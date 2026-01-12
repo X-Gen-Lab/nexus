@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- N/A
-
-### Changed
-- N/A
+- Bilingual documentation support (English/Chinese)
+- Sphinx documentation with separate EN/CN builds
+- Documentation build script (build_docs.bat)
 
 ### Fixed
-- N/A
+- UART test API compatibility with hal_uart.h
+- C++20 designated initializers for MSVC compatibility
+- Chinese navigation in Sphinx sidebar
 
 ---
 
