@@ -39,9 +39,11 @@ jobs:
 
     - name: Generate Coverage Report
       run: |
-        lcov --capture --directory build --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/googletest/*' --output-file coverage.info
-        lcov --list coverage.info
+        lcov --capture --directory build --output-file coverage.info \
+          --ignore-errors mismatch,inconsistent,gcov
+        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/googletest/*' \
+          --output-file coverage.info --ignore-errors unused
+        lcov --list coverage.info || true
 
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v4
