@@ -38,6 +38,7 @@ cmake-build-*/
 # Documentation build
 docs/build/
 docs/api/
+docs/sphinx/_build/
 *.log
 
 # Test coverage
@@ -68,3 +69,12 @@ desktop.ini
 *.zip
 *.tar.gz
 *.rar
+
+# Sphinx
+docs/sphinx/_build/
+docs/sphinx/.doctrees/
+
+# Doxygen
+docs/api/html/
+docs/api/xml/
+docs/api/latex/
