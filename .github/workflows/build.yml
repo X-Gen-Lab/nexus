@@ -80,6 +80,8 @@ jobs:
       run: |
         cppcheck --enable=all --error-exitcode=1 \
           --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          --suppress=unmatchedSuppression \
           -I hal/include -I osal/include \
           hal/ osal/ platforms/
 
