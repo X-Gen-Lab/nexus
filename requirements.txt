@@ -1,0 +1,21 @@
+# 脚本交付验证系统依赖
+
+# 核心依赖
+pathlib2>=2.3.0; python_version < '3.4'
+
+# 测试依赖
+pytest>=7.0.0
+pytest-cov>=4.0.0
+hypothesis>=6.0.0
+
+# 报告生成依赖
+jinja2>=3.0.0
+markdown>=3.0.0
+
+# 开发依赖
+black>=22.0.0
+flake8>=5.0.0
+mypy>=1.0.0
+
+# 平台特定依赖
+psutil>=5.8.0  # 用于性能监控
