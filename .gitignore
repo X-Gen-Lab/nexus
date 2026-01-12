@@ -49,6 +49,10 @@ Testing/
 *.gcov
 lcov.info
 
+# Test results
+test_results.xml
+*.xml.bak
+
 # Package managers
 node_modules/
 __pycache__/
