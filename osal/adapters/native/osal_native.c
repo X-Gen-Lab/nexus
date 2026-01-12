@@ -11,6 +11,12 @@
  *                  This is a minimal single-threaded implementation.
  */
 
+/* Enable usleep on POSIX systems */
+#ifndef _WIN32
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#endif
+
 #include "osal/osal.h"
 #include <string.h>
 
