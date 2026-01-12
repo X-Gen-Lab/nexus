@@ -89,12 +89,13 @@ jobs:
           -I hal/include -I osal/include \
           -I platforms/native/include \
           -I platforms/stm32f4/include \
-          hal/ osal/ platforms/
+          hal/ osal/ platforms/ applications/
 
     - name: Check Code Format
       run: |
-        # Check all project code except third-party (ext/) directory
-        find hal osal platforms applications -name "*.c" -o -name "*.h" | \
+        # Check all project code except third-party (ext/, vendors/) directories
+        find hal osal platforms applications \
+          -name "*.c" -o -name "*.h" | \
           xargs clang-format --dry-run --Werror
 
   # Documentation build
