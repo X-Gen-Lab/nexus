@@ -86,41 +86,41 @@
     - **Property 9: I2C Protocol Compliance**
     - **Validates: Requirements 4.4**
 
-- [ ] 7. HAL Timer 模块实现
-  - [ ] 7.1 实现 Native 平台 Timer 驱动
+- [x] 7. HAL Timer 模块实现
+  - [x] 7.1 实现 Native 平台 Timer 驱动
     - 创建 hal_timer_native.c
     - 实现 init, start, stop, get_count, set_callback 函数
     - 实现 PWM 相关函数
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
-  - [ ] 7.2 编写 Timer 单元测试
+  - [x] 7.2 编写 Timer 单元测试
     - 测试定时器启停
     - 测试 PWM 配置
     - _Requirements: 5.1, 5.2, 5.3, 5.6_
-  - [ ] 7.3 编写 Timer 属性测试
+  - [x] 7.3 编写 Timer 属性测试
     - **Property 10: Timer Periodic Callback**
     - **Property 11: Timer Oneshot Callback**
     - **Property 12: PWM Duty Cycle Range**
     - **Validates: Requirements 5.4, 5.5, 5.7**
 
-- [ ] 8. HAL ADC 模块实现
-  - [ ] 8.1 实现 Native 平台 ADC 驱动
+- [x] 8. HAL ADC 模块实现
+  - [x] 8.1 实现 Native 平台 ADC 驱动
     - 创建 hal_adc_native.c
     - 实现 init, read, read_multi, to_millivolts 函数
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
-  - [ ] 8.2 编写 ADC 单元测试
+  - [x] 8.2 编写 ADC 单元测试
     - 测试初始化
     - 测试读取操作
     - _Requirements: 6.1, 6.2_
-  - [ ] 8.3 编写 ADC 属性测试
+  - [x] 8.3 编写 ADC 属性测试
     - **Property 13: ADC Voltage Conversion**
     - **Validates: Requirements 6.4**
 
-- [ ] 9. Checkpoint - HAL 完整模块验证
+- [x] 9. Checkpoint - HAL 完整模块验证
   - 确保所有 HAL 模块测试通过
   - 验证 Native 平台所有 HAL 功能正常
   - 如有问题请询问用户
 
-- [ ] 10. OSAL Task 模块实现
+- [-] 10. OSAL Task 模块实现
   - [ ] 10.1 实现 Native 平台 Task 适配
     - 更新 osal_native.c 实现任务管理
     - 使用 pthread 实现任务创建和调度
