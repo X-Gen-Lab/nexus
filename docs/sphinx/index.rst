@@ -1,5 +1,9 @@
-Nexus Embedded Platform Documentation
-=====================================
+Nexus Embedded Platform
+=======================
+
+.. note::
+   
+   **Language / 语言**: `English <index.html>`_ | `中文 <index_cn.html>`_
 
 Welcome to the Nexus Embedded Platform documentation. Nexus is a world-class
 embedded software development platform designed for building reliable,
@@ -37,13 +41,6 @@ secure, and portable embedded applications.
    development/coding_standards
    development/testing
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 Features
 --------
 
@@ -61,3 +58,10 @@ Quick Links
 * `GitHub Repository <https://github.com/nexus-team/nexus>`_
 * `Issue Tracker <https://github.com/nexus-team/nexus/issues>`_
 * `Changelog <https://github.com/nexus-team/nexus/blob/main/CHANGELOG.md>`_
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
