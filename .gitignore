@@ -1,0 +1,69 @@
+# Build directories
+build/
+out/
+cmake-build-*/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# VS Code (keep settings, ignore user-specific)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Compiled files
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.d
+
+# Libraries
+*.a
+*.lib
+
+# Debug files
+*.dSYM/
+
+# Documentation build
+docs/build/
+docs/api/
+*.log
+
+# Test coverage
+coverage/
+*.gcno
+*.gcda
+*.gcov
+lcov.info
+
+# Package managers
+node_modules/
+__pycache__/
+*.pyc
+.env
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
