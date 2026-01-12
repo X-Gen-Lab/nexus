@@ -43,6 +43,7 @@ docs/sphinx/_build/
 
 # Test coverage
 coverage/
+Testing/
 *.gcno
 *.gcda
 *.gcov
