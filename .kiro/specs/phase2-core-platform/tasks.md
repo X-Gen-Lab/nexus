@@ -35,25 +35,25 @@
     - 添加中断支持
     - _Requirements: 12.1, 1.7, 1.8_
 
-- [ ] 3. HAL UART 模块实现
-  - [ ] 3.1 实现 Native 平台 UART 驱动
+- [x] 3. HAL UART 模块实现
+  - [x] 3.1 实现 Native 平台 UART 驱动
     - 实现 hal_uart_native.c 使用环形缓冲区
     - 实现 init, transmit, receive, putc, getc 函数
     - _Requirements: 2.1, 2.3, 2.5, 2.6, 2.7_
-  - [ ] 3.2 编写 UART 单元测试
+  - [x] 3.2 编写 UART 单元测试
     - 测试初始化配置
     - 测试发送接收
     - _Requirements: 2.1, 2.3, 2.5_
-  - [ ] 3.3 编写 UART 属性测试
+  - [x] 3.3 编写 UART 属性测试
     - **Property 4: UART Data Integrity**
     - **Property 5: UART Baudrate Accuracy**
     - **Validates: Requirements 2.2, 2.3, 2.5, 2.6, 2.7**
-  - [ ] 3.4 完善 STM32F4 UART 驱动
+  - [x] 3.4 完善 STM32F4 UART 驱动
     - 完善 hal_uart_stm32f4.c 实现
     - 添加中断和回调支持
     - _Requirements: 12.2, 2.4, 2.8_
 
-- [ ] 4. Checkpoint - HAL 基础模块验证
+- [x] 4. Checkpoint - HAL 基础模块验证
   - 确保 GPIO 和 UART 测试通过
   - 验证 Native 平台编译运行正常
   - 如有问题请询问用户

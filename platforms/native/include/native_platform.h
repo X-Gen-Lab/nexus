@@ -40,6 +40,52 @@ native_gpio_pin_t* native_gpio_get_state(uint8_t port, uint8_t pin);
  */
 void native_gpio_reset_all(void);
 
+/*===========================================================================*/
+/* UART Test Helpers                                                          */
+/*===========================================================================*/
+
+/**
+ * \brief           Simulated UART state (opaque for testing)
+ */
+typedef struct native_uart_state native_uart_state_t;
+
+/**
+ * \brief           Reset all simulated UART states
+ */
+void native_uart_reset_all(void);
+
+/**
+ * \brief           Get simulated UART state (for testing)
+ * \param[in]       instance: UART instance
+ * \return          Pointer to UART state or NULL
+ */
+native_uart_state_t* native_uart_get_state(int instance);
+
+/**
+ * \brief           Inject data into UART RX buffer (for testing)
+ * \param[in]       instance: UART instance
+ * \param[in]       data: Data to inject
+ * \param[in]       len: Length of data
+ * \return          true on success, false on failure
+ */
+bool native_uart_inject_rx_data(int instance, const uint8_t* data, size_t len);
+
+/**
+ * \brief           Get data from UART TX buffer (for testing)
+ * \param[in]       instance: UART instance
+ * \param[out]      data: Buffer to store data
+ * \param[in]       max_len: Maximum length to read
+ * \return          Number of bytes read
+ */
+size_t native_uart_get_tx_data(int instance, uint8_t* data, size_t max_len);
+
+/**
+ * \brief           Get actual configured baudrate (for testing)
+ * \param[in]       instance: UART instance
+ * \return          Actual baudrate or 0 if not initialized
+ */
+uint32_t native_uart_get_actual_baudrate(int instance);
+
 #ifdef __cplusplus
 }
 #endif
