@@ -73,16 +73,16 @@
     - **Property 8: SPI CS Control**
     - **Validates: Requirements 3.2, 3.5, 3.6, 3.7**
 
-- [ ] 6. HAL I2C 模块实现
-  - [ ] 6.1 实现 Native 平台 I2C 驱动
+- [x] 6. HAL I2C 模块实现
+  - [x] 6.1 实现 Native 平台 I2C 驱动
     - 创建 hal_i2c_native.c
     - 实现 init, master_transmit, master_receive, mem_write, mem_read 函数
     - _Requirements: 4.1, 4.4, 4.5, 4.6, 4.7_
-  - [ ] 6.2 编写 I2C 单元测试
+  - [x] 6.2 编写 I2C 单元测试
     - 测试速度配置
     - 测试读写操作
     - _Requirements: 4.1, 4.2, 4.3_
-  - [ ] 6.3 编写 I2C 属性测试
+  - [x] 6.3 编写 I2C 属性测试
     - **Property 9: I2C Protocol Compliance**
     - **Validates: Requirements 4.4**
 
