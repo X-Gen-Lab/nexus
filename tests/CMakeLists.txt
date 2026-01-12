@@ -29,6 +29,9 @@ add_executable(nexus_tests
     hal/test_hal_uart.cpp
 )
 
+# Require C++20 for designated initializers
+target_compile_features(nexus_tests PRIVATE cxx_std_20)
+
 target_include_directories(nexus_tests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/hal/include
