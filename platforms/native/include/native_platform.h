@@ -11,9 +11,11 @@
 #ifndef NATIVE_PLATFORM_H
 #define NATIVE_PLATFORM_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "hal/hal_adc.h"
 #include "hal/hal_spi.h"
+#include "hal/hal_timer.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +25,9 @@ extern "C" {
  * \brief           Simulated GPIO state
  */
 typedef struct {
-    bool     configured;    /**< Pin configured flag */
-    bool     is_output;     /**< Output mode flag */
-    bool     level;         /**< Current level */
+    bool configured; /**< Pin configured flag */
+    bool is_output;  /**< Output mode flag */
+    bool level;      /**< Current level */
 } native_gpio_pin_t;
 
 /**
@@ -216,8 +218,9 @@ bool native_i2c_set_device_ready(int instance, uint16_t dev_addr, bool ready);
  * \param[in]       len: Length of data
  * \return          true on success, false on failure
  */
-bool native_i2c_write_device_memory(int instance, uint16_t dev_addr, 
-                                    uint16_t mem_addr, const uint8_t* data, size_t len);
+bool native_i2c_write_device_memory(int instance, uint16_t dev_addr,
+                                    uint16_t mem_addr, const uint8_t* data,
+                                    size_t len);
 
 /**
  * \brief           Read data from device memory (for testing)
@@ -229,7 +232,8 @@ bool native_i2c_write_device_memory(int instance, uint16_t dev_addr,
  * \return          true on success, false on failure
  */
 bool native_i2c_read_device_memory(int instance, uint16_t dev_addr,
-                                   uint16_t mem_addr, uint8_t* data, size_t len);
+                                   uint16_t mem_addr, uint8_t* data,
+                                   size_t len);
 
 /**
  * \brief           Get data from I2C TX buffer (for testing)
@@ -262,6 +266,162 @@ uint16_t native_i2c_get_last_dev_addr(int instance);
  * \return          Last memory address or 0
  */
 uint16_t native_i2c_get_last_mem_addr(int instance);
+
+/*===========================================================================*/
+/* Timer Test Helpers                                                         */
+/*===========================================================================*/
+
+/**
+ * \brief           Simulated Timer state (opaque for testing)
+ */
+typedef struct native_timer_state native_timer_state_t;
+
+/**
+ * \brief           Reset all simulated Timer states
+ */
+void native_timer_reset_all(void);
+
+/**
+ * \brief           Get simulated Timer state (for testing)
+ * \param[in]       instance: Timer instance
+ * \return          Pointer to Timer state or NULL
+ */
+native_timer_state_t* native_timer_get_state(int instance);
+
+/**
+ * \brief           Check if Timer instance is initialized
+ * \param[in]       instance: Timer instance
+ * \return          true if initialized, false otherwise
+ */
+bool native_timer_is_initialized(int instance);
+
+/**
+ * \brief           Check if Timer instance is running
+ * \param[in]       instance: Timer instance
+ * \return          true if running, false otherwise
+ */
+bool native_timer_is_running(int instance);
+
+/**
+ * \brief           Get configured period in microseconds (for testing)
+ * \param[in]       instance: Timer instance
+ * \return          Period in microseconds or 0 if not initialized
+ */
+uint32_t native_timer_get_period_us(int instance);
+
+/**
+ * \brief           Get configured timer mode (for testing)
+ * \param[in]       instance: Timer instance
+ * \return          Timer mode
+ */
+hal_timer_mode_t native_timer_get_mode(int instance);
+
+/**
+ * \brief           Get callback invocation count (for testing)
+ * \param[in]       instance: Timer instance
+ * \return          Number of times callback was invoked
+ */
+uint32_t native_timer_get_callback_count(int instance);
+
+/**
+ * \brief           Simulate timer period elapsed (for testing)
+ * \param[in]       instance: Timer instance
+ * \return          true if callback was invoked, false otherwise
+ *
+ * This function simulates the timer period expiring and invokes
+ * the registered callback. For ONESHOT mode, the timer stops.
+ * For PERIODIC mode, the timer continues running.
+ */
+bool native_timer_simulate_period_elapsed(int instance);
+
+/*===========================================================================*/
+/* PWM Test Helpers                                                           */
+/*===========================================================================*/
+
+/**
+ * \brief           Check if PWM channel is initialized
+ * \param[in]       instance: Timer instance
+ * \param[in]       channel: PWM channel
+ * \return          true if initialized, false otherwise
+ */
+bool native_pwm_is_initialized(int instance, int channel);
+
+/**
+ * \brief           Check if PWM channel is running
+ * \param[in]       instance: Timer instance
+ * \param[in]       channel: PWM channel
+ * \return          true if running, false otherwise
+ */
+bool native_pwm_is_running(int instance, int channel);
+
+/**
+ * \brief           Get PWM frequency (for testing)
+ * \param[in]       instance: Timer instance
+ * \param[in]       channel: PWM channel
+ * \return          PWM frequency in Hz or 0 if not initialized
+ */
+uint32_t native_pwm_get_frequency(int instance, int channel);
+
+/**
+ * \brief           Get PWM duty cycle (for testing)
+ * \param[in]       instance: Timer instance
+ * \param[in]       channel: PWM channel
+ * \return          Duty cycle (0-10000) or 0 if not initialized
+ */
+uint16_t native_pwm_get_duty_cycle(int instance, int channel);
+
+/*===========================================================================*/
+/* ADC Test Helpers                                                           */
+/*===========================================================================*/
+
+/**
+ * \brief           Simulated ADC state (opaque for testing)
+ */
+typedef struct native_adc_state native_adc_state_t;
+
+/**
+ * \brief           Reset all simulated ADC states
+ */
+void native_adc_reset_all(void);
+
+/**
+ * \brief           Get simulated ADC state (for testing)
+ * \param[in]       instance: ADC instance
+ * \return          Pointer to ADC state or NULL
+ */
+native_adc_state_t* native_adc_get_state(int instance);
+
+/**
+ * \brief           Check if ADC instance is initialized
+ * \param[in]       instance: ADC instance
+ * \return          true if initialized, false otherwise
+ */
+bool native_adc_is_initialized(int instance);
+
+/**
+ * \brief           Get configured ADC resolution (for testing)
+ * \param[in]       instance: ADC instance
+ * \return          ADC resolution
+ */
+hal_adc_resolution_t native_adc_get_resolution(int instance);
+
+/**
+ * \brief           Set simulated ADC value for a channel (for testing)
+ * \param[in]       instance: ADC instance
+ * \param[in]       channel: ADC channel
+ * \param[in]       value: Value to set
+ * \return          true on success, false on failure
+ */
+bool native_adc_set_simulated_value(int instance, uint8_t channel,
+                                    uint16_t value);
+
+/**
+ * \brief           Get simulated ADC value for a channel (for testing)
+ * \param[in]       instance: ADC instance
+ * \param[in]       channel: ADC channel
+ * \return          Simulated value
+ */
+uint16_t native_adc_get_simulated_value(int instance, uint8_t channel);
 
 #ifdef __cplusplus
 }

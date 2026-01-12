@@ -33,6 +33,10 @@ add_executable(nexus_tests
     hal/test_hal_spi_properties.cpp
     hal/test_hal_i2c.cpp
     hal/test_hal_i2c_properties.cpp
+    hal/test_hal_timer.cpp
+    hal/test_hal_timer_properties.cpp
+    hal/test_hal_adc.cpp
+    hal/test_hal_adc_properties.cpp
 )
 
 # Require C++20 for designated initializers

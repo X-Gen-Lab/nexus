@@ -11,6 +11,8 @@ target_sources(platform_native
         src/hal_uart_native.c
         src/hal_spi_native.c
         src/hal_i2c_native.c
+        src/hal_timer_native.c
+        src/hal_adc_native.c
         src/hal_system_native.c
 )
 
