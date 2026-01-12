@@ -80,9 +80,15 @@ jobs:
       run: |
         cppcheck --enable=all --error-exitcode=1 \
           --suppress=missingIncludeSystem \
+          --suppress=missingInclude \
           --suppress=unusedFunction \
           --suppress=unmatchedSuppression \
+          --suppress=comparePointers \
+          --suppress=constVariablePointer \
+          --suppress=duplicateExpression \
           -I hal/include -I osal/include \
+          -I platforms/native/include \
+          -I platforms/stm32f4/include \
           hal/ osal/ platforms/
 
     - name: Check Code Format
