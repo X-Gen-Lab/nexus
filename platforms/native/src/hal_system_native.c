@@ -8,6 +8,12 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 
+/* Enable POSIX features for clock_gettime and usleep */
+#ifndef _WIN32
+#define _POSIX_C_SOURCE 199309L
+#define _DEFAULT_SOURCE
+#endif
+
 #include "hal/hal_def.h"
 
 #ifdef _WIN32

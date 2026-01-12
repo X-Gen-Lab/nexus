@@ -28,6 +28,18 @@ extern "C" {
 #define APB1PERIPH_BASE     PERIPH_BASE
 #define APB2PERIPH_BASE     (PERIPH_BASE + 0x00010000UL)
 
+/**
+ * \brief           Memory base addresses
+ */
+#define FLASH_BASE          0x08000000UL
+#define SRAM_BASE           0x20000000UL
+
+/**
+ * \brief           Cortex-M4 System Control Block base
+ */
+#define SCS_BASE            0xE000E000UL
+#define SCB_BASE            (SCS_BASE + 0x0D00UL)
+
 #define GPIOA_BASE          (AHB1PERIPH_BASE + 0x0000UL)
 #define GPIOB_BASE          (AHB1PERIPH_BASE + 0x0400UL)
 #define GPIOC_BASE          (AHB1PERIPH_BASE + 0x0800UL)
@@ -120,6 +132,33 @@ typedef struct {
 } SYSCFG_TypeDef;
 
 /**
+ * \brief           SCB Register Structure (System Control Block)
+ */
+typedef struct {
+    volatile uint32_t CPUID;    /**< CPUID Base Register */
+    volatile uint32_t ICSR;     /**< Interrupt Control and State Register */
+    volatile uint32_t VTOR;     /**< Vector Table Offset Register */
+    volatile uint32_t AIRCR;    /**< Application Interrupt and Reset Control */
+    volatile uint32_t SCR;      /**< System Control Register */
+    volatile uint32_t CCR;      /**< Configuration Control Register */
+    volatile uint8_t  SHP[12];  /**< System Handlers Priority Registers */
+    volatile uint32_t SHCSR;    /**< System Handler Control and State */
+    volatile uint32_t CFSR;     /**< Configurable Fault Status Register */
+    volatile uint32_t HFSR;     /**< HardFault Status Register */
+    volatile uint32_t DFSR;     /**< Debug Fault Status Register */
+    volatile uint32_t MMFAR;    /**< MemManage Fault Address Register */
+    volatile uint32_t BFAR;     /**< BusFault Address Register */
+    volatile uint32_t AFSR;     /**< Auxiliary Fault Status Register */
+    volatile uint32_t PFR[2];   /**< Processor Feature Register */
+    volatile uint32_t DFR;      /**< Debug Feature Register */
+    volatile uint32_t ADR;      /**< Auxiliary Feature Register */
+    volatile uint32_t MMFR[4];  /**< Memory Model Feature Register */
+    volatile uint32_t ISAR[5];  /**< Instruction Set Attributes Register */
+    uint32_t RESERVED0[5];
+    volatile uint32_t CPACR;    /**< Coprocessor Access Control Register */
+} SCB_TypeDef;
+
+/**
  * \brief           Peripheral instances
  */
 #define GPIOA   ((GPIO_TypeDef*)GPIOA_BASE)
@@ -139,6 +178,13 @@ typedef struct {
 
 #define EXTI    ((EXTI_TypeDef*)EXTI_BASE)
 #define SYSCFG  ((SYSCFG_TypeDef*)SYSCFG_BASE)
+#define SCB     ((SCB_TypeDef*)SCB_BASE)
+
+/**
+ * \brief           FPU definitions
+ */
+#define __FPU_PRESENT   1
+#define __FPU_USED      1
 
 /**
  * \brief           RCC AHB1ENR bit definitions
