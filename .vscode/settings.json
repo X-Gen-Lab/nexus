@@ -1,0 +1,69 @@
+{
+    // C/C++ Configuration
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.clang_format_style": "file",
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "C_Cpp.doxygen.generatedStyle": "/**",
+
+    // Doxygen Generator (backslash style)
+    "doxdocgen.file.fileTemplate": "\\file            {name}",
+    "doxdocgen.generic.briefTemplate": "\\brief           {text}",
+    "doxdocgen.generic.paramTemplate": "\\param[{direction}]       {param}: ",
+    "doxdocgen.generic.returnTemplate": "\\return          ",
+    "doxdocgen.generic.authorTag": "\\author          {author} ({email})",
+    "doxdocgen.generic.dateTemplate": "\\date            {date}",
+    "doxdocgen.file.versionTag": "\\version         1.0.0",
+    "doxdocgen.generic.useGitUserName": true,
+    "doxdocgen.generic.useGitUserEmail": true,
+    "doxdocgen.cpp.tparamTemplate": "\\tparam          {param}: ",
+    "doxdocgen.generic.commandSuggestionAddPrefix": true,
+    "doxdocgen.file.fileOrder": [
+        "file",
+        "brief",
+        "author",
+        "version",
+        "date",
+        "empty",
+        "copyright"
+    ],
+    "doxdocgen.file.copyrightTag": [
+        "\\copyright       Copyright (c) 2026 Nexus Team"
+    ],
+
+    // Editor Configuration
+    "editor.formatOnSave": true,
+    "editor.rulers": [80],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+
+    // File Associations
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "*.hpp": "cpp",
+        "*.cpp": "cpp"
+    },
+
+    // CMake Configuration
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.generator": "Ninja",
+
+    // Search Exclude
+    "search.exclude": {
+        "**/build": true,
+        "**/third_party": true,
+        "**/docs/build": true
+    },
+
+    // Files Exclude
+    "files.exclude": {
+        "**/.git": true,
+        "**/build": true,
+        "**/*.o": true,
+        "**/*.elf": true
+    }
+}

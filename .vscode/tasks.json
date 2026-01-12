@@ -1,0 +1,84 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Configure CMake (Debug)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B", "build",
+                "-G", "Ninja",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DNEXUS_PLATFORM=${input:platform}",
+                "-DNEXUS_BUILD_TESTS=ON"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Configure CMake (Release)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B", "build",
+                "-G", "Ninja",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DNEXUS_PLATFORM=${input:platform}"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--parallel"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--target", "clean"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "ctest",
+            "args": ["--test-dir", "build", "--output-on-failure"],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Format Code",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Get-ChildItem -Recurse -Include *.c,*.h | ForEach-Object { clang-format -i $_.FullName }"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Docs",
+            "type": "shell",
+            "command": "doxygen",
+            "args": ["Doxyfile"],
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "platform",
+            "type": "pickString",
+            "description": "Select target platform",
+            "options": ["stm32f4", "stm32h7", "esp32", "nrf52", "native"],
+            "default": "stm32f4"
+        }
+    ]
+}
