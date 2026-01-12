@@ -44,6 +44,7 @@ docs/sphinx/_build/
 # Test coverage
 coverage/
 Testing/
+.hypothesis/
 *.gcno
 *.gcda
 *.gcov
