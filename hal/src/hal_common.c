@@ -43,32 +43,8 @@ hal_status_t hal_deinit(void)
     return HAL_OK;
 }
 
-/* Weak implementations - to be overridden by platform */
-
-__attribute__((weak))
-void hal_delay_ms(uint32_t ms)
-{
-    /* Simple busy-wait delay - should be overridden */
-    volatile uint32_t count = ms * 1000;
-    while (count--) {
-        __asm volatile("nop");
-    }
-}
-
-__attribute__((weak))
-void hal_delay_us(uint32_t us)
-{
-    /* Simple busy-wait delay - should be overridden */
-    volatile uint32_t count = us;
-    while (count--) {
-        __asm volatile("nop");
-    }
-}
-
-__attribute__((weak))
-uint32_t hal_get_tick(void)
-{
-    /* Should be overridden by platform */
-    static uint32_t tick = 0;
-    return tick++;
-}
+/*
+ * Note: The following functions are implemented in platform-specific code.
+ * For native platform, see platforms/native/src/hal_system_native.c
+ * For STM32F4, see platforms/stm32f4/src/hal_system_stm32f4.c
+ */

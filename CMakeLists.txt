@@ -77,28 +77,42 @@ endif()
 ##############################################################################
 # Compiler Flags
 ##############################################################################
-add_compile_options(
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Werror
-    -Wno-unused-parameter
-    -ffunction-sections
-    -fdata-sections
-)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-Og -g3)
-    add_compile_definitions(DEBUG)
+if(MSVC)
+    # MSVC compiler flags
+    add_compile_options(
+        /W4
+        /WX
+        /wd4100  # unreferenced formal parameter
+    )
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_definitions(DEBUG)
+    else()
+        add_compile_definitions(NDEBUG)
+    endif()
 else()
-    add_compile_options(-O2)
-    add_compile_definitions(NDEBUG)
-endif()
+    # GCC/Clang compiler flags
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+        -Wno-unused-parameter
+        -ffunction-sections
+        -fdata-sections
+    )
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-Og -g3)
+        add_compile_definitions(DEBUG)
+    else()
+        add_compile_options(-O2)
+        add_compile_definitions(NDEBUG)
+    endif()
 
-# Coverage flags
-if(NEXUS_ENABLE_COVERAGE)
-    add_compile_options(--coverage)
-    add_link_options(--coverage)
+    # Coverage flags (GCC/Clang only)
+    if(NEXUS_ENABLE_COVERAGE)
+        add_compile_options(--coverage)
+        add_link_options(--coverage)
+    endif()
 endif()
 
 ##############################################################################

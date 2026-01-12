@@ -58,7 +58,18 @@ typedef enum {
     HAL_ERROR_FRAMING       = 304,  /**< Framing error */
     HAL_ERROR_NOISE         = 305,  /**< Noise error */
 
+    /* Aliases for compatibility */
+    HAL_ERR_PARAM           = HAL_ERROR_INVALID_PARAM,
+    HAL_ERR_STATE           = HAL_ERROR_INVALID_STATE,
+    HAL_ERR_NOT_SUPPORTED   = HAL_ERROR_NOT_SUPPORTED,
+    HAL_ERR_FAIL            = HAL_ERROR,
+
 } hal_status_t;
+
+/**
+ * \brief           Wait forever timeout value
+ */
+#define HAL_WAIT_FOREVER        0xFFFFFFFFUL
 
 /**
  * \brief           Check if status is OK

@@ -13,8 +13,14 @@ target_include_directories(osal_interface
 # OSAL implementation library
 add_library(osal STATIC)
 
-# Select adapter based on backend
-if(NEXUS_OSAL_BACKEND STREQUAL "baremetal")
+# Select adapter based on backend and platform
+if(NEXUS_PLATFORM STREQUAL "native")
+    target_sources(osal
+        PRIVATE
+            adapters/native/osal_native.c
+    )
+    message(STATUS "OSAL: Using native adapter")
+elseif(NEXUS_OSAL_BACKEND STREQUAL "baremetal")
     target_sources(osal
         PRIVATE
             adapters/baremetal/osal_baremetal.c
