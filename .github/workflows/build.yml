@@ -93,9 +93,9 @@ jobs:
 
     - name: Check Code Format
       run: |
-        # Check format but don't fail the build (informational only)
-        find hal/src hal/include osal/include -name "*.c" -o -name "*.h" | \
-          xargs clang-format --dry-run -Werror 2>&1 || echo "Format check completed with warnings"
+        # Check all project code except third-party (ext/) directory
+        find hal osal platforms applications -name "*.c" -o -name "*.h" | \
+          xargs clang-format --dry-run --Werror
 
   # Documentation build
   docs:
