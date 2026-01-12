@@ -1,0 +1,25 @@
+##############################################################################
+# Native Platform Support (for host testing)
+##############################################################################
+
+# Platform library
+add_library(platform_native STATIC)
+
+target_sources(platform_native
+    PRIVATE
+        src/hal_gpio_native.c
+        src/hal_uart_native.c
+        src/hal_system_native.c
+)
+
+target_include_directories(platform_native
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(platform_native
+    PUBLIC
+        hal_interface
+)
+
+# Native platform doesn't need linker script
