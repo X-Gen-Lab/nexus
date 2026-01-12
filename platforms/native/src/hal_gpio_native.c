@@ -47,8 +47,11 @@ hal_status_t hal_gpio_init(hal_gpio_port_t port,
 {
     native_gpio_pin_t* state;
 
-    if (port >= MAX_PORTS || pin >= MAX_PINS || config == NULL) {
-        return HAL_ERR_PARAM;
+    if (port >= MAX_PORTS || pin >= MAX_PINS) {
+        return HAL_ERROR_INVALID_PARAM;
+    }
+    if (config == NULL) {
+        return HAL_ERROR_NULL_POINTER;
     }
 
     state = &gpio_state[port][pin];
@@ -64,7 +67,7 @@ hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin)
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
-        return HAL_ERR_PARAM;
+        return HAL_ERROR_INVALID_PARAM;
     }
 
     state = &gpio_state[port][pin];
@@ -82,12 +85,15 @@ hal_status_t hal_gpio_write(hal_gpio_port_t port,
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
-        return HAL_ERR_PARAM;
+        return HAL_ERROR_INVALID_PARAM;
     }
 
     state = &gpio_state[port][pin];
-    if (!state->configured || !state->is_output) {
-        return HAL_ERR_STATE;
+    if (!state->configured) {
+        return HAL_ERROR_NOT_INIT;
+    }
+    if (!state->is_output) {
+        return HAL_ERROR_INVALID_STATE;
     }
 
     state->level = (level == HAL_GPIO_LEVEL_HIGH);
@@ -100,13 +106,16 @@ hal_status_t hal_gpio_read(hal_gpio_port_t port,
 {
     native_gpio_pin_t* state;
 
-    if (port >= MAX_PORTS || pin >= MAX_PINS || level == NULL) {
-        return HAL_ERR_PARAM;
+    if (port >= MAX_PORTS || pin >= MAX_PINS) {
+        return HAL_ERROR_INVALID_PARAM;
+    }
+    if (level == NULL) {
+        return HAL_ERROR_NULL_POINTER;
     }
 
     state = &gpio_state[port][pin];
     if (!state->configured) {
-        return HAL_ERR_STATE;
+        return HAL_ERROR_NOT_INIT;
     }
 
     *level = state->level ? HAL_GPIO_LEVEL_HIGH : HAL_GPIO_LEVEL_LOW;
@@ -118,12 +127,15 @@ hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin)
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
-        return HAL_ERR_PARAM;
+        return HAL_ERROR_INVALID_PARAM;
     }
 
     state = &gpio_state[port][pin];
-    if (!state->configured || !state->is_output) {
-        return HAL_ERR_STATE;
+    if (!state->configured) {
+        return HAL_ERROR_NOT_INIT;
+    }
+    if (!state->is_output) {
+        return HAL_ERROR_INVALID_STATE;
     }
 
     state->level = !state->level;

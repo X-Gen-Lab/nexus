@@ -38,6 +38,8 @@ extern "C" {
 #define GPIOH_BASE          (AHB1PERIPH_BASE + 0x1C00UL)
 
 #define RCC_BASE            (AHB1PERIPH_BASE + 0x3800UL)
+#define EXTI_BASE           (APB2PERIPH_BASE + 0x3C00UL)
+#define SYSCFG_BASE         (APB2PERIPH_BASE + 0x3800UL)
 
 #define USART1_BASE         (APB2PERIPH_BASE + 0x1000UL)
 #define USART2_BASE         (APB1PERIPH_BASE + 0x4400UL)
@@ -95,6 +97,29 @@ typedef struct {
 } USART_TypeDef;
 
 /**
+ * \brief           EXTI Register Structure
+ */
+typedef struct {
+    volatile uint32_t IMR;      /**< Interrupt mask register */
+    volatile uint32_t EMR;      /**< Event mask register */
+    volatile uint32_t RTSR;     /**< Rising trigger selection register */
+    volatile uint32_t FTSR;     /**< Falling trigger selection register */
+    volatile uint32_t SWIER;    /**< Software interrupt event register */
+    volatile uint32_t PR;       /**< Pending register */
+} EXTI_TypeDef;
+
+/**
+ * \brief           SYSCFG Register Structure
+ */
+typedef struct {
+    volatile uint32_t MEMRMP;   /**< Memory remap register */
+    volatile uint32_t PMC;      /**< Peripheral mode configuration */
+    volatile uint32_t EXTICR[4];/**< External interrupt configuration */
+    uint32_t RESERVED[2];
+    volatile uint32_t CMPCR;    /**< Compensation cell control register */
+} SYSCFG_TypeDef;
+
+/**
  * \brief           Peripheral instances
  */
 #define GPIOA   ((GPIO_TypeDef*)GPIOA_BASE)
@@ -112,6 +137,9 @@ typedef struct {
 #define USART2  ((USART_TypeDef*)USART2_BASE)
 #define USART3  ((USART_TypeDef*)USART3_BASE)
 
+#define EXTI    ((EXTI_TypeDef*)EXTI_BASE)
+#define SYSCFG  ((SYSCFG_TypeDef*)SYSCFG_BASE)
+
 /**
  * \brief           RCC AHB1ENR bit definitions
  */
@@ -123,6 +151,31 @@ typedef struct {
 #define RCC_AHB1ENR_GPIOFEN     (1UL << 5)
 #define RCC_AHB1ENR_GPIOGEN     (1UL << 6)
 #define RCC_AHB1ENR_GPIOHEN     (1UL << 7)
+
+/**
+ * \brief           RCC APB2ENR bit definitions
+ */
+#define RCC_APB2ENR_SYSCFGEN    (1UL << 14)
+
+/**
+ * \brief           NVIC IRQ numbers for EXTI
+ */
+typedef enum {
+    EXTI0_IRQn      = 6,
+    EXTI1_IRQn      = 7,
+    EXTI2_IRQn      = 8,
+    EXTI3_IRQn      = 9,
+    EXTI4_IRQn      = 10,
+    EXTI9_5_IRQn    = 23,
+    EXTI15_10_IRQn  = 40
+} IRQn_Type;
+
+/**
+ * \brief           NVIC functions (simplified)
+ */
+void NVIC_EnableIRQ(IRQn_Type IRQn);
+void NVIC_DisableIRQ(IRQn_Type IRQn);
+void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority);
 
 /**
  * \brief           System clock frequency

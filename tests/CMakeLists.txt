@@ -26,6 +26,7 @@ include(GoogleTest)
 add_executable(nexus_tests
     test_main.cpp
     hal/test_hal_gpio.cpp
+    hal/test_hal_gpio_properties.cpp
     hal/test_hal_uart.cpp
 )
 
