@@ -1,0 +1,274 @@
+---
+Language:        Cpp  # 设置语言为C++
+AccessModifierOffset: -2  # 访问修饰符（如public、private）的缩进偏移量
+AlignAfterOpenBracket: Align  # 左括号后对齐参数
+AlignArrayOfStructures: None  # 不对齐结构体数组
+AlignConsecutiveAssignments:
+  Enabled:         false  # 不对连续赋值语句进行对齐
+  AcrossEmptyLines: false  # 不跨空行对齐
+  AcrossComments:  false  # 不跨注释对齐
+  AlignCompound:   false  # 不对复合语句对齐
+  AlignFunctionPointers: false  # 不对函数指针对齐
+  PadOperators:    true  # 在操作符周围添加空格
+AlignConsecutiveBitFields:
+  Enabled:         true   # 对连续位域声明进行对齐
+  AcrossEmptyLines: true   # 跨空行对齐
+  AcrossComments:  true   # 跨注释对齐
+  AlignCompound:   false  # 不对复合语句对齐
+  AlignFunctionPointers: false  # 不对函数指针对齐
+  PadOperators:    false  # 不在操作符周围添加空格
+AlignConsecutiveDeclarations:
+  Enabled:         false  # 不对连续变量声明进行对齐
+  AcrossEmptyLines: false  # 不跨空行对齐
+  AcrossComments:  false  # 不跨注释对齐
+  AlignCompound:   false  # 不对复合语句对齐
+  AlignFunctionPointers: false  # 不对函数指针对齐
+  PadOperators:    false  # 不在操作符周围添加空格
+AlignConsecutiveMacros:
+  Enabled:         true  # 对连续宏定义进行对齐
+  AcrossEmptyLines: true  # 跨空行对齐
+  AcrossComments:  true  # 跨注释对齐
+  AlignCompound:   false  # 不对复合语句对齐
+  AlignFunctionPointers: false  # 不对函数指针对齐
+  PadOperators:    false  # 不在操作符周围添加空格
+AlignConsecutiveShortCaseStatements:
+  Enabled:         false  # 不对连续短case语句进行对齐
+  AcrossEmptyLines: false  # 不跨空行对齐
+  AcrossComments:  false  # 不跨注释对齐
+  AlignCaseArrows: false  # 不对case箭头对齐
+  AlignCaseColons: false  # 不对case冒号对齐
+AlignConsecutiveTableGenBreakingDAGArgColons:
+  Enabled:         false  # 不启用对齐 TableGen DAG 参数中的冒号
+  AcrossEmptyLines: false  # 不跨空行对齐
+  AcrossComments:  false  # 不跨注释对齐
+  AlignCompound:   false  # 不对复合语句中的冒号对齐
+  AlignFunctionPointers: false  # 不对函数指针中的冒号对齐
+  PadOperators:    false  # 不在操作符周围添加空格
+AlignConsecutiveTableGenCondOperatorColons:
+  Enabled:         false  # 不启用对齐 TableGen 条件操作符中的冒号
+  AcrossEmptyLines: false  # 不跨空行对齐
+  AcrossComments:  false  # 不跨注释对齐
+  AlignCompound:   false  # 不对复合语句中的冒号对齐
+  AlignFunctionPointers: false  # 不对函数指针中的冒号对齐
+  PadOperators:    false  # 不在操作符周围添加空格
+AlignConsecutiveTableGenDefinitionColons:
+  Enabled:         false  # 不启用对齐 TableGen 定义中的冒号
+  AcrossEmptyLines: false  # 不跨空行对齐
+  AcrossComments:  false  # 不跨注释对齐
+  AlignCompound:   false  # 不对复合语句中的冒号对齐
+  AlignFunctionPointers: false  # 不对函数指针中的冒号对齐
+  PadOperators:    false  # 不在操作符周围添加空格
+AlignEscapedNewlines: Right  # 转义换行符右对齐
+AlignOperands:   Align  # 操作数对齐
+AlignTrailingComments:
+  Kind:            Always  # 始终对齐尾随注释
+  OverEmptyLines:  0  # 不跨空行对齐
+AllowAllArgumentsOnNextLine: true  # 允许所有参数换行到下一行
+AllowAllParametersOfDeclarationOnNextLine: true  # 允许声明的所有参数换行到下一行
+AllowBreakBeforeNoexceptSpecifier: Never  # 不在noexcept前换行
+AllowShortBlocksOnASingleLine: Never  # 不允许短代码块单行显示
+AllowShortCaseExpressionOnASingleLine: false  # 不允许短case表达式单行显示
+AllowShortCaseLabelsOnASingleLine: false  # 不允许短case标签单行显示
+AllowShortCompoundRequirementOnASingleLine: true  # 允许短复合需求单行显示
+AllowShortEnumsOnASingleLine: true  # 允许短枚举单行显示
+AllowShortFunctionsOnASingleLine: None  # 不允许短函数单行显示
+AllowShortIfStatementsOnASingleLine: Never  # 不允许短if语句单行显示
+AllowShortLambdasOnASingleLine: All  # 允许短lambda表达式单行显示
+AllowShortLoopsOnASingleLine: false  # 不允许短循环单行显示
+AlwaysBreakAfterDefinitionReturnType: None  # 不在函数返回类型后强制换行
+AlwaysBreakBeforeMultilineStrings: false  # 不在多行字符串前强制换行
+AttributeMacros:
+  - __capability  # 定义属性宏
+BinPackArguments: true  # 参数打包
+BinPackParameters: true  # 参数打包
+BitFieldColonSpacing: Both  # 位域冒号两侧加空格
+BraceWrapping:
+  AfterCaseLabel:  false  # case标签后不换行加花括号
+  AfterClass:      false  # 类定义后不换行加花括号
+  AfterControlStatement: Never  # 控制语句后不换行加花括号
+  AfterEnum:       false  # 枚举定义后不换行加花括号
+  AfterExternBlock: false  # extern块后不换行加花括号
+  AfterFunction:   false  # 函数定义后不换行加花括号
+  AfterNamespace:  false  # 命名空间后不换行加花括号
+  AfterObjCDeclaration: false  # Objective-C声明后不换行加花括号
+  AfterStruct:     false  # 结构体定义后不换行加花括号
+  AfterUnion:      false  # 联合体定义后不换行加花括号
+  BeforeCatch:     false  # catch前不换行加花括号
+  BeforeElse:      false  # else前不换行加花括号
+  BeforeLambdaBody: false  # lambda体前不换行加花括号
+  BeforeWhile:     false  # while前不换行加花括号
+  IndentBraces:    false  # 不缩进花括号
+  SplitEmptyFunction: true  # 空函数分隔花括号
+  SplitEmptyRecord: true  # 空记录分隔花括号
+  SplitEmptyNamespace: true  # 空命名空间分隔花括号
+BreakAdjacentStringLiterals: true  # 分隔相邻字符串字面量
+BreakAfterAttributes: Leave  # 属性后保持原样
+BreakAfterJavaFieldAnnotations: false  # Java字段注解后不换行
+BreakAfterReturnType: None  # 返回类型后不换行
+BreakArrays:     true  # 数组初始化时换行
+BreakBeforeBinaryOperators: None  # 二元操作符前不换行
+BreakBeforeConceptDeclarations: Always  # 概念声明前始终换行
+BreakBeforeBraces: Attach  # 花括号附加到前一行
+BreakBeforeInlineASMColon: OnlyMultiline  # 多行内联汇编冒号前换行
+BreakBeforeTernaryOperators: true  # 三元操作符前换行
+BreakConstructorInitializers: BeforeColon  # 构造函数初始化列表冒号前换行
+BreakFunctionDefinitionParameters: false  # 函数定义参数不换行
+BreakInheritanceList: BeforeColon  # 继承列表冒号前换行
+BreakStringLiterals: true  # 字符串字面量换行
+BreakTemplateDeclarations: MultiLine  # 多行模板声明换行
+ColumnLimit:     80  # 每行最大字符数限制为80
+CommentPragmas:  '^ IWYU pragma:'  # 注释中匹配正则表达式的部分视为特殊注释
+CompactNamespaces: false  # 不压缩命名空间
+ConstructorInitializerIndentWidth: 4  # 构造函数初始化列表缩进宽度
+ContinuationIndentWidth: 4  # 续行缩进宽度
+Cpp11BracedListStyle: true  # 使用C++11风格的大括号列表
+DerivePointerAlignment: false  # 不自动推导指针对齐方式
+DisableFormat:   false  # 不禁用格式化
+EmptyLineAfterAccessModifier: Never  # 访问修饰符后不插入空行
+EmptyLineBeforeAccessModifier: LogicalBlock  # 逻辑块前插入空行
+ExperimentalAutoDetectBinPacking: false  # 不启用实验性自动检测参数打包
+FixNamespaceComments: true  # 修复命名空间注释
+ForEachMacros:
+  - foreach  # 定义foreach宏
+  - Q_FOREACH
+  - BOOST_FOREACH
+IfMacros:
+  - KJ_IF_MAYBE  # 定义if宏
+IncludeBlocks:   Preserve  # 保留头文件包含块
+IncludeCategories:
+  - Regex:           '^(<|"(gtest|gmock|isl|json)/)'  # 匹配特定头文件路径
+    Priority:        0
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'  # 匹配特定头文件路径
+    Priority:        1  # 优先级
+    SortPriority:    0  # 排序优先级
+    CaseSensitive:   false  # 不区分大小写
+  - Regex:           '.*'  # 匹配所有其他头文件
+    Priority:        2
+    SortPriority:    0
+    CaseSensitive:   false
+IncludeIsMainRegex: '(Test)?$'  # 主文件匹配正则表达式
+IncludeIsMainSourceRegex: ''  # 主源文件匹配正则表达式
+IndentAccessModifiers: false  # 不缩进访问修饰符
+IndentCaseBlocks: false  # 不缩进case块
+IndentCaseLabels: true  # 缩进case标签
+IndentExternBlock: AfterExternBlock  # extern块后缩进
+IndentGotoLabels: true  # 缩进goto标签
+IndentPPDirectives: None  # 不缩进预处理指令
+IndentRequiresClause: true  # 缩进requires子句
+IndentWidth:     4  # 缩进宽度为4个空格
+IndentWrappedFunctionNames: false  # 不缩进换行的函数名
+InsertBraces:    false  # 不插入花括号
+InsertNewlineAtEOF: false  # 文件末尾不插入换行符
+InsertTrailingCommas: None  # 不插入尾随逗号
+IntegerLiteralSeparator:
+  Binary:          0  # 二进制整数字面量分隔符间隔
+  BinaryMinDigits: 0  # 二进制最小位数
+  Decimal:         0  # 十进制整数字面量分隔符间隔
+  DecimalMinDigits: 0  # 十进制最小位数
+  Hex:             0  # 十六进制整数字面量分隔符间隔
+  HexMinDigits:    0  # 十六进制最小位数
+JavaScriptQuotes: Leave  # JavaScript字符串引号保持原样
+JavaScriptWrapImports: true  # JavaScript导入换行
+KeepEmptyLines:
+  AtEndOfFile:     false  # 文件末尾不保留空行
+  AtStartOfBlock:  true  # 块开头保留空行
+  AtStartOfFile:   true  # 文件开头保留空行
+LambdaBodyIndentation: Signature  # lambda体缩进与签名对齐
+LineEnding:      DeriveLF  # 行尾使用LF
+MacroBlockBegin: ''  # 宏块开始标记
+MacroBlockEnd:   ''  # 宏块结束标记
+MainIncludeChar: Quote  # 主头文件包含字符为双引号
+MaxEmptyLinesToKeep: 1  # 最大保留空行数为1
+NamespaceIndentation: None  # 不缩进命名空间
+ObjCBinPackProtocolList: Auto  # Objective-C协议列表自动打包
+ObjCBlockIndentWidth: 2  # Objective-C块缩进宽度
+ObjCBreakBeforeNestedBlockParam: true  # 嵌套块参数前换行
+ObjCSpaceAfterProperty: false  # Objective-C属性后不加空格
+ObjCSpaceBeforeProtocolList: true  # Objective-C协议列表前加空格
+PackConstructorInitializers: BinPack  # 构造函数初始化列表打包
+PenaltyBreakAssignment: 2  # 赋值操作符换行惩罚值
+PenaltyBreakBeforeFirstCallParameter: 19  # 第一个调用参数前换行惩罚值
+PenaltyBreakComment: 300  # 注释换行惩罚值
+PenaltyBreakFirstLessLess: 120  # 第一个<<操作符换行惩罚值
+PenaltyBreakOpenParenthesis: 0  # 左括号换行惩罚值
+PenaltyBreakScopeResolution: 500  # 作用域解析符换行惩罚值
+PenaltyBreakString: 1000  # 字符串换行惩罚值
+PenaltyBreakTemplateDeclaration: 10  # 模板声明换行惩罚值
+PenaltyExcessCharacter: 1000000  # 超出字符限制惩罚值
+PenaltyIndentedWhitespace: 0  # 缩进空白惩罚值
+PenaltyReturnTypeOnItsOwnLine: 60  # 返回类型单独一行惩罚值
+PointerAlignment: Left  # 指针符号靠左对齐
+PPIndentWidth:   -1  # 预处理指令缩进宽度
+QualifierAlignment: Leave  # 限定符对齐方式保持原样
+ReferenceAlignment: Pointer  # 引用对齐方式与指针一致
+ReflowComments:  true  # 重新排版注释
+RemoveBracesLLVM: false  # 不移除LLVM风格的花括号
+RemoveParentheses: Leave  # 保持括号原样
+RemoveSemicolon: false  # 不移除分号
+RequiresClausePosition: OwnLine  # requires子句单独一行
+RequiresExpressionIndentation: OuterScope  # requires表达式缩进与外层作用域对齐
+SeparateDefinitionBlocks: Leave  # 定义块保持原样
+ShortNamespaceLines: 1  # 短命名空间行数
+SkipMacroDefinitionBody: false  # 不跳过宏定义体
+SortIncludes:    CaseSensitive  # 按字母顺序排序头文件包含，区分大小写
+SortJavaStaticImport: Before  # Java静态导入排序在前
+SortUsingDeclarations: LexicographicNumeric  # 按字典和数字顺序排序using声明
+SpaceAfterCStyleCast: false  # C风格强制转换后不加空格
+SpaceAfterLogicalNot: false  # 逻辑非操作符后不加空格
+SpaceAfterTemplateKeyword: true  # template关键字后加空格
+SpaceAroundPointerQualifiers: Default  # 指针限定符周围默认加空格
+SpaceBeforeAssignmentOperators: true  # 赋值操作符前加空格
+SpaceBeforeCaseColon: false  # case冒号前不加空格
+SpaceBeforeCpp11BracedList: false  # C++11大括号列表前不加空格
+SpaceBeforeCtorInitializerColon: true  # 构造函数初始化列表冒号前加空格
+SpaceBeforeInheritanceColon: true  # 继承冒号前加空格
+SpaceBeforeJsonColon: false  # JSON冒号前不加空格
+SpaceBeforeParens: ControlStatements  # 控制语句左括号前加空格
+SpaceBeforeParensOptions:
+  AfterControlStatements: true  # 控制语句后加空格
+  AfterForeachMacros: true  # foreach宏后加空格
+  AfterFunctionDefinitionName: false  # 函数定义名后不加空格
+  AfterFunctionDeclarationName: false  # 函数声明名后不加空格
+  AfterIfMacros:   true  # if宏后加空格
+  AfterOverloadedOperator: false  # 重载操作符后不加空格
+  AfterPlacementOperator: true  # placement操作符后加空格
+  AfterRequiresInClause: false  # requires子句中不加空格
+  AfterRequiresInExpression: false  # requires表达式中不加空格
+  BeforeNonEmptyParentheses: false  # 非空括号前不加空格
+SpaceBeforeRangeBasedForLoopColon: true  # 基于范围的for循环冒号前加空格
+SpaceBeforeSquareBrackets: false  # 方括号前不加空格
+SpaceInEmptyBlock: false  # 空块中不加空格
+SpacesBeforeTrailingComments: 1  # 尾随注释前加1个空格
+SpacesInAngles:  Never  # 尖括号内不加空格
+SpacesInContainerLiterals: true  # 容器字面量内加空格
+SpacesInLineCommentPrefix:
+  Minimum:         1  # 行注释前缀最小空格数
+  Maximum:         -1  # 行注释前缀最大空格数（无限制）
+SpacesInParens:  Never  # 圆括号内不加空格
+SpacesInParensOptions:
+  ExceptDoubleParentheses: false  # 双圆括号内不加空格
+  InCStyleCasts:   false  # C风格强制转换内不加空格
+  InConditionalStatements: false  # 条件语句内不加空格
+  InEmptyParentheses: false  # 空括号内不加空格
+  Other:           false  # 其他情况不加空格
+SpacesInSquareBrackets: false  # 方括号内不加空格
+Standard:        Latest  # 使用最新的C++标准
+StatementAttributeLikeMacros:
+  - Q_EMIT  # 定义类似属性的宏
+StatementMacros:
+  - Q_UNUSED  # 定义语句宏
+  - QT_REQUIRE_VERSION
+TableGenBreakInsideDAGArg: DontBreak  # TableGen DAG参数内不换行
+TabWidth:        4  # Tab宽度为4个空格
+UseTab:          Never  # 不使用Tab字符
+VerilogBreakBetweenInstancePorts: true  # Verilog实例端口间换行
+WhitespaceSensitiveMacros:
+  - BOOST_PP_STRINGIZE  # 定义对空格敏感的宏
+  - CF_SWIFT_NAME
+  - NS_SWIFT_NAME
+  - PP_STRINGIZE
+  - STRINGIZE
+...
+
