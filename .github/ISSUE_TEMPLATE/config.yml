@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://nexus-platform.github.io/nexus/
+    about: Check the documentation before opening an issue
+  - name: Discussions
+    url: https://github.com/nexus-platform/nexus/discussions
+    about: Ask questions and discuss ideas
