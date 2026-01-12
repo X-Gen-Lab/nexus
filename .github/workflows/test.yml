@@ -1,0 +1,100 @@
+# Nexus Test Workflow
+# Runs unit tests and generates coverage reports
+
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+
+    - name: Configure CMake with Coverage
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DNEXUS_PLATFORM=native \
+          -DNEXUS_ENABLE_COVERAGE=ON \
+          -DCMAKE_C_FLAGS="--coverage" \
+          -DCMAKE_CXX_FLAGS="--coverage"
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run Tests
+      working-directory: build
+      run: ctest --output-on-failure
+
+    - name: Generate Coverage Report
+      run: |
+        lcov --capture --directory build --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/googletest/*' --output-file coverage.info
+        lcov --list coverage.info
+
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: coverage.info
+        fail_ci_if_error: false
+        verbose: true
+
+  # Memory sanitizer tests
+  sanitizer:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure with AddressSanitizer
+      run: |
+        cmake -B build-asan \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DNEXUS_PLATFORM=native \
+          -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
+          -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
+
+    - name: Build
+      run: cmake --build build-asan
+
+    - name: Run Tests with ASan
+      working-directory: build-asan
+      run: ctest --output-on-failure
+      env:
+        ASAN_OPTIONS: detect_leaks=1
+
+  # MISRA compliance check
+  misra:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install cppcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+
+    - name: Run MISRA Check
+      run: |
+        cppcheck --addon=misra.json \
+          --suppress=missingIncludeSystem \
+          -I hal/include -I osal/include \
+          hal/ osal/ 2>&1 | tee misra-report.txt
+
+    - name: Upload MISRA Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: misra-report
+        path: misra-report.txt

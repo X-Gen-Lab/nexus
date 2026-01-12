@@ -1,0 +1,118 @@
+# Nexus Build Workflow
+# Builds the project for multiple platforms
+
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  # Native build (for testing)
+  build-native:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake (Native)
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DNEXUS_PLATFORM=native
+
+    - name: Build
+      run: cmake --build build --config ${{env.BUILD_TYPE}}
+
+    - name: Run Tests
+      working-directory: build
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+
+  # ARM cross-compilation
+  build-arm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install ARM Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi
+
+    - name: Configure CMake (STM32F4)
+      run: |
+        cmake -B build-stm32f4 \
+          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+          -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
+          -DNEXUS_PLATFORM=stm32f4
+
+    - name: Build STM32F4
+      run: cmake --build build-stm32f4 --config ${{env.BUILD_TYPE}}
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: stm32f4-binaries
+        path: |
+          build-stm32f4/**/*.bin
+          build-stm32f4/**/*.hex
+          build-stm32f4/**/*.elf
+
+  # Static analysis
+  static-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck clang-format
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --error-exitcode=1 \
+          --suppress=missingIncludeSystem \
+          -I hal/include -I osal/include \
+          hal/ osal/ platforms/
+
+    - name: Check Code Format
+      run: |
+        find hal osal platforms -name "*.c" -o -name "*.h" | \
+          xargs clang-format --dry-run --Werror
+
+  # Documentation build
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Doxygen
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz
+
+    - name: Install Sphinx
+      run: |
+        pip install sphinx breathe sphinx-rtd-theme
+
+    - name: Build Doxygen
+      run: doxygen Doxyfile
+
+    - name: Build Sphinx
+      working-directory: docs/sphinx
+      run: sphinx-build -b html . _build/html
+
+    - name: Upload Documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs/
