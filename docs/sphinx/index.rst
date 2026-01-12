@@ -3,7 +3,7 @@ Nexus Embedded Platform
 
 .. note::
    
-   **Language / 语言**: `English <index.html>`_ | `中文 <index_cn.html>`_
+   **Language / 语言**: `English <../en/index.html>`_ | `中文 <../cn/index_cn.html>`_
 
 Welcome to the Nexus Embedded Platform documentation. Nexus is a world-class
 embedded software development platform designed for building reliable,

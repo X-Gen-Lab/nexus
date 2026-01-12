@@ -1,9 +1,6 @@
 """
-Sphinx Configuration for Nexus Embedded Platform Documentation
-Nexus 嵌入式平台文档 Sphinx 配置
-
-Supports both English and Chinese documentation.
-支持中英文双语文档。
+Sphinx Configuration for Nexus Embedded Platform Documentation (Chinese)
+Nexus 嵌入式平台文档 Sphinx 配置（中文版）
 """
 
 import os
@@ -11,8 +8,7 @@ import sys
 
 # -- Project information -----------------------------------------------------
 
-project = 'Nexus Embedded Platform'
-project_cn = 'Nexus 嵌入式平台'
+project = 'Nexus 嵌入式平台'
 copyright = '2026, Nexus Team'
 author = 'Nexus Team'
 version = '1.0.0'
@@ -30,25 +26,22 @@ extensions = [
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'index_cn.rst',
-                    'getting_started/introduction_cn.rst',
-                    'getting_started/installation_cn.rst',
-                    'getting_started/quickstart_cn.rst',
-                    'user_guide/architecture_cn.rst',
-                    'user_guide/hal_cn.rst',
-                    'user_guide/osal_cn.rst',
-                    'user_guide/porting_cn.rst',
-                    'development/contributing_cn.rst',
-                    'development/coding_standards_cn.rst',
-                    'development/testing_cn.rst',
-                    'conf_cn.py']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'conf_cn.py',
+                    'index.rst',
+                    'getting_started/introduction.rst',
+                    'getting_started/installation.rst',
+                    'getting_started/quickstart.rst',
+                    'user_guide/architecture.rst',
+                    'user_guide/hal.rst',
+                    'user_guide/osal.rst',
+                    'user_guide/porting.rst',
+                    'development/contributing.rst',
+                    'development/coding_standards.rst',
+                    'development/testing.rst']
 
 # -- Internationalization (i18n) ---------------------------------------------
 
-# Supported languages
-language = 'en'
-locale_dirs = ['locale/']
-gettext_compact = False
+language = 'zh_CN'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -59,7 +52,7 @@ html_favicon = None
 
 html_theme_options = {
     'logo_name': True,
-    'description': 'World-class Embedded Software Development Platform',
+    'description': '世界级嵌入式软件开发平台',
     'github_user': 'nexus-team',
     'github_repo': 'nexus',
     'github_button': True,
@@ -98,7 +91,7 @@ source_suffix = {
 
 # -- Master document ---------------------------------------------------------
 
-master_doc = 'index'
+master_doc = 'index_cn'
 
 # -- Intersphinx configuration -----------------------------------------------
 

@@ -3,7 +3,7 @@ Nexus 嵌入式平台
 
 .. note::
    
-   **Language / 语言**: `English <index.html>`_ | `中文 <index_cn.html>`_
+   **Language / 语言**: `English <../en/index.html>`_ | `中文 <../cn/index_cn.html>`_
 
 欢迎使用 Nexus 嵌入式平台文档。Nexus 是一个世界级的嵌入式软件开发平台，
 专为构建可靠、安全、可移植的嵌入式应用而设计。
@@ -12,33 +12,33 @@ Nexus 嵌入式平台
    :maxdepth: 2
    :caption: 快速入门
 
-   简介 <getting_started/introduction_cn>
-   安装指南 <getting_started/installation_cn>
-   快速入门 <getting_started/quickstart_cn>
+   getting_started/introduction_cn
+   getting_started/installation_cn
+   getting_started/quickstart_cn
 
 .. toctree::
    :maxdepth: 2
    :caption: 用户指南
 
-   架构概览 <user_guide/architecture_cn>
-   硬件抽象层 (HAL) <user_guide/hal_cn>
-   操作系统抽象层 (OSAL) <user_guide/osal_cn>
-   移植指南 <user_guide/porting_cn>
+   user_guide/architecture_cn
+   user_guide/hal_cn
+   user_guide/osal_cn
+   user_guide/porting_cn
 
 .. toctree::
    :maxdepth: 2
    :caption: API 参考
 
-   HAL API <api/hal>
-   OSAL API <api/osal>
+   api/hal
+   api/osal
 
 .. toctree::
    :maxdepth: 2
    :caption: 开发指南
 
-   贡献指南 <development/contributing_cn>
-   编码规范 <development/coding_standards_cn>
-   测试 <development/testing_cn>
+   development/contributing_cn
+   development/coding_standards_cn
+   development/testing_cn
 
 功能特性
 --------
@@ -62,5 +62,4 @@ Nexus 嵌入式平台
 ==========
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
