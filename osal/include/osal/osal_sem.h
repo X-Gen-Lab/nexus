@@ -29,6 +29,17 @@ extern "C" {
 typedef void* osal_sem_handle_t;
 
 /**
+ * \brief           Create a semaphore
+ * \param[in]       initial_count: Initial count value
+ * \param[in]       max_count: Maximum count value
+ * \param[out]      handle: Pointer to store semaphore handle
+ * \return          OSAL_OK on success, error code otherwise
+ */
+osal_status_t osal_sem_create(uint32_t initial_count,
+                              uint32_t max_count,
+                              osal_sem_handle_t* handle);
+
+/**
  * \brief           Create a binary semaphore
  * \param[in]       initial: Initial value (0 or 1)
  * \param[out]      handle: Pointer to store semaphore handle
