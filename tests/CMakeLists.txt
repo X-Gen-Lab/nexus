@@ -29,6 +29,8 @@ add_executable(nexus_tests
     hal/test_hal_gpio_properties.cpp
     hal/test_hal_uart.cpp
     hal/test_hal_uart_properties.cpp
+    hal/test_hal_spi.cpp
+    hal/test_hal_spi_properties.cpp
 )
 
 # Require C++20 for designated initializers

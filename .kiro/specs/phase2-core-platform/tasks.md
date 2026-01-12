@@ -58,16 +58,16 @@
   - 验证 Native 平台编译运行正常
   - 如有问题请询问用户
 
-- [ ] 5. HAL SPI 模块实现
-  - [ ] 5.1 实现 Native 平台 SPI 驱动
+- [x] 5. HAL SPI 模块实现
+  - [x] 5.1 实现 Native 平台 SPI 驱动
     - 创建 hal_spi_native.c
     - 实现 init, transmit, receive, transfer, cs_control 函数
     - _Requirements: 3.1, 3.3, 3.4, 3.5, 3.6, 3.7_
-  - [ ] 5.2 编写 SPI 单元测试
+  - [x] 5.2 编写 SPI 单元测试
     - 测试模式配置
     - 测试传输操作
     - _Requirements: 3.1, 3.2, 3.5_
-  - [ ] 5.3 编写 SPI 属性测试
+  - [x] 5.3 编写 SPI 属性测试
     - **Property 6: SPI Mode Configuration**
     - **Property 7: SPI Full-Duplex Transfer**
     - **Property 8: SPI CS Control**

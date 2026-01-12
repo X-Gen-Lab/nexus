@@ -9,6 +9,7 @@ target_sources(platform_native
     PRIVATE
         src/hal_gpio_native.c
         src/hal_uart_native.c
+        src/hal_spi_native.c
         src/hal_system_native.c
 )
 
