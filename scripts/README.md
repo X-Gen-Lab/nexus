@@ -1,98 +1,94 @@
 # Nexus Scripts
 
-本目录包含 Nexus 项目的常用脚本。
+本目录包含 Nexus 项目的常用脚本，支持 Windows (.bat)、Unix (.sh) 和跨平台 Python (.py) 脚本。
 
 ## 目录结构
 
 ```
 scripts/
-├── README.md           # 本文档
-├── build.cmd           # 构建入口 (Windows)
-├── test.cmd            # 测试入口 (Windows)
-├── format.cmd          # 格式化入口 (Windows)
-├── clean.cmd           # 清理入口 (Windows)
-├── docs.cmd            # 文档入口 (Windows)
-├── windows/            # Windows 平台脚本
-│   ├── build.bat
-│   ├── test.bat
-│   ├── format.bat
-│   ├── clean.bat
-│   └── docs.bat
-└── unix/               # Linux/macOS 平台脚本
-    ├── build.sh
-    ├── test.sh
-    ├── format.sh
-    ├── clean.sh
-    └── docs.sh
+├── README.md               # 本文档
+├── building/               # 构建相关脚本
+│   ├── build.bat           # Windows 构建
+│   ├── build.sh            # Unix 构建
+│   └── build.py            # Python 跨平台构建
+├── test/                   # 测试相关脚本
+│   ├── test.bat            # Windows 测试
+│   ├── test.sh             # Unix 测试
+│   └── test.py             # Python 跨平台测试
+├── tools/                  # 开发工具脚本
+│   ├── format.bat          # Windows 格式化
+│   ├── format.sh           # Unix 格式化
+│   ├── format.py           # Python 跨平台格式化
+│   ├── clean.bat           # Windows 清理
+│   ├── clean.sh            # Unix 清理
+│   ├── clean.py            # Python 跨平台清理
+│   ├── docs.bat            # Windows 文档生成
+│   ├── docs.sh             # Unix 文档生成
+│   └── docs.py             # Python 跨平台文档生成
+└── ci/                     # CI/CD 脚本
+    └── ci_build.py         # CI 构建脚本
 ```
-
-## 脚本列表
-
-| 功能 | Windows | Linux/macOS | 说明 |
-|------|---------|-------------|------|
-| 构建 | `build.cmd` | `unix/build.sh` | 编译项目 |
-| 测试 | `test.cmd` | `unix/test.sh` | 运行测试 |
-| 格式化 | `format.cmd` | `unix/format.sh` | 代码格式化 |
-| 清理 | `clean.cmd` | `unix/clean.sh` | 清理构建产物 |
-| 文档 | `docs.cmd` | `unix/docs.sh` | 生成文档 |
 
 ## 使用方法
 
-### Linux/macOS
+### Python 脚本 (推荐，跨平台)
 
 ```bash
-# 构建项目
-./scripts/unix/build.sh              # Debug 构建 (默认)
-./scripts/unix/build.sh release      # Release 构建
-./scripts/unix/build.sh debug clean  # 清理后重新构建
+# 构建
+python scripts/building/build.py                 # Debug 构建
+python scripts/building/build.py -t release      # Release 构建
+python scripts/building/build.py -c              # 清理后构建
+python scripts/building/build.py -j 8            # 指定并行数
 
-# 运行测试
-./scripts/unix/test.sh               # 运行所有测试
-./scripts/unix/test.sh "HalGpioTest.*"  # 运行特定测试
-./scripts/unix/test.sh verbose       # 详细输出
+# 测试
+python scripts/test/test.py                      # 运行所有测试
+python scripts/test/test.py -f "HalGpioTest.*"   # 过滤测试
+python scripts/test/test.py -v                   # 详细输出
+python scripts/test/test.py --xml report.xml     # 生成 XML 报告
 
-# 代码格式化
-./scripts/unix/format.sh             # 格式化所有代码
-./scripts/unix/format.sh check       # 仅检查格式 (CI 使用)
+# 格式化
+python scripts/tools/format.py                   # 格式化代码
+python scripts/tools/format.py -c                # 仅检查格式
 
-# 清理构建
-./scripts/unix/clean.sh              # 清理构建目录
-./scripts/unix/clean.sh all          # 清理所有
+# 清理
+python scripts/tools/clean.py                    # 清理构建目录
+python scripts/tools/clean.py -a                 # 清理所有
 
-# 生成文档
-./scripts/unix/docs.sh               # 生成所有文档
-./scripts/unix/docs.sh doxygen       # 仅生成 Doxygen
-./scripts/unix/docs.sh sphinx        # 仅生成 Sphinx
+# 文档
+python scripts/tools/docs.py                     # 生成所有文档
+python scripts/tools/docs.py -t doxygen          # 仅 Doxygen
+
+# CI
+python scripts/ci/ci_build.py                    # 运行完整 CI
+python scripts/ci/ci_build.py --stage build      # 仅构建阶段
+python scripts/ci/ci_build.py --stage test       # 仅测试阶段
+```
+
+### Unix (Linux/macOS)
+
+```bash
+./scripts/building/build.sh                      # 构建
+./scripts/building/build.sh release              # Release 构建
+./scripts/test/test.sh                           # 测试
+./scripts/tools/format.sh                        # 格式化
+./scripts/tools/clean.sh                         # 清理
+./scripts/tools/docs.sh                          # 文档
 ```
 
 ### Windows
 
 ```cmd
-REM 构建项目
-scripts\build.cmd                    REM Debug 构建 (默认)
-scripts\build.cmd release            REM Release 构建
-scripts\build.cmd debug clean        REM 清理后重新构建
-
-REM 运行测试
-scripts\test.cmd                     REM 运行所有测试
-scripts\test.cmd "HalSpiTest.*"      REM 运行特定测试
-scripts\test.cmd verbose             REM 详细输出
-
-REM 代码格式化
-scripts\format.cmd                   REM 格式化所有代码
-scripts\format.cmd check             REM 仅检查格式
-
-REM 清理构建
-scripts\clean.cmd                    REM 清理构建目录
-scripts\clean.cmd all                REM 清理所有
-
-REM 生成文档
-scripts\docs.cmd                     REM 生成所有文档
-scripts\docs.cmd doxygen             REM 仅生成 Doxygen
+scripts\building\build.bat                       REM 构建
+scripts\building\build.bat release               REM Release 构建
+scripts\test\test.bat                            REM 测试
+scripts\tools\format.bat                         REM 格式化
+scripts\tools\clean.bat                          REM 清理
+scripts\tools\docs.bat                           REM 文档
 ```
 
 ## 依赖
 
+- Python 3.7+ (Python 脚本)
 - CMake 3.16+
 - C/C++ 编译器 (GCC, Clang, MSVC)
 - clang-format (代码格式化)
