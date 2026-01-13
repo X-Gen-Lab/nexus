@@ -120,78 +120,78 @@
   - 验证 Native 平台所有 HAL 功能正常
   - 如有问题请询问用户
 
-- [-] 10. OSAL Task 模块实现
-  - [ ] 10.1 实现 Native 平台 Task 适配
+- [x] 10. OSAL Task 模块实现
+  - [x] 10.1 实现 Native 平台 Task 适配
     - 更新 osal_native.c 实现任务管理
     - 使用 pthread 实现任务创建和调度
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
-  - [ ] 10.2 编写 Task 单元测试
+  - [x] 10.2 编写 Task 单元测试
     - 测试任务创建删除
     - 测试任务挂起恢复
     - _Requirements: 7.1, 7.3, 7.4, 7.5_
 
-- [ ] 11. OSAL Mutex 模块实现
-  - [ ] 11.1 实现 Native 平台 Mutex 适配
+- [x] 11. OSAL Mutex 模块实现
+  - [x] 11.1 实现 Native 平台 Mutex 适配
     - 更新 osal_native.c 实现互斥锁
     - 使用 pthread_mutex 实现
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
-  - [ ] 11.2 编写 Mutex 单元测试
+  - [x] 11.2 编写 Mutex 单元测试
     - 测试创建删除
     - 测试加锁解锁
     - _Requirements: 8.1, 8.2, 8.4, 8.5_
-  - [ ] 11.3 编写 Mutex 属性测试
+  - [x] 11.3 编写 Mutex 属性测试
     - **Property 14: Mutex Mutual Exclusion**
     - **Validates: Requirements 8.2, 8.3, 8.4**
 
-- [ ] 12. OSAL Semaphore 模块实现
-  - [ ] 12.1 实现 Native 平台 Semaphore 适配
+- [x] 12. OSAL Semaphore 模块实现
+  - [x] 12.1 实现 Native 平台 Semaphore 适配
     - 更新 osal_native.c 实现信号量
     - 使用 sem_t 或条件变量实现
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
-  - [ ] 12.2 编写 Semaphore 单元测试
+  - [x] 12.2 编写 Semaphore 单元测试
     - 测试创建删除
     - 测试 take/give 操作
     - _Requirements: 9.1, 9.2, 9.4, 9.6_
-  - [ ] 12.3 编写 Semaphore 属性测试
+  - [x] 12.3 编写 Semaphore 属性测试
     - **Property 15: Semaphore Counting**
     - **Validates: Requirements 9.2, 9.3, 9.4**
 
-- [ ] 13. OSAL Queue 模块实现
-  - [ ] 13.1 实现 Native 平台 Queue 适配
+- [x] 13. OSAL Queue 模块实现
+  - [x] 13.1 实现 Native 平台 Queue 适配
     - 更新 osal_native.c 实现消息队列
     - 使用环形缓冲区和条件变量实现
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7_
-  - [ ] 13.2 编写 Queue 单元测试
+  - [x] 13.2 编写 Queue 单元测试
     - 测试创建删除
     - 测试发送接收
     - _Requirements: 10.1, 10.2, 10.4, 10.7_
-  - [ ] 13.3 编写 Queue 属性测试
+  - [x] 13.3 编写 Queue 属性测试
     - **Property 16: Queue FIFO Order**
     - **Property 17: Queue Capacity**
     - **Validates: Requirements 10.1, 10.2, 10.3, 10.4**
 
-- [ ] 14. Checkpoint - OSAL 模块验证
+- [x] 14. Checkpoint - OSAL 模块验证
   - 确保所有 OSAL 模块测试通过
   - 验证 Native 平台所有 OSAL 功能正常
   - 如有问题请询问用户
 
-- [ ] 15. Baremetal OSAL 适配
-  - [ ] 15.1 完善 Baremetal OSAL 实现
+- [x] 15. Baremetal OSAL 适配
+  - [x] 15.1 完善 Baremetal OSAL 实现
     - 更新 osal_baremetal.c
     - 实现简单的协作式调度
     - _Requirements: 7.1, 8.1, 9.1, 10.1_
 
-- [ ] 16. 集成测试和文档
-  - [ ] 16.1 编写 HAL + OSAL 集成测试
+- [x] 16. 集成测试和文档
+  - [x] 16.1 编写 HAL + OSAL 集成测试
     - 测试多任务使用 HAL 模块
     - 测试任务间通信
     - _Requirements: 13.2, 13.3_
-  - [ ] 16.2 更新 API 文档
+  - [x] 16.2 更新 API 文档
     - 确保所有公共 API 有 Doxygen 注释
     - 生成 API 文档
     - _Requirements: 13.5_
 
-- [ ] 17. Final Checkpoint - 完整验证
+- [x] 17. Final Checkpoint - 完整验证
   - 确保所有测试通过
   - 验证代码覆盖率 ≥ 80%
   - 如有问题请询问用户

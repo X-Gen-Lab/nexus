@@ -52,7 +52,6 @@ uint32_t hal_get_tick(void)
 
 /**
  * \brief           Delay in milliseconds
- * \param[in]       ms: Delay time in milliseconds
  */
 void hal_delay_ms(uint32_t ms)
 {
@@ -64,7 +63,6 @@ void hal_delay_ms(uint32_t ms)
 
 /**
  * \brief           Delay in microseconds (approximate)
- * \param[in]       us: Delay time in microseconds
  * \note            This is a busy-wait implementation
  */
 void hal_delay_us(uint32_t us)
@@ -100,7 +98,6 @@ uint32_t hal_enter_critical(void)
 
 /**
  * \brief           Exit critical section (restore interrupts)
- * \param[in]       state: Previous interrupt state
  */
 void hal_exit_critical(uint32_t state)
 {
