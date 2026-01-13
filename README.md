@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-online-blue.svg)](https://nexus-platform.github.io/nexus/)
 
-[English](#nexus-embedded-platform) | [中文](#nexus-嵌入式平台)
+[English](README.md) | [中文](README.md)
 
 **Nexus** is a world-class embedded software development platform designed for building reliable, secure, and portable embedded applications.
 

@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Development Environment
 - VS Code configuration (settings, tasks, launch, extensions)
-- Doxygen backslash style comments (\file, \brief, \param)
+- Doxygen backslash style comments (\\file, \\brief, \\param)
 
 #### Build System
 - CMake root configuration with platform selection
