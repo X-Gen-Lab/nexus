@@ -130,6 +130,92 @@ static void mutual_exclusion_task(void* arg) {
 }
 
 /**
+ * Feature: freertos-adapter, Property 5: Mutex Lifecycle Consistency
+ * 
+ * *For any* mutex created via osal_mutex_create(), the mutex SHALL be lockable
+ * and unlockable; after unlock, the mutex SHALL be deletable with OSAL_OK.
+ * 
+ * **Validates: Requirements 5.1, 5.2, 5.3, 5.4**
+ */
+TEST_F(OsalMutexPropertyTest, Property5_MutexLifecycleConsistency) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_mutex_handle_t mutex = nullptr;
+        
+        /* Create mutex - should succeed */
+        osal_status_t status = osal_mutex_create(&mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex create failed";
+        ASSERT_NE(nullptr, mutex)
+            << "Iteration " << test_iter << ": mutex handle is null";
+        
+        /* Lock mutex - should succeed */
+        status = osal_mutex_lock(mutex, OSAL_WAIT_FOREVER);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex lock failed";
+        
+        /* Unlock mutex - should succeed */
+        status = osal_mutex_unlock(mutex);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex unlock failed";
+        
+        /* Delete mutex - should succeed after unlock */
+        status = osal_mutex_delete(mutex);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex delete failed";
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 6: Mutex Lock/Unlock Round Trip
+ * 
+ * *For any* unlocked mutex, locking then unlocking SHALL return the mutex to
+ * unlocked state, allowing subsequent lock operations to succeed.
+ * 
+ * **Validates: Requirements 5.3, 5.4**
+ */
+TEST_F(OsalMutexPropertyTest, Property6_MutexLockUnlockRoundTrip) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_mutex_handle_t mutex = nullptr;
+        
+        /* Create mutex */
+        osal_status_t status = osal_mutex_create(&mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex create failed";
+        
+        /* Generate random number of lock/unlock cycles */
+        int num_cycles = randomIterations();
+        
+        for (int cycle = 0; cycle < num_cycles; ++cycle) {
+            /* Lock mutex - should succeed */
+            status = osal_mutex_lock(mutex, OSAL_WAIT_FOREVER);
+            EXPECT_EQ(OSAL_OK, status)
+                << "Iteration " << test_iter << ", cycle " << cycle 
+                << ": mutex lock failed";
+            
+            /* Unlock mutex - should succeed */
+            status = osal_mutex_unlock(mutex);
+            EXPECT_EQ(OSAL_OK, status)
+                << "Iteration " << test_iter << ", cycle " << cycle 
+                << ": mutex unlock failed";
+        }
+        
+        /* After all cycles, mutex should still be lockable (unlocked state) */
+        status = osal_mutex_lock(mutex, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter 
+            << ": mutex should be lockable after round-trip cycles";
+        
+        /* Unlock before delete */
+        osal_mutex_unlock(mutex);
+        
+        /* Clean up */
+        status = osal_mutex_delete(mutex);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex delete failed";
+    }
+}
+
+/**
  * Feature: phase2-core-platform, Property 14: Mutex Mutual Exclusion
  * 
  * *For any* mutex, only one task SHALL hold the lock at any time.

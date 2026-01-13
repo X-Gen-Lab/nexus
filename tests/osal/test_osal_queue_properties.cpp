@@ -19,6 +19,7 @@
 #include <thread>
 #include <vector>
 #include <algorithm>
+#include <cstring>
 
 extern "C" {
 #include "osal/osal.h"
@@ -68,7 +69,253 @@ protected:
         std::uniform_int_distribution<int> dist(-10000, 10000);
         return dist(rng);
     }
+    
+    /**
+     * \brief       Generate random byte value
+     */
+    uint8_t randomByte() {
+        std::uniform_int_distribution<int> dist(0, 255);
+        return static_cast<uint8_t>(dist(rng));
+    }
 };
+
+/*---------------------------------------------------------------------------*/
+/* Property 9: Queue Round-Trip Consistency                                  */
+/* Feature: freertos-adapter, Property 9: Queue Round-Trip Consistency       */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: freertos-adapter, Property 9: Queue Round-Trip Consistency
+ * 
+ * *For any* queue with item_size S and item_count N, sending an item then
+ * receiving SHALL return an item with identical content to what was sent.
+ * 
+ * **Validates: Requirements 7.1, 7.3, 7.5**
+ */
+TEST_F(OsalQueuePropertyTest, Property9_QueueRoundTripConsistency) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random item size (1-64 bytes) */
+        std::uniform_int_distribution<size_t> size_dist(1, 64);
+        size_t item_size = size_dist(rng);
+        size_t capacity = randomCapacity();
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(item_size, capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed "
+            << "(item_size=" << item_size << ", capacity=" << capacity << ")";
+        
+        /* Generate random data to send */
+        std::vector<uint8_t> send_data(item_size);
+        for (size_t i = 0; i < item_size; i++) {
+            send_data[i] = randomByte();
+        }
+        
+        /* Send the item */
+        ASSERT_EQ(OSAL_OK, osal_queue_send(queue, send_data.data(), OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": send failed";
+        
+        /* Receive the item */
+        std::vector<uint8_t> recv_data(item_size, 0);
+        ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, recv_data.data(), OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": receive failed";
+        
+        /* Verify round-trip consistency - received data must match sent data */
+        EXPECT_EQ(0, std::memcmp(send_data.data(), recv_data.data(), item_size))
+            << "Iteration " << test_iter << ": round-trip data mismatch "
+            << "(item_size=" << item_size << ")";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 9b: Queue Round-Trip with Multiple Items
+ * 
+ * *For any* sequence of items sent to a queue, receiving them SHALL return
+ * items with identical content in FIFO order.
+ * 
+ * **Validates: Requirements 7.1, 7.3, 7.5**
+ */
+TEST_F(OsalQueuePropertyTest, Property9_QueueRoundTripMultipleItems) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Use fixed item size for this test */
+        size_t item_size = sizeof(int);
+        size_t capacity = randomCapacity();
+        size_t num_items = randomItemCount(capacity);
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(item_size, capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        /* Generate and send random values */
+        std::vector<int> sent_values(num_items);
+        for (size_t i = 0; i < num_items; i++) {
+            sent_values[i] = randomValue();
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &sent_values[i], OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+        }
+        
+        /* Receive and verify each value */
+        for (size_t i = 0; i < num_items; i++) {
+            int recv_value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": receive " << i << " failed";
+            
+            EXPECT_EQ(sent_values[i], recv_value)
+                << "Iteration " << test_iter << ": round-trip mismatch at index " << i
+                << " (sent " << sent_values[i] << ", received " << recv_value << ")";
+        }
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 10: Queue Count Accuracy                                         */
+/* Feature: freertos-adapter, Property 10: Queue Count Accuracy              */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: freertos-adapter, Property 10: Queue Count Accuracy
+ * 
+ * *For any* queue, after sending K items (K <= capacity) and receiving M items
+ * (M <= K), osal_queue_get_count() SHALL return K-M.
+ * 
+ * **Validates: Requirements 7.7**
+ */
+TEST_F(OsalQueuePropertyTest, Property10_QueueCountAccuracy) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        size_t capacity = randomCapacity();
+        size_t num_sends = randomItemCount(capacity);
+        
+        /* Random number of receives (0 to num_sends) */
+        std::uniform_int_distribution<size_t> recv_dist(0, num_sends);
+        size_t num_receives = recv_dist(rng);
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        /* Initial count should be 0 */
+        EXPECT_EQ(0u, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": initial count should be 0";
+        
+        /* Send K items */
+        for (size_t i = 0; i < num_sends; i++) {
+            int value = static_cast<int>(i);
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+            
+            /* Verify count after each send */
+            EXPECT_EQ(i + 1, osal_queue_get_count(queue))
+                << "Iteration " << test_iter << ": count after send " << i << " incorrect";
+        }
+        
+        /* Receive M items */
+        for (size_t i = 0; i < num_receives; i++) {
+            int value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": receive " << i << " failed";
+            
+            /* Verify count after each receive */
+            size_t expected_count = num_sends - (i + 1);
+            EXPECT_EQ(expected_count, osal_queue_get_count(queue))
+                << "Iteration " << test_iter << ": count after receive " << i << " incorrect "
+                << "(expected " << expected_count << ")";
+        }
+        
+        /* Final count should be K - M */
+        size_t expected_final = num_sends - num_receives;
+        EXPECT_EQ(expected_final, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": final count incorrect "
+            << "(K=" << num_sends << ", M=" << num_receives 
+            << ", expected K-M=" << expected_final << ")";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 11: Queue Peek Does Not Remove                                   */
+/* Feature: freertos-adapter, Property 11: Queue Peek Does Not Remove        */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: freertos-adapter, Property 11: Queue Peek Does Not Remove
+ * 
+ * *For any* non-empty queue, calling osal_queue_peek() SHALL return the front
+ * item without changing the queue count.
+ * 
+ * **Validates: Requirements 7.6**
+ */
+TEST_F(OsalQueuePropertyTest, Property11_QueuePeekDoesNotRemove) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        size_t capacity = randomCapacity();
+        size_t num_items = randomItemCount(capacity);
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        /* Send items */
+        std::vector<int> sent_values(num_items);
+        for (size_t i = 0; i < num_items; i++) {
+            sent_values[i] = randomValue();
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &sent_values[i], OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+        }
+        
+        /* Record count before peek */
+        size_t count_before = osal_queue_get_count(queue);
+        EXPECT_EQ(num_items, count_before)
+            << "Iteration " << test_iter << ": count before peek incorrect";
+        
+        /* Peek multiple times - count should not change */
+        for (int peek_iter = 0; peek_iter < 5; peek_iter++) {
+            int peek_value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_peek(queue, &peek_value))
+                << "Iteration " << test_iter << ": peek " << peek_iter << " failed";
+            
+            /* Peek should return the front item (first sent) */
+            EXPECT_EQ(sent_values[0], peek_value)
+                << "Iteration " << test_iter << ": peek " << peek_iter 
+                << " returned wrong value";
+            
+            /* Count should remain unchanged */
+            EXPECT_EQ(count_before, osal_queue_get_count(queue))
+                << "Iteration " << test_iter << ": peek " << peek_iter 
+                << " changed the count";
+        }
+        
+        /* Verify receive still gets the same front item */
+        int recv_value = 0;
+        ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": receive after peek failed";
+        
+        EXPECT_EQ(sent_values[0], recv_value)
+            << "Iteration " << test_iter << ": receive after peek got wrong value";
+        
+        /* Now count should be decremented */
+        EXPECT_EQ(count_before - 1, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": count after receive incorrect";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
 
 /*---------------------------------------------------------------------------*/
 /* Property 16: Queue FIFO Order                                             */
