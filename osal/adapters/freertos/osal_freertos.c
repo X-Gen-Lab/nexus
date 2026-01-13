@@ -1,126 +1,113 @@
 /**
- * @file osal_freertos.c
- * @brief OSAL FreeRTOS Adapter Implementation
+ * \file            osal_freertos.c
+ * \brief           OSAL FreeRTOS Adapter Implementation
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-01-13
  *
- * This file implements the OSAL interface using FreeRTOS APIs.
- * It provides task management, synchronization primitives, and
- * inter-task communication facilities.
+ * \copyright       Copyright (c) 2026 Nexus Team
  *
- * @author Nexus Team
- * @version 1.0.0
- * @date 2026-01-13
+ * \details         This file implements the OSAL interface using FreeRTOS APIs.
+ *                  It provides task management, synchronization primitives, and
+ *                  inter-task communication facilities.
  *
- * @copyright Copyright (c) 2026 Nexus Team
- *
- * @section error_handling Error Handling Strategy
+ * \section error_handling Error Handling Strategy
  *
  * This implementation follows a unified error handling approach:
  *
- * 1. **NULL Pointer Validation**: All functions that accept pointer parameters
+ * 1. NULL Pointer Validation: All functions that accept pointer parameters
  *    validate them at entry and return OSAL_ERROR_NULL_POINTER if NULL.
  *    - Exception: osal_task_delete() accepts NULL to delete the calling task.
  *
- * 2. **Invalid Parameter Validation**: Functions validate parameter constraints:
+ * 2. Invalid Parameter Validation: Functions validate parameter constraints:
  *    - Priority must be in range [0, 31]
  *    - item_size and item_count must be > 0 for queues
  *    - initial_count must not exceed max_count for semaphores
  *    - max_count must be >= 1 for counting semaphores
  *
- * 3. **Timeout Conversion**: All timeout values are converted using
+ * 3. Timeout Conversion: All timeout values are converted using
  *    osal_to_freertos_ticks() which handles:
  *    - OSAL_WAIT_FOREVER -> portMAX_DELAY
  *    - OSAL_NO_WAIT -> 0
  *    - Positive ms values -> pdMS_TO_TICKS(ms)
  *
- * 4. **ISR Context Detection**: Functions that cannot be called from ISR
+ * 4. ISR Context Detection: Functions that cannot be called from ISR
  *    context (e.g., osal_mutex_lock) detect ISR context and return
  *    OSAL_ERROR_ISR.
  *
- * 5. **Memory Allocation Failures**: When FreeRTOS returns NULL for object
+ * 5. Memory Allocation Failures: When FreeRTOS returns NULL for object
  *    creation, OSAL_ERROR_NO_MEMORY is returned.
  *
- * @note Requirements: 9.1, 9.2, 9.3, 10.1, 10.2, 10.3, 10.4
+ * \note            Requirements: 9.1, 9.2, 9.3, 10.1, 10.2, 10.3, 10.4
  */
 
 #include "osal/osal.h"
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
 #include "queue.h"
+#include "semphr.h"
+#include "task.h"
 
 /*---------------------------------------------------------------------------*/
 /* Error Handling Macros                                                     */
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Validate that a pointer is not NULL
- * @param ptr Pointer to validate
- * @return OSAL_ERROR_NULL_POINTER if ptr is NULL
- *
- * @note Requirements: 10.1
+ * \brief           Validate that a pointer is not NULL
+ * \note            Requirements: 10.1
  */
-#define OSAL_VALIDATE_PTR(ptr) \
-    do { \
-        if ((ptr) == NULL) { \
-            return OSAL_ERROR_NULL_POINTER; \
-        } \
+#define OSAL_VALIDATE_PTR(ptr)                                                 \
+    do {                                                                       \
+        if ((ptr) == NULL) {                                                   \
+            return OSAL_ERROR_NULL_POINTER;                                    \
+        }                                                                      \
     } while (0)
 
 /**
- * @brief Validate that two pointers are not NULL
- * @param ptr1 First pointer to validate
- * @param ptr2 Second pointer to validate
- * @return OSAL_ERROR_NULL_POINTER if either is NULL
- *
- * @note Requirements: 10.1
+ * \brief           Validate that two pointers are not NULL
+ * \note            Requirements: 10.1
  */
-#define OSAL_VALIDATE_PTR2(ptr1, ptr2) \
-    do { \
-        if ((ptr1) == NULL || (ptr2) == NULL) { \
-            return OSAL_ERROR_NULL_POINTER; \
-        } \
+#define OSAL_VALIDATE_PTR2(ptr1, ptr2)                                         \
+    do {                                                                       \
+        if ((ptr1) == NULL || (ptr2) == NULL) {                                \
+            return OSAL_ERROR_NULL_POINTER;                                    \
+        }                                                                      \
     } while (0)
 
 /**
- * @brief Validate a condition and return error if false
- * @param cond Condition to validate
- * @param err Error code to return if condition is false
- *
- * @note Requirements: 10.2
+ * \brief           Validate a condition and return error if false
+ * \note            Requirements: 10.2
  */
-#define OSAL_VALIDATE_PARAM(cond, err) \
-    do { \
-        if (!(cond)) { \
-            return (err); \
-        } \
+#define OSAL_VALIDATE_PARAM(cond, err)                                         \
+    do {                                                                       \
+        if (!(cond)) {                                                         \
+            return (err);                                                      \
+        }                                                                      \
     } while (0)
 
 /**
- * @brief Check if in ISR context and return error if so
- * @return OSAL_ERROR_ISR if called from ISR context
- *
- * @note Requirements: 10.4
+ * \brief           Check if in ISR context and return error if so
+ * \note            Requirements: 10.4
  */
-#define OSAL_CHECK_NOT_ISR() \
-    do { \
-        if (is_in_isr()) { \
-            return OSAL_ERROR_ISR; \
-        } \
+#define OSAL_CHECK_NOT_ISR()                                                   \
+    do {                                                                       \
+        if (is_in_isr()) {                                                     \
+            return OSAL_ERROR_ISR;                                             \
+        }                                                                      \
     } while (0)
 
 /*---------------------------------------------------------------------------*/
 /* Static Variables                                                          */
 /*---------------------------------------------------------------------------*/
 
-/** @brief Flag indicating if OSAL has been initialized */
+/** \brief          Flag indicating if OSAL has been initialized */
 static bool s_osal_initialized = false;
 
-/** @brief Critical section nesting counter for ISR context */
+/** \brief          Critical section nesting counter for ISR context */
 static volatile uint32_t s_isr_critical_nesting = 0;
 
-/** @brief Saved interrupt mask for ISR critical sections */
+/** \brief          Saved interrupt mask for ISR critical sections */
 static volatile UBaseType_t s_isr_saved_mask = 0;
 
 /*---------------------------------------------------------------------------*/
@@ -128,43 +115,38 @@ static volatile UBaseType_t s_isr_saved_mask = 0;
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Map OSAL priority to FreeRTOS priority
+ * \brief           Map OSAL priority to FreeRTOS priority
  *
- * OSAL uses priority range 0-31 where 0 is lowest and 31 is highest.
- * FreeRTOS uses priority range 0 to (configMAX_PRIORITIES-1) where 0 is lowest.
+ * \details         OSAL uses priority range 0-31 where 0 is lowest and 31 is
+ * highest. FreeRTOS uses priority range 0 to (configMAX_PRIORITIES-1) where 0
+ * is lowest.
  *
- * @param[in] osal_prio OSAL priority (0-31)
- * @return FreeRTOS priority (0 to configMAX_PRIORITIES-1)
- *
- * @note Requirements: 4.7
+ * \note            Requirements: 4.7
  */
-static inline UBaseType_t osal_to_freertos_priority(uint8_t osal_prio)
-{
+static inline UBaseType_t osal_to_freertos_priority(uint8_t osal_prio) {
     /* Clamp OSAL priority to valid range */
     if (osal_prio > 31) {
         osal_prio = 31;
     }
 
-    /* Linear mapping from OSAL [0,31] to FreeRTOS [0, configMAX_PRIORITIES-1] */
+    /* Linear mapping from OSAL [0,31] to FreeRTOS [0, configMAX_PRIORITIES-1]
+     */
     return (UBaseType_t)((osal_prio * (configMAX_PRIORITIES - 1)) / 31);
 }
 
 /**
- * @brief Map FreeRTOS priority to OSAL priority
+ * \brief           Map FreeRTOS priority to OSAL priority
  *
- * Reverse mapping from FreeRTOS priority to OSAL priority.
- *
- * @param[in] freertos_prio FreeRTOS priority (0 to configMAX_PRIORITIES-1)
- * @return OSAL priority (0-31)
+ * \details         Reverse mapping from FreeRTOS priority to OSAL priority.
  */
-static inline uint8_t freertos_to_osal_priority(UBaseType_t freertos_prio)
-{
+static inline uint8_t freertos_to_osal_priority(UBaseType_t freertos_prio) {
     /* Clamp FreeRTOS priority to valid range */
     if (freertos_prio >= configMAX_PRIORITIES) {
         freertos_prio = configMAX_PRIORITIES - 1;
     }
 
-    /* Linear mapping from FreeRTOS [0, configMAX_PRIORITIES-1] to OSAL [0,31] */
+    /* Linear mapping from FreeRTOS [0, configMAX_PRIORITIES-1] to OSAL [0,31]
+     */
     return (uint8_t)((freertos_prio * 31) / (configMAX_PRIORITIES - 1));
 }
 
@@ -173,17 +155,14 @@ static inline uint8_t freertos_to_osal_priority(UBaseType_t freertos_prio)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Convert OSAL timeout to FreeRTOS ticks
+ * \brief           Convert OSAL timeout to FreeRTOS ticks
  *
- * Converts OSAL timeout values (in milliseconds) to FreeRTOS tick counts.
+ * \details         Converts OSAL timeout values (in milliseconds) to FreeRTOS
+ * tick counts.
  *
- * @param[in] timeout_ms Timeout in milliseconds
- * @return FreeRTOS tick count
- *
- * @note Requirements: 9.1, 9.2, 9.3
+ * \note            Requirements: 9.1, 9.2, 9.3
  */
-static inline TickType_t osal_to_freertos_ticks(uint32_t timeout_ms)
-{
+static inline TickType_t osal_to_freertos_ticks(uint32_t timeout_ms) {
     /* OSAL_WAIT_FOREVER maps to portMAX_DELAY (infinite wait) */
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         return portMAX_DELAY;
@@ -203,19 +182,16 @@ static inline TickType_t osal_to_freertos_ticks(uint32_t timeout_ms)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Check if currently executing in ISR context
+ * \brief           Check if currently executing in ISR context
  *
- * Detects whether the current execution context is an interrupt service
- * routine (ISR). This is used to select appropriate FreeRTOS API variants
- * (e.g., xSemaphoreGiveFromISR vs xSemaphoreGive).
+ * \details         Detects whether the current execution context is an
+ * interrupt service routine (ISR). This is used to select appropriate FreeRTOS
+ * API variants (e.g., xSemaphoreGiveFromISR vs xSemaphoreGive).
  *
- * @return true if in ISR context, false otherwise
- *
- * @note Requirements: 8.4
+ * \note            Requirements: 8.4
  */
-static inline bool is_in_isr(void)
-{
-#if defined(__ARM_ARCH) || defined(__arm__) || defined(__ARM_ARCH_7M__) || \
+static inline bool is_in_isr(void) {
+#if defined(__ARM_ARCH) || defined(__arm__) || defined(__ARM_ARCH_7M__) ||     \
     defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_6M__)
     /*
      * On ARM Cortex-M processors, read the IPSR (Interrupt Program Status
@@ -241,17 +217,14 @@ static inline bool is_in_isr(void)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Initialize OSAL layer
+ * \brief           Initialize OSAL layer
  *
- * Initializes the OSAL layer with FreeRTOS backend. This function is
- * idempotent - calling it multiple times has no additional effect.
+ * \details         Initializes the OSAL layer with FreeRTOS backend. This
+ * function is idempotent - calling it multiple times has no additional effect.
  *
- * @return OSAL_OK on success
- *
- * @note Requirements: 3.1, 3.4
+ * \note            Requirements: 3.1, 3.4
  */
-osal_status_t osal_init(void)
-{
+osal_status_t osal_init(void) {
     if (s_osal_initialized) {
         /* Already initialized - return success (idempotent) */
         return OSAL_OK;
@@ -268,15 +241,14 @@ osal_status_t osal_init(void)
 }
 
 /**
- * @brief Start OSAL scheduler
+ * \brief           Start OSAL scheduler
  *
- * Starts the FreeRTOS scheduler. This function does not return under
- * normal operation.
+ * \details         Starts the FreeRTOS scheduler. This function does not return
+ * under normal operation.
  *
- * @note Requirements: 3.2
+ * \note            Requirements: 3.2
  */
-void osal_start(void)
-{
+void osal_start(void) {
     if (!s_osal_initialized) {
         osal_init();
     }
@@ -291,30 +263,26 @@ void osal_start(void)
 }
 
 /**
- * @brief Check if scheduler is running
+ * \brief           Check if scheduler is running
  *
- * @return true if scheduler is running, false otherwise
- *
- * @note Requirements: 3.3
+ * \note            Requirements: 3.3
  */
-bool osal_is_running(void)
-{
+bool osal_is_running(void) {
     return (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED);
 }
 
 /**
- * @brief Enter critical section
+ * \brief           Enter critical section
  *
- * Disables interrupts and enters a critical section. Supports nesting -
- * interrupts are only re-enabled when the nesting count returns to zero.
+ * \details         Disables interrupts and enters a critical section. Supports
+ * nesting - interrupts are only re-enabled when the nesting count returns to
+ * zero. For task context, FreeRTOS taskENTER_CRITICAL() handles nesting
+ * internally. For ISR context, we manually track nesting and save/restore the
+ * interrupt mask.
  *
- * For task context, FreeRTOS taskENTER_CRITICAL() handles nesting internally.
- * For ISR context, we manually track nesting and save/restore the interrupt mask.
- *
- * @note Requirements: 8.1, 8.3
+ * \note            Requirements: 8.1, 8.3
  */
-void osal_enter_critical(void)
-{
+void osal_enter_critical(void) {
     if (is_in_isr()) {
         /*
          * In ISR context, use the ISR-safe critical section API.
@@ -331,15 +299,14 @@ void osal_enter_critical(void)
 }
 
 /**
- * @brief Exit critical section
+ * \brief           Exit critical section
  *
- * Restores interrupt state and exits the critical section. Only restores
- * interrupts when the nesting count returns to zero.
+ * \details         Restores interrupt state and exits the critical section.
+ * Only restores interrupts when the nesting count returns to zero.
  *
- * @note Requirements: 8.2, 8.3
+ * \note            Requirements: 8.2, 8.3
  */
-void osal_exit_critical(void)
-{
+void osal_exit_critical(void) {
     if (is_in_isr()) {
         /*
          * In ISR context, restore interrupt mask only when nesting
@@ -358,14 +325,11 @@ void osal_exit_critical(void)
 }
 
 /**
- * @brief Check if in ISR context
+ * \brief           Check if in ISR context
  *
- * @return true if in ISR context, false otherwise
- *
- * @note Requirements: 8.4
+ * \note            Requirements: 8.4
  */
-bool osal_is_isr(void)
-{
+bool osal_is_isr(void) {
     return is_in_isr();
 }
 
@@ -374,20 +338,16 @@ bool osal_is_isr(void)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Create a new task
+ * \brief           Create a new task
  *
- * Creates a FreeRTOS task with the specified configuration. The OSAL priority
- * (0-31) is mapped to FreeRTOS priority range.
+ * \details         Creates a FreeRTOS task with the specified configuration.
+ *                  The OSAL priority (0-31) is mapped to FreeRTOS priority
+ * range.
  *
- * @param[in]  config Task configuration structure
- * @param[out] handle Pointer to store the created task handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 4.1, 4.7, 10.1, 10.2
+ * \note            Requirements: 4.1, 4.7, 10.1, 10.2
  */
 osal_status_t osal_task_create(const osal_task_config_t* config,
-                               osal_task_handle_t* handle)
-{
+                               osal_task_handle_t* handle) {
     /* Parameter validation - NULL pointer checks */
     if (config == NULL || handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -421,7 +381,8 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
      * FreeRTOS stack size is specified in words, not bytes.
      * Ensure minimum stack size of configMINIMAL_STACK_SIZE.
      */
-    configSTACK_DEPTH_TYPE stack_depth = config->stack_size / sizeof(StackType_t);
+    configSTACK_DEPTH_TYPE stack_depth =
+        config->stack_size / sizeof(StackType_t);
     if (stack_depth < configMINIMAL_STACK_SIZE) {
         stack_depth = configMINIMAL_STACK_SIZE;
     }
@@ -430,14 +391,14 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     const char* task_name = (config->name != NULL) ? config->name : "task";
 
     /* Create the FreeRTOS task */
-    BaseType_t result = xTaskCreate(
-        (TaskFunction_t)config->func,   /* Task function */
-        task_name,                       /* Task name */
-        stack_depth,                     /* Stack depth in words */
-        config->arg,                     /* Task argument */
-        freertos_priority,               /* FreeRTOS priority */
-        &task_handle                     /* Task handle output */
-    );
+    BaseType_t result =
+        xTaskCreate((TaskFunction_t)config->func, /* Task function */
+                    task_name,                    /* Task name */
+                    stack_depth,                  /* Stack depth in words */
+                    config->arg,                  /* Task argument */
+                    freertos_priority,            /* FreeRTOS priority */
+                    &task_handle                  /* Task handle output */
+        );
 
     /* Check if task creation succeeded */
     if (result != pdPASS) {
@@ -450,17 +411,14 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
 }
 
 /**
- * @brief Delete a task
+ * \brief           Delete a task
  *
- * Deletes a FreeRTOS task. If handle is NULL, deletes the calling task.
+ * \details         Deletes a FreeRTOS task. If handle is NULL, deletes the
+ *                  calling task.
  *
- * @param[in] handle Task handle (NULL to delete current task)
- * @return OSAL_OK on success
- *
- * @note Requirements: 4.2
+ * \note            Requirements: 4.2
  */
-osal_status_t osal_task_delete(osal_task_handle_t handle)
-{
+osal_status_t osal_task_delete(osal_task_handle_t handle) {
     /*
      * FreeRTOS vTaskDelete accepts NULL to delete the calling task.
      * No NULL pointer error for this function - NULL is a valid input.
@@ -470,17 +428,14 @@ osal_status_t osal_task_delete(osal_task_handle_t handle)
 }
 
 /**
- * @brief Suspend a task
+ * \brief           Suspend a task
  *
- * Suspends a FreeRTOS task. The task will not run until resumed.
+ * \details         Suspends a FreeRTOS task. The task will not run until
+ * resumed.
  *
- * @param[in] handle Task handle
- * @return OSAL_OK on success, OSAL_ERROR_NULL_POINTER if handle is NULL
- *
- * @note Requirements: 4.3
+ * \note            Requirements: 4.3
  */
-osal_status_t osal_task_suspend(osal_task_handle_t handle)
-{
+osal_status_t osal_task_suspend(osal_task_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -490,17 +445,13 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle)
 }
 
 /**
- * @brief Resume a suspended task
+ * \brief           Resume a suspended task
  *
- * Resumes a previously suspended FreeRTOS task.
+ * \details         Resumes a previously suspended FreeRTOS task.
  *
- * @param[in] handle Task handle
- * @return OSAL_OK on success, OSAL_ERROR_NULL_POINTER if handle is NULL
- *
- * @note Requirements: 4.4
+ * \note            Requirements: 4.4
  */
-osal_status_t osal_task_resume(osal_task_handle_t handle)
-{
+osal_status_t osal_task_resume(osal_task_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -510,17 +461,14 @@ osal_status_t osal_task_resume(osal_task_handle_t handle)
 }
 
 /**
- * @brief Delay current task
+ * \brief           Delay current task
  *
- * Blocks the calling task for the specified number of milliseconds.
+ * \details         Blocks the calling task for the specified number of
+ * milliseconds.
  *
- * @param[in] ms Delay time in milliseconds
- * @return OSAL_OK on success
- *
- * @note Requirements: 4.5
+ * \note            Requirements: 4.5
  */
-osal_status_t osal_task_delay(uint32_t ms)
-{
+osal_status_t osal_task_delay(uint32_t ms) {
     /* Convert milliseconds to FreeRTOS ticks and delay */
     TickType_t ticks = osal_to_freertos_ticks(ms);
     vTaskDelay(ticks);
@@ -528,46 +476,33 @@ osal_status_t osal_task_delay(uint32_t ms)
 }
 
 /**
- * @brief Yield current task
+ * \brief           Yield current task
  *
- * Yields the processor to another task of equal or higher priority.
+ * \details         Yields the processor to another task of equal or higher
+ * priority.
  *
- * @return OSAL_OK on success
- *
- * @note Requirements: 4.6
+ * \note            Requirements: 4.6
  */
-osal_status_t osal_task_yield(void)
-{
+osal_status_t osal_task_yield(void) {
     taskYIELD();
     return OSAL_OK;
 }
 
 /**
- * @brief Get current task handle
+ * \brief           Get current task handle
  *
- * Returns the handle of the currently executing task.
- *
- * @return Current task handle, or NULL if scheduler not started
- *
- * @note Requirements: 4.8
+ * \note            Requirements: 4.8
  */
-osal_task_handle_t osal_task_get_current(void)
-{
+osal_task_handle_t osal_task_get_current(void) {
     return (osal_task_handle_t)xTaskGetCurrentTaskHandle();
 }
 
 /**
- * @brief Get task name
+ * \brief           Get task name
  *
- * Returns the name string of the specified task.
- *
- * @param[in] handle Task handle
- * @return Task name string, or NULL if handle is invalid
- *
- * @note Requirements: 4.9
+ * \note            Requirements: 4.9
  */
-const char* osal_task_get_name(osal_task_handle_t handle)
-{
+const char* osal_task_get_name(osal_task_handle_t handle) {
     if (handle == NULL) {
         return NULL;
     }
@@ -580,18 +515,14 @@ const char* osal_task_get_name(osal_task_handle_t handle)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Create a mutex
+ * \brief           Create a mutex
  *
- * Creates a FreeRTOS mutex using xSemaphoreCreateMutex(). FreeRTOS mutexes
- * support priority inheritance to prevent priority inversion.
+ * \details         Creates a FreeRTOS mutex using xSemaphoreCreateMutex().
+ * FreeRTOS mutexes support priority inheritance to prevent priority inversion.
  *
- * @param[out] handle Pointer to store the created mutex handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 5.1, 5.5
+ * \note            Requirements: 5.1, 5.5
  */
-osal_status_t osal_mutex_create(osal_mutex_handle_t* handle)
-{
+osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -616,17 +547,13 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle)
 }
 
 /**
- * @brief Delete a mutex
+ * \brief           Delete a mutex
  *
- * Deletes a FreeRTOS mutex using vSemaphoreDelete().
+ * \details         Deletes a FreeRTOS mutex using vSemaphoreDelete().
  *
- * @param[in] handle Mutex handle to delete
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 5.2
+ * \note            Requirements: 5.2
  */
-osal_status_t osal_mutex_delete(osal_mutex_handle_t handle)
-{
+osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -638,20 +565,16 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle)
 }
 
 /**
- * @brief Lock a mutex
+ * \brief           Lock a mutex
+ * infinite)
+ *                  OSAL_ERROR_ISR if called from ISR context
  *
- * Acquires a FreeRTOS mutex using xSemaphoreTake(). This function blocks
- * until the mutex is acquired or the timeout expires.
+ * \details         Acquires a FreeRTOS mutex using xSemaphoreTake(). This
+ * function blocks until the mutex is acquired or the timeout expires.
  *
- * @param[in] handle Mutex handle
- * @param[in] timeout_ms Timeout in milliseconds (OSAL_WAIT_FOREVER for infinite)
- * @return OSAL_OK on success, OSAL_ERROR_TIMEOUT on timeout,
- *         OSAL_ERROR_ISR if called from ISR context
- *
- * @note Requirements: 5.3, 5.5, 5.6
+ * \note            Requirements: 5.3, 5.5, 5.6
  */
-osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms)
-{
+osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -674,17 +597,13 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms)
 }
 
 /**
- * @brief Unlock a mutex
+ * \brief           Unlock a mutex
  *
- * Releases a FreeRTOS mutex using xSemaphoreGive().
+ * \details         Releases a FreeRTOS mutex using xSemaphoreGive().
  *
- * @param[in] handle Mutex handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 5.4
+ * \note            Requirements: 5.4
  */
-osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle)
-{
+osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -700,22 +619,15 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Create a semaphore (generic)
+ * \brief           Create a semaphore (generic)
  *
- * Creates a FreeRTOS counting semaphore with the specified initial and
- * maximum count values.
+ * \details         Creates a FreeRTOS counting semaphore with the specified
+ * initial and maximum count values.
  *
- * @param[in]  initial_count Initial count value
- * @param[in]  max_count Maximum count value
- * @param[out] handle Pointer to store the created semaphore handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 6.1, 6.2
+ * \note            Requirements: 6.1, 6.2
  */
-osal_status_t osal_sem_create(uint32_t initial_count,
-                              uint32_t max_count,
-                              osal_sem_handle_t* handle)
-{
+osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
+                              osal_sem_handle_t* handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -750,20 +662,15 @@ osal_status_t osal_sem_create(uint32_t initial_count,
 }
 
 /**
- * @brief Create a binary semaphore
+ * \brief           Create a binary semaphore
  *
- * Creates a FreeRTOS binary semaphore using xSemaphoreCreateBinary().
- * Binary semaphores have a maximum count of 1.
+ * \details         Creates a FreeRTOS binary semaphore using
+ * xSemaphoreCreateBinary(). Binary semaphores have a maximum count of 1.
  *
- * @param[in]  initial Initial value (0 or 1)
- * @param[out] handle Pointer to store the created semaphore handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 6.1
+ * \note            Requirements: 6.1
  */
 osal_status_t osal_sem_create_binary(uint32_t initial,
-                                     osal_sem_handle_t* handle)
-{
+                                     osal_sem_handle_t* handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -796,21 +703,15 @@ osal_status_t osal_sem_create_binary(uint32_t initial,
 }
 
 /**
- * @brief Create a counting semaphore
+ * \brief           Create a counting semaphore
  *
- * Creates a FreeRTOS counting semaphore using xSemaphoreCreateCounting().
+ * \details         Creates a FreeRTOS counting semaphore using
+ * xSemaphoreCreateCounting().
  *
- * @param[in]  max_count Maximum count value
- * @param[in]  initial Initial count value
- * @param[out] handle Pointer to store the created semaphore handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 6.2
+ * \note            Requirements: 6.2
  */
-osal_status_t osal_sem_create_counting(uint32_t max_count,
-                                       uint32_t initial,
-                                       osal_sem_handle_t* handle)
-{
+osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
+                                       osal_sem_handle_t* handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -845,17 +746,13 @@ osal_status_t osal_sem_create_counting(uint32_t max_count,
 }
 
 /**
- * @brief Delete a semaphore
+ * \brief           Delete a semaphore
  *
- * Deletes a FreeRTOS semaphore using vSemaphoreDelete().
+ * \details         Deletes a FreeRTOS semaphore using vSemaphoreDelete().
  *
- * @param[in] handle Semaphore handle to delete
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 6.3
+ * \note            Requirements: 6.3
  */
-osal_status_t osal_sem_delete(osal_sem_handle_t handle)
-{
+osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -867,19 +764,15 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle)
 }
 
 /**
- * @brief Take (wait for) a semaphore
+ * \brief           Take (wait for) a semaphore
+ * infinite)
  *
- * Waits for a FreeRTOS semaphore using xSemaphoreTake(). This function
- * blocks until the semaphore is available or the timeout expires.
+ * \details         Waits for a FreeRTOS semaphore using xSemaphoreTake(). This
+ * function blocks until the semaphore is available or the timeout expires.
  *
- * @param[in] handle Semaphore handle
- * @param[in] timeout_ms Timeout in milliseconds (OSAL_WAIT_FOREVER for infinite)
- * @return OSAL_OK on success, OSAL_ERROR_TIMEOUT on timeout
- *
- * @note Requirements: 6.4
+ * \note            Requirements: 6.4
  */
-osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms)
-{
+osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -897,17 +790,13 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms)
 }
 
 /**
- * @brief Give (signal) a semaphore
+ * \brief           Give (signal) a semaphore
  *
- * Signals a FreeRTOS semaphore using xSemaphoreGive().
+ * \details         Signals a FreeRTOS semaphore using xSemaphoreGive().
  *
- * @param[in] handle Semaphore handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 6.5
+ * \note            Requirements: 6.5
  */
-osal_status_t osal_sem_give(osal_sem_handle_t handle)
-{
+osal_status_t osal_sem_give(osal_sem_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -919,19 +808,15 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle)
 }
 
 /**
- * @brief Give (signal) a semaphore from ISR context
+ * \brief           Give (signal) a semaphore from ISR context
  *
- * Signals a FreeRTOS semaphore from an interrupt service routine using
- * xSemaphoreGiveFromISR(). This function handles the higher priority task
- * woken flag and triggers a context switch if needed.
+ * \details         Signals a FreeRTOS semaphore from an interrupt service
+ * routine using xSemaphoreGiveFromISR(). This function handles the higher
+ * priority task woken flag and triggers a context switch if needed.
  *
- * @param[in] handle Semaphore handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 6.6
+ * \note            Requirements: 6.6
  */
-osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle)
-{
+osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -960,22 +845,15 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle)
 /*---------------------------------------------------------------------------*/
 
 /**
- * @brief Create a message queue
+ * \brief           Create a message queue
  *
- * Creates a FreeRTOS queue using xQueueCreate(). The queue can hold
- * item_count items, each of item_size bytes.
+ * \details         Creates a FreeRTOS queue using xQueueCreate(). The queue can
+ * hold item_count items, each of item_size bytes.
  *
- * @param[in]  item_size Size of each item in bytes
- * @param[in]  item_count Maximum number of items the queue can hold
- * @param[out] handle Pointer to store the created queue handle
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 7.1
+ * \note            Requirements: 7.1
  */
-osal_status_t osal_queue_create(size_t item_size,
-                                size_t item_count,
-                                osal_queue_handle_t* handle)
-{
+osal_status_t osal_queue_create(size_t item_size, size_t item_count,
+                                osal_queue_handle_t* handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -995,7 +873,8 @@ osal_status_t osal_queue_create(size_t item_size,
     }
 
     /* Create FreeRTOS queue */
-    QueueHandle_t queue = xQueueCreate((UBaseType_t)item_count, (UBaseType_t)item_size);
+    QueueHandle_t queue =
+        xQueueCreate((UBaseType_t)item_count, (UBaseType_t)item_size);
     if (queue == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
@@ -1005,17 +884,13 @@ osal_status_t osal_queue_create(size_t item_size,
 }
 
 /**
- * @brief Delete a message queue
+ * \brief           Delete a message queue
  *
- * Deletes a FreeRTOS queue using vQueueDelete().
+ * \details         Deletes a FreeRTOS queue using vQueueDelete().
  *
- * @param[in] handle Queue handle to delete
- * @return OSAL_OK on success, error code otherwise
- *
- * @note Requirements: 7.2
+ * \note            Requirements: 7.2
  */
-osal_status_t osal_queue_delete(osal_queue_handle_t handle)
-{
+osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1027,22 +902,18 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle)
 }
 
 /**
- * @brief Send item to queue
+ * \brief           Send item to queue
+ * infinite)
+ * timeout expired
  *
- * Sends an item to the back of a FreeRTOS queue using xQueueSend().
- * This function blocks until space is available or the timeout expires.
+ * \details         Sends an item to the back of a FreeRTOS queue using
+ * xQueueSend(). This function blocks until space is available or the timeout
+ * expires.
  *
- * @param[in] handle Queue handle
- * @param[in] item Pointer to item to send
- * @param[in] timeout_ms Timeout in milliseconds (OSAL_WAIT_FOREVER for infinite)
- * @return OSAL_OK on success, OSAL_ERROR_FULL if queue is full and timeout expired
- *
- * @note Requirements: 7.3
+ * \note            Requirements: 7.3
  */
-osal_status_t osal_queue_send(osal_queue_handle_t handle,
-                              const void* item,
-                              uint32_t timeout_ms)
-{
+osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
+                              uint32_t timeout_ms) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1061,22 +932,18 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
 }
 
 /**
- * @brief Send item to front of queue
+ * \brief           Send item to front of queue
+ * infinite)
+ * timeout expired
  *
- * Sends an item to the front of a FreeRTOS queue using xQueueSendToFront().
- * This function blocks until space is available or the timeout expires.
+ * \details         Sends an item to the front of a FreeRTOS queue using
+ * xQueueSendToFront(). This function blocks until space is available or the
+ * timeout expires.
  *
- * @param[in] handle Queue handle
- * @param[in] item Pointer to item to send
- * @param[in] timeout_ms Timeout in milliseconds (OSAL_WAIT_FOREVER for infinite)
- * @return OSAL_OK on success, OSAL_ERROR_FULL if queue is full and timeout expired
- *
- * @note Requirements: 7.4
+ * \note            Requirements: 7.4
  */
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
-                                    const void* item,
-                                    uint32_t timeout_ms)
-{
+                                    const void* item, uint32_t timeout_ms) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1095,22 +962,18 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
 }
 
 /**
- * @brief Receive item from queue
+ * \brief           Receive item from queue
+ * infinite)
+ * timeout expired
  *
- * Receives an item from a FreeRTOS queue using xQueueReceive().
- * This function blocks until an item is available or the timeout expires.
+ * \details         Receives an item from a FreeRTOS queue using
+ * xQueueReceive(). This function blocks until an item is available or the
+ * timeout expires.
  *
- * @param[in]  handle Queue handle
- * @param[out] item Pointer to store received item
- * @param[in]  timeout_ms Timeout in milliseconds (OSAL_WAIT_FOREVER for infinite)
- * @return OSAL_OK on success, OSAL_ERROR_EMPTY if queue is empty and timeout expired
- *
- * @note Requirements: 7.5
+ * \note            Requirements: 7.5
  */
-osal_status_t osal_queue_receive(osal_queue_handle_t handle,
-                                 void* item,
-                                 uint32_t timeout_ms)
-{
+osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
+                                 uint32_t timeout_ms) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1129,19 +992,15 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle,
 }
 
 /**
- * @brief Peek item from queue (without removing)
+ * \brief           Peek item from queue (without removing)
  *
- * Peeks at the front item of a FreeRTOS queue using xQueuePeek().
- * The item is copied to the output buffer but remains in the queue.
+ * \details         Peeks at the front item of a FreeRTOS queue using
+ * xQueuePeek(). The item is copied to the output buffer but remains in the
+ * queue.
  *
- * @param[in]  handle Queue handle
- * @param[out] item Pointer to store peeked item
- * @return OSAL_OK on success, OSAL_ERROR_EMPTY if queue is empty
- *
- * @note Requirements: 7.6
+ * \note            Requirements: 7.6
  */
-osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item)
-{
+osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1157,17 +1016,14 @@ osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item)
 }
 
 /**
- * @brief Get number of items in queue
+ * \brief           Get number of items in queue
  *
- * Returns the number of items currently in the queue using uxQueueMessagesWaiting().
+ * \details         Returns the number of items currently in the queue using
+ *                  uxQueueMessagesWaiting().
  *
- * @param[in] handle Queue handle
- * @return Number of items in queue, 0 if handle is NULL
- *
- * @note Requirements: 7.7
+ * \note            Requirements: 7.7
  */
-size_t osal_queue_get_count(osal_queue_handle_t handle)
-{
+size_t osal_queue_get_count(osal_queue_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return 0;
@@ -1178,15 +1034,9 @@ size_t osal_queue_get_count(osal_queue_handle_t handle)
 }
 
 /**
- * @brief Check if queue is empty
- *
- * Checks if the queue has no items.
- *
- * @param[in] handle Queue handle
- * @return true if empty or handle is NULL, false otherwise
+ * \brief           Check if queue is empty
  */
-bool osal_queue_is_empty(osal_queue_handle_t handle)
-{
+bool osal_queue_is_empty(osal_queue_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return true;
@@ -1197,15 +1047,12 @@ bool osal_queue_is_empty(osal_queue_handle_t handle)
 }
 
 /**
- * @brief Check if queue is full
+ * \brief           Check if queue is full
  *
- * Checks if the queue has reached its capacity using uxQueueSpacesAvailable().
- *
- * @param[in] handle Queue handle
- * @return true if full, false otherwise or if handle is NULL
+ * \details         Checks if the queue has reached its capacity using
+ * uxQueueSpacesAvailable().
  */
-bool osal_queue_is_full(osal_queue_handle_t handle)
-{
+bool osal_queue_is_full(osal_queue_handle_t handle) {
     /* Parameter validation - NULL pointer check */
     if (handle == NULL) {
         return false;
@@ -1216,21 +1063,16 @@ bool osal_queue_is_full(osal_queue_handle_t handle)
 }
 
 /**
- * @brief Send item to queue from ISR context
+ * \brief           Send item to queue from ISR context
  *
- * Sends an item to a FreeRTOS queue from an interrupt service routine using
- * xQueueSendFromISR(). This function handles the higher priority task woken
- * flag and triggers a context switch if needed.
+ * \details         Sends an item to a FreeRTOS queue from an interrupt service
+ * routine using xQueueSendFromISR(). This function handles the higher priority
+ * task woken flag and triggers a context switch if needed.
  *
- * @param[in] handle Queue handle
- * @param[in] item Pointer to item to send
- * @return OSAL_OK on success, OSAL_ERROR_FULL if queue is full
- *
- * @note Requirements: 7.8
+ * \note            Requirements: 7.8
  */
 osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
-                                       const void* item)
-{
+                                       const void* item) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1243,8 +1085,9 @@ osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
      * currently running task.
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
-    if (xQueueSendFromISR((QueueHandle_t)handle, item, &xHigherPriorityTaskWoken) != pdTRUE) {
+
+    if (xQueueSendFromISR((QueueHandle_t)handle, item,
+                          &xHigherPriorityTaskWoken) != pdTRUE) {
         /* Queue is full */
         return OSAL_ERROR_FULL;
     }
@@ -1259,21 +1102,16 @@ osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
 }
 
 /**
- * @brief Receive item from queue from ISR context
+ * \brief           Receive item from queue from ISR context
  *
- * Receives an item from a FreeRTOS queue from an interrupt service routine
- * using xQueueReceiveFromISR(). This function handles the higher priority
- * task woken flag and triggers a context switch if needed.
+ * \details         Receives an item from a FreeRTOS queue from an interrupt
+ * service routine using xQueueReceiveFromISR(). This function handles the
+ * higher priority task woken flag and triggers a context switch if needed.
  *
- * @param[in]  handle Queue handle
- * @param[out] item Pointer to store received item
- * @return OSAL_OK on success, OSAL_ERROR_EMPTY if queue is empty
- *
- * @note Requirements: 7.9
+ * \note            Requirements: 7.9
  */
 osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
-                                          void* item)
-{
+                                          void* item) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1286,8 +1124,9 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
      * currently running task.
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
-    if (xQueueReceiveFromISR((QueueHandle_t)handle, item, &xHigherPriorityTaskWoken) != pdTRUE) {
+
+    if (xQueueReceiveFromISR((QueueHandle_t)handle, item,
+                             &xHigherPriorityTaskWoken) != pdTRUE) {
         /* Queue is empty */
         return OSAL_ERROR_EMPTY;
     }
