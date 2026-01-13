@@ -1,0 +1,11 @@
+[submodule "ext/catch"]
+	path = ext/catch
+	url = https://github.com/catchorg/Catch2.git
+
+[submodule "ext/googletest"]
+	path = ext/googletest
+	url = https://github.com/google/googletest.git
+
+[submodule "ext/freertos"]
+	path = ext/freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
