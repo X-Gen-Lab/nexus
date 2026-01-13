@@ -462,6 +462,27 @@ nexus/
 │       ├── threadx/
 │       └── baremetal/
 │
+├── framework/                  # 框架层 (FRAMEWORK LAYER)
+│   ├── log/                    # 日志系统
+│   │   ├── include/
+│   │   │   └── log/
+│   │   │       ├── log.h
+│   │   │       ├── log_def.h
+│   │   │       └── log_backend.h
+│   │   └── src/
+│   ├── event/                  # 事件框架
+│   │   ├── include/
+│   │   └── src/
+│   ├── fsm/                    # 状态机
+│   │   ├── include/
+│   │   └── src/
+│   ├── shell/                  # 命令行
+│   │   ├── include/
+│   │   └── src/
+│   └── config/                 # 配置管理
+│       ├── include/
+│       └── src/
+│
 ├── security/                   # 安全模块 (新增)
 │   ├── include/
 │   │   └── security/
@@ -556,9 +577,10 @@ nexus/
 │   │   └── sign/               # 固件签名
 │   └── scripts/
 │
-├── third_party/                # 第三方库
+├── ext/                        # 第三方库
 │   ├── googletest/
 │   ├── freertos/
+│   ├── catch/
 │   ├── mbedtls/
 │   ├── lwip/
 │   ├── tflite_micro/
@@ -1794,7 +1816,7 @@ rules:
     treat_as_error: false
 
 suppressions:
-  - file: "third_party/*"
+  - file: "ext/*"
     rules: ["*"]
     reason: "Third-party code"
 ```
