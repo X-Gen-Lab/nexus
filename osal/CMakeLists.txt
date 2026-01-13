@@ -31,6 +31,11 @@ elseif(NEXUS_OSAL_BACKEND STREQUAL "freertos")
         PRIVATE
             adapters/freertos/osal_freertos.c
     )
+    # Link FreeRTOS kernel
+    target_link_libraries(osal
+        PRIVATE
+            freertos_kernel
+    )
     message(STATUS "OSAL: Using FreeRTOS adapter")
 else()
     message(FATAL_ERROR "Unknown OSAL backend: ${NEXUS_OSAL_BACKEND}")

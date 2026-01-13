@@ -745,7 +745,7 @@ osal_status_t osal_sem_create(uint32_t initial_count,
         return OSAL_ERROR_NULL_POINTER;
     }
     
-    if (initial_count > max_count) {
+    if (max_count == 0 || initial_count > max_count) {
         return OSAL_ERROR_INVALID_PARAM;
     }
     

@@ -38,13 +38,17 @@ add_executable(nexus_tests
     hal/test_hal_adc.cpp
     hal/test_hal_adc_properties.cpp
     osal/test_osal_task.cpp
+    osal/test_osal_task_properties.cpp
     osal/test_osal_mutex.cpp
     osal/test_osal_mutex_properties.cpp
     osal/test_osal_sem.cpp
     osal/test_osal_sem_properties.cpp
     osal/test_osal_queue.cpp
     osal/test_osal_queue_properties.cpp
+    osal/test_osal_core_properties.cpp
+    osal/test_osal_error_handling_properties.cpp
     integration/test_hal_osal_integration.cpp
+    integration/test_freertos_adapter_integration.cpp
 )
 
 # Require C++20 for designated initializers
