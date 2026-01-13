@@ -2,7 +2,7 @@ Nexus Embedded Platform
 =======================
 
 .. note::
-   
+
    **Language / 语言**: `English <../en/index.html>`_ | `中文 <../cn/index_cn.html>`_
 
 Welcome to the Nexus Embedded Platform documentation. Nexus is a world-class
@@ -24,6 +24,7 @@ secure, and portable embedded applications.
    user_guide/architecture
    user_guide/hal
    user_guide/osal
+   user_guide/log
    user_guide/porting
 
 .. toctree::
@@ -32,6 +33,7 @@ secure, and portable embedded applications.
 
    api/hal
    api/osal
+   api/log
 
 .. toctree::
    :maxdepth: 2
@@ -46,6 +48,7 @@ Features
 
 * **Hardware Abstraction Layer (HAL)**: Unified API for GPIO, UART, SPI, I2C, Timer, ADC
 * **OS Abstraction Layer (OSAL)**: Portable RTOS interface supporting FreeRTOS and bare-metal
+* **Log Framework**: Flexible logging with multiple backends, async mode, and module filtering
 * **Multi-Platform Support**: STM32F4, STM32H7, ESP32, nRF52, and more
 * **Security**: Secure boot, TLS 1.3, crypto engine, key management
 * **Functional Safety**: MISRA C compliance, MPU protection, runtime checks

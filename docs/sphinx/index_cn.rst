@@ -2,7 +2,7 @@ Nexus 嵌入式平台
 ================
 
 .. note::
-   
+
    **Language / 语言**: `English <../en/index.html>`_ | `中文 <../cn/index_cn.html>`_
 
 欢迎使用 Nexus 嵌入式平台文档。Nexus 是一个世界级的嵌入式软件开发平台，
@@ -23,6 +23,7 @@ Nexus 嵌入式平台
    user_guide/architecture_cn
    user_guide/hal_cn
    user_guide/osal_cn
+   user_guide/log_cn
    user_guide/porting_cn
 
 .. toctree::
@@ -31,6 +32,7 @@ Nexus 嵌入式平台
 
    api/hal
    api/osal
+   api/log
 
 .. toctree::
    :maxdepth: 2
@@ -45,6 +47,7 @@ Nexus 嵌入式平台
 
 * **硬件抽象层 (HAL)**: 统一的 GPIO、UART、SPI、I2C、Timer、ADC 接口
 * **操作系统抽象层 (OSAL)**: 可移植的 RTOS 接口，支持 FreeRTOS 和裸机
+* **日志框架**: 灵活的日志系统，支持多后端、异步模式和模块过滤
 * **多平台支持**: STM32F4、STM32H7、ESP32、nRF52 等
 * **安全特性**: 安全启动、TLS 1.3、加密引擎、密钥管理
 * **功能安全**: MISRA C 合规、MPU 保护、运行时检查
