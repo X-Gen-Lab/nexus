@@ -47,8 +47,12 @@ add_executable(nexus_tests
     osal/test_osal_queue_properties.cpp
     osal/test_osal_core_properties.cpp
     osal/test_osal_error_handling_properties.cpp
+    log/test_log.cpp
+    log/test_log_properties.cpp
+    log/test_log_uart_backend.cpp
     integration/test_hal_osal_integration.cpp
     integration/test_freertos_adapter_integration.cpp
+    integration/test_log_integration.cpp
 )
 
 # Require C++20 for designated initializers
@@ -59,6 +63,7 @@ target_include_directories(nexus_tests
         ${CMAKE_SOURCE_DIR}/hal/include
         ${CMAKE_SOURCE_DIR}/osal/include
         ${CMAKE_SOURCE_DIR}/platforms/native/include
+        ${CMAKE_SOURCE_DIR}/framework/log/include
 )
 
 # Platform-specific threading libraries
@@ -77,6 +82,7 @@ target_link_libraries(nexus_tests
         hal_interface
         hal
         osal
+        log_framework
         ${THREAD_LIBS}
 )
 

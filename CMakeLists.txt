@@ -128,6 +128,9 @@ include(FreeRTOS)
 add_subdirectory(hal)
 add_subdirectory(osal)
 
+# Framework layer
+add_subdirectory(framework)
+
 # Middleware (when available)
 # add_subdirectory(middleware)
 
