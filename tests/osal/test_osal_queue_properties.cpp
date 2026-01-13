@@ -1,0 +1,358 @@
+/**
+ * \file            test_osal_queue_properties.cpp
+ * \brief           OSAL Queue Property-Based Tests
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-01-13
+ *
+ * \copyright       Copyright (c) 2026 Nexus Team
+ *
+ * Property-based tests for OSAL Queue module.
+ * These tests verify universal properties that should hold for all valid inputs.
+ * Each property test runs 100+ iterations with random inputs.
+ */
+
+#include <gtest/gtest.h>
+#include <random>
+#include <atomic>
+#include <chrono>
+#include <thread>
+#include <vector>
+#include <algorithm>
+
+extern "C" {
+#include "osal/osal.h"
+}
+
+/**
+ * \brief           Number of iterations for property tests
+ */
+static constexpr int PROPERTY_TEST_ITERATIONS = 100;
+
+/**
+ * \brief           OSAL Queue Property Test Fixture
+ */
+class OsalQueuePropertyTest : public ::testing::Test {
+protected:
+    std::mt19937 rng;
+    
+    void SetUp() override {
+        osal_init();
+        rng.seed(std::random_device{}());
+    }
+
+    void TearDown() override {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    
+    /**
+     * \brief       Generate random queue capacity (2-20)
+     */
+    size_t randomCapacity() {
+        std::uniform_int_distribution<size_t> dist(2, 20);
+        return dist(rng);
+    }
+    
+    /**
+     * \brief       Generate random number of items to send (1-capacity)
+     */
+    size_t randomItemCount(size_t max_count) {
+        std::uniform_int_distribution<size_t> dist(1, max_count);
+        return dist(rng);
+    }
+    
+    /**
+     * \brief       Generate random integer value
+     */
+    int randomValue() {
+        std::uniform_int_distribution<int> dist(-10000, 10000);
+        return dist(rng);
+    }
+};
+
+/*---------------------------------------------------------------------------*/
+/* Property 16: Queue FIFO Order                                             */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: phase2-core-platform, Property 16: Queue FIFO Order
+ * 
+ * *For any* sequence of items sent to a queue, receiving them SHALL return
+ * items in the same order (FIFO).
+ * 
+ * **Validates: Requirements 10.2, 10.4**
+ */
+TEST_F(OsalQueuePropertyTest, Property16_QueueFIFOOrder) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        size_t capacity = randomCapacity();
+        size_t num_items = randomItemCount(capacity);
+        
+        /* Generate random values to send */
+        std::vector<int> send_values(num_items);
+        for (size_t i = 0; i < num_items; i++) {
+            send_values[i] = randomValue();
+        }
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        /* Send all items */
+        for (size_t i = 0; i < num_items; i++) {
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &send_values[i], OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+        }
+        
+        /* Receive all items and verify FIFO order */
+        for (size_t i = 0; i < num_items; i++) {
+            int recv_value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": receive " << i << " failed";
+            
+            EXPECT_EQ(send_values[i], recv_value)
+                << "Iteration " << test_iter << ": FIFO order violated at index " << i
+                << " (expected " << send_values[i] << ", got " << recv_value << ")";
+        }
+        
+        /* Queue should be empty */
+        EXPECT_TRUE(osal_queue_is_empty(queue))
+            << "Iteration " << test_iter << ": queue should be empty after receiving all items";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+
+/**
+ * Feature: phase2-core-platform, Property 16b: Queue FIFO Order with Interleaved Operations
+ * 
+ * *For any* sequence of interleaved send/receive operations, the relative order
+ * of items SHALL be preserved (FIFO).
+ * 
+ * **Validates: Requirements 10.2, 10.4**
+ */
+TEST_F(OsalQueuePropertyTest, Property16_QueueFIFOOrderInterleaved) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        size_t capacity = randomCapacity();
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        std::vector<int> expected_order;
+        int send_counter = 0;
+        
+        /* Perform random interleaved operations */
+        for (int op = 0; op < 50; op++) {
+            bool do_send = (rng() % 2 == 0) || osal_queue_is_empty(queue);
+            bool queue_full = osal_queue_is_full(queue);
+            
+            if (do_send && !queue_full) {
+                /* Send a new item */
+                int value = send_counter++;
+                ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &value, OSAL_NO_WAIT))
+                    << "Iteration " << test_iter << ": send failed at op " << op;
+                expected_order.push_back(value);
+            } else if (!osal_queue_is_empty(queue)) {
+                /* Receive an item */
+                int recv_value = 0;
+                ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+                    << "Iteration " << test_iter << ": receive failed at op " << op;
+                
+                /* Verify FIFO order */
+                ASSERT_FALSE(expected_order.empty())
+                    << "Iteration " << test_iter << ": expected_order is empty but received value";
+                
+                EXPECT_EQ(expected_order.front(), recv_value)
+                    << "Iteration " << test_iter << ": FIFO order violated at op " << op;
+                
+                expected_order.erase(expected_order.begin());
+            }
+        }
+        
+        /* Drain remaining items and verify order */
+        while (!osal_queue_is_empty(queue)) {
+            int recv_value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT));
+            
+            ASSERT_FALSE(expected_order.empty());
+            EXPECT_EQ(expected_order.front(), recv_value)
+                << "Iteration " << test_iter << ": FIFO order violated during drain";
+            expected_order.erase(expected_order.begin());
+        }
+        
+        EXPECT_TRUE(expected_order.empty())
+            << "Iteration " << test_iter << ": expected_order should be empty";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 17: Queue Capacity                                               */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: phase2-core-platform, Property 17: Queue Capacity
+ * 
+ * *For any* queue with capacity N, sending N+1 items without receiving
+ * SHALL block on the (N+1)th send.
+ * 
+ * **Validates: Requirements 10.1, 10.3**
+ */
+TEST_F(OsalQueuePropertyTest, Property17_QueueCapacity) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random capacity */
+        size_t capacity = randomCapacity();
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        /* Fill the queue to capacity */
+        for (size_t i = 0; i < capacity; i++) {
+            int value = static_cast<int>(i);
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i 
+                << " should succeed (capacity=" << capacity << ")";
+        }
+        
+        /* Queue should be full */
+        EXPECT_TRUE(osal_queue_is_full(queue))
+            << "Iteration " << test_iter << ": queue should be full after " << capacity << " sends";
+        
+        EXPECT_EQ(capacity, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": queue count should equal capacity";
+        
+        /* The (capacity + 1)th send should fail/block */
+        int extra_value = 999;
+        EXPECT_EQ(OSAL_ERROR_FULL, osal_queue_send(queue, &extra_value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter 
+            << ": send after reaching capacity should return FULL";
+        
+        /* Receive one item */
+        int recv_value = 0;
+        ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": receive should succeed";
+        
+        /* Now send should succeed again */
+        EXPECT_EQ(OSAL_OK, osal_queue_send(queue, &extra_value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter 
+            << ": send after receiving should succeed";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/**
+ * Feature: phase2-core-platform, Property 17b: Queue Capacity with Different Item Sizes
+ * 
+ * *For any* queue with capacity N and item size S, the queue SHALL hold
+ * exactly N items regardless of item size.
+ * 
+ * **Validates: Requirements 10.1**
+ */
+TEST_F(OsalQueuePropertyTest, Property17_QueueCapacityDifferentSizes) {
+    /* Test with different item sizes */
+    std::vector<size_t> item_sizes = {1, 4, 16, 64, 128};
+    
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Pick random item size */
+        size_t item_size = item_sizes[rng() % item_sizes.size()];
+        size_t capacity = randomCapacity();
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(item_size, capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed "
+            << "(item_size=" << item_size << ", capacity=" << capacity << ")";
+        
+        /* Allocate buffer for items */
+        std::vector<uint8_t> item(item_size);
+        
+        /* Fill the queue to capacity */
+        for (size_t i = 0; i < capacity; i++) {
+            /* Fill item with pattern */
+            std::fill(item.begin(), item.end(), static_cast<uint8_t>(i & 0xFF));
+            
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, item.data(), OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " should succeed";
+        }
+        
+        /* Verify capacity */
+        EXPECT_EQ(capacity, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": queue count should equal capacity";
+        
+        EXPECT_TRUE(osal_queue_is_full(queue))
+            << "Iteration " << test_iter << ": queue should be full";
+        
+        /* Extra send should fail */
+        EXPECT_EQ(OSAL_ERROR_FULL, osal_queue_send(queue, item.data(), OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": send when full should fail";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/**
+ * Feature: phase2-core-platform, Property 17c: Queue Empty After Draining
+ * 
+ * *For any* queue with N items, receiving N items SHALL result in an empty queue.
+ * 
+ * **Validates: Requirements 10.4**
+ */
+TEST_F(OsalQueuePropertyTest, Property17_QueueEmptyAfterDraining) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        size_t capacity = randomCapacity();
+        size_t num_items = randomItemCount(capacity);
+        
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+        
+        /* Send items */
+        for (size_t i = 0; i < num_items; i++) {
+            int value = static_cast<int>(i);
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &value, OSAL_NO_WAIT));
+        }
+        
+        EXPECT_EQ(num_items, osal_queue_get_count(queue));
+        
+        /* Receive all items */
+        for (size_t i = 0; i < num_items; i++) {
+            int recv_value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT));
+        }
+        
+        /* Queue should be empty */
+        EXPECT_TRUE(osal_queue_is_empty(queue))
+            << "Iteration " << test_iter << ": queue should be empty after draining";
+        
+        EXPECT_EQ(0u, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": queue count should be 0";
+        
+        /* Receive on empty queue should fail */
+        int value = 0;
+        EXPECT_EQ(OSAL_ERROR_EMPTY, osal_queue_receive(queue, &value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": receive on empty queue should fail";
+        
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
