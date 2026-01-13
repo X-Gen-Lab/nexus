@@ -37,6 +37,14 @@ add_executable(nexus_tests
     hal/test_hal_timer_properties.cpp
     hal/test_hal_adc.cpp
     hal/test_hal_adc_properties.cpp
+    osal/test_osal_task.cpp
+    osal/test_osal_mutex.cpp
+    osal/test_osal_mutex_properties.cpp
+    osal/test_osal_sem.cpp
+    osal/test_osal_sem_properties.cpp
+    osal/test_osal_queue.cpp
+    osal/test_osal_queue_properties.cpp
+    integration/test_hal_osal_integration.cpp
 )
 
 # Require C++20 for designated initializers
@@ -45,8 +53,17 @@ target_compile_features(nexus_tests PRIVATE cxx_std_20)
 target_include_directories(nexus_tests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/hal/include
+        ${CMAKE_SOURCE_DIR}/osal/include
         ${CMAKE_SOURCE_DIR}/platforms/native/include
 )
+
+# Platform-specific threading libraries
+if(WIN32)
+    set(THREAD_LIBS "")
+else()
+    find_package(Threads REQUIRED)
+    set(THREAD_LIBS Threads::Threads)
+endif()
 
 target_link_libraries(nexus_tests
     PRIVATE
@@ -54,6 +71,9 @@ target_link_libraries(nexus_tests
         GTest::gmock
         platform_native
         hal_interface
+        hal
+        osal
+        ${THREAD_LIBS}
 )
 
 # Discover tests
