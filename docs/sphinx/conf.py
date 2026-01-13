@@ -37,6 +37,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'index_cn.rst',
                     'user_guide/architecture_cn.rst',
                     'user_guide/hal_cn.rst',
                     'user_guide/osal_cn.rst',
+                    'user_guide/log_cn.rst',
                     'user_guide/porting_cn.rst',
                     'development/contributing_cn.rst',
                     'development/coding_standards_cn.rst',
@@ -78,12 +79,17 @@ html_sidebars = {
 }
 
 # -- Breathe configuration ---------------------------------------------------
+# Note: Doxygen must be run first from project root: doxygen Doxyfile
+# This generates XML output to docs/api/xml
 
 breathe_projects = {
-    'nexus': '../api/xml'
+    'nexus': '../../docs/api/xml'
 }
 breathe_default_project = 'nexus'
 breathe_default_members = ('members', 'undoc-members')
+
+# Suppress breathe warnings if Doxygen XML not found
+suppress_warnings = ['breathe.doxygen']
 
 # -- Todo extension configuration --------------------------------------------
 
