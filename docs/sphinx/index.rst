@@ -3,7 +3,7 @@ Nexus Embedded Platform
 
 .. note::
 
-   **Language / 语言**: `English <../en/index.html>`_ | `中文 <../cn/index_cn.html>`_
+   **Language / 语言**: Use the language switcher in the sidebar.
 
 Welcome to the Nexus Embedded Platform documentation. Nexus is a world-class
 embedded software development platform designed for building reliable,
@@ -25,6 +25,8 @@ secure, and portable embedded applications.
    user_guide/hal
    user_guide/osal
    user_guide/log
+   user_guide/shell
+   user_guide/config
    user_guide/porting
 
 .. toctree::
@@ -34,6 +36,8 @@ secure, and portable embedded applications.
    api/hal
    api/osal
    api/log
+   api/shell
+   api/config
 
 .. toctree::
    :maxdepth: 2
@@ -58,9 +62,17 @@ Features
 Quick Links
 -----------
 
-* `GitHub Repository <https://github.com/nexus-team/nexus>`_
-* `Issue Tracker <https://github.com/nexus-team/nexus/issues>`_
-* `Changelog <https://github.com/nexus-team/nexus/blob/main/CHANGELOG.md>`_
+* :doc:`getting_started/introduction` - Learn about Nexus
+* :doc:`getting_started/installation` - Set up your environment
+* :doc:`getting_started/quickstart` - Build your first app
+
+Community
+---------
+
+* `GitHub <https://github.com/X-Gen-Lab/nexus>`_
+* `Issues <https://github.com/X-Gen-Lab/nexus/issues>`_
+* `Discussions <https://github.com/X-Gen-Lab/nexus/discussions>`_
+* `Changelog <https://github.com/X-Gen-Lab/nexus/blob/main/CHANGELOG.md>`_
 
 Indices and tables
 ==================
