@@ -1,6 +1,7 @@
 #!/bin/bash
-# Build Nexus Documentation (English and Chinese)
+# Build Nexus Documentation with i18n Support
 # Bash/Shell version for Linux/macOS
+# Uses Sphinx official gettext mechanism
 
 set -e
 
@@ -16,35 +17,37 @@ print_header() {
 }
 
 print_step() {
-    echo -e "${GREEN}$1${NC}"
+    echo -e "${GREEN}  → $1${NC}"
 }
 
 print_warning() {
-    echo -e "${YELLOW}$1${NC}"
+    echo -e "${YELLOW}  ⚠ $1${NC}"
 }
 
 print_error() {
-    echo -e "${RED}$1${NC}"
+    echo -e "${RED}  ✗ $1${NC}"
 }
 
+print_success() {
+    echo -e "${GREEN}  ✓ $1${NC}"
+}
+
+# Supported languages
+LANGUAGES=("en" "zh_CN")
+
 # Parse arguments
-BUILD_ENGLISH=true
-BUILD_CHINESE=true
+BUILD_LANG=""
 CLEAN=false
 SERVE=false
 PORT=8000
+UPDATE_PO=false
+RUN_DOXYGEN=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -e|--english)
-            BUILD_ENGLISH=true
-            BUILD_CHINESE=false
-            shift
-            ;;
-        -c|--chinese)
-            BUILD_ENGLISH=false
-            BUILD_CHINESE=true
-            shift
+        -l|--lang)
+            BUILD_LANG="$2"
+            shift 2
             ;;
         --clean)
             CLEAN=true
@@ -58,16 +61,31 @@ while [[ $# -gt 0 ]]; do
             PORT="$2"
             shift 2
             ;;
+        -d|--doxygen)
+            RUN_DOXYGEN=true
+            shift
+            ;;
+        --update-po)
+            UPDATE_PO=true
+            shift
+            ;;
         -h|--help)
             echo "Usage: $0 [options]"
             echo ""
             echo "Options:"
-            echo "  -e, --english    Build English documentation only"
-            echo "  -c, --chinese    Build Chinese documentation only"
+            echo "  -l, --lang LANG  Build specific language only (en, zh_CN)"
             echo "  --clean          Clean build directory before building"
             echo "  -s, --serve      Serve documentation after building"
             echo "  -p, --port PORT  Port for serving (default: 8000)"
+            echo "  -d, --doxygen    Run Doxygen first"
+            echo "  --update-po      Update translation .po files"
             echo "  -h, --help       Show this help message"
+            echo ""
+            echo "Examples:"
+            echo "  $0                    # Build all languages"
+            echo "  $0 --lang zh_CN       # Build Chinese only"
+            echo "  $0 --clean --serve    # Clean, rebuild, and serve"
+            echo "  $0 --update-po        # Update translation files"
             exit 0
             ;;
         *)
@@ -77,78 +95,181 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-print_header "========================================"
-print_header "Building Nexus Documentation"
-print_header "========================================"
+print_header ""
+print_header "╔════════════════════════════════════════╗"
+print_header "║   Nexus Documentation Builder (i18n)   ║"
+print_header "╚════════════════════════════════════════╝"
+print_header ""
+
+# Handle --update-po
+if [ "$UPDATE_PO" = true ]; then
+    print_header "Updating Translation Files"
+    print_step "Extracting translatable messages..."
+    python3 -m sphinx -b gettext . _build/gettext
+    print_success "Message extraction completed"
+
+    print_step "Updating zh_CN translation files..."
+    python3 -m sphinx_intl update -p _build/gettext -l zh_CN
+    print_success "Translation files updated"
+
+    echo ""
+    echo "Edit files in: locale/zh_CN/LC_MESSAGES/*.po"
+    exit 0
+fi
+
+# Run Doxygen if requested
+if [ "$RUN_DOXYGEN" = true ]; then
+    print_header "Running Doxygen"
+    print_step "Generating API documentation..."
+    cd ../..
+    doxygen Doxyfile || print_warning "Doxygen failed, API docs may be incomplete"
+    cd docs/sphinx
+    print_success "Doxygen completed"
+fi
 
 # Clean if requested
 if [ "$CLEAN" = true ]; then
-    print_warning "[Clean] Removing _build directory..."
+    print_header "Cleaning Build Directory"
+    print_step "Removing _build directory..."
     rm -rf _build
+    print_success "Clean completed"
 fi
 
-# Create output directories
-mkdir -p _build/html/en
-mkdir -p _build/html/cn
-
-# Build English documentation
-if [ "$BUILD_ENGLISH" = true ]; then
-    print_step ""
-    print_step "[1/3] Building English documentation..."
-    python3 -m sphinx -b html . _build/html/en
+# Determine languages to build
+if [ -n "$BUILD_LANG" ]; then
+    LANGS_TO_BUILD=("$BUILD_LANG")
+else
+    LANGS_TO_BUILD=("${LANGUAGES[@]}")
 fi
 
-# Build Chinese documentation
-if [ "$BUILD_CHINESE" = true ]; then
-    print_step ""
-    print_step "[2/3] Building Chinese documentation..."
-    EXCLUDE_PATTERNS="['_build','Thumbs.db','.DS_Store','index.rst','getting_started/introduction.rst','getting_started/installation.rst','getting_started/quickstart.rst','user_guide/architecture.rst','user_guide/hal.rst','user_guide/osal.rst','user_guide/log.rst','user_guide/porting.rst','development/contributing.rst','development/coding_standards.rst','development/testing.rst','conf_cn.py']"
-    python3 -m sphinx -b html -c . . _build/html/cn \
-        -D master_doc=index_cn \
-        -D language=zh_CN \
-        -D "exclude_patterns=$EXCLUDE_PATTERNS"
-fi
+# Build documentation
+print_header "Building Documentation"
 
-# Create language selection page
-print_step ""
-print_step "[3/3] Creating language selection page..."
-cat > _build/html/index.html << 'EOF'
+for lang in "${LANGS_TO_BUILD[@]}"; do
+    print_step "Building $lang documentation..."
+    mkdir -p "_build/html/$lang"
+
+    if [ "$lang" = "en" ]; then
+        python3 -m sphinx -b html . "_build/html/$lang"
+    else
+        python3 -m sphinx -b html -D "language=$lang" . "_build/html/$lang"
+    fi
+
+    print_success "$lang documentation built"
+done
+
+# Create language selection page (only if building all languages)
+if [ -z "$BUILD_LANG" ]; then
+    print_step "Creating language selection page..."
+    cat > _build/html/index.html << 'EOF'
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=en/index.html">
-    <title>Nexus Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3; url=en/index.html">
+    <title>Nexus Documentation - Language Selection</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f5f5f5; }
-        .container { text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; margin-bottom: 20px; }
-        p { color: #666; margin-bottom: 20px; }
-        a { display: inline-block; margin: 10px; padding: 12px 24px; background: #0066cc; color: white; text-decoration: none; border-radius: 4px; }
-        a:hover { background: #0052a3; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            text-align: center;
+            padding: 60px 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+        .logo { font-size: 48px; margin-bottom: 20px; }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .languages {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            min-width: 140px;
+        }
+        a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        .flag { font-size: 32px; margin-bottom: 8px; }
+        .lang-name { font-weight: 500; font-size: 16px; }
+        .redirect-notice {
+            margin-top: 30px;
+            color: #999;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="logo">📚</div>
         <h1>Nexus Embedded Platform</h1>
-        <p>Select language:</p>
-        <a href="en/index.html">English</a>
-        <a href="cn/index_cn.html">Chinese</a>
+        <p class="subtitle">Select your preferred language</p>
+        <div class="languages">
+            <a href="en/index.html">
+                <span class="flag">🇺🇸</span>
+                <span class="lang-name">English</span>
+            </a>
+            <a href="zh_CN/index.html">
+                <span class="flag">🇨🇳</span>
+                <span class="lang-name">中文</span>
+            </a>
+        </div>
+        <p class="redirect-notice">Redirecting to English in 3 seconds...</p>
     </div>
 </body>
 </html>
 EOF
+    print_success "Language selection page created"
+fi
 
+# Summary
 print_header ""
-print_header "========================================"
-print_header "Build completed successfully!"
-print_header "========================================"
+print_header "╔════════════════════════════════════════╗"
+print_header "║         Build Completed!               ║"
+print_header "╚════════════════════════════════════════╝"
 echo ""
-echo "Output:"
-echo "  Language selection: _build/html/index.html"
-echo "  English docs:       _build/html/en/index.html"
-echo "  Chinese docs:       _build/html/cn/index_cn.html"
+echo "Output locations:"
+if [ -z "$BUILD_LANG" ]; then
+    echo "  Language selector: _build/html/index.html"
+fi
+for lang in "${LANGS_TO_BUILD[@]}"; do
+    printf "  %-15s: _build/html/%s/index.html\n" "$lang" "$lang"
+done
 
 # Serve if requested
 if [ "$SERVE" = true ]; then
