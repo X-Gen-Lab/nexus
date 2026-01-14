@@ -122,161 +122,161 @@
   - 验证模块间接口正确
   - 如有问题请询问用户
 
-- [ ] 9. 查询和枚举模块实现
-  - [ ] 9.1 实现查询功能
+- [x] 9. 查询和枚举模块实现
+  - [x] 9.1 实现查询功能
     - 创建 config_query.c
     - 实现 config_exists
     - 实现 config_get_type
     - 实现 config_delete
     - 实现 config_get_count
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.6_
-  - [ ] 9.2 实现枚举功能
+  - [x] 9.2 实现枚举功能
     - 实现 config_iterate
     - 实现 config_ns_iterate
     - _Requirements: 8.5_
-  - [ ] 9.3 编写查询枚举单元测试
+  - [x] 9.3 编写查询枚举单元测试
     - 测试存在性检查
     - 测试类型查询
     - 测试删除操作
     - 测试迭代功能
     - _Requirements: 8.1-8.6_
 
-- [ ] 10. 存储后端实现
-  - [ ] 10.1 实现后端抽象层
+- [x] 10. 存储后端实现
+  - [x] 10.1 实现后端抽象层
     - 创建 config_backend.c
     - 实现 config_set_backend
     - 实现 config_commit / config_load
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.7, 9.1_
-  - [ ] 10.2 实现 RAM 后端
+  - [x] 10.2 实现 RAM 后端
     - 创建 config_ram_backend.c
     - 实现易失性存储
     - _Requirements: 9.2_
-  - [ ] 10.3 实现 Flash 后端
+  - [x] 10.3 实现 Flash 后端
     - 创建 config_flash_backend.c
     - 实现持久化存储
     - 支持磨损均衡提示
     - _Requirements: 9.3, 9.5, 9.6_
-  - [ ] 10.4 实现 Mock 后端（测试用）
+  - [x] 10.4 实现 Mock 后端（测试用）
     - 创建 config_mock_backend.c
     - 支持测试注入
     - _Requirements: 9.1_
-  - [ ] 10.5 编写后端单元测试
+  - [x] 10.5 编写后端单元测试
     - 测试后端设置
     - 测试提交和加载
     - 测试 NVS 错误处理
     - _Requirements: 6.1, 6.2, 6.5, 6.6, 9.1-9.6_
-  - [ ] 10.6 编写后端属性测试
+  - [x] 10.6 编写后端属性测试
     - **Property 8: Persistence Round-Trip**
     - **Validates: Requirements 6.1, 6.2**
 
-- [ ] 11. Checkpoint - 持久化验证
+- [x] 11. Checkpoint - 持久化验证
   - 确保后端模块测试通过
   - 验证持久化功能正常
   - 如有问题请询问用户
 
-- [ ] 12. 导入/导出模块实现
-  - [ ] 12.1 实现 JSON 导出
+- [x] 12. 导入/导出模块实现
+  - [x] 12.1 实现 JSON 导出
     - 创建 config_export.c
     - 实现 config_get_export_size
     - 实现 config_export (JSON 格式)
     - 实现 config_export_namespace
     - _Requirements: 11.1, 11.5, 11.8_
-  - [ ] 12.2 实现 JSON 导入
+  - [x] 12.2 实现 JSON 导入
     - 创建 config_import.c
     - 实现 config_import (JSON 格式)
     - 实现 config_import_namespace
     - 实现格式验证
     - _Requirements: 11.2, 11.6, 11.7, 11.9, 11.10_
-  - [ ] 12.3 实现二进制导出/导入
+  - [x] 12.3 实现二进制导出/导入
     - 实现 config_export (Binary 格式)
     - 实现 config_import (Binary 格式)
     - _Requirements: 11.3, 11.4_
-  - [ ] 12.4 编写导入导出单元测试
+  - [x] 12.4 编写导入导出单元测试
     - 测试 JSON 导出/导入
     - 测试二进制导出/导入
     - 测试命名空间选择性导出
     - 测试格式验证
     - _Requirements: 11.1-11.10_
-  - [ ] 12.5 编写导入导出属性测试
+  - [x] 12.5 编写导入导出属性测试
     - **Property 6: Export/Import Round-Trip**
     - **Validates: Requirements 11.1-11.6**
 
-- [ ] 13. 加密模块实现
-  - [ ] 13.1 实现加密核心
+- [x] 13. 加密模块实现
+  - [x] 13.1 实现加密核心
     - 创建 config_crypto.c
     - 实现 config_set_encryption_key
     - 实现 config_clear_encryption_key
     - 实现 AES-128/256 加密解密
     - _Requirements: 12.3, 12.4, 12.5_
-  - [ ] 13.2 实现加密存储 API
+  - [x] 13.2 实现加密存储 API
     - 实现 config_set_str_encrypted
     - 实现 config_set_blob_encrypted
     - 实现 config_is_encrypted
     - 实现 config_rotate_encryption_key
     - _Requirements: 12.1, 12.2, 12.6, 12.7, 12.8, 12.10_
-  - [ ] 13.3 实现加密导出支持
+  - [x] 13.3 实现加密导出支持
     - 支持 CONFIG_EXPORT_FLAG_DECRYPT
     - 加密键导出时保持加密
     - _Requirements: 12.9_
-  - [ ] 13.4 编写加密单元测试
+  - [x] 13.4 编写加密单元测试
     - 测试加密存储和读取
     - 测试无密钥错误
     - 测试密钥轮换
     - _Requirements: 12.1-12.10_
-  - [ ] 13.5 编写加密属性测试
+  - [x] 13.5 编写加密属性测试
     - **Property 7: Encryption Transparency**
     - **Validates: Requirements 12.1, 12.2**
 
-- [ ] 14. Checkpoint - 高级功能验证
+- [x] 14. Checkpoint - 高级功能验证
   - 确保导入导出和加密模块测试通过
   - 验证加密导出功能正常
   - 如有问题请询问用户
 
-- [ ] 15. 错误处理完善
-  - [ ] 15.1 实现错误处理机制
+- [x] 15. 错误处理完善
+  - [x] 15.1 实现错误处理机制
     - 实现 config_get_last_error
     - 实现 config_error_to_str
     - 完善所有错误码返回
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
-  - [ ] 15.2 编写错误处理测试
+  - [x] 15.2 编写错误处理测试
     - 测试各种错误场景
     - 测试错误码转字符串
     - _Requirements: 10.1-10.6_
 
-- [ ] 16. 集成测试和文档
-  - [ ] 16.1 编写集成测试
+- [x] 16. 集成测试和文档 ✓
+  - [x] 16.1 编写集成测试
     - 测试完整配置流程
     - 测试命名空间和回调
     - 测试持久化和加密
     - _Requirements: 1.1-12.10_
-  - [ ] 16.2 更新 API 文档
+  - [x] 16.2 更新 API 文档 ✓
     - 确保所有公共 API 有 Doxygen 注释
-    - 创建使用示例
+    - 创建使用示例 (docs/examples/config_example.c)
     - _Requirements: 1.1_
-  - [ ] 16.3 创建 Config Manager 示例应用
+  - [x] 16.3 创建 Config Manager 示例应用 ✓
     - 创建 applications/config_demo/
     - 演示配置存储和读取
     - 演示导入导出功能
     - _Requirements: 1.1, 2.1, 11.1_
 
-- [ ] 17. 代码格式和注释规范
-  - [ ] 17.1 代码格式检查
+- [x] 17. 代码格式和注释规范
+  - [x] 17.1 代码格式检查
     - 运行 clang-format 格式化所有源文件
     - 确保符合 .clang-format 配置
     - 运行 scripts/tools/format.py 验证格式
     - _Requirements: 项目代码规范_
-  - [ ] 17.2 注释规范检查
+  - [x] 17.2 注释规范检查
     - 确保所有公共 API 有 Doxygen 注释
     - 确保函数注释包含 @brief, @param, @return
     - 确保文件头包含版权和许可证信息
     - 确保复杂逻辑有行内注释说明
     - _Requirements: 项目文档规范_
-  - [ ] 17.3 静态分析检查
+  - [x] 17.3 静态分析检查
     - 运行 clang-tidy 检查代码质量
     - 修复所有警告和错误
     - _Requirements: 项目代码规范_
 
-- [ ] 18. Final Checkpoint - 完整验证
+- [x] 18. Final Checkpoint - 完整验证
   - 确保所有测试通过
   - 验证代码覆盖率 ≥ 80%
   - 验证代码格式和注释符合项目规范
@@ -284,7 +284,7 @@
 
 ## Notes
 
-- 所有任务均为必需，确保全面测试覆盖
+- 所有任务均为必需，确保全面测试覆盖 n
 - 每个任务引用具体的需求以确保可追溯性
 - Checkpoint 任务用于增量验证
 - 属性测试验证通用正确性属性
