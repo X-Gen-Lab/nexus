@@ -1,0 +1,73 @@
+# Installation - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Installation"
+msgstr "安装"
+
+msgid "Prerequisites"
+msgstr "前置条件"
+
+msgid "Before installing Nexus, ensure you have the following tools installed:"
+msgstr "安装 Nexus 之前，请确保已安装以下工具："
+
+msgid "**CMake** (3.16 or later)"
+msgstr "**CMake**（3.16 或更高版本）"
+
+msgid "**Python** (3.8 or later)"
+msgstr "**Python**（3.8 或更高版本）"
+
+msgid "**GCC ARM Toolchain** (for embedded targets)"
+msgstr "**GCC ARM 工具链**（用于嵌入式目标）"
+
+msgid "**GCC/Clang** (for native builds)"
+msgstr "**GCC/Clang**（用于本地构建）"
+
+msgid "Installing Prerequisites"
+msgstr "安装前置条件"
+
+msgid "Windows"
+msgstr "Windows"
+
+msgid "Linux"
+msgstr "Linux"
+
+msgid "macOS"
+msgstr "macOS"
+
+msgid "Getting Nexus"
+msgstr "获取 Nexus"
+
+msgid "Clone the repository:"
+msgstr "克隆仓库："
+
+msgid "Building"
+msgstr "构建"
+
+msgid "Native Build (for testing)"
+msgstr "本地构建（用于测试）"
+
+msgid "Embedded Build (STM32F4)"
+msgstr "嵌入式构建（STM32F4）"
+
+msgid "Running Tests"
+msgstr "运行测试"
+
+msgid "Building Documentation"
+msgstr "构建文档"
+
+msgid "Next Steps"
+msgstr "下一步"
+
+msgid "After installation, proceed to:"
+msgstr "安装完成后，请继续："
+
+msgid ":doc:`quickstart` - Build your first application"
+msgstr ":doc:`quickstart` - 构建你的第一个应用"
+
+msgid ":doc:`../user_guide/architecture` - Understand the architecture"
+msgstr ":doc:`../user_guide/architecture` - 了解架构"

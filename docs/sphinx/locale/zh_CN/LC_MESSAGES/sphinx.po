@@ -1,0 +1,134 @@
+# Sphinx built-in messages - Chinese Translation
+# This file contains translations for Sphinx's built-in UI strings
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-15 00:00+0000\n"
+"PO-Revision-Date: 2026-01-15 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
+"Language: zh_CN\n"
+"Language-Team: Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Navigation
+msgid "Navigation"
+msgstr "导航"
+
+msgid "Table of Contents"
+msgstr "目录"
+
+msgid "Next"
+msgstr "下一页"
+
+msgid "Previous"
+msgstr "上一页"
+
+msgid "Index"
+msgstr "索引"
+
+msgid "Module Index"
+msgstr "模块索引"
+
+msgid "Search Page"
+msgstr "搜索页面"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "Quick search"
+msgstr "快速搜索"
+
+msgid "Go"
+msgstr "搜索"
+
+# Content
+msgid "Note"
+msgstr "注意"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "See also"
+msgstr "参见"
+
+msgid "Todo"
+msgstr "待办"
+
+msgid "Tip"
+msgstr "提示"
+
+msgid "Important"
+msgstr "重要"
+
+msgid "Hint"
+msgstr "提示"
+
+msgid "Caution"
+msgstr "注意"
+
+msgid "Danger"
+msgstr "危险"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Example"
+msgstr "示例"
+
+# API Documentation
+msgid "Parameters"
+msgstr "参数"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "Return type"
+msgstr "返回类型"
+
+msgid "Raises"
+msgstr "异常"
+
+msgid "Variables"
+msgstr "变量"
+
+msgid "class"
+msgstr "类"
+
+msgid "function"
+msgstr "函数"
+
+msgid "method"
+msgstr "方法"
+
+msgid "attribute"
+msgstr "属性"
+
+msgid "module"
+msgstr "模块"
+
+# Footer
+msgid "Copyright"
+msgstr "版权所有"
+
+msgid "Built with"
+msgstr "使用"
+
+msgid "Last updated on"
+msgstr "最后更新于"
+
+# Search results
+msgid "Search Results"
+msgstr "搜索结果"
+
+msgid "Your search did not match any documents."
+msgstr "您的搜索没有匹配任何文档。"
+
+msgid "Searching..."
+msgstr "搜索中..."
+
+msgid "Search finished, found %s page(s) matching the search query."
+msgstr "搜索完成，找到 %s 个匹配的页面。"

@@ -1,0 +1,342 @@
+# Introduction - Chinese Translation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-15 01:24+0800\n"
+"PO-Revision-Date: 2026-01-15 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
+"Language: zh_CN\n"
+"Language-Team: Chinese\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../getting_started/introduction.rst:2 e0ea78e5111742dba49862fb881c220f
+msgid "Introduction"
+msgstr "简介"
+
+#: ../../getting_started/introduction.rst:5 8156c23155ad48d9b1808d910e111dcf
+msgid "What is Nexus?"
+msgstr "什么是 Nexus？"
+
+#: ../../getting_started/introduction.rst:7 4e87ea6f83dc4f28bf17bd8fc13e3d0a
+msgid ""
+"Nexus is a world-class embedded software development platform designed "
+"for building reliable, secure, and portable embedded applications. It "
+"provides a comprehensive set of abstraction layers and middleware "
+"components that enable developers to write code once and deploy across "
+"multiple MCU families."
+msgstr ""
+"Nexus "
+"是一个世界级的嵌入式软件开发平台，专为构建可靠、安全、可移植的嵌入式应用而设计。它提供了一套完整的抽象层和中间件组件，使开发者能够一次编写代码，部署到多个"
+" MCU 系列。"
+
+#: ../../getting_started/introduction.rst:13 07604add83e14bafb7e2077286288347
+msgid "Key Features"
+msgstr "核心特性"
+
+#: ../../getting_started/introduction.rst:15 4a90d1ad3f6a4e2c94ee17a11a5d9dc5
+msgid ""
+"**Unified APIs**: Consistent interfaces across different hardware "
+"platforms"
+msgstr "**统一 API**: 跨不同硬件平台的一致接口"
+
+#: ../../getting_started/introduction.rst:16 f9614faa06f54241be9e6296de442c3c
+msgid ""
+"**Portability**: Write once, run on multiple MCU families (STM32, ESP32, "
+"nRF52)"
+msgstr "**可移植性**: 一次编写，运行在多个 MCU 系列（STM32、ESP32、nRF52）"
+
+#: ../../getting_started/introduction.rst:17 3b3bea00161f4f17a0e7f8a68b664f51
+msgid "**Quality**: MISRA C compliant, thoroughly tested code with 90%+ coverage"
+msgstr "**高质量**: 符合 MISRA C 标准，经过充分测试，覆盖率超过 90%"
+
+#: ../../getting_started/introduction.rst:18 86a7453c5619485091f1f68942166b4a
+msgid "**Security**: Built-in security features for IoT applications"
+msgstr "**安全性**: 内置 IoT 应用安全特性"
+
+#: ../../getting_started/introduction.rst:19 e96309e188f34a10a5766c02a1abb855
+msgid "**Real-time**: Support for FreeRTOS and bare-metal configurations"
+msgstr "**实时性**: 支持 FreeRTOS 和裸机配置"
+
+#: ../../getting_started/introduction.rst:20 64369ccdff8844b9b6304b3f74d947da
+msgid "**Ecosystem**: Rich middleware, cloud integration, and tooling"
+msgstr "**生态系统**: 丰富的中间件、云端集成和工具链"
+
+#: ../../getting_started/introduction.rst:23 11e592795b2e4b9bb75f407fbb648196
+msgid "Why Nexus?"
+msgstr "为什么选择 Nexus？"
+
+#: ../../getting_started/introduction.rst:25 8669596436834b75a0f29add19311dc8
+msgid "**For Embedded Developers:**"
+msgstr "**对于嵌入式开发者：**"
+
+#: ../../getting_started/introduction.rst:27 b39f53cf1c314963b797d85dcd56e3d1
+msgid "Reduce time-to-market with ready-to-use components"
+msgstr "使用即用型组件缩短上市时间"
+
+#: ../../getting_started/introduction.rst:28 baf4d2490be04b50ad7c49a09000583b
+msgid "Focus on application logic instead of low-level drivers"
+msgstr "专注于应用逻辑而非底层驱动"
+
+#: ../../getting_started/introduction.rst:29 39c90be65f154948a58fb174407c0516
+msgid "Easy migration between MCU platforms"
+msgstr "轻松在 MCU 平台之间迁移"
+
+#: ../../getting_started/introduction.rst:31 02f392c8c2c64a4a974eb19e5bf0583e
+msgid "**For Teams:**"
+msgstr "**对于团队：**"
+
+#: ../../getting_started/introduction.rst:33 30ffff1efcbc48a5873b50b89a68718f
+msgid "Consistent coding standards across projects"
+msgstr "跨项目的一致编码标准"
+
+#: ../../getting_started/introduction.rst:34 caca2922923940fa897efa53d3f82139
+msgid "Comprehensive documentation and examples"
+msgstr "完善的文档和示例"
+
+#: ../../getting_started/introduction.rst:35 88ab2b7dc1134e5d9d7d423d03083e35
+msgid "Active community and support"
+msgstr "活跃的社区和支持"
+
+#: ../../getting_started/introduction.rst:38 fda5a451459447068cfa601156180e6c
+msgid "Architecture Overview"
+msgstr "架构概述"
+
+#: ../../getting_started/introduction.rst:40 3dc248c9cc2f4c98846f9c15c37c694c
+msgid ""
+"Nexus follows a layered architecture that separates hardware-specific "
+"code from application logic:"
+msgstr "Nexus 采用分层架构，将硬件相关代码与应用逻辑分离："
+
+#: ../../getting_started/introduction.rst:43 1f6d9b79a6824adabf86f919dde575fe
+msgid ""
+"┌─────────────────────────────────────────────────────────────┐\n"
+"│                      Applications                            │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                      Middleware                              │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │  Shell  │ │   Log   │ │  Config │ │  Event  │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                         OSAL                                 │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │  Task   │ │  Mutex  │ │  Queue  │ │  Timer  │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                          HAL                                 │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │  GPIO   │ │  UART   │ │   SPI   │ │   I2C   │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                    Platform / Hardware                       │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │ STM32F4 │ │ STM32H7 │ │  ESP32  │ │  nRF52  │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"└─────────────────────────────────────────────────────────────┘"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:70 f03c44dd7acf43d38d2b932929914a9b
+msgid "Layer Descriptions"
+msgstr "层级说明"
+
+#: ../../getting_started/introduction.rst:72 025414aa6177456a8fe78196d8e7b034
+msgid "**Application Layer**"
+msgstr "**应用层**"
+
+#: ../../getting_started/introduction.rst:73 e4d871fa67444605959c589fd7422dc9
+msgid "User applications built on top of Nexus platform."
+msgstr "基于 Nexus 平台构建的用户应用程序。"
+
+#: ../../getting_started/introduction.rst:75 533df344d7c446739fdd29270dc0dab0
+msgid "**Middleware Layer**"
+msgstr "**中间件层**"
+
+#: ../../getting_started/introduction.rst:76 8ec868eb6e5946c3a554898a2c42aeb3
+msgid ""
+"Common services including logging, shell, configuration management, and "
+"event handling."
+msgstr "通用服务，包括日志、Shell、配置管理和事件处理。"
+
+#: ../../getting_started/introduction.rst:79 535266fad91e4a7cbcb9291a3f892553
+msgid "**OSAL (OS Abstraction Layer)**"
+msgstr "**OSAL（操作系统抽象层）**"
+
+#: ../../getting_started/introduction.rst:80 6c3e1577792747419b94e7c3b5f999d4
+msgid ""
+"Portable interface for RTOS primitives: tasks, mutexes, semaphores, "
+"queues, and timers. Supports FreeRTOS and bare-metal backends."
+msgstr "RTOS 原语的可移植接口：任务、互斥锁、信号量、队列和定时器。支持 FreeRTOS 和裸机后端。"
+
+#: ../../getting_started/introduction.rst:83 1f2ac973909547d39029f390dce9e7a9
+msgid "**HAL (Hardware Abstraction Layer)**"
+msgstr "**HAL（硬件抽象层）**"
+
+#: ../../getting_started/introduction.rst:84 51200830a54240de903d74199d6ccca8
+msgid ""
+"Unified API for hardware peripherals: GPIO, UART, SPI, I2C, Timer, ADC. "
+"Hides hardware differences from application code."
+msgstr "硬件外设的统一 API：GPIO、UART、SPI、I2C、Timer、ADC。对应用代码隐藏硬件差异。"
+
+#: ../../getting_started/introduction.rst:87 616f0572d8b54a5d931764b5acb1fc30
+msgid "**Platform Layer**"
+msgstr "**平台层**"
+
+#: ../../getting_started/introduction.rst:88 6582d2dbcc1f47e38c63a1ee5f4dce13
+msgid ""
+"MCU-specific implementations including startup code, linker scripts, and "
+"vendor SDK integration."
+msgstr "MCU 特定实现，包括启动代码、链接脚本和厂商 SDK 集成。"
+
+#: ../../getting_started/introduction.rst:92 6f28ef64af584c849e929be11ff94b3f
+msgid "Supported Platforms"
+msgstr "支持的平台"
+
+#: ../../getting_started/introduction.rst:95 1bc8f3fb7ac7498bbed3248294a69a09
+#, fuzzy
+msgid "Platform"
+msgstr "**平台层**"
+
+#: ../../getting_started/introduction.rst:95 7965c794ae4d4c3eb47e1bb1f9558ac2
+msgid "MCU"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:95 16287b3ffd644e75844fef37db5eba1c
+msgid "Status"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:95 84f0686d332e4457a437608dd6546128
+msgid "RTOS Support"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:97 0f43d77ab21f403fb218489eda86f270
+msgid "STM32F4"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:97 3ae9c3a6159c4e868490957eae1081c8
+msgid "STM32F407VGT6"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:97
+#: ../../getting_started/introduction.rst:105 0e164cd27f9a488eb4bce807c7c964de
+#: 61c440c9e1b24f87802309965f4b9c85
+msgid "✅"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:97
+#: ../../getting_started/introduction.rst:99 4d81cb30885c4bac950985630c5ea38a
+#: 8c47ac3673d7429e824d8e2b37cd5548
+msgid "FreeRTOS, Bare"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:99 009417acd98844c0bf0f013092871530
+msgid "STM32H7"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:99 23020018d64a433d87a19a9e426b7e9b
+msgid "STM32H743ZIT6"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:99
+#: ../../getting_started/introduction.rst:101
+#: ../../getting_started/introduction.rst:103 0f1f8ae84e924826aa2c2edc0027e71f
+#: 5d7dde3c8f84455ea3657c728577ddcd fdefab84767b444cbaee54e821db95bc
+msgid "🚧"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:101 e3a88613a365412b9d9824632bb1b46b
+msgid "ESP32"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:101 221c5be8b51245e0939a20260edf498d
+msgid "ESP32-WROOM-32"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:101 80771eb174584d06a5ac7961fa45e5ca
+msgid "FreeRTOS"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:103 78e6ee5c89e6469d811090f68d3ec054
+msgid "nRF52"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:103 b7362386659a48ee8878278ddd644180
+msgid "nRF52840"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:103 3db5e9192b644589b871e8786be68cc3
+msgid "FreeRTOS, Zephyr"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:105 faa1b2f229444a61b8bdfca20ac0162c
+msgid "Native"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:105 70fb702998cc4b4e8a1cc3d890a0aab6
+msgid "x86/x64"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:105 b0c0fae77f4446aaab561ae93c820d65
+msgid "pthreads"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:108 974253cd0971444ebfc23cb4274ee2b2
+msgid "Legend: ✅ Supported, 🚧 In Progress"
+msgstr "图例：✅ 已支持，🚧 开发中"
+
+#: ../../getting_started/introduction.rst:111 12d1a5944efb446d9373fc13ec7276fd
+msgid "Project Structure"
+msgstr "项目结构"
+
+#: ../../getting_started/introduction.rst:115 5ca2d73539b04977bae1113166432e11
+msgid ""
+"nexus/\n"
+"├── hal/                    # Hardware Abstraction Layer\n"
+"│   ├── include/            # Public headers\n"
+"│   └── src/                # Common HAL code\n"
+"├── osal/                   # OS Abstraction Layer\n"
+"│   ├── include/            # Public headers\n"
+"│   └── adapters/           # RTOS adapters (FreeRTOS, native)\n"
+"├── framework/              # Middleware components\n"
+"│   └── log/                # Logging framework\n"
+"├── platforms/              # Platform-specific code\n"
+"│   ├── stm32f4/            # STM32F4 platform\n"
+"│   └── native/             # Native (PC) platform\n"
+"├── applications/           # Example applications\n"
+"├── tests/                  # Unit tests\n"
+"├── docs/                   # Documentation\n"
+"└── cmake/                  # CMake modules and toolchains"
+msgstr ""
+
+#: ../../getting_started/introduction.rst:133 94e52e71cbff420aa78fe69e85041165
+msgid "License"
+msgstr "许可证"
+
+#: ../../getting_started/introduction.rst:135 b16ba389207742a9b46279378355b51f
+msgid "Nexus is released under the MIT License. See the LICENSE file for details."
+msgstr "Nexus 基于 MIT 许可证发布。详情请参阅 LICENSE 文件。"
+
+#: ../../getting_started/introduction.rst:138 bfb9281f76c24137ad6d0ce2058bcc36
+msgid "Getting Started"
+msgstr "开始使用"
+
+#: ../../getting_started/introduction.rst:140 47bdffd97f504a3f9b9787f29dc6bfb0
+msgid "Ready to start? Follow these guides:"
+msgstr "准备好开始了吗？请按照以下指南操作："
+
+#: ../../getting_started/introduction.rst:142 a25f6826838042edae3b9fd06d105b49
+msgid ":doc:`installation` - Set up your development environment"
+msgstr ":doc:`installation` - 设置开发环境"
+
+#: ../../getting_started/introduction.rst:143 0e696475fd5847c49b5277d9d5075bd9
+msgid ":doc:`quickstart` - Build your first Nexus application"
+msgstr ":doc:`quickstart` - 构建你的第一个 Nexus 应用"
+
+#: ../../getting_started/introduction.rst:144 37c4026fa9d148b0959fba98be336e90
+msgid ":doc:`../user_guide/architecture` - Deep dive into the architecture"
+msgstr ":doc:`../user_guide/architecture` - 深入了解架构"
+

@@ -1,0 +1,88 @@
+# Coding Standards - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Coding Standards"
+msgstr "编码规范"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid "This document describes the coding standards for the Nexus project."
+msgstr "本文档描述 Nexus 项目的编码规范。"
+
+msgid "General Guidelines"
+msgstr "通用准则"
+
+msgid "Naming Conventions"
+msgstr "命名约定"
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Variables"
+msgstr "变量"
+
+msgid "Constants"
+msgstr "常量"
+
+msgid "Macros"
+msgstr "宏"
+
+msgid "Types"
+msgstr "类型"
+
+msgid "Files"
+msgstr "文件"
+
+msgid "Formatting"
+msgstr "格式化"
+
+msgid "Indentation"
+msgstr "缩进"
+
+msgid "Braces"
+msgstr "大括号"
+
+msgid "Line Length"
+msgstr "行长度"
+
+msgid "Whitespace"
+msgstr "空白"
+
+msgid "Comments"
+msgstr "注释"
+
+msgid "Documentation Comments"
+msgstr "文档注释"
+
+msgid "Inline Comments"
+msgstr "行内注释"
+
+msgid "Error Handling"
+msgstr "错误处理"
+
+msgid "Memory Management"
+msgstr "内存管理"
+
+msgid "Thread Safety"
+msgstr "线程安全"
+
+msgid "MISRA C Compliance"
+msgstr "MISRA C 合规"
+
+msgid "Tools"
+msgstr "工具"
+
+msgid "clang-format"
+msgstr "clang-format"
+
+msgid "clang-tidy"
+msgstr "clang-tidy"
+
+msgid "Examples"
+msgstr "示例"

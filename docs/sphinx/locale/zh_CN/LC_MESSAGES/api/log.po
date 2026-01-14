@@ -1,0 +1,31 @@
+# Log API - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Log Framework API Reference"
+msgstr "日志框架 API 参考"
+
+msgid "This section documents the Log Framework API."
+msgstr "本节记录日志框架 API。"
+
+msgid "Log Definitions"
+msgstr "日志定义"
+
+msgid "Log Macros"
+msgstr "日志宏"
+
+msgid "Log Backend"
+msgstr "日志后端"
+
+msgid "Console Backend"
+msgstr "Console 后端"
+
+msgid "UART Backend"
+msgstr "UART 后端"
+
+msgid "Memory Backend"
+msgstr "Memory 后端"

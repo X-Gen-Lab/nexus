@@ -1,0 +1,73 @@
+# Porting Guide - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Porting Guide"
+msgstr "移植指南"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid "This guide explains how to port Nexus to a new hardware platform."
+msgstr "本指南说明如何将 Nexus 移植到新的硬件平台。"
+
+msgid "Prerequisites"
+msgstr "前置条件"
+
+msgid "Platform Structure"
+msgstr "平台结构"
+
+msgid "HAL Implementation"
+msgstr "HAL 实现"
+
+msgid "GPIO Implementation"
+msgstr "GPIO 实现"
+
+msgid "UART Implementation"
+msgstr "UART 实现"
+
+msgid "Timer Implementation"
+msgstr "定时器实现"
+
+msgid "OSAL Adapter"
+msgstr "OSAL 适配器"
+
+msgid "Build Configuration"
+msgstr "构建配置"
+
+msgid "CMake Configuration"
+msgstr "CMake 配置"
+
+msgid "Toolchain File"
+msgstr "工具链文件"
+
+msgid "Linker Script"
+msgstr "链接脚本"
+
+msgid "Startup Code"
+msgstr "启动代码"
+
+msgid "Testing"
+msgstr "测试"
+
+msgid "Verification"
+msgstr "验证"
+
+msgid "Common Issues"
+msgstr "常见问题"
+
+msgid "Next Steps"
+msgstr "下一步"
+
+msgid "Example"
+msgstr "示例"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "Dependencies"
+msgstr "依赖"

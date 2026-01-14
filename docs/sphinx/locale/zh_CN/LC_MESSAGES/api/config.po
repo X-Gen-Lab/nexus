@@ -1,0 +1,28 @@
+# Config API - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Config Manager API Reference"
+msgstr "配置管理器 API 参考"
+
+msgid "This section documents the Configuration Manager API."
+msgstr "本节记录配置管理器 API。"
+
+msgid "Config Core"
+msgstr "配置核心"
+
+msgid "Config Definitions"
+msgstr "配置定义"
+
+msgid "Backend Interface"
+msgstr "后端接口"
+
+msgid "RAM Backend"
+msgstr "RAM 后端"
+
+msgid "Flash Backend"
+msgstr "Flash 后端"

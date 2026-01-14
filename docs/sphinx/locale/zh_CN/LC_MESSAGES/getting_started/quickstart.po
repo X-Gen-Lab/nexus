@@ -1,0 +1,52 @@
+# Quick Start - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Quick Start"
+msgstr "快速开始"
+
+msgid "This guide will help you build your first Nexus application."
+msgstr "本指南将帮助你构建第一个 Nexus 应用。"
+
+msgid "Create a New Project"
+msgstr "创建新项目"
+
+msgid "Build and Flash"
+msgstr "构建和烧录"
+
+msgid "Understanding the Code"
+msgstr "理解代码"
+
+msgid "Next Steps"
+msgstr "下一步"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid "Prerequisites"
+msgstr "前置条件"
+
+msgid "Project Structure"
+msgstr "项目结构"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "Building"
+msgstr "构建"
+
+msgid "Running"
+msgstr "运行"
+
+msgid "Debugging"
+msgstr "调试"
+
+msgid "Example"
+msgstr "示例"
+
+msgid "See also"
+msgstr "参见"

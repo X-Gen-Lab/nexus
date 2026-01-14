@@ -1,0 +1,67 @@
+# HAL - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Hardware Abstraction Layer (HAL)"
+msgstr "硬件抽象层 (HAL)"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid "Supported Peripherals"
+msgstr "支持的外设"
+
+msgid "GPIO"
+msgstr "GPIO"
+
+msgid "UART"
+msgstr "UART"
+
+msgid "SPI"
+msgstr "SPI"
+
+msgid "I2C"
+msgstr "I2C"
+
+msgid "Timer"
+msgstr "定时器"
+
+msgid "ADC"
+msgstr "ADC"
+
+msgid "PWM"
+msgstr "PWM"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "Initialization"
+msgstr "初始化"
+
+msgid "Usage Examples"
+msgstr "使用示例"
+
+msgid "Error Handling"
+msgstr "错误处理"
+
+msgid "Thread Safety"
+msgstr "线程安全"
+
+msgid "Porting"
+msgstr "移植"
+
+msgid "API Reference"
+msgstr "API 参考"
+
+msgid "Features"
+msgstr "特性"
+
+msgid "Quick Start"
+msgstr "快速开始"
+
+msgid "Dependencies"
+msgstr "依赖"

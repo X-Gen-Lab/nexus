@@ -1,0 +1,63 @@
+{# Language switcher sidebar component #}
+<div class="language-switcher">
+    <div class="title">🌐 Language</div>
+    <div class="languages">
+        {% for lang_code, lang_name in languages %}
+        <a href="../{{ lang_code }}/{{ pagename }}.html" {% if lang_code==current_language %}class="current" {% endif
+            %}>
+            {{ lang_name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .language-switcher {
+        padding: 12px 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+    }
+
+    .language-switcher .title {
+        font-size: 11px;
+        color: #666;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .language-switcher .languages {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .language-switcher a {
+        display: inline-block;
+        padding: 6px 14px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+
+    .language-switcher a:hover {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+
+    .language-switcher a.current {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+        font-weight: 500;
+        pointer-events: none;
+    }
+</style>

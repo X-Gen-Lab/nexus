@@ -1,0 +1,67 @@
+# Architecture - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Architecture"
+msgstr "架构"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid "Design Principles"
+msgstr "设计原则"
+
+msgid "Layer Architecture"
+msgstr "分层架构"
+
+msgid "Application Layer"
+msgstr "应用层"
+
+msgid "Middleware Layer"
+msgstr "中间件层"
+
+msgid "OS Abstraction Layer"
+msgstr "操作系统抽象层"
+
+msgid "Hardware Abstraction Layer"
+msgstr "硬件抽象层"
+
+msgid "Platform Layer"
+msgstr "平台层"
+
+msgid "Data Flow"
+msgstr "数据流"
+
+msgid "Dependency Rules"
+msgstr "依赖规则"
+
+msgid "Memory Management"
+msgstr "内存管理"
+
+msgid "Error Handling"
+msgstr "错误处理"
+
+msgid "Build System"
+msgstr "构建系统"
+
+msgid "Next Steps"
+msgstr "下一步"
+
+msgid "Portability"
+msgstr "可移植性"
+
+msgid "Modularity"
+msgstr "模块化"
+
+msgid "Testability"
+msgstr "可测试性"
+
+msgid "Safety"
+msgstr "安全性"
+
+msgid "Performance"
+msgstr "性能"

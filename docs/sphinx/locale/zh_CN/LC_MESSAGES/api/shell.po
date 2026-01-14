@@ -1,0 +1,37 @@
+# Shell API - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Shell Framework API Reference"
+msgstr "Shell 框架 API 参考"
+
+msgid "This section documents the Shell Framework API."
+msgstr "本节记录 Shell 框架 API。"
+
+msgid "Shell Core"
+msgstr "Shell 核心"
+
+msgid "Definitions & Constants"
+msgstr "定义和常量"
+
+msgid "Command Management"
+msgstr "命令管理"
+
+msgid "Line Editor"
+msgstr "行编辑器"
+
+msgid "History"
+msgstr "历史"
+
+msgid "Autocomplete"
+msgstr "自动补全"
+
+msgid "Parser"
+msgstr "解析器"
+
+msgid "Backend Interface"
+msgstr "后端接口"

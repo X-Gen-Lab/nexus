@@ -1,0 +1,28 @@
+# OSAL API - Chinese Translation
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus 1.0.0\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "OSAL API Reference"
+msgstr "OSAL API 参考"
+
+msgid "This section documents the OS Abstraction Layer (OSAL) API."
+msgstr "本节记录操作系统抽象层 (OSAL) API。"
+
+msgid "OSAL Definitions"
+msgstr "OSAL 定义"
+
+msgid "Task API"
+msgstr "任务 API"
+
+msgid "Mutex API"
+msgstr "互斥锁 API"
+
+msgid "Semaphore API"
+msgstr "信号量 API"
+
+msgid "Queue API"
+msgstr "队列 API"

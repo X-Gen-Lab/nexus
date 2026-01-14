@@ -1,0 +1,269 @@
+# Shell Framework - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-15 01:24+0800\n"
+"PO-Revision-Date: 2026-01-15 01:30+0800\n"
+"Last-Translator: Nexus Team\n"
+"Language: zh_CN\n"
+"Language-Team: Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Shell Framework"
+msgstr "Shell 框架"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid ""
+"The Shell Framework provides an interactive command-line interface (CLI) "
+"for the Nexus embedded platform. It supports command registration, line "
+"editing, command history, auto-completion, and multiple I/O backends."
+msgstr ""
+"Shell 框架为 Nexus 嵌入式平台提供交互式命令行界面（CLI）。"
+"它支持命令注册、行编辑、命令历史、自动补全和多种 I/O 后端。"
+
+msgid "Features"
+msgstr "特性"
+
+msgid "**Command Registration**: Dynamic command registration with help and usage"
+msgstr "**命令注册**: 动态注册命令，支持帮助和用法说明"
+
+msgid "**Line Editing**: Cursor movement, insert, delete, Home/End keys"
+msgstr "**行编辑**: 光标移动、插入、删除、Home/End 键"
+
+msgid "**Command History**: Browse history with up/down arrows"
+msgstr "**命令历史**: 使用上下箭头浏览历史"
+
+msgid "**Auto-Completion**: Tab completion for commands and arguments"
+msgstr "**自动补全**: Tab 键补全命令和参数"
+
+msgid "**Built-in Commands**: help, version, clear, history, echo"
+msgstr "**内置命令**: help、version、clear、history、echo"
+
+msgid "**Multiple Backends**: UART, Console, and custom backends"
+msgstr "**多后端支持**: UART、Console 和自定义后端"
+
+msgid "**Argument Parsing**: Supports quotes and escape characters"
+msgstr "**参数解析**: 支持引号和转义字符"
+
+msgid "**Thread-Safe**: Safe for multi-task environments"
+msgstr "**线程安全**: 多任务环境下安全使用"
+
+msgid "**Resource Configurable**: Static allocation for constrained systems"
+msgstr "**资源可配置**: 支持静态分配，适用于资源受限系统"
+
+msgid "Quick Start"
+msgstr "快速开始"
+
+msgid "**Basic usage:**"
+msgstr "**基本用法：**"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "**Custom configuration:**"
+msgstr "**自定义配置：**"
+
+msgid "**Default configuration:**"
+msgstr "**默认配置：**"
+
+msgid "Parameter"
+msgstr "参数"
+
+msgid "Default"
+msgstr "默认值"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Shell prompt string"
+msgstr "Shell 提示符字符串"
+
+msgid "Command buffer size"
+msgstr "命令缓冲区大小"
+
+msgid "History entry count"
+msgstr "历史记录数量"
+
+msgid "Max registered commands"
+msgstr "最大注册命令数"
+
+msgid "Command Definition"
+msgstr "命令定义"
+
+msgid "**Command structure:**"
+msgstr "**命令结构：**"
+
+msgid "**Handler function signature:**"
+msgstr "**处理函数签名：**"
+
+msgid "``argc``: Argument count (including command name)"
+msgstr "``argc``: 参数数量（包括命令名）"
+
+msgid "``argv``: Argument array"
+msgstr "``argv``: 参数数组"
+
+msgid "Return: 0 for success, non-zero for error"
+msgstr "返回值：0 表示成功，非 0 表示错误"
+
+msgid "**Example command with auto-completion:**"
+msgstr "**带自动补全的命令示例：**"
+
+msgid "Built-in Commands"
+msgstr "内置命令"
+
+msgid "Command"
+msgstr "命令"
+
+msgid "Usage"
+msgstr "用法"
+
+msgid "Show available commands"
+msgstr "显示可用命令"
+
+msgid "Show Shell version"
+msgstr "显示 Shell 版本"
+
+msgid "Clear terminal screen"
+msgstr "清除终端屏幕"
+
+msgid "Show command history"
+msgstr "显示命令历史"
+
+msgid "Print arguments"
+msgstr "打印参数"
+
+msgid "Line Editing Keys"
+msgstr "行编辑快捷键"
+
+msgid "Key"
+msgstr "按键"
+
+msgid "Function"
+msgstr "功能"
+
+msgid "Move cursor left"
+msgstr "光标左移"
+
+msgid "Move cursor right"
+msgstr "光标右移"
+
+msgid "Move to line start"
+msgstr "移到行首"
+
+msgid "Move to line end"
+msgstr "移到行尾"
+
+msgid "Delete previous character"
+msgstr "删除前一字符"
+
+msgid "Delete current character"
+msgstr "删除当前字符"
+
+msgid "Delete to end of line"
+msgstr "删除到行尾"
+
+msgid "Delete to start of line"
+msgstr "删除到行首"
+
+msgid "Previous history"
+msgstr "上一条历史"
+
+msgid "Next history"
+msgstr "下一条历史"
+
+msgid "Auto-complete"
+msgstr "自动补全"
+
+msgid "Cancel current input"
+msgstr "取消当前输入"
+
+msgid "Clear screen"
+msgstr "清屏"
+
+msgid "Backends"
+msgstr "后端"
+
+msgid "UART Backend"
+msgstr "UART 后端"
+
+msgid "Custom Backend"
+msgstr "自定义后端"
+
+msgid "Output Functions"
+msgstr "输出函数"
+
+msgid "Error Handling"
+msgstr "错误处理"
+
+msgid "**Status codes:**"
+msgstr "**状态码：**"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Success"
+msgstr "成功"
+
+msgid "Invalid parameter"
+msgstr "无效参数"
+
+msgid "Not initialized"
+msgstr "未初始化"
+
+msgid "Already initialized"
+msgstr "已初始化"
+
+msgid "No backend configured"
+msgstr "未配置后端"
+
+msgid "Command not found"
+msgstr "命令未找到"
+
+msgid "Command already exists"
+msgstr "命令已存在"
+
+msgid "Buffer full"
+msgstr "缓冲区满"
+
+msgid "Compile-Time Configuration"
+msgstr "编译时配置"
+
+msgid "Macro"
+msgstr "宏定义"
+
+msgid "Max command count"
+msgstr "最大命令数"
+
+msgid "Default command buffer"
+msgstr "默认命令缓冲区"
+
+msgid "Default history depth"
+msgstr "默认历史深度"
+
+msgid "Max argument count"
+msgstr "最大参数数量"
+
+msgid "Default prompt"
+msgstr "默认提示符"
+
+msgid "Dependencies"
+msgstr "依赖"
+
+msgid "**OSAL**: OS Abstraction Layer (optional, for thread safety)"
+msgstr "**OSAL**: 操作系统抽象层（可选，用于线程安全）"
+
+msgid "**HAL**: Hardware Abstraction Layer (UART backend)"
+msgstr "**HAL**: 硬件抽象层（UART 后端）"
+
+msgid "API Reference"
+msgstr "API 参考"
+
+msgid "See :doc:`../api/shell` for complete API documentation."
+msgstr "完整 API 文档请参阅 :doc:`../api/shell`。"

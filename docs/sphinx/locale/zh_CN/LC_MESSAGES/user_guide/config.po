@@ -1,0 +1,293 @@
+# Config Manager - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-15 01:24+0800\n"
+"PO-Revision-Date: 2026-01-15 01:30+0800\n"
+"Last-Translator: Nexus Team\n"
+"Language: zh_CN\n"
+"Language-Team: Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Config Manager"
+msgstr "配置管理器"
+
+msgid "Overview"
+msgstr "概述"
+
+msgid ""
+"The Config Manager provides a flexible, secure, and persistent key-value "
+"configuration storage for the Nexus embedded platform. It supports multiple "
+"data types, namespaces, change notifications, and optional encryption."
+msgstr ""
+"配置管理器为 Nexus 嵌入式平台提供灵活、安全、持久化的键值配置存储。"
+"它支持多种数据类型、命名空间、变更通知和可选加密。"
+
+msgid "Features"
+msgstr "特性"
+
+msgid "**Multiple Types**: int32/64, uint32, float, bool, string, blob"
+msgstr "**多类型支持**: int32/64、uint32、float、bool、string、blob"
+
+msgid "**Namespace Isolation**: Separate configurations by module"
+msgstr "**命名空间隔离**: 按模块分离配置"
+
+msgid "**Default Values**: Register defaults with one-click reset"
+msgstr "**默认值管理**: 注册默认值，支持一键恢复"
+
+msgid "**Change Notifications**: Callbacks on configuration changes"
+msgstr "**变更通知**: 配置变更时触发回调"
+
+msgid "**Persistent Storage**: RAM, Flash, and custom backends"
+msgstr "**持久化存储**: RAM、Flash 和自定义后端"
+
+msgid "**Import/Export**: Binary and JSON format support"
+msgstr "**导入/导出**: 支持二进制和 JSON 格式"
+
+msgid "**Optional Encryption**: AES-128/256 for sensitive data"
+msgstr "**可选加密**: AES-128/256 加密敏感数据"
+
+msgid "**Thread-Safe**: Safe for multi-task environments"
+msgstr "**线程安全**: 多任务环境下安全使用"
+
+msgid "**Resource Configurable**: Static allocation for constrained systems"
+msgstr "**资源可配置**: 支持静态分配，适用于资源受限系统"
+
+msgid "Quick Start"
+msgstr "快速开始"
+
+msgid "**Basic usage:**"
+msgstr "**基本用法：**"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "**Custom configuration:**"
+msgstr "**自定义配置：**"
+
+msgid "**Default configuration:**"
+msgstr "**默认配置：**"
+
+msgid "Parameter"
+msgstr "参数"
+
+msgid "Default"
+msgstr "默认值"
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Maximum key count"
+msgstr "最大键数量"
+
+msgid "Maximum key length"
+msgstr "最大键长度"
+
+msgid "Maximum value size"
+msgstr "最大值大小"
+
+msgid "Maximum namespace count"
+msgstr "最大命名空间数"
+
+msgid "Maximum callback count"
+msgstr "最大回调数"
+
+msgid "Auto-commit mode"
+msgstr "自动提交模式"
+
+msgid "Data Types"
+msgstr "数据类型"
+
+msgid "Type"
+msgstr "类型"
+
+msgid "Value"
+msgstr "值"
+
+msgid "32-bit signed integer"
+msgstr "32 位有符号整数"
+
+msgid "32-bit unsigned integer"
+msgstr "32 位无符号整数"
+
+msgid "64-bit signed integer"
+msgstr "64 位有符号整数"
+
+msgid "Single-precision float"
+msgstr "单精度浮点数"
+
+msgid "Boolean value"
+msgstr "布尔值"
+
+msgid "Null-terminated string"
+msgstr "空终止字符串"
+
+msgid "Binary data"
+msgstr "二进制数据"
+
+msgid "Type Operations"
+msgstr "类型操作"
+
+msgid "**Integer operations:**"
+msgstr "**整数操作：**"
+
+msgid "**Float and boolean:**"
+msgstr "**浮点和布尔：**"
+
+msgid "**String and blob:**"
+msgstr "**字符串和二进制：**"
+
+msgid "Namespaces"
+msgstr "命名空间"
+
+msgid "Namespaces isolate configurations for different modules:"
+msgstr "命名空间用于隔离不同模块的配置："
+
+msgid "Default Values"
+msgstr "默认值"
+
+msgid "**Single default values:**"
+msgstr "**单个默认值：**"
+
+msgid "**Batch registration:**"
+msgstr "**批量注册：**"
+
+msgid "Change Notifications"
+msgstr "变更通知"
+
+msgid "**Watch specific key:**"
+msgstr "**监听特定键：**"
+
+msgid "**Watch all changes:**"
+msgstr "**监听所有变更：**"
+
+msgid "Storage Backends"
+msgstr "存储后端"
+
+msgid "RAM Backend"
+msgstr "RAM 后端"
+
+msgid "For testing and volatile storage:"
+msgstr "用于测试和易失性存储："
+
+msgid "Flash Backend"
+msgstr "Flash 后端"
+
+msgid "For persistent storage:"
+msgstr "用于持久化存储："
+
+msgid "Custom Backend"
+msgstr "自定义后端"
+
+msgid "Import/Export"
+msgstr "导入/导出"
+
+msgid "**Binary format:**"
+msgstr "**二进制格式：**"
+
+msgid "**JSON format:**"
+msgstr "**JSON 格式：**"
+
+msgid "**Namespace export:**"
+msgstr "**命名空间导出：**"
+
+msgid "Encryption"
+msgstr "加密"
+
+msgid "**Set encryption key:**"
+msgstr "**设置加密密钥：**"
+
+msgid "**Store encrypted data:**"
+msgstr "**存储加密数据：**"
+
+msgid "**Key rotation:**"
+msgstr "**密钥轮换：**"
+
+msgid "Query Operations"
+msgstr "查询操作"
+
+msgid "Error Handling"
+msgstr "错误处理"
+
+msgid "**Status codes:**"
+msgstr "**状态码：**"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Success"
+msgstr "成功"
+
+msgid "Invalid parameter"
+msgstr "无效参数"
+
+msgid "Not initialized"
+msgstr "未初始化"
+
+msgid "Already initialized"
+msgstr "已初始化"
+
+msgid "Key not found"
+msgstr "键未找到"
+
+msgid "Type mismatch"
+msgstr "类型不匹配"
+
+msgid "Buffer too small"
+msgstr "缓冲区太小"
+
+msgid "Storage full"
+msgstr "存储已满"
+
+msgid "Backend error"
+msgstr "后端错误"
+
+msgid "Encryption error"
+msgstr "加密错误"
+
+msgid "Compile-Time Configuration"
+msgstr "编译时配置"
+
+msgid "Macro"
+msgstr "宏定义"
+
+msgid "Default max key count"
+msgstr "默认最大键数"
+
+msgid "Default max key length"
+msgstr "默认最大键长度"
+
+msgid "Default max value size"
+msgstr "默认最大值大小"
+
+msgid "Default max namespaces"
+msgstr "默认最大命名空间数"
+
+msgid "Default max callbacks"
+msgstr "默认最大回调数"
+
+msgid "Enable encryption"
+msgstr "启用加密"
+
+msgid "Enable JSON support"
+msgstr "启用 JSON 支持"
+
+msgid "Dependencies"
+msgstr "依赖"
+
+msgid "**OSAL**: OS Abstraction Layer (Mutex for thread safety)"
+msgstr "**OSAL**: 操作系统抽象层（Mutex 用于线程安全）"
+
+msgid "**HAL**: Hardware Abstraction Layer (Flash backend)"
+msgstr "**HAL**: 硬件抽象层（Flash 后端）"
+
+msgid "API Reference"
+msgstr "API 参考"
+
+msgid "See :doc:`../api/config` for complete API documentation."
+msgstr "完整 API 文档请参阅 :doc:`../api/config`。"
