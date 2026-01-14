@@ -17,15 +17,13 @@
 #include <string.h>
 
 /**
- * \defgroup        SHELL_UART_BACKEND_IMPL Shell UART Backend Implementation
- * \brief           UART backend implementation
+ * \addtogroup      SHELL_UART_BACKEND
  * \{
  */
 
-/**
- * \name            Private Data
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Private Data                                                              */
+/*---------------------------------------------------------------------------*/
 
 /** UART instance used by the backend */
 static hal_uart_instance_t g_uart_instance = HAL_UART_0;
@@ -39,22 +37,15 @@ static bool g_uart_backend_initialized = false;
 /** Blocking write timeout in milliseconds */
 #define UART_WRITE_TIMEOUT_MS   1000
 
-/**
- * \}
- */
-
-/**
- * \name            Private Functions
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Private Functions                                                         */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Non-blocking read from UART
  * \param[out]      data: Buffer to store read data
  * \param[in]       max_len: Maximum number of bytes to read
  * \return          Number of bytes actually read, 0 if no data available
- *
- * Requirement 8.4: Non-blocking read operation
  */
 static int
 uart_backend_read(uint8_t* data, int max_len) {
@@ -87,8 +78,6 @@ uart_backend_read(uint8_t* data, int max_len) {
  * \param[in]       data: Data buffer to write
  * \param[in]       len: Number of bytes to write
  * \return          Number of bytes actually written
- *
- * Requirement 8.5: Blocking write operation
  */
 static int
 uart_backend_write(const uint8_t* data, int len) {
@@ -109,40 +98,22 @@ uart_backend_write(const uint8_t* data, int len) {
     return len;
 }
 
-/**
- * \}
- */
-
-/**
- * \name            Public Data
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Public Data                                                               */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           UART backend instance
- *
- * Pre-configured backend for UART communication.
- * Requirement 8.3: UART backend implementation
  */
 const shell_backend_t shell_uart_backend = {
     .read = uart_backend_read,
     .write = uart_backend_write
 };
 
-/**
- * \}
- */
+/*---------------------------------------------------------------------------*/
+/* Public API Implementation                                                 */
+/*---------------------------------------------------------------------------*/
 
-/**
- * \name            Public API Implementation
- * \{
- */
-
-/**
- * \brief           Initialize UART backend
- * \param[in]       uart_instance: UART instance number to use
- * \return          SHELL_OK on success, error code otherwise
- */
 shell_status_t
 shell_uart_backend_init(int uart_instance) {
     /* Validate UART instance */
@@ -156,28 +127,16 @@ shell_uart_backend_init(int uart_instance) {
     return SHELL_OK;
 }
 
-/**
- * \brief           Deinitialize UART backend
- * \return          SHELL_OK on success
- */
 shell_status_t
 shell_uart_backend_deinit(void) {
     g_uart_backend_initialized = false;
     return SHELL_OK;
 }
 
-/**
- * \brief           Check if UART backend is initialized
- * \return          true if initialized, false otherwise
- */
 bool
 shell_uart_backend_is_initialized(void) {
     return g_uart_backend_initialized;
 }
-
-/**
- * \}
- */
 
 /**
  * \}

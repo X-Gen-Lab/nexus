@@ -28,18 +28,14 @@
  * \{
  */
 
-/**
- * \name            Command Handlers
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Command Handlers                                                          */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Help command handler
- *
- * Lists all registered commands or shows detailed help for a specific command.
- *
- * Requirements: 7.1, 7.2
- *
+ * \details         Lists all registered commands or shows detailed help
+ *                  for a specific command.
  * \param[in]       argc: Argument count
  * \param[in]       argv: Argument array
  * \return          0 on success
@@ -91,11 +87,7 @@ cmd_help(int argc, char* argv[]) {
 
 /**
  * \brief           Version command handler
- *
- * Displays the Shell version string.
- *
- * Requirement: 7.3
- *
+ * \details         Displays the Shell version string.
  * \param[in]       argc: Argument count
  * \param[in]       argv: Argument array
  * \return          0 on success
@@ -111,11 +103,7 @@ cmd_version(int argc, char* argv[]) {
 
 /**
  * \brief           Clear command handler
- *
- * Clears the terminal screen using ANSI escape sequences.
- *
- * Requirement: 7.4
- *
+ * \details         Clears the terminal screen using ANSI escape sequences.
  * \param[in]       argc: Argument count
  * \param[in]       argv: Argument array
  * \return          0 on success
@@ -131,11 +119,7 @@ cmd_clear(int argc, char* argv[]) {
 
 /**
  * \brief           History command handler
- *
- * Displays the command history with entry numbers.
- *
- * Requirement: 7.5
- *
+ * \details         Displays the command history with entry numbers.
  * \param[in]       argc: Argument count
  * \param[in]       argv: Argument array
  * \return          0 on success
@@ -170,11 +154,7 @@ cmd_history(int argc, char* argv[]) {
 
 /**
  * \brief           Echo command handler
- *
- * Prints all arguments separated by spaces.
- *
- * Requirement: 7.6
- *
+ * \details         Prints all arguments separated by spaces.
  * \param[in]       argc: Argument count
  * \param[in]       argv: Argument array
  * \return          0 on success
@@ -191,14 +171,9 @@ cmd_echo(int argc, char* argv[]) {
     return 0;
 }
 
-/**
- * \}
- */
-
-/**
- * \name            Built-in Command Definitions
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Built-in Command Definitions                                              */
+/*---------------------------------------------------------------------------*/
 
 /** Help command definition */
 static const shell_command_t builtin_help = {
@@ -245,19 +220,10 @@ static const shell_command_t builtin_echo = {
     .completion = NULL
 };
 
-/**
- * \}
- */
+/*---------------------------------------------------------------------------*/
+/* Public API                                                                */
+/*---------------------------------------------------------------------------*/
 
-/**
- * \name            Public API
- * \{
- */
-
-/**
- * \brief           Register all built-in commands
- * \return          SHELL_OK on success, error code otherwise
- */
 shell_status_t
 shell_register_builtin_commands(void) {
     shell_status_t status;
@@ -294,10 +260,6 @@ shell_register_builtin_commands(void) {
 
     return SHELL_OK;
 }
-
-/**
- * \}
- */
 
 /**
  * \}

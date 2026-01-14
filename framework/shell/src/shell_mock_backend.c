@@ -17,15 +17,13 @@
 #include <string.h>
 
 /**
- * \defgroup        SHELL_MOCK_BACKEND_IMPL Shell Mock Backend Implementation
- * \brief           Mock backend implementation for testing
+ * \addtogroup      SHELL_MOCK_BACKEND
  * \{
  */
 
-/**
- * \name            Constants
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Constants                                                                 */
+/*---------------------------------------------------------------------------*/
 
 /** Maximum input buffer size */
 #define MOCK_INPUT_BUFFER_SIZE      1024
@@ -33,14 +31,9 @@
 /** Maximum output buffer size */
 #define MOCK_OUTPUT_BUFFER_SIZE     4096
 
-/**
- * \}
- */
-
-/**
- * \name            Private Data
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Private Data                                                              */
+/*---------------------------------------------------------------------------*/
 
 /** Input buffer for injected data */
 static uint8_t g_input_buffer[MOCK_INPUT_BUFFER_SIZE];
@@ -60,14 +53,9 @@ static size_t g_output_length = 0;
 /** Backend initialization flag */
 static bool g_mock_backend_initialized = false;
 
-/**
- * \}
- */
-
-/**
- * \name            Private Functions
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Private Functions                                                         */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Non-blocking read from mock input buffer
@@ -119,38 +107,22 @@ mock_backend_write(const uint8_t* data, int len) {
     return count;
 }
 
-/**
- * \}
- */
-
-/**
- * \name            Public Data
- * \{
- */
+/*---------------------------------------------------------------------------*/
+/* Public Data                                                               */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Mock backend instance
- *
- * Backend for testing that supports input injection and output capture.
  */
 const shell_backend_t shell_mock_backend = {
     .read = mock_backend_read,
     .write = mock_backend_write
 };
 
-/**
- * \}
- */
+/*---------------------------------------------------------------------------*/
+/* Public API Implementation                                                 */
+/*---------------------------------------------------------------------------*/
 
-/**
- * \name            Public API Implementation
- * \{
- */
-
-/**
- * \brief           Initialize mock backend
- * \return          SHELL_OK on success
- */
 shell_status_t
 shell_mock_backend_init(void) {
     g_input_length = 0;
@@ -161,10 +133,6 @@ shell_mock_backend_init(void) {
     return SHELL_OK;
 }
 
-/**
- * \brief           Deinitialize mock backend
- * \return          SHELL_OK on success
- */
 shell_status_t
 shell_mock_backend_deinit(void) {
     g_mock_backend_initialized = false;
@@ -175,11 +143,6 @@ shell_mock_backend_deinit(void) {
     return SHELL_OK;
 }
 
-/**
- * \brief           Reset mock backend buffers
- *
- * Clears both input and output buffers without deinitializing.
- */
 void
 shell_mock_backend_reset(void) {
     g_input_length = 0;
@@ -187,12 +150,6 @@ shell_mock_backend_reset(void) {
     g_output_length = 0;
 }
 
-/**
- * \brief           Inject input data into mock backend
- * \param[in]       data: Data to inject
- * \param[in]       len: Length of data
- * \return          Number of bytes injected
- */
 int
 shell_mock_backend_inject_input(const uint8_t* data, size_t len) {
     if (data == NULL || len == 0) {
@@ -211,11 +168,6 @@ shell_mock_backend_inject_input(const uint8_t* data, size_t len) {
     return (int)count;
 }
 
-/**
- * \brief           Inject input string into mock backend
- * \param[in]       str: Null-terminated string to inject
- * \return          Number of bytes injected
- */
 int
 shell_mock_backend_inject_string(const char* str) {
     if (str == NULL) {
@@ -225,12 +177,6 @@ shell_mock_backend_inject_string(const char* str) {
     return shell_mock_backend_inject_input((const uint8_t*)str, strlen(str));
 }
 
-/**
- * \brief           Get captured output data
- * \param[out]      data: Buffer to store output data
- * \param[in]       max_len: Maximum buffer size
- * \return          Number of bytes copied
- */
 int
 shell_mock_backend_get_output(uint8_t* data, size_t max_len) {
     if (data == NULL || max_len == 0) {
@@ -246,12 +192,6 @@ shell_mock_backend_get_output(uint8_t* data, size_t max_len) {
     return (int)copy_len;
 }
 
-/**
- * \brief           Get captured output as string
- * \param[out]      str: Buffer to store output string
- * \param[in]       max_len: Maximum buffer size (including null terminator)
- * \return          Number of characters copied (excluding null terminator)
- */
 int
 shell_mock_backend_get_output_string(char* str, size_t max_len) {
     if (str == NULL || max_len == 0) {
@@ -269,27 +209,16 @@ shell_mock_backend_get_output_string(char* str, size_t max_len) {
     return (int)copy_len;
 }
 
-/**
- * \brief           Get current output length
- * \return          Number of bytes in output buffer
- */
 size_t
 shell_mock_backend_get_output_length(void) {
     return g_output_length;
 }
 
-/**
- * \brief           Clear output buffer
- */
 void
 shell_mock_backend_clear_output(void) {
     g_output_length = 0;
 }
 
-/**
- * \brief           Get remaining input length
- * \return          Number of bytes remaining in input buffer
- */
 size_t
 shell_mock_backend_get_remaining_input(void) {
     if (g_input_read_pos >= g_input_length) {
@@ -298,18 +227,10 @@ shell_mock_backend_get_remaining_input(void) {
     return g_input_length - g_input_read_pos;
 }
 
-/**
- * \brief           Check if mock backend is initialized
- * \return          true if initialized, false otherwise
- */
 bool
 shell_mock_backend_is_initialized(void) {
     return g_mock_backend_initialized;
 }
-
-/**
- * \}
- */
 
 /**
  * \}
