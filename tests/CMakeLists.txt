@@ -50,9 +50,25 @@ add_executable(nexus_tests
     log/test_log.cpp
     log/test_log_properties.cpp
     log/test_log_uart_backend.cpp
+    shell/test_shell_parser.cpp
+    shell/test_shell_parser_properties.cpp
+    shell/test_shell_line_editor.cpp
+    shell/test_shell_line_editor_properties.cpp
+    shell/test_shell_history.cpp
+    shell/test_shell_history_properties.cpp
+    shell/test_shell_autocomplete.cpp
+    shell/test_shell_autocomplete_properties.cpp
+    shell/test_shell_command.cpp
+    shell/test_shell_command_properties.cpp
+    shell/test_shell_core.cpp
+    shell/test_shell_core_properties.cpp
+    shell/test_shell_backend.cpp
+    shell/test_shell_backend_properties.cpp
+    shell/test_shell_builtin.cpp
     integration/test_hal_osal_integration.cpp
     integration/test_freertos_adapter_integration.cpp
     integration/test_log_integration.cpp
+    integration/test_shell_integration.cpp
 )
 
 # Require C++20 for designated initializers
@@ -64,6 +80,7 @@ target_include_directories(nexus_tests
         ${CMAKE_SOURCE_DIR}/osal/include
         ${CMAKE_SOURCE_DIR}/platforms/native/include
         ${CMAKE_SOURCE_DIR}/framework/log/include
+        ${CMAKE_SOURCE_DIR}/framework/shell/include
 )
 
 # Platform-specific threading libraries
@@ -83,6 +100,7 @@ target_link_libraries(nexus_tests
         hal
         osal
         log_framework
+        shell_framework
         ${THREAD_LIBS}
 )
 
