@@ -33,7 +33,7 @@ extern "C" {
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_store_init(uint16_t max_keys, uint8_t max_key_len,
-                                   uint16_t max_value_size);
+                                  uint16_t max_value_size);
 
 /**
  * \brief           Deinitialize the config store
@@ -58,8 +58,8 @@ bool config_store_is_initialized(void);
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_store_set(const char* key, config_type_t type,
-                                  const void* value, size_t size, uint8_t flags,
-                                  uint8_t namespace_id);
+                                 const void* value, size_t size, uint8_t flags,
+                                 uint8_t namespace_id);
 
 /**
  * \brief           Get a value
@@ -72,8 +72,8 @@ config_status_t config_store_set(const char* key, config_type_t type,
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_store_get(const char* key, config_type_t* type,
-                                  void* value, size_t* size, uint8_t* flags,
-                                  uint8_t namespace_id);
+                                 void* value, size_t* size, uint8_t* flags,
+                                 uint8_t namespace_id);
 
 /**
  * \brief           Check if a key exists
@@ -83,7 +83,7 @@ config_status_t config_store_get(const char* key, config_type_t* type,
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_store_exists(const char* key, uint8_t namespace_id,
-                                     bool* exists);
+                                    bool* exists);
 
 /**
  * \brief           Get the type of a stored value
@@ -93,7 +93,7 @@ config_status_t config_store_exists(const char* key, uint8_t namespace_id,
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_store_get_type(const char* key, uint8_t namespace_id,
-                                       config_type_t* type);
+                                      config_type_t* type);
 
 /**
  * \brief           Delete a configuration key
@@ -124,7 +124,7 @@ config_status_t config_store_clear_all(void);
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_store_get_size(const char* key, uint8_t namespace_id,
-                                       size_t* size);
+                                      size_t* size);
 
 /**
  * \brief           Clear all entries in a namespace
@@ -139,7 +139,57 @@ config_status_t config_store_clear_namespace(uint8_t namespace_id);
  * \param[out]      count: Pointer to store count
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_store_get_namespace_count(uint8_t namespace_id, size_t* count);
+config_status_t config_store_get_namespace_count(uint8_t namespace_id,
+                                                 size_t* count);
+
+/**
+ * \brief           Entry information for iteration
+ */
+typedef struct {
+    char key[CONFIG_MAX_MAX_KEY_LEN]; /**< Configuration key */
+    config_type_t type;               /**< Value type */
+    uint16_t value_size;              /**< Value size in bytes */
+    uint8_t flags;                    /**< Entry flags */
+    uint8_t namespace_id;             /**< Namespace identifier */
+} config_store_entry_info_t;
+
+/**
+ * \brief           Iteration callback function type
+ * \param[in]       info: Entry information
+ * \param[in]       user_data: User-provided context
+ * \return          true to continue iteration, false to stop
+ */
+typedef bool (*config_store_iterate_cb_t)(const config_store_entry_info_t* info,
+                                          void* user_data);
+
+/**
+ * \brief           Iterate over all configuration entries
+ * \param[in]       callback: Iteration callback
+ * \param[in]       user_data: User-provided context
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t config_store_iterate(config_store_iterate_cb_t callback,
+                                     void* user_data);
+
+/**
+ * \brief           Iterate over entries in a specific namespace
+ * \param[in]       namespace_id: Namespace identifier
+ * \param[in]       callback: Iteration callback
+ * \param[in]       user_data: User-provided context
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t config_store_iterate_namespace(
+    uint8_t namespace_id, config_store_iterate_cb_t callback, void* user_data);
+
+/**
+ * \brief           Get entry flags
+ * \param[in]       key: Configuration key
+ * \param[in]       namespace_id: Namespace identifier
+ * \param[out]      flags: Pointer to store flags
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t config_store_get_flags(const char* key, uint8_t namespace_id,
+                                       uint8_t* flags);
 
 #ifdef __cplusplus
 }

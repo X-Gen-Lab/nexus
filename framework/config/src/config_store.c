@@ -12,6 +12,7 @@
  *                  Uses static memory allocation for embedded systems.
  */
 
+#include "config_store.h"
 #include "config/config.h"
 #include <string.h>
 
@@ -23,24 +24,24 @@
  * \brief           Configuration entry structure
  */
 typedef struct {
-    char key[CONFIG_MAX_MAX_KEY_LEN];   /**< Key name */
-    config_type_t type;                  /**< Value type */
-    uint8_t flags;                       /**< Entry flags */
-    uint16_t value_size;                 /**< Size of stored value */
-    uint8_t namespace_id;                /**< Namespace identifier */
+    char key[CONFIG_MAX_MAX_KEY_LEN];         /**< Key name */
+    config_type_t type;                       /**< Value type */
+    uint8_t flags;                            /**< Entry flags */
+    uint16_t value_size;                      /**< Size of stored value */
+    uint8_t namespace_id;                     /**< Namespace identifier */
     uint8_t value[CONFIG_MAX_MAX_VALUE_SIZE]; /**< Value storage */
-    bool in_use;                         /**< Entry is in use */
+    bool in_use;                              /**< Entry is in use */
 } config_entry_internal_t;
 
 /**
  * \brief           Config store context structure
  */
 typedef struct {
-    bool initialized;                    /**< Store is initialized */
-    uint16_t max_keys;                   /**< Maximum number of keys */
-    uint8_t max_key_len;                 /**< Maximum key length */
-    uint16_t max_value_size;             /**< Maximum value size */
-    size_t entry_count;                  /**< Current number of entries */
+    bool initialized;        /**< Store is initialized */
+    uint16_t max_keys;       /**< Maximum number of keys */
+    uint8_t max_key_len;     /**< Maximum key length */
+    uint16_t max_value_size; /**< Maximum value size */
+    size_t entry_count;      /**< Current number of entries */
     config_entry_internal_t entries[CONFIG_MAX_MAX_KEYS]; /**< Entry storage */
 } config_store_ctx_t;
 
@@ -63,8 +64,8 @@ static config_store_ctx_t g_store_ctx;
  * \param[in]       namespace_id: Namespace identifier
  * \return          Pointer to entry if found, NULL otherwise
  */
-static config_entry_internal_t*
-config_store_find_entry(const char* key, uint8_t namespace_id) {
+static config_entry_internal_t* config_store_find_entry(const char* key,
+                                                        uint8_t namespace_id) {
     if (key == NULL) {
         return NULL;
     }
@@ -72,7 +73,8 @@ config_store_find_entry(const char* key, uint8_t namespace_id) {
     for (size_t i = 0; i < g_store_ctx.max_keys; ++i) {
         if (g_store_ctx.entries[i].in_use &&
             g_store_ctx.entries[i].namespace_id == namespace_id &&
-            strncmp(g_store_ctx.entries[i].key, key, g_store_ctx.max_key_len) == 0) {
+            strncmp(g_store_ctx.entries[i].key, key, g_store_ctx.max_key_len) ==
+                0) {
             return &g_store_ctx.entries[i];
         }
     }
@@ -83,8 +85,7 @@ config_store_find_entry(const char* key, uint8_t namespace_id) {
  * \brief           Find free entry slot
  * \return          Pointer to free entry if available, NULL otherwise
  */
-static config_entry_internal_t*
-config_store_find_free_entry(void) {
+static config_entry_internal_t* config_store_find_free_entry(void) {
     for (size_t i = 0; i < g_store_ctx.max_keys; ++i) {
         if (!g_store_ctx.entries[i].in_use) {
             return &g_store_ctx.entries[i];
@@ -104,16 +105,18 @@ config_store_find_free_entry(void) {
  * \param[in]       max_value_size: Maximum value size
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_init(uint16_t max_keys, uint8_t max_key_len, uint16_t max_value_size) {
+config_status_t config_store_init(uint16_t max_keys, uint8_t max_key_len,
+                                  uint16_t max_value_size) {
     /* Validate parameters */
     if (max_keys < CONFIG_MIN_MAX_KEYS || max_keys > CONFIG_MAX_MAX_KEYS) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
-    if (max_key_len < CONFIG_MIN_MAX_KEY_LEN || max_key_len > CONFIG_MAX_MAX_KEY_LEN) {
+    if (max_key_len < CONFIG_MIN_MAX_KEY_LEN ||
+        max_key_len > CONFIG_MAX_MAX_KEY_LEN) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
-    if (max_value_size < CONFIG_MIN_MAX_VALUE_SIZE || max_value_size > CONFIG_MAX_MAX_VALUE_SIZE) {
+    if (max_value_size < CONFIG_MIN_MAX_VALUE_SIZE ||
+        max_value_size > CONFIG_MAX_MAX_VALUE_SIZE) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
@@ -132,8 +135,7 @@ config_store_init(uint16_t max_keys, uint8_t max_key_len, uint16_t max_value_siz
  * \brief           Deinitialize the config store
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_deinit(void) {
+config_status_t config_store_deinit(void) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -146,8 +148,7 @@ config_store_deinit(void) {
  * \brief           Check if store is initialized
  * \return          true if initialized, false otherwise
  */
-bool
-config_store_is_initialized(void) {
+bool config_store_is_initialized(void) {
     return g_store_ctx.initialized;
 }
 
@@ -161,9 +162,9 @@ config_store_is_initialized(void) {
  * \param[in]       namespace_id: Namespace identifier
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_set(const char* key, config_type_t type, const void* value,
-                 size_t size, uint8_t flags, uint8_t namespace_id) {
+config_status_t config_store_set(const char* key, config_type_t type,
+                                 const void* value, size_t size, uint8_t flags,
+                                 uint8_t namespace_id) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -184,7 +185,7 @@ config_store_set(const char* key, config_type_t type, const void* value,
 
     /* Find existing entry or allocate new one */
     config_entry_internal_t* entry = config_store_find_entry(key, namespace_id);
-    
+
     if (entry == NULL) {
         /* Allocate new entry */
         entry = config_store_find_free_entry();
@@ -197,9 +198,9 @@ config_store_set(const char* key, config_type_t type, const void* value,
     /* Store the entry */
     memset(entry->key, 0, sizeof(entry->key));
     /* Safe string copy - manually copy up to max_key_len - 1 characters */
-    size_t copy_len = key_len < (size_t)(g_store_ctx.max_key_len - 1) 
-                      ? key_len 
-                      : (size_t)(g_store_ctx.max_key_len - 1);
+    size_t copy_len = key_len < (size_t)(g_store_ctx.max_key_len - 1)
+                          ? key_len
+                          : (size_t)(g_store_ctx.max_key_len - 1);
     memcpy(entry->key, key, copy_len);
     entry->key[copy_len] = '\0';
     entry->type = type;
@@ -222,9 +223,9 @@ config_store_set(const char* key, config_type_t type, const void* value,
  * \param[in]       namespace_id: Namespace identifier
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_get(const char* key, config_type_t* type, void* value,
-                 size_t* size, uint8_t* flags, uint8_t namespace_id) {
+config_status_t config_store_get(const char* key, config_type_t* type,
+                                 void* value, size_t* size, uint8_t* flags,
+                                 uint8_t namespace_id) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -268,8 +269,8 @@ config_store_get(const char* key, config_type_t* type, void* value,
  * \param[out]      exists: Pointer to store result
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_exists(const char* key, uint8_t namespace_id, bool* exists) {
+config_status_t config_store_exists(const char* key, uint8_t namespace_id,
+                                    bool* exists) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -291,8 +292,8 @@ config_store_exists(const char* key, uint8_t namespace_id, bool* exists) {
  * \param[out]      type: Pointer to store type
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_get_type(const char* key, uint8_t namespace_id, config_type_t* type) {
+config_status_t config_store_get_type(const char* key, uint8_t namespace_id,
+                                      config_type_t* type) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -316,8 +317,7 @@ config_store_get_type(const char* key, uint8_t namespace_id, config_type_t* type
  * \param[in]       namespace_id: Namespace identifier
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_delete(const char* key, uint8_t namespace_id) {
+config_status_t config_store_delete(const char* key, uint8_t namespace_id) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -344,8 +344,7 @@ config_store_delete(const char* key, uint8_t namespace_id) {
  * \param[out]      count: Pointer to store count
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_get_count(size_t* count) {
+config_status_t config_store_get_count(size_t* count) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -362,8 +361,7 @@ config_store_get_count(size_t* count) {
  * \brief           Clear all entries
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_clear_all(void) {
+config_status_t config_store_clear_all(void) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -383,8 +381,8 @@ config_store_clear_all(void) {
  * \param[out]      size: Pointer to store size
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_get_size(const char* key, uint8_t namespace_id, size_t* size) {
+config_status_t config_store_get_size(const char* key, uint8_t namespace_id,
+                                      size_t* size) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -407,8 +405,7 @@ config_store_get_size(const char* key, uint8_t namespace_id, size_t* size) {
  * \param[in]       namespace_id: Namespace identifier
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_clear_namespace(uint8_t namespace_id) {
+config_status_t config_store_clear_namespace(uint8_t namespace_id) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -430,8 +427,8 @@ config_store_clear_namespace(uint8_t namespace_id) {
  * \param[out]      count: Pointer to store count
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_store_get_namespace_count(uint8_t namespace_id, size_t* count) {
+config_status_t config_store_get_namespace_count(uint8_t namespace_id,
+                                                 size_t* count) {
     if (!g_store_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -449,5 +446,121 @@ config_store_get_namespace_count(uint8_t namespace_id, size_t* count) {
     }
 
     *count = ns_count;
+    return CONFIG_OK;
+}
+
+/**
+ * \brief           Iterate over all configuration entries
+ * \param[in]       callback: Iteration callback
+ * \param[in]       user_data: User-provided context
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t config_store_iterate(config_store_iterate_cb_t callback,
+                                     void* user_data) {
+    if (!g_store_ctx.initialized) {
+        return CONFIG_ERROR_NOT_INIT;
+    }
+
+    if (callback == NULL) {
+        return CONFIG_ERROR_INVALID_PARAM;
+    }
+
+    for (size_t i = 0; i < g_store_ctx.max_keys; ++i) {
+        if (g_store_ctx.entries[i].in_use) {
+            config_store_entry_info_t info;
+            memset(&info, 0, sizeof(info));
+
+            /* Copy key */
+            size_t key_len = strlen(g_store_ctx.entries[i].key);
+            size_t copy_len = key_len < (CONFIG_MAX_MAX_KEY_LEN - 1)
+                                  ? key_len
+                                  : (CONFIG_MAX_MAX_KEY_LEN - 1);
+            memcpy(info.key, g_store_ctx.entries[i].key, copy_len);
+            info.key[copy_len] = '\0';
+
+            info.type = g_store_ctx.entries[i].type;
+            info.value_size = g_store_ctx.entries[i].value_size;
+            info.flags = g_store_ctx.entries[i].flags;
+            info.namespace_id = g_store_ctx.entries[i].namespace_id;
+
+            /* Call callback, stop if it returns false */
+            if (!callback(&info, user_data)) {
+                break;
+            }
+        }
+    }
+
+    return CONFIG_OK;
+}
+
+/**
+ * \brief           Iterate over entries in a specific namespace
+ * \param[in]       namespace_id: Namespace identifier
+ * \param[in]       callback: Iteration callback
+ * \param[in]       user_data: User-provided context
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t config_store_iterate_namespace(
+    uint8_t namespace_id, config_store_iterate_cb_t callback, void* user_data) {
+    if (!g_store_ctx.initialized) {
+        return CONFIG_ERROR_NOT_INIT;
+    }
+
+    if (callback == NULL) {
+        return CONFIG_ERROR_INVALID_PARAM;
+    }
+
+    for (size_t i = 0; i < g_store_ctx.max_keys; ++i) {
+        if (g_store_ctx.entries[i].in_use &&
+            g_store_ctx.entries[i].namespace_id == namespace_id) {
+            config_store_entry_info_t info;
+            memset(&info, 0, sizeof(info));
+
+            /* Copy key */
+            size_t key_len = strlen(g_store_ctx.entries[i].key);
+            size_t copy_len = key_len < (CONFIG_MAX_MAX_KEY_LEN - 1)
+                                  ? key_len
+                                  : (CONFIG_MAX_MAX_KEY_LEN - 1);
+            memcpy(info.key, g_store_ctx.entries[i].key, copy_len);
+            info.key[copy_len] = '\0';
+
+            info.type = g_store_ctx.entries[i].type;
+            info.value_size = g_store_ctx.entries[i].value_size;
+            info.flags = g_store_ctx.entries[i].flags;
+            info.namespace_id = g_store_ctx.entries[i].namespace_id;
+
+            /* Call callback, stop if it returns false */
+            if (!callback(&info, user_data)) {
+                break;
+            }
+        }
+    }
+
+    return CONFIG_OK;
+}
+
+/**
+ * \brief           Get entry flags
+ * \param[in]       key: Configuration key
+ * \param[in]       namespace_id: Namespace identifier
+ * \param[out]      flags: Pointer to store flags
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t config_store_get_flags(const char* key, uint8_t namespace_id,
+                                       uint8_t* flags) {
+    if (!g_store_ctx.initialized) {
+        return CONFIG_ERROR_NOT_INIT;
+    }
+
+    if (key == NULL || flags == NULL) {
+        return CONFIG_ERROR_INVALID_PARAM;
+    }
+
+    config_entry_internal_t* entry = config_store_find_entry(key, namespace_id);
+    if (entry == NULL) {
+        return CONFIG_ERROR_NOT_FOUND;
+    }
+
+    *flags = entry->flags;
     return CONFIG_OK;
 }

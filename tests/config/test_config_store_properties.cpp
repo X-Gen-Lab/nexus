@@ -15,13 +15,13 @@
  * **Validates: Requirements 2.1-2.10, 3.1-3.6**
  */
 
+#include <cmath>
+#include <cstring>
 #include <gtest/gtest.h>
+#include <limits>
 #include <random>
 #include <string>
 #include <vector>
-#include <cstring>
-#include <cmath>
-#include <limits>
 
 extern "C" {
 #include "config/config.h"
@@ -115,7 +115,8 @@ class ConfigStorePropertyTest : public ::testing::Test {
      */
     std::string randomString() {
         std::uniform_int_distribution<int> len_dist(0, 100);
-        std::uniform_int_distribution<int> char_dist(32, 126);  /* Printable ASCII */
+        std::uniform_int_distribution<int> char_dist(32,
+                                                     126); /* Printable ASCII */
         int len = len_dist(rng);
         std::string str;
         for (int i = 0; i < len; ++i) {
@@ -318,7 +319,7 @@ TEST_F(ConfigStorePropertyTest, Property2_SetGetBoolConsistency) {
             << "' with value " << set_value;
 
         /* Get the value back */
-        bool get_value = !set_value;  /* Initialize to opposite */
+        bool get_value = !set_value; /* Initialize to opposite */
         status = config_get_bool(key.c_str(), &get_value, !set_value);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": get_bool failed for key '" << key
@@ -395,8 +396,8 @@ TEST_F(ConfigStorePropertyTest, Property2_SetGetBlobConsistency) {
         /* Get the value back */
         std::vector<uint8_t> get_value(set_value.size() + 100);
         size_t actual_size = 0;
-        status = config_get_blob(key.c_str(), get_value.data(), get_value.size(),
-                                  &actual_size);
+        status = config_get_blob(key.c_str(), get_value.data(),
+                                 get_value.size(), &actual_size);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": get_blob failed for key '" << key
             << "'";
@@ -407,7 +408,8 @@ TEST_F(ConfigStorePropertyTest, Property2_SetGetBlobConsistency) {
             << "'. Set " << set_value.size() << ", got " << actual_size;
 
         /* Verify round-trip property */
-        EXPECT_EQ(0, memcmp(set_value.data(), get_value.data(), set_value.size()))
+        EXPECT_EQ(0,
+                  memcmp(set_value.data(), get_value.data(), set_value.size()))
             << "Iteration " << test_iter << ": round-trip failed for key '"
             << key << "'. Data mismatch.";
     }
@@ -480,15 +482,16 @@ TEST_F(ConfigStorePropertyTest, Property_DeleteRemovesKey) {
         /* Verify it exists */
         bool exists = false;
         ASSERT_EQ(CONFIG_OK, config_exists(key.c_str(), &exists));
-        ASSERT_TRUE(exists) << "Iteration " << test_iter << ": key should exist";
+        ASSERT_TRUE(exists)
+            << "Iteration " << test_iter << ": key should exist";
 
         /* Delete it */
         ASSERT_EQ(CONFIG_OK, config_delete(key.c_str()));
 
         /* Verify it no longer exists */
         ASSERT_EQ(CONFIG_OK, config_exists(key.c_str(), &exists));
-        EXPECT_FALSE(exists)
-            << "Iteration " << test_iter << ": key should not exist after delete";
+        EXPECT_FALSE(exists) << "Iteration " << test_iter
+                             << ": key should not exist after delete";
     }
 }
 
