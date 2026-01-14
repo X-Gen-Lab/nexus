@@ -53,12 +53,12 @@ param(
     [ValidateSet("auto", "winget", "scoop")]
     [string]$PackageManager = "auto",
 
-    [switch]$Verbose,
+    [switch]$VerboseOutput,
     [switch]$Help
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 

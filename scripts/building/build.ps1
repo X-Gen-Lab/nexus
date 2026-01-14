@@ -49,12 +49,12 @@ param(
     [ValidateSet("native", "stm32f4", "all")]
     [string]$Platform = "native",
 
-    [switch]$Verbose,
+    [switch]$VerboseOutput,
     [switch]$Help
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 

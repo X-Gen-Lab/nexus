@@ -58,14 +58,14 @@ param(
     [switch]$Docs,
     [switch]$Tests,
     [switch]$Cache,
-    [switch]$Verbose,
+    [switch]$VerboseOutput,
     [switch]$DryRun,
     [switch]$Force,
     [switch]$Help
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 

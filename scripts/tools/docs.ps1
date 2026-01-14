@@ -53,7 +53,7 @@ param(
     [ValidateSet("doxygen", "sphinx", "all")]
     [string]$Target = "all",
 
-    [switch]$Verbose,
+    [switch]$VerboseOutput,
     [switch]$Clean,
     [switch]$Open,
 
@@ -70,7 +70,7 @@ param(
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 

@@ -66,12 +66,12 @@ param(
     [switch]$Parallel,
     [string]$Artifacts = "ci-artifacts",
     [int]$Timeout = 30,
-    [switch]$Verbose,
+    [switch]$VerboseOutput,
     [switch]$Help
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 

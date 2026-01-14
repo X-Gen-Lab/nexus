@@ -51,7 +51,7 @@
 [CmdletBinding()]
 param(
     [string]$Filter = "*",
-    [switch]$Verbose,
+    [switch]$VerboseOutput,
     [string]$Xml = "",
     [string]$BuildDir = "",
 
@@ -64,7 +64,7 @@ param(
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 
