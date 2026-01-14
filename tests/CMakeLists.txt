@@ -74,10 +74,18 @@ add_executable(nexus_tests
     config/test_config_namespace_properties.cpp
     config/test_config_callback.cpp
     config/test_config_callback_properties.cpp
+    config/test_config_query.cpp
+    config/test_config_backend.cpp
+    config/test_config_backend_properties.cpp
+    config/test_config_import_export.cpp
+    config/test_config_import_export_properties.cpp
+    config/test_config_crypto.cpp
+    config/test_config_crypto_properties.cpp
     integration/test_hal_osal_integration.cpp
     integration/test_freertos_adapter_integration.cpp
     integration/test_log_integration.cpp
     integration/test_shell_integration.cpp
+    integration/test_config_integration.cpp
 )
 
 # Require C++20 for designated initializers
