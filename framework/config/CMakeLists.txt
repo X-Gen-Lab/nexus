@@ -21,6 +21,14 @@ target_sources(config_framework
         src/config_default.c
         src/config_namespace.c
         src/config_callback.c
+        src/config_query.c
+        src/config_backend.c
+        src/config_ram_backend.c
+        src/config_flash_backend.c
+        src/config_mock_backend.c
+        src/config_export.c
+        src/config_import.c
+        src/config_crypto.c
 )
 
 target_link_libraries(config_framework

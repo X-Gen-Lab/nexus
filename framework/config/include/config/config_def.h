@@ -29,25 +29,25 @@ extern "C" {
  * \brief           Config Manager status codes
  */
 typedef enum {
-    CONFIG_OK = 0,                     /**< Operation successful */
-    CONFIG_ERROR = 1,                  /**< Generic error */
-    CONFIG_ERROR_INVALID_PARAM = 2,    /**< Invalid parameter */
-    CONFIG_ERROR_NOT_INIT = 3,         /**< Not initialized */
-    CONFIG_ERROR_ALREADY_INIT = 4,     /**< Already initialized */
-    CONFIG_ERROR_NO_MEMORY = 5,        /**< Out of memory */
-    CONFIG_ERROR_NOT_FOUND = 6,        /**< Key not found */
-    CONFIG_ERROR_ALREADY_EXISTS = 7,   /**< Key already exists */
-    CONFIG_ERROR_TYPE_MISMATCH = 8,    /**< Type mismatch */
-    CONFIG_ERROR_KEY_TOO_LONG = 9,     /**< Key name too long */
-    CONFIG_ERROR_VALUE_TOO_LARGE = 10, /**< Value size too large */
-    CONFIG_ERROR_BUFFER_TOO_SMALL = 11,/**< Buffer too small */
-    CONFIG_ERROR_NO_SPACE = 12,        /**< Storage space full */
-    CONFIG_ERROR_NVS_READ = 13,        /**< NVS read failure */
-    CONFIG_ERROR_NVS_WRITE = 14,       /**< NVS write failure */
-    CONFIG_ERROR_INVALID_FORMAT = 15,  /**< Invalid format */
-    CONFIG_ERROR_NO_ENCRYPTION_KEY = 16,/**< Encryption key not set */
-    CONFIG_ERROR_CRYPTO_FAILED = 17,   /**< Encryption/decryption failed */
-    CONFIG_ERROR_NO_BACKEND = 18,      /**< Backend not set */
+    CONFIG_OK = 0,                       /**< Operation successful */
+    CONFIG_ERROR = 1,                    /**< Generic error */
+    CONFIG_ERROR_INVALID_PARAM = 2,      /**< Invalid parameter */
+    CONFIG_ERROR_NOT_INIT = 3,           /**< Not initialized */
+    CONFIG_ERROR_ALREADY_INIT = 4,       /**< Already initialized */
+    CONFIG_ERROR_NO_MEMORY = 5,          /**< Out of memory */
+    CONFIG_ERROR_NOT_FOUND = 6,          /**< Key not found */
+    CONFIG_ERROR_ALREADY_EXISTS = 7,     /**< Key already exists */
+    CONFIG_ERROR_TYPE_MISMATCH = 8,      /**< Type mismatch */
+    CONFIG_ERROR_KEY_TOO_LONG = 9,       /**< Key name too long */
+    CONFIG_ERROR_VALUE_TOO_LARGE = 10,   /**< Value size too large */
+    CONFIG_ERROR_BUFFER_TOO_SMALL = 11,  /**< Buffer too small */
+    CONFIG_ERROR_NO_SPACE = 12,          /**< Storage space full */
+    CONFIG_ERROR_NVS_READ = 13,          /**< NVS read failure */
+    CONFIG_ERROR_NVS_WRITE = 14,         /**< NVS write failure */
+    CONFIG_ERROR_INVALID_FORMAT = 15,    /**< Invalid format */
+    CONFIG_ERROR_NO_ENCRYPTION_KEY = 16, /**< Encryption key not set */
+    CONFIG_ERROR_CRYPTO_FAILED = 17,     /**< Encryption/decryption failed */
+    CONFIG_ERROR_NO_BACKEND = 18,        /**< Backend not set */
 } config_status_t;
 
 /**
@@ -73,7 +73,6 @@ typedef enum {
     CONFIG_FLAG_PERSISTENT = (1 << 2), /**< Requires persistence */
 } config_flags_t;
 
-
 /**
  * \brief           Export format types
  */
@@ -95,8 +94,8 @@ typedef enum {
  * \brief           Import flags
  */
 typedef enum {
-    CONFIG_IMPORT_FLAG_NONE = 0,            /**< No flags */
-    CONFIG_IMPORT_FLAG_CLEAR = (1 << 0),    /**< Clear existing before import */
+    CONFIG_IMPORT_FLAG_NONE = 0,         /**< No flags */
+    CONFIG_IMPORT_FLAG_CLEAR = (1 << 0), /**< Clear existing before import */
     CONFIG_IMPORT_FLAG_SKIP_ERRORS = (1 << 1), /**< Skip errors and continue */
 } config_import_flags_t;
 
@@ -145,10 +144,10 @@ typedef enum {
  * \brief           Configuration limits
  * \{
  */
-#define CONFIG_MIN_MAX_KEYS 32
-#define CONFIG_MAX_MAX_KEYS 256
-#define CONFIG_MIN_MAX_KEY_LEN 16
-#define CONFIG_MAX_MAX_KEY_LEN 64
+#define CONFIG_MIN_MAX_KEYS       32
+#define CONFIG_MAX_MAX_KEYS       256
+#define CONFIG_MIN_MAX_KEY_LEN    16
+#define CONFIG_MAX_MAX_KEY_LEN    64
 #define CONFIG_MIN_MAX_VALUE_SIZE 64
 #define CONFIG_MAX_MAX_VALUE_SIZE 1024
 /** \} */

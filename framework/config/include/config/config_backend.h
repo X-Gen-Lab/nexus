@@ -51,7 +51,7 @@ typedef config_status_t (*config_backend_deinit_fn)(void* ctx);
  * \return          CONFIG_OK on success, error code otherwise
  */
 typedef config_status_t (*config_backend_read_fn)(void* ctx, const char* key,
-                                                   void* data, size_t* size);
+                                                  void* data, size_t* size);
 
 /**
  * \brief           Backend write function type
@@ -62,7 +62,8 @@ typedef config_status_t (*config_backend_read_fn)(void* ctx, const char* key,
  * \return          CONFIG_OK on success, error code otherwise
  */
 typedef config_status_t (*config_backend_write_fn)(void* ctx, const char* key,
-                                                    const void* data, size_t size);
+                                                   const void* data,
+                                                   size_t size);
 
 /**
  * \brief           Backend erase function type
@@ -86,7 +87,6 @@ typedef config_status_t (*config_backend_erase_all_fn)(void* ctx);
  */
 typedef config_status_t (*config_backend_commit_fn)(void* ctx);
 
-
 /**
  * \brief           Config backend structure
  *
@@ -94,15 +94,16 @@ typedef config_status_t (*config_backend_commit_fn)(void* ctx);
  * Each backend must implement at least read, write, and erase functions.
  */
 struct config_backend {
-    const char* name;                    /**< Backend name (must be unique) */
-    config_backend_init_fn init;         /**< Initialization function (optional) */
-    config_backend_deinit_fn deinit;     /**< Deinitialization function (optional) */
-    config_backend_read_fn read;         /**< Read function (required) */
-    config_backend_write_fn write;       /**< Write function (required) */
-    config_backend_erase_fn erase;       /**< Erase function (required) */
+    const char* name;            /**< Backend name (must be unique) */
+    config_backend_init_fn init; /**< Initialization function (optional) */
+    config_backend_deinit_fn
+        deinit;                    /**< Deinitialization function (optional) */
+    config_backend_read_fn read;   /**< Read function (required) */
+    config_backend_write_fn write; /**< Write function (required) */
+    config_backend_erase_fn erase; /**< Erase function (required) */
     config_backend_erase_all_fn erase_all; /**< Erase all function (optional) */
-    config_backend_commit_fn commit;     /**< Commit function (optional) */
-    void* ctx;                           /**< Backend-specific context */
+    config_backend_commit_fn commit;       /**< Commit function (optional) */
+    void* ctx;                             /**< Backend-specific context */
 };
 
 /**

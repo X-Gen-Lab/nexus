@@ -7,7 +7,8 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * \brief           Configuration management interface for Nexus embedded platform.
+ * \brief           Configuration management interface for Nexus embedded
+ * platform.
  *
  * The Config Manager provides:
  * - Key-value configuration storage
@@ -25,11 +26,11 @@
  *
  * void app_init(void) {
  *     config_init(NULL);  // Use default config
- *     
+ *
  *     // Store values
  *     config_set_i32("app.timeout", 5000);
  *     config_set_str("app.name", "MyApp");
- *     
+ *
  *     // Read values
  *     int32_t timeout = 0;
  *     config_get_i32("app.timeout", &timeout, 1000);
@@ -57,27 +58,24 @@ extern "C" {
  * \brief           Config Manager configuration structure
  */
 typedef struct {
-    uint16_t max_keys;        /**< Maximum key count (32-256) */
-    uint8_t max_key_len;      /**< Maximum key length (16-64) */
-    uint16_t max_value_size;  /**< Maximum value size (64-1024) */
-    uint8_t max_namespaces;   /**< Maximum namespace count */
-    uint8_t max_callbacks;    /**< Maximum callback count */
-    bool auto_commit;         /**< Auto-commit mode */
+    uint16_t max_keys;       /**< Maximum key count (32-256) */
+    uint8_t max_key_len;     /**< Maximum key length (16-64) */
+    uint16_t max_value_size; /**< Maximum value size (64-1024) */
+    uint8_t max_namespaces;  /**< Maximum namespace count */
+    uint8_t max_callbacks;   /**< Maximum callback count */
+    bool auto_commit;        /**< Auto-commit mode */
 } config_manager_config_t;
 
 /**
  * \brief           Default configuration initializer
  */
 #define CONFIG_MANAGER_CONFIG_DEFAULT                                          \
-    {                                                                          \
-        .max_keys = CONFIG_DEFAULT_MAX_KEYS,                                   \
-        .max_key_len = CONFIG_DEFAULT_MAX_KEY_LEN,                             \
-        .max_value_size = CONFIG_DEFAULT_MAX_VALUE_SIZE,                       \
-        .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,                       \
-        .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,                         \
-        .auto_commit = false                                                   \
-    }
-
+    {.max_keys = CONFIG_DEFAULT_MAX_KEYS,                                      \
+     .max_key_len = CONFIG_DEFAULT_MAX_KEY_LEN,                                \
+     .max_value_size = CONFIG_DEFAULT_MAX_VALUE_SIZE,                          \
+     .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,                          \
+     .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,                            \
+     .auto_commit = false}
 
 /**
  * \name            Initialization and Configuration
@@ -147,7 +145,8 @@ config_status_t config_set_i32(const char* key, int32_t value);
  * \param[in]       default_val: Default value if key not found
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_get_i32(const char* key, int32_t* value, int32_t default_val);
+config_status_t config_get_i32(const char* key, int32_t* value,
+                               int32_t default_val);
 
 /**
  * \brief           Set a 32-bit unsigned integer value
@@ -164,7 +163,8 @@ config_status_t config_set_u32(const char* key, uint32_t value);
  * \param[in]       default_val: Default value if key not found
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_get_u32(const char* key, uint32_t* value, uint32_t default_val);
+config_status_t config_get_u32(const char* key, uint32_t* value,
+                               uint32_t default_val);
 
 /**
  * \brief           Set a 64-bit signed integer value
@@ -181,12 +181,12 @@ config_status_t config_set_i64(const char* key, int64_t value);
  * \param[in]       default_val: Default value if key not found
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_get_i64(const char* key, int64_t* value, int64_t default_val);
+config_status_t config_get_i64(const char* key, int64_t* value,
+                               int64_t default_val);
 
 /**
  * \}
  */
-
 
 /**
  * \name            Float and Boolean Operations
@@ -208,7 +208,8 @@ config_status_t config_set_float(const char* key, float value);
  * \param[in]       default_val: Default value if key not found
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_get_float(const char* key, float* value, float default_val);
+config_status_t config_get_float(const char* key, float* value,
+                                 float default_val);
 
 /**
  * \brief           Set a boolean value
@@ -279,7 +280,7 @@ config_status_t config_set_blob(const char* key, const void* data, size_t size);
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_get_blob(const char* key, void* buffer, size_t buf_size,
-                                 size_t* actual_size);
+                                size_t* actual_size);
 
 /**
  * \brief           Get the size of a stored blob
@@ -292,7 +293,6 @@ config_status_t config_get_blob_len(const char* key, size_t* len);
 /**
  * \}
  */
-
 
 /**
  * \name            Namespace Operations
@@ -310,7 +310,8 @@ typedef struct config_namespace* config_ns_handle_t;
  * \param[out]      handle: Pointer to store the namespace handle
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_open_namespace(const char* name, config_ns_handle_t* handle);
+config_status_t config_open_namespace(const char* name,
+                                      config_ns_handle_t* handle);
 
 /**
  * \brief           Close a namespace
@@ -333,7 +334,8 @@ config_status_t config_erase_namespace(const char* name);
  * \param[in]       value: Value to store
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_ns_set_i32(config_ns_handle_t ns, const char* key, int32_t value);
+config_status_t config_ns_set_i32(config_ns_handle_t ns, const char* key,
+                                  int32_t value);
 
 /**
  * \brief           Get a 32-bit signed integer from namespace
@@ -344,7 +346,7 @@ config_status_t config_ns_set_i32(config_ns_handle_t ns, const char* key, int32_
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_ns_get_i32(config_ns_handle_t ns, const char* key,
-                                   int32_t* value, int32_t default_val);
+                                  int32_t* value, int32_t default_val);
 
 /**
  * \brief           Set a 32-bit unsigned integer in namespace
@@ -353,7 +355,8 @@ config_status_t config_ns_get_i32(config_ns_handle_t ns, const char* key,
  * \param[in]       value: Value to store
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_ns_set_u32(config_ns_handle_t ns, const char* key, uint32_t value);
+config_status_t config_ns_set_u32(config_ns_handle_t ns, const char* key,
+                                  uint32_t value);
 
 /**
  * \brief           Get a 32-bit unsigned integer from namespace
@@ -364,7 +367,7 @@ config_status_t config_ns_set_u32(config_ns_handle_t ns, const char* key, uint32
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_ns_get_u32(config_ns_handle_t ns, const char* key,
-                                   uint32_t* value, uint32_t default_val);
+                                  uint32_t* value, uint32_t default_val);
 
 /**
  * \brief           Set a string in namespace
@@ -373,7 +376,8 @@ config_status_t config_ns_get_u32(config_ns_handle_t ns, const char* key,
  * \param[in]       value: String value to store
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_ns_set_str(config_ns_handle_t ns, const char* key, const char* value);
+config_status_t config_ns_set_str(config_ns_handle_t ns, const char* key,
+                                  const char* value);
 
 /**
  * \brief           Get a string from namespace
@@ -384,7 +388,7 @@ config_status_t config_ns_set_str(config_ns_handle_t ns, const char* key, const 
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_ns_get_str(config_ns_handle_t ns, const char* key,
-                                   char* buffer, size_t buf_size);
+                                  char* buffer, size_t buf_size);
 
 /**
  * \brief           Set a boolean in namespace
@@ -393,7 +397,8 @@ config_status_t config_ns_get_str(config_ns_handle_t ns, const char* key,
  * \param[in]       value: Boolean value to store
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_ns_set_bool(config_ns_handle_t ns, const char* key, bool value);
+config_status_t config_ns_set_bool(config_ns_handle_t ns, const char* key,
+                                   bool value);
 
 /**
  * \brief           Get a boolean from namespace
@@ -404,7 +409,7 @@ config_status_t config_ns_set_bool(config_ns_handle_t ns, const char* key, bool 
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_ns_get_bool(config_ns_handle_t ns, const char* key,
-                                    bool* value, bool default_val);
+                                   bool* value, bool default_val);
 
 /**
  * \brief           Check if a key exists in namespace
@@ -413,7 +418,8 @@ config_status_t config_ns_get_bool(config_ns_handle_t ns, const char* key,
  * \param[out]      exists: Pointer to store the result
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_ns_exists(config_ns_handle_t ns, const char* key, bool* exists);
+config_status_t config_ns_exists(config_ns_handle_t ns, const char* key,
+                                 bool* exists);
 
 /**
  * \brief           Delete a key from namespace
@@ -436,16 +442,16 @@ config_status_t config_ns_delete(config_ns_handle_t ns, const char* key);
  * \brief           Default value definition structure
  */
 typedef struct {
-    const char* key;       /**< Configuration key */
-    config_type_t type;    /**< Value type */
+    const char* key;    /**< Configuration key */
+    config_type_t type; /**< Value type */
     union {
-        int32_t i32_val;   /**< 32-bit signed integer */
-        uint32_t u32_val;  /**< 32-bit unsigned integer */
-        int64_t i64_val;   /**< 64-bit signed integer */
-        float float_val;   /**< Float value */
-        bool bool_val;     /**< Boolean value */
+        int32_t i32_val;     /**< 32-bit signed integer */
+        uint32_t u32_val;    /**< 32-bit unsigned integer */
+        int64_t i64_val;     /**< 64-bit signed integer */
+        float float_val;     /**< Float value */
+        bool bool_val;       /**< Boolean value */
         const char* str_val; /**< String value */
-    } value;               /**< Default value */
+    } value;                 /**< Default value */
 } config_default_t;
 
 /**
@@ -515,12 +521,12 @@ config_status_t config_reset_all_to_defaults(void);
  * \param[in]       count: Number of defaults
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_register_defaults(const config_default_t* defaults, size_t count);
+config_status_t config_register_defaults(const config_default_t* defaults,
+                                         size_t count);
 
 /**
  * \}
  */
-
 
 /**
  * \name            Change Notification Callbacks
@@ -536,8 +542,8 @@ config_status_t config_register_defaults(const config_default_t* defaults, size_
  * \param[in]       user_data: User-provided context
  */
 typedef void (*config_change_cb_t)(const char* key, config_type_t type,
-                                    const void* old_value, const void* new_value,
-                                    void* user_data);
+                                   const void* old_value, const void* new_value,
+                                   void* user_data);
 
 /**
  * \brief           Callback handle type
@@ -552,8 +558,10 @@ typedef struct config_callback* config_cb_handle_t;
  * \param[out]      handle: Pointer to store the callback handle
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_register_callback(const char* key, config_change_cb_t callback,
-                                          void* user_data, config_cb_handle_t* handle);
+config_status_t config_register_callback(const char* key,
+                                         config_change_cb_t callback,
+                                         void* user_data,
+                                         config_cb_handle_t* handle);
 
 /**
  * \brief           Register a wildcard callback for all key changes
@@ -563,8 +571,8 @@ config_status_t config_register_callback(const char* key, config_change_cb_t cal
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_register_wildcard_callback(config_change_cb_t callback,
-                                                   void* user_data,
-                                                   config_cb_handle_t* handle);
+                                                  void* user_data,
+                                                  config_cb_handle_t* handle);
 
 /**
  * \brief           Unregister a callback
@@ -587,9 +595,9 @@ config_status_t config_unregister_callback(config_cb_handle_t handle);
  */
 typedef struct {
     char key[CONFIG_DEFAULT_MAX_KEY_LEN]; /**< Configuration key */
-    config_type_t type;                    /**< Value type */
-    uint16_t value_size;                   /**< Value size in bytes */
-    uint8_t flags;                         /**< Entry flags */
+    config_type_t type;                   /**< Value type */
+    uint16_t value_size;                  /**< Value size in bytes */
+    uint8_t flags;                        /**< Entry flags */
 } config_entry_info_t;
 
 /**
@@ -598,7 +606,8 @@ typedef struct {
  * \param[in]       user_data: User-provided context
  * \return          true to continue iteration, false to stop
  */
-typedef bool (*config_iterate_cb_t)(const config_entry_info_t* info, void* user_data);
+typedef bool (*config_iterate_cb_t)(const config_entry_info_t* info,
+                                    void* user_data);
 
 /**
  * \brief           Check if a key exists
@@ -645,13 +654,13 @@ config_status_t config_iterate(config_iterate_cb_t callback, void* user_data);
  * \param[in]       user_data: User-provided context
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_ns_iterate(config_ns_handle_t ns, config_iterate_cb_t callback,
-                                   void* user_data);
+config_status_t config_ns_iterate(config_ns_handle_t ns,
+                                  config_iterate_cb_t callback,
+                                  void* user_data);
 
 /**
  * \}
  */
-
 
 /**
  * \name            Import/Export Operations
@@ -666,8 +675,8 @@ config_status_t config_ns_iterate(config_ns_handle_t ns, config_iterate_cb_t cal
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_get_export_size(config_format_t format,
-                                        config_export_flags_t flags,
-                                        size_t* size);
+                                       config_export_flags_t flags,
+                                       size_t* size);
 
 /**
  * \brief           Export all configurations
@@ -678,8 +687,9 @@ config_status_t config_get_export_size(config_format_t format,
  * \param[out]      actual_size: Actual size of exported data
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_export(config_format_t format, config_export_flags_t flags,
-                               void* buffer, size_t buf_size, size_t* actual_size);
+config_status_t config_export(config_format_t format,
+                              config_export_flags_t flags, void* buffer,
+                              size_t buf_size, size_t* actual_size);
 
 /**
  * \brief           Export configurations from a specific namespace
@@ -691,9 +701,11 @@ config_status_t config_export(config_format_t format, config_export_flags_t flag
  * \param[out]      actual_size: Actual size of exported data
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_export_namespace(const char* ns_name, config_format_t format,
-                                         config_export_flags_t flags, void* buffer,
-                                         size_t buf_size, size_t* actual_size);
+config_status_t config_export_namespace(const char* ns_name,
+                                        config_format_t format,
+                                        config_export_flags_t flags,
+                                        void* buffer, size_t buf_size,
+                                        size_t* actual_size);
 
 /**
  * \brief           Import configurations
@@ -703,8 +715,9 @@ config_status_t config_export_namespace(const char* ns_name, config_format_t for
  * \param[in]       size: Size of the data
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_import(config_format_t format, config_import_flags_t flags,
-                               const void* data, size_t size);
+config_status_t config_import(config_format_t format,
+                              config_import_flags_t flags, const void* data,
+                              size_t size);
 
 /**
  * \brief           Import configurations to a specific namespace
@@ -715,9 +728,10 @@ config_status_t config_import(config_format_t format, config_import_flags_t flag
  * \param[in]       size: Size of the data
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_import_namespace(const char* ns_name, config_format_t format,
-                                         config_import_flags_t flags, const void* data,
-                                         size_t size);
+config_status_t config_import_namespace(const char* ns_name,
+                                        config_format_t format,
+                                        config_import_flags_t flags,
+                                        const void* data, size_t size);
 
 /**
  * \}
@@ -736,7 +750,7 @@ config_status_t config_import_namespace(const char* ns_name, config_format_t for
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_set_encryption_key(const uint8_t* key, size_t key_len,
-                                           config_crypto_algo_t algo);
+                                          config_crypto_algo_t algo);
 
 /**
  * \brief           Clear the encryption key
@@ -759,7 +773,8 @@ config_status_t config_set_str_encrypted(const char* key, const char* value);
  * \param[in]       size: Size of the data
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_set_blob_encrypted(const char* key, const void* data, size_t size);
+config_status_t config_set_blob_encrypted(const char* key, const void* data,
+                                          size_t size);
 
 /**
  * \brief           Check if a key is encrypted
@@ -777,8 +792,9 @@ config_status_t config_is_encrypted(const char* key, bool* encrypted);
  * \return          CONFIG_OK on success, error code otherwise
  * \note            Re-encrypts all encrypted keys with the new key
  */
-config_status_t config_rotate_encryption_key(const uint8_t* new_key, size_t key_len,
-                                              config_crypto_algo_t algo);
+config_status_t config_rotate_encryption_key(const uint8_t* new_key,
+                                             size_t key_len,
+                                             config_crypto_algo_t algo);
 
 /**
  * \}
