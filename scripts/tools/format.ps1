@@ -10,7 +10,7 @@
 .PARAMETER Check
     Check only mode - don't modify files, just report formatting issues
 
-.PARAMETER Verbose
+.PARAMETER VerboseOutput
     Enable verbose output showing each file being processed
 
 .PARAMETER Extensions
@@ -21,6 +21,9 @@
 
 .PARAMETER Exclude
     Patterns to exclude from formatting (supports wildcards)
+
+.PARAMETER ConfigFile
+    Path to format configuration file (default: .clang-format-dirs)
 
 .PARAMETER Style
     Clang-format style: file (default), llvm, google, chromium, mozilla, webkit
@@ -36,7 +39,7 @@
     Format all source files using .clang-format configuration
 
 .EXAMPLE
-    .\format.ps1 -Check -Verbose
+    .\format.ps1 -Check -VerboseOutput
     Check formatting without modifying files, with verbose output
 
 .EXAMPLE
@@ -51,20 +54,22 @@
 [CmdletBinding()]
 param(
     [switch]$Check,
-    [switch]$Verbose,
-    [string]$Extensions = ".c,.h,.cpp,.hpp",
-    [string]$Directories = "hal,osal,platforms,tests,applications",
+    [switch]$VerboseOutput,
+    [string]$Extensions = "",
+    [string]$Directories = "",
     [string[]]$Exclude = @(),
+    [string]$ConfigFile = "",
 
     [ValidateSet("file", "llvm", "google", "chromium", "mozilla", "webkit")]
     [string]$Style = "file",
 
     [switch]$Parallel,
+    [switch]$ShowConfig,
     [switch]$Help
 )
 
 # Set verbose preference
-if ($Verbose) {
+if ($VerboseOutput) {
     $VerbosePreference = "Continue"
 }
 
@@ -119,6 +124,74 @@ function Get-ProjectRoot {
     return (Get-Item $PSScriptRoot).Parent.Parent.FullName
 }
 
+function Read-FormatConfig {
+    param([string]$ConfigPath)
+    
+    $config = @{
+        Directories = @("hal", "osal", "platforms", "tests", "applications", "framework")
+        Exclude = @("ext", "vendors", "build", "build-*", "_build", "docs", "scripts")
+        Extensions = @(".c", ".h", ".cpp", ".hpp")
+    }
+    
+    if (!(Test-Path $ConfigPath)) {
+        Write-Verbose "Config file not found: $ConfigPath, using defaults"
+        return $config
+    }
+    
+    Write-Verbose "Reading config from: $ConfigPath"
+    
+    $inExtensionsSection = $false
+    $customExtensions = @()
+    $customDirs = @()
+    $customExclude = @()
+    
+    foreach ($line in Get-Content $ConfigPath) {
+        $line = $line.Trim()
+        
+        # Skip empty lines and comments
+        if ([string]::IsNullOrEmpty($line) -or $line.StartsWith('#')) {
+            continue
+        }
+        
+        # Check for extensions section
+        if ($line -eq '[extensions]') {
+            $inExtensionsSection = $true
+            continue
+        }
+        
+        # Handle extensions section
+        if ($inExtensionsSection) {
+            if ($line.StartsWith('[')) {
+                $inExtensionsSection = $false
+            }
+            elseif ($line.StartsWith('.')) {
+                $customExtensions += $line
+            }
+            continue
+        }
+        
+        # Handle exclusion patterns (lines starting with !)
+        if ($line.StartsWith('!')) {
+            $customExclude += $line.Substring(1).Trim()
+        }
+        else {
+            $customDirs += $line
+        }
+    }
+    
+    if ($customDirs.Count -gt 0) {
+        $config.Directories = $customDirs
+    }
+    if ($customExclude.Count -gt 0) {
+        $config.Exclude = $customExclude
+    }
+    if ($customExtensions.Count -gt 0) {
+        $config.Extensions = $customExtensions
+    }
+    
+    return $config
+}
+
 function Show-Help {
     Write-Host @"
 Nexus Code Formatter - PowerShell Version
@@ -127,19 +200,22 @@ Usage: .\format.ps1 [options]
 
 Options:
   -Check                Check only mode (don't modify files)
-  -Verbose              Enable verbose output
-  -Extensions <list>    File extensions to format (default: .c,.h,.cpp,.hpp)
-  -Directories <list>   Directories to scan (default: hal,osal,platforms,tests,applications)
-  -Exclude <patterns>   Patterns to exclude from formatting
+  -VerboseOutput        Enable verbose output
+  -Extensions <list>    File extensions to format (overrides config file)
+  -Directories <list>   Directories to scan (overrides config file)
+  -Exclude <patterns>   Patterns to exclude from formatting (overrides config file)
+  -ConfigFile <path>    Path to format config file (default: .clang-format-dirs)
   -Style <style>        Clang-format style: file (default), llvm, google, chromium, mozilla, webkit
   -Parallel             Enable parallel processing
+  -ShowConfig           Show configuration and exit
   -Help                 Show this help information
 
 Examples:
   .\format.ps1                              # Format all source files
-  .\format.ps1 -Check -Verbose              # Check formatting with verbose output
+  .\format.ps1 -Check -VerboseOutput        # Check formatting with verbose output
   .\format.ps1 -Style google                # Use Google coding style
   .\format.ps1 -Exclude "*test*" -Parallel  # Exclude test files, use parallel processing
+  .\format.ps1 -ShowConfig                  # Show current configuration
 
 Clang-Format Styles:
   file      - Use .clang-format file in project root (recommended)
@@ -244,7 +320,7 @@ function Find-SourceFiles {
 
     Write-Success "Found $($allFiles.Count) source files to process"
 
-    if ($Verbose -and $allFiles.Count -le 20) {
+    if ($VerboseOutput -and $allFiles.Count -le 20) {
         Write-Host "Files to process:" -ForegroundColor Gray
         foreach ($file in $allFiles) {
             $relativePath = $file.FullName.Substring($ProjectRoot.Length + 1)
@@ -430,20 +506,58 @@ function Main {
     }
 
     $projectRoot = Get-ProjectRoot
-    $extensionList = $Extensions -split ',' | ForEach-Object { $_.Trim() }
-    $directoryList = $Directories -split ',' | ForEach-Object { $_.Trim() }
+    
+    # Determine config file path
+    $configPath = if ($ConfigFile) { 
+        if ([System.IO.Path]::IsPathRooted($ConfigFile)) { $ConfigFile } 
+        else { Join-Path $projectRoot $ConfigFile }
+    } else { 
+        Join-Path $projectRoot ".clang-format-dirs" 
+    }
+    
+    # Read configuration from file
+    $config = Read-FormatConfig -ConfigPath $configPath
+    
+    # Override with command line parameters if provided
+    $extensionList = if ($Extensions) { 
+        $Extensions -split ',' | ForEach-Object { $_.Trim() } 
+    } else { 
+        $config.Extensions 
+    }
+    
+    $directoryList = if ($Directories) { 
+        $Directories -split ',' | ForEach-Object { $_.Trim() } 
+    } else { 
+        $config.Directories 
+    }
+    
+    $excludePatterns = if ($Exclude.Count -gt 0) { 
+        $Exclude 
+    } else { 
+        $config.Exclude 
+    }
 
     Write-Header "Nexus Code Formatter - PowerShell Version"
 
+    # Show config and exit if requested
+    if ($ShowConfig) {
+        Write-Host "Configuration File: $configPath"
+        Write-Host "Directories: $($directoryList -join ', ')"
+        Write-Host "Extensions: $($extensionList -join ', ')"
+        Write-Host "Exclude Patterns: $($excludePatterns -join ', ')"
+        return 0
+    }
+
     Write-Host "Configuration:"
     Write-Host "  Project Root: $projectRoot"
+    Write-Host "  Config File: $configPath"
     Write-Host "  Mode: $(if ($Check) { 'Check Only' } else { 'Format' })"
     Write-Host "  Style: $Style"
     Write-Host "  Extensions: $($extensionList -join ', ')"
     Write-Host "  Directories: $($directoryList -join ', ')"
-    Write-Host "  Exclude Patterns: $(if ($Exclude.Count -gt 0) { $Exclude -join ', ' } else { 'None' })"
+    Write-Host "  Exclude Patterns: $($excludePatterns -join ', ')"
     Write-Host "  Parallel Processing: $(if ($Parallel) { 'Yes' } else { 'No' })"
-    Write-Host "  Verbose Output: $(if ($Verbose) { 'Yes' } else { 'No' })"
+    Write-Host "  Verbose Output: $(if ($VerboseOutput) { 'Yes' } else { 'No' })"
 
     # Check for .clang-format file if using 'file' style
     if ($Style -eq "file") {
@@ -459,7 +573,7 @@ function Main {
     }
 
     # Find source files
-    $sourceFiles = Find-SourceFiles -ProjectRoot $projectRoot -Extensions $extensionList -Directories $directoryList -ExcludePatterns $Exclude
+    $sourceFiles = Find-SourceFiles -ProjectRoot $projectRoot -Extensions $extensionList -Directories $directoryList -ExcludePatterns $excludePatterns
 
     if ($sourceFiles.Count -eq 0) {
         Write-Warning "No source files found to process"
