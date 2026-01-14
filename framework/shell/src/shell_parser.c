@@ -90,21 +90,6 @@ static shell_status_t parse_unquoted_arg(char** str, char** arg_start) {
     return SHELL_OK;
 }
 
-/**
- * @brief Parse a command line into command name and arguments
- * 
- * Parses a command line string, extracting the command name and arguments.
- * Supports:
- * - Space-separated arguments (Requirement 3.4)
- * - Quoted strings as single arguments (Requirement 3.5)
- * - Maximum 8 arguments per command (Requirement 3.6)
- * 
- * @param line Input command line (will be modified)
- * @param result Output parsed command structure
- * @return SHELL_OK on success
- * @return SHELL_ERROR_INVALID_PARAM if line or result is NULL
- * @return SHELL_ERROR_BUFFER_FULL if too many arguments
- */
 shell_status_t parse_command_line(char* line, parsed_command_t* result) {
     if (line == NULL || result == NULL) {
         return SHELL_ERROR_INVALID_PARAM;

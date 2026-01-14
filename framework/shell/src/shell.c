@@ -25,15 +25,13 @@
 #include <stdlib.h>
 
 /**
- * \defgroup        SHELL_CORE Shell Core Implementation
- * \brief           Core shell functionality
+ * \addtogroup      SHELL
  * \{
  */
 
-/**
- * \name            Constants
- * \{
- */
+/* ============================================================================
+ * Constants
+ * ========================================================================= */
 
 /** Shell version string */
 #define SHELL_VERSION               "1.0.0"
@@ -49,14 +47,9 @@
 #define ANSI_CURSOR_SAVE            "\033[s"
 #define ANSI_CURSOR_RESTORE         "\033[u"
 
-/**
- * \}
- */
-
-/**
- * \name            Escape Sequence State Machine
- * \{
- */
+/* ============================================================================
+ * Escape Sequence State Machine Types
+ * ========================================================================= */
 
 /**
  * \brief           Escape sequence parser states
@@ -83,11 +76,9 @@ typedef enum {
     ESC_RESULT_INVALID              /**< Invalid/unknown sequence */
 } escape_result_t;
 
-/**
- * \}
- */
-
-/**
+/* ============================================================================
+ * Shell Context Structure
+ * ========================================================================= *//**
  * \brief           Shell context structure
  *
  * Contains all state for the Shell module.
@@ -115,22 +106,16 @@ typedef struct {
     char                prompt[SHELL_MAX_PROMPT_LEN + 1];
 } shell_context_t;
 
-/**
- * \name            Private Data
- * \{
- */
+/* ============================================================================
+ * Private Data
+ * ========================================================================= */
 
 /** Global shell context */
 static shell_context_t g_shell_ctx;
 
-/**
- * \}
- */
-
-/**
- * \name            Private Function Declarations
- * \{
- */
+/* ============================================================================
+ * Private Function Declarations
+ * ========================================================================= */
 
 static shell_status_t validate_config(const shell_config_t* config);
 static void reset_escape_state(void);
@@ -143,15 +128,9 @@ static void execute_command_line(void);
 static void redraw_line(void);
 static void refresh_line_from_cursor(void);
 
-/**
- * \}
- */
-
-
-/**
- * \name            Configuration Validation
- * \{
- */
+/* ============================================================================
+ * Configuration Validation
+ * ========================================================================= */
 
 /**
  * \brief           Validate shell configuration
@@ -185,14 +164,9 @@ validate_config(const shell_config_t* config) {
     return SHELL_OK;
 }
 
-/**
- * \}
- */
-
-/**
- * \name            Escape Sequence Processing
- * \{
- */
+/* ============================================================================
+ * Escape Sequence Processing
+ * ========================================================================= */
 
 /**
  * \brief           Reset escape sequence state machine
@@ -293,15 +267,9 @@ process_escape_char(uint8_t c) {
     return ESC_RESULT_INVALID;
 }
 
-/**
- * \}
- */
-
-
-/**
- * \name            Line Display Functions
- * \{
- */
+/* ============================================================================
+ * Line Display Functions
+ * ========================================================================= */
 
 /**
  * \brief           Redraw the entire command line
@@ -364,14 +332,9 @@ refresh_line_from_cursor(void) {
     }
 }
 
-/**
- * \}
- */
-
-/**
- * \name            Input Handling Functions
- * \{
- */
+/* ============================================================================
+ * Input Handling Functions
+ * ========================================================================= */
 
 /**
  * \brief           Handle escape sequence result
@@ -601,15 +564,9 @@ handle_control_char(uint8_t c) {
     }
 }
 
-/**
- * \}
- */
-
-
-/**
- * \name            Command Execution
- * \{
- */
+/* ============================================================================
+ * Command Execution
+ * ========================================================================= */
 
 /**
  * \brief           Execute the current command line
@@ -670,20 +627,11 @@ execute_command_line(void) {
     shell_print_prompt();
 }
 
-/**
- * \}
- */
+/* ============================================================================
+ * Public API Implementation
+ * ========================================================================= */
 
-/**
- * \name            Public API Implementation
- * \{
- */
-
-/**
- * \brief           Initialize the Shell module
- * \param[in]       config: Pointer to configuration structure
- * \return          SHELL_OK on success, error code otherwise
- */
+/* See shell.h for documentation */
 shell_status_t
 shell_init(const shell_config_t* config) {
     shell_status_t status;
@@ -944,15 +892,9 @@ shell_get_history_manager(void) {
     return &g_shell_ctx.history;
 }
 
-/**
- * \}
- */
-
-/**
- * \name            Error Handling Functions
- * \brief           Error handling and recovery (Requirements 10.1-10.5)
- * \{
- */
+/* ============================================================================
+ * Error Handling Functions
+ * ========================================================================= */
 
 /**
  * \brief           Error message strings for each status code
@@ -1050,8 +992,3 @@ shell_recover(void) {
 /**
  * \}
  */
-
-/**
- * \}
- */
-

@@ -24,8 +24,7 @@
 #include <string.h>
 
 /**
- * \defgroup        SHELL_BUILTIN Shell Built-in Commands
- * \brief           Built-in command implementations
+ * \addtogroup      SHELL_BUILTIN
  * \{
  */
 
