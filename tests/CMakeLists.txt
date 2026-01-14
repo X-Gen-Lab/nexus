@@ -65,6 +65,15 @@ add_executable(nexus_tests
     shell/test_shell_backend.cpp
     shell/test_shell_backend_properties.cpp
     shell/test_shell_builtin.cpp
+    config/test_config_store.cpp
+    config/test_config_store_properties.cpp
+    config/test_config_core_properties.cpp
+    config/test_config_default.cpp
+    config/test_config_default_properties.cpp
+    config/test_config_namespace.cpp
+    config/test_config_namespace_properties.cpp
+    config/test_config_callback.cpp
+    config/test_config_callback_properties.cpp
     integration/test_hal_osal_integration.cpp
     integration/test_freertos_adapter_integration.cpp
     integration/test_log_integration.cpp
@@ -81,6 +90,7 @@ target_include_directories(nexus_tests
         ${CMAKE_SOURCE_DIR}/platforms/native/include
         ${CMAKE_SOURCE_DIR}/framework/log/include
         ${CMAKE_SOURCE_DIR}/framework/shell/include
+        ${CMAKE_SOURCE_DIR}/framework/config/include
 )
 
 # Platform-specific threading libraries
@@ -101,6 +111,7 @@ target_link_libraries(nexus_tests
         osal
         log_framework
         shell_framework
+        config_framework
         ${THREAD_LIBS}
 )
 
