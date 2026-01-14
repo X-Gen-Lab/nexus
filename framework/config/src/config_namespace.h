@@ -20,6 +20,9 @@
 extern "C" {
 #endif
 
+/* Forward declaration of namespace handle structure */
+struct config_namespace;
+
 /**
  * \brief           Initialize the namespace manager
  * \param[in]       max_namespaces: Maximum number of namespaces
@@ -62,7 +65,8 @@ config_status_t config_namespace_create(const char* name, uint8_t* ns_id);
  * \param[in]       name_size: Size of name buffer
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t config_namespace_get_name(uint8_t ns_id, char* name, size_t name_size);
+config_status_t config_namespace_get_name(uint8_t ns_id, char* name,
+                                          size_t name_size);
 
 /**
  * \brief           Check if namespace ID is valid
@@ -77,6 +81,23 @@ bool config_namespace_is_valid_id(uint8_t ns_id);
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_namespace_get_count(size_t* count);
+
+/**
+ * \brief           Get namespace ID from handle
+ * \param[in]       handle: Namespace handle
+ * \param[out]      ns_id: Pointer to store namespace ID
+ * \return          CONFIG_OK on success, error code otherwise
+ */
+config_status_t
+config_namespace_get_handle_id(const struct config_namespace* handle,
+                               uint8_t* ns_id);
+
+/**
+ * \brief           Check if namespace handle is valid
+ * \param[in]       handle: Namespace handle
+ * \return          true if valid, false otherwise
+ */
+bool config_namespace_is_valid_handle(const struct config_namespace* handle);
 
 #ifdef __cplusplus
 }

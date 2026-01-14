@@ -14,8 +14,8 @@
  *                  Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6
  */
 
-#include "config/config.h"
 #include "config_namespace.h"
+#include "config/config.h"
 #include "config_store.h"
 #include <string.h>
 
@@ -27,28 +27,30 @@
  * \brief           Namespace entry structure
  */
 typedef struct {
-    char name[CONFIG_MAX_NS_NAME_LEN];  /**< Namespace name */
-    bool active;                         /**< Namespace is active/in-use */
-    uint8_t ref_count;                   /**< Reference count for open handles */
+    char name[CONFIG_MAX_NS_NAME_LEN]; /**< Namespace name */
+    bool active;                       /**< Namespace is active/in-use */
+    uint8_t ref_count;                 /**< Reference count for open handles */
 } config_namespace_entry_t;
 
 /**
  * \brief           Namespace handle internal structure
  */
 struct config_namespace {
-    uint8_t ns_id;                       /**< Namespace ID */
-    bool valid;                          /**< Handle is valid */
+    uint8_t ns_id; /**< Namespace ID */
+    bool valid;    /**< Handle is valid */
 };
 
 /**
  * \brief           Namespace manager context
  */
 typedef struct {
-    bool initialized;                    /**< Manager is initialized */
-    uint8_t max_namespaces;              /**< Maximum number of namespaces */
-    size_t active_count;                 /**< Number of active namespaces */
-    config_namespace_entry_t namespaces[CONFIG_DEFAULT_MAX_NAMESPACES]; /**< Namespace storage */
-    struct config_namespace handles[CONFIG_DEFAULT_MAX_NAMESPACES * 2]; /**< Handle storage */
+    bool initialized;       /**< Manager is initialized */
+    uint8_t max_namespaces; /**< Maximum number of namespaces */
+    size_t active_count;    /**< Number of active namespaces */
+    config_namespace_entry_t
+        namespaces[CONFIG_DEFAULT_MAX_NAMESPACES]; /**< Namespace storage */
+    struct config_namespace
+        handles[CONFIG_DEFAULT_MAX_NAMESPACES * 2]; /**< Handle storage */
 } config_namespace_ctx_t;
 
 /*---------------------------------------------------------------------------*/
@@ -69,15 +71,15 @@ static config_namespace_ctx_t g_ns_ctx;
  * \param[in]       name: Namespace name
  * \return          Namespace index if found, -1 otherwise
  */
-static int
-config_namespace_find_by_name(const char* name) {
+static int config_namespace_find_by_name(const char* name) {
     if (name == NULL) {
         return -1;
     }
 
     for (uint8_t i = 0; i < g_ns_ctx.max_namespaces; ++i) {
         if (g_ns_ctx.namespaces[i].active &&
-            strncmp(g_ns_ctx.namespaces[i].name, name, CONFIG_MAX_NS_NAME_LEN) == 0) {
+            strncmp(g_ns_ctx.namespaces[i].name, name,
+                    CONFIG_MAX_NS_NAME_LEN) == 0) {
             return (int)i;
         }
     }
@@ -88,8 +90,7 @@ config_namespace_find_by_name(const char* name) {
  * \brief           Find free namespace slot
  * \return          Free slot index if available, -1 otherwise
  */
-static int
-config_namespace_find_free_slot(void) {
+static int config_namespace_find_free_slot(void) {
     for (uint8_t i = 0; i < g_ns_ctx.max_namespaces; ++i) {
         if (!g_ns_ctx.namespaces[i].active) {
             return (int)i;
@@ -102,8 +103,7 @@ config_namespace_find_free_slot(void) {
  * \brief           Find free handle slot
  * \return          Pointer to free handle if available, NULL otherwise
  */
-static struct config_namespace*
-config_namespace_find_free_handle(void) {
+static struct config_namespace* config_namespace_find_free_handle(void) {
     size_t max_handles = (size_t)g_ns_ctx.max_namespaces * 2;
     for (size_t i = 0; i < max_handles; ++i) {
         if (!g_ns_ctx.handles[i].valid) {
@@ -117,8 +117,7 @@ config_namespace_find_free_handle(void) {
 /* Internal API Implementation                                               */
 /*---------------------------------------------------------------------------*/
 
-config_status_t
-config_namespace_init(uint8_t max_namespaces) {
+config_status_t config_namespace_init(uint8_t max_namespaces) {
     if (max_namespaces == 0 || max_namespaces > CONFIG_DEFAULT_MAX_NAMESPACES) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -138,8 +137,7 @@ config_namespace_init(uint8_t max_namespaces) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_namespace_deinit(void) {
+config_status_t config_namespace_deinit(void) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -148,13 +146,11 @@ config_namespace_deinit(void) {
     return CONFIG_OK;
 }
 
-bool
-config_namespace_is_initialized(void) {
+bool config_namespace_is_initialized(void) {
     return g_ns_ctx.initialized;
 }
 
-config_status_t
-config_namespace_get_id(const char* name, uint8_t* ns_id) {
+config_status_t config_namespace_get_id(const char* name, uint8_t* ns_id) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -172,8 +168,7 @@ config_namespace_get_id(const char* name, uint8_t* ns_id) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_namespace_create(const char* name, uint8_t* ns_id) {
+config_status_t config_namespace_create(const char* name, uint8_t* ns_id) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -203,7 +198,9 @@ config_namespace_create(const char* name, uint8_t* ns_id) {
 
     /* Create new namespace */
     memset(g_ns_ctx.namespaces[idx].name, 0, CONFIG_MAX_NS_NAME_LEN);
-    size_t copy_len = name_len < (CONFIG_MAX_NS_NAME_LEN - 1) ? name_len : (CONFIG_MAX_NS_NAME_LEN - 1);
+    size_t copy_len = name_len < (CONFIG_MAX_NS_NAME_LEN - 1)
+                          ? name_len
+                          : (CONFIG_MAX_NS_NAME_LEN - 1);
     memcpy(g_ns_ctx.namespaces[idx].name, name, copy_len);
     g_ns_ctx.namespaces[idx].active = true;
     g_ns_ctx.namespaces[idx].ref_count = 0;
@@ -213,8 +210,8 @@ config_namespace_create(const char* name, uint8_t* ns_id) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_namespace_get_name(uint8_t ns_id, char* name, size_t name_size) {
+config_status_t config_namespace_get_name(uint8_t ns_id, char* name,
+                                          size_t name_size) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -223,7 +220,8 @@ config_namespace_get_name(uint8_t ns_id, char* name, size_t name_size) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (ns_id >= g_ns_ctx.max_namespaces || !g_ns_ctx.namespaces[ns_id].active) {
+    if (ns_id >= g_ns_ctx.max_namespaces ||
+        !g_ns_ctx.namespaces[ns_id].active) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
@@ -238,8 +236,7 @@ config_namespace_get_name(uint8_t ns_id, char* name, size_t name_size) {
     return CONFIG_OK;
 }
 
-bool
-config_namespace_is_valid_id(uint8_t ns_id) {
+bool config_namespace_is_valid_id(uint8_t ns_id) {
     if (!g_ns_ctx.initialized) {
         return false;
     }
@@ -247,8 +244,7 @@ config_namespace_is_valid_id(uint8_t ns_id) {
     return ns_id < g_ns_ctx.max_namespaces && g_ns_ctx.namespaces[ns_id].active;
 }
 
-config_status_t
-config_namespace_get_count(size_t* count) {
+config_status_t config_namespace_get_count(size_t* count) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -265,8 +261,8 @@ config_namespace_get_count(size_t* count) {
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-config_status_t
-config_open_namespace(const char* name, config_ns_handle_t* handle) {
+config_status_t config_open_namespace(const char* name,
+                                      config_ns_handle_t* handle) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -297,8 +293,7 @@ config_open_namespace(const char* name, config_ns_handle_t* handle) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_close_namespace(config_ns_handle_t handle) {
+config_status_t config_close_namespace(config_ns_handle_t handle) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -308,7 +303,8 @@ config_close_namespace(config_ns_handle_t handle) {
     }
 
     uint8_t ns_id = handle->ns_id;
-    if (ns_id >= g_ns_ctx.max_namespaces || !g_ns_ctx.namespaces[ns_id].active) {
+    if (ns_id >= g_ns_ctx.max_namespaces ||
+        !g_ns_ctx.namespaces[ns_id].active) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
@@ -323,8 +319,7 @@ config_close_namespace(config_ns_handle_t handle) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_erase_namespace(const char* name) {
+config_status_t config_erase_namespace(const char* name) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -366,8 +361,8 @@ config_erase_namespace(const char* name) {
 /* Namespace-scoped Operations                                               */
 /*---------------------------------------------------------------------------*/
 
-config_status_t
-config_ns_set_i32(config_ns_handle_t ns, const char* key, int32_t value) {
+config_status_t config_ns_set_i32(config_ns_handle_t ns, const char* key,
+                                  int32_t value) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -384,9 +379,8 @@ config_ns_set_i32(config_ns_handle_t ns, const char* key, int32_t value) {
                             CONFIG_FLAG_NONE, ns->ns_id);
 }
 
-config_status_t
-config_ns_get_i32(config_ns_handle_t ns, const char* key, int32_t* value,
-                  int32_t default_val) {
+config_status_t config_ns_get_i32(config_ns_handle_t ns, const char* key,
+                                  int32_t* value, int32_t default_val) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -421,8 +415,8 @@ config_ns_get_i32(config_ns_handle_t ns, const char* key, int32_t* value,
     return config_store_get(key, NULL, value, &size, NULL, ns->ns_id);
 }
 
-config_status_t
-config_ns_set_u32(config_ns_handle_t ns, const char* key, uint32_t value) {
+config_status_t config_ns_set_u32(config_ns_handle_t ns, const char* key,
+                                  uint32_t value) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -439,9 +433,8 @@ config_ns_set_u32(config_ns_handle_t ns, const char* key, uint32_t value) {
                             CONFIG_FLAG_NONE, ns->ns_id);
 }
 
-config_status_t
-config_ns_get_u32(config_ns_handle_t ns, const char* key, uint32_t* value,
-                  uint32_t default_val) {
+config_status_t config_ns_get_u32(config_ns_handle_t ns, const char* key,
+                                  uint32_t* value, uint32_t default_val) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -474,8 +467,8 @@ config_ns_get_u32(config_ns_handle_t ns, const char* key, uint32_t* value,
     return config_store_get(key, NULL, value, &size, NULL, ns->ns_id);
 }
 
-config_status_t
-config_ns_set_str(config_ns_handle_t ns, const char* key, const char* value) {
+config_status_t config_ns_set_str(config_ns_handle_t ns, const char* key,
+                                  const char* value) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -493,14 +486,14 @@ config_ns_set_str(config_ns_handle_t ns, const char* key, const char* value) {
                             CONFIG_FLAG_NONE, ns->ns_id);
 }
 
-config_status_t
-config_ns_get_str(config_ns_handle_t ns, const char* key, char* buffer,
-                  size_t buf_size) {
+config_status_t config_ns_get_str(config_ns_handle_t ns, const char* key,
+                                  char* buffer, size_t buf_size) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || buffer == NULL || buf_size == 0) {
+    if (ns == NULL || !ns->valid || key == NULL || buffer == NULL ||
+        buf_size == 0) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
@@ -530,8 +523,8 @@ config_ns_get_str(config_ns_handle_t ns, const char* key, char* buffer,
     return CONFIG_OK;
 }
 
-config_status_t
-config_ns_set_bool(config_ns_handle_t ns, const char* key, bool value) {
+config_status_t config_ns_set_bool(config_ns_handle_t ns, const char* key,
+                                   bool value) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -548,9 +541,8 @@ config_ns_set_bool(config_ns_handle_t ns, const char* key, bool value) {
                             CONFIG_FLAG_NONE, ns->ns_id);
 }
 
-config_status_t
-config_ns_get_bool(config_ns_handle_t ns, const char* key, bool* value,
-                   bool default_val) {
+config_status_t config_ns_get_bool(config_ns_handle_t ns, const char* key,
+                                   bool* value, bool default_val) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -583,8 +575,8 @@ config_ns_get_bool(config_ns_handle_t ns, const char* key, bool* value,
     return config_store_get(key, NULL, value, &size, NULL, ns->ns_id);
 }
 
-config_status_t
-config_ns_exists(config_ns_handle_t ns, const char* key, bool* exists) {
+config_status_t config_ns_exists(config_ns_handle_t ns, const char* key,
+                                 bool* exists) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -600,8 +592,7 @@ config_ns_exists(config_ns_handle_t ns, const char* key, bool* exists) {
     return config_store_exists(key, ns->ns_id, exists);
 }
 
-config_status_t
-config_ns_delete(config_ns_handle_t ns, const char* key) {
+config_status_t config_ns_delete(config_ns_handle_t ns, const char* key) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -615,4 +606,39 @@ config_ns_delete(config_ns_handle_t ns, const char* key) {
     }
 
     return config_store_delete(key, ns->ns_id);
+}
+
+/*---------------------------------------------------------------------------*/
+/* Namespace Handle Helper Functions                                         */
+/*---------------------------------------------------------------------------*/
+
+config_status_t
+config_namespace_get_handle_id(const struct config_namespace* handle,
+                               uint8_t* ns_id) {
+    if (!g_ns_ctx.initialized) {
+        return CONFIG_ERROR_NOT_INIT;
+    }
+
+    if (handle == NULL || ns_id == NULL) {
+        return CONFIG_ERROR_INVALID_PARAM;
+    }
+
+    if (!handle->valid) {
+        return CONFIG_ERROR_INVALID_PARAM;
+    }
+
+    *ns_id = handle->ns_id;
+    return CONFIG_OK;
+}
+
+bool config_namespace_is_valid_handle(const struct config_namespace* handle) {
+    if (!g_ns_ctx.initialized) {
+        return false;
+    }
+
+    if (handle == NULL) {
+        return false;
+    }
+
+    return handle->valid && config_namespace_is_valid_id(handle->ns_id);
 }

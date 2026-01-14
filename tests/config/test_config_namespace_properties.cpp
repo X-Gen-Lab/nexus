@@ -15,12 +15,12 @@
  * **Validates: Requirements 5.1, 5.2**
  */
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include <set>
 #include <string>
 #include <vector>
-#include <cstring>
-#include <set>
 
 extern "C" {
 #include "config/config.h"
@@ -96,7 +96,8 @@ class ConfigNamespacePropertyTest : public ::testing::Test {
      */
     std::string randomString() {
         std::uniform_int_distribution<int> len_dist(1, 50);
-        std::uniform_int_distribution<int> char_dist(32, 126);  /* Printable ASCII */
+        std::uniform_int_distribution<int> char_dist(32,
+                                                     126); /* Printable ASCII */
         int len = len_dist(rng);
         std::string str;
         for (int i = 0; i < len; ++i) {
@@ -158,7 +159,8 @@ TEST_F(ConfigNamespacePropertyTest, Property3_NamespaceIsolationI32) {
 
         /* Verify namespace 1 still has its original value */
         int32_t retrieved1 = 0;
-        ASSERT_EQ(CONFIG_OK, config_ns_get_i32(ns1, key.c_str(), &retrieved1, 0))
+        ASSERT_EQ(CONFIG_OK,
+                  config_ns_get_i32(ns1, key.c_str(), &retrieved1, 0))
             << "Iteration " << test_iter << ": failed to get value from ns1";
         EXPECT_EQ(value1, retrieved1)
             << "Iteration " << test_iter << ": ns1 value was affected by ns2. "
@@ -166,7 +168,8 @@ TEST_F(ConfigNamespacePropertyTest, Property3_NamespaceIsolationI32) {
 
         /* Verify namespace 2 has its value */
         int32_t retrieved2 = 0;
-        ASSERT_EQ(CONFIG_OK, config_ns_get_i32(ns2, key.c_str(), &retrieved2, 0))
+        ASSERT_EQ(CONFIG_OK,
+                  config_ns_get_i32(ns2, key.c_str(), &retrieved2, 0))
             << "Iteration " << test_iter << ": failed to get value from ns2";
         EXPECT_EQ(value2, retrieved2)
             << "Iteration " << test_iter << ": ns2 value incorrect. "
@@ -214,18 +217,22 @@ TEST_F(ConfigNamespacePropertyTest, Property3_NamespaceIsolationStr) {
         ASSERT_EQ(CONFIG_OK, config_open_namespace(ns2_name.c_str(), &ns2));
 
         /* Set different values in each namespace */
-        ASSERT_EQ(CONFIG_OK, config_ns_set_str(ns1, key.c_str(), value1.c_str()));
-        ASSERT_EQ(CONFIG_OK, config_ns_set_str(ns2, key.c_str(), value2.c_str()));
+        ASSERT_EQ(CONFIG_OK,
+                  config_ns_set_str(ns1, key.c_str(), value1.c_str()));
+        ASSERT_EQ(CONFIG_OK,
+                  config_ns_set_str(ns2, key.c_str(), value2.c_str()));
 
         /* Verify namespace 1 still has its original value */
         char buffer1[256];
-        ASSERT_EQ(CONFIG_OK, config_ns_get_str(ns1, key.c_str(), buffer1, sizeof(buffer1)));
+        ASSERT_EQ(CONFIG_OK, config_ns_get_str(ns1, key.c_str(), buffer1,
+                                               sizeof(buffer1)));
         EXPECT_STREQ(value1.c_str(), buffer1)
             << "Iteration " << test_iter << ": ns1 string was affected by ns2";
 
         /* Verify namespace 2 has its value */
         char buffer2[256];
-        ASSERT_EQ(CONFIG_OK, config_ns_get_str(ns2, key.c_str(), buffer2, sizeof(buffer2)));
+        ASSERT_EQ(CONFIG_OK, config_ns_get_str(ns2, key.c_str(), buffer2,
+                                               sizeof(buffer2)));
         EXPECT_STREQ(value2.c_str(), buffer2)
             << "Iteration " << test_iter << ": ns2 string incorrect";
 
@@ -268,19 +275,23 @@ TEST_F(ConfigNamespacePropertyTest, Property3_NamespaceIsolationFromDefault) {
 
         /* Open custom namespace and set value */
         config_ns_handle_t custom_ns = NULL;
-        ASSERT_EQ(CONFIG_OK, config_open_namespace(custom_ns_name.c_str(), &custom_ns));
-        ASSERT_EQ(CONFIG_OK, config_ns_set_i32(custom_ns, key.c_str(), custom_value));
+        ASSERT_EQ(CONFIG_OK,
+                  config_open_namespace(custom_ns_name.c_str(), &custom_ns));
+        ASSERT_EQ(CONFIG_OK,
+                  config_ns_set_i32(custom_ns, key.c_str(), custom_value));
 
         /* Verify default namespace value is unchanged */
         int32_t retrieved_default = 0;
-        ASSERT_EQ(CONFIG_OK, config_get_i32(key.c_str(), &retrieved_default, 0));
+        ASSERT_EQ(CONFIG_OK,
+                  config_get_i32(key.c_str(), &retrieved_default, 0));
         EXPECT_EQ(default_value, retrieved_default)
             << "Iteration " << test_iter << ": default ns value was affected. "
             << "Expected " << default_value << ", got " << retrieved_default;
 
         /* Verify custom namespace has its value */
         int32_t retrieved_custom = 0;
-        ASSERT_EQ(CONFIG_OK, config_ns_get_i32(custom_ns, key.c_str(), &retrieved_custom, 0));
+        ASSERT_EQ(CONFIG_OK, config_ns_get_i32(custom_ns, key.c_str(),
+                                               &retrieved_custom, 0));
         EXPECT_EQ(custom_value, retrieved_custom)
             << "Iteration " << test_iter << ": custom ns value incorrect. "
             << "Expected " << custom_value << ", got " << retrieved_custom;
@@ -341,9 +352,11 @@ TEST_F(ConfigNamespacePropertyTest, Property3_NamespaceDeleteIsolation) {
 
         /* Verify namespace 2 value is unchanged */
         int32_t retrieved2 = 0;
-        ASSERT_EQ(CONFIG_OK, config_ns_get_i32(ns2, key.c_str(), &retrieved2, 0));
+        ASSERT_EQ(CONFIG_OK,
+                  config_ns_get_i32(ns2, key.c_str(), &retrieved2, 0));
         EXPECT_EQ(value2, retrieved2)
-            << "Iteration " << test_iter << ": ns2 value was affected by ns1 delete";
+            << "Iteration " << test_iter
+            << ": ns2 value was affected by ns1 delete";
 
         /* Clean up */
         EXPECT_EQ(CONFIG_OK, config_close_namespace(ns1));
@@ -432,11 +445,12 @@ TEST_F(ConfigNamespacePropertyTest, Property_MultipleKeysPerNamespace) {
         /* Verify all values can be retrieved correctly */
         for (const auto& pair : pairs) {
             int32_t retrieved = 0;
-            ASSERT_EQ(CONFIG_OK, config_ns_get_i32(ns, pair.first.c_str(), &retrieved, 0));
+            ASSERT_EQ(CONFIG_OK,
+                      config_ns_get_i32(ns, pair.first.c_str(), &retrieved, 0));
             EXPECT_EQ(pair.second, retrieved)
                 << "Iteration " << test_iter << ": key '" << pair.first
-                << "' value mismatch. Expected " << pair.second
-                << ", got " << retrieved;
+                << "' value mismatch. Expected " << pair.second << ", got "
+                << retrieved;
         }
 
         /* Clean up */
