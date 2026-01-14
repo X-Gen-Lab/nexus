@@ -56,7 +56,7 @@ class ConfigCorePropertyTest : public ::testing::Test {
      */
     uint16_t randomMaxKeys() {
         std::uniform_int_distribution<uint16_t> dist(CONFIG_MIN_MAX_KEYS,
-                                                      CONFIG_MAX_MAX_KEYS);
+                                                     CONFIG_MAX_MAX_KEYS);
         return dist(rng);
     }
 
@@ -65,7 +65,7 @@ class ConfigCorePropertyTest : public ::testing::Test {
      */
     uint8_t randomMaxKeyLen() {
         std::uniform_int_distribution<int> dist(CONFIG_MIN_MAX_KEY_LEN,
-                                                 CONFIG_MAX_MAX_KEY_LEN);
+                                                CONFIG_MAX_MAX_KEY_LEN);
         return static_cast<uint8_t>(dist(rng));
     }
 
@@ -74,25 +74,29 @@ class ConfigCorePropertyTest : public ::testing::Test {
      */
     uint16_t randomMaxValueSize() {
         std::uniform_int_distribution<uint16_t> dist(CONFIG_MIN_MAX_VALUE_SIZE,
-                                                      CONFIG_MAX_MAX_VALUE_SIZE);
+                                                     CONFIG_MAX_MAX_VALUE_SIZE);
         return dist(rng);
     }
 
     /**
      * \brief       Generate random valid max_namespaces value (1-8)
-     * \note        Limited to CONFIG_DEFAULT_MAX_NAMESPACES due to static storage
+     * \note        Limited to CONFIG_DEFAULT_MAX_NAMESPACES due to static
+     * storage
      */
     uint8_t randomMaxNamespaces() {
-        std::uniform_int_distribution<int> dist(1, CONFIG_DEFAULT_MAX_NAMESPACES);
+        std::uniform_int_distribution<int> dist(1,
+                                                CONFIG_DEFAULT_MAX_NAMESPACES);
         return static_cast<uint8_t>(dist(rng));
     }
 
     /**
      * \brief       Generate random valid max_callbacks value (1-16)
-     * \note        Limited to CONFIG_DEFAULT_MAX_CALLBACKS due to static storage
+     * \note        Limited to CONFIG_DEFAULT_MAX_CALLBACKS due to static
+     * storage
      */
     uint8_t randomMaxCallbacks() {
-        std::uniform_int_distribution<int> dist(1, CONFIG_DEFAULT_MAX_CALLBACKS);
+        std::uniform_int_distribution<int> dist(1,
+                                                CONFIG_DEFAULT_MAX_CALLBACKS);
         return static_cast<uint8_t>(dist(rng));
     }
 
@@ -114,8 +118,7 @@ class ConfigCorePropertyTest : public ::testing::Test {
             .max_value_size = randomMaxValueSize(),
             .max_namespaces = randomMaxNamespaces(),
             .max_callbacks = randomMaxCallbacks(),
-            .auto_commit = randomBool()
-        };
+            .auto_commit = randomBool()};
         return config;
     }
 };
@@ -314,47 +317,39 @@ TEST_F(ConfigCorePropertyTest, Property1_InitDeinitBoundaryValues) {
     /*       due to static storage allocation in the implementation */
     std::vector<config_manager_config_t> boundary_configs = {
         /* Minimum values */
-        {
-            .max_keys = CONFIG_MIN_MAX_KEYS,
-            .max_key_len = CONFIG_MIN_MAX_KEY_LEN,
-            .max_value_size = CONFIG_MIN_MAX_VALUE_SIZE,
-            .max_namespaces = 1,
-            .max_callbacks = 1,
-            .auto_commit = false
-        },
+        {.max_keys = CONFIG_MIN_MAX_KEYS,
+         .max_key_len = CONFIG_MIN_MAX_KEY_LEN,
+         .max_value_size = CONFIG_MIN_MAX_VALUE_SIZE,
+         .max_namespaces = 1,
+         .max_callbacks = 1,
+         .auto_commit = false},
         /* Maximum values (within static storage limits) */
-        {
-            .max_keys = CONFIG_MAX_MAX_KEYS,
-            .max_key_len = CONFIG_MAX_MAX_KEY_LEN,
-            .max_value_size = CONFIG_MAX_MAX_VALUE_SIZE,
-            .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,
-            .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,
-            .auto_commit = true
-        },
+        {.max_keys = CONFIG_MAX_MAX_KEYS,
+         .max_key_len = CONFIG_MAX_MAX_KEY_LEN,
+         .max_value_size = CONFIG_MAX_MAX_VALUE_SIZE,
+         .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,
+         .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,
+         .auto_commit = true},
         /* Mixed min/max */
-        {
-            .max_keys = CONFIG_MIN_MAX_KEYS,
-            .max_key_len = CONFIG_MAX_MAX_KEY_LEN,
-            .max_value_size = CONFIG_MIN_MAX_VALUE_SIZE,
-            .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,
-            .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,
-            .auto_commit = false
-        },
-        {
-            .max_keys = CONFIG_MAX_MAX_KEYS,
-            .max_key_len = CONFIG_MIN_MAX_KEY_LEN,
-            .max_value_size = CONFIG_MAX_MAX_VALUE_SIZE,
-            .max_namespaces = 4,
-            .max_callbacks = 8,
-            .auto_commit = true
-        }
-    };
+        {.max_keys = CONFIG_MIN_MAX_KEYS,
+         .max_key_len = CONFIG_MAX_MAX_KEY_LEN,
+         .max_value_size = CONFIG_MIN_MAX_VALUE_SIZE,
+         .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,
+         .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,
+         .auto_commit = false},
+        {.max_keys = CONFIG_MAX_MAX_KEYS,
+         .max_key_len = CONFIG_MIN_MAX_KEY_LEN,
+         .max_value_size = CONFIG_MAX_MAX_VALUE_SIZE,
+         .max_namespaces = 4,
+         .max_callbacks = 8,
+         .auto_commit = true}};
 
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Pick a random boundary config */
         std::uniform_int_distribution<size_t> config_dist(
             0, boundary_configs.size() - 1);
-        const config_manager_config_t& config = boundary_configs[config_dist(rng)];
+        const config_manager_config_t& config =
+            boundary_configs[config_dist(rng)];
 
         /* Ensure we start in uninitialized state */
         ASSERT_FALSE(config_is_initialized())
@@ -384,4 +379,3 @@ TEST_F(ConfigCorePropertyTest, Property1_InitDeinitBoundaryValues) {
             << ": should be uninitialized after config_deinit";
     }
 }
-
