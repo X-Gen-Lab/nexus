@@ -1,17 +1,39 @@
 OSAL API Reference
 ==================
 
-.. doxygenfile:: osal_def.h
-   :project: nexus
+This section documents the OS Abstraction Layer (OSAL) API.
 
-.. doxygenfile:: osal_task.h
-   :project: nexus
+OSAL Definitions
+----------------
 
-.. doxygenfile:: osal_mutex.h
+.. doxygengroup:: OSAL_DEF
    :project: nexus
+   :content-only:
 
-.. doxygenfile:: osal_sem.h
-   :project: nexus
+Task API
+--------
 
-.. doxygenfile:: osal_queue.h
+.. doxygengroup:: OSAL_TASK
    :project: nexus
+   :content-only:
+
+Mutex API
+---------
+
+.. doxygengroup:: OSAL_MUTEX
+   :project: nexus
+   :content-only:
+
+Semaphore API
+-------------
+
+.. doxygengroup:: OSAL_SEM
+   :project: nexus
+   :content-only:
+
+Queue API
+---------
+
+.. doxygengroup:: OSAL_QUEUE
+   :project: nexus
+   :content-only:
