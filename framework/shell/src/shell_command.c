@@ -32,8 +32,7 @@ static shell_completion_cb_t g_completion_callback = NULL;
 /* Public Functions                                                          */
 /*---------------------------------------------------------------------------*/
 
-shell_status_t
-shell_register_command(const shell_command_t* cmd) {
+shell_status_t shell_register_command(const shell_command_t* cmd) {
     /* Validate parameters */
     if (cmd == NULL || cmd->name == NULL || cmd->handler == NULL) {
         return SHELL_ERROR_INVALID_PARAM;
@@ -55,8 +54,7 @@ shell_register_command(const shell_command_t* cmd) {
     return SHELL_OK;
 }
 
-shell_status_t
-shell_unregister_command(const char* name) {
+shell_status_t shell_unregister_command(const char* name) {
     int i;
 
     /* Validate parameters */
@@ -66,8 +64,7 @@ shell_unregister_command(const char* name) {
 
     /* Find and remove command */
     for (i = 0; i < g_command_count; i++) {
-        if (g_commands[i] != NULL &&
-            strcmp(g_commands[i]->name, name) == 0) {
+        if (g_commands[i] != NULL && strcmp(g_commands[i]->name, name) == 0) {
             /* Shift remaining commands */
             for (int j = i; j < g_command_count - 1; j++) {
                 g_commands[j] = g_commands[j + 1];
@@ -80,8 +77,7 @@ shell_unregister_command(const char* name) {
     return SHELL_ERROR_NOT_FOUND;
 }
 
-const shell_command_t*
-shell_get_command(const char* name) {
+const shell_command_t* shell_get_command(const char* name) {
     int i;
 
     if (name == NULL) {
@@ -89,8 +85,7 @@ shell_get_command(const char* name) {
     }
 
     for (i = 0; i < g_command_count; i++) {
-        if (g_commands[i] != NULL &&
-            strcmp(g_commands[i]->name, name) == 0) {
+        if (g_commands[i] != NULL && strcmp(g_commands[i]->name, name) == 0) {
             return g_commands[i];
         }
     }
@@ -98,8 +93,7 @@ shell_get_command(const char* name) {
     return NULL;
 }
 
-shell_status_t
-shell_get_commands(const shell_command_t** cmds[], int* count) {
+shell_status_t shell_get_commands(const shell_command_t** cmds[], int* count) {
     if (cmds == NULL || count == NULL) {
         return SHELL_ERROR_INVALID_PARAM;
     }
@@ -110,24 +104,20 @@ shell_get_commands(const shell_command_t** cmds[], int* count) {
     return SHELL_OK;
 }
 
-int
-shell_get_command_count(void) {
+int shell_get_command_count(void) {
     return g_command_count;
 }
 
-shell_status_t
-shell_set_completion_callback(shell_completion_cb_t callback) {
+shell_status_t shell_set_completion_callback(shell_completion_cb_t callback) {
     g_completion_callback = callback;
     return SHELL_OK;
 }
 
-shell_completion_cb_t
-shell_get_completion_callback(void) {
+shell_completion_cb_t shell_get_completion_callback(void) {
     return g_completion_callback;
 }
 
-void
-shell_clear_commands(void) {
+void shell_clear_commands(void) {
     g_command_count = 0;
     g_completion_callback = NULL;
     for (int i = 0; i < SHELL_MAX_COMMANDS; i++) {

@@ -30,12 +30,12 @@ extern "C" {
  * \brief           History manager state structure
  */
 typedef struct {
-    char**      entries;        /**< Array of history entry pointers */
-    uint16_t    entry_size;     /**< Maximum size of each entry */
-    uint8_t     capacity;       /**< Maximum number of entries */
-    uint8_t     count;          /**< Current number of entries */
-    uint8_t     head;           /**< Index of newest entry (circular buffer) */
-    int8_t      browse_index;   /**< Current browse position (-1 = current input) */
+    char** entries;      /**< Array of history entry pointers */
+    uint16_t entry_size; /**< Maximum size of each entry */
+    uint8_t capacity;    /**< Maximum number of entries */
+    uint8_t count;       /**< Current number of entries */
+    uint8_t head;        /**< Index of newest entry (circular buffer) */
+    int8_t browse_index; /**< Current browse position (-1 = current input) */
 } history_manager_t;
 
 /**
@@ -43,9 +43,11 @@ typedef struct {
  * \param[in,out]   hist: Pointer to history manager structure
  * \param[in]       entries: Array of entry buffer pointers
  * \param[in]       capacity: Maximum number of history entries
- * \param[in]       entry_size: Maximum size of each entry (including null terminator)
+ * \param[in]       entry_size: Maximum size of each entry (including null
+ * terminator)
  */
-void history_init(history_manager_t* hist, char** entries, uint8_t capacity, uint16_t entry_size);
+void history_init(history_manager_t* hist, char** entries, uint8_t capacity,
+                  uint16_t entry_size);
 
 /**
  * \brief           Deinitialize history manager
@@ -57,7 +59,8 @@ void history_deinit(history_manager_t* hist);
  * \brief           Add command to history
  * \param[in,out]   hist: Pointer to history manager
  * \param[in]       cmd: Command string to add
- * \return          true if command was added, false if skipped (empty or duplicate)
+ * \return          true if command was added, false if skipped (empty or
+ * duplicate)
  */
 bool history_add(history_manager_t* hist, const char* cmd);
 
@@ -71,7 +74,8 @@ const char* history_get_prev(history_manager_t* hist);
 /**
  * \brief           Get next command (Down arrow)
  * \param[in,out]   hist: Pointer to history manager
- * \return          Pointer to next command, or NULL if at newest (current input)
+ * \return          Pointer to next command, or NULL if at newest (current
+ * input)
  */
 const char* history_get_next(history_manager_t* hist);
 

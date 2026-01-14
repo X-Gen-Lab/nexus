@@ -20,8 +20,7 @@
 /* Initialization                                                            */
 /*---------------------------------------------------------------------------*/
 
-void
-line_editor_init(line_editor_t* editor, char* buffer, uint16_t size) {
+void line_editor_init(line_editor_t* editor, char* buffer, uint16_t size) {
     if (editor == NULL || buffer == NULL || size == 0) {
         return;
     }
@@ -40,8 +39,7 @@ line_editor_init(line_editor_t* editor, char* buffer, uint16_t size) {
 /* Core Editing Operations - Requirements 4.2, 4.3                           */
 /*---------------------------------------------------------------------------*/
 
-bool
-line_editor_insert_char(line_editor_t* editor, char c) {
+bool line_editor_insert_char(line_editor_t* editor, char c) {
     if (editor == NULL || editor->buffer == NULL) {
         return false;
     }
@@ -80,8 +78,7 @@ line_editor_insert_char(line_editor_t* editor, char c) {
     return true;
 }
 
-bool
-line_editor_delete_char(line_editor_t* editor) {
+bool line_editor_delete_char(line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return false;
     }
@@ -102,8 +99,7 @@ line_editor_delete_char(line_editor_t* editor) {
     return true;
 }
 
-bool
-line_editor_backspace(line_editor_t* editor) {
+bool line_editor_backspace(line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return false;
     }
@@ -131,8 +127,7 @@ line_editor_backspace(line_editor_t* editor) {
 /* Cursor Movement - Requirements 4.8, 4.9                                   */
 /*---------------------------------------------------------------------------*/
 
-void
-line_editor_move_cursor(line_editor_t* editor, int offset) {
+void line_editor_move_cursor(line_editor_t* editor, int offset) {
     if (editor == NULL) {
         return;
     }
@@ -149,8 +144,7 @@ line_editor_move_cursor(line_editor_t* editor, int offset) {
     editor->cursor = (uint16_t)new_pos;
 }
 
-void
-line_editor_move_to_start(line_editor_t* editor) {
+void line_editor_move_to_start(line_editor_t* editor) {
     if (editor == NULL) {
         return;
     }
@@ -158,8 +152,7 @@ line_editor_move_to_start(line_editor_t* editor) {
     editor->cursor = 0;
 }
 
-void
-line_editor_move_to_end(line_editor_t* editor) {
+void line_editor_move_to_end(line_editor_t* editor) {
     if (editor == NULL) {
         return;
     }
@@ -171,8 +164,7 @@ line_editor_move_to_end(line_editor_t* editor) {
 /* Advanced Editing - Requirements 4.10, 4.11, 4.12, 4.13, 4.14, 4.15        */
 /*---------------------------------------------------------------------------*/
 
-void
-line_editor_delete_to_end(line_editor_t* editor) {
+void line_editor_delete_to_end(line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return;
     }
@@ -182,8 +174,7 @@ line_editor_delete_to_end(line_editor_t* editor) {
     editor->buffer[editor->length] = '\0';
 }
 
-void
-line_editor_delete_to_start(line_editor_t* editor) {
+void line_editor_delete_to_start(line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return;
     }
@@ -201,8 +192,7 @@ line_editor_delete_to_start(line_editor_t* editor) {
     editor->buffer[editor->length] = '\0';
 }
 
-void
-line_editor_delete_word(line_editor_t* editor) {
+void line_editor_delete_word(line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return;
     }
@@ -215,13 +205,13 @@ line_editor_delete_word(line_editor_t* editor) {
 
     /* Skip trailing whitespace before cursor */
     while (start > 0 && (editor->buffer[start - 1] == ' ' ||
-                          editor->buffer[start - 1] == '\t')) {
+                         editor->buffer[start - 1] == '\t')) {
         start--;
     }
 
     /* Find start of word (non-whitespace characters) */
     while (start > 0 && editor->buffer[start - 1] != ' ' &&
-                        editor->buffer[start - 1] != '\t') {
+           editor->buffer[start - 1] != '\t') {
         start--;
     }
 
@@ -241,8 +231,7 @@ line_editor_delete_word(line_editor_t* editor) {
     editor->buffer[editor->length] = '\0';
 }
 
-void
-line_editor_clear(line_editor_t* editor) {
+void line_editor_clear(line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return;
     }
@@ -256,8 +245,7 @@ line_editor_clear(line_editor_t* editor) {
 /* Accessor Functions                                                        */
 /*---------------------------------------------------------------------------*/
 
-const char*
-line_editor_get_buffer(const line_editor_t* editor) {
+const char* line_editor_get_buffer(const line_editor_t* editor) {
     if (editor == NULL || editor->buffer == NULL) {
         return "";
     }
@@ -265,8 +253,7 @@ line_editor_get_buffer(const line_editor_t* editor) {
     return editor->buffer;
 }
 
-uint16_t
-line_editor_get_length(const line_editor_t* editor) {
+uint16_t line_editor_get_length(const line_editor_t* editor) {
     if (editor == NULL) {
         return 0;
     }
@@ -274,8 +261,7 @@ line_editor_get_length(const line_editor_t* editor) {
     return editor->length;
 }
 
-uint16_t
-line_editor_get_cursor(const line_editor_t* editor) {
+uint16_t line_editor_get_cursor(const line_editor_t* editor) {
     if (editor == NULL) {
         return 0;
     }
@@ -283,8 +269,7 @@ line_editor_get_cursor(const line_editor_t* editor) {
     return editor->cursor;
 }
 
-void
-line_editor_set_content(line_editor_t* editor, const char* content) {
+void line_editor_set_content(line_editor_t* editor, const char* content) {
     if (editor == NULL || editor->buffer == NULL) {
         return;
     }

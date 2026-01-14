@@ -15,14 +15,14 @@
  */
 
 #include "shell/shell.h"
-#include "shell/shell_line_editor.h"
-#include "shell/shell_history.h"
 #include "shell/shell_autocomplete.h"
+#include "shell/shell_history.h"
+#include "shell/shell_line_editor.h"
 #include "shell/shell_parser.h"
-#include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /**
  * \addtogroup      SHELL
@@ -34,18 +34,18 @@
 /*---------------------------------------------------------------------------*/
 
 /** Shell version string */
-#define SHELL_VERSION               "1.0.0"
+#define SHELL_VERSION "1.0.0"
 
 /** Maximum escape sequence buffer size */
-#define SHELL_ESCAPE_BUFFER_SIZE    8
+#define SHELL_ESCAPE_BUFFER_SIZE 8
 
 /** ANSI escape sequences */
-#define ANSI_CLEAR_SCREEN           "\033[2J\033[H"
-#define ANSI_CURSOR_LEFT            "\033[D"
-#define ANSI_CURSOR_RIGHT           "\033[C"
-#define ANSI_ERASE_LINE             "\033[K"
-#define ANSI_CURSOR_SAVE            "\033[s"
-#define ANSI_CURSOR_RESTORE         "\033[u"
+#define ANSI_CLEAR_SCREEN   "\033[2J\033[H"
+#define ANSI_CURSOR_LEFT    "\033[D"
+#define ANSI_CURSOR_RIGHT   "\033[C"
+#define ANSI_ERASE_LINE     "\033[K"
+#define ANSI_CURSOR_SAVE    "\033[s"
+#define ANSI_CURSOR_RESTORE "\033[u"
 
 /*---------------------------------------------------------------------------*/
 /* Escape Sequence State Machine Types                                       */
@@ -55,25 +55,25 @@
  * \brief           Escape sequence parser states
  */
 typedef enum {
-    ESC_STATE_NORMAL = 0,           /**< Normal input state */
-    ESC_STATE_ESC,                  /**< Received ESC (0x1B) */
-    ESC_STATE_CSI,                  /**< Received CSI (ESC [) */
-    ESC_STATE_SS3                   /**< Received SS3 (ESC O) */
+    ESC_STATE_NORMAL = 0, /**< Normal input state */
+    ESC_STATE_ESC,        /**< Received ESC (0x1B) */
+    ESC_STATE_CSI,        /**< Received CSI (ESC [) */
+    ESC_STATE_SS3         /**< Received SS3 (ESC O) */
 } escape_state_t;
 
 /**
  * \brief           Parsed escape sequence result
  */
 typedef enum {
-    ESC_RESULT_NONE = 0,            /**< No complete sequence yet */
-    ESC_RESULT_UP,                  /**< Up arrow */
-    ESC_RESULT_DOWN,                /**< Down arrow */
-    ESC_RESULT_LEFT,                /**< Left arrow */
-    ESC_RESULT_RIGHT,               /**< Right arrow */
-    ESC_RESULT_HOME,                /**< Home key */
-    ESC_RESULT_END,                 /**< End key */
-    ESC_RESULT_DELETE,              /**< Delete key */
-    ESC_RESULT_INVALID              /**< Invalid/unknown sequence */
+    ESC_RESULT_NONE = 0, /**< No complete sequence yet */
+    ESC_RESULT_UP,       /**< Up arrow */
+    ESC_RESULT_DOWN,     /**< Down arrow */
+    ESC_RESULT_LEFT,     /**< Left arrow */
+    ESC_RESULT_RIGHT,    /**< Right arrow */
+    ESC_RESULT_HOME,     /**< Home key */
+    ESC_RESULT_END,      /**< End key */
+    ESC_RESULT_DELETE,   /**< Delete key */
+    ESC_RESULT_INVALID   /**< Invalid/unknown sequence */
 } escape_result_t;
 
 /*---------------------------------------------------------------------------*/
@@ -86,26 +86,26 @@ typedef enum {
  * Contains all state for the Shell module.
  */
 typedef struct {
-    bool                initialized;    /**< Initialization flag */
-    shell_config_t      config;         /**< Configuration copy */
-    const shell_backend_t* backend;     /**< I/O backend */
-    line_editor_t       editor;         /**< Line editor state */
-    history_manager_t   history;        /**< History manager state */
-    char*               cmd_buffer;     /**< Command buffer */
-    char*               saved_input;    /**< Saved input for history */
-    shell_status_t      last_error;     /**< Last error code */
+    bool initialized;               /**< Initialization flag */
+    shell_config_t config;          /**< Configuration copy */
+    const shell_backend_t* backend; /**< I/O backend */
+    line_editor_t editor;           /**< Line editor state */
+    history_manager_t history;      /**< History manager state */
+    char* cmd_buffer;               /**< Command buffer */
+    char* saved_input;              /**< Saved input for history */
+    shell_status_t last_error;      /**< Last error code */
 
     /* Escape sequence parsing state */
-    escape_state_t      escape_state;   /**< Current escape state */
-    uint8_t             escape_buffer[SHELL_ESCAPE_BUFFER_SIZE];
-    uint8_t             escape_index;   /**< Escape buffer index */
+    escape_state_t escape_state; /**< Current escape state */
+    uint8_t escape_buffer[SHELL_ESCAPE_BUFFER_SIZE];
+    uint8_t escape_index; /**< Escape buffer index */
 
     /* History storage */
-    char**              history_entries;/**< History entry pointers */
-    char*               history_storage;/**< History storage buffer */
+    char** history_entries; /**< History entry pointers */
+    char* history_storage;  /**< History storage buffer */
 
     /* Prompt storage */
-    char                prompt[SHELL_MAX_PROMPT_LEN + 1];
+    char prompt[SHELL_MAX_PROMPT_LEN + 1];
 } shell_context_t;
 
 /*---------------------------------------------------------------------------*/
@@ -139,8 +139,7 @@ static void refresh_line_from_cursor(void);
  * \param[in]       config: Configuration to validate
  * \return          SHELL_OK if valid, error code otherwise
  */
-static shell_status_t
-validate_config(const shell_config_t* config) {
+static shell_status_t validate_config(const shell_config_t* config) {
     if (config == NULL) {
         return SHELL_ERROR_INVALID_PARAM;
     }
@@ -173,8 +172,7 @@ validate_config(const shell_config_t* config) {
 /**
  * \brief           Reset escape sequence state machine
  */
-static void
-reset_escape_state(void) {
+static void reset_escape_state(void) {
     g_shell_ctx.escape_state = ESC_STATE_NORMAL;
     g_shell_ctx.escape_index = 0;
     memset(g_shell_ctx.escape_buffer, 0, SHELL_ESCAPE_BUFFER_SIZE);
@@ -185,8 +183,7 @@ reset_escape_state(void) {
  * \param[in]       c: Character to process
  * \return          Escape result (key identified or still processing)
  */
-static escape_result_t
-process_escape_char(uint8_t c) {
+static escape_result_t process_escape_char(uint8_t c) {
     switch (g_shell_ctx.escape_state) {
         case ESC_STATE_NORMAL:
             if (c == SHELL_KEY_ESCAPE) {
@@ -213,29 +210,48 @@ process_escape_char(uint8_t c) {
             }
 
             /* Check for final character (letter or ~) */
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-                c == '~') {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '~') {
                 escape_result_t result = ESC_RESULT_INVALID;
 
                 /* Single character sequences */
                 if (g_shell_ctx.escape_index == 1) {
                     switch (c) {
-                        case 'A': result = ESC_RESULT_UP; break;
-                        case 'B': result = ESC_RESULT_DOWN; break;
-                        case 'C': result = ESC_RESULT_RIGHT; break;
-                        case 'D': result = ESC_RESULT_LEFT; break;
-                        case 'H': result = ESC_RESULT_HOME; break;
-                        case 'F': result = ESC_RESULT_END; break;
-                        default: break;
+                        case 'A':
+                            result = ESC_RESULT_UP;
+                            break;
+                        case 'B':
+                            result = ESC_RESULT_DOWN;
+                            break;
+                        case 'C':
+                            result = ESC_RESULT_RIGHT;
+                            break;
+                        case 'D':
+                            result = ESC_RESULT_LEFT;
+                            break;
+                        case 'H':
+                            result = ESC_RESULT_HOME;
+                            break;
+                        case 'F':
+                            result = ESC_RESULT_END;
+                            break;
+                        default:
+                            break;
                     }
                 }
                 /* Multi-character sequences (e.g., ESC[1~, ESC[3~) */
                 else if (g_shell_ctx.escape_index == 2 && c == '~') {
                     switch (g_shell_ctx.escape_buffer[0]) {
-                        case '1': result = ESC_RESULT_HOME; break;
-                        case '3': result = ESC_RESULT_DELETE; break;
-                        case '4': result = ESC_RESULT_END; break;
-                        default: break;
+                        case '1':
+                            result = ESC_RESULT_HOME;
+                            break;
+                        case '3':
+                            result = ESC_RESULT_DELETE;
+                            break;
+                        case '4':
+                            result = ESC_RESULT_END;
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -249,13 +265,26 @@ process_escape_char(uint8_t c) {
             {
                 escape_result_t result = ESC_RESULT_INVALID;
                 switch (c) {
-                    case 'A': result = ESC_RESULT_UP; break;
-                    case 'B': result = ESC_RESULT_DOWN; break;
-                    case 'C': result = ESC_RESULT_RIGHT; break;
-                    case 'D': result = ESC_RESULT_LEFT; break;
-                    case 'H': result = ESC_RESULT_HOME; break;
-                    case 'F': result = ESC_RESULT_END; break;
-                    default: break;
+                    case 'A':
+                        result = ESC_RESULT_UP;
+                        break;
+                    case 'B':
+                        result = ESC_RESULT_DOWN;
+                        break;
+                    case 'C':
+                        result = ESC_RESULT_RIGHT;
+                        break;
+                    case 'D':
+                        result = ESC_RESULT_LEFT;
+                        break;
+                    case 'H':
+                        result = ESC_RESULT_HOME;
+                        break;
+                    case 'F':
+                        result = ESC_RESULT_END;
+                        break;
+                    default:
+                        break;
                 }
                 reset_escape_state();
                 return result;
@@ -278,8 +307,7 @@ process_escape_char(uint8_t c) {
  *
  * Clears the current line and redraws prompt and buffer content.
  */
-static void
-redraw_line(void) {
+static void redraw_line(void) {
     if (g_shell_ctx.backend == NULL || g_shell_ctx.backend->write == NULL) {
         return;
     }
@@ -310,8 +338,7 @@ redraw_line(void) {
  *
  * Used after inserting or deleting characters.
  */
-static void
-refresh_line_from_cursor(void) {
+static void refresh_line_from_cursor(void) {
     if (g_shell_ctx.backend == NULL || g_shell_ctx.backend->write == NULL) {
         return;
     }
@@ -342,8 +369,7 @@ refresh_line_from_cursor(void) {
  * \brief           Handle escape sequence result
  * \param[in]       result: Parsed escape sequence result
  */
-static void
-handle_escape_result(escape_result_t result) {
+static void handle_escape_result(escape_result_t result) {
     const char* hist_cmd;
 
     switch (result) {
@@ -417,8 +443,7 @@ handle_escape_result(escape_result_t result) {
  * \brief           Handle printable character input
  * \param[in]       c: Character to insert
  */
-static void
-handle_printable_char(char c) {
+static void handle_printable_char(char c) {
     /* Check buffer full (Requirement 4.7) */
     if (line_editor_get_length(&g_shell_ctx.editor) >=
         g_shell_ctx.config.cmd_buffer_size - 1) {
@@ -440,15 +465,14 @@ handle_printable_char(char c) {
 /**
  * \brief           Handle Tab key for auto-completion
  */
-static void
-handle_tab_completion(void) {
+static void handle_tab_completion(void) {
     completion_result_t result;
     const char* input = line_editor_get_buffer(&g_shell_ctx.editor);
     int input_len = (int)line_editor_get_length(&g_shell_ctx.editor);
     int cursor_pos = (int)line_editor_get_cursor(&g_shell_ctx.editor);
 
-    shell_status_t status = autocomplete_process(input, input_len,
-                                                  cursor_pos, &result);
+    shell_status_t status =
+        autocomplete_process(input, input_len, cursor_pos, &result);
     if (status != SHELL_OK) {
         return;
     }
@@ -472,8 +496,8 @@ handle_tab_completion(void) {
         /* Complete common prefix if any */
         if (result.common_prefix_len > input_len) {
             char prefix[SHELL_MAX_CMD_NAME + 1];
-            int prefix_len = autocomplete_get_common_prefix(&result, prefix,
-                                                            sizeof(prefix));
+            int prefix_len =
+                autocomplete_get_common_prefix(&result, prefix, sizeof(prefix));
             if (prefix_len > 0) {
                 line_editor_clear(&g_shell_ctx.editor);
                 for (int i = 0; i < prefix_len; i++) {
@@ -492,8 +516,7 @@ handle_tab_completion(void) {
  * \brief           Handle control character input
  * \param[in]       c: Control character
  */
-static void
-handle_control_char(uint8_t c) {
+static void handle_control_char(uint8_t c) {
     switch (c) {
         case SHELL_KEY_ENTER:
             /* Execute command (Requirement 4.1) */
@@ -575,8 +598,7 @@ handle_control_char(uint8_t c) {
  *
  * Parses and executes the command in the line editor buffer.
  */
-static void
-execute_command_line(void) {
+static void execute_command_line(void) {
     const char* input = line_editor_get_buffer(&g_shell_ctx.editor);
 
     /* Skip empty input */
@@ -634,8 +656,7 @@ execute_command_line(void) {
 /*---------------------------------------------------------------------------*/
 
 /* See shell.h for documentation */
-shell_status_t
-shell_init(const shell_config_t* config) {
+shell_status_t shell_init(const shell_config_t* config) {
     shell_status_t status;
 
     /* Check if already initialized (Requirement 1.3) */
@@ -693,8 +714,8 @@ shell_init(const shell_config_t* config) {
 
     /* Allocate history storage */
     size_t entry_size = config->cmd_buffer_size;
-    g_shell_ctx.history_storage = (char*)malloc(config->history_depth *
-                                                 entry_size);
+    g_shell_ctx.history_storage =
+        (char*)malloc(config->history_depth * entry_size);
     if (g_shell_ctx.history_storage == NULL) {
         free(g_shell_ctx.cmd_buffer);
         free(g_shell_ctx.saved_input);
@@ -706,8 +727,8 @@ shell_init(const shell_config_t* config) {
     memset(g_shell_ctx.history_storage, 0, config->history_depth * entry_size);
 
     /* Allocate history entry pointers */
-    g_shell_ctx.history_entries = (char**)malloc(config->history_depth *
-                                                  sizeof(char*));
+    g_shell_ctx.history_entries =
+        (char**)malloc(config->history_depth * sizeof(char*));
     if (g_shell_ctx.history_entries == NULL) {
         free(g_shell_ctx.cmd_buffer);
         free(g_shell_ctx.saved_input);
@@ -721,8 +742,8 @@ shell_init(const shell_config_t* config) {
 
     /* Set up history entry pointers */
     for (uint8_t i = 0; i < config->history_depth; i++) {
-        g_shell_ctx.history_entries[i] = &g_shell_ctx.history_storage[i *
-                                                                      entry_size];
+        g_shell_ctx.history_entries[i] =
+            &g_shell_ctx.history_storage[i * entry_size];
     }
 
     /* Initialize line editor */
@@ -747,8 +768,7 @@ shell_init(const shell_config_t* config) {
  * \brief           Deinitialize the Shell module
  * \return          SHELL_OK on success, error code otherwise
  */
-shell_status_t
-shell_deinit(void) {
+shell_status_t shell_deinit(void) {
     /* Check if initialized */
     if (!g_shell_ctx.initialized) {
         return SHELL_ERROR_NOT_INIT;
@@ -788,8 +808,7 @@ shell_deinit(void) {
  * \brief           Check if Shell is initialized
  * \return          true if initialized, false otherwise
  */
-bool
-shell_is_initialized(void) {
+bool shell_is_initialized(void) {
     return g_shell_ctx.initialized;
 }
 
@@ -797,8 +816,7 @@ shell_is_initialized(void) {
  * \brief           Process Shell input
  * \return          SHELL_OK on success, error code otherwise
  */
-shell_status_t
-shell_process(void) {
+shell_status_t shell_process(void) {
     uint8_t c;
     int bytes_read;
     const shell_backend_t* backend;
@@ -849,8 +867,7 @@ shell_process(void) {
  * \brief           Get the last error code
  * \return          Last error code
  */
-shell_status_t
-shell_get_last_error(void) {
+shell_status_t shell_get_last_error(void) {
     return g_shell_ctx.last_error;
 }
 
@@ -858,16 +875,14 @@ shell_get_last_error(void) {
  * \brief           Get Shell version string
  * \return          Version string
  */
-const char*
-shell_get_version(void) {
+const char* shell_get_version(void) {
     return SHELL_VERSION;
 }
 
 /**
  * \brief           Print the Shell prompt
  */
-void
-shell_print_prompt(void) {
+void shell_print_prompt(void) {
     const shell_backend_t* backend = shell_get_backend();
     if (backend != NULL && backend->write != NULL) {
         shell_puts(g_shell_ctx.prompt);
@@ -877,8 +892,7 @@ shell_print_prompt(void) {
 /**
  * \brief           Clear the terminal screen
  */
-void
-shell_clear_screen(void) {
+void shell_clear_screen(void) {
     shell_puts(ANSI_CLEAR_SCREEN);
 }
 
@@ -886,8 +900,7 @@ shell_clear_screen(void) {
  * \brief           Get the history manager
  * \return          Pointer to history manager, or NULL if not initialized
  */
-history_manager_t*
-shell_get_history_manager(void) {
+history_manager_t* shell_get_history_manager(void) {
     if (!g_shell_ctx.initialized) {
         return NULL;
     }
@@ -902,20 +915,20 @@ shell_get_history_manager(void) {
  * \brief           Error message strings for each status code
  */
 static const char* const g_error_messages[] = {
-    "Success",                              /* SHELL_OK */
-    "Generic error",                        /* SHELL_ERROR */
-    "Invalid parameter",                    /* SHELL_ERROR_INVALID_PARAM */
-    "Shell not initialized",                /* SHELL_ERROR_NOT_INIT */
-    "Shell already initialized",            /* SHELL_ERROR_ALREADY_INIT */
-    "Memory allocation failed",             /* SHELL_ERROR_NO_MEMORY */
-    "Item not found",                       /* SHELL_ERROR_NOT_FOUND */
-    "Item already exists",                  /* SHELL_ERROR_ALREADY_EXISTS */
-    "No backend configured",                /* SHELL_ERROR_NO_BACKEND */
-    "Buffer is full",                       /* SHELL_ERROR_BUFFER_FULL */
+    "Success",                   /* SHELL_OK */
+    "Generic error",             /* SHELL_ERROR */
+    "Invalid parameter",         /* SHELL_ERROR_INVALID_PARAM */
+    "Shell not initialized",     /* SHELL_ERROR_NOT_INIT */
+    "Shell already initialized", /* SHELL_ERROR_ALREADY_INIT */
+    "Memory allocation failed",  /* SHELL_ERROR_NO_MEMORY */
+    "Item not found",            /* SHELL_ERROR_NOT_FOUND */
+    "Item already exists",       /* SHELL_ERROR_ALREADY_EXISTS */
+    "No backend configured",     /* SHELL_ERROR_NO_BACKEND */
+    "Buffer is full",            /* SHELL_ERROR_BUFFER_FULL */
 };
 
 /** Number of error messages */
-#define SHELL_ERROR_MESSAGE_COUNT \
+#define SHELL_ERROR_MESSAGE_COUNT                                              \
     (sizeof(g_error_messages) / sizeof(g_error_messages[0]))
 
 /**
@@ -923,8 +936,7 @@ static const char* const g_error_messages[] = {
  * \param[in]       status: Status code to get message for
  * \return          Pointer to error message string (never NULL)
  */
-const char*
-shell_get_error_message(shell_status_t status) {
+const char* shell_get_error_message(shell_status_t status) {
     if ((size_t)status < SHELL_ERROR_MESSAGE_COUNT) {
         return g_error_messages[status];
     }
@@ -935,8 +947,7 @@ shell_get_error_message(shell_status_t status) {
  * \brief           Print error message to shell output
  * \param[in]       status: Status code to print message for
  */
-void
-shell_print_error(shell_status_t status) {
+void shell_print_error(shell_status_t status) {
     const char* msg = shell_get_error_message(status);
     shell_printf("Error: %s (code %d)\r\n", msg, (int)status);
 }
@@ -946,8 +957,7 @@ shell_print_error(shell_status_t status) {
  * \param[in]       status: Status code to print message for
  * \param[in]       context: Additional context string (can be NULL)
  */
-void
-shell_print_error_context(shell_status_t status, const char* context) {
+void shell_print_error_context(shell_status_t status, const char* context) {
     const char* msg = shell_get_error_message(status);
     if (context != NULL && context[0] != '\0') {
         shell_printf("Error: %s - %s (code %d)\r\n", msg, context, (int)status);
@@ -960,8 +970,7 @@ shell_print_error_context(shell_status_t status, const char* context) {
  * \brief           Reset shell to a known good state after error
  * \return          SHELL_OK on successful recovery, error code otherwise
  */
-shell_status_t
-shell_recover(void) {
+shell_status_t shell_recover(void) {
     /* Check if shell is initialized */
     if (!g_shell_ctx.initialized) {
         return SHELL_ERROR_NOT_INIT;

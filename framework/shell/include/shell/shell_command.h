@@ -40,19 +40,19 @@ typedef int (*shell_cmd_handler_t)(int argc, char* argv[]);
  * \param[out]      completions: Array to store completion suggestions
  * \param[out]      count: Pointer to store number of completions found
  */
-typedef void (*shell_completion_cb_t)(const char* partial, 
-                                       char* completions[], 
-                                       int* count);
+typedef void (*shell_completion_cb_t)(const char* partial, char* completions[],
+                                      int* count);
 
 /**
  * \brief           Shell command structure
  */
 typedef struct {
-    const char*             name;       /**< Command name (max 16 chars) */
-    shell_cmd_handler_t     handler;    /**< Command handler function */
-    const char*             help;       /**< Short help description */
-    const char*             usage;      /**< Usage string (e.g., "cmd [options]") */
-    shell_completion_cb_t   completion; /**< Argument completion callback (optional) */
+    const char* name;            /**< Command name (max 16 chars) */
+    shell_cmd_handler_t handler; /**< Command handler function */
+    const char* help;            /**< Short help description */
+    const char* usage;           /**< Usage string (e.g., "cmd [options]") */
+    shell_completion_cb_t
+        completion; /**< Argument completion callback (optional) */
 } shell_command_t;
 
 /**
@@ -60,7 +60,8 @@ typedef struct {
  * \param[in]       cmd: Pointer to command structure (must remain valid)
  * \return          SHELL_OK on success
  * \return          SHELL_ERROR_INVALID_PARAM if cmd, name, or handler is NULL
- * \return          SHELL_ERROR_ALREADY_EXISTS if command name already registered
+ * \return          SHELL_ERROR_ALREADY_EXISTS if command name already
+ * registered
  * \return          SHELL_ERROR_NO_MEMORY if command registry is full
  */
 shell_status_t shell_register_command(const shell_command_t* cmd);

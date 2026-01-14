@@ -38,7 +38,7 @@ typedef struct {
      * \return      Number of bytes actually read, 0 if no data available
      */
     int (*read)(uint8_t* data, int max_len);
-    
+
     /**
      * \brief       Blocking write function
      * \param[in]   data: Data buffer to write

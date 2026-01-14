@@ -14,8 +14,8 @@
 #ifndef SHELL_AUTOCOMPLETE_H
 #define SHELL_AUTOCOMPLETE_H
 
-#include "shell_def.h"
 #include "shell_command.h"
+#include "shell_def.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,9 +31,10 @@ extern "C" {
  * \brief           Auto-completion result structure
  */
 typedef struct {
-    char        matches[SHELL_MAX_COMPLETIONS][SHELL_MAX_CMD_NAME + 1]; /**< Matching command names */
-    int         match_count;                                             /**< Number of matches found */
-    int         common_prefix_len;                                       /**< Length of common prefix */
+    char matches[SHELL_MAX_COMPLETIONS]
+                [SHELL_MAX_CMD_NAME + 1]; /**< Matching command names */
+    int match_count;                      /**< Number of matches found */
+    int common_prefix_len;                /**< Length of common prefix */
 } completion_result_t;
 
 /**
@@ -49,7 +50,8 @@ shell_status_t autocomplete_init(void);
  * \return          SHELL_OK on success
  * \return          SHELL_ERROR_INVALID_PARAM if partial or result is NULL
  */
-shell_status_t autocomplete_command(const char* partial, completion_result_t* result);
+shell_status_t autocomplete_command(const char* partial,
+                                    completion_result_t* result);
 
 /**
  * \brief           Show all matching completions to the user
@@ -64,9 +66,8 @@ void autocomplete_show_matches(const completion_result_t* result);
  * \param[in]       prefix_size: Size of the prefix buffer
  * \return          Length of the common prefix, or 0 if no common prefix
  */
-int autocomplete_get_common_prefix(const completion_result_t* result, 
-                                    char* prefix, 
-                                    int prefix_size);
+int autocomplete_get_common_prefix(const completion_result_t* result,
+                                   char* prefix, int prefix_size);
 
 /**
  * \brief           Process Tab key press for auto-completion
@@ -77,10 +78,9 @@ int autocomplete_get_common_prefix(const completion_result_t* result,
  * \return          SHELL_OK on success
  * \return          SHELL_ERROR_INVALID_PARAM if parameters are invalid
  */
-shell_status_t autocomplete_process(const char* input, 
-                                     int input_len,
-                                     int cursor_pos,
-                                     completion_result_t* result);
+shell_status_t autocomplete_process(const char* input, int input_len,
+                                    int cursor_pos,
+                                    completion_result_t* result);
 
 /**
  * \}

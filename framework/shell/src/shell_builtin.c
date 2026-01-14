@@ -18,9 +18,9 @@
  */
 
 #include "shell/shell.h"
+#include "shell/shell_backend.h"
 #include "shell/shell_command.h"
 #include "shell/shell_history.h"
-#include "shell/shell_backend.h"
 #include <string.h>
 
 /**
@@ -40,8 +40,7 @@
  * \param[in]       argv: Argument array
  * \return          0 on success
  */
-static int
-cmd_help(int argc, char* argv[]) {
+static int cmd_help(int argc, char* argv[]) {
     const shell_command_t** cmds = NULL;
     int count = 0;
 
@@ -92,8 +91,7 @@ cmd_help(int argc, char* argv[]) {
  * \param[in]       argv: Argument array
  * \return          0 on success
  */
-static int
-cmd_version(int argc, char* argv[]) {
+static int cmd_version(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
@@ -108,8 +106,7 @@ cmd_version(int argc, char* argv[]) {
  * \param[in]       argv: Argument array
  * \return          0 on success
  */
-static int
-cmd_clear(int argc, char* argv[]) {
+static int cmd_clear(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
@@ -124,8 +121,7 @@ cmd_clear(int argc, char* argv[]) {
  * \param[in]       argv: Argument array
  * \return          0 on success
  */
-static int
-cmd_history(int argc, char* argv[]) {
+static int cmd_history(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
@@ -159,8 +155,7 @@ cmd_history(int argc, char* argv[]) {
  * \param[in]       argv: Argument array
  * \return          0 on success
  */
-static int
-cmd_echo(int argc, char* argv[]) {
+static int cmd_echo(int argc, char* argv[]) {
     for (int i = 1; i < argc; i++) {
         if (i > 1) {
             shell_printf(" ");
@@ -176,56 +171,46 @@ cmd_echo(int argc, char* argv[]) {
 /*---------------------------------------------------------------------------*/
 
 /** Help command definition */
-static const shell_command_t builtin_help = {
-    .name = "help",
-    .handler = cmd_help,
-    .help = "Show available commands",
-    .usage = "help [command]",
-    .completion = NULL
-};
+static const shell_command_t builtin_help = {.name = "help",
+                                             .handler = cmd_help,
+                                             .help = "Show available commands",
+                                             .usage = "help [command]",
+                                             .completion = NULL};
 
 /** Version command definition */
-static const shell_command_t builtin_version = {
-    .name = "version",
-    .handler = cmd_version,
-    .help = "Show Shell version",
-    .usage = "version",
-    .completion = NULL
-};
+static const shell_command_t builtin_version = {.name = "version",
+                                                .handler = cmd_version,
+                                                .help = "Show Shell version",
+                                                .usage = "version",
+                                                .completion = NULL};
 
 /** Clear command definition */
-static const shell_command_t builtin_clear = {
-    .name = "clear",
-    .handler = cmd_clear,
-    .help = "Clear the terminal screen",
-    .usage = "clear",
-    .completion = NULL
-};
+static const shell_command_t builtin_clear = {.name = "clear",
+                                              .handler = cmd_clear,
+                                              .help =
+                                                  "Clear the terminal screen",
+                                              .usage = "clear",
+                                              .completion = NULL};
 
 /** History command definition */
-static const shell_command_t builtin_history = {
-    .name = "history",
-    .handler = cmd_history,
-    .help = "Show command history",
-    .usage = "history",
-    .completion = NULL
-};
+static const shell_command_t builtin_history = {.name = "history",
+                                                .handler = cmd_history,
+                                                .help = "Show command history",
+                                                .usage = "history",
+                                                .completion = NULL};
 
 /** Echo command definition */
-static const shell_command_t builtin_echo = {
-    .name = "echo",
-    .handler = cmd_echo,
-    .help = "Print arguments",
-    .usage = "echo [text...]",
-    .completion = NULL
-};
+static const shell_command_t builtin_echo = {.name = "echo",
+                                             .handler = cmd_echo,
+                                             .help = "Print arguments",
+                                             .usage = "echo [text...]",
+                                             .completion = NULL};
 
 /*---------------------------------------------------------------------------*/
 /* Public API                                                                */
 /*---------------------------------------------------------------------------*/
 
-shell_status_t
-shell_register_builtin_commands(void) {
+shell_status_t shell_register_builtin_commands(void) {
     shell_status_t status;
 
     /* Register help command (Requirement 7.1, 7.2) */

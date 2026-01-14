@@ -15,9 +15,9 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include "shell_def.h"
-#include "shell_command.h"
 #include "shell_backend.h"
+#include "shell_command.h"
+#include "shell_def.h"
 #include "shell_history.h"
 
 #ifdef __cplusplus
@@ -34,21 +34,20 @@ extern "C" {
  * \brief           Shell configuration structure
  */
 typedef struct {
-    const char*     prompt;             /**< Prompt string (max 16 chars) */
-    uint16_t        cmd_buffer_size;    /**< Command buffer size (64-256) */
-    uint8_t         history_depth;      /**< History depth (4-32) */
-    uint8_t         max_commands;       /**< Max commands (default 32) */
+    const char* prompt;       /**< Prompt string (max 16 chars) */
+    uint16_t cmd_buffer_size; /**< Command buffer size (64-256) */
+    uint8_t history_depth;    /**< History depth (4-32) */
+    uint8_t max_commands;     /**< Max commands (default 32) */
 } shell_config_t;
 
 /**
  * \brief           Default Shell configuration
  */
-#define SHELL_CONFIG_DEFAULT { \
-    .prompt = SHELL_DEFAULT_PROMPT, \
-    .cmd_buffer_size = SHELL_DEFAULT_CMD_BUFFER_SIZE, \
-    .history_depth = SHELL_DEFAULT_HISTORY_DEPTH, \
-    .max_commands = SHELL_MAX_COMMANDS \
-}
+#define SHELL_CONFIG_DEFAULT                                                   \
+    {.prompt = SHELL_DEFAULT_PROMPT,                                           \
+     .cmd_buffer_size = SHELL_DEFAULT_CMD_BUFFER_SIZE,                         \
+     .history_depth = SHELL_DEFAULT_HISTORY_DEPTH,                             \
+     .max_commands = SHELL_MAX_COMMANDS}
 
 /**
  * \brief           Initialize the Shell module

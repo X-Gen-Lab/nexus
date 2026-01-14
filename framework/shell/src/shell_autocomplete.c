@@ -15,17 +15,16 @@
 
 #include "shell/shell_autocomplete.h"
 #include "shell/shell_command.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
 /*---------------------------------------------------------------------------*/
 
-static shell_status_t autocomplete_argument(const char* input,
-                                             int input_len,
-                                             int cursor_pos,
-                                             completion_result_t* result);
+static shell_status_t autocomplete_argument(const char* input, int input_len,
+                                            int cursor_pos,
+                                            completion_result_t* result);
 
 /*---------------------------------------------------------------------------*/
 /* Private Helper Functions                                                  */
@@ -37,8 +36,7 @@ static shell_status_t autocomplete_argument(const char* input,
  * \param[in]       src: Source string
  * \param[in]       size: Size of destination buffer
  */
-static void
-safe_strcpy(char* dest, const char* src, size_t size) {
+static void safe_strcpy(char* dest, const char* src, size_t size) {
     if (dest == NULL || src == NULL || size == 0) {
         return;
     }
@@ -56,8 +54,7 @@ safe_strcpy(char* dest, const char* src, size_t size) {
  * \param[in]       prefix: Prefix to match
  * \return          true if str starts with prefix, false otherwise
  */
-static bool
-starts_with(const char* str, const char* prefix) {
+static bool starts_with(const char* str, const char* prefix) {
     if (str == NULL || prefix == NULL) {
         return false;
     }
@@ -79,8 +76,7 @@ starts_with(const char* str, const char* prefix) {
  * \param[in]       str2: Second string
  * \return          Length of common prefix
  */
-static int
-common_prefix_length(const char* str1, const char* str2) {
+static int common_prefix_length(const char* str1, const char* str2) {
     int len = 0;
 
     if (str1 == NULL || str2 == NULL) {
@@ -98,14 +94,13 @@ common_prefix_length(const char* str1, const char* str2) {
 /* Public Functions                                                          */
 /*---------------------------------------------------------------------------*/
 
-shell_status_t
-autocomplete_init(void) {
+shell_status_t autocomplete_init(void) {
     /* No initialization needed for now */
     return SHELL_OK;
 }
 
-shell_status_t
-autocomplete_command(const char* partial, completion_result_t* result) {
+shell_status_t autocomplete_command(const char* partial,
+                                    completion_result_t* result) {
     const shell_command_t** commands = NULL;
     int command_count = 0;
     int partial_len;
@@ -128,21 +123,22 @@ autocomplete_command(const char* partial, completion_result_t* result) {
 
     /* Get registered commands */
     if (shell_get_commands(&commands, &command_count) != SHELL_OK) {
-        return SHELL_OK;  /* No commands registered, return empty result */
+        return SHELL_OK; /* No commands registered, return empty result */
     }
 
     if (commands == NULL || command_count == 0) {
-        return SHELL_OK;  /* No commands registered */
+        return SHELL_OK; /* No commands registered */
     }
 
     /* Find matching commands */
-    for (i = 0; i < command_count && result->match_count < SHELL_MAX_COMPLETIONS; i++) {
+    for (i = 0;
+         i < command_count && result->match_count < SHELL_MAX_COMPLETIONS;
+         i++) {
         if (commands[i] != NULL && commands[i]->name != NULL) {
             if (starts_with(commands[i]->name, partial)) {
                 /* Copy matching command name */
                 safe_strcpy(result->matches[result->match_count],
-                            commands[i]->name,
-                            SHELL_MAX_CMD_NAME + 1);
+                            commands[i]->name, SHELL_MAX_CMD_NAME + 1);
                 result->match_count++;
             }
         }
@@ -155,8 +151,8 @@ autocomplete_command(const char* partial, completion_result_t* result) {
 
         /* Find common prefix among all matches */
         for (i = 1; i < result->match_count; i++) {
-            int prefix_len = common_prefix_length(result->matches[0],
-                                                   result->matches[i]);
+            int prefix_len =
+                common_prefix_length(result->matches[0], result->matches[i]);
             if (prefix_len < result->common_prefix_len) {
                 result->common_prefix_len = prefix_len;
             }
@@ -166,8 +162,7 @@ autocomplete_command(const char* partial, completion_result_t* result) {
     return SHELL_OK;
 }
 
-void
-autocomplete_show_matches(const completion_result_t* result) {
+void autocomplete_show_matches(const completion_result_t* result) {
     int i;
 
     if (result == NULL || result->match_count == 0) {
@@ -186,10 +181,8 @@ autocomplete_show_matches(const completion_result_t* result) {
     printf("\n");
 }
 
-int
-autocomplete_get_common_prefix(const completion_result_t* result,
-                                char* prefix,
-                                int prefix_size) {
+int autocomplete_get_common_prefix(const completion_result_t* result,
+                                   char* prefix, int prefix_size) {
     if (result == NULL || prefix == NULL || prefix_size <= 0) {
         return 0;
     }
@@ -214,11 +207,9 @@ autocomplete_get_common_prefix(const completion_result_t* result,
     return copy_len;
 }
 
-shell_status_t
-autocomplete_process(const char* input,
-                      int input_len,
-                      int cursor_pos,
-                      completion_result_t* result) {
+shell_status_t autocomplete_process(const char* input, int input_len,
+                                    int cursor_pos,
+                                    completion_result_t* result) {
     char partial[SHELL_MAX_CMD_NAME + 1];
     int partial_len;
     int word_start;
@@ -249,14 +240,14 @@ autocomplete_process(const char* input,
 
     /* Find end of first word (command name) */
     int word_end = word_start;
-    while (word_end < input_len &&
-           input[word_end] != ' ' && input[word_end] != '\t') {
+    while (word_end < input_len && input[word_end] != ' ' &&
+           input[word_end] != '\t') {
         word_end++;
     }
 
     /* Only complete if cursor is at or after the first word */
     if (cursor_pos < word_start) {
-        return SHELL_OK;  /* Cursor before command, no completion */
+        return SHELL_OK; /* Cursor before command, no completion */
     }
 
     /* If cursor is past the first word, we're in argument territory */
@@ -294,11 +285,9 @@ autocomplete_process(const char* input,
  * \param[out]      result: Completion result
  * \return          SHELL_OK on success
  */
-static shell_status_t
-autocomplete_argument(const char* input,
-                       int input_len,
-                       int cursor_pos,
-                       completion_result_t* result) {
+static shell_status_t autocomplete_argument(const char* input, int input_len,
+                                            int cursor_pos,
+                                            completion_result_t* result) {
     char cmd_name[SHELL_MAX_CMD_NAME + 1];
     char partial_arg[SHELL_MAX_CMD_BUFFER_SIZE];
     int cmd_start, cmd_end;
@@ -321,8 +310,8 @@ autocomplete_argument(const char* input,
     }
 
     cmd_end = cmd_start;
-    while (cmd_end < input_len &&
-           input[cmd_end] != ' ' && input[cmd_end] != '\t') {
+    while (cmd_end < input_len && input[cmd_end] != ' ' &&
+           input[cmd_end] != '\t') {
         cmd_end++;
     }
 
@@ -354,8 +343,8 @@ autocomplete_argument(const char* input,
 
     /* Find the start of the current argument */
     arg_start = cursor_pos;
-    while (arg_start > cmd_end &&
-           input[arg_start - 1] != ' ' && input[arg_start - 1] != '\t') {
+    while (arg_start > cmd_end && input[arg_start - 1] != ' ' &&
+           input[arg_start - 1] != '\t') {
         arg_start--;
     }
 
@@ -371,7 +360,8 @@ autocomplete_argument(const char* input,
     partial_arg[partial_len] = '\0';
 
     /* Allocate temporary buffers for completions */
-    static char completion_buffers[SHELL_MAX_COMPLETIONS][SHELL_MAX_CMD_NAME + 1];
+    static char completion_buffers[SHELL_MAX_COMPLETIONS]
+                                  [SHELL_MAX_CMD_NAME + 1];
     for (i = 0; i < SHELL_MAX_COMPLETIONS; i++) {
         completions[i] = completion_buffers[i];
     }
@@ -386,7 +376,8 @@ autocomplete_argument(const char* input,
 
     for (i = 0; i < completion_count; i++) {
         if (completions[i] != NULL) {
-            safe_strcpy(result->matches[i], completions[i], SHELL_MAX_CMD_NAME + 1);
+            safe_strcpy(result->matches[i], completions[i],
+                        SHELL_MAX_CMD_NAME + 1);
         }
     }
     result->match_count = completion_count;
@@ -396,8 +387,8 @@ autocomplete_argument(const char* input,
         result->common_prefix_len = (int)strlen(result->matches[0]);
 
         for (i = 1; i < result->match_count; i++) {
-            int prefix_len = common_prefix_length(result->matches[0],
-                                                   result->matches[i]);
+            int prefix_len =
+                common_prefix_length(result->matches[0], result->matches[i]);
             if (prefix_len < result->common_prefix_len) {
                 result->common_prefix_len = prefix_len;
             }

@@ -14,15 +14,14 @@
  */
 
 #include "shell/shell_parser.h"
-#include <string.h>
 #include <stdbool.h>
+#include <string.h>
 
 /**
  * \brief           Skip whitespace characters in a string
  * \param[in,out]   str: Pointer to string pointer (updated to skip whitespace)
  */
-static void
-skip_whitespace(char** str) {
+static void skip_whitespace(char** str) {
     while (**str == ' ' || **str == '\t') {
         (*str)++;
     }
@@ -33,8 +32,7 @@ skip_whitespace(char** str) {
  * \param[in]       c: Character to check
  * \return          true if quote character, false otherwise
  */
-static bool
-is_quote(char c) {
+static bool is_quote(char c) {
     return (c == '"' || c == '\'');
 }
 
@@ -47,8 +45,8 @@ is_quote(char c) {
  * \param[out]      arg_start: Output pointer to start of argument
  * \return          SHELL_OK on success, error code on failure
  */
-static shell_status_t
-parse_quoted_string(char** str, char quote_char, char** arg_start) {
+static shell_status_t parse_quoted_string(char** str, char quote_char,
+                                          char** arg_start) {
     *arg_start = *str;
 
     /* Find closing quote */
@@ -75,8 +73,7 @@ parse_quoted_string(char** str, char quote_char, char** arg_start) {
  * \param[out]      arg_start: Output pointer to start of argument
  * \return          SHELL_OK on success
  */
-static shell_status_t
-parse_unquoted_arg(char** str, char** arg_start) {
+static shell_status_t parse_unquoted_arg(char** str, char** arg_start) {
     *arg_start = *str;
 
     /* Find end of argument (whitespace or end of string) */
@@ -93,8 +90,7 @@ parse_unquoted_arg(char** str, char** arg_start) {
     return SHELL_OK;
 }
 
-shell_status_t
-parse_command_line(char* line, parsed_command_t* result) {
+shell_status_t parse_command_line(char* line, parsed_command_t* result) {
     if (line == NULL || result == NULL) {
         return SHELL_ERROR_INVALID_PARAM;
     }
@@ -120,7 +116,7 @@ parse_command_line(char* line, parsed_command_t* result) {
     char* arg_start;
     if (is_quote(*ptr)) {
         char quote_char = *ptr;
-        ptr++;  /* Skip opening quote */
+        ptr++; /* Skip opening quote */
         parse_quoted_string(&ptr, quote_char, &arg_start);
     } else {
         parse_unquoted_arg(&ptr, &arg_start);
@@ -149,7 +145,7 @@ parse_command_line(char* line, parsed_command_t* result) {
         /* Parse next argument */
         if (is_quote(*ptr)) {
             char quote_char = *ptr;
-            ptr++;  /* Skip opening quote */
+            ptr++; /* Skip opening quote */
             parse_quoted_string(&ptr, quote_char, &arg_start);
         } else {
             parse_unquoted_arg(&ptr, &arg_start);

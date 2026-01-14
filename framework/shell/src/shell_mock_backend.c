@@ -26,10 +26,10 @@
 /*---------------------------------------------------------------------------*/
 
 /** Maximum input buffer size */
-#define MOCK_INPUT_BUFFER_SIZE      1024
+#define MOCK_INPUT_BUFFER_SIZE 1024
 
 /** Maximum output buffer size */
-#define MOCK_OUTPUT_BUFFER_SIZE     4096
+#define MOCK_OUTPUT_BUFFER_SIZE 4096
 
 /*---------------------------------------------------------------------------*/
 /* Private Data                                                              */
@@ -63,8 +63,7 @@ static bool g_mock_backend_initialized = false;
  * \param[in]       max_len: Maximum number of bytes to read
  * \return          Number of bytes actually read, 0 if no data available
  */
-static int
-mock_backend_read(uint8_t* data, int max_len) {
+static int mock_backend_read(uint8_t* data, int max_len) {
     if (!g_mock_backend_initialized) {
         return 0;
     }
@@ -88,8 +87,7 @@ mock_backend_read(uint8_t* data, int max_len) {
  * \param[in]       len: Number of bytes to write
  * \return          Number of bytes actually written
  */
-static int
-mock_backend_write(const uint8_t* data, int len) {
+static int mock_backend_write(const uint8_t* data, int len) {
     if (!g_mock_backend_initialized) {
         return 0;
     }
@@ -114,17 +112,14 @@ mock_backend_write(const uint8_t* data, int len) {
 /**
  * \brief           Mock backend instance
  */
-const shell_backend_t shell_mock_backend = {
-    .read = mock_backend_read,
-    .write = mock_backend_write
-};
+const shell_backend_t shell_mock_backend = {.read = mock_backend_read,
+                                            .write = mock_backend_write};
 
 /*---------------------------------------------------------------------------*/
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-shell_status_t
-shell_mock_backend_init(void) {
+shell_status_t shell_mock_backend_init(void) {
     g_input_length = 0;
     g_input_read_pos = 0;
     g_output_length = 0;
@@ -133,8 +128,7 @@ shell_mock_backend_init(void) {
     return SHELL_OK;
 }
 
-shell_status_t
-shell_mock_backend_deinit(void) {
+shell_status_t shell_mock_backend_deinit(void) {
     g_mock_backend_initialized = false;
     g_input_length = 0;
     g_input_read_pos = 0;
@@ -143,15 +137,13 @@ shell_mock_backend_deinit(void) {
     return SHELL_OK;
 }
 
-void
-shell_mock_backend_reset(void) {
+void shell_mock_backend_reset(void) {
     g_input_length = 0;
     g_input_read_pos = 0;
     g_output_length = 0;
 }
 
-int
-shell_mock_backend_inject_input(const uint8_t* data, size_t len) {
+int shell_mock_backend_inject_input(const uint8_t* data, size_t len) {
     if (data == NULL || len == 0) {
         return 0;
     }
@@ -168,8 +160,7 @@ shell_mock_backend_inject_input(const uint8_t* data, size_t len) {
     return (int)count;
 }
 
-int
-shell_mock_backend_inject_string(const char* str) {
+int shell_mock_backend_inject_string(const char* str) {
     if (str == NULL) {
         return 0;
     }
@@ -177,8 +168,7 @@ shell_mock_backend_inject_string(const char* str) {
     return shell_mock_backend_inject_input((const uint8_t*)str, strlen(str));
 }
 
-int
-shell_mock_backend_get_output(uint8_t* data, size_t max_len) {
+int shell_mock_backend_get_output(uint8_t* data, size_t max_len) {
     if (data == NULL || max_len == 0) {
         return 0;
     }
@@ -192,8 +182,7 @@ shell_mock_backend_get_output(uint8_t* data, size_t max_len) {
     return (int)copy_len;
 }
 
-int
-shell_mock_backend_get_output_string(char* str, size_t max_len) {
+int shell_mock_backend_get_output_string(char* str, size_t max_len) {
     if (str == NULL || max_len == 0) {
         return 0;
     }
@@ -209,26 +198,22 @@ shell_mock_backend_get_output_string(char* str, size_t max_len) {
     return (int)copy_len;
 }
 
-size_t
-shell_mock_backend_get_output_length(void) {
+size_t shell_mock_backend_get_output_length(void) {
     return g_output_length;
 }
 
-void
-shell_mock_backend_clear_output(void) {
+void shell_mock_backend_clear_output(void) {
     g_output_length = 0;
 }
 
-size_t
-shell_mock_backend_get_remaining_input(void) {
+size_t shell_mock_backend_get_remaining_input(void) {
     if (g_input_read_pos >= g_input_length) {
         return 0;
     }
     return g_input_length - g_input_read_pos;
 }
 
-bool
-shell_mock_backend_is_initialized(void) {
+bool shell_mock_backend_is_initialized(void) {
     return g_mock_backend_initialized;
 }
 

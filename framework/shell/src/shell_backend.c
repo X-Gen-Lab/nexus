@@ -30,25 +30,22 @@
 static const shell_backend_t* g_current_backend = NULL;
 
 /** Printf buffer size */
-#define SHELL_PRINTF_BUFFER_SIZE    256
+#define SHELL_PRINTF_BUFFER_SIZE 256
 
 /*---------------------------------------------------------------------------*/
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-shell_status_t
-shell_set_backend(const shell_backend_t* backend) {
+shell_status_t shell_set_backend(const shell_backend_t* backend) {
     g_current_backend = backend;
     return SHELL_OK;
 }
 
-const shell_backend_t*
-shell_get_backend(void) {
+const shell_backend_t* shell_get_backend(void) {
     return g_current_backend;
 }
 
-int
-shell_printf(const char* format, ...) {
+int shell_printf(const char* format, ...) {
     if (g_current_backend == NULL || g_current_backend->write == NULL) {
         return -1;
     }
@@ -76,8 +73,7 @@ shell_printf(const char* format, ...) {
     return g_current_backend->write((const uint8_t*)buffer, len);
 }
 
-int
-shell_write(const uint8_t* data, int len) {
+int shell_write(const uint8_t* data, int len) {
     if (g_current_backend == NULL || g_current_backend->write == NULL) {
         return 0;
     }
@@ -89,8 +85,7 @@ shell_write(const uint8_t* data, int len) {
     return g_current_backend->write(data, len);
 }
 
-int
-shell_putchar(char c) {
+int shell_putchar(char c) {
     if (g_current_backend == NULL || g_current_backend->write == NULL) {
         return 0;
     }
@@ -99,8 +94,7 @@ shell_putchar(char c) {
     return g_current_backend->write(&byte, 1);
 }
 
-int
-shell_puts(const char* str) {
+int shell_puts(const char* str) {
     if (g_current_backend == NULL || g_current_backend->write == NULL) {
         return 0;
     }

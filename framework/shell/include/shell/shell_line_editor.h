@@ -30,11 +30,11 @@ extern "C" {
  * \brief           Line editor state structure
  */
 typedef struct {
-    char*       buffer;         /**< Input buffer pointer */
-    uint16_t    buffer_size;    /**< Buffer size (capacity) */
-    uint16_t    length;         /**< Current content length */
-    uint16_t    cursor;         /**< Cursor position (0 to length) */
-    bool        insert_mode;    /**< Insert mode (true) or overwrite mode */
+    char* buffer;         /**< Input buffer pointer */
+    uint16_t buffer_size; /**< Buffer size (capacity) */
+    uint16_t length;      /**< Current content length */
+    uint16_t cursor;      /**< Cursor position (0 to length) */
+    bool insert_mode;     /**< Insert mode (true) or overwrite mode */
 } line_editor_t;
 
 /**

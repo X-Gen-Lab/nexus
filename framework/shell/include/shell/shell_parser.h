@@ -30,9 +30,9 @@ extern "C" {
  * \brief           Parsed command structure
  */
 typedef struct {
-    char*       cmd_name;                   /**< Command name (first token) */
-    int         argc;                       /**< Argument count (including command name) */
-    char*       argv[SHELL_MAX_ARGS];       /**< Argument array */
+    char* cmd_name;             /**< Command name (first token) */
+    int argc;                   /**< Argument count (including command name) */
+    char* argv[SHELL_MAX_ARGS]; /**< Argument array */
 } parsed_command_t;
 
 /**
@@ -41,11 +41,13 @@ typedef struct {
  * \param[out]      result: Output parsed command structure
  * \return          SHELL_OK on success
  * \return          SHELL_ERROR_INVALID_PARAM if line or result is NULL
- * \return          SHELL_ERROR_BUFFER_FULL if too many arguments (> SHELL_MAX_ARGS)
- * \note            The line buffer is modified in place. The argv pointers point
- *                  into the original line buffer.
+ * \return          SHELL_ERROR_BUFFER_FULL if too many arguments (>
+ * SHELL_MAX_ARGS)
+ * \note            The line buffer is modified in place. The argv pointers
+ * point into the original line buffer.
  * \note            Empty lines result in argc=0 and cmd_name=NULL
- * \note            Unterminated quotes are handled gracefully (rest of string is argument)
+ * \note            Unterminated quotes are handled gracefully (rest of string
+ * is argument)
  */
 shell_status_t parse_command_line(char* line, parsed_command_t* result);
 

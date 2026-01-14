@@ -7,13 +7,14 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * Implements the UART backend for Shell I/O operations using HAL UART interface.
+ * Implements the UART backend for Shell I/O operations using HAL UART
+ * interface.
  *
  * Requirements: 8.3, 8.4, 8.5
  */
 
-#include "shell/shell_backend.h"
 #include "hal/hal_uart.h"
+#include "shell/shell_backend.h"
 #include <string.h>
 
 /**
@@ -32,10 +33,10 @@ static hal_uart_instance_t g_uart_instance = HAL_UART_0;
 static bool g_uart_backend_initialized = false;
 
 /** Non-blocking read timeout in milliseconds */
-#define UART_READ_TIMEOUT_MS    0
+#define UART_READ_TIMEOUT_MS 0
 
 /** Blocking write timeout in milliseconds */
-#define UART_WRITE_TIMEOUT_MS   1000
+#define UART_WRITE_TIMEOUT_MS 1000
 
 /*---------------------------------------------------------------------------*/
 /* Private Functions                                                         */
@@ -47,8 +48,7 @@ static bool g_uart_backend_initialized = false;
  * \param[in]       max_len: Maximum number of bytes to read
  * \return          Number of bytes actually read, 0 if no data available
  */
-static int
-uart_backend_read(uint8_t* data, int max_len) {
+static int uart_backend_read(uint8_t* data, int max_len) {
     if (!g_uart_backend_initialized) {
         return 0;
     }
@@ -61,8 +61,8 @@ uart_backend_read(uint8_t* data, int max_len) {
 
     /* Try to read available bytes without blocking */
     while (count < max_len) {
-        hal_status_t status = hal_uart_getc(g_uart_instance, &data[count],
-                                            UART_READ_TIMEOUT_MS);
+        hal_status_t status =
+            hal_uart_getc(g_uart_instance, &data[count], UART_READ_TIMEOUT_MS);
         if (status != HAL_OK) {
             /* No more data available */
             break;
@@ -79,8 +79,7 @@ uart_backend_read(uint8_t* data, int max_len) {
  * \param[in]       len: Number of bytes to write
  * \return          Number of bytes actually written
  */
-static int
-uart_backend_write(const uint8_t* data, int len) {
+static int uart_backend_write(const uint8_t* data, int len) {
     if (!g_uart_backend_initialized) {
         return 0;
     }
@@ -89,8 +88,8 @@ uart_backend_write(const uint8_t* data, int len) {
         return 0;
     }
 
-    hal_status_t status = hal_uart_transmit(g_uart_instance, data,
-                                            (size_t)len, UART_WRITE_TIMEOUT_MS);
+    hal_status_t status = hal_uart_transmit(g_uart_instance, data, (size_t)len,
+                                            UART_WRITE_TIMEOUT_MS);
     if (status != HAL_OK) {
         return 0;
     }
@@ -105,17 +104,14 @@ uart_backend_write(const uint8_t* data, int len) {
 /**
  * \brief           UART backend instance
  */
-const shell_backend_t shell_uart_backend = {
-    .read = uart_backend_read,
-    .write = uart_backend_write
-};
+const shell_backend_t shell_uart_backend = {.read = uart_backend_read,
+                                            .write = uart_backend_write};
 
 /*---------------------------------------------------------------------------*/
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-shell_status_t
-shell_uart_backend_init(int uart_instance) {
+shell_status_t shell_uart_backend_init(int uart_instance) {
     /* Validate UART instance */
     if (uart_instance < 0 || uart_instance >= HAL_UART_MAX) {
         return SHELL_ERROR_INVALID_PARAM;
@@ -127,14 +123,12 @@ shell_uart_backend_init(int uart_instance) {
     return SHELL_OK;
 }
 
-shell_status_t
-shell_uart_backend_deinit(void) {
+shell_status_t shell_uart_backend_deinit(void) {
     g_uart_backend_initialized = false;
     return SHELL_OK;
 }
 
-bool
-shell_uart_backend_is_initialized(void) {
+bool shell_uart_backend_is_initialized(void) {
     return g_uart_backend_initialized;
 }
 

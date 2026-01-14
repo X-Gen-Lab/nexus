@@ -25,8 +25,7 @@
  * \param[in]       cmd: Command string to check
  * \return          true if empty or whitespace-only, false otherwise
  */
-static bool
-is_empty_command(const char* cmd) {
+static bool is_empty_command(const char* cmd) {
     if (cmd == NULL) {
         return true;
     }
@@ -48,8 +47,8 @@ is_empty_command(const char* cmd) {
  * \param[in]       logical_index: Logical index (0 = most recent)
  * \return          Buffer index
  */
-static uint8_t
-get_buffer_index(const history_manager_t* hist, uint8_t logical_index) {
+static uint8_t get_buffer_index(const history_manager_t* hist,
+                                uint8_t logical_index) {
     if (hist->count == 0 || logical_index >= hist->count) {
         return 0;
     }
@@ -69,8 +68,7 @@ get_buffer_index(const history_manager_t* hist, uint8_t logical_index) {
  * \param[in]       hist: History manager instance
  * \return          Most recent entry or NULL if empty
  */
-static const char*
-get_most_recent(const history_manager_t* hist) {
+static const char* get_most_recent(const history_manager_t* hist) {
     if (hist->count == 0) {
         return NULL;
     }
@@ -81,9 +79,8 @@ get_most_recent(const history_manager_t* hist) {
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-void
-history_init(history_manager_t* hist, char** entries,
-             uint8_t capacity, uint16_t entry_size) {
+void history_init(history_manager_t* hist, char** entries, uint8_t capacity,
+                  uint16_t entry_size) {
     if (hist == NULL) {
         return;
     }
@@ -105,8 +102,7 @@ history_init(history_manager_t* hist, char** entries,
     }
 }
 
-void
-history_deinit(history_manager_t* hist) {
+void history_deinit(history_manager_t* hist) {
     if (hist == NULL) {
         return;
     }
@@ -119,8 +115,7 @@ history_deinit(history_manager_t* hist) {
     hist->browse_index = -1;
 }
 
-bool
-history_add(history_manager_t* hist, const char* cmd) {
+bool history_add(history_manager_t* hist, const char* cmd) {
     /* Validate parameters */
     if (hist == NULL || hist->entries == NULL || hist->capacity == 0) {
         return false;
@@ -171,8 +166,7 @@ history_add(history_manager_t* hist, const char* cmd) {
     return true;
 }
 
-const char*
-history_get_prev(history_manager_t* hist) {
+const char* history_get_prev(history_manager_t* hist) {
     if (hist == NULL || hist->entries == NULL || hist->count == 0) {
         return NULL;
     }
@@ -190,8 +184,10 @@ history_get_prev(history_manager_t* hist) {
     /* Check if we've reached the oldest entry */
     if (next_index >= (int8_t)hist->count) {
         /* Already at oldest, return current oldest */
-        if (hist->browse_index >= 0 && hist->browse_index < (int8_t)hist->count) {
-            uint8_t buf_idx = get_buffer_index(hist, (uint8_t)hist->browse_index);
+        if (hist->browse_index >= 0 &&
+            hist->browse_index < (int8_t)hist->count) {
+            uint8_t buf_idx =
+                get_buffer_index(hist, (uint8_t)hist->browse_index);
             return hist->entries[buf_idx];
         }
         return NULL;
@@ -203,8 +199,7 @@ history_get_prev(history_manager_t* hist) {
     return hist->entries[buf_idx];
 }
 
-const char*
-history_get_next(history_manager_t* hist) {
+const char* history_get_next(history_manager_t* hist) {
     if (hist == NULL || hist->entries == NULL) {
         return NULL;
     }
@@ -220,7 +215,7 @@ history_get_next(history_manager_t* hist) {
     /* Check if we've returned to current input */
     if (next_index < 0) {
         hist->browse_index = -1;
-        return NULL;  /* NULL indicates return to current input */
+        return NULL; /* NULL indicates return to current input */
     }
 
     /* Update browse index and return entry */
@@ -229,24 +224,21 @@ history_get_next(history_manager_t* hist) {
     return hist->entries[buf_idx];
 }
 
-void
-history_reset_browse(history_manager_t* hist) {
+void history_reset_browse(history_manager_t* hist) {
     if (hist == NULL) {
         return;
     }
     hist->browse_index = -1;
 }
 
-uint8_t
-history_get_count(const history_manager_t* hist) {
+uint8_t history_get_count(const history_manager_t* hist) {
     if (hist == NULL) {
         return 0;
     }
     return hist->count;
 }
 
-const char*
-history_get_entry(const history_manager_t* hist, uint8_t index) {
+const char* history_get_entry(const history_manager_t* hist, uint8_t index) {
     if (hist == NULL || hist->entries == NULL || index >= hist->count) {
         return NULL;
     }
@@ -255,8 +247,7 @@ history_get_entry(const history_manager_t* hist, uint8_t index) {
     return hist->entries[buf_idx];
 }
 
-void
-history_clear(history_manager_t* hist) {
+void history_clear(history_manager_t* hist) {
     if (hist == NULL) {
         return;
     }
@@ -275,8 +266,7 @@ history_clear(history_manager_t* hist) {
     }
 }
 
-bool
-history_is_browsing(const history_manager_t* hist) {
+bool history_is_browsing(const history_manager_t* hist) {
     if (hist == NULL) {
         return false;
     }
