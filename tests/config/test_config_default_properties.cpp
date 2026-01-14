@@ -15,11 +15,11 @@
  * **Validates: Requirements 4.1, 4.2, 4.4**
  */
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <random>
 #include <string>
 #include <vector>
-#include <cstring>
 
 extern "C" {
 #include "config/config.h"
@@ -113,7 +113,8 @@ class ConfigDefaultPropertyTest : public ::testing::Test {
      */
     std::string randomString() {
         std::uniform_int_distribution<int> len_dist(1, 50);
-        std::uniform_int_distribution<int> char_dist(32, 126);  /* Printable ASCII */
+        std::uniform_int_distribution<int> char_dist(32,
+                                                     126); /* Printable ASCII */
         int len = len_dist(rng);
         std::string str;
         for (int i = 0; i < len; ++i) {
@@ -147,14 +148,15 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackI32) {
         std::string key = "default.i32." + std::to_string(test_iter);
         int32_t default_value = randomI32();
         int32_t actual_value = randomI32();
-        
+
         /* Ensure actual_value is different from default_value */
         while (actual_value == default_value) {
             actual_value = randomI32();
         }
 
         /* Register a default value */
-        config_status_t status = config_set_default_i32(key.c_str(), default_value);
+        config_status_t status =
+            config_set_default_i32(key.c_str(), default_value);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": set_default_i32 failed for key '"
             << key << "' with value " << default_value;
@@ -170,13 +172,14 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackI32) {
         status = config_get_i32(key.c_str(), &get_value, 0);
         ASSERT_EQ(CONFIG_OK, status);
         ASSERT_EQ(actual_value, get_value)
-            << "Iteration " << test_iter << ": actual value not stored correctly";
+            << "Iteration " << test_iter
+            << ": actual value not stored correctly";
 
         /* Reset to default */
         status = config_reset_to_default(key.c_str());
         ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": reset_to_default failed for key '"
-            << key << "'";
+            << "Iteration " << test_iter
+            << ": reset_to_default failed for key '" << key << "'";
 
         /* Get the value - should now be the default */
         status = config_get_i32(key.c_str(), &get_value, 0);
@@ -185,8 +188,9 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackI32) {
 
         /* Verify default value is returned */
         EXPECT_EQ(default_value, get_value)
-            << "Iteration " << test_iter << ": default fallback failed for key '"
-            << key << "'. Expected " << default_value << ", got " << get_value;
+            << "Iteration " << test_iter
+            << ": default fallback failed for key '" << key << "'. Expected "
+            << default_value << ", got " << get_value;
     }
 }
 
@@ -207,14 +211,15 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackStr) {
         std::string key = "default.str." + std::to_string(test_iter);
         std::string default_value = randomString();
         std::string actual_value = randomString();
-        
+
         /* Ensure actual_value is different from default_value */
         while (actual_value == default_value) {
             actual_value = randomString();
         }
 
         /* Register a default value */
-        config_status_t status = config_set_default_str(key.c_str(), default_value.c_str());
+        config_status_t status =
+            config_set_default_str(key.c_str(), default_value.c_str());
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": set_default_str failed for key '"
             << key << "'";
@@ -222,20 +227,22 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackStr) {
         /* Set an actual value */
         status = config_set_str(key.c_str(), actual_value.c_str());
         ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": set_str failed for key '" << key << "'";
+            << "Iteration " << test_iter << ": set_str failed for key '" << key
+            << "'";
 
         /* Verify actual value is stored */
         char buffer[256];
         status = config_get_str(key.c_str(), buffer, sizeof(buffer));
         ASSERT_EQ(CONFIG_OK, status);
         ASSERT_STREQ(actual_value.c_str(), buffer)
-            << "Iteration " << test_iter << ": actual value not stored correctly";
+            << "Iteration " << test_iter
+            << ": actual value not stored correctly";
 
         /* Reset to default */
         status = config_reset_to_default(key.c_str());
         ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": reset_to_default failed for key '"
-            << key << "'";
+            << "Iteration " << test_iter
+            << ": reset_to_default failed for key '" << key << "'";
 
         /* Get the value - should now be the default */
         status = config_get_str(key.c_str(), buffer, sizeof(buffer));
@@ -244,8 +251,9 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackStr) {
 
         /* Verify default value is returned */
         EXPECT_STREQ(default_value.c_str(), buffer)
-            << "Iteration " << test_iter << ": default fallback failed for key '"
-            << key << "'. Expected '" << default_value << "', got '" << buffer << "'";
+            << "Iteration " << test_iter
+            << ": default fallback failed for key '" << key << "'. Expected '"
+            << default_value << "', got '" << buffer << "'";
     }
 }
 
@@ -265,31 +273,34 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackBool) {
 
         std::string key = "default.bool." + std::to_string(test_iter);
         bool default_value = randomBool();
-        bool actual_value = !default_value;  /* Ensure different */
+        bool actual_value = !default_value; /* Ensure different */
 
         /* Register a default value */
-        config_status_t status = config_set_default_bool(key.c_str(), default_value);
+        config_status_t status =
+            config_set_default_bool(key.c_str(), default_value);
         ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": set_default_bool failed for key '"
-            << key << "'";
+            << "Iteration " << test_iter
+            << ": set_default_bool failed for key '" << key << "'";
 
         /* Set an actual value */
         status = config_set_bool(key.c_str(), actual_value);
         ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": set_bool failed for key '" << key << "'";
+            << "Iteration " << test_iter << ": set_bool failed for key '" << key
+            << "'";
 
         /* Verify actual value is stored */
         bool get_value = default_value;
         status = config_get_bool(key.c_str(), &get_value, default_value);
         ASSERT_EQ(CONFIG_OK, status);
         ASSERT_EQ(actual_value, get_value)
-            << "Iteration " << test_iter << ": actual value not stored correctly";
+            << "Iteration " << test_iter
+            << ": actual value not stored correctly";
 
         /* Reset to default */
         status = config_reset_to_default(key.c_str());
         ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": reset_to_default failed for key '"
-            << key << "'";
+            << "Iteration " << test_iter
+            << ": reset_to_default failed for key '" << key << "'";
 
         /* Get the value - should now be the default */
         status = config_get_bool(key.c_str(), &get_value, actual_value);
@@ -298,8 +309,9 @@ TEST_F(ConfigDefaultPropertyTest, Property4_DefaultFallbackBool) {
 
         /* Verify default value is returned */
         EXPECT_EQ(default_value, get_value)
-            << "Iteration " << test_iter << ": default fallback failed for key '"
-            << key << "'. Expected " << default_value << ", got " << get_value;
+            << "Iteration " << test_iter
+            << ": default fallback failed for key '" << key << "'. Expected "
+            << default_value << ", got " << get_value;
     }
 }
 
@@ -327,7 +339,8 @@ TEST_F(ConfigDefaultPropertyTest, Property_ResetAllDefaultsConsistency) {
 
         /* Register defaults and set actual values */
         for (int i = 0; i < num_keys; ++i) {
-            std::string key = "resetall." + std::to_string(test_iter) + "." + std::to_string(i);
+            std::string key = "resetall." + std::to_string(test_iter) + "." +
+                              std::to_string(i);
             int32_t default_val = randomI32();
             int32_t actual_val = randomI32();
             while (actual_val == default_val) {
@@ -338,7 +351,8 @@ TEST_F(ConfigDefaultPropertyTest, Property_ResetAllDefaultsConsistency) {
             default_values.push_back(default_val);
             actual_values.push_back(actual_val);
 
-            ASSERT_EQ(CONFIG_OK, config_set_default_i32(key.c_str(), default_val));
+            ASSERT_EQ(CONFIG_OK,
+                      config_set_default_i32(key.c_str(), default_val));
             ASSERT_EQ(CONFIG_OK, config_set_i32(key.c_str(), actual_val));
         }
 
@@ -356,11 +370,12 @@ TEST_F(ConfigDefaultPropertyTest, Property_ResetAllDefaultsConsistency) {
         for (int i = 0; i < num_keys; ++i) {
             int32_t value = 0;
             config_status_t status = config_get_i32(keys[i].c_str(), &value, 0);
-            ASSERT_EQ(CONFIG_OK, status)
-                << "Iteration " << test_iter << ", key " << i << ": get_i32 failed";
+            ASSERT_EQ(CONFIG_OK, status) << "Iteration " << test_iter
+                                         << ", key " << i << ": get_i32 failed";
             EXPECT_EQ(default_values[i], value)
                 << "Iteration " << test_iter << ", key '" << keys[i]
-                << "': expected default " << default_values[i] << ", got " << value;
+                << "': expected default " << default_values[i] << ", got "
+                << value;
         }
     }
 }
@@ -388,7 +403,8 @@ TEST_F(ConfigDefaultPropertyTest, Property_RegisterDefaultsBatchConsistency) {
         std::vector<int32_t> values(num_defaults);
 
         for (int i = 0; i < num_defaults; ++i) {
-            keys[i] = "batch." + std::to_string(test_iter) + "." + std::to_string(i);
+            keys[i] =
+                "batch." + std::to_string(test_iter) + "." + std::to_string(i);
             values[i] = randomI32();
             defaults[i].key = keys[i].c_str();
             defaults[i].type = CONFIG_TYPE_I32;
@@ -396,7 +412,8 @@ TEST_F(ConfigDefaultPropertyTest, Property_RegisterDefaultsBatchConsistency) {
         }
 
         /* Register all defaults at once */
-        config_status_t status = config_register_defaults(defaults.data(), num_defaults);
+        config_status_t status =
+            config_register_defaults(defaults.data(), num_defaults);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": register_defaults failed";
 
@@ -411,7 +428,8 @@ TEST_F(ConfigDefaultPropertyTest, Property_RegisterDefaultsBatchConsistency) {
 
             /* Verify default is restored */
             int32_t get_value = 0;
-            ASSERT_EQ(CONFIG_OK, config_get_i32(keys[i].c_str(), &get_value, 0));
+            ASSERT_EQ(CONFIG_OK,
+                      config_get_i32(keys[i].c_str(), &get_value, 0));
             EXPECT_EQ(values[i], get_value)
                 << "Iteration " << test_iter << ", key '" << keys[i]
                 << "': expected " << values[i] << ", got " << get_value;
@@ -442,7 +460,8 @@ TEST_F(ConfigDefaultPropertyTest, Property_DefaultOverwritePreservesLatest) {
         int32_t last_default = 0;
         for (int i = 0; i < num_writes; ++i) {
             last_default = randomI32();
-            config_status_t status = config_set_default_i32(key.c_str(), last_default);
+            config_status_t status =
+                config_set_default_i32(key.c_str(), last_default);
             ASSERT_EQ(CONFIG_OK, status)
                 << "Iteration " << test_iter << ", write " << i
                 << ": set_default_i32 failed";

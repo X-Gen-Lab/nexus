@@ -29,7 +29,7 @@ extern "C" {
  * \return          CONFIG_OK on success, error code otherwise
  */
 config_status_t config_get_default(const char* key, config_type_t* type,
-                                    void* value, size_t* size);
+                                   void* value, size_t* size);
 
 /**
  * \brief           Check if a default value exists for a key
@@ -44,38 +44,6 @@ config_status_t config_has_default(const char* key, bool* exists);
  * \note            Called from config_deinit
  */
 void config_default_clear_all(void);
-
-/**
- * \brief           Set default value for a 32-bit unsigned integer
- * \param[in]       key: Configuration key
- * \param[in]       value: Default value
- * \return          CONFIG_OK on success, error code otherwise
- */
-config_status_t config_set_default_u32(const char* key, uint32_t value);
-
-/**
- * \brief           Set default value for a 64-bit signed integer
- * \param[in]       key: Configuration key
- * \param[in]       value: Default value
- * \return          CONFIG_OK on success, error code otherwise
- */
-config_status_t config_set_default_i64(const char* key, int64_t value);
-
-/**
- * \brief           Set default value for a float
- * \param[in]       key: Configuration key
- * \param[in]       value: Default value
- * \return          CONFIG_OK on success, error code otherwise
- */
-config_status_t config_set_default_float(const char* key, float value);
-
-/**
- * \brief           Set default value for a boolean
- * \param[in]       key: Configuration key
- * \param[in]       value: Default value
- * \return          CONFIG_OK on success, error code otherwise
- */
-config_status_t config_set_default_bool(const char* key, bool value);
 
 #ifdef __cplusplus
 }

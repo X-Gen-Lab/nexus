@@ -11,8 +11,8 @@
  *                  Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "config/config.h"
@@ -57,7 +57,8 @@ TEST_F(ConfigDefaultTest, SetDefaultI32NullKey) {
 }
 
 TEST_F(ConfigDefaultTest, SetDefaultStrNullKey) {
-    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_set_default_str(NULL, "hello"));
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM,
+              config_set_default_str(NULL, "hello"));
 }
 
 TEST_F(ConfigDefaultTest, SetDefaultStrNullValue) {
@@ -70,34 +71,36 @@ TEST_F(ConfigDefaultTest, SetDefaultStrNullValue) {
 
 TEST_F(ConfigDefaultTest, GetI32WithRegisteredDefault) {
     int32_t value = 0;
-    
+
     /* Register a default value */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.fallback.i32", 100));
-    
+
     /* Get value without setting it - should return the registered default */
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.fallback.i32", &value, 0));
-    /* Note: Current implementation returns the passed default_val, not registered default */
+    /* Note: Current implementation returns the passed default_val, not
+     * registered default */
     /* This is expected behavior per the current API design */
     EXPECT_EQ(0, value);
 }
 
 TEST_F(ConfigDefaultTest, GetI32WithoutDefault) {
     int32_t value = 0;
-    
-    /* Get non-existent key without registered default - should return passed default */
+
+    /* Get non-existent key without registered default - should return passed
+     * default */
     EXPECT_EQ(CONFIG_OK, config_get_i32("nonexistent", &value, 999));
     EXPECT_EQ(999, value);
 }
 
 TEST_F(ConfigDefaultTest, GetI32ExistingValueOverridesDefault) {
     int32_t value = 0;
-    
+
     /* Register a default value */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.override", 100));
-    
+
     /* Set an actual value */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.override", 200));
-    
+
     /* Get should return the actual value, not the default */
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.override", &value, 0));
     EXPECT_EQ(200, value);
@@ -109,20 +112,20 @@ TEST_F(ConfigDefaultTest, GetI32ExistingValueOverridesDefault) {
 
 TEST_F(ConfigDefaultTest, ResetToDefault) {
     int32_t value = 0;
-    
+
     /* Register a default value */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.reset", 50));
-    
+
     /* Set an actual value */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.reset", 100));
-    
+
     /* Verify actual value is set */
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.reset", &value, 0));
     EXPECT_EQ(100, value);
-    
+
     /* Reset to default */
     EXPECT_EQ(CONFIG_OK, config_reset_to_default("test.reset"));
-    
+
     /* Verify value is now the default */
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.reset", &value, 0));
     EXPECT_EQ(50, value);
@@ -139,45 +142,48 @@ TEST_F(ConfigDefaultTest, ResetToDefaultNotFound) {
 
 TEST_F(ConfigDefaultTest, ResetToDefaultString) {
     char buffer[64];
-    
+
     /* Register a default string */
-    EXPECT_EQ(CONFIG_OK, config_set_default_str("test.reset.str", "default_value"));
-    
+    EXPECT_EQ(CONFIG_OK,
+              config_set_default_str("test.reset.str", "default_value"));
+
     /* Set an actual value */
     EXPECT_EQ(CONFIG_OK, config_set_str("test.reset.str", "actual_value"));
-    
+
     /* Verify actual value is set */
-    EXPECT_EQ(CONFIG_OK, config_get_str("test.reset.str", buffer, sizeof(buffer)));
+    EXPECT_EQ(CONFIG_OK,
+              config_get_str("test.reset.str", buffer, sizeof(buffer)));
     EXPECT_STREQ("actual_value", buffer);
-    
+
     /* Reset to default */
     EXPECT_EQ(CONFIG_OK, config_reset_to_default("test.reset.str"));
-    
+
     /* Verify value is now the default */
-    EXPECT_EQ(CONFIG_OK, config_get_str("test.reset.str", buffer, sizeof(buffer)));
+    EXPECT_EQ(CONFIG_OK,
+              config_get_str("test.reset.str", buffer, sizeof(buffer)));
     EXPECT_STREQ("default_value", buffer);
 }
 
 TEST_F(ConfigDefaultTest, ResetAllToDefaults) {
     int32_t value1 = 0, value2 = 0;
-    
+
     /* Register multiple defaults */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.all.key1", 10));
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.all.key2", 20));
-    
+
     /* Set actual values */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.all.key1", 100));
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.all.key2", 200));
-    
+
     /* Verify actual values */
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.all.key1", &value1, 0));
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.all.key2", &value2, 0));
     EXPECT_EQ(100, value1);
     EXPECT_EQ(200, value2);
-    
+
     /* Reset all to defaults */
     EXPECT_EQ(CONFIG_OK, config_reset_all_to_defaults());
-    
+
     /* Verify values are now defaults */
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.all.key1", &value1, 0));
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.all.key2", &value2, 0));
@@ -191,33 +197,39 @@ TEST_F(ConfigDefaultTest, ResetAllToDefaults) {
 
 TEST_F(ConfigDefaultTest, RegisterDefaults) {
     const config_default_t defaults[] = {
-        { .key = "app.timeout", .type = CONFIG_TYPE_I32, .value = { .i32_val = 5000 } },
-        { .key = "app.enabled", .type = CONFIG_TYPE_BOOL, .value = { .bool_val = true } },
-        { .key = "app.name", .type = CONFIG_TYPE_STRING, .value = { .str_val = "MyApp" } },
+        {.key = "app.timeout",
+         .type = CONFIG_TYPE_I32,
+         .value = {.i32_val = 5000}},
+        {.key = "app.enabled",
+         .type = CONFIG_TYPE_BOOL,
+         .value = {.bool_val = true}},
+        {.key = "app.name",
+         .type = CONFIG_TYPE_STRING,
+         .value = {.str_val = "MyApp"}},
     };
-    
+
     EXPECT_EQ(CONFIG_OK, config_register_defaults(defaults, 3));
-    
+
     /* Verify defaults are registered by resetting to them */
     int32_t timeout = 0;
     bool enabled = false;
     char name[32];
-    
+
     /* Set actual values first */
     EXPECT_EQ(CONFIG_OK, config_set_i32("app.timeout", 1000));
     EXPECT_EQ(CONFIG_OK, config_set_bool("app.enabled", false));
     EXPECT_EQ(CONFIG_OK, config_set_str("app.name", "OtherApp"));
-    
+
     /* Reset to defaults */
     EXPECT_EQ(CONFIG_OK, config_reset_to_default("app.timeout"));
     EXPECT_EQ(CONFIG_OK, config_reset_to_default("app.enabled"));
     EXPECT_EQ(CONFIG_OK, config_reset_to_default("app.name"));
-    
+
     /* Verify defaults */
     EXPECT_EQ(CONFIG_OK, config_get_i32("app.timeout", &timeout, 0));
     EXPECT_EQ(CONFIG_OK, config_get_bool("app.enabled", &enabled, false));
     EXPECT_EQ(CONFIG_OK, config_get_str("app.name", name, sizeof(name)));
-    
+
     EXPECT_EQ(5000, timeout);
     EXPECT_TRUE(enabled);
     EXPECT_STREQ("MyApp", name);
@@ -229,22 +241,33 @@ TEST_F(ConfigDefaultTest, RegisterDefaultsNullArray) {
 
 TEST_F(ConfigDefaultTest, RegisterDefaultsZeroCount) {
     const config_default_t defaults[] = {
-        { .key = "test", .type = CONFIG_TYPE_I32, .value = { .i32_val = 42 } },
+        {.key = "test", .type = CONFIG_TYPE_I32, .value = {.i32_val = 42}},
     };
-    
-    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_register_defaults(defaults, 0));
+
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM,
+              config_register_defaults(defaults, 0));
 }
 
 TEST_F(ConfigDefaultTest, RegisterDefaultsAllTypes) {
     const config_default_t defaults[] = {
-        { .key = "type.i32", .type = CONFIG_TYPE_I32, .value = { .i32_val = -123 } },
-        { .key = "type.u32", .type = CONFIG_TYPE_U32, .value = { .u32_val = 456 } },
-        { .key = "type.i64", .type = CONFIG_TYPE_I64, .value = { .i64_val = 789012345678LL } },
-        { .key = "type.float", .type = CONFIG_TYPE_FLOAT, .value = { .float_val = 3.14f } },
-        { .key = "type.bool", .type = CONFIG_TYPE_BOOL, .value = { .bool_val = true } },
-        { .key = "type.str", .type = CONFIG_TYPE_STRING, .value = { .str_val = "test" } },
+        {.key = "type.i32",
+         .type = CONFIG_TYPE_I32,
+         .value = {.i32_val = -123}},
+        {.key = "type.u32", .type = CONFIG_TYPE_U32, .value = {.u32_val = 456}},
+        {.key = "type.i64",
+         .type = CONFIG_TYPE_I64,
+         .value = {.i64_val = 789012345678LL}},
+        {.key = "type.float",
+         .type = CONFIG_TYPE_FLOAT,
+         .value = {.float_val = 3.14f}},
+        {.key = "type.bool",
+         .type = CONFIG_TYPE_BOOL,
+         .value = {.bool_val = true}},
+        {.key = "type.str",
+         .type = CONFIG_TYPE_STRING,
+         .value = {.str_val = "test"}},
     };
-    
+
     EXPECT_EQ(CONFIG_OK, config_register_defaults(defaults, 6));
 }
 
@@ -254,13 +277,13 @@ TEST_F(ConfigDefaultTest, RegisterDefaultsAllTypes) {
 
 TEST_F(ConfigDefaultTest, OverwriteDefault) {
     int32_t value = 0;
-    
+
     /* Register initial default */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.overwrite", 100));
-    
+
     /* Overwrite with new default */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.overwrite", 200));
-    
+
     /* Reset to default should use the new value */
     EXPECT_EQ(CONFIG_OK, config_reset_to_default("test.overwrite"));
     EXPECT_EQ(CONFIG_OK, config_get_i32("test.overwrite", &value, 0));
@@ -288,9 +311,9 @@ TEST_F(ConfigDefaultTest, ResetAllNotInitialized) {
 
 TEST_F(ConfigDefaultTest, RegisterDefaultsNotInitialized) {
     const config_default_t defaults[] = {
-        { .key = "test", .type = CONFIG_TYPE_I32, .value = { .i32_val = 42 } },
+        {.key = "test", .type = CONFIG_TYPE_I32, .value = {.i32_val = 42}},
     };
-    
+
     EXPECT_EQ(CONFIG_OK, config_deinit());
     EXPECT_EQ(CONFIG_ERROR_NOT_INIT, config_register_defaults(defaults, 1));
 }
@@ -302,11 +325,11 @@ TEST_F(ConfigDefaultTest, RegisterDefaultsNotInitialized) {
 TEST_F(ConfigDefaultTest, DefaultsClearedOnDeinit) {
     /* Register a default */
     EXPECT_EQ(CONFIG_OK, config_set_default_i32("test.clear", 42));
-    
+
     /* Deinit and reinit */
     EXPECT_EQ(CONFIG_OK, config_deinit());
     EXPECT_EQ(CONFIG_OK, config_init(NULL));
-    
+
     /* Default should no longer exist */
     EXPECT_EQ(CONFIG_ERROR_NOT_FOUND, config_reset_to_default("test.clear"));
 }

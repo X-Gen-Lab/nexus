@@ -8,8 +8,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * \details         Implements default value management functionality including
- *                  registering defaults, fallback to defaults, and reset operations.
- *                  Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
+ *                  registering defaults, fallback to defaults, and reset
+ * operations. Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
  */
 
 #include "config/config.h"
@@ -24,11 +24,11 @@
  * \brief           Internal default value entry structure
  */
 typedef struct {
-    char key[CONFIG_MAX_MAX_KEY_LEN];   /**< Key name */
-    config_type_t type;                  /**< Value type */
-    uint16_t value_size;                 /**< Size of stored value */
+    char key[CONFIG_MAX_MAX_KEY_LEN];         /**< Key name */
+    config_type_t type;                       /**< Value type */
+    uint16_t value_size;                      /**< Size of stored value */
     uint8_t value[CONFIG_MAX_MAX_VALUE_SIZE]; /**< Value storage */
-    bool in_use;                         /**< Entry is in use */
+    bool in_use;                              /**< Entry is in use */
 } config_default_entry_t;
 
 /*---------------------------------------------------------------------------*/
@@ -57,8 +57,7 @@ static bool g_defaults_initialized = false;
 /**
  * \brief           Initialize defaults storage (called from config_init)
  */
-static void
-config_default_init_storage(void) {
+static void config_default_init_storage(void) {
     if (!g_defaults_initialized) {
         memset(g_defaults, 0, sizeof(g_defaults));
         g_default_count = 0;
@@ -71,8 +70,7 @@ config_default_init_storage(void) {
  * \param[in]       key: Key to find
  * \return          Pointer to entry if found, NULL otherwise
  */
-static config_default_entry_t*
-config_default_find_entry(const char* key) {
+static config_default_entry_t* config_default_find_entry(const char* key) {
     if (key == NULL) {
         return NULL;
     }
@@ -90,8 +88,7 @@ config_default_find_entry(const char* key) {
  * \brief           Find free default entry slot
  * \return          Pointer to free entry if available, NULL otherwise
  */
-static config_default_entry_t*
-config_default_find_free_entry(void) {
+static config_default_entry_t* config_default_find_free_entry(void) {
     for (size_t i = 0; i < CONFIG_DEFAULT_MAX_DEFAULTS; ++i) {
         if (!g_defaults[i].in_use) {
             return &g_defaults[i];
@@ -108,8 +105,8 @@ config_default_find_free_entry(void) {
  * \param[in]       size: Value size
  * \return          CONFIG_OK on success, error code otherwise
  */
-static config_status_t
-config_default_store(const char* key, config_type_t type, const void* value, size_t size) {
+static config_status_t config_default_store(const char* key, config_type_t type,
+                                            const void* value, size_t size) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -133,7 +130,7 @@ config_default_store(const char* key, config_type_t type, const void* value, siz
 
     /* Find existing entry or allocate new one */
     config_default_entry_t* entry = config_default_find_entry(key);
-    
+
     if (entry == NULL) {
         /* Allocate new entry */
         entry = config_default_find_free_entry();
@@ -145,9 +142,9 @@ config_default_store(const char* key, config_type_t type, const void* value, siz
 
     /* Store the default value */
     memset(entry->key, 0, sizeof(entry->key));
-    size_t copy_len = key_len < (CONFIG_MAX_MAX_KEY_LEN - 1) 
-                      ? key_len 
-                      : (CONFIG_MAX_MAX_KEY_LEN - 1);
+    size_t copy_len = key_len < (CONFIG_MAX_MAX_KEY_LEN - 1)
+                          ? key_len
+                          : (CONFIG_MAX_MAX_KEY_LEN - 1);
     memcpy(entry->key, key, copy_len);
     entry->key[copy_len] = '\0';
     entry->type = type;
@@ -162,13 +159,11 @@ config_default_store(const char* key, config_type_t type, const void* value, siz
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-config_status_t
-config_set_default_i32(const char* key, int32_t value) {
+config_status_t config_set_default_i32(const char* key, int32_t value) {
     return config_default_store(key, CONFIG_TYPE_I32, &value, sizeof(int32_t));
 }
 
-config_status_t
-config_set_default_str(const char* key, const char* value) {
+config_status_t config_set_default_str(const char* key, const char* value) {
     if (value == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -176,28 +171,23 @@ config_set_default_str(const char* key, const char* value) {
     return config_default_store(key, CONFIG_TYPE_STRING, value, len);
 }
 
-config_status_t
-config_set_default_u32(const char* key, uint32_t value) {
+config_status_t config_set_default_u32(const char* key, uint32_t value) {
     return config_default_store(key, CONFIG_TYPE_U32, &value, sizeof(uint32_t));
 }
 
-config_status_t
-config_set_default_i64(const char* key, int64_t value) {
+config_status_t config_set_default_i64(const char* key, int64_t value) {
     return config_default_store(key, CONFIG_TYPE_I64, &value, sizeof(int64_t));
 }
 
-config_status_t
-config_set_default_float(const char* key, float value) {
+config_status_t config_set_default_float(const char* key, float value) {
     return config_default_store(key, CONFIG_TYPE_FLOAT, &value, sizeof(float));
 }
 
-config_status_t
-config_set_default_bool(const char* key, bool value) {
+config_status_t config_set_default_bool(const char* key, bool value) {
     return config_default_store(key, CONFIG_TYPE_BOOL, &value, sizeof(bool));
 }
 
-config_status_t
-config_reset_to_default(const char* key) {
+config_status_t config_reset_to_default(const char* key) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -214,7 +204,8 @@ config_reset_to_default(const char* key) {
 
     /* Delete current value if exists */
     bool exists = false;
-    config_status_t status = config_store_exists(key, CONFIG_DEFAULT_NAMESPACE_ID, &exists);
+    config_status_t status =
+        config_store_exists(key, CONFIG_DEFAULT_NAMESPACE_ID, &exists);
     if (status != CONFIG_OK) {
         return status;
     }
@@ -231,8 +222,7 @@ config_reset_to_default(const char* key) {
                             CONFIG_FLAG_NONE, CONFIG_DEFAULT_NAMESPACE_ID);
 }
 
-config_status_t
-config_reset_all_to_defaults(void) {
+config_status_t config_reset_all_to_defaults(void) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -250,8 +240,8 @@ config_reset_all_to_defaults(void) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_register_defaults(const config_default_t* defaults, size_t count) {
+config_status_t config_register_defaults(const config_default_t* defaults,
+                                         size_t count) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -278,7 +268,8 @@ config_register_defaults(const config_default_t* defaults, size_t count) {
                 status = config_set_default_i64(def->key, def->value.i64_val);
                 break;
             case CONFIG_TYPE_FLOAT:
-                status = config_set_default_float(def->key, def->value.float_val);
+                status =
+                    config_set_default_float(def->key, def->value.float_val);
                 break;
             case CONFIG_TYPE_BOOL:
                 status = config_set_default_bool(def->key, def->value.bool_val);
@@ -307,8 +298,8 @@ config_register_defaults(const config_default_t* defaults, size_t count) {
  * \param[in,out]   size: Input: buffer size, Output: actual size
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_get_default(const char* key, config_type_t* type, void* value, size_t* size) {
+config_status_t config_get_default(const char* key, config_type_t* type,
+                                   void* value, size_t* size) {
     if (key == NULL || size == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -342,8 +333,7 @@ config_get_default(const char* key, config_type_t* type, void* value, size_t* si
  * \param[out]      exists: Pointer to store result
  * \return          CONFIG_OK on success, error code otherwise
  */
-config_status_t
-config_has_default(const char* key, bool* exists) {
+config_status_t config_has_default(const char* key, bool* exists) {
     if (key == NULL || exists == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -357,8 +347,7 @@ config_has_default(const char* key, bool* exists) {
 /**
  * \brief           Clear all registered defaults (called from config_deinit)
  */
-void
-config_default_clear_all(void) {
+void config_default_clear_all(void) {
     memset(g_defaults, 0, sizeof(g_defaults));
     g_default_count = 0;
     g_defaults_initialized = false;
