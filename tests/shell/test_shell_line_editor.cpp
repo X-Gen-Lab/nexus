@@ -11,8 +11,8 @@
  * Requirements: 4.1-4.15
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "shell/shell_line_editor.h"
@@ -22,7 +22,7 @@ extern "C" {
  * \brief           Line Editor Test Fixture
  */
 class LineEditorTest : public ::testing::Test {
-protected:
+  protected:
     line_editor_t editor;
     char buffer[128];
 
@@ -78,7 +78,7 @@ TEST_F(LineEditorTest, InsertMultipleChars) {
     line_editor_insert_char(&editor, 'l');
     line_editor_insert_char(&editor, 'l');
     line_editor_insert_char(&editor, 'o');
-    
+
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
     EXPECT_EQ(5, editor.cursor);
@@ -90,14 +90,14 @@ TEST_F(LineEditorTest, InsertAtMiddle) {
     line_editor_insert_char(&editor, 'l');
     line_editor_insert_char(&editor, 'l');
     line_editor_insert_char(&editor, 'o');
-    
+
     /* Move cursor back 3 positions */
     line_editor_move_cursor(&editor, -3);
     EXPECT_EQ(1, editor.cursor);
-    
+
     /* Insert 'e' at position 1 */
     line_editor_insert_char(&editor, 'e');
-    
+
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
     EXPECT_EQ(2, editor.cursor);
@@ -107,12 +107,12 @@ TEST_F(LineEditorTest, InsertWhenBufferFull) {
     char small_buffer[4];
     line_editor_t small_editor;
     line_editor_init(&small_editor, small_buffer, sizeof(small_buffer));
-    
+
     /* Fill buffer (3 chars + null terminator) */
     EXPECT_TRUE(line_editor_insert_char(&small_editor, 'a'));
     EXPECT_TRUE(line_editor_insert_char(&small_editor, 'b'));
     EXPECT_TRUE(line_editor_insert_char(&small_editor, 'c'));
-    
+
     /* Buffer should be full now */
     EXPECT_FALSE(line_editor_insert_char(&small_editor, 'd'));
     EXPECT_STREQ("abc", small_buffer);
@@ -122,14 +122,13 @@ TEST_F(LineEditorTest, InsertWithNullEditor) {
     EXPECT_FALSE(line_editor_insert_char(nullptr, 'a'));
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Backspace Tests - Requirements 4.2                                        */
 /*---------------------------------------------------------------------------*/
 
 TEST_F(LineEditorTest, BackspaceAtEnd) {
     line_editor_set_content(&editor, "hello");
-    
+
     EXPECT_TRUE(line_editor_backspace(&editor));
     EXPECT_STREQ("hell", buffer);
     EXPECT_EQ(4, editor.length);
@@ -138,8 +137,8 @@ TEST_F(LineEditorTest, BackspaceAtEnd) {
 
 TEST_F(LineEditorTest, BackspaceAtMiddle) {
     line_editor_set_content(&editor, "hello");
-    line_editor_move_cursor(&editor, -2);  /* cursor at 'l' */
-    
+    line_editor_move_cursor(&editor, -2); /* cursor at 'l' */
+
     EXPECT_TRUE(line_editor_backspace(&editor));
     EXPECT_STREQ("helo", buffer);
     EXPECT_EQ(4, editor.length);
@@ -149,7 +148,7 @@ TEST_F(LineEditorTest, BackspaceAtMiddle) {
 TEST_F(LineEditorTest, BackspaceAtStart) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_to_start(&editor);
-    
+
     EXPECT_FALSE(line_editor_backspace(&editor));
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
@@ -172,7 +171,7 @@ TEST_F(LineEditorTest, BackspaceWithNullEditor) {
 TEST_F(LineEditorTest, DeleteAtStart) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_to_start(&editor);
-    
+
     EXPECT_TRUE(line_editor_delete_char(&editor));
     EXPECT_STREQ("ello", buffer);
     EXPECT_EQ(4, editor.length);
@@ -181,8 +180,8 @@ TEST_F(LineEditorTest, DeleteAtStart) {
 
 TEST_F(LineEditorTest, DeleteAtMiddle) {
     line_editor_set_content(&editor, "hello");
-    line_editor_move_cursor(&editor, -3);  /* cursor at second 'l' */
-    
+    line_editor_move_cursor(&editor, -3); /* cursor at second 'l' */
+
     EXPECT_TRUE(line_editor_delete_char(&editor));
     EXPECT_STREQ("helo", buffer);
     EXPECT_EQ(4, editor.length);
@@ -191,7 +190,7 @@ TEST_F(LineEditorTest, DeleteAtMiddle) {
 
 TEST_F(LineEditorTest, DeleteAtEnd) {
     line_editor_set_content(&editor, "hello");
-    
+
     EXPECT_FALSE(line_editor_delete_char(&editor));
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
@@ -207,10 +206,10 @@ TEST_F(LineEditorTest, DeleteWithNullEditor) {
 
 TEST_F(LineEditorTest, MoveCursorLeft) {
     line_editor_set_content(&editor, "hello");
-    
+
     line_editor_move_cursor(&editor, -1);
     EXPECT_EQ(4, editor.cursor);
-    
+
     line_editor_move_cursor(&editor, -2);
     EXPECT_EQ(2, editor.cursor);
 }
@@ -218,10 +217,10 @@ TEST_F(LineEditorTest, MoveCursorLeft) {
 TEST_F(LineEditorTest, MoveCursorRight) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_to_start(&editor);
-    
+
     line_editor_move_cursor(&editor, 1);
     EXPECT_EQ(1, editor.cursor);
-    
+
     line_editor_move_cursor(&editor, 2);
     EXPECT_EQ(3, editor.cursor);
 }
@@ -229,14 +228,14 @@ TEST_F(LineEditorTest, MoveCursorRight) {
 TEST_F(LineEditorTest, MoveCursorBeyondStart) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_cursor(&editor, -10);
-    
+
     EXPECT_EQ(0, editor.cursor);
 }
 
 TEST_F(LineEditorTest, MoveCursorBeyondEnd) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_cursor(&editor, 10);
-    
+
     EXPECT_EQ(5, editor.cursor);
 }
 
@@ -251,7 +250,7 @@ TEST_F(LineEditorTest, MoveCursorWithNullEditor) {
 
 TEST_F(LineEditorTest, MoveToStart) {
     line_editor_set_content(&editor, "hello world");
-    
+
     line_editor_move_to_start(&editor);
     EXPECT_EQ(0, editor.cursor);
 }
@@ -259,7 +258,7 @@ TEST_F(LineEditorTest, MoveToStart) {
 TEST_F(LineEditorTest, MoveToEnd) {
     line_editor_set_content(&editor, "hello world");
     line_editor_move_to_start(&editor);
-    
+
     line_editor_move_to_end(&editor);
     EXPECT_EQ(11, editor.cursor);
 }
@@ -280,8 +279,8 @@ TEST_F(LineEditorTest, MoveToEndWithNullEditor) {
 
 TEST_F(LineEditorTest, DeleteToEndFromMiddle) {
     line_editor_set_content(&editor, "hello world");
-    line_editor_move_cursor(&editor, -6);  /* cursor at 'w' */
-    
+    line_editor_move_cursor(&editor, -6); /* cursor at 'w' */
+
     line_editor_delete_to_end(&editor);
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
@@ -291,7 +290,7 @@ TEST_F(LineEditorTest, DeleteToEndFromMiddle) {
 TEST_F(LineEditorTest, DeleteToEndFromStart) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_to_start(&editor);
-    
+
     line_editor_delete_to_end(&editor);
     EXPECT_STREQ("", buffer);
     EXPECT_EQ(0, editor.length);
@@ -300,7 +299,7 @@ TEST_F(LineEditorTest, DeleteToEndFromStart) {
 
 TEST_F(LineEditorTest, DeleteToEndAtEnd) {
     line_editor_set_content(&editor, "hello");
-    
+
     line_editor_delete_to_end(&editor);
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
@@ -317,17 +316,17 @@ TEST_F(LineEditorTest, DeleteToEndWithNullEditor) {
 
 TEST_F(LineEditorTest, DeleteToStartFromMiddle) {
     line_editor_set_content(&editor, "hello world");
-    line_editor_move_cursor(&editor, -6);  /* cursor at ' ' before 'w' */
-    
+    line_editor_move_cursor(&editor, -6); /* cursor at ' ' before 'w' */
+
     line_editor_delete_to_start(&editor);
-    EXPECT_STREQ(" world", buffer);  /* Space before 'world' remains */
+    EXPECT_STREQ(" world", buffer); /* Space before 'world' remains */
     EXPECT_EQ(6, editor.length);
     EXPECT_EQ(0, editor.cursor);
 }
 
 TEST_F(LineEditorTest, DeleteToStartFromEnd) {
     line_editor_set_content(&editor, "hello");
-    
+
     line_editor_delete_to_start(&editor);
     EXPECT_STREQ("", buffer);
     EXPECT_EQ(0, editor.length);
@@ -337,7 +336,7 @@ TEST_F(LineEditorTest, DeleteToStartFromEnd) {
 TEST_F(LineEditorTest, DeleteToStartAtStart) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_to_start(&editor);
-    
+
     line_editor_delete_to_start(&editor);
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
@@ -355,7 +354,7 @@ TEST_F(LineEditorTest, DeleteToStartWithNullEditor) {
 
 TEST_F(LineEditorTest, DeleteWordAtEnd) {
     line_editor_set_content(&editor, "hello world");
-    
+
     line_editor_delete_word(&editor);
     EXPECT_STREQ("hello ", buffer);
     EXPECT_EQ(6, editor.length);
@@ -364,7 +363,7 @@ TEST_F(LineEditorTest, DeleteWordAtEnd) {
 
 TEST_F(LineEditorTest, DeleteWordWithTrailingSpaces) {
     line_editor_set_content(&editor, "hello world   ");
-    
+
     line_editor_delete_word(&editor);
     EXPECT_STREQ("hello ", buffer);
     EXPECT_EQ(6, editor.length);
@@ -372,17 +371,19 @@ TEST_F(LineEditorTest, DeleteWordWithTrailingSpaces) {
 
 TEST_F(LineEditorTest, DeleteWordAtMiddle) {
     line_editor_set_content(&editor, "hello world test");
-    line_editor_move_cursor(&editor, -5);  /* cursor at ' ' before 'test' */
-    
+    line_editor_move_cursor(&editor, -5); /* cursor at ' ' before 'test' */
+
     line_editor_delete_word(&editor);
-    EXPECT_STREQ("hello  test", buffer);  /* Two spaces: one before 'world' and one before 'test' */
+    EXPECT_STREQ(
+        "hello  test",
+        buffer); /* Two spaces: one before 'world' and one before 'test' */
     EXPECT_EQ(11, editor.length);
 }
 
 TEST_F(LineEditorTest, DeleteWordAtStart) {
     line_editor_set_content(&editor, "hello");
     line_editor_move_to_start(&editor);
-    
+
     line_editor_delete_word(&editor);
     EXPECT_STREQ("hello", buffer);
     EXPECT_EQ(5, editor.length);
@@ -391,7 +392,7 @@ TEST_F(LineEditorTest, DeleteWordAtStart) {
 
 TEST_F(LineEditorTest, DeleteWordSingleWord) {
     line_editor_set_content(&editor, "hello");
-    
+
     line_editor_delete_word(&editor);
     EXPECT_STREQ("", buffer);
     EXPECT_EQ(0, editor.length);
@@ -408,7 +409,7 @@ TEST_F(LineEditorTest, DeleteWordWithNullEditor) {
 
 TEST_F(LineEditorTest, ClearBuffer) {
     line_editor_set_content(&editor, "hello world");
-    
+
     line_editor_clear(&editor);
     EXPECT_STREQ("", buffer);
     EXPECT_EQ(0, editor.length);
@@ -481,9 +482,9 @@ TEST_F(LineEditorTest, SetContentTruncation) {
     char small_buffer[8];
     line_editor_t small_editor;
     line_editor_init(&small_editor, small_buffer, sizeof(small_buffer));
-    
+
     line_editor_set_content(&small_editor, "hello world");
-    EXPECT_EQ(7, small_editor.length);  /* Truncated to fit */
+    EXPECT_EQ(7, small_editor.length); /* Truncated to fit */
     EXPECT_STREQ("hello w", small_buffer);
 }
 

@@ -20,8 +20,8 @@
 /* Local definitions                                                          */
 /*===========================================================================*/
 
-#define MAX_UART_INSTANCES      4
-#define UART_BUFFER_SIZE        256
+#define MAX_UART_INSTANCES 4
+#define UART_BUFFER_SIZE   256
 
 /**
  * \brief           Ring buffer structure
@@ -58,8 +58,7 @@ static uart_state_t uart_state[MAX_UART_INSTANCES];
  * \brief           Initialize ring buffer
  * \param[in]       rb: Pointer to ring buffer
  */
-static void ring_buffer_init(ring_buffer_t* rb)
-{
+static void ring_buffer_init(ring_buffer_t* rb) {
     rb->head = 0;
     rb->tail = 0;
     rb->count = 0;
@@ -71,8 +70,7 @@ static void ring_buffer_init(ring_buffer_t* rb)
  * \param[in]       rb: Pointer to ring buffer
  * \return          true if empty, false otherwise
  */
-static bool ring_buffer_is_empty(const ring_buffer_t* rb)
-{
+static bool ring_buffer_is_empty(const ring_buffer_t* rb) {
     return rb->count == 0;
 }
 
@@ -81,8 +79,7 @@ static bool ring_buffer_is_empty(const ring_buffer_t* rb)
  * \param[in]       rb: Pointer to ring buffer
  * \return          true if full, false otherwise
  */
-static bool ring_buffer_is_full(const ring_buffer_t* rb)
-{
+static bool ring_buffer_is_full(const ring_buffer_t* rb) {
     return rb->count >= UART_BUFFER_SIZE;
 }
 
@@ -92,8 +89,7 @@ static bool ring_buffer_is_full(const ring_buffer_t* rb)
  * \param[in]       byte: Byte to put
  * \return          true on success, false if buffer full
  */
-static bool ring_buffer_put(ring_buffer_t* rb, uint8_t byte)
-{
+static bool ring_buffer_put(ring_buffer_t* rb, uint8_t byte) {
     if (ring_buffer_is_full(rb)) {
         return false;
     }
@@ -109,8 +105,7 @@ static bool ring_buffer_put(ring_buffer_t* rb, uint8_t byte)
  * \param[out]      byte: Pointer to store byte
  * \return          true on success, false if buffer empty
  */
-static bool ring_buffer_get(ring_buffer_t* rb, uint8_t* byte)
-{
+static bool ring_buffer_get(ring_buffer_t* rb, uint8_t* byte) {
     if (ring_buffer_is_empty(rb)) {
         return false;
     }
@@ -128,8 +123,7 @@ static bool ring_buffer_get(ring_buffer_t* rb, uint8_t* byte)
  * This simulates the baudrate calculation that would happen on real hardware.
  * The actual baudrate is calculated to be within 2% of the requested value.
  */
-static uint32_t calculate_actual_baudrate(uint32_t requested)
-{
+static uint32_t calculate_actual_baudrate(uint32_t requested) {
     /* Simulate a typical MCU clock divider calculation */
     /* For simulation, we return the exact requested baudrate */
     /* In real hardware, there would be some error due to clock division */
@@ -140,23 +134,18 @@ static uint32_t calculate_actual_baudrate(uint32_t requested)
 /* Public functions - Test helpers                                            */
 /*===========================================================================*/
 
-void native_uart_reset_all(void)
-{
+void native_uart_reset_all(void) {
     memset(uart_state, 0, sizeof(uart_state));
 }
 
-native_uart_state_t* native_uart_get_state(int instance)
-{
+native_uart_state_t* native_uart_get_state(int instance) {
     if (instance < 0 || instance >= MAX_UART_INSTANCES) {
         return NULL;
     }
     return (native_uart_state_t*)&uart_state[instance];
 }
 
-bool native_uart_inject_rx_data(int instance,
-                                const uint8_t* data,
-                                size_t len)
-{
+bool native_uart_inject_rx_data(int instance, const uint8_t* data, size_t len) {
     if (instance < 0 || instance >= MAX_UART_INSTANCES || data == NULL) {
         return false;
     }
@@ -166,21 +155,19 @@ bool native_uart_inject_rx_data(int instance,
 
     for (size_t i = 0; i < len; i++) {
         if (!ring_buffer_put(&uart_state[instance].rx_buffer, data[i])) {
-            return false;  /* Buffer full */
+            return false; /* Buffer full */
         }
         /* Invoke callback if registered */
         if (uart_state[instance].rx_callback != NULL) {
-            uart_state[instance].rx_callback((hal_uart_instance_t)instance, data[i],
+            uart_state[instance].rx_callback((hal_uart_instance_t)instance,
+                                             data[i],
                                              uart_state[instance].rx_context);
         }
     }
     return true;
 }
 
-size_t native_uart_get_tx_data(int instance,
-                               uint8_t* data,
-                               size_t max_len)
-{
+size_t native_uart_get_tx_data(int instance, uint8_t* data, size_t max_len) {
     if (instance < 0 || instance >= MAX_UART_INSTANCES || data == NULL) {
         return 0;
     }
@@ -199,8 +186,7 @@ size_t native_uart_get_tx_data(int instance,
     return count;
 }
 
-uint32_t native_uart_get_actual_baudrate(int instance)
-{
+uint32_t native_uart_get_actual_baudrate(int instance) {
     if (instance < 0 || instance >= MAX_UART_INSTANCES) {
         return 0;
     }
@@ -215,8 +201,7 @@ uint32_t native_uart_get_actual_baudrate(int instance)
 /*===========================================================================*/
 
 hal_status_t hal_uart_init(hal_uart_instance_t instance,
-                           const hal_uart_config_t* config)
-{
+                           const hal_uart_config_t* config) {
     if (instance >= MAX_UART_INSTANCES) {
         return HAL_ERROR_INVALID_PARAM;
     }
@@ -244,8 +229,7 @@ hal_status_t hal_uart_init(hal_uart_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_uart_deinit(hal_uart_instance_t instance)
-{
+hal_status_t hal_uart_deinit(hal_uart_instance_t instance) {
     if (instance >= MAX_UART_INSTANCES) {
         return HAL_ERROR_INVALID_PARAM;
     }
@@ -261,11 +245,9 @@ hal_status_t hal_uart_deinit(hal_uart_instance_t instance)
 }
 
 hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
-                               const uint8_t* data,
-                               size_t len,
-                               uint32_t timeout_ms)
-{
-    (void)timeout_ms;  /* Timeout not used in native simulation */
+                               const uint8_t* data, size_t len,
+                               uint32_t timeout_ms) {
+    (void)timeout_ms; /* Timeout not used in native simulation */
 
     if (instance >= MAX_UART_INSTANCES) {
         return HAL_ERROR_INVALID_PARAM;
@@ -282,7 +264,7 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
     /* Put data into TX buffer */
     for (size_t i = 0; i < len; i++) {
         if (!ring_buffer_put(&state->tx_buffer, data[i])) {
-            return HAL_ERROR_OVERRUN;  /* Buffer full */
+            return HAL_ERROR_OVERRUN; /* Buffer full */
         }
     }
 
@@ -294,12 +276,9 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_uart_receive(hal_uart_instance_t instance,
-                              uint8_t* data,
-                              size_t len,
-                              uint32_t timeout_ms)
-{
-    (void)timeout_ms;  /* Timeout not used in native simulation */
+hal_status_t hal_uart_receive(hal_uart_instance_t instance, uint8_t* data,
+                              size_t len, uint32_t timeout_ms) {
+    (void)timeout_ms; /* Timeout not used in native simulation */
 
     if (instance >= MAX_UART_INSTANCES) {
         return HAL_ERROR_INVALID_PARAM;
@@ -316,29 +295,25 @@ hal_status_t hal_uart_receive(hal_uart_instance_t instance,
     /* Get data from RX buffer */
     for (size_t i = 0; i < len; i++) {
         if (!ring_buffer_get(&state->rx_buffer, &data[i])) {
-            return HAL_ERROR_TIMEOUT;  /* No data available */
+            return HAL_ERROR_TIMEOUT; /* No data available */
         }
     }
 
     return HAL_OK;
 }
 
-hal_status_t hal_uart_putc(hal_uart_instance_t instance, uint8_t byte)
-{
+hal_status_t hal_uart_putc(hal_uart_instance_t instance, uint8_t byte) {
     return hal_uart_transmit(instance, &byte, 1, HAL_WAIT_FOREVER);
 }
 
-hal_status_t hal_uart_getc(hal_uart_instance_t instance,
-                           uint8_t* byte,
-                           uint32_t timeout_ms)
-{
+hal_status_t hal_uart_getc(hal_uart_instance_t instance, uint8_t* byte,
+                           uint32_t timeout_ms) {
     return hal_uart_receive(instance, byte, 1, timeout_ms);
 }
 
 hal_status_t hal_uart_set_rx_callback(hal_uart_instance_t instance,
                                       hal_uart_rx_callback_t callback,
-                                      void* context)
-{
+                                      void* context) {
     if (instance >= MAX_UART_INSTANCES) {
         return HAL_ERROR_INVALID_PARAM;
     }
@@ -356,8 +331,7 @@ hal_status_t hal_uart_set_rx_callback(hal_uart_instance_t instance,
 
 hal_status_t hal_uart_set_tx_callback(hal_uart_instance_t instance,
                                       hal_uart_tx_callback_t callback,
-                                      void* context)
-{
+                                      void* context) {
     if (instance >= MAX_UART_INSTANCES) {
         return HAL_ERROR_INVALID_PARAM;
     }

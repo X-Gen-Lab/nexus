@@ -11,8 +11,8 @@
  * Requirements: 8.1, 8.2
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 #include <string>
 
 extern "C" {
@@ -23,7 +23,7 @@ extern "C" {
  * \brief           Shell Backend Test Fixture
  */
 class ShellBackendTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         /* Clear any existing backend */
         shell_set_backend(nullptr);
@@ -121,7 +121,7 @@ TEST_F(ShellBackendTest, WriteWithNoBackend) {
 TEST_F(ShellBackendTest, WriteWithBackend) {
     shell_set_backend(&shell_mock_backend);
 
-    uint8_t data[] = {0x41, 0x42, 0x43};  /* "ABC" */
+    uint8_t data[] = {0x41, 0x42, 0x43}; /* "ABC" */
     int result = shell_write(data, sizeof(data));
     EXPECT_EQ(3, result);
 
@@ -216,7 +216,7 @@ TEST_F(ShellBackendTest, PutsWithEmptyString) {
  * \brief           Mock Backend Test Fixture
  */
 class MockBackendTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         shell_mock_backend_init();
     }

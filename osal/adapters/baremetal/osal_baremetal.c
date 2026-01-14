@@ -13,7 +13,8 @@
  *
  *                  Features:
  *                  - Cooperative task scheduling (tasks must yield)
- *                  - Simple mutex implementation (non-blocking in single-thread)
+ *                  - Simple mutex implementation (non-blocking in
+ * single-thread)
  *                  - Counting semaphores
  *                  - FIFO message queues
  *
@@ -29,19 +30,19 @@
 /* Disable MSVC deprecation warnings for standard C functions */
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#pragma warning(disable: 4996)
+#pragma warning(disable : 4996)
 #endif
 
 /*---------------------------------------------------------------------------*/
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_TASKS          8
-#define OSAL_MAX_MUTEXES        8
-#define OSAL_MAX_SEMS           8
-#define OSAL_MAX_QUEUES         4
-#define OSAL_QUEUE_MAX_SIZE     256
-#define OSAL_TASK_NAME_MAX      16
+#define OSAL_MAX_TASKS      8
+#define OSAL_MAX_MUTEXES    8
+#define OSAL_MAX_SEMS       8
+#define OSAL_MAX_QUEUES     4
+#define OSAL_QUEUE_MAX_SIZE 256
+#define OSAL_TASK_NAME_MAX  16
 
 /*---------------------------------------------------------------------------*/
 /* Platform-specific functions                                               */
@@ -49,12 +50,12 @@
 
 /* Weak symbol support for different compilers */
 #if defined(__GNUC__) || defined(__clang__)
-    #define OSAL_WEAK __attribute__((weak))
+#define OSAL_WEAK __attribute__((weak))
 #elif defined(_MSC_VER)
-    /* MSVC doesn't support weak symbols directly */
-    #define OSAL_WEAK
+/* MSVC doesn't support weak symbols directly */
+#define OSAL_WEAK
 #else
-    #define OSAL_WEAK
+#define OSAL_WEAK
 #endif
 
 /**
@@ -62,8 +63,7 @@
  * \param[in]       us: Microseconds to delay
  * \note            This is a weak symbol that can be overridden by platform
  */
-OSAL_WEAK void osal_platform_delay_us(uint32_t us)
-{
+OSAL_WEAK void osal_platform_delay_us(uint32_t us) {
     /* Default busy-wait implementation */
     volatile uint32_t count = us;
     while (count--) {
@@ -82,8 +82,7 @@ OSAL_WEAK void osal_platform_delay_us(uint32_t us)
  * \brief           Platform-specific critical section enter
  * \note            Weak symbol - override for specific MCU
  */
-OSAL_WEAK void osal_platform_enter_critical(void)
-{
+OSAL_WEAK void osal_platform_enter_critical(void) {
 #if defined(__ARM_ARCH) && (defined(__GNUC__) || defined(__clang__))
     __asm volatile("cpsid i" ::: "memory");
 #elif defined(_MSC_VER) && defined(_M_ARM)
@@ -98,8 +97,7 @@ OSAL_WEAK void osal_platform_enter_critical(void)
  * \brief           Platform-specific critical section exit
  * \note            Weak symbol - override for specific MCU
  */
-OSAL_WEAK void osal_platform_exit_critical(void)
-{
+OSAL_WEAK void osal_platform_exit_critical(void) {
 #if defined(__ARM_ARCH) && (defined(__GNUC__) || defined(__clang__))
     __asm volatile("cpsie i" ::: "memory");
 #elif defined(_MSC_VER) && defined(_M_ARM)
@@ -115,8 +113,7 @@ OSAL_WEAK void osal_platform_exit_critical(void)
  * \return          true if in ISR context
  * \note            Weak symbol - override for specific MCU
  */
-OSAL_WEAK bool osal_platform_is_isr(void)
-{
+OSAL_WEAK bool osal_platform_is_isr(void) {
 #if defined(__ARM_ARCH) && (defined(__GNUC__) || defined(__clang__))
     uint32_t ipsr;
     __asm volatile("mrs %0, ipsr" : "=r"(ipsr));
@@ -135,24 +132,24 @@ OSAL_WEAK bool osal_platform_is_isr(void)
  * \brief           Task state enumeration
  */
 typedef enum {
-    TASK_STATE_UNUSED = 0,      /**< Slot not in use */
-    TASK_STATE_READY,           /**< Task ready to run */
-    TASK_STATE_RUNNING,         /**< Task currently running */
-    TASK_STATE_SUSPENDED,       /**< Task suspended */
-    TASK_STATE_BLOCKED,         /**< Task blocked (waiting) */
-    TASK_STATE_DELETED          /**< Task marked for deletion */
+    TASK_STATE_UNUSED = 0, /**< Slot not in use */
+    TASK_STATE_READY,      /**< Task ready to run */
+    TASK_STATE_RUNNING,    /**< Task currently running */
+    TASK_STATE_SUSPENDED,  /**< Task suspended */
+    TASK_STATE_BLOCKED,    /**< Task blocked (waiting) */
+    TASK_STATE_DELETED     /**< Task marked for deletion */
 } task_state_t;
 
 /**
  * \brief           Task control block
  */
 typedef struct {
-    task_state_t        state;                      /**< Task state */
-    char                name[OSAL_TASK_NAME_MAX];   /**< Task name */
-    osal_task_func_t    func;                       /**< Task function */
-    void*               arg;                        /**< Task argument */
-    uint8_t             priority;                   /**< Task priority (0-31) */
-    uint32_t            delay_ticks;                /**< Remaining delay ticks */
+    task_state_t state;            /**< Task state */
+    char name[OSAL_TASK_NAME_MAX]; /**< Task name */
+    osal_task_func_t func;         /**< Task function */
+    void* arg;                     /**< Task argument */
+    uint8_t priority;              /**< Task priority (0-31) */
+    uint32_t delay_ticks;          /**< Remaining delay ticks */
 } osal_task_tcb_t;
 
 /*---------------------------------------------------------------------------*/
@@ -163,10 +160,10 @@ typedef struct {
  * \brief           Mutex control block
  */
 typedef struct {
-    bool                used;           /**< Slot in use flag */
-    bool                locked;         /**< Lock state */
-    osal_task_handle_t  owner;          /**< Owner task handle */
-    uint32_t            lock_count;     /**< Recursive lock count */
+    bool used;                /**< Slot in use flag */
+    bool locked;              /**< Lock state */
+    osal_task_handle_t owner; /**< Owner task handle */
+    uint32_t lock_count;      /**< Recursive lock count */
 } osal_mutex_cb_t;
 
 /*---------------------------------------------------------------------------*/
@@ -177,9 +174,9 @@ typedef struct {
  * \brief           Semaphore control block
  */
 typedef struct {
-    bool                used;           /**< Slot in use flag */
-    uint32_t            count;          /**< Current count */
-    uint32_t            max_count;      /**< Maximum count */
+    bool used;          /**< Slot in use flag */
+    uint32_t count;     /**< Current count */
+    uint32_t max_count; /**< Maximum count */
 } osal_sem_cb_t;
 
 /*---------------------------------------------------------------------------*/
@@ -190,13 +187,13 @@ typedef struct {
  * \brief           Queue control block
  */
 typedef struct {
-    bool                used;           /**< Slot in use flag */
-    uint8_t             buffer[OSAL_QUEUE_MAX_SIZE]; /**< Data buffer */
-    size_t              item_size;      /**< Size of each item */
-    size_t              item_count;     /**< Maximum number of items */
-    size_t              head;           /**< Head index */
-    size_t              tail;           /**< Tail index */
-    size_t              count;          /**< Current item count */
+    bool used;                           /**< Slot in use flag */
+    uint8_t buffer[OSAL_QUEUE_MAX_SIZE]; /**< Data buffer */
+    size_t item_size;                    /**< Size of each item */
+    size_t item_count;                   /**< Maximum number of items */
+    size_t head;                         /**< Head index */
+    size_t tail;                         /**< Tail index */
+    size_t count;                        /**< Current item count */
 } osal_queue_cb_t;
 
 /*---------------------------------------------------------------------------*/
@@ -234,8 +231,7 @@ static volatile uint32_t s_tick_count = 0;
 /* OSAL Core Functions                                                       */
 /*---------------------------------------------------------------------------*/
 
-osal_status_t osal_init(void)
-{
+osal_status_t osal_init(void) {
     if (s_osal_initialized) {
         return OSAL_OK;
     }
@@ -261,8 +257,7 @@ osal_status_t osal_init(void)
  *                  so tasks must call osal_task_yield() or osal_task_delay()
  *                  to allow other tasks to run.
  */
-static void scheduler_run(void)
-{
+static void scheduler_run(void) {
     while (s_osal_running) {
         bool task_ran = false;
 
@@ -297,7 +292,7 @@ static void scheduler_run(void)
         /* Update delay counters */
         s_tick_count++;
         for (int i = 0; i < OSAL_MAX_TASKS; i++) {
-            if (s_tasks[i].state == TASK_STATE_BLOCKED && 
+            if (s_tasks[i].state == TASK_STATE_BLOCKED &&
                 s_tasks[i].delay_ticks > 0) {
                 s_tasks[i].delay_ticks--;
                 if (s_tasks[i].delay_ticks == 0) {
@@ -308,8 +303,7 @@ static void scheduler_run(void)
     }
 }
 
-void osal_start(void)
-{
+void osal_start(void) {
     if (!s_osal_initialized) {
         osal_init();
     }
@@ -318,19 +312,16 @@ void osal_start(void)
     scheduler_run();
 }
 
-bool osal_is_running(void)
-{
+bool osal_is_running(void) {
     return s_osal_running;
 }
 
-void osal_enter_critical(void)
-{
+void osal_enter_critical(void) {
     osal_platform_enter_critical();
     s_critical_nesting++;
 }
 
-void osal_exit_critical(void)
-{
+void osal_exit_critical(void) {
     if (s_critical_nesting > 0) {
         s_critical_nesting--;
         if (s_critical_nesting == 0) {
@@ -339,8 +330,7 @@ void osal_exit_critical(void)
     }
 }
 
-bool osal_is_isr(void)
-{
+bool osal_is_isr(void) {
     return osal_platform_is_isr();
 }
 
@@ -349,8 +339,7 @@ bool osal_is_isr(void)
 /*---------------------------------------------------------------------------*/
 
 osal_status_t osal_task_create(const osal_task_config_t* config,
-                               osal_task_handle_t* handle)
-{
+                               osal_task_handle_t* handle) {
     if (config == NULL || handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -408,8 +397,7 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     return OSAL_OK;
 }
 
-osal_status_t osal_task_delete(osal_task_handle_t handle)
-{
+osal_status_t osal_task_delete(osal_task_handle_t handle) {
     osal_task_tcb_t* task;
 
     if (handle == NULL) {
@@ -443,8 +431,7 @@ osal_status_t osal_task_delete(osal_task_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_task_suspend(osal_task_handle_t handle)
-{
+osal_status_t osal_task_suspend(osal_task_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -472,8 +459,7 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_task_resume(osal_task_handle_t handle)
-{
+osal_status_t osal_task_resume(osal_task_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -503,8 +489,7 @@ osal_status_t osal_task_resume(osal_task_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_task_delay(uint32_t ms)
-{
+osal_status_t osal_task_delay(uint32_t ms) {
     if (ms == 0) {
         return OSAL_OK;
     }
@@ -517,23 +502,20 @@ osal_status_t osal_task_delay(uint32_t ms)
     return OSAL_OK;
 }
 
-osal_status_t osal_task_yield(void)
-{
+osal_status_t osal_task_yield(void) {
     /* In cooperative scheduling, yield does nothing special */
     /* The scheduler will pick the next task when current task returns */
     return OSAL_OK;
 }
 
-osal_task_handle_t osal_task_get_current(void)
-{
+osal_task_handle_t osal_task_get_current(void) {
     if (s_current_task >= 0 && s_current_task < OSAL_MAX_TASKS) {
         return (osal_task_handle_t)&s_tasks[s_current_task];
     }
     return NULL;
 }
 
-const char* osal_task_get_name(osal_task_handle_t handle)
-{
+const char* osal_task_get_name(osal_task_handle_t handle) {
     if (handle == NULL) {
         return "main";
     }
@@ -554,8 +536,7 @@ const char* osal_task_get_name(osal_task_handle_t handle)
 /* Mutex Functions                                                           */
 /*---------------------------------------------------------------------------*/
 
-osal_status_t osal_mutex_create(osal_mutex_handle_t* handle)
-{
+osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -594,8 +575,7 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_mutex_delete(osal_mutex_handle_t handle)
-{
+osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -625,8 +605,7 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms)
-{
+osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -698,8 +677,7 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms)
     return OSAL_ERROR_TIMEOUT;
 }
 
-osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle)
-{
+osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -746,10 +724,8 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle)
 /* Semaphore Functions                                                       */
 /*---------------------------------------------------------------------------*/
 
-osal_status_t osal_sem_create(uint32_t initial_count,
-                              uint32_t max_count,
-                              osal_sem_handle_t* handle)
-{
+osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
+                              osal_sem_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -792,20 +768,16 @@ osal_status_t osal_sem_create(uint32_t initial_count,
 }
 
 osal_status_t osal_sem_create_binary(uint32_t initial,
-                                     osal_sem_handle_t* handle)
-{
+                                     osal_sem_handle_t* handle) {
     return osal_sem_create(initial ? 1 : 0, 1, handle);
 }
 
-osal_status_t osal_sem_create_counting(uint32_t max_count,
-                                       uint32_t initial,
-                                       osal_sem_handle_t* handle)
-{
+osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
+                                       osal_sem_handle_t* handle) {
     return osal_sem_create(initial, max_count, handle);
 }
 
-osal_status_t osal_sem_delete(osal_sem_handle_t handle)
-{
+osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -834,8 +806,7 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms)
-{
+osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -893,8 +864,7 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms)
     return OSAL_ERROR_TIMEOUT;
 }
 
-osal_status_t osal_sem_give(osal_sem_handle_t handle)
-{
+osal_status_t osal_sem_give(osal_sem_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -924,8 +894,7 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle)
-{
+osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
     /* Same as osal_sem_give for baremetal */
     return osal_sem_give(handle);
 }
@@ -934,10 +903,8 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle)
 /* Queue Functions                                                           */
 /*---------------------------------------------------------------------------*/
 
-osal_status_t osal_queue_create(size_t item_size,
-                                size_t item_count,
-                                osal_queue_handle_t* handle)
-{
+osal_status_t osal_queue_create(size_t item_size, size_t item_count,
+                                osal_queue_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -987,8 +954,7 @@ osal_status_t osal_queue_create(size_t item_size,
     return OSAL_OK;
 }
 
-osal_status_t osal_queue_delete(osal_queue_handle_t handle)
-{
+osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -1016,10 +982,8 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle)
     return OSAL_OK;
 }
 
-osal_status_t osal_queue_send(osal_queue_handle_t handle,
-                              const void* item,
-                              uint32_t timeout_ms)
-{
+osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
+                              uint32_t timeout_ms) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -1043,8 +1007,8 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
 
     /* Try to send immediately */
     if (queue->count < queue->item_count) {
-        memcpy(&queue->buffer[queue->tail * queue->item_size],
-               item, queue->item_size);
+        memcpy(&queue->buffer[queue->tail * queue->item_size], item,
+               queue->item_size);
         queue->tail = (queue->tail + 1) % queue->item_count;
         queue->count++;
         osal_exit_critical();
@@ -1066,8 +1030,8 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
 
         osal_enter_critical();
         if (queue->count < queue->item_count) {
-            memcpy(&queue->buffer[queue->tail * queue->item_size],
-                   item, queue->item_size);
+            memcpy(&queue->buffer[queue->tail * queue->item_size], item,
+                   queue->item_size);
             queue->tail = (queue->tail + 1) % queue->item_count;
             queue->count++;
             osal_exit_critical();
@@ -1084,9 +1048,7 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
 }
 
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
-                                    const void* item,
-                                    uint32_t timeout_ms)
-{
+                                    const void* item, uint32_t timeout_ms) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -1111,9 +1073,10 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
     /* Try to send immediately */
     if (queue->count < queue->item_count) {
         /* Move head back */
-        queue->head = (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
-        memcpy(&queue->buffer[queue->head * queue->item_size],
-               item, queue->item_size);
+        queue->head =
+            (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
+        memcpy(&queue->buffer[queue->head * queue->item_size], item,
+               queue->item_size);
         queue->count++;
         osal_exit_critical();
         return OSAL_OK;
@@ -1134,9 +1097,10 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
 
         osal_enter_critical();
         if (queue->count < queue->item_count) {
-            queue->head = (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
-            memcpy(&queue->buffer[queue->head * queue->item_size],
-                   item, queue->item_size);
+            queue->head =
+                (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
+            memcpy(&queue->buffer[queue->head * queue->item_size], item,
+                   queue->item_size);
             queue->count++;
             osal_exit_critical();
             return OSAL_OK;
@@ -1151,10 +1115,8 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
     return OSAL_ERROR_TIMEOUT;
 }
 
-osal_status_t osal_queue_receive(osal_queue_handle_t handle,
-                                 void* item,
-                                 uint32_t timeout_ms)
-{
+osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
+                                 uint32_t timeout_ms) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -1218,8 +1180,7 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle,
     return OSAL_ERROR_TIMEOUT;
 }
 
-osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item)
-{
+osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
@@ -1253,8 +1214,7 @@ osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item)
     return OSAL_OK;
 }
 
-size_t osal_queue_get_count(osal_queue_handle_t handle)
-{
+size_t osal_queue_get_count(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return 0;
     }
@@ -1271,13 +1231,11 @@ size_t osal_queue_get_count(osal_queue_handle_t handle)
     return 0;
 }
 
-bool osal_queue_is_empty(osal_queue_handle_t handle)
-{
+bool osal_queue_is_empty(osal_queue_handle_t handle) {
     return osal_queue_get_count(handle) == 0;
 }
 
-bool osal_queue_is_full(osal_queue_handle_t handle)
-{
+bool osal_queue_is_full(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return true;
     }
@@ -1295,15 +1253,13 @@ bool osal_queue_is_full(osal_queue_handle_t handle)
 }
 
 osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
-                                       const void* item)
-{
+                                       const void* item) {
     /* Same as osal_queue_send with no wait for baremetal */
     return osal_queue_send(handle, item, OSAL_NO_WAIT);
 }
 
 osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
-                                          void* item)
-{
+                                          void* item) {
     /* Same as osal_queue_receive with no wait for baremetal */
     return osal_queue_receive(handle, item, OSAL_NO_WAIT);
 }

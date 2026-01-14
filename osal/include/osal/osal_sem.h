@@ -35,8 +35,7 @@ typedef void* osal_sem_handle_t;
  * \param[out]      handle: Pointer to store semaphore handle
  * \return          OSAL_OK on success, error code otherwise
  */
-osal_status_t osal_sem_create(uint32_t initial_count,
-                              uint32_t max_count,
+osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
                               osal_sem_handle_t* handle);
 
 /**
@@ -55,8 +54,7 @@ osal_status_t osal_sem_create_binary(uint32_t initial,
  * \param[out]      handle: Pointer to store semaphore handle
  * \return          OSAL_OK on success, error code otherwise
  */
-osal_status_t osal_sem_create_counting(uint32_t max_count,
-                                       uint32_t initial,
+osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
                                        osal_sem_handle_t* handle);
 
 /**

@@ -19,7 +19,6 @@
 #include <thread>
 #include <vector>
 
-
 extern "C" {
 #include "hal/hal_uart.h"
 #include "log/log.h"

@@ -39,22 +39,22 @@ typedef void (*osal_task_func_t)(void* arg);
  * \note            Priority range is 0-31, where 0 is lowest and 31 is highest
  */
 typedef enum {
-    OSAL_TASK_PRIORITY_IDLE     = 0,    /**< Idle priority (lowest) */
-    OSAL_TASK_PRIORITY_LOW      = 8,    /**< Low priority */
-    OSAL_TASK_PRIORITY_NORMAL   = 16,   /**< Normal priority */
-    OSAL_TASK_PRIORITY_HIGH     = 24,   /**< High priority */
-    OSAL_TASK_PRIORITY_REALTIME = 31    /**< Real-time priority (highest) */
+    OSAL_TASK_PRIORITY_IDLE = 0,     /**< Idle priority (lowest) */
+    OSAL_TASK_PRIORITY_LOW = 8,      /**< Low priority */
+    OSAL_TASK_PRIORITY_NORMAL = 16,  /**< Normal priority */
+    OSAL_TASK_PRIORITY_HIGH = 24,    /**< High priority */
+    OSAL_TASK_PRIORITY_REALTIME = 31 /**< Real-time priority (highest) */
 } osal_task_priority_t;
 
 /**
  * \brief           Task configuration structure
  */
 typedef struct {
-    const char*           name;       /**< Task name */
-    osal_task_func_t      func;       /**< Task function */
-    void*                 arg;        /**< Task argument */
-    uint8_t               priority;   /**< Task priority (0-31) */
-    size_t                stack_size; /**< Stack size in bytes */
+    const char* name;      /**< Task name */
+    osal_task_func_t func; /**< Task function */
+    void* arg;             /**< Task argument */
+    uint8_t priority;      /**< Task priority (0-31) */
+    size_t stack_size;     /**< Stack size in bytes */
 } osal_task_config_t;
 
 /**

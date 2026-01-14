@@ -35,8 +35,7 @@ typedef void* osal_queue_handle_t;
  * \param[out]      handle: Pointer to store queue handle
  * \return          OSAL_OK on success, error code otherwise
  */
-osal_status_t osal_queue_create(size_t item_size,
-                                size_t item_count,
+osal_status_t osal_queue_create(size_t item_size, size_t item_count,
                                 osal_queue_handle_t* handle);
 
 /**
@@ -53,8 +52,7 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle);
  * \param[in]       timeout_ms: Timeout in milliseconds
  * \return          OSAL_OK on success, error code otherwise
  */
-osal_status_t osal_queue_send(osal_queue_handle_t handle,
-                              const void* item,
+osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
                               uint32_t timeout_ms);
 
 /**
@@ -65,8 +63,7 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
  * \return          OSAL_OK on success, error code otherwise
  */
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
-                                    const void* item,
-                                    uint32_t timeout_ms);
+                                    const void* item, uint32_t timeout_ms);
 
 /**
  * \brief           Receive item from queue
@@ -75,8 +72,7 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
  * \param[in]       timeout_ms: Timeout in milliseconds
  * \return          OSAL_OK on success, error code otherwise
  */
-osal_status_t osal_queue_receive(osal_queue_handle_t handle,
-                                 void* item,
+osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
                                  uint32_t timeout_ms);
 
 /**

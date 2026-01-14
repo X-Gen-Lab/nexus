@@ -27,55 +27,55 @@ extern "C" {
  * \brief           Timer instance enumeration
  */
 typedef enum {
-    HAL_TIMER_0 = 0,                /**< Timer instance 0 */
-    HAL_TIMER_1,                    /**< Timer instance 1 */
-    HAL_TIMER_2,                    /**< Timer instance 2 */
-    HAL_TIMER_3,                    /**< Timer instance 3 */
-    HAL_TIMER_MAX                   /**< Maximum timer count */
+    HAL_TIMER_0 = 0, /**< Timer instance 0 */
+    HAL_TIMER_1,     /**< Timer instance 1 */
+    HAL_TIMER_2,     /**< Timer instance 2 */
+    HAL_TIMER_3,     /**< Timer instance 3 */
+    HAL_TIMER_MAX    /**< Maximum timer count */
 } hal_timer_instance_t;
 
 /**
  * \brief           Timer mode
  */
 typedef enum {
-    HAL_TIMER_MODE_ONESHOT = 0,     /**< One-shot mode */
-    HAL_TIMER_MODE_PERIODIC         /**< Periodic mode */
+    HAL_TIMER_MODE_ONESHOT = 0, /**< One-shot mode */
+    HAL_TIMER_MODE_PERIODIC     /**< Periodic mode */
 } hal_timer_mode_t;
 
 /**
  * \brief           Timer direction
  */
 typedef enum {
-    HAL_TIMER_DIR_UP = 0,           /**< Count up */
-    HAL_TIMER_DIR_DOWN              /**< Count down */
+    HAL_TIMER_DIR_UP = 0, /**< Count up */
+    HAL_TIMER_DIR_DOWN    /**< Count down */
 } hal_timer_dir_t;
 
 /**
  * \brief           PWM channel
  */
 typedef enum {
-    HAL_TIMER_CH_1 = 0,             /**< Channel 1 */
-    HAL_TIMER_CH_2,                 /**< Channel 2 */
-    HAL_TIMER_CH_3,                 /**< Channel 3 */
-    HAL_TIMER_CH_4,                 /**< Channel 4 */
-    HAL_TIMER_CH_MAX                /**< Maximum channel count */
+    HAL_TIMER_CH_1 = 0, /**< Channel 1 */
+    HAL_TIMER_CH_2,     /**< Channel 2 */
+    HAL_TIMER_CH_3,     /**< Channel 3 */
+    HAL_TIMER_CH_4,     /**< Channel 4 */
+    HAL_TIMER_CH_MAX    /**< Maximum channel count */
 } hal_timer_channel_t;
 
 /**
  * \brief           Timer configuration structure
  */
 typedef struct {
-    uint32_t            period_us;  /**< Period in microseconds */
-    hal_timer_mode_t    mode;       /**< Timer mode */
-    hal_timer_dir_t     direction;  /**< Count direction */
+    uint32_t period_us;        /**< Period in microseconds */
+    hal_timer_mode_t mode;     /**< Timer mode */
+    hal_timer_dir_t direction; /**< Count direction */
 } hal_timer_config_t;
 
 /**
  * \brief           PWM configuration structure
  */
 typedef struct {
-    uint32_t            frequency;  /**< PWM frequency in Hz */
-    uint16_t            duty_cycle; /**< Duty cycle (0-10000 = 0-100.00%) */
+    uint32_t frequency;  /**< PWM frequency in Hz */
+    uint16_t duty_cycle; /**< Duty cycle (0-10000 = 0-100.00%) */
 } hal_pwm_config_t;
 
 /**
@@ -131,8 +131,7 @@ hal_status_t hal_timer_get_count(hal_timer_instance_t instance,
  * \param[in]       count: Counter value to set
  * \return          HAL_OK on success, error code otherwise
  */
-hal_status_t hal_timer_set_count(hal_timer_instance_t instance,
-                                 uint32_t count);
+hal_status_t hal_timer_set_count(hal_timer_instance_t instance, uint32_t count);
 
 /**
  * \brief           Register timer callback
@@ -182,8 +181,7 @@ hal_status_t hal_pwm_stop(hal_timer_instance_t instance,
  * \return          HAL_OK on success, error code otherwise
  */
 hal_status_t hal_pwm_set_duty(hal_timer_instance_t instance,
-                              hal_timer_channel_t channel,
-                              uint16_t duty_cycle);
+                              hal_timer_channel_t channel, uint16_t duty_cycle);
 
 /**
  * \}

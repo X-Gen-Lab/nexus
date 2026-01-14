@@ -11,8 +11,8 @@
  * Requirements: 5.1, 5.2, 5.3, 5.5, 5.6
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "shell/shell_history.h"
@@ -22,10 +22,10 @@ extern "C" {
  * \brief           History Manager Test Fixture
  */
 class HistoryTest : public ::testing::Test {
-protected:
+  protected:
     static constexpr uint8_t HISTORY_CAPACITY = 8;
     static constexpr uint16_t ENTRY_SIZE = 64;
-    
+
     history_manager_t history;
     char* entries[HISTORY_CAPACITY];
     char entry_buffers[HISTORY_CAPACITY][ENTRY_SIZE];
@@ -89,7 +89,7 @@ TEST_F(HistoryTest, AddMultipleCommands) {
     EXPECT_TRUE(history_add(&history, "cmd1"));
     EXPECT_TRUE(history_add(&history, "cmd2"));
     EXPECT_TRUE(history_add(&history, "cmd3"));
-    
+
     EXPECT_EQ(3, history_get_count(&history));
     /* Index 0 is most recent */
     EXPECT_STREQ("cmd3", history_get_entry(&history, 0));
@@ -116,14 +116,14 @@ TEST_F(HistoryTest, AddNullCommandRejected) {
 
 TEST_F(HistoryTest, AddDuplicateConsecutiveRejected) {
     EXPECT_TRUE(history_add(&history, "help"));
-    EXPECT_FALSE(history_add(&history, "help"));  /* Duplicate */
+    EXPECT_FALSE(history_add(&history, "help")); /* Duplicate */
     EXPECT_EQ(1, history_get_count(&history));
 }
 
 TEST_F(HistoryTest, AddDuplicateNonConsecutiveAllowed) {
     EXPECT_TRUE(history_add(&history, "help"));
     EXPECT_TRUE(history_add(&history, "version"));
-    EXPECT_TRUE(history_add(&history, "help"));  /* Not consecutive duplicate */
+    EXPECT_TRUE(history_add(&history, "help")); /* Not consecutive duplicate */
     EXPECT_EQ(3, history_get_count(&history));
 }
 
@@ -141,7 +141,7 @@ TEST_F(HistoryTest, FillToCapacity) {
         snprintf(cmd, sizeof(cmd), "cmd%d", i);
         EXPECT_TRUE(history_add(&history, cmd));
     }
-    
+
     EXPECT_EQ(HISTORY_CAPACITY, history_get_count(&history));
 }
 
@@ -152,14 +152,14 @@ TEST_F(HistoryTest, FIFORemovesOldest) {
         snprintf(cmd, sizeof(cmd), "cmd%d", i);
         history_add(&history, cmd);
     }
-    
+
     /* Add one more - should remove oldest (cmd0) */
     EXPECT_TRUE(history_add(&history, "new_cmd"));
     EXPECT_EQ(HISTORY_CAPACITY, history_get_count(&history));
-    
+
     /* Most recent should be new_cmd */
     EXPECT_STREQ("new_cmd", history_get_entry(&history, 0));
-    
+
     /* Oldest should now be cmd1 (cmd0 was removed) */
     EXPECT_STREQ("cmd1", history_get_entry(&history, HISTORY_CAPACITY - 1));
 }
@@ -171,9 +171,9 @@ TEST_F(HistoryTest, FIFOWrapsAround) {
         snprintf(cmd, sizeof(cmd), "cmd%d", i);
         history_add(&history, cmd);
     }
-    
+
     EXPECT_EQ(HISTORY_CAPACITY, history_get_count(&history));
-    
+
     /* Most recent should be the last added */
     char expected[16];
     snprintf(expected, sizeof(expected), "cmd%d", HISTORY_CAPACITY * 2 - 1);
@@ -190,10 +190,10 @@ TEST_F(HistoryTest, GetPrevFromEmpty) {
 
 TEST_F(HistoryTest, GetPrevSingleEntry) {
     history_add(&history, "cmd1");
-    
+
     EXPECT_STREQ("cmd1", history_get_prev(&history));
     EXPECT_TRUE(history_is_browsing(&history));
-    
+
     /* Second call should return same (oldest) */
     EXPECT_STREQ("cmd1", history_get_prev(&history));
 }
@@ -202,19 +202,19 @@ TEST_F(HistoryTest, GetPrevMultipleEntries) {
     history_add(&history, "cmd1");
     history_add(&history, "cmd2");
     history_add(&history, "cmd3");
-    
+
     /* Navigate backward through history */
-    EXPECT_STREQ("cmd3", history_get_prev(&history));  /* Most recent */
+    EXPECT_STREQ("cmd3", history_get_prev(&history)); /* Most recent */
     EXPECT_STREQ("cmd2", history_get_prev(&history));
-    EXPECT_STREQ("cmd1", history_get_prev(&history));  /* Oldest */
-    
+    EXPECT_STREQ("cmd1", history_get_prev(&history)); /* Oldest */
+
     /* At oldest, should stay there */
     EXPECT_STREQ("cmd1", history_get_prev(&history));
 }
 
 TEST_F(HistoryTest, GetNextFromNotBrowsing) {
     history_add(&history, "cmd1");
-    
+
     /* Not browsing, should return NULL */
     EXPECT_EQ(nullptr, history_get_next(&history));
 }
@@ -223,16 +223,16 @@ TEST_F(HistoryTest, GetNextAfterPrev) {
     history_add(&history, "cmd1");
     history_add(&history, "cmd2");
     history_add(&history, "cmd3");
-    
+
     /* Go back to oldest */
-    history_get_prev(&history);  /* cmd3 */
-    history_get_prev(&history);  /* cmd2 */
-    history_get_prev(&history);  /* cmd1 */
-    
+    history_get_prev(&history); /* cmd3 */
+    history_get_prev(&history); /* cmd2 */
+    history_get_prev(&history); /* cmd1 */
+
     /* Navigate forward */
     EXPECT_STREQ("cmd2", history_get_next(&history));
     EXPECT_STREQ("cmd3", history_get_next(&history));
-    
+
     /* At newest, next returns NULL (back to current input) */
     EXPECT_EQ(nullptr, history_get_next(&history));
     EXPECT_FALSE(history_is_browsing(&history));
@@ -253,17 +253,17 @@ TEST_F(HistoryTest, GetNextWithNullHistory) {
 TEST_F(HistoryTest, ResetBrowseWhileBrowsing) {
     history_add(&history, "cmd1");
     history_add(&history, "cmd2");
-    
+
     history_get_prev(&history);
     EXPECT_TRUE(history_is_browsing(&history));
-    
+
     history_reset_browse(&history);
     EXPECT_FALSE(history_is_browsing(&history));
 }
 
 TEST_F(HistoryTest, ResetBrowseWhenNotBrowsing) {
     history_add(&history, "cmd1");
-    
+
     EXPECT_FALSE(history_is_browsing(&history));
     history_reset_browse(&history);
     EXPECT_FALSE(history_is_browsing(&history));
@@ -281,14 +281,14 @@ TEST_F(HistoryTest, ResetBrowseWithNullHistory) {
 TEST_F(HistoryTest, GetEntryValidIndex) {
     history_add(&history, "cmd1");
     history_add(&history, "cmd2");
-    
+
     EXPECT_STREQ("cmd2", history_get_entry(&history, 0));
     EXPECT_STREQ("cmd1", history_get_entry(&history, 1));
 }
 
 TEST_F(HistoryTest, GetEntryInvalidIndex) {
     history_add(&history, "cmd1");
-    
+
     EXPECT_EQ(nullptr, history_get_entry(&history, 1));
     EXPECT_EQ(nullptr, history_get_entry(&history, 100));
 }
@@ -309,9 +309,9 @@ TEST_F(HistoryTest, ClearRemovesAllEntries) {
     history_add(&history, "cmd1");
     history_add(&history, "cmd2");
     history_add(&history, "cmd3");
-    
+
     history_clear(&history);
-    
+
     EXPECT_EQ(0, history_get_count(&history));
     EXPECT_EQ(nullptr, history_get_entry(&history, 0));
 }
@@ -320,7 +320,7 @@ TEST_F(HistoryTest, ClearResetsBrowse) {
     history_add(&history, "cmd1");
     history_get_prev(&history);
     EXPECT_TRUE(history_is_browsing(&history));
-    
+
     history_clear(&history);
     EXPECT_FALSE(history_is_browsing(&history));
 }
@@ -341,7 +341,7 @@ TEST_F(HistoryTest, GetCountEmpty) {
 TEST_F(HistoryTest, GetCountAfterAdds) {
     history_add(&history, "cmd1");
     EXPECT_EQ(1, history_get_count(&history));
-    
+
     history_add(&history, "cmd2");
     EXPECT_EQ(2, history_get_count(&history));
 }
@@ -375,9 +375,9 @@ TEST_F(HistoryTest, IsBrowsingWithNullHistory) {
 TEST_F(HistoryTest, AddLongCommandTruncated) {
     /* Create a command longer than ENTRY_SIZE */
     std::string long_cmd(ENTRY_SIZE + 10, 'x');
-    
+
     EXPECT_TRUE(history_add(&history, long_cmd.c_str()));
-    
+
     const char* stored = history_get_entry(&history, 0);
     EXPECT_NE(nullptr, stored);
     EXPECT_EQ(ENTRY_SIZE - 1, strlen(stored));
@@ -390,11 +390,11 @@ TEST_F(HistoryTest, AddLongCommandTruncated) {
 TEST_F(HistoryTest, AddResetsBrowse) {
     history_add(&history, "cmd1");
     history_add(&history, "cmd2");
-    
+
     /* Start browsing */
     history_get_prev(&history);
     EXPECT_TRUE(history_is_browsing(&history));
-    
+
     /* Add new command should reset browse */
     history_add(&history, "cmd3");
     EXPECT_FALSE(history_is_browsing(&history));

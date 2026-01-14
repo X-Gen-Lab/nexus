@@ -8,16 +8,16 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * Property-based tests for SPI module.
- * These tests verify universal properties that should hold for all valid inputs.
- * Each property test runs 100+ iterations with random inputs.
+ * These tests verify universal properties that should hold for all valid
+ * inputs. Each property test runs 100+ iterations with random inputs.
  *
  * **Validates: Requirements 3.2, 3.5, 3.6, 3.7**
  */
 
-#include <gtest/gtest.h>
-#include <random>
 #include <cstdint>
 #include <cstring>
+#include <gtest/gtest.h>
+#include <random>
 
 extern "C" {
 #include "hal/hal_spi.h"
@@ -38,7 +38,7 @@ static constexpr size_t MAX_TRANSFER_SIZE = 64;
  * \brief           SPI Property Test Fixture
  */
 class HalSpiPropertyTest : public ::testing::Test {
-protected:
+  protected:
     std::mt19937 rng;
 
     void SetUp() override {
@@ -77,16 +77,13 @@ protected:
     }
 
     hal_spi_config_t makeConfig(hal_spi_mode_t mode) {
-        return hal_spi_config_t{
-            .clock_hz   = 1000000,
-            .mode       = mode,
-            .bit_order  = HAL_SPI_MSB_FIRST,
-            .data_width = HAL_SPI_DATA_8BIT,
-            .role       = HAL_SPI_ROLE_MASTER
-        };
+        return hal_spi_config_t{.clock_hz = 1000000,
+                                .mode = mode,
+                                .bit_order = HAL_SPI_MSB_FIRST,
+                                .data_width = HAL_SPI_DATA_8BIT,
+                                .role = HAL_SPI_ROLE_MASTER};
     }
 };
-
 
 /**
  * Feature: phase2-core-platform, Property 6: SPI Mode Configuration
@@ -146,7 +143,8 @@ TEST_F(HalSpiPropertyTest, Property7_SpiFullDuplexTransfer) {
         memset(rx_data, 0, sizeof(rx_data));
 
         // Perform full-duplex transfer
-        ASSERT_EQ(HAL_OK, hal_spi_transfer(instance, tx_data, rx_data, transfer_len, 1000))
+        ASSERT_EQ(HAL_OK, hal_spi_transfer(instance, tx_data, rx_data,
+                                           transfer_len, 1000))
             << "Iteration " << i << ": transfer failed";
 
         // Verify the transfer length matches
@@ -157,7 +155,8 @@ TEST_F(HalSpiPropertyTest, Property7_SpiFullDuplexTransfer) {
 
         // In loopback mode, RX should equal TX (verifies full-duplex)
         EXPECT_EQ(0, memcmp(tx_data, rx_data, transfer_len))
-            << "Iteration " << i << ": loopback data mismatch for len=" << transfer_len;
+            << "Iteration " << i
+            << ": loopback data mismatch for len=" << transfer_len;
 
         hal_spi_deinit(instance);
     }
@@ -166,8 +165,8 @@ TEST_F(HalSpiPropertyTest, Property7_SpiFullDuplexTransfer) {
 /**
  * Feature: phase2-core-platform, Property 8: SPI CS Control
  *
- * *For any* CS control operation, active=true SHALL result in CS low (asserted),
- * and active=false SHALL result in CS high (deasserted).
+ * *For any* CS control operation, active=true SHALL result in CS low
+ * (asserted), and active=false SHALL result in CS high (deasserted).
  *
  * **Validates: Requirements 3.6, 3.7**
  */
@@ -190,13 +189,15 @@ TEST_F(HalSpiPropertyTest, Property8_SpiCsControl) {
         ASSERT_EQ(HAL_OK, hal_spi_cs_control(instance, true))
             << "Iteration " << i << ": cs_control(true) failed";
         EXPECT_TRUE(native_spi_get_cs_state(instance))
-            << "Iteration " << i << ": CS should be active (low) after cs_control(true)";
+            << "Iteration " << i
+            << ": CS should be active (low) after cs_control(true)";
 
         // Deassert CS (active=false means CS high)
         ASSERT_EQ(HAL_OK, hal_spi_cs_control(instance, false))
             << "Iteration " << i << ": cs_control(false) failed";
         EXPECT_FALSE(native_spi_get_cs_state(instance))
-            << "Iteration " << i << ": CS should be inactive (high) after cs_control(false)";
+            << "Iteration " << i
+            << ": CS should be inactive (high) after cs_control(false)";
 
         // Test toggling multiple times
         std::uniform_int_distribution<int> toggle_dist(1, 10);
@@ -206,9 +207,11 @@ TEST_F(HalSpiPropertyTest, Property8_SpiCsControl) {
         for (int t = 0; t < toggles; ++t) {
             expected_state = !expected_state;
             ASSERT_EQ(HAL_OK, hal_spi_cs_control(instance, expected_state))
-                << "Iteration " << i << ", toggle " << t << ": cs_control failed";
+                << "Iteration " << i << ", toggle " << t
+                << ": cs_control failed";
             EXPECT_EQ(expected_state, native_spi_get_cs_state(instance))
-                << "Iteration " << i << ", toggle " << t << ": CS state mismatch";
+                << "Iteration " << i << ", toggle " << t
+                << ": CS state mismatch";
         }
 
         hal_spi_deinit(instance);

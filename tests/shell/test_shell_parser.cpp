@@ -11,8 +11,8 @@
  * Requirements: 3.1, 3.4, 3.5
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "shell/shell_parser.h"
@@ -22,7 +22,7 @@ extern "C" {
  * \brief           Shell Parser Test Fixture
  */
 class ShellParserTest : public ::testing::Test {
-protected:
+  protected:
     parsed_command_t result;
     char line_buffer[256];
 
@@ -51,7 +51,7 @@ protected:
  */
 TEST_F(ShellParserTest, ParseSimpleCommand) {
     copyLine("help");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("help", result.cmd_name);
     EXPECT_EQ(1, result.argc);
@@ -60,11 +60,12 @@ TEST_F(ShellParserTest, ParseSimpleCommand) {
 
 /**
  * \brief           Test parsing command with single argument
- * \details         Requirements 3.1, 3.4 - Parse command and space-separated argument
+ * \details         Requirements 3.1, 3.4 - Parse command and space-separated
+ * argument
  */
 TEST_F(ShellParserTest, ParseCommandWithOneArg) {
     copyLine("help version");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("help", result.cmd_name);
     EXPECT_EQ(2, result.argc);
@@ -74,11 +75,12 @@ TEST_F(ShellParserTest, ParseCommandWithOneArg) {
 
 /**
  * \brief           Test parsing command with multiple arguments
- * \details         Requirements 3.1, 3.4 - Parse command with multiple space-separated arguments
+ * \details         Requirements 3.1, 3.4 - Parse command with multiple
+ * space-separated arguments
  */
 TEST_F(ShellParserTest, ParseCommandWithMultipleArgs) {
     copyLine("gpio set 13 high");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("gpio", result.cmd_name);
     EXPECT_EQ(4, result.argc);
@@ -94,7 +96,7 @@ TEST_F(ShellParserTest, ParseCommandWithMultipleArgs) {
  */
 TEST_F(ShellParserTest, ParseWithLeadingWhitespace) {
     copyLine("   help");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("help", result.cmd_name);
     EXPECT_EQ(1, result.argc);
@@ -106,7 +108,7 @@ TEST_F(ShellParserTest, ParseWithLeadingWhitespace) {
  */
 TEST_F(ShellParserTest, ParseWithTrailingWhitespace) {
     copyLine("help   ");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("help", result.cmd_name);
     EXPECT_EQ(1, result.argc);
@@ -118,7 +120,7 @@ TEST_F(ShellParserTest, ParseWithTrailingWhitespace) {
  */
 TEST_F(ShellParserTest, ParseWithMultipleSpaces) {
     copyLine("gpio   set    13");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("gpio", result.cmd_name);
     EXPECT_EQ(3, result.argc);
@@ -137,7 +139,7 @@ TEST_F(ShellParserTest, ParseWithMultipleSpaces) {
  */
 TEST_F(ShellParserTest, ParseDoubleQuotedString) {
     copyLine("echo \"hello world\"");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("echo", result.cmd_name);
     EXPECT_EQ(2, result.argc);
@@ -151,7 +153,7 @@ TEST_F(ShellParserTest, ParseDoubleQuotedString) {
  */
 TEST_F(ShellParserTest, ParseSingleQuotedString) {
     copyLine("echo 'hello world'");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("echo", result.cmd_name);
     EXPECT_EQ(2, result.argc);
@@ -165,7 +167,7 @@ TEST_F(ShellParserTest, ParseSingleQuotedString) {
  */
 TEST_F(ShellParserTest, ParseMixedQuotedUnquoted) {
     copyLine("log info \"System started\" now");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("log", result.cmd_name);
     EXPECT_EQ(4, result.argc);
@@ -181,7 +183,7 @@ TEST_F(ShellParserTest, ParseMixedQuotedUnquoted) {
  */
 TEST_F(ShellParserTest, ParseEmptyQuotedString) {
     copyLine("echo \"\"");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_STREQ("echo", result.cmd_name);
     EXPECT_EQ(2, result.argc);
@@ -194,7 +196,7 @@ TEST_F(ShellParserTest, ParseEmptyQuotedString) {
  */
 TEST_F(ShellParserTest, ParseQuotedWithSpecialChars) {
     copyLine("echo \"hello\tworld\"");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_EQ(2, result.argc);
     EXPECT_STREQ("hello\tworld", result.argv[1]);
@@ -210,7 +212,7 @@ TEST_F(ShellParserTest, ParseQuotedWithSpecialChars) {
  */
 TEST_F(ShellParserTest, ParseEmptyLine) {
     copyLine("");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_EQ(0, result.argc);
     EXPECT_EQ(nullptr, result.cmd_name);
@@ -222,7 +224,7 @@ TEST_F(ShellParserTest, ParseEmptyLine) {
  */
 TEST_F(ShellParserTest, ParseWhitespaceOnly) {
     copyLine("   \t  ");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_EQ(0, result.argc);
     EXPECT_EQ(nullptr, result.cmd_name);
@@ -242,7 +244,8 @@ TEST_F(ShellParserTest, ParseNullLine) {
  */
 TEST_F(ShellParserTest, ParseNullResult) {
     copyLine("help");
-    EXPECT_EQ(SHELL_ERROR_INVALID_PARAM, parse_command_line(line_buffer, nullptr));
+    EXPECT_EQ(SHELL_ERROR_INVALID_PARAM,
+              parse_command_line(line_buffer, nullptr));
 }
 
 /**
@@ -252,7 +255,7 @@ TEST_F(ShellParserTest, ParseNullResult) {
 TEST_F(ShellParserTest, ParseMaxArgs) {
     /* SHELL_MAX_ARGS is 8, so we need 8 tokens */
     copyLine("cmd a1 a2 a3 a4 a5 a6 a7");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_EQ(SHELL_MAX_ARGS, result.argc);
     EXPECT_STREQ("cmd", result.argv[0]);
@@ -266,8 +269,9 @@ TEST_F(ShellParserTest, ParseMaxArgs) {
 TEST_F(ShellParserTest, ParseTooManyArgs) {
     /* SHELL_MAX_ARGS is 8, so 9 tokens should fail */
     copyLine("cmd a1 a2 a3 a4 a5 a6 a7 a8");
-    
-    EXPECT_EQ(SHELL_ERROR_BUFFER_FULL, parse_command_line(line_buffer, &result));
+
+    EXPECT_EQ(SHELL_ERROR_BUFFER_FULL,
+              parse_command_line(line_buffer, &result));
 }
 
 /**
@@ -276,7 +280,7 @@ TEST_F(ShellParserTest, ParseTooManyArgs) {
  */
 TEST_F(ShellParserTest, ParseUnterminatedQuote) {
     copyLine("echo \"hello world");
-    
+
     /* Should succeed, treating rest of string as argument */
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_EQ(2, result.argc);
@@ -289,7 +293,7 @@ TEST_F(ShellParserTest, ParseUnterminatedQuote) {
  */
 TEST_F(ShellParserTest, ParseWithTabs) {
     copyLine("gpio\tset\t13");
-    
+
     EXPECT_EQ(SHELL_OK, parse_command_line(line_buffer, &result));
     EXPECT_EQ(3, result.argc);
     EXPECT_STREQ("gpio", result.argv[0]);

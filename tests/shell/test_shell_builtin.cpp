@@ -11,10 +11,10 @@
  * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
-#include <vector>
+#include <gtest/gtest.h>
 #include <string>
+#include <vector>
 
 extern "C" {
 #include "shell/shell.h"
@@ -26,7 +26,7 @@ extern "C" {
  * \brief           Mock backend for testing built-in commands
  */
 class BuiltinMockBackend {
-public:
+  public:
     static std::vector<uint8_t> input_buffer;
     static std::vector<uint8_t> output_buffer;
     static size_t read_pos;
@@ -78,28 +78,24 @@ size_t BuiltinMockBackend::read_pos = 0;
 
 /** Mock backend instance */
 static const shell_backend_t builtin_mock_backend = {
-    .read = BuiltinMockBackend::read,
-    .write = BuiltinMockBackend::write
-};
+    .read = BuiltinMockBackend::read, .write = BuiltinMockBackend::write};
 
 /**
  * \brief           Shell Built-in Commands Test Fixture
  */
 class ShellBuiltinTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         BuiltinMockBackend::reset();
         shell_clear_commands();
         if (shell_is_initialized()) {
             shell_deinit();
         }
-        
-        shell_config_t config = {
-            .prompt = "test> ",
-            .cmd_buffer_size = 128,
-            .history_depth = 8,
-            .max_commands = 32
-        };
+
+        shell_config_t config = {.prompt = "test> ",
+                                 .cmd_buffer_size = 128,
+                                 .history_depth = 8,
+                                 .max_commands = 32};
         shell_init(&config);
         shell_set_backend(&builtin_mock_backend);
         shell_register_builtin_commands();
@@ -137,9 +133,9 @@ TEST_F(ShellBuiltinTest, HelpListsAllCommands) {
     /* Requirement 7.1: help lists all registered commands */
     BuiltinMockBackend::clear_output();
     execute_command("help");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain all built-in commands */
     EXPECT_NE(std::string::npos, output.find("help"));
     EXPECT_NE(std::string::npos, output.find("version"));
@@ -152,9 +148,9 @@ TEST_F(ShellBuiltinTest, HelpShowsSpecificCommand) {
     /* Requirement 7.2: help <command> shows detailed help */
     BuiltinMockBackend::clear_output();
     execute_command("help version");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain command name and description */
     EXPECT_NE(std::string::npos, output.find("version"));
     EXPECT_NE(std::string::npos, output.find("Command:"));
@@ -163,9 +159,9 @@ TEST_F(ShellBuiltinTest, HelpShowsSpecificCommand) {
 TEST_F(ShellBuiltinTest, HelpUnknownCommand) {
     BuiltinMockBackend::clear_output();
     execute_command("help nonexistent");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should indicate unknown command */
     EXPECT_NE(std::string::npos, output.find("Unknown command"));
 }
@@ -185,9 +181,9 @@ TEST_F(ShellBuiltinTest, VersionShowsVersion) {
     /* Requirement 7.3: version shows Shell version */
     BuiltinMockBackend::clear_output();
     execute_command("version");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain version string */
     const char* version = shell_get_version();
     EXPECT_NE(std::string::npos, output.find(version));
@@ -208,9 +204,9 @@ TEST_F(ShellBuiltinTest, ClearSendsEscapeSequence) {
     /* Requirement 7.4: clear clears the terminal screen */
     BuiltinMockBackend::clear_output();
     execute_command("clear");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain ANSI clear screen sequence */
     EXPECT_NE(std::string::npos, output.find("\033[2J"));
 }
@@ -230,9 +226,9 @@ TEST_F(ShellBuiltinTest, HistoryShowsEmptyMessage) {
     /* When no commands in history */
     BuiltinMockBackend::clear_output();
     execute_command("history");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* First command is "history" itself, so it should show that */
     /* Or show "No commands" if history is checked before adding */
 }
@@ -241,12 +237,12 @@ TEST_F(ShellBuiltinTest, HistoryShowsPreviousCommands) {
     /* Requirement 7.5: history shows command history */
     execute_command("version");
     execute_command("help");
-    
+
     BuiltinMockBackend::clear_output();
     execute_command("history");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain previous commands */
     EXPECT_NE(std::string::npos, output.find("version"));
     EXPECT_NE(std::string::npos, output.find("help"));
@@ -267,9 +263,9 @@ TEST_F(ShellBuiltinTest, EchoNoArgs) {
     /* Requirement 7.6: echo prints arguments */
     BuiltinMockBackend::clear_output();
     execute_command("echo");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should just print newline */
     EXPECT_NE(std::string::npos, output.find("\r\n"));
 }
@@ -277,9 +273,9 @@ TEST_F(ShellBuiltinTest, EchoNoArgs) {
 TEST_F(ShellBuiltinTest, EchoSingleArg) {
     BuiltinMockBackend::clear_output();
     execute_command("echo hello");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain the argument */
     EXPECT_NE(std::string::npos, output.find("hello"));
 }
@@ -287,9 +283,9 @@ TEST_F(ShellBuiltinTest, EchoSingleArg) {
 TEST_F(ShellBuiltinTest, EchoMultipleArgs) {
     BuiltinMockBackend::clear_output();
     execute_command("echo hello world");
-    
+
     std::string output = BuiltinMockBackend::get_output();
-    
+
     /* Should contain both arguments */
     EXPECT_NE(std::string::npos, output.find("hello"));
     EXPECT_NE(std::string::npos, output.find("world"));
@@ -302,9 +298,9 @@ TEST_F(ShellBuiltinTest, EchoMultipleArgs) {
 TEST_F(ShellBuiltinTest, RegisterBuiltinCommandsSuccess) {
     /* Clear and re-register */
     shell_clear_commands();
-    
+
     EXPECT_EQ(SHELL_OK, shell_register_builtin_commands());
-    
+
     /* All built-in commands should be registered */
     EXPECT_NE(nullptr, shell_get_command("help"));
     EXPECT_NE(nullptr, shell_get_command("version"));
@@ -316,7 +312,7 @@ TEST_F(ShellBuiltinTest, RegisterBuiltinCommandsSuccess) {
 TEST_F(ShellBuiltinTest, BuiltinCommandCount) {
     shell_clear_commands();
     shell_register_builtin_commands();
-    
+
     /* Should have exactly 5 built-in commands */
     EXPECT_EQ(5, shell_get_command_count());
 }
@@ -332,7 +328,7 @@ TEST_F(ShellBuiltinTest, GetHistoryManagerWhenInitialized) {
 
 TEST_F(ShellBuiltinTest, GetHistoryManagerWhenNotInitialized) {
     shell_deinit();
-    
+
     history_manager_t* hist = shell_get_history_manager();
     EXPECT_EQ(nullptr, hist);
 }

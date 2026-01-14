@@ -8,8 +8,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "hal/hal_uart.h"
@@ -20,7 +20,7 @@ extern "C" {
  * \brief           UART Test Fixture
  */
 class HalUartTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         native_uart_reset_all();
     }
@@ -30,13 +30,11 @@ protected:
     }
 
     hal_uart_config_t makeDefaultConfig(uint32_t baudrate = 115200) {
-        return hal_uart_config_t{
-            .baudrate = baudrate,
-            .wordlen  = HAL_UART_WORDLEN_8,
-            .stopbits = HAL_UART_STOPBITS_1,
-            .parity   = HAL_UART_PARITY_NONE,
-            .flowctrl = HAL_UART_FLOWCTRL_NONE
-        };
+        return hal_uart_config_t{.baudrate = baudrate,
+                                 .wordlen = HAL_UART_WORDLEN_8,
+                                 .stopbits = HAL_UART_STOPBITS_1,
+                                 .parity = HAL_UART_PARITY_NONE,
+                                 .flowctrl = HAL_UART_FLOWCTRL_NONE};
     }
 };
 
@@ -54,7 +52,8 @@ TEST_F(HalUartTest, InitWithValidConfig) {
  * \details         Requirements 2.1 - init with different baudrates
  */
 TEST_F(HalUartTest, InitWithVariousBaudrates) {
-    uint32_t baudrates[] = {9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
+    uint32_t baudrates[] = {9600,   19200,  38400,  57600,
+                            115200, 230400, 460800, 921600};
 
     for (uint32_t baudrate : baudrates) {
         native_uart_reset_all();
@@ -117,7 +116,8 @@ TEST_F(HalUartTest, TransmitValidData) {
     ASSERT_EQ(HAL_OK, hal_uart_init(HAL_UART_0, &config));
 
     uint8_t tx_data[] = "Hello UART";
-    EXPECT_EQ(HAL_OK, hal_uart_transmit(HAL_UART_0, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_OK,
+              hal_uart_transmit(HAL_UART_0, tx_data, sizeof(tx_data), 1000));
 
     /* Verify data was transmitted by reading from TX buffer */
     uint8_t rx_data[32] = {0};
@@ -128,11 +128,13 @@ TEST_F(HalUartTest, TransmitValidData) {
 
 /**
  * \brief           Test UART transmit without initialization
- * \details         Requirements 2.3 - transmit on uninitialized UART should fail
+ * \details         Requirements 2.3 - transmit on uninitialized UART should
+ * fail
  */
 TEST_F(HalUartTest, TransmitWithoutInit) {
     uint8_t data[] = "Hello";
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_uart_transmit(HAL_UART_0, data, sizeof(data), 1000));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_uart_transmit(HAL_UART_0, data, sizeof(data), 1000));
 }
 
 /**
@@ -142,7 +144,8 @@ TEST_F(HalUartTest, TransmitWithoutInit) {
 TEST_F(HalUartTest, TransmitNullData) {
     hal_uart_config_t config = makeDefaultConfig();
     ASSERT_EQ(HAL_OK, hal_uart_init(HAL_UART_0, &config));
-    EXPECT_EQ(HAL_ERROR_NULL_POINTER, hal_uart_transmit(HAL_UART_0, nullptr, 10, 1000));
+    EXPECT_EQ(HAL_ERROR_NULL_POINTER,
+              hal_uart_transmit(HAL_UART_0, nullptr, 10, 1000));
 }
 
 /**
@@ -155,11 +158,13 @@ TEST_F(HalUartTest, ReceiveValidData) {
 
     /* Inject data into RX buffer */
     uint8_t inject_data[] = "Test Data";
-    ASSERT_TRUE(native_uart_inject_rx_data(HAL_UART_0, inject_data, sizeof(inject_data)));
+    ASSERT_TRUE(native_uart_inject_rx_data(HAL_UART_0, inject_data,
+                                           sizeof(inject_data)));
 
     /* Receive data */
     uint8_t rx_data[32] = {0};
-    EXPECT_EQ(HAL_OK, hal_uart_receive(HAL_UART_0, rx_data, sizeof(inject_data), 1000));
+    EXPECT_EQ(HAL_OK,
+              hal_uart_receive(HAL_UART_0, rx_data, sizeof(inject_data), 1000));
     EXPECT_EQ(0, memcmp(inject_data, rx_data, sizeof(inject_data)));
 }
 
@@ -169,7 +174,8 @@ TEST_F(HalUartTest, ReceiveValidData) {
  */
 TEST_F(HalUartTest, ReceiveWithoutInit) {
     uint8_t data[10];
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_uart_receive(HAL_UART_0, data, sizeof(data), 1000));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_uart_receive(HAL_UART_0, data, sizeof(data), 1000));
 }
 
 /**
@@ -179,7 +185,8 @@ TEST_F(HalUartTest, ReceiveWithoutInit) {
 TEST_F(HalUartTest, ReceiveNullBuffer) {
     hal_uart_config_t config = makeDefaultConfig();
     ASSERT_EQ(HAL_OK, hal_uart_init(HAL_UART_0, &config));
-    EXPECT_EQ(HAL_ERROR_NULL_POINTER, hal_uart_receive(HAL_UART_0, nullptr, 10, 1000));
+    EXPECT_EQ(HAL_ERROR_NULL_POINTER,
+              hal_uart_receive(HAL_UART_0, nullptr, 10, 1000));
 }
 
 /**
@@ -191,7 +198,8 @@ TEST_F(HalUartTest, ReceiveTimeout) {
     ASSERT_EQ(HAL_OK, hal_uart_init(HAL_UART_0, &config));
 
     uint8_t data[10];
-    EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_uart_receive(HAL_UART_0, data, sizeof(data), 100));
+    EXPECT_EQ(HAL_ERROR_TIMEOUT,
+              hal_uart_receive(HAL_UART_0, data, sizeof(data), 100));
 }
 
 /**
@@ -253,7 +261,8 @@ TEST_F(HalUartTest, SetRxCallback) {
     static uint8_t last_byte = 0;
     callback_count = 0;
 
-    auto callback = [](hal_uart_instance_t instance, uint8_t data, void* context) {
+    auto callback = [](hal_uart_instance_t instance, uint8_t data,
+                       void* context) {
         (void)instance;
         (void)context;
         callback_count++;
@@ -291,7 +300,8 @@ TEST_F(HalUartTest, SetTxCallback) {
 
     /* Transmit data - callback should be invoked */
     uint8_t tx_data[] = "Test";
-    EXPECT_EQ(HAL_OK, hal_uart_transmit(HAL_UART_0, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_OK,
+              hal_uart_transmit(HAL_UART_0, tx_data, sizeof(tx_data), 1000));
 
     EXPECT_EQ(1, callback_count);
 }
@@ -304,8 +314,10 @@ TEST_F(HalUartTest, SetCallbackWithoutInit) {
     auto rx_callback = [](hal_uart_instance_t, uint8_t, void*) {};
     auto tx_callback = [](hal_uart_instance_t, void*) {};
 
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_uart_set_rx_callback(HAL_UART_0, rx_callback, nullptr));
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_uart_set_tx_callback(HAL_UART_0, tx_callback, nullptr));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_uart_set_rx_callback(HAL_UART_0, rx_callback, nullptr));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_uart_set_tx_callback(HAL_UART_0, tx_callback, nullptr));
 }
 
 /**

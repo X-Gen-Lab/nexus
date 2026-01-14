@@ -20,20 +20,20 @@
 /* Local definitions                                                          */
 /*===========================================================================*/
 
-#define SPI_BUFFER_SIZE     256
+#define SPI_BUFFER_SIZE 256
 
 /**
  * \brief           SPI instance state
  */
 typedef struct {
-    bool                initialized;
-    hal_spi_config_t    config;
-    hal_spi_callback_t  callback;
-    void*               context;
-    bool                cs_active;      /**< CS pin state (true = asserted/low) */
-    uint8_t             tx_buffer[SPI_BUFFER_SIZE];  /**< Last transmitted data */
-    uint8_t             rx_buffer[SPI_BUFFER_SIZE];  /**< Simulated RX data */
-    size_t              last_transfer_len;           /**< Length of last transfer */
+    bool initialized;
+    hal_spi_config_t config;
+    hal_spi_callback_t callback;
+    void* context;
+    bool cs_active; /**< CS pin state (true = asserted/low) */
+    uint8_t tx_buffer[SPI_BUFFER_SIZE]; /**< Last transmitted data */
+    uint8_t rx_buffer[SPI_BUFFER_SIZE]; /**< Simulated RX data */
+    size_t last_transfer_len;           /**< Length of last transfer */
 } spi_state_t;
 
 static spi_state_t spi_instances[HAL_SPI_MAX];
@@ -42,53 +42,46 @@ static spi_state_t spi_instances[HAL_SPI_MAX];
 /* Public functions - Test helpers                                            */
 /*===========================================================================*/
 
-void native_spi_reset_all(void)
-{
+void native_spi_reset_all(void) {
     memset(spi_instances, 0, sizeof(spi_instances));
 }
 
-native_spi_state_t* native_spi_get_state(int instance)
-{
+native_spi_state_t* native_spi_get_state(int instance) {
     if (instance < 0 || instance >= HAL_SPI_MAX) {
         return NULL;
     }
     return (native_spi_state_t*)&spi_instances[instance];
 }
 
-bool native_spi_is_initialized(int instance)
-{
+bool native_spi_is_initialized(int instance) {
     if (instance < 0 || instance >= HAL_SPI_MAX) {
         return false;
     }
     return spi_instances[instance].initialized;
 }
 
-bool native_spi_get_cs_state(int instance)
-{
+bool native_spi_get_cs_state(int instance) {
     if (instance < 0 || instance >= HAL_SPI_MAX) {
         return false;
     }
     return spi_instances[instance].cs_active;
 }
 
-hal_spi_mode_t native_spi_get_mode(int instance)
-{
+hal_spi_mode_t native_spi_get_mode(int instance) {
     if (instance < 0 || instance >= HAL_SPI_MAX) {
         return HAL_SPI_MODE_0;
     }
     return spi_instances[instance].config.mode;
 }
 
-size_t native_spi_get_last_transfer_len(int instance)
-{
+size_t native_spi_get_last_transfer_len(int instance) {
     if (instance < 0 || instance >= HAL_SPI_MAX) {
         return 0;
     }
     return spi_instances[instance].last_transfer_len;
 }
 
-bool native_spi_inject_rx_data(int instance, const uint8_t* data, size_t len)
-{
+bool native_spi_inject_rx_data(int instance, const uint8_t* data, size_t len) {
     if (instance < 0 || instance >= HAL_SPI_MAX || data == NULL) {
         return false;
     }
@@ -99,8 +92,7 @@ bool native_spi_inject_rx_data(int instance, const uint8_t* data, size_t len)
     return true;
 }
 
-size_t native_spi_get_tx_data(int instance, uint8_t* data, size_t max_len)
-{
+size_t native_spi_get_tx_data(int instance, uint8_t* data, size_t max_len) {
     if (instance < 0 || instance >= HAL_SPI_MAX || data == NULL) {
         return 0;
     }
@@ -117,8 +109,7 @@ size_t native_spi_get_tx_data(int instance, uint8_t* data, size_t max_len)
 /*===========================================================================*/
 
 hal_status_t hal_spi_init(hal_spi_instance_t instance,
-                          const hal_spi_config_t* config)
-{
+                          const hal_spi_config_t* config) {
     if (instance >= HAL_SPI_MAX) {
         return HAL_ERROR_INVALID_PARAM;
     }
@@ -139,13 +130,12 @@ hal_status_t hal_spi_init(hal_spi_instance_t instance,
     spi->cs_active = false;
     spi->last_transfer_len = 0;
     memset(spi->tx_buffer, 0, SPI_BUFFER_SIZE);
-    memset(spi->rx_buffer, 0xFF, SPI_BUFFER_SIZE);  /* Default RX is 0xFF */
+    memset(spi->rx_buffer, 0xFF, SPI_BUFFER_SIZE); /* Default RX is 0xFF */
 
     return HAL_OK;
 }
 
-hal_status_t hal_spi_deinit(hal_spi_instance_t instance)
-{
+hal_status_t hal_spi_deinit(hal_spi_instance_t instance) {
     if (instance >= HAL_SPI_MAX) {
         return HAL_ERROR_INVALID_PARAM;
     }
@@ -161,10 +151,8 @@ hal_status_t hal_spi_deinit(hal_spi_instance_t instance)
 }
 
 hal_status_t hal_spi_transmit(hal_spi_instance_t instance,
-                              const uint8_t* tx_data,
-                              size_t len,
-                              uint32_t timeout_ms)
-{
+                              const uint8_t* tx_data, size_t len,
+                              uint32_t timeout_ms) {
     (void)timeout_ms;
 
     if (instance >= HAL_SPI_MAX) {
@@ -194,11 +182,8 @@ hal_status_t hal_spi_transmit(hal_spi_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_spi_receive(hal_spi_instance_t instance,
-                             uint8_t* rx_data,
-                             size_t len,
-                             uint32_t timeout_ms)
-{
+hal_status_t hal_spi_receive(hal_spi_instance_t instance, uint8_t* rx_data,
+                             size_t len, uint32_t timeout_ms) {
     (void)timeout_ms;
 
     if (instance >= HAL_SPI_MAX) {
@@ -229,11 +214,8 @@ hal_status_t hal_spi_receive(hal_spi_instance_t instance,
 }
 
 hal_status_t hal_spi_transfer(hal_spi_instance_t instance,
-                              const uint8_t* tx_data,
-                              uint8_t* rx_data,
-                              size_t len,
-                              uint32_t timeout_ms)
-{
+                              const uint8_t* tx_data, uint8_t* rx_data,
+                              size_t len, uint32_t timeout_ms) {
     (void)timeout_ms;
 
     if (instance >= HAL_SPI_MAX) {
@@ -273,8 +255,7 @@ hal_status_t hal_spi_transfer(hal_spi_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_spi_cs_control(hal_spi_instance_t instance, bool active)
-{
+hal_status_t hal_spi_cs_control(hal_spi_instance_t instance, bool active) {
     if (instance >= HAL_SPI_MAX) {
         return HAL_ERROR_INVALID_PARAM;
     }
@@ -291,9 +272,7 @@ hal_status_t hal_spi_cs_control(hal_spi_instance_t instance, bool active)
 }
 
 hal_status_t hal_spi_set_callback(hal_spi_instance_t instance,
-                                  hal_spi_callback_t callback,
-                                  void* context)
-{
+                                  hal_spi_callback_t callback, void* context) {
     if (instance >= HAL_SPI_MAX) {
         return HAL_ERROR_INVALID_PARAM;
     }

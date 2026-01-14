@@ -16,33 +16,30 @@
 /**
  * \brief           LED pin definitions (STM32F4 Discovery)
  */
-#define LED_GREEN_PORT      HAL_GPIO_PORT_D
-#define LED_GREEN_PIN       12
-#define LED_ORANGE_PORT     HAL_GPIO_PORT_D
-#define LED_ORANGE_PIN      13
-#define LED_RED_PORT        HAL_GPIO_PORT_D
-#define LED_RED_PIN         14
-#define LED_BLUE_PORT       HAL_GPIO_PORT_D
-#define LED_BLUE_PIN        15
+#define LED_GREEN_PORT  HAL_GPIO_PORT_D
+#define LED_GREEN_PIN   12
+#define LED_ORANGE_PORT HAL_GPIO_PORT_D
+#define LED_ORANGE_PIN  13
+#define LED_RED_PORT    HAL_GPIO_PORT_D
+#define LED_RED_PIN     14
+#define LED_BLUE_PORT   HAL_GPIO_PORT_D
+#define LED_BLUE_PIN    15
 
 /**
  * \brief           Blink delay in milliseconds
  */
-#define BLINK_DELAY_MS      500
+#define BLINK_DELAY_MS 500
 
 /**
  * \brief           Initialize LEDs
  * \return          HAL_OK on success
  */
-static hal_status_t led_init(void)
-{
-    hal_gpio_config_t config = {
-        .direction   = HAL_GPIO_DIR_OUTPUT,
-        .pull        = HAL_GPIO_PULL_NONE,
-        .output_mode = HAL_GPIO_OUTPUT_PP,
-        .speed       = HAL_GPIO_SPEED_LOW,
-        .init_level  = HAL_GPIO_LEVEL_LOW
-    };
+static hal_status_t led_init(void) {
+    hal_gpio_config_t config = {.direction = HAL_GPIO_DIR_OUTPUT,
+                                .pull = HAL_GPIO_PULL_NONE,
+                                .output_mode = HAL_GPIO_OUTPUT_PP,
+                                .speed = HAL_GPIO_SPEED_LOW,
+                                .init_level = HAL_GPIO_LEVEL_LOW};
 
     /* Initialize all LEDs */
     if (hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config) != HAL_OK) {
@@ -65,8 +62,7 @@ static hal_status_t led_init(void)
  * \brief           Main entry point
  * \return          Should never return
  */
-int main(void)
-{
+int main(void) {
     /* Initialize HAL system */
     hal_system_init();
 

@@ -19,8 +19,7 @@
  * \brief           GPIO port base addresses
  */
 static GPIO_TypeDef* const gpio_ports[HAL_GPIO_PORT_MAX] = {
-    GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH
-};
+    GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH};
 
 /**
  * \brief           GPIO clock enable bits
@@ -28,8 +27,7 @@ static GPIO_TypeDef* const gpio_ports[HAL_GPIO_PORT_MAX] = {
 static const uint32_t gpio_clk_bits[HAL_GPIO_PORT_MAX] = {
     RCC_AHB1ENR_GPIOAEN, RCC_AHB1ENR_GPIOBEN, RCC_AHB1ENR_GPIOCEN,
     RCC_AHB1ENR_GPIODEN, RCC_AHB1ENR_GPIOEEN, RCC_AHB1ENR_GPIOFEN,
-    RCC_AHB1ENR_GPIOGEN, RCC_AHB1ENR_GPIOHEN
-};
+    RCC_AHB1ENR_GPIOGEN, RCC_AHB1ENR_GPIOHEN};
 
 /**
  * \brief           IRQ callback storage for each EXTI line (0-15)
@@ -48,8 +46,7 @@ static struct {
  * \brief           Enable GPIO port clock
  * \param[in]       port: GPIO port
  */
-static void gpio_enable_clock(hal_gpio_port_t port)
-{
+static void gpio_enable_clock(hal_gpio_port_t port) {
     RCC->AHB1ENR |= gpio_clk_bits[port];
     /* Delay after enabling clock */
     __asm volatile("dsb");
@@ -60,8 +57,7 @@ static void gpio_enable_clock(hal_gpio_port_t port)
  * \param[in]       pin: GPIO pin (EXTI line)
  * \return          IRQ number
  */
-static IRQn_Type gpio_get_irqn(hal_gpio_pin_t pin)
-{
+static IRQn_Type gpio_get_irqn(hal_gpio_pin_t pin) {
     if (pin <= 4) {
         return (IRQn_Type)(EXTI0_IRQn + pin);
     } else if (pin <= 9) {
@@ -75,10 +71,8 @@ static IRQn_Type gpio_get_irqn(hal_gpio_pin_t pin)
 /* Public functions                                                           */
 /*===========================================================================*/
 
-hal_status_t hal_gpio_init(hal_gpio_port_t port,
-                           hal_gpio_pin_t pin,
-                           const hal_gpio_config_t* config)
-{
+hal_status_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                           const hal_gpio_config_t* config) {
     GPIO_TypeDef* gpio;
     uint32_t temp;
 
@@ -129,8 +123,7 @@ hal_status_t hal_gpio_init(hal_gpio_port_t port,
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     GPIO_TypeDef* gpio;
 
     if (port >= HAL_GPIO_PORT_MAX || pin > 15) {
@@ -155,10 +148,8 @@ hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin)
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_write(hal_gpio_port_t port,
-                            hal_gpio_pin_t pin,
-                            hal_gpio_level_t level)
-{
+hal_status_t hal_gpio_write(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                            hal_gpio_level_t level) {
     GPIO_TypeDef* gpio;
 
     if (port >= HAL_GPIO_PORT_MAX || pin > 15) {
@@ -176,10 +167,8 @@ hal_status_t hal_gpio_write(hal_gpio_port_t port,
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_read(hal_gpio_port_t port,
-                           hal_gpio_pin_t pin,
-                           hal_gpio_level_t* level)
-{
+hal_status_t hal_gpio_read(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                           hal_gpio_level_t* level) {
     GPIO_TypeDef* gpio;
 
     if (port >= HAL_GPIO_PORT_MAX || pin > 15 || level == NULL) {
@@ -187,13 +176,13 @@ hal_status_t hal_gpio_read(hal_gpio_port_t port,
     }
 
     gpio = gpio_ports[port];
-    *level = (gpio->IDR & (1UL << pin)) ? HAL_GPIO_LEVEL_HIGH : HAL_GPIO_LEVEL_LOW;
+    *level =
+        (gpio->IDR & (1UL << pin)) ? HAL_GPIO_LEVEL_HIGH : HAL_GPIO_LEVEL_LOW;
 
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     GPIO_TypeDef* gpio;
 
     if (port >= HAL_GPIO_PORT_MAX || pin > 15) {
@@ -206,12 +195,10 @@ hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin)
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_irq_config(hal_gpio_port_t port,
-                                 hal_gpio_pin_t pin,
+hal_status_t hal_gpio_irq_config(hal_gpio_port_t port, hal_gpio_pin_t pin,
                                  hal_gpio_irq_mode_t mode,
                                  hal_gpio_irq_callback_t callback,
-                                 void* context)
-{
+                                 void* context) {
     uint32_t exticr_idx;
     uint32_t exticr_shift;
 
@@ -267,8 +254,7 @@ hal_status_t hal_gpio_irq_config(hal_gpio_port_t port,
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_irq_enable(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_irq_enable(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     (void)port;
 
     if (pin > 15) {
@@ -287,8 +273,7 @@ hal_status_t hal_gpio_irq_enable(hal_gpio_port_t port, hal_gpio_pin_t pin)
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     (void)port;
 
     if (pin > 15) {
@@ -312,8 +297,7 @@ hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin)
  * \brief           Common EXTI handler
  * \param[in]       pin: EXTI line (pin number)
  */
-static void gpio_exti_handler(hal_gpio_pin_t pin)
-{
+static void gpio_exti_handler(hal_gpio_pin_t pin) {
     /* Check if interrupt is pending */
     if (EXTI->PR & (1UL << pin)) {
         /* Clear pending flag */
@@ -321,41 +305,46 @@ static void gpio_exti_handler(hal_gpio_pin_t pin)
 
         /* Call user callback */
         if (gpio_irq_handlers[pin].callback != NULL) {
-            gpio_irq_handlers[pin].callback(
-                gpio_irq_handlers[pin].port,
-                pin,
-                gpio_irq_handlers[pin].context
-            );
+            gpio_irq_handlers[pin].callback(gpio_irq_handlers[pin].port, pin,
+                                            gpio_irq_handlers[pin].context);
         }
     }
 }
 
 /* EXTI0 IRQ Handler */
-void EXTI0_IRQHandler(void) { gpio_exti_handler(0); }
+void EXTI0_IRQHandler(void) {
+    gpio_exti_handler(0);
+}
 
 /* EXTI1 IRQ Handler */
-void EXTI1_IRQHandler(void) { gpio_exti_handler(1); }
+void EXTI1_IRQHandler(void) {
+    gpio_exti_handler(1);
+}
 
 /* EXTI2 IRQ Handler */
-void EXTI2_IRQHandler(void) { gpio_exti_handler(2); }
+void EXTI2_IRQHandler(void) {
+    gpio_exti_handler(2);
+}
 
 /* EXTI3 IRQ Handler */
-void EXTI3_IRQHandler(void) { gpio_exti_handler(3); }
+void EXTI3_IRQHandler(void) {
+    gpio_exti_handler(3);
+}
 
 /* EXTI4 IRQ Handler */
-void EXTI4_IRQHandler(void) { gpio_exti_handler(4); }
+void EXTI4_IRQHandler(void) {
+    gpio_exti_handler(4);
+}
 
 /* EXTI9_5 IRQ Handler */
-void EXTI9_5_IRQHandler(void)
-{
+void EXTI9_5_IRQHandler(void) {
     for (hal_gpio_pin_t pin = 5; pin <= 9; ++pin) {
         gpio_exti_handler(pin);
     }
 }
 
 /* EXTI15_10 IRQ Handler */
-void EXTI15_10_IRQHandler(void)
-{
+void EXTI15_10_IRQHandler(void) {
     for (hal_gpio_pin_t pin = 10; pin <= 15; ++pin) {
         gpio_exti_handler(pin);
     }

@@ -16,8 +16,8 @@
 /* Local definitions                                                          */
 /*===========================================================================*/
 
-#define MAX_PORTS   8
-#define MAX_PINS    16
+#define MAX_PORTS 8
+#define MAX_PINS  16
 
 /**
  * \brief           Simulated GPIO state array
@@ -28,23 +28,19 @@ static native_gpio_pin_t gpio_state[MAX_PORTS][MAX_PINS];
 /* Public functions                                                           */
 /*===========================================================================*/
 
-native_gpio_pin_t* native_gpio_get_state(uint8_t port, uint8_t pin)
-{
+native_gpio_pin_t* native_gpio_get_state(uint8_t port, uint8_t pin) {
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
         return NULL;
     }
     return &gpio_state[port][pin];
 }
 
-void native_gpio_reset_all(void)
-{
+void native_gpio_reset_all(void) {
     memset(gpio_state, 0, sizeof(gpio_state));
 }
 
-hal_status_t hal_gpio_init(hal_gpio_port_t port,
-                           hal_gpio_pin_t pin,
-                           const hal_gpio_config_t* config)
-{
+hal_status_t hal_gpio_init(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                           const hal_gpio_config_t* config) {
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
@@ -62,8 +58,7 @@ hal_status_t hal_gpio_init(hal_gpio_port_t port,
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
@@ -78,10 +73,8 @@ hal_status_t hal_gpio_deinit(hal_gpio_port_t port, hal_gpio_pin_t pin)
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_write(hal_gpio_port_t port,
-                            hal_gpio_pin_t pin,
-                            hal_gpio_level_t level)
-{
+hal_status_t hal_gpio_write(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                            hal_gpio_level_t level) {
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
@@ -100,10 +93,8 @@ hal_status_t hal_gpio_write(hal_gpio_port_t port,
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_read(hal_gpio_port_t port,
-                           hal_gpio_pin_t pin,
-                           hal_gpio_level_t* level)
-{
+hal_status_t hal_gpio_read(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                           hal_gpio_level_t* level) {
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
@@ -122,8 +113,7 @@ hal_status_t hal_gpio_read(hal_gpio_port_t port,
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     native_gpio_pin_t* state;
 
     if (port >= MAX_PORTS || pin >= MAX_PINS) {
@@ -142,12 +132,10 @@ hal_status_t hal_gpio_toggle(hal_gpio_port_t port, hal_gpio_pin_t pin)
     return HAL_OK;
 }
 
-hal_status_t hal_gpio_irq_config(hal_gpio_port_t port,
-                                 hal_gpio_pin_t pin,
+hal_status_t hal_gpio_irq_config(hal_gpio_port_t port, hal_gpio_pin_t pin,
                                  hal_gpio_irq_mode_t mode,
                                  hal_gpio_irq_callback_t callback,
-                                 void* context)
-{
+                                 void* context) {
     (void)port;
     (void)pin;
     (void)mode;
@@ -156,15 +144,13 @@ hal_status_t hal_gpio_irq_config(hal_gpio_port_t port,
     return HAL_ERR_NOT_SUPPORTED;
 }
 
-hal_status_t hal_gpio_irq_enable(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_irq_enable(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     (void)port;
     (void)pin;
     return HAL_ERR_NOT_SUPPORTED;
 }
 
-hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin)
-{
+hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     (void)port;
     (void)pin;
     return HAL_ERR_NOT_SUPPORTED;

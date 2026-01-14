@@ -8,17 +8,17 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * Property-based tests for Shell core initialization and deinitialization.
- * These tests verify universal properties that should hold for all valid inputs.
- * Each property test runs 100+ iterations with random inputs.
+ * These tests verify universal properties that should hold for all valid
+ * inputs. Each property test runs 100+ iterations with random inputs.
  *
  * Feature: shell-cli-middleware
  * **Validates: Requirements 1.1, 1.6**
  */
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <random>
 #include <string>
-#include <cstring>
 
 extern "C" {
 #include "shell/shell.h"
@@ -34,7 +34,7 @@ static constexpr int PROPERTY_TEST_ITERATIONS = 100;
  * \brief           Shell Core Property Test Fixture
  */
 class ShellCorePropertyTest : public ::testing::Test {
-protected:
+  protected:
     std::mt19937 rng;
 
     void SetUp() override {
@@ -77,7 +77,7 @@ protected:
      */
     uint16_t randomBufferSize() {
         std::uniform_int_distribution<int> dist(SHELL_MIN_CMD_BUFFER_SIZE,
-                                                 SHELL_MAX_CMD_BUFFER_SIZE);
+                                                SHELL_MAX_CMD_BUFFER_SIZE);
         return static_cast<uint16_t>(dist(rng));
     }
 
@@ -87,7 +87,7 @@ protected:
      */
     uint8_t randomHistoryDepth() {
         std::uniform_int_distribution<int> dist(SHELL_MIN_HISTORY_DEPTH,
-                                                 SHELL_MAX_HISTORY_DEPTH);
+                                                SHELL_MAX_HISTORY_DEPTH);
         return static_cast<uint8_t>(dist(rng));
     }
 
@@ -101,16 +101,13 @@ protected:
         std::memcpy(s_prompt, prompt.c_str(), prompt.length());
         s_prompt[prompt.length()] = '\0';
 
-        shell_config_t config = {
-            .prompt = s_prompt,
-            .cmd_buffer_size = randomBufferSize(),
-            .history_depth = randomHistoryDepth(),
-            .max_commands = SHELL_MAX_COMMANDS
-        };
+        shell_config_t config = {.prompt = s_prompt,
+                                 .cmd_buffer_size = randomBufferSize(),
+                                 .history_depth = randomHistoryDepth(),
+                                 .max_commands = SHELL_MAX_COMMANDS};
         return config;
     }
 };
-
 
 /*---------------------------------------------------------------------------*/
 /* Property 1: Init/Deinit Round-Trip                                        */
@@ -142,9 +139,9 @@ TEST_F(ShellCorePropertyTest, Property1_InitDeinitRoundTrip) {
         /* Step 1: Initialize shell */
         shell_status_t initStatus = shell_init(&config);
         EXPECT_EQ(SHELL_OK, initStatus)
-            << "Iter " << iter << ": init failed with buffer_size="
-            << config.cmd_buffer_size << ", history_depth="
-            << static_cast<int>(config.history_depth);
+            << "Iter " << iter
+            << ": init failed with buffer_size=" << config.cmd_buffer_size
+            << ", history_depth=" << static_cast<int>(config.history_depth);
 
         if (initStatus != SHELL_OK) {
             continue;
@@ -161,7 +158,8 @@ TEST_F(ShellCorePropertyTest, Property1_InitDeinitRoundTrip) {
 
         /* Verify shell is uninitialized */
         EXPECT_FALSE(shell_is_initialized())
-            << "Iter " << iter << ": shell should be uninitialized after deinit";
+            << "Iter " << iter
+            << ": shell should be uninitialized after deinit";
     }
 }
 
@@ -290,8 +288,8 @@ TEST_F(ShellCorePropertyTest, Property1d_ConfigValidation) {
         }
 
         /* Test invalid buffer sizes */
-        std::uniform_int_distribution<int> invalidSmallDist(1,
-            SHELL_MIN_CMD_BUFFER_SIZE - 1);
+        std::uniform_int_distribution<int> invalidSmallDist(
+            1, SHELL_MIN_CMD_BUFFER_SIZE - 1);
         std::uniform_int_distribution<int> invalidLargeDist(
             SHELL_MAX_CMD_BUFFER_SIZE + 1, SHELL_MAX_CMD_BUFFER_SIZE + 100);
 
@@ -327,4 +325,3 @@ TEST_F(ShellCorePropertyTest, Property1d_ConfigValidation) {
         EXPECT_FALSE(shell_is_initialized());
     }
 }
-

@@ -8,16 +8,16 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * Property-based tests for I2C module.
- * These tests verify universal properties that should hold for all valid inputs.
- * Each property test runs 100+ iterations with random inputs.
+ * These tests verify universal properties that should hold for all valid
+ * inputs. Each property test runs 100+ iterations with random inputs.
  *
  * **Validates: Requirements 4.4**
  */
 
-#include <gtest/gtest.h>
-#include <random>
 #include <cstdint>
 #include <cstring>
+#include <gtest/gtest.h>
+#include <random>
 
 extern "C" {
 #include "hal/hal_i2c.h"
@@ -38,7 +38,7 @@ static constexpr size_t MAX_TRANSFER_SIZE = 64;
  * \brief           I2C Property Test Fixture
  */
 class HalI2cPropertyTest : public ::testing::Test {
-protected:
+  protected:
     std::mt19937 rng;
 
     void SetUp() override {
@@ -61,12 +61,14 @@ protected:
     }
 
     uint16_t randomDeviceAddress() {
-        std::uniform_int_distribution<int> dist(0x08, 0x77); // Valid 7-bit I2C range
+        std::uniform_int_distribution<int> dist(0x08,
+                                                0x77);  // Valid 7-bit I2C range
         return static_cast<uint16_t>(dist(rng));
     }
 
     uint16_t randomMemoryAddress() {
-        std::uniform_int_distribution<int> dist(0, 255); // Within buffer bounds
+        std::uniform_int_distribution<int> dist(0,
+                                                255);  // Within buffer bounds
         return static_cast<uint16_t>(dist(rng));
     }
 
@@ -88,10 +90,7 @@ protected:
 
     hal_i2c_config_t makeConfig(hal_i2c_speed_t speed) {
         return hal_i2c_config_t{
-            .speed      = speed,
-            .addr_mode  = HAL_I2C_ADDR_7BIT,
-            .own_addr   = 0x50
-        };
+            .speed = speed, .addr_mode = HAL_I2C_ADDR_7BIT, .own_addr = 0x50};
     }
 };
 
@@ -119,32 +118,39 @@ TEST_F(HalI2cPropertyTest, Property9_I2cProtocolCompliance) {
 
         // Add a simulated device
         ASSERT_TRUE(native_i2c_add_device(instance, dev_addr, true))
-            << "Iteration " << i << ": failed to add device " << std::hex << dev_addr;
+            << "Iteration " << i << ": failed to add device " << std::hex
+            << dev_addr;
 
         // Generate random TX data
         uint8_t tx_data[MAX_TRANSFER_SIZE];
         fillRandomData(tx_data, transfer_len);
 
         // Perform master transmit
-        ASSERT_EQ(HAL_OK, hal_i2c_master_transmit(instance, dev_addr, tx_data, transfer_len, 1000))
-            << "Iteration " << i << ": master_transmit failed for dev_addr=" << std::hex << dev_addr
+        ASSERT_EQ(HAL_OK, hal_i2c_master_transmit(instance, dev_addr, tx_data,
+                                                  transfer_len, 1000))
+            << "Iteration " << i
+            << ": master_transmit failed for dev_addr=" << std::hex << dev_addr
             << " len=" << transfer_len;
 
-        // Verify protocol compliance: the transaction should have recorded the correct device address
+        // Verify protocol compliance: the transaction should have recorded the
+        // correct device address
         uint16_t recorded_dev_addr = native_i2c_get_last_dev_addr(instance);
         EXPECT_EQ(dev_addr, recorded_dev_addr)
             << "Iteration " << i << ": device address mismatch. "
-            << "Expected=" << std::hex << dev_addr << " Got=" << recorded_dev_addr;
+            << "Expected=" << std::hex << dev_addr
+            << " Got=" << recorded_dev_addr;
 
         // Verify the transmitted data was correctly recorded
         uint8_t read_back[MAX_TRANSFER_SIZE];
-        size_t actual_len = native_i2c_get_last_tx_data(instance, read_back, sizeof(read_back));
+        size_t actual_len =
+            native_i2c_get_last_tx_data(instance, read_back, sizeof(read_back));
         EXPECT_EQ(transfer_len, actual_len)
             << "Iteration " << i << ": TX length mismatch. "
             << "Expected=" << transfer_len << " Got=" << actual_len;
 
         EXPECT_EQ(0, memcmp(tx_data, read_back, transfer_len))
-            << "Iteration " << i << ": TX data mismatch for len=" << transfer_len;
+            << "Iteration " << i
+            << ": TX data mismatch for len=" << transfer_len;
 
         hal_i2c_deinit(instance);
     }
@@ -166,7 +172,9 @@ TEST_F(HalI2cPropertyTest, Property9Extended_I2cMemoryWriteProtocol) {
         auto speed = randomSpeed();
         auto dev_addr = randomDeviceAddress();
         auto mem_addr = randomMemoryAddress();
-        auto transfer_len = std::min(randomTransferSize(), size_t(256 - mem_addr)); // Stay within bounds
+        auto transfer_len =
+            std::min(randomTransferSize(),
+                     size_t(256 - mem_addr));  // Stay within bounds
 
         hal_i2c_config_t config = makeConfig(speed);
         ASSERT_EQ(HAL_OK, hal_i2c_init(instance, &config))
@@ -181,8 +189,10 @@ TEST_F(HalI2cPropertyTest, Property9Extended_I2cMemoryWriteProtocol) {
         fillRandomData(write_data, transfer_len);
 
         // Write to memory
-        ASSERT_EQ(HAL_OK, hal_i2c_mem_write(instance, dev_addr, mem_addr, 1, write_data, transfer_len, 1000))
-            << "Iteration " << i << ": mem_write failed for dev_addr=" << std::hex << dev_addr
+        ASSERT_EQ(HAL_OK, hal_i2c_mem_write(instance, dev_addr, mem_addr, 1,
+                                            write_data, transfer_len, 1000))
+            << "Iteration " << i
+            << ": mem_write failed for dev_addr=" << std::hex << dev_addr
             << " mem_addr=" << mem_addr << " len=" << transfer_len;
 
         // Verify the memory write recorded correct transaction details
@@ -193,12 +203,14 @@ TEST_F(HalI2cPropertyTest, Property9Extended_I2cMemoryWriteProtocol) {
 
         // Read back from memory to verify write
         uint8_t read_data[MAX_TRANSFER_SIZE];
-        ASSERT_EQ(HAL_OK, hal_i2c_mem_read(instance, dev_addr, mem_addr, 1, read_data, transfer_len, 1000))
+        ASSERT_EQ(HAL_OK, hal_i2c_mem_read(instance, dev_addr, mem_addr, 1,
+                                           read_data, transfer_len, 1000))
             << "Iteration " << i << ": mem_read failed";
 
         // Verify data integrity (round-trip property)
         EXPECT_EQ(0, memcmp(write_data, read_data, transfer_len))
-            << "Iteration " << i << ": memory round-trip data mismatch for len=" << transfer_len
+            << "Iteration " << i
+            << ": memory round-trip data mismatch for len=" << transfer_len
             << " at mem_addr=" << mem_addr;
 
         hal_i2c_deinit(instance);
@@ -230,13 +242,13 @@ TEST_F(HalI2cPropertyTest, Property9Extended_I2cSpeedConfiguration) {
 
         switch (speed) {
             case HAL_I2C_SPEED_STANDARD:
-                expected_speed = 100000; // 100 kHz
+                expected_speed = 100000;  // 100 kHz
                 break;
             case HAL_I2C_SPEED_FAST:
-                expected_speed = 400000; // 400 kHz
+                expected_speed = 400000;  // 400 kHz
                 break;
             case HAL_I2C_SPEED_FAST_PLUS:
-                expected_speed = 1000000; // 1 MHz
+                expected_speed = 1000000;  // 1 MHz
                 break;
             default:
                 expected_speed = 100000;
@@ -272,26 +284,32 @@ TEST_F(HalI2cPropertyTest, Property9Extended_I2cDeviceReadyCheck) {
             << "Iteration " << i << ": init failed";
 
         // Initially no device should be present
-        EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
+        EXPECT_EQ(HAL_ERROR_TIMEOUT,
+                  hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
             << "Iteration " << i << ": device should not be ready initially";
 
         // Add device but not ready
         ASSERT_TRUE(native_i2c_add_device(instance, dev_addr, false))
             << "Iteration " << i << ": failed to add device";
-        EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
-            << "Iteration " << i << ": device should not be ready when not ready flag set";
+        EXPECT_EQ(HAL_ERROR_TIMEOUT,
+                  hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
+            << "Iteration " << i
+            << ": device should not be ready when not ready flag set";
 
         // Set device ready
         ASSERT_TRUE(native_i2c_set_device_ready(instance, dev_addr, true))
             << "Iteration " << i << ": failed to set device ready";
         EXPECT_EQ(HAL_OK, hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
-            << "Iteration " << i << ": device should be ready when ready flag set";
+            << "Iteration " << i
+            << ": device should be ready when ready flag set";
 
         // Set device not ready again
         ASSERT_TRUE(native_i2c_set_device_ready(instance, dev_addr, false))
             << "Iteration " << i << ": failed to set device not ready";
-        EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
-            << "Iteration " << i << ": device should not be ready after clearing ready flag";
+        EXPECT_EQ(HAL_ERROR_TIMEOUT,
+                  hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
+            << "Iteration " << i
+            << ": device should not be ready after clearing ready flag";
 
         hal_i2c_deinit(instance);
     }

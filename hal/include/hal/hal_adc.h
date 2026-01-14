@@ -27,60 +27,60 @@ extern "C" {
  * \brief           ADC instance enumeration
  */
 typedef enum {
-    HAL_ADC_0 = 0,                  /**< ADC instance 0 */
-    HAL_ADC_1,                      /**< ADC instance 1 */
-    HAL_ADC_2,                      /**< ADC instance 2 */
-    HAL_ADC_MAX                     /**< Maximum ADC count */
+    HAL_ADC_0 = 0, /**< ADC instance 0 */
+    HAL_ADC_1,     /**< ADC instance 1 */
+    HAL_ADC_2,     /**< ADC instance 2 */
+    HAL_ADC_MAX    /**< Maximum ADC count */
 } hal_adc_instance_t;
 
 /**
  * \brief           ADC resolution
  */
 typedef enum {
-    HAL_ADC_RES_6BIT = 0,           /**< 6-bit resolution */
-    HAL_ADC_RES_8BIT,               /**< 8-bit resolution */
-    HAL_ADC_RES_10BIT,              /**< 10-bit resolution */
-    HAL_ADC_RES_12BIT               /**< 12-bit resolution */
+    HAL_ADC_RES_6BIT = 0, /**< 6-bit resolution */
+    HAL_ADC_RES_8BIT,     /**< 8-bit resolution */
+    HAL_ADC_RES_10BIT,    /**< 10-bit resolution */
+    HAL_ADC_RES_12BIT     /**< 12-bit resolution */
 } hal_adc_resolution_t;
 
 /**
  * \brief           ADC reference voltage
  */
 typedef enum {
-    HAL_ADC_REF_INTERNAL = 0,       /**< Internal reference */
-    HAL_ADC_REF_EXTERNAL,           /**< External reference */
-    HAL_ADC_REF_VDD                 /**< VDD as reference */
+    HAL_ADC_REF_INTERNAL = 0, /**< Internal reference */
+    HAL_ADC_REF_EXTERNAL,     /**< External reference */
+    HAL_ADC_REF_VDD           /**< VDD as reference */
 } hal_adc_reference_t;
 
 /**
  * \brief           ADC sample time
  */
 typedef enum {
-    HAL_ADC_SAMPLE_3CYCLES = 0,     /**< 3 cycles */
-    HAL_ADC_SAMPLE_15CYCLES,        /**< 15 cycles */
-    HAL_ADC_SAMPLE_28CYCLES,        /**< 28 cycles */
-    HAL_ADC_SAMPLE_56CYCLES,        /**< 56 cycles */
-    HAL_ADC_SAMPLE_84CYCLES,        /**< 84 cycles */
-    HAL_ADC_SAMPLE_112CYCLES,       /**< 112 cycles */
-    HAL_ADC_SAMPLE_144CYCLES,       /**< 144 cycles */
-    HAL_ADC_SAMPLE_480CYCLES        /**< 480 cycles */
+    HAL_ADC_SAMPLE_3CYCLES = 0, /**< 3 cycles */
+    HAL_ADC_SAMPLE_15CYCLES,    /**< 15 cycles */
+    HAL_ADC_SAMPLE_28CYCLES,    /**< 28 cycles */
+    HAL_ADC_SAMPLE_56CYCLES,    /**< 56 cycles */
+    HAL_ADC_SAMPLE_84CYCLES,    /**< 84 cycles */
+    HAL_ADC_SAMPLE_112CYCLES,   /**< 112 cycles */
+    HAL_ADC_SAMPLE_144CYCLES,   /**< 144 cycles */
+    HAL_ADC_SAMPLE_480CYCLES    /**< 480 cycles */
 } hal_adc_sample_time_t;
 
 /**
  * \brief           ADC configuration structure
  */
 typedef struct {
-    hal_adc_resolution_t  resolution;   /**< ADC resolution */
-    hal_adc_reference_t   reference;    /**< Reference voltage */
-    hal_adc_sample_time_t sample_time;  /**< Sample time */
+    hal_adc_resolution_t resolution;   /**< ADC resolution */
+    hal_adc_reference_t reference;     /**< Reference voltage */
+    hal_adc_sample_time_t sample_time; /**< Sample time */
 } hal_adc_config_t;
 
 /**
  * \brief           ADC channel configuration
  */
 typedef struct {
-    uint8_t               channel;      /**< Channel number (0-15) */
-    hal_adc_sample_time_t sample_time;  /**< Sample time for this channel */
+    uint8_t channel;                   /**< Channel number (0-15) */
+    hal_adc_sample_time_t sample_time; /**< Sample time for this channel */
 } hal_adc_channel_config_t;
 
 /**
@@ -89,8 +89,7 @@ typedef struct {
  * \param[in]       value: Converted value
  * \param[in]       context: User context
  */
-typedef void (*hal_adc_callback_t)(hal_adc_instance_t instance,
-                                   uint16_t value,
+typedef void (*hal_adc_callback_t)(hal_adc_instance_t instance, uint16_t value,
                                    void* context);
 
 /**
@@ -126,10 +125,8 @@ hal_status_t hal_adc_config_channel(hal_adc_instance_t instance,
  * \param[in]       timeout_ms: Timeout in milliseconds
  * \return          HAL_OK on success, error code otherwise
  */
-hal_status_t hal_adc_read(hal_adc_instance_t instance,
-                          uint8_t channel,
-                          uint16_t* value,
-                          uint32_t timeout_ms);
+hal_status_t hal_adc_read(hal_adc_instance_t instance, uint8_t channel,
+                          uint16_t* value, uint32_t timeout_ms);
 
 /**
  * \brief           Read multiple channels (blocking)
@@ -141,10 +138,8 @@ hal_status_t hal_adc_read(hal_adc_instance_t instance,
  * \return          HAL_OK on success, error code otherwise
  */
 hal_status_t hal_adc_read_multi(hal_adc_instance_t instance,
-                                const uint8_t* channels,
-                                uint16_t* values,
-                                size_t count,
-                                uint32_t timeout_ms);
+                                const uint8_t* channels, uint16_t* values,
+                                size_t count, uint32_t timeout_ms);
 
 /**
  * \brief           Convert raw ADC value to millivolts
@@ -153,8 +148,7 @@ hal_status_t hal_adc_read_multi(hal_adc_instance_t instance,
  * \param[in]       vref_mv: Reference voltage in millivolts
  * \return          Voltage in millivolts
  */
-uint32_t hal_adc_to_millivolts(hal_adc_instance_t instance,
-                               uint16_t raw_value,
+uint32_t hal_adc_to_millivolts(hal_adc_instance_t instance, uint16_t raw_value,
                                uint32_t vref_mv);
 
 /**
@@ -172,8 +166,7 @@ hal_status_t hal_adc_read_temperature(hal_adc_instance_t instance,
  * \param[out]      vref_mv: Pointer to store reference voltage in mV
  * \return          HAL_OK on success, error code otherwise
  */
-hal_status_t hal_adc_read_vref(hal_adc_instance_t instance,
-                               uint16_t* vref_mv);
+hal_status_t hal_adc_read_vref(hal_adc_instance_t instance, uint16_t* vref_mv);
 
 /**
  * \brief           Register conversion complete callback
@@ -183,8 +176,7 @@ hal_status_t hal_adc_read_vref(hal_adc_instance_t instance,
  * \return          HAL_OK on success, error code otherwise
  */
 hal_status_t hal_adc_set_callback(hal_adc_instance_t instance,
-                                  hal_adc_callback_t callback,
-                                  void* context);
+                                  hal_adc_callback_t callback, void* context);
 
 /**
  * \}

@@ -8,14 +8,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * Property-based tests for UART module.
- * These tests verify universal properties that should hold for all valid inputs.
- * Each property test runs 100+ iterations with random inputs.
+ * These tests verify universal properties that should hold for all valid
+ * inputs. Each property test runs 100+ iterations with random inputs.
  */
 
-#include <gtest/gtest.h>
-#include <random>
 #include <cstdint>
 #include <cstring>
+#include <gtest/gtest.h>
+#include <random>
 #include <vector>
 
 extern "C" {
@@ -32,7 +32,7 @@ static constexpr int PROPERTY_TEST_ITERATIONS = 100;
  * \brief           UART Property Test Fixture
  */
 class HalUartPropertyTest : public ::testing::Test {
-protected:
+  protected:
     std::mt19937 rng;
 
     void SetUp() override {
@@ -51,9 +51,8 @@ protected:
 
     uint32_t randomBaudrate() {
         /* Valid baudrates: 9600 - 921600 */
-        std::vector<uint32_t> baudrates = {
-            9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600
-        };
+        std::vector<uint32_t> baudrates = {9600,   19200,  38400,  57600,
+                                           115200, 230400, 460800, 921600};
         std::uniform_int_distribution<size_t> dist(0, baudrates.size() - 1);
         return baudrates[dist(rng)];
     }
@@ -74,13 +73,11 @@ protected:
     }
 
     hal_uart_config_t makeConfig(uint32_t baudrate) {
-        return hal_uart_config_t{
-            .baudrate = baudrate,
-            .wordlen  = HAL_UART_WORDLEN_8,
-            .stopbits = HAL_UART_STOPBITS_1,
-            .parity   = HAL_UART_PARITY_NONE,
-            .flowctrl = HAL_UART_FLOWCTRL_NONE
-        };
+        return hal_uart_config_t{.baudrate = baudrate,
+                                 .wordlen = HAL_UART_WORDLEN_8,
+                                 .stopbits = HAL_UART_STOPBITS_1,
+                                 .parity = HAL_UART_PARITY_NONE,
+                                 .flowctrl = HAL_UART_FLOWCTRL_NONE};
     }
 };
 
@@ -98,7 +95,7 @@ TEST_F(HalUartPropertyTest, Property4_DataIntegrity) {
 
         auto instance = randomInstance();
         auto baudrate = randomBaudrate();
-        auto tx_data = randomData(1, 64);  /* Random data 1-64 bytes */
+        auto tx_data = randomData(1, 64); /* Random data 1-64 bytes */
 
         hal_uart_config_t config = makeConfig(baudrate);
 
@@ -107,17 +104,19 @@ TEST_F(HalUartPropertyTest, Property4_DataIntegrity) {
             << " baudrate=" << baudrate;
 
         /* Transmit data */
-        ASSERT_EQ(HAL_OK, hal_uart_transmit(instance, tx_data.data(), tx_data.size(), 1000))
+        ASSERT_EQ(HAL_OK, hal_uart_transmit(instance, tx_data.data(),
+                                            tx_data.size(), 1000))
             << "Iteration " << i << ": transmit failed";
 
         /* Read transmitted data from TX buffer (simulates loopback) */
         std::vector<uint8_t> rx_data(tx_data.size());
-        size_t rx_len = native_uart_get_tx_data(instance, rx_data.data(), rx_data.size());
+        size_t rx_len =
+            native_uart_get_tx_data(instance, rx_data.data(), rx_data.size());
 
         /* Verify data integrity */
         EXPECT_EQ(tx_data.size(), rx_len)
-            << "Iteration " << i << ": length mismatch. Expected " << tx_data.size()
-            << " got " << rx_len;
+            << "Iteration " << i << ": length mismatch. Expected "
+            << tx_data.size() << " got " << rx_len;
 
         EXPECT_EQ(0, memcmp(tx_data.data(), rx_data.data(), tx_data.size()))
             << "Iteration " << i << ": data mismatch for instance=" << instance
@@ -141,7 +140,7 @@ TEST_F(HalUartPropertyTest, Property4b_DataIntegrityRxPath) {
 
         auto instance = randomInstance();
         auto baudrate = randomBaudrate();
-        auto inject_data = randomData(1, 64);  /* Random data 1-64 bytes */
+        auto inject_data = randomData(1, 64); /* Random data 1-64 bytes */
 
         hal_uart_config_t config = makeConfig(baudrate);
 
@@ -149,16 +148,19 @@ TEST_F(HalUartPropertyTest, Property4b_DataIntegrityRxPath) {
             << "Iteration " << i << ": init failed";
 
         /* Inject data into RX buffer */
-        ASSERT_TRUE(native_uart_inject_rx_data(instance, inject_data.data(), inject_data.size()))
+        ASSERT_TRUE(native_uart_inject_rx_data(instance, inject_data.data(),
+                                               inject_data.size()))
             << "Iteration " << i << ": inject failed";
 
         /* Receive data */
         std::vector<uint8_t> rx_data(inject_data.size());
-        ASSERT_EQ(HAL_OK, hal_uart_receive(instance, rx_data.data(), rx_data.size(), 1000))
+        ASSERT_EQ(HAL_OK, hal_uart_receive(instance, rx_data.data(),
+                                           rx_data.size(), 1000))
             << "Iteration " << i << ": receive failed";
 
         /* Verify data integrity */
-        EXPECT_EQ(0, memcmp(inject_data.data(), rx_data.data(), inject_data.size()))
+        EXPECT_EQ(
+            0, memcmp(inject_data.data(), rx_data.data(), inject_data.size()))
             << "Iteration " << i << ": data mismatch for instance=" << instance
             << " len=" << inject_data.size();
 
@@ -199,8 +201,8 @@ TEST_F(HalUartPropertyTest, Property4c_SingleByteIntegrity) {
             << "Iteration " << i << ": expected 1 byte, got " << rx_len;
 
         EXPECT_EQ(tx_byte, rx_byte)
-            << "Iteration " << i << ": byte mismatch. Sent 0x" << std::hex << (int)tx_byte
-            << " received 0x" << (int)rx_byte;
+            << "Iteration " << i << ": byte mismatch. Sent 0x" << std::hex
+            << (int)tx_byte << " received 0x" << (int)rx_byte;
 
         hal_uart_deinit(instance);
     }
@@ -216,9 +218,8 @@ TEST_F(HalUartPropertyTest, Property4c_SingleByteIntegrity) {
  */
 TEST_F(HalUartPropertyTest, Property5_BaudrateAccuracy) {
     /* Test all standard baudrates */
-    std::vector<uint32_t> baudrates = {
-        9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600
-    };
+    std::vector<uint32_t> baudrates = {9600,   19200,  38400,  57600,
+                                       115200, 230400, 460800, 921600};
 
     for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
         native_uart_reset_all();
@@ -231,7 +232,8 @@ TEST_F(HalUartPropertyTest, Property5_BaudrateAccuracy) {
         hal_uart_config_t config = makeConfig(requested_baudrate);
 
         ASSERT_EQ(HAL_OK, hal_uart_init(instance, &config))
-            << "Iteration " << i << ": init failed for baudrate=" << requested_baudrate;
+            << "Iteration " << i
+            << ": init failed for baudrate=" << requested_baudrate;
 
         /* Get actual configured baudrate */
         uint32_t actual_baudrate = native_uart_get_actual_baudrate(instance);
@@ -239,8 +241,10 @@ TEST_F(HalUartPropertyTest, Property5_BaudrateAccuracy) {
         /* Calculate error percentage */
         double error_percent = 0.0;
         if (requested_baudrate > 0) {
-            double diff = static_cast<double>(actual_baudrate) - static_cast<double>(requested_baudrate);
-            error_percent = (diff / static_cast<double>(requested_baudrate)) * 100.0;
+            double diff = static_cast<double>(actual_baudrate) -
+                          static_cast<double>(requested_baudrate);
+            error_percent =
+                (diff / static_cast<double>(requested_baudrate)) * 100.0;
             if (error_percent < 0) {
                 error_percent = -error_percent;
             }
@@ -250,8 +254,8 @@ TEST_F(HalUartPropertyTest, Property5_BaudrateAccuracy) {
         EXPECT_LT(error_percent, 2.0)
             << "Iteration " << i << ": baudrate error too high. "
             << "Requested=" << requested_baudrate
-            << " Actual=" << actual_baudrate
-            << " Error=" << error_percent << "%";
+            << " Actual=" << actual_baudrate << " Error=" << error_percent
+            << "%";
 
         hal_uart_deinit(instance);
     }

@@ -8,19 +8,19 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * Property-based tests for Shell backend I/O operations.
- * These tests verify universal properties that should hold for all valid inputs.
- * Each property test runs 100+ iterations with random inputs.
+ * These tests verify universal properties that should hold for all valid
+ * inputs. Each property test runs 100+ iterations with random inputs.
  *
  * Feature: shell-cli-middleware
  * **Property 8: Backend I/O Consistency**
  * **Validates: Requirements 8.1, 8.4, 8.5**
  */
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <random>
 #include <string>
 #include <vector>
-#include <cstring>
 
 extern "C" {
 #include "shell/shell_backend.h"
@@ -40,7 +40,7 @@ static constexpr size_t MAX_TEST_DATA_SIZE = 512;
  * \brief           Shell Backend Property Test Fixture
  */
 class ShellBackendPropertyTest : public ::testing::Test {
-protected:
+  protected:
     std::mt19937 rng;
 
     void SetUp() override {
@@ -113,7 +113,8 @@ protected:
             case 1: {
                 /* Hex format */
                 int val = intDist(rng);
-                if (val < 0) val = -val;
+                if (val < 0)
+                    val = -val;
                 snprintf(buffer, sizeof(buffer), "%x", val);
                 return {"Hex: %x", std::string("Hex: ") + buffer};
             }
@@ -129,7 +130,6 @@ protected:
         }
     }
 };
-
 
 /*---------------------------------------------------------------------------*/
 /* Property 8: Backend I/O Consistency                                       */
@@ -158,8 +158,8 @@ TEST_F(ShellBackendPropertyTest, Property8_WriteTransmitsAllBytes) {
 
         /* Verify all bytes were written */
         EXPECT_EQ(static_cast<int>(data.size()), written)
-            << "Iter " << iter << ": write should transmit all "
-            << data.size() << " bytes";
+            << "Iter " << iter << ": write should transmit all " << data.size()
+            << " bytes";
 
         /* Verify output matches input */
         size_t outputLen = shell_mock_backend_get_output_length();
@@ -189,8 +189,8 @@ TEST_F(ShellBackendPropertyTest, Property8a_ReadIsNonBlocking) {
         /* Read with no data should return 0 immediately */
         uint8_t buffer[256];
         int read = shell_mock_backend.read(buffer, sizeof(buffer));
-        EXPECT_EQ(0, read)
-            << "Iter " << iter << ": read with no data should return 0";
+        EXPECT_EQ(0, read) << "Iter " << iter
+                           << ": read with no data should return 0";
 
         /* Inject some data */
         std::vector<uint8_t> data = randomData(100);
@@ -226,8 +226,7 @@ TEST_F(ShellBackendPropertyTest, Property8b_PrintfOutputConsistency) {
 
         /* Print using shell_printf */
         int result = shell_printf("%s", str.c_str());
-        EXPECT_GT(result, 0)
-            << "Iter " << iter << ": printf should succeed";
+        EXPECT_GT(result, 0) << "Iter " << iter << ": printf should succeed";
 
         /* Get output */
         char output[512];
@@ -324,8 +323,8 @@ TEST_F(ShellBackendPropertyTest, Property8e_ReadPartialDataConsistency) {
         while (shell_mock_backend_get_remaining_input() > 0) {
             int chunkSize = chunkDist(rng);
             uint8_t buffer[64];
-            int read = shell_mock_backend.read(buffer,
-                std::min(chunkSize, static_cast<int>(sizeof(buffer))));
+            int read = shell_mock_backend.read(
+                buffer, std::min(chunkSize, static_cast<int>(sizeof(buffer))));
 
             for (int i = 0; i < read; ++i) {
                 received.push_back(buffer[i]);

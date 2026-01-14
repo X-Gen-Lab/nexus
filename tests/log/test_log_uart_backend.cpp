@@ -14,12 +14,10 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
-
 extern "C" {
 #include "hal/hal_uart.h"
 #include "log/log.h"
 #include "native_platform.h"
-
 }
 
 /**

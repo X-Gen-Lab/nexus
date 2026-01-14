@@ -18,62 +18,61 @@
 /**
  * \brief           Maximum number of UART instances
  */
-#define UART_MAX_INSTANCES      3
+#define UART_MAX_INSTANCES 3
 
 /**
  * \brief           USART Status Register bit definitions
  */
-#define USART_SR_PE             (1UL << 0)   /**< Parity error */
-#define USART_SR_FE             (1UL << 1)   /**< Framing error */
-#define USART_SR_NE             (1UL << 2)   /**< Noise error */
-#define USART_SR_ORE            (1UL << 3)   /**< Overrun error */
-#define USART_SR_IDLE           (1UL << 4)   /**< IDLE line detected */
-#define USART_SR_RXNE           (1UL << 5)   /**< Read data register not empty */
-#define USART_SR_TC             (1UL << 6)   /**< Transmission complete */
-#define USART_SR_TXE            (1UL << 7)   /**< Transmit data register empty */
+#define USART_SR_PE   (1UL << 0) /**< Parity error */
+#define USART_SR_FE   (1UL << 1) /**< Framing error */
+#define USART_SR_NE   (1UL << 2) /**< Noise error */
+#define USART_SR_ORE  (1UL << 3) /**< Overrun error */
+#define USART_SR_IDLE (1UL << 4) /**< IDLE line detected */
+#define USART_SR_RXNE (1UL << 5) /**< Read data register not empty */
+#define USART_SR_TC   (1UL << 6) /**< Transmission complete */
+#define USART_SR_TXE  (1UL << 7) /**< Transmit data register empty */
 
 /**
  * \brief           USART Control Register 1 bit definitions
  */
-#define USART_CR1_RE            (1UL << 2)   /**< Receiver enable */
-#define USART_CR1_TE            (1UL << 3)   /**< Transmitter enable */
-#define USART_CR1_IDLEIE        (1UL << 4)   /**< IDLE interrupt enable */
-#define USART_CR1_RXNEIE        (1UL << 5)   /**< RXNE interrupt enable */
-#define USART_CR1_TCIE          (1UL << 6)   /**< TC interrupt enable */
-#define USART_CR1_TXEIE         (1UL << 7)   /**< TXE interrupt enable */
-#define USART_CR1_PEIE          (1UL << 8)   /**< PE interrupt enable */
-#define USART_CR1_PS            (1UL << 9)   /**< Parity selection */
-#define USART_CR1_PCE           (1UL << 10)  /**< Parity control enable */
-#define USART_CR1_M             (1UL << 12)  /**< Word length */
-#define USART_CR1_UE            (1UL << 13)  /**< USART enable */
+#define USART_CR1_RE     (1UL << 2)  /**< Receiver enable */
+#define USART_CR1_TE     (1UL << 3)  /**< Transmitter enable */
+#define USART_CR1_IDLEIE (1UL << 4)  /**< IDLE interrupt enable */
+#define USART_CR1_RXNEIE (1UL << 5)  /**< RXNE interrupt enable */
+#define USART_CR1_TCIE   (1UL << 6)  /**< TC interrupt enable */
+#define USART_CR1_TXEIE  (1UL << 7)  /**< TXE interrupt enable */
+#define USART_CR1_PEIE   (1UL << 8)  /**< PE interrupt enable */
+#define USART_CR1_PS     (1UL << 9)  /**< Parity selection */
+#define USART_CR1_PCE    (1UL << 10) /**< Parity control enable */
+#define USART_CR1_M      (1UL << 12) /**< Word length */
+#define USART_CR1_UE     (1UL << 13) /**< USART enable */
 
 /**
  * \brief           USART Control Register 2 bit definitions
  */
-#define USART_CR2_STOP_1        (0UL << 12)  /**< 1 stop bit */
-#define USART_CR2_STOP_2        (2UL << 12)  /**< 2 stop bits */
+#define USART_CR2_STOP_1 (0UL << 12) /**< 1 stop bit */
+#define USART_CR2_STOP_2 (2UL << 12) /**< 2 stop bits */
 
 /**
  * \brief           UART instance data
  */
 typedef struct {
-    USART_TypeDef*          instance;       /**< USART peripheral */
-    hal_uart_config_t       config;         /**< Configuration */
-    hal_uart_rx_callback_t  rx_callback;    /**< RX callback */
-    hal_uart_tx_callback_t  tx_callback;    /**< TX callback */
-    void*                   rx_context;     /**< RX callback context */
-    void*                   tx_context;     /**< TX callback context */
-    bool                    initialized;    /**< Initialization flag */
+    USART_TypeDef* instance;            /**< USART peripheral */
+    hal_uart_config_t config;           /**< Configuration */
+    hal_uart_rx_callback_t rx_callback; /**< RX callback */
+    hal_uart_tx_callback_t tx_callback; /**< TX callback */
+    void* rx_context;                   /**< RX callback context */
+    void* tx_context;                   /**< TX callback context */
+    bool initialized;                   /**< Initialization flag */
 } uart_data_t;
 
 /**
  * \brief           UART instance data array
  */
 static uart_data_t uart_data[UART_MAX_INSTANCES] = {
-    { USART1, {0}, NULL, NULL, NULL, NULL, false },
-    { USART2, {0}, NULL, NULL, NULL, NULL, false },
-    { USART3, {0}, NULL, NULL, NULL, NULL, false }
-};
+    {USART1, {0}, NULL, NULL, NULL, NULL, false},
+    {USART2, {0}, NULL, NULL, NULL, NULL, false},
+    {USART3, {0}, NULL, NULL, NULL, NULL, false}};
 
 /*===========================================================================*/
 /* Local functions                                                            */
@@ -84,8 +83,7 @@ static uart_data_t uart_data[UART_MAX_INSTANCES] = {
  * \param[in]       instance: UART instance
  * \return          Pointer to UART data or NULL
  */
-static uart_data_t* uart_get_data(hal_uart_instance_t instance)
-{
+static uart_data_t* uart_get_data(hal_uart_instance_t instance) {
     if (instance >= UART_MAX_INSTANCES) {
         return NULL;
     }
@@ -96,16 +94,15 @@ static uart_data_t* uart_get_data(hal_uart_instance_t instance)
  * \brief           Enable UART clock
  * \param[in]       instance: UART instance
  */
-static void uart_enable_clock(hal_uart_instance_t instance)
-{
+static void uart_enable_clock(hal_uart_instance_t instance) {
     switch (instance) {
-        case HAL_UART_0:  /* USART1 on APB2 */
+        case HAL_UART_0: /* USART1 on APB2 */
             RCC->APB2ENR |= (1UL << 4);
             break;
-        case HAL_UART_1:  /* USART2 on APB1 */
+        case HAL_UART_1: /* USART2 on APB1 */
             RCC->APB1ENR |= (1UL << 17);
             break;
-        case HAL_UART_2:  /* USART3 on APB1 */
+        case HAL_UART_2: /* USART3 on APB1 */
             RCC->APB1ENR |= (1UL << 18);
             break;
         default:
@@ -120,8 +117,7 @@ static void uart_enable_clock(hal_uart_instance_t instance)
  * \param[in]       instance: UART instance
  * \return          APB clock frequency
  */
-static uint32_t uart_get_clock(hal_uart_instance_t instance)
-{
+static uint32_t uart_get_clock(hal_uart_instance_t instance) {
     /* USART1 is on APB2, USART2/3 are on APB1 */
     /* Simplified: assume SystemCoreClock with no prescalers */
     (void)instance;
@@ -133,8 +129,7 @@ static uint32_t uart_get_clock(hal_uart_instance_t instance)
 /*===========================================================================*/
 
 hal_status_t hal_uart_init(hal_uart_instance_t instance,
-                           const hal_uart_config_t* config)
-{
+                           const hal_uart_config_t* config) {
     uart_data_t* data;
     USART_TypeDef* uart;
     uint32_t brr;
@@ -219,8 +214,7 @@ hal_status_t hal_uart_init(hal_uart_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_uart_deinit(hal_uart_instance_t instance)
-{
+hal_status_t hal_uart_deinit(hal_uart_instance_t instance) {
     uart_data_t* data = uart_get_data(instance);
 
     if (data == NULL) {
@@ -240,10 +234,8 @@ hal_status_t hal_uart_deinit(hal_uart_instance_t instance)
 }
 
 hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
-                               const uint8_t* data_buf,
-                               size_t len,
-                               uint32_t timeout_ms)
-{
+                               const uint8_t* data_buf, size_t len,
+                               uint32_t timeout_ms) {
     uart_data_t* data = uart_get_data(instance);
     USART_TypeDef* uart;
     size_t i;
@@ -263,7 +255,7 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
 
     for (i = 0; i < len; i++) {
         /* Wait for TXE (transmit data register empty) with timeout */
-        timeout_count = timeout_ms * 1000;  /* Simple delay counter */
+        timeout_count = timeout_ms * 1000; /* Simple delay counter */
         while (!(uart->SR & USART_SR_TXE)) {
             if (timeout_ms != HAL_WAIT_FOREVER && --timeout_count == 0) {
                 return HAL_ERROR_TIMEOUT;
@@ -288,11 +280,8 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_uart_receive(hal_uart_instance_t instance,
-                              uint8_t* data_buf,
-                              size_t len,
-                              uint32_t timeout_ms)
-{
+hal_status_t hal_uart_receive(hal_uart_instance_t instance, uint8_t* data_buf,
+                              size_t len, uint32_t timeout_ms) {
     uart_data_t* data = uart_get_data(instance);
     USART_TypeDef* uart;
     size_t i;
@@ -344,22 +333,18 @@ hal_status_t hal_uart_receive(hal_uart_instance_t instance,
     return HAL_OK;
 }
 
-hal_status_t hal_uart_putc(hal_uart_instance_t instance, uint8_t byte)
-{
+hal_status_t hal_uart_putc(hal_uart_instance_t instance, uint8_t byte) {
     return hal_uart_transmit(instance, &byte, 1, HAL_WAIT_FOREVER);
 }
 
-hal_status_t hal_uart_getc(hal_uart_instance_t instance,
-                           uint8_t* byte,
-                           uint32_t timeout_ms)
-{
+hal_status_t hal_uart_getc(hal_uart_instance_t instance, uint8_t* byte,
+                           uint32_t timeout_ms) {
     return hal_uart_receive(instance, byte, 1, timeout_ms);
 }
 
 hal_status_t hal_uart_set_rx_callback(hal_uart_instance_t instance,
                                       hal_uart_rx_callback_t callback,
-                                      void* context)
-{
+                                      void* context) {
     uart_data_t* data = uart_get_data(instance);
 
     if (data == NULL) {
@@ -384,8 +369,7 @@ hal_status_t hal_uart_set_rx_callback(hal_uart_instance_t instance,
 
 hal_status_t hal_uart_set_tx_callback(hal_uart_instance_t instance,
                                       hal_uart_tx_callback_t callback,
-                                      void* context)
-{
+                                      void* context) {
     uart_data_t* data = uart_get_data(instance);
 
     if (data == NULL) {
@@ -416,8 +400,7 @@ hal_status_t hal_uart_set_tx_callback(hal_uart_instance_t instance,
  * \brief           Common UART IRQ handler
  * \param[in]       instance: UART instance
  */
-static void uart_irq_handler(hal_uart_instance_t instance)
-{
+static void uart_irq_handler(hal_uart_instance_t instance) {
     uart_data_t* data = uart_get_data(instance);
     USART_TypeDef* uart;
 
@@ -448,23 +431,20 @@ static void uart_irq_handler(hal_uart_instance_t instance)
 /**
  * \brief           USART1 IRQ handler
  */
-void USART1_IRQHandler(void)
-{
+void USART1_IRQHandler(void) {
     uart_irq_handler(HAL_UART_0);
 }
 
 /**
  * \brief           USART2 IRQ handler
  */
-void USART2_IRQHandler(void)
-{
+void USART2_IRQHandler(void) {
     uart_irq_handler(HAL_UART_1);
 }
 
 /**
  * \brief           USART3 IRQ handler
  */
-void USART3_IRQHandler(void)
-{
+void USART3_IRQHandler(void) {
     uart_irq_handler(HAL_UART_2);
 }

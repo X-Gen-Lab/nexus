@@ -18,8 +18,7 @@ static bool s_hal_initialized = false;
 /**
  * \brief           Initialize HAL layer
  */
-hal_status_t hal_init(void)
-{
+hal_status_t hal_init(void) {
     if (s_hal_initialized) {
         return HAL_ERROR_ALREADY_INIT;
     }
@@ -33,8 +32,7 @@ hal_status_t hal_init(void)
 /**
  * \brief           Deinitialize HAL layer
  */
-hal_status_t hal_deinit(void)
-{
+hal_status_t hal_deinit(void) {
     if (!s_hal_initialized) {
         return HAL_ERROR_NOT_INIT;
     }

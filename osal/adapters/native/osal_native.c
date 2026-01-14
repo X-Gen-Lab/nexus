@@ -21,23 +21,23 @@
 /* Disable MSVC deprecation warnings */
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#pragma warning(disable: 4996)
+#pragma warning(disable : 4996)
 #endif
 
 #include "osal/osal.h"
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef _WIN32
-#include <windows.h>
 #include <process.h>
+#include <windows.h>
 #else
-#include <pthread.h>
-#include <unistd.h>
-#include <time.h>
 #include <errno.h>
+#include <pthread.h>
 #include <sched.h>
+#include <time.h>
+#include <unistd.h>
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -56,21 +56,21 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    bool                used;
-    bool                running;
-    bool                suspended;
-    bool                delete_pending;
-    char                name[OSAL_TASK_NAME_MAX];
-    osal_task_func_t    func;
-    void*               arg;
-    uint8_t             priority;
+    bool used;
+    bool running;
+    bool suspended;
+    bool delete_pending;
+    char name[OSAL_TASK_NAME_MAX];
+    osal_task_func_t func;
+    void* arg;
+    uint8_t priority;
 #ifdef _WIN32
-    HANDLE              thread;
-    HANDLE              suspend_event;
+    HANDLE thread;
+    HANDLE suspend_event;
 #else
-    pthread_t           thread;
-    pthread_mutex_t     suspend_mutex;
-    pthread_cond_t      suspend_cond;
+    pthread_t thread;
+    pthread_mutex_t suspend_mutex;
+    pthread_cond_t suspend_cond;
 #endif
 } osal_task_internal_t;
 
@@ -79,11 +79,11 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    bool                used;
+    bool used;
 #ifdef _WIN32
-    CRITICAL_SECTION    cs;
+    CRITICAL_SECTION cs;
 #else
-    pthread_mutex_t     mutex;
+    pthread_mutex_t mutex;
 #endif
 } osal_mutex_internal_t;
 
@@ -92,14 +92,14 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    bool                used;
-    uint32_t            count;
-    uint32_t            max_count;
+    bool used;
+    uint32_t count;
+    uint32_t max_count;
 #ifdef _WIN32
-    HANDLE              sem;
+    HANDLE sem;
 #else
-    pthread_mutex_t     mutex;
-    pthread_cond_t      cond;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
 #endif
 } osal_sem_internal_t;
 
@@ -108,21 +108,21 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    bool                used;
-    uint8_t*            buffer;
-    size_t              item_size;
-    size_t              item_count;
-    size_t              head;
-    size_t              tail;
-    size_t              count;
+    bool used;
+    uint8_t* buffer;
+    size_t item_size;
+    size_t item_count;
+    size_t head;
+    size_t tail;
+    size_t count;
 #ifdef _WIN32
-    CRITICAL_SECTION    cs;
-    HANDLE              not_empty;
-    HANDLE              not_full;
+    CRITICAL_SECTION cs;
+    HANDLE not_empty;
+    HANDLE not_full;
 #else
-    pthread_mutex_t     mutex;
-    pthread_cond_t      not_empty;
-    pthread_cond_t      not_full;
+    pthread_mutex_t mutex;
+    pthread_cond_t not_empty;
+    pthread_cond_t not_full;
 #endif
 } osal_queue_internal_t;
 
@@ -130,22 +130,22 @@ typedef struct {
 /* Static Variables                                                          */
 /*---------------------------------------------------------------------------*/
 
-static bool                     s_osal_initialized = false;
-static bool                     s_osal_running = false;
-static volatile uint32_t        s_critical_nesting = 0;
+static bool s_osal_initialized = false;
+static bool s_osal_running = false;
+static volatile uint32_t s_critical_nesting = 0;
 
-static osal_task_internal_t     s_tasks[OSAL_MAX_TASKS];
-static osal_mutex_internal_t    s_mutexes[OSAL_MAX_MUTEXES];
-static osal_sem_internal_t      s_sems[OSAL_MAX_SEMS];
-static osal_queue_internal_t    s_queues[OSAL_MAX_QUEUES];
+static osal_task_internal_t s_tasks[OSAL_MAX_TASKS];
+static osal_mutex_internal_t s_mutexes[OSAL_MAX_MUTEXES];
+static osal_sem_internal_t s_sems[OSAL_MAX_SEMS];
+static osal_queue_internal_t s_queues[OSAL_MAX_QUEUES];
 
 #ifdef _WIN32
-static CRITICAL_SECTION         s_global_cs;
-static DWORD                    s_tls_index = TLS_OUT_OF_INDEXES;
+static CRITICAL_SECTION s_global_cs;
+static DWORD s_tls_index = TLS_OUT_OF_INDEXES;
 #else
-static pthread_mutex_t          s_global_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_key_t            s_tls_key;
-static bool                     s_tls_key_created = false;
+static pthread_mutex_t s_global_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_key_t s_tls_key;
+static bool s_tls_key_created = false;
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -175,7 +175,7 @@ static void global_unlock(void) {
 static void ms_to_timespec(uint32_t ms, struct timespec* ts) {
     struct timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
-    
+
     uint64_t nsec = now.tv_nsec + (uint64_t)ms * 1000000ULL;
     ts->tv_sec = now.tv_sec + (time_t)(nsec / 1000000000ULL);
     ts->tv_nsec = (long)(nsec % 1000000000ULL);
@@ -218,7 +218,7 @@ osal_status_t osal_init(void) {
 
 void osal_start(void) {
     s_osal_running = true;
-    
+
     /* In native platform, we don't have a real scheduler.
      * Just keep the main thread alive while tasks run. */
     while (s_osal_running) {
@@ -251,7 +251,6 @@ bool osal_is_isr(void) {
     return false;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Task Functions                                                            */
 /*---------------------------------------------------------------------------*/
@@ -259,44 +258,44 @@ bool osal_is_isr(void) {
 #ifdef _WIN32
 static unsigned __stdcall task_wrapper(void* arg) {
     osal_task_internal_t* task = (osal_task_internal_t*)arg;
-    
+
     /* Store task pointer in TLS */
     TlsSetValue(s_tls_index, task);
-    
+
     task->running = true;
-    
+
     /* Wait for initial resume if suspended */
     while (task->suspended && !task->delete_pending) {
         WaitForSingleObject(task->suspend_event, INFINITE);
     }
-    
+
     if (!task->delete_pending && task->func) {
         task->func(task->arg);
     }
-    
+
     task->running = false;
     return 0;
 }
 #else
 static void* task_wrapper(void* arg) {
     osal_task_internal_t* task = (osal_task_internal_t*)arg;
-    
+
     /* Store task pointer in TLS */
     pthread_setspecific(s_tls_key, task);
-    
+
     task->running = true;
-    
+
     /* Check for suspend at start */
     pthread_mutex_lock(&task->suspend_mutex);
     while (task->suspended && !task->delete_pending) {
         pthread_cond_wait(&task->suspend_cond, &task->suspend_mutex);
     }
     pthread_mutex_unlock(&task->suspend_mutex);
-    
+
     if (!task->delete_pending && task->func) {
         task->func(task->arg);
     }
-    
+
     task->running = false;
     return NULL;
 }
@@ -307,15 +306,15 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     if (config == NULL || handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (config->func == NULL) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     if (config->priority > 31) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     /* Auto-initialize if needed */
     if (!s_osal_initialized) {
         osal_status_t status = osal_init();
@@ -323,9 +322,9 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
             return status;
         }
     }
-    
+
     global_lock();
-    
+
     /* Find free slot */
     int slot = -1;
     for (int i = 0; i < OSAL_MAX_TASKS; i++) {
@@ -334,29 +333,29 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
             break;
         }
     }
-    
+
     if (slot < 0) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     osal_task_internal_t* task = &s_tasks[slot];
     memset(task, 0, sizeof(*task));
-    
+
     task->used = true;
     task->func = config->func;
     task->arg = config->arg;
     task->priority = config->priority;
     task->suspended = false;
     task->delete_pending = false;
-    
+
     if (config->name != NULL) {
         strncpy(task->name, config->name, OSAL_TASK_NAME_MAX - 1);
         task->name[OSAL_TASK_NAME_MAX - 1] = '\0';
     } else {
         snprintf(task->name, OSAL_TASK_NAME_MAX, "task_%d", slot);
     }
-    
+
 #ifdef _WIN32
     task->suspend_event = CreateEvent(NULL, FALSE, TRUE, NULL);
     if (task->suspend_event == NULL) {
@@ -364,13 +363,9 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
-    task->thread = (HANDLE)_beginthreadex(NULL, 
-                                          (unsigned)config->stack_size,
-                                          task_wrapper, 
-                                          task, 
-                                          0, 
-                                          NULL);
+
+    task->thread = (HANDLE)_beginthreadex(NULL, (unsigned)config->stack_size,
+                                          task_wrapper, task, 0, NULL);
     if (task->thread == NULL) {
         CloseHandle(task->suspend_event);
         task->used = false;
@@ -380,10 +375,10 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
 #else
     pthread_mutex_init(&task->suspend_mutex, NULL);
     pthread_cond_init(&task->suspend_cond, NULL);
-    
+
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    
+
     if (config->stack_size > 0) {
         size_t stack_size = config->stack_size;
         /* Ensure minimum stack size */
@@ -392,10 +387,10 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
         }
         pthread_attr_setstacksize(&attr, stack_size);
     }
-    
+
     int result = pthread_create(&task->thread, &attr, task_wrapper, task);
     pthread_attr_destroy(&attr);
-    
+
     if (result != 0) {
         pthread_mutex_destroy(&task->suspend_mutex);
         pthread_cond_destroy(&task->suspend_cond);
@@ -404,16 +399,16 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
         return OSAL_ERROR_NO_MEMORY;
     }
 #endif
-    
+
     *handle = (osal_task_handle_t)task;
     global_unlock();
-    
+
     return OSAL_OK;
 }
 
 osal_status_t osal_task_delete(osal_task_handle_t handle) {
     osal_task_internal_t* task;
-    
+
     if (handle == NULL) {
         /* Delete current task */
 #ifdef _WIN32
@@ -427,15 +422,15 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
     } else {
         task = (osal_task_internal_t*)handle;
     }
-    
+
     if (!task->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     global_lock();
-    
+
     task->delete_pending = true;
-    
+
     /* Wake up if suspended */
 #ifdef _WIN32
     SetEvent(task->suspend_event);
@@ -445,16 +440,18 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
     pthread_cond_signal(&task->suspend_cond);
     pthread_mutex_unlock(&task->suspend_mutex);
 #endif
-    
+
     global_unlock();
-    
+
     /* Wait for thread to finish if not deleting self */
 #ifdef _WIN32
-    osal_task_internal_t* current = (osal_task_internal_t*)TlsGetValue(s_tls_index);
+    osal_task_internal_t* current =
+        (osal_task_internal_t*)TlsGetValue(s_tls_index);
 #else
-    osal_task_internal_t* current = (osal_task_internal_t*)pthread_getspecific(s_tls_key);
+    osal_task_internal_t* current =
+        (osal_task_internal_t*)pthread_getspecific(s_tls_key);
 #endif
-    
+
     if (task != current) {
 #ifdef _WIN32
         WaitForSingleObject(task->thread, INFINITE);
@@ -466,11 +463,11 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
         pthread_cond_destroy(&task->suspend_cond);
 #endif
     }
-    
+
     global_lock();
     task->used = false;
     global_unlock();
-    
+
     return OSAL_OK;
 }
 
@@ -478,13 +475,13 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_task_internal_t* task = (osal_task_internal_t*)handle;
-    
+
     if (!task->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     ResetEvent(task->suspend_event);
     task->suspended = true;
@@ -493,7 +490,7 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle) {
     task->suspended = true;
     pthread_mutex_unlock(&task->suspend_mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -501,13 +498,13 @@ osal_status_t osal_task_resume(osal_task_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_task_internal_t* task = (osal_task_internal_t*)handle;
-    
+
     if (!task->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     task->suspended = false;
     SetEvent(task->suspend_event);
@@ -517,7 +514,7 @@ osal_status_t osal_task_resume(osal_task_handle_t handle) {
     pthread_cond_signal(&task->suspend_cond);
     pthread_mutex_unlock(&task->suspend_mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -527,15 +524,17 @@ osal_status_t osal_task_delay(uint32_t ms) {
 #else
     usleep(ms * 1000);
 #endif
-    
+
     /* Check if current task should be suspended */
 #ifdef _WIN32
-    osal_task_internal_t* task = (osal_task_internal_t*)TlsGetValue(s_tls_index);
+    osal_task_internal_t* task =
+        (osal_task_internal_t*)TlsGetValue(s_tls_index);
     if (task != NULL && task->suspended) {
         WaitForSingleObject(task->suspend_event, INFINITE);
     }
 #else
-    osal_task_internal_t* task = (osal_task_internal_t*)pthread_getspecific(s_tls_key);
+    osal_task_internal_t* task =
+        (osal_task_internal_t*)pthread_getspecific(s_tls_key);
     if (task != NULL) {
         pthread_mutex_lock(&task->suspend_mutex);
         while (task->suspended && !task->delete_pending) {
@@ -544,7 +543,7 @@ osal_status_t osal_task_delay(uint32_t ms) {
         pthread_mutex_unlock(&task->suspend_mutex);
     }
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -569,16 +568,15 @@ const char* osal_task_get_name(osal_task_handle_t handle) {
     if (handle == NULL) {
         return NULL;
     }
-    
+
     osal_task_internal_t* task = (osal_task_internal_t*)handle;
-    
+
     if (!task->used) {
         return NULL;
     }
-    
+
     return task->name;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Mutex Functions                                                           */
@@ -588,7 +586,7 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     /* Auto-initialize if needed */
     if (!s_osal_initialized) {
         osal_status_t status = osal_init();
@@ -596,9 +594,9 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
             return status;
         }
     }
-    
+
     global_lock();
-    
+
     /* Find free slot */
     int slot = -1;
     for (int i = 0; i < OSAL_MAX_MUTEXES; i++) {
@@ -607,14 +605,14 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
             break;
         }
     }
-    
+
     if (slot < 0) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     osal_mutex_internal_t* mutex = &s_mutexes[slot];
-    
+
 #ifdef _WIN32
     InitializeCriticalSection(&mutex->cs);
 #else
@@ -624,10 +622,10 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
     pthread_mutex_init(&mutex->mutex, &attr);
     pthread_mutexattr_destroy(&attr);
 #endif
-    
+
     mutex->used = true;
     *handle = (osal_mutex_handle_t)mutex;
-    
+
     global_unlock();
     return OSAL_OK;
 }
@@ -636,23 +634,23 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
-    
+
     if (!mutex->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     global_lock();
-    
+
 #ifdef _WIN32
     DeleteCriticalSection(&mutex->cs);
 #else
     pthread_mutex_destroy(&mutex->mutex);
 #endif
-    
+
     mutex->used = false;
-    
+
     global_unlock();
     return OSAL_OK;
 }
@@ -661,13 +659,13 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
-    
+
     if (!mutex->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         EnterCriticalSection(&mutex->cs);
@@ -702,7 +700,7 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
     } else {
         struct timespec ts;
         ms_to_timespec(timeout_ms, &ts);
-        
+
         int result = pthread_mutex_timedlock(&mutex->mutex, &ts);
         if (result == 0) {
             return OSAL_OK;
@@ -718,19 +716,19 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
-    
+
     if (!mutex->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     LeaveCriticalSection(&mutex->cs);
 #else
     pthread_mutex_unlock(&mutex->mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -738,17 +736,16 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
 /* Semaphore Functions                                                       */
 /*---------------------------------------------------------------------------*/
 
-osal_status_t osal_sem_create(uint32_t initial_count,
-                              uint32_t max_count,
+osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
                               osal_sem_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (max_count == 0 || initial_count > max_count) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     /* Auto-initialize if needed */
     if (!s_osal_initialized) {
         osal_status_t status = osal_init();
@@ -756,9 +753,9 @@ osal_status_t osal_sem_create(uint32_t initial_count,
             return status;
         }
     }
-    
+
     global_lock();
-    
+
     /* Find free slot */
     int slot = -1;
     for (int i = 0; i < OSAL_MAX_SEMS; i++) {
@@ -767,17 +764,17 @@ osal_status_t osal_sem_create(uint32_t initial_count,
             break;
         }
     }
-    
+
     if (slot < 0) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     osal_sem_internal_t* sem = &s_sems[slot];
-    
+
     sem->count = initial_count;
     sem->max_count = max_count;
-    
+
 #ifdef _WIN32
     sem->sem = CreateSemaphore(NULL, initial_count, max_count, NULL);
     if (sem->sem == NULL) {
@@ -788,10 +785,10 @@ osal_status_t osal_sem_create(uint32_t initial_count,
     pthread_mutex_init(&sem->mutex, NULL);
     pthread_cond_init(&sem->cond, NULL);
 #endif
-    
+
     sem->used = true;
     *handle = (osal_sem_handle_t)sem;
-    
+
     global_unlock();
     return OSAL_OK;
 }
@@ -801,8 +798,7 @@ osal_status_t osal_sem_create_binary(uint32_t initial,
     return osal_sem_create(initial ? 1 : 0, 1, handle);
 }
 
-osal_status_t osal_sem_create_counting(uint32_t max_count,
-                                       uint32_t initial,
+osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
                                        osal_sem_handle_t* handle) {
     return osal_sem_create(initial, max_count, handle);
 }
@@ -811,24 +807,24 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
-    
+
     if (!sem->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     global_lock();
-    
+
 #ifdef _WIN32
     CloseHandle(sem->sem);
 #else
     pthread_mutex_destroy(&sem->mutex);
     pthread_cond_destroy(&sem->cond);
 #endif
-    
+
     sem->used = false;
-    
+
     global_unlock();
     return OSAL_OK;
 }
@@ -837,17 +833,17 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
-    
+
     if (!sem->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     DWORD wait_time = (timeout_ms == OSAL_WAIT_FOREVER) ? INFINITE : timeout_ms;
     DWORD result = WaitForSingleObject(sem->sem, wait_time);
-    
+
     if (result == WAIT_OBJECT_0) {
         return OSAL_OK;
     } else if (result == WAIT_TIMEOUT) {
@@ -856,7 +852,7 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     return OSAL_ERROR;
 #else
     pthread_mutex_lock(&sem->mutex);
-    
+
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         while (sem->count == 0) {
             pthread_cond_wait(&sem->cond, &sem->mutex);
@@ -875,7 +871,7 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     } else {
         struct timespec ts;
         ms_to_timespec(timeout_ms, &ts);
-        
+
         while (sem->count == 0) {
             int result = pthread_cond_timedwait(&sem->cond, &sem->mutex, &ts);
             if (result == ETIMEDOUT) {
@@ -894,13 +890,13 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
-    
+
     if (!sem->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     if (ReleaseSemaphore(sem->sem, 1, NULL)) {
         return OSAL_OK;
@@ -908,12 +904,12 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle) {
     return OSAL_ERROR;
 #else
     pthread_mutex_lock(&sem->mutex);
-    
+
     if (sem->count < sem->max_count) {
         sem->count++;
         pthread_cond_signal(&sem->cond);
     }
-    
+
     pthread_mutex_unlock(&sem->mutex);
     return OSAL_OK;
 #endif
@@ -924,22 +920,20 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
     return osal_sem_give(handle);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Queue Functions                                                           */
 /*---------------------------------------------------------------------------*/
 
-osal_status_t osal_queue_create(size_t item_size,
-                                size_t item_count,
+osal_status_t osal_queue_create(size_t item_size, size_t item_count,
                                 osal_queue_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (item_size == 0 || item_count == 0) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     /* Auto-initialize if needed */
     if (!s_osal_initialized) {
         osal_status_t status = osal_init();
@@ -947,9 +941,9 @@ osal_status_t osal_queue_create(size_t item_size,
             return status;
         }
     }
-    
+
     global_lock();
-    
+
     /* Find free slot */
     int slot = -1;
     for (int i = 0; i < OSAL_MAX_QUEUES; i++) {
@@ -958,35 +952,37 @@ osal_status_t osal_queue_create(size_t item_size,
             break;
         }
     }
-    
+
     if (slot < 0) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     osal_queue_internal_t* queue = &s_queues[slot];
-    
+
     /* Allocate buffer */
     queue->buffer = (uint8_t*)malloc(item_size * item_count);
     if (queue->buffer == NULL) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     queue->item_size = item_size;
     queue->item_count = item_count;
     queue->head = 0;
     queue->tail = 0;
     queue->count = 0;
-    
+
 #ifdef _WIN32
     InitializeCriticalSection(&queue->cs);
     queue->not_empty = CreateEvent(NULL, TRUE, FALSE, NULL);
     queue->not_full = CreateEvent(NULL, TRUE, TRUE, NULL);
-    
+
     if (queue->not_empty == NULL || queue->not_full == NULL) {
-        if (queue->not_empty) CloseHandle(queue->not_empty);
-        if (queue->not_full) CloseHandle(queue->not_full);
+        if (queue->not_empty)
+            CloseHandle(queue->not_empty);
+        if (queue->not_full)
+            CloseHandle(queue->not_full);
         DeleteCriticalSection(&queue->cs);
         free(queue->buffer);
         global_unlock();
@@ -997,10 +993,10 @@ osal_status_t osal_queue_create(size_t item_size,
     pthread_cond_init(&queue->not_empty, NULL);
     pthread_cond_init(&queue->not_full, NULL);
 #endif
-    
+
     queue->used = true;
     *handle = (osal_queue_handle_t)queue;
-    
+
     global_unlock();
     return OSAL_OK;
 }
@@ -1009,15 +1005,15 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     global_lock();
-    
+
 #ifdef _WIN32
     CloseHandle(queue->not_empty);
     CloseHandle(queue->not_full);
@@ -1027,31 +1023,30 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
     pthread_cond_destroy(&queue->not_empty);
     pthread_cond_destroy(&queue->not_full);
 #endif
-    
+
     free(queue->buffer);
     queue->buffer = NULL;
     queue->used = false;
-    
+
     global_unlock();
     return OSAL_OK;
 }
 
-osal_status_t osal_queue_send(osal_queue_handle_t handle,
-                              const void* item,
+osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
                               uint32_t timeout_ms) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&queue->cs);
-    
+
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         while (queue->count >= queue->item_count) {
             LeaveCriticalSection(&queue->cs);
@@ -1075,23 +1070,24 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
             EnterCriticalSection(&queue->cs);
         }
     }
-    
+
     /* Copy item to queue */
-    memcpy(queue->buffer + (queue->tail * queue->item_size), item, queue->item_size);
+    memcpy(queue->buffer + (queue->tail * queue->item_size), item,
+           queue->item_size);
     queue->tail = (queue->tail + 1) % queue->item_count;
     queue->count++;
-    
+
     /* Signal not empty */
     SetEvent(queue->not_empty);
     if (queue->count >= queue->item_count) {
         ResetEvent(queue->not_full);
     }
-    
+
     LeaveCriticalSection(&queue->cs);
     return OSAL_OK;
 #else
     pthread_mutex_lock(&queue->mutex);
-    
+
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         while (queue->count >= queue->item_count) {
             pthread_cond_wait(&queue->not_full, &queue->mutex);
@@ -1104,45 +1100,46 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle,
     } else {
         struct timespec ts;
         ms_to_timespec(timeout_ms, &ts);
-        
+
         while (queue->count >= queue->item_count) {
-            int result = pthread_cond_timedwait(&queue->not_full, &queue->mutex, &ts);
+            int result =
+                pthread_cond_timedwait(&queue->not_full, &queue->mutex, &ts);
             if (result == ETIMEDOUT) {
                 pthread_mutex_unlock(&queue->mutex);
                 return OSAL_ERROR_TIMEOUT;
             }
         }
     }
-    
+
     /* Copy item to queue */
-    memcpy(queue->buffer + (queue->tail * queue->item_size), item, queue->item_size);
+    memcpy(queue->buffer + (queue->tail * queue->item_size), item,
+           queue->item_size);
     queue->tail = (queue->tail + 1) % queue->item_count;
     queue->count++;
-    
+
     /* Signal not empty */
     pthread_cond_signal(&queue->not_empty);
-    
+
     pthread_mutex_unlock(&queue->mutex);
     return OSAL_OK;
 #endif
 }
 
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
-                                    const void* item,
-                                    uint32_t timeout_ms) {
+                                    const void* item, uint32_t timeout_ms) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&queue->cs);
-    
+
     if (timeout_ms == OSAL_NO_WAIT) {
         if (queue->count >= queue->item_count) {
             LeaveCriticalSection(&queue->cs);
@@ -1151,29 +1148,32 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
     } else {
         while (queue->count >= queue->item_count) {
             LeaveCriticalSection(&queue->cs);
-            DWORD wait_time = (timeout_ms == OSAL_WAIT_FOREVER) ? INFINITE : timeout_ms;
-            if (WaitForSingleObject(queue->not_full, wait_time) == WAIT_TIMEOUT) {
+            DWORD wait_time =
+                (timeout_ms == OSAL_WAIT_FOREVER) ? INFINITE : timeout_ms;
+            if (WaitForSingleObject(queue->not_full, wait_time) ==
+                WAIT_TIMEOUT) {
                 return OSAL_ERROR_TIMEOUT;
             }
             EnterCriticalSection(&queue->cs);
         }
     }
-    
+
     /* Move head back and copy item */
     queue->head = (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
-    memcpy(queue->buffer + (queue->head * queue->item_size), item, queue->item_size);
+    memcpy(queue->buffer + (queue->head * queue->item_size), item,
+           queue->item_size);
     queue->count++;
-    
+
     SetEvent(queue->not_empty);
     if (queue->count >= queue->item_count) {
         ResetEvent(queue->not_full);
     }
-    
+
     LeaveCriticalSection(&queue->cs);
     return OSAL_OK;
 #else
     pthread_mutex_lock(&queue->mutex);
-    
+
     if (timeout_ms == OSAL_NO_WAIT) {
         if (queue->count >= queue->item_count) {
             pthread_mutex_unlock(&queue->mutex);
@@ -1186,44 +1186,45 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
     } else {
         struct timespec ts;
         ms_to_timespec(timeout_ms, &ts);
-        
+
         while (queue->count >= queue->item_count) {
-            int result = pthread_cond_timedwait(&queue->not_full, &queue->mutex, &ts);
+            int result =
+                pthread_cond_timedwait(&queue->not_full, &queue->mutex, &ts);
             if (result == ETIMEDOUT) {
                 pthread_mutex_unlock(&queue->mutex);
                 return OSAL_ERROR_TIMEOUT;
             }
         }
     }
-    
+
     /* Move head back and copy item */
     queue->head = (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
-    memcpy(queue->buffer + (queue->head * queue->item_size), item, queue->item_size);
+    memcpy(queue->buffer + (queue->head * queue->item_size), item,
+           queue->item_size);
     queue->count++;
-    
+
     pthread_cond_signal(&queue->not_empty);
-    
+
     pthread_mutex_unlock(&queue->mutex);
     return OSAL_OK;
 #endif
 }
 
-osal_status_t osal_queue_receive(osal_queue_handle_t handle,
-                                 void* item,
+osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
                                  uint32_t timeout_ms) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&queue->cs);
-    
+
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         while (queue->count == 0) {
             LeaveCriticalSection(&queue->cs);
@@ -1247,23 +1248,24 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle,
             EnterCriticalSection(&queue->cs);
         }
     }
-    
+
     /* Copy item from queue */
-    memcpy(item, queue->buffer + (queue->head * queue->item_size), queue->item_size);
+    memcpy(item, queue->buffer + (queue->head * queue->item_size),
+           queue->item_size);
     queue->head = (queue->head + 1) % queue->item_count;
     queue->count--;
-    
+
     /* Signal not full */
     SetEvent(queue->not_full);
     if (queue->count == 0) {
         ResetEvent(queue->not_empty);
     }
-    
+
     LeaveCriticalSection(&queue->cs);
     return OSAL_OK;
 #else
     pthread_mutex_lock(&queue->mutex);
-    
+
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         while (queue->count == 0) {
             pthread_cond_wait(&queue->not_empty, &queue->mutex);
@@ -1276,24 +1278,26 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle,
     } else {
         struct timespec ts;
         ms_to_timespec(timeout_ms, &ts);
-        
+
         while (queue->count == 0) {
-            int result = pthread_cond_timedwait(&queue->not_empty, &queue->mutex, &ts);
+            int result =
+                pthread_cond_timedwait(&queue->not_empty, &queue->mutex, &ts);
             if (result == ETIMEDOUT) {
                 pthread_mutex_unlock(&queue->mutex);
                 return OSAL_ERROR_TIMEOUT;
             }
         }
     }
-    
+
     /* Copy item from queue */
-    memcpy(item, queue->buffer + (queue->head * queue->item_size), queue->item_size);
+    memcpy(item, queue->buffer + (queue->head * queue->item_size),
+           queue->item_size);
     queue->head = (queue->head + 1) % queue->item_count;
     queue->count--;
-    
+
     /* Signal not full */
     pthread_cond_signal(&queue->not_full);
-    
+
     pthread_mutex_unlock(&queue->mutex);
     return OSAL_OK;
 #endif
@@ -1303,35 +1307,37 @@ osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&queue->cs);
-    
+
     if (queue->count == 0) {
         LeaveCriticalSection(&queue->cs);
         return OSAL_ERROR_EMPTY;
     }
-    
-    memcpy(item, queue->buffer + (queue->head * queue->item_size), queue->item_size);
-    
+
+    memcpy(item, queue->buffer + (queue->head * queue->item_size),
+           queue->item_size);
+
     LeaveCriticalSection(&queue->cs);
     return OSAL_OK;
 #else
     pthread_mutex_lock(&queue->mutex);
-    
+
     if (queue->count == 0) {
         pthread_mutex_unlock(&queue->mutex);
         return OSAL_ERROR_EMPTY;
     }
-    
-    memcpy(item, queue->buffer + (queue->head * queue->item_size), queue->item_size);
-    
+
+    memcpy(item, queue->buffer + (queue->head * queue->item_size),
+           queue->item_size);
+
     pthread_mutex_unlock(&queue->mutex);
     return OSAL_OK;
 #endif
@@ -1341,13 +1347,13 @@ size_t osal_queue_get_count(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return 0;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return 0;
     }
-    
+
     return queue->count;
 }
 
@@ -1355,13 +1361,13 @@ bool osal_queue_is_empty(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return true;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return true;
     }
-    
+
     return queue->count == 0;
 }
 
@@ -1369,13 +1375,13 @@ bool osal_queue_is_full(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return false;
     }
-    
+
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
-    
+
     if (!queue->used) {
         return false;
     }
-    
+
     return queue->count >= queue->item_count;
 }
 

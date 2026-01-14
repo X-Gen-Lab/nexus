@@ -12,8 +12,8 @@
  * Requirements: 3.1, 3.2, 3.5
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "hal/hal_spi.h"
@@ -24,7 +24,7 @@ extern "C" {
  * \brief           SPI Test Fixture
  */
 class HalSpiTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         native_spi_reset_all();
     }
@@ -34,13 +34,11 @@ protected:
     }
 
     hal_spi_config_t makeDefaultConfig() {
-        return hal_spi_config_t{
-            .clock_hz   = 1000000,
-            .mode       = HAL_SPI_MODE_0,
-            .bit_order  = HAL_SPI_MSB_FIRST,
-            .data_width = HAL_SPI_DATA_8BIT,
-            .role       = HAL_SPI_ROLE_MASTER
-        };
+        return hal_spi_config_t{.clock_hz = 1000000,
+                                .mode = HAL_SPI_MODE_0,
+                                .bit_order = HAL_SPI_MSB_FIRST,
+                                .data_width = HAL_SPI_DATA_8BIT,
+                                .role = HAL_SPI_ROLE_MASTER};
     }
 };
 
@@ -57,7 +55,8 @@ TEST_F(HalSpiTest, InitWithValidConfig) {
 
 /**
  * \brief           Test SPI initialization with all modes
- * \details         Requirements 3.2 - all 4 SPI modes (0-3) should be configurable
+ * \details         Requirements 3.2 - all 4 SPI modes (0-3) should be
+ * configurable
  */
 TEST_F(HalSpiTest, InitAllModes) {
     hal_spi_config_t config = makeDefaultConfig();
@@ -86,7 +85,6 @@ TEST_F(HalSpiTest, InitAllModes) {
     EXPECT_EQ(HAL_SPI_MODE_3, native_spi_get_mode(HAL_SPI_0));
     hal_spi_deinit(HAL_SPI_0);
 }
-
 
 /**
  * \brief           Test SPI initialization with invalid parameters
@@ -123,11 +121,13 @@ TEST_F(HalSpiTest, Transmit) {
     ASSERT_EQ(HAL_OK, hal_spi_init(HAL_SPI_0, &config));
 
     uint8_t tx_data[] = {0x01, 0x02, 0x03, 0x04};
-    EXPECT_EQ(HAL_OK, hal_spi_transmit(HAL_SPI_0, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_OK,
+              hal_spi_transmit(HAL_SPI_0, tx_data, sizeof(tx_data), 1000));
 
     // Verify transmitted data
     uint8_t read_back[4];
-    size_t len = native_spi_get_tx_data(HAL_SPI_0, read_back, sizeof(read_back));
+    size_t len =
+        native_spi_get_tx_data(HAL_SPI_0, read_back, sizeof(read_back));
     EXPECT_EQ(sizeof(tx_data), len);
     EXPECT_EQ(0, memcmp(tx_data, read_back, sizeof(tx_data)));
 }
@@ -137,7 +137,8 @@ TEST_F(HalSpiTest, Transmit) {
  */
 TEST_F(HalSpiTest, TransmitNotInit) {
     uint8_t tx_data[] = {0x01, 0x02};
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_spi_transmit(HAL_SPI_0, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_spi_transmit(HAL_SPI_0, tx_data, sizeof(tx_data), 1000));
 }
 
 /**
@@ -147,7 +148,8 @@ TEST_F(HalSpiTest, TransmitNullPointer) {
     hal_spi_config_t config = makeDefaultConfig();
     ASSERT_EQ(HAL_OK, hal_spi_init(HAL_SPI_0, &config));
 
-    EXPECT_EQ(HAL_ERROR_NULL_POINTER, hal_spi_transmit(HAL_SPI_0, nullptr, 4, 1000));
+    EXPECT_EQ(HAL_ERROR_NULL_POINTER,
+              hal_spi_transmit(HAL_SPI_0, nullptr, 4, 1000));
 }
 
 /**
@@ -160,11 +162,13 @@ TEST_F(HalSpiTest, Receive) {
 
     // Inject data to be received
     uint8_t inject_data[] = {0xAA, 0xBB, 0xCC, 0xDD};
-    ASSERT_TRUE(native_spi_inject_rx_data(HAL_SPI_0, inject_data, sizeof(inject_data)));
+    ASSERT_TRUE(
+        native_spi_inject_rx_data(HAL_SPI_0, inject_data, sizeof(inject_data)));
 
     // Receive data
     uint8_t rx_data[4];
-    EXPECT_EQ(HAL_OK, hal_spi_receive(HAL_SPI_0, rx_data, sizeof(rx_data), 1000));
+    EXPECT_EQ(HAL_OK,
+              hal_spi_receive(HAL_SPI_0, rx_data, sizeof(rx_data), 1000));
     EXPECT_EQ(0, memcmp(inject_data, rx_data, sizeof(inject_data)));
 }
 
@@ -173,7 +177,8 @@ TEST_F(HalSpiTest, Receive) {
  */
 TEST_F(HalSpiTest, ReceiveNotInit) {
     uint8_t rx_data[4];
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_spi_receive(HAL_SPI_0, rx_data, sizeof(rx_data), 1000));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_spi_receive(HAL_SPI_0, rx_data, sizeof(rx_data), 1000));
 }
 
 /**
@@ -183,7 +188,8 @@ TEST_F(HalSpiTest, ReceiveNullPointer) {
     hal_spi_config_t config = makeDefaultConfig();
     ASSERT_EQ(HAL_OK, hal_spi_init(HAL_SPI_0, &config));
 
-    EXPECT_EQ(HAL_ERROR_NULL_POINTER, hal_spi_receive(HAL_SPI_0, nullptr, 4, 1000));
+    EXPECT_EQ(HAL_ERROR_NULL_POINTER,
+              hal_spi_receive(HAL_SPI_0, nullptr, 4, 1000));
 }
 
 /**
@@ -198,14 +204,16 @@ TEST_F(HalSpiTest, Transfer) {
     uint8_t rx_data[4];
 
     // In loopback mode, RX should receive what TX sends
-    EXPECT_EQ(HAL_OK, hal_spi_transfer(HAL_SPI_0, tx_data, rx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_OK, hal_spi_transfer(HAL_SPI_0, tx_data, rx_data,
+                                       sizeof(tx_data), 1000));
 
     // Verify loopback
     EXPECT_EQ(0, memcmp(tx_data, rx_data, sizeof(tx_data)));
 
     // Verify TX data was stored
     uint8_t read_back[4];
-    size_t len = native_spi_get_tx_data(HAL_SPI_0, read_back, sizeof(read_back));
+    size_t len =
+        native_spi_get_tx_data(HAL_SPI_0, read_back, sizeof(read_back));
     EXPECT_EQ(sizeof(tx_data), len);
     EXPECT_EQ(0, memcmp(tx_data, read_back, sizeof(tx_data)));
 }
@@ -216,7 +224,8 @@ TEST_F(HalSpiTest, Transfer) {
 TEST_F(HalSpiTest, TransferNotInit) {
     uint8_t tx_data[] = {0x01, 0x02};
     uint8_t rx_data[2];
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_spi_transfer(HAL_SPI_0, tx_data, rx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_spi_transfer(HAL_SPI_0, tx_data, rx_data,
+                                                   sizeof(tx_data), 1000));
 }
 
 /**

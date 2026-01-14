@@ -28,8 +28,7 @@ static volatile uint32_t systick_counter = 0;
  * \brief           Initialize HAL system
  * \return          HAL_OK on success
  */
-hal_status_t hal_system_init(void)
-{
+hal_status_t hal_system_init(void) {
     /* Configure SysTick for 1ms tick */
     if (SysTick_Config(SystemCoreClock / 1000) != 0) {
         return HAL_ERR_FAIL;
@@ -45,16 +44,14 @@ hal_status_t hal_system_init(void)
  * \brief           Get system tick count (milliseconds)
  * \return          Current tick count
  */
-uint32_t hal_get_tick(void)
-{
+uint32_t hal_get_tick(void) {
     return systick_counter;
 }
 
 /**
  * \brief           Delay in milliseconds
  */
-void hal_delay_ms(uint32_t ms)
-{
+void hal_delay_ms(uint32_t ms) {
     uint32_t start = systick_counter;
     while ((systick_counter - start) < ms) {
         /* Wait */
@@ -65,8 +62,7 @@ void hal_delay_ms(uint32_t ms)
  * \brief           Delay in microseconds (approximate)
  * \note            This is a busy-wait implementation
  */
-void hal_delay_us(uint32_t us)
-{
+void hal_delay_us(uint32_t us) {
     uint32_t cycles = (SystemCoreClock / 1000000UL) * us / 4;
     while (cycles--) {
         __asm volatile("nop");
@@ -76,8 +72,7 @@ void hal_delay_us(uint32_t us)
 /**
  * \brief           System reset
  */
-void hal_system_reset(void)
-{
+void hal_system_reset(void) {
     NVIC_SystemReset();
 }
 
@@ -85,27 +80,19 @@ void hal_system_reset(void)
  * \brief           Enter critical section (disable interrupts)
  * \return          Previous interrupt state
  */
-uint32_t hal_enter_critical(void)
-{
+uint32_t hal_enter_critical(void) {
     uint32_t primask;
-    __asm volatile(
-        "mrs %0, primask\n"
-        "cpsid i\n"
-        : "=r"(primask)
-    );
+    __asm volatile("mrs %0, primask\n"
+                   "cpsid i\n"
+                   : "=r"(primask));
     return primask;
 }
 
 /**
  * \brief           Exit critical section (restore interrupts)
  */
-void hal_exit_critical(uint32_t state)
-{
-    __asm volatile(
-        "msr primask, %0\n"
-        :
-        : "r"(state)
-    );
+void hal_exit_critical(uint32_t state) {
+    __asm volatile("msr primask, %0\n" : : "r"(state));
 }
 
 /*===========================================================================*/
@@ -115,7 +102,6 @@ void hal_exit_critical(uint32_t state)
 /**
  * \brief           SysTick interrupt handler
  */
-void SysTick_Handler(void)
-{
+void SysTick_Handler(void) {
     systick_counter++;
 }

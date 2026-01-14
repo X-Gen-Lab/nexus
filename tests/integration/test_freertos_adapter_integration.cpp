@@ -17,13 +17,13 @@
  * \note            Task 12.2 - FreeRTOS adapter integration tests
  */
 
-#include <gtest/gtest.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <thread>
 #include <cstring>
+#include <gtest/gtest.h>
+#include <thread>
 #include <vector>
-#include <algorithm>
 
 extern "C" {
 #include "osal/osal.h"
@@ -33,7 +33,7 @@ extern "C" {
  * \brief           FreeRTOS Adapter Integration Test Fixture
  */
 class FreeRTOSAdapterIntegrationTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         osal_init();
     }
@@ -80,12 +80,15 @@ static void concurrent_counter_task(void* arg) {
     int task_id = (arg != nullptr) ? *((int*)arg) : 0;
     (void)task_id;
 
-    for (int i = 0; i < s_concurrent_state.iterations_per_task && 
-         s_concurrent_state.running; i++) {
-        if (osal_mutex_lock(s_concurrent_state.mutex, OSAL_WAIT_FOREVER) == OSAL_OK) {
+    for (int i = 0; i < s_concurrent_state.iterations_per_task &&
+                    s_concurrent_state.running;
+         i++) {
+        if (osal_mutex_lock(s_concurrent_state.mutex, OSAL_WAIT_FOREVER) ==
+            OSAL_OK) {
             /* Critical section: increment counter */
             int current = s_concurrent_state.counter.load();
-            /* Small delay to increase chance of race condition if mutex fails */
+            /* Small delay to increase chance of race condition if mutex fails
+             */
             osal_task_yield();
             s_concurrent_state.counter.store(current + 1);
             osal_mutex_unlock(s_concurrent_state.mutex);
@@ -105,46 +108,45 @@ static void concurrent_counter_task(void* arg) {
 TEST_F(FreeRTOSAdapterIntegrationTest, ConcurrentCounterWithMutex) {
     const int NUM_TASKS = 4;
     const int ITERATIONS = 50;
-    
+
     /* Create mutex and semaphore */
     ASSERT_EQ(OSAL_OK, osal_mutex_create(&s_concurrent_state.mutex));
-    ASSERT_EQ(OSAL_OK, osal_sem_create(0, NUM_TASKS, &s_concurrent_state.done_sem));
-    
+    ASSERT_EQ(OSAL_OK,
+              osal_sem_create(0, NUM_TASKS, &s_concurrent_state.done_sem));
+
     /* Reset state */
     s_concurrent_state.counter = 0;
     s_concurrent_state.running = true;
     s_concurrent_state.num_tasks = NUM_TASKS;
     s_concurrent_state.iterations_per_task = ITERATIONS;
-    
+
     /* Create task IDs */
     int task_ids[NUM_TASKS];
     osal_task_handle_t tasks[NUM_TASKS];
-    
+
     /* Create tasks */
     for (int i = 0; i < NUM_TASKS; i++) {
         task_ids[i] = i;
-        osal_task_config_t config = {
-            .name = "counter",
-            .func = concurrent_counter_task,
-            .arg = &task_ids[i],
-            .priority = OSAL_TASK_PRIORITY_NORMAL,
-            .stack_size = 4096
-        };
+        osal_task_config_t config = {.name = "counter",
+                                     .func = concurrent_counter_task,
+                                     .arg = &task_ids[i],
+                                     .priority = OSAL_TASK_PRIORITY_NORMAL,
+                                     .stack_size = 4096};
         ASSERT_EQ(OSAL_OK, osal_task_create(&config, &tasks[i]));
     }
-    
+
     /* Wait for all tasks to complete */
     for (int i = 0; i < NUM_TASKS; i++) {
         EXPECT_EQ(OSAL_OK, osal_sem_take(s_concurrent_state.done_sem, 10000));
     }
-    
+
     /* Stop tasks */
     s_concurrent_state.running = false;
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    
+
     /* Verify counter value: should be exactly NUM_TASKS * ITERATIONS */
     EXPECT_EQ(NUM_TASKS * ITERATIONS, s_concurrent_state.counter.load());
-    
+
     /* Clean up */
     for (int i = 0; i < NUM_TASKS; i++) {
         osal_task_delete(tasks[i]);
@@ -174,16 +176,17 @@ static struct {
  */
 static void priority_test_task(void* arg) {
     int priority = (arg != nullptr) ? *((int*)arg) : 0;
-    
+
     /* Wait for start signal */
     osal_sem_take(s_priority_state.start_sem, OSAL_WAIT_FOREVER);
-    
+
     /* Log execution order */
-    if (osal_mutex_lock(s_priority_state.log_mutex, OSAL_WAIT_FOREVER) == OSAL_OK) {
+    if (osal_mutex_lock(s_priority_state.log_mutex, OSAL_WAIT_FOREVER) ==
+        OSAL_OK) {
         s_priority_state.order_log.push_back(priority);
         osal_mutex_unlock(s_priority_state.log_mutex);
     }
-    
+
     /* Signal completion */
     osal_sem_give(s_priority_state.done_sem);
 }
@@ -196,57 +199,58 @@ static void priority_test_task(void* arg) {
 TEST_F(FreeRTOSAdapterIntegrationTest, PriorityScheduling) {
     const int NUM_TASKS = 4;
     int priorities[] = {
-        OSAL_TASK_PRIORITY_LOW,      /* 8 */
-        OSAL_TASK_PRIORITY_NORMAL,   /* 16 */
-        OSAL_TASK_PRIORITY_HIGH,     /* 24 */
-        OSAL_TASK_PRIORITY_REALTIME  /* 31 */
+        OSAL_TASK_PRIORITY_LOW,     /* 8 */
+        OSAL_TASK_PRIORITY_NORMAL,  /* 16 */
+        OSAL_TASK_PRIORITY_HIGH,    /* 24 */
+        OSAL_TASK_PRIORITY_REALTIME /* 31 */
     };
-    
+
     /* Create synchronization primitives */
-    ASSERT_EQ(OSAL_OK, osal_sem_create(0, NUM_TASKS, &s_priority_state.start_sem));
-    ASSERT_EQ(OSAL_OK, osal_sem_create(0, NUM_TASKS, &s_priority_state.done_sem));
+    ASSERT_EQ(OSAL_OK,
+              osal_sem_create(0, NUM_TASKS, &s_priority_state.start_sem));
+    ASSERT_EQ(OSAL_OK,
+              osal_sem_create(0, NUM_TASKS, &s_priority_state.done_sem));
     ASSERT_EQ(OSAL_OK, osal_mutex_create(&s_priority_state.log_mutex));
-    
+
     /* Reset state */
     s_priority_state.execution_order = 0;
     s_priority_state.order_log.clear();
     s_priority_state.running = true;
-    
+
     /* Create tasks in reverse priority order (low to high) */
     osal_task_handle_t tasks[NUM_TASKS];
     for (int i = 0; i < NUM_TASKS; i++) {
-        osal_task_config_t config = {
-            .name = "prio_task",
-            .func = priority_test_task,
-            .arg = &priorities[i],
-            .priority = (uint8_t)priorities[i],
-            .stack_size = 4096
-        };
+        osal_task_config_t config = {.name = "prio_task",
+                                     .func = priority_test_task,
+                                     .arg = &priorities[i],
+                                     .priority = (uint8_t)priorities[i],
+                                     .stack_size = 4096};
         ASSERT_EQ(OSAL_OK, osal_task_create(&config, &tasks[i]));
     }
-    
+
     /* Small delay to let all tasks start and block on semaphore */
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    
+
     /* Release all tasks simultaneously */
     for (int i = 0; i < NUM_TASKS; i++) {
         osal_sem_give(s_priority_state.start_sem);
     }
-    
+
     /* Wait for all tasks to complete */
     for (int i = 0; i < NUM_TASKS; i++) {
         EXPECT_EQ(OSAL_OK, osal_sem_take(s_priority_state.done_sem, 5000));
     }
-    
+
     /* Stop tasks */
     s_priority_state.running = false;
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    
+
     /* Verify execution order: higher priority should execute first */
-    /* Note: Due to native platform threading, order may not be strictly enforced */
+    /* Note: Due to native platform threading, order may not be strictly
+     * enforced */
     /* We verify that all tasks executed */
     EXPECT_EQ(NUM_TASKS, (int)s_priority_state.order_log.size());
-    
+
     /* Clean up */
     for (int i = 0; i < NUM_TASKS; i++) {
         osal_task_delete(tasks[i]);
@@ -274,12 +278,12 @@ static struct {
  */
 static void suspend_test_task(void* arg) {
     (void)arg;
-    
+
     while (s_suspend_state.running) {
         s_suspend_state.counter++;
         osal_task_delay(10);
     }
-    
+
     osal_sem_give(s_suspend_state.done_sem);
 }
 
@@ -291,53 +295,51 @@ static void suspend_test_task(void* arg) {
 TEST_F(FreeRTOSAdapterIntegrationTest, TaskSuspendResume) {
     /* Create semaphore */
     ASSERT_EQ(OSAL_OK, osal_sem_create(0, 1, &s_suspend_state.done_sem));
-    
+
     /* Reset state */
     s_suspend_state.counter = 0;
     s_suspend_state.running = true;
-    
+
     /* Create task */
-    osal_task_config_t config = {
-        .name = "suspend_test",
-        .func = suspend_test_task,
-        .arg = nullptr,
-        .priority = OSAL_TASK_PRIORITY_NORMAL,
-        .stack_size = 4096
-    };
-    
+    osal_task_config_t config = {.name = "suspend_test",
+                                 .func = suspend_test_task,
+                                 .arg = nullptr,
+                                 .priority = OSAL_TASK_PRIORITY_NORMAL,
+                                 .stack_size = 4096};
+
     osal_task_handle_t task = nullptr;
     ASSERT_EQ(OSAL_OK, osal_task_create(&config, &task));
-    
+
     /* Let task run for a bit */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int count_before_suspend = s_suspend_state.counter.load();
     EXPECT_GT(count_before_suspend, 0);
-    
+
     /* Suspend task */
     ASSERT_EQ(OSAL_OK, osal_task_suspend(task));
-    
+
     /* Wait and verify counter doesn't change */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int count_while_suspended = s_suspend_state.counter.load();
-    
+
     /* Counter should not have increased significantly while suspended */
     /* Allow small tolerance for timing */
     EXPECT_LE(count_while_suspended - count_before_suspend, 2);
-    
+
     /* Resume task */
     ASSERT_EQ(OSAL_OK, osal_task_resume(task));
-    
+
     /* Let task run again */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int count_after_resume = s_suspend_state.counter.load();
-    
+
     /* Counter should have increased after resume */
     EXPECT_GT(count_after_resume, count_while_suspended);
-    
+
     /* Stop task */
     s_suspend_state.running = false;
     EXPECT_EQ(OSAL_OK, osal_sem_take(s_suspend_state.done_sem, 5000));
-    
+
     /* Clean up */
     osal_task_delete(task);
     osal_sem_delete(s_suspend_state.done_sem);
@@ -355,23 +357,22 @@ TEST_F(FreeRTOSAdapterIntegrationTest, TaskSuspendResume) {
 TEST_F(FreeRTOSAdapterIntegrationTest, QueueFIFOOrder) {
     const int NUM_MESSAGES = 20;
     osal_queue_handle_t queue = nullptr;
-    
+
     /* Create queue */
-    ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(test_message_t), NUM_MESSAGES, &queue));
-    
+    ASSERT_EQ(OSAL_OK,
+              osal_queue_create(sizeof(test_message_t), NUM_MESSAGES, &queue));
+
     /* Send messages */
     for (int i = 0; i < NUM_MESSAGES; i++) {
-        test_message_t msg = {
-            .id = (uint32_t)i,
-            .data = (uint32_t)(i * 100),
-            .sender_priority = 0
-        };
+        test_message_t msg = {.id = (uint32_t)i,
+                              .data = (uint32_t)(i * 100),
+                              .sender_priority = 0};
         ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &msg, OSAL_NO_WAIT));
     }
-    
+
     /* Verify queue count */
     EXPECT_EQ((size_t)NUM_MESSAGES, osal_queue_get_count(queue));
-    
+
     /* Receive and verify order */
     for (int i = 0; i < NUM_MESSAGES; i++) {
         test_message_t msg;
@@ -379,10 +380,10 @@ TEST_F(FreeRTOSAdapterIntegrationTest, QueueFIFOOrder) {
         EXPECT_EQ((uint32_t)i, msg.id);
         EXPECT_EQ((uint32_t)(i * 100), msg.data);
     }
-    
+
     /* Verify queue is empty */
     EXPECT_TRUE(osal_queue_is_empty(queue));
-    
+
     /* Clean up */
     osal_queue_delete(queue);
 }
@@ -398,33 +399,27 @@ TEST_F(FreeRTOSAdapterIntegrationTest, QueueFIFOOrder) {
  */
 TEST_F(FreeRTOSAdapterIntegrationTest, QueueSendFront) {
     osal_queue_handle_t queue = nullptr;
-    
+
     /* Create queue */
     ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(test_message_t), 10, &queue));
-    
+
     /* Send messages to back */
     for (int i = 0; i < 3; i++) {
         test_message_t msg = {
-            .id = (uint32_t)i,
-            .data = 0,
-            .sender_priority = 0
-        };
+            .id = (uint32_t)i, .data = 0, .sender_priority = 0};
         ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &msg, OSAL_NO_WAIT));
     }
-    
+
     /* Send high-priority message to front */
-    test_message_t priority_msg = {
-        .id = 999,
-        .data = 0,
-        .sender_priority = 0
-    };
-    ASSERT_EQ(OSAL_OK, osal_queue_send_front(queue, &priority_msg, OSAL_NO_WAIT));
-    
+    test_message_t priority_msg = {.id = 999, .data = 0, .sender_priority = 0};
+    ASSERT_EQ(OSAL_OK,
+              osal_queue_send_front(queue, &priority_msg, OSAL_NO_WAIT));
+
     /* First received message should be the priority message */
     test_message_t received;
     ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &received, OSAL_NO_WAIT));
     EXPECT_EQ(999u, received.id);
-    
+
     /* Clean up */
     osal_queue_delete(queue);
 }
@@ -442,31 +437,32 @@ TEST_F(FreeRTOSAdapterIntegrationTest, CountingSemaphore) {
     const uint32_t MAX_COUNT = 5;
     const uint32_t INITIAL_COUNT = 2;
     osal_sem_handle_t sem = nullptr;
-    
+
     /* Create counting semaphore */
-    ASSERT_EQ(OSAL_OK, osal_sem_create_counting(MAX_COUNT, INITIAL_COUNT, &sem));
-    
+    ASSERT_EQ(OSAL_OK,
+              osal_sem_create_counting(MAX_COUNT, INITIAL_COUNT, &sem));
+
     /* Take initial count */
     for (uint32_t i = 0; i < INITIAL_COUNT; i++) {
         EXPECT_EQ(OSAL_OK, osal_sem_take(sem, OSAL_NO_WAIT));
     }
-    
+
     /* Next take should timeout (count is 0) */
     EXPECT_EQ(OSAL_ERROR_TIMEOUT, osal_sem_take(sem, 10));
-    
+
     /* Give up to max count */
     for (uint32_t i = 0; i < MAX_COUNT; i++) {
         EXPECT_EQ(OSAL_OK, osal_sem_give(sem));
     }
-    
+
     /* Take all */
     for (uint32_t i = 0; i < MAX_COUNT; i++) {
         EXPECT_EQ(OSAL_OK, osal_sem_take(sem, OSAL_NO_WAIT));
     }
-    
+
     /* Should be empty again */
     EXPECT_EQ(OSAL_ERROR_TIMEOUT, osal_sem_take(sem, 10));
-    
+
     /* Clean up */
     osal_sem_delete(sem);
 }
@@ -481,28 +477,28 @@ TEST_F(FreeRTOSAdapterIntegrationTest, CountingSemaphore) {
  */
 TEST_F(FreeRTOSAdapterIntegrationTest, BinarySemaphore) {
     osal_sem_handle_t sem = nullptr;
-    
+
     /* Create binary semaphore with initial count 0 */
     ASSERT_EQ(OSAL_OK, osal_sem_create_binary(0, &sem));
-    
+
     /* Take should timeout (count is 0) */
     EXPECT_EQ(OSAL_ERROR_TIMEOUT, osal_sem_take(sem, 10));
-    
+
     /* Give once */
     EXPECT_EQ(OSAL_OK, osal_sem_give(sem));
-    
+
     /* Give again - behavior may vary by platform:
      * - FreeRTOS: succeeds but count stays at 1
      * - Native Windows: may return error if semaphore is at max
      * We just verify the semaphore still works correctly */
-    osal_sem_give(sem);  /* Don't check return value - platform dependent */
-    
+    osal_sem_give(sem); /* Don't check return value - platform dependent */
+
     /* Take should succeed */
     EXPECT_EQ(OSAL_OK, osal_sem_take(sem, OSAL_NO_WAIT));
-    
+
     /* Second take should timeout (binary semaphore) */
     EXPECT_EQ(OSAL_ERROR_TIMEOUT, osal_sem_take(sem, 10));
-    
+
     /* Clean up */
     osal_sem_delete(sem);
 }
@@ -526,14 +522,15 @@ static struct {
  */
 static void mutex_holder_task(void* arg) {
     int hold_time_ms = (arg != nullptr) ? *((int*)arg) : 100;
-    
-    if (osal_mutex_lock(s_mutex_timeout_state.mutex, OSAL_WAIT_FOREVER) == OSAL_OK) {
+
+    if (osal_mutex_lock(s_mutex_timeout_state.mutex, OSAL_WAIT_FOREVER) ==
+        OSAL_OK) {
         s_mutex_timeout_state.holding = true;
         osal_task_delay(hold_time_ms);
         s_mutex_timeout_state.holding = false;
         osal_mutex_unlock(s_mutex_timeout_state.mutex);
     }
-    
+
     osal_sem_give(s_mutex_timeout_state.done_sem);
 }
 
@@ -545,52 +542,52 @@ static void mutex_holder_task(void* arg) {
  *                  due to threading model differences.
  */
 TEST_F(FreeRTOSAdapterIntegrationTest, MutexTimeout) {
-    int hold_time = 300;  /* Increased hold time for reliability */
-    
+    int hold_time = 300; /* Increased hold time for reliability */
+
     /* Create mutex and semaphore */
     ASSERT_EQ(OSAL_OK, osal_mutex_create(&s_mutex_timeout_state.mutex));
     ASSERT_EQ(OSAL_OK, osal_sem_create(0, 1, &s_mutex_timeout_state.done_sem));
-    
+
     /* Reset state */
     s_mutex_timeout_state.holding = false;
     s_mutex_timeout_state.running = true;
-    
+
     /* Create holder task with higher priority */
-    osal_task_config_t config = {
-        .name = "holder",
-        .func = mutex_holder_task,
-        .arg = &hold_time,
-        .priority = OSAL_TASK_PRIORITY_HIGH,
-        .stack_size = 4096
-    };
-    
+    osal_task_config_t config = {.name = "holder",
+                                 .func = mutex_holder_task,
+                                 .arg = &hold_time,
+                                 .priority = OSAL_TASK_PRIORITY_HIGH,
+                                 .stack_size = 4096};
+
     osal_task_handle_t holder = nullptr;
     ASSERT_EQ(OSAL_OK, osal_task_create(&config, &holder));
-    
+
     /* Wait for holder to acquire mutex */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    
+
     /* Check if holder is actually holding the mutex */
     if (s_mutex_timeout_state.holding.load()) {
         /* Try to lock with short timeout - should fail */
-        osal_status_t lock_result = osal_mutex_lock(s_mutex_timeout_state.mutex, 50);
-        
+        osal_status_t lock_result =
+            osal_mutex_lock(s_mutex_timeout_state.mutex, 50);
+
         /* On native platform, the main thread may be able to acquire the mutex
-         * due to threading model differences. We accept either timeout or success. */
+         * due to threading model differences. We accept either timeout or
+         * success. */
         if (lock_result == OSAL_OK) {
             /* If we got the lock, release it */
             osal_mutex_unlock(s_mutex_timeout_state.mutex);
         }
         /* Test passes either way - we're testing the API works */
     }
-    
+
     /* Wait for holder to release */
     EXPECT_EQ(OSAL_OK, osal_sem_take(s_mutex_timeout_state.done_sem, 5000));
-    
+
     /* Now lock should definitely succeed */
     EXPECT_EQ(OSAL_OK, osal_mutex_lock(s_mutex_timeout_state.mutex, 100));
     osal_mutex_unlock(s_mutex_timeout_state.mutex);
-    
+
     /* Clean up */
     osal_task_delete(holder);
     osal_mutex_delete(s_mutex_timeout_state.mutex);
@@ -610,16 +607,16 @@ TEST_F(FreeRTOSAdapterIntegrationTest, CriticalSectionNesting) {
     osal_enter_critical();
     osal_enter_critical();
     osal_enter_critical();
-    
+
     /* Exit in reverse order */
     osal_exit_critical();
     osal_exit_critical();
     osal_exit_critical();
-    
+
     /* Should be able to enter again */
     osal_enter_critical();
     osal_exit_critical();
-    
+
     /* Test passes if no deadlock or crash */
     SUCCEED();
 }
@@ -642,13 +639,13 @@ static struct {
  */
 static void name_test_task(void* arg) {
     (void)arg;
-    
+
     osal_task_handle_t self = osal_task_get_current();
     const char* name = osal_task_get_name(self);
-    
-    s_name_test_state.name_matched = 
+
+    s_name_test_state.name_matched =
         (name != nullptr && strcmp(name, s_name_test_state.expected_name) == 0);
-    
+
     osal_sem_give(s_name_test_state.done_sem);
 }
 
@@ -658,36 +655,34 @@ static void name_test_task(void* arg) {
  */
 TEST_F(FreeRTOSAdapterIntegrationTest, TaskNameRetrieval) {
     const char* test_name = "TestTaskName";
-    
+
     /* Create semaphore */
     ASSERT_EQ(OSAL_OK, osal_sem_create(0, 1, &s_name_test_state.done_sem));
-    
+
     /* Reset state */
     s_name_test_state.expected_name = test_name;
     s_name_test_state.name_matched = false;
-    
+
     /* Create task with specific name */
-    osal_task_config_t config = {
-        .name = test_name,
-        .func = name_test_task,
-        .arg = nullptr,
-        .priority = OSAL_TASK_PRIORITY_NORMAL,
-        .stack_size = 4096
-    };
-    
+    osal_task_config_t config = {.name = test_name,
+                                 .func = name_test_task,
+                                 .arg = nullptr,
+                                 .priority = OSAL_TASK_PRIORITY_NORMAL,
+                                 .stack_size = 4096};
+
     osal_task_handle_t task = nullptr;
     ASSERT_EQ(OSAL_OK, osal_task_create(&config, &task));
-    
+
     /* Wait for task to complete */
     EXPECT_EQ(OSAL_OK, osal_sem_take(s_name_test_state.done_sem, 5000));
-    
+
     /* Verify name matched */
     EXPECT_TRUE(s_name_test_state.name_matched);
-    
+
     /* Also verify from outside the task */
     const char* retrieved_name = osal_task_get_name(task);
     EXPECT_STREQ(test_name, retrieved_name);
-    
+
     /* Clean up */
     osal_task_delete(task);
     osal_sem_delete(s_name_test_state.done_sem);
@@ -704,21 +699,17 @@ TEST_F(FreeRTOSAdapterIntegrationTest, TaskNameRetrieval) {
  */
 TEST_F(FreeRTOSAdapterIntegrationTest, QueuePeekDoesNotRemove) {
     osal_queue_handle_t queue = nullptr;
-    
+
     /* Create queue */
     ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(test_message_t), 5, &queue));
-    
+
     /* Send a message */
-    test_message_t msg = {
-        .id = 42,
-        .data = 100,
-        .sender_priority = 0
-    };
+    test_message_t msg = {.id = 42, .data = 100, .sender_priority = 0};
     ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &msg, OSAL_NO_WAIT));
-    
+
     /* Verify count is 1 */
     EXPECT_EQ(1u, osal_queue_get_count(queue));
-    
+
     /* Peek multiple times */
     for (int i = 0; i < 3; i++) {
         test_message_t peeked;
@@ -726,18 +717,18 @@ TEST_F(FreeRTOSAdapterIntegrationTest, QueuePeekDoesNotRemove) {
         EXPECT_EQ(42u, peeked.id);
         EXPECT_EQ(100u, peeked.data);
     }
-    
+
     /* Count should still be 1 */
     EXPECT_EQ(1u, osal_queue_get_count(queue));
-    
+
     /* Receive should get the same message */
     test_message_t received;
     ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &received, OSAL_NO_WAIT));
     EXPECT_EQ(42u, received.id);
-    
+
     /* Now queue should be empty */
     EXPECT_TRUE(osal_queue_is_empty(queue));
-    
+
     /* Clean up */
     osal_queue_delete(queue);
 }
@@ -756,7 +747,7 @@ TEST_F(FreeRTOSAdapterIntegrationTest, InitIdempotency) {
     for (int i = 0; i < 5; i++) {
         EXPECT_EQ(OSAL_OK, osal_init());
     }
-    
+
     /* System should still work */
     osal_mutex_handle_t mutex = nullptr;
     EXPECT_EQ(OSAL_OK, osal_mutex_create(&mutex));

@@ -19,10 +19,10 @@
 #include "osal_def.h"
 
 /* OSAL modules */
-#include "osal_task.h"
 #include "osal_mutex.h"
-#include "osal_sem.h"
 #include "osal_queue.h"
+#include "osal_sem.h"
+#include "osal_task.h"
 
 #ifdef __cplusplus
 extern "C" {

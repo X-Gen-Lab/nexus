@@ -12,8 +12,8 @@
  * Requirements: 4.1, 4.2, 4.3
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
+#include <gtest/gtest.h>
 
 extern "C" {
 #include "hal/hal_i2c.h"
@@ -24,7 +24,7 @@ extern "C" {
  * \brief           I2C Test Fixture
  */
 class HalI2cTest : public ::testing::Test {
-protected:
+  protected:
     void SetUp() override {
         native_i2c_reset_all();
     }
@@ -34,11 +34,9 @@ protected:
     }
 
     hal_i2c_config_t makeDefaultConfig() {
-        return hal_i2c_config_t{
-            .speed      = HAL_I2C_SPEED_STANDARD,
-            .addr_mode  = HAL_I2C_ADDR_7BIT,
-            .own_addr   = 0x50
-        };
+        return hal_i2c_config_t{.speed = HAL_I2C_SPEED_STANDARD,
+                                .addr_mode = HAL_I2C_ADDR_7BIT,
+                                .own_addr = 0x50};
     }
 };
 
@@ -131,11 +129,13 @@ TEST_F(HalI2cTest, MasterTransmit) {
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, true));
 
     uint8_t tx_data[] = {0x01, 0x02, 0x03, 0x04};
-    EXPECT_EQ(HAL_OK, hal_i2c_master_transmit(HAL_I2C_0, dev_addr, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_OK, hal_i2c_master_transmit(HAL_I2C_0, dev_addr, tx_data,
+                                              sizeof(tx_data), 1000));
 
     // Verify transmitted data
     uint8_t read_back[4];
-    size_t len = native_i2c_get_last_tx_data(HAL_I2C_0, read_back, sizeof(read_back));
+    size_t len =
+        native_i2c_get_last_tx_data(HAL_I2C_0, read_back, sizeof(read_back));
     EXPECT_EQ(sizeof(tx_data), len);
     EXPECT_EQ(0, memcmp(tx_data, read_back, sizeof(tx_data)));
     EXPECT_EQ(dev_addr, native_i2c_get_last_dev_addr(HAL_I2C_0));
@@ -149,7 +149,9 @@ TEST_F(HalI2cTest, MasterTransmitNoDevice) {
     ASSERT_EQ(HAL_OK, hal_i2c_init(HAL_I2C_0, &config));
 
     uint8_t tx_data[] = {0x01, 0x02};
-    EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_master_transmit(HAL_I2C_0, 0x48, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_ERROR_TIMEOUT,
+              hal_i2c_master_transmit(HAL_I2C_0, 0x48, tx_data, sizeof(tx_data),
+                                      1000));
 }
 
 /**
@@ -157,7 +159,9 @@ TEST_F(HalI2cTest, MasterTransmitNoDevice) {
  */
 TEST_F(HalI2cTest, MasterTransmitNotInit) {
     uint8_t tx_data[] = {0x01, 0x02};
-    EXPECT_EQ(HAL_ERROR_NOT_INIT, hal_i2c_master_transmit(HAL_I2C_0, 0x48, tx_data, sizeof(tx_data), 1000));
+    EXPECT_EQ(HAL_ERROR_NOT_INIT,
+              hal_i2c_master_transmit(HAL_I2C_0, 0x48, tx_data, sizeof(tx_data),
+                                      1000));
 }
 
 /**
@@ -171,13 +175,15 @@ TEST_F(HalI2cTest, MasterReceive) {
     // Add a device and pre-fill its memory
     uint16_t dev_addr = 0x48;
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, true));
-    
+
     uint8_t device_data[] = {0xAA, 0xBB, 0xCC, 0xDD};
-    ASSERT_TRUE(native_i2c_write_device_memory(HAL_I2C_0, dev_addr, 0, device_data, sizeof(device_data)));
+    ASSERT_TRUE(native_i2c_write_device_memory(
+        HAL_I2C_0, dev_addr, 0, device_data, sizeof(device_data)));
 
     // Receive data
     uint8_t rx_data[4];
-    EXPECT_EQ(HAL_OK, hal_i2c_master_receive(HAL_I2C_0, dev_addr, rx_data, sizeof(rx_data), 1000));
+    EXPECT_EQ(HAL_OK, hal_i2c_master_receive(HAL_I2C_0, dev_addr, rx_data,
+                                             sizeof(rx_data), 1000));
     EXPECT_EQ(0, memcmp(device_data, rx_data, sizeof(device_data)));
     EXPECT_EQ(dev_addr, native_i2c_get_last_dev_addr(HAL_I2C_0));
 }
@@ -190,7 +196,9 @@ TEST_F(HalI2cTest, MasterReceiveNoDevice) {
     ASSERT_EQ(HAL_OK, hal_i2c_init(HAL_I2C_0, &config));
 
     uint8_t rx_data[4];
-    EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_master_receive(HAL_I2C_0, 0x48, rx_data, sizeof(rx_data), 1000));
+    EXPECT_EQ(HAL_ERROR_TIMEOUT,
+              hal_i2c_master_receive(HAL_I2C_0, 0x48, rx_data, sizeof(rx_data),
+                                     1000));
 }
 
 /**
@@ -207,13 +215,15 @@ TEST_F(HalI2cTest, MemoryWrite) {
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, true));
 
     uint8_t write_data[] = {0x11, 0x22, 0x33, 0x44};
-    EXPECT_EQ(HAL_OK, hal_i2c_mem_write(HAL_I2C_0, dev_addr, mem_addr, 1, write_data, sizeof(write_data), 1000));
+    EXPECT_EQ(HAL_OK, hal_i2c_mem_write(HAL_I2C_0, dev_addr, mem_addr, 1,
+                                        write_data, sizeof(write_data), 1000));
 
     // Verify data was written to device memory
     uint8_t read_back[4];
-    ASSERT_TRUE(native_i2c_read_device_memory(HAL_I2C_0, dev_addr, mem_addr, read_back, sizeof(read_back)));
+    ASSERT_TRUE(native_i2c_read_device_memory(HAL_I2C_0, dev_addr, mem_addr,
+                                              read_back, sizeof(read_back)));
     EXPECT_EQ(0, memcmp(write_data, read_back, sizeof(write_data)));
-    
+
     // Verify transaction details
     EXPECT_EQ(dev_addr, native_i2c_get_last_dev_addr(HAL_I2C_0));
     EXPECT_EQ(mem_addr, native_i2c_get_last_mem_addr(HAL_I2C_0));
@@ -231,15 +241,17 @@ TEST_F(HalI2cTest, MemoryRead) {
     uint16_t dev_addr = 0x50;
     uint16_t mem_addr = 0x20;
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, true));
-    
+
     uint8_t device_data[] = {0x55, 0x66, 0x77, 0x88};
-    ASSERT_TRUE(native_i2c_write_device_memory(HAL_I2C_0, dev_addr, mem_addr, device_data, sizeof(device_data)));
+    ASSERT_TRUE(native_i2c_write_device_memory(
+        HAL_I2C_0, dev_addr, mem_addr, device_data, sizeof(device_data)));
 
     // Read from memory
     uint8_t rx_data[4];
-    EXPECT_EQ(HAL_OK, hal_i2c_mem_read(HAL_I2C_0, dev_addr, mem_addr, 1, rx_data, sizeof(rx_data), 1000));
+    EXPECT_EQ(HAL_OK, hal_i2c_mem_read(HAL_I2C_0, dev_addr, mem_addr, 1,
+                                       rx_data, sizeof(rx_data), 1000));
     EXPECT_EQ(0, memcmp(device_data, rx_data, sizeof(device_data)));
-    
+
     // Verify transaction details
     EXPECT_EQ(dev_addr, native_i2c_get_last_dev_addr(HAL_I2C_0));
     EXPECT_EQ(mem_addr, native_i2c_get_last_mem_addr(HAL_I2C_0));
@@ -257,13 +269,15 @@ TEST_F(HalI2cTest, MemoryOperations2ByteAddr) {
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, true));
 
     uint8_t write_data[] = {0xAB, 0xCD};
-    
+
     // Write with 2-byte memory address
-    EXPECT_EQ(HAL_OK, hal_i2c_mem_write(HAL_I2C_0, dev_addr, mem_addr, 2, write_data, sizeof(write_data), 1000));
-    
+    EXPECT_EQ(HAL_OK, hal_i2c_mem_write(HAL_I2C_0, dev_addr, mem_addr, 2,
+                                        write_data, sizeof(write_data), 1000));
+
     // Read back with 2-byte memory address
     uint8_t rx_data[2];
-    EXPECT_EQ(HAL_OK, hal_i2c_mem_read(HAL_I2C_0, dev_addr, mem_addr, 2, rx_data, sizeof(rx_data), 1000));
+    EXPECT_EQ(HAL_OK, hal_i2c_mem_read(HAL_I2C_0, dev_addr, mem_addr, 2,
+                                       rx_data, sizeof(rx_data), 1000));
     EXPECT_EQ(0, memcmp(write_data, rx_data, sizeof(write_data)));
 }
 
@@ -275,14 +289,16 @@ TEST_F(HalI2cTest, IsDeviceReady) {
     ASSERT_EQ(HAL_OK, hal_i2c_init(HAL_I2C_0, &config));
 
     uint16_t dev_addr = 0x48;
-    
+
     // Device not present
-    EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_is_device_ready(HAL_I2C_0, dev_addr, 3, 100));
-    
+    EXPECT_EQ(HAL_ERROR_TIMEOUT,
+              hal_i2c_is_device_ready(HAL_I2C_0, dev_addr, 3, 100));
+
     // Add device but not ready
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, false));
-    EXPECT_EQ(HAL_ERROR_TIMEOUT, hal_i2c_is_device_ready(HAL_I2C_0, dev_addr, 3, 100));
-    
+    EXPECT_EQ(HAL_ERROR_TIMEOUT,
+              hal_i2c_is_device_ready(HAL_I2C_0, dev_addr, 3, 100));
+
     // Set device ready
     ASSERT_TRUE(native_i2c_set_device_ready(HAL_I2C_0, dev_addr, true));
     EXPECT_EQ(HAL_OK, hal_i2c_is_device_ready(HAL_I2C_0, dev_addr, 3, 100));
@@ -296,19 +312,28 @@ TEST_F(HalI2cTest, InvalidParameters) {
     ASSERT_EQ(HAL_OK, hal_i2c_init(HAL_I2C_0, &config));
 
     uint8_t data[4];
-    
+
     // Invalid instance
-    EXPECT_EQ(HAL_ERROR_INVALID_PARAM, hal_i2c_master_transmit(HAL_I2C_MAX, 0x48, data, sizeof(data), 1000));
-    
+    EXPECT_EQ(
+        HAL_ERROR_INVALID_PARAM,
+        hal_i2c_master_transmit(HAL_I2C_MAX, 0x48, data, sizeof(data), 1000));
+
     // Null pointer
-    EXPECT_EQ(HAL_ERROR_NULL_POINTER, hal_i2c_master_transmit(HAL_I2C_0, 0x48, nullptr, sizeof(data), 1000));
-    EXPECT_EQ(HAL_ERROR_NULL_POINTER, hal_i2c_master_receive(HAL_I2C_0, 0x48, nullptr, sizeof(data), 1000));
-    
+    EXPECT_EQ(
+        HAL_ERROR_NULL_POINTER,
+        hal_i2c_master_transmit(HAL_I2C_0, 0x48, nullptr, sizeof(data), 1000));
+    EXPECT_EQ(
+        HAL_ERROR_NULL_POINTER,
+        hal_i2c_master_receive(HAL_I2C_0, 0x48, nullptr, sizeof(data), 1000));
+
     // Zero length
-    EXPECT_EQ(HAL_ERROR_INVALID_PARAM, hal_i2c_master_transmit(HAL_I2C_0, 0x48, data, 0, 1000));
-    
+    EXPECT_EQ(HAL_ERROR_INVALID_PARAM,
+              hal_i2c_master_transmit(HAL_I2C_0, 0x48, data, 0, 1000));
+
     // Invalid memory address size
-    EXPECT_EQ(HAL_ERROR_INVALID_PARAM, hal_i2c_mem_write(HAL_I2C_0, 0x48, 0x10, 3, data, sizeof(data), 1000));
+    EXPECT_EQ(
+        HAL_ERROR_INVALID_PARAM,
+        hal_i2c_mem_write(HAL_I2C_0, 0x48, 0x10, 3, data, sizeof(data), 1000));
 }
 
 /**
@@ -339,21 +364,24 @@ TEST_F(HalI2cTest, CallbackRegistration) {
     ASSERT_EQ(HAL_OK, hal_i2c_init(HAL_I2C_0, &config));
 
     bool callback_called = false;
-    auto callback = [](hal_i2c_instance_t instance, uint32_t event, void* context) {
+    auto callback = [](hal_i2c_instance_t instance, uint32_t event,
+                       void* context) {
         (void)instance;
         (void)event;
         bool* flag = static_cast<bool*>(context);
         *flag = true;
     };
 
-    EXPECT_EQ(HAL_OK, hal_i2c_set_callback(HAL_I2C_0, callback, &callback_called));
+    EXPECT_EQ(HAL_OK,
+              hal_i2c_set_callback(HAL_I2C_0, callback, &callback_called));
 
     // Add device and perform operation to trigger callback
     uint16_t dev_addr = 0x48;
     ASSERT_TRUE(native_i2c_add_device(HAL_I2C_0, dev_addr, true));
-    
+
     uint8_t tx_data[] = {0x01, 0x02};
-    EXPECT_EQ(HAL_OK, hal_i2c_master_transmit(HAL_I2C_0, dev_addr, tx_data, sizeof(tx_data), 1000));
-    
+    EXPECT_EQ(HAL_OK, hal_i2c_master_transmit(HAL_I2C_0, dev_addr, tx_data,
+                                              sizeof(tx_data), 1000));
+
     EXPECT_TRUE(callback_called);
 }
