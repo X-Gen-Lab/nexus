@@ -14,8 +14,8 @@
  *                  Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6
  */
 
-#include "config/config.h"
 #include "config_callback.h"
+#include "config/config.h"
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -26,30 +26,32 @@
  * \brief           Callback entry structure
  */
 typedef struct {
-    char key[CONFIG_MAX_MAX_KEY_LEN];   /**< Key to watch (empty for wildcard) */
-    config_change_cb_t callback;         /**< Callback function */
-    void* user_data;                     /**< User-provided context */
-    bool wildcard;                       /**< Is this a wildcard callback */
-    bool in_use;                         /**< Entry is in use */
+    char key[CONFIG_MAX_MAX_KEY_LEN]; /**< Key to watch (empty for wildcard) */
+    config_change_cb_t callback;      /**< Callback function */
+    void* user_data;                  /**< User-provided context */
+    bool wildcard;                    /**< Is this a wildcard callback */
+    bool in_use;                      /**< Entry is in use */
 } config_callback_entry_t;
 
 /**
  * \brief           Callback handle internal structure
  */
 struct config_callback {
-    size_t index;                        /**< Index in callback array */
-    bool valid;                          /**< Handle is valid */
+    size_t index; /**< Index in callback array */
+    bool valid;   /**< Handle is valid */
 };
 
 /**
  * \brief           Callback manager context
  */
 typedef struct {
-    bool initialized;                    /**< Manager is initialized */
-    uint8_t max_callbacks;               /**< Maximum number of callbacks */
-    size_t callback_count;               /**< Number of registered callbacks */
-    config_callback_entry_t callbacks[CONFIG_DEFAULT_MAX_CALLBACKS]; /**< Callback storage */
-    struct config_callback handles[CONFIG_DEFAULT_MAX_CALLBACKS];    /**< Handle storage */
+    bool initialized;      /**< Manager is initialized */
+    uint8_t max_callbacks; /**< Maximum number of callbacks */
+    size_t callback_count; /**< Number of registered callbacks */
+    config_callback_entry_t
+        callbacks[CONFIG_DEFAULT_MAX_CALLBACKS]; /**< Callback storage */
+    struct config_callback
+        handles[CONFIG_DEFAULT_MAX_CALLBACKS]; /**< Handle storage */
 } config_callback_ctx_t;
 
 /*---------------------------------------------------------------------------*/
@@ -69,8 +71,7 @@ static config_callback_ctx_t g_cb_ctx;
  * \brief           Find free callback slot
  * \return          Index of free slot if available, -1 otherwise
  */
-static int
-config_callback_find_free_slot(void) {
+static int config_callback_find_free_slot(void) {
     for (uint8_t i = 0; i < g_cb_ctx.max_callbacks; ++i) {
         if (!g_cb_ctx.callbacks[i].in_use) {
             return (int)i;
@@ -83,8 +84,7 @@ config_callback_find_free_slot(void) {
  * \brief           Find free handle slot
  * \return          Pointer to free handle if available, NULL otherwise
  */
-static struct config_callback*
-config_callback_find_free_handle(void) {
+static struct config_callback* config_callback_find_free_handle(void) {
     for (uint8_t i = 0; i < g_cb_ctx.max_callbacks; ++i) {
         if (!g_cb_ctx.handles[i].valid) {
             return &g_cb_ctx.handles[i];
@@ -99,8 +99,8 @@ config_callback_find_free_handle(void) {
  * \param[in]       key: Key to check
  * \return          true if matches, false otherwise
  */
-static bool
-config_callback_key_matches(const config_callback_entry_t* entry, const char* key) {
+static bool config_callback_key_matches(const config_callback_entry_t* entry,
+                                        const char* key) {
     if (entry == NULL || key == NULL) {
         return false;
     }
@@ -118,8 +118,7 @@ config_callback_key_matches(const config_callback_entry_t* entry, const char* ke
 /* Internal API Implementation                                               */
 /*---------------------------------------------------------------------------*/
 
-config_status_t
-config_callback_init(uint8_t max_callbacks) {
+config_status_t config_callback_init(uint8_t max_callbacks) {
     if (max_callbacks == 0 || max_callbacks > CONFIG_DEFAULT_MAX_CALLBACKS) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -132,8 +131,7 @@ config_callback_init(uint8_t max_callbacks) {
     return CONFIG_OK;
 }
 
-config_status_t
-config_callback_deinit(void) {
+config_status_t config_callback_deinit(void) {
     if (!g_cb_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -142,15 +140,13 @@ config_callback_deinit(void) {
     return CONFIG_OK;
 }
 
-bool
-config_callback_is_initialized(void) {
+bool config_callback_is_initialized(void) {
     return g_cb_ctx.initialized;
 }
 
-config_status_t
-config_callback_notify(const char* key, config_type_t type,
-                       const void* old_value, size_t old_size,
-                       const void* new_value, size_t new_size) {
+config_status_t config_callback_notify(const char* key, config_type_t type,
+                                       const void* old_value, size_t old_size,
+                                       const void* new_value, size_t new_size) {
     if (!g_cb_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -179,8 +175,7 @@ config_callback_notify(const char* key, config_type_t type,
     return CONFIG_OK;
 }
 
-config_status_t
-config_callback_get_count(size_t* count) {
+config_status_t config_callback_get_count(size_t* count) {
     if (!g_cb_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -197,9 +192,10 @@ config_callback_get_count(size_t* count) {
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-config_status_t
-config_register_callback(const char* key, config_change_cb_t callback,
-                         void* user_data, config_cb_handle_t* handle) {
+config_status_t config_register_callback(const char* key,
+                                         config_change_cb_t callback,
+                                         void* user_data,
+                                         config_cb_handle_t* handle) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -234,8 +230,8 @@ config_register_callback(const char* key, config_change_cb_t callback,
     config_callback_entry_t* entry = &g_cb_ctx.callbacks[slot];
     memset(entry->key, 0, sizeof(entry->key));
     size_t copy_len = key_len < (CONFIG_MAX_MAX_KEY_LEN - 1)
-                      ? key_len
-                      : (CONFIG_MAX_MAX_KEY_LEN - 1);
+                          ? key_len
+                          : (CONFIG_MAX_MAX_KEY_LEN - 1);
     memcpy(entry->key, key, copy_len);
     entry->key[copy_len] = '\0';
     entry->callback = callback;
@@ -253,10 +249,9 @@ config_register_callback(const char* key, config_change_cb_t callback,
     return CONFIG_OK;
 }
 
-config_status_t
-config_register_wildcard_callback(config_change_cb_t callback,
-                                  void* user_data,
-                                  config_cb_handle_t* handle) {
+config_status_t config_register_wildcard_callback(config_change_cb_t callback,
+                                                  void* user_data,
+                                                  config_cb_handle_t* handle) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }
@@ -299,8 +294,7 @@ config_register_wildcard_callback(config_change_cb_t callback,
     return CONFIG_OK;
 }
 
-config_status_t
-config_unregister_callback(config_cb_handle_t handle) {
+config_status_t config_unregister_callback(config_cb_handle_t handle) {
     if (!config_is_initialized()) {
         return CONFIG_ERROR_NOT_INIT;
     }

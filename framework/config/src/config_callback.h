@@ -51,8 +51,8 @@ bool config_callback_is_initialized(void);
  * \note            This function is called internally when a value changes
  */
 config_status_t config_callback_notify(const char* key, config_type_t type,
-                                        const void* old_value, size_t old_size,
-                                        const void* new_value, size_t new_size);
+                                       const void* old_value, size_t old_size,
+                                       const void* new_value, size_t new_size);
 
 /**
  * \brief           Get the number of registered callbacks

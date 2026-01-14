@@ -7,14 +7,14 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * \details         Unit tests for Config Manager callback notification functionality.
- *                  Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6
+ * \details         Unit tests for Config Manager callback notification
+ * functionality. Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6
  */
 
-#include <gtest/gtest.h>
 #include <cstring>
-#include <vector>
+#include <gtest/gtest.h>
 #include <string>
+#include <vector>
 
 extern "C" {
 #include "config/config.h"
@@ -46,10 +46,9 @@ static std::vector<CallbackRecord> g_callback_records;
 /**
  * \brief           Test callback function for int32 values
  */
-static void
-test_callback_i32(const char* key, config_type_t type,
-                  const void* old_value, const void* new_value,
-                  void* user_data) {
+static void test_callback_i32(const char* key, config_type_t type,
+                              const void* old_value, const void* new_value,
+                              void* user_data) {
     CallbackRecord record;
     record.key = key ? key : "";
     record.type = type;
@@ -63,10 +62,9 @@ test_callback_i32(const char* key, config_type_t type,
 /**
  * \brief           Test callback function for string values
  */
-static void
-test_callback_str(const char* key, config_type_t type,
-                  const void* old_value, const void* new_value,
-                  void* user_data) {
+static void test_callback_str(const char* key, config_type_t type,
+                              const void* old_value, const void* new_value,
+                              void* user_data) {
     CallbackRecord record;
     record.key = key ? key : "";
     record.type = type;
@@ -80,17 +78,18 @@ test_callback_str(const char* key, config_type_t type,
 /**
  * \brief           Wildcard callback that records all changes
  */
-static void
-test_wildcard_callback(const char* key, config_type_t type,
-                       const void* old_value, const void* new_value,
-                       void* user_data) {
+static void test_wildcard_callback(const char* key, config_type_t type,
+                                   const void* old_value, const void* new_value,
+                                   void* user_data) {
     CallbackRecord record;
     record.key = key ? key : "";
     record.type = type;
     record.has_old_value = (old_value != NULL);
     if (type == CONFIG_TYPE_I32) {
-        record.old_i32 = old_value ? *static_cast<const int32_t*>(old_value) : 0;
-        record.new_i32 = new_value ? *static_cast<const int32_t*>(new_value) : 0;
+        record.old_i32 =
+            old_value ? *static_cast<const int32_t*>(old_value) : 0;
+        record.new_i32 =
+            new_value ? *static_cast<const int32_t*>(new_value) : 0;
     } else if (type == CONFIG_TYPE_STRING) {
         record.old_str = old_value ? static_cast<const char*>(old_value) : "";
         record.new_str = new_value ? static_cast<const char*>(new_value) : "";
@@ -107,10 +106,9 @@ static int g_callback_count = 0;
 /**
  * \brief           Simple counting callback
  */
-static void
-test_counting_callback(const char* key, config_type_t type,
-                       const void* old_value, const void* new_value,
-                       void* user_data) {
+static void test_counting_callback(const char* key, config_type_t type,
+                                   const void* old_value, const void* new_value,
+                                   void* user_data) {
     (void)key;
     (void)type;
     (void)old_value;
@@ -128,7 +126,7 @@ class ConfigCallbackTest : public ::testing::Test {
         /* Clear callback records */
         g_callback_records.clear();
         g_callback_count = 0;
-        
+
         /* Ensure config is deinitialized before each test */
         if (config_is_initialized()) {
             config_deinit();
@@ -154,7 +152,7 @@ class ConfigCallbackTest : public ::testing::Test {
 TEST_F(ConfigCallbackTest, RegisterCallback) {
     config_cb_handle_t handle = NULL;
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_callback_i32,
-                                                   NULL, &handle));
+                                                  NULL, &handle));
     EXPECT_NE(nullptr, handle);
 }
 
@@ -171,8 +169,9 @@ TEST_F(ConfigCallbackTest, RegisterCallbackNullCallback) {
 }
 
 TEST_F(ConfigCallbackTest, RegisterCallbackNullHandle) {
-    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM,
-              config_register_callback("test.key", test_callback_i32, NULL, NULL));
+    EXPECT_EQ(
+        CONFIG_ERROR_INVALID_PARAM,
+        config_register_callback("test.key", test_callback_i32, NULL, NULL));
 }
 
 TEST_F(ConfigCallbackTest, RegisterCallbackEmptyKey) {
@@ -187,8 +186,8 @@ TEST_F(ConfigCallbackTest, RegisterCallbackEmptyKey) {
 
 TEST_F(ConfigCallbackTest, RegisterWildcardCallback) {
     config_cb_handle_t handle = NULL;
-    EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(test_wildcard_callback,
-                                                           NULL, &handle));
+    EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(
+                             test_wildcard_callback, NULL, &handle));
     EXPECT_NE(nullptr, handle);
 }
 
@@ -199,8 +198,9 @@ TEST_F(ConfigCallbackTest, RegisterWildcardCallbackNullCallback) {
 }
 
 TEST_F(ConfigCallbackTest, RegisterWildcardCallbackNullHandle) {
-    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM,
-              config_register_wildcard_callback(test_wildcard_callback, NULL, NULL));
+    EXPECT_EQ(
+        CONFIG_ERROR_INVALID_PARAM,
+        config_register_wildcard_callback(test_wildcard_callback, NULL, NULL));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -210,7 +210,7 @@ TEST_F(ConfigCallbackTest, RegisterWildcardCallbackNullHandle) {
 TEST_F(ConfigCallbackTest, UnregisterCallback) {
     config_cb_handle_t handle = NULL;
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_callback_i32,
-                                                   NULL, &handle));
+                                                  NULL, &handle));
     EXPECT_EQ(CONFIG_OK, config_unregister_callback(handle));
 }
 
@@ -221,7 +221,7 @@ TEST_F(ConfigCallbackTest, UnregisterCallbackNullHandle) {
 TEST_F(ConfigCallbackTest, UnregisterCallbackTwice) {
     config_cb_handle_t handle = NULL;
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_callback_i32,
-                                                   NULL, &handle));
+                                                  NULL, &handle));
     EXPECT_EQ(CONFIG_OK, config_unregister_callback(handle));
     /* Second unregister should fail - handle is invalid */
     EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(handle));
@@ -233,12 +233,12 @@ TEST_F(ConfigCallbackTest, UnregisterCallbackTwice) {
 
 TEST_F(ConfigCallbackTest, CallbackInvokedOnSet) {
     config_cb_handle_t handle = NULL;
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.value", test_callback_i32,
-                                                   NULL, &handle));
-    
+    EXPECT_EQ(CONFIG_OK, config_register_callback(
+                             "test.value", test_callback_i32, NULL, &handle));
+
     /* Set a value - callback should be invoked */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.value", 42));
-    
+
     ASSERT_EQ(1u, g_callback_records.size());
     EXPECT_EQ("test.value", g_callback_records[0].key);
     EXPECT_EQ(CONFIG_TYPE_I32, g_callback_records[0].type);
@@ -248,18 +248,18 @@ TEST_F(ConfigCallbackTest, CallbackInvokedOnSet) {
 
 TEST_F(ConfigCallbackTest, CallbackInvokedWithOldValue) {
     config_cb_handle_t handle = NULL;
-    
+
     /* Set initial value */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.value", 10));
-    
+
     /* Register callback */
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.value", test_callback_i32,
-                                                   NULL, &handle));
+    EXPECT_EQ(CONFIG_OK, config_register_callback(
+                             "test.value", test_callback_i32, NULL, &handle));
     g_callback_records.clear();
-    
+
     /* Update value - callback should receive old and new values */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.value", 20));
-    
+
     ASSERT_EQ(1u, g_callback_records.size());
     EXPECT_EQ("test.value", g_callback_records[0].key);
     EXPECT_TRUE(g_callback_records[0].has_old_value);
@@ -269,26 +269,26 @@ TEST_F(ConfigCallbackTest, CallbackInvokedWithOldValue) {
 
 TEST_F(ConfigCallbackTest, CallbackNotInvokedForDifferentKey) {
     config_cb_handle_t handle = NULL;
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key1", test_callback_i32,
-                                                   NULL, &handle));
-    
+    EXPECT_EQ(CONFIG_OK, config_register_callback(
+                             "test.key1", test_callback_i32, NULL, &handle));
+
     /* Set a different key - callback should NOT be invoked */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.key2", 42));
-    
+
     EXPECT_EQ(0u, g_callback_records.size());
 }
 
 TEST_F(ConfigCallbackTest, CallbackNotInvokedAfterUnregister) {
     config_cb_handle_t handle = NULL;
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.value", test_callback_i32,
-                                                   NULL, &handle));
-    
+    EXPECT_EQ(CONFIG_OK, config_register_callback(
+                             "test.value", test_callback_i32, NULL, &handle));
+
     /* Unregister callback */
     EXPECT_EQ(CONFIG_OK, config_unregister_callback(handle));
-    
+
     /* Set value - callback should NOT be invoked */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.value", 42));
-    
+
     EXPECT_EQ(0u, g_callback_records.size());
 }
 
@@ -298,14 +298,14 @@ TEST_F(ConfigCallbackTest, CallbackNotInvokedAfterUnregister) {
 
 TEST_F(ConfigCallbackTest, WildcardCallbackInvokedForAllKeys) {
     config_cb_handle_t handle = NULL;
-    EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(test_wildcard_callback,
-                                                           NULL, &handle));
-    
+    EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(
+                             test_wildcard_callback, NULL, &handle));
+
     /* Set multiple different keys */
     EXPECT_EQ(CONFIG_OK, config_set_i32("key1", 1));
     EXPECT_EQ(CONFIG_OK, config_set_i32("key2", 2));
     EXPECT_EQ(CONFIG_OK, config_set_str("key3", "hello"));
-    
+
     /* Wildcard callback should be invoked for all */
     ASSERT_EQ(3u, g_callback_records.size());
     EXPECT_EQ("key1", g_callback_records[0].key);
@@ -320,33 +320,36 @@ TEST_F(ConfigCallbackTest, WildcardCallbackInvokedForAllKeys) {
 TEST_F(ConfigCallbackTest, MultipleCallbacksForSameKey) {
     config_cb_handle_t handle1 = NULL;
     config_cb_handle_t handle2 = NULL;
-    
+
     /* Register two callbacks for the same key */
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_counting_callback,
-                                                   NULL, &handle1));
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_counting_callback,
-                                                   NULL, &handle2));
-    
+    EXPECT_EQ(CONFIG_OK,
+              config_register_callback("test.key", test_counting_callback, NULL,
+                                       &handle1));
+    EXPECT_EQ(CONFIG_OK,
+              config_register_callback("test.key", test_counting_callback, NULL,
+                                       &handle2));
+
     /* Set value - both callbacks should be invoked */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.key", 42));
-    
+
     EXPECT_EQ(2, g_callback_count);
 }
 
 TEST_F(ConfigCallbackTest, SpecificAndWildcardCallbacks) {
     config_cb_handle_t handle1 = NULL;
     config_cb_handle_t handle2 = NULL;
-    
+
     /* Register specific callback */
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_counting_callback,
-                                                   NULL, &handle1));
+    EXPECT_EQ(CONFIG_OK,
+              config_register_callback("test.key", test_counting_callback, NULL,
+                                       &handle1));
     /* Register wildcard callback */
-    EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(test_counting_callback,
-                                                           NULL, &handle2));
-    
+    EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(
+                             test_counting_callback, NULL, &handle2));
+
     /* Set value - both callbacks should be invoked */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.key", 42));
-    
+
     EXPECT_EQ(2, g_callback_count);
 }
 
@@ -357,12 +360,12 @@ TEST_F(ConfigCallbackTest, SpecificAndWildcardCallbacks) {
 TEST_F(ConfigCallbackTest, CallbackReceivesUserData) {
     config_cb_handle_t handle = NULL;
     int user_data = 12345;
-    
+
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_callback_i32,
-                                                   &user_data, &handle));
-    
+                                                  &user_data, &handle));
+
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.key", 42));
-    
+
     ASSERT_EQ(1u, g_callback_records.size());
     EXPECT_EQ(&user_data, g_callback_records[0].user_data);
 }
@@ -374,10 +377,10 @@ TEST_F(ConfigCallbackTest, CallbackReceivesUserData) {
 TEST_F(ConfigCallbackTest, StringCallbackInvoked) {
     config_cb_handle_t handle = NULL;
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.str", test_callback_str,
-                                                   NULL, &handle));
-    
+                                                  NULL, &handle));
+
     EXPECT_EQ(CONFIG_OK, config_set_str("test.str", "hello"));
-    
+
     ASSERT_EQ(1u, g_callback_records.size());
     EXPECT_EQ("test.str", g_callback_records[0].key);
     EXPECT_EQ(CONFIG_TYPE_STRING, g_callback_records[0].type);
@@ -386,18 +389,18 @@ TEST_F(ConfigCallbackTest, StringCallbackInvoked) {
 
 TEST_F(ConfigCallbackTest, StringCallbackWithOldValue) {
     config_cb_handle_t handle = NULL;
-    
+
     /* Set initial value */
     EXPECT_EQ(CONFIG_OK, config_set_str("test.str", "old"));
-    
+
     /* Register callback */
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.str", test_callback_str,
-                                                   NULL, &handle));
+                                                  NULL, &handle));
     g_callback_records.clear();
-    
+
     /* Update value */
     EXPECT_EQ(CONFIG_OK, config_set_str("test.str", "new"));
-    
+
     ASSERT_EQ(1u, g_callback_records.size());
     EXPECT_TRUE(g_callback_records[0].has_old_value);
     EXPECT_EQ("old", g_callback_records[0].old_str);
@@ -410,25 +413,27 @@ TEST_F(ConfigCallbackTest, StringCallbackWithOldValue) {
 
 TEST_F(ConfigCallbackTest, RegisterCallbackNotInitialized) {
     EXPECT_EQ(CONFIG_OK, config_deinit());
-    
+
     config_cb_handle_t handle = NULL;
-    EXPECT_EQ(CONFIG_ERROR_NOT_INIT,
-              config_register_callback("test.key", test_callback_i32, NULL, &handle));
+    EXPECT_EQ(
+        CONFIG_ERROR_NOT_INIT,
+        config_register_callback("test.key", test_callback_i32, NULL, &handle));
 }
 
 TEST_F(ConfigCallbackTest, RegisterWildcardNotInitialized) {
     EXPECT_EQ(CONFIG_OK, config_deinit());
-    
+
     config_cb_handle_t handle = NULL;
     EXPECT_EQ(CONFIG_ERROR_NOT_INIT,
-              config_register_wildcard_callback(test_wildcard_callback, NULL, &handle));
+              config_register_wildcard_callback(test_wildcard_callback, NULL,
+                                                &handle));
 }
 
 TEST_F(ConfigCallbackTest, UnregisterCallbackNotInitialized) {
     config_cb_handle_t handle = NULL;
     EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_callback_i32,
-                                                   NULL, &handle));
-    
+                                                  NULL, &handle));
+
     EXPECT_EQ(CONFIG_OK, config_deinit());
     EXPECT_EQ(CONFIG_ERROR_NOT_INIT, config_unregister_callback(handle));
 }
@@ -440,10 +445,9 @@ TEST_F(ConfigCallbackTest, UnregisterCallbackNotInitialized) {
 /**
  * \brief           Callback that throws/fails
  */
-static void
-test_failing_callback(const char* key, config_type_t type,
-                      const void* old_value, const void* new_value,
-                      void* user_data) {
+static void test_failing_callback(const char* key, config_type_t type,
+                                  const void* old_value, const void* new_value,
+                                  void* user_data) {
     (void)key;
     (void)type;
     (void)old_value;
@@ -458,18 +462,21 @@ TEST_F(ConfigCallbackTest, ContinueAfterCallbackFailure) {
     config_cb_handle_t handle1 = NULL;
     config_cb_handle_t handle2 = NULL;
     config_cb_handle_t handle3 = NULL;
-    
+
     /* Register three callbacks */
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_counting_callback,
-                                                   NULL, &handle1));
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_failing_callback,
-                                                   NULL, &handle2));
-    EXPECT_EQ(CONFIG_OK, config_register_callback("test.key", test_counting_callback,
-                                                   NULL, &handle3));
-    
+    EXPECT_EQ(CONFIG_OK,
+              config_register_callback("test.key", test_counting_callback, NULL,
+                                       &handle1));
+    EXPECT_EQ(CONFIG_OK,
+              config_register_callback("test.key", test_failing_callback, NULL,
+                                       &handle2));
+    EXPECT_EQ(CONFIG_OK,
+              config_register_callback("test.key", test_counting_callback, NULL,
+                                       &handle3));
+
     /* Set value - all callbacks should be invoked even if one "fails" */
     EXPECT_EQ(CONFIG_OK, config_set_i32("test.key", 42));
-    
+
     /* All three callbacks should have been invoked */
     EXPECT_EQ(3, g_callback_count);
 }

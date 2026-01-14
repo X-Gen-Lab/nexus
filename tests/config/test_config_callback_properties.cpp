@@ -15,11 +15,11 @@
  * **Validates: Requirements 7.1, 7.2**
  */
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <random>
 #include <string>
 #include <vector>
-#include <cstring>
 
 extern "C" {
 #include "config/config.h"
@@ -56,8 +56,7 @@ static PropertyCallbackRecord g_prop_record;
 /**
  * \brief           Reset the property callback record
  */
-static void
-reset_prop_record(void) {
+static void reset_prop_record(void) {
     g_prop_record.key.clear();
     g_prop_record.type = CONFIG_TYPE_I32;
     g_prop_record.has_old_value = false;
@@ -71,32 +70,34 @@ reset_prop_record(void) {
 /**
  * \brief           Property test callback for int32 values
  */
-static void
-prop_callback_i32(const char* key, config_type_t type,
-                  const void* old_value, const void* new_value,
-                  void* user_data) {
+static void prop_callback_i32(const char* key, config_type_t type,
+                              const void* old_value, const void* new_value,
+                              void* user_data) {
     (void)user_data;
     g_prop_record.key = key ? key : "";
     g_prop_record.type = type;
     g_prop_record.has_old_value = (old_value != NULL);
-    g_prop_record.old_i32 = old_value ? *static_cast<const int32_t*>(old_value) : 0;
-    g_prop_record.new_i32 = new_value ? *static_cast<const int32_t*>(new_value) : 0;
+    g_prop_record.old_i32 =
+        old_value ? *static_cast<const int32_t*>(old_value) : 0;
+    g_prop_record.new_i32 =
+        new_value ? *static_cast<const int32_t*>(new_value) : 0;
     g_prop_record.invoked = true;
 }
 
 /**
  * \brief           Property test callback for string values
  */
-static void
-prop_callback_str(const char* key, config_type_t type,
-                  const void* old_value, const void* new_value,
-                  void* user_data) {
+static void prop_callback_str(const char* key, config_type_t type,
+                              const void* old_value, const void* new_value,
+                              void* user_data) {
     (void)user_data;
     g_prop_record.key = key ? key : "";
     g_prop_record.type = type;
     g_prop_record.has_old_value = (old_value != NULL);
-    g_prop_record.old_str = old_value ? static_cast<const char*>(old_value) : "";
-    g_prop_record.new_str = new_value ? static_cast<const char*>(new_value) : "";
+    g_prop_record.old_str =
+        old_value ? static_cast<const char*>(old_value) : "";
+    g_prop_record.new_str =
+        new_value ? static_cast<const char*>(new_value) : "";
     g_prop_record.invoked = true;
 }
 
@@ -108,10 +109,9 @@ static int g_wildcard_count = 0;
 /**
  * \brief           Wildcard callback for counting invocations
  */
-static void
-prop_wildcard_callback(const char* key, config_type_t type,
-                       const void* old_value, const void* new_value,
-                       void* user_data) {
+static void prop_wildcard_callback(const char* key, config_type_t type,
+                                   const void* old_value, const void* new_value,
+                                   void* user_data) {
     (void)key;
     (void)type;
     (void)old_value;
@@ -131,7 +131,7 @@ class ConfigCallbackPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
         reset_prop_record();
         g_wildcard_count = 0;
-        
+
         /* Ensure config is deinitialized before each test */
         if (config_is_initialized()) {
             config_deinit();
@@ -176,7 +176,8 @@ class ConfigCallbackPropertyTest : public ::testing::Test {
      */
     std::string randomString() {
         std::uniform_int_distribution<int> len_dist(1, 50);
-        std::uniform_int_distribution<int> char_dist(32, 126);  /* Printable ASCII */
+        std::uniform_int_distribution<int> char_dist(32,
+                                                     126); /* Printable ASCII */
         int len = len_dist(rng);
         std::string str;
         for (int i = 0; i < len; ++i) {
@@ -213,8 +214,8 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationI32NewKey) {
 
         /* Register callback */
         config_cb_handle_t handle = NULL;
-        config_status_t status = config_register_callback(key.c_str(), prop_callback_i32,
-                                                          NULL, &handle);
+        config_status_t status = config_register_callback(
+            key.c_str(), prop_callback_i32, NULL, &handle);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": register_callback failed";
 
@@ -237,11 +238,13 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationI32NewKey) {
 
         /* Verify callback received correct new value */
         EXPECT_EQ(new_value, g_prop_record.new_i32)
-            << "Iteration " << test_iter << ": callback received wrong new value";
+            << "Iteration " << test_iter
+            << ": callback received wrong new value";
 
         /* For new key, old value should be NULL */
         EXPECT_FALSE(g_prop_record.has_old_value)
-            << "Iteration " << test_iter << ": callback should not have old value for new key";
+            << "Iteration " << test_iter
+            << ": callback should not have old value for new key";
 
         /* Cleanup */
         config_unregister_callback(handle);
@@ -266,7 +269,7 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationI32Update) {
         std::string key = "cb.i32.upd." + std::to_string(test_iter);
         int32_t old_value = randomI32();
         int32_t new_value = randomI32();
-        
+
         /* Ensure values are different */
         while (new_value == old_value) {
             new_value = randomI32();
@@ -279,7 +282,8 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationI32Update) {
 
         /* Register callback */
         config_cb_handle_t handle = NULL;
-        status = config_register_callback(key.c_str(), prop_callback_i32, NULL, &handle);
+        status = config_register_callback(key.c_str(), prop_callback_i32, NULL,
+                                          &handle);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": register_callback failed";
 
@@ -298,12 +302,14 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationI32Update) {
         EXPECT_TRUE(g_prop_record.has_old_value)
             << "Iteration " << test_iter << ": callback should have old value";
         EXPECT_EQ(old_value, g_prop_record.old_i32)
-            << "Iteration " << test_iter << ": callback received wrong old value. "
+            << "Iteration " << test_iter
+            << ": callback received wrong old value. "
             << "Expected " << old_value << ", got " << g_prop_record.old_i32;
 
         /* Verify callback received correct new value */
         EXPECT_EQ(new_value, g_prop_record.new_i32)
-            << "Iteration " << test_iter << ": callback received wrong new value. "
+            << "Iteration " << test_iter
+            << ": callback received wrong new value. "
             << "Expected " << new_value << ", got " << g_prop_record.new_i32;
 
         /* Cleanup */
@@ -329,7 +335,7 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationString) {
         std::string key = "cb.str." + std::to_string(test_iter);
         std::string old_value = randomString();
         std::string new_value = randomString();
-        
+
         /* Ensure values are different */
         while (new_value == old_value) {
             new_value = randomString();
@@ -342,7 +348,8 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationString) {
 
         /* Register callback */
         config_cb_handle_t handle = NULL;
-        status = config_register_callback(key.c_str(), prop_callback_str, NULL, &handle);
+        status = config_register_callback(key.c_str(), prop_callback_str, NULL,
+                                          &handle);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": register_callback failed";
 
@@ -365,11 +372,13 @@ TEST_F(ConfigCallbackPropertyTest, Property5_CallbackInvocationString) {
         EXPECT_TRUE(g_prop_record.has_old_value)
             << "Iteration " << test_iter << ": callback should have old value";
         EXPECT_EQ(old_value, g_prop_record.old_str)
-            << "Iteration " << test_iter << ": callback received wrong old value";
+            << "Iteration " << test_iter
+            << ": callback received wrong old value";
 
         /* Verify callback received correct new value */
         EXPECT_EQ(new_value, g_prop_record.new_str)
-            << "Iteration " << test_iter << ": callback received wrong new value";
+            << "Iteration " << test_iter
+            << ": callback received wrong new value";
 
         /* Cleanup */
         config_unregister_callback(handle);
@@ -393,10 +402,10 @@ TEST_F(ConfigCallbackPropertyTest, Property_WildcardCallbackInvocation) {
 
         /* Register wildcard callback */
         config_cb_handle_t handle = NULL;
-        config_status_t status = config_register_wildcard_callback(prop_wildcard_callback,
-                                                                   NULL, &handle);
-        ASSERT_EQ(CONFIG_OK, status)
-            << "Iteration " << test_iter << ": register_wildcard_callback failed";
+        config_status_t status = config_register_wildcard_callback(
+            prop_wildcard_callback, NULL, &handle);
+        ASSERT_EQ(CONFIG_OK, status) << "Iteration " << test_iter
+                                     << ": register_wildcard_callback failed";
 
         /* Generate random number of keys to set (1-5) */
         std::uniform_int_distribution<int> count_dist(1, 5);
@@ -404,16 +413,18 @@ TEST_F(ConfigCallbackPropertyTest, Property_WildcardCallbackInvocation) {
 
         /* Set multiple random keys */
         for (int i = 0; i < num_keys; ++i) {
-            std::string key = randomKey() + "." + std::to_string(test_iter) + "." + std::to_string(i);
+            std::string key = randomKey() + "." + std::to_string(test_iter) +
+                              "." + std::to_string(i);
             int32_t value = randomI32();
             status = config_set_i32(key.c_str(), value);
-            ASSERT_EQ(CONFIG_OK, status)
-                << "Iteration " << test_iter << ", key " << i << ": set_i32 failed";
+            ASSERT_EQ(CONFIG_OK, status) << "Iteration " << test_iter
+                                         << ", key " << i << ": set_i32 failed";
         }
 
         /* Verify wildcard callback was invoked for each key */
         EXPECT_EQ(num_keys, g_wildcard_count)
-            << "Iteration " << test_iter << ": wildcard callback invocation count mismatch. "
+            << "Iteration " << test_iter
+            << ": wildcard callback invocation count mismatch. "
             << "Expected " << num_keys << ", got " << g_wildcard_count;
 
         /* Cleanup */
@@ -442,8 +453,8 @@ TEST_F(ConfigCallbackPropertyTest, Property_CallbackNotInvokedAfterUnregister) {
 
         /* Register callback */
         config_cb_handle_t handle = NULL;
-        config_status_t status = config_register_callback(key.c_str(), prop_callback_i32,
-                                                          NULL, &handle);
+        config_status_t status = config_register_callback(
+            key.c_str(), prop_callback_i32, NULL, &handle);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": register_callback failed";
 
@@ -451,7 +462,8 @@ TEST_F(ConfigCallbackPropertyTest, Property_CallbackNotInvokedAfterUnregister) {
         status = config_set_i32(key.c_str(), value1);
         ASSERT_EQ(CONFIG_OK, status);
         EXPECT_TRUE(g_prop_record.invoked)
-            << "Iteration " << test_iter << ": callback should be invoked before unregister";
+            << "Iteration " << test_iter
+            << ": callback should be invoked before unregister";
 
         /* Unregister callback */
         status = config_unregister_callback(handle);
@@ -465,7 +477,8 @@ TEST_F(ConfigCallbackPropertyTest, Property_CallbackNotInvokedAfterUnregister) {
         ASSERT_EQ(CONFIG_OK, status);
 
         EXPECT_FALSE(g_prop_record.invoked)
-            << "Iteration " << test_iter << ": callback should NOT be invoked after unregister";
+            << "Iteration " << test_iter
+            << ": callback should NOT be invoked after unregister";
     }
 }
 
@@ -490,8 +503,8 @@ TEST_F(ConfigCallbackPropertyTest, Property_CallbackNotInvokedForDifferentKey) {
 
         /* Register callback for specific key */
         config_cb_handle_t handle = NULL;
-        config_status_t status = config_register_callback(registered_key.c_str(),
-                                                          prop_callback_i32, NULL, &handle);
+        config_status_t status = config_register_callback(
+            registered_key.c_str(), prop_callback_i32, NULL, &handle);
         ASSERT_EQ(CONFIG_OK, status)
             << "Iteration " << test_iter << ": register_callback failed";
 
@@ -500,7 +513,8 @@ TEST_F(ConfigCallbackPropertyTest, Property_CallbackNotInvokedForDifferentKey) {
         ASSERT_EQ(CONFIG_OK, status);
 
         EXPECT_FALSE(g_prop_record.invoked)
-            << "Iteration " << test_iter << ": callback should NOT be invoked for different key";
+            << "Iteration " << test_iter
+            << ": callback should NOT be invoked for different key";
 
         /* Cleanup */
         config_unregister_callback(handle);
