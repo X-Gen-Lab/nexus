@@ -1,0 +1,292 @@
+# Implementation Plan: Config Manager Middleware
+
+## Overview
+
+本实现计划将配置管理中间件开发分解为可执行的编码任务。实现顺序遵循依赖关系：先完成核心数据结构和基础模块，再实现高级功能（导入/导出、加密），最后进行集成测试。
+
+## Tasks
+
+- [x] 1. 项目结构和基础定义
+  - [x] 1.1 创建 Config Manager 模块目录结构
+    - 创建 framework/config/include/config/ 目录
+    - 创建 framework/config/src/ 目录
+    - 创建 framework/config/CMakeLists.txt
+    - 更新 framework/CMakeLists.txt 添加 config 子目录
+    - _Requirements: 1.1_
+  - [x] 1.2 定义 Config Manager 头文件接口
+    - 创建 config_def.h 定义状态码、类型和常量
+    - 创建 config.h 定义核心 API
+    - 创建 config_backend.h 定义后端接口
+    - _Requirements: 1.1, 9.1, 10.1_
+
+- [x] 2. 配置存储核心实现
+  - [x] 2.1 实现配置条目存储
+    - 创建 config_store.c
+    - 实现配置条目内部结构
+    - 实现键值查找算法
+    - 实现内存管理（静态分配）
+    - _Requirements: 1.4, 1.5, 1.6_
+  - [x] 2.2 实现基本数据类型存储
+    - 实现 config_set_i32 / config_get_i32
+    - 实现 config_set_u32 / config_get_u32
+    - 实现 config_set_i64 / config_get_i64
+    - 实现 config_set_float / config_get_float
+    - 实现 config_set_bool / config_get_bool
+    - _Requirements: 2.1-2.10_
+  - [x] 2.3 实现字符串和二进制数据存储
+    - 实现 config_set_str / config_get_str
+    - 实现 config_set_blob / config_get_blob
+    - 实现 config_get_str_len / config_get_blob_len
+    - _Requirements: 3.1-3.8_
+  - [x] 2.4 编写基本存储单元测试
+    - 测试各数据类型的存取
+    - 测试缓冲区大小检查
+    - 测试边界情况
+    - _Requirements: 2.1-2.10, 3.1-3.8_
+  - [x] 2.5 编写存储属性测试
+    - **Property 2: Set/Get Value Consistency**
+    - **Validates: Requirements 2.1-2.10, 3.1-3.6**
+
+- [x] 3. Config Manager 核心实现
+  - [x] 3.1 实现初始化和反初始化
+    - 创建 config.c
+    - 实现 config_init
+    - 实现 config_deinit
+    - 实现配置验证
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7_
+  - [x] 3.2 编写核心单元测试
+    - 测试初始化配置
+    - 测试重复初始化
+    - 测试反初始化
+    - _Requirements: 1.1, 1.2, 1.3, 1.7_
+  - [x] 3.3 编写核心属性测试
+    - **Property 1: Init/Deinit Round-Trip**
+    - **Validates: Requirements 1.1, 1.7**
+
+- [x] 4. Checkpoint - 基础模块验证
+  - 确保存储和核心模块测试通过
+  - 验证 Native 平台编译正常
+  - 如有问题请询问用户
+
+- [x] 5. 默认值管理模块实现
+  - [x] 5.1 实现默认值管理器
+    - 创建 config_default.c
+    - 实现 config_set_default_i32 / config_set_default_str 等
+    - 实现 config_reset_to_default
+    - 实现 config_register_defaults
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
+  - [x] 5.2 编写默认值单元测试
+    - 测试默认值注册
+    - 测试默认值回退
+    - 测试重置到默认值
+    - _Requirements: 4.1-4.6_
+  - [x] 5.3 编写默认值属性测试
+    - **Property 4: Default Value Fallback**
+    - **Validates: Requirements 4.1, 4.2, 4.4**
+
+- [x] 6. 命名空间模块实现
+  - [x] 6.1 实现命名空间管理器
+    - 创建 config_namespace.c
+    - 实现 config_open_namespace / config_close_namespace
+    - 实现 config_erase_namespace
+    - 实现带命名空间的存取 API
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
+  - [x] 6.2 编写命名空间单元测试
+    - 测试命名空间创建和关闭
+    - 测试命名空间隔离
+    - 测试命名空间擦除
+    - _Requirements: 5.1-5.6_
+  - [x] 6.3 编写命名空间属性测试
+    - **Property 3: Namespace Isolation**
+    - **Validates: Requirements 5.1, 5.2**
+
+- [x] 7. 回调通知模块实现
+  - [x] 7.1 实现回调管理器
+    - 创建 config_callback.c
+    - 实现 config_register_callback
+    - 实现 config_register_wildcard_callback
+    - 实现 config_unregister_callback
+    - 实现回调触发机制
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
+  - [x] 7.2 编写回调单元测试
+    - 测试回调注册和注销
+    - 测试回调触发
+    - 测试通配符回调
+    - _Requirements: 7.1-7.6_
+  - [x] 7.3 编写回调属性测试
+    - **Property 5: Callback Invocation**
+    - **Validates: Requirements 7.1, 7.2**
+
+- [x] 8. Checkpoint - 核心功能验证
+  - 确保默认值、命名空间、回调模块测试通过
+  - 验证模块间接口正确
+  - 如有问题请询问用户
+
+- [ ] 9. 查询和枚举模块实现
+  - [ ] 9.1 实现查询功能
+    - 创建 config_query.c
+    - 实现 config_exists
+    - 实现 config_get_type
+    - 实现 config_delete
+    - 实现 config_get_count
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.6_
+  - [ ] 9.2 实现枚举功能
+    - 实现 config_iterate
+    - 实现 config_ns_iterate
+    - _Requirements: 8.5_
+  - [ ] 9.3 编写查询枚举单元测试
+    - 测试存在性检查
+    - 测试类型查询
+    - 测试删除操作
+    - 测试迭代功能
+    - _Requirements: 8.1-8.6_
+
+- [ ] 10. 存储后端实现
+  - [ ] 10.1 实现后端抽象层
+    - 创建 config_backend.c
+    - 实现 config_set_backend
+    - 实现 config_commit / config_load
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.7, 9.1_
+  - [ ] 10.2 实现 RAM 后端
+    - 创建 config_ram_backend.c
+    - 实现易失性存储
+    - _Requirements: 9.2_
+  - [ ] 10.3 实现 Flash 后端
+    - 创建 config_flash_backend.c
+    - 实现持久化存储
+    - 支持磨损均衡提示
+    - _Requirements: 9.3, 9.5, 9.6_
+  - [ ] 10.4 实现 Mock 后端（测试用）
+    - 创建 config_mock_backend.c
+    - 支持测试注入
+    - _Requirements: 9.1_
+  - [ ] 10.5 编写后端单元测试
+    - 测试后端设置
+    - 测试提交和加载
+    - 测试 NVS 错误处理
+    - _Requirements: 6.1, 6.2, 6.5, 6.6, 9.1-9.6_
+  - [ ] 10.6 编写后端属性测试
+    - **Property 8: Persistence Round-Trip**
+    - **Validates: Requirements 6.1, 6.2**
+
+- [ ] 11. Checkpoint - 持久化验证
+  - 确保后端模块测试通过
+  - 验证持久化功能正常
+  - 如有问题请询问用户
+
+- [ ] 12. 导入/导出模块实现
+  - [ ] 12.1 实现 JSON 导出
+    - 创建 config_export.c
+    - 实现 config_get_export_size
+    - 实现 config_export (JSON 格式)
+    - 实现 config_export_namespace
+    - _Requirements: 11.1, 11.5, 11.8_
+  - [ ] 12.2 实现 JSON 导入
+    - 创建 config_import.c
+    - 实现 config_import (JSON 格式)
+    - 实现 config_import_namespace
+    - 实现格式验证
+    - _Requirements: 11.2, 11.6, 11.7, 11.9, 11.10_
+  - [ ] 12.3 实现二进制导出/导入
+    - 实现 config_export (Binary 格式)
+    - 实现 config_import (Binary 格式)
+    - _Requirements: 11.3, 11.4_
+  - [ ] 12.4 编写导入导出单元测试
+    - 测试 JSON 导出/导入
+    - 测试二进制导出/导入
+    - 测试命名空间选择性导出
+    - 测试格式验证
+    - _Requirements: 11.1-11.10_
+  - [ ] 12.5 编写导入导出属性测试
+    - **Property 6: Export/Import Round-Trip**
+    - **Validates: Requirements 11.1-11.6**
+
+- [ ] 13. 加密模块实现
+  - [ ] 13.1 实现加密核心
+    - 创建 config_crypto.c
+    - 实现 config_set_encryption_key
+    - 实现 config_clear_encryption_key
+    - 实现 AES-128/256 加密解密
+    - _Requirements: 12.3, 12.4, 12.5_
+  - [ ] 13.2 实现加密存储 API
+    - 实现 config_set_str_encrypted
+    - 实现 config_set_blob_encrypted
+    - 实现 config_is_encrypted
+    - 实现 config_rotate_encryption_key
+    - _Requirements: 12.1, 12.2, 12.6, 12.7, 12.8, 12.10_
+  - [ ] 13.3 实现加密导出支持
+    - 支持 CONFIG_EXPORT_FLAG_DECRYPT
+    - 加密键导出时保持加密
+    - _Requirements: 12.9_
+  - [ ] 13.4 编写加密单元测试
+    - 测试加密存储和读取
+    - 测试无密钥错误
+    - 测试密钥轮换
+    - _Requirements: 12.1-12.10_
+  - [ ] 13.5 编写加密属性测试
+    - **Property 7: Encryption Transparency**
+    - **Validates: Requirements 12.1, 12.2**
+
+- [ ] 14. Checkpoint - 高级功能验证
+  - 确保导入导出和加密模块测试通过
+  - 验证加密导出功能正常
+  - 如有问题请询问用户
+
+- [ ] 15. 错误处理完善
+  - [ ] 15.1 实现错误处理机制
+    - 实现 config_get_last_error
+    - 实现 config_error_to_str
+    - 完善所有错误码返回
+    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
+  - [ ] 15.2 编写错误处理测试
+    - 测试各种错误场景
+    - 测试错误码转字符串
+    - _Requirements: 10.1-10.6_
+
+- [ ] 16. 集成测试和文档
+  - [ ] 16.1 编写集成测试
+    - 测试完整配置流程
+    - 测试命名空间和回调
+    - 测试持久化和加密
+    - _Requirements: 1.1-12.10_
+  - [ ] 16.2 更新 API 文档
+    - 确保所有公共 API 有 Doxygen 注释
+    - 创建使用示例
+    - _Requirements: 1.1_
+  - [ ] 16.3 创建 Config Manager 示例应用
+    - 创建 applications/config_demo/
+    - 演示配置存储和读取
+    - 演示导入导出功能
+    - _Requirements: 1.1, 2.1, 11.1_
+
+- [ ] 17. 代码格式和注释规范
+  - [ ] 17.1 代码格式检查
+    - 运行 clang-format 格式化所有源文件
+    - 确保符合 .clang-format 配置
+    - 运行 scripts/tools/format.py 验证格式
+    - _Requirements: 项目代码规范_
+  - [ ] 17.2 注释规范检查
+    - 确保所有公共 API 有 Doxygen 注释
+    - 确保函数注释包含 @brief, @param, @return
+    - 确保文件头包含版权和许可证信息
+    - 确保复杂逻辑有行内注释说明
+    - _Requirements: 项目文档规范_
+  - [ ] 17.3 静态分析检查
+    - 运行 clang-tidy 检查代码质量
+    - 修复所有警告和错误
+    - _Requirements: 项目代码规范_
+
+- [ ] 18. Final Checkpoint - 完整验证
+  - 确保所有测试通过
+  - 验证代码覆盖率 ≥ 80%
+  - 验证代码格式和注释符合项目规范
+  - 如有问题请询问用户
+
+## Notes
+
+- 所有任务均为必需，确保全面测试覆盖
+- 每个任务引用具体的需求以确保可追溯性
+- Checkpoint 任务用于增量验证
+- 属性测试验证通用正确性属性
+- 单元测试验证具体示例和边界情况
+- 加密模块依赖平台加密库（如 mbedTLS），需确保可用
