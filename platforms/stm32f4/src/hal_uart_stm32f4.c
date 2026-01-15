@@ -1,15 +1,21 @@
 /**
  * \file            hal_uart_stm32f4.c
- * \brief           STM32F4 UART HAL Implementation
+ * \brief           STM32F4 UART HAL Implementation (ST HAL Wrapper)
  * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-12
+ * \version         2.0.0
+ * \date            2026-01-15
  *
  * \copyright       Copyright (c) 2026 Nexus Team
+ *
+ * This implementation wraps ST HAL UART functions to provide the Nexus HAL
+ * interface. It uses HAL_UART_Init(), HAL_UART_Transmit(), HAL_UART_Receive(),
+ * HAL_UART_Transmit_IT(), HAL_UART_Receive_IT(), and HAL_UART_IRQHandler()
+ * from the ST HAL library.
  */
 
 #include "hal/hal_uart.h"
 #include "stm32f4xx.h"
+#include "stm32f4xx_hal_conf.h"
 
 /*===========================================================================*/
 /* Local definitions                                                          */
@@ -21,58 +27,28 @@
 #define UART_MAX_INSTANCES 3
 
 /**
- * \brief           USART Status Register bit definitions
+ * \brief           Default timeout for single byte operations (ms)
  */
-#define USART_SR_PE   (1UL << 0) /**< Parity error */
-#define USART_SR_FE   (1UL << 1) /**< Framing error */
-#define USART_SR_NE   (1UL << 2) /**< Noise error */
-#define USART_SR_ORE  (1UL << 3) /**< Overrun error */
-#define USART_SR_IDLE (1UL << 4) /**< IDLE line detected */
-#define USART_SR_RXNE (1UL << 5) /**< Read data register not empty */
-#define USART_SR_TC   (1UL << 6) /**< Transmission complete */
-#define USART_SR_TXE  (1UL << 7) /**< Transmit data register empty */
+#define UART_DEFAULT_TIMEOUT 1000
 
 /**
- * \brief           USART Control Register 1 bit definitions
- */
-#define USART_CR1_RE     (1UL << 2)  /**< Receiver enable */
-#define USART_CR1_TE     (1UL << 3)  /**< Transmitter enable */
-#define USART_CR1_IDLEIE (1UL << 4)  /**< IDLE interrupt enable */
-#define USART_CR1_RXNEIE (1UL << 5)  /**< RXNE interrupt enable */
-#define USART_CR1_TCIE   (1UL << 6)  /**< TC interrupt enable */
-#define USART_CR1_TXEIE  (1UL << 7)  /**< TXE interrupt enable */
-#define USART_CR1_PEIE   (1UL << 8)  /**< PE interrupt enable */
-#define USART_CR1_PS     (1UL << 9)  /**< Parity selection */
-#define USART_CR1_PCE    (1UL << 10) /**< Parity control enable */
-#define USART_CR1_M      (1UL << 12) /**< Word length */
-#define USART_CR1_UE     (1UL << 13) /**< USART enable */
-
-/**
- * \brief           USART Control Register 2 bit definitions
- */
-#define USART_CR2_STOP_1 (0UL << 12) /**< 1 stop bit */
-#define USART_CR2_STOP_2 (2UL << 12) /**< 2 stop bits */
-
-/**
- * \brief           UART instance data
+ * \brief           UART instance data structure - wraps ST HAL Handle
  */
 typedef struct {
-    USART_TypeDef* instance;            /**< USART peripheral */
-    hal_uart_config_t config;           /**< Configuration */
+    UART_HandleTypeDef huart;           /**< ST HAL UART Handle */
+    hal_uart_config_t config;           /**< Nexus configuration */
     hal_uart_rx_callback_t rx_callback; /**< RX callback */
     hal_uart_tx_callback_t tx_callback; /**< TX callback */
     void* rx_context;                   /**< RX callback context */
     void* tx_context;                   /**< TX callback context */
-    bool initialized;                   /**< Initialization flag */
+    uint8_t rx_byte;  /**< Single byte RX buffer for IT mode */
+    bool initialized; /**< Initialization flag */
 } uart_data_t;
 
 /**
  * \brief           UART instance data array
  */
-static uart_data_t uart_data[UART_MAX_INSTANCES] = {
-    {USART1, {0}, NULL, NULL, NULL, NULL, false},
-    {USART2, {0}, NULL, NULL, NULL, NULL, false},
-    {USART3, {0}, NULL, NULL, NULL, NULL, false}};
+static uart_data_t uart_data[UART_MAX_INSTANCES];
 
 /*===========================================================================*/
 /* Local functions                                                            */
@@ -91,37 +67,225 @@ static uart_data_t* uart_get_data(hal_uart_instance_t instance) {
 }
 
 /**
- * \brief           Enable UART clock
+ * \brief           Get USART peripheral pointer by instance
  * \param[in]       instance: UART instance
+ * \return          USART peripheral pointer
  */
-static void uart_enable_clock(hal_uart_instance_t instance) {
+static USART_TypeDef* uart_get_instance(hal_uart_instance_t instance) {
     switch (instance) {
-        case HAL_UART_0: /* USART1 on APB2 */
-            RCC->APB2ENR |= (1UL << 4);
-            break;
-        case HAL_UART_1: /* USART2 on APB1 */
-            RCC->APB1ENR |= (1UL << 17);
-            break;
-        case HAL_UART_2: /* USART3 on APB1 */
-            RCC->APB1ENR |= (1UL << 18);
-            break;
+        case HAL_UART_0:
+            return USART1;
+        case HAL_UART_1:
+            return USART2;
+        case HAL_UART_2:
+            return USART3;
         default:
-            break;
+            return NULL;
     }
-    /* Data synchronization barrier */
-    __asm volatile("dsb");
 }
 
 /**
- * \brief           Get APB clock for UART
- * \param[in]       instance: UART instance
- * \return          APB clock frequency
+ * \brief           Map Nexus word length to ST HAL word length
  */
-static uint32_t uart_get_clock(hal_uart_instance_t instance) {
-    /* USART1 is on APB2, USART2/3 are on APB1 */
-    /* Simplified: assume SystemCoreClock with no prescalers */
-    (void)instance;
-    return SystemCoreClock;
+static uint32_t map_wordlen(hal_uart_wordlen_t wordlen) {
+    switch (wordlen) {
+        case HAL_UART_WORDLEN_9:
+            return UART_WORDLENGTH_9B;
+        case HAL_UART_WORDLEN_8:
+        default:
+            return UART_WORDLENGTH_8B;
+    }
+}
+
+/**
+ * \brief           Map Nexus stop bits to ST HAL stop bits
+ */
+static uint32_t map_stopbits(hal_uart_stopbits_t stopbits) {
+    switch (stopbits) {
+        case HAL_UART_STOPBITS_2:
+            return UART_STOPBITS_2;
+        case HAL_UART_STOPBITS_1:
+        default:
+            return UART_STOPBITS_1;
+    }
+}
+
+/**
+ * \brief           Map Nexus parity to ST HAL parity
+ */
+static uint32_t map_parity(hal_uart_parity_t parity) {
+    switch (parity) {
+        case HAL_UART_PARITY_EVEN:
+            return UART_PARITY_EVEN;
+        case HAL_UART_PARITY_ODD:
+            return UART_PARITY_ODD;
+        case HAL_UART_PARITY_NONE:
+        default:
+            return UART_PARITY_NONE;
+    }
+}
+
+/**
+ * \brief           Map Nexus flow control to ST HAL flow control
+ */
+static uint32_t map_flowctrl(hal_uart_flowctrl_t flowctrl) {
+    switch (flowctrl) {
+        case HAL_UART_FLOWCTRL_RTS:
+            return UART_HWCONTROL_RTS;
+        case HAL_UART_FLOWCTRL_CTS:
+            return UART_HWCONTROL_CTS;
+        case HAL_UART_FLOWCTRL_RTS_CTS:
+            return UART_HWCONTROL_RTS_CTS;
+        case HAL_UART_FLOWCTRL_NONE:
+        default:
+            return UART_HWCONTROL_NONE;
+    }
+}
+
+/**
+ * \brief           Map ST HAL status to Nexus HAL status
+ */
+static hal_status_t map_hal_status(HAL_StatusTypeDef status) {
+    switch (status) {
+        case HAL_OK:
+            return HAL_OK;
+        case HAL_BUSY:
+            return HAL_ERROR_BUSY;
+        case HAL_TIMEOUT:
+            return HAL_ERROR_TIMEOUT;
+        case HAL_ERROR:
+        default:
+            return HAL_ERROR;
+    }
+}
+
+/**
+ * \brief           Map ST HAL UART error to Nexus HAL error
+ */
+static hal_status_t map_uart_error(uint32_t error) {
+    if (error & HAL_UART_ERROR_PE) {
+        return HAL_ERROR_PARITY;
+    }
+    if (error & HAL_UART_ERROR_FE) {
+        return HAL_ERROR_FRAMING;
+    }
+    if (error & HAL_UART_ERROR_NE) {
+        return HAL_ERROR_NOISE;
+    }
+    if (error & HAL_UART_ERROR_ORE) {
+        return HAL_ERROR_OVERRUN;
+    }
+    return HAL_ERROR_IO;
+}
+
+/**
+ * \brief           Get NVIC IRQ number for UART instance
+ */
+static IRQn_Type uart_get_irqn(hal_uart_instance_t instance) {
+    switch (instance) {
+        case HAL_UART_0:
+            return USART1_IRQn;
+        case HAL_UART_1:
+            return USART2_IRQn;
+        case HAL_UART_2:
+            return USART3_IRQn;
+        default:
+            return USART1_IRQn;
+    }
+}
+
+/*===========================================================================*/
+/* ST HAL MSP Functions (Clock and GPIO Configuration)                        */
+/*===========================================================================*/
+
+/**
+ * \brief           UART MSP Initialization
+ * \note            This function is called by HAL_UART_Init() to configure
+ *                  clocks and GPIO pins for the UART peripheral.
+ * \param[in]       huart: UART handle pointer
+ */
+void HAL_UART_MspInit(UART_HandleTypeDef* huart) {
+    GPIO_InitTypeDef gpio_init = {0};
+
+    if (huart->Instance == USART1) {
+        /* Enable USART1 clock (APB2) */
+        __HAL_RCC_USART1_CLK_ENABLE();
+        /* Enable GPIOA clock for TX (PA9) and RX (PA10) */
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+
+        /* Configure USART1 TX (PA9) */
+        gpio_init.Pin = GPIO_PIN_9;
+        gpio_init.Mode = GPIO_MODE_AF_PP;
+        gpio_init.Pull = GPIO_NOPULL;
+        gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        gpio_init.Alternate = GPIO_AF7_USART1;
+        HAL_GPIO_Init(GPIOA, &gpio_init);
+
+        /* Configure USART1 RX (PA10) */
+        gpio_init.Pin = GPIO_PIN_10;
+        gpio_init.Mode = GPIO_MODE_AF_PP;
+        gpio_init.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOA, &gpio_init);
+
+    } else if (huart->Instance == USART2) {
+        /* Enable USART2 clock (APB1) */
+        __HAL_RCC_USART2_CLK_ENABLE();
+        /* Enable GPIOA clock for TX (PA2) and RX (PA3) */
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+
+        /* Configure USART2 TX (PA2) */
+        gpio_init.Pin = GPIO_PIN_2;
+        gpio_init.Mode = GPIO_MODE_AF_PP;
+        gpio_init.Pull = GPIO_NOPULL;
+        gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        gpio_init.Alternate = GPIO_AF7_USART2;
+        HAL_GPIO_Init(GPIOA, &gpio_init);
+
+        /* Configure USART2 RX (PA3) */
+        gpio_init.Pin = GPIO_PIN_3;
+        gpio_init.Mode = GPIO_MODE_AF_PP;
+        gpio_init.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOA, &gpio_init);
+
+    } else if (huart->Instance == USART3) {
+        /* Enable USART3 clock (APB1) */
+        __HAL_RCC_USART3_CLK_ENABLE();
+        /* Enable GPIOB clock for TX (PB10) and RX (PB11) */
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+
+        /* Configure USART3 TX (PB10) */
+        gpio_init.Pin = GPIO_PIN_10;
+        gpio_init.Mode = GPIO_MODE_AF_PP;
+        gpio_init.Pull = GPIO_NOPULL;
+        gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        gpio_init.Alternate = GPIO_AF7_USART3;
+        HAL_GPIO_Init(GPIOB, &gpio_init);
+
+        /* Configure USART3 RX (PB11) */
+        gpio_init.Pin = GPIO_PIN_11;
+        gpio_init.Mode = GPIO_MODE_AF_PP;
+        gpio_init.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOB, &gpio_init);
+    }
+}
+
+/**
+ * \brief           UART MSP De-Initialization
+ * \note            This function is called by HAL_UART_DeInit() to release
+ *                  resources used by the UART peripheral.
+ * \param[in]       huart: UART handle pointer
+ */
+void HAL_UART_MspDeInit(UART_HandleTypeDef* huart) {
+    if (huart->Instance == USART1) {
+        __HAL_RCC_USART1_CLK_DISABLE();
+        HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9 | GPIO_PIN_10);
+    } else if (huart->Instance == USART2) {
+        __HAL_RCC_USART2_CLK_DISABLE();
+        HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2 | GPIO_PIN_3);
+    } else if (huart->Instance == USART3) {
+        __HAL_RCC_USART3_CLK_DISABLE();
+        HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10 | GPIO_PIN_11);
+    }
 }
 
 /*===========================================================================*/
@@ -131,10 +295,7 @@ static uint32_t uart_get_clock(hal_uart_instance_t instance) {
 hal_status_t hal_uart_init(hal_uart_instance_t instance,
                            const hal_uart_config_t* config) {
     uart_data_t* data;
-    USART_TypeDef* uart;
-    uint32_t brr;
-    uint32_t cr1 = 0;
-    uint32_t cr2 = 0;
+    HAL_StatusTypeDef status;
 
     /* Parameter validation */
     if (config == NULL) {
@@ -154,54 +315,21 @@ hal_status_t hal_uart_init(hal_uart_instance_t instance,
         return HAL_ERROR_INVALID_PARAM;
     }
 
-    /* Enable clock */
-    uart_enable_clock(instance);
-    uart = data->instance;
+    /* Configure ST HAL UART_HandleTypeDef */
+    data->huart.Instance = uart_get_instance(instance);
+    data->huart.Init.BaudRate = config->baudrate;
+    data->huart.Init.WordLength = map_wordlen(config->wordlen);
+    data->huart.Init.StopBits = map_stopbits(config->stopbits);
+    data->huart.Init.Parity = map_parity(config->parity);
+    data->huart.Init.HwFlowCtl = map_flowctrl(config->flowctrl);
+    data->huart.Init.Mode = UART_MODE_TX_RX;
+    data->huart.Init.OverSampling = UART_OVERSAMPLING_16;
 
-    /* Disable UART during configuration */
-    uart->CR1 = 0;
-
-    /* Calculate baud rate register value */
-    /* BRR = fck / baudrate (with rounding) */
-    brr = (uart_get_clock(instance) + config->baudrate / 2) / config->baudrate;
-    uart->BRR = brr;
-
-    /* Configure word length */
-    if (config->wordlen == HAL_UART_WORDLEN_9) {
-        cr1 |= USART_CR1_M;
+    /* Call ST HAL UART Init */
+    status = HAL_UART_Init(&data->huart);
+    if (status != HAL_OK) {
+        return map_hal_status(status);
     }
-
-    /* Configure parity */
-    switch (config->parity) {
-        case HAL_UART_PARITY_EVEN:
-            cr1 |= USART_CR1_PCE;
-            break;
-        case HAL_UART_PARITY_ODD:
-            cr1 |= USART_CR1_PCE | USART_CR1_PS;
-            break;
-        default:
-            break;
-    }
-
-    /* Configure stop bits */
-    switch (config->stopbits) {
-        case HAL_UART_STOPBITS_2:
-            cr2 |= USART_CR2_STOP_2;
-            break;
-        default:
-            cr2 |= USART_CR2_STOP_1;
-            break;
-    }
-
-    /* Enable TX and RX */
-    cr1 |= USART_CR1_TE | USART_CR1_RE;
-
-    /* Apply configuration */
-    uart->CR2 = cr2;
-    uart->CR1 = cr1;
-
-    /* Enable UART */
-    uart->CR1 |= USART_CR1_UE;
 
     /* Store configuration */
     data->config = *config;
@@ -216,6 +344,7 @@ hal_status_t hal_uart_init(hal_uart_instance_t instance,
 
 hal_status_t hal_uart_deinit(hal_uart_instance_t instance) {
     uart_data_t* data = uart_get_data(instance);
+    HAL_StatusTypeDef status;
 
     if (data == NULL) {
         return HAL_ERROR_INVALID_PARAM;
@@ -224,11 +353,21 @@ hal_status_t hal_uart_deinit(hal_uart_instance_t instance) {
         return HAL_ERROR_NOT_INIT;
     }
 
-    /* Disable UART */
-    data->instance->CR1 = 0;
+    /* Disable NVIC interrupt */
+    HAL_NVIC_DisableIRQ(uart_get_irqn(instance));
+
+    /* Call ST HAL UART DeInit */
+    status = HAL_UART_DeInit(&data->huart);
+    if (status != HAL_OK) {
+        return map_hal_status(status);
+    }
+
+    /* Clear state */
     data->initialized = false;
     data->rx_callback = NULL;
     data->tx_callback = NULL;
+    data->rx_context = NULL;
+    data->tx_context = NULL;
 
     return HAL_OK;
 }
@@ -237,9 +376,7 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
                                const uint8_t* data_buf, size_t len,
                                uint32_t timeout_ms) {
     uart_data_t* data = uart_get_data(instance);
-    USART_TypeDef* uart;
-    size_t i;
-    uint32_t timeout_count;
+    HAL_StatusTypeDef status;
 
     if (data == NULL) {
         return HAL_ERROR_INVALID_PARAM;
@@ -251,25 +388,17 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
         return HAL_ERROR_NOT_INIT;
     }
 
-    uart = data->instance;
+    /* Use ST HAL blocking transmit */
+    status = HAL_UART_Transmit(&data->huart, (uint8_t*)data_buf, (uint16_t)len,
+                               timeout_ms);
 
-    for (i = 0; i < len; i++) {
-        /* Wait for TXE (transmit data register empty) with timeout */
-        timeout_count = timeout_ms * 1000; /* Simple delay counter */
-        while (!(uart->SR & USART_SR_TXE)) {
-            if (timeout_ms != HAL_WAIT_FOREVER && --timeout_count == 0) {
-                return HAL_ERROR_TIMEOUT;
-            }
+    if (status != HAL_OK) {
+        /* Check for specific UART errors */
+        uint32_t error = HAL_UART_GetError(&data->huart);
+        if (error != HAL_UART_ERROR_NONE) {
+            return map_uart_error(error);
         }
-        uart->DR = data_buf[i];
-    }
-
-    /* Wait for TC (transmission complete) */
-    timeout_count = timeout_ms * 1000;
-    while (!(uart->SR & USART_SR_TC)) {
-        if (timeout_ms != HAL_WAIT_FOREVER && --timeout_count == 0) {
-            return HAL_ERROR_TIMEOUT;
-        }
+        return map_hal_status(status);
     }
 
     /* Invoke TX complete callback if registered */
@@ -283,9 +412,7 @@ hal_status_t hal_uart_transmit(hal_uart_instance_t instance,
 hal_status_t hal_uart_receive(hal_uart_instance_t instance, uint8_t* data_buf,
                               size_t len, uint32_t timeout_ms) {
     uart_data_t* data = uart_get_data(instance);
-    USART_TypeDef* uart;
-    size_t i;
-    uint32_t timeout_count;
+    HAL_StatusTypeDef status;
 
     if (data == NULL) {
         return HAL_ERROR_INVALID_PARAM;
@@ -297,35 +424,22 @@ hal_status_t hal_uart_receive(hal_uart_instance_t instance, uint8_t* data_buf,
         return HAL_ERROR_NOT_INIT;
     }
 
-    uart = data->instance;
+    /* Use ST HAL blocking receive */
+    status =
+        HAL_UART_Receive(&data->huart, data_buf, (uint16_t)len, timeout_ms);
 
-    for (i = 0; i < len; i++) {
-        /* Wait for RXNE (receive data register not empty) with timeout */
-        timeout_count = timeout_ms * 1000;
-        while (!(uart->SR & USART_SR_RXNE)) {
-            if (timeout_ms != HAL_WAIT_FOREVER && --timeout_count == 0) {
-                return HAL_ERROR_TIMEOUT;
-            }
+    if (status != HAL_OK) {
+        /* Check for specific UART errors */
+        uint32_t error = HAL_UART_GetError(&data->huart);
+        if (error != HAL_UART_ERROR_NONE) {
+            return map_uart_error(error);
         }
+        return map_hal_status(status);
+    }
 
-        /* Check for errors */
-        if (uart->SR & USART_SR_PE) {
-            return HAL_ERROR_PARITY;
-        }
-        if (uart->SR & USART_SR_FE) {
-            return HAL_ERROR_FRAMING;
-        }
-        if (uart->SR & USART_SR_NE) {
-            return HAL_ERROR_NOISE;
-        }
-        if (uart->SR & USART_SR_ORE) {
-            return HAL_ERROR_OVERRUN;
-        }
-
-        data_buf[i] = (uint8_t)uart->DR;
-
-        /* Invoke RX callback if registered */
-        if (data->rx_callback != NULL) {
+    /* Invoke RX callback for each byte if registered */
+    if (data->rx_callback != NULL) {
+        for (size_t i = 0; i < len; i++) {
             data->rx_callback(instance, data_buf[i], data->rx_context);
         }
     }
@@ -334,11 +448,14 @@ hal_status_t hal_uart_receive(hal_uart_instance_t instance, uint8_t* data_buf,
 }
 
 hal_status_t hal_uart_putc(hal_uart_instance_t instance, uint8_t byte) {
-    return hal_uart_transmit(instance, &byte, 1, HAL_WAIT_FOREVER);
+    return hal_uart_transmit(instance, &byte, 1, UART_DEFAULT_TIMEOUT);
 }
 
 hal_status_t hal_uart_getc(hal_uart_instance_t instance, uint8_t* byte,
                            uint32_t timeout_ms) {
+    if (byte == NULL) {
+        return HAL_ERROR_NULL_POINTER;
+    }
     return hal_uart_receive(instance, byte, 1, timeout_ms);
 }
 
@@ -357,11 +474,16 @@ hal_status_t hal_uart_set_rx_callback(hal_uart_instance_t instance,
     data->rx_callback = callback;
     data->rx_context = context;
 
-    /* Enable RXNE interrupt if callback is set */
     if (callback != NULL) {
-        data->instance->CR1 |= USART_CR1_RXNEIE;
+        /* Enable NVIC interrupt */
+        HAL_NVIC_SetPriority(uart_get_irqn(instance), 5, 0);
+        HAL_NVIC_EnableIRQ(uart_get_irqn(instance));
+
+        /* Start interrupt-based receive for single byte */
+        HAL_UART_Receive_IT(&data->huart, &data->rx_byte, 1);
     } else {
-        data->instance->CR1 &= ~USART_CR1_RXNEIE;
+        /* Abort any ongoing IT receive */
+        HAL_UART_AbortReceive_IT(&data->huart);
     }
 
     return HAL_OK;
@@ -382,69 +504,99 @@ hal_status_t hal_uart_set_tx_callback(hal_uart_instance_t instance,
     data->tx_callback = callback;
     data->tx_context = context;
 
-    /* Enable TC interrupt if callback is set */
     if (callback != NULL) {
-        data->instance->CR1 |= USART_CR1_TCIE;
-    } else {
-        data->instance->CR1 &= ~USART_CR1_TCIE;
+        /* Enable NVIC interrupt */
+        HAL_NVIC_SetPriority(uart_get_irqn(instance), 5, 0);
+        HAL_NVIC_EnableIRQ(uart_get_irqn(instance));
     }
 
     return HAL_OK;
 }
 
 /*===========================================================================*/
-/* Interrupt handlers                                                         */
+/* ST HAL Callback Implementations                                            */
 /*===========================================================================*/
 
 /**
- * \brief           Common UART IRQ handler
- * \param[in]       instance: UART instance
+ * \brief           ST HAL UART RX Complete Callback
+ * \note            Called by HAL_UART_IRQHandler() when RX is complete
+ * \param[in]       huart: UART handle pointer
  */
-static void uart_irq_handler(hal_uart_instance_t instance) {
-    uart_data_t* data = uart_get_data(instance);
-    USART_TypeDef* uart;
-
-    if (data == NULL || !data->initialized) {
-        return;
-    }
-
-    uart = data->instance;
-
-    /* Check for RX data available */
-    if ((uart->SR & USART_SR_RXNE) && (uart->CR1 & USART_CR1_RXNEIE)) {
-        uint8_t byte = (uint8_t)uart->DR;
-        if (data->rx_callback != NULL) {
-            data->rx_callback(instance, byte, data->rx_context);
-        }
-    }
-
-    /* Check for TX complete */
-    if ((uart->SR & USART_SR_TC) && (uart->CR1 & USART_CR1_TCIE)) {
-        /* Clear TC flag by reading SR then writing DR (or just clear it) */
-        uart->SR &= ~USART_SR_TC;
-        if (data->tx_callback != NULL) {
-            data->tx_callback(instance, data->tx_context);
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
+    /* Find which instance triggered the callback */
+    for (hal_uart_instance_t i = 0; i < UART_MAX_INSTANCES; i++) {
+        uart_data_t* data = &uart_data[i];
+        if (data->initialized && &data->huart == huart) {
+            /* Invoke user callback with received byte */
+            if (data->rx_callback != NULL) {
+                data->rx_callback(i, data->rx_byte, data->rx_context);
+            }
+            /* Re-enable receive for next byte */
+            HAL_UART_Receive_IT(&data->huart, &data->rx_byte, 1);
+            break;
         }
     }
 }
 
 /**
- * \brief           USART1 IRQ handler
+ * \brief           ST HAL UART TX Complete Callback
+ * \note            Called by HAL_UART_IRQHandler() when TX is complete
+ * \param[in]       huart: UART handle pointer
+ */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
+    /* Find which instance triggered the callback */
+    for (hal_uart_instance_t i = 0; i < UART_MAX_INSTANCES; i++) {
+        uart_data_t* data = &uart_data[i];
+        if (data->initialized && &data->huart == huart) {
+            /* Invoke user callback */
+            if (data->tx_callback != NULL) {
+                data->tx_callback(i, data->tx_context);
+            }
+            break;
+        }
+    }
+}
+
+/**
+ * \brief           ST HAL UART Error Callback
+ * \note            Called by HAL_UART_IRQHandler() when an error occurs
+ * \param[in]       huart: UART handle pointer
+ */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart) {
+    /* Find which instance triggered the callback */
+    for (hal_uart_instance_t i = 0; i < UART_MAX_INSTANCES; i++) {
+        uart_data_t* data = &uart_data[i];
+        if (data->initialized && &data->huart == huart) {
+            /* Clear error flags and re-enable receive if callback is set */
+            if (data->rx_callback != NULL) {
+                HAL_UART_Receive_IT(&data->huart, &data->rx_byte, 1);
+            }
+            break;
+        }
+    }
+}
+
+/*===========================================================================*/
+/* IRQ Handlers - Using ST HAL UART Handler                                   */
+/*===========================================================================*/
+
+/**
+ * \brief           USART1 IRQ Handler
  */
 void USART1_IRQHandler(void) {
-    uart_irq_handler(HAL_UART_0);
+    HAL_UART_IRQHandler(&uart_data[HAL_UART_0].huart);
 }
 
 /**
- * \brief           USART2 IRQ handler
+ * \brief           USART2 IRQ Handler
  */
 void USART2_IRQHandler(void) {
-    uart_irq_handler(HAL_UART_1);
+    HAL_UART_IRQHandler(&uart_data[HAL_UART_1].huart);
 }
 
 /**
- * \brief           USART3 IRQ handler
+ * \brief           USART3 IRQ Handler
  */
 void USART3_IRQHandler(void) {
-    uart_irq_handler(HAL_UART_2);
+    HAL_UART_IRQHandler(&uart_data[HAL_UART_2].huart);
 }
