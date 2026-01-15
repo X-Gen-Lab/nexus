@@ -108,6 +108,16 @@ typedef struct {
 } hal_gpio_config_t;
 
 /**
+ * \brief           GPIO alternate function configuration structure
+ */
+typedef struct {
+    uint8_t alternate;                  /**< Alternate function number (0-15) */
+    hal_gpio_pull_t pull;               /**< Pull configuration */
+    hal_gpio_output_mode_t output_mode; /**< Output mode (PP or OD) */
+    hal_gpio_speed_t speed;             /**< Output speed */
+} hal_gpio_af_config_t;
+
+/**
  * \brief           GPIO interrupt callback function type
  * \param[in]       port: GPIO port that triggered interrupt
  * \param[in]       pin: GPIO pin that triggered interrupt
@@ -191,6 +201,16 @@ hal_status_t hal_gpio_irq_enable(hal_gpio_port_t port, hal_gpio_pin_t pin);
  * \return          HAL_OK on success, error code otherwise
  */
 hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin);
+
+/**
+ * \brief           Configure GPIO pin for alternate function
+ * \param[in]       port: GPIO port
+ * \param[in]       pin: GPIO pin number (0-15)
+ * \param[in]       config: Pointer to alternate function configuration
+ * \return          HAL_OK on success, error code otherwise
+ */
+hal_status_t hal_gpio_init_af(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                              const hal_gpio_af_config_t* config);
 
 /**
  * \}

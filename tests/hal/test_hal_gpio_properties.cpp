@@ -204,3 +204,75 @@ TEST_F(HalGpioPropertyTest, Property3_LifecycleValidity) {
             << "Iteration " << i << ": toggle after deinit should fail";
     }
 }
+
+/**
+ * Feature: stm32f4-hal-adapter, Property 4: GPIO Parameter Validation
+ *
+ * *For any* invalid port (>= HAL_GPIO_PORT_MAX) or invalid pin (> 15),
+ * calling any GPIO function SHALL return HAL_ERROR_INVALID_PARAM without
+ * modifying hardware state.
+ *
+ * **Validates: Requirements 3.2, 3.8**
+ */
+TEST_F(HalGpioPropertyTest, Property4_ParameterValidation) {
+    for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
+        native_gpio_reset_all();
+
+        // Generate invalid port values
+        std::uniform_int_distribution<int> invalid_port_dist(
+            HAL_GPIO_PORT_MAX, HAL_GPIO_PORT_MAX + 10);
+        auto invalid_port =
+            static_cast<hal_gpio_port_t>(invalid_port_dist(rng));
+
+        // Generate invalid pin values
+        std::uniform_int_distribution<int> invalid_pin_dist(16, 255);
+        auto invalid_pin = static_cast<hal_gpio_pin_t>(invalid_pin_dist(rng));
+
+        auto valid_port = randomPort();
+        auto valid_pin = randomPin();
+        auto level = randomLevel();
+        hal_gpio_level_t read_level;
+
+        hal_gpio_config_t config = makeOutputConfig(HAL_GPIO_LEVEL_LOW);
+
+        // Test with invalid port
+        EXPECT_EQ(HAL_ERR_PARAM,
+                  hal_gpio_init(invalid_port, valid_pin, &config))
+            << "Iteration " << i << ": init with invalid port should fail";
+        EXPECT_EQ(HAL_ERR_PARAM, hal_gpio_write(invalid_port, valid_pin, level))
+            << "Iteration " << i << ": write with invalid port should fail";
+        EXPECT_EQ(HAL_ERR_PARAM,
+                  hal_gpio_read(invalid_port, valid_pin, &read_level))
+            << "Iteration " << i << ": read with invalid port should fail";
+        EXPECT_EQ(HAL_ERR_PARAM, hal_gpio_toggle(invalid_port, valid_pin))
+            << "Iteration " << i << ": toggle with invalid port should fail";
+        EXPECT_EQ(HAL_ERR_PARAM, hal_gpio_deinit(invalid_port, valid_pin))
+            << "Iteration " << i << ": deinit with invalid port should fail";
+
+        // Test with invalid pin
+        EXPECT_EQ(HAL_ERR_PARAM,
+                  hal_gpio_init(valid_port, invalid_pin, &config))
+            << "Iteration " << i << ": init with invalid pin should fail";
+        EXPECT_EQ(HAL_ERR_PARAM, hal_gpio_write(valid_port, invalid_pin, level))
+            << "Iteration " << i << ": write with invalid pin should fail";
+        EXPECT_EQ(HAL_ERR_PARAM,
+                  hal_gpio_read(valid_port, invalid_pin, &read_level))
+            << "Iteration " << i << ": read with invalid pin should fail";
+        EXPECT_EQ(HAL_ERR_PARAM, hal_gpio_toggle(valid_port, invalid_pin))
+            << "Iteration " << i << ": toggle with invalid pin should fail";
+        EXPECT_EQ(HAL_ERR_PARAM, hal_gpio_deinit(valid_port, invalid_pin))
+            << "Iteration " << i << ": deinit with invalid pin should fail";
+
+        // Test with null config pointer
+        EXPECT_EQ(HAL_ERROR_NULL_POINTER,
+                  hal_gpio_init(valid_port, valid_pin, nullptr))
+            << "Iteration " << i << ": init with null config should fail";
+
+        // Test with null level pointer for read
+        ASSERT_EQ(HAL_OK, hal_gpio_init(valid_port, valid_pin, &config));
+        EXPECT_EQ(HAL_ERROR_NULL_POINTER,
+                  hal_gpio_read(valid_port, valid_pin, nullptr))
+            << "Iteration " << i << ": read with null level should fail";
+        hal_gpio_deinit(valid_port, valid_pin);
+    }
+}

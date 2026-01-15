@@ -155,3 +155,25 @@ hal_status_t hal_gpio_irq_disable(hal_gpio_port_t port, hal_gpio_pin_t pin) {
     (void)pin;
     return HAL_ERR_NOT_SUPPORTED;
 }
+
+hal_status_t hal_gpio_init_af(hal_gpio_port_t port, hal_gpio_pin_t pin,
+                              const hal_gpio_af_config_t* config) {
+    native_gpio_pin_t* state;
+
+    if (port >= MAX_PORTS || pin >= MAX_PINS) {
+        return HAL_ERROR_INVALID_PARAM;
+    }
+    if (config == NULL) {
+        return HAL_ERROR_NULL_POINTER;
+    }
+    if (config->alternate > 15) {
+        return HAL_ERROR_INVALID_PARAM;
+    }
+
+    state = &gpio_state[port][pin];
+    state->configured = true;
+    state->is_output = false; /* AF pins are not regular outputs */
+    state->level = false;
+
+    return HAL_OK;
+}
