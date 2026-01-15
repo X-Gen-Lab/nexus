@@ -1,0 +1,155 @@
+/**
+ * \file            nx_types.h
+ * \brief           Nexus platform basic type definitions
+ * \author          Nexus Team
+ *
+ * This file provides portable type definitions for the Nexus HAL.
+ * It uses standard C headers when available, or provides fallback definitions.
+ */
+
+#ifndef NX_TYPES_H
+#define NX_TYPES_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * Include standard headers if available
+ */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+/* C99 or later - use standard headers */
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#else
+/* Pre-C99 fallback definitions */
+
+/* Fixed-width integer types */
+#ifndef _STDINT_H
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
+#if defined(__GNUC__) || defined(_MSC_VER)
+typedef signed long long int64_t;
+typedef unsigned long long uint64_t;
+#endif
+#endif /* _STDINT_H */
+
+/* Size types */
+#ifndef _STDDEF_H
+#ifndef _SIZE_T_DEFINED
+typedef unsigned int size_t;
+#define _SIZE_T_DEFINED
+#endif
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+#endif /* _STDDEF_H */
+
+/* Boolean type */
+#ifndef _STDBOOL_H
+#ifndef __cplusplus
+typedef unsigned char bool;
+#define true  1
+#define false 0
+#endif
+#define __bool_true_false_are_defined 1
+#endif /* _STDBOOL_H */
+
+#endif /* __STDC_VERSION__ */
+
+/*
+ * Additional type definitions for embedded systems
+ */
+
+/** Pointer-sized unsigned integer */
+typedef uintptr_t nx_uintptr_t;
+
+/** Register-sized type for hardware access */
+typedef volatile uint32_t nx_reg32_t;
+typedef volatile uint16_t nx_reg16_t;
+typedef volatile uint8_t nx_reg8_t;
+
+/*
+ * Compiler-specific attributes
+ */
+#if defined(__GNUC__)
+#define NX_PACKED     __attribute__((packed))
+#define NX_ALIGNED(x) __attribute__((aligned(x)))
+#define NX_UNUSED     __attribute__((unused))
+#define NX_WEAK       __attribute__((weak))
+#define NX_INLINE     static inline
+#define NX_NORETURN   __attribute__((noreturn))
+#elif defined(__ICCARM__)
+#define NX_PACKED     __packed
+#define NX_ALIGNED(x) _Pragma("data_alignment=" #x)
+#define NX_UNUSED
+#define NX_WEAK     __weak
+#define NX_INLINE   static inline
+#define NX_NORETURN __noreturn
+#elif defined(_MSC_VER)
+#define NX_PACKED
+#define NX_ALIGNED(x) __declspec(align(x))
+#define NX_UNUSED
+#define NX_WEAK
+#define NX_INLINE   static __inline
+#define NX_NORETURN __declspec(noreturn)
+#else
+#define NX_PACKED
+#define NX_ALIGNED(x)
+#define NX_UNUSED
+#define NX_WEAK
+#define NX_INLINE static inline
+#define NX_NORETURN
+#endif
+
+/*
+ * Utility macros
+ */
+
+/** Get array element count */
+#define NX_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+
+/** Get minimum of two values */
+#define NX_MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+/** Get maximum of two values */
+#define NX_MAX(a, b) (((a) > (b)) ? (a) : (b))
+
+/** Clamp value to range */
+#define NX_CLAMP(val, min, max) (NX_MIN(NX_MAX((val), (min)), (max)))
+
+/** Check if value is power of 2 */
+#define NX_IS_POWER_OF_2(x) (((x) != 0) && (((x) & ((x) - 1)) == 0))
+
+/** Align value up to alignment boundary */
+#define NX_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
+
+/** Align value down to alignment boundary */
+#define NX_ALIGN_DOWN(x, align) ((x) & ~((align) - 1))
+
+/** Get offset of member in structure */
+#ifndef offsetof
+#define offsetof(type, member) ((size_t)&((type*)0)->member)
+#endif
+
+/** Get container structure from member pointer */
+#define NX_CONTAINER_OF(ptr, type, member)                                     \
+    ((type*)((char*)(ptr) - offsetof(type, member)))
+
+/** Bit manipulation macros */
+#define NX_BIT(n)           (1UL << (n))
+#define NX_BIT_SET(x, n)    ((x) |= NX_BIT(n))
+#define NX_BIT_CLEAR(x, n)  ((x) &= ~NX_BIT(n))
+#define NX_BIT_TOGGLE(x, n) ((x) ^= NX_BIT(n))
+#define NX_BIT_CHECK(x, n)  (((x) & NX_BIT(n)) != 0)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* NX_TYPES_H */
