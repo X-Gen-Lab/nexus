@@ -27,6 +27,18 @@ add_executable(nexus_tests
     test_main.cpp
     hal/test_build_system.cpp
     hal/test_compiler_abstraction.cpp
+    hal/test_nx_status.cpp
+    hal/test_nx_device.cpp
+    hal/test_nx_hal.cpp
+    hal/test_checkpoint_verification.cpp
+    hal/test_resource_managers.cpp
+    hal/test_nx_gpio.cpp
+    hal/test_nx_uart.cpp
+    hal/test_nx_spi.cpp
+    hal/test_nx_i2c.cpp
+    hal/test_nx_timer.cpp
+    hal/test_nx_adc.cpp
+    hal/test_nx_factory.cpp
     hal/test_hal_gpio.cpp
     hal/test_hal_gpio_properties.cpp
     hal/test_hal_uart.cpp

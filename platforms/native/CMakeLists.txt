@@ -14,6 +14,15 @@ target_sources(platform_native
         src/hal_timer_native.c
         src/hal_adc_native.c
         src/hal_system_native.c
+        src/nx_dma_native.c
+        src/nx_isr_native.c
+        src/nx_gpio_native.c
+        src/nx_uart_native.c
+        src/nx_spi_native.c
+        src/nx_i2c_native.c
+        src/nx_timer_native.c
+        src/nx_adc_native.c
+        src/nx_factory_native.c
 )
 
 target_include_directories(platform_native
