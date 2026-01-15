@@ -14,6 +14,11 @@
 #include "hal/hal_adc.h"
 #include "hal/hal_spi.h"
 #include "hal/hal_timer.h"
+#include "hal/interface/nx_adc.h"
+#include "hal/interface/nx_gpio.h"
+#include "hal/interface/nx_i2c.h"
+#include "hal/interface/nx_timer.h"
+#include "hal/interface/nx_uart.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -44,6 +49,36 @@ native_gpio_pin_t* native_gpio_get_state(uint8_t port, uint8_t pin);
 void native_gpio_reset_all(void);
 
 /*===========================================================================*/
+/* New GPIO Interface (nx_gpio_t) Test Helpers                               */
+/*===========================================================================*/
+
+/**
+ * \brief           Get GPIO instance (factory function)
+ * \param[in]       port: GPIO port number (0=A, 1=B, ...)
+ * \param[in]       pin: GPIO pin number (0-15)
+ * \return          GPIO interface pointer, NULL on failure
+ */
+nx_gpio_t* nx_gpio_native_get(uint8_t port, uint8_t pin);
+
+/**
+ * \brief           Get GPIO instance with configuration
+ * \param[in]       port: GPIO port number (0=A, 1=B, ...)
+ * \param[in]       pin: GPIO pin number (0-15)
+ * \param[in]       cfg: GPIO configuration
+ * \return          GPIO interface pointer, NULL on failure
+ */
+nx_gpio_t* nx_gpio_native_get_with_config(uint8_t port, uint8_t pin,
+                                          const nx_gpio_config_t* cfg);
+
+/**
+ * \brief           Simulate GPIO EXTI trigger (for testing)
+ * \param[in]       port: GPIO port number (0=A, 1=B, ...)
+ * \param[in]       pin: GPIO pin number (0-15)
+ * \note            This function is for testing purposes only
+ */
+void nx_gpio_native_simulate_exti(uint8_t port, uint8_t pin);
+
+/*===========================================================================*/
 /* UART Test Helpers                                                          */
 /*===========================================================================*/
 
@@ -51,6 +86,27 @@ void native_gpio_reset_all(void);
  * \brief           Simulated UART state (opaque for testing)
  */
 typedef struct native_uart_state native_uart_state_t;
+
+/**
+ * \brief           Get UART instance (factory function)
+ * \param[in]       index: UART index (0-3)
+ * \return          UART interface pointer, NULL on failure
+ */
+nx_uart_t* nx_uart_native_get(uint8_t index);
+
+/**
+ * \brief           Get UART instance with configuration
+ * \param[in]       index: UART index (0-3)
+ * \param[in]       cfg: UART configuration
+ * \return          UART interface pointer, NULL on failure
+ */
+nx_uart_t* nx_uart_native_get_with_config(uint8_t index,
+                                          const nx_uart_config_t* cfg);
+
+/**
+ * \brief           Reset all UART instances (for testing)
+ */
+void nx_uart_native_reset_all(void);
 
 /**
  * \brief           Reset all simulated UART states
@@ -166,6 +222,13 @@ size_t native_spi_get_tx_data(int instance, uint8_t* data, size_t max_len);
 typedef struct native_i2c_state native_i2c_state_t;
 
 /**
+ * \brief           Get I2C instance (factory function)
+ * \param[in]       index: I2C index (0-2)
+ * \return          I2C interface pointer, NULL on failure
+ */
+nx_i2c_t* nx_i2c_native_get(uint8_t index);
+
+/**
  * \brief           Reset all simulated I2C states
  */
 void native_i2c_reset_all(void);
@@ -277,6 +340,22 @@ uint16_t native_i2c_get_last_mem_addr(int instance);
 typedef struct native_timer_state native_timer_state_t;
 
 /**
+ * \brief           Get Timer instance (factory function)
+ * \param[in]       timer_index: Timer index (0-13)
+ * \return          Timer interface pointer, NULL on failure
+ */
+nx_timer_t* nx_timer_native_get(uint8_t timer_index);
+
+/**
+ * \brief           Get Timer instance with configuration
+ * \param[in]       timer_index: Timer index (0-13)
+ * \param[in]       cfg: Timer configuration
+ * \return          Timer interface pointer, NULL on failure
+ */
+nx_timer_t* nx_timer_native_get_with_config(uint8_t timer_index,
+                                            const nx_timer_config_t* cfg);
+
+/**
  * \brief           Reset all simulated Timer states
  */
 void native_timer_reset_all(void);
@@ -378,6 +457,32 @@ uint16_t native_pwm_get_duty_cycle(int instance, int channel);
  * \brief           Simulated ADC state (opaque for testing)
  */
 typedef struct native_adc_state native_adc_state_t;
+
+/**
+ * \brief           Get ADC instance (factory function)
+ * \param[in]       adc_index: ADC index (0-2)
+ * \return          ADC interface pointer, NULL on failure
+ */
+nx_adc_t* nx_adc_native_get(uint8_t adc_index);
+
+/**
+ * \brief           Get ADC instance with configuration
+ * \param[in]       adc_index: ADC index (0-2)
+ * \param[in]       cfg: ADC configuration
+ * \return          ADC interface pointer, NULL on failure
+ */
+nx_adc_t* nx_adc_native_get_with_config(uint8_t adc_index,
+                                        const nx_adc_config_t* cfg);
+
+/**
+ * \brief           Set simulated ADC value for testing
+ * \param[in]       adc_index: ADC index (0-2)
+ * \param[in]       channel: ADC channel (0-15)
+ * \param[in]       value: Simulated value
+ * \note            This function is for testing purposes only
+ */
+void nx_adc_native_set_simulated_value(uint8_t adc_index, uint8_t channel,
+                                       uint16_t value);
 
 /**
  * \brief           Reset all simulated ADC states
