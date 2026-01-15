@@ -270,3 +270,189 @@ TEST_F(HalTimerPropertyTest, Property12_PwmDutyCycleRange) {
             << "Iteration " << i << ": should reject duty > 10000";
     }
 }
+
+/**
+ * Feature: stm32f4-hal-adapter, Property 12: Timer Period Configuration
+ *
+ * *For any* valid period value, the timer SHALL be configured with the
+ * requested period and the configured period SHALL match the requested value.
+ *
+ * **Validates: Requirements 7.1, 7.9**
+ */
+TEST_F(HalTimerPropertyTest, Property12_TimerPeriodConfiguration) {
+    for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
+        native_timer_reset_all();
+
+        auto instance = randomInstance();
+        auto period_us = randomPeriodUs();
+
+        hal_timer_config_t config = {.period_us = period_us,
+                                     .mode = HAL_TIMER_MODE_PERIODIC,
+                                     .direction = HAL_TIMER_DIR_UP};
+
+        /* Initialize timer with random period */
+        ASSERT_EQ(HAL_OK, hal_timer_init(instance, &config))
+            << "Iteration " << i << ": init failed for instance=" << instance
+            << " period_us=" << period_us;
+
+        /* Verify timer is initialized */
+        EXPECT_TRUE(native_timer_is_initialized(instance))
+            << "Iteration " << i << ": timer should be initialized";
+
+        /* Verify configured period matches requested period */
+        uint32_t actual_period = native_timer_get_period_us(instance);
+        EXPECT_EQ(period_us, actual_period)
+            << "Iteration " << i << ": period mismatch. "
+            << "Expected " << period_us << ", got " << actual_period;
+
+        /* Verify timer mode is correctly set */
+        hal_timer_mode_t actual_mode = native_timer_get_mode(instance);
+        EXPECT_EQ(HAL_TIMER_MODE_PERIODIC, actual_mode)
+            << "Iteration " << i << ": mode mismatch";
+
+        /* Deinitialize and verify */
+        ASSERT_EQ(HAL_OK, hal_timer_deinit(instance))
+            << "Iteration " << i << ": deinit failed";
+
+        EXPECT_FALSE(native_timer_is_initialized(instance))
+            << "Iteration " << i << ": timer should be deinitialized";
+    }
+}
+
+/**
+ * Feature: stm32f4-hal-adapter, Property 13: Timer Start/Stop Control
+ *
+ * *For any* initialized timer, starting SHALL set running state to true,
+ * and stopping SHALL set running state to false. The running state SHALL
+ * be consistent with the last start/stop operation.
+ *
+ * **Validates: Requirements 7.2, 7.3**
+ */
+TEST_F(HalTimerPropertyTest, Property13_TimerStartStopControl) {
+    for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
+        native_timer_reset_all();
+
+        auto instance = randomInstance();
+        auto period_us = randomPeriodUs();
+
+        hal_timer_config_t config = {.period_us = period_us,
+                                     .mode = HAL_TIMER_MODE_PERIODIC,
+                                     .direction = HAL_TIMER_DIR_UP};
+
+        /* Initialize timer */
+        ASSERT_EQ(HAL_OK, hal_timer_init(instance, &config))
+            << "Iteration " << i << ": init failed";
+
+        /* Timer should not be running after init */
+        EXPECT_FALSE(native_timer_is_running(instance))
+            << "Iteration " << i << ": timer should not be running after init";
+
+        /* Start timer */
+        ASSERT_EQ(HAL_OK, hal_timer_start(instance))
+            << "Iteration " << i << ": start failed";
+
+        /* Timer should be running after start */
+        EXPECT_TRUE(native_timer_is_running(instance))
+            << "Iteration " << i << ": timer should be running after start";
+
+        /* Stop timer */
+        ASSERT_EQ(HAL_OK, hal_timer_stop(instance))
+            << "Iteration " << i << ": stop failed";
+
+        /* Timer should not be running after stop */
+        EXPECT_FALSE(native_timer_is_running(instance))
+            << "Iteration " << i << ": timer should not be running after stop";
+
+        /* Start again to verify multiple start/stop cycles */
+        ASSERT_EQ(HAL_OK, hal_timer_start(instance))
+            << "Iteration " << i << ": second start failed";
+
+        EXPECT_TRUE(native_timer_is_running(instance))
+            << "Iteration " << i
+            << ": timer should be running after second start";
+
+        /* Stop again */
+        ASSERT_EQ(HAL_OK, hal_timer_stop(instance))
+            << "Iteration " << i << ": second stop failed";
+
+        EXPECT_FALSE(native_timer_is_running(instance))
+            << "Iteration " << i
+            << ": timer should not be running after second stop";
+
+        hal_timer_deinit(instance);
+    }
+}
+
+/**
+ * Feature: stm32f4-hal-adapter, Property 14: PWM Duty Cycle Precision
+ *
+ * *For any* PWM configuration, the duty cycle SHALL be accurately set
+ * and retrievable. Setting duty cycle to X SHALL result in reading X back.
+ * The duty cycle range is 0-10000 (0.00% to 100.00%).
+ *
+ * **Validates: Requirements 7.7, 7.8**
+ */
+TEST_F(HalTimerPropertyTest, Property14_PwmDutyCyclePrecision) {
+    for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
+        native_timer_reset_all();
+
+        auto instance = randomInstance();
+        auto channel = randomChannel();
+        auto frequency = randomFrequency();
+        auto initial_duty = randomDutyCycle();
+
+        hal_pwm_config_t config = {.frequency = frequency,
+                                   .duty_cycle = initial_duty};
+
+        /* Initialize PWM */
+        ASSERT_EQ(HAL_OK, hal_pwm_init(instance, channel, &config))
+            << "Iteration " << i << ": init failed";
+
+        /* Verify PWM is initialized */
+        EXPECT_TRUE(native_pwm_is_initialized(instance, channel))
+            << "Iteration " << i << ": PWM should be initialized";
+
+        /* Verify initial duty cycle */
+        uint16_t actual_duty = native_pwm_get_duty_cycle(instance, channel);
+        EXPECT_EQ(initial_duty, actual_duty)
+            << "Iteration " << i << ": initial duty cycle mismatch";
+
+        /* Test multiple duty cycle changes */
+        for (int j = 0; j < 5; ++j) {
+            auto new_duty = randomDutyCycle();
+
+            ASSERT_EQ(HAL_OK, hal_pwm_set_duty(instance, channel, new_duty))
+                << "Iteration " << i << ", change " << j << ": set_duty failed";
+
+            actual_duty = native_pwm_get_duty_cycle(instance, channel);
+            EXPECT_EQ(new_duty, actual_duty)
+                << "Iteration " << i << ", change " << j
+                << ": duty cycle mismatch. Expected " << new_duty << ", got "
+                << actual_duty;
+        }
+
+        /* Test boundary values for precision */
+        /* 0% duty cycle */
+        ASSERT_EQ(HAL_OK, hal_pwm_set_duty(instance, channel, 0))
+            << "Iteration " << i << ": set_duty(0) failed";
+        EXPECT_EQ(0u, native_pwm_get_duty_cycle(instance, channel))
+            << "Iteration " << i << ": 0% duty cycle precision error";
+
+        /* 50% duty cycle */
+        ASSERT_EQ(HAL_OK, hal_pwm_set_duty(instance, channel, 5000))
+            << "Iteration " << i << ": set_duty(5000) failed";
+        EXPECT_EQ(5000u, native_pwm_get_duty_cycle(instance, channel))
+            << "Iteration " << i << ": 50% duty cycle precision error";
+
+        /* 100% duty cycle */
+        ASSERT_EQ(HAL_OK, hal_pwm_set_duty(instance, channel, 10000))
+            << "Iteration " << i << ": set_duty(10000) failed";
+        EXPECT_EQ(10000u, native_pwm_get_duty_cycle(instance, channel))
+            << "Iteration " << i << ": 100% duty cycle precision error";
+
+        /* Verify frequency is preserved */
+        uint32_t actual_freq = native_pwm_get_frequency(instance, channel);
+        EXPECT_EQ(frequency, actual_freq)
+            << "Iteration " << i << ": frequency should be preserved";
+    }
+}
