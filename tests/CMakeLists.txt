@@ -25,6 +25,8 @@ include(GoogleTest)
 # Test executable
 add_executable(nexus_tests
     test_main.cpp
+    hal/test_build_system.cpp
+    hal/test_compiler_abstraction.cpp
     hal/test_hal_gpio.cpp
     hal/test_hal_gpio_properties.cpp
     hal/test_hal_uart.cpp
@@ -37,6 +39,8 @@ add_executable(nexus_tests
     hal/test_hal_timer_properties.cpp
     hal/test_hal_adc.cpp
     hal/test_hal_adc_properties.cpp
+    hal/test_hal_system_properties.cpp
+    hal/test_hal_error_handling_properties.cpp
     osal/test_osal_task.cpp
     osal/test_osal_task_properties.cpp
     osal/test_osal_mutex.cpp
@@ -102,9 +106,11 @@ target_include_directories(nexus_tests
         ${CMAKE_SOURCE_DIR}/hal/include
         ${CMAKE_SOURCE_DIR}/osal/include
         ${CMAKE_SOURCE_DIR}/platforms/native/include
+        ${CMAKE_SOURCE_DIR}/platforms/stm32f4/include
         ${CMAKE_SOURCE_DIR}/framework/log/include
         ${CMAKE_SOURCE_DIR}/framework/shell/include
         ${CMAKE_SOURCE_DIR}/framework/config/include
+        ${CMAKE_SOURCE_DIR}
 )
 
 # Platform-specific threading libraries

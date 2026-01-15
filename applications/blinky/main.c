@@ -63,14 +63,19 @@ static hal_status_t led_init(void) {
  * \return          Should never return
  */
 int main(void) {
-    /* Initialize HAL system */
-    hal_system_init();
+    /* Initialize HAL layer (system clock, SysTick, FPU) */
+    if (hal_init() != HAL_OK) {
+        /* Error: stay in infinite loop */
+        while (1) {
+            /* HAL initialization failed */
+        }
+    }
 
     /* Initialize LEDs */
     if (led_init() != HAL_OK) {
         /* Error: stay in infinite loop */
         while (1) {
-            /* Error state */
+            /* LED initialization failed */
         }
     }
 
