@@ -45,6 +45,12 @@ add_executable(nexus_tests
     osal/test_osal_sem_properties.cpp
     osal/test_osal_queue.cpp
     osal/test_osal_queue_properties.cpp
+    osal/test_osal_timer.cpp
+    osal/test_osal_timer_properties.cpp
+    osal/test_osal_mem.cpp
+    osal/test_osal_mem_properties.cpp
+    osal/test_osal_event.cpp
+    osal/test_osal_event_properties.cpp
     osal/test_osal_core_properties.cpp
     osal/test_osal_error_handling_properties.cpp
     log/test_log.cpp
