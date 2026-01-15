@@ -1,66 +1,88 @@
 /**
- * STM32F407VGTx Linker Script
- * 
+ * STM32F407VGTx Linker Script for GCC and Clang
+ *
  * Memory Configuration:
  *   - FLASH: 1MB (0x08000000 - 0x080FFFFF)
  *   - SRAM:  192KB (128KB + 64KB CCM)
  *     - Main SRAM: 128KB (0x20000000 - 0x2001FFFF)
  *     - CCM RAM:   64KB  (0x10000000 - 0x1000FFFF)
+ *
+ * Supported Compilers:
+ *   - GCC (arm-none-eabi-gcc)
+ *   - Clang (armclang / LLVM)
+ *
+ * Requirements: 11.4, 12.7
  */
 
-/* Entry point */
+/* Entry point - Reset_Handler from startup code */
 ENTRY(Reset_Handler)
 
-/* Stack size */
-_Min_Heap_Size = 0x2000;   /* 8KB heap */
-_Min_Stack_Size = 0x1000;  /* 4KB stack */
+/* Minimum heap and stack sizes */
+_Min_Heap_Size = 0x2000;   /* 8KB heap - adjust as needed */
+_Min_Stack_Size = 0x1000;  /* 4KB stack - adjust as needed */
 
-/* Memory regions */
+/* Memory regions definition */
 MEMORY
 {
+    /* Main Flash memory - 1MB */
     FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
+
+    /* Main SRAM - 128KB */
     RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 128K
+
+    /* Core Coupled Memory (CCM) RAM - 64KB
+     * Note: CCM RAM is only accessible by CPU, not by DMA */
     CCMRAM (rw)     : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
-/* Sections */
+/* Sections definition */
 SECTIONS
 {
-    /* Interrupt vector table */
+    /*=========================================================================
+     * Interrupt Vector Table
+     * Must be placed at the start of Flash (0x08000000)
+     *=========================================================================*/
     .isr_vector :
     {
         . = ALIGN(4);
-        KEEP(*(.isr_vector))
+        KEEP(*(.isr_vector))    /* Startup code vector table */
+        KEEP(*(.intvec))        /* Alternative name for IAR compatibility */
         . = ALIGN(4);
     } >FLASH
 
-    /* Program code */
+    /*=========================================================================
+     * Program Code (.text section)
+     *=========================================================================*/
     .text :
     {
         . = ALIGN(4);
-        *(.text)
-        *(.text*)
-        *(.glue_7)
-        *(.glue_7t)
-        *(.eh_frame)
+        *(.text)                /* .text sections (code) */
+        *(.text*)               /* .text* sections (code) */
+        *(.glue_7)              /* ARM/Thumb interworking glue */
+        *(.glue_7t)             /* ARM/Thumb interworking glue */
+        *(.eh_frame)            /* Exception handling frame */
 
-        KEEP(*(.init))
-        KEEP(*(.fini))
+        KEEP(*(.init))          /* Constructor initialization */
+        KEEP(*(.fini))          /* Destructor finalization */
 
         . = ALIGN(4);
-        _etext = .;
+        _etext = .;             /* End of code symbol */
     } >FLASH
 
-    /* Read-only data */
+    /*=========================================================================
+     * Read-Only Data (.rodata section)
+     *=========================================================================*/
     .rodata :
     {
         . = ALIGN(4);
-        *(.rodata)
-        *(.rodata*)
+        *(.rodata)              /* .rodata sections (constants) */
+        *(.rodata*)             /* .rodata* sections (constants) */
         . = ALIGN(4);
     } >FLASH
 
-    /* ARM exception handling */
+    /*=========================================================================
+     * ARM Exception Handling
+     *=========================================================================*/
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -73,7 +95,9 @@ SECTIONS
         __exidx_end = .;
     } >FLASH
 
-    /* Constructors */
+    /*=========================================================================
+     * C++ Constructors/Destructors
+     *=========================================================================*/
     .preinit_array :
     {
         PROVIDE_HIDDEN(__preinit_array_start = .);
@@ -97,60 +121,75 @@ SECTIONS
         PROVIDE_HIDDEN(__fini_array_end = .);
     } >FLASH
 
-    /* Used by startup to initialize data */
+    /*=========================================================================
+     * Initialized Data Section
+     * Loaded from Flash, copied to RAM at startup
+     *=========================================================================*/
+
+    /* Used by startup code to initialize data */
     _sidata = LOADADDR(.data);
 
-    /* Initialized data */
     .data :
     {
         . = ALIGN(4);
-        _sdata = .;
-        *(.data)
-        *(.data*)
+        _sdata = .;             /* Start of data symbol */
+        *(.data)                /* .data sections */
+        *(.data*)               /* .data* sections */
         . = ALIGN(4);
-        _edata = .;
+        _edata = .;             /* End of data symbol */
     } >RAM AT> FLASH
 
-    /* CCM RAM section (for performance-critical data) */
+    /*=========================================================================
+     * CCM RAM Section
+     * For performance-critical data (CPU-only access, no DMA)
+     *=========================================================================*/
     .ccmram :
     {
         . = ALIGN(4);
-        _sccmram = .;
-        *(.ccmram)
-        *(.ccmram*)
+        _sccmram = .;           /* Start of CCM RAM symbol */
+        *(.ccmram)              /* .ccmram sections */
+        *(.ccmram*)             /* .ccmram* sections */
         . = ALIGN(4);
-        _eccmram = .;
+        _eccmram = .;           /* End of CCM RAM symbol */
     } >CCMRAM
 
-    /* Uninitialized data */
+    /*=========================================================================
+     * Uninitialized Data Section (.bss)
+     * Zero-initialized at startup
+     *=========================================================================*/
     .bss :
     {
         . = ALIGN(4);
-        _sbss = .;
-        __bss_start__ = _sbss;
-        *(.bss)
-        *(.bss*)
-        *(COMMON)
+        _sbss = .;              /* Start of BSS symbol */
+        __bss_start__ = _sbss;  /* Alternative symbol for C library */
+        *(.bss)                 /* .bss sections */
+        *(.bss*)                /* .bss* sections */
+        *(COMMON)               /* Common symbols */
         . = ALIGN(4);
-        _ebss = .;
-        __bss_end__ = _ebss;
+        _ebss = .;              /* End of BSS symbol */
+        __bss_end__ = _ebss;    /* Alternative symbol for C library */
     } >RAM
 
-    /* User heap and stack */
+    /*=========================================================================
+     * User Heap and Stack
+     *=========================================================================*/
     ._user_heap_stack :
     {
         . = ALIGN(8);
-        PROVIDE(end = .);
-        PROVIDE(_end = .);
+        PROVIDE(end = .);       /* Symbol for sbrk() */
+        PROVIDE(_end = .);      /* Alternative symbol */
         . = . + _Min_Heap_Size;
         . = . + _Min_Stack_Size;
         . = ALIGN(8);
     } >RAM
 
-    /* Stack pointer initial value */
+    /* Initial stack pointer - top of RAM */
     _estack = ORIGIN(RAM) + LENGTH(RAM);
 
-    /* Remove debug info from standard libraries */
+    /*=========================================================================
+     * Debug Information Removal
+     * Remove debug info from standard libraries to reduce binary size
+     *=========================================================================*/
     /DISCARD/ :
     {
         libc.a(*)
@@ -158,6 +197,6 @@ SECTIONS
         libgcc.a(*)
     }
 
-    /* ARM attributes */
+    /* ARM build attributes */
     .ARM.attributes 0 : { *(.ARM.attributes) }
 }
