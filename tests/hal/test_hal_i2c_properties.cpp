@@ -314,3 +314,99 @@ TEST_F(HalI2cPropertyTest, Property9Extended_I2cDeviceReadyCheck) {
         hal_i2c_deinit(instance);
     }
 }
+
+/**
+ * Feature: stm32f4-hal-adapter, Property 10: I2C 速度模式配置
+ *
+ * *For any* I2C speed mode (Standard/Fast/Fast-Plus), the I2C CCR register
+ * SHALL be configured to achieve the target frequency within ±5% tolerance.
+ *
+ * **Validates: Requirements 6.1, 6.9**
+ */
+TEST_F(HalI2cPropertyTest, Property10_I2cSpeedModeConfiguration) {
+    for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
+        native_i2c_reset_all();
+
+        auto instance = randomInstance();
+        auto speed = randomSpeed();
+
+        hal_i2c_config_t config = makeConfig(speed);
+        ASSERT_EQ(HAL_OK, hal_i2c_init(instance, &config))
+            << "Iteration " << i << ": init failed for speed=" << speed;
+
+        // Verify the speed was correctly configured
+        uint32_t actual_speed = native_i2c_get_actual_speed(instance);
+        uint32_t expected_speed;
+
+        switch (speed) {
+            case HAL_I2C_SPEED_STANDARD:
+                expected_speed = 100000;  // 100 kHz
+                break;
+            case HAL_I2C_SPEED_FAST:
+                expected_speed = 400000;  // 400 kHz
+                break;
+            case HAL_I2C_SPEED_FAST_PLUS:
+                expected_speed = 1000000;  // 1 MHz
+                break;
+            default:
+                expected_speed = 100000;
+                break;
+        }
+
+        // Verify speed is within ±5% tolerance
+        uint32_t tolerance = expected_speed / 20;  // 5%
+        EXPECT_GE(actual_speed, expected_speed - tolerance)
+            << "Iteration " << i << ": speed too low for mode=" << speed
+            << ". Expected=" << expected_speed << " Got=" << actual_speed;
+        EXPECT_LE(actual_speed, expected_speed + tolerance)
+            << "Iteration " << i << ": speed too high for mode=" << speed
+            << ". Expected=" << expected_speed << " Got=" << actual_speed;
+
+        hal_i2c_deinit(instance);
+    }
+}
+
+/**
+ * Feature: stm32f4-hal-adapter, Property 11: I2C 设备探测
+ *
+ * *For any* I2C address, `hal_i2c_is_device_ready` SHALL return HAL_OK if
+ * the device ACKs the address, and HAL_ERROR_IO if NACK is received.
+ *
+ * **Validates: Requirements 6.6, 6.7**
+ */
+TEST_F(HalI2cPropertyTest, Property11_I2cDeviceProbe) {
+    for (int i = 0; i < PROPERTY_TEST_ITERATIONS; ++i) {
+        native_i2c_reset_all();
+
+        auto instance = randomInstance();
+        auto speed = randomSpeed();
+        auto dev_addr = randomDeviceAddress();
+
+        hal_i2c_config_t config = makeConfig(speed);
+        ASSERT_EQ(HAL_OK, hal_i2c_init(instance, &config))
+            << "Iteration " << i << ": init failed";
+
+        // Test 1: Device not present - should return error (NACK)
+        hal_status_t status =
+            hal_i2c_is_device_ready(instance, dev_addr, 1, 10);
+        EXPECT_TRUE(status == HAL_ERROR_TIMEOUT || status == HAL_ERROR_IO)
+            << "Iteration " << i << ": expected error for non-existent device "
+            << std::hex << dev_addr << ", got status=" << status;
+
+        // Test 2: Add device and set ready (ACK) - should return HAL_OK
+        ASSERT_TRUE(native_i2c_add_device(instance, dev_addr, true))
+            << "Iteration " << i << ": failed to add device";
+        EXPECT_EQ(HAL_OK, hal_i2c_is_device_ready(instance, dev_addr, 1, 10))
+            << "Iteration " << i << ": device should ACK when ready";
+
+        // Test 3: Set device not ready (NACK) - should return error
+        ASSERT_TRUE(native_i2c_set_device_ready(instance, dev_addr, false))
+            << "Iteration " << i << ": failed to set device not ready";
+        status = hal_i2c_is_device_ready(instance, dev_addr, 1, 10);
+        EXPECT_TRUE(status == HAL_ERROR_TIMEOUT || status == HAL_ERROR_IO)
+            << "Iteration " << i << ": expected error for NACK device "
+            << std::hex << dev_addr << ", got status=" << status;
+
+        hal_i2c_deinit(instance);
+    }
+}
