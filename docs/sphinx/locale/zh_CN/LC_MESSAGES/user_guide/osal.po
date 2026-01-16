@@ -1,10 +1,18 @@
-# OSAL - Chinese Translation
+# OSAL User Guide - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"PO-Revision-Date: 2026-01-16 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "OS Abstraction Layer (OSAL)"
 msgstr "操作系统抽象层 (OSAL)"
@@ -12,68 +20,175 @@ msgstr "操作系统抽象层 (OSAL)"
 msgid "Overview"
 msgstr "概述"
 
-msgid "Features"
-msgstr "特性"
+msgid ""
+"OSAL provides a portable interface for RTOS primitives. Applications can switch "
+"between different RTOS backends (FreeRTOS, RT-Thread, Zephyr) or run bare-metal "
+"without code changes."
+msgstr ""
+"OSAL 为 RTOS 原语提供可移植接口。应用程序可以在不同的 RTOS 后端"
+"（FreeRTOS、RT-Thread、Zephyr）之间切换，或在裸机上运行，无需修改代码。"
 
-msgid "Supported RTOS"
-msgstr "支持的 RTOS"
+msgid "Key features:"
+msgstr "主要特性："
 
-msgid "FreeRTOS"
-msgstr "FreeRTOS"
+msgid "Unified API across multiple RTOS backends"
+msgstr "跨多个 RTOS 后端的统一 API"
+
+msgid "Bare-metal support for resource-constrained systems"
+msgstr "支持资源受限系统的裸机运行"
+
+msgid "Task, mutex, semaphore, queue, and timer primitives"
+msgstr "任务、互斥锁、信号量、队列和定时器原语"
+
+msgid "Critical section and interrupt management"
+msgstr "临界区和中断管理"
+
+msgid "Memory allocation abstraction"
+msgstr "内存分配抽象"
+
+msgid "Supported Backends"
+msgstr "支持的后端"
+
+msgid "Backend"
+msgstr "后端"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Notes"
+msgstr "备注"
 
 msgid "Bare-metal"
 msgstr "裸机"
 
-msgid "Native (pthreads)"
-msgstr "本地 (pthreads)"
+msgid "Ready"
+msgstr "就绪"
+
+msgid "Cooperative"
+msgstr "协作式"
+
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+msgid "Full support"
+msgstr "完整支持"
+
+msgid "Planned"
+msgstr "计划中"
+
+msgid "Getting Started"
+msgstr "快速开始"
+
+msgid "Include the header:"
+msgstr "包含头文件："
+
+msgid "Initialize OSAL:"
+msgstr "初始化 OSAL："
 
 msgid "Task Management"
 msgstr "任务管理"
 
-msgid "Creating Tasks"
-msgstr "创建任务"
+msgid "Create a task:"
+msgstr "创建任务："
 
-msgid "Task Priority"
-msgstr "任务优先级"
-
-msgid "Task Control"
-msgstr "任务控制"
-
-msgid "Synchronization"
-msgstr "同步"
+msgid "Task control:"
+msgstr "任务控制："
 
 msgid "Mutex"
 msgstr "互斥锁"
 
+msgid "Create and use mutex:"
+msgstr "创建和使用互斥锁："
+
 msgid "Semaphore"
 msgstr "信号量"
 
-msgid "Queue"
-msgstr "队列"
+msgid "Binary semaphore:"
+msgstr "二值信号量："
 
-msgid "Timer"
-msgstr "定时器"
+msgid "Counting semaphore:"
+msgstr "计数信号量："
+
+msgid "Message Queue"
+msgstr "消息队列"
+
+msgid "Create and use queue:"
+msgstr "创建和使用队列："
 
 msgid "Software Timer"
 msgstr "软件定时器"
 
-msgid "Configuration"
-msgstr "配置"
+msgid "Create and use timer:"
+msgstr "创建和使用定时器："
+
+msgid "Critical Sections"
+msgstr "临界区"
+
+msgid "Disable/enable interrupts:"
+msgstr "禁用/启用中断："
+
+msgid "Nested critical sections:"
+msgstr "嵌套临界区："
+
+msgid "Memory Management"
+msgstr "内存管理"
+
+msgid "Dynamic allocation:"
+msgstr "动态分配："
+
+msgid "Time Functions"
+msgstr "时间函数"
+
+msgid "Get system time:"
+msgstr "获取系统时间："
 
 msgid "Error Handling"
 msgstr "错误处理"
 
-msgid "Porting"
-msgstr "移植"
+msgid "All OSAL functions return ``osal_status_t``:"
+msgstr "所有 OSAL 函数返回 ``osal_status_t``："
+
+msgid "Common status codes:"
+msgstr "常见状态码："
+
+msgid "Success"
+msgstr "成功"
+
+msgid "Invalid parameter"
+msgstr "无效参数"
+
+msgid "Operation timeout"
+msgstr "操作超时"
+
+msgid "Out of memory"
+msgstr "内存不足"
+
+msgid "Called from ISR context"
+msgstr "从 ISR 上下文调用"
+
+msgid "Bare-metal Considerations"
+msgstr "裸机注意事项"
+
+msgid "When using the bare-metal backend:"
+msgstr "使用裸机后端时："
+
+msgid "Tasks run cooperatively (no preemption)"
+msgstr "任务协作运行（无抢占）"
+
+msgid "``osal_task_delay()`` uses busy-wait"
+msgstr "``osal_task_delay()`` 使用忙等待"
+
+msgid "Mutexes use simple flags (no priority inheritance)"
+msgstr "互斥锁使用简单标志（无优先级继承）"
+
+msgid "Queues use ring buffers"
+msgstr "队列使用环形缓冲区"
+
+msgid "Call ``osal_scheduler_run()`` in main loop"
+msgstr "在主循环中调用 ``osal_scheduler_run()``"
 
 msgid "API Reference"
 msgstr "API 参考"
 
-msgid "Quick Start"
-msgstr "快速开始"
-
-msgid "Dependencies"
-msgstr "依赖"
-
-msgid "Thread Safety"
-msgstr "线程安全"
+msgid "See :doc:`../api/osal` for complete API documentation."
+msgstr "完整 API 文档请参阅 :doc:`../api/osal`。"

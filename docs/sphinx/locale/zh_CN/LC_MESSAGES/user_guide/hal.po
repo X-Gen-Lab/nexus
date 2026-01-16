@@ -1,10 +1,18 @@
-# HAL - Chinese Translation
+# HAL User Guide - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"PO-Revision-Date: 2026-01-16 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "Hardware Abstraction Layer (HAL)"
 msgstr "硬件抽象层 (HAL)"
@@ -12,56 +20,184 @@ msgstr "硬件抽象层 (HAL)"
 msgid "Overview"
 msgstr "概述"
 
+msgid ""
+"The Nexus HAL provides a unified, object-oriented interface for hardware peripherals "
+"across different MCU platforms. It uses a factory pattern to create device instances "
+"and interface-based design for operations."
+msgstr ""
+"Nexus HAL 为不同 MCU 平台的硬件外设提供统一的面向对象接口。"
+"它使用工厂模式创建设备实例，并采用基于接口的设计进行操作。"
+
+msgid "Key features:"
+msgstr "主要特性："
+
+msgid "Factory pattern for device creation and lifecycle management"
+msgstr "工厂模式用于设备创建和生命周期管理"
+
+msgid "Interface-based design with consistent API across peripherals"
+msgstr "基于接口的设计，跨外设提供一致的 API"
+
+msgid "Reference counting for safe resource management"
+msgstr "引用计数实现安全的资源管理"
+
+msgid "Support for both synchronous and asynchronous operations"
+msgstr "支持同步和异步操作"
+
+msgid "Power management and diagnostic interfaces"
+msgstr "电源管理和诊断接口"
+
+msgid "Architecture"
+msgstr "架构"
+
+msgid "The HAL is organized into several layers:"
+msgstr "HAL 分为以下几层："
+
 msgid "Supported Peripherals"
 msgstr "支持的外设"
+
+msgid "Module"
+msgstr "模块"
+
+msgid "Interface"
+msgstr "接口"
+
+msgid "Description"
+msgstr "描述"
 
 msgid "GPIO"
 msgstr "GPIO"
 
+msgid "General I/O"
+msgstr "通用输入输出"
+
 msgid "UART"
 msgstr "UART"
+
+msgid "Serial comm"
+msgstr "串行通信"
 
 msgid "SPI"
 msgstr "SPI"
 
+msgid "SPI bus"
+msgstr "SPI 总线"
+
 msgid "I2C"
 msgstr "I2C"
+
+msgid "I2C bus"
+msgstr "I2C 总线"
 
 msgid "Timer"
 msgstr "定时器"
 
+msgid "Hardware timers"
+msgstr "硬件定时器"
+
 msgid "ADC"
 msgstr "ADC"
 
-msgid "PWM"
-msgstr "PWM"
+msgid "Analog input"
+msgstr "模拟输入"
 
-msgid "Configuration"
-msgstr "配置"
+msgid "Getting Started"
+msgstr "快速开始"
 
-msgid "Initialization"
-msgstr "初始化"
+msgid "Include the main header:"
+msgstr "包含主头文件："
 
-msgid "Usage Examples"
-msgstr "使用示例"
+msgid "Initialize and use:"
+msgstr "初始化和使用："
+
+msgid "GPIO Module"
+msgstr "GPIO 模块"
+
+msgid "Get GPIO with default configuration:"
+msgstr "使用默认配置获取 GPIO："
+
+msgid "Get GPIO with custom configuration:"
+msgstr "使用自定义配置获取 GPIO："
+
+msgid "Operations:"
+msgstr "操作："
+
+msgid "External interrupt:"
+msgstr "外部中断："
+
+msgid "UART Module"
+msgstr "UART 模块"
+
+msgid "Get UART with default configuration:"
+msgstr "使用默认配置获取 UART："
+
+msgid "Get UART with custom configuration:"
+msgstr "使用自定义配置获取 UART："
+
+msgid "Synchronous operations:"
+msgstr "同步操作："
+
+msgid "Asynchronous operations:"
+msgstr "异步操作："
+
+msgid "Release when done:"
+msgstr "使用完毕后释放："
+
+msgid "SPI Module"
+msgstr "SPI 模块"
+
+msgid "Get SPI device:"
+msgstr "获取 SPI 设备："
+
+msgid "I2C Module"
+msgstr "I2C 模块"
+
+msgid "Get I2C device:"
+msgstr "获取 I2C 设备："
 
 msgid "Error Handling"
 msgstr "错误处理"
 
-msgid "Thread Safety"
-msgstr "线程安全"
+msgid ""
+"All factory functions return ``NULL`` on failure. Interface methods return "
+"``nx_status_t``:"
+msgstr ""
+"所有工厂函数在失败时返回 ``NULL``。接口方法返回 ``nx_status_t``："
 
-msgid "Porting"
-msgstr "移植"
+msgid "Common status codes:"
+msgstr "常见状态码："
+
+msgid "Success"
+msgstr "成功"
+
+msgid "Invalid parameter"
+msgstr "无效参数"
+
+msgid "Invalid state"
+msgstr "无效状态"
+
+msgid "Operation timeout"
+msgstr "操作超时"
+
+msgid "Resource busy"
+msgstr "资源忙"
+
+msgid "Out of memory"
+msgstr "内存不足"
+
+msgid "Lifecycle Management"
+msgstr "生命周期管理"
+
+msgid "Devices support lifecycle operations through the ``nx_lifecycle_t`` interface:"
+msgstr "设备通过 ``nx_lifecycle_t`` 接口支持生命周期操作："
+
+msgid "Power Management"
+msgstr "电源管理"
+
+msgid "Devices support power management through the ``nx_power_t`` interface:"
+msgstr "设备通过 ``nx_power_t`` 接口支持电源管理："
 
 msgid "API Reference"
 msgstr "API 参考"
 
-msgid "Features"
-msgstr "特性"
-
-msgid "Quick Start"
-msgstr "快速开始"
-
-msgid "Dependencies"
-msgstr "依赖"
+msgid "See :doc:`../api/hal` for complete API documentation."
+msgstr "完整 API 文档请参阅 :doc:`../api/hal`。"

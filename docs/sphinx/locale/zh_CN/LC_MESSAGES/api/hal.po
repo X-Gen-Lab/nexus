@@ -1,25 +1,58 @@
-# HAL API - Chinese Translation
+# HAL API Reference - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"PO-Revision-Date: 2026-01-16 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "HAL API Reference"
 msgstr "HAL API 参考"
 
 msgid "This section documents the Hardware Abstraction Layer (HAL) API."
-msgstr "本节记录硬件抽象层 (HAL) API。"
+msgstr "本节介绍硬件抽象层 (HAL) API。"
 
-msgid "HAL Definitions"
-msgstr "HAL 定义"
+msgid "Overview"
+msgstr "概述"
+
+msgid ""
+"The Nexus HAL uses a factory pattern for device creation and interface-based "
+"design for operations. Include ``hal/nx_hal.h`` to access all HAL functionality."
+msgstr ""
+"Nexus HAL 使用工厂模式创建设备，并采用基于接口的设计进行操作。"
+"包含 ``hal/nx_hal.h`` 即可访问所有 HAL 功能。"
+
+msgid "Core Functions"
+msgstr "核心函数"
+
+msgid "Status Codes"
+msgstr "状态码"
 
 msgid "GPIO API"
 msgstr "GPIO API"
 
+msgid "Factory Functions:"
+msgstr "工厂函数："
+
+msgid "Configuration:"
+msgstr "配置："
+
+msgid "Interface:"
+msgstr "接口："
+
 msgid "UART API"
 msgstr "UART API"
+
+msgid "TX/RX Interfaces:"
+msgstr "TX/RX 接口："
 
 msgid "SPI API"
 msgstr "SPI API"
@@ -32,3 +65,18 @@ msgstr "定时器 API"
 
 msgid "ADC API"
 msgstr "ADC API"
+
+msgid "Device Enumeration"
+msgstr "设备枚举"
+
+msgid "Base Interfaces"
+msgstr "基础接口"
+
+msgid "Lifecycle Interface:"
+msgstr "生命周期接口："
+
+msgid "Power Interface:"
+msgstr "电源接口："
+
+msgid "Diagnostic Interface:"
+msgstr "诊断接口："

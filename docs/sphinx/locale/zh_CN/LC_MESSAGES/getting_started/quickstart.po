@@ -1,52 +1,93 @@
 # Quick Start - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"PO-Revision-Date: 2026-01-16 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "Quick Start"
 msgstr "快速开始"
 
-msgid "This guide will help you build your first Nexus application."
-msgstr "本指南将帮助你构建第一个 Nexus 应用。"
+msgid "This guide will help you create your first Nexus application - a simple LED blinky."
+msgstr "本指南将帮助您创建第一个 Nexus 应用程序 - 一个简单的 LED 闪烁程序。"
+
+msgid "Prerequisites"
+msgstr "前提条件"
+
+msgid "Make sure you have completed the :doc:`installation` guide."
+msgstr "请确保您已完成 :doc:`installation` 指南。"
 
 msgid "Create a New Project"
 msgstr "创建新项目"
 
-msgid "Build and Flash"
-msgstr "构建和烧录"
+msgid "Create a project directory:"
+msgstr "创建项目目录："
+
+msgid "Build for Native (Testing)"
+msgstr "构建本地版本（测试）"
+
+msgid "Build for STM32F4"
+msgstr "构建 STM32F4 版本"
 
 msgid "Understanding the Code"
 msgstr "理解代码"
 
+msgid "HAL Initialization:"
+msgstr "HAL 初始化："
+
+msgid ""
+"This initializes the HAL subsystem, including platform-specific hardware, "
+"resource managers, and device registry."
+msgstr ""
+"这将初始化 HAL 子系统，包括平台特定硬件、资源管理器和设备注册表。"
+
+msgid "GPIO Configuration:"
+msgstr "GPIO 配置："
+
+msgid ""
+"The factory function creates a GPIO device instance with the specified "
+"configuration. It returns a pointer to the GPIO interface."
+msgstr ""
+"工厂函数使用指定的配置创建 GPIO 设备实例。它返回指向 GPIO 接口的指针。"
+
+msgid "GPIO Operations:"
+msgstr "GPIO 操作："
+
+msgid "The GPIO interface provides methods for basic I/O operations."
+msgstr "GPIO 接口提供基本 I/O 操作的方法。"
+
+msgid "Resource Cleanup:"
+msgstr "资源清理："
+
+msgid "Always release devices when done to free resources."
+msgstr "使用完毕后务必释放设备以释放资源。"
+
+msgid "Adding UART Output"
+msgstr "添加 UART 输出"
+
+msgid "Extend your application with serial output:"
+msgstr "为您的应用程序添加串口输出："
+
 msgid "Next Steps"
 msgstr "下一步"
 
-msgid "Overview"
-msgstr "概述"
+msgid ":doc:`../user_guide/hal` - Learn more about HAL interfaces"
+msgstr ":doc:`../user_guide/hal` - 了解更多 HAL 接口"
 
-msgid "Prerequisites"
-msgstr "前置条件"
+msgid ":doc:`../user_guide/osal` - Add multi-tasking with OSAL"
+msgstr ":doc:`../user_guide/osal` - 使用 OSAL 添加多任务"
 
-msgid "Project Structure"
-msgstr "项目结构"
+msgid ":doc:`../user_guide/log` - Add logging to your application"
+msgstr ":doc:`../user_guide/log` - 为应用程序添加日志"
 
-msgid "Configuration"
-msgstr "配置"
-
-msgid "Building"
-msgstr "构建"
-
-msgid "Running"
-msgstr "运行"
-
-msgid "Debugging"
-msgstr "调试"
-
-msgid "Example"
-msgstr "示例"
-
-msgid "See also"
-msgstr "参见"
+msgid "Browse example applications in ``applications/`` directory"
+msgstr "浏览 ``applications/`` 目录中的示例应用程序"

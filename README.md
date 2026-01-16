@@ -108,27 +108,33 @@ build_docs.bat
 ## First Project
 
 ```c
-#include "hal/hal_gpio.h"
-#include "hal/hal_system.h"
+#include "hal/nx_hal.h"
 
 int main(void)
 {
-    hal_system_init();
+    /* Initialize HAL */
+    nx_hal_init();
 
-    hal_gpio_config_t config = {
-        .direction   = HAL_GPIO_DIR_OUTPUT,
-        .pull        = HAL_GPIO_PULL_NONE,
-        .output_mode = HAL_GPIO_OUTPUT_PP,
-        .speed       = HAL_GPIO_SPEED_LOW,
-        .init_level  = HAL_GPIO_LEVEL_LOW
+    /* Get GPIO device (Port A, Pin 5) */
+    nx_gpio_config_t cfg = {
+        .mode  = NX_GPIO_MODE_OUTPUT_PP,
+        .pull  = NX_GPIO_PULL_NONE,
+        .speed = NX_GPIO_SPEED_LOW,
     };
 
-    hal_gpio_init(HAL_GPIO_PORT_A, 5, &config);
+    nx_gpio_t* led = nx_factory_gpio_with_config(0, 5, &cfg);
+    if (!led) {
+        return -1;
+    }
 
     while (1) {
-        hal_gpio_toggle(HAL_GPIO_PORT_A, 5);
-        hal_delay_ms(500);
+        led->toggle(led);
+        /* delay 500ms - platform specific */
     }
+
+    nx_factory_gpio_release(led);
+    nx_hal_deinit();
+    return 0;
 }
 ```
 
@@ -199,19 +205,20 @@ ctest --test-dir build -C Release --output-on-failure
 Use backslash style for Doxygen comments:
 ```c
 /**
- * \file            hal_gpio.h
- * \brief           GPIO Hardware Abstraction Layer
+ * \file            nx_gpio.h
+ * \brief           GPIO device interface definition
+ * \author          Nexus Team
  */
 
 /**
- * \brief           Initialize GPIO pin
- * \param[in]       port: GPIO port
- * \param[in]       pin: Pin number (0-15)
- * \param[in]       config: Pointer to configuration
- * \return          HAL_OK on success
+ * \brief           Get GPIO device with configuration
+ * \param[in]       port: GPIO port number
+ * \param[in]       pin: GPIO pin number
+ * \param[in]       cfg: GPIO configuration
+ * \return          GPIO interface pointer, NULL on failure
  */
-hal_status_t hal_gpio_init(hal_gpio_port_t port, uint8_t pin,
-                           const hal_gpio_config_t* config);
+nx_gpio_t* nx_factory_gpio_with_config(uint8_t port, uint8_t pin,
+                                       const nx_gpio_config_t* cfg);
 ```
 
 ## CI/CD

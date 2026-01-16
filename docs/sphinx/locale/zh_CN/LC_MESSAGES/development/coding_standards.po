@@ -1,88 +1,182 @@
 # Coding Standards - Chinese Translation
+# Copyright (C) 2026, Nexus Team
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"PO-Revision-Date: 2026-01-16 00:00+0000\n"
+"Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 msgid "Coding Standards"
 msgstr "编码规范"
 
-msgid "Overview"
-msgstr "概述"
+msgid "Nexus follows strict coding standards for quality and safety."
+msgstr "Nexus 遵循严格的编码规范以确保质量和安全。"
 
-msgid "This document describes the coding standards for the Nexus project."
-msgstr "本文档描述 Nexus 项目的编码规范。"
+msgid "C Standard"
+msgstr "C 标准"
 
-msgid "General Guidelines"
-msgstr "通用准则"
+msgid "C11 for source code"
+msgstr "源代码使用 C11"
 
-msgid "Naming Conventions"
-msgstr "命名约定"
+msgid "C++17 for tests"
+msgstr "测试使用 C++17"
 
-msgid "Functions"
-msgstr "函数"
+msgid "Code Formatting"
+msgstr "代码格式化"
 
-msgid "Variables"
-msgstr "变量"
-
-msgid "Constants"
-msgstr "常量"
-
-msgid "Macros"
-msgstr "宏"
-
-msgid "Types"
-msgstr "类型"
-
-msgid "Files"
-msgstr "文件"
-
-msgid "Formatting"
-msgstr "格式化"
+msgid ""
+"The project uses clang-format for automatic code formatting. Run ``clang-format`` "
+"before committing code."
+msgstr ""
+"项目使用 clang-format 进行自动代码格式化。提交代码前请运行 ``clang-format``。"
 
 msgid "Indentation"
 msgstr "缩进"
 
-msgid "Braces"
-msgstr "大括号"
+msgid "Use 4 spaces for indentation (no tabs)"
+msgstr "使用 4 个空格缩进（不使用制表符）"
+
+msgid "Indent case labels inside switch statements"
+msgstr "switch 语句中的 case 标签需要缩进"
+
+msgid "Do not indent preprocessor directives"
+msgstr "预处理指令不缩进"
 
 msgid "Line Length"
 msgstr "行长度"
 
-msgid "Whitespace"
-msgstr "空白"
+msgid "Maximum line length: 80 characters"
+msgstr "最大行长度：80 个字符"
 
-msgid "Comments"
-msgstr "注释"
+msgid "Break long lines at appropriate points"
+msgstr "在适当位置断开长行"
 
-msgid "Documentation Comments"
-msgstr "文档注释"
+msgid "Braces"
+msgstr "大括号"
+
+msgid "Use attached braces (K&R style)"
+msgstr "使用附着式大括号（K&R 风格）"
+
+msgid "Spaces"
+msgstr "空格"
+
+msgid "Space after control keywords: ``if (``, ``for (``, ``while (``"
+msgstr "控制关键字后加空格：``if (``、``for (``、``while (``"
+
+msgid "No space after function names: ``func()``"
+msgstr "函数名后不加空格：``func()``"
+
+msgid "No space after casts: ``(int)value``"
+msgstr "类型转换后不加空格：``(int)value``"
+
+msgid "Two spaces before trailing comments"
+msgstr "行尾注释前加两个空格"
+
+msgid "Space around binary operators: ``a + b``, ``x = y``"
+msgstr "二元运算符两侧加空格：``a + b``、``x = y``"
+
+msgid "Pointer Alignment"
+msgstr "指针对齐"
+
+msgid "Pointers align to the left (with the type)"
+msgstr "指针靠左对齐（与类型一起）"
+
+msgid "Empty Lines"
+msgstr "空行"
+
+msgid "Maximum one consecutive empty line"
+msgstr "最多一个连续空行"
+
+msgid "Use empty lines to separate logical sections"
+msgstr "使用空行分隔逻辑段落"
+
+msgid "Naming Conventions"
+msgstr "命名约定"
+
+msgid "Functions: ``module_action_object()`` (e.g., ``hal_gpio_init()``)"
+msgstr "函数：``module_action_object()``（例如 ``hal_gpio_init()``）"
+
+msgid "Types: ``module_type_t`` (e.g., ``hal_status_t``)"
+msgstr "类型：``module_type_t``（例如 ``hal_status_t``）"
+
+msgid "Macros: ``MODULE_MACRO_NAME`` (e.g., ``HAL_OK``)"
+msgstr "宏：``MODULE_MACRO_NAME``（例如 ``HAL_OK``）"
+
+msgid "Constants: ``MODULE_CONSTANT`` (e.g., ``HAL_GPIO_PORT_MAX``)"
+msgstr "常量：``MODULE_CONSTANT``（例如 ``HAL_GPIO_PORT_MAX``）"
+
+msgid "Static variables: ``s_variable_name`` prefix"
+msgstr "静态变量：``s_variable_name`` 前缀"
+
+msgid "Global variables: ``g_variable_name`` prefix (avoid when possible)"
+msgstr "全局变量：``g_variable_name`` 前缀（尽量避免使用）"
+
+msgid "Documentation"
+msgstr "文档"
+
+msgid ""
+"All public APIs must have Doxygen comments. This project uses ``\\`` style "
+"Doxygen tags (not ``@`` style)."
+msgstr ""
+"所有公共 API 必须有 Doxygen 注释。本项目使用 ``\\`` 风格的 "
+"Doxygen 标签（不使用 ``@`` 风格）。"
+
+msgid "Tag Alignment"
+msgstr "标签对齐"
+
+msgid ""
+"All Doxygen tags must be aligned to column 20 (17 spaces after ``*``). "
+"This ensures consistent formatting across the codebase"
+msgstr ""
+"所有 Doxygen 标签必须对齐到第 20 列（``*`` 后 17 个空格）。"
+"这确保了整个代码库的格式一致性"
+
+msgid "File Header Format"
+msgstr "文件头格式"
+
+msgid "Every source file must have a file header comment"
+msgstr "每个源文件必须有文件头注释"
+
+msgid "Header Files (.h)"
+msgstr "头文件 (.h)"
+
+msgid ""
+"Header files contain full API documentation including parameters and return values"
+msgstr ""
+"头文件包含完整的 API 文档，包括参数和返回值"
+
+msgid "Source Files (.c)"
+msgstr "源文件 (.c)"
+
+msgid ""
+"Source files should NOT duplicate ``\\param`` and ``\\return`` documentation "
+"from headers. Use only ``\\brief``, ``\\details``, and ``\\note``"
+msgstr ""
+"源文件不应重复头文件中的 ``\\param`` 和 ``\\return`` 文档。"
+"只使用 ``\\brief``、``\\details`` 和 ``\\note``"
+
+msgid "Section Comments"
+msgstr "段落注释"
+
+msgid "Use section comments to organize code into logical blocks"
+msgstr "使用段落注释将代码组织成逻辑块"
 
 msgid "Inline Comments"
 msgstr "行内注释"
 
-msgid "Error Handling"
-msgstr "错误处理"
+msgid "Use ``/* comment */`` style for inline comments, not ``//``"
+msgstr "行内注释使用 ``/* comment */`` 风格，不使用 ``//``"
 
-msgid "Memory Management"
-msgstr "内存管理"
+msgid "MISRA C"
+msgstr "MISRA C"
 
-msgid "Thread Safety"
-msgstr "线程安全"
-
-msgid "MISRA C Compliance"
-msgstr "MISRA C 合规"
-
-msgid "Tools"
-msgstr "工具"
-
-msgid "clang-format"
-msgstr "clang-format"
-
-msgid "clang-tidy"
-msgstr "clang-tidy"
-
-msgid "Examples"
-msgstr "示例"
+msgid "Code should comply with MISRA C:2012 guidelines."
+msgstr "代码应符合 MISRA C:2012 准则。"
