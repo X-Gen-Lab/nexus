@@ -40,6 +40,13 @@ add_executable(nexus_tests
     hal/test_nx_timer.cpp
     hal/test_nx_adc.cpp
     hal/test_nx_factory.cpp
+    hal/test_nx_device_registry.cpp
+    hal/test_nx_device_registry_properties.cpp
+    # Init tests
+    init/test_nx_init.cpp
+    init/test_nx_init_properties.cpp
+    init/test_nx_firmware_info.cpp
+    init/test_nx_startup.cpp
     # OSAL tests
     osal/test_osal_task.cpp
     osal/test_osal_task_properties.cpp
@@ -104,6 +111,9 @@ add_executable(nexus_tests
 # Require C++20 for designated initializers
 target_compile_features(nexus_tests PRIVATE cxx_std_20)
 
+# Define test mode for startup framework tests
+target_compile_definitions(nexus_tests PRIVATE NX_STARTUP_TEST_MODE)
+
 target_include_directories(nexus_tests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/hal/include
@@ -113,6 +123,7 @@ target_include_directories(nexus_tests
         ${CMAKE_SOURCE_DIR}/framework/log/include
         ${CMAKE_SOURCE_DIR}/framework/shell/include
         ${CMAKE_SOURCE_DIR}/framework/config/include
+        ${CMAKE_SOURCE_DIR}/framework/init/include
         ${CMAKE_SOURCE_DIR}
 )
 
@@ -135,6 +146,7 @@ target_link_libraries(nexus_tests
         log_framework
         shell_framework
         config_framework
+        init_framework
         ${THREAD_LIBS}
 )
 

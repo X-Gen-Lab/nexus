@@ -1,0 +1,151 @@
+; /**
+;  * \file            nx_sections.sct
+;  * \brief           Nexus static registry scatter file for Arm Compiler
+;  * \author          Nexus Team
+;  *
+;  * This file defines the linker sections required for the Nexus static
+;  * registry pattern when using Arm Compiler 5 or Arm Compiler 6 (armclang).
+;  *
+;  * Sections defined:
+;  *   - nx_init_fn  : Initialization function pointers (sorted by level)
+;  *   - nx_device   : Static device registry
+;  *   - nx_fw_info  : Firmware information metadata
+;  *
+;  * Usage:
+;  *   Copy these execution region definitions into your scatter file's
+;  *   load region, typically after the RO (read-only) data section.
+;  *
+;  * Requirements: 4.2
+;  */
+
+; ===========================================================================
+; Example scatter file structure showing where to place Nexus sections
+; ===========================================================================
+;
+; LR_IROM1 0x08000000 0x00100000  {    ; Load region - 1MB Flash
+;
+;     ER_IROM1 0x08000000 0x00100000  { ; Execution region for code
+;         *.o (RESET, +First)
+;         *(InRoot$Sections)
+;         .ANY (+RO)
+;     }
+;
+;     ; --- Nexus Static Registry Sections (copy from below) ---
+;
+;     RW_IRAM1 0x20000000 0x00020000  { ; Execution region for RAM
+;         .ANY (+RW +ZI)
+;     }
+; }
+;
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Nexus Initialization Function Section
+; ---------------------------------------------------------------------------
+; The nx_init_fn execution region contains function pointers for automatic
+; initialization. Functions are sorted by level (0-7) using section names.
+;
+; Level 0: Boundary marker (start) - internal use only
+; Level 1: Board initialization (clock, power)
+; Level 2: Pre-initialization (memory, debug)
+; Level 3: BSP initialization (peripheral config)
+; Level 4: Driver initialization
+; Level 5: Component initialization (middleware)
+; Level 6: Application initialization
+; Level 7: Boundary marker (end) - internal use only
+;
+; Arm Compiler automatically provides Image$nx_init_fn$Base and
+; Image$nx_init_fn$Limit symbols for section boundaries.
+;
+    nx_init_fn +0 ALIGN 4 {
+        *(.nx_init_fn.0)        ; Level 0: Boundary start
+        *(.nx_init_fn.1)        ; Level 1: Board
+        *(.nx_init_fn.2)        ; Level 2: Prev
+        *(.nx_init_fn.3)        ; Level 3: BSP
+        *(.nx_init_fn.4)        ; Level 4: Driver
+        *(.nx_init_fn.5)        ; Level 5: Component
+        *(.nx_init_fn.6)        ; Level 6: App
+        *(.nx_init_fn.7)        ; Level 7: Boundary end
+    }
+
+; ---------------------------------------------------------------------------
+; Nexus Device Registry Section
+; ---------------------------------------------------------------------------
+; The nx_device execution region contains static device descriptors
+; registered at compile time using NX_DEVICE_REGISTER macro.
+;
+; Each device descriptor is aligned to pointer size for efficient access.
+;
+; Arm Compiler automatically provides Image$nx_device$Base and
+; Image$nx_device$Limit symbols for section boundaries.
+;
+    nx_device +0 ALIGN 4 {
+        *(.nx_device)
+        *(.nx_device.*)
+    }
+
+; ---------------------------------------------------------------------------
+; Nexus Firmware Information Section
+; ---------------------------------------------------------------------------
+; The nx_fw_info execution region contains firmware metadata that can be
+; extracted by external tools without executing the firmware.
+;
+; Contains: product name, vendor, version, build date/time, key
+;
+; Arm Compiler automatically provides Image$nx_fw_info$Base and
+; Image$nx_fw_info$Limit symbols for section boundaries.
+;
+    nx_fw_info +0 ALIGN 4 {
+        *(.nx_fw_info)
+        *(.nx_fw_info.*)
+    }
+
+; ===========================================================================
+; Complete Example Scatter File
+; ===========================================================================
+; Below is a complete example scatter file for STM32F407VG showing how to
+; integrate the Nexus sections:
+;
+; LR_IROM1 0x08000000 0x00100000  {
+;
+;     ER_IROM1 0x08000000 0x00100000  {
+;         *.o (RESET, +First)
+;         *(InRoot$Sections)
+;         .ANY (+RO)
+;     }
+;
+;     ; Nexus initialization functions (sorted by level)
+;     nx_init_fn +0 ALIGN 4 {
+;         *(.nx_init_fn.0)
+;         *(.nx_init_fn.1)
+;         *(.nx_init_fn.2)
+;         *(.nx_init_fn.3)
+;         *(.nx_init_fn.4)
+;         *(.nx_init_fn.5)
+;         *(.nx_init_fn.6)
+;         *(.nx_init_fn.7)
+;     }
+;
+;     ; Nexus device registry
+;     nx_device +0 ALIGN 4 {
+;         *(.nx_device)
+;         *(.nx_device.*)
+;     }
+;
+;     ; Nexus firmware information
+;     nx_fw_info +0 ALIGN 4 {
+;         *(.nx_fw_info)
+;         *(.nx_fw_info.*)
+;     }
+;
+;     RW_IRAM1 0x20000000 0x00020000  {
+;         .ANY (+RW +ZI)
+;     }
+;
+;     ; CCM RAM for performance-critical data
+;     RW_CCMRAM 0x10000000 0x00010000  {
+;         *(.ccmram)
+;         *(.ccmram.*)
+;     }
+; }
+; ===========================================================================
