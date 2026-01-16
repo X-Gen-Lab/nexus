@@ -57,6 +57,8 @@ add_executable(nexus_tests
     osal/test_osal_event_properties.cpp
     osal/test_osal_core_properties.cpp
     osal/test_osal_error_handling_properties.cpp
+    osal/test_osal_diag_properties.cpp
+    osal/test_osal_handle_validation_properties.cpp
     # Log tests
     log/test_log.cpp
     log/test_log_properties.cpp

@@ -231,6 +231,16 @@ static volatile uint32_t s_tick_count = 0;
 /* OSAL Core Functions                                                       */
 /*---------------------------------------------------------------------------*/
 
+/**
+ * \brief           Initialize OSAL layer
+ *
+ * \details         Initializes the OSAL layer for baremetal operation. This
+ *                  function is idempotent - calling it multiple times has no
+ *                  additional effect. Clears all control blocks for tasks,
+ *                  mutexes, semaphores, and queues.
+ *
+ * \note            Requirements: 3.1, 3.4
+ */
 osal_status_t osal_init(void) {
     if (s_osal_initialized) {
         return OSAL_OK;
@@ -303,6 +313,15 @@ static void scheduler_run(void) {
     }
 }
 
+/**
+ * \brief           Start OSAL scheduler
+ *
+ * \details         Starts the baremetal cooperative scheduler. This function
+ *                  does not return under normal operation. Tasks run in
+ *                  round-robin fashion until they yield or complete.
+ *
+ * \note            Requirements: 3.2
+ */
 void osal_start(void) {
     if (!s_osal_initialized) {
         osal_init();
@@ -312,15 +331,38 @@ void osal_start(void) {
     scheduler_run();
 }
 
+/**
+ * \brief           Check if scheduler is running
+ *
+ * \note            Requirements: 3.3
+ */
 bool osal_is_running(void) {
     return s_osal_running;
 }
 
+/**
+ * \brief           Enter critical section
+ *
+ * \details         Disables interrupts and enters a critical section. Supports
+ *                  nesting - interrupts are only re-enabled when the nesting
+ *                  count returns to zero.
+ *
+ * \note            Requirements: 8.1, 8.3
+ */
 void osal_enter_critical(void) {
     osal_platform_enter_critical();
     s_critical_nesting++;
 }
 
+/**
+ * \brief           Exit critical section
+ *
+ * \details         Restores interrupt state and exits the critical section.
+ *                  Only restores interrupts when the nesting count returns
+ *                  to zero.
+ *
+ * \note            Requirements: 8.2, 8.3
+ */
 void osal_exit_critical(void) {
     if (s_critical_nesting > 0) {
         s_critical_nesting--;
@@ -330,6 +372,11 @@ void osal_exit_critical(void) {
     }
 }
 
+/**
+ * \brief           Check if in ISR context
+ *
+ * \note            Requirements: 8.4
+ */
 bool osal_is_isr(void) {
     return osal_platform_is_isr();
 }
@@ -338,6 +385,15 @@ bool osal_is_isr(void) {
 /* Task Management Functions                                                 */
 /*---------------------------------------------------------------------------*/
 
+/**
+ * \brief           Create a new task
+ *
+ * \details         Creates a task in the baremetal cooperative scheduler.
+ *                  Tasks are stored in a fixed-size array and run in
+ *                  round-robin fashion when the scheduler is started.
+ *
+ * \note            Requirements: 4.1, 4.7, 10.1, 10.2
+ */
 osal_status_t osal_task_create(const osal_task_config_t* config,
                                osal_task_handle_t* handle) {
     if (config == NULL || handle == NULL) {
@@ -397,8 +453,15 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     return OSAL_OK;
 }
 
+/**
+ * \brief           Delete a task
+ *
+ * \details         Marks a task as deleted in the baremetal scheduler.
+ *                  If handle is NULL, deletes the calling task.
+ *
+ * \note            Requirements: 4.2
+ */
 osal_status_t osal_task_delete(osal_task_handle_t handle) {
-    osal_task_tcb_t* task;
 
     if (handle == NULL) {
         /* Delete current task */
@@ -431,12 +494,15 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Suspend a task
+ *
+ * \details         Suspends a task in the baremetal scheduler. The task will
+ *                  not run until resumed.
+ *
+ * \note            Requirements: 4.3
+ */
 osal_status_t osal_task_suspend(osal_task_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_task_tcb_t* task = (osal_task_tcb_t*)handle;
 
     /* Validate task pointer */
     bool valid = false;
@@ -459,12 +525,15 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Resume a suspended task
+ *
+ * \details         Resumes a previously suspended task in the baremetal
+ *                  scheduler.
+ *
+ * \note            Requirements: 4.4
+ */
 osal_status_t osal_task_resume(osal_task_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_task_tcb_t* task = (osal_task_tcb_t*)handle;
 
     /* Validate task pointer */
     bool valid = false;
@@ -489,12 +558,16 @@ osal_status_t osal_task_resume(osal_task_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Delay current task
+ *
+ * \details         Blocks the calling task for the specified number of
+ *                  milliseconds using busy-wait delay.
+ *
+ * \note            Requirements: 4.5
+ * \note            In baremetal cooperative scheduling, this is a busy-wait.
+ */
 osal_status_t osal_task_delay(uint32_t ms) {
-    if (ms == 0) {
-        return OSAL_OK;
-    }
-
-    /* In cooperative scheduling, we do a busy-wait delay */
     /* Convert ms to microseconds and delay */
     uint32_t us = ms * 1000;
     osal_platform_delay_us(us);
@@ -502,12 +575,24 @@ osal_status_t osal_task_delay(uint32_t ms) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Yield current task
+ *
+ * \details         In cooperative scheduling, yield does nothing special.
+ *                  The scheduler will pick the next task when current task
+ *                  returns.
+ *
+ * \note            Requirements: 4.6
+ */
 osal_status_t osal_task_yield(void) {
-    /* In cooperative scheduling, yield does nothing special */
-    /* The scheduler will pick the next task when current task returns */
     return OSAL_OK;
 }
 
+/**
+ * \brief           Get current task handle
+ *
+ * \note            Requirements: 4.8
+ */
 osal_task_handle_t osal_task_get_current(void) {
     if (s_current_task >= 0 && s_current_task < OSAL_MAX_TASKS) {
         return (osal_task_handle_t)&s_tasks[s_current_task];
@@ -515,6 +600,11 @@ osal_task_handle_t osal_task_get_current(void) {
     return NULL;
 }
 
+/**
+ * \brief           Get task name
+ *
+ * \note            Requirements: 4.9
+ */
 const char* osal_task_get_name(osal_task_handle_t handle) {
     if (handle == NULL) {
         return "main";
@@ -536,6 +626,14 @@ const char* osal_task_get_name(osal_task_handle_t handle) {
 /* Mutex Functions                                                           */
 /*---------------------------------------------------------------------------*/
 
+/**
+ * \brief           Create a mutex
+ *
+ * \details         Creates a mutex in the baremetal implementation. Mutexes
+ *                  support recursive locking by the same task.
+ *
+ * \note            Requirements: 5.1, 5.5
+ */
 osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -575,12 +673,15 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Delete a mutex
+ *
+ * \details         Deletes a mutex and releases its slot in the control block
+ *                  array.
+ *
+ * \note            Requirements: 5.2
+ */
 osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_mutex_cb_t* mutex = (osal_mutex_cb_t*)handle;
 
     /* Validate mutex pointer */
     bool valid = false;
@@ -605,12 +706,16 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Lock a mutex
+ *
+ * \details         Acquires a mutex with optional timeout. Supports recursive
+ *                  locking by the same task. In baremetal cooperative
+ *                  scheduling, blocking is implemented as busy-wait.
+ *
+ * \note            Requirements: 5.3, 5.5, 5.6
+ */
 osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_mutex_cb_t* mutex = (osal_mutex_cb_t*)handle;
 
     /* Validate mutex pointer */
     bool valid = false;
@@ -677,12 +782,15 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
     return OSAL_ERROR_TIMEOUT;
 }
 
+/**
+ * \brief           Unlock a mutex
+ *
+ * \details         Releases a mutex. Handles recursive unlock by decrementing
+ *                  the lock count.
+ *
+ * \note            Requirements: 5.4
+ */
 osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_mutex_cb_t* mutex = (osal_mutex_cb_t*)handle;
 
     /* Validate mutex pointer */
     bool valid = false;
@@ -724,6 +832,14 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
 /* Semaphore Functions                                                       */
 /*---------------------------------------------------------------------------*/
 
+/**
+ * \brief           Create a semaphore (generic)
+ *
+ * \details         Creates a counting semaphore with the specified initial
+ *                  and maximum count values.
+ *
+ * \note            Requirements: 6.1, 6.2
+ */
 osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
                               osal_sem_handle_t* handle) {
     if (handle == NULL) {
@@ -767,16 +883,38 @@ osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
     return OSAL_OK;
 }
 
+/**
+ * \brief           Create a binary semaphore
+ *
+ * \details         Creates a binary semaphore with maximum count of 1.
+ *
+ * \note            Requirements: 6.1
+ */
 osal_status_t osal_sem_create_binary(uint32_t initial,
                                      osal_sem_handle_t* handle) {
     return osal_sem_create(initial ? 1 : 0, 1, handle);
 }
 
+/**
+ * \brief           Create a counting semaphore
+ *
+ * \details         Creates a counting semaphore with specified maximum count.
+ *
+ * \note            Requirements: 6.2
+ */
 osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
                                        osal_sem_handle_t* handle) {
     return osal_sem_create(initial, max_count, handle);
 }
 
+/**
+ * \brief           Delete a semaphore
+ *
+ * \details         Deletes a semaphore and releases its slot in the control
+ *                  block array.
+ *
+ * \note            Requirements: 6.3
+ */
 osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -806,6 +944,15 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Take (wait for) a semaphore
+ *
+ * \details         Waits for a semaphore to become available. In baremetal
+ *                  cooperative scheduling, blocking is implemented as
+ *                  busy-wait with timeout.
+ *
+ * \note            Requirements: 6.4
+ */
 osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -845,7 +992,7 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     /* Busy-wait with timeout */
     uint32_t elapsed = 0;
     while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
-        osal_platform_delay_us(1000); /* 1ms delay */
+        osal_platform_delay_us(1000);  /* 1ms delay */
         elapsed++;
 
         osal_enter_critical();
@@ -864,6 +1011,14 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     return OSAL_ERROR_TIMEOUT;
 }
 
+/**
+ * \brief           Give (signal) a semaphore
+ *
+ * \details         Signals a semaphore by incrementing its count up to the
+ *                  maximum value.
+ *
+ * \note            Requirements: 6.5
+ */
 osal_status_t osal_sem_give(osal_sem_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -894,6 +1049,14 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Give (signal) a semaphore from ISR context
+ *
+ * \details         Same as osal_sem_give for baremetal implementation since
+ *                  there is no separate ISR-safe API needed.
+ *
+ * \note            Requirements: 6.6
+ */
 osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
     /* Same as osal_sem_give for baremetal */
     return osal_sem_give(handle);
@@ -903,6 +1066,14 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
 /* Queue Functions                                                           */
 /*---------------------------------------------------------------------------*/
 
+/**
+ * \brief           Create a message queue
+ *
+ * \details         Creates a FIFO message queue with the specified item size
+ *                  and capacity. Uses a fixed-size buffer for storage.
+ *
+ * \note            Requirements: 7.1
+ */
 osal_status_t osal_queue_create(size_t item_size, size_t item_count,
                                 osal_queue_handle_t* handle) {
     if (handle == NULL) {
@@ -954,12 +1125,15 @@ osal_status_t osal_queue_create(size_t item_size, size_t item_count,
     return OSAL_OK;
 }
 
+/**
+ * \brief           Delete a message queue
+ *
+ * \details         Deletes a queue and releases its slot in the control block
+ *                  array.
+ *
+ * \note            Requirements: 7.2
+ */
 osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_queue_cb_t* queue = (osal_queue_cb_t*)handle;
 
     /* Validate queue pointer */
     bool valid = false;
@@ -982,13 +1156,16 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Send item to queue
+ *
+ * \details         Sends an item to the back of the queue. In baremetal
+ *                  cooperative scheduling, blocking is implemented as
+ *                  busy-wait with timeout.
+ *
+ * \note            Requirements: 7.3
+ */
 osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
-                              uint32_t timeout_ms) {
-    if (handle == NULL || item == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_queue_cb_t* queue = (osal_queue_cb_t*)handle;
 
     /* Validate queue pointer */
     bool valid = false;
@@ -1047,13 +1224,16 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
     return OSAL_ERROR_TIMEOUT;
 }
 
+/**
+ * \brief           Send item to front of queue
+ *
+ * \details         Sends an item to the front of the queue. In baremetal
+ *                  cooperative scheduling, blocking is implemented as
+ *                  busy-wait with timeout.
+ *
+ * \note            Requirements: 7.4
+ */
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
-                                    const void* item, uint32_t timeout_ms) {
-    if (handle == NULL || item == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_queue_cb_t* queue = (osal_queue_cb_t*)handle;
 
     /* Validate queue pointer */
     bool valid = false;
@@ -1115,13 +1295,16 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
     return OSAL_ERROR_TIMEOUT;
 }
 
+/**
+ * \brief           Receive item from queue
+ *
+ * \details         Receives an item from the front of the queue. In baremetal
+ *                  cooperative scheduling, blocking is implemented as
+ *                  busy-wait with timeout.
+ *
+ * \note            Requirements: 7.5
+ */
 osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
-                                 uint32_t timeout_ms) {
-    if (handle == NULL || item == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_queue_cb_t* queue = (osal_queue_cb_t*)handle;
 
     /* Validate queue pointer */
     bool valid = false;
@@ -1180,12 +1363,14 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
     return OSAL_ERROR_TIMEOUT;
 }
 
+/**
+ * \brief           Peek item from queue (without removing)
+ *
+ * \details         Peeks at the front item of the queue without removing it.
+ *
+ * \note            Requirements: 7.6
+ */
 osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
-    if (handle == NULL || item == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
-
-    osal_queue_cb_t* queue = (osal_queue_cb_t*)handle;
 
     /* Validate queue pointer */
     bool valid = false;
@@ -1214,6 +1399,13 @@ osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
     return OSAL_OK;
 }
 
+/**
+ * \brief           Get number of items in queue
+ *
+ * \details         Returns the number of items currently in the queue.
+ *
+ * \note            Requirements: 7.7
+ */
 size_t osal_queue_get_count(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return 0;
@@ -1231,10 +1423,16 @@ size_t osal_queue_get_count(osal_queue_handle_t handle) {
     return 0;
 }
 
+/**
+ * \brief           Check if queue is empty
+ */
 bool osal_queue_is_empty(osal_queue_handle_t handle) {
     return osal_queue_get_count(handle) == 0;
 }
 
+/**
+ * \brief           Check if queue is full
+ */
 bool osal_queue_is_full(osal_queue_handle_t handle) {
     if (handle == NULL) {
         return true;
@@ -1252,12 +1450,28 @@ bool osal_queue_is_full(osal_queue_handle_t handle) {
     return true;
 }
 
+/**
+ * \brief           Send item to queue from ISR context
+ *
+ * \details         Same as osal_queue_send with no wait for baremetal
+ *                  implementation.
+ *
+ * \note            Requirements: 7.8
+ */
 osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
                                        const void* item) {
     /* Same as osal_queue_send with no wait for baremetal */
     return osal_queue_send(handle, item, OSAL_NO_WAIT);
 }
 
+/**
+ * \brief           Receive item from queue from ISR context
+ *
+ * \details         Same as osal_queue_receive with no wait for baremetal
+ *                  implementation.
+ *
+ * \note            Requirements: 7.9
+ */
 osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
                                           void* item) {
     /* Same as osal_queue_receive with no wait for baremetal */

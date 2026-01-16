@@ -15,10 +15,14 @@
 #ifndef OSAL_H
 #define OSAL_H
 
+/* Configuration */
+#include "osal_config.h"
+
 /* Common definitions */
 #include "osal_def.h"
 
 /* OSAL modules */
+#include "osal_diag.h"
 #include "osal_event.h"
 #include "osal_mem.h"
 #include "osal_mutex.h"
@@ -40,34 +44,42 @@ extern "C" {
 /**
  * \brief           Initialize OSAL layer
  * \return          OSAL_OK on success, error code otherwise
+ * \retval          OSAL_OK Initialization successful
+ * \retval          OSAL_ERROR Initialization failed
  */
 osal_status_t osal_init(void);
 
 /**
  * \brief           Start OSAL scheduler
- * \note            This function does not return
+ * \note            This function does not return under normal operation
  */
 void osal_start(void);
 
 /**
  * \brief           Check if scheduler is running
  * \return          true if running, false otherwise
+ * \retval          true Scheduler is running
+ * \retval          false Scheduler is not running
  */
 bool osal_is_running(void);
 
 /**
  * \brief           Enter critical section
+ * \note            Disables interrupts to protect critical code sections
  */
 void osal_enter_critical(void);
 
 /**
  * \brief           Exit critical section
+ * \note            Re-enables interrupts after critical code section
  */
 void osal_exit_critical(void);
 
 /**
  * \brief           Check if in ISR context
  * \return          true if in ISR, false otherwise
+ * \retval          true Currently executing in ISR context
+ * \retval          false Currently executing in task context
  */
 bool osal_is_isr(void);
 
