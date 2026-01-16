@@ -346,3 +346,288 @@ TEST_F(OsalMemPropertyTest, Property12_MemoryStatisticsConsistency) {
         }
     }
 }
+
+/*---------------------------------------------------------------------------*/
+/* Property 8: Memory Allocation Count Tracking                              */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 8: Memory Allocation Count Tracking
+ *
+ * *For any* sequence of osal_mem_alloc() and osal_mem_free() operations,
+ * osal_mem_get_allocation_count() SHALL equal the number of allocations
+ * minus the number of frees.
+ *
+ * **Validates: Requirements 6.1**
+ */
+TEST_F(OsalMemPropertyTest, Property8_MemoryAllocationCountTracking) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Get initial allocation count */
+        size_t initial_count = osal_mem_get_allocation_count();
+
+        /* Generate random number of allocations (1-10) */
+        std::uniform_int_distribution<int> count_dist(1, 10);
+        int alloc_count = count_dist(rng);
+
+        std::vector<void*> allocations;
+
+        /* Perform allocations and verify count increases */
+        for (int i = 0; i < alloc_count; ++i) {
+            size_t alloc_size = randomSmallSize();
+            void* ptr = osal_mem_alloc(alloc_size);
+
+            if (ptr != nullptr) {
+                allocations.push_back(ptr);
+
+                /* Verify allocation count increased */
+                size_t current_count = osal_mem_get_allocation_count();
+                size_t expected_count = initial_count + allocations.size();
+                EXPECT_EQ(expected_count, current_count)
+                    << "Iteration " << test_iter << ", alloc " << i
+                    << ": allocation count should be " << expected_count
+                    << " but got " << current_count;
+            }
+        }
+
+        /* Free allocations and verify count decreases */
+        size_t freed_count = 0;
+        for (void* ptr : allocations) {
+            osal_mem_free(ptr);
+            freed_count++;
+
+            /* Verify allocation count decreased */
+            size_t current_count = osal_mem_get_allocation_count();
+            size_t expected_count =
+                initial_count + allocations.size() - freed_count;
+            EXPECT_EQ(expected_count, current_count)
+                << "Iteration " << test_iter << ", free " << freed_count
+                << ": allocation count should be " << expected_count
+                << " but got " << current_count;
+        }
+
+        /* Final count should equal initial count */
+        size_t final_count = osal_mem_get_allocation_count();
+        EXPECT_EQ(initial_count, final_count)
+            << "Iteration " << test_iter
+            << ": final allocation count should equal initial count";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 9: Memory Heap Integrity                                         */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 9: Memory Heap Integrity
+ *
+ * *For any* valid sequence of memory allocation and deallocation operations,
+ * osal_mem_check_integrity() SHALL return OSAL_OK.
+ *
+ * **Validates: Requirements 6.3**
+ */
+TEST_F(OsalMemPropertyTest, Property9_MemoryHeapIntegrity) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Verify initial heap integrity */
+        EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+            << "Iteration " << test_iter
+            << ": initial heap integrity check failed";
+
+        /* Generate random number of allocations (1-10) */
+        std::uniform_int_distribution<int> count_dist(1, 10);
+        int alloc_count = count_dist(rng);
+
+        std::vector<void*> allocations;
+
+        /* Perform allocations and verify integrity after each */
+        for (int i = 0; i < alloc_count; ++i) {
+            size_t alloc_size = randomSmallSize();
+            void* ptr = osal_mem_alloc(alloc_size);
+
+            if (ptr != nullptr) {
+                allocations.push_back(ptr);
+
+                /* Write some data to the allocation */
+                memset(ptr, randomByte(), alloc_size);
+
+                /* Verify heap integrity after allocation */
+                EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+                    << "Iteration " << test_iter << ", alloc " << i
+                    << ": heap integrity check failed after allocation";
+            }
+        }
+
+        /* Free allocations in random order and verify integrity */
+        while (!allocations.empty()) {
+            /* Pick random allocation to free */
+            std::uniform_int_distribution<size_t> idx_dist(
+                0, allocations.size() - 1);
+            size_t idx = idx_dist(rng);
+
+            osal_mem_free(allocations[idx]);
+            allocations.erase(allocations.begin() + idx);
+
+            /* Verify heap integrity after free */
+            EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+                << "Iteration " << test_iter
+                << ": heap integrity check failed after free";
+        }
+
+        /* Verify final heap integrity */
+        EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+            << "Iteration " << test_iter
+            << ": final heap integrity check failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 10: Aligned Memory Round-Trip                                    */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 10: Aligned Memory Round-Trip
+ *
+ * *For any* aligned memory allocation with alignment A, the returned pointer
+ * SHALL be divisible by A, and osal_mem_free_aligned() SHALL successfully
+ * free the memory.
+ *
+ * **Validates: Requirements 6.4**
+ */
+TEST_F(OsalMemPropertyTest, Property10_AlignedMemoryRoundTrip) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random alignment (power of 2: 4, 8, 16, 32, 64) */
+        const size_t alignments[] = {4, 8, 16, 32, 64};
+        std::uniform_int_distribution<size_t> align_dist(0, 4);
+        size_t alignment = alignments[align_dist(rng)];
+
+        /* Generate random size */
+        size_t size = randomSize();
+
+        /* Get initial allocation count */
+        size_t initial_count = osal_mem_get_allocation_count();
+
+        /* Allocate aligned memory */
+        void* ptr = osal_mem_alloc_aligned(alignment, size);
+        ASSERT_NE(nullptr, ptr)
+            << "Iteration " << test_iter << ": aligned allocation failed "
+            << "(alignment=" << alignment << ", size=" << size << ")";
+
+        /* Verify alignment */
+        uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+        EXPECT_EQ(0u, addr % alignment)
+            << "Iteration " << test_iter << ": pointer is not aligned "
+            << "(alignment=" << alignment << ", addr=0x" << std::hex << addr
+            << std::dec << ")";
+
+        /* Verify allocation count increased */
+        size_t after_alloc_count = osal_mem_get_allocation_count();
+        EXPECT_EQ(initial_count + 1, after_alloc_count)
+            << "Iteration " << test_iter
+            << ": allocation count should increase by 1";
+
+        /* Write data to verify memory is usable */
+        uint8_t* byte_ptr = static_cast<uint8_t*>(ptr);
+        uint8_t test_pattern = randomByte();
+        for (size_t i = 0; i < size; ++i) {
+            byte_ptr[i] = test_pattern;
+        }
+
+        /* Verify data was written correctly */
+        for (size_t i = 0; i < size; ++i) {
+            EXPECT_EQ(test_pattern, byte_ptr[i])
+                << "Iteration " << test_iter << ": data verification failed "
+                << "at byte " << i;
+        }
+
+        /* Free aligned memory using osal_mem_free_aligned */
+        osal_mem_free_aligned(ptr);
+
+        /* Verify allocation count decreased */
+        size_t after_free_count = osal_mem_get_allocation_count();
+        EXPECT_EQ(initial_count, after_free_count)
+            << "Iteration " << test_iter
+            << ": allocation count should return to initial value after free";
+
+        /* Verify heap integrity after free */
+        EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+            << "Iteration " << test_iter
+            << ": heap integrity check failed after aligned free";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Additional Edge Case Tests                                                */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Edge Case: NULL Pointer Free Aligned
+ *
+ * Calling osal_mem_free_aligned() with NULL pointer SHALL be safe (no-op).
+ *
+ * **Validates: Requirements 6.4**
+ */
+TEST_F(OsalMemPropertyTest, EdgeCase_NullPointerFreeAligned) {
+    /* Get initial allocation count */
+    size_t initial_count = osal_mem_get_allocation_count();
+
+    /* Free NULL pointer - should be safe */
+    osal_mem_free_aligned(nullptr);
+
+    /* Verify allocation count unchanged */
+    size_t after_count = osal_mem_get_allocation_count();
+    EXPECT_EQ(initial_count, after_count)
+        << "Allocation count should not change when freeing NULL";
+
+    /* Verify heap integrity */
+    EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+        << "Heap integrity check failed after freeing NULL";
+}
+
+/**
+ * Feature: osal-refactor, Edge Case: Multiple Aligned Allocations
+ *
+ * Multiple aligned allocations with different alignments SHALL all be
+ * properly aligned and freeable.
+ *
+ * **Validates: Requirements 6.4**
+ */
+TEST_F(OsalMemPropertyTest, EdgeCase_MultipleAlignedAllocations) {
+    const size_t alignments[] = {4, 8, 16, 32, 64};
+    std::vector<void*> allocations;
+
+    /* Get initial allocation count */
+    size_t initial_count = osal_mem_get_allocation_count();
+
+    /* Allocate with different alignments */
+    for (size_t alignment : alignments) {
+        size_t size = randomSize();
+        void* ptr = osal_mem_alloc_aligned(alignment, size);
+        ASSERT_NE(nullptr, ptr)
+            << "Aligned allocation failed for alignment=" << alignment;
+
+        /* Verify alignment */
+        uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+        EXPECT_EQ(0u, addr % alignment)
+            << "Pointer not aligned for alignment=" << alignment;
+
+        allocations.push_back(ptr);
+    }
+
+    /* Verify allocation count */
+    size_t after_alloc_count = osal_mem_get_allocation_count();
+    EXPECT_EQ(initial_count + allocations.size(), after_alloc_count)
+        << "Allocation count mismatch after multiple aligned allocations";
+
+    /* Free all allocations */
+    for (void* ptr : allocations) {
+        osal_mem_free_aligned(ptr);
+    }
+
+    /* Verify allocation count returned to initial */
+    size_t final_count = osal_mem_get_allocation_count();
+    EXPECT_EQ(initial_count, final_count)
+        << "Allocation count should return to initial after freeing all";
+
+    /* Verify heap integrity */
+    EXPECT_EQ(OSAL_OK, osal_mem_check_integrity())
+        << "Heap integrity check failed after freeing all aligned allocations";
+}
