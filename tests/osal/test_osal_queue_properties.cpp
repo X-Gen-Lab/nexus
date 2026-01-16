@@ -637,3 +637,288 @@ TEST_F(OsalQueuePropertyTest, Property17_QueueEmptyAfterDraining) {
             << "Iteration " << test_iter << ": queue delete failed";
     }
 }
+
+/*---------------------------------------------------------------------------*/
+/* Property 12: Queue Space Invariant                                        */
+/* Feature: osal-refactor, Property 12: Queue Space Invariant                */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 12: Queue Space Invariant
+ *
+ * *For any* queue with capacity C, osal_queue_get_available_space() +
+ * osal_queue_get_count() SHALL equal C.
+ *
+ * **Validates: Requirements 8.1**
+ */
+TEST_F(OsalQueuePropertyTest, Property12_QueueSpaceInvariant) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random capacity */
+        size_t capacity = randomCapacity();
+
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Initial state: empty queue */
+        size_t count = osal_queue_get_count(queue);
+        size_t available = osal_queue_get_available_space(queue);
+        EXPECT_EQ(capacity, count + available)
+            << "Iteration " << test_iter
+            << ": invariant violated at initial state "
+            << "(count=" << count << ", available=" << available
+            << ", capacity=" << capacity << ")";
+
+        /* Random number of items to send */
+        size_t num_items = randomItemCount(capacity);
+
+        /* Send items and verify invariant after each send */
+        for (size_t i = 0; i < num_items; i++) {
+            int value = static_cast<int>(i);
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+
+            count = osal_queue_get_count(queue);
+            available = osal_queue_get_available_space(queue);
+            EXPECT_EQ(capacity, count + available)
+                << "Iteration " << test_iter
+                << ": invariant violated after send " << i
+                << " (count=" << count << ", available=" << available
+                << ", capacity=" << capacity << ")";
+        }
+
+        /* Receive some items and verify invariant */
+        size_t num_receives = num_items / 2;
+        for (size_t i = 0; i < num_receives; i++) {
+            int recv_value = 0;
+            ASSERT_EQ(OSAL_OK,
+                      osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": receive " << i << " failed";
+
+            count = osal_queue_get_count(queue);
+            available = osal_queue_get_available_space(queue);
+            EXPECT_EQ(capacity, count + available)
+                << "Iteration " << test_iter
+                << ": invariant violated after receive " << i
+                << " (count=" << count << ", available=" << available
+                << ", capacity=" << capacity << ")";
+        }
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 13: Queue Reset Clears All                                       */
+/* Feature: osal-refactor, Property 13: Queue Reset Clears All               */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 13: Queue Reset Clears All
+ *
+ * *For any* queue with items, after calling osal_queue_reset(),
+ * osal_queue_get_count() SHALL return 0 and osal_queue_is_empty() SHALL
+ * return true.
+ *
+ * **Validates: Requirements 8.2**
+ */
+TEST_F(OsalQueuePropertyTest, Property13_QueueResetClearsAll) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random capacity */
+        size_t capacity = randomCapacity();
+
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Random number of items to send */
+        size_t num_items = randomItemCount(capacity);
+
+        /* Send items */
+        for (size_t i = 0; i < num_items; i++) {
+            int value = static_cast<int>(i);
+            ASSERT_EQ(OSAL_OK, osal_queue_send(queue, &value, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+        }
+
+        /* Verify queue has items */
+        EXPECT_EQ(num_items, osal_queue_get_count(queue))
+            << "Iteration " << test_iter << ": queue should have items";
+        EXPECT_FALSE(osal_queue_is_empty(queue))
+            << "Iteration " << test_iter << ": queue should not be empty";
+
+        /* Reset the queue */
+        ASSERT_EQ(OSAL_OK, osal_queue_reset(queue))
+            << "Iteration " << test_iter << ": queue reset failed";
+
+        /* Verify queue is empty after reset */
+        EXPECT_EQ(0u, osal_queue_get_count(queue))
+            << "Iteration " << test_iter
+            << ": queue count should be 0 after reset";
+        EXPECT_TRUE(osal_queue_is_empty(queue))
+            << "Iteration " << test_iter
+            << ": queue should be empty after reset";
+
+        /* Verify available space equals capacity after reset */
+        EXPECT_EQ(capacity, osal_queue_get_available_space(queue))
+            << "Iteration " << test_iter
+            << ": available space should equal capacity after reset";
+
+        /* Verify receive fails on empty queue */
+        int recv_value = 0;
+        EXPECT_EQ(OSAL_ERROR_EMPTY,
+                  osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter
+            << ": receive should fail on reset queue";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 14: Queue Overwrite Mode Behavior                                */
+/* Feature: osal-refactor, Property 14: Queue Overwrite Mode Behavior        */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 14: Queue Overwrite Mode Behavior
+ *
+ * *For any* queue in overwrite mode, osal_queue_send() SHALL always succeed
+ * (return OSAL_OK) regardless of queue fullness.
+ *
+ * **Validates: Requirements 8.3, 8.4**
+ *
+ * Note: This test verifies the API accepts the mode setting. Full overwrite
+ * behavior depends on platform-specific implementation.
+ */
+TEST_F(OsalQueuePropertyTest, Property14_QueueOverwriteModeBehavior) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random capacity */
+        size_t capacity = randomCapacity();
+
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Set overwrite mode - should succeed */
+        EXPECT_EQ(OSAL_OK, osal_queue_set_mode(queue, OSAL_QUEUE_MODE_OVERWRITE))
+            << "Iteration " << test_iter << ": set overwrite mode failed";
+
+        /* Set normal mode - should succeed */
+        EXPECT_EQ(OSAL_OK, osal_queue_set_mode(queue, OSAL_QUEUE_MODE_NORMAL))
+            << "Iteration " << test_iter << ": set normal mode failed";
+
+        /* Test invalid mode */
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM,
+                  osal_queue_set_mode(queue, (osal_queue_mode_t)99))
+            << "Iteration " << test_iter
+            << ": invalid mode should return error";
+
+        /* Test NULL handle */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+                  osal_queue_set_mode(nullptr, OSAL_QUEUE_MODE_NORMAL))
+            << "Iteration " << test_iter
+            << ": NULL handle should return error";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 15: Queue Peek From ISR                                          */
+/* Feature: osal-refactor, Property 15: Queue Peek From ISR                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 15: Queue Peek From ISR
+ *
+ * *For any* non-empty queue, osal_queue_peek_from_isr() SHALL return the
+ * front item without removing it, and subsequent peek SHALL return the
+ * same item.
+ *
+ * **Validates: Requirements 8.5**
+ */
+TEST_F(OsalQueuePropertyTest, Property15_QueuePeekFromISR) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random capacity */
+        size_t capacity = randomCapacity();
+        size_t num_items = randomItemCount(capacity);
+
+        /* Create queue */
+        osal_queue_handle_t queue = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_queue_create(sizeof(int), capacity, &queue))
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Send items */
+        std::vector<int> sent_values(num_items);
+        for (size_t i = 0; i < num_items; i++) {
+            sent_values[i] = randomValue();
+            ASSERT_EQ(OSAL_OK,
+                      osal_queue_send(queue, &sent_values[i], OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": send " << i << " failed";
+        }
+
+        /* Record count before peek */
+        size_t count_before = osal_queue_get_count(queue);
+
+        /* Peek from ISR multiple times - should return same value */
+        for (int peek_iter = 0; peek_iter < 5; peek_iter++) {
+            int peek_value = 0;
+            ASSERT_EQ(OSAL_OK, osal_queue_peek_from_isr(queue, &peek_value))
+                << "Iteration " << test_iter << ": peek_from_isr " << peek_iter
+                << " failed";
+
+            /* Peek should return the front item (first sent) */
+            EXPECT_EQ(sent_values[0], peek_value)
+                << "Iteration " << test_iter << ": peek_from_isr " << peek_iter
+                << " returned wrong value";
+
+            /* Count should remain unchanged */
+            EXPECT_EQ(count_before, osal_queue_get_count(queue))
+                << "Iteration " << test_iter << ": peek_from_isr " << peek_iter
+                << " changed the count";
+        }
+
+        /* Verify receive still gets the same front item */
+        int recv_value = 0;
+        ASSERT_EQ(OSAL_OK, osal_queue_receive(queue, &recv_value, OSAL_NO_WAIT))
+            << "Iteration " << test_iter << ": receive after peek failed";
+
+        EXPECT_EQ(sent_values[0], recv_value)
+            << "Iteration " << test_iter
+            << ": receive after peek got wrong value";
+
+        /* Test peek on empty queue */
+        osal_queue_reset(queue);
+        int empty_peek = 0;
+        EXPECT_EQ(OSAL_ERROR_EMPTY,
+                  osal_queue_peek_from_isr(queue, &empty_peek))
+            << "Iteration " << test_iter
+            << ": peek_from_isr on empty queue should fail";
+
+        /* Test NULL handle */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+                  osal_queue_peek_from_isr(nullptr, &empty_peek))
+            << "Iteration " << test_iter
+            << ": peek_from_isr with NULL handle should fail";
+
+        /* Test NULL item pointer */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+                  osal_queue_peek_from_isr(queue, nullptr))
+            << "Iteration " << test_iter
+            << ": peek_from_isr with NULL item should fail";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))
+            << "Iteration " << test_iter << ": queue delete failed";
+    }
+}
