@@ -1,34 +1,40 @@
 /**
  * \file            nx_device.c
- * \brief           Device base class implementation
+ * \brief           Unified device management implementation
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-01-12
+ * \date            2026-01-16
  *
  * \copyright       Copyright (c) 2026 Nexus Team
+ *
+ * \details         This file implements the unified device API that searches
+ *                  both static registry (linker section) and dynamic registry.
  */
 
 #include "hal/base/nx_device.h"
+#include "hal/base/nx_device_registry.h"
 #include "hal/nx_status.h"
 #include <string.h>
 
-/*
- * Device registry configuration
- */
+/*---------------------------------------------------------------------------*/
+/* Configuration                                                             */
+/*---------------------------------------------------------------------------*/
+
 #ifndef NX_DEVICE_MAX_DEVICES
 #define NX_DEVICE_MAX_DEVICES 32
 #endif
 
-/*
- * Device registry - stores pointers to registered devices
- */
+/*---------------------------------------------------------------------------*/
+/* Dynamic Registry                                                          */
+/*---------------------------------------------------------------------------*/
+
 static nx_device_t* g_device_registry[NX_DEVICE_MAX_DEVICES];
 static size_t g_device_count = 0;
 
-/*
- * Device interface mapping - maps interface pointers to device descriptors
- * This is needed for nx_device_put() to find the device from interface pointer
- */
+/*---------------------------------------------------------------------------*/
+/* Interface Mapping                                                         */
+/*---------------------------------------------------------------------------*/
+
 static struct {
     void* interface;
     nx_device_t* device;
@@ -36,16 +42,14 @@ static struct {
 static size_t g_interface_count = 0;
 
 /**
- * \brief           Find device in registry by name
+ * \brief           Find device in dynamic registry by name
  */
-static nx_device_t* device_find_internal(const char* name) {
-    size_t i;
-
+static nx_device_t* device_find_dynamic(const char* name) {
     if (name == NULL) {
         return NULL;
     }
 
-    for (i = 0; i < g_device_count; i++) {
+    for (size_t i = 0; i < g_device_count; i++) {
         if (g_device_registry[i] != NULL &&
             g_device_registry[i]->name != NULL &&
             strcmp(g_device_registry[i]->name, name) == 0) {
@@ -57,16 +61,32 @@ static nx_device_t* device_find_internal(const char* name) {
 }
 
 /**
+ * \brief           Find device by name (static + dynamic)
+ */
+static nx_device_t* device_find_internal(const char* name) {
+    if (name == NULL) {
+        return NULL;
+    }
+
+    /* Search static registry first */
+    const nx_device_t* dev = nx_device_registry_find(name);
+    if (dev != NULL) {
+        return (nx_device_t*)dev;
+    }
+
+    /* Then search dynamic registry */
+    return device_find_dynamic(name);
+}
+
+/**
  * \brief           Find device by interface pointer
  */
 static nx_device_t* device_find_by_interface(void* interface) {
-    size_t i;
-
     if (interface == NULL) {
         return NULL;
     }
 
-    for (i = 0; i < g_interface_count; i++) {
+    for (size_t i = 0; i < g_interface_count; i++) {
         if (g_interface_map[i].interface == interface) {
             return g_interface_map[i].device;
         }
@@ -94,11 +114,8 @@ static nx_status_t interface_map_add(void* interface, nx_device_t* device) {
  * \brief           Remove interface from device mapping
  */
 static void interface_map_remove(void* interface) {
-    size_t i;
-
-    for (i = 0; i < g_interface_count; i++) {
+    for (size_t i = 0; i < g_interface_count; i++) {
         if (g_interface_map[i].interface == interface) {
-            /* Move last entry to this position */
             if (i < g_interface_count - 1) {
                 g_interface_map[i] = g_interface_map[g_interface_count - 1];
             }
@@ -108,28 +125,34 @@ static void interface_map_remove(void* interface) {
     }
 }
 
+/*---------------------------------------------------------------------------*/
+/* Dynamic Registration API                                                  */
+/*---------------------------------------------------------------------------*/
+
 nx_status_t nx_device_register(nx_device_t* dev) {
     if (dev == NULL || dev->name == NULL) {
         return NX_ERR_NULL_PTR;
     }
 
-    /* Check if already registered */
-    if (device_find_internal(dev->name) != NULL) {
+    /* Check if already in static registry */
+    if (nx_device_registry_find(dev->name) != NULL) {
         return NX_ERR_ALREADY_INIT;
     }
 
-    /* Check capacity */
+    /* Check if already in dynamic registry */
+    if (device_find_dynamic(dev->name) != NULL) {
+        return NX_ERR_ALREADY_INIT;
+    }
+
     if (g_device_count >= NX_DEVICE_MAX_DEVICES) {
         return NX_ERR_NO_RESOURCE;
     }
 
-    /* Initialize state */
     dev->state.initialized = 0;
     dev->state.state = NX_DEV_STATE_UNINITIALIZED;
     dev->state.ref_count = 0;
     dev->state.init_result = NX_OK;
 
-    /* Add to registry */
     g_device_registry[g_device_count] = dev;
     g_device_count++;
 
@@ -137,21 +160,16 @@ nx_status_t nx_device_register(nx_device_t* dev) {
 }
 
 nx_status_t nx_device_unregister(nx_device_t* dev) {
-    size_t i;
-
     if (dev == NULL) {
         return NX_ERR_NULL_PTR;
     }
 
-    /* Check if device has references */
     if (dev->state.ref_count > 0) {
         return NX_ERR_BUSY;
     }
 
-    /* Find and remove from registry */
-    for (i = 0; i < g_device_count; i++) {
+    for (size_t i = 0; i < g_device_count; i++) {
         if (g_device_registry[i] == dev) {
-            /* Move last entry to this position */
             if (i < g_device_count - 1) {
                 g_device_registry[i] = g_device_registry[g_device_count - 1];
             }
@@ -162,6 +180,10 @@ nx_status_t nx_device_unregister(nx_device_t* dev) {
 
     return NX_ERR_NOT_FOUND;
 }
+
+/*---------------------------------------------------------------------------*/
+/* Public API Implementation                                                 */
+/*---------------------------------------------------------------------------*/
 
 const nx_device_t* nx_device_find(const char* name) {
     return device_find_internal(name);

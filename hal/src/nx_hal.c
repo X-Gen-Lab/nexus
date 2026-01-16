@@ -9,6 +9,7 @@
  */
 
 #include "hal/nx_hal.h"
+#include "hal/nx_device_registry.h"
 #include <stdbool.h>
 
 /*---------------------------------------------------------------------------*/
@@ -103,6 +104,13 @@ nx_status_t nx_hal_init(void) {
         return status;
     }
 
+    /* Initialize all devices in the static registry */
+    status = nx_device_registry_init_all();
+    if (status != NX_OK) {
+        /* Log warning but continue - some devices may have failed */
+        /* Individual device errors are tracked in device state */
+    }
+
     /* Mark as initialized */
     hal_initialized = true;
 
@@ -115,6 +123,12 @@ nx_status_t nx_hal_deinit(void) {
     /* Check if not initialized */
     if (!hal_initialized) {
         return NX_OK;
+    }
+
+    /* Deinitialize all devices in the static registry */
+    status = nx_device_registry_deinit_all();
+    if (status != NX_OK) {
+        /* Log warning but continue - some devices may have failed */
     }
 
     /* Deinitialize platform-specific hardware */

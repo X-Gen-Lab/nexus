@@ -17,6 +17,7 @@ target_sources(hal
     PRIVATE
         src/nx_status.c
         src/nx_device.c
+        src/nx_device_registry.c
         src/nx_hal.c
 )
 
