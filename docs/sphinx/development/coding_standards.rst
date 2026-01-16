@@ -15,6 +15,8 @@ Code Formatting
 The project uses clang-format for automatic code formatting. Run ``clang-format``
 before committing code.
 
+See also: ``.kiro/steering/comment-standards.md`` for detailed comment guidelines.
+
 Indentation
 ~~~~~~~~~~~
 
@@ -98,7 +100,17 @@ This ensures consistent formatting across the codebase::
 File Header Format
 ~~~~~~~~~~~~~~~~~~
 
-Every source file must have a file header comment::
+Every source file must have a file header comment.
+
+**Header files (.h)** - Minimal format::
+
+    /**
+     * \file            filename.h
+     * \brief           Brief description of the file
+     * \author          Nexus Team
+     */
+
+**Source files (.c)** - Full format with version and copyright::
 
     /**
      * \file            filename.c
@@ -144,11 +156,15 @@ from headers. Use only ``\brief``, ``\details``, and ``\note``::
 Section Comments
 ~~~~~~~~~~~~~~~~
 
-Use section comments to organize code into logical blocks::
+Use section comments to organize code into logical blocks. The separator line
+must be exactly 77 characters (``/*`` + 75 characters + ``*/``)::
 
     /*---------------------------------------------------------------------------*/
     /* Section Name                                                              */
     /*---------------------------------------------------------------------------*/
+
+**Important**: Do NOT use ``/*===...===*/`` style separators. Always use
+``/*---...---*/`` for consistency.
 
 Inline Comments
 ~~~~~~~~~~~~~~~
@@ -156,6 +172,41 @@ Inline Comments
 Use ``/* comment */`` style for inline comments, not ``//``::
 
     int value = 0;  /* Initialize to zero */
+
+Macro Comments
+~~~~~~~~~~~~~~
+
+Use Doxygen block comments or inline comments for macros::
+
+    /**
+     * \brief           Maximum buffer size
+     */
+    #define MAX_BUFFER_SIZE 256
+
+    /* Or use inline style */
+    #define MAX_BUFFER_SIZE 256  /**< Maximum buffer size */
+
+Static Functions
+~~~~~~~~~~~~~~~~
+
+Static functions use simplified comments with only ``\brief``::
+
+    /**
+     * \brief           Internal helper function description
+     */
+    static void internal_helper(void) {
+        /* Implementation */
+    }
+
+Prohibited Practices
+~~~~~~~~~~~~~~~~~~~~
+
+The following practices are NOT allowed:
+
+- Using ``@`` style Doxygen tags (use ``\`` instead)
+- Using ``//`` single-line comments (use ``/* */`` instead)
+- Using ``/*===...===*/`` section separators (use ``/*---...---*/`` instead)
+- Duplicating ``\param`` and ``\return`` in source files (only in headers)
 
 MISRA C
 -------

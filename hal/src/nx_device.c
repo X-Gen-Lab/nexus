@@ -2,6 +2,10 @@
  * \file            nx_device.c
  * \brief           Device base class implementation
  * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-01-12
+ *
+ * \copyright       Copyright (c) 2026 Nexus Team
  */
 
 #include "hal/base/nx_device.h"
