@@ -25,9 +25,9 @@
  * \brief           UART backend context structure
  */
 typedef struct {
-    nx_uart_t* uart;      /**< UART interface pointer */
-    bool initialized;     /**< Initialization flag */
-    uint32_t timeout_ms;  /**< Transmit timeout in milliseconds */
+    nx_uart_t* uart;     /**< UART interface pointer */
+    bool initialized;    /**< Initialization flag */
+    uint32_t timeout_ms; /**< Transmit timeout in milliseconds */
 } uart_backend_ctx_t;
 
 /**
@@ -84,8 +84,8 @@ static log_status_t uart_backend_write(void* ctx, const char* msg, size_t len) {
     }
 
     /* Transmit data via UART */
-    nx_status_t status = tx_sync->send(tx_sync, (const uint8_t*)msg, len,
-                                       uart_ctx->timeout_ms);
+    nx_status_t status =
+        tx_sync->send(tx_sync, (const uint8_t*)msg, len, uart_ctx->timeout_ms);
 
     if (status != NX_OK) {
         return LOG_ERROR_BACKEND;

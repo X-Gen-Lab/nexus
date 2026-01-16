@@ -140,7 +140,6 @@ TEST_F(OsalMemTest, AllocWriteRead) {
     osal_mem_free(ptr);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Calloc Tests - Requirements 6.1                                           */
 /*---------------------------------------------------------------------------*/
@@ -192,7 +191,8 @@ TEST_F(OsalMemTest, CallocVariousSizes) {
     osal_mem_free(ptr1);
 
     /* Medium allocation */
-    uint32_t* ptr2 = static_cast<uint32_t*>(osal_mem_calloc(64, sizeof(uint32_t)));
+    uint32_t* ptr2 =
+        static_cast<uint32_t*>(osal_mem_calloc(64, sizeof(uint32_t)));
     ASSERT_NE(nullptr, ptr2);
     for (int i = 0; i < 64; i++) {
         EXPECT_EQ(0u, ptr2[i]);
@@ -313,7 +313,8 @@ TEST_F(OsalMemTest, ReallocSameSize) {
 
 /**
  * \brief           Test aligned allocation with valid alignment
- * \details         Requirements 6.3 - Aligned allocation should return aligned pointer
+ * \details         Requirements 6.3 - Aligned allocation should return aligned
+ * pointer
  */
 TEST_F(OsalMemTest, AllocAlignedValid) {
     const size_t alignments[] = {1, 2, 4, 8, 16, 32, 64};
@@ -324,14 +325,16 @@ TEST_F(OsalMemTest, AllocAlignedValid) {
 
         /* Verify alignment */
         uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
-        EXPECT_EQ(0u, addr % alignment) << "Alignment " << alignment << " failed";
+        EXPECT_EQ(0u, addr % alignment)
+            << "Alignment " << alignment << " failed";
 
         osal_mem_free(ptr);
     }
 }
 
 /**
- * \brief           Test aligned allocation with invalid alignment (not power of 2)
+ * \brief           Test aligned allocation with invalid alignment (not power of
+ * 2)
  */
 TEST_F(OsalMemTest, AllocAlignedInvalidAlignment) {
     /* 3 is not a power of 2 */
@@ -362,7 +365,8 @@ TEST_F(OsalMemTest, AllocAlignedWriteRead) {
     const size_t alignment = 16;
     const size_t size = 100;
 
-    uint8_t* ptr = static_cast<uint8_t*>(osal_mem_alloc_aligned(alignment, size));
+    uint8_t* ptr =
+        static_cast<uint8_t*>(osal_mem_alloc_aligned(alignment, size));
     ASSERT_NE(nullptr, ptr);
 
     /* Verify alignment */
@@ -381,7 +385,6 @@ TEST_F(OsalMemTest, AllocAlignedWriteRead) {
 
     osal_mem_free(ptr);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Memory Statistics Tests - Requirements 7.1-7.4                            */
@@ -508,4 +511,3 @@ TEST_F(OsalMemTest, StatsStructureFields) {
     EXPECT_EQ(stats.free_size, osal_mem_get_free_size());
     EXPECT_EQ(stats.min_free_size, osal_mem_get_min_free_size());
 }
-

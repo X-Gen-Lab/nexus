@@ -1401,7 +1401,7 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
 /* Timer Internal Structures                                                 */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_TIMERS 16
+#define OSAL_MAX_TIMERS     16
 #define OSAL_TIMER_NAME_MAX 32
 
 typedef struct {
@@ -1436,24 +1436,25 @@ static osal_timer_internal_t s_timers[OSAL_MAX_TIMERS];
 #ifdef _WIN32
 static unsigned __stdcall timer_thread_func(void* arg) {
     osal_timer_internal_t* timer = (osal_timer_internal_t*)arg;
-    
+
     while (!timer->delete_pending) {
         /* Wait for the timer period or stop/reset event */
-        HANDLE events[2] = { timer->stop_event, timer->reset_event };
-        DWORD result = WaitForMultipleObjects(2, events, FALSE, timer->period_ms);
-        
+        HANDLE events[2] = {timer->stop_event, timer->reset_event};
+        DWORD result =
+            WaitForMultipleObjects(2, events, FALSE, timer->period_ms);
+
         EnterCriticalSection(&timer->cs);
-        
+
         if (timer->delete_pending) {
             LeaveCriticalSection(&timer->cs);
             break;
         }
-        
+
         if (result == WAIT_OBJECT_0) {
             /* Stop event signaled - wait until started again */
             timer->active = false;
             LeaveCriticalSection(&timer->cs);
-            
+
             /* Wait for reset event (which also acts as start) */
             while (!timer->delete_pending && !timer->active) {
                 WaitForSingleObject(timer->reset_event, INFINITE);
@@ -1474,17 +1475,17 @@ static unsigned __stdcall timer_thread_func(void* arg) {
             if (timer->active && timer->callback != NULL) {
                 osal_timer_callback_t cb = timer->callback;
                 void* cb_arg = timer->arg;
-                
+
                 /* For one-shot timer, mark as inactive before callback */
                 if (timer->mode == OSAL_TIMER_ONE_SHOT) {
                     timer->active = false;
                 }
-                
+
                 LeaveCriticalSection(&timer->cs);
-                
+
                 /* Invoke callback outside of lock */
                 cb(cb_arg);
-                
+
                 /* For one-shot timer, wait for restart */
                 if (timer->mode == OSAL_TIMER_ONE_SHOT) {
                     EnterCriticalSection(&timer->cs);
@@ -1498,18 +1499,18 @@ static unsigned __stdcall timer_thread_func(void* arg) {
                 continue;
             }
         }
-        
+
         LeaveCriticalSection(&timer->cs);
     }
-    
+
     return 0;
 }
 #else
 static void* timer_thread_func(void* arg) {
     osal_timer_internal_t* timer = (osal_timer_internal_t*)arg;
-    
+
     pthread_mutex_lock(&timer->mutex);
-    
+
     while (!timer->delete_pending) {
         if (!timer->active) {
             /* Wait until timer is started */
@@ -1520,56 +1521,56 @@ static void* timer_thread_func(void* arg) {
                 break;
             }
         }
-        
+
         /* Calculate absolute timeout */
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
         uint64_t nsec = ts.tv_nsec + (uint64_t)timer->period_ms * 1000000ULL;
         ts.tv_sec += (time_t)(nsec / 1000000000ULL);
         ts.tv_nsec = (long)(nsec % 1000000000ULL);
-        
+
         /* Wait for timeout or signal */
         timer->stop_requested = false;
         timer->reset_requested = false;
-        
+
         int result = pthread_cond_timedwait(&timer->cond, &timer->mutex, &ts);
-        
+
         if (timer->delete_pending) {
             break;
         }
-        
+
         if (timer->stop_requested) {
             /* Stop requested - mark as inactive and wait */
             timer->active = false;
             continue;
         }
-        
+
         if (timer->reset_requested) {
             /* Reset requested - restart countdown */
             continue;
         }
-        
+
         if (result == ETIMEDOUT) {
             /* Timer expired - invoke callback */
             if (timer->active && timer->callback != NULL) {
                 osal_timer_callback_t cb = timer->callback;
                 void* cb_arg = timer->arg;
-                
+
                 /* For one-shot timer, mark as inactive before callback */
                 if (timer->mode == OSAL_TIMER_ONE_SHOT) {
                     timer->active = false;
                 }
-                
+
                 pthread_mutex_unlock(&timer->mutex);
-                
+
                 /* Invoke callback outside of lock */
                 cb(cb_arg);
-                
+
                 pthread_mutex_lock(&timer->mutex);
             }
         }
     }
-    
+
     pthread_mutex_unlock(&timer->mutex);
     return NULL;
 }
@@ -1584,19 +1585,19 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (config == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (config->callback == NULL) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     if (config->period_ms == 0) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     /* Auto-initialize if needed */
     if (!s_osal_initialized) {
         osal_status_t status = osal_init();
@@ -1604,9 +1605,9 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
             return status;
         }
     }
-    
+
     global_lock();
-    
+
     /* Find free slot */
     int slot = -1;
     for (int i = 0; i < OSAL_MAX_TIMERS; i++) {
@@ -1615,15 +1616,15 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
             break;
         }
     }
-    
+
     if (slot < 0) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     osal_timer_internal_t* timer = &s_timers[slot];
     memset(timer, 0, sizeof(*timer));
-    
+
     timer->used = true;
     timer->active = false;
     timer->delete_pending = false;
@@ -1631,29 +1632,32 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     timer->mode = config->mode;
     timer->callback = config->callback;
     timer->arg = config->arg;
-    
+
     if (config->name != NULL) {
         strncpy(timer->name, config->name, OSAL_TIMER_NAME_MAX - 1);
         timer->name[OSAL_TIMER_NAME_MAX - 1] = '\0';
     } else {
         snprintf(timer->name, OSAL_TIMER_NAME_MAX, "timer_%d", slot);
     }
-    
+
 #ifdef _WIN32
     InitializeCriticalSection(&timer->cs);
     timer->stop_event = CreateEvent(NULL, FALSE, FALSE, NULL);
     timer->reset_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    
+
     if (timer->stop_event == NULL || timer->reset_event == NULL) {
-        if (timer->stop_event) CloseHandle(timer->stop_event);
-        if (timer->reset_event) CloseHandle(timer->reset_event);
+        if (timer->stop_event)
+            CloseHandle(timer->stop_event);
+        if (timer->reset_event)
+            CloseHandle(timer->reset_event);
         DeleteCriticalSection(&timer->cs);
         timer->used = false;
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
-    
-    timer->thread = (HANDLE)_beginthreadex(NULL, 0, timer_thread_func, timer, 0, NULL);
+
+    timer->thread =
+        (HANDLE)_beginthreadex(NULL, 0, timer_thread_func, timer, 0, NULL);
     if (timer->thread == NULL) {
         CloseHandle(timer->stop_event);
         CloseHandle(timer->reset_event);
@@ -1667,7 +1671,7 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     pthread_cond_init(&timer->cond, NULL);
     timer->stop_requested = false;
     timer->reset_requested = false;
-    
+
     int result = pthread_create(&timer->thread, NULL, timer_thread_func, timer);
     if (result != 0) {
         pthread_mutex_destroy(&timer->mutex);
@@ -1677,10 +1681,10 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
         return OSAL_ERROR_NO_MEMORY;
     }
 #endif
-    
+
     *handle = (osal_timer_handle_t)timer;
     global_unlock();
-    
+
     return OSAL_OK;
 }
 
@@ -1688,27 +1692,27 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
-    
+
     if (!timer->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     global_lock();
-    
+
     timer->delete_pending = true;
-    
+
 #ifdef _WIN32
     /* Signal events to wake up the thread */
     SetEvent(timer->stop_event);
     SetEvent(timer->reset_event);
-    
+
     global_unlock();
-    
+
     /* Wait for thread to finish */
     WaitForSingleObject(timer->thread, INFINITE);
-    
+
     /* Clean up resources */
     CloseHandle(timer->thread);
     CloseHandle(timer->stop_event);
@@ -1719,40 +1723,39 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
     pthread_mutex_lock(&timer->mutex);
     pthread_cond_signal(&timer->cond);
     pthread_mutex_unlock(&timer->mutex);
-    
+
     global_unlock();
-    
+
     /* Wait for thread to finish */
     pthread_join(timer->thread, NULL);
-    
+
     /* Clean up resources */
     pthread_mutex_destroy(&timer->mutex);
     pthread_cond_destroy(&timer->cond);
 #endif
-    
+
     global_lock();
     timer->used = false;
     global_unlock();
-    
+
     return OSAL_OK;
 }
-
 
 osal_status_t osal_timer_start(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
-    
+
     if (!timer->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&timer->cs);
     timer->active = true;
-    SetEvent(timer->reset_event);  /* Signal to start/restart the timer */
+    SetEvent(timer->reset_event); /* Signal to start/restart the timer */
     LeaveCriticalSection(&timer->cs);
 #else
     pthread_mutex_lock(&timer->mutex);
@@ -1761,7 +1764,7 @@ osal_status_t osal_timer_start(osal_timer_handle_t handle) {
     pthread_cond_signal(&timer->cond);
     pthread_mutex_unlock(&timer->mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -1769,13 +1772,13 @@ osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
-    
+
     if (!timer->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&timer->cs);
     timer->active = false;
@@ -1788,7 +1791,7 @@ osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
     pthread_cond_signal(&timer->cond);
     pthread_mutex_unlock(&timer->mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -1796,26 +1799,26 @@ osal_status_t osal_timer_reset(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
-    
+
     if (!timer->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&timer->cs);
-    timer->active = true;  /* Reset also starts the timer if not running */
+    timer->active = true; /* Reset also starts the timer if not running */
     SetEvent(timer->reset_event);
     LeaveCriticalSection(&timer->cs);
 #else
     pthread_mutex_lock(&timer->mutex);
-    timer->active = true;  /* Reset also starts the timer if not running */
+    timer->active = true; /* Reset also starts the timer if not running */
     timer->reset_requested = true;
     pthread_cond_signal(&timer->cond);
     pthread_mutex_unlock(&timer->mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -1824,17 +1827,17 @@ osal_status_t osal_timer_set_period(osal_timer_handle_t handle,
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (period_ms == 0) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
-    
+
     if (!timer->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&timer->cs);
     timer->period_ms = period_ms;
@@ -1853,7 +1856,7 @@ osal_status_t osal_timer_set_period(osal_timer_handle_t handle,
     }
     pthread_mutex_unlock(&timer->mutex);
 #endif
-    
+
     return OSAL_OK;
 }
 
@@ -1861,15 +1864,15 @@ bool osal_timer_is_active(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return false;
     }
-    
+
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
-    
+
     if (!timer->used) {
         return false;
     }
-    
+
     bool active;
-    
+
 #ifdef _WIN32
     EnterCriticalSection(&timer->cs);
     active = timer->active;
@@ -1879,7 +1882,7 @@ bool osal_timer_is_active(osal_timer_handle_t handle) {
     active = timer->active;
     pthread_mutex_unlock(&timer->mutex);
 #endif
-    
+
     return active;
 }
 
@@ -1898,20 +1901,19 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) {
     return osal_timer_reset(handle);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Event Flags Internal Structures                                           */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_EVENTS 16
-#define OSAL_EVENT_BITS_MASK 0x00FFFFFF  /* 24-bit support */
+#define OSAL_MAX_EVENTS      16
+#define OSAL_EVENT_BITS_MASK 0x00FFFFFF /* 24-bit support */
 
 typedef struct {
     bool used;
     osal_event_bits_t bits;
 #ifdef _WIN32
     CRITICAL_SECTION cs;
-    HANDLE cond;  /* Manual-reset event for signaling */
+    HANDLE cond; /* Manual-reset event for signaling */
 #else
     pthread_mutex_t mutex;
     pthread_cond_t cond;
@@ -1960,7 +1962,7 @@ osal_status_t osal_event_create(osal_event_handle_t* handle) {
 
 #ifdef _WIN32
     InitializeCriticalSection(&event->cs);
-    event->cond = CreateEvent(NULL, TRUE, FALSE, NULL);  /* Manual-reset event */
+    event->cond = CreateEvent(NULL, TRUE, FALSE, NULL); /* Manual-reset event */
 
     if (event->cond == NULL) {
         DeleteCriticalSection(&event->cs);
@@ -2025,12 +2027,12 @@ osal_status_t osal_event_set(osal_event_handle_t handle,
 #ifdef _WIN32
     EnterCriticalSection(&event->cs);
     event->bits |= (bits & OSAL_EVENT_BITS_MASK);
-    SetEvent(event->cond);  /* Signal all waiting threads */
+    SetEvent(event->cond); /* Signal all waiting threads */
     LeaveCriticalSection(&event->cs);
 #else
     pthread_mutex_lock(&event->mutex);
     event->bits |= (bits & OSAL_EVENT_BITS_MASK);
-    pthread_cond_broadcast(&event->cond);  /* Wake all waiting threads */
+    pthread_cond_broadcast(&event->cond); /* Wake all waiting threads */
     pthread_mutex_unlock(&event->mutex);
 #endif
 
@@ -2105,18 +2107,18 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
     if (condition_met) {
         /* Condition already met - return immediately */
         osal_event_bits_t matched_bits = event->bits & bits;
-        
+
         if (options->auto_clear) {
             event->bits &= ~matched_bits;
             if (event->bits == 0) {
                 ResetEvent(event->cond);
             }
         }
-        
+
         if (bits_out != NULL) {
             *bits_out = matched_bits;
         }
-        
+
         LeaveCriticalSection(&event->cs);
         return OSAL_OK;
     }
@@ -2127,12 +2129,14 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
         return OSAL_ERROR_TIMEOUT;
     }
 
-    DWORD wait_time = (options->timeout_ms == OSAL_WAIT_FOREVER) ? INFINITE : options->timeout_ms;
+    DWORD wait_time = (options->timeout_ms == OSAL_WAIT_FOREVER)
+                          ? INFINITE
+                          : options->timeout_ms;
     DWORD start_time = GetTickCount();
 
     while (!condition_met) {
         LeaveCriticalSection(&event->cs);
-        
+
         /* Calculate remaining timeout */
         DWORD remaining = wait_time;
         if (wait_time != INFINITE) {
@@ -2142,16 +2146,16 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
             }
             remaining = wait_time - elapsed;
         }
-        
+
         DWORD result = WaitForSingleObject(event->cond, remaining);
-        
+
         EnterCriticalSection(&event->cs);
-        
+
         if (result == WAIT_TIMEOUT) {
             LeaveCriticalSection(&event->cs);
             return OSAL_ERROR_TIMEOUT;
         }
-        
+
         /* Check condition again */
         if (options->mode == OSAL_EVENT_WAIT_ALL) {
             condition_met = ((event->bits & bits) == bits);
@@ -2162,18 +2166,18 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
 
     /* Condition met */
     osal_event_bits_t matched_bits = event->bits & bits;
-    
+
     if (options->auto_clear) {
         event->bits &= ~matched_bits;
         if (event->bits == 0) {
             ResetEvent(event->cond);
         }
     }
-    
+
     if (bits_out != NULL) {
         *bits_out = matched_bits;
     }
-    
+
     LeaveCriticalSection(&event->cs);
     return OSAL_OK;
 #else
@@ -2190,15 +2194,15 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
     if (condition_met) {
         /* Condition already met - return immediately */
         osal_event_bits_t matched_bits = event->bits & bits;
-        
+
         if (options->auto_clear) {
             event->bits &= ~matched_bits;
         }
-        
+
         if (bits_out != NULL) {
             *bits_out = matched_bits;
         }
-        
+
         pthread_mutex_unlock(&event->mutex);
         return OSAL_OK;
     }
@@ -2213,7 +2217,7 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
         /* Wait forever */
         while (!condition_met) {
             pthread_cond_wait(&event->cond, &event->mutex);
-            
+
             /* Check condition */
             if (options->mode == OSAL_EVENT_WAIT_ALL) {
                 condition_met = ((event->bits & bits) == bits);
@@ -2227,13 +2231,14 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
         ms_to_timespec(options->timeout_ms, &ts);
 
         while (!condition_met) {
-            int result = pthread_cond_timedwait(&event->cond, &event->mutex, &ts);
-            
+            int result =
+                pthread_cond_timedwait(&event->cond, &event->mutex, &ts);
+
             if (result == ETIMEDOUT) {
                 pthread_mutex_unlock(&event->mutex);
                 return OSAL_ERROR_TIMEOUT;
             }
-            
+
             /* Check condition */
             if (options->mode == OSAL_EVENT_WAIT_ALL) {
                 condition_met = ((event->bits & bits) == bits);
@@ -2245,15 +2250,15 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
 
     /* Condition met */
     osal_event_bits_t matched_bits = event->bits & bits;
-    
+
     if (options->auto_clear) {
         event->bits &= ~matched_bits;
     }
-    
+
     if (bits_out != NULL) {
         *bits_out = matched_bits;
     }
-    
+
     pthread_mutex_unlock(&event->mutex);
     return OSAL_OK;
 #endif
@@ -2297,37 +2302,39 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
 
 /**
  * \brief           Memory allocation header for tracking
- * \details         Stores metadata about each allocation for statistics tracking
+ * \details         Stores metadata about each allocation for statistics
+ * tracking
  */
 typedef struct osal_mem_header {
-    size_t size;                    /**< Allocated size (excluding header) */
-    size_t alignment;               /**< Alignment used (0 for normal alloc) */
-    void* original_ptr;             /**< Original pointer (for aligned alloc) */
-    struct osal_mem_header* next;   /**< Next allocation in list */
-    struct osal_mem_header* prev;   /**< Previous allocation in list */
+    size_t size;                  /**< Allocated size (excluding header) */
+    size_t alignment;             /**< Alignment used (0 for normal alloc) */
+    void* original_ptr;           /**< Original pointer (for aligned alloc) */
+    struct osal_mem_header* next; /**< Next allocation in list */
+    struct osal_mem_header* prev; /**< Previous allocation in list */
 } osal_mem_header_t;
 
 /**
  * \brief           Memory statistics tracking structure
  */
 typedef struct {
-    size_t total_allocated;         /**< Total bytes currently allocated */
-    size_t peak_allocated;          /**< Peak bytes allocated (watermark) */
-    size_t allocation_count;        /**< Number of active allocations */
+    size_t total_allocated;  /**< Total bytes currently allocated */
+    size_t peak_allocated;   /**< Peak bytes allocated (watermark) */
+    size_t allocation_count; /**< Number of active allocations */
 #ifdef _WIN32
-    CRITICAL_SECTION cs;            /**< Critical section for thread safety */
+    CRITICAL_SECTION cs; /**< Critical section for thread safety */
 #else
-    pthread_mutex_t mutex;          /**< Mutex for thread safety */
+    pthread_mutex_t mutex; /**< Mutex for thread safety */
 #endif
-    osal_mem_header_t* alloc_list;  /**< Linked list of allocations */
-    bool initialized;               /**< Whether memory tracking is initialized */
+    osal_mem_header_t* alloc_list; /**< Linked list of allocations */
+    bool initialized; /**< Whether memory tracking is initialized */
 } osal_mem_stats_internal_t;
 
 /**
  * \brief           Simulated total heap size for native platform
- * \details         This is a simulated value since native platform uses system heap
+ * \details         This is a simulated value since native platform uses system
+ * heap
  */
-#define OSAL_NATIVE_HEAP_SIZE (1024 * 1024)  /* 1 MB simulated heap */
+#define OSAL_NATIVE_HEAP_SIZE (1024 * 1024) /* 1 MB simulated heap */
 
 static osal_mem_stats_internal_t s_mem_stats = {0};
 
@@ -2342,13 +2349,13 @@ static void mem_init_tracking(void) {
     if (s_mem_stats.initialized) {
         return;
     }
-    
+
 #ifdef _WIN32
     InitializeCriticalSection(&s_mem_stats.cs);
 #else
     pthread_mutex_init(&s_mem_stats.mutex, NULL);
 #endif
-    
+
     s_mem_stats.total_allocated = 0;
     s_mem_stats.peak_allocated = 0;
     s_mem_stats.allocation_count = 0;
@@ -2388,9 +2395,9 @@ static void mem_track_alloc(osal_mem_header_t* header, size_t size) {
     header->size = size;
     header->alignment = 0;
     header->original_ptr = NULL;
-    
+
     mem_lock();
-    
+
     /* Add to linked list */
     header->next = s_mem_stats.alloc_list;
     header->prev = NULL;
@@ -2398,16 +2405,16 @@ static void mem_track_alloc(osal_mem_header_t* header, size_t size) {
         s_mem_stats.alloc_list->prev = header;
     }
     s_mem_stats.alloc_list = header;
-    
+
     /* Update statistics */
     s_mem_stats.total_allocated += size;
     s_mem_stats.allocation_count++;
-    
+
     /* Update peak if necessary */
     if (s_mem_stats.total_allocated > s_mem_stats.peak_allocated) {
         s_mem_stats.peak_allocated = s_mem_stats.total_allocated;
     }
-    
+
     mem_unlock();
 }
 
@@ -2417,7 +2424,7 @@ static void mem_track_alloc(osal_mem_header_t* header, size_t size) {
  */
 static void mem_untrack_alloc(osal_mem_header_t* header) {
     mem_lock();
-    
+
     /* Remove from linked list */
     if (header->prev != NULL) {
         header->prev->next = header->next;
@@ -2427,11 +2434,11 @@ static void mem_untrack_alloc(osal_mem_header_t* header) {
     if (header->next != NULL) {
         header->next->prev = header->prev;
     }
-    
+
     /* Update statistics */
     s_mem_stats.total_allocated -= header->size;
     s_mem_stats.allocation_count--;
-    
+
     mem_unlock();
 }
 
@@ -2453,23 +2460,23 @@ void* osal_mem_alloc(size_t size) {
     if (size == 0) {
         return NULL;
     }
-    
+
     /* Allocate memory with header for tracking */
     size_t total_size = sizeof(osal_mem_header_t) + size;
-    
+
     /* Check for overflow */
     if (total_size < size) {
         return NULL;
     }
-    
+
     osal_mem_header_t* header = (osal_mem_header_t*)malloc(total_size);
     if (header == NULL) {
         return NULL;
     }
-    
+
     /* Track the allocation */
     mem_track_alloc(header, size);
-    
+
     /* Return pointer to user data (after header) */
     return (void*)(header + 1);
 }
@@ -2487,10 +2494,10 @@ void osal_mem_free(void* ptr) {
     if (ptr == NULL) {
         return;
     }
-    
+
     /* Get header from user pointer */
     osal_mem_header_t* header = ((osal_mem_header_t*)ptr) - 1;
-    
+
     /* Check if this is an aligned allocation */
     if (header->alignment != 0 && header->original_ptr != NULL) {
         /* For aligned allocations, free the original pointer */
@@ -2518,24 +2525,24 @@ void* osal_mem_calloc(size_t count, size_t size) {
     if (count == 0 || size == 0) {
         return NULL;
     }
-    
+
     /* Calculate total size with overflow check */
     size_t total_size = count * size;
-    
+
     /* Check for multiplication overflow */
     if (total_size / count != size) {
         return NULL;
     }
-    
+
     /* Allocate memory using our tracked allocator */
     void* ptr = osal_mem_alloc(total_size);
     if (ptr == NULL) {
         return NULL;
     }
-    
+
     /* Zero-initialize the memory */
     memset(ptr, 0, total_size);
-    
+
     return ptr;
 }
 
@@ -2556,31 +2563,31 @@ void* osal_mem_realloc(void* ptr, size_t size) {
     if (ptr == NULL) {
         return osal_mem_alloc(size);
     }
-    
+
     /* If size is 0, free the memory and return NULL */
     if (size == 0) {
         osal_mem_free(ptr);
         return NULL;
     }
-    
+
     /* Get header from user pointer */
     osal_mem_header_t* old_header = ((osal_mem_header_t*)ptr) - 1;
     size_t old_size = old_header->size;
-    
+
     /* Allocate new memory block */
     void* new_ptr = osal_mem_alloc(size);
     if (new_ptr == NULL) {
         /* Allocation failed - original memory is unchanged */
         return NULL;
     }
-    
+
     /* Copy data from old block to new block */
     size_t copy_size = (old_size < size) ? old_size : size;
     memcpy(new_ptr, ptr, copy_size);
-    
+
     /* Free the old memory block */
     osal_mem_free(ptr);
-    
+
     return new_ptr;
 }
 
@@ -2588,7 +2595,8 @@ void* osal_mem_realloc(void* ptr, size_t size) {
  * \brief           Allocate aligned memory
  *
  * \details         Allocates memory with a specific alignment requirement.
- *                  Implemented by over-allocating and adjusting the returned pointer.
+ *                  Implemented by over-allocating and adjusting the returned
+ * pointer.
  *
  *                  The implementation stores the original pointer in the header
  *                  so it can be freed correctly.
@@ -2600,17 +2608,17 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
     if (size == 0) {
         return NULL;
     }
-    
+
     /* Validate alignment is a power of 2 */
     if (alignment == 0 || (alignment & (alignment - 1)) != 0) {
         return NULL;
     }
-    
+
     /* Ensure minimum alignment of pointer size */
     if (alignment < sizeof(void*)) {
         alignment = sizeof(void*);
     }
-    
+
     /*
      * Calculate total size needed:
      * - Header size
@@ -2618,18 +2626,18 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
      * - Extra space for alignment adjustment (alignment - 1 bytes max)
      */
     size_t total_size = sizeof(osal_mem_header_t) + size + alignment - 1;
-    
+
     /* Check for overflow */
     if (total_size < size) {
         return NULL;
     }
-    
+
     /* Allocate the memory block */
     void* raw_ptr = malloc(total_size);
     if (raw_ptr == NULL) {
         return NULL;
     }
-    
+
     /*
      * Calculate aligned pointer:
      * 1. Start after the header
@@ -2637,17 +2645,17 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
      */
     uintptr_t raw_addr = (uintptr_t)raw_ptr + sizeof(osal_mem_header_t);
     uintptr_t aligned_addr = (raw_addr + alignment - 1) & ~(alignment - 1);
-    
+
     /* Place header just before the aligned user data */
-    osal_mem_header_t* header = (osal_mem_header_t*)(aligned_addr) - 1;
-    
+    osal_mem_header_t* header = (osal_mem_header_t*)(aligned_addr)-1;
+
     /* Track the allocation with alignment info */
     header->size = size;
     header->alignment = alignment;
     header->original_ptr = raw_ptr;
-    
+
     mem_lock();
-    
+
     /* Add to linked list */
     header->next = s_mem_stats.alloc_list;
     header->prev = NULL;
@@ -2655,18 +2663,18 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
         s_mem_stats.alloc_list->prev = header;
     }
     s_mem_stats.alloc_list = header;
-    
+
     /* Update statistics */
     s_mem_stats.total_allocated += size;
     s_mem_stats.allocation_count++;
-    
+
     /* Update peak if necessary */
     if (s_mem_stats.total_allocated > s_mem_stats.peak_allocated) {
         s_mem_stats.peak_allocated = s_mem_stats.total_allocated;
     }
-    
+
     mem_unlock();
-    
+
     return (void*)aligned_addr;
 }
 
@@ -2682,11 +2690,11 @@ osal_status_t osal_mem_get_stats(osal_mem_stats_t* stats) {
     if (stats == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     mem_init_tracking();
-    
+
     mem_lock();
-    
+
     /*
      * For native platform, we simulate a fixed heap size.
      * The free size is calculated as total - allocated.
@@ -2695,9 +2703,9 @@ osal_status_t osal_mem_get_stats(osal_mem_stats_t* stats) {
     stats->total_size = OSAL_NATIVE_HEAP_SIZE;
     stats->free_size = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.total_allocated;
     stats->min_free_size = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.peak_allocated;
-    
+
     mem_unlock();
-    
+
     return OSAL_OK;
 }
 
@@ -2705,17 +2713,18 @@ osal_status_t osal_mem_get_stats(osal_mem_stats_t* stats) {
  * \brief           Get free heap size
  *
  * \details         Returns the current free heap size in bytes.
- *                  For native platform, this is simulated based on tracked allocations.
+ *                  For native platform, this is simulated based on tracked
+ * allocations.
  *
  * \note            Requirements: 7.2
  */
 size_t osal_mem_get_free_size(void) {
     mem_init_tracking();
-    
+
     mem_lock();
     size_t free_size = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.total_allocated;
     mem_unlock();
-    
+
     return free_size;
 }
 
@@ -2730,10 +2739,10 @@ size_t osal_mem_get_free_size(void) {
  */
 size_t osal_mem_get_min_free_size(void) {
     mem_init_tracking();
-    
+
     mem_lock();
     size_t min_free = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.peak_allocated;
     mem_unlock();
-    
+
     return min_free;
 }

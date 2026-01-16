@@ -38,8 +38,8 @@ typedef void (*osal_timer_callback_t)(void* arg);
  * \brief           Timer mode enumeration
  */
 typedef enum {
-    OSAL_TIMER_ONE_SHOT = 0,  /**< Timer fires once */
-    OSAL_TIMER_PERIODIC = 1   /**< Timer fires repeatedly */
+    OSAL_TIMER_ONE_SHOT = 0, /**< Timer fires once */
+    OSAL_TIMER_PERIODIC = 1  /**< Timer fires repeatedly */
 } osal_timer_mode_t;
 
 /**
@@ -117,7 +117,8 @@ osal_status_t osal_timer_set_period(osal_timer_handle_t handle,
 /**
  * \brief           Check if timer is active
  * \param[in]       handle: Timer handle
- * \return          true if active, false otherwise (also false if handle is NULL)
+ * \return          true if active, false otherwise (also false if handle is
+ * NULL)
  */
 bool osal_timer_is_active(osal_timer_handle_t handle);
 

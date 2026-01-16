@@ -95,7 +95,8 @@ static void test_timer_callback_with_arg(void* arg) {
 /*---------------------------------------------------------------------------*/
 
 /**
- * Feature: osal-timer-memory, Property 1: Timer Creation and Callback Invocation
+ * Feature: osal-timer-memory, Property 1: Timer Creation and Callback
+ * Invocation
  *
  * *For any* valid timer configuration (non-NULL callback, positive period),
  * creating and starting the timer SHALL result in the callback being invoked
@@ -115,13 +116,11 @@ TEST_F(OsalTimerPropertyTest, Property1_TimerCreationAndCallbackInvocation) {
         s_callback_state.callback_invoked = false;
 
         /* Create timer configuration */
-        osal_timer_config_t config = {
-            .name = "test_timer",
-            .period_ms = period_ms,
-            .mode = OSAL_TIMER_ONE_SHOT,
-            .callback = test_timer_callback_with_arg,
-            .arg = &arg_value
-        };
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_ONE_SHOT,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &arg_value};
 
         /* Create timer */
         osal_timer_handle_t timer = nullptr;
@@ -150,8 +149,9 @@ TEST_F(OsalTimerPropertyTest, Property1_TimerCreationAndCallbackInvocation) {
 
         /* Verify correct argument was passed */
         EXPECT_EQ(arg_value, s_callback_state.last_arg_value)
-            << "Iteration " << test_iter << ": callback received wrong argument "
-            << "(expected " << arg_value << ", got " 
+            << "Iteration " << test_iter
+            << ": callback received wrong argument "
+            << "(expected " << arg_value << ", got "
             << s_callback_state.last_arg_value << ")";
 
         /* Clean up */
@@ -186,13 +186,11 @@ TEST_F(OsalTimerPropertyTest, Property2_TimerStopPreventsCallback) {
         s_callback_state.callback_invoked = false;
 
         /* Create timer configuration */
-        osal_timer_config_t config = {
-            .name = "test_timer",
-            .period_ms = period_ms,
-            .mode = OSAL_TIMER_PERIODIC,
-            .callback = test_timer_callback_with_arg,
-            .arg = &s_callback_state
-        };
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_PERIODIC,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &s_callback_state};
 
         /* Create and start timer */
         osal_timer_handle_t timer = nullptr;
@@ -218,7 +216,8 @@ TEST_F(OsalTimerPropertyTest, Property2_TimerStopPreventsCallback) {
         int count_after_stop = s_callback_state.callback_count;
         EXPECT_EQ(count_before_stop, count_after_stop)
             << "Iteration " << test_iter << ": callback invoked after stop "
-            << "(before=" << count_before_stop << ", after=" << count_after_stop << ")";
+            << "(before=" << count_before_stop << ", after=" << count_after_stop
+            << ")";
 
         /* Clean up */
         ASSERT_EQ(OSAL_OK, osal_timer_delete(timer))
@@ -250,13 +249,11 @@ TEST_F(OsalTimerPropertyTest, Property4_PeriodicTimerAutoRestart) {
         s_callback_state.callback_invoked = false;
 
         /* Create periodic timer */
-        osal_timer_config_t config = {
-            .name = "periodic_timer",
-            .period_ms = period_ms,
-            .mode = OSAL_TIMER_PERIODIC,
-            .callback = test_timer_callback_with_arg,
-            .arg = &s_callback_state
-        };
+        osal_timer_config_t config = {.name = "periodic_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_PERIODIC,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &s_callback_state};
 
         /* Create and start timer */
         osal_timer_handle_t timer = nullptr;
@@ -276,7 +273,8 @@ TEST_F(OsalTimerPropertyTest, Property4_PeriodicTimerAutoRestart) {
         /* Verify multiple callbacks occurred */
         int callback_count = s_callback_state.callback_count;
         EXPECT_GE(callback_count, 2)
-            << "Iteration " << test_iter << ": periodic timer should fire multiple times "
+            << "Iteration " << test_iter
+            << ": periodic timer should fire multiple times "
             << "(period=" << period_ms << "ms, count=" << callback_count << ")";
 
         /* Clean up */
@@ -309,13 +307,11 @@ TEST_F(OsalTimerPropertyTest, Property5_OneShotTimerSingleExecution) {
         s_callback_state.callback_invoked = false;
 
         /* Create one-shot timer */
-        osal_timer_config_t config = {
-            .name = "oneshot_timer",
-            .period_ms = period_ms,
-            .mode = OSAL_TIMER_ONE_SHOT,
-            .callback = test_timer_callback_with_arg,
-            .arg = &s_callback_state
-        };
+        osal_timer_config_t config = {.name = "oneshot_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_ONE_SHOT,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &s_callback_state};
 
         /* Create and start timer */
         osal_timer_handle_t timer = nullptr;
@@ -330,7 +326,8 @@ TEST_F(OsalTimerPropertyTest, Property5_OneShotTimerSingleExecution) {
         /* Record callback count after first period */
         int count_after_first = s_callback_state.callback_count;
         EXPECT_GE(count_after_first, 1)
-            << "Iteration " << test_iter << ": one-shot timer should fire at least once";
+            << "Iteration " << test_iter
+            << ": one-shot timer should fire at least once";
 
         /* Wait for additional periods to ensure no more callbacks */
         std::this_thread::sleep_for(std::chrono::milliseconds(period_ms * 2));
@@ -338,13 +335,16 @@ TEST_F(OsalTimerPropertyTest, Property5_OneShotTimerSingleExecution) {
         /* Verify callback was invoked exactly once */
         int final_count = s_callback_state.callback_count;
         EXPECT_EQ(count_after_first, final_count)
-            << "Iteration " << test_iter << ": one-shot timer fired multiple times "
-            << "(first=" << count_after_first << ", final=" << final_count << ")";
+            << "Iteration " << test_iter
+            << ": one-shot timer fired multiple times "
+            << "(first=" << count_after_first << ", final=" << final_count
+            << ")";
 
         /* Verify timer is inactive after firing */
         bool is_active = osal_timer_is_active(timer);
         EXPECT_FALSE(is_active)
-            << "Iteration " << test_iter << ": one-shot timer should be inactive after firing";
+            << "Iteration " << test_iter
+            << ": one-shot timer should be inactive after firing";
 
         /* Clean up */
         ASSERT_EQ(OSAL_OK, osal_timer_delete(timer))
@@ -362,8 +362,8 @@ TEST_F(OsalTimerPropertyTest, Property5_OneShotTimerSingleExecution) {
  * Feature: osal-timer-memory, Property 6: Timer Active State Consistency
  *
  * *For any* timer, the `osal_timer_is_active()` function SHALL return true
- * if and only if the timer is currently running (started and not stopped/expired
- * for one-shot).
+ * if and only if the timer is currently running (started and not
+ * stopped/expired for one-shot).
  *
  * **Validates: Requirements 3.4**
  */
@@ -378,13 +378,11 @@ TEST_F(OsalTimerPropertyTest, Property6_TimerActiveStateConsistency) {
         s_callback_state.callback_invoked = false;
 
         /* Create timer */
-        osal_timer_config_t config = {
-            .name = "test_timer",
-            .period_ms = period_ms,
-            .mode = mode,
-            .callback = test_timer_callback_with_arg,
-            .arg = &s_callback_state
-        };
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = mode,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &s_callback_state};
 
         osal_timer_handle_t timer = nullptr;
         ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer))
@@ -392,35 +390,40 @@ TEST_F(OsalTimerPropertyTest, Property6_TimerActiveStateConsistency) {
 
         /* Timer should be inactive after creation */
         EXPECT_FALSE(osal_timer_is_active(timer))
-            << "Iteration " << test_iter << ": timer should be inactive after creation";
+            << "Iteration " << test_iter
+            << ": timer should be inactive after creation";
 
         /* Start timer - should become active */
         ASSERT_EQ(OSAL_OK, osal_timer_start(timer))
             << "Iteration " << test_iter << ": timer start failed";
 
         EXPECT_TRUE(osal_timer_is_active(timer))
-            << "Iteration " << test_iter << ": timer should be active after start";
+            << "Iteration " << test_iter
+            << ": timer should be active after start";
 
         /* Stop timer - should become inactive */
         ASSERT_EQ(OSAL_OK, osal_timer_stop(timer))
             << "Iteration " << test_iter << ": timer stop failed";
 
         EXPECT_FALSE(osal_timer_is_active(timer))
-            << "Iteration " << test_iter << ": timer should be inactive after stop";
+            << "Iteration " << test_iter
+            << ": timer should be inactive after stop";
 
         /* Start again - should become active */
         ASSERT_EQ(OSAL_OK, osal_timer_start(timer))
             << "Iteration " << test_iter << ": timer restart failed";
 
         EXPECT_TRUE(osal_timer_is_active(timer))
-            << "Iteration " << test_iter << ": timer should be active after restart";
+            << "Iteration " << test_iter
+            << ": timer should be active after restart";
 
         /* For one-shot timers, verify inactive after expiration */
         if (mode == OSAL_TIMER_ONE_SHOT) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(period_ms + 100));
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(period_ms + 100));
 
             EXPECT_FALSE(osal_timer_is_active(timer))
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": one-shot timer should be inactive after expiration";
         } else {
             /* For periodic timers, stop before checking final state */

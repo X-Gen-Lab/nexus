@@ -1154,11 +1154,12 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
  *
  * \details         FreeRTOS timer callbacks receive the timer handle, not a
  *                  user-provided argument. This structure stores the user
- *                  callback and argument, and is stored in the timer's ID field.
+ *                  callback and argument, and is stored in the timer's ID
+ * field.
  */
 typedef struct {
-    osal_timer_callback_t user_callback;  /**< User callback function */
-    void* user_arg;                       /**< User callback argument */
+    osal_timer_callback_t user_callback; /**< User callback function */
+    void* user_arg;                      /**< User callback argument */
 } osal_timer_context_t;
 
 /**
@@ -1172,8 +1173,9 @@ typedef struct {
  */
 static void osal_timer_callback_wrapper(TimerHandle_t xTimer) {
     /* Get the timer context from the timer ID */
-    osal_timer_context_t* ctx = (osal_timer_context_t*)pvTimerGetTimerID(xTimer);
-    
+    osal_timer_context_t* ctx =
+        (osal_timer_context_t*)pvTimerGetTimerID(xTimer);
+
     if (ctx != NULL && ctx->user_callback != NULL) {
         /* Invoke the user callback with the user argument */
         ctx->user_callback(ctx->user_arg);
@@ -1195,21 +1197,21 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     if (config == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     /* Parameter validation - callback must be valid */
     if (config->callback == NULL) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     /* Parameter validation - period must be non-zero */
     if (config->period_ms == 0) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     /* Auto-initialize OSAL if needed */
     if (!s_osal_initialized) {
         osal_status_t status = osal_init();
@@ -1217,45 +1219,47 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
             return status;
         }
     }
-    
+
     /* Allocate timer context for callback argument passing */
-    osal_timer_context_t* ctx = (osal_timer_context_t*)pvPortMalloc(sizeof(osal_timer_context_t));
+    osal_timer_context_t* ctx =
+        (osal_timer_context_t*)pvPortMalloc(sizeof(osal_timer_context_t));
     if (ctx == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     /* Store user callback and argument in context */
     ctx->user_callback = config->callback;
     ctx->user_arg = config->arg;
-    
+
     /* Convert period from milliseconds to ticks */
     TickType_t period_ticks = pdMS_TO_TICKS(config->period_ms);
     if (period_ticks == 0) {
         /* Ensure at least 1 tick period */
         period_ticks = 1;
     }
-    
+
     /* Determine auto-reload setting based on timer mode */
-    BaseType_t auto_reload = (config->mode == OSAL_TIMER_PERIODIC) ? pdTRUE : pdFALSE;
-    
+    BaseType_t auto_reload =
+        (config->mode == OSAL_TIMER_PERIODIC) ? pdTRUE : pdFALSE;
+
     /* Use provided name or default to "timer" */
     const char* timer_name = (config->name != NULL) ? config->name : "timer";
-    
+
     /* Create the FreeRTOS timer */
-    TimerHandle_t timer = xTimerCreate(
-        timer_name,                    /* Timer name */
-        period_ticks,                  /* Timer period in ticks */
-        auto_reload,                   /* Auto-reload (periodic) or one-shot */
-        (void*)ctx,                    /* Timer ID (stores our context) */
-        osal_timer_callback_wrapper    /* Callback wrapper function */
-    );
-    
+    TimerHandle_t timer =
+        xTimerCreate(timer_name,   /* Timer name */
+                     period_ticks, /* Timer period in ticks */
+                     auto_reload,  /* Auto-reload (periodic) or one-shot */
+                     (void*)ctx,   /* Timer ID (stores our context) */
+                     osal_timer_callback_wrapper /* Callback wrapper function */
+        );
+
     if (timer == NULL) {
         /* Timer creation failed - free the context */
         vPortFree(ctx);
         return OSAL_ERROR_NO_MEMORY;
     }
-    
+
     /* Return the timer handle */
     *handle = (osal_timer_handle_t)timer;
     return OSAL_OK;
@@ -1274,12 +1278,12 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /* Get the timer context to free it */
     osal_timer_context_t* ctx = (osal_timer_context_t*)pvTimerGetTimerID(timer);
-    
+
     /* Delete the FreeRTOS timer
      * Use portMAX_DELAY to wait indefinitely for the command to be sent
      * to the timer command queue.
@@ -1287,15 +1291,14 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
     if (xTimerDelete(timer, portMAX_DELAY) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     /* Free the timer context */
     if (ctx != NULL) {
         vPortFree(ctx);
     }
-    
+
     return OSAL_OK;
 }
-
 
 /**
  * \brief           Start a timer
@@ -1311,9 +1314,9 @@ osal_status_t osal_timer_start(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /* Start the timer
      * Use portMAX_DELAY to wait indefinitely for the command to be sent
      * to the timer command queue.
@@ -1321,7 +1324,7 @@ osal_status_t osal_timer_start(osal_timer_handle_t handle) {
     if (xTimerStart(timer, portMAX_DELAY) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     return OSAL_OK;
 }
 
@@ -1338,9 +1341,9 @@ osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /* Stop the timer
      * Use portMAX_DELAY to wait indefinitely for the command to be sent
      * to the timer command queue.
@@ -1348,7 +1351,7 @@ osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
     if (xTimerStop(timer, portMAX_DELAY) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     return OSAL_OK;
 }
 
@@ -1357,7 +1360,8 @@ osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
  *
  * \details         Resets a FreeRTOS software timer using xTimerReset().
  *                  This restarts the timer countdown from the beginning of
- *                  the period. If the timer was not running, it will be started.
+ *                  the period. If the timer was not running, it will be
+ * started.
  *
  * \note            Requirements: 2.3
  */
@@ -1366,9 +1370,9 @@ osal_status_t osal_timer_reset(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /* Reset the timer
      * Use portMAX_DELAY to wait indefinitely for the command to be sent
      * to the timer command queue.
@@ -1376,10 +1380,9 @@ osal_status_t osal_timer_reset(osal_timer_handle_t handle) {
     if (xTimerReset(timer, portMAX_DELAY) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     return OSAL_OK;
 }
-
 
 /**
  * \brief           Change timer period
@@ -1396,21 +1399,21 @@ osal_status_t osal_timer_set_period(osal_timer_handle_t handle,
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     /* Parameter validation - period must be non-zero */
     if (period_ms == 0) {
         return OSAL_ERROR_INVALID_PARAM;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /* Convert period from milliseconds to ticks */
     TickType_t period_ticks = pdMS_TO_TICKS(period_ms);
     if (period_ticks == 0) {
         /* Ensure at least 1 tick period */
         period_ticks = 1;
     }
-    
+
     /* Change the timer period
      * Use portMAX_DELAY to wait indefinitely for the command to be sent
      * to the timer command queue.
@@ -1418,7 +1421,7 @@ osal_status_t osal_timer_set_period(osal_timer_handle_t handle,
     if (xTimerChangePeriod(timer, period_ticks, portMAX_DELAY) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     return OSAL_OK;
 }
 
@@ -1435,13 +1438,12 @@ bool osal_timer_is_active(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return false;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /* Query timer active state */
     return (xTimerIsTimerActive(timer) != pdFALSE);
 }
-
 
 /**
  * \brief           Start timer from ISR context
@@ -1458,9 +1460,9 @@ osal_status_t osal_timer_start_from_isr(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /*
      * Use ISR-safe version of timer start.
      * xHigherPriorityTaskWoken is set to pdTRUE if starting the timer
@@ -1468,17 +1470,17 @@ osal_status_t osal_timer_start_from_isr(osal_timer_handle_t handle) {
      * currently running task.
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
+
     if (xTimerStartFromISR(timer, &xHigherPriorityTaskWoken) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     /*
      * Request a context switch if a higher priority task was woken.
      * This ensures the higher priority task runs as soon as the ISR completes.
      */
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    
+
     return OSAL_OK;
 }
 
@@ -1497,9 +1499,9 @@ osal_status_t osal_timer_stop_from_isr(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /*
      * Use ISR-safe version of timer stop.
      * xHigherPriorityTaskWoken is set to pdTRUE if stopping the timer
@@ -1507,17 +1509,17 @@ osal_status_t osal_timer_stop_from_isr(osal_timer_handle_t handle) {
      * currently running task.
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
+
     if (xTimerStopFromISR(timer, &xHigherPriorityTaskWoken) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     /*
      * Request a context switch if a higher priority task was woken.
      * This ensures the higher priority task runs as soon as the ISR completes.
      */
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    
+
     return OSAL_OK;
 }
 
@@ -1536,9 +1538,9 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) {
     if (handle == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     TimerHandle_t timer = (TimerHandle_t)handle;
-    
+
     /*
      * Use ISR-safe version of timer reset.
      * xHigherPriorityTaskWoken is set to pdTRUE if resetting the timer
@@ -1546,20 +1548,19 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) {
      * currently running task.
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
+
     if (xTimerResetFromISR(timer, &xHigherPriorityTaskWoken) != pdPASS) {
         return OSAL_ERROR;
     }
-    
+
     /*
      * Request a context switch if a higher priority task was woken.
      * This ensures the higher priority task runs as soon as the ISR completes.
      */
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    
+
     return OSAL_OK;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Memory Functions                                                          */
@@ -1568,8 +1569,8 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) {
 /**
  * \brief           Allocate memory
  *
- * \details         Allocates memory from the FreeRTOS heap using pvPortMalloc().
- *                  This function is thread-safe.
+ * \details         Allocates memory from the FreeRTOS heap using
+ * pvPortMalloc(). This function is thread-safe.
  *
  * \note            Requirements: 5.1-5.6
  */
@@ -1578,7 +1579,7 @@ void* osal_mem_alloc(size_t size) {
     if (size == 0) {
         return NULL;
     }
-    
+
     /* Allocate memory using FreeRTOS heap */
     return pvPortMalloc(size);
 }
@@ -1596,18 +1597,17 @@ void osal_mem_free(void* ptr) {
     if (ptr == NULL) {
         return;
     }
-    
+
     /* Free memory using FreeRTOS heap */
     vPortFree(ptr);
 }
-
 
 /**
  * \brief           Allocate and zero-initialize memory
  *
  * \details         Allocates memory from the FreeRTOS heap and initializes
- *                  all bytes to zero. Implemented using pvPortMalloc() + memset().
- *                  This function is thread-safe.
+ *                  all bytes to zero. Implemented using pvPortMalloc() +
+ * memset(). This function is thread-safe.
  *
  * \note            Requirements: 6.1
  */
@@ -1616,24 +1616,24 @@ void* osal_mem_calloc(size_t count, size_t size) {
     if (count == 0 || size == 0) {
         return NULL;
     }
-    
+
     /* Calculate total size with overflow check */
     size_t total_size = count * size;
-    
+
     /* Check for multiplication overflow */
     if (total_size / count != size) {
         return NULL;
     }
-    
+
     /* Allocate memory */
     void* ptr = pvPortMalloc(total_size);
     if (ptr == NULL) {
         return NULL;
     }
-    
+
     /* Zero-initialize the memory */
     memset(ptr, 0, total_size);
-    
+
     return ptr;
 }
 
@@ -1642,8 +1642,8 @@ void* osal_mem_calloc(size_t count, size_t size) {
  *
  * \details         Reallocates memory, preserving the original data up to
  *                  the minimum of old and new sizes. FreeRTOS does not provide
- *                  a native realloc, so this is implemented using pvPortMalloc(),
- *                  memcpy(), and vPortFree().
+ *                  a native realloc, so this is implemented using
+ * pvPortMalloc(), memcpy(), and vPortFree().
  *
  *                  Special cases:
  *                  - If ptr is NULL, behaves like osal_mem_alloc(size)
@@ -1656,38 +1656,37 @@ void* osal_mem_realloc(void* ptr, size_t size) {
     if (ptr == NULL) {
         return osal_mem_alloc(size);
     }
-    
+
     /* If size is 0, free the memory and return NULL */
     if (size == 0) {
         osal_mem_free(ptr);
         return NULL;
     }
-    
+
     /* Allocate new memory block */
     void* new_ptr = pvPortMalloc(size);
     if (new_ptr == NULL) {
         /* Allocation failed - original memory is unchanged */
         return NULL;
     }
-    
+
     /*
      * Copy data from old block to new block.
      * Note: FreeRTOS doesn't provide a way to query the size of an allocation,
      * so we copy 'size' bytes. If the new size is larger than the old size,
      * we may read beyond the original allocation. To be safe, we should
      * only copy up to the new size, which is what we do here.
-     * 
+     *
      * In practice, the caller should know the original size and only use
      * realloc to grow or shrink allocations appropriately.
      */
     memcpy(new_ptr, ptr, size);
-    
+
     /* Free the old memory block */
     vPortFree(ptr);
-    
+
     return new_ptr;
 }
-
 
 /**
  * \brief           Allocate aligned memory
@@ -1707,17 +1706,17 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
     if (size == 0) {
         return NULL;
     }
-    
+
     /* Validate alignment is a power of 2 */
     if (alignment == 0 || (alignment & (alignment - 1)) != 0) {
         return NULL;
     }
-    
+
     /* Ensure minimum alignment of pointer size */
     if (alignment < sizeof(void*)) {
         alignment = sizeof(void*);
     }
-    
+
     /*
      * Calculate total size needed:
      * - Original size
@@ -1725,27 +1724,28 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
      * - Space to store the original pointer (sizeof(void*))
      */
     size_t total_size = size + alignment - 1 + sizeof(void*);
-    
+
     /* Check for overflow */
     if (total_size < size) {
         return NULL;
     }
-    
+
     /* Allocate the memory block */
     void* raw_ptr = pvPortMalloc(total_size);
     if (raw_ptr == NULL) {
         return NULL;
     }
-    
+
     /*
      * Calculate aligned pointer:
      * 1. Add sizeof(void*) to leave room for storing original pointer
      * 2. Add (alignment - 1) and mask off low bits to align
      */
     uintptr_t raw_addr = (uintptr_t)raw_ptr;
-    uintptr_t aligned_addr = (raw_addr + sizeof(void*) + alignment - 1) & ~(alignment - 1);
+    uintptr_t aligned_addr =
+        (raw_addr + sizeof(void*) + alignment - 1) & ~(alignment - 1);
     void* aligned_ptr = (void*)aligned_addr;
-    
+
     /*
      * Store the original pointer just before the aligned pointer.
      * This allows osal_mem_free to work correctly with aligned allocations
@@ -1758,16 +1758,16 @@ void* osal_mem_alloc_aligned(size_t alignment, size_t size) {
      * should not free aligned memory with osal_mem_free.
      */
     ((void**)aligned_ptr)[-1] = raw_ptr;
-    
+
     return aligned_ptr;
 }
-
 
 /**
  * \brief           Get memory statistics
  *
  * \details         Retrieves memory usage statistics from the FreeRTOS heap.
- *                  Uses xPortGetFreeHeapSize() and xPortGetMinimumEverFreeHeapSize().
+ *                  Uses xPortGetFreeHeapSize() and
+ * xPortGetMinimumEverFreeHeapSize().
  *
  * \note            Requirements: 7.1-7.4
  */
@@ -1776,15 +1776,16 @@ osal_status_t osal_mem_get_stats(osal_mem_stats_t* stats) {
     if (stats == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
-    
+
     /*
      * FreeRTOS provides functions to query free heap size and minimum
-     * ever free heap size. The total heap size is defined by configTOTAL_HEAP_SIZE.
+     * ever free heap size. The total heap size is defined by
+     * configTOTAL_HEAP_SIZE.
      */
     stats->total_size = configTOTAL_HEAP_SIZE;
     stats->free_size = xPortGetFreeHeapSize();
     stats->min_free_size = xPortGetMinimumEverFreeHeapSize();
-    
+
     return OSAL_OK;
 }
 
@@ -1966,19 +1967,16 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
     TickType_t ticks = osal_to_freertos_ticks(options->timeout_ms);
 
     /* Map OSAL wait mode to FreeRTOS wait mode */
-    BaseType_t wait_for_all = (options->mode == OSAL_EVENT_WAIT_ALL) ? pdTRUE : pdFALSE;
+    BaseType_t wait_for_all =
+        (options->mode == OSAL_EVENT_WAIT_ALL) ? pdTRUE : pdFALSE;
 
     /* Map OSAL auto-clear to FreeRTOS clear on exit */
     BaseType_t clear_on_exit = options->auto_clear ? pdTRUE : pdFALSE;
 
     /* Wait for the event bits */
-    EventBits_t result = xEventGroupWaitBits(
-        (EventGroupHandle_t)handle,
-        (EventBits_t)bits,
-        clear_on_exit,
-        wait_for_all,
-        ticks
-    );
+    EventBits_t result =
+        xEventGroupWaitBits((EventGroupHandle_t)handle, (EventBits_t)bits,
+                            clear_on_exit, wait_for_all, ticks);
 
     /* Store the result bits if requested */
     if (bits_out != NULL) {
@@ -2055,11 +2053,9 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    BaseType_t result = xEventGroupSetBitsFromISR(
-        (EventGroupHandle_t)handle,
-        (EventBits_t)bits,
-        &xHigherPriorityTaskWoken
-    );
+    BaseType_t result =
+        xEventGroupSetBitsFromISR((EventGroupHandle_t)handle, (EventBits_t)bits,
+                                  &xHigherPriorityTaskWoken);
 
     /* Check if the operation succeeded */
     if (result != pdPASS) {

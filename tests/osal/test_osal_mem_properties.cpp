@@ -59,7 +59,8 @@ class OsalMemPropertyTest : public ::testing::Test {
     }
 
     /**
-     * \brief       Generate random alignment (power of 2: 1, 2, 4, 8, 16, 32, 64)
+     * \brief       Generate random alignment (power of 2: 1, 2, 4, 8, 16, 32,
+     * 64)
      */
     size_t randomAlignment() {
         const size_t alignments[] = {1, 2, 4, 8, 16, 32, 64};
@@ -100,12 +101,14 @@ TEST_F(OsalMemPropertyTest, Property8_MemoryAllocationRoundTrip) {
         /* Allocate memory */
         void* ptr = osal_mem_alloc(alloc_size);
         ASSERT_NE(nullptr, ptr)
-            << "Iteration " << test_iter << ": allocation failed for size " << alloc_size;
+            << "Iteration " << test_iter << ": allocation failed for size "
+            << alloc_size;
 
         /* Verify free size decreased */
         size_t free_after_alloc = osal_mem_get_free_size();
         EXPECT_LT(free_after_alloc, free_before)
-            << "Iteration " << test_iter << ": free size should decrease after allocation";
+            << "Iteration " << test_iter
+            << ": free size should decrease after allocation";
 
         /* Free memory */
         osal_mem_free(ptr);
@@ -113,19 +116,21 @@ TEST_F(OsalMemPropertyTest, Property8_MemoryAllocationRoundTrip) {
         /* Get free heap size after free */
         size_t free_after_free = osal_mem_get_free_size();
 
-        /* Verify free size increased back (allowing for small overhead/fragmentation) */
+        /* Verify free size increased back (allowing for small
+         * overhead/fragmentation) */
         EXPECT_GE(free_after_free, free_after_alloc)
-            << "Iteration " << test_iter << ": free size should increase after free "
+            << "Iteration " << test_iter
+            << ": free size should increase after free "
             << "(before=" << free_before << ", after_alloc=" << free_after_alloc
             << ", after_free=" << free_after_free << ")";
 
         /* Free size should be close to original (within reasonable overhead) */
-        size_t diff = (free_before > free_after_free) 
-                      ? (free_before - free_after_free) 
-                      : (free_after_free - free_before);
-        EXPECT_LE(diff, 128)
-            << "Iteration " << test_iter << ": free size should return to approximately "
-            << "the same level (diff=" << diff << " bytes)";
+        size_t diff = (free_before > free_after_free)
+                          ? (free_before - free_after_free)
+                          : (free_after_free - free_before);
+        EXPECT_LE(diff, 128) << "Iteration " << test_iter
+                             << ": free size should return to approximately "
+                             << "the same level (diff=" << diff << " bytes)";
     }
 }
 
@@ -150,14 +155,15 @@ TEST_F(OsalMemPropertyTest, Property9_CallocZeroInitialization) {
         /* Allocate memory with calloc */
         uint8_t* ptr = static_cast<uint8_t*>(osal_mem_calloc(count, size));
         ASSERT_NE(nullptr, ptr)
-            << "Iteration " << test_iter << ": calloc failed for count=" 
-            << count << ", size=" << size;
+            << "Iteration " << test_iter
+            << ": calloc failed for count=" << count << ", size=" << size;
 
         /* Verify all bytes are zero */
         size_t total_bytes = count * size;
         for (size_t i = 0; i < total_bytes; ++i) {
             EXPECT_EQ(0, ptr[i])
-                << "Iteration " << test_iter << ": byte " << i << " is not zero "
+                << "Iteration " << test_iter << ": byte " << i
+                << " is not zero "
                 << "(count=" << count << ", size=" << size << ")";
         }
 
@@ -187,7 +193,8 @@ TEST_F(OsalMemPropertyTest, Property10_ReallocDataPreservation) {
         /* Allocate initial memory */
         uint8_t* ptr = static_cast<uint8_t*>(osal_mem_alloc(old_size));
         ASSERT_NE(nullptr, ptr)
-            << "Iteration " << test_iter << ": initial allocation failed for size " << old_size;
+            << "Iteration " << test_iter
+            << ": initial allocation failed for size " << old_size;
 
         /* Fill with random pattern */
         std::vector<uint8_t> pattern(old_size);
@@ -197,7 +204,8 @@ TEST_F(OsalMemPropertyTest, Property10_ReallocDataPreservation) {
         }
 
         /* Reallocate to larger size */
-        uint8_t* new_ptr = static_cast<uint8_t*>(osal_mem_realloc(ptr, new_size));
+        uint8_t* new_ptr =
+            static_cast<uint8_t*>(osal_mem_realloc(ptr, new_size));
         ASSERT_NE(nullptr, new_ptr)
             << "Iteration " << test_iter << ": realloc failed "
             << "(old_size=" << old_size << ", new_size=" << new_size << ")";
@@ -205,7 +213,8 @@ TEST_F(OsalMemPropertyTest, Property10_ReallocDataPreservation) {
         /* Verify original data is preserved */
         for (size_t i = 0; i < old_size; ++i) {
             EXPECT_EQ(pattern[i], new_ptr[i])
-                << "Iteration " << test_iter << ": byte " << i << " was not preserved "
+                << "Iteration " << test_iter << ": byte " << i
+                << " was not preserved "
                 << "(old_size=" << old_size << ", new_size=" << new_size << ")";
         }
 
@@ -242,7 +251,8 @@ TEST_F(OsalMemPropertyTest, Property11_AlignedAllocationAlignment) {
         uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
         EXPECT_EQ(0u, addr % alignment)
             << "Iteration " << test_iter << ": pointer is not aligned "
-            << "(alignment=" << alignment << ", addr=0x" << std::hex << addr << std::dec << ")";
+            << "(alignment=" << alignment << ", addr=0x" << std::hex << addr
+            << std::dec << ")";
 
         /* Verify memory is usable (write and read) */
         uint8_t* byte_ptr = static_cast<uint8_t*>(ptr);
@@ -287,25 +297,26 @@ TEST_F(OsalMemPropertyTest, Property12_MemoryStatisticsConsistency) {
         for (int i = 0; i < alloc_count; ++i) {
             size_t alloc_size = randomSmallSize();
             void* ptr = osal_mem_alloc(alloc_size);
-            
+
             if (ptr != nullptr) {
                 allocations.push_back(ptr);
 
                 /* Verify free size decreased */
                 size_t current_free = osal_mem_get_free_size();
                 EXPECT_LE(current_free, prev_free)
-                    << "Iteration " << test_iter << ", alloc " << i 
-                    << ": free size should decrease or stay same after allocation";
+                    << "Iteration " << test_iter << ", alloc " << i
+                    << ": free size should decrease or stay same after "
+                       "allocation";
 
                 /* Verify min free size never increases */
                 size_t current_min_free = osal_mem_get_min_free_size();
                 EXPECT_LE(current_min_free, prev_min_free)
-                    << "Iteration " << test_iter << ", alloc " << i 
+                    << "Iteration " << test_iter << ", alloc " << i
                     << ": min free size should never increase";
 
                 /* Verify min free size <= current free size */
                 EXPECT_LE(current_min_free, current_free)
-                    << "Iteration " << test_iter << ", alloc " << i 
+                    << "Iteration " << test_iter << ", alloc " << i
                     << ": min free size should be <= current free size";
 
                 prev_free = current_free;
@@ -316,19 +327,19 @@ TEST_F(OsalMemPropertyTest, Property12_MemoryStatisticsConsistency) {
         /* Free all allocations and verify statistics */
         for (void* ptr : allocations) {
             size_t free_before = osal_mem_get_free_size();
-            
+
             osal_mem_free(ptr);
 
             /* Verify free size increased */
             size_t free_after = osal_mem_get_free_size();
             EXPECT_GE(free_after, free_before)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": free size should increase after free";
 
             /* Verify min free size still never increases */
             size_t current_min_free = osal_mem_get_min_free_size();
             EXPECT_LE(current_min_free, prev_min_free)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": min free size should never increase even after free";
 
             prev_min_free = current_min_free;

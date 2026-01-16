@@ -27,9 +27,9 @@ extern "C" {
  * \brief           Memory statistics structure
  */
 typedef struct {
-    size_t total_size;      /**< Total heap size in bytes */
-    size_t free_size;       /**< Current free heap size in bytes */
-    size_t min_free_size;   /**< Minimum ever free heap size (watermark) */
+    size_t total_size;    /**< Total heap size in bytes */
+    size_t free_size;     /**< Current free heap size in bytes */
+    size_t min_free_size; /**< Minimum ever free heap size (watermark) */
 } osal_mem_stats_t;
 
 /**
@@ -66,7 +66,8 @@ void* osal_mem_calloc(size_t count, size_t size);
  * \return          Pointer to reallocated memory, NULL on failure
  * \note            If ptr is NULL, behaves like osal_mem_alloc
  * \note            If size is zero, frees the memory and returns NULL
- * \note            Original data is preserved up to the minimum of old and new sizes
+ * \note            Original data is preserved up to the minimum of old and new
+ * sizes
  * \note            This function is thread-safe
  */
 void* osal_mem_realloc(void* ptr, size_t size);
@@ -100,7 +101,8 @@ size_t osal_mem_get_free_size(void);
 /**
  * \brief           Get minimum ever free heap size
  * \return          Minimum free heap size in bytes (watermark)
- * \note            This value represents the lowest free heap size since system start
+ * \note            This value represents the lowest free heap size since system
+ * start
  */
 size_t osal_mem_get_min_free_size(void);
 

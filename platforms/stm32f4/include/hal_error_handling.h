@@ -256,9 +256,8 @@ nx_wait_flag_set(volatile uint32_t* reg, uint32_t flag, uint32_t timeout_ms) {
  * infinite) \return          NX_WAIT_OK if flag cleared, NX_WAIT_TIMEOUT if
  * timeout
  */
-static inline nx_wait_result_t nx_wait_flag_clear(volatile uint32_t* reg,
-                                                  uint32_t flag,
-                                                  uint32_t timeout_ms) {
+static inline nx_wait_result_t
+nx_wait_flag_clear(volatile uint32_t* reg, uint32_t flag, uint32_t timeout_ms) {
     uint32_t start = nx_get_tick();
 
     while ((*reg & flag) != 0) {

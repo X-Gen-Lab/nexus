@@ -87,7 +87,8 @@ osal_status_t osal_event_clear(osal_event_handle_t handle,
  * \param[in]       handle: Event flags handle
  * \param[in]       bits: Bits to wait for
  * \param[in]       options: Wait options (mode, auto-clear, timeout)
- * \param[out]      bits_out: Pointer to store actual bits that satisfied condition (optional)
+ * \param[out]      bits_out: Pointer to store actual bits that satisfied
+ * condition (optional)
  * \return          OSAL_OK on success, error code otherwise
  */
 osal_status_t osal_event_wait(osal_event_handle_t handle,

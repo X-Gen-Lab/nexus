@@ -8,7 +8,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * \details         Unit tests for OSAL Event Flags module.
- *                  Requirements: 1.1-1.6, 2.1-2.5, 3.1-3.5, 4.1-4.9, 5.1-5.4, 6.1-6.3, 8.2-8.3
+ *                  Requirements: 1.1-1.6, 2.1-2.5, 3.1-3.5, 4.1-4.9, 5.1-5.4, 6.1-6.3,
+ * 8.2-8.3
  */
 
 #include <atomic>
@@ -231,11 +232,8 @@ TEST_F(OsalEventTest, WaitAllMode) {
 
     /* Wait for all bits 0 and 2 - should succeed immediately */
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ALL,
-        .auto_clear = false,
-        .timeout_ms = 100
-    };
-    
+        .mode = OSAL_EVENT_WAIT_ALL, .auto_clear = false, .timeout_ms = 100};
+
     osal_event_bits_t bits_out = 0;
     EXPECT_EQ(OSAL_OK, osal_event_wait(handle, 0x05, &options, &bits_out));
     EXPECT_EQ(0x05, bits_out);
@@ -256,11 +254,8 @@ TEST_F(OsalEventTest, WaitAnyMode) {
 
     /* Wait for any of bits 0, 1, or 2 - should succeed immediately */
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ANY,
-        .auto_clear = false,
-        .timeout_ms = 100
-    };
-    
+        .mode = OSAL_EVENT_WAIT_ANY, .auto_clear = false, .timeout_ms = 100};
+
     osal_event_bits_t bits_out = 0;
     EXPECT_EQ(OSAL_OK, osal_event_wait(handle, 0x07, &options, &bits_out));
     EXPECT_EQ(0x01, bits_out);
@@ -281,14 +276,11 @@ TEST_F(OsalEventTest, WaitWithAutoClear) {
 
     /* Wait with auto-clear */
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ANY,
-        .auto_clear = true,
-        .timeout_ms = 100
-    };
-    
+        .mode = OSAL_EVENT_WAIT_ANY, .auto_clear = true, .timeout_ms = 100};
+
     osal_event_bits_t bits_out = 0;
     EXPECT_EQ(OSAL_OK, osal_event_wait(handle, 0x03, &options, &bits_out));
-    
+
     /* Bits 0 and 1 should be cleared */
     EXPECT_EQ(0x0C, osal_event_get(handle));
 
@@ -308,14 +300,11 @@ TEST_F(OsalEventTest, WaitWithoutAutoClear) {
 
     /* Wait without auto-clear */
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ANY,
-        .auto_clear = false,
-        .timeout_ms = 100
-    };
-    
+        .mode = OSAL_EVENT_WAIT_ANY, .auto_clear = false, .timeout_ms = 100};
+
     osal_event_bits_t bits_out = 0;
     EXPECT_EQ(OSAL_OK, osal_event_wait(handle, 0x03, &options, &bits_out));
-    
+
     /* All bits should still be set */
     EXPECT_EQ(0x0F, osal_event_get(handle));
 
@@ -334,15 +323,13 @@ TEST_F(OsalEventTest, WaitTimeout) {
 
     /* Wait for bits that aren't set - should timeout */
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ALL,
-        .auto_clear = false,
-        .timeout_ms = 100
-    };
-    
+        .mode = OSAL_EVENT_WAIT_ALL, .auto_clear = false, .timeout_ms = 100};
+
     auto start = std::chrono::steady_clock::now();
     osal_status_t status = osal_event_wait(handle, 0x01, &options, nullptr);
     auto elapsed = std::chrono::steady_clock::now() - start;
-    auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+    auto elapsed_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 
     EXPECT_EQ(OSAL_ERROR_TIMEOUT, status);
     EXPECT_GE(elapsed_ms, 80); /* Should have waited at least ~100ms */
@@ -352,7 +339,8 @@ TEST_F(OsalEventTest, WaitTimeout) {
 
 /**
  * \brief           Test wait immediate return when condition met
- * \details         Requirements 4.9 - Should return immediately if condition met
+ * \details         Requirements 4.9 - Should return immediately if condition
+ * met
  */
 TEST_F(OsalEventTest, WaitImmediateReturn) {
     osal_event_handle_t handle = nullptr;
@@ -363,15 +351,13 @@ TEST_F(OsalEventTest, WaitImmediateReturn) {
 
     /* Wait should return immediately */
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ANY,
-        .auto_clear = false,
-        .timeout_ms = 1000
-    };
-    
+        .mode = OSAL_EVENT_WAIT_ANY, .auto_clear = false, .timeout_ms = 1000};
+
     auto start = std::chrono::steady_clock::now();
     EXPECT_EQ(OSAL_OK, osal_event_wait(handle, 0x01, &options, nullptr));
     auto elapsed = std::chrono::steady_clock::now() - start;
-    auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+    auto elapsed_ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 
     EXPECT_LT(elapsed_ms, 50); /* Should return quickly */
 
@@ -384,12 +370,10 @@ TEST_F(OsalEventTest, WaitImmediateReturn) {
  */
 TEST_F(OsalEventTest, WaitWithNullHandle) {
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ANY,
-        .auto_clear = false,
-        .timeout_ms = 100
-    };
-    
-    EXPECT_EQ(OSAL_ERROR_NULL_POINTER, osal_event_wait(nullptr, 0x01, &options, nullptr));
+        .mode = OSAL_EVENT_WAIT_ANY, .auto_clear = false, .timeout_ms = 100};
+
+    EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+              osal_event_wait(nullptr, 0x01, &options, nullptr));
 }
 
 /**
@@ -401,12 +385,10 @@ TEST_F(OsalEventTest, WaitWithZeroMask) {
     EXPECT_EQ(OSAL_OK, osal_event_create(&handle));
 
     osal_event_wait_options_t options = {
-        .mode = OSAL_EVENT_WAIT_ANY,
-        .auto_clear = false,
-        .timeout_ms = 100
-    };
-    
-    EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, osal_event_wait(handle, 0x00, &options, nullptr));
+        .mode = OSAL_EVENT_WAIT_ANY, .auto_clear = false, .timeout_ms = 100};
+
+    EXPECT_EQ(OSAL_ERROR_INVALID_PARAM,
+              osal_event_wait(handle, 0x00, &options, nullptr));
 
     EXPECT_EQ(OSAL_OK, osal_event_delete(handle));
 }
@@ -450,7 +432,7 @@ TEST_F(OsalEventTest, GetDoesNotModifyBits) {
     EXPECT_EQ(OSAL_OK, osal_event_create(&handle));
 
     EXPECT_EQ(OSAL_OK, osal_event_set(handle, 0x55));
-    
+
     /* Get multiple times */
     EXPECT_EQ(0x55, osal_event_get(handle));
     EXPECT_EQ(0x55, osal_event_get(handle));
@@ -515,7 +497,7 @@ TEST_F(OsalEventTest, TwentyFourBitSupport) {
     /* Set all 24 bits */
     osal_event_bits_t all_24_bits = 0x00FFFFFF;
     EXPECT_EQ(OSAL_OK, osal_event_set(handle, all_24_bits));
-    
+
     /* Verify all 24 bits are set */
     osal_event_bits_t result = osal_event_get(handle);
     EXPECT_EQ(all_24_bits, result & all_24_bits);
@@ -630,14 +612,13 @@ TEST_F(OsalEventTest, ConcurrentWaitOperations) {
     for (int i = 0; i < num_waiters; ++i) {
         threads.emplace_back([&]() {
             tasks_started++;
-            
-            osal_event_wait_options_t options = {
-                .mode = OSAL_EVENT_WAIT_ANY,
-                .auto_clear = false,
-                .timeout_ms = 2000
-            };
-            
-            osal_status_t status = osal_event_wait(handle, 0x01, &options, nullptr);
+
+            osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ANY,
+                                                 .auto_clear = false,
+                                                 .timeout_ms = 2000};
+
+            osal_status_t status =
+                osal_event_wait(handle, 0x01, &options, nullptr);
             if (status == OSAL_OK) {
                 tasks_woke_up++;
             }
@@ -683,13 +664,12 @@ TEST_F(OsalEventTest, SetClearWaitRaceConditions) {
     /* Waiter thread - repeatedly waits for bit 0 */
     std::thread waiter([&]() {
         while (test_running) {
-            osal_event_wait_options_t options = {
-                .mode = OSAL_EVENT_WAIT_ANY,
-                .auto_clear = true,
-                .timeout_ms = 100
-            };
-            
-            osal_status_t status = osal_event_wait(handle, 0x01, &options, nullptr);
+            osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ANY,
+                                                 .auto_clear = true,
+                                                 .timeout_ms = 100};
+
+            osal_status_t status =
+                osal_event_wait(handle, 0x01, &options, nullptr);
             if (status == OSAL_OK) {
                 successful_waits++;
             }
@@ -727,8 +707,9 @@ TEST_F(OsalEventTest, SetClearWaitRaceConditions) {
     /* Verify operations occurred */
     EXPECT_GT(set_operations.load(), 0);
     EXPECT_GT(clear_operations.load(), 0);
-    
-    /* We should have had some successful waits (not all will succeed due to clears) */
+
+    /* We should have had some successful waits (not all will succeed due to
+     * clears) */
     EXPECT_GT(successful_waits.load(), 0);
 
     EXPECT_EQ(OSAL_OK, osal_event_delete(handle));

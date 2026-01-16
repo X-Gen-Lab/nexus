@@ -78,13 +78,11 @@ static void test_timer_callback_with_arg(void* arg) {
  *                  parameters
  */
 TEST_F(OsalTimerTest, CreateTimerValid) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     EXPECT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -99,13 +97,11 @@ TEST_F(OsalTimerTest, CreateTimerValid) {
  * \details         Requirements 1.2 - Should return OSAL_ERROR_NULL_POINTER
  */
 TEST_F(OsalTimerTest, CreateTimerNullHandle) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     EXPECT_EQ(OSAL_ERROR_NULL_POINTER, osal_timer_create(&config, nullptr));
 }
@@ -115,13 +111,11 @@ TEST_F(OsalTimerTest, CreateTimerNullHandle) {
  * \details         Requirements 1.3 - Should return OSAL_ERROR_INVALID_PARAM
  */
 TEST_F(OsalTimerTest, CreateTimerNullCallback) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = nullptr,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = nullptr,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, osal_timer_create(&config, &timer));
@@ -132,13 +126,11 @@ TEST_F(OsalTimerTest, CreateTimerNullCallback) {
  * \details         Requirements 1.4 - Should return OSAL_ERROR_INVALID_PARAM
  */
 TEST_F(OsalTimerTest, CreateTimerZeroPeriod) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 0,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 0,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, osal_timer_create(&config, &timer));
@@ -149,13 +141,11 @@ TEST_F(OsalTimerTest, CreateTimerZeroPeriod) {
  * \details         Requirements 1.6 - Should support one-shot mode
  */
 TEST_F(OsalTimerTest, CreateOneShotTimer) {
-    osal_timer_config_t config = {
-        .name = "oneshot_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "oneshot_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     EXPECT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -169,13 +159,11 @@ TEST_F(OsalTimerTest, CreateOneShotTimer) {
  * \details         Requirements 1.6 - Should support periodic mode
  */
 TEST_F(OsalTimerTest, CreatePeriodicTimer) {
-    osal_timer_config_t config = {
-        .name = "periodic_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_PERIODIC,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "periodic_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_PERIODIC,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     EXPECT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -196,13 +184,11 @@ TEST_F(OsalTimerTest, StartTimer) {
     s_test_state.callback_count = 0;
     s_test_state.callback_invoked = false;
 
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -226,13 +212,11 @@ TEST_F(OsalTimerTest, StopTimer) {
     s_test_state.callback_count = 0;
     s_test_state.callback_invoked = false;
 
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_PERIODIC,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_PERIODIC,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -261,13 +245,11 @@ TEST_F(OsalTimerTest, ResetTimer) {
     s_test_state.callback_count = 0;
     s_test_state.callback_invoked = false;
 
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -294,13 +276,11 @@ TEST_F(OsalTimerTest, ResetTimer) {
  * \details         Requirements 2.4 - Timer should release resources
  */
 TEST_F(OsalTimerTest, DeleteTimer) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -328,13 +308,11 @@ TEST_F(OsalTimerTest, PeriodicTimerAutoRestart) {
     s_test_state.callback_count = 0;
     s_test_state.callback_invoked = false;
 
-    osal_timer_config_t config = {
-        .name = "periodic_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_PERIODIC,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "periodic_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_PERIODIC,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -358,13 +336,11 @@ TEST_F(OsalTimerTest, OneShotTimerStopsAfterFiring) {
     s_test_state.callback_count = 0;
     s_test_state.callback_invoked = false;
 
-    osal_timer_config_t config = {
-        .name = "oneshot_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "oneshot_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -397,13 +373,11 @@ TEST_F(OsalTimerTest, CallbackWithCorrectArgument) {
 
     int test_value = 12345;
 
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback_with_arg,
-        .arg = &test_value
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback_with_arg,
+                                  .arg = &test_value};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -423,13 +397,11 @@ TEST_F(OsalTimerTest, CallbackWithCorrectArgument) {
  * \details         Requirements 3.4 - Timer should be inactive after creation
  */
 TEST_F(OsalTimerTest, IsActiveAfterCreation) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -444,13 +416,11 @@ TEST_F(OsalTimerTest, IsActiveAfterCreation) {
  * \details         Requirements 3.4 - Timer should be active after start
  */
 TEST_F(OsalTimerTest, IsActiveAfterStart) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_PERIODIC,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_PERIODIC,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -467,13 +437,11 @@ TEST_F(OsalTimerTest, IsActiveAfterStart) {
  * \details         Requirements 3.4 - Timer should be inactive after stop
  */
 TEST_F(OsalTimerTest, IsActiveAfterStop) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_PERIODIC,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_PERIODIC,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -494,13 +462,11 @@ TEST_F(OsalTimerTest, IsActiveAfterOneShotExpiration) {
     s_test_state.callback_count = 0;
     s_test_state.callback_invoked = false;
 
-    osal_timer_config_t config = {
-        .name = "oneshot_timer",
-        .period_ms = 50,
-        .mode = OSAL_TIMER_ONE_SHOT,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "oneshot_timer",
+                                  .period_ms = 50,
+                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));
@@ -520,13 +486,11 @@ TEST_F(OsalTimerTest, IsActiveAfterOneShotExpiration) {
  * \details         Requirements 3.4 - Timer state should transition correctly
  */
 TEST_F(OsalTimerTest, TimerStateTransitions) {
-    osal_timer_config_t config = {
-        .name = "test_timer",
-        .period_ms = 100,
-        .mode = OSAL_TIMER_PERIODIC,
-        .callback = test_timer_callback,
-        .arg = nullptr
-    };
+    osal_timer_config_t config = {.name = "test_timer",
+                                  .period_ms = 100,
+                                  .mode = OSAL_TIMER_PERIODIC,
+                                  .callback = test_timer_callback,
+                                  .arg = nullptr};
 
     osal_timer_handle_t timer = nullptr;
     ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer));

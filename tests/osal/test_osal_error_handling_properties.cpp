@@ -8,8 +8,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * Property-based tests for OSAL error handling across Timer and Memory modules.
- * These tests verify universal properties that should hold for all error conditions.
- * Each property test runs 100+ iterations with random inputs.
+ * These tests verify universal properties that should hold for all error
+ * conditions. Each property test runs 100+ iterations with random inputs.
  */
 
 #include <gtest/gtest.h>
@@ -65,7 +65,8 @@ class OsalErrorHandlingPropertyTest : public ::testing::Test {
     }
 
     /**
-     * \brief       Generate random alignment (power of 2: 1, 2, 4, 8, 16, 32, 64)
+     * \brief       Generate random alignment (power of 2: 1, 2, 4, 8, 16, 32,
+     * 64)
      */
     size_t randomAlignment() {
         const size_t alignments[] = {1, 2, 4, 8, 16, 32, 64};
@@ -98,18 +99,17 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
         /* Test Timer Functions with NULL handle pointer */
         {
             /* osal_timer_create with NULL handle pointer */
-            osal_timer_config_t config = {
-                .name = "test_timer",
-                .period_ms = randomPeriod(),
-                .mode = randomMode(),
-                .callback = dummy_timer_callback,
-                .arg = nullptr
-            };
+            osal_timer_config_t config = {.name = "test_timer",
+                                          .period_ms = randomPeriod(),
+                                          .mode = randomMode(),
+                                          .callback = dummy_timer_callback,
+                                          .arg = nullptr};
 
             osal_status_t status = osal_timer_create(&config, nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_create should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_create should return OSAL_ERROR_NULL_POINTER "
+                   "for NULL handle";
         }
 
         /* Test Timer Functions with NULL timer handle */
@@ -117,50 +117,58 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
             /* osal_timer_delete with NULL handle */
             osal_status_t status = osal_timer_delete(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_delete should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_delete should return OSAL_ERROR_NULL_POINTER "
+                   "for NULL handle";
 
             /* osal_timer_start with NULL handle */
             status = osal_timer_start(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_start should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_start should return OSAL_ERROR_NULL_POINTER "
+                   "for NULL handle";
 
             /* osal_timer_stop with NULL handle */
             status = osal_timer_stop(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_stop should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_stop should return OSAL_ERROR_NULL_POINTER "
+                   "for NULL handle";
 
             /* osal_timer_reset with NULL handle */
             status = osal_timer_reset(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_reset should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_reset should return OSAL_ERROR_NULL_POINTER "
+                   "for NULL handle";
 
             /* osal_timer_set_period with NULL handle */
             status = osal_timer_set_period(nullptr, randomPeriod());
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_set_period should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_set_period should return "
+                   "OSAL_ERROR_NULL_POINTER for NULL handle";
 
             /* osal_timer_start_from_isr with NULL handle */
             status = osal_timer_start_from_isr(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_start_from_isr should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_start_from_isr should return "
+                   "OSAL_ERROR_NULL_POINTER for NULL handle";
 
             /* osal_timer_stop_from_isr with NULL handle */
             status = osal_timer_stop_from_isr(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_stop_from_isr should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_stop_from_isr should return "
+                   "OSAL_ERROR_NULL_POINTER for NULL handle";
 
             /* osal_timer_reset_from_isr with NULL handle */
             status = osal_timer_reset_from_isr(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_reset_from_isr should return OSAL_ERROR_NULL_POINTER for NULL handle";
+                << "Iteration " << test_iter
+                << ": osal_timer_reset_from_isr should return "
+                   "OSAL_ERROR_NULL_POINTER for NULL handle";
         }
 
         /* Test osal_timer_is_active with NULL handle */
@@ -168,7 +176,7 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
             /* osal_timer_is_active should return false for NULL handle */
             bool is_active = osal_timer_is_active(nullptr);
             EXPECT_FALSE(is_active)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": osal_timer_is_active should return false for NULL handle";
         }
 
@@ -177,8 +185,9 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
             /* osal_mem_get_stats with NULL stats pointer */
             osal_status_t status = osal_mem_get_stats(nullptr);
             EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter 
-                << ": osal_mem_get_stats should return OSAL_ERROR_NULL_POINTER for NULL stats";
+                << "Iteration " << test_iter
+                << ": osal_mem_get_stats should return OSAL_ERROR_NULL_POINTER "
+                   "for NULL stats";
         }
 
         /* Test osal_mem_free with NULL pointer (should be safe no-op) */
@@ -186,12 +195,11 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
             /* osal_mem_free with NULL should not crash */
             osal_mem_free(nullptr);
             /* If we reach here without crashing, the test passes */
-            SUCCEED() << "Iteration " << test_iter 
+            SUCCEED() << "Iteration " << test_iter
                       << ": osal_mem_free safely handled NULL pointer";
         }
     }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Property 14: Invalid Parameter Error Handling                             */
@@ -201,11 +209,13 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
  * Feature: osal-timer-memory, Property 14: Invalid Parameter Error Handling
  *
  * *For any* function with parameter constraints (e.g., non-zero period, valid
- * alignment), violating those constraints SHALL return OSAL_ERROR_INVALID_PARAM.
+ * alignment), violating those constraints SHALL return
+ * OSAL_ERROR_INVALID_PARAM.
  *
  * **Validates: Requirements 8.3**
  */
-TEST_F(OsalErrorHandlingPropertyTest, Property14_InvalidParameterErrorHandling) {
+TEST_F(OsalErrorHandlingPropertyTest,
+       Property14_InvalidParameterErrorHandling) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Test Timer Functions with invalid parameters */
         {
@@ -214,41 +224,40 @@ TEST_F(OsalErrorHandlingPropertyTest, Property14_InvalidParameterErrorHandling) 
                 .name = "test_timer",
                 .period_ms = randomPeriod(),
                 .mode = randomMode(),
-                .callback = nullptr,  /* Invalid: NULL callback */
-                .arg = nullptr
-            };
+                .callback = nullptr, /* Invalid: NULL callback */
+                .arg = nullptr};
 
             osal_timer_handle_t timer = nullptr;
-            osal_status_t status = osal_timer_create(&config_null_callback, &timer);
+            osal_status_t status =
+                osal_timer_create(&config_null_callback, &timer);
             EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_create should return OSAL_ERROR_INVALID_PARAM for NULL callback";
+                << "Iteration " << test_iter
+                << ": osal_timer_create should return OSAL_ERROR_INVALID_PARAM "
+                   "for NULL callback";
 
             /* osal_timer_create with zero period */
             osal_timer_config_t config_zero_period = {
                 .name = "test_timer",
-                .period_ms = 0,  /* Invalid: zero period */
+                .period_ms = 0, /* Invalid: zero period */
                 .mode = randomMode(),
                 .callback = dummy_timer_callback,
-                .arg = nullptr
-            };
+                .arg = nullptr};
 
             status = osal_timer_create(&config_zero_period, &timer);
             EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_create should return OSAL_ERROR_INVALID_PARAM for zero period";
+                << "Iteration " << test_iter
+                << ": osal_timer_create should return OSAL_ERROR_INVALID_PARAM "
+                   "for zero period";
         }
 
         /* Test osal_timer_set_period with zero period */
         {
             /* First create a valid timer */
-            osal_timer_config_t config = {
-                .name = "test_timer",
-                .period_ms = randomPeriod(),
-                .mode = randomMode(),
-                .callback = dummy_timer_callback,
-                .arg = nullptr
-            };
+            osal_timer_config_t config = {.name = "test_timer",
+                                          .period_ms = randomPeriod(),
+                                          .mode = randomMode(),
+                                          .callback = dummy_timer_callback,
+                                          .arg = nullptr};
 
             osal_timer_handle_t timer = nullptr;
             osal_status_t status = osal_timer_create(&config, &timer);
@@ -258,8 +267,9 @@ TEST_F(OsalErrorHandlingPropertyTest, Property14_InvalidParameterErrorHandling) 
             /* Try to set zero period */
             status = osal_timer_set_period(timer, 0);
             EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
-                << "Iteration " << test_iter 
-                << ": osal_timer_set_period should return OSAL_ERROR_INVALID_PARAM for zero period";
+                << "Iteration " << test_iter
+                << ": osal_timer_set_period should return "
+                   "OSAL_ERROR_INVALID_PARAM for zero period";
 
             /* Clean up */
             osal_timer_delete(timer);
@@ -270,19 +280,19 @@ TEST_F(OsalErrorHandlingPropertyTest, Property14_InvalidParameterErrorHandling) 
             /* osal_mem_alloc with zero size should return NULL */
             void* ptr = osal_mem_alloc(0);
             EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": osal_mem_alloc should return NULL for zero size";
 
             /* osal_mem_calloc with zero count should return NULL */
             ptr = osal_mem_calloc(0, randomSize());
             EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": osal_mem_calloc should return NULL for zero count";
 
             /* osal_mem_calloc with zero size should return NULL */
             ptr = osal_mem_calloc(randomSize(), 0);
             EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": osal_mem_calloc should return NULL for zero size";
 
             /* osal_mem_realloc with zero size should free and return NULL */
@@ -290,27 +300,29 @@ TEST_F(OsalErrorHandlingPropertyTest, Property14_InvalidParameterErrorHandling) 
             if (alloc_ptr != nullptr) {
                 ptr = osal_mem_realloc(alloc_ptr, 0);
                 EXPECT_EQ(nullptr, ptr)
-                    << "Iteration " << test_iter 
+                    << "Iteration " << test_iter
                     << ": osal_mem_realloc should return NULL for zero size";
-                /* Note: alloc_ptr should be freed by realloc, don't free again */
+                /* Note: alloc_ptr should be freed by realloc, don't free again
+                 */
             }
 
             /* osal_mem_alloc_aligned with invalid alignment (not power of 2) */
             /* Test various non-power-of-2 values */
-            const size_t invalid_alignments[] = {3, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15};
+            const size_t invalid_alignments[] = {3,  5,  6,  7,  9, 10,
+                                                 11, 12, 13, 14, 15};
             std::uniform_int_distribution<size_t> align_dist(0, 10);
             size_t invalid_alignment = invalid_alignments[align_dist(rng)];
-            
+
             ptr = osal_mem_alloc_aligned(invalid_alignment, randomSize());
-            EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter 
-                << ": osal_mem_alloc_aligned should return NULL for invalid alignment "
-                << invalid_alignment;
+            EXPECT_EQ(nullptr, ptr) << "Iteration " << test_iter
+                                    << ": osal_mem_alloc_aligned should return "
+                                       "NULL for invalid alignment "
+                                    << invalid_alignment;
 
             /* osal_mem_alloc_aligned with zero size should return NULL */
             ptr = osal_mem_alloc_aligned(randomAlignment(), 0);
             EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter 
+                << "Iteration " << test_iter
                 << ": osal_mem_alloc_aligned should return NULL for zero size";
         }
     }

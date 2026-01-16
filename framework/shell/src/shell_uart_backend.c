@@ -94,8 +94,8 @@ static int uart_backend_write(const uint8_t* data, int len) {
     }
 
     /* Transmit data */
-    nx_status_t status = tx_sync->send(tx_sync, data, (size_t)len,
-                                       UART_WRITE_TIMEOUT_MS);
+    nx_status_t status =
+        tx_sync->send(tx_sync, data, (size_t)len, UART_WRITE_TIMEOUT_MS);
     if (status != NX_OK) {
         return 0;
     }
@@ -110,10 +110,8 @@ static int uart_backend_write(const uint8_t* data, int len) {
 /**
  * \brief           UART backend instance
  */
-const shell_backend_t shell_uart_backend = {
-    .read = uart_backend_read,
-    .write = uart_backend_write
-};
+const shell_backend_t shell_uart_backend = {.read = uart_backend_read,
+                                            .write = uart_backend_write};
 
 /*---------------------------------------------------------------------------*/
 /* Public API Implementation                                                 */
