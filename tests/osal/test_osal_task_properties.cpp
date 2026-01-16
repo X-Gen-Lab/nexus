@@ -475,3 +475,310 @@ TEST_F(OsalTaskPropertyTest, Property2_MultipleSuspendResumeCycles) {
         osal_task_delete(handle);
     }
 }
+
+/**
+ * Feature: osal-refactor, Property 16: Task Priority Round-Trip
+ *
+ * *For any* task, after calling osal_task_set_priority(handle, P),
+ * osal_task_get_priority(handle) SHALL return P.
+ *
+ * **Validates: Requirements 9.1, 9.2**
+ */
+TEST_F(OsalTaskPropertyTest, Property16_TaskPriorityRoundTrip) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        s_task_completed = false;
+        s_task_should_run = true;
+
+        /* Create task with initial priority */
+        uint8_t initial_priority = randomPriority();
+
+        osal_task_config_t config = {.name = "prio_roundtrip",
+                                     .func = lifecycle_task_func,
+                                     .arg = nullptr,
+                                     .priority = initial_priority,
+                                     .stack_size = 4096};
+
+        osal_task_handle_t handle = nullptr;
+
+        osal_status_t status = osal_task_create(&config, &handle);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": Task creation should succeed";
+
+        if (status != OSAL_OK) {
+            continue;
+        }
+
+        /* Wait for task to start */
+        waitForTaskCompletion(500);
+
+        /* Verify initial priority */
+        uint8_t read_priority = osal_task_get_priority(handle);
+        EXPECT_EQ(initial_priority, read_priority)
+            << "Iteration " << test_iter
+            << ": Initial priority should match. Expected: "
+            << (int)initial_priority << ", Got: " << (int)read_priority;
+
+        /* Generate new random priority and set it */
+        uint8_t new_priority = randomPriority();
+        osal_status_t set_status = osal_task_set_priority(handle, new_priority);
+        EXPECT_EQ(OSAL_OK, set_status)
+            << "Iteration " << test_iter
+            << ": Setting priority should succeed";
+
+        /* Verify round-trip: get should return what we set */
+        read_priority = osal_task_get_priority(handle);
+        EXPECT_EQ(new_priority, read_priority)
+            << "Iteration " << test_iter
+            << ": Priority round-trip failed. Set: " << (int)new_priority
+            << ", Got: " << (int)read_priority;
+
+        /* Clean up */
+        s_task_should_run = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        osal_task_delete(handle);
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 16 Extension: Invalid Priority Rejection
+ *
+ * *For any* priority value > 31, osal_task_set_priority() SHALL return
+ * OSAL_ERROR_INVALID_PARAM.
+ *
+ * **Validates: Requirements 9.2**
+ */
+TEST_F(OsalTaskPropertyTest, Property16_SetPriorityInvalidRejection) {
+    std::uniform_int_distribution<int> dist(32, 255);
+
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        s_task_completed = false;
+        s_task_should_run = true;
+
+        osal_task_config_t config = {.name = "invalid_set_prio",
+                                     .func = lifecycle_task_func,
+                                     .arg = nullptr,
+                                     .priority = OSAL_TASK_PRIORITY_NORMAL,
+                                     .stack_size = 4096};
+
+        osal_task_handle_t handle = nullptr;
+
+        osal_status_t status = osal_task_create(&config, &handle);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": Task creation should succeed";
+
+        if (status != OSAL_OK) {
+            continue;
+        }
+
+        waitForTaskCompletion(500);
+
+        /* Try to set invalid priority */
+        uint8_t invalid_priority = static_cast<uint8_t>(dist(rng));
+        osal_status_t set_status =
+            osal_task_set_priority(handle, invalid_priority);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, set_status)
+            << "Iteration " << test_iter
+            << ": Setting invalid priority=" << (int)invalid_priority
+            << " should fail";
+
+        /* Clean up */
+        s_task_should_run = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        osal_task_delete(handle);
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 16 Extension: NULL Handle Rejection
+ *
+ * *For any* NULL handle, osal_task_set_priority() SHALL return
+ * OSAL_ERROR_NULL_POINTER and osal_task_get_priority() SHALL return 0.
+ *
+ * **Validates: Requirements 9.1, 9.2**
+ */
+TEST_F(OsalTaskPropertyTest, Property16_NullHandleRejection) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        uint8_t priority = randomPriority();
+
+        /* osal_task_set_priority with NULL should return error */
+        osal_status_t status = osal_task_set_priority(nullptr, priority);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": set_priority with NULL handle should return "
+               "OSAL_ERROR_NULL_POINTER";
+
+        /* osal_task_get_priority with NULL should return 0 */
+        uint8_t result = osal_task_get_priority(nullptr);
+        EXPECT_EQ(0, result)
+            << "Iteration " << test_iter
+            << ": get_priority with NULL handle should return 0";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 17: Task State Consistency
+ *
+ * *For any* suspended task, osal_task_get_state() SHALL return
+ * OSAL_TASK_STATE_SUSPENDED.
+ *
+ * **Validates: Requirements 9.4**
+ */
+TEST_F(OsalTaskPropertyTest, Property17_TaskStateConsistency) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        s_task_completed = false;
+        s_task_should_run = true;
+
+        osal_task_config_t config = {.name = "state_test",
+                                     .func = lifecycle_task_func,
+                                     .arg = nullptr,
+                                     .priority = randomPriority(),
+                                     .stack_size = 4096};
+
+        osal_task_handle_t handle = nullptr;
+
+        osal_status_t status = osal_task_create(&config, &handle);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": Task creation should succeed";
+
+        if (status != OSAL_OK) {
+            continue;
+        }
+
+        /* Wait for task to start */
+        waitForTaskCompletion(500);
+
+        /* Task should be in READY or RUNNING state initially */
+        osal_task_state_t state = osal_task_get_state(handle);
+        EXPECT_TRUE(state == OSAL_TASK_STATE_READY ||
+                    state == OSAL_TASK_STATE_RUNNING ||
+                    state == OSAL_TASK_STATE_BLOCKED)
+            << "Iteration " << test_iter
+            << ": Running task should be in READY, RUNNING, or BLOCKED state, "
+               "got: "
+            << (int)state;
+
+        /* Suspend the task */
+        osal_status_t suspend_status = osal_task_suspend(handle);
+        EXPECT_EQ(OSAL_OK, suspend_status)
+            << "Iteration " << test_iter << ": Suspend should succeed";
+
+        /* Give time for state to update */
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+        /* Suspended task should report SUSPENDED state */
+        state = osal_task_get_state(handle);
+        EXPECT_EQ(OSAL_TASK_STATE_SUSPENDED, state)
+            << "Iteration " << test_iter
+            << ": Suspended task should be in SUSPENDED state, got: "
+            << (int)state;
+
+        /* Resume the task */
+        osal_status_t resume_status = osal_task_resume(handle);
+        EXPECT_EQ(OSAL_OK, resume_status)
+            << "Iteration " << test_iter << ": Resume should succeed";
+
+        /* Give time for state to update */
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+        /* Resumed task should no longer be in SUSPENDED state */
+        state = osal_task_get_state(handle);
+        EXPECT_NE(OSAL_TASK_STATE_SUSPENDED, state)
+            << "Iteration " << test_iter
+            << ": Resumed task should not be in SUSPENDED state";
+
+        /* Clean up */
+        s_task_should_run = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        osal_task_delete(handle);
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 17 Extension: NULL Handle State
+ *
+ * *For any* NULL handle, osal_task_get_state() SHALL return
+ * OSAL_TASK_STATE_DELETED.
+ *
+ * **Validates: Requirements 9.4**
+ */
+TEST_F(OsalTaskPropertyTest, Property17_NullHandleState) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_task_state_t state = osal_task_get_state(nullptr);
+        EXPECT_EQ(OSAL_TASK_STATE_DELETED, state)
+            << "Iteration " << test_iter
+            << ": get_state with NULL handle should return "
+               "OSAL_TASK_STATE_DELETED";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 18: Task Stack Watermark Validity
+ *
+ * *For any* task with stack size S, osal_task_get_stack_watermark() SHALL
+ * return a value in the range [0, S] or SIZE_MAX (indicating not available).
+ *
+ * **Validates: Requirements 9.3**
+ */
+TEST_F(OsalTaskPropertyTest, Property18_TaskStackWatermarkValidity) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        s_task_completed = false;
+        s_task_should_run = true;
+
+        size_t stack_size = randomStackSize();
+
+        osal_task_config_t config = {.name = "watermark_test",
+                                     .func = lifecycle_task_func,
+                                     .arg = nullptr,
+                                     .priority = randomPriority(),
+                                     .stack_size = stack_size};
+
+        osal_task_handle_t handle = nullptr;
+
+        osal_status_t status = osal_task_create(&config, &handle);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": Task creation should succeed";
+
+        if (status != OSAL_OK) {
+            continue;
+        }
+
+        /* Wait for task to start and use some stack */
+        waitForTaskCompletion(500);
+
+        /* Get stack watermark */
+        size_t watermark = osal_task_get_stack_watermark(handle);
+
+        /*
+         * Watermark should be either:
+         * - In valid range [0, stack_size] for platforms that support it
+         * - SIZE_MAX for platforms that don't support stack monitoring
+         */
+        bool valid_watermark =
+            (watermark <= stack_size) || (watermark == SIZE_MAX);
+        EXPECT_TRUE(valid_watermark)
+            << "Iteration " << test_iter
+            << ": Stack watermark should be in valid range [0, " << stack_size
+            << "] or SIZE_MAX, got: " << watermark;
+
+        /* Clean up */
+        s_task_should_run = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        osal_task_delete(handle);
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 18 Extension: NULL Handle Watermark
+ *
+ * *For any* NULL handle, osal_task_get_stack_watermark() SHALL return 0.
+ *
+ * **Validates: Requirements 9.3**
+ */
+TEST_F(OsalTaskPropertyTest, Property18_NullHandleWatermark) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        size_t watermark = osal_task_get_stack_watermark(nullptr);
+        EXPECT_EQ(0u, watermark)
+            << "Iteration " << test_iter
+            << ": get_stack_watermark with NULL handle should return 0";
+    }
+}
