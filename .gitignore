@@ -85,3 +85,7 @@ docs/sphinx/.doctrees/
 docs/api/html/
 docs/api/xml/
 docs/api/latex/
+
+# Test result files
+osal_test_results.xml
+osal_property_test_results.xml
