@@ -991,3 +991,270 @@ TEST_F(OsalEventPropertyTest, Property17_InvalidParameterErrorHandling) {
         osal_event_delete(handle);
     }
 }
+
+/*---------------------------------------------------------------------------*/
+/* Property 18: Event Clear From ISR                                         */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 11: Event Clear From ISR
+ *
+ * *For any* event flags object with bits B set, calling
+ * osal_event_clear_from_isr() with mask M SHALL result in bits (B & ~M)
+ * being set.
+ *
+ * **Validates: Requirements 7.2**
+ */
+TEST_F(OsalEventPropertyTest, Property18_EventClearFromISR) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_event_handle_t handle = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_event_create(&handle));
+
+        /* Generate random initial bits and bits to clear */
+        osal_event_bits_t initial_bits = randomBitsMask();
+        osal_event_bits_t bits_to_clear = randomBitsMask();
+
+        /* Set initial bits */
+        ASSERT_EQ(OSAL_OK, osal_event_set(handle, initial_bits));
+
+        /* Clear bits using ISR-safe function */
+        osal_status_t status = osal_event_clear_from_isr(handle, bits_to_clear);
+
+        /* Verify clear succeeded */
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": clear_from_isr should succeed";
+
+        /* Verify only specified bits are cleared: result = B & ~M */
+        osal_event_bits_t current_bits = osal_event_get(handle);
+        osal_event_bits_t expected_bits = initial_bits & ~bits_to_clear;
+
+        EXPECT_EQ(expected_bits, current_bits)
+            << "Iteration " << test_iter
+            << ": clear_from_isr should result in (B & ~M) "
+            << "(initial=0x" << std::hex << initial_bits << ", cleared=0x"
+            << bits_to_clear << ", expected=0x" << expected_bits << ", got=0x"
+            << current_bits << std::dec << ")";
+
+        /* Clean up */
+        osal_event_delete(handle);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 19: Event Clear From ISR NULL Pointer Handling                   */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 11 (extended): Event Clear From ISR Error
+ * Handling
+ *
+ * *For any* call to osal_event_clear_from_isr() with NULL handle or zero bits,
+ * the function SHALL return the appropriate error code.
+ *
+ * **Validates: Requirements 7.2**
+ */
+TEST_F(OsalEventPropertyTest, Property19_EventClearFromISRErrorHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_event_handle_t handle = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_event_create(&handle));
+
+        osal_event_bits_t bits = randomBitsMask();
+
+        /* Test clear_from_isr with NULL handle */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+                  osal_event_clear_from_isr(nullptr, bits))
+            << "Iteration " << test_iter
+            << ": clear_from_isr with NULL should return error";
+
+        /* Test clear_from_isr with zero mask */
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM,
+                  osal_event_clear_from_isr(handle, 0))
+            << "Iteration " << test_iter
+            << ": clear_from_isr with zero mask should return error";
+
+        /* Clean up */
+        osal_event_delete(handle);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 20: Event Sync Basic Functionality                               */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property (extended): Event Sync Basic Functionality
+ *
+ * *For any* event flags object, calling osal_event_sync() SHALL atomically
+ * set the specified bits and then wait for the wait_bits to be set.
+ * On success, the wait_bits are cleared (xEventGroupSync behavior).
+ *
+ * **Validates: Requirements 7.3**
+ */
+TEST_F(OsalEventPropertyTest, Property20_EventSyncBasicFunctionality) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_event_handle_t handle = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_event_create(&handle));
+
+        /* Generate non-overlapping bits for set and wait to test properly */
+        osal_event_bits_t set_bits = randomSingleBit();
+        osal_event_bits_t wait_bits = randomSingleBit();
+
+        /* Ensure set_bits and wait_bits don't overlap for clearer testing */
+        while ((set_bits & wait_bits) != 0) {
+            wait_bits = randomSingleBit();
+        }
+
+        /* Pre-set the wait_bits so sync will succeed immediately */
+        ASSERT_EQ(OSAL_OK, osal_event_set(handle, wait_bits));
+
+        osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ALL,
+                                             .auto_clear = false,
+                                             .timeout_ms = 100};
+
+        osal_event_bits_t bits_out = 0;
+        osal_status_t status =
+            osal_event_sync(handle, set_bits, wait_bits, &options, &bits_out);
+
+        /* Verify sync succeeded */
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter
+            << ": sync should succeed when wait_bits are already set";
+
+        /* Verify bits_out contains the wait_bits */
+        EXPECT_EQ(wait_bits, bits_out & wait_bits)
+            << "Iteration " << test_iter << ": bits_out should contain wait_bits "
+            << "(wait_bits=0x" << std::hex << wait_bits << ", bits_out=0x"
+            << bits_out << std::dec << ")";
+
+        /* After sync: set_bits should be set, wait_bits should be cleared */
+        osal_event_bits_t current_bits = osal_event_get(handle);
+
+        /* set_bits should be present (they were set by sync) */
+        EXPECT_EQ(set_bits, current_bits & set_bits)
+            << "Iteration " << test_iter << ": set_bits should be set "
+            << "(set_bits=0x" << std::hex << set_bits << ", current=0x"
+            << current_bits << std::dec << ")";
+
+        /* wait_bits should be cleared (xEventGroupSync clears them on exit) */
+        EXPECT_EQ(0u, current_bits & wait_bits)
+            << "Iteration " << test_iter << ": wait_bits should be cleared "
+            << "(wait_bits=0x" << std::hex << wait_bits << ", current=0x"
+            << current_bits << std::dec << ")";
+
+        /* Clean up */
+        osal_event_delete(handle);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 21: Event Sync Error Handling                                    */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property (extended): Event Sync Error Handling
+ *
+ * *For any* call to osal_event_sync() with invalid parameters, the function
+ * SHALL return the appropriate error code.
+ *
+ * **Validates: Requirements 7.3**
+ */
+TEST_F(OsalEventPropertyTest, Property21_EventSyncErrorHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_event_handle_t handle = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_event_create(&handle));
+
+        osal_event_bits_t bits = randomSmallBitsMask();
+        osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ALL,
+                                             .auto_clear = false,
+                                             .timeout_ms = 100};
+
+        /* Test sync with NULL handle */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+                  osal_event_sync(nullptr, bits, bits, &options, nullptr))
+            << "Iteration " << test_iter
+            << ": sync with NULL handle should return error";
+
+        /* Test sync with NULL options */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
+                  osal_event_sync(handle, bits, bits, nullptr, nullptr))
+            << "Iteration " << test_iter
+            << ": sync with NULL options should return error";
+
+        /* Test sync with zero set_bits */
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM,
+                  osal_event_sync(handle, 0, bits, &options, nullptr))
+            << "Iteration " << test_iter
+            << ": sync with zero set_bits should return error";
+
+        /* Test sync with zero wait_bits */
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM,
+                  osal_event_sync(handle, bits, 0, &options, nullptr))
+            << "Iteration " << test_iter
+            << ": sync with zero wait_bits should return error";
+
+        /* Clean up */
+        osal_event_delete(handle);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 22: Event Sync Timeout                                           */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property (extended): Event Sync Timeout
+ *
+ * *For any* call to osal_event_sync() where the wait condition is not met
+ * within the timeout, the function SHALL return OSAL_ERROR_TIMEOUT.
+ *
+ * **Validates: Requirements 7.3**
+ */
+TEST_F(OsalEventPropertyTest, Property22_EventSyncTimeout) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_event_handle_t handle = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_event_create(&handle));
+
+        /* Generate non-overlapping bits - set_bits should NOT contain wait_bits */
+        osal_event_bits_t set_bits = randomSingleBit();
+        osal_event_bits_t wait_bits = randomSingleBit();
+
+        /* Ensure set_bits and wait_bits don't overlap so sync will timeout */
+        while ((set_bits & wait_bits) != 0) {
+            wait_bits = randomSingleBit();
+        }
+
+        /* Use short timeout for faster tests */
+        osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ALL,
+                                             .auto_clear = false,
+                                             .timeout_ms = 50};
+
+        auto start = std::chrono::steady_clock::now();
+        osal_status_t status =
+            osal_event_sync(handle, set_bits, wait_bits, &options, nullptr);
+        auto elapsed = std::chrono::steady_clock::now() - start;
+        auto elapsed_ms =
+            std::chrono::duration_cast<std::chrono::milliseconds>(elapsed)
+                .count();
+
+        /* Verify timeout occurred */
+        EXPECT_EQ(OSAL_ERROR_TIMEOUT, status)
+            << "Iteration " << test_iter << ": sync should timeout "
+            << "(set_bits=0x" << std::hex << set_bits << ", wait_bits=0x"
+            << wait_bits << std::dec << ")";
+
+        /* Verify timeout duration is reasonable */
+        EXPECT_GE(elapsed_ms, 40)
+            << "Iteration " << test_iter << ": should wait at least ~50ms";
+        EXPECT_LE(elapsed_ms, 200)
+            << "Iteration " << test_iter << ": should not wait too long";
+
+        /* Verify set_bits were still set even though timeout occurred */
+        osal_event_bits_t current_bits = osal_event_get(handle);
+        EXPECT_EQ(set_bits, current_bits & set_bits)
+            << "Iteration " << test_iter
+            << ": set_bits should be set even after timeout";
+
+        /* Clean up */
+        osal_event_delete(handle);
+    }
+}
