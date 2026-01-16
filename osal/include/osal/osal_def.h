@@ -63,6 +63,69 @@ typedef enum {
  */
 #define OSAL_IS_ERROR(status) ((status) != OSAL_OK)
 
+/*---------------------------------------------------------------------------*/
+/* Unified Error Handling Macros                                             */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Validate pointer is not NULL
+ * \param[in]       ptr: Pointer to validate
+ * \return          Returns OSAL_ERROR_NULL_POINTER if ptr is NULL
+ *
+ * \note            Requirements: 1.2
+ */
+#define OSAL_VALIDATE_PTR(ptr)                                              \
+    do {                                                                    \
+        if ((ptr) == NULL) {                                                \
+            return OSAL_ERROR_NULL_POINTER;                                 \
+        }                                                                   \
+    } while (0)
+
+/**
+ * \brief           Validate condition or return error
+ * \param[in]       cond: Condition to validate
+ * \param[in]       err: Error code to return if condition is false
+ * \return          Returns err if condition is false
+ *
+ * \note            Requirements: 1.3
+ */
+#define OSAL_VALIDATE_PARAM(cond, err)                                      \
+    do {                                                                    \
+        if (!(cond)) {                                                      \
+            return (err);                                                   \
+        }                                                                   \
+    } while (0)
+
+/**
+ * \brief           Check not in ISR context
+ * \return          Returns OSAL_ERROR_ISR if called from ISR
+ *
+ * \note            Requirements: 1.4
+ * \note            Requires osal_is_isr() to be declared before use
+ */
+#define OSAL_CHECK_NOT_ISR()                                                \
+    do {                                                                    \
+        if (osal_is_isr()) {                                                \
+            return OSAL_ERROR_ISR;                                          \
+        }                                                                   \
+    } while (0)
+
+/**
+ * \brief           Validate handle (basic NULL check version)
+ * \param[in]       handle: Handle to validate
+ * \return          Returns OSAL_ERROR_NULL_POINTER if handle is NULL
+ *
+ * \note            Requirements: 1.1
+ * \note            For full handle validation with magic number checking,
+ *                  use OSAL_VALIDATE_HANDLE from osal_internal.h
+ */
+#define OSAL_VALIDATE_HANDLE_PTR(handle)                                    \
+    do {                                                                    \
+        if ((handle) == NULL) {                                             \
+            return OSAL_ERROR_NULL_POINTER;                                 \
+        }                                                                   \
+    } while (0)
+
 /**
  * \}
  */
