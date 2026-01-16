@@ -152,6 +152,43 @@ osal_status_t osal_timer_stop_from_isr(osal_timer_handle_t handle);
  */
 osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle);
 
+/*---------------------------------------------------------------------------*/
+/* Timer Enhanced Functions                                                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Get timer remaining time
+ * \param[in]       handle: Timer handle
+ * \return          Remaining time in milliseconds, or 0 if not active or
+ *                  handle is invalid
+ * \note            Returns 0 for inactive timers or invalid handles
+ * \note            Requirements: 5.1
+ */
+uint32_t osal_timer_get_remaining(osal_timer_handle_t handle);
+
+/**
+ * \brief           Get timer configured period
+ * \param[in]       handle: Timer handle
+ * \return          Period in milliseconds, or 0 if handle is invalid
+ * \note            Requirements: 5.2
+ */
+uint32_t osal_timer_get_period(osal_timer_handle_t handle);
+
+/**
+ * \brief           Set timer callback function
+ * \param[in]       handle: Timer handle
+ * \param[in]       callback: New callback function
+ * \param[in]       arg: New callback argument (can be NULL)
+ * \return          OSAL_OK on success, error code otherwise
+ * \retval          OSAL_OK Callback changed successfully
+ * \retval          OSAL_ERROR_NULL_POINTER handle or callback is NULL
+ * \retval          OSAL_ERROR_INVALID_PARAM Invalid timer handle
+ * \note            Requirements: 5.3
+ */
+osal_status_t osal_timer_set_callback(osal_timer_handle_t handle,
+                                      osal_timer_callback_t callback,
+                                      void* arg);
+
 /**
  * \}
  */

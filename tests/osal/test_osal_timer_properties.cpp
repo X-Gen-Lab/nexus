@@ -437,3 +437,278 @@ TEST_F(OsalTimerPropertyTest, Property6_TimerActiveStateConsistency) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
+
+/*---------------------------------------------------------------------------*/
+/* Property 7: Timer Period Query Consistency                                */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 6: Timer Period Query Consistency
+ *
+ * *For any* timer created with period P, osal_timer_get_period() SHALL return
+ * P until the period is changed.
+ *
+ * **Validates: Requirements 5.2**
+ */
+TEST_F(OsalTimerPropertyTest, Property7_TimerPeriodQueryConsistency) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random timer configuration */
+        uint32_t period_ms = randomPeriod();
+        osal_timer_mode_t mode = randomMode();
+
+        /* Initialize callback state */
+        s_callback_state.callback_count = 0;
+        s_callback_state.callback_invoked = false;
+
+        /* Create timer */
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = mode,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &s_callback_state};
+
+        osal_timer_handle_t timer = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer))
+            << "Iteration " << test_iter << ": timer create failed";
+
+        /* Query period - should match configured period */
+        uint32_t queried_period = osal_timer_get_period(timer);
+
+        /*
+         * Allow small tolerance due to tick conversion rounding.
+         * The period may be slightly different due to ms->ticks->ms conversion.
+         */
+        int32_t diff = (int32_t)queried_period - (int32_t)period_ms;
+        EXPECT_LE(std::abs(diff), 10)
+            << "Iteration " << test_iter << ": period mismatch "
+            << "(configured=" << period_ms << "ms, queried=" << queried_period
+            << "ms)";
+
+        /* Change period and verify */
+        uint32_t new_period_ms = randomPeriod();
+        ASSERT_EQ(OSAL_OK, osal_timer_set_period(timer, new_period_ms))
+            << "Iteration " << test_iter << ": set period failed";
+
+        queried_period = osal_timer_get_period(timer);
+        diff = (int32_t)queried_period - (int32_t)new_period_ms;
+        EXPECT_LE(std::abs(diff), 10)
+            << "Iteration " << test_iter << ": new period mismatch "
+            << "(configured=" << new_period_ms
+            << "ms, queried=" << queried_period << "ms)";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_timer_delete(timer))
+            << "Iteration " << test_iter << ": timer delete failed";
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 8: Timer Remaining Time Validity                                 */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 7: Timer Remaining Time Validity
+ *
+ * *For any* active timer with period P, osal_timer_get_remaining() SHALL
+ * return a value in the range [0, P].
+ *
+ * **Validates: Requirements 5.1**
+ */
+TEST_F(OsalTimerPropertyTest, Property8_TimerRemainingTimeValidity) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random timer configuration with longer period for testing */
+        uint32_t period_ms = 100 + randomPeriod();  /* 110-300ms */
+
+        /* Initialize callback state */
+        s_callback_state.callback_count = 0;
+        s_callback_state.callback_invoked = false;
+
+        /* Create periodic timer */
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_PERIODIC,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &s_callback_state};
+
+        osal_timer_handle_t timer = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer))
+            << "Iteration " << test_iter << ": timer create failed";
+
+        /* Timer not started - remaining should be 0 */
+        uint32_t remaining = osal_timer_get_remaining(timer);
+        EXPECT_EQ(0u, remaining)
+            << "Iteration " << test_iter
+            << ": inactive timer should have 0 remaining time";
+
+        /* Start timer */
+        ASSERT_EQ(OSAL_OK, osal_timer_start(timer))
+            << "Iteration " << test_iter << ": timer start failed";
+
+        /* Query remaining time multiple times */
+        for (int i = 0; i < 5; ++i) {
+            remaining = osal_timer_get_remaining(timer);
+
+            /*
+             * Remaining time should be in range [0, period].
+             * Allow some tolerance for timing variations.
+             */
+            EXPECT_LE(remaining, period_ms + 50)
+                << "Iteration " << test_iter << ", sample " << i
+                << ": remaining time exceeds period "
+                << "(remaining=" << remaining << "ms, period=" << period_ms
+                << "ms)";
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        }
+
+        /* Stop timer */
+        ASSERT_EQ(OSAL_OK, osal_timer_stop(timer))
+            << "Iteration " << test_iter << ": timer stop failed";
+
+        /* Stopped timer - remaining should be 0 */
+        remaining = osal_timer_get_remaining(timer);
+        EXPECT_EQ(0u, remaining)
+            << "Iteration " << test_iter
+            << ": stopped timer should have 0 remaining time";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_timer_delete(timer))
+            << "Iteration " << test_iter << ": timer delete failed";
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 9: Timer Callback Change                                         */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Second callback for testing callback change
+ */
+static void test_timer_callback_second(void* arg) {
+    int* value_ptr = (int*)arg;
+    s_callback_state.callback_count++;
+    /* Mark with a different value to distinguish from first callback */
+    s_callback_state.last_arg_value = *value_ptr + 1000;
+    s_callback_state.callback_invoked = true;
+}
+
+/**
+ * Feature: osal-refactor, Property: Timer Callback Change
+ *
+ * *For any* timer, calling osal_timer_set_callback() SHALL change the callback
+ * function that is invoked when the timer expires.
+ *
+ * **Validates: Requirements 5.3**
+ */
+TEST_F(OsalTimerPropertyTest, Property9_TimerCallbackChange) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random timer configuration */
+        uint32_t period_ms = randomPeriod();
+        int arg_value = randomArgValue();
+
+        /* Initialize callback state */
+        s_callback_state.callback_count = 0;
+        s_callback_state.last_arg_value = 0;
+        s_callback_state.callback_invoked = false;
+
+        /* Create timer with first callback */
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_ONE_SHOT,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &arg_value};
+
+        osal_timer_handle_t timer = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer))
+            << "Iteration " << test_iter << ": timer create failed";
+
+        /* Change callback before starting */
+        ASSERT_EQ(OSAL_OK,
+                  osal_timer_set_callback(timer, test_timer_callback_second,
+                                          &arg_value))
+            << "Iteration " << test_iter << ": set callback failed";
+
+        /* Start timer */
+        ASSERT_EQ(OSAL_OK, osal_timer_start(timer))
+            << "Iteration " << test_iter << ": timer start failed";
+
+        /* Wait for callback */
+        std::this_thread::sleep_for(std::chrono::milliseconds(period_ms + 200));
+
+        /* Verify the second callback was invoked (marked with +1000) */
+        EXPECT_TRUE(s_callback_state.callback_invoked)
+            << "Iteration " << test_iter << ": callback was not invoked";
+
+        EXPECT_EQ(arg_value + 1000, s_callback_state.last_arg_value)
+            << "Iteration " << test_iter
+            << ": wrong callback was invoked "
+            << "(expected " << (arg_value + 1000) << ", got "
+            << s_callback_state.last_arg_value << ")";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_timer_delete(timer))
+            << "Iteration " << test_iter << ": timer delete failed";
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 10: Timer Set Callback NULL Validation                           */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property: Timer Set Callback NULL Validation
+ *
+ * *For any* timer, calling osal_timer_set_callback() with NULL callback
+ * SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 5.3**
+ */
+TEST_F(OsalTimerPropertyTest, Property10_TimerSetCallbackNullValidation) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random timer configuration */
+        uint32_t period_ms = randomPeriod();
+        int arg_value = randomArgValue();
+
+        /* Initialize callback state */
+        s_callback_state.callback_count = 0;
+        s_callback_state.callback_invoked = false;
+
+        /* Create timer */
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = period_ms,
+                                      .mode = OSAL_TIMER_ONE_SHOT,
+                                      .callback = test_timer_callback_with_arg,
+                                      .arg = &arg_value};
+
+        osal_timer_handle_t timer = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_timer_create(&config, &timer))
+            << "Iteration " << test_iter << ": timer create failed";
+
+        /* Try to set NULL callback - should fail */
+        osal_status_t status =
+            osal_timer_set_callback(timer, nullptr, &arg_value);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": set_callback with NULL should return NULL_POINTER error";
+
+        /* Try with NULL handle - should fail */
+        status = osal_timer_set_callback(nullptr, test_timer_callback_with_arg,
+                                         &arg_value);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": set_callback with NULL handle should return NULL_POINTER "
+               "error";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_timer_delete(timer))
+            << "Iteration " << test_iter << ": timer delete failed";
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
