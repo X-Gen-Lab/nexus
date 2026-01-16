@@ -31,7 +31,9 @@ typedef struct nx_device_info_s {
     uint8_t ref_count;       /**< Reference count */
 } nx_device_info_t;
 
-/* ========== GPIO Factory Functions ========== */
+/*---------------------------------------------------------------------------*/
+/* GPIO Factory Functions                                                    */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Get GPIO device
@@ -57,7 +59,9 @@ nx_gpio_t* nx_factory_gpio_with_config(uint8_t port, uint8_t pin,
  */
 void nx_factory_gpio_release(nx_gpio_t* gpio);
 
-/* ========== UART Factory Functions ========== */
+/*---------------------------------------------------------------------------*/
+/* UART Factory Functions                                                    */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Get UART device
@@ -81,7 +85,9 @@ nx_uart_t* nx_factory_uart_with_config(uint8_t index,
  */
 void nx_factory_uart_release(nx_uart_t* uart);
 
-/* ========== SPI Factory Functions ========== */
+/*---------------------------------------------------------------------------*/
+/* SPI Factory Functions                                                     */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Get SPI device
@@ -104,7 +110,9 @@ nx_spi_t* nx_factory_spi_with_config(uint8_t index, const nx_spi_config_t* cfg);
  */
 void nx_factory_spi_release(nx_spi_t* spi);
 
-/* ========== I2C Factory Functions ========== */
+/*---------------------------------------------------------------------------*/
+/* I2C Factory Functions                                                     */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Get I2C device
@@ -127,7 +135,9 @@ nx_i2c_t* nx_factory_i2c_with_config(uint8_t index, const nx_i2c_config_t* cfg);
  */
 void nx_factory_i2c_release(nx_i2c_t* i2c);
 
-/* ========== Timer Factory Functions ========== */
+/*---------------------------------------------------------------------------*/
+/* Timer Factory Functions                                                   */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Get Timer device
@@ -151,7 +161,9 @@ nx_timer_t* nx_factory_timer_with_config(uint8_t index,
  */
 void nx_factory_timer_release(nx_timer_t* timer);
 
-/* ========== ADC Factory Functions ========== */
+/*---------------------------------------------------------------------------*/
+/* ADC Factory Functions                                                     */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Get ADC device
@@ -174,7 +186,9 @@ nx_adc_t* nx_factory_adc_with_config(uint8_t index, const nx_adc_config_t* cfg);
  */
 void nx_factory_adc_release(nx_adc_t* adc);
 
-/* ========== Device Enumeration ========== */
+/*---------------------------------------------------------------------------*/
+/* Device Enumeration                                                        */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Enumerate all devices

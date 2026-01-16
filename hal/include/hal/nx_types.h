@@ -14,9 +14,9 @@
 extern "C" {
 #endif
 
-/*
- * Include standard headers if available
- */
+/*---------------------------------------------------------------------------*/
+/* Include standard headers if available                                     */
+/*---------------------------------------------------------------------------*/
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 /* C99 or later - use standard headers */
 #include <stdbool.h>
@@ -62,9 +62,9 @@ typedef unsigned char bool;
 
 #endif /* __STDC_VERSION__ */
 
-/*
- * Additional type definitions for embedded systems
- */
+/*---------------------------------------------------------------------------*/
+/* Additional type definitions for embedded systems                          */
+/*---------------------------------------------------------------------------*/
 
 /** Pointer-sized unsigned integer */
 typedef uintptr_t nx_uintptr_t;
@@ -74,42 +74,110 @@ typedef volatile uint32_t nx_reg32_t;
 typedef volatile uint16_t nx_reg16_t;
 typedef volatile uint8_t nx_reg8_t;
 
-/*
- * Compiler-specific attributes
- */
-#if defined(__GNUC__)
-#define NX_PACKED     __attribute__((packed))
-#define NX_ALIGNED(x) __attribute__((aligned(x)))
-#define NX_UNUSED     __attribute__((unused))
-#define NX_WEAK       __attribute__((weak))
-#define NX_INLINE     static inline
-#define NX_NORETURN   __attribute__((noreturn))
+/*---------------------------------------------------------------------------*/
+/* Compiler-specific attributes                                              */
+/*---------------------------------------------------------------------------*/
+
+/* Arm Compiler 4/5 (armcc) */
+#if defined(__CC_ARM)
+#define NX_ASM          __asm
+#define NX_INLINE      static __inline
+#define NX_NORETURN    __declspec(noreturn)
+#define NX_PACKED      __packed
+#define NX_ALIGNED(x)  __align(x)
+#define NX_UNUSED      __attribute__((unused))
+#define NX_WEAK        __weak
+#define NX_SECTION(x)  __attribute__((section(x)))
+#define NX_USED        __attribute__((used))
+
+/* Arm Compiler 6 (armclang) */
+#elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+#define NX_ASM          __asm
+#define NX_INLINE      static inline
+#define NX_NORETURN    __attribute__((noreturn))
+#define NX_PACKED      __attribute__((packed))
+#define NX_ALIGNED(x)  __attribute__((aligned(x)))
+#define NX_UNUSED      __attribute__((unused))
+#define NX_WEAK        __attribute__((weak))
+#define NX_SECTION(x)  __attribute__((section(x)))
+#define NX_USED        __attribute__((used))
+
+/* GCC / Clang */
+#elif defined(__GNUC__)
+#define NX_ASM          __asm__
+#define NX_INLINE      static inline
+#define NX_NORETURN    __attribute__((noreturn))
+#define NX_PACKED      __attribute__((packed))
+#define NX_ALIGNED(x)  __attribute__((aligned(x)))
+#define NX_UNUSED      __attribute__((unused))
+#define NX_WEAK        __attribute__((weak))
+#define NX_SECTION(x)  __attribute__((section(x)))
+#define NX_USED        __attribute__((used))
+
+/* IAR Compiler */
 #elif defined(__ICCARM__)
-#define NX_PACKED     __packed
-#define NX_ALIGNED(x) _Pragma("data_alignment=" #x)
+#define NX_ASM          __asm
+#define NX_INLINE      static inline
+#define NX_NORETURN    __noreturn
+#define NX_PACKED      __packed
+#define NX_ALIGNED(x)  _Pragma("data_alignment=" #x)
 #define NX_UNUSED
-#define NX_WEAK     __weak
-#define NX_INLINE   static inline
-#define NX_NORETURN __noreturn
+#define NX_WEAK        __weak
+#define NX_SECTION(x)  _Pragma("location=" #x)
+#define NX_USED        __root
+
+/* TI Arm Compiler */
+#elif defined(__TI_ARM__)
+#define NX_ASM          __asm
+#define NX_INLINE      static inline
+#define NX_NORETURN    __attribute__((noreturn))
+#define NX_PACKED      __attribute__((packed))
+#define NX_ALIGNED(x)  __attribute__((aligned(x)))
+#define NX_UNUSED      __attribute__((unused))
+#define NX_WEAK        __attribute__((weak))
+#define NX_SECTION(x)  __attribute__((section(x)))
+#define NX_USED        __attribute__((used))
+
+/* TASKING Compiler */
+#elif defined(__TASKING__)
+#define NX_ASM          __asm
+#define NX_INLINE      static inline
+#define NX_NORETURN    __attribute__((noreturn))
+#define NX_PACKED      __packed__
+#define NX_ALIGNED(x)  __align(x)
+#define NX_UNUSED      __attribute__((unused))
+#define NX_WEAK        __attribute__((weak))
+#define NX_SECTION(x)  __attribute__((section(x)))
+#define NX_USED        __attribute__((used))
+
+/* Microsoft Visual C++ */
 #elif defined(_MSC_VER)
+#define NX_ASM          __asm
+#define NX_INLINE      static __inline
+#define NX_NORETURN    __declspec(noreturn)
 #define NX_PACKED
-#define NX_ALIGNED(x) __declspec(align(x))
+#define NX_ALIGNED(x)  __declspec(align(x))
 #define NX_UNUSED
 #define NX_WEAK
-#define NX_INLINE   static __inline
-#define NX_NORETURN __declspec(noreturn)
+#define NX_SECTION(x)  __declspec(allocate(x))
+#define NX_USED
+
+/* Unknown compiler - fallback */
 #else
+#define NX_ASM          __asm__
+#define NX_INLINE      static inline
+#define NX_NORETURN
 #define NX_PACKED
 #define NX_ALIGNED(x)
 #define NX_UNUSED
 #define NX_WEAK
-#define NX_INLINE static inline
-#define NX_NORETURN
+#define NX_SECTION(x)
+#define NX_USED
 #endif
 
-/*
- * Utility macros
- */
+/*---------------------------------------------------------------------------*/
+/* Utility macros                                                            */
+/*---------------------------------------------------------------------------*/
 
 /** Get array element count */
 #define NX_ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
