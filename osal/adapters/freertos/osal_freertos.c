@@ -42,6 +42,7 @@
  */
 
 #include "osal/osal.h"
+#include "osal/osal_internal.h"
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
@@ -103,6 +104,68 @@
     } while (0)
 
 /*---------------------------------------------------------------------------*/
+/* Internal Wrapper Structures for Handle Validation                         */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Internal task wrapper structure
+ * \details         Wraps FreeRTOS TaskHandle_t with handle validation header
+ */
+typedef struct {
+    osal_handle_header_t header;    /**< Handle validation header */
+    TaskHandle_t handle;            /**< FreeRTOS task handle */
+} osal_task_wrapper_t;
+
+/**
+ * \brief           Internal mutex wrapper structure
+ * \details         Wraps FreeRTOS SemaphoreHandle_t with handle validation header
+ */
+typedef struct {
+    osal_handle_header_t header;    /**< Handle validation header */
+    SemaphoreHandle_t handle;       /**< FreeRTOS mutex handle */
+} osal_mutex_wrapper_t;
+
+/**
+ * \brief           Internal semaphore wrapper structure
+ * \details         Wraps FreeRTOS SemaphoreHandle_t with handle validation header
+ */
+typedef struct {
+    osal_handle_header_t header;    /**< Handle validation header */
+    SemaphoreHandle_t handle;       /**< FreeRTOS semaphore handle */
+} osal_sem_wrapper_t;
+
+/**
+ * \brief           Internal queue wrapper structure
+ * \details         Wraps FreeRTOS QueueHandle_t with handle validation header
+ */
+typedef struct {
+    osal_handle_header_t header;    /**< Handle validation header */
+    QueueHandle_t handle;           /**< FreeRTOS queue handle */
+    osal_queue_mode_t mode;         /**< Queue mode (normal/overwrite) */
+    size_t item_count;              /**< Queue capacity for space calculation */
+} osal_queue_wrapper_t;
+
+/**
+ * \brief           Internal event flags wrapper structure
+ * \details         Wraps FreeRTOS EventGroupHandle_t with handle validation header
+ */
+typedef struct {
+    osal_handle_header_t header;    /**< Handle validation header */
+    EventGroupHandle_t handle;      /**< FreeRTOS event group handle */
+} osal_event_wrapper_t;
+
+/**
+ * \brief           Internal timer wrapper structure
+ * \details         Wraps FreeRTOS TimerHandle_t with handle validation header
+ */
+typedef struct {
+    osal_handle_header_t header;    /**< Handle validation header */
+    TimerHandle_t handle;           /**< FreeRTOS timer handle */
+    osal_timer_callback_t callback; /**< User callback function */
+    void* arg;                      /**< User callback argument */
+} osal_timer_wrapper_t;
+
+/*---------------------------------------------------------------------------*/
 /* Static Variables                                                          */
 /*---------------------------------------------------------------------------*/
 
@@ -114,6 +177,72 @@ static volatile uint32_t s_isr_critical_nesting = 0;
 
 /** \brief          Saved interrupt mask for ISR critical sections */
 static volatile UBaseType_t s_isr_saved_mask = 0;
+
+/*---------------------------------------------------------------------------*/
+/* Diagnostics - Resource Statistics Tracking                                */
+/*---------------------------------------------------------------------------*/
+
+#if OSAL_STATS_ENABLE
+
+/**
+ * \brief           Resource statistics structure for internal tracking
+ */
+typedef struct {
+    volatile uint16_t count;        /**< Current count */
+    volatile uint16_t watermark;    /**< Peak count (high watermark) */
+} osal_resource_stats_internal_t;
+
+/**
+ * \brief           Global statistics context
+ */
+typedef struct {
+    osal_resource_stats_internal_t tasks;    /**< Task statistics */
+    osal_resource_stats_internal_t mutexes;  /**< Mutex statistics */
+    osal_resource_stats_internal_t sems;     /**< Semaphore statistics */
+    osal_resource_stats_internal_t queues;   /**< Queue statistics */
+    osal_resource_stats_internal_t events;   /**< Event flags statistics */
+    osal_resource_stats_internal_t timers;   /**< Timer statistics */
+    volatile size_t mem_allocated;           /**< Total bytes allocated */
+    volatile size_t mem_peak;                /**< Peak memory allocation */
+    volatile size_t mem_alloc_count;         /**< Number of active allocations */
+} osal_global_stats_t;
+
+/** \brief          Global statistics instance */
+static osal_global_stats_t s_osal_stats = {0};
+
+/**
+ * \brief           Increment resource count and update watermark
+ * \param[in]       stats: Pointer to statistics structure
+ */
+static inline void osal_stats_inc(osal_resource_stats_internal_t* stats) {
+    osal_enter_critical();
+    stats->count++;
+    if (stats->count > stats->watermark) {
+        stats->watermark = stats->count;
+    }
+    osal_exit_critical();
+}
+
+/**
+ * \brief           Decrement resource count
+ * \param[in]       stats: Pointer to statistics structure
+ */
+static inline void osal_stats_dec(osal_resource_stats_internal_t* stats) {
+    osal_enter_critical();
+    if (stats->count > 0) {
+        stats->count--;
+    }
+    osal_exit_critical();
+}
+
+#endif /* OSAL_STATS_ENABLE */
+
+/*---------------------------------------------------------------------------*/
+/* Diagnostics - Error Callback                                              */
+/*---------------------------------------------------------------------------*/
+
+/** \brief          Registered error callback function */
+static osal_error_callback_t s_error_callback = NULL;
 
 /*---------------------------------------------------------------------------*/
 /* Helper Functions - Priority Mapping                                       */
@@ -376,7 +505,15 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
         }
     }
 
-    TaskHandle_t task_handle = NULL;
+    /* Allocate wrapper structure for handle validation */
+    osal_task_wrapper_t* wrapper =
+        (osal_task_wrapper_t*)pvPortMalloc(sizeof(osal_task_wrapper_t));
+    if (wrapper == NULL) {
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_TASK);
 
     /* Map OSAL priority to FreeRTOS priority */
     UBaseType_t freertos_priority = osal_to_freertos_priority(config->priority);
@@ -402,16 +539,24 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
                     stack_depth,                  /* Stack depth in words */
                     config->arg,                  /* Task argument */
                     freertos_priority,            /* FreeRTOS priority */
-                    &task_handle                  /* Task handle output */
+                    &wrapper->handle              /* Task handle output */
         );
 
     /* Check if task creation succeeded */
     if (result != pdPASS) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    /* Return the task handle */
-    *handle = (osal_task_handle_t)task_handle;
+#if OSAL_STATS_ENABLE
+    /* Update task statistics */
+    osal_stats_inc(&s_osal_stats.tasks);
+#endif
+
+    /* Return the wrapper as the task handle */
+    *handle = (osal_task_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -424,11 +569,37 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
  * \note            Requirements: 4.2
  */
 osal_status_t osal_task_delete(osal_task_handle_t handle) {
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+    TaskHandle_t task_handle = NULL;
+
+    if (wrapper != NULL) {
+        /* Validate handle using magic number and type check */
+#if OSAL_HANDLE_VALIDATION
+        if (!OSAL_HANDLE_IS_VALID(&wrapper->header, OSAL_TYPE_TASK)) {
+            return OSAL_ERROR_INVALID_PARAM;
+        }
+#endif
+
+        /* Extract FreeRTOS handle from wrapper */
+        task_handle = wrapper->handle;
+
+#if OSAL_STATS_ENABLE
+        /* Update task statistics */
+        osal_stats_dec(&s_osal_stats.tasks);
+#endif
+
+        /* Invalidate handle header before deletion */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+
+        /* Free the wrapper structure */
+        vPortFree(wrapper);
+    }
+
     /*
      * FreeRTOS vTaskDelete accepts NULL to delete the calling task.
      * No NULL pointer error for this function - NULL is a valid input.
      */
-    vTaskDelete((TaskHandle_t)handle);
+    vTaskDelete(task_handle);
     return OSAL_OK;
 }
 
@@ -441,11 +612,11 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
  * \note            Requirements: 4.3
  */
 osal_status_t osal_task_suspend(osal_task_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
 
-    vTaskSuspend((TaskHandle_t)handle);
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+    vTaskSuspend(wrapper->handle);
     return OSAL_OK;
 }
 
@@ -457,11 +628,11 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle) {
  * \note            Requirements: 4.4
  */
 osal_status_t osal_task_resume(osal_task_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
 
-    vTaskResume((TaskHandle_t)handle);
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+    vTaskResume(wrapper->handle);
     return OSAL_OK;
 }
 
@@ -499,6 +670,9 @@ osal_status_t osal_task_yield(void) {
  * \note            Requirements: 4.8
  */
 osal_task_handle_t osal_task_get_current(void) {
+    /* Note: This returns the FreeRTOS handle directly, not a wrapper.
+     * For proper handle validation, the caller should use the wrapper
+     * returned from osal_task_create(). */
     return (osal_task_handle_t)xTaskGetCurrentTaskHandle();
 }
 
@@ -512,7 +686,134 @@ const char* osal_task_get_name(osal_task_handle_t handle) {
         return NULL;
     }
 
-    return pcTaskGetName((TaskHandle_t)handle);
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+    return pcTaskGetName(wrapper->handle);
+}
+
+/**
+ * \brief           Get task priority
+ *
+ * \details         Returns the current priority of the specified task.
+ *                  The FreeRTOS priority is mapped back to OSAL priority range.
+ *
+ * \note            Requirements: 9.1
+ */
+uint8_t osal_task_get_priority(osal_task_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&wrapper->header, OSAL_TYPE_TASK)) {
+        return 0;
+    }
+#endif
+
+    /* Get FreeRTOS priority and convert to OSAL priority */
+    UBaseType_t freertos_prio = uxTaskPriorityGet(wrapper->handle);
+    return freertos_to_osal_priority(freertos_prio);
+}
+
+/**
+ * \brief           Set task priority
+ *
+ * \details         Changes the priority of the specified task at runtime.
+ *                  The OSAL priority is mapped to FreeRTOS priority range.
+ *
+ * \note            Requirements: 9.2
+ */
+osal_status_t osal_task_set_priority(osal_task_handle_t handle,
+                                     uint8_t priority) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
+
+    /* Parameter validation - priority must be in valid range (0-31) */
+    if (priority > 31) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+    /* Map OSAL priority to FreeRTOS priority and set */
+    UBaseType_t freertos_prio = osal_to_freertos_priority(priority);
+    vTaskPrioritySet(wrapper->handle, freertos_prio);
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Get task stack high watermark
+ *
+ * \details         Returns the minimum amount of remaining stack space that
+ *                  was available to the task since the task started executing.
+ *                  This is the high water mark of stack usage.
+ *
+ * \note            Requirements: 9.3
+ */
+size_t osal_task_get_stack_watermark(osal_task_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&wrapper->header, OSAL_TYPE_TASK)) {
+        return 0;
+    }
+#endif
+
+    /*
+     * uxTaskGetStackHighWaterMark returns the minimum free stack space
+     * in words (StackType_t units). Convert to bytes.
+     */
+    UBaseType_t watermark_words = uxTaskGetStackHighWaterMark(wrapper->handle);
+    return (size_t)(watermark_words * sizeof(StackType_t));
+}
+
+/**
+ * \brief           Get task state
+ *
+ * \details         Returns the current state of the specified task.
+ *                  Maps FreeRTOS task state to OSAL task state enumeration.
+ *
+ * \note            Requirements: 9.4
+ */
+osal_task_state_t osal_task_get_state(osal_task_handle_t handle) {
+    if (handle == NULL) {
+        return OSAL_TASK_STATE_DELETED;
+    }
+
+    osal_task_wrapper_t* wrapper = (osal_task_wrapper_t*)handle;
+
+    /* Validate handle - return DELETED for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&wrapper->header, OSAL_TYPE_TASK)) {
+        return OSAL_TASK_STATE_DELETED;
+    }
+#endif
+
+    /* Get FreeRTOS task state */
+    eTaskState freertos_state = eTaskGetState(wrapper->handle);
+
+    /* Map FreeRTOS state to OSAL state */
+    switch (freertos_state) {
+        case eRunning:
+            return OSAL_TASK_STATE_RUNNING;
+        case eReady:
+            return OSAL_TASK_STATE_READY;
+        case eBlocked:
+            return OSAL_TASK_STATE_BLOCKED;
+        case eSuspended:
+            return OSAL_TASK_STATE_SUSPENDED;
+        case eDeleted:
+            return OSAL_TASK_STATE_DELETED;
+        default:
+            return OSAL_TASK_STATE_READY;
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -541,13 +842,31 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
         }
     }
 
-    /* Create FreeRTOS mutex with priority inheritance */
-    SemaphoreHandle_t mutex = xSemaphoreCreateMutex();
-    if (mutex == NULL) {
+    /* Allocate wrapper structure for handle validation */
+    osal_mutex_wrapper_t* wrapper =
+        (osal_mutex_wrapper_t*)pvPortMalloc(sizeof(osal_mutex_wrapper_t));
+    if (wrapper == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    *handle = (osal_mutex_handle_t)mutex;
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_MUTEX);
+
+    /* Create FreeRTOS mutex with priority inheritance */
+    wrapper->handle = xSemaphoreCreateMutex();
+    if (wrapper->handle == NULL) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Update mutex statistics */
+    osal_stats_inc(&s_osal_stats.mutexes);
+#endif
+
+    *handle = (osal_mutex_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -559,13 +878,23 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
  * \note            Requirements: 5.2
  */
 osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
-    /* Parameter validation - NULL pointer check */
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_MUTEX);
+
+    osal_mutex_wrapper_t* wrapper = (osal_mutex_wrapper_t*)handle;
+
+#if OSAL_STATS_ENABLE
+    /* Update mutex statistics */
+    osal_stats_dec(&s_osal_stats.mutexes);
+#endif
 
     /* Delete the FreeRTOS mutex */
-    vSemaphoreDelete((SemaphoreHandle_t)handle);
+    vSemaphoreDelete(wrapper->handle);
+
+    /* Invalidate handle header before freeing */
+    OSAL_HANDLE_DEINIT(&wrapper->header);
+    vPortFree(wrapper);
+
     return OSAL_OK;
 }
 
@@ -590,11 +919,13 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
         return OSAL_ERROR_ISR;
     }
 
+    osal_mutex_wrapper_t* wrapper = (osal_mutex_wrapper_t*)handle;
+
     /* Convert timeout to FreeRTOS ticks */
     TickType_t ticks = osal_to_freertos_ticks(timeout_ms);
 
     /* Attempt to acquire the mutex */
-    if (xSemaphoreTake((SemaphoreHandle_t)handle, ticks) != pdTRUE) {
+    if (xSemaphoreTake(wrapper->handle, ticks) != pdTRUE) {
         return OSAL_ERROR_TIMEOUT;
     }
 
@@ -614,9 +945,55 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_mutex_wrapper_t* wrapper = (osal_mutex_wrapper_t*)handle;
+
     /* Release the mutex */
-    xSemaphoreGive((SemaphoreHandle_t)handle);
+    xSemaphoreGive(wrapper->handle);
     return OSAL_OK;
+}
+
+/**
+ * \brief           Get mutex owner task
+ *
+ * \details         Returns the task handle of the task that currently holds
+ *                  the mutex. Uses xSemaphoreGetMutexHolder() FreeRTOS API.
+ *
+ * \note            Requirements: 10.1
+ */
+osal_task_handle_t osal_mutex_get_owner(osal_mutex_handle_t handle) {
+    if (handle == NULL) {
+        return NULL;
+    }
+
+    osal_mutex_wrapper_t* wrapper = (osal_mutex_wrapper_t*)handle;
+    /*
+     * xSemaphoreGetMutexHolder returns the task handle of the task
+     * that holds the mutex, or NULL if the mutex is not held.
+     * Note: Returns FreeRTOS TaskHandle_t, not OSAL wrapper.
+     */
+    TaskHandle_t owner = xSemaphoreGetMutexHolder(wrapper->handle);
+    return (osal_task_handle_t)owner;
+}
+
+/**
+ * \brief           Check if mutex is locked
+ *
+ * \details         Returns true if the mutex is currently held by any task.
+ *                  Uses xSemaphoreGetMutexHolder() to check ownership.
+ *
+ * \note            Requirements: 10.2
+ */
+bool osal_mutex_is_locked(osal_mutex_handle_t handle) {
+    if (handle == NULL) {
+        return false;
+    }
+
+    osal_mutex_wrapper_t* wrapper = (osal_mutex_wrapper_t*)handle;
+    /*
+     * If xSemaphoreGetMutexHolder returns non-NULL, the mutex is locked.
+     */
+    TaskHandle_t owner = xSemaphoreGetMutexHolder(wrapper->handle);
+    return (owner != NULL);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -656,13 +1033,31 @@ osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
         }
     }
 
-    /* Create FreeRTOS counting semaphore */
-    SemaphoreHandle_t sem = xSemaphoreCreateCounting(max_count, initial_count);
-    if (sem == NULL) {
+    /* Allocate wrapper structure for handle validation */
+    osal_sem_wrapper_t* wrapper =
+        (osal_sem_wrapper_t*)pvPortMalloc(sizeof(osal_sem_wrapper_t));
+    if (wrapper == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    *handle = (osal_sem_handle_t)sem;
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_SEM);
+
+    /* Create FreeRTOS counting semaphore */
+    wrapper->handle = xSemaphoreCreateCounting(max_count, initial_count);
+    if (wrapper->handle == NULL) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Update semaphore statistics */
+    osal_stats_inc(&s_osal_stats.sems);
+#endif
+
+    *handle = (osal_sem_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -689,9 +1084,22 @@ osal_status_t osal_sem_create_binary(uint32_t initial,
         }
     }
 
+    /* Allocate wrapper structure for handle validation */
+    osal_sem_wrapper_t* wrapper =
+        (osal_sem_wrapper_t*)pvPortMalloc(sizeof(osal_sem_wrapper_t));
+    if (wrapper == NULL) {
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_SEM);
+
     /* Create FreeRTOS binary semaphore */
-    SemaphoreHandle_t sem = xSemaphoreCreateBinary();
-    if (sem == NULL) {
+    wrapper->handle = xSemaphoreCreateBinary();
+    if (wrapper->handle == NULL) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
         return OSAL_ERROR_NO_MEMORY;
     }
 
@@ -700,10 +1108,15 @@ osal_status_t osal_sem_create_binary(uint32_t initial,
      * If initial > 0, we need to give the semaphore to set it to "full" state.
      */
     if (initial > 0) {
-        xSemaphoreGive(sem);
+        xSemaphoreGive(wrapper->handle);
     }
 
-    *handle = (osal_sem_handle_t)sem;
+#if OSAL_STATS_ENABLE
+    /* Update semaphore statistics */
+    osal_stats_inc(&s_osal_stats.sems);
+#endif
+
+    *handle = (osal_sem_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -740,13 +1153,31 @@ osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
         }
     }
 
-    /* Create FreeRTOS counting semaphore */
-    SemaphoreHandle_t sem = xSemaphoreCreateCounting(max_count, initial);
-    if (sem == NULL) {
+    /* Allocate wrapper structure for handle validation */
+    osal_sem_wrapper_t* wrapper =
+        (osal_sem_wrapper_t*)pvPortMalloc(sizeof(osal_sem_wrapper_t));
+    if (wrapper == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    *handle = (osal_sem_handle_t)sem;
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_SEM);
+
+    /* Create FreeRTOS counting semaphore */
+    wrapper->handle = xSemaphoreCreateCounting(max_count, initial);
+    if (wrapper->handle == NULL) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Update semaphore statistics */
+    osal_stats_inc(&s_osal_stats.sems);
+#endif
+
+    *handle = (osal_sem_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -763,8 +1194,20 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_sem_wrapper_t* wrapper = (osal_sem_wrapper_t*)handle;
+
+#if OSAL_STATS_ENABLE
+    /* Update semaphore statistics */
+    osal_stats_dec(&s_osal_stats.sems);
+#endif
+
     /* Delete the FreeRTOS semaphore */
-    vSemaphoreDelete((SemaphoreHandle_t)handle);
+    vSemaphoreDelete(wrapper->handle);
+
+    /* Invalidate handle header before freeing */
+    OSAL_HANDLE_DEINIT(&wrapper->header);
+    vPortFree(wrapper);
+
     return OSAL_OK;
 }
 
@@ -783,11 +1226,13 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_sem_wrapper_t* wrapper = (osal_sem_wrapper_t*)handle;
+
     /* Convert timeout to FreeRTOS ticks */
     TickType_t ticks = osal_to_freertos_ticks(timeout_ms);
 
     /* Attempt to take the semaphore */
-    if (xSemaphoreTake((SemaphoreHandle_t)handle, ticks) != pdTRUE) {
+    if (xSemaphoreTake(wrapper->handle, ticks) != pdTRUE) {
         return OSAL_ERROR_TIMEOUT;
     }
 
@@ -807,8 +1252,10 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_sem_wrapper_t* wrapper = (osal_sem_wrapper_t*)handle;
+
     /* Give the semaphore */
-    xSemaphoreGive((SemaphoreHandle_t)handle);
+    xSemaphoreGive(wrapper->handle);
     return OSAL_OK;
 }
 
@@ -827,6 +1274,8 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_sem_wrapper_t* wrapper = (osal_sem_wrapper_t*)handle;
+
     /*
      * Use ISR-safe version of semaphore give.
      * xHigherPriorityTaskWoken is set to pdTRUE if giving the semaphore
@@ -834,13 +1283,80 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
      * currently running task.
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR((SemaphoreHandle_t)handle, &xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(wrapper->handle, &xHigherPriorityTaskWoken);
 
     /*
      * Request a context switch if a higher priority task was woken.
      * This ensures the higher priority task runs as soon as the ISR completes.
      */
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Get semaphore current count
+ *
+ * \details         Returns the current count of the semaphore using
+ *                  uxSemaphoreGetCount() FreeRTOS API.
+ *
+ * \note            Requirements: 10.3
+ */
+uint32_t osal_sem_get_count(osal_sem_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_sem_wrapper_t* wrapper = (osal_sem_wrapper_t*)handle;
+
+    /*
+     * uxSemaphoreGetCount returns the count of the semaphore.
+     * For binary semaphores, this will be 0 or 1.
+     * For counting semaphores, this will be 0 to max_count.
+     */
+    return (uint32_t)uxSemaphoreGetCount(wrapper->handle);
+}
+
+/**
+ * \brief           Reset semaphore to specified count
+ *
+ * \details         Resets the semaphore count to the specified value.
+ *                  This is done by taking all available counts and then
+ *                  giving the semaphore the specified number of times.
+ *
+ * \note            Requirements: 10.4
+ * \note            This operation is not atomic and should be used with care
+ *                  in multi-threaded environments.
+ */
+osal_status_t osal_sem_reset(osal_sem_handle_t handle, uint32_t count) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    osal_sem_wrapper_t* wrapper = (osal_sem_wrapper_t*)handle;
+
+    /*
+     * FreeRTOS does not provide a direct API to reset semaphore count.
+     * We implement this by:
+     * 1. Taking all available counts (non-blocking)
+     * 2. Giving the semaphore 'count' times
+     *
+     * Note: This is not atomic, so use with care in multi-threaded code.
+     */
+
+    /* Drain all available counts */
+    while (xSemaphoreTake(wrapper->handle, 0) == pdTRUE) {
+        /* Keep taking until empty */
+    }
+
+    /* Give the semaphore 'count' times */
+    for (uint32_t i = 0; i < count; i++) {
+        if (xSemaphoreGive(wrapper->handle) != pdTRUE) {
+            /* Reached max count, stop giving */
+            break;
+        }
+    }
 
     return OSAL_OK;
 }
@@ -877,14 +1393,34 @@ osal_status_t osal_queue_create(size_t item_size, size_t item_count,
         }
     }
 
-    /* Create FreeRTOS queue */
-    QueueHandle_t queue =
-        xQueueCreate((UBaseType_t)item_count, (UBaseType_t)item_size);
-    if (queue == NULL) {
+    /* Allocate wrapper structure for handle validation */
+    osal_queue_wrapper_t* wrapper =
+        (osal_queue_wrapper_t*)pvPortMalloc(sizeof(osal_queue_wrapper_t));
+    if (wrapper == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    *handle = (osal_queue_handle_t)queue;
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_QUEUE);
+    wrapper->mode = OSAL_QUEUE_MODE_NORMAL;
+    wrapper->item_count = item_count;
+
+    /* Create FreeRTOS queue */
+    wrapper->handle =
+        xQueueCreate((UBaseType_t)item_count, (UBaseType_t)item_size);
+    if (wrapper->handle == NULL) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Update queue statistics */
+    osal_stats_inc(&s_osal_stats.queues);
+#endif
+
+    *handle = (osal_queue_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -901,8 +1437,20 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
+#if OSAL_STATS_ENABLE
+    /* Update queue statistics */
+    osal_stats_dec(&s_osal_stats.queues);
+#endif
+
     /* Delete the FreeRTOS queue */
-    vQueueDelete((QueueHandle_t)handle);
+    vQueueDelete(wrapper->handle);
+
+    /* Invalidate handle header before freeing */
+    OSAL_HANDLE_DEINIT(&wrapper->header);
+    vPortFree(wrapper);
+
     return OSAL_OK;
 }
 
@@ -924,11 +1472,13 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Convert timeout to FreeRTOS ticks */
     TickType_t ticks = osal_to_freertos_ticks(timeout_ms);
 
     /* Send item to queue */
-    if (xQueueSend((QueueHandle_t)handle, item, ticks) != pdTRUE) {
+    if (xQueueSend(wrapper->handle, item, ticks) != pdTRUE) {
         /* Queue is full and timeout expired */
         return OSAL_ERROR_FULL;
     }
@@ -954,11 +1504,13 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Convert timeout to FreeRTOS ticks */
     TickType_t ticks = osal_to_freertos_ticks(timeout_ms);
 
     /* Send item to front of queue */
-    if (xQueueSendToFront((QueueHandle_t)handle, item, ticks) != pdTRUE) {
+    if (xQueueSendToFront(wrapper->handle, item, ticks) != pdTRUE) {
         /* Queue is full and timeout expired */
         return OSAL_ERROR_FULL;
     }
@@ -984,11 +1536,13 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Convert timeout to FreeRTOS ticks */
     TickType_t ticks = osal_to_freertos_ticks(timeout_ms);
 
     /* Receive item from queue */
-    if (xQueueReceive((QueueHandle_t)handle, item, ticks) != pdTRUE) {
+    if (xQueueReceive(wrapper->handle, item, ticks) != pdTRUE) {
         /* Queue is empty and timeout expired */
         return OSAL_ERROR_EMPTY;
     }
@@ -1011,8 +1565,10 @@ osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Peek at front item without removing (no wait) */
-    if (xQueuePeek((QueueHandle_t)handle, item, 0) != pdTRUE) {
+    if (xQueuePeek(wrapper->handle, item, 0) != pdTRUE) {
         /* Queue is empty */
         return OSAL_ERROR_EMPTY;
     }
@@ -1034,8 +1590,10 @@ size_t osal_queue_get_count(osal_queue_handle_t handle) {
         return 0;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Return number of items waiting in queue */
-    return (size_t)uxQueueMessagesWaiting((QueueHandle_t)handle);
+    return (size_t)uxQueueMessagesWaiting(wrapper->handle);
 }
 
 /**
@@ -1047,8 +1605,10 @@ bool osal_queue_is_empty(osal_queue_handle_t handle) {
         return true;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Queue is empty if message count is 0 */
-    return (uxQueueMessagesWaiting((QueueHandle_t)handle) == 0);
+    return (uxQueueMessagesWaiting(wrapper->handle) == 0);
 }
 
 /**
@@ -1063,8 +1623,10 @@ bool osal_queue_is_full(osal_queue_handle_t handle) {
         return false;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /* Queue is full if no spaces are available */
-    return (uxQueueSpacesAvailable((QueueHandle_t)handle) == 0);
+    return (uxQueueSpacesAvailable(wrapper->handle) == 0);
 }
 
 /**
@@ -1083,6 +1645,8 @@ osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /*
      * Use ISR-safe version of queue send.
      * xHigherPriorityTaskWoken is set to pdTRUE if sending to the queue
@@ -1091,7 +1655,7 @@ osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    if (xQueueSendFromISR((QueueHandle_t)handle, item,
+    if (xQueueSendFromISR(wrapper->handle, item,
                           &xHigherPriorityTaskWoken) != pdTRUE) {
         /* Queue is full */
         return OSAL_ERROR_FULL;
@@ -1122,6 +1686,8 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
     /*
      * Use ISR-safe version of queue receive.
      * xHigherPriorityTaskWoken is set to pdTRUE if receiving from the queue
@@ -1130,7 +1696,7 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    if (xQueueReceiveFromISR((QueueHandle_t)handle, item,
+    if (xQueueReceiveFromISR(wrapper->handle, item,
                              &xHigherPriorityTaskWoken) != pdTRUE) {
         /* Queue is empty */
         return OSAL_ERROR_EMPTY;
@@ -1145,40 +1711,136 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
     return OSAL_OK;
 }
 
+/**
+ * \brief           Get available space in queue
+ *
+ * \details         Returns the number of free slots in the queue using
+ *                  uxQueueSpacesAvailable().
+ *
+ * \note            Requirements: 8.1
+ */
+size_t osal_queue_get_available_space(osal_queue_handle_t handle) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
+    /* Return number of available spaces in queue */
+    return (size_t)uxQueueSpacesAvailable(wrapper->handle);
+}
+
+/**
+ * \brief           Reset queue (clear all items)
+ *
+ * \details         Resets the queue to its empty state using xQueueReset().
+ *                  All items in the queue are discarded.
+ *
+ * \note            Requirements: 8.2
+ */
+osal_status_t osal_queue_reset(osal_queue_handle_t handle) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
+    /* Reset the queue - discards all items */
+    xQueueReset(wrapper->handle);
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Set queue mode
+ *
+ * \details         Sets the queue operating mode. In FreeRTOS, the standard
+ *                  queue does not support overwrite mode directly. This
+ *                  function is provided for API compatibility but overwrite
+ *                  mode requires using xQueueOverwrite() for single-item
+ *                  queues. For multi-item queues, overwrite mode is not
+ *                  natively supported.
+ *
+ * \note            Requirements: 8.3
+ *                  FreeRTOS limitation: Overwrite mode only works for
+ *                  single-item queues using xQueueOverwrite().
+ */
+osal_status_t osal_queue_set_mode(osal_queue_handle_t handle,
+                                  osal_queue_mode_t mode) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    /* Parameter validation - mode must be valid */
+    if (mode != OSAL_QUEUE_MODE_NORMAL && mode != OSAL_QUEUE_MODE_OVERWRITE) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
+    /*
+     * Store the mode in the wrapper structure.
+     * The actual behavior depends on how send operations are called.
+     * For overwrite mode with single-item queues, xQueueOverwrite() should
+     * be used instead of xQueueSend().
+     */
+    wrapper->mode = mode;
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Peek item from queue in ISR context
+ *
+ * \details         Peeks at the front item of a FreeRTOS queue from an
+ *                  interrupt service routine using xQueuePeekFromISR().
+ *                  The item is copied to the output buffer but remains
+ *                  in the queue.
+ *
+ * \note            Requirements: 8.5
+ */
+osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle,
+                                       void* item) {
+    /* Parameter validation - NULL pointer checks */
+    if (handle == NULL || item == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    osal_queue_wrapper_t* wrapper = (osal_queue_wrapper_t*)handle;
+
+    /* Peek at front item from ISR context */
+    if (xQueuePeekFromISR(wrapper->handle, item) != pdTRUE) {
+        /* Queue is empty */
+        return OSAL_ERROR_EMPTY;
+    }
+
+    return OSAL_OK;
+}
+
 /*---------------------------------------------------------------------------*/
 /* Timer Functions                                                           */
 /*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Internal timer context for callback argument passing
- *
- * \details         FreeRTOS timer callbacks receive the timer handle, not a
- *                  user-provided argument. This structure stores the user
- *                  callback and argument, and is stored in the timer's ID
- * field.
- */
-typedef struct {
-    osal_timer_callback_t user_callback; /**< User callback function */
-    void* user_arg;                      /**< User callback argument */
-} osal_timer_context_t;
-
-/**
  * \brief           Internal FreeRTOS timer callback wrapper
  *
  * \details         This function is called by FreeRTOS when a timer expires.
- *                  It retrieves the user callback and argument from the timer's
- *                  ID field and invokes the user callback.
+ *                  It retrieves the wrapper from the timer's ID field and
+ *                  invokes the user callback with the user argument.
  *
  * \param[in]       xTimer: FreeRTOS timer handle
  */
 static void osal_timer_callback_wrapper(TimerHandle_t xTimer) {
-    /* Get the timer context from the timer ID */
-    osal_timer_context_t* ctx =
-        (osal_timer_context_t*)pvTimerGetTimerID(xTimer);
+    /* Get the timer wrapper from the timer ID */
+    osal_timer_wrapper_t* wrapper =
+        (osal_timer_wrapper_t*)pvTimerGetTimerID(xTimer);
 
-    if (ctx != NULL && ctx->user_callback != NULL) {
+    if (wrapper != NULL && wrapper->callback != NULL) {
         /* Invoke the user callback with the user argument */
-        ctx->user_callback(ctx->user_arg);
+        wrapper->callback(wrapper->arg);
     }
 }
 
@@ -1220,16 +1882,19 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
         }
     }
 
-    /* Allocate timer context for callback argument passing */
-    osal_timer_context_t* ctx =
-        (osal_timer_context_t*)pvPortMalloc(sizeof(osal_timer_context_t));
-    if (ctx == NULL) {
+    /* Allocate wrapper structure for handle validation */
+    osal_timer_wrapper_t* wrapper =
+        (osal_timer_wrapper_t*)pvPortMalloc(sizeof(osal_timer_wrapper_t));
+    if (wrapper == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    /* Store user callback and argument in context */
-    ctx->user_callback = config->callback;
-    ctx->user_arg = config->arg;
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_TIMER);
+
+    /* Store user callback and argument in wrapper */
+    wrapper->callback = config->callback;
+    wrapper->arg = config->arg;
 
     /* Convert period from milliseconds to ticks */
     TickType_t period_ticks = pdMS_TO_TICKS(config->period_ms);
@@ -1246,22 +1911,28 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     const char* timer_name = (config->name != NULL) ? config->name : "timer";
 
     /* Create the FreeRTOS timer */
-    TimerHandle_t timer =
+    wrapper->handle =
         xTimerCreate(timer_name,   /* Timer name */
                      period_ticks, /* Timer period in ticks */
                      auto_reload,  /* Auto-reload (periodic) or one-shot */
-                     (void*)ctx,   /* Timer ID (stores our context) */
+                     (void*)wrapper, /* Timer ID (stores our wrapper) */
                      osal_timer_callback_wrapper /* Callback wrapper function */
         );
 
-    if (timer == NULL) {
-        /* Timer creation failed - free the context */
-        vPortFree(ctx);
+    if (wrapper->handle == NULL) {
+        /* Timer creation failed - invalidate and free wrapper */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    /* Return the timer handle */
-    *handle = (osal_timer_handle_t)timer;
+#if OSAL_STATS_ENABLE
+    /* Update timer statistics */
+    osal_stats_inc(&s_osal_stats.timers);
+#endif
+
+    /* Return the wrapper as the timer handle */
+    *handle = (osal_timer_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -1283,6 +1954,11 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
 
     /* Get the timer context to free it */
     osal_timer_context_t* ctx = (osal_timer_context_t*)pvTimerGetTimerID(timer);
+
+#if OSAL_STATS_ENABLE
+    /* Update timer statistics */
+    osal_stats_dec(&s_osal_stats.timers);
+#endif
 
     /* Delete the FreeRTOS timer
      * Use portMAX_DELAY to wait indefinitely for the command to be sent
@@ -1563,6 +2239,113 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) {
 }
 
 /*---------------------------------------------------------------------------*/
+/* Timer Enhanced Functions                                                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Get timer remaining time
+ *
+ * \details         Returns the time remaining until the timer expires.
+ *                  Uses xTimerGetExpiryTime() to get the absolute expiry time
+ *                  and calculates the remaining time from the current tick
+ *                  count.
+ *
+ * \note            Requirements: 5.1
+ */
+uint32_t osal_timer_get_remaining(osal_timer_handle_t handle) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return 0;
+    }
+
+    TimerHandle_t timer = (TimerHandle_t)handle;
+
+    /* Check if timer is active */
+    if (xTimerIsTimerActive(timer) == pdFALSE) {
+        return 0;
+    }
+
+    /* Get the expiry time and current tick count */
+    TickType_t expiry_time = xTimerGetExpiryTime(timer);
+    TickType_t current_time = xTaskGetTickCount();
+
+    /* Calculate remaining ticks */
+    TickType_t remaining_ticks;
+    if (expiry_time >= current_time) {
+        remaining_ticks = expiry_time - current_time;
+    } else {
+        /* Timer has already expired or tick count wrapped */
+        remaining_ticks = 0;
+    }
+
+    /* Convert ticks to milliseconds */
+    return (uint32_t)((remaining_ticks * 1000) / configTICK_RATE_HZ);
+}
+
+/**
+ * \brief           Get timer configured period
+ *
+ * \details         Returns the period of the timer in milliseconds.
+ *                  Uses xTimerGetPeriod() to get the period in ticks and
+ *                  converts to milliseconds.
+ *
+ * \note            Requirements: 5.2
+ */
+uint32_t osal_timer_get_period(osal_timer_handle_t handle) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return 0;
+    }
+
+    TimerHandle_t timer = (TimerHandle_t)handle;
+
+    /* Get the timer period in ticks */
+    TickType_t period_ticks = xTimerGetPeriod(timer);
+
+    /* Convert ticks to milliseconds */
+    return (uint32_t)((period_ticks * 1000) / configTICK_RATE_HZ);
+}
+
+/**
+ * \brief           Set timer callback function
+ *
+ * \details         Changes the callback function and argument for a timer.
+ *                  Updates the timer context structure stored in the timer ID.
+ *
+ * \note            Requirements: 5.3
+ */
+osal_status_t osal_timer_set_callback(osal_timer_handle_t handle,
+                                      osal_timer_callback_t callback,
+                                      void* arg) {
+    /* Parameter validation - NULL pointer checks */
+    if (handle == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    if (callback == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    TimerHandle_t timer = (TimerHandle_t)handle;
+
+    /* Get the timer context from the timer ID */
+    osal_timer_context_t* ctx =
+        (osal_timer_context_t*)pvTimerGetTimerID(timer);
+
+    if (ctx == NULL) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* Update the callback and argument in the context */
+    osal_enter_critical();
+    ctx->user_callback = callback;
+    ctx->user_arg = arg;
+    osal_exit_critical();
+
+    return OSAL_OK;
+}
+
+/*---------------------------------------------------------------------------*/
 /* Memory Functions                                                          */
 /*---------------------------------------------------------------------------*/
 
@@ -1581,7 +2364,21 @@ void* osal_mem_alloc(size_t size) {
     }
 
     /* Allocate memory using FreeRTOS heap */
-    return pvPortMalloc(size);
+    void* ptr = pvPortMalloc(size);
+
+#if OSAL_STATS_ENABLE
+    if (ptr != NULL) {
+        osal_enter_critical();
+        s_osal_stats.mem_alloc_count++;
+        s_osal_stats.mem_allocated += size;
+        if (s_osal_stats.mem_allocated > s_osal_stats.mem_peak) {
+            s_osal_stats.mem_peak = s_osal_stats.mem_allocated;
+        }
+        osal_exit_critical();
+    }
+#endif
+
+    return ptr;
 }
 
 /**
@@ -1597,6 +2394,15 @@ void osal_mem_free(void* ptr) {
     if (ptr == NULL) {
         return;
     }
+
+#if OSAL_STATS_ENABLE
+    osal_enter_critical();
+    if (s_osal_stats.mem_alloc_count > 0) {
+        s_osal_stats.mem_alloc_count--;
+    }
+    /* Note: We cannot track exact freed size without additional bookkeeping */
+    osal_exit_critical();
+#endif
 
     /* Free memory using FreeRTOS heap */
     vPortFree(ptr);
@@ -1814,6 +2620,101 @@ size_t osal_mem_get_min_free_size(void) {
     return xPortGetMinimumEverFreeHeapSize();
 }
 
+/**
+ * \brief           Get active allocation count
+ *
+ * \details         Returns the number of active memory allocations.
+ *                  This is tracked internally when OSAL_STATS_ENABLE is defined.
+ *
+ * \note            Requirements: 6.1
+ */
+size_t osal_mem_get_allocation_count(void) {
+#if OSAL_STATS_ENABLE
+    size_t count;
+    osal_enter_critical();
+    count = s_osal_stats.mem_alloc_count;
+    osal_exit_critical();
+    return count;
+#else
+    /* Statistics not enabled - return 0 */
+    return 0;
+#endif
+}
+
+/**
+ * \brief           Check heap integrity
+ *
+ * \details         Performs a basic integrity check on the FreeRTOS heap.
+ *                  Uses vPortGetHeapStats() if available (heap_4 or heap_5),
+ *                  otherwise performs a basic sanity check.
+ *
+ * \note            Requirements: 6.3
+ */
+osal_status_t osal_mem_check_integrity(void) {
+    /*
+     * FreeRTOS heap integrity checking depends on the heap implementation:
+     * - heap_1: No integrity check available (simple bump allocator)
+     * - heap_2: No integrity check available
+     * - heap_3: Uses standard library malloc (no FreeRTOS check)
+     * - heap_4: Can use vPortGetHeapStats() for basic validation
+     * - heap_5: Can use vPortGetHeapStats() for basic validation
+     *
+     * We perform a basic sanity check by verifying that:
+     * 1. Free heap size is not larger than total heap size
+     * 2. Minimum ever free size is not larger than current free size
+     */
+    size_t free_size = xPortGetFreeHeapSize();
+    size_t min_free_size = xPortGetMinimumEverFreeHeapSize();
+
+    /* Basic sanity checks */
+    if (free_size > configTOTAL_HEAP_SIZE) {
+        return OSAL_ERROR;
+    }
+
+    if (min_free_size > free_size) {
+        /* This should never happen - indicates corruption */
+        return OSAL_ERROR;
+    }
+
+    if (min_free_size > configTOTAL_HEAP_SIZE) {
+        return OSAL_ERROR;
+    }
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Free aligned memory
+ *
+ * \details         Frees memory that was allocated with osal_mem_alloc_aligned().
+ *                  Retrieves the original pointer stored before the aligned
+ *                  address and frees it.
+ *
+ * \note            Requirements: 6.4
+ */
+void osal_mem_free_aligned(void* ptr) {
+    /* Safe to call with NULL - just return */
+    if (ptr == NULL) {
+        return;
+    }
+
+    /*
+     * The original pointer is stored just before the aligned pointer.
+     * Retrieve it and free the original allocation.
+     */
+    void* original_ptr = ((void**)ptr)[-1];
+
+#if OSAL_STATS_ENABLE
+    osal_enter_critical();
+    if (s_osal_stats.mem_alloc_count > 0) {
+        s_osal_stats.mem_alloc_count--;
+    }
+    osal_exit_critical();
+#endif
+
+    vPortFree(original_ptr);
+}
+
 /*---------------------------------------------------------------------------*/
 /* Event Flags Functions                                                     */
 /*---------------------------------------------------------------------------*/
@@ -1850,13 +2751,31 @@ osal_status_t osal_event_create(osal_event_handle_t* handle) {
         }
     }
 
-    /* Create FreeRTOS event group */
-    EventGroupHandle_t event_group = xEventGroupCreate();
-    if (event_group == NULL) {
+    /* Allocate wrapper structure for handle validation */
+    osal_event_wrapper_t* wrapper =
+        (osal_event_wrapper_t*)pvPortMalloc(sizeof(osal_event_wrapper_t));
+    if (wrapper == NULL) {
         return OSAL_ERROR_NO_MEMORY;
     }
 
-    *handle = (osal_event_handle_t)event_group;
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&wrapper->header, OSAL_TYPE_EVENT);
+
+    /* Create FreeRTOS event group */
+    wrapper->handle = xEventGroupCreate();
+    if (wrapper->handle == NULL) {
+        /* Invalidate and free wrapper on failure */
+        OSAL_HANDLE_DEINIT(&wrapper->header);
+        vPortFree(wrapper);
+        return OSAL_ERROR_NO_MEMORY;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Update event statistics */
+    osal_stats_inc(&s_osal_stats.events);
+#endif
+
+    *handle = (osal_event_handle_t)wrapper;
     return OSAL_OK;
 }
 
@@ -1874,8 +2793,20 @@ osal_status_t osal_event_delete(osal_event_handle_t handle) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
+#if OSAL_STATS_ENABLE
+    /* Update event statistics */
+    osal_stats_dec(&s_osal_stats.events);
+#endif
+
     /* Delete the FreeRTOS event group */
-    vEventGroupDelete((EventGroupHandle_t)handle);
+    vEventGroupDelete(wrapper->handle);
+
+    /* Invalidate handle header before freeing */
+    OSAL_HANDLE_DEINIT(&wrapper->header);
+    vPortFree(wrapper);
+
     return OSAL_OK;
 }
 
@@ -1900,8 +2831,10 @@ osal_status_t osal_event_set(osal_event_handle_t handle,
         return OSAL_ERROR_INVALID_PARAM;
     }
 
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
     /* Set the event bits atomically */
-    xEventGroupSetBits((EventGroupHandle_t)handle, (EventBits_t)bits);
+    xEventGroupSetBits(wrapper->handle, (EventBits_t)bits);
     return OSAL_OK;
 }
 
@@ -1926,8 +2859,10 @@ osal_status_t osal_event_clear(osal_event_handle_t handle,
         return OSAL_ERROR_INVALID_PARAM;
     }
 
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
     /* Clear the event bits atomically */
-    xEventGroupClearBits((EventGroupHandle_t)handle, (EventBits_t)bits);
+    xEventGroupClearBits(wrapper->handle, (EventBits_t)bits);
     return OSAL_OK;
 }
 
@@ -1963,6 +2898,8 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
         return OSAL_ERROR_ISR;
     }
 
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
     /* Convert timeout to FreeRTOS ticks */
     TickType_t ticks = osal_to_freertos_ticks(options->timeout_ms);
 
@@ -1975,7 +2912,7 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
 
     /* Wait for the event bits */
     EventBits_t result =
-        xEventGroupWaitBits((EventGroupHandle_t)handle, (EventBits_t)bits,
+        xEventGroupWaitBits(wrapper->handle, (EventBits_t)bits,
                             clear_on_exit, wait_for_all, ticks);
 
     /* Store the result bits if requested */
@@ -2019,8 +2956,10 @@ osal_event_bits_t osal_event_get(osal_event_handle_t handle) {
         return 0;
     }
 
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
     /* Get the current event bits (non-blocking) */
-    return (osal_event_bits_t)xEventGroupGetBits((EventGroupHandle_t)handle);
+    return (osal_event_bits_t)xEventGroupGetBits(wrapper->handle);
 }
 
 /**
@@ -2045,6 +2984,8 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
         return OSAL_ERROR_INVALID_PARAM;
     }
 
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
     /*
      * Use ISR-safe version of event group set bits.
      * xHigherPriorityTaskWoken is set to pdTRUE if setting the bits
@@ -2054,7 +2995,7 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     BaseType_t result =
-        xEventGroupSetBitsFromISR((EventGroupHandle_t)handle, (EventBits_t)bits,
+        xEventGroupSetBitsFromISR(wrapper->handle, (EventBits_t)bits,
                                   &xHigherPriorityTaskWoken);
 
     /* Check if the operation succeeded */
@@ -2069,4 +3010,243 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
     return OSAL_OK;
+}
+
+/**
+ * \brief           Clear event bits from ISR context
+ *
+ * \details         Clears event bits from an interrupt service routine using
+ *                  xEventGroupClearBitsFromISR(). Note that FreeRTOS defers
+ *                  the actual clear operation to the timer daemon task.
+ *
+ * \note            Requirements: 7.2
+ */
+osal_status_t osal_event_clear_from_isr(osal_event_handle_t handle,
+                                        osal_event_bits_t bits) {
+    /* Parameter validation - NULL pointer check */
+    if (handle == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    /* Parameter validation - zero bits mask check */
+    if (bits == 0) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
+    /*
+     * Use ISR-safe version of event group clear bits.
+     * Note: xEventGroupClearBitsFromISR() defers the clear operation
+     * to the timer daemon task. The function returns pdPASS if the
+     * command was successfully sent to the timer command queue.
+     */
+    BaseType_t result =
+        xEventGroupClearBitsFromISR(wrapper->handle, (EventBits_t)bits);
+
+    /* Check if the operation was queued successfully */
+    if (result != pdPASS) {
+        return OSAL_ERROR;
+    }
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Synchronous set and wait operation
+ *
+ * \details         Atomically sets event bits and then waits for a different
+ *                  set of bits to be set. This is useful for task rendezvous
+ *                  synchronization patterns. Uses xEventGroupSync() FreeRTOS API.
+ *
+ * \note            Requirements: 7.3
+ */
+osal_status_t osal_event_sync(osal_event_handle_t handle,
+                              osal_event_bits_t set_bits,
+                              osal_event_bits_t wait_bits,
+                              const osal_event_wait_options_t* options,
+                              osal_event_bits_t* bits_out) {
+    /* Parameter validation - NULL pointer checks */
+    if (handle == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    if (options == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    /* Parameter validation - zero bits mask check */
+    if (set_bits == 0 || wait_bits == 0) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* ISR context check - sync cannot be called from ISR */
+    if (is_in_isr()) {
+        return OSAL_ERROR_ISR;
+    }
+
+    osal_event_wrapper_t* wrapper = (osal_event_wrapper_t*)handle;
+
+    /* Convert timeout to FreeRTOS ticks */
+    TickType_t ticks = osal_to_freertos_ticks(options->timeout_ms);
+
+    /*
+     * xEventGroupSync atomically sets the specified bits and then waits
+     * for all the wait_bits to be set. The bits that were set are cleared
+     * on exit (similar to auto_clear behavior).
+     */
+    EventBits_t result =
+        xEventGroupSync(wrapper->handle,
+                        (EventBits_t)set_bits,
+                        (EventBits_t)wait_bits,
+                        ticks);
+
+    /* Store the result bits if requested */
+    if (bits_out != NULL) {
+        *bits_out = (osal_event_bits_t)result;
+    }
+
+    /*
+     * Check if the sync condition was satisfied.
+     * xEventGroupSync returns the event bits value at the time either
+     * the bits being waited for became set, or the timeout expired.
+     * We need to check if all wait_bits are set in the result.
+     */
+    if ((result & wait_bits) == wait_bits) {
+        return OSAL_OK;
+    }
+
+    /* Timeout occurred - condition was not met */
+    return OSAL_ERROR_TIMEOUT;
+}
+
+/*---------------------------------------------------------------------------*/
+/* Diagnostics Functions                                                     */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Get OSAL resource statistics
+ *
+ * \details         Retrieves current resource counts and watermarks for all
+ *                  OSAL resource types. This function is safe to call from
+ *                  any context, including ISR.
+ *
+ * \note            Requirements: 2.1, 2.2, 2.3, 2.5
+ */
+osal_status_t osal_get_stats(osal_stats_t* stats) {
+    /* Parameter validation - NULL pointer check */
+    if (stats == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Enter critical section to ensure consistent snapshot */
+    osal_enter_critical();
+
+    /* Copy current counts */
+    stats->task_count = s_osal_stats.tasks.count;
+    stats->mutex_count = s_osal_stats.mutexes.count;
+    stats->sem_count = s_osal_stats.sems.count;
+    stats->queue_count = s_osal_stats.queues.count;
+    stats->event_count = s_osal_stats.events.count;
+    stats->timer_count = s_osal_stats.timers.count;
+
+    /* Copy watermarks */
+    stats->task_watermark = s_osal_stats.tasks.watermark;
+    stats->mutex_watermark = s_osal_stats.mutexes.watermark;
+    stats->sem_watermark = s_osal_stats.sems.watermark;
+    stats->queue_watermark = s_osal_stats.queues.watermark;
+    stats->event_watermark = s_osal_stats.events.watermark;
+    stats->timer_watermark = s_osal_stats.timers.watermark;
+
+    /* Copy memory statistics */
+    stats->mem_allocated = s_osal_stats.mem_allocated;
+    stats->mem_peak = s_osal_stats.mem_peak;
+    stats->mem_alloc_count = s_osal_stats.mem_alloc_count;
+
+    osal_exit_critical();
+#else
+    /* Statistics disabled - return zeros */
+    memset(stats, 0, sizeof(osal_stats_t));
+#endif
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Reset OSAL statistics watermarks
+ *
+ * \details         Resets all watermark values to current counts. This is
+ *                  useful for monitoring peak usage over specific time periods.
+ *                  This function is safe to call from any context, including ISR.
+ *
+ * \note            Requirements: 2.3
+ */
+osal_status_t osal_reset_stats(void) {
+#if OSAL_STATS_ENABLE
+    /* Enter critical section to ensure atomic reset */
+    osal_enter_critical();
+
+    /* Reset watermarks to current counts */
+    s_osal_stats.tasks.watermark = s_osal_stats.tasks.count;
+    s_osal_stats.mutexes.watermark = s_osal_stats.mutexes.count;
+    s_osal_stats.sems.watermark = s_osal_stats.sems.count;
+    s_osal_stats.queues.watermark = s_osal_stats.queues.count;
+    s_osal_stats.events.watermark = s_osal_stats.events.count;
+    s_osal_stats.timers.watermark = s_osal_stats.timers.count;
+
+    /* Reset memory peak to current allocation */
+    s_osal_stats.mem_peak = s_osal_stats.mem_allocated;
+
+    osal_exit_critical();
+#endif
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Register error callback
+ *
+ * \details         Registers a callback function that will be invoked when
+ *                  certain errors occur. Only one callback can be registered
+ *                  at a time; registering a new callback replaces the previous
+ *                  one. Pass NULL to disable the callback.
+ *
+ * \note            Requirements: 2.5
+ */
+osal_status_t osal_set_error_callback(osal_error_callback_t callback) {
+    /* Enter critical section for atomic update */
+    osal_enter_critical();
+    s_error_callback = callback;
+    osal_exit_critical();
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Get error callback
+ *
+ * \details         Returns the currently registered error callback function,
+ *                  or NULL if no callback is registered.
+ */
+osal_error_callback_t osal_get_error_callback(void) {
+    return s_error_callback;
+}
+
+/**
+ * \brief           Report an error through the error callback
+ *
+ * \details         Invokes the registered error callback if one is set.
+ *                  This function is intended for internal use by OSAL
+ *                  implementations to report errors.
+ *
+ * \note            The callback may be invoked from ISR context, so it
+ *                  should be kept short and should not block.
+ */
+void osal_report_error(osal_status_t error, const char* file, uint32_t line) {
+    osal_error_callback_t callback = s_error_callback;
+
+    if (callback != NULL) {
+        callback(error, file, line);
+    }
 }

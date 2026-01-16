@@ -25,6 +25,7 @@
 #endif
 
 #include "osal/osal.h"
+#include "osal/osal_internal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,10 +45,8 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_TASKS      16
-#define OSAL_MAX_MUTEXES    16
-#define OSAL_MAX_SEMS       16
-#define OSAL_MAX_QUEUES     8
+/* Use configuration from osal_config.h for resource limits */
+/* Local configuration for native-specific settings */
 #define OSAL_QUEUE_MAX_SIZE 256
 #define OSAL_TASK_NAME_MAX  32
 
@@ -56,6 +55,7 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
+    osal_handle_header_t header;        /**< Handle validation header */
     bool used;
     bool running;
     bool suspended;
@@ -79,7 +79,10 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
+    osal_handle_header_t header;        /**< Handle validation header */
     bool used;
+    bool locked;                        /**< Lock state for tracking */
+    osal_task_internal_t* owner;        /**< Owner task pointer */
 #ifdef _WIN32
     CRITICAL_SECTION cs;
 #else
@@ -92,6 +95,7 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
+    osal_handle_header_t header;        /**< Handle validation header */
     bool used;
     uint32_t count;
     uint32_t max_count;
@@ -108,6 +112,7 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
+    osal_handle_header_t header;        /**< Handle validation header */
     bool used;
     uint8_t* buffer;
     size_t item_size;
@@ -115,6 +120,7 @@ typedef struct {
     size_t head;
     size_t tail;
     size_t count;
+    osal_queue_mode_t mode;             /**< Queue mode (normal/overwrite) */
 #ifdef _WIN32
     CRITICAL_SECTION cs;
     HANDLE not_empty;
@@ -181,6 +187,69 @@ static void ms_to_timespec(uint32_t ms, struct timespec* ts) {
     ts->tv_nsec = (long)(nsec % 1000000000ULL);
 }
 #endif
+
+/*---------------------------------------------------------------------------*/
+/* Diagnostics - Resource Statistics Tracking                                */
+/*---------------------------------------------------------------------------*/
+
+#if OSAL_STATS_ENABLE
+
+/**
+ * \brief           Resource statistics structure for internal tracking
+ */
+typedef struct {
+    volatile uint16_t count;        /**< Current count */
+    volatile uint16_t watermark;    /**< Peak count (high watermark) */
+} osal_resource_stats_internal_t;
+
+/**
+ * \brief           Global statistics context
+ */
+typedef struct {
+    osal_resource_stats_internal_t tasks;    /**< Task statistics */
+    osal_resource_stats_internal_t mutexes;  /**< Mutex statistics */
+    osal_resource_stats_internal_t sems;     /**< Semaphore statistics */
+    osal_resource_stats_internal_t queues;   /**< Queue statistics */
+    osal_resource_stats_internal_t events;   /**< Event flags statistics */
+    osal_resource_stats_internal_t timers;   /**< Timer statistics */
+} osal_global_stats_t;
+
+/** \brief          Global statistics instance */
+static osal_global_stats_t s_osal_stats = {0};
+
+/**
+ * \brief           Increment resource count and update watermark
+ * \param[in]       stats: Pointer to statistics structure
+ */
+static inline void osal_stats_inc(osal_resource_stats_internal_t* stats) {
+    global_lock();
+    stats->count++;
+    if (stats->count > stats->watermark) {
+        stats->watermark = stats->count;
+    }
+    global_unlock();
+}
+
+/**
+ * \brief           Decrement resource count
+ * \param[in]       stats: Pointer to statistics structure
+ */
+static inline void osal_stats_dec(osal_resource_stats_internal_t* stats) {
+    global_lock();
+    if (stats->count > 0) {
+        stats->count--;
+    }
+    global_unlock();
+}
+
+#endif /* OSAL_STATS_ENABLE */
+
+/*---------------------------------------------------------------------------*/
+/* Diagnostics - Error Callback                                              */
+/*---------------------------------------------------------------------------*/
+
+/** \brief          Registered error callback function */
+static osal_error_callback_t s_error_callback = NULL;
 
 /*---------------------------------------------------------------------------*/
 /* OSAL Core Functions                                                       */
@@ -342,6 +411,9 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     osal_task_internal_t* task = &s_tasks[slot];
     memset(task, 0, sizeof(*task));
 
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&task->header, OSAL_TYPE_TASK);
+
     task->used = true;
     task->func = config->func;
     task->arg = config->arg;
@@ -400,6 +472,11 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     }
 #endif
 
+#if OSAL_STATS_ENABLE
+    /* Update task statistics */
+    osal_stats_inc(&s_osal_stats.tasks);
+#endif
+
     *handle = (osal_task_handle_t)task;
     global_unlock();
 
@@ -421,11 +498,18 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
         }
     } else {
         task = (osal_task_internal_t*)handle;
+        /* Validate handle using magic number and type check */
+        OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
     }
 
     if (!task->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+#if OSAL_STATS_ENABLE
+    /* Update task statistics */
+    osal_stats_dec(&s_osal_stats.tasks);
+#endif
 
     global_lock();
 
@@ -465,6 +549,8 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
     }
 
     global_lock();
+    /* Invalidate handle header before marking as unused */
+    OSAL_HANDLE_DEINIT(&task->header);
     task->used = false;
     global_unlock();
 
@@ -472,9 +558,8 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
 }
 
 osal_status_t osal_task_suspend(osal_task_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
 
     osal_task_internal_t* task = (osal_task_internal_t*)handle;
 
@@ -495,9 +580,8 @@ osal_status_t osal_task_suspend(osal_task_handle_t handle) {
 }
 
 osal_status_t osal_task_resume(osal_task_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
 
     osal_task_internal_t* task = (osal_task_internal_t*)handle;
 
@@ -578,6 +662,151 @@ const char* osal_task_get_name(osal_task_handle_t handle) {
     return task->name;
 }
 
+/**
+ * \brief           Get task priority
+ *
+ * \details         Returns the current priority of the specified task.
+ *
+ * \note            Requirements: 9.1
+ */
+uint8_t osal_task_get_priority(osal_task_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_task_internal_t* task = (osal_task_internal_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&task->header, OSAL_TYPE_TASK)) {
+        return 0;
+    }
+#endif
+
+    if (!task->used) {
+        return 0;
+    }
+
+    return task->priority;
+}
+
+/**
+ * \brief           Set task priority
+ *
+ * \details         Changes the priority of the specified task at runtime.
+ *
+ * \note            Requirements: 9.2
+ */
+osal_status_t osal_task_set_priority(osal_task_handle_t handle,
+                                     uint8_t priority) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TASK);
+
+    /* Parameter validation - priority must be in valid range (0-31) */
+    if (priority > 31) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    osal_task_internal_t* task = (osal_task_internal_t*)handle;
+
+    if (!task->used) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    global_lock();
+    task->priority = priority;
+    global_unlock();
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Get task stack high watermark
+ *
+ * \details         Returns an estimated value for stack watermark.
+ *                  Native platform does not have direct stack monitoring,
+ *                  so this returns a placeholder value.
+ *
+ * \note            Requirements: 9.3
+ */
+size_t osal_task_get_stack_watermark(osal_task_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_task_internal_t* task = (osal_task_internal_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&task->header, OSAL_TYPE_TASK)) {
+        return 0;
+    }
+#endif
+
+    if (!task->used) {
+        return 0;
+    }
+
+    /*
+     * Native platform (pthreads/Windows threads) does not provide
+     * direct stack watermark monitoring. Return a placeholder value
+     * indicating stack monitoring is not available.
+     * A value of SIZE_MAX indicates "unknown/not available".
+     */
+    return SIZE_MAX;
+}
+
+/**
+ * \brief           Get task state
+ *
+ * \details         Returns the current state of the specified task.
+ *
+ * \note            Requirements: 9.4
+ */
+osal_task_state_t osal_task_get_state(osal_task_handle_t handle) {
+    if (handle == NULL) {
+        return OSAL_TASK_STATE_DELETED;
+    }
+
+    osal_task_internal_t* task = (osal_task_internal_t*)handle;
+
+    /* Validate handle - return DELETED for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&task->header, OSAL_TYPE_TASK)) {
+        return OSAL_TASK_STATE_DELETED;
+    }
+#endif
+
+    if (!task->used) {
+        return OSAL_TASK_STATE_DELETED;
+    }
+
+    if (task->delete_pending) {
+        return OSAL_TASK_STATE_DELETED;
+    }
+
+    if (task->suspended) {
+        return OSAL_TASK_STATE_SUSPENDED;
+    }
+
+    if (task->running) {
+        /* Check if this is the current task */
+#ifdef _WIN32
+        osal_task_internal_t* current =
+            (osal_task_internal_t*)TlsGetValue(s_tls_index);
+#else
+        osal_task_internal_t* current =
+            (osal_task_internal_t*)pthread_getspecific(s_tls_key);
+#endif
+        if (task == current) {
+            return OSAL_TASK_STATE_RUNNING;
+        }
+        return OSAL_TASK_STATE_READY;
+    }
+
+    return OSAL_TASK_STATE_READY;
+}
+
 /*---------------------------------------------------------------------------*/
 /* Mutex Functions                                                           */
 /*---------------------------------------------------------------------------*/
@@ -613,6 +842,9 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
 
     osal_mutex_internal_t* mutex = &s_mutexes[slot];
 
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&mutex->header, OSAL_TYPE_MUTEX);
+
 #ifdef _WIN32
     InitializeCriticalSection(&mutex->cs);
 #else
@@ -624,22 +856,33 @@ osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
 #endif
 
     mutex->used = true;
+    mutex->locked = false;
+    mutex->owner = NULL;
     *handle = (osal_mutex_handle_t)mutex;
+
+#if OSAL_STATS_ENABLE
+    /* Update mutex statistics */
+    osal_stats_inc(&s_osal_stats.mutexes);
+#endif
 
     global_unlock();
     return OSAL_OK;
 }
 
 osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_MUTEX);
 
     osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
 
     if (!mutex->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+#if OSAL_STATS_ENABLE
+    /* Update mutex statistics */
+    osal_stats_dec(&s_osal_stats.mutexes);
+#endif
 
     global_lock();
 
@@ -649,6 +892,8 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
     pthread_mutex_destroy(&mutex->mutex);
 #endif
 
+    /* Invalidate handle header before marking as unused */
+    OSAL_HANDLE_DEINIT(&mutex->header);
     mutex->used = false;
 
     global_unlock();
@@ -656,9 +901,8 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
 }
 
 osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_MUTEX);
 
     osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
 
@@ -666,12 +910,25 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
         return OSAL_ERROR_INVALID_PARAM;
     }
 
+    /* Get current task for owner tracking */
+#ifdef _WIN32
+    osal_task_internal_t* current_task =
+        (osal_task_internal_t*)TlsGetValue(s_tls_index);
+#else
+    osal_task_internal_t* current_task =
+        (osal_task_internal_t*)pthread_getspecific(s_tls_key);
+#endif
+
 #ifdef _WIN32
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         EnterCriticalSection(&mutex->cs);
+        mutex->locked = true;
+        mutex->owner = current_task;
         return OSAL_OK;
     } else if (timeout_ms == OSAL_NO_WAIT) {
         if (TryEnterCriticalSection(&mutex->cs)) {
+            mutex->locked = true;
+            mutex->owner = current_task;
             return OSAL_OK;
         }
         return OSAL_ERROR_TIMEOUT;
@@ -681,6 +938,8 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
         uint32_t elapsed = 0;
         while (elapsed < timeout_ms) {
             if (TryEnterCriticalSection(&mutex->cs)) {
+                mutex->locked = true;
+                mutex->owner = current_task;
                 return OSAL_OK;
             }
             Sleep(1);
@@ -691,9 +950,13 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
 #else
     if (timeout_ms == OSAL_WAIT_FOREVER) {
         pthread_mutex_lock(&mutex->mutex);
+        mutex->locked = true;
+        mutex->owner = current_task;
         return OSAL_OK;
     } else if (timeout_ms == OSAL_NO_WAIT) {
         if (pthread_mutex_trylock(&mutex->mutex) == 0) {
+            mutex->locked = true;
+            mutex->owner = current_task;
             return OSAL_OK;
         }
         return OSAL_ERROR_TIMEOUT;
@@ -703,6 +966,8 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
 
         int result = pthread_mutex_timedlock(&mutex->mutex, &ts);
         if (result == 0) {
+            mutex->locked = true;
+            mutex->owner = current_task;
             return OSAL_OK;
         } else if (result == ETIMEDOUT) {
             return OSAL_ERROR_TIMEOUT;
@@ -713,15 +978,18 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
 }
 
 osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_MUTEX);
 
     osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
 
     if (!mutex->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+    /* Clear owner tracking before unlocking */
+    mutex->locked = false;
+    mutex->owner = NULL;
 
 #ifdef _WIN32
     LeaveCriticalSection(&mutex->cs);
@@ -730,6 +998,63 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
 #endif
 
     return OSAL_OK;
+}
+
+/**
+ * \brief           Get mutex owner task
+ *
+ * \details         Returns the task handle of the task that currently holds
+ *                  the mutex.
+ *
+ * \note            Requirements: 10.1
+ */
+osal_task_handle_t osal_mutex_get_owner(osal_mutex_handle_t handle) {
+    if (handle == NULL) {
+        return NULL;
+    }
+
+    osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
+
+    /* Validate handle - return NULL for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&mutex->header, OSAL_TYPE_MUTEX)) {
+        return NULL;
+    }
+#endif
+
+    if (!mutex->used) {
+        return NULL;
+    }
+
+    return (osal_task_handle_t)mutex->owner;
+}
+
+/**
+ * \brief           Check if mutex is locked
+ *
+ * \details         Returns true if the mutex is currently held by any task.
+ *
+ * \note            Requirements: 10.2
+ */
+bool osal_mutex_is_locked(osal_mutex_handle_t handle) {
+    if (handle == NULL) {
+        return false;
+    }
+
+    osal_mutex_internal_t* mutex = (osal_mutex_internal_t*)handle;
+
+    /* Validate handle - return false for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&mutex->header, OSAL_TYPE_MUTEX)) {
+        return false;
+    }
+#endif
+
+    if (!mutex->used) {
+        return false;
+    }
+
+    return mutex->locked;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -772,6 +1097,9 @@ osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
 
     osal_sem_internal_t* sem = &s_sems[slot];
 
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&sem->header, OSAL_TYPE_SEM);
+
     sem->count = initial_count;
     sem->max_count = max_count;
 
@@ -789,6 +1117,11 @@ osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
     sem->used = true;
     *handle = (osal_sem_handle_t)sem;
 
+#if OSAL_STATS_ENABLE
+    /* Update semaphore statistics */
+    osal_stats_inc(&s_osal_stats.sems);
+#endif
+
     global_unlock();
     return OSAL_OK;
 }
@@ -804,15 +1137,19 @@ osal_status_t osal_sem_create_counting(uint32_t max_count, uint32_t initial,
 }
 
 osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_SEM);
 
     osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
 
     if (!sem->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+#if OSAL_STATS_ENABLE
+    /* Update semaphore statistics */
+    osal_stats_dec(&s_osal_stats.sems);
+#endif
 
     global_lock();
 
@@ -823,6 +1160,8 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     pthread_cond_destroy(&sem->cond);
 #endif
 
+    /* Invalidate handle header before marking as unused */
+    OSAL_HANDLE_DEINIT(&sem->header);
     sem->used = false;
 
     global_unlock();
@@ -830,9 +1169,8 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
 }
 
 osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_SEM);
 
     osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
 
@@ -845,6 +1183,10 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     DWORD result = WaitForSingleObject(sem->sem, wait_time);
 
     if (result == WAIT_OBJECT_0) {
+        /* Decrement internal count tracking */
+        if (sem->count > 0) {
+            sem->count--;
+        }
         return OSAL_OK;
     } else if (result == WAIT_TIMEOUT) {
         return OSAL_ERROR_TIMEOUT;
@@ -887,9 +1229,8 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
 }
 
 osal_status_t osal_sem_give(osal_sem_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_SEM);
 
     osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
 
@@ -899,6 +1240,10 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle) {
 
 #ifdef _WIN32
     if (ReleaseSemaphore(sem->sem, 1, NULL)) {
+        /* Increment internal count tracking (capped at max_count) */
+        if (sem->count < sem->max_count) {
+            sem->count++;
+        }
         return OSAL_OK;
     }
     return OSAL_ERROR;
@@ -918,6 +1263,97 @@ osal_status_t osal_sem_give(osal_sem_handle_t handle) {
 osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
     /* In native platform, ISR context is the same as normal context */
     return osal_sem_give(handle);
+}
+
+/**
+ * \brief           Get semaphore current count
+ *
+ * \details         Returns the current count of the semaphore.
+ *
+ * \note            Requirements: 10.3
+ */
+uint32_t osal_sem_get_count(osal_sem_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&sem->header, OSAL_TYPE_SEM)) {
+        return 0;
+    }
+#endif
+
+    if (!sem->used) {
+        return 0;
+    }
+
+#ifdef _WIN32
+    /*
+     * Windows semaphores don't provide a direct way to query count.
+     * We track the count internally in the structure.
+     */
+    return sem->count;
+#else
+    uint32_t count;
+    pthread_mutex_lock(&sem->mutex);
+    count = sem->count;
+    pthread_mutex_unlock(&sem->mutex);
+    return count;
+#endif
+}
+
+/**
+ * \brief           Reset semaphore to specified count
+ *
+ * \details         Resets the semaphore count to the specified value.
+ *
+ * \note            Requirements: 10.4
+ */
+osal_status_t osal_sem_reset(osal_sem_handle_t handle, uint32_t count) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_SEM);
+
+    osal_sem_internal_t* sem = (osal_sem_internal_t*)handle;
+
+    if (!sem->used) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* Validate count doesn't exceed max_count */
+    if (count > sem->max_count) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+#ifdef _WIN32
+    /*
+     * Windows semaphores don't support direct reset.
+     * We need to drain and refill the semaphore.
+     */
+    /* Drain all available counts */
+    while (WaitForSingleObject(sem->sem, 0) == WAIT_OBJECT_0) {
+        /* Keep taking until empty */
+    }
+
+    /* Give the semaphore 'count' times */
+    for (uint32_t i = 0; i < count; i++) {
+        ReleaseSemaphore(sem->sem, 1, NULL);
+    }
+
+    sem->count = count;
+#else
+    pthread_mutex_lock(&sem->mutex);
+    sem->count = count;
+    /* Wake up any waiting threads if count > 0 */
+    if (count > 0) {
+        pthread_cond_broadcast(&sem->cond);
+    }
+    pthread_mutex_unlock(&sem->mutex);
+#endif
+
+    return OSAL_OK;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -960,6 +1396,9 @@ osal_status_t osal_queue_create(size_t item_size, size_t item_count,
 
     osal_queue_internal_t* queue = &s_queues[slot];
 
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&queue->header, OSAL_TYPE_QUEUE);
+
     /* Allocate buffer */
     queue->buffer = (uint8_t*)malloc(item_size * item_count);
     if (queue->buffer == NULL) {
@@ -997,20 +1436,29 @@ osal_status_t osal_queue_create(size_t item_size, size_t item_count,
     queue->used = true;
     *handle = (osal_queue_handle_t)queue;
 
+#if OSAL_STATS_ENABLE
+    /* Update queue statistics */
+    osal_stats_inc(&s_osal_stats.queues);
+#endif
+
     global_unlock();
     return OSAL_OK;
 }
 
 osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
     if (!queue->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+#if OSAL_STATS_ENABLE
+    /* Update queue statistics */
+    osal_stats_dec(&s_osal_stats.queues);
+#endif
 
     global_lock();
 
@@ -1026,6 +1474,9 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
 
     free(queue->buffer);
     queue->buffer = NULL;
+
+    /* Invalidate handle header before marking as unused */
+    OSAL_HANDLE_DEINIT(&queue->header);
     queue->used = false;
 
     global_unlock();
@@ -1034,9 +1485,12 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
 
 osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
                               uint32_t timeout_ms) {
-    if (handle == NULL || item == NULL) {
+    if (item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
+
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
@@ -1127,9 +1581,12 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
 
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
                                     const void* item, uint32_t timeout_ms) {
-    if (handle == NULL || item == NULL) {
+    if (item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
+
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
@@ -1212,9 +1669,12 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
 
 osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
                                  uint32_t timeout_ms) {
-    if (handle == NULL || item == NULL) {
+    if (item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
+
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
@@ -1304,9 +1764,12 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
 }
 
 osal_status_t osal_queue_peek(osal_queue_handle_t handle, void* item) {
-    if (handle == NULL || item == NULL) {
+    if (item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
+
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
@@ -1350,6 +1813,13 @@ size_t osal_queue_get_count(osal_queue_handle_t handle) {
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&queue->header, OSAL_TYPE_QUEUE)) {
+        return 0;
+    }
+#endif
+
     if (!queue->used) {
         return 0;
     }
@@ -1364,6 +1834,13 @@ bool osal_queue_is_empty(osal_queue_handle_t handle) {
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
 
+    /* Validate handle - return true (empty) for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&queue->header, OSAL_TYPE_QUEUE)) {
+        return true;
+    }
+#endif
+
     if (!queue->used) {
         return true;
     }
@@ -1377,6 +1854,13 @@ bool osal_queue_is_full(osal_queue_handle_t handle) {
     }
 
     osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
+
+    /* Validate handle - return false for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&queue->header, OSAL_TYPE_QUEUE)) {
+        return false;
+    }
+#endif
 
     if (!queue->used) {
         return false;
@@ -1397,14 +1881,139 @@ osal_status_t osal_queue_receive_from_isr(osal_queue_handle_t handle,
     return osal_queue_receive(handle, item, OSAL_NO_WAIT);
 }
 
+/**
+ * \brief           Get available space in queue
+ *
+ * \details         Returns the number of free slots in the queue.
+ *
+ * \note            Requirements: 8.1
+ */
+size_t osal_queue_get_available_space(osal_queue_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&queue->header, OSAL_TYPE_QUEUE)) {
+        return 0;
+    }
+#endif
+
+    if (!queue->used) {
+        return 0;
+    }
+
+    size_t available;
+#ifdef _WIN32
+    EnterCriticalSection(&queue->cs);
+    available = queue->item_count - queue->count;
+    LeaveCriticalSection(&queue->cs);
+#else
+    pthread_mutex_lock(&queue->mutex);
+    available = queue->item_count - queue->count;
+    pthread_mutex_unlock(&queue->mutex);
+#endif
+
+    return available;
+}
+
+/**
+ * \brief           Reset queue (clear all items)
+ *
+ * \details         Resets the queue to its empty state. All items in the
+ *                  queue are discarded.
+ *
+ * \note            Requirements: 8.2
+ */
+osal_status_t osal_queue_reset(osal_queue_handle_t handle) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
+
+    osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
+
+    if (!queue->used) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+#ifdef _WIN32
+    EnterCriticalSection(&queue->cs);
+    queue->head = 0;
+    queue->tail = 0;
+    queue->count = 0;
+    /* Signal that queue is no longer full (if anyone was waiting) */
+    SetEvent(queue->not_full);
+    LeaveCriticalSection(&queue->cs);
+#else
+    pthread_mutex_lock(&queue->mutex);
+    queue->head = 0;
+    queue->tail = 0;
+    queue->count = 0;
+    /* Signal that queue is no longer full (if anyone was waiting) */
+    pthread_cond_broadcast(&queue->not_full);
+    pthread_mutex_unlock(&queue->mutex);
+#endif
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Set queue mode
+ *
+ * \details         Sets the queue operating mode. In native platform,
+ *                  this function accepts the mode for API compatibility
+ *                  but the actual overwrite behavior would need to be
+ *                  implemented in the send function.
+ *
+ * \note            Requirements: 8.3
+ */
+osal_status_t osal_queue_set_mode(osal_queue_handle_t handle,
+                                  osal_queue_mode_t mode) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_QUEUE);
+
+    osal_queue_internal_t* queue = (osal_queue_internal_t*)handle;
+
+    if (!queue->used) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* Parameter validation - mode must be valid */
+    if (mode != OSAL_QUEUE_MODE_NORMAL && mode != OSAL_QUEUE_MODE_OVERWRITE) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* Store the mode in the queue structure */
+    queue->mode = mode;
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Peek item from queue in ISR context
+ *
+ * \details         In native platform, ISR context is the same as normal
+ *                  context. This function peeks at the front item without
+ *                  removing it.
+ *
+ * \note            Requirements: 8.5
+ */
+osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle,
+                                       void* item) {
+    /* In native platform, ISR context is the same as normal context */
+    return osal_queue_peek(handle, item);
+}
+
 /*---------------------------------------------------------------------------*/
 /* Timer Internal Structures                                                 */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_TIMERS     16
 #define OSAL_TIMER_NAME_MAX 32
 
 typedef struct {
+    osal_handle_header_t header;        /**< Handle validation header */
     bool used;
     bool active;
     bool delete_pending;
@@ -1625,6 +2234,9 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     osal_timer_internal_t* timer = &s_timers[slot];
     memset(timer, 0, sizeof(*timer));
 
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&timer->header, OSAL_TYPE_TIMER);
+
     timer->used = true;
     timer->active = false;
     timer->delete_pending = false;
@@ -1682,6 +2294,11 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
     }
 #endif
 
+#if OSAL_STATS_ENABLE
+    /* Update timer statistics */
+    osal_stats_inc(&s_osal_stats.timers);
+#endif
+
     *handle = (osal_timer_handle_t)timer;
     global_unlock();
 
@@ -1689,15 +2306,19 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
 }
 
 osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TIMER);
 
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
 
     if (!timer->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+#if OSAL_STATS_ENABLE
+    /* Update timer statistics */
+    osal_stats_dec(&s_osal_stats.timers);
+#endif
 
     global_lock();
 
@@ -1735,6 +2356,8 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
 #endif
 
     global_lock();
+    /* Invalidate handle header before marking as unused */
+    OSAL_HANDLE_DEINIT(&timer->header);
     timer->used = false;
     global_unlock();
 
@@ -1742,9 +2365,8 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle) {
 }
 
 osal_status_t osal_timer_start(osal_timer_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TIMER);
 
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
 
@@ -1769,9 +2391,8 @@ osal_status_t osal_timer_start(osal_timer_handle_t handle) {
 }
 
 osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TIMER);
 
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
 
@@ -1796,9 +2417,8 @@ osal_status_t osal_timer_stop(osal_timer_handle_t handle) {
 }
 
 osal_status_t osal_timer_reset(osal_timer_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TIMER);
 
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
 
@@ -1824,9 +2444,8 @@ osal_status_t osal_timer_reset(osal_timer_handle_t handle) {
 
 osal_status_t osal_timer_set_period(osal_timer_handle_t handle,
                                     uint32_t period_ms) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TIMER);
 
     if (period_ms == 0) {
         return OSAL_ERROR_INVALID_PARAM;
@@ -1867,6 +2486,13 @@ bool osal_timer_is_active(osal_timer_handle_t handle) {
 
     osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
 
+    /* Validate handle - return false for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&timer->header, OSAL_TYPE_TIMER)) {
+        return false;
+    }
+#endif
+
     if (!timer->used) {
         return false;
     }
@@ -1902,13 +2528,136 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) {
 }
 
 /*---------------------------------------------------------------------------*/
+/* Timer Enhanced Functions                                                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Get timer remaining time
+ *
+ * \details         Returns the time remaining until the timer expires.
+ *                  For native platform, this is an approximation since we
+ *                  don't have precise tick-based timing.
+ *
+ * \note            Requirements: 5.1
+ */
+uint32_t osal_timer_get_remaining(osal_timer_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&timer->header, OSAL_TYPE_TIMER)) {
+        return 0;
+    }
+#endif
+
+    if (!timer->used) {
+        return 0;
+    }
+
+    /* Check if timer is active */
+    bool active;
+#ifdef _WIN32
+    EnterCriticalSection(&timer->cs);
+    active = timer->active;
+    LeaveCriticalSection(&timer->cs);
+#else
+    pthread_mutex_lock(&timer->mutex);
+    active = timer->active;
+    pthread_mutex_unlock(&timer->mutex);
+#endif
+
+    if (!active) {
+        return 0;
+    }
+
+    /*
+     * Native platform does not track precise remaining time.
+     * Return the full period as an approximation.
+     * A more accurate implementation would require tracking
+     * the start time of the current period.
+     */
+    return timer->period_ms;
+}
+
+/**
+ * \brief           Get timer configured period
+ *
+ * \details         Returns the period of the timer in milliseconds.
+ *
+ * \note            Requirements: 5.2
+ */
+uint32_t osal_timer_get_period(osal_timer_handle_t handle) {
+    if (handle == NULL) {
+        return 0;
+    }
+
+    osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
+
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&timer->header, OSAL_TYPE_TIMER)) {
+        return 0;
+    }
+#endif
+
+    if (!timer->used) {
+        return 0;
+    }
+
+    return timer->period_ms;
+}
+
+/**
+ * \brief           Set timer callback function
+ *
+ * \details         Changes the callback function and argument for a timer.
+ *
+ * \note            Requirements: 5.3
+ */
+osal_status_t osal_timer_set_callback(osal_timer_handle_t handle,
+                                      osal_timer_callback_t callback,
+                                      void* arg) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_TIMER);
+
+    if (callback == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    osal_timer_internal_t* timer = (osal_timer_internal_t*)handle;
+
+    if (!timer->used) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* Update the callback and argument */
+#ifdef _WIN32
+    EnterCriticalSection(&timer->cs);
+    timer->callback = callback;
+    timer->arg = arg;
+    LeaveCriticalSection(&timer->cs);
+#else
+    pthread_mutex_lock(&timer->mutex);
+    timer->callback = callback;
+    timer->arg = arg;
+    pthread_mutex_unlock(&timer->mutex);
+#endif
+
+    return OSAL_OK;
+}
+
+/*---------------------------------------------------------------------------*/
 /* Event Flags Internal Structures                                           */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_EVENTS      16
 #define OSAL_EVENT_BITS_MASK 0x00FFFFFF /* 24-bit support */
 
 typedef struct {
+    osal_handle_header_t header;        /**< Handle validation header */
     bool used;
     osal_event_bits_t bits;
 #ifdef _WIN32
@@ -1958,6 +2707,9 @@ osal_status_t osal_event_create(osal_event_handle_t* handle) {
     osal_event_internal_t* event = &s_events[slot];
     memset(event, 0, sizeof(*event));
 
+    /* Initialize handle header for validation */
+    OSAL_HANDLE_INIT(&event->header, OSAL_TYPE_EVENT);
+
     event->bits = 0;
 
 #ifdef _WIN32
@@ -1977,20 +2729,29 @@ osal_status_t osal_event_create(osal_event_handle_t* handle) {
     event->used = true;
     *handle = (osal_event_handle_t)event;
 
+#if OSAL_STATS_ENABLE
+    /* Update event statistics */
+    osal_stats_inc(&s_osal_stats.events);
+#endif
+
     global_unlock();
     return OSAL_OK;
 }
 
 osal_status_t osal_event_delete(osal_event_handle_t handle) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_EVENT);
 
     osal_event_internal_t* event = (osal_event_internal_t*)handle;
 
     if (!event->used) {
         return OSAL_ERROR_INVALID_PARAM;
     }
+
+#if OSAL_STATS_ENABLE
+    /* Update event statistics */
+    osal_stats_dec(&s_osal_stats.events);
+#endif
 
     global_lock();
 
@@ -2002,6 +2763,8 @@ osal_status_t osal_event_delete(osal_event_handle_t handle) {
     pthread_cond_destroy(&event->cond);
 #endif
 
+    /* Invalidate handle header before marking as unused */
+    OSAL_HANDLE_DEINIT(&event->header);
     event->used = false;
 
     global_unlock();
@@ -2010,9 +2773,8 @@ osal_status_t osal_event_delete(osal_event_handle_t handle) {
 
 osal_status_t osal_event_set(osal_event_handle_t handle,
                              osal_event_bits_t bits) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_EVENT);
 
     if (bits == 0) {
         return OSAL_ERROR_INVALID_PARAM;
@@ -2041,9 +2803,8 @@ osal_status_t osal_event_set(osal_event_handle_t handle,
 
 osal_status_t osal_event_clear(osal_event_handle_t handle,
                                osal_event_bits_t bits) {
-    if (handle == NULL) {
-        return OSAL_ERROR_NULL_POINTER;
-    }
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_EVENT);
 
     if (bits == 0) {
         return OSAL_ERROR_INVALID_PARAM;
@@ -2076,7 +2837,10 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
                               osal_event_bits_t bits,
                               const osal_event_wait_options_t* options,
                               osal_event_bits_t* bits_out) {
-    if (handle == NULL || options == NULL) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_EVENT);
+
+    if (options == NULL) {
         return OSAL_ERROR_NULL_POINTER;
     }
 
@@ -2271,6 +3035,13 @@ osal_event_bits_t osal_event_get(osal_event_handle_t handle) {
 
     osal_event_internal_t* event = (osal_event_internal_t*)handle;
 
+    /* Validate handle - return 0 for invalid handles */
+#if OSAL_HANDLE_VALIDATION
+    if (!OSAL_HANDLE_IS_VALID(&event->header, OSAL_TYPE_EVENT)) {
+        return 0;
+    }
+#endif
+
     if (!event->used) {
         return 0;
     }
@@ -2294,6 +3065,203 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
                                       osal_event_bits_t bits) {
     /* In native platform, ISR context is the same as normal context */
     return osal_event_set(handle, bits);
+}
+
+/**
+ * \brief           Clear event bits from ISR context
+ *
+ * \details         In native platform, ISR context is the same as normal
+ *                  context, so this function simply delegates to osal_event_clear().
+ *
+ * \note            Requirements: 7.2
+ */
+osal_status_t osal_event_clear_from_isr(osal_event_handle_t handle,
+                                        osal_event_bits_t bits) {
+    /* In native platform, ISR context is the same as normal context */
+    return osal_event_clear(handle, bits);
+}
+
+/**
+ * \brief           Synchronous set and wait operation
+ *
+ * \details         Atomically sets event bits and then waits for a different
+ *                  set of bits to be set. This is useful for task rendezvous
+ *                  synchronization patterns.
+ *
+ * \note            Requirements: 7.3
+ */
+osal_status_t osal_event_sync(osal_event_handle_t handle,
+                              osal_event_bits_t set_bits,
+                              osal_event_bits_t wait_bits,
+                              const osal_event_wait_options_t* options,
+                              osal_event_bits_t* bits_out) {
+    /* Validate handle using magic number and type check */
+    OSAL_VALIDATE_HANDLE(handle, OSAL_TYPE_EVENT);
+
+    if (options == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+    /* Parameter validation - zero bits mask check */
+    if (set_bits == 0 || wait_bits == 0) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    osal_event_internal_t* event = (osal_event_internal_t*)handle;
+
+    if (!event->used) {
+        return OSAL_ERROR_INVALID_PARAM;
+    }
+
+    /* Mask bits to valid range */
+    set_bits &= OSAL_EVENT_BITS_MASK;
+    wait_bits &= OSAL_EVENT_BITS_MASK;
+
+#ifdef _WIN32
+    EnterCriticalSection(&event->cs);
+
+    /* Set the bits first */
+    event->bits |= set_bits;
+    SetEvent(event->cond);  /* Signal all waiting threads */
+
+    /* Check if wait condition is already met */
+    bool condition_met = ((event->bits & wait_bits) == wait_bits);
+
+    if (condition_met) {
+        /* Condition already met - clear the wait bits and return */
+        osal_event_bits_t matched_bits = event->bits & wait_bits;
+        event->bits &= ~wait_bits;  /* xEventGroupSync clears wait bits on exit */
+
+        if (event->bits == 0) {
+            ResetEvent(event->cond);
+        }
+
+        if (bits_out != NULL) {
+            *bits_out = matched_bits;
+        }
+
+        LeaveCriticalSection(&event->cs);
+        return OSAL_OK;
+    }
+
+    /* Need to wait */
+    if (options->timeout_ms == OSAL_NO_WAIT) {
+        LeaveCriticalSection(&event->cs);
+        return OSAL_ERROR_TIMEOUT;
+    }
+
+    DWORD wait_time = (options->timeout_ms == OSAL_WAIT_FOREVER)
+                          ? INFINITE
+                          : options->timeout_ms;
+    DWORD start_time = GetTickCount();
+
+    while (!condition_met) {
+        LeaveCriticalSection(&event->cs);
+
+        /* Calculate remaining timeout */
+        DWORD remaining = wait_time;
+        if (wait_time != INFINITE) {
+            DWORD elapsed = GetTickCount() - start_time;
+            if (elapsed >= wait_time) {
+                return OSAL_ERROR_TIMEOUT;
+            }
+            remaining = wait_time - elapsed;
+        }
+
+        DWORD result = WaitForSingleObject(event->cond, remaining);
+
+        EnterCriticalSection(&event->cs);
+
+        if (result == WAIT_TIMEOUT) {
+            LeaveCriticalSection(&event->cs);
+            return OSAL_ERROR_TIMEOUT;
+        }
+
+        /* Check condition again */
+        condition_met = ((event->bits & wait_bits) == wait_bits);
+    }
+
+    /* Condition met - clear the wait bits (xEventGroupSync behavior) */
+    osal_event_bits_t matched_bits = event->bits & wait_bits;
+    event->bits &= ~wait_bits;
+
+    if (event->bits == 0) {
+        ResetEvent(event->cond);
+    }
+
+    if (bits_out != NULL) {
+        *bits_out = matched_bits;
+    }
+
+    LeaveCriticalSection(&event->cs);
+    return OSAL_OK;
+#else
+    pthread_mutex_lock(&event->mutex);
+
+    /* Set the bits first */
+    event->bits |= set_bits;
+    pthread_cond_broadcast(&event->cond);  /* Wake all waiting threads */
+
+    /* Check if wait condition is already met */
+    bool condition_met = ((event->bits & wait_bits) == wait_bits);
+
+    if (condition_met) {
+        /* Condition already met - clear the wait bits and return */
+        osal_event_bits_t matched_bits = event->bits & wait_bits;
+        event->bits &= ~wait_bits;  /* xEventGroupSync clears wait bits on exit */
+
+        if (bits_out != NULL) {
+            *bits_out = matched_bits;
+        }
+
+        pthread_mutex_unlock(&event->mutex);
+        return OSAL_OK;
+    }
+
+    /* Need to wait */
+    if (options->timeout_ms == OSAL_NO_WAIT) {
+        pthread_mutex_unlock(&event->mutex);
+        return OSAL_ERROR_TIMEOUT;
+    }
+
+    if (options->timeout_ms == OSAL_WAIT_FOREVER) {
+        /* Wait forever */
+        while (!condition_met) {
+            pthread_cond_wait(&event->cond, &event->mutex);
+
+            /* Check condition */
+            condition_met = ((event->bits & wait_bits) == wait_bits);
+        }
+    } else {
+        /* Wait with timeout */
+        struct timespec ts;
+        ms_to_timespec(options->timeout_ms, &ts);
+
+        while (!condition_met) {
+            int result =
+                pthread_cond_timedwait(&event->cond, &event->mutex, &ts);
+
+            if (result == ETIMEDOUT) {
+                pthread_mutex_unlock(&event->mutex);
+                return OSAL_ERROR_TIMEOUT;
+            }
+
+            /* Check condition */
+            condition_met = ((event->bits & wait_bits) == wait_bits);
+        }
+    }
+
+    /* Condition met - clear the wait bits (xEventGroupSync behavior) */
+    osal_event_bits_t matched_bits = event->bits & wait_bits;
+    event->bits &= ~wait_bits;
+
+    if (bits_out != NULL) {
+        *bits_out = matched_bits;
+    }
+
+    pthread_mutex_unlock(&event->mutex);
+    return OSAL_OK;
+#endif
 }
 
 /*---------------------------------------------------------------------------*/
@@ -2745,4 +3713,266 @@ size_t osal_mem_get_min_free_size(void) {
     mem_unlock();
 
     return min_free;
+}
+
+/**
+ * \brief           Get active allocation count
+ *
+ * \details         Returns the number of active memory allocations.
+ *                  This is tracked internally in the allocation list.
+ *
+ * \note            Requirements: 6.1
+ */
+size_t osal_mem_get_allocation_count(void) {
+    mem_init_tracking();
+
+    mem_lock();
+    size_t count = s_mem_stats.allocation_count;
+    mem_unlock();
+
+    return count;
+}
+
+/**
+ * \brief           Check heap integrity
+ *
+ * \details         Performs a basic integrity check on the tracked allocations.
+ *                  Validates the linked list structure and statistics consistency.
+ *
+ * \note            Requirements: 6.3
+ */
+osal_status_t osal_mem_check_integrity(void) {
+    mem_init_tracking();
+
+    mem_lock();
+
+    /* Basic sanity checks */
+    if (s_mem_stats.total_allocated > OSAL_NATIVE_HEAP_SIZE) {
+        mem_unlock();
+        return OSAL_ERROR;
+    }
+
+    if (s_mem_stats.peak_allocated > OSAL_NATIVE_HEAP_SIZE) {
+        mem_unlock();
+        return OSAL_ERROR;
+    }
+
+    if (s_mem_stats.total_allocated > s_mem_stats.peak_allocated) {
+        /* Current allocation should never exceed peak */
+        mem_unlock();
+        return OSAL_ERROR;
+    }
+
+    /* Walk the allocation list and verify count */
+    size_t counted = 0;
+    size_t total_size = 0;
+    osal_mem_header_t* current = s_mem_stats.alloc_list;
+
+    while (current != NULL) {
+        counted++;
+        total_size += current->size;
+
+        /* Check for list corruption (circular reference) */
+        if (counted > s_mem_stats.allocation_count + 1) {
+            mem_unlock();
+            return OSAL_ERROR;
+        }
+
+        /* Verify prev/next consistency */
+        if (current->next != NULL && current->next->prev != current) {
+            mem_unlock();
+            return OSAL_ERROR;
+        }
+
+        current = current->next;
+    }
+
+    /* Verify count matches */
+    if (counted != s_mem_stats.allocation_count) {
+        mem_unlock();
+        return OSAL_ERROR;
+    }
+
+    /* Verify total size matches (approximately - aligned allocations may differ) */
+    /* Allow some tolerance for alignment overhead */
+    if (total_size > s_mem_stats.total_allocated + 
+        (s_mem_stats.allocation_count * 64)) {
+        mem_unlock();
+        return OSAL_ERROR;
+    }
+
+    mem_unlock();
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Free aligned memory
+ *
+ * \details         Frees memory that was allocated with osal_mem_alloc_aligned().
+ *                  Retrieves the original pointer stored in the header and frees it.
+ *
+ * \note            Requirements: 6.4
+ */
+void osal_mem_free_aligned(void* ptr) {
+    /* Safe to call with NULL - just return */
+    if (ptr == NULL) {
+        return;
+    }
+
+    /* Get header from user pointer */
+    osal_mem_header_t* header = ((osal_mem_header_t*)ptr) - 1;
+
+    /* Verify this is an aligned allocation */
+    if (header->alignment == 0 || header->original_ptr == NULL) {
+        /*
+         * This doesn't look like an aligned allocation.
+         * Fall back to regular free behavior for safety.
+         */
+        osal_mem_free(ptr);
+        return;
+    }
+
+    /* Get the original pointer and untrack the allocation */
+    void* original = header->original_ptr;
+    mem_untrack_alloc(header);
+
+    /* Free the original allocation */
+    free(original);
+}
+
+/*---------------------------------------------------------------------------*/
+/* Diagnostics Functions                                                     */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Get OSAL resource statistics
+ *
+ * \details         Retrieves current resource counts and watermarks for all
+ *                  OSAL resource types. This function is safe to call from
+ *                  any context.
+ *
+ * \note            Requirements: 2.1, 2.2, 2.3, 2.5
+ */
+osal_status_t osal_get_stats(osal_stats_t* stats) {
+    /* Parameter validation - NULL pointer check */
+    if (stats == NULL) {
+        return OSAL_ERROR_NULL_POINTER;
+    }
+
+#if OSAL_STATS_ENABLE
+    /* Enter critical section to ensure consistent snapshot */
+    global_lock();
+
+    /* Copy current counts */
+    stats->task_count = s_osal_stats.tasks.count;
+    stats->mutex_count = s_osal_stats.mutexes.count;
+    stats->sem_count = s_osal_stats.sems.count;
+    stats->queue_count = s_osal_stats.queues.count;
+    stats->event_count = s_osal_stats.events.count;
+    stats->timer_count = s_osal_stats.timers.count;
+
+    /* Copy watermarks */
+    stats->task_watermark = s_osal_stats.tasks.watermark;
+    stats->mutex_watermark = s_osal_stats.mutexes.watermark;
+    stats->sem_watermark = s_osal_stats.sems.watermark;
+    stats->queue_watermark = s_osal_stats.queues.watermark;
+    stats->event_watermark = s_osal_stats.events.watermark;
+    stats->timer_watermark = s_osal_stats.timers.watermark;
+
+    /* Copy memory statistics from memory tracking */
+    mem_init_tracking();
+    mem_lock();
+    stats->mem_allocated = s_mem_stats.total_allocated;
+    stats->mem_peak = s_mem_stats.peak_allocated;
+    stats->mem_alloc_count = s_mem_stats.allocation_count;
+    mem_unlock();
+
+    global_unlock();
+#else
+    /* Statistics disabled - return zeros */
+    memset(stats, 0, sizeof(osal_stats_t));
+#endif
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Reset OSAL statistics watermarks
+ *
+ * \details         Resets all watermark values to current counts. This is
+ *                  useful for monitoring peak usage over specific time periods.
+ *                  This function is safe to call from any context.
+ *
+ * \note            Requirements: 2.3
+ */
+osal_status_t osal_reset_stats(void) {
+#if OSAL_STATS_ENABLE
+    /* Enter critical section to ensure atomic reset */
+    global_lock();
+
+    /* Reset watermarks to current counts */
+    s_osal_stats.tasks.watermark = s_osal_stats.tasks.count;
+    s_osal_stats.mutexes.watermark = s_osal_stats.mutexes.count;
+    s_osal_stats.sems.watermark = s_osal_stats.sems.count;
+    s_osal_stats.queues.watermark = s_osal_stats.queues.count;
+    s_osal_stats.events.watermark = s_osal_stats.events.count;
+    s_osal_stats.timers.watermark = s_osal_stats.timers.count;
+
+    /* Reset memory peak to current allocation */
+    mem_init_tracking();
+    mem_lock();
+    s_mem_stats.peak_allocated = s_mem_stats.total_allocated;
+    mem_unlock();
+
+    global_unlock();
+#endif
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Register error callback
+ *
+ * \details         Registers a callback function that will be invoked when
+ *                  certain errors occur. Only one callback can be registered
+ *                  at a time; registering a new callback replaces the previous
+ *                  one. Pass NULL to disable the callback.
+ *
+ * \note            Requirements: 2.5
+ */
+osal_status_t osal_set_error_callback(osal_error_callback_t callback) {
+    /* Enter critical section for atomic update */
+    global_lock();
+    s_error_callback = callback;
+    global_unlock();
+
+    return OSAL_OK;
+}
+
+/**
+ * \brief           Get error callback
+ *
+ * \details         Returns the currently registered error callback function,
+ *                  or NULL if no callback is registered.
+ */
+osal_error_callback_t osal_get_error_callback(void) {
+    return s_error_callback;
+}
+
+/**
+ * \brief           Report an error through the error callback
+ *
+ * \details         Invokes the registered error callback if one is set.
+ *                  This function is intended for internal use by OSAL
+ *                  implementations to report errors.
+ *
+ * \note            The callback may be invoked from any context, so it
+ *                  should be kept short and should not block.
+ */
+void osal_report_error(osal_status_t error, const char* file, uint32_t line) {
+    osal_error_callback_t callback = s_error_callback;
+
+    if (callback != NULL) {
+        callback(error, file, line);
+    }
 }
