@@ -79,6 +79,7 @@ desktop.ini
 # Sphinx
 docs/sphinx/_build/
 docs/sphinx/.doctrees/
+*.mo
 
 # Doxygen
 docs/api/html/
