@@ -531,3 +531,267 @@ TEST_F(OsalSemPropertyTest, Property15_GiveTakeBalance) {
             << "Iteration " << test_iter << ": semaphore delete failed";
     }
 }
+
+/*---------------------------------------------------------------------------*/
+/* Property 20: Semaphore Count Tracking                                     */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 20: Semaphore Count Tracking
+ *
+ * *For any* semaphore with initial count C, after N successful take operations
+ * and M give operations, osal_sem_get_count() SHALL return C - N + M
+ * (clamped to [0, max_count]).
+ *
+ * **Validates: Requirements 10.3**
+ */
+TEST_F(OsalSemPropertyTest, Property20_SemaphoreCountTracking) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        uint32_t max_count = randomMaxCount();
+        uint32_t initial_count = randomInitialCount(max_count);
+
+        /* Create semaphore */
+        osal_sem_handle_t sem = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_sem_create(initial_count, max_count, &sem))
+            << "Iteration " << test_iter << ": semaphore create failed";
+
+        /* Verify initial count */
+        uint32_t count = osal_sem_get_count(sem);
+        EXPECT_EQ(initial_count, count)
+            << "Iteration " << test_iter
+            << ": initial count mismatch. Expected " << initial_count
+            << ", got " << count;
+
+        /* Track expected count */
+        uint32_t expected_count = initial_count;
+
+        /* Perform random number of take operations */
+        uint32_t num_takes = (expected_count > 0)
+                                 ? (randomInitialCount(expected_count))
+                                 : 0;
+        for (uint32_t i = 0; i < num_takes; i++) {
+            ASSERT_EQ(OSAL_OK, osal_sem_take(sem, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": take " << i << " failed";
+            expected_count--;
+
+            /* Verify count after each take */
+            count = osal_sem_get_count(sem);
+            EXPECT_EQ(expected_count, count)
+                << "Iteration " << test_iter << ", after take " << i
+                << ": count mismatch. Expected " << expected_count
+                << ", got " << count;
+        }
+
+        /* Perform random number of give operations */
+        uint32_t available_gives = max_count - expected_count;
+        uint32_t num_gives = (available_gives > 0)
+                                 ? randomInitialCount(available_gives)
+                                 : 0;
+        for (uint32_t i = 0; i < num_gives; i++) {
+            ASSERT_EQ(OSAL_OK, osal_sem_give(sem))
+                << "Iteration " << test_iter << ": give " << i << " failed";
+            expected_count++;
+
+            /* Verify count after each give */
+            count = osal_sem_get_count(sem);
+            EXPECT_EQ(expected_count, count)
+                << "Iteration " << test_iter << ", after give " << i
+                << ": count mismatch. Expected " << expected_count
+                << ", got " << count;
+        }
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_sem_delete(sem))
+            << "Iteration " << test_iter << ": semaphore delete failed";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 20b: Semaphore Count NULL Handle
+ *
+ * *For any* NULL semaphore handle, osal_sem_get_count() SHALL return 0.
+ *
+ * **Validates: Requirements 10.3**
+ */
+TEST_F(OsalSemPropertyTest, Property20b_SemaphoreCountNullHandle) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* NULL handle should return 0 */
+        EXPECT_EQ(0u, osal_sem_get_count(nullptr))
+            << "Iteration " << test_iter
+            << ": get_count(NULL) should return 0";
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 21: Semaphore Reset                                              */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 21: Semaphore Reset
+ *
+ * *For any* semaphore, after calling osal_sem_reset(handle, N),
+ * osal_sem_get_count() SHALL return N.
+ *
+ * **Validates: Requirements 10.4**
+ */
+TEST_F(OsalSemPropertyTest, Property21_SemaphoreReset) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        uint32_t max_count = randomMaxCount();
+        uint32_t initial_count = randomInitialCount(max_count);
+
+        /* Create semaphore */
+        osal_sem_handle_t sem = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_sem_create(initial_count, max_count, &sem))
+            << "Iteration " << test_iter << ": semaphore create failed";
+
+        /* Perform some random operations to change the count */
+        uint32_t current_count = initial_count;
+
+        /* Take some */
+        uint32_t num_takes = (current_count > 0)
+                                 ? randomInitialCount(current_count)
+                                 : 0;
+        for (uint32_t i = 0; i < num_takes; i++) {
+            osal_sem_take(sem, OSAL_NO_WAIT);
+            current_count--;
+        }
+
+        /* Give some */
+        uint32_t available_gives = max_count - current_count;
+        uint32_t num_gives = (available_gives > 0)
+                                 ? randomInitialCount(available_gives)
+                                 : 0;
+        for (uint32_t i = 0; i < num_gives; i++) {
+            osal_sem_give(sem);
+            current_count++;
+        }
+
+        /* Generate random reset count (within valid range) */
+        uint32_t reset_count = randomInitialCount(max_count);
+
+        /* Reset the semaphore */
+        osal_status_t status = osal_sem_reset(sem, reset_count);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": semaphore reset failed";
+
+        /* Verify count after reset */
+        uint32_t count = osal_sem_get_count(sem);
+        EXPECT_EQ(reset_count, count)
+            << "Iteration " << test_iter
+            << ": count after reset mismatch. Expected " << reset_count
+            << ", got " << count;
+
+        /* Verify we can take exactly reset_count times */
+        for (uint32_t i = 0; i < reset_count; i++) {
+            EXPECT_EQ(OSAL_OK, osal_sem_take(sem, OSAL_NO_WAIT))
+                << "Iteration " << test_iter << ": take " << i
+                << " after reset should succeed";
+        }
+
+        /* One more take should fail */
+        EXPECT_EQ(OSAL_ERROR_TIMEOUT, osal_sem_take(sem, OSAL_NO_WAIT))
+            << "Iteration " << test_iter
+            << ": take after exhausting reset count should timeout";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_sem_delete(sem))
+            << "Iteration " << test_iter << ": semaphore delete failed";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 21b: Semaphore Reset to Zero
+ *
+ * *For any* semaphore with count > 0, after calling osal_sem_reset(handle, 0),
+ * osal_sem_get_count() SHALL return 0 and take SHALL timeout.
+ *
+ * **Validates: Requirements 10.4**
+ */
+TEST_F(OsalSemPropertyTest, Property21b_SemaphoreResetToZero) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters with non-zero initial count */
+        uint32_t max_count = randomMaxCount();
+        uint32_t initial_count = randomInitialCount(max_count);
+        if (initial_count == 0) {
+            initial_count = 1;
+        }
+
+        /* Create semaphore */
+        osal_sem_handle_t sem = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_sem_create(initial_count, max_count, &sem))
+            << "Iteration " << test_iter << ": semaphore create failed";
+
+        /* Verify initial count is non-zero */
+        EXPECT_GT(osal_sem_get_count(sem), 0u)
+            << "Iteration " << test_iter << ": initial count should be > 0";
+
+        /* Reset to zero */
+        osal_status_t status = osal_sem_reset(sem, 0);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": semaphore reset to 0 failed";
+
+        /* Verify count is zero */
+        EXPECT_EQ(0u, osal_sem_get_count(sem))
+            << "Iteration " << test_iter << ": count after reset should be 0";
+
+        /* Take should timeout */
+        EXPECT_EQ(OSAL_ERROR_TIMEOUT, osal_sem_take(sem, OSAL_NO_WAIT))
+            << "Iteration " << test_iter
+            << ": take after reset to 0 should timeout";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_sem_delete(sem))
+            << "Iteration " << test_iter << ": semaphore delete failed";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 21c: Semaphore Reset NULL Handle
+ *
+ * *For any* NULL semaphore handle, osal_sem_reset() SHALL return
+ * OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 10.4**
+ */
+TEST_F(OsalSemPropertyTest, Property21c_SemaphoreResetNullHandle) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* NULL handle should return error */
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, osal_sem_reset(nullptr, 5))
+            << "Iteration " << test_iter
+            << ": reset(NULL) should return NULL_POINTER error";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 21d: Semaphore Reset Invalid Count
+ *
+ * *For any* semaphore with max_count M, calling osal_sem_reset(handle, N)
+ * where N > M SHALL return OSAL_ERROR_INVALID_PARAM.
+ *
+ * **Validates: Requirements 10.4**
+ */
+TEST_F(OsalSemPropertyTest, Property21d_SemaphoreResetInvalidCount) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* Generate random parameters */
+        uint32_t max_count = randomMaxCount();
+        uint32_t initial_count = randomInitialCount(max_count);
+
+        /* Create semaphore */
+        osal_sem_handle_t sem = nullptr;
+        ASSERT_EQ(OSAL_OK, osal_sem_create(initial_count, max_count, &sem))
+            << "Iteration " << test_iter << ": semaphore create failed";
+
+        /* Try to reset with count > max_count */
+        uint32_t invalid_count = max_count + 1;
+        osal_status_t status = osal_sem_reset(sem, invalid_count);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": reset with count > max_count should return INVALID_PARAM";
+
+        /* Clean up */
+        ASSERT_EQ(OSAL_OK, osal_sem_delete(sem))
+            << "Iteration " << test_iter << ": semaphore delete failed";
+    }
+}

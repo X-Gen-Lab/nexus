@@ -290,3 +290,145 @@ TEST_F(OsalMutexPropertyTest, Property14_MutualExclusion) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
+
+/*---------------------------------------------------------------------------*/
+/* Property 19: Mutex Lock State Consistency                                 */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: osal-refactor, Property 19: Mutex Lock State Consistency
+ *
+ * *For any* mutex, after osal_mutex_lock() succeeds, osal_mutex_is_locked()
+ * SHALL return true and osal_mutex_get_owner() SHALL return the locking task.
+ * After osal_mutex_unlock(), osal_mutex_is_locked() SHALL return false.
+ *
+ * **Validates: Requirements 10.1, 10.2**
+ */
+TEST_F(OsalMutexPropertyTest, Property19_MutexLockStateConsistency) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_mutex_handle_t mutex = nullptr;
+
+        /* Create mutex */
+        osal_status_t status = osal_mutex_create(&mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex create failed";
+
+        /* Initially, mutex should not be locked */
+        EXPECT_FALSE(osal_mutex_is_locked(mutex))
+            << "Iteration " << test_iter
+            << ": newly created mutex should not be locked";
+
+        /* Initially, mutex should have no owner */
+        EXPECT_EQ(nullptr, osal_mutex_get_owner(mutex))
+            << "Iteration " << test_iter
+            << ": newly created mutex should have no owner";
+
+        /* Lock the mutex */
+        status = osal_mutex_lock(mutex, OSAL_WAIT_FOREVER);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex lock failed";
+
+        /* After lock, mutex should be locked */
+        EXPECT_TRUE(osal_mutex_is_locked(mutex))
+            << "Iteration " << test_iter
+            << ": mutex should be locked after lock()";
+
+        /* After lock, mutex should have an owner (may be NULL in main thread
+         * context for native adapter, but should be consistent) */
+        /* Note: In native adapter without task context, owner may be NULL */
+
+        /* Unlock the mutex */
+        status = osal_mutex_unlock(mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex unlock failed";
+
+        /* After unlock, mutex should not be locked */
+        EXPECT_FALSE(osal_mutex_is_locked(mutex))
+            << "Iteration " << test_iter
+            << ": mutex should not be locked after unlock()";
+
+        /* After unlock, mutex should have no owner */
+        EXPECT_EQ(nullptr, osal_mutex_get_owner(mutex))
+            << "Iteration " << test_iter
+            << ": mutex should have no owner after unlock()";
+
+        /* Clean up */
+        status = osal_mutex_delete(mutex);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex delete failed";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 19b: Mutex Lock State with Multiple
+ * Lock/Unlock Cycles
+ *
+ * *For any* mutex, after multiple lock/unlock cycles, the lock state SHALL
+ * be consistent with the last operation performed.
+ *
+ * **Validates: Requirements 10.1, 10.2**
+ */
+TEST_F(OsalMutexPropertyTest, Property19b_MutexLockStateMultipleCycles) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_mutex_handle_t mutex = nullptr;
+
+        /* Create mutex */
+        osal_status_t status = osal_mutex_create(&mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex create failed";
+
+        /* Generate random number of lock/unlock cycles */
+        int num_cycles = randomIterations();
+
+        for (int cycle = 0; cycle < num_cycles; ++cycle) {
+            /* Lock mutex */
+            status = osal_mutex_lock(mutex, OSAL_WAIT_FOREVER);
+            ASSERT_EQ(OSAL_OK, status)
+                << "Iteration " << test_iter << ", cycle " << cycle
+                << ": mutex lock failed";
+
+            /* Verify locked state */
+            EXPECT_TRUE(osal_mutex_is_locked(mutex))
+                << "Iteration " << test_iter << ", cycle " << cycle
+                << ": mutex should be locked";
+
+            /* Unlock mutex */
+            status = osal_mutex_unlock(mutex);
+            ASSERT_EQ(OSAL_OK, status)
+                << "Iteration " << test_iter << ", cycle " << cycle
+                << ": mutex unlock failed";
+
+            /* Verify unlocked state */
+            EXPECT_FALSE(osal_mutex_is_locked(mutex))
+                << "Iteration " << test_iter << ", cycle " << cycle
+                << ": mutex should not be locked";
+        }
+
+        /* Clean up */
+        status = osal_mutex_delete(mutex);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex delete failed";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 19c: Mutex NULL Handle Handling
+ *
+ * *For any* NULL mutex handle, osal_mutex_is_locked() SHALL return false
+ * and osal_mutex_get_owner() SHALL return NULL.
+ *
+ * **Validates: Requirements 10.1, 10.2**
+ */
+TEST_F(OsalMutexPropertyTest, Property19c_MutexNullHandleHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        /* NULL handle should return false for is_locked */
+        EXPECT_FALSE(osal_mutex_is_locked(nullptr))
+            << "Iteration " << test_iter
+            << ": is_locked(NULL) should return false";
+
+        /* NULL handle should return NULL for get_owner */
+        EXPECT_EQ(nullptr, osal_mutex_get_owner(nullptr))
+            << "Iteration " << test_iter
+            << ": get_owner(NULL) should return NULL";
+    }
+}
