@@ -11,14 +11,13 @@
 #ifndef NATIVE_PLATFORM_H
 #define NATIVE_PLATFORM_H
 
-#include "hal/hal_adc.h"
-#include "hal/hal_spi.h"
-#include "hal/hal_timer.h"
 #include "hal/interface/nx_adc.h"
 #include "hal/interface/nx_gpio.h"
 #include "hal/interface/nx_i2c.h"
+#include "hal/interface/nx_spi.h"
 #include "hal/interface/nx_timer.h"
 #include "hal/interface/nx_uart.h"
+#include "hal/nx_status.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -185,7 +184,7 @@ bool native_spi_get_cs_state(int instance);
  * \param[in]       instance: SPI instance
  * \return          SPI mode (0-3)
  */
-hal_spi_mode_t native_spi_get_mode(int instance);
+nx_spi_mode_t native_spi_get_mode(int instance);
 
 /**
  * \brief           Get length of last transfer (for testing)
@@ -393,7 +392,7 @@ uint32_t native_timer_get_period_us(int instance);
  * \param[in]       instance: Timer instance
  * \return          Timer mode
  */
-hal_timer_mode_t native_timer_get_mode(int instance);
+nx_timer_mode_t native_timer_get_mode(int instance);
 
 /**
  * \brief           Get callback invocation count (for testing)
@@ -508,7 +507,7 @@ bool native_adc_is_initialized(int instance);
  * \param[in]       instance: ADC instance
  * \return          ADC resolution
  */
-hal_adc_resolution_t native_adc_get_resolution(int instance);
+nx_adc_resolution_t native_adc_get_resolution(int instance);
 
 /**
  * \brief           Set simulated ADC value for a channel (for testing)

@@ -7,13 +7,6 @@ add_library(platform_native STATIC)
 
 target_sources(platform_native
     PRIVATE
-        src/hal_gpio_native.c
-        src/hal_uart_native.c
-        src/hal_spi_native.c
-        src/hal_i2c_native.c
-        src/hal_timer_native.c
-        src/hal_adc_native.c
-        src/hal_system_native.c
         src/nx_dma_native.c
         src/nx_isr_native.c
         src/nx_gpio_native.c

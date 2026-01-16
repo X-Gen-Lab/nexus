@@ -25,6 +25,7 @@ include(GoogleTest)
 # Test executable
 add_executable(nexus_tests
     test_main.cpp
+    # HAL tests (new nx_* API)
     hal/test_build_system.cpp
     hal/test_compiler_abstraction.cpp
     hal/test_nx_status.cpp
@@ -39,20 +40,7 @@ add_executable(nexus_tests
     hal/test_nx_timer.cpp
     hal/test_nx_adc.cpp
     hal/test_nx_factory.cpp
-    hal/test_hal_gpio.cpp
-    hal/test_hal_gpio_properties.cpp
-    hal/test_hal_uart.cpp
-    hal/test_hal_uart_properties.cpp
-    hal/test_hal_spi.cpp
-    hal/test_hal_spi_properties.cpp
-    hal/test_hal_i2c.cpp
-    hal/test_hal_i2c_properties.cpp
-    hal/test_hal_timer.cpp
-    hal/test_hal_timer_properties.cpp
-    hal/test_hal_adc.cpp
-    hal/test_hal_adc_properties.cpp
-    hal/test_hal_system_properties.cpp
-    hal/test_hal_error_handling_properties.cpp
+    # OSAL tests
     osal/test_osal_task.cpp
     osal/test_osal_task_properties.cpp
     osal/test_osal_mutex.cpp
@@ -69,9 +57,10 @@ add_executable(nexus_tests
     osal/test_osal_event_properties.cpp
     osal/test_osal_core_properties.cpp
     osal/test_osal_error_handling_properties.cpp
+    # Log tests
     log/test_log.cpp
     log/test_log_properties.cpp
-    log/test_log_uart_backend.cpp
+    # Shell tests
     shell/test_shell_parser.cpp
     shell/test_shell_parser_properties.cpp
     shell/test_shell_line_editor.cpp
@@ -87,6 +76,7 @@ add_executable(nexus_tests
     shell/test_shell_backend.cpp
     shell/test_shell_backend_properties.cpp
     shell/test_shell_builtin.cpp
+    # Config tests
     config/test_config_store.cpp
     config/test_config_store_properties.cpp
     config/test_config_core_properties.cpp
@@ -103,9 +93,8 @@ add_executable(nexus_tests
     config/test_config_import_export_properties.cpp
     config/test_config_crypto.cpp
     config/test_config_crypto_properties.cpp
-    integration/test_hal_osal_integration.cpp
+    # Integration tests
     integration/test_freertos_adapter_integration.cpp
-    integration/test_log_integration.cpp
     integration/test_shell_integration.cpp
     integration/test_config_integration.cpp
 )

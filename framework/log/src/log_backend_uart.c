@@ -2,17 +2,17 @@
  * \file            log_backend_uart.c
  * \brief           Log UART Backend Implementation
  * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-13
+ * \version         2.0.0
+ * \date            2026-01-16
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * \details         UART backend for log framework. Outputs log messages
- *                  to a UART peripheral using the HAL UART interface.
+ *                  to a UART peripheral using the new nx_uart_t interface.
  *                  Requirements: 3.5
  */
 
-#include "hal/hal_uart.h"
+#include "hal/interface/nx_uart.h"
 #include "log/log_backend.h"
 #include <stdlib.h>
 #include <string.h>
@@ -25,9 +25,9 @@
  * \brief           UART backend context structure
  */
 typedef struct {
-    hal_uart_instance_t uart; /**< HAL UART instance */
-    bool initialized;         /**< Initialization flag */
-    uint32_t timeout_ms;      /**< Transmit timeout in milliseconds */
+    nx_uart_t* uart;      /**< UART interface pointer */
+    bool initialized;     /**< Initialization flag */
+    uint32_t timeout_ms;  /**< Transmit timeout in milliseconds */
 } uart_backend_ctx_t;
 
 /**
@@ -73,11 +73,21 @@ static log_status_t uart_backend_write(void* ctx, const char* msg, size_t len) {
         return LOG_ERROR_NOT_INIT;
     }
 
-    /* Transmit data via HAL UART */
-    hal_status_t status = hal_uart_transmit(uart_ctx->uart, (const uint8_t*)msg,
-                                            len, uart_ctx->timeout_ms);
+    if (uart_ctx->uart == NULL) {
+        return LOG_ERROR_BACKEND;
+    }
 
-    if (status != HAL_OK) {
+    /* Get synchronous TX interface */
+    nx_tx_sync_t* tx_sync = uart_ctx->uart->get_tx_sync(uart_ctx->uart);
+    if (tx_sync == NULL) {
+        return LOG_ERROR_BACKEND;
+    }
+
+    /* Transmit data via UART */
+    nx_status_t status = tx_sync->send(tx_sync, (const uint8_t*)msg, len,
+                                       uart_ctx->timeout_ms);
+
+    if (status != NX_OK) {
         return LOG_ERROR_BACKEND;
     }
 
@@ -125,9 +135,9 @@ static log_status_t uart_backend_deinit(void* ctx) {
 /* Public API                                                                */
 /*---------------------------------------------------------------------------*/
 
-log_backend_t* log_backend_uart_create(hal_uart_instance_t uart) {
-    /* Validate UART instance */
-    if (uart >= HAL_UART_MAX) {
+log_backend_t* log_backend_uart_create(nx_uart_t* uart) {
+    /* Validate UART interface */
+    if (uart == NULL) {
         return NULL;
     }
 
@@ -177,12 +187,6 @@ void log_backend_uart_destroy(log_backend_t* backend) {
     free(backend);
 }
 
-/**
- * \brief           Set UART backend transmit timeout
- * \param[in]       backend: Pointer to UART backend
- * \param[in]       timeout_ms: Timeout in milliseconds
- * \return          LOG_OK on success, error code otherwise
- */
 log_status_t log_backend_uart_set_timeout(log_backend_t* backend,
                                           uint32_t timeout_ms) {
     if (backend == NULL || backend->ctx == NULL) {
@@ -195,14 +199,9 @@ log_status_t log_backend_uart_set_timeout(log_backend_t* backend,
     return LOG_OK;
 }
 
-/**
- * \brief           Get UART instance from backend
- * \param[in]       backend: Pointer to UART backend
- * \return          UART instance, or HAL_UART_MAX on error
- */
-hal_uart_instance_t log_backend_uart_get_instance(log_backend_t* backend) {
+nx_uart_t* log_backend_uart_get_interface(log_backend_t* backend) {
     if (backend == NULL || backend->ctx == NULL) {
-        return HAL_UART_MAX;
+        return NULL;
     }
 
     uart_backend_ctx_t* ctx = (uart_backend_ctx_t*)backend->ctx;

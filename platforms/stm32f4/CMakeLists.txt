@@ -136,13 +136,6 @@ set(ST_HAL_SOURCES
 
 # Nexus HAL adapter source files (platform-specific implementations)
 set(NEXUS_HAL_SOURCES
-    src/hal_gpio_stm32f4.c
-    src/hal_uart_stm32f4.c
-    src/hal_spi_stm32f4.c
-    src/hal_i2c_stm32f4.c
-    src/hal_timer_stm32f4.c
-    src/hal_adc_stm32f4.c
-    src/hal_system_stm32f4.c
     src/nx_dma_stm32f4.c
     src/nx_isr_stm32f4.c
     src/nx_gpio_stm32f4.c

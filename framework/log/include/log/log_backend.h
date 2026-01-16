@@ -185,14 +185,14 @@ size_t log_backend_memory_size(log_backend_t* backend);
  * \{
  */
 
-#include "hal/hal_uart.h"
+#include "hal/interface/nx_uart.h"
 
 /**
  * \brief           Create a UART backend
- * \param[in]       uart: HAL UART instance
+ * \param[in]       uart: UART interface pointer (nx_uart_t*)
  * \return          Pointer to backend structure, or NULL on failure
  */
-log_backend_t* log_backend_uart_create(hal_uart_instance_t uart);
+log_backend_t* log_backend_uart_create(nx_uart_t* uart);
 
 /**
  * \brief           Destroy a UART backend
@@ -210,11 +210,11 @@ log_status_t log_backend_uart_set_timeout(log_backend_t* backend,
                                           uint32_t timeout_ms);
 
 /**
- * \brief           Get UART instance from backend
+ * \brief           Get UART interface from backend
  * \param[in]       backend: Pointer to UART backend
- * \return          UART instance, or HAL_UART_MAX on error
+ * \return          UART interface pointer, or NULL on error
  */
-hal_uart_instance_t log_backend_uart_get_instance(log_backend_t* backend);
+nx_uart_t* log_backend_uart_get_interface(log_backend_t* backend);
 
 /**
  * \}

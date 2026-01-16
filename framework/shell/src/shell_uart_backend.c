@@ -2,18 +2,19 @@
  * \file            shell_uart_backend.c
  * \brief           Shell UART backend implementation
  * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-14
+ * \version         2.0.0
+ * \date            2026-01-16
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * Implements the UART backend for Shell I/O operations using HAL UART
- * interface.
+ * Implements the UART backend for Shell I/O operations using the new
+ * nx_uart_t interface.
  *
  * Requirements: 8.3, 8.4, 8.5
  */
 
-#include "hal/hal_uart.h"
+#include "hal/interface/nx_uart.h"
+#include "hal/nx_factory.h"
 #include "shell/shell_backend.h"
 #include <string.h>
 
@@ -26,8 +27,11 @@
 /* Private Data                                                              */
 /*---------------------------------------------------------------------------*/
 
-/** UART instance used by the backend */
-static hal_uart_instance_t g_uart_instance = HAL_UART_0;
+/** UART interface pointer */
+static nx_uart_t* g_uart = NULL;
+
+/** UART index */
+static uint8_t g_uart_index = 0;
 
 /** Backend initialization flag */
 static bool g_uart_backend_initialized = false;
@@ -49,7 +53,7 @@ static bool g_uart_backend_initialized = false;
  * \return          Number of bytes actually read, 0 if no data available
  */
 static int uart_backend_read(uint8_t* data, int max_len) {
-    if (!g_uart_backend_initialized) {
+    if (!g_uart_backend_initialized || g_uart == NULL) {
         return 0;
     }
 
@@ -57,20 +61,15 @@ static int uart_backend_read(uint8_t* data, int max_len) {
         return 0;
     }
 
-    int count = 0;
-
-    /* Try to read available bytes without blocking */
-    while (count < max_len) {
-        hal_status_t status =
-            hal_uart_getc(g_uart_instance, &data[count], UART_READ_TIMEOUT_MS);
-        if (status != HAL_OK) {
-            /* No more data available */
-            break;
-        }
-        count++;
+    /* Get async RX interface */
+    nx_rx_async_t* rx_async = g_uart->get_rx_async(g_uart);
+    if (rx_async == NULL) {
+        return 0;
     }
 
-    return count;
+    /* Read available data */
+    size_t count = rx_async->read(rx_async, data, (size_t)max_len);
+    return (int)count;
 }
 
 /**
@@ -80,7 +79,7 @@ static int uart_backend_read(uint8_t* data, int max_len) {
  * \return          Number of bytes actually written
  */
 static int uart_backend_write(const uint8_t* data, int len) {
-    if (!g_uart_backend_initialized) {
+    if (!g_uart_backend_initialized || g_uart == NULL) {
         return 0;
     }
 
@@ -88,9 +87,16 @@ static int uart_backend_write(const uint8_t* data, int len) {
         return 0;
     }
 
-    hal_status_t status = hal_uart_transmit(g_uart_instance, data, (size_t)len,
-                                            UART_WRITE_TIMEOUT_MS);
-    if (status != HAL_OK) {
+    /* Get sync TX interface */
+    nx_tx_sync_t* tx_sync = g_uart->get_tx_sync(g_uart);
+    if (tx_sync == NULL) {
+        return 0;
+    }
+
+    /* Transmit data */
+    nx_status_t status = tx_sync->send(tx_sync, data, (size_t)len,
+                                       UART_WRITE_TIMEOUT_MS);
+    if (status != NX_OK) {
         return 0;
     }
 
@@ -104,8 +110,10 @@ static int uart_backend_write(const uint8_t* data, int len) {
 /**
  * \brief           UART backend instance
  */
-const shell_backend_t shell_uart_backend = {.read = uart_backend_read,
-                                            .write = uart_backend_write};
+const shell_backend_t shell_uart_backend = {
+    .read = uart_backend_read,
+    .write = uart_backend_write
+};
 
 /*---------------------------------------------------------------------------*/
 /* Public API Implementation                                                 */
@@ -113,17 +121,46 @@ const shell_backend_t shell_uart_backend = {.read = uart_backend_read,
 
 shell_status_t shell_uart_backend_init(int uart_instance) {
     /* Validate UART instance */
-    if (uart_instance < 0 || uart_instance >= HAL_UART_MAX) {
+    if (uart_instance < 0 || uart_instance > 5) {
         return SHELL_ERROR_INVALID_PARAM;
     }
 
-    g_uart_instance = (hal_uart_instance_t)uart_instance;
+    /* Get UART interface from factory */
+    g_uart = nx_factory_uart((uint8_t)uart_instance);
+    if (g_uart == NULL) {
+        return SHELL_ERROR;
+    }
+
+    /* Initialize UART */
+    nx_lifecycle_t* lifecycle = g_uart->get_lifecycle(g_uart);
+    if (lifecycle != NULL) {
+        nx_status_t status = lifecycle->init(lifecycle);
+        if (status != NX_OK) {
+            nx_factory_uart_release(g_uart);
+            g_uart = NULL;
+            return SHELL_ERROR;
+        }
+    }
+
+    g_uart_index = (uint8_t)uart_instance;
     g_uart_backend_initialized = true;
 
     return SHELL_OK;
 }
 
 shell_status_t shell_uart_backend_deinit(void) {
+    if (g_uart != NULL) {
+        /* Deinitialize UART */
+        nx_lifecycle_t* lifecycle = g_uart->get_lifecycle(g_uart);
+        if (lifecycle != NULL) {
+            lifecycle->deinit(lifecycle);
+        }
+
+        /* Release UART */
+        nx_factory_uart_release(g_uart);
+        g_uart = NULL;
+    }
+
     g_uart_backend_initialized = false;
     return SHELL_OK;
 }
