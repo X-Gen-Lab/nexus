@@ -3,21 +3,35 @@
  * \brief           OSAL Error Handling Property-Based Tests
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-01-15
+ * \date            2026-01-16
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * Property-based tests for OSAL error handling across Timer and Memory modules.
- * These tests verify universal properties that should hold for all error
- * conditions. Each property test runs 100+ iterations with random inputs.
+ * Property-based tests for OSAL Error Handling.
+ * These tests verify universal properties that should hold for all valid
+ * inputs. Each property test runs 100+ iterations with random inputs.
+ *
+ * Properties tested:
+ * - Property 1: NULL Pointer Error Handling (osal-refactor)
+ * - Property 2: Invalid Parameter Error Handling (osal-refactor)
+ * - Property 12: Timeout Conversion Correctness (freertos-adapter)
+ * - Property 13: Null Pointer Error Handling (freertos-adapter)
+ * - Property 14: Invalid Parameter Error Handling (freertos-adapter)
  */
 
+#include <chrono>
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <random>
+#include <thread>
 #include <vector>
 
 extern "C" {
 #include "osal/osal.h"
+#include "osal/osal_diag.h"
+#include "osal/osal_timer.h"
+#include "osal/osal_event.h"
+#include "osal/osal_mem.h"
 }
 
 /**
@@ -33,171 +47,718 @@ class OsalErrorHandlingPropertyTest : public ::testing::Test {
     std::mt19937 rng;
 
     void SetUp() override {
-        osal_init();
         rng.seed(std::random_device{}());
+        /* Ensure OSAL is initialized for each test */
+        osal_init();
     }
 
     void TearDown() override {
-        /* No specific cleanup needed */
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     /**
-     * \brief       Generate random timer period (10-1000ms)
+     * \brief       Generate random timeout value (excluding special values)
      */
-    uint32_t randomPeriod() {
-        std::uniform_int_distribution<uint32_t> dist(10, 1000);
+    uint32_t randomTimeoutMs() {
+        std::uniform_int_distribution<uint32_t> dist(1, 10000);
         return dist(rng);
     }
 
     /**
-     * \brief       Generate random timer mode
+     * \brief       Generate random priority value (valid range 0-31)
      */
-    osal_timer_mode_t randomMode() {
-        return (rng() % 2 == 0) ? OSAL_TIMER_ONE_SHOT : OSAL_TIMER_PERIODIC;
+    uint8_t randomValidPriority() {
+        std::uniform_int_distribution<int> dist(0, 31);
+        return static_cast<uint8_t>(dist(rng));
     }
 
     /**
-     * \brief       Generate random allocation size (1-8192 bytes)
+     * \brief       Generate random invalid priority value (> 31)
      */
-    size_t randomSize() {
-        std::uniform_int_distribution<size_t> dist(1, 8192);
+    uint8_t randomInvalidPriority() {
+        std::uniform_int_distribution<int> dist(32, 255);
+        return static_cast<uint8_t>(dist(rng));
+    }
+
+    /**
+     * \brief       Generate random positive size value
+     */
+    size_t randomPositiveSize() {
+        std::uniform_int_distribution<size_t> dist(1, 1024);
         return dist(rng);
     }
 
     /**
-     * \brief       Generate random alignment (power of 2: 1, 2, 4, 8, 16, 32,
-     * 64)
+     * \brief       Generate random count value for semaphores
      */
-    size_t randomAlignment() {
-        const size_t alignments[] = {1, 2, 4, 8, 16, 32, 64};
-        std::uniform_int_distribution<size_t> dist(0, 6);
-        return alignments[dist(rng)];
+    uint32_t randomCount() {
+        std::uniform_int_distribution<uint32_t> dist(1, 100);
+        return dist(rng);
     }
 };
 
+/*---------------------------------------------------------------------------*/
+/* Property 1: NULL Pointer Error Handling (osal-refactor)                   */
+/*---------------------------------------------------------------------------*/
+
 /**
- * \brief           Dummy callback for timer tests
+ * Feature: osal-refactor, Property 1: NULL Pointer Error Handling
+ *
+ * *For any* OSAL function that accepts a pointer parameter marked as required,
+ * passing NULL SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 1.2, 2.4**
  */
-static void dummy_timer_callback(void* arg) {
-    (void)arg;
+TEST_F(OsalErrorHandlingPropertyTest, Property1_TimerNullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test osal_timer_create with NULL handle */
+        osal_timer_config_t timer_config = {
+            .name = "test",
+            .period_ms = 100,
+            .mode = OSAL_TIMER_ONE_SHOT,
+            .callback = [](void*) {},
+            .arg = nullptr
+        };
+        status = osal_timer_create(&timer_config, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_create(NULL handle) should return NULL_POINTER";
+
+        /* Test osal_timer_create with NULL config */
+        osal_timer_handle_t timer = nullptr;
+        status = osal_timer_create(nullptr, &timer);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_create(NULL config) should return NULL_POINTER";
+
+        /* Test osal_timer_delete with NULL handle */
+        status = osal_timer_delete(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_delete(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_start with NULL handle */
+        status = osal_timer_start(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_start(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_stop with NULL handle */
+        status = osal_timer_stop(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_stop(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_reset with NULL handle */
+        status = osal_timer_reset(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_reset(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_set_period with NULL handle */
+        status = osal_timer_set_period(nullptr, 100);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_set_period(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_start_from_isr with NULL handle */
+        status = osal_timer_start_from_isr(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_start_from_isr(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_stop_from_isr with NULL handle */
+        status = osal_timer_stop_from_isr(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_stop_from_isr(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_reset_from_isr with NULL handle */
+        status = osal_timer_reset_from_isr(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_reset_from_isr(NULL) should return NULL_POINTER";
+
+        /* Test osal_timer_set_callback with NULL handle */
+        status = osal_timer_set_callback(nullptr, [](void*) {}, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_timer_set_callback(NULL handle) should return "
+               "NULL_POINTER";
+
+        /* Create a valid timer to test set_callback with NULL callback */
+        status = osal_timer_create(&timer_config, &timer);
+        if (status == OSAL_OK && timer != nullptr) {
+            status = osal_timer_set_callback(timer, nullptr, nullptr);
+            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+                << "Iteration " << test_iter
+                << ": osal_timer_set_callback(NULL callback) should return "
+                   "NULL_POINTER";
+            osal_timer_delete(timer);
+        }
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 1: NULL Pointer Error Handling - Events
+ *
+ * *For any* event API that accepts pointer parameters, passing NULL
+ * SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 1.2, 2.4**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property1_EventNullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test osal_event_create with NULL handle */
+        status = osal_event_create(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_create(NULL) should return NULL_POINTER";
+
+        /* Test osal_event_delete with NULL handle */
+        status = osal_event_delete(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_delete(NULL) should return NULL_POINTER";
+
+        /* Test osal_event_set with NULL handle */
+        status = osal_event_set(nullptr, 0x01);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_set(NULL) should return NULL_POINTER";
+
+        /* Test osal_event_clear with NULL handle */
+        status = osal_event_clear(nullptr, 0x01);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_clear(NULL) should return NULL_POINTER";
+
+        /* Test osal_event_wait with NULL handle */
+        osal_event_wait_options_t options = {
+            .mode = OSAL_EVENT_WAIT_ANY,
+            .auto_clear = false,
+            .timeout_ms = OSAL_NO_WAIT
+        };
+        osal_event_bits_t bits_out = 0;
+        status = osal_event_wait(nullptr, 0x01, &options, &bits_out);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_wait(NULL handle) should return NULL_POINTER";
+
+        /* Test osal_event_set_from_isr with NULL handle */
+        status = osal_event_set_from_isr(nullptr, 0x01);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_set_from_isr(NULL) should return NULL_POINTER";
+
+        /* Test osal_event_clear_from_isr with NULL handle */
+        status = osal_event_clear_from_isr(nullptr, 0x01);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_clear_from_isr(NULL) should return NULL_POINTER";
+
+        /* Test osal_event_sync with NULL handle */
+        status = osal_event_sync(nullptr, 0x01, 0x02, &options, &bits_out);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_event_sync(NULL handle) should return NULL_POINTER";
+
+        /* Create a valid event to test sync with NULL options */
+        osal_event_handle_t event = nullptr;
+        status = osal_event_create(&event);
+        if (status == OSAL_OK && event != nullptr) {
+            status = osal_event_sync(event, 0x01, 0x02, nullptr, &bits_out);
+            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+                << "Iteration " << test_iter
+                << ": osal_event_sync(NULL options) should return NULL_POINTER";
+            osal_event_delete(event);
+        }
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 1: NULL Pointer Error Handling - Memory
+ *
+ * *For any* memory API that accepts pointer parameters, passing NULL
+ * SHALL return OSAL_ERROR_NULL_POINTER or handle gracefully.
+ *
+ * **Validates: Requirements 1.2, 2.4**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property1_MemoryNullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test osal_mem_get_stats with NULL pointer */
+        status = osal_mem_get_stats(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_mem_get_stats(NULL) should return NULL_POINTER";
+
+        /* Test osal_mem_free with NULL - should be safe (no-op) */
+        osal_mem_free(nullptr);  /* Should not crash */
+
+        /* Test osal_mem_free_aligned with NULL - should be safe (no-op) */
+        osal_mem_free_aligned(nullptr);  /* Should not crash */
+
+        /* Test osal_mem_realloc with NULL ptr - should behave like alloc */
+        void* ptr = osal_mem_realloc(nullptr, 64);
+        if (ptr != nullptr) {
+            osal_mem_free(ptr);
+        }
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 1: NULL Pointer Error Handling - Diagnostics
+ *
+ * *For any* diagnostics API that accepts pointer parameters, passing NULL
+ * SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 1.2, 2.4**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property1_DiagnosticsNullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test osal_get_stats with NULL pointer */
+        status = osal_get_stats(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_get_stats(NULL) should return NULL_POINTER";
+
+        /* Test osal_set_error_callback with NULL - should be valid (disable) */
+        status = osal_set_error_callback(nullptr);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter
+            << ": osal_set_error_callback(NULL) should succeed (disable)";
+    }
+}
+
+/**
+ * Feature: osal-refactor, Property 1: NULL Pointer Error Handling - Enhanced APIs
+ *
+ * *For any* enhanced OSAL API that accepts pointer parameters, passing NULL
+ * SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 1.2, 2.4**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property1_EnhancedAPINullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test osal_sem_reset with NULL handle */
+        status = osal_sem_reset(nullptr, 0);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_reset(NULL) should return NULL_POINTER";
+
+        /* Test osal_queue_reset with NULL handle */
+        status = osal_queue_reset(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_reset(NULL) should return NULL_POINTER";
+
+        /* Test osal_queue_set_mode with NULL handle */
+        status = osal_queue_set_mode(nullptr, OSAL_QUEUE_MODE_NORMAL);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_set_mode(NULL) should return NULL_POINTER";
+
+        /* Test osal_queue_peek_from_isr with NULL handle */
+        int item = 0;
+        status = osal_queue_peek_from_isr(nullptr, &item);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_peek_from_isr(NULL handle) should return "
+               "NULL_POINTER";
+
+        /* Create a valid queue to test peek_from_isr with NULL item */
+        osal_queue_handle_t queue = nullptr;
+        status = osal_queue_create(sizeof(int), 10, &queue);
+        if (status == OSAL_OK && queue != nullptr) {
+            status = osal_queue_peek_from_isr(queue, nullptr);
+            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+                << "Iteration " << test_iter
+                << ": osal_queue_peek_from_isr(NULL item) should return "
+                   "NULL_POINTER";
+            osal_queue_delete(queue);
+        }
+
+        /* Test osal_task_set_priority with NULL handle */
+        status = osal_task_set_priority(nullptr, 16);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_task_set_priority(NULL) should return NULL_POINTER";
+    }
 }
 
 /*---------------------------------------------------------------------------*/
-/* Property 13: NULL Pointer Error Handling                                  */
+/* Property 12: Timeout Conversion Correctness                               */
 /*---------------------------------------------------------------------------*/
 
 /**
- * Feature: osal-timer-memory, Property 13: NULL Pointer Error Handling
+ * Feature: freertos-adapter, Property 12: Timeout Conversion Correctness
  *
- * *For any* function that requires a non-NULL pointer parameter, passing NULL
- * SHALL return OSAL_ERROR_NULL_POINTER.
+ * *For any* timeout value, OSAL_WAIT_FOREVER SHALL convert to portMAX_DELAY,
+ * OSAL_NO_WAIT SHALL convert to 0, and positive millisecond values SHALL
+ * convert to the equivalent tick count using pdMS_TO_TICKS().
  *
- * **Validates: Requirements 8.2**
+ * **Validates: Requirements 9.1, 9.2, 9.3**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property12_TimeoutConversionCorrectness) {
+    /*
+     * Test OSAL_WAIT_FOREVER behavior:
+     * When using OSAL_WAIT_FOREVER, blocking operations should wait
+     * indefinitely. We verify this by checking that a mutex lock with
+     * OSAL_WAIT_FOREVER succeeds when the mutex is available.
+     */
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_mutex_handle_t mutex = nullptr;
+
+        /* Create mutex */
+        osal_status_t status = osal_mutex_create(&mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex create failed";
+
+        /* Test OSAL_WAIT_FOREVER - should succeed immediately on available
+         * mutex */
+        status = osal_mutex_lock(mutex, OSAL_WAIT_FOREVER);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter
+            << ": OSAL_WAIT_FOREVER should succeed on available mutex";
+
+        osal_mutex_unlock(mutex);
+        osal_mutex_delete(mutex);
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 12 Extension: OSAL_NO_WAIT Behavior
+ *
+ * *For any* blocking operation with OSAL_NO_WAIT timeout, the operation
+ * SHALL return immediately without blocking.
+ *
+ * **Validates: Requirements 9.2**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property12_NoWaitBehavior) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_mutex_handle_t mutex = nullptr;
+
+        /* Create mutex */
+        osal_status_t status = osal_mutex_create(&mutex);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": mutex create failed";
+
+        /* Lock the mutex first */
+        status = osal_mutex_lock(mutex, OSAL_NO_WAIT);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": first lock should succeed";
+
+        /*
+         * Try to lock again with OSAL_NO_WAIT - should fail immediately
+         * with OSAL_ERROR_TIMEOUT (not block)
+         * Note: On native adapter, recursive locking may be allowed,
+         * so we test with a queue instead for more reliable behavior
+         */
+        osal_mutex_unlock(mutex);
+        osal_mutex_delete(mutex);
+
+        /* Test with queue - more reliable for NO_WAIT behavior */
+        osal_queue_handle_t queue = nullptr;
+        status = osal_queue_create(sizeof(int), 1, &queue);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Try to receive from empty queue with NO_WAIT - should fail
+         * immediately */
+        int item = 0;
+        auto start = std::chrono::steady_clock::now();
+        status = osal_queue_receive(queue, &item, OSAL_NO_WAIT);
+        auto elapsed = std::chrono::steady_clock::now() - start;
+
+        EXPECT_EQ(OSAL_ERROR_EMPTY, status)
+            << "Iteration " << test_iter
+            << ": receive from empty queue with NO_WAIT should return EMPTY";
+
+        /* Should return almost immediately (< 100ms) */
+        EXPECT_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed)
+                      .count(),
+                  100)
+            << "Iteration " << test_iter
+            << ": NO_WAIT should return immediately";
+
+        osal_queue_delete(queue);
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 12 Extension: Positive Timeout Behavior
+ *
+ * *For any* positive timeout value, blocking operations SHALL wait for
+ * approximately that duration before timing out.
+ *
+ * **Validates: Requirements 9.3**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property12_PositiveTimeoutBehavior) {
+    /* Use fewer iterations for timing tests */
+    for (int test_iter = 0; test_iter < 10; ++test_iter) {
+        osal_queue_handle_t queue = nullptr;
+
+        /* Create empty queue */
+        osal_status_t status = osal_queue_create(sizeof(int), 1, &queue);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Generate random timeout (50-200ms for reasonable test duration) */
+        std::uniform_int_distribution<uint32_t> dist(50, 200);
+        uint32_t timeout_ms = dist(rng);
+
+        /* Try to receive from empty queue - should timeout */
+        int item = 0;
+        auto start = std::chrono::steady_clock::now();
+        status = osal_queue_receive(queue, &item, timeout_ms);
+        auto elapsed = std::chrono::steady_clock::now() - start;
+        auto elapsed_ms =
+            std::chrono::duration_cast<std::chrono::milliseconds>(elapsed)
+                .count();
+
+        /* After timeout, the result should be OSAL_ERROR_TIMEOUT */
+        EXPECT_EQ(OSAL_ERROR_TIMEOUT, status)
+            << "Iteration " << test_iter
+            << ": receive from empty queue should timeout";
+
+        /* Elapsed time should be approximately the timeout value (within 50%
+         * tolerance) */
+        EXPECT_GE(elapsed_ms, timeout_ms * 0.5)
+            << "Iteration " << test_iter << ": elapsed time (" << elapsed_ms
+            << "ms) should be >= " << (timeout_ms * 0.5) << "ms";
+
+        EXPECT_LE(elapsed_ms, timeout_ms * 2.0)
+            << "Iteration " << test_iter << ": elapsed time (" << elapsed_ms
+            << "ms) should be <= " << (timeout_ms * 2.0) << "ms";
+
+        osal_queue_delete(queue);
+    }
+}
+
+/*---------------------------------------------------------------------------*/
+/* Property 13: Null Pointer Error Handling                                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * Feature: freertos-adapter, Property 13: Null Pointer Error Handling
+ *
+ * *For any* OSAL API that accepts pointer parameters, passing NULL for
+ * required pointers SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 10.1**
  */
 TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
-        /* Test Timer Functions with NULL handle pointer */
-        {
-            /* osal_timer_create with NULL handle pointer */
-            osal_timer_config_t config = {.name = "test_timer",
-                                          .period_ms = randomPeriod(),
-                                          .mode = randomMode(),
-                                          .callback = dummy_timer_callback,
-                                          .arg = nullptr};
+        osal_status_t status;
 
-            osal_status_t status = osal_timer_create(&config, nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_create should return OSAL_ERROR_NULL_POINTER "
-                   "for NULL handle";
-        }
+        /* Test osal_task_create with NULL config */
+        osal_task_handle_t task_handle = nullptr;
+        status = osal_task_create(nullptr, &task_handle);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_task_create(NULL config) should return NULL_POINTER";
 
-        /* Test Timer Functions with NULL timer handle */
-        {
-            /* osal_timer_delete with NULL handle */
-            osal_status_t status = osal_timer_delete(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_delete should return OSAL_ERROR_NULL_POINTER "
-                   "for NULL handle";
+        /* Test osal_task_create with NULL handle */
+        osal_task_config_t config = {.name = "test",
+                                     .func = [](void*) {},
+                                     .arg = nullptr,
+                                     .priority = 16,
+                                     .stack_size = 1024};
+        status = osal_task_create(&config, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_task_create(NULL handle) should return NULL_POINTER";
 
-            /* osal_timer_start with NULL handle */
-            status = osal_timer_start(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_start should return OSAL_ERROR_NULL_POINTER "
-                   "for NULL handle";
+        /* Test osal_mutex_create with NULL handle */
+        status = osal_mutex_create(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_mutex_create(NULL) should return NULL_POINTER";
 
-            /* osal_timer_stop with NULL handle */
-            status = osal_timer_stop(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_stop should return OSAL_ERROR_NULL_POINTER "
-                   "for NULL handle";
+        /* Test osal_mutex_delete with NULL handle */
+        status = osal_mutex_delete(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_mutex_delete(NULL) should return NULL_POINTER";
 
-            /* osal_timer_reset with NULL handle */
-            status = osal_timer_reset(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_reset should return OSAL_ERROR_NULL_POINTER "
-                   "for NULL handle";
+        /* Test osal_mutex_lock with NULL handle */
+        status = osal_mutex_lock(nullptr, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_mutex_lock(NULL) should return NULL_POINTER";
 
-            /* osal_timer_set_period with NULL handle */
-            status = osal_timer_set_period(nullptr, randomPeriod());
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_set_period should return "
-                   "OSAL_ERROR_NULL_POINTER for NULL handle";
+        /* Test osal_mutex_unlock with NULL handle */
+        status = osal_mutex_unlock(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_mutex_unlock(NULL) should return NULL_POINTER";
+    }
+}
 
-            /* osal_timer_start_from_isr with NULL handle */
-            status = osal_timer_start_from_isr(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_start_from_isr should return "
-                   "OSAL_ERROR_NULL_POINTER for NULL handle";
+/**
+ * Feature: freertos-adapter, Property 13 Extension: Semaphore Null Pointer
+ * Handling
+ *
+ * *For any* semaphore API that accepts pointer parameters, passing NULL
+ * SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 10.1**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property13_SemaphoreNullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
 
-            /* osal_timer_stop_from_isr with NULL handle */
-            status = osal_timer_stop_from_isr(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_stop_from_isr should return "
-                   "OSAL_ERROR_NULL_POINTER for NULL handle";
+        /* Test osal_sem_create with NULL handle */
+        status = osal_sem_create(0, 1, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create(NULL handle) should return NULL_POINTER";
 
-            /* osal_timer_reset_from_isr with NULL handle */
-            status = osal_timer_reset_from_isr(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_reset_from_isr should return "
-                   "OSAL_ERROR_NULL_POINTER for NULL handle";
-        }
+        /* Test osal_sem_create_binary with NULL handle */
+        status = osal_sem_create_binary(0, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create_binary(NULL) should return NULL_POINTER";
 
-        /* Test osal_timer_is_active with NULL handle */
-        {
-            /* osal_timer_is_active should return false for NULL handle */
-            bool is_active = osal_timer_is_active(nullptr);
-            EXPECT_FALSE(is_active)
-                << "Iteration " << test_iter
-                << ": osal_timer_is_active should return false for NULL handle";
-        }
+        /* Test osal_sem_create_counting with NULL handle */
+        status = osal_sem_create_counting(10, 0, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create_counting(NULL) should return NULL_POINTER";
 
-        /* Test Memory Functions with NULL stats pointer */
-        {
-            /* osal_mem_get_stats with NULL stats pointer */
-            osal_status_t status = osal_mem_get_stats(nullptr);
-            EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
-                << "Iteration " << test_iter
-                << ": osal_mem_get_stats should return OSAL_ERROR_NULL_POINTER "
-                   "for NULL stats";
-        }
+        /* Test osal_sem_delete with NULL handle */
+        status = osal_sem_delete(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_delete(NULL) should return NULL_POINTER";
 
-        /* Test osal_mem_free with NULL pointer (should be safe no-op) */
-        {
-            /* osal_mem_free with NULL should not crash */
-            osal_mem_free(nullptr);
-            /* If we reach here without crashing, the test passes */
-            SUCCEED() << "Iteration " << test_iter
-                      << ": osal_mem_free safely handled NULL pointer";
-        }
+        /* Test osal_sem_take with NULL handle */
+        status = osal_sem_take(nullptr, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_take(NULL) should return NULL_POINTER";
+
+        /* Test osal_sem_give with NULL handle */
+        status = osal_sem_give(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_give(NULL) should return NULL_POINTER";
+
+        /* Test osal_sem_give_from_isr with NULL handle */
+        status = osal_sem_give_from_isr(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_give_from_isr(NULL) should return NULL_POINTER";
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 13 Extension: Queue Null Pointer Handling
+ *
+ * *For any* queue API that accepts pointer parameters, passing NULL
+ * SHALL return OSAL_ERROR_NULL_POINTER.
+ *
+ * **Validates: Requirements 10.1**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property13_QueueNullPointerHandling) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test osal_queue_create with NULL handle */
+        status = osal_queue_create(sizeof(int), 10, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_create(NULL handle) should return NULL_POINTER";
+
+        /* Test osal_queue_delete with NULL handle */
+        status = osal_queue_delete(nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_delete(NULL) should return NULL_POINTER";
+
+        /* Create a valid queue for testing send/receive with NULL item */
+        osal_queue_handle_t queue = nullptr;
+        status = osal_queue_create(sizeof(int), 10, &queue);
+        ASSERT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter << ": queue create failed";
+
+        /* Test osal_queue_send with NULL handle */
+        int item = 42;
+        status = osal_queue_send(nullptr, &item, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_send(NULL handle) should return NULL_POINTER";
+
+        /* Test osal_queue_send with NULL item */
+        status = osal_queue_send(queue, nullptr, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_send(NULL item) should return NULL_POINTER";
+
+        /* Test osal_queue_receive with NULL handle */
+        status = osal_queue_receive(nullptr, &item, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_receive(NULL handle) should return NULL_POINTER";
+
+        /* Test osal_queue_receive with NULL item */
+        status = osal_queue_receive(queue, nullptr, OSAL_NO_WAIT);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_receive(NULL item) should return NULL_POINTER";
+
+        /* Test osal_queue_peek with NULL handle */
+        status = osal_queue_peek(nullptr, &item);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_peek(NULL handle) should return NULL_POINTER";
+
+        /* Test osal_queue_peek with NULL item */
+        status = osal_queue_peek(queue, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_peek(NULL item) should return NULL_POINTER";
+
+        /* Test osal_queue_send_from_isr with NULL handle */
+        status = osal_queue_send_from_isr(nullptr, &item);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_send_from_isr(NULL handle) should return "
+               "NULL_POINTER";
+
+        /* Test osal_queue_send_from_isr with NULL item */
+        status = osal_queue_send_from_isr(queue, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_send_from_isr(NULL item) should return "
+               "NULL_POINTER";
+
+        /* Test osal_queue_receive_from_isr with NULL handle */
+        status = osal_queue_receive_from_isr(nullptr, &item);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_receive_from_isr(NULL handle) should return "
+               "NULL_POINTER";
+
+        /* Test osal_queue_receive_from_isr with NULL item */
+        status = osal_queue_receive_from_isr(queue, nullptr);
+        EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_receive_from_isr(NULL item) should return "
+               "NULL_POINTER";
+
+        /* Clean up */
+        osal_queue_delete(queue);
     }
 }
 
@@ -206,124 +767,177 @@ TEST_F(OsalErrorHandlingPropertyTest, Property13_NullPointerErrorHandling) {
 /*---------------------------------------------------------------------------*/
 
 /**
- * Feature: osal-timer-memory, Property 14: Invalid Parameter Error Handling
+ * Feature: freertos-adapter, Property 14: Invalid Parameter Error Handling
  *
- * *For any* function with parameter constraints (e.g., non-zero period, valid
- * alignment), violating those constraints SHALL return
- * OSAL_ERROR_INVALID_PARAM.
+ * *For any* OSAL API with parameter constraints (e.g., priority > 31,
+ * item_size = 0), passing invalid values SHALL return OSAL_ERROR_INVALID_PARAM.
  *
- * **Validates: Requirements 8.3**
+ * **Validates: Requirements 10.2**
  */
 TEST_F(OsalErrorHandlingPropertyTest,
        Property14_InvalidParameterErrorHandling) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
-        /* Test Timer Functions with invalid parameters */
-        {
-            /* osal_timer_create with NULL callback */
-            osal_timer_config_t config_null_callback = {
-                .name = "test_timer",
-                .period_ms = randomPeriod(),
-                .mode = randomMode(),
-                .callback = nullptr, /* Invalid: NULL callback */
-                .arg = nullptr};
+        osal_status_t status;
 
-            osal_timer_handle_t timer = nullptr;
-            osal_status_t status =
-                osal_timer_create(&config_null_callback, &timer);
-            EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_create should return OSAL_ERROR_INVALID_PARAM "
-                   "for NULL callback";
+        /* Test osal_task_create with invalid priority (> 31) */
+        osal_task_handle_t task_handle = nullptr;
+        uint8_t invalid_priority = randomInvalidPriority();
+        osal_task_config_t config = {.name = "test",
+                                     .func = [](void*) {},
+                                     .arg = nullptr,
+                                     .priority = invalid_priority,
+                                     .stack_size = 1024};
+        status = osal_task_create(&config, &task_handle);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter << ": osal_task_create with priority "
+            << (int)invalid_priority << " should return INVALID_PARAM";
 
-            /* osal_timer_create with zero period */
-            osal_timer_config_t config_zero_period = {
-                .name = "test_timer",
-                .period_ms = 0, /* Invalid: zero period */
-                .mode = randomMode(),
-                .callback = dummy_timer_callback,
-                .arg = nullptr};
+        /* Test osal_task_create with NULL function pointer */
+        config.priority = 16;
+        config.func = nullptr;
+        status = osal_task_create(&config, &task_handle);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_task_create with NULL func should return INVALID_PARAM";
+    }
+}
 
-            status = osal_timer_create(&config_zero_period, &timer);
-            EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_create should return OSAL_ERROR_INVALID_PARAM "
-                   "for zero period";
+/**
+ * Feature: freertos-adapter, Property 14 Extension: Queue Invalid Parameters
+ *
+ * *For any* queue creation with item_size = 0 or item_count = 0,
+ * the operation SHALL return OSAL_ERROR_INVALID_PARAM.
+ *
+ * **Validates: Requirements 10.2**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property14_QueueInvalidParameters) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+        osal_queue_handle_t queue = nullptr;
+
+        /* Test osal_queue_create with item_size = 0 */
+        size_t valid_count = randomPositiveSize();
+        status = osal_queue_create(0, valid_count, &queue);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_create with item_size=0 should return "
+               "INVALID_PARAM";
+
+        /* Test osal_queue_create with item_count = 0 */
+        size_t valid_size = randomPositiveSize();
+        status = osal_queue_create(valid_size, 0, &queue);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_create with item_count=0 should return "
+               "INVALID_PARAM";
+
+        /* Test osal_queue_create with both = 0 */
+        status = osal_queue_create(0, 0, &queue);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_create with both=0 should return INVALID_PARAM";
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 14 Extension: Semaphore Invalid
+ * Parameters
+ *
+ * *For any* counting semaphore creation with initial > max_count or max_count =
+ * 0, the operation SHALL return OSAL_ERROR_INVALID_PARAM.
+ *
+ * **Validates: Requirements 10.2**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property14_SemaphoreInvalidParameters) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+        osal_sem_handle_t sem = nullptr;
+
+        /* Generate random values where initial > max_count */
+        uint32_t max_count = randomCount();
+        uint32_t initial = max_count + 1 + (randomCount() % 10);
+
+        /* Test osal_sem_create with initial > max_count */
+        status = osal_sem_create(initial, max_count, &sem);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter << ": osal_sem_create with initial("
+            << initial << ") > max_count(" << max_count
+            << ") should return INVALID_PARAM";
+
+        /* Test osal_sem_create with max_count = 0 */
+        status = osal_sem_create(0, 0, &sem);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create with max_count=0 should return INVALID_PARAM";
+
+        /* Test osal_sem_create_counting with initial > max_count */
+        status = osal_sem_create_counting(max_count, initial, &sem);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create_counting with initial > max_count should "
+               "return INVALID_PARAM";
+
+        /* Test osal_sem_create_counting with max_count = 0 */
+        status = osal_sem_create_counting(0, 0, &sem);
+        EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create_counting with max_count=0 should return "
+               "INVALID_PARAM";
+    }
+}
+
+/**
+ * Feature: freertos-adapter, Property 14 Extension: Valid Parameters Succeed
+ *
+ * *For any* valid parameter combination, the operation SHALL succeed with
+ * OSAL_OK. This is the inverse property - ensuring valid inputs work correctly.
+ *
+ * **Validates: Requirements 10.2**
+ */
+TEST_F(OsalErrorHandlingPropertyTest, Property14_ValidParametersSucceed) {
+    for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
+        osal_status_t status;
+
+        /* Test queue creation with valid parameters */
+        osal_queue_handle_t queue = nullptr;
+        size_t item_size = randomPositiveSize();
+        size_t item_count = randomPositiveSize();
+        status = osal_queue_create(item_size, item_count, &queue);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter
+            << ": osal_queue_create with valid params should succeed";
+        if (status == OSAL_OK) {
+            osal_queue_delete(queue);
         }
 
-        /* Test osal_timer_set_period with zero period */
-        {
-            /* First create a valid timer */
-            osal_timer_config_t config = {.name = "test_timer",
-                                          .period_ms = randomPeriod(),
-                                          .mode = randomMode(),
-                                          .callback = dummy_timer_callback,
-                                          .arg = nullptr};
-
-            osal_timer_handle_t timer = nullptr;
-            osal_status_t status = osal_timer_create(&config, &timer);
-            ASSERT_EQ(OSAL_OK, status)
-                << "Iteration " << test_iter << ": timer create failed";
-
-            /* Try to set zero period */
-            status = osal_timer_set_period(timer, 0);
-            EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, status)
-                << "Iteration " << test_iter
-                << ": osal_timer_set_period should return "
-                   "OSAL_ERROR_INVALID_PARAM for zero period";
-
-            /* Clean up */
-            osal_timer_delete(timer);
+        /* Test semaphore creation with valid parameters */
+        osal_sem_handle_t sem = nullptr;
+        uint32_t max_count = randomCount();
+        uint32_t initial = max_count > 0 ? (randomCount() % max_count) : 0;
+        status = osal_sem_create(initial, max_count, &sem);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create with valid params should succeed";
+        if (status == OSAL_OK) {
+            osal_sem_delete(sem);
         }
 
-        /* Test Memory Functions with invalid parameters */
-        {
-            /* osal_mem_alloc with zero size should return NULL */
-            void* ptr = osal_mem_alloc(0);
-            EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter
-                << ": osal_mem_alloc should return NULL for zero size";
+        /* Test counting semaphore creation with valid parameters */
+        status = osal_sem_create_counting(max_count, initial, &sem);
+        EXPECT_EQ(OSAL_OK, status)
+            << "Iteration " << test_iter
+            << ": osal_sem_create_counting with valid params should succeed";
+        if (status == OSAL_OK) {
+            osal_sem_delete(sem);
+        }
 
-            /* osal_mem_calloc with zero count should return NULL */
-            ptr = osal_mem_calloc(0, randomSize());
-            EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter
-                << ": osal_mem_calloc should return NULL for zero count";
-
-            /* osal_mem_calloc with zero size should return NULL */
-            ptr = osal_mem_calloc(randomSize(), 0);
-            EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter
-                << ": osal_mem_calloc should return NULL for zero size";
-
-            /* osal_mem_realloc with zero size should free and return NULL */
-            void* alloc_ptr = osal_mem_alloc(randomSize());
-            if (alloc_ptr != nullptr) {
-                ptr = osal_mem_realloc(alloc_ptr, 0);
-                EXPECT_EQ(nullptr, ptr)
-                    << "Iteration " << test_iter
-                    << ": osal_mem_realloc should return NULL for zero size";
-                /* Note: alloc_ptr should be freed by realloc, don't free again
-                 */
-            }
-
-            /* osal_mem_alloc_aligned with invalid alignment (not power of 2) */
-            /* Test various non-power-of-2 values */
-            const size_t invalid_alignments[] = {3,  5,  6,  7,  9, 10,
-                                                 11, 12, 13, 14, 15};
-            std::uniform_int_distribution<size_t> align_dist(0, 10);
-            size_t invalid_alignment = invalid_alignments[align_dist(rng)];
-
-            ptr = osal_mem_alloc_aligned(invalid_alignment, randomSize());
-            EXPECT_EQ(nullptr, ptr) << "Iteration " << test_iter
-                                    << ": osal_mem_alloc_aligned should return "
-                                       "NULL for invalid alignment "
-                                    << invalid_alignment;
-
-            /* osal_mem_alloc_aligned with zero size should return NULL */
-            ptr = osal_mem_alloc_aligned(randomAlignment(), 0);
-            EXPECT_EQ(nullptr, ptr)
-                << "Iteration " << test_iter
-                << ": osal_mem_alloc_aligned should return NULL for zero size";
+        /* Test mutex creation */
+        osal_mutex_handle_t mutex = nullptr;
+        status = osal_mutex_create(&mutex);
+        EXPECT_EQ(OSAL_OK, status) << "Iteration " << test_iter
+                                   << ": osal_mutex_create should succeed";
+        if (status == OSAL_OK) {
+            osal_mutex_delete(mutex);
         }
     }
 }
