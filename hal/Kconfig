@@ -1,0 +1,143 @@
+# hal/Kconfig - Hardware Abstraction Layer configuration
+
+menu "Hardware Abstraction Layer"
+
+config HAL_ENABLE
+    bool "Enable HAL"
+    default y
+    help
+      Enable the Hardware Abstraction Layer.
+
+      The HAL provides a unified interface for hardware peripherals
+      across different platforms.
+
+if HAL_ENABLE
+
+menu "Debug Configuration"
+
+config HAL_DEBUG_ENABLE
+    bool "Enable HAL debug output"
+    default n
+    help
+      Enable debug output for HAL operations.
+      This adds logging and diagnostic information.
+
+config HAL_DEBUG_LEVEL
+    int "HAL debug level"
+    default 2
+    range 0 4
+    depends on HAL_DEBUG_ENABLE
+    help
+      Debug level for HAL operations:
+        0 = None
+        1 = Error
+        2 = Warning
+        3 = Info
+        4 = Verbose
+
+config HAL_ASSERT_ENABLE
+    bool "Enable HAL assertions"
+    default y
+    help
+      Enable runtime assertions in HAL code.
+      Assertions help catch programming errors during development.
+
+endmenu
+
+menu "Statistics Configuration"
+
+config HAL_STATISTICS_ENABLE
+    bool "Enable HAL statistics"
+    default y
+    help
+      Enable statistics collection for HAL operations.
+      Useful for performance monitoring and debugging.
+
+config HAL_STATISTICS_BUFFER_SIZE
+    int "Statistics buffer size"
+    default 256
+    range 64 4096
+    depends on HAL_STATISTICS_ENABLE
+    help
+      Size of statistics buffer in entries.
+      Larger buffers can store more historical data.
+
+endmenu
+
+menu "Timeout Configuration"
+
+config HAL_DEFAULT_TIMEOUT_MS
+    int "Default timeout (ms)"
+    default 1000
+    range 100 60000
+    help
+      Default timeout for HAL operations in milliseconds.
+      Used when no specific timeout is provided.
+
+config HAL_INIT_TIMEOUT_MS
+    int "Initialization timeout (ms)"
+    default 5000
+    range 1000 60000
+    help
+      Timeout for HAL initialization in milliseconds.
+      Initialization may take longer than normal operations.
+
+endmenu
+
+menu "Memory Configuration"
+
+choice
+    prompt "Memory allocation mode"
+    default HAL_MEM_MODE_STATIC
+    help
+      Select memory allocation strategy for HAL.
+
+config HAL_MEM_MODE_STATIC
+    bool "Static allocation"
+    help
+      Use static memory allocation.
+      All memory is allocated at compile time.
+
+config HAL_MEM_MODE_DYNAMIC
+    bool "Dynamic allocation"
+    help
+      Use dynamic memory allocation.
+      Memory is allocated at runtime as needed.
+
+endchoice
+
+config HAL_MEM_POOL_SIZE
+    int "Memory pool size (bytes)"
+    default 4096
+    range 1024 65536
+    depends on HAL_MEM_MODE_STATIC
+    help
+      Size of static memory pool in bytes.
+      Used for HAL internal allocations.
+
+endmenu
+
+menu "Thread Safety"
+
+config HAL_THREAD_SAFE
+    bool "Enable thread safety"
+    default y
+    depends on !OSAL_BAREMETAL
+    help
+      Enable thread-safe HAL operations.
+      Uses mutexes to protect shared resources.
+
+config HAL_MUTEX_TIMEOUT_MS
+    int "Mutex timeout (ms)"
+    default 1000
+    range 100 10000
+    depends on HAL_THREAD_SAFE
+    help
+      Timeout for mutex acquisition in milliseconds.
+      Prevents deadlocks in case of errors.
+
+endmenu
+
+endif # HAL_ENABLE
+
+endmenu # Hardware Abstraction Layer
