@@ -275,6 +275,7 @@ endif()
 
 # Tests
 if(NEXUS_BUILD_TESTS AND NEXUS_PLATFORM STREQUAL "native")
+    include(${CMAKE_SOURCE_DIR}/cmake/CTestConfig.cmake)
     enable_testing()
     add_subdirectory(tests)
 endif()
