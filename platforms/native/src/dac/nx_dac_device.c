@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_dac.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_dac_helpers.h"
 #include "nx_dac_types.h"
@@ -24,15 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_DAC_MAX_INSTANCES 4
-#define DEVICE_TYPE          NX_DAC
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_dac_state_t g_dac_states[NX_DAC_MAX_INSTANCES];
-static nx_dac_impl_t g_dac_instances[NX_DAC_MAX_INSTANCES];
+#define DEVICE_TYPE NX_DAC
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -162,8 +155,13 @@ static void dac_init_instance(nx_dac_impl_t* impl, uint8_t index,
     dac_init_lifecycle(&impl->lifecycle);
     dac_init_power(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_dac_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_dac_state_t*)nx_mem_alloc(sizeof(nx_dac_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_dac_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -199,18 +197,31 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
     const nx_dac_platform_config_t* config =
         (const nx_dac_platform_config_t*)dev->config;
 
-    if (config == NULL || config->dac_index >= NX_DAC_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_dac_impl_t* impl = &g_dac_instances[config->dac_index];
+    /* Allocate implementation structure */
+    nx_dac_impl_t* impl = (nx_dac_impl_t*)nx_mem_alloc(sizeof(nx_dac_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_dac_impl_t));
 
     /* Initialize instance with platform configuration */
     dac_init_instance(impl, config->dac_index, config);
 
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+
     /* Initialize lifecycle */
     nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
     if (status != NX_OK) {
+        nx_mem_free(impl->state);
+        nx_mem_free(impl);
         return NULL;
     }
 
@@ -223,9 +234,9 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
 #define NX_DAC_CONFIG(index)                                                   \
     static const nx_dac_platform_config_t dac_config_##index = {               \
         .dac_index = index,                                                    \
-        .channel_count = CONFIG_DAC##index##_CHANNEL_COUNT,                    \
-        .resolution = CONFIG_DAC##index##_RESOLUTION,                          \
-        .vref_mv = CONFIG_DAC##index##_VREF_MV,                                \
+        .channel_count = NX_CONFIG_DAC##index##_CHANNEL_COUNT,                 \
+        .resolution = NX_CONFIG_DAC##index##_RESOLUTION,                       \
+        .vref_mv = NX_CONFIG_DAC##index##_VREF_MV,                             \
     }
 
 /**
@@ -241,120 +252,10 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
                        &dac_kconfig_state_##index, nx_dac_device_init)
 
 /* Register all enabled DAC instances */
+#ifndef _MSC_VER
 NX_TRAVERSE_EACH_INSTANCE(NX_DAC_DEVICE_REGISTER, DEVICE_TYPE);
-
-/*---------------------------------------------------------------------------*/
-/* Legacy Factory Functions (for backward compatibility)                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get DAC instance (legacy)
- */
-nx_dac_t* nx_dac_native_get(uint8_t index) {
-    if (index >= NX_DAC_MAX_INSTANCES) {
-        return NULL;
-    }
-
-    /* Use device registration mechanism */
-    char name[16];
-    snprintf(name, sizeof(name), "DAC%d", index);
-    return (nx_dac_t*)nx_device_get(name);
-}
-
-/**
- * \brief           Reset all DAC instances (for testing)
- */
-void nx_dac_native_reset_all(void) {
-    for (uint8_t i = 0; i < NX_DAC_MAX_INSTANCES; i++) {
-        nx_dac_impl_t* impl = &g_dac_instances[i];
-        if (impl->state && impl->state->initialized) {
-            impl->lifecycle.deinit(&impl->lifecycle);
-        }
-        memset(&g_dac_states[i], 0, sizeof(nx_dac_state_t));
-    }
-}
-
-/**
- * \brief           Get DAC channel value (for testing)
- */
-uint32_t nx_dac_native_get_channel_value(uint8_t dac_index, uint8_t channel) {
-    if (dac_index >= NX_DAC_MAX_INSTANCES || channel >= NX_DAC_MAX_CHANNELS) {
-        return 0;
-    }
-
-    nx_dac_impl_t* impl = &g_dac_instances[dac_index];
-    return impl->channels[channel].current_value;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Test Support Functions                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get DAC output value (for testing)
- */
-nx_status_t nx_dac_native_get_value(uint8_t index, uint8_t channel,
-                                    uint16_t* value) {
-    if (index >= NX_DAC_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-    if (channel >= NX_DAC_MAX_CHANNELS) {
-        return NX_ERR_INVALID_PARAM;
-    }
-    if (!value) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_dac_impl_t* impl = &g_dac_instances[index];
-    *value = (uint16_t)(impl->channels[channel].current_value & 0xFFFF);
-    return NX_OK;
-}
-
-/**
- * \brief           Get DAC state (for testing)
- */
-nx_status_t nx_dac_native_get_state(uint8_t index, bool* initialized,
-                                    bool* suspended) {
-    if (index >= NX_DAC_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_dac_impl_t* impl = &g_dac_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    if (initialized) {
-        *initialized = impl->state->initialized;
-    }
-    if (suspended) {
-        *suspended = impl->state->suspended;
-    }
-
-    return NX_OK;
-}
-
-/**
- * \brief           Reset DAC instance (for testing)
- */
-nx_status_t nx_dac_native_reset(uint8_t index) {
-    if (index >= NX_DAC_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_dac_impl_t* impl = &g_dac_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    /* Reset all channel values */
-    for (uint8_t i = 0; i < NX_DAC_MAX_CHANNELS; i++) {
-        impl->channels[i].current_value = 0;
-    }
-
-    /* Reset state flags */
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-
-    return NX_OK;
-}
+#else
+/* MSVC: Temporarily disabled due to macro compatibility issues */
+#pragma message(                                                               \
+    "DAC device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
+#endif

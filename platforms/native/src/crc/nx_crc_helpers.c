@@ -151,22 +151,3 @@ uint16_t crc16_calculate(const uint8_t* data, size_t len, uint16_t init) {
 
     return crc;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Test Support Functions                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Reset CRC state for testing
- */
-void crc_reset_state(nx_crc_state_t* state) {
-    if (state == NULL) {
-        return;
-    }
-
-    /* Reset CRC value to initial value */
-    state->current_crc = state->config.init_value;
-
-    /* Clear statistics */
-    memset(&state->stats, 0, sizeof(nx_crc_stats_t));
-}

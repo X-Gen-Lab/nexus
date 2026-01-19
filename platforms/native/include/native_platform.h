@@ -3,15 +3,17 @@
  * \brief           Native Platform Main Header
  * \author          Nexus Team
  * \version         2.0.0
- * \date            2026-01-18
+ * \date            2026-01-20
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * \details         Main header file for the Native platform. This header
- *                  provides a unified interface to all peripheral test
- *                  helpers by including modular peripheral-specific headers.
- *                  The Native platform serves as a host-based simulation
- *                  environment for testing Nexus HAL implementations.
+ *                  provides access to HAL interfaces. The Native platform
+ *                  serves as a host-based simulation environment for testing
+ *                  Nexus HAL implementations.
+ *
+ *                  To use devices, include hal/nx_factory.h and use the
+ *                  nx_factory_*() functions to get device instances.
  */
 
 #ifndef NATIVE_PLATFORM_H
@@ -30,20 +32,7 @@
 #include "hal/interface/nx_uart.h"
 #include "hal/interface/nx_usb.h"
 #include "hal/interface/nx_watchdog.h"
+#include "hal/nx_factory.h"
 #include "hal/nx_status.h"
-
-/*---------------------------------------------------------------------------*/
-/* Native Platform Test Helpers                                              */
-/*---------------------------------------------------------------------------*/
-
-#include "native_adc_test.h"
-#include "native_gpio_test.h"
-#include "native_i2c_test.h"
-#include "native_rtc_test.h"
-#include "native_spi_test.h"
-#include "native_timer_test.h"
-#include "native_uart_test.h"
-#include "native_usb_test.h"
-#include "native_watchdog_test.h"
 
 #endif /* NATIVE_PLATFORM_H */

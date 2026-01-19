@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_uart.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_uart_helpers.h"
 #include "nx_uart_types.h"
@@ -24,70 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_UART_MAX_INSTANCES 4
-#define DEVICE_TYPE           NX_UART
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_uart_state_t g_uart_states[NX_UART_MAX_INSTANCES];
-static nx_uart_impl_t g_uart_instances[NX_UART_MAX_INSTANCES];
-
-/* Dynamic buffer allocation based on Kconfig */
-static uint8_t g_uart0_tx_buffer[NX_CONFIG_UART0_TX_BUFFER_SIZE];
-static uint8_t g_uart0_rx_buffer[NX_CONFIG_UART0_RX_BUFFER_SIZE];
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_1
-static uint8_t g_uart1_tx_buffer[NX_CONFIG_UART1_TX_BUFFER_SIZE];
-static uint8_t g_uart1_rx_buffer[NX_CONFIG_UART1_RX_BUFFER_SIZE];
-#endif
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_2
-static uint8_t g_uart2_tx_buffer[NX_CONFIG_UART2_TX_BUFFER_SIZE];
-static uint8_t g_uart2_rx_buffer[NX_CONFIG_UART2_RX_BUFFER_SIZE];
-#endif
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_3
-static uint8_t g_uart3_tx_buffer[NX_CONFIG_UART3_TX_BUFFER_SIZE];
-static uint8_t g_uart3_rx_buffer[NX_CONFIG_UART3_RX_BUFFER_SIZE];
-#endif
-
-/* Buffer pointer table */
-static uint8_t* g_uart_tx_buffers[NX_UART_MAX_INSTANCES] = {
-    g_uart0_tx_buffer,
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_1
-    g_uart1_tx_buffer,
-#else
-    NULL,
-#endif
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_2
-    g_uart2_tx_buffer,
-#else
-    NULL,
-#endif
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_3
-    g_uart3_tx_buffer,
-#else
-    NULL,
-#endif
-};
-
-static uint8_t* g_uart_rx_buffers[NX_UART_MAX_INSTANCES] = {
-    g_uart0_rx_buffer,
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_1
-    g_uart1_rx_buffer,
-#else
-    NULL,
-#endif
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_2
-    g_uart2_rx_buffer,
-#else
-    NULL,
-#endif
-#ifdef NX_CONFIG_INSTANCE_NATIVE_UART_3
-    g_uart3_rx_buffer,
-#else
-    NULL,
-#endif
-};
+#define DEVICE_TYPE NX_UART
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -198,8 +136,13 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
     uart_init_power(&impl->power);
     uart_init_diagnostic(&impl->diagnostic);
 
-    /* Link to state */
-    impl->state = &g_uart_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_uart_state_t*)nx_mem_alloc(sizeof(nx_uart_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_uart_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -216,6 +159,21 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
         impl->state->config.dma_rx_enable = false;
         impl->state->config.tx_buf_size = platform_cfg->tx_buf_size;
         impl->state->config.rx_buf_size = platform_cfg->rx_buf_size;
+
+        /* Allocate buffers dynamically */
+        impl->state->tx_buf.data =
+            (uint8_t*)nx_mem_alloc(platform_cfg->tx_buf_size);
+        impl->state->tx_buf.size = platform_cfg->tx_buf_size;
+        impl->state->tx_buf.head = 0;
+        impl->state->tx_buf.tail = 0;
+        impl->state->tx_buf.count = 0;
+
+        impl->state->rx_buf.data =
+            (uint8_t*)nx_mem_alloc(platform_cfg->rx_buf_size);
+        impl->state->rx_buf.size = platform_cfg->rx_buf_size;
+        impl->state->rx_buf.head = 0;
+        impl->state->rx_buf.tail = 0;
+        impl->state->rx_buf.count = 0;
     }
 
     /* Clear statistics */
@@ -233,18 +191,40 @@ static void* nx_uart_device_init(const nx_device_t* dev) {
     const nx_uart_platform_config_t* config =
         (const nx_uart_platform_config_t*)dev->config;
 
-    if (config == NULL || config->uart_index >= NX_UART_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_uart_impl_t* impl = &g_uart_instances[config->uart_index];
+    /* Allocate implementation structure */
+    nx_uart_impl_t* impl =
+        (nx_uart_impl_t*)nx_mem_alloc(sizeof(nx_uart_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_uart_impl_t));
 
     /* Initialize instance with platform configuration */
     uart_init_instance(impl, config->uart_index, config);
 
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+
     /* Initialize lifecycle */
     nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
     if (status != NX_OK) {
+        if (impl->state) {
+            if (impl->state->tx_buf.data) {
+                nx_mem_free(impl->state->tx_buf.data);
+            }
+            if (impl->state->rx_buf.data) {
+                nx_mem_free(impl->state->rx_buf.data);
+            }
+            nx_mem_free(impl->state);
+        }
+        nx_mem_free(impl);
         return NULL;
     }
 
@@ -257,13 +237,13 @@ static void* nx_uart_device_init(const nx_device_t* dev) {
 #define NX_UART_CONFIG(index)                                                  \
     static const nx_uart_platform_config_t uart_config_##index = {             \
         .uart_index = index,                                                   \
-        .baudrate = CONFIG_UART##index##_BAUDRATE,                             \
-        .word_length = CONFIG_UART##index##_DATA_BITS,                         \
-        .stop_bits = CONFIG_UART##index##_STOP_BITS,                           \
-        .parity = CONFIG_UART##index##_PARITY_VALUE,                           \
+        .baudrate = NX_CONFIG_UART##index##_BAUDRATE,                          \
+        .word_length = NX_CONFIG_UART##index##_DATA_BITS,                      \
+        .stop_bits = NX_CONFIG_UART##index##_STOP_BITS,                        \
+        .parity = NX_CONFIG_UART##index##_PARITY_VALUE,                        \
         .flow_control = 0,                                                     \
-        .tx_buf_size = CONFIG_UART##index##_TX_BUFFER_SIZE,                    \
-        .rx_buf_size = CONFIG_UART##index##_RX_BUFFER_SIZE,                    \
+        .tx_buf_size = NX_CONFIG_UART##index##_TX_BUFFER_SIZE,                 \
+        .rx_buf_size = NX_CONFIG_UART##index##_RX_BUFFER_SIZE,                 \
     }
 
 /**
@@ -280,74 +260,10 @@ static void* nx_uart_device_init(const nx_device_t* dev) {
                        nx_uart_device_init)
 
 /* Register all enabled UART instances */
+#ifndef _MSC_VER
 NX_TRAVERSE_EACH_INSTANCE(NX_UART_DEVICE_REGISTER, DEVICE_TYPE);
-
-/*---------------------------------------------------------------------------*/
-/* Legacy Factory Functions (for backward compatibility)                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get UART instance (legacy)
- */
-nx_uart_t* nx_uart_native_get(uint8_t index) {
-    if (index >= NX_UART_MAX_INSTANCES) {
-        return NULL;
-    }
-
-    /* Use device registration mechanism */
-    char name[16];
-    snprintf(name, sizeof(name), "UART%d", index);
-    return (nx_uart_t*)nx_device_get(name);
-}
-
-/**
- * \brief           Get UART instance with configuration (deprecated)
- * \deprecated      Configuration should be done via Kconfig
- */
-nx_uart_t* nx_uart_native_get_with_config(uint8_t index,
-                                          const nx_uart_config_t* cfg) {
-    /* Configuration is now compile-time only, ignore cfg parameter */
-    (void)cfg;
-    return nx_uart_native_get(index);
-}
-
-/**
- * \brief           Reset all UART instances (for testing)
- */
-void nx_uart_native_reset_all(void) {
-    for (uint8_t i = 0; i < NX_UART_MAX_INSTANCES; i++) {
-        nx_uart_impl_t* impl = &g_uart_instances[i];
-        if (impl->state && impl->state->initialized) {
-            impl->lifecycle.deinit(&impl->lifecycle);
-        }
-        memset(&g_uart_states[i], 0, sizeof(nx_uart_state_t));
-    }
-}
-
-/**
- * \brief           Inject data into RX buffer (for testing)
- */
-nx_status_t nx_uart_native_inject_rx(uint8_t index, const uint8_t* data,
-                                     size_t len) {
-    if (index >= NX_UART_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_uart_impl_t* impl = &g_uart_instances[index];
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    size_t written = buffer_write(&impl->state->rx_buf, data, len);
-    return (written == len) ? NX_OK : NX_ERR_FULL;
-}
-
-/**
- * \brief           Get UART device descriptor (for testing)
- */
-nx_device_t* nx_uart_native_get_device(uint8_t index) {
-    if (index >= NX_UART_MAX_INSTANCES) {
-        return NULL;
-    }
-    return g_uart_instances[index].device;
-}
+#else
+/* MSVC: Temporarily disabled due to macro compatibility issues */
+#pragma message(                                                               \
+    "UART device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
+#endif

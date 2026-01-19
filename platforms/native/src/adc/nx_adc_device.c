@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_adc.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_adc_helpers.h"
 #include "nx_adc_types.h"
@@ -25,15 +26,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_ADC_MAX_INSTANCES 4
-#define DEVICE_TYPE          NX_ADC
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_adc_state_t g_adc_states[NX_ADC_MAX_INSTANCES];
-static nx_adc_impl_t g_adc_instances[NX_ADC_MAX_INSTANCES];
+#define DEVICE_TYPE NX_ADC
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -148,13 +141,17 @@ static void adc_init_instance(nx_adc_impl_t* impl, uint8_t index,
     adc_init_power(&impl->power);
     adc_init_diagnostic(&impl->diagnostic);
 
-    /* Link to state */
-    impl->state = &g_adc_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_adc_state_t*)nx_mem_alloc(sizeof(nx_adc_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_adc_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
     impl->state->clock_enabled = false;
-    memset(&impl->state->stats, 0, sizeof(nx_adc_stats_t));
 
     /* Set configuration from Kconfig */
     if (platform_cfg != NULL) {
@@ -181,18 +178,31 @@ static void* nx_adc_device_init(const nx_device_t* dev) {
     const nx_adc_platform_config_t* config =
         (const nx_adc_platform_config_t*)dev->config;
 
-    if (config == NULL || config->adc_index >= NX_ADC_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_adc_impl_t* impl = &g_adc_instances[config->adc_index];
+    /* Allocate implementation structure */
+    nx_adc_impl_t* impl = (nx_adc_impl_t*)nx_mem_alloc(sizeof(nx_adc_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_adc_impl_t));
 
     /* Initialize instance with platform configuration */
     adc_init_instance(impl, config->adc_index, config);
 
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+
     /* Initialize lifecycle */
     nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
     if (status != NX_OK) {
+        nx_mem_free(impl->state);
+        nx_mem_free(impl);
         return NULL;
     }
 
@@ -205,8 +215,8 @@ static void* nx_adc_device_init(const nx_device_t* dev) {
 #define NX_ADC_CONFIG(index)                                                   \
     static const nx_adc_platform_config_t adc_config_##index = {               \
         .adc_index = index,                                                    \
-        .channel_count = CONFIG_ADC##index##_CHANNEL_COUNT,                    \
-        .resolution = CONFIG_ADC##index##_RESOLUTION,                          \
+        .channel_count = NX_CONFIG_ADC##index##_CHANNEL_COUNT,                 \
+        .resolution = NX_CONFIG_ADC##index##_RESOLUTION,                       \
     }
 
 /**
@@ -222,118 +232,10 @@ static void* nx_adc_device_init(const nx_device_t* dev) {
                        &adc_kconfig_state_##index, nx_adc_device_init)
 
 /* Register all enabled ADC instances */
+#ifndef _MSC_VER
 NX_TRAVERSE_EACH_INSTANCE(NX_ADC_DEVICE_REGISTER, DEVICE_TYPE);
-
-/*---------------------------------------------------------------------------*/
-/* Legacy Factory Functions (for backward compatibility)                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get ADC instance (legacy)
- */
-nx_adc_t* nx_adc_native_get(uint8_t index) {
-    if (index >= NX_ADC_MAX_INSTANCES) {
-        return NULL;
-    }
-
-    /* Use device registration mechanism */
-    char name[16];
-    snprintf(name, sizeof(name), "ADC%d", index);
-    return (nx_adc_t*)nx_device_get(name);
-}
-
-/**
- * \brief           Reset all ADC instances (for testing)
- */
-void nx_adc_native_reset_all(void) {
-    for (uint8_t i = 0; i < NX_ADC_MAX_INSTANCES; i++) {
-        nx_adc_impl_t* impl = &g_adc_instances[i];
-        if (impl->state && impl->state->initialized) {
-            impl->lifecycle.deinit(&impl->lifecycle);
-        }
-        memset(&g_adc_states[i], 0, sizeof(nx_adc_state_t));
-    }
-}
-
-/**
- * \brief           Set simulated ADC channel value (for testing)
- */
-void nx_adc_native_set_simulated_value(uint8_t adc_index, uint8_t channel,
-                                       uint16_t value) {
-    if (adc_index >= NX_ADC_MAX_INSTANCES || channel >= NX_ADC_MAX_CHANNELS) {
-        return;
-    }
-
-    nx_adc_impl_t* impl = &g_adc_instances[adc_index];
-    impl->channels[channel].simulated_value = value;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Test Support Functions                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Set simulated ADC value (for testing)
- */
-nx_status_t nx_adc_native_set_value(uint8_t index, uint8_t channel,
-                                    uint16_t value) {
-    if (index >= NX_ADC_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-    if (channel >= NX_ADC_MAX_CHANNELS) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_adc_impl_t* impl = &g_adc_instances[index];
-    impl->channels[channel].simulated_value = value;
-    return NX_OK;
-}
-
-/**
- * \brief           Get ADC state (for testing)
- */
-nx_status_t nx_adc_native_get_state(uint8_t index, bool* initialized,
-                                    bool* suspended) {
-    if (index >= NX_ADC_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_adc_impl_t* impl = &g_adc_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    if (initialized) {
-        *initialized = impl->state->initialized;
-    }
-    if (suspended) {
-        *suspended = impl->state->suspended;
-    }
-
-    return NX_OK;
-}
-
-/**
- * \brief           Reset ADC instance (for testing)
- */
-nx_status_t nx_adc_native_reset(uint8_t index) {
-    if (index >= NX_ADC_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_adc_impl_t* impl = &g_adc_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    /* Reset all channel values */
-    for (uint8_t i = 0; i < NX_ADC_MAX_CHANNELS; i++) {
-        impl->channels[i].simulated_value = 0;
-    }
-
-    /* Reset state flags */
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-
-    return NX_OK;
-}
+#else
+/* MSVC: Temporarily disabled due to macro compatibility issues */
+#pragma message(                                                               \
+    "ADC device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
+#endif

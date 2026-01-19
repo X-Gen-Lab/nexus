@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_i2c.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_i2c_helpers.h"
 #include "nx_i2c_types.h"
@@ -24,105 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_I2C_MAX_INSTANCES 4
-#define DEVICE_TYPE          NX_I2C
-
-/* Fallback definitions for Kconfig macros (if not generated yet) */
-#ifndef CONFIG_I2C0_TX_BUFFER_SIZE
-#define CONFIG_I2C0_TX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C0_RX_BUFFER_SIZE
-#define CONFIG_I2C0_RX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C0_SPEED
-#define CONFIG_I2C0_SPEED 100000
-#endif
-#ifndef CONFIG_I2C0_SCL_PIN
-#define CONFIG_I2C0_SCL_PIN 5
-#endif
-#ifndef CONFIG_I2C0_SDA_PIN
-#define CONFIG_I2C0_SDA_PIN 4
-#endif
-
-#ifndef CONFIG_I2C1_TX_BUFFER_SIZE
-#define CONFIG_I2C1_TX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C1_RX_BUFFER_SIZE
-#define CONFIG_I2C1_RX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C1_SPEED
-#define CONFIG_I2C1_SPEED 100000
-#endif
-#ifndef CONFIG_I2C1_SCL_PIN
-#define CONFIG_I2C1_SCL_PIN 15
-#endif
-#ifndef CONFIG_I2C1_SDA_PIN
-#define CONFIG_I2C1_SDA_PIN 14
-#endif
-
-#ifndef CONFIG_I2C2_TX_BUFFER_SIZE
-#define CONFIG_I2C2_TX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C2_RX_BUFFER_SIZE
-#define CONFIG_I2C2_RX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C2_SPEED
-#define CONFIG_I2C2_SPEED 100000
-#endif
-#ifndef CONFIG_I2C2_SCL_PIN
-#define CONFIG_I2C2_SCL_PIN 25
-#endif
-#ifndef CONFIG_I2C2_SDA_PIN
-#define CONFIG_I2C2_SDA_PIN 24
-#endif
-
-#ifndef CONFIG_I2C3_TX_BUFFER_SIZE
-#define CONFIG_I2C3_TX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C3_RX_BUFFER_SIZE
-#define CONFIG_I2C3_RX_BUFFER_SIZE 256
-#endif
-#ifndef CONFIG_I2C3_SPEED
-#define CONFIG_I2C3_SPEED 100000
-#endif
-#ifndef CONFIG_I2C3_SCL_PIN
-#define CONFIG_I2C3_SCL_PIN 35
-#endif
-#ifndef CONFIG_I2C3_SDA_PIN
-#define CONFIG_I2C3_SDA_PIN 34
-#endif
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_i2c_state_t g_i2c_states[NX_I2C_MAX_INSTANCES];
-static nx_i2c_impl_t g_i2c_instances[NX_I2C_MAX_INSTANCES];
-
-/* Dynamic buffer allocation based on Kconfig */
-static uint8_t g_i2c0_tx_buffer[CONFIG_I2C0_TX_BUFFER_SIZE];
-static uint8_t g_i2c0_rx_buffer[CONFIG_I2C0_RX_BUFFER_SIZE];
-static uint8_t g_i2c1_tx_buffer[CONFIG_I2C1_TX_BUFFER_SIZE];
-static uint8_t g_i2c1_rx_buffer[CONFIG_I2C1_RX_BUFFER_SIZE];
-static uint8_t g_i2c2_tx_buffer[CONFIG_I2C2_TX_BUFFER_SIZE];
-static uint8_t g_i2c2_rx_buffer[CONFIG_I2C2_RX_BUFFER_SIZE];
-static uint8_t g_i2c3_tx_buffer[CONFIG_I2C3_TX_BUFFER_SIZE];
-static uint8_t g_i2c3_rx_buffer[CONFIG_I2C3_RX_BUFFER_SIZE];
-
-/* Buffer pointer table */
-static uint8_t* g_i2c_tx_buffers[NX_I2C_MAX_INSTANCES] = {
-    g_i2c0_tx_buffer,
-    g_i2c1_tx_buffer,
-    g_i2c2_tx_buffer,
-    g_i2c3_tx_buffer,
-};
-
-static uint8_t* g_i2c_rx_buffers[NX_I2C_MAX_INSTANCES] = {
-    g_i2c0_rx_buffer,
-    g_i2c1_rx_buffer,
-    g_i2c2_rx_buffer,
-    g_i2c3_rx_buffer,
-};
+#define DEVICE_TYPE NX_I2C
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -279,8 +182,13 @@ static void i2c_init_instance(nx_i2c_impl_t* impl, uint8_t index,
     i2c_init_power(&impl->power);
     i2c_init_diagnostic(&impl->diagnostic);
 
-    /* Link to state */
-    impl->state = &g_i2c_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_i2c_state_t*)nx_mem_alloc(sizeof(nx_i2c_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_i2c_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -295,6 +203,21 @@ static void i2c_init_instance(nx_i2c_impl_t* impl, uint8_t index,
         impl->state->config.dma_rx_enable = false;
         impl->state->config.tx_buf_size = platform_cfg->tx_buf_size;
         impl->state->config.rx_buf_size = platform_cfg->rx_buf_size;
+
+        /* Allocate buffers dynamically */
+        impl->state->tx_buf.data =
+            (uint8_t*)nx_mem_alloc(platform_cfg->tx_buf_size);
+        impl->state->tx_buf.size = platform_cfg->tx_buf_size;
+        impl->state->tx_buf.head = 0;
+        impl->state->tx_buf.tail = 0;
+        impl->state->tx_buf.count = 0;
+
+        impl->state->rx_buf.data =
+            (uint8_t*)nx_mem_alloc(platform_cfg->rx_buf_size);
+        impl->state->rx_buf.size = platform_cfg->rx_buf_size;
+        impl->state->rx_buf.head = 0;
+        impl->state->rx_buf.tail = 0;
+        impl->state->rx_buf.count = 0;
     }
 
     /* Clear statistics */
@@ -315,18 +238,39 @@ static void* nx_i2c_device_init(const nx_device_t* dev) {
     const nx_i2c_platform_config_t* config =
         (const nx_i2c_platform_config_t*)dev->config;
 
-    if (config == NULL || config->i2c_index >= NX_I2C_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_i2c_impl_t* impl = &g_i2c_instances[config->i2c_index];
+    /* Allocate implementation structure */
+    nx_i2c_impl_t* impl = (nx_i2c_impl_t*)nx_mem_alloc(sizeof(nx_i2c_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_i2c_impl_t));
 
     /* Initialize instance with platform configuration */
     i2c_init_instance(impl, config->i2c_index, config);
 
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+
     /* Initialize lifecycle */
     nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
     if (status != NX_OK) {
+        if (impl->state) {
+            if (impl->state->tx_buf.data) {
+                nx_mem_free(impl->state->tx_buf.data);
+            }
+            if (impl->state->rx_buf.data) {
+                nx_mem_free(impl->state->rx_buf.data);
+            }
+            nx_mem_free(impl->state);
+        }
+        nx_mem_free(impl);
         return NULL;
     }
 
@@ -339,11 +283,11 @@ static void* nx_i2c_device_init(const nx_device_t* dev) {
 #define NX_I2C_CONFIG(index)                                                   \
     static const nx_i2c_platform_config_t i2c_config_##index = {               \
         .i2c_index = index,                                                    \
-        .speed = CONFIG_I2C##index##_SPEED,                                    \
-        .scl_pin = CONFIG_I2C##index##_SCL_PIN,                                \
-        .sda_pin = CONFIG_I2C##index##_SDA_PIN,                                \
-        .tx_buf_size = CONFIG_I2C##index##_TX_BUFFER_SIZE,                     \
-        .rx_buf_size = CONFIG_I2C##index##_RX_BUFFER_SIZE,                     \
+        .speed = NX_CONFIG_I2C##index##_SPEED,                                 \
+        .scl_pin = NX_CONFIG_I2C##index##_SCL_PIN,                             \
+        .sda_pin = NX_CONFIG_I2C##index##_SDA_PIN,                             \
+        .tx_buf_size = NX_CONFIG_I2C##index##_TX_BUFFER_SIZE,                  \
+        .rx_buf_size = NX_CONFIG_I2C##index##_RX_BUFFER_SIZE,                  \
     }
 
 /**
@@ -359,146 +303,10 @@ static void* nx_i2c_device_init(const nx_device_t* dev) {
                        &i2c_kconfig_state_##index, nx_i2c_device_init)
 
 /* Register all enabled I2C instances */
+#ifndef _MSC_VER
 NX_TRAVERSE_EACH_INSTANCE(NX_I2C_DEVICE_REGISTER, DEVICE_TYPE);
-
-/*---------------------------------------------------------------------------*/
-/* Legacy Factory Functions (for backward compatibility)                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get I2C instance (legacy)
- */
-nx_i2c_bus_t* nx_i2c_native_get(uint8_t index) {
-    if (index >= NX_I2C_MAX_INSTANCES) {
-        return NULL;
-    }
-
-    /* Use device registration mechanism */
-    char name[16];
-    snprintf(name, sizeof(name), "I2C%d", index);
-    return (nx_i2c_bus_t*)nx_device_get(name);
-}
-
-/**
- * \brief           Reset all I2C instances (for testing)
- */
-void nx_i2c_native_reset_all(void) {
-    for (uint8_t i = 0; i < NX_I2C_MAX_INSTANCES; i++) {
-        nx_i2c_impl_t* impl = &g_i2c_instances[i];
-        if (impl->state && impl->state->initialized) {
-            impl->lifecycle.deinit(&impl->lifecycle);
-        }
-        memset(&g_i2c_states[i], 0, sizeof(nx_i2c_state_t));
-    }
-}
-
-/**
- * \brief           Inject data into RX buffer (for testing)
- */
-nx_status_t nx_i2c_native_inject_rx(uint8_t index, const uint8_t* data,
-                                    size_t len) {
-    if (index >= NX_I2C_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_i2c_impl_t* impl = &g_i2c_instances[index];
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    size_t written = i2c_buffer_write(&impl->state->rx_buf, data, len);
-    return (written == len) ? NX_OK : NX_ERR_FULL;
-}
-
-/**
- * \brief           Get I2C device descriptor (for testing)
- */
-nx_device_t* nx_i2c_native_get_device(uint8_t index) {
-    if (index >= NX_I2C_MAX_INSTANCES) {
-        return NULL;
-    }
-    return g_i2c_instances[index].device;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Test Support Functions                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get TX buffer data (for testing)
- */
-nx_status_t nx_i2c_native_get_tx_data(uint8_t index, uint8_t* data,
-                                      size_t max_len, size_t* actual_len) {
-    if (index >= NX_I2C_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-    if (!data || !actual_len) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_i2c_impl_t* impl = &g_i2c_instances[index];
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    *actual_len = i2c_buffer_read(&impl->state->tx_buf, data, max_len);
-    return NX_OK;
-}
-
-/**
- * \brief           Get I2C state (for testing)
- */
-nx_status_t nx_i2c_native_get_state(uint8_t index, bool* initialized,
-                                    bool* suspended, bool* busy) {
-    if (index >= NX_I2C_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_i2c_impl_t* impl = &g_i2c_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    if (initialized) {
-        *initialized = impl->state->initialized;
-    }
-    if (suspended) {
-        *suspended = impl->state->suspended;
-    }
-    if (busy) {
-        *busy = impl->state->busy;
-    }
-
-    return NX_OK;
-}
-
-/**
- * \brief           Reset I2C instance (for testing)
- */
-nx_status_t nx_i2c_native_reset(uint8_t index) {
-    if (index >= NX_I2C_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_i2c_impl_t* impl = &g_i2c_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    /* Clear buffers */
-    i2c_buffer_clear(&impl->state->tx_buf);
-    i2c_buffer_clear(&impl->state->rx_buf);
-
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_i2c_stats_t));
-
-    /* Clear device handle */
-    memset(&impl->state->current_device, 0, sizeof(nx_i2c_device_handle_t));
-
-    /* Reset state flags */
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    return NX_OK;
-}
+#else
+/* MSVC: Temporarily disabled due to macro compatibility issues */
+#pragma message(                                                               \
+    "I2C device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
+#endif

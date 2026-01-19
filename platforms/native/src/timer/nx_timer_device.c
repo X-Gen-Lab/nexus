@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_timer.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_timer_helpers.h"
 #include "nx_timer_types.h"
@@ -24,15 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_TIMER_MAX_INSTANCES 8
-#define DEVICE_TYPE            NX_TIMER
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_timer_state_t g_timer_states[NX_TIMER_MAX_INSTANCES];
-static nx_timer_impl_t g_timer_instances[NX_TIMER_MAX_INSTANCES];
+#define DEVICE_TYPE NX_TIMER
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -157,8 +150,13 @@ timer_init_instance(nx_timer_impl_t* impl, uint8_t index,
     timer_init_lifecycle(&impl->lifecycle);
     timer_init_power(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_timer_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_timer_state_t*)nx_mem_alloc(sizeof(nx_timer_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_timer_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -187,18 +185,32 @@ static void* nx_timer_device_init(const nx_device_t* dev) {
     const nx_timer_platform_config_t* config =
         (const nx_timer_platform_config_t*)dev->config;
 
-    if (config == NULL || config->timer_index >= NX_TIMER_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_timer_impl_t* impl = &g_timer_instances[config->timer_index];
+    /* Allocate implementation structure */
+    nx_timer_impl_t* impl =
+        (nx_timer_impl_t*)nx_mem_alloc(sizeof(nx_timer_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_timer_impl_t));
 
     /* Initialize instance with platform configuration */
     timer_init_instance(impl, config->timer_index, config);
 
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+
     /* Initialize lifecycle */
     nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
     if (status != NX_OK) {
+        nx_mem_free(impl->state);
+        nx_mem_free(impl);
         return NULL;
     }
 
@@ -211,8 +223,8 @@ static void* nx_timer_device_init(const nx_device_t* dev) {
 #define NX_TIMER_CONFIG(index)                                                 \
     static const nx_timer_platform_config_t timer_config_##index = {           \
         .timer_index = index,                                                  \
-        .frequency = CONFIG_TIMER##index##_FREQUENCY,                          \
-        .channel_count = CONFIG_TIMER##index##_CHANNEL_COUNT,                  \
+        .frequency = NX_CONFIG_TIMER##index##_FREQUENCY,                       \
+        .channel_count = NX_CONFIG_TIMER##index##_CHANNEL_COUNT,               \
     }
 
 /**
@@ -229,138 +241,10 @@ static void* nx_timer_device_init(const nx_device_t* dev) {
                        nx_timer_device_init)
 
 /* Register all enabled timer instances */
+#ifndef _MSC_VER
 NX_TRAVERSE_EACH_INSTANCE(NX_TIMER_DEVICE_REGISTER, DEVICE_TYPE);
-
-/*---------------------------------------------------------------------------*/
-/* Legacy Factory Functions (for backward compatibility)                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get timer instance (legacy)
- */
-nx_timer_base_t* nx_timer_native_get(uint8_t index) {
-    if (index >= NX_TIMER_MAX_INSTANCES) {
-        return NULL;
-    }
-
-    /* Use device registration mechanism */
-    char name[16];
-    snprintf(name, sizeof(name), "TIMER%d", index);
-    return (nx_timer_base_t*)nx_device_get(name);
-}
-
-/**
- * \brief           Reset all timer instances (for testing)
- */
-void nx_timer_native_reset_all(void) {
-    for (uint8_t i = 0; i < NX_TIMER_MAX_INSTANCES; i++) {
-        nx_timer_impl_t* impl = &g_timer_instances[i];
-        if (impl->state && impl->state->initialized) {
-            impl->lifecycle.deinit(&impl->lifecycle);
-        }
-        memset(&g_timer_states[i], 0, sizeof(nx_timer_state_t));
-    }
-}
-
-/**
- * \brief           Trigger timer callback (for testing)
- */
-void nx_timer_native_trigger_callback(uint8_t index) {
-    if (index >= NX_TIMER_MAX_INSTANCES) {
-        return;
-    }
-
-    nx_timer_impl_t* impl = &g_timer_instances[index];
-    if (impl->state && impl->state->initialized && impl->state->callback) {
-        impl->state->callback(impl->state->user_data);
-    }
-}
-
-/**
- * \brief           Increment timer counter (for testing)
- */
-void nx_timer_native_increment_counter(uint8_t index, uint32_t value) {
-    if (index >= NX_TIMER_MAX_INSTANCES) {
-        return;
-    }
-
-    nx_timer_impl_t* impl = &g_timer_instances[index];
-    if (impl->state && impl->state->initialized && impl->state->running) {
-        impl->state->counter += value;
-    }
-}
-
-/*---------------------------------------------------------------------------*/
-/* Test Support Functions                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get Timer state (for testing)
- */
-nx_status_t nx_timer_native_get_state(uint8_t index, bool* initialized,
-                                      bool* suspended, bool* running) {
-    if (index >= NX_TIMER_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_timer_impl_t* impl = &g_timer_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    if (initialized) {
-        *initialized = impl->state->initialized;
-    }
-    if (suspended) {
-        *suspended = impl->state->suspended;
-    }
-    if (running) {
-        *running = impl->state->running;
-    }
-
-    return NX_OK;
-}
-
-/**
- * \brief           Get Timer counter value (for testing)
- */
-nx_status_t nx_timer_native_get_counter(uint8_t index, uint32_t* counter) {
-    if (index >= NX_TIMER_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-    if (!counter) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_timer_impl_t* impl = &g_timer_instances[index];
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    *counter = impl->state->counter;
-    return NX_OK;
-}
-
-/**
- * \brief           Reset Timer instance (for testing)
- */
-nx_status_t nx_timer_native_reset(uint8_t index) {
-    if (index >= NX_TIMER_MAX_INSTANCES) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    nx_timer_impl_t* impl = &g_timer_instances[index];
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    /* Reset state */
-    impl->state->counter = 0;
-    impl->state->running = false;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->callback = NULL;
-    impl->state->user_data = NULL;
-
-    return NX_OK;
-}
+#else
+/* MSVC: Temporarily disabled due to macro compatibility issues */
+#pragma message(                                                               \
+    "Timer device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
+#endif

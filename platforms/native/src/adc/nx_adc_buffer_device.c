@@ -13,6 +13,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_adc.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_adc_helpers.h"
 #include "nx_adc_types.h"
@@ -24,15 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_ADC_BUFFER_MAX_INSTANCES 4
-#define DEVICE_TYPE                 NX_ADC_BUFFER
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_adc_buffer_state_t g_adc_buffer_states[NX_ADC_BUFFER_MAX_INSTANCES];
-static nx_adc_buffer_impl_t g_adc_buffer_instances[NX_ADC_BUFFER_MAX_INSTANCES];
+#define DEVICE_TYPE NX_ADC_BUFFER
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -181,8 +174,14 @@ adc_buffer_init_instance(nx_adc_buffer_impl_t* impl, uint8_t index,
     adc_buffer_init_lifecycle(&impl->lifecycle);
     adc_buffer_init_power(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_adc_buffer_states[index];
+    /* Allocate and initialize state */
+    impl->state =
+        (nx_adc_buffer_state_t*)nx_mem_alloc(sizeof(nx_adc_buffer_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_adc_buffer_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->clock_enabled = false;
@@ -201,7 +200,7 @@ adc_buffer_init_instance(nx_adc_buffer_impl_t* impl, uint8_t index,
              platform_cfg->channel_count) *
             platform_cfg->channel_count;
         impl->state->buffer =
-            (uint32_t*)malloc(aligned_size * sizeof(uint32_t));
+            (uint32_t*)nx_mem_alloc(aligned_size * sizeof(uint32_t));
         impl->state->buffer_size = aligned_size;
 
         if (impl->state->buffer) {
@@ -221,18 +220,37 @@ static void* nx_adc_buffer_device_init(const nx_device_t* dev) {
     const nx_adc_buffer_platform_config_t* config =
         (const nx_adc_buffer_platform_config_t*)dev->config;
 
-    if (config == NULL || config->adc_index >= NX_ADC_BUFFER_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_adc_buffer_impl_t* impl = &g_adc_buffer_instances[config->adc_index];
+    /* Allocate implementation structure */
+    nx_adc_buffer_impl_t* impl =
+        (nx_adc_buffer_impl_t*)nx_mem_alloc(sizeof(nx_adc_buffer_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_adc_buffer_impl_t));
 
     /* Initialize instance with platform configuration */
     adc_buffer_init_instance(impl, config->adc_index, config);
 
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+
     /* Initialize lifecycle */
     nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
     if (status != NX_OK) {
+        if (impl->state) {
+            if (impl->state->buffer) {
+                nx_mem_free(impl->state->buffer);
+            }
+            nx_mem_free(impl->state);
+        }
+        nx_mem_free(impl);
         return NULL;
     }
 
@@ -245,8 +263,8 @@ static void* nx_adc_buffer_device_init(const nx_device_t* dev) {
 #define NX_ADC_BUFFER_CONFIG(index)                                            \
     static const nx_adc_buffer_platform_config_t adc_buffer_config_##index = { \
         .adc_index = index,                                                    \
-        .channel_count = CONFIG_ADC_BUFFER##index##_CHANNEL_COUNT,             \
-        .buffer_size = CONFIG_ADC_BUFFER##index##_BUFFER_SIZE,                 \
+        .channel_count = NX_CONFIG_ADC_BUFFER##index##_CHANNEL_COUNT,          \
+        .buffer_size = NX_CONFIG_ADC_BUFFER##index##_BUFFER_SIZE,              \
     }
 
 /**
@@ -263,46 +281,10 @@ static void* nx_adc_buffer_device_init(const nx_device_t* dev) {
         &adc_buffer_kconfig_state_##index, nx_adc_buffer_device_init)
 
 /* Register all enabled ADC buffer instances */
+#ifndef _MSC_VER
 NX_TRAVERSE_EACH_INSTANCE(NX_ADC_BUFFER_DEVICE_REGISTER, DEVICE_TYPE);
-
-/*---------------------------------------------------------------------------*/
-/* Legacy Factory Functions (for backward compatibility)                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get ADC buffer instance (legacy)
- */
-nx_adc_buffer_t* nx_adc_buffer_native_get(uint8_t index, size_t buffer_size) {
-    if (index >= NX_ADC_BUFFER_MAX_INSTANCES) {
-        return NULL;
-    }
-
-    /* Use device registration mechanism */
-    char name[32];
-    snprintf(name, sizeof(name), "ADC_BUFFER%d", index);
-
-    (void)buffer_size; /* Buffer size is configured via Kconfig */
-
-    return (nx_adc_buffer_t*)nx_device_get(name);
-}
-
-/**
- * \brief           Cleanup ADC buffer instance (for testing)
- */
-void nx_adc_buffer_native_cleanup(uint8_t index) {
-    if (index >= NX_ADC_BUFFER_MAX_INSTANCES) {
-        return;
-    }
-
-    nx_adc_buffer_impl_t* impl = &g_adc_buffer_instances[index];
-    if (impl->state) {
-        if (impl->state->initialized) {
-            impl->lifecycle.deinit(&impl->lifecycle);
-        }
-        if (impl->state->buffer) {
-            free(impl->state->buffer);
-            impl->state->buffer = NULL;
-        }
-    }
-    memset(&g_adc_buffer_states[index], 0, sizeof(nx_adc_buffer_state_t));
-}
+#else
+/* MSVC: Temporarily disabled due to macro compatibility issues */
+#pragma message(                                                               \
+    "ADC Buffer device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
+#endif
