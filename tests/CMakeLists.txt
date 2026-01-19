@@ -25,87 +25,29 @@ include(GoogleTest)
 # Test executable
 add_executable(nexus_tests
     test_main.cpp
-    # HAL tests (new nx_* API)
-    hal/test_build_system.cpp
-    hal/test_compiler_abstraction.cpp
-    hal/test_nx_status.cpp
-    hal/test_nx_device.cpp
-    hal/test_nx_hal.cpp
-    hal/test_checkpoint_verification.cpp
-    hal/test_resource_managers.cpp
-    hal/test_nx_gpio.cpp
-    hal/test_nx_uart.cpp
-    hal/test_nx_spi.cpp
-    hal/test_nx_i2c.cpp
-    hal/test_nx_timer.cpp
-    hal/test_nx_adc.cpp
-    hal/test_nx_factory.cpp
-    hal/test_nx_device_registry.cpp
-    hal/test_nx_device_registry_properties.cpp
-    # Init tests
-    init/test_nx_init.cpp
-    init/test_nx_init_properties.cpp
-    init/test_nx_firmware_info.cpp
-    init/test_nx_startup.cpp
-    # OSAL tests
-    osal/test_osal_task.cpp
-    osal/test_osal_task_properties.cpp
-    osal/test_osal_mutex.cpp
-    osal/test_osal_mutex_properties.cpp
-    osal/test_osal_sem.cpp
-    osal/test_osal_sem_properties.cpp
-    osal/test_osal_queue.cpp
-    osal/test_osal_queue_properties.cpp
-    osal/test_osal_timer.cpp
-    osal/test_osal_timer_properties.cpp
-    osal/test_osal_mem.cpp
-    osal/test_osal_mem_properties.cpp
-    osal/test_osal_event.cpp
-    osal/test_osal_event_properties.cpp
-    osal/test_osal_core_properties.cpp
-    osal/test_osal_error_handling_properties.cpp
-    osal/test_osal_diag_properties.cpp
-    osal/test_osal_handle_validation_properties.cpp
-    # Log tests
-    log/test_log.cpp
-    log/test_log_properties.cpp
-    # Shell tests
-    shell/test_shell_parser.cpp
-    shell/test_shell_parser_properties.cpp
-    shell/test_shell_line_editor.cpp
-    shell/test_shell_line_editor_properties.cpp
-    shell/test_shell_history.cpp
-    shell/test_shell_history_properties.cpp
-    shell/test_shell_autocomplete.cpp
-    shell/test_shell_autocomplete_properties.cpp
-    shell/test_shell_command.cpp
-    shell/test_shell_command_properties.cpp
-    shell/test_shell_core.cpp
-    shell/test_shell_core_properties.cpp
-    shell/test_shell_backend.cpp
-    shell/test_shell_backend_properties.cpp
-    shell/test_shell_builtin.cpp
-    # Config tests
-    config/test_config_store.cpp
-    config/test_config_store_properties.cpp
-    config/test_config_core_properties.cpp
-    config/test_config_default.cpp
-    config/test_config_default_properties.cpp
-    config/test_config_namespace.cpp
-    config/test_config_namespace_properties.cpp
-    config/test_config_callback.cpp
-    config/test_config_callback_properties.cpp
-    config/test_config_query.cpp
-    config/test_config_backend.cpp
-    config/test_config_backend_properties.cpp
-    config/test_config_import_export.cpp
-    config/test_config_import_export_properties.cpp
-    config/test_config_crypto.cpp
-    config/test_config_crypto_properties.cpp
-    # Integration tests
-    integration/test_freertos_adapter_integration.cpp
-    integration/test_shell_integration.cpp
-    integration/test_config_integration.cpp
+    # HAL tests - CRC
+    hal/test_nx_crc.cpp
+    hal/test_nx_crc_properties.cpp
+    # HAL tests - Flash
+    hal/test_nx_flash.cpp
+    hal/test_nx_flash_properties.cpp
+    # HAL tests - RTC
+    hal/test_nx_rtc.cpp
+    hal/test_nx_rtc_properties.cpp
+    # HAL tests - SDIO
+    hal/test_nx_sdio.cpp
+    hal/test_nx_sdio_properties.cpp
+    # HAL tests - USB
+    hal/test_nx_usb.cpp
+    hal/test_nx_usb_properties.cpp
+    # HAL tests - Watchdog
+    hal/test_nx_watchdog.cpp
+    hal/test_nx_watchdog_properties.cpp
+    # HAL tests - Option Bytes
+    hal/test_nx_option_bytes.cpp
+    hal/test_nx_option_bytes_properties.cpp
+    # HAL tests - Integration
+    hal/test_nx_integration.cpp
 )
 
 # Require C++20 for designated initializers
@@ -113,6 +55,11 @@ target_compile_features(nexus_tests PRIVATE cxx_std_20)
 
 # Define test mode for startup framework tests
 target_compile_definitions(nexus_tests PRIVATE NX_STARTUP_TEST_MODE)
+
+# MSVC: Enable /FS flag to allow parallel compilation with shared PDB
+if(MSVC)
+    target_compile_options(nexus_tests PRIVATE /FS)
+endif()
 
 target_include_directories(nexus_tests
     PRIVATE
@@ -151,4 +98,43 @@ target_link_libraries(nexus_tests
 )
 
 # Discover tests
-gtest_discover_tests(nexus_tests)
+gtest_discover_tests(nexus_tests
+    PROPERTIES
+        TIMEOUT 300  # 5 minutes timeout per test
+        LABELS "unit;property;integration"
+)
+
+##############################################################################
+# CTest Configuration
+##############################################################################
+
+# Enable parallel test execution
+if(NOT DEFINED CTEST_PARALLEL_LEVEL)
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if(NOT N EQUAL 0)
+        set(CTEST_PARALLEL_LEVEL ${N} CACHE STRING "Number of parallel test jobs")
+        message(STATUS "CTest parallel level: ${CTEST_PARALLEL_LEVEL}")
+    else()
+        set(CTEST_PARALLEL_LEVEL 1 CACHE STRING "Number of parallel test jobs")
+    endif()
+endif()
+
+# Configure test timeout (default 5 minutes)
+if(NOT DEFINED CTEST_TEST_TIMEOUT)
+    set(CTEST_TEST_TIMEOUT 300 CACHE STRING "Test timeout in seconds")
+endif()
+
+# Configure test output on failure
+set(CTEST_OUTPUT_ON_FAILURE ON CACHE BOOL "Show test output on failure")
+
+# Configure test discovery mode
+set(CMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST CACHE STRING "Test discovery mode")
+
+message(STATUS "")
+message(STATUS "=== CTest Configuration ===")
+message(STATUS "  Parallel level: ${CTEST_PARALLEL_LEVEL}")
+message(STATUS "  Test timeout:   ${CTEST_TEST_TIMEOUT}s")
+message(STATUS "  Output on fail: ${CTEST_OUTPUT_ON_FAILURE}")
+message(STATUS "===========================")
+message(STATUS "")
