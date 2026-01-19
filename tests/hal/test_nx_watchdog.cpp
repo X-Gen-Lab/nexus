@@ -17,6 +17,7 @@
 #include <thread>
 
 extern "C" {
+#include "hal/interface/nx_power.h"
 #include "hal/interface/nx_watchdog.h"
 #include "native_watchdog_test.h"
 }
@@ -307,14 +308,17 @@ TEST_F(WatchdogTest, LifecycleGetState) {
 /*---------------------------------------------------------------------------*/
 
 TEST_F(WatchdogTest, PowerEnable) {
-    nx_lifecycle_t* lifecycle = wdt->get_lifecycle(wdt);
-    nx_power_t* power =
-        (nx_power_t*)lifecycle; /* Power interface is part of impl */
-
     /* Note: Power interface is not directly accessible through watchdog
-     * interface */
-    /* This test would require accessing the implementation structure */
-    /* For now, we'll skip direct power tests */
+     * interface in the current implementation. This test is a placeholder
+     * for future power management testing if the interface is exposed. */
+
+    /* For now, we verify that the watchdog can be initialized and used,
+     * which implicitly tests that power is available */
+    nx_lifecycle_t* lifecycle = wdt->get_lifecycle(wdt);
+    ASSERT_NE(nullptr, lifecycle);
+
+    EXPECT_EQ(NX_OK, lifecycle->init(lifecycle));
+    EXPECT_EQ(NX_DEV_STATE_RUNNING, lifecycle->get_state(lifecycle));
 }
 
 /*---------------------------------------------------------------------------*/

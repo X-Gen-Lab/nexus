@@ -213,14 +213,14 @@ nx_device_t* nx_option_bytes_native_get_device(uint8_t index) {
  * \brief           Set write protection status (for testing)
  */
 nx_status_t nx_option_bytes_native_set_write_protection(uint8_t index,
-                                                        bool protected) {
+                                                        bool is_protected) {
     if (index >= g_option_bytes_instance_count) {
         return NX_ERR_INVALID_PARAM;
     }
 
     nx_option_bytes_impl_t* impl = &g_option_bytes_instances[index];
     if (impl->state) {
-        impl->state->data.write_protected = protected;
+        impl->state->data.write_protected = is_protected;
         return NX_OK;
     }
 
@@ -231,14 +231,14 @@ nx_status_t nx_option_bytes_native_set_write_protection(uint8_t index,
  * \brief           Get write protection status (for testing)
  */
 nx_status_t nx_option_bytes_native_get_write_protection(uint8_t index,
-                                                        bool* protected) {
-    if (index >= g_option_bytes_instance_count || protected == NULL) {
+                                                        bool* is_protected) {
+    if (index >= g_option_bytes_instance_count || is_protected == NULL) {
         return NX_ERR_INVALID_PARAM;
     }
 
     nx_option_bytes_impl_t* impl = &g_option_bytes_instances[index];
     if (impl->state) {
-        *protected = impl->state->data.write_protected;
+        *is_protected = impl->state->data.write_protected;
         return NX_OK;
     }
 

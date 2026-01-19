@@ -156,8 +156,10 @@ TEST_F(FlashTest, Write_Alignment) {
               flash->write(flash, addr + 1, aligned_data, write_unit));
 
     /* Unaligned length should fail */
-    EXPECT_EQ(NX_ERR_INVALID_PARAM, flash->write(flash, addr + write_unit * 4,
-                                                 aligned_data, write_unit + 1));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,
+              flash->write(flash, addr + static_cast<uint32_t>(write_unit) * 4,
+                           aligned_data,
+                           static_cast<uint32_t>(write_unit) + 1));
 }
 
 TEST_F(FlashTest, Write_WhenLocked) {
@@ -213,7 +215,7 @@ TEST_F(FlashTest, Read_WrittenData) {
 
 TEST_F(FlashTest, Read_CrossSectorBoundary) {
     /* Read across sector boundary */
-    size_t page_size = flash->get_page_size(flash);
+    uint32_t page_size = static_cast<uint32_t>(flash->get_page_size(flash));
     uint32_t addr = page_size - 8;
 
     /* Erase sectors */

@@ -73,17 +73,17 @@ class RTCPropertyTest : public ::testing::Test {
      */
     nx_datetime_t randomValidDatetime() {
         std::uniform_int_distribution<uint16_t> year_dist(2000, 2099);
-        std::uniform_int_distribution<uint8_t> month_dist(1, 12);
-        std::uniform_int_distribution<uint8_t> hour_dist(0, 23);
-        std::uniform_int_distribution<uint8_t> minute_dist(0, 59);
-        std::uniform_int_distribution<uint8_t> second_dist(0, 59);
+        std::uniform_int_distribution<int> month_dist(1, 12);
+        std::uniform_int_distribution<int> hour_dist(0, 23);
+        std::uniform_int_distribution<int> minute_dist(0, 59);
+        std::uniform_int_distribution<int> second_dist(0, 59);
 
         nx_datetime_t dt;
         dt.year = year_dist(rng);
-        dt.month = month_dist(rng);
-        dt.hour = hour_dist(rng);
-        dt.minute = minute_dist(rng);
-        dt.second = second_dist(rng);
+        dt.month = static_cast<uint8_t>(month_dist(rng));
+        dt.hour = static_cast<uint8_t>(hour_dist(rng));
+        dt.minute = static_cast<uint8_t>(minute_dist(rng));
+        dt.second = static_cast<uint8_t>(second_dist(rng));
 
         /* Adjust day based on month */
         uint8_t max_day = 31;
@@ -97,8 +97,8 @@ class RTCPropertyTest : public ::testing::Test {
             max_day = 30;
         }
 
-        std::uniform_int_distribution<uint8_t> day_dist(1, max_day);
-        dt.day = day_dist(rng);
+        std::uniform_int_distribution<int> day_dist(1, max_day);
+        dt.day = static_cast<uint8_t>(day_dist(rng));
 
         return dt;
     }
@@ -324,8 +324,8 @@ TEST_F(RTCPropertyTest, Property9_AlarmTriggersAtCorrectTime) {
         ASSERT_EQ(NX_OK, rtc->set_datetime(rtc, &current_time));
 
         /* Generate alarm time 5-10 seconds in the future */
-        std::uniform_int_distribution<uint8_t> advance_dist(5, 10);
-        uint8_t advance_seconds = advance_dist(rng);
+        std::uniform_int_distribution<int> advance_dist(5, 10);
+        uint8_t advance_seconds = static_cast<uint8_t>(advance_dist(rng));
 
         nx_datetime_t alarm_time = current_time;
         alarm_time.second += advance_seconds;

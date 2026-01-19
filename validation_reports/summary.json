@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-01-19T23:25:55.005277",
+  "summary": {
+    "total_tests": 0,
+    "passed_tests": 0,
+    "failed_tests": 0,
+    "skipped_tests": 0,
+    "pass_rate": 0.0,
+    "total_time": 0.0
+  },
+  "test_suites": [
+    {
+      "name": "unit_tests",
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "execution_time": 0.0
+    },
+    {
+      "name": "property_tests",
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "execution_time": 0.0
+    },
+    {
+      "name": "integration_tests",
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "execution_time": 0.0
+    }
+  ]
+}

@@ -75,10 +75,10 @@ class OptionBytesPropertyTest : public ::testing::Test {
      * \brief       Generate random user data
      */
     std::vector<uint8_t> randomUserData(size_t len) {
-        std::uniform_int_distribution<uint8_t> byte_dist(0, 255);
+        std::uniform_int_distribution<int> byte_dist(0, 255);
         std::vector<uint8_t> data(len);
         for (size_t i = 0; i < len; i++) {
-            data[i] = byte_dist(rng);
+            data[i] = static_cast<uint8_t>(byte_dist(rng));
         }
         return data;
     }
@@ -87,16 +87,16 @@ class OptionBytesPropertyTest : public ::testing::Test {
      * \brief       Generate random protection level (0-2)
      */
     uint8_t randomProtectionLevel() {
-        std::uniform_int_distribution<uint8_t> level_dist(0, 2);
-        return level_dist(rng);
+        std::uniform_int_distribution<int> level_dist(0, 2);
+        return static_cast<uint8_t>(level_dist(rng));
     }
 
     /**
      * \brief       Generate random invalid protection level (> 2)
      */
     uint8_t randomInvalidProtectionLevel() {
-        std::uniform_int_distribution<uint8_t> level_dist(3, 255);
-        return level_dist(rng);
+        std::uniform_int_distribution<int> level_dist(3, 255);
+        return static_cast<uint8_t>(level_dist(rng));
     }
 };
 

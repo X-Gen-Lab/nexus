@@ -63,20 +63,20 @@ nx_status_t nx_option_bytes_native_get_state(uint8_t index, bool* initialized,
 /**
  * \brief           Set write protection status
  * \param[in]       index: Instance index
- * \param[in]       protected: Write protection status
+ * \param[in]       is_protected: Write protection status
  * \return          NX_OK on success, error code otherwise
  */
 nx_status_t nx_option_bytes_native_set_write_protection(uint8_t index,
-                                                        bool protected);
+                                                        bool is_protected);
 
 /**
  * \brief           Get write protection status
  * \param[in]       index: Instance index
- * \param[out]      protected: Write protection status
+ * \param[out]      is_protected: Write protection status
  * \return          NX_OK on success, error code otherwise
  */
 nx_status_t nx_option_bytes_native_get_write_protection(uint8_t index,
-                                                        bool* protected);
+                                                        bool* is_protected);
 
 /**
  * \brief           Check if there are pending changes
