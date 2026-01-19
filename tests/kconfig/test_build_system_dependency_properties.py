@@ -49,8 +49,7 @@ def project_root():
 def run_cmake_configure(build_dir, source_dir):
     """Run CMake configuration."""
     result = subprocess.run(
-        ['cmake', str(source_dir)],
-        cwd=str(build_dir),
+        ['cmake', '-S', str(source_dir), '-B', str(build_dir)],
         capture_output=True,
         text=True,
         timeout=60
@@ -60,9 +59,16 @@ def run_cmake_configure(build_dir, source_dir):
 
 def get_config_header_mtime(project_root):
     """Get the modification time of the configuration header."""
-    config_header = project_root / 'hal' / 'include' / 'hal' / 'nexus_config.h'
-    if config_header.exists():
-        return config_header.stat().st_mtime
+    # Check both possible locations
+    config_header_locations = [
+        project_root / 'nexus_config.h',
+        project_root / 'hal' / 'include' / 'hal' / 'nexus_config.h',
+    ]
+
+    for config_header in config_header_locations:
+        if config_header.exists():
+            return config_header.stat().st_mtime
+
     return None
 
 
@@ -212,17 +218,17 @@ def test_cmake_variables_defined(temp_build_dir, project_root):
 
     # Run CMake configuration with -Wno-dev to suppress developer warnings
     result = subprocess.run(
-        ['cmake', '-Wno-dev', str(project_root)],
-        cwd=str(temp_build_dir),
+        ['cmake', '-S', str(project_root), '-B', str(temp_build_dir), '-Wno-dev'],
         capture_output=True,
         text=True,
         timeout=60
     )
 
-    # Check if configuration succeeded or at least got past variable definition
+    # Check if configuration succeeded
     if result.returncode != 0:
         # Check if the error is related to config generation, not variable definition
-        if 'NEXUS_KCONFIG_FILE' not in result.stdout and 'NEXUS_KCONFIG_FILE' not in result.stderr:
+        error_output = result.stdout + result.stderr
+        if 'NEXUS_KCONFIG_FILE' not in error_output:
             pytest.skip(f"CMake configuration failed before variable definition: {result.stderr[:200]}")
 
     # Check CMake cache for required variables

@@ -24,7 +24,7 @@ from hypothesis import given, strategies as st, settings
 # Import the generation functions
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'kconfig'))
-from generate_hal_config import generate_header
+from generate_config import generate_header
 
 
 @st.composite

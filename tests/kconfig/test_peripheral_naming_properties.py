@@ -29,11 +29,11 @@ KCONFIG_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'Kconfig')
 
 # Peripheral instances to test with expected naming pattern
 PERIPHERAL_INSTANCES = [
-    ('PLATFORM_STM32', 'INSTANCE_STM32_UART_1', 'STM32', 'UART', '1'),
-    ('PLATFORM_STM32', 'INSTANCE_STM32_UART_2', 'STM32', 'UART', '2'),
-    ('PLATFORM_STM32', 'INSTANCE_STM32_UART_3', 'STM32', 'UART', '3'),
+    ('PLATFORM_STM32', 'INSTANCE_NX_UART_1', 'NX', 'UART', '1'),
+    ('PLATFORM_STM32', 'INSTANCE_NX_UART_2', 'NX', 'UART', '2'),
     ('PLATFORM_NATIVE', 'INSTANCE_NX_UART_0', 'NX', 'UART', '0'),
     ('PLATFORM_NATIVE', 'INSTANCE_NX_UART_1', 'NX', 'UART', '1'),
+    ('PLATFORM_NATIVE', 'INSTANCE_NX_UART_2', 'NX', 'UART', '2'),
 ]
 
 
