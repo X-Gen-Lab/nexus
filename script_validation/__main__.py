@@ -133,7 +133,7 @@ def create_argument_parser() -> argparse.ArgumentParser:
         dest="output_dir",
         type=str,
         default=None,
-        help="报告输出目录 (默认: ./validation_reports)"
+        help="报告输出目录 (默认: ./build/validation_reports)"
     )
 
     # 验证器选择
@@ -378,7 +378,7 @@ def run_validation(config: ValidationConfig) -> int:
         report = controller.run_validation()
 
         # 生成报告
-        output_dir = config.output_dir or (config.root_path / "validation_reports")
+        output_dir = config.output_dir or (config.root_path / "build" / "validation_reports")
         generated_reports = controller.generate_reports(report, output_dir)
 
         # 如果配置了JUnit格式，额外生成JUnit报告

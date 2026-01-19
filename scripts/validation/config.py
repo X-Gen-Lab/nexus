@@ -54,7 +54,7 @@ class ConfigManager:
             parallel_jobs = config_dict.get("parallel_jobs", 0)
             platforms = config_dict.get("platforms", ["native"])
             fail_fast = config_dict.get("fail_fast", False)
-            report_dir = config_dict.get("report_dir", "validation_reports")
+            report_dir = config_dict.get("report_dir", "build/validation_reports")
             verbose = config_dict.get("verbose", False)
 
             # 验证配置值

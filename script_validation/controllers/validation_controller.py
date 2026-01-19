@@ -227,7 +227,7 @@ class ValidationController:
             Dict[str, str]: 报告格式到文件路径的映射
         """
         if output_dir is None:
-            output_dir = self.config.root_path / "validation_reports"
+            output_dir = self.config.root_path / "build" / "validation_reports"
 
         output_dir.mkdir(parents=True, exist_ok=True)
         generated_reports = {}

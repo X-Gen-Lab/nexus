@@ -108,7 +108,7 @@ class ValidationWorkflow:
             report = self.controller.run_validation()
 
             # 生成报告
-            output_dir = self.config.output_dir or (self.config.root_path / "validation_reports")
+            output_dir = self.config.output_dir or (self.config.root_path / "build" / "validation_reports")
             generated_reports = self.controller.generate_reports(report, output_dir)
 
             # 触发报告生成回调

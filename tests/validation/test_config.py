@@ -43,7 +43,7 @@ class TestConfigManager:
         assert config.parallel_jobs == 0
         assert config.platforms == ["native"]
         assert config.fail_fast is False
-        assert config.report_dir == "validation_reports"
+        assert config.report_dir == "build/validation_reports"
         assert config.verbose is False
 
     def test_load_from_dict_valid(self):

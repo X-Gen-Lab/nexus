@@ -114,9 +114,9 @@ def create_argument_parser() -> argparse.ArgumentParser:
     report_group.add_argument(
         '--report-dir',
         type=str,
-        default='validation_reports',
+        default='build/validation_reports',
         metavar='DIR',
-        help='报告输出目录（默认: validation_reports）'
+        help='报告输出目录（默认: build/validation_reports）'
     )
 
     # 配置文件选项
@@ -206,7 +206,7 @@ def load_configuration(args: argparse.Namespace) -> ValidationConfig:
     if args.fail_fast:
         config.fail_fast = True
 
-    if args.report_dir != 'validation_reports':
+    if args.report_dir != 'build/validation_reports':
         config.report_dir = args.report_dir
 
     if args.verbose:

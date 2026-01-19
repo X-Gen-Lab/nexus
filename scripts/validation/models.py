@@ -99,5 +99,5 @@ class ValidationConfig:
     parallel_jobs: int = 0            # 并行作业数（0表示自动）
     platforms: List[str] = field(default_factory=lambda: ["native"])
     fail_fast: bool = False           # 首次失败时停止
-    report_dir: str = "validation_reports"  # 报告输出目录
+    report_dir: str = "build/validation_reports"  # 报告输出目录
     verbose: bool = False             # 详细输出模式

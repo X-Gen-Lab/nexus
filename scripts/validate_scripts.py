@@ -176,7 +176,7 @@ def create_argument_parser() -> argparse.ArgumentParser:
         dest="output_dir",
         type=str,
         default=None,
-        help="报告输出目录 (默认: ./validation_reports)"
+        help="报告输出目录 (默认: ./build/validation_reports)"
     )
 
     # 验证器选择
@@ -519,7 +519,7 @@ def run_validation_command(args, logger: logging.Logger) -> int:
         report = workflow.run()
 
         # 确定输出目录
-        output_dir = Path(args.output_dir) if args.output_dir else (PROJECT_ROOT / "validation_reports")
+        output_dir = Path(args.output_dir) if args.output_dir else (PROJECT_ROOT / "build" / "validation_reports")
 
         # 生成报告
         generated_reports = workflow.controller.generate_reports(report, output_dir)
