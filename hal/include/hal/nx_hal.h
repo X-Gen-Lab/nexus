@@ -52,7 +52,6 @@ extern "C" {
 /* Base Interfaces                                                           */
 /*---------------------------------------------------------------------------*/
 
-#include "hal/interface/nx_configurable.h"
 #include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
@@ -62,11 +61,14 @@ extern "C" {
 /*---------------------------------------------------------------------------*/
 
 #include "hal/interface/nx_adc.h"
+#include "hal/interface/nx_can.h"
+#include "hal/interface/nx_flash.h"
 #include "hal/interface/nx_gpio.h"
 #include "hal/interface/nx_i2c.h"
 #include "hal/interface/nx_spi.h"
 #include "hal/interface/nx_timer.h"
 #include "hal/interface/nx_uart.h"
+#include "hal/interface/nx_usb.h"
 
 /*---------------------------------------------------------------------------*/
 /* Resource Managers                                                         */
@@ -80,12 +82,6 @@ extern "C" {
 /*---------------------------------------------------------------------------*/
 
 #include "hal/nx_factory.h"
-
-/*---------------------------------------------------------------------------*/
-/* Static Device Registry                                                    */
-/*---------------------------------------------------------------------------*/
-
-#include "hal/nx_device_registry.h"
 
 /*---------------------------------------------------------------------------*/
 /* HAL Initialization and Deinitialization                                   */

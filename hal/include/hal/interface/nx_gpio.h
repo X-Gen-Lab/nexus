@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+/*---------------------------------------------------------------------------*/
+/* Type Definitions                                                          */
+/*---------------------------------------------------------------------------*/
+
 /**
  * \brief           GPIO mode enumeration
  */
@@ -48,56 +52,186 @@ typedef enum nx_gpio_speed_e {
 } nx_gpio_speed_t;
 
 /**
- * \brief           GPIO external interrupt trigger enumeration
+ * \brief           GPIO interrupt trigger type enumeration
  */
-typedef enum nx_gpio_exti_trig_e {
-    NX_GPIO_EXTI_NONE = 0, /**< No interrupt */
-    NX_GPIO_EXTI_RISING,   /**< Rising edge trigger */
-    NX_GPIO_EXTI_FALLING,  /**< Falling edge trigger */
-    NX_GPIO_EXTI_BOTH,     /**< Both edges trigger */
-} nx_gpio_exti_trig_t;
+typedef enum nx_gpio_trigger_e {
+    NX_GPIO_TRIGGER_RISING = 0, /**< Rising edge trigger */
+    NX_GPIO_TRIGGER_FALLING,    /**< Falling edge trigger */
+    NX_GPIO_TRIGGER_BOTH,       /**< Both edges trigger */
+} nx_gpio_trigger_t;
 
 /**
- * \brief           GPIO configuration structure
+ * \brief           GPIO interrupt callback function type
+ * \param[in]       user_data: User context pointer
  */
-typedef struct nx_gpio_config_s {
-    nx_gpio_mode_t mode;   /**< GPIO mode */
-    nx_gpio_pull_t pull;   /**< Pull-up/pull-down configuration */
-    nx_gpio_speed_t speed; /**< GPIO speed */
-    uint8_t af_index;      /**< Alternate function index */
-} nx_gpio_config_t;
+typedef void (*nx_gpio_callback_t)(void* user_data);
+
+/*---------------------------------------------------------------------------*/
+/* GPIO Read Interface                                                       */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           GPIO external interrupt callback type
- * \param[in]       context: User context pointer
+ * \brief           GPIO read interface (input only)
  */
-typedef void (*nx_gpio_exti_callback_t)(void* context);
+typedef struct nx_gpio_read_s nx_gpio_read_t;
+struct nx_gpio_read_s {
+    /**
+     * \brief           Read GPIO pin state
+     * \param[in]       self: Interface pointer
+     * \return          Pin state (0 or 1)
+     */
+    uint8_t (*read)(nx_gpio_read_t* self);
 
-/**
- * \brief           GPIO device interface
- */
-typedef struct nx_gpio_s nx_gpio_t;
-struct nx_gpio_s {
-    /* Basic operations */
-    uint8_t (*read)(nx_gpio_t* self);
-    void (*write)(nx_gpio_t* self, uint8_t state);
-    void (*toggle)(nx_gpio_t* self);
+    /**
+     * \brief           Register external interrupt callback
+     * \param[in]       self: Interface pointer
+     * \param[in]       callback: Interrupt callback function
+     * \param[in]       user_data: User context pointer
+     * \param[in]       trigger: Interrupt trigger type
+     * \return          NX_OK on success, error code otherwise
+     */
+    nx_status_t (*register_exti)(nx_gpio_read_t* self,
+                                 nx_gpio_callback_t callback, void* user_data,
+                                 nx_gpio_trigger_t trigger);
 
-    /* Runtime configuration */
-    nx_status_t (*set_mode)(nx_gpio_t* self, nx_gpio_mode_t mode);
-    nx_status_t (*set_pull)(nx_gpio_t* self, nx_gpio_pull_t pull);
-    nx_status_t (*get_config)(nx_gpio_t* self, nx_gpio_config_t* cfg);
-    nx_status_t (*set_config)(nx_gpio_t* self, const nx_gpio_config_t* cfg);
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: Interface pointer
+     * \return          Lifecycle interface pointer
+     */
+    nx_lifecycle_t* (*get_lifecycle)(nx_gpio_read_t* self);
 
-    /* Interrupt configuration */
-    nx_status_t (*set_exti)(nx_gpio_t* self, nx_gpio_exti_trig_t trig,
-                            nx_gpio_exti_callback_t cb, void* ctx);
-    nx_status_t (*clear_exti)(nx_gpio_t* self);
-
-    /* Base interfaces */
-    nx_lifecycle_t* (*get_lifecycle)(nx_gpio_t* self);
-    nx_power_t* (*get_power)(nx_gpio_t* self);
+    /**
+     * \brief           Get power management interface
+     * \param[in]       self: Interface pointer
+     * \return          Power management interface pointer
+     */
+    nx_power_t* (*get_power)(nx_gpio_read_t* self);
 };
+
+/*---------------------------------------------------------------------------*/
+/* GPIO Write Interface                                                      */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           GPIO write interface (output only)
+ */
+typedef struct nx_gpio_write_s nx_gpio_write_t;
+struct nx_gpio_write_s {
+    /**
+     * \brief           Write GPIO pin state
+     * \param[in]       self: Interface pointer
+     * \param[in]       state: Pin state to write (0 or 1)
+     */
+    void (*write)(nx_gpio_write_t* self, uint8_t state);
+
+    /**
+     * \brief           Toggle GPIO pin state
+     * \param[in]       self: Interface pointer
+     */
+    void (*toggle)(nx_gpio_write_t* self);
+
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: Interface pointer
+     * \return          Lifecycle interface pointer
+     */
+    nx_lifecycle_t* (*get_lifecycle)(nx_gpio_write_t* self);
+
+    /**
+     * \brief           Get power management interface
+     * \param[in]       self: Interface pointer
+     * \return          Power management interface pointer
+     */
+    nx_power_t* (*get_power)(nx_gpio_write_t* self);
+};
+
+/*---------------------------------------------------------------------------*/
+/* GPIO Read-Write Interface                                                 */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           GPIO read-write interface (bidirectional)
+ */
+typedef struct nx_gpio_read_write_s nx_gpio_read_write_t;
+struct nx_gpio_read_write_s {
+    nx_gpio_read_t read;   /**< Read interface */
+    nx_gpio_write_t write; /**< Write interface */
+};
+
+/*---------------------------------------------------------------------------*/
+/* Initialization Macros                                                     */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Initialize GPIO read interface
+ * \param[in]       p: Pointer to nx_gpio_read_t structure
+ * \param[in]       _read: Read function pointer
+ * \param[in]       _register_exti: Register EXTI function pointer
+ * \param[in]       _get_lifecycle: Get lifecycle function pointer
+ * \param[in]       _get_power: Get power function pointer
+ */
+#define NX_INIT_GPIO_READ(p, _read, _register_exti, _get_lifecycle,            \
+                          _get_power)                                          \
+    do {                                                                       \
+        (p)->read = (_read);                                                   \
+        (p)->register_exti = (_register_exti);                                 \
+        (p)->get_lifecycle = (_get_lifecycle);                                 \
+        (p)->get_power = (_get_power);                                         \
+        NX_ASSERT((p)->read);                                                  \
+        NX_ASSERT((p)->get_lifecycle);                                         \
+    } while (0)
+
+/**
+ * \brief           Initialize GPIO write interface
+ * \param[in]       p: Pointer to nx_gpio_write_t structure
+ * \param[in]       _write: Write function pointer
+ * \param[in]       _toggle: Toggle function pointer
+ * \param[in]       _get_lifecycle: Get lifecycle function pointer
+ * \param[in]       _get_power: Get power function pointer
+ */
+#define NX_INIT_GPIO_WRITE(p, _write, _toggle, _get_lifecycle, _get_power)     \
+    do {                                                                       \
+        (p)->write = (_write);                                                 \
+        (p)->toggle = (_toggle);                                               \
+        (p)->get_lifecycle = (_get_lifecycle);                                 \
+        (p)->get_power = (_get_power);                                         \
+        NX_ASSERT((p)->write && (p)->toggle);                                  \
+        NX_ASSERT((p)->get_lifecycle);                                         \
+    } while (0)
+
+/**
+ * \brief           Initialize GPIO read-write interface
+ * \param[in]       p: Pointer to nx_gpio_read_write_t structure
+ * \param[in]       _read: Read function pointer
+ * \param[in]       _register_exti: Register EXTI function pointer
+ * \param[in]       _write: Write function pointer
+ * \param[in]       _toggle: Toggle function pointer
+ * \param[in]       _get_lifecycle_r: Get lifecycle function pointer for read
+ * \param[in]       _get_power_r: Get power function pointer for read
+ * \param[in]       _get_lifecycle_w: Get lifecycle function pointer for write
+ * \param[in]       _get_power_w: Get power function pointer for write
+ */
+#define NX_INIT_GPIO_READ_WRITE(p, _read, _register_exti, _write, _toggle,     \
+                                _get_lifecycle_r, _get_power_r,                \
+                                _get_lifecycle_w, _get_power_w)                \
+    do {                                                                       \
+        NX_INIT_GPIO_READ(&(p)->read, _read, _register_exti, _get_lifecycle_r, \
+                          _get_power_r);                                       \
+        NX_INIT_GPIO_WRITE(&(p)->write, _write, _toggle, _get_lifecycle_w,     \
+                           _get_power_w);                                      \
+    } while (0)
+
+/*---------------------------------------------------------------------------*/
+/* Type Aliases for Backward Compatibility                                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           GPIO interface type alias (for backward compatibility)
+ * \note            New code should use nx_gpio_read_t, nx_gpio_write_t, or
+ *                  nx_gpio_read_write_t explicitly
+ */
+typedef nx_gpio_read_write_t nx_gpio_t;
 
 #ifdef __cplusplus
 }

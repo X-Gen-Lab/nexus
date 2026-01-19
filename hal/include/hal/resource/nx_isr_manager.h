@@ -30,10 +30,16 @@ typedef enum nx_isr_priority_e {
 typedef struct nx_isr_handle_s nx_isr_handle_t;
 
 /**
- * \brief           ISR callback function type
+ * \brief           ISR handler function type
+ * \param[in]       user_data: User data pointer
+ */
+typedef void (*nx_isr_handler_t)(void* user_data);
+
+/**
+ * \brief           ISR callback function type (alias for nx_isr_handler_t)
  * \param[in]       data: User data pointer
  */
-typedef void (*nx_isr_func_t)(void* data);
+typedef nx_isr_handler_t nx_isr_func_t;
 
 /**
  * \brief           ISR manager interface
@@ -62,14 +68,15 @@ struct nx_isr_manager_s {
     nx_status_t (*disconnect)(nx_isr_manager_t* self, nx_isr_handle_t* handle);
 
     /**
-     * \brief           Set hardware interrupt priority
+     * \brief           Set interrupt priority
      * \param[in]       self: ISR manager instance
      * \param[in]       irq: IRQ number
-     * \param[in]       hw_prio: Hardware priority (0-15)
+     * \param[in]       priority: Hardware priority (0-15, lower is higher
+     * priority)
      * \return          NX_OK on success, error code otherwise
      */
-    nx_status_t (*set_hw_priority)(nx_isr_manager_t* self, uint32_t irq,
-                                   uint8_t hw_prio);
+    nx_status_t (*set_priority)(nx_isr_manager_t* self, uint32_t irq,
+                                uint8_t priority);
 
     /**
      * \brief           Enable interrupt

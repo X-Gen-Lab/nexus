@@ -17,7 +17,12 @@ extern "C" {
 /*---------------------------------------------------------------------------*/
 /* Include standard headers if available                                     */
 /*---------------------------------------------------------------------------*/
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if defined(__cplusplus)
+/* C++ mode - use standard headers */
+#include <cstddef>
+#include <cstdint>
+/* C++ has built-in bool type, no need for stdbool.h */
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 /* C99 or later - use standard headers */
 #include <stdbool.h>
 #include <stddef.h>
@@ -46,7 +51,11 @@ typedef unsigned int size_t;
 #define _SIZE_T_DEFINED
 #endif
 #ifndef NULL
+#ifdef __cplusplus
+#define NULL 0
+#else
 #define NULL ((void*)0)
+#endif
 #endif
 #endif /* _STDDEF_H */
 
@@ -67,7 +76,14 @@ typedef unsigned char bool;
 /*---------------------------------------------------------------------------*/
 
 /** Pointer-sized unsigned integer */
+#if defined(__cplusplus) ||                                                    \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+/* C99/C++ - uintptr_t is available from stdint.h */
 typedef uintptr_t nx_uintptr_t;
+#else
+/* Pre-C99 fallback */
+typedef unsigned long nx_uintptr_t;
+#endif
 
 /** Register-sized type for hardware access */
 typedef volatile uint32_t nx_reg32_t;
@@ -80,92 +96,94 @@ typedef volatile uint8_t nx_reg8_t;
 
 /* Arm Compiler 4/5 (armcc) */
 #if defined(__CC_ARM)
-#define NX_ASM          __asm
-#define NX_INLINE      static __inline
-#define NX_NORETURN    __declspec(noreturn)
-#define NX_PACKED      __packed
-#define NX_ALIGNED(x)  __align(x)
-#define NX_UNUSED      __attribute__((unused))
-#define NX_WEAK        __weak
-#define NX_SECTION(x)  __attribute__((section(x)))
-#define NX_USED        __attribute__((used))
+#define NX_ASM        __asm
+#define NX_INLINE     static __inline
+#define NX_NORETURN   __declspec(noreturn)
+#define NX_PACKED     __packed
+#define NX_ALIGNED(x) __align(x)
+#define NX_UNUSED     __attribute__((unused))
+#define NX_WEAK       __weak
+#define NX_SECTION(x) __attribute__((section(x)))
+#define NX_USED       __attribute__((used))
 
 /* Arm Compiler 6 (armclang) */
 #elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-#define NX_ASM          __asm
-#define NX_INLINE      static inline
-#define NX_NORETURN    __attribute__((noreturn))
-#define NX_PACKED      __attribute__((packed))
-#define NX_ALIGNED(x)  __attribute__((aligned(x)))
-#define NX_UNUSED      __attribute__((unused))
-#define NX_WEAK        __attribute__((weak))
-#define NX_SECTION(x)  __attribute__((section(x)))
-#define NX_USED        __attribute__((used))
+#define NX_ASM        __asm
+#define NX_INLINE     static inline
+#define NX_NORETURN   __attribute__((noreturn))
+#define NX_PACKED     __attribute__((packed))
+#define NX_ALIGNED(x) __attribute__((aligned(x)))
+#define NX_UNUSED     __attribute__((unused))
+#define NX_WEAK       __attribute__((weak))
+#define NX_SECTION(x) __attribute__((section(x)))
+#define NX_USED       __attribute__((used))
 
 /* GCC / Clang */
 #elif defined(__GNUC__)
-#define NX_ASM          __asm__
-#define NX_INLINE      static inline
-#define NX_NORETURN    __attribute__((noreturn))
-#define NX_PACKED      __attribute__((packed))
-#define NX_ALIGNED(x)  __attribute__((aligned(x)))
-#define NX_UNUSED      __attribute__((unused))
-#define NX_WEAK        __attribute__((weak))
-#define NX_SECTION(x)  __attribute__((section(x)))
-#define NX_USED        __attribute__((used))
+#define NX_ASM        __asm__
+#define NX_INLINE     static inline
+#define NX_NORETURN   __attribute__((noreturn))
+#define NX_PACKED     __attribute__((packed))
+#define NX_ALIGNED(x) __attribute__((aligned(x)))
+#define NX_UNUSED     __attribute__((unused))
+#define NX_WEAK       __attribute__((weak))
+#define NX_SECTION(x) __attribute__((section(x)))
+#define NX_USED       __attribute__((used))
+#define NX_DEPRECATED __attribute__((deprecated))
 
 /* IAR Compiler */
 #elif defined(__ICCARM__)
-#define NX_ASM          __asm
-#define NX_INLINE      static inline
-#define NX_NORETURN    __noreturn
-#define NX_PACKED      __packed
-#define NX_ALIGNED(x)  _Pragma("data_alignment=" #x)
+#define NX_ASM        __asm
+#define NX_INLINE     static inline
+#define NX_NORETURN   __noreturn
+#define NX_PACKED     __packed
+#define NX_ALIGNED(x) _Pragma("data_alignment=" #x)
 #define NX_UNUSED
-#define NX_WEAK        __weak
-#define NX_SECTION(x)  _Pragma("location=" #x)
-#define NX_USED        __root
+#define NX_WEAK       __weak
+#define NX_SECTION(x) _Pragma("location=" #x)
+#define NX_USED       __root
 
 /* TI Arm Compiler */
 #elif defined(__TI_ARM__)
-#define NX_ASM          __asm
-#define NX_INLINE      static inline
-#define NX_NORETURN    __attribute__((noreturn))
-#define NX_PACKED      __attribute__((packed))
-#define NX_ALIGNED(x)  __attribute__((aligned(x)))
-#define NX_UNUSED      __attribute__((unused))
-#define NX_WEAK        __attribute__((weak))
-#define NX_SECTION(x)  __attribute__((section(x)))
-#define NX_USED        __attribute__((used))
+#define NX_ASM        __asm
+#define NX_INLINE     static inline
+#define NX_NORETURN   __attribute__((noreturn))
+#define NX_PACKED     __attribute__((packed))
+#define NX_ALIGNED(x) __attribute__((aligned(x)))
+#define NX_UNUSED     __attribute__((unused))
+#define NX_WEAK       __attribute__((weak))
+#define NX_SECTION(x) __attribute__((section(x)))
+#define NX_USED       __attribute__((used))
 
 /* TASKING Compiler */
 #elif defined(__TASKING__)
-#define NX_ASM          __asm
-#define NX_INLINE      static inline
-#define NX_NORETURN    __attribute__((noreturn))
-#define NX_PACKED      __packed__
-#define NX_ALIGNED(x)  __align(x)
-#define NX_UNUSED      __attribute__((unused))
-#define NX_WEAK        __attribute__((weak))
-#define NX_SECTION(x)  __attribute__((section(x)))
-#define NX_USED        __attribute__((used))
+#define NX_ASM        __asm
+#define NX_INLINE     static inline
+#define NX_NORETURN   __attribute__((noreturn))
+#define NX_PACKED     __packed__
+#define NX_ALIGNED(x) __align(x)
+#define NX_UNUSED     __attribute__((unused))
+#define NX_WEAK       __attribute__((weak))
+#define NX_SECTION(x) __attribute__((section(x)))
+#define NX_USED       __attribute__((used))
 
 /* Microsoft Visual C++ */
 #elif defined(_MSC_VER)
-#define NX_ASM          __asm
-#define NX_INLINE      static __inline
-#define NX_NORETURN    __declspec(noreturn)
+#define NX_ASM      __asm
+#define NX_INLINE   static __inline
+#define NX_NORETURN __declspec(noreturn)
 #define NX_PACKED
-#define NX_ALIGNED(x)  __declspec(align(x))
+#define NX_ALIGNED(x) __declspec(align(x))
 #define NX_UNUSED
 #define NX_WEAK
-#define NX_SECTION(x)  __declspec(allocate(x))
+#define NX_SECTION(x) __declspec(allocate(x))
 #define NX_USED
+#define NX_DEPRECATED __declspec(deprecated)
 
 /* Unknown compiler - fallback */
 #else
-#define NX_ASM          __asm__
-#define NX_INLINE      static inline
+#define NX_ASM    __asm__
+#define NX_INLINE static inline
 #define NX_NORETURN
 #define NX_PACKED
 #define NX_ALIGNED(x)
@@ -173,6 +191,7 @@ typedef volatile uint8_t nx_reg8_t;
 #define NX_WEAK
 #define NX_SECTION(x)
 #define NX_USED
+#define NX_DEPRECATED
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -215,6 +234,78 @@ typedef volatile uint8_t nx_reg8_t;
 #define NX_BIT_CLEAR(x, n)  ((x) &= ~NX_BIT(n))
 #define NX_BIT_TOGGLE(x, n) ((x) ^= NX_BIT(n))
 #define NX_BIT_CHECK(x, n)  (((x) & NX_BIT(n)) != 0)
+
+/*---------------------------------------------------------------------------*/
+/* Assertion macros                                                          */
+/*---------------------------------------------------------------------------*/
+
+#include "nexus_config.h"
+
+#if NX_CONFIG_HAL_ASSERT_ENABLE
+
+/**
+ * \brief           Assert handler function type
+ */
+typedef void (*nx_assert_handler_t)(const char* file, int line,
+                                    const char* expr);
+
+/**
+ * \brief           Set custom assert handler
+ * \param[in]       handler: Assert handler function
+ */
+void nx_set_assert_handler(nx_assert_handler_t handler);
+
+/**
+ * \brief           Default assert handler (weak, can be overridden)
+ * \param[in]       file: Source file name
+ * \param[in]       line: Line number
+ * \param[in]       expr: Failed expression string
+ */
+void nx_assert_failed(const char* file, int line, const char* expr);
+
+/**
+ * \brief           Assert macro with expression
+ * \param[in]       expr: Expression to evaluate
+ */
+#define NX_ASSERT(expr)                                                        \
+    do {                                                                       \
+        if (!(expr)) {                                                         \
+            nx_assert_failed(__FILE__, __LINE__, #expr);                       \
+        }                                                                      \
+    } while (0)
+
+/**
+ * \brief           Assert macro with message
+ * \param[in]       expr: Expression to evaluate
+ * \param[in]       msg: Message to display on failure
+ */
+#define NX_ASSERT_MSG(expr, msg)                                               \
+    do {                                                                       \
+        if (!(expr)) {                                                         \
+            nx_assert_failed(__FILE__, __LINE__, msg);                         \
+        }                                                                      \
+    } while (0)
+
+#else /* NX_CONFIG_HAL_ASSERT_ENABLE */
+
+#define NX_ASSERT(expr)          ((void)0)
+#define NX_ASSERT_MSG(expr, msg) ((void)0)
+
+#endif /* NX_CONFIG_HAL_ASSERT_ENABLE */
+
+/**
+ * \brief           Static assert (compile-time)
+ * \param[in]       expr: Expression to evaluate
+ * \param[in]       msg: Message identifier (no spaces)
+ */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define NX_STATIC_ASSERT(expr, msg) _Static_assert(expr, #msg)
+#elif defined(__cplusplus) && __cplusplus >= 201103L
+#define NX_STATIC_ASSERT(expr, msg) static_assert(expr, #msg)
+#else
+#define NX_STATIC_ASSERT(expr, msg)                                            \
+    typedef char NX_STATIC_ASSERT_##msg[(expr) ? 1 : -1] NX_UNUSED
+#endif
 
 #ifdef __cplusplus
 }

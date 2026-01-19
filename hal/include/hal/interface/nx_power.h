@@ -33,9 +33,9 @@ typedef void (*nx_power_callback_t)(void* user_data, bool enabled);
 typedef struct nx_power_s nx_power_t;
 struct nx_power_s {
     /**
-     * \brief       Enable device power/clock
-     * \param[in]   self: Pointer to power interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Enable device power/clock
+     * \param[in]       self: Pointer to power interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function enables the peripheral clock and/or power domain
      * for the device. The device configuration is restored if it was
@@ -44,9 +44,9 @@ struct nx_power_s {
     nx_status_t (*enable)(nx_power_t* self);
 
     /**
-     * \brief       Disable device power/clock
-     * \param[in]   self: Pointer to power interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Disable device power/clock
+     * \param[in]       self: Pointer to power interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function disables the peripheral clock and/or power domain
      * for the device to reduce power consumption. The device configuration
@@ -55,18 +55,18 @@ struct nx_power_s {
     nx_status_t (*disable)(nx_power_t* self);
 
     /**
-     * \brief       Check if device power is enabled
-     * \param[in]   self: Pointer to power interface
-     * \return      true if enabled, false if disabled
+     * \brief           Check if device power is enabled
+     * \param[in]       self: Pointer to power interface
+     * \return          true if enabled, false if disabled
      */
     bool (*is_enabled)(nx_power_t* self);
 
     /**
-     * \brief       Set power state change callback
-     * \param[in]   self: Pointer to power interface
-     * \param[in]   callback: Callback function (NULL to disable)
-     * \param[in]   user_data: User data passed to callback
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Set power state change callback
+     * \param[in]       self: Pointer to power interface
+     * \param[in]       callback: Callback function (NULL to disable)
+     * \param[in]       user_data: User data passed to callback
+     * \return          NX_OK on success, error code otherwise
      *
      * The callback is invoked when the power state changes.
      */

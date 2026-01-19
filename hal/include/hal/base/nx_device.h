@@ -1,218 +1,167 @@
 /**
  * \file            nx_device.h
- * \brief           Device base class definition
+ * \brief           Kconfig-driven device registration mechanism
  * \author          Nexus Team
  *
- * This file defines the device base class that all HAL devices inherit from.
- * It provides common functionality including reference counting, state
- * management, and lifecycle operations.
+ * \details         This file provides a simplified device registration
+ *                  mechanism driven by Kconfig.Devices are registered at
+ *                  compile time using macros that traverse Kconfig-enabled
+ *                  instances.
  */
 
 #ifndef NX_DEVICE_H
 #define NX_DEVICE_H
 
-#include "hal/interface/nx_lifecycle.h"
 #include "hal/nx_status.h"
 #include "hal/nx_types.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * \brief           Maximum reference count value
- */
-#define NX_DEVICE_MAX_REF_COUNT 15
+/*---------------------------------------------------------------------------*/
+/* Helper Macros                                                             */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Forward declaration of device structure
+ * \brief           Concatenate two tokens
  */
-typedef struct nx_device_s nx_device_t;
+#define _NX_CONCAT(a, b) a##b
+#define NX_CONCAT(a, b)  _NX_CONCAT(a, b)
+
+/*---------------------------------------------------------------------------*/
+/* Device State Structure                                                    */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Device initialization function type
- * \param[in]       dev: Device descriptor
- * \return          Device interface pointer, NULL on failure
- *
- * This function is called to initialize the device and return
- * a pointer to the device-specific interface structure.
+ * \brief           Device Kconfig state structure
  */
-typedef void* (*nx_device_init_fn)(const nx_device_t* dev);
+typedef struct nx_device_config_state_s {
+    uint8_t init_res; /**< Initialization result */
+    bool initialized; /**< Initialization flag */
+} nx_device_config_state_t;
 
-/**
- * \brief           Device deinitialization function type
- * \param[in]       dev: Device descriptor
- * \return          NX_OK on success, error code otherwise
- */
-typedef nx_status_t (*nx_device_deinit_fn)(const nx_device_t* dev);
-
-/**
- * \brief           Device suspend function type
- * \param[in]       dev: Device descriptor
- * \return          NX_OK on success, error code otherwise
- */
-typedef nx_status_t (*nx_device_suspend_fn)(const nx_device_t* dev);
-
-/**
- * \brief           Device resume function type
- * \param[in]       dev: Device descriptor
- * \return          NX_OK on success, error code otherwise
- */
-typedef nx_status_t (*nx_device_resume_fn)(const nx_device_t* dev);
-
-/**
- * \brief           Device state structure (packed for memory efficiency)
- */
-typedef struct nx_device_state_s {
-    uint8_t init_result;     /**< Initialization result (nx_status_t) */
-    uint8_t initialized : 1; /**< Initialization flag */
-    uint8_t state       : 3; /**< Device state (nx_device_state_t) */
-    uint8_t ref_count   : 4; /**< Reference count (max 15) */
-} nx_device_state_info_t;
+/*---------------------------------------------------------------------------*/
+/* Device Descriptor Structure                                               */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Device descriptor structure
  *
- * This structure describes a device and provides the necessary
- * information and function pointers for device management.
- * Device descriptors are typically defined statically.
+ * This structure describes a device registered at compile time.
+ * It contains the device name, configuration, state, and initialization
+ * function pointer.
  */
-struct nx_device_s {
-    const char* name;           /**< Device name (unique identifier) */
-    const void* default_config; /**< Default configuration (ROM) */
-    void* runtime_config;       /**< Runtime configuration (RAM) */
-    size_t config_size;         /**< Configuration structure size */
+typedef struct nx_device_s {
+    const char* name;                                    /**< Device name */
+    const void* config;                                  /**< Device config */
+    struct nx_device_config_state_s* state;              /**< Device state */
+    void* (*device_init)(const struct nx_device_s* dev); /**< Init fn */
+    void* api;                                           /**< Cached API ptr */
+} nx_device_t;
 
-    nx_device_state_info_t state; /**< Device state information */
-
-    /* Lifecycle function pointers */
-    nx_device_init_fn device_init;     /**< Device initialization function */
-    nx_device_deinit_fn device_deinit; /**< Device deinitialization function */
-    nx_device_suspend_fn device_suspend; /**< Device suspend function */
-    nx_device_resume_fn device_resume;   /**< Device resume function */
-
-    void* priv; /**< Private data pointer */
-};
+/*---------------------------------------------------------------------------*/
+/* Device Registration Macro                                                 */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Get device interface (increment reference count)
- * \param[in]       name: Device name
- * \return          Device interface pointer, NULL if not found or error
+ * \brief           Register a device at compile time
+ * \param[in]       device_type: Device type identifier (e.g., NX_UART)
+ * \param[in]       index: Device index
+ * \param[in]       device_name: Device name string
+ * \param[in]       device_config: Pointer to device configuration
+ * \param[in]       device_state: Pointer to device state
+ * \param[in]       init: Device initialization function
  *
- * This function looks up a device by name, initializes it if necessary,
- * and increments the reference count. The returned pointer should be
- * released with nx_device_put() when no longer needed.
+ * This macro registers a device in the .nx_device linker section.
+ * The device will be automatically discovered at runtime.
  *
- * If the device is already initialized, this function returns the
- * existing interface and increments the reference count.
+ * Example:
+ * \code
+ * NX_DEVICE_REGISTER(NX_UART, 0, "UART0", &uart0_config,
+ *                    &uart0_state, uart0_init);
+ * \endcode
  */
-void* nx_device_get(const char* name);
+#if defined(_MSC_VER)
+/* MSVC: __declspec must come after storage class specifier */
+#define NX_DEVICE_REGISTER(device_type, index, device_name, device_config,     \
+                           device_state, init)                                 \
+    static NX_ALIGNED(sizeof(void*)) const nx_device_t NX_CONCAT(device_type,  \
+                                                                 index) = {    \
+        .name = device_name,                                                   \
+        .config = device_config,                                               \
+        .state = device_state,                                                 \
+        .device_init = init,                                                   \
+        .api = NULL,                                                           \
+    }
+#else
+/* GCC/Clang style attributes */
+#define NX_DEVICE_REGISTER(device_type, index, device_name, device_config,     \
+                           device_state, init)                                 \
+    NX_USED NX_SECTION(".nx_device")                                           \
+        NX_ALIGNED(sizeof(void*)) static const nx_device_t                     \
+        NX_CONCAT(device_type, index) = {                                      \
+            .name = device_name,                                               \
+            .config = device_config,                                           \
+            .state = device_state,                                             \
+            .device_init = init,                                               \
+            .api = NULL,                                                       \
+    }
+#endif
+
+/*---------------------------------------------------------------------------*/
+/* Instance Traversal Macro                                                  */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Release device (decrement reference count)
- * \param[in]       dev_intf: Device interface pointer
- * \return          NX_OK on success, error code otherwise
+ * \brief           Traverse all enabled instances of a device type
+ * \param[in]       fn: Function macro to call for each instance
+ * \param[in]       device_type: Device type identifier
  *
- * This function decrements the reference count for the device.
- * When the reference count reaches zero, the device is deinitialized
- * and its resources are released.
+ * This macro expands to call the provided function macro for each
+ * enabled instance of the device type. The instance list is generated
+ * by Kconfig using NX_DEFINE_INSTANCE_* macros.
+ *
+ * Example:
+ * \code
+ * #define UART_REGISTER(index) \
+ *     NX_DEVICE_REGISTER(NX_UART, index, "UART" #index, ...)
+ *
+ * NX_TRAVERSE_EACH_INSTANCE(UART_REGISTER, NX_UART);
+ * \endcode
  */
-nx_status_t nx_device_put(void* dev_intf);
+#define NX_TRAVERSE_EACH_INSTANCE(fn, device_type)                             \
+    NX_CONCAT(NX_DEFINE_INSTANCE_, device_type(fn))
+
+/*---------------------------------------------------------------------------*/
+/* Device Lookup Functions                                                   */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Find device descriptor (does not increment reference count)
+ * \brief           Find device descriptor by name
  * \param[in]       name: Device name
  * \return          Device descriptor pointer, NULL if not found
- *
- * This function looks up a device by name without initializing it
- * or modifying the reference count. Useful for checking if a device
- * exists or querying its state.
+ * \note            This function only finds the device, does not initialize
  */
 const nx_device_t* nx_device_find(const char* name);
 
 /**
- * \brief           Reinitialize device with new configuration
+ * \brief           Initialize device and cache the API pointer
  * \param[in]       dev: Device descriptor
- * \param[in]       new_config: New configuration (NULL to use default)
- * \return          NX_OK on success, error code otherwise
- *
- * This function deinitializes the device, updates its configuration,
- * and reinitializes it. The reference count is preserved.
+ * \return          Device API pointer, NULL on failure
+ * \note            This function caches the API pointer after first init
+ *                  Subsequent calls return the cached pointer
  */
-nx_status_t nx_device_reinit(const nx_device_t* dev, const void* new_config);
+void* nx_device_init(const nx_device_t* dev);
 
 /**
- * \brief           Get device reference count
- * \param[in]       dev: Device descriptor
- * \return          Current reference count
+ * \brief           Get device by name (find + init)
+ * \param[in]       name: Device name
+ * \return          Device API pointer, NULL if not found or init failed
+ * \note            This is a convenience function combining find and init
  */
-uint8_t nx_device_get_ref_count(const nx_device_t* dev);
-
-/**
- * \brief           Get device state
- * \param[in]       dev: Device descriptor
- * \return          Current device state
- */
-nx_device_state_t nx_device_get_state(const nx_device_t* dev);
-
-/**
- * \brief           Check if device is initialized
- * \param[in]       dev: Device descriptor
- * \return          true if initialized, false otherwise
- */
-bool nx_device_is_initialized(const nx_device_t* dev);
-
-/**
- * \brief           Register a device with the device manager
- * \param[in]       dev: Device descriptor to register
- * \return          NX_OK on success, error code otherwise
- *
- * This function registers a device descriptor with the device manager.
- * Devices must be registered before they can be accessed via nx_device_get().
- */
-nx_status_t nx_device_register(nx_device_t* dev);
-
-/**
- * \brief           Unregister a device from the device manager
- * \param[in]       dev: Device descriptor to unregister
- * \return          NX_OK on success, error code otherwise
- *
- * This function removes a device from the device manager.
- * The device must have a reference count of zero.
- */
-nx_status_t nx_device_unregister(nx_device_t* dev);
-
-/**
- * \brief           Device table entry macro for static device registration
- * \param[in]       _name: Device name string
- * \param[in]       _default_cfg: Pointer to default configuration
- * \param[in]       _runtime_cfg: Pointer to runtime configuration buffer
- * \param[in]       _cfg_size: Size of configuration structure
- * \param[in]       _init: Initialization function
- * \param[in]       _deinit: Deinitialization function
- * \param[in]       _suspend: Suspend function (can be NULL)
- * \param[in]       _resume: Resume function (can be NULL)
- */
-#define NX_DEVICE_DEFINE(_name, _default_cfg, _runtime_cfg, _cfg_size, _init,  \
-                         _deinit, _suspend, _resume)                           \
-    {                                                                          \
-        .name = (_name),                                                       \
-        .default_config = (_default_cfg),                                      \
-        .runtime_config = (_runtime_cfg),                                      \
-        .config_size = (_cfg_size),                                            \
-        .state =                                                               \
-            {                                                                  \
-                .init_result = NX_OK,                                          \
-                .initialized = 0,                                              \
-                .state = NX_DEV_STATE_UNINITIALIZED,                           \
-                .ref_count = 0,                                                \
-            },                                                                 \
-        .device_init = (_init),                                                \
-        .device_deinit = (_deinit),                                            \
-        .device_suspend = (_suspend),                                          \
-        .device_resume = (_resume),                                            \
-        .priv = NULL,                                                          \
-    }
+void* nx_device_get(const char* name);
 
 #ifdef __cplusplus
 }

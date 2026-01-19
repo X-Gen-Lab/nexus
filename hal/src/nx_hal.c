@@ -9,7 +9,7 @@
  */
 
 #include "hal/nx_hal.h"
-#include "hal/nx_device_registry.h"
+/* #include "hal/base/nx_device_registry.h" */ /* TODO: 实现静态注册表 */
 #include <stdbool.h>
 
 /*---------------------------------------------------------------------------*/
@@ -104,12 +104,15 @@ nx_status_t nx_hal_init(void) {
         return status;
     }
 
-    /* Initialize all devices in the static registry */
+    /* TODO: Initialize all devices in the static registry */
+    /* 静态注册表功能尚未实现 */
+    /*
     status = nx_device_registry_init_all();
     if (status != NX_OK) {
-        /* Log warning but continue - some devices may have failed */
-        /* Individual device errors are tracked in device state */
+        // Log warning but continue - some devices may have failed
+        // Individual device errors are tracked in device state
     }
+    */
 
     /* Mark as initialized */
     hal_initialized = true;
@@ -125,11 +128,14 @@ nx_status_t nx_hal_deinit(void) {
         return NX_OK;
     }
 
-    /* Deinitialize all devices in the static registry */
+    /* TODO: Deinitialize all devices in the static registry */
+    /* 静态注册表功能尚未实现 */
+    /*
     status = nx_device_registry_deinit_all();
     if (status != NX_OK) {
-        /* Log warning but continue - some devices may have failed */
+        // Log warning but continue - some devices may have failed
     }
+    */
 
     /* Deinitialize platform-specific hardware */
     status = nx_platform_deinit();

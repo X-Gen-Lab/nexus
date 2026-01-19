@@ -48,9 +48,9 @@ typedef enum nx_device_state_e {
 typedef struct nx_lifecycle_s nx_lifecycle_t;
 struct nx_lifecycle_s {
     /**
-     * \brief       Initialize the device
-     * \param[in]   self: Pointer to lifecycle interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Initialize the device
+     * \param[in]       self: Pointer to lifecycle interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function initializes the device hardware and prepares it for use.
      * After successful initialization, the device state should be RUNNING.
@@ -58,9 +58,9 @@ struct nx_lifecycle_s {
     nx_status_t (*init)(nx_lifecycle_t* self);
 
     /**
-     * \brief       Deinitialize the device
-     * \param[in]   self: Pointer to lifecycle interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Deinitialize the device
+     * \param[in]       self: Pointer to lifecycle interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function releases all resources held by the device and returns
      * it to the UNINITIALIZED state. After deinitialization, the device
@@ -69,9 +69,9 @@ struct nx_lifecycle_s {
     nx_status_t (*deinit)(nx_lifecycle_t* self);
 
     /**
-     * \brief       Suspend the device
-     * \param[in]   self: Pointer to lifecycle interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Suspend the device
+     * \param[in]       self: Pointer to lifecycle interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function puts the device into a low-power suspended state.
      * The device configuration is preserved and can be restored with resume().
@@ -79,9 +79,9 @@ struct nx_lifecycle_s {
     nx_status_t (*suspend)(nx_lifecycle_t* self);
 
     /**
-     * \brief       Resume the device from suspended state
-     * \param[in]   self: Pointer to lifecycle interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Resume the device from suspended state
+     * \param[in]       self: Pointer to lifecycle interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function restores the device from suspended state to running state.
      * The device configuration is restored to what it was before suspend().
@@ -89,9 +89,9 @@ struct nx_lifecycle_s {
     nx_status_t (*resume)(nx_lifecycle_t* self);
 
     /**
-     * \brief       Get current device state
-     * \param[in]   self: Pointer to lifecycle interface
-     * \return      Current device state
+     * \brief           Get current device state
+     * \param[in]       self: Pointer to lifecycle interface
+     * \return          Current device state
      */
     nx_device_state_t (*get_state)(nx_lifecycle_t* self);
 };

@@ -26,11 +26,11 @@ extern "C" {
 typedef struct nx_diagnostic_s nx_diagnostic_t;
 struct nx_diagnostic_s {
     /**
-     * \brief       Get current device status
-     * \param[in]   self: Pointer to diagnostic interface
-     * \param[out]  status: Buffer to store status information
-     * \param[in]   size: Size of status buffer
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Get current device status
+     * \param[in]       self: Pointer to diagnostic interface
+     * \param[out]      status: Buffer to store status information
+     * \param[in]       size: Size of status buffer
+     * \return          NX_OK on success, error code otherwise
      *
      * The status structure is device-specific and contains information
      * about the current operational state of the device.
@@ -38,11 +38,11 @@ struct nx_diagnostic_s {
     nx_status_t (*get_status)(nx_diagnostic_t* self, void* status, size_t size);
 
     /**
-     * \brief       Get device statistics
-     * \param[in]   self: Pointer to diagnostic interface
-     * \param[out]  stats: Buffer to store statistics
-     * \param[in]   size: Size of statistics buffer
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Get device statistics
+     * \param[in]       self: Pointer to diagnostic interface
+     * \param[out]      stats: Buffer to store statistics
+     * \param[in]       size: Size of statistics buffer
+     * \return          NX_OK on success, error code otherwise
      *
      * The statistics structure is device-specific and contains
      * accumulated performance data such as transfer counts,
@@ -52,9 +52,9 @@ struct nx_diagnostic_s {
                                   size_t size);
 
     /**
-     * \brief       Clear accumulated statistics
-     * \param[in]   self: Pointer to diagnostic interface
-     * \return      NX_OK on success, error code otherwise
+     * \brief           Clear accumulated statistics
+     * \param[in]       self: Pointer to diagnostic interface
+     * \return          NX_OK on success, error code otherwise
      *
      * This function resets all accumulated statistics to zero.
      */

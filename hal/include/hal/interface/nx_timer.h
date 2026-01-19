@@ -7,7 +7,6 @@
 #ifndef NX_TIMER_H
 #define NX_TIMER_H
 
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_status.h"
@@ -17,95 +16,201 @@
 extern "C" {
 #endif
 
-/**
- * \brief           Timer mode enumeration
- */
-typedef enum nx_timer_mode_e {
-    NX_TIMER_MODE_ONE_SHOT = 0,   /**< One-shot mode */
-    NX_TIMER_MODE_PERIODIC,       /**< Periodic mode */
-    NX_TIMER_MODE_PWM,            /**< PWM mode */
-    NX_TIMER_MODE_INPUT_CAPTURE,  /**< Input capture mode */
-    NX_TIMER_MODE_OUTPUT_COMPARE, /**< Output compare mode */
-} nx_timer_mode_t;
-
-/**
- * \brief           Timer configuration structure
- */
-typedef struct nx_timer_config_s {
-    nx_timer_mode_t mode;  /**< Timer mode */
-    uint32_t frequency_hz; /**< Timer frequency in Hz */
-    uint32_t period_us;    /**< Timer period in microseconds */
-    bool auto_reload;      /**< Auto-reload flag */
-    uint8_t prescaler;     /**< Prescaler value */
-} nx_timer_config_t;
-
-/**
- * \brief           PWM configuration structure
- */
-typedef struct nx_pwm_config_s {
-    uint32_t frequency_hz; /**< PWM frequency in Hz */
-    uint8_t duty_cycle;    /**< Duty cycle: 0-100 */
-    uint8_t channel;       /**< PWM channel */
-    bool inverted;         /**< Inverted output flag */
-} nx_pwm_config_t;
-
-/**
- * \brief           Timer statistics structure
- */
-typedef struct nx_timer_stats_s {
-    bool running;            /**< Running flag */
-    uint32_t overflow_count; /**< Overflow count */
-    uint32_t capture_count;  /**< Capture event count */
-    uint32_t compare_count;  /**< Compare event count */
-} nx_timer_stats_t;
+/*---------------------------------------------------------------------------*/
+/* Type Definitions                                                          */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Timer callback function type
- * \param[in]       context: User context pointer
+ * \param[in]       user_data: User context pointer
  */
-typedef void (*nx_timer_callback_t)(void* context);
+typedef void (*nx_timer_callback_t)(void* user_data);
+
+/*---------------------------------------------------------------------------*/
+/* Timer Base Interface                                                      */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Timer device interface
+ * \brief           Timer base timing interface
  */
-typedef struct nx_timer_s nx_timer_t;
-struct nx_timer_s {
-    /* Basic timer operations */
-    nx_status_t (*start)(nx_timer_t* self);
-    nx_status_t (*stop)(nx_timer_t* self);
-    nx_status_t (*reset)(nx_timer_t* self);
-    uint32_t (*get_counter)(nx_timer_t* self);
-    nx_status_t (*set_counter)(nx_timer_t* self, uint32_t value);
+typedef struct nx_timer_base_s nx_timer_base_t;
+struct nx_timer_base_s {
+    /**
+     * \brief           Start timer
+     * \param[in]       self: Interface pointer
+     */
+    void (*start)(nx_timer_base_t* self);
 
-    /* Timer callback */
-    nx_status_t (*set_callback)(nx_timer_t* self, nx_timer_callback_t cb,
-                                void* ctx);
-    nx_status_t (*clear_callback)(nx_timer_t* self);
+    /**
+     * \brief           Stop timer
+     * \param[in]       self: Interface pointer
+     */
+    void (*stop)(nx_timer_base_t* self);
 
-    /* PWM operations */
-    nx_status_t (*pwm_start)(nx_timer_t* self, uint8_t channel);
-    nx_status_t (*pwm_stop)(nx_timer_t* self, uint8_t channel);
-    nx_status_t (*pwm_set_duty_cycle)(nx_timer_t* self, uint8_t channel,
-                                      uint8_t duty_cycle);
-    nx_status_t (*pwm_get_config)(nx_timer_t* self, uint8_t channel,
-                                  nx_pwm_config_t* cfg);
-    nx_status_t (*pwm_set_config)(nx_timer_t* self, uint8_t channel,
-                                  const nx_pwm_config_t* cfg);
+    /**
+     * \brief           Set timer period
+     * \param[in]       self: Interface pointer
+     * \param[in]       prescaler: Prescaler value
+     * \param[in]       period: Period value
+     */
+    void (*set_period)(nx_timer_base_t* self, uint16_t prescaler,
+                       uint32_t period);
 
-    /* Runtime configuration */
-    nx_status_t (*set_frequency)(nx_timer_t* self, uint32_t frequency_hz);
-    nx_status_t (*set_period)(nx_timer_t* self, uint32_t period_us);
-    nx_status_t (*get_config)(nx_timer_t* self, nx_timer_config_t* cfg);
-    nx_status_t (*set_config)(nx_timer_t* self, const nx_timer_config_t* cfg);
+    /**
+     * \brief           Get timer counter value
+     * \param[in]       self: Interface pointer
+     * \return          Current counter value
+     */
+    uint32_t (*get_count)(nx_timer_base_t* self);
 
-    /* Base interfaces */
-    nx_lifecycle_t* (*get_lifecycle)(nx_timer_t* self);
-    nx_power_t* (*get_power)(nx_timer_t* self);
-    nx_diagnostic_t* (*get_diagnostic)(nx_timer_t* self);
+    /**
+     * \brief           Set timer callback
+     * \param[in]       self: Interface pointer
+     * \param[in]       callback: Callback function
+     * \param[in]       user_data: User context pointer
+     * \return          NX_OK on success
+     */
+    nx_status_t (*set_callback)(nx_timer_base_t* self,
+                                nx_timer_callback_t callback, void* user_data);
 
-    /* Diagnostics */
-    nx_status_t (*get_stats)(nx_timer_t* self, nx_timer_stats_t* stats);
-    nx_status_t (*clear_stats)(nx_timer_t* self);
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: Interface pointer
+     * \return          Lifecycle interface pointer
+     */
+    nx_lifecycle_t* (*get_lifecycle)(nx_timer_base_t* self);
+
+    /**
+     * \brief           Get power interface
+     * \param[in]       self: Interface pointer
+     * \return          Power interface pointer
+     */
+    nx_power_t* (*get_power)(nx_timer_base_t* self);
+};
+
+/*---------------------------------------------------------------------------*/
+/* PWM Channel Interface                                                     */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           PWM channel interface
+ */
+typedef struct nx_timer_pwm_channel_s nx_timer_pwm_channel_t;
+struct nx_timer_pwm_channel_s {
+    /**
+     * \brief           Set PWM duty cycle
+     * \param[in]       self: Interface pointer
+     * \param[in]       duty: Duty cycle value (0-period)
+     */
+    void (*set_duty)(nx_timer_pwm_channel_t* self, uint32_t duty);
+};
+
+/*---------------------------------------------------------------------------*/
+/* PWM Controller Interface                                                  */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           PWM controller interface
+ */
+typedef struct nx_timer_pwm_ctrl_s nx_timer_pwm_ctrl_t;
+struct nx_timer_pwm_ctrl_s {
+    /**
+     * \brief           Start PWM controller
+     * \param[in]       self: Interface pointer
+     */
+    void (*start)(nx_timer_pwm_ctrl_t* self);
+
+    /**
+     * \brief           Stop PWM controller
+     * \param[in]       self: Interface pointer
+     */
+    void (*stop)(nx_timer_pwm_ctrl_t* self);
+
+    /**
+     * \brief           Set PWM period
+     * \param[in]       self: Interface pointer
+     * \param[in]       prescaler: Prescaler value
+     * \param[in]       period: Period value
+     */
+    void (*set_period)(nx_timer_pwm_ctrl_t* self, uint16_t prescaler,
+                       uint32_t period);
+};
+
+/*---------------------------------------------------------------------------*/
+/* PWM Output Interface                                                      */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           PWM output interface
+ */
+typedef struct nx_timer_pwm_s nx_timer_pwm_t;
+struct nx_timer_pwm_s {
+    /**
+     * \brief           Get PWM channel interface
+     * \param[in]       self: Interface pointer
+     * \param[in]       channel_index: Channel index
+     * \return          PWM channel interface pointer
+     */
+    nx_timer_pwm_channel_t* (*get_channel)(nx_timer_pwm_t* self,
+                                           uint8_t channel_index);
+
+    /**
+     * \brief           Get PWM controller interface
+     * \param[in]       self: Interface pointer
+     * \return          PWM controller interface pointer
+     */
+    nx_timer_pwm_ctrl_t* (*get_controller)(nx_timer_pwm_t* self);
+
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: Interface pointer
+     * \return          Lifecycle interface pointer
+     */
+    nx_lifecycle_t* (*get_lifecycle)(nx_timer_pwm_t* self);
+
+    /**
+     * \brief           Get power interface
+     * \param[in]       self: Interface pointer
+     * \return          Power interface pointer
+     */
+    nx_power_t* (*get_power)(nx_timer_pwm_t* self);
+};
+
+/*---------------------------------------------------------------------------*/
+/* Encoder Interface                                                         */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Encoder interface
+ */
+typedef struct nx_timer_encoder_s nx_timer_encoder_t;
+struct nx_timer_encoder_s {
+    /**
+     * \brief           Get encoder count
+     * \param[in]       self: Interface pointer
+     * \return          Current encoder count (signed for direction)
+     */
+    int64_t (*get_count)(nx_timer_encoder_t* self);
+
+    /**
+     * \brief           Reset encoder count
+     * \param[in]       self: Interface pointer
+     */
+    void (*reset)(nx_timer_encoder_t* self);
+
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: Interface pointer
+     * \return          Lifecycle interface pointer
+     */
+    nx_lifecycle_t* (*get_lifecycle)(nx_timer_encoder_t* self);
+
+    /**
+     * \brief           Get power interface
+     * \param[in]       self: Interface pointer
+     * \return          Power interface pointer
+     */
+    nx_power_t* (*get_power)(nx_timer_encoder_t* self);
 };
 
 #ifdef __cplusplus

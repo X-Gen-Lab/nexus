@@ -17,118 +17,193 @@
 extern "C" {
 #endif
 
-/**
- * \brief           ADC resolution enumeration
- */
-typedef enum nx_adc_resolution_e {
-    NX_ADC_RESOLUTION_6BIT = 0, /**< 6-bit resolution */
-    NX_ADC_RESOLUTION_8BIT,     /**< 8-bit resolution */
-    NX_ADC_RESOLUTION_10BIT,    /**< 10-bit resolution */
-    NX_ADC_RESOLUTION_12BIT,    /**< 12-bit resolution */
-    NX_ADC_RESOLUTION_14BIT,    /**< 14-bit resolution */
-    NX_ADC_RESOLUTION_16BIT,    /**< 16-bit resolution */
-} nx_adc_resolution_t;
+/*---------------------------------------------------------------------------*/
+/* Type Definitions                                                          */
+/*---------------------------------------------------------------------------*/
 
 /**
- * \brief           ADC sampling time enumeration
+ * \brief           ADC buffer callback function type
+ * \param[in]       buffer: Pointer to sample buffer
+ * \param[in]       size: Number of samples in buffer
+ * \param[in]       user_data: User-provided context pointer
+ * \note            Buffer contains interleaved multi-channel samples
  */
-typedef enum nx_adc_sampling_time_e {
-    NX_ADC_SAMPLING_3_CYCLES = 0, /**< 3 cycles */
-    NX_ADC_SAMPLING_15_CYCLES,    /**< 15 cycles */
-    NX_ADC_SAMPLING_28_CYCLES,    /**< 28 cycles */
-    NX_ADC_SAMPLING_56_CYCLES,    /**< 56 cycles */
-    NX_ADC_SAMPLING_84_CYCLES,    /**< 84 cycles */
-    NX_ADC_SAMPLING_112_CYCLES,   /**< 112 cycles */
-    NX_ADC_SAMPLING_144_CYCLES,   /**< 144 cycles */
-    NX_ADC_SAMPLING_480_CYCLES,   /**< 480 cycles */
-} nx_adc_sampling_time_t;
+typedef void (*nx_adc_buffer_callback_t)(const uint32_t* buffer, size_t size,
+                                         void* user_data);
 
 /**
- * \brief           ADC trigger source enumeration
+ * \brief           ADC channel interface
+ * \details         Provides access to individual ADC channel values
  */
-typedef enum nx_adc_trigger_e {
-    NX_ADC_TRIGGER_SOFTWARE = 0, /**< Software trigger */
-    NX_ADC_TRIGGER_TIMER,        /**< Timer trigger */
-    NX_ADC_TRIGGER_EXTERNAL,     /**< External trigger */
-} nx_adc_trigger_t;
+typedef struct nx_adc_channel_s nx_adc_channel_t;
+struct nx_adc_channel_s {
+    /**
+     * \brief           Get ADC channel conversion value
+     * \param[in]       self: Channel interface pointer
+     * \return          Conversion result (raw value)
+     */
+    uint32_t (*get_value)(nx_adc_channel_t* self);
+};
 
 /**
- * \brief           ADC configuration structure
- */
-typedef struct nx_adc_config_s {
-    nx_adc_resolution_t resolution;       /**< ADC resolution */
-    nx_adc_sampling_time_t sampling_time; /**< Sampling time */
-    nx_adc_trigger_t trigger;             /**< Trigger source */
-    bool continuous_mode;                 /**< Continuous conversion mode */
-    bool dma_enable;                      /**< Enable DMA */
-    uint8_t channel_count;                /**< Number of channels */
-    uint8_t* channels;                    /**< Channel list */
-} nx_adc_config_t;
-
-/**
- * \brief           ADC statistics structure
- */
-typedef struct nx_adc_stats_s {
-    bool busy;                 /**< Busy flag */
-    uint32_t conversion_count; /**< Total conversions */
-    uint32_t overrun_count;    /**< Overrun error count */
-    uint32_t dma_error_count;  /**< DMA error count */
-} nx_adc_stats_t;
-
-/**
- * \brief           ADC conversion complete callback type
- * \param[in]       context: User context pointer
- * \param[in]       channel: ADC channel
- * \param[in]       value: Conversion result
- */
-typedef void (*nx_adc_callback_t)(void* context, uint8_t channel,
-                                  uint16_t value);
-
-/**
- * \brief           ADC device interface
+ * \brief           ADC device interface (simple single-shot mode)
+ * \details         Provides basic ADC trigger and channel access with
+ *                  lifecycle, power, and diagnostic management
  */
 typedef struct nx_adc_s nx_adc_t;
 struct nx_adc_s {
-    /* Single conversion operations */
-    nx_status_t (*read)(nx_adc_t* self, uint8_t channel, uint16_t* value);
-    nx_status_t (*read_voltage)(nx_adc_t* self, uint8_t channel,
-                                uint32_t* voltage_mv);
+    /**
+     * \brief           Trigger ADC conversion (single-shot mode)
+     * \param[in]       self: ADC interface pointer
+     * \note            Starts conversion on all configured channels
+     */
+    void (*trigger)(nx_adc_t* self);
 
-    /* Multi-channel operations */
-    nx_status_t (*read_multi)(nx_adc_t* self, uint8_t* channels, uint8_t count,
-                              uint16_t* values);
+    /**
+     * \brief           Get ADC channel interface
+     * \param[in]       self: ADC interface pointer
+     * \param[in]       channel_index: Channel index (0-based)
+     * \return          Channel interface pointer, NULL on invalid index
+     */
+    nx_adc_channel_t* (*get_channel)(nx_adc_t* self, uint8_t channel_index);
 
-    /* Continuous/DMA operations */
-    nx_status_t (*start_continuous)(nx_adc_t* self);
-    nx_status_t (*stop_continuous)(nx_adc_t* self);
-    nx_status_t (*get_buffer)(nx_adc_t* self, uint16_t* buffer, size_t* count);
-
-    /* Callback */
-    nx_status_t (*set_callback)(nx_adc_t* self, nx_adc_callback_t cb,
-                                void* ctx);
-    nx_status_t (*clear_callback)(nx_adc_t* self);
-
-    /* Calibration */
-    nx_status_t (*calibrate)(nx_adc_t* self);
-    nx_status_t (*set_reference_voltage)(nx_adc_t* self, uint32_t vref_mv);
-
-    /* Runtime configuration */
-    nx_status_t (*set_resolution)(nx_adc_t* self,
-                                  nx_adc_resolution_t resolution);
-    nx_status_t (*set_sampling_time)(nx_adc_t* self,
-                                     nx_adc_sampling_time_t time);
-    nx_status_t (*get_config)(nx_adc_t* self, nx_adc_config_t* cfg);
-    nx_status_t (*set_config)(nx_adc_t* self, const nx_adc_config_t* cfg);
-
-    /* Base interfaces */
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: ADC interface pointer
+     * \return          Lifecycle interface pointer
+     */
     nx_lifecycle_t* (*get_lifecycle)(nx_adc_t* self);
-    nx_power_t* (*get_power)(nx_adc_t* self);
-    nx_diagnostic_t* (*get_diagnostic)(nx_adc_t* self);
 
-    /* Diagnostics */
-    nx_status_t (*get_stats)(nx_adc_t* self, nx_adc_stats_t* stats);
-    nx_status_t (*clear_stats)(nx_adc_t* self);
+    /**
+     * \brief           Get power management interface
+     * \param[in]       self: ADC interface pointer
+     * \return          Power interface pointer
+     */
+    nx_power_t* (*get_power)(nx_adc_t* self);
+
+    /**
+     * \brief           Get diagnostic interface
+     * \param[in]       self: ADC interface pointer
+     * \return          Diagnostic interface pointer
+     */
+    nx_diagnostic_t* (*get_diagnostic)(nx_adc_t* self);
 };
+
+/**
+ * \brief           ADC buffered multi-channel sampling interface
+ * \details         High-performance interface that exposes internal buffer
+ *                  for direct access to multi-channel samples. Buffer size
+ *                  is a multiple of channel count for efficient DMA operation.
+ */
+typedef struct nx_adc_buffer_s nx_adc_buffer_t;
+struct nx_adc_buffer_s {
+    /**
+     * \brief           Trigger buffered sampling
+     * \param[in]       self: ADC buffer interface pointer
+     * \note            Starts sampling into internal buffer
+     */
+    void (*trigger)(nx_adc_buffer_t* self);
+
+    /**
+     * \brief           Register buffer-full callback
+     * \param[in]       self: ADC buffer interface pointer
+     * \param[in]       callback: Callback invoked when buffer is full
+     * \param[in]       user_data: User context passed to callback
+     * \note            Callback receives buffer pointer, size, and user_data
+     */
+    void (*register_callback)(nx_adc_buffer_t* self,
+                              nx_adc_buffer_callback_t callback,
+                              void* user_data);
+
+    /**
+     * \brief           Get sample buffer pointer
+     * \param[in]       self: ADC buffer interface pointer
+     * \return          Pointer to internal sample buffer
+     * \note            Buffer contains interleaved multi-channel samples
+     */
+    uint32_t* (*get_buffer)(nx_adc_buffer_t* self);
+
+    /**
+     * \brief           Get buffer capacity
+     * \param[in]       self: ADC buffer interface pointer
+     * \return          Total buffer size in samples (multiple of channel count)
+     */
+    size_t (*get_buffer_size)(nx_adc_buffer_t* self);
+
+    /**
+     * \brief           Get lifecycle interface
+     * \param[in]       self: ADC buffer interface pointer
+     * \return          Lifecycle interface pointer
+     */
+    nx_lifecycle_t* (*get_lifecycle)(nx_adc_buffer_t* self);
+
+    /**
+     * \brief           Get power management interface
+     * \param[in]       self: ADC buffer interface pointer
+     * \return          Power interface pointer
+     */
+    nx_power_t* (*get_power)(nx_adc_buffer_t* self);
+};
+
+/*---------------------------------------------------------------------------*/
+/* Initialization Macros                                                     */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Initialize ADC channel interface
+ * \param[in]       p: Pointer to nx_adc_channel_t structure
+ * \param[in]       _get_value: get_value function pointer
+ */
+#define NX_INIT_ADC_CHANNEL(p, _get_value)                                     \
+    do {                                                                       \
+        (p)->get_value = (_get_value);                                         \
+        NX_ASSERT((p)->get_value);                                             \
+    } while (0)
+
+/**
+ * \brief           Initialize ADC interface
+ * \param[in]       p: Pointer to nx_adc_t structure
+ * \param[in]       _trigger: trigger function pointer
+ * \param[in]       _get_channel: get_channel function pointer
+ * \param[in]       _get_lifecycle: get_lifecycle function pointer
+ * \param[in]       _get_power: get_power function pointer
+ * \param[in]       _get_diagnostic: get_diagnostic function pointer
+ */
+#define NX_INIT_ADC(p, _trigger, _get_channel, _get_lifecycle, _get_power,     \
+                    _get_diagnostic)                                           \
+    do {                                                                       \
+        (p)->trigger = (_trigger);                                             \
+        (p)->get_channel = (_get_channel);                                     \
+        (p)->get_lifecycle = (_get_lifecycle);                                 \
+        (p)->get_power = (_get_power);                                         \
+        (p)->get_diagnostic = (_get_diagnostic);                               \
+        NX_ASSERT((p)->trigger && (p)->get_channel);                           \
+        NX_ASSERT((p)->get_lifecycle);                                         \
+    } while (0)
+
+/**
+ * \brief           Initialize ADC buffer interface
+ * \param[in]       p: Pointer to nx_adc_buffer_t structure
+ * \param[in]       _trigger: trigger function pointer
+ * \param[in]       _register_callback: register_callback function pointer
+ * \param[in]       _get_buffer: get_buffer function pointer
+ * \param[in]       _get_buffer_size: get_buffer_size function pointer
+ * \param[in]       _get_lifecycle: get_lifecycle function pointer
+ * \param[in]       _get_power: get_power function pointer
+ */
+#define NX_INIT_ADC_BUFFER(p, _trigger, _register_callback, _get_buffer,       \
+                           _get_buffer_size, _get_lifecycle, _get_power)       \
+    do {                                                                       \
+        (p)->trigger = (_trigger);                                             \
+        (p)->register_callback = (_register_callback);                         \
+        (p)->get_buffer = (_get_buffer);                                       \
+        (p)->get_buffer_size = (_get_buffer_size);                             \
+        (p)->get_lifecycle = (_get_lifecycle);                                 \
+        (p)->get_power = (_get_power);                                         \
+        NX_ASSERT((p)->trigger && (p)->register_callback);                     \
+        NX_ASSERT((p)->get_buffer && (p)->get_buffer_size);                    \
+        NX_ASSERT((p)->get_lifecycle);                                         \
+    } while (0)
 
 #ifdef __cplusplus
 }
