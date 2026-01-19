@@ -48,9 +48,6 @@ static bool g_uart_backend_initialized = false;
 
 /**
  * \brief           Non-blocking read from UART
- * \param[out]      data: Buffer to store read data
- * \param[in]       max_len: Maximum number of bytes to read
- * \return          Number of bytes actually read, 0 if no data available
  */
 static int uart_backend_read(uint8_t* data, int max_len) {
     if (!g_uart_backend_initialized || g_uart == NULL) {
@@ -67,9 +64,13 @@ static int uart_backend_read(uint8_t* data, int max_len) {
         return 0;
     }
 
-    /* Read available data */
-    size_t count = rx_async->read(rx_async, data, (size_t)max_len);
-    return (int)count;
+    /* Read available data using new interface */
+    size_t len = (size_t)max_len;
+    nx_status_t status = rx_async->receive(rx_async, data, &len);
+    if (status != NX_OK) {
+        return 0;
+    }
+    return (int)len;
 }
 
 /**
