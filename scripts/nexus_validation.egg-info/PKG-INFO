@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: nexus-validation
+Version: 1.0.0
+Requires-Dist: pytest>=7.4.0
+Requires-Dist: pytest-cov>=4.1.0
+Requires-Dist: hypothesis>=6.82.0
+Requires-Dist: coverage>=7.2.0
+Requires-Dist: jinja2>=3.1.2
+Requires-Dist: junit-xml>=1.9
+Requires-Dist: pyyaml>=6.0
+Dynamic: requires-dist

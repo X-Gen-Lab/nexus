@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码覆盖率报告 - Nexus 系统验证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .timestamp {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            color: #1e293b;
+            font-size: 1.8em;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 700;
+        }
+
+        .coverage-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .coverage-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .coverage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .coverage-card h3 {
+            color: #64748b;
+            font-size: 1em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .coverage-percentage {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .coverage-good {
+            color: #059669;
+        }
+
+        .coverage-warning {
+            color: #d97706;
+        }
+
+        .coverage-bad {
+            color: #dc2626;
+        }
+
+        .coverage-details {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #64748b;
+        }
+
+        .threshold-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .threshold-pass {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+
+        .threshold-fail {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .file-coverage-table {
+            margin: 30px 0;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        td {
+            color: #374151;
+        }
+
+        .file-path {
+            font-family: 'Courier New', monospace;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .coverage-bar-cell {
+            min-width: 200px;
+        }
+
+        .coverage-bar {
+            width: 100%;
+            height: 24px;
+            background-color: #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .coverage-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+        }
+
+        .coverage-bar-good {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        }
+
+        .coverage-bar-warning {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .coverage-bar-bad {
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .uncovered-section {
+            margin: 40px 0;
+        }
+
+        .uncovered-list {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .uncovered-item {
+            padding: 12px;
+            margin: 8px 0;
+            background-color: white;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .uncovered-location {
+            color: #374151;
+        }
+
+        .uncovered-line {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-good {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .legend-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .legend-bad {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .filter-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .filter-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+            font-size: 1.2em;
+        }
+
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px 40px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .coverage-card:hover {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .coverage-summary {
+                grid-template-columns: 1fr;
+            }
+            .content {
+                padding: 20px;
+            }
+            .legend {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 代码覆盖率报告</h1>
+            <p class="timestamp">生成时间: {{ timestamp }}</p>
+        </div>
+
+        <div class="content">
+            {% if coverage %}
+            <div class="section-title">覆盖率概览</div>
+
+            <div class="coverage-summary">
+                <div class="coverage-card">
+                    <h3>行覆盖率</h3>
+                    <div class="coverage-percentage {% if coverage.line_coverage >= 80 %}coverage-good{% elif coverage.line_coverage >= 60 %}coverage-warning{% else %}coverage-bad{% endif %}">
+                        {{ "%.1f"|format(coverage.line_coverage) }}%
+                    </div>
+                    <div class="coverage-details">
+                        {% if coverage.line_coverage >= threshold * 100 %}
+                        <span class="threshold-indicator threshold-pass">✓ 达到阈值</span>
+                        {% else %}
+                        <span class="threshold-indicator threshold-fail">✗ 低于阈值 ({{ threshold * 100 }}%)</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="coverage-card">
+                    <h3>分支覆盖率</h3>
+                    <div class="coverage-percentage {% if coverage.branch_coverage >= 80 %}coverage-good{% elif coverage.branch_coverage >= 60 %}coverage-warning{% else %}coverage-bad{% endif %}">
+                        {{ "%.1f"|format(coverage.branch_coverage) }}%
+                    </div>
+                    <div class="coverage-details">
+                        {% if coverage.branch_coverage >= threshold * 100 %}
+                        <span class="threshold-indicator threshold-pass">✓ 达到阈值</span>
+                        {% else %}
+                        <span class="threshold-indicator threshold-fail">✗ 低于阈值 ({{ threshold * 100 }}%)</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="coverage-card">
+                    <h3>函数覆盖率</h3>
+                    <div class="coverage-percentage {% if coverage.function_coverage >= 80 %}coverage-good{% elif coverage.function_coverage >= 60 %}coverage-warning{% else %}coverage-bad{% endif %}">
+                        {{ "%.1f"|format(coverage.function_coverage) }}%
+                    </div>
+                    <div class="coverage-details">
+                        {% if coverage.function_coverage >= threshold * 100 %}
+                        <span class="threshold-indicator threshold-pass">✓ 达到阈值</span>
+                        {% else %}
+                        <span class="threshold-indicator threshold-fail">✗ 低于阈值 ({{ threshold * 100 }}%)</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color legend-good"></div>
+                    <span>优秀 (≥80%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-warning"></div>
+                    <span>警告 (60-80%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-bad"></div>
+                    <span>不足 (<60%)</span>
+                </div>
+            </div>
+
+            {% if file_coverage %}
+            <div class="section-title">文件级覆盖率</div>
+
+            <div class="filter-section">
+                <input type="text" id="fileFilter" placeholder="🔍 搜索文件路径..." onkeyup="filterFiles()">
+            </div>
+
+            <div class="file-coverage-table">
+                <table id="coverageTable">
+                    <thead>
+                        <tr>
+                            <th>文件路径</th>
+                            <th style="text-align: center;">行覆盖率</th>
+                            <th style="text-align: center;">分支覆盖率</th>
+                            <th style="text-align: center;">函数覆盖率</th>
+                            <th class="coverage-bar-cell">覆盖率可视化</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in file_coverage %}
+                        <tr>
+                            <td class="file-path">{{ file.path }}</td>
+                            <td style="text-align: center; font-weight: 600; {% if file.line_coverage >= 80 %}color: #059669;{% elif file.line_coverage >= 60 %}color: #d97706;{% else %}color: #dc2626;{% endif %}">
+                                {{ "%.1f"|format(file.line_coverage) }}%
+                            </td>
+                            <td style="text-align: center; font-weight: 600; {% if file.branch_coverage >= 80 %}color: #059669;{% elif file.branch_coverage >= 60 %}color: #d97706;{% else %}color: #dc2626;{% endif %}">
+                                {{ "%.1f"|format(file.branch_coverage) }}%
+                            </td>
+                            <td style="text-align: center; font-weight: 600; {% if file.function_coverage >= 80 %}color: #059669;{% elif file.function_coverage >= 60 %}color: #d97706;{% else %}color: #dc2626;{% endif %}">
+                                {{ "%.1f"|format(file.function_coverage) }}%
+                            </td>
+                            <td class="coverage-bar-cell">
+                                <div class="coverage-bar">
+                                    <div class="coverage-bar-fill {% if file.line_coverage >= 80 %}coverage-bar-good{% elif file.line_coverage >= 60 %}coverage-bar-warning{% else %}coverage-bar-bad{% endif %}"
+                                         style="width: {{ file.line_coverage }}%">
+                                        {{ "%.0f"|format(file.line_coverage) }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            {% if coverage.uncovered_lines %}
+            <div class="uncovered-section">
+                <div class="section-title">未覆盖的代码行</div>
+                <div class="uncovered-list">
+                    {% for location in coverage.uncovered_lines[:50] %}
+                    <div class="uncovered-item">
+                        <span class="uncovered-location">{{ location.file_path }}</span>
+                        <span class="uncovered-line">行 {{ location.line_number }}{% if location.function_name %} ({{ location.function_name }}){% endif %}</span>
+                    </div>
+                    {% endfor %}
+                    {% if coverage.uncovered_lines|length > 50 %}
+                    <div style="text-align: center; margin-top: 20px; color: #64748b;">
+                        ... 还有 {{ coverage.uncovered_lines|length - 50 }} 个未覆盖的代码行
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if coverage.uncovered_branches %}
+            <div class="uncovered-section">
+                <div class="section-title">未覆盖的分支</div>
+                <div class="uncovered-list">
+                    {% for location in coverage.uncovered_branches[:50] %}
+                    <div class="uncovered-item">
+                        <span class="uncovered-location">{{ location.file_path }}</span>
+                        <span class="uncovered-line">行 {{ location.line_number }}{% if location.function_name %} ({{ location.function_name }}){% endif %}</span>
+                    </div>
+                    {% endfor %}
+                    {% if coverage.uncovered_branches|length > 50 %}
+                    <div style="text-align: center; margin-top: 20px; color: #64748b;">
+                        ... 还有 {{ coverage.uncovered_branches|length - 50 }} 个未覆盖的分支
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="no-data">
+                <p>📊 暂无覆盖率数据</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">请启用覆盖率收集后重新运行验证</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <p>Nexus 系统验证框架 | 自动生成于 {{ timestamp }}</p>
+        </div>
+    </div>
+
+    <script>
+        function filterFiles() {
+            const input = document.getElementById('fileFilter');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('coverageTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const filePathCell = rows[i].getElementsByClassName('file-path')[0];
+                if (filePathCell) {
+                    const filePath = filePathCell.textContent || filePathCell.innerText;
+                    if (filePath.toLowerCase().indexOf(filter) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

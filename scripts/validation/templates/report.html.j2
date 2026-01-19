@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus 系统验证报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            font-size: 1.5em;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .status-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-failure {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .summary-card.passed .value {
+            color: #27ae60;
+        }
+
+        .summary-card.failed .value {
+            color: #e74c3c;
+        }
+
+        .summary-card.skipped .value {
+            color: #f39c12;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }
+
+        .failure-item {
+            background-color: #fff5f5;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .failure-item h4 {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .failure-item pre {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        .coverage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .coverage-card {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .coverage-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .coverage-percentage {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .coverage-good {
+            color: #27ae60;
+        }
+
+        .coverage-warning {
+            color: #f39c12;
+        }
+
+        .coverage-bad {
+            color: #e74c3c;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Nexus 系统验证报告</h1>
+            <p class="timestamp">生成时间: {{ timestamp }}</p>
+            <div class="status-badge {% if success %}status-success{% else %}status-failure{% endif %}">
+                {% if success %}✓ 验证通过{% else %}✗ 验证失败{% endif %}
+            </div>
+        </div>
+
+        <h2>测试汇总</h2>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>总测试数</h3>
+                <div class="value">{{ total_tests }}</div>
+            </div>
+            <div class="summary-card passed">
+                <h3>通过</h3>
+                <div class="value">{{ passed_tests }}</div>
+            </div>
+            <div class="summary-card failed">
+                <h3>失败</h3>
+                <div class="value">{{ failed_tests }}</div>
+            </div>
+            <div class="summary-card skipped">
+                <h3>跳过</h3>
+                <div class="value">{{ skipped_tests }}</div>
+            </div>
+            <div class="summary-card">
+                <h3>执行时间</h3>
+                <div class="value">{{ "%.2f"|format(execution_time) }}s</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ pass_rate }}%">
+                {{ "%.1f"|format(pass_rate) }}% 通过
+            </div>
+        </div>
+
+        <h2>测试套件详情</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>测试套件</th>
+                    <th>总数</th>
+                    <th>通过</th>
+                    <th>失败</th>
+                    <th>跳过</th>
+                    <th>通过率</th>
+                    <th>执行时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in test_results %}
+                <tr>
+                    <td><strong>{{ result.suite_name }}</strong></td>
+                    <td>{{ result.total_tests }}</td>
+                    <td style="color: #27ae60;">{{ result.passed_tests }}</td>
+                    <td style="color: #e74c3c;">{{ result.failed_tests }}</td>
+                    <td style="color: #f39c12;">{{ result.skipped_tests }}</td>
+                    <td>{{ "%.1f"|format(result.pass_rate) }}%</td>
+                    <td>{{ "%.3f"|format(result.execution_time) }}s</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if failures %}
+        <h2>失败测试详情</h2>
+        {% for failure in failures %}
+        <div class="failure-item">
+            <h4>{{ failure.suite_name }} :: {{ failure.test_name }}</h4>
+            <p><strong>错误消息:</strong></p>
+            <pre>{{ failure.error_message }}</pre>
+            {% if failure.stack_trace %}
+            <p><strong>堆栈跟踪:</strong></p>
+            <pre>{{ failure.stack_trace }}</pre>
+            {% endif %}
+            {% if failure.counterexample %}
+            <p><strong>属性测试反例:</strong></p>
+            <pre>{{ failure.counterexample }}</pre>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if coverage %}
+        <h2>代码覆盖率</h2>
+        <div class="coverage-grid">
+            <div class="coverage-card">
+                <h3>行覆盖率</h3>
+                <div class="coverage-percentage {% if coverage.line_coverage >= 80 %}coverage-good{% elif coverage.line_coverage >= 60 %}coverage-warning{% else %}coverage-bad{% endif %}">
+                    {{ "%.1f"|format(coverage.line_coverage) }}%
+                </div>
+            </div>
+            <div class="coverage-card">
+                <h3>分支覆盖率</h3>
+                <div class="coverage-percentage {% if coverage.branch_coverage >= 80 %}coverage-good{% elif coverage.branch_coverage >= 60 %}coverage-warning{% else %}coverage-bad{% endif %}">
+                    {{ "%.1f"|format(coverage.branch_coverage) }}%
+                </div>
+            </div>
+            <div class="coverage-card">
+                <h3>函数覆盖率</h3>
+                <div class="coverage-percentage {% if coverage.function_coverage >= 80 %}coverage-good{% elif coverage.function_coverage >= 60 %}coverage-warning{% else %}coverage-bad{% endif %}">
+                    {{ "%.1f"|format(coverage.function_coverage) }}%
+                </div>
+            </div>
+        </div>
+        <p style="margin-top: 20px; color: #7f8c8d;">
+            未覆盖行数: {{ coverage.uncovered_lines_count }} |
+            未覆盖分支数: {{ coverage.uncovered_branches_count }}
+        </p>
+        {% endif %}
+    </div>
+</body>
+</html>

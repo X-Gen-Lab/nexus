@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+\file            junit.xml.j2
+\brief           JUnit XML报告模板
+\author          Nexus Team
+
+\details         符合JUnit XML Schema的测试报告模板，用于CI工具集成
+-->
+<testsuites tests="{{ total_tests }}"
+            failures="{{ total_failures }}"
+            skipped="{{ total_skipped }}"
+            time="{{ "%.3f"|format(total_time) }}"
+            timestamp="{{ timestamp }}">
+{% for result in test_results %}
+  <testsuite name="{{ result.suite_name|e }}"
+             tests="{{ result.total_tests }}"
+             failures="{{ result.failed_tests }}"
+             skipped="{{ result.skipped_tests }}"
+             time="{{ "%.3f"|format(result.execution_time) }}"
+             timestamp="{{ timestamp }}">
+    {% for i in range(result.passed_tests) %}
+    <testcase name="test_{{ i + 1 }}"
+              classname="{{ result.suite_name|e }}"
+              time="0.000" />
+    {% endfor %}
+    {% for failure in result.failures %}
+    <testcase name="{{ failure.test_name|e }}"
+              classname="{{ result.suite_name|e }}"
+              time="0.000">
+      <failure message="{{ failure.error_message|e }}"
+               type="AssertionError">{{ failure.error_message|e }}
+{% if failure.stack_trace %}
+
+堆栈跟踪:
+{{ failure.stack_trace|e }}
+{% endif %}
+{% if failure.counterexample %}
+
+属性测试反例:
+{{ failure.counterexample|e }}
+{% endif %}</failure>
+    </testcase>
+    {% endfor %}
+    {% for i in range(result.skipped_tests) %}
+    <testcase name="skipped_test_{{ i + 1 }}"
+              classname="{{ result.suite_name|e }}"
+              time="0.000">
+      <skipped message="Test skipped" />
+    </testcase>
+    {% endfor %}
+  </testsuite>
+{% endfor %}
+</testsuites>

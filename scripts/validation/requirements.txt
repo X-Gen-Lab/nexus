@@ -1,0 +1,19 @@
+# Nexus 系统验证框架依赖
+
+# 测试框架
+pytest>=7.4.0
+pytest-cov>=4.1.0
+hypothesis>=6.82.0
+
+# 覆盖率工具
+coverage>=7.2.0
+
+# 报告生成
+jinja2>=3.1.2
+junit-xml>=1.9
+
+# 数据处理
+pyyaml>=6.0
+
+# 类型检查
+mypy>=1.4.0
