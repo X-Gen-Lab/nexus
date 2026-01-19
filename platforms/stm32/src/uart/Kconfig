@@ -17,14 +17,14 @@ config STM32_UART_MAX_INSTANCES
 #
 # UART1 Configuration
 #
-menuconfig INSTANCE_STM32_UART_1
+menuconfig INSTANCE_NX_UART_1
     bool "Enable UART1"
     default y
     depends on STM32_UART_ENABLE
     help
       Enable UART instance 1.
 
-if INSTANCE_STM32_UART_1
+if INSTANCE_NX_UART_1
 
 config UART1_BAUDRATE
     int "UART1 baud rate"
@@ -51,54 +51,54 @@ config UART1_STOP_BITS
 
 choice
     prompt "UART1 parity"
-    default STM32_UART1_PARITY_NONE
+    default NX_UART1_PARITY_NONE
     help
       Parity setting for UART1.
 
-config STM32_UART1_PARITY_NONE
+config NX_UART1_PARITY_NONE
     bool "None"
 
-config STM32_UART1_PARITY_ODD
+config NX_UART1_PARITY_ODD
     bool "Odd"
 
-config STM32_UART1_PARITY_EVEN
+config NX_UART1_PARITY_EVEN
     bool "Even"
 
 endchoice
 
 config UART1_PARITY_VALUE
     int
-    default 0 if STM32_UART1_PARITY_NONE
-    default 1 if STM32_UART1_PARITY_ODD
-    default 2 if STM32_UART1_PARITY_EVEN
+    default 0 if NX_UART1_PARITY_NONE
+    default 1 if NX_UART1_PARITY_ODD
+    default 2 if NX_UART1_PARITY_EVEN
     help
       Internal parity value for code generation.
 
 choice
     prompt "UART1 transfer mode"
-    default STM32_UART1_MODE_DMA
+    default NX_UART1_MODE_DMA
     help
       Transfer mode for UART1.
       - Polling: Simple but blocks CPU
       - Interrupt: Efficient for low data rates
       - DMA: Best for high data rates
 
-config STM32_UART1_MODE_POLLING
+config NX_UART1_MODE_POLLING
     bool "Polling"
 
-config STM32_UART1_MODE_INTERRUPT
+config NX_UART1_MODE_INTERRUPT
     bool "Interrupt"
 
-config STM32_UART1_MODE_DMA
+config NX_UART1_MODE_DMA
     bool "DMA"
 
 endchoice
 
 config UART1_MODE_VALUE
     int
-    default 0 if STM32_UART1_MODE_POLLING
-    default 1 if STM32_UART1_MODE_INTERRUPT
-    default 2 if STM32_UART1_MODE_DMA
+    default 0 if NX_UART1_MODE_POLLING
+    default 1 if NX_UART1_MODE_INTERRUPT
+    default 2 if NX_UART1_MODE_DMA
     help
       Internal mode value for code generation.
 
@@ -120,7 +120,7 @@ config UART1_DMA_TX_CHANNEL
     int "UART1 DMA TX channel"
     default 4
     range 0 15
-    depends on STM32_UART1_MODE_DMA
+    depends on NX_UART1_MODE_DMA
     help
       DMA channel for UART1 TX transfers.
 
@@ -128,7 +128,7 @@ config UART1_DMA_RX_CHANNEL
     int "UART1 DMA RX channel"
     default 5
     range 0 15
-    depends on STM32_UART1_MODE_DMA
+    depends on NX_UART1_MODE_DMA
     help
       DMA channel for UART1 RX transfers.
 
@@ -160,19 +160,19 @@ config UART1_RX_PORT
 
 endmenu
 
-endif # INSTANCE_STM32_UART_1
+endif # INSTANCE_NX_UART_1
 
 #
 # UART2 Configuration
 #
-menuconfig INSTANCE_STM32_UART_2
+menuconfig INSTANCE_NX_UART_2
     bool "Enable UART2"
     default n
     depends on STM32_UART_ENABLE
     help
       Enable UART instance 2.
 
-if INSTANCE_STM32_UART_2
+if INSTANCE_NX_UART_2
 
 config UART2_BAUDRATE
     int "UART2 baud rate"
@@ -196,45 +196,45 @@ config UART2_STOP_BITS
 
 choice
     prompt "UART2 parity"
-    default STM32_UART2_PARITY_NONE
+    default NX_UART2_PARITY_NONE
 
-config STM32_UART2_PARITY_NONE
+config NX_UART2_PARITY_NONE
     bool "None"
 
-config STM32_UART2_PARITY_ODD
+config NX_UART2_PARITY_ODD
     bool "Odd"
 
-config STM32_UART2_PARITY_EVEN
+config NX_UART2_PARITY_EVEN
     bool "Even"
 
 endchoice
 
 config UART2_PARITY_VALUE
     int
-    default 0 if STM32_UART2_PARITY_NONE
-    default 1 if STM32_UART2_PARITY_ODD
-    default 2 if STM32_UART2_PARITY_EVEN
+    default 0 if NX_UART2_PARITY_NONE
+    default 1 if NX_UART2_PARITY_ODD
+    default 2 if NX_UART2_PARITY_EVEN
 
 choice
     prompt "UART2 transfer mode"
-    default STM32_UART2_MODE_DMA
+    default NX_UART2_MODE_DMA
 
-config STM32_UART2_MODE_POLLING
+config NX_UART2_MODE_POLLING
     bool "Polling"
 
-config STM32_UART2_MODE_INTERRUPT
+config NX_UART2_MODE_INTERRUPT
     bool "Interrupt"
 
-config STM32_UART2_MODE_DMA
+config NX_UART2_MODE_DMA
     bool "DMA"
 
 endchoice
 
 config UART2_MODE_VALUE
     int
-    default 0 if STM32_UART2_MODE_POLLING
-    default 1 if STM32_UART2_MODE_INTERRUPT
-    default 2 if STM32_UART2_MODE_DMA
+    default 0 if NX_UART2_MODE_POLLING
+    default 1 if NX_UART2_MODE_INTERRUPT
+    default 2 if NX_UART2_MODE_DMA
 
 config UART2_TX_BUFFER_SIZE
     int "UART2 TX buffer size"
@@ -254,13 +254,13 @@ config UART2_DMA_TX_CHANNEL
     int "UART2 DMA TX channel"
     default 6
     range 0 15
-    depends on STM32_UART2_MODE_DMA
+    depends on NX_UART2_MODE_DMA
 
 config UART2_DMA_RX_CHANNEL
     int "UART2 DMA RX channel"
     default 7
     range 0 15
-    depends on STM32_UART2_MODE_DMA
+    depends on NX_UART2_MODE_DMA
 
 menu "UART2 Pin Configuration"
 
@@ -286,19 +286,19 @@ config UART2_RX_PORT
 
 endmenu
 
-endif # INSTANCE_STM32_UART_2
+endif # INSTANCE_NX_UART_2
 
 #
 # UART3 Configuration
 #
-menuconfig INSTANCE_STM32_UART_3
+menuconfig INSTANCE_NX_UART_3
     bool "Enable UART3"
     default n
     depends on STM32_UART_ENABLE
     help
       Enable UART instance 3.
 
-if INSTANCE_STM32_UART_3
+if INSTANCE_NX_UART_3
 
 config UART3_BAUDRATE
     int "UART3 baud rate"
@@ -316,45 +316,45 @@ config UART3_STOP_BITS
 
 choice
     prompt "UART3 parity"
-    default STM32_UART3_PARITY_NONE
+    default NX_UART3_PARITY_NONE
 
-config STM32_UART3_PARITY_NONE
+config NX_UART3_PARITY_NONE
     bool "None"
 
-config STM32_UART3_PARITY_ODD
+config NX_UART3_PARITY_ODD
     bool "Odd"
 
-config STM32_UART3_PARITY_EVEN
+config NX_UART3_PARITY_EVEN
     bool "Even"
 
 endchoice
 
 config UART3_PARITY_VALUE
     int
-    default 0 if STM32_UART3_PARITY_NONE
-    default 1 if STM32_UART3_PARITY_ODD
-    default 2 if STM32_UART3_PARITY_EVEN
+    default 0 if NX_UART3_PARITY_NONE
+    default 1 if NX_UART3_PARITY_ODD
+    default 2 if NX_UART3_PARITY_EVEN
 
 choice
     prompt "UART3 transfer mode"
-    default STM32_UART3_MODE_DMA
+    default NX_UART3_MODE_DMA
 
-config STM32_UART3_MODE_POLLING
+config NX_UART3_MODE_POLLING
     bool "Polling"
 
-config STM32_UART3_MODE_INTERRUPT
+config NX_UART3_MODE_INTERRUPT
     bool "Interrupt"
 
-config STM32_UART3_MODE_DMA
+config NX_UART3_MODE_DMA
     bool "DMA"
 
 endchoice
 
 config UART3_MODE_VALUE
     int
-    default 0 if STM32_UART3_MODE_POLLING
-    default 1 if STM32_UART3_MODE_INTERRUPT
-    default 2 if STM32_UART3_MODE_DMA
+    default 0 if NX_UART3_MODE_POLLING
+    default 1 if NX_UART3_MODE_INTERRUPT
+    default 2 if NX_UART3_MODE_DMA
 
 config UART3_TX_BUFFER_SIZE
     int "UART3 TX buffer size"
@@ -370,13 +370,13 @@ config UART3_DMA_TX_CHANNEL
     int "UART3 DMA TX channel"
     default 2
     range 0 15
-    depends on STM32_UART3_MODE_DMA
+    depends on NX_UART3_MODE_DMA
 
 config UART3_DMA_RX_CHANNEL
     int "UART3 DMA RX channel"
     default 3
     range 0 15
-    depends on STM32_UART3_MODE_DMA
+    depends on NX_UART3_MODE_DMA
 
 menu "UART3 Pin Configuration"
 
@@ -402,4 +402,4 @@ config UART3_RX_PORT
 
 endmenu
 
-endif # INSTANCE_STM32_UART_3
+endif # INSTANCE_NX_UART_3
