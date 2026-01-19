@@ -1,0 +1,12 @@
+# platforms/gd32/Kconfig - GD32 platform configuration
+#
+# This file will be implemented in future tasks
+
+if PLATFORM_GD32
+
+# Placeholder - to be implemented
+config GD32_PLACEHOLDER
+    bool
+    default y
+
+endif # PLATFORM_GD32

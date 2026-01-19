@@ -1,0 +1,12 @@
+# platforms/esp32/Kconfig - ESP32 platform configuration
+#
+# This file will be implemented in future tasks
+
+if PLATFORM_ESP32
+
+# Placeholder - to be implemented
+config ESP32_PLACEHOLDER
+    bool
+    default y
+
+endif # PLATFORM_ESP32

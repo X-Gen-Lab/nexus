@@ -1,0 +1,114 @@
+#
+# STM32 Peripheral Configuration
+#
+# This file defines peripheral configuration menus and imports
+# peripheral-specific Kconfig files.
+#
+
+menu "Peripheral Configuration"
+
+#
+# UART Configuration
+#
+menuconfig STM32_UART_ENABLE
+    bool "Enable UART support"
+    default y
+    help
+      Enable UART (Universal Asynchronous Receiver/Transmitter) support
+      for the STM32 platform. UART is used for serial communication.
+
+if STM32_UART_ENABLE
+    source "platforms/stm32/src/uart/Kconfig"
+endif
+
+#
+# GPIO Configuration
+#
+menuconfig STM32_GPIO_ENABLE
+    bool "Enable GPIO support"
+    default y
+    help
+      Enable GPIO (General Purpose Input/Output) support for the STM32
+      platform. GPIO provides digital I/O pin control.
+
+if STM32_GPIO_ENABLE
+    # GPIO Kconfig will be added in future tasks
+    # rsource "src/gpio/Kconfig"
+endif
+
+#
+# SPI Configuration
+#
+menuconfig STM32_SPI_ENABLE
+    bool "Enable SPI support"
+    default y
+    help
+      Enable SPI (Serial Peripheral Interface) support for the STM32
+      platform. SPI is used for high-speed synchronous serial communication.
+
+if STM32_SPI_ENABLE
+    # SPI Kconfig will be added in future tasks
+    # rsource "src/spi/Kconfig"
+endif
+
+#
+# I2C Configuration
+#
+menuconfig STM32_I2C_ENABLE
+    bool "Enable I2C support"
+    default y
+    help
+      Enable I2C (Inter-Integrated Circuit) support for the STM32 platform.
+      I2C is used for communication with sensors and other peripherals.
+
+if STM32_I2C_ENABLE
+    # I2C Kconfig will be added in future tasks
+    # rsource "src/i2c/Kconfig"
+endif
+
+#
+# Timer Configuration
+#
+menuconfig STM32_TIMER_ENABLE
+    bool "Enable Timer support"
+    default y
+    help
+      Enable Timer support for the STM32 platform.
+      Timers provide timing, counting, and PWM generation capabilities.
+
+if STM32_TIMER_ENABLE
+    # Timer Kconfig will be added in future tasks
+    # rsource "src/timer/Kconfig"
+endif
+
+#
+# ADC Configuration
+#
+menuconfig STM32_ADC_ENABLE
+    bool "Enable ADC support"
+    default n
+    help
+      Enable ADC (Analog-to-Digital Converter) support for the STM32
+      platform. ADC converts analog signals to digital values.
+
+if STM32_ADC_ENABLE
+    # ADC Kconfig will be added in future tasks
+    # rsource "src/adc/Kconfig"
+endif
+
+#
+# DAC Configuration
+#
+menuconfig STM32_DAC_ENABLE
+    bool "Enable DAC support"
+    default n
+    help
+      Enable DAC (Digital-to-Analog Converter) support for the STM32
+      platform. DAC converts digital values to analog signals.
+
+if STM32_DAC_ENABLE
+    # DAC Kconfig will be added in future tasks
+    # rsource "src/dac/Kconfig"
+endif
+
+endmenu

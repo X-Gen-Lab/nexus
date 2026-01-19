@@ -1,0 +1,166 @@
+#
+# STM32 Chip Family and Variant Selection
+#
+# This file defines chip family selection (STM32F4, STM32H7, STM32L4)
+# and chip variant selection within each family.
+#
+
+choice
+    prompt "STM32 Chip Family"
+    default STM32F4
+    depends on PLATFORM_STM32
+    help
+      Select the STM32 chip family for your target hardware.
+      This determines available peripherals and memory layout.
+
+config STM32F4
+    bool "STM32F4 Series"
+    help
+      STM32F4 series microcontrollers with Cortex-M4 core.
+      High-performance MCUs with DSP and FPU capabilities.
+      Operating frequency up to 180 MHz.
+
+config STM32H7
+    bool "STM32H7 Series"
+    help
+      STM32H7 series microcontrollers with Cortex-M7 core.
+      High-performance MCUs with advanced peripherals.
+      Operating frequency up to 480 MHz.
+
+config STM32L4
+    bool "STM32L4 Series"
+    help
+      STM32L4 series low-power microcontrollers with Cortex-M4 core.
+      Ultra-low-power MCUs optimized for battery-powered applications.
+      Operating frequency up to 120 MHz.
+
+endchoice
+
+#
+# STM32F4 Chip Variant Selection
+#
+
+if STM32F4
+
+choice
+    prompt "STM32F4 Chip Variant"
+    default STM32F407
+    help
+      Select the specific STM32F4 chip variant.
+      Different variants have different memory sizes and peripheral sets.
+
+config STM32F407
+    bool "STM32F407"
+    help
+      STM32F407 variant with:
+      - Up to 1 MB Flash
+      - Up to 192 KB SRAM
+      - Rich peripheral set including USB OTG, Ethernet
+
+config STM32F429
+    bool "STM32F429"
+    help
+      STM32F429 variant with:
+      - Up to 2 MB Flash
+      - Up to 256 KB SRAM
+      - LCD-TFT controller, Chrom-ART Accelerator
+
+config STM32F446
+    bool "STM32F446"
+    help
+      STM32F446 variant with:
+      - Up to 512 KB Flash
+      - Up to 128 KB SRAM
+      - Quad SPI, SAI audio interface
+
+endchoice
+
+config STM32_CHIP_NAME
+    string
+    default "STM32F407xx" if STM32F407
+    default "STM32F429xx" if STM32F429
+    default "STM32F446xx" if STM32F446
+    help
+      STM32 chip name used for HAL driver selection.
+
+endif # STM32F4
+
+#
+# STM32H7 Chip Variant Selection
+#
+
+if STM32H7
+
+choice
+    prompt "STM32H7 Chip Variant"
+    default STM32H743
+    help
+      Select the specific STM32H7 chip variant.
+      Different variants have different memory sizes and peripheral sets.
+
+config STM32H743
+    bool "STM32H743"
+    help
+      STM32H743 variant with:
+      - Up to 2 MB Flash
+      - Up to 1 MB SRAM
+      - Dual-core architecture support
+
+config STM32H750
+    bool "STM32H750"
+    help
+      STM32H750 variant with:
+      - 128 KB Flash (value line)
+      - Up to 1 MB SRAM
+      - Optimized for external memory applications
+
+endchoice
+
+config STM32_CHIP_NAME
+    string
+    default "STM32H743xx" if STM32H743
+    default "STM32H750xx" if STM32H750
+    help
+      STM32 chip name used for HAL driver selection.
+
+endif # STM32H7
+
+#
+# STM32L4 Chip Variant Selection
+#
+
+if STM32L4
+
+choice
+    prompt "STM32L4 Chip Variant"
+    default STM32L476
+    help
+      Select the specific STM32L4 chip variant.
+      Different variants have different memory sizes and peripheral sets.
+
+config STM32L476
+    bool "STM32L476"
+    help
+      STM32L476 variant with:
+      - Up to 1 MB Flash
+      - Up to 128 KB SRAM
+      - USB OTG FS, LCD controller
+
+config STM32L432
+    bool "STM32L432"
+    help
+      STM32L432 variant with:
+      - Up to 256 KB Flash
+      - Up to 64 KB SRAM
+      - Compact package options
+
+endchoice
+
+config STM32_CHIP_NAME
+    string
+    default "STM32L476xx" if STM32L476
+    default "STM32L432xx" if STM32L432
+    help
+      STM32 chip name used for HAL driver selection.
+
+endif # STM32L4

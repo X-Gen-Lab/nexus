@@ -1,0 +1,83 @@
+#
+#STM32 Platform Configuration
+#
+#This file defines the STM32 platform configuration and imports
+#chip - specific and peripheral - specific Kconfig files.
+#
+
+if PLATFORM_STM32
+
+config STM32_PLATFORM_NAME
+    string
+    default "STM32 Platform"
+    help
+      STM32 platform name for identification.
+
+config STM32_PLATFORM_VERSION
+    string
+    default "1.0.0"
+    help
+      STM32 platform version.
+
+#Chip family and variant selection
+source "platforms/stm32/Kconfig_chip"
+
+menu "STM32 Platform Settings"
+
+config STM32_ENABLE_LOGGING
+    bool "Enable platform logging"
+    default y
+    help
+      Enable logging output for the STM32 platform.
+      Useful for debugging and development.
+
+config STM32_LOG_LEVEL
+    int "Platform log level"
+    default 3
+    range 0 4
+    depends on STM32_ENABLE_LOGGING
+    help
+      Log level for STM32 platform:
+      0 = None, 1 = Error, 2 = Warning, 3 = Info, 4 = Debug
+
+config STM32_ENABLE_STATISTICS
+    bool "Enable performance statistics"
+    default y
+    help
+      Enable performance statistics collection for peripherals.
+      Provides diagnostic information about peripheral usage.
+
+config STM32_BUFFER_ALIGNMENT
+    int "Buffer alignment (bytes)"
+    default 4
+    range 1 64
+    help
+      Memory alignment for peripheral buffers.
+      Must be a power of 2 for optimal DMA performance.
+
+endmenu
+
+menu "Resource Managers"
+
+config STM32_DMA_CHANNELS
+    int "Number of DMA channels"
+    default 8
+    range 1 32
+    help
+      Number of DMA channels available on the STM32 chip.
+      Actual availability depends on the selected chip variant.
+
+config STM32_ISR_SLOTS
+    int "Number of ISR slots"
+    default 64
+    range 1 256
+    help
+      Number of interrupt service routine slots available.
+      Each peripheral can register interrupt callbacks.
+
+endmenu
+
+#Peripheral configuration
+source "platforms/stm32/Kconfig_peripherals"
+
+endif # PLATFORM_STM32

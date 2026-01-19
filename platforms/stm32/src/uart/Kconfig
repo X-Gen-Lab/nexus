@@ -1,0 +1,405 @@
+#
+# UART Configuration for STM32 Platform
+#
+# This file defines UART peripheral configuration for STM32 chips.
+# It includes instance configuration, transfer modes, and pin settings.
+#
+
+config STM32_UART_MAX_INSTANCES
+    int "Maximum number of UART instances"
+    default 6
+    range 1 8
+    depends on STM32_UART_ENABLE
+    help
+      Maximum number of UART instances supported by the STM32 chip.
+      Actual availability depends on the selected chip variant.
+
+#
+# UART1 Configuration
+#
+menuconfig INSTANCE_STM32_UART_1
+    bool "Enable UART1"
+    default y
+    depends on STM32_UART_ENABLE
+    help
+      Enable UART instance 1.
+
+if INSTANCE_STM32_UART_1
+
+config UART1_BAUDRATE
+    int "UART1 baud rate"
+    default 115200
+    help
+      Baud rate for UART1.
+      Common values: 9600, 19200, 38400, 57600, 115200, 230400, 460800
+
+config UART1_DATA_BITS
+    int "UART1 data bits"
+    default 8
+    range 7 9
+    help
+      Number of data bits for UART1.
+      Typical values: 7, 8, or 9 bits
+
+config UART1_STOP_BITS
+    int "UART1 stop bits"
+    default 1
+    range 1 2
+    help
+      Number of stop bits for UART1.
+      1 = One stop bit, 2 = Two stop bits
+
+choice
+    prompt "UART1 parity"
+    default STM32_UART1_PARITY_NONE
+    help
+      Parity setting for UART1.
+
+config STM32_UART1_PARITY_NONE
+    bool "None"
+
+config STM32_UART1_PARITY_ODD
+    bool "Odd"
+
+config STM32_UART1_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART1_PARITY_VALUE
+    int
+    default 0 if STM32_UART1_PARITY_NONE
+    default 1 if STM32_UART1_PARITY_ODD
+    default 2 if STM32_UART1_PARITY_EVEN
+    help
+      Internal parity value for code generation.
+
+choice
+    prompt "UART1 transfer mode"
+    default STM32_UART1_MODE_DMA
+    help
+      Transfer mode for UART1.
+      - Polling: Simple but blocks CPU
+      - Interrupt: Efficient for low data rates
+      - DMA: Best for high data rates
+
+config STM32_UART1_MODE_POLLING
+    bool "Polling"
+
+config STM32_UART1_MODE_INTERRUPT
+    bool "Interrupt"
+
+config STM32_UART1_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART1_MODE_VALUE
+    int
+    default 0 if STM32_UART1_MODE_POLLING
+    default 1 if STM32_UART1_MODE_INTERRUPT
+    default 2 if STM32_UART1_MODE_DMA
+    help
+      Internal mode value for code generation.
+
+config UART1_TX_BUFFER_SIZE
+    int "UART1 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for UART1 in bytes.
+
+config UART1_RX_BUFFER_SIZE
+    int "UART1 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for UART1 in bytes.
+
+config UART1_DMA_TX_CHANNEL
+    int "UART1 DMA TX channel"
+    default 4
+    range 0 15
+    depends on STM32_UART1_MODE_DMA
+    help
+      DMA channel for UART1 TX transfers.
+
+config UART1_DMA_RX_CHANNEL
+    int "UART1 DMA RX channel"
+    default 5
+    range 0 15
+    depends on STM32_UART1_MODE_DMA
+    help
+      DMA channel for UART1 RX transfers.
+
+menu "UART1 Pin Configuration"
+
+config UART1_TX_PIN
+    int "TX pin"
+    default 9
+    help
+      TX pin number (e.g., PA9 = 9).
+
+config UART1_RX_PIN
+    int "RX pin"
+    default 10
+    help
+      RX pin number (e.g., PA10 = 10).
+
+config UART1_TX_PORT
+    string "TX port"
+    default "GPIOA"
+    help
+      TX GPIO port (e.g., GPIOA, GPIOB).
+
+config UART1_RX_PORT
+    string "RX port"
+    default "GPIOA"
+    help
+      RX GPIO port (e.g., GPIOA, GPIOB).
+
+endmenu
+
+endif # INSTANCE_STM32_UART_1
+
+#
+# UART2 Configuration
+#
+menuconfig INSTANCE_STM32_UART_2
+    bool "Enable UART2"
+    default n
+    depends on STM32_UART_ENABLE
+    help
+      Enable UART instance 2.
+
+if INSTANCE_STM32_UART_2
+
+config UART2_BAUDRATE
+    int "UART2 baud rate"
+    default 115200
+    help
+      Baud rate for UART2.
+
+config UART2_DATA_BITS
+    int "UART2 data bits"
+    default 8
+    range 7 9
+    help
+      Number of data bits for UART2.
+
+config UART2_STOP_BITS
+    int "UART2 stop bits"
+    default 1
+    range 1 2
+    help
+      Number of stop bits for UART2.
+
+choice
+    prompt "UART2 parity"
+    default STM32_UART2_PARITY_NONE
+
+config STM32_UART2_PARITY_NONE
+    bool "None"
+
+config STM32_UART2_PARITY_ODD
+    bool "Odd"
+
+config STM32_UART2_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART2_PARITY_VALUE
+    int
+    default 0 if STM32_UART2_PARITY_NONE
+    default 1 if STM32_UART2_PARITY_ODD
+    default 2 if STM32_UART2_PARITY_EVEN
+
+choice
+    prompt "UART2 transfer mode"
+    default STM32_UART2_MODE_DMA
+
+config STM32_UART2_MODE_POLLING
+    bool "Polling"
+
+config STM32_UART2_MODE_INTERRUPT
+    bool "Interrupt"
+
+config STM32_UART2_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART2_MODE_VALUE
+    int
+    default 0 if STM32_UART2_MODE_POLLING
+    default 1 if STM32_UART2_MODE_INTERRUPT
+    default 2 if STM32_UART2_MODE_DMA
+
+config UART2_TX_BUFFER_SIZE
+    int "UART2 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for UART2 in bytes.
+
+config UART2_RX_BUFFER_SIZE
+    int "UART2 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for UART2 in bytes.
+
+config UART2_DMA_TX_CHANNEL
+    int "UART2 DMA TX channel"
+    default 6
+    range 0 15
+    depends on STM32_UART2_MODE_DMA
+
+config UART2_DMA_RX_CHANNEL
+    int "UART2 DMA RX channel"
+    default 7
+    range 0 15
+    depends on STM32_UART2_MODE_DMA
+
+menu "UART2 Pin Configuration"
+
+config UART2_TX_PIN
+    int "TX pin"
+    default 2
+    help
+      TX pin number (e.g., PA2 = 2).
+
+config UART2_RX_PIN
+    int "RX pin"
+    default 3
+    help
+      RX pin number (e.g., PA3 = 3).
+
+config UART2_TX_PORT
+    string "TX port"
+    default "GPIOA"
+
+config UART2_RX_PORT
+    string "RX port"
+    default "GPIOA"
+
+endmenu
+
+endif # INSTANCE_STM32_UART_2
+
+#
+# UART3 Configuration
+#
+menuconfig INSTANCE_STM32_UART_3
+    bool "Enable UART3"
+    default n
+    depends on STM32_UART_ENABLE
+    help
+      Enable UART instance 3.
+
+if INSTANCE_STM32_UART_3
+
+config UART3_BAUDRATE
+    int "UART3 baud rate"
+    default 115200
+
+config UART3_DATA_BITS
+    int "UART3 data bits"
+    default 8
+    range 7 9
+
+config UART3_STOP_BITS
+    int "UART3 stop bits"
+    default 1
+    range 1 2
+
+choice
+    prompt "UART3 parity"
+    default STM32_UART3_PARITY_NONE
+
+config STM32_UART3_PARITY_NONE
+    bool "None"
+
+config STM32_UART3_PARITY_ODD
+    bool "Odd"
+
+config STM32_UART3_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART3_PARITY_VALUE
+    int
+    default 0 if STM32_UART3_PARITY_NONE
+    default 1 if STM32_UART3_PARITY_ODD
+    default 2 if STM32_UART3_PARITY_EVEN
+
+choice
+    prompt "UART3 transfer mode"
+    default STM32_UART3_MODE_DMA
+
+config STM32_UART3_MODE_POLLING
+    bool "Polling"
+
+config STM32_UART3_MODE_INTERRUPT
+    bool "Interrupt"
+
+config STM32_UART3_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART3_MODE_VALUE
+    int
+    default 0 if STM32_UART3_MODE_POLLING
+    default 1 if STM32_UART3_MODE_INTERRUPT
+    default 2 if STM32_UART3_MODE_DMA
+
+config UART3_TX_BUFFER_SIZE
+    int "UART3 TX buffer size"
+    default 256
+    range 16 4096
+
+config UART3_RX_BUFFER_SIZE
+    int "UART3 RX buffer size"
+    default 256
+    range 16 4096
+
+config UART3_DMA_TX_CHANNEL
+    int "UART3 DMA TX channel"
+    default 2
+    range 0 15
+    depends on STM32_UART3_MODE_DMA
+
+config UART3_DMA_RX_CHANNEL
+    int "UART3 DMA RX channel"
+    default 3
+    range 0 15
+    depends on STM32_UART3_MODE_DMA
+
+menu "UART3 Pin Configuration"
+
+config UART3_TX_PIN
+    int "TX pin"
+    default 10
+    help
+      TX pin number (e.g., PB10 = 10).
+
+config UART3_RX_PIN
+    int "RX pin"
+    default 11
+    help
+      RX pin number (e.g., PB11 = 11).
+
+config UART3_TX_PORT
+    string "TX port"
+    default "GPIOB"
+
+config UART3_RX_PORT
+    string "RX port"
+    default "GPIOB"
+
+endmenu
+
+endif # INSTANCE_STM32_UART_3

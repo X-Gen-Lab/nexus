@@ -1,0 +1,12 @@
+# platforms/nrf52/Kconfig - NRF52 platform configuration
+#
+# This file will be implemented in future tasks
+
+if PLATFORM_NRF52
+
+# Placeholder - to be implemented
+config NRF52_PLACEHOLDER
+    bool
+    default y
+
+endif # PLATFORM_NRF52
