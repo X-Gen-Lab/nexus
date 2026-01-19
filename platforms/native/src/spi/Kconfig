@@ -1,0 +1,218 @@
+# SPI Configuration for Native Platform
+
+config SPI_NATIVE
+    bool "Enable SPI support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable SPI peripheral support for the Native platform.
+      This provides simulated SPI functionality for testing
+      and development on PC.
+
+if SPI_NATIVE
+
+config SPI_MAX_INSTANCES
+    int "Maximum number of SPI instances"
+    default 4
+    range 1 8
+    help
+      Maximum number of SPI instances supported by the
+      Native platform. Each instance requires buffer memory.
+
+# SPI0 Configuration
+config INSTANCE_NX_SPI_0
+    bool "Enable SPI0"
+    default y
+    help
+      Enable SPI instance 0.
+
+if INSTANCE_NX_SPI_0
+
+config SPI0_MAX_SPEED
+    int "SPI0 maximum speed (Hz)"
+    default 1000000
+    help
+      Maximum SPI speed for SPI0 in Hz (simulated).
+
+config SPI0_MOSI_PIN
+    int "SPI0 MOSI pin"
+    default 11
+    help
+      MOSI pin number for SPI0 (simulated).
+
+config SPI0_MISO_PIN
+    int "SPI0 MISO pin"
+    default 12
+    help
+      MISO pin number for SPI0 (simulated).
+
+config SPI0_SCK_PIN
+    int "SPI0 SCK pin"
+    default 13
+    help
+      SCK pin number for SPI0 (simulated).
+
+config SPI0_TX_BUFFER_SIZE
+    int "SPI0 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for SPI0 in bytes.
+
+config SPI0_RX_BUFFER_SIZE
+    int "SPI0 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for SPI0 in bytes.
+
+endif # INSTANCE_NX_SPI_0
+
+# SPI1 Configuration
+config INSTANCE_NX_SPI_1
+    bool "Enable SPI1"
+    default n
+    help
+      Enable SPI instance 1.
+
+if INSTANCE_NX_SPI_1
+
+config SPI1_MAX_SPEED
+    int "SPI1 maximum speed (Hz)"
+    default 1000000
+    help
+      Maximum SPI speed for SPI1 in Hz (simulated).
+
+config SPI1_MOSI_PIN
+    int "SPI1 MOSI pin"
+    default 21
+    help
+      MOSI pin number for SPI1 (simulated).
+
+config SPI1_MISO_PIN
+    int "SPI1 MISO pin"
+    default 22
+    help
+      MISO pin number for SPI1 (simulated).
+
+config SPI1_SCK_PIN
+    int "SPI1 SCK pin"
+    default 23
+    help
+      SCK pin number for SPI1 (simulated).
+
+config SPI1_TX_BUFFER_SIZE
+    int "SPI1 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for SPI1 in bytes.
+
+config SPI1_RX_BUFFER_SIZE
+    int "SPI1 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for SPI1 in bytes.
+
+endif # INSTANCE_NX_SPI_1
+
+# SPI2 Configuration
+config INSTANCE_NX_SPI_2
+    bool "Enable SPI2"
+    default n
+    help
+      Enable SPI instance 2.
+
+if INSTANCE_NX_SPI_2
+
+config SPI2_MAX_SPEED
+    int "SPI2 maximum speed (Hz)"
+    default 1000000
+    help
+      Maximum SPI speed for SPI2 in Hz (simulated).
+
+config SPI2_MOSI_PIN
+    int "SPI2 MOSI pin"
+    default 31
+    help
+      MOSI pin number for SPI2 (simulated).
+
+config SPI2_MISO_PIN
+    int "SPI2 MISO pin"
+    default 32
+    help
+      MISO pin number for SPI2 (simulated).
+
+config SPI2_SCK_PIN
+    int "SPI2 SCK pin"
+    default 33
+    help
+      SCK pin number for SPI2 (simulated).
+
+config SPI2_TX_BUFFER_SIZE
+    int "SPI2 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for SPI2 in bytes.
+
+config SPI2_RX_BUFFER_SIZE
+    int "SPI2 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for SPI2 in bytes.
+
+endif # INSTANCE_NX_SPI_2
+
+# SPI3 Configuration
+config INSTANCE_NX_SPI_3
+    bool "Enable SPI3"
+    default n
+    help
+      Enable SPI instance 3.
+
+if INSTANCE_NX_SPI_3
+
+config SPI3_MAX_SPEED
+    int "SPI3 maximum speed (Hz)"
+    default 1000000
+    help
+      Maximum SPI speed for SPI3 in Hz (simulated).
+
+config SPI3_MOSI_PIN
+    int "SPI3 MOSI pin"
+    default 41
+    help
+      MOSI pin number for SPI3 (simulated).
+
+config SPI3_MISO_PIN
+    int "SPI3 MISO pin"
+    default 42
+    help
+      MISO pin number for SPI3 (simulated).
+
+config SPI3_SCK_PIN
+    int "SPI3 SCK pin"
+    default 43
+    help
+      SCK pin number for SPI3 (simulated).
+
+config SPI3_TX_BUFFER_SIZE
+    int "SPI3 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for SPI3 in bytes.
+
+config SPI3_RX_BUFFER_SIZE
+    int "SPI3 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for SPI3 in bytes.
+
+endif # INSTANCE_NX_SPI_3
+
+endif # SPI_NATIVE

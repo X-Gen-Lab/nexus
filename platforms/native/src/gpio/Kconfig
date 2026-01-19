@@ -1,0 +1,260 @@
+# GPIO Configuration for Native Platform
+
+config GPIO_NATIVE
+    bool "Enable GPIO support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable GPIO peripheral support for the Native platform.
+      This provides simulated GPIO functionality for testing
+      and development on PC.
+
+if GPIO_NATIVE
+
+config GPIO_MAX_PORTS
+    int "Maximum number of GPIO ports"
+    default 8
+    range 1 16
+    help
+      Maximum number of GPIO ports supported by the
+      Native platform (A-H).
+
+config GPIO_MAX_PINS_PER_PORT
+    int "Maximum number of pins per port"
+    default 16
+    range 1 16
+    help
+      Maximum number of pins per GPIO port.
+
+# GPIOA Configuration
+config INSTANCE_NX_GPIOA
+    bool "Enable GPIOA"
+    default y
+    help
+      Enable GPIO port A.
+
+if INSTANCE_NX_GPIOA
+
+config INSTANCE_NX_GPIOA_PIN0
+    bool "Enable GPIOA PIN0"
+    default y
+    help
+      Enable GPIOA pin 0.
+
+if INSTANCE_NX_GPIOA_PIN0
+
+choice GPIOA_PIN0_WR_MODE
+    prompt "GPIOA PIN0 mode"
+    default GPIOA_PIN0_WR_MODE_RW
+    help
+      Select the GPIO mode for GPIOA PIN0.
+
+config GPIOA_PIN0_WR_MODE_READ
+    bool "Read only"
+    help
+      Configure as input only.
+
+config GPIOA_PIN0_WR_MODE_WRITE
+    bool "Write only"
+    help
+      Configure as output only.
+
+config GPIOA_PIN0_WR_MODE_RW
+    bool "Read-Write"
+    help
+      Configure as bidirectional (input/output).
+
+endchoice
+
+config GPIOA_PIN0_MODE
+    int "GPIOA PIN0 GPIO mode"
+    default 1
+    range 0 5
+    help
+      GPIO mode for GPIOA PIN0:
+      0 = Input, 1 = Output PP, 2 = Output OD,
+      3 = AF PP, 4 = AF OD, 5 = Analog
+
+config GPIOA_PIN0_PULL_VALUE
+    int "GPIOA PIN0 pull configuration"
+    default 0
+    range 0 2
+    help
+      Pull configuration for GPIOA PIN0:
+      0 = None, 1 = Pull-up, 2 = Pull-down
+
+config GPIOA_PIN0_SPEED_VALUE
+    int "GPIOA PIN0 speed"
+    default 1
+    range 0 3
+    help
+      Speed configuration for GPIOA PIN0:
+      0 = Low, 1 = Medium, 2 = High, 3 = Very High
+
+config GPIOA_PIN0_OUTPUT_VALUE
+    int "GPIOA PIN0 initial output value"
+    default 0
+    range 0 1
+    help
+      Initial output value for GPIOA PIN0:
+      0 = Low, 1 = High
+
+endif # INSTANCE_NX_GPIOA_PIN0
+
+endif # INSTANCE_NX_GPIOA
+
+# GPIOB Configuration
+config INSTANCE_NX_GPIOB
+    bool "Enable GPIOB"
+    default n
+    help
+      Enable GPIO port B.
+
+if INSTANCE_NX_GPIOB
+
+config INSTANCE_NX_GPIOB_PIN0
+    bool "Enable GPIOB PIN0"
+    default y
+    help
+      Enable GPIOB pin 0.
+
+if INSTANCE_NX_GPIOB_PIN0
+
+choice GPIOB_PIN0_WR_MODE
+    prompt "GPIOB PIN0 mode"
+    default GPIOB_PIN0_WR_MODE_RW
+    help
+      Select the GPIO mode for GPIOB PIN0.
+
+config GPIOB_PIN0_WR_MODE_READ
+    bool "Read only"
+    help
+      Configure as input only.
+
+config GPIOB_PIN0_WR_MODE_WRITE
+    bool "Write only"
+    help
+      Configure as output only.
+
+config GPIOB_PIN0_WR_MODE_RW
+    bool "Read-Write"
+    help
+      Configure as bidirectional (input/output).
+
+endchoice
+
+config GPIOB_PIN0_MODE
+    int "GPIOB PIN0 GPIO mode"
+    default 1
+    range 0 5
+    help
+      GPIO mode for GPIOB PIN0:
+      0 = Input, 1 = Output PP, 2 = Output OD,
+      3 = AF PP, 4 = AF OD, 5 = Analog
+
+config GPIOB_PIN0_PULL_VALUE
+    int "GPIOB PIN0 pull configuration"
+    default 0
+    range 0 2
+    help
+      Pull configuration for GPIOB PIN0:
+      0 = None, 1 = Pull-up, 2 = Pull-down
+
+config GPIOB_PIN0_SPEED_VALUE
+    int "GPIOB PIN0 speed"
+    default 1
+    range 0 3
+    help
+      Speed configuration for GPIOB PIN0:
+      0 = Low, 1 = Medium, 2 = High, 3 = Very High
+
+config GPIOB_PIN0_OUTPUT_VALUE
+    int "GPIOB PIN0 initial output value"
+    default 0
+    range 0 1
+    help
+      Initial output value for GPIOB PIN0:
+      0 = Low, 1 = High
+
+endif # INSTANCE_NX_GPIOB_PIN0
+
+endif # INSTANCE_NX_GPIOB
+
+# GPIOC Configuration
+config INSTANCE_NX_GPIOC
+    bool "Enable GPIOC"
+    default n
+    help
+      Enable GPIO port C.
+
+if INSTANCE_NX_GPIOC
+
+config INSTANCE_NX_GPIOC_PIN0
+    bool "Enable GPIOC PIN0"
+    default y
+    help
+      Enable GPIOC pin 0.
+
+if INSTANCE_NX_GPIOC_PIN0
+
+choice GPIOC_PIN0_WR_MODE
+    prompt "GPIOC PIN0 mode"
+    default GPIOC_PIN0_WR_MODE_RW
+    help
+      Select the GPIO mode for GPIOC PIN0.
+
+config GPIOC_PIN0_WR_MODE_READ
+    bool "Read only"
+    help
+      Configure as input only.
+
+config GPIOC_PIN0_WR_MODE_WRITE
+    bool "Write only"
+    help
+      Configure as output only.
+
+config GPIOC_PIN0_WR_MODE_RW
+    bool "Read-Write"
+    help
+      Configure as bidirectional (input/output).
+
+endchoice
+
+config GPIOC_PIN0_MODE
+    int "GPIOC PIN0 GPIO mode"
+    default 1
+    range 0 5
+    help
+      GPIO mode for GPIOC PIN0:
+      0 = Input, 1 = Output PP, 2 = Output OD,
+      3 = AF PP, 4 = AF OD, 5 = Analog
+
+config GPIOC_PIN0_PULL_VALUE
+    int "GPIOC PIN0 pull configuration"
+    default 0
+    range 0 2
+    help
+      Pull configuration for GPIOC PIN0:
+      0 = None, 1 = Pull-up, 2 = Pull-down
+
+config GPIOC_PIN0_SPEED_VALUE
+    int "GPIOC PIN0 speed"
+    default 1
+    range 0 3
+    help
+      Speed configuration for GPIOC PIN0:
+      0 = Low, 1 = Medium, 2 = High, 3 = Very High
+
+config GPIOC_PIN0_OUTPUT_VALUE
+    int "GPIOC PIN0 initial output value"
+    default 0
+    range 0 1
+    help
+      Initial output value for GPIOC PIN0:
+      0 = Low, 1 = High
+
+endif # INSTANCE_NX_GPIOC_PIN0
+
+endif # INSTANCE_NX_GPIOC
+
+endif # GPIO_NATIVE

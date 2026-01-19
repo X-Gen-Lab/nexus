@@ -1,0 +1,60 @@
+# Watchdog Configuration for Native Platform
+
+config WATCHDOG_NATIVE
+    bool "Enable Watchdog support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable Watchdog Timer peripheral support for the
+      Native platform. This provides simulated watchdog
+      functionality for testing and development on PC.
+
+if WATCHDOG_NATIVE
+
+config WATCHDOG_MAX_INSTANCES
+    int "Maximum number of Watchdog instances"
+    default 1
+    range 1 4
+    help
+      Maximum number of Watchdog instances supported by the
+      Native platform.
+
+# Watchdog0 Configuration
+config INSTANCE_NX_WATCHDOG0
+    bool "Enable Watchdog0"
+    default y
+    help
+      Enable Watchdog instance 0.
+
+if INSTANCE_NX_WATCHDOG0
+
+config WATCHDOG0_DEFAULT_TIMEOUT_MS
+    int "Default timeout for Watchdog0 (milliseconds)"
+    default 5000
+    range 100 60000
+    help
+      Default timeout value for Watchdog0 in milliseconds.
+      The watchdog will trigger a reset if not fed within
+      this time period.
+
+endif # INSTANCE_NX_WATCHDOG0
+
+# Watchdog1 Configuration
+config INSTANCE_NX_WATCHDOG1
+    bool "Enable Watchdog1"
+    default n
+    help
+      Enable Watchdog instance 1.
+
+if INSTANCE_NX_WATCHDOG1
+
+config WATCHDOG1_DEFAULT_TIMEOUT_MS
+    int "Default timeout for Watchdog1 (milliseconds)"
+    default 5000
+    range 100 60000
+    help
+      Default timeout value for Watchdog1 in milliseconds.
+
+endif # INSTANCE_NX_WATCHDOG1
+
+endif # WATCHDOG_NATIVE

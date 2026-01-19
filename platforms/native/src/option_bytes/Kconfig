@@ -1,0 +1,30 @@
+config NATIVE_OPTION_BYTES
+    bool "Enable Option Bytes support"
+    default y
+    help
+      Enable Option Bytes peripheral support for Native platform.
+      Provides simulated device configuration options with read/write protection.
+
+if NATIVE_OPTION_BYTES
+
+config NATIVE_OPTION_BYTES_INSTANCES
+    int "Number of Option Bytes instances"
+    default 1
+    range 1 4
+    help
+      Number of Option Bytes peripheral instances to create.
+
+config NATIVE_OPTION_BYTES_USER_DATA_SIZE
+    int "User data size in bytes"
+    default 16
+    help
+      Size of user data area in option bytes.
+
+config NATIVE_OPTION_BYTES_DEFAULT_PROTECTION
+    int "Default read protection level"
+    default 0
+    range 0 2
+    help
+      Default read protection level (0=none, 1=level1, 2=level2).
+
+endif # NATIVE_OPTION_BYTES

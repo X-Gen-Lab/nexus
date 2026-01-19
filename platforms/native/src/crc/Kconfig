@@ -1,0 +1,125 @@
+# CRC Configuration for Native Platform
+
+config CRC_NATIVE
+    bool "Enable CRC support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable CRC peripheral support for the Native platform.
+      This provides simulated CRC functionality for testing
+      and development on PC.
+
+if CRC_NATIVE
+
+config CRC_MAX_INSTANCES
+    int "Maximum number of CRC instances"
+    default 1
+    range 1 4
+    help
+      Maximum number of CRC instances supported by the
+      Native platform.
+
+# CRC0 Configuration
+config INSTANCE_NX_CRC0
+    bool "Enable CRC0"
+    default y
+    help
+      Enable CRC instance 0.
+
+if INSTANCE_NX_CRC0
+
+choice CRC0_ALGORITHM
+    prompt "CRC0 algorithm"
+    default CRC0_ALGORITHM_CRC32
+    help
+      Select the default CRC algorithm for CRC0.
+
+config CRC0_ALGORITHM_CRC32
+    bool "CRC-32 (IEEE 802.3)"
+    help
+      Use CRC-32 algorithm with polynomial 0x04C11DB7.
+
+config CRC0_ALGORITHM_CRC16
+    bool "CRC-16 (CCITT)"
+    help
+      Use CRC-16 CCITT algorithm with polynomial 0x1021.
+
+endchoice
+
+config CRC0_POLYNOMIAL
+    hex "CRC0 polynomial"
+    default 0x04C11DB7 if CRC0_ALGORITHM_CRC32
+    default 0x1021 if CRC0_ALGORITHM_CRC16
+    help
+      CRC polynomial value for CRC0.
+      Default: 0x04C11DB7 for CRC-32, 0x1021 for CRC-16.
+
+config CRC0_INIT_VALUE
+    hex "CRC0 initial value"
+    default 0xFFFFFFFF if CRC0_ALGORITHM_CRC32
+    default 0xFFFF if CRC0_ALGORITHM_CRC16
+    help
+      Initial CRC value for CRC0.
+      Default: 0xFFFFFFFF for CRC-32, 0xFFFF for CRC-16.
+
+config CRC0_FINAL_XOR
+    hex "CRC0 final XOR value"
+    default 0xFFFFFFFF if CRC0_ALGORITHM_CRC32
+    default 0x0000 if CRC0_ALGORITHM_CRC16
+    help
+      Final XOR value applied to CRC result.
+      Default: 0xFFFFFFFF for CRC-32, 0x0000 for CRC-16.
+
+endif # INSTANCE_NX_CRC0
+
+# CRC1 Configuration
+config INSTANCE_NX_CRC1
+    bool "Enable CRC1"
+    default n
+    help
+      Enable CRC instance 1.
+
+if INSTANCE_NX_CRC1
+
+choice CRC1_ALGORITHM
+    prompt "CRC1 algorithm"
+    default CRC1_ALGORITHM_CRC32
+    help
+      Select the default CRC algorithm for CRC1.
+
+config CRC1_ALGORITHM_CRC32
+    bool "CRC-32 (IEEE 802.3)"
+    help
+      Use CRC-32 algorithm with polynomial 0x04C11DB7.
+
+config CRC1_ALGORITHM_CRC16
+    bool "CRC-16 (CCITT)"
+    help
+      Use CRC-16 CCITT algorithm with polynomial 0x1021.
+
+endchoice
+
+config CRC1_POLYNOMIAL
+    hex "CRC1 polynomial"
+    default 0x04C11DB7 if CRC1_ALGORITHM_CRC32
+    default 0x1021 if CRC1_ALGORITHM_CRC16
+    help
+      CRC polynomial value for CRC1.
+
+config CRC1_INIT_VALUE
+    hex "CRC1 initial value"
+    default 0xFFFFFFFF if CRC1_ALGORITHM_CRC32
+    default 0xFFFF if CRC1_ALGORITHM_CRC16
+    help
+      Initial CRC value for CRC1.
+
+config CRC1_FINAL_XOR
+    hex "CRC1 final XOR value"
+    default 0xFFFFFFFF if CRC1_ALGORITHM_CRC32
+    default 0x0000 if CRC1_ALGORITHM_CRC16
+    help
+      Final XOR value applied to CRC result.
+
+endif # INSTANCE_NX_CRC1
+
+endif # CRC_NATIVE

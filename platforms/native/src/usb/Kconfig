@@ -1,0 +1,39 @@
+config NX_USB_ENABLED
+    bool "Enable USB support"
+    default y
+    help
+      Enable USB (Universal Serial Bus) peripheral support for Native platform.
+      Provides simulated USB device functionality for testing.
+
+if NX_USB_ENABLED
+
+config NX_USB_NUM_ENDPOINTS
+    int "Number of USB endpoints"
+    default 4
+    range 1 8
+    help
+      Number of USB endpoints to support. Each endpoint can be configured
+      for different transfer types (control, bulk, interrupt, isochronous).
+
+config NX_USB_TX_BUFFER_SIZE
+    int "USB TX buffer size"
+    default 1024
+    range 64 4096
+    help
+      Size of the USB transmit buffer in bytes.
+
+config NX_USB_RX_BUFFER_SIZE
+    int "USB RX buffer size"
+    default 1024
+    range 64 4096
+    help
+      Size of the USB receive buffer in bytes.
+
+config NX_USB_AUTO_CONNECT
+    bool "Auto-connect USB on initialization"
+    default y
+    help
+      Automatically set USB to connected state on initialization.
+      Useful for testing without manual connection simulation.
+
+endif # NX_USB_ENABLED

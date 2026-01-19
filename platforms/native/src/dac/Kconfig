@@ -1,0 +1,150 @@
+# DAC Configuration for Native Platform
+
+config DAC_NATIVE
+    bool "Enable DAC support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable DAC peripheral support for the Native platform.
+      This provides simulated DAC functionality for testing
+      and development on PC.
+
+if DAC_NATIVE
+
+config DAC_MAX_INSTANCES
+    int "Maximum number of DAC instances"
+    default 4
+    range 1 8
+    help
+      Maximum number of DAC instances supported by the
+      Native platform.
+
+# DAC0 Configuration
+config INSTANCE_NX_DAC_0
+    bool "Enable DAC0"
+    default y
+    help
+      Enable DAC instance 0.
+
+if INSTANCE_NX_DAC_0
+
+config DAC0_CHANNEL_COUNT
+    int "DAC0 channel count"
+    default 2
+    range 1 4
+    help
+      Number of DAC channels for DAC0.
+
+config DAC0_RESOLUTION
+    int "DAC0 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      DAC resolution for DAC0 in bits.
+
+config DAC0_VREF_MV
+    int "DAC0 reference voltage (mV)"
+    default 3300
+    range 1000 5000
+    help
+      Reference voltage for DAC0 in millivolts.
+
+endif # INSTANCE_NX_DAC_0
+
+# DAC1 Configuration
+config INSTANCE_NX_DAC_1
+    bool "Enable DAC1"
+    default n
+    help
+      Enable DAC instance 1.
+
+if INSTANCE_NX_DAC_1
+
+config DAC1_CHANNEL_COUNT
+    int "DAC1 channel count"
+    default 2
+    range 1 4
+    help
+      Number of DAC channels for DAC1.
+
+config DAC1_RESOLUTION
+    int "DAC1 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      DAC resolution for DAC1 in bits.
+
+config DAC1_VREF_MV
+    int "DAC1 reference voltage (mV)"
+    default 3300
+    range 1000 5000
+    help
+      Reference voltage for DAC1 in millivolts.
+
+endif # INSTANCE_NX_DAC_1
+
+# DAC2 Configuration
+config INSTANCE_NX_DAC_2
+    bool "Enable DAC2"
+    default n
+    help
+      Enable DAC instance 2.
+
+if INSTANCE_NX_DAC_2
+
+config DAC2_CHANNEL_COUNT
+    int "DAC2 channel count"
+    default 2
+    range 1 4
+    help
+      Number of DAC channels for DAC2.
+
+config DAC2_RESOLUTION
+    int "DAC2 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      DAC resolution for DAC2 in bits.
+
+config DAC2_VREF_MV
+    int "DAC2 reference voltage (mV)"
+    default 3300
+    range 1000 5000
+    help
+      Reference voltage for DAC2 in millivolts.
+
+endif # INSTANCE_NX_DAC_2
+
+# DAC3 Configuration
+config INSTANCE_NX_DAC_3
+    bool "Enable DAC3"
+    default n
+    help
+      Enable DAC instance 3.
+
+if INSTANCE_NX_DAC_3
+
+config DAC3_CHANNEL_COUNT
+    int "DAC3 channel count"
+    default 2
+    range 1 4
+    help
+      Number of DAC channels for DAC3.
+
+config DAC3_RESOLUTION
+    int "DAC3 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      DAC resolution for DAC3 in bits.
+
+config DAC3_VREF_MV
+    int "DAC3 reference voltage (mV)"
+    default 3300
+    range 1000 5000
+    help
+      Reference voltage for DAC3 in millivolts.
+
+endif # INSTANCE_NX_DAC_3
+
+endif # DAC_NATIVE

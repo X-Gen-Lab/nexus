@@ -1,0 +1,197 @@
+# I2C Configuration for Native Platform
+
+config I2C_NATIVE
+    bool "Enable I2C support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable I2C peripheral support for the Native platform.
+      This provides simulated I2C functionality for testing
+      and development on PC.
+
+if I2C_NATIVE
+
+config I2C_MAX_INSTANCES
+    int "Maximum number of I2C instances"
+    default 4
+    range 1 8
+    help
+      Maximum number of I2C instances supported by the
+      Native platform. Each instance requires buffer memory.
+
+# I2C0 Configuration
+config INSTANCE_NX_I2C_0
+    bool "Enable I2C0"
+    default y
+    help
+      Enable I2C instance 0.
+
+if INSTANCE_NX_I2C_0
+
+config I2C0_SPEED
+    int "I2C0 speed (Hz)"
+    default 100000
+    help
+      I2C speed for I2C0 in Hz (simulated).
+      Standard mode: 100000 Hz
+      Fast mode: 400000 Hz
+      Fast mode plus: 1000000 Hz
+
+config I2C0_SCL_PIN
+    int "I2C0 SCL pin"
+    default 5
+    help
+      SCL pin number for I2C0 (simulated).
+
+config I2C0_SDA_PIN
+    int "I2C0 SDA pin"
+    default 4
+    help
+      SDA pin number for I2C0 (simulated).
+
+config I2C0_TX_BUFFER_SIZE
+    int "I2C0 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for I2C0 in bytes.
+
+config I2C0_RX_BUFFER_SIZE
+    int "I2C0 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for I2C0 in bytes.
+
+endif # INSTANCE_NX_I2C_0
+
+# I2C1 Configuration
+config INSTANCE_NX_I2C_1
+    bool "Enable I2C1"
+    default n
+    help
+      Enable I2C instance 1.
+
+if INSTANCE_NX_I2C_1
+
+config I2C1_SPEED
+    int "I2C1 speed (Hz)"
+    default 100000
+    help
+      I2C speed for I2C1 in Hz (simulated).
+
+config I2C1_SCL_PIN
+    int "I2C1 SCL pin"
+    default 15
+    help
+      SCL pin number for I2C1 (simulated).
+
+config I2C1_SDA_PIN
+    int "I2C1 SDA pin"
+    default 14
+    help
+      SDA pin number for I2C1 (simulated).
+
+config I2C1_TX_BUFFER_SIZE
+    int "I2C1 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for I2C1 in bytes.
+
+config I2C1_RX_BUFFER_SIZE
+    int "I2C1 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for I2C1 in bytes.
+
+endif # INSTANCE_NX_I2C_1
+
+# I2C2 Configuration
+config INSTANCE_NX_I2C_2
+    bool "Enable I2C2"
+    default n
+    help
+      Enable I2C instance 2.
+
+if INSTANCE_NX_I2C_2
+
+config I2C2_SPEED
+    int "I2C2 speed (Hz)"
+    default 100000
+    help
+      I2C speed for I2C2 in Hz (simulated).
+
+config I2C2_SCL_PIN
+    int "I2C2 SCL pin"
+    default 25
+    help
+      SCL pin number for I2C2 (simulated).
+
+config I2C2_SDA_PIN
+    int "I2C2 SDA pin"
+    default 24
+    help
+      SDA pin number for I2C2 (simulated).
+
+config I2C2_TX_BUFFER_SIZE
+    int "I2C2 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for I2C2 in bytes.
+
+config I2C2_RX_BUFFER_SIZE
+    int "I2C2 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for I2C2 in bytes.
+
+endif # INSTANCE_NX_I2C_2
+
+# I2C3 Configuration
+config INSTANCE_NX_I2C_3
+    bool "Enable I2C3"
+    default n
+    help
+      Enable I2C instance 3.
+
+if INSTANCE_NX_I2C_3
+
+config I2C3_SPEED
+    int "I2C3 speed (Hz)"
+    default 100000
+    help
+      I2C speed for I2C3 in Hz (simulated).
+
+config I2C3_SCL_PIN
+    int "I2C3 SCL pin"
+    default 35
+    help
+      SCL pin number for I2C3 (simulated).
+
+config I2C3_SDA_PIN
+    int "I2C3 SDA pin"
+    default 34
+    help
+      SDA pin number for I2C3 (simulated).
+
+config I2C3_TX_BUFFER_SIZE
+    int "I2C3 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for I2C3 in bytes.
+
+config I2C3_RX_BUFFER_SIZE
+    int "I2C3 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for I2C3 in bytes.
+
+endif # INSTANCE_NX_I2C_3
+
+endif # I2C_NATIVE

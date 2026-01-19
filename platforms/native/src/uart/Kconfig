@@ -1,0 +1,382 @@
+# UART Configuration for Native Platform
+
+config NATIVE_UART_ENABLE
+    bool "Enable UART support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable UART peripheral support for the Native platform.
+      This provides simulated UART functionality for testing
+      and development on PC.
+
+if NATIVE_UART_ENABLE
+
+config NATIVE_UART_MAX_INSTANCES
+    int "Maximum number of UART instances"
+    default 4
+    range 1 8
+    help
+      Maximum number of UART instances supported by the
+      Native platform. Each instance requires buffer memory.
+
+# UART0 Configuration
+menuconfig INSTANCE_NATIVE_UART_0
+    bool "Enable UART0"
+    default y
+    depends on NATIVE_UART_ENABLE
+    help
+      Enable UART instance 0.
+
+if INSTANCE_NATIVE_UART_0
+
+config UART0_BAUDRATE
+    int "UART0 baud rate"
+    default 115200
+    help
+      Baud rate for UART0 (simulated).
+
+config UART0_DATA_BITS
+    int "UART0 data bits"
+    default 8
+    range 5 9
+    help
+      Number of data bits for UART0.
+
+config UART0_STOP_BITS
+    int "UART0 stop bits"
+    default 1
+    range 1 2
+    help
+      Number of stop bits for UART0.
+
+choice
+    prompt "UART0 parity"
+    default NATIVE_UART0_PARITY_NONE
+    depends on INSTANCE_NATIVE_UART_0
+
+config NATIVE_UART0_PARITY_NONE
+    bool "None"
+
+config NATIVE_UART0_PARITY_ODD
+    bool "Odd"
+
+config NATIVE_UART0_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART0_PARITY_VALUE
+    int
+    default 0 if NATIVE_UART0_PARITY_NONE
+    default 1 if NATIVE_UART0_PARITY_ODD
+    default 2 if NATIVE_UART0_PARITY_EVEN
+
+choice
+    prompt "UART0 transfer mode"
+    default NATIVE_UART0_MODE_INTERRUPT
+    depends on INSTANCE_NATIVE_UART_0
+
+config NATIVE_UART0_MODE_POLLING
+    bool "Polling"
+
+config NATIVE_UART0_MODE_INTERRUPT
+    bool "Interrupt"
+
+config NATIVE_UART0_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART0_MODE_VALUE
+    int
+    default 0 if NATIVE_UART0_MODE_POLLING
+    default 1 if NATIVE_UART0_MODE_INTERRUPT
+    default 2 if NATIVE_UART0_MODE_DMA
+
+config UART0_TX_BUFFER_SIZE
+    int "UART0 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for UART0 in bytes.
+
+config UART0_RX_BUFFER_SIZE
+    int "UART0 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for UART0 in bytes.
+
+endif # INSTANCE_NATIVE_UART_0
+
+# UART1 Configuration
+menuconfig INSTANCE_NATIVE_UART_1
+    bool "Enable UART1"
+    default n
+    depends on NATIVE_UART_ENABLE
+    help
+      Enable UART instance 1.
+
+if INSTANCE_NATIVE_UART_1
+
+config UART1_BAUDRATE
+    int "UART1 baud rate"
+    default 115200
+    help
+      Baud rate for UART1 (simulated).
+
+config UART1_DATA_BITS
+    int "UART1 data bits"
+    default 8
+    range 5 9
+    help
+      Number of data bits for UART1.
+
+config UART1_STOP_BITS
+    int "UART1 stop bits"
+    default 1
+    range 1 2
+    help
+      Number of stop bits for UART1.
+
+choice
+    prompt "UART1 parity"
+    default NATIVE_UART1_PARITY_NONE
+    depends on INSTANCE_NATIVE_UART_1
+
+config NATIVE_UART1_PARITY_NONE
+    bool "None"
+
+config NATIVE_UART1_PARITY_ODD
+    bool "Odd"
+
+config NATIVE_UART1_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART1_PARITY_VALUE
+    int
+    default 0 if NATIVE_UART1_PARITY_NONE
+    default 1 if NATIVE_UART1_PARITY_ODD
+    default 2 if NATIVE_UART1_PARITY_EVEN
+
+choice
+    prompt "UART1 transfer mode"
+    default NATIVE_UART1_MODE_INTERRUPT
+    depends on INSTANCE_NATIVE_UART_1
+
+config NATIVE_UART1_MODE_POLLING
+    bool "Polling"
+
+config NATIVE_UART1_MODE_INTERRUPT
+    bool "Interrupt"
+
+config NATIVE_UART1_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART1_MODE_VALUE
+    int
+    default 0 if NATIVE_UART1_MODE_POLLING
+    default 1 if NATIVE_UART1_MODE_INTERRUPT
+    default 2 if NATIVE_UART1_MODE_DMA
+
+config UART1_TX_BUFFER_SIZE
+    int "UART1 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for UART1 in bytes.
+
+config UART1_RX_BUFFER_SIZE
+    int "UART1 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for UART1 in bytes.
+
+endif # INSTANCE_NATIVE_UART_1
+
+# UART2 Configuration
+menuconfig INSTANCE_NATIVE_UART_2
+    bool "Enable UART2"
+    default n
+    depends on NATIVE_UART_ENABLE
+    help
+      Enable UART instance 2.
+
+if INSTANCE_NATIVE_UART_2
+
+config UART2_BAUDRATE
+    int "UART2 baud rate"
+    default 115200
+    help
+      Baud rate for UART2 (simulated).
+
+config UART2_DATA_BITS
+    int "UART2 data bits"
+    default 8
+    range 5 9
+    help
+      Number of data bits for UART2.
+
+config UART2_STOP_BITS
+    int "UART2 stop bits"
+    default 1
+    range 1 2
+    help
+      Number of stop bits for UART2.
+
+choice
+    prompt "UART2 parity"
+    default NATIVE_UART2_PARITY_NONE
+    depends on INSTANCE_NATIVE_UART_2
+
+config NATIVE_UART2_PARITY_NONE
+    bool "None"
+
+config NATIVE_UART2_PARITY_ODD
+    bool "Odd"
+
+config NATIVE_UART2_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART2_PARITY_VALUE
+    int
+    default 0 if NATIVE_UART2_PARITY_NONE
+    default 1 if NATIVE_UART2_PARITY_ODD
+    default 2 if NATIVE_UART2_PARITY_EVEN
+
+choice
+    prompt "UART2 transfer mode"
+    default NATIVE_UART2_MODE_INTERRUPT
+    depends on INSTANCE_NATIVE_UART_2
+
+config NATIVE_UART2_MODE_POLLING
+    bool "Polling"
+
+config NATIVE_UART2_MODE_INTERRUPT
+    bool "Interrupt"
+
+config NATIVE_UART2_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART2_MODE_VALUE
+    int
+    default 0 if NATIVE_UART2_MODE_POLLING
+    default 1 if NATIVE_UART2_MODE_INTERRUPT
+    default 2 if NATIVE_UART2_MODE_DMA
+
+config UART2_TX_BUFFER_SIZE
+    int "UART2 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for UART2 in bytes.
+
+config UART2_RX_BUFFER_SIZE
+    int "UART2 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for UART2 in bytes.
+
+endif # INSTANCE_NATIVE_UART_2
+
+# UART3 Configuration
+menuconfig INSTANCE_NATIVE_UART_3
+    bool "Enable UART3"
+    default n
+    depends on NATIVE_UART_ENABLE
+    help
+      Enable UART instance 3.
+
+if INSTANCE_NATIVE_UART_3
+
+config UART3_BAUDRATE
+    int "UART3 baud rate"
+    default 115200
+    help
+      Baud rate for UART3 (simulated).
+
+config UART3_DATA_BITS
+    int "UART3 data bits"
+    default 8
+    range 5 9
+    help
+      Number of data bits for UART3.
+
+config UART3_STOP_BITS
+    int "UART3 stop bits"
+    default 1
+    range 1 2
+    help
+      Number of stop bits for UART3.
+
+choice
+    prompt "UART3 parity"
+    default NATIVE_UART3_PARITY_NONE
+    depends on INSTANCE_NATIVE_UART_3
+
+config NATIVE_UART3_PARITY_NONE
+    bool "None"
+
+config NATIVE_UART3_PARITY_ODD
+    bool "Odd"
+
+config NATIVE_UART3_PARITY_EVEN
+    bool "Even"
+
+endchoice
+
+config UART3_PARITY_VALUE
+    int
+    default 0 if NATIVE_UART3_PARITY_NONE
+    default 1 if NATIVE_UART3_PARITY_ODD
+    default 2 if NATIVE_UART3_PARITY_EVEN
+
+choice
+    prompt "UART3 transfer mode"
+    default NATIVE_UART3_MODE_INTERRUPT
+    depends on INSTANCE_NATIVE_UART_3
+
+config NATIVE_UART3_MODE_POLLING
+    bool "Polling"
+
+config NATIVE_UART3_MODE_INTERRUPT
+    bool "Interrupt"
+
+config NATIVE_UART3_MODE_DMA
+    bool "DMA"
+
+endchoice
+
+config UART3_MODE_VALUE
+    int
+    default 0 if NATIVE_UART3_MODE_POLLING
+    default 1 if NATIVE_UART3_MODE_INTERRUPT
+    default 2 if NATIVE_UART3_MODE_DMA
+
+config UART3_TX_BUFFER_SIZE
+    int "UART3 TX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of TX buffer for UART3 in bytes.
+
+config UART3_RX_BUFFER_SIZE
+    int "UART3 RX buffer size"
+    default 256
+    range 16 4096
+    help
+      Size of RX buffer for UART3 in bytes.
+
+endif # INSTANCE_NATIVE_UART_3
+
+endif # NATIVE_UART_ENABLE

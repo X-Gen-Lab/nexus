@@ -1,0 +1,248 @@
+# ADC Configuration for Native Platform
+
+config ADC_NATIVE
+    bool "Enable ADC support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable ADC peripheral support for the Native platform.
+      This provides simulated ADC functionality for testing
+      and development on PC.
+
+if ADC_NATIVE
+
+config ADC_MAX_INSTANCES
+    int "Maximum number of ADC instances"
+    default 4
+    range 1 8
+    help
+      Maximum number of ADC instances supported by the
+      Native platform.
+
+# ADC0 Configuration
+config INSTANCE_NX_ADC_0
+    bool "Enable ADC0"
+    default y
+    help
+      Enable ADC instance 0.
+
+if INSTANCE_NX_ADC_0
+
+config ADC0_CHANNEL_COUNT
+    int "ADC0 channel count"
+    default 16
+    range 1 16
+    help
+      Number of ADC channels for ADC0.
+
+config ADC0_RESOLUTION
+    int "ADC0 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      ADC resolution for ADC0 in bits.
+
+endif # INSTANCE_NX_ADC_0
+
+# ADC1 Configuration
+config INSTANCE_NX_ADC_1
+    bool "Enable ADC1"
+    default n
+    help
+      Enable ADC instance 1.
+
+if INSTANCE_NX_ADC_1
+
+config ADC1_CHANNEL_COUNT
+    int "ADC1 channel count"
+    default 16
+    range 1 16
+    help
+      Number of ADC channels for ADC1.
+
+config ADC1_RESOLUTION
+    int "ADC1 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      ADC resolution for ADC1 in bits.
+
+endif # INSTANCE_NX_ADC_1
+
+# ADC2 Configuration
+config INSTANCE_NX_ADC_2
+    bool "Enable ADC2"
+    default n
+    help
+      Enable ADC instance 2.
+
+if INSTANCE_NX_ADC_2
+
+config ADC2_CHANNEL_COUNT
+    int "ADC2 channel count"
+    default 16
+    range 1 16
+    help
+      Number of ADC channels for ADC2.
+
+config ADC2_RESOLUTION
+    int "ADC2 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      ADC resolution for ADC2 in bits.
+
+endif # INSTANCE_NX_ADC_2
+
+# ADC3 Configuration
+config INSTANCE_NX_ADC_3
+    bool "Enable ADC3"
+    default n
+    help
+      Enable ADC instance 3.
+
+if INSTANCE_NX_ADC_3
+
+config ADC3_CHANNEL_COUNT
+    int "ADC3 channel count"
+    default 16
+    range 1 16
+    help
+      Number of ADC channels for ADC3.
+
+config ADC3_RESOLUTION
+    int "ADC3 resolution (bits)"
+    default 12
+    range 8 16
+    help
+      ADC resolution for ADC3 in bits.
+
+endif # INSTANCE_NX_ADC_3
+
+endif # ADC_NATIVE
+
+# ADC Buffer Configuration
+config ADC_BUFFER_NATIVE
+    bool "Enable ADC Buffer support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE && ADC_NATIVE
+    help
+      Enable ADC Buffer peripheral support for the Native platform.
+      This provides simulated buffered multi-channel ADC sampling
+      for testing and development on PC.
+
+if ADC_BUFFER_NATIVE
+
+config ADC_BUFFER_MAX_INSTANCES
+    int "Maximum number of ADC Buffer instances"
+    default 4
+    range 1 8
+    help
+      Maximum number of ADC Buffer instances supported by the
+      Native platform.
+
+# ADC Buffer 0 Configuration
+config INSTANCE_NX_ADC_BUFFER_0
+    bool "Enable ADC_BUFFER0"
+    default y
+    help
+      Enable ADC Buffer instance 0.
+
+if INSTANCE_NX_ADC_BUFFER_0
+
+config ADC_BUFFER0_CHANNEL_COUNT
+    int "ADC_BUFFER0 channel count"
+    default 4
+    range 1 16
+    help
+      Number of ADC channels for ADC_BUFFER0.
+
+config ADC_BUFFER0_BUFFER_SIZE
+    int "ADC_BUFFER0 buffer size (samples)"
+    default 256
+    range 16 4096
+    help
+      Buffer size for ADC_BUFFER0 in samples.
+      Will be aligned to multiple of channel count.
+
+endif # INSTANCE_NX_ADC_BUFFER_0
+
+# ADC Buffer 1 Configuration
+config INSTANCE_NX_ADC_BUFFER_1
+    bool "Enable ADC_BUFFER1"
+    default n
+    help
+      Enable ADC Buffer instance 1.
+
+if INSTANCE_NX_ADC_BUFFER_1
+
+config ADC_BUFFER1_CHANNEL_COUNT
+    int "ADC_BUFFER1 channel count"
+    default 4
+    range 1 16
+    help
+      Number of ADC channels for ADC_BUFFER1.
+
+config ADC_BUFFER1_BUFFER_SIZE
+    int "ADC_BUFFER1 buffer size (samples)"
+    default 256
+    range 16 4096
+    help
+      Buffer size for ADC_BUFFER1 in samples.
+      Will be aligned to multiple of channel count.
+
+endif # INSTANCE_NX_ADC_BUFFER_1
+
+# ADC Buffer 2 Configuration
+config INSTANCE_NX_ADC_BUFFER_2
+    bool "Enable ADC_BUFFER2"
+    default n
+    help
+      Enable ADC Buffer instance 2.
+
+if INSTANCE_NX_ADC_BUFFER_2
+
+config ADC_BUFFER2_CHANNEL_COUNT
+    int "ADC_BUFFER2 channel count"
+    default 4
+    range 1 16
+    help
+      Number of ADC channels for ADC_BUFFER2.
+
+config ADC_BUFFER2_BUFFER_SIZE
+    int "ADC_BUFFER2 buffer size (samples)"
+    default 256
+    range 16 4096
+    help
+      Buffer size for ADC_BUFFER2 in samples.
+      Will be aligned to multiple of channel count.
+
+endif # INSTANCE_NX_ADC_BUFFER_2
+
+# ADC Buffer 3 Configuration
+config INSTANCE_NX_ADC_BUFFER_3
+    bool "Enable ADC_BUFFER3"
+    default n
+    help
+      Enable ADC Buffer instance 3.
+
+if INSTANCE_NX_ADC_BUFFER_3
+
+config ADC_BUFFER3_CHANNEL_COUNT
+    int "ADC_BUFFER3 channel count"
+    default 4
+    range 1 16
+    help
+      Number of ADC channels for ADC_BUFFER3.
+
+config ADC_BUFFER3_BUFFER_SIZE
+    int "ADC_BUFFER3 buffer size (samples)"
+    default 256
+    range 16 4096
+    help
+      Buffer size for ADC_BUFFER3 in samples.
+      Will be aligned to multiple of channel count.
+
+endif # INSTANCE_NX_ADC_BUFFER_3
+
+endif # ADC_BUFFER_NATIVE

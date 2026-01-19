@@ -1,0 +1,42 @@
+config NATIVE_FLASH
+    bool "Enable Flash support"
+    default y
+    help
+      Enable internal Flash peripheral support for Native platform.
+      Provides simulated flash memory with erase, write, and read operations.
+
+if NATIVE_FLASH
+
+config NATIVE_FLASH_INSTANCES
+    int "Number of Flash instances"
+    default 1
+    range 1 4
+    help
+      Number of Flash peripheral instances to create.
+
+config NATIVE_FLASH_SECTOR_SIZE
+    int "Flash sector size in bytes"
+    default 4096
+    help
+      Size of each flash sector in bytes.
+
+config NATIVE_FLASH_NUM_SECTORS
+    int "Number of flash sectors"
+    default 128
+    help
+      Total number of flash sectors.
+
+config NATIVE_FLASH_PERSISTENCE
+    bool "Enable flash persistence to file"
+    default y
+    help
+      Enable saving flash contents to a file for persistence across runs.
+
+config NATIVE_FLASH_BACKING_FILE
+    string "Flash backing file path"
+    default "native_flash.bin"
+    depends on NATIVE_FLASH_PERSISTENCE
+    help
+      Path to the file used for flash persistence.
+
+endif # NATIVE_FLASH

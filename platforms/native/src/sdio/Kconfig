@@ -1,0 +1,34 @@
+config NATIVE_SDIO
+    bool "Enable SDIO support"
+    default y
+    help
+      Enable SDIO peripheral support for Native platform.
+
+if NATIVE_SDIO
+
+config NATIVE_SDIO_INSTANCES
+    int "Number of SDIO instances"
+    default 1
+    range 1 4
+    help
+      Number of SDIO instances to support.
+
+config NATIVE_SDIO_CARD_PRESENT
+    bool "Simulate card present at startup"
+    default y
+    help
+      Simulate SD card present at startup for testing.
+
+config NATIVE_SDIO_BLOCK_SIZE
+    int "SDIO block size"
+    default 512
+    help
+      SDIO block size in bytes (standard is 512).
+
+config NATIVE_SDIO_NUM_BLOCKS
+    int "Number of SDIO blocks"
+    default 1024
+    help
+      Number of blocks in simulated SD card (default 1024 = 512KB).
+
+endif # NATIVE_SDIO

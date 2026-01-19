@@ -1,0 +1,75 @@
+# RTC Configuration for Native Platform
+
+config RTC_NATIVE
+    bool "Enable RTC support for Native platform"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Enable RTC (Real-Time Clock) peripheral support for the
+      Native platform. This provides simulated RTC functionality
+      for testing and development on PC.
+
+if RTC_NATIVE
+
+config RTC_MAX_INSTANCES
+    int "Maximum number of RTC instances"
+    default 1
+    range 1 4
+    help
+      Maximum number of RTC instances supported by the
+      Native platform.
+
+# RTC0 Configuration
+config INSTANCE_NX_RTC0
+    bool "Enable RTC0"
+    default y
+    help
+      Enable RTC instance 0.
+
+if INSTANCE_NX_RTC0
+
+config RTC0_ENABLE_ALARM
+    bool "Enable alarm functionality for RTC0"
+    default y
+    help
+      Enable alarm functionality for RTC0.
+      When enabled, the RTC can trigger callbacks at
+      specified date/time values.
+
+config RTC0_ALARM_COUNT
+    int "Maximum number of alarms for RTC0"
+    default 1
+    range 1 8
+    depends on RTC0_ENABLE_ALARM
+    help
+      Maximum number of alarms supported by RTC0.
+      Currently only 1 alarm is supported.
+
+endif # INSTANCE_NX_RTC0
+
+# RTC1 Configuration
+config INSTANCE_NX_RTC1
+    bool "Enable RTC1"
+    default n
+    help
+      Enable RTC instance 1.
+
+if INSTANCE_NX_RTC1
+
+config RTC1_ENABLE_ALARM
+    bool "Enable alarm functionality for RTC1"
+    default y
+    help
+      Enable alarm functionality for RTC1.
+
+config RTC1_ALARM_COUNT
+    int "Maximum number of alarms for RTC1"
+    default 1
+    range 1 8
+    depends on RTC1_ENABLE_ALARM
+    help
+      Maximum number of alarms supported by RTC1.
+
+endif # INSTANCE_NX_RTC1
+
+endif # RTC_NATIVE
