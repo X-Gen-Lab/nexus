@@ -1,0 +1,21 @@
+# Kconfig - Root configuration file for Nexus Embedded Platform
+#
+# This is the main entry point for the Kconfig-based configuration system.
+# It includes platform, HAL, and OSAL configuration files.
+
+mainmenu "Nexus Embedded Platform Configuration"
+
+# Platform selection and configuration
+source "platforms/Kconfig"
+
+# HAL layer configuration
+source "hal/Kconfig"
+
+# OSAL configuration
+source "osal/Kconfig"
+
+# Framework layer configuration (future expansion)
+# source "framework/Kconfig"
+
+# Middleware configuration (future expansion)
+# source "middleware/Kconfig"
