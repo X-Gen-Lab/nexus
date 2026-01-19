@@ -22,7 +22,8 @@
 
 extern "C" {
 #include "hal/interface/nx_crc.h"
-#include "native_crc_test.h"
+#include "hal/nx_factory.h"
+#include "tests/hal/native/devices/native_crc_helpers.h"
 }
 
 /**
@@ -42,10 +43,10 @@ class CRCPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all CRC instances */
-        nx_crc_native_reset_all();
+        native_crc_reset_all();
 
         /* Get CRC0 instance */
-        crc = nx_crc_native_get(0);
+        crc = nx_factory_crc(0);
         ASSERT_NE(nullptr, crc);
 
         /* Initialize CRC */
@@ -64,7 +65,7 @@ class CRCPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_crc_native_reset_all();
+        native_crc_reset_all();
     }
 
     /**

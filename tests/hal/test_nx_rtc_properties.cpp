@@ -23,7 +23,7 @@
 
 extern "C" {
 #include "hal/interface/nx_rtc.h"
-#include "native_rtc_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_rtc_helpers.h"
 }
 
 /**
@@ -43,10 +43,10 @@ class RTCPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all RTC instances */
-        nx_rtc_native_reset_all();
+        native_rtc_reset_all();
 
         /* Get RTC0 instance */
-        rtc = nx_rtc_native_get(0);
+        rtc = nx_factory_rtc(0);
         ASSERT_NE(nullptr, rtc);
 
         /* Initialize RTC */
@@ -65,7 +65,7 @@ class RTCPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_rtc_native_reset_all();
+        native_rtc_reset_all();
     }
 
     /**
@@ -352,10 +352,10 @@ TEST_F(RTCPropertyTest, Property9_AlarmTriggersAtCorrectTime) {
             << "Iteration " << test_iter << ": Alarm triggered prematurely";
 
         /* Advance time to alarm time */
-        ASSERT_EQ(NX_OK, nx_rtc_native_advance_time(0, advance_seconds));
+        ASSERT_EQ(NX_OK, native_rtc_advance_time(0, advance_seconds));
 
         /* Check alarm */
-        ASSERT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+        ASSERT_EQ(NX_OK, native_rtc_check_alarm(0));
 
         /* Alarm should have triggered exactly once */
         EXPECT_EQ(1, g_alarm_trigger_count)
@@ -395,7 +395,7 @@ TEST_F(RTCPropertyTest, Property9_PastAlarmTriggersImmediately) {
                                         property_alarm_callback, nullptr));
 
         /* Check alarm */
-        ASSERT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+        ASSERT_EQ(NX_OK, native_rtc_check_alarm(0));
 
         /* Alarm should have triggered */
         EXPECT_EQ(1, g_alarm_trigger_count)
@@ -441,10 +441,10 @@ TEST_F(RTCPropertyTest, Property9_DisabledAlarmDoesNotTrigger) {
         ASSERT_EQ(NX_OK, rtc->set_alarm(rtc, nullptr, nullptr, nullptr));
 
         /* Advance time to alarm time */
-        ASSERT_EQ(NX_OK, nx_rtc_native_advance_time(0, 5));
+        ASSERT_EQ(NX_OK, native_rtc_advance_time(0, 5));
 
         /* Check alarm */
-        ASSERT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+        ASSERT_EQ(NX_OK, native_rtc_check_alarm(0));
 
         /* Alarm should not have triggered */
         EXPECT_EQ(0, g_alarm_trigger_count)
@@ -487,12 +487,12 @@ TEST_F(RTCPropertyTest, Property9_AlarmTriggersOnlyOnce) {
                                         property_alarm_callback, nullptr));
 
         /* Advance time to alarm time */
-        ASSERT_EQ(NX_OK, nx_rtc_native_advance_time(0, 5));
+        ASSERT_EQ(NX_OK, native_rtc_advance_time(0, 5));
 
         /* Check alarm multiple times */
-        ASSERT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
-        ASSERT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
-        ASSERT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+        ASSERT_EQ(NX_OK, native_rtc_check_alarm(0));
+        ASSERT_EQ(NX_OK, native_rtc_check_alarm(0));
+        ASSERT_EQ(NX_OK, native_rtc_check_alarm(0));
 
         /* Alarm should have triggered exactly once */
         EXPECT_EQ(1, g_alarm_trigger_count)

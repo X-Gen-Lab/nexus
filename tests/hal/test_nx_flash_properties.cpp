@@ -23,7 +23,8 @@
 
 extern "C" {
 #include "hal/interface/nx_flash.h"
-#include "native_flash_test.h"
+#include "hal/nx_factory.h"
+#include "tests/hal/native/devices/native_flash_helpers.h"
 }
 
 /**
@@ -43,10 +44,10 @@ class FlashPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all Flash instances */
-        nx_flash_native_reset_all();
+        native_flash_reset_all();
 
         /* Get Flash0 instance */
-        flash = nx_flash_native_get(0);
+        flash = nx_factory_flash(0);
         ASSERT_NE(nullptr, flash);
 
         /* Initialize Flash */
@@ -68,7 +69,7 @@ class FlashPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_flash_native_reset_all();
+        native_flash_reset_all();
     }
 
     /**
@@ -168,7 +169,7 @@ TEST_F(FlashPropertyTest, Property6_EraseMarksAreaAsErased) {
         ASSERT_EQ(NX_OK, flash->erase(flash, addr, len));
 
         /* Verify area is erased */
-        EXPECT_TRUE(nx_flash_native_is_erased(0, addr, len))
+        EXPECT_TRUE(native_flash_is_erased(0, addr, len))
             << "Iteration " << test_iter << ": Area not erased at address "
             << addr;
     }

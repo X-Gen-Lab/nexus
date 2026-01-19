@@ -43,10 +43,10 @@ class OptionBytesPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all Option Bytes instances */
-        nx_option_bytes_native_reset_all();
+        native_option_bytes_reset_all();
 
         /* Get Option Bytes instance */
-        opt_bytes = nx_option_bytes_native_get(0);
+        opt_bytes = nx_factory_option_bytes(0);
         ASSERT_NE(nullptr, opt_bytes);
 
         /* Initialize Option Bytes */
@@ -68,7 +68,7 @@ class OptionBytesPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_option_bytes_native_reset_all();
+        native_option_bytes_reset_all();
     }
 
     /**
@@ -124,7 +124,7 @@ TEST_F(OptionBytesPropertyTest, Property14_WriteProtectionBlocksUserDataWrite) {
         std::vector<uint8_t> data = randomUserData(len);
 
         /* Enable write protection */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, true));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, true));
 
         /* Attempt to write user data */
         nx_status_t status =
@@ -136,7 +136,7 @@ TEST_F(OptionBytesPropertyTest, Property14_WriteProtectionBlocksUserDataWrite) {
             << ": Write protection did not block user data write";
 
         /* Disable write protection for next iteration */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, false));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, false));
     }
 }
 
@@ -156,7 +156,7 @@ TEST_F(OptionBytesPropertyTest,
         uint8_t level = randomProtectionLevel();
 
         /* Enable write protection */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, true));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, true));
 
         /* Attempt to set protection level */
         nx_status_t status = opt_bytes->set_read_protection(opt_bytes, level);
@@ -167,7 +167,7 @@ TEST_F(OptionBytesPropertyTest,
             << ": Write protection did not block protection level change";
 
         /* Disable write protection for next iteration */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, false));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, false));
     }
 }
 
@@ -191,7 +191,7 @@ TEST_F(OptionBytesPropertyTest, Property14_WriteProtectionBlocksApply) {
         ASSERT_EQ(NX_OK, opt_bytes->set_user_data(opt_bytes, data.data(), len));
 
         /* Enable write protection */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, true));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, true));
 
         /* Attempt to apply changes */
         nx_status_t status = opt_bytes->apply(opt_bytes);
@@ -202,8 +202,8 @@ TEST_F(OptionBytesPropertyTest, Property14_WriteProtectionBlocksApply) {
             << ": Write protection did not block apply";
 
         /* Disable write protection and reset for next iteration */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, false));
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_reset(0));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, false));
+        ASSERT_EQ(NX_OK, native_option_bytes_reset(0));
 
         /* Reinitialize */
         nx_lifecycle_t* lifecycle =
@@ -229,7 +229,7 @@ TEST_F(OptionBytesPropertyTest, Property14_NoWriteProtectionAllowsWrite) {
         std::vector<uint8_t> data = randomUserData(len);
 
         /* Ensure write protection is disabled */
-        ASSERT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, false));
+        ASSERT_EQ(NX_OK, native_option_bytes_set_write_protection(0, false));
 
         /* Write user data */
         nx_status_t status =
@@ -424,3 +424,4 @@ TEST_F(OptionBytesPropertyTest, ProtectionLevelChangeNotVisibleUntilApply) {
             << ": Protection level change not visible after apply()";
     }
 }
+

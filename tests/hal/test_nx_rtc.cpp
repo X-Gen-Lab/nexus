@@ -19,7 +19,7 @@
 
 extern "C" {
 #include "hal/interface/nx_rtc.h"
-#include "native_rtc_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_rtc_helpers.h"
 }
 
 /**
@@ -29,10 +29,10 @@ class RTCTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all RTC instances before each test */
-        nx_rtc_native_reset_all();
+        native_rtc_reset_all();
 
         /* Get RTC0 instance */
-        rtc = nx_rtc_native_get(0);
+        rtc = nx_factory_rtc(0);
         ASSERT_NE(nullptr, rtc);
 
         /* Initialize RTC */
@@ -51,7 +51,7 @@ class RTCTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_rtc_native_reset_all();
+        native_rtc_reset_all();
     }
 
     nx_rtc_t* rtc = nullptr;
@@ -110,7 +110,7 @@ TEST_F(RTCTest, TimeProgression) {
     EXPECT_EQ(NX_OK, rtc->set_datetime(rtc, &initial_time));
 
     /* Simulate 5 seconds passing */
-    EXPECT_EQ(NX_OK, nx_rtc_native_advance_time(0, 5));
+    EXPECT_EQ(NX_OK, native_rtc_advance_time(0, 5));
 
     /* Get time */
     nx_datetime_t current_time;
@@ -290,10 +290,10 @@ TEST_F(RTCTest, AlarmTrigger) {
     EXPECT_EQ(NX_OK, rtc->set_alarm(rtc, &alarm_time, alarm_callback, nullptr));
 
     /* Advance time by 5 seconds */
-    EXPECT_EQ(NX_OK, nx_rtc_native_advance_time(0, 5));
+    EXPECT_EQ(NX_OK, native_rtc_advance_time(0, 5));
 
     /* Manually check alarm */
-    EXPECT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+    EXPECT_EQ(NX_OK, native_rtc_check_alarm(0));
 
     /* Alarm should have triggered */
     EXPECT_TRUE(g_alarm_triggered);
@@ -325,8 +325,8 @@ TEST_F(RTCTest, AlarmUserData) {
               rtc->set_alarm(rtc, &alarm_time, alarm_callback, &user_data));
 
     /* Advance time and trigger alarm */
-    EXPECT_EQ(NX_OK, nx_rtc_native_advance_time(0, 5));
-    EXPECT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+    EXPECT_EQ(NX_OK, native_rtc_advance_time(0, 5));
+    EXPECT_EQ(NX_OK, native_rtc_check_alarm(0));
 
     /* Check user data was passed */
     EXPECT_TRUE(g_alarm_triggered);
@@ -349,8 +349,8 @@ TEST_F(RTCTest, DisableAlarm) {
     EXPECT_EQ(NX_OK, rtc->set_alarm(rtc, nullptr, nullptr, nullptr));
 
     /* Advance time */
-    EXPECT_EQ(NX_OK, nx_rtc_native_advance_time(0, 5));
-    EXPECT_EQ(NX_OK, nx_rtc_native_check_alarm(0));
+    EXPECT_EQ(NX_OK, native_rtc_advance_time(0, 5));
+    EXPECT_EQ(NX_OK, native_rtc_check_alarm(0));
 
     /* Alarm should not have triggered */
     EXPECT_FALSE(g_alarm_triggered);
@@ -364,7 +364,7 @@ TEST_F(RTCTest, LifecycleInit) {
     /* Already initialized in SetUp, check state */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_rtc_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_rtc_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -376,7 +376,7 @@ TEST_F(RTCTest, LifecycleDeinit) {
 
     /* Check state */
     bool initialized = false;
-    EXPECT_EQ(NX_OK, nx_rtc_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_rtc_get_state(0, &initialized, nullptr));
     EXPECT_FALSE(initialized);
 }
 
@@ -387,14 +387,14 @@ TEST_F(RTCTest, LifecycleSuspendResume) {
 
     /* Check state */
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_rtc_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_rtc_get_state(0, nullptr, &suspended));
     EXPECT_TRUE(suspended);
 
     /* Resume */
     EXPECT_EQ(NX_OK, lifecycle->resume(lifecycle));
 
     /* Check state */
-    EXPECT_EQ(NX_OK, nx_rtc_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_rtc_get_state(0, nullptr, &suspended));
     EXPECT_FALSE(suspended);
 }
 

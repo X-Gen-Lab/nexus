@@ -42,10 +42,10 @@ class USBPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all USB instances */
-        nx_usb_native_reset_all();
+        native_usb_reset_all();
 
         /* Get USB0 instance */
-        usb = nx_usb_native_get(0);
+        usb = nx_factory_usb(0);
         ASSERT_NE(nullptr, usb);
 
         /* Initialize USB */
@@ -54,7 +54,7 @@ class USBPropertyTest : public ::testing::Test {
         ASSERT_EQ(NX_OK, lifecycle->init(lifecycle));
 
         /* Ensure connected */
-        ASSERT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+        ASSERT_EQ(NX_OK, native_usb_simulate_connect(0));
     }
 
     void TearDown() override {
@@ -67,7 +67,7 @@ class USBPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_usb_native_reset_all();
+        native_usb_reset_all();
     }
 
     /**
@@ -118,7 +118,7 @@ TEST_F(USBPropertyTest, Property10_TxRxRoundTrip) {
 
         /* Simulate loopback by injecting TX data into RX */
         ASSERT_EQ(NX_OK,
-                  nx_usb_native_inject_rx(0, tx_data.data(), tx_data.size()))
+                  native_usb_inject_rx(0, tx_data.data(), tx_data.size()))
             << "Iteration " << test_iter;
 
         /* Receive data (async) */
@@ -159,7 +159,7 @@ TEST_F(USBPropertyTest, Property10_SyncTxRxRoundTrip) {
 
         /* Simulate loopback */
         ASSERT_EQ(NX_OK,
-                  nx_usb_native_inject_rx(0, tx_data.data(), tx_data.size()))
+                  native_usb_inject_rx(0, tx_data.data(), tx_data.size()))
             << "Iteration " << test_iter;
 
         /* Receive data (sync) */
@@ -201,12 +201,12 @@ TEST_F(USBPropertyTest, Property10_ConnectionStateConsistency) {
 
             if (op_type == 0 && !expected_connected) {
                 /* Connect */
-                ASSERT_EQ(NX_OK, nx_usb_native_simulate_connect(0))
+                ASSERT_EQ(NX_OK, native_usb_simulate_connect(0))
                     << "Iteration " << test_iter << ", Op " << op;
                 expected_connected = true;
             } else if (op_type == 1 && expected_connected) {
                 /* Disconnect */
-                ASSERT_EQ(NX_OK, nx_usb_native_simulate_disconnect(0))
+                ASSERT_EQ(NX_OK, native_usb_simulate_disconnect(0))
                     << "Iteration " << test_iter << ", Op " << op;
                 expected_connected = false;
             }
@@ -241,12 +241,12 @@ TEST_F(USBPropertyTest, Property10_SuspendResumeStateConsistency) {
 
             if (op_type == 0 && !expected_suspended) {
                 /* Suspend */
-                ASSERT_EQ(NX_OK, nx_usb_native_simulate_suspend(0))
+                ASSERT_EQ(NX_OK, native_usb_simulate_suspend(0))
                     << "Iteration " << test_iter << ", Op " << op;
                 expected_suspended = true;
             } else if (op_type == 1 && expected_suspended) {
                 /* Resume */
-                ASSERT_EQ(NX_OK, nx_usb_native_simulate_resume(0))
+                ASSERT_EQ(NX_OK, native_usb_simulate_resume(0))
                     << "Iteration " << test_iter << ", Op " << op;
                 expected_suspended = false;
             }
@@ -255,7 +255,7 @@ TEST_F(USBPropertyTest, Property10_SuspendResumeStateConsistency) {
             bool initialized = false;
             bool suspended = false;
             ASSERT_EQ(NX_OK,
-                      nx_usb_native_get_state(0, &initialized, &suspended))
+                      native_usb_get_state(0, &initialized, &suspended))
                 << "Iteration " << test_iter << ", Op " << op;
 
             EXPECT_TRUE(initialized)
@@ -278,7 +278,7 @@ TEST_F(USBPropertyTest, Property10_SuspendResumeStateConsistency) {
 TEST_F(USBPropertyTest, Property10_DisconnectedTxFails) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Disconnect */
-        ASSERT_EQ(NX_OK, nx_usb_native_simulate_disconnect(0))
+        ASSERT_EQ(NX_OK, native_usb_simulate_disconnect(0))
             << "Iteration " << test_iter;
 
         /* Generate random data */
@@ -293,7 +293,7 @@ TEST_F(USBPropertyTest, Property10_DisconnectedTxFails) {
             << "Iteration " << test_iter << ": TX succeeded while disconnected";
 
         /* Reconnect for next iteration */
-        ASSERT_EQ(NX_OK, nx_usb_native_simulate_connect(0))
+        ASSERT_EQ(NX_OK, native_usb_simulate_connect(0))
             << "Iteration " << test_iter;
     }
 }
@@ -310,7 +310,7 @@ TEST_F(USBPropertyTest, Property10_DisconnectedTxFails) {
 TEST_F(USBPropertyTest, Property10_DisconnectedRxFails) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Disconnect */
-        ASSERT_EQ(NX_OK, nx_usb_native_simulate_disconnect(0))
+        ASSERT_EQ(NX_OK, native_usb_simulate_disconnect(0))
             << "Iteration " << test_iter;
 
         /* Try to receive - should fail */
@@ -325,7 +325,7 @@ TEST_F(USBPropertyTest, Property10_DisconnectedRxFails) {
             << "Iteration " << test_iter << ": RX succeeded while disconnected";
 
         /* Reconnect for next iteration */
-        ASSERT_EQ(NX_OK, nx_usb_native_simulate_connect(0))
+        ASSERT_EQ(NX_OK, native_usb_simulate_connect(0))
             << "Iteration " << test_iter;
     }
 }
@@ -383,7 +383,7 @@ TEST_F(USBPropertyTest, Property10_LifecycleStateConsistency) {
                     << "Iteration " << test_iter << ", Op " << op;
 
                 /* Reconnect after reinit */
-                ASSERT_EQ(NX_OK, nx_usb_native_simulate_connect(0))
+                ASSERT_EQ(NX_OK, native_usb_simulate_connect(0))
                     << "Iteration " << test_iter << ", Op " << op;
             }
         }
@@ -432,3 +432,4 @@ TEST_F(USBPropertyTest, Property10_PowerStateConsistency) {
         }
     }
 }
+

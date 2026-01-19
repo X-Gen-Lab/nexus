@@ -23,7 +23,7 @@
 
 extern "C" {
 #include "hal/interface/nx_watchdog.h"
-#include "native_watchdog_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_watchdog_helpers.h"
 }
 
 /**
@@ -43,10 +43,10 @@ class WatchdogPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all Watchdog instances */
-        nx_watchdog_native_reset_all();
+        native_watchdog_reset_all();
 
         /* Get Watchdog0 instance */
-        wdt = nx_watchdog_native_get(0);
+        wdt = nx_factory_watchdog(0);
         ASSERT_NE(nullptr, wdt);
 
         /* Initialize Watchdog */
@@ -65,7 +65,7 @@ class WatchdogPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_watchdog_native_reset_all();
+        native_watchdog_reset_all();
     }
 };
 
@@ -99,10 +99,10 @@ TEST_F(WatchdogPropertyTest, Property11_FeedResetsCountdown) {
         uint32_t wait_time = wait_dist(rng);
 
         /* Advance time but not past timeout */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, wait_time));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, wait_time));
 
         /* Should not have timed out yet */
-        EXPECT_FALSE(nx_watchdog_native_has_timed_out(0))
+        EXPECT_FALSE(native_watchdog_has_timed_out(0))
             << "Iteration " << test_iter
             << ": Watchdog timed out before timeout period";
 
@@ -110,10 +110,10 @@ TEST_F(WatchdogPropertyTest, Property11_FeedResetsCountdown) {
         wdt->feed(wdt);
 
         /* Advance time again by same amount */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, wait_time));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, wait_time));
 
         /* Should still not have timed out (feed reset the timer) */
-        EXPECT_FALSE(nx_watchdog_native_has_timed_out(0))
+        EXPECT_FALSE(native_watchdog_has_timed_out(0))
             << "Iteration " << test_iter
             << ": Watchdog timed out after feed (feed did not reset timer)";
 
@@ -146,10 +146,10 @@ TEST_F(WatchdogPropertyTest, Property11_MultipleFeedsPreventTimeout) {
         for (int i = 0; i < feed_count; ++i) {
             /* Advance time to 70% of timeout */
             uint32_t advance_time = (timeout_ms * 7) / 10;
-            ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, advance_time));
+            ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, advance_time));
 
             /* Should not have timed out */
-            EXPECT_FALSE(nx_watchdog_native_has_timed_out(0))
+            EXPECT_FALSE(native_watchdog_has_timed_out(0))
                 << "Iteration " << test_iter << ", Feed " << i
                 << ": Watchdog timed out despite regular feeding";
 
@@ -184,10 +184,10 @@ TEST_F(WatchdogPropertyTest, Property11_NoFeedCausesTimeout) {
         uint32_t advance_time = advance_dist(rng);
 
         /* Advance time past timeout without feeding */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, advance_time));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, advance_time));
 
         /* Should have timed out */
-        EXPECT_TRUE(nx_watchdog_native_has_timed_out(0))
+        EXPECT_TRUE(native_watchdog_has_timed_out(0))
             << "Iteration " << test_iter << ": Watchdog did not timeout after "
             << advance_time << "ms (timeout=" << timeout_ms << "ms)";
 
@@ -211,7 +211,7 @@ TEST_F(WatchdogPropertyTest, Property11_FeedStoppedWatchdogHasNoEffect) {
         wdt->feed(wdt);
 
         /* Should not have timed out (not running) */
-        EXPECT_FALSE(nx_watchdog_native_has_timed_out(0))
+        EXPECT_FALSE(native_watchdog_has_timed_out(0))
             << "Iteration " << test_iter
             << ": Stopped watchdog reported timeout";
 
@@ -219,10 +219,10 @@ TEST_F(WatchdogPropertyTest, Property11_FeedStoppedWatchdogHasNoEffect) {
         uint32_t timeout_ms = wdt->get_timeout(wdt);
 
         /* Advance time past timeout */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 1000));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 1000));
 
         /* Should still not have timed out (not running) */
-        EXPECT_FALSE(nx_watchdog_native_has_timed_out(0))
+        EXPECT_FALSE(native_watchdog_has_timed_out(0))
             << "Iteration " << test_iter
             << ": Stopped watchdog timed out unexpectedly";
     }
@@ -277,7 +277,7 @@ TEST_F(WatchdogPropertyTest, Property12_TimeoutInvokesCallback) {
         uint32_t advance_time = advance_dist(rng);
 
         /* Advance time past timeout */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, advance_time));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, advance_time));
 
         /* Callback should have been invoked exactly once */
         EXPECT_EQ(1, g_callback_invocation_count)
@@ -313,10 +313,10 @@ TEST_F(WatchdogPropertyTest, Property12_TimeoutWithoutCallbackDoesNotCrash) {
         uint32_t timeout_ms = wdt->get_timeout(wdt);
 
         /* Advance time past timeout */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 1000));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 1000));
 
         /* Should have timed out (but not crashed) */
-        EXPECT_TRUE(nx_watchdog_native_has_timed_out(0))
+        EXPECT_TRUE(native_watchdog_has_timed_out(0))
             << "Iteration " << test_iter;
 
         /* Stop watchdog for next iteration */
@@ -356,7 +356,7 @@ TEST_F(WatchdogPropertyTest, Property12_FeedPreventsCallbackInvocation) {
         for (int i = 0; i < cycles; ++i) {
             /* Advance time to 70% of timeout */
             uint32_t advance_time = (timeout_ms * 7) / 10;
-            ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, advance_time));
+            ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, advance_time));
 
             /* Feed watchdog */
             wdt->feed(wdt);
@@ -397,14 +397,14 @@ TEST_F(WatchdogPropertyTest, Property12_CallbackInvokedOnlyOnce) {
         uint32_t timeout_ms = wdt->get_timeout(wdt);
 
         /* Advance time past timeout */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 1000));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 1000));
 
         /* Callback should have been invoked once */
         EXPECT_EQ(1, g_callback_invocation_count)
             << "Iteration " << test_iter << ": Initial callback count";
 
         /* Advance time further (simulate continued timeout) */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms));
 
         /* Callback should still only have been invoked once */
         EXPECT_EQ(1, g_callback_invocation_count)
@@ -448,7 +448,7 @@ TEST_F(WatchdogPropertyTest, Property12_CallbackCanBeChanged) {
         uint32_t timeout_ms = wdt->get_timeout(wdt);
 
         /* Advance time past timeout */
-        ASSERT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 1000));
+        ASSERT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 1000));
 
         /* Only second callback should have been invoked */
         EXPECT_EQ(0, g_callback_invocation_count)

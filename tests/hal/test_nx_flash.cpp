@@ -16,7 +16,8 @@
 
 extern "C" {
 #include "hal/interface/nx_flash.h"
-#include "native_flash_test.h"
+#include "hal/nx_factory.h"
+#include "tests/hal/native/devices/native_flash_helpers.h"
 }
 
 /**
@@ -26,10 +27,10 @@ class FlashTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all Flash instances before each test */
-        nx_flash_native_reset_all();
+        native_flash_reset_all();
 
         /* Get Flash0 instance */
-        flash = nx_flash_native_get(0);
+        flash = nx_factory_flash(0);
         ASSERT_NE(nullptr, flash);
 
         /* Initialize Flash */
@@ -51,7 +52,7 @@ class FlashTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_flash_native_reset_all();
+        native_flash_reset_all();
     }
 
     nx_internal_flash_t* flash = nullptr;
@@ -69,7 +70,7 @@ TEST_F(FlashTest, Erase_SingleSector) {
     EXPECT_EQ(NX_OK, flash->erase(flash, addr, size));
 
     /* Verify sector is erased */
-    EXPECT_TRUE(nx_flash_native_is_erased(0, addr, size));
+    EXPECT_TRUE(native_flash_is_erased(0, addr, size));
 }
 
 TEST_F(FlashTest, Erase_MultipleSectors) {
@@ -80,7 +81,7 @@ TEST_F(FlashTest, Erase_MultipleSectors) {
     EXPECT_EQ(NX_OK, flash->erase(flash, addr, size));
 
     /* Verify all sectors are erased */
-    EXPECT_TRUE(nx_flash_native_is_erased(0, addr, size));
+    EXPECT_TRUE(native_flash_is_erased(0, addr, size));
 }
 
 TEST_F(FlashTest, Erase_PartialSector) {
@@ -91,7 +92,7 @@ TEST_F(FlashTest, Erase_PartialSector) {
     EXPECT_EQ(NX_OK, flash->erase(flash, addr, size));
 
     /* Verify entire sector is erased */
-    EXPECT_TRUE(nx_flash_native_is_erased(0, 0, flash->get_page_size(flash)));
+    EXPECT_TRUE(native_flash_is_erased(0, 0, flash->get_page_size(flash)));
 }
 
 TEST_F(FlashTest, Erase_WhenLocked) {
@@ -241,17 +242,17 @@ TEST_F(FlashTest, Read_CrossSectorBoundary) {
 TEST_F(FlashTest, Lock_Unlock) {
     /* Flash should start unlocked (from SetUp) */
     bool locked = false;
-    EXPECT_EQ(NX_OK, nx_flash_native_get_lock_status(0, &locked));
+    EXPECT_EQ(NX_OK, native_flash_get_lock_status(0, &locked));
     EXPECT_FALSE(locked);
 
     /* Lock flash */
     EXPECT_EQ(NX_OK, flash->lock(flash));
-    EXPECT_EQ(NX_OK, nx_flash_native_get_lock_status(0, &locked));
+    EXPECT_EQ(NX_OK, native_flash_get_lock_status(0, &locked));
     EXPECT_TRUE(locked);
 
     /* Unlock flash */
     EXPECT_EQ(NX_OK, flash->unlock(flash));
-    EXPECT_EQ(NX_OK, nx_flash_native_get_lock_status(0, &locked));
+    EXPECT_EQ(NX_OK, native_flash_get_lock_status(0, &locked));
     EXPECT_FALSE(locked);
 }
 
@@ -262,19 +263,19 @@ TEST_F(FlashTest, Lock_Unlock) {
 TEST_F(FlashTest, Lifecycle_InitDeinit) {
     /* Flash is already initialized in SetUp */
     bool initialized = false;
-    EXPECT_EQ(NX_OK, nx_flash_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_flash_get_state(0, &initialized, nullptr));
     EXPECT_TRUE(initialized);
 
     /* Deinitialize */
     nx_lifecycle_t* lifecycle = flash->get_lifecycle(flash);
     EXPECT_EQ(NX_OK, lifecycle->deinit(lifecycle));
 
-    EXPECT_EQ(NX_OK, nx_flash_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_flash_get_state(0, &initialized, nullptr));
     EXPECT_FALSE(initialized);
 
     /* Reinitialize */
     EXPECT_EQ(NX_OK, lifecycle->init(lifecycle));
-    EXPECT_EQ(NX_OK, nx_flash_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_flash_get_state(0, &initialized, nullptr));
     EXPECT_TRUE(initialized);
 }
 
@@ -285,13 +286,13 @@ TEST_F(FlashTest, Lifecycle_SuspendResume) {
     nx_lifecycle_t* lifecycle = flash->get_lifecycle(flash);
     EXPECT_EQ(NX_OK, lifecycle->suspend(lifecycle));
 
-    EXPECT_EQ(NX_OK, nx_flash_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_flash_get_state(0, nullptr, &suspended));
     EXPECT_TRUE(suspended);
 
     /* Resume */
     EXPECT_EQ(NX_OK, lifecycle->resume(lifecycle));
 
-    EXPECT_EQ(NX_OK, nx_flash_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_flash_get_state(0, nullptr, &suspended));
     EXPECT_FALSE(suspended);
 }
 

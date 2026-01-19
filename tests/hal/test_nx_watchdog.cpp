@@ -19,7 +19,7 @@
 extern "C" {
 #include "hal/interface/nx_power.h"
 #include "hal/interface/nx_watchdog.h"
-#include "native_watchdog_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_watchdog_helpers.h"
 }
 
 /**
@@ -29,10 +29,10 @@ class WatchdogTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all Watchdog instances before each test */
-        nx_watchdog_native_reset_all();
+        native_watchdog_reset_all();
 
         /* Get Watchdog0 instance */
-        wdt = nx_watchdog_native_get(0);
+        wdt = nx_factory_watchdog(0);
         ASSERT_NE(nullptr, wdt);
 
         /* Initialize Watchdog */
@@ -51,7 +51,7 @@ class WatchdogTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_watchdog_native_reset_all();
+        native_watchdog_reset_all();
     }
 
     nx_watchdog_t* wdt = nullptr;
@@ -100,7 +100,7 @@ TEST_F(WatchdogTest, FeedWatchdog) {
     wdt->feed(wdt);
 
     /* Should not have timed out */
-    EXPECT_FALSE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_FALSE(native_watchdog_has_timed_out(0));
 }
 
 TEST_F(WatchdogTest, FeedWithoutStart) {
@@ -108,7 +108,7 @@ TEST_F(WatchdogTest, FeedWithoutStart) {
     wdt->feed(wdt);
 
     /* Should not have timed out */
-    EXPECT_FALSE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_FALSE(native_watchdog_has_timed_out(0));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -120,17 +120,17 @@ TEST_F(WatchdogTest, TimeoutDetection) {
     EXPECT_EQ(NX_OK, wdt->start(wdt));
 
     /* Should not have timed out yet */
-    EXPECT_FALSE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_FALSE(native_watchdog_has_timed_out(0));
 
     /* Get timeout value */
     uint32_t timeout_ms = wdt->get_timeout(wdt);
     EXPECT_GT(timeout_ms, 0U);
 
     /* Advance time past timeout */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 100));
+    EXPECT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 100));
 
     /* Should have timed out */
-    EXPECT_TRUE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_TRUE(native_watchdog_has_timed_out(0));
 }
 
 TEST_F(WatchdogTest, FeedPreventsTimeout) {
@@ -141,19 +141,19 @@ TEST_F(WatchdogTest, FeedPreventsTimeout) {
     uint32_t timeout_ms = wdt->get_timeout(wdt);
 
     /* Advance time to just before timeout */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms - 100));
+    EXPECT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms - 100));
 
     /* Feed watchdog */
     wdt->feed(wdt);
 
     /* Should not have timed out */
-    EXPECT_FALSE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_FALSE(native_watchdog_has_timed_out(0));
 
     /* Advance time again (but not past new timeout) */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms - 100));
+    EXPECT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms - 100));
 
     /* Should still not have timed out */
-    EXPECT_FALSE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_FALSE(native_watchdog_has_timed_out(0));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -185,7 +185,7 @@ TEST_F(WatchdogTest, CallbackRegistration) {
     uint32_t timeout_ms = wdt->get_timeout(wdt);
 
     /* Advance time past timeout */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 100));
+    EXPECT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 100));
 
     /* Callback should have been invoked */
     EXPECT_TRUE(g_callback_invoked);
@@ -206,7 +206,7 @@ TEST_F(WatchdogTest, CallbackNotInvokedBeforeTimeout) {
     uint32_t timeout_ms = wdt->get_timeout(wdt);
 
     /* Advance time but not past timeout */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms - 100));
+    EXPECT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms - 100));
 
     /* Callback should not have been invoked */
     EXPECT_FALSE(g_callback_invoked);
@@ -223,10 +223,10 @@ TEST_F(WatchdogTest, NullCallback) {
     uint32_t timeout_ms = wdt->get_timeout(wdt);
 
     /* Advance time past timeout (should not crash) */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_advance_time(0, timeout_ms + 100));
+    EXPECT_EQ(NX_OK, native_watchdog_advance_time(0, timeout_ms + 100));
 
     /* Should have timed out */
-    EXPECT_TRUE(nx_watchdog_native_has_timed_out(0));
+    EXPECT_TRUE(native_watchdog_has_timed_out(0));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -249,7 +249,7 @@ TEST_F(WatchdogTest, LifecycleInit) {
     /* Already initialized in SetUp */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_watchdog_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_watchdog_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -261,7 +261,7 @@ TEST_F(WatchdogTest, LifecycleDeinit) {
 
     /* Check state */
     bool initialized = true;
-    EXPECT_EQ(NX_OK, nx_watchdog_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_watchdog_get_state(0, &initialized, nullptr));
     EXPECT_FALSE(initialized);
 }
 
@@ -273,14 +273,14 @@ TEST_F(WatchdogTest, LifecycleSuspendResume) {
 
     /* Check state */
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_watchdog_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_watchdog_get_state(0, nullptr, &suspended));
     EXPECT_TRUE(suspended);
 
     /* Resume */
     EXPECT_EQ(NX_OK, lifecycle->resume(lifecycle));
 
     /* Check state */
-    EXPECT_EQ(NX_OK, nx_watchdog_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_watchdog_get_state(0, nullptr, &suspended));
     EXPECT_FALSE(suspended);
 }
 

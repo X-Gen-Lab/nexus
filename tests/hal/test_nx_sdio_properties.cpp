@@ -42,14 +42,14 @@ class SDIOPropertyTest : public ::testing::Test {
         rng.seed(std::random_device{}());
 
         /* Reset all SDIO instances */
-        nx_sdio_native_reset_all();
+        native_sdio_reset_all();
 
         /* Get SDIO0 instance */
-        sdio = nx_sdio_native_get(0);
+        sdio = nx_factory_sdio(0);
         ASSERT_NE(nullptr, sdio);
 
         /* Set card present */
-        ASSERT_EQ(NX_OK, nx_sdio_native_set_card_present(0, true));
+        ASSERT_EQ(NX_OK, native_sdio_set_card_present(0, true));
 
         /* Initialize SDIO */
         nx_lifecycle_t* lifecycle = sdio->get_lifecycle(sdio);
@@ -67,7 +67,7 @@ class SDIOPropertyTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_sdio_native_reset_all();
+        native_sdio_reset_all();
     }
 
     /**
@@ -286,3 +286,4 @@ TEST_F(SDIOPropertyTest, Property_MultipleWritesSameBlock) {
             << "Iteration " << iteration << ": Last written data not preserved";
     }
 }
+

@@ -16,7 +16,8 @@
 
 extern "C" {
 #include "hal/interface/nx_crc.h"
-#include "native_crc_test.h"
+#include "hal/nx_factory.h"
+#include "tests/hal/native/devices/native_crc_helpers.h"
 }
 
 /**
@@ -26,10 +27,10 @@ class CRCTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all CRC instances before each test */
-        nx_crc_native_reset_all();
+        native_crc_reset_all();
 
         /* Get CRC0 instance */
-        crc = nx_crc_native_get(0);
+        crc = nx_factory_crc(0);
         ASSERT_NE(nullptr, crc);
 
         /* Initialize CRC */
@@ -48,7 +49,7 @@ class CRCTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_crc_native_reset_all();
+        native_crc_reset_all();
     }
 
     nx_crc_t* crc = nullptr;
@@ -141,7 +142,7 @@ TEST_F(CRCTest, LifecycleInit) {
     /* Already initialized in SetUp, check state */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_crc_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_crc_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -154,7 +155,7 @@ TEST_F(CRCTest, LifecycleDeinit) {
 
     /* Check state */
     bool initialized = false;
-    EXPECT_EQ(NX_OK, nx_crc_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_crc_get_state(0, &initialized, nullptr));
     EXPECT_FALSE(initialized);
 }
 
@@ -166,7 +167,7 @@ TEST_F(CRCTest, LifecycleSuspend) {
 
     /* Check state */
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_crc_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_crc_get_state(0, nullptr, &suspended));
     EXPECT_TRUE(suspended);
 }
 
@@ -181,7 +182,7 @@ TEST_F(CRCTest, LifecycleResume) {
 
     /* Check state */
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_crc_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_crc_get_state(0, nullptr, &suspended));
     EXPECT_FALSE(suspended);
 }
 

@@ -6,7 +6,7 @@
 
 #include "hal/interface/nx_sdio.h"
 #include "hal/nx_status.h"
-#include "native_sdio_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_sdio_helpers.h"
 #include <cstring>
 #include <gtest/gtest.h>
 
@@ -18,19 +18,19 @@ class SDIOTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all instances before each test */
-        nx_sdio_native_reset_all();
+        native_sdio_reset_all();
 
         /* Get SDIO instance */
-        sdio = nx_sdio_native_get(0);
+        sdio = nx_factory_sdio(0);
         ASSERT_NE(nullptr, sdio);
 
         /* Set card present */
-        nx_sdio_native_set_card_present(0, true);
+        native_sdio_set_card_present(0, true);
     }
 
     void TearDown() override {
         /* Reset after test */
-        nx_sdio_native_reset_all();
+        native_sdio_reset_all();
     }
 
     nx_sdio_t* sdio;
@@ -54,7 +54,7 @@ TEST_F(SDIOTest, Lifecycle_Init) {
     /* Verify state */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_sdio_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_sdio_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -72,7 +72,7 @@ TEST_F(SDIOTest, Lifecycle_Deinit) {
 
     /* Verify state */
     bool initialized = false;
-    EXPECT_EQ(NX_OK, nx_sdio_native_get_state(0, &initialized, nullptr));
+    EXPECT_EQ(NX_OK, native_sdio_get_state(0, &initialized, nullptr));
     EXPECT_FALSE(initialized);
 }
 
@@ -89,7 +89,7 @@ TEST_F(SDIOTest, Lifecycle_SuspendResume) {
 
     /* Verify state */
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_sdio_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_sdio_get_state(0, nullptr, &suspended));
     EXPECT_TRUE(suspended);
 
     /* Resume */
@@ -97,7 +97,7 @@ TEST_F(SDIOTest, Lifecycle_SuspendResume) {
     EXPECT_EQ(NX_DEV_STATE_RUNNING, lifecycle->get_state(lifecycle));
 
     /* Verify state */
-    EXPECT_EQ(NX_OK, nx_sdio_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_sdio_get_state(0, nullptr, &suspended));
     EXPECT_FALSE(suspended);
 }
 
@@ -225,11 +225,11 @@ TEST_F(SDIOTest, CardDetection) {
     EXPECT_TRUE(sdio->is_present(sdio));
 
     /* Remove card */
-    nx_sdio_native_set_card_present(0, false);
+    native_sdio_set_card_present(0, false);
     EXPECT_FALSE(sdio->is_present(sdio));
 
     /* Insert card */
-    nx_sdio_native_set_card_present(0, true);
+    native_sdio_set_card_present(0, true);
     EXPECT_TRUE(sdio->is_present(sdio));
 }
 
@@ -237,17 +237,17 @@ TEST_F(SDIOTest, OperationsWithoutCard) {
     nx_lifecycle_t* lifecycle = sdio->get_lifecycle(sdio);
 
     /* Remove card */
-    nx_sdio_native_set_card_present(0, false);
+    native_sdio_set_card_present(0, false);
 
     /* Initialize should fail without card */
     EXPECT_EQ(NX_ERR_INVALID_STATE, lifecycle->init(lifecycle));
 
     /* Insert card and initialize */
-    nx_sdio_native_set_card_present(0, true);
+    native_sdio_set_card_present(0, true);
     EXPECT_EQ(NX_OK, lifecycle->init(lifecycle));
 
     /* Remove card after init */
-    nx_sdio_native_set_card_present(0, false);
+    native_sdio_set_card_present(0, false);
 
     /* Operations should fail without card */
     uint8_t data[512];
@@ -294,8 +294,8 @@ TEST_F(SDIOTest, ErrorConditions) {
     EXPECT_EQ(NX_ERR_NULL_PTR, sdio->write(sdio, 0, nullptr, 1));
 
     /* Operations before init */
-    nx_sdio_native_reset(0);
-    nx_sdio_native_set_card_present(0, true);
+    native_sdio_reset(0);
+    native_sdio_set_card_present(0, true);
     EXPECT_EQ(NX_ERR_NOT_INIT, sdio->read(sdio, 0, data, 1));
     EXPECT_EQ(NX_ERR_NOT_INIT, sdio->write(sdio, 0, data, 1));
     EXPECT_EQ(NX_ERR_NOT_INIT, sdio->erase(sdio, 0, 1));
@@ -306,31 +306,31 @@ TEST_F(SDIOTest, ErrorConditions) {
 /*---------------------------------------------------------------------------*/
 
 TEST(SDIOHelperTest, TestHelpers) {
-    nx_sdio_native_reset_all();
+    native_sdio_reset_all();
 
     /* Get instance */
-    nx_sdio_t* sdio = nx_sdio_native_get(0);
+    nx_sdio_t* sdio = nx_factory_sdio(0);
     ASSERT_NE(nullptr, sdio);
 
     /* Invalid index */
-    EXPECT_EQ(nullptr, nx_sdio_native_get(10));
+    EXPECT_EQ(nullptr, nx_factory_sdio(10));
 
     /* State query */
     bool initialized = true;
     bool suspended = true;
-    EXPECT_EQ(NX_OK, nx_sdio_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_sdio_get_state(0, &initialized, &suspended));
     EXPECT_FALSE(initialized);
     EXPECT_FALSE(suspended);
 
     /* Card present helpers */
-    nx_sdio_native_set_card_present(0, true);
-    EXPECT_TRUE(nx_sdio_native_is_card_present(0));
+    native_sdio_set_card_present(0, true);
+    EXPECT_TRUE(native_sdio_is_card_present(0));
 
-    nx_sdio_native_set_card_present(0, false);
-    EXPECT_FALSE(nx_sdio_native_is_card_present(0));
+    native_sdio_set_card_present(0, false);
+    EXPECT_FALSE(native_sdio_is_card_present(0));
 
     /* Block data helper */
-    nx_sdio_native_set_card_present(0, true);
+    native_sdio_set_card_present(0, true);
     nx_lifecycle_t* lifecycle = sdio->get_lifecycle(sdio);
     EXPECT_EQ(NX_OK, lifecycle->init(lifecycle));
 
@@ -339,6 +339,7 @@ TEST(SDIOHelperTest, TestHelpers) {
     memset(write_data, 0x55, 512);
 
     EXPECT_EQ(NX_OK, sdio->write(sdio, 0, write_data, 1));
-    EXPECT_EQ(NX_OK, nx_sdio_native_get_block_data(0, 0, read_data));
+    EXPECT_EQ(NX_OK, native_sdio_get_block_data(0, 0, read_data));
     EXPECT_EQ(0, memcmp(write_data, read_data, 512));
 }
+

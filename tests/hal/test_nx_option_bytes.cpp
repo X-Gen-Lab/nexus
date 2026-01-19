@@ -18,7 +18,7 @@ extern "C" {
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_option_bytes.h"
 #include "hal/interface/nx_power.h"
-#include "native_option_bytes_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_option_bytes_helpers.h"
 }
 
 /**
@@ -28,10 +28,10 @@ class OptionBytesTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all Option Bytes instances before each test */
-        nx_option_bytes_native_reset_all();
+        native_option_bytes_reset_all();
 
         /* Get Option Bytes instance */
-        opt_bytes = nx_option_bytes_native_get(0);
+        opt_bytes = nx_factory_option_bytes(0);
         ASSERT_NE(nullptr, opt_bytes);
 
         /* Initialize Option Bytes */
@@ -53,7 +53,7 @@ class OptionBytesTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_option_bytes_native_reset_all();
+        native_option_bytes_reset_all();
     }
 
     nx_option_bytes_t* opt_bytes = nullptr;
@@ -168,7 +168,7 @@ TEST_F(OptionBytesTest, WriteProtection) {
                         0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
 
     /* Enable write protection */
-    EXPECT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, true));
+    EXPECT_EQ(NX_OK, native_option_bytes_set_write_protection(0, true));
 
     /* Attempt to write should fail */
     EXPECT_EQ(NX_ERR_PERMISSION, opt_bytes->set_user_data(opt_bytes, data, 16));
@@ -177,7 +177,7 @@ TEST_F(OptionBytesTest, WriteProtection) {
     EXPECT_EQ(NX_ERR_PERMISSION, opt_bytes->set_read_protection(opt_bytes, 1));
 
     /* Disable write protection */
-    EXPECT_EQ(NX_OK, nx_option_bytes_native_set_write_protection(0, false));
+    EXPECT_EQ(NX_OK, native_option_bytes_set_write_protection(0, false));
 
     /* Write should now succeed */
     EXPECT_EQ(NX_OK, opt_bytes->set_user_data(opt_bytes, data, 16));
@@ -195,7 +195,7 @@ TEST_F(OptionBytesTest, PendingChanges) {
     /* Initially no pending changes */
     bool has_pending = false;
     EXPECT_EQ(NX_OK,
-              nx_option_bytes_native_has_pending_changes(0, &has_pending));
+              native_option_bytes_has_pending_changes(0, &has_pending));
     EXPECT_FALSE(has_pending);
 
     /* Write data (creates pending changes) */
@@ -203,7 +203,7 @@ TEST_F(OptionBytesTest, PendingChanges) {
 
     /* Should have pending changes */
     EXPECT_EQ(NX_OK,
-              nx_option_bytes_native_has_pending_changes(0, &has_pending));
+              native_option_bytes_has_pending_changes(0, &has_pending));
     EXPECT_TRUE(has_pending);
 
     /* Apply changes */
@@ -211,7 +211,7 @@ TEST_F(OptionBytesTest, PendingChanges) {
 
     /* Should no longer have pending changes */
     EXPECT_EQ(NX_OK,
-              nx_option_bytes_native_has_pending_changes(0, &has_pending));
+              native_option_bytes_has_pending_changes(0, &has_pending));
     EXPECT_FALSE(has_pending);
 }
 
@@ -229,7 +229,7 @@ TEST_F(OptionBytesTest, LifecycleInit) {
     bool initialized = false;
     bool suspended = false;
     EXPECT_EQ(NX_OK,
-              nx_option_bytes_native_get_state(0, &initialized, &suspended));
+              native_option_bytes_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -244,7 +244,7 @@ TEST_F(OptionBytesTest, LifecycleDeinit) {
     /* Check state */
     bool initialized = false;
     EXPECT_EQ(NX_OK,
-              nx_option_bytes_native_get_state(0, &initialized, nullptr));
+              native_option_bytes_get_state(0, &initialized, nullptr));
     EXPECT_FALSE(initialized);
 }
 
@@ -257,14 +257,14 @@ TEST_F(OptionBytesTest, LifecycleSuspendResume) {
 
     /* Check state */
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_option_bytes_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_option_bytes_get_state(0, nullptr, &suspended));
     EXPECT_TRUE(suspended);
 
     /* Resume */
     EXPECT_EQ(NX_OK, lifecycle->resume(lifecycle));
 
     /* Check state */
-    EXPECT_EQ(NX_OK, nx_option_bytes_native_get_state(0, nullptr, &suspended));
+    EXPECT_EQ(NX_OK, native_option_bytes_get_state(0, nullptr, &suspended));
     EXPECT_FALSE(suspended);
 }
 
@@ -383,3 +383,4 @@ TEST_F(OptionBytesTest, ResumeWithoutSuspend) {
     /* Resume without suspend should fail */
     EXPECT_EQ(NX_ERR_INVALID_STATE, lifecycle->resume(lifecycle));
 }
+

@@ -16,7 +16,7 @@
 
 extern "C" {
 #include "hal/interface/nx_usb.h"
-#include "native_usb_test.h"
+#include "hal/nx_factory.h"`n#include "tests/hal/native/devices/native_usb_helpers.h"
 }
 
 /**
@@ -26,10 +26,10 @@ class USBTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Reset all USB instances before each test */
-        nx_usb_native_reset_all();
+        native_usb_reset_all();
 
         /* Get USB0 instance */
-        usb = nx_usb_native_get(0);
+        usb = nx_factory_usb(0);
         ASSERT_NE(nullptr, usb);
 
         /* Initialize USB */
@@ -48,7 +48,7 @@ class USBTest : public ::testing::Test {
         }
 
         /* Reset all instances */
-        nx_usb_native_reset_all();
+        native_usb_reset_all();
     }
 
     nx_usb_t* usb = nullptr;
@@ -68,7 +68,7 @@ TEST_F(USBTest, LifecycleInit) {
     /* Verify state through test helper */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_usb_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_usb_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -84,7 +84,7 @@ TEST_F(USBTest, LifecycleDeinit) {
     /* Verify state */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_usb_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_usb_get_state(0, &initialized, &suspended));
     EXPECT_FALSE(initialized);
 }
 
@@ -99,7 +99,7 @@ TEST_F(USBTest, LifecycleSuspendResume) {
     /* Verify state */
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_usb_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_usb_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_TRUE(suspended);
 
@@ -108,7 +108,7 @@ TEST_F(USBTest, LifecycleSuspendResume) {
     EXPECT_EQ(NX_DEV_STATE_RUNNING, lifecycle->get_state(lifecycle));
 
     /* Verify state */
-    EXPECT_EQ(NX_OK, nx_usb_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_usb_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(initialized);
     EXPECT_FALSE(suspended);
 }
@@ -173,27 +173,27 @@ TEST_F(USBTest, ConnectionStatus) {
     EXPECT_TRUE(usb->is_connected(usb));
 
     /* Simulate disconnect */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_disconnect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_disconnect(0));
     EXPECT_FALSE(usb->is_connected(usb));
 
     /* Simulate connect */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
     EXPECT_TRUE(usb->is_connected(usb));
 }
 
 TEST_F(USBTest, DisconnectClearsBuffers) {
     /* Connect first */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     /* Inject some RX data */
     uint8_t test_data[] = {0x01, 0x02, 0x03, 0x04};
-    EXPECT_EQ(NX_OK, nx_usb_native_inject_rx(0, test_data, sizeof(test_data)));
+    EXPECT_EQ(NX_OK, native_usb_inject_rx(0, test_data, sizeof(test_data)));
 
     /* Disconnect - should clear buffers */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_disconnect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_disconnect(0));
 
     /* Reconnect */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     /* Try to receive - should have no data */
     nx_rx_async_t* rx = usb->get_rx_async(usb);
@@ -210,16 +210,16 @@ TEST_F(USBTest, DisconnectClearsBuffers) {
 
 TEST_F(USBTest, SuspendResumeEvents) {
     /* Simulate suspend */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_suspend(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_suspend(0));
 
     bool initialized = false;
     bool suspended = false;
-    EXPECT_EQ(NX_OK, nx_usb_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_usb_get_state(0, &initialized, &suspended));
     EXPECT_TRUE(suspended);
 
     /* Simulate resume */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_resume(0));
-    EXPECT_EQ(NX_OK, nx_usb_native_get_state(0, &initialized, &suspended));
+    EXPECT_EQ(NX_OK, native_usb_simulate_resume(0));
+    EXPECT_EQ(NX_OK, native_usb_get_state(0, &initialized, &suspended));
     EXPECT_FALSE(suspended);
 }
 
@@ -229,7 +229,7 @@ TEST_F(USBTest, SuspendResumeEvents) {
 
 TEST_F(USBTest, AsyncTxSend) {
     /* Ensure connected */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     nx_tx_async_t* tx = usb->get_tx_async(usb);
     ASSERT_NE(nullptr, tx);
@@ -244,7 +244,7 @@ TEST_F(USBTest, AsyncTxSend) {
 
 TEST_F(USBTest, AsyncTxDisconnected) {
     /* Disconnect */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_disconnect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_disconnect(0));
 
     nx_tx_async_t* tx = usb->get_tx_async(usb);
     ASSERT_NE(nullptr, tx);
@@ -260,11 +260,11 @@ TEST_F(USBTest, AsyncTxDisconnected) {
 
 TEST_F(USBTest, AsyncRxReceive) {
     /* Ensure connected */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     /* Inject data */
     uint8_t test_data[] = {0xAA, 0xBB, 0xCC, 0xDD};
-    EXPECT_EQ(NX_OK, nx_usb_native_inject_rx(0, test_data, sizeof(test_data)));
+    EXPECT_EQ(NX_OK, native_usb_inject_rx(0, test_data, sizeof(test_data)));
 
     /* Receive data */
     nx_rx_async_t* rx = usb->get_rx_async(usb);
@@ -279,7 +279,7 @@ TEST_F(USBTest, AsyncRxReceive) {
 
 TEST_F(USBTest, AsyncRxNoData) {
     /* Ensure connected */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     nx_rx_async_t* rx = usb->get_rx_async(usb);
     ASSERT_NE(nullptr, rx);
@@ -297,7 +297,7 @@ TEST_F(USBTest, AsyncRxNoData) {
 
 TEST_F(USBTest, SyncTxSend) {
     /* Ensure connected */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     nx_tx_sync_t* tx = usb->get_tx_sync(usb);
     ASSERT_NE(nullptr, tx);
@@ -313,11 +313,11 @@ TEST_F(USBTest, SyncTxSend) {
 
 TEST_F(USBTest, SyncRxReceive) {
     /* Ensure connected */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     /* Inject data */
     uint8_t test_data[] = {0x55, 0x66, 0x77, 0x88};
-    EXPECT_EQ(NX_OK, nx_usb_native_inject_rx(0, test_data, sizeof(test_data)));
+    EXPECT_EQ(NX_OK, native_usb_inject_rx(0, test_data, sizeof(test_data)));
 
     /* Receive data */
     nx_rx_sync_t* rx = usb->get_rx_sync(usb);
@@ -332,11 +332,11 @@ TEST_F(USBTest, SyncRxReceive) {
 
 TEST_F(USBTest, SyncRxReceiveAll) {
     /* Ensure connected */
-    EXPECT_EQ(NX_OK, nx_usb_native_simulate_connect(0));
+    EXPECT_EQ(NX_OK, native_usb_simulate_connect(0));
 
     /* Inject data */
     uint8_t test_data[] = {0x99, 0xAA, 0xBB, 0xCC};
-    EXPECT_EQ(NX_OK, nx_usb_native_inject_rx(0, test_data, sizeof(test_data)));
+    EXPECT_EQ(NX_OK, native_usb_inject_rx(0, test_data, sizeof(test_data)));
 
     /* Receive all data */
     nx_rx_sync_t* rx = usb->get_rx_sync(usb);
@@ -392,3 +392,4 @@ TEST_F(USBTest, SuspendedAccess) {
     uint8_t data[] = {0x01, 0x02};
     EXPECT_EQ(NX_ERR_INVALID_STATE, tx->send(tx, data, sizeof(data)));
 }
+
