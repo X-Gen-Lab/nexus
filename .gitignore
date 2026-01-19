@@ -1,11 +1,14 @@
 # Build directories
 build/
 build-*/
+_build/
 out/
 cmake-build-*/
+nonexistent_build_dir/
 
 # IDE
 .idea/
+.kiro/
 *.swp
 *.swo
 *~
@@ -45,6 +48,7 @@ docs/sphinx/_build/
 coverage/
 Testing/
 .hypothesis/
+.pytest_cache/
 *.gcno
 *.gcda
 *.gcov

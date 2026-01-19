@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+- **HAL Configuration Removal**: Removed all runtime configuration methods from HAL interfaces
+  - Removed `nx_uart_config_t`, `nx_gpio_config_t`, `nx_can_config_t`, `nx_spi_config_t`, and `nx_i2c_config_t` structures
+  - Removed `get_config()` and `set_config()` methods from all HAL interfaces
+  - All static configuration must now be done at compile-time through Kconfig
+  - Device-specific runtime parameters (SPI device config, I2C device address) are still supported
+  - See MIGRATION_GUIDE.md in `.kiro/specs/hal-config-removal/` for migration instructions
+
+### Added
+- Kconfig-based compile-time configuration system for all HAL peripherals
+  - UART: Baudrate, data bits, stop bits, parity, buffer sizes
+  - SPI: Bus clock frequency, pin mapping
+  - I2C: Bus speed, pin mapping
+  - GPIO: Mode, pull-up/down, speed, alternate function
+  - CAN: Baudrate, mode, bit timing parameters
+- Device registration mechanism for Kconfig-driven device instantiation
+- Comprehensive migration documentation and examples
+- Bilingual documentation support (English/Chinese)
+- Sphinx documentation with separate EN/CN builds
+- Documentation build script (build_docs.bat)
+
+### Changed
+- HAL interfaces now focus purely on runtime operations
+- Factory functions no longer accept configuration parameters
+- Platform implementations read configuration from Kconfig-generated macros
+
+### Removed
+- `nx_configurable.h` generic configuration interface
+- All `*_with_config()` factory functions
+- Runtime configuration methods from UART, SPI, I2C, GPIO, and CAN interfaces
+
+### Fixed
+- UART test API compatibility with hal_uart.h
+- C++20 designated initializers for MSVC compatibility
+- Chinese navigation in Sphinx sidebar
+
+### Migration Notes
+- **Action Required**: Update all code using runtime configuration to use Kconfig
+- **Backward Compatibility**: Deprecated structures were marked with `NX_DEPRECATED` in previous versions
+- **Migration Path**: See `.kiro/specs/hal-config-removal/MIGRATION_GUIDE.md` for detailed instructions
+- **Timeline**: This is a breaking change - update your code before upgrading
+
+---
+
+## [Unreleased]
+
 ### Added
 - Bilingual documentation support (English/Chinese)
 - Sphinx documentation with separate EN/CN builds

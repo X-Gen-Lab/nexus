@@ -63,6 +63,9 @@
         "**/*.elf": true
     },
     "cSpell.words": [
-        "OSAL"
+        "deinitializes",
+        "KCONFIG",
+        "OSAL",
+        "transceive"
     ]
 }

@@ -2,6 +2,8 @@
 
 # 核心依赖
 pathlib2>=2.3.0; python_version < '3.4'
+kconfiglib>=14.1.0  # Kconfig 解析库
+windows-curses>=2.3.0; sys_platform == 'win32'  # Windows 上的 menuconfig 支持
 
 # 测试依赖
 pytest>=7.0.0
