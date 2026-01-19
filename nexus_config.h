@@ -4,7 +4,7 @@
  * \author          Nexus Team
  *
  * This file is auto-generated from Kconfig. Do not edit manually.
- * Generated: 2026-01-19 23:25:39
+ * Generated: 2026-01-20 02:28:36
  */
 
 #ifndef NEXUS_CONFIG_H
@@ -290,57 +290,36 @@ extern "C" {
 /* UART Configuration                                                        */
 /*---------------------------------------------------------------------------*/
 
-#define NX_CONFIG_INSTANCE_NATIVE_UART_0 1
-/* #undef NX_CONFIG_INSTANCE_NATIVE_UART_1 */
-/* #undef NX_CONFIG_INSTANCE_NATIVE_UART_2 */
-/* #undef NX_CONFIG_INSTANCE_NATIVE_UART_3 */
-/* #undef NX_CONFIG_INSTANCE_STM32_UART_1 */
-/* #undef NX_CONFIG_INSTANCE_STM32_UART_2 */
-/* #undef NX_CONFIG_INSTANCE_STM32_UART_3 */
-/* #undef NX_CONFIG_NATIVE_UART0_MODE_DMA */
-#define NX_CONFIG_NATIVE_UART0_MODE_INTERRUPT 1
-/* #undef NX_CONFIG_NATIVE_UART0_MODE_POLLING */
-/* #undef NX_CONFIG_NATIVE_UART0_PARITY_EVEN */
-#define NX_CONFIG_NATIVE_UART0_PARITY_NONE 1
-/* #undef NX_CONFIG_NATIVE_UART0_PARITY_ODD */
-/* #undef NX_CONFIG_NATIVE_UART1_MODE_DMA */
-/* #undef NX_CONFIG_NATIVE_UART1_MODE_INTERRUPT */
-/* #undef NX_CONFIG_NATIVE_UART1_MODE_POLLING */
-/* #undef NX_CONFIG_NATIVE_UART1_PARITY_EVEN */
-/* #undef NX_CONFIG_NATIVE_UART1_PARITY_NONE */
-/* #undef NX_CONFIG_NATIVE_UART1_PARITY_ODD */
-/* #undef NX_CONFIG_NATIVE_UART2_MODE_DMA */
-/* #undef NX_CONFIG_NATIVE_UART2_MODE_INTERRUPT */
-/* #undef NX_CONFIG_NATIVE_UART2_MODE_POLLING */
-/* #undef NX_CONFIG_NATIVE_UART2_PARITY_EVEN */
-/* #undef NX_CONFIG_NATIVE_UART2_PARITY_NONE */
-/* #undef NX_CONFIG_NATIVE_UART2_PARITY_ODD */
-/* #undef NX_CONFIG_NATIVE_UART3_MODE_DMA */
-/* #undef NX_CONFIG_NATIVE_UART3_MODE_INTERRUPT */
-/* #undef NX_CONFIG_NATIVE_UART3_MODE_POLLING */
-/* #undef NX_CONFIG_NATIVE_UART3_PARITY_EVEN */
-/* #undef NX_CONFIG_NATIVE_UART3_PARITY_NONE */
-/* #undef NX_CONFIG_NATIVE_UART3_PARITY_ODD */
+#define NX_CONFIG_INSTANCE_NX_UART_0 1
+/* #undef NX_CONFIG_INSTANCE_NX_UART_1 */
+/* #undef NX_CONFIG_INSTANCE_NX_UART_2 */
+/* #undef NX_CONFIG_INSTANCE_NX_UART_3 */
 #define NX_CONFIG_NATIVE_UART_ENABLE 1
 #define NX_CONFIG_NATIVE_UART_MAX_INSTANCES 4
-/* #undef NX_CONFIG_STM32_UART1_MODE_DMA */
-/* #undef NX_CONFIG_STM32_UART1_MODE_INTERRUPT */
-/* #undef NX_CONFIG_STM32_UART1_MODE_POLLING */
-/* #undef NX_CONFIG_STM32_UART1_PARITY_EVEN */
-/* #undef NX_CONFIG_STM32_UART1_PARITY_NONE */
-/* #undef NX_CONFIG_STM32_UART1_PARITY_ODD */
-/* #undef NX_CONFIG_STM32_UART2_MODE_DMA */
-/* #undef NX_CONFIG_STM32_UART2_MODE_INTERRUPT */
-/* #undef NX_CONFIG_STM32_UART2_MODE_POLLING */
-/* #undef NX_CONFIG_STM32_UART2_PARITY_EVEN */
-/* #undef NX_CONFIG_STM32_UART2_PARITY_NONE */
-/* #undef NX_CONFIG_STM32_UART2_PARITY_ODD */
-/* #undef NX_CONFIG_STM32_UART3_MODE_DMA */
-/* #undef NX_CONFIG_STM32_UART3_MODE_INTERRUPT */
-/* #undef NX_CONFIG_STM32_UART3_MODE_POLLING */
-/* #undef NX_CONFIG_STM32_UART3_PARITY_EVEN */
-/* #undef NX_CONFIG_STM32_UART3_PARITY_NONE */
-/* #undef NX_CONFIG_STM32_UART3_PARITY_ODD */
+/* #undef NX_CONFIG_NX_UART0_MODE_DMA */
+#define NX_CONFIG_NX_UART0_MODE_INTERRUPT 1
+/* #undef NX_CONFIG_NX_UART0_MODE_POLLING */
+/* #undef NX_CONFIG_NX_UART0_PARITY_EVEN */
+#define NX_CONFIG_NX_UART0_PARITY_NONE 1
+/* #undef NX_CONFIG_NX_UART0_PARITY_ODD */
+/* #undef NX_CONFIG_NX_UART1_MODE_DMA */
+/* #undef NX_CONFIG_NX_UART1_MODE_INTERRUPT */
+/* #undef NX_CONFIG_NX_UART1_MODE_POLLING */
+/* #undef NX_CONFIG_NX_UART1_PARITY_EVEN */
+/* #undef NX_CONFIG_NX_UART1_PARITY_NONE */
+/* #undef NX_CONFIG_NX_UART1_PARITY_ODD */
+/* #undef NX_CONFIG_NX_UART2_MODE_DMA */
+/* #undef NX_CONFIG_NX_UART2_MODE_INTERRUPT */
+/* #undef NX_CONFIG_NX_UART2_MODE_POLLING */
+/* #undef NX_CONFIG_NX_UART2_PARITY_EVEN */
+/* #undef NX_CONFIG_NX_UART2_PARITY_NONE */
+/* #undef NX_CONFIG_NX_UART2_PARITY_ODD */
+/* #undef NX_CONFIG_NX_UART3_MODE_DMA */
+/* #undef NX_CONFIG_NX_UART3_MODE_INTERRUPT */
+/* #undef NX_CONFIG_NX_UART3_MODE_POLLING */
+/* #undef NX_CONFIG_NX_UART3_PARITY_EVEN */
+/* #undef NX_CONFIG_NX_UART3_PARITY_NONE */
+/* #undef NX_CONFIG_NX_UART3_PARITY_ODD */
 /* #undef NX_CONFIG_STM32_UART_ENABLE */
 #define NX_CONFIG_UART0_BAUDRATE 115200
 #define NX_CONFIG_UART0_DATA_BITS 8
@@ -359,6 +338,186 @@ extern "C" {
 #define NX_CONFIG_NX_USB_NUM_ENDPOINTS 4
 #define NX_CONFIG_NX_USB_RX_BUFFER_SIZE 1024
 #define NX_CONFIG_NX_USB_TX_BUFFER_SIZE 1024
+
+/*---------------------------------------------------------------------------*/
+/* Peripheral Instance Traversal Macros                                      */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           ADC instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * ADC instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_ADC(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_ADC(fn) \
+    _NX_ADC_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_ADC_0
+#define _NX_ADC_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_ADC0_ENABLED 1
+#else
+#define _NX_ADC_INSTANCE_0(fn)
+#define NX_CONFIG_ADC0_ENABLED 0
+#endif
+
+/**
+ * \brief           ADC_BUFFER instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * ADC_BUFFER instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_ADC_BUFFER(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_ADC_BUFFER(fn) \
+    _NX_ADC_BUFFER_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_ADC_BUFFER_0
+#define _NX_ADC_BUFFER_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_ADC_BUFFER0_ENABLED 1
+#else
+#define _NX_ADC_BUFFER_INSTANCE_0(fn)
+#define NX_CONFIG_ADC_BUFFER0_ENABLED 0
+#endif
+
+/**
+ * \brief           DAC instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * DAC instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_DAC(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_DAC(fn) \
+    _NX_DAC_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_DAC_0
+#define _NX_DAC_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_DAC0_ENABLED 1
+#else
+#define _NX_DAC_INSTANCE_0(fn)
+#define NX_CONFIG_DAC0_ENABLED 0
+#endif
+
+/**
+ * \brief           GPIOA instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * GPIOA instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_GPIOA(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(PIN0)
+ */
+#define NX_DEFINE_INSTANCE_NX_GPIOA(fn) \
+    _NX_GPIOA_INSTANCE_PIN0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_GPIOA_PIN0
+#define _NX_GPIOA_INSTANCE_PIN0(fn) fn(PIN0)
+#define NX_CONFIG_GPIOAPIN0_ENABLED 1
+#else
+#define _NX_GPIOA_INSTANCE_PIN0(fn)
+#define NX_CONFIG_GPIOAPIN0_ENABLED 0
+#endif
+
+/**
+ * \brief           I2C instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * I2C instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_I2C(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_I2C(fn) \
+    _NX_I2C_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_I2C_0
+#define _NX_I2C_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_I2C0_ENABLED 1
+#else
+#define _NX_I2C_INSTANCE_0(fn)
+#define NX_CONFIG_I2C0_ENABLED 0
+#endif
+
+/**
+ * \brief           SPI instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * SPI instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_SPI(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_SPI(fn) \
+    _NX_SPI_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_SPI_0
+#define _NX_SPI_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_SPI0_ENABLED 1
+#else
+#define _NX_SPI_INSTANCE_0(fn)
+#define NX_CONFIG_SPI0_ENABLED 0
+#endif
+
+/**
+ * \brief           TIMER instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * TIMER instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_TIMER(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_TIMER(fn) \
+    _NX_TIMER_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_TIMER_0
+#define _NX_TIMER_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_TIMER0_ENABLED 1
+#else
+#define _NX_TIMER_INSTANCE_0(fn)
+#define NX_CONFIG_TIMER0_ENABLED 0
+#endif
+
+/**
+ * \brief           UART instance traversal macro
+ *
+ * This macro expands to call the provided function for each enabled
+ * UART instance. Used by the device registration system.
+ *
+ * Example:
+ *   NX_DEFINE_INSTANCE_NX_UART(MY_REGISTER_FUNC)
+ *   expands to:
+ *   MY_REGISTER_FUNC(0)
+ */
+#define NX_DEFINE_INSTANCE_NX_UART(fn) \
+    _NX_UART_INSTANCE_0(fn)
+
+#ifdef NX_CONFIG_INSTANCE_NX_UART_0
+#define _NX_UART_INSTANCE_0(fn) fn(0)
+#define NX_CONFIG_UART0_ENABLED 1
+#else
+#define _NX_UART_INSTANCE_0(fn)
+#define NX_CONFIG_UART0_ENABLED 0
+#endif
 
 #ifdef __cplusplus
 }
