@@ -1,0 +1,28 @@
+# osal/adapters/rtthread/Kconfig - RT-Thread OSAL configuration
+
+if OSAL_RTTHREAD
+
+menu "RT-Thread Configuration"
+
+config RTTHREAD_USING_COMPONENTS_INIT
+    bool "Enable components initialization"
+    default y
+    help
+      Enable automatic component initialization.
+
+config RTTHREAD_USING_USER_MAIN
+    bool "Enable user main function"
+    default y
+    help
+      Enable user-defined main function.
+
+config RTTHREAD_MAIN_THREAD_STACK_SIZE
+    int "Main thread stack size"
+    default 2048
+    range 512 8192
+    help
+      Stack size for the main thread in bytes.
+
+endmenu
+
+endif # OSAL_RTTHREAD

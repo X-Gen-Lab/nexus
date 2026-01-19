@@ -1,0 +1,38 @@
+# osal/adapters/freertos/Kconfig - FreeRTOS OSAL configuration
+
+if OSAL_FREERTOS
+
+menu "FreeRTOS Configuration"
+
+config FREERTOS_USE_PREEMPTION
+    bool "Use preemptive scheduling"
+    default y
+    help
+      Enable preemptive multitasking.
+      Disable for cooperative scheduling.
+
+config FREERTOS_USE_TIMERS
+    bool "Enable software timers"
+    default y
+    help
+      Enable FreeRTOS software timer functionality.
+
+config FREERTOS_TIMER_TASK_PRIORITY
+    int "Timer task priority"
+    default 2
+    range 0 31
+    depends on FREERTOS_USE_TIMERS
+    help
+      Priority of the timer service task.
+
+config FREERTOS_TIMER_QUEUE_LENGTH
+    int "Timer queue length"
+    default 10
+    range 1 100
+    depends on FREERTOS_USE_TIMERS
+    help
+      Length of the timer command queue.
+
+endmenu
+
+endif # OSAL_FREERTOS

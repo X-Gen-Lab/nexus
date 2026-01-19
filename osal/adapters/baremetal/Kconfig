@@ -1,0 +1,24 @@
+# osal/adapters/baremetal/Kconfig - Bare-metal OSAL configuration
+
+if OSAL_BAREMETAL
+
+menu "Bare-metal Configuration"
+
+config BAREMETAL_SIMPLE_SCHEDULER
+    bool "Enable simple scheduler"
+    default y
+    help
+      Enable a simple cooperative scheduler for bare-metal.
+      Provides basic task switching without preemption.
+
+config BAREMETAL_MAX_TASKS
+    int "Maximum number of tasks"
+    default 8
+    range 1 32
+    depends on BAREMETAL_SIMPLE_SCHEDULER
+    help
+      Maximum number of tasks that can be registered.
+
+endmenu
+
+endif # OSAL_BAREMETAL

@@ -1,0 +1,29 @@
+# osal/adapters/zephyr/Kconfig - Zephyr RTOS OSAL configuration
+
+if OSAL_ZEPHYR
+
+menu "Zephyr Configuration"
+
+config ZEPHYR_KERNEL_PREEMPT
+    bool "Enable kernel preemption"
+    default y
+    help
+      Enable preemptive multitasking in Zephyr kernel.
+
+config ZEPHYR_TIMESLICING
+    bool "Enable time slicing"
+    default y
+    help
+      Enable time slicing for threads of equal priority.
+
+config ZEPHYR_TIMESLICE_SIZE
+    int "Time slice size (ms)"
+    default 10
+    range 1 1000
+    depends on ZEPHYR_TIMESLICING
+    help
+      Time slice duration in milliseconds.
+
+endmenu
+
+endif # OSAL_ZEPHYR

@@ -1,0 +1,167 @@
+# osal/Kconfig - Operating System Abstraction Layer configuration
+
+menu "Operating System Abstraction Layer"
+
+choice
+    prompt "OSAL Backend"
+    default OSAL_BAREMETAL
+    help
+      Select the operating system backend for OSAL.
+
+      Available backends:
+      - Bare-metal: No RTOS, simple scheduler
+      - FreeRTOS: Popular real-time operating system
+      - RT-Thread: Chinese RTOS with rich features
+      - Zephyr: Linux Foundation RTOS
+      - Linux: For testing on Linux systems
+      - Native: PC simulation backend
+
+config OSAL_BAREMETAL
+    bool "Bare-metal (No OS)"
+    help
+      Bare-metal implementation without RTOS.
+      Provides basic task scheduling and synchronization.
+
+config OSAL_FREERTOS
+    bool "FreeRTOS"
+    help
+      FreeRTOS real-time operating system.
+      Industry-standard RTOS with wide platform support.
+
+config OSAL_RTTHREAD
+    bool "RT-Thread"
+    help
+      RT-Thread real-time operating system.
+      Feature-rich RTOS with IoT support.
+
+config OSAL_ZEPHYR
+    bool "Zephyr RTOS"
+    help
+      Zephyr real-time operating system.
+      Linux Foundation project with modern architecture.
+
+config OSAL_LINUX
+    bool "Linux"
+    help
+      Linux operating system (for testing).
+      Uses POSIX threads and synchronization primitives.
+
+config OSAL_NATIVE
+    bool "Native (PC Simulation)"
+    help
+      Native PC simulation backend.
+      For development and testing on PC.
+
+endchoice
+
+# OSAL backend name string
+config OSAL_BACKEND_NAME
+    string
+    default "baremetal" if OSAL_BAREMETAL
+    default "freertos" if OSAL_FREERTOS
+    default "rtthread" if OSAL_RTTHREAD
+    default "zephyr" if OSAL_ZEPHYR
+    default "linux" if OSAL_LINUX
+    default "native" if OSAL_NATIVE
+
+# System parameters configuration
+menu "System Parameters"
+
+config OSAL_TICK_RATE_HZ
+    int "System tick rate (Hz)"
+    default 1000 if OSAL_FREERTOS
+    default 1000 if OSAL_RTTHREAD
+    default 100 if OSAL_ZEPHYR
+    default 1000
+    range 100 10000
+    help
+      System tick rate in Hz.
+      Higher rates provide better timing resolution but increase overhead.
+
+config OSAL_HEAP_SIZE
+    int "Heap size (bytes)"
+    default 32768 if OSAL_FREERTOS
+    default 32768 if OSAL_RTTHREAD
+    default 16384 if OSAL_BAREMETAL
+    default 65536
+    range 4096 1048576
+    help
+      Total heap size in bytes.
+      Used for dynamic memory allocation.
+
+config OSAL_MAIN_STACK_SIZE
+    int "Main stack size (bytes)"
+    default 2048 if OSAL_FREERTOS
+    default 2048 if OSAL_RTTHREAD
+    default 4096 if OSAL_BAREMETAL
+    default 4096
+    range 512 65536
+    help
+      Main task/thread stack size in bytes.
+      Must be large enough for application needs.
+
+config OSAL_MAX_PRIORITIES
+    int "Maximum priority levels"
+    default 32 if OSAL_FREERTOS
+    default 32 if OSAL_RTTHREAD
+    default 16
+    range 8 256
+    depends on !OSAL_BAREMETAL
+    help
+      Maximum number of priority levels.
+      More levels provide finer control but increase overhead.
+
+endmenu
+
+# Linker script configuration
+menu "Linker Script Configuration"
+    depends on !PLATFORM_NATIVE
+
+config LINKER_RAM_START
+    hex "RAM start address"
+    default 0x20000000 if STM32F4
+    default 0x24000000 if STM32H7
+    default 0x20000000 if GD32F30X
+    default 0x20000000
+    help
+      Starting address of RAM in memory map.
+      Platform-specific value.
+
+config LINKER_RAM_SIZE
+    hex "RAM size"
+    default 0x00020000 if STM32F407
+    default 0x00080000 if STM32H743
+    default 0x00010000 if GD32F303
+    default 0x00020000
+    help
+      Total RAM size in bytes.
+      Platform-specific value.
+
+config LINKER_FLASH_START
+    hex "Flash start address"
+    default 0x08000000 if PLATFORM_STM32
+    default 0x08000000 if PLATFORM_GD32
+    default 0x08000000
+    help
+      Starting address of Flash in memory map.
+      Platform-specific value.
+
+config LINKER_FLASH_SIZE
+    hex "Flash size"
+    default 0x00100000 if STM32F407
+    default 0x00200000 if STM32H743
+    default 0x00040000 if GD32F303
+    default 0x00100000
+    help
+      Total Flash size in bytes.
+      Platform-specific value.
+
+endmenu
+
+# Include backend-specific configuration files
+rsource "adapters/baremetal/Kconfig"
+rsource "adapters/freertos/Kconfig"
+rsource "adapters/rtthread/Kconfig"
+rsource "adapters/zephyr/Kconfig"
+
+endmenu
