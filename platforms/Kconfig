@@ -1,0 +1,79 @@
+# platforms/Kconfig - Platform selection and configuration
+
+choice
+    prompt "Target Platform"
+    default PLATFORM_NATIVE
+    help
+      Select the target platform for the Nexus HAL.
+
+      Available platforms:
+      - Native: PC-based simulation for development and testing
+      - STM32: STMicroelectronics STM32 microcontrollers
+      - GD32: GigaDevice GD32 microcontrollers
+      - ESP32: Espressif ESP32 microcontrollers
+      - NRF52: Nordic Semiconductor nRF52 series
+
+config PLATFORM_NATIVE
+    bool "Native Platform (PC Simulation)"
+    help
+      Native platform for PC-based development and testing.
+      Provides simulation environment for HAL operations.
+
+config PLATFORM_STM32
+    bool "STM32 Platform"
+    help
+      STM32 microcontroller platform support.
+      Supports STM32F4, STM32H7, STM32L4 series and more.
+
+config PLATFORM_GD32
+    bool "GD32 Platform"
+    help
+      GD32 microcontroller platform support.
+      Supports GD32F30x, GD32F40x series and more.
+
+config PLATFORM_ESP32
+    bool "ESP32 Platform"
+    help
+      ESP32 microcontroller platform support.
+      Supports ESP32, ESP32-S2, ESP32-C3 series.
+
+config PLATFORM_NRF52
+    bool "NRF52 Platform"
+    help
+      Nordic nRF52 series platform support.
+      Supports nRF52832, nRF52840 and more.
+
+endchoice
+
+# Platform name string (used in code for platform identification)
+config PLATFORM_NAME
+    string
+    default "native" if PLATFORM_NATIVE
+    default "stm32" if PLATFORM_STM32
+    default "gd32" if PLATFORM_GD32
+    default "esp32" if PLATFORM_ESP32
+    default "nrf52" if PLATFORM_NRF52
+
+# Include platform-specific configuration files
+# Using rsource for relative path resolution
+# Only include the selected platform's configuration
+
+if PLATFORM_NATIVE
+rsource "native/Kconfig"
+endif
+
+if PLATFORM_STM32
+rsource "stm32/Kconfig"
+endif
+
+if PLATFORM_GD32
+rsource "gd32/Kconfig"
+endif
+
+if PLATFORM_ESP32
+rsource "esp32/Kconfig"
+endif
+
+if PLATFORM_NRF52
+rsource "nrf52/Kconfig"
+endif

@@ -1,0 +1,101 @@
+#
+# Native Platform Configuration
+#
+# This file defines the Native platform configuration and imports
+# all peripheral-specific Kconfig files.
+#
+
+if PLATFORM_NATIVE
+
+config NATIVE_PLATFORM_NAME
+    string
+    default "Native Platform (PC Simulation)"
+    help
+      Native platform name for identification.
+
+config NATIVE_PLATFORM_VERSION
+    string
+    default "1.0.0"
+    help
+      Native platform version.
+
+menu "Native Platform Settings"
+
+config NATIVE_ENABLE_LOGGING
+    bool "Enable platform logging"
+    default y
+    help
+      Enable logging output for the Native platform.
+      Useful for debugging and development.
+
+config NATIVE_LOG_LEVEL
+    int "Platform log level"
+    default 3
+    range 0 4
+    depends on NATIVE_ENABLE_LOGGING
+    help
+      Log level for Native platform:
+      0 = None, 1 = Error, 2 = Warning, 3 = Info, 4 = Debug
+
+config NATIVE_ENABLE_STATISTICS
+    bool "Enable performance statistics"
+    default y
+    help
+      Enable performance statistics collection for peripherals.
+      Provides diagnostic information about peripheral usage.
+
+config NATIVE_BUFFER_ALIGNMENT
+    int "Buffer alignment (bytes)"
+    default 4
+    range 1 64
+    help
+      Memory alignment for peripheral buffers.
+      Must be a power of 2.
+
+endmenu
+
+menu "Resource Managers"
+
+config NATIVE_DMA_CHANNELS
+    int "Number of DMA channels"
+    default 8
+    range 1 32
+    help
+      Number of simulated DMA channels available.
+      Each peripheral can request DMA channels for transfers.
+
+config NATIVE_ISR_SLOTS
+    int "Number of ISR slots"
+    default 64
+    range 1 256
+    help
+      Number of interrupt service routine slots available.
+      Each peripheral can register interrupt callbacks.
+
+endmenu
+
+menu "Peripheral Configuration"
+
+# Import peripheral Kconfig files
+source "platforms/native/src/uart/Kconfig"
+source "platforms/native/src/gpio/Kconfig"
+source "platforms/native/src/spi/Kconfig"
+source "platforms/native/src/i2c/Kconfig"
+source "platforms/native/src/timer/Kconfig"
+source "platforms/native/src/adc/Kconfig"
+source "platforms/native/src/dac/Kconfig"
+source "platforms/native/src/crc/Kconfig"
+source "platforms/native/src/usb/Kconfig"
+
+# Note: The following peripherals will have Kconfig files added
+# when their implementations are completed:
+# - Flash (platforms/native/src/flash/Kconfig)
+# - RTC (platforms/native/src/rtc/Kconfig)
+# - Watchdog (platforms/native/src/watchdog/Kconfig)
+# - SDIO (platforms/native/src/sdio/Kconfig)
+# - Option Bytes (platforms/native/src/option_bytes/Kconfig)
+
+endmenu
+
+endif # PLATFORM_NATIVE
+
