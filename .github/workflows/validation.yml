@@ -1,0 +1,181 @@
+# Nexus System Validation Workflow
+# Comprehensive validation including unit tests, property tests, integration tests, and coverage analysis
+
+name: System Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Main validation job with matrix for multiple platforms and build types
+  validate:
+    name: Validate (${{ matrix.os }}, ${{ matrix.build_type }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false  # Continue testing other configurations even if one fails
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        build_type: [Debug, Release]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0  # Full history for better coverage analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      # Platform-specific dependency installation
+      - name: Install Dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            lcov \
+            gcc \
+            g++ \
+            python3-pip
+
+      - name: Install Dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install cmake ninja lcov
+
+      - name: Install Dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install cmake ninja -y
+
+      # Install Python dependencies
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install hypothesis pytest pytest-cov jinja2
+
+      # Configure CMake with coverage enabled for Debug builds
+      - name: Configure CMake (with Coverage)
+        if: matrix.build_type == 'Debug'
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DNEXUS_PLATFORM=native \
+            -DNEXUS_BUILD_TESTS=ON \
+            -DNEXUS_ENABLE_COVERAGE=ON
+
+      - name: Configure CMake (without Coverage)
+        if: matrix.build_type == 'Release'
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DNEXUS_PLATFORM=native \
+            -DNEXUS_BUILD_TESTS=ON
+
+      # Build tests
+      - name: Build Tests
+        run: cmake --build build --config ${{ matrix.build_type }}
+
+      # Run validation script with coverage for Debug builds
+      - name: Run Validation (with Coverage)
+        if: matrix.build_type == 'Debug' && matrix.os == 'ubuntu-latest'
+        run: |
+          python scripts/validation/validate.py \
+            --build-dir build \
+            --coverage \
+            --threshold 0.80 \
+            --report-dir validation_reports \
+            --verbose
+        continue-on-error: false
+
+      # Run validation script without coverage for Release builds or non-Ubuntu platforms
+      - name: Run Validation (without Coverage)
+        if: matrix.build_type == 'Release' || matrix.os != 'ubuntu-latest'
+        run: |
+          python scripts/validation/validate.py \
+            --build-dir build \
+            --report-dir validation_reports \
+            --verbose
+        continue-on-error: false
+
+      # Upload test results as artifacts
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.build_type }}
+          path: |
+            validation_reports/
+            build/Testing/
+          retention-days: 30
+
+      # Upload coverage data (Ubuntu Debug only)
+      - name: Generate Coverage Info
+        if: matrix.build_type == 'Debug' && matrix.os == 'ubuntu-latest'
+        run: |
+          lcov --capture --directory build --output-file coverage.info \
+            --ignore-errors mismatch,inconsistent,gcov
+          lcov --remove coverage.info \
+            '/usr/*' \
+            '*/tests/*' \
+            '*/ext/*' \
+            '*/googletest/*' \
+            '*/catch/*' \
+            --output-file coverage.info \
+            --ignore-errors unused
+          lcov --list coverage.info || true
+        continue-on-error: true
+
+      # Upload coverage to Codecov
+      - name: Upload Coverage to Codecov
+        if: matrix.build_type == 'Debug' && matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.info
+          flags: unittests,propertytests,integrationtests
+          name: nexus-validation-coverage
+          fail_ci_if_error: false
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      # Check coverage threshold (Ubuntu Debug only)
+      - name: Check Coverage Threshold
+        if: matrix.build_type == 'Debug' && matrix.os == 'ubuntu-latest'
+        run: |
+          python scripts/validation/check_coverage.py \
+            --coverage-file coverage.info \
+            --threshold 0.80
+        continue-on-error: false
+
+  # Summary job to check if all validations passed
+  validation-summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: validate
+    if: always()
+
+    steps:
+      - name: Check Validation Results
+        run: |
+          if [ "${{ needs.validate.result }}" == "success" ]; then
+            echo "✓ All validation jobs passed"
+            exit 0
+          else
+            echo "✗ Some validation jobs failed"
+            exit 1
+          fi
