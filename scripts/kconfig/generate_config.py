@@ -37,12 +37,42 @@ def parse_config_with_kconfig(kconfig_file='Kconfig', config_file='.config'):
     config = {}
 
     try:
-        # Parse Kconfig file
-        kconf = kconfiglib.Kconfig(kconfig_file)
+        # Suppress kconfiglib warnings by redirecting stderr temporarily
+        import io
+        import contextlib
 
-        # Load .config if it exists
-        if os.path.exists(config_file):
-            kconf.load_config(config_file)
+        # Create a custom stderr that filters out known harmless warnings
+        class FilteredStderr:
+            def __init__(self, original_stderr):
+                self.original_stderr = original_stderr
+                self.buffer = []
+
+            def write(self, text):
+                # Filter out known harmless warnings about choice symbols
+                if 'choice symbol' in text and 'is defined with a prompt outside the choice' in text:
+                    return
+                if 'default selection' in text and 'is not contained in the choice' in text:
+                    return
+                # Pass through other messages
+                self.original_stderr.write(text)
+
+            def flush(self):
+                self.original_stderr.flush()
+
+        # Temporarily replace stderr
+        original_stderr = sys.stderr
+        sys.stderr = FilteredStderr(original_stderr)
+
+        try:
+            # Parse Kconfig file
+            kconf = kconfiglib.Kconfig(kconfig_file)
+
+            # Load .config if it exists
+            if os.path.exists(config_file):
+                kconf.load_config(config_file)
+        finally:
+            # Restore original stderr
+            sys.stderr = original_stderr
 
         # Extract all configuration symbols
         for sym in kconf.unique_defined_syms:
@@ -187,6 +217,8 @@ def generate_header(config, output_path):
 
     # Group configurations by category
     categorized = {}
+    instance_symbols = {}  # Track INSTANCE_NX_* symbols for macro generation
+
     for key, value in config.items():
         # Skip if not set
         if value is None:
@@ -197,6 +229,19 @@ def generate_header(config, output_path):
             nx_key = key.replace('CONFIG_', 'NX_CONFIG_', 1)
         else:
             nx_key = f'NX_CONFIG_{key}'
+
+        # Track instance symbols for macro generation
+        if 'INSTANCE_NX_' in nx_key and value is True:
+            # Extract peripheral type and instance number
+            # e.g., NX_CONFIG_INSTANCE_NX_UART_0 -> UART, 0
+            parts = nx_key.replace('NX_CONFIG_INSTANCE_NX_', '').split('_')
+            if len(parts) >= 2:
+                peripheral = '_'.join(parts[:-1])  # UART, SPI, GPIO, etc.
+                instance_num = parts[-1]  # 0, 1, 2, etc.
+
+                if peripheral not in instance_symbols:
+                    instance_symbols[peripheral] = []
+                instance_symbols[peripheral].append(instance_num)
 
         # Determine category
         category = categorize_config(nx_key)
@@ -245,6 +290,51 @@ def generate_header(config, output_path):
 
         header.append('')
 
+    # Generate instance traversal macros
+    if instance_symbols:
+        header.append('/*' + '-' * 75 + '*/')
+        header.append(f'/* {"Peripheral Instance Traversal Macros":<73} */')
+        header.append('/*' + '-' * 75 + '*/')
+        header.append('')
+
+        for peripheral in sorted(instance_symbols.keys()):
+            instances = sorted(instance_symbols[peripheral], key=lambda x: int(x) if x.isdigit() else x)
+
+            header.append('/**')
+            header.append(f' * \\brief           {peripheral} instance traversal macro')
+            header.append(' *')
+            header.append(' * This macro expands to call the provided function for each enabled')
+            header.append(f' * {peripheral} instance. Used by the device registration system.')
+            header.append(' *')
+            header.append(' * Example:')
+            header.append(f' *   NX_DEFINE_INSTANCE_NX_{peripheral}(MY_REGISTER_FUNC)')
+            header.append(' *   expands to:')
+            instances_str = ' '.join([f'MY_REGISTER_FUNC({i})' for i in instances[:3]])
+            if len(instances) > 3:
+                instances_str += ' ...'
+            header.append(f' *   {instances_str}')
+            header.append(' */')
+
+            # Generate the macro definition
+            macro_lines = []
+            for inst in instances:
+                macro_lines.append(f'    _NX_{peripheral}_INSTANCE_{inst}(fn)')
+
+            header.append(f'#define NX_DEFINE_INSTANCE_NX_{peripheral}(fn) \\')
+            header.append(' \\\n'.join(macro_lines))
+            header.append('')
+
+            # Generate helper macros for each instance
+            for inst in instances:
+                header.append(f'#ifdef NX_CONFIG_INSTANCE_NX_{peripheral}_{inst}')
+                header.append(f'#define _NX_{peripheral}_INSTANCE_{inst}(fn) fn({inst})')
+                header.append(f'#define NX_CONFIG_{peripheral}{inst}_ENABLED 1')
+                header.append('#else')
+                header.append(f'#define _NX_{peripheral}_INSTANCE_{inst}(fn)')
+                header.append(f'#define NX_CONFIG_{peripheral}{inst}_ENABLED 0')
+                header.append('#endif')
+                header.append('')
+
     # File footer
     header.append('#ifdef __cplusplus')
     header.append('}')
@@ -259,6 +349,8 @@ def generate_header(config, output_path):
         f.write('\n'.join(header))
 
     print(f'Generated: {output_path}')
+    if instance_symbols:
+        print(f'Generated instance macros for: {", ".join(sorted(instance_symbols.keys()))}')
 
 
 def generate_default_config(kconfig_file, output_path):
@@ -270,12 +362,33 @@ def generate_default_config(kconfig_file, output_path):
         output_path: Path to output header file
     """
     try:
-        # Parse Kconfig with defaults
-        kconf = kconfiglib.Kconfig(kconfig_file)
+        # Suppress kconfiglib warnings
+        class FilteredStderr:
+            def __init__(self, original_stderr):
+                self.original_stderr = original_stderr
 
-        # Write default .config to temporary file
-        temp_config = '.config_temp_default'
-        kconf.write_config(temp_config)
+            def write(self, text):
+                if 'choice symbol' in text and 'is defined with a prompt outside the choice' in text:
+                    return
+                if 'default selection' in text and 'is not contained in the choice' in text:
+                    return
+                self.original_stderr.write(text)
+
+            def flush(self):
+                self.original_stderr.flush()
+
+        original_stderr = sys.stderr
+        sys.stderr = FilteredStderr(original_stderr)
+
+        try:
+            # Parse Kconfig with defaults
+            kconf = kconfiglib.Kconfig(kconfig_file)
+
+            # Write default .config to temporary file
+            temp_config = '.config_temp_default'
+            kconf.write_config(temp_config)
+        finally:
+            sys.stderr = original_stderr
 
         # Parse the default config
         config = parse_config_with_kconfig(kconfig_file, temp_config)
