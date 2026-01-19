@@ -1,0 +1,850 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../development/kconfig_guide.rst:2 fe2c60ef919f484e9b679274b170022b
+msgid "Kconfig Writing Guide"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:4 8f1a25799ba040c19009ec2f2342b1fb
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:8 171f5c533ed84877a0718f7f96470a52
+msgid "Overview"
+msgstr "概述"
+
+#: ../../development/kconfig_guide.rst:10 fe06590a0acd46f89f567d9225020ebe
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:14 f0e9a82a3346417b8615d8c0f513b5fa
+msgid "**Key Concepts:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:16 49856630eaf54f659abea02a9d9aac47
+msgid "**config**: Define a configuration symbol"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:17 807087f9fa19407e881809ea1366b1c1
+msgid "**menuconfig**: Define a configuration symbol that opens a menu"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:18 f9f77f9f25cc4de2a66b63fcf0d605c4
+msgid "**choice**: Define mutually exclusive options"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:19 f37ad1d390f446dda3ac591ab4f1f9f7
+msgid "**menu**: Group related options"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:20 6474e462c97248769d89a69ef670d450
+msgid "**if/endif**: Conditional inclusion"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:21 2fcf9a9b0f97462e8a762dca3b4fb941
+msgid "**depends on**: Specify dependencies"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:22 4d4bed0cea2548d185a33a3da0f453f6
+msgid "**select**: Automatically enable dependencies"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:23 5f693ffec3f8475bbdcd3cc54f844659
+msgid "**default**: Specify default values"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:24 229e43eca8f8418492fb7162510d610f
+msgid "**range**: Specify valid value ranges"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:25 d5d71bd6de1d404aba0436c3ff4d2801
+msgid "**help**: Provide documentation"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:28 f6ae52c4c6b343ffb914b4c43f97aba6
+msgid "Basic Syntax"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:31 5ee9ed672b10422f8d7029974b847023
+msgid "Configuration Symbol"
+msgstr "配置 Symbol"
+
+#: ../../development/kconfig_guide.rst:33 2f98a965a2e1462a90bd1201bde6f737
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:42 817443a3caba4e84b7f2c21d1f3524af
+msgid "**Types:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:44 3684f5b766d2412aa659dcd152bdb6c0
+msgid "``bool``: Boolean (y/n)"
+msgstr "``bool``: 布尔 (y/n)"
+
+#: ../../development/kconfig_guide.rst:45 9f1266ac3e38470db22207d59c9918b9
+msgid "``int``: Integer"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:46 3c50d9b22481415fad329cefe88ff36f
+msgid "``hex``: Hexadecimal"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:47 7b4f4401c8f14d3d923e455d2488b06c
+msgid "``string``: String"
+msgstr "``字符串``: String"
+
+#: ../../development/kconfig_guide.rst:49
+#: ../../development/kconfig_guide.rst:153
+#: ../../development/kconfig_guide.rst:378
+#: ../../development/kconfig_guide.rst:539 412609a4e2494e4f82aeaf4395d6b9c1
+#: 6ee3526a7d0641ef80f9ddcd570ed6dc 6f8c17cbb8c5456baac687ca2608a73b
+#: 835a413d6914409db0948e72cd946349
+msgid "**Example:**"
+msgstr "**示例:**"
+
+#: ../../development/kconfig_guide.rst:51 fbe0faf4884147af9730b8e05bc0b190
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:62 94feec79d6ab4300a9ccf530c482c45c
+msgid "Menu Configuration"
+msgstr "Menu 配置"
+
+#: ../../development/kconfig_guide.rst:64 09b33f2fc9c24941981aa948e961208e
+msgid "``menuconfig`` creates a configuration symbol that also opens a submenu:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:66 ac1850f96d5b4bc29b7a63491b561de0
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:84 cdc4e98816404d80817d80775895a948
+msgid "Choice Menu"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:86 5badb472b5c5416aa852c5e92e09b9c6
+msgid "``choice`` creates mutually exclusive options:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:88 c8699f9ac24a46f0b5b03f91d115080a
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:108 ff0a46af4e3f4a1da89f963c25fcf898
+msgid "Regular Menu"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:110 dc41fee4d5084b34a7b118178ac04ec5
+msgid "``menu`` groups related options without creating a symbol:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:112 7ea488dfa52442e3a95f607d880f3af2
+msgid ""
+msgstr ""
+"menu \System 参数\\n\n"
+"\n\n"
+"config TICK_RATE_HZ\n\n"
+"    int \System tick rate (Hz)\\n\n"
+"    default 1000\n\n"
+"    range 100 10000\n\n"
+"\n\n"
+"config HEAP_SIZE\n\n"
+"    int \Heap size (bytes)\\n\n"
+"    default 32768\n\n"
+"    range 4096 1048576\n\n"
+"\n\n"
+"endmenu\n"
+
+#: ../../development/kconfig_guide.rst:129
+#: ../../development/kconfig_guide.rst:618 07b67e8aa9da4e7c93f4c0e0a8bc1903
+#: 0ecc4e6a5b0b420fb2017ea40cd0d482
+msgid "Dependencies"
+msgstr "依赖"
+
+#: ../../development/kconfig_guide.rst:132 9834d40a83864960809b0307aa1e70b2
+msgid "depends on"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:134 8dfdfb744ba14058a62b1e9824ff81a0
+msgid "``depends on`` makes an option visible only when dependencies are met:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:136 d3e6eda0c4e54e7091818a90d1a1dd2e
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:145 24a90dfd2963484a8c5eca4f31aa9b7c
+msgid "**Operators:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:147 8be7e43e2cf34f598b551950cb779024
+msgid "``&&``: Logical AND"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:148 59a86c0385404cae81ee12955cda863f
+msgid "``||``: Logical OR"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:149 58f4580ab92149b3af5acfe29398dcef
+msgid "``!``: Logical NOT"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:150 3157436eb87c4843bba7fcaeade77f5a
+msgid "``=``: Equality"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:151 00ebfe6e60a24c3390e64e1bb5fa27f3
+msgid "``!=``: Inequality"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:155 92a75499f3024ed09b0de10693d5c4b0
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:163 d9d80835a6b14e2daab8bcdfa536c63a
+msgid "select"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:165 936f3ce893fd4cdfbc6706a375465af9
+msgid "``select`` automatically enables dependencies:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:167 0511ef97c1f44a1b96ea01d5e4fd0fe6
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:176 3795da505c6c47e3bdfa37299c790669
+msgid "**Note:** Use ``select`` sparingly. Prefer ``depends on`` when possible."
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:179 b30071f9f5884d958167ded14dbfbd98
+msgid "Conditional Inclusion"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:181 f4ddcb9c7a834f57b0dd553739f75503
+msgid "``if/endif`` blocks conditionally include configuration options:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:183 f5e9711dd12d49c198b3c70e2ac2b833
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:196 1056cfa173c94940862b2460a4359c79
+msgid "Default Values"
+msgstr "默认值"
+
+#: ../../development/kconfig_guide.rst:199 1ac263386d934e22b52769e1d5684f8c
+msgid "Simple Defaults"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:201
+#: ../../development/kconfig_guide.rst:695 06597a75c6954c90826500a27b7b907e
+#: 64bddb0fca014c6e94928738dbdf6ca1
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:208 855e7e10fb094ecd9dcafaf8ed1a2e4f
+msgid "Conditional Defaults"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:210 2d650c7d09cb4eb086840b3be6dbc004
+msgid "Defaults can depend on other options:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:212 a92332f8a1124d5e993112fc04f206eb
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:220 aa4c5bd8e9e143069d952beb017285a6
+msgid "**Evaluation order:** First matching condition is used."
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:223 5b50ab28e5b24cae8999d4a9234586ec
+msgid "Expression Defaults"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:225 da354a2dad42474991f0d3537f98a00b
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:234 c3cf519a1efa4e1d964af8c3c004cb59
+msgid "Range Constraints"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:237 1cd14cf029df4abeb416db75578adfa0
+msgid "Integer Ranges"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:239 0e66239928c846ff818663ca20e5cfb3
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:249 ad7100a00c874ab29db0231b0c10b997
+msgid "Conditional Ranges"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:251 3ed28b28b0b0463b96cb4e9435536a5b
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:260 e936080b12bf41348bce0d2f2b20d4f8
+msgid "Hexadecimal Values"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:262 7807fffcda6a43cea7921917bda6fc41
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:270 c7a0666246e74432be1f51e7b263341d
+msgid "File Inclusion"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:273 f1cb83f941d04b3081ef15fe47140ab8
+msgid "source Directive"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:275 f393f535415748ae9a0642737748284c
+msgid "``source`` includes a file with absolute or relative path:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:277 709292ebbccf4773a78043a43a03cea5
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:286 de5a242c14254be78eb46cb605f1de4c
+msgid "rsource Directive"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:288 63529c8bfca946deb88b6112d21381f1
+msgid "``rsource`` includes a file with path relative to current file:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:290 359cb04a33364ef8a12bcd9bb0fd18eb
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:297 0569cb84a12a441eadb869e740ecbd5a
+msgid "**Best Practice:** Use ``rsource`` for platform-specific includes."
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:300 7d9cf450fe2a462a8ecaacab0f552f84
+msgid "Naming Conventions"
+msgstr "命名约定"
+
+#: ../../development/kconfig_guide.rst:303 d79e7136c059449d84787845c7070cbb
+msgid "Symbol Names"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:305 a6557b8f316440fc8a78ea27ff4f01ca
+msgid "**Platform symbols:**"
+msgstr "**平台 symbols:**"
+
+#: ../../development/kconfig_guide.rst:307 1fb610496b0742b9a50f569c3fd951a9
+msgid ""
+msgstr ""
+"PLATFORM_<NAME>                 # 平台选择\n\n"
+"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific\n"
+
+#: ../../development/kconfig_guide.rst:312
+#: ../../development/kconfig_guide.rst:327
+#: ../../development/kconfig_guide.rst:342
+#: ../../development/kconfig_guide.rst:357 34d709db0bd24e1498e0755ab5faebe4
+#: 362e1a81c5c3431998ac3cbc4b8f2ed9 62fccb5d26494831bdab20048c4ba9e8
+#: c29088b82417404eb20a64426da8cea9
+msgid "**Examples:**"
+msgstr "**示例:**"
+
+#: ../../development/kconfig_guide.rst:314 6b105475074a4a4dbc8074c03d1ccab1
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:320 e34f6679f6504368baca51dd80906aa9
+msgid "**Peripheral instances:**"
+msgstr "**外设 instances:**"
+
+#: ../../development/kconfig_guide.rst:322 1062b51871bc4589b65563948dd009c9
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:329 09c8ae3d40444644a855c5666416b5b5
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:335 b58c42580e844e158e5d2ff4158731af
+msgid "**OSAL symbols:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:337 c91716462a8f4fbd916c16d03bebf12d
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:344 0dad35920c9544ff91426f0414236831
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:351 a9974b3a234d47028bb59dc926f9a7f3
+msgid "Prompt Text"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:353 2b19e13ce6d0489db3747b596a562e2c
+msgid "Use sentence case"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:354 6c70f95c385941d59ff11f565bd7c705
+msgid "Be concise but descriptive"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:355 0eb9f0b3854b4037890f36e614f6e0ac
+msgid "Include units in parentheses"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:359 3c08b0ef1c1b4006be4b6703c9d61272
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:371 170da5556f044c099f770af429cf85eb
+msgid "Help Text"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:373 41ff546319454eaab339b4f67c849fbd
+msgid "First line: brief description"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:374 9ffb09f7369c4fbcab7146fe2c5b0717
+msgid "Following lines: detailed explanation"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:375 548f2708c94044faadc5d3ffaadeffaf
+msgid "Include examples if helpful"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:376 6cdacf66ac3c4636a9559d2dce1f6b51
+msgid "Document valid ranges and common values"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:380 e4a23ee7591648cfa10e16c09c83b980
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:397 73faeb01d74c413ea5fd7c78a71e35f7
+msgid "Configuration Patterns"
+msgstr "配置 Patterns"
+
+#: ../../development/kconfig_guide.rst:400 3f83b0a9ab3b423f8c14e868105cf728
+msgid "Platform Configuration"
+msgstr "平台配置"
+
+#: ../../development/kconfig_guide.rst:402
+#: ../../development/kconfig_guide.rst:432
+#: ../../development/kconfig_guide.rst:468
+#: ../../development/kconfig_guide.rst:497 368da32efbfb4b9095c0d06f8f72bfad
+#: 444e30d7f567428584aadc56698f2c0a 6411a8de4ed644319ea5d25988ac8b38
+#: c903f1b20f244d90b20f6fc1f32381cd
+msgid "**Pattern:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:404 3c84c28aa0e84ab2b8740686344182cc
+msgid ""
+msgstr ""
+"# 平台选择 (choice)\n\n"
+"choice\n\n"
+"    prompt \Target Platform\\n\n"
+"    default PLATFORM_NATIVE\n\n"
+"\n\n"
+"config PLATFORM_<NAME>\n\n"
+"    bool \Platform description\\n\n"
+"\n\n"
+"endchoice\n\n"
+"\n\n"
+"# Platform-specific configuration\n\n"
+"if PLATFORM_<NAME>\n\n"
+"\n\n"
+"# Platform settings\n\n"
+"menu \Platform Settings\\n\n"
+"    # ...\n\n"
+"endmenu\n\n"
+"\n\n"
+"# 外设配置uration\n\n"
+"source \platforms/<name>/Kconfig_peripherals\\n\n"
+"\n\n"
+"endif\n"
+
+#: ../../development/kconfig_guide.rst:430 1507e4867bec4e2ca81bdd361afc84d3
+msgid "Peripheral Configuration"
+msgstr "外设配置"
+
+#: ../../development/kconfig_guide.rst:434 e6b2dea8949446198ffaca422a25f4b7
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:466 a81d450db0494dac876009bd8140f771
+msgid "Transfer Mode Selection"
+msgstr "Transfer Mode 选择ion"
+
+#: ../../development/kconfig_guide.rst:470 11bed6dd7db84cc2b442da1e0ca4e545
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:495 13d826c21b634772815465e3bb9c2455
+msgid "Buffer Configuration"
+msgstr "Buffer 配置"
+
+#: ../../development/kconfig_guide.rst:499 5b50e157f16c41658537637bede27e45
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:512
+#: ../../development/kconfig_guide.rst:633 a5bc9df3270046058befaf9ee5904f06
+#: e0072d7a294c412bb01beebbb6b7db32
+msgid "Validation"
+msgstr "验证"
+
+#: ../../development/kconfig_guide.rst:515 b8fbf1eb00d042808bedefb380abfa7d
+msgid "Syntax Validation"
+msgstr "Syntax 验证"
+
+#: ../../development/kconfig_guide.rst:517 a4263478e86a481e818b7a079c632dcf
+msgid "Always validate Kconfig files:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:519 19155dea074a4d92a898329f8fb45f21
+msgid "python scripts/kconfig/validate_kconfig.py Kconfig"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:523 efbc07c5b0884948b43d94e1074c9116
+msgid "**Common errors:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:525 c65fd880bd4c480a802006b1d55b1840
+msgid "Unclosed blocks (if/endif, menu/endmenu, choice/endchoice)"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:526 25d67fea9d694936a7ef8246c84ced24
+msgid "Missing source files"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:527 4adb5cc029f146fa9915fac664b7073f
+msgid "Undefined symbols in dependencies"
+msgstr "未定义的符号 in dependencies"
+
+#: ../../development/kconfig_guide.rst:528 f840e9422178444ea97b2fa13d55abad
+msgid "Invalid range constraints"
+msgstr "Invalid 范围约束"
+
+#: ../../development/kconfig_guide.rst:531 5b5a812d9bf1476fa9c020bc0a8e64c1
+msgid "Dependency Validation"
+msgstr "Dependency 验证"
+
+#: ../../development/kconfig_guide.rst:533 042e4923d9e4446187c2291e0d1de561
+msgid "Check for:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:535 4996155810f0422d9d15763f6ad5f41d
+msgid "Circular dependencies"
+msgstr "循环依赖"
+
+#: ../../development/kconfig_guide.rst:536 de8a4823247a4f61ade9e045b0c90de7
+msgid "Undefined symbols"
+msgstr "未定义的符号"
+
+#: ../../development/kconfig_guide.rst:537 f1cfab74dd0849ea8681f6536df4831b
+msgid "Conflicting dependencies"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:541 ca27991fc2af41ffb9f76e1c67b90c3e
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:551 edfedff00f024f2e8e56d46d9d96e93e
+msgid "Testing"
+msgstr "测试"
+
+#: ../../development/kconfig_guide.rst:554 eb2552fea14b42ee8f55139bac0ba2d0
+msgid "Test Configuration"
+msgstr "Test 配置"
+
+#: ../../development/kconfig_guide.rst:556 848ebac8bfdf437caaaf0507f12cb388
+msgid "Create test configurations:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:558 7ab214cdd577481abb8ada670a527753
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:569 05b10179fe2d41e29cd59d9e7a139093
+msgid "Verify Generated Headers"
+msgstr "Verify 生成d Headers"
+
+#: ../../development/kconfig_guide.rst:571 96635b5580234faf970e11b8ecb2ec0a
+msgid "Check generated headers:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:573 e4ff09026a6f4e69b633a1e511e0bcef
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:582 8b2b8cd51fb5402f9cce92fbc303274c
+msgid "Property-Based Testing"
+msgstr "Property-Based 测试"
+
+#: ../../development/kconfig_guide.rst:584 2f158754256140aea24b60c495f121bd
+msgid "Write property tests for configuration:"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:586 26eac92ab100463bab95a8a62a64e7e9
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:599 73c954f7ec9f4147bc2cc2610e4b7dad
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../development/kconfig_guide.rst:602 48be9a99e66d443a9a2820dc9236f13d
+msgid "Organization"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:604 a93a7183124a4e8bb8ef7d6be44f3116
+msgid "**Group related options** in menus"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:605 ccb25b64ffc54b7a8f6ea93223f7530b
+msgid "**Use menuconfig** for enable + settings pattern"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:606 14d9992a3c8e40879b1ddaf6c2d3fdad
+msgid "**Keep files focused** on single component"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:607 91849d07e30844339758ff014af126f3
+msgid "**Use consistent naming** across platforms"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:610 ad4ce77264d24da7bb8a210191c5e448
+msgid "Documentation"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:612 f3213cad2dbb4aee818cc7fee4d22f76
+msgid "**Always provide help text**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:613 0c861c7d3b1a4a678cd4bd0daf340df1
+msgid "**Document valid ranges**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:614 f325a0f3f84641c4aa6d0fc9abc6fe5d
+msgid "**Include examples** for complex options"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:615 9d243b2584774ad39a5ac2bca9760965
+msgid "**Explain dependencies**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:620 50e237f5ebd540a6b1702ee12d95bedd
+msgid "**Prefer depends on** over select"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:621 f5a6d7415f374a6a87dacacc64d91652
+msgid "**Avoid circular dependencies**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:622 d2520e6dd5eb45deace92b9caf228708
+msgid "**Keep dependency chains short**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:623 9cdcafcc6ef1436f8815c9ea8eec82d6
+msgid "**Document why dependencies exist**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:626 3f0f870a60454485a95c2f35f211e06b
+msgid "Defaults"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:628 1e554b248f62438e8db0129126a46ccb
+msgid "**Provide sensible defaults**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:629 226a01d517374add817491fb7da3f920
+msgid "**Use conditional defaults** for platform-specific values"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:630 204ad1c592024e95835f6de17e87f11d
+msgid "**Document default rationale** in help text"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:635 63526c34132d4ebdbeb7c0af9c59d68e
+msgid "**Use range constraints** for integers"
+msgstr "**Use 范围约束** for 整数s"
+
+#: ../../development/kconfig_guide.rst:636 b6f83c7718f3462289cad0a97c068884
+msgid "**Validate before committing**"
+msgstr "**验证 before committing**"
+
+#: ../../development/kconfig_guide.rst:637 38f44e253adf46d885e1ead0c8e7dcae
+msgid "**Test with multiple configurations**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:638 def2689f5dbb436db13ad81cd59beb52
+msgid "**Check generated headers**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:641 1ffc0deebd74420886651fdb5b771a30
+msgid "Common Pitfalls"
+msgstr "常见陷阱"
+
+#: ../../development/kconfig_guide.rst:644 9cf1a393e4a644ddbf438af6e65306d3
+msgid "Circular Dependencies"
+msgstr "Circular 依赖"
+
+#: ../../development/kconfig_guide.rst:646
+#: ../../development/kconfig_guide.rst:672
+#: ../../development/kconfig_guide.rst:693
+#: ../../development/kconfig_guide.rst:715 161d56d4161b4ce9b359adf407680ac0
+#: 5bdc3d6123ed4bd7ae6b001873088b44 7bf22d49beb9465684e0ee82ce692112
+#: c447152ca52d4a7881260e9853d78675
+msgid "**Bad:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:648 8d79772448f54d8ebeab813b660448fa
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:658
+#: ../../development/kconfig_guide.rst:682
+#: ../../development/kconfig_guide.rst:701
+#: ../../development/kconfig_guide.rst:725 3de2c81882e54449944f6ca4150cfc47
+#: 5094ccf3acc243f6a29627b97d9afe17 b3d298ae1c764dcc980083f366394912
+#: e7457e515b07476693dd93c2a87b1cdf
+msgid "**Good:**"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:660 de6df38e95cf42c7a328a96daf320c29
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:670 f503e1b3245442eb99623ff32ab1db0c
+msgid "Overuse of select"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:674 9eb8a20598ac4b71a1ed81c984b6f5b5
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:684 077af827ba6244759687fa82c79f4c73
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:691 56dbd66150e64ec78c0bef3805b7f25f
+msgid "Missing Help Text"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:703 d2b08d93eb13494c82b75e9376730028
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:713 3649fa03004e43f0b3ffef5b18bdbfff
+msgid "Inconsistent Naming"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:717 650255103d9b4fd5a901e6ee406fdb08
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:727 43840d5fb1f14b3da541527ce679b075
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:736 76712b31fddb47ec9e8824059365338c
+msgid "Examples"
+msgstr "示例"
+
+#: ../../development/kconfig_guide.rst:739 e73f1e4d55164341aedbd86b71eb1bba
+msgid "Complete Platform Configuration"
+msgstr "Complete 平台配置"
+
+#: ../../development/kconfig_guide.rst:741 824542762e6a451cb8102b8ae8e6c39c
+msgid ""
+msgstr ""
+"# platforms/stm32/Kconfig\n\n"
+"if PLATFORM_STM32\n\n"
+"\n\n"
+"config STM32_PLATFORM_NAME\n\n"
+"    string\n\n"
+"    default \STM32 Platform\\n\n"
+"\n\n"
+"config STM32_PLATFORM_VERSION\n\n"
+"    string\n\n"
+"    default \1.0.0\\n\n"
+"\n\n"
+"# 芯片选择\n\n"
+"source \platforms/stm32/Kconfig_chip\\n\n"
+"\n\n"
+"menu \STM32 Platform Settings\\n\n"
+"\n\n"
+"config STM32_ENABLE_LOGGING\n\n"
+"    bool \Enable platform logging\\n\n"
+"    default y\n\n"
+"\n\n"
+"config STM32_LOG_LEVEL\n\n"
+"    int \Platform log level\\n\n"
+"    default 3\n\n"
+"    range 0 4\n\n"
+"    depends on STM32_ENABLE_LOGGING\n\n"
+"\n\n"
+"endmenu\n\n"
+"\n\n"
+"# 外设配置uration\n\n"
+"source \platforms/stm32/Kconfig_peripherals\\n\n"
+"\n\n"
+"endif # PLATFORM_STM32\n"
+
+#: ../../development/kconfig_guide.rst:777 bd5c6b7e77b945b7bdd76cd3a89466aa
+msgid "Complete Peripheral Configuration"
+msgstr "Complete 外设配置"
+
+#: ../../development/kconfig_guide.rst:779 c8b09635bd4d490f9bf981f38878ddf2
+msgid ""
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:838 4dbf6f2a3aa24a70bbaa6328d7a777d2
+msgid "See Also"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:840 1a6b71888a134c02afea3e2d43072742
+msgid ":doc:`../user_guide/kconfig` - Kconfig user guide"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:841 4ba2715929e4445da713267422437406
+msgid ":doc:`../api/kconfig_tools` - Kconfig tools API"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:842 fcad3c8ca52c417093cc9b28cbb0f550
+msgid ":doc:`contributing` - Contributing guidelines"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:843 e2773812e37a47008bf26c51b52ac84c
+msgid "Configuration Guide: ``docs/configuration_guide.md``"
+msgstr "配置 Guide: ``docs/configuration_guide.md``"
+
+#: ../../development/kconfig_guide.rst:844 fd7e1a76c86449988d9dc26b8c232379
+msgid "Kconfig Writing Guide: ``docs/kconfig_writing_guide.md``"
+msgstr ""
+

@@ -195,23 +195,17 @@ cleanup:
 }
 
 /**
- * \brief           Example 4: SPI runtime configuration
- * \details         Demonstrates changing SPI parameters at runtime
+ * \brief           Example 4: SPI runtime configuration (DEPRECATED)
+ * \details         Demonstrates the old runtime configuration approach.
+ *                  This is now deprecated - use Kconfig for compile-time
+ * config.
  */
 void example_spi_runtime_config(void) {
-    printf("=== SPI Example 4: Runtime Configuration ===\n");
+    printf("=== SPI Example 4: Runtime Configuration (DEPRECATED) ===\n");
+    printf("Note: Runtime configuration is deprecated. Use Kconfig instead.\n");
 
-    /* Create custom configuration */
-    nx_spi_config_t custom_config = {
-        .clock_hz = 1000000, /* 1 MHz */
-        .mode = NX_SPI_MODE_0,
-        .bits = 8,
-        .msb_first = true,
-        .cs_delay_us = 10,
-    };
-
-    /* Get SPI with custom configuration */
-    nx_spi_t* spi = nx_factory_spi_with_config(0, &custom_config);
+    /* Get SPI device (configuration from Kconfig) */
+    nx_spi_t* spi = nx_factory_spi(0);
     if (!spi) {
         printf("Error: Failed to get SPI device\n");
         return;
@@ -436,64 +430,6 @@ void example_i2c_scan(void) {
     printf("\n");
 }
 
-/**
- * \brief           Example 8: I2C runtime configuration
- * \details         Demonstrates changing I2C speed at runtime
- */
-void example_i2c_runtime_config(void) {
-    printf("=== I2C Example 8: Runtime Configuration ===\n");
-
-    /* Create custom configuration */
-    nx_i2c_config_t custom_config = {
-        .speed = NX_I2C_SPEED_STANDARD, /* 100 kHz */
-        .own_addr = 0x00,
-        .addr_10bit = false,
-    };
-
-    nx_i2c_t* i2c = nx_factory_i2c_with_config(0, &custom_config);
-    if (!i2c) {
-        printf("Error: Failed to get I2C device\n");
-        return;
-    }
-
-    nx_lifecycle_t* lifecycle = i2c->get_lifecycle(i2c);
-    if (lifecycle->init(lifecycle) != NX_OK) {
-        printf("Error: Failed to initialize I2C\n");
-        nx_factory_i2c_release(i2c);
-        return;
-    }
-
-    /* Get current configuration */
-    nx_i2c_config_t current_config;
-    if (i2c->get_config(i2c, &current_config) == NX_OK) {
-        printf("Current configuration:\n");
-        printf("  Speed: %d (STANDARD=%d, FAST=%d)\n", current_config.speed,
-               NX_I2C_SPEED_STANDARD, NX_I2C_SPEED_FAST);
-    }
-
-    /* Change to fast mode */
-    printf("\nSwitching to Fast Mode (400 kHz)...\n");
-    if (i2c->set_speed(i2c, NX_I2C_SPEED_FAST) == NX_OK) {
-        i2c->get_config(i2c, &current_config);
-        printf("New speed: %d\n", current_config.speed);
-    }
-
-    /* Get statistics */
-    nx_i2c_stats_t stats;
-    if (i2c->get_stats(i2c, &stats) == NX_OK) {
-        printf("\nI2C Statistics:\n");
-        printf("  Busy: %s\n", stats.busy ? "Yes" : "No");
-        printf("  TX count: %lu bytes\n", (unsigned long)stats.tx_count);
-        printf("  RX count: %lu bytes\n", (unsigned long)stats.rx_count);
-        printf("  NACK count: %lu\n", (unsigned long)stats.nack_count);
-        printf("  Bus errors: %lu\n", (unsigned long)stats.bus_error_count);
-    }
-
-    lifecycle->deinit(lifecycle);
-    nx_factory_i2c_release(i2c);
-    printf("\n");
-}
-
 /*---------------------------------------------------------------------------*/
 /* Main Function                                                             */
 /*---------------------------------------------------------------------------*/
@@ -520,7 +456,6 @@ int main(void) {
     example_i2c_basic();
     example_i2c_memory();
     example_i2c_scan();
-    example_i2c_runtime_config();
 
     /* Cleanup HAL */
     nx_hal_deinit();
@@ -528,4 +463,3 @@ int main(void) {
     printf("All examples completed\n");
     return 0;
 }
-

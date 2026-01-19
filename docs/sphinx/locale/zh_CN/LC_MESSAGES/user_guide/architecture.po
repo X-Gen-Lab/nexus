@@ -2,66 +2,527 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../user_guide/architecture.rst:2 4dcc640ed0b54c46847ed78b9ab25c22
 msgid "Architecture"
 msgstr "架构"
 
-msgid "Overview"
-msgstr "概述"
+#: ../../user_guide/architecture.rst:4 5ba5d671573b459cb46f152d41020a6c
+msgid ""
+"This document provides a detailed overview of the Nexus platform "
+"architecture."
+msgstr ""
 
+#: ../../user_guide/architecture.rst:7 f5348a2d5b694d58b1a2ad70bdf0a0c7
 msgid "Design Principles"
 msgstr "设计原则"
 
+#: ../../user_guide/architecture.rst:9 b00d201d62b44b4f89613a1c9afc19db
+msgid "Nexus is built on the following design principles:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:11 8d0a1c1b6fcf4b29a721fa47b2314431
+msgid "**Separation of Concerns**: Each layer has a specific responsibility"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:12 0695976c7e6941df9cbc5b57d6025f51
+msgid "**Abstraction**: Hide implementation details behind clean interfaces"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:13 0177605f8d9e4c10978b66da8678bad6
+msgid "**Portability**: Minimize platform-specific code in applications"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:14 3c92a43e29074283bc332b14a298c656
+msgid "**Testability**: Design for unit testing and simulation"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:15 eb365540bfab495fab9a05671bc2dcff
+msgid "**Resource Efficiency**: Optimize for constrained embedded systems"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:18 d5c40cd14d9e49ebbe1c1fff5e1ca0a6
 msgid "Layer Architecture"
 msgstr "分层架构"
 
+#: ../../user_guide/architecture.rst:20 3c928b94d05f449dbe629131b7334b9b
+msgid ""
+"┌─────────────────────────────────────────────────────────────┐\n"
+"│                      Applications                            │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                      Middleware                              │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │  Shell  │ │   Log   │ │  Config │ │  Event  │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                         OSAL                                 │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │  Task   │ │  Mutex  │ │  Queue  │ │  Timer  │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                          HAL                                 │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │  GPIO   │ │  UART   │ │   SPI   │ │   I2C   │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"├─────────────────────────────────────────────────────────────┤\n"
+"│                    Platform / Hardware                       │\n"
+"│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │\n"
+"│  │ STM32F4 │ │ STM32H7 │ │  ESP32  │ │  nRF52  │           │\n"
+"│  └─────────┘ └─────────┘ └─────────┘ └─────────┘           │\n"
+"└─────────────────────────────────────────────────────────────┘"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:47 52d017e366f4463ba2369baaaeb9c6fb
 msgid "Application Layer"
 msgstr "应用层"
 
+#: ../../user_guide/architecture.rst:49 4cb0c6db6a5f4c6aaf83fa1a7a9e87e6
+msgid "User applications built on top of Nexus platform. Applications should:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:51 9a47ed410fb5440b9b3928a492ee56ad
+msgid "Use only public APIs from lower layers"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:52 955f347cd948478789e149c6174d9696
+msgid "Avoid direct hardware access"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:53 72b6da7799254d95b07936ba70256f46
+msgid "Be portable across supported platforms"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:56 2909a0fa7e4843b98df24fe22c51ac67
 msgid "Middleware Layer"
 msgstr "中间件层"
 
-msgid "OS Abstraction Layer"
+#: ../../user_guide/architecture.rst:58 1911069ec8ba46c1ad8ad8922d8de496
+msgid "Common services that provide higher-level functionality:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:60 5aa884730e004accbd7b687afb76bf99
+msgid "**Log Framework**: Flexible logging with multiple backends"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:61 8a78278e206c4ee3826d06ad1c1b37d4
+msgid "**Shell**: Command-line interface for debugging"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:62 8ef6841ec310445fb2da8bb19c5c861b
+msgid "**Config**: Configuration management and persistence"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:63 a65ede1ed6314bf0b69cc1c9dbea3d8d
+msgid "**Event**: Event-driven programming support"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:65 b278d321fcae4dc19e5647f37f62c315
+msgid "See :doc:`log` for detailed Log Framework documentation."
+msgstr ""
+
+#: ../../user_guide/architecture.rst:68 804e86fc222b437881d9945482ac943b
+#, fuzzy
+msgid "OSAL Layer"
 msgstr "操作系统抽象层"
 
-msgid "Hardware Abstraction Layer"
+#: ../../user_guide/architecture.rst:70 ac2cd85d246841fda2e9b70d7e8d8a2e
+msgid "OS Abstraction Layer provides portable RTOS primitives:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:72 cc4fdeb081224871a1c8d8abb83dbfb6
+msgid "**Task**: Thread/task management"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:73 f99e0ea457d841c4a7995ea14e55e818
+msgid "**Mutex**: Mutual exclusion locks"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:74 9d4f4a3bb4e34bf085f0287894b1aadd
+msgid "**Semaphore**: Binary and counting semaphores"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:75 3d4c07cd91544347a62c86f302a1f021
+msgid "**Queue**: Message queues for inter-task communication"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:76 9c4d1e5e66e04b21ae9c9a99d796d8e7
+msgid "**Timer**: Software timers"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:78 6b5c5791436641e2bcb660a2f822aa75
+msgid "Supported backends:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:80 f4d97537415a4f4c9b17f7640dc973ad
+msgid "FreeRTOS"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:81 e01e9f96e46b453fa13ba22f68983418
+msgid "Native (pthreads for PC simulation)"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:82 590348cbf3f84c93a62050e65aaac51e
+msgid "Bare-metal (cooperative scheduling)"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:84 8b007b011c6045ec9b492e9ab7d24389
+msgid "See :doc:`osal` for detailed OSAL documentation."
+msgstr ""
+
+#: ../../user_guide/architecture.rst:87 76164c037e774491830d06373c1a7961
+#, fuzzy
+msgid "HAL Layer"
+msgstr "应用层"
+
+#: ../../user_guide/architecture.rst:89 ade0ee25510743988967874fa7ef0468
+#, fuzzy
+msgid "Hardware Abstraction Layer provides unified peripheral APIs:"
 msgstr "硬件抽象层"
 
+#: ../../user_guide/architecture.rst:91 0cf79161c2474b85bd8c5055d58f8f8b
+msgid "**GPIO**: General-purpose I/O"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:92 52bd44e37e5c4026903669ba1109cb90
+msgid "**UART**: Serial communication"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:93 3c91b5e53231492f921f9dc389a42aa2
+msgid "**SPI**: SPI bus master/slave"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:94 7e64e922fd7a482ba109a767ab2047de
+msgid "**I2C**: I2C bus master/slave"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:95 065f70fbeb694bc9875f0ab06e36a8a3
+msgid "**Timer**: Hardware timers and PWM"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:96 eff13d89d2cd45288a4453313c89fd45
+msgid "**ADC**: Analog-to-digital conversion"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:98 716deff112034f73844ede3181fd6d8a
+msgid "See :doc:`hal` for detailed HAL documentation."
+msgstr ""
+
+#: ../../user_guide/architecture.rst:101 e1f454279ab747b8a8cfab72b9520723
 msgid "Platform Layer"
 msgstr "平台层"
 
+#: ../../user_guide/architecture.rst:103 5544b7035fac4092ba3d91800cef2e77
+msgid "MCU-specific implementations including:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:105 28b70545e10749d48e0881a2a15621e8
+msgid "Startup code and system initialization"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:106 0ee462e7ef3e4f598efb08b468e8582e
+msgid "Linker scripts"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:107 ea620954dad447b7a2c0179b2bb47f85
+msgid "Vendor SDK integration"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:108 6fcbe5b8627d4efeaf2594ff83ae8e77
+#, fuzzy
+msgid "Clock and power management"
+msgstr "内存管理"
+
+#: ../../user_guide/architecture.rst:111 f5a4e7792aca42199edc8553e6f08ff6
 msgid "Data Flow"
 msgstr "数据流"
 
+#: ../../user_guide/architecture.rst:113 94dffd42a8984817ab4c86c07beb6724
+msgid ""
+"Application\n"
+"    │\n"
+"    ▼\n"
+"┌─────────────────┐\n"
+"│   Middleware    │  ← Uses OSAL for threading, HAL for I/O\n"
+"└────────┬────────┘\n"
+"         │\n"
+"         ▼\n"
+"┌─────────────────┐\n"
+"│      OSAL       │  ← Uses HAL for timing\n"
+"└────────┬────────┘\n"
+"         │\n"
+"         ▼\n"
+"┌─────────────────┐\n"
+"│       HAL       │  ← Uses Platform for hardware access\n"
+"└────────┬────────┘\n"
+"         │\n"
+"         ▼\n"
+"┌─────────────────┐\n"
+"│    Platform     │  ← Direct hardware access\n"
+"└─────────────────┘"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:138 5f01afa9c7b446e69aea9101b04efb26
 msgid "Dependency Rules"
 msgstr "依赖规则"
 
+#: ../../user_guide/architecture.rst:140 60cb9de4752747a5a233af6cd6f6b4e1
+msgid "Strict dependency rules ensure clean architecture:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:142 3db96e20f32d47f1ab59762380f17afb
+msgid "**Upper layers depend on lower layers** (never reverse)"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:143 49af9025264a493eb2de3346b43964d6
+msgid "**Same-layer components are independent** (no horizontal dependencies)"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:144 a0f378119de645c69c1688de9b170373
+msgid "**Platform layer is the only layer with hardware access**"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:146 7db6547aa666470c84e117d962cfb960
+msgid ""
+"✅ Application → Middleware → OSAL → HAL → Platform\n"
+"❌ HAL → Middleware (reverse dependency)\n"
+"❌ GPIO → UART (horizontal dependency within HAL)"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:153 9afb0fcbcc3a45d1bf4b98c502f51548
 msgid "Memory Management"
 msgstr "内存管理"
 
+#: ../../user_guide/architecture.rst:155 d33a384383a042ed9de0dc8ff57797c8
+msgid "Nexus supports multiple memory management strategies:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:157 1f8cc9c1aa3e4b69aed90c103ac10b8b
+msgid "**Static Allocation**"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:158 8c8c743e407647ef9f3ae5a1d0a7c3d4
+msgid ""
+"All memory allocated at compile time. Suitable for safety-critical "
+"systems."
+msgstr ""
+
+#: ../../user_guide/architecture.rst:160 832f96a3a5aa43529b089afd2b81762f
+msgid "**Dynamic Allocation**"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:161 dc60f9b8b7de48359eb54a27c541a886
+msgid ""
+"Runtime memory allocation using malloc/free. More flexible but requires "
+"careful management."
+msgstr ""
+
+#: ../../user_guide/architecture.rst:164 829859c8f1ac45a4b69771c321066fb8
+msgid "**Pool Allocation**"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:165 2eb50f438f7b42f08bc01b1c2a6bf49c
+msgid "Fixed-size memory pools for predictable allocation patterns."
+msgstr ""
+
+#: ../../user_guide/architecture.rst:167 5eb42860aa0641628fffa80371834e2f
+msgid "Configuration example:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:169 a99712c6eced45fda5a1d8ba199f3018
+msgid ""
+"/* Static allocation mode */\n"
+"#define NEXUS_USE_STATIC_ALLOC  1\n"
+"#define NEXUS_MAX_TASKS         8\n"
+"#define NEXUS_MAX_MUTEXES       16"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:177 9d205e6fec874b1cb506b064f74b1b00
 msgid "Error Handling"
 msgstr "错误处理"
 
+#: ../../user_guide/architecture.rst:179 9866b962f9354bc49d581ab416a30871
+msgid "All Nexus APIs follow consistent error handling:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:181 74e0334db347479caa194b174a5a8171
+#, python-format
+msgid ""
+"/* All functions return status codes */\n"
+"hal_status_t status = hal_gpio_init(port, pin, &config);\n"
+"if (status != HAL_OK) {\n"
+"    /* Handle error */\n"
+"    LOG_ERROR(\"GPIO init failed: %d\", status);\n"
+"}"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:190 0b676d30d5e34d239b70d6576a064ccd
+msgid "Common status codes:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:193 04601364775f41ecadb57d82add8cb39
+msgid "Status"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:193 ../../user_guide/architecture.rst:227
+#: 3c4b0d35274e420ebfc2cf7478bfe49b c7d87f1efea74252a9a1e499f811af75
+msgid "Description"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:195 aa12dd9de1b6421b89f0a27ebf27d669
+msgid "``XXX_OK``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:195 48dfa2efb0184f72b38e9a76f7c7c082
+msgid "Operation successful"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:197 aced54f9ceb84912818d9633d4e9ed3c
+msgid "``XXX_ERROR``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:197 7f59572eae9d41f89df27edfbc657d55
+msgid "General error"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:199 7a7f180761c94b52a64ed03f2483139d
+msgid "``XXX_ERROR_PARAM``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:199 e7eee03320c847b0b8a998aedde78d5a
+msgid "Invalid parameter"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:201 4275ce7be639423da0419fa90dd8fe75
+msgid "``XXX_ERROR_STATE``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:201 f542d4ea786c4d21af9d6410b8ee9a66
+msgid "Invalid state"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:203 067f604fdf7c4765919d63064617d3c3
+msgid "``XXX_ERROR_TIMEOUT``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:203 91858677756c4b9cb9f4897681cf3bd2
+msgid "Operation timed out"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:205 52a6a94b64be4ee9a0ddbded7ddd3662
+msgid "``XXX_ERROR_NO_MEMORY``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:205 1e8ed6e7b8e641039675afd72e75aeff
+msgid "Memory allocation failed"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:209 39b8bbef9d5c4207b7f02dc141ca2db0
 msgid "Build System"
 msgstr "构建系统"
 
+#: ../../user_guide/architecture.rst:211 e31be4ae28d541a6bae20c7e3c5684e2
+msgid "Nexus uses CMake for cross-platform build configuration:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:213 20a632f8ba9e4d2b84c10ab8fdea255c
+msgid ""
+"# Select platform\n"
+"cmake -B build -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Enable features\n"
+"cmake -B build \\\n"
+"    -DNEXUS_PLATFORM=stm32f4 \\\n"
+"    -DNEXUS_BUILD_TESTS=ON \\\n"
+"    -DNEXUS_ENABLE_LOG=ON"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:224 7a966f7bb37044af8cae0596373a7bda
+msgid "Key CMake options:"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:227 eb2e973a194b46398b39b574d1d44ac1
+msgid "Option"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:229 156a0f4617b74f6caf17b3b70cbfaa10
+msgid "``NEXUS_PLATFORM``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:229 cfd41e88c0e34c85bc6ae65a2f4ebdf2
+msgid "Target platform (stm32f4, native)"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:231 6248c3f2856041e09ce02d9d537a20c5
+msgid "``NEXUS_BUILD_TESTS``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:231 aa9734fd513c4ef79c07ed7832e421ce
+msgid "Build unit tests"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:233 a5c237e17e1349cb899e017ca0c778c2
+msgid "``NEXUS_ENABLE_LOG``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:233 fc6d905a32c542588d3f1e25b50aaaf2
+msgid "Enable log framework"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:235 601da8167e324966a6e21e210360abc0
+msgid "``NEXUS_ENABLE_COVERAGE``"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:235 6c5c499c20bb493f966e14e1015b38e5
+msgid "Enable code coverage"
+msgstr ""
+
+#: ../../user_guide/architecture.rst:239 5d1674da376c482e839aba69ba58c171
 msgid "Next Steps"
 msgstr "下一步"
 
-msgid "Portability"
-msgstr "可移植性"
+#: ../../user_guide/architecture.rst:241 5f718ec4eee046988bd31b5cd89d8b44
+#, fuzzy
+msgid ":doc:`hal` - Learn about the Hardware Abstraction Layer"
+msgstr "硬件抽象层"
 
-msgid "Modularity"
-msgstr "模块化"
+#: ../../user_guide/architecture.rst:242 9721c0a610ae4df8b4c2a36bfa26aade
+msgid ":doc:`osal` - Learn about the OS Abstraction Layer"
+msgstr ""
 
-msgid "Testability"
-msgstr "可测试性"
+#: ../../user_guide/architecture.rst:243 6f8537554d41463bbfb2af2db9bc83e8
+msgid ":doc:`log` - Learn about the Log Framework"
+msgstr ""
 
-msgid "Safety"
-msgstr "安全性"
+#: ../../user_guide/architecture.rst:244 627c65141e114f8a86e9482b1728be54
+msgid ":doc:`porting` - Port Nexus to a new platform"
+msgstr ""
 
-msgid "Performance"
-msgstr "性能"
+#~ msgid "Overview"
+#~ msgstr "概述"
+
+#~ msgid "Portability"
+#~ msgstr "可移植性"
+
+#~ msgid "Modularity"
+#~ msgstr "模块化"
+
+#~ msgid "Testability"
+#~ msgstr "可测试性"
+
+#~ msgid "Safety"
+#~ msgstr "安全性"
+
+#~ msgid "Performance"
+#~ msgstr "性能"
+

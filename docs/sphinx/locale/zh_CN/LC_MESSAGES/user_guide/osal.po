@@ -5,190 +5,511 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
 "PO-Revision-Date: 2026-01-16 00:00+0000\n"
 "Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
 "Language-Team: Chinese\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../user_guide/osal.rst:2 3e5de8ba2dd347328ea94c4a78bad059
 msgid "OS Abstraction Layer (OSAL)"
 msgstr "操作系统抽象层 (OSAL)"
 
+#: ../../user_guide/osal.rst:5 9cbb6a3f5b7245e3b18948d81c7ceef1
 msgid "Overview"
 msgstr "概述"
 
+#: ../../user_guide/osal.rst:7 7340f1899fbe4afa92a0079a25d98c12
 msgid ""
-"OSAL provides a portable interface for RTOS primitives. Applications can switch "
-"between different RTOS backends (FreeRTOS, RT-Thread, Zephyr) or run bare-metal "
-"without code changes."
+"OSAL provides a portable interface for RTOS primitives. Applications can "
+"switch between different RTOS backends (FreeRTOS, RT-Thread, Zephyr) or "
+"run bare-metal without code changes."
 msgstr ""
-"OSAL 为 RTOS 原语提供可移植接口。应用程序可以在不同的 RTOS 后端"
-"（FreeRTOS、RT-Thread、Zephyr）之间切换，或在裸机上运行，无需修改代码。"
+"OSAL 为 RTOS 原语提供可移植接口。应用程序可以在不同的 RTOS 后端（FreeRTOS、RT-"
+"Thread、Zephyr）之间切换，或在裸机上运行，无需修改代码。"
 
+#: ../../user_guide/osal.rst:11 ecb42cced6b94d7eb7bddf860aa71b93
 msgid "Key features:"
 msgstr "主要特性："
 
+#: ../../user_guide/osal.rst:13 43252fce26fd49178452f616fa947451
 msgid "Unified API across multiple RTOS backends"
 msgstr "跨多个 RTOS 后端的统一 API"
 
+#: ../../user_guide/osal.rst:14 3f93baa472c24ca382d0e857fd6c818a
 msgid "Bare-metal support for resource-constrained systems"
 msgstr "支持资源受限系统的裸机运行"
 
+#: ../../user_guide/osal.rst:15 5521c1dc98a040b5b65a91c45d0b7202
 msgid "Task, mutex, semaphore, queue, and timer primitives"
 msgstr "任务、互斥锁、信号量、队列和定时器原语"
 
+#: ../../user_guide/osal.rst:16 a5ab05a7b12b4ae7baad55b16f200c54
 msgid "Critical section and interrupt management"
 msgstr "临界区和中断管理"
 
+#: ../../user_guide/osal.rst:17 d5b6019818da4be99fee2d85c5b8ba2a
 msgid "Memory allocation abstraction"
 msgstr "内存分配抽象"
 
+#: ../../user_guide/osal.rst:20 da4116e97e2e4af888d0eb247e6362a7
 msgid "Supported Backends"
 msgstr "支持的后端"
 
+#: ../../user_guide/osal.rst:23 1769f688990746cb8ef4c76cd645cb88
 msgid "Backend"
 msgstr "后端"
 
+#: ../../user_guide/osal.rst:23 1d5abdfa80d9478ca8f11cc332e3db21
 msgid "Status"
 msgstr "状态"
 
+#: ../../user_guide/osal.rst:23 e94bed2fc7044a989ac9235f488ea5b5
 msgid "Notes"
 msgstr "备注"
 
+#: ../../user_guide/osal.rst:25 878613820c524a91a4359c247eee0bfd
 msgid "Bare-metal"
 msgstr "裸机"
 
-msgid "Ready"
+#: ../../user_guide/osal.rst:25 ../../user_guide/osal.rst:27
+#: 40d48949beb9440b8671e380a3bf530c 8a5b5bc2309a4971b157be3f70a2bb1c
+#, fuzzy
+msgid "✅ Ready"
 msgstr "就绪"
 
+#: ../../user_guide/osal.rst:25 d144b07df2d1401aa19264cd16c53b20
 msgid "Cooperative"
 msgstr "协作式"
 
+#: ../../user_guide/osal.rst:27 7e592c95d2e54ad6b1197cb46c88d3a6
 msgid "FreeRTOS"
 msgstr "FreeRTOS"
 
+#: ../../user_guide/osal.rst:27 4252809d1d234f63a48ea95c902754fe
 msgid "Full support"
 msgstr "完整支持"
 
-msgid "Planned"
+#: ../../user_guide/osal.rst:29 256accb346194494a6036896a92a147f
+msgid "RT-Thread"
+msgstr ""
+
+#: ../../user_guide/osal.rst:29 ../../user_guide/osal.rst:31
+#: 00291cba1e84463eb4317ae17c7ee9c4 b0d5e00444654b0cbdefba405dfb918b
+#, fuzzy
+msgid "🚧 Planned"
 msgstr "计划中"
 
+#: ../../user_guide/osal.rst:31 7bacfea6fbf94633bbbb7d82d4c6ec6a
+msgid "Zephyr"
+msgstr ""
+
+#: ../../user_guide/osal.rst:35 38d19e4317344271a58e8e3f150cbefe
 msgid "Getting Started"
 msgstr "快速开始"
 
-msgid "Include the header:"
+#: ../../user_guide/osal.rst:37 523ec028a59746b6892cd4718287cb22
+#, fuzzy
+msgid "**Include the header:**"
 msgstr "包含头文件："
 
-msgid "Initialize OSAL:"
+#: ../../user_guide/osal.rst:39 224f594370834b7e95309333d875d856
+msgid "#include \"osal/osal.h\""
+msgstr ""
+
+#: ../../user_guide/osal.rst:43 e8d37e7660fb42d7840a3da01d2716a4
+#, fuzzy
+msgid "**Initialize OSAL:**"
 msgstr "初始化 OSAL："
 
+#: ../../user_guide/osal.rst:45 bf43fcc5ecb34486885242c12552299f
+msgid "osal_init();"
+msgstr ""
+
+#: ../../user_guide/osal.rst:50 291549b3fa8d44a2aabe6c3fd0e5c373
 msgid "Task Management"
 msgstr "任务管理"
 
-msgid "Create a task:"
+#: ../../user_guide/osal.rst:52 1237989737454a2084782767520bd8e8
+#, fuzzy
+msgid "**Create a task:**"
 msgstr "创建任务："
 
-msgid "Task control:"
+#: ../../user_guide/osal.rst:54 bf42f7860ab14a4c91b359fb58215d49
+msgid ""
+"void my_task(void* arg)\n"
+"{\n"
+"    while (1) {\n"
+"        /* Task code */\n"
+"        osal_task_delay(100);\n"
+"    }\n"
+"}\n"
+"\n"
+"osal_task_config_t cfg = {\n"
+"    .name       = \"my_task\",\n"
+"    .func       = my_task,\n"
+"    .arg        = NULL,\n"
+"    .stack_size = 1024,\n"
+"    .priority   = OSAL_PRIORITY_NORMAL,\n"
+"};\n"
+"\n"
+"osal_task_handle_t handle;\n"
+"osal_status_t status = osal_task_create(&cfg, &handle);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:75 499a190bda49499c8bc6d9c4f6078d1e
+#, fuzzy
+msgid "**Task control:**"
 msgstr "任务控制："
 
+#: ../../user_guide/osal.rst:77 ac4591415f434849b2a6345f1a9dea08
+msgid ""
+"/* Delay current task */\n"
+"osal_task_delay(100);  /* 100 ms */\n"
+"\n"
+"/* Suspend task */\n"
+"osal_task_suspend(handle);\n"
+"\n"
+"/* Resume task */\n"
+"osal_task_resume(handle);\n"
+"\n"
+"/* Delete task */\n"
+"osal_task_delete(handle);\n"
+"\n"
+"/* Get current task handle */\n"
+"osal_task_handle_t current = osal_task_get_current();"
+msgstr ""
+
+#: ../../user_guide/osal.rst:95 ccc5cfb707694e8ba65626441eda6cd8
 msgid "Mutex"
 msgstr "互斥锁"
 
-msgid "Create and use mutex:"
+#: ../../user_guide/osal.rst:97 d08b7a1cc76f4386a096c45372b8c09c
+#, fuzzy
+msgid "**Create and use mutex:**"
 msgstr "创建和使用互斥锁："
 
+#: ../../user_guide/osal.rst:99 51de02e7909644fb99df04ad08e662d5
+msgid ""
+"osal_mutex_handle_t mutex;\n"
+"osal_mutex_create(&mutex);\n"
+"\n"
+"/* Lock with timeout */\n"
+"if (osal_mutex_lock(mutex, 1000) == OSAL_OK) {\n"
+"    /* Critical section */\n"
+"    /* ... */\n"
+"\n"
+"    /* Unlock */\n"
+"    osal_mutex_unlock(mutex);\n"
+"}\n"
+"\n"
+"/* Lock forever */\n"
+"osal_mutex_lock(mutex, OSAL_WAIT_FOREVER);\n"
+"\n"
+"/* Try lock (non-blocking) */\n"
+"if (osal_mutex_lock(mutex, 0) == OSAL_OK) {\n"
+"    /* Got the lock */\n"
+"}\n"
+"\n"
+"/* Delete when done */\n"
+"osal_mutex_delete(mutex);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:125 fdc943f0afba4d2395e9af621bf8ec1c
 msgid "Semaphore"
 msgstr "信号量"
 
-msgid "Binary semaphore:"
+#: ../../user_guide/osal.rst:127 03dda90ef15c4c8bbaad9d49a8294ff4
+#, fuzzy
+msgid "**Binary semaphore:**"
 msgstr "二值信号量："
 
-msgid "Counting semaphore:"
+#: ../../user_guide/osal.rst:129 9335cb2f9bdc462ba3b1995b0f063845
+msgid ""
+"osal_sem_handle_t sem;\n"
+"osal_sem_create_binary(0, &sem);  /* Initial count = 0 */\n"
+"\n"
+"/* Wait (take) */\n"
+"osal_sem_take(sem, OSAL_WAIT_FOREVER);\n"
+"\n"
+"/* Signal (give) */\n"
+"osal_sem_give(sem);\n"
+"\n"
+"/* Delete */\n"
+"osal_sem_delete(sem);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:143 0420b3f97afa4e4e8a34b4667d940947
+#, fuzzy
+msgid "**Counting semaphore:**"
 msgstr "计数信号量："
 
+#: ../../user_guide/osal.rst:145 ae231a0549f14a7fb5c01f566d79702e
+msgid ""
+"osal_sem_handle_t sem;\n"
+"osal_sem_create_counting(10, 0, &sem);  /* max=10, initial=0 */\n"
+"\n"
+"/* Take multiple */\n"
+"osal_sem_take(sem, 1000);\n"
+"\n"
+"/* Give multiple */\n"
+"osal_sem_give(sem);\n"
+"\n"
+"/* Get current count */\n"
+"uint32_t count = osal_sem_get_count(sem);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:160 d9a27231b5bc4f50bd77cc1ee85aef83
 msgid "Message Queue"
 msgstr "消息队列"
 
-msgid "Create and use queue:"
+#: ../../user_guide/osal.rst:162 251df6e83de64e4db956a7289a3c7b85
+#, fuzzy
+msgid "**Create and use queue:**"
 msgstr "创建和使用队列："
 
+#: ../../user_guide/osal.rst:164 fd7eb7a15d1840f2981762c096e01be1
+msgid ""
+"typedef struct {\n"
+"    uint32_t id;\n"
+"    uint32_t data;\n"
+"} message_t;\n"
+"\n"
+"osal_queue_handle_t queue;\n"
+"osal_queue_create(sizeof(message_t), 10, &queue);\n"
+"\n"
+"/* Send message */\n"
+"message_t msg = { .id = 1, .data = 42 };\n"
+"osal_queue_send(queue, &msg, OSAL_WAIT_FOREVER);\n"
+"\n"
+"/* Send to front (high priority) */\n"
+"osal_queue_send_front(queue, &msg, 1000);\n"
+"\n"
+"/* Receive message */\n"
+"message_t received;\n"
+"osal_queue_receive(queue, &received, OSAL_WAIT_FOREVER);\n"
+"\n"
+"/* Check available messages */\n"
+"uint32_t count = osal_queue_get_count(queue);\n"
+"\n"
+"/* Delete */\n"
+"osal_queue_delete(queue);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:192 3f0bb1711422489e9b44588ca4f2e74b
 msgid "Software Timer"
 msgstr "软件定时器"
 
-msgid "Create and use timer:"
+#: ../../user_guide/osal.rst:194 dd112852882e40ce9782a02e7271bf25
+#, fuzzy
+msgid "**Create and use timer:**"
 msgstr "创建和使用定时器："
 
+#: ../../user_guide/osal.rst:196 7fd0538e92ff47e6baf6e17c121c0f2b
+msgid ""
+"void timer_callback(void* arg)\n"
+"{\n"
+"    /* Timer expired */\n"
+"}\n"
+"\n"
+"osal_timer_handle_t timer;\n"
+"osal_timer_create(\"my_timer\", timer_callback, NULL,\n"
+"                  1000,  /* Period: 1000 ms */\n"
+"                  true,  /* Auto-reload */\n"
+"                  &timer);\n"
+"\n"
+"/* Start timer */\n"
+"osal_timer_start(timer);\n"
+"\n"
+"/* Stop timer */\n"
+"osal_timer_stop(timer);\n"
+"\n"
+"/* Change period */\n"
+"osal_timer_set_period(timer, 500);\n"
+"\n"
+"/* Delete */\n"
+"osal_timer_delete(timer);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:222 330c23cd0b0a4c5c8f697e88c073f39d
 msgid "Critical Sections"
 msgstr "临界区"
 
-msgid "Disable/enable interrupts:"
+#: ../../user_guide/osal.rst:224 b5d66d65c0834fc695ae46c8bb153aea
+#, fuzzy
+msgid "**Disable/enable interrupts:**"
 msgstr "禁用/启用中断："
 
-msgid "Nested critical sections:"
+#: ../../user_guide/osal.rst:226 6792c9883e6d451b8c48aeadb1d1708a
+msgid ""
+"osal_enter_critical();\n"
+"/* Interrupts disabled - keep this section short! */\n"
+"/* ... */\n"
+"osal_exit_critical();"
+msgstr ""
+
+#: ../../user_guide/osal.rst:233 a47eec173af241c9bdaffd151ac8cb9e
+#, fuzzy
+msgid "**Nested critical sections:**"
 msgstr "嵌套临界区："
 
+#: ../../user_guide/osal.rst:235 efd5f28aeed74d8fac4cd62955cda92a
+msgid ""
+"uint32_t state = osal_interrupt_disable();\n"
+"/* Interrupts disabled */\n"
+"/* ... */\n"
+"osal_interrupt_restore(state);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:243 2053ffd7d5974625b830dd92afed8cc4
 msgid "Memory Management"
 msgstr "内存管理"
 
-msgid "Dynamic allocation:"
+#: ../../user_guide/osal.rst:245 0f6f52042c88430c96db8fdee0bab031
+#, fuzzy
+msgid "**Dynamic allocation:**"
 msgstr "动态分配："
 
+#: ../../user_guide/osal.rst:247 5697a6cd84bd46d4bad4dec3346fb245
+msgid ""
+"void* ptr = osal_malloc(1024);\n"
+"if (ptr) {\n"
+"    /* Use memory */\n"
+"    osal_free(ptr);\n"
+"}\n"
+"\n"
+"/* Aligned allocation */\n"
+"void* aligned = osal_malloc_aligned(1024, 32);\n"
+"osal_free_aligned(aligned);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:260 74c49fb9f57b42ec9a5bda65bfe3a597
 msgid "Time Functions"
 msgstr "时间函数"
 
-msgid "Get system time:"
+#: ../../user_guide/osal.rst:262 bd29919ecb5446a6933fff8d2430d99b
+#, fuzzy
+msgid "**Get system time:**"
 msgstr "获取系统时间："
 
+#: ../../user_guide/osal.rst:264 06770ee8f52a4ea18c493ebfb904cdc0
+msgid ""
+"/* Get tick count */\n"
+"uint32_t ticks = osal_get_tick_count();\n"
+"\n"
+"/* Get milliseconds */\n"
+"uint32_t ms = osal_get_time_ms();\n"
+"\n"
+"/* Delay */\n"
+"osal_delay_ms(100);"
+msgstr ""
+
+#: ../../user_guide/osal.rst:276 c96d5b6ecee441dd8f150f567c69f559
 msgid "Error Handling"
 msgstr "错误处理"
 
+#: ../../user_guide/osal.rst:278 0ad5cd3e044f42fdb4584ecf8a154fd6
 msgid "All OSAL functions return ``osal_status_t``:"
 msgstr "所有 OSAL 函数返回 ``osal_status_t``："
 
+#: ../../user_guide/osal.rst:280 37725b3e827348eaac6ded1ec2c39870
+msgid ""
+"osal_status_t status = osal_mutex_create(&mutex);\n"
+"if (status != OSAL_OK) {\n"
+"    /* Handle error */\n"
+"}"
+msgstr ""
+
+#: ../../user_guide/osal.rst:287 8ba4ee720f8e4bb88d1798ee6acb8397
 msgid "Common status codes:"
 msgstr "常见状态码："
 
-msgid "Success"
-msgstr "成功"
+#: ../../user_guide/osal.rst:289 adc75985db364dcc8a8d0198d5afc14c
+msgid "``OSAL_OK`` - Success"
+msgstr ""
 
-msgid "Invalid parameter"
+#: ../../user_guide/osal.rst:290 b9876664c2da4fe8ba9ace40c85e176d
+#, fuzzy
+msgid "``OSAL_ERR_PARAM`` - Invalid parameter"
 msgstr "无效参数"
 
-msgid "Operation timeout"
-msgstr "操作超时"
+#: ../../user_guide/osal.rst:291 aa9014edc8174919be9b04b2d53caa7d
+msgid "``OSAL_ERR_TIMEOUT`` - Operation timeout"
+msgstr ""
 
-msgid "Out of memory"
-msgstr "内存不足"
+#: ../../user_guide/osal.rst:292 d52d09a8518e4749874627f82bea6e27
+msgid "``OSAL_ERR_NO_MEM`` - Out of memory"
+msgstr ""
 
-msgid "Called from ISR context"
+#: ../../user_guide/osal.rst:293 101dd883c062408787460056231677fa
+#, fuzzy
+msgid "``OSAL_ERR_ISR`` - Called from ISR context"
 msgstr "从 ISR 上下文调用"
 
+#: ../../user_guide/osal.rst:296 4b67828e1daf42fba6d251dac2fb180d
 msgid "Bare-metal Considerations"
 msgstr "裸机注意事项"
 
+#: ../../user_guide/osal.rst:298 31a8d3da389c4e099f02ae1c7a19a1f5
 msgid "When using the bare-metal backend:"
 msgstr "使用裸机后端时："
 
+#: ../../user_guide/osal.rst:300 67a668c7a1c84762ae6f37fbe7d89d6a
 msgid "Tasks run cooperatively (no preemption)"
 msgstr "任务协作运行（无抢占）"
 
+#: ../../user_guide/osal.rst:301 a21c7625026e41d481b904ad4845cdf5
 msgid "``osal_task_delay()`` uses busy-wait"
 msgstr "``osal_task_delay()`` 使用忙等待"
 
+#: ../../user_guide/osal.rst:302 f76c413e10254b678daccdf6d9abfa4f
 msgid "Mutexes use simple flags (no priority inheritance)"
 msgstr "互斥锁使用简单标志（无优先级继承）"
 
+#: ../../user_guide/osal.rst:303 5c9083c521334a6291dbe212810517cf
 msgid "Queues use ring buffers"
 msgstr "队列使用环形缓冲区"
 
+#: ../../user_guide/osal.rst:304 a0f8293127844884892e49de4c26ffdd
 msgid "Call ``osal_scheduler_run()`` in main loop"
 msgstr "在主循环中调用 ``osal_scheduler_run()``"
 
+#: ../../user_guide/osal.rst:306 17ae56c39fea419b819cb09a32da8b09
+msgid ""
+"int main(void)\n"
+"{\n"
+"    osal_init();\n"
+"\n"
+"    /* Create tasks */\n"
+"    osal_task_create(&task1_cfg, &task1);\n"
+"    osal_task_create(&task2_cfg, &task2);\n"
+"\n"
+"    /* Run scheduler (bare-metal) */\n"
+"    osal_scheduler_run();\n"
+"\n"
+"    return 0;\n"
+"}"
+msgstr ""
+
+#: ../../user_guide/osal.rst:323 e5ce75b0b5264963b96676468a7e0cf3
 msgid "API Reference"
 msgstr "API 参考"
 
+#: ../../user_guide/osal.rst:325 73c8c5775e5c4a068092b65186e3cbc5
 msgid "See :doc:`../api/osal` for complete API documentation."
 msgstr "完整 API 文档请参阅 :doc:`../api/osal`。"
+
+#~ msgid "Success"
+#~ msgstr "成功"
+
+#~ msgid "Operation timeout"
+#~ msgstr "操作超时"
+
+#~ msgid "Out of memory"
+#~ msgstr "内存不足"
+

@@ -5,178 +5,411 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
 "PO-Revision-Date: 2026-01-16 00:00+0000\n"
 "Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
 "Language-Team: Chinese\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../development/coding_standards.rst:2 75f664604ca2429383a69086189f6306
 msgid "Coding Standards"
 msgstr "编码规范"
 
+#: ../../development/coding_standards.rst:4 b6abeedfa3b340da922ebc075acb50d7
 msgid "Nexus follows strict coding standards for quality and safety."
 msgstr "Nexus 遵循严格的编码规范以确保质量和安全。"
 
+#: ../../development/coding_standards.rst:7 f9a7bced62a34290ac478e355e21a7c9
 msgid "C Standard"
 msgstr "C 标准"
 
+#: ../../development/coding_standards.rst:9 019d370b854e4067b8afda985d6045f0
 msgid "C11 for source code"
 msgstr "源代码使用 C11"
 
+#: ../../development/coding_standards.rst:10 19f1b33bd828492e957af6880ff971b8
 msgid "C++17 for tests"
 msgstr "测试使用 C++17"
 
+#: ../../development/coding_standards.rst:13 7808eaeb71794d8e9fbcfe5a060883f5
 msgid "Code Formatting"
 msgstr "代码格式化"
 
+#: ../../development/coding_standards.rst:15 db152b76f45e4baea3bec12795fdbc62
 msgid ""
-"The project uses clang-format for automatic code formatting. Run ``clang-format`` "
-"before committing code."
-msgstr ""
-"项目使用 clang-format 进行自动代码格式化。提交代码前请运行 ``clang-format``。"
+"The project uses clang-format for automatic code formatting. Run ``clang-"
+"format`` before committing code."
+msgstr "项目使用 clang-format 进行自动代码格式化。提交代码前请运行 ``clang-format``。"
 
+#: ../../development/coding_standards.rst:18 2655337d626b441c90426e0bdda9035e
+msgid ""
+"See also: ``.kiro/steering/comment-standards.md`` for detailed comment "
+"guidelines."
+msgstr ""
+
+#: ../../development/coding_standards.rst:21 045684ba07e2423b8cb7dcbb4382067f
 msgid "Indentation"
 msgstr "缩进"
 
+#: ../../development/coding_standards.rst:23 fe6896fc95b34e72970cffceeb92e91a
 msgid "Use 4 spaces for indentation (no tabs)"
 msgstr "使用 4 个空格缩进（不使用制表符）"
 
+#: ../../development/coding_standards.rst:24 a53a7472deba474bad01f5d25b912e02
 msgid "Indent case labels inside switch statements"
 msgstr "switch 语句中的 case 标签需要缩进"
 
+#: ../../development/coding_standards.rst:25 39463edb1e7a471da025393baa7761ad
 msgid "Do not indent preprocessor directives"
 msgstr "预处理指令不缩进"
 
+#: ../../development/coding_standards.rst:28 5ff3d00158c043d988a2b4e287772382
 msgid "Line Length"
 msgstr "行长度"
 
+#: ../../development/coding_standards.rst:30 6edb5888858a41368cfc1df395aa75d2
 msgid "Maximum line length: 80 characters"
 msgstr "最大行长度：80 个字符"
 
+#: ../../development/coding_standards.rst:31 d8100c1c2eb747479d63e667b903892c
 msgid "Break long lines at appropriate points"
 msgstr "在适当位置断开长行"
 
+#: ../../development/coding_standards.rst:34 d34b1ab1fbc146ae95f9df0938b5b024
 msgid "Braces"
 msgstr "大括号"
 
-msgid "Use attached braces (K&R style)"
+#: ../../development/coding_standards.rst:36 aaae7a0d15844b76aa6074f7b178b640
+#, fuzzy
+msgid "Use attached braces (K&R style)::"
 msgstr "使用附着式大括号（K&R 风格）"
 
+#: ../../development/coding_standards.rst:38 757396a6d45848d781948bd4512a3d8f
+msgid ""
+"if (condition) {\n"
+"    /* code */\n"
+"} else {\n"
+"    /* code */\n"
+"}\n"
+"\n"
+"void function(void) {\n"
+"    /* code */\n"
+"}"
+msgstr ""
+
+#: ../../development/coding_standards.rst:49 fccea3a00a75448e85cd522053e0b50c
 msgid "Spaces"
 msgstr "空格"
 
+#: ../../development/coding_standards.rst:51 89961ea5b73a4a22a6e2e6d97a2ed7cd
 msgid "Space after control keywords: ``if (``, ``for (``, ``while (``"
 msgstr "控制关键字后加空格：``if (``、``for (``、``while (``"
 
+#: ../../development/coding_standards.rst:52 0c0816e289674e978778fe60ba122334
 msgid "No space after function names: ``func()``"
 msgstr "函数名后不加空格：``func()``"
 
+#: ../../development/coding_standards.rst:53 92295565b60145d381262a71db6b0379
 msgid "No space after casts: ``(int)value``"
 msgstr "类型转换后不加空格：``(int)value``"
 
+#: ../../development/coding_standards.rst:54 0c182c34eafc447db68d4ab1412d3640
 msgid "Two spaces before trailing comments"
 msgstr "行尾注释前加两个空格"
 
+#: ../../development/coding_standards.rst:55 81ddcb77f9704be489fc638efc137700
 msgid "Space around binary operators: ``a + b``, ``x = y``"
 msgstr "二元运算符两侧加空格：``a + b``、``x = y``"
 
+#: ../../development/coding_standards.rst:58 3ded06a3c869402e9120e130c82c980d
 msgid "Pointer Alignment"
 msgstr "指针对齐"
 
-msgid "Pointers align to the left (with the type)"
+#: ../../development/coding_standards.rst:60 eea39b46314749729b461eb235c4e185
+#, fuzzy
+msgid "Pointers align to the left (with the type)::"
 msgstr "指针靠左对齐（与类型一起）"
 
+#: ../../development/coding_standards.rst:62 b19264a65a224cd5b7fb8e74bb944841
+msgid ""
+"int* ptr;           /* Correct */\n"
+"char* str;          /* Correct */"
+msgstr ""
+
+#: ../../development/coding_standards.rst:66 2b9b8aba36d3432f9d6799182b32f987
 msgid "Empty Lines"
 msgstr "空行"
 
+#: ../../development/coding_standards.rst:68 44b6d34efb804776912883243c405f0e
 msgid "Maximum one consecutive empty line"
 msgstr "最多一个连续空行"
 
+#: ../../development/coding_standards.rst:69 904115740145454d89c4c78eafabab57
 msgid "Use empty lines to separate logical sections"
 msgstr "使用空行分隔逻辑段落"
 
+#: ../../development/coding_standards.rst:72 94b4846936f946269d2ec357202ca2de
 msgid "Naming Conventions"
 msgstr "命名约定"
 
+#: ../../development/coding_standards.rst:74 a2b9824bd2194c6ea77486432ba69b68
 msgid "Functions: ``module_action_object()`` (e.g., ``hal_gpio_init()``)"
 msgstr "函数：``module_action_object()``（例如 ``hal_gpio_init()``）"
 
+#: ../../development/coding_standards.rst:75 e265f889b18140d9bafb262f0978c0a4
 msgid "Types: ``module_type_t`` (e.g., ``hal_status_t``)"
 msgstr "类型：``module_type_t``（例如 ``hal_status_t``）"
 
+#: ../../development/coding_standards.rst:76 6f2da062213e418290b8f1ce85d17e71
 msgid "Macros: ``MODULE_MACRO_NAME`` (e.g., ``HAL_OK``)"
 msgstr "宏：``MODULE_MACRO_NAME``（例如 ``HAL_OK``）"
 
+#: ../../development/coding_standards.rst:77 3fd8478f50a54eb69c3833fc78e9192b
 msgid "Constants: ``MODULE_CONSTANT`` (e.g., ``HAL_GPIO_PORT_MAX``)"
 msgstr "常量：``MODULE_CONSTANT``（例如 ``HAL_GPIO_PORT_MAX``）"
 
+#: ../../development/coding_standards.rst:78 da80b6fff37847d39344995a39d39ad3
 msgid "Static variables: ``s_variable_name`` prefix"
 msgstr "静态变量：``s_variable_name`` 前缀"
 
+#: ../../development/coding_standards.rst:79 f0eadbe3af9d4896a413046ebf887ffd
 msgid "Global variables: ``g_variable_name`` prefix (avoid when possible)"
 msgstr "全局变量：``g_variable_name`` 前缀（尽量避免使用）"
 
+#: ../../development/coding_standards.rst:82 a9ac9573cb8947a884cfb67517c0e650
 msgid "Documentation"
 msgstr "文档"
 
+#: ../../development/coding_standards.rst:84 1483e242811e4d2fa6aecfeea17d1f86
 msgid ""
-"All public APIs must have Doxygen comments. This project uses ``\\`` style "
-"Doxygen tags (not ``@`` style)."
-msgstr ""
-"所有公共 API 必须有 Doxygen 注释。本项目使用 ``\\`` 风格的 "
-"Doxygen 标签（不使用 ``@`` 风格）。"
+"All public APIs must have Doxygen comments. This project uses ``\\`` "
+"style Doxygen tags (not ``@`` style)."
+msgstr "所有公共 API 必须有 Doxygen 注释。本项目使用 ``\\`` 风格的 Doxygen 标签（不使用 ``@`` 风格）。"
 
+#: ../../development/coding_standards.rst:88 6e87f545c5234aadaceff7cb3aff61ae
 msgid "Tag Alignment"
 msgstr "标签对齐"
 
+#: ../../development/coding_standards.rst:90 27b2482011644e2592ec392b4e425df3
+#, fuzzy
 msgid ""
 "All Doxygen tags must be aligned to column 20 (17 spaces after ``*``). "
-"This ensures consistent formatting across the codebase"
-msgstr ""
-"所有 Doxygen 标签必须对齐到第 20 列（``*`` 后 17 个空格）。"
-"这确保了整个代码库的格式一致性"
+"This ensures consistent formatting across the codebase::"
+msgstr "所有 Doxygen 标签必须对齐到第 20 列（``*`` 后 17 个空格）。这确保了整个代码库的格式一致性"
 
+#: ../../development/coding_standards.rst:93 5fe68f1b37244d7a871ee9a6e5b3f5ca
+msgid ""
+"/**\n"
+" * \\brief           Brief description starts at column 20\n"
+" * \\param[in]       param: Parameter description\n"
+" * \\param[out]      result: Output parameter description\n"
+" * \\return          Return value description\n"
+" */"
+msgstr ""
+
+#: ../../development/coding_standards.rst:101 281b38471b5e4e3392c4db42577d8bff
 msgid "File Header Format"
 msgstr "文件头格式"
 
-msgid "Every source file must have a file header comment"
+#: ../../development/coding_standards.rst:103 ecd088c8c30b484aa85cd2302c032a86
+#, fuzzy
+msgid "Every source file must have a file header comment."
 msgstr "每个源文件必须有文件头注释"
 
+#: ../../development/coding_standards.rst:105 ed224c0d27dc40aea4d1990e8ff4d924
+msgid "**Header files (.h)** - Minimal format::"
+msgstr ""
+
+#: ../../development/coding_standards.rst:107 93b4ed5593994dbcb61c9e1a510e5fe3
+msgid ""
+"/**\n"
+" * \\file            filename.h\n"
+" * \\brief           Brief description of the file\n"
+" * \\author          Nexus Team\n"
+" */"
+msgstr ""
+
+#: ../../development/coding_standards.rst:113 78021aeb6cef4d819cdc78ebeb668915
+msgid "**Source files (.c)** - Full format with version and copyright::"
+msgstr ""
+
+#: ../../development/coding_standards.rst:115 2bb5d6abd60d473891f848a4dfbda89f
+msgid ""
+"/**\n"
+" * \\file            filename.c\n"
+" * \\brief           Brief description of the file\n"
+" * \\author          Nexus Team\n"
+" * \\version         1.0.0\n"
+" * \\date            2026-01-12\n"
+" *\n"
+" * \\copyright       Copyright (c) 2026 Nexus Team\n"
+" *\n"
+" * \\details         Detailed description of the file contents\n"
+" *                  and purpose. Can span multiple lines.\n"
+" */"
+msgstr ""
+
+#: ../../development/coding_standards.rst:129 4c5c269db01141cda23d9eeb40b917b4
 msgid "Header Files (.h)"
 msgstr "头文件 (.h)"
 
+#: ../../development/coding_standards.rst:131 71a06e791377443c9ebefd2b6484de68
+#, fuzzy
 msgid ""
-"Header files contain full API documentation including parameters and return values"
-msgstr ""
-"头文件包含完整的 API 文档，包括参数和返回值"
+"Header files contain full API documentation including parameters and "
+"return values::"
+msgstr "头文件包含完整的 API 文档，包括参数和返回值"
 
+#: ../../development/coding_standards.rst:133 9650821ca3bc41718e73c159dcaa5a34
+msgid ""
+"/**\n"
+" * \\brief           Create a mutex\n"
+" * \\param[out]      handle: Pointer to store mutex handle\n"
+" * \\return          OSAL_OK on success, error code otherwise\n"
+" */\n"
+"osal_status_t osal_mutex_create(osal_mutex_handle_t* handle);"
+msgstr ""
+
+#: ../../development/coding_standards.rst:141 8aee063e4dad4c3ab248767c21c8a9f8
 msgid "Source Files (.c)"
 msgstr "源文件 (.c)"
 
+#: ../../development/coding_standards.rst:143 6350c8939353494eb8fc492d85803d16
+#, fuzzy
 msgid ""
-"Source files should NOT duplicate ``\\param`` and ``\\return`` documentation "
-"from headers. Use only ``\\brief``, ``\\details``, and ``\\note``"
+"Source files should NOT duplicate ``\\param`` and ``\\return`` "
+"documentation from headers. Use only ``\\brief``, ``\\details``, and "
+"``\\note``::"
 msgstr ""
-"源文件不应重复头文件中的 ``\\param`` 和 ``\\return`` 文档。"
-"只使用 ``\\brief``、``\\details`` 和 ``\\note``"
+"源文件不应重复头文件中的 ``\\param`` 和 ``\\return`` 文档。只使用 ``\\brief``、``\\details`` "
+"和 ``\\note``"
 
+#: ../../development/coding_standards.rst:146 e4a80285e57640b78c215f56d01212e3
+msgid ""
+"/**\n"
+" * \\brief           Create a mutex\n"
+" * \\details         Allocates and initializes a new mutex object.\n"
+" *                  The mutex is created in unlocked state.\n"
+" * \\note            Thread-safe function.\n"
+" */\n"
+"osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {\n"
+"    /* Implementation */\n"
+"}"
+msgstr ""
+
+#: ../../development/coding_standards.rst:157 aa4f5013ccce42a7a94b4c0c7c9108bc
 msgid "Section Comments"
 msgstr "段落注释"
 
-msgid "Use section comments to organize code into logical blocks"
-msgstr "使用段落注释将代码组织成逻辑块"
+#: ../../development/coding_standards.rst:159 f54469ac74d74644a9a658fe6eee5311
+msgid ""
+"Use section comments to organize code into logical blocks. The separator "
+"line must be exactly 77 characters (``/*`` + 75 characters + ``*/``)::"
+msgstr ""
 
+#: ../../development/coding_standards.rst:162 731332eccf3946c58a1d0a4f3eadc3d7
+msgid ""
+"/*---------------------------------------------------------------------------*/"
+"\n"
+"/* Section Name"
+"                                                              */\n"
+"/*---------------------------------------------------------------------------*/"
+msgstr ""
+
+#: ../../development/coding_standards.rst:166 b435f948f3fc4a8f8921dd0c0523f3a5
+msgid ""
+"**Important**: Do NOT use ``/*===...===*/`` style separators. Always use "
+"``/*---...---*/`` for consistency."
+msgstr ""
+
+#: ../../development/coding_standards.rst:170 c4c614f27b4349a487d31ecadae5427d
 msgid "Inline Comments"
 msgstr "行内注释"
 
-msgid "Use ``/* comment */`` style for inline comments, not ``//``"
+#: ../../development/coding_standards.rst:172 d3534162c74c4476be06043c35f349cd
+#, fuzzy
+msgid "Use ``/* comment */`` style for inline comments, not ``//``::"
 msgstr "行内注释使用 ``/* comment */`` 风格，不使用 ``//``"
 
+#: ../../development/coding_standards.rst:174 6fc318c16c0f46adb2e335283e763964
+msgid "int value = 0;  /* Initialize to zero */"
+msgstr ""
+
+#: ../../development/coding_standards.rst:177 1b134ee513a245e09b578c0da1b8cbaa
+#, fuzzy
+msgid "Macro Comments"
+msgstr "段落注释"
+
+#: ../../development/coding_standards.rst:179 437958af8a7c4ae19faf1eb551dcab20
+msgid "Use Doxygen block comments or inline comments for macros::"
+msgstr ""
+
+#: ../../development/coding_standards.rst:181 0437e167815448ef856ad77acefc9452
+msgid ""
+"/**\n"
+" * \\brief           Maximum buffer size\n"
+" */\n"
+"#define MAX_BUFFER_SIZE 256\n"
+"\n"
+"/* Or use inline style */\n"
+"#define MAX_BUFFER_SIZE 256  /**< Maximum buffer size */"
+msgstr ""
+
+#: ../../development/coding_standards.rst:190 398edc2620974be7849ea06483c2a3e5
+msgid "Static Functions"
+msgstr ""
+
+#: ../../development/coding_standards.rst:192 0f285c7cdfef499e99098f5b417b20ab
+msgid "Static functions use simplified comments with only ``\\brief``::"
+msgstr ""
+
+#: ../../development/coding_standards.rst:194 da7a0e34e63244b190266e4dcf0ccf58
+msgid ""
+"/**\n"
+" * \\brief           Internal helper function description\n"
+" */\n"
+"static void internal_helper(void) {\n"
+"    /* Implementation */\n"
+"}"
+msgstr ""
+
+#: ../../development/coding_standards.rst:202 21108894ed9a4e19a6188165a05f1568
+msgid "Prohibited Practices"
+msgstr ""
+
+#: ../../development/coding_standards.rst:204 13d8ee70757f4f98a0536994b2a0d69f
+msgid "The following practices are NOT allowed:"
+msgstr ""
+
+#: ../../development/coding_standards.rst:206 a3397064f70744eab1f83990ae7d4206
+msgid "Using ``@`` style Doxygen tags (use ``\\`` instead)"
+msgstr ""
+
+#: ../../development/coding_standards.rst:207 0e03541ad17d48aab83d2fb7b5f777f7
+msgid "Using ``//`` single-line comments (use ``/* */`` instead)"
+msgstr ""
+
+#: ../../development/coding_standards.rst:208 578a267d6aad4b149315600a263eb965
+msgid "Using ``/*===...===*/`` section separators (use ``/*---...---*/`` instead)"
+msgstr ""
+
+#: ../../development/coding_standards.rst:209 18ce2a3beae24553b4f1234fd43daa27
+msgid "Duplicating ``\\param`` and ``\\return`` in source files (only in headers)"
+msgstr ""
+
+#: ../../development/coding_standards.rst:212 d9ae50177fcf4ad39b59a9a5e6307b02
 msgid "MISRA C"
 msgstr "MISRA C"
 
+#: ../../development/coding_standards.rst:214 be2a85dc5fa8415aab693c3314a0aef7
 msgid "Code should comply with MISRA C:2012 guidelines."
 msgstr "代码应符合 MISRA C:2012 准则。"
+
+#~ msgid "Use section comments to organize code into logical blocks"
+#~ msgstr "使用段落注释将代码组织成逻辑块"
+

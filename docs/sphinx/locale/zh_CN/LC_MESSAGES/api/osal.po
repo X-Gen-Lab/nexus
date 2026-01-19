@@ -2,27 +2,88 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../api/osal.rst:2 136d348a555f48579c4ad9076ed12ad6
 msgid "OSAL API Reference"
 msgstr "OSAL API 参考"
 
+#: ../../api/osal.rst:4 fe68910a674e4261a9cd41ddc27f2237
 msgid "This section documents the OS Abstraction Layer (OSAL) API."
 msgstr "本节记录操作系统抽象层 (OSAL) API。"
 
+#: ../../api/osal.rst:7 d955cfb9cf9b4d5f9d7f2df0a706e9aa
 msgid "OSAL Definitions"
 msgstr "OSAL 定义"
 
+#: ../../api/osal.rst:14 fe60aa8868c845d5ad4af92d13c7f535
 msgid "Task API"
 msgstr "任务 API"
 
+#: ../../api/osal.rst 9208a68b61864c73859097552ac7373a
+msgid "Param arg"
+msgstr ""
+
+#: ../../api/osal.rst 08dc2f2428874442b26706be52f4c693
+#: 0be0f0524acf4fa69fee32d717a68c53 0d2697e646a2465eb5c1115959868b09
+#: 14f89bd79ee842b5b0490cf0a0a2f9c4 1ab8f3a6fe7941c3a81941e34443046c
+#: 20cd48942d4349a38fdbf0cc26003efa 2a926d5853394036bb4c98f4ab455d32
+#: 360808c1ae694585bcc28fca159052ed 4138c186f2cd418abd14be31b93bf991
+#: 47224a38983f4a7fa579a64db76942cf 5a92f246b3b147659e391b29e3e23fad
+#: 60c860265cf547338e44516d1b6dcf64 64555dab1bea40418c3bcac1d7b6400e
+#: 767e1bd9822e42d19e0746f51876589b 8792827071f146e9b2a7fe5afe1fb329
+#: 9f6aabeb4bc14cf4a878d4969327b224 c088a76f895f42ef8a337206620e6661
+#: c2d42c976ef148dbb4aac94d8802b258 c2ed57697e0340b29e4343144ebeb8e1
+#: c78e344b728646ecbfb55b75a526d551 c8d5ff341cba4c438b7ead8c570083ac
+#: cc6d6a8f5466456da3f2dfd6c6da89ef cc96d6735b1f46f9bbc4314f11db18fd
+#: cfb74150d1ad467dbb1ac8506be6710a d3ef8c2ff5e04b2d9f3e9dd31319bf1a
+#: e99652f18d984711a3092b355dd6a58d ee54ab32926d4605b6790701071c9cd5
+#: f4e2aacb82204ab69b6a221d27760a64
+msgid "Parameters"
+msgstr ""
+
+#: ../../api/osal.rst 03e6a78b3e764fe29d842a4e5b491268
+#: 05f9c3b1d49e4a6a8185ba3dcdb6632a 06f77f2b6008492bbd27fca2476747c3
+#: 07097bf43f424278b58a496f65d694a7 08da4e6e2da34f5d8384dd1f9b416d80
+#: 171888c7161c44f5b0fd26bac78dfadd 26395263ef9f489394a7f19232adc833
+#: 29eafd53239a4a4e82a620f2553ba7bb 2d9664bc6f784b6e80eb43660f6eb881
+#: 45411c9610c44630b9d33d68d478599f 570b4eaf316f49b6a94a22bedda271b2
+#: 67f858b84a7340f8ade80534bc1a04df 68c0e4b76e5d4d44b2d43782761d9763
+#: 75021dd8bf9d4b22aef1ae92af70c43a 80a9484a9c17488a84f84e0f3613fd26
+#: 874df1caaba84d07a60307a592d757f7 8b20ec413daa4c929c8d4db019e0d700
+#: 97a33411bacf4a70b689cebd49bac040 ab604cae326549c796ec5a65326d3cbe
+#: ac1ec51d5c4940c5b0781d70b8bc2ea1 b959b6c5e68f405f931877b521c83b96
+#: c1c80ee3a42d4cb29a5aab2ac94f4ef2 c7eb7012ba064e5fa85a8cb8dcef26dc
+#: cdb41badf23f44abae5c77078d8bd6d4 d44c2746d3d2401d8ca6c15f4f497e3d
+#: da80a09b03874b57be508330281b05a4 e7724b9195c64081a9630aa26beeea26
+#: ec2e580b07ee4e5cb19405238498b45f ec964163f7c84202bc08fe027ca1ad2c
+#: fb18b40b2d094205b0d5f3d2ca1d3ea4
+msgid "Returns"
+msgstr ""
+
+#: ../../api/osal.rst d719a2a35be84c80a055390806f98112
+msgid "Public Members"
+msgstr ""
+
+#: ../../api/osal.rst:21 b096da6a331a423d9c1fb52488246952
 msgid "Mutex API"
 msgstr "互斥锁 API"
 
+#: ../../api/osal.rst:28 f5a5b14521324f7092871fe003d9988b
 msgid "Semaphore API"
 msgstr "信号量 API"
 
+#: ../../api/osal.rst:35 f1e429d3f9564e56ad89e3f7552c9a57
 msgid "Queue API"
 msgstr "队列 API"
+

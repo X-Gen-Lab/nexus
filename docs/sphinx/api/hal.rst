@@ -216,8 +216,11 @@ SPI API
 .. code-block:: c
 
     nx_spi_t* nx_factory_spi(uint8_t index);
-    nx_spi_t* nx_factory_spi_with_config(uint8_t index, const nx_spi_config_t* cfg);
     void nx_factory_spi_release(nx_spi_t* spi);
+
+.. note::
+   The ``nx_factory_spi_with_config()`` function has been removed.
+   Use Kconfig for compile-time bus configuration.
 
 I2C API
 -------
@@ -227,7 +230,6 @@ I2C API
 .. code-block:: c
 
     nx_i2c_t* nx_factory_i2c(uint8_t index);
-    nx_i2c_t* nx_factory_i2c_with_config(uint8_t index, const nx_i2c_config_t* cfg);
     void nx_factory_i2c_release(nx_i2c_t* i2c);
 
 Timer API

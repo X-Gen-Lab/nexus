@@ -1,0 +1,693 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../api/kconfig_tools.rst:2 e753dc1312e24ed29d0c047a38e51dab
+msgid "Kconfig Tools API"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:5 00a5c6337d7e4248a24b83bdf03617fb
+msgid "Overview"
+msgstr "概述"
+
+#: ../../api/kconfig_tools.rst:7 1688d9abc0ab45d786e785f67302bff0
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:11 6c19f4774145463f90c6c452f191b3da
+msgid "Module: generate_hal_config"
+msgstr "模块: generate_hal_config"
+
+#: ../../api/kconfig_tools.rst:14 1c966f8ea57f47859d3d0400e7546a45
+msgid "Configuration Header Generation"
+msgstr "配置 Header Generation"
+
+#: ../../api/kconfig_tools.rst:18 071ab205779b48598a28c30c6efe5f26
+msgid "Generate C header file from configuration dictionary."
+msgstr "生成 C header file from configuration dictionary."
+
+#: ../../api/kconfig_tools.rst 01eedf4fb3474bcfad21522de1ca3d3f
+#: 05d1f76f6117420db92e8a5923d77a89 1f3d6055514e4a28b086984d7185149e
+#: 52dbb9cd36f04c5a899d65ac4167949b 7220e08b2e3a49058f8e212fba69bc3a
+#: 805c4c12d8ee4265888e69846ee184f0 8865f5ed67b44d3b9c8db74655c15ae8
+#: 8ba915b95a0749f2853466fa22dd1120 90076d3e558c49a298d1af68bf7243ec
+#: 9bf4504290f344878daaeef27e29a547 a7552af1d0b34dd3a73e4e7bc2fd4e09
+#: abefb9bbc7e74bb682ec447e3e7476e9 c48919454d4d4fedbfc35973e9c0491d
+#: dc5e6ead235a4eca9443b059303e585a e70b9caa0545449e93473c8d49536c2f
+#: f670806d9d494f9daa40f1cf30663975 fd09e87e48f34ac99155c21bfae0a7b0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../api/kconfig_tools.rst:20 1b1403dbc0604c05b0184191e382cc8c
+msgid "Configuration key-value pairs"
+msgstr "配置 key-value pairs"
+
+#: ../../api/kconfig_tools.rst:21 ../../api/kconfig_tools.rst:291
+#: 1f7c5e4eabca4431b5aeebe3b4925500 7b1bcfb20d5e48d9ae85fc51b71237a2
+msgid "Output file path (optional)"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst 00f54daae7c4422f94e8b9e8c4a07760
+#: 136e5080a3cf4543986d6bd7762ab406 2dbd957d97df40d1a1499d115d682cb0
+#: 3ca41d774a124df7bb2389acdfbdf83c 3f2d17ec1d0a41b98c2f0acf55137768
+#: 3f6ad587cc844729a37c56fd1054dfbd 5b30eb14e5d2401881056a385a6c510f
+#: 75c3825cf14648619091fedc33d61ac4 7dce30fdbaa5478485133101f786bf7b
+#: 805d8c6ce47244a8b1e71889edd6a26b 83689c5bda3f4e28a8b24f8c192aa8b7
+#: 8608ac109fd34cc6bb6b62c89a513c99 a5a8b2978c5040c3a10a96a7cd6ef904
+#: abfeb3a543d7460ea9c712a68732e23d c682cf1484204f909efb1b0eb952219f
+#: d22d26b684d7499796749c8c9f97555b d6ccdc794ed24d9899f360bc3d5ba30e
+#: d947464e9cd04d6baa45cb548ebb220a
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../api/kconfig_tools.rst:22 d18f0d82a38d4f2c8c63471d557e081b
+msgid "Generated header content as string"
+msgstr "生成d header content as 字符串"
+
+#: ../../api/kconfig_tools.rst 218da1c4cf2d4d6a806dfdb35c1ba7dd
+#: 2f9bafc5b15049d8901a1702f7af0933 30ed644f377d40ec996ffb50d52c1fec
+#: 3e69ca523cd7428b9e82b61e26d8484f 468dbc5d7761487db0da44b408b0e37d
+#: 522dea91ab7e4c038edb3938dce869c9 718fd43b06dc415a9fd673ebbb6582e3
+#: 993ed356a5104e788e52f35b97de4466 a0839309589248639ca17f2fb14d95a3
+#: a22ef9d8dad64132aae2616d4ac09395 a5196a8babb044c19f270ecbbcc9933d
+#: e1a99d1d6fa247e9877e7079911f97e5 e3a23c6e981d4c80b87ad8f4af2158e2
+#: e8ad498fed5a426e93395893feef80b5 ea8d61231ef040b997499ac0c16f50dc
+#: ecb152d9d3a94801875e26e9d5c1af6b fb7a145d373a4562b1f6c1d4cd40ab42
+#: ffe4d0cd8fcb4333894480d371f789e1
+msgid "Return type"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:25 ../../api/kconfig_tools.rst:47
+#: ../../api/kconfig_tools.rst:64 ../../api/kconfig_tools.rst:97
+#: ../../api/kconfig_tools.rst:120 ../../api/kconfig_tools.rst:191
+#: ../../api/kconfig_tools.rst:239 ../../api/kconfig_tools.rst:296
+#: ../../api/kconfig_tools.rst:502 12b182a97f6d40a38e6d444b47c64d11
+#: 1b52f30eea0f4fb7a0659fc30d845011 3e2651c647134f12a4c304bc1cac6189
+#: 6279183de7014927829d9ebb85dbc038 ad7739d5cc6b4de3b94d87af5d4a01a5
+#: affabe463eb64a268007a3aa12b99034 c3abbcc44a184e199751300fa0677429
+#: d9be3abdd68a49c399527cf226055c45 e1a8a10d26994655ab9190e258d9dd74
+msgid "**Example:**"
+msgstr "**示例:**"
+
+#: ../../api/kconfig_tools.rst:27 4d218d70778d4aa8a80968742d7fd982
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:41 a1e9b8e57e89410bb1000959fea493c5
+msgid "Parse .config file and return configuration dictionary."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:43 98556e25754e4bcca773f6fc00871e2a
+msgid "Path to .config file"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:44 ../../api/kconfig_tools.rst:261
+#: d68a2d3a4c1a493aa95a7c9fe114bb56 dbb6a9457fbd4a94a6ea3ce130c1cccc
+msgid "Configuration dictionary"
+msgstr "配置 dictionary"
+
+#: ../../api/kconfig_tools.rst:49 717deffb6aa342c6abf622b1f6b1522a
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:58 091a50479bac48b09441e358c00bedb7
+msgid "Generate default configuration for specified platform."
+msgstr "生成 default configuration for specified platform."
+
+#: ../../api/kconfig_tools.rst:60 08400444c78c4f419f7bd513b9ef0295
+msgid "Platform name (native, stm32, gd32, etc.)"
+msgstr "平台 name (native, stm32, gd32, etc.)"
+
+#: ../../api/kconfig_tools.rst:61 2cb42a8f85bf461eb0cf01953c4b0cc1
+msgid "Default configuration dictionary"
+msgstr "默认配置 dictionary"
+
+#: ../../api/kconfig_tools.rst:66 630e8a76ae6a48b8868de82dfa79c4db
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:77 6c971d7bf69240c0844065736acab202
+msgid "Module: validate_kconfig"
+msgstr "模块: validate_kconfig"
+
+#: ../../api/kconfig_tools.rst:80 ed26f3fee9b848ecbd8e03cf2fa72375
+msgid "Kconfig Validation"
+msgstr "Kconfig 验证"
+
+#: ../../api/kconfig_tools.rst:84 8e794dd11d5f4b34bdf7d81c34306167
+msgid "Validator for Kconfig files."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:86 1fba0e0a04ee4ff4be5d23fefdd01e30
+msgid "Root directory for resolving paths"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:90 cae9202ba5744c7fbcd6e04a72172e0f
+msgid "Validate a single Kconfig file."
+msgstr "验证 a single Kconfig file."
+
+#: ../../api/kconfig_tools.rst:92 298e4a5115b44564ad3a54a86b8ca87e
+msgid "Path to Kconfig file"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:93 901d64b8db8c4daaa32d51220f5d5318
+msgid "Whether file is included via source/rsource"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:94 ../../api/kconfig_tools.rst:137
+#: ../../api/kconfig_tools.rst:144 419452d5de904bcfa16e540f54665187
+#: 57b1fff1313b4c348c25e05028b649e9 a2e6af288beb4727a63cb945b9fb4505
+msgid "Tuple of (errors, warnings)"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:99 4a4c1e810141497d9c05064410e25cbc
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:114 6b2a1d8f8fd1435da1db46d4b9d5ff9b
+msgid "Validate Kconfig file and all included files."
+msgstr "验证 Kconfig file and all included files."
+
+#: ../../api/kconfig_tools.rst:116 ../../api/kconfig_tools.rst:290
+#: 7a569f45bc7149e6abbcd94e6b5f212a baa3c54c4a1f44d49f89fc9fc16415c0
+msgid "Root Kconfig file path"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:117 81849128adb64ae6ab13560673f1562d
+msgid "True if validation passed, False otherwise"
+msgstr "True if 验证 passed, False otherwise"
+
+#: ../../api/kconfig_tools.rst:122 4871ddbf3ec4479fa395cfc163a9fe09
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:135 d774822faac047ddb1450b87c24d2f7a
+msgid "Validate dependencies and selects."
+msgstr "验证 dependencies and selects."
+
+#: ../../api/kconfig_tools.rst:142 4eeff814df2443aea3501a4696f1a1da
+msgid "Validate range constraints and default values."
+msgstr "验证 范围约束 and default values."
+
+#: ../../api/kconfig_tools.rst:149 470f9db14f2d4653ad0982112c07f380
+msgid "Print validation results to stdout."
+msgstr "Print 验证 results to stdout."
+
+#: ../../api/kconfig_tools.rst:153 dd8daf311eea4b9bb9db2b6e4c369ac5
+msgid "List of validation errors."
+msgstr "List of 验证 errors."
+
+#: ../../api/kconfig_tools.rst 1c48e925f73d49ce9a486808c84bea93
+#: 51be90e5c66743ab887541f45a6e8056 cb76cf7ebe9943f791413781f7abc2c0
+#: dd02749375b8452093b3a41027b96d43
+msgid "type"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:155 ../../api/kconfig_tools.rst:161
+#: 1a86ab69b7cf4968bcf2774fa579d6d7 927aede07dc64d8b86538dd50f45bab5
+msgid "list[str]"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:159 baf4d5e050f146d4b6dade4627b1435c
+msgid "List of validation warnings."
+msgstr "List of 验证 warnings."
+
+#: ../../api/kconfig_tools.rst:165 ca647b34bc814d87a9843f3536bf40ae
+msgid "Dictionary of parsed configuration symbols."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:167 afe88ef1fe9e466aa2f025990ce4e1f9
+msgid "dict[str, dict]"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:171 11ce6e7569ed4fb0be91c45aea153cce
+msgid "Dictionary of symbol dependencies."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:173 b7c24bc6ba9d40eb884e70e50ff73949
+msgid "dict[str, set[str]]"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:176 bd5fac433fa74dbcacfcbf3ff125da5a
+msgid "Module: kconfig_migrate"
+msgstr "模块: kconfig_migrate"
+
+#: ../../api/kconfig_tools.rst:179 eac828ed28494cb59392d65e25711cb1
+msgid "Configuration Migration"
+msgstr "配置 Migration"
+
+#: ../../api/kconfig_tools.rst:183 578a0545978f442eb2f5de5b07d87889
+msgid "Migrate configuration file to new version."
+msgstr "迁移 configuration file to new version."
+
+#: ../../api/kconfig_tools.rst:185 01f6cf1bf810426895c893e0c34703d9
+msgid "Input configuration file path"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:186 c54cda5c5f5d41178ef2c28b4ffe18eb
+msgid "Output configuration file path"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:187 14dacc3c451c472fbda8d5c790cf0435
+msgid "Target version (optional)"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:188 364c4f49acc340be9b48e2f5658ebe90
+msgid "True if migration succeeded"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:193 25290257b45d4c51af8535cef457964b
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:208 ecf48c49e0c14452b808e5e9127cce37
+msgid "Detect configuration file version."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:210 ../../api/kconfig_tools.rst:260
+#: 89136b4c633a46dea854400d60146843 a95a39d30d994f9d982388a23f4f1d83
+msgid "Configuration file path"
+msgstr "配置 file path"
+
+#: ../../api/kconfig_tools.rst:211 696c9fd0409a4f568e0df292cb984fc9
+msgid "Version string or None"
+msgstr "Version 字符串 or None"
+
+#: ../../api/kconfig_tools.rst:216 a1d92fb43f994f4ebf5bc7fa2291a509
+msgid "Get symbol mapping between versions."
+msgstr "Get symbol mapping 版本之间."
+
+#: ../../api/kconfig_tools.rst:218 34e4ef85c1514763b5208d7a6c3c4434
+msgid "Source version"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:219 95e2e03c935e40a89e3c699dad8c6cfa
+msgid "Target version"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:220 27ecf1518f1c4ce6ade15f08aa16a9ae
+msgid "Symbol mapping dictionary"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:224 53cd99c5f3ee429ea74da1cbe85f4079
+msgid "Module: kconfig_diff"
+msgstr "模块: kconfig_diff"
+
+#: ../../api/kconfig_tools.rst:227 a3bcf53aaf994c4c995509010801bbf2
+msgid "Configuration Comparison"
+msgstr "配置 Comparison"
+
+#: ../../api/kconfig_tools.rst:231 557fa831dbb44fd8840e9b8222fcd1eb
+msgid "Compare two configuration files."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:233 8c46d26b1a834da8be40f4b5e64053b5
+msgid "First configuration file path"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:234 9a26789280e040578416d3cc5c27e614
+msgid "Second configuration file path"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:235 c121091ba8a34cf18a15f6e4ae043b6b
+msgid "Output format ('text' or 'json')"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:236 9c0564a447d04dfab3a16697386ca880
+msgid "Difference report"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:241 71a11187aace4c8b9bf32db4d1a8431e
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:258 3fb8c234302d4e52a003963085d53066
+msgid "Parse configuration file."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:266 eb17bf3dca084ddf8e12afaa169493ca
+msgid "Format difference dictionary as text."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:268 ../../api/kconfig_tools.rst:276
+#: 500e0137bdb048fd8e684c498bc15963 e4f4eab6b3a944a0be5794533a4b11b5
+msgid "Difference dictionary"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:269 c608eb3b4b2544bab815b5fb0f1f15c6
+msgid "Formatted text"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:274 aeeb6adef4a2427b95d3a4fff8fa7f66
+msgid "Format difference dictionary as JSON."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:277 f18b3a5a9b3e4363b7f0f57d166e544a
+msgid "JSON string"
+msgstr "JSON 字符串"
+
+#: ../../api/kconfig_tools.rst:281 b2c457e32ea4482cb8ce4d83ecdf2417
+msgid "Module: generate_config_docs"
+msgstr "模块: generate_config_docs"
+
+#: ../../api/kconfig_tools.rst:284 41936a549f214535a374a4ff891c8a84
+msgid "Documentation Generation"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:288 af03695a1e064ef690b1bd70fe504f3e
+msgid "Generate documentation from Kconfig files."
+msgstr "生成 documentation from Kconfig files."
+
+#: ../../api/kconfig_tools.rst:292 6ff78185598d4a6bbdfc5a553075da01
+msgid "Output format ('markdown' or 'rst')"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:293 bb08e9078df94a63b3069d14ff70dfe3
+msgid "Generated documentation"
+msgstr "生成d documentation"
+
+#: ../../api/kconfig_tools.rst:298 2176f720accd46929929930fc239e1be
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:310 0bbbf751c356405e836cc64d4f91b912
+msgid "Extract all configuration options from Kconfig file."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:312 eedfbe01641941ef8075fb3134be4e3f
+msgid "Kconfig file path"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:313 f2873be459624d9594bb081369965559
+msgid "List of configuration options"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:318 f913ec28f58a4a76aba788c0c3793e7c
+msgid "Format configuration option as markdown."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:320 ../../api/kconfig_tools.rst:328
+#: 110f879ed4e241fbb914674ee7e46893 ee69fe0115c74781999fddab353aed56
+msgid "Configuration option dictionary"
+msgstr "配置 option dictionary"
+
+#: ../../api/kconfig_tools.rst:321 8f36d38b7e124e428b95d7e290e415d2
+msgid "Formatted markdown"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:326 768f52025c434aa6b8920cc777686528
+msgid "Format configuration option as reStructuredText."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:329 5e7a2a469f334445a6abd47067d15c6b
+msgid "Formatted reStructuredText"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:333 6bd652423a5849d284c56b126f00a6e1
+msgid "Command-Line Interface"
+msgstr "命令行接口"
+
+#: ../../api/kconfig_tools.rst:336 de07f9e2025947b88e53e075bb89af53
+msgid "nexus_config.py"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:338 d9b8a6be980b4925930334f7a8e5ef47
+msgid "Unified configuration management tool."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:340 5aa0e7d4950e4b0db63db80b37d21204
+msgid "**Usage:**"
+msgstr "**用法:**"
+
+#: ../../api/kconfig_tools.rst:342 030c1300705d49a8b1926444cfe0eb89
+msgid "python scripts/nexus_config.py <command> [options]"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:346 75882f0778574bbc90548c24953e6eb0
+msgid "**Commands:**"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:348 8b24afa98d0f4c20a7d2780ea45c202f
+msgid "``generate`` - Generate configuration header file"
+msgstr "``generate`` - 生成 configuration header file"
+
+#: ../../api/kconfig_tools.rst:349 0b0266a19aec4aed91349309d56ebf46
+msgid "``validate`` - Validate Kconfig files"
+msgstr "``validate`` - 验证 Kconfig files"
+
+#: ../../api/kconfig_tools.rst:350 374087c64fb34a88abe0e80e7129b24f
+msgid "``migrate`` - Migrate configuration to new version"
+msgstr "``migrate`` - 迁移 configuration to new version"
+
+#: ../../api/kconfig_tools.rst:351 35ad02a8bf0941e1b111ed915008df89
+msgid "``diff`` - Compare configuration files"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:352 d1d9fe07ce164970a84de0b867b110cd
+msgid "``info`` - Display configuration information"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:354 7437da309734473ab44ca83361e061f3
+msgid "**Generate Command:**"
+msgstr "**生成 Command:**"
+
+#: ../../api/kconfig_tools.rst:356 d00a50f980a840b388b391de3d1ea792
+msgid ""
+msgstr ""
+"python scripts/nexus_config.py generate [options]\n\n"
+"\n\n"
+"选项:\n\n"
+"  -c, --config FILE    Input configuration file\n\n"
+"  -o, --output FILE    Output header file\n\n"
+"  -d, --default        Generate default configuration\n\n"
+"  -p, --platform NAME  Platform name for default config\n"
+
+#: ../../api/kconfig_tools.rst:366 c81a5581505a4980bd3f7b287ef1918d
+msgid "**Validate Command:**"
+msgstr "**验证 Command:**"
+
+#: ../../api/kconfig_tools.rst:368 9c42cfe2772a41478d5ba08153726b46
+msgid ""
+msgstr ""
+"python scripts/nexus_config.py validate [kconfig_file]\n\n"
+"\n\n"
+"参数:\n\n"
+"  kconfig_file         Root Kconfig file (default: Kconfig)\n"
+
+#: ../../api/kconfig_tools.rst:375 7b2fa6369b224acc97f90ee8abb79353
+msgid "**Migrate Command:**"
+msgstr "**迁移 Command:**"
+
+#: ../../api/kconfig_tools.rst:377 db68ac1fdc6a421abd00f7b9aff95366
+msgid ""
+msgstr ""
+"python scripts/nexus_config.py migrate input_file [options]\n\n"
+"\n\n"
+"参数:\n\n"
+"  input_file           Input configuration file\n\n"
+"\n\n"
+"选项:\n\n"
+"  -o, --output FILE    Output configuration file\n\n"
+"  -t, --target-version VERSION  Target version\n"
+
+#: ../../api/kconfig_tools.rst:388 900ced747436449abb432375e512ea9d
+msgid "**Diff Command:**"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:390 1bd66b548d10492f84bb78020f34347c
+msgid ""
+msgstr ""
+"python scripts/nexus_config.py diff config1 config2 [options]\n\n"
+"\n\n"
+"参数:\n\n"
+"  config1              First configuration file\n\n"
+"  config2              Second configuration file\n\n"
+"\n\n"
+"选项:\n\n"
+"  -f, --format FORMAT  Output format (text or json)\n\n"
+"  -o, --output FILE    Output file\n"
+
+#: ../../api/kconfig_tools.rst:403 0d2c2a6f12c3492d9383d7534c06d4ed
+msgid "Data Structures"
+msgstr "数据结构"
+
+#: ../../api/kconfig_tools.rst:406 016e06c192554424a1763c8d213c56c3
+msgid "Configuration Dictionary"
+msgstr "配置 Dictionary"
+
+#: ../../api/kconfig_tools.rst:408 06bf258eb077494d83fe0ceca6046e89
+msgid "Configuration dictionaries map symbol names to values:"
+msgstr "配置 dictionaries map symbol names to values:"
+
+#: ../../api/kconfig_tools.rst:410 ec7c70b9aad446809869188d1099dd62
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:422 8a80fe1f5d4f4aa89333f52feb59d157
+msgid "Symbol Information"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:424 0a6925d239b149328761842e3b22df32
+msgid "Symbol information dictionaries contain metadata:"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:426 7d3e52c004694b23a4df8ff24c974cf8
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:439 ea4683cc03b742cda55f833be1cce20f
+msgid "Validation Results"
+msgstr "验证 Results"
+
+#: ../../api/kconfig_tools.rst:441 5dddcfcd9a784c498a66abdab0c37bf6
+msgid "Validation results contain errors and warnings:"
+msgstr "验证 results contain errors and warnings:"
+
+#: ../../api/kconfig_tools.rst:443 7fae72f8f9ec4f45b05dd52bb669e8d9
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:456 ecf06d4810b64b8f96292fd89abfe458
+msgid "Difference Report"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:458 cd874342b61249d692ee76288658daa9
+msgid "Difference reports show configuration changes:"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:460 e4c72795c9354356a3a74511ec523e9a
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:481 ../../api/kconfig_tools.rst:543
+#: 3f86a7e12f164c4589e5003342c9a560 6864bc37ac0f44eaae34675f5dc74e4f
+msgid "Error Handling"
+msgstr "错误处理"
+
+#: ../../api/kconfig_tools.rst:484 d52cfa6363e94dff89ff338aa26f8c2b
+msgid "Exceptions"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:488 28a8e90d3f3f4a28a7f1424bb5cd2b5a
+msgid "Base exception for Kconfig-related errors."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:492 c20dc34d7b9d49f18a52dc8feaee15d6
+msgid "Raised when validation fails."
+msgstr "Raised when 验证 fails."
+
+#: ../../api/kconfig_tools.rst:496 96f6850d2bcc46c490bc030a2ed92222
+msgid "Raised when parsing fails."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:500 9ed59169df6940a4ab79351f23820165
+msgid "Raised when header generation fails."
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:504 d9c36ef257104206a615efc9a47d2bcc
+msgid ""
+msgstr ""
+"from validate_kconfig import KconfigValidator, ValidationError\n\n"
+"\n\n"
+"try:\n\n"
+"    validator = KconfigValidator('.')\n\n"
+"    success = validator.validate_all(Path('Kconfig'))\n\n"
+"    if not success:\n\n"
+"        raise 验证Error(\验证 failed\)\n\n"
+"except 验证Error as e:\n\n"
+"    print(f\Error: {e}\)\n\n"
+"    validator.print_results()\n"
+
+#: ../../api/kconfig_tools.rst:518 70a1e8b2287d483ab247d150c1283f8b
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../api/kconfig_tools.rst:521 47593d2aac614b2e9d8a3b8688420204
+msgid "Validation"
+msgstr "验证"
+
+#: ../../api/kconfig_tools.rst:523 2209df38c6894b288b80bc930c7f7696
+msgid "Always validate before generating:"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:525 d2a5d3d2484d4d9e941fe46db1aa79e7
+msgid ""
+msgstr ""
+"from pathlib import Path\n\n"
+"from validate_kconfig import KconfigValidator\n\n"
+"from generate_hal_config import generate_header, parse_config_file\n\n"
+"\n\n"
+"# Validate first\n\n"
+"validator = KconfigValidator('.')\n\n"
+"if not validator.validate_all(Path('Kconfig')):\n\n"
+"    print(\验证 failed!\)\n\n"
+"    validator.print_results()\n\n"
+"    exit(1)\n\n"
+"\n\n"
+"# Then generate\n\n"
+"config = parse_config_file('.config')\n\n"
+"generate_header(config, 'nexus_config.h')\n"
+
+#: ../../api/kconfig_tools.rst:545 ddff49e077ea4d51bf9ed7e6181940fa
+msgid "Handle errors gracefully:"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:547 dd2b357722634c1eb5d981add7bed08c
+msgid ""
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:559 738df9c5b5a54e9ea59b4ab2cf1786fb
+msgid "Logging"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:561 a89bcc34658248daa60605bb063c223e
+msgid "Use logging for debugging:"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:563 1625efcf05bd43a580ca250d7a7e0a3b
+msgid ""
+msgstr ""
+"import logging\n\n"
+"\n\n"
+"logging.basicConfig(level=logging.DEBUG)\n\n"
+"logger = logging.getLogger(__name__)\n\n"
+"\n\n"
+"validator = KconfigValidator('.')\n\n"
+"logger.debug(\Starting validation\)\n\n"
+"success = validator.validate_all(Path('Kconfig'))\n\n"
+"logger.info(f\验证 {'passed' if success else 'failed'}\)\n"
+
+#: ../../api/kconfig_tools.rst:576 9d94365ca31a44c5a293597bb6b423ae
+msgid "See Also"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:578 2500ac8a2dc443d9808cd067225f6c15
+msgid ":doc:`../user_guide/kconfig` - Kconfig user guide"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:579 94cf880a32ef4eefa1ef06ffbb3e2942
+msgid ":doc:`../development/contributing` - Contributing guidelines"
+msgstr ""
+
+#: ../../api/kconfig_tools.rst:580 7c3b1d40bb99492f9f09476d1ffff04c
+msgid "Scripts README: ``scripts/kconfig/README.md``"
+msgstr ""
+

@@ -215,17 +215,14 @@ SPI Module
 
     nx_spi_t* spi = nx_factory_spi(0);
 
-    /* Or with configuration */
-    nx_spi_config_t cfg = {
-        .clock_hz   = 1000000,
-        .mode       = 0,
-        .bit_order  = NX_SPI_MSB_FIRST,
-    };
-    nx_spi_t* spi = nx_factory_spi_with_config(0, &cfg);
-
     /* Use SPI... */
 
     nx_factory_spi_release(spi);
+
+.. note::
+   Bus-level configuration (clock frequency, pin mapping) should be done
+   through Kconfig at compile-time. Device-specific parameters (CS pin,
+   speed, mode) are specified when acquiring communication handles.
 
 I2C Module
 ----------
@@ -235,12 +232,6 @@ I2C Module
 .. code-block:: c
 
     nx_i2c_t* i2c = nx_factory_i2c(0);
-
-    /* Or with configuration */
-    nx_i2c_config_t cfg = {
-        .clock_hz = 100000,  /* 100 kHz */
-    };
-    nx_i2c_t* i2c = nx_factory_i2c_with_config(0, &cfg);
 
     /* Use I2C... */
 

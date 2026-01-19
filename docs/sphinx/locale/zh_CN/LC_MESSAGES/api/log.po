@@ -2,30 +2,97 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../api/log.rst:2 9c176e01379b43e6b543e4a8c6fc8872
 msgid "Log Framework API Reference"
 msgstr "日志框架 API 参考"
 
+#: ../../api/log.rst:4 e33de8a46809461d9209406a7fa13f86
 msgid "This section documents the Log Framework API."
 msgstr "本节记录日志框架 API。"
 
+#: ../../api/log.rst:7 fa53113bc0f94392b682e7a563c46935
 msgid "Log Definitions"
 msgstr "日志定义"
 
+#: ../../api/log.rst 02e5d150f0404a53bbb4a0ae3f01f781
+#: 0ed9d9ff8bd3484bb8a0823fd219e9a8 2ad95f2296c54a2a910f8110bb3bc9a6
+#: 435cff38c2934484a26bcea0b1ca3a6a 45a5588b415f4c3798783d0aa2b709a9
+#: 46c19d336afb429b81ef971712b35d8a 56f32fbabe3a4086a82b15f3b0066298
+#: 6435f5067cde4c58b3983a5f3df28a37 7e23b0d478a44162b26056bde8dd3f31
+#: 7e3c34164d694db680017312eb94e2bd 879eb95dc0f049ef81483825e42959de
+#: 9dd3713e0663458794331d6c2be9dd19 ac287dfe4eed4c6484c3a87f6e277ea7
+#: b4e603c9deda4fdbbaa8cb3d87b53e74 b70f5e27dd794e1e9bac98dbcae81062
+#: b91dcfe3587d46829ff59ec8506297a8 c20571350f8d4e12815a5d0f436aca36
+#: cb46c4bd32854b458310d8cadac725bd cdd9a6fa16c14316956fe91e7fa389b4
+#: de0bcad4715945e8abe08a334ad95546 e59a438d4cc04b4eba30ac5d8ec97668
+#: e8d9a267d2474c6daf8690bdf99df717 f4bb1aa42f274c14a2c4c3da1700751e
+#: f500cc3a3d284825a2999f13999a7c9c
+msgid "Parameters"
+msgstr ""
+
+#: ../../api/log.rst 33b9785029da41f5af86bb354e5bb554
+#: 3621290486d24001bb4cca91c6c55a6c 48549e8eb1334c449554f305de6512a8
+#: 4ae774e5f21e486396ab0e35b12458f2 591bb8c3cb96437f97c0df208d16b521
+#: 6280a83b45064f6eb8d41f1ef634d688 72ae064b0ead40049c0b904b02a3eb23
+#: 7f124caa00554bbbb20a6c86b869929f 9c116e1f35d949b78faa504d7b153d03
+#: 9f5f9575d28c42408a8a637448f8b7b1 b4be245840c54a46a371a90179e94c25
+#: bf3f79ffb22640318a6d290b876d2b37 eefa8fb68ce949679af332656ed0b341
+msgid "Returns"
+msgstr ""
+
+#: ../../api/log.rst:14 ec4f9bf07a6d426e97ae1cbfe00e2e55
 msgid "Log Macros"
 msgstr "日志宏"
 
+#: ../../api/log.rst:21 51cda086a323494f822cbf5ed4485870
 msgid "Log Backend"
 msgstr "日志后端"
 
+#: ../../api/log.rst 38971de90905451184322a4689eb4dc8
+#: c9de43516c514ad0b31752833d9c5e3d cc64476c418f4dedbedeff0370b489b8
+#: edcd7d745f1442bb9314f9f98e46e911
+msgid "Param ctx"
+msgstr ""
+
+#: ../../api/log.rst 4dd27194643641f39545e731a6dc52a2
+#: 6290d56e9bf349c18c4bbf0c3259a036 b06366e53a914148a32cd61d49bdb19e
+#: dfc6cbd93287415e991832ddb2c7bd0e
+msgid "Return"
+msgstr ""
+
+#: ../../api/log.rst ac1e41ef03ec4b77933c1821fa0108b0
+msgid "Param msg"
+msgstr ""
+
+#: ../../api/log.rst 077f97a331f54cf99e5ec7bbda978290
+msgid "Param len"
+msgstr ""
+
+#: ../../api/log.rst d2dd826c61014dc4b1b9b97b6153071b
+msgid "Public Members"
+msgstr ""
+
+#: ../../api/log.rst:28 0d41c886bcd94a499f159f1ef4ddfee5
 msgid "Console Backend"
 msgstr "Console 后端"
 
+#: ../../api/log.rst:35 e2f8eee0ecfe4016abf66016d7a84eaa
 msgid "UART Backend"
 msgstr "UART 后端"
 
+#: ../../api/log.rst:42 0d84c25588794ae5aab8a59b441856b8
 msgid "Memory Backend"
 msgstr "Memory 后端"
+

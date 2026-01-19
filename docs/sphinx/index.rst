@@ -27,6 +27,7 @@ secure, and portable embedded applications.
    user_guide/log
    user_guide/shell
    user_guide/config
+   user_guide/kconfig
    user_guide/porting
 
 .. toctree::
@@ -38,6 +39,7 @@ secure, and portable embedded applications.
    api/log
    api/shell
    api/config
+   api/kconfig_tools
 
 .. toctree::
    :maxdepth: 2
@@ -45,6 +47,7 @@ secure, and portable embedded applications.
 
    development/contributing
    development/coding_standards
+   development/kconfig_guide
    development/testing
 
 Features

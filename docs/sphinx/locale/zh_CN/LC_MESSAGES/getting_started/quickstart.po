@@ -5,89 +5,279 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 00:00+0000\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
 "PO-Revision-Date: 2026-01-16 00:00+0000\n"
 "Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
 "Language-Team: Chinese\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../getting_started/quickstart.rst:2 ee1358bee50d4537b2373db958303e4a
 msgid "Quick Start"
 msgstr "快速开始"
 
-msgid "This guide will help you create your first Nexus application - a simple LED blinky."
+#: ../../getting_started/quickstart.rst:4 dd1e60e0104b48ae89ede406ef077264
+msgid ""
+"This guide will help you create your first Nexus application - a simple "
+"LED blinky."
 msgstr "本指南将帮助您创建第一个 Nexus 应用程序 - 一个简单的 LED 闪烁程序。"
 
+#: ../../getting_started/quickstart.rst:7 9b6c32d6d46341239a6791ea64231484
 msgid "Prerequisites"
 msgstr "前提条件"
 
+#: ../../getting_started/quickstart.rst:9 7f77153cbd8a4f70ba86da9990f5d6a7
 msgid "Make sure you have completed the :doc:`installation` guide."
 msgstr "请确保您已完成 :doc:`installation` 指南。"
 
+#: ../../getting_started/quickstart.rst:12 002cb1cead4742de9feb3d5217415b09
 msgid "Create a New Project"
 msgstr "创建新项目"
 
+#: ../../getting_started/quickstart.rst:14 e0d21f820d2d441e849a92e94fc46306
 msgid "Create a project directory:"
 msgstr "创建项目目录："
 
+#: ../../getting_started/quickstart.rst:16 13c850cbaa9f41ab861498ebdb536fe3
+msgid ""
+"mkdir my_blinky\n"
+"cd my_blinky"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:21 0136ea9ae6104ab2a20bd9b80ef6daa1
+msgid "Create ``CMakeLists.txt``:"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:23 1f786a48f9614e61af81903251e039c4
+msgid ""
+"cmake_minimum_required(VERSION 3.16)\n"
+"project(my_blinky C)\n"
+"\n"
+"# Add Nexus as subdirectory\n"
+"add_subdirectory(nexus)\n"
+"\n"
+"# Create application\n"
+"add_executable(blinky main.c)\n"
+"target_link_libraries(blinky PRIVATE nexus_hal nexus_platform)"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:35 a1c31b52a64944af8d31563bb59efb52
+msgid "Create ``main.c``:"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:37 b6ce9329eedd42d888e4a1feaa60faf0
+msgid ""
+"#include \"hal/nx_hal.h\"\n"
+"\n"
+"#define LED_PORT    0   /* Port A */\n"
+"#define LED_PIN     5   /* Pin 5 */\n"
+"\n"
+"int main(void)\n"
+"{\n"
+"    /* Initialize HAL */\n"
+"    nx_hal_init();\n"
+"\n"
+"    /* Configure GPIO */\n"
+"    nx_gpio_config_t cfg = {\n"
+"        .mode  = NX_GPIO_MODE_OUTPUT_PP,\n"
+"        .pull  = NX_GPIO_PULL_NONE,\n"
+"        .speed = NX_GPIO_SPEED_LOW,\n"
+"    };\n"
+"\n"
+"    /* Get GPIO device */\n"
+"    nx_gpio_t* led = nx_factory_gpio_with_config(LED_PORT, LED_PIN, "
+"&cfg);\n"
+"    if (!led) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Blink loop */\n"
+"    while (1) {\n"
+"        led->toggle(led);\n"
+"        /* Platform-specific delay */\n"
+"        for (volatile int i = 0; i < 1000000; i++);\n"
+"    }\n"
+"\n"
+"    /* Cleanup (never reached) */\n"
+"    nx_factory_gpio_release(led);\n"
+"    nx_hal_deinit();\n"
+"    return 0;\n"
+"}"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:76 927b1d542a524d8aaf86c084e55db517
 msgid "Build for Native (Testing)"
 msgstr "构建本地版本（测试）"
 
+#: ../../getting_started/quickstart.rst:78 6aa67ef2e54f42ef9ecd7f7f4e6ef148
+msgid ""
+"# Configure for native platform\n"
+"cmake -B build -DNEXUS_PLATFORM=native\n"
+"\n"
+"# Build\n"
+"cmake --build build\n"
+"\n"
+"# Run\n"
+"./build/blinky"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:90 f0b2baabd4d34634bd02b5a77bd47445
 msgid "Build for STM32F4"
 msgstr "构建 STM32F4 版本"
 
+#: ../../getting_started/quickstart.rst:92 a586d00b58d740b0ac9ae81af6b7a9f0
+msgid ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=nexus/cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4\n"
+"\n"
+"# Flash (using OpenOCD)\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/blinky.elf verify reset exit\""
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:107 4c3b67491903443b837cbfab6f4b5eef
 msgid "Understanding the Code"
 msgstr "理解代码"
 
-msgid "HAL Initialization:"
+#: ../../getting_started/quickstart.rst:109 b9ff7289d6514982b4fd31b4b45390b7
+#, fuzzy
+msgid "**HAL Initialization:**"
 msgstr "HAL 初始化："
 
-msgid ""
-"This initializes the HAL subsystem, including platform-specific hardware, "
-"resource managers, and device registry."
+#: ../../getting_started/quickstart.rst:111 d23b8d091d064da2b7cadf37bc6ac8b3
+msgid "nx_hal_init();  /* Initialize HAL subsystem */"
 msgstr ""
-"这将初始化 HAL 子系统，包括平台特定硬件、资源管理器和设备注册表。"
 
-msgid "GPIO Configuration:"
+#: ../../getting_started/quickstart.rst:115 d12190f0cf3748ad855b71907a495192
+msgid ""
+"This initializes the HAL subsystem, including platform-specific hardware,"
+" resource managers, and device registry."
+msgstr "这将初始化 HAL 子系统，包括平台特定硬件、资源管理器和设备注册表。"
+
+#: ../../getting_started/quickstart.rst:118 c98216e15c704665929d0af835345d28
+#, fuzzy
+msgid "**GPIO Configuration:**"
 msgstr "GPIO 配置："
 
+#: ../../getting_started/quickstart.rst:120 354bab4d3dae4ba8bf0ad27b53c56d33
+msgid ""
+"nx_gpio_config_t cfg = {\n"
+"    .mode  = NX_GPIO_MODE_OUTPUT_PP,  /* Push-pull output */\n"
+"    .pull  = NX_GPIO_PULL_NONE,       /* No pull-up/down */\n"
+"    .speed = NX_GPIO_SPEED_LOW,       /* Low speed */\n"
+"};\n"
+"\n"
+"nx_gpio_t* led = nx_factory_gpio_with_config(LED_PORT, LED_PIN, &cfg);"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:130 8e9196a7f3b44a2c98df458ea105d69a
 msgid ""
 "The factory function creates a GPIO device instance with the specified "
 "configuration. It returns a pointer to the GPIO interface."
-msgstr ""
-"工厂函数使用指定的配置创建 GPIO 设备实例。它返回指向 GPIO 接口的指针。"
+msgstr "工厂函数使用指定的配置创建 GPIO 设备实例。它返回指向 GPIO 接口的指针。"
 
-msgid "GPIO Operations:"
+#: ../../getting_started/quickstart.rst:133 1a9601e0708f45d291cb81a94e1d4663
+#, fuzzy
+msgid "**GPIO Operations:**"
 msgstr "GPIO 操作："
 
+#: ../../getting_started/quickstart.rst:135 326d2599c1634cd1a3dd7c3505e9b66a
+msgid ""
+"led->toggle(led);       /* Toggle pin state */\n"
+"led->write(led, 1);     /* Set high */\n"
+"led->write(led, 0);     /* Set low */\n"
+"uint8_t state = led->read(led);  /* Read state */"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:142 683f8fb778e6487485c942568bca1c3f
 msgid "The GPIO interface provides methods for basic I/O operations."
 msgstr "GPIO 接口提供基本 I/O 操作的方法。"
 
-msgid "Resource Cleanup:"
+#: ../../getting_started/quickstart.rst:144 f41aeab869f544b2bff465b5363279b7
+#, fuzzy
+msgid "**Resource Cleanup:**"
 msgstr "资源清理："
 
+#: ../../getting_started/quickstart.rst:146 8e62a82bd4f949499917dec894049e2e
+msgid ""
+"nx_factory_gpio_release(led);  /* Release GPIO device */\n"
+"nx_hal_deinit();               /* Deinitialize HAL */"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:151 2ac10bdce3f2427ca49132a05175626c
 msgid "Always release devices when done to free resources."
 msgstr "使用完毕后务必释放设备以释放资源。"
 
+#: ../../getting_started/quickstart.rst:154 b8cea8219a65425f89db9d3a6f206ceb
 msgid "Adding UART Output"
 msgstr "添加 UART 输出"
 
+#: ../../getting_started/quickstart.rst:156 d8a3d5b3118242faaf17be341ed021b2
 msgid "Extend your application with serial output:"
 msgstr "为您的应用程序添加串口输出："
 
+#: ../../getting_started/quickstart.rst:158 c093a4c99aec43378270e77fabc0942a
+msgid ""
+"#include \"hal/nx_hal.h\"\n"
+"#include <string.h>\n"
+"\n"
+"int main(void)\n"
+"{\n"
+"    nx_hal_init();\n"
+"\n"
+"    /* Configure UART */\n"
+"    nx_uart_config_t uart_cfg = {\n"
+"        .baudrate    = 115200,\n"
+"        .word_length = 8,\n"
+"        .stop_bits   = 1,\n"
+"        .parity      = 0,\n"
+"    };\n"
+"\n"
+"    nx_uart_t* uart = nx_factory_uart_with_config(0, &uart_cfg);\n"
+"    if (!uart) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Get synchronous TX interface */\n"
+"    nx_tx_sync_t* tx = uart->get_tx_sync(uart);\n"
+"\n"
+"    /* Send message */\n"
+"    const char* msg = \"Hello, Nexus!\\r\\n\";\n"
+"    tx->send(tx, (uint8_t*)msg, strlen(msg), 1000);\n"
+"\n"
+"    /* Cleanup */\n"
+"    nx_factory_uart_release(uart);\n"
+"    nx_hal_deinit();\n"
+"    return 0;\n"
+"}"
+msgstr ""
+
+#: ../../getting_started/quickstart.rst:194 9ac43273a1154c359549e7a4abed904c
 msgid "Next Steps"
 msgstr "下一步"
 
+#: ../../getting_started/quickstart.rst:196 83be3e5e3bf346e7ba7ab73757a9c2f0
 msgid ":doc:`../user_guide/hal` - Learn more about HAL interfaces"
 msgstr ":doc:`../user_guide/hal` - 了解更多 HAL 接口"
 
+#: ../../getting_started/quickstart.rst:197 df16a6180dbe42c9b51013a6efa7933a
 msgid ":doc:`../user_guide/osal` - Add multi-tasking with OSAL"
 msgstr ":doc:`../user_guide/osal` - 使用 OSAL 添加多任务"
 
+#: ../../getting_started/quickstart.rst:198 258fa5a433284c249b88643e140a65cb
 msgid ":doc:`../user_guide/log` - Add logging to your application"
 msgstr ":doc:`../user_guide/log` - 为应用程序添加日志"
 
+#: ../../getting_started/quickstart.rst:199 e6487dc55c7149319b2efa8a9c27bc9e
 msgid "Browse example applications in ``applications/`` directory"
 msgstr "浏览 ``applications/`` 目录中的示例应用程序"
+

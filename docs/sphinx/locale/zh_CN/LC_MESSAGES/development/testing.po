@@ -2,75 +2,428 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
 
+#: ../../development/testing.rst:2 c544ed328f584010a6311f3b1b313e28
 msgid "Testing"
 msgstr "测试"
 
-msgid "Overview"
-msgstr "概述"
+#: ../../development/testing.rst:4 0012b3eaa4d943dca295c492b8d03870
+msgid ""
+"Nexus uses Google Test for unit testing and provides comprehensive "
+"testing infrastructure for embedded software development."
+msgstr ""
 
-msgid "This document describes the testing strategy for the Nexus project."
-msgstr "本文档描述 Nexus 项目的测试策略。"
-
+#: ../../development/testing.rst:8 26f4b555440342f0adcbe1ffe24acb47
 msgid "Test Framework"
 msgstr "测试框架"
 
-msgid "Unit Tests"
-msgstr "单元测试"
+#: ../../development/testing.rst:10 6508e341f1a649209fc5397ef4e83112
+msgid "**Unit Testing**: Google Test (gtest)"
+msgstr ""
 
-msgid "Integration Tests"
-msgstr "集成测试"
+#: ../../development/testing.rst:11 572ce92af1fd42c58985e6b674618a74
+msgid "**Mocking**: Google Mock (gmock)"
+msgstr ""
 
-msgid "System Tests"
-msgstr "系统测试"
+#: ../../development/testing.rst:12 4ec4eab0e7a64eee8f0cef42d469be1d
+msgid "**Coverage**: gcov/lcov"
+msgstr ""
 
+#: ../../development/testing.rst:13 0e9d6710e4df421485ed28154712251c
+msgid "**Static Analysis**: MISRA C checker"
+msgstr ""
+
+#: ../../development/testing.rst:16 e16d646f6c49436c996ff4f9cb191c49
+#, fuzzy
+msgid "Building Tests"
+msgstr "编写测试"
+
+#: ../../development/testing.rst:18 8970170d987f480c9997ab26f2be2048
+msgid "Configure and build with tests enabled::"
+msgstr ""
+
+#: ../../development/testing.rst:20 f532c9f4076e4078bc789cc99be11b97
+msgid ""
+"cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\n"
+"cmake --build build --config Release"
+msgstr ""
+
+#: ../../development/testing.rst:24 34403af4408642aebf2c7a23c83ea7af
 msgid "Running Tests"
 msgstr "运行测试"
 
-msgid "All Tests"
+#: ../../development/testing.rst:27 f30908b53ae24b10903ec6ac3afec559
+#, fuzzy
+msgid "Run All Tests"
 msgstr "所有测试"
 
-msgid "Specific Tests"
+#: ../../development/testing.rst:31 6e2ba9c577fc4b52bb704c5ad857587c
+msgid "ctest --test-dir build -C Release --output-on-failure"
+msgstr ""
+
+#: ../../development/testing.rst:34 5ea1a1be1f044797ac999c7ff55ecf60
+#, fuzzy
+msgid "Run Specific Test Suite"
 msgstr "特定测试"
 
-msgid "Test Coverage"
-msgstr "测试覆盖率"
+#: ../../development/testing.rst:38 ef0d3eef41934927baffb455cc7d760d
+msgid "./build/tests/Release/nexus_tests --gtest_filter=\"HalGpioTest.*\""
+msgstr ""
 
+#: ../../development/testing.rst:41 02b3063dfb2e4db7b5f179503bf6eb75
+msgid "Run with Verbose Output"
+msgstr ""
+
+#: ../../development/testing.rst:45 7fbdd48f6b1744dd817432c29723c6d8
+msgid ""
+"./build/tests/Release/nexus_tests --gtest_filter=\"*\" "
+"--gtest_print_time=1"
+msgstr ""
+
+#: ../../development/testing.rst:48 9d2034d75c9948e8b0dde92927be0fd4
+#, fuzzy
+msgid "List Available Tests"
+msgstr "所有测试"
+
+#: ../../development/testing.rst:52 0ad22392bed54405ada2ff1b631f4872
+msgid "./build/tests/Release/nexus_tests --gtest_list_tests"
+msgstr ""
+
+#: ../../development/testing.rst:55 4e0a06cd21a64aafb3a1b39ccabdb195
 msgid "Writing Tests"
 msgstr "编写测试"
 
-msgid "Test Structure"
-msgstr "测试结构"
+#: ../../development/testing.rst:58 872cecbe616f4aec9668ba68fbcd9209
+msgid "Test File Location"
+msgstr ""
 
-msgid "Assertions"
-msgstr "断言"
+#: ../../development/testing.rst:60 11c84ae6dfa047f1adc698fbc7b82085
+msgid ""
+"Place test files in the ``tests/`` directory with the following "
+"structure::"
+msgstr ""
 
-msgid "Mocking"
-msgstr "模拟"
+#: ../../development/testing.rst:62 fb2dc049e0ba4e5e89b787b85efd1c7d
+msgid ""
+"tests/\n"
+"├── hal/\n"
+"│   ├── test_hal_gpio.cpp\n"
+"│   ├── test_hal_uart.cpp\n"
+"│   └── test_hal_spi.cpp\n"
+"├── osal/\n"
+"│   ├── test_osal_task.cpp\n"
+"│   ├── test_osal_mutex.cpp\n"
+"│   └── test_osal_queue.cpp\n"
+"└── framework/\n"
+"    └── log/\n"
+"        └── test_log.cpp"
+msgstr ""
 
-msgid "Fixtures"
-msgstr "测试夹具"
+#: ../../development/testing.rst:76 98f15390d9e54b88b12bd1b4a7accd78
+msgid "Test File Template"
+msgstr ""
 
+#: ../../development/testing.rst:78 bf100158eab943d98f209d28a6114db0
+msgid ""
+"/**\n"
+" * \\file            test_hal_gpio.cpp\n"
+" * \\brief           HAL GPIO unit tests\n"
+" */\n"
+"\n"
+"#include <gtest/gtest.h>\n"
+"\n"
+"extern \"C\" {\n"
+"#include \"hal/hal_gpio.h\"\n"
+"}\n"
+"\n"
+"class HalGpioTest : public ::testing::Test {\n"
+"protected:\n"
+"    void SetUp() override {\n"
+"        /* Initialize test fixtures */\n"
+"    }\n"
+"\n"
+"    void TearDown() override {\n"
+"        /* Clean up test fixtures */\n"
+"    }\n"
+"};\n"
+"\n"
+"TEST_F(HalGpioTest, InitOutput) {\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction   = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull        = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed       = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level  = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"    EXPECT_EQ(HAL_OK, hal_gpio_init(HAL_GPIO_PORT_A, 0, &config));\n"
+"}\n"
+"\n"
+"TEST_F(HalGpioTest, InitNullConfig) {\n"
+"    EXPECT_EQ(HAL_ERROR_NULL_POINTER,\n"
+"              hal_gpio_init(HAL_GPIO_PORT_A, 0, nullptr));\n"
+"}\n"
+"\n"
+"TEST_F(HalGpioTest, WriteOutput) {\n"
+"    /* Setup */\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT\n"
+"    };\n"
+"    hal_gpio_init(HAL_GPIO_PORT_A, 0, &config);\n"
+"\n"
+"    /* Test */\n"
+"    EXPECT_EQ(HAL_OK, hal_gpio_write(HAL_GPIO_PORT_A, 0, "
+"HAL_GPIO_LEVEL_HIGH));\n"
+"}"
+msgstr ""
+
+#: ../../development/testing.rst:130 1fb32145af3d448b800c3d78c91ac4ec
+msgid "Test Naming Convention"
+msgstr ""
+
+#: ../../development/testing.rst:132 8717219c90614ed7a49f54797ba21123
+msgid "Test class: ``ModuleNameTest`` (e.g., ``HalGpioTest``, ``OsalMutexTest``)"
+msgstr ""
+
+#: ../../development/testing.rst:133 3ae6d4cd46054e178886190d06be011a
+msgid "Test case: Descriptive action (e.g., ``InitOutput``, ``WriteInvalidPort``)"
+msgstr ""
+
+#: ../../development/testing.rst:136 aae8d5b000c54d909f90d85ce0a32bad
+#, fuzzy
+msgid "Test Categories"
+msgstr "测试框架"
+
+#: ../../development/testing.rst:138 a856d15b61bc4eb69b8435c1fdcfda62
+msgid "**Positive Tests**: Verify correct behavior with valid inputs"
+msgstr ""
+
+#: ../../development/testing.rst:139 d9206549a5a84709b44a9a6864d909c7
+msgid "**Negative Tests**: Verify error handling with invalid inputs"
+msgstr ""
+
+#: ../../development/testing.rst:140 c5e9d5ee785f4a219d8a158a86ea564f
+msgid "**Boundary Tests**: Test edge cases and limits"
+msgstr ""
+
+#: ../../development/testing.rst:141 e68fb5c984ee47748c8d34a09de1bae2
+msgid "**Integration Tests**: Test component interactions"
+msgstr ""
+
+#: ../../development/testing.rst:144 1156ebd907f14f6cb4045c6c7c660e2b
+#, fuzzy
+msgid "Code Coverage"
+msgstr "测试覆盖率"
+
+#: ../../development/testing.rst:147 a349ad09d3dd46a0949f46362a678b37
+#, fuzzy
+msgid "Enable Coverage"
+msgstr "测试覆盖率"
+
+#: ../../development/testing.rst:151 64b8a6cfd1c14315ba777c96702fa4e5
+msgid ""
+"cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON "
+"-DNEXUS_ENABLE_COVERAGE=ON\n"
+"cmake --build build"
+msgstr ""
+
+#: ../../development/testing.rst:155 bfbbe7a9cd6e4961976b6500b6fd90ae
+msgid "Generate Coverage Report"
+msgstr ""
+
+#: ../../development/testing.rst:159 f443d337b851485fbaca8b84896ef3db
+msgid ""
+"cd build\n"
+"ctest --output-on-failure\n"
+"lcov --capture --directory . --output-file coverage.info\n"
+"lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file "
+"coverage.info\n"
+"genhtml coverage.info --output-directory coverage_report"
+msgstr ""
+
+#: ../../development/testing.rst:166 50768febeaf845b1bbfab7c744f8d6bd
+msgid "Coverage Requirements"
+msgstr ""
+
+#: ../../development/testing.rst:168 a53c5f24e3e24707953ddc76aa4dd1e7
+msgid "Minimum code coverage: **90%**"
+msgstr ""
+
+#: ../../development/testing.rst:169 ef7b532237434d92a38c9689064614da
+msgid "All public APIs must have tests"
+msgstr ""
+
+#: ../../development/testing.rst:170 f261b5c81bc84a40855928eadf8d3fa3
+msgid "All error paths must be tested"
+msgstr ""
+
+#: ../../development/testing.rst:173 98351c5db01f4e37b3f5652346ed82bf
+msgid "Static Analysis"
+msgstr ""
+
+#: ../../development/testing.rst:176 3a0fc8f5caf1462cb275bc01b1dbe32d
+msgid "MISRA C Compliance"
+msgstr ""
+
+#: ../../development/testing.rst:178 12065918ffbc4b68aa74d57bffd20a5c
+msgid "Run MISRA C checker::"
+msgstr ""
+
+#: ../../development/testing.rst:180 e21b57f41dd8434883e95e9739e4be73
+msgid ""
+"# Using cppcheck with MISRA addon\n"
+"cppcheck --addon=misra hal/ osal/ framework/"
+msgstr ""
+
+#: ../../development/testing.rst:184 2e5af01e53f6400bb8b1703002d8c1cd
+msgid "Address Sanitizer"
+msgstr ""
+
+#: ../../development/testing.rst:186 4b620b53d63f43d6990f4c4138567370
+msgid "Build with sanitizers for memory error detection::"
+msgstr ""
+
+#: ../../development/testing.rst:188 bbecbc3783ab4077b9305b89662efaf9
+msgid ""
+"cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON \\\n"
+"      -DCMAKE_C_FLAGS=\"-fsanitize=address -fno-omit-frame-pointer\" \\\n"
+"      -DCMAKE_CXX_FLAGS=\"-fsanitize=address -fno-omit-frame-pointer\""
+msgstr ""
+
+#: ../../development/testing.rst:193 baf166081a9b433bb2b826393350764f
 msgid "Best Practices"
 msgstr "最佳实践"
 
-msgid "CI/CD Integration"
+#: ../../development/testing.rst:195 5e2581ece48541298e24bcd6730cbed7
+msgid ""
+"**Test Independence**: Each test should be independent and not rely on "
+"other tests"
+msgstr ""
+
+#: ../../development/testing.rst:196 c14978f7ec804a28b6751fd786766491
+msgid "**Clear Assertions**: Use descriptive assertion messages"
+msgstr ""
+
+#: ../../development/testing.rst:197 090ce436201c4c86bbece69ff0bd637e
+msgid "**Setup/Teardown**: Use fixtures for common setup and cleanup"
+msgstr ""
+
+#: ../../development/testing.rst:198 0769c8a9974d480d88326139695e36ba
+msgid "**Mock External Dependencies**: Use mocks for hardware and OS dependencies"
+msgstr ""
+
+#: ../../development/testing.rst:199 84530a2696574a16b81a6b704814c6d7
+msgid "**Test Edge Cases**: Include boundary conditions and error cases"
+msgstr ""
+
+#: ../../development/testing.rst:200 3896fb1a7b35488aab029ae6c8de0984
+msgid "**Keep Tests Fast**: Unit tests should run quickly"
+msgstr ""
+
+#: ../../development/testing.rst:201 a7e61071cd4f4db3b019c348b64ce547
+msgid "**Avoid Test Duplication**: Use parameterized tests for similar cases"
+msgstr ""
+
+#: ../../development/testing.rst:204 26ce353726d5433cbd89f69d88b0314b
+msgid "Parameterized Tests"
+msgstr ""
+
+#: ../../development/testing.rst:206 20a3a2ac776045fb82dbdea7a4890234
+msgid ""
+"class HalGpioPortTest : public ::testing::TestWithParam<hal_gpio_port_t> "
+"{};\n"
+"\n"
+"TEST_P(HalGpioPortTest, InitValidPort) {\n"
+"    hal_gpio_port_t port = GetParam();\n"
+"    hal_gpio_config_t config = { .direction = HAL_GPIO_DIR_OUTPUT };\n"
+"    EXPECT_EQ(HAL_OK, hal_gpio_init(port, 0, &config));\n"
+"}\n"
+"\n"
+"INSTANTIATE_TEST_SUITE_P(\n"
+"    AllPorts,\n"
+"    HalGpioPortTest,\n"
+"    ::testing::Values(\n"
+"        HAL_GPIO_PORT_A,\n"
+"        HAL_GPIO_PORT_B,\n"
+"        HAL_GPIO_PORT_C\n"
+"    )\n"
+");"
+msgstr ""
+
+#: ../../development/testing.rst:227 7cfabf99501545468530608d68a45952
+#, fuzzy
+msgid "CI Integration"
 msgstr "CI/CD 集成"
 
-msgid "Hardware-in-the-Loop"
-msgstr "硬件在环"
+#: ../../development/testing.rst:229 81a21355c95b4928a808aec64676c558
+msgid "Tests run automatically on every PR via GitHub Actions:"
+msgstr ""
 
-msgid "Performance Testing"
-msgstr "性能测试"
+#: ../../development/testing.rst:231 f98195c2660e4f02bec8190992d3cd14
+msgid "Multi-platform testing (Windows, Linux, macOS)"
+msgstr ""
 
-msgid "Examples"
-msgstr "示例"
+#: ../../development/testing.rst:232 a39e9d09e6e842b7a244a9fcd15e417b
+msgid "Coverage reporting"
+msgstr ""
 
-msgid "Configuration"
-msgstr "配置"
+#: ../../development/testing.rst:233 fe2637a0b02e47dca0ab34cce10aa639
+msgid "Memory sanitizer checks"
+msgstr ""
 
-msgid "Dependencies"
-msgstr "依赖"
+#: ../../development/testing.rst:234 c2ea529127304d39b529c9c2d14a644e
+msgid "MISRA compliance checks"
+msgstr ""
+
+#~ msgid "Overview"
+#~ msgstr "概述"
+
+#~ msgid "This document describes the testing strategy for the Nexus project."
+#~ msgstr "本文档描述 Nexus 项目的测试策略。"
+
+#~ msgid "Unit Tests"
+#~ msgstr "单元测试"
+
+#~ msgid "Integration Tests"
+#~ msgstr "集成测试"
+
+#~ msgid "System Tests"
+#~ msgstr "系统测试"
+
+#~ msgid "Test Structure"
+#~ msgstr "测试结构"
+
+#~ msgid "Assertions"
+#~ msgstr "断言"
+
+#~ msgid "Mocking"
+#~ msgstr "模拟"
+
+#~ msgid "Fixtures"
+#~ msgstr "测试夹具"
+
+#~ msgid "Hardware-in-the-Loop"
+#~ msgstr "硬件在环"
+
+#~ msgid "Performance Testing"
+#~ msgstr "性能测试"
+
+#~ msgid "Examples"
+#~ msgstr "示例"
+
+#~ msgid "Configuration"
+#~ msgstr "配置"
+
+#~ msgid "Dependencies"
+#~ msgstr "依赖"
+
