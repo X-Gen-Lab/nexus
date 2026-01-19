@@ -49,6 +49,14 @@ add_executable(nexus_tests
     # HAL tests - Integration
     # TODO: Update integration tests to match new HAL interfaces
     # hal/test_nx_integration.cpp
+    # Native platform test helpers
+    hal/native/devices/native_crc_helpers.c
+    hal/native/devices/native_flash_helpers.c
+    hal/native/devices/native_rtc_helpers.c
+    hal/native/devices/native_watchdog_helpers.c
+    hal/native/devices/native_usb_helpers.c
+    hal/native/devices/native_sdio_helpers.c
+    hal/native/devices/native_option_bytes_helpers.c
 )
 
 # Require C++20 for designated initializers
