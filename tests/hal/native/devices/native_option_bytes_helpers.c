@@ -13,7 +13,6 @@
 #include "hal/nx_factory.h"
 #include <string.h>
 
-
 static nx_option_bytes_impl_t* get_option_bytes_impl(uint8_t index) {
     nx_option_bytes_t* opt = nx_factory_option_bytes(index);
     return opt ? (nx_option_bytes_impl_t*)opt : NULL;
@@ -23,7 +22,7 @@ nx_status_t native_option_bytes_get_state(uint8_t index, bool* initialized,
                                           bool* suspended) {
     nx_option_bytes_impl_t* impl = get_option_bytes_impl(index);
     if (!impl || !impl->state)
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     if (initialized)
         *initialized = impl->state->initialized;
     if (suspended)
@@ -35,8 +34,8 @@ nx_status_t native_option_bytes_set_write_protection(uint8_t index,
                                                      bool enabled) {
     nx_option_bytes_impl_t* impl = get_option_bytes_impl(index);
     if (!impl || !impl->state)
-        return NX_ERR_INVALID_ARG;
-    impl->state->write_protected = enabled;
+        return NX_ERR_INVALID_PARAM;
+    impl->state->data.write_protected = enabled;
     return NX_OK;
 }
 
@@ -44,8 +43,8 @@ nx_status_t native_option_bytes_has_pending_changes(uint8_t index,
                                                     bool* has_pending) {
     nx_option_bytes_impl_t* impl = get_option_bytes_impl(index);
     if (!impl || !impl->state || !has_pending)
-        return NX_ERR_INVALID_ARG;
-    *has_pending = impl->state->has_pending_changes;
+        return NX_ERR_INVALID_PARAM;
+    *has_pending = impl->state->pending.pending_changes;
     return NX_OK;
 }
 

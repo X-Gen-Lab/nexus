@@ -44,7 +44,7 @@ nx_status_t native_flash_get_state(uint8_t index, bool* initialized,
                                    bool* suspended) {
     nx_flash_impl_t* impl = get_flash_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     if (initialized != NULL) {
@@ -64,7 +64,7 @@ nx_status_t native_flash_get_state(uint8_t index, bool* initialized,
 nx_status_t native_flash_get_lock_status(uint8_t index, bool* locked) {
     nx_flash_impl_t* impl = get_flash_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     if (locked != NULL) {

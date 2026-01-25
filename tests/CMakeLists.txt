@@ -7,7 +7,10 @@ cmake_minimum_required(VERSION 3.16)
 # Enable testing
 enable_testing()
 
-# Fetch Google Test
+##############################################################################
+# Google Test Setup
+##############################################################################
+
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -22,66 +25,9 @@ FetchContent_MakeAvailable(googletest)
 # Include Google Test
 include(GoogleTest)
 
-# Test executable
-add_executable(nexus_tests
-    test_main.cpp
-    # HAL tests - CRC
-    hal/test_nx_crc.cpp
-    hal/test_nx_crc_properties.cpp
-    # HAL tests - Flash
-    hal/test_nx_flash.cpp
-    hal/test_nx_flash_properties.cpp
-    # HAL tests - RTC
-    hal/test_nx_rtc.cpp
-    hal/test_nx_rtc_properties.cpp
-    # HAL tests - SDIO
-    hal/test_nx_sdio.cpp
-    hal/test_nx_sdio_properties.cpp
-    # HAL tests - USB
-    hal/test_nx_usb.cpp
-    hal/test_nx_usb_properties.cpp
-    # HAL tests - Watchdog
-    hal/test_nx_watchdog.cpp
-    hal/test_nx_watchdog_properties.cpp
-    # HAL tests - Option Bytes
-    hal/test_nx_option_bytes.cpp
-    hal/test_nx_option_bytes_properties.cpp
-    # HAL tests - Integration
-    # TODO: Update integration tests to match new HAL interfaces
-    # hal/test_nx_integration.cpp
-    # Native platform test helpers
-    hal/native/devices/native_crc_helpers.c
-    hal/native/devices/native_flash_helpers.c
-    hal/native/devices/native_rtc_helpers.c
-    hal/native/devices/native_watchdog_helpers.c
-    hal/native/devices/native_usb_helpers.c
-    hal/native/devices/native_sdio_helpers.c
-    hal/native/devices/native_option_bytes_helpers.c
-)
-
-# Require C++20 for designated initializers
-target_compile_features(nexus_tests PRIVATE cxx_std_20)
-
-# Define test mode for startup framework tests
-target_compile_definitions(nexus_tests PRIVATE NX_STARTUP_TEST_MODE)
-
-# MSVC: Enable /FS flag to allow parallel compilation with shared PDB
-if(MSVC)
-    target_compile_options(nexus_tests PRIVATE /FS)
-endif()
-
-target_include_directories(nexus_tests
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/hal/include
-        ${CMAKE_SOURCE_DIR}/osal/include
-        ${CMAKE_SOURCE_DIR}/platforms/native/include
-        ${CMAKE_SOURCE_DIR}/platforms/stm32f4/include
-        ${CMAKE_SOURCE_DIR}/framework/log/include
-        ${CMAKE_SOURCE_DIR}/framework/shell/include
-        ${CMAKE_SOURCE_DIR}/framework/config/include
-        ${CMAKE_SOURCE_DIR}/framework/init/include
-        ${CMAKE_SOURCE_DIR}
-)
+##############################################################################
+# Common Test Configuration
+##############################################################################
 
 # Platform-specific threading libraries
 if(WIN32)
@@ -91,27 +37,50 @@ else()
     set(THREAD_LIBS Threads::Threads)
 endif()
 
-target_link_libraries(nexus_tests
-    PRIVATE
-        GTest::gtest
-        GTest::gmock
-        platform_native
-        hal_interface
-        hal
-        osal
-        log_framework
-        shell_framework
-        config_framework
-        init_framework
-        ${THREAD_LIBS}
+# Common include directories for all tests
+set(NEXUS_TEST_INCLUDES
+    ${CMAKE_SOURCE_DIR}/hal/include
+    ${CMAKE_SOURCE_DIR}/osal/include
+    ${CMAKE_SOURCE_DIR}/platforms/native/include
+    ${CMAKE_SOURCE_DIR}/framework/log/include
+    ${CMAKE_SOURCE_DIR}/framework/shell/include
+    ${CMAKE_SOURCE_DIR}/framework/config/include
+    ${CMAKE_SOURCE_DIR}/framework/init/include
+    ${CMAKE_SOURCE_DIR}
 )
 
-# Discover tests
-gtest_discover_tests(nexus_tests
-    PROPERTIES
-        TIMEOUT 300  # 5 minutes timeout per test
-        LABELS "unit;property;integration"
+# Common link libraries for all tests
+set(NEXUS_TEST_LIBS
+    GTest::gtest
+    GTest::gmock
+    platform_native
+    hal_interface
+    hal
+    osal
+    log_framework
+    shell_framework
+    config_framework
+    init_framework
+    ${THREAD_LIBS}
 )
+
+# Common compile options
+set(NEXUS_TEST_COMPILE_OPTIONS "")
+if(MSVC)
+    list(APPEND NEXUS_TEST_COMPILE_OPTIONS /FS)
+endif()
+
+##############################################################################
+# Test Subdirectories
+##############################################################################
+
+add_subdirectory(hal)
+add_subdirectory(osal)
+add_subdirectory(config)
+add_subdirectory(log)
+add_subdirectory(shell)
+add_subdirectory(init)
+add_subdirectory(integration)
 
 ##############################################################################
 # CTest Configuration

@@ -86,6 +86,8 @@ class ShellCoreTest : public ::testing::Test {
         if (shell_is_initialized()) {
             shell_deinit();
         }
+        /* Clear backend */
+        shell_set_backend(nullptr);
     }
 
     void TearDown() override {
@@ -93,6 +95,7 @@ class ShellCoreTest : public ::testing::Test {
             shell_deinit();
         }
         shell_clear_commands();
+        shell_set_backend(nullptr);
         MockBackend::reset();
     }
 

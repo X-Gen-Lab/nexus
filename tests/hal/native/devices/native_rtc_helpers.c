@@ -16,6 +16,10 @@
 
 #include <string.h>
 
+/* External function to advance simulated time */
+extern void nx_advance_time_ms(uint32_t ms);
+extern void nx_reset_time(void);
+
 /*---------------------------------------------------------------------------*/
 /* Internal Helper                                                           */
 /*---------------------------------------------------------------------------*/
@@ -42,7 +46,7 @@ nx_status_t native_rtc_get_state(uint8_t index, bool* initialized,
                                  bool* suspended) {
     nx_rtc_impl_t* impl = get_rtc_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     if (initialized != NULL) {
@@ -62,15 +66,14 @@ nx_status_t native_rtc_get_state(uint8_t index, bool* initialized,
 nx_status_t native_rtc_advance_time(uint8_t index, uint32_t seconds) {
     nx_rtc_impl_t* impl = get_rtc_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     /* Advance simulated time */
-    extern void nx_advance_time_ms(uint32_t ms);
     nx_advance_time_ms(seconds * 1000);
 
     /* Update RTC time */
-    impl->state->current_time.second += seconds;
+    impl->state->current_time.second += (uint8_t)seconds;
     while (impl->state->current_time.second >= 60) {
         impl->state->current_time.second -= 60;
         impl->state->current_time.minute++;
@@ -89,11 +92,13 @@ nx_status_t native_rtc_advance_time(uint8_t index, uint32_t seconds) {
 
 /**
  * \brief           Check and trigger alarm
+ * \details         Implements one-shot alarm behavior - alarm is automatically
+ *                  disabled after triggering once.
  */
 nx_status_t native_rtc_check_alarm(uint8_t index) {
     nx_rtc_impl_t* impl = get_rtc_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     /* Check if alarm is enabled and should trigger */
@@ -106,6 +111,9 @@ nx_status_t native_rtc_check_alarm(uint8_t index) {
             /* Trigger alarm callback */
             impl->state->alarm.callback(impl->state->alarm.user_data);
             impl->state->stats.alarm_trigger_count++;
+
+            /* Disable alarm after triggering (one-shot behavior) */
+            impl->state->alarm.enabled = false;
         }
     }
 
@@ -129,6 +137,5 @@ void native_rtc_reset_all(void) {
         memset(&impl->state->stats, 0, sizeof(nx_rtc_stats_t));
     }
 
-    extern void nx_reset_time(void);
     nx_reset_time();
 }

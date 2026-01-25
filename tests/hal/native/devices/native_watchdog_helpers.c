@@ -16,6 +16,11 @@
 
 #include <string.h>
 
+/* External functions for time simulation */
+extern uint64_t nx_get_time_ms(void);
+extern void nx_advance_time_ms(uint32_t ms);
+extern void nx_reset_time(void);
+
 /*---------------------------------------------------------------------------*/
 /* Internal Helper - Get Watchdog Implementation                             */
 /*---------------------------------------------------------------------------*/
@@ -44,7 +49,7 @@ nx_status_t native_watchdog_get_state(uint8_t index, bool* initialized,
                                       bool* suspended) {
     nx_watchdog_impl_t* impl = get_watchdog_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     if (initialized != NULL) {
@@ -73,7 +78,7 @@ bool native_watchdog_has_timed_out(uint8_t index) {
     }
 
     /* Get current time (simulated) */
-    extern uint64_t nx_get_time_ms(void);
+
     uint64_t current_time = nx_get_time_ms();
 
     /* Check if timeout has occurred */
@@ -87,27 +92,31 @@ bool native_watchdog_has_timed_out(uint8_t index) {
 nx_status_t native_watchdog_advance_time(uint8_t index, uint32_t milliseconds) {
     nx_watchdog_impl_t* impl = get_watchdog_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
+    }
+
+    /* Check if timeout will occur during this time advance */
+    bool was_timed_out = false;
+    if (impl->state->running) {
+        uint64_t current_time = nx_get_time_ms();
+        uint64_t elapsed_before = current_time - impl->state->last_feed_time_ms;
+        was_timed_out = (elapsed_before >= impl->state->config.timeout_ms);
     }
 
     /* Advance simulated time */
-    extern void nx_advance_time_ms(uint32_t ms);
     nx_advance_time_ms(milliseconds);
 
     /* Check if timeout occurred and invoke callback if needed */
     if (impl->state->running && impl->state->callback != NULL) {
-        uint64_t elapsed = 0;
-        extern uint64_t nx_get_time_ms(void);
         uint64_t current_time = nx_get_time_ms();
-        elapsed = current_time - impl->state->last_feed_time_ms;
+        uint64_t elapsed_after = current_time - impl->state->last_feed_time_ms;
+        bool is_timed_out = (elapsed_after >= impl->state->config.timeout_ms);
 
-        if (elapsed >= impl->state->config.timeout_ms) {
-            /* Invoke callback once */
-            if (impl->state->stats.timeout_count == 0 ||
-                elapsed < impl->state->config.timeout_ms + milliseconds) {
-                impl->state->callback(impl->state->user_data);
-                impl->state->stats.timeout_count++;
-            }
+        /* Invoke callback only once when transitioning from not-timed-out to
+         * timed-out */
+        if (is_timed_out && !was_timed_out) {
+            impl->state->callback(impl->state->user_data);
+            impl->state->stats.timeout_count++;
         }
     }
 
@@ -138,6 +147,6 @@ void native_watchdog_reset_all(void) {
     }
 
     /* Reset simulated time */
-    extern void nx_reset_time(void);
+
     nx_reset_time();
 }

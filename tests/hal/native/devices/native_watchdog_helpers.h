@@ -46,6 +46,11 @@ bool native_watchdog_has_timed_out(uint8_t index);
  */
 nx_status_t native_watchdog_advance_time(uint8_t index, uint32_t milliseconds);
 
+/**
+ * \brief           Reset all Watchdog instances to initial state
+ */
+void native_watchdog_reset_all(void);
+
 /*---------------------------------------------------------------------------*/
 /* Usage Example                                                             */
 /*---------------------------------------------------------------------------*/

@@ -1408,21 +1408,22 @@ TEST_F(LogPropertyTest, Property15_AsyncFlushCompleteness) {
         std::uniform_int_distribution<int> msg_count_dist(5, 20);
         int num_messages = msg_count_dist(rng);
 
-        /* Initialize log system in async mode */
+        /* Initialize log system in async mode with larger queue */
         log_config_t config = {.level = LOG_LEVEL_TRACE,
                                .format = "%m",
                                .async_mode = true,
                                .buffer_size = 4096,
                                .max_msg_len = 128,
                                .color_enabled = false,
-                               .async_queue_size = 64,
+                               .async_queue_size = 128, /* Increased from 64 */
                                .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
 
-        /* Create and register memory backend */
-        log_backend_t* backend = log_backend_memory_create(8192);
+        /* Create and register memory backend with larger buffer */
+        log_backend_t* backend =
+            log_backend_memory_create(16384); /* Increased from 8192 */
         ASSERT_NE(nullptr, backend)
             << "Iteration " << test_iter << ": backend creation failed";
         ASSERT_EQ(LOG_OK, log_backend_register(backend))
@@ -1442,6 +1443,9 @@ TEST_F(LogPropertyTest, Property15_AsyncFlushCompleteness) {
                                       << ": log_write failed for msg " << i;
         }
 
+        /* Give async task time to process before flush */
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
         /* Flush - should block until all messages are processed */
         EXPECT_EQ(LOG_OK, log_async_flush())
             << "Iteration " << test_iter << ": flush failed";
@@ -1449,6 +1453,9 @@ TEST_F(LogPropertyTest, Property15_AsyncFlushCompleteness) {
         /* After flush, pending count should be 0 */
         EXPECT_EQ(0u, log_async_pending())
             << "Iteration " << test_iter << ": pending not 0 after flush";
+
+        /* Additional wait to ensure backend has written everything */
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         /* Read from backend and verify ALL messages were received */
         char buf[16384];

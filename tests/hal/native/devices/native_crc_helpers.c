@@ -45,7 +45,7 @@ nx_status_t native_crc_get_state(uint8_t index, bool* initialized,
                                  bool* suspended) {
     nx_crc_impl_t* impl = get_crc_impl(index);
     if (impl == NULL || impl->state == NULL) {
-        return NX_ERR_INVALID_ARG;
+        return NX_ERR_INVALID_PARAM;
     }
 
     if (initialized != NULL) {
