@@ -41,6 +41,7 @@ typedef struct nx_device_s nx_device_t;
 typedef enum {
     NX_CRC_ALGO_CRC32 = 0, /**< CRC-32 (IEEE 802.3) */
     NX_CRC_ALGO_CRC16,     /**< CRC-16 (CCITT) */
+    NX_CRC_ALGO_CRC8,      /**< CRC-8 */
 } nx_crc_algo_t;
 
 /*---------------------------------------------------------------------------*/
@@ -53,7 +54,7 @@ typedef enum {
  * Contains compile-time configuration from Kconfig.
  */
 typedef struct nx_crc_platform_config_s {
-    uint8_t index;           /**< CRC instance index */
+    uint8_t crc_index;       /**< CRC instance index */
     nx_crc_algo_t algorithm; /**< Default CRC algorithm */
     uint32_t polynomial;     /**< CRC polynomial */
     uint32_t init_value;     /**< Initial CRC value */

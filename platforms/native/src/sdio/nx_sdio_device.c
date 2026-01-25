@@ -13,11 +13,20 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/nx_status.h"
+#include "hal/system/nx_mem.h"
+#include "nexus_config.h"
 #include "nx_sdio_helpers.h"
 #include "nx_sdio_types.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/*---------------------------------------------------------------------------*/
+/* Configuration                                                             */
+/*---------------------------------------------------------------------------*/
+
+#define DEVICE_TYPE NX_SDIO
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -52,47 +61,57 @@ static nx_lifecycle_t* sdio_get_lifecycle(nx_sdio_t* self);
 static nx_power_t* sdio_get_power(nx_sdio_t* self);
 
 /*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-/* SDIO instances */
-static nx_sdio_impl_t g_sdio_instances[4];
-static nx_sdio_state_t g_sdio_states[4];
-static nx_sdio_block_t g_sdio_blocks[4][NX_SDIO_NUM_BLOCKS];
-
-/* Instance count */
-static uint8_t g_sdio_instance_count = 0;
-
-/*---------------------------------------------------------------------------*/
 /* Device Initialization                                                     */
 /*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Initialize SDIO device
+ * \brief           Device initialization function for Kconfig registration
  */
-nx_status_t nx_sdio_device_init(const nx_sdio_platform_config_t* config) {
-    if (!config) {
-        return NX_ERR_NULL_PTR;
+static void* nx_sdio_device_init(const nx_device_t* dev) {
+    const nx_sdio_platform_config_t* config =
+        (const nx_sdio_platform_config_t*)dev->config;
+
+    if (config == NULL) {
+        return NULL;
     }
 
-    if (config->index >= 4) {
-        return NX_ERR_INVALID_PARAM;
+    /* Allocate implementation structure */
+    nx_sdio_impl_t* impl =
+        (nx_sdio_impl_t*)nx_mem_alloc(sizeof(nx_sdio_impl_t));
+    if (!impl) {
+        return NULL;
     }
+    memset(impl, 0, sizeof(nx_sdio_impl_t));
 
-    nx_sdio_impl_t* impl = &g_sdio_instances[config->index];
-    nx_sdio_state_t* state = &g_sdio_states[config->index];
+    /* Allocate state structure */
+    nx_sdio_state_t* state =
+        (nx_sdio_state_t*)nx_mem_alloc(sizeof(nx_sdio_state_t));
+    if (!state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
+    memset(state, 0, sizeof(nx_sdio_state_t));
+
+    /* Allocate blocks */
+    nx_sdio_block_t* blocks = (nx_sdio_block_t*)nx_mem_alloc(
+        sizeof(nx_sdio_block_t) * config->num_blocks);
+    if (!blocks) {
+        nx_mem_free(state);
+        nx_mem_free(impl);
+        return NULL;
+    }
+    memset(blocks, 0, sizeof(nx_sdio_block_t) * config->num_blocks);
 
     /* Initialize state */
-    memset(state, 0, sizeof(nx_sdio_state_t));
-    state->index = config->index;
+    state->index = config->sdio_index;
     state->card_present = config->card_present;
-    state->blocks = g_sdio_blocks[config->index];
+    state->blocks = blocks;
     state->initialized = false;
     state->suspended = false;
 
-    /* Initialize configuration with defaults */
-    state->config.clock_speed = 25000000; /* 25 MHz */
-    state->config.bus_width = 4;          /* 4-bit bus */
+    /* Initialize configuration from platform config */
+    state->config.clock_speed = config->clock_speed;
+    state->config.bus_width = config->bus_width;
 
     /* Initialize lifecycle interface */
     impl->lifecycle.init = sdio_lifecycle_init;
@@ -117,12 +136,12 @@ nx_status_t nx_sdio_device_init(const nx_sdio_platform_config_t* config) {
     impl->base.get_lifecycle = sdio_get_lifecycle;
     impl->base.get_power = sdio_get_power;
 
-    /* Link state */
+    /* Link state and device */
     impl->state = state;
-    impl->device = NULL;
+    impl->device = (nx_device_t*)dev;
 
-    g_sdio_instance_count++;
-    return NX_OK;
+    /* Device is created but not initialized - tests will call init() */
+    return &impl->base;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -141,16 +160,20 @@ static nx_status_t sdio_lifecycle_init(nx_lifecycle_t* self) {
         (nx_sdio_impl_t*)((char*)self - offsetof(nx_sdio_impl_t, lifecycle));
     nx_sdio_state_t* state = impl->state;
 
+    /* Check if already initialized */
     if (state->initialized) {
         return NX_ERR_ALREADY_INIT;
     }
 
-    /* Initialize card if present */
-    if (state->card_present) {
-        nx_status_t status = sdio_init_card(state);
-        if (status != NX_OK) {
-            return status;
-        }
+    /* Check if card is present before initializing */
+    if (!state->card_present) {
+        return NX_ERR_INVALID_STATE;
+    }
+
+    /* Initialize card */
+    nx_status_t status = sdio_init_card(state);
+    if (status != NX_OK) {
+        return status;
     }
 
     state->initialized = true;
@@ -380,3 +403,38 @@ static nx_power_t* sdio_get_power(nx_sdio_t* self) {
     nx_sdio_impl_t* impl = sdio_get_impl(self);
     return impl ? &impl->power : NULL;
 }
+
+/*---------------------------------------------------------------------------*/
+/* Device Registration                                                       */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Configuration macro - reads from Kconfig
+ */
+#define NX_SDIO_CONFIG(index)                                                  \
+    static const nx_sdio_platform_config_t sdio_config_##index = {             \
+        .sdio_index = index,                                                   \
+        .bus_width = NX_CONFIG_SDIO##index##_BUS_WIDTH_VALUE,                  \
+        .clock_speed = NX_CONFIG_SDIO##index##_CLOCK_SPEED,                    \
+        .block_size = NX_CONFIG_SDIO##index##_BLOCK_SIZE,                      \
+        .num_blocks = NX_CONFIG_SDIO##index##_NUM_BLOCKS,                      \
+        .card_present = NX_CONFIG_SDIO##index##_CARD_PRESENT,                  \
+    }
+
+/**
+ * \brief           Device registration macro
+ */
+#define NX_SDIO_DEVICE_REGISTER(index)                                         \
+    NX_SDIO_CONFIG(index);                                                     \
+    static nx_device_config_state_t sdio_kconfig_state_##index = {             \
+        .init_res = 0,                                                         \
+        .initialized = false,                                                  \
+    };                                                                         \
+    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "SDIO" #index,                      \
+                       &sdio_config_##index, &sdio_kconfig_state_##index,      \
+                       nx_sdio_device_init);
+
+/**
+ * \brief           Register all enabled SDIO instances
+ */
+NX_TRAVERSE_EACH_INSTANCE(NX_SDIO_DEVICE_REGISTER, DEVICE_TYPE);

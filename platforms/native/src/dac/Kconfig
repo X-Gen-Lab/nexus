@@ -1,6 +1,6 @@
 # DAC Configuration for Native Platform
 
-config DAC_NATIVE
+config NATIVE_DAC_ENABLE
     bool "Enable DAC support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,20 +9,13 @@ config DAC_NATIVE
       This provides simulated DAC functionality for testing
       and development on PC.
 
-if DAC_NATIVE
-
-config DAC_MAX_INSTANCES
-    int "Maximum number of DAC instances"
-    default 4
-    range 1 8
-    help
-      Maximum number of DAC instances supported by the
-      Native platform.
+if NATIVE_DAC_ENABLE
 
 # DAC0 Configuration
-config INSTANCE_NX_DAC_0
+menuconfig INSTANCE_NX_DAC_0
     bool "Enable DAC0"
     default y
+    depends on NATIVE_DAC_ENABLE
     help
       Enable DAC instance 0.
 
@@ -35,12 +28,38 @@ config DAC0_CHANNEL_COUNT
     help
       Number of DAC channels for DAC0.
 
+choice
+    prompt "DAC0 resolution"
+    default NX_DAC0_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_DAC_0
+
+config NX_DAC0_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_DAC0_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_DAC0_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_DAC0_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config DAC0_RESOLUTION_VALUE
+    int
+    default 0 if NX_DAC0_RESOLUTION_BIT_8
+    default 1 if NX_DAC0_RESOLUTION_BIT_10
+    default 2 if NX_DAC0_RESOLUTION_BIT_12
+    default 3 if NX_DAC0_RESOLUTION_BIT_16
+
 config DAC0_RESOLUTION
-    int "DAC0 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      DAC resolution for DAC0 in bits.
+    int
+    default 8 if NX_DAC0_RESOLUTION_BIT_8
+    default 10 if NX_DAC0_RESOLUTION_BIT_10
+    default 12 if NX_DAC0_RESOLUTION_BIT_12
+    default 16 if NX_DAC0_RESOLUTION_BIT_16
 
 config DAC0_VREF_MV
     int "DAC0 reference voltage (mV)"
@@ -49,12 +68,35 @@ config DAC0_VREF_MV
     help
       Reference voltage for DAC0 in millivolts.
 
+choice
+    prompt "DAC0 trigger mode"
+    default NX_DAC0_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_DAC_0
+
+config NX_DAC0_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_DAC0_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_DAC0_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config DAC0_TRIGGER_VALUE
+    int
+    default 0 if NX_DAC0_TRIGGER_SOFTWARE
+    default 1 if NX_DAC0_TRIGGER_TIMER
+    default 2 if NX_DAC0_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_DAC_0
 
 # DAC1 Configuration
-config INSTANCE_NX_DAC_1
+menuconfig INSTANCE_NX_DAC_1
     bool "Enable DAC1"
     default n
+    depends on NATIVE_DAC_ENABLE
     help
       Enable DAC instance 1.
 
@@ -67,12 +109,38 @@ config DAC1_CHANNEL_COUNT
     help
       Number of DAC channels for DAC1.
 
+choice
+    prompt "DAC1 resolution"
+    default NX_DAC1_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_DAC_1
+
+config NX_DAC1_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_DAC1_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_DAC1_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_DAC1_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config DAC1_RESOLUTION_VALUE
+    int
+    default 0 if NX_DAC1_RESOLUTION_BIT_8
+    default 1 if NX_DAC1_RESOLUTION_BIT_10
+    default 2 if NX_DAC1_RESOLUTION_BIT_12
+    default 3 if NX_DAC1_RESOLUTION_BIT_16
+
 config DAC1_RESOLUTION
-    int "DAC1 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      DAC resolution for DAC1 in bits.
+    int
+    default 8 if NX_DAC1_RESOLUTION_BIT_8
+    default 10 if NX_DAC1_RESOLUTION_BIT_10
+    default 12 if NX_DAC1_RESOLUTION_BIT_12
+    default 16 if NX_DAC1_RESOLUTION_BIT_16
 
 config DAC1_VREF_MV
     int "DAC1 reference voltage (mV)"
@@ -81,12 +149,35 @@ config DAC1_VREF_MV
     help
       Reference voltage for DAC1 in millivolts.
 
+choice
+    prompt "DAC1 trigger mode"
+    default NX_DAC1_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_DAC_1
+
+config NX_DAC1_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_DAC1_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_DAC1_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config DAC1_TRIGGER_VALUE
+    int
+    default 0 if NX_DAC1_TRIGGER_SOFTWARE
+    default 1 if NX_DAC1_TRIGGER_TIMER
+    default 2 if NX_DAC1_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_DAC_1
 
 # DAC2 Configuration
-config INSTANCE_NX_DAC_2
+menuconfig INSTANCE_NX_DAC_2
     bool "Enable DAC2"
     default n
+    depends on NATIVE_DAC_ENABLE
     help
       Enable DAC instance 2.
 
@@ -99,12 +190,38 @@ config DAC2_CHANNEL_COUNT
     help
       Number of DAC channels for DAC2.
 
+choice
+    prompt "DAC2 resolution"
+    default NX_DAC2_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_DAC_2
+
+config NX_DAC2_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_DAC2_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_DAC2_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_DAC2_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config DAC2_RESOLUTION_VALUE
+    int
+    default 0 if NX_DAC2_RESOLUTION_BIT_8
+    default 1 if NX_DAC2_RESOLUTION_BIT_10
+    default 2 if NX_DAC2_RESOLUTION_BIT_12
+    default 3 if NX_DAC2_RESOLUTION_BIT_16
+
 config DAC2_RESOLUTION
-    int "DAC2 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      DAC resolution for DAC2 in bits.
+    int
+    default 8 if NX_DAC2_RESOLUTION_BIT_8
+    default 10 if NX_DAC2_RESOLUTION_BIT_10
+    default 12 if NX_DAC2_RESOLUTION_BIT_12
+    default 16 if NX_DAC2_RESOLUTION_BIT_16
 
 config DAC2_VREF_MV
     int "DAC2 reference voltage (mV)"
@@ -113,12 +230,35 @@ config DAC2_VREF_MV
     help
       Reference voltage for DAC2 in millivolts.
 
+choice
+    prompt "DAC2 trigger mode"
+    default NX_DAC2_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_DAC_2
+
+config NX_DAC2_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_DAC2_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_DAC2_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config DAC2_TRIGGER_VALUE
+    int
+    default 0 if NX_DAC2_TRIGGER_SOFTWARE
+    default 1 if NX_DAC2_TRIGGER_TIMER
+    default 2 if NX_DAC2_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_DAC_2
 
 # DAC3 Configuration
-config INSTANCE_NX_DAC_3
+menuconfig INSTANCE_NX_DAC_3
     bool "Enable DAC3"
     default n
+    depends on NATIVE_DAC_ENABLE
     help
       Enable DAC instance 3.
 
@@ -131,12 +271,38 @@ config DAC3_CHANNEL_COUNT
     help
       Number of DAC channels for DAC3.
 
+choice
+    prompt "DAC3 resolution"
+    default NX_DAC3_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_DAC_3
+
+config NX_DAC3_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_DAC3_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_DAC3_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_DAC3_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config DAC3_RESOLUTION_VALUE
+    int
+    default 0 if NX_DAC3_RESOLUTION_BIT_8
+    default 1 if NX_DAC3_RESOLUTION_BIT_10
+    default 2 if NX_DAC3_RESOLUTION_BIT_12
+    default 3 if NX_DAC3_RESOLUTION_BIT_16
+
 config DAC3_RESOLUTION
-    int "DAC3 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      DAC resolution for DAC3 in bits.
+    int
+    default 8 if NX_DAC3_RESOLUTION_BIT_8
+    default 10 if NX_DAC3_RESOLUTION_BIT_10
+    default 12 if NX_DAC3_RESOLUTION_BIT_12
+    default 16 if NX_DAC3_RESOLUTION_BIT_16
 
 config DAC3_VREF_MV
     int "DAC3 reference voltage (mV)"
@@ -145,6 +311,28 @@ config DAC3_VREF_MV
     help
       Reference voltage for DAC3 in millivolts.
 
+choice
+    prompt "DAC3 trigger mode"
+    default NX_DAC3_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_DAC_3
+
+config NX_DAC3_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_DAC3_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_DAC3_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config DAC3_TRIGGER_VALUE
+    int
+    default 0 if NX_DAC3_TRIGGER_SOFTWARE
+    default 1 if NX_DAC3_TRIGGER_TIMER
+    default 2 if NX_DAC3_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_DAC_3
 
-endif # DAC_NATIVE
+endif # NATIVE_DAC_ENABLE

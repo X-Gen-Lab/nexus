@@ -105,6 +105,11 @@ static nx_status_t gpio_lifecycle_suspend(nx_lifecycle_t* self) {
         return NX_ERR_NOT_INIT;
     }
 
+    /* Check if already suspended */
+    if (impl->state->suspended) {
+        return NX_ERR_INVALID_STATE;
+    }
+
     /* Mark as suspended */
     impl->state->suspended = true;
 
@@ -128,6 +133,11 @@ static nx_status_t gpio_lifecycle_resume(nx_lifecycle_t* self) {
     /* Check if initialized */
     if (!impl->state->initialized) {
         return NX_ERR_NOT_INIT;
+    }
+
+    /* Check if not suspended */
+    if (!impl->state->suspended) {
+        return NX_ERR_INVALID_STATE;
     }
 
     /* Mark as resumed */

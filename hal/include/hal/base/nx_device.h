@@ -27,8 +27,8 @@ extern "C" {
 /**
  * \brief           Concatenate two tokens
  */
-#define _NX_CONCAT(a, b) a##b
-#define NX_CONCAT(a, b)  _NX_CONCAT(a, b)
+#define _NX_CONCAT(a, ...) a##__VA_ARGS__
+#define NX_CONCAT(a, ...)  _NX_CONCAT(a, __VA_ARGS__)
 
 /*---------------------------------------------------------------------------*/
 /* Device State Structure                                                    */
@@ -40,6 +40,7 @@ extern "C" {
 typedef struct nx_device_config_state_s {
     uint8_t init_res; /**< Initialization result */
     bool initialized; /**< Initialization flag */
+    void* api;        /**< Cached API pointer */
 } nx_device_config_state_t;
 
 /*---------------------------------------------------------------------------*/
@@ -58,7 +59,6 @@ typedef struct nx_device_s {
     const void* config;                                  /**< Device config */
     struct nx_device_config_state_s* state;              /**< Device state */
     void* (*device_init)(const struct nx_device_s* dev); /**< Init fn */
-    void* api;                                           /**< Cached API ptr */
 } nx_device_t;
 
 /*---------------------------------------------------------------------------*/
@@ -84,16 +84,14 @@ typedef struct nx_device_s {
  * \endcode
  */
 #if defined(_MSC_VER)
-/* MSVC: __declspec must come after storage class specifier */
+/* MSVC: Devices are not static so they can be manually registered */
 #define NX_DEVICE_REGISTER(device_type, index, device_name, device_config,     \
                            device_state, init)                                 \
-    static NX_ALIGNED(sizeof(void*)) const nx_device_t NX_CONCAT(device_type,  \
-                                                                 index) = {    \
+    const nx_device_t NX_CONCAT(device_type, index) = {                        \
         .name = device_name,                                                   \
         .config = device_config,                                               \
         .state = device_state,                                                 \
         .device_init = init,                                                   \
-        .api = NULL,                                                           \
     }
 #else
 /* GCC/Clang style attributes */
@@ -106,7 +104,6 @@ typedef struct nx_device_s {
             .config = device_config,                                           \
             .state = device_state,                                             \
             .device_init = init,                                               \
-            .api = NULL,                                                       \
     }
 #endif
 
@@ -132,7 +129,7 @@ typedef struct nx_device_s {
  * \endcode
  */
 #define NX_TRAVERSE_EACH_INSTANCE(fn, device_type)                             \
-    NX_CONCAT(NX_DEFINE_INSTANCE_, device_type(fn))
+    NX_CONCAT(NX_DEFINE_INSTANCE_, device_type)(fn)
 
 /*---------------------------------------------------------------------------*/
 /* Device Lookup Functions                                                   */
@@ -162,6 +159,31 @@ void* nx_device_init(const nx_device_t* dev);
  * \note            This is a convenience function combining find and init
  */
 void* nx_device_get(const char* name);
+
+/*---------------------------------------------------------------------------*/
+/* Manual Registration (for MSVC and testing)                                */
+/*---------------------------------------------------------------------------*/
+
+#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
+    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
+
+/**
+ * \brief           Manually register a device
+ * \param[in]       dev: Device descriptor pointer
+ * \return          NX_OK on success, error code otherwise
+ * \note            Only available on platforms without linker section support
+ *                  This function is not thread-safe
+ */
+nx_status_t nx_device_register(const nx_device_t* dev);
+
+/**
+ * \brief           Clear all manually registered devices
+ * \note            Useful for test cleanup
+ *                  This function is not thread-safe
+ */
+void nx_device_clear_all(void);
+
+#endif
 
 #ifdef __cplusplus
 }

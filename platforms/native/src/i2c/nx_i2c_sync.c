@@ -72,7 +72,10 @@ static nx_status_t tx_rx_sync_transfer(nx_tx_rx_sync_t* self,
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
     }
-    if (!tx_data || !rx_data || !rx_len) {
+    if (!rx_data || !rx_len) {
+        return NX_ERR_NULL_PTR;
+    }
+    if (tx_len > 0 && !tx_data) {
         return NX_ERR_NULL_PTR;
     }
 
@@ -84,35 +87,46 @@ static nx_status_t tx_rx_sync_transfer(nx_tx_rx_sync_t* self,
     (void)timeout_ms; /* Ignore timeout in simulation */
 
     /* Simulate: write TX data to buffer */
-    size_t written = i2c_buffer_write(&impl->state->tx_buf, tx_data, tx_len);
-    if (written < tx_len) {
-        return NX_ERR_FULL;
+    if (tx_len > 0) {
+        size_t written =
+            i2c_buffer_write(&impl->state->tx_buf, tx_data, tx_len);
+        if (written < tx_len) {
+            return NX_ERR_FULL;
+        }
     }
 
-    /* Simulate: read RX data from buffer (echo back for simulation) */
+    /* Simulate: read RX data from buffer */
     size_t max_rx = *rx_len;
-    size_t actual_rx = (tx_len < max_rx) ? tx_len : max_rx;
-
     size_t available = i2c_buffer_get_count(&impl->state->rx_buf);
-    if (available >= actual_rx) {
+
+    if (available > 0) {
+        /* Read available data from RX buffer */
+        size_t to_read = (available < max_rx) ? available : max_rx;
         size_t read_count =
-            i2c_buffer_read(&impl->state->rx_buf, rx_data, actual_rx);
-        if (read_count < actual_rx) {
-            *rx_len = read_count;
-            return NX_ERR_TIMEOUT;
-        }
+            i2c_buffer_read(&impl->state->rx_buf, rx_data, to_read);
         *rx_len = read_count;
-    } else {
+        /* Note: rx_count already updated by inject function, don't update again
+         */
+    } else if (tx_len > 0 && max_rx > 0) {
         /* If no data in RX buffer, echo TX data for simulation */
-        for (size_t i = 0; i < actual_rx; i++) {
+        size_t echo_len = (tx_len < max_rx) ? tx_len : max_rx;
+        for (size_t i = 0; i < echo_len; i++) {
             rx_data[i] = tx_data[i];
         }
-        *rx_len = actual_rx;
+        *rx_len = echo_len;
+        /* Update rx_count for echoed data */
+        impl->state->stats.rx_count += (uint32_t)echo_len;
+    } else {
+        /* No TX data and no RX data available */
+        *rx_len = 0;
+        /* If this was a receive-only operation (tx_len == 0), return timeout */
+        if (tx_len == 0 && max_rx > 0) {
+            return NX_ERR_TIMEOUT;
+        }
     }
 
-    /* Update statistics */
+    /* Update TX statistics */
     impl->state->stats.tx_count += (uint32_t)tx_len;
-    impl->state->stats.rx_count += (uint32_t)(*rx_len);
 
     return NX_OK;
 }

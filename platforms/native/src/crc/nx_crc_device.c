@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_crc.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_crc_helpers.h"
 #include "nx_crc_types.h"
@@ -24,16 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_CRC_MAX_INSTANCES 4
-#define DEVICE_TYPE          NX_CRC
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_crc_state_t g_crc_states[NX_CRC_MAX_INSTANCES];
-static nx_crc_impl_t g_crc_instances[NX_CRC_MAX_INSTANCES];
-static uint8_t g_crc_instance_count = 0;
+#define DEVICE_TYPE NX_CRC
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -58,8 +50,13 @@ static void crc_init_instance(nx_crc_impl_t* impl, uint8_t index,
     crc_init_lifecycle(&impl->lifecycle);
     crc_init_power(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_crc_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_crc_state_t*)nx_mem_alloc(sizeof(nx_crc_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_crc_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -73,9 +70,6 @@ static void crc_init_instance(nx_crc_impl_t* impl, uint8_t index,
         impl->state->config.final_xor = platform_cfg->final_xor;
         impl->state->current_crc = platform_cfg->init_value;
     }
-
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_crc_stats_t));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -89,45 +83,62 @@ static void* nx_crc_device_init(const nx_device_t* dev) {
     const nx_crc_platform_config_t* config =
         (const nx_crc_platform_config_t*)dev->config;
 
-    if (config == NULL || g_crc_instance_count >= NX_CRC_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    uint8_t index = g_crc_instance_count++;
-    nx_crc_impl_t* impl = &g_crc_instances[index];
+    /* Allocate implementation structure */
+    nx_crc_impl_t* impl = (nx_crc_impl_t*)nx_mem_alloc(sizeof(nx_crc_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_crc_impl_t));
 
     /* Initialize instance with platform configuration */
-    crc_init_instance(impl, index, config);
+    crc_init_instance(impl, config->crc_index, config);
+
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
 
     /* Store device pointer */
     impl->device = (nx_device_t*)dev;
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
-/* Register all enabled CRC instances */
-/* TODO: Fix MSVC compilation issue with NX_DEVICE_REGISTER macro */
-/*
-#if defined(NX_CONFIG_INSTANCE_NX_CRC0)
-static const nx_crc_platform_config_t crc_config_0 = {
-    .index = 0,
-    .algorithm =
-        NX_CONFIG_CRC0_ALGORITHM_CRC32 ? NX_CRC_ALGO_CRC32 : NX_CRC_ALGO_CRC16,
-    .polynomial = NX_CONFIG_CRC0_POLYNOMIAL,
-    .init_value = NX_CONFIG_CRC0_INIT_VALUE,
-    .final_xor = NX_CONFIG_CRC0_FINAL_XOR,
-};
-static nx_device_config_state_t crc_kconfig_state_0 = {
-    .init_res = 0,
-    .initialized = false,
-};
-NX_DEVICE_REGISTER(DEVICE_TYPE, 0, "CRC0", &crc_config_0, &crc_kconfig_state_0,
-                   nx_crc_device_init);
-#endif
-*/
+/**
+ * \brief           Configuration macro - reads from Kconfig
+ */
+#define NX_CRC_CONFIG(index)                                                   \
+    static const nx_crc_platform_config_t crc_config_##index = {               \
+        .crc_index = index,                                                    \
+        .algorithm = NX_CONFIG_NX_CRC##index##_ALGORITHM_VALUE == 0            \
+                         ? NX_CRC_ALGO_CRC32                                   \
+                         : (NX_CONFIG_NX_CRC##index##_ALGORITHM_VALUE == 1     \
+                                ? NX_CRC_ALGO_CRC16                            \
+                                : NX_CRC_ALGO_CRC8),                           \
+        .polynomial = NX_CONFIG_NX_CRC##index##_POLYNOMIAL,                    \
+        .init_value = NX_CONFIG_NX_CRC##index##_INIT_VALUE,                    \
+        .final_xor = NX_CONFIG_NX_CRC##index##_FINAL_XOR,                      \
+    }
+
+/**
+ * \brief           Device registration macro
+ */
+#define NX_CRC_DEVICE_REGISTER(index)                                          \
+    NX_CRC_CONFIG(index);                                                      \
+    static nx_device_config_state_t crc_kconfig_state_##index = {              \
+        .init_res = 0,                                                         \
+        .initialized = false,                                                  \
+    };                                                                         \
+    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "CRC" #index, &crc_config_##index,  \
+                       &crc_kconfig_state_##index, nx_crc_device_init);
+
+/**
+ * \brief           Register all enabled CRC instances
+ */
+NX_TRAVERSE_EACH_INSTANCE(NX_CRC_DEVICE_REGISTER, DEVICE_TYPE);

@@ -42,12 +42,12 @@ typedef struct nx_device_s nx_device_t;
  * Contains compile-time configuration from Kconfig.
  */
 typedef struct nx_gpio_platform_config_s {
-    uint8_t port;          /**< GPIO port (A=0, B=1, etc.) */
-    uint8_t pin;           /**< GPIO pin number (0-15) */
-    nx_gpio_mode_t mode;   /**< GPIO mode */
-    nx_gpio_pull_t pull;   /**< Pull-up/pull-down configuration */
-    nx_gpio_speed_t speed; /**< GPIO speed */
-    uint8_t af;            /**< Alternate function number */
+    uint8_t port;  /**< GPIO port (A=0, B=1, etc.) */
+    uint8_t pin;   /**< GPIO pin number (0-15) */
+    uint8_t mode;  /**< GPIO mode */
+    uint8_t pull;  /**< Pull-up/pull-down configuration */
+    uint8_t speed; /**< GPIO speed */
+    uint8_t af;    /**< Alternate function number */
 } nx_gpio_platform_config_t;
 
 /*---------------------------------------------------------------------------*/
@@ -58,12 +58,12 @@ typedef struct nx_gpio_platform_config_s {
  * \brief           GPIO runtime configuration structure
  */
 typedef struct nx_gpio_config_s {
-    uint8_t port;          /**< GPIO port (A=0, B=1, etc.) */
-    uint8_t pin;           /**< GPIO pin number (0-15) */
-    nx_gpio_mode_t mode;   /**< GPIO mode */
-    nx_gpio_pull_t pull;   /**< Pull-up/pull-down configuration */
-    nx_gpio_speed_t speed; /**< GPIO speed */
-    uint8_t af;            /**< Alternate function number */
+    uint8_t port;  /**< GPIO port (A=0, B=1, etc.) */
+    uint8_t pin;   /**< GPIO pin number (0-15) */
+    uint8_t mode;  /**< GPIO mode */
+    uint8_t pull;  /**< Pull-up/pull-down configuration */
+    uint8_t speed; /**< GPIO speed */
+    uint8_t af;    /**< Alternate function number */
 } nx_gpio_config_t;
 
 /*---------------------------------------------------------------------------*/

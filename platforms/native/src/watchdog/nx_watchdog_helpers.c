@@ -30,25 +30,17 @@
 /* System Time Functions                                                     */
 /*---------------------------------------------------------------------------*/
 
+/* External time simulation function for testing */
+extern uint64_t nx_get_time_ms(void);
+
 /**
  * \brief           Get current system time in milliseconds
+ * \details         Uses simulated time if available (for testing),
+ *                  otherwise falls back to real system time
  */
 uint64_t watchdog_get_system_time_ms(void) {
-#ifdef _WIN32
-    FILETIME ft;
-    ULARGE_INTEGER uli;
-
-    GetSystemTimeAsFileTime(&ft);
-    uli.LowPart = ft.dwLowDateTime;
-    uli.HighPart = ft.dwHighDateTime;
-
-    /* Convert 100-nanosecond intervals to milliseconds */
-    return uli.QuadPart / 10000ULL;
-#else
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (uint64_t)tv.tv_sec * 1000ULL + (uint64_t)tv.tv_usec / 1000ULL;
-#endif
+    /* Use simulated time for testing */
+    return nx_get_time_ms();
 }
 
 /*---------------------------------------------------------------------------*/

@@ -77,3 +77,34 @@ void gpio_reset_state(nx_gpio_state_t* state) {
     /* Reset pin state */
     state->pin_state = 0;
 }
+
+/*---------------------------------------------------------------------------*/
+/* Configuration Validation Functions                                        */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Validate GPIO port number
+ * \details         Checks if port number is within valid range (0-7)
+ *                  corresponding to GPIO ports A-H
+ */
+bool nx_gpio_validate_port(uint8_t port) {
+    return port < 8;
+}
+
+/**
+ * \brief           Validate GPIO pin number
+ * \details         Checks if pin number is within valid range (0-15)
+ *                  as each GPIO port has 16 pins
+ */
+bool nx_gpio_validate_pin(uint8_t pin) {
+    return pin < 16;
+}
+
+/**
+ * \brief           Validate GPIO configuration
+ * \details         Validates both port and pin numbers to ensure they
+ *                  are within acceptable ranges before device registration
+ */
+bool nx_gpio_validate_config(uint8_t port, uint8_t pin) {
+    return nx_gpio_validate_port(port) && nx_gpio_validate_pin(pin);
+}

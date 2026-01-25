@@ -1,30 +1,151 @@
-config NATIVE_OPTION_BYTES
-    bool "Enable Option Bytes support"
+# Option Bytes Configuration for Native Platform
+
+config NATIVE_OPTION_BYTES_ENABLE
+    bool "Enable Option Bytes support for Native platform"
     default y
+    depends on PLATFORM_NATIVE
     help
-      Enable Option Bytes peripheral support for Native platform.
-      Provides simulated device configuration options with read/write protection.
+      Enable Option Bytes peripheral support for the Native platform.
+      This provides simulated Option Bytes functionality for testing
+      flash configuration and security settings on PC.
 
-if NATIVE_OPTION_BYTES
+if NATIVE_OPTION_BYTES_ENABLE
 
-config NATIVE_OPTION_BYTES_INSTANCES
-    int "Number of Option Bytes instances"
-    default 1
-    range 1 4
+# Option Bytes 0 Configuration
+menuconfig INSTANCE_NX_OPTION_BYTES_0
+    bool "Enable OPTION_BYTES0"
+    default y
+    depends on NATIVE_OPTION_BYTES_ENABLE
     help
-      Number of Option Bytes peripheral instances to create.
+      Enable Option Bytes instance 0.
 
-config NATIVE_OPTION_BYTES_USER_DATA_SIZE
-    int "User data size in bytes"
-    default 16
+if INSTANCE_NX_OPTION_BYTES_0
+
+choice
+    prompt "Read protection level"
+    default NX_OPTBYTES0_RDP_LEVEL0
+    depends on INSTANCE_NX_OPTION_BYTES_0
+
+config NX_OPTBYTES0_RDP_LEVEL0
+    bool "Level 0 (No protection)"
     help
-      Size of user data area in option bytes.
+      No read protection. Flash can be read freely.
 
-config NATIVE_OPTION_BYTES_DEFAULT_PROTECTION
-    int "Default read protection level"
-    default 0
-    range 0 2
+config NX_OPTBYTES0_RDP_LEVEL1
+    bool "Level 1 (Memory read protection)"
     help
-      Default read protection level (0=none, 1=level1, 2=level2).
+      Memory read protection enabled. Debug access disabled.
 
-endif # NATIVE_OPTION_BYTES
+config NX_OPTBYTES0_RDP_LEVEL2
+    bool "Level 2 (Chip read protection)"
+    help
+      Chip read protection. Debug permanently disabled.
+      WARNING: This is irreversible!
+
+endchoice
+
+config OPTBYTES0_RDP_VALUE
+    int
+    default 0 if NX_OPTBYTES0_RDP_LEVEL0
+    default 1 if NX_OPTBYTES0_RDP_LEVEL1
+    default 2 if NX_OPTBYTES0_RDP_LEVEL2
+
+config OPTBYTES0_RDP_LEVEL_VALUE
+    int
+    default 0 if NX_OPTBYTES0_RDP_LEVEL0
+    default 1 if NX_OPTBYTES0_RDP_LEVEL1
+    default 2 if NX_OPTBYTES0_RDP_LEVEL2
+
+choice
+    prompt "Watchdog selection"
+    default NX_OPTBYTES0_WDG_SW
+    depends on INSTANCE_NX_OPTION_BYTES_0
+
+config NX_OPTBYTES0_WDG_SW
+    bool "Software watchdog"
+    help
+      Watchdog controlled by software.
+
+config NX_OPTBYTES0_WDG_HW
+    bool "Hardware watchdog"
+    help
+      Watchdog automatically enabled at startup.
+
+endchoice
+
+config OPTBYTES0_WDG_VALUE
+    int
+    default 0 if NX_OPTBYTES0_WDG_SW
+    default 1 if NX_OPTBYTES0_WDG_HW
+
+choice
+    prompt "Reset on stop mode"
+    default NX_OPTBYTES0_STOP_NORST
+    depends on INSTANCE_NX_OPTION_BYTES_0
+
+config NX_OPTBYTES0_STOP_NORST
+    bool "No reset generated"
+
+config NX_OPTBYTES0_STOP_RST
+    bool "Reset generated"
+
+endchoice
+
+config OPTBYTES0_STOP_VALUE
+    int
+    default 0 if NX_OPTBYTES0_STOP_NO_RST
+    default 1 if NX_OPTBYTES0_STOP_RST
+
+config OPTBYTES0_STOP_RST_VALUE
+    int
+    default 0 if NX_OPTBYTES0_STOP_NORST
+    default 1 if NX_OPTBYTES0_STOP_RST
+
+choice
+    prompt "Reset on standby mode"
+    default NX_OPTBYTES0_STDBY_NORST
+    depends on INSTANCE_NX_OPTION_BYTES_0
+
+config NX_OPTBYTES0_STDBY_NORST
+    bool "No reset generated"
+
+config NX_OPTBYTES0_STDBY_RST
+    bool "Reset generated"
+
+endchoice
+
+config OPTBYTES0_STDBY_VALUE
+    int
+    default 0 if NX_OPTBYTES0_STDBY_NO_RST
+    default 1 if NX_OPTBYTES0_STDBY_RST
+
+config OPTBYTES0_STDBY_RST_VALUE
+    int
+    default 0 if NX_OPTBYTES0_STDBY_NORST
+    default 1 if NX_OPTBYTES0_STDBY_RST
+
+config OPTBYTES0_WRITE_PROTECT_SECTORS
+    hex "Write protection sector mask"
+    default 0x00000000
+    help
+      Bitmask of sectors to write protect.
+      Each bit represents one sector (bit 0 = sector 0, etc.).
+      Set bit to 1 to enable write protection for that sector.
+
+config OPTBYTES0_USER_DATA0
+    hex "User data byte 0"
+    default 0xFF
+    range 0x00 0xFF
+    help
+      User-defined data byte 0 stored in option bytes.
+
+config OPTBYTES0_USER_DATA1
+    hex "User data byte 1"
+    default 0xFF
+    range 0x00 0xFF
+    help
+      User-defined data byte 1 stored in option bytes.
+
+endif # INSTANCE_NX_OPTION_BYTES_0
+
+endif # NATIVE_OPTION_BYTES_ENABLE

@@ -17,21 +17,6 @@
 #include <stddef.h>
 
 /*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get ADC buffer implementation from power interface
- */
-static nx_adc_buffer_impl_t* adc_buffer_get_impl_from_power(nx_power_t* self) {
-    if (!self) {
-        return NULL;
-    }
-    return (nx_adc_buffer_impl_t*)((char*)self -
-                                   offsetof(nx_adc_buffer_impl_t, power));
-}
-
-/*---------------------------------------------------------------------------*/
 /* Power Operations                                                          */
 /*---------------------------------------------------------------------------*/
 
@@ -39,7 +24,8 @@ static nx_adc_buffer_impl_t* adc_buffer_get_impl_from_power(nx_power_t* self) {
  * \brief           Enable ADC buffer power
  */
 static nx_status_t adc_buffer_power_enable(nx_power_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_power(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, power);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -51,7 +37,8 @@ static nx_status_t adc_buffer_power_enable(nx_power_t* self) {
  * \brief           Disable ADC buffer power
  */
 static nx_status_t adc_buffer_power_disable(nx_power_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_power(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, power);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -63,7 +50,8 @@ static nx_status_t adc_buffer_power_disable(nx_power_t* self) {
  * \brief           Check if ADC buffer power is enabled
  */
 static bool adc_buffer_power_is_enabled(nx_power_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_power(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, power);
     if (!impl || !impl->state) {
         return false;
     }

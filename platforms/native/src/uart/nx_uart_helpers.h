@@ -67,7 +67,8 @@ static inline size_t buffer_get_count(const nx_uart_buffer_t* buf) {
  * \param[in]       len: Data length
  * \return          Number of bytes written
  */
-size_t buffer_write(nx_uart_buffer_t* buf, const uint8_t* data, size_t len);
+size_t uart_buffer_write(nx_uart_buffer_t* buf, const uint8_t* data,
+                         size_t len);
 
 /**
  * \brief           Read data from circular buffer
@@ -76,7 +77,7 @@ size_t buffer_write(nx_uart_buffer_t* buf, const uint8_t* data, size_t len);
  * \param[in]       len: Maximum bytes to read
  * \return          Number of bytes read
  */
-size_t buffer_read(nx_uart_buffer_t* buf, uint8_t* data, size_t len);
+size_t uart_buffer_read(nx_uart_buffer_t* buf, uint8_t* data, size_t len);
 
 #ifdef __cplusplus
 }

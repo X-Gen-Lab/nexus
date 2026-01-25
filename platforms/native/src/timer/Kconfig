@@ -1,6 +1,6 @@
 # Timer Configuration for Native Platform
 
-config TIMER_NATIVE
+config NATIVE_TIMER_ENABLE
     bool "Enable Timer support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,20 +9,13 @@ config TIMER_NATIVE
       This provides simulated Timer functionality for testing
       and development on PC.
 
-if TIMER_NATIVE
-
-config TIMER_MAX_INSTANCES
-    int "Maximum number of Timer instances"
-    default 8
-    range 1 16
-    help
-      Maximum number of Timer instances supported by the
-      Native platform.
+if NATIVE_TIMER_ENABLE
 
 # Timer0 Configuration
-config INSTANCE_NX_TIMER_0
+menuconfig INSTANCE_NX_TIMER_0
     bool "Enable TIMER0"
     default y
+    depends on NATIVE_TIMER_ENABLE
     help
       Enable Timer instance 0.
 
@@ -31,6 +24,7 @@ if INSTANCE_NX_TIMER_0
 config TIMER0_FREQUENCY
     int "TIMER0 frequency (Hz)"
     default 1000000
+    range 1000 100000000
     help
       Timer frequency for TIMER0 in Hz (simulated).
 
@@ -41,12 +35,35 @@ config TIMER0_CHANNEL_COUNT
     help
       Number of PWM channels for TIMER0.
 
+choice
+    prompt "TIMER0 counter mode"
+    default NX_TIMER0_MODE_UP
+    depends on INSTANCE_NX_TIMER_0
+
+config NX_TIMER0_MODE_UP
+    bool "Up counting"
+
+config NX_TIMER0_MODE_DOWN
+    bool "Down counting"
+
+config NX_TIMER0_MODE_CENTER
+    bool "Center-aligned"
+
+endchoice
+
+config TIMER0_MODE_VALUE
+    int
+    default 0 if NX_TIMER0_MODE_UP
+    default 1 if NX_TIMER0_MODE_DOWN
+    default 2 if NX_TIMER0_MODE_CENTER
+
 endif # INSTANCE_NX_TIMER_0
 
 # Timer1 Configuration
-config INSTANCE_NX_TIMER_1
+menuconfig INSTANCE_NX_TIMER_1
     bool "Enable TIMER1"
     default n
+    depends on NATIVE_TIMER_ENABLE
     help
       Enable Timer instance 1.
 
@@ -55,6 +72,7 @@ if INSTANCE_NX_TIMER_1
 config TIMER1_FREQUENCY
     int "TIMER1 frequency (Hz)"
     default 1000000
+    range 1000 100000000
     help
       Timer frequency for TIMER1 in Hz (simulated).
 
@@ -65,12 +83,35 @@ config TIMER1_CHANNEL_COUNT
     help
       Number of PWM channels for TIMER1.
 
+choice
+    prompt "TIMER1 counter mode"
+    default NX_TIMER1_MODE_UP
+    depends on INSTANCE_NX_TIMER_1
+
+config NX_TIMER1_MODE_UP
+    bool "Up counting"
+
+config NX_TIMER1_MODE_DOWN
+    bool "Down counting"
+
+config NX_TIMER1_MODE_CENTER
+    bool "Center-aligned"
+
+endchoice
+
+config TIMER1_MODE_VALUE
+    int
+    default 0 if NX_TIMER1_MODE_UP
+    default 1 if NX_TIMER1_MODE_DOWN
+    default 2 if NX_TIMER1_MODE_CENTER
+
 endif # INSTANCE_NX_TIMER_1
 
 # Timer2 Configuration
-config INSTANCE_NX_TIMER_2
+menuconfig INSTANCE_NX_TIMER_2
     bool "Enable TIMER2"
     default n
+    depends on NATIVE_TIMER_ENABLE
     help
       Enable Timer instance 2.
 
@@ -79,6 +120,7 @@ if INSTANCE_NX_TIMER_2
 config TIMER2_FREQUENCY
     int "TIMER2 frequency (Hz)"
     default 1000000
+    range 1000 100000000
     help
       Timer frequency for TIMER2 in Hz (simulated).
 
@@ -89,12 +131,35 @@ config TIMER2_CHANNEL_COUNT
     help
       Number of PWM channels for TIMER2.
 
+choice
+    prompt "TIMER2 counter mode"
+    default NX_TIMER2_MODE_UP
+    depends on INSTANCE_NX_TIMER_2
+
+config NX_TIMER2_MODE_UP
+    bool "Up counting"
+
+config NX_TIMER2_MODE_DOWN
+    bool "Down counting"
+
+config NX_TIMER2_MODE_CENTER
+    bool "Center-aligned"
+
+endchoice
+
+config TIMER2_MODE_VALUE
+    int
+    default 0 if NX_TIMER2_MODE_UP
+    default 1 if NX_TIMER2_MODE_DOWN
+    default 2 if NX_TIMER2_MODE_CENTER
+
 endif # INSTANCE_NX_TIMER_2
 
 # Timer3 Configuration
-config INSTANCE_NX_TIMER_3
+menuconfig INSTANCE_NX_TIMER_3
     bool "Enable TIMER3"
     default n
+    depends on NATIVE_TIMER_ENABLE
     help
       Enable Timer instance 3.
 
@@ -103,6 +168,7 @@ if INSTANCE_NX_TIMER_3
 config TIMER3_FREQUENCY
     int "TIMER3 frequency (Hz)"
     default 1000000
+    range 1000 100000000
     help
       Timer frequency for TIMER3 in Hz (simulated).
 
@@ -113,102 +179,28 @@ config TIMER3_CHANNEL_COUNT
     help
       Number of PWM channels for TIMER3.
 
+choice
+    prompt "TIMER3 counter mode"
+    default NX_TIMER3_MODE_UP
+    depends on INSTANCE_NX_TIMER_3
+
+config NX_TIMER3_MODE_UP
+    bool "Up counting"
+
+config NX_TIMER3_MODE_DOWN
+    bool "Down counting"
+
+config NX_TIMER3_MODE_CENTER
+    bool "Center-aligned"
+
+endchoice
+
+config TIMER3_MODE_VALUE
+    int
+    default 0 if NX_TIMER3_MODE_UP
+    default 1 if NX_TIMER3_MODE_DOWN
+    default 2 if NX_TIMER3_MODE_CENTER
+
 endif # INSTANCE_NX_TIMER_3
 
-# Timer4 Configuration
-config INSTANCE_NX_TIMER_4
-    bool "Enable TIMER4"
-    default n
-    help
-      Enable Timer instance 4.
-
-if INSTANCE_NX_TIMER_4
-
-config TIMER4_FREQUENCY
-    int "TIMER4 frequency (Hz)"
-    default 1000000
-    help
-      Timer frequency for TIMER4 in Hz (simulated).
-
-config TIMER4_CHANNEL_COUNT
-    int "TIMER4 PWM channel count"
-    default 4
-    range 0 8
-    help
-      Number of PWM channels for TIMER4.
-
-endif # INSTANCE_NX_TIMER_4
-
-# Timer5 Configuration
-config INSTANCE_NX_TIMER_5
-    bool "Enable TIMER5"
-    default n
-    help
-      Enable Timer instance 5.
-
-if INSTANCE_NX_TIMER_5
-
-config TIMER5_FREQUENCY
-    int "TIMER5 frequency (Hz)"
-    default 1000000
-    help
-      Timer frequency for TIMER5 in Hz (simulated).
-
-config TIMER5_CHANNEL_COUNT
-    int "TIMER5 PWM channel count"
-    default 4
-    range 0 8
-    help
-      Number of PWM channels for TIMER5.
-
-endif # INSTANCE_NX_TIMER_5
-
-# Timer6 Configuration
-config INSTANCE_NX_TIMER_6
-    bool "Enable TIMER6"
-    default n
-    help
-      Enable Timer instance 6.
-
-if INSTANCE_NX_TIMER_6
-
-config TIMER6_FREQUENCY
-    int "TIMER6 frequency (Hz)"
-    default 1000000
-    help
-      Timer frequency for TIMER6 in Hz (simulated).
-
-config TIMER6_CHANNEL_COUNT
-    int "TIMER6 PWM channel count"
-    default 4
-    range 0 8
-    help
-      Number of PWM channels for TIMER6.
-
-endif # INSTANCE_NX_TIMER_6
-
-# Timer7 Configuration
-config INSTANCE_NX_TIMER_7
-    bool "Enable TIMER7"
-    default n
-    help
-      Enable Timer instance 7.
-
-if INSTANCE_NX_TIMER_7
-
-config TIMER7_FREQUENCY
-    int "TIMER7 frequency (Hz)"
-    default 1000000
-    help
-      Timer frequency for TIMER7 in Hz (simulated).
-
-config TIMER7_CHANNEL_COUNT
-    int "TIMER7 PWM channel count"
-    default 4
-    range 0 8
-    help
-      Number of PWM channels for TIMER7.
-
-endif # INSTANCE_NX_TIMER_7
-
-endif # TIMER_NATIVE
+endif # NATIVE_TIMER_ENABLE

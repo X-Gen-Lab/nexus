@@ -29,11 +29,14 @@ static nx_status_t tx_async_send(nx_tx_async_t* self, const uint8_t* data,
     nx_spi_impl_t* impl = NX_CONTAINER_OF(self, nx_spi_impl_t, tx_async);
 
     /* Parameter validation */
+    if (!data) {
+        return NX_ERR_INVALID_PARAM;
+    }
+    if (len == 0) {
+        return NX_ERR_INVALID_PARAM;
+    }
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
-    }
-    if (!data) {
-        return NX_ERR_NULL_PTR;
     }
     if (impl->state->busy) {
         return NX_ERR_BUSY;

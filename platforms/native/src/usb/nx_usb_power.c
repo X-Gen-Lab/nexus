@@ -13,6 +13,7 @@
 
 #include "nx_usb_helpers.h"
 #include "nx_usb_types.h"
+#include <string.h>
 
 /*---------------------------------------------------------------------------*/
 /* Power Context Structure                                                   */
@@ -150,4 +151,13 @@ void usb_init_power(nx_power_t* power) {
     power->disable = usb_power_disable;
     power->is_enabled = usb_power_is_enabled;
     power->set_callback = usb_power_set_callback;
+}
+
+/**
+ * \brief           Reset power context for testing
+ */
+void usb_reset_power_context(uint8_t index) {
+    if (index < 2) {
+        memset(&g_power_contexts[index], 0, sizeof(nx_usb_power_ctx_t));
+    }
 }

@@ -46,13 +46,16 @@ static nx_status_t usb_tx_async_send(nx_tx_async_t* self, const uint8_t* data,
         return NX_ERR_BUSY;
     }
 
-    size_t written = buffer_write(&state->tx_buf, data, len);
+    size_t written = usb_buffer_write(&state->tx_buf, data, len);
     if (written < len) {
         return NX_ERR_FULL;
     }
 
     state->stats.tx_count++;
     state->stats.tx_bytes += (uint32_t)written;
+
+    /* In native simulation, immediately "transmit" data by clearing buffer */
+    buffer_clear(&state->tx_buf);
 
     return NX_OK;
 }
@@ -109,7 +112,7 @@ static nx_status_t usb_rx_async_receive(nx_rx_async_t* self, uint8_t* data,
     }
 
     size_t to_read = (*len < available) ? *len : available;
-    size_t read = buffer_read(&state->rx_buf, data, to_read);
+    size_t read = usb_buffer_read(&state->rx_buf, data, to_read);
 
     *len = read;
     state->stats.rx_count++;
@@ -147,13 +150,16 @@ static nx_status_t usb_tx_sync_send(nx_tx_sync_t* self, const uint8_t* data,
         return NX_ERR_INVALID_STATE;
     }
 
-    size_t written = buffer_write(&state->tx_buf, data, len);
+    size_t written = usb_buffer_write(&state->tx_buf, data, len);
     if (written < len) {
         return NX_ERR_FULL;
     }
 
     state->stats.tx_count++;
     state->stats.tx_bytes += (uint32_t)written;
+
+    /* In native simulation, immediately "transmit" data by clearing buffer */
+    buffer_clear(&state->tx_buf);
 
     return NX_OK;
 }
@@ -194,7 +200,7 @@ static nx_status_t usb_rx_sync_receive(nx_rx_sync_t* self, uint8_t* data,
     }
 
     size_t to_read = (*len < available) ? *len : available;
-    size_t read = buffer_read(&state->rx_buf, data, to_read);
+    size_t read = usb_buffer_read(&state->rx_buf, data, to_read);
 
     *len = read;
     state->stats.rx_count++;

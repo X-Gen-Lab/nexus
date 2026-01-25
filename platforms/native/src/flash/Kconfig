@@ -1,42 +1,75 @@
-config NATIVE_FLASH
-    bool "Enable Flash support"
+# Flash Configuration for Native Platform
+
+config NATIVE_FLASH_ENABLE
+    bool "Enable Internal Flash support for Native platform"
     default y
+    depends on PLATFORM_NATIVE
     help
-      Enable internal Flash peripheral support for Native platform.
-      Provides simulated flash memory with erase, write, and read operations.
+      Enable Internal Flash peripheral support for the Native platform.
+      This provides simulated Flash memory functionality for testing
+      and development on PC.
 
-if NATIVE_FLASH
+if NATIVE_FLASH_ENABLE
 
-config NATIVE_FLASH_INSTANCES
-    int "Number of Flash instances"
-    default 1
-    range 1 4
-    help
-      Number of Flash peripheral instances to create.
-
-config NATIVE_FLASH_SECTOR_SIZE
-    int "Flash sector size in bytes"
-    default 4096
-    help
-      Size of each flash sector in bytes.
-
-config NATIVE_FLASH_NUM_SECTORS
-    int "Number of flash sectors"
-    default 128
-    help
-      Total number of flash sectors.
-
-config NATIVE_FLASH_PERSISTENCE
-    bool "Enable flash persistence to file"
+# Flash0 Configuration
+menuconfig INSTANCE_NX_INTERNAL_FLASH0
+    bool "Enable FLASH0"
     default y
+    depends on NATIVE_FLASH_ENABLE
     help
-      Enable saving flash contents to a file for persistence across runs.
+      Enable Internal Flash instance 0.
 
-config NATIVE_FLASH_BACKING_FILE
-    string "Flash backing file path"
-    default "native_flash.bin"
-    depends on NATIVE_FLASH_PERSISTENCE
+if INSTANCE_NX_INTERNAL_FLASH0
+
+config FLASH0_SIZE_KB
+    int "FLASH0 size (KB)"
+    default 512
+    range 64 2048
     help
-      Path to the file used for flash persistence.
+      Total flash size for FLASH0 in kilobytes.
 
-endif # NATIVE_FLASH
+config FLASH0_SECTOR_SIZE_KB
+    int "FLASH0 sector size (KB)"
+    default 4
+    range 1 128
+    help
+      Sector size for FLASH0 in kilobytes.
+
+config FLASH0_PAGE_SIZE_BYTES
+    int "FLASH0 page size (bytes)"
+    default 256
+    range 64 2048
+    help
+      Page size for FLASH0 in bytes.
+
+choice
+    prompt "FLASH0 write protection"
+    default NX_FLASH0_WP_DISABLED
+    depends on INSTANCE_NX_INTERNAL_FLASH0
+
+config NX_FLASH0_WP_DISABLED
+    bool "Disabled"
+    help
+      No write protection.
+
+config NX_FLASH0_WP_ENABLED
+    bool "Enabled"
+    help
+      Enable write protection for specified sectors.
+
+endchoice
+
+config FLASH0_WP_VALUE
+    int
+    default 0 if NX_FLASH0_WP_DISABLED
+    default 1 if NX_FLASH0_WP_ENABLED
+
+config FLASH0_BACKING_FILE
+    string "FLASH0 backing file path"
+    default "native_flash0.bin"
+    help
+      Path to backing file for persistent flash storage simulation.
+
+endif # INSTANCE_NX_INTERNAL_FLASH0
+
+endif # NATIVE_FLASH_ENABLE

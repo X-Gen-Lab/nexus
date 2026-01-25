@@ -42,6 +42,7 @@ static nx_status_t dac_power_enable(nx_power_t* self) {
         return NX_ERR_NULL_PTR;
     }
     impl->state->clock_enabled = true;
+    impl->state->suspended = false;
     return NX_OK;
 }
 
@@ -54,6 +55,7 @@ static nx_status_t dac_power_disable(nx_power_t* self) {
         return NX_ERR_NULL_PTR;
     }
     impl->state->clock_enabled = false;
+    impl->state->suspended = true;
     return NX_OK;
 }
 

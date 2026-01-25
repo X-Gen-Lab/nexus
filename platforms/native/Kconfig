@@ -86,14 +86,11 @@ source "platforms/native/src/adc/Kconfig"
 source "platforms/native/src/dac/Kconfig"
 source "platforms/native/src/crc/Kconfig"
 source "platforms/native/src/usb/Kconfig"
-
-# Note: The following peripherals will have Kconfig files added
-# when their implementations are completed:
-# - Flash (platforms/native/src/flash/Kconfig)
-# - RTC (platforms/native/src/rtc/Kconfig)
-# - Watchdog (platforms/native/src/watchdog/Kconfig)
-# - SDIO (platforms/native/src/sdio/Kconfig)
-# - Option Bytes (platforms/native/src/option_bytes/Kconfig)
+source "platforms/native/src/flash/Kconfig"
+source "platforms/native/src/rtc/Kconfig"
+source "platforms/native/src/watchdog/Kconfig"
+source "platforms/native/src/sdio/Kconfig"
+source "platforms/native/src/option_bytes/Kconfig"
 
 endmenu
 

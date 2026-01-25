@@ -17,33 +17,23 @@
 #include <stdlib.h>
 
 /*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get ADC implementation from lifecycle interface
- */
-static nx_adc_impl_t* adc_get_impl_from_lifecycle(nx_lifecycle_t* self) {
-    if (!self) {
-        return NULL;
-    }
-    return (nx_adc_impl_t*)((char*)self - offsetof(nx_adc_impl_t, lifecycle));
-}
-
-/*---------------------------------------------------------------------------*/
 /* Lifecycle Operations                                                      */
 /*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Initialize ADC device
+ * \details         Supports idempotent initialization - calling init multiple
+ *                  times is safe and maintains the same state.
  */
 static nx_status_t adc_lifecycle_init(nx_lifecycle_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl_from_lifecycle(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
+
+    /* Idempotent: if already initialized, return success */
     if (impl->state->initialized) {
-        return NX_ERR_ALREADY_INIT;
+        return NX_OK;
     }
 
     impl->state->clock_enabled = true;
@@ -63,7 +53,7 @@ static nx_status_t adc_lifecycle_init(nx_lifecycle_t* self) {
  * \brief           Deinitialize ADC device
  */
 static nx_status_t adc_lifecycle_deinit(nx_lifecycle_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl_from_lifecycle(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -81,7 +71,7 @@ static nx_status_t adc_lifecycle_deinit(nx_lifecycle_t* self) {
  * \brief           Suspend ADC device
  */
 static nx_status_t adc_lifecycle_suspend(nx_lifecycle_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl_from_lifecycle(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -98,7 +88,7 @@ static nx_status_t adc_lifecycle_suspend(nx_lifecycle_t* self) {
  * \brief           Resume ADC device
  */
 static nx_status_t adc_lifecycle_resume(nx_lifecycle_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl_from_lifecycle(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -115,7 +105,7 @@ static nx_status_t adc_lifecycle_resume(nx_lifecycle_t* self) {
  * \brief           Get ADC device state
  */
 static nx_device_state_t adc_lifecycle_get_state(nx_lifecycle_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl_from_lifecycle(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_DEV_STATE_ERROR;
     }

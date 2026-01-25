@@ -37,33 +37,95 @@ gpio/
 
 GPIO instances are configured via Kconfig. Each GPIO pin can be individually enabled and configured.
 
+### Kconfig Configuration Symbols
+
+The GPIO registration system uses a standardized naming convention for Kconfig symbols:
+
+- **Instance Enable**: `INSTANCE_NX_GPIO<PORT>_PIN<PIN>` (e.g., `INSTANCE_NX_GPIOA_PIN0`)
+- **Mode Configuration**: `CONFIG_GPIO<PORT>_PIN<PIN>_MODE` (e.g., `CONFIG_GPIOA_PIN0_MODE`)
+- **Pull Configuration**: `CONFIG_GPIO<PORT>_PIN<PIN>_PULL_VALUE` (e.g., `CONFIG_GPIOA_PIN0_PULL_VALUE`)
+- **Speed Configuration**: `CONFIG_GPIO<PORT>_PIN<PIN>_SPEED_VALUE` (e.g., `CONFIG_GPIOA_PIN0_SPEED_VALUE`)
+
+### Device Naming Convention
+
+GPIO devices are registered with a standardized naming format:
+- **Format**: `"GPIO<PORT><PIN>"` (e.g., `"GPIOA0"`, `"GPIOB12"`)
+- **Port Letter**: Calculated as `'A' + port_number` (0→A, 1→B, 2→C, etc.)
+- **Device ID**: Calculated as `(port * 16 + pin)` for unique identification
+
 ### Example Configuration
 
 ```kconfig
-# Enable GPIOA
-CONFIG_INSTANCE_NX_GPIOA=y
-
 # Enable GPIOA PIN0
 CONFIG_INSTANCE_NX_GPIOA_PIN0=y
 CONFIG_GPIOA_PIN0_MODE=1          # Output push-pull
 CONFIG_GPIOA_PIN0_PULL_VALUE=0    # No pull
 CONFIG_GPIOA_PIN0_SPEED_VALUE=1   # Medium speed
-CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0  # Initial low
+
+# Enable GPIOB PIN5
+CONFIG_INSTANCE_NX_GPIOB_PIN5=y
+CONFIG_GPIOB_PIN5_MODE=0          # Input
+CONFIG_GPIOB_PIN5_PULL_VALUE=1    # Pull-up
+CONFIG_GPIOB_PIN5_SPEED_VALUE=0   # Low speed
 ```
 
 ## Usage
 
 ### Getting GPIO Instance
 
+There are two ways to get a GPIO instance:
+
+#### 1. Using Factory Functions (Recommended)
+
 ```c
-/* Get GPIO read-write instance */
-nx_gpio_read_write_t* gpio = nx_gpio_native_get(0, 0);  /* GPIOA PIN0 */
+#include "hal/nx_factory.h"
+
+/* Get GPIO read-write instance using factory function */
+nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(0, 5);  /* GPIOA PIN5 */
+if (gpio == NULL) {
+    /* Device not registered or initialization failed */
+}
 
 /* Get read-only interface */
-nx_gpio_read_t* gpio_read = &gpio->read;
+nx_gpio_read_t* gpio_read = nx_factory_gpio_read(0, 5);
 
 /* Get write-only interface */
-nx_gpio_write_t* gpio_write = &gpio->write;
+nx_gpio_write_t* gpio_write = nx_factory_gpio_write(0, 5);
+```
+
+#### 2. Using Native Platform Functions
+
+```c
+#include "nx_gpio_native.h"
+
+/* Get GPIO read-write instance */
+nx_gpio_read_write_t* gpio = nx_gpio_native_get_read_write(0, 0);  /* GPIOA PIN0 */
+
+/* Get read-only interface */
+nx_gpio_read_t* gpio_read = nx_gpio_native_get_read(0, 0);
+
+/* Get write-only interface */
+nx_gpio_write_t* gpio_write = nx_gpio_native_get_write(0, 0);
+```
+
+### Port and Pin Numbering
+
+- **Port Numbers**: 0-7 (corresponding to ports A-H)
+  - Port A = 0, Port B = 1, Port C = 2, etc.
+- **Pin Numbers**: 0-15 (each port has 16 pins)
+
+### Port Conversion Helpers
+
+Helper macros are available for converting between port numbers and characters:
+
+```c
+#include "nx_gpio_helpers.h"
+
+/* Convert port character to number */
+uint8_t port_num = NX_GPIO_PORT_NUM('A');  /* Returns 0 */
+
+/* Convert port number to character */
+char port_char = NX_GPIO_PORT_CHAR(1);     /* Returns 'B' */
 ```
 
 ### Initialization
@@ -140,7 +202,44 @@ nx_gpio_native_reset_all();
 
 ### Device Registration
 
-GPIO devices are registered using the `NX_DEVICE_REGISTER` macro and the `NX_DEFINE_INSTANCE_NX_GPIO` traversal macro from the Kconfig system.
+GPIO devices are registered using a Kconfig-driven registration system:
+
+1. **Kconfig Configuration**: Users enable GPIO instances via Kconfig
+2. **Macro Generation**: The Kconfig system generates `NX_DEFINE_INSTANCE_NX_GPIO(fn)` macro in `nexus_config.h`
+3. **Device Registration**: The `NX_TRAVERSE_EACH_INSTANCE` macro expands to call `NX_GPIO_DEVICE_REGISTER` for each enabled instance
+4. **Automatic Initialization**: Devices are initialized on first access via factory functions
+
+#### Registration Macros
+
+```c
+/* Configuration macro - reads from Kconfig */
+#define NX_GPIO_CONFIG(_P, _N)
+    /* Creates static platform configuration structure */
+    /* Reads CONFIG_GPIO<PORT>_PIN<PIN>_* symbols */
+
+/* Device registration macro */
+#define NX_GPIO_DEVICE_REGISTER(_P, _N)
+    /* Generates configuration, state, and registration code */
+    /* Device name: "GPIO<PORT><PIN>" */
+    /* Device ID: (port_num * 16 + pin) */
+
+/* Register all enabled instances */
+NX_TRAVERSE_EACH_INSTANCE(NX_GPIO_DEVICE_REGISTER, DEVICE_TYPE);
+```
+
+#### Device Lookup
+
+Factory functions construct device names using the same format as registration:
+
+```c
+static inline nx_gpio_t* nx_factory_gpio(char port, uint8_t pin) {
+    char name[16];
+    snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
+    return (nx_gpio_t*)nx_device_get(name);
+}
+```
+
+This ensures consistency between device registration and lookup.
 
 ### Interface Separation
 
@@ -160,6 +259,23 @@ Each GPIO pin has its own state structure containing:
 - Current pin state
 - Initialization and suspend flags
 
+### Configuration Validation
+
+Helper functions are provided to validate GPIO configurations:
+
+```c
+#include "nx_gpio_helpers.h"
+
+/* Validate port number (0-7) */
+bool valid = nx_gpio_validate_port(port);
+
+/* Validate pin number (0-15) */
+bool valid = nx_gpio_validate_pin(pin);
+
+/* Validate both port and pin */
+bool valid = nx_gpio_validate_config(port, pin);
+```
+
 ## Notes
 
 - The Native platform simulates GPIO behavior for testing purposes
@@ -167,3 +283,27 @@ Each GPIO pin has its own state structure containing:
 - External interrupts are triggered manually via testing functions
 - Power management is simulated (always enabled)
 - All GPIO operations are thread-safe in single-threaded environments
+
+## Migration from Old Implementation
+
+If you're migrating from an older GPIO implementation:
+
+1. **Update Kconfig symbols**: Ensure configuration symbols follow the new naming convention
+   - Old: `CONFIG_GPIO_A_PIN_0_MODE`
+   - New: `CONFIG_GPIOA_PIN0_MODE`
+
+2. **Update device access**: Use factory functions with port character
+   - Old: `nx_device_get("gpio_a_0")`
+   - New: `nx_factory_gpio('A', 0)` or `nx_factory_gpio_read_write('A', 0)`
+
+3. **Port parameter**: Use character port values ('A'-'H') instead of numbers
+   - Port A = 'A', Port B = 'B', etc.
+   - Port A = 0, Port B = 1, etc.
+
+4. **Device names**: Devices are now named `"GPIOA0"`, `"GPIOB5"`, etc.
+   - Format: `"GPIO<PORT><PIN>"`
+
+5. **Regenerate configuration**: Run Kconfig generation script to update `nexus_config.h`
+   ```bash
+   python scripts/kconfig/generate_config.py
+   ```

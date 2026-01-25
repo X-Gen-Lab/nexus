@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_watchdog.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_watchdog_helpers.h"
 #include "nx_watchdog_types.h"
@@ -24,16 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_WATCHDOG_MAX_INSTANCES 4
-#define DEVICE_TYPE               NX_WATCHDOG
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_watchdog_state_t g_watchdog_states[NX_WATCHDOG_MAX_INSTANCES];
-static nx_watchdog_impl_t g_watchdog_instances[NX_WATCHDOG_MAX_INSTANCES];
-static uint8_t g_watchdog_instance_count = 0;
+#define DEVICE_TYPE NX_WATCHDOG
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -59,8 +51,14 @@ watchdog_init_instance(nx_watchdog_impl_t* impl, uint8_t index,
     nx_watchdog_lifecycle_init(&impl->lifecycle);
     nx_watchdog_power_init(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_watchdog_states[index];
+    /* Allocate and initialize state */
+    impl->state =
+        (nx_watchdog_state_t*)nx_mem_alloc(sizeof(nx_watchdog_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_watchdog_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -77,9 +75,6 @@ watchdog_init_instance(nx_watchdog_impl_t* impl, uint8_t index,
     impl->state->callback = NULL;
     impl->state->user_data = NULL;
 
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_watchdog_stats_t));
-
     /* Initialize last feed time */
     impl->state->last_feed_time_ms = 0;
 }
@@ -95,54 +90,54 @@ static void* nx_watchdog_device_init(const nx_device_t* dev) {
     const nx_watchdog_platform_config_t* config =
         (const nx_watchdog_platform_config_t*)dev->config;
 
-    if (g_watchdog_instance_count >= NX_WATCHDOG_MAX_INSTANCES) {
+    /* Allocate implementation structure */
+    nx_watchdog_impl_t* impl =
+        (nx_watchdog_impl_t*)nx_mem_alloc(sizeof(nx_watchdog_impl_t));
+    if (!impl) {
         return NULL;
     }
-
-    uint8_t index = g_watchdog_instance_count++;
-    nx_watchdog_impl_t* impl = &g_watchdog_instances[index];
+    memset(impl, 0, sizeof(nx_watchdog_impl_t));
 
     /* Initialize instance with platform configuration */
+    uint8_t index = config ? config->watchdog_index : 0;
     watchdog_init_instance(impl, index, config);
+
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
 
     /* Store device pointer */
     impl->device = (nx_device_t*)dev;
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
 /**
  * \brief           Configuration macro - reads from Kconfig
  */
-#define NX_WATCHDOG_CONFIG(idx)                                                \
-    static const nx_watchdog_platform_config_t watchdog_config_##idx = {       \
-        .index = idx,                                                          \
-        .default_timeout = NX_CONFIG_WATCHDOG##idx##_DEFAULT_TIMEOUT_MS,       \
+#define NX_WATCHDOG_CONFIG(index)                                              \
+    static const nx_watchdog_platform_config_t watchdog_config_##index = {     \
+        .watchdog_index = index,                                               \
+        .default_timeout = NX_CONFIG_WATCHDOG##index##_DEFAULT_TIMEOUT_MS,     \
     }
 
-/* Register all enabled Watchdog instances */
-#if defined(NX_CONFIG_INSTANCE_NX_WATCHDOG0)
-NX_WATCHDOG_CONFIG(0);
-static nx_device_config_state_t watchdog_kconfig_state_0 = {
-    .init_res = 0,
-    .initialized = false,
-};
-NX_DEVICE_REGISTER(DEVICE_TYPE, 0, "WATCHDOG0", &watchdog_config_0,
-                   &watchdog_kconfig_state_0, nx_watchdog_device_init);
-#endif
+/**
+ * \brief           Device registration macro
+ */
+#define NX_WATCHDOG_DEVICE_REGISTER(index)                                     \
+    NX_WATCHDOG_CONFIG(index);                                                 \
+    static nx_device_config_state_t watchdog_state_##index = {                 \
+        .init_res = 0,                                                         \
+        .initialized = false,                                                  \
+    };                                                                         \
+    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "WATCHDOG" #index,                  \
+                       &watchdog_config_##index, &watchdog_state_##index,      \
+                       nx_watchdog_device_init);
 
-#if defined(NX_CONFIG_INSTANCE_NX_WATCHDOG1)
-NX_WATCHDOG_CONFIG(1);
-static nx_device_config_state_t watchdog_kconfig_state_1 = {
-    .init_res = 0,
-    .initialized = false,
-};
-NX_DEVICE_REGISTER(DEVICE_TYPE, 1, "WATCHDOG1", &watchdog_config_1,
-                   &watchdog_kconfig_state_1, nx_watchdog_device_init);
-#endif
+/**
+ * \brief           Register all enabled ADC instances
+ */
+NX_TRAVERSE_EACH_INSTANCE(NX_WATCHDOG_DEVICE_REGISTER, DEVICE_TYPE);

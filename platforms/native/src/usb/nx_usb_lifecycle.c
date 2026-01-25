@@ -14,14 +14,11 @@
 #include "nexus_config.h"
 #include "nx_usb_helpers.h"
 #include "nx_usb_types.h"
-
+#include <string.h>
 
 /*---------------------------------------------------------------------------*/
 /* External Buffer References                                                */
 /*---------------------------------------------------------------------------*/
-
-extern uint8_t* g_usb_tx_buffers[];
-extern uint8_t* g_usb_rx_buffers[];
 
 /*---------------------------------------------------------------------------*/
 /* Lifecycle Implementation                                                  */
@@ -47,19 +44,19 @@ static nx_status_t usb_lifecycle_init(nx_lifecycle_t* self) {
         return NX_ERR_ALREADY_INIT;
     }
 
-    /* Initialize TX buffer */
-    uint8_t* tx_buf = g_usb_tx_buffers[state->index];
-    if (tx_buf == NULL) {
-        return NX_ERR_NULL_PTR;
+    /* Clear TX and RX buffers */
+    if (state->tx_buf.data) {
+        memset(state->tx_buf.data, 0, state->config.tx_buf_size);
     }
-    buffer_init(&state->tx_buf, tx_buf, state->config.tx_buf_size);
-
-    /* Initialize RX buffer */
-    uint8_t* rx_buf = g_usb_rx_buffers[state->index];
-    if (rx_buf == NULL) {
-        return NX_ERR_NULL_PTR;
+    if (state->rx_buf.data) {
+        memset(state->rx_buf.data, 0, state->config.rx_buf_size);
     }
-    buffer_init(&state->rx_buf, rx_buf, state->config.rx_buf_size);
+    state->tx_buf.head = 0;
+    state->tx_buf.tail = 0;
+    state->tx_buf.count = 0;
+    state->rx_buf.head = 0;
+    state->rx_buf.tail = 0;
+    state->rx_buf.count = 0;
 
     /* Initialize endpoints */
     for (uint8_t i = 0; i < NX_USB_MAX_ENDPOINTS; i++) {
@@ -77,10 +74,11 @@ static nx_status_t usb_lifecycle_init(nx_lifecycle_t* self) {
     state->stats.resume_count = 0;
 
     /* Set initial connection state based on Kconfig */
-#ifdef NX_CONFIG_USB_AUTO_CONNECT
-    state->connected = true;
-#else
+#if defined(NX_CONFIG_USB_AUTO_CONNECT) && (NX_CONFIG_USB_AUTO_CONNECT == 0)
     state->connected = false;
+#else
+    /* Default to connected for simulation/testing */
+    state->connected = true;
 #endif
 
     /* Mark as initialized and running */

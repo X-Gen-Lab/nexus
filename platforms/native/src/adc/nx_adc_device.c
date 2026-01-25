@@ -73,11 +73,8 @@ static void adc_trigger(nx_adc_t* self) {
     nx_adc_impl_t* impl = adc_get_impl(self);
     if (impl && impl->state && impl->state->initialized) {
         impl->state->stats.conversion_count++;
-
-        /* Update simulated channel values */
-        for (int i = 0; i < NX_ADC_MAX_CHANNELS; i++) {
-            impl->channels[i].simulated_value = (uint16_t)(rand() % 4096);
-        }
+        /* Note: Channel values are set via native_adc_set_analog_value() */
+        /* Do not randomize here - use the values set by test helpers */
     }
 }
 
@@ -174,7 +171,7 @@ static void adc_init_instance(nx_adc_impl_t* impl, uint8_t index,
 /**
  * \brief           Device initialization function for Kconfig registration
  */
-static void* nx_adc_device_init(const nx_device_t* dev) {
+NX_UNUSED static void* nx_adc_device_init(const nx_device_t* dev) {
     const nx_adc_platform_config_t* config =
         (const nx_adc_platform_config_t*)dev->config;
 
@@ -198,14 +195,7 @@ static void* nx_adc_device_init(const nx_device_t* dev) {
         return NULL;
     }
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        nx_mem_free(impl->state);
-        nx_mem_free(impl);
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
@@ -229,13 +219,9 @@ static void* nx_adc_device_init(const nx_device_t* dev) {
         .initialized = false,                                                  \
     };                                                                         \
     NX_DEVICE_REGISTER(DEVICE_TYPE, index, "ADC" #index, &adc_config_##index,  \
-                       &adc_kconfig_state_##index, nx_adc_device_init)
+                       &adc_kconfig_state_##index, nx_adc_device_init);
 
-/* Register all enabled ADC instances */
-#ifndef _MSC_VER
+/**
+ * \brief           Register all enabled ADC instances
+ */
 NX_TRAVERSE_EACH_INSTANCE(NX_ADC_DEVICE_REGISTER, DEVICE_TYPE);
-#else
-/* MSVC: Temporarily disabled due to macro compatibility issues */
-#pragma message(                                                               \
-    "ADC device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
-#endif

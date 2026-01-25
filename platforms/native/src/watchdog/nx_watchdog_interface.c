@@ -30,6 +30,10 @@
  * \brief           Start watchdog timer
  */
 static nx_status_t watchdog_start(nx_watchdog_t* self) {
+    if (self == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
+
     nx_watchdog_impl_t* impl = watchdog_get_impl(self);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
@@ -59,6 +63,10 @@ static nx_status_t watchdog_start(nx_watchdog_t* self) {
  * \brief           Stop watchdog timer
  */
 static nx_status_t watchdog_stop(nx_watchdog_t* self) {
+    if (self == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
+
     nx_watchdog_impl_t* impl = watchdog_get_impl(self);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
@@ -87,6 +95,10 @@ static nx_status_t watchdog_stop(nx_watchdog_t* self) {
  * \brief           Feed (refresh) watchdog timer
  */
 static void watchdog_feed(nx_watchdog_t* self) {
+    if (self == NULL) {
+        return;
+    }
+
     nx_watchdog_impl_t* impl = watchdog_get_impl(self);
     if (!impl || !impl->state) {
         return;
@@ -108,6 +120,10 @@ static void watchdog_feed(nx_watchdog_t* self) {
  * \brief           Get watchdog timeout value
  */
 static uint32_t watchdog_get_timeout(nx_watchdog_t* self) {
+    if (self == NULL) {
+        return 0;
+    }
+
     nx_watchdog_impl_t* impl = watchdog_get_impl(self);
     if (!impl || !impl->state) {
         return 0;
@@ -122,6 +138,10 @@ static uint32_t watchdog_get_timeout(nx_watchdog_t* self) {
 static nx_status_t watchdog_set_callback(nx_watchdog_t* self,
                                          nx_watchdog_callback_t callback,
                                          void* user_data) {
+    if (self == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
+
     nx_watchdog_impl_t* impl = watchdog_get_impl(self);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;

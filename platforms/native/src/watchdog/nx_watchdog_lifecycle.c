@@ -35,8 +35,9 @@ static nx_status_t watchdog_lifecycle_init(nx_lifecycle_t* self) {
         return NX_ERR_NULL_PTR;
     }
 
+    /* If already initialized, return success (idempotent) */
     if (state->initialized) {
-        return NX_ERR_ALREADY_INIT;
+        return NX_OK;
     }
 
     /* Initialize watchdog state */

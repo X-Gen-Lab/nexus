@@ -174,6 +174,60 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
         impl->state->rx_buf.head = 0;
         impl->state->rx_buf.tail = 0;
         impl->state->rx_buf.count = 0;
+
+        /* Check if buffer allocation succeeded */
+        if (impl->state->tx_buf.data == NULL ||
+            impl->state->rx_buf.data == NULL) {
+            /* Allocation failed - clean up */
+            if (impl->state->tx_buf.data != NULL) {
+                nx_mem_free(impl->state->tx_buf.data);
+            }
+            if (impl->state->rx_buf.data != NULL) {
+                nx_mem_free(impl->state->rx_buf.data);
+            }
+            nx_mem_free(impl->state);
+            impl->state = NULL;
+            return;
+        }
+    } else {
+        /* No platform config - set default buffer sizes */
+        impl->state->config.baudrate = 115200;
+        impl->state->config.word_length = 8;
+        impl->state->config.stop_bits = 1;
+        impl->state->config.parity = 0;
+        impl->state->config.flow_control = 0;
+        impl->state->config.dma_tx_enable = false;
+        impl->state->config.dma_rx_enable = false;
+        impl->state->config.tx_buf_size = 256;
+        impl->state->config.rx_buf_size = 256;
+
+        /* Allocate buffers with default sizes */
+        impl->state->tx_buf.data = (uint8_t*)nx_mem_alloc(256);
+        impl->state->tx_buf.size = 256;
+        impl->state->tx_buf.head = 0;
+        impl->state->tx_buf.tail = 0;
+        impl->state->tx_buf.count = 0;
+
+        impl->state->rx_buf.data = (uint8_t*)nx_mem_alloc(256);
+        impl->state->rx_buf.size = 256;
+        impl->state->rx_buf.head = 0;
+        impl->state->rx_buf.tail = 0;
+        impl->state->rx_buf.count = 0;
+
+        /* Check if buffer allocation succeeded */
+        if (impl->state->tx_buf.data == NULL ||
+            impl->state->rx_buf.data == NULL) {
+            /* Allocation failed - clean up */
+            if (impl->state->tx_buf.data != NULL) {
+                nx_mem_free(impl->state->tx_buf.data);
+            }
+            if (impl->state->rx_buf.data != NULL) {
+                nx_mem_free(impl->state->rx_buf.data);
+            }
+            nx_mem_free(impl->state);
+            impl->state = NULL;
+            return;
+        }
     }
 
     /* Clear statistics */
@@ -187,7 +241,7 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
 /**
  * \brief           Device initialization function for Kconfig registration
  */
-static void* nx_uart_device_init(const nx_device_t* dev) {
+NX_UNUSED static void* nx_uart_device_init(const nx_device_t* dev) {
     const nx_uart_platform_config_t* config =
         (const nx_uart_platform_config_t*)dev->config;
 
@@ -212,22 +266,7 @@ static void* nx_uart_device_init(const nx_device_t* dev) {
         return NULL;
     }
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        if (impl->state) {
-            if (impl->state->tx_buf.data) {
-                nx_mem_free(impl->state->tx_buf.data);
-            }
-            if (impl->state->rx_buf.data) {
-                nx_mem_free(impl->state->rx_buf.data);
-            }
-            nx_mem_free(impl->state);
-        }
-        nx_mem_free(impl);
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
@@ -257,13 +296,9 @@ static void* nx_uart_device_init(const nx_device_t* dev) {
     };                                                                         \
     NX_DEVICE_REGISTER(DEVICE_TYPE, index, "UART" #index,                      \
                        &uart_config_##index, &uart_kconfig_state_##index,      \
-                       nx_uart_device_init)
+                       nx_uart_device_init);
 
-/* Register all enabled UART instances */
-#ifndef _MSC_VER
+/**
+ * \brief           Register all enabled UART instances
+ */
 NX_TRAVERSE_EACH_INSTANCE(NX_UART_DEVICE_REGISTER, DEVICE_TYPE);
-#else
-/* MSVC: Temporarily disabled due to macro compatibility issues */
-#pragma message(                                                               \
-    "UART device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
-#endif

@@ -1,6 +1,6 @@
 # SPI Configuration for Native Platform
 
-config SPI_NATIVE
+config NATIVE_SPI_ENABLE
     bool "Enable SPI support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,20 +9,13 @@ config SPI_NATIVE
       This provides simulated SPI functionality for testing
       and development on PC.
 
-if SPI_NATIVE
-
-config SPI_MAX_INSTANCES
-    int "Maximum number of SPI instances"
-    default 4
-    range 1 8
-    help
-      Maximum number of SPI instances supported by the
-      Native platform. Each instance requires buffer memory.
+if NATIVE_SPI_ENABLE
 
 # SPI0 Configuration
-config INSTANCE_NX_SPI_0
+menuconfig INSTANCE_NX_SPI_0
     bool "Enable SPI0"
     default y
+    depends on NATIVE_SPI_ENABLE
     help
       Enable SPI instance 0.
 
@@ -34,23 +27,64 @@ config SPI0_MAX_SPEED
     help
       Maximum SPI speed for SPI0 in Hz (simulated).
 
-config SPI0_MOSI_PIN
-    int "SPI0 MOSI pin"
-    default 11
-    help
-      MOSI pin number for SPI0 (simulated).
+choice
+    prompt "SPI0 clock polarity"
+    default NX_SPI0_CPOL_LOW
+    depends on INSTANCE_NX_SPI_0
 
-config SPI0_MISO_PIN
-    int "SPI0 MISO pin"
-    default 12
-    help
-      MISO pin number for SPI0 (simulated).
+config NX_SPI0_CPOL_LOW
+    bool "Clock polarity low (CPOL=0)"
 
-config SPI0_SCK_PIN
-    int "SPI0 SCK pin"
-    default 13
-    help
-      SCK pin number for SPI0 (simulated).
+config NX_SPI0_CPOL_HIGH
+    bool "Clock polarity high (CPOL=1)"
+
+endchoice
+
+config SPI0_CPOL_VALUE
+    int
+    default 0 if NX_SPI0_CPOL_LOW
+    default 1 if NX_SPI0_CPOL_HIGH
+
+choice
+    prompt "SPI0 clock phase"
+    default NX_SPI0_CPHA_EDGE_1
+    depends on INSTANCE_NX_SPI_0
+
+config NX_SPI0_CPHA_EDGE_1
+    bool "First edge (CPHA=0)"
+
+config NX_SPI0_CPHA_EDGE_2
+    bool "Second edge (CPHA=1)"
+
+endchoice
+
+config SPI0_CPHA_VALUE
+    int
+    default 0 if NX_SPI0_CPHA_EDGE_1
+    default 1 if NX_SPI0_CPHA_EDGE_2
+
+choice
+    prompt "SPI0 bit order"
+    default NX_SPI0_MSB_FIRST
+    depends on INSTANCE_NX_SPI_0
+
+config NX_SPI0_MSB_FIRST
+    bool "MSB first"
+
+config NX_SPI0_LSB_FIRST
+    bool "LSB first"
+
+endchoice
+
+config SPI0_MSB_VALUE
+    int
+    default 0 if NX_SPI0_MSB_FIRST
+    default 1 if NX_SPI0_LSB_FIRST
+
+config SPI0_BIT_ORDER_VALUE
+    int
+    default 0 if NX_SPI0_MSB_FIRST
+    default 1 if NX_SPI0_LSB_FIRST
 
 config SPI0_TX_BUFFER_SIZE
     int "SPI0 TX buffer size"
@@ -69,9 +103,10 @@ config SPI0_RX_BUFFER_SIZE
 endif # INSTANCE_NX_SPI_0
 
 # SPI1 Configuration
-config INSTANCE_NX_SPI_1
+menuconfig INSTANCE_NX_SPI_1
     bool "Enable SPI1"
     default n
+    depends on NATIVE_SPI_ENABLE
     help
       Enable SPI instance 1.
 
@@ -83,23 +118,64 @@ config SPI1_MAX_SPEED
     help
       Maximum SPI speed for SPI1 in Hz (simulated).
 
-config SPI1_MOSI_PIN
-    int "SPI1 MOSI pin"
-    default 21
-    help
-      MOSI pin number for SPI1 (simulated).
+choice
+    prompt "SPI1 clock polarity"
+    default NX_SPI1_CPOL_LOW
+    depends on INSTANCE_NX_SPI_1
 
-config SPI1_MISO_PIN
-    int "SPI1 MISO pin"
-    default 22
-    help
-      MISO pin number for SPI1 (simulated).
+config NX_SPI1_CPOL_LOW
+    bool "Clock polarity low (CPOL=0)"
 
-config SPI1_SCK_PIN
-    int "SPI1 SCK pin"
-    default 23
-    help
-      SCK pin number for SPI1 (simulated).
+config NX_SPI1_CPOL_HIGH
+    bool "Clock polarity high (CPOL=1)"
+
+endchoice
+
+config SPI1_CPOL_VALUE
+    int
+    default 0 if NX_SPI1_CPOL_LOW
+    default 1 if NX_SPI1_CPOL_HIGH
+
+choice
+    prompt "SPI1 clock phase"
+    default NX_SPI1_CPHA_EDGE_1
+    depends on INSTANCE_NX_SPI_1
+
+config NX_SPI1_CPHA_EDGE_1
+    bool "First edge (CPHA=0)"
+
+config NX_SPI1_CPHA_EDGE_2
+    bool "Second edge (CPHA=1)"
+
+endchoice
+
+config SPI1_CPHA_VALUE
+    int
+    default 0 if NX_SPI1_CPHA_EDGE_1
+    default 1 if NX_SPI1_CPHA_EDGE_2
+
+choice
+    prompt "SPI1 bit order"
+    default NX_SPI1_MSB_FIRST
+    depends on INSTANCE_NX_SPI_1
+
+config NX_SPI1_MSB_FIRST
+    bool "MSB first"
+
+config NX_SPI1_LSB_FIRST
+    bool "LSB first"
+
+endchoice
+
+config SPI1_MSB_VALUE
+    int
+    default 0 if NX_SPI1_MSB_FIRST
+    default 1 if NX_SPI1_LSB_FIRST
+
+config SPI1_BIT_ORDER_VALUE
+    int
+    default 0 if NX_SPI1_MSB_FIRST
+    default 1 if NX_SPI1_LSB_FIRST
 
 config SPI1_TX_BUFFER_SIZE
     int "SPI1 TX buffer size"
@@ -118,9 +194,10 @@ config SPI1_RX_BUFFER_SIZE
 endif # INSTANCE_NX_SPI_1
 
 # SPI2 Configuration
-config INSTANCE_NX_SPI_2
+menuconfig INSTANCE_NX_SPI_2
     bool "Enable SPI2"
     default n
+    depends on NATIVE_SPI_ENABLE
     help
       Enable SPI instance 2.
 
@@ -132,23 +209,64 @@ config SPI2_MAX_SPEED
     help
       Maximum SPI speed for SPI2 in Hz (simulated).
 
-config SPI2_MOSI_PIN
-    int "SPI2 MOSI pin"
-    default 31
-    help
-      MOSI pin number for SPI2 (simulated).
+choice
+    prompt "SPI2 clock polarity"
+    default NX_SPI2_CPOL_LOW
+    depends on INSTANCE_NX_SPI_2
 
-config SPI2_MISO_PIN
-    int "SPI2 MISO pin"
-    default 32
-    help
-      MISO pin number for SPI2 (simulated).
+config NX_SPI2_CPOL_LOW
+    bool "Clock polarity low (CPOL=0)"
 
-config SPI2_SCK_PIN
-    int "SPI2 SCK pin"
-    default 33
-    help
-      SCK pin number for SPI2 (simulated).
+config NX_SPI2_CPOL_HIGH
+    bool "Clock polarity high (CPOL=1)"
+
+endchoice
+
+config SPI2_CPOL_VALUE
+    int
+    default 0 if NX_SPI2_CPOL_LOW
+    default 1 if NX_SPI2_CPOL_HIGH
+
+choice
+    prompt "SPI2 clock phase"
+    default NX_SPI2_CPHA_EDGE_1
+    depends on INSTANCE_NX_SPI_2
+
+config NX_SPI2_CPHA_EDGE_1
+    bool "First edge (CPHA=0)"
+
+config NX_SPI2_CPHA_EDGE_2
+    bool "Second edge (CPHA=1)"
+
+endchoice
+
+config SPI2_CPHA_VALUE
+    int
+    default 0 if NX_SPI2_CPHA_EDGE_1
+    default 1 if NX_SPI2_CPHA_EDGE_2
+
+choice
+    prompt "SPI2 bit order"
+    default NX_SPI2_MSB_FIRST
+    depends on INSTANCE_NX_SPI_2
+
+config NX_SPI2_MSB_FIRST
+    bool "MSB first"
+
+config NX_SPI2_LSB_FIRST
+    bool "LSB first"
+
+endchoice
+
+config SPI2_MSB_VALUE
+    int
+    default 0 if NX_SPI2_MSB_FIRST
+    default 1 if NX_SPI2_LSB_FIRST
+
+config SPI2_BIT_ORDER_VALUE
+    int
+    default 0 if NX_SPI2_MSB_FIRST
+    default 1 if NX_SPI2_LSB_FIRST
 
 config SPI2_TX_BUFFER_SIZE
     int "SPI2 TX buffer size"
@@ -167,9 +285,10 @@ config SPI2_RX_BUFFER_SIZE
 endif # INSTANCE_NX_SPI_2
 
 # SPI3 Configuration
-config INSTANCE_NX_SPI_3
+menuconfig INSTANCE_NX_SPI_3
     bool "Enable SPI3"
     default n
+    depends on NATIVE_SPI_ENABLE
     help
       Enable SPI instance 3.
 
@@ -181,23 +300,64 @@ config SPI3_MAX_SPEED
     help
       Maximum SPI speed for SPI3 in Hz (simulated).
 
-config SPI3_MOSI_PIN
-    int "SPI3 MOSI pin"
-    default 41
-    help
-      MOSI pin number for SPI3 (simulated).
+choice
+    prompt "SPI3 clock polarity"
+    default NX_SPI3_CPOL_LOW
+    depends on INSTANCE_NX_SPI_3
 
-config SPI3_MISO_PIN
-    int "SPI3 MISO pin"
-    default 42
-    help
-      MISO pin number for SPI3 (simulated).
+config NX_SPI3_CPOL_LOW
+    bool "Clock polarity low (CPOL=0)"
 
-config SPI3_SCK_PIN
-    int "SPI3 SCK pin"
-    default 43
-    help
-      SCK pin number for SPI3 (simulated).
+config NX_SPI3_CPOL_HIGH
+    bool "Clock polarity high (CPOL=1)"
+
+endchoice
+
+config SPI3_CPOL_VALUE
+    int
+    default 0 if NX_SPI3_CPOL_LOW
+    default 1 if NX_SPI3_CPOL_HIGH
+
+choice
+    prompt "SPI3 clock phase"
+    default NX_SPI3_CPHA_EDGE_1
+    depends on INSTANCE_NX_SPI_3
+
+config NX_SPI3_CPHA_EDGE_1
+    bool "First edge (CPHA=0)"
+
+config NX_SPI3_CPHA_EDGE_2
+    bool "Second edge (CPHA=1)"
+
+endchoice
+
+config SPI3_CPHA_VALUE
+    int
+    default 0 if NX_SPI3_CPHA_EDGE_1
+    default 1 if NX_SPI3_CPHA_EDGE_2
+
+choice
+    prompt "SPI3 bit order"
+    default NX_SPI3_MSB_FIRST
+    depends on INSTANCE_NX_SPI_3
+
+config NX_SPI3_MSB_FIRST
+    bool "MSB first"
+
+config NX_SPI3_LSB_FIRST
+    bool "LSB first"
+
+endchoice
+
+config SPI3_MSB_VALUE
+    int
+    default 0 if NX_SPI3_MSB_FIRST
+    default 1 if NX_SPI3_LSB_FIRST
+
+config SPI3_BIT_ORDER_VALUE
+    int
+    default 0 if NX_SPI3_MSB_FIRST
+    default 1 if NX_SPI3_LSB_FIRST
 
 config SPI3_TX_BUFFER_SIZE
     int "SPI3 TX buffer size"
@@ -215,4 +375,4 @@ config SPI3_RX_BUFFER_SIZE
 
 endif # INSTANCE_NX_SPI_3
 
-endif # SPI_NATIVE
+endif # NATIVE_SPI_ENABLE

@@ -1,34 +1,266 @@
-config NATIVE_SDIO
-    bool "Enable SDIO support"
+# SDIO Configuration for Native Platform
+
+config NATIVE_SDIO_ENABLE
+    bool "Enable SDIO support for Native platform"
     default y
+    depends on PLATFORM_NATIVE
     help
-      Enable SDIO peripheral support for Native platform.
+      Enable SDIO (SD/MMC) peripheral support for the Native platform.
+      This provides simulated SDIO functionality for testing
+      and development on PC.
 
-if NATIVE_SDIO
+if NATIVE_SDIO_ENABLE
 
-config NATIVE_SDIO_INSTANCES
-    int "Number of SDIO instances"
-    default 1
-    range 1 4
-    help
-      Number of SDIO instances to support.
-
-config NATIVE_SDIO_CARD_PRESENT
-    bool "Simulate card present at startup"
+# SDIO0 Configuration
+menuconfig INSTANCE_NX_SDIO_0
+    bool "Enable SDIO0"
     default y
+    depends on NATIVE_SDIO_ENABLE
     help
-      Simulate SD card present at startup for testing.
+      Enable SDIO instance 0.
 
-config NATIVE_SDIO_BLOCK_SIZE
-    int "SDIO block size"
+if INSTANCE_NX_SDIO_0
+
+choice
+    prompt "SDIO0 bus width"
+    default NX_SDIO0_BUS_WIDTH_4BIT
+    depends on INSTANCE_NX_SDIO_0
+
+config NX_SDIO0_BUS_WIDTH_1BIT
+    bool "1-bit bus"
+
+config NX_SDIO0_BUS_WIDTH_4BIT
+    bool "4-bit bus"
+
+config NX_SDIO0_BUS_WIDTH_8BIT
+    bool "8-bit bus"
+
+endchoice
+
+config SDIO0_BUS_WIDTH_VALUE
+    int
+    default 1 if NX_SDIO0_BUS_WIDTH_1BIT
+    default 4 if NX_SDIO0_BUS_WIDTH_4BIT
+    default 8 if NX_SDIO0_BUS_WIDTH_8BIT
+
+choice
+    prompt "SDIO0 clock speed"
+    default NX_SDIO0_CLOCK_MHZ_25
+    depends on INSTANCE_NX_SDIO_0
+
+config NX_SDIO0_CLOCK_KHZ_400
+    bool "400 kHz (Identification)"
+
+config NX_SDIO0_CLOCK_MHZ_25
+    bool "25 MHz (Default Speed)"
+
+config NX_SDIO0_CLOCK_MHZ_50
+    bool "50 MHz (High Speed)"
+
+config NX_SDIO0_CLOCK_MHZ_100
+    bool "100 MHz (SDR50)"
+
+config NX_SDIO0_CLOCK_MHZ_200
+    bool "200 MHz (SDR104)"
+
+endchoice
+
+config SDIO0_CLOCK_VALUE
+    int
+    default 0 if NX_SDIO0_CLOCK_KHZ_400
+    default 1 if NX_SDIO0_CLOCK_MHZ_25
+    default 2 if NX_SDIO0_CLOCK_MHZ_50
+    default 3 if NX_SDIO0_CLOCK_MHZ_100
+    default 4 if NX_SDIO0_CLOCK_MHZ_200
+
+config SDIO0_CLOCK_SPEED
+    int
+    default 400000 if NX_SDIO0_CLOCK_KHZ_400
+    default 25000000 if NX_SDIO0_CLOCK_MHZ_25
+    default 50000000 if NX_SDIO0_CLOCK_MHZ_50
+    default 100000000 if NX_SDIO0_CLOCK_MHZ_100
+    default 200000000 if NX_SDIO0_CLOCK_MHZ_200
+
+config SDIO0_BLOCK_SIZE
+    int "SDIO0 block size (bytes)"
     default 512
+    range 1 2048
     help
-      SDIO block size in bytes (standard is 512).
+      Block size for SDIO0 in bytes.
 
-config NATIVE_SDIO_NUM_BLOCKS
-    int "Number of SDIO blocks"
+config SDIO0_NUM_BLOCKS
+    int "SDIO0 number of blocks"
     default 1024
+    range 1 1048576
     help
-      Number of blocks in simulated SD card (default 1024 = 512KB).
+      Number of blocks for simulated SD card.
 
-endif # NATIVE_SDIO
+config SDIO0_CARD_PRESENT
+    bool "SDIO0 card present at startup"
+    default y
+    help
+      Simulate SD card presence at startup.
+
+choice
+    prompt "SDIO0 card type"
+    default NX_SDIO0_CARD_SDHC
+    depends on INSTANCE_NX_SDIO_0
+
+config NX_SDIO0_CARD_SDSC
+    bool "SDSC (Standard Capacity)"
+    help
+      SD card up to 2GB.
+
+config NX_SDIO0_CARD_SDHC
+    bool "SDHC (High Capacity)"
+    help
+      SD card 2GB to 32GB.
+
+config NX_SDIO0_CARD_SDXC
+    bool "SDXC (Extended Capacity)"
+    help
+      SD card 32GB to 2TB.
+
+endchoice
+
+config SDIO0_CARD_VALUE
+    int
+    default 0 if NX_SDIO0_CARD_SDSC
+    default 1 if NX_SDIO0_CARD_SDHC
+    default 2 if NX_SDIO0_CARD_SDXC
+
+config SDIO0_CARD_TYPE_VALUE
+    int
+    default 0 if NX_SDIO0_CARD_SDSC
+    default 1 if NX_SDIO0_CARD_SDHC
+    default 2 if NX_SDIO0_CARD_SDXC
+
+endif # INSTANCE_NX_SDIO_0
+
+# SDIO1 Configuration
+menuconfig INSTANCE_NX_SDIO_1
+    bool "Enable SDIO1"
+    default n
+    depends on NATIVE_SDIO_ENABLE
+    help
+      Enable SDIO instance 1.
+
+if INSTANCE_NX_SDIO_1
+
+choice
+    prompt "SDIO1 bus width"
+    default NX_SDIO1_BUS_WIDTH_4BIT
+    depends on INSTANCE_NX_SDIO_1
+
+config NX_SDIO1_BUS_WIDTH_1BIT
+    bool "1-bit bus"
+
+config NX_SDIO1_BUS_WIDTH_4BIT
+    bool "4-bit bus"
+
+config NX_SDIO1_BUS_WIDTH_8BIT
+    bool "8-bit bus"
+
+endchoice
+
+config SDIO1_BUS_WIDTH_VALUE
+    int
+    default 1 if NX_SDIO1_BUS_WIDTH_1BIT
+    default 4 if NX_SDIO1_BUS_WIDTH_4BIT
+    default 8 if NX_SDIO1_BUS_WIDTH_8BIT
+
+choice
+    prompt "SDIO1 clock speed"
+    default NX_SDIO1_CLOCK_MHZ_25
+    depends on INSTANCE_NX_SDIO_1
+
+config NX_SDIO1_CLOCK_KHZ_400
+    bool "400 kHz (Identification)"
+
+config NX_SDIO1_CLOCK_MHZ_25
+    bool "25 MHz (Default Speed)"
+
+config NX_SDIO1_CLOCK_MHZ_50
+    bool "50 MHz (High Speed)"
+
+config NX_SDIO1_CLOCK_MHZ_100
+    bool "100 MHz (SDR50)"
+
+config NX_SDIO1_CLOCK_MHZ_200
+    bool "200 MHz (SDR104)"
+
+endchoice
+
+config SDIO1_CLOCK_VALUE
+    int
+    default 0 if NX_SDIO1_CLOCK_KHZ_400
+    default 1 if NX_SDIO1_CLOCK_MHZ_25
+    default 2 if NX_SDIO1_CLOCK_MHZ_50
+    default 3 if NX_SDIO1_CLOCK_MHZ_100
+    default 4 if NX_SDIO1_CLOCK_MHZ_200
+
+config SDIO1_CLOCK_SPEED
+    int
+    default 400000 if NX_SDIO1_CLOCK_KHZ_400
+    default 25000000 if NX_SDIO1_CLOCK_MHZ_25
+    default 50000000 if NX_SDIO1_CLOCK_MHZ_50
+    default 100000000 if NX_SDIO1_CLOCK_MHZ_100
+    default 200000000 if NX_SDIO1_CLOCK_MHZ_200
+
+config SDIO1_BLOCK_SIZE
+    int "SDIO1 block size (bytes)"
+    default 512
+    range 1 2048
+    help
+      Block size for SDIO1 in bytes.
+
+config SDIO1_NUM_BLOCKS
+    int "SDIO1 number of blocks"
+    default 1024
+    range 1 1048576
+    help
+      Number of blocks for simulated SD card.
+
+config SDIO1_CARD_PRESENT
+    bool "SDIO1 card present at startup"
+    default y
+    help
+      Simulate SD card presence at startup.
+
+choice
+    prompt "SDIO1 card type"
+    default NX_SDIO1_CARD_SDHC
+    depends on INSTANCE_NX_SDIO_1
+
+config NX_SDIO1_CARD_SDSC
+    bool "SDSC (Standard Capacity)"
+    help
+      SD card up to 2GB.
+
+config NX_SDIO1_CARD_SDHC
+    bool "SDHC (High Capacity)"
+    help
+      SD card 2GB to 32GB.
+
+config NX_SDIO1_CARD_SDXC
+    bool "SDXC (Extended Capacity)"
+    help
+      SD card 32GB to 2TB.
+
+endchoice
+
+config SDIO1_CARD_VALUE
+    int
+    default 0 if NX_SDIO1_CARD_SDSC
+    default 1 if NX_SDIO1_CARD_SDHC
+    default 2 if NX_SDIO1_CARD_SDXC
+
+config SDIO1_CARD_TYPE_VALUE
+    int
+    default 0 if NX_SDIO1_CARD_SDSC
+    default 1 if NX_SDIO1_CARD_SDHC
+    default 2 if NX_SDIO1_CARD_SDXC
+
+endif # INSTANCE_NX_SDIO_1
+
+endif # NATIVE_SDIO_ENABLE

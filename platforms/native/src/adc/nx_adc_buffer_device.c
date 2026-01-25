@@ -241,19 +241,7 @@ static void* nx_adc_buffer_device_init(const nx_device_t* dev) {
         return NULL;
     }
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        if (impl->state) {
-            if (impl->state->buffer) {
-                nx_mem_free(impl->state->buffer);
-            }
-            nx_mem_free(impl->state);
-        }
-        nx_mem_free(impl);
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
@@ -278,13 +266,9 @@ static void* nx_adc_buffer_device_init(const nx_device_t* dev) {
     };                                                                         \
     NX_DEVICE_REGISTER(                                                        \
         DEVICE_TYPE, index, "ADC_BUFFER" #index, &adc_buffer_config_##index,   \
-        &adc_buffer_kconfig_state_##index, nx_adc_buffer_device_init)
+        &adc_buffer_kconfig_state_##index, nx_adc_buffer_device_init);
 
-/* Register all enabled ADC buffer instances */
-#ifndef _MSC_VER
+/**
+ * \brief           Register all enabled ADC buffer instances
+ */
 NX_TRAVERSE_EACH_INSTANCE(NX_ADC_BUFFER_DEVICE_REGISTER, DEVICE_TYPE);
-#else
-/* MSVC: Temporarily disabled due to macro compatibility issues */
-#pragma message(                                                               \
-    "ADC Buffer device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
-#endif

@@ -1,6 +1,6 @@
-# RTC Configuration for Native Platform
+#RTC Configuration for Native Platform
 
-config RTC_NATIVE
+config NATIVE_RTC_ENABLE
     bool "Enable RTC support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,48 +9,93 @@ config RTC_NATIVE
       Native platform. This provides simulated RTC functionality
       for testing and development on PC.
 
-if RTC_NATIVE
+if NATIVE_RTC_ENABLE
 
-config RTC_MAX_INSTANCES
-    int "Maximum number of RTC instances"
-    default 1
-    range 1 4
-    help
-      Maximum number of RTC instances supported by the
-      Native platform.
-
-# RTC0 Configuration
-config INSTANCE_NX_RTC0
+#RTC0 Configuration
+menuconfig INSTANCE_NX_RTC_0
     bool "Enable RTC0"
     default y
+    depends on NATIVE_RTC_ENABLE
     help
       Enable RTC instance 0.
 
-if INSTANCE_NX_RTC0
+if INSTANCE_NX_RTC_0
 
 config RTC0_ENABLE_ALARM
     bool "Enable alarm functionality for RTC0"
     default y
     help
       Enable alarm functionality for RTC0.
-      When enabled, the RTC can trigger callbacks at
-      specified date/time values.
 
 config RTC0_ALARM_COUNT
-    int "Maximum number of alarms for RTC0"
-    default 1
-    range 1 8
+    int "Number of alarms for RTC0"
+    default 2
+    range 1 4
     depends on RTC0_ENABLE_ALARM
     help
-      Maximum number of alarms supported by RTC0.
-      Currently only 1 alarm is supported.
+      Number of alarm channels for RTC0.
+
+choice
+    prompt "RTC0 clock source"
+    default NX_RTC0_CLOCK_LSE
+    depends on INSTANCE_NX_RTC0
+
+config NX_RTC0_CLOCK_LSE
+    bool "LSE (Low Speed External)"
+    help
+      Use external 32.768 kHz crystal.
+
+config NX_RTC0_CLOCK_LSI
+    bool "LSI (Low Speed Internal)"
+    help
+      Use internal low speed oscillator.
+
+config NX_RTC0_CLOCK_HSE
+    bool "HSE (High Speed External)"
+    help
+      Use high speed external clock divided.
+
+endchoice
+
+config RTC0_CLOCK_VALUE
+    int
+    default 0 if NX_RTC0_CLOCK_LSE
+    default 1 if NX_RTC0_CLOCK_LSI
+    default 2 if NX_RTC0_CLOCK_HSE
+
+config RTC0_CLOCK_SOURCE_VALUE
+    int
+    default 0 if NX_RTC0_CLOCK_LSE
+    default 1 if NX_RTC0_CLOCK_LSI
+    default 2 if NX_RTC0_CLOCK_HSE
+
+choice
+    prompt "RTC0 output format"
+    default NX_RTC0_FORMAT_H_24
+    depends on INSTANCE_NX_RTC0
+
+config NX_RTC0_FORMAT_H_24
+    bool "24-hour format"
+
+config NX_RTC0_FORMAT_H_12
+    bool "12-hour format (AM/PM)"
+
+endchoice
+
+config RTC0_FORMAT_VALUE
+    int
+    default 0 if NX_RTC0_FORMAT_H_24
+    default 1 if NX_RTC0_FORMAT_H_12
+    default 0 if NX_RTC0_FORMAT_24H
+    default 1 if NX_RTC0_FORMAT_12H
 
 endif # INSTANCE_NX_RTC0
 
-# RTC1 Configuration
-config INSTANCE_NX_RTC1
+#RTC1 Configuration
+menuconfig INSTANCE_NX_RTC1
     bool "Enable RTC1"
     default n
+    depends on NATIVE_RTC_ENABLE
     help
       Enable RTC instance 1.
 
@@ -63,13 +108,67 @@ config RTC1_ENABLE_ALARM
       Enable alarm functionality for RTC1.
 
 config RTC1_ALARM_COUNT
-    int "Maximum number of alarms for RTC1"
-    default 1
-    range 1 8
+    int "Number of alarms for RTC1"
+    default 2
+    range 1 4
     depends on RTC1_ENABLE_ALARM
     help
-      Maximum number of alarms supported by RTC1.
+      Number of alarm channels for RTC1.
+
+choice
+    prompt "RTC1 clock source"
+    default NX_RTC1_CLOCK_LSE
+    depends on INSTANCE_NX_RTC1
+
+config NX_RTC1_CLOCK_LSE
+    bool "LSE (Low Speed External)"
+    help
+      Use external 32.768 kHz crystal.
+
+config NX_RTC1_CLOCK_LSI
+    bool "LSI (Low Speed Internal)"
+    help
+      Use internal low speed oscillator.
+
+config NX_RTC1_CLOCK_HSE
+    bool "HSE (High Speed External)"
+    help
+      Use high speed external clock divided.
+
+endchoice
+
+config RTC1_CLOCK_VALUE
+    int
+    default 0 if NX_RTC1_CLOCK_LSE
+    default 1 if NX_RTC1_CLOCK_LSI
+    default 2 if NX_RTC1_CLOCK_HSE
+
+config RTC1_CLOCK_SOURCE_VALUE
+    int
+    default 0 if NX_RTC1_CLOCK_LSE
+    default 1 if NX_RTC1_CLOCK_LSI
+    default 2 if NX_RTC1_CLOCK_HSE
+
+choice
+    prompt "RTC1 output format"
+    default NX_RTC1_FORMAT_H_24
+    depends on INSTANCE_NX_RTC1
+
+config NX_RTC1_FORMAT_H_24
+    bool "24-hour format"
+
+config NX_RTC1_FORMAT_H_12
+    bool "12-hour format (AM/PM)"
+
+endchoice
+
+config RTC1_FORMAT_VALUE
+    int
+    default 0 if NX_RTC1_FORMAT_H_24
+    default 1 if NX_RTC1_FORMAT_H_12
+    default 0 if NX_RTC1_FORMAT_24H
+    default 1 if NX_RTC1_FORMAT_12H
 
 endif # INSTANCE_NX_RTC1
 
-endif # RTC_NATIVE
+endif # NATIVE_RTC_ENABLE

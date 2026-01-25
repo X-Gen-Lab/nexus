@@ -65,7 +65,7 @@ void buffer_init(nx_usb_buffer_t* buf, uint8_t* data, size_t size);
  * \param[in]       len: Data length
  * \return          Number of bytes written
  */
-size_t buffer_write(nx_usb_buffer_t* buf, const uint8_t* data, size_t len);
+size_t usb_buffer_write(nx_usb_buffer_t* buf, const uint8_t* data, size_t len);
 
 /**
  * \brief           Read data from circular buffer
@@ -74,7 +74,7 @@ size_t buffer_write(nx_usb_buffer_t* buf, const uint8_t* data, size_t len);
  * \param[in]       len: Maximum bytes to read
  * \return          Number of bytes read
  */
-size_t buffer_read(nx_usb_buffer_t* buf, uint8_t* data, size_t len);
+size_t usb_buffer_read(nx_usb_buffer_t* buf, uint8_t* data, size_t len);
 
 /**
  * \brief           Get available bytes in buffer
@@ -207,6 +207,12 @@ void usb_init_rx_sync(nx_rx_sync_t* rx_sync);
  * \param[in]       base: USB base interface pointer
  */
 void usb_init_base(nx_usb_t* base);
+
+/**
+ * \brief           Reset power context for testing
+ * \param[in]       index: USB instance index
+ */
+void usb_reset_power_context(uint8_t index);
 
 #ifdef __cplusplus
 }

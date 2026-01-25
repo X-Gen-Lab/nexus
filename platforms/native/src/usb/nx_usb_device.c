@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_usb.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_usb_helpers.h"
 #include "nx_usb_types.h"
@@ -24,40 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_USB_MAX_INSTANCES 2
-#define DEVICE_TYPE          NX_USB
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_usb_state_t g_usb_states[NX_USB_MAX_INSTANCES];
-static nx_usb_impl_t g_usb_instances[NX_USB_MAX_INSTANCES];
-
-/* Static buffer allocation - simplified for native platform */
-#ifndef NX_CONFIG_USB_TX_BUFFER_SIZE
-#define NX_CONFIG_USB_TX_BUFFER_SIZE 1024
-#endif
-
-#ifndef NX_CONFIG_USB_RX_BUFFER_SIZE
-#define NX_CONFIG_USB_RX_BUFFER_SIZE 1024
-#endif
-
-static uint8_t g_usb0_tx_buffer[NX_CONFIG_USB_TX_BUFFER_SIZE];
-static uint8_t g_usb0_rx_buffer[NX_CONFIG_USB_RX_BUFFER_SIZE];
-static uint8_t g_usb1_tx_buffer[NX_CONFIG_USB_TX_BUFFER_SIZE];
-static uint8_t g_usb1_rx_buffer[NX_CONFIG_USB_RX_BUFFER_SIZE];
-
-/* Buffer pointer table */
-uint8_t* g_usb_tx_buffers[NX_USB_MAX_INSTANCES] = {
-    g_usb0_tx_buffer,
-    g_usb1_tx_buffer,
-};
-
-uint8_t* g_usb_rx_buffers[NX_USB_MAX_INSTANCES] = {
-    g_usb0_rx_buffer,
-    g_usb1_rx_buffer,
-};
+#define DEVICE_TYPE NX_USB
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -163,8 +131,13 @@ static void usb_init_instance(nx_usb_impl_t* impl, uint8_t index,
     usb_init_lifecycle(&impl->lifecycle);
     usb_init_power(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_usb_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_usb_state_t*)nx_mem_alloc(sizeof(nx_usb_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_usb_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -178,13 +151,31 @@ static void usb_init_instance(nx_usb_impl_t* impl, uint8_t index,
         impl->state->config.rx_buf_size = platform_cfg->rx_buf_size;
     }
 
+    /* Allocate TX and RX buffer data */
+    impl->state->tx_buf.data =
+        (uint8_t*)nx_mem_alloc(impl->state->config.tx_buf_size);
+    impl->state->rx_buf.data =
+        (uint8_t*)nx_mem_alloc(impl->state->config.rx_buf_size);
+
+    if (!impl->state->tx_buf.data || !impl->state->rx_buf.data) {
+        if (impl->state->tx_buf.data) {
+            nx_mem_free(impl->state->tx_buf.data);
+        }
+        if (impl->state->rx_buf.data) {
+            nx_mem_free(impl->state->rx_buf.data);
+        }
+        nx_mem_free(impl->state);
+        impl->state = NULL;
+        return;
+    }
+
+    impl->state->tx_buf.size = impl->state->config.tx_buf_size;
+    impl->state->rx_buf.size = impl->state->config.rx_buf_size;
+
     /* Initialize endpoints */
     for (uint8_t i = 0; i < NX_USB_MAX_ENDPOINTS; i++) {
         endpoint_init(&impl->state->endpoints[i]);
     }
-
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_usb_stats_t));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -198,24 +189,30 @@ static void* nx_usb_device_init(const nx_device_t* dev) {
     const nx_usb_platform_config_t* config =
         (const nx_usb_platform_config_t*)dev->config;
 
-    if (config == NULL || config->usb_index >= NX_USB_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    nx_usb_impl_t* impl = &g_usb_instances[config->usb_index];
+    /* Allocate implementation structure */
+    nx_usb_impl_t* impl = (nx_usb_impl_t*)nx_mem_alloc(sizeof(nx_usb_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_usb_impl_t));
 
     /* Initialize instance with platform configuration */
     usb_init_instance(impl, config->usb_index, config);
 
-    /* Store device pointer */
-    impl->device = (nx_device_t*)dev;
-
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
         return NULL;
     }
 
+    /* Store device pointer */
+    impl->device = (nx_device_t*)dev;
+
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
@@ -225,9 +222,9 @@ static void* nx_usb_device_init(const nx_device_t* dev) {
 #define NX_USB_CONFIG(index)                                                   \
     static const nx_usb_platform_config_t usb_config_##index = {               \
         .usb_index = index,                                                    \
-        .num_endpoints = CONFIG_USB##index##_NUM_ENDPOINTS,                    \
-        .tx_buf_size = CONFIG_USB##index##_TX_BUFFER_SIZE,                     \
-        .rx_buf_size = CONFIG_USB##index##_RX_BUFFER_SIZE,                     \
+        .num_endpoints = NX_CONFIG_USB##index##_NUM_ENDPOINTS,                 \
+        .tx_buf_size = NX_CONFIG_USB##index##_TX_BUFFER_SIZE,                  \
+        .rx_buf_size = NX_CONFIG_USB##index##_RX_BUFFER_SIZE,                  \
     }
 
 /**
@@ -240,13 +237,9 @@ static void* nx_usb_device_init(const nx_device_t* dev) {
         .initialized = false,                                                  \
     };                                                                         \
     NX_DEVICE_REGISTER(DEVICE_TYPE, index, "USB" #index, &usb_config_##index,  \
-                       &usb_kconfig_state_##index, nx_usb_device_init)
+                       &usb_kconfig_state_##index, nx_usb_device_init);
 
-/* Register all enabled USB instances */
-#ifndef _MSC_VER
+/**
+ * \brief           Register all enabled USB instances
+ */
 NX_TRAVERSE_EACH_INSTANCE(NX_USB_DEVICE_REGISTER, DEVICE_TYPE);
-#else
-/* MSVC: Temporarily disabled due to macro compatibility issues */
-#pragma message(                                                               \
-    "USB device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
-#endif

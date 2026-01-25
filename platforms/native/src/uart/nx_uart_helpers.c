@@ -24,8 +24,9 @@
  * \note            Frequently called functions moved to inline in header
  * \note            Optimized to use memcpy for contiguous blocks
  */
-size_t buffer_write(nx_uart_buffer_t* buf, const uint8_t* data, size_t len) {
-    if (!buf || !data || len == 0) {
+size_t uart_buffer_write(nx_uart_buffer_t* buf, const uint8_t* data,
+                         size_t len) {
+    if (!buf || !buf->data || !data || len == 0) {
         return 0;
     }
 
@@ -54,8 +55,8 @@ size_t buffer_write(nx_uart_buffer_t* buf, const uint8_t* data, size_t len) {
  * \brief           Read data from circular buffer
  * \note            Optimized to use memcpy for contiguous blocks
  */
-size_t buffer_read(nx_uart_buffer_t* buf, uint8_t* data, size_t len) {
-    if (!buf || !data || len == 0) {
+size_t uart_buffer_read(nx_uart_buffer_t* buf, uint8_t* data, size_t len) {
+    if (!buf || !buf->data || !data || len == 0) {
         return 0;
     }
 

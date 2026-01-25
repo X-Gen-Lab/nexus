@@ -17,20 +17,6 @@
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get ADC implementation from diagnostic interface
- */
-static nx_adc_impl_t* adc_get_impl_from_diagnostic(nx_diagnostic_t* self) {
-    if (!self) {
-        return NULL;
-    }
-    return (nx_adc_impl_t*)((char*)self - offsetof(nx_adc_impl_t, diagnostic));
-}
-
-/*---------------------------------------------------------------------------*/
 /* Diagnostic Operations                                                     */
 /*---------------------------------------------------------------------------*/
 
@@ -39,7 +25,7 @@ static nx_adc_impl_t* adc_get_impl_from_diagnostic(nx_diagnostic_t* self) {
  */
 static nx_status_t adc_diagnostic_get_status(nx_diagnostic_t* self,
                                              void* status, size_t size) {
-    nx_adc_impl_t* impl = adc_get_impl_from_diagnostic(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, diagnostic);
     if (!impl || !impl->state || !status) {
         return NX_ERR_NULL_PTR;
     }
@@ -56,7 +42,8 @@ static nx_status_t adc_diagnostic_get_status(nx_diagnostic_t* self,
  */
 static nx_status_t adc_diagnostic_get_statistics(nx_diagnostic_t* self,
                                                  void* stats, size_t size) {
-    nx_adc_impl_t* impl = adc_get_impl_from_diagnostic(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, diagnostic);
+    ;
     if (!impl || !impl->state || !stats) {
         return NX_ERR_NULL_PTR;
     }
@@ -72,7 +59,8 @@ static nx_status_t adc_diagnostic_get_statistics(nx_diagnostic_t* self,
  * \brief           Clear ADC statistics
  */
 static nx_status_t adc_diagnostic_clear_statistics(nx_diagnostic_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl_from_diagnostic(self);
+    nx_adc_impl_t* impl = NX_CONTAINER_OF(self, nx_adc_impl_t, diagnostic);
+    ;
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }

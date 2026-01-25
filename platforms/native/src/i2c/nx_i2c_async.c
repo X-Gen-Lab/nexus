@@ -86,9 +86,6 @@ static nx_status_t tx_rx_async_transfer(nx_tx_rx_async_t* self,
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
     }
-    if (!tx_data) {
-        return NX_ERR_NULL_PTR;
-    }
     if (impl->state->busy) {
         return NX_ERR_BUSY;
     }
@@ -100,36 +97,40 @@ static nx_status_t tx_rx_async_transfer(nx_tx_rx_async_t* self,
 
     (void)timeout_ms; /* Ignore timeout in simulation */
 
-    /* Simulate: write TX data to buffer */
-    size_t written = i2c_buffer_write(&impl->state->tx_buf, tx_data, tx_len);
-    if (written < tx_len) {
-        return NX_ERR_FULL;
+    /* Simulate: write TX data to buffer if provided */
+    if (tx_data && tx_len > 0) {
+        size_t written =
+            i2c_buffer_write(&impl->state->tx_buf, tx_data, tx_len);
+        if (written < tx_len) {
+            return NX_ERR_FULL;
+        }
+        impl->state->stats.tx_count += (uint32_t)tx_len;
     }
 
-    /* Update statistics */
-    impl->state->stats.tx_count += (uint32_t)tx_len;
-
-    /* Simulate: prepare RX data (echo back for simulation) */
+    /* Simulate: prepare RX data */
     uint8_t rx_data[256]; /* Temporary buffer for simulation */
-    size_t rx_len = (tx_len < sizeof(rx_data)) ? tx_len : sizeof(rx_data);
+    size_t rx_len = 0;
 
     size_t available = i2c_buffer_get_count(&impl->state->rx_buf);
-    if (available >= rx_len) {
-        size_t read_count =
-            i2c_buffer_read(&impl->state->rx_buf, rx_data, rx_len);
-        if (read_count > 0) {
-            impl->state->stats.rx_count += (uint32_t)read_count;
-        }
-    } else {
+    if (available > 0) {
+        /* Read available data from RX buffer */
+        size_t to_read =
+            (available < sizeof(rx_data)) ? available : sizeof(rx_data);
+        rx_len = i2c_buffer_read(&impl->state->rx_buf, rx_data, to_read);
+        /* Note: rx_count already updated by inject function, don't update again
+         */
+    } else if (tx_data && tx_len > 0) {
         /* If no data in RX buffer, echo TX data for simulation */
+        rx_len = (tx_len < sizeof(rx_data)) ? tx_len : sizeof(rx_data);
         for (size_t i = 0; i < rx_len; i++) {
             rx_data[i] = tx_data[i];
         }
+        /* Update rx_count for echoed data */
         impl->state->stats.rx_count += (uint32_t)rx_len;
     }
 
-    /* Invoke callback if registered */
-    if (impl->state->current_device.callback) {
+    /* Invoke callback if registered and there's RX data */
+    if (impl->state->current_device.callback && rx_len > 0) {
         impl->state->current_device.callback(
             impl->state->current_device.user_data, rx_data, rx_len);
     }

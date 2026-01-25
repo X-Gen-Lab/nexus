@@ -48,8 +48,12 @@ typedef struct nx_device_s nx_device_t;
  * Contains compile-time configuration from Kconfig.
  */
 typedef struct nx_sdio_platform_config_s {
-    uint8_t index;     /**< SDIO instance index */
-    bool card_present; /**< Initial card present state */
+    uint8_t sdio_index;   /**< SDIO instance index */
+    uint8_t bus_width;    /**< Bus width (1, 4, or 8 bits) */
+    uint32_t clock_speed; /**< Clock speed in Hz */
+    uint32_t block_size;  /**< Block size in bytes */
+    uint32_t num_blocks;  /**< Number of blocks */
+    bool card_present;    /**< Initial card present state */
 } nx_sdio_platform_config_t;
 
 /*---------------------------------------------------------------------------*/

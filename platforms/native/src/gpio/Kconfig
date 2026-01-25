@@ -1,6 +1,6 @@
-# GPIO Configuration for Native Platform
+#GPIO Configuration for Native Platform
 
-config GPIO_NATIVE
+config NATIVE_GPIO_ENABLE
     bool "Enable GPIO support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,33 +9,19 @@ config GPIO_NATIVE
       This provides simulated GPIO functionality for testing
       and development on PC.
 
-if GPIO_NATIVE
+if NATIVE_GPIO_ENABLE
 
-config GPIO_MAX_PORTS
-    int "Maximum number of GPIO ports"
-    default 8
-    range 1 16
-    help
-      Maximum number of GPIO ports supported by the
-      Native platform (A-H).
-
-config GPIO_MAX_PINS_PER_PORT
-    int "Maximum number of pins per port"
-    default 16
-    range 1 16
-    help
-      Maximum number of pins per GPIO port.
-
-# GPIOA Configuration
-config INSTANCE_NX_GPIOA
+#GPIOA Configuration
+menuconfig INSTANCE_NX_GPIOA
     bool "Enable GPIOA"
     default y
+    depends on NATIVE_GPIO_ENABLE
     help
       Enable GPIO port A.
 
 if INSTANCE_NX_GPIOA
 
-config INSTANCE_NX_GPIOA_PIN0
+menuconfig INSTANCE_NX_GPIOA_PIN0
     bool "Enable GPIOA PIN0"
     default y
     help
@@ -43,53 +29,87 @@ config INSTANCE_NX_GPIOA_PIN0
 
 if INSTANCE_NX_GPIOA_PIN0
 
-choice GPIOA_PIN0_WR_MODE
+choice
     prompt "GPIOA PIN0 mode"
-    default GPIOA_PIN0_WR_MODE_RW
-    help
-      Select the GPIO mode for GPIOA PIN0.
+    default NX_GPIOA_PIN0_MODE_OUTPUT_PP
+    depends on INSTANCE_NX_GPIOA_PIN0
 
-config GPIOA_PIN0_WR_MODE_READ
-    bool "Read only"
-    help
-      Configure as input only.
+config NX_GPIOA_PIN0_MODE_INPUT
+    bool "Input"
 
-config GPIOA_PIN0_WR_MODE_WRITE
-    bool "Write only"
-    help
-      Configure as output only.
+config NX_GPIOA_PIN0_MODE_OUTPUT_PP
+    bool "Output Push-Pull"
 
-config GPIOA_PIN0_WR_MODE_RW
-    bool "Read-Write"
-    help
-      Configure as bidirectional (input/output).
+config NX_GPIOA_PIN0_MODE_OUTPUT_OD
+    bool "Output Open-Drain"
+
+config NX_GPIOA_PIN0_MODE_AF_PP
+    bool "Alternate Function Push-Pull"
+
+config NX_GPIOA_PIN0_MODE_AF_OD
+    bool "Alternate Function Open-Drain"
+
+config NX_GPIOA_PIN0_MODE_ANALOG
+    bool "Analog"
 
 endchoice
 
 config GPIOA_PIN0_MODE
-    int "GPIOA PIN0 GPIO mode"
-    default 1
-    range 0 5
-    help
-      GPIO mode for GPIOA PIN0:
-      0 = Input, 1 = Output PP, 2 = Output OD,
-      3 = AF PP, 4 = AF OD, 5 = Analog
+    int
+    default 0 if NX_GPIOA_PIN0_MODE_INPUT
+    default 1 if NX_GPIOA_PIN0_MODE_OUTPUT_PP
+    default 2 if NX_GPIOA_PIN0_MODE_OUTPUT_OD
+    default 3 if NX_GPIOA_PIN0_MODE_AF_PP
+    default 4 if NX_GPIOA_PIN0_MODE_AF_OD
+    default 5 if NX_GPIOA_PIN0_MODE_ANALOG
+
+choice
+    prompt "GPIOA PIN0 pull configuration"
+    default NX_GPIOA_PIN0_PULL_NONE
+    depends on INSTANCE_NX_GPIOA_PIN0
+
+config NX_GPIOA_PIN0_PULL_NONE
+    bool "No pull-up/pull-down"
+
+config NX_GPIOA_PIN0_PULL_UP
+    bool "Pull-up"
+
+config NX_GPIOA_PIN0_PULL_DOWN
+    bool "Pull-down"
+
+endchoice
 
 config GPIOA_PIN0_PULL_VALUE
-    int "GPIOA PIN0 pull configuration"
-    default 0
-    range 0 2
-    help
-      Pull configuration for GPIOA PIN0:
-      0 = None, 1 = Pull-up, 2 = Pull-down
+    int
+    default 0 if NX_GPIOA_PIN0_PULL_NONE
+    default 1 if NX_GPIOA_PIN0_PULL_UP
+    default 2 if NX_GPIOA_PIN0_PULL_DOWN
+
+choice
+    prompt "GPIOA PIN0 speed"
+    default NX_GPIOA_PIN0_SPEED_MEDIUM
+    depends on INSTANCE_NX_GPIOA_PIN0
+
+config NX_GPIOA_PIN0_SPEED_LOW
+    bool "Low speed"
+
+config NX_GPIOA_PIN0_SPEED_MEDIUM
+    bool "Medium speed"
+
+config NX_GPIOA_PIN0_SPEED_HIGH
+    bool "High speed"
+
+config NX_GPIOA_PIN0_SPEED_VERY_HIGH
+    bool "Very high speed"
+
+endchoice
 
 config GPIOA_PIN0_SPEED_VALUE
-    int "GPIOA PIN0 speed"
-    default 1
-    range 0 3
-    help
-      Speed configuration for GPIOA PIN0:
-      0 = Low, 1 = Medium, 2 = High, 3 = Very High
+    int
+    default 0 if NX_GPIOA_PIN0_SPEED_LOW
+    default 1 if NX_GPIOA_PIN0_SPEED_MEDIUM
+    default 2 if NX_GPIOA_PIN0_SPEED_HIGH
+    default 3 if NX_GPIOA_PIN0_SPEED_VERY_HIGH
 
 config GPIOA_PIN0_OUTPUT_VALUE
     int "GPIOA PIN0 initial output value"
@@ -101,18 +121,220 @@ config GPIOA_PIN0_OUTPUT_VALUE
 
 endif # INSTANCE_NX_GPIOA_PIN0
 
+menuconfig INSTANCE_NX_GPIOA_PIN1
+    bool "Enable GPIOA PIN1"
+    default n
+    help
+      Enable GPIOA pin 1.
+
+if INSTANCE_NX_GPIOA_PIN1
+
+choice
+    prompt "GPIOA PIN1 mode"
+    default NX_GPIOA_PIN1_MODE_OUTPUT_PP
+    depends on INSTANCE_NX_GPIOA_PIN1
+
+config NX_GPIOA_PIN1_MODE_INPUT
+    bool "Input"
+
+config NX_GPIOA_PIN1_MODE_OUTPUT_PP
+    bool "Output Push-Pull"
+
+config NX_GPIOA_PIN1_MODE_OUTPUT_OD
+    bool "Output Open-Drain"
+
+config NX_GPIOA_PIN1_MODE_AF_PP
+    bool "Alternate Function Push-Pull"
+
+config NX_GPIOA_PIN1_MODE_AF_OD
+    bool "Alternate Function Open-Drain"
+
+config NX_GPIOA_PIN1_MODE_ANALOG
+    bool "Analog"
+
+endchoice
+
+config GPIOA_PIN1_MODE
+    int
+    default 0 if NX_GPIOA_PIN1_MODE_INPUT
+    default 1 if NX_GPIOA_PIN1_MODE_OUTPUT_PP
+    default 2 if NX_GPIOA_PIN1_MODE_OUTPUT_OD
+    default 3 if NX_GPIOA_PIN1_MODE_AF_PP
+    default 4 if NX_GPIOA_PIN1_MODE_AF_OD
+    default 5 if NX_GPIOA_PIN1_MODE_ANALOG
+
+choice
+    prompt "GPIOA PIN1 pull configuration"
+    default NX_GPIOA_PIN1_PULL_NONE
+    depends on INSTANCE_NX_GPIOA_PIN1
+
+config NX_GPIOA_PIN1_PULL_NONE
+    bool "No pull-up/pull-down"
+
+config NX_GPIOA_PIN1_PULL_UP
+    bool "Pull-up"
+
+config NX_GPIOA_PIN1_PULL_DOWN
+    bool "Pull-down"
+
+endchoice
+
+config GPIOA_PIN1_PULL_VALUE
+    int
+    default 0 if NX_GPIOA_PIN1_PULL_NONE
+    default 1 if NX_GPIOA_PIN1_PULL_UP
+    default 2 if NX_GPIOA_PIN1_PULL_DOWN
+
+choice
+    prompt "GPIOA PIN1 speed"
+    default NX_GPIOA_PIN1_SPEED_MEDIUM
+    depends on INSTANCE_NX_GPIOA_PIN1
+
+config NX_GPIOA_PIN1_SPEED_LOW
+    bool "Low speed"
+
+config NX_GPIOA_PIN1_SPEED_MEDIUM
+    bool "Medium speed"
+
+config NX_GPIOA_PIN1_SPEED_HIGH
+    bool "High speed"
+
+config NX_GPIOA_PIN1_SPEED_VERY_HIGH
+    bool "Very high speed"
+
+endchoice
+
+config GPIOA_PIN1_SPEED_VALUE
+    int
+    default 0 if NX_GPIOA_PIN1_SPEED_LOW
+    default 1 if NX_GPIOA_PIN1_SPEED_MEDIUM
+    default 2 if NX_GPIOA_PIN1_SPEED_HIGH
+    default 3 if NX_GPIOA_PIN1_SPEED_VERY_HIGH
+
+config GPIOA_PIN1_OUTPUT_VALUE
+    int "GPIOA PIN1 initial output value"
+    default 0
+    range 0 1
+    help
+      Initial output value for GPIOA PIN1:
+      0 = Low, 1 = High
+
+endif # INSTANCE_NX_GPIOA_PIN1
+
+
+menuconfig INSTANCE_NX_GPIOA_PIN2
+    bool "Enable GPIOA PIN2"
+    default y
+    help
+      Enable GPIOA pin 2.
+
+if INSTANCE_NX_GPIOA_PIN2
+
+choice
+    prompt "GPIOA PIN2 mode"
+    default NX_GPIOA_PIN2_MODE_OUTPUT_PP
+    depends on INSTANCE_NX_GPIOA_PIN2
+
+config NX_GPIOA_PIN2_MODE_INPUT
+    bool "Input"
+
+config NX_GPIOA_PIN2_MODE_OUTPUT_PP
+    bool "Output Push-Pull"
+
+config NX_GPIOA_PIN2_MODE_OUTPUT_OD
+    bool "Output Open-Drain"
+
+config NX_GPIOA_PIN2_MODE_AF_PP
+    bool "Alternate Function Push-Pull"
+
+config NX_GPIOA_PIN2_MODE_AF_OD
+    bool "Alternate Function Open-Drain"
+
+config NX_GPIOA_PIN2_MODE_ANALOG
+    bool "Analog"
+
+endchoice
+
+config GPIOA_PIN2_MODE
+    int
+    default 0 if NX_GPIOA_PIN2_MODE_INPUT
+    default 1 if NX_GPIOA_PIN2_MODE_OUTPUT_PP
+    default 2 if NX_GPIOA_PIN2_MODE_OUTPUT_OD
+    default 3 if NX_GPIOA_PIN2_MODE_AF_PP
+    default 4 if NX_GPIOA_PIN2_MODE_AF_OD
+    default 5 if NX_GPIOA_PIN2_MODE_ANALOG
+
+choice
+    prompt "GPIOA PIN2 pull configuration"
+    default NX_GPIOA_PIN2_PULL_NONE
+    depends on INSTANCE_NX_GPIOA_PIN2
+
+config NX_GPIOA_PIN2_PULL_NONE
+    bool "No pull-up/pull-down"
+
+config NX_GPIOA_PIN2_PULL_UP
+    bool "Pull-up"
+
+config NX_GPIOA_PIN2_PULL_DOWN
+    bool "Pull-down"
+
+endchoice
+
+config GPIOA_PIN2_PULL_VALUE
+    int
+    default 0 if NX_GPIOA_PIN2_PULL_NONE
+    default 1 if NX_GPIOA_PIN2_PULL_UP
+    default 2 if NX_GPIOA_PIN2_PULL_DOWN
+
+choice
+    prompt "GPIOA PIN2 speed"
+    default NX_GPIOA_PIN2_SPEED_MEDIUM
+    depends on INSTANCE_NX_GPIOA_PIN2
+
+config NX_GPIOA_PIN2_SPEED_LOW
+    bool "Low speed"
+
+config NX_GPIOA_PIN2_SPEED_MEDIUM
+    bool "Medium speed"
+
+config NX_GPIOA_PIN2_SPEED_HIGH
+    bool "High speed"
+
+config NX_GPIOA_PIN2_SPEED_VERY_HIGH
+    bool "Very high speed"
+
+endchoice
+
+config GPIOA_PIN2_SPEED_VALUE
+    int
+    default 0 if NX_GPIOA_PIN2_SPEED_LOW
+    default 1 if NX_GPIOA_PIN2_SPEED_MEDIUM
+    default 2 if NX_GPIOA_PIN2_SPEED_HIGH
+    default 3 if NX_GPIOA_PIN2_SPEED_VERY_HIGH
+
+config GPIOA_PIN2_OUTPUT_VALUE
+    int "GPIOA PIN2 initial output value"
+    default 0
+    range 0 1
+    help
+      Initial output value for GPIOA PIN2:
+      0 = Low, 1 = High
+
+endif # INSTANCE_NX_GPIOA_PIN2
+
 endif # INSTANCE_NX_GPIOA
 
-# GPIOB Configuration
-config INSTANCE_NX_GPIOB
+#GPIOB Configuration
+menuconfig INSTANCE_NX_GPIOB
     bool "Enable GPIOB"
     default n
+    depends on NATIVE_GPIO_ENABLE
     help
       Enable GPIO port B.
 
 if INSTANCE_NX_GPIOB
 
-config INSTANCE_NX_GPIOB_PIN0
+menuconfig INSTANCE_NX_GPIOB_PIN0
     bool "Enable GPIOB PIN0"
     default y
     help
@@ -120,53 +342,87 @@ config INSTANCE_NX_GPIOB_PIN0
 
 if INSTANCE_NX_GPIOB_PIN0
 
-choice GPIOB_PIN0_WR_MODE
+choice
     prompt "GPIOB PIN0 mode"
-    default GPIOB_PIN0_WR_MODE_RW
-    help
-      Select the GPIO mode for GPIOB PIN0.
+    default NX_GPIOB_PIN0_MODE_OUTPUT_PP
+    depends on INSTANCE_NX_GPIOB_PIN0
 
-config GPIOB_PIN0_WR_MODE_READ
-    bool "Read only"
-    help
-      Configure as input only.
+config NX_GPIOB_PIN0_MODE_INPUT
+    bool "Input"
 
-config GPIOB_PIN0_WR_MODE_WRITE
-    bool "Write only"
-    help
-      Configure as output only.
+config NX_GPIOB_PIN0_MODE_OUTPUT_PP
+    bool "Output Push-Pull"
 
-config GPIOB_PIN0_WR_MODE_RW
-    bool "Read-Write"
-    help
-      Configure as bidirectional (input/output).
+config NX_GPIOB_PIN0_MODE_OUTPUT_OD
+    bool "Output Open-Drain"
+
+config NX_GPIOB_PIN0_MODE_AF_PP
+    bool "Alternate Function Push-Pull"
+
+config NX_GPIOB_PIN0_MODE_AF_OD
+    bool "Alternate Function Open-Drain"
+
+config NX_GPIOB_PIN0_MODE_ANALOG
+    bool "Analog"
 
 endchoice
 
 config GPIOB_PIN0_MODE
-    int "GPIOB PIN0 GPIO mode"
-    default 1
-    range 0 5
-    help
-      GPIO mode for GPIOB PIN0:
-      0 = Input, 1 = Output PP, 2 = Output OD,
-      3 = AF PP, 4 = AF OD, 5 = Analog
+    int
+    default 0 if NX_GPIOB_PIN0_MODE_INPUT
+    default 1 if NX_GPIOB_PIN0_MODE_OUTPUT_PP
+    default 2 if NX_GPIOB_PIN0_MODE_OUTPUT_OD
+    default 3 if NX_GPIOB_PIN0_MODE_AF_PP
+    default 4 if NX_GPIOB_PIN0_MODE_AF_OD
+    default 5 if NX_GPIOB_PIN0_MODE_ANALOG
+
+choice
+    prompt "GPIOB PIN0 pull configuration"
+    default NX_GPIOB_PIN0_PULL_NONE
+    depends on INSTANCE_NX_GPIOB_PIN0
+
+config NX_GPIOB_PIN0_PULL_NONE
+    bool "No pull-up/pull-down"
+
+config NX_GPIOB_PIN0_PULL_UP
+    bool "Pull-up"
+
+config NX_GPIOB_PIN0_PULL_DOWN
+    bool "Pull-down"
+
+endchoice
 
 config GPIOB_PIN0_PULL_VALUE
-    int "GPIOB PIN0 pull configuration"
-    default 0
-    range 0 2
-    help
-      Pull configuration for GPIOB PIN0:
-      0 = None, 1 = Pull-up, 2 = Pull-down
+    int
+    default 0 if NX_GPIOB_PIN0_PULL_NONE
+    default 1 if NX_GPIOB_PIN0_PULL_UP
+    default 2 if NX_GPIOB_PIN0_PULL_DOWN
+
+choice
+    prompt "GPIOB PIN0 speed"
+    default NX_GPIOB_PIN0_SPEED_MEDIUM
+    depends on INSTANCE_NX_GPIOB_PIN0
+
+config NX_GPIOB_PIN0_SPEED_LOW
+    bool "Low speed"
+
+config NX_GPIOB_PIN0_SPEED_MEDIUM
+    bool "Medium speed"
+
+config NX_GPIOB_PIN0_SPEED_HIGH
+    bool "High speed"
+
+config NX_GPIOB_PIN0_SPEED_VERY_HIGH
+    bool "Very high speed"
+
+endchoice
 
 config GPIOB_PIN0_SPEED_VALUE
-    int "GPIOB PIN0 speed"
-    default 1
-    range 0 3
-    help
-      Speed configuration for GPIOB PIN0:
-      0 = Low, 1 = Medium, 2 = High, 3 = Very High
+    int
+    default 0 if NX_GPIOB_PIN0_SPEED_LOW
+    default 1 if NX_GPIOB_PIN0_SPEED_MEDIUM
+    default 2 if NX_GPIOB_PIN0_SPEED_HIGH
+    default 3 if NX_GPIOB_PIN0_SPEED_VERY_HIGH
 
 config GPIOB_PIN0_OUTPUT_VALUE
     int "GPIOB PIN0 initial output value"
@@ -180,16 +436,17 @@ endif # INSTANCE_NX_GPIOB_PIN0
 
 endif # INSTANCE_NX_GPIOB
 
-# GPIOC Configuration
-config INSTANCE_NX_GPIOC
+#GPIOC Configuration
+menuconfig INSTANCE_NX_GPIOC
     bool "Enable GPIOC"
     default n
+    depends on NATIVE_GPIO_ENABLE
     help
       Enable GPIO port C.
 
 if INSTANCE_NX_GPIOC
 
-config INSTANCE_NX_GPIOC_PIN0
+menuconfig INSTANCE_NX_GPIOC_PIN0
     bool "Enable GPIOC PIN0"
     default y
     help
@@ -197,53 +454,87 @@ config INSTANCE_NX_GPIOC_PIN0
 
 if INSTANCE_NX_GPIOC_PIN0
 
-choice GPIOC_PIN0_WR_MODE
+choice
     prompt "GPIOC PIN0 mode"
-    default GPIOC_PIN0_WR_MODE_RW
-    help
-      Select the GPIO mode for GPIOC PIN0.
+    default NX_GPIOC_PIN0_MODE_OUTPUT_PP
+    depends on INSTANCE_NX_GPIOC_PIN0
 
-config GPIOC_PIN0_WR_MODE_READ
-    bool "Read only"
-    help
-      Configure as input only.
+config NX_GPIOC_PIN0_MODE_INPUT
+    bool "Input"
 
-config GPIOC_PIN0_WR_MODE_WRITE
-    bool "Write only"
-    help
-      Configure as output only.
+config NX_GPIOC_PIN0_MODE_OUTPUT_PP
+    bool "Output Push-Pull"
 
-config GPIOC_PIN0_WR_MODE_RW
-    bool "Read-Write"
-    help
-      Configure as bidirectional (input/output).
+config NX_GPIOC_PIN0_MODE_OUTPUT_OD
+    bool "Output Open-Drain"
+
+config NX_GPIOC_PIN0_MODE_AF_PP
+    bool "Alternate Function Push-Pull"
+
+config NX_GPIOC_PIN0_MODE_AF_OD
+    bool "Alternate Function Open-Drain"
+
+config NX_GPIOC_PIN0_MODE_ANALOG
+    bool "Analog"
 
 endchoice
 
 config GPIOC_PIN0_MODE
-    int "GPIOC PIN0 GPIO mode"
-    default 1
-    range 0 5
-    help
-      GPIO mode for GPIOC PIN0:
-      0 = Input, 1 = Output PP, 2 = Output OD,
-      3 = AF PP, 4 = AF OD, 5 = Analog
+    int
+    default 0 if NX_GPIOC_PIN0_MODE_INPUT
+    default 1 if NX_GPIOC_PIN0_MODE_OUTPUT_PP
+    default 2 if NX_GPIOC_PIN0_MODE_OUTPUT_OD
+    default 3 if NX_GPIOC_PIN0_MODE_AF_PP
+    default 4 if NX_GPIOC_PIN0_MODE_AF_OD
+    default 5 if NX_GPIOC_PIN0_MODE_ANALOG
+
+choice
+    prompt "GPIOC PIN0 pull configuration"
+    default NX_GPIOC_PIN0_PULL_NONE
+    depends on INSTANCE_NX_GPIOC_PIN0
+
+config NX_GPIOC_PIN0_PULL_NONE
+    bool "No pull-up/pull-down"
+
+config NX_GPIOC_PIN0_PULL_UP
+    bool "Pull-up"
+
+config NX_GPIOC_PIN0_PULL_DOWN
+    bool "Pull-down"
+
+endchoice
 
 config GPIOC_PIN0_PULL_VALUE
-    int "GPIOC PIN0 pull configuration"
-    default 0
-    range 0 2
-    help
-      Pull configuration for GPIOC PIN0:
-      0 = None, 1 = Pull-up, 2 = Pull-down
+    int
+    default 0 if NX_GPIOC_PIN0_PULL_NONE
+    default 1 if NX_GPIOC_PIN0_PULL_UP
+    default 2 if NX_GPIOC_PIN0_PULL_DOWN
+
+choice
+    prompt "GPIOC PIN0 speed"
+    default NX_GPIOC_PIN0_SPEED_MEDIUM
+    depends on INSTANCE_NX_GPIOC_PIN0
+
+config NX_GPIOC_PIN0_SPEED_LOW
+    bool "Low speed"
+
+config NX_GPIOC_PIN0_SPEED_MEDIUM
+    bool "Medium speed"
+
+config NX_GPIOC_PIN0_SPEED_HIGH
+    bool "High speed"
+
+config NX_GPIOC_PIN0_SPEED_VERY_HIGH
+    bool "Very high speed"
+
+endchoice
 
 config GPIOC_PIN0_SPEED_VALUE
-    int "GPIOC PIN0 speed"
-    default 1
-    range 0 3
-    help
-      Speed configuration for GPIOC PIN0:
-      0 = Low, 1 = Medium, 2 = High, 3 = Very High
+    int
+    default 0 if NX_GPIOC_PIN0_SPEED_LOW
+    default 1 if NX_GPIOC_PIN0_SPEED_MEDIUM
+    default 2 if NX_GPIOC_PIN0_SPEED_HIGH
+    default 3 if NX_GPIOC_PIN0_SPEED_VERY_HIGH
 
 config GPIOC_PIN0_OUTPUT_VALUE
     int "GPIOC PIN0 initial output value"
@@ -257,4 +548,4 @@ endif # INSTANCE_NX_GPIOC_PIN0
 
 endif # INSTANCE_NX_GPIOC
 
-endif # GPIO_NATIVE
+endif # NATIVE_GPIO_ENABLE

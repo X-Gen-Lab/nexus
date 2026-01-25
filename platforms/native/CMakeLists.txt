@@ -11,7 +11,6 @@ add_library(platform_native STATIC)
 target_sources(platform_native
     PRIVATE
         src/platform/nx_platform_init.c
-        src/platform/nx_device_registry_stub.c
 )
 
 #-----------------------------------------------------------------------------

@@ -41,51 +41,50 @@ extern "C" {
 
 /**
  * \brief           Get GPIO device
- * \param[in]       port: GPIO port number
+ * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO interface pointer, NULL on failure
  */
-static inline nx_gpio_t* nx_factory_gpio(uint8_t port, uint8_t pin) {
+static inline nx_gpio_t* nx_factory_gpio(char port, uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d", 'A' + port, pin);
+    snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
     return (nx_gpio_t*)nx_device_get(name);
 }
 
 /**
  * \brief           Get GPIO read interface
- * \param[in]       port: GPIO port number
+ * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO read interface pointer, NULL on failure
  */
-static inline nx_gpio_read_t* nx_factory_gpio_read(uint8_t port, uint8_t pin) {
+static inline nx_gpio_read_t* nx_factory_gpio_read(char port, uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d", 'A' + port, pin);
+    snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
     return (nx_gpio_read_t*)nx_device_get(name);
 }
 
 /**
  * \brief           Get GPIO write interface
- * \param[in]       port: GPIO port number
+ * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO write interface pointer, NULL on failure
  */
-static inline nx_gpio_write_t* nx_factory_gpio_write(uint8_t port,
-                                                     uint8_t pin) {
+static inline nx_gpio_write_t* nx_factory_gpio_write(char port, uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d", 'A' + port, pin);
+    snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
     return (nx_gpio_write_t*)nx_device_get(name);
 }
 
 /**
  * \brief           Get GPIO read-write interface
- * \param[in]       port: GPIO port number
+ * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO read-write interface pointer, NULL on failure
  */
-static inline nx_gpio_read_write_t* nx_factory_gpio_read_write(uint8_t port,
+static inline nx_gpio_read_write_t* nx_factory_gpio_read_write(char port,
                                                                uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d", 'A' + port, pin);
+    snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
     return (nx_gpio_read_write_t*)nx_device_get(name);
 }
 
@@ -337,8 +336,10 @@ static inline void nx_factory_can_release(nx_can_bus_t* can) {
  * \brief           Get USB device
  * \return          USB interface pointer, NULL on failure
  */
-static inline nx_usb_t* nx_factory_usb(void) {
-    return (nx_usb_t*)nx_device_get("USB0");
+static inline nx_usb_t* nx_factory_usb(uint8_t index) {
+    char name[16];
+    snprintf(name, sizeof(name), "USB%d", index);
+    return (nx_usb_t*)nx_device_get(name);
 }
 
 /**

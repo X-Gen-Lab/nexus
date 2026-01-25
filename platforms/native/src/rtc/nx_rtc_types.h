@@ -41,7 +41,7 @@ typedef struct nx_device_s nx_device_t;
  * Contains compile-time configuration from Kconfig.
  */
 typedef struct nx_rtc_platform_config_s {
-    uint8_t index;        /**< RTC instance index */
+    uint8_t rtc_index;    /**< RTC instance index */
     bool enable_alarm;    /**< Enable alarm functionality */
     uint32_t alarm_count; /**< Maximum number of alarms */
 } nx_rtc_platform_config_t;

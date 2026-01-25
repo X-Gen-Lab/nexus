@@ -32,19 +32,22 @@ static nx_status_t tx_async_send(nx_tx_async_t* self, const uint8_t* data,
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
     }
-    if (!data) {
-        return NX_ERR_NULL_PTR;
+    if (!data || len == 0) {
+        return NX_ERR_INVALID_PARAM;
     }
     if (impl->state->tx_busy) {
         return NX_ERR_BUSY;
     }
 
-    /* Simulate: write to stdout */
-    fwrite(data, 1, len, stdout);
-    fflush(stdout);
+    /* Write data to TX buffer */
+    size_t written = uart_buffer_write(&impl->state->tx_buf, data, len);
+    if (written < len) {
+        /* Buffer full */
+        return NX_ERR_NO_MEMORY;
+    }
 
     /* Update statistics */
-    impl->state->stats.tx_count += (uint32_t)len;
+    impl->state->stats.tx_count += (uint32_t)written;
 
     return NX_OK;
 }
@@ -79,7 +82,7 @@ static nx_status_t rx_async_receive(nx_rx_async_t* self, uint8_t* data,
         return NX_ERR_NOT_INIT;
     }
     if (!data || !len) {
-        return NX_ERR_NULL_PTR;
+        return NX_ERR_INVALID_PARAM;
     }
 
     /* Check data availability */
@@ -91,11 +94,8 @@ static nx_status_t rx_async_receive(nx_rx_async_t* self, uint8_t* data,
 
     /* Read data from buffer */
     size_t to_read = (*len < available) ? *len : available;
-    size_t read_count = buffer_read(&impl->state->rx_buf, data, to_read);
+    size_t read_count = uart_buffer_read(&impl->state->rx_buf, data, to_read);
     *len = read_count;
-
-    /* Update statistics */
-    impl->state->stats.rx_count += (uint32_t)read_count;
 
     return NX_OK;
 }

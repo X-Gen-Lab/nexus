@@ -1,6 +1,6 @@
 # CRC Configuration for Native Platform
 
-config CRC_NATIVE
+config NATIVE_CRC_ENABLE
     bool "Enable CRC support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,117 +9,193 @@ config CRC_NATIVE
       This provides simulated CRC functionality for testing
       and development on PC.
 
-if CRC_NATIVE
-
-config CRC_MAX_INSTANCES
-    int "Maximum number of CRC instances"
-    default 1
-    range 1 4
-    help
-      Maximum number of CRC instances supported by the
-      Native platform.
+if NATIVE_CRC_ENABLE
 
 # CRC0 Configuration
-config INSTANCE_NX_CRC0
+menuconfig INSTANCE_NX_CRC_0
     bool "Enable CRC0"
     default y
+    depends on NATIVE_CRC_ENABLE
     help
       Enable CRC instance 0.
 
-if INSTANCE_NX_CRC0
+if INSTANCE_NX_CRC_0
 
-choice CRC0_ALGORITHM
+choice
     prompt "CRC0 algorithm"
-    default CRC0_ALGORITHM_CRC32
-    help
-      Select the default CRC algorithm for CRC0.
+    default NX_CRC0_ALGORITHM_CRC32
+    depends on INSTANCE_NX_CRC_0
 
-config CRC0_ALGORITHM_CRC32
+config NX_CRC0_ALGORITHM_CRC32
     bool "CRC-32 (IEEE 802.3)"
     help
       Use CRC-32 algorithm with polynomial 0x04C11DB7.
 
-config CRC0_ALGORITHM_CRC16
+config NX_CRC0_ALGORITHM_CRC16
     bool "CRC-16 (CCITT)"
     help
       Use CRC-16 CCITT algorithm with polynomial 0x1021.
 
+config NX_CRC0_ALGORITHM_CRC8
+    bool "CRC-8"
+    help
+      Use CRC-8 algorithm with polynomial 0x07.
+
 endchoice
 
-config CRC0_POLYNOMIAL
+config NX_CRC0_ALGORITHM_VALUE
+    int
+    default 0 if NX_CRC0_ALGORITHM_CRC32
+    default 1 if NX_CRC0_ALGORITHM_CRC16
+    default 2 if NX_CRC0_ALGORITHM_CRC8
+
+config NX_CRC0_POLYNOMIAL
     hex "CRC0 polynomial"
-    default 0x04C11DB7 if CRC0_ALGORITHM_CRC32
-    default 0x1021 if CRC0_ALGORITHM_CRC16
+    default 0x04C11DB7 if NX_CRC0_ALGORITHM_CRC32
+    default 0x1021 if NX_CRC0_ALGORITHM_CRC16
+    default 0x07 if NX_CRC0_ALGORITHM_CRC8
     help
       CRC polynomial value for CRC0.
-      Default: 0x04C11DB7 for CRC-32, 0x1021 for CRC-16.
+      Default: 0x04C11DB7 for CRC-32, 0x1021 for CRC-16, 0x07 for CRC-8.
 
-config CRC0_INIT_VALUE
+config NX_CRC0_INIT_VALUE
     hex "CRC0 initial value"
-    default 0xFFFFFFFF if CRC0_ALGORITHM_CRC32
-    default 0xFFFF if CRC0_ALGORITHM_CRC16
+    default 0xFFFFFFFF if NX_CRC0_ALGORITHM_CRC32
+    default 0xFFFF if NX_CRC0_ALGORITHM_CRC16
+    default 0xFF if NX_CRC0_ALGORITHM_CRC8
     help
       Initial CRC value for CRC0.
-      Default: 0xFFFFFFFF for CRC-32, 0xFFFF for CRC-16.
+      Default: 0xFFFFFFFF for CRC-32, 0xFFFF for CRC-16, 0xFF for CRC-8.
 
-config CRC0_FINAL_XOR
+config NX_CRC0_FINAL_XOR
     hex "CRC0 final XOR value"
-    default 0xFFFFFFFF if CRC0_ALGORITHM_CRC32
-    default 0x0000 if CRC0_ALGORITHM_CRC16
+    default 0xFFFFFFFF if NX_CRC0_ALGORITHM_CRC32
+    default 0x0000 if NX_CRC0_ALGORITHM_CRC16
+    default 0x00 if NX_CRC0_ALGORITHM_CRC8
     help
       Final XOR value applied to CRC result.
-      Default: 0xFFFFFFFF for CRC-32, 0x0000 for CRC-16.
+      Default: 0xFFFFFFFF for CRC-32, 0x0000 for CRC-16, 0x00 for CRC-8.
 
-endif # INSTANCE_NX_CRC0
+choice
+    prompt "CRC0 input data format"
+    default NX_CRC0_INPUT_BYTE
+    depends on INSTANCE_NX_CRC_0
+
+config NX_CRC0_INPUT_BYTE
+    bool "Byte (8-bit)"
+
+config NX_CRC0_INPUT_HALFWORD
+    bool "Half-word (16-bit)"
+
+config NX_CRC0_INPUT_WORD
+    bool "Word (32-bit)"
+
+endchoice
+
+config NX_CRC0_INPUT_VALUE
+    int
+    default 0 if NX_CRC0_INPUT_BYTE
+    default 1 if NX_CRC0_INPUT_HALFWORD
+    default 2 if NX_CRC0_INPUT_WORD
+
+config NX_CRC0_INPUT_FORMAT_VALUE
+    int
+    default 0 if NX_CRC0_INPUT_BYTE
+    default 1 if NX_CRC0_INPUT_HALFWORD
+    default 2 if NX_CRC0_INPUT_WORD
+
+endif # INSTANCE_NX_CRC_0
 
 # CRC1 Configuration
-config INSTANCE_NX_CRC1
+menuconfig INSTANCE_NX_CRC_1
     bool "Enable CRC1"
     default n
+    depends on NATIVE_CRC_ENABLE
     help
       Enable CRC instance 1.
 
-if INSTANCE_NX_CRC1
+if INSTANCE_NX_CRC_1
 
-choice CRC1_ALGORITHM
+choice
     prompt "CRC1 algorithm"
-    default CRC1_ALGORITHM_CRC32
-    help
-      Select the default CRC algorithm for CRC1.
+    default NX_CRC1_ALGORITHM_CRC32
+    depends on INSTANCE_NX_CRC_1
 
-config CRC1_ALGORITHM_CRC32
+config NX_CRC1_ALGORITHM_CRC32
     bool "CRC-32 (IEEE 802.3)"
     help
       Use CRC-32 algorithm with polynomial 0x04C11DB7.
 
-config CRC1_ALGORITHM_CRC16
+config NX_CRC1_ALGORITHM_CRC16
     bool "CRC-16 (CCITT)"
     help
       Use CRC-16 CCITT algorithm with polynomial 0x1021.
 
+config NX_CRC1_ALGORITHM_CRC8
+    bool "CRC-8"
+    help
+      Use CRC-8 algorithm with polynomial 0x07.
+
 endchoice
 
-config CRC1_POLYNOMIAL
+config NX_CRC1_ALGORITHM_VALUE
+    int
+    default 0 if NX_CRC1_ALGORITHM_CRC32
+    default 1 if NX_CRC1_ALGORITHM_CRC16
+    default 2 if NX_CRC1_ALGORITHM_CRC8
+
+config NX_CRC1_POLYNOMIAL
     hex "CRC1 polynomial"
-    default 0x04C11DB7 if CRC1_ALGORITHM_CRC32
-    default 0x1021 if CRC1_ALGORITHM_CRC16
+    default 0x04C11DB7 if NX_CRC1_ALGORITHM_CRC32
+    default 0x1021 if NX_CRC1_ALGORITHM_CRC16
+    default 0x07 if NX_CRC1_ALGORITHM_CRC8
     help
       CRC polynomial value for CRC1.
 
-config CRC1_INIT_VALUE
+config NX_CRC1_INIT_VALUE
     hex "CRC1 initial value"
-    default 0xFFFFFFFF if CRC1_ALGORITHM_CRC32
-    default 0xFFFF if CRC1_ALGORITHM_CRC16
+    default 0xFFFFFFFF if NX_CRC1_ALGORITHM_CRC32
+    default 0xFFFF if NX_CRC1_ALGORITHM_CRC16
+    default 0xFF if NX_CRC1_ALGORITHM_CRC8
     help
       Initial CRC value for CRC1.
 
-config CRC1_FINAL_XOR
+config NX_CRC1_FINAL_XOR
     hex "CRC1 final XOR value"
-    default 0xFFFFFFFF if CRC1_ALGORITHM_CRC32
-    default 0x0000 if CRC1_ALGORITHM_CRC16
+    default 0xFFFFFFFF if NX_CRC1_ALGORITHM_CRC32
+    default 0x0000 if NX_CRC1_ALGORITHM_CRC16
+    default 0x00 if NX_CRC1_ALGORITHM_CRC8
     help
       Final XOR value applied to CRC result.
 
-endif # INSTANCE_NX_CRC1
+choice
+    prompt "CRC1 input data format"
+    default NX_CRC1_INPUT_BYTE
+    depends on INSTANCE_NX_CRC_1
 
-endif # CRC_NATIVE
+config NX_CRC1_INPUT_BYTE
+    bool "Byte (8-bit)"
+
+config NX_CRC1_INPUT_HALFWORD
+    bool "Half-word (16-bit)"
+
+config NX_CRC1_INPUT_WORD
+    bool "Word (32-bit)"
+
+endchoice
+
+config NX_CRC1_INPUT_VALUE
+    int
+    default 0 if NX_CRC1_INPUT_BYTE
+    default 1 if NX_CRC1_INPUT_HALFWORD
+    default 2 if NX_CRC1_INPUT_WORD
+
+config NX_CRC1_INPUT_FORMAT_VALUE
+    int
+    default 0 if NX_CRC1_INPUT_BYTE
+    default 1 if NX_CRC1_INPUT_HALFWORD
+    default 2 if NX_CRC1_INPUT_WORD
+
+endif # INSTANCE_NX_CRC_1
+
+endif # NATIVE_CRC_ENABLE

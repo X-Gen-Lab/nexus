@@ -14,6 +14,7 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_rtc.h"
+#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_rtc_helpers.h"
 #include "nx_rtc_types.h"
@@ -24,16 +25,7 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define NX_RTC_MAX_INSTANCES 4
-#define DEVICE_TYPE          NX_RTC
-
-/*---------------------------------------------------------------------------*/
-/* Static Storage                                                            */
-/*---------------------------------------------------------------------------*/
-
-static nx_rtc_state_t g_rtc_states[NX_RTC_MAX_INSTANCES];
-static nx_rtc_impl_t g_rtc_instances[NX_RTC_MAX_INSTANCES];
-static uint8_t g_rtc_instance_count = 0;
+#define DEVICE_TYPE NX_RTC
 
 /*---------------------------------------------------------------------------*/
 /* Forward Declarations                                                      */
@@ -58,8 +50,13 @@ static void rtc_init_instance(nx_rtc_impl_t* impl, uint8_t index,
     rtc_init_lifecycle(&impl->lifecycle);
     rtc_init_power(&impl->power);
 
-    /* Link to state */
-    impl->state = &g_rtc_states[index];
+    /* Allocate and initialize state */
+    impl->state = (nx_rtc_state_t*)nx_mem_alloc(sizeof(nx_rtc_state_t));
+    if (!impl->state) {
+        return;
+    }
+    memset(impl->state, 0, sizeof(nx_rtc_state_t));
+
     impl->state->index = index;
     impl->state->initialized = false;
     impl->state->suspended = false;
@@ -80,9 +77,6 @@ static void rtc_init_instance(nx_rtc_impl_t* impl, uint8_t index,
     /* Clear alarm */
     memset(&impl->state->alarm, 0, sizeof(nx_rtc_alarm_t));
 
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_rtc_stats_t));
-
     /* Initialize start timestamp */
     impl->state->start_timestamp_ms = rtc_get_system_time_ms();
 }
@@ -94,61 +88,60 @@ static void rtc_init_instance(nx_rtc_impl_t* impl, uint8_t index,
 /**
  * \brief           Device initialization function for Kconfig registration
  */
-static void* nx_rtc_device_init(const nx_device_t* dev) {
+NX_UNUSED static void* nx_rtc_device_init(const nx_device_t* dev) {
     const nx_rtc_platform_config_t* config =
         (const nx_rtc_platform_config_t*)dev->config;
 
-    if (config == NULL || g_rtc_instance_count >= NX_RTC_MAX_INSTANCES) {
+    if (config == NULL) {
         return NULL;
     }
 
-    uint8_t index = g_rtc_instance_count++;
-    nx_rtc_impl_t* impl = &g_rtc_instances[index];
+    /* Allocate implementation structure */
+    nx_rtc_impl_t* impl = (nx_rtc_impl_t*)nx_mem_alloc(sizeof(nx_rtc_impl_t));
+    if (!impl) {
+        return NULL;
+    }
+    memset(impl, 0, sizeof(nx_rtc_impl_t));
 
     /* Initialize instance with platform configuration */
-    rtc_init_instance(impl, index, config);
+    rtc_init_instance(impl, config->rtc_index, config);
+
+    /* Check if state allocation succeeded */
+    if (!impl->state) {
+        nx_mem_free(impl);
+        return NULL;
+    }
 
     /* Store device pointer */
     impl->device = (nx_device_t*)dev;
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
 /**
  * \brief           Configuration macro - reads from Kconfig
  */
-#define NX_RTC_CONFIG(idx)                                                     \
-    static const nx_rtc_platform_config_t rtc_config_##idx = {                 \
-        .index = idx,                                                          \
-        .enable_alarm = NX_CONFIG_RTC##idx##_ENABLE_ALARM,                     \
-        .alarm_count = NX_CONFIG_RTC##idx##_ALARM_COUNT,                       \
+#define NX_RTC_CONFIG(index)                                                   \
+    static const nx_rtc_platform_config_t rtc_config_##index = {               \
+        .rtc_index = index,                                                    \
+        .enable_alarm = NX_CONFIG_RTC##index##_ENABLE_ALARM,                   \
+        .alarm_count = NX_CONFIG_RTC##index##_ALARM_COUNT,                     \
     }
 
 /**
  * \brief           Device registration macro
  */
-#define NX_RTC_DEVICE_REGISTER(idx)                                            \
-    NX_RTC_CONFIG(idx)                                                         \
-    static nx_device_config_state_t rtc_kconfig_state_##idx = {                \
+#define NX_RTC_DEVICE_REGISTER(index)                                          \
+    NX_RTC_CONFIG(index);                                                      \
+    static nx_device_config_state_t rtc_kconfig_state_##index = {              \
         .init_res = 0,                                                         \
         .initialized = false,                                                  \
     };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, idx, "RTC" #idx, &rtc_config_##idx,        \
-                       &rtc_kconfig_state_##idx, nx_rtc_device_init)
+    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "RTC" #index, &rtc_config_##index,  \
+                       &rtc_kconfig_state_##index, nx_rtc_device_init);
 
-/* Register all enabled RTC instances */
-#if defined(NX_CONFIG_INSTANCE_NX_RTC0)
-NX_RTC_CONFIG(0);
-static nx_device_config_state_t rtc_kconfig_state_0 = {
-    .init_res = 0,
-    .initialized = false,
-};
-NX_DEVICE_REGISTER(DEVICE_TYPE, 0, "RTC0", &rtc_config_0, &rtc_kconfig_state_0,
-                   nx_rtc_device_init);
-#endif
+/**
+ * \brief           Register all enabled RTC instances
+ */
+NX_TRAVERSE_EACH_INSTANCE(NX_RTC_DEVICE_REGISTER, DEVICE_TYPE);

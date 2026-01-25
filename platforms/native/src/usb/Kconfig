@@ -1,39 +1,174 @@
-config NX_USB_ENABLED
-    bool "Enable USB support"
+# USB Configuration for Native Platform
+
+config NATIVE_USB_ENABLE
+    bool "Enable USB support for Native platform"
     default y
+    depends on PLATFORM_NATIVE
     help
-      Enable USB (Universal Serial Bus) peripheral support for Native platform.
-      Provides simulated USB device functionality for testing.
+      Enable USB peripheral support for the Native platform.
+      This provides simulated USB functionality for testing
+      and development on PC.
 
-if NX_USB_ENABLED
+if NATIVE_USB_ENABLE
 
-config NX_USB_NUM_ENDPOINTS
-    int "Number of USB endpoints"
-    default 4
-    range 1 8
+# USB0 Configuration
+menuconfig INSTANCE_NX_USB_0
+    bool "Enable USB0"
+    default y
+    depends on NATIVE_USB_ENABLE
     help
-      Number of USB endpoints to support. Each endpoint can be configured
-      for different transfer types (control, bulk, interrupt, isochronous).
+      Enable USB instance 0.
 
-config NX_USB_TX_BUFFER_SIZE
-    int "USB TX buffer size"
+if INSTANCE_NX_USB_0
+
+choice
+    prompt "USB0 speed"
+    default NX_USB0_SPEED_FULL
+    depends on INSTANCE_NX_USB_0
+
+config NX_USB0_SPEED_LOW
+    bool "Low Speed (1.5 Mbps)"
+
+config NX_USB0_SPEED_FULL
+    bool "Full Speed (12 Mbps)"
+
+config NX_USB0_SPEED_HIGH
+    bool "High Speed (480 Mbps)"
+
+endchoice
+
+config USB0_SPEED_VALUE
+    int
+    default 0 if NX_USB0_SPEED_LOW
+    default 1 if NX_USB0_SPEED_FULL
+    default 2 if NX_USB0_SPEED_HIGH
+
+config USB0_NUM_ENDPOINTS
+    int "USB0 number of endpoints"
+    default 8
+    range 1 16
+    help
+      Number of USB endpoints for USB0.
+
+config USB0_TX_BUFFER_SIZE
+    int "USB0 TX buffer size"
     default 1024
     range 64 4096
     help
-      Size of the USB transmit buffer in bytes.
+      Size of TX buffer for USB0 in bytes.
 
-config NX_USB_RX_BUFFER_SIZE
-    int "USB RX buffer size"
+config USB0_RX_BUFFER_SIZE
+    int "USB0 RX buffer size"
     default 1024
     range 64 4096
     help
-      Size of the USB receive buffer in bytes.
+      Size of RX buffer for USB0 in bytes.
 
-config NX_USB_AUTO_CONNECT
-    bool "Auto-connect USB on initialization"
-    default y
+choice
+    prompt "USB0 power mode"
+    default NX_USB0_POWER_BUS
+    depends on INSTANCE_NX_USB_0
+
+config NX_USB0_POWER_BUS
+    bool "Bus powered"
+
+config NX_USB0_POWER_SELF
+    bool "Self powered"
+
+endchoice
+
+config USB0_POWER_VALUE
+    int
+    default 0 if NX_USB0_POWER_BUS
+    default 1 if NX_USB0_POWER_SELF
+
+config USB0_MAX_POWER_MA
+    int "USB0 maximum power (mA)"
+    default 500
+    range 0 500
     help
-      Automatically set USB to connected state on initialization.
-      Useful for testing without manual connection simulation.
+      Maximum power consumption for USB0 in milliamps.
 
-endif # NX_USB_ENABLED
+endif # INSTANCE_NX_USB_0
+
+# USB1 Configuration
+menuconfig INSTANCE_NX_USB_1
+    bool "Enable USB1"
+    default n
+    depends on NATIVE_USB_ENABLE
+    help
+      Enable USB instance 1.
+
+if INSTANCE_NX_USB_1
+
+choice
+    prompt "USB1 speed"
+    default NX_USB1_SPEED_FULL
+    depends on INSTANCE_NX_USB_1
+
+config NX_USB1_SPEED_LOW
+    bool "Low Speed (1.5 Mbps)"
+
+config NX_USB1_SPEED_FULL
+    bool "Full Speed (12 Mbps)"
+
+config NX_USB1_SPEED_HIGH
+    bool "High Speed (480 Mbps)"
+
+endchoice
+
+config USB1_SPEED_VALUE
+    int
+    default 0 if NX_USB1_SPEED_LOW
+    default 1 if NX_USB1_SPEED_FULL
+    default 2 if NX_USB1_SPEED_HIGH
+
+config USB1_NUM_ENDPOINTS
+    int "USB1 number of endpoints"
+    default 8
+    range 1 16
+    help
+      Number of USB endpoints for USB1.
+
+config USB1_TX_BUFFER_SIZE
+    int "USB1 TX buffer size"
+    default 1024
+    range 64 4096
+    help
+      Size of TX buffer for USB1 in bytes.
+
+config USB1_RX_BUFFER_SIZE
+    int "USB1 RX buffer size"
+    default 1024
+    range 64 4096
+    help
+      Size of RX buffer for USB1 in bytes.
+
+choice
+    prompt "USB1 power mode"
+    default NX_USB1_POWER_BUS
+    depends on INSTANCE_NX_USB_1
+
+config NX_USB1_POWER_BUS
+    bool "Bus powered"
+
+config NX_USB1_POWER_SELF
+    bool "Self powered"
+
+endchoice
+
+config USB1_POWER_VALUE
+    int
+    default 0 if NX_USB1_POWER_BUS
+    default 1 if NX_USB1_POWER_SELF
+
+config USB1_MAX_POWER_MA
+    int "USB1 maximum power (mA)"
+    default 500
+    range 0 500
+    help
+      Maximum power consumption for USB1 in milliamps.
+
+endif # INSTANCE_NX_USB_1
+
+endif # NATIVE_USB_ENABLE

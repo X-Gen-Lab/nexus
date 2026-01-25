@@ -17,30 +17,16 @@
 #include <stddef.h>
 
 /*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get ADC buffer implementation from lifecycle interface
- */
-static nx_adc_buffer_impl_t*
-adc_buffer_get_impl_from_lifecycle(nx_lifecycle_t* self) {
-    if (!self) {
-        return NULL;
-    }
-    return (nx_adc_buffer_impl_t*)((char*)self -
-                                   offsetof(nx_adc_buffer_impl_t, lifecycle));
-}
-
-/*---------------------------------------------------------------------------*/
 /* Lifecycle Operations                                                      */
 /*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Initialize ADC buffer device
+ * \brief
+ *
  */
 static nx_status_t adc_buffer_lifecycle_init(nx_lifecycle_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_lifecycle(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -60,7 +46,8 @@ static nx_status_t adc_buffer_lifecycle_init(nx_lifecycle_t* self) {
  * \brief           Deinitialize ADC buffer device
  */
 static nx_status_t adc_buffer_lifecycle_deinit(nx_lifecycle_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_lifecycle(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -79,7 +66,8 @@ static nx_status_t adc_buffer_lifecycle_deinit(nx_lifecycle_t* self) {
  * \brief           Suspend ADC buffer device
  */
 static nx_status_t adc_buffer_lifecycle_suspend(nx_lifecycle_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_lifecycle(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -95,7 +83,8 @@ static nx_status_t adc_buffer_lifecycle_suspend(nx_lifecycle_t* self) {
  * \brief           Resume ADC buffer device
  */
 static nx_status_t adc_buffer_lifecycle_resume(nx_lifecycle_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_lifecycle(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_ERR_NULL_PTR;
     }
@@ -111,7 +100,8 @@ static nx_status_t adc_buffer_lifecycle_resume(nx_lifecycle_t* self) {
  * \brief           Get ADC buffer device state
  */
 static nx_device_state_t adc_buffer_lifecycle_get_state(nx_lifecycle_t* self) {
-    nx_adc_buffer_impl_t* impl = adc_buffer_get_impl_from_lifecycle(self);
+    nx_adc_buffer_impl_t* impl =
+        NX_CONTAINER_OF(self, nx_adc_buffer_impl_t, lifecycle);
     if (!impl || !impl->state) {
         return NX_DEV_STATE_ERROR;
     }

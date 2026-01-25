@@ -66,8 +66,8 @@ static nx_isr_manager_impl_t g_isr_manager = {
             .enable = isr_enable,
             .disable = isr_disable,
         },
-    .chains = {0},
-    .handle_pool = {0},
+    .chains = {{0}},
+    .handle_pool = {{0}},
 };
 
 /**

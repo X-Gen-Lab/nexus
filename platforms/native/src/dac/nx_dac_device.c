@@ -217,14 +217,7 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
         return NULL;
     }
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        nx_mem_free(impl->state);
-        nx_mem_free(impl);
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
@@ -232,7 +225,7 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
  * \brief           Configuration macro - reads from Kconfig
  */
 #define NX_DAC_CONFIG(index)                                                   \
-    static const nx_dac_platform_config_t dac_config_##index = {               \
+    static const nx_dac_platform_config_t nx_dac_platform_config##index = {    \
         .dac_index = index,                                                    \
         .channel_count = NX_CONFIG_DAC##index##_CHANNEL_COUNT,                 \
         .resolution = NX_CONFIG_DAC##index##_RESOLUTION,                       \
@@ -248,14 +241,11 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
         .init_res = 0,                                                         \
         .initialized = false,                                                  \
     };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "DAC" #index, &dac_config_##index,  \
-                       &dac_kconfig_state_##index, nx_dac_device_init)
+    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "DAC" #index,                       \
+                       &nx_dac_platform_config##index,                         \
+                       &dac_kconfig_state_##index, nx_dac_device_init);
 
-/* Register all enabled DAC instances */
-#ifndef _MSC_VER
+/**
+ * \brief           Configuration macro - reads from Kconfig
+ */
 NX_TRAVERSE_EACH_INSTANCE(NX_DAC_DEVICE_REGISTER, DEVICE_TYPE);
-#else
-/* MSVC: Temporarily disabled due to macro compatibility issues */
-#pragma message(                                                               \
-    "DAC device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
-#endif

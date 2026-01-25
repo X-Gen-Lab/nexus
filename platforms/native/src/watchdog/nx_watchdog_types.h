@@ -41,7 +41,7 @@ typedef struct nx_device_s nx_device_t;
  * Contains compile-time configuration from Kconfig.
  */
 typedef struct nx_watchdog_platform_config_s {
-    uint8_t index;            /**< Watchdog instance index */
+    uint8_t watchdog_index;   /**< Watchdog instance index */
     uint32_t default_timeout; /**< Default timeout in milliseconds */
 } nx_watchdog_platform_config_t;
 

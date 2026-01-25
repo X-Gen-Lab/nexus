@@ -1,6 +1,6 @@
-# ADC Configuration for Native Platform
+#ADC Configuration for Native Platform
 
-config ADC_NATIVE
+config NATIVE_ADC_ENABLE
     bool "Enable ADC support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,20 +9,13 @@ config ADC_NATIVE
       This provides simulated ADC functionality for testing
       and development on PC.
 
-if ADC_NATIVE
+if NATIVE_ADC_ENABLE
 
-config ADC_MAX_INSTANCES
-    int "Maximum number of ADC instances"
-    default 4
-    range 1 8
-    help
-      Maximum number of ADC instances supported by the
-      Native platform.
-
-# ADC0 Configuration
-config INSTANCE_NX_ADC_0
+#ADC0 Configuration
+menuconfig INSTANCE_NX_ADC_0
     bool "Enable ADC0"
     default y
+    depends on NATIVE_ADC_ENABLE
     help
       Enable ADC instance 0.
 
@@ -35,19 +28,68 @@ config ADC0_CHANNEL_COUNT
     help
       Number of ADC channels for ADC0.
 
+choice
+    prompt "ADC0 resolution"
+    default NX_ADC0_RESOLUTION_12
+    depends on INSTANCE_NX_ADC_0
+
+config NX_ADC0_RESOLUTION_8
+    bool "8-bit resolution"
+
+config NX_ADC0_RESOLUTION_10
+    bool "10-bit resolution"
+
+config NX_ADC0_RESOLUTION_12
+    bool "12-bit resolution"
+
+config NX_ADC0_RESOLUTION_16
+    bool "16-bit resolution"
+
+endchoice
+
+config ADC0_RESOLUTION_VALUE
+    int
+    default 0 if NX_ADC0_RESOLUTION_8
+    default 1 if NX_ADC0_RESOLUTION_10
+    default 2 if NX_ADC0_RESOLUTION_12
+    default 3 if NX_ADC0_RESOLUTION_16
+
 config ADC0_RESOLUTION
-    int "ADC0 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      ADC resolution for ADC0 in bits.
+    int
+    default 8 if NX_ADC0_RESOLUTION_8
+    default 10 if NX_ADC0_RESOLUTION_10
+    default 12 if NX_ADC0_RESOLUTION_12
+    default 16 if NX_ADC0_RESOLUTION_16
+
+choice
+    prompt "ADC0 sampling time"
+    default NX_ADC0_SAMPLE_TIME_MEDIUM
+    depends on INSTANCE_NX_ADC_0
+
+config NX_ADC0_SAMPLE_TIME_FAST
+    bool "Fast (1.5 cycles)"
+
+config NX_ADC0_SAMPLE_TIME_MEDIUM
+    bool "Medium (7.5 cycles)"
+
+config NX_ADC0_SAMPLE_TIME_SLOW
+    bool "Slow (28.5 cycles)"
+
+endchoice
+
+config ADC0_SAMPLE_TIME_VALUE
+    int
+    default 0 if NX_ADC0_SAMPLE_TIME_FAST
+    default 1 if NX_ADC0_SAMPLE_TIME_MEDIUM
+    default 2 if NX_ADC0_SAMPLE_TIME_SLOW
 
 endif # INSTANCE_NX_ADC_0
 
-# ADC1 Configuration
-config INSTANCE_NX_ADC_1
+#ADC1 Configuration
+menuconfig INSTANCE_NX_ADC_1
     bool "Enable ADC1"
     default n
+    depends on NATIVE_ADC_ENABLE
     help
       Enable ADC instance 1.
 
@@ -60,19 +102,68 @@ config ADC1_CHANNEL_COUNT
     help
       Number of ADC channels for ADC1.
 
+choice
+    prompt "ADC1 resolution"
+    default NX_ADC1_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_ADC_1
+
+config NX_ADC1_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_ADC1_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_ADC1_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_ADC1_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config ADC1_RESOLUTION_VALUE
+    int
+    default 0 if NX_ADC1_RESOLUTION_BIT_8
+    default 1 if NX_ADC1_RESOLUTION_BIT_10
+    default 2 if NX_ADC1_RESOLUTION_BIT_12
+    default 3 if NX_ADC1_RESOLUTION_BIT_16
+
 config ADC1_RESOLUTION
-    int "ADC1 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      ADC resolution for ADC1 in bits.
+    int
+    default 8 if NX_ADC1_RESOLUTION_BIT_8
+    default 10 if NX_ADC1_RESOLUTION_BIT_10
+    default 12 if NX_ADC1_RESOLUTION_BIT_12
+    default 16 if NX_ADC1_RESOLUTION_BIT_16
+
+choice
+    prompt "ADC1 sampling time"
+    default NX_ADC1_SAMPLE_TIME_MEDIUM
+    depends on INSTANCE_NX_ADC_1
+
+config NX_ADC1_SAMPLE_TIME_FAST
+    bool "Fast (1.5 cycles)"
+
+config NX_ADC1_SAMPLE_TIME_MEDIUM
+    bool "Medium (7.5 cycles)"
+
+config NX_ADC1_SAMPLE_TIME_SLOW
+    bool "Slow (28.5 cycles)"
+
+endchoice
+
+config ADC1_SAMPLE_TIME_VALUE
+    int
+    default 0 if NX_ADC1_SAMPLE_TIME_FAST
+    default 1 if NX_ADC1_SAMPLE_TIME_MEDIUM
+    default 2 if NX_ADC1_SAMPLE_TIME_SLOW
 
 endif # INSTANCE_NX_ADC_1
 
-# ADC2 Configuration
-config INSTANCE_NX_ADC_2
+#ADC2 Configuration
+menuconfig INSTANCE_NX_ADC_2
     bool "Enable ADC2"
     default n
+    depends on NATIVE_ADC_ENABLE
     help
       Enable ADC instance 2.
 
@@ -85,19 +176,68 @@ config ADC2_CHANNEL_COUNT
     help
       Number of ADC channels for ADC2.
 
+choice
+    prompt "ADC2 resolution"
+    default NX_ADC2_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_ADC_2
+
+config NX_ADC2_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_ADC2_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_ADC2_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_ADC2_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config ADC2_RESOLUTION_VALUE
+    int
+    default 0 if NX_ADC2_RESOLUTION_BIT_8
+    default 1 if NX_ADC2_RESOLUTION_BIT_10
+    default 2 if NX_ADC2_RESOLUTION_BIT_12
+    default 3 if NX_ADC2_RESOLUTION_BIT_16
+
 config ADC2_RESOLUTION
-    int "ADC2 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      ADC resolution for ADC2 in bits.
+    int
+    default 8 if NX_ADC2_RESOLUTION_BIT_8
+    default 10 if NX_ADC2_RESOLUTION_BIT_10
+    default 12 if NX_ADC2_RESOLUTION_BIT_12
+    default 16 if NX_ADC2_RESOLUTION_BIT_16
+
+choice
+    prompt "ADC2 sampling time"
+    default NX_ADC2_SAMPLE_TIME_MEDIUM
+    depends on INSTANCE_NX_ADC_2
+
+config NX_ADC2_SAMPLE_TIME_FAST
+    bool "Fast (1.5 cycles)"
+
+config NX_ADC2_SAMPLE_TIME_MEDIUM
+    bool "Medium (7.5 cycles)"
+
+config NX_ADC2_SAMPLE_TIME_SLOW
+    bool "Slow (28.5 cycles)"
+
+endchoice
+
+config ADC2_SAMPLE_TIME_VALUE
+    int
+    default 0 if NX_ADC2_SAMPLE_TIME_FAST
+    default 1 if NX_ADC2_SAMPLE_TIME_MEDIUM
+    default 2 if NX_ADC2_SAMPLE_TIME_SLOW
 
 endif # INSTANCE_NX_ADC_2
 
-# ADC3 Configuration
-config INSTANCE_NX_ADC_3
+#ADC3 Configuration
+menuconfig INSTANCE_NX_ADC_3
     bool "Enable ADC3"
     default n
+    depends on NATIVE_ADC_ENABLE
     help
       Enable ADC instance 3.
 
@@ -110,41 +250,82 @@ config ADC3_CHANNEL_COUNT
     help
       Number of ADC channels for ADC3.
 
+choice
+    prompt "ADC3 resolution"
+    default NX_ADC3_RESOLUTION_BIT_12
+    depends on INSTANCE_NX_ADC_3
+
+config NX_ADC3_RESOLUTION_BIT_8
+    bool "8-bit resolution"
+
+config NX_ADC3_RESOLUTION_BIT_10
+    bool "10-bit resolution"
+
+config NX_ADC3_RESOLUTION_BIT_12
+    bool "12-bit resolution"
+
+config NX_ADC3_RESOLUTION_BIT_16
+    bool "16-bit resolution"
+
+endchoice
+
+config ADC3_RESOLUTION_VALUE
+    int
+    default 0 if NX_ADC3_RESOLUTION_BIT_8
+    default 1 if NX_ADC3_RESOLUTION_BIT_10
+    default 2 if NX_ADC3_RESOLUTION_BIT_12
+    default 3 if NX_ADC3_RESOLUTION_BIT_16
+
 config ADC3_RESOLUTION
-    int "ADC3 resolution (bits)"
-    default 12
-    range 8 16
-    help
-      ADC resolution for ADC3 in bits.
+    int
+    default 8 if NX_ADC3_RESOLUTION_BIT_8
+    default 10 if NX_ADC3_RESOLUTION_BIT_10
+    default 12 if NX_ADC3_RESOLUTION_BIT_12
+    default 16 if NX_ADC3_RESOLUTION_BIT_16
+
+choice
+    prompt "ADC3 sampling time"
+    default NX_ADC3_SAMPLE_TIME_MEDIUM
+    depends on INSTANCE_NX_ADC_3
+
+config NX_ADC3_SAMPLE_TIME_FAST
+    bool "Fast (1.5 cycles)"
+
+config NX_ADC3_SAMPLE_TIME_MEDIUM
+    bool "Medium (7.5 cycles)"
+
+config NX_ADC3_SAMPLE_TIME_SLOW
+    bool "Slow (28.5 cycles)"
+
+endchoice
+
+config ADC3_SAMPLE_TIME_VALUE
+    int
+    default 0 if NX_ADC3_SAMPLE_TIME_FAST
+    default 1 if NX_ADC3_SAMPLE_TIME_MEDIUM
+    default 2 if NX_ADC3_SAMPLE_TIME_SLOW
 
 endif # INSTANCE_NX_ADC_3
 
-endif # ADC_NATIVE
+endif # NATIVE_ADC_ENABLE
 
-# ADC Buffer Configuration
-config ADC_BUFFER_NATIVE
+#ADC Buffer Configuration
+config NATIVE_ADC_BUFFER_ENABLE
     bool "Enable ADC Buffer support for Native platform"
     default y
-    depends on PLATFORM_NATIVE && ADC_NATIVE
+    depends on PLATFORM_NATIVE && NATIVE_ADC_ENABLE
     help
       Enable ADC Buffer peripheral support for the Native platform.
       This provides simulated buffered multi-channel ADC sampling
       for testing and development on PC.
 
-if ADC_BUFFER_NATIVE
+if NATIVE_ADC_BUFFER_ENABLE
 
-config ADC_BUFFER_MAX_INSTANCES
-    int "Maximum number of ADC Buffer instances"
-    default 4
-    range 1 8
-    help
-      Maximum number of ADC Buffer instances supported by the
-      Native platform.
-
-# ADC Buffer 0 Configuration
-config INSTANCE_NX_ADC_BUFFER_0
+#ADC Buffer 0 Configuration
+menuconfig INSTANCE_NX_ADC_BUFFER_0
     bool "Enable ADC_BUFFER0"
     default y
+    depends on NATIVE_ADC_BUFFER_ENABLE
     help
       Enable ADC Buffer instance 0.
 
@@ -165,12 +346,35 @@ config ADC_BUFFER0_BUFFER_SIZE
       Buffer size for ADC_BUFFER0 in samples.
       Will be aligned to multiple of channel count.
 
+choice
+    prompt "ADC_BUFFER0 trigger mode"
+    default NX_ADC_BUFFER0_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_ADC_BUFFER_0
+
+config NX_ADC_BUFFER0_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_ADC_BUFFER0_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_ADC_BUFFER0_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config ADC_BUFFER0_TRIGGER_VALUE
+    int
+    default 0 if NX_ADC_BUFFER0_TRIGGER_SOFTWARE
+    default 1 if NX_ADC_BUFFER0_TRIGGER_TIMER
+    default 2 if NX_ADC_BUFFER0_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_ADC_BUFFER_0
 
-# ADC Buffer 1 Configuration
-config INSTANCE_NX_ADC_BUFFER_1
+#ADC Buffer 1 Configuration
+menuconfig INSTANCE_NX_ADC_BUFFER_1
     bool "Enable ADC_BUFFER1"
     default n
+    depends on NATIVE_ADC_BUFFER_ENABLE
     help
       Enable ADC Buffer instance 1.
 
@@ -191,12 +395,35 @@ config ADC_BUFFER1_BUFFER_SIZE
       Buffer size for ADC_BUFFER1 in samples.
       Will be aligned to multiple of channel count.
 
+choice
+    prompt "ADC_BUFFER1 trigger mode"
+    default NX_ADC_BUFFER1_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_ADC_BUFFER_1
+
+config NX_ADC_BUFFER1_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_ADC_BUFFER1_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_ADC_BUFFER1_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config ADC_BUFFER1_TRIGGER_VALUE
+    int
+    default 0 if NX_ADC_BUFFER1_TRIGGER_SOFTWARE
+    default 1 if NX_ADC_BUFFER1_TRIGGER_TIMER
+    default 2 if NX_ADC_BUFFER1_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_ADC_BUFFER_1
 
-# ADC Buffer 2 Configuration
-config INSTANCE_NX_ADC_BUFFER_2
+#ADC Buffer 2 Configuration
+menuconfig INSTANCE_NX_ADC_BUFFER_2
     bool "Enable ADC_BUFFER2"
     default n
+    depends on NATIVE_ADC_BUFFER_ENABLE
     help
       Enable ADC Buffer instance 2.
 
@@ -217,12 +444,35 @@ config ADC_BUFFER2_BUFFER_SIZE
       Buffer size for ADC_BUFFER2 in samples.
       Will be aligned to multiple of channel count.
 
+choice
+    prompt "ADC_BUFFER2 trigger mode"
+    default NX_ADC_BUFFER2_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_ADC_BUFFER_2
+
+config NX_ADC_BUFFER2_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_ADC_BUFFER2_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_ADC_BUFFER2_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config ADC_BUFFER2_TRIGGER_VALUE
+    int
+    default 0 if NX_ADC_BUFFER2_TRIGGER_SOFTWARE
+    default 1 if NX_ADC_BUFFER2_TRIGGER_TIMER
+    default 2 if NX_ADC_BUFFER2_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_ADC_BUFFER_2
 
-# ADC Buffer 3 Configuration
-config INSTANCE_NX_ADC_BUFFER_3
+#ADC Buffer 3 Configuration
+menuconfig INSTANCE_NX_ADC_BUFFER_3
     bool "Enable ADC_BUFFER3"
     default n
+    depends on NATIVE_ADC_BUFFER_ENABLE
     help
       Enable ADC Buffer instance 3.
 
@@ -243,6 +493,28 @@ config ADC_BUFFER3_BUFFER_SIZE
       Buffer size for ADC_BUFFER3 in samples.
       Will be aligned to multiple of channel count.
 
+choice
+    prompt "ADC_BUFFER3 trigger mode"
+    default NX_ADC_BUFFER3_TRIGGER_SOFTWARE
+    depends on INSTANCE_NX_ADC_BUFFER_3
+
+config NX_ADC_BUFFER3_TRIGGER_SOFTWARE
+    bool "Software trigger"
+
+config NX_ADC_BUFFER3_TRIGGER_TIMER
+    bool "Timer trigger"
+
+config NX_ADC_BUFFER3_TRIGGER_EXTERNAL
+    bool "External trigger"
+
+endchoice
+
+config ADC_BUFFER3_TRIGGER_VALUE
+    int
+    default 0 if NX_ADC_BUFFER3_TRIGGER_SOFTWARE
+    default 1 if NX_ADC_BUFFER3_TRIGGER_TIMER
+    default 2 if NX_ADC_BUFFER3_TRIGGER_EXTERNAL
+
 endif # INSTANCE_NX_ADC_BUFFER_3
 
-endif # ADC_BUFFER_NATIVE
+endif # NATIVE_ADC_BUFFER_ENABLE

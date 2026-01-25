@@ -15,14 +15,11 @@
 #include "hal/nx_status.h"
 #include "nx_uart_helpers.h"
 #include "nx_uart_types.h"
+#include <string.h>
 
 /*---------------------------------------------------------------------------*/
 /* External Buffer References                                                */
 /*---------------------------------------------------------------------------*/
-
-/* Buffer pointers are managed in nx_uart_device.c */
-extern uint8_t* g_uart_tx_buffers[];
-extern uint8_t* g_uart_rx_buffers[];
 
 /*---------------------------------------------------------------------------*/
 /* Lifecycle Interface Implementation                                        */
@@ -42,11 +39,23 @@ static nx_status_t uart_lifecycle_init(nx_lifecycle_t* self) {
         return NX_ERR_ALREADY_INIT;
     }
 
-    /* Initialize buffers */
-    buffer_init(&impl->state->tx_buf, g_uart_tx_buffers[impl->state->index],
-                impl->state->config.tx_buf_size);
-    buffer_init(&impl->state->rx_buf, g_uart_rx_buffers[impl->state->index],
-                impl->state->config.rx_buf_size);
+    /* Clear buffer contents and reset pointers */
+    if (impl->state->tx_buf.data != NULL) {
+        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
+        impl->state->tx_buf.head = 0;
+        impl->state->tx_buf.tail = 0;
+        impl->state->tx_buf.count = 0;
+    }
+
+    if (impl->state->rx_buf.data != NULL) {
+        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
+        impl->state->rx_buf.head = 0;
+        impl->state->rx_buf.tail = 0;
+        impl->state->rx_buf.count = 0;
+    }
+
+    /* Clear statistics */
+    memset(&impl->state->stats, 0, sizeof(nx_uart_stats_t));
 
     /* Set state flags */
     impl->state->initialized = true;
@@ -66,8 +75,28 @@ static nx_status_t uart_lifecycle_deinit(nx_lifecycle_t* self) {
         return NX_ERR_NOT_INIT;
     }
 
-    /* Clear state flag */
+    /* Clear buffer contents and reset pointers */
+    if (impl->state->tx_buf.data != NULL) {
+        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
+        impl->state->tx_buf.head = 0;
+        impl->state->tx_buf.tail = 0;
+        impl->state->tx_buf.count = 0;
+    }
+
+    if (impl->state->rx_buf.data != NULL) {
+        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
+        impl->state->rx_buf.head = 0;
+        impl->state->rx_buf.tail = 0;
+        impl->state->rx_buf.count = 0;
+    }
+
+    /* Clear statistics */
+    memset(&impl->state->stats, 0, sizeof(nx_uart_stats_t));
+
+    /* Clear state flags */
     impl->state->initialized = false;
+    impl->state->suspended = false;
+    impl->state->tx_busy = false;
 
     return NX_OK;
 }
@@ -81,6 +110,11 @@ static nx_status_t uart_lifecycle_suspend(nx_lifecycle_t* self) {
     /* Parameter validation */
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
+    }
+
+    /* Check if already suspended */
+    if (impl->state->suspended) {
+        return NX_ERR_INVALID_STATE;
     }
 
     /* Set suspend flag */
@@ -98,6 +132,11 @@ static nx_status_t uart_lifecycle_resume(nx_lifecycle_t* self) {
     /* Parameter validation */
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
+    }
+
+    /* Check if not suspended */
+    if (!impl->state->suspended) {
+        return NX_ERR_INVALID_STATE;
     }
 
     /* Clear suspend flag */

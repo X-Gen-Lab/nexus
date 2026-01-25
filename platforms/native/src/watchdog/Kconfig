@@ -1,60 +1,94 @@
 # Watchdog Configuration for Native Platform
 
-config WATCHDOG_NATIVE
+config NATIVE_WATCHDOG_ENABLE
     bool "Enable Watchdog support for Native platform"
     default y
     depends on PLATFORM_NATIVE
     help
-      Enable Watchdog Timer peripheral support for the
-      Native platform. This provides simulated watchdog
-      functionality for testing and development on PC.
+      Enable Watchdog peripheral support for the Native platform.
+      This provides simulated Watchdog functionality for testing
+      and development on PC.
 
-if WATCHDOG_NATIVE
-
-config WATCHDOG_MAX_INSTANCES
-    int "Maximum number of Watchdog instances"
-    default 1
-    range 1 4
-    help
-      Maximum number of Watchdog instances supported by the
-      Native platform.
+if NATIVE_WATCHDOG_ENABLE
 
 # Watchdog0 Configuration
-config INSTANCE_NX_WATCHDOG0
-    bool "Enable Watchdog0"
+menuconfig INSTANCE_NX_WATCHDOG_0
+    bool "Enable WATCHDOG0"
     default y
+    depends on NATIVE_WATCHDOG_ENABLE
     help
       Enable Watchdog instance 0.
 
-if INSTANCE_NX_WATCHDOG0
+if INSTANCE_NX_WATCHDOG_0
 
 config WATCHDOG0_DEFAULT_TIMEOUT_MS
-    int "Default timeout for Watchdog0 (milliseconds)"
+    int "WATCHDOG0 default timeout (ms)"
     default 5000
     range 100 60000
     help
-      Default timeout value for Watchdog0 in milliseconds.
-      The watchdog will trigger a reset if not fed within
-      this time period.
+      Default timeout for WATCHDOG0 in milliseconds (simulated).
+      Range: 100ms to 60000ms (1 minute).
 
-endif # INSTANCE_NX_WATCHDOG0
+endif # INSTANCE_NX_WATCHDOG_0
 
 # Watchdog1 Configuration
-config INSTANCE_NX_WATCHDOG1
-    bool "Enable Watchdog1"
+menuconfig INSTANCE_NX_WATCHDOG_1
+    bool "Enable WATCHDOG1"
     default n
+    depends on NATIVE_WATCHDOG_ENABLE
     help
       Enable Watchdog instance 1.
 
-if INSTANCE_NX_WATCHDOG1
+if INSTANCE_NX_WATCHDOG_1
 
 config WATCHDOG1_DEFAULT_TIMEOUT_MS
-    int "Default timeout for Watchdog1 (milliseconds)"
+    int "WATCHDOG1 default timeout (ms)"
     default 5000
     range 100 60000
     help
-      Default timeout value for Watchdog1 in milliseconds.
+      Default timeout for WATCHDOG1 in milliseconds (simulated).
+      Range: 100ms to 60000ms (1 minute).
 
-endif # INSTANCE_NX_WATCHDOG1
+endif # INSTANCE_NX_WATCHDOG_1
 
-endif # WATCHDOG_NATIVE
+# Watchdog2 Configuration
+menuconfig INSTANCE_NX_WATCHDOG_2
+    bool "Enable WATCHDOG2"
+    default n
+    depends on NATIVE_WATCHDOG_ENABLE
+    help
+      Enable Watchdog instance 2.
+
+if INSTANCE_NX_WATCHDOG_2
+
+config WATCHDOG2_DEFAULT_TIMEOUT_MS
+    int "WATCHDOG2 default timeout (ms)"
+    default 5000
+    range 100 60000
+    help
+      Default timeout for WATCHDOG2 in milliseconds (simulated).
+      Range: 100ms to 60000ms (1 minute).
+
+endif # INSTANCE_NX_WATCHDOG_2
+
+# Watchdog3 Configuration
+menuconfig INSTANCE_NX_WATCHDOG_3
+    bool "Enable WATCHDOG3"
+    default n
+    depends on NATIVE_WATCHDOG_ENABLE
+    help
+      Enable Watchdog instance 3.
+
+if INSTANCE_NX_WATCHDOG_3
+
+config WATCHDOG3_DEFAULT_TIMEOUT_MS
+    int "WATCHDOG3 default timeout (ms)"
+    default 5000
+    range 100 60000
+    help
+      Default timeout for WATCHDOG3 in milliseconds (simulated).
+      Range: 100ms to 60000ms (1 minute).
+
+endif # INSTANCE_NX_WATCHDOG_3
+
+endif # NATIVE_WATCHDOG_ENABLE

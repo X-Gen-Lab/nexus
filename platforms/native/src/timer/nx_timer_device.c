@@ -206,14 +206,7 @@ static void* nx_timer_device_init(const nx_device_t* dev) {
         return NULL;
     }
 
-    /* Initialize lifecycle */
-    nx_status_t status = impl->lifecycle.init(&impl->lifecycle);
-    if (status != NX_OK) {
-        nx_mem_free(impl->state);
-        nx_mem_free(impl);
-        return NULL;
-    }
-
+    /* Device is created but not initialized - tests will call init() */
     return &impl->base;
 }
 
@@ -238,13 +231,9 @@ static void* nx_timer_device_init(const nx_device_t* dev) {
     };                                                                         \
     NX_DEVICE_REGISTER(DEVICE_TYPE, index, "TIMER" #index,                     \
                        &timer_config_##index, &timer_kconfig_state_##index,    \
-                       nx_timer_device_init)
+                       nx_timer_device_init);
 
-/* Register all enabled timer instances */
-#ifndef _MSC_VER
+/**
+ * \brief           Register all enabled timer instances
+ */
 NX_TRAVERSE_EACH_INSTANCE(NX_TIMER_DEVICE_REGISTER, DEVICE_TYPE);
-#else
-/* MSVC: Temporarily disabled due to macro compatibility issues */
-#pragma message(                                                               \
-    "Timer device registration disabled on MSVC - TODO: Fix NX_DEVICE_REGISTER macro")
-#endif

@@ -1,6 +1,6 @@
 # I2C Configuration for Native Platform
 
-config I2C_NATIVE
+config NATIVE_I2C_ENABLE
     bool "Enable I2C support for Native platform"
     default y
     depends on PLATFORM_NATIVE
@@ -9,45 +9,68 @@ config I2C_NATIVE
       This provides simulated I2C functionality for testing
       and development on PC.
 
-if I2C_NATIVE
-
-config I2C_MAX_INSTANCES
-    int "Maximum number of I2C instances"
-    default 4
-    range 1 8
-    help
-      Maximum number of I2C instances supported by the
-      Native platform. Each instance requires buffer memory.
+if NATIVE_I2C_ENABLE
 
 # I2C0 Configuration
-config INSTANCE_NX_I2C_0
+menuconfig INSTANCE_NX_I2C_0
     bool "Enable I2C0"
     default y
+    depends on NATIVE_I2C_ENABLE
     help
       Enable I2C instance 0.
 
 if INSTANCE_NX_I2C_0
 
+choice
+    prompt "I2C0 speed mode"
+    default NX_I2C0_SPEED_STANDARD
+    depends on INSTANCE_NX_I2C_0
+
+config NX_I2C0_SPEED_STANDARD
+    bool "Standard mode (100 kHz)"
+
+config NX_I2C0_SPEED_FAST
+    bool "Fast mode (400 kHz)"
+
+config NX_I2C0_SPEED_FAST_PLUS
+    bool "Fast mode plus (1 MHz)"
+
+endchoice
+
+config I2C0_SPEED_VALUE
+    int
+    default 0 if NX_I2C0_SPEED_STANDARD
+    default 1 if NX_I2C0_SPEED_FAST
+    default 2 if NX_I2C0_SPEED_FAST_PLUS
+
 config I2C0_SPEED
-    int "I2C0 speed (Hz)"
-    default 100000
-    help
-      I2C speed for I2C0 in Hz (simulated).
-      Standard mode: 100000 Hz
-      Fast mode: 400000 Hz
-      Fast mode plus: 1000000 Hz
+    int
+    default 100000 if NX_I2C0_SPEED_STANDARD
+    default 400000 if NX_I2C0_SPEED_FAST
+    default 1000000 if NX_I2C0_SPEED_FAST_PLUS
 
-config I2C0_SCL_PIN
-    int "I2C0 SCL pin"
-    default 5
-    help
-      SCL pin number for I2C0 (simulated).
+choice
+    prompt "I2C0 addressing mode"
+    default NX_I2C0_ADDR_BIT_7
+    depends on INSTANCE_NX_I2C_0
 
-config I2C0_SDA_PIN
-    int "I2C0 SDA pin"
-    default 4
-    help
-      SDA pin number for I2C0 (simulated).
+config NX_I2C0_ADDR_BIT_7
+    bool "7-bit addressing"
+
+config NX_I2C0_ADDR_BIT_10
+    bool "10-bit addressing"
+
+endchoice
+
+config I2C0_ADDR_VALUE
+    int
+    default 0 if NX_I2C0_ADDR_BIT_7
+    default 1 if NX_I2C0_ADDR_BIT_10
+
+config I2C0_ADDR_MODE_VALUE
+    int
+    default 0 if NX_I2C0_ADDR_BIT_7
+    default 1 if NX_I2C0_ADDR_BIT_10
 
 config I2C0_TX_BUFFER_SIZE
     int "I2C0 TX buffer size"
@@ -66,31 +89,65 @@ config I2C0_RX_BUFFER_SIZE
 endif # INSTANCE_NX_I2C_0
 
 # I2C1 Configuration
-config INSTANCE_NX_I2C_1
+menuconfig INSTANCE_NX_I2C_1
     bool "Enable I2C1"
     default n
+    depends on NATIVE_I2C_ENABLE
     help
       Enable I2C instance 1.
 
 if INSTANCE_NX_I2C_1
 
+choice
+    prompt "I2C1 speed mode"
+    default NX_I2C1_SPEED_STANDARD
+    depends on INSTANCE_NX_I2C_1
+
+config NX_I2C1_SPEED_STANDARD
+    bool "Standard mode (100 kHz)"
+
+config NX_I2C1_SPEED_FAST
+    bool "Fast mode (400 kHz)"
+
+config NX_I2C1_SPEED_FAST_PLUS
+    bool "Fast mode plus (1 MHz)"
+
+endchoice
+
+config I2C1_SPEED_VALUE
+    int
+    default 0 if NX_I2C1_SPEED_STANDARD
+    default 1 if NX_I2C1_SPEED_FAST
+    default 2 if NX_I2C1_SPEED_FAST_PLUS
+
 config I2C1_SPEED
-    int "I2C1 speed (Hz)"
-    default 100000
-    help
-      I2C speed for I2C1 in Hz (simulated).
+    int
+    default 100000 if NX_I2C1_SPEED_STANDARD
+    default 400000 if NX_I2C1_SPEED_FAST
+    default 1000000 if NX_I2C1_SPEED_FAST_PLUS
 
-config I2C1_SCL_PIN
-    int "I2C1 SCL pin"
-    default 15
-    help
-      SCL pin number for I2C1 (simulated).
+choice
+    prompt "I2C1 addressing mode"
+    default NX_I2C1_ADDR_BIT_7
+    depends on INSTANCE_NX_I2C_1
 
-config I2C1_SDA_PIN
-    int "I2C1 SDA pin"
-    default 14
-    help
-      SDA pin number for I2C1 (simulated).
+config NX_I2C1_ADDR_BIT_7
+    bool "7-bit addressing"
+
+config NX_I2C1_ADDR_BIT_10
+    bool "10-bit addressing"
+
+endchoice
+
+config I2C1_ADDR_VALUE
+    int
+    default 0 if NX_I2C1_ADDR_BIT_7
+    default 1 if NX_I2C1_ADDR_BIT_10
+
+config I2C1_ADDR_MODE_VALUE
+    int
+    default 0 if NX_I2C1_ADDR_BIT_7
+    default 1 if NX_I2C1_ADDR_BIT_10
 
 config I2C1_TX_BUFFER_SIZE
     int "I2C1 TX buffer size"
@@ -109,31 +166,65 @@ config I2C1_RX_BUFFER_SIZE
 endif # INSTANCE_NX_I2C_1
 
 # I2C2 Configuration
-config INSTANCE_NX_I2C_2
+menuconfig INSTANCE_NX_I2C_2
     bool "Enable I2C2"
     default n
+    depends on NATIVE_I2C_ENABLE
     help
       Enable I2C instance 2.
 
 if INSTANCE_NX_I2C_2
 
+choice
+    prompt "I2C2 speed mode"
+    default NX_I2C2_SPEED_STANDARD
+    depends on INSTANCE_NX_I2C_2
+
+config NX_I2C2_SPEED_STANDARD
+    bool "Standard mode (100 kHz)"
+
+config NX_I2C2_SPEED_FAST
+    bool "Fast mode (400 kHz)"
+
+config NX_I2C2_SPEED_FAST_PLUS
+    bool "Fast mode plus (1 MHz)"
+
+endchoice
+
+config I2C2_SPEED_VALUE
+    int
+    default 0 if NX_I2C2_SPEED_STANDARD
+    default 1 if NX_I2C2_SPEED_FAST
+    default 2 if NX_I2C2_SPEED_FAST_PLUS
+
 config I2C2_SPEED
-    int "I2C2 speed (Hz)"
-    default 100000
-    help
-      I2C speed for I2C2 in Hz (simulated).
+    int
+    default 100000 if NX_I2C2_SPEED_STANDARD
+    default 400000 if NX_I2C2_SPEED_FAST
+    default 1000000 if NX_I2C2_SPEED_FAST_PLUS
 
-config I2C2_SCL_PIN
-    int "I2C2 SCL pin"
-    default 25
-    help
-      SCL pin number for I2C2 (simulated).
+choice
+    prompt "I2C2 addressing mode"
+    default NX_I2C2_ADDR_BIT_7
+    depends on INSTANCE_NX_I2C_2
 
-config I2C2_SDA_PIN
-    int "I2C2 SDA pin"
-    default 24
-    help
-      SDA pin number for I2C2 (simulated).
+config NX_I2C2_ADDR_BIT_7
+    bool "7-bit addressing"
+
+config NX_I2C2_ADDR_BIT_10
+    bool "10-bit addressing"
+
+endchoice
+
+config I2C2_ADDR_VALUE
+    int
+    default 0 if NX_I2C2_ADDR_BIT_7
+    default 1 if NX_I2C2_ADDR_BIT_10
+
+config I2C2_ADDR_MODE_VALUE
+    int
+    default 0 if NX_I2C2_ADDR_BIT_7
+    default 1 if NX_I2C2_ADDR_BIT_10
 
 config I2C2_TX_BUFFER_SIZE
     int "I2C2 TX buffer size"
@@ -152,31 +243,65 @@ config I2C2_RX_BUFFER_SIZE
 endif # INSTANCE_NX_I2C_2
 
 # I2C3 Configuration
-config INSTANCE_NX_I2C_3
+menuconfig INSTANCE_NX_I2C_3
     bool "Enable I2C3"
     default n
+    depends on NATIVE_I2C_ENABLE
     help
       Enable I2C instance 3.
 
 if INSTANCE_NX_I2C_3
 
+choice
+    prompt "I2C3 speed mode"
+    default NX_I2C3_SPEED_STANDARD
+    depends on INSTANCE_NX_I2C_3
+
+config NX_I2C3_SPEED_STANDARD
+    bool "Standard mode (100 kHz)"
+
+config NX_I2C3_SPEED_FAST
+    bool "Fast mode (400 kHz)"
+
+config NX_I2C3_SPEED_FAST_PLUS
+    bool "Fast mode plus (1 MHz)"
+
+endchoice
+
+config I2C3_SPEED_VALUE
+    int
+    default 0 if NX_I2C3_SPEED_STANDARD
+    default 1 if NX_I2C3_SPEED_FAST
+    default 2 if NX_I2C3_SPEED_FAST_PLUS
+
 config I2C3_SPEED
-    int "I2C3 speed (Hz)"
-    default 100000
-    help
-      I2C speed for I2C3 in Hz (simulated).
+    int
+    default 100000 if NX_I2C3_SPEED_STANDARD
+    default 400000 if NX_I2C3_SPEED_FAST
+    default 1000000 if NX_I2C3_SPEED_FAST_PLUS
 
-config I2C3_SCL_PIN
-    int "I2C3 SCL pin"
-    default 35
-    help
-      SCL pin number for I2C3 (simulated).
+choice
+    prompt "I2C3 addressing mode"
+    default NX_I2C3_ADDR_BIT_7
+    depends on INSTANCE_NX_I2C_3
 
-config I2C3_SDA_PIN
-    int "I2C3 SDA pin"
-    default 34
-    help
-      SDA pin number for I2C3 (simulated).
+config NX_I2C3_ADDR_BIT_7
+    bool "7-bit addressing"
+
+config NX_I2C3_ADDR_BIT_10
+    bool "10-bit addressing"
+
+endchoice
+
+config I2C3_ADDR_VALUE
+    int
+    default 0 if NX_I2C3_ADDR_BIT_7
+    default 1 if NX_I2C3_ADDR_BIT_10
+
+config I2C3_ADDR_MODE_VALUE
+    int
+    default 0 if NX_I2C3_ADDR_BIT_7
+    default 1 if NX_I2C3_ADDR_BIT_10
 
 config I2C3_TX_BUFFER_SIZE
     int "I2C3 TX buffer size"
@@ -194,4 +319,4 @@ config I2C3_RX_BUFFER_SIZE
 
 endif # INSTANCE_NX_I2C_3
 
-endif # I2C_NATIVE
+endif # NATIVE_I2C_ENABLE

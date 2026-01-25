@@ -30,8 +30,10 @@ static nx_status_t timer_lifecycle_init(nx_lifecycle_t* self) {
     if (!impl->state) {
         return NX_ERR_NULL_PTR;
     }
+
+    /* If already initialized, return success (idempotent) */
     if (impl->state->initialized) {
-        return NX_ERR_ALREADY_INIT;
+        return NX_OK;
     }
 
     /* Set state flags */
@@ -74,6 +76,11 @@ static nx_status_t timer_lifecycle_suspend(nx_lifecycle_t* self) {
         return NX_ERR_NOT_INIT;
     }
 
+    /* Check if already suspended */
+    if (impl->state->suspended) {
+        return NX_ERR_INVALID_STATE;
+    }
+
     /* Set suspend flag */
     impl->state->suspended = true;
 
@@ -89,6 +96,11 @@ static nx_status_t timer_lifecycle_resume(nx_lifecycle_t* self) {
     /* Parameter validation */
     if (!impl->state || !impl->state->initialized) {
         return NX_ERR_NOT_INIT;
+    }
+
+    /* Check if not suspended */
+    if (!impl->state->suspended) {
+        return NX_ERR_INVALID_STATE;
     }
 
     /* Clear suspend flag */

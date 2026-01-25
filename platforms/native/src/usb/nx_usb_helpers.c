@@ -75,7 +75,7 @@ void buffer_init(nx_usb_buffer_t* buf, uint8_t* data, size_t size) {
 /**
  * \brief           Write data to circular buffer
  */
-size_t buffer_write(nx_usb_buffer_t* buf, const uint8_t* data, size_t len) {
+size_t usb_buffer_write(nx_usb_buffer_t* buf, const uint8_t* data, size_t len) {
     if (buf == NULL || data == NULL || len == 0) {
         return 0;
     }
@@ -95,7 +95,7 @@ size_t buffer_write(nx_usb_buffer_t* buf, const uint8_t* data, size_t len) {
 /**
  * \brief           Read data from circular buffer
  */
-size_t buffer_read(nx_usb_buffer_t* buf, uint8_t* data, size_t len) {
+size_t usb_buffer_read(nx_usb_buffer_t* buf, uint8_t* data, size_t len) {
     if (buf == NULL || data == NULL || len == 0) {
         return 0;
     }
