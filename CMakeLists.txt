@@ -131,6 +131,13 @@ else()
         if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
             add_compile_options(-fprofile-arcs -ftest-coverage)
         endif()
+
+        # Disable unused warnings for coverage build (device registration disabled)
+        add_compile_options(
+            -Wno-unused-function
+            -Wno-unused-variable
+            -Wno-unused-const-variable
+        )
     endif()
 endif()
 
