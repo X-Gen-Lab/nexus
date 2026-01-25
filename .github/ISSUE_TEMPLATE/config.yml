@@ -1,8 +1,17 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Documentation
+  - name: 📚 Documentation
     url: https://nexus-platform.github.io/nexus/
-    about: Check the documentation before opening an issue
-  - name: Discussions
+    about: Check the comprehensive documentation before opening an issue
+  - name: 💬 Discussions
     url: https://github.com/nexus-platform/nexus/discussions
-    about: Ask questions and discuss ideas
+    about: Ask questions, share ideas, and discuss with the community
+  - name: 🔒 Security Advisory
+    url: https://github.com/nexus-platform/nexus/security/advisories/new
+    about: Report security vulnerabilities privately (for critical issues)
+  - name: 📖 API Reference
+    url: https://nexus-platform.github.io/nexus/api/
+    about: Browse the complete API documentation
+  - name: 🚀 Quick Start Guide
+    url: https://nexus-platform.github.io/nexus/en/getting-started.html
+    about: Get started with Nexus in minutes

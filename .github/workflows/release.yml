@@ -1,0 +1,177 @@
+# Nexus Release Workflow
+# Automated release process with changelog generation
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1.0)'
+        required: true
+        type: string
+
+env:
+  BUILD_TYPE: Release
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Create release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Get Version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Release version: $VERSION"
+
+    - name: Generate Changelog
+      id: changelog
+      run: |
+        # Extract changelog for this version
+        VERSION=${{ steps.get_version.outputs.version }}
+        if [ -f CHANGELOG.md ]; then
+          # Extract section for this version
+          sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > release-notes.md
+        else
+          echo "Release $VERSION" > release-notes.md
+        fi
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.version }}
+        release_name: Nexus ${{ steps.get_version.outputs.version }}
+        body_path: release-notes.md
+        draft: false
+        prerelease: ${{ contains(steps.get_version.outputs.version, 'rc') || contains(steps.get_version.outputs.version, 'beta') }}
+
+  # Build release artifacts
+  build-release:
+    name: Build Release (${{ matrix.platform }})
+    needs: create-release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [stm32f4, stm32h7]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
+
+    - name: Build ${{ matrix.platform }}
+      run: |
+        cmake -B build-${{ matrix.platform }} \
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
+          -DNEXUS_PLATFORM=${{ matrix.platform }} \
+          -DNEXUS_BUILD_EXAMPLES=ON
+        cmake --build build-${{ matrix.platform }} --config ${{ env.BUILD_TYPE }} --parallel
+
+    - name: Package Artifacts
+      run: |
+        VERSION=${{ needs.create-release.outputs.version }}
+        PLATFORM=${{ matrix.platform }}
+        mkdir -p release-package
+
+        # Copy binaries
+        find build-$PLATFORM -name "*.bin" -o -name "*.hex" -o -name "*.elf" | \
+          xargs -I {} cp {} release-package/
+
+        # Generate size report
+        find build-$PLATFORM -name "*.elf" -exec arm-none-eabi-size {} \; > release-package/size-report.txt
+
+        # Create archive
+        tar -czf nexus-${VERSION}-${PLATFORM}.tar.gz release-package/
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./nexus-${{ needs.create-release.outputs.version }}-${{ matrix.platform }}.tar.gz
+        asset_name: nexus-${{ needs.create-release.outputs.version }}-${{ matrix.platform }}.tar.gz
+        asset_content_type: application/gzip
+
+  # Build documentation for release
+  build-docs:
+    name: Build Release Documentation
+    needs: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz
+        pip install sphinx sphinx-intl breathe sphinx-rtd-theme
+
+    - name: Build Documentation
+      run: |
+        # Build Doxygen
+        doxygen Doxyfile
+
+        # Build Sphinx
+        cd docs/sphinx
+        sphinx-build -b html . _build/html/en
+        sphinx-build -b html -D language=zh_CN . _build/html/zh_CN
+        cd ../..
+
+        # Package documentation
+        tar -czf nexus-${{ needs.create-release.outputs.version }}-docs.tar.gz docs/
+
+    - name: Upload Documentation Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./nexus-${{ needs.create-release.outputs.version }}-docs.tar.gz
+        asset_name: nexus-${{ needs.create-release.outputs.version }}-docs.tar.gz
+        asset_content_type: application/gzip
