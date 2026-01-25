@@ -3,100 +3,94 @@
  * \brief           Blinky Example Application
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-01-12
+ * \date            2026-01-25
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * \note            This example blinks an LED on STM32F4 Discovery board.
- *                  LED: PD12 (Green), PD13 (Orange), PD14 (Red), PD15 (Blue)
+ * \details         This example demonstrates basic GPIO output control by
+ *                  blinking LEDs in sequence. It shows how to:
+ *                  - Initialize the Nexus HAL
+ *                  - Get GPIO devices using the factory interface
+ *                  - Toggle GPIO outputs
+ *                  - Use OSAL delay functions
+ *
+ * \note            GPIO pins are configured via Kconfig at compile-time.
+ *                  Default configuration uses GPIOA pins 0-2 and GPIOB pin 0.
  */
 
-#include "hal/hal.h"
+#include "hal/nx_hal.h"
+#include "osal/osal.h"
 
-/**
- * \brief           LED pin definitions (STM32F4 Discovery)
- */
-#define LED_GREEN_PORT  HAL_GPIO_PORT_D
-#define LED_GREEN_PIN   12
-#define LED_ORANGE_PORT HAL_GPIO_PORT_D
-#define LED_ORANGE_PIN  13
-#define LED_RED_PORT    HAL_GPIO_PORT_D
-#define LED_RED_PIN     14
-#define LED_BLUE_PORT   HAL_GPIO_PORT_D
-#define LED_BLUE_PIN    15
+/*---------------------------------------------------------------------------*/
+/* Configuration                                                             */
+/*---------------------------------------------------------------------------*/
 
-/**
- * \brief           Blink delay in milliseconds
- */
-#define BLINK_DELAY_MS 500
+#define BLINK_DELAY_MS 500 /**< Blink delay in milliseconds */
 
-/**
- * \brief           Initialize LEDs
- * \return          HAL_OK on success
- */
-static hal_status_t led_init(void) {
-    hal_gpio_config_t config = {.direction = HAL_GPIO_DIR_OUTPUT,
-                                .pull = HAL_GPIO_PULL_NONE,
-                                .output_mode = HAL_GPIO_OUTPUT_PP,
-                                .speed = HAL_GPIO_SPEED_LOW,
-                                .init_level = HAL_GPIO_LEVEL_LOW};
-
-    /* Initialize all LEDs */
-    if (hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-    if (hal_gpio_init(LED_ORANGE_PORT, LED_ORANGE_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-    if (hal_gpio_init(LED_RED_PORT, LED_RED_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-    if (hal_gpio_init(LED_BLUE_PORT, LED_BLUE_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-
-    return HAL_OK;
-}
+/*---------------------------------------------------------------------------*/
+/* Main Entry Point                                                          */
+/*---------------------------------------------------------------------------*/
 
 /**
  * \brief           Main entry point
- * \return          Should never return
+ * \details         Initializes HAL and OSAL, then blinks LEDs in sequence
  */
 int main(void) {
-    /* Initialize HAL layer (system clock, SysTick, FPU) */
-    if (hal_init() != HAL_OK) {
-        /* Error: stay in infinite loop */
+    nx_status_t status;
+
+    /* Initialize OSAL (must be first) */
+    if (osal_init() != OSAL_OK) {
+        while (1) {
+            /* OSAL initialization failed */
+        }
+    }
+
+    /* Initialize HAL */
+    status = nx_hal_init();
+    if (status != NX_OK) {
         while (1) {
             /* HAL initialization failed */
         }
     }
 
-    /* Initialize LEDs */
-    if (led_init() != HAL_OK) {
-        /* Error: stay in infinite loop */
+    /* Get GPIO devices (configured via Kconfig) */
+    nx_gpio_write_t* led0 = nx_factory_gpio_write('A', 0);
+    nx_gpio_write_t* led1 = nx_factory_gpio_write('A', 1);
+    nx_gpio_write_t* led2 = nx_factory_gpio_write('A', 2);
+    nx_gpio_write_t* led3 = nx_factory_gpio_write('B', 0);
+
+    /* Check if all LEDs are available */
+    if (!led0 || !led1 || !led2 || !led3) {
         while (1) {
-            /* LED initialization failed */
+            /* GPIO device not available - check Kconfig */
         }
     }
 
     /* Main loop: blink LEDs in sequence */
     while (1) {
-        /* Green LED */
-        hal_gpio_toggle(LED_GREEN_PORT, LED_GREEN_PIN);
-        hal_delay_ms(BLINK_DELAY_MS);
+        /* LED 0 */
+        led0->toggle(led0);
+        osal_task_delay(BLINK_DELAY_MS);
 
-        /* Orange LED */
-        hal_gpio_toggle(LED_ORANGE_PORT, LED_ORANGE_PIN);
-        hal_delay_ms(BLINK_DELAY_MS);
+        /* LED 1 */
+        led1->toggle(led1);
+        osal_task_delay(BLINK_DELAY_MS);
 
-        /* Red LED */
-        hal_gpio_toggle(LED_RED_PORT, LED_RED_PIN);
-        hal_delay_ms(BLINK_DELAY_MS);
+        /* LED 2 */
+        led2->toggle(led2);
+        osal_task_delay(BLINK_DELAY_MS);
 
-        /* Blue LED */
-        hal_gpio_toggle(LED_BLUE_PORT, LED_BLUE_PIN);
-        hal_delay_ms(BLINK_DELAY_MS);
+        /* LED 3 */
+        led3->toggle(led3);
+        osal_task_delay(BLINK_DELAY_MS);
     }
+
+    /* Cleanup (never reached) */
+    nx_factory_gpio_release((nx_gpio_t*)led0);
+    nx_factory_gpio_release((nx_gpio_t*)led1);
+    nx_factory_gpio_release((nx_gpio_t*)led2);
+    nx_factory_gpio_release((nx_gpio_t*)led3);
+    nx_hal_deinit();
 
     return 0;
 }

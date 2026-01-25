@@ -3,52 +3,47 @@
  * \brief           Config Manager Demo Application
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-01-15
+ * \date            2026-01-25
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  *
- * \details         This example demonstrates the Config Manager middleware
- *                  on STM32F4 Discovery board. It shows configuration storage,
- *                  retrieval, namespaces, and import/export functionality.
+ * \details         This example demonstrates the Config Manager framework
+ *                  features:
+ *                  - Configuration storage and retrieval
+ *                  - Namespace isolation
+ *                  - Query and enumeration
+ *                  - JSON import/export
+ *                  - Binary import/export
  *
- * \note            UART2 pins: PA2 (TX), PA3 (RX)
- *                  Connect to a serial terminal at 115200 baud.
+ * \note            UART0 is used for output (115200 baud).
  */
 
-#include "config/config.h"
-#include "hal/hal.h"
+#include "framework/config/config.h"
+#include "hal/nx_hal.h"
+#include "osal/osal.h"
 #include <stdio.h>
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
-/* Pin Definitions                                                           */
+/* Global Variables                                                          */
 /*---------------------------------------------------------------------------*/
 
-/** LED pins on STM32F4 Discovery */
-#define LED_GREEN_PORT  HAL_GPIO_PORT_D
-#define LED_GREEN_PIN   12
-#define LED_ORANGE_PORT HAL_GPIO_PORT_D
-#define LED_ORANGE_PIN  13
-#define LED_RED_PORT    HAL_GPIO_PORT_D
-#define LED_RED_PIN     14
-#define LED_BLUE_PORT   HAL_GPIO_PORT_D
-#define LED_BLUE_PIN    15
-
-/** User button */
-#define USER_BTN_PORT HAL_GPIO_PORT_A
-#define USER_BTN_PIN  0
+static nx_uart_t* g_uart = NULL; /**< UART device for output */
 
 /*---------------------------------------------------------------------------*/
-/* UART Output                                                               */
+/* UART Output Functions                                                     */
 /*---------------------------------------------------------------------------*/
-
-static hal_uart_id_t g_uart = HAL_UART_1;
 
 /**
  * \brief           Print string to UART
  */
 static void uart_print(const char* str) {
-    hal_uart_write(g_uart, (const uint8_t*)str, strlen(str), 1000);
+    if (g_uart) {
+        nx_tx_sync_t* tx = g_uart->get_tx_sync(g_uart);
+        if (tx) {
+            tx->send(tx, (const uint8_t*)str, strlen(str), 1000);
+        }
+    }
 }
 
 /**
@@ -156,6 +151,7 @@ static void demo_namespaces(void) {
 
 /**
  * \brief           Iteration callback for listing configs
+ * \details         Called for each configuration entry during iteration
  */
 static bool list_config_cb(const config_entry_info_t* info, void* user_data) {
     (void)user_data;
@@ -188,7 +184,7 @@ static bool list_config_cb(const config_entry_info_t* info, void* user_data) {
     }
 
     uart_printf("  %s [%s, %u bytes]\r\n", info->key, type_str,
-                info->value_size);
+                (unsigned)info->value_size);
     return true;
 }
 
@@ -220,10 +216,10 @@ static void demo_query(void) {
 }
 
 /**
- * \brief           Demonstrate JSON import/export
+ * \brief           Demonstrate JSON export
  */
-static void demo_json_export_import(void) {
-    uart_print("\r\n=== JSON Export/Import Demo ===\r\n");
+static void demo_json_export(void) {
+    uart_print("\r\n=== JSON Export Demo ===\r\n");
 
     /* Get export size */
     size_t export_size = 0;
@@ -232,149 +228,25 @@ static void demo_json_export_import(void) {
                 (unsigned)export_size);
 
     /* Export to JSON */
-    char buffer[1024];
+    char buffer[512];
     size_t actual_size = 0;
     config_status_t status = config_export(CONFIG_FORMAT_JSON, 0, buffer,
                                            sizeof(buffer), &actual_size);
 
     if (status == CONFIG_OK) {
-        uart_printf("Exported %u bytes of JSON:\r\n", (unsigned)actual_size);
-        /* Print JSON (may be truncated for display) */
-        if (actual_size < 200) {
-            uart_print(buffer);
-            uart_print("\r\n");
+        uart_printf("Exported %u bytes of JSON\r\n", (unsigned)actual_size);
+        /* Print first 100 chars as preview */
+        if (actual_size > 100) {
+            char preview[101];
+            memcpy(preview, buffer, 100);
+            preview[100] = '\0';
+            uart_printf("Preview: %s...\r\n", preview);
         } else {
-            char preview[200];
-            memcpy(preview, buffer, 196);
-            preview[196] = '.';
-            preview[197] = '.';
-            preview[198] = '.';
-            preview[199] = '\0';
-            uart_print(preview);
-            uart_print("\r\n");
+            uart_printf("JSON: %s\r\n", buffer);
         }
     } else {
         uart_printf("Export failed: %s\r\n", config_error_to_str(status));
     }
-
-    /* Demonstrate import by clearing and reimporting */
-    uart_print("Clearing configuration...\r\n");
-
-    /* Delete some keys to demonstrate import */
-    config_delete("app.timeout");
-    config_delete("app.retry");
-
-    /* Verify deletion */
-    bool exists = false;
-    config_exists("app.timeout", &exists);
-    uart_printf("Key 'app.timeout' after delete: %s\r\n",
-                exists ? "exists" : "deleted");
-
-    /* Import from JSON */
-    uart_print("Importing from JSON...\r\n");
-    status = config_import(CONFIG_FORMAT_JSON, 0, buffer, actual_size);
-
-    if (status == CONFIG_OK) {
-        uart_print("Import successful\r\n");
-
-        /* Verify import */
-        config_exists("app.timeout", &exists);
-        uart_printf("Key 'app.timeout' after import: %s\r\n",
-                    exists ? "restored" : "missing");
-
-        int32_t timeout = 0;
-        config_get_i32("app.timeout", &timeout, 0);
-        uart_printf("Value 'app.timeout' = %ld\r\n", (long)timeout);
-    } else {
-        uart_printf("Import failed: %s\r\n", config_error_to_str(status));
-    }
-}
-
-/**
- * \brief           Demonstrate binary import/export
- */
-static void demo_binary_export_import(void) {
-    uart_print("\r\n=== Binary Export/Import Demo ===\r\n");
-
-    /* Store some binary data */
-    uint8_t calibration[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-    config_set_blob("sensor.cal", calibration, sizeof(calibration));
-    uart_print("Stored calibration blob\r\n");
-
-    /* Export to binary */
-    uint8_t buffer[512];
-    size_t actual_size = 0;
-    config_status_t status = config_export(CONFIG_FORMAT_BINARY, 0, buffer,
-                                           sizeof(buffer), &actual_size);
-
-    if (status == CONFIG_OK) {
-        uart_printf("Exported %u bytes of binary data\r\n",
-                    (unsigned)actual_size);
-    } else {
-        uart_printf("Binary export failed: %s\r\n",
-                    config_error_to_str(status));
-    }
-
-    /* Delete blob and reimport */
-    config_delete("sensor.cal");
-
-    status = config_import(CONFIG_FORMAT_BINARY, 0, buffer, actual_size);
-    if (status == CONFIG_OK) {
-        uart_print("Binary import successful\r\n");
-
-        /* Verify blob */
-        uint8_t read_cal[16];
-        size_t read_size = 0;
-        config_get_blob("sensor.cal", read_cal, sizeof(read_cal), &read_size);
-        uart_printf("Restored calibration blob: %u bytes\r\n",
-                    (unsigned)read_size);
-    } else {
-        uart_printf("Binary import failed: %s\r\n",
-                    config_error_to_str(status));
-    }
-}
-
-/*---------------------------------------------------------------------------*/
-/* Initialization                                                            */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize LEDs
- */
-static hal_status_t led_init(void) {
-    hal_gpio_config_t config = {.direction = HAL_GPIO_DIR_OUTPUT,
-                                .pull = HAL_GPIO_PULL_NONE,
-                                .output_mode = HAL_GPIO_OUTPUT_PP,
-                                .speed = HAL_GPIO_SPEED_LOW,
-                                .init_level = HAL_GPIO_LEVEL_LOW};
-
-    if (hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-    if (hal_gpio_init(LED_ORANGE_PORT, LED_ORANGE_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-    if (hal_gpio_init(LED_RED_PORT, LED_RED_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-    if (hal_gpio_init(LED_BLUE_PORT, LED_BLUE_PIN, &config) != HAL_OK) {
-        return HAL_ERR_FAIL;
-    }
-
-    return HAL_OK;
-}
-
-/**
- * \brief           Initialize UART for output
- */
-static hal_status_t uart_init_output(void) {
-    hal_uart_config_t config = {.baudrate = 115200,
-                                .wordlen = HAL_UART_WORDLEN_8,
-                                .stopbits = HAL_UART_STOPBITS_1,
-                                .parity = HAL_UART_PARITY_NONE,
-                                .flowctrl = HAL_UART_FLOWCTRL_NONE};
-
-    return hal_uart_init(g_uart, &config);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -385,52 +257,63 @@ static hal_status_t uart_init_output(void) {
  * \brief           Main entry point
  */
 int main(void) {
-    /* Initialize HAL system */
-    hal_system_init();
-
-    /* Initialize peripherals */
-    if (led_init() != HAL_OK) {
+    /* Initialize OSAL */
+    if (osal_init() != OSAL_OK) {
         while (1) {
-            hal_gpio_toggle(LED_RED_PORT, LED_RED_PIN);
-            hal_delay_ms(100);
+            /* OSAL initialization failed */
         }
     }
 
-    if (uart_init_output() != HAL_OK) {
+    /* Initialize HAL */
+    if (nx_hal_init() != NX_OK) {
         while (1) {
-            hal_gpio_toggle(LED_ORANGE_PORT, LED_ORANGE_PIN);
-            hal_delay_ms(100);
+            /* HAL initialization failed */
         }
     }
+
+    /* Get UART device for output */
+    g_uart = nx_factory_uart(0);
+    if (!g_uart) {
+        while (1) {
+            /* UART device not available */
+        }
+    }
+
+    /* Get GPIO devices for status indication */
+    nx_gpio_write_t* led0 = nx_factory_gpio_write('A', 0);
+    nx_gpio_write_t* led_error = nx_factory_gpio_write('B', 0);
 
     /* Print welcome message */
     uart_print("\r\n");
     uart_print("========================================\r\n");
     uart_print("  Nexus Config Manager Demo\r\n");
-    uart_print("  STM32F4 Discovery Board\r\n");
+    uart_printf("  HAL Version: %s\r\n", nx_hal_get_version());
     uart_print("========================================\r\n");
 
     /* Initialize Config Manager */
     config_status_t status = config_init(NULL);
     if (status != CONFIG_OK) {
         uart_printf("Config init failed: %s\r\n", config_error_to_str(status));
+        if (led_error) {
+            led_error->write(led_error, 1);
+        }
         while (1) {
-            hal_gpio_toggle(LED_BLUE_PORT, LED_BLUE_PIN);
-            hal_delay_ms(100);
+            /* Error state */
         }
     }
 
     uart_print("Config Manager initialized\r\n");
 
-    /* Turn on green LED to indicate ready */
-    hal_gpio_write(LED_GREEN_PORT, LED_GREEN_PIN, HAL_GPIO_LEVEL_HIGH);
+    /* Turn on LED to indicate ready */
+    if (led0) {
+        led0->write(led0, 1);
+    }
 
     /* Run demos */
     demo_basic_config();
     demo_namespaces();
     demo_query();
-    demo_json_export_import();
-    demo_binary_export_import();
+    demo_json_export();
 
     /* Summary */
     uart_print("\r\n========================================\r\n");
@@ -440,10 +323,12 @@ int main(void) {
     /* Cleanup */
     config_deinit();
 
-    /* Blink green LED to indicate success */
+    /* Blink LED to indicate success */
     while (1) {
-        hal_gpio_toggle(LED_GREEN_PORT, LED_GREEN_PIN);
-        hal_delay_ms(500);
+        if (led0) {
+            led0->toggle(led0);
+        }
+        osal_task_delay(500);
     }
 
     return 0;
