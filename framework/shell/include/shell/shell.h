@@ -44,10 +44,12 @@ typedef struct {
  * \brief           Default Shell configuration
  */
 #define SHELL_CONFIG_DEFAULT                                                   \
-    {.prompt = SHELL_DEFAULT_PROMPT,                                           \
-     .cmd_buffer_size = SHELL_DEFAULT_CMD_BUFFER_SIZE,                         \
-     .history_depth = SHELL_DEFAULT_HISTORY_DEPTH,                             \
-     .max_commands = SHELL_MAX_COMMANDS}
+    {                                                                          \
+        .prompt = SHELL_DEFAULT_PROMPT,                                        \
+        .cmd_buffer_size = SHELL_DEFAULT_CMD_BUFFER_SIZE,                      \
+        .history_depth = SHELL_DEFAULT_HISTORY_DEPTH,                          \
+        .max_commands = SHELL_MAX_COMMANDS                                     \
+    }
 
 /**
  * \brief           Initialize the Shell module

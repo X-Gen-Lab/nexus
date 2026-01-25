@@ -64,14 +64,16 @@ typedef struct {
  * \brief           Default configuration initializer
  */
 #define LOG_CONFIG_DEFAULT                                                     \
-    {.level = LOG_DEFAULT_LEVEL,                                               \
-     .format = NULL,                                                           \
-     .async_mode = false,                                                      \
-     .buffer_size = 0,                                                         \
-     .max_msg_len = 0,                                                         \
-     .color_enabled = false,                                                   \
-     .async_queue_size = 0,                                                    \
-     .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST}
+    {                                                                          \
+        .level = LOG_DEFAULT_LEVEL,                                            \
+        .format = NULL,                                                        \
+        .async_mode = false,                                                   \
+        .buffer_size = 0,                                                      \
+        .max_msg_len = 0,                                                      \
+        .color_enabled = false,                                                \
+        .async_queue_size = 0,                                                 \
+        .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST                          \
+    }
 
 /**
  * \name            Initialization and Configuration

@@ -70,12 +70,14 @@ typedef struct {
  * \brief           Default configuration initializer
  */
 #define CONFIG_MANAGER_CONFIG_DEFAULT                                          \
-    {.max_keys = CONFIG_DEFAULT_MAX_KEYS,                                      \
-     .max_key_len = CONFIG_DEFAULT_MAX_KEY_LEN,                                \
-     .max_value_size = CONFIG_DEFAULT_MAX_VALUE_SIZE,                          \
-     .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,                          \
-     .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,                            \
-     .auto_commit = false}
+    {                                                                          \
+        .max_keys = CONFIG_DEFAULT_MAX_KEYS,                                   \
+        .max_key_len = CONFIG_DEFAULT_MAX_KEY_LEN,                             \
+        .max_value_size = CONFIG_DEFAULT_MAX_VALUE_SIZE,                       \
+        .max_namespaces = CONFIG_DEFAULT_MAX_NAMESPACES,                       \
+        .max_callbacks = CONFIG_DEFAULT_MAX_CALLBACKS,                         \
+        .auto_commit = false                                                   \
+    }
 
 /**
  * \name            Initialization and Configuration
