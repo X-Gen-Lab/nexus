@@ -1,0 +1,67 @@
+# STM32 平台 Kconfig 批量生成配置示例
+#
+# 此文件演示如何为 STM32 平台生成 Kconfig 文件
+# 使用方法:
+#   python scripts/kconfig_tools/cli.py batch-generate -c examples/stm32_config.yaml -o platforms/stm32/src/
+
+peripherals:
+  # STM32 UART 配置
+  - type: UART
+    platform: STM32
+    instances: 6
+    output: uart/Kconfig
+    description: "STM32 USART/UART 外设，支持 6 个实例"
+
+  # STM32 GPIO 配置
+  - type: GPIO
+    platform: STM32
+    instances: 11
+    output: gpio/Kconfig
+    description: "STM32 GPIO 外设，支持 A-K 共 11 个端口"
+
+  # STM32 SPI 配置
+  - type: SPI
+    platform: STM32
+    instances: 4
+    output: spi/Kconfig
+    description: "STM32 SPI 外设，支持 4 个实例"
+
+  # STM32 I2C 配置
+  - type: I2C
+    platform: STM32
+    instances: 3
+    output: i2c/Kconfig
+    description: "STM32 I2C 外设，支持 3 个实例"
+
+  # STM32 ADC 配置
+  - type: ADC
+    platform: STM32
+    instances: 3
+    output: adc/Kconfig
+    description: "STM32 ADC 外设，支持 3 个实例"
+
+  # STM32 DAC 配置
+  - type: DAC
+    platform: STM32
+    instances: 2
+    output: dac/Kconfig
+    description: "STM32 DAC 外设，支持 2 个实例"
+
+  # STM32 CRC 配置
+  - type: CRC
+    platform: STM32
+    instances: 1
+    output: crc/Kconfig
+    description: "STM32 CRC 外设，支持 1 个实例"
+
+  # STM32 WATCHDOG 配置
+  - type: WATCHDOG
+    platform: STM32
+    instances: 2
+    output: watchdog/Kconfig
+    description: "STM32 看门狗外设，支持 IWDG 和 WWDG 两个实例"
+
+options:
+  overwrite: false
+  validate: true
+  verbose: true

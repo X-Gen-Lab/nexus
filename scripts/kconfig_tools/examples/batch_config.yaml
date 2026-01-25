@@ -1,0 +1,74 @@
+# Kconfig 批量生成配置文件示例
+#
+# 此文件演示如何配置批量生成多个外设的 Kconfig 文件
+# 使用方法:
+#   python scripts/kconfig_tools/cli.py batch-generate -c examples/batch_config.yaml -o platforms/native/src/
+
+# 外设配置列表
+peripherals:
+  # UART 外设配置
+  - type: UART
+    platform: NATIVE
+    instances: 4
+    output: uart/Kconfig
+    description: "UART 串口外设，支持 4 个实例"
+
+  # GPIO 外设配置
+  - type: GPIO
+    platform: NATIVE
+    instances: 3
+    output: gpio/Kconfig
+    description: "GPIO 通用输入输出外设，支持 A/B/C 三个端口"
+
+  # SPI 外设配置
+  - type: SPI
+    platform: NATIVE
+    instances: 2
+    output: spi/Kconfig
+    description: "SPI 串行外设接口，支持 2 个实例"
+
+  # I2C 外设配置
+  - type: I2C
+    platform: NATIVE
+    instances: 2
+    output: i2c/Kconfig
+    description: "I2C 总线接口，支持 2 个实例"
+
+  # ADC 外设配置
+  - type: ADC
+    platform: NATIVE
+    instances: 1
+    output: adc/Kconfig
+    description: "ADC 模数转换器，支持 1 个实例"
+
+  # DAC 外设配置
+  - type: DAC
+    platform: NATIVE
+    instances: 1
+    output: dac/Kconfig
+    description: "DAC 数模转换器，支持 1 个实例"
+
+  # CRC 外设配置
+  - type: CRC
+    platform: NATIVE
+    instances: 1
+    output: crc/Kconfig
+    description: "CRC 循环冗余校验，支持 1 个实例"
+
+  # WATCHDOG 外设配置
+  - type: WATCHDOG
+    platform: NATIVE
+    instances: 1
+    output: watchdog/Kconfig
+    description: "看门狗定时器，支持 1 个实例"
+
+# 全局配置选项
+options:
+  # 是否覆盖已存在的文件
+  overwrite: false
+
+  # 是否在生成后自动验证
+  validate: true
+
+  # 是否生成详细日志
+  verbose: true

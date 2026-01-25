@@ -1,0 +1,92 @@
+{
+    "name": "TIMER",
+    "platform": "NATIVE",
+    "max_instances": 4,
+    "instance_type": "numeric",
+    "help_text": "定时器外设配置",
+    "parameters": [
+        {
+            "name": "PRESCALER",
+            "type": "int",
+            "default": 1,
+            "range": [
+                1,
+                65536
+            ],
+            "help": "定时器预分频值"
+        },
+        {
+            "name": "PERIOD",
+            "type": "int",
+            "default": 1000,
+            "range": [
+                1,
+                4294967295
+            ],
+            "help": "定时器周期值（微秒）"
+        },
+        {
+            "name": "AUTO_RELOAD",
+            "type": "bool",
+            "default": true,
+            "help": "是否启用自动重载"
+        },
+        {
+            "name": "COUNTER_MODE",
+            "type": "string",
+            "default": "UP",
+            "help": "计数模式"
+        }
+    ],
+    "choices": [
+        {
+            "name": "CLOCK_SOURCE",
+            "options": [
+                "INTERNAL",
+                "EXTERNAL",
+                "CASCADE"
+            ],
+            "default": "INTERNAL",
+            "help": "时钟源选择",
+            "values": {
+                "INTERNAL": 0,
+                "EXTERNAL": 1,
+                "CASCADE": 2
+            }
+        },
+        {
+            "name": "TRIGGER_MODE",
+            "options": [
+                "DISABLED",
+                "RISING_EDGE",
+                "FALLING_EDGE",
+                "BOTH_EDGES"
+            ],
+            "default": "DISABLED",
+            "help": "触发模式",
+            "values": {
+                "DISABLED": 0,
+                "RISING_EDGE": 1,
+                "FALLING_EDGE": 2,
+                "BOTH_EDGES": 3
+            }
+        },
+        {
+            "name": "INTERRUPT",
+            "options": [
+                "NONE",
+                "UPDATE",
+                "CAPTURE",
+                "COMPARE"
+            ],
+            "default": "NONE",
+            "help": "中断类型",
+            "values": {
+                "NONE": 0,
+                "UPDATE": 1,
+                "CAPTURE": 2,
+                "COMPARE": 3
+            }
+        }
+    ]
+}

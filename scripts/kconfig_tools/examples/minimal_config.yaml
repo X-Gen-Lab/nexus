@@ -1,0 +1,21 @@
+# 最小化配置示例
+#
+# 此文件演示最简单的批量生成配置
+# 适用于快速原型开发或测试
+
+peripherals:
+  # 只生成 UART 和 GPIO
+  - type: UART
+    platform: NATIVE
+    instances: 2
+    output: uart/Kconfig
+
+  - type: GPIO
+    platform: NATIVE
+    instances: 2
+    output: gpio/Kconfig
+
+options:
+  overwrite: true
+  validate: true
+  verbose: false
