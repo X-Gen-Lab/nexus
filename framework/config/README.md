@@ -419,6 +419,54 @@ framework/config/
 
 完整示例请参考 `applications/config_demo/`。
 
+## 文档
+
+完整文档请参考 `docs/` 目录：
+
+- **[DESIGN.md](docs/DESIGN.md)** - 架构设计文档
+  - 系统架构和分层设计
+  - 核心数据结构
+  - 关键流程说明
+  - 设计决策和权衡
+
+- **[USER_GUIDE.md](docs/USER_GUIDE.md)** - 详细使用指南
+  - 快速开始
+  - 基本操作（整数、浮点、字符串、二进制）
+  - 命名空间使用
+  - 默认值管理
+  - 变更通知回调
+  - 存储后端配置
+  - 导入/导出功能
+  - 加密功能
+  - 高级用法和最佳实践
+
+- **[TEST_GUIDE.md](docs/TEST_GUIDE.md)** - 测试文档
+  - 测试策略和覆盖率要求
+  - 单元测试示例
+  - 集成测试示例
+  - 性能测试和基准
+  - 线程安全测试
+  - 属性测试（Property-Based Testing）
+
+- **[CHANGELOG.md](docs/CHANGELOG.md)** - 版本变更记录
+  - 版本历史
+  - 新增功能
+  - 问题修复
+  - 升级指南
+
+- **[PORTING_GUIDE.md](docs/PORTING_GUIDE.md)** - 移植指南
+  - 平台适配说明
+  - OSAL 接口实现
+  - Flash HAL 接口实现
+  - 编译配置
+  - 移植步骤和验证
+
+- **[TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** - 故障排查指南
+  - 常见问题诊断
+  - 错误码说明
+  - 性能优化建议
+  - 调试技巧
+
 ## 许可证
 
 Copyright (c) 2026 Nexus Team

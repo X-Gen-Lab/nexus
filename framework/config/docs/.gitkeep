@@ -1,0 +1,15 @@
+# Config Manager 文档目录
+
+本目录包含 Config Manager 模块的完整文档。
+
+## 文档列表
+
+1. README.md - 文档索引和导航
+2. DESIGN.md - 架构设计文档 (17.6 KB)
+3. USER_GUIDE.md - 详细使用指南 (26.9 KB)
+4. TEST_GUIDE.md - 测试文档 (29.4 KB)
+5. CHANGELOG.md - 版本变更记录 (4.5 KB)
+6. PORTING_GUIDE.md - 移植指南 (16.9 KB)
+7. TROUBLESHOOTING.md - 故障排查指南 (19.2 KB)
+
+总计: ~120 KB 的详细文档
