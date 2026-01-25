@@ -135,63 +135,305 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`
 
 ## Testing
 
+### Testing Requirements
+
+**All contributions must include appropriate tests.** Testing is a critical part of maintaining code quality and preventing regressions.
+
+#### When Adding New Features
+
+1. **Unit Tests Required**: Write unit tests that verify specific examples and edge cases
+2. **Property Tests Recommended**: For HAL implementations, write property-based tests that verify universal properties across many inputs
+3. **Test Coverage**: New code must maintain or improve overall coverage
+4. **Test Documentation**: Include clear comments explaining what each test validates
+
+#### When Modifying Existing Code
+
+1. **Run All Tests**: Ensure all existing tests still pass
+2. **Update Tests**: Modify tests if behavior changes are intentional
+3. **Add Tests**: Add new tests for newly covered scenarios
+4. **No Regression**: Do not reduce test coverage
+
+#### When Removing Features
+
+1. **Remove Tests**: Delete tests for removed functionality
+2. **Update Dependencies**: Update tests that depend on removed features
+3. **Verify Build**: Ensure test suite still compiles and runs
+
+### Coverage Requirements
+
+**Target**: 100% code coverage for Native platform HAL implementations
+
+**Minimum Requirements**:
+- Line coverage: ≥95%
+- Branch coverage: ≥95%
+- Function coverage: ≥95%
+
+**Coverage Verification**:
+```bash
+# Generate coverage report (Linux/WSL)
+cd scripts/coverage
+./run_coverage_linux.sh
+
+# Generate coverage report (Windows)
+cd scripts\coverage
+.\run_coverage_windows.ps1
+
+# View report
+# Linux: xdg-open ../../coverage_html/index.html
+# Windows: start ..\..\coverage_report\html\index.html
+```
+
+**Coverage Enforcement**:
+- CI/CD pipeline automatically checks coverage
+- PRs that reduce coverage below threshold will be flagged
+- Maintainers may request additional tests to meet coverage requirements
+
 ### Running Tests
+
+#### Quick Start
 
 ```bash
 # Build with tests
 cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
-cmake --build build --config Release
+cmake --build build --config Debug
 
 # Run all tests
-ctest --test-dir build -C Release --output-on-failure
+cd build && ctest --output-on-failure
 
+# Or run test executable directly
+./build/tests/nexus_tests
+```
+
+#### Running Specific Tests
+
+```bash
 # Run specific test suite
-./build/tests/Release/nexus_tests --gtest_filter="HalGpioTest.*"
+./build/tests/nexus_tests --gtest_filter="GPIO*"
+
+# Run specific test case
+./build/tests/nexus_tests --gtest_filter="GPIOTest.BasicInitialization"
+
+# Run multiple test suites
+./build/tests/nexus_tests --gtest_filter="GPIO*:UART*:SPI*"
 
 # Run with verbose output
-./build/tests/Release/nexus_tests --gtest_filter="*" --gtest_print_time=1
+./build/tests/nexus_tests --gtest_verbose
 ```
+
+#### Platform-Specific Notes
+
+**Linux/WSL (Recommended for Native Platform)**:
+- Full test support
+- Coverage tools: lcov or gcovr
+- All tests should pass
+
+**Windows (MSVC)**:
+- Native platform has known device registration issues
+- Use WSL for Native platform testing
+- Other platforms work correctly
 
 ### Writing Tests
 
-Tests use Google Test framework. Place test files in `tests/` directory:
+#### Test File Organization
+
+Tests use Google Test framework. Each peripheral should have two test files:
+
+1. **Unit Tests**: `tests/hal/test_nx_<peripheral>.cpp`
+   - Verify specific examples and edge cases
+   - Test error handling and boundary conditions
+   - Test integration between components
+
+2. **Property Tests**: `tests/hal/test_nx_<peripheral>_properties.cpp`
+   - Verify universal properties across random inputs
+   - Run minimum 100 iterations per property
+   - Test correctness properties from design document
+
+#### Unit Test Example
 
 ```cpp
-// tests/hal/test_hal_gpio.cpp
+/**
+ * \file            test_nx_gpio.cpp
+ * \brief           GPIO HAL unit tests
+ */
+
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "hal/hal_gpio.h"
+#include "hal/nx_factory.h"
+#include "tests/hal/native/devices/native_gpio_helpers.h"
 }
 
-class HalGpioTest : public ::testing::Test {
+class GPIOTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Setup code
+        native_gpio_reset_all();
+        gpio = nx_factory_gpio(0);
+        ASSERT_NE(nullptr, gpio);
     }
+    
     void TearDown() override {
-        // Cleanup code
+        if (gpio != nullptr && gpio->deinit != nullptr) {
+            gpio->deinit(gpio);
+        }
+        native_gpio_reset_all();
     }
+    
+    nx_gpio_t* gpio = nullptr;
 };
 
-TEST_F(HalGpioTest, InitOutput) {
-    hal_gpio_config_t config = {
-        .direction   = HAL_GPIO_DIR_OUTPUT,
-        .pull        = HAL_GPIO_PULL_NONE,
-        .output_mode = HAL_GPIO_OUTPUT_PP,
-        .speed       = HAL_GPIO_SPEED_LOW,
-        .init_level  = HAL_GPIO_LEVEL_LOW
+TEST_F(GPIOTest, BasicInitialization) {
+    nx_gpio_config_t config = {
+        .mode = NX_GPIO_MODE_OUTPUT,
+        .pull = NX_GPIO_PULL_NONE,
+        .level = NX_GPIO_LEVEL_LOW
     };
-    EXPECT_EQ(HAL_OK, hal_gpio_init(HAL_GPIO_PORT_A, 0, &config));
+    
+    ASSERT_EQ(NX_OK, gpio->init(gpio, 5, &config));
+    
+    /* Verify state */
+    native_gpio_state_t state;
+    ASSERT_EQ(NX_OK, native_gpio_get_state(0, 5, &state));
+    EXPECT_TRUE(state.initialized);
+}
+
+TEST_F(GPIOTest, ErrorHandling_NullPointer) {
+    EXPECT_NE(NX_OK, gpio->init(nullptr, 0, nullptr));
 }
 ```
 
-### Test Requirements
+#### Property Test Example
 
-- Write unit tests for new features
-- Maintain ≥90% code coverage
-- Run tests before submitting PR
-- Tests must pass on all platforms (Windows, Linux, macOS)
+```cpp
+/**
+ * \file            test_nx_gpio_properties.cpp
+ * \brief           GPIO HAL property-based tests
+ */
+
+#include <gtest/gtest.h>
+#include <random>
+
+extern "C" {
+#include "hal/nx_factory.h"
+#include "tests/hal/native/devices/native_gpio_helpers.h"
+}
+
+class GPIOPropertyTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        rng.seed(std::random_device{}());
+        native_gpio_reset_all();
+        gpio = nx_factory_gpio(0);
+        ASSERT_NE(nullptr, gpio);
+    }
+    
+    void TearDown() override {
+        if (gpio != nullptr && gpio->deinit != nullptr) {
+            gpio->deinit(gpio);
+        }
+        native_gpio_reset_all();
+    }
+    
+    std::mt19937 rng;
+    nx_gpio_t* gpio = nullptr;
+};
+
+/**
+ * Feature: native-hal-validation, Property 11: GPIO Read-Write Consistency
+ *
+ * *For any* GPIO pin and level value, writing then immediately reading
+ * should return the same level value.
+ *
+ * **Validates: Requirements 1.2, 1.3**
+ */
+TEST_F(GPIOPropertyTest, Property11_ReadWriteConsistency) {
+    const int iterations = 100;
+    
+    for (int i = 0; i < iterations; ++i) {
+        /* Generate random pin and level */
+        std::uniform_int_distribution<uint8_t> pin_dist(0, 15);
+        uint8_t pin = pin_dist(rng);
+        
+        nx_gpio_level_t level = (rng() % 2) ? NX_GPIO_LEVEL_HIGH : NX_GPIO_LEVEL_LOW;
+        
+        /* Initialize pin as output */
+        nx_gpio_config_t config = {
+            .mode = NX_GPIO_MODE_OUTPUT,
+            .pull = NX_GPIO_PULL_NONE,
+            .level = NX_GPIO_LEVEL_LOW
+        };
+        ASSERT_EQ(NX_OK, gpio->init(gpio, pin, &config));
+        
+        /* Write level */
+        ASSERT_EQ(NX_OK, gpio->write(gpio, pin, level));
+        
+        /* Read level */
+        nx_gpio_level_t read_level;
+        ASSERT_EQ(NX_OK, gpio->read(gpio, pin, &read_level));
+        
+        /* Verify consistency */
+        EXPECT_EQ(level, read_level) << "Iteration " << i << ", Pin " << (int)pin;
+        
+        /* Cleanup */
+        gpio->deinit(gpio);
+        native_gpio_reset(0);
+    }
+}
+```
+
+#### Test Helper Functions
+
+For Native platform testing, use test helper functions to:
+- Query internal peripheral state
+- Inject receive data (simulate hardware)
+- Capture transmit data (verify output)
+- Advance time (for timers)
+- Reset peripherals to clean state
+
+Example:
+```cpp
+#include "tests/hal/native/devices/native_uart_helpers.h"
+
+/* Inject data to simulate hardware reception */
+uint8_t rx_data[] = {0x01, 0x02, 0x03};
+native_uart_inject_rx_data(0, rx_data, sizeof(rx_data));
+
+/* Capture transmitted data */
+uint8_t tx_buffer[10];
+size_t tx_len = sizeof(tx_buffer);
+native_uart_get_tx_data(0, tx_buffer, &tx_len);
+
+/* Query internal state */
+native_uart_state_t state;
+native_uart_get_state(0, &state);
+```
+
+### Test Best Practices
+
+1. **Independence**: Each test should run independently
+2. **Repeatability**: Tests should produce consistent results
+3. **Clear Assertions**: Use descriptive assertion messages
+4. **Single Concept**: Each test should verify one concept
+5. **Cleanup**: Always clean up resources in TearDown()
+6. **Documentation**: Comment what each test validates
+
+### Detailed Testing Guide
+
+For comprehensive testing documentation, see:
+- **[Native Platform Testing Guide](tests/hal/native/TESTING_GUIDE.md)**: Complete guide for running tests, adding new tests, using test helpers, and generating coverage reports
+- **[Coverage Analysis Guide](docs/testing/COVERAGE_ANALYSIS.md)**: Detailed coverage analysis and improvement strategies
+- **[Coverage Scripts README](scripts/coverage/README.md)**: Coverage script usage and options
+
+### Pre-Submission Checklist
+
+Before submitting a PR, verify:
+
+- [ ] All new code has corresponding tests
+- [ ] All tests pass locally: `cd build && ctest --output-on-failure`
+- [ ] Coverage meets requirements (≥95% or maintains 100%)
+- [ ] Property tests run minimum 100 iterations
+- [ ] Test code follows Nexus coding standards
+- [ ] Test documentation is clear and complete
+- [ ] No test warnings or errors
 
 ## Documentation
 
