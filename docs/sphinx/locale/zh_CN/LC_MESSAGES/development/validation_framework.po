@@ -1,0 +1,1316 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../development/validation_framework.rst:2
+#: ca8cae75421c42d8baa0b70aff723cf5
+msgid "Validation Framework"
+msgstr "验证框架"
+
+#: ../../development/validation_framework.rst:4
+#: d72301113804460ca77ce2bc4e972bcd
+msgid ""
+"The Nexus Validation Framework is a comprehensive automated testing and "
+"coverage analysis tool for verifying the correctness of the Nexus Embedded "
+"Platform's configuration system, HAL framework, OSAL framework, and platform"
+" implementations."
+msgstr ""
+
+#: ../../development/validation_framework.rst:8
+#: 296a4e629a21457595e889d13891e9ec
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../development/validation_framework.rst:11
+#: 9ff2550f1a754b3fabc64eebb8d576d5
+msgid "Overview"
+msgstr "概述"
+
+#: ../../development/validation_framework.rst:13
+#: f783d4bf792249b68980fe9ca52e5522
+msgid "The validation framework provides:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:15
+#: b8c47464d3c04213b22cbf0d6d8cb6ec
+msgid ""
+"**Test Execution**: Unit tests, property-based tests, and integration tests"
+msgstr ""
+
+#: ../../development/validation_framework.rst:16
+#: e77b25f6545045c48ec5383090fbf996
+msgid "**Coverage Analysis**: Line, branch, and function coverage tracking"
+msgstr ""
+
+#: ../../development/validation_framework.rst:17
+#: 4ebb4e2448844b1b8588b87dfd6ec128
+msgid "**Report Generation**: HTML, XML, and JUnit format reports"
+msgstr ""
+
+#: ../../development/validation_framework.rst:18
+#: 796b7d6dd28343328869adda697e116a
+msgid "**CI/CD Integration**: GitHub Actions, GitLab CI, and Jenkins support"
+msgstr ""
+
+#: ../../development/validation_framework.rst:21
+#: 71c81d1918e24b98b6c08b4dd494a955
+msgid "System Requirements"
+msgstr ""
+
+#: ../../development/validation_framework.rst:24
+#: 154165102c724b32ac6f8db9fde253d4
+msgid "Required Tools"
+msgstr ""
+
+#: ../../development/validation_framework.rst:26
+#: 520acfd6fdf54b8e89d0243407457b96
+msgid "**Python**: 3.8 or higher"
+msgstr ""
+
+#: ../../development/validation_framework.rst:27
+#: 0249d225e8f3439f83665a55b775bd88
+msgid "**CMake**: 3.15 or higher"
+msgstr ""
+
+#: ../../development/validation_framework.rst:28
+#: a0ef496c4b524d61965216edac6a67f7
+msgid "**Ninja**: Build system (recommended)"
+msgstr "**Ninja**: Build system (recommended)"
+
+#: ../../development/validation_framework.rst:29
+#: 148d07d394904b688d0a0108b492ef3f
+msgid "**C/C++ Compiler**: GCC 9+, Clang 10+, or MSVC 2019+"
+msgstr ""
+
+#: ../../development/validation_framework.rst:32
+#: a5cc2cac1a0045169e7c2b807a8c66fa
+msgid "Coverage Tools"
+msgstr ""
+
+#: ../../development/validation_framework.rst:34
+#: 424030d7a0ce4857acd410a0d9207119
+msgid "**Linux/macOS**: gcov + lcov"
+msgstr ""
+
+#: ../../development/validation_framework.rst:35
+#: e5d8431525754058bbdc81fb4546930f
+msgid "**Windows**: OpenCppCoverage (optional)"
+msgstr "**Windows**: OpenCppCoverage (optional)"
+
+#: ../../development/validation_framework.rst:38
+#: d08c9182541c4fdf8edf0df964214c75
+msgid "Python Dependencies"
+msgstr ""
+
+#: ../../development/validation_framework.rst:40
+#: 4b54f25d96c44cc1913a5d7248c5f017
+msgid "Install required Python packages:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:42
+#: ../../development/validation_framework.rst:91
+#: 5a1a6209c2f44b53a56ef3e18c705c5c 9e44ea4b69244897a2712e8b681b1c67
+msgid "pip install -r scripts/validation/requirements.txt"
+msgstr "pip install -r scripts/validation/requirements.txt"
+
+#: ../../development/validation_framework.rst:46
+#: cdf6faab5b7f485997f841871fd581d5
+msgid "Main dependencies:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:48
+#: d59d1eebe1894573904ff352a32f6e48
+msgid "``hypothesis``: Property-based testing framework"
+msgstr ""
+
+#: ../../development/validation_framework.rst:49
+#: 5f898ef5a1d94ab9ad546254e3e4ed50
+msgid "``pytest``: Python testing framework"
+msgstr ""
+
+#: ../../development/validation_framework.rst:50
+#: 1a94f7c9ef9845748633eb0a050b2bf9
+msgid "``jinja2``: Report template engine"
+msgstr ""
+
+#: ../../development/validation_framework.rst:51
+#: afdf577941e14c1abc1d5d4c5695de51
+msgid "``lxml``: XML processing"
+msgstr ""
+
+#: ../../development/validation_framework.rst:52
+#: b114cbf47a12488c9c76a71b0c12b035
+msgid "``pyyaml``: Configuration file parsing"
+msgstr ""
+
+#: ../../development/validation_framework.rst:55
+#: a8f6c7bfcdbb42629f90c16eec210e21
+msgid "Installation"
+msgstr "安装"
+
+#: ../../development/validation_framework.rst:58
+#: 70a1f72160cd48e99bbb80a4932eafbe
+msgid "1. Clone Repository"
+msgstr ""
+
+#: ../../development/validation_framework.rst:60
+#: c6dbfecdd50342969e79d33383e40291
+msgid ""
+"git clone https://github.com/your-org/nexus.git\n"
+"cd nexus\n"
+"git submodule update --init --recursive"
+msgstr ""
+"git clone https://github.com/your-org/nexus.git\n"
+"cd nexus\n"
+"git submodule update --init --recursive"
+
+#: ../../development/validation_framework.rst:67
+#: 5c6ba9534e1a4e108642fa1caadd4b4d
+msgid "2. Install System Dependencies"
+msgstr ""
+
+#: ../../development/validation_framework.rst:69
+#: 4bfeea17b54744f98090938bcec17774
+msgid "**Ubuntu/Debian:**"
+msgstr "**Ubuntu/Debian:**"
+
+#: ../../development/validation_framework.rst:71
+#: 918e75cbc8624bc7b98a6eb7fcb4e48c
+msgid ""
+"sudo apt-get update\n"
+"sudo apt-get install -y cmake ninja-build lcov python3-pip"
+msgstr ""
+
+#: ../../development/validation_framework.rst:76
+#: a470bc4f596f424c995757eb0e548527
+msgid "**macOS:**"
+msgstr "**macOS:**"
+
+#: ../../development/validation_framework.rst:78
+#: ab338fdeca414515886d1c4bcddf0f79
+msgid "brew install cmake ninja lcov python3"
+msgstr ""
+
+#: ../../development/validation_framework.rst:82
+#: 57c6408abbba4e1d8d5165f30cccf959
+msgid "**Windows:**"
+msgstr "**Windows:**"
+
+#: ../../development/validation_framework.rst:84
+#: f8007ada491349589a4fc84faca82db0
+msgid "choco install cmake ninja python3"
+msgstr ""
+
+#: ../../development/validation_framework.rst:89
+#: 015a8e05638b4311ab433cafb39e88d1
+msgid "3. Install Python Dependencies"
+msgstr ""
+
+#: ../../development/validation_framework.rst:96
+#: c83c01b15617421f91bb5b5ffdee1a8f
+msgid "4. Verify Installation"
+msgstr ""
+
+#: ../../development/validation_framework.rst:98
+#: 2624b3b1070140d69aeb5ff41d961d7e
+msgid "python scripts/validation/validate.py --help"
+msgstr "python scripts/validation/validate.py --help"
+
+#: ../../development/validation_framework.rst:103
+#: e369cace81444b4899bebe3f1b914772
+msgid "Quick Start"
+msgstr "快速开始"
+
+#: ../../development/validation_framework.rst:106
+#: 92b75ab7e3a14818a3723597054e70ee
+msgid "Basic Usage"
+msgstr ""
+
+#: ../../development/validation_framework.rst:108
+#: f8c6d263b8d44382a931ebafbbd0a30a
+msgid "**Run all tests:**"
+msgstr "**Run all tests:**"
+
+#: ../../development/validation_framework.rst:110
+#: 51f98c61d9e944c3910fae589ffbe97d
+msgid "python scripts/validation/validate.py"
+msgstr "python scripts/validation/validate.py"
+
+#: ../../development/validation_framework.rst:114
+#: 0bcc046a04f14abd9ec230979208828a
+msgid "**Enable coverage analysis:**"
+msgstr "**Enable coverage analysis:**"
+
+#: ../../development/validation_framework.rst:116
+#: ../../development/validation_framework.rst:209
+#: 0d28a46f5b644d758b1d85f15ba75f07 646374f6369c499997955800b602ab2c
+msgid "python scripts/validation/validate.py --coverage"
+msgstr "python scripts/validation/validate.py --coverage"
+
+#: ../../development/validation_framework.rst:120
+#: 5dc07e8bea8841c3b5e4a74f703e3ed3
+msgid "**Set coverage threshold:**"
+msgstr "**Set coverage threshold:**"
+
+#: ../../development/validation_framework.rst:122
+#: cc47ce987d76478fbc8c1128ebe3b420
+msgid "python scripts/validation/validate.py --coverage --threshold 0.85"
+msgstr "python scripts/validation/validate.py --coverage --threshold 0.85"
+
+#: ../../development/validation_framework.rst:126
+#: 7ac6885ce60a4916a86e9ef4a6833c0e
+msgid "**Parallel test execution:**"
+msgstr "**Parallel test execution:**"
+
+#: ../../development/validation_framework.rst:128
+#: c4f4089fe903434aa16e80a704b0cbc9
+msgid "python scripts/validation/validate.py --parallel 4"
+msgstr "python scripts/validation/validate.py --parallel 4"
+
+#: ../../development/validation_framework.rst:133
+#: 8b6fa920bfe44c9995cf51dcf1ca1f01
+msgid "Typical Workflow"
+msgstr ""
+
+#: ../../development/validation_framework.rst:135
+#: 1f97430b95924858b48f4d3aecdcba0c
+msgid ""
+"# 1. Clean previous builds\n"
+"rm -rf build validation_reports\n"
+"\n"
+"# 2. Run full validation with coverage\n"
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.80 \\\n"
+"    --parallel 8 \\\n"
+"    --report-dir validation_reports\n"
+"\n"
+"# 3. View reports\n"
+"# HTML report: validation_reports/report.html\n"
+"# Coverage report: validation_reports/coverage/index.html\n"
+"# JUnit XML: validation_reports/junit.xml"
+msgstr ""
+"# 1. Clean previous builds\n"
+"rm -rf build validation_reports\n"
+"\n"
+"# 2. Run full validation with coverage\n"
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.80 \\\n"
+"    --parallel 8 \\\n"
+"    --report-dir validation_reports\n"
+"\n"
+"# 3. View reports\n"
+"# HTML report: validation_reports/report.html\n"
+"# Coverage report: validation_reports/coverage/index.html\n"
+"# JUnit XML: validation_reports/junit.xml"
+
+#: ../../development/validation_framework.rst:153
+#: 2697749874ec45cabcf6e70def371fa7
+msgid "Command-Line Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:156
+#: 10dbfc7475ab4cc8ae79debc1bf5c4d0
+msgid "Basic Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:158
+#: 550baaa552884d48bdf2f8baa9084877
+msgid ""
+"--build-dir DIR       Build directory (default: build)\n"
+"--source-dir DIR      Source code directory (default: .)"
+msgstr ""
+"--build-dir DIR       Build directory (default: build)\n"
+"--source-dir DIR      Source code directory (default: .)"
+
+#: ../../development/validation_framework.rst:164
+#: 5b9873d5d7a8462eada64e3de3f68b19
+msgid "Coverage Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:166
+#: dacc3b500a404509b8b59e3f35ea751e
+msgid ""
+"--coverage            Enable code coverage analysis\n"
+"--threshold FLOAT     Coverage threshold 0.0-1.0 (default: 0.80)"
+msgstr ""
+"--coverage            Enable code coverage analysis\n"
+"--threshold FLOAT     Coverage threshold 0.0-1.0 (default: 0.80)"
+
+#: ../../development/validation_framework.rst:172
+#: fa180101bc0245e99e7960cb4bd0ef5e
+msgid "Test Execution Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:174
+#: cfeba4daa0914913b6ed836dbde55680
+msgid ""
+"--timeout SECONDS     Test timeout in seconds (default: 300)\n"
+"--parallel N          Number of parallel jobs (default: auto-detect)\n"
+"--fail-fast           Stop on first test failure"
+msgstr ""
+"--timeout SECONDS     Test timeout in seconds (default: 300)\n"
+"--parallel N          Number of parallel jobs (default: auto-detect)\n"
+"--fail-fast           Stop on first test failure"
+
+#: ../../development/validation_framework.rst:181
+#: d30d2dcc76804557a13fb33118a27636
+msgid "Report Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:183
+#: e607e5871ae04544bdeae8e6e15d6914
+msgid ""
+"--report-dir DIR      Report output directory (default: "
+"build/validation_reports)"
+msgstr ""
+"--report-dir DIR      Report output directory (default: "
+"build/validation_reports)"
+
+#: ../../development/validation_framework.rst:188
+#: 0254f0ebc6ca4423928b2579fc0a2a2d
+msgid "Configuration File Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:190
+#: c3e10ba1f5d74e7bb5bc73a799a3985d
+msgid ""
+"--config FILE         Load configuration from JSON file\n"
+"--save-config FILE    Save current configuration to JSON file"
+msgstr ""
+
+#: ../../development/validation_framework.rst:196
+#: b226d0aec6194d17b4dd39007c324968
+msgid "Output Options"
+msgstr ""
+
+#: ../../development/validation_framework.rst:198
+#: bfca10e2daee421b84fcdc4e90c6339e
+msgid ""
+"--verbose, -v         Enable verbose output mode\n"
+"--quiet, -q           Enable quiet mode (minimal output)"
+msgstr ""
+"--verbose, -v         Enable verbose output mode\n"
+"--quiet, -q           Enable quiet mode (minimal output)"
+
+#: ../../development/validation_framework.rst:204
+#: da0bce94604b402e9edc44f53bb21de1
+msgid "Coverage Analysis"
+msgstr "覆盖率分析"
+
+#: ../../development/validation_framework.rst:207
+#: 4e5ed40f84f5453a8672e8b01ac96bed
+msgid "Generating Coverage Reports"
+msgstr ""
+
+#: ../../development/validation_framework.rst:213
+#: 395855075d284a1893c5b7e268d79f43
+msgid ""
+"Coverage reports are generated in the ``validation_reports/coverage/`` "
+"directory:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:215
+#: d8c24490398f484e977db96f88d4d672
+msgid "``index.html``: Main coverage report"
+msgstr ""
+
+#: ../../development/validation_framework.rst:216
+#: 8cf78e5ca5464d00ad24f0f47df18d5f
+msgid "``coverage.info``: lcov format data"
+msgstr ""
+
+#: ../../development/validation_framework.rst:217
+#: f7c3c8c7b84b4e6286677677ea4d92fc
+msgid "``coverage.xml``: Cobertura XML format"
+msgstr ""
+
+#: ../../development/validation_framework.rst:220
+#: 9d41bd3f4c764a90a415ba46653382f3
+msgid "Checking Coverage Threshold"
+msgstr ""
+
+#: ../../development/validation_framework.rst:222
+#: 44ea87ebd46d4744b2b586bf5d57689e
+msgid ""
+"python scripts/validation/check_coverage.py \\\n"
+"    --coverage-file build/coverage.info \\\n"
+"    --threshold 0.80"
+msgstr ""
+"python scripts/validation/check_coverage.py \\\n"
+"    --coverage-file build/coverage.info \\\n"
+"    --threshold 0.80"
+
+#: ../../development/validation_framework.rst:229
+#: b162591a51fd4d1896b157cf995e7064
+msgid "Viewing Uncovered Regions"
+msgstr ""
+
+#: ../../development/validation_framework.rst:231
+#: 9466977d6d0b476c82cdf1d9e0c4375e
+msgid "The coverage report highlights:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:233
+#: c5b0f000f8c84b688c6846f5fdd49301
+msgid "🔴 **Red**: Unexecuted code lines"
+msgstr ""
+
+#: ../../development/validation_framework.rst:234
+#: bf60d224a5ff4decbf583010be9cffb1
+msgid "🟡 **Yellow**: Partially covered branches"
+msgstr "🟡 **黄色**：部分覆盖的分支"
+
+#: ../../development/validation_framework.rst:235
+#: 17f380945db944e19704103c17869326
+msgid "🟢 **Green**: Fully covered code"
+msgstr ""
+
+#: ../../development/validation_framework.rst:238
+#: af8f3f5aef9b4826b0110f3615071959
+msgid "Coverage Analysis Examples"
+msgstr ""
+
+#: ../../development/validation_framework.rst:240
+#: 65e97a6995324124b1841079f4d9a0f5
+msgid "**Example 1: Basic Coverage Analysis**"
+msgstr "**Example 1: Basic Coverage Analysis**"
+
+#: ../../development/validation_framework.rst:242
+#: 368def07b0ef4c61ab4923d0fe801402
+msgid ""
+"# Run tests with coverage\n"
+"python scripts/validation/validate.py --coverage\n"
+"\n"
+"# View HTML report\n"
+"open validation_reports/coverage_html/index.html"
+msgstr ""
+"# Run tests with coverage\n"
+"python scripts/validation/validate.py --coverage\n"
+"\n"
+"# View HTML report\n"
+"open validation_reports/coverage_html/index.html"
+
+#: ../../development/validation_framework.rst:250
+#: 0ad6e8801a4f4f0593cdd4548a616ea7
+msgid "**Example 2: Coverage with Threshold Check**"
+msgstr "**Example 2: Coverage with Threshold Check**"
+
+#: ../../development/validation_framework.rst:252
+#: 54ce4d02a87c47ab886d6058ba0b2634
+msgid ""
+"# Run with 85% threshold\n"
+"python scripts/validation/validate.py --coverage --threshold 0.85\n"
+"\n"
+"# Exit code 0 if threshold met, non-zero otherwise\n"
+"echo $?"
+msgstr ""
+"# Run with 85% threshold\n"
+"python scripts/validation/validate.py --coverage --threshold 0.85\n"
+"\n"
+"# Exit code 0 if threshold met, non-zero otherwise\n"
+"echo $?"
+
+#: ../../development/validation_framework.rst:260
+#: e6bec8e2532d4b5ea7540b386ef80d8a
+msgid "**Example 3: Coverage for Specific Module**"
+msgstr "**Example 3: Coverage for Specific Module**"
+
+#: ../../development/validation_framework.rst:262
+#: 51b19ab9dd224d50a393ca5c110804d5
+msgid ""
+"# Build and run tests for config module only\n"
+"cd build\n"
+"ctest -R \"config_.*\" --verbose\n"
+"\n"
+"# Generate coverage for config module\n"
+"lcov --capture --directory . --output-file config_coverage.info\n"
+"lcov --extract config_coverage.info \"*/framework/config/*\" --output-file config_filtered.info\n"
+"genhtml config_filtered.info --output-directory config_coverage_html"
+msgstr ""
+"# Build and run tests for config module only\n"
+"cd build\n"
+"ctest -R \"config_.*\" --verbose\n"
+"\n"
+"# Generate coverage for config module\n"
+"lcov --capture --directory . --output-file config_coverage.info\n"
+"lcov --extract config_coverage.info \"*/framework/config/*\" --output-file config_filtered.info\n"
+"genhtml config_filtered.info --output-directory config_coverage_html"
+
+#: ../../development/validation_framework.rst:273
+#: 6c40122eacf949fba591967d61596f96
+msgid "**Example 4: Identifying Uncovered Code**"
+msgstr "**Example 4: Identifying Uncovered Code**"
+
+#: ../../development/validation_framework.rst:275
+#: b718a98862294522b7319de79c9d44c6
+msgid ""
+"# Using the coverage analyzer API\n"
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"config = ConfigManager().load_default()\n"
+"config.coverage_enabled = True\n"
+"\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"\n"
+"# Get uncovered regions\n"
+"uncovered = analyzer.identify_uncovered_regions()\n"
+"\n"
+"for location in uncovered[:10]:\n"
+"    print(f\"{location.file_path}:{location.line_number}\")"
+msgstr ""
+"# Using the coverage analyzer API\n"
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"config = ConfigManager().load_default()\n"
+"config.coverage_enabled = True\n"
+"\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"\n"
+"# Get uncovered regions\n"
+"uncovered = analyzer.identify_uncovered_regions()\n"
+"\n"
+"for location in uncovered[:10]:\n"
+"    print(f\"{location.file_path}:{location.line_number}\")"
+
+#: ../../development/validation_framework.rst:293
+#: 4d9752ec31c8460484d95733feda102a
+msgid "**Example 5: Coverage Report Formats**"
+msgstr "**Example 5: Coverage Report Formats**"
+
+#: ../../development/validation_framework.rst:295
+#: b9a75ae03e4f4a43ac2ec41cf7b809fe
+msgid ""
+"# Generate HTML report\n"
+"python scripts/validation/validate.py --coverage\n"
+"genhtml build/coverage.info --output-directory coverage_html\n"
+"\n"
+"# Generate XML report for CI\n"
+"python -m lcov_cobertura build/coverage.info --output coverage.xml\n"
+"\n"
+"# Generate JSON report\n"
+"lcov --summary build/coverage.info --output-file coverage_summary.json"
+msgstr ""
+"# Generate HTML report\n"
+"python scripts/validation/validate.py --coverage\n"
+"genhtml build/coverage.info --output-directory coverage_html\n"
+"\n"
+"# Generate XML report for CI\n"
+"python -m lcov_cobertura build/coverage.info --output coverage.xml\n"
+"\n"
+"# Generate JSON report\n"
+"lcov --summary build/coverage.info --output-file coverage_summary.json"
+
+#: ../../development/validation_framework.rst:308
+#: 9f3ecc929758482cbf5dc9aa92bb522b
+msgid "Property-Based Testing"
+msgstr ""
+
+#: ../../development/validation_framework.rst:310
+#: 77231fe86faf4a3ca9a780a62520caa5
+msgid ""
+"Property-based tests use the Hypothesis library and run at least 100 "
+"iterations per test:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:312
+#: fb1e1cce3fea4b18beeb09ec4d86f1c3
+msgid ""
+"from hypothesis import given, settings\n"
+"import hypothesis.strategies as st\n"
+"\n"
+"@settings(max_examples=100)\n"
+"@given(value=st.integers())\n"
+"def test_property(value):\n"
+"    \"\"\"\n"
+"    Feature: system-validation, Property 1: Test property\n"
+"    Validates: Requirements 1.1\n"
+"    \"\"\"\n"
+"    assert some_property_holds(value)"
+msgstr ""
+"from hypothesis import given, settings\n"
+"import hypothesis.strategies as st\n"
+"\n"
+"@settings(max_examples=100)\n"
+"@given(value=st.integers())\n"
+"def test_property(value):\n"
+"    \"\"\"\n"
+"    Feature: system-validation, Property 1: Test property\n"
+"    Validates: Requirements 1.1\n"
+"    \"\"\"\n"
+"    assert some_property_holds(value)"
+
+#: ../../development/validation_framework.rst:327
+#: d9f30e03422247b18a12c713c0f8f914
+msgid "Viewing Failing Examples"
+msgstr ""
+
+#: ../../development/validation_framework.rst:329
+#: 454acded511c4de8aa2bf1dd289410b0
+msgid "When a property test fails, the counterexample is displayed:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:331
+#: ../../development/validation_framework.rst:553
+#: 216b5945d02b4eccbae4497b580fadb8 41b4a412582e4424955c0cd3a4a89113
+msgid "Falsifying example: test_property(value=42)"
+msgstr "Falsifying example: test_property(value=42)"
+
+#: ../../development/validation_framework.rst:336
+#: 4fe07df60dd04d22a62409b2ebd6513c
+msgid "Configuration"
+msgstr "配置"
+
+#: ../../development/validation_framework.rst:339
+#: 5acc10c4def94a1f8b4eee8f993b3726
+msgid "Configuration File"
+msgstr "配置文件"
+
+#: ../../development/validation_framework.rst:341
+#: a2d54babe147460aba824632ff6e8fec
+msgid "Create ``validation_config.yaml`` for custom configuration:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:343
+#: 7da3346d3a004c339ce553e98d22706e
+msgid ""
+"# Build configuration\n"
+"build:\n"
+"  directory: build\n"
+"  generator: Ninja\n"
+"  build_type: Debug\n"
+"\n"
+"# Test configuration\n"
+"testing:\n"
+"  parallel_jobs: 8\n"
+"  timeout: 300\n"
+"  fail_fast: false\n"
+"\n"
+"# Coverage configuration\n"
+"coverage:\n"
+"  enabled: true\n"
+"  threshold: 0.80\n"
+"  exclude_patterns:\n"
+"    - \"*/tests/*\"\n"
+"    - \"*/ext/*\"\n"
+"\n"
+"# Report configuration\n"
+"reporting:\n"
+"  output_dir: validation_reports\n"
+"  formats:\n"
+"    - html\n"
+"    - junit\n"
+"    - json"
+msgstr ""
+"# Build configuration\n"
+"build:\n"
+"  directory: build\n"
+"  generator: Ninja\n"
+"  build_type: Debug\n"
+"\n"
+"# Test configuration\n"
+"testing:\n"
+"  parallel_jobs: 8\n"
+"  timeout: 300\n"
+"  fail_fast: false\n"
+"\n"
+"# Coverage configuration\n"
+"coverage:\n"
+"  enabled: true\n"
+"  threshold: 0.80\n"
+"  exclude_patterns:\n"
+"    - \"*/tests/*\"\n"
+"    - \"*/ext/*\"\n"
+"\n"
+"# Report configuration\n"
+"reporting:\n"
+"  output_dir: validation_reports\n"
+"  formats:\n"
+"    - html\n"
+"    - junit\n"
+"    - json"
+
+#: ../../development/validation_framework.rst:373
+#: 807a804a40d549c1b09f22ec69cb86f5
+msgid "Using the configuration file:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:375
+#: eee143f935234c7bbc8c1fe94c8a6d68
+msgid "python scripts/validation/validate.py --config validation_config.yaml"
+msgstr "python scripts/validation/validate.py --config validation_config.yaml"
+
+#: ../../development/validation_framework.rst:380
+#: 95da3e2fa1204cc4b90fdf0d9f137f3d
+msgid "Environment Variables"
+msgstr "环境变量"
+
+#: ../../development/validation_framework.rst:382
+#: 87605e484e1c4f65bf63f85266c61a98
+msgid ""
+"# Set build directory\n"
+"export NEXUS_BUILD_DIR=build_coverage\n"
+"\n"
+"# Set coverage threshold\n"
+"export NEXUS_COVERAGE_THRESHOLD=0.85\n"
+"\n"
+"# Set parallel jobs\n"
+"export NEXUS_PARALLEL_JOBS=16\n"
+"\n"
+"# Run validation\n"
+"python scripts/validation/validate.py"
+msgstr ""
+"# Set build directory\n"
+"export NEXUS_BUILD_DIR=build_coverage\n"
+"\n"
+"# Set coverage threshold\n"
+"export NEXUS_COVERAGE_THRESHOLD=0.85\n"
+"\n"
+"# Set parallel jobs\n"
+"export NEXUS_PARALLEL_JOBS=16\n"
+"\n"
+"# Run validation\n"
+"python scripts/validation/validate.py"
+
+#: ../../development/validation_framework.rst:397
+#: b36b2182ea544d8c80c84024682667db
+msgid "Report Formats"
+msgstr ""
+
+#: ../../development/validation_framework.rst:400
+#: b0d7a7376ef9434d93f299644d639984
+msgid "HTML Report"
+msgstr "HTML 报告"
+
+#: ../../development/validation_framework.rst:402
+#: 32087e05687c4d299156f1784d61d0ff
+msgid "The main report (``validation_reports/report.html``) contains:"
+msgstr "The main report (``validation_reports/report.html``) contains:"
+
+#: ../../development/validation_framework.rst:404
+#: 78cc2129f8ee460f9153c0b1f2e9d585
+msgid "Test results summary table"
+msgstr ""
+
+#: ../../development/validation_framework.rst:405
+#: 1c245d124e51469b845e1c8c459e28fe
+msgid "Coverage statistics charts"
+msgstr ""
+
+#: ../../development/validation_framework.rst:406
+#: e123b3603a974aa0b61420956865bfaa
+msgid "Failed test details"
+msgstr ""
+
+#: ../../development/validation_framework.rst:407
+#: 854e542204714d7ea6fc8c75d9cd48b0
+msgid "Performance analysis"
+msgstr ""
+
+#: ../../development/validation_framework.rst:408
+#: 7206481e0d5a487f831b50f8f369f1fc
+msgid "Interactive filtering and search"
+msgstr ""
+
+#: ../../development/validation_framework.rst:411
+#: fb61e465b37b4cbe89591a064994b2e0
+msgid "JUnit XML Report"
+msgstr "JUnit XML 报告"
+
+#: ../../development/validation_framework.rst:413
+#: 00c62432ce82421ca30afeacfff3adba
+msgid "JUnit format (``validation_reports/junit.xml``) for CI integration:"
+msgstr "JUnit format (``validation_reports/junit.xml``) for CI integration:"
+
+#: ../../development/validation_framework.rst:415
+#: 9359eaa16ca7436ca50c300d123c92a8
+msgid ""
+"<testsuites>\n"
+"  <testsuite name=\"config_tests\" tests=\"10\" failures=\"0\" time=\"1.23\">\n"
+"    <testcase name=\"test_config_set\" time=\"0.12\"/>\n"
+"    ...\n"
+"  </testsuite>\n"
+"</testsuites>"
+msgstr ""
+"<testsuites>\n"
+"  <testsuite name=\"config_tests\" tests=\"10\" failures=\"0\" time=\"1.23\">\n"
+"    <testcase name=\"test_config_set\" time=\"0.12\"/>\n"
+"    ...\n"
+"  </testsuite>\n"
+"</testsuites>"
+
+#: ../../development/validation_framework.rst:425
+#: f6e0c45afbc94c4ab04f02c20dd6881c
+msgid "Coverage Report"
+msgstr "覆盖率报告"
+
+#: ../../development/validation_framework.rst:427
+#: 207534eca7724a3b9eb12b2f5525cb7f
+msgid "Coverage report (``validation_reports/coverage/index.html``) provides:"
+msgstr ""
+"Coverage report (``validation_reports/coverage/index.html``) provides:"
+
+#: ../../development/validation_framework.rst:429
+#: bcf224a7593c42ac8eac772bf51066e2
+msgid "File-level coverage statistics"
+msgstr ""
+
+#: ../../development/validation_framework.rst:430
+#: 5ed8109fa0f742c781a3523a00f58c76
+msgid "Source code line-level coverage visualization"
+msgstr ""
+
+#: ../../development/validation_framework.rst:431
+#: 27cb7d3edaef441caa6e2890fe5ae6c6
+msgid "List of uncovered code regions"
+msgstr ""
+
+#: ../../development/validation_framework.rst:432
+#: 4b29150146d448d3b24755bc9feae4df
+msgid "Branch coverage details"
+msgstr ""
+
+#: ../../development/validation_framework.rst:435
+#: af3c33c7d06848329317b93af74e4307
+msgid "CI/CD Integration"
+msgstr ""
+
+#: ../../development/validation_framework.rst:438
+#: bc5d74ebf706452f858acfbada8c6d7c
+msgid "GitHub Actions"
+msgstr "GitHub Actions"
+
+#: ../../development/validation_framework.rst:440
+#: ab438d95cf44436684e021fc7714592b
+msgid ""
+"The project includes a pre-configured GitHub Actions workflow "
+"(``.github/workflows/validation.yml``):"
+msgstr ""
+"The project includes a pre-configured GitHub Actions workflow "
+"(``.github/workflows/validation.yml``):"
+
+#: ../../development/validation_framework.rst:442
+#: e8d60cb12d80495981e971de6b506306
+msgid ""
+"name: System Validation\n"
+"on: [push, pull_request]\n"
+"jobs:\n"
+"  validate:\n"
+"    runs-on: ubuntu-latest\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"      - name: Run Validation\n"
+"        run: python scripts/validation/validate.py --coverage\n"
+"      - name: Upload Coverage\n"
+"        uses: codecov/codecov-action@v3"
+msgstr ""
+"name: System Validation\n"
+"on: [push, pull_request]\n"
+"jobs:\n"
+"  validate:\n"
+"    runs-on: ubuntu-latest\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"      - name: Run Validation\n"
+"        run: python scripts/validation/validate.py --coverage\n"
+"      - name: Upload Coverage\n"
+"        uses: codecov/codecov-action@v3"
+
+#: ../../development/validation_framework.rst:457
+#: e417522c25a5472090ba18b1aec20e11
+msgid "Local CI Simulation"
+msgstr ""
+
+#: ../../development/validation_framework.rst:459
+#: 95ece61e3bef439bb66a9a363f347cf1
+msgid "Simulate CI environment locally:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:461
+#: 730d588f0a7643c49147307ccbab3e77
+msgid ""
+"# Clean environment\n"
+"rm -rf build validation_reports\n"
+"\n"
+"# Run validation (CI mode)\n"
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.80 \\\n"
+"    --fail-fast \\\n"
+"    --report-dir validation_reports\n"
+"\n"
+"# Check exit code\n"
+"echo $?  # 0 = success, non-zero = failure"
+msgstr ""
+"# Clean environment\n"
+"rm -rf build validation_reports\n"
+"\n"
+"# Run validation (CI mode)\n"
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.80 \\\n"
+"    --fail-fast \\\n"
+"    --report-dir validation_reports\n"
+"\n"
+"# Check exit code\n"
+"echo $?  # 0 = success, non-zero = failure"
+
+#: ../../development/validation_framework.rst:477
+#: 4be7344347124799a6a874faaf53f032
+msgid "GitLab CI"
+msgstr "GitLab CI"
+
+#: ../../development/validation_framework.rst:479
+#: 1f50645b3c1d42bea0dcf7aac4e8f949
+msgid ""
+"test:\n"
+"  script:\n"
+"    - pip install -r scripts/validation/requirements.txt\n"
+"    - python scripts/validation/validate.py --coverage\n"
+"  artifacts:\n"
+"    reports:\n"
+"      junit: validation_reports/junit.xml\n"
+"      coverage_report:\n"
+"        coverage_format: cobertura\n"
+"        path: validation_reports/coverage.xml"
+msgstr ""
+
+#: ../../development/validation_framework.rst:493
+#: 4c5965bacb2044d7981c87c00a331fff
+msgid "Jenkins"
+msgstr "Jenkins"
+
+#: ../../development/validation_framework.rst:495
+#: 2c47a0fa158e4358882022ff1c162797
+msgid ""
+"stage('Validation') {\n"
+"    steps {\n"
+"        sh 'python scripts/validation/validate.py --coverage'\n"
+"        junit 'validation_reports/junit.xml'\n"
+"        publishHTML([\n"
+"            reportDir: 'validation_reports',\n"
+"            reportFiles: 'report.html',\n"
+"            reportName: 'Validation Report'\n"
+"        ])\n"
+"    }\n"
+"}"
+msgstr ""
+"stage('Validation') {\n"
+"    steps {\n"
+"        sh 'python scripts/validation/validate.py --coverage'\n"
+"        junit 'validation_reports/junit.xml'\n"
+"        publishHTML([\n"
+"            reportDir: 'validation_reports',\n"
+"            reportFiles: 'report.html',\n"
+"            reportName: 'Validation Report'\n"
+"        ])\n"
+"    }\n"
+"}"
+
+#: ../../development/validation_framework.rst:510
+#: d5d9cc92904f4143ad79553b6254da14
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../development/validation_framework.rst:513
+#: f3a84adffeed40c0a41972cb999539d6
+msgid "Common Issues"
+msgstr ""
+
+#: ../../development/validation_framework.rst:515
+#: 46fc8683cbb94c2c85d3a2de31675874
+msgid "**1. Build Failure**"
+msgstr "**1. Build Failure**"
+
+#: ../../development/validation_framework.rst:517
+#: cc57f19482bc40848f8dae679420d304
+msgid "Error: CMake configuration failed"
+msgstr ""
+
+#: ../../development/validation_framework.rst:521
+#: ../../development/validation_framework.rst:533
+#: ../../development/validation_framework.rst:545
+#: ../../development/validation_framework.rst:557
+#: 09a38cc0c215484095acd7244f21013b 692c2f3db1e24628ac0e04377a36d2d0
+#: 7a27a9fc51244c15bcc747f80ea850dd af287cb50c6f47219519bffdcdcf67e1
+msgid "**Solution:**"
+msgstr "**Solution:**"
+
+#: ../../development/validation_framework.rst:523
+#: f28e4a5821d047e48187bb4c94f5723b
+msgid "Check CMake version >= 3.15"
+msgstr "Check CMake version >= 3.15"
+
+#: ../../development/validation_framework.rst:524
+#: e71d11fda120469d917acfa50588d7be
+msgid ""
+"Ensure all submodules are initialized: ``git submodule update --init "
+"--recursive``"
+msgstr ""
+
+#: ../../development/validation_framework.rst:525
+#: 522b7c988c0847ea9490c57d5b3b41e7
+msgid "Clean build directory: ``rm -rf build``"
+msgstr ""
+
+#: ../../development/validation_framework.rst:527
+#: c93c92c434634028a677b8cd44d5eef8
+msgid "**2. Test Timeout**"
+msgstr "**2. Test Timeout**"
+
+#: ../../development/validation_framework.rst:529
+#: 5e15b9960a3b44a5ad3b7cdf7a4de3de
+msgid "Error: Test timeout after 300 seconds"
+msgstr ""
+
+#: ../../development/validation_framework.rst:535
+#: eadafc79a0104abd87adbe03ed0daace
+msgid "Increase timeout: ``--test-timeout 600``"
+msgstr ""
+
+#: ../../development/validation_framework.rst:536
+#: 4a59e5f2a810450fa060ab966fc4d71a
+msgid "Check for deadlocks or infinite loops"
+msgstr ""
+
+#: ../../development/validation_framework.rst:537
+#: a03639467d7346e485bb3f9f5c381649
+msgid "Reduce parallel jobs: ``--parallel 2``"
+msgstr ""
+
+#: ../../development/validation_framework.rst:539
+#: fd5e55ca15e74fb2a4d89df2c58ef6c3
+msgid "**3. Missing Coverage Data**"
+msgstr "**3. Missing Coverage Data**"
+
+#: ../../development/validation_framework.rst:541
+#: 5dc796e3f0044393a9cfe782d47b158d
+msgid "Warning: No coverage data found"
+msgstr ""
+
+#: ../../development/validation_framework.rst:547
+#: ab637eac2b434cdca5f657407ff32a56
+msgid "Ensure ``--coverage`` option is used"
+msgstr ""
+
+#: ../../development/validation_framework.rst:548
+#: 0e8f35acfa024faba024a5a0477d09e7
+msgid "Check compiler supports coverage: ``gcc --version``"
+msgstr ""
+
+#: ../../development/validation_framework.rst:549
+#: 304f1b0cfdc240e794aa0d2f3a2e1af7
+msgid "Verify lcov is installed: ``lcov --version``"
+msgstr ""
+
+#: ../../development/validation_framework.rst:551
+#: 5fde5b3bc0b7485c852b65af250ae1b2
+msgid "**4. Property Test Failure**"
+msgstr "**4. Property Test Failure**"
+
+#: ../../development/validation_framework.rst:559
+#: c5085f1c1da24642bcc13290dde587bc
+msgid "Check if counterexample reveals a real bug"
+msgstr ""
+
+#: ../../development/validation_framework.rst:560
+#: 4a287d7d2b50462091bacb480ba5c471
+msgid "If test issue, adjust test strategy"
+msgstr ""
+
+#: ../../development/validation_framework.rst:561
+#: d64ed3a20bfa49c9b94b7eaf7f7346c5
+msgid "If code issue, fix implementation"
+msgstr ""
+
+#: ../../development/validation_framework.rst:564
+#: 3ad8d25b34ca439f831f008128cef2cf
+msgid "Debugging Tips"
+msgstr ""
+
+#: ../../development/validation_framework.rst:566
+#: 591d89d9414645bd939a1ead1f9cd30e
+msgid "**Enable verbose output:**"
+msgstr "**Enable verbose output:**"
+
+#: ../../development/validation_framework.rst:568
+#: 3d49289305e94397b5bccb7b79be3fd1
+msgid "python scripts/validation/validate.py --verbose"
+msgstr "python scripts/validation/validate.py --verbose"
+
+#: ../../development/validation_framework.rst:572
+#: 1cb14f8cbb2f4f7e97520db1e1586604
+msgid "**View CMake configuration:**"
+msgstr "**View CMake configuration:**"
+
+#: ../../development/validation_framework.rst:574
+#: 9a85d582d04b40d8b0afb5f8c0c9b28f
+msgid ""
+"cmake -B build -DNEXUS_BUILD_TESTS=ON -DNEXUS_ENABLE_COVERAGE=ON\n"
+"cmake -L build  # List all configuration options"
+msgstr ""
+"cmake -B build -DNEXUS_BUILD_TESTS=ON -DNEXUS_ENABLE_COVERAGE=ON\n"
+"cmake -L build  # List all configuration options"
+
+#: ../../development/validation_framework.rst:579
+#: 678b59033a3c4070b0d56761bc44dc60
+msgid "**Manually run single test:**"
+msgstr "**Manually run single test:**"
+
+#: ../../development/validation_framework.rst:581
+#: 7835ff2358f346948af3af21b8457e78
+msgid ""
+"cd build\n"
+"./tests/config/config_tests --gtest_filter=\"ConfigTest.SetGet\""
+msgstr ""
+"cd build\n"
+"./tests/config/config_tests --gtest_filter=\"ConfigTest.SetGet\""
+
+#: ../../development/validation_framework.rst:586
+#: 7600995a7dfe44658f24317d28c70243
+msgid "**Check coverage data:**"
+msgstr "**Check coverage data:**"
+
+#: ../../development/validation_framework.rst:588
+#: 0c70781782f941c19ef844c23031114a
+msgid ""
+"# View raw coverage data\n"
+"lcov --list build/coverage.info\n"
+"\n"
+"# Generate coverage report\n"
+"genhtml build/coverage.info --output-directory coverage_html"
+msgstr ""
+"# View raw coverage data\n"
+"lcov --list build/coverage.info\n"
+"\n"
+"# Generate coverage report\n"
+"genhtml build/coverage.info --output-directory coverage_html"
+
+#: ../../development/validation_framework.rst:597
+#: 848bae0a98434439bb23221944040d10
+msgid "API Reference"
+msgstr "API 参考"
+
+#: ../../development/validation_framework.rst:600
+#: 201704116b624ca482da3d3d77d81a85
+msgid "ValidationController"
+msgstr ""
+
+#: ../../development/validation_framework.rst:602
+#: 3c4ca02af9794f759dec4d9e8e204792
+msgid "Main controller for running validation:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:604
+#: aab3296b740242d092f8993703728d04
+msgid ""
+"from scripts.validation.validation_controller import ValidationController\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"config = ConfigManager().load_default()\n"
+"controller = ValidationController(config)\n"
+"result = controller.run_all_tests()"
+msgstr ""
+"from scripts.validation.validation_controller import ValidationController\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"config = ConfigManager().load_default()\n"
+"controller = ValidationController(config)\n"
+"result = controller.run_all_tests()"
+
+#: ../../development/validation_framework.rst:614
+#: d18e1142d0ea4b0ba2f3444ead2a6ec8
+msgid "CoverageAnalyzer"
+msgstr ""
+
+#: ../../development/validation_framework.rst:616
+#: f311a48381d34b5a8861c3dd969a6c9e
+msgid "Coverage analysis and reporting:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:618
+#: ea9f5d74bded4a5a9e021ae8e0967891
+msgid ""
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"analyzer.enable_coverage()\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"analyzer.generate_coverage_report(format=\"html\")\n"
+"meets_threshold = analyzer.check_threshold(0.80)"
+msgstr ""
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"analyzer.enable_coverage()\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"analyzer.generate_coverage_report(format=\"html\")\n"
+"meets_threshold = analyzer.check_threshold(0.80)"
+
+#: ../../development/validation_framework.rst:629
+#: f89d3a8c4c1c4003a393af299fdc39f1
+msgid "ReportGenerator"
+msgstr ""
+
+#: ../../development/validation_framework.rst:631
+#: 3ba6def8be4c4ad99f981e3cf4702f64
+msgid "Generate validation reports:"
+msgstr ""
+
+#: ../../development/validation_framework.rst:633
+#: c8df4a0c7e3549fdb76d892827e5dde2
+msgid ""
+"from scripts.validation.report_generator import ReportGenerator\n"
+"\n"
+"generator = ReportGenerator(config)\n"
+"generator.generate_html_report(validation_result)\n"
+"generator.generate_junit_report(validation_result)"
+msgstr ""
+"from scripts.validation.report_generator import ReportGenerator\n"
+"\n"
+"generator = ReportGenerator(config)\n"
+"generator.generate_html_report(validation_result)\n"
+"generator.generate_junit_report(validation_result)"
+
+#: ../../development/validation_framework.rst:642
+#: a17f896aac594cb6bdba8568c9c86dc1
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../development/validation_framework.rst:644
+#: b9c66a4c69724af38fe9f519d7b872b0
+msgid ":doc:`testing` - General testing guide"
+msgstr ":doc:`testing` - General testing guide"
+
+#: ../../development/validation_framework.rst:645
+#: 6ec2e87cc1014c9bb86d29a1fd48d9aa
+msgid ":doc:`scripts` - Build scripts documentation"
+msgstr ":doc:`scripts` - Build scripts documentation"
+
+#: ../../development/validation_framework.rst:646
+#: b2bcf7bcbd6b47d58c223477f8b7c8bb
+msgid ":doc:`contributing` - Contribution guidelines"
+msgstr ":doc:`contributing` - Contribution guidelines"

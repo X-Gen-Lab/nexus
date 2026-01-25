@@ -1,0 +1,1681 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../user_guide/kconfig_tutorial.rst:2 781aa7817b774786b85cc7a1ed85e5aa
+msgid "Kconfig Tutorial"
+msgstr "Kconfig 教程"
+
+#: ../../user_guide/kconfig_tutorial.rst:4 03e607735d7c429fa96325d4427034fd
+msgid ""
+"This tutorial provides a comprehensive guide to using the Kconfig "
+"configuration system in the Nexus Embedded Platform, from basic concepts to "
+"advanced techniques."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:8 f2759141a50b450eb363cf45f7f460c7
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../user_guide/kconfig_tutorial.rst:11 6e402155d4434b7f87aa1b6f5020d2dc
+msgid "Introduction"
+msgstr "简介"
+
+#: ../../user_guide/kconfig_tutorial.rst:14 2b559e93a4e84397aefa31b451e45fe0
+msgid "What is Kconfig?"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:16 0ffe9459447c4f59982ccbf6c751afb4
+msgid ""
+"Kconfig is a configuration language originally developed for the Linux "
+"kernel. It provides:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:18 c38fb7c1b69e426494a3fff105543e95
+msgid "**Hierarchical Configuration**: Organize options in menus and submenus"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:19 defb72144a4f4bce9c50da398b0693df
+msgid ""
+"**Type Safety**: Boolean, integer, string, and hexadecimal types with "
+"validation"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:20 2c2884f03574476daf76eef9fb44ca62
+msgid "**Dependencies**: Express relationships between configuration options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:21 51cb1d0362f540c89ddada9bf1a0ae6e
+msgid "**Default Values**: Platform-specific and conditional defaults"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:22 6672b11da01d4fbea6e3c05710ddc1d7
+msgid ""
+"**Validation**: Range constraints, symbol dependencies, and consistency "
+"checks"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:26 a2525de783044d02a928190dd2c1ba88
+msgid ":doc:`kconfig` - Kconfig system overview"
+msgstr ":doc:`kconfig` - Kconfig system overview"
+
+#: ../../user_guide/kconfig_tutorial.rst:27 beb9d029b1864f43ace688a0903c5fc0
+msgid ":doc:`kconfig_peripherals` - Peripheral configuration examples"
+msgstr ":doc:`kconfig_peripherals` - Peripheral configuration examples"
+
+#: ../../user_guide/kconfig_tutorial.rst:28 0e0cccb033e54a068b3f4363be8877e4
+#, fuzzy
+msgid ":doc:`kconfig_platforms` - Platform-specific configuration"
+msgstr "Platform-Specific 配置"
+
+#: ../../user_guide/kconfig_tutorial.rst:29 0e0cccb033e54a068b3f4363be8877e4
+msgid ":doc:`kconfig_osal` - OSAL backend configuration"
+msgstr ":doc:`kconfig_osal` - OSAL backend configuration"
+
+#: ../../user_guide/kconfig_tutorial.rst:30 a2525de783044d02a928190dd2c1ba88
+msgid ":doc:`kconfig_tools` - Kconfig tools documentation"
+msgstr ":doc:`kconfig_tools` - Kconfig tools documentation"
+
+#: ../../user_guide/kconfig_tutorial.rst:31
+#: ../../user_guide/kconfig_tutorial.rst:1039 3a7b59e7423d4725a09bc1c91927f745
+msgid ":doc:`build_system` - Build system integration"
+msgstr ":doc:`build_system` - Build system integration"
+
+#: ../../user_guide/kconfig_tutorial.rst:34
+#: ../../user_guide/kconfig_tutorial.rst:626 87b355814da7491991d28a16e038fcb0
+msgid "Configuration Workflow"
+msgstr "配置 Workflow"
+
+#: ../../user_guide/kconfig_tutorial.rst:36 27b61491c0024b669b824118c27a53c2
+msgid ""
+"The following diagram shows the complete Kconfig configuration workflow:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:73 ddca06f478ef4a4d9fe070a744246ea0
+msgid "Why Use Kconfig?"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:75 9c45e4a5b126460a97272f5bb454a196
+msgid "**Benefits:**"
+msgstr "**Benefits:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:77 ade077f0c2014a99b051ea99288d7e3b
+msgid ""
+"**Compile-Time Configuration**: All configuration resolved before "
+"compilation"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:78 05d8870fade04945bf739fcdea8e90b7
+msgid "**Type Safety**: Prevents invalid configurations"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:79 fdf27a23605f4312951fc655cff3a845
+msgid "**Dependency Management**: Automatic handling of option dependencies"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:80 f4555a7973ca4e61b4e90a7159b6a89b
+msgid "**Multiple Platforms**: Single configuration system for all platforms"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:81 4e5f4f7c360b416b89adf95d16508719
+msgid "**Validation**: Built-in validation prevents configuration errors"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:82 450f64f1cfde4a3aab1d5e069e38c225
+msgid "**Documentation**: Self-documenting with help text"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:84 547f561b3898434293ad67e08feb18ca
+msgid "**Use Cases:**"
+msgstr "**Use Cases:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:86 0789f3a4a34745e795d8fa03f7fcfdb5
+msgid "Platform selection (Native, STM32, GD32, ESP32)"
+msgstr "Platform selection (Native, STM32, GD32, ESP32)"
+
+#: ../../user_guide/kconfig_tutorial.rst:87 d7af13ce8ea24905a54036d2b66fa0dd
+msgid "Peripheral configuration (UART, GPIO, SPI, I2C, Timer, ADC)"
+msgstr "Peripheral configuration (UART, GPIO, SPI, I2C, Timer, ADC)"
+
+#: ../../user_guide/kconfig_tutorial.rst:88 d099159e322d47928c9a5f03a13f2220
+msgid "OSAL backend selection (FreeRTOS, RT-Thread, bare-metal)"
+msgstr "OSAL backend selection (FreeRTOS, RT-Thread, bare-metal)"
+
+#: ../../user_guide/kconfig_tutorial.rst:89 2ce225fb85f54b7dbe0e40376ad545de
+msgid "Memory layout configuration"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:90 80f080885dc646e2aa95092eed92ff59
+msgid "Debug and optimization settings"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:93 29ab1241b60441f4bcbf8626c515e55b
+msgid "Basic Concepts"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:96 12c9087bf42c43bda94cec64674ac361
+msgid "Configuration Symbols"
+msgstr "配置 Symbols"
+
+#: ../../user_guide/kconfig_tutorial.rst:98 2ee305b540f2498ea5e4a7af88747287
+msgid "A configuration symbol is a named option that can be set to a value:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:100 d24531fea7b847b48b33b4fac6e01e8d
+msgid ""
+"config UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"    default y\n"
+"    help\n"
+"      Enable UART peripheral support in the HAL."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:108 c1ee30a03e2145d392110e44266b1b8b
+msgid "**Symbol Types:**"
+msgstr "**Symbol Types:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:110 9fe3fcb048724191aee19b746c277fb7
+msgid "``bool``: Boolean (y/n)"
+msgstr "``bool``: Boolean (y/n)"
+
+#: ../../user_guide/kconfig_tutorial.rst:111 f66d01ffe56d42ad9955291af4294b86
+msgid "``tristate``: Three-state (y/m/n) - rarely used in embedded"
+msgstr "``tristate``: Three-state (y/m/n) - rarely used in embedded"
+
+#: ../../user_guide/kconfig_tutorial.rst:112 91de1cea40424d7993ec0ce15433b9b0
+msgid "``int``: Integer value"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:113 e1bce1913885448f9f3b0922510e2097
+msgid "``hex``: Hexadecimal value"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:114 82a8303f77814a28a21d19aa5a03a0d9
+msgid "``string``: String value"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:117 e1f89bcfc3374de4b05d2119fdf65208
+msgid "Symbol Naming"
+msgstr "符号 Naming"
+
+#: ../../user_guide/kconfig_tutorial.rst:119 af167eb5d2da40b489119973f000f49f
+msgid "**Naming Conventions:**"
+msgstr "**Naming Conventions:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:121 7495aabc5ddc4ba8a3c7b4aabc45fab5
+msgid ""
+"PLATFORM_<NAME>                      # Platform selection\n"
+"<PLATFORM>_<PERIPHERAL>_ENABLE       # Peripheral enable\n"
+"INSTANCE_<PLATFORM>_<PERIPHERAL>_<N> # Instance enable\n"
+"<PERIPHERAL><N>_<PARAMETER>          # Instance parameter"
+msgstr ""
+"PLATFORM_<NAME>                      # Platform selection\n"
+"<PLATFORM>_<PERIPHERAL>_ENABLE       # Peripheral enable\n"
+"INSTANCE_<PLATFORM>_<PERIPHERAL>_<N> # Instance enable\n"
+"<PERIPHERAL><N>_<PARAMETER>          # Instance parameter"
+
+#: ../../user_guide/kconfig_tutorial.rst:128 9db26a1532f74a659d3da27743a4b152
+msgid "**Examples:**"
+msgstr "**Examples:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:130 9d2b9725f6aa4642aff36eff17dc5c36
+msgid ""
+"config PLATFORM_STM32                # Platform\n"
+"config STM32_UART_ENABLE             # Peripheral enable\n"
+"config INSTANCE_STM32_UART_1         # Instance enable\n"
+"config UART1_BAUDRATE                # Instance parameter"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:138
+#: ../../user_guide/kconfig_tutorial.rst:906 00dd5f7cb58b4d029a8f54e2ef702b61
+msgid "Dependencies"
+msgstr "依赖"
+
+#: ../../user_guide/kconfig_tutorial.rst:140 a0c88e5909c141d9bab99ebe54267690
+msgid "Use ``depends on`` to make options conditional:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:142 1f2bceb61cfd4a91b63a8dab2c561c99
+msgid ""
+"config UART1_DMA_ENABLE\n"
+"    bool \"Enable DMA for UART1\"\n"
+"    depends on INSTANCE_STM32_UART_1\n"
+"    depends on STM32_DMA_ENABLE\n"
+"    help\n"
+"      Enable DMA transfers for UART1."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:151 13886f9e059b4e47b33e264833e64974
+msgid ""
+"Multiple dependencies are AND'ed together. The option is only visible when "
+"all dependencies are satisfied."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:154 c5599dca4ca34dbc8b28da3916e20c07
+msgid "Default Values"
+msgstr "默认 Values"
+
+#: ../../user_guide/kconfig_tutorial.rst:156 a00f53ee74264231978b5b2eae47d21d
+msgid "Provide sensible defaults for all options:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:158 13c5b32b4d64448fa889274dccfe1519
+msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:166 0aea8f8609894e4fa25aa4918a1a6429
+msgid "**Conditional Defaults:**"
+msgstr "**Conditional Defaults:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:168 bfff007d2bdd4440a37257d68611fdcc
+msgid ""
+"config OSAL_HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768 if OSAL_FREERTOS\n"
+"    default 16384 if OSAL_BAREMETAL\n"
+"    default 65536\n"
+"    range 4096 1048576"
+msgstr ""
+"config OSAL_HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768 if OSAL_FREERTOS\n"
+"    default 16384 if OSAL_BAREMETAL\n"
+"    default 65536\n"
+"    range 4096 1048576"
+
+#: ../../user_guide/kconfig_tutorial.rst:177 83b8c733e57e489d9a41940fda10074f
+msgid "The first matching default is used."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:180 f94852ca3a5b4939bddf138e6975cb51
+msgid "Help Text"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:182 e7adace5a6884f7f8fc51e64cd2a366d
+msgid "Always provide help text explaining the option:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:184 4aac88f6a66148e2b863dfcf6e981413
+msgid ""
+"config UART1_TX_BUFFER_SIZE\n"
+"    int \"UART1 TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"    help\n"
+"      Size of the UART1 transmit buffer in bytes.\n"
+"\n"
+"      Larger buffers can improve throughput but consume\n"
+"      more RAM. Must be a power of 2 for optimal performance.\n"
+"\n"
+"      Recommended values:\n"
+"      - 128 bytes: Low-bandwidth applications\n"
+"      - 256 bytes: General purpose (default)\n"
+"      - 512+ bytes: High-bandwidth applications"
+msgstr ""
+"config UART1_TX_BUFFER_SIZE\n"
+"    int \"UART1 TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"    help\n"
+"      Size of the UART1 transmit buffer in bytes.\n"
+"\n"
+"      Larger buffers can improve throughput but consume\n"
+"      more RAM. Must be a power of 2 for optimal performance.\n"
+"\n"
+"      Recommended values:\n"
+"      - 128 bytes: Low-bandwidth applications\n"
+"      - 256 bytes: General purpose (default)\n"
+"      - 512+ bytes: High-bandwidth applications"
+
+#: ../../user_guide/kconfig_tutorial.rst:202 3cd483f9def84631a2e31b7d2125eb63
+msgid "Basic Configuration Workflow"
+msgstr "Basic 配置 Workflow"
+
+#: ../../user_guide/kconfig_tutorial.rst:205 5f0f4a5d6fde45ef9bc6595a2a593bba
+msgid "Step 1: Select Platform"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:207 29fd22e96cb743599dac0a7ea36916a1
+msgid "Choose your target platform:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:209 59505532d2e74b988d992dae764337b8
+msgid ""
+"# .config file\n"
+"CONFIG_PLATFORM_STM32=y"
+msgstr ""
+"# .config file\n"
+"CONFIG_PLATFORM_STM32=y"
+
+#: ../../user_guide/kconfig_tutorial.rst:214 ae62638f615a491eab0ef1c6c7090721
+msgid "Or use a default configuration:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:216 4701cd1956f24261b6c507948e0cc164
+msgid ""
+"# Copy platform defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config"
+msgstr ""
+"# Copy platform defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config"
+
+#: ../../user_guide/kconfig_tutorial.rst:222 1f32684f33914a2781427d21e0220b40
+msgid "Step 2: Select Chip"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:224 3d4b603071e4487ca9434c97be89b055
+msgid "For STM32, select chip family and variant:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:226 544753cfa27048cc8ab72bb6a33eb19e
+msgid ""
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y"
+msgstr ""
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y"
+
+#: ../../user_guide/kconfig_tutorial.rst:232 fb76dc0fe4e94c45b92729a889db46d1
+msgid "Step 3: Configure Peripherals"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:234 651e95abec4b4f77b4be543f89e05279
+msgid "Enable and configure required peripherals:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:236 b44c52f259bb44cebbfcc8627331154a
+msgid ""
+"# Enable UART\n"
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y"
+msgstr ""
+"# Enable UART\n"
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y"
+
+#: ../../user_guide/kconfig_tutorial.rst:245 c7202d80e20646a6a83b6a90dbd75def
+msgid "Step 4: Select OSAL Backend"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:247 5434572550e844e6941613114151db94
+msgid "Choose your RTOS:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:249 5e0528cb47714fd4bcef2af8be641d5f
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768"
+
+#: ../../user_guide/kconfig_tutorial.rst:256 072b287edf83428cb0182a9da7b153d7
+msgid "Step 5: Generate Configuration"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:258 5fac0a0612ea4ebeb19822ee80d566e4
+msgid "Generate the C header file:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:260 b9a5c35f1159404daa535d7677b1dbfd
+msgid "python scripts/kconfig/generate_config.py --config .config"
+msgstr "python scripts/kconfig/generate_config.py --config .config"
+
+#: ../../user_guide/kconfig_tutorial.rst:264 f88a21f9e922461197dd253add319839
+msgid "This creates ``nexus_config.h``:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:266 cd5463a45576467c8a80d3a3126c6fca
+msgid ""
+"#define NX_CONFIG_PLATFORM_STM32 1\n"
+"#define NX_CONFIG_STM32F407 1\n"
+"#define NX_CONFIG_UART1_BAUDRATE 115200\n"
+"#define NX_CONFIG_OSAL_FREERTOS 1"
+msgstr ""
+"#define NX_CONFIG_PLATFORM_STM32 1\n"
+"#define NX_CONFIG_STM32F407 1\n"
+"#define NX_CONFIG_UART1_BAUDRATE 115200\n"
+"#define NX_CONFIG_OSAL_FREERTOS 1"
+
+#: ../../user_guide/kconfig_tutorial.rst:274 ac465647c5504574bf868a3ce51afdc8
+msgid "Step 6: Build Project"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:276 c7d86bae40b341a7a8acbbe4302ac2b6
+msgid "Build with the generated configuration:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:278 c8c156d72a4c464fbaa65639c284365b
+msgid ""
+"cmake -B build\n"
+"cmake --build build"
+msgstr ""
+"cmake -B build\n"
+"cmake --build build"
+
+#: ../../user_guide/kconfig_tutorial.rst:284 d5e91f5a79c04b87995eeb87d7e7acc7
+msgid "Intermediate Concepts"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:287 95115d2568b74e6c9b03ac26a394c933
+msgid "Menu Organization"
+msgstr "菜单 Organization"
+
+#: ../../user_guide/kconfig_tutorial.rst:289 f3b72c13c04f424ea25a01383b4882fe
+msgid "Use ``menu`` and ``endmenu`` to group related options:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:291 19a001f146ae44f9b721ee0c826aae65
+msgid ""
+"menu \"UART Configuration\"\n"
+"\n"
+"config UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"    default y\n"
+"\n"
+"if UART_ENABLE\n"
+"\n"
+"config UART_MAX_INSTANCES\n"
+"    int \"Maximum UART instances\"\n"
+"    default 4\n"
+"    range 1 8\n"
+"\n"
+"endif # UART_ENABLE\n"
+"\n"
+"endmenu"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:311 48cac9c9e404456ab09705db7ae9c1ca
+msgid "Menuconfig"
+msgstr "menuconfig"
+
+#: ../../user_guide/kconfig_tutorial.rst:313 af261dedacdf4b3ebb8df94be07ee39b
+msgid "Use ``menuconfig`` for options that have sub-options:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:315 123f297e57be4377af7c43c7ca2f4368
+msgid ""
+"menuconfig INSTANCE_STM32_UART_1\n"
+"    bool \"Enable UART1\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_STM32_UART_1\n"
+"\n"
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"\n"
+"config UART1_DATA_BITS\n"
+"    int \"UART1 data bits\"\n"
+"    default 8\n"
+"    range 7 9\n"
+"\n"
+"endif # INSTANCE_STM32_UART_1"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:334 a7badbd64c754863aa87d135c996e2cc
+msgid ""
+"This creates a menu entry that can be enabled/disabled and contains sub-"
+"options."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:337 f274bc30555e4920b50391df3e118519
+msgid "Choice Groups"
+msgstr "选择 Groups"
+
+#: ../../user_guide/kconfig_tutorial.rst:339 7aea4daf718d40809e38e09d7e7c6397
+msgid "Use ``choice`` for mutually exclusive options:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:341 c72117d1cc534f76bed98bd81894de74
+msgid ""
+"choice\n"
+"    prompt \"UART1 transfer mode\"\n"
+"    default UART1_MODE_DMA\n"
+"\n"
+"config UART1_MODE_POLLING\n"
+"    bool \"Polling\"\n"
+"    help\n"
+"      Use polling mode for UART1 transfers.\n"
+"      Simple but blocks CPU.\n"
+"\n"
+"config UART1_MODE_INTERRUPT\n"
+"    bool \"Interrupt\"\n"
+"    help\n"
+"      Use interrupt mode for UART1 transfers.\n"
+"      Non-blocking but requires ISR handling.\n"
+"\n"
+"config UART1_MODE_DMA\n"
+"    bool \"DMA\"\n"
+"    help\n"
+"      Use DMA mode for UART1 transfers.\n"
+"      Most efficient for large transfers.\n"
+"\n"
+"endchoice"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:367 739cc4cbe85f46edbce5c42d105df944
+msgid "Only one option in the choice group can be selected."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:370 1e2cf923bd584b9db24dba9524577015
+msgid "Range Constraints"
+msgstr "范围 Constraints"
+
+#: ../../user_guide/kconfig_tutorial.rst:372 ac2a8453ff2746a3b614beb581e628a0
+msgid "Use ``range`` to constrain integer values:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:374 22de94c5ef434010829d7fb0e691a796
+msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    range 9600 921600\n"
+"    help\n"
+"      Baud rate must be between 9600 and 921600 bps."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:383 a64397efc73342d1a47bc167a7d3abc6
+msgid "**Conditional Ranges:**"
+msgstr "**Conditional Ranges:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:385 7bb9c26c535f47dabfd007fdbb6bb4a6
+msgid ""
+"config TIMER_PRESCALER\n"
+"    int \"Timer prescaler\"\n"
+"    default 1\n"
+"    range 1 65536 if STM32F4\n"
+"    range 1 32768 if STM32L4\n"
+"    help\n"
+"      Timer prescaler value.\n"
+"      Range depends on chip family."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:397 8a4f32ebb27342168d6b96ee3f25adce
+msgid "Select Statements"
+msgstr "选择 Statements"
+
+#: ../../user_guide/kconfig_tutorial.rst:399 35fd728940004694ab6d8044723bafe5
+msgid "Use ``select`` to automatically enable dependencies:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:401 7bb4cd52c4c74a0ca2d7e28818c2f6b3
+msgid ""
+"config UART1_DMA_ENABLE\n"
+"    bool \"Enable DMA for UART1\"\n"
+"    depends on INSTANCE_STM32_UART_1\n"
+"    select STM32_DMA_ENABLE\n"
+"    help\n"
+"      Enable DMA transfers for UART1.\n"
+"      Automatically enables DMA subsystem."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:411 91d4229d744d4c1bac0e74918c346f94
+msgid ""
+"When ``UART1_DMA_ENABLE`` is set, ``STM32_DMA_ENABLE`` is automatically "
+"enabled."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:413 c902272e1d3f4bd0bf4ca893b747d7bb
+msgid ""
+"**Warning**: Use ``select`` sparingly. It can create circular dependencies "
+"and override user choices."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:416 1819052b29414edc84f7fa816598c8ba
+msgid "Imply Statements"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:418 8601a53798ab42e4bc95323892ef6273
+msgid "Use ``imply`` to suggest but not force dependencies:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:420 878bbf8d7d8343b09c6bc0f01e655018
+msgid ""
+"config UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"    imply DMA_ENABLE\n"
+"    help\n"
+"      Enable UART peripheral support.\n"
+"      DMA is recommended but not required."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:429 132464333e0a4387a2acedca58818d45
+msgid "``imply`` sets the default but allows the user to override it."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:432 7fd4e2d2b53f44d7811f29fc193a2a7c
+msgid "Advanced Concepts"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:435 cb03bace691b454ebe95c91f9bad9d19
+msgid "Conditional Compilation"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:437 7b5d4e93dfc94603ba1f5666605dca2a
+msgid "Use ``if`` blocks for conditional sections:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:439 43c4b4f0729545389f99f37dbc4e1a47
+msgid ""
+"if PLATFORM_STM32\n"
+"\n"
+"source \"platforms/stm32/Kconfig_chip\"\n"
+"source \"platforms/stm32/Kconfig_peripherals\"\n"
+"\n"
+"menu \"STM32 Platform Settings\"\n"
+"    # STM32-specific options\n"
+"endmenu\n"
+"\n"
+"endif # PLATFORM_STM32"
+msgstr ""
+"if PLATFORM_STM32\n"
+"\n"
+"source \"platforms/stm32/Kconfig_chip\"\n"
+"source \"platforms/stm32/Kconfig_peripherals\"\n"
+"\n"
+"menu \"STM32 Platform Settings\"\n"
+"    # STM32-specific options\n"
+"endmenu\n"
+"\n"
+"endif # PLATFORM_STM32"
+
+#: ../../user_guide/kconfig_tutorial.rst:452 b32cfdabb3d34683ba5eb77d228a3194
+msgid ""
+"Everything inside the ``if`` block is only visible when ``PLATFORM_STM32`` "
+"is enabled."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:455 35f0f2898cdd4f189be418a0ee2ef9d5
+msgid "Visibility Conditions"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:457 b2e49d3ae9fa47a689aa736271d68bfb
+msgid "Control option visibility with ``visible if``:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:459 fe703c77339247a8a7337ec74fd99da0
+msgid ""
+"config ADVANCED_FEATURE\n"
+"    bool \"Enable advanced feature\"\n"
+"    visible if EXPERT_MODE\n"
+"    help\n"
+"      This option is only visible in expert mode."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:468 db31f983258a48a5a496ec595f44aac4
+msgid "Source Directives"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:470 bd500c2661544a159961338147664bee
+msgid "Include other Kconfig files:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:472 9aadebef74c745da8f48f3356d31f693
+msgid ""
+"# Absolute path from root\n"
+"source \"platforms/stm32/Kconfig\"\n"
+"\n"
+"# Relative path (rsource)\n"
+"rsource \"adapters/*/Kconfig\""
+msgstr ""
+"# Absolute path from root\n"
+"source \"platforms/stm32/Kconfig\"\n"
+"\n"
+"# Relative path (rsource)\n"
+"rsource \"adapters/*/Kconfig\""
+
+#: ../../user_guide/kconfig_tutorial.rst:480 7a1bb62780c143249aa20af9452023ed
+msgid "``rsource`` supports wildcards for including multiple files."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:483 55d36036349b4bbc83872aaae75853e6
+msgid "Environment Variables"
+msgstr "环境变量"
+
+#: ../../user_guide/kconfig_tutorial.rst:485 a885407748954b5196dbb69227bddae2
+msgid "Access environment variables:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:487 1ccfb2f8060d4e8ba57ad85f58dd1472
+msgid ""
+"config CUSTOM_PLATFORM\n"
+"    string \"Custom platform name\"\n"
+"    default \"$(PLATFORM_NAME)\"\n"
+"    help\n"
+"      Platform name from environment variable."
+msgstr ""
+"config CUSTOM_PLATFORM\n"
+"    string \"Custom platform name\"\n"
+"    default \"$(PLATFORM_NAME)\"\n"
+"    help\n"
+"      Platform name from environment variable."
+
+#: ../../user_guide/kconfig_tutorial.rst:496 45232eaea55c42259d5984329b725cc9
+msgid "Derived Symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:498 bfebcc8317f54c23b69d9d3d7ba01c29
+msgid "Create symbols derived from other symbols:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:500 15c22aac235345d591b771a09f06acd3
+msgid ""
+"config UART_COUNT\n"
+"    int\n"
+"    default 1 if INSTANCE_STM32_UART_1\n"
+"    default 2 if INSTANCE_STM32_UART_2\n"
+"    default 3 if INSTANCE_STM32_UART_3\n"
+"    default 0"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:509 29a57551f27641dfad7f144fd91cb23f
+msgid "This symbol has no prompt and is automatically calculated."
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:512 3f954245de6847c0a920de5dc0db195b
+msgid "Platform-Specific Configuration"
+msgstr "Platform-Specific 配置"
+
+#: ../../user_guide/kconfig_tutorial.rst:515 b8377be8645641d594b5b0b3f0177e8e
+msgid "Native Platform"
+msgstr "Native 平台"
+
+#: ../../user_guide/kconfig_tutorial.rst:517
+#: ../../user_guide/kconfig_tutorial.rst:551
+#: ../../user_guide/kconfig_tutorial.rst:579 c951222355ab4417a8382fdb71298cf2
+msgid "**Quick Start:**"
+msgstr "**Quick Start:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:519 ff647950d683446a9d09ebc1ce71f86b
+msgid ""
+"cp platforms/native/defconfig .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+"cp platforms/native/defconfig .config\n"
+"python scripts/kconfig/generate_config.py"
+
+#: ../../user_guide/kconfig_tutorial.rst:524
+#: ../../user_guide/kconfig_tutorial.rst:558
+#: ../../user_guide/kconfig_tutorial.rst:586
+#: ../../user_guide/kconfig_tutorial.rst:607
+#: ../../user_guide/kconfig_tutorial.rst:618 9c3f5d67afb547ffbcff89b85e57e810
+#: c8744e2b5f9445c5a488e619ee6ce9a2
+msgid "**Key Options:**"
+msgstr "**Key Options:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:526 ba9cabad9d7c47b4995905d3794f1135
+msgid ""
+"CONFIG_PLATFORM_NATIVE=y\n"
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3\n"
+"CONFIG_NATIVE_DMA_CHANNELS=8\n"
+"CONFIG_NATIVE_ISR_SLOTS=64"
+msgstr ""
+"CONFIG_PLATFORM_NATIVE=y\n"
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3\n"
+"CONFIG_NATIVE_DMA_CHANNELS=8\n"
+"CONFIG_NATIVE_ISR_SLOTS=64"
+
+#: ../../user_guide/kconfig_tutorial.rst:534 bd444a4edd2c45ac92f0845d1c2e7d44
+msgid "**Peripheral Configuration:**"
+msgstr "**Peripheral Configuration:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:536 0b316f7fc03e4759be6f40e1e6e9cc35
+msgid ""
+"# UART\n"
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_NATIVE_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"\n"
+"# GPIO\n"
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"CONFIG_INSTANCE_NATIVE_GPIO_A=y\n"
+"CONFIG_GPIO_A_PIN_COUNT=16"
+msgstr ""
+"# UART\n"
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_NATIVE_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"\n"
+"# GPIO\n"
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"CONFIG_INSTANCE_NATIVE_GPIO_A=y\n"
+"CONFIG_GPIO_A_PIN_COUNT=16"
+
+#: ../../user_guide/kconfig_tutorial.rst:549 8b0e7db5e872460da80bdc098e377b15
+msgid "STM32F4 Platform"
+msgstr "STM32F4 平台"
+
+#: ../../user_guide/kconfig_tutorial.rst:553 c6c5b833f9b94d6cae1cd2afcf991e48
+msgid ""
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:560 80aac56d11514255976ff8f3f52e30e0
+msgid ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32F407xx\""
+msgstr ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32F407xx\""
+
+#: ../../user_guide/kconfig_tutorial.rst:567
+#: ../../user_guide/kconfig_tutorial.rst:595 956be33b3d164b4aa7624f536a396e1a
+msgid "**Memory Configuration:**"
+msgstr "**Memory Configuration:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:569 7ca9966b13964481a4687470bd3d1ce0
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00020000\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00100000"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00020000\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00100000"
+
+#: ../../user_guide/kconfig_tutorial.rst:577 687d75eb3c504b619a77c251ef2b6b39
+msgid "STM32H7 Platform"
+msgstr "STM32H7 平台"
+
+#: ../../user_guide/kconfig_tutorial.rst:581 bc45ed52052f4bc88112addc71b2074c
+msgid ""
+"cp platforms/stm32/defconfig_stm32h7 .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:588 8be0cefda54946a99a224758e7894fe4
+msgid ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32H7=y\n"
+"CONFIG_STM32H743=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32H743xx\""
+msgstr ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32H7=y\n"
+"CONFIG_STM32H743=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32H743xx\""
+
+#: ../../user_guide/kconfig_tutorial.rst:597 86c3fe4fd7bc4e158ff5dec4bb386b57
+msgid ""
+"CONFIG_LINKER_RAM_START=0x24000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00080000\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00200000"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x24000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00080000\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00200000"
+
+#: ../../user_guide/kconfig_tutorial.rst:605 071fc5c488304b4c9eea49628f42e8c0
+msgid "GD32 Platform"
+msgstr "GD32 平台"
+
+#: ../../user_guide/kconfig_tutorial.rst:609 dae23ef498de4ca68fb754ffa9b91b7a
+msgid ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_GD32F30X=y\n"
+"CONFIG_GD32F303=y"
+msgstr ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_GD32F30X=y\n"
+"CONFIG_GD32F303=y"
+
+#: ../../user_guide/kconfig_tutorial.rst:616 4d11bb0b3b71452dabb2790d28fe35eb
+msgid "ESP32 Platform"
+msgstr "ESP32 平台"
+
+#: ../../user_guide/kconfig_tutorial.rst:620 e591cf687b604273a8e6ebd239ae7e15
+msgid ""
+"CONFIG_PLATFORM_ESP32=y\n"
+"CONFIG_ESP32_WROOM_32=y"
+msgstr ""
+"CONFIG_PLATFORM_ESP32=y\n"
+"CONFIG_ESP32_WROOM_32=y"
+
+#: ../../user_guide/kconfig_tutorial.rst:629 c0209363e8514514a25d84a689b14b7d
+msgid "Interactive Configuration"
+msgstr "Interactive 配置"
+
+#: ../../user_guide/kconfig_tutorial.rst:631 f37d09136b174b31a441c7bd011c80e8
+msgid ""
+"While Nexus doesn't currently provide a menuconfig UI, you can edit "
+"``.config`` directly:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:633 4a18c422ebc7498391718a8670943378
+msgid ""
+"# Edit configuration\n"
+"nano .config\n"
+"\n"
+"# Validate changes\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Generate header\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+"# Edit configuration\n"
+"nano .config\n"
+"\n"
+"# Validate changes\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Generate header\n"
+"python scripts/kconfig/generate_config.py"
+
+#: ../../user_guide/kconfig_tutorial.rst:645 eeb3caa28f234077a971b3abd238282a
+msgid "Automated Configuration"
+msgstr "Automated 配置"
+
+#: ../../user_guide/kconfig_tutorial.rst:647 e57c25f09fc744a7866f10822858e129
+msgid "Use scripts for automated configuration:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:649 0b26fcf83e2d48d98b584dfc82785fee
+msgid ""
+"#!/usr/bin/env python3\n"
+"# configure.py\n"
+"\n"
+"import subprocess\n"
+"\n"
+"def configure_platform(platform, chip=None):\n"
+"    config_lines = [\n"
+"        f\"CONFIG_PLATFORM_{platform.upper()}=y\"\n"
+"    ]\n"
+"\n"
+"    if chip:\n"
+"        config_lines.append(f\"CONFIG_{chip.upper()}=y\")\n"
+"\n"
+"    with open('.config', 'w') as f:\n"
+"        f.write('\\n'.join(config_lines))\n"
+"\n"
+"    # Generate header\n"
+"    subprocess.run([\n"
+"        'python', 'scripts/kconfig/generate_config.py'\n"
+"    ])\n"
+"\n"
+"# Usage\n"
+"configure_platform('stm32', 'stm32f407')"
+msgstr ""
+"#!/usr/bin/env python3\n"
+"# configure.py\n"
+"\n"
+"import subprocess\n"
+"\n"
+"def configure_platform(platform, chip=None):\n"
+"    config_lines = [\n"
+"        f\"CONFIG_PLATFORM_{platform.upper()}=y\"\n"
+"    ]\n"
+"\n"
+"    if chip:\n"
+"        config_lines.append(f\"CONFIG_{chip.upper()}=y\")\n"
+"\n"
+"    with open('.config', 'w') as f:\n"
+"        f.write('\\n'.join(config_lines))\n"
+"\n"
+"    # Generate header\n"
+"    subprocess.run([\n"
+"        'python', 'scripts/kconfig/generate_config.py'\n"
+"    ])\n"
+"\n"
+"# Usage\n"
+"configure_platform('stm32', 'stm32f407')"
+
+#: ../../user_guide/kconfig_tutorial.rst:676 7f4810dec92d4678a8726b28e21cd42e
+msgid "Configuration Templates"
+msgstr "配置 Templates"
+
+#: ../../user_guide/kconfig_tutorial.rst:678 1f3109ebec714c85a79dccbb0e4104ee
+msgid "Create reusable configuration templates:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:680 a4a8e09521bc4bb28e1ad28d05a594f3
+msgid ""
+"# templates/uart_debug.config\n"
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_INTERRUPT=y\n"
+"CONFIG_HAL_DEBUG_ENABLE=y\n"
+"CONFIG_HAL_DEBUG_LEVEL=4"
+msgstr ""
+"# templates/uart_debug.config\n"
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_INTERRUPT=y\n"
+"CONFIG_HAL_DEBUG_ENABLE=y\n"
+"CONFIG_HAL_DEBUG_LEVEL=4"
+
+#: ../../user_guide/kconfig_tutorial.rst:690 aa0bc838ea714002a88c1acd704d0b8b
+msgid "Merge with base configuration:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:692 546b5d1bb08d4029b4d5a6d9be9547a4
+msgid ""
+"cat platforms/stm32/defconfig_stm32f4 templates/uart_debug.config > .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+"cat platforms/stm32/defconfig_stm32f4 templates/uart_debug.config > .config\n"
+"python scripts/kconfig/generate_config.py"
+
+#: ../../user_guide/kconfig_tutorial.rst:698 81ff2b9b669e4eca8073d66684514e59
+msgid "Configuration Validation"
+msgstr "配置 验证"
+
+#: ../../user_guide/kconfig_tutorial.rst:701 86f37d16144341b2843eae4f8475adde
+msgid "Syntax Validation"
+msgstr "Syntax 验证"
+
+#: ../../user_guide/kconfig_tutorial.rst:703 8f52646605964ccaa4a077e80e2cae5f
+msgid "Validate Kconfig syntax:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:705 4ebfe122411d4244852cf97122fe951d
+msgid "python scripts/kconfig/validate_kconfig.py Kconfig"
+msgstr "python scripts/kconfig/validate_kconfig.py Kconfig"
+
+#: ../../user_guide/kconfig_tutorial.rst:709
+#: ../../user_guide/kconfig_tutorial.rst:725
+#: ../../user_guide/kconfig_tutorial.rst:740 d99d4a2835364befbd7aa4c3ab187789
+#: ff61ca39014940bab23d2ab59a223acd
+msgid "**Checks:**"
+msgstr "**Checks:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:711 ebc60c8659374a8f955430a1c38ced67
+msgid "Block structure (if/endif, menu/endmenu, choice/endchoice)"
+msgstr "Block structure (if/endif, menu/endmenu, choice/endchoice)"
+
+#: ../../user_guide/kconfig_tutorial.rst:712 9adeabc550354db7a3ff36aea9f7276e
+msgid "Source file existence"
+msgstr "源文件存在性"
+
+#: ../../user_guide/kconfig_tutorial.rst:713 a5ee9ed128dc4b42957592da8a7c8426
+msgid "Symbol definitions"
+msgstr "符号 definitions"
+
+#: ../../user_guide/kconfig_tutorial.rst:714 ff13e6f91f254fcc88ddd21b56aa938e
+msgid "Syntax errors"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:717 a7a2839348a84018a7be5a5cdc05d0ec
+msgid "Dependency Validation"
+msgstr "依赖 验证"
+
+#: ../../user_guide/kconfig_tutorial.rst:719 a63411758b9f4aa6aa2e858126ccfa63
+msgid "Check for dependency issues:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:721
+#: ../../user_guide/kconfig_tutorial.rst:1023 40a45ff596a843f7a520a91c906a7e90
+msgid "python scripts/kconfig/validate_kconfig.py --check-deps Kconfig"
+msgstr "python scripts/kconfig/validate_kconfig.py --check-deps Kconfig"
+
+#: ../../user_guide/kconfig_tutorial.rst:727 7327c305a9c541b5b0f5a7729fe0239a
+msgid "Circular dependencies"
+msgstr "循环依赖"
+
+#: ../../user_guide/kconfig_tutorial.rst:728 f85f42f590b844fe94a74e5ea55b7258
+msgid "Undefined symbol references"
+msgstr "未定义的符号引用"
+
+#: ../../user_guide/kconfig_tutorial.rst:729 8d0ed79b7e9147b5869ce7b442fddb6c
+msgid "Unsatisfiable dependencies"
+msgstr "无法满足的依赖"
+
+#: ../../user_guide/kconfig_tutorial.rst:732 0cae453f769644e092cf7be0e47b6383
+msgid "Value Validation"
+msgstr "值 验证"
+
+#: ../../user_guide/kconfig_tutorial.rst:734 ba2fec17b97242dd8f8a82a5f091efee
+msgid "Validate configuration values:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:736 b63b5404098645229e3006dbb80b27d1
+msgid "python scripts/kconfig/validate_kconfig.py --check-values .config"
+msgstr "python scripts/kconfig/validate_kconfig.py --check-values .config"
+
+#: ../../user_guide/kconfig_tutorial.rst:742 287f272e9f8d43f2ac1d334e76b9a914
+msgid "Range constraint violations"
+msgstr "范围 constraint violations"
+
+#: ../../user_guide/kconfig_tutorial.rst:743 b765ce0b8fdb496db5582e362ca1c433
+msgid "Invalid type values"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:744 f4921fb9fb7b48e4b3d2c5a0c1e563e7
+msgid "Missing required symbols"
+msgstr "缺少必需的符号"
+
+#: ../../user_guide/kconfig_tutorial.rst:747 82d87940b8b94d27b48de536babfca12
+msgid "Configuration Comparison"
+msgstr "配置 Comparison"
+
+#: ../../user_guide/kconfig_tutorial.rst:750 c001d35b4cb84e22ab8eb69fa630f29b
+msgid "Compare Two Configurations"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:752 e4d092501471447cae34f8a8f0cb5ab3
+msgid "Show differences between configurations:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:754 bf8dcbf6ff834bd8ab746a1ecf945358
+msgid "python scripts/kconfig/kconfig_diff.py old.config new.config"
+msgstr "python scripts/kconfig/kconfig_diff.py old.config new.config"
+
+#: ../../user_guide/kconfig_tutorial.rst:758 d204cfd977454fb79381a9c02dee3067
+msgid "**Output:**"
+msgstr "**Output:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:760 92e133b4dc0b4497845aa5c796e697e6
+msgid ""
+"Added symbols:\n"
+"  CONFIG_NEW_FEATURE=y\n"
+"\n"
+"Removed symbols:\n"
+"  CONFIG_OLD_FEATURE=y\n"
+"\n"
+"Changed symbols:\n"
+"  CONFIG_UART1_BAUDRATE: 9600 -> 115200"
+msgstr ""
+"Added symbols:\n"
+"  CONFIG_NEW_FEATURE=y\n"
+"\n"
+"Removed symbols:\n"
+"  CONFIG_OLD_FEATURE=y\n"
+"\n"
+"Changed symbols:\n"
+"  CONFIG_UART1_BAUDRATE: 9600 -> 115200"
+
+#: ../../user_guide/kconfig_tutorial.rst:772 5b8f4a331e144bbb9cfcf5a0af56d2a0
+msgid "JSON Output"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:774 9e9084a581f94f85837cb8e783cb6ea8
+msgid "Generate machine-readable diff:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:776 2dc258ec321a44df8c9686707c8f0720
+msgid ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    --format json \\\n"
+"    old.config new.config \\\n"
+"    --output diff.json"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    --format json \\\n"
+"    old.config new.config \\\n"
+"    --output diff.json"
+
+#: ../../user_guide/kconfig_tutorial.rst:784 fdd6ab8583fa44b48a6874c59fbdf49f
+msgid "Configuration Migration"
+msgstr "配置 迁移"
+
+#: ../../user_guide/kconfig_tutorial.rst:787 9c17c06eb2a64b80bebc8b32b30d0efb
+msgid "Version Migration"
+msgstr "Version 迁移"
+
+#: ../../user_guide/kconfig_tutorial.rst:789 b0131264be5a457baa6e504df360399b
+msgid "Migrate configuration to new version:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:791 8608dedc30ef45b29a5d9bee328aff69
+msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --version 2.0"
+msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --version 2.0"
+
+#: ../../user_guide/kconfig_tutorial.rst:798 7e9f5355f4b34802a65d926dc8fb0330
+msgid "**Migration Rules:**"
+msgstr "**Migration Rules:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:800 c5ddd079965f47218a7c5ed2edc5f494
+msgid "Renamed symbols are automatically updated"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:801 b11d7e9122374a97817b230863836c59
+msgid "Deprecated symbols are removed"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:802 25520a5114be40f8a6250b23822fd555
+msgid "New required symbols are added with defaults"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:803 1432c6972ff94a40b6167bc23431a33d
+msgid "Migration log is generated"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:806 d843b3525c0b482cb4e9a4df36b8d922
+msgid "Symbol Renaming"
+msgstr "符号 Renaming"
+
+#: ../../user_guide/kconfig_tutorial.rst:808 85714db048ed4684ad8c0ca14902e451
+msgid "Handle renamed symbols:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:810 b100c14738c141d5b997b9c59e9b6c79
+msgid ""
+"# migration_rules.py\n"
+"SYMBOL_RENAMES = {\n"
+"    'OLD_UART_ENABLE': 'STM32_UART_ENABLE',\n"
+"    'OLD_BAUDRATE': 'UART1_BAUDRATE',\n"
+"}"
+msgstr ""
+"# migration_rules.py\n"
+"SYMBOL_RENAMES = {\n"
+"    'OLD_UART_ENABLE': 'STM32_UART_ENABLE',\n"
+"    'OLD_BAUDRATE': 'UART1_BAUDRATE',\n"
+"}"
+
+#: ../../user_guide/kconfig_tutorial.rst:819 a2a0998b4d77486aa912e91cd2ca3e4f
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../user_guide/kconfig_tutorial.rst:822 a127158860664462b121ab2416521420
+msgid "Naming Conventions"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:824 86341c67c31645f0b10b4dc76dcdb6d8
+msgid "**Follow consistent naming:**"
+msgstr "**Follow consistent naming:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:826 f89f7298d36d4b52ad37b23fe8f1b776
+msgid ""
+"✓ CONFIG_PLATFORM_STM32\n"
+"✓ CONFIG_STM32_UART_ENABLE\n"
+"✓ CONFIG_INSTANCE_STM32_UART_1\n"
+"✓ CONFIG_UART1_BAUDRATE\n"
+"\n"
+"✗ CONFIG_STM32_PLATFORM\n"
+"✗ CONFIG_ENABLE_UART_STM32\n"
+"✗ CONFIG_STM32_UART1_INSTANCE\n"
+"✗ CONFIG_BAUDRATE_UART1"
+msgstr ""
+"✓ CONFIG_PLATFORM_STM32\n"
+"✓ CONFIG_STM32_UART_ENABLE\n"
+"✓ CONFIG_INSTANCE_STM32_UART_1\n"
+"✓ CONFIG_UART1_BAUDRATE\n"
+"\n"
+"✗ CONFIG_STM32_PLATFORM\n"
+"✗ CONFIG_ENABLE_UART_STM32\n"
+"✗ CONFIG_STM32_UART1_INSTANCE\n"
+"✗ CONFIG_BAUDRATE_UART1"
+
+#: ../../user_guide/kconfig_tutorial.rst:839 53b4c85d32e4436c904c2a673b4c68e7
+msgid "Organization"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:841 4ac307ed4071400daa540c5773b3a3a4
+msgid "**Group related options:**"
+msgstr "**Group related options:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:843 4511a93e97864dad995aaf819520a90c
+msgid ""
+"menu \"UART Configuration\"\n"
+"\n"
+"menuconfig STM32_UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"\n"
+"if STM32_UART_ENABLE\n"
+"\n"
+"menu \"UART Instances\"\n"
+"    # Instance configurations\n"
+"endmenu\n"
+"\n"
+"menu \"UART Global Settings\"\n"
+"    # Global settings\n"
+"endmenu\n"
+"\n"
+"endif # STM32_UART_ENABLE\n"
+"\n"
+"endmenu"
+msgstr ""
+"menu \"UART Configuration\"\n"
+"\n"
+"menuconfig STM32_UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"\n"
+"if STM32_UART_ENABLE\n"
+"\n"
+"menu \"UART Instances\"\n"
+"    # Instance configurations\n"
+"endmenu\n"
+"\n"
+"menu \"UART Global Settings\"\n"
+"    # Global settings\n"
+"endmenu\n"
+"\n"
+"endif # STM32_UART_ENABLE\n"
+"\n"
+"endmenu"
+
+#: ../../user_guide/kconfig_tutorial.rst:865 d34fa9b1e9b043d39da12d1e8e2aa0ce
+msgid "Documentation"
+msgstr "文档"
+
+#: ../../user_guide/kconfig_tutorial.rst:867 1eb5985b7c0f400d9926ea1d602e6a66
+msgid "**Provide comprehensive help:**"
+msgstr "**Provide comprehensive help:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:869 ee5e6f47375e4b6cb2eabec4819c4b47
+msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    range 9600 921600\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"\n"
+"      Common values:\n"
+"      - 9600: Low-speed serial\n"
+"      - 19200: Moderate speed\n"
+"      - 38400: Higher speed\n"
+"      - 57600: High speed\n"
+"      - 115200: Very high speed (default)\n"
+"      - 230400, 460800, 921600: Ultra high speed\n"
+"\n"
+"      Note: Higher baud rates require more accurate\n"
+"      clock configuration and may not work reliably\n"
+"      on all platforms."
+msgstr ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    range 9600 921600\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"\n"
+"      Common values:\n"
+"      - 9600: Low-speed serial\n"
+"      - 19200: Moderate speed\n"
+"      - 38400: Higher speed\n"
+"      - 57600: High speed\n"
+"      - 115200: Very high speed (default)\n"
+"      - 230400, 460800, 921600: Ultra high speed\n"
+"\n"
+"      Note: Higher baud rates require more accurate\n"
+"      clock configuration and may not work reliably\n"
+"      on all platforms."
+
+#: ../../user_guide/kconfig_tutorial.rst:891 43a39b2728844703bb3ba38d56facfab
+msgid "Defaults"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:893 0c701a401a5245eeb0441a2629a7c7bb
+msgid "**Provide sensible defaults:**"
+msgstr "**Provide sensible defaults:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:895 1c1639466b33405591965e8eb040bada
+msgid ""
+"config UART1_TX_BUFFER_SIZE\n"
+"    int \"UART1 TX buffer size\"\n"
+"    default 256 if UART1_MODE_DMA\n"
+"    default 128 if UART1_MODE_INTERRUPT\n"
+"    default 64 if UART1_MODE_POLLING\n"
+"    default 256\n"
+"    range 16 4096"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:908 bff1d5faf52f466686e4878807057195
+msgid "**Use depends on for hard requirements:**"
+msgstr "**Use depends on for hard requirements:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:910 a84c778fa11d44bb955eea4ad5377d01
+msgid ""
+"config UART1_DMA_ENABLE\n"
+"    bool \"Enable DMA for UART1\"\n"
+"    depends on INSTANCE_STM32_UART_1\n"
+"    depends on STM32_DMA_ENABLE"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:917 2b3784b153964b8a981231b6641a3764
+msgid "**Use select sparingly:**"
+msgstr "**Use select sparingly:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:919 a983c72d5d874664aa08c277ef582f6e
+msgid ""
+"# Good: select for internal dependencies\n"
+"config UART_DRIVER\n"
+"    bool\n"
+"    select CLOCK_ENABLE\n"
+"    select GPIO_ENABLE\n"
+"\n"
+"# Bad: select for user-visible options\n"
+"config UART_ENABLE\n"
+"    bool \"Enable UART\"\n"
+"    select DMA_ENABLE  # Don't force DMA on users"
+msgstr ""
+"# Good: select for internal dependencies\n"
+"config UART_DRIVER\n"
+"    bool\n"
+"    select CLOCK_ENABLE\n"
+"    select GPIO_ENABLE\n"
+"\n"
+"# Bad: select for user-visible options\n"
+"config UART_ENABLE\n"
+"    bool \"Enable UART\"\n"
+"    select DMA_ENABLE  # Don't force DMA on users"
+
+#: ../../user_guide/kconfig_tutorial.rst:933 0beb7352e4794833b6da0b49a4a57b95
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../user_guide/kconfig_tutorial.rst:936 a71fbdb5bd03415782d497af2c6276ec
+msgid "Common Issues"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:938 d8f4913c4a194e839325853c376b0dac
+msgid "**Issue: Symbol not defined**"
+msgstr "**Issue: Symbol not defined**"
+
+#: ../../user_guide/kconfig_tutorial.rst:940 58e1a41123bf4b258555f7d292d0a375
+msgid "Error: Symbol 'UART_ENABLE' is not defined"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:944
+#: ../../user_guide/kconfig_tutorial.rst:960
+#: ../../user_guide/kconfig_tutorial.rst:987 0f5087e4ada14669859e07f56cd218ef
+#: b6e2c38afff6434dac33346c829385dc
+msgid "**Solution:**"
+msgstr "**Solution:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:946 d13863162e9f4aac96cabf7faa3bed29
+msgid ""
+"# Find where symbol should be defined\n"
+"grep -r \"config UART_ENABLE\" .\n"
+"\n"
+"# Check if Kconfig file is sourced\n"
+"grep -r \"source.*uart.*Kconfig\" ."
+msgstr ""
+"# Find where symbol should be defined\n"
+"grep -r \"config UART_ENABLE\" .\n"
+"\n"
+"# Check if Kconfig file is sourced\n"
+"grep -r \"source.*uart.*Kconfig\" ."
+
+#: ../../user_guide/kconfig_tutorial.rst:954 e765f938cfdd43238e0aee665aeca077
+msgid "**Issue: Circular dependency**"
+msgstr "**Issue: Circular dependency**"
+
+#: ../../user_guide/kconfig_tutorial.rst:956 1ed2d76be45e4dbd98ae9c74113dee15
+msgid "Error: Circular dependency detected: A -> B -> A"
+msgstr "Error: Circular dependency detected: A -> B -> A"
+
+#: ../../user_guide/kconfig_tutorial.rst:962 781c8e434099488d98e2555f86741e41
+msgid ""
+"# Bad: circular dependency\n"
+"config A\n"
+"    bool \"Option A\"\n"
+"    depends on B\n"
+"\n"
+"config B\n"
+"    bool \"Option B\"\n"
+"    depends on A\n"
+"\n"
+"# Good: remove circular dependency\n"
+"config A\n"
+"    bool \"Option A\"\n"
+"\n"
+"config B\n"
+"    bool \"Option B\"\n"
+"    depends on A"
+msgstr ""
+"# Bad: circular dependency\n"
+"config A\n"
+"    bool \"Option A\"\n"
+"    depends on B\n"
+"\n"
+"config B\n"
+"    bool \"Option B\"\n"
+"    depends on A\n"
+"\n"
+"# Good: remove circular dependency\n"
+"config A\n"
+"    bool \"Option A\"\n"
+"\n"
+"config B\n"
+"    bool \"Option B\"\n"
+"    depends on A"
+
+#: ../../user_guide/kconfig_tutorial.rst:981 5a7420879f5543d1a5eaf33e3c0bb00e
+msgid "**Issue: Range violation**"
+msgstr "**Issue: 范围 violation**"
+
+#: ../../user_guide/kconfig_tutorial.rst:983 ffd06fae7b504104b58428d3152a350f
+msgid "Error: Value 1000000 is outside range [9600, 921600]"
+msgstr "Error: Value 1000000 is outside range [9600, 921600]"
+
+#: ../../user_guide/kconfig_tutorial.rst:989 f3dc3a8108204e7daec8110927f49560
+msgid ""
+"# Fix the value in .config\n"
+"CONFIG_UART1_BAUDRATE=115200"
+msgstr ""
+"# Fix the value in .config\n"
+"CONFIG_UART1_BAUDRATE=115200"
+
+#: ../../user_guide/kconfig_tutorial.rst:994 2501afb429b34d5da05f0801833da2e1
+msgid "**Issue: Configuration not applied**"
+msgstr "**Issue: Configuration not applied**"
+
+#: ../../user_guide/kconfig_tutorial.rst:996 9f0fd1e536bc45d5af4bfedcc79999dc
+msgid ""
+"# Regenerate configuration header\n"
+"python scripts/kconfig/generate_config.py --config .config\n"
+"\n"
+"# Clean and rebuild\n"
+"rm -rf build\n"
+"cmake -B build\n"
+"cmake --build build"
+msgstr ""
+"# Regenerate configuration header\n"
+"python scripts/kconfig/generate_config.py --config .config\n"
+"\n"
+"# Clean and rebuild\n"
+"rm -rf build\n"
+"cmake -B build\n"
+"cmake --build build"
+
+#: ../../user_guide/kconfig_tutorial.rst:1007 6384e25f3eb649bdaf147d2a9f2efc1a
+msgid "Debugging Configuration"
+msgstr "Debugging 配置"
+
+#: ../../user_guide/kconfig_tutorial.rst:1009 b966b27340694ce385d33d7700a01502
+msgid "**Enable verbose output:**"
+msgstr "**Enable verbose output:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:1011 a846cba930dd4370979abf839c166407
+msgid "python scripts/kconfig/generate_config.py --verbose"
+msgstr "python scripts/kconfig/generate_config.py --verbose"
+
+#: ../../user_guide/kconfig_tutorial.rst:1015 fcfabd323a754fd8925caeccf3bb7428
+msgid "**Check generated header:**"
+msgstr "**Check generated header:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:1017 9b553ce49cba46499a03785da1634603
+msgid "cat nexus_config.h | grep UART"
+msgstr ""
+
+#: ../../user_guide/kconfig_tutorial.rst:1021 ff5be14053e741fba8c45b9e2fb83195
+msgid "**Validate dependencies:**"
+msgstr "**Validate dependencies:**"
+
+#: ../../user_guide/kconfig_tutorial.rst:1028 b0dffe559d3c488ea0c41eac4dc5974a
+msgid "Next Steps"
+msgstr "下一步"
+
+#: ../../user_guide/kconfig_tutorial.rst:1030 beb9d029b1864f43ace688a0903c5fc0
+msgid ""
+":doc:`kconfig_peripherals` - Detailed peripheral configuration examples"
+msgstr ""
+":doc:`kconfig_peripherals` - Detailed peripheral configuration examples"
+
+#: ../../user_guide/kconfig_tutorial.rst:1031 0e0cccb033e54a068b3f4363be8877e4
+msgid ":doc:`kconfig_platforms` - Platform-specific configuration guides"
+msgstr ":doc:`kconfig_platforms` - Platform-specific configuration guides"
+
+#: ../../user_guide/kconfig_tutorial.rst:1032 a2525de783044d02a928190dd2c1ba88
+msgid ":doc:`kconfig_tools` - Configuration tools reference"
+msgstr ":doc:`kconfig_tools` - Configuration tools reference"
+
+#: ../../user_guide/kconfig_tutorial.rst:1033 ea4446a3d551463993ee4b81c07eeeda
+msgid ":doc:`../development/kconfig_guide` - Writing Kconfig files"
+msgstr ":doc:`../development/kconfig_guide` - Writing Kconfig files"
+
+#: ../../user_guide/kconfig_tutorial.rst:1036 56ad786ad34648639104fcc6b99830c9
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../user_guide/kconfig_tutorial.rst:1038 de9c111ac9d44fc4bb5c66e4a8d6be48
+msgid ""
+"`Kconfig Language <https://www.kernel.org/doc/html/latest/kbuild/kconfig-"
+"language.html>`_"
+msgstr ""
+"`Kconfig Language <https://www.kernel.org/doc/html/latest/kbuild/kconfig-"
+"language.html>`_"
+
+#: ../../user_guide/kconfig_tutorial.rst:1040 c0ef6c631ea5449dbb7428d5fd1eb5bb
+msgid ":doc:`porting` - Platform porting guide"
+msgstr ":doc:`porting` - Platform porting guide"

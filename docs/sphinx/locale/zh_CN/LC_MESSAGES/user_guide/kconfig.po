@@ -1,724 +1,1345 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2026, Nexus Team
-# This file is distributed under the same license as the Nexus Embedded
-# Platform package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
-#: ../../user_guide/kconfig.rst:2 974f2e70dba340378890a85964eb7f95
+#: ../../user_guide/kconfig.rst:2 1e4f5ec88801492bb78722419a1fe53e
 msgid "Kconfig Configuration System"
 msgstr "Kconfig 配置系统"
 
-#: ../../user_guide/kconfig.rst:5 39fe8dbcd4324648a4ed5949d34aab8a
+#: ../../user_guide/kconfig.rst:5 f57803173071446aa9c44151de8bfa79
 msgid "Overview"
 msgstr "概述"
 
-#: ../../user_guide/kconfig.rst:7 6bb9f1d6f2a34862b494aef5c108d938
+#: ../../user_guide/kconfig.rst:7 4fe773680fe541059b141466851f417d
 msgid ""
+"The Nexus platform uses a Kconfig-based configuration system for managing "
+"build-time configuration options. This system provides a hierarchical, type-"
+"safe, and maintainable way to configure platforms, chips, peripherals, and "
+"RTOS backends."
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:12 481b2993807e483697ba9c924fc82460
+#: ../../user_guide/kconfig.rst:12 a803eaae67454e8db6ffbf0f4022d02a
 msgid "**Key Features:**"
 msgstr "**主要特性：**"
 
-#: ../../user_guide/kconfig.rst:14 9d6c5bbbbee149f48fdcaf4f8d45bc32
+#: ../../user_guide/kconfig.rst:14 e1d31cd1763b44d490a85360f68f45cf
 msgid "**Hierarchical Organization**: Platform → Chip → Peripheral → Instance"
 msgstr "**层次化组织**: 平台 → 芯片 → 外设 → 实例"
 
-#: ../../user_guide/kconfig.rst:15 9c12a1fdd8aa4ec7af61e2f01fe3e453
+#: ../../user_guide/kconfig.rst:15 e0511c21e0ce498b94934b12edfb696f
 msgid ""
+"**Type Safety**: Boolean, integer, string, and hexadecimal types with "
+"validation"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:16 9dab591891c140d39b9c554688842976
+#: ../../user_guide/kconfig.rst:16 92e776501d1941b7b4f0809804158fa8
 msgid "**Multiple Platforms**: Native, STM32, GD32, ESP32, NRF52"
 msgstr "**多平台支持**: 本地, STM32, GD32, ESP32, NRF52"
 
-#: ../../user_guide/kconfig.rst:17 6880c5b004b14f8c95d15515fcc743e8
+#: ../../user_guide/kconfig.rst:17 266f5149cdc2494eb94dc4f9b8be6d01
 msgid "**OSAL Backends**: Bare-metal, FreeRTOS, RT-Thread, Zephyr"
 msgstr "**OSAL 后端**: 裸机, FreeRTOS, RT-Thread, Zephyr"
 
-#: ../../user_guide/kconfig.rst:18 820f1364c4c441d3a906f41c39e42f5b
+#: ../../user_guide/kconfig.rst:18 f6368302e46340a39db79383fadf22e7
 msgid "**Automatic Generation**: C header files generated from configuration"
 msgstr "**自动生成**：从配置生成 C 头文件"
 
-#: ../../user_guide/kconfig.rst:19 192c8e63409d40d0aaa9c1b0ad41bcc8
+#: ../../user_guide/kconfig.rst:19 5d89032843704363bf745346c4d61108
 msgid ""
+"**Validation Tools**: Syntax checking, dependency validation, range "
+"constraints"
 msgstr ""
-"**验证工具*: Syntax checking, dependency validation, range \n"
-"constraints\n"
 
-#: ../../user_guide/kconfig.rst:20 0ea04154e0eb43338817a56a6968fbb0
+#: ../../user_guide/kconfig.rst:20 2c7d25d30f4f4d86b1fd319077e54fc4
 msgid "**Migration Support**: Configuration migration between versions"
 msgstr "**迁移支持**：版本之间的配置迁移"
 
-#: ../../user_guide/kconfig.rst:23 6a9be8ae6e164511b1f5d0f63f75edf7
+#: ../../user_guide/kconfig.rst:23 7ef0dd66e69d434091ba961a7b4c4caf
 msgid "Architecture"
 msgstr "架构"
 
-#: ../../user_guide/kconfig.rst:26 27cb9fd0e9d74890b99f4dc6ab140db3
+#: ../../user_guide/kconfig.rst:26 5be5ed663c4442f5a04cffaaf06f48bd
 msgid "Configuration Hierarchy"
 msgstr "配置层次结构"
 
-#: ../../user_guide/kconfig.rst:28 c6eee2c434e1478aa38239a165617ce0
+#: ../../user_guide/kconfig.rst:28 9ce97794a1414c46850eb24959e453c5
 msgid "The configuration system follows a four-level hierarchy:"
 msgstr "配置系统遵循四级层次结构："
 
-#: ../../user_guide/kconfig.rst:30 de22fefae2ff487a85d4bb1f82c32134
+#: ../../user_guide/kconfig.rst:30 b7e8a3e1193742d69727691ac1240d9d
 msgid ""
+"Kconfig (Root)\n"
+"├── Platform Selection (Native, STM32, GD32, ESP32, NRF52)\n"
+"│   ├── Chip Family (STM32F4, STM32H7, STM32L4, ...)\n"
+"│   │   ├── Chip Variant (STM32F407, STM32F429, ...)\n"
+"│   │   └── Peripheral Configuration\n"
+"│   │       ├── UART (UART1, UART2, ...)\n"
+"│   │       ├── GPIO (GPIO_A, GPIO_B, ...)\n"
+"│   │       ├── SPI (SPI1, SPI2, ...)\n"
+"│   │       └── I2C (I2C1, I2C2, ...)\n"
+"│   └── Platform-Specific Settings\n"
+"├── OSAL Configuration\n"
+"│   ├── Backend Selection (Bare-metal, FreeRTOS, RT-Thread, ...)\n"
+"│   ├── System Parameters (Tick rate, Heap size, Stack size)\n"
+"│   └── Linker Script Configuration\n"
+"└── HAL Configuration\n"
+"    ├── Debug Settings\n"
+"    ├── Statistics\n"
+"    └── Timeout Configuration"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:52 258abb3ea3d740f1b86c04d25c183999
+#: ../../user_guide/kconfig.rst:52 c523e5122bb94929876831e16d15d643
 msgid "File Organization"
 msgstr "文件组织"
 
-#: ../../user_guide/kconfig.rst:54 d6477622664445788a17b613e1a6dcf6
+#: ../../user_guide/kconfig.rst:54 ecbd830f5930452fbc66ea1f6e36e9e1
 msgid ""
+"nexus/\n"
+"├── Kconfig                              # Root configuration file\n"
+"├── .config                              # Generated configuration\n"
+"│\n"
+"├── platforms/\n"
+"│   ├── Kconfig                          # Platform selection\n"
+"│   ├── native/\n"
+"│   │   ├── Kconfig                      # Native platform config\n"
+"│   │   ├── defconfig                    # Default configuration\n"
+"│   │   └── src/\n"
+"│   │       ├── uart/Kconfig\n"
+"│   │       ├── gpio/Kconfig\n"
+"│   │       └── ...\n"
+"│   │\n"
+"│   └── stm32/\n"
+"│       ├── Kconfig                      # STM32 platform config\n"
+"│       ├── Kconfig_chip                 # Chip selection\n"
+"│       ├── Kconfig_peripherals          # Peripheral config\n"
+"│       ├── defconfig_stm32f4            # STM32F4 defaults\n"
+"│       └── defconfig_stm32h7            # STM32H7 defaults\n"
+"│\n"
+"├── osal/\n"
+"│   └── Kconfig                          # OSAL configuration\n"
+"│\n"
+"├── hal/\n"
+"│   ├── Kconfig                          # HAL configuration\n"
+"│   └── include/hal/\n"
+"│       └── nexus_config.h              # Generated header\n"
+"│\n"
+"└── scripts/kconfig/\n"
+"    ├── generate_config.py           # Config → C header\n"
+"    ├── validate_kconfig.py              # Validation tool\n"
+"    ├── kconfig_migrate.py               # Migration tool\n"
+"    └── kconfig_diff.py                  # Comparison tool"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:92 bdfd196aa4ca4deabaf107a0451bdf6f
+#: ../../user_guide/kconfig.rst:92 3b35263f4ab7481587c9b719f0479fdc
 msgid "Quick Start"
 msgstr "快速开始"
 
-#: ../../user_guide/kconfig.rst:95 c5705e74de1c4284a9ea8c6e4175b60b
+#: ../../user_guide/kconfig.rst:95 35262541825c46ecb731499fb56caebd
 msgid "Basic Configuration"
 msgstr "基本配置"
 
-#: ../../user_guide/kconfig.rst:97 2e39f82b02674afaab97bb2f3625d717
+#: ../../user_guide/kconfig.rst:97 b305ce779e6645919ad92cefc40a33e5
 msgid "**1. Select Platform:**"
 msgstr "**1. 选择平台:**"
 
-#: ../../user_guide/kconfig.rst:99 9cf6f401b1904c009dea1ad23d420cc9
+#: ../../user_guide/kconfig.rst:99 44f01a6519b948d89aa684e6adce0f4d
 msgid "Edit ``.config`` or use menuconfig:"
 msgstr "编辑 ``.config`` 或使用 menuconfig："
 
-#: ../../user_guide/kconfig.rst:101 b7c62d39fa68433da6b0bbd5283dedec
+#: ../../user_guide/kconfig.rst:101 1ec2903fbac249888a6021db0eb8e5e1
 msgid ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y"
 msgstr ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y"
 
-#: ../../user_guide/kconfig.rst:107 88095d19ea6b4ad38cb2760bf12fec2a
+#: ../../user_guide/kconfig.rst:107 63f8be8117ce472aafbf90771a6ccae7
 msgid "**2. Configure Peripherals:**"
 msgstr "**2. 配置外设:**"
 
-#: ../../user_guide/kconfig.rst:109 717fdcc792af4d68854c4d471b7bb16e
+#: ../../user_guide/kconfig.rst:109 8c4a365b509e4be2a71ef9ec5c2cc679
 msgid ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y"
 msgstr ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y"
 
-#: ../../user_guide/kconfig.rst:116 34ee594c98aa4695815c5aeefd788829
+#: ../../user_guide/kconfig.rst:116 1c2c3b4b8bc74aff9ea52dbc40065f6c
 msgid "**3. Select OSAL Backend:**"
 msgstr "**3. 选择OSAL后端:**"
 
-#: ../../user_guide/kconfig.rst:118 703ddeef121346d384f59b87a2942216
+#: ../../user_guide/kconfig.rst:118 4ad5aa05b1bd4d1389f9abfddd3ae51c
 msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768"
 msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768"
 
-#: ../../user_guide/kconfig.rst:124 b551e5469b9e45969451144b447936ce
+#: ../../user_guide/kconfig.rst:124 9b6a6b7a970542019c1be04e36a29800
 msgid "**4. Generate Configuration:**"
 msgstr "**4. 生成配置:**"
 
-#: ../../user_guide/kconfig.rst:126 39b2cafa2f864c98ad7d39d7bbb40d76
+#: ../../user_guide/kconfig.rst:126 7447e2f0a2d8413fb2b26b1bb0940e4c
 msgid "python scripts/kconfig/generate_config.py --config .config"
-msgstr ""
+msgstr "python scripts/kconfig/generate_config.py --config .config"
 
-#: ../../user_guide/kconfig.rst:130 d69758e6b97340b1990fc0ea00989b07
+#: ../../user_guide/kconfig.rst:130 2034f03d451c41aebdfa90c7bbfdce86
 msgid "This generates ``nexus_config.h``:"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:132 450f6ef2db8a4357bee142db217dd1d2
+#: ../../user_guide/kconfig.rst:132 35cffff220184dffb5fec4a7c0e25f39
 msgid ""
+"#define NX_CONFIG_PLATFORM_STM32 1\n"
+"#define NX_CONFIG_STM32F407 1\n"
+"#define NX_CONFIG_UART1_BAUDRATE 115200\n"
+"#define NX_CONFIG_OSAL_FREERTOS 1"
 msgstr ""
+"#define NX_CONFIG_PLATFORM_STM32 1\n"
+"#define NX_CONFIG_STM32F407 1\n"
+"#define NX_CONFIG_UART1_BAUDRATE 115200\n"
+"#define NX_CONFIG_OSAL_FREERTOS 1"
 
-#: ../../user_guide/kconfig.rst:140 9476f3dfed7e4af899682a21d739d330
+#: ../../user_guide/kconfig.rst:140 378ee4ebfa9e44ceab28a3ebaee15ed2
 msgid "Using Default Configurations"
 msgstr "使用默认配置"
 
-#: ../../user_guide/kconfig.rst:142 3ec7d570beca4508be1863d184ac8f09
+#: ../../user_guide/kconfig.rst:142 263f9b7e6a6a40ad9a42db569d00178b
 msgid "**Native Platform:**"
 msgstr "**本地平台:**"
 
-#: ../../user_guide/kconfig.rst:144 5e271661cdfd46909dc6f072b84ca33f
+#: ../../user_guide/kconfig.rst:144 7173bbb5f6e74ff3ac8bca9291de36a0
 msgid ""
+"cp platforms/native/defconfig .config\n"
+"python scripts/kconfig/generate_config.py"
 msgstr ""
+"cp platforms/native/defconfig .config\n"
+"python scripts/kconfig/generate_config.py"
 
-#: ../../user_guide/kconfig.rst:149 a4df9c47d4c04478b09b6643b5e7d606
+#: ../../user_guide/kconfig.rst:149 1311e309fa494eb188e7e570e5691c78
 msgid "**STM32F4 Platform:**"
 msgstr "**STM32F4 平台:**"
 
-#: ../../user_guide/kconfig.rst:151 37ae5c9be5a242f0ae5414a31fcdf82b
+#: ../../user_guide/kconfig.rst:151 44d2e0591e3147e695929fe3c219b908
 msgid ""
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"python scripts/kconfig/generate_config.py"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:156 6bd56d5ac61f4484ad95ebeca0dfd144
+#: ../../user_guide/kconfig.rst:156 37a05a91dab6409fbed9217b64316be2
 msgid "**STM32H7 Platform:**"
 msgstr "**STM32H7 平台:**"
 
-#: ../../user_guide/kconfig.rst:158 a7135fbfeb444b6096f28432ccfbe465
+#: ../../user_guide/kconfig.rst:158 13f1b87b062445f687a131a368e09f71
 msgid ""
+"cp platforms/stm32/defconfig_stm32h7 .config\n"
+"python scripts/kconfig/generate_config.py"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:164 72ad4de625594be691e74b00e1934a59
+#: ../../user_guide/kconfig.rst:164 4ae667372d0548279fcce00c09c38b98
 msgid "Configuration Tools"
 msgstr "配置工具"
 
-#: ../../user_guide/kconfig.rst:167 784e729b9b2643f89031152f0484bef0
+#: ../../user_guide/kconfig.rst:167 f568058fa83e49429ddadb9f0211fde1
 msgid "Generate Configuration Header"
 msgstr "生成配置头文件"
 
-#: ../../user_guide/kconfig.rst:169 20c9aa9a50a74076898a46d1504c3bdd
+#: ../../user_guide/kconfig.rst:169 2faf5acff57d4c0f922b21c4169a5781
 msgid "Convert ``.config`` to C header file:"
 msgstr "将 ``.config`` 文件转换为 C 头文件"
 
-#: ../../user_guide/kconfig.rst:171 5a089e620146432db57fb96afff690d8
+#: ../../user_guide/kconfig.rst:171 d5f124e0ac624f599e0bf470e1e1f70e
 msgid ""
+"# From .config file\n"
+"python scripts/kconfig/generate_config.py \\\n"
+"    --config .config \\\n"
+"    --output nexus_config.h\n"
+"\n"
+"# Generate default configuration\n"
+"python scripts/kconfig/generate_config.py --default"
 msgstr ""
+"# From .config file\n"
+"python scripts/kconfig/generate_config.py \\\n"
+"    --config .config \\\n"
+"    --output nexus_config.h\n"
+"\n"
+"# Generate default configuration\n"
+"python scripts/kconfig/generate_config.py --default"
 
-#: ../../user_guide/kconfig.rst:182 2fc6b45cc02e4b1caa0cf67e57fed8db
+#: ../../user_guide/kconfig.rst:182 197937b286b94ad9ab464e672ef83ef7
 msgid "Validate Configuration"
 msgstr "验证配置"
 
-#: ../../user_guide/kconfig.rst:184 a51cb27e59674132883f516aa8b1f62d
+#: ../../user_guide/kconfig.rst:184 a395cce517374e57a2cbeabf3c8787a7
 msgid "Check Kconfig syntax and dependencies:"
 msgstr "检查 Kconfig 语法和依赖项："
 
-#: ../../user_guide/kconfig.rst:186 7b4440c25aa149c0bc22186ae2c1a754
+#: ../../user_guide/kconfig.rst:186 b6af7ca29dcb443390e500ac16acf53e
 msgid ""
+"# Validate root Kconfig\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Validate specific file\n"
+"python scripts/kconfig/validate_kconfig.py platforms/stm32/Kconfig"
 msgstr ""
+"# Validate root Kconfig\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Validate specific file\n"
+"python scripts/kconfig/validate_kconfig.py platforms/stm32/Kconfig"
 
-#: ../../user_guide/kconfig.rst:194 9e2c6154eda943f197cf2e2a24e68245
+#: ../../user_guide/kconfig.rst:194 3dd88621f2be4095b1fcae1ffbe631d5
 msgid "**Validation checks:**"
 msgstr "**验证检查**"
 
-#: ../../user_guide/kconfig.rst:196 e57236ebb42a4e1d98af94ffca986806
+#: ../../user_guide/kconfig.rst:196 110151b8b6334e8ca348ef9b9be18fb6
 msgid "Block structure (if/endif, menu/endmenu, choice/endchoice)"
-msgstr ""
+msgstr "Block structure (if/endif, menu/endmenu, choice/endchoice)"
 
-#: ../../user_guide/kconfig.rst:197 75a305994a7e4520b2abb6d696ac12ce
-msgid "源文件存在"
-msgstr ""
+#: ../../user_guide/kconfig.rst:197 0d8d247f1c1f4c178731501bee25ebc8
+msgid "Source file existence"
+msgstr "源文件存在性"
 
-#: ../../user_guide/kconfig.rst:198 79878a534ea44aca872ad5837bea5fa6
+#: ../../user_guide/kconfig.rst:198 276a89d2795b4e51b1b97283b2bbb3b1
 msgid "Circular dependencies"
-msgstr ""
+msgstr "循环依赖"
 
-#: ../../user_guide/kconfig.rst:199 1f1593dfb5d54fd18e8c8001e7878e28
+#: ../../user_guide/kconfig.rst:199 1ade3b1c18884c9c89dd3eb03c039d8a
 msgid "Undefined symbol references"
-msgstr ""
+msgstr "未定义的符号引用"
 
-#: ../../user_guide/kconfig.rst:200 241ac351547a4eb5b9ddf1c4d6a67fb0
+#: ../../user_guide/kconfig.rst:200 196230c8fdc4428ca2f1d36d6a3907ba
 msgid "Range constraint violations"
-msgstr ""
+msgstr "范围 constraint violations"
 
-#: ../../user_guide/kconfig.rst:201 7cd8575d9c1d41f5a055e98d80a6f4bd
+#: ../../user_guide/kconfig.rst:201 b9a7d282aea04f61afbfd88ce968810b
 msgid "Default value consistency"
-msgstr ""
+msgstr "默认 value consistency"
 
-#: ../../user_guide/kconfig.rst:204 a9aa3195a0ac4d1db78b961685ec486c
+#: ../../user_guide/kconfig.rst:204 3ed3a6fc6f994a08b53c6597d777e6f1
 msgid "Compare Configurations"
 msgstr "比较配置"
 
-#: ../../user_guide/kconfig.rst:206 377dee0ff5634ebc916ad6d115a36851
+#: ../../user_guide/kconfig.rst:206 146e552564f6436584cf340d0baf984a
 msgid "Show differences between two configurations:"
 msgstr "对比两种配置之间的差异："
 
-#: ../../user_guide/kconfig.rst:208 fed2ae9a789a49deb445bd6a7d77dcd1
+#: ../../user_guide/kconfig.rst:208 4fc53075f99e4f8a8230af792f399df2
 msgid ""
+"# Text format (default)\n"
+"python scripts/kconfig/kconfig_diff.py .config platforms/native/.config\n"
+"\n"
+"# JSON format\n"
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    --format json \\\n"
+"    config1 config2 \\\n"
+"    --output diff.json"
 msgstr ""
+"# Text format (default)\n"
+"python scripts/kconfig/kconfig_diff.py .config platforms/native/.config\n"
+"\n"
+"# JSON format\n"
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    --format json \\\n"
+"    config1 config2 \\\n"
+"    --output diff.json"
 
-#: ../../user_guide/kconfig.rst:220 d88d4811398e4a12a9d7bd9b41aa80e5
+#: ../../user_guide/kconfig.rst:220 1621d07e24604a808070323b48682a4c
 msgid "Migrate Configuration"
 msgstr "迁移配置"
 
-#: ../../user_guide/kconfig.rst:222 1cb1b8828e074bcb8e93c74357ddad43
+#: ../../user_guide/kconfig.rst:222 3d3dac81b3eb4a1aaf598a6490c1e491
 msgid "Migrate configuration to new version:"
 msgstr "将配置迁移到新版本："
 
-#: ../../user_guide/kconfig.rst:224 356ca4d053f748d698e9ba1497bb12bb
+#: ../../user_guide/kconfig.rst:224 cec10d64c5ac45e1984ea5f675bf6f20
 msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --version 2.0"
 msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --version 2.0"
 
-#: ../../user_guide/kconfig.rst:232 d020947857264d12ad00f827802dec3b
+#: ../../user_guide/kconfig.rst:232 7086b0b0307049ed81f85d189fd7c8f0
 msgid "Generate Documentation"
 msgstr "生成文档"
 
-#: ../../user_guide/kconfig.rst:234 6f747472ca8a42cda9e9ad3d190aa9a2
+#: ../../user_guide/kconfig.rst:234 2f7377069bf14a8da1c7e39f3d7cb681
 msgid "Generate configuration reference documentation:"
 msgstr "生成配置参考文档："
 
-#: ../../user_guide/kconfig.rst:236 9c5c52af0ed14a38a8d5b47ee73ea8f9
+#: ../../user_guide/kconfig.rst:236 3da97e233304492c84c0d90d748ee2aa
 msgid ""
+"python scripts/kconfig/generate_config_docs.py \\\n"
+"    Kconfig \\\n"
+"    --output docs/config_reference.md"
 msgstr ""
+"python scripts/kconfig/generate_config_docs.py \\\n"
+"    Kconfig \\\n"
+"    --output docs/config_reference.md"
 
-#: ../../user_guide/kconfig.rst:243 cd170dfb73884ab9b56dc338a5217d46
+#: ../../user_guide/kconfig.rst:243 13bc3860ab494002afe5de2f818270f4
 msgid "Unified Configuration Tool"
 msgstr "统一配置工具"
 
-#: ../../user_guide/kconfig.rst:245 432422ca361544e980259107f83a7da5
+#: ../../user_guide/kconfig.rst:245 99cd13ffe64142b3a48641c448ca8c10
 msgid "Use ``nexus_config.py`` for all operations:"
 msgstr "所有操作均使用 ``nexus_config.py``："
 
-#: ../../user_guide/kconfig.rst:247 aefbc336599846238c89240bed93576b
+#: ../../user_guide/kconfig.rst:247 d2222f9742fe4e03adff26bb96b24218
 msgid ""
+"# Generate configuration\n"
+"python scripts/nexus_config.py generate\n"
+"\n"
+"# Validate configuration\n"
+"python scripts/nexus_config.py validate Kconfig\n"
+"\n"
+"# Compare configurations\n"
+"python scripts/nexus_config.py diff old.config new.config\n"
+"\n"
+"# Migrate configuration\n"
+"python scripts/nexus_config.py migrate old.config --target-version 2.0"
 msgstr ""
+"# Generate configuration\n"
+"python scripts/nexus_config.py generate\n"
+"\n"
+"# Validate configuration\n"
+"python scripts/nexus_config.py validate Kconfig\n"
+"\n"
+"# Compare configurations\n"
+"python scripts/nexus_config.py diff old.config new.config\n"
+"\n"
+"# Migrate configuration\n"
+"python scripts/nexus_config.py migrate old.config --target-version 2.0"
 
-#: ../../user_guide/kconfig.rst:262 ecb6a4092bfd4dbab677936408a21610
+#: ../../user_guide/kconfig.rst:262 16ddec3746d34e468a5b6597d0f2d155
 msgid "Platform Configuration"
-msgstr ""
+msgstr "平台 配置"
 
-#: ../../user_guide/kconfig.rst:265 912d72f2b57646678be26a6baf0e22e6
+#: ../../user_guide/kconfig.rst:265 0f68d4e451644f9fa87766452531739a
 msgid "Platform Selection"
 msgstr "平台配置"
 
-#: ../../user_guide/kconfig.rst:267 87f6e5f2d24a454d91cd21955d43de81
+#: ../../user_guide/kconfig.rst:267 d36692e16348477182182f4503264205
 msgid "Select one platform from available options:"
 msgstr "请从可用选项中选择一个平台："
 
-#: ../../user_guide/kconfig.rst:269 119fa587df6f4dd6a13fe96bd3f16e54
+#: ../../user_guide/kconfig.rst:269 8727072db75f4b7f98d462149678d832
 msgid ""
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"\n"
+"config PLATFORM_NATIVE\n"
+"    bool \"Native Platform (PC Simulation)\"\n"
+"\n"
+"config PLATFORM_STM32\n"
+"    bool \"STM32 Platform\"\n"
+"\n"
+"config PLATFORM_GD32\n"
+"    bool \"GD32 Platform\"\n"
+"\n"
+"config PLATFORM_ESP32\n"
+"    bool \"ESP32 Platform\"\n"
+"\n"
+"config PLATFORM_NRF52\n"
+"    bool \"NRF52 Platform\"\n"
+"\n"
+"endchoice"
 msgstr ""
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"\n"
+"config PLATFORM_NATIVE\n"
+"    bool \"Native Platform (PC Simulation)\"\n"
+"\n"
+"config PLATFORM_STM32\n"
+"    bool \"STM32 Platform\"\n"
+"\n"
+"config PLATFORM_GD32\n"
+"    bool \"GD32 Platform\"\n"
+"\n"
+"config PLATFORM_ESP32\n"
+"    bool \"ESP32 Platform\"\n"
+"\n"
+"config PLATFORM_NRF52\n"
+"    bool \"NRF52 Platform\"\n"
+"\n"
+"endchoice"
 
-#: ../../user_guide/kconfig.rst:293 41c33cee316941ad94f2b6ae1b4cc417
+#: ../../user_guide/kconfig.rst:293 2b4d3dccee204578a637098886597780
 msgid "STM32 Platform"
 msgstr "STM32 平台"
 
-#: ../../user_guide/kconfig.rst:295 1da6487c682a48a29ce4f27dedcfea28
+#: ../../user_guide/kconfig.rst:295 b5502ca1d127443fb2c5f3b62e949b2e
 msgid "**Chip Family Selection:**"
-msgstr ""
+msgstr "**Chip Family Selection:**"
 
-#: ../../user_guide/kconfig.rst:297 3c7aad26d8224273aef305206b38253d
+#: ../../user_guide/kconfig.rst:297 2ab3b54211fa40fe8ce74b12192ab720
 msgid ""
+"choice\n"
+"    prompt \"STM32 Chip Family\"\n"
+"    default STM32F4\n"
+"\n"
+"config STM32F4\n"
+"    bool \"STM32F4 Series\"\n"
+"\n"
+"config STM32H7\n"
+"    bool \"STM32H7 Series\"\n"
+"\n"
+"config STM32L4\n"
+"    bool \"STM32L4 Series\"\n"
+"\n"
+"endchoice"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:314 3c61136021b84c41820e295f60cd8b0d
+#: ../../user_guide/kconfig.rst:314 31175e8285514672a351a430248b7e2e
 msgid "**Chip Variant:**"
-msgstr ""
+msgstr "**Chip Variant:**"
 
-#: ../../user_guide/kconfig.rst:316 f819941f665345919f2c4db4aedf0ef2
+#: ../../user_guide/kconfig.rst:316 9ac72ddb552c4f629f87acd784101734
 msgid ""
+"if STM32F4\n"
+"\n"
+"choice\n"
+"    prompt \"STM32F4 Chip Variant\"\n"
+"    default STM32F407\n"
+"\n"
+"config STM32F407\n"
+"    bool \"STM32F407\"\n"
+"\n"
+"config STM32F429\n"
+"    bool \"STM32F429\"\n"
+"\n"
+"config STM32F446\n"
+"    bool \"STM32F446\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"endif"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:337 ../../user_guide/kconfig.rst:410
-#: 780e1b85b88e445d99dc5309609f0735 8546499f26f049c59ac0f3d9f3fedffc
+#: 66d561125d2b4a4f84b73f03fdbfec86 d5b7a351ba034fb1a184284e4f7565fe
 msgid "**Example Configuration:**"
-msgstr ""
+msgstr "**Example Configuration:**"
 
-#: ../../user_guide/kconfig.rst:339 86ef856c68a8434d8df1f15e6c9d47c8
+#: ../../user_guide/kconfig.rst:339 e723b3ca5c5e42a6a3ce2a19c097bab4
 msgid ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32F407xx\""
 msgstr ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F4=y\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32F407xx\""
 
-#: ../../user_guide/kconfig.rst:347 9d475d1778a2408ab87c041754382ac7
+#: ../../user_guide/kconfig.rst:347 3a5fb399945444b88a90ab38aa76b48b
 msgid "Peripheral Configuration"
 msgstr "外设配置"
 
-#: ../../user_guide/kconfig.rst:350 814a8b44efba40979263a9bd5b1df01d
+#: ../../user_guide/kconfig.rst:350 c905ee14768f4143af5bbb69cf7e6d6c
 msgid "UART Configuration"
 msgstr "UART 配置"
 
-#: ../../user_guide/kconfig.rst:352 055fb123005f4c7c91d03719ea958795
+#: ../../user_guide/kconfig.rst:352 dcff0e008c8b40dc9a918bca45d044c0
 msgid "**Enable UART:**"
 msgstr "**启用 UART:**"
 
-#: ../../user_guide/kconfig.rst:354 4f19c6a2013441dfa118ca7762543b74
+#: ../../user_guide/kconfig.rst:354 3e4ea044102a4a53a2f34343928af485
 msgid ""
+"menuconfig STM32_UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"    default y"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:360 488440514c1e4e90bdd3904c7429e455
+#: ../../user_guide/kconfig.rst:360 13776f74590749428f1f51cee0286d69
 msgid "**Configure UART Instance:**"
 msgstr "**配置 UART 实例:**"
 
-#: ../../user_guide/kconfig.rst:362 141f6af06a584f2d89e1f9c686e4019c
+#: ../../user_guide/kconfig.rst:362 815048683f624881be2eda10de5c4e73
 msgid ""
+"if STM32_UART_ENABLE\n"
+"\n"
+"menuconfig INSTANCE_STM32_UART_1\n"
+"    bool \"Enable UART1\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_STM32_UART_1\n"
+"\n"
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"\n"
+"config UART1_DATA_BITS\n"
+"    int \"UART1 data bits\"\n"
+"    default 8\n"
+"    range 7 9\n"
+"\n"
+"choice\n"
+"    prompt \"UART1 transfer mode\"\n"
+"    default UART1_MODE_DMA\n"
+"\n"
+"config UART1_MODE_POLLING\n"
+"    bool \"Polling\"\n"
+"\n"
+"config UART1_MODE_INTERRUPT\n"
+"    bool \"Interrupt\"\n"
+"\n"
+"config UART1_MODE_DMA\n"
+"    bool \"DMA\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"config UART1_TX_BUFFER_SIZE\n"
+"    int \"UART1 TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"config UART1_RX_BUFFER_SIZE\n"
+"    int \"UART1 RX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"endif # INSTANCE_STM32_UART_1\n"
+"\n"
+"endif # STM32_UART_ENABLE"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:412 294a54978c564b8eb994483843de82b5
+#: ../../user_guide/kconfig.rst:412 43b048e9199442a0b4bbcf989eabebab
 msgid ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_DATA_BITS=8\n"
+"CONFIG_UART1_MODE_DMA=y\n"
+"CONFIG_UART1_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART1_RX_BUFFER_SIZE=256"
 msgstr ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_DATA_BITS=8\n"
+"CONFIG_UART1_MODE_DMA=y\n"
+"CONFIG_UART1_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART1_RX_BUFFER_SIZE=256"
 
-#: ../../user_guide/kconfig.rst:423 9d267f65e25841d189b47fb80722d0a2
+#: ../../user_guide/kconfig.rst:423 ed36cc48a9a34b448a13c2a666368980
 msgid "GPIO Configuration"
 msgstr "GPIO 配置"
 
-#: ../../user_guide/kconfig.rst:425 b4f9a8c9899941ee88ffabf126787b98
+#: ../../user_guide/kconfig.rst:425 8e1da48a4b1c4ce7872ee21b67fbd3ae
 msgid ""
+"menuconfig NATIVE_GPIO_ENABLE\n"
+"    bool \"Enable GPIO support\"\n"
+"    default y\n"
+"\n"
+"if NATIVE_GPIO_ENABLE\n"
+"\n"
+"menuconfig INSTANCE_NATIVE_GPIO_A\n"
+"    bool \"Enable GPIO Port A\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_NATIVE_GPIO_A\n"
+"\n"
+"config GPIO_A_PIN_COUNT\n"
+"    int \"Number of pins in Port A\"\n"
+"    default 16\n"
+"    range 1 32\n"
+"\n"
+"config GPIO_A_DEFAULT_MODE\n"
+"    int \"Default pin mode\"\n"
+"    default 0\n"
+"    help\n"
+"      0 = Input, 1 = Output, 2 = Alternate Function\n"
+"\n"
+"endif # INSTANCE_NATIVE_GPIO_A\n"
+"\n"
+"endif # NATIVE_GPIO_ENABLE"
 msgstr ""
-"menuconfig NATIVE_GPIO_ENABLE\n\n"
-"    bool \Enable GPIO support\\n\n"
-"    default y\n\n"
-"\n\n"
-"if NATIVE_GPIO_ENABLE\n\n"
-"\n\n"
-"menuconfig INSTANCE_NATIVE_GPIO_A\n\n"
-"    bool \Enable GPIO Port A\\n\n"
-"    default y\n\n"
-"\n\n"
-"if INSTANCE_NATIVE_GPIO_A\n\n"
-"\n\n"
-"config GPIO_A_PIN_COUNT\n\n"
-"    int \Number of pins in Port A\\n\n"
-"    default 16\n\n"
-"    range 1 32\n\n"
-"\n\n"
-"config GPIO_A_DEFAULT_MODE\n\n"
-"    int \Default pin mode\\n\n"
-"    default 0\n\n"
-"    help\n\n"
-"      0 = Input, 1 = Output, 2 = Alternate 函数\n\n"
-"\n\n"
-"endif # INSTANCE_NATIVE_GPIO_A\n\n"
-"\n\n"
-"endif # NATIVE_GPIO_ENABLE\n"
+"menuconfig NATIVE_GPIO_ENABLE\n"
+"    bool \"Enable GPIO support\"\n"
+"    default y\n"
+"\n"
+"if NATIVE_GPIO_ENABLE\n"
+"\n"
+"menuconfig INSTANCE_NATIVE_GPIO_A\n"
+"    bool \"Enable GPIO Port A\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_NATIVE_GPIO_A\n"
+"\n"
+"config GPIO_A_PIN_COUNT\n"
+"    int \"Number of pins in Port A\"\n"
+"    default 16\n"
+"    range 1 32\n"
+"\n"
+"config GPIO_A_DEFAULT_MODE\n"
+"    int \"Default pin mode\"\n"
+"    default 0\n"
+"    help\n"
+"      0 = Input, 1 = Output, 2 = Alternate Function\n"
+"\n"
+"endif # INSTANCE_NATIVE_GPIO_A\n"
+"\n"
+"endif # NATIVE_GPIO_ENABLE"
 
-#: ../../user_guide/kconfig.rst:455 643a04a00cc14e9486d922103b23dae8
+#: ../../user_guide/kconfig.rst:455 6843c2e70bc04b169e6eaefbf6ba784e
 msgid "OSAL Configuration"
 msgstr "OSAL 配置"
 
-#: ../../user_guide/kconfig.rst:458 90c26f901226425e815da44a6fe78e2a
+#: ../../user_guide/kconfig.rst:458 7e33aa81c7654e4eac6f518e5023500e
 msgid "Backend Selection"
 msgstr "后端选择"
 
-#: ../../user_guide/kconfig.rst:460 2c285b7437164d1caf1558551ae7c795
+#: ../../user_guide/kconfig.rst:460 4bd29f711f644b278572aada3b5b1772
 msgid ""
+"choice\n"
+"    prompt \"OSAL Backend\"\n"
+"    default OSAL_BAREMETAL\n"
+"\n"
+"config OSAL_BAREMETAL\n"
+"    bool \"Bare-metal (No OS)\"\n"
+"\n"
+"config OSAL_FREERTOS\n"
+"    bool \"FreeRTOS\"\n"
+"\n"
+"config OSAL_RTTHREAD\n"
+"    bool \"RT-Thread\"\n"
+"\n"
+"config OSAL_ZEPHYR\n"
+"    bool \"Zephyr RTOS\"\n"
+"\n"
+"config OSAL_LINUX\n"
+"    bool \"Linux\"\n"
+"\n"
+"config OSAL_NATIVE\n"
+"    bool \"Native (PC Simulation)\"\n"
+"\n"
+"endchoice"
 msgstr ""
+"choice\n"
+"    prompt \"OSAL Backend\"\n"
+"    default OSAL_BAREMETAL\n"
+"\n"
+"config OSAL_BAREMETAL\n"
+"    bool \"Bare-metal (No OS)\"\n"
+"\n"
+"config OSAL_FREERTOS\n"
+"    bool \"FreeRTOS\"\n"
+"\n"
+"config OSAL_RTTHREAD\n"
+"    bool \"RT-Thread\"\n"
+"\n"
+"config OSAL_ZEPHYR\n"
+"    bool \"Zephyr RTOS\"\n"
+"\n"
+"config OSAL_LINUX\n"
+"    bool \"Linux\"\n"
+"\n"
+"config OSAL_NATIVE\n"
+"    bool \"Native (PC Simulation)\"\n"
+"\n"
+"endchoice"
 
-#: ../../user_guide/kconfig.rst:487 62391317d5004549a236cecf1162fb8f
+#: ../../user_guide/kconfig.rst:487 39634bdf28704769a278c840f8007781
 msgid "System Parameters"
 msgstr "System 参数"
 
-#: ../../user_guide/kconfig.rst:489 46f148b0648246f18a8bf6b80a64b2a6
+#: ../../user_guide/kconfig.rst:489 1374a2c2a62c4b62bc8e004c00a0e75b
 msgid ""
+"menu \"System Parameters\"\n"
+"\n"
+"config OSAL_TICK_RATE_HZ\n"
+"    int \"System tick rate (Hz)\"\n"
+"    default 1000 if OSAL_FREERTOS\n"
+"    default 1000 if OSAL_RTTHREAD\n"
+"    default 100 if OSAL_ZEPHYR\n"
+"    default 1000\n"
+"    range 100 10000\n"
+"\n"
+"config OSAL_HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768 if OSAL_FREERTOS\n"
+"    default 32768 if OSAL_RTTHREAD\n"
+"    default 16384 if OSAL_BAREMETAL\n"
+"    default 65536\n"
+"    range 4096 1048576\n"
+"\n"
+"config OSAL_MAIN_STACK_SIZE\n"
+"    int \"Main stack size (bytes)\"\n"
+"    default 2048 if OSAL_FREERTOS\n"
+"    default 2048 if OSAL_RTTHREAD\n"
+"    default 4096 if OSAL_BAREMETAL\n"
+"    default 4096\n"
+"    range 512 65536\n"
+"\n"
+"endmenu"
 msgstr ""
-"menu \System 参数\\n\n"
-"\n\n"
-"config OSAL_TICK_RATE_HZ\n\n"
-"    int \System tick rate (Hz)\\n\n"
-"    default 1000 if OSAL_FREERTOS\n\n"
-"    default 1000 if OSAL_RTTHREAD\n\n"
-"    default 100 if OSAL_ZEPHYR\n\n"
-"    default 1000\n\n"
-"    range 100 10000\n\n"
-"\n\n"
-"config OSAL_HEAP_SIZE\n\n"
-"    int \Heap size (bytes)\\n\n"
-"    default 32768 if OSAL_FREERTOS\n\n"
-"    default 32768 if OSAL_RTTHREAD\n\n"
-"    default 16384 if OSAL_BAREMETAL\n\n"
-"    default 65536\n\n"
-"    range 4096 1048576\n\n"
-"\n\n"
-"config OSAL_MAIN_STACK_SIZE\n\n"
-"    int \Main stack size (bytes)\\n\n"
-"    default 2048 if OSAL_FREERTOS\n\n"
-"    default 2048 if OSAL_RTTHREAD\n\n"
-"    default 4096 if OSAL_BAREMETAL\n\n"
-"    default 4096\n\n"
-"    range 512 65536\n\n"
-"\n\n"
-"endmenu\n"
+"menu \"System Parameters\"\n"
+"\n"
+"config OSAL_TICK_RATE_HZ\n"
+"    int \"System tick rate (Hz)\"\n"
+"    default 1000 if OSAL_FREERTOS\n"
+"    default 1000 if OSAL_RTTHREAD\n"
+"    default 100 if OSAL_ZEPHYR\n"
+"    default 1000\n"
+"    range 100 10000\n"
+"\n"
+"config OSAL_HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768 if OSAL_FREERTOS\n"
+"    default 32768 if OSAL_RTTHREAD\n"
+"    default 16384 if OSAL_BAREMETAL\n"
+"    default 65536\n"
+"    range 4096 1048576\n"
+"\n"
+"config OSAL_MAIN_STACK_SIZE\n"
+"    int \"Main stack size (bytes)\"\n"
+"    default 2048 if OSAL_FREERTOS\n"
+"    default 2048 if OSAL_RTTHREAD\n"
+"    default 4096 if OSAL_BAREMETAL\n"
+"    default 4096\n"
+"    range 512 65536\n"
+"\n"
+"endmenu"
 
-#: ../../user_guide/kconfig.rst:520 e9ec4fbba74b4bc99c5043915b9678eb
+#: ../../user_guide/kconfig.rst:520 e132cb96e49b4390badc5faac918798c
 msgid "Linker Script Configuration"
 msgstr "链接脚本配置"
 
-#: ../../user_guide/kconfig.rst:522 a0522356746741a2b2ed0b549188409a
+#: ../../user_guide/kconfig.rst:522 c05cabdddde242988c301f28d35b6cd6
 msgid ""
+"menu \"Linker Script Configuration\"\n"
+"    depends on !PLATFORM_NATIVE\n"
+"\n"
+"config LINKER_RAM_START\n"
+"    hex \"RAM start address\"\n"
+"    default 0x20000000 if STM32F4\n"
+"    default 0x24000000 if STM32H7\n"
+"    default 0x20000000\n"
+"\n"
+"config LINKER_RAM_SIZE\n"
+"    hex \"RAM size\"\n"
+"    default 0x00020000 if STM32F407\n"
+"    default 0x00080000 if STM32H743\n"
+"    default 0x00020000\n"
+"\n"
+"config LINKER_FLASH_START\n"
+"    hex \"Flash start address\"\n"
+"    default 0x08000000 if PLATFORM_STM32\n"
+"    default 0x08000000\n"
+"\n"
+"config LINKER_FLASH_SIZE\n"
+"    hex \"Flash size\"\n"
+"    default 0x00100000 if STM32F407\n"
+"    default 0x00200000 if STM32H743\n"
+"    default 0x00100000\n"
+"\n"
+"endmenu"
 msgstr ""
-"menu \链接脚本配置\\n\n"
-"    depends on !PLATFORM_NATIVE\n\n"
-"\n\n"
-"config LINKER_RAM_START\n\n"
-"    hex \RAM start address\\n\n"
-"    default 0x20000000 if STM32F4\n\n"
-"    default 0x24000000 if STM32H7\n\n"
-"    default 0x20000000\n\n"
-"\n\n"
-"config LINKER_RAM_SIZE\n\n"
-"    hex \RAM size\\n\n"
-"    default 0x00020000 if STM32F407\n\n"
-"    default 0x00080000 if STM32H743\n\n"
-"    default 0x00020000\n\n"
-"\n\n"
-"config LINKER_FLASH_START\n\n"
-"    hex \Flash start address\\n\n"
-"    default 0x08000000 if PLATFORM_STM32\n\n"
-"    default 0x08000000\n\n"
-"\n\n"
-"config LINKER_FLASH_SIZE\n\n"
-"    hex \Flash size\\n\n"
-"    default 0x00100000 if STM32F407\n\n"
-"    default 0x00200000 if STM32H743\n\n"
-"    default 0x00100000\n\n"
-"\n\n"
-"endmenu\n"
 
-#: ../../user_guide/kconfig.rst:553 546cf8bbec9b44789eae79ee3bb4b840
+#: ../../user_guide/kconfig.rst:553 ca22d2ec1fee47b5b7fa98b938261836
 msgid "HAL Configuration"
 msgstr "HAL 配置"
 
-#: ../../user_guide/kconfig.rst:556 c06cb73d24a14f669c478b06ce71de65
+#: ../../user_guide/kconfig.rst:556 3f0fa10e0638454db7eb1377c84bcc39
 msgid "Debug Configuration"
 msgstr "Debug 配置"
 
-#: ../../user_guide/kconfig.rst:558 2679de53b9fe430ba480f054a2370e73
+#: ../../user_guide/kconfig.rst:558 f20854e92073416dad633c5c3134206a
 msgid ""
+"menu \"Debug Configuration\"\n"
+"\n"
+"config HAL_DEBUG_ENABLE\n"
+"    bool \"Enable HAL debug output\"\n"
+"    default n\n"
+"\n"
+"config HAL_DEBUG_LEVEL\n"
+"    int \"HAL debug level\"\n"
+"    default 2\n"
+"    range 0 4\n"
+"    depends on HAL_DEBUG_ENABLE\n"
+"    help\n"
+"      Debug level: 0=None, 1=Error, 2=Warning, 3=Info, 4=Verbose\n"
+"\n"
+"config HAL_ASSERT_ENABLE\n"
+"    bool \"Enable HAL assertions\"\n"
+"    default y\n"
+"\n"
+"endmenu"
 msgstr ""
+"menu \"Debug Configuration\"\n"
+"\n"
+"config HAL_DEBUG_ENABLE\n"
+"    bool \"Enable HAL debug output\"\n"
+"    default n\n"
+"\n"
+"config HAL_DEBUG_LEVEL\n"
+"    int \"HAL debug level\"\n"
+"    default 2\n"
+"    range 0 4\n"
+"    depends on HAL_DEBUG_ENABLE\n"
+"    help\n"
+"      Debug level: 0=None, 1=Error, 2=Warning, 3=Info, 4=Verbose\n"
+"\n"
+"config HAL_ASSERT_ENABLE\n"
+"    bool \"Enable HAL assertions\"\n"
+"    default y\n"
+"\n"
+"endmenu"
 
-#: ../../user_guide/kconfig.rst:581 10fc75ee53fb445a932043974d3474f2
+#: ../../user_guide/kconfig.rst:581 847baf80014d4051a5bb7726d03bc1e9
 msgid "Statistics Configuration"
 msgstr "Statistics 配置"
 
-#: ../../user_guide/kconfig.rst:583 0bd0321e29df47c79b4055e29a271add
+#: ../../user_guide/kconfig.rst:583 46fc219852fb406eb29d6566d3e21c62
 msgid ""
+"menu \"Statistics Configuration\"\n"
+"\n"
+"config HAL_STATISTICS_ENABLE\n"
+"    bool \"Enable HAL statistics\"\n"
+"    default y\n"
+"\n"
+"config HAL_STATISTICS_BUFFER_SIZE\n"
+"    int \"Statistics buffer size\"\n"
+"    default 256\n"
+"    range 64 4096\n"
+"    depends on HAL_STATISTICS_ENABLE\n"
+"\n"
+"endmenu"
 msgstr ""
-"menu \统计 Configuration\\n\n"
-"\n\n"
-"config HAL_STATISTICS_ENABLE\n\n"
-"    bool \Enable HAL statistics\\n\n"
-"    default y\n\n"
-"\n\n"
-"config HAL_STATISTICS_BUFFER_SIZE\n\n"
-"    int \统计 buffer size\\n\n"
-"    default 256\n\n"
-"    range 64 4096\n\n"
-"    depends on HAL_STATISTICS_ENABLE\n\n"
-"\n\n"
-"endmenu\n"
 
-#: ../../user_guide/kconfig.rst:600 62e242e29b3d460f8c0086b8be02fa95
+#: ../../user_guide/kconfig.rst:600 8453be65387d4a048edf6c0f9b408479
 msgid "Using Configuration in Code"
 msgstr "在代码中使用配置"
 
-#: ../../user_guide/kconfig.rst:603 26cc4d5d4b8f4af292968dc793b2deb8
-msgid "包含生成的头文件"
+#: ../../user_guide/kconfig.rst:603 129825aedc93451ca93832d26ea8d994
+msgid "Include Generated Header"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:605 47317769f8374c31940f8fb4b2c05f31
+#: ../../user_guide/kconfig.rst:605 59c6c8e6789c4bcb86b02f7fa9d0e0d5
 msgid "#include \"nexus_config.h\""
-msgstr ""
+msgstr "#include \"nexus_config.h\""
 
-#: ../../user_guide/kconfig.rst:610 a393bcf854ee4c05953c222feada6a18
+#: ../../user_guide/kconfig.rst:610 deb4ae393e784a42a5955b4c7261316f
 msgid "Conditional Compilation"
 msgstr "条件编译"
 
-#: ../../user_guide/kconfig.rst:612 2b7bb03444394a7c93ff44b6d08044f3
+#: ../../user_guide/kconfig.rst:612 13932ee45b8247928f5484478486fe43
 msgid "**Platform-specific code:**"
 msgstr "**平台特性代码:**"
 
-#: ../../user_guide/kconfig.rst:614 e51e3c0d3ad945718726c3ca1eceecf4
+#: ../../user_guide/kconfig.rst:614 dd9d7303730748eb9e20de180ca47478
 msgid ""
+"#ifdef NX_CONFIG_PLATFORM_STM32\n"
+"    /* STM32 specific implementation */\n"
+"#elif defined(NX_CONFIG_PLATFORM_GD32)\n"
+"    /* GD32 specific implementation */\n"
+"#endif"
 msgstr ""
+"#ifdef NX_CONFIG_PLATFORM_STM32\n"
+"    /* STM32 specific implementation */\n"
+"#elif defined(NX_CONFIG_PLATFORM_GD32)\n"
+"    /* GD32 specific implementation */\n"
+"#endif"
 
-#: ../../user_guide/kconfig.rst:622 6e9cdae4fccb494eb0b981b850fa5bc1
+#: ../../user_guide/kconfig.rst:622 56fe2023d6414b76a522000fc4948285
 msgid "**Peripheral enable:**"
 msgstr "**外设使能:**"
 
-#: ../../user_guide/kconfig.rst:624 77b4e346583245c5b8688b8b584a5c58
+#: ../../user_guide/kconfig.rst:624 68e9dc805ea3431787b6f30d30f49e93
 msgid ""
+"#ifdef NX_CONFIG_INSTANCE_STM32_UART_1\n"
+"    /* Initialize UART1 */\n"
+"    uart_init(UART1, NX_CONFIG_UART1_BAUDRATE);\n"
+"#endif"
 msgstr ""
+"#ifdef NX_CONFIG_INSTANCE_STM32_UART_1\n"
+"    /* Initialize UART1 */\n"
+"    uart_init(UART1, NX_CONFIG_UART1_BAUDRATE);\n"
+"#endif"
 
-#: ../../user_guide/kconfig.rst:632 e9734e450abb4800a2d2aff191c02bb2
-msgid "使用配置值"
-msgstr ""
+#: ../../user_guide/kconfig.rst:632 9637753973df4f1e9ceb40416b0db23b
+#, fuzzy
+msgid "Using Configuration Values"
+msgstr "在代码中使用配置"
 
-#: ../../user_guide/kconfig.rst:634 4efd72412e9b4450a4c4564f0104aa91
+#: ../../user_guide/kconfig.rst:634 4d974c70c4fe480cbe2aa9d180645188
 msgid ""
+"/* Use configuration values */\n"
+"static uint8_t tx_buffer[NX_CONFIG_UART1_TX_BUFFER_SIZE];\n"
+"static uint8_t rx_buffer[NX_CONFIG_UART1_RX_BUFFER_SIZE];\n"
+"\n"
+"/* OSAL backend selection */\n"
+"#if defined(NX_CONFIG_OSAL_FREERTOS)\n"
+"    #include \"FreeRTOS.h\"\n"
+"    #include \"task.h\"\n"
+"#elif defined(NX_CONFIG_OSAL_RTTHREAD)\n"
+"    #include <rtthread.h>\n"
+"#elif defined(NX_CONFIG_OSAL_BAREMETAL)\n"
+"    /* Bare-metal implementation */\n"
+"#endif"
 msgstr ""
+"/* Use configuration values */\n"
+"static uint8_t tx_buffer[NX_CONFIG_UART1_TX_BUFFER_SIZE];\n"
+"static uint8_t rx_buffer[NX_CONFIG_UART1_RX_BUFFER_SIZE];\n"
+"\n"
+"/* OSAL backend selection */\n"
+"#if defined(NX_CONFIG_OSAL_FREERTOS)\n"
+"    #include \"FreeRTOS.h\"\n"
+"    #include \"task.h\"\n"
+"#elif defined(NX_CONFIG_OSAL_RTTHREAD)\n"
+"    #include <rtthread.h>\n"
+"#elif defined(NX_CONFIG_OSAL_BAREMETAL)\n"
+"    /* Bare-metal implementation */\n"
+"#endif"
 
-#: ../../user_guide/kconfig.rst:651 d32bfe69d1154795806fc9e9ec009273
+#: ../../user_guide/kconfig.rst:651 ee162ea01f1141df86635690b99c2286
 msgid "Build System Integration"
 msgstr "构建系统集成"
 
-#: ../../user_guide/kconfig.rst:654 e5c624ba7e5d4829b687a1ae472a8383
+#: ../../user_guide/kconfig.rst:654 cc7e6d8fde5b4c289488f93f8a953c45
 msgid "CMake Integration"
 msgstr "CMake 集成"
 
-#: ../../user_guide/kconfig.rst:656 7f3a76f84d9545a39159ab439dcb7cfc
+#: ../../user_guide/kconfig.rst:656 42edf8b36e8043a5b3f57fc39799d073
 msgid "The configuration system is integrated into CMake:"
 msgstr "配置系统已集成到 CMake 中："
 
-#: ../../user_guide/kconfig.rst:658 508581f968274e53a8fd941cdf8f1436
+#: ../../user_guide/kconfig.rst:658 ceb695a8f4ca411d8d5d26516b708fef
 msgid ""
+"# CMakeLists.txt\n"
+"function(nexus_generate_config)\n"
+"    set(GENERATOR_SCRIPT \"${CMAKE_SOURCE_DIR}/scripts/kconfig/generate_config.py\")\n"
+"    set(CONFIG_FILE \"${CMAKE_SOURCE_DIR}/.config\")\n"
+"    set(OUTPUT_FILE \"${CMAKE_SOURCE_DIR}/nexus_config.h\")\n"
+"\n"
+"    # Generate configuration header\n"
+"    execute_process(\n"
+"        COMMAND ${Python3_EXECUTABLE} ${GENERATOR_SCRIPT}\n"
+"                --config ${CONFIG_FILE}\n"
+"                --output ${OUTPUT_FILE}\n"
+"        RESULT_VARIABLE RESULT\n"
+"    )\n"
+"\n"
+"    if(NOT RESULT EQUAL 0)\n"
+"        message(FATAL_ERROR \"Failed to generate HAL config\")\n"
+"    endif()\n"
+"endfunction()\n"
+"\n"
+"# Call during configuration\n"
+"nexus_generate_config()"
+msgstr ""
+"# CMakeLists.txt\n"
+"function(nexus_generate_config)\n"
+"    set(GENERATOR_SCRIPT \"${CMAKE_SOURCE_DIR}/scripts/kconfig/generate_config.py\")\n"
+"    set(CONFIG_FILE \"${CMAKE_SOURCE_DIR}/.config\")\n"
+"    set(OUTPUT_FILE \"${CMAKE_SOURCE_DIR}/nexus_config.h\")\n"
+"\n"
+"    # Generate configuration header\n"
+"    execute_process(\n"
+"        COMMAND ${Python3_EXECUTABLE} ${GENERATOR_SCRIPT}\n"
+"                --config ${CONFIG_FILE}\n"
+"                --output ${OUTPUT_FILE}\n"
+"        RESULT_VARIABLE RESULT\n"
+"    )\n"
+"\n"
+"    if(NOT RESULT EQUAL 0)\n"
+"        message(FATAL_ERROR \"Failed to generate HAL config\")\n"
+"    endif()\n"
+"endfunction()\n"
+"\n"
+"# Call during configuration\n"
+"nexus_generate_config()"
+
+#: ../../user_guide/kconfig.rst:683 b1dc5fe2a64b405a98bd31ce597c7e6b
+msgid "Automatic Regeneration"
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:683 7e5e6ead8ecb4319ae7ea5da34d28ff2
-msgid "自动生成"
-msgstr ""
-
-#: ../../user_guide/kconfig.rst:685 21433dbf8d3843da8dee2ab065413592
+#: ../../user_guide/kconfig.rst:685 f8d2623758774035a7beeadf35be51e1
 msgid "Configuration headers are automatically regenerated when:"
 msgstr "在以下情况下，配置头文件会自动重新生成："
 
-#: ../../user_guide/kconfig.rst:687 f8e14b92309e4b34b596bd913b0148a7
+#: ../../user_guide/kconfig.rst:687 09638d4729994132bc054fcd4b84f2a8
 msgid "``.config`` file changes"
 msgstr "`.config` 文件更改"
 
-#: ../../user_guide/kconfig.rst:688 f5398c3c889847c488c4b8ffff5ff153
+#: ../../user_guide/kconfig.rst:688 0e9d964f63874c70b1b845135d1a3b5c
 msgid "Any ``Kconfig`` file changes"
 msgstr "任何 ``Kconfig`` 文件更改"
 
-#: ../../user_guide/kconfig.rst:689 251c209af92c4dc89b85b9a396ad5911
+#: ../../user_guide/kconfig.rst:689 9c35d6d225f54c7195d4608291390889
 msgid "CMake configuration is run"
 msgstr "CMake 配置运行"
 
-#: ../../user_guide/kconfig.rst:692 317b16c7d1b5486cb6a38d5b3f82b359
+#: ../../user_guide/kconfig.rst:692 d88dc645e311449586190457a4c55033
 msgid "Best Practices"
 msgstr "最佳实践"
 
-#: ../../user_guide/kconfig.rst:695 1666f85d7909427186001f0357a2e1b1
+#: ../../user_guide/kconfig.rst:695 c37a2b090a914ec589f0589a7bcdbd8e
 msgid "Naming Conventions"
 msgstr "命名约定"
 
-#: ../../user_guide/kconfig.rst:697 aa71bc37bb7d4bb5ad72991933cfd381
+#: ../../user_guide/kconfig.rst:697 b76c9db677054158a3d88fc1715f05bd
 msgid "**Platform symbols:**"
 msgstr "**平台符号：**"
 
-#: ../../user_guide/kconfig.rst:699 568baa4bdbcb4bfc9ac61882093c72e5
+#: ../../user_guide/kconfig.rst:699 97e09e7b80204fdfa4b966378e4e2e65
 msgid ""
+"PLATFORM_<NAME>                 # Platform selection\n"
+"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific config"
 msgstr ""
-"PLATFORM_<NAME>                 # 平台选择\n\n"
-"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific config\n"
+"PLATFORM_<NAME>                 # Platform selection\n"
+"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific config"
 
-#: ../../user_guide/kconfig.rst:704 72291c73c2ac4baeb908d4758da7af6c
+#: ../../user_guide/kconfig.rst:704 efcfad687ac944889d7b6e1b4136562a
 msgid "**Peripheral instances:**"
 msgstr "**外设 instances:**"
 
-#: ../../user_guide/kconfig.rst:706 213bd90f25284f28a62a5cd44ff6cbec
+#: ../../user_guide/kconfig.rst:706 2ae3710d2f8a48ba8fa482aa60ab2d05
 msgid ""
+"INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>  # Instance enable\n"
+"<PERIPHERAL><N>_<PARAMETER>           # Instance parameter"
 msgstr ""
+"INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>  # Instance enable\n"
+"<PERIPHERAL><N>_<PARAMETER>           # Instance parameter"
 
-#: ../../user_guide/kconfig.rst:711 85344ff8fd624328b97b9648e7df3c04
+#: ../../user_guide/kconfig.rst:711 4875c6672b094ddaa0d2f92b40887a73
 msgid "**Examples:**"
 msgstr "**示例:**"
 
-#: ../../user_guide/kconfig.rst:713 339c4b91849845fdbb3ed91813a6672c
+#: ../../user_guide/kconfig.rst:713 ecd933abdffc4ddb876060c55c5eeaa4
 msgid ""
+"PLATFORM_STM32\n"
+"STM32_UART_ENABLE\n"
+"INSTANCE_STM32_UART_1\n"
+"UART1_BAUDRATE\n"
+"UART1_MODE_DMA"
 msgstr ""
+"PLATFORM_STM32\n"
+"STM32_UART_ENABLE\n"
+"INSTANCE_STM32_UART_1\n"
+"UART1_BAUDRATE\n"
+"UART1_MODE_DMA"
 
-#: ../../user_guide/kconfig.rst:722 31ce71dfa66e4487849943baecf136f8
+#: ../../user_guide/kconfig.rst:722 3c84d2abd5f54b0abfc8d501f02ea8c2
 msgid "Configuration Organization"
 msgstr "配置组织"
 
-#: ../../user_guide/kconfig.rst:724 a900315bff5a44ec850fceb1b29a8fa5
+#: ../../user_guide/kconfig.rst:724 5794482207614d75ac4429d2a561a398
 msgid "**Use choice for mutually exclusive options**"
 msgstr "使用选择功能来表示互斥选项"
 
-#: ../../user_guide/kconfig.rst:725 f1f985b05c9a42819614a5b20ccb72c7
+#: ../../user_guide/kconfig.rst:725 b343b8ad4744489794fb43642fa3ec09
 msgid "**Use menuconfig for grouped settings**"
 msgstr "使用 menuconfig 进行分组设置"
 
-#: ../../user_guide/kconfig.rst:726 c52a8e8570b748cab7b53de223bd7dec
+#: ../../user_guide/kconfig.rst:726 7fa2ff3c7e384acfa233eb782d02f63c
 msgid "**Provide sensible defaults**"
 msgstr "提供合理的默认值"
 
-#: ../../user_guide/kconfig.rst:727 72d4008f8da846cbb5b0af079ad6caf8
+#: ../../user_guide/kconfig.rst:727 9b67002d357548f9aade7ce07a13a1e8
 msgid "**Add help text for all options**"
 msgstr "为所有选项添加帮助文本"
 
-#: ../../user_guide/kconfig.rst:728 7a22e23f13d649ce9468a22a540cbe66
+#: ../../user_guide/kconfig.rst:728 d1ec9db6976d4e6e87e1e9dab80fb6fc
 msgid "**Use range constraints for integers**"
 msgstr "**对整数使用范围约束**"
 
-#: ../../user_guide/kconfig.rst:729 261a799e939f408da8e651845a20830e
+#: ../../user_guide/kconfig.rst:729 24fba044c034407796061c3ed9bcd897
 msgid "**Use depends on for conditional options**"
 msgstr "使用依赖于条件选项"
 
-#: ../../user_guide/kconfig.rst:732 e73ff4fa1eb345708d13176598c47f75
+#: ../../user_guide/kconfig.rst:732 56dd568cbae848ff95cd258c9738e190
 msgid "Validation"
 msgstr "验证"
 
-#: ../../user_guide/kconfig.rst:734 3bbc9b7dd306435da3102871bff8320b
+#: ../../user_guide/kconfig.rst:734 24fec67c4edd4cc9bc29ffb1ea5efbb9
 msgid "Always validate configuration before building:"
 msgstr "构建之前务必验证配置"
 
-#: ../../user_guide/kconfig.rst:736 b0ba9df5cfd64009a1910d0c8ef9a43d
+#: ../../user_guide/kconfig.rst:736 f58303c8656b4c669a7cef7ef2d98a13
 msgid ""
+"# Validate syntax\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Check for errors\n"
+"if [ $? -ne 0 ]; then\n"
+"    echo \"Configuration validation failed\"\n"
+"    exit 1\n"
+"fi\n"
+"\n"
+"# Generate header\n"
+"python scripts/kconfig/generate_config.py"
 msgstr ""
+"# Validate syntax\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Check for errors\n"
+"if [ $? -ne 0 ]; then\n"
+"    echo \"Configuration validation failed\"\n"
+"    exit 1\n"
+"fi\n"
+"\n"
+"# Generate header\n"
+"python scripts/kconfig/generate_config.py"
 
-#: ../../user_guide/kconfig.rst:751 4625920bd1c247ab890b49463478c5fd
+#: ../../user_guide/kconfig.rst:751 e2581b4c4aed44fea0468c18c5b4c3cb
 msgid "Documentation"
 msgstr "文档"
 
-#: ../../user_guide/kconfig.rst:753 fb5bb3c5f2df49999e996b1b7f8b93d7
+#: ../../user_guide/kconfig.rst:753 c799a5a506ef4c6aacf7f922d230aa41
 msgid "Document all configuration options:"
 msgstr "记录所有配置选项："
 
-#: ../../user_guide/kconfig.rst:755 499a3fff06e5440f8e230e48d4c1eab3
+#: ../../user_guide/kconfig.rst:755 e50b47deea2141b08c2b636deeda0328
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"      Common values: 9600, 19200, 38400, 57600, 115200\n"
+"\n"
+"      Note: Higher baud rates may require more accurate\n"
+"      clock configuration."
 msgstr ""
 
-#: ../../user_guide/kconfig.rst:768 fc1b221134bd4047b40bdc3e79029ecd
+#: ../../user_guide/kconfig.rst:768 8fb1ed5247944a11bc6db11515756549
 msgid "Troubleshooting"
 msgstr "故障排除"
 
-#: ../../user_guide/kconfig.rst:771 71883d6b40ef418ea42605d06a300495
+#: ../../user_guide/kconfig.rst:771 9caea1dc31164c2ea1943537fe7908a5
 msgid "Common Issues"
 msgstr "常见问题"
 
-#: ../../user_guide/kconfig.rst:773 75a90b553a19481da6ca2ce71d4fdd6f
+#: ../../user_guide/kconfig.rst:773 bfc2399da1fc447e8f913b3ee21cd469
 msgid "**Issue: Configuration not applied**"
-msgstr "**Issue: 配置未应用*"
+msgstr "Issue: 配置未应用*"
 
-#: ../../user_guide/kconfig.rst:775 81a3e496bafa41e19366c37a101d599f
+#: ../../user_guide/kconfig.rst:775 52045bafd6e24d8aa1e012484f5aa6be
 msgid ""
+"# Regenerate configuration header\n"
+"python scripts/kconfig/generate_config.py --config .config\n"
+"\n"
+"# Clean and rebuild\n"
+"rm -rf build\n"
+"cmake -B build\n"
+"cmake --build build"
 msgstr ""
+"# Regenerate configuration header\n"
+"python scripts/kconfig/generate_config.py --config .config\n"
+"\n"
+"# Clean and rebuild\n"
+"rm -rf build\n"
+"cmake -B build\n"
+"cmake --build build"
 
-#: ../../user_guide/kconfig.rst:785 cafca8aebf4c4262a6e0279aee6596a6
+#: ../../user_guide/kconfig.rst:785 ec4e51fbe03440ca8b96831d8f93fcc4
 msgid "**Issue: Validation errors**"
 msgstr "**Issue: 验证错误**"
 
-#: ../../user_guide/kconfig.rst:787 394f456ebb644c84b53846591c780a44
+#: ../../user_guide/kconfig.rst:787 12754e6f0c614a1992739d1b8dff7e8b
 msgid ""
+"# Check validation output\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Fix reported errors in Kconfig files"
 msgstr ""
+"# Check validation output\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Fix reported errors in Kconfig files"
 
-#: ../../user_guide/kconfig.rst:794 a04fae42c49641b085edb9517e48e8cf
+#: ../../user_guide/kconfig.rst:794 8b1723ee380b425cac364cd0eb1383c0
 msgid "**Issue: Missing symbols**"
 msgstr "**Issue: 缺失符号**"
 
-#: ../../user_guide/kconfig.rst:796 c6d94ca4077f4a0f90d022376e2d7a00
+#: ../../user_guide/kconfig.rst:796 f75f619a9ece4872b0bdfaf002c04c02
 msgid ""
+"# Check if symbol is defined\n"
+"grep -r \"config SYMBOL_NAME\" .\n"
+"\n"
+"# Verify .config has the symbol\n"
+"grep \"SYMBOL_NAME\" .config"
 msgstr ""
+"# Check if symbol is defined\n"
+"grep -r \"config SYMBOL_NAME\" .\n"
+"\n"
+"# Verify .config has the symbol\n"
+"grep \"SYMBOL_NAME\" .config"
 
-#: ../../user_guide/kconfig.rst:804 4038298b0914413b82be9bbf1d856d22
+#: ../../user_guide/kconfig.rst:804 f2589b63da7d4108997b58cb92837323
 msgid "**Issue: Default values not working**"
 msgstr "**Issue: 默认值不起作用**"
 
-#: ../../user_guide/kconfig.rst:806 a1ed6a7995ed468285d882ee46bda773
+#: ../../user_guide/kconfig.rst:806 036578d4deb4466d9728756832de207b
 msgid ""
+"# Use platform-specific defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"\n"
+"# Or generate default configuration\n"
+"python scripts/kconfig/generate_config.py --default"
 msgstr ""
+"# Use platform-specific defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"\n"
+"# Or generate default configuration\n"
+"python scripts/kconfig/generate_config.py --default"
 
-#: ../../user_guide/kconfig.rst:815 6191caa746bf43f297472b90a53add66
+#: ../../user_guide/kconfig.rst:815 ac302b78574d41e88bf36bb1250646ae
 msgid "See Also"
 msgstr "参见"
 
-#: ../../user_guide/kconfig.rst:817 672caffab2924736b0a8fbbc8dacb014
+#: ../../user_guide/kconfig.rst:817 5970fd84952c4007b7ec73cbe24487c7
 msgid ":doc:`../development/contributing` - Contributing guidelines"
-msgstr ""
+msgstr ":doc:`../development/contributing` - Contributing guidelines"
 
-#: ../../user_guide/kconfig.rst:818 6be4c51744eb4074a05b2d156628ee99
+#: ../../user_guide/kconfig.rst:818 a6954c6f41df4ab8ad255fadc55f5a64
 msgid ":doc:`porting` - Platform porting guide"
 msgstr ":doc:`porting` - 平台移植指南"
 
-#: ../../user_guide/kconfig.rst:819 c94445d54e874cb0a2b0e8dd6b0ddab7
+#: ../../user_guide/kconfig.rst:819 0982b75e309a4db3a936b8473e3b34aa
 msgid "Configuration Guide: ``docs/configuration_guide.md``"
 msgstr "配置指南: ``docs/configuration_guide.md``"
 
-#: ../../user_guide/kconfig.rst:820 6dc5055166554ec68dc016675b5e9919
+#: ../../user_guide/kconfig.rst:820 24cf6d2ada6b40e38238478fc2d38479
 msgid "Kconfig Writing Guide: ``docs/kconfig_writing_guide.md``"
 msgstr "Kconfig 编写指南"
 
-#: ../../user_guide/kconfig.rst:821 cd25348fd60546c9bca340d5c30cd776
 msgid "Configuration Reference: ``docs/config_reference.md``"
 msgstr "配置参考: ``docs/config_reference.md``"
 
+#~ msgid "源文件存在"
+#~ msgstr ""
+
+#~ msgid "包含生成的头文件"
+#~ msgstr ""
+
+#~ msgid "使用配置值"
+#~ msgstr ""
+
+#~ msgid "自动生成"
+#~ msgstr ""

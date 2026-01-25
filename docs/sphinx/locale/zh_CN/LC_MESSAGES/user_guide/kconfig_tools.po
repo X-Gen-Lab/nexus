@@ -1,0 +1,1734 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../user_guide/kconfig_tools.rst:2 c9a8fceb85b84d5dbfa92f66988aa9f8
+msgid "Kconfig Tools Reference"
+msgstr "Kconfig Tools 参考"
+
+#: ../../user_guide/kconfig_tools.rst:4 e2a18481eac44c479a764a4d3e538c6d
+msgid ""
+"This guide provides detailed documentation for all Kconfig configuration "
+"tools in the Nexus Embedded Platform."
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:8 3688d7f406d4432d9fa0989937a53ac7
+msgid "Table of Contents"
+msgstr "目录"
+
+#: b9b74d4eb0c14f9b8bafcf6c55a388b6
+msgid "Overview"
+msgstr "概述"
+
+#: ../../user_guide/kconfig_tools.rst:13 9c916da281a44e1e9bf721bf00f57b41
+msgid ""
+"The Nexus platform provides several Python-based tools for working with "
+"Kconfig configurations:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:15 c405392de2b7441cb4ee5e321fd31829
+msgid "**generate_config.py**: Generate C header files from .config"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:16 e9fb1c25ebd7472ca38e05c62e360705
+msgid "**validate_kconfig.py**: Validate Kconfig syntax and dependencies"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:17 5f867e58e69d40cfb055b8e4d1afa095
+msgid "**kconfig_migrate.py**: Migrate configurations between versions"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:18 cbfbedd47a164b7e83e5f3895c9b3efa
+msgid "**kconfig_diff.py**: Compare two configurations"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:19 9d5a2a2b5acb41d1805f94462a7ed534
+msgid "**generate_config_docs.py**: Generate configuration documentation"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:21 9291fae6db74489eb926fd1f28cc7f01
+msgid "All tools are located in ``scripts/kconfig/`` directory."
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:25 89e06a4dad854874a203d2841adeccfd
+msgid "generate_config.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:30 8b672874a65840eb93998271bbfb5eeb
+msgid ""
+"Generates C header files from Kconfig ``.config`` files. This is the primary"
+" tool for converting Kconfig configuration to C macros."
+msgstr ""
+
+#: 92d50841e5384b4a93d3717aa5f93360 b02505d3550745f5b42da0a37e9d1d38
+msgid "Usage"
+msgstr "用法"
+
+#: c9a057d2141546b9924b2e631b576eae fd75e81b3d0d468d99d9b4bf5bae57d7
+msgid "**Basic usage:**"
+msgstr "**Basic usage:**"
+
+#: ../../user_guide/kconfig_tools.rst:37 c8a9ccef3ce04019a58e20febee0032f
+msgid "python scripts/kconfig/generate_config.py"
+msgstr "python scripts/kconfig/generate_config.py"
+
+#: ed98e851c0b14a208c93a1aeb973b8e0
+msgid "**With options:**"
+msgstr "**With options:**"
+
+#: ../../user_guide/kconfig_tools.rst:43 b44ac651fee4400fb2e2c827e2433f6e
+msgid ""
+"python scripts/kconfig/generate_config.py \\\n"
+"    --config .config \\\n"
+"    --output nexus_config.h \\\n"
+"    --prefix NX_CONFIG_"
+msgstr ""
+"python scripts/kconfig/generate_config.py \\\n"
+"    --config .config \\\n"
+"    --output nexus_config.h \\\n"
+"    --prefix NX_CONFIG_"
+
+#: 2b99cbfcd85c4a4f888b5b521d3c3752 88581d0023f044e9a68e2c15f807d452
+msgid "Command-Line Options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:53 f95a0dd6927c474db85becfb53031732
+msgid ""
+"--config PATH          Path to .config file (default: .config)\n"
+"--output PATH          Output header file path (default: nexus_config.h)\n"
+"--prefix PREFIX        Macro prefix (default: NX_CONFIG_)\n"
+"--kconfig PATH         Root Kconfig file (default: Kconfig)\n"
+"--default              Generate default configuration\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+msgstr ""
+"--config PATH          Path to .config file (default: .config)\n"
+"--output PATH          Output header file path (default: nexus_config.h)\n"
+"--prefix PREFIX        Macro prefix (default: NX_CONFIG_)\n"
+"--kconfig PATH         Root Kconfig file (default: Kconfig)\n"
+"--default              Generate default configuration\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+
+#: 6c6c399f40874fe8acd557674c6ad1f9 f65233724d1747e8b53aad6e87675738
+msgid "Examples"
+msgstr "示例"
+
+#: ../../user_guide/kconfig_tools.rst:66 329e2651f83040b6894323c56d04b1ba
+msgid "**Generate from .config:**"
+msgstr "**Generate from .config:**"
+
+#: 417f38f8adf54f2591a9f6a05eb2f73b 4687ebc18af141b8a4a44bfc870e2a2c
+msgid "python scripts/kconfig/generate_config.py --config .config"
+msgstr "python scripts/kconfig/generate_config.py --config .config"
+
+#: ../../user_guide/kconfig_tools.rst:72 6bb7e616be474c0fbac930d6f54363ef
+msgid "**Generate default configuration:**"
+msgstr "**Generate default configuration:**"
+
+#: ../../user_guide/kconfig_tools.rst:74 6ad3c81b67f84231956c3f59c608606d
+msgid "python scripts/kconfig/generate_config.py --default"
+msgstr "python scripts/kconfig/generate_config.py --default"
+
+#: ../../user_guide/kconfig_tools.rst:78 c2c62e3d20084c439663a7d12701bc13
+msgid "**Custom output file:**"
+msgstr "**Custom output file:**"
+
+#: ../../user_guide/kconfig_tools.rst:80 02fa697d2d704bac8b7b36988108b966
+msgid ""
+"python scripts/kconfig/generate_config.py \\\n"
+"    --config platforms/native/defconfig \\\n"
+"    --output build/native_config.h"
+msgstr ""
+"python scripts/kconfig/generate_config.py \\\n"
+"    --config platforms/native/defconfig \\\n"
+"    --output build/native_config.h"
+
+#: ../../user_guide/kconfig_tools.rst:86 6ea2ebb41c8b47e0957396bcbbf92a5d
+msgid "**Custom prefix:**"
+msgstr "**Custom prefix:**"
+
+#: ../../user_guide/kconfig_tools.rst:88 854e13cb66f1465aa9c1144308c56a92
+msgid ""
+"python scripts/kconfig/generate_config.py \\\n"
+"    --prefix MY_CONFIG_"
+msgstr ""
+"python scripts/kconfig/generate_config.py \\\n"
+"    --prefix MY_CONFIG_"
+
+#: cc8eb262d3ac4641a37069154ef60afa
+msgid "Output Format"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:96 b683f5cf62584e1b8203636e6071434a
+msgid "**Input (.config):**"
+msgstr "**Input (.config):**"
+
+#: ../../user_guide/kconfig_tools.rst:98 9daf53555d114b18b0929a7506224c24
+msgid ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_OSAL_FREERTOS=y"
+msgstr ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_OSAL_FREERTOS=y"
+
+#: ../../user_guide/kconfig_tools.rst:105 a7effbff273c4e1eba142bdb8741645d
+msgid "**Output (nexus_config.h):**"
+msgstr "**Output (nexus_config.h):**"
+
+#: ../../user_guide/kconfig_tools.rst:107 3fdb24a23e044f7198d3c8ace67c9824
+msgid ""
+"#ifndef NEXUS_CONFIG_H\n"
+"#define NEXUS_CONFIG_H\n"
+"\n"
+"#define NX_CONFIG_PLATFORM_STM32 1\n"
+"#define NX_CONFIG_STM32F407 1\n"
+"#define NX_CONFIG_UART1_BAUDRATE 115200\n"
+"#define NX_CONFIG_OSAL_FREERTOS 1\n"
+"\n"
+"#endif /* NEXUS_CONFIG_H */"
+msgstr ""
+"#ifndef NEXUS_CONFIG_H\n"
+"#define NEXUS_CONFIG_H\n"
+"\n"
+"#define NX_CONFIG_PLATFORM_STM32 1\n"
+"#define NX_CONFIG_STM32F407 1\n"
+"#define NX_CONFIG_UART1_BAUDRATE 115200\n"
+"#define NX_CONFIG_OSAL_FREERTOS 1\n"
+"\n"
+"#endif /* NEXUS_CONFIG_H */"
+
+#: ../../user_guide/kconfig_tools.rst:120 a025a59f4eaf4d14935848c42ee4ce07
+msgid "Type Conversion"
+msgstr "类型 Conversion"
+
+#: ../../user_guide/kconfig_tools.rst:122 e9052a91f49b4b7f93a04c074a70096a
+msgid "**Boolean values:**"
+msgstr "**Boolean values:**"
+
+#: ../../user_guide/kconfig_tools.rst:124 4c37a6079b794eb7869b692b10015ea9
+msgid ""
+"CONFIG_UART_ENABLE=y    # -> #define NX_CONFIG_UART_ENABLE 1\n"
+"CONFIG_ADC_ENABLE=n     # -> /* #undef NX_CONFIG_ADC_ENABLE */"
+msgstr ""
+"CONFIG_UART_ENABLE=y    # -> #define NX_CONFIG_UART_ENABLE 1\n"
+"CONFIG_ADC_ENABLE=n     # -> /* #undef NX_CONFIG_ADC_ENABLE */"
+
+#: ../../user_guide/kconfig_tools.rst:129 d62073ddaae94570b7b03458803c983f
+msgid "**Integer values:**"
+msgstr "**Integer values:**"
+
+#: ../../user_guide/kconfig_tools.rst:131 3529f58780bd43b9bc1cb3815e68c5c3
+msgid ""
+"CONFIG_UART1_BAUDRATE=115200  # -> #define NX_CONFIG_UART1_BAUDRATE 115200"
+msgstr ""
+"CONFIG_UART1_BAUDRATE=115200  # -> #define NX_CONFIG_UART1_BAUDRATE 115200"
+
+#: ../../user_guide/kconfig_tools.rst:135 690e45fa36f24643877da7a1d2b2c155
+msgid "**Hexadecimal values:**"
+msgstr "**Hexadecimal values:**"
+
+#: ../../user_guide/kconfig_tools.rst:137 935e2d8abb9d46a7b0256899591cb3cc
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000  # -> #define NX_CONFIG_LINKER_RAM_START "
+"0x20000000"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000  # -> #define NX_CONFIG_LINKER_RAM_START "
+"0x20000000"
+
+#: ../../user_guide/kconfig_tools.rst:141 21f498ea23c049bbb8142f9a87157d74
+msgid "**String values:**"
+msgstr "**String values:**"
+
+#: ../../user_guide/kconfig_tools.rst:143 5b766630b87f4ab5991ae2550e9c7547
+msgid "CONFIG_PLATFORM_NAME=\"stm32\"  # -> #define NX_CONFIG_PLATFORM_NAME \"stm32\""
+msgstr ""
+"CONFIG_PLATFORM_NAME=\"stm32\"  # -> #define NX_CONFIG_PLATFORM_NAME "
+"\"stm32\""
+
+#: ../../user_guide/kconfig_tools.rst:148 0538c8d5235b468a9395ddb228d953b8
+msgid "Integration with Build System"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:150 a03d2aac20c64f4e8b920bb114374ec4
+msgid "**CMake integration:**"
+msgstr "**CMake integration:**"
+
+#: ../../user_guide/kconfig_tools.rst:152 b9d3ec9c4c774787b71f0f581eeb2e23
+msgid ""
+"# Generate configuration header\n"
+"execute_process(\n"
+"    COMMAND ${Python3_EXECUTABLE}\n"
+"            ${CMAKE_SOURCE_DIR}/scripts/kconfig/generate_config.py\n"
+"            --config ${CMAKE_SOURCE_DIR}/.config\n"
+"            --output ${CMAKE_SOURCE_DIR}/nexus_config.h\n"
+"    RESULT_VARIABLE RESULT\n"
+")\n"
+"\n"
+"if(NOT RESULT EQUAL 0)\n"
+"    message(FATAL_ERROR \"Failed to generate configuration\")\n"
+"endif()"
+msgstr ""
+"# Generate configuration header\n"
+"execute_process(\n"
+"    COMMAND ${Python3_EXECUTABLE}\n"
+"            ${CMAKE_SOURCE_DIR}/scripts/kconfig/generate_config.py\n"
+"            --config ${CMAKE_SOURCE_DIR}/.config\n"
+"            --output ${CMAKE_SOURCE_DIR}/nexus_config.h\n"
+"    RESULT_VARIABLE RESULT\n"
+")\n"
+"\n"
+"if(NOT RESULT EQUAL 0)\n"
+"    message(FATAL_ERROR \"Failed to generate configuration\")\n"
+"endif()"
+
+#: ../../user_guide/kconfig_tools.rst:167 edeba1bc79c8440199b9fe7bf6c12d90
+msgid "**Make integration:**"
+msgstr "**Make integration:**"
+
+#: ../../user_guide/kconfig_tools.rst:169 b0430db54a894471b6cc8f1fcefc5e20
+msgid ""
+"nexus_config.h: .config\n"
+"    python scripts/kconfig/generate_config.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:175 3519306cb4614deba191b438809b7c3f
+msgid "Error Handling"
+msgstr "错误处理"
+
+#: ../../user_guide/kconfig_tools.rst:177 0b20d16e1f0c4111923d35410afadac3
+msgid "**Missing .config file:**"
+msgstr "**Missing .config file:**"
+
+#: ../../user_guide/kconfig_tools.rst:179 3400102a90a6427e9af504c61e36614a
+msgid ""
+"Error: Configuration file '.config' not found\n"
+"Use --default to generate default configuration"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:184 4df8607733d34976ae77575b35c3f27c
+msgid "**Invalid Kconfig syntax:**"
+msgstr "**Invalid Kconfig syntax:**"
+
+#: ../../user_guide/kconfig_tools.rst:186 d1c6fb5e16e14e90a3f66e9b37f2d4e6
+msgid ""
+"Error: Invalid Kconfig syntax in platforms/stm32/Kconfig:42\n"
+"Unexpected token: 'endmenu'"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:191 e41a9948c11c4fff9c82f2cc05e7d66e
+msgid "**Circular dependency:**"
+msgstr "**Circular dependency:**"
+
+#: ../../user_guide/kconfig_tools.rst:193 14dbaef718d841b8bab4550b2df43cc4
+msgid ""
+"Error: Circular dependency detected:\n"
+"CONFIG_A depends on CONFIG_B\n"
+"CONFIG_B depends on CONFIG_A"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:201 ceeacd0d04164a08b52c9178515bbe6d
+msgid "validate_kconfig.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:206 39fd6880e8da46c8a7e686de8d0e0d1e
+msgid ""
+"Validates Kconfig files for syntax errors, dependency issues, and structural"
+" problems."
+msgstr ""
+
+#: 36ad4a1c4a9442988c282c7791c86c68 a9883d7271a14afea878e645f3414cb4
+msgid "python scripts/kconfig/validate_kconfig.py Kconfig"
+msgstr "python scripts/kconfig/validate_kconfig.py Kconfig"
+
+#: ../../user_guide/kconfig_tools.rst:219 fdcab89c6d11462a9c6157564180dfaa
+msgid ""
+"python scripts/kconfig/validate_kconfig.py Kconfig \\\n"
+"    --check-deps \\\n"
+"    --check-values \\\n"
+"    --config .config"
+msgstr ""
+"python scripts/kconfig/validate_kconfig.py Kconfig \\\n"
+"    --check-deps \\\n"
+"    --check-values \\\n"
+"    --config .config"
+
+#: ../../user_guide/kconfig_tools.rst:229 393bee2a81704ab3b3f8138454fa7267
+msgid ""
+"KCONFIG_FILE           Root Kconfig file to validate\n"
+"--check-deps           Check for dependency issues\n"
+"--check-values         Validate configuration values\n"
+"--config PATH          Configuration file to validate\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:241 a77f3d55298744bb9b8734e5d7fc43ff
+msgid "**Validate Kconfig syntax:**"
+msgstr "**Validate Kconfig syntax:**"
+
+#: ../../user_guide/kconfig_tools.rst:247 df6472f2cb1e4c7a8a0fa2124ef37621
+msgid "**Check dependencies:**"
+msgstr "**Check dependencies:**"
+
+#: ../../user_guide/kconfig_tools.rst:249 f53b697eb390490dbf0bb66fc31db6bc
+msgid "python scripts/kconfig/validate_kconfig.py Kconfig --check-deps"
+msgstr "python scripts/kconfig/validate_kconfig.py Kconfig --check-deps"
+
+#: ../../user_guide/kconfig_tools.rst:253 e2d53c982ef5495cbebc6bbd56d205b2
+msgid "**Validate configuration values:**"
+msgstr "**Validate configuration values:**"
+
+#: ../../user_guide/kconfig_tools.rst:255 4f43f772b86e4a2f911209ca3b3e3b1d
+msgid ""
+"python scripts/kconfig/validate_kconfig.py Kconfig \\\n"
+"    --check-values \\\n"
+"    --config .config"
+msgstr ""
+"python scripts/kconfig/validate_kconfig.py Kconfig \\\n"
+"    --check-values \\\n"
+"    --config .config"
+
+#: ../../user_guide/kconfig_tools.rst:261 bc24d8fc10dd4c51bc77c60282868ee8
+msgid "**Validate specific file:**"
+msgstr "**Validate specific file:**"
+
+#: ../../user_guide/kconfig_tools.rst:263 5f5cd322d13f4ee3853b2e81367779c0
+msgid "python scripts/kconfig/validate_kconfig.py platforms/stm32/Kconfig"
+msgstr "python scripts/kconfig/validate_kconfig.py platforms/stm32/Kconfig"
+
+#: ../../user_guide/kconfig_tools.rst:268 207569d96d624ab183405ea65690da33
+msgid "Validation Checks"
+msgstr "验证 Checks"
+
+#: ../../user_guide/kconfig_tools.rst:270 ff9a53c09ea8464d8821aebf5dc66462
+msgid "**Syntax validation:**"
+msgstr "**Syntax validation:**"
+
+#: ../../user_guide/kconfig_tools.rst:272 a0a699e534244805a8bf9211673bb05f
+msgid "Block structure (if/endif, menu/endmenu, choice/endchoice)"
+msgstr "Block structure (if/endif, menu/endmenu, choice/endchoice)"
+
+#: ../../user_guide/kconfig_tools.rst:273 9dd5feae055d4960aa2cd907e7eeab9f
+msgid "Keyword spelling"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:274 22ee857965974088ac64affa3afe4c77
+msgid "Indentation consistency"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:275 7872eba1ea9f4390834a46f3438eec79
+msgid "Comment syntax"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:277 8505b9f4e22b4beb84178f84115d88d1
+msgid "**Dependency validation:**"
+msgstr "**Dependency validation:**"
+
+#: ../../user_guide/kconfig_tools.rst:279 17a10ebbed1f4b1cae8ded15f6b111a2
+msgid "Circular dependencies"
+msgstr "循环依赖"
+
+#: ../../user_guide/kconfig_tools.rst:280 d5b4187ed4ca42e2a9d05512795f15e3
+msgid "Undefined symbol references"
+msgstr "未定义的符号引用"
+
+#: ../../user_guide/kconfig_tools.rst:281 dd173621547d41ada171f226dab34775
+msgid "Unsatisfiable dependencies"
+msgstr "无法满足的依赖"
+
+#: ../../user_guide/kconfig_tools.rst:282 b07d5e9db27d43a1bf46bebc48103905
+msgid "Missing dependencies"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:284 e30894f8fa25480da51595a3e78b00ae
+msgid "**Value validation:**"
+msgstr "**Value validation:**"
+
+#: ../../user_guide/kconfig_tools.rst:286 eb9dd284a5bf48f3aa98ec6ccd1b6162
+msgid "Range constraint violations"
+msgstr "范围 constraint violations"
+
+#: ../../user_guide/kconfig_tools.rst:287 3a8d34bf9d6c4c3eac98f79a60715647
+msgid "Invalid type values"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:288 71e9fc95119a465b8381aac2a3e546d4
+msgid "Missing required symbols"
+msgstr "缺少必需的符号"
+
+#: ../../user_guide/kconfig_tools.rst:289 885c52f0428c4eeda52355993bb3d687
+msgid "Conflicting values"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:291 3769e293a74d44f98c6c3f3464aebd11
+msgid "**Structural validation:**"
+msgstr "**Structural validation:**"
+
+#: ../../user_guide/kconfig_tools.rst:293 08ac7c1848974ddfaf093738f4599525
+msgid "Source file existence"
+msgstr "源文件存在性"
+
+#: ../../user_guide/kconfig_tools.rst:294 db9469c29d8c4352983ac623c4cd9d75
+msgid "Duplicate symbol definitions"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:295 2a99c09f4c794ea38044f9cffebf2080
+msgid "Orphaned symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:296 9a88a52470364b5f97ffdf65c97a8809
+msgid "Unused symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:301 445a765888874c3b9cb9eea75dc638a9
+msgid "**Success:**"
+msgstr "**Success:**"
+
+#: ../../user_guide/kconfig_tools.rst:303 06b351d7b394423490c4a9cadff81c45
+msgid ""
+"Validating Kconfig...\n"
+"✓ Syntax validation passed\n"
+"✓ Dependency validation passed\n"
+"✓ Value validation passed\n"
+"\n"
+"Validation completed successfully"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:312 bd36dd12298a4ca9a8cf87ce785fa746
+msgid "**Errors:**"
+msgstr "**Errors:**"
+
+#: ../../user_guide/kconfig_tools.rst:314 c2df3ca2c7cb4da585b49cd35d1a8085
+msgid ""
+"Validating Kconfig...\n"
+"✗ Syntax errors found:\n"
+"  platforms/stm32/Kconfig:42: Unexpected 'endmenu' without matching 'menu'\n"
+"  platforms/stm32/Kconfig:58: Missing 'endif' for 'if' at line 45\n"
+"\n"
+"✗ Dependency errors found:\n"
+"  CONFIG_UART1_DMA_ENABLE depends on undefined symbol CONFIG_DMA_ENABLE\n"
+"  Circular dependency: CONFIG_A -> CONFIG_B -> CONFIG_A\n"
+"\n"
+"✗ Value errors found:\n"
+"  CONFIG_UART1_BAUDRATE=1000000 violates range [9600, 921600]\n"
+"  CONFIG_PLATFORM_STM32 and CONFIG_PLATFORM_GD32 cannot both be set\n"
+"\n"
+"Validation failed with 6 errors"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:332 8879cc16ccfa401ebcc869a55b97a311
+msgid "Integration with CI/CD"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:334 12d5ce5b4697422d8027736eb7a88b19
+msgid "**GitHub Actions:**"
+msgstr "**GitHub Actions:**"
+
+#: ../../user_guide/kconfig_tools.rst:336 69ab5bbe3396405ea7242408cd0fb6d8
+msgid ""
+"- name: Validate Kconfig\n"
+"  run: |\n"
+"    python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"    if [ $? -ne 0 ]; then\n"
+"      echo \"Kconfig validation failed\"\n"
+"      exit 1\n"
+"    fi"
+msgstr ""
+"- name: Validate Kconfig\n"
+"  run: |\n"
+"    python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"    if [ $? -ne 0 ]; then\n"
+"      echo \"Kconfig validation failed\"\n"
+"      exit 1\n"
+"    fi"
+
+#: ../../user_guide/kconfig_tools.rst:346 e963cf0378f34069b1acd462c98bd3ec
+msgid "**Pre-commit hook:**"
+msgstr "**Pre-commit hook:**"
+
+#: ../../user_guide/kconfig_tools.rst:348 719cb6d44b2a453cbc38b6ed5be40faf
+msgid ""
+"#!/bin/bash\n"
+"# .git/hooks/pre-commit\n"
+"\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"if [ $? -ne 0 ]; then\n"
+"    echo \"Kconfig validation failed. Commit aborted.\"\n"
+"    exit 1\n"
+"fi"
+msgstr ""
+"#!/bin/bash\n"
+"# .git/hooks/pre-commit\n"
+"\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"if [ $? -ne 0 ]; then\n"
+"    echo \"Kconfig validation failed. Commit aborted.\"\n"
+"    exit 1\n"
+"fi"
+
+#: ../../user_guide/kconfig_tools.rst:361 b78fb846ee3048ff9e0f6817f57fec36
+msgid "kconfig_migrate.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:366 3ff3d2a96c0840cfbdb54c29edaef1ee
+msgid ""
+"Migrates configuration files between different versions of the Nexus "
+"platform."
+msgstr ""
+
+#: cea49df02ce5446089feed13ce82e088
+msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --version 2.0"
+msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --version 2.0"
+
+#: ../../user_guide/kconfig_tools.rst:380 08c2474a67504fcf83b1acd464e4ee24
+msgid "**With migration rules:**"
+msgstr "**With migration rules:**"
+
+#: ../../user_guide/kconfig_tools.rst:382 87429e6ad2f44da1a5b780662d603e2a
+msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --rules migration_rules.py"
+msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input old.config \\\n"
+"    --output new.config \\\n"
+"    --rules migration_rules.py"
+
+#: ../../user_guide/kconfig_tools.rst:392 4a7818a32beb41c5908f092acf03d6ed
+msgid ""
+"--input PATH           Input configuration file\n"
+"--output PATH          Output configuration file\n"
+"--version VERSION      Target version\n"
+"--rules PATH           Migration rules file\n"
+"--dry-run              Show changes without writing\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:405 e0194093feed46daaaa3053725e7f01c
+msgid "**Migrate to version 2.0:**"
+msgstr "**Migrate to version 2.0:**"
+
+#: ../../user_guide/kconfig_tools.rst:407 b2b41350b7bb4ee9bcc94175264cae2b
+msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input .config \\\n"
+"    --output .config.new \\\n"
+"    --version 2.0"
+msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input .config \\\n"
+"    --output .config.new \\\n"
+"    --version 2.0"
+
+#: ../../user_guide/kconfig_tools.rst:414 a518c09554c249009c325f5a37288c83
+msgid "**Dry run (preview changes):**"
+msgstr "**Dry run (preview changes):**"
+
+#: ../../user_guide/kconfig_tools.rst:416 02863478efcf48f7bf3ae27eabf3d976
+msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input .config \\\n"
+"    --output .config.new \\\n"
+"    --version 2.0 \\\n"
+"    --dry-run"
+msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input .config \\\n"
+"    --output .config.new \\\n"
+"    --version 2.0 \\\n"
+"    --dry-run"
+
+#: ../../user_guide/kconfig_tools.rst:424 71ab7ac5445f43c296ec28b15ebb82a5
+msgid "**Custom migration rules:**"
+msgstr "**Custom migration rules:**"
+
+#: ../../user_guide/kconfig_tools.rst:426 cba5f83a4fc14afd8decf6383c6029f9
+msgid ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input .config \\\n"
+"    --output .config.new \\\n"
+"    --rules custom_rules.py"
+msgstr ""
+"python scripts/kconfig/kconfig_migrate.py \\\n"
+"    --input .config \\\n"
+"    --output .config.new \\\n"
+"    --rules custom_rules.py"
+
+#: ../../user_guide/kconfig_tools.rst:434 a128b635d3964d00a8f84456a875ca1d
+msgid "Migration Rules"
+msgstr "迁移 Rules"
+
+#: ../../user_guide/kconfig_tools.rst:436 2e083f9453d345c884cebf4abf367f9a
+msgid "**Symbol renaming:**"
+msgstr "**Symbol renaming:**"
+
+#: ../../user_guide/kconfig_tools.rst:438 1256fe54a0284951b187b58c7b432c05
+msgid ""
+"# migration_rules.py\n"
+"SYMBOL_RENAMES = {\n"
+"    'OLD_UART_ENABLE': 'STM32_UART_ENABLE',\n"
+"    'OLD_BAUDRATE': 'UART1_BAUDRATE',\n"
+"    'OLD_GPIO_ENABLE': 'NATIVE_GPIO_ENABLE',\n"
+"}"
+msgstr ""
+"# migration_rules.py\n"
+"SYMBOL_RENAMES = {\n"
+"    'OLD_UART_ENABLE': 'STM32_UART_ENABLE',\n"
+"    'OLD_BAUDRATE': 'UART1_BAUDRATE',\n"
+"    'OLD_GPIO_ENABLE': 'NATIVE_GPIO_ENABLE',\n"
+"}"
+
+#: ../../user_guide/kconfig_tools.rst:447 9ede7fdc10ce4e13a44136f7c7f461e9
+msgid "**Symbol removal:**"
+msgstr "**Symbol removal:**"
+
+#: ../../user_guide/kconfig_tools.rst:449 5b87fa38bbf542afb7077ebe30325122
+msgid ""
+"DEPRECATED_SYMBOLS = [\n"
+"    'OLD_FEATURE_ENABLE',\n"
+"    'LEGACY_MODE',\n"
+"]"
+msgstr ""
+"DEPRECATED_SYMBOLS = [\n"
+"    'OLD_FEATURE_ENABLE',\n"
+"    'LEGACY_MODE',\n"
+"]"
+
+#: ../../user_guide/kconfig_tools.rst:456 922226c3295e48fe8ee34ce794ca94bc
+msgid "**Value transformation:**"
+msgstr "**Value transformation:**"
+
+#: ../../user_guide/kconfig_tools.rst:458 a13d106f51b149c887dffef904cced98
+msgid ""
+"VALUE_TRANSFORMS = {\n"
+"    'UART1_MODE': {\n"
+"        0: 'UART1_MODE_POLLING',\n"
+"        1: 'UART1_MODE_INTERRUPT',\n"
+"        2: 'UART1_MODE_DMA',\n"
+"    }\n"
+"}"
+msgstr ""
+"VALUE_TRANSFORMS = {\n"
+"    'UART1_MODE': {\n"
+"        0: 'UART1_MODE_POLLING',\n"
+"        1: 'UART1_MODE_INTERRUPT',\n"
+"        2: 'UART1_MODE_DMA',\n"
+"    }\n"
+"}"
+
+#: ../../user_guide/kconfig_tools.rst:468 d726917e87504bf28e8a97ac73075396
+msgid "**Default values:**"
+msgstr "**Default values:**"
+
+#: ../../user_guide/kconfig_tools.rst:470 b33a292f0cb04552a5afcc952e1da015
+msgid ""
+"NEW_DEFAULTS = {\n"
+"    'NEW_FEATURE_ENABLE': 'y',\n"
+"    'NEW_BUFFER_SIZE': '256',\n"
+"}"
+msgstr ""
+"NEW_DEFAULTS = {\n"
+"    'NEW_FEATURE_ENABLE': 'y',\n"
+"    'NEW_BUFFER_SIZE': '256',\n"
+"}"
+
+#: ../../user_guide/kconfig_tools.rst:480 00e9f6a9c73243219ca258a646cc666f
+msgid "**Migration log:**"
+msgstr "**Migration log:**"
+
+#: ../../user_guide/kconfig_tools.rst:482 faa05ba30326427b81cf1418ab74f9a0
+msgid ""
+"Migrating configuration from v1.0 to v2.0...\n"
+"\n"
+"Renamed symbols:\n"
+"  OLD_UART_ENABLE -> STM32_UART_ENABLE\n"
+"  OLD_BAUDRATE -> UART1_BAUDRATE\n"
+"\n"
+"Removed deprecated symbols:\n"
+"  OLD_FEATURE_ENABLE\n"
+"  LEGACY_MODE\n"
+"\n"
+"Added new symbols with defaults:\n"
+"  NEW_FEATURE_ENABLE=y\n"
+"  NEW_BUFFER_SIZE=256\n"
+"\n"
+"Transformed values:\n"
+"  UART1_MODE: 2 -> UART1_MODE_DMA\n"
+"\n"
+"Migration completed successfully\n"
+"Backup saved to: .config.backup"
+msgstr ""
+"Migrating configuration from v1.0 to v2.0...\n"
+"\n"
+"Renamed symbols:\n"
+"  OLD_UART_ENABLE -> STM32_UART_ENABLE\n"
+"  OLD_BAUDRATE -> UART1_BAUDRATE\n"
+"\n"
+"Removed deprecated symbols:\n"
+"  OLD_FEATURE_ENABLE\n"
+"  LEGACY_MODE\n"
+"\n"
+"Added new symbols with defaults:\n"
+"  NEW_FEATURE_ENABLE=y\n"
+"  NEW_BUFFER_SIZE=256\n"
+"\n"
+"Transformed values:\n"
+"  UART1_MODE: 2 -> UART1_MODE_DMA\n"
+"\n"
+"Migration completed successfully\n"
+"Backup saved to: .config.backup"
+
+#: ../../user_guide/kconfig_tools.rst:504 a8ad777a162545b89999bd2ebc4487c9
+msgid "**Dry run output:**"
+msgstr "**Dry run output:**"
+
+#: ../../user_guide/kconfig_tools.rst:506 4a22510251d546cea1bd4c1b73184ea0
+msgid ""
+"[DRY RUN] Would rename:\n"
+"  OLD_UART_ENABLE -> STM32_UART_ENABLE\n"
+"\n"
+"[DRY RUN] Would remove:\n"
+"  OLD_FEATURE_ENABLE\n"
+"\n"
+"[DRY RUN] Would add:\n"
+"  NEW_FEATURE_ENABLE=y\n"
+"\n"
+"No changes written (dry run mode)"
+msgstr ""
+"[DRY RUN] Would rename:\n"
+"  OLD_UART_ENABLE -> STM32_UART_ENABLE\n"
+"\n"
+"[DRY RUN] Would remove:\n"
+"  OLD_FEATURE_ENABLE\n"
+"\n"
+"[DRY RUN] Would add:\n"
+"  NEW_FEATURE_ENABLE=y\n"
+"\n"
+"No changes written (dry run mode)"
+
+#: b7576b3c38b845038706bbe464168fd1
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../user_guide/kconfig_tools.rst:522 8a08dbc71c2c4580b9ae19077d8836d0
+msgid "Always backup configuration before migration"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:523 648bed703e0b4011983140d87e2898f3
+msgid "Use dry-run to preview changes"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:524 c15d2758824f470eb6a4ce96f7119d16
+msgid "Test migrated configuration"
+msgstr "测试 migrated configuration"
+
+#: ../../user_guide/kconfig_tools.rst:525 7a4a347327f749aabc2eca41e9c6baca
+msgid "Validate after migration"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:526 5d9a483f725143f581ce4b1c21bc0e36
+msgid "Document migration rules"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:530 cff31a42b2c5499990c2204afcf36fe3
+msgid "kconfig_diff.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:535 de54079b19374470abdbf5a0210d5e1d
+msgid "Compares two configuration files and shows differences."
+msgstr ""
+
+#: 896caaf96fd04e9888efc25e0f03a1b2
+msgid "python scripts/kconfig/kconfig_diff.py old.config new.config"
+msgstr "python scripts/kconfig/kconfig_diff.py old.config new.config"
+
+#: 71b88515190149f2ba2a8fdded75af13
+msgid ""
+"python scripts/kconfig/kconfig_diff.py old.config new.config \\\n"
+"    --format json \\\n"
+"    --output diff.json"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py old.config new.config \\\n"
+"    --format json \\\n"
+"    --output diff.json"
+
+#: ../../user_guide/kconfig_tools.rst:557 ef801a2e3ecd4548a20f25baafa56cc7
+msgid ""
+"CONFIG1                First configuration file\n"
+"CONFIG2                Second configuration file\n"
+"--format FORMAT        Output format (text, json, html)\n"
+"--output PATH          Output file path\n"
+"--ignore-comments      Ignore comment differences\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+msgstr ""
+"CONFIG1                First configuration file\n"
+"CONFIG2                Second configuration file\n"
+"--format FORMAT        Output format (text, json, html)\n"
+"--output PATH          Output file path\n"
+"--ignore-comments      Ignore comment differences\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+
+#: ../../user_guide/kconfig_tools.rst:570 da30db4275da44478ac94d624a10e933
+msgid "**Text format (default):**"
+msgstr "**Text format (default):**"
+
+#: ../../user_guide/kconfig_tools.rst:572 d3c220d3ffa34ac3b24f7f99792a05f9
+msgid ""
+"python scripts/kconfig/kconfig_diff.py .config platforms/native/defconfig"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py .config platforms/native/defconfig"
+
+#: e967e14e05254ed58f4b0808fab6a048
+msgid "**JSON format:**"
+msgstr "**JSON format:**"
+
+#: 3e3060ec846b40c78eb3e6368dca05a9 6e006b196663460285420bcc904e165b
+msgid "**HTML format:**"
+msgstr "**HTML format:**"
+
+#: ../../user_guide/kconfig_tools.rst:586 b035b94a82f94d0d98fa2798eebb06f1
+msgid ""
+"python scripts/kconfig/kconfig_diff.py old.config new.config \\\n"
+"    --format html \\\n"
+"    --output diff.html"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py old.config new.config \\\n"
+"    --format html \\\n"
+"    --output diff.html"
+
+#: ../../user_guide/kconfig_tools.rst:592 8d4b8993a02e49fea57e543e9b98c56b
+msgid "**Ignore comments:**"
+msgstr "**Ignore comments:**"
+
+#: ../../user_guide/kconfig_tools.rst:594 6f6146e95465492e8f16eed9ce501cd7
+msgid ""
+"python scripts/kconfig/kconfig_diff.py old.config new.config \\\n"
+"    --ignore-comments"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py old.config new.config \\\n"
+"    --ignore-comments"
+
+#: ../../user_guide/kconfig_tools.rst:600 909b844f6d7e466bbee2163cb7f698e8
+msgid "Output Formats"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:602 50fc2c1e50f344d080498045873788e1
+msgid "**Text format:**"
+msgstr "**Text format:**"
+
+#: ../../user_guide/kconfig_tools.rst:604 1ece4746938d455293fc715159d09a8c
+msgid ""
+"Configuration Diff: old.config vs new.config\n"
+"\n"
+"Added symbols (3):\n"
+"  + CONFIG_NEW_FEATURE=y\n"
+"  + CONFIG_NEW_BUFFER_SIZE=256\n"
+"  + CONFIG_NEW_MODE=2\n"
+"\n"
+"Removed symbols (2):\n"
+"  - CONFIG_OLD_FEATURE=y\n"
+"  - CONFIG_LEGACY_MODE=1\n"
+"\n"
+"Changed symbols (4):\n"
+"  ~ CONFIG_UART1_BAUDRATE: 9600 -> 115200\n"
+"  ~ CONFIG_HEAP_SIZE: 16384 -> 32768\n"
+"  ~ CONFIG_PLATFORM_NAME: \"native\" -> \"stm32\"\n"
+"  ~ CONFIG_OSAL_BACKEND: BAREMETAL -> FREERTOS\n"
+"\n"
+"Unchanged symbols: 42\n"
+"\n"
+"Summary:\n"
+"  Total symbols in old.config: 47\n"
+"  Total symbols in new.config: 48\n"
+"  Added: 3\n"
+"  Removed: 2\n"
+"  Changed: 4\n"
+"  Unchanged: 42"
+msgstr ""
+"Configuration Diff: old.config vs new.config\n"
+"\n"
+"Added symbols (3):\n"
+"  + CONFIG_NEW_FEATURE=y\n"
+"  + CONFIG_NEW_BUFFER_SIZE=256\n"
+"  + CONFIG_NEW_MODE=2\n"
+"\n"
+"Removed symbols (2):\n"
+"  - CONFIG_OLD_FEATURE=y\n"
+"  - CONFIG_LEGACY_MODE=1\n"
+"\n"
+"Changed symbols (4):\n"
+"  ~ CONFIG_UART1_BAUDRATE: 9600 -> 115200\n"
+"  ~ CONFIG_HEAP_SIZE: 16384 -> 32768\n"
+"  ~ CONFIG_PLATFORM_NAME: \"native\" -> \"stm32\"\n"
+"  ~ CONFIG_OSAL_BACKEND: BAREMETAL -> FREERTOS\n"
+"\n"
+"Unchanged symbols: 42\n"
+"\n"
+"Summary:\n"
+"  Total symbols in old.config: 47\n"
+"  Total symbols in new.config: 48\n"
+"  Added: 3\n"
+"  Removed: 2\n"
+"  Changed: 4\n"
+"  Unchanged: 42"
+
+#: ../../user_guide/kconfig_tools.rst:635 a33bdad8947e47b68af747fdc44de92e
+msgid ""
+"{\n"
+"  \"added\": [\n"
+"    {\"symbol\": \"CONFIG_NEW_FEATURE\", \"value\": \"y\"},\n"
+"    {\"symbol\": \"CONFIG_NEW_BUFFER_SIZE\", \"value\": \"256\"}\n"
+"  ],\n"
+"  \"removed\": [\n"
+"    {\"symbol\": \"CONFIG_OLD_FEATURE\", \"value\": \"y\"}\n"
+"  ],\n"
+"  \"changed\": [\n"
+"    {\n"
+"      \"symbol\": \"CONFIG_UART1_BAUDRATE\",\n"
+"      \"old_value\": \"9600\",\n"
+"      \"new_value\": \"115200\"\n"
+"    }\n"
+"  ],\n"
+"  \"unchanged\": 42,\n"
+"  \"summary\": {\n"
+"    \"total_old\": 47,\n"
+"    \"total_new\": 48,\n"
+"    \"added\": 2,\n"
+"    \"removed\": 1,\n"
+"    \"changed\": 1\n"
+"  }\n"
+"}"
+msgstr ""
+"{\n"
+"  \"added\": [\n"
+"    {\"symbol\": \"CONFIG_NEW_FEATURE\", \"value\": \"y\"},\n"
+"    {\"symbol\": \"CONFIG_NEW_BUFFER_SIZE\", \"value\": \"256\"}\n"
+"  ],\n"
+"  \"removed\": [\n"
+"    {\"symbol\": \"CONFIG_OLD_FEATURE\", \"value\": \"y\"}\n"
+"  ],\n"
+"  \"changed\": [\n"
+"    {\n"
+"      \"symbol\": \"CONFIG_UART1_BAUDRATE\",\n"
+"      \"old_value\": \"9600\",\n"
+"      \"new_value\": \"115200\"\n"
+"    }\n"
+"  ],\n"
+"  \"unchanged\": 42,\n"
+"  \"summary\": {\n"
+"    \"total_old\": 47,\n"
+"    \"total_new\": 48,\n"
+"    \"added\": 2,\n"
+"    \"removed\": 1,\n"
+"    \"changed\": 1\n"
+"  }\n"
+"}"
+
+#: ../../user_guide/kconfig_tools.rst:664 50d9e950703a421eac1c98532435c0d8
+msgid "Generates an HTML report with color-coded differences:"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:666 1f4acb6dd2d4492bbecf3bf8b4ee3f00
+msgid "Green: Added symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:667 947f98cf7685420db89c5d088c5f439f
+msgid "Red: Removed symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:668 6a0cea6ac2c7475185b3d741d63987ac
+msgid "Yellow: Changed symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:669 09a01326389644e2b03811359cee319d
+msgid "Gray: Unchanged symbols"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:672 28ce38d20bbf494b8284e3935f6464fc
+msgid "Use Cases"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:674 1c2306d2a5ff405f9bd4ea56fc5da0ce
+msgid "**Compare platform configurations:**"
+msgstr "**Compare platform configurations:**"
+
+#: ../../user_guide/kconfig_tools.rst:676 e22ec4d620d1488d994a13049a34ca97
+msgid ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    platforms/native/defconfig \\\n"
+"    platforms/stm32/defconfig_stm32f4"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    platforms/native/defconfig \\\n"
+"    platforms/stm32/defconfig_stm32f4"
+
+#: ../../user_guide/kconfig_tools.rst:682 748aaf892fe046c9bfb6d930b0085920
+msgid "**Compare before/after changes:**"
+msgstr "**Compare before/after changes:**"
+
+#: ../../user_guide/kconfig_tools.rst:684 4a19f3497fbc4e358f333a6ef35530b8
+msgid ""
+"cp .config .config.backup\n"
+"# Make changes\n"
+"python scripts/kconfig/kconfig_diff.py .config.backup .config"
+msgstr ""
+"cp .config .config.backup\n"
+"# Make changes\n"
+"python scripts/kconfig/kconfig_diff.py .config.backup .config"
+
+#: ../../user_guide/kconfig_tools.rst:690 2d8886aefcb14e8c8fe97b80639b6720
+msgid "**Review configuration updates:**"
+msgstr "**Review configuration updates:**"
+
+#: ../../user_guide/kconfig_tools.rst:692 72bf56dfe51c49518e2b209549b85b39
+msgid ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    old_version/.config \\\n"
+"    new_version/.config"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    old_version/.config \\\n"
+"    new_version/.config"
+
+#: ../../user_guide/kconfig_tools.rst:699 2e216fd94b8d4f1196422e270e3a2d21
+msgid "Integration with Version Control"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:701 db0ad9f585614c1ea8d2509958a03950
+msgid "**Git diff tool:**"
+msgstr "**Git diff tool:**"
+
+#: ../../user_guide/kconfig_tools.rst:703 1e858d7d8c5e43a3990821b0078a7c61
+msgid ""
+"# .gitconfig\n"
+"[diff \"kconfig\"]\n"
+"    command = python scripts/kconfig/kconfig_diff.py"
+msgstr ""
+"# .gitconfig\n"
+"[diff \"kconfig\"]\n"
+"    command = python scripts/kconfig/kconfig_diff.py"
+
+#: ../../user_guide/kconfig_tools.rst:709 48f78ba2212a41ae849362555edb0920
+msgid "**Pre-merge check:**"
+msgstr "**Pre-merge check:**"
+
+#: ../../user_guide/kconfig_tools.rst:711 22427e97968544bf9361f2e3b6b5c930
+msgid ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    main:.config \\\n"
+"    feature-branch:.config"
+msgstr ""
+"python scripts/kconfig/kconfig_diff.py \\\n"
+"    main:.config \\\n"
+"    feature-branch:.config"
+
+#: ../../user_guide/kconfig_tools.rst:719 bb3e9923d7e648f88ada2ab5416f171b
+msgid "generate_config_docs.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:724 da788b8081a84af9b1f6d44498216137
+msgid ""
+"Generates documentation from Kconfig files, creating a reference guide for "
+"all configuration options."
+msgstr ""
+
+#: afd69acf7cbf44aa8a9b755c053568d0
+msgid ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.md"
+msgstr ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.md"
+
+#: ../../user_guide/kconfig_tools.rst:738 81fa133ab0fa49a0be2277a20bda8e69
+msgid ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.rst \\\n"
+"    --format rst \\\n"
+"    --include-defaults"
+msgstr ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.rst \\\n"
+"    --format rst \\\n"
+"    --include-defaults"
+
+#: ../../user_guide/kconfig_tools.rst:748 4a9077d1e3bc464f8f8f2a2883c3b2ad
+msgid ""
+"KCONFIG_FILE           Root Kconfig file\n"
+"--output PATH          Output documentation file\n"
+"--format FORMAT        Output format (markdown, rst, html)\n"
+"--include-defaults     Include default values\n"
+"--include-help         Include help text\n"
+"--group-by GROUP       Group by (platform, module, type)\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+msgstr ""
+"KCONFIG_FILE           Root Kconfig file\n"
+"--output PATH          Output documentation file\n"
+"--format FORMAT        Output format (markdown, rst, html)\n"
+"--include-defaults     Include default values\n"
+"--include-help         Include help text\n"
+"--group-by GROUP       Group by (platform, module, type)\n"
+"--verbose              Enable verbose output\n"
+"--help                 Show help message"
+
+#: ../../user_guide/kconfig_tools.rst:762 b3ef953ab07b46ac9e76900cfeba226c
+msgid "**Markdown format:**"
+msgstr "**Markdown format:**"
+
+#: ../../user_guide/kconfig_tools.rst:764 f0a8ddecf6bd46608083f61702abc6e1
+msgid ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.md \\\n"
+"    --format markdown"
+msgstr ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.md \\\n"
+"    --format markdown"
+
+#: ../../user_guide/kconfig_tools.rst:770 c0406777aa7f4be28b14d85d9b18e02c
+msgid "**reStructuredText format:**"
+msgstr "**reStructuredText format:**"
+
+#: ../../user_guide/kconfig_tools.rst:772 0d46f232015c4454a1aabe67b584312b
+msgid ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.rst \\\n"
+"    --format rst"
+msgstr ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.rst \\\n"
+"    --format rst"
+
+#: ../../user_guide/kconfig_tools.rst:780 da33190487b643b78c50f793fc3b35f0
+msgid ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.html \\\n"
+"    --format html"
+msgstr ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.html \\\n"
+"    --format html"
+
+#: ../../user_guide/kconfig_tools.rst:786 cea6f1b7e0e1409b91aa7c3f694bf803
+msgid "**Group by platform:**"
+msgstr "**Group by platform:**"
+
+#: ../../user_guide/kconfig_tools.rst:788 25f4da20a8914d65a23927542d45aaaa
+msgid ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.md \\\n"
+"    --group-by platform"
+msgstr ""
+"python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"    --output docs/config_reference.md \\\n"
+"    --group-by platform"
+
+#: ../../user_guide/kconfig_tools.rst:797 ba82d3f2c5fd4a078bb0a51270474ef6
+msgid "**Markdown example:**"
+msgstr "**Markdown example:**"
+
+#: ../../user_guide/kconfig_tools.rst:799 af090d3c112a4b54af887b79021460ed
+msgid ""
+"# Configuration Reference\n"
+"\n"
+"## Platform Configuration\n"
+"\n"
+"### CONFIG_PLATFORM_STM32\n"
+"\n"
+"**Type:** bool\n"
+"**Default:** n\n"
+"**Depends on:** None\n"
+"\n"
+"Enable STM32 platform support.\n"
+"\n"
+"The STM32 platform provides support for STMicroelectronics\n"
+"STM32 series microcontrollers.\n"
+"\n"
+"### CONFIG_STM32F407\n"
+"\n"
+"**Type:** bool\n"
+"**Default:** n\n"
+"**Depends on:** CONFIG_PLATFORM_STM32, CONFIG_STM32F4\n"
+"\n"
+"Enable STM32F407 variant.\n"
+"\n"
+"## UART Configuration\n"
+"\n"
+"### CONFIG_UART1_BAUDRATE\n"
+"\n"
+"**Type:** int\n"
+"**Default:** 115200\n"
+"**Range:** 9600 to 921600\n"
+"**Depends on:** CONFIG_INSTANCE_STM32_UART_1\n"
+"\n"
+"Baud rate for UART1 in bits per second."
+msgstr ""
+"# Configuration Reference\n"
+"\n"
+"## Platform Configuration\n"
+"\n"
+"### CONFIG_PLATFORM_STM32\n"
+"\n"
+"**Type:** bool\n"
+"**Default:** n\n"
+"**Depends on:** None\n"
+"\n"
+"Enable STM32 platform support.\n"
+"\n"
+"The STM32 platform provides support for STMicroelectronics\n"
+"STM32 series microcontrollers.\n"
+"\n"
+"### CONFIG_STM32F407\n"
+"\n"
+"**Type:** bool\n"
+"**Default:** n\n"
+"**Depends on:** CONFIG_PLATFORM_STM32, CONFIG_STM32F4\n"
+"\n"
+"Enable STM32F407 variant.\n"
+"\n"
+"## UART Configuration\n"
+"\n"
+"### CONFIG_UART1_BAUDRATE\n"
+"\n"
+"**Type:** int\n"
+"**Default:** 115200\n"
+"**Range:** 9600 to 921600\n"
+"**Depends on:** CONFIG_INSTANCE_STM32_UART_1\n"
+"\n"
+"Baud rate for UART1 in bits per second."
+
+#: ../../user_guide/kconfig_tools.rst:835 2e79ccb4c32a446fb2ba2d6ad0864785
+msgid "**reStructuredText example:**"
+msgstr "**reStructuredText example:**"
+
+#: ../../user_guide/kconfig_tools.rst:837 7f96becce0f1437f9a2c55f149db21f4
+msgid ""
+"Configuration Reference\n"
+"=======================\n"
+"\n"
+"Platform Configuration\n"
+"----------------------\n"
+"\n"
+"CONFIG_PLATFORM_STM32\n"
+"^^^^^^^^^^^^^^^^^^^^^\n"
+"\n"
+":Type: bool\n"
+":Default: n\n"
+":Depends on: None\n"
+"\n"
+"Enable STM32 platform support.\n"
+"\n"
+"The STM32 platform provides support for STMicroelectronics\n"
+"STM32 series microcontrollers."
+msgstr ""
+"Configuration Reference\n"
+"=======================\n"
+"\n"
+"Platform Configuration\n"
+"----------------------\n"
+"\n"
+"CONFIG_PLATFORM_STM32\n"
+"^^^^^^^^^^^^^^^^^^^^^\n"
+"\n"
+":Type: bool\n"
+":Default: n\n"
+":Depends on: None\n"
+"\n"
+"Enable STM32 platform support.\n"
+"\n"
+"The STM32 platform provides support for STMicroelectronics\n"
+"STM32 series microcontrollers."
+
+#: ../../user_guide/kconfig_tools.rst:858 efcad4b425864b47b13c7bd158bbd9c0
+msgid "Grouping Options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:860 25668e1b062048ef9f188084286f73b5
+msgid "**By platform:**"
+msgstr "**By platform:**"
+
+#: ../../user_guide/kconfig_tools.rst:862 cd953dc404c148cfb72c399104ff0009
+msgid "Native Platform"
+msgstr "Native 平台"
+
+#: ../../user_guide/kconfig_tools.rst:863 cdaf43dc35804851962bba7a65340a68
+msgid "STM32 Platform"
+msgstr "STM32 平台"
+
+#: ../../user_guide/kconfig_tools.rst:864 5abbed07d8894764bdf5f237303e7495
+msgid "GD32 Platform"
+msgstr "GD32 平台"
+
+#: ../../user_guide/kconfig_tools.rst:865 33d72048bae2408c85dad0fdf893abba
+msgid "ESP32 Platform"
+msgstr "ESP32 平台"
+
+#: ../../user_guide/kconfig_tools.rst:867 c99785280c9e405ea180c83ed1d6ebc7
+msgid "**By module:**"
+msgstr "**By module:**"
+
+#: ../../user_guide/kconfig_tools.rst:869 314202ea07a94cbebdfe1690bd7c1313
+msgid "HAL Configuration"
+msgstr "HAL 配置"
+
+#: ../../user_guide/kconfig_tools.rst:870 e58dbe1ac4444ad3ab4167cbae48f275
+msgid "OSAL Configuration"
+msgstr "OSAL 配置"
+
+#: ../../user_guide/kconfig_tools.rst:871 71cb5f750e904c7da3fc115614921a0e
+msgid "Peripheral Configuration"
+msgstr "外设 配置"
+
+#: ../../user_guide/kconfig_tools.rst:872 5cc83adfb49844ebb17cc90282ccc11c
+msgid "Framework Configuration"
+msgstr "框架 配置"
+
+#: ../../user_guide/kconfig_tools.rst:874 6ee8a9219be341a7b6d085218acc6ade
+msgid "**By type:**"
+msgstr "**By type:**"
+
+#: ../../user_guide/kconfig_tools.rst:876 45fe1365e1a74b47a4da4e2a9e979354
+msgid "Boolean Options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:877 57e629da06234f3cbdb116c7e6895fd9
+msgid "Integer Options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:878 7f285e99710e45ea87f3a681f9932b47
+msgid "String Options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:879 bf7df84adf1648e7bd50f1313d883125
+msgid "Hexadecimal Options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:882 249fe938cdca42629ae20d46ac67d0b7
+msgid "Integration with Sphinx"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:884 21ebb9275dae43fe86ffca9afafe6e10
+msgid "**Include in Sphinx documentation:**"
+msgstr "**Include in Sphinx documentation:**"
+
+#: ../../user_guide/kconfig_tools.rst:886 6c15d1ec24df40f89eff134dbcdc763a
+msgid ".. include:: config_reference.rst"
+msgstr ".. include:: config_reference.rst"
+
+#: ../../user_guide/kconfig_tools.rst:890 ba62d8357aa84c9eacc2b96a8e287663
+msgid "**Automatic generation:**"
+msgstr "**Automatic generation:**"
+
+#: ../../user_guide/kconfig_tools.rst:892 b8aa229ea24c4f71808bf7d5ba255477
+msgid ""
+"# conf.py\n"
+"import subprocess\n"
+"\n"
+"subprocess.run([\n"
+"    'python', 'scripts/kconfig/generate_config_docs.py',\n"
+"    'Kconfig',\n"
+"    '--output', 'docs/sphinx/reference/config_reference.rst',\n"
+"    '--format', 'rst'\n"
+"])"
+msgstr ""
+"# conf.py\n"
+"import subprocess\n"
+"\n"
+"subprocess.run([\n"
+"    'python', 'scripts/kconfig/generate_config_docs.py',\n"
+"    'Kconfig',\n"
+"    '--output', 'docs/sphinx/reference/config_reference.rst',\n"
+"    '--format', 'rst'\n"
+"])"
+
+#: ../../user_guide/kconfig_tools.rst:905 91a6c2b32b154ae0959ff74d85b79cfc
+msgid "Tool Workflow"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:908 795a6133c48d40a1a1371732a215bbe6
+msgid "Typical Workflow"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:910 750e58d25e5846758cbb62bd9e170495
+msgid "**1. Validate Kconfig files:**"
+msgstr "**1. Validate Kconfig files:**"
+
+#: ../../user_guide/kconfig_tools.rst:916 4636d4de34ce422fb4b3c7907f5ade2f
+msgid "**2. Generate configuration:**"
+msgstr "**2. Generate configuration:**"
+
+#: ../../user_guide/kconfig_tools.rst:922 0380a64fe6994c12a4f6472f8e8b7789
+msgid "**3. Compare configurations:**"
+msgstr "**3. Compare configurations:**"
+
+#: ../../user_guide/kconfig_tools.rst:928 a89e23b43fac4daf927b64cba9f699c4
+msgid "**4. Migrate if needed:**"
+msgstr "**4. Migrate if needed:**"
+
+#: ../../user_guide/kconfig_tools.rst:937 3bb47953e1f847d58c8bc314c0a7acca
+msgid "**5. Generate documentation:**"
+msgstr "**5. Generate documentation:**"
+
+#: ../../user_guide/kconfig_tools.rst:945 c5fb6c1064ea4761936a1a93f3dccf1a
+msgid "CI/CD Integration"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:947 e4c39e503642446fa894bc198bafb421
+msgid "**Complete CI pipeline:**"
+msgstr "**Complete CI pipeline:**"
+
+#: ../../user_guide/kconfig_tools.rst:949 10742f9a38bc4c1fa6453027be3f12f6
+msgid ""
+"name: Kconfig CI\n"
+"\n"
+"on: [push, pull_request]\n"
+"\n"
+"jobs:\n"
+"  validate:\n"
+"    runs-on: ubuntu-latest\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"\n"
+"      - name: Validate Kconfig\n"
+"        run: |\n"
+"          python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"      - name: Generate configuration\n"
+"        run: |\n"
+"          python scripts/kconfig/generate_config.py\n"
+"\n"
+"      - name: Generate documentation\n"
+"        run: |\n"
+"          python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"            --output docs/config_reference.md\n"
+"\n"
+"      - name: Upload documentation\n"
+"        uses: actions/upload-artifact@v3\n"
+"        with:\n"
+"          name: config-docs\n"
+"          path: docs/config_reference.md"
+msgstr ""
+"name: Kconfig CI\n"
+"\n"
+"on: [push, pull_request]\n"
+"\n"
+"jobs:\n"
+"  validate:\n"
+"    runs-on: ubuntu-latest\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"\n"
+"      - name: Validate Kconfig\n"
+"        run: |\n"
+"          python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"      - name: Generate configuration\n"
+"        run: |\n"
+"          python scripts/kconfig/generate_config.py\n"
+"\n"
+"      - name: Generate documentation\n"
+"        run: |\n"
+"          python scripts/kconfig/generate_config_docs.py Kconfig \\\n"
+"            --output docs/config_reference.md\n"
+"\n"
+"      - name: Upload documentation\n"
+"        uses: actions/upload-artifact@v3\n"
+"        with:\n"
+"          name: config-docs\n"
+"          path: docs/config_reference.md"
+
+#: ../../user_guide/kconfig_tools.rst:984 b84de3c37f0d4cc2b9ad79f1734b9f5c
+msgid "General Guidelines"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:986 8bf4e0ab93a94d15bc75c6af601e0a9b
+msgid "Validate before generating"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:987 915b93f371634acaaec0c47ebc4ddad7
+msgid "Use version control for configurations"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:988 48b34f9e9e464a59bf6b40dce6bced86
+msgid "Document configuration changes"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:989 096c708cbc0f46ff804223daae5b8f28
+msgid "Test configurations before deployment"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:990 f7bc3eca97214e4bbc9939876b29e6b6
+msgid "Use default configurations as templates"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:991 fc55e09b36f14757b2937f618f45c5ca
+msgid "Keep configurations organized"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:994 9d812f3b4af94784b5127e485a686d73
+msgid "Configuration Management"
+msgstr "配置 Management"
+
+#: ../../user_guide/kconfig_tools.rst:996 7a1970ee56d54149a153188eca169d61
+msgid "Use defconfig files for platforms"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:997 31edccc1643042a1b66a64f5b739fc59
+msgid "Version control .config files"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:998 da1d653dc5574ef7817b43e7e19eadfe
+msgid "Document custom configurations"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:999 788f11a268ad4063a4f187ad41041225
+msgid "Use meaningful symbol names"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1000 ac5969d9637b456ca41ce29d374c671c
+msgid "Group related options"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1001 1a07512e0d5b4f87a9da252c689fdf7e
+msgid "Provide comprehensive help text"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1004 b46b91d3bd2e4defa3df0f3e6c892ab7
+msgid "Tool Usage"
+msgstr "Tool 用法"
+
+#: ../../user_guide/kconfig_tools.rst:1006 ffcb01cf35684ab88706a2509c5bc2e9
+msgid "Run validation regularly"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1007 f421f8407cf04e6287125e0b9aa83975
+msgid "Use diff to review changes"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1008 29cbc76757a94b7ba9d05f7b3aaca5fc
+msgid "Migrate configurations systematically"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1009 d05c82e9b1ed48709a15d87adc5a48c5
+msgid "Generate documentation automatically"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1010 e1bf37c76c2f41da8e7caaedf1c806c8
+msgid "Integrate with CI/CD"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1011 fbefff57279248038784f1b37d7dc917
+msgid "Monitor for errors"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1014 572956c53132447a995db66cd6ba6e6d
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../user_guide/kconfig_tools.rst:1017 083bc452902a42fc9d4cdea9d153b59b
+msgid "Common Issues"
+msgstr ""
+
+#: ../../user_guide/kconfig_tools.rst:1019 c7f33c8416e749c588ad94df8daf51d9
+msgid "**Issue: Tool not found**"
+msgstr "**Issue: Tool not found**"
+
+#: ../../user_guide/kconfig_tools.rst:1021 d4e44b8e59164623939a0d34eb5228f2
+msgid ""
+"# Ensure Python is installed\n"
+"python --version\n"
+"\n"
+"# Ensure tools are in correct location\n"
+"ls scripts/kconfig/"
+msgstr ""
+"# Ensure Python is installed\n"
+"python --version\n"
+"\n"
+"# Ensure tools are in correct location\n"
+"ls scripts/kconfig/"
+
+#: ../../user_guide/kconfig_tools.rst:1029 6259bfdb98124cdb9eebb0c602e73e93
+msgid "**Issue: Permission denied**"
+msgstr "**Issue: Permission denied**"
+
+#: ../../user_guide/kconfig_tools.rst:1031 07dde761fb614ac288e8e69cea7a5ab1
+msgid ""
+"# Make scripts executable\n"
+"chmod +x scripts/kconfig/*.py"
+msgstr ""
+"# Make scripts executable\n"
+"chmod +x scripts/kconfig/*.py"
+
+#: ../../user_guide/kconfig_tools.rst:1036 80baf7a631114a78a9020e0a7f95b375
+msgid "**Issue: Module not found**"
+msgstr "**Issue: Module not found**"
+
+#: ../../user_guide/kconfig_tools.rst:1038 9bea2e10b76748e9bac51aac7deca819
+msgid ""
+"# Install required packages\n"
+"pip install -r requirements.txt"
+msgstr ""
+"# Install required packages\n"
+"pip install -r requirements.txt"
+
+#: ../../user_guide/kconfig_tools.rst:1043 95a73791083c42b0ab8f71f05afc901f
+msgid "**Issue: Invalid configuration**"
+msgstr "**Issue: Invalid configuration**"
+
+#: ../../user_guide/kconfig_tools.rst:1045 6bc8e200f6e646df9af251cdf7ab822e
+msgid ""
+"# Validate configuration\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig --check-values --config .config\n"
+"\n"
+"# Fix errors and regenerate\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+"# Validate configuration\n"
+"python scripts/kconfig/validate_kconfig.py Kconfig --check-values --config .config\n"
+"\n"
+"# Fix errors and regenerate\n"
+"python scripts/kconfig/generate_config.py"
+
+#: ../../user_guide/kconfig_tools.rst:1054 3426a966c1ba4609946c403d077ac440
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../user_guide/kconfig_tools.rst:1056 003beb1ad01e4f1791c4d32a3fda8f1b
+msgid ":doc:`kconfig_tutorial` - Kconfig tutorial"
+msgstr ":doc:`kconfig_tutorial` - Kconfig tutorial"
+
+#: ../../user_guide/kconfig_tools.rst:1057 a523d8bd7a4249978782e632e274baaa
+msgid ":doc:`kconfig_peripherals` - Peripheral configuration"
+msgstr ":doc:`kconfig_peripherals` - Peripheral configuration"
+
+#: ../../user_guide/kconfig_tools.rst:1058 77d6f86e41f743fc8604e6c270c8483c
+msgid ":doc:`kconfig_platforms` - Platform-specific configuration"
+msgstr ":doc:`kconfig_platforms` - Platform-specific configuration"
+
+#: ../../user_guide/kconfig_tools.rst:1059 20becd411e4c4e02b65e6442c452831b
+msgid ":doc:`../development/contributing` - Contributing guidelines"
+msgstr ":doc:`../development/contributing` - Contributing guidelines"

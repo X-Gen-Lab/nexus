@@ -5,193 +5,209 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
 "PO-Revision-Date: 2026-01-16 00:00+0000\n"
 "Last-Translator: Nexus Team\n"
-"Language: zh_CN\n"
 "Language-Team: Chinese\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: ../../user_guide/hal.rst:2 146e00e42873436d8097a20600fe6c9a
+#: ../../user_guide/hal.rst:2 36fc1c37ab994c76860f64bcb30ed6fd
 msgid "Hardware Abstraction Layer (HAL)"
 msgstr "硬件抽象层 (HAL)"
 
-#: ../../user_guide/hal.rst:5 2e3b0e52759a4a5c915fd632c81dbe4b
+#: ../../user_guide/hal.rst:5 90df2e040720427197a7f4521c5744f2
 msgid "Overview"
 msgstr "概述"
 
-#: ../../user_guide/hal.rst:7 d2fc794a0e0740b68dd8bd439bf4afa9
+#: ../../user_guide/hal.rst:7 0d31d5dee9814510bb653170859ba1e7
 msgid ""
 "The Nexus HAL provides a unified, object-oriented interface for hardware "
 "peripherals across different MCU platforms. It uses a factory pattern to "
 "create device instances and interface-based design for operations."
 msgstr "Nexus HAL 为不同 MCU 平台的硬件外设提供统一的面向对象接口。它使用工厂模式创建设备实例，并采用基于接口的设计进行操作。"
 
-#: ../../user_guide/hal.rst:11 e61e860b2e8c4254998e13197593942f
+#: ../../user_guide/hal.rst:11 b91bde956f364943b6b8bbe081389d19
 msgid "Key features:"
 msgstr "主要特性："
 
-#: ../../user_guide/hal.rst:13 d2c7a21a09e443b9b0dc16369e703973
+#: ../../user_guide/hal.rst:13 0c6413bf0b27485b8f4aa7bca0567e4c
 msgid "Factory pattern for device creation and lifecycle management"
 msgstr "工厂模式用于设备创建和生命周期管理"
 
-#: ../../user_guide/hal.rst:14 4e1bb3d15bfe4acca71ba5ed7e666e49
+#: ../../user_guide/hal.rst:14 c6f3e1e0a76442cc927e438e546cf3c8
 msgid "Interface-based design with consistent API across peripherals"
 msgstr "基于接口的设计，跨外设提供一致的 API"
 
-#: ../../user_guide/hal.rst:15 76eb9f0a1ea24e479ebbeb840e6d6e44
+#: ../../user_guide/hal.rst:15 cd9b0f9b4028419898744d47b774b325
 msgid "Reference counting for safe resource management"
 msgstr "引用计数实现安全的资源管理"
 
-#: ../../user_guide/hal.rst:16 3f2c3932a33a4a569a601d014e336951
+#: ../../user_guide/hal.rst:16 9a329be1b383494388eb96543991b692
 msgid "Support for both synchronous and asynchronous operations"
 msgstr "支持同步和异步操作"
 
-#: ../../user_guide/hal.rst:17 a247b792587341f99f648063206ba91c
+#: ../../user_guide/hal.rst:17 a4a40a20133e4e21813485d038f4de19
 msgid "Power management and diagnostic interfaces"
 msgstr "电源管理和诊断接口"
 
-#: ../../user_guide/hal.rst:20 7c9c60214ed94d0ca85740e658cf389b
+#: ../../user_guide/hal.rst:21 e90845501b304580a9e08a4997acc1f7
+msgid ":doc:`osal` - OS Abstraction Layer for RTOS integration"
+msgstr ":doc:`osal` - OS Abstraction Layer for RTOS integration"
+
+#: ../../user_guide/hal.rst:22 56b2f531a18241028fd39a150f43778e
+msgid ":doc:`kconfig_peripherals` - Peripheral configuration guide"
+msgstr ":doc:`kconfig_peripherals` - Peripheral configuration guide"
+
+#: ../../user_guide/hal.rst:23 ce27c16adb2e4cdfa8182c557a525e43
+msgid ":doc:`../platform_guides/index` - Platform-specific guides"
+msgstr ":doc:`../platform_guides/index` - Platform-specific guides"
+
+#: ../../user_guide/hal.rst:24 7296d554e436445aacc6be952adece1f
+msgid ":doc:`../tutorials/gpio_control` - GPIO tutorial"
+msgstr ":doc:`../tutorials/gpio_control` - GPIO tutorial"
+
+#: ../../user_guide/hal.rst:25 e8486b3f8b18491e86deaf13ad3a1364
+msgid ":doc:`../tutorials/uart_communication` - UART tutorial"
+msgstr ":doc:`../tutorials/uart_communication` - UART tutorial"
+
+#: ../../user_guide/hal.rst:26 dd922c40f09f42a6a5c7ab882992aa67
+#, fuzzy
+msgid ":doc:`../api/hal` - Complete HAL API reference"
+msgstr "完整 API 文档请参阅 :doc:`../api/hal`。"
+
+#: ../../user_guide/hal.rst:29 568f38574d6e4b859d45668b8a62fa45
 msgid "Architecture"
 msgstr "架构"
 
-#: ../../user_guide/hal.rst:22 e57613fe04534e18b8922a8cb0b884d7
+#: ../../user_guide/hal.rst:31 f1d0bbc1b3774b41b17a95e2239b3fe9
 msgid "The HAL is organized into several layers:"
 msgstr "HAL 分为以下几层："
 
-#: ../../user_guide/hal.rst:26 07e3143d58934b999982f1fe3ddd817b
-msgid ""
-"+------------------+\n"
-"|   Application    |\n"
-"+------------------+\n"
-"       |\n"
-"+------------------+\n"
-"|   nx_factory     |  Device creation and management\n"
-"+------------------+\n"
-"       |\n"
-"+------------------+\n"
-"|   Interfaces     |  nx_gpio_t, nx_uart_t, nx_spi_t, etc.\n"
-"+------------------+\n"
-"       |\n"
-"+------------------+\n"
-"|   Platform HAL   |  STM32F4, Native, etc.\n"
-"+------------------+"
+#: ../../user_guide/hal.rst:64 a2e02db8738a42b58bea1ecbfc54f36c
+msgid "Device Lifecycle"
 msgstr ""
 
-#: ../../user_guide/hal.rst:43 0f24d042334444e896091365b675d9cf
+#: ../../user_guide/hal.rst:66 2057a7679fb34284afadce1dd54b2899
+msgid ""
+"The following diagram shows the complete device lifecycle from creation to "
+"release:"
+msgstr ""
+
+#: ../../user_guide/hal.rst:100 88404b5d25d24f51bcc0558b4ba53598
 msgid "Supported Peripherals"
 msgstr "支持的外设"
 
-#: ../../user_guide/hal.rst:46 d945bca339244bbf9f8d6b34365cd1c7
+#: ../../user_guide/hal.rst:103 6db6f19d8b8d47de9b1f2eb6e63eba73
 msgid "Module"
 msgstr "模块"
 
-#: ../../user_guide/hal.rst:46 e115e41df1344eafaec12daaf0ed3aa6
+#: ../../user_guide/hal.rst:103 fba3f52c3c4f43189570f056f4202373
 msgid "Interface"
 msgstr "接口"
 
-#: ../../user_guide/hal.rst:46 5cc85952efa6446bb495efaef2b7e1fe
+#: ../../user_guide/hal.rst:103 b195ba1ec1744e7388cce2d14a887065
 msgid "Description"
 msgstr "描述"
 
-#: ../../user_guide/hal.rst:48 5d6002a293764c2fbe7d310e29995e9c
+#: ../../user_guide/hal.rst:105 1feaec3f37334faa8c3cda66d50067ee
 msgid "GPIO"
 msgstr "GPIO"
 
-#: ../../user_guide/hal.rst:48 e4c68ec634cb428aba9c66a469e0e169
+#: ../../user_guide/hal.rst:105 5f6acecfc72943e3b7fdcf5e6d614e0f
 #, fuzzy
 msgid "nx_gpio_t"
 msgstr "GPIO"
 
-#: ../../user_guide/hal.rst:48 2bae54c38b2940ae8e2809d5a15eabb2
+#: ../../user_guide/hal.rst:105 622ea06bc53e44e49b47efb06b851979
 msgid "General I/O"
 msgstr "通用输入输出"
 
-#: ../../user_guide/hal.rst:50 f87cf525d03744338db62c802d98ff6c
+#: ../../user_guide/hal.rst:107 edc0b555da29484db3aeb427b800f419
 msgid "UART"
 msgstr "UART"
 
-#: ../../user_guide/hal.rst:50 3929cd4686c8479baca9fab596f535bd
+#: ../../user_guide/hal.rst:107 639f68933b854638948fdcf511724559
 #, fuzzy
 msgid "nx_uart_t"
 msgstr "UART"
 
-#: ../../user_guide/hal.rst:50 f2e933cc40c24f4698ae3f6313c6cf71
+#: ../../user_guide/hal.rst:107 a1b0e5e683eb4e98900e45c047042e24
 msgid "Serial comm"
 msgstr "串行通信"
 
-#: ../../user_guide/hal.rst:52 e1d0fe19e3c64a7fbe530814ebe014ef
+#: ../../user_guide/hal.rst:109 a50563d476244337b660c2f1df49ff7d
 msgid "SPI"
 msgstr "SPI"
 
-#: ../../user_guide/hal.rst:52 40413ecc6e7b430ba1a3c18edae31d01
+#: ../../user_guide/hal.rst:109 37539edccf5848c08a51328b33c1e1c6
 msgid "nx_spi_t"
 msgstr ""
 
-#: ../../user_guide/hal.rst:52 0428dc683a7b4700beb68a3c1ebb6943
+#: ../../user_guide/hal.rst:109 f1a0edc7f31e4b849e67546f3a06884c
 msgid "SPI bus"
 msgstr "SPI 总线"
 
-#: ../../user_guide/hal.rst:54 b7e6bdb4ccf94ebcb12245f52e4b6b3b
+#: ../../user_guide/hal.rst:111 71229bd9a7134eb5800ab6bfab7ad404
 msgid "I2C"
 msgstr "I2C"
 
-#: ../../user_guide/hal.rst:54 edfd2f9868fc40ceb381f8994be7bc5a
+#: ../../user_guide/hal.rst:111 9162151bb50a490fb57afecb3a5171b3
 msgid "nx_i2c_t"
 msgstr ""
 
-#: ../../user_guide/hal.rst:54 b46edcd1b43240398a61a1e6ab83c49a
+#: ../../user_guide/hal.rst:111 adca49bb50f74fe8ad038f6551931025
 msgid "I2C bus"
 msgstr "I2C 总线"
 
-#: ../../user_guide/hal.rst:56 6564c3e1036b42c1b8fad4710262044d
+#: ../../user_guide/hal.rst:113 f45fe561c7a046aca327bd9ec18403e3
 msgid "Timer"
 msgstr "定时器"
 
-#: ../../user_guide/hal.rst:56 f9550cfcd3434d6ca7275991b6d4fb31
+#: ../../user_guide/hal.rst:113 1e203e0b89044ab9bbe4642b65004453
 #, fuzzy
 msgid "nx_timer_t"
 msgstr "定时器"
 
-#: ../../user_guide/hal.rst:56 ea6dafc0d015492ea06c35b628a89fcc
+#: ../../user_guide/hal.rst:113 c4f42fa3e4cc416b8f904e11143296db
 msgid "Hardware timers"
 msgstr "硬件定时器"
 
-#: ../../user_guide/hal.rst:58 908d692b9a104e14b4e30abf64425e38
+#: ../../user_guide/hal.rst:115 7eb0ff16210345d5bb94dbd26e5bf3f4
 msgid "ADC"
 msgstr "ADC"
 
-#: ../../user_guide/hal.rst:58 bcad16537d034a428edb33d805d34151
+#: ../../user_guide/hal.rst:115 1926b0f21eda4b6a9469a9e5f3708007
 msgid "nx_adc_t"
 msgstr ""
 
-#: ../../user_guide/hal.rst:58 e251054afe954cf2b4ba39a2400cb26b
+#: ../../user_guide/hal.rst:115 98dca0fe40e54d93ae8600093ec3f783
 msgid "Analog input"
 msgstr "模拟输入"
 
-#: ../../user_guide/hal.rst:62 6c9da505eaf745e898ca3885d448f5b2
+#: ../../user_guide/hal.rst:119 78ad4646fa9641baa5f12171290c4516
 msgid "Getting Started"
 msgstr "快速开始"
 
-#: ../../user_guide/hal.rst:64 5052af8a97744852936b9dd8d3bb209a
+#: ../../user_guide/hal.rst:121 d3b68aa37cc444ce82266b889bbe0633
 #, fuzzy
 msgid "**Include the main header:**"
 msgstr "包含主头文件："
 
-#: ../../user_guide/hal.rst:66 18aa9cb7d6f54869b6cb6da0ea6f56c0
+#: ../../user_guide/hal.rst:123 b2344c07904943278edf018d048a537b
 msgid "#include \"hal/nx_hal.h\""
-msgstr ""
+msgstr "#include \"hal/nx_hal.h\""
 
-#: ../../user_guide/hal.rst:70 879a7a6a47d74c0fa30e1f9ac09266b7
+#: ../../user_guide/hal.rst:127 8074bc65e91541b7b9de1e51343e710a
 #, fuzzy
 msgid "**Initialize and use:**"
 msgstr "初始化和使用："
 
-#: ../../user_guide/hal.rst:72 e992ed703dcb43f09d27bde70ff2bd2d
+#: ../../user_guide/hal.rst:129 948c4931c06748a18bf75eee66b6f119
 msgid ""
 "int main(void)\n"
 "{\n"
@@ -210,26 +226,42 @@ msgid ""
 "    return 0;\n"
 "}"
 msgstr ""
+"int main(void)\n"
+"{\n"
+"    /* Initialize HAL */\n"
+"    nx_hal_init();\n"
+"\n"
+"    /* Get a GPIO device */\n"
+"    nx_gpio_t* led = nx_factory_gpio(0, 5);  /* Port A, Pin 5 */\n"
+"    if (led) {\n"
+"        led->write(led, 1);  /* Turn on */\n"
+"        nx_factory_gpio_release(led);\n"
+"    }\n"
+"\n"
+"    /* Cleanup */\n"
+"    nx_hal_deinit();\n"
+"    return 0;\n"
+"}"
 
-#: ../../user_guide/hal.rst:92 ce3f4244233c4a19b401ab62fb776a51
+#: ../../user_guide/hal.rst:149 a340e18b88ff49728b2c5aa2524a3940
 msgid "GPIO Module"
 msgstr "GPIO 模块"
 
-#: ../../user_guide/hal.rst:94 4ad1deee7f4243bfb74a2dd7f8fd3fc9
+#: ../../user_guide/hal.rst:151 d740de31b7644b668615287b797a0ce0
 #, fuzzy
 msgid "**Get GPIO with default configuration:**"
 msgstr "使用默认配置获取 GPIO："
 
-#: ../../user_guide/hal.rst:96 56bb8388a4e34d80aec09a915be54bb4
+#: ../../user_guide/hal.rst:153 92904072889f4e32b59afcce0980e1b3
 msgid "nx_gpio_t* gpio = nx_factory_gpio(port, pin);"
-msgstr ""
+msgstr "nx_gpio_t* gpio = nx_factory_gpio(port, pin);"
 
-#: ../../user_guide/hal.rst:100 f4df58196ac04d42a7d4c81ec56dfeda
+#: ../../user_guide/hal.rst:157 bbcb586eee7347aab4e7398cce6307a9
 #, fuzzy
 msgid "**Get GPIO with custom configuration:**"
 msgstr "使用自定义配置获取 GPIO："
 
-#: ../../user_guide/hal.rst:102 13f72cee85564a788d8a396358e8ba27
+#: ../../user_guide/hal.rst:159 a4519b5b4b9045b2ad41c6e254dfc31e
 msgid ""
 "nx_gpio_config_t cfg = {\n"
 "    .mode  = NX_GPIO_MODE_OUTPUT_PP,\n"
@@ -239,13 +271,20 @@ msgid ""
 "\n"
 "nx_gpio_t* led = nx_factory_gpio_with_config(0, 5, &cfg);"
 msgstr ""
+"nx_gpio_config_t cfg = {\n"
+"    .mode  = NX_GPIO_MODE_OUTPUT_PP,\n"
+"    .pull  = NX_GPIO_PULL_NONE,\n"
+"    .speed = NX_GPIO_SPEED_LOW,\n"
+"};\n"
+"\n"
+"nx_gpio_t* led = nx_factory_gpio_with_config(0, 5, &cfg);"
 
-#: ../../user_guide/hal.rst:112 f87bbacfa0f54c6abe9ece3727980fff
+#: ../../user_guide/hal.rst:169 f1e99e9ddb7d4d55bd2ecae6391c811b
 #, fuzzy
 msgid "**Operations:**"
 msgstr "操作："
 
-#: ../../user_guide/hal.rst:114 203b4dc7b0194e6b92a028cd2a8e01b5
+#: ../../user_guide/hal.rst:171 35c7bf7a0cbf443899a9c91bb46df010
 msgid ""
 "/* Write */\n"
 "led->write(led, 1);  /* High */\n"
@@ -264,13 +303,29 @@ msgid ""
 "/* Release when done */\n"
 "nx_factory_gpio_release(led);"
 msgstr ""
+"/* Write */\n"
+"led->write(led, 1);  /* High */\n"
+"led->write(led, 0);  /* Low */\n"
+"\n"
+"/* Read */\n"
+"uint8_t state = led->read(led);\n"
+"\n"
+"/* Toggle */\n"
+"led->toggle(led);\n"
+"\n"
+"/* Runtime configuration */\n"
+"led->set_mode(led, NX_GPIO_MODE_INPUT);\n"
+"led->set_pull(led, NX_GPIO_PULL_UP);\n"
+"\n"
+"/* Release when done */\n"
+"nx_factory_gpio_release(led);"
 
-#: ../../user_guide/hal.rst:133 cc7735510e94471ba1f993edf96fa487
+#: ../../user_guide/hal.rst:190 d8b98cc2099a4af8ba1e81a50011f148
 #, fuzzy
 msgid "**External interrupt:**"
 msgstr "外部中断："
 
-#: ../../user_guide/hal.rst:135 213e9bcb5b32483fb2cd889a81a99b2a
+#: ../../user_guide/hal.rst:192 5c4d10d677ec47f29f6a1845da5a726c
 msgid ""
 "void button_callback(void* ctx)\n"
 "{\n"
@@ -281,26 +336,34 @@ msgid ""
 "btn->set_mode(btn, NX_GPIO_MODE_INPUT);\n"
 "btn->set_exti(btn, NX_GPIO_EXTI_FALLING, button_callback, NULL);"
 msgstr ""
+"void button_callback(void* ctx)\n"
+"{\n"
+"    /* Handle button press */\n"
+"}\n"
+"\n"
+"nx_gpio_t* btn = nx_factory_gpio(0, 0);\n"
+"btn->set_mode(btn, NX_GPIO_MODE_INPUT);\n"
+"btn->set_exti(btn, NX_GPIO_EXTI_FALLING, button_callback, NULL);"
 
-#: ../../user_guide/hal.rst:147 beac2f92d81848db959ebdc90d51bbf0
+#: ../../user_guide/hal.rst:204 c2179dc5c0944a36812cea779e7875fb
 msgid "UART Module"
 msgstr "UART 模块"
 
-#: ../../user_guide/hal.rst:149 13fd0d8775ef4dc48a24c8b3638d16d8
+#: ../../user_guide/hal.rst:206 dac569ecc06b446f882aa679c44d248d
 #, fuzzy
 msgid "**Get UART with default configuration:**"
 msgstr "使用默认配置获取 UART："
 
-#: ../../user_guide/hal.rst:151 6dc2412f9ba64e76852a68d8fa0e811e
+#: ../../user_guide/hal.rst:208 f423e37fb4164ba79ee1f6ffe0878d84
 msgid "nx_uart_t* uart = nx_factory_uart(0);"
-msgstr ""
+msgstr "nx_uart_t* uart = nx_factory_uart(0);"
 
-#: ../../user_guide/hal.rst:155 2749cb23bfdf4ee1b020f7215809545c
+#: ../../user_guide/hal.rst:212 51e4dcce12494c1ea6f567bb50f75c52
 #, fuzzy
 msgid "**Get UART with custom configuration:**"
 msgstr "使用自定义配置获取 UART："
 
-#: ../../user_guide/hal.rst:157 937baa8812c14a5e9437a567f826151f
+#: ../../user_guide/hal.rst:214 1c8421b3d23147eca5dd5eb674ef76bc
 msgid ""
 "nx_uart_config_t cfg = {\n"
 "    .baudrate     = 115200,\n"
@@ -312,13 +375,22 @@ msgid ""
 "\n"
 "nx_uart_t* uart = nx_factory_uart_with_config(0, &cfg);"
 msgstr ""
+"nx_uart_config_t cfg = {\n"
+"    .baudrate     = 115200,\n"
+"    .word_length  = 8,\n"
+"    .stop_bits    = 1,\n"
+"    .parity       = 0,  /* None */\n"
+"    .flow_control = 0,  /* None */\n"
+"};\n"
+"\n"
+"nx_uart_t* uart = nx_factory_uart_with_config(0, &cfg);"
 
-#: ../../user_guide/hal.rst:169 cb92a69c41434bfbb14f9f43a149f5a5
+#: ../../user_guide/hal.rst:226 a6dea07050d0437f859164c63fb580b5
 #, fuzzy
 msgid "**Synchronous operations:**"
 msgstr "同步操作："
 
-#: ../../user_guide/hal.rst:171 fa0fe4d43d9742b3a2238f1d26d9c62c
+#: ../../user_guide/hal.rst:228 f0782f17af11447aba9fc383080bfb66
 msgid ""
 "nx_tx_sync_t* tx = uart->get_tx_sync(uart);\n"
 "nx_rx_sync_t* rx = uart->get_rx_sync(uart);\n"
@@ -331,13 +403,23 @@ msgid ""
 "uint8_t buf[64];\n"
 "rx->receive(rx, buf, sizeof(buf), 1000);"
 msgstr ""
+"nx_tx_sync_t* tx = uart->get_tx_sync(uart);\n"
+"nx_rx_sync_t* rx = uart->get_rx_sync(uart);\n"
+"\n"
+"/* Transmit with timeout */\n"
+"const char* msg = \"Hello, Nexus!\";\n"
+"tx->send(tx, (uint8_t*)msg, strlen(msg), 1000);\n"
+"\n"
+"/* Receive with timeout */\n"
+"uint8_t buf[64];\n"
+"rx->receive(rx, buf, sizeof(buf), 1000);"
 
-#: ../../user_guide/hal.rst:184 9d3ed52b2fb443e18ab7e6b7d9d9c2da
+#: ../../user_guide/hal.rst:241 36688e4be4124e8784c3418b8b45b445
 #, fuzzy
 msgid "**Asynchronous operations:**"
 msgstr "异步操作："
 
-#: ../../user_guide/hal.rst:186 fc3c1f53a07f4e01b7c76eb2d8070f51
+#: ../../user_guide/hal.rst:243 bed7c3dcda7d4655ab7bced41b00447a
 msgid ""
 "nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
 "nx_rx_async_t* rx = uart->get_rx_async(uart);\n"
@@ -354,26 +436,40 @@ msgid ""
 "/* Set receive callback */\n"
 "rx->set_callback(rx, my_rx_callback, NULL);"
 msgstr ""
+"nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"nx_rx_async_t* rx = uart->get_rx_async(uart);\n"
+"\n"
+"/* Non-blocking send */\n"
+"tx->send(tx, data, len);\n"
+"\n"
+"/* Check available data */\n"
+"size_t avail = rx->available(rx);\n"
+"if (avail > 0) {\n"
+"    size_t read = rx->read(rx, buf, avail);\n"
+"}\n"
+"\n"
+"/* Set receive callback */\n"
+"rx->set_callback(rx, my_rx_callback, NULL);"
 
-#: ../../user_guide/hal.rst:203 7b853a2584884ff89bec3f0ec4c5cc88
+#: ../../user_guide/hal.rst:260 57d40959b8114330bed37403982c2f93
 #, fuzzy
 msgid "**Release when done:**"
 msgstr "使用完毕后释放："
 
-#: ../../user_guide/hal.rst:205 7b44b85929fa405fa7cb7b9a76bb7fbf
+#: ../../user_guide/hal.rst:262 b854fafea4b645699ff4baf417449dae
 msgid "nx_factory_uart_release(uart);"
-msgstr ""
+msgstr "nx_factory_uart_release(uart);"
 
-#: ../../user_guide/hal.rst:210 087f4a97756945cca4d5a471a6ae4a85
+#: ../../user_guide/hal.rst:267 e0cd4a107bc94675afedb46b9ef37caf
 msgid "SPI Module"
 msgstr "SPI 模块"
 
-#: ../../user_guide/hal.rst:212 500c4fe3ed18447284a76350950b9faa
+#: ../../user_guide/hal.rst:269 5d37d76a82bc4b5ba820b95c1b5080ab
 #, fuzzy
 msgid "**Get SPI device:**"
 msgstr "获取 SPI 设备："
 
-#: ../../user_guide/hal.rst:214 f12fcf360b2a478bb2aed5c2e295a491
+#: ../../user_guide/hal.rst:271 20d84914a27e40eaa01f9b260f140198
 msgid ""
 "nx_spi_t* spi = nx_factory_spi(0);\n"
 "\n"
@@ -381,24 +477,32 @@ msgid ""
 "\n"
 "nx_factory_spi_release(spi);"
 msgstr ""
+"nx_spi_t* spi = nx_factory_spi(0);\n"
+"\n"
+"/* Use SPI... */\n"
+"\n"
+"nx_factory_spi_release(spi);"
 
-#: ../../user_guide/hal.rst:223 6c568f7b81874020b105f16fa72dca24
+#: ../../user_guide/hal.rst:280 979a03fd98f24f74bcba143081b11d51
 msgid ""
 "Bus-level configuration (clock frequency, pin mapping) should be done "
-"through Kconfig at compile-time. Device-specific parameters (CS pin, "
-"speed, mode) are specified when acquiring communication handles."
+"through Kconfig at compile-time. Device-specific parameters (CS pin, speed, "
+"mode) are specified when acquiring communication handles."
 msgstr ""
+"Bus-level configuration (clock frequency, pin mapping) should be done "
+"through Kconfig at compile-time. Device-specific parameters (CS pin, speed, "
+"mode) are specified when acquiring communication handles."
 
-#: ../../user_guide/hal.rst:228 b55d3d70fae844e9aa176ec8c372da28
+#: ../../user_guide/hal.rst:285 ecc5a9afc4794070b5e5ea31953729cf
 msgid "I2C Module"
 msgstr "I2C 模块"
 
-#: ../../user_guide/hal.rst:230 6c950a86d51b4ecea1f8e39bc75c1d45
+#: ../../user_guide/hal.rst:287 cd13d623af034d30a7bfcd3775cae229
 #, fuzzy
 msgid "**Get I2C device:**"
 msgstr "获取 I2C 设备："
 
-#: ../../user_guide/hal.rst:232 c23f7da6dd7b4284b3cfc6ecaec4fea7
+#: ../../user_guide/hal.rst:289 848673e8d74a4228b379cf6fdfdb7f19
 msgid ""
 "nx_i2c_t* i2c = nx_factory_i2c(0);\n"
 "\n"
@@ -406,18 +510,23 @@ msgid ""
 "\n"
 "nx_factory_i2c_release(i2c);"
 msgstr ""
+"nx_i2c_t* i2c = nx_factory_i2c(0);\n"
+"\n"
+"/* Use I2C... */\n"
+"\n"
+"nx_factory_i2c_release(i2c);"
 
-#: ../../user_guide/hal.rst:241 a7b1f0482f3c41678e2bae2ec1816bd7
+#: ../../user_guide/hal.rst:298 bf92c2db86dc4cdc91fefb92b4217cb6
 msgid "Error Handling"
 msgstr "错误处理"
 
-#: ../../user_guide/hal.rst:243 4bf2d5b5972e4a5aa6c32b3ae08356fd
+#: ../../user_guide/hal.rst:300 9063d8c266d14ceba0e878ae71e1ce04
 msgid ""
-"All factory functions return ``NULL`` on failure. Interface methods "
-"return ``nx_status_t``:"
+"All factory functions return ``NULL`` on failure. Interface methods return "
+"``nx_status_t``:"
 msgstr "所有工厂函数在失败时返回 ``NULL``。接口方法返回 ``nx_status_t``："
 
-#: ../../user_guide/hal.rst:246 afd85c68d6bc4a4d8477681074512493
+#: ../../user_guide/hal.rst:303 3c6d862b145741c4acab0cc75b096a98
 msgid ""
 "nx_gpio_t* gpio = nx_factory_gpio(port, pin);\n"
 "if (!gpio) {\n"
@@ -430,48 +539,58 @@ msgid ""
 "    /* Handle error */\n"
 "}"
 msgstr ""
+"nx_gpio_t* gpio = nx_factory_gpio(port, pin);\n"
+"if (!gpio) {\n"
+"    /* Handle error: device not available */\n"
+"    return -1;\n"
+"}\n"
+"\n"
+"nx_status_t status = gpio->set_mode(gpio, NX_GPIO_MODE_OUTPUT_PP);\n"
+"if (status != NX_OK) {\n"
+"    /* Handle error */\n"
+"}"
 
-#: ../../user_guide/hal.rst:259 2c4607c9c1134e32a9853f1d7b35c1f8
+#: ../../user_guide/hal.rst:316 c450471a75b643cdb339f15706977daa
 msgid "Common status codes:"
 msgstr "常见状态码："
 
-#: ../../user_guide/hal.rst:261 fccaa98503154d459d2e9c93eafa2f57
+#: ../../user_guide/hal.rst:318 479f5abb90874d7294b4873051ebc4ff
 msgid "``NX_OK`` - Success"
 msgstr ""
 
-#: ../../user_guide/hal.rst:262 d0da217daddf4a81868d723570c54757
+#: ../../user_guide/hal.rst:319 c603fe8aa4b541ce9cba85a06a6d5a96
 #, fuzzy
 msgid "``NX_ERR_PARAM`` - Invalid parameter"
 msgstr "无效参数"
 
-#: ../../user_guide/hal.rst:263 7787c6c830f648d1a665692b7751984b
+#: ../../user_guide/hal.rst:320 429b8e495781495eb13dee7d4a5c2047
 msgid "``NX_ERR_STATE`` - Invalid state"
 msgstr ""
 
-#: ../../user_guide/hal.rst:264 f8b0ea6935504d77b3bf54bfbe57220e
+#: ../../user_guide/hal.rst:321 fcb133effb2b400fbb7d1b30ad4af493
 #, fuzzy
 msgid "``NX_ERR_TIMEOUT`` - Operation timeout"
 msgstr "操作超时"
 
-#: ../../user_guide/hal.rst:265 d0c0fc77a8344c39a2bc84d94d9b8119
+#: ../../user_guide/hal.rst:322 1c700dbe5fa549d4ad7c93c845b8c28b
 msgid "``NX_ERR_BUSY`` - Resource busy"
 msgstr ""
 
-#: ../../user_guide/hal.rst:266 5e42be3515eb4bcc9358c894879b9913
+#: ../../user_guide/hal.rst:323 306a4c9c506845ddbaf931e843d2d779
 msgid "``NX_ERR_NO_MEM`` - Out of memory"
 msgstr ""
 
-#: ../../user_guide/hal.rst:269 71ce7d099be243cea610a96f6f58a9f1
+#: ../../user_guide/hal.rst:326 d11062a0437b4315bc0368f57939b876
 msgid "Lifecycle Management"
 msgstr "生命周期管理"
 
-#: ../../user_guide/hal.rst:271 3d62c66f78014914ae7617c70f978086
+#: ../../user_guide/hal.rst:328 6d2a6b0b4899414a8f255eadafa552b5
 msgid ""
 "Devices support lifecycle operations through the ``nx_lifecycle_t`` "
 "interface:"
 msgstr "设备通过 ``nx_lifecycle_t`` 接口支持生命周期操作："
 
-#: ../../user_guide/hal.rst:273 e4bd8c258297494a95ad583e43e9cf03
+#: ../../user_guide/hal.rst:330 25fd517d1a004800a8aa0e93768748f0
 msgid ""
 "nx_gpio_t* gpio = nx_factory_gpio(0, 5);\n"
 "nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);\n"
@@ -482,16 +601,24 @@ msgid ""
 "/* Resume device */\n"
 "lc->resume(lc);"
 msgstr ""
+"nx_gpio_t* gpio = nx_factory_gpio(0, 5);\n"
+"nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);\n"
+"\n"
+"/* Suspend device */\n"
+"lc->suspend(lc);\n"
+"\n"
+"/* Resume device */\n"
+"lc->resume(lc);"
 
-#: ../../user_guide/hal.rst:285 72e2e23e5f994220b7b48614d7a7c615
+#: ../../user_guide/hal.rst:342 4e2edea298ab48c68f220fac36b5a76a
 msgid "Power Management"
 msgstr "电源管理"
 
-#: ../../user_guide/hal.rst:287 6fe2a9112de34b55968da24460668d6a
+#: ../../user_guide/hal.rst:344 17dc5776c9fa4054bf993aa06817dcef
 msgid "Devices support power management through the ``nx_power_t`` interface:"
 msgstr "设备通过 ``nx_power_t`` 接口支持电源管理："
 
-#: ../../user_guide/hal.rst:289 90c55113e27b4357bfba3aa60119f2fa
+#: ../../user_guide/hal.rst:346 1fbbd9b23a154624b00e7068f26380ba
 msgid ""
 "nx_uart_t* uart = nx_factory_uart(0);\n"
 "nx_power_t* pwr = uart->get_power(uart);\n"
@@ -502,12 +629,20 @@ msgid ""
 "/* Wake up */\n"
 "pwr->set_mode(pwr, NX_POWER_MODE_NORMAL);"
 msgstr ""
+"nx_uart_t* uart = nx_factory_uart(0);\n"
+"nx_power_t* pwr = uart->get_power(uart);\n"
+"\n"
+"/* Enter low power mode */\n"
+"pwr->set_mode(pwr, NX_POWER_MODE_SLEEP);\n"
+"\n"
+"/* Wake up */\n"
+"pwr->set_mode(pwr, NX_POWER_MODE_NORMAL);"
 
-#: ../../user_guide/hal.rst:301 1822075c955e45c9acb9c8cc201e7812
+#: ../../user_guide/hal.rst:358 5d3f31276cdb425f954eba47aee78d74
 msgid "API Reference"
 msgstr "API 参考"
 
-#: ../../user_guide/hal.rst:303 028ebe8ad6854244b15ce5f77cde39e8
+#: ../../user_guide/hal.rst:360 dd922c40f09f42a6a5c7ab882992aa67
 msgid "See :doc:`../api/hal` for complete API documentation."
 msgstr "完整 API 文档请参阅 :doc:`../api/hal`。"
 
@@ -523,3 +658,20 @@ msgstr "完整 API 文档请参阅 :doc:`../api/hal`。"
 #~ msgid "Out of memory"
 #~ msgstr "内存不足"
 
+#~ msgid ""
+#~ "+------------------+\n"
+#~ "|   Application    |\n"
+#~ "+------------------+\n"
+#~ "       |\n"
+#~ "+------------------+\n"
+#~ "|   nx_factory     |  Device creation and management\n"
+#~ "+------------------+\n"
+#~ "       |\n"
+#~ "+------------------+\n"
+#~ "|   Interfaces     |  nx_gpio_t, nx_uart_t, nx_spi_t, etc.\n"
+#~ "+------------------+\n"
+#~ "       |\n"
+#~ "+------------------+\n"
+#~ "|   Platform HAL   |  STM32F4, Native, etc.\n"
+#~ "+------------------+"
+#~ msgstr ""

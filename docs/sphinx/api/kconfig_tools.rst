@@ -8,10 +8,10 @@ The Kconfig tools provide Python APIs for managing configuration files,
 validating Kconfig syntax, and generating C header files.
 
 Module: generate_hal_config
-----------------------------
+---------------------------
 
 Configuration Header Generation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: generate_header(config_dict, output_file=None)
 
@@ -57,7 +57,7 @@ Configuration Header Generation
 
    Generate default configuration for specified platform.
 
-   :param str platform: Platform name (native, stm32, gd32, etc.)
+   :param str platform: Platform name (native, STM32, GD32, etc.)
    :return: Default configuration dictionary
    :rtype: dict
 
@@ -68,13 +68,13 @@ Configuration Header Generation
        from generate_hal_config import generate_default_config
 
        # Generate default for STM32
-       config = generate_default_config('stm32')
+       config = generate_default_config('STM32')
 
        # Generate default for current platform
        config = generate_default_config()
 
 Module: validate_kconfig
--------------------------
+------------------------
 
 Kconfig Validation
 ^^^^^^^^^^^^^^^^^^
@@ -173,7 +173,7 @@ Kconfig Validation
       :type: dict[str, set[str]]
 
 Module: kconfig_migrate
-------------------------
+-----------------------
 
 Configuration Migration
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -278,7 +278,7 @@ Configuration Comparison
    :rtype: str
 
 Module: generate_config_docs
------------------------------
+----------------------------
 
 Documentation Generation
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -330,7 +330,7 @@ Documentation Generation
    :rtype: str
 
 Command-Line Interface
------------------------
+----------------------
 
 nexus_config.py
 ^^^^^^^^^^^^^^^
@@ -431,7 +431,7 @@ Symbol information dictionaries contain metadata:
         'default': '115200',
         'range': (9600, 921600),
         'help': 'Baud rate for UART1',
-        'file': 'platforms/stm32/src/uart/Kconfig',
+        'file': 'platforms/STM32/src/uart/Kconfig',
         'line': 42
     }
 
@@ -445,7 +445,7 @@ Validation results contain errors and warnings:
     {
         'errors': [
             'Kconfig:10: Unclosed if block',
-            'platforms/stm32/Kconfig:25: Undefined symbol INVALID_SYMBOL'
+            'platforms/STM32/Kconfig:25: Undefined symbol INVALID_SYMBOL'
         ],
         'warnings': [
             'platforms/native/Kconfig:15: default outside of config block'
@@ -577,5 +577,5 @@ See Also
 
 * :doc:`../user_guide/kconfig` - Kconfig user guide
 * :doc:`../development/contributing` - Contributing guidelines
-* Scripts README: ``scripts/kconfig/README.md``
+* Scripts README: ``scripts/Kconfig/README.md``
 

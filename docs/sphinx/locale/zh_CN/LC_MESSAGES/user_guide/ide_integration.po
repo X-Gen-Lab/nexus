@@ -1,0 +1,1077 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../user_guide/ide_integration.rst:2 8d1735c01713405d9ed45c2ebc5e353e
+msgid "IDE Integration"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:4 ca03ae81e7d848fe8a2775c9b2e2829c
+msgid ""
+"This guide covers integrating the Nexus Embedded Platform with popular IDEs "
+"including Visual Studio Code, CLion, and Visual Studio."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:8 ea6c38c28200484a8da69f42404ebe5d
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../user_guide/ide_integration.rst:11 1a00c5e3b5d64cf088a7bcdb4dcd7236
+msgid "Visual Studio Code"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:13 35d138b71c484eecb0bb7ca71bf50995
+msgid ""
+"VS Code is a lightweight, cross-platform editor with excellent CMake and "
+"C/C++ support."
+msgstr ""
+
+#: aa76e6d41eef4424b3fca8dbd5fabe5f f95fdad62b0549dc9fe7d1e2700902aa
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../user_guide/ide_integration.rst:18 d27d348528164c968830b75f279c0086
+msgid "Install the following VS Code extensions:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:20 ba6934d9064f42a1a7eba329568786d3
+msgid "**C/C++** (ms-vscode.cpptools) - IntelliSense, debugging"
+msgstr "**C/C++** (ms-vscode.cpptools) - IntelliSense, debugging"
+
+#: ../../user_guide/ide_integration.rst:21 3186be90d220460f84970c4742b27faf
+msgid "**CMake Tools** (ms-vscode.cmake-tools) - CMake integration"
+msgstr "**CMake Tools** (ms-vscode.cmake-tools) - CMake integration"
+
+#: ../../user_guide/ide_integration.rst:22 f919701e3941494b94445acdda3c160d
+msgid "**CMake** (twxs.cmake) - CMake language support"
+msgstr "**CMake** (twxs.cmake) - CMake language support"
+
+#: ../../user_guide/ide_integration.rst:24 f5c66775bc54414a9e2ad2ec86880fbd
+msgid "Installation:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:26 6d722ef136194457b5e5e1baf5224afe
+msgid ""
+"code --install-extension ms-vscode.cpptools\n"
+"code --install-extension ms-vscode.cmake-tools\n"
+"code --install-extension twxs.cmake"
+msgstr ""
+
+#: c924f21d546a4bf98d376959bb3ec893 fe00844a313c4689a296fd765fd36632
+msgid "Configuration"
+msgstr "配置"
+
+#: ../../user_guide/ide_integration.rst:35 5390cf14eaf04073a7d3eaf08b0d1ff0
+msgid "Create ``.vscode/settings.json``:"
+msgstr "创建 ``.vscode/settings.json``："
+
+#: ../../user_guide/ide_integration.rst:37 f5e2aada085f423abc60b535a4205592
+msgid ""
+"{\n"
+"    \"cmake.configureOnOpen\": true,\n"
+"    \"cmake.buildDirectory\": \"${workspaceFolder}/build\",\n"
+"    \"cmake.generator\": \"Ninja\",\n"
+"    \"cmake.configureSettings\": {\n"
+"        \"NEXUS_PLATFORM\": \"native\",\n"
+"        \"NEXUS_BUILD_TESTS\": \"ON\",\n"
+"        \"NEXUS_BUILD_EXAMPLES\": \"ON\",\n"
+"        \"CMAKE_BUILD_TYPE\": \"Debug\",\n"
+"        \"CMAKE_EXPORT_COMPILE_COMMANDS\": \"ON\"\n"
+"    },\n"
+"    \"C_Cpp.default.configurationProvider\": \"ms-vscode.cmake-tools\",\n"
+"    \"C_Cpp.default.compileCommands\": \"${workspaceFolder}/build/compile_commands.json\",\n"
+"    \"files.associations\": {\n"
+"        \"*.h\": \"c\",\n"
+"        \"*.c\": \"c\"\n"
+"    }\n"
+"}"
+msgstr ""
+"{\n"
+"    \"cmake.configureOnOpen\": true,\n"
+"    \"cmake.buildDirectory\": \"${workspaceFolder}/build\",\n"
+"    \"cmake.generator\": \"Ninja\",\n"
+"    \"cmake.configureSettings\": {\n"
+"        \"NEXUS_PLATFORM\": \"native\",\n"
+"        \"NEXUS_BUILD_TESTS\": \"ON\",\n"
+"        \"NEXUS_BUILD_EXAMPLES\": \"ON\",\n"
+"        \"CMAKE_BUILD_TYPE\": \"Debug\",\n"
+"        \"CMAKE_EXPORT_COMPILE_COMMANDS\": \"ON\"\n"
+"    },\n"
+"    \"C_Cpp.default.configurationProvider\": \"ms-vscode.cmake-tools\",\n"
+"    \"C_Cpp.default.compileCommands\": \"${workspaceFolder}/build/compile_commands.json\",\n"
+"    \"files.associations\": {\n"
+"        \"*.h\": \"c\",\n"
+"        \"*.c\": \"c\"\n"
+"    }\n"
+"}"
+
+#: ../../user_guide/ide_integration.rst:58 5df052c6feb14b8f81bad7fbc7afb7a9
+msgid "Create ``.vscode/c_cpp_properties.json``:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:60 72b7a123f6644e01a6d449a40921cea5
+msgid ""
+"{\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"Linux\",\n"
+"            \"includePath\": [\n"
+"                \"${workspaceFolder}/**\"\n"
+"            ],\n"
+"            \"defines\": [],\n"
+"            \"compilerPath\": \"/usr/bin/gcc\",\n"
+"            \"cStandard\": \"c11\",\n"
+"            \"cppStandard\": \"c++17\",\n"
+"            \"intelliSenseMode\": \"linux-gcc-x64\",\n"
+"            \"compileCommands\": \"${workspaceFolder}/build/compile_commands.json\"\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"Win32\",\n"
+"            \"includePath\": [\n"
+"                \"${workspaceFolder}/**\"\n"
+"            ],\n"
+"            \"defines\": [\n"
+"                \"_DEBUG\",\n"
+"                \"UNICODE\",\n"
+"                \"_UNICODE\"\n"
+"            ],\n"
+"            \"windowsSdkVersion\": \"10.0.19041.0\",\n"
+"            \"compilerPath\": \"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.30.30705/bin/Hostx64/x64/cl.exe\",\n"
+"            \"cStandard\": \"c11\",\n"
+"            \"cppStandard\": \"c++17\",\n"
+"            \"intelliSenseMode\": \"windows-msvc-x64\",\n"
+"            \"compileCommands\": \"${workspaceFolder}/build/compile_commands.json\"\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"Mac\",\n"
+"            \"includePath\": [\n"
+"                \"${workspaceFolder}/**\"\n"
+"            ],\n"
+"            \"defines\": [],\n"
+"            \"macFrameworkPath\": [\n"
+"                \"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks\"\n"
+"            ],\n"
+"            \"compilerPath\": \"/usr/bin/clang\",\n"
+"            \"cStandard\": \"c11\",\n"
+"            \"cppStandard\": \"c++17\",\n"
+"            \"intelliSenseMode\": \"macos-clang-x64\",\n"
+"            \"compileCommands\": \"${workspaceFolder}/build/compile_commands.json\"\n"
+"        }\n"
+"    ],\n"
+"    \"version\": 4\n"
+"}"
+msgstr ""
+"{\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"Linux\",\n"
+"            \"includePath\": [\n"
+"                \"${workspaceFolder}/**\"\n"
+"            ],\n"
+"            \"defines\": [],\n"
+"            \"compilerPath\": \"/usr/bin/gcc\",\n"
+"            \"cStandard\": \"c11\",\n"
+"            \"cppStandard\": \"c++17\",\n"
+"            \"intelliSenseMode\": \"linux-gcc-x64\",\n"
+"            \"compileCommands\": \"${workspaceFolder}/build/compile_commands.json\"\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"Win32\",\n"
+"            \"includePath\": [\n"
+"                \"${workspaceFolder}/**\"\n"
+"            ],\n"
+"            \"defines\": [\n"
+"                \"_DEBUG\",\n"
+"                \"UNICODE\",\n"
+"                \"_UNICODE\"\n"
+"            ],\n"
+"            \"windowsSdkVersion\": \"10.0.19041.0\",\n"
+"            \"compilerPath\": \"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.30.30705/bin/Hostx64/x64/cl.exe\",\n"
+"            \"cStandard\": \"c11\",\n"
+"            \"cppStandard\": \"c++17\",\n"
+"            \"intelliSenseMode\": \"windows-msvc-x64\",\n"
+"            \"compileCommands\": \"${workspaceFolder}/build/compile_commands.json\"\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"Mac\",\n"
+"            \"includePath\": [\n"
+"                \"${workspaceFolder}/**\"\n"
+"            ],\n"
+"            \"defines\": [],\n"
+"            \"macFrameworkPath\": [\n"
+"                \"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks\"\n"
+"            ],\n"
+"            \"compilerPath\": \"/usr/bin/clang\",\n"
+"            \"cStandard\": \"c11\",\n"
+"            \"cppStandard\": \"c++17\",\n"
+"            \"intelliSenseMode\": \"macos-clang-x64\",\n"
+"            \"compileCommands\": \"${workspaceFolder}/build/compile_commands.json\"\n"
+"        }\n"
+"    ],\n"
+"    \"version\": 4\n"
+"}"
+
+#: ../../user_guide/ide_integration.rst:112 88c476a190b34832af980befb238b207
+msgid "Create ``.vscode/launch.json`` for debugging:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:114 93e391566cf54b6583cb7eea25c45e5a
+msgid ""
+"{\n"
+"    \"version\": \"0.2.0\",\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"(gdb) Launch Tests\",\n"
+"            \"type\": \"cppdbg\",\n"
+"            \"request\": \"launch\",\n"
+"            \"program\": \"${workspaceFolder}/build/tests/nexus_tests\",\n"
+"            \"args\": [],\n"
+"            \"stopAtEntry\": false,\n"
+"            \"cwd\": \"${workspaceFolder}\",\n"
+"            \"environment\": [],\n"
+"            \"externalConsole\": false,\n"
+"            \"MIMode\": \"gdb\",\n"
+"            \"setupCommands\": [\n"
+"                {\n"
+"                    \"description\": \"Enable pretty-printing for gdb\",\n"
+"                    \"text\": \"-enable-pretty-printing\",\n"
+"                    \"ignoreFailures\": true\n"
+"                }\n"
+"            ],\n"
+"            \"preLaunchTask\": \"CMake: build\",\n"
+"            \"miDebuggerPath\": \"/usr/bin/gdb\",\n"
+"            \"linux\": {\n"
+"                \"MIMode\": \"gdb\",\n"
+"                \"miDebuggerPath\": \"/usr/bin/gdb\"\n"
+"            },\n"
+"            \"osx\": {\n"
+"                \"MIMode\": \"lldb\"\n"
+"            },\n"
+"            \"windows\": {\n"
+"                \"MIMode\": \"gdb\",\n"
+"                \"miDebuggerPath\": \"C:\\\\msys64\\\\mingw64\\\\bin\\\\gdb.exe\"\n"
+"            }\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"(gdb) Launch Blinky\",\n"
+"            \"type\": \"cppdbg\",\n"
+"            \"request\": \"launch\",\n"
+"            \"program\": \"${workspaceFolder}/build/applications/blinky/blinky\",\n"
+"            \"args\": [],\n"
+"            \"stopAtEntry\": false,\n"
+"            \"cwd\": \"${workspaceFolder}\",\n"
+"            \"environment\": [],\n"
+"            \"externalConsole\": false,\n"
+"            \"MIMode\": \"gdb\",\n"
+"            \"preLaunchTask\": \"CMake: build\"\n"
+"        }\n"
+"    ]\n"
+"}"
+msgstr ""
+"{\n"
+"    \"version\": \"0.2.0\",\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"(gdb) Launch Tests\",\n"
+"            \"type\": \"cppdbg\",\n"
+"            \"request\": \"launch\",\n"
+"            \"program\": \"${workspaceFolder}/build/tests/nexus_tests\",\n"
+"            \"args\": [],\n"
+"            \"stopAtEntry\": false,\n"
+"            \"cwd\": \"${workspaceFolder}\",\n"
+"            \"environment\": [],\n"
+"            \"externalConsole\": false,\n"
+"            \"MIMode\": \"gdb\",\n"
+"            \"setupCommands\": [\n"
+"                {\n"
+"                    \"description\": \"Enable pretty-printing for gdb\",\n"
+"                    \"text\": \"-enable-pretty-printing\",\n"
+"                    \"ignoreFailures\": true\n"
+"                }\n"
+"            ],\n"
+"            \"preLaunchTask\": \"CMake: build\",\n"
+"            \"miDebuggerPath\": \"/usr/bin/gdb\",\n"
+"            \"linux\": {\n"
+"                \"MIMode\": \"gdb\",\n"
+"                \"miDebuggerPath\": \"/usr/bin/gdb\"\n"
+"            },\n"
+"            \"osx\": {\n"
+"                \"MIMode\": \"lldb\"\n"
+"            },\n"
+"            \"windows\": {\n"
+"                \"MIMode\": \"gdb\",\n"
+"                \"miDebuggerPath\": \"C:\\\\msys64\\\\mingw64\\\\bin\\\\gdb.exe\"\n"
+"            }\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"(gdb) Launch Blinky\",\n"
+"            \"type\": \"cppdbg\",\n"
+"            \"request\": \"launch\",\n"
+"            \"program\": \"${workspaceFolder}/build/applications/blinky/blinky\",\n"
+"            \"args\": [],\n"
+"            \"stopAtEntry\": false,\n"
+"            \"cwd\": \"${workspaceFolder}\",\n"
+"            \"environment\": [],\n"
+"            \"externalConsole\": false,\n"
+"            \"MIMode\": \"gdb\",\n"
+"            \"preLaunchTask\": \"CMake: build\"\n"
+"        }\n"
+"    ]\n"
+"}"
+
+#: ../../user_guide/ide_integration.rst:167 69cf078a073b4e7184888848ad2894d5
+msgid "Create ``.vscode/tasks.json``:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:169 17b58df535d0471eac504d93f2a1f066
+msgid ""
+"{\n"
+"    \"version\": \"2.0.0\",\n"
+"    \"tasks\": [\n"
+"        {\n"
+"            \"label\": \"CMake: configure\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"cmake\",\n"
+"            \"args\": [\n"
+"                \"-B\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"-DNEXUS_PLATFORM=native\",\n"
+"                \"-DCMAKE_BUILD_TYPE=Debug\"\n"
+"            ],\n"
+"            \"group\": \"build\",\n"
+"            \"problemMatcher\": []\n"
+"        },\n"
+"        {\n"
+"            \"label\": \"CMake: build\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"cmake\",\n"
+"            \"args\": [\n"
+"                \"--build\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"--\",\n"
+"                \"-j4\"\n"
+"            ],\n"
+"            \"group\": {\n"
+"                \"kind\": \"build\",\n"
+"                \"isDefault\": true\n"
+"            },\n"
+"            \"problemMatcher\": [\"$gcc\"],\n"
+"            \"dependsOn\": [\"CMake: configure\"]\n"
+"        },\n"
+"        {\n"
+"            \"label\": \"CMake: clean\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"cmake\",\n"
+"            \"args\": [\n"
+"                \"--build\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"--target\",\n"
+"                \"clean\"\n"
+"            ],\n"
+"            \"group\": \"build\",\n"
+"            \"problemMatcher\": []\n"
+"        },\n"
+"        {\n"
+"            \"label\": \"Run Tests\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"ctest\",\n"
+"            \"args\": [\n"
+"                \"--test-dir\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"--output-on-failure\"\n"
+"            ],\n"
+"            \"group\": \"test\",\n"
+"            \"problemMatcher\": [],\n"
+"            \"dependsOn\": [\"CMake: build\"]\n"
+"        }\n"
+"    ]\n"
+"}"
+msgstr ""
+"{\n"
+"    \"version\": \"2.0.0\",\n"
+"    \"tasks\": [\n"
+"        {\n"
+"            \"label\": \"CMake: configure\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"cmake\",\n"
+"            \"args\": [\n"
+"                \"-B\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"-DNEXUS_PLATFORM=native\",\n"
+"                \"-DCMAKE_BUILD_TYPE=Debug\"\n"
+"            ],\n"
+"            \"group\": \"build\",\n"
+"            \"problemMatcher\": []\n"
+"        },\n"
+"        {\n"
+"            \"label\": \"CMake: build\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"cmake\",\n"
+"            \"args\": [\n"
+"                \"--build\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"--\",\n"
+"                \"-j4\"\n"
+"            ],\n"
+"            \"group\": {\n"
+"                \"kind\": \"build\",\n"
+"                \"isDefault\": true\n"
+"            },\n"
+"            \"problemMatcher\": [\"$gcc\"],\n"
+"            \"dependsOn\": [\"CMake: configure\"]\n"
+"        },\n"
+"        {\n"
+"            \"label\": \"CMake: clean\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"cmake\",\n"
+"            \"args\": [\n"
+"                \"--build\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"--target\",\n"
+"                \"clean\"\n"
+"            ],\n"
+"            \"group\": \"build\",\n"
+"            \"problemMatcher\": []\n"
+"        },\n"
+"        {\n"
+"            \"label\": \"Run Tests\",\n"
+"            \"type\": \"shell\",\n"
+"            \"command\": \"ctest\",\n"
+"            \"args\": [\n"
+"                \"--test-dir\",\n"
+"                \"${workspaceFolder}/build\",\n"
+"                \"--output-on-failure\"\n"
+"            ],\n"
+"            \"group\": \"test\",\n"
+"            \"problemMatcher\": [],\n"
+"            \"dependsOn\": [\"CMake: build\"]\n"
+"        }\n"
+"    ]\n"
+"}"
+
+#: 2d7c409ddc6a4f57b4bd1fc28c88f9ba d3422fc40f0242dda5f9b43682d3f8c4
+msgid "Usage"
+msgstr "用法"
+
+#: ../../user_guide/ide_integration.rst:236 ae781d1a3a6443f6a0441043de7d008e
+msgid ""
+"**Open Project**: ``File > Open Folder`` and select the Nexus root directory"
+msgstr ""
+"**Open Project**: ``File > Open Folder`` and select the Nexus root directory"
+
+#: ../../user_guide/ide_integration.rst:238 5eafb1834cfd499cb5e516958f237ed3
+msgid "**Configure**: Press ``Ctrl+Shift+P`` and run ``CMake: Configure``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:240 923c9f2273ea421d8c23190ac3b024a3
+msgid ""
+"**Build**: Press ``Ctrl+Shift+P`` and run ``CMake: Build`` or press ``F7``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:242 4b9bfc66c3b34049b84477a121063b3a
+msgid "**Run Tests**: Press ``Ctrl+Shift+P`` and run ``CMake: Run Tests``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:244 8fa797defd43448f917ae8d23a207c33
+msgid "**Debug**: Press ``F5`` to start debugging"
+msgstr ""
+
+#: 7094de124e404d3baaaa6b33d4f7857c a3aaf3a45e574a54bdf1382e498440c6
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:249 385d88619e1d484988c474609624d18e
+msgid "``F7`` - Build"
+msgstr ""
+
+#: 50325ba32de84f94b4634429cf513e7e
+msgid "``F5`` - Start debugging"
+msgstr ""
+
+#: 88e551228a344f3a872471bd12cd8209
+msgid "``Shift+F5`` - Stop debugging"
+msgstr ""
+
+#: ff9d921eb31540389e389139e2e0f6fb
+msgid "``F9`` - Toggle breakpoint"
+msgstr ""
+
+#: e361521a3ff84417b3fcdaaf87e8c03d
+msgid "``F10`` - Step over"
+msgstr ""
+
+#: 6a0b42f3c07b42f1a3016347de4ecaec
+msgid "``F11`` - Step into"
+msgstr ""
+
+#: 6b8f1ad6e50b4d8f8167a8d1809acfcc
+msgid "``Shift+F11`` - Step out"
+msgstr ""
+
+#: e4089ef2b33749bdaed8b4c89855707c
+msgid "CLion"
+msgstr "CLion"
+
+#: ../../user_guide/ide_integration.rst:260 bb48d902845648008820664b3358aee6
+msgid ""
+"CLion is a cross-platform C/C++ IDE from JetBrains with native CMake "
+"support."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:265 d01f72cd44c84fbe9970c350e4aa10f2
+msgid "CLion automatically detects CMake projects. Ensure you have:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:267 760c696bfc54424ca9f8bc280258e99a
+msgid "CLion 2020.3 or later"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:268 fcb671991d1a4a73bceb52a6589143f5
+msgid "CMake 3.16 or later"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:269 ad0d5b61a4f14cae84748a819f0e5025
+msgid "C/C++ compiler (GCC, Clang, or MSVC)"
+msgstr "C/C++ compiler (GCC, Clang, or MSVC)"
+
+#: ../../user_guide/ide_integration.rst:270 cb2b775b06b64483ba3e5e36b23898ea
+msgid "ARM GCC toolchain (for embedded targets)"
+msgstr "ARM GCC toolchain (for embedded targets)"
+
+#: ../../user_guide/ide_integration.rst:275 583dd94b46374cc7bc4d5a3cfe9fc57f
+msgid ""
+"CLion automatically detects CMake projects. No additional configuration is "
+"required for basic usage."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:278 0c8384ed13a04cbea3fa092128f25f33
+msgid "Custom CMake Options"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:280 74cc0d8c35194c77abe839d5a8d4b08b
+msgid "Open ``File > Settings > Build, Execution, Deployment > CMake``"
+msgstr "Open ``File > Settings > Build, Execution, Deployment > CMake``"
+
+#: ../../user_guide/ide_integration.rst:282 af4aa0d3a7ae4da3847463430634eb08
+msgid "Add build profiles:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:284 7ff57719216a4bb28e295feac92a5a2b
+msgid "**Debug Profile**:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:286 4af2c95eb0c34103b3f5410ce953a0e6
+msgid "Name: ``Debug``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:287 20d5cb5a606e4118bc273ddf28492789
+msgid "Build type: ``Debug``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:288 a377f4516e58496ebd32b7305bb84337
+msgid "CMake options: ``-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON``"
+msgstr "CMake options: ``-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON``"
+
+#: ../../user_guide/ide_integration.rst:289 97397381e4ac40449e0c7cd4d6e06de8
+msgid "Build directory: ``build-Debug``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:291 02cc678f78e14473ac6f460d333ee976
+msgid "**Release Profile**:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:293 d02982b02d6b44bb8eaf090d3626f2fd
+msgid "Name: ``Release``"
+msgstr ""
+
+#: c492a72a6eb548868b8414321966b50e
+msgid "Build type: ``Release``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:295 b43dabbb6c6649299045c24c8c066a08
+msgid "CMake options: ``-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=OFF``"
+msgstr "CMake options: ``-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=OFF``"
+
+#: ../../user_guide/ide_integration.rst:296 bad8009e45244ae486906ec871aa8ac8
+msgid "Build directory: ``build-Release``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:298 e8fc92620459421cb1ec41e253ac0ab2
+msgid "**STM32F4 Profile**:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:300 28ef5bd9bf2b4ae2a07cd9c14fe88838
+msgid "Name: ``STM32F4``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:302 a41ff842218f4bca8697de8ce30b9847
+msgid "CMake options: ``-DNEXUS_PLATFORM=stm32f4 -DNEXUS_BUILD_TESTS=OFF``"
+msgstr "CMake options: ``-DNEXUS_PLATFORM=stm32f4 -DNEXUS_BUILD_TESTS=OFF``"
+
+#: ../../user_guide/ide_integration.rst:303 eab4d0614c5645b28c54eda117d607ab
+msgid "Build directory: ``build-stm32f4``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:304 3c0f1a7f8de641e5ab4703869f59dd74
+msgid ""
+"Toolchain: ``ARM GCC`` (configure in ``File > Settings > Build, Execution, "
+"Deployment > Toolchains``)"
+msgstr ""
+"Toolchain: ``ARM GCC`` (configure in ``File > Settings > Build, Execution, "
+"Deployment > Toolchains``)"
+
+#: ../../user_guide/ide_integration.rst:307 af3f29db601c400a940435de17dbae57
+msgid "Toolchain Configuration"
+msgstr "工具链 配置"
+
+#: ../../user_guide/ide_integration.rst:309 96c4262ed5344884bca030e2558a1854
+msgid "For ARM cross-compilation:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:311 cf98aba1cc7341888d3d92ee7c6458b4
+msgid "Open ``File > Settings > Build, Execution, Deployment > Toolchains``"
+msgstr "Open ``File > Settings > Build, Execution, Deployment > Toolchains``"
+
+#: ../../user_guide/ide_integration.rst:313 034b4ffeaaa748b9abcb1e5a6882f885
+msgid "Add new toolchain:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:315 2f50511526be4e39a366413b875b4fef
+msgid "Name: ``ARM GCC``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:316 654fd60f7ee645a496eaf999db7d7d86
+msgid "C Compiler: ``/usr/bin/arm-none-eabi-gcc`` (or Windows path)"
+msgstr "C Compiler: ``/usr/bin/arm-none-eabi-gcc`` (or Windows path)"
+
+#: ../../user_guide/ide_integration.rst:317 1f3c312fd22d4f7d8a7df010b556c281
+msgid "C++ Compiler: ``/usr/bin/arm-none-eabi-g++``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:318 ec7264df430344dcab41aa05bd0c3f2b
+msgid "Debugger: ``/usr/bin/arm-none-eabi-gdb``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:321 90874beeca1e46238d6fec0438a16ddb
+msgid "Run/Debug Configurations"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:323 7de29d62a9fe48abb84c958ba7c47d43
+msgid "CLion automatically creates run configurations for executables."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:325 7add8389f10747feaa89ec7f15047f27
+msgid "To create a custom configuration:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:327 fb08a38eaa5448328b371f5f549b2e6d
+msgid "``Run > Edit Configurations``"
+msgstr "``Run > Edit Configurations``"
+
+#: ../../user_guide/ide_integration.rst:329 9415a108c34c4e7ba97cc53d79de2dcb
+msgid "Add new ``CMake Application``:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:331 200d66df32a04002bf7f9d6a5a307f89
+msgid "Name: ``Nexus Tests``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:332 09f038c19a904eed85d3412ab65ed62d
+msgid "Target: ``nexus_tests``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:333 7d523dfc0f9f46acb3480debf81bdd3f
+msgid "Executable: ``nexus_tests``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:334 49f4ba2f1eb046efb5fdae10481e3fb2
+msgid "Program arguments: ``--gtest_filter=*``"
+msgstr "Program arguments: ``--gtest_filter=*``"
+
+#: ../../user_guide/ide_integration.rst:339 3156fbf731c14f1297ff0b30c10b3fa4
+msgid "**Open Project**: ``File > Open`` and select ``CMakeLists.txt``"
+msgstr "**Open Project**: ``File > Open`` and select ``CMakeLists.txt``"
+
+#: ../../user_guide/ide_integration.rst:341 1385e356f85a469c93ef1f56956f2dc6
+msgid "**Reload CMake**: ``Tools > CMake > Reload CMake Project``"
+msgstr "**Reload CMake**: ``Tools > CMake > Reload CMake Project``"
+
+#: ../../user_guide/ide_integration.rst:343 6ecff0908a2c4a428c0b9598a05f4f5d
+msgid "**Build**: ``Build > Build Project`` or ``Ctrl+F9``"
+msgstr "**Build**: ``Build > Build Project`` or ``Ctrl+F9``"
+
+#: ../../user_guide/ide_integration.rst:345 8f5d354177b64eb295a7e3f2ef7667b8
+msgid "**Run**: ``Run > Run`` or ``Shift+F10``"
+msgstr "**Run**: ``Run > Run`` or ``Shift+F10``"
+
+#: ../../user_guide/ide_integration.rst:347 76b9fd66c4744db98f319f367facce5d
+msgid "**Debug**: ``Run > Debug`` or ``Shift+F9``"
+msgstr "**Debug**: ``Run > Debug`` or ``Shift+F9``"
+
+#: ../../user_guide/ide_integration.rst:349 448456066e17409398ad03ec87ae7472
+msgid ""
+"**Run Tests**: Right-click on ``tests`` folder and select ``Run Tests``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:354 31fc649a02084586b879691c2c69952d
+msgid "``Ctrl+F9`` - Build project"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:355 a789e28550054c3498cf02b2c556561b
+msgid "``Shift+F10`` - Run"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:356 e60ad2bea8204d96be0bc4193fccde35
+msgid "``Shift+F9`` - Debug"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:357 a5a242f570594f098266d75344f36202
+msgid "``Ctrl+F8`` - Toggle breakpoint"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:358 34edeb6948d049e28214762624a160a9
+msgid "``F8`` - Step over"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:359 6709f0c74de44c4cb2d2c5f979c5f289
+msgid "``F7`` - Step into"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:360 f76429eb5d2d4ec0bbefa066ca1d8687
+msgid "``Shift+F8`` - Step out"
+msgstr ""
+
+#: 8832d6ec7cdc461db98aa85c31012a16
+msgid "Visual Studio"
+msgstr "Visual Studio"
+
+#: ../../user_guide/ide_integration.rst:365 4e6765522ebc483fae775164616dad1f
+msgid "Visual Studio 2019/2022 has native CMake support."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:370 82ecc33679654d08a0926a44d717d1da
+msgid "Install Visual Studio with:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:372 508906714b7145539af783c582f44591
+msgid "**Desktop development with C++** workload"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:373 96332cd6848242ee95e35d7bfaefdfd1
+msgid "**C++ CMake tools for Windows** component"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:374 1494b01f6b644c61a6375223f5d28442
+msgid "**C++ Clang tools for Windows** (optional)"
+msgstr "**C++ Clang tools for Windows** (optional)"
+
+#: ../../user_guide/ide_integration.rst:379 ba8a45d674c24c1ab15a2c648e97d0a2
+msgid "Visual Studio uses ``CMakeSettings.json`` for configuration."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:381 9e2b845a89c14e02bb09e5b75e2c80ed
+msgid "Create ``CMakeSettings.json``:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:383 b7cf7e87671948329601eae8a1c7aa68
+msgid ""
+"{\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"x64-Debug\",\n"
+"            \"generator\": \"Ninja\",\n"
+"            \"configurationType\": \"Debug\",\n"
+"            \"inheritEnvironments\": [ \"msvc_x64_x64\" ],\n"
+"            \"buildRoot\": \"${projectDir}\\\\build\\\\${name}\",\n"
+"            \"installRoot\": \"${projectDir}\\\\install\\\\${name}\",\n"
+"            \"cmakeCommandArgs\": \"-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\",\n"
+"            \"buildCommandArgs\": \"\",\n"
+"            \"ctestCommandArgs\": \"\",\n"
+"            \"variables\": [\n"
+"                {\n"
+"                    \"name\": \"CMAKE_BUILD_TYPE\",\n"
+"                    \"value\": \"Debug\",\n"
+"                    \"type\": \"STRING\"\n"
+"                },\n"
+"                {\n"
+"                    \"name\": \"NEXUS_PLATFORM\",\n"
+"                    \"value\": \"native\",\n"
+"                    \"type\": \"STRING\"\n"
+"                },\n"
+"                {\n"
+"                    \"name\": \"NEXUS_BUILD_TESTS\",\n"
+"                    \"value\": \"ON\",\n"
+"                    \"type\": \"BOOL\"\n"
+"                }\n"
+"            ]\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"x64-Release\",\n"
+"            \"generator\": \"Ninja\",\n"
+"            \"configurationType\": \"Release\",\n"
+"            \"inheritEnvironments\": [ \"msvc_x64_x64\" ],\n"
+"            \"buildRoot\": \"${projectDir}\\\\build\\\\${name}\",\n"
+"            \"installRoot\": \"${projectDir}\\\\install\\\\${name}\",\n"
+"            \"cmakeCommandArgs\": \"-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=OFF\",\n"
+"            \"buildCommandArgs\": \"\",\n"
+"            \"ctestCommandArgs\": \"\",\n"
+"            \"variables\": [\n"
+"                {\n"
+"                    \"name\": \"CMAKE_BUILD_TYPE\",\n"
+"                    \"value\": \"Release\",\n"
+"                    \"type\": \"STRING\"\n"
+"                }\n"
+"            ]\n"
+"        }\n"
+"    ]\n"
+"}"
+msgstr ""
+"{\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"x64-Debug\",\n"
+"            \"generator\": \"Ninja\",\n"
+"            \"configurationType\": \"Debug\",\n"
+"            \"inheritEnvironments\": [ \"msvc_x64_x64\" ],\n"
+"            \"buildRoot\": \"${projectDir}\\\\build\\\\${name}\",\n"
+"            \"installRoot\": \"${projectDir}\\\\install\\\\${name}\",\n"
+"            \"cmakeCommandArgs\": \"-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\",\n"
+"            \"buildCommandArgs\": \"\",\n"
+"            \"ctestCommandArgs\": \"\",\n"
+"            \"variables\": [\n"
+"                {\n"
+"                    \"name\": \"CMAKE_BUILD_TYPE\",\n"
+"                    \"value\": \"Debug\",\n"
+"                    \"type\": \"STRING\"\n"
+"                },\n"
+"                {\n"
+"                    \"name\": \"NEXUS_PLATFORM\",\n"
+"                    \"value\": \"native\",\n"
+"                    \"type\": \"STRING\"\n"
+"                },\n"
+"                {\n"
+"                    \"name\": \"NEXUS_BUILD_TESTS\",\n"
+"                    \"value\": \"ON\",\n"
+"                    \"type\": \"BOOL\"\n"
+"                }\n"
+"            ]\n"
+"        },\n"
+"        {\n"
+"            \"name\": \"x64-Release\",\n"
+"            \"generator\": \"Ninja\",\n"
+"            \"configurationType\": \"Release\",\n"
+"            \"inheritEnvironments\": [ \"msvc_x64_x64\" ],\n"
+"            \"buildRoot\": \"${projectDir}\\\\build\\\\${name}\",\n"
+"            \"installRoot\": \"${projectDir}\\\\install\\\\${name}\",\n"
+"            \"cmakeCommandArgs\": \"-DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=OFF\",\n"
+"            \"buildCommandArgs\": \"\",\n"
+"            \"ctestCommandArgs\": \"\",\n"
+"            \"variables\": [\n"
+"                {\n"
+"                    \"name\": \"CMAKE_BUILD_TYPE\",\n"
+"                    \"value\": \"Release\",\n"
+"                    \"type\": \"STRING\"\n"
+"                }\n"
+"            ]\n"
+"        }\n"
+"    ]\n"
+"}"
+
+#: ../../user_guide/ide_integration.rst:439 b6dfb4f1d1234b53affa5889f06d688c
+msgid ""
+"**Open Project**: ``File > Open > CMake`` and select ``CMakeLists.txt``"
+msgstr ""
+"**Open Project**: ``File > Open > CMake`` and select ``CMakeLists.txt``"
+
+#: ../../user_guide/ide_integration.rst:441 84c1c07208fa4217b269743d41cd6721
+msgid ""
+"**Select Configuration**: Use the configuration dropdown in the toolbar"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:443 7e89f943bcfa4c59b94d649d12b2ace3
+msgid "**Build**: ``Build > Build All`` or ``Ctrl+Shift+B``"
+msgstr "**Build**: ``Build > Build All`` or ``Ctrl+Shift+B``"
+
+#: ../../user_guide/ide_integration.rst:445 70257c5d5cdb4ff294578e161c6340f8
+msgid "**Run Tests**: ``Test > Run All Tests``"
+msgstr "**Run Tests**: ``Test > Run All Tests``"
+
+#: ../../user_guide/ide_integration.rst:447 c3142565c0ea4899818c8f6968b1d656
+msgid "**Debug**: Set breakpoints and press ``F5``"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:450 0d385244a28e4438bbbc5c00822f1943
+msgid "Test Explorer"
+msgstr "测试 Explorer"
+
+#: ../../user_guide/ide_integration.rst:452 b61cbec715eb40ef8bda4771544e39c3
+msgid "Visual Studio integrates with Google Test:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:454 6eb475eebc3e47088c6fb99ef8061fe9
+msgid "Open ``Test > Test Explorer``"
+msgstr "Open ``Test > Test Explorer``"
+
+#: ../../user_guide/ide_integration.rst:456 e0bad504ad0a48b6b1d69a3f33934814
+msgid "Tests appear automatically after building"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:458 b330fb42fbec496d85241df63772b54a
+msgid "Run individual tests or test suites"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:460 425f50a31cbe484b92603cb744447b36
+msgid "View test output and failures"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:465 87f5df7370f64b40ad0e3312c9a234d0
+msgid "``Ctrl+Shift+B`` - Build solution"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:467 2904ceb631e541c199a46e3fde3e7d27
+msgid "``Ctrl+F5`` - Start without debugging"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:475 40812eceb45d4f598af2f54bc043c3b8
+msgid "ARM Cross-Compilation in Visual Studio"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:477 040a168eb1884ca6914052b6191769c5
+msgid "For ARM targets, use Visual Studio with external toolchain:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:479 61d99d9a548f40b3a3ff58a5c6948a46
+msgid "Install ARM GCC toolchain"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:481 2e95f22cf7134d5ca1a2398eccc4cfb3
+msgid "Create ARM configuration in ``CMakeSettings.json``:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:483 44b6f30c2b6b442384772f925932b0c8
+msgid ""
+"{\n"
+"    \"name\": \"ARM-STM32F4\",\n"
+"    \"generator\": \"Ninja\",\n"
+"    \"configurationType\": \"Release\",\n"
+"    \"buildRoot\": \"${projectDir}\\\\build\\\\${name}\",\n"
+"    \"cmakeCommandArgs\": \"-DNEXUS_PLATFORM=stm32f4 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\",\n"
+"    \"variables\": [\n"
+"        {\n"
+"            \"name\": \"TOOLCHAIN_PREFIX\",\n"
+"            \"value\": \"C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10\",\n"
+"            \"type\": \"PATH\"\n"
+"        }\n"
+"    ]\n"
+"}"
+msgstr ""
+"{\n"
+"    \"name\": \"ARM-STM32F4\",\n"
+"    \"generator\": \"Ninja\",\n"
+"    \"configurationType\": \"Release\",\n"
+"    \"buildRoot\": \"${projectDir}\\\\build\\\\${name}\",\n"
+"    \"cmakeCommandArgs\": \"-DNEXUS_PLATFORM=stm32f4 -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\",\n"
+"    \"variables\": [\n"
+"        {\n"
+"            \"name\": \"TOOLCHAIN_PREFIX\",\n"
+"            \"value\": \"C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10\",\n"
+"            \"type\": \"PATH\"\n"
+"        }\n"
+"    ]\n"
+"}"
+
+#: ../../user_guide/ide_integration.rst:500 61af30c2c1d846d08791f03ab8c47044
+msgid "Build using this configuration"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:503 67ba03c90ff2494ca65c53916e9c342f
+msgid "Common Issues"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:506 29f390e5479b4e4c93c8f74495d1b9de
+msgid "VS Code"
+msgstr "VS Code"
+
+#: ../../user_guide/ide_integration.rst:508 6d679bcd35a1446e8fdbe7616c110e4a
+msgid "**IntelliSense not working**"
+msgstr "**IntelliSense not working**"
+
+#: ../../user_guide/ide_integration.rst:510 2cc85418dd0c41d4880e5a104b6b35ca
+msgid "Solution: Ensure ``compile_commands.json`` is generated:"
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:512 b0bd43dcf76f41289274f43a45b4be8e
+msgid "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .."
+msgstr "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .."
+
+#: ../../user_guide/ide_integration.rst:516 393c522e6af14347b662e18b17d0a525
+msgid "**CMake Tools extension not detecting project**"
+msgstr "**CMake Tools extension not detecting project**"
+
+#: ../../user_guide/ide_integration.rst:518 3a8b296511d145488ba26279ca8a272f
+msgid ""
+"Solution: Reload window (``Ctrl+Shift+P`` > ``Developer: Reload Window``)"
+msgstr ""
+"Solution: Reload window (``Ctrl+Shift+P`` > ``Developer: Reload Window``)"
+
+#: ../../user_guide/ide_integration.rst:523 9af1d6d40e8f4240a36a1bccede508e5
+msgid "**CMake errors on project open**"
+msgstr "**CMake errors on project open**"
+
+#: ../../user_guide/ide_integration.rst:525 edc0b2cd9ca64b50846f4d9cd189f80c
+msgid ""
+"Solution: Check CMake version and ensure all dependencies are installed."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:527 345acfc3758643be852257442ab7616d
+msgid "**Toolchain not found**"
+msgstr "**Toolchain not found**"
+
+#: ../../user_guide/ide_integration.rst:529 82b1f0b986914ae0afb4cfc3c548d769
+msgid ""
+"Solution: Configure toolchain in ``File > Settings > Build, Execution, "
+"Deployment > Toolchains``"
+msgstr ""
+"Solution: Configure toolchain in ``File > Settings > Build, Execution, "
+"Deployment > Toolchains``"
+
+#: ../../user_guide/ide_integration.rst:534 fc2dbcc52416498f9431332766cbe255
+msgid "**CMake configuration fails**"
+msgstr "**CMake configuration fails**"
+
+#: ../../user_guide/ide_integration.rst:536 074da0a67e884afb8c00a9ddc7e41c91
+msgid ""
+"Solution: Check ``Output > CMake`` window for errors. Ensure CMake 3.16+ is "
+"installed."
+msgstr ""
+"Solution: Check ``Output > CMake`` window for errors. Ensure CMake 3.16+ is "
+"installed."
+
+#: ../../user_guide/ide_integration.rst:538 4b5c91e346854da09678df85fb3acf71
+msgid "**Tests not appearing in Test Explorer**"
+msgstr "**Tests not appearing in Test Explorer**"
+
+#: ../../user_guide/ide_integration.rst:540 75445d2fb4ae4b96a7d1862b6bc987b4
+msgid "Solution: Rebuild project and refresh Test Explorer."
+msgstr ""
+
+#: ../../user_guide/ide_integration.rst:543 108a48cf0ef5486a917dc63c2b2709fd
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../user_guide/ide_integration.rst:545 b512c26bda1b4cb19ac97a92abf0cf0e
+msgid ":doc:`build_system` - Build system documentation"
+msgstr ":doc:`build_system` - Build system documentation"
+
+#: ../../user_guide/ide_integration.rst:546 7d70713a5d9e42a28837a8b837355707
+msgid ":doc:`../development/testing` - Testing guide"
+msgstr ":doc:`../development/testing` - Testing guide"
+
+#: ../../user_guide/ide_integration.rst:547 6a59927f0d6342238a74f64db9819d39
+msgid ":doc:`../getting_started/installation` - Installation guide"
+msgstr ":doc:`../getting_started/installation` - Installation guide"

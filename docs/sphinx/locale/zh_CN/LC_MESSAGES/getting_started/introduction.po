@@ -1,19 +1,11 @@
-# Introduction - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-15 01:24+0800\n"
-"PO-Revision-Date: 2026-01-15 00:00+0000\n"
-"Last-Translator: Nexus Team\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
 #: ../../getting_started/introduction.rst:2 e0ea78e5111742dba49862fb881c220f
 msgid "Introduction"
@@ -25,11 +17,11 @@ msgstr "什么是 Nexus？"
 
 #: ../../getting_started/introduction.rst:7 4e87ea6f83dc4f28bf17bd8fc13e3d0a
 msgid ""
-"Nexus is a world-class embedded software development platform designed "
-"for building reliable, secure, and portable embedded applications. It "
-"provides a comprehensive set of abstraction layers and middleware "
-"components that enable developers to write code once and deploy across "
-"multiple MCU families."
+"Nexus is a world-class embedded software development platform designed for "
+"building reliable, secure, and portable embedded applications. It provides a"
+" comprehensive set of abstraction layers and middleware components that "
+"enable developers to write code once and deploy across multiple MCU "
+"families."
 msgstr ""
 "Nexus "
 "是一个世界级的嵌入式软件开发平台，专为构建可靠、安全、可移植的嵌入式应用而设计。它提供了一套完整的抽象层和中间件组件，使开发者能够一次编写代码，部署到多个"
@@ -41,8 +33,7 @@ msgstr "核心特性"
 
 #: ../../getting_started/introduction.rst:15 4a90d1ad3f6a4e2c94ee17a11a5d9dc5
 msgid ""
-"**Unified APIs**: Consistent interfaces across different hardware "
-"platforms"
+"**Unified APIs**: Consistent interfaces across different hardware platforms"
 msgstr "**统一 API**: 跨不同硬件平台的一致接口"
 
 #: ../../getting_started/introduction.rst:16 f9614faa06f54241be9e6296de442c3c
@@ -52,7 +43,8 @@ msgid ""
 msgstr "**可移植性**: 一次编写，运行在多个 MCU 系列（STM32、ESP32、nRF52）"
 
 #: ../../getting_started/introduction.rst:17 3b3bea00161f4f17a0e7f8a68b664f51
-msgid "**Quality**: MISRA C compliant, thoroughly tested code with 90%+ coverage"
+msgid ""
+"**Quality**: MISRA C compliant, thoroughly tested code with 90%+ coverage"
 msgstr "**高质量**: 符合 MISRA C 标准，经过充分测试，覆盖率超过 90%"
 
 #: ../../getting_started/introduction.rst:18 86a7453c5619485091f1f68942166b4a
@@ -109,8 +101,8 @@ msgstr "架构概述"
 
 #: ../../getting_started/introduction.rst:40 3dc248c9cc2f4c98846f9c15c37c694c
 msgid ""
-"Nexus follows a layered architecture that separates hardware-specific "
-"code from application logic:"
+"Nexus follows a layered architecture that separates hardware-specific code "
+"from application logic:"
 msgstr "Nexus 采用分层架构，将硬件相关代码与应用逻辑分离："
 
 #: ../../getting_started/introduction.rst:43 1f6d9b79a6824adabf86f919dde575fe
@@ -168,8 +160,8 @@ msgstr "**OSAL（操作系统抽象层）**"
 
 #: ../../getting_started/introduction.rst:80 6c3e1577792747419b94e7c3b5f999d4
 msgid ""
-"Portable interface for RTOS primitives: tasks, mutexes, semaphores, "
-"queues, and timers. Supports FreeRTOS and bare-metal backends."
+"Portable interface for RTOS primitives: tasks, mutexes, semaphores, queues, "
+"and timers. Supports FreeRTOS and bare-metal backends."
 msgstr "RTOS 原语的可移植接口：任务、互斥锁、信号量、队列和定时器。支持 FreeRTOS 和裸机后端。"
 
 #: ../../getting_started/introduction.rst:83 1f2ac973909547d39029f390dce9e7a9
@@ -203,62 +195,55 @@ msgstr "**平台层**"
 
 #: ../../getting_started/introduction.rst:95 7965c794ae4d4c3eb47e1bb1f9558ac2
 msgid "MCU"
-msgstr ""
+msgstr "MCU"
 
 #: ../../getting_started/introduction.rst:95 16287b3ffd644e75844fef37db5eba1c
 msgid "Status"
-msgstr ""
+msgstr "状态"
 
 #: ../../getting_started/introduction.rst:95 84f0686d332e4457a437608dd6546128
 msgid "RTOS Support"
-msgstr ""
+msgstr "RTOS 支持"
 
 #: ../../getting_started/introduction.rst:97 0f43d77ab21f403fb218489eda86f270
 msgid "STM32F4"
-msgstr ""
+msgstr "STM32F4"
 
 #: ../../getting_started/introduction.rst:97 3ae9c3a6159c4e868490957eae1081c8
 msgid "STM32F407VGT6"
-msgstr ""
+msgstr "STM32F407VGT6"
 
-#: ../../getting_started/introduction.rst:97
-#: ../../getting_started/introduction.rst:105 0e164cd27f9a488eb4bce807c7c964de
 #: 61c440c9e1b24f87802309965f4b9c85
 msgid "✅"
-msgstr ""
+msgstr "✅"
 
-#: ../../getting_started/introduction.rst:97
-#: ../../getting_started/introduction.rst:99 4d81cb30885c4bac950985630c5ea38a
 #: 8c47ac3673d7429e824d8e2b37cd5548
 msgid "FreeRTOS, Bare"
-msgstr ""
+msgstr "FreeRTOS，裸机"
 
 #: ../../getting_started/introduction.rst:99 009417acd98844c0bf0f013092871530
 msgid "STM32H7"
-msgstr ""
+msgstr "STM32H7"
 
 #: ../../getting_started/introduction.rst:99 23020018d64a433d87a19a9e426b7e9b
 msgid "STM32H743ZIT6"
-msgstr ""
+msgstr "STM32H743ZIT6"
 
-#: ../../getting_started/introduction.rst:99
-#: ../../getting_started/introduction.rst:101
-#: ../../getting_started/introduction.rst:103 0f1f8ae84e924826aa2c2edc0027e71f
 #: 5d7dde3c8f84455ea3657c728577ddcd fdefab84767b444cbaee54e821db95bc
 msgid "🚧"
-msgstr ""
+msgstr "🚧"
 
 #: ../../getting_started/introduction.rst:101 e3a88613a365412b9d9824632bb1b46b
 msgid "ESP32"
-msgstr ""
+msgstr "ESP32"
 
 #: ../../getting_started/introduction.rst:101 221c5be8b51245e0939a20260edf498d
 msgid "ESP32-WROOM-32"
-msgstr ""
+msgstr "ESP32-WROOM-32"
 
 #: ../../getting_started/introduction.rst:101 80771eb174584d06a5ac7961fa45e5ca
 msgid "FreeRTOS"
-msgstr ""
+msgstr "FreeRTOS"
 
 #: ../../getting_started/introduction.rst:103 78e6ee5c89e6469d811090f68d3ec054
 msgid "nRF52"
@@ -274,11 +259,11 @@ msgstr ""
 
 #: ../../getting_started/introduction.rst:105 faa1b2f229444a61b8bdfca20ac0162c
 msgid "Native"
-msgstr ""
+msgstr "Native"
 
 #: ../../getting_started/introduction.rst:105 70fb702998cc4b4e8a1cc3d890a0aab6
 msgid "x86/x64"
-msgstr ""
+msgstr "x86/x64"
 
 #: ../../getting_started/introduction.rst:105 b0c0fae77f4446aaab561ae93c820d65
 msgid "pthreads"
@@ -317,7 +302,8 @@ msgid "License"
 msgstr "许可证"
 
 #: ../../getting_started/introduction.rst:135 b16ba389207742a9b46279378355b51f
-msgid "Nexus is released under the MIT License. See the LICENSE file for details."
+msgid ""
+"Nexus is released under the MIT License. See the LICENSE file for details."
 msgstr "Nexus 基于 MIT 许可证发布。详情请参阅 LICENSE 文件。"
 
 #: ../../getting_started/introduction.rst:138 bfb9281f76c24137ad6d0ce2058bcc36
@@ -339,4 +325,3 @@ msgstr ":doc:`quickstart` - 构建你的第一个 Nexus 应用"
 #: ../../getting_started/introduction.rst:144 37c4026fa9d148b0959fba98be336e90
 msgid ":doc:`../user_guide/architecture` - Deep dive into the architecture"
 msgstr ":doc:`../user_guide/architecture` - 深入了解架构"
-

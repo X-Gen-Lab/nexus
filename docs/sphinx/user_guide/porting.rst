@@ -26,9 +26,7 @@ Porting Steps
 Step 1: Create Platform Directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create a new directory under ``platforms/``:
-
-::
+Create a new directory under ``platforms/``::
 
     platforms/
     └── my_platform/
@@ -202,7 +200,7 @@ Create CMakeLists.txt for your platform:
 
 **CMakeLists.txt:**
 
-.. code-block:: cmake
+.. code-block:: CMake
 
     # Platform: my_platform
 
@@ -238,9 +236,9 @@ Step 6: Add Toolchain File
 
 If needed, create a toolchain file:
 
-**cmake/toolchains/my_platform.cmake:**
+**CMake/toolchains/my_platform.CMake:**
 
-.. code-block:: cmake
+.. code-block:: CMake
 
     set(CMAKE_SYSTEM_NAME Generic)
     set(CMAKE_SYSTEM_PROCESSOR arm)
@@ -281,10 +279,10 @@ Testing Your Port
 
    .. code-block:: bash
 
-       cmake -B build \
-           -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/my_platform.cmake \
+       CMake -B build \
+           -DCMAKE_TOOLCHAIN_FILE=CMake/toolchains/my_platform.CMake \
            -DNEXUS_PLATFORM=my_platform
-       cmake --build build
+       CMake --build build
 
 2. **Flash and verify LED blinks**
 
@@ -292,8 +290,8 @@ Testing Your Port
 
    .. code-block:: bash
 
-       cmake -B build-test -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
-       cmake --build build-test
+       CMake -B build-test -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
+       CMake --build build-test
        ctest --test-dir build-test
 
 4. **Test each HAL module individually**

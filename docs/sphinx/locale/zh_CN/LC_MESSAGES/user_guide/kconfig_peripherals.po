@@ -1,0 +1,2007 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../user_guide/kconfig_peripherals.rst:2 c51025ae0fce41a480489cfee00a61d1
+msgid "Peripheral Configuration Guide"
+msgstr "外设 配置 Guide"
+
+#: ../../user_guide/kconfig_peripherals.rst:4 62e153ff57c14b52a419f6ee7e11828f
+msgid ""
+"This guide provides detailed examples for configuring all peripheral types "
+"in the Nexus Embedded Platform using Kconfig."
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:8 b1c4085479c043589b81d45737fa27d0
+msgid "Table of Contents"
+msgstr "目录"
+
+#: e5d4c5301fbb48b485de498dcb143f14
+msgid "Overview"
+msgstr "概述"
+
+#: ../../user_guide/kconfig_peripherals.rst:13
+#: e4dba7b49e9142338edcf0c4030037a4
+msgid ""
+"The Nexus platform supports comprehensive peripheral configuration through "
+"Kconfig. Each peripheral type has:"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:15
+#: 059037a2cad7405c8191711f6d02f3ae
+msgid "**Enable/Disable Control**: Top-level enable for the peripheral type"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:16
+#: 3b9ca3cbc52248948dcf93fe44f8189c
+msgid ""
+"**Instance Configuration**: Individual configuration for each peripheral "
+"instance"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:17
+#: 224f2b9da2d546a6835b3f0e99ef11f6
+msgid ""
+"**Parameter Settings**: Detailed parameters for each instance (baud rate, "
+"mode, buffers, etc.)"
+msgstr ""
+"**Parameter Settings**: Detailed parameters for each instance (baud rate, "
+"mode, buffers, etc.)"
+
+#: ../../user_guide/kconfig_peripherals.rst:18
+#: b7f5d1a11b1e4888b9ed1a523861fe0c
+msgid "**Platform-Specific Options**: Options that vary by platform"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:21
+#: 06a604b7ca474092a4eb31fd3f65dece
+msgid "Peripheral Types"
+msgstr "外设 Types"
+
+#: ../../user_guide/kconfig_peripherals.rst:23
+#: d610ee5b090c4dcf90ded351e4526f1b
+msgid "The following peripheral types are supported:"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:25
+#: 16ad38aa9bab45af9b516d7322953004
+msgid "**UART**: Universal Asynchronous Receiver/Transmitter"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:26
+#: c52288c7ce2b4539a2583c7ca99e22f4
+msgid "**GPIO**: General Purpose Input/Output"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:27
+#: 47ca13d7c5534cc880ecda36572235c4
+msgid "**SPI**: Serial Peripheral Interface"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:28
+#: e6402471c80148b4b27ddce5eb8397ae
+msgid "**I2C**: Inter-Integrated Circuit"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:29
+#: 25f203d3ac554cc7a14c493aa6bcfc3f
+msgid "**Timer**: Hardware timers with PWM support"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:30
+#: 77477b9028c843d4b65cd8d2e2826e92
+msgid "**ADC**: Analog-to-Digital Converter"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:31
+#: f8848094a18c4980b281ab0cd8dcb92c
+msgid "**CAN**: Controller Area Network (platform-dependent)"
+msgstr "**CAN**: Controller Area Network (platform-dependent)"
+
+#: ../../user_guide/kconfig_peripherals.rst:34
+#: a296e41d7c4349d7a7650a51f93805ac
+msgid "Configuration Pattern"
+msgstr "配置 Pattern"
+
+#: ../../user_guide/kconfig_peripherals.rst:36
+#: 3f12858d70c94f4a800a39658d0d4d59
+msgid "All peripherals follow a consistent configuration pattern:"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:38
+#: acf7d4296dff426a8484c84660330b25
+msgid ""
+"# 1. Enable peripheral type\n"
+"config <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"    bool \"Enable <PERIPHERAL> support\"\n"
+"    default y\n"
+"\n"
+"# 2. Enable specific instance\n"
+"menuconfig INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"    bool \"Enable <PERIPHERAL><N>\"\n"
+"    default y\n"
+"    depends on <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"\n"
+"# 3. Configure instance parameters\n"
+"if INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"\n"
+"config <PERIPHERAL><N>_<PARAMETER>\n"
+"    <type> \"<Parameter description>\"\n"
+"    default <value>\n"
+"\n"
+"endif"
+msgstr ""
+"# 1. Enable peripheral type\n"
+"config <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"    bool \"Enable <PERIPHERAL> support\"\n"
+"    default y\n"
+"\n"
+"# 2. Enable specific instance\n"
+"menuconfig INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"    bool \"Enable <PERIPHERAL><N>\"\n"
+"    default y\n"
+"    depends on <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"\n"
+"# 3. Configure instance parameters\n"
+"if INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"\n"
+"config <PERIPHERAL><N>_<PARAMETER>\n"
+"    <type> \"<Parameter description>\"\n"
+"    default <value>\n"
+"\n"
+"endif"
+
+#: ../../user_guide/kconfig_peripherals.rst:62
+#: e99f2a4b6c1a4d2ca8f1aa90afcdfe01
+msgid "UART Configuration"
+msgstr "UART 配置"
+
+#: ../../user_guide/kconfig_peripherals.rst:67
+#: 3c253c0c82f74870a469fba55c0e98e0
+msgid ""
+"UART (Universal Asynchronous Receiver/Transmitter) provides serial "
+"communication. Configuration includes:"
+msgstr ""
+"UART (Universal Asynchronous Receiver/Transmitter) provides serial "
+"communication. Configuration includes:"
+
+#: ../../user_guide/kconfig_peripherals.rst:69
+#: 48e89806b0b44a90b7d83ddb1362977d
+msgid "Baud rate"
+msgstr ""
+
+#: ../../user_guide/kconfig_peripherals.rst:70
+#: 69ea2d40e83845bc86907cc7470840d4
+msgid "Data bits (5-9)"
+msgstr "Data bits (5-9)"
+
+#: ../../user_guide/kconfig_peripherals.rst:71
+#: f9d821061db04f258970fced1afd4171
+msgid "Stop bits (1-2)"
+msgstr "Stop bits (1-2)"
+
+#: ../../user_guide/kconfig_peripherals.rst:72
+#: 7176f3598dc240aea6f55bcf00900f6c
+msgid "Parity (None, Odd, Even)"
+msgstr "Parity (None, Odd, Even)"
+
+#: ../../user_guide/kconfig_peripherals.rst:73
+#: 6bff81f9ecfe461681fc4f54ea922b19
+msgid "Transfer mode (Polling, Interrupt, DMA)"
+msgstr "Transfer mode (Polling, Interrupt, DMA)"
+
+#: bb4d92be8c9f428f97324b4af4dedcd1
+msgid "Buffer sizes"
+msgstr ""
+
+#: 9cf7cc1ab1c1486193e461e68af91946 c3291826a334426da8889eaa41c09e2f
+msgid "Required Parameters"
+msgstr "必需 参数"
+
+#: ../../user_guide/kconfig_peripherals.rst:79
+#: deb662b50b0b4880b6473a5242c3978e
+msgid "**All UART instances require:**"
+msgstr "**All UART instances require:**"
+
+#: ../../user_guide/kconfig_peripherals.rst:81
+#: d8a70dedb7664f54b93fff32bc0362d8
+msgid "``UART<N>_BAUDRATE``: Communication speed in bits per second"
+msgstr "``UART<N>_BAUDRATE``: Communication speed in bits per second"
+
+#: ../../user_guide/kconfig_peripherals.rst:82
+#: c9270ee21d0047e1b51cbba27421fd1f
+msgid "``UART<N>_DATA_BITS``: Number of data bits per frame"
+msgstr "``UART<N>_DATA_BITS``: Number of data bits per frame"
+
+#: ../../user_guide/kconfig_peripherals.rst:83
+#: f940e9f74086406fbe1c25723c04ddc0
+msgid "``UART<N>_STOP_BITS``: Number of stop bits"
+msgstr "``UART<N>_STOP_BITS``: Number of stop bits"
+
+#: ../../user_guide/kconfig_peripherals.rst:84
+#: 6c6da6b6a7f342c9a46a6b5c8b2e186c
+msgid "``UART<N>_PARITY``: Parity checking mode"
+msgstr "``UART<N>_PARITY``: Parity checking mode"
+
+#: ../../user_guide/kconfig_peripherals.rst:85
+#: 19e20632680b435e9686c5b195b05c3a
+msgid "``UART<N>_MODE``: Transfer mode (Polling/Interrupt/DMA)"
+msgstr "``UART<N>_MODE``: Transfer mode (Polling/Interrupt/DMA)"
+
+#: ../../user_guide/kconfig_peripherals.rst:86
+#: e0ada4f848fd49a0828b6ad46b304f32
+msgid "``UART<N>_TX_BUFFER_SIZE``: Transmit buffer size in bytes"
+msgstr "``UART<N>_TX_BUFFER_SIZE``: Transmit buffer size in bytes"
+
+#: ../../user_guide/kconfig_peripherals.rst:87
+#: b4e98a3b9e694b8e8d4d6ea8ab6c2abc
+msgid "``UART<N>_RX_BUFFER_SIZE``: Receive buffer size in bytes"
+msgstr "``UART<N>_RX_BUFFER_SIZE``: Receive buffer size in bytes"
+
+#: ../../user_guide/kconfig_peripherals.rst:90
+#: b8ec2e53eb294abe9c8ab857a7b4fb61
+msgid "Basic UART Configuration"
+msgstr "Basic UART 配置"
+
+#: ../../user_guide/kconfig_peripherals.rst:92
+#: 208eeeee38f041748b4ac6a4b56e6be7
+msgid "**Enable UART and configure UART0:**"
+msgstr "**Enable UART and configure UART0:**"
+
+#: ../../user_guide/kconfig_peripherals.rst:94
+#: c4370fd4c4ed4e2d964405285fd1ff17
+msgid ""
+"# Enable UART peripheral\n"
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"\n"
+"# Enable UART0 instance\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"\n"
+"# Configure UART0 parameters\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_NX_UART0_PARITY_NONE=y\n"
+"CONFIG_NX_UART0_MODE_INTERRUPT=y\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=256"
+msgstr ""
+"# Enable UART peripheral\n"
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"\n"
+"# Enable UART0 instance\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"\n"
+"# Configure UART0 parameters\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_NX_UART0_PARITY_NONE=y\n"
+"CONFIG_NX_UART0_MODE_INTERRUPT=y\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=256"
+
+#: 0263a340059a41d8be6fab565bcf6169 f2870dd1998c4eb9a2ae487d5e2cbe1d
+msgid "**Generated Configuration:**"
+msgstr "**Generated Configuration:**"
+
+#: 06758c0ee38d467d8e1f0316a9e4575b
+msgid ""
+"#define NX_CONFIG_NATIVE_UART_ENABLE 1\n"
+"#define NX_CONFIG_INSTANCE_NX_UART_0 1\n"
+"#define NX_CONFIG_UART0_BAUDRATE 115200\n"
+"#define NX_CONFIG_UART0_DATA_BITS 8\n"
+"#define NX_CONFIG_UART0_STOP_BITS 1\n"
+"#define NX_CONFIG_UART0_PARITY_VALUE 0\n"
+"#define NX_CONFIG_UART0_MODE_VALUE 1\n"
+"#define NX_CONFIG_UART0_TX_BUFFER_SIZE 256\n"
+"#define NX_CONFIG_UART0_RX_BUFFER_SIZE 256"
+msgstr ""
+"#define NX_CONFIG_NATIVE_UART_ENABLE 1\n"
+"#define NX_CONFIG_INSTANCE_NX_UART_0 1\n"
+"#define NX_CONFIG_UART0_BAUDRATE 115200\n"
+"#define NX_CONFIG_UART0_DATA_BITS 8\n"
+"#define NX_CONFIG_UART0_STOP_BITS 1\n"
+"#define NX_CONFIG_UART0_PARITY_VALUE 0\n"
+"#define NX_CONFIG_UART0_MODE_VALUE 1\n"
+"#define NX_CONFIG_UART0_TX_BUFFER_SIZE 256\n"
+"#define NX_CONFIG_UART0_RX_BUFFER_SIZE 256"
+
+#: 7202e918dda9411d90758ae10d0b9401
+msgid "UART Transfer Modes"
+msgstr ""
+
+#: a92d8a55053a48df884f7de67aff3c94
+msgid "**Polling Mode:**"
+msgstr "**Polling Mode:**"
+
+#: d1a834e6b7604d8caf151d28e25750d6
+msgid "CONFIG_NX_UART0_MODE_POLLING=y"
+msgstr "CONFIG_NX_UART0_MODE_POLLING=y"
+
+#: 0773e5190ff940ce8003f151093fe565
+msgid "Simplest implementation"
+msgstr ""
+
+#: d7e0018d2fa241cb88c8b990d8bfb48e
+msgid "Blocks CPU during transfers"
+msgstr ""
+
+#: 78f24f940de44c23b710b645c64292a2
+msgid "No interrupt overhead"
+msgstr ""
+
+#: 6b921b8e3eba4578bf7a4ba6b746b232
+msgid "Best for: Simple applications, debugging"
+msgstr ""
+
+#: 9fc99d5eeb69419a994062f92976b9d4
+msgid "**Interrupt Mode:**"
+msgstr "**Interrupt Mode:**"
+
+#: 38b3c7f3b9d34e1fafadda810d44d3e3
+msgid "CONFIG_NX_UART0_MODE_INTERRUPT=y"
+msgstr "CONFIG_NX_UART0_MODE_INTERRUPT=y"
+
+#: 230e2e40f7c24cbdaed9a40f32709cc3
+msgid "Non-blocking transfers"
+msgstr ""
+
+#: 8fc641f77e7c42cb97d9c431679fe33c
+msgid "Uses interrupts for TX/RX"
+msgstr ""
+
+#: 2ea85211e39244ecab2a7a336c3deb2c
+msgid "Moderate CPU overhead"
+msgstr ""
+
+#: bf5cce4b865a494d8ab65525555909a9
+msgid "Best for: General-purpose applications"
+msgstr ""
+
+#: 3806484ee42942e686de5cc880c0b32c
+msgid "**DMA Mode:**"
+msgstr "**DMA Mode:**"
+
+#: 74fccbf289e749f9acd7d95caa3e7d30
+msgid "CONFIG_NX_UART0_MODE_DMA=y"
+msgstr "CONFIG_NX_UART0_MODE_DMA=y"
+
+#: 9484ceda4fdf4166a9f75c2181488677
+msgid "Most efficient for large transfers"
+msgstr ""
+
+#: 86e106d4ac1f453a93514b5ff9431bff
+msgid "Minimal CPU involvement"
+msgstr ""
+
+#: 9ce589eae15c4454bb3f86aa1a6ed1b0
+msgid "Requires DMA controller"
+msgstr ""
+
+#: 82ec2e9690a5447895234f5ed25d859d
+msgid "Best for: High-throughput applications"
+msgstr ""
+
+#: bdfb6da0e3c64e46993ea8dc0e77adaf
+msgid "UART Parity Configuration"
+msgstr "UART Parity 配置"
+
+#: dc5ef4840fec488c9f9db4dcf7428e5f
+msgid "**No Parity:**"
+msgstr "**No Parity:**"
+
+#: 967000f07d024aa5a1f8eafb9b738c67
+msgid "CONFIG_NX_UART0_PARITY_NONE=y"
+msgstr "CONFIG_NX_UART0_PARITY_NONE=y"
+
+#: 0e9a042456a74906a51dd5c829422f00
+msgid "**Odd Parity:**"
+msgstr "**Odd Parity:**"
+
+#: f43df4495f974eb999dbf92ab1555687
+msgid "CONFIG_NX_UART0_PARITY_ODD=y"
+msgstr "CONFIG_NX_UART0_PARITY_ODD=y"
+
+#: f574dd34d1a14a0296a934e734a82798
+msgid "**Even Parity:**"
+msgstr "**Even Parity:**"
+
+#: 63be63a4cff341e08ecfbb54af8ff5ed
+msgid "CONFIG_NX_UART0_PARITY_EVEN=y"
+msgstr "CONFIG_NX_UART0_PARITY_EVEN=y"
+
+#: 8fa004453e61400691d1cd815d90e9ae
+msgid "Common UART Configurations"
+msgstr ""
+
+#: acf5354fbc854b6cb093190161a36ff8
+msgid "**Debug Console (115200 8N1):**"
+msgstr "**Debug Console (115200 8N1):**"
+
+#: afcbf216d30f4a6c8d21ec3f66419560
+msgid ""
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_NX_UART0_PARITY_NONE=y\n"
+"CONFIG_NX_UART0_MODE_INTERRUPT=y\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=512\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=512"
+msgstr ""
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_NX_UART0_PARITY_NONE=y\n"
+"CONFIG_NX_UART0_MODE_INTERRUPT=y\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=512\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=512"
+
+#: 87d916e416364059bb16993faf8d7898
+msgid "**Low-Speed Sensor (9600 8N1):**"
+msgstr "**Low-Speed Sensor (9600 8N1):**"
+
+#: b28f1beb35d643989e78689670b79dde
+msgid ""
+"CONFIG_INSTANCE_NX_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=9600\n"
+"CONFIG_UART1_DATA_BITS=8\n"
+"CONFIG_UART1_STOP_BITS=1\n"
+"CONFIG_NX_UART1_PARITY_NONE=y\n"
+"CONFIG_NX_UART1_MODE_POLLING=y\n"
+"CONFIG_UART1_TX_BUFFER_SIZE=64\n"
+"CONFIG_UART1_RX_BUFFER_SIZE=64"
+msgstr ""
+"CONFIG_INSTANCE_NX_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=9600\n"
+"CONFIG_UART1_DATA_BITS=8\n"
+"CONFIG_UART1_STOP_BITS=1\n"
+"CONFIG_NX_UART1_PARITY_NONE=y\n"
+"CONFIG_NX_UART1_MODE_POLLING=y\n"
+"CONFIG_UART1_TX_BUFFER_SIZE=64\n"
+"CONFIG_UART1_RX_BUFFER_SIZE=64"
+
+#: de1492e7356f4a6ba853fa7bbbfbb4b7
+msgid "**High-Speed Data (921600 8N1 DMA):**"
+msgstr "**High-Speed Data (921600 8N1 DMA):**"
+
+#: c9f98868bcc94d0b8628282e4b9cc362
+msgid ""
+"CONFIG_INSTANCE_NX_UART_2=y\n"
+"CONFIG_UART2_BAUDRATE=921600\n"
+"CONFIG_UART2_DATA_BITS=8\n"
+"CONFIG_UART2_STOP_BITS=1\n"
+"CONFIG_NX_UART2_PARITY_NONE=y\n"
+"CONFIG_NX_UART2_MODE_DMA=y\n"
+"CONFIG_UART2_TX_BUFFER_SIZE=2048\n"
+"CONFIG_UART2_RX_BUFFER_SIZE=2048"
+msgstr ""
+"CONFIG_INSTANCE_NX_UART_2=y\n"
+"CONFIG_UART2_BAUDRATE=921600\n"
+"CONFIG_UART2_DATA_BITS=8\n"
+"CONFIG_UART2_STOP_BITS=1\n"
+"CONFIG_NX_UART2_PARITY_NONE=y\n"
+"CONFIG_NX_UART2_MODE_DMA=y\n"
+"CONFIG_UART2_TX_BUFFER_SIZE=2048\n"
+"CONFIG_UART2_RX_BUFFER_SIZE=2048"
+
+#: 9fc6f197b33441e7aab51c570f5e14e6
+msgid "**Industrial Protocol (19200 7E1):**"
+msgstr "**Industrial Protocol (19200 7E1):**"
+
+#: 25d2a49691374e2db841665adb30bef9
+msgid ""
+"CONFIG_INSTANCE_NX_UART_3=y\n"
+"CONFIG_UART3_BAUDRATE=19200\n"
+"CONFIG_UART3_DATA_BITS=7\n"
+"CONFIG_UART3_STOP_BITS=1\n"
+"CONFIG_NX_UART3_PARITY_EVEN=y\n"
+"CONFIG_NX_UART3_MODE_INTERRUPT=y\n"
+"CONFIG_UART3_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART3_RX_BUFFER_SIZE=256"
+msgstr ""
+"CONFIG_INSTANCE_NX_UART_3=y\n"
+"CONFIG_UART3_BAUDRATE=19200\n"
+"CONFIG_UART3_DATA_BITS=7\n"
+"CONFIG_UART3_STOP_BITS=1\n"
+"CONFIG_NX_UART3_PARITY_EVEN=y\n"
+"CONFIG_NX_UART3_MODE_INTERRUPT=y\n"
+"CONFIG_UART3_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART3_RX_BUFFER_SIZE=256"
+
+#: 25ae588cda17416bb6ddc230065044f6
+msgid "Multiple UART Instances"
+msgstr ""
+
+#: 4f15e83bf8cf473e874d7a6fd7394366
+msgid "**Configure multiple UARTs:**"
+msgstr "**Configure multiple UARTs:**"
+
+#: 8610d8105ba842a0810aaec7e3a324b5
+msgid ""
+"# Enable UART peripheral\n"
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_NATIVE_UART_MAX_INSTANCES=4\n"
+"\n"
+"# UART0: Debug console\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_NX_UART0_MODE_INTERRUPT=y\n"
+"\n"
+"# UART1: GPS module\n"
+"CONFIG_INSTANCE_NX_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=9600\n"
+"CONFIG_NX_UART1_MODE_INTERRUPT=y\n"
+"\n"
+"# UART2: Bluetooth module\n"
+"CONFIG_INSTANCE_NX_UART_2=y\n"
+"CONFIG_UART2_BAUDRATE=115200\n"
+"CONFIG_NX_UART2_MODE_DMA=y\n"
+"\n"
+"# UART3: RS485 interface\n"
+"CONFIG_INSTANCE_NX_UART_3=y\n"
+"CONFIG_UART3_BAUDRATE=38400\n"
+"CONFIG_NX_UART3_MODE_INTERRUPT=y"
+msgstr ""
+"# Enable UART peripheral\n"
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_NATIVE_UART_MAX_INSTANCES=4\n"
+"\n"
+"# UART0: Debug console\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_NX_UART0_MODE_INTERRUPT=y\n"
+"\n"
+"# UART1: GPS module\n"
+"CONFIG_INSTANCE_NX_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=9600\n"
+"CONFIG_NX_UART1_MODE_INTERRUPT=y\n"
+"\n"
+"# UART2: Bluetooth module\n"
+"CONFIG_INSTANCE_NX_UART_2=y\n"
+"CONFIG_UART2_BAUDRATE=115200\n"
+"CONFIG_NX_UART2_MODE_DMA=y\n"
+"\n"
+"# UART3: RS485 interface\n"
+"CONFIG_INSTANCE_NX_UART_3=y\n"
+"CONFIG_UART3_BAUDRATE=38400\n"
+"CONFIG_NX_UART3_MODE_INTERRUPT=y"
+
+#: f204d787110c462dbe0cf1ded2758ed1
+msgid "GPIO Configuration"
+msgstr "GPIO 配置"
+
+#: 2bce1e866b98441db44c4bf87d461e6c
+msgid ""
+"GPIO (General Purpose Input/Output) provides digital I/O pin control. "
+"Configuration includes:"
+msgstr ""
+"GPIO (General Purpose Input/Output) provides digital I/O pin control. "
+"Configuration includes:"
+
+#: a867e0af609e4503af6cf61338b343c4
+msgid ""
+"Pin mode (Input, Output Push-Pull, Output Open-Drain, Alternate Function, "
+"Analog)"
+msgstr ""
+"Pin mode (Input, Output Push-Pull, Output Open-Drain, Alternate Function, "
+"Analog)"
+
+#: 7c7818213ae645a5816c3c5525c13d45
+msgid "Pull configuration (None, Pull-up, Pull-down)"
+msgstr "Pull configuration (None, Pull-up, Pull-down)"
+
+#: 850184d3edd34b2f99d91459df714ca5
+msgid "Speed (Low, Medium, High, Very High)"
+msgstr "Speed (Low, Medium, High, Very High)"
+
+#: 418adc7da0774dd68ad608c53e0525e3
+msgid "Initial output value"
+msgstr ""
+
+#: eb7dcae0885241f28e20eada765ed376
+msgid "**All GPIO pins require:**"
+msgstr "**All GPIO pins require:**"
+
+#: 774d817d729c4f9fa4641f7133bd194c
+msgid "``GPIO<PORT>_PIN<N>_MODE``: Pin operating mode"
+msgstr "``GPIO<PORT>_PIN<N>_MODE``: Pin operating mode"
+
+#: 540d520b64cf426fa0c57d313403fd51
+msgid "``GPIO<PORT>_PIN<N>_PULL``: Pull-up/pull-down configuration"
+msgstr "``GPIO<PORT>_PIN<N>_PULL``: Pull-up/pull-down configuration"
+
+#: 1b71040e17154aec9831c9295a94fc17
+msgid "``GPIO<PORT>_PIN<N>_SPEED``: Pin speed/slew rate"
+msgstr "``GPIO<PORT>_PIN<N>_SPEED``: Pin speed/slew rate"
+
+#: 85ee8b269d6049f29963e7f8296ae81f
+msgid ""
+"``GPIO<PORT>_PIN<N>_OUTPUT_VALUE``: Initial output value (for output modes)"
+msgstr ""
+"``GPIO<PORT>_PIN<N>_OUTPUT_VALUE``: Initial output value (for output modes)"
+
+#: ff842655c3044322b87b1e022dd69b50
+msgid "Basic GPIO Configuration"
+msgstr "Basic GPIO 配置"
+
+#: 7607e2b9f3e14eb196f29cb4f6eb116c
+msgid "**Enable GPIO and configure GPIOA PIN0:**"
+msgstr "**Enable GPIO and configure GPIOA PIN0:**"
+
+#: 05c47c1859a349038b3bbef1cc095cc9
+msgid ""
+"# Enable GPIO peripheral\n"
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"\n"
+"# Enable GPIOA port\n"
+"CONFIG_INSTANCE_NX_GPIOA=y\n"
+"\n"
+"# Enable and configure GPIOA PIN0\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_NONE=y\n"
+"CONFIG_NX_GPIOA_PIN0_SPEED_MEDIUM=y\n"
+"CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0"
+msgstr ""
+"# Enable GPIO peripheral\n"
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"\n"
+"# Enable GPIOA port\n"
+"CONFIG_INSTANCE_NX_GPIOA=y\n"
+"\n"
+"# Enable and configure GPIOA PIN0\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_NONE=y\n"
+"CONFIG_NX_GPIOA_PIN0_SPEED_MEDIUM=y\n"
+"CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0"
+
+#: bb8c8d150285420baef10d052285701b
+msgid ""
+"#define NX_CONFIG_NATIVE_GPIO_ENABLE 1\n"
+"#define NX_CONFIG_INSTANCE_NX_GPIOA 1\n"
+"#define NX_CONFIG_INSTANCE_NX_GPIOA_PIN0 1\n"
+"#define NX_CONFIG_GPIOA_PIN0_MODE 1\n"
+"#define NX_CONFIG_GPIOA_PIN0_PULL_VALUE 0\n"
+"#define NX_CONFIG_GPIOA_PIN0_SPEED_VALUE 1\n"
+"#define NX_CONFIG_GPIOA_PIN0_OUTPUT_VALUE 0"
+msgstr ""
+"#define NX_CONFIG_NATIVE_GPIO_ENABLE 1\n"
+"#define NX_CONFIG_INSTANCE_NX_GPIOA 1\n"
+"#define NX_CONFIG_INSTANCE_NX_GPIOA_PIN0 1\n"
+"#define NX_CONFIG_GPIOA_PIN0_MODE 1\n"
+"#define NX_CONFIG_GPIOA_PIN0_PULL_VALUE 0\n"
+"#define NX_CONFIG_GPIOA_PIN0_SPEED_VALUE 1\n"
+"#define NX_CONFIG_GPIOA_PIN0_OUTPUT_VALUE 0"
+
+#: e8f3bb9c471a49e1ad7f1d978a3e86c1
+msgid "GPIO Pin Modes"
+msgstr "GPIO 引脚 Modes"
+
+#: ae68ca490499475f8c2f51122c96eec0
+msgid "**Input Mode:**"
+msgstr "**Input Mode:**"
+
+#: 7f2368a6ff464c98a5af963cf5744a0c
+msgid ""
+"CONFIG_NX_GPIOA_PIN0_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_UP=y  # Optional pull-up"
+msgstr ""
+"CONFIG_NX_GPIOA_PIN0_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_UP=y  # Optional pull-up"
+
+#: 6e20010c087e4b76b77767b13e0128a9
+msgid "Read digital input"
+msgstr ""
+
+#: 85a220b11afc4eb9a1fa34d06238ffa5
+msgid "High impedance"
+msgstr ""
+
+#: 9e6ee50dc9c14e879adbb11117c1fbe9
+msgid "Can enable pull-up/pull-down"
+msgstr ""
+
+#: ca45543e3fee4bc7abb24396a8c3bb07
+msgid "**Output Push-Pull:**"
+msgstr "**Output Push-Pull:**"
+
+#: 286526afb1234210aa736d686d3d6ef8
+msgid ""
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0"
+msgstr ""
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0"
+
+#: 31d723c59c2e4d60914bfb116c4f8e6a
+msgid "Drive high or low"
+msgstr ""
+
+#: fa59d295dee6455ebe8864379488d0ee
+msgid "Strong output"
+msgstr ""
+
+#: 7dbc9613195c48ba8945560ea233cd56
+msgid "Most common output mode"
+msgstr ""
+
+#: 99a2b931e60941c4a6b460f852116bcc
+msgid "**Output Open-Drain:**"
+msgstr "**Output Open-Drain:**"
+
+#: 667775c1731f4a3ca829ff0b320bc3c9
+msgid ""
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_OD=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_UP=y  # External pull-up required"
+msgstr ""
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_OD=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_UP=y  # External pull-up required"
+
+#: 4b91315e23ad4c5b97847d98c0ae9c9b
+msgid "Can only pull low"
+msgstr ""
+
+#: eaa86c7fa0884ffd872710660f90bdd5
+msgid "Requires external pull-up"
+msgstr ""
+
+#: 667cdc9ddc3044da8de8c402163fe214
+msgid "Used for I2C, 1-Wire"
+msgstr ""
+
+#: 7928a39729834154b1653cd3f2ae5a12
+msgid "**Alternate Function Push-Pull:**"
+msgstr "**Alternate 函数 Push-Pull:**"
+
+#: c279e5fea422491e87e2dd6863d3c3ac
+msgid "CONFIG_NX_GPIOA_PIN0_MODE_AF_PP=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_MODE_AF_PP=y"
+
+#: 7379a61fe1b04a718fd497a2877b646c
+msgid "Controlled by peripheral (UART, SPI, etc.)"
+msgstr "Controlled by peripheral (UART, SPI, etc.)"
+
+#: e44347dfffab48b6826754d8f838d01b
+msgid "Push-pull output"
+msgstr ""
+
+#: 602387ac0626426ab5d7dd8025a87467
+msgid "**Alternate Function Open-Drain:**"
+msgstr "**Alternate 函数 Open-Drain:**"
+
+#: bf2746d8717b4a7482904d6a7c6b032a
+msgid "CONFIG_NX_GPIOA_PIN0_MODE_AF_OD=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_MODE_AF_OD=y"
+
+#: db84954b347144b28a17fed3da34cb86
+msgid "Controlled by peripheral"
+msgstr ""
+
+#: 52738179ffae42049601371354e48095
+msgid "Open-drain output"
+msgstr ""
+
+#: 1e928448aa014f248b4f7c65b14f2a55
+msgid "**Analog Mode:**"
+msgstr "**Analog Mode:**"
+
+#: 85eb0219b83e4c20878193dbbeb254ff
+msgid "CONFIG_NX_GPIOA_PIN0_MODE_ANALOG=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_MODE_ANALOG=y"
+
+#: 1f13d038d8ad4f638601140afe799b6c
+msgid "Used for ADC/DAC"
+msgstr ""
+
+#: 183cdefb94fa4ff393d8e6b9b0259536
+msgid "Disables digital circuitry"
+msgstr ""
+
+#: 0a41ce8ed5c74196b5b9f908bb826407
+msgid "GPIO Pull Configuration"
+msgstr "GPIO Pull 配置"
+
+#: 75eff9e634094dab89165cd61e9e4601
+msgid "**No Pull:**"
+msgstr "**No Pull:**"
+
+#: 34933aae38f3427cac144c2173c280bd
+msgid "CONFIG_NX_GPIOA_PIN0_PULL_NONE=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_PULL_NONE=y"
+
+#: 3d80e5b891e3498cb8e78e7c012c6742
+msgid "**Pull-Up:**"
+msgstr "**Pull-Up:**"
+
+#: ef7234305dfc4ec890ec385abb8f3b97
+msgid "CONFIG_NX_GPIOA_PIN0_PULL_UP=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_PULL_UP=y"
+
+#: 3c1b572a20eb49d4b73e1833022db4cd
+msgid "**Pull-Down:**"
+msgstr "**Pull-Down:**"
+
+#: a444a4678ec24e8e8373bb9ca9b9b1a4
+msgid "CONFIG_NX_GPIOA_PIN0_PULL_DOWN=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_PULL_DOWN=y"
+
+#: 0f4f103e2e1547a7ad816a25d9457c1e
+msgid "GPIO Speed Configuration"
+msgstr "GPIO Speed 配置"
+
+#: 20dccad234f14130957964bb244d7779
+msgid "**Low Speed:**"
+msgstr "**Low Speed:**"
+
+#: 651cfdd30e4f4ba0ac7695e2c674f2b3
+msgid "CONFIG_NX_GPIOA_PIN0_SPEED_LOW=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_SPEED_LOW=y"
+
+#: 505fb70968d946548ee48526bc56d077
+msgid "Lowest EMI"
+msgstr ""
+
+#: 4c483275784e43f881b4a5746d82c993
+msgid "Suitable for slow signals"
+msgstr ""
+
+#: 1739c217cf7249479c716731bb6397b9
+msgid "**Medium Speed:**"
+msgstr "**Medium Speed:**"
+
+#: 6d7a835ca0de4c4f97509df00c00f89a
+msgid "CONFIG_NX_GPIOA_PIN0_SPEED_MEDIUM=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_SPEED_MEDIUM=y"
+
+#: 9c2b15f3dc144d748fa4f39822822572
+msgid "Balanced performance"
+msgstr ""
+
+#: 2920260edd8340cfbfa005d74fe6e9a5
+msgid "Default for most applications"
+msgstr ""
+
+#: e70b9352f2174ef9b7c6e2eed7c634a4
+msgid "**High Speed:**"
+msgstr "**High Speed:**"
+
+#: e720285cc1fd4f2ea1dfa3c27f58859a
+msgid "CONFIG_NX_GPIOA_PIN0_SPEED_HIGH=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_SPEED_HIGH=y"
+
+#: 72b17ddec22c40668321b7b570384d63
+msgid "Fast switching"
+msgstr ""
+
+#: 06cc74841640480eaef7049a280d0f56
+msgid "Higher EMI"
+msgstr ""
+
+#: d436d52361084537942b374d60a57785
+msgid "**Very High Speed:**"
+msgstr "**Very High Speed:**"
+
+#: 72f62ee2b5e441ebb1a57324d1f02676
+msgid "CONFIG_NX_GPIOA_PIN0_SPEED_VERY_HIGH=y"
+msgstr "CONFIG_NX_GPIOA_PIN0_SPEED_VERY_HIGH=y"
+
+#: 1d92b210471b46cc9249d1fba1bb7a4e
+msgid "Fastest switching"
+msgstr ""
+
+#: 8163aed3ba0c49e69fc200c364ef6a14
+msgid "Highest EMI"
+msgstr ""
+
+#: c876d5a26ffc437c957997ef149645a4
+msgid "For high-speed protocols"
+msgstr ""
+
+#: 86b186d5996d42a8a7cb9b8a29eddb98
+msgid "Common GPIO Configurations"
+msgstr ""
+
+#: f31d9c7e22234cb79cd5cd6e4e2f23a5
+msgid "**LED Output:**"
+msgstr "**LED Output:**"
+
+#: 50712f2ef305492e931d3c0e308ab1b5
+msgid ""
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_NONE=y\n"
+"CONFIG_NX_GPIOA_PIN0_SPEED_LOW=y\n"
+"CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0"
+msgstr ""
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_NX_GPIOA_PIN0_PULL_NONE=y\n"
+"CONFIG_NX_GPIOA_PIN0_SPEED_LOW=y\n"
+"CONFIG_GPIOA_PIN0_OUTPUT_VALUE=0"
+
+#: a561973a2c3b4e40b9542a6a6e516a56
+msgid "**Button Input:**"
+msgstr "**Button Input:**"
+
+#: ebbc7ab8bfbb41099b38c9ffeac478a0
+msgid ""
+"CONFIG_INSTANCE_NX_GPIOA_PIN1=y\n"
+"CONFIG_NX_GPIOA_PIN1_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN1_PULL_UP=y\n"
+"CONFIG_NX_GPIOA_PIN1_SPEED_LOW=y"
+msgstr ""
+"CONFIG_INSTANCE_NX_GPIOA_PIN1=y\n"
+"CONFIG_NX_GPIOA_PIN1_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN1_PULL_UP=y\n"
+"CONFIG_NX_GPIOA_PIN1_SPEED_LOW=y"
+
+#: b3758d65bcd7407c98f718a62be94181
+msgid "**I2C SCL/SDA (Open-Drain):**"
+msgstr "**I2C SCL/SDA (Open-Drain):**"
+
+#: 85e2df34194f4088b1cef22ae6d153ce
+msgid ""
+"# SCL\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN2=y\n"
+"CONFIG_NX_GPIOA_PIN2_MODE_AF_OD=y\n"
+"CONFIG_NX_GPIOA_PIN2_PULL_UP=y\n"
+"CONFIG_NX_GPIOA_PIN2_SPEED_HIGH=y\n"
+"\n"
+"# SDA\n"
+"CONFIG_INSTANCE_NX_GPIOB_PIN0=y\n"
+"CONFIG_NX_GPIOB_PIN0_MODE_AF_OD=y\n"
+"CONFIG_NX_GPIOB_PIN0_PULL_UP=y\n"
+"CONFIG_NX_GPIOB_PIN0_SPEED_HIGH=y"
+msgstr ""
+"# SCL\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN2=y\n"
+"CONFIG_NX_GPIOA_PIN2_MODE_AF_OD=y\n"
+"CONFIG_NX_GPIOA_PIN2_PULL_UP=y\n"
+"CONFIG_NX_GPIOA_PIN2_SPEED_HIGH=y\n"
+"\n"
+"# SDA\n"
+"CONFIG_INSTANCE_NX_GPIOB_PIN0=y\n"
+"CONFIG_NX_GPIOB_PIN0_MODE_AF_OD=y\n"
+"CONFIG_NX_GPIOB_PIN0_PULL_UP=y\n"
+"CONFIG_NX_GPIOB_PIN0_SPEED_HIGH=y"
+
+#: dcd7849c3ac34040bd5b7cf7c82cc914
+msgid "**SPI Pins:**"
+msgstr "**SPI Pins:**"
+
+#: 6b67841dd6b249f0bb0bd1bdeba7d29e
+msgid ""
+"# SCK\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_AF_PP=y\n"
+"CONFIG_NX_GPIOA_PIN0_SPEED_VERY_HIGH=y\n"
+"\n"
+"# MOSI\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN1=y\n"
+"CONFIG_NX_GPIOA_PIN1_MODE_AF_PP=y\n"
+"CONFIG_NX_GPIOA_PIN1_SPEED_VERY_HIGH=y\n"
+"\n"
+"# MISO\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN2=y\n"
+"CONFIG_NX_GPIOA_PIN2_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN2_PULL_NONE=y\n"
+"CONFIG_NX_GPIOA_PIN2_SPEED_VERY_HIGH=y"
+msgstr ""
+"# SCK\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_AF_PP=y\n"
+"CONFIG_NX_GPIOA_PIN0_SPEED_VERY_HIGH=y\n"
+"\n"
+"# MOSI\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN1=y\n"
+"CONFIG_NX_GPIOA_PIN1_MODE_AF_PP=y\n"
+"CONFIG_NX_GPIOA_PIN1_SPEED_VERY_HIGH=y\n"
+"\n"
+"# MISO\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN2=y\n"
+"CONFIG_NX_GPIOA_PIN2_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN2_PULL_NONE=y\n"
+"CONFIG_NX_GPIOA_PIN2_SPEED_VERY_HIGH=y"
+
+#: 66ea01c097554b8eb47e0bde531799d5
+msgid "Multiple GPIO Ports"
+msgstr ""
+
+#: 0af4716dc9e5487db7ab4af1f0f59d62
+msgid "**Configure multiple GPIO ports:**"
+msgstr "**Configure multiple GPIO ports:**"
+
+#: 1531868c1f0b4b489d1f72e0206a14d8
+msgid ""
+"# Enable GPIO\n"
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"\n"
+"# GPIOA: LEDs and buttons\n"
+"CONFIG_INSTANCE_NX_GPIOA=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y  # LED1\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN1=y  # LED2\n"
+"CONFIG_NX_GPIOA_PIN1_MODE_OUTPUT_PP=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN2=y  # Button\n"
+"CONFIG_NX_GPIOA_PIN2_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN2_PULL_UP=y\n"
+"\n"
+"# GPIOB: I2C interface\n"
+"CONFIG_INSTANCE_NX_GPIOB=y\n"
+"CONFIG_INSTANCE_NX_GPIOB_PIN0=y  # I2C SCL\n"
+"CONFIG_NX_GPIOB_PIN0_MODE_AF_OD=y\n"
+"CONFIG_NX_GPIOB_PIN0_PULL_UP=y\n"
+"\n"
+"# GPIOC: Analog inputs\n"
+"CONFIG_INSTANCE_NX_GPIOC=y\n"
+"CONFIG_INSTANCE_NX_GPIOC_PIN0=y  # ADC input\n"
+"CONFIG_NX_GPIOC_PIN0_MODE_ANALOG=y"
+msgstr ""
+"# Enable GPIO\n"
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"\n"
+"# GPIOA: LEDs and buttons\n"
+"CONFIG_INSTANCE_NX_GPIOA=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y  # LED1\n"
+"CONFIG_NX_GPIOA_PIN0_MODE_OUTPUT_PP=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN1=y  # LED2\n"
+"CONFIG_NX_GPIOA_PIN1_MODE_OUTPUT_PP=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN2=y  # Button\n"
+"CONFIG_NX_GPIOA_PIN2_MODE_INPUT=y\n"
+"CONFIG_NX_GPIOA_PIN2_PULL_UP=y\n"
+"\n"
+"# GPIOB: I2C interface\n"
+"CONFIG_INSTANCE_NX_GPIOB=y\n"
+"CONFIG_INSTANCE_NX_GPIOB_PIN0=y  # I2C SCL\n"
+"CONFIG_NX_GPIOB_PIN0_MODE_AF_OD=y\n"
+"CONFIG_NX_GPIOB_PIN0_PULL_UP=y\n"
+"\n"
+"# GPIOC: Analog inputs\n"
+"CONFIG_INSTANCE_NX_GPIOC=y\n"
+"CONFIG_INSTANCE_NX_GPIOC_PIN0=y  # ADC input\n"
+"CONFIG_NX_GPIOC_PIN0_MODE_ANALOG=y"
+
+#: efdee200e24d433e9e00984aeef441ec
+msgid "SPI Configuration"
+msgstr "SPI 配置"
+
+#: 04c7b5902efe4c8cb31ed71fa737a57a
+msgid ""
+"SPI (Serial Peripheral Interface) provides high-speed synchronous serial "
+"communication. Configuration includes:"
+msgstr ""
+"SPI (Serial Peripheral Interface) provides high-speed synchronous serial "
+"communication. Configuration includes:"
+
+#: 7a70b7d359e444bcab40966cf94d7f37
+msgid "Maximum speed (Hz)"
+msgstr "Maximum speed (Hz)"
+
+#: 7ad6c3486f494699b135f9bade17e2f5
+msgid "Clock polarity (CPOL)"
+msgstr "时钟 polarity (CPOL)"
+
+#: 1ef395d55ec543d9ba2ee3a3cd7a5ad0
+msgid "Clock phase (CPHA)"
+msgstr "时钟 phase (CPHA)"
+
+#: 8f525ea25368453a9f8e59a9d9523f2b
+msgid "Bit order (MSB/LSB first)"
+msgstr "Bit order (MSB/LSB first)"
+
+#: 464b30aac01a477a89f927d43adb389b
+msgid "**All SPI instances require:**"
+msgstr "**All SPI instances require:**"
+
+#: a99083af346e44cb86451f8863b16997
+msgid "``SPI<N>_MAX_SPEED``: Maximum SPI clock speed in Hz"
+msgstr "``SPI<N>_MAX_SPEED``: Maximum SPI clock speed in Hz"
+
+#: f31dba4f63a942f1a5379d173dcdeb7c
+msgid "``SPI<N>_CPOL``: Clock polarity (0 or 1)"
+msgstr "``SPI<N>_CPOL``: Clock polarity (0 or 1)"
+
+#: 5114678eef6947c080939ae1aa041fbb
+msgid "``SPI<N>_CPHA``: Clock phase (0 or 1)"
+msgstr "``SPI<N>_CPHA``: Clock phase (0 or 1)"
+
+#: c205b8da4b8545f4afeef82cf5dfe95b
+msgid "``SPI<N>_BIT_ORDER``: Bit order (MSB or LSB first)"
+msgstr "``SPI<N>_BIT_ORDER``: Bit order (MSB or LSB first)"
+
+#: 8d3126556a954cc0a185af073da8cf72
+msgid "``SPI<N>_TX_BUFFER_SIZE``: Transmit buffer size in bytes"
+msgstr "``SPI<N>_TX_BUFFER_SIZE``: Transmit buffer size in bytes"
+
+#: 7724f33660e746c7b98e4a2768aaefba
+msgid "``SPI<N>_RX_BUFFER_SIZE``: Receive buffer size in bytes"
+msgstr "``SPI<N>_RX_BUFFER_SIZE``: Receive buffer size in bytes"
+
+#: 138fa3892a744fefaca93263ed0fc92f
+msgid "Basic SPI Configuration"
+msgstr "Basic SPI 配置"
+
+#: a2599fab3cf349a8a55f766ac3f13c64
+msgid "**Enable SPI and configure SPI0:**"
+msgstr "**Enable SPI and configure SPI0:**"
+
+#: 278cacc397e549b6a3958ea6203c9441
+msgid ""
+"# Enable SPI peripheral\n"
+"CONFIG_NATIVE_SPI_ENABLE=y\n"
+"\n"
+"# Enable SPI0 instance\n"
+"CONFIG_INSTANCE_NX_SPI_0=y\n"
+"\n"
+"# Configure SPI0 parameters\n"
+"CONFIG_SPI0_MAX_SPEED=1000000\n"
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y\n"
+"CONFIG_NX_SPI0_MSB_FIRST=y\n"
+"CONFIG_SPI0_TX_BUFFER_SIZE=256\n"
+"CONFIG_SPI0_RX_BUFFER_SIZE=256"
+msgstr ""
+"# Enable SPI peripheral\n"
+"CONFIG_NATIVE_SPI_ENABLE=y\n"
+"\n"
+"# Enable SPI0 instance\n"
+"CONFIG_INSTANCE_NX_SPI_0=y\n"
+"\n"
+"# Configure SPI0 parameters\n"
+"CONFIG_SPI0_MAX_SPEED=1000000\n"
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y\n"
+"CONFIG_NX_SPI0_MSB_FIRST=y\n"
+"CONFIG_SPI0_TX_BUFFER_SIZE=256\n"
+"CONFIG_SPI0_RX_BUFFER_SIZE=256"
+
+#: 606767e4f49a4341934e878eb7c22ac8
+msgid "SPI Modes"
+msgstr ""
+
+#: 6e95c3c8cba44cb99e1a3d6b74f17dc1
+msgid "SPI has four modes based on CPOL and CPHA:"
+msgstr ""
+
+#: 02765c8454f44b5ba97a70efa44a6cc9
+msgid "**Mode 0 (CPOL=0, CPHA=0):**"
+msgstr "**Mode 0 (CPOL=0, CPHA=0):**"
+
+#: cf4e3bf1542640d486f9161380d96ec1
+msgid ""
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y"
+msgstr ""
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y"
+
+#: 057cb994f191484a85010aeb8295fa15 8844b9561dcb4519b2102a9b548e1a6f
+msgid "Clock idle low"
+msgstr "时钟 idle low"
+
+#: c518976665aa43d98bfdd0f964bd2faa d0a8e5275a754e7a9f92e0209466fdbd
+msgid "Data sampled on first edge"
+msgstr ""
+
+#: e222afe8e9314dd59ce9b39d858faaeb
+msgid "Most common mode"
+msgstr ""
+
+#: 788aed1c9d0e4dceb57423e32a060ade
+msgid "**Mode 1 (CPOL=0, CPHA=1):**"
+msgstr "**Mode 1 (CPOL=0, CPHA=1):**"
+
+#: 2a55c1751e934a55a12a3a59db79ce62
+msgid ""
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_2=y"
+msgstr ""
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_2=y"
+
+#: 180c7727fd064117904ea6d7f5e86361 5582e27daa9c486c95ff06ec674b73f5
+msgid "Data sampled on second edge"
+msgstr ""
+
+#: 2b3d96f234c340a1b8373d40892d7cee
+msgid "**Mode 2 (CPOL=1, CPHA=0):**"
+msgstr "**Mode 2 (CPOL=1, CPHA=0):**"
+
+#: 2808ff287cb64ec886b3024c12ef7ad1
+msgid ""
+"CONFIG_NX_SPI0_CPOL_HIGH=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y"
+msgstr ""
+"CONFIG_NX_SPI0_CPOL_HIGH=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y"
+
+#: 1c647d02f6b6499f892cf3519234fc9a d37256b213a9459d9858cf372624f6b9
+msgid "Clock idle high"
+msgstr "时钟 idle high"
+
+#: e2b3cc28548b4ee2885de9f9e96cc035
+msgid "**Mode 3 (CPOL=1, CPHA=1):**"
+msgstr "**Mode 3 (CPOL=1, CPHA=1):**"
+
+#: b05095152cc1482cb776007db1883b47
+msgid ""
+"CONFIG_NX_SPI0_CPOL_HIGH=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_2=y"
+msgstr ""
+"CONFIG_NX_SPI0_CPOL_HIGH=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_2=y"
+
+#: ab786112c7a941fc98cfad8c9476c176
+msgid "Common SPI Configurations"
+msgstr ""
+
+#: d1382610eb2549e7a973f795730b0567
+msgid "**SD Card (Mode 0, 25 MHz):**"
+msgstr "**SD Card (Mode 0, 25 MHz):**"
+
+#: d3fc2a88fc2b4d2b9accb2cabec4cf13
+msgid ""
+"CONFIG_INSTANCE_NX_SPI_0=y\n"
+"CONFIG_SPI0_MAX_SPEED=25000000\n"
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y\n"
+"CONFIG_NX_SPI0_MSB_FIRST=y\n"
+"CONFIG_SPI0_TX_BUFFER_SIZE=512\n"
+"CONFIG_SPI0_RX_BUFFER_SIZE=512"
+msgstr ""
+"CONFIG_INSTANCE_NX_SPI_0=y\n"
+"CONFIG_SPI0_MAX_SPEED=25000000\n"
+"CONFIG_NX_SPI0_CPOL_LOW=y\n"
+"CONFIG_NX_SPI0_CPHA_EDGE_1=y\n"
+"CONFIG_NX_SPI0_MSB_FIRST=y\n"
+"CONFIG_SPI0_TX_BUFFER_SIZE=512\n"
+"CONFIG_SPI0_RX_BUFFER_SIZE=512"
+
+#: 4b1ac12b5b08475f80aff4df9de176e3
+msgid "**Flash Memory (Mode 0, 10 MHz):**"
+msgstr "**Flash Memory (Mode 0, 10 MHz):**"
+
+#: e9cc4c3571824c349f66ce4ef21d4630
+msgid ""
+"CONFIG_INSTANCE_NX_SPI_1=y\n"
+"CONFIG_SPI1_MAX_SPEED=10000000\n"
+"CONFIG_NX_SPI1_CPOL_LOW=y\n"
+"CONFIG_NX_SPI1_CPHA_EDGE_1=y\n"
+"CONFIG_NX_SPI1_MSB_FIRST=y\n"
+"CONFIG_SPI1_TX_BUFFER_SIZE=256\n"
+"CONFIG_SPI1_RX_BUFFER_SIZE=256"
+msgstr ""
+"CONFIG_INSTANCE_NX_SPI_1=y\n"
+"CONFIG_SPI1_MAX_SPEED=10000000\n"
+"CONFIG_NX_SPI1_CPOL_LOW=y\n"
+"CONFIG_NX_SPI1_CPHA_EDGE_1=y\n"
+"CONFIG_NX_SPI1_MSB_FIRST=y\n"
+"CONFIG_SPI1_TX_BUFFER_SIZE=256\n"
+"CONFIG_SPI1_RX_BUFFER_SIZE=256"
+
+#: 243446a9b95e4febada6cc229147dd79
+msgid "**Display (Mode 3, 20 MHz):**"
+msgstr "**Display (Mode 3, 20 MHz):**"
+
+#: e6a1c3d7f80f466281decfb1c5b231e7
+msgid ""
+"CONFIG_INSTANCE_NX_SPI_2=y\n"
+"CONFIG_SPI2_MAX_SPEED=20000000\n"
+"CONFIG_NX_SPI2_CPOL_HIGH=y\n"
+"CONFIG_NX_SPI2_CPHA_EDGE_2=y\n"
+"CONFIG_NX_SPI2_MSB_FIRST=y\n"
+"CONFIG_SPI2_TX_BUFFER_SIZE=1024\n"
+"CONFIG_SPI2_RX_BUFFER_SIZE=128"
+msgstr ""
+"CONFIG_INSTANCE_NX_SPI_2=y\n"
+"CONFIG_SPI2_MAX_SPEED=20000000\n"
+"CONFIG_NX_SPI2_CPOL_HIGH=y\n"
+"CONFIG_NX_SPI2_CPHA_EDGE_2=y\n"
+"CONFIG_NX_SPI2_MSB_FIRST=y\n"
+"CONFIG_SPI2_TX_BUFFER_SIZE=1024\n"
+"CONFIG_SPI2_RX_BUFFER_SIZE=128"
+
+#: 233af146c268412398c38d6005656154
+msgid "I2C Configuration"
+msgstr "I2C 配置"
+
+#: 287ce82f91754fedb0b02ff417d5e8ea
+msgid ""
+"I2C (Inter-Integrated Circuit) provides multi-master, multi-slave serial "
+"communication. Configuration includes:"
+msgstr ""
+"I2C (Inter-Integrated Circuit) provides multi-master, multi-slave serial "
+"communication. Configuration includes:"
+
+#: b10b8ab6eece4fcb9074112ac594fcd8
+msgid "Speed mode (Standard 100kHz, Fast 400kHz, Fast Plus 1MHz)"
+msgstr "Speed mode (Standard 100kHz, Fast 400kHz, Fast Plus 1MHz)"
+
+#: 80ae8f0d6fdf462184e09d6599365b97
+msgid "Addressing mode (7-bit or 10-bit)"
+msgstr "Addressing mode (7-bit or 10-bit)"
+
+#: 72a91772d2084950ab16514af4c21a0f
+msgid "**All I2C instances require:**"
+msgstr "**All I2C instances require:**"
+
+#: 5c98b4047fe94cf5b99087ca620c0ad6
+msgid "``I2C<N>_SPEED``: I2C bus speed mode"
+msgstr "``I2C<N>_SPEED``: I2C bus speed mode"
+
+#: 6d95765ead50403dae21c2d5b42e7c74
+msgid "``I2C<N>_ADDR_MODE``: Addressing mode (7-bit or 10-bit)"
+msgstr "``I2C<N>_ADDR_MODE``: Addressing mode (7-bit or 10-bit)"
+
+#: cd972d5feb8f4695ba8e23bd70dc9472
+msgid "``I2C<N>_TX_BUFFER_SIZE``: Transmit buffer size in bytes"
+msgstr "``I2C<N>_TX_BUFFER_SIZE``: Transmit buffer size in bytes"
+
+#: 5dc170c1c9ea45c2b86ceb2ec9fcb0f6
+msgid "``I2C<N>_RX_BUFFER_SIZE``: Receive buffer size in bytes"
+msgstr "``I2C<N>_RX_BUFFER_SIZE``: Receive buffer size in bytes"
+
+#: 9123a8a078bd40b6a7e7a123eb71bc99
+msgid "Basic I2C Configuration"
+msgstr "Basic I2C 配置"
+
+#: 1644d453dedc4e92b5c0656c9ce5f4b3
+msgid "**Enable I2C and configure I2C0:**"
+msgstr "**Enable I2C and configure I2C0:**"
+
+#: c1222ccc57884cbc9d07697e08f41d06
+msgid ""
+"# Enable I2C peripheral\n"
+"CONFIG_NATIVE_I2C_ENABLE=y\n"
+"\n"
+"# Enable I2C0 instance\n"
+"CONFIG_INSTANCE_NX_I2C_0=y\n"
+"\n"
+"# Configure I2C0 parameters\n"
+"CONFIG_NX_I2C0_SPEED_FAST=y\n"
+"CONFIG_NX_I2C0_ADDR_BIT_7=y\n"
+"CONFIG_I2C0_TX_BUFFER_SIZE=256\n"
+"CONFIG_I2C0_RX_BUFFER_SIZE=256"
+msgstr ""
+"# Enable I2C peripheral\n"
+"CONFIG_NATIVE_I2C_ENABLE=y\n"
+"\n"
+"# Enable I2C0 instance\n"
+"CONFIG_INSTANCE_NX_I2C_0=y\n"
+"\n"
+"# Configure I2C0 parameters\n"
+"CONFIG_NX_I2C0_SPEED_FAST=y\n"
+"CONFIG_NX_I2C0_ADDR_BIT_7=y\n"
+"CONFIG_I2C0_TX_BUFFER_SIZE=256\n"
+"CONFIG_I2C0_RX_BUFFER_SIZE=256"
+
+#: 84048d35c96c4665811a6c8c9a537ae9
+msgid "I2C Speed Modes"
+msgstr ""
+
+#: a8bffad0d5ba4f4bbc1c6b9984c8d5fd
+msgid "**Standard Mode (100 kHz):**"
+msgstr "**Standard Mode (100 kHz):**"
+
+#: 0e12176be3404631bd0f746ba5ae82fa
+msgid "CONFIG_NX_I2C0_SPEED_STANDARD=y"
+msgstr "CONFIG_NX_I2C0_SPEED_STANDARD=y"
+
+#: 5006aa382b3d418fa66fe22d97386fa7
+msgid "100 kHz bus speed"
+msgstr ""
+
+#: 6ede0429b6914258b5e1fa4f1eec3665
+msgid "Longest cable length"
+msgstr ""
+
+#: e8c50ae0d3c24ab684606557f57e6ee5
+msgid "Best compatibility"
+msgstr ""
+
+#: 3390b72976a34b7bb59b788b02dd372e
+msgid "**Fast Mode (400 kHz):**"
+msgstr "**Fast Mode (400 kHz):**"
+
+#: 29fc365dc3d5419d93449d9b17cb8ace
+msgid "CONFIG_NX_I2C0_SPEED_FAST=y"
+msgstr "CONFIG_NX_I2C0_SPEED_FAST=y"
+
+#: 9a7b787457564ba4911301a230f41f1b
+msgid "400 kHz bus speed"
+msgstr ""
+
+#: 361e756b1fbb42448bf4c2e62e4981f1 abebd07500534b88b88a8bd436e67747
+msgid "Good balance"
+msgstr ""
+
+#: 0867853330234560a0d4b3392a8ba2a3
+msgid "**Fast Mode Plus (1 MHz):**"
+msgstr "**Fast Mode Plus (1 MHz):**"
+
+#: 0a077a200d9f4093971e3029b0597112
+msgid "CONFIG_NX_I2C0_SPEED_FAST_PLUS=y"
+msgstr "CONFIG_NX_I2C0_SPEED_FAST_PLUS=y"
+
+#: 7e154db64be74a10b9b2953330e21459
+msgid "1 MHz bus speed"
+msgstr ""
+
+#: c2174fd09e7341ed849dabcf2fd059ca
+msgid "Shortest cable length"
+msgstr ""
+
+#: 03c0765d4ae047f0806c87ccc6fd2adf
+msgid "Requires capable devices"
+msgstr ""
+
+#: 1eb928a7ffb34c42b8bc83f4220164ee
+msgid "I2C Addressing Modes"
+msgstr ""
+
+#: 0cfcd17a0fc1450fa3a72b91085bd9f1
+msgid "**7-bit Addressing:**"
+msgstr "**7-bit Addressing:**"
+
+#: 906ffc9067bc4591be84727a965a6102
+msgid "CONFIG_NX_I2C0_ADDR_BIT_7=y"
+msgstr "CONFIG_NX_I2C0_ADDR_BIT_7=y"
+
+#: a2181845fcc8480fbff2644fb666658a
+msgid "Standard addressing"
+msgstr ""
+
+#: 2708e39c1c80427ab6049bf670b6e8d8
+msgid "128 possible addresses"
+msgstr ""
+
+#: 7721c326a0124f1caba8ed4618e1a875
+msgid "Most common"
+msgstr ""
+
+#: 12ff70d281f34df3a973db24f1107178
+msgid "**10-bit Addressing:**"
+msgstr "**10-bit Addressing:**"
+
+#: 2e194f275ace4b73b02cd0d417bc6efd
+msgid "CONFIG_NX_I2C0_ADDR_BIT_10=y"
+msgstr "CONFIG_NX_I2C0_ADDR_BIT_10=y"
+
+#: 4bcb1f02b4704d16b8d3b9d6ab66aadf
+msgid "Extended addressing"
+msgstr ""
+
+#: 1ec0406b84d74f4eb270223d03facc93
+msgid "1024 possible addresses"
+msgstr ""
+
+#: d2f5c90fb9244396b1b26645454788b2
+msgid "Less common"
+msgstr ""
+
+#: c2a6686eb97f47cc90d74f359597a90d
+msgid "Common I2C Configurations"
+msgstr ""
+
+#: 16552e4561864af1a60473aa54e628e0
+msgid "**Sensor Bus (Fast Mode, 7-bit):**"
+msgstr "**Sensor Bus (Fast Mode, 7-bit):**"
+
+#: 4c08c33b994f45519b1d9f93c34888a3
+msgid ""
+"CONFIG_INSTANCE_NX_I2C_0=y\n"
+"CONFIG_NX_I2C0_SPEED_FAST=y\n"
+"CONFIG_NX_I2C0_ADDR_BIT_7=y\n"
+"CONFIG_I2C0_TX_BUFFER_SIZE=128\n"
+"CONFIG_I2C0_RX_BUFFER_SIZE=128"
+msgstr ""
+"CONFIG_INSTANCE_NX_I2C_0=y\n"
+"CONFIG_NX_I2C0_SPEED_FAST=y\n"
+"CONFIG_NX_I2C0_ADDR_BIT_7=y\n"
+"CONFIG_I2C0_TX_BUFFER_SIZE=128\n"
+"CONFIG_I2C0_RX_BUFFER_SIZE=128"
+
+#: d3bfc09f81dc4b7cbbfd118cf6717eb2
+msgid "**EEPROM (Standard Mode, 7-bit):**"
+msgstr "**EEPROM (Standard Mode, 7-bit):**"
+
+#: 785b4f8dedd540108ae672a786d4e393
+msgid ""
+"CONFIG_INSTANCE_NX_I2C_1=y\n"
+"CONFIG_NX_I2C1_SPEED_STANDARD=y\n"
+"CONFIG_NX_I2C1_ADDR_BIT_7=y\n"
+"CONFIG_I2C1_TX_BUFFER_SIZE=256\n"
+"CONFIG_I2C1_RX_BUFFER_SIZE=256"
+msgstr ""
+"CONFIG_INSTANCE_NX_I2C_1=y\n"
+"CONFIG_NX_I2C1_SPEED_STANDARD=y\n"
+"CONFIG_NX_I2C1_ADDR_BIT_7=y\n"
+"CONFIG_I2C1_TX_BUFFER_SIZE=256\n"
+"CONFIG_I2C1_RX_BUFFER_SIZE=256"
+
+#: 102406f9a710431a80ce2e6cc1e9fb83
+msgid "**High-Speed Sensors (Fast Plus, 7-bit):**"
+msgstr "**High-Speed Sensors (Fast Plus, 7-bit):**"
+
+#: 8040be2eea2f4eea93967d8c6d075325
+msgid ""
+"CONFIG_INSTANCE_NX_I2C_2=y\n"
+"CONFIG_NX_I2C2_SPEED_FAST_PLUS=y\n"
+"CONFIG_NX_I2C2_ADDR_BIT_7=y\n"
+"CONFIG_I2C2_TX_BUFFER_SIZE=512\n"
+"CONFIG_I2C2_RX_BUFFER_SIZE=512"
+msgstr ""
+"CONFIG_INSTANCE_NX_I2C_2=y\n"
+"CONFIG_NX_I2C2_SPEED_FAST_PLUS=y\n"
+"CONFIG_NX_I2C2_ADDR_BIT_7=y\n"
+"CONFIG_I2C2_TX_BUFFER_SIZE=512\n"
+"CONFIG_I2C2_RX_BUFFER_SIZE=512"
+
+#: 4029c4415f3945e399ff0bba8305a007
+msgid "Timer Configuration"
+msgstr "定时器 配置"
+
+#: 5470ea8233c141e6aa7b26c1733a2808
+msgid ""
+"Timer peripherals provide timing, counting, and PWM generation. "
+"Configuration includes:"
+msgstr ""
+
+#: 02a829aec0464c93bd06b7a1d9b3795e
+msgid "Timer frequency (Hz)"
+msgstr "定时器 frequency (Hz)"
+
+#: 2bd5c88c8e2d4cd5ade0c2e36a131260
+msgid "Counter mode (Up, Down, Center-aligned)"
+msgstr "Counter mode (Up, Down, Center-aligned)"
+
+#: 14a5019fda5e48ce9a64f508174a772f
+msgid "PWM channel count"
+msgstr ""
+
+#: 822785365bc7460a8c598d384b89b283
+msgid "**All Timer instances require:**"
+msgstr "**All Timer instances require:**"
+
+#: cec845387d7b4a4782e8570ea03fea54
+msgid "``TIMER<N>_FREQUENCY``: Timer base frequency in Hz"
+msgstr "``TIMER<N>_FREQUENCY``: Timer base frequency in Hz"
+
+#: 582c40ce381745e994c8b262f599a6f6
+msgid "``TIMER<N>_MODE``: Counter mode"
+msgstr "``TIMER<N>_MODE``: Counter mode"
+
+#: e7c7ee48783e45578c4aa6d8eae3f869
+msgid "``TIMER<N>_CHANNEL_COUNT``: Number of PWM channels"
+msgstr "``TIMER<N>_CHANNEL_COUNT``: Number of PWM channels"
+
+#: 64056994704a467597b91fbc2a546816
+msgid "Basic Timer Configuration"
+msgstr "Basic 定时器 配置"
+
+#: 461d08e849d44bdd8dbae10509666355
+msgid "**Enable Timer and configure TIMER0:**"
+msgstr "**Enable Timer and configure TIMER0:**"
+
+#: 1e1f485800a64521b058cfda1675beba
+msgid ""
+"# Enable Timer peripheral\n"
+"CONFIG_NATIVE_TIMER_ENABLE=y\n"
+"\n"
+"# Enable TIMER0 instance\n"
+"CONFIG_INSTANCE_NX_TIMER_0=y\n"
+"\n"
+"# Configure TIMER0 parameters\n"
+"CONFIG_TIMER0_FREQUENCY=1000000\n"
+"CONFIG_NX_TIMER0_MODE_UP=y\n"
+"CONFIG_TIMER0_CHANNEL_COUNT=4"
+msgstr ""
+"# Enable Timer peripheral\n"
+"CONFIG_NATIVE_TIMER_ENABLE=y\n"
+"\n"
+"# Enable TIMER0 instance\n"
+"CONFIG_INSTANCE_NX_TIMER_0=y\n"
+"\n"
+"# Configure TIMER0 parameters\n"
+"CONFIG_TIMER0_FREQUENCY=1000000\n"
+"CONFIG_NX_TIMER0_MODE_UP=y\n"
+"CONFIG_TIMER0_CHANNEL_COUNT=4"
+
+#: 7026d656b2974fec80fefbc4b4053d6b
+msgid "Timer Counter Modes"
+msgstr "定时器 Counter Modes"
+
+#: afcf2aef0d0a415b91cc708d98f50fa7
+msgid "**Up Counting:**"
+msgstr "**Up Counting:**"
+
+#: bfb0ae98739e4e6a986ed6f1c4c4b595
+msgid "CONFIG_NX_TIMER0_MODE_UP=y"
+msgstr "CONFIG_NX_TIMER0_MODE_UP=y"
+
+#: 4c9928e5a109443cbbd4af429183f93e
+msgid "Counts from 0 to period"
+msgstr ""
+
+#: 36fa1ec916b843c59e041f612c5d2183
+msgid "**Down Counting:**"
+msgstr "**Down Counting:**"
+
+#: 0163cc6091a14bb7b1c52dceecb93b63
+msgid "CONFIG_NX_TIMER0_MODE_DOWN=y"
+msgstr "CONFIG_NX_TIMER0_MODE_DOWN=y"
+
+#: 3815b82f6c7f48daaf8179733094e30f
+msgid "Counts from period to 0"
+msgstr ""
+
+#: d4ff77ec48b84a4190f6eaecd0ff48b7
+msgid "**Center-Aligned:**"
+msgstr "**Center-Aligned:**"
+
+#: 57b54fdd23324edcab902140dee017ae
+msgid "CONFIG_NX_TIMER0_MODE_CENTER=y"
+msgstr "CONFIG_NX_TIMER0_MODE_CENTER=y"
+
+#: 69c7e2a01ddb48c2aebb8a66b5803fb8
+msgid "Counts up then down"
+msgstr ""
+
+#: 4c60a5a0d3c74f95a611dfb8d1709442
+msgid "Used for symmetric PWM"
+msgstr ""
+
+#: 6dfe63faa25d4188ac5e3ec8c5c050ab
+msgid "Common Timer Configurations"
+msgstr "Common 定时器 Configurations"
+
+#: 849f09c9279046d5bd58a94df2f03cf5
+msgid "**PWM Generation (1 MHz, 4 channels):**"
+msgstr "**PWM Generation (1 MHz, 4 channels):**"
+
+#: 7dfc5dd3717f48cbb44c4c3f49ea4bb4
+msgid ""
+"CONFIG_INSTANCE_NX_TIMER_0=y\n"
+"CONFIG_TIMER0_FREQUENCY=1000000\n"
+"CONFIG_NX_TIMER0_MODE_UP=y\n"
+"CONFIG_TIMER0_CHANNEL_COUNT=4"
+msgstr ""
+"CONFIG_INSTANCE_NX_TIMER_0=y\n"
+"CONFIG_TIMER0_FREQUENCY=1000000\n"
+"CONFIG_NX_TIMER0_MODE_UP=y\n"
+"CONFIG_TIMER0_CHANNEL_COUNT=4"
+
+#: 34ad32d94e154e809b36146fba85d222
+msgid "**Periodic Interrupt (10 kHz):**"
+msgstr "**Periodic Interrupt (10 kHz):**"
+
+#: 0af4e64e0226468d8d706035b0ccea3b
+msgid ""
+"CONFIG_INSTANCE_NX_TIMER_1=y\n"
+"CONFIG_TIMER1_FREQUENCY=10000\n"
+"CONFIG_NX_TIMER1_MODE_UP=y\n"
+"CONFIG_TIMER1_CHANNEL_COUNT=0"
+msgstr ""
+"CONFIG_INSTANCE_NX_TIMER_1=y\n"
+"CONFIG_TIMER1_FREQUENCY=10000\n"
+"CONFIG_NX_TIMER1_MODE_UP=y\n"
+"CONFIG_TIMER1_CHANNEL_COUNT=0"
+
+#: 7d518eee65734be7b8fb65453c0469d0
+msgid "**Motor Control (20 kHz, Center-aligned):**"
+msgstr "**Motor Control (20 kHz, Center-aligned):**"
+
+#: fd785f7555f549c689cba2719748e7a4
+msgid ""
+"CONFIG_INSTANCE_NX_TIMER_2=y\n"
+"CONFIG_TIMER2_FREQUENCY=20000\n"
+"CONFIG_NX_TIMER2_MODE_CENTER=y\n"
+"CONFIG_TIMER2_CHANNEL_COUNT=6"
+msgstr ""
+"CONFIG_INSTANCE_NX_TIMER_2=y\n"
+"CONFIG_TIMER2_FREQUENCY=20000\n"
+"CONFIG_NX_TIMER2_MODE_CENTER=y\n"
+"CONFIG_TIMER2_CHANNEL_COUNT=6"
+
+#: ebadfca33ce940ffa35332d57f33aea9
+msgid "ADC Configuration"
+msgstr "ADC 配置"
+
+#: 31114b8d6ce34b619334b93124f6b0fc
+msgid ""
+"ADC (Analog-to-Digital Converter) converts analog signals to digital values."
+" Configuration includes:"
+msgstr ""
+"ADC (Analog-to-Digital Converter) converts analog signals to digital values."
+" Configuration includes:"
+
+#: 8d0a9fb408c14769953550244a3a9c63
+msgid "Resolution (8, 10, 12, 16 bits)"
+msgstr "Resolution (8, 10, 12, 16 bits)"
+
+#: 001d7c0f10794c808a53f2369dee0118
+msgid "Sampling time"
+msgstr ""
+
+#: f76ff9275c824d649cac98d314dcd9e6
+msgid "Channel count"
+msgstr ""
+
+#: 8f279bc913eb4df0b7af80409b34701d
+msgid "**All ADC instances require:**"
+msgstr "**All ADC instances require:**"
+
+#: b3ef883181fb424095169083d814263d
+msgid "``ADC<N>_RESOLUTION``: ADC resolution in bits"
+msgstr "``ADC<N>_RESOLUTION``: ADC resolution in bits"
+
+#: 6b806c22deb84445bb24c5dde2702f41
+msgid "``ADC<N>_SAMPLE_TIME``: Sampling time"
+msgstr "``ADC<N>_SAMPLE_TIME``: Sampling time"
+
+#: 6cdfb2996ff34bc3b3ad25a0b56c882a
+msgid "``ADC<N>_CHANNEL_COUNT``: Number of ADC channels"
+msgstr "``ADC<N>_CHANNEL_COUNT``: Number of ADC channels"
+
+#: 4b39b178a71943d98034f3435b5c61c7
+msgid "Basic ADC Configuration"
+msgstr "Basic ADC 配置"
+
+#: ba4771d6a0854fa18b00d203af56ba7a
+msgid "**Enable ADC and configure ADC0:**"
+msgstr "**Enable ADC and configure ADC0:**"
+
+#: 731719694c044101abe96a9cd05b2266
+msgid ""
+"# Enable ADC peripheral\n"
+"CONFIG_NATIVE_ADC_ENABLE=y\n"
+"\n"
+"# Enable ADC0 instance\n"
+"CONFIG_INSTANCE_NX_ADC_0=y\n"
+"\n"
+"# Configure ADC0 parameters\n"
+"CONFIG_NX_ADC0_RESOLUTION_12=y\n"
+"CONFIG_NX_ADC0_SAMPLE_TIME_MEDIUM=y\n"
+"CONFIG_ADC0_CHANNEL_COUNT=16"
+msgstr ""
+"# Enable ADC peripheral\n"
+"CONFIG_NATIVE_ADC_ENABLE=y\n"
+"\n"
+"# Enable ADC0 instance\n"
+"CONFIG_INSTANCE_NX_ADC_0=y\n"
+"\n"
+"# Configure ADC0 parameters\n"
+"CONFIG_NX_ADC0_RESOLUTION_12=y\n"
+"CONFIG_NX_ADC0_SAMPLE_TIME_MEDIUM=y\n"
+"CONFIG_ADC0_CHANNEL_COUNT=16"
+
+#: d89bf647ced9455ab8f6a0bac5e962c7
+msgid "ADC Resolution"
+msgstr ""
+
+#: 81baefa2727d4e8bbfe4c4fb018ba60d
+msgid "**8-bit Resolution:**"
+msgstr "**8-bit Resolution:**"
+
+#: 766dec8c5df94fe3be28cf00c8ca00a5
+msgid "CONFIG_NX_ADC0_RESOLUTION_8=y"
+msgstr "CONFIG_NX_ADC0_RESOLUTION_8=y"
+
+#: abf830c6e91c4d8d91831a08db067fa2
+msgid "256 levels (0-255)"
+msgstr "256 levels (0-255)"
+
+#: 3c508dcd406d48ef94623ca63c646773
+msgid "Fastest conversion"
+msgstr ""
+
+#: cc29497145814a8a94bb028019ede3eb
+msgid "Lowest precision"
+msgstr ""
+
+#: a75438f330f5460eb9466398c99dd83e
+msgid "**10-bit Resolution:**"
+msgstr "**10-bit Resolution:**"
+
+#: 9a149c660787441099693b5885c6a6bf
+msgid "CONFIG_NX_ADC0_RESOLUTION_10=y"
+msgstr "CONFIG_NX_ADC0_RESOLUTION_10=y"
+
+#: da4ce8fbf9974c149ce5a963653973ed
+msgid "1024 levels (0-1023)"
+msgstr "1024 levels (0-1023)"
+
+#: 8b38199a2e6543caa7698470cb836689
+msgid "**12-bit Resolution:**"
+msgstr "**12-bit Resolution:**"
+
+#: 3c69da01384f49e68050ff342fae00b2
+msgid "CONFIG_NX_ADC0_RESOLUTION_12=y"
+msgstr "CONFIG_NX_ADC0_RESOLUTION_12=y"
+
+#: 3bf69341ca304ce99596f9be8db8154f
+msgid "4096 levels (0-4095)"
+msgstr "4096 levels (0-4095)"
+
+#: c0e781117e544c319ad8fd2030c1d3af
+msgid "Good precision"
+msgstr ""
+
+#: 0905db17854744278b1c9efd34804be4
+msgid "**16-bit Resolution:**"
+msgstr "**16-bit Resolution:**"
+
+#: 25a9e4d55cdc42fc9f177c8147a020de
+msgid "CONFIG_NX_ADC0_RESOLUTION_16=y"
+msgstr "CONFIG_NX_ADC0_RESOLUTION_16=y"
+
+#: 4531e89608cd430e8c0b167ac5f593a3
+msgid "65536 levels (0-65535)"
+msgstr "65536 levels (0-65535)"
+
+#: b3cfc754072b420482a7cb6b4596a454
+msgid "Highest precision"
+msgstr ""
+
+#: e2747ab8b0af4832880614f525d5d882
+msgid "Slowest conversion"
+msgstr ""
+
+#: dbfe0fbea8e14cbeba0ffc2290f34ee5
+msgid "ADC Sampling Time"
+msgstr ""
+
+#: a6d4b0f8ecb344de94c632222d203166
+msgid "**Fast Sampling:**"
+msgstr "**Fast Sampling:**"
+
+#: 87e74dd9b4f044f8938cddc89f3a05d8
+msgid "CONFIG_NX_ADC0_SAMPLE_TIME_FAST=y"
+msgstr "CONFIG_NX_ADC0_SAMPLE_TIME_FAST=y"
+
+#: 4d432356486546c093352ab9c822ed43
+msgid "Shortest sampling time"
+msgstr ""
+
+#: c0a0adfc13c34af3ac8feba5319dcb1f
+msgid "Requires low source impedance"
+msgstr ""
+
+#: 6f716f5e05b74ec0a0f4d4ef0cfba3f0
+msgid "**Medium Sampling:**"
+msgstr "**Medium Sampling:**"
+
+#: 186435f484474423bf1d42f523d549a7
+msgid "CONFIG_NX_ADC0_SAMPLE_TIME_MEDIUM=y"
+msgstr "CONFIG_NX_ADC0_SAMPLE_TIME_MEDIUM=y"
+
+#: 21fe3317db284499a744d019e94d123a
+msgid "Balanced sampling time"
+msgstr ""
+
+#: 00ec6722b4964b818667df430b7ef7ab
+msgid "**Slow Sampling:**"
+msgstr "**Slow Sampling:**"
+
+#: 638c81c8e0be46769e782e01b2f69e28
+msgid "CONFIG_NX_ADC0_SAMPLE_TIME_SLOW=y"
+msgstr "CONFIG_NX_ADC0_SAMPLE_TIME_SLOW=y"
+
+#: fa9cf46031474253af95c476fee6b0b0
+msgid "Longest sampling time"
+msgstr ""
+
+#: 5a9ff0009c014b419b8ae1e5f022c599
+msgid "Best for high impedance sources"
+msgstr ""
+
+#: 7b3dcc3fd5094d44a5a2d8f59ba303fc
+msgid "Common ADC Configurations"
+msgstr ""
+
+#: 85b0e3a1c3104c9bb13eee35c03e9449
+msgid "**General Purpose (12-bit, Medium):**"
+msgstr "**General Purpose (12-bit, Medium):**"
+
+#: c97d7eb5476742b19ca303f6ed889fb4
+msgid ""
+"CONFIG_INSTANCE_NX_ADC_0=y\n"
+"CONFIG_NX_ADC0_RESOLUTION_12=y\n"
+"CONFIG_NX_ADC0_SAMPLE_TIME_MEDIUM=y\n"
+"CONFIG_ADC0_CHANNEL_COUNT=8"
+msgstr ""
+"CONFIG_INSTANCE_NX_ADC_0=y\n"
+"CONFIG_NX_ADC0_RESOLUTION_12=y\n"
+"CONFIG_NX_ADC0_SAMPLE_TIME_MEDIUM=y\n"
+"CONFIG_ADC0_CHANNEL_COUNT=8"
+
+#: 6ffcba952f344c62b40f060a5d9a73e7
+msgid "**High-Speed (8-bit, Fast):**"
+msgstr "**High-Speed (8-bit, Fast):**"
+
+#: 4456e86984104980b1e64615c4606c3f
+msgid ""
+"CONFIG_INSTANCE_NX_ADC_1=y\n"
+"CONFIG_NX_ADC1_RESOLUTION_BIT_8=y\n"
+"CONFIG_NX_ADC1_SAMPLE_TIME_FAST=y\n"
+"CONFIG_ADC1_CHANNEL_COUNT=4"
+msgstr ""
+"CONFIG_INSTANCE_NX_ADC_1=y\n"
+"CONFIG_NX_ADC1_RESOLUTION_BIT_8=y\n"
+"CONFIG_NX_ADC1_SAMPLE_TIME_FAST=y\n"
+"CONFIG_ADC1_CHANNEL_COUNT=4"
+
+#: 3419a4a08ef4431e98bb894478784c84
+msgid "**High-Precision (16-bit, Slow):**"
+msgstr "**High-Precision (16-bit, Slow):**"
+
+#: d4c243202332456f8b105d85f825e5c5
+msgid ""
+"CONFIG_INSTANCE_NX_ADC_2=y\n"
+"CONFIG_NX_ADC2_RESOLUTION_BIT_16=y\n"
+"CONFIG_NX_ADC2_SAMPLE_TIME_SLOW=y\n"
+"CONFIG_ADC2_CHANNEL_COUNT=4"
+msgstr ""
+"CONFIG_INSTANCE_NX_ADC_2=y\n"
+"CONFIG_NX_ADC2_RESOLUTION_BIT_16=y\n"
+"CONFIG_NX_ADC2_SAMPLE_TIME_SLOW=y\n"
+"CONFIG_ADC2_CHANNEL_COUNT=4"
+
+#: 5bcd2703cfd346849062933253ac2d70
+msgid "ADC Buffer Configuration"
+msgstr "ADC Buffer 配置"
+
+#: 47df0e6856fe455ebeafc65cbcba3f91
+msgid "**Enable ADC Buffer for multi-channel sampling:**"
+msgstr "**Enable ADC Buffer for multi-channel sampling:**"
+
+#: c9340b5c2a7d4e2d9806aa256d9befad
+msgid ""
+"# Enable ADC Buffer\n"
+"CONFIG_NATIVE_ADC_BUFFER_ENABLE=y\n"
+"\n"
+"# Configure ADC_BUFFER0\n"
+"CONFIG_INSTANCE_NX_ADC_BUFFER_0=y\n"
+"CONFIG_ADC_BUFFER0_CHANNEL_COUNT=4\n"
+"CONFIG_ADC_BUFFER0_BUFFER_SIZE=256\n"
+"CONFIG_NX_ADC_BUFFER0_TRIGGER_TIMER=y"
+msgstr ""
+"# Enable ADC Buffer\n"
+"CONFIG_NATIVE_ADC_BUFFER_ENABLE=y\n"
+"\n"
+"# Configure ADC_BUFFER0\n"
+"CONFIG_INSTANCE_NX_ADC_BUFFER_0=y\n"
+"CONFIG_ADC_BUFFER0_CHANNEL_COUNT=4\n"
+"CONFIG_ADC_BUFFER0_BUFFER_SIZE=256\n"
+"CONFIG_NX_ADC_BUFFER0_TRIGGER_TIMER=y"
+
+#: 6c204292ee364ed989468ddc28f5840e
+msgid "See Also"
+msgstr "另请参阅"
+
+#: f15d82b4abd8445fbe5071f32bed558a
+msgid ":doc:`kconfig_tutorial` - Kconfig tutorial"
+msgstr ":doc:`kconfig_tutorial` - Kconfig tutorial"
+
+#: 8f6241c57ef1409b82868b9cd53d6b7b
+msgid ":doc:`kconfig_platforms` - Platform-specific configuration"
+msgstr ":doc:`kconfig_platforms` - Platform-specific configuration"
+
+#: aa2727ab696646eb9922e5958ecf84a0
+msgid ":doc:`kconfig_tools` - Configuration tools reference"
+msgstr ":doc:`kconfig_tools` - Configuration tools reference"
+
+#: b6d475816ad14965bf5b4a9df41b2993
+msgid ":doc:`../api/hal` - HAL API reference"
+msgstr ":doc:`../api/hal` - HAL API reference"

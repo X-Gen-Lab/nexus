@@ -5,82 +5,81 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
 "PO-Revision-Date: 2026-01-15 01:30+0800\n"
 "Last-Translator: Nexus Team\n"
-"Language: zh_CN\n"
 "Language-Team: Chinese\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: ../../user_guide/config.rst:2 4ce1bf0a31224216913a3c71c3289b8a
+#: ../../user_guide/config.rst:2 33ce49002618443c928b6fbd0bd54870
 msgid "Config Manager"
 msgstr "配置管理器"
 
-#: ../../user_guide/config.rst:5 1e8c3dff4b9b4bdcba53811aa68bd5aa
+#: ../../user_guide/config.rst:5 8c71de0bf49c417983d9868f90ea90f8
 msgid "Overview"
 msgstr "概述"
 
-#: ../../user_guide/config.rst:7 eb3cda3ac1e840beadaf4a2756873d7a
+#: ../../user_guide/config.rst:7 363d09e1d2824b4b97fd80848a6c8e1c
 msgid ""
 "The Config Manager provides a flexible, secure, and persistent key-value "
-"configuration storage for the Nexus embedded platform. It supports "
-"multiple data types, namespaces, change notifications, and optional "
-"encryption."
+"configuration storage for the Nexus embedded platform. It supports multiple "
+"data types, namespaces, change notifications, and optional encryption."
 msgstr "配置管理器为 Nexus 嵌入式平台提供灵活、安全、持久化的键值配置存储。它支持多种数据类型、命名空间、变更通知和可选加密。"
 
-#: ../../user_guide/config.rst:12 34960cae96aa4e9380f62a3074c6d31c
+#: ../../user_guide/config.rst:12 4171c58c56554a8db35746d7a2141f3c
 msgid "Features"
 msgstr "特性"
 
-#: ../../user_guide/config.rst:14 ca91a2b49e7942f5942b7c1d74ef7438
+#: ../../user_guide/config.rst:14 9b5aeb4baede4860b9614b03599bb53a
 msgid "**Multiple Types**: int32/64, uint32, float, bool, string, blob"
 msgstr "**多类型支持**: int32/64、uint32、float、bool、string、blob"
 
-#: ../../user_guide/config.rst:15 f90c1c9992bf4c6aa1a85d759eb09e15
+#: ../../user_guide/config.rst:15 28cd88d47d3540c595d3957a8f0d4474
 msgid "**Namespace Isolation**: Separate configurations by module"
 msgstr "**命名空间隔离**: 按模块分离配置"
 
-#: ../../user_guide/config.rst:16 df6850d362f848e1913b47ab83ed42ec
+#: ../../user_guide/config.rst:16 509d49ffc6f047509a11f04d420d579c
 msgid "**Default Values**: Register defaults with one-click reset"
 msgstr "**默认值管理**: 注册默认值，支持一键恢复"
 
-#: ../../user_guide/config.rst:17 dd8ff7b979774729bbba565f286b779b
+#: ../../user_guide/config.rst:17 2b408bc8890a4710bc46cb1f6be1e11c
 msgid "**Change Notifications**: Callbacks on configuration changes"
 msgstr "**变更通知**: 配置变更时触发回调"
 
-#: ../../user_guide/config.rst:18 65b7233e6b504bc8833998ff90bf372f
+#: ../../user_guide/config.rst:18 ac8e21957698479d810b65b72c3a4426
 msgid "**Persistent Storage**: RAM, Flash, and custom backends"
 msgstr "**持久化存储**: RAM、Flash 和自定义后端"
 
-#: ../../user_guide/config.rst:19 ac1c0ad163e04cee913c282c30bc1baf
+#: ../../user_guide/config.rst:19 763e87fe08e24110ade4b83401eb1aa4
 msgid "**Import/Export**: Binary and JSON format support"
 msgstr "**导入/导出**: 支持二进制和 JSON 格式"
 
-#: ../../user_guide/config.rst:20 dcf82698389e483db6fd57ee55f70903
+#: ../../user_guide/config.rst:20 2e835fa7d3b741a5bce0b21059333341
 msgid "**Optional Encryption**: AES-128/256 for sensitive data"
 msgstr "**可选加密**: AES-128/256 加密敏感数据"
 
-#: ../../user_guide/config.rst:21 e960ce6ca5374013ae80389b17ff2978
+#: ../../user_guide/config.rst:21 74d458c2823146e6848995f9210c372e
 msgid "**Thread-Safe**: Safe for multi-task environments"
 msgstr "**线程安全**: 多任务环境下安全使用"
 
-#: ../../user_guide/config.rst:22 2cfdaa7b9dae44cb84aea3d41776a29a
+#: ../../user_guide/config.rst:22 01e57be9c37d4d1788d3e00360f1782b
 msgid "**Resource Configurable**: Static allocation for constrained systems"
 msgstr "**资源可配置**: 支持静态分配，适用于资源受限系统"
 
-#: ../../user_guide/config.rst:25 cb8ba80b057046bca5ed8c57f4798b1e
+#: ../../user_guide/config.rst:25 9720b63ac4774b598e3021030b489110
 msgid "Quick Start"
 msgstr "快速开始"
 
-#: ../../user_guide/config.rst:27 813c0952c0d645e5ab26ee07e438b829
+#: ../../user_guide/config.rst:27 d752fea067c34ee1b0b0de2e370925af
 msgid "**Basic usage:**"
 msgstr "**基本用法：**"
 
-#: ../../user_guide/config.rst:29 ee48df9fdbba46e78167efd3621d6291
+#: ../../user_guide/config.rst:29 d507a21daba04408b1e3797a187fbb4d
 msgid ""
 "#include \"config/config.h\"\n"
 "\n"
@@ -112,16 +111,45 @@ msgid ""
 "    config_deinit();\n"
 "}"
 msgstr ""
+"#include \"config/config.h\"\n"
+"\n"
+"void app_init(void)\n"
+"{\n"
+"    // Initialize with default config\n"
+"    config_init(NULL);\n"
+"\n"
+"    // Store configuration values\n"
+"    config_set_i32(\"app.timeout\", 5000);\n"
+"    config_set_str(\"app.name\", \"MyApp\");\n"
+"    config_set_bool(\"app.debug\", true);\n"
+"    config_set_float(\"sensor.threshold\", 3.14f);\n"
+"\n"
+"    // Read configuration values\n"
+"    int32_t timeout = 0;\n"
+"    config_get_i32(\"app.timeout\", &timeout, 1000);  // Default: 1000\n"
+"\n"
+"    char name[32];\n"
+"    config_get_str(\"app.name\", name, sizeof(name));\n"
+"\n"
+"    bool debug = false;\n"
+"    config_get_bool(\"app.debug\", &debug, false);\n"
+"\n"
+"    // Commit to storage\n"
+"    config_commit();\n"
+"\n"
+"    // Cleanup\n"
+"    config_deinit();\n"
+"}"
 
-#: ../../user_guide/config.rst:62 9a126ae17ca8481081aa05ace92dee82
+#: ../../user_guide/config.rst:62 3b0e2a79dad14da1b89b5082ee70a7a4
 msgid "Configuration"
 msgstr "配置"
 
-#: ../../user_guide/config.rst:64 66270ce6833f4c51aaeda5730f32e038
+#: ../../user_guide/config.rst:64 663d04219aaf459fb46627f7f1800be4
 msgid "**Custom configuration:**"
 msgstr "**自定义配置：**"
 
-#: ../../user_guide/config.rst:66 bb8ea116f9e94d4cb0a19e871e403c66
+#: ../../user_guide/config.rst:66 6bdf90b7d954455f92494707fdd1e603
 msgid ""
 "config_manager_config_t config = {\n"
 "    .max_keys = 128,           // Max key count\n"
@@ -134,280 +162,481 @@ msgid ""
 "\n"
 "config_init(&config);"
 msgstr ""
+"config_manager_config_t config = {\n"
+"    .max_keys = 128,           // Max key count\n"
+"    .max_key_len = 32,         // Max key length\n"
+"    .max_value_size = 256,     // Max value size\n"
+"    .max_namespaces = 8,       // Max namespace count\n"
+"    .max_callbacks = 16,       // Max callback count\n"
+"    .auto_commit = true        // Auto-commit mode\n"
+"};\n"
+"\n"
+"config_init(&config);"
 
-#: ../../user_guide/config.rst:79 7e9c9ad5324e4695bbbf231aba534e54
+#: ../../user_guide/config.rst:79 19fd30eb31b4436599ce1451df0d32ab
 msgid "**Default configuration:**"
 msgstr "**默认配置：**"
 
-#: ../../user_guide/config.rst:82 85c58fa4586842428c163f18461ebf2d
+#: ../../user_guide/config.rst:82 f99f7d0383904f7f822a003b39db8d7a
 msgid "Parameter"
 msgstr "参数"
 
-#: ../../user_guide/config.rst:82 ../../user_guide/config.rst:495
-#: 69e7c32b364143cbbef4e5eb48017860 e25253755f47452f8a4c49d75644fc43
+#: ../../user_guide/config.rst:82 ../../user_guide/config.rst:787
+#: 14a1f4984b0b442984b0e62093c2a05b c6b7b21b0288410abbc6b55e27bb4d72
 msgid "Default"
 msgstr "默认值"
 
 #: ../../user_guide/config.rst:82 ../../user_guide/config.rst:101
-#: ../../user_guide/config.rst:468 ../../user_guide/config.rst:495
-#: 2e591e807fd34980b677f4bf29f2dfca b29649198a604228ac603f9a4feb142b
-#: bbb3163f8c754b56af8a827ea06025cb c5638ad6bdfd4f0db3ee6889b98c8737
+#: ../../user_guide/config.rst:760 ../../user_guide/config.rst:787
+#: 24da73f3b8b54acbb2c218915c3ee7ac 534b444dc3a3426393539e9f298589d8
+#: 9568d2ae68484cdd882dfb80bb0784f5
 msgid "Description"
 msgstr "描述"
 
-#: ../../user_guide/config.rst:84 ad08a9770b484eeba0aee4a5dd0b204a
+#: ../../user_guide/config.rst:84 0eeac19a8a594c4e90f64dc1badbc13b
 msgid "``max_keys``"
-msgstr ""
+msgstr "``max_keys``"
 
-#: ../../user_guide/config.rst:84 ../../user_guide/config.rst:497
-#: 507281b97c4f4cb88d17ab9fc6a83851 95b018da95c14fdca622862b8a6ace5e
+#: ../../user_guide/config.rst:84 ../../user_guide/config.rst:789
+#: 48b66cbbb18d45c2bbbe9e175aeac941 976075c4e30d46e98cdffbbbbb60ed0d
 msgid "``64``"
-msgstr ""
+msgstr "``64``"
 
-#: ../../user_guide/config.rst:84 659a199c2bb34dc4b1c021b148ca429a
+#: ../../user_guide/config.rst:84 1b904494cfef4eafaa2828b7d800d7c6
 msgid "Maximum key count"
 msgstr "最大键数量"
 
-#: ../../user_guide/config.rst:86 5c3f0a11286a4bee8ea858d71aa156d3
+#: ../../user_guide/config.rst:86 94adb6a3086b4b8ca8822531ac8d8bdc
 msgid "``max_key_len``"
-msgstr ""
+msgstr "``max_key_len``"
 
-#: ../../user_guide/config.rst:86 ../../user_guide/config.rst:499
-#: 26e0edffef444f068f8b7af69aa1009c 82f6718ccabe47628d309a125abcee49
+#: ../../user_guide/config.rst:86 ../../user_guide/config.rst:791
+#: 8b0efd8025204f7a85566b81d14bb6b3 b032260922194b78a08f197097a63a5d
 msgid "``32``"
-msgstr ""
+msgstr "``32``"
 
-#: ../../user_guide/config.rst:86 925a3ad24d574c648eb2d45a0ecc7f78
+#: ../../user_guide/config.rst:86 1c87c7496311485eba665f61a5bb7ae3
 msgid "Maximum key length"
 msgstr "最大键长度"
 
-#: ../../user_guide/config.rst:88 992fa8c4a27d4fab8d7115dd845cb96a
+#: ../../user_guide/config.rst:88 1daedd78326e489d927a26d50199a145
 #, fuzzy
 msgid "``max_value_size``"
 msgstr "最大值大小"
 
-#: ../../user_guide/config.rst:88 ../../user_guide/config.rst:501
-#: 442ffedab129404bae5cd836b1b1ece1 c3e65087b6914d14ab00e4925de0ca2d
+#: ../../user_guide/config.rst:88 ../../user_guide/config.rst:793
+#: 07a43a2fe332477f934cfdd3919df687 eaad53be759c4e5bbae70c1a5bf77a2f
 msgid "``256``"
-msgstr ""
+msgstr "``256``"
 
-#: ../../user_guide/config.rst:88 84ebba8338bf4996b89b5e53af3c3b18
+#: ../../user_guide/config.rst:88 323e38e3a9084fc199f6cd31cfa8b259
 msgid "Maximum value size"
 msgstr "最大值大小"
 
-#: ../../user_guide/config.rst:90 808b1f3a988147bcb7a4f4238b58eb7d
+#: ../../user_guide/config.rst:90 a055d34b1bcc4e349b237dea0d3cba00
 #, fuzzy
 msgid "``max_namespaces``"
 msgstr "命名空间"
 
-#: ../../user_guide/config.rst:90 ../../user_guide/config.rst:503
-#: 0c4ff7b23a154415af1da537da0e4cbc 55ea54a24a404c7295d86bc6656b92fa
+#: ../../user_guide/config.rst:90 ../../user_guide/config.rst:795
+#: 43a5fe8b40324dd69067451a1cd06057 a23ded9af062493982d787d07606f982
 msgid "``4``"
-msgstr ""
+msgstr "``4``"
 
-#: ../../user_guide/config.rst:90 f868584870654e729d6c24b8178b6543
+#: ../../user_guide/config.rst:90 6478b7c72588403f88302a6707d9acca
 msgid "Maximum namespace count"
 msgstr "最大命名空间数"
 
-#: ../../user_guide/config.rst:92 db742ece38d94a0690464087ce1d1d8a
+#: ../../user_guide/config.rst:92 3d02ce46d0b940ae858d646e47b6adb5
 #, fuzzy
 msgid "``max_callbacks``"
 msgstr "默认最大回调数"
 
-#: ../../user_guide/config.rst:92 ../../user_guide/config.rst:505
-#: 2481b5640cbb4752be8d5e257b3a46e2 f253a9afa7d546dbad0fc5b6f637c707
+#: ../../user_guide/config.rst:92 ../../user_guide/config.rst:797
+#: d7c7d05b8c71447baccc542f94cc963c d92a831b788b49c89150cfc4cebaff90
 msgid "``8``"
-msgstr ""
+msgstr "``8``"
 
-#: ../../user_guide/config.rst:92 966abdf1ba684edd893998930212cd10
+#: ../../user_guide/config.rst:92 1052d0ba50a142e2a7b6d75d83a17d38
 msgid "Maximum callback count"
 msgstr "最大回调数"
 
-#: ../../user_guide/config.rst:94 8f10923d6e30487397f065e82da880f3
+#: ../../user_guide/config.rst:94 f4b9659a9f4a4a70b32e8b972a4358d0
 #, fuzzy
 msgid "``auto_commit``"
 msgstr "自动提交模式"
 
-#: ../../user_guide/config.rst:94 b4100df080d84a90b2d0c32f0ce4d341
+#: ../../user_guide/config.rst:94 ecc10f4d530f45af81c869e905e880a2
 msgid "``false``"
-msgstr ""
+msgstr "``false``"
 
-#: ../../user_guide/config.rst:94 56ac86f77d4c456aa1bb5069ac4bd13c
+#: ../../user_guide/config.rst:94 069a48fe14b1429fa5a2ce6651287903
 msgid "Auto-commit mode"
 msgstr "自动提交模式"
 
-#: ../../user_guide/config.rst:98 2db93480b22e4e9690dcb918073e96fc
+#: ../../user_guide/config.rst:98 375ab19d43ec4f8083f8b8bdbc549caa
 msgid "Data Types"
 msgstr "数据类型"
 
-#: ../../user_guide/config.rst:101 7dbb1aef321449ce8a3cd9c5e2879d57
+#: ../../user_guide/config.rst:101 41c238335f66449892cc8777a87a5fc0
 msgid "Type"
 msgstr "类型"
 
-#: ../../user_guide/config.rst:101 15ffc6bf11144c11b8f058c18810fd5c
+#: ../../user_guide/config.rst:101 81b7228a346845b38866b838e18eb660
 msgid "Value"
 msgstr "值"
 
-#: ../../user_guide/config.rst:103 07e07b81166a4bd2bd51dac98f549b28
+#: ../../user_guide/config.rst:103 fddc202067ab4760a20780aecb0f89ff
 msgid "``CONFIG_TYPE_I32``"
-msgstr ""
+msgstr "``CONFIG_TYPE_I32``"
 
-#: ../../user_guide/config.rst:103 4d8adcd113a141fd83fe07bab4145de3
+#: ../../user_guide/config.rst:103 8d05f644af4e470ea6997d7e9edca3ff
 msgid "0"
-msgstr ""
+msgstr "0"
 
-#: ../../user_guide/config.rst:103 a2f0e4ea90d647f3be8c3e099e810a6a
+#: ../../user_guide/config.rst:103 da61a38e376e47ef8c9678dbf3e5f060
 msgid "32-bit signed integer"
 msgstr "32 位有符号整数"
 
-#: ../../user_guide/config.rst:105 6d84755411f146808bdc80833758aa1a
+#: ../../user_guide/config.rst:105 cc9999091c2a42838319eece28639427
 msgid "``CONFIG_TYPE_U32``"
-msgstr ""
+msgstr "``CONFIG_TYPE_U32``"
 
-#: ../../user_guide/config.rst:105 b1b28da8d11e4dec9f7a0774a37f9182
+#: ../../user_guide/config.rst:105 e88549df2d80411ca42127aafb5e983d
 msgid "1"
-msgstr ""
+msgstr "1"
 
-#: ../../user_guide/config.rst:105 a4d3f55e6be4459485b22311950ca941
+#: ../../user_guide/config.rst:105 93f636eeddbb4f99b6fd2c8956460aeb
 msgid "32-bit unsigned integer"
 msgstr "32 位无符号整数"
 
-#: ../../user_guide/config.rst:107 f55e940ce6a74bce942d763939850266
+#: ../../user_guide/config.rst:107 638328215b7340bf8e2e34922e733fe4
 msgid "``CONFIG_TYPE_I64``"
-msgstr ""
+msgstr "``CONFIG_TYPE_I64``"
 
-#: ../../user_guide/config.rst:107 090e539928d74aae8cade269238913c7
+#: ../../user_guide/config.rst:107 687d2463140c495385b0f0df98dd7863
 msgid "2"
-msgstr ""
+msgstr "2"
 
-#: ../../user_guide/config.rst:107 7245f03e56224b47a880c1d2d97c318c
+#: ../../user_guide/config.rst:107 e1abc472b7f94af598aea6dd2182a954
 msgid "64-bit signed integer"
 msgstr "64 位有符号整数"
 
-#: ../../user_guide/config.rst:109 21046a4e0f884e869600b16c3f28e2ab
+#: ../../user_guide/config.rst:109 4d5daebeb7aa42748265878c8db95703
 msgid "``CONFIG_TYPE_FLOAT``"
-msgstr ""
+msgstr "``CONFIG_TYPE_FLOAT``"
 
-#: ../../user_guide/config.rst:109 56be9de370dd4001b2be1629199d3a3a
+#: ../../user_guide/config.rst:109 a25435971b484990bb16058f20465ed8
 msgid "3"
-msgstr ""
+msgstr "3"
 
-#: ../../user_guide/config.rst:109 ab09050adb0e4bbe90e6a8061b99ad35
+#: ../../user_guide/config.rst:109 de806cf8f6c146dbb96862563dec0cec
 msgid "Single-precision float"
 msgstr "单精度浮点数"
 
-#: ../../user_guide/config.rst:111 e27d55b7e0d84e4cbe07ea3f79e49e6b
+#: ../../user_guide/config.rst:111 9985f2432bff46149f4bb5c62b33208e
 msgid "``CONFIG_TYPE_BOOL``"
-msgstr ""
+msgstr "``CONFIG_TYPE_BOOL``"
 
-#: ../../user_guide/config.rst:111 8375702c33064c07a2da530d8e09cbb8
+#: ../../user_guide/config.rst:111 2caf3465820d4fe19c11143f47fb1873
 msgid "4"
-msgstr ""
+msgstr "4"
 
-#: ../../user_guide/config.rst:111 13d9b0187a804894b133fc9d10987aa6
+#: ../../user_guide/config.rst:111 95d26489ff6a4a26a39e39a0dfd7a0be
 msgid "Boolean value"
 msgstr "布尔值"
 
-#: ../../user_guide/config.rst:113 0ccb8e2c442c4fb3a378e34dc63db8ea
+#: ../../user_guide/config.rst:113 938d4be010004f3cab842142e224990e
 msgid "``CONFIG_TYPE_STR``"
-msgstr ""
+msgstr "``CONFIG_TYPE_STR``"
 
-#: ../../user_guide/config.rst:113 6de177874b5a48399d22f747fd5a90e4
+#: ../../user_guide/config.rst:113 02df2b5c3b6741e0b76ad163e2428aa7
 msgid "5"
-msgstr ""
+msgstr "5"
 
-#: ../../user_guide/config.rst:113 df0cdbe8a3e9464fac13f7613c78ace8
+#: ../../user_guide/config.rst:113 75f7f577824449009e8515043c501b5a
 msgid "Null-terminated string"
 msgstr "空终止字符串"
 
-#: ../../user_guide/config.rst:115 3eeee18614dd462ab691686bdcb73fa6
+#: ../../user_guide/config.rst:115 d086672a8d194c6fafe2c5a951acd590
 msgid "``CONFIG_TYPE_BLOB``"
-msgstr ""
+msgstr "``CONFIG_TYPE_BLOB``"
 
-#: ../../user_guide/config.rst:115 dd265f981bad47668a2cab8ee534f127
+#: ../../user_guide/config.rst:115 eaedaddb311a468599bbcf7272692173
 msgid "6"
-msgstr ""
+msgstr "6"
 
-#: ../../user_guide/config.rst:115 a783b6cedf8c400586b9edceed7d35dc
+#: ../../user_guide/config.rst:115 c23dc09fa2e24cdda2d926e7cb8079e6
 msgid "Binary data"
 msgstr "二进制数据"
 
-#: ../../user_guide/config.rst:119 28c009b1504b4fe1925492daab9ec5ec
+#: ../../user_guide/config.rst:119 3e51295c6c61437b99092783ed0c4f86
 msgid "Type Operations"
 msgstr "类型操作"
 
-#: ../../user_guide/config.rst:121 0a4b70af3cb0461592fa9627f92f4529
-msgid "**Integer operations:**"
-msgstr "**整数操作：**"
+#: ../../user_guide/config.rst:122 e6ccf78c01f14e86a36c04bbd7ea882c
+#, fuzzy
+msgid "32-bit Signed Integer (int32)"
+msgstr "32 位有符号整数"
 
-#: ../../user_guide/config.rst:123 b00201df3f6941f4a0e71d1146162f26
+#: ../../user_guide/config.rst:124 519ddf112b244171b4bd6c53b0e3f387
 msgid ""
-"// 32-bit signed\n"
+"// Store 32-bit signed integer\n"
 "config_set_i32(\"app.timeout\", 5000);\n"
+"config_set_i32(\"sensor.offset\", -100);\n"
+"\n"
+"// Read with default value\n"
 "int32_t timeout;\n"
-"config_get_i32(\"app.timeout\", &timeout, 1000);\n"
+"config_get_i32(\"app.timeout\", &timeout, 1000);  // Default: 1000\n"
 "\n"
-"// 32-bit unsigned\n"
-"config_set_u32(\"app.count\", 100);\n"
-"uint32_t count;\n"
-"config_get_u32(\"app.count\", &count, 0);\n"
-"\n"
-"// 64-bit signed\n"
-"config_set_i64(\"app.timestamp\", 1234567890123LL);\n"
-"int64_t timestamp;\n"
-"config_get_i64(\"app.timestamp\", &timestamp, 0);"
+"// Check if exists before reading\n"
+"bool exists;\n"
+"config_exists(\"app.timeout\", &exists);\n"
+"if (exists) {\n"
+"    config_get_i32(\"app.timeout\", &timeout, 0);\n"
+"}"
 msgstr ""
+"// Store 32-bit signed integer\n"
+"config_set_i32(\"app.timeout\", 5000);\n"
+"config_set_i32(\"sensor.offset\", -100);\n"
+"\n"
+"// Read with default value\n"
+"int32_t timeout;\n"
+"config_get_i32(\"app.timeout\", &timeout, 1000);  // Default: 1000\n"
+"\n"
+"// Check if exists before reading\n"
+"bool exists;\n"
+"config_exists(\"app.timeout\", &exists);\n"
+"if (exists) {\n"
+"    config_get_i32(\"app.timeout\", &timeout, 0);\n"
+"}"
 
-#: ../../user_guide/config.rst:140 df8eaaf4c8d747618eea4ece1f132f6a
-msgid "**Float and boolean:**"
-msgstr "**浮点和布尔：**"
+#: ../../user_guide/config.rst:142 1677269bbcc54d3fa983dca3f0f67b3f
+#, fuzzy
+msgid "32-bit Unsigned Integer (uint32)"
+msgstr "32 位无符号整数"
 
-#: ../../user_guide/config.rst:142 3f38737f131a44c991044f3545b4762b
+#: ../../user_guide/config.rst:144 519ddf112b244171b4bd6c53b0e3f387
 msgid ""
-"// Float\n"
+"// Store 32-bit unsigned integer\n"
+"config_set_u32(\"app.count\", 100);\n"
+"config_set_u32(\"network.retry_count\", 5);\n"
+"\n"
+"// Read with default value\n"
+"uint32_t count;\n"
+"config_get_u32(\"app.count\", &count, 0);  // Default: 0\n"
+"\n"
+"// Use for counters and IDs\n"
+"uint32_t device_id;\n"
+"config_get_u32(\"device.id\", &device_id, 0xFFFFFFFF);"
+msgstr ""
+"// Store 32-bit unsigned integer\n"
+"config_set_u32(\"app.count\", 100);\n"
+"config_set_u32(\"network.retry_count\", 5);\n"
+"\n"
+"// Read with default value\n"
+"uint32_t count;\n"
+"config_get_u32(\"app.count\", &count, 0);  // Default: 0\n"
+"\n"
+"// Use for counters and IDs\n"
+"uint32_t device_id;\n"
+"config_get_u32(\"device.id\", &device_id, 0xFFFFFFFF);"
+
+#: ../../user_guide/config.rst:159 e06693e6f2d34d81af11d6e11f729a34
+#, fuzzy
+msgid "64-bit Signed Integer (int64)"
+msgstr "64 位有符号整数"
+
+#: ../../user_guide/config.rst:161 19415084d16c46d5a9ce982284924d8e
+msgid ""
+"// Store 64-bit signed integer (timestamps, large values)\n"
+"config_set_i64(\"app.timestamp\", 1234567890123LL);\n"
+"config_set_i64(\"system.boot_time\", -1000000LL);\n"
+"\n"
+"// Read with default value\n"
+"int64_t timestamp;\n"
+"config_get_i64(\"app.timestamp\", &timestamp, 0);\n"
+"\n"
+"// Use for timestamps\n"
+"int64_t last_sync;\n"
+"config_get_i64(\"network.last_sync\", &last_sync, 0);"
+msgstr ""
+"// Store 64-bit signed integer (timestamps, large values)\n"
+"config_set_i64(\"app.timestamp\", 1234567890123LL);\n"
+"config_set_i64(\"system.boot_time\", -1000000LL);\n"
+"\n"
+"// Read with default value\n"
+"int64_t timestamp;\n"
+"config_get_i64(\"app.timestamp\", &timestamp, 0);\n"
+"\n"
+"// Use for timestamps\n"
+"int64_t last_sync;\n"
+"config_get_i64(\"network.last_sync\", &last_sync, 0);"
+
+#: ../../user_guide/config.rst:176 1c30ce63885840b395648d5e9436a271
+#, fuzzy
+msgid "Float (Single-Precision)"
+msgstr "单精度浮点数"
+
+#: ../../user_guide/config.rst:178 db3bd7f34e8f44db9ae92b38288a15df
+msgid ""
+"// Store floating-point values\n"
 "config_set_float(\"sensor.threshold\", 3.14f);\n"
+"config_set_float(\"calibration.offset\", -0.5f);\n"
+"config_set_float(\"pid.kp\", 1.2f);\n"
+"\n"
+"// Read with default value\n"
 "float threshold;\n"
 "config_get_float(\"sensor.threshold\", &threshold, 0.0f);\n"
 "\n"
-"// Boolean\n"
-"config_set_bool(\"app.debug\", true);\n"
-"bool debug;\n"
-"config_get_bool(\"app.debug\", &debug, false);"
+"// Use for sensor calibration\n"
+"float temp_offset;\n"
+"config_get_float(\"sensor.temp_offset\", &temp_offset, 0.0f);"
 msgstr ""
+"// Store floating-point values\n"
+"config_set_float(\"sensor.threshold\", 3.14f);\n"
+"config_set_float(\"calibration.offset\", -0.5f);\n"
+"config_set_float(\"pid.kp\", 1.2f);\n"
+"\n"
+"// Read with default value\n"
+"float threshold;\n"
+"config_get_float(\"sensor.threshold\", &threshold, 0.0f);\n"
+"\n"
+"// Use for sensor calibration\n"
+"float temp_offset;\n"
+"config_get_float(\"sensor.temp_offset\", &temp_offset, 0.0f);"
 
-#: ../../user_guide/config.rst:154 0e177fd8e40740289b5b44c69781b881
-msgid "**String and blob:**"
-msgstr "**字符串和二进制：**"
+#: ../../user_guide/config.rst:194 afe5b2f7d26f4af7a22161448a3edaee
+#, fuzzy
+msgid "Boolean"
+msgstr "布尔值"
 
-#: ../../user_guide/config.rst:156 45f32879c1684e30a79ae9943de37eae
+#: ../../user_guide/config.rst:196 27d2808378334064b619bf43c9cb3f63
 msgid ""
-"// String\n"
+"// Store boolean values\n"
+"config_set_bool(\"app.debug\", true);\n"
+"config_set_bool(\"network.dhcp_enabled\", false);\n"
+"config_set_bool(\"sensor.auto_calibrate\", true);\n"
+"\n"
+"// Read with default value\n"
+"bool debug;\n"
+"config_get_bool(\"app.debug\", &debug, false);\n"
+"\n"
+"// Use for feature flags\n"
+"bool use_ssl;\n"
+"config_get_bool(\"network.use_ssl\", &use_ssl, true);"
+msgstr ""
+"// Store boolean values\n"
+"config_set_bool(\"app.debug\", true);\n"
+"config_set_bool(\"network.dhcp_enabled\", false);\n"
+"config_set_bool(\"sensor.auto_calibrate\", true);\n"
+"\n"
+"// Read with default value\n"
+"bool debug;\n"
+"config_get_bool(\"app.debug\", &debug, false);\n"
+"\n"
+"// Use for feature flags\n"
+"bool use_ssl;\n"
+"config_get_bool(\"network.use_ssl\", &use_ssl, true);"
+
+#: ../../user_guide/config.rst:212 9fac72712c8248739d46cfda5780bade
+msgid "String"
+msgstr "字符串"
+
+#: ../../user_guide/config.rst:214 5cf8b96dcaa3430cb28e68f3124d5393
+msgid ""
+"// Store string values\n"
 "config_set_str(\"app.name\", \"MyApp\");\n"
+"config_set_str(\"network.hostname\", \"device-001\");\n"
+"config_set_str(\"wifi.ssid\", \"MyNetwork\");\n"
+"\n"
+"// Read string\n"
 "char name[32];\n"
 "config_get_str(\"app.name\", name, sizeof(name));\n"
 "\n"
-"// Get string length\n"
+"// Get string length first\n"
 "size_t len;\n"
 "config_get_str_len(\"app.name\", &len);\n"
+"char* dynamic_buf = malloc(len + 1);\n"
+"config_get_str(\"app.name\", dynamic_buf, len + 1);\n"
 "\n"
-"// Binary blob\n"
-"uint8_t data[] = {0x01, 0x02, 0x03, 0x04};\n"
-"config_set_blob(\"app.data\", data, sizeof(data));\n"
-"\n"
-"uint8_t buffer[64];\n"
-"size_t actual_size;\n"
-"config_get_blob(\"app.data\", buffer, sizeof(buffer), &actual_size);"
+"// Use for configuration strings\n"
+"char server_url[128];\n"
+"config_get_str(\"network.server_url\", server_url, sizeof(server_url));"
 msgstr ""
+"// Store string values\n"
+"config_set_str(\"app.name\", \"MyApp\");\n"
+"config_set_str(\"network.hostname\", \"device-001\");\n"
+"config_set_str(\"wifi.ssid\", \"MyNetwork\");\n"
+"\n"
+"// Read string\n"
+"char name[32];\n"
+"config_get_str(\"app.name\", name, sizeof(name));\n"
+"\n"
+"// Get string length first\n"
+"size_t len;\n"
+"config_get_str_len(\"app.name\", &len);\n"
+"char* dynamic_buf = malloc(len + 1);\n"
+"config_get_str(\"app.name\", dynamic_buf, len + 1);\n"
+"\n"
+"// Use for configuration strings\n"
+"char server_url[128];\n"
+"config_get_str(\"network.server_url\", server_url, sizeof(server_url));"
 
-#: ../../user_guide/config.rst:176 55a43a2d315f4016806396207307048e
+#: ../../user_guide/config.rst:236 7b77e6e95753413d97eccbcaa5c125ab
+#, fuzzy
+msgid "Binary Blob"
+msgstr "二进制数据"
+
+#: ../../user_guide/config.rst:238 69736539660e40f3bf29e3351cf81aa4
+msgid ""
+"// Store binary data (certificates, keys, raw data)\n"
+"uint8_t cert_data[] = {0x30, 0x82, 0x01, 0x0A, ...};\n"
+"config_set_blob(\"security.certificate\", cert_data, sizeof(cert_data));\n"
+"\n"
+"// Store encryption key\n"
+"uint8_t aes_key[16] = {0x00, 0x01, 0x02, ...};\n"
+"config_set_blob(\"security.aes_key\", aes_key, sizeof(aes_key));\n"
+"\n"
+"// Read binary data\n"
+"uint8_t buffer[256];\n"
+"size_t actual_size;\n"
+"config_get_blob(\"security.certificate\", buffer, sizeof(buffer), &actual_size);\n"
+"\n"
+"// Get blob size first\n"
+"size_t blob_size;\n"
+"config_get_blob_len(\"security.certificate\", &blob_size);\n"
+"uint8_t* dynamic_buf = malloc(blob_size);\n"
+"config_get_blob(\"security.certificate\", dynamic_buf, blob_size, &actual_size);"
+msgstr ""
+"// Store binary data (certificates, keys, raw data)\n"
+"uint8_t cert_data[] = {0x30, 0x82, 0x01, 0x0A, ...};\n"
+"config_set_blob(\"security.certificate\", cert_data, sizeof(cert_data));\n"
+"\n"
+"// Store encryption key\n"
+"uint8_t aes_key[16] = {0x00, 0x01, 0x02, ...};\n"
+"config_set_blob(\"security.aes_key\", aes_key, sizeof(aes_key));\n"
+"\n"
+"// Read binary data\n"
+"uint8_t buffer[256];\n"
+"size_t actual_size;\n"
+"config_get_blob(\"security.certificate\", buffer, sizeof(buffer), &actual_size);\n"
+"\n"
+"// Get blob size first\n"
+"size_t blob_size;\n"
+"config_get_blob_len(\"security.certificate\", &blob_size);\n"
+"uint8_t* dynamic_buf = malloc(blob_size);\n"
+"config_get_blob(\"security.certificate\", dynamic_buf, blob_size, &actual_size);"
+
+#: ../../user_guide/config.rst:260 a2d156309ab546bfad78a414de591e0e
 msgid "Namespaces"
 msgstr "命名空间"
 
-#: ../../user_guide/config.rst:178 d5ce615924a746b0bb7ea710d03388a0
+#: ../../user_guide/config.rst:262 54eb9f446ddb4bf5943f7c9e49ee335c
 msgid "Namespaces isolate configurations for different modules:"
 msgstr "命名空间用于隔离不同模块的配置："
 
-#: ../../user_guide/config.rst:180 40314446f25148eeb54f0efaa3fa5656
+#: ../../user_guide/config.rst:264 cc9f55c0fa45404296bb5ea03f934462
 msgid ""
 "// Open namespace\n"
 "config_ns_handle_t ns;\n"
@@ -435,16 +664,41 @@ msgid ""
 "// Erase entire namespace\n"
 "config_erase_namespace(\"network\");"
 msgstr ""
+"// Open namespace\n"
+"config_ns_handle_t ns;\n"
+"config_open_namespace(\"network\", &ns);\n"
+"\n"
+"// Operations within namespace\n"
+"config_ns_set_i32(ns, \"port\", 8080);\n"
+"config_ns_set_str(ns, \"host\", \"192.168.1.1\");\n"
+"config_ns_set_bool(ns, \"ssl\", true);\n"
+"\n"
+"// Read from namespace\n"
+"int32_t port = 0;\n"
+"config_ns_get_i32(ns, \"port\", &port, 80);\n"
+"\n"
+"// Check if key exists\n"
+"bool exists;\n"
+"config_ns_exists(ns, \"port\", &exists);\n"
+"\n"
+"// Delete key\n"
+"config_ns_delete(ns, \"port\");\n"
+"\n"
+"// Close namespace\n"
+"config_close_namespace(ns);\n"
+"\n"
+"// Erase entire namespace\n"
+"config_erase_namespace(\"network\");"
 
-#: ../../user_guide/config.rst:209 8479934573424ee1a2d925fac9eeb0ee
+#: ../../user_guide/config.rst:293 931bd31c49f04f4c81a21e08b393730d
 msgid "Default Values"
 msgstr "默认值"
 
-#: ../../user_guide/config.rst:211 2218133bfd844c838460532774035a57
+#: ../../user_guide/config.rst:295 b7cea276cc334909a1a15fed34a9c210
 msgid "**Single default values:**"
 msgstr "**单个默认值：**"
 
-#: ../../user_guide/config.rst:213 b8197656b363489db8b13d291af1a068
+#: ../../user_guide/config.rst:297 cca8dbb1e4f54e98acc1de32d46230ab
 msgid ""
 "// Register defaults\n"
 "config_set_default_i32(\"app.timeout\", 5000);\n"
@@ -457,12 +711,22 @@ msgid ""
 "// Reset all to defaults\n"
 "config_reset_all_to_defaults();"
 msgstr ""
+"// Register defaults\n"
+"config_set_default_i32(\"app.timeout\", 5000);\n"
+"config_set_default_str(\"app.name\", \"DefaultApp\");\n"
+"config_set_default_bool(\"app.debug\", false);\n"
+"\n"
+"// Reset to default\n"
+"config_reset_to_default(\"app.timeout\");\n"
+"\n"
+"// Reset all to defaults\n"
+"config_reset_all_to_defaults();"
 
-#: ../../user_guide/config.rst:226 3561e1a8d785467285c96c0edfb2e6a2
+#: ../../user_guide/config.rst:310 eec12b0a7a0841c3bd2172087a4fb2a4
 msgid "**Batch registration:**"
 msgstr "**批量注册：**"
 
-#: ../../user_guide/config.rst:228 8ffee2219b3444439126341f0a0f6174
+#: ../../user_guide/config.rst:312 f3d7c43b3b6049f48ba1512e7f2b4353
 msgid ""
 "static const config_default_t app_defaults[] = {\n"
 "    {\"app.timeout\", CONFIG_TYPE_I32, {.i32_val = 5000}},\n"
@@ -474,16 +738,25 @@ msgid ""
 "config_register_defaults(app_defaults,\n"
 "                         sizeof(app_defaults) / sizeof(app_defaults[0]));"
 msgstr ""
+"static const config_default_t app_defaults[] = {\n"
+"    {\"app.timeout\", CONFIG_TYPE_I32, {.i32_val = 5000}},\n"
+"    {\"app.name\", CONFIG_TYPE_STR, {.str_val = \"MyApp\"}},\n"
+"    {\"app.debug\", CONFIG_TYPE_BOOL, {.bool_val = false}},\n"
+"    {\"app.rate\", CONFIG_TYPE_FLOAT, {.float_val = 1.5f}},\n"
+"};\n"
+"\n"
+"config_register_defaults(app_defaults,\n"
+"                         sizeof(app_defaults) / sizeof(app_defaults[0]));"
 
-#: ../../user_guide/config.rst:241 f263edb0bd9040198f7f1abe8b2e3689
+#: ../../user_guide/config.rst:325 6df00a5f43c94ed48d9fb769e723953c
 msgid "Change Notifications"
 msgstr "变更通知"
 
-#: ../../user_guide/config.rst:243 009419e8725a4a34acbb64c41c20334f
+#: ../../user_guide/config.rst:327 71e96304f2044fcda02838724804f291
 msgid "**Watch specific key:**"
 msgstr "**监听特定键：**"
 
-#: ../../user_guide/config.rst:245 115bbae942664c80a678f5a2eeb50a55
+#: ../../user_guide/config.rst:329 6aefa0d109a04020a6b27deb159417c7
 #, python-format
 msgid ""
 "void on_timeout_change(const char* key, config_type_t type,\n"
@@ -496,8 +769,7 @@ msgid ""
 "}\n"
 "\n"
 "config_cb_handle_t handle;\n"
-"config_register_callback(\"app.timeout\", on_timeout_change, NULL, "
-"&handle);\n"
+"config_register_callback(\"app.timeout\", on_timeout_change, NULL, &handle);\n"
 "\n"
 "// Triggers callback\n"
 "config_set_i32(\"app.timeout\", 10000);\n"
@@ -505,12 +777,29 @@ msgid ""
 "// Unregister\n"
 "config_unregister_callback(handle);"
 msgstr ""
+"void on_timeout_change(const char* key, config_type_t type,\n"
+"                       const void* old_val, const void* new_val,\n"
+"                       void* user_data)\n"
+"{\n"
+"    int32_t old_timeout = old_val ? *(int32_t*)old_val : 0;\n"
+"    int32_t new_timeout = *(int32_t*)new_val;\n"
+"    printf(\"Timeout changed: %d -> %d\\n\", old_timeout, new_timeout);\n"
+"}\n"
+"\n"
+"config_cb_handle_t handle;\n"
+"config_register_callback(\"app.timeout\", on_timeout_change, NULL, &handle);\n"
+"\n"
+"// Triggers callback\n"
+"config_set_i32(\"app.timeout\", 10000);\n"
+"\n"
+"// Unregister\n"
+"config_unregister_callback(handle);"
 
-#: ../../user_guide/config.rst:265 26005a43db71463d8af986c07467f951
+#: ../../user_guide/config.rst:349 c5891307353541a180dd991252cc77c6
 msgid "**Watch all changes:**"
 msgstr "**监听所有变更：**"
 
-#: ../../user_guide/config.rst:267 7b8359e195854f409c257bed05150fde
+#: ../../user_guide/config.rst:351 0d768b946ccc44bfb56161a2a376033e
 #, python-format
 msgid ""
 "void on_any_change(const char* key, config_type_t type,\n"
@@ -523,95 +812,631 @@ msgid ""
 "config_cb_handle_t handle;\n"
 "config_register_wildcard_callback(on_any_change, NULL, &handle);"
 msgstr ""
+"void on_any_change(const char* key, config_type_t type,\n"
+"                   const void* old_val, const void* new_val,\n"
+"                   void* user_data)\n"
+"{\n"
+"    printf(\"Config changed: %s\\n\", key);\n"
+"}\n"
+"\n"
+"config_cb_handle_t handle;\n"
+"config_register_wildcard_callback(on_any_change, NULL, &handle);"
 
-#: ../../user_guide/config.rst:280 6e96b329eb9345b590e10934d0b0d4a3
+#: ../../user_guide/config.rst:364 f96b5f495c404d619e110f2c289c29f9
 msgid "Storage Backends"
 msgstr "存储后端"
 
-#: ../../user_guide/config.rst:283 c971fb6eb9de4719a394733dd8121d1b
-msgid "RAM Backend"
+#: ../../user_guide/config.rst:366 8dcb9dc6ecc44e43a5ab56f5b8799401
+msgid ""
+"The Config Manager supports multiple storage backends for different use "
+"cases. Each backend implements the same interface, allowing easy switching "
+"between storage types."
+msgstr ""
+
+#: ../../user_guide/config.rst:371 e58ffcd8e2514dda96d3b76033efd8c6
+#, fuzzy
+msgid "RAM Backend (Volatile)"
 msgstr "RAM 后端"
 
-#: ../../user_guide/config.rst:285 3594f009f0b049e688d1896b3097a56b
-msgid "For testing and volatile storage:"
-msgstr "用于测试和易失性存储："
+#: ../../user_guide/config.rst:373 4cbd26041e5e4fafba96c694d177152d
+msgid ""
+"The RAM backend stores configuration in memory. Data is lost on power cycle."
+" Ideal for testing, temporary storage, and development."
+msgstr ""
 
-#: ../../user_guide/config.rst:287 003d2675c7ef4135a3f8cd60b57456f6
+#: ../../user_guide/config.rst:376 15e06491387c4984a56e77d9283f92e7
 msgid ""
 "#include \"config/config_backend.h\"\n"
 "\n"
-"// Create RAM backend\n"
+"// Create RAM backend with 4KB buffer\n"
 "config_backend_t* ram = config_backend_ram_create(4096);\n"
+"if (ram == NULL) {\n"
+"    printf(\"Failed to create RAM backend\\n\");\n"
+"    return -1;\n"
+"}\n"
+"\n"
+"// Set as active backend\n"
 "config_set_backend(ram);\n"
 "\n"
-"// When done\n"
+"// Use configuration normally\n"
+"config_set_i32(\"app.timeout\", 5000);\n"
+"config_set_str(\"app.name\", \"TestApp\");\n"
+"\n"
+"// Data is stored in RAM\n"
+"config_commit();  // No-op for RAM backend\n"
+"\n"
+"// When done, destroy backend\n"
 "config_backend_ram_destroy(ram);"
 msgstr ""
+"#include \"config/config_backend.h\"\n"
+"\n"
+"// Create RAM backend with 4KB buffer\n"
+"config_backend_t* ram = config_backend_ram_create(4096);\n"
+"if (ram == NULL) {\n"
+"    printf(\"Failed to create RAM backend\\n\");\n"
+"    return -1;\n"
+"}\n"
+"\n"
+"// Set as active backend\n"
+"config_set_backend(ram);\n"
+"\n"
+"// Use configuration normally\n"
+"config_set_i32(\"app.timeout\", 5000);\n"
+"config_set_str(\"app.name\", \"TestApp\");\n"
+"\n"
+"// Data is stored in RAM\n"
+"config_commit();  // No-op for RAM backend\n"
+"\n"
+"// When done, destroy backend\n"
+"config_backend_ram_destroy(ram);"
 
-#: ../../user_guide/config.rst:299 e2363bce74914fcc9f0a15e6f6675059
-msgid "Flash Backend"
-msgstr "Flash 后端"
-
-#: ../../user_guide/config.rst:301 28d663f39caf40a291b58a3cf6c2cbd8
-msgid "For persistent storage:"
-msgstr "用于持久化存储："
-
-#: ../../user_guide/config.rst:303 d6b5847918a14662ace6cd5e2b85637a
+#: ../../user_guide/config.rst:400 487e5707725d4ba7946c66aed96ae7a6
 msgid ""
-"// Create Flash backend\n"
-"config_backend_t* flash = config_backend_flash_create(\n"
-"    FLASH_CONFIG_ADDR,    // Flash start address\n"
-"    FLASH_CONFIG_SIZE     // Partition size\n"
-");\n"
-"config_set_backend(flash);\n"
-"\n"
-"// Load from Flash\n"
-"config_load();\n"
-"\n"
-"// Save to Flash\n"
-"config_commit();"
+"**Use cases:** - Unit testing - Temporary configuration - Development and "
+"debugging - Systems without persistent storage"
 msgstr ""
 
-#: ../../user_guide/config.rst:319 f0867f3bc0f748dcbfb69b532509002d
+#: ../../user_guide/config.rst:407 729870ee3857417082cb0e2e609d581a
+#, fuzzy
+msgid "Flash Backend (Persistent)"
+msgstr "Flash 后端"
+
+#: ../../user_guide/config.rst:409 f2812e50163c43e8aece5de92bd82c90
+msgid ""
+"The Flash backend stores configuration in non-volatile Flash memory. Data "
+"persists across power cycles. Requires HAL Flash driver."
+msgstr ""
+
+#: ../../user_guide/config.rst:412 14591853eea44be3aff8d07f0430f7f9
+msgid ""
+"#include \"config/config_backend.h\"\n"
+"#include \"hal/hal_flash.h\"\n"
+"\n"
+"// Define Flash partition for configuration\n"
+"#define CONFIG_FLASH_ADDR   0x08080000  // Flash address\n"
+"#define CONFIG_FLASH_SIZE   0x00010000  // 64KB partition\n"
+"\n"
+"// Initialize Flash HAL\n"
+"hal_flash_init();\n"
+"\n"
+"// Create Flash backend\n"
+"config_backend_t* flash = config_backend_flash_create(\n"
+"    CONFIG_FLASH_ADDR,\n"
+"    CONFIG_FLASH_SIZE\n"
+");\n"
+"if (flash == NULL) {\n"
+"    printf(\"Failed to create Flash backend\\n\");\n"
+"    return -1;\n"
+"}\n"
+"\n"
+"// Set as active backend\n"
+"config_set_backend(flash);\n"
+"\n"
+"// Load existing configuration from Flash\n"
+"config_status_t status = config_load();\n"
+"if (status != CONFIG_OK) {\n"
+"    printf(\"No existing config, using defaults\\n\");\n"
+"    // Set default values\n"
+"    config_set_i32(\"app.timeout\", 5000);\n"
+"    config_set_str(\"app.name\", \"MyApp\");\n"
+"}\n"
+"\n"
+"// Modify configuration\n"
+"config_set_bool(\"app.debug\", true);\n"
+"\n"
+"// Save to Flash\n"
+"config_commit();\n"
+"\n"
+"// When done, destroy backend\n"
+"config_backend_flash_destroy(flash);\n"
+"hal_flash_deinit();"
+msgstr ""
+"#include \"config/config_backend.h\"\n"
+"#include \"hal/hal_flash.h\"\n"
+"\n"
+"// Define Flash partition for configuration\n"
+"#define CONFIG_FLASH_ADDR   0x08080000  // Flash address\n"
+"#define CONFIG_FLASH_SIZE   0x00010000  // 64KB partition\n"
+"\n"
+"// Initialize Flash HAL\n"
+"hal_flash_init();\n"
+"\n"
+"// Create Flash backend\n"
+"config_backend_t* flash = config_backend_flash_create(\n"
+"    CONFIG_FLASH_ADDR,\n"
+"    CONFIG_FLASH_SIZE\n"
+");\n"
+"if (flash == NULL) {\n"
+"    printf(\"Failed to create Flash backend\\n\");\n"
+"    return -1;\n"
+"}\n"
+"\n"
+"// Set as active backend\n"
+"config_set_backend(flash);\n"
+"\n"
+"// Load existing configuration from Flash\n"
+"config_status_t status = config_load();\n"
+"if (status != CONFIG_OK) {\n"
+"    printf(\"No existing config, using defaults\\n\");\n"
+"    // Set default values\n"
+"    config_set_i32(\"app.timeout\", 5000);\n"
+"    config_set_str(\"app.name\", \"MyApp\");\n"
+"}\n"
+"\n"
+"// Modify configuration\n"
+"config_set_bool(\"app.debug\", true);\n"
+"\n"
+"// Save to Flash\n"
+"config_commit();\n"
+"\n"
+"// When done, destroy backend\n"
+"config_backend_flash_destroy(flash);\n"
+"hal_flash_deinit();"
+
+#: ../../user_guide/config.rst:456 286d3001f3d1446498f84a9b6e9a4c45
+msgid ""
+"**Use cases:** - Production systems - Persistent user settings - Device "
+"configuration - Calibration data"
+msgstr ""
+
+#: ../../user_guide/config.rst:462 630979919f2a4883802d94a203993942
+msgid ""
+"**Flash considerations:** - Wear leveling: Flash has limited write cycles - "
+"Erase granularity: Flash erases in sectors/pages - Write time: Flash writes "
+"are slower than RAM - Power loss: Use atomic writes or checksums"
+msgstr ""
+
+#: ../../user_guide/config.rst:469 725d9a48e2af401ba9eb8664532f66cb
 msgid "Custom Backend"
 msgstr "自定义后端"
 
-#: ../../user_guide/config.rst:321 ba7dbd68d1084f6e932f84e2f513cb38
+#: ../../user_guide/config.rst:471 8d16678cc1ef4444b21238cc18d96f44
 msgid ""
-"static config_status_t my_read(void* ctx, const char* key,\n"
-"                               void* value, size_t* size)\n"
+"Implement a custom backend for specialized storage needs (EEPROM, SD card, "
+"network storage, etc.)."
+msgstr ""
+"Implement a custom backend for specialized storage needs (EEPROM, SD card, "
+"network storage, etc.)."
+
+#: ../../user_guide/config.rst:474 fe41838660154f8e95120001b21dd4c8
+msgid ""
+"#include \"config/config_backend.h\"\n"
+"\n"
+"// Custom context (your storage state)\n"
+"typedef struct {\n"
+"    void* storage_handle;\n"
+"    uint32_t base_address;\n"
+"} my_backend_ctx_t;\n"
+"\n"
+"// Read function\n"
+"static config_status_t my_backend_read(void* ctx, const char* key,\n"
+"                                       void* value, size_t* size)\n"
 "{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
 "    // Implement read logic\n"
+"    // 1. Find key in storage\n"
+"    // 2. Read value\n"
+"    // 3. Copy to value buffer\n"
+"    // 4. Set size\n"
+"\n"
 "    return CONFIG_OK;\n"
 "}\n"
 "\n"
-"static config_status_t my_write(void* ctx, const char* key,\n"
-"                                const void* value, size_t size)\n"
+"// Write function\n"
+"static config_status_t my_backend_write(void* ctx, const char* key,\n"
+"                                        const void* value, size_t size)\n"
 "{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
 "    // Implement write logic\n"
+"    // 1. Find or allocate space for key\n"
+"    // 2. Write value\n"
+"    // 3. Update metadata\n"
+"\n"
 "    return CONFIG_OK;\n"
 "}\n"
 "\n"
-"static const config_backend_t my_backend = {\n"
-"    .read = my_read,\n"
-"    .write = my_write,\n"
-"    .erase = my_erase,\n"
-"    .commit = my_commit,\n"
-"    .ctx = &my_context\n"
-"};\n"
+"// Erase function\n"
+"static config_status_t my_backend_erase(void* ctx, const char* key)\n"
+"{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
 "\n"
-"config_set_backend(&my_backend);"
+"    // Implement erase logic\n"
+"    // 1. Find key\n"
+"    // 2. Mark as deleted or reclaim space\n"
+"\n"
+"    return CONFIG_OK;\n"
+"}\n"
+"\n"
+"// Commit function (flush to storage)\n"
+"static config_status_t my_backend_commit(void* ctx)\n"
+"{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
+"    // Implement commit logic\n"
+"    // 1. Flush any cached writes\n"
+"    // 2. Update checksums\n"
+"    // 3. Ensure data integrity\n"
+"\n"
+"    return CONFIG_OK;\n"
+"}\n"
+"\n"
+"// Create custom backend\n"
+"config_backend_t* my_backend_create(void)\n"
+"{\n"
+"    // Allocate context\n"
+"    my_backend_ctx_t* ctx = malloc(sizeof(my_backend_ctx_t));\n"
+"    if (ctx == NULL) {\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    // Initialize context\n"
+"    ctx->storage_handle = open_storage();\n"
+"    ctx->base_address = 0x1000;\n"
+"\n"
+"    // Allocate backend structure\n"
+"    config_backend_t* backend = malloc(sizeof(config_backend_t));\n"
+"    if (backend == NULL) {\n"
+"        free(ctx);\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    // Set function pointers\n"
+"    backend->read = my_backend_read;\n"
+"    backend->write = my_backend_write;\n"
+"    backend->erase = my_backend_erase;\n"
+"    backend->commit = my_backend_commit;\n"
+"    backend->ctx = ctx;\n"
+"\n"
+"    return backend;\n"
+"}\n"
+"\n"
+"// Destroy custom backend\n"
+"void my_backend_destroy(config_backend_t* backend)\n"
+"{\n"
+"    if (backend != NULL) {\n"
+"        my_backend_ctx_t* ctx = (my_backend_ctx_t*)backend->ctx;\n"
+"        if (ctx != NULL) {\n"
+"            close_storage(ctx->storage_handle);\n"
+"            free(ctx);\n"
+"        }\n"
+"        free(backend);\n"
+"    }\n"
+"}\n"
+"\n"
+"// Usage\n"
+"config_backend_t* backend = my_backend_create();\n"
+"config_set_backend(backend);\n"
+"\n"
+"// Use configuration\n"
+"config_set_i32(\"app.value\", 42);\n"
+"config_commit();\n"
+"\n"
+"// Cleanup\n"
+"my_backend_destroy(backend);"
+msgstr ""
+"#include \"config/config_backend.h\"\n"
+"\n"
+"// Custom context (your storage state)\n"
+"typedef struct {\n"
+"    void* storage_handle;\n"
+"    uint32_t base_address;\n"
+"} my_backend_ctx_t;\n"
+"\n"
+"// Read function\n"
+"static config_status_t my_backend_read(void* ctx, const char* key,\n"
+"                                       void* value, size_t* size)\n"
+"{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
+"    // Implement read logic\n"
+"    // 1. Find key in storage\n"
+"    // 2. Read value\n"
+"    // 3. Copy to value buffer\n"
+"    // 4. Set size\n"
+"\n"
+"    return CONFIG_OK;\n"
+"}\n"
+"\n"
+"// Write function\n"
+"static config_status_t my_backend_write(void* ctx, const char* key,\n"
+"                                        const void* value, size_t size)\n"
+"{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
+"    // Implement write logic\n"
+"    // 1. Find or allocate space for key\n"
+"    // 2. Write value\n"
+"    // 3. Update metadata\n"
+"\n"
+"    return CONFIG_OK;\n"
+"}\n"
+"\n"
+"// Erase function\n"
+"static config_status_t my_backend_erase(void* ctx, const char* key)\n"
+"{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
+"    // Implement erase logic\n"
+"    // 1. Find key\n"
+"    // 2. Mark as deleted or reclaim space\n"
+"\n"
+"    return CONFIG_OK;\n"
+"}\n"
+"\n"
+"// Commit function (flush to storage)\n"
+"static config_status_t my_backend_commit(void* ctx)\n"
+"{\n"
+"    my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;\n"
+"\n"
+"    // Implement commit logic\n"
+"    // 1. Flush any cached writes\n"
+"    // 2. Update checksums\n"
+"    // 3. Ensure data integrity\n"
+"\n"
+"    return CONFIG_OK;\n"
+"}\n"
+"\n"
+"// Create custom backend\n"
+"config_backend_t* my_backend_create(void)\n"
+"{\n"
+"    // Allocate context\n"
+"    my_backend_ctx_t* ctx = malloc(sizeof(my_backend_ctx_t));\n"
+"    if (ctx == NULL) {\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    // Initialize context\n"
+"    ctx->storage_handle = open_storage();\n"
+"    ctx->base_address = 0x1000;\n"
+"\n"
+"    // Allocate backend structure\n"
+"    config_backend_t* backend = malloc(sizeof(config_backend_t));\n"
+"    if (backend == NULL) {\n"
+"        free(ctx);\n"
+"        return NULL;\n"
+"    }\n"
+"\n"
+"    // Set function pointers\n"
+"    backend->read = my_backend_read;\n"
+"    backend->write = my_backend_write;\n"
+"    backend->erase = my_backend_erase;\n"
+"    backend->commit = my_backend_commit;\n"
+"    backend->ctx = ctx;\n"
+"\n"
+"    return backend;\n"
+"}\n"
+"\n"
+"// Destroy custom backend\n"
+"void my_backend_destroy(config_backend_t* backend)\n"
+"{\n"
+"    if (backend != NULL) {\n"
+"        my_backend_ctx_t* ctx = (my_backend_ctx_t*)backend->ctx;\n"
+"        if (ctx != NULL) {\n"
+"            close_storage(ctx->storage_handle);\n"
+"            free(ctx);\n"
+"        }\n"
+"        free(backend);\n"
+"    }\n"
+"}\n"
+"\n"
+"// Usage\n"
+"config_backend_t* backend = my_backend_create();\n"
+"config_set_backend(backend);\n"
+"\n"
+"// Use configuration\n"
+"config_set_i32(\"app.value\", 42);\n"
+"config_commit();\n"
+"\n"
+"// Cleanup\n"
+"my_backend_destroy(backend);"
+
+#: ../../user_guide/config.rst:592 3f8b5653227447769e4401908610a16a
+msgid ""
+"**Custom backend use cases:** - EEPROM storage - SD card configuration files"
+" - Network-based configuration (cloud sync) - Database storage - Encrypted "
+"storage with custom crypto"
+msgstr ""
+"**Custom backend use cases:** - EEPROM storage - SD card configuration files"
+" - Network-based configuration (cloud sync) - Database storage - Encrypted "
+"storage with custom crypto"
+
+#: ../../user_guide/config.rst:600 72f0b42af4f14141a82dc6f47fe81213
+#, fuzzy
+msgid "Backend Comparison"
+msgstr "后端错误"
+
+#: ../../user_guide/config.rst:603 f8a47a3927764e23b4b1d6efbc58ee00
+#, fuzzy
+msgid "Feature"
+msgstr "特性"
+
+#: ../../user_guide/config.rst:603 b2a28bdcff034d918bcdb2c09b24561f
+msgid "RAM"
+msgstr "RAM"
+
+#: ../../user_guide/config.rst:603 6f74c787fe1d458299ba341fbc815529
+msgid "Flash"
+msgstr "Flash"
+
+#: ../../user_guide/config.rst:603 725d9a48e2af401ba9eb8664532f66cb
+#, fuzzy
+msgid "Custom"
+msgstr "自定义后端"
+
+#: ../../user_guide/config.rst:603 d30e63ff2ea94756b06d7e506e0796ee
+msgid "Notes"
+msgstr "注意事项"
+
+#: ../../user_guide/config.rst:605 5fd291f7da5643eb882e080f0088c154
+#, fuzzy
+msgid "Persistent"
+msgstr "用于持久化存储："
+
+#: ../../user_guide/config.rst:605 ec1ec675af2b4d0a93afed4bfb7840c0
+msgid "No"
+msgstr "否"
+
+#: ../../user_guide/config.rst:605 76f43e01b1b842a6bd04e7a1b3212977
+msgid "Yes"
+msgstr "是"
+
+#: ../../user_guide/config.rst:605 ../../user_guide/config.rst:609
+#: ../../user_guide/config.rst:613 a970256a5c984998be4e9a33c60f5cac
+#, fuzzy
+msgid "Depends"
+msgstr "依赖"
+
+#: ../../user_guide/config.rst:605 fe4a25d0286243ea898517d73d22dc89
+msgid "Across reboot"
 msgstr ""
 
-#: ../../user_guide/config.rst:348 c137e53919df47ceb74d24ee99628f55
+#: ../../user_guide/config.rst:607 a7b67191fbd4417da44be6c9b8d53a7b
+msgid "Speed"
+msgstr "速度"
+
+#: ../../user_guide/config.rst:607 76299174bb0946149e06dcfd2ff7372c
+msgid "Fast"
+msgstr ""
+
+#: ../../user_guide/config.rst:607 ../../user_guide/config.rst:615
+#: 109577bdf7584485a72a48427d0a70a4 2a9cfca382b64e7aba1abc67865b9a79
+msgid "Medium"
+msgstr ""
+
+#: ../../user_guide/config.rst:607 ../../user_guide/config.rst:611
+#: 5c699f9da46b488bb756246cb1e01423 a6b50a77bc6f4619a2b5a9fdc14f2d32
+msgid "Varies"
+msgstr ""
+
+#: ../../user_guide/config.rst:607 4ccebe81688e4e9cbfb5927de0079e93
+msgid "Read/write"
+msgstr "Read/write"
+
+#: ../../user_guide/config.rst:609 19641ce9c0f54f54ad53cdb3f4c8d7cc
+msgid "Wear leveling"
+msgstr ""
+
+#: ../../user_guide/config.rst:609 78fd70ef583a4f15aff2e39a35a7533b
+msgid "N/A"
+msgstr "N/A"
+
+#: ../../user_guide/config.rst:609 90ec20cacf60481c9738246b3c471fc7
+msgid "Required"
+msgstr "必需"
+
+#: ../../user_guide/config.rst:609 f96b5f495c404d619e110f2c289c29f9
+msgid "Write cycles"
+msgstr ""
+
+#: ../../user_guide/config.rst:611 a34be0fa2c664882a1b46c2084182673
+msgid "Size limit"
+msgstr ""
+
+#: ../../user_guide/config.rst:611 dbf8ef313c79442490118b17373b70bc
+msgid "RAM size"
+msgstr ""
+
+#: ../../user_guide/config.rst:611 6f74c787fe1d458299ba341fbc815529
+#, fuzzy
+msgid "Flash size"
+msgstr "Flash 后端"
+
+#: ../../user_guide/config.rst:611 c7e070e5e06a4395b252e570305d2404
+#, fuzzy
+msgid "Storage cap"
+msgstr "存储已满"
+
+#: ../../user_guide/config.rst:613 643ebcba3e0642b7be6945bf91b48669
+msgid "Power loss"
+msgstr ""
+
+#: ../../user_guide/config.rst:613 2d3402ea8da3483aa121676c2049da2d
+#, fuzzy
+msgid "Data lost"
+msgstr "数据类型"
+
+#: ../../user_guide/config.rst:613 86a3d9eda38e4115a7e9fee0f4932bc8
+msgid "Safe"
+msgstr ""
+
+#: ../../user_guide/config.rst:613 850bce99fdc645b2a94ef6203995c45e
+msgid "Data integrity"
+msgstr ""
+
+#: ../../user_guide/config.rst:615 11be5a385cd64963b1275c16c0a06f4d
+msgid "Complexity"
+msgstr ""
+
+#: ../../user_guide/config.rst:615 1016a1b97749486f8e9c3230a7e34e9f
+msgid "Simple"
+msgstr ""
+
+#: ../../user_guide/config.rst:615 e8326f6217ce416bb5f988939e6c4b3b
+msgid "High"
+msgstr ""
+
+#: ../../user_guide/config.rst:615 be2fd36ccb044badaa812024c1ac9c99
+#, fuzzy
+msgid "Implementation"
+msgstr "编译时配置"
+
+#: ../../user_guide/config.rst:619 36fb5e6e4ef04471b59e5d8719bb7d0a
+msgid "Backend Selection Guide"
+msgstr ""
+
+#: ../../user_guide/config.rst:621 4fa505c454a64b10a2c2828357b6d042
+msgid ""
+"**Choose RAM backend when:** - Testing and development - Temporary "
+"configuration - No persistent storage needed - Maximum performance required"
+msgstr ""
+
+#: ../../user_guide/config.rst:627 6fcb64590c224ecb9e5bcb07af72f6b4
+msgid ""
+"**Choose Flash backend when:** - Production deployment - Configuration must "
+"persist - Limited RAM available - Standard embedded system"
+msgstr ""
+
+#: ../../user_guide/config.rst:633 7ebabef4bbda4de69c7725825028f3f7
+msgid ""
+"**Choose Custom backend when:** - Special storage requirements - External "
+"storage (SD, EEPROM) - Network/cloud synchronization - Custom encryption or "
+"compression"
+msgstr ""
+"**Choose Custom backend when:** - Special storage requirements - External "
+"storage (SD, EEPROM) - Network/cloud synchronization - Custom encryption or "
+"compression"
+
+#: ../../user_guide/config.rst:640 1b74040038194f619b343bf1ea1ee9ae
 msgid "Import/Export"
 msgstr "导入/导出"
 
-#: ../../user_guide/config.rst:350 7faf44641a814515996b085e411447f3
+#: ../../user_guide/config.rst:642 7b77e6e95753413d97eccbcaa5c125ab
 msgid "**Binary format:**"
 msgstr "**二进制格式：**"
 
-#: ../../user_guide/config.rst:352 0463694636534468a0f10db47c610ba3
+#: ../../user_guide/config.rst:644 3f58ed9ed7a9421cbc944d52ad5b8135
 msgid ""
 "// Export\n"
 "size_t export_size;\n"
@@ -619,18 +1444,27 @@ msgid ""
 "\n"
 "uint8_t* buffer = malloc(export_size);\n"
 "size_t actual_size;\n"
-"config_export(CONFIG_FORMAT_BINARY, 0, buffer, export_size, "
-"&actual_size);\n"
+"config_export(CONFIG_FORMAT_BINARY, 0, buffer, export_size, &actual_size);\n"
 "\n"
 "// Import\n"
 "config_import(CONFIG_FORMAT_BINARY, 0, buffer, actual_size);"
 msgstr ""
+"// Export\n"
+"size_t export_size;\n"
+"config_get_export_size(CONFIG_FORMAT_BINARY, 0, &export_size);\n"
+"\n"
+"uint8_t* buffer = malloc(export_size);\n"
+"size_t actual_size;\n"
+"config_export(CONFIG_FORMAT_BINARY, 0, buffer, export_size, &actual_size);\n"
+"\n"
+"// Import\n"
+"config_import(CONFIG_FORMAT_BINARY, 0, buffer, actual_size);"
 
-#: ../../user_guide/config.rst:365 51b8095aaa534bc5bf7ee23bb71dc069
+#: ../../user_guide/config.rst:657 6c0adbef42eb400e9ff2c30624a5daa9
 msgid "**JSON format:**"
 msgstr "**JSON 格式：**"
 
-#: ../../user_guide/config.rst:367 3b8731ca42454253a284770193a86872
+#: ../../user_guide/config.rst:659 12831028a93344a0b4b698a222d3cda8
 msgid ""
 "// Export as JSON\n"
 "char json_buffer[1024];\n"
@@ -639,41 +1473,54 @@ msgid ""
 "              sizeof(json_buffer), &json_size);\n"
 "\n"
 "// Import JSON\n"
-"const char* json = \"{\\\"app.timeout\\\": 5000, \\\"app.name\\\": "
-"\\\"Test\\\"}\";\n"
+"const char* json = \"{\\\"app.timeout\\\": 5000, \\\"app.name\\\": \\\"Test\\\"}\";\n"
 "config_import(CONFIG_FORMAT_JSON, 0, json, strlen(json));"
 msgstr ""
+"// Export as JSON\n"
+"char json_buffer[1024];\n"
+"size_t json_size;\n"
+"config_export(CONFIG_FORMAT_JSON, 0, json_buffer,\n"
+"              sizeof(json_buffer), &json_size);\n"
+"\n"
+"// Import JSON\n"
+"const char* json = \"{\\\"app.timeout\\\": 5000, \\\"app.name\\\": \\\"Test\\\"}\";\n"
+"config_import(CONFIG_FORMAT_JSON, 0, json, strlen(json));"
 
-#: ../../user_guide/config.rst:379 c490673c40754be8a33cb68f53f1ab80
+#: ../../user_guide/config.rst:671 1b58b5470c214052b06293b9661cf37e
 msgid "**Namespace export:**"
 msgstr "**命名空间导出：**"
 
-#: ../../user_guide/config.rst:381 f82b56f10bff49f4927f1d903e7cb620
+#: ../../user_guide/config.rst:673 d07e38be2f524f76ac0a53aaf3aeaa7a
 msgid ""
 "// Export specific namespace only\n"
 "config_export_namespace(\"network\", CONFIG_FORMAT_JSON, 0,\n"
 "                        buffer, buf_size, &actual_size);"
 msgstr ""
+"// Export specific namespace only\n"
+"config_export_namespace(\"network\", CONFIG_FORMAT_JSON, 0,\n"
+"                        buffer, buf_size, &actual_size);"
 
-#: ../../user_guide/config.rst:388 6c1c322303fa4736bbe15fc992034ea4
+#: ../../user_guide/config.rst:680 852c2d940be240c9a79de626af87f96b
 msgid "Encryption"
 msgstr "加密"
 
-#: ../../user_guide/config.rst:390 f9caa81e7c8a4b08aea9ca2af7f687e1
+#: ../../user_guide/config.rst:682 d515f61f33fe425b88b7a90523b08bd6
 msgid "**Set encryption key:**"
 msgstr "**设置加密密钥：**"
 
-#: ../../user_guide/config.rst:392 1e46fa1a48d14500a628e07059edb1f4
+#: ../../user_guide/config.rst:684 ae9ccec059a14630b27a771521708357
 msgid ""
 "uint8_t key[16] = {0x00, 0x01, 0x02, ...};  // AES-128 key\n"
 "config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);"
 msgstr ""
+"uint8_t key[16] = {0x00, 0x01, 0x02, ...};  // AES-128 key\n"
+"config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);"
 
-#: ../../user_guide/config.rst:397 5173338899f34e04a6bea290be563e47
+#: ../../user_guide/config.rst:689 4a83c974fcfc4c1784a7ea21b0818a25
 msgid "**Store encrypted data:**"
 msgstr "**存储加密数据：**"
 
-#: ../../user_guide/config.rst:399 d7381ffd8dfb40d997dd844a610a9c0a
+#: ../../user_guide/config.rst:691 4cd5658a2ef54aafb24b712adbbda0a1
 msgid ""
 "// Encrypt and store string\n"
 "config_set_str_encrypted(\"auth.password\", \"secret123\");\n"
@@ -690,24 +1537,40 @@ msgid ""
 "bool encrypted;\n"
 "config_is_encrypted(\"auth.password\", &encrypted);"
 msgstr ""
+"// Encrypt and store string\n"
+"config_set_str_encrypted(\"auth.password\", \"secret123\");\n"
+"\n"
+"// Encrypt and store binary\n"
+"uint8_t token[32] = {...};\n"
+"config_set_blob_encrypted(\"auth.token\", token, sizeof(token));\n"
+"\n"
+"// Reading auto-decrypts\n"
+"char password[64];\n"
+"config_get_str(\"auth.password\", password, sizeof(password));\n"
+"\n"
+"// Check if key is encrypted\n"
+"bool encrypted;\n"
+"config_is_encrypted(\"auth.password\", &encrypted);"
 
-#: ../../user_guide/config.rst:416 cfd4a731c70c42309c9398b72335d275
+#: ../../user_guide/config.rst:708 640df408b662491aa8cc054fa3ed3639
 msgid "**Key rotation:**"
 msgstr "**密钥轮换：**"
 
-#: ../../user_guide/config.rst:418 2628bca6fcee47b9a06be00a0f901270
+#: ../../user_guide/config.rst:710 838275168ea348318bfafcba87aad748
 msgid ""
 "// Re-encrypt all encrypted data with new key\n"
 "uint8_t new_key[16] = {...};\n"
-"config_rotate_encryption_key(new_key, sizeof(new_key), "
-"CONFIG_CRYPTO_AES128);"
+"config_rotate_encryption_key(new_key, sizeof(new_key), CONFIG_CRYPTO_AES128);"
 msgstr ""
+"// Re-encrypt all encrypted data with new key\n"
+"uint8_t new_key[16] = {...};\n"
+"config_rotate_encryption_key(new_key, sizeof(new_key), CONFIG_CRYPTO_AES128);"
 
-#: ../../user_guide/config.rst:425 30b6bcbceb7e4337a88fc8d8835ce41b
+#: ../../user_guide/config.rst:717 19ae6fca8fd240568a8d0d7cdd9db046
 msgid "Query Operations"
 msgstr "查询操作"
 
-#: ../../user_guide/config.rst:427 0547c14444a44bceb9f485e259bc9061
+#: ../../user_guide/config.rst:719 35dd072909a54a5983066b8d20570bac
 #, python-format
 msgid ""
 "// Check if key exists\n"
@@ -735,12 +1598,36 @@ msgid ""
 "\n"
 "config_iterate(print_entry, NULL);"
 msgstr ""
+"// Check if key exists\n"
+"bool exists;\n"
+"config_exists(\"app.timeout\", &exists);\n"
+"\n"
+"// Get value type\n"
+"config_type_t type;\n"
+"config_get_type(\"app.timeout\", &type);\n"
+"\n"
+"// Delete key\n"
+"config_delete(\"app.timeout\");\n"
+"\n"
+"// Get key count\n"
+"size_t count;\n"
+"config_get_count(&count);\n"
+"\n"
+"// Iterate all entries\n"
+"bool print_entry(const config_entry_info_t* info, void* user_data)\n"
+"{\n"
+"    printf(\"Key: %s, Type: %d, Size: %d\\n\",\n"
+"           info->key, info->type, info->value_size);\n"
+"    return true;  // Continue iteration\n"
+"}\n"
+"\n"
+"config_iterate(print_entry, NULL);"
 
-#: ../../user_guide/config.rst:455 79adc1dd832f49a1bb46cd250f06c24c
+#: ../../user_guide/config.rst:747 19641ce9c0f54f54ad53cdb3f4c8d7cc
 msgid "Error Handling"
 msgstr "错误处理"
 
-#: ../../user_guide/config.rst:457 e8534c9ab0d4435cb0dd6aa62cd8f5d2
+#: ../../user_guide/config.rst:749 997fd8816da84c6fa6cda6352848b563
 #, python-format
 msgid ""
 "config_status_t status = config_set_i32(\"key\", 100);\n"
@@ -749,186 +1636,302 @@ msgid ""
 "    printf(\"Error: %s\\n\", msg);\n"
 "}"
 msgstr ""
+"config_status_t status = config_set_i32(\"key\", 100);\n"
+"if (status != CONFIG_OK) {\n"
+"    const char* msg = config_error_to_str(status);\n"
+"    printf(\"Error: %s\\n\", msg);\n"
+"}"
 
-#: ../../user_guide/config.rst:465 8a115cec80864a8c8001845bac54daf7
+#: ../../user_guide/config.rst:757 dd89d3525fac435f97736a8355cb0cc8
 msgid "**Status codes:**"
 msgstr "**状态码：**"
 
-#: ../../user_guide/config.rst:468 4478be29164a4791aac20e8a85a06ff6
+#: ../../user_guide/config.rst:760 7030bbd772ab4b718509790099eaf431
 msgid "Status"
 msgstr "状态"
 
-#: ../../user_guide/config.rst:470 b8720873b56c4fb09188e8074a24e8de
+#: ../../user_guide/config.rst:762 5a1777e5293741928e05c4f8d820a834
 msgid "``CONFIG_OK``"
-msgstr ""
+msgstr "``CONFIG_OK``"
 
-#: ../../user_guide/config.rst:470 3e07905a71fc434eb432ffc474bfaedb
+#: ../../user_guide/config.rst:762 70bc1f5a79d1479081015df3b9abe516
 msgid "Success"
 msgstr "成功"
 
-#: ../../user_guide/config.rst:472 cc57ed8267f348e282557b8b6b9b55e4
+#: ../../user_guide/config.rst:764 fb53f3ef6639496392efff0ca8299208
 msgid "``CONFIG_ERROR_INVALID_PARAM``"
-msgstr ""
+msgstr "``CONFIG_ERROR_INVALID_PARAM``"
 
-#: ../../user_guide/config.rst:472 9864612ab05544fda15af529ba2cc178
+#: ../../user_guide/config.rst:764 455c82979a2e4e4397e924069ed54044
 msgid "Invalid parameter"
 msgstr "无效参数"
 
-#: ../../user_guide/config.rst:474 fa2e05480e144f3b974b465686b207b2
+#: ../../user_guide/config.rst:766 d5d6ed1757b644caab70a4867d8b56df
 msgid "``CONFIG_ERROR_NOT_INIT``"
-msgstr ""
+msgstr "``CONFIG_ERROR_NOT_INIT``"
 
-#: ../../user_guide/config.rst:474 01046f08ddf84d2aa96c2d05876fb014
+#: ../../user_guide/config.rst:766 7a6499b21710405b89f3bff2efe6bfe6
 msgid "Not initialized"
 msgstr "未初始化"
 
-#: ../../user_guide/config.rst:476 e2970ff5b42d4ecb82454633a3ca0171
+#: ../../user_guide/config.rst:768 788f0364439447b8bd06987e8b14066c
 msgid "``CONFIG_ERROR_ALREADY_INIT``"
-msgstr ""
+msgstr "``CONFIG_ERROR_ALREADY_INIT``"
 
-#: ../../user_guide/config.rst:476 f1972f02d6cb4d1490e9bccc5fbf963f
+#: ../../user_guide/config.rst:768 aaf3afb49e194542ae05579dfddf648a
 msgid "Already initialized"
 msgstr "已初始化"
 
-#: ../../user_guide/config.rst:478 96a61d2967ee486d90713d0e2493cac6
+#: ../../user_guide/config.rst:770 b0a29b85112747989c366b8bc2f29a4e
 msgid "``CONFIG_ERROR_NOT_FOUND``"
-msgstr ""
+msgstr "``CONFIG_ERROR_NOT_FOUND``"
 
-#: ../../user_guide/config.rst:478 61572f9a49554ba7b9ece1da4fe99b7a
+#: ../../user_guide/config.rst:770 bfc2592bb7ea4d49be3be2a7e2abba06
 msgid "Key not found"
 msgstr "键未找到"
 
-#: ../../user_guide/config.rst:480 accd8024b60d47d98b5316e9afe6186b
+#: ../../user_guide/config.rst:772 bc589565e7c542a2a1fce47321a0f974
 msgid "``CONFIG_ERROR_TYPE_MISMATCH``"
-msgstr ""
+msgstr "``CONFIG_ERROR_TYPE_MISMATCH``"
 
-#: ../../user_guide/config.rst:480 91a4f9168d8f42c98829462c8efa7e15
+#: ../../user_guide/config.rst:772 a34be0fa2c664882a1b46c2084182673
 msgid "Type mismatch"
 msgstr "类型不匹配"
 
-#: ../../user_guide/config.rst:482 dbdabd2403af43dc828c1898eb24d278
+#: ../../user_guide/config.rst:774 a3e21ee061ee4182b4d1bf9741e36347
 msgid "``CONFIG_ERROR_BUFFER_TOO_SMALL``"
-msgstr ""
+msgstr "``CONFIG_ERROR_BUFFER_TOO_SMALL``"
 
-#: ../../user_guide/config.rst:482 1c73314cedad4365aecd9f45448dcc70
+#: ../../user_guide/config.rst:774 035fce55438843e1994fe19b6b60225c
 msgid "Buffer too small"
 msgstr "缓冲区太小"
 
-#: ../../user_guide/config.rst:484 552432243c3743d49eed066c41467bc4
+#: ../../user_guide/config.rst:776 4ead308daa87429382f70818bdea7abc
 msgid "``CONFIG_ERROR_STORAGE_FULL``"
-msgstr ""
+msgstr "``CONFIG_ERROR_STORAGE_FULL``"
 
-#: ../../user_guide/config.rst:484 8ca26a8d476b41d5b619871e30422234
+#: ../../user_guide/config.rst:776 c7e070e5e06a4395b252e570305d2404
 msgid "Storage full"
 msgstr "存储已满"
 
-#: ../../user_guide/config.rst:486 784db507b2534f71ab59e97a9d479b9f
+#: ../../user_guide/config.rst:778 1f35ba6c889342bdbcb9ab0843555b60
 msgid "``CONFIG_ERROR_BACKEND``"
-msgstr ""
+msgstr "``CONFIG_ERROR_BACKEND``"
 
-#: ../../user_guide/config.rst:486 ce914f5d2b05415b9fad6639d7c0ee9d
+#: ../../user_guide/config.rst:778 72f0b42af4f14141a82dc6f47fe81213
 msgid "Backend error"
 msgstr "后端错误"
 
-#: ../../user_guide/config.rst:488 e785aabdc4684077913020b90125d0cd
+#: ../../user_guide/config.rst:780 78247e9252c845dfb8f43a8c21308f10
 msgid "``CONFIG_ERROR_CRYPTO``"
-msgstr ""
+msgstr "``CONFIG_ERROR_CRYPTO``"
 
-#: ../../user_guide/config.rst:488 cc74c522a3204c9395abfa4e344fec0c
+#: ../../user_guide/config.rst:780 b8ce03733a4b4b92b8c03b6602fc04d4
 msgid "Encryption error"
 msgstr "加密错误"
 
-#: ../../user_guide/config.rst:492 be4e2ec15dae494c88928ade7c0c992e
+#: ../../user_guide/config.rst:784 1474b5a1960149c68f9f02b30903d1a6
 msgid "Compile-Time Configuration"
 msgstr "编译时配置"
 
-#: ../../user_guide/config.rst:495 c936534f32dc4295abe42e61b30d1888
+#: ../../user_guide/config.rst:787 fb358bbe646d4130975c60d6ff8ff6c1
 msgid "Macro"
 msgstr "宏定义"
 
-#: ../../user_guide/config.rst:497 42e20bf12cfe44e48d71979f931087da
+#: ../../user_guide/config.rst:789 f0244019f04a4f30a5ff22d5f71fc56d
 msgid "``CONFIG_DEFAULT_MAX_KEYS``"
-msgstr ""
+msgstr "``CONFIG_DEFAULT_MAX_KEYS``"
 
-#: ../../user_guide/config.rst:497 87fe33ae2fe84efdad0006e669e97423
+#: ../../user_guide/config.rst:789 00d7aa0dac1d45d0a1889d14d20a38a7
 msgid "Default max key count"
 msgstr "默认最大键数"
 
-#: ../../user_guide/config.rst:499 5504e5bffc5d4353a873c7c8bc7e735d
+#: ../../user_guide/config.rst:791 f65e95602f764a8d9855af40c942366a
 #, fuzzy
 msgid "``CONFIG_DEFAULT_MAX_KEY_LEN``"
 msgstr "默认最大键长度"
 
-#: ../../user_guide/config.rst:499 0d94de6e325e4e25955dc0e14e57de04
+#: ../../user_guide/config.rst:791 38b161348fc042bdb7a76ac9f5efd760
 msgid "Default max key length"
 msgstr "默认最大键长度"
 
-#: ../../user_guide/config.rst:501 4fda5742af664873873944c7f45e0fda
+#: ../../user_guide/config.rst:793 ed8bdc87fb1a45db97c594afb5c80e05
 #, fuzzy
 msgid "``CONFIG_DEFAULT_MAX_VALUE_SIZE``"
 msgstr "默认最大值大小"
 
-#: ../../user_guide/config.rst:501 9da0beb03cab47ffb3612b360261802f
+#: ../../user_guide/config.rst:793 795db3a8ee534bdabcee09a7b99acf6c
 msgid "Default max value size"
 msgstr "默认最大值大小"
 
-#: ../../user_guide/config.rst:503 133c7da177fb4212b4816cdb6a215b73
+#: ../../user_guide/config.rst:795 f7a7531e7c104a03b5c40d0161fd0c6d
 #, fuzzy
 msgid "``CONFIG_DEFAULT_MAX_NAMESPACES``"
 msgstr "默认最大命名空间数"
 
-#: ../../user_guide/config.rst:503 f9182050b82044418c9c6460e9e15c5c
+#: ../../user_guide/config.rst:795 0ed2f38e76ec406382cf43f87f593511
 msgid "Default max namespaces"
 msgstr "默认最大命名空间数"
 
-#: ../../user_guide/config.rst:505 a5418e3529694b49ad69208f3fde2c72
+#: ../../user_guide/config.rst:797 d21268782d6c45e4aa1e3600e7ba01de
 #, fuzzy
 msgid "``CONFIG_DEFAULT_MAX_CALLBACKS``"
 msgstr "默认最大回调数"
 
-#: ../../user_guide/config.rst:505 42383f0a682843c89a9dcedd7b72e0b4
+#: ../../user_guide/config.rst:797 a1af1737534c49bbad44d05aa2dd88c7
 msgid "Default max callbacks"
 msgstr "默认最大回调数"
 
-#: ../../user_guide/config.rst:507 2dee9c283f0a4119ad14f90a466a3bc7
+#: ../../user_guide/config.rst:799 07ed986333224b238244f35458b4dc4b
 #, fuzzy
 msgid "``CONFIG_ENABLE_ENCRYPTION``"
 msgstr "启用加密"
 
-#: ../../user_guide/config.rst:507 ../../user_guide/config.rst:509
-#: 68c43985e43348b0848b2b2e8a694019 f06f33f9e2424d0d8f366e8fa0d051be
+#: ../../user_guide/config.rst:799 ../../user_guide/config.rst:801
+#: dad446073ce544d685ab5f05aabb80d7
 msgid "``1``"
-msgstr ""
+msgstr "``1``"
 
-#: ../../user_guide/config.rst:507 f621f519c1e546d3821567f45249b114
+#: ../../user_guide/config.rst:799 be2fd36ccb044badaa812024c1ac9c99
 msgid "Enable encryption"
 msgstr "启用加密"
 
-#: ../../user_guide/config.rst:509 4d3b99ad5d4f45e4885f30a7ae295c43
+#: ../../user_guide/config.rst:801 b2c92063af03418fa25ba74de8a79214
 msgid "``CONFIG_ENABLE_JSON``"
-msgstr ""
+msgstr "``CONFIG_ENABLE_JSON``"
 
-#: ../../user_guide/config.rst:509 6468106fda5944309f8741c25d7cab2d
+#: ../../user_guide/config.rst:801 7967b6287c3f4b66929fc315f98c68fc
 msgid "Enable JSON support"
 msgstr "启用 JSON 支持"
 
-#: ../../user_guide/config.rst:513 193c68a8676f466cb12bd2ccd8ead74d
+#: ../../user_guide/config.rst:805 a970256a5c984998be4e9a33c60f5cac
 msgid "Dependencies"
 msgstr "依赖"
 
-#: ../../user_guide/config.rst:515 c84dfbb840fe4020b43e86160e6bbea6
+#: ../../user_guide/config.rst:807 e8b6d62062774a95945a29567988d1bc
 msgid "**OSAL**: OS Abstraction Layer (Mutex for thread safety)"
 msgstr "**OSAL**: 操作系统抽象层（Mutex 用于线程安全）"
 
-#: ../../user_guide/config.rst:516 2f1c13a3a8bc4afba7c6921245f3db07
+#: ../../user_guide/config.rst:808 093ac4cb1142415ba17a706376283476
 msgid "**HAL**: Hardware Abstraction Layer (Flash backend)"
 msgstr "**HAL**: 硬件抽象层（Flash 后端）"
 
-#: ../../user_guide/config.rst:519 2c27c6ab658346a991ed39c9e015a690
+#: ../../user_guide/config.rst:811 e16df1967eb4499f9207443d12931d88
 msgid "API Reference"
 msgstr "API 参考"
 
-#: ../../user_guide/config.rst:521 be82a1494a9f494795d2225e637e1a98
+#: ../../user_guide/config.rst:813 c16f2f8ebb8e4b84813b98972efdfe50
 msgid "See :doc:`../api/config` for complete API documentation."
 msgstr "完整 API 文档请参阅 :doc:`../api/config`。"
 
+#~ msgid "**Integer operations:**"
+#~ msgstr "**整数操作：**"
+
+#~ msgid ""
+#~ "// 32-bit signed\n"
+#~ "config_set_i32(\"app.timeout\", 5000);\n"
+#~ "int32_t timeout;\n"
+#~ "config_get_i32(\"app.timeout\", &timeout, 1000);\n"
+#~ "\n"
+#~ "// 32-bit unsigned\n"
+#~ "config_set_u32(\"app.count\", 100);\n"
+#~ "uint32_t count;\n"
+#~ "config_get_u32(\"app.count\", &count, 0);\n"
+#~ "\n"
+#~ "// 64-bit signed\n"
+#~ "config_set_i64(\"app.timestamp\", 1234567890123LL);\n"
+#~ "int64_t timestamp;\n"
+#~ "config_get_i64(\"app.timestamp\", &timestamp, 0);"
+#~ msgstr ""
+
+#~ msgid "**Float and boolean:**"
+#~ msgstr "**浮点和布尔：**"
+
+#~ msgid ""
+#~ "// Float\n"
+#~ "config_set_float(\"sensor.threshold\", 3.14f);\n"
+#~ "float threshold;\n"
+#~ "config_get_float(\"sensor.threshold\", &threshold, 0.0f);\n"
+#~ "\n"
+#~ "// Boolean\n"
+#~ "config_set_bool(\"app.debug\", true);\n"
+#~ "bool debug;\n"
+#~ "config_get_bool(\"app.debug\", &debug, false);"
+#~ msgstr ""
+
+#~ msgid "**String and blob:**"
+#~ msgstr "**字符串和二进制：**"
+
+#~ msgid ""
+#~ "// String\n"
+#~ "config_set_str(\"app.name\", \"MyApp\");\n"
+#~ "char name[32];\n"
+#~ "config_get_str(\"app.name\", name, sizeof(name));\n"
+#~ "\n"
+#~ "// Get string length\n"
+#~ "size_t len;\n"
+#~ "config_get_str_len(\"app.name\", &len);\n"
+#~ "\n"
+#~ "// Binary blob\n"
+#~ "uint8_t data[] = {0x01, 0x02, 0x03, 0x04};\n"
+#~ "config_set_blob(\"app.data\", data, sizeof(data));\n"
+#~ "\n"
+#~ "uint8_t buffer[64];\n"
+#~ "size_t actual_size;\n"
+#~ "config_get_blob(\"app.data\", buffer, sizeof(buffer), &actual_size);"
+#~ msgstr ""
+
+#~ msgid "For testing and volatile storage:"
+#~ msgstr "用于测试和易失性存储："
+
+#~ msgid ""
+#~ "#include \"config/config_backend.h\"\n"
+#~ "\n"
+#~ "// Create RAM backend\n"
+#~ "config_backend_t* ram = config_backend_ram_create(4096);\n"
+#~ "config_set_backend(ram);\n"
+#~ "\n"
+#~ "// When done\n"
+#~ "config_backend_ram_destroy(ram);"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "// Create Flash backend\n"
+#~ "config_backend_t* flash = config_backend_flash_create(\n"
+#~ "    FLASH_CONFIG_ADDR,    // Flash start address\n"
+#~ "    FLASH_CONFIG_SIZE     // Partition size\n"
+#~ ");\n"
+#~ "config_set_backend(flash);\n"
+#~ "\n"
+#~ "// Load from Flash\n"
+#~ "config_load();\n"
+#~ "\n"
+#~ "// Save to Flash\n"
+#~ "config_commit();"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "static config_status_t my_read(void* ctx, const char* key,\n"
+#~ "                               void* value, size_t* size)\n"
+#~ "{\n"
+#~ "    // Implement read logic\n"
+#~ "    return CONFIG_OK;\n"
+#~ "}\n"
+#~ "\n"
+#~ "static config_status_t my_write(void* ctx, const char* key,\n"
+#~ "                                const void* value, size_t size)\n"
+#~ "{\n"
+#~ "    // Implement write logic\n"
+#~ "    return CONFIG_OK;\n"
+#~ "}\n"
+#~ "\n"
+#~ "static const config_backend_t my_backend = {\n"
+#~ "    .read = my_read,\n"
+#~ "    .write = my_write,\n"
+#~ "    .erase = my_erase,\n"
+#~ "    .commit = my_commit,\n"
+#~ "    .ctx = &my_context\n"
+#~ "};\n"
+#~ "\n"
+#~ "config_set_backend(&my_backend);"
+#~ msgstr ""

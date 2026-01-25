@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 12:00+0000\n"
+"PO-Revision-Date: 2026-01-25 12:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Chinese (Simplified)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: _templates/tutorial_template.rst:2
+msgid "Tutorial Title"
+msgstr "教程标题"
+
+#: _templates/tutorial_template.rst:5
+msgid "Introduction"
+msgstr "简介"
+
+#: _templates/tutorial_template.rst:10
+msgid "Prerequisites"
+msgstr "前提条件"
+
+#: _templates/tutorial_template.rst:15
+msgid "Step 1: Setup"
+msgstr "步骤 1：设置"
+
+#: _templates/tutorial_template.rst:20
+msgid "Step 2: Implementation"
+msgstr "步骤 2：实现"
+
+#: _templates/tutorial_template.rst:25
+msgid "Step 3: Testing"
+msgstr "步骤 3：测试"
+
+#: _templates/tutorial_template.rst:30
+msgid "Conclusion"
+msgstr "总结"
+
+#: _templates/tutorial_template.rst:35
+msgid "Next Steps"
+msgstr "下一步"

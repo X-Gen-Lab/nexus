@@ -1,0 +1,2015 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../user_guide/kconfig_platforms.rst:2 00509557327b4a9aae8c3796508905ae
+msgid "Platform-Specific Configuration Guide"
+msgstr "Platform-Specific 配置 Guide"
+
+#: ../../user_guide/kconfig_platforms.rst:4 f14c45070cd44f1c9ab0bf693cdc4956
+msgid ""
+"This guide provides detailed configuration information for each supported "
+"platform in the Nexus Embedded Platform."
+msgstr "本指南提供 Nexus 嵌入式平台中每个支持平台的详细配置信息。"
+
+#: ../../user_guide/kconfig_platforms.rst:8 83b500a19b324473819b4abad6fd954a
+msgid "Table of Contents"
+msgstr "目录"
+
+#: eb29310430114562b1c72af9a5f00679
+msgid "Overview"
+msgstr "概述"
+
+#: ../../user_guide/kconfig_platforms.rst:13 64c99e2a55f04550bffd98475d4f33a2
+msgid ""
+"The Nexus platform supports multiple hardware platforms, each with unique "
+"characteristics and configuration requirements:"
+msgstr "Nexus 平台支持多个硬件平台，每个平台都有独特的特性和配置要求："
+
+#: ../../user_guide/kconfig_platforms.rst:15 3d3cb3fce3cc4be1b3af075a225c7785
+msgid "**Native**: PC simulation platform for development and testing"
+msgstr "**Native**：用于开发和测试的 PC 仿真平台"
+
+#: ../../user_guide/kconfig_platforms.rst:16 c6d6f1484c6c421e9e2c03f98a968970
+msgid ""
+"**STM32F4**: ARM Cortex-M4 microcontrollers (STM32F407, STM32F429, "
+"STM32F446)"
+msgstr ""
+"**STM32F4**: ARM Cortex-M4 microcontrollers (STM32F407, STM32F429, "
+"STM32F446)"
+
+#: ../../user_guide/kconfig_platforms.rst:17 e0fac6021276429db9f688f559ea520c
+msgid "**STM32H7**: ARM Cortex-M7 microcontrollers (STM32H743, STM32H750)"
+msgstr "**STM32H7**: ARM Cortex-M7 microcontrollers (STM32H743, STM32H750)"
+
+#: ../../user_guide/kconfig_platforms.rst:18 0034ddc217104f04bb16b74f72d8e990
+msgid "**GD32**: GigaDevice microcontrollers (GD32F303, GD32F307)"
+msgstr "**GD32**: GigaDevice microcontrollers (GD32F303, GD32F307)"
+
+#: ../../user_guide/kconfig_platforms.rst:19 133ab36be81547978a04344a21997246
+msgid "**ESP32**: Espressif ESP32 WiFi/Bluetooth SoC"
+msgstr "**ESP32**：Espressif ESP32 WiFi/蓝牙 SoC"
+
+#: ../../user_guide/kconfig_platforms.rst:22 cc7d184a48ca4470bdeacc71f6679662
+msgid "Platform Selection"
+msgstr "平台 Selection"
+
+#: ../../user_guide/kconfig_platforms.rst:24 3e2c6daec91a4fe781493cd7cb66c474
+msgid "Select one platform using the choice menu:"
+msgstr "使用选择菜单选择一个平台："
+
+#: ../../user_guide/kconfig_platforms.rst:26 0bc6901fa9da44cdac3aa96293e9ac95
+msgid ""
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"\n"
+"config PLATFORM_NATIVE\n"
+"    bool \"Native Platform (PC Simulation)\"\n"
+"\n"
+"config PLATFORM_STM32\n"
+"    bool \"STM32 Platform\"\n"
+"\n"
+"config PLATFORM_GD32\n"
+"    bool \"GD32 Platform\"\n"
+"\n"
+"config PLATFORM_ESP32\n"
+"    bool \"ESP32 Platform\"\n"
+"\n"
+"config PLATFORM_NRF52\n"
+"    bool \"NRF52 Platform\"\n"
+"\n"
+"endchoice"
+msgstr ""
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"\n"
+"config PLATFORM_NATIVE\n"
+"    bool \"Native Platform (PC Simulation)\"\n"
+"\n"
+"config PLATFORM_STM32\n"
+"    bool \"STM32 Platform\"\n"
+"\n"
+"config PLATFORM_GD32\n"
+"    bool \"GD32 Platform\"\n"
+"\n"
+"config PLATFORM_ESP32\n"
+"    bool \"ESP32 Platform\"\n"
+"\n"
+"config PLATFORM_NRF52\n"
+"    bool \"NRF52 Platform\"\n"
+"\n"
+"endchoice"
+
+#: ../../user_guide/kconfig_platforms.rst:49 b88232542eaa43c4aef2cfc16d85b54e
+msgid "Only one platform can be selected at a time."
+msgstr "一次只能选择一个平台。"
+
+#: ../../user_guide/kconfig_platforms.rst:53 6c69956666cc4975ab282a5381d3a539
+msgid "Native Platform"
+msgstr "Native 平台"
+
+#: ../../user_guide/kconfig_platforms.rst:58 6ce3ded98970424ba070def06751514d
+msgid ""
+"The Native platform provides PC simulation for development and testing "
+"without hardware. It runs on Windows, Linux, and macOS."
+msgstr "Native 平台提供无需硬件的 PC 仿真，用于开发和测试。它可在 Windows、Linux 和 macOS 上运行。"
+
+#: c51f50c2bef845a1a3cd5c806a5904ce e50dfd45370141d785a6327dcdc7b399
+msgid "**Features:**"
+msgstr "**Features:**"
+
+#: ../../user_guide/kconfig_platforms.rst:62 740716fde5c549d28516459ccdda269a
+msgid "Simulated peripherals (UART, GPIO, SPI, I2C, Timer, ADC)"
+msgstr "Simulated peripherals (UART, GPIO, SPI, I2C, Timer, ADC)"
+
+#: ../../user_guide/kconfig_platforms.rst:63 db88d7a00c124d53a9220e3ab2eb5c5b
+msgid "No hardware required"
+msgstr "无需硬件"
+
+#: ../../user_guide/kconfig_platforms.rst:64 17fa44123345418d81f2f9dbec6e1ae2
+msgid "Fast development iteration"
+msgstr "快速开发迭代"
+
+#: ../../user_guide/kconfig_platforms.rst:65 9e151889326742abb414d531303418bc
+msgid "Cross-platform support"
+msgstr "跨平台支持"
+
+#: ../../user_guide/kconfig_platforms.rst:66 cb098ec3a6764f27a92db56f6e104218
+msgid "Debugging with standard tools (GDB, Visual Studio)"
+msgstr "Debugging with standard tools (GDB, Visual Studio)"
+
+#: 87c38ae9b50d4d3ab73dcaa23907c20c f43e9ec4853f46858734a2ec2a90207e
+msgid "Quick Start"
+msgstr "快速开始"
+
+#: 67ae274b4d5f4d47ab6f4456af08f65c c87302d9148b466aa25874b9ac20b0c3
+msgid "**1. Use default configuration:**"
+msgstr "**1. Use default configuration:**"
+
+#: ../../user_guide/kconfig_platforms.rst:73 135063ee3cfc4c69a8dfcb1d7fc8f0e2
+msgid ""
+"cp platforms/native/defconfig .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+"cp platforms/native/defconfig .config\n"
+"python scripts/kconfig/generate_config.py"
+
+#: bf8f3a941f6e45d6a8226cbaf1d4ff17 e3df724607bd4be3900362cbbb0e8e45
+msgid "**2. Build:**"
+msgstr "**2. Build:**"
+
+#: ../../user_guide/kconfig_platforms.rst:80 3d0176a92d7c478384bccfa09d727968
+msgid ""
+"cmake -B build -DPLATFORM=native\n"
+"cmake --build build"
+msgstr ""
+"cmake -B build -DPLATFORM=native\n"
+"cmake --build build"
+
+#: ../../user_guide/kconfig_platforms.rst:85 037369a307da450db70edafadd6fe6a6
+msgid "**3. Run:**"
+msgstr "**3. Run:**"
+
+#: ../../user_guide/kconfig_platforms.rst:87 ce2e389c98af4f8384f39b7361c56465
+msgid "./build/applications/blinky/blinky"
+msgstr "./build/applications/blinky/blinky"
+
+#: ab190f899fa94de3a6ea371c0f38348d ba88ffa29fe046ae9bad8c943f95a875
+msgid "Platform Configuration"
+msgstr "平台 配置"
+
+#: ../../user_guide/kconfig_platforms.rst:94 c0f7d3a3011048cb81e33f6eed212834
+msgid "**Basic configuration:**"
+msgstr "**Basic configuration:**"
+
+#: ../../user_guide/kconfig_platforms.rst:96 1f8b88b512cd4a22a3d9d2566cb5405b
+msgid ""
+"CONFIG_PLATFORM_NATIVE=y\n"
+"CONFIG_NATIVE_PLATFORM_NAME=\"Native Platform (PC Simulation)\"\n"
+"CONFIG_NATIVE_PLATFORM_VERSION=\"1.0.0\""
+msgstr ""
+"CONFIG_PLATFORM_NATIVE=y\n"
+"CONFIG_NATIVE_PLATFORM_NAME=\"Native Platform (PC Simulation)\"\n"
+"CONFIG_NATIVE_PLATFORM_VERSION=\"1.0.0\""
+
+#: 05e6207abdfd477eb9f2998a703c5327 a17dfd3987f441fdb57e46e37e7e6149
+msgid "**Platform settings:**"
+msgstr "**Platform settings:**"
+
+#: ../../user_guide/kconfig_platforms.rst:104 e49f1b6624854c91a37b6b30af659927
+msgid ""
+"# Logging\n"
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3  # 0=None, 1=Error, 2=Warning, 3=Info, 4=Debug\n"
+"\n"
+"# Statistics\n"
+"CONFIG_NATIVE_ENABLE_STATISTICS=y\n"
+"\n"
+"# Memory alignment\n"
+"CONFIG_NATIVE_BUFFER_ALIGNMENT=4"
+msgstr ""
+"# Logging\n"
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3  # 0=None, 1=Error, 2=Warning, 3=Info, 4=Debug\n"
+"\n"
+"# Statistics\n"
+"CONFIG_NATIVE_ENABLE_STATISTICS=y\n"
+"\n"
+"# Memory alignment\n"
+"CONFIG_NATIVE_BUFFER_ALIGNMENT=4"
+
+#: f6e7d39c604b4991acceb475c69237f9
+msgid "**Resource managers:**"
+msgstr "**Resource managers:**"
+
+#: ../../user_guide/kconfig_platforms.rst:118 652e9b247830492c8127fc4bc31a9b54
+msgid ""
+"CONFIG_NATIVE_DMA_CHANNELS=8\n"
+"CONFIG_NATIVE_ISR_SLOTS=64"
+msgstr ""
+"CONFIG_NATIVE_DMA_CHANNELS=8\n"
+"CONFIG_NATIVE_ISR_SLOTS=64"
+
+#: ../../user_guide/kconfig_platforms.rst:124 1712ed0495c741f5a9b3195916dd2832
+msgid "Supported Peripherals"
+msgstr "支持 Peripherals"
+
+#: ../../user_guide/kconfig_platforms.rst:126 d1b6be2543b74844aaaf9bea7d30cdd3
+msgid "**UART:**"
+msgstr "**UART:**"
+
+#: ../../user_guide/kconfig_platforms.rst:128 41ed1f2a837142d39c5f2eef77a66bf6
+msgid ""
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_NATIVE_UART_MAX_INSTANCES=4\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200"
+msgstr ""
+"CONFIG_NATIVE_UART_ENABLE=y\n"
+"CONFIG_NATIVE_UART_MAX_INSTANCES=4\n"
+"CONFIG_INSTANCE_NX_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200"
+
+#: c94e7fe2649c41f29da01a23a3ccc38f
+msgid "**GPIO:**"
+msgstr "**GPIO:**"
+
+#: ../../user_guide/kconfig_platforms.rst:137 e9c15d710d0c44eba7bdfec527eca21b
+msgid ""
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_GPIOA=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y"
+msgstr ""
+"CONFIG_NATIVE_GPIO_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_GPIOA=y\n"
+"CONFIG_INSTANCE_NX_GPIOA_PIN0=y"
+
+#: 9dd302e93bd641009b7fee06e09e8aa8
+msgid "**SPI:**"
+msgstr "**SPI:**"
+
+#: ../../user_guide/kconfig_platforms.rst:145 7322ec0bc797451eac130e72cd10aa51
+msgid ""
+"CONFIG_NATIVE_SPI_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_SPI_0=y\n"
+"CONFIG_SPI0_MAX_SPEED=1000000"
+msgstr ""
+"CONFIG_NATIVE_SPI_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_SPI_0=y\n"
+"CONFIG_SPI0_MAX_SPEED=1000000"
+
+#: 9c1191a8f1d945deb317fa6ab18a4119
+msgid "**I2C:**"
+msgstr "**I2C:**"
+
+#: ../../user_guide/kconfig_platforms.rst:153 dc757c8cc5144ed9a6ce0de3d9a0720c
+msgid ""
+"CONFIG_NATIVE_I2C_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_I2C_0=y\n"
+"CONFIG_NX_I2C0_SPEED_FAST=y"
+msgstr ""
+"CONFIG_NATIVE_I2C_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_I2C_0=y\n"
+"CONFIG_NX_I2C0_SPEED_FAST=y"
+
+#: a541eb4598bd4ddb9f2a81e2e4889ab5
+msgid "**Timer:**"
+msgstr "**Timer:**"
+
+#: ../../user_guide/kconfig_platforms.rst:161 1885e8331a754e64b7a8cece07215352
+msgid ""
+"CONFIG_NATIVE_TIMER_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_TIMER_0=y\n"
+"CONFIG_TIMER0_FREQUENCY=1000000"
+msgstr ""
+"CONFIG_NATIVE_TIMER_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_TIMER_0=y\n"
+"CONFIG_TIMER0_FREQUENCY=1000000"
+
+#: ../../user_guide/kconfig_platforms.rst:167 0e30ef136a07441a955bb09e6289d2d1
+msgid "**ADC:**"
+msgstr "**ADC:**"
+
+#: ../../user_guide/kconfig_platforms.rst:169 8f939f00ec7f456ca6ffb5be19959657
+msgid ""
+"CONFIG_NATIVE_ADC_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_ADC_0=y\n"
+"CONFIG_NX_ADC0_RESOLUTION_12=y"
+msgstr ""
+"CONFIG_NATIVE_ADC_ENABLE=y\n"
+"CONFIG_INSTANCE_NX_ADC_0=y\n"
+"CONFIG_NX_ADC0_RESOLUTION_12=y"
+
+#: b0df9cfa9d954f9c87fe5a62d3cf5562 d7f61e80243842ae8302cd15d0243b9f
+msgid "OSAL Configuration"
+msgstr "OSAL 配置"
+
+#: ../../user_guide/kconfig_platforms.rst:178 8fd590cf7f5e4cecaa518cc86e49cc6f
+msgid "**Native OSAL backend:**"
+msgstr "**Native OSAL backend:**"
+
+#: ../../user_guide/kconfig_platforms.rst:180 837c301655e141ee9197f2e6decff6b2
+msgid ""
+"CONFIG_OSAL_NATIVE=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"native\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+msgstr ""
+"CONFIG_OSAL_NATIVE=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"native\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+
+#: ../../user_guide/kconfig_platforms.rst:188 9515d3a6f79a4e14bc695517672a7120
+msgid "**Alternative: FreeRTOS on Native:**"
+msgstr "**Alternative: FreeRTOS on Native:**"
+
+#: ../../user_guide/kconfig_platforms.rst:190 9b2b0cb0dc54403f99b6c27e59b6002f
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768"
+
+#: 7964e463dc9049e4979c1b050e3b20a3 97b749521049471aaa9759dae2391117
+msgid "Limitations"
+msgstr "限制"
+
+#: ../../user_guide/kconfig_platforms.rst:200 6da46e93c3534a37bed5028a7495b341
+msgid "Simulated peripherals don't match real hardware timing"
+msgstr "模拟外设与实际硬件时序不匹配"
+
+#: ../../user_guide/kconfig_platforms.rst:201 569ef15f766349fbba390ace1486995e
+msgid "No real interrupt latency"
+msgstr "无真实中断延迟"
+
+#: ../../user_guide/kconfig_platforms.rst:202 912f6b812e1f4268af85b42cac3d219b
+msgid "No power management"
+msgstr "无电源管理"
+
+#: ../../user_guide/kconfig_platforms.rst:203 b578e2db300f4780bb492a1c23328573
+msgid "No hardware-specific features"
+msgstr "无硬件特定功能"
+
+#: a276d72c8fd24d8e889a2d94278e029c dbc9ea35869c472890e4c76bf8a60e63
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../user_guide/kconfig_platforms.rst:208 fab3e2787d6e449da393ab6b78c88a19
+msgid "Use Native platform for algorithm development"
+msgstr "使用本地平台进行算法开发"
+
+#: ../../user_guide/kconfig_platforms.rst:209 21636c2f1cc94e53bc05c27a5637acba
+msgid "Test hardware-independent code"
+msgstr "测试 hardware-independent code"
+
+#: ../../user_guide/kconfig_platforms.rst:210 3381b9b3ac494fc98b9afd44b6c30421
+msgid "Validate configuration before hardware deployment"
+msgstr "在硬件部署前验证配置"
+
+#: ../../user_guide/kconfig_platforms.rst:211 4adb8dddba3d4cbca2115ab232f2a320
+msgid "Use for CI/CD testing"
+msgstr "用于 CI/CD 测试"
+
+#: ../../user_guide/kconfig_platforms.rst:215 6791404b343d4b6f96ef9b3ddce86c05
+msgid "STM32F4 Platform"
+msgstr "STM32F4 平台"
+
+#: ../../user_guide/kconfig_platforms.rst:220 d5bfbdb0e6414a62af5d832573a8ca1d
+msgid ""
+"The STM32F4 platform supports STMicroelectronics STM32F4 series ARM "
+"Cortex-M4 microcontrollers."
+msgstr "STM32F4 平台支持 STMicroelectronics STM32F4 系列 ARM Cortex-M4 微控制器。"
+
+#: be353dc0744843c29e585d46da574716 c7e21f4157cf4b0f85a9f97fe7a91ea8
+msgid "**Supported Variants:**"
+msgstr "**Supported Variants:**"
+
+#: ../../user_guide/kconfig_platforms.rst:224 0280f1c0097249b29643366758e5796a
+msgid "STM32F407: 168 MHz, 1 MB Flash, 192 KB RAM"
+msgstr "STM32F407：168 MHz，1 MB Flash，192 KB RAM"
+
+#: ../../user_guide/kconfig_platforms.rst:225 4cc83552e33141e287d5903b4a3c0d0c
+msgid "STM32F429: 180 MHz, 2 MB Flash, 256 KB RAM"
+msgstr "STM32F429：180 MHz，2 MB Flash，256 KB RAM"
+
+#: ../../user_guide/kconfig_platforms.rst:226 892140a02ba1493789cdfdcd7a03e3d5
+msgid "STM32F446: 180 MHz, 512 KB Flash, 128 KB RAM"
+msgstr "STM32F446：180 MHz，512 KB Flash，128 KB RAM"
+
+#: ../../user_guide/kconfig_platforms.rst:230 0f2e39e761b6436db91a05bcbdb6a66a
+msgid "ARM Cortex-M4 with FPU"
+msgstr "带 FPU 的 ARM Cortex-M4"
+
+#: ../../user_guide/kconfig_platforms.rst:231 689cc0aef362424c8aecac07db801306
+msgid "Up to 180 MHz"
+msgstr "最高 180 MHz"
+
+#: a4dfe9e63e08410eb29ebcc1648deb70
+msgid "Rich peripheral set"
+msgstr "丰富的外设集"
+
+#: 2e0a3468ea484e25aa0025cb71d8cc17
+msgid "DMA support"
+msgstr "DMA 支持"
+
+#: ../../user_guide/kconfig_platforms.rst:234 dcc63df1398945aaad6ade084c26142c
+msgid "Low power modes"
+msgstr "低功耗模式"
+
+#: ../../user_guide/kconfig_platforms.rst:241 9ec0308472cf4a0980f78698414358ee
+msgid ""
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:248 e90609e4fcc84fb58ac0fb9ca48f60b4
+msgid ""
+"cmake -B build -DPLATFORM=stm32 -DCHIP=STM32F407\n"
+"cmake --build build"
+msgstr ""
+"cmake -B build -DPLATFORM=stm32 -DCHIP=STM32F407\n"
+"cmake --build build"
+
+#: c1cb1063b50c41b9a9bdd7e10a88a93b
+msgid "**3. Flash:**"
+msgstr "**3. Flash:**"
+
+#: ../../user_guide/kconfig_platforms.rst:255 cceb5a002a3d4af9b296801cf7530907
+msgid ""
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build/applications/blinky/blinky.elf verify reset exit\""
+msgstr ""
+
+#: 3c48a29d28fc4eb59b5cd4a5e98a4e60 94a3d095129f42eba04201bdee3c1313
+msgid "**Platform selection:**"
+msgstr "**Platform selection:**"
+
+#: bc3a21798b7e46e69abc89d9ce146814
+msgid ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32_PLATFORM_NAME=\"STM32 Platform\"\n"
+"CONFIG_STM32_PLATFORM_VERSION=\"1.0.0\""
+msgstr ""
+"CONFIG_PLATFORM_STM32=y\n"
+"CONFIG_STM32_PLATFORM_NAME=\"STM32 Platform\"\n"
+"CONFIG_STM32_PLATFORM_VERSION=\"1.0.0\""
+
+#: 4e7d0705cacd4ce983c2bc55d5e2dc48 97d010d43ed5454c8c955723add84471
+msgid "**Chip selection:**"
+msgstr "**Chip selection:**"
+
+#: ../../user_guide/kconfig_platforms.rst:273 55c384866cb94cd2ab7ec60059e091a5
+msgid ""
+"# Chip family\n"
+"CONFIG_STM32F4=y\n"
+"\n"
+"# Chip variant\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32F407xx\""
+msgstr ""
+"# Chip family\n"
+"CONFIG_STM32F4=y\n"
+"\n"
+"# Chip variant\n"
+"CONFIG_STM32F407=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32F407xx\""
+
+#: e2bf969272104578a0736b25dfb5c8c9
+msgid ""
+"CONFIG_STM32_ENABLE_LOGGING=y\n"
+"CONFIG_STM32_LOG_LEVEL=3\n"
+"CONFIG_STM32_ENABLE_STATISTICS=y\n"
+"CONFIG_STM32_BUFFER_ALIGNMENT=4"
+msgstr ""
+"CONFIG_STM32_ENABLE_LOGGING=y\n"
+"CONFIG_STM32_LOG_LEVEL=3\n"
+"CONFIG_STM32_ENABLE_STATISTICS=y\n"
+"CONFIG_STM32_BUFFER_ALIGNMENT=4"
+
+#: ../../user_guide/kconfig_platforms.rst:293 dcb106430cb848e2b0e58e854feaf9d6
+msgid ""
+"CONFIG_STM32_DMA_CHANNELS=8\n"
+"CONFIG_STM32_ISR_SLOTS=64"
+msgstr ""
+"CONFIG_STM32_DMA_CHANNELS=8\n"
+"CONFIG_STM32_ISR_SLOTS=64"
+
+#: 6aad97c000a4473bb554044f853fcf0b 887dfed08954432599a9663040d5d0f3
+msgid "Memory Configuration"
+msgstr "Memory 配置"
+
+#: ../../user_guide/kconfig_platforms.rst:301 b458f708c4f5488ab870f8db94d74e96
+msgid "**STM32F407 memory layout:**"
+msgstr "**STM32F407 memory layout:**"
+
+#: ../../user_guide/kconfig_platforms.rst:303 e87d2c85b5b34a2881504a2a7fd5837b
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00020000      # 128 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00100000    # 1 MB"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00020000      # 128 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00100000    # 1 MB"
+
+#: ../../user_guide/kconfig_platforms.rst:310 0f73ae318a874172a4849c4b0bd743da
+msgid "**STM32F429 memory layout:**"
+msgstr "**STM32F429 memory layout:**"
+
+#: ../../user_guide/kconfig_platforms.rst:312 77f7d1f5f3e5492381e5978de20e89e6
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00030000      # 192 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00200000    # 2 MB"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00030000      # 192 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00200000    # 2 MB"
+
+#: ../../user_guide/kconfig_platforms.rst:319 270b043cba184d3db8663a8f8d0053b8
+msgid "**STM32F446 memory layout:**"
+msgstr "**STM32F446 memory layout:**"
+
+#: ../../user_guide/kconfig_platforms.rst:321 ab611425aaf14a528289175553926c5c
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00020000      # 128 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00080000    # 512 KB"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00020000      # 128 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00080000    # 512 KB"
+
+#: b1a9b93a75b44fa5a32952ce129b8e76
+msgid "Peripheral Configuration"
+msgstr "外设 配置"
+
+#: ced4b66d09034a47ae612db899cbb6d5
+msgid "**UART with DMA:**"
+msgstr "**UART with DMA:**"
+
+#: ../../user_guide/kconfig_platforms.rst:333 be96696accc9465baa91e4ae4e8c2b98
+msgid ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_STM32_UART_MAX_INSTANCES=6\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y\n"
+"CONFIG_UART1_DMA_TX_CHANNEL=4\n"
+"CONFIG_UART1_DMA_RX_CHANNEL=5\n"
+"CONFIG_UART1_TX_PIN=9\n"
+"CONFIG_UART1_RX_PIN=10\n"
+"CONFIG_UART1_TX_PORT=\"GPIOA\"\n"
+"CONFIG_UART1_RX_PORT=\"GPIOA\""
+msgstr ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_STM32_UART_MAX_INSTANCES=6\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y\n"
+"CONFIG_UART1_DMA_TX_CHANNEL=4\n"
+"CONFIG_UART1_DMA_RX_CHANNEL=5\n"
+"CONFIG_UART1_TX_PIN=9\n"
+"CONFIG_UART1_RX_PIN=10\n"
+"CONFIG_UART1_TX_PORT=\"GPIOA\"\n"
+"CONFIG_UART1_RX_PORT=\"GPIOA\""
+
+#: ../../user_guide/kconfig_platforms.rst:349 603748cad8734a208bc05224e06d4849
+msgid "CONFIG_STM32_GPIO_ENABLE=y"
+msgstr "CONFIG_STM32_GPIO_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:355 4c6921ae5d6e44adacb9e69c4ce1f895
+msgid "CONFIG_STM32_SPI_ENABLE=y"
+msgstr "CONFIG_STM32_SPI_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:361 df467287701d46e19d120ba166471ecf
+msgid "CONFIG_STM32_I2C_ENABLE=y"
+msgstr "CONFIG_STM32_I2C_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:367 717c2f9bf4ae466380f160b9a6797e26
+msgid "CONFIG_STM32_TIMER_ENABLE=y"
+msgstr "CONFIG_STM32_TIMER_ENABLE=y"
+
+#: a296fc988d984b66a4ba74e9ca008f6a
+msgid "**FreeRTOS (recommended):**"
+msgstr "**FreeRTOS (recommended):**"
+
+#: f03da458d6f54d7ebd7b8836441b39dd
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_platforms.rst:385 e671ed1bd3574d47be406ec0eed34153
+msgid "**Bare-metal:**"
+msgstr "**Bare-metal:**"
+
+#: ../../user_guide/kconfig_platforms.rst:387 8a963cde0dba477d863527f38280cd3b
+msgid ""
+"CONFIG_OSAL_BAREMETAL=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"baremetal\"\n"
+"CONFIG_OSAL_HEAP_SIZE=16384"
+msgstr ""
+"CONFIG_OSAL_BAREMETAL=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"baremetal\"\n"
+"CONFIG_OSAL_HEAP_SIZE=16384"
+
+#: 58e846d66d184fb2a08e6be3883c9133
+msgid "Clock Configuration"
+msgstr "时钟 配置"
+
+#: ../../user_guide/kconfig_platforms.rst:396 3c290e1cce6c4541a315f71b946d8277
+msgid "**STM32F407 (168 MHz):**"
+msgstr "**STM32F407 (168 MHz):**"
+
+#: 786566d90b92457091011d50d01c501a
+msgid "HSE: 8 MHz external crystal"
+msgstr "HSE：8 MHz 外部晶振"
+
+#: ../../user_guide/kconfig_platforms.rst:399 36e7dbdae5da4e2cbc28ed6e1dbb6778
+msgid "PLL: 168 MHz system clock"
+msgstr "PLL：168 MHz 系统时钟"
+
+#: ../../user_guide/kconfig_platforms.rst:400 c1891fcac50544258cbb73fee47e002b
+msgid "AHB: 168 MHz"
+msgstr "AHB：168 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:401 cd3ee35485724d5084f582cb04d4ee72
+msgid "APB1: 42 MHz"
+msgstr "APB1：42 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:402 e8dd5768e37b4555bceb53f6216a4139
+msgid "APB2: 84 MHz"
+msgstr "APB2：84 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:404 fd687271f0a2481bb9944fefa6367952
+msgid "**STM32F429 (180 MHz):**"
+msgstr "**STM32F429 (180 MHz):**"
+
+#: ../../user_guide/kconfig_platforms.rst:407 7f97a084729b475ab4aaf5e0573f1fce
+msgid "PLL: 180 MHz system clock"
+msgstr "PLL：180 MHz 系统时钟"
+
+#: ../../user_guide/kconfig_platforms.rst:408 995f9f2e16c2446da56e4e45af0d5b75
+msgid "AHB: 180 MHz"
+msgstr "AHB：180 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:409 ba72c19386144112bfd247e3dd36a19d
+msgid "APB1: 45 MHz"
+msgstr "APB1：45 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:410 2b63e57e67644db49938ace127342e1a
+msgid "APB2: 90 MHz"
+msgstr "APB2：90 MHz"
+
+#: 63d6940429ae453293ed6e2b18c6183b
+msgid "Development Boards"
+msgstr "开发 Boards"
+
+#: ../../user_guide/kconfig_platforms.rst:415 af189a213aa94142a79647519e8254bd
+msgid "**STM32F407 Discovery:**"
+msgstr "**STM32F407 Discovery:**"
+
+#: ../../user_guide/kconfig_platforms.rst:417 687b864ec4024faca4aabcc797af52d5
+msgid "STM32F407VGT6"
+msgstr "STM32F407VGT6"
+
+#: ca4ccf03d8714b168ca9dfc3706d83f6
+msgid "8 MHz HSE"
+msgstr "8 MHz HSE"
+
+#: ../../user_guide/kconfig_platforms.rst:419 eb40d30c20e440198f3e634c3372dfcc
+msgid "ST-LINK/V2 debugger"
+msgstr "ST-LINK/V2 调试器"
+
+#: ../../user_guide/kconfig_platforms.rst:420 9abfa4107df74d658736bef0ad0f5af0
+msgid "LEDs on PD12-PD15"
+msgstr "PD12-PD15 上的 LED"
+
+#: ../../user_guide/kconfig_platforms.rst:421 c9a208678d3543028214905d739cb18f
+msgid "User button on PA0"
+msgstr "PA0 上的用户按钮"
+
+#: ../../user_guide/kconfig_platforms.rst:423 53ce4a036bce413e9d234c2d64bb964c
+msgid "**STM32F429 Discovery:**"
+msgstr "**STM32F429 Discovery:**"
+
+#: ../../user_guide/kconfig_platforms.rst:425 873c2503eb9245a3b7f094cc12b10259
+msgid "STM32F429ZIT6"
+msgstr "STM32F429ZIT6"
+
+#: ../../user_guide/kconfig_platforms.rst:427 339ccffb60d24edb96968eec04dd6390
+msgid "ST-LINK/V2-B debugger"
+msgstr "ST-LINK/V2-B 调试器"
+
+#: ../../user_guide/kconfig_platforms.rst:428 04656c39b4334bcca4346d10c30e4b49
+msgid "2.4\" LCD display"
+msgstr "2.4\" LCD 显示屏"
+
+#: ../../user_guide/kconfig_platforms.rst:429 1be1b61d674245599a0dc0a3039c7f8b
+msgid "LEDs on PG13-PG14"
+msgstr "PG13-PG14 上的 LED"
+
+#: 88b4c10fbf414899803fb5a7e4b43cfd
+msgid "Debugging"
+msgstr "调试"
+
+#: 67b905593c75451da284e2d806c495bb
+msgid "**OpenOCD:**"
+msgstr "**OpenOCD:**"
+
+#: ../../user_guide/kconfig_platforms.rst:436 e55bb620c2dd4ed2a1b3c5f8c1fd8251
+msgid "openocd -f interface/stlink.cfg -f target/stm32f4x.cfg"
+msgstr "openocd -f interface/stlink.cfg -f target/stm32f4x.cfg"
+
+#: b6b2741042934bd899b361ba8f6bbdf2
+msgid "**GDB:**"
+msgstr "**GDB:**"
+
+#: 89b9380fdf5744918a264c7720a3a614
+msgid ""
+"arm-none-eabi-gdb build/applications/blinky/blinky.elf\n"
+"(gdb) target remote localhost:3333\n"
+"(gdb) monitor reset halt\n"
+"(gdb) load\n"
+"(gdb) continue"
+msgstr ""
+"arm-none-eabi-gdb build/applications/blinky/blinky.elf\n"
+"(gdb) target remote localhost:3333\n"
+"(gdb) monitor reset halt\n"
+"(gdb) load\n"
+"(gdb) continue"
+
+#: ../../user_guide/kconfig_platforms.rst:450 64767c7674544335a8e6043c8dbe6e4b
+msgid "**ST-LINK Utility:**"
+msgstr "**ST-LINK Utility:**"
+
+#: ../../user_guide/kconfig_platforms.rst:452 7afc0f9cfc5f4cf0be55b0f771b2362c
+msgid "Use ST-LINK Utility for flashing"
+msgstr "使用 ST-LINK Utility 进行烧录"
+
+#: ../../user_guide/kconfig_platforms.rst:453 c9e432f2125f4a90ba2a493164fdb20f
+msgid "Supports mass erase and option bytes"
+msgstr "支持批量擦除和选项字节"
+
+#: ../../user_guide/kconfig_platforms.rst:458 8231ea3279694bf18c20a3ffcc5eb7cc
+msgid "Maximum 180 MHz clock"
+msgstr "最大 180 MHz 时钟"
+
+#: ../../user_guide/kconfig_platforms.rst:459 b5fb39ca507249bdbf47ad7622e33dd7
+msgid "Limited RAM compared to STM32H7"
+msgstr "与 STM32H7 相比 RAM 有限"
+
+#: ../../user_guide/kconfig_platforms.rst:460 d477d9cbefdc40858fd9df75ab0d3a36
+msgid "No cache (except STM32F429)"
+msgstr "No cache (except STM32F429)"
+
+#: ../../user_guide/kconfig_platforms.rst:461 c98d97e22051469e95a9573a0e5e359b
+msgid "Single-precision FPU only"
+msgstr "仅单精度 FPU"
+
+#: ../../user_guide/kconfig_platforms.rst:466 837c4a5ae0364dc2b724d78711113825
+msgid "Use DMA for high-throughput peripherals"
+msgstr "对高吞吐量外设使用 DMA"
+
+#: ../../user_guide/kconfig_platforms.rst:467 88ccc89b12184b94919ce617c373c20a
+msgid "Enable FPU for floating-point operations"
+msgstr "为浮点运算启用 FPU"
+
+#: ../../user_guide/kconfig_platforms.rst:468 1573200570b84eb089547df346ff89a1
+msgid "Configure clock tree carefully"
+msgstr "仔细配置时钟树"
+
+#: 3b1faf444e464bfb92c188f6bff514c5
+msgid "Use appropriate power modes"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:470 235231eadb1a43a1ab4b570a253c3d5f
+msgid "Validate pin assignments with datasheet"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:474 31af8fac92b34f37858b5f3b79b62409
+msgid "STM32H7 Platform"
+msgstr "STM32H7 平台"
+
+#: ../../user_guide/kconfig_platforms.rst:479 45c6a73c68ba41a19c81fe8953244131
+msgid ""
+"The STM32H7 platform supports STMicroelectronics STM32H7 series ARM "
+"Cortex-M7 microcontrollers."
+msgstr "STM32H7 平台支持 STMicroelectronics STM32H7 系列 ARM Cortex-M7 微控制器。"
+
+#: ../../user_guide/kconfig_platforms.rst:483 36e7b437f0c24c5eba1bb151fc848613
+msgid "STM32H743: 480 MHz, 2 MB Flash, 1 MB RAM"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:484 aff51c378190496ca9ad9e7cf1a37a19
+msgid "STM32H750: 480 MHz, 128 KB Flash, 1 MB RAM (bootloader variant)"
+msgstr "STM32H750: 480 MHz, 128 KB Flash, 1 MB RAM (bootloader variant)"
+
+#: ../../user_guide/kconfig_platforms.rst:488 66b060d70f324f66972d0dd832616394
+msgid "ARM Cortex-M7 with double-precision FPU"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:489 2119db32558344dab797370efc3fdd94
+msgid "Up to 480 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:490 bd644a5d7cfb43a1906a348a21baa1f0
+msgid "Large RAM (up to 1 MB)"
+msgstr "Large RAM (up to 1 MB)"
+
+#: ../../user_guide/kconfig_platforms.rst:491 b9ffd455a85c47cc9f5053c0f238e74d
+msgid "Advanced peripherals"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:492 c5f1b39a5a334e0c9f4d07f348462847
+msgid "Dual-bank Flash"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:493 61846ac8864d40bb8f79d62e9e59588c
+msgid "Hardware crypto accelerator"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:494 6832fcb7be9446c0b42796a0e628fdea
+msgid "Cache (I-Cache, D-Cache)"
+msgstr "Cache (I-Cache, D-Cache)"
+
+#: ../../user_guide/kconfig_platforms.rst:501 542896e9fc864a1faf1320b163048a56
+msgid ""
+"cp platforms/stm32/defconfig_stm32h7 .config\n"
+"python scripts/kconfig/generate_config.py"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:508 8df326443548441cb546c0395ba7be4b
+msgid ""
+"cmake -B build -DPLATFORM=stm32 -DCHIP=STM32H743\n"
+"cmake --build build"
+msgstr ""
+"cmake -B build -DPLATFORM=stm32 -DCHIP=STM32H743\n"
+"cmake --build build"
+
+#: ../../user_guide/kconfig_platforms.rst:515 641b8af2693c47bca087c57da021cb9b
+msgid ""
+"openocd -f interface/stlink.cfg -f target/stm32h7x.cfg \\\n"
+"    -c \"program build/applications/blinky/blinky.elf verify reset exit\""
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:533 d4401d5c6cfc497eaf2fbaabd4ceacfc
+msgid ""
+"# Chip family\n"
+"CONFIG_STM32H7=y\n"
+"\n"
+"# Chip variant\n"
+"CONFIG_STM32H743=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32H743xx\""
+msgstr ""
+"# Chip family\n"
+"CONFIG_STM32H7=y\n"
+"\n"
+"# Chip variant\n"
+"CONFIG_STM32H743=y\n"
+"CONFIG_STM32_CHIP_NAME=\"STM32H743xx\""
+
+#: ../../user_guide/kconfig_platforms.rst:554 c283bf0f34c341ebba1517b540029a75
+msgid "**STM32H743 memory layout:**"
+msgstr "**STM32H743 memory layout:**"
+
+#: ../../user_guide/kconfig_platforms.rst:556 f9f9acabbade4f4990bd69cf7c37b6dd
+msgid ""
+"# DTCM RAM (64 KB) - fastest, for stack and critical data\n"
+"CONFIG_LINKER_DTCM_START=0x20000000\n"
+"CONFIG_LINKER_DTCM_SIZE=0x00010000\n"
+"\n"
+"# AXI SRAM (512 KB) - main RAM\n"
+"CONFIG_LINKER_RAM_START=0x24000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00080000\n"
+"\n"
+"# SRAM1 (128 KB)\n"
+"CONFIG_LINKER_SRAM1_START=0x30000000\n"
+"CONFIG_LINKER_SRAM1_SIZE=0x00020000\n"
+"\n"
+"# SRAM2 (128 KB)\n"
+"CONFIG_LINKER_SRAM2_START=0x30020000\n"
+"CONFIG_LINKER_SRAM2_SIZE=0x00020000\n"
+"\n"
+"# SRAM3 (32 KB)\n"
+"CONFIG_LINKER_SRAM3_START=0x30040000\n"
+"CONFIG_LINKER_SRAM3_SIZE=0x00008000\n"
+"\n"
+"# SRAM4 (64 KB) - backup domain\n"
+"CONFIG_LINKER_SRAM4_START=0x38000000\n"
+"CONFIG_LINKER_SRAM4_SIZE=0x00010000\n"
+"\n"
+"# Flash (2 MB, dual-bank)\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00200000"
+msgstr ""
+"# DTCM RAM (64 KB) - fastest, for stack and critical data\n"
+"CONFIG_LINKER_DTCM_START=0x20000000\n"
+"CONFIG_LINKER_DTCM_SIZE=0x00010000\n"
+"\n"
+"# AXI SRAM (512 KB) - main RAM\n"
+"CONFIG_LINKER_RAM_START=0x24000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00080000\n"
+"\n"
+"# SRAM1 (128 KB)\n"
+"CONFIG_LINKER_SRAM1_START=0x30000000\n"
+"CONFIG_LINKER_SRAM1_SIZE=0x00020000\n"
+"\n"
+"# SRAM2 (128 KB)\n"
+"CONFIG_LINKER_SRAM2_START=0x30020000\n"
+"CONFIG_LINKER_SRAM2_SIZE=0x00020000\n"
+"\n"
+"# SRAM3 (32 KB)\n"
+"CONFIG_LINKER_SRAM3_START=0x30040000\n"
+"CONFIG_LINKER_SRAM3_SIZE=0x00008000\n"
+"\n"
+"# SRAM4 (64 KB) - backup domain\n"
+"CONFIG_LINKER_SRAM4_START=0x38000000\n"
+"CONFIG_LINKER_SRAM4_SIZE=0x00010000\n"
+"\n"
+"# Flash (2 MB, dual-bank)\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00200000"
+
+#: ../../user_guide/kconfig_platforms.rst:586 b0ccdcbb21fa49679d0a1a1295e34cf6
+msgid "**STM32H750 memory layout:**"
+msgstr "**STM32H750 memory layout:**"
+
+#: ../../user_guide/kconfig_platforms.rst:588 cdc488208b2f43dca41e4dfe49c272e1
+msgid ""
+"# Same RAM as STM32H743\n"
+"CONFIG_LINKER_RAM_START=0x24000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00080000\n"
+"\n"
+"# Smaller Flash (128 KB)\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00020000"
+msgstr ""
+"# Same RAM as STM32H743\n"
+"CONFIG_LINKER_RAM_START=0x24000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00080000\n"
+"\n"
+"# Smaller Flash (128 KB)\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00020000"
+
+#: ../../user_guide/kconfig_platforms.rst:599 4fc53f08d490474f8155d6d4c15570e2
+msgid "Memory Regions"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:601 8b1b80ee8bed4a76af1504caad3aeddc
+msgid "**DTCM (Data Tightly Coupled Memory):**"
+msgstr "**DTCM (Data Tightly Coupled Memory):**"
+
+#: 8ccc1ad63c204feab8493b85bb408c9a
+msgid "64 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:604 1de26fd778664c299cec1b677d1bfb52
+msgid "Zero wait state"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:605 c651c19d79d34afba56dad3113c612e3
+msgid "Best for stack and frequently accessed data"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:606 b4a2cef86cf14b97aaed17202f0275be
+msgid "Not accessible by DMA"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:608 1474d3d743304b29bdfd873616e64e7f
+msgid "**AXI SRAM:**"
+msgstr "**AXI SRAM:**"
+
+#: ../../user_guide/kconfig_platforms.rst:610 1821c21443a94641a5f6fb0c6115c704
+msgid "512 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:611 7e14dd1b2ade401bb1b4a982978a09b7
+msgid "Main application RAM"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:612 425c89046257428c95a9eda276826697
+msgid "Accessible by all masters"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:613 94074afc6cef46caa1e001a7eaa2a8fe
+msgid "Use for general purpose"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:615 c7c71c0f23c642feb1fd7284e2dbd847
+msgid "**SRAM1/2/3:**"
+msgstr "**SRAM1/2/3:**"
+
+#: ../../user_guide/kconfig_platforms.rst:617 b16b28523234449d89a119a528016f10
+msgid "128 KB + 128 KB + 32 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:618 ccfc205f7fe44868b6e2946e9c3fb18c
+msgid "Accessible by DMA"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:619 59618de9c15244a49b330d852a590e87
+msgid "Use for DMA buffers"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:621 64b7aab66570471eaff9137e2fd91d45
+msgid "**SRAM4:**"
+msgstr "**SRAM4:**"
+
+#: ../../user_guide/kconfig_platforms.rst:624 3976887d22084d5bb729a27e1ddd762d
+msgid "Backup domain"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:625 3be0d0392457483a9fc56497acd76bc6
+msgid "Retained in standby mode"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:626 a791c84d343c41e6843876639beed186
+msgid "Use for persistent data"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:633 b5a5afb3620843589f54dbf19876a019
+msgid ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y\n"
+"CONFIG_UART1_DMA_TX_CHANNEL=4\n"
+"CONFIG_UART1_DMA_RX_CHANNEL=5"
+msgstr ""
+"CONFIG_STM32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_UART_1=y\n"
+"CONFIG_UART1_BAUDRATE=115200\n"
+"CONFIG_UART1_MODE_DMA=y\n"
+"CONFIG_UART1_DMA_TX_CHANNEL=4\n"
+"CONFIG_UART1_DMA_RX_CHANNEL=5"
+
+#: ../../user_guide/kconfig_platforms.rst:642 90238db22b8449edb9b65543e630b532
+msgid "**High-speed SPI:**"
+msgstr "**High-speed SPI:**"
+
+#: ../../user_guide/kconfig_platforms.rst:644 1d67ab4cd89b482baddaae216d9222d8
+msgid ""
+"CONFIG_STM32_SPI_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_SPI_1=y\n"
+"CONFIG_SPI1_MAX_SPEED=50000000  # 50 MHz"
+msgstr ""
+"CONFIG_STM32_SPI_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_SPI_1=y\n"
+"CONFIG_SPI1_MAX_SPEED=50000000  # 50 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:650 d536bac0f4ed4cf487bdc963674ddd05
+msgid "**Fast I2C:**"
+msgstr "**Fast I2C:**"
+
+#: ../../user_guide/kconfig_platforms.rst:652 659d6b6f0a5f4affb7b9ba69bcd56e20
+msgid ""
+"CONFIG_STM32_I2C_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_I2C_1=y\n"
+"CONFIG_NX_I2C1_SPEED_FAST_PLUS=y  # 1 MHz"
+msgstr ""
+"CONFIG_STM32_I2C_ENABLE=y\n"
+"CONFIG_INSTANCE_STM32_I2C_1=y\n"
+"CONFIG_NX_I2C1_SPEED_FAST_PLUS=y  # 1 MHz"
+
+#: ../../user_guide/kconfig_platforms.rst:675 c2e457400f67453f9eeec2fff49971dc
+msgid "**STM32H743 (480 MHz):**"
+msgstr "**STM32H743 (480 MHz):**"
+
+#: ../../user_guide/kconfig_platforms.rst:677 7515547c7f674cd18212ac48a37739a5
+msgid "HSE: 25 MHz external crystal"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:678 2ceef6b6827a43529702a6a7f3fe7b6f
+msgid "PLL1: 480 MHz system clock"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:679 66e9559a967744f799d4a36ae0cb9aa6
+msgid "AHB: 240 MHz (with divider)"
+msgstr "AHB: 240 MHz (with divider)"
+
+#: ../../user_guide/kconfig_platforms.rst:680 9797385c286e4a32914840f3b4092a2f
+msgid "APB1: 120 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:681 73f8fb638a0f4ee698d509a2208f38c4
+msgid "APB2: 120 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:682 5427eafbeeae4ad9861c9a54572722a9
+msgid "APB3: 120 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:683 9519fd80e85f4f68afc3476e96b3c460
+msgid "APB4: 120 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:685 ae045e4ecdab47f3982f9e67e12ef412
+msgid "**Clock domains:**"
+msgstr "**Clock domains:**"
+
+#: ../../user_guide/kconfig_platforms.rst:687 d16b478e441845fd8981630000736e42
+msgid "sys_ck: 480 MHz (CPU)"
+msgstr "sys_ck: 480 MHz (CPU)"
+
+#: ../../user_guide/kconfig_platforms.rst:688 efe779cb862a479c9942348a21d68e5f
+msgid "hclk: 240 MHz (AHB)"
+msgstr "hclk: 240 MHz (AHB)"
+
+#: ../../user_guide/kconfig_platforms.rst:689 49a6f1f256c64a22a0656923b95707ac
+msgid "pclk1-4: 120 MHz (APB)"
+msgstr "pclk1-4: 120 MHz (APB)"
+
+#: ../../user_guide/kconfig_platforms.rst:692 5eded4558d6d473ea0309b2603d9b6df
+msgid "Cache Configuration"
+msgstr "Cache 配置"
+
+#: ../../user_guide/kconfig_platforms.rst:694 fb0e2157aec24d109903506470daf2bf
+msgid "**Instruction Cache:**"
+msgstr "**Instruction Cache:**"
+
+#: ../../user_guide/kconfig_platforms.rst:696 55b24a312714470895b9ebe3bd698478
+msgid "CONFIG_STM32H7_ICACHE_ENABLE=y"
+msgstr "CONFIG_STM32H7_ICACHE_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:700 0324695faac54da0a2e376c3cec8f6e0
+msgid "**Data Cache:**"
+msgstr "**Data Cache:**"
+
+#: ../../user_guide/kconfig_platforms.rst:702 94b29839bf534ab5aae1b754596e1ef7
+msgid "CONFIG_STM32H7_DCACHE_ENABLE=y"
+msgstr "CONFIG_STM32H7_DCACHE_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:706 e5ad5a4175eb474abf33f00a150e285d
+msgid "**Cache coherency:**"
+msgstr "**Cache coherency:**"
+
+#: ../../user_guide/kconfig_platforms.rst:708 5e006d80fe9f485e81270f2c3e9cd671
+msgid "Use MPU to configure cacheable regions"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:709 d9e46a9da7b1477990cd69e65b672f1c
+msgid "Mark DMA buffers as non-cacheable"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:710 5c414ab3b45c4e84a16fd7931b52ac9b
+msgid "Use cache maintenance operations"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:715 15e05850f74146afa7d10a2e5a3e67b5
+msgid "**NUCLEO-H743ZI:**"
+msgstr "**NUCLEO-H743ZI:**"
+
+#: ../../user_guide/kconfig_platforms.rst:717 1efd264b73ff4b929145a56a53e1f07d
+msgid "STM32H743ZIT6"
+msgstr "STM32H743ZIT6"
+
+#: ../../user_guide/kconfig_platforms.rst:718 a9444cca7b454ac7894faead77d75587
+msgid "25 MHz HSE"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:719 b08fe8e428664ab2bab671383016fd85
+msgid "ST-LINK/V2-1 debugger"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:720 bf2f44e3419246308db76ef918528e71
+msgid "Arduino Uno V3 connectors"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:721 1f1b7439a93d408e92e68bbd76646156
+msgid "Ethernet PHY"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:723 5bc084e3d71e4291bea69f7a16fe0dad
+msgid "**STM32H743I-EVAL:**"
+msgstr "**STM32H743I-EVAL:**"
+
+#: ../../user_guide/kconfig_platforms.rst:725 58e36660b18543daa90e98abaa78690e
+msgid "STM32H743XIH6"
+msgstr "STM32H743XIH6"
+
+#: ../../user_guide/kconfig_platforms.rst:726 f43e005bb61f436c817d2fb6113a2a85
+msgid "Full evaluation board"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:727 8f32945266034ed4a4da2793bec57d34
+msgid "LCD display"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:728 e34d3b06379345828b20ff046767a9e8
+msgid "Audio codec"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:729 8d88f30153794e7dbfa5b55f55fcca0c
+msgid "Ethernet"
+msgstr "以太网"
+
+#: ../../user_guide/kconfig_platforms.rst:730 f6e4d543d29f4781b0c26ef9a40f8c6c
+msgid "USB HS/FS"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:737 53025b28e13642f599a473182cd41903
+msgid "openocd -f interface/stlink.cfg -f target/stm32h7x.cfg"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:752 fbe2254a12b7460493db8600e75147a4
+msgid "Performance Optimization"
+msgstr "性能优化"
+
+#: ../../user_guide/kconfig_platforms.rst:754 1d89db9c091049aaab6d293d9dbae0d9
+msgid "**Enable caches:**"
+msgstr "**Enable caches:**"
+
+#: ../../user_guide/kconfig_platforms.rst:756 04db0e632c154821ab81f41b89eb40b9
+msgid ""
+"SCB_EnableICache();\n"
+"SCB_EnableDCache();"
+msgstr ""
+"SCB_EnableICache();\n"
+"SCB_EnableDCache();"
+
+#: ../../user_guide/kconfig_platforms.rst:761 aadeb1ba4dbd4dae9fead3b3a1ff88ea
+msgid "**Use DTCM for stack:**"
+msgstr "**Use DTCM for stack:**"
+
+#: ../../user_guide/kconfig_platforms.rst:763 950494e324ff4611897676bbb8590992
+msgid "__attribute__((section(\".dtcm\"))) uint8_t stack[4096];"
+msgstr "__attribute__((section(\".dtcm\"))) uint8_t stack[4096];"
+
+#: ../../user_guide/kconfig_platforms.rst:767 ec0174767f1648509dd575bd9f8892a8
+msgid "**DMA buffers in SRAM1:**"
+msgstr "**DMA buffers in SRAM1:**"
+
+#: ../../user_guide/kconfig_platforms.rst:769 42df5e1f23534c099fff52e29b4409a6
+msgid "__attribute__((section(\".sram1\"))) uint8_t dma_buffer[1024];"
+msgstr "__attribute__((section(\".sram1\"))) uint8_t dma_buffer[1024];"
+
+#: ../../user_guide/kconfig_platforms.rst:773 f36ae57c45354a92b44b8082a45b5f4b
+msgid "**MPU configuration:**"
+msgstr "**MPU configuration:**"
+
+#: ../../user_guide/kconfig_platforms.rst:775 6ffa5737888c49ef9035fc3e7ae69f49
+msgid "Configure Flash as cacheable"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:776 8a2aaa26e7c7492aacc8223521dc1301
+msgid "Configure RAM as cacheable (except DMA buffers)"
+msgstr "Configure RAM as cacheable (except DMA buffers)"
+
+#: ../../user_guide/kconfig_platforms.rst:777 30f518223d6041df9f38c127a69b70f9
+msgid "Use write-through for shared data"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:782 4be53ca7c4b24bdc8ca24ada10ffd1dc
+msgid "Complex clock tree"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:783 df8d609a1bd54546a6107fbd230753fb
+msgid "Multiple RAM regions require careful planning"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:784 84f2f54e5a7047b389e6b40084f991d3
+msgid "Cache coherency considerations"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:785 62883439778949bba8a05e3e91d74336
+msgid "Higher power consumption than STM32F4"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:790 3acc44558d8f43f4a4bc92a37339e1fd
+msgid "Use DTCM for stack and critical data"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:791 d3bdbbe8d4c24933b6a75ea91f614513
+msgid "Enable caches for performance"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:792 42c0e3f2b0de4a2fb395d66b13528a39
+msgid "Configure MPU for cache coherency"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:793 70c36be3585046e883f7acd3baffac5e
+msgid "Use appropriate RAM region for each purpose"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:794 59f1db0f471a436fac83ad79fbff868d
+msgid "Validate clock configuration"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:795 5ddd9ced906842f39c648bb3e26885e1
+msgid "Test with cache enabled/disabled"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:799 90be57314fb748db8bcda9b1c23701d8
+msgid "GD32 Platform"
+msgstr "GD32 平台"
+
+#: ../../user_guide/kconfig_platforms.rst:804 5bb897b84f7a4f71a7103d8f11689739
+msgid ""
+"The GD32 platform supports GigaDevice GD32 series ARM Cortex-M "
+"microcontrollers, which are compatible with STM32."
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:808 c6df6468b7b34efa81a370aa05b8fb13
+msgid "GD32F303: Cortex-M4, 120 MHz, 256 KB Flash, 48 KB RAM"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:809 cf74444c005b4e239b6790304c76136c
+msgid "GD32F307: Cortex-M4, 120 MHz, 512 KB Flash, 96 KB RAM"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:813 9d3f09f53df94de88fd512f785903614
+msgid "STM32-compatible peripherals"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:814 69a83df7de7f43b18acf990b43e92853
+msgid "Lower cost alternative"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:815 786226df619147b1a6415010595dfdfb
+msgid "Good peripheral set"
+msgstr ""
+
+#: 53b9fa78297348e79aa32831bd567a30
+msgid "**1. Create configuration:**"
+msgstr "**1. Create configuration:**"
+
+#: ../../user_guide/kconfig_platforms.rst:823 c7c676626a344f71ac7096c18cebe53a
+msgid ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_GD32F30X=y\n"
+"CONFIG_GD32F303=y"
+msgstr ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_GD32F30X=y\n"
+"CONFIG_GD32F303=y"
+
+#: ../../user_guide/kconfig_platforms.rst:831 c960431bff9f4757badfc6a3d3349384
+msgid ""
+"cmake -B build -DPLATFORM=gd32 -DCHIP=GD32F303\n"
+"cmake --build build"
+msgstr ""
+"cmake -B build -DPLATFORM=gd32 -DCHIP=GD32F303\n"
+"cmake --build build"
+
+#: ../../user_guide/kconfig_platforms.rst:838 32b4761626134d039c2a27f5a92b9a68
+msgid ""
+"openocd -f interface/stlink.cfg -f target/gd32f3x.cfg \\\n"
+"    -c \"program build/applications/blinky/blinky.elf verify reset exit\""
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:848 8dea3c90b0484d07b690cbec6ffa7c31
+msgid ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_GD32_PLATFORM_NAME=\"GD32 Platform\""
+msgstr ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_GD32_PLATFORM_NAME=\"GD32 Platform\""
+
+#: ../../user_guide/kconfig_platforms.rst:855 4595402d229045d598954c33fba6fcc1
+msgid ""
+"CONFIG_GD32F30X=y\n"
+"CONFIG_GD32F303=y\n"
+"CONFIG_GD32_CHIP_NAME=\"GD32F303xx\""
+msgstr ""
+"CONFIG_GD32F30X=y\n"
+"CONFIG_GD32F303=y\n"
+"CONFIG_GD32_CHIP_NAME=\"GD32F303xx\""
+
+#: ../../user_guide/kconfig_platforms.rst:864 851656b11b2e487798b9ab849ff2e8ff
+msgid "**GD32F303:**"
+msgstr "**GD32F303:**"
+
+#: ../../user_guide/kconfig_platforms.rst:866 bfd530f65afe4272b825a5bff63e0092
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x0000C000      # 48 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00040000    # 256 KB"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x0000C000      # 48 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00040000    # 256 KB"
+
+#: ../../user_guide/kconfig_platforms.rst:873 9509cf91356d4b44999e2ea3c1249a82
+msgid "**GD32F307:**"
+msgstr "**GD32F307:**"
+
+#: ../../user_guide/kconfig_platforms.rst:875 8f3778cc2a0f483893a5a6c97f032fba
+msgid ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00018000      # 96 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00080000    # 512 KB"
+msgstr ""
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00018000      # 96 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00080000    # 512 KB"
+
+#: ../../user_guide/kconfig_platforms.rst:885 017e3918b10d46d689b4c8547fc9e1c1
+msgid "GD32 peripherals are configured similarly to STM32:"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:887 5a34b34f08354feb875756d78c77481f
+msgid ""
+"# UART\n"
+"CONFIG_GD32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_GD32_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"\n"
+"# GPIO\n"
+"CONFIG_GD32_GPIO_ENABLE=y\n"
+"\n"
+"# SPI\n"
+"CONFIG_GD32_SPI_ENABLE=y\n"
+"\n"
+"# I2C\n"
+"CONFIG_GD32_I2C_ENABLE=y"
+msgstr ""
+"# UART\n"
+"CONFIG_GD32_UART_ENABLE=y\n"
+"CONFIG_INSTANCE_GD32_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"\n"
+"# GPIO\n"
+"CONFIG_GD32_GPIO_ENABLE=y\n"
+"\n"
+"# SPI\n"
+"CONFIG_GD32_SPI_ENABLE=y\n"
+"\n"
+"# I2C\n"
+"CONFIG_GD32_I2C_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:906 3fad960800c74f938f26175512b25ae8
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=16384"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=16384"
+
+#: ../../user_guide/kconfig_platforms.rst:913 7cb64c242a6b45c887f84ecb9495140a
+msgid "Differences from STM32"
+msgstr "与 STM32 的差异"
+
+#: ../../user_guide/kconfig_platforms.rst:915 53f159af0c054e07b99420faf31b7894
+msgid "Some peripheral register differences"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:916 62f28ce1c070456284301a53b98fe6a9
+msgid "Different USB implementation"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:917 1b1b162b7e814f779d8aa19455b526f2
+msgid "Slightly different DMA channels"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:918 0d2b660205f64a46a1c14ab025c14b73
+msgid "Check GD32 datasheet for specifics"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:923 82e197c265124cff85adc32ff72a2dd9
+msgid "Verify peripheral compatibility"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:924 bcc70e3c44154757ae6451dc1f7576d3
+msgid "Test thoroughly"
+msgstr "测试 thoroughly"
+
+#: ../../user_guide/kconfig_platforms.rst:925 be8b70de77224c739c5612e7f64f0b31
+msgid "Use GD32-specific documentation"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:926 4e178511f79a4568913a5315959f8d47
+msgid "Consider STM32 as reference"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:929 a2f4b72971e44ca398ecbcf24cd21e53
+msgid "ESP32 Platform"
+msgstr "ESP32 平台"
+
+#: ../../user_guide/kconfig_platforms.rst:934 bf8108a3efd94f83abbcce9145df75a1
+msgid "The ESP32 platform supports Espressif ESP32 WiFi/Bluetooth SoC."
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:938 966b281136424cd8b17a430256ccb404
+msgid "Dual-core Xtensa LX6"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:939 c998dddfdd2d4a68bf4fc521677bff4c
+msgid "WiFi 802.11 b/g/n"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:940 3df26b81faa84c02b28f9660280b4627
+msgid "Bluetooth Classic and BLE"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:942 af2aff1a9d0c4f59bbcecec03e4e85b1
+msgid "Large ecosystem"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:949 a254525c469846c6811ff074aa63031a
+msgid ""
+"CONFIG_PLATFORM_ESP32=y\n"
+"CONFIG_ESP32_WROOM_32=y"
+msgstr ""
+"CONFIG_PLATFORM_ESP32=y\n"
+"CONFIG_ESP32_WROOM_32=y"
+
+#: ../../user_guide/kconfig_platforms.rst:956 8dce1f17040741faa0e6b73fee87548b
+msgid "idf.py build"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:962 6075917ab1324b2a84be016a071c7c80
+msgid "idf.py flash"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:969 9dfb087239ae459fa575b8b0e633a51b
+msgid ""
+"CONFIG_PLATFORM_ESP32=y\n"
+"CONFIG_ESP32_PLATFORM_NAME=\"ESP32 Platform\""
+msgstr ""
+"CONFIG_PLATFORM_ESP32=y\n"
+"CONFIG_ESP32_PLATFORM_NAME=\"ESP32 Platform\""
+
+#: ../../user_guide/kconfig_platforms.rst:974 e1588473cc6b444b9d9680b328ee0457
+msgid "**Module selection:**"
+msgstr "**Module selection:**"
+
+#: ../../user_guide/kconfig_platforms.rst:976 652b2fdcffd641f2b50a5f8cdb86a481
+msgid "CONFIG_ESP32_WROOM_32=y"
+msgstr "CONFIG_ESP32_WROOM_32=y"
+
+#: ../../user_guide/kconfig_platforms.rst:983 3206a168827549419d8568ea634a030a
+msgid ""
+"# UART\n"
+"CONFIG_ESP32_UART_ENABLE=y\n"
+"\n"
+"# GPIO\n"
+"CONFIG_ESP32_GPIO_ENABLE=y\n"
+"\n"
+"# SPI\n"
+"CONFIG_ESP32_SPI_ENABLE=y\n"
+"\n"
+"# I2C\n"
+"CONFIG_ESP32_I2C_ENABLE=y\n"
+"\n"
+"# WiFi\n"
+"CONFIG_ESP32_WIFI_ENABLE=y\n"
+"\n"
+"# Bluetooth\n"
+"CONFIG_ESP32_BT_ENABLE=y"
+msgstr ""
+"# UART\n"
+"CONFIG_ESP32_UART_ENABLE=y\n"
+"\n"
+"# GPIO\n"
+"CONFIG_ESP32_GPIO_ENABLE=y\n"
+"\n"
+"# SPI\n"
+"CONFIG_ESP32_SPI_ENABLE=y\n"
+"\n"
+"# I2C\n"
+"CONFIG_ESP32_I2C_ENABLE=y\n"
+"\n"
+"# WiFi\n"
+"CONFIG_ESP32_WIFI_ENABLE=y\n"
+"\n"
+"# Bluetooth\n"
+"CONFIG_ESP32_BT_ENABLE=y"
+
+#: ../../user_guide/kconfig_platforms.rst:1006
+#: 41734edbee5a4861804d29887c548757
+msgid "ESP32 uses FreeRTOS:"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1008
+#: 8afa05285e4f4ed7a0b500445bbb1329
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536"
+
+#: ../../user_guide/kconfig_platforms.rst:1015
+#: e6675524b9ab4be3bbef677f9ce94226
+msgid "WiFi Configuration"
+msgstr "WiFi 配置"
+
+#: ../../user_guide/kconfig_platforms.rst:1017
+#: d742a94c4a4d48fb8337c79274692d66
+msgid ""
+"CONFIG_ESP32_WIFI_SSID=\"MyNetwork\"\n"
+"CONFIG_ESP32_WIFI_PASSWORD=\"MyPassword\"\n"
+"CONFIG_ESP32_WIFI_MODE_STA=y"
+msgstr ""
+"CONFIG_ESP32_WIFI_SSID=\"MyNetwork\"\n"
+"CONFIG_ESP32_WIFI_PASSWORD=\"MyPassword\"\n"
+"CONFIG_ESP32_WIFI_MODE_STA=y"
+
+#: ../../user_guide/kconfig_platforms.rst:1026
+#: a6998b5ae58b4f72b83b8e90726ae0f7
+msgid "Use ESP-IDF for WiFi/BT"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1027
+#: 92cd5cd9932a446cb80ca1cfb5349c53
+msgid "Manage dual-core carefully"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1028
+#: e2e4d009c6f045e9a5e6e891607a66e4
+msgid "Monitor heap usage"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1032
+#: 6ef1f542696c4b76a7feb0f5408fc1d2
+msgid "Platform Comparison"
+msgstr "平台 Comparison"
+
+#: ../../user_guide/kconfig_platforms.rst:1035
+#: f720bc3ff8ca49afb65022adebeb037f
+msgid "Feature Comparison"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1041
+#: c680a525ff814f7ea1c4e791fd8df719
+msgid "Feature"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1042
+#: c8761358e1e1420e81b3212cfb015ff4
+msgid "Native"
+msgstr "Native"
+
+#: ../../user_guide/kconfig_platforms.rst:1043
+#: 3fe578926e9e4525923075014d973f74
+msgid "STM32F4"
+msgstr "STM32F4"
+
+#: ../../user_guide/kconfig_platforms.rst:1044
+#: 90821a2258704fd184f62e4826af6ea1
+msgid "STM32H7"
+msgstr "STM32H7"
+
+#: ../../user_guide/kconfig_platforms.rst:1045
+#: 93c7d4e2171044f38c4660fae5f36ed3
+msgid "GD32"
+msgstr "GD32"
+
+#: ../../user_guide/kconfig_platforms.rst:1046
+#: 242625c9c12f4e74919a5e0e70695579
+msgid "ESP32"
+msgstr "ESP32"
+
+#: ../../user_guide/kconfig_platforms.rst:1047
+#: e144541f01344b1ca4d0484dfe1bcc2d
+msgid "CPU"
+msgstr "CPU"
+
+#: ../../user_guide/kconfig_platforms.rst:1048
+#: d6d0650482124ef5bc12eacdd8a90684
+msgid "x86/ARM"
+msgstr "x86/ARM"
+
+#: fdca887b74d94dff8990ca5fea761f87
+msgid "Cortex-M4"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1050
+#: 2806c847e9284cb8a912c5fff4893c5a
+msgid "Cortex-M7"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1052
+#: b74414eca71f4548a26245129015ffd3
+msgid "Xtensa LX6"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1053
+#: b59a570703ad435f91d8d02c26de9755
+msgid "Max Freq"
+msgstr ""
+
+#: 283b7a3b36194b279fbdc4a1b1741541 dfc0a70186f54c97820ed516b6e89142
+msgid "N/A"
+msgstr "N/A"
+
+#: ../../user_guide/kconfig_platforms.rst:1055
+#: 2a2be9a9877548eaac081a7811e8d7f2
+msgid "180 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1056
+#: 877ed1ab247541c88119719f80577cf0
+msgid "480 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1057
+#: 6be0cd2b587e4938a0728199c6e2dce0
+msgid "120 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1058
+#: aa2d0b45f56d4d50b0b06ea6a184846c
+msgid "240 MHz"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1059
+#: 0370496e0c0e4c4a80952a048ebc7404
+msgid "Flash"
+msgstr "Flash"
+
+#: b2d700bd26b842818e8f7a82de2890ac
+msgid "Up to 2 MB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1063
+#: eae904082a6145629c3c2ea980e03594
+msgid "Up to 512 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1064
+#: bd20e7d370cc4f01a389c38c9262aceb
+msgid "Up to 16 MB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1065
+#: cbd80486553c4456a1978d87a1ecef15
+msgid "RAM"
+msgstr "RAM"
+
+#: ../../user_guide/kconfig_platforms.rst:1067
+#: 6ed5a52f4d034bb5b3a3ff5b1312bc1c
+msgid "Up to 256 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1068
+#: 070a2813926840f993bde7b2f5ce18e8
+msgid "Up to 1 MB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1069
+#: dd5866c1a9ed449b81ab826dca4b21c1
+msgid "Up to 96 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1070
+#: fa60a195089c4cdb8f5b3a2a78db897b
+msgid "520 KB"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1071
+#: b081f69fac384db89390b890f305a5a3
+msgid "FPU"
+msgstr "FPU"
+
+#: 838509a986b846d69f72079b3b606ac5
+msgid "Yes"
+msgstr "是"
+
+#: 983feb7517c64722a8b706970cfe7645
+msgid "Single"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1074
+#: 5d81d49b123544babca7391295f472d7
+msgid "Double"
+msgstr ""
+
+#: e4dd9da744754d89ad053545cd0caea4 f1a383868fbe4b4d8ec13246f85e093c
+msgid "No"
+msgstr "否"
+
+#: ../../user_guide/kconfig_platforms.rst:1077
+#: bcc075d9a84640e894cd33379ca808e2
+msgid "WiFi"
+msgstr "WiFi"
+
+#: ../../user_guide/kconfig_platforms.rst:1083
+#: e89ce1c12d75488ebadab6bef70422ac
+msgid "Cost"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1084
+#: 34fda91c48db421fb325b57c11d5ed79
+msgid "Free"
+msgstr ""
+
+#: b31bd1baa38a40a88d2b625b599a0c98
+msgid "Low"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1086
+#: 94d7fdcdbe0242e6acfd9d8eebae6359
+msgid "Medium"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1087
+#: 162b406523d143db92d8686ba2a26845
+msgid "Very Low"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1091
+#: c1565a86f3f34d008b504ae90315cce6
+msgid "Use Case Recommendations"
+msgstr "用例建议"
+
+#: ../../user_guide/kconfig_platforms.rst:1093
+#: fe9f6f03983946d89f7ada7922d66d84
+msgid "**Native:**"
+msgstr "**Native:**"
+
+#: ../../user_guide/kconfig_platforms.rst:1095
+#: f745663ee9874820b0efd98b7f0f660e
+msgid "Development and testing"
+msgstr "开发 and testing"
+
+#: ../../user_guide/kconfig_platforms.rst:1096
+#: 973bdbcccbe0456a9ea91c61afc9d1b6
+msgid "Algorithm validation"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1097
+#: d18a45a590344a109422c7d955620b84
+msgid "CI/CD pipelines"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1098
+#: 7920bdde117043b18328a7e8b1f2550c
+msgid "Cross-platform development"
+msgstr "跨平台开发"
+
+#: ../../user_guide/kconfig_platforms.rst:1100
+#: ca1db27c109541dc9b9a8a16c6880eeb
+msgid "**STM32F4:**"
+msgstr "**STM32F4:**"
+
+#: ../../user_guide/kconfig_platforms.rst:1102
+#: cbcf89984b5b43f492ba0d16f3c1ec54
+msgid "General embedded applications"
+msgstr "通用嵌入式应用"
+
+#: ../../user_guide/kconfig_platforms.rst:1103
+#: 51e3efe30e3143d08e4815689396e09b
+msgid "Motor control"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1104
+#: 5d322d3b963641a9b883656514504cc6
+msgid "Industrial automation"
+msgstr ""
+
+#: 85b7f43f880b488f8f580eb356410628
+msgid "Cost-sensitive projects"
+msgstr "成本敏感型项目"
+
+#: ../../user_guide/kconfig_platforms.rst:1107
+#: 7995a33cebe14fe1a2aaa0d52f6d0d6d
+msgid "**STM32H7:**"
+msgstr "**STM32H7:**"
+
+#: ../../user_guide/kconfig_platforms.rst:1109
+#: 1cf43debc4184a109733811009df511a
+msgid "High-performance applications"
+msgstr "高性能应用"
+
+#: ../../user_guide/kconfig_platforms.rst:1110
+#: 13ca82ab552042949f510aa2fae5c135
+msgid "Digital signal processing"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1111
+#: 6d5391115d28476dbd65cd11eb773977
+msgid "Graphics applications"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1112
+#: 2e5744d354344f3e9f215f8fa4f6b26b
+msgid "Data acquisition"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1114
+#: 69511ca4f1174f478535af8398514d0f
+msgid "**GD32:**"
+msgstr "**GD32:**"
+
+#: ../../user_guide/kconfig_platforms.rst:1117
+#: 30962eb2b2de461590a2d93aa90171a3
+msgid "STM32 alternative"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1118
+#: ed34588a77484e18b6a351900a0f1f0a
+msgid "Simple applications"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1120
+#: bce20ebb987f4c69ad897693523c456f
+msgid "**ESP32:**"
+msgstr "**ESP32:**"
+
+#: ../../user_guide/kconfig_platforms.rst:1122
+#: b899a706f79842a2bbb186c91ebc98d2
+msgid "IoT applications"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1123
+#: 940e43f160fc41dcbf2c5ac2e02ca7e5
+msgid "WiFi connectivity"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1124
+#: e8200ec625af49e9a7240439fa282497
+msgid "Bluetooth devices"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1125
+#: 15447c6164c14b2bbd0bc8e1989afbce
+msgid "Smart home"
+msgstr ""
+
+#: ../../user_guide/kconfig_platforms.rst:1128
+#: 66becb3e61b04ce88e32ab7d50be8151
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../user_guide/kconfig_platforms.rst:1130
+#: 266f77d117c841979faf23dc48bdb5d7
+msgid ":doc:`kconfig_tutorial` - Kconfig tutorial"
+msgstr ":doc:`kconfig_tutorial` - Kconfig tutorial"
+
+#: ../../user_guide/kconfig_platforms.rst:1131
+#: 479e68bac6e54e5692b5efe20a397b07
+msgid ":doc:`kconfig_peripherals` - Peripheral configuration"
+msgstr ":doc:`kconfig_peripherals` - Peripheral configuration"
+
+#: ../../user_guide/kconfig_platforms.rst:1132
+#: 1390becb0c8e426f94e99a5b796bb30e
+msgid ":doc:`build_system` - Build system guide"
+msgstr ":doc:`build_system` - Build system guide"
+
+#: ../../user_guide/kconfig_platforms.rst:1133
+#: 098f5c9575c44035be45832e2abadba3
+msgid ":doc:`porting` - Platform porting guide"
+msgstr ":doc:`porting` - Platform porting guide"

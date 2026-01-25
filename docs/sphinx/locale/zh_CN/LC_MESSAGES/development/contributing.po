@@ -1,18 +1,11 @@
-# Contributing - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
 #: ../../development/contributing.rst:2 d8ec1a7fa8c544f681284af1b2751bc2
 msgid "Contributing"
@@ -21,8 +14,8 @@ msgstr "贡献指南"
 #: ../../development/contributing.rst:4 ae4505deffdb46f3863394b684141c53
 #, fuzzy
 msgid ""
-"Thank you for your interest in contributing to Nexus! This guide covers "
-"the contribution workflow and guidelines."
+"Thank you for your interest in contributing to Nexus! This guide covers the "
+"contribution workflow and guidelines."
 msgstr "感谢你对 Nexus 项目的贡献兴趣！"
 
 #: ../../development/contributing.rst:8 1c49816811b544ee9490270bf9accabe
@@ -32,11 +25,11 @@ msgstr "开发环境设置"
 
 #: ../../development/contributing.rst:11 19465f501e92455c96890ab55a2c945c
 msgid "Prerequisites"
-msgstr ""
+msgstr "前置条件"
 
 #: ../../development/contributing.rst:13 42629f7e780f49a9868ecc30ce225b4c
 msgid "**Windows**::"
-msgstr ""
+msgstr "**Windows**："
 
 #: ../../development/contributing.rst:15 848ceaccbaac4ee6a735cc2358a01fe2
 msgid ""
@@ -44,10 +37,13 @@ msgid ""
 "winget install Git.Git\n"
 "# Install Visual Studio 2019+ or Build Tools"
 msgstr ""
+"winget install Kitware.CMake\n"
+"winget install Git.Git\n"
+"# Install Visual Studio 2019+ or Build Tools"
 
 #: ../../development/contributing.rst:19 7f059a88fa354ea59377988a4c6dfddc
 msgid "**Linux (Ubuntu/Debian)**::"
-msgstr ""
+msgstr "**Linux (Ubuntu/Debian)**::"
 
 #: ../../development/contributing.rst:21 4136ff0f936841dcb9209322bdb2d11c
 msgid "sudo apt-get install cmake gcc g++ git"
@@ -55,7 +51,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:23 c9bee1d24ff1471bb67f4057474dc692
 msgid "**macOS**::"
-msgstr ""
+msgstr "**macOS**："
 
 #: ../../development/contributing.rst:25 768d364bdc74435992d61a0ad6ff2e87
 msgid "brew install cmake git"
@@ -63,7 +59,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:28 4eedcae8dc2e4f11b2a4be5733bd87ea
 msgid "Clone and Build"
-msgstr ""
+msgstr "Clone and 构建"
 
 #: ../../development/contributing.rst:32 567f3eb13d3d4d0993aa373c2cfd4daa
 msgid ""
@@ -71,13 +67,21 @@ msgid ""
 "cd nexus\n"
 "\n"
 "# Native build (for testing)\n"
-"cmake -B build -DCMAKE_BUILD_TYPE=Debug -DNEXUS_PLATFORM=native "
-"-DNEXUS_BUILD_TESTS=ON\n"
+"cmake -B build -DCMAKE_BUILD_TYPE=Debug -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\n"
 "cmake --build build --config Debug\n"
 "\n"
 "# Run tests\n"
 "ctest --test-dir build -C Debug --output-on-failure"
 msgstr ""
+"git clone https://github.com/nexus-platform/nexus.git\n"
+"cd nexus\n"
+"\n"
+"# Native build (for testing)\n"
+"cmake -B build -DCMAKE_BUILD_TYPE=Debug -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\n"
+"cmake --build build --config Debug\n"
+"\n"
+"# Run tests\n"
+"ctest --test-dir build -C Debug --output-on-failure"
 
 #: ../../development/contributing.rst:43 e99bbf8caddb42f4a3ad3d1edc7ff53a
 #, fuzzy
@@ -103,7 +107,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:52 c3ddadef26984669b3045b4015e12758
 msgid "Platform and version (Windows/Linux/macOS, compiler version)"
-msgstr ""
+msgstr "Platform and version (Windows/Linux/macOS, compiler version)"
 
 #: ../../development/contributing.rst:53 bdb751fc68a040dd88f6803725936ba7
 msgid "Steps to reproduce"
@@ -119,7 +123,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:58 fd1bbd8a197b4521b40306b044303b11
 msgid "Suggesting Features"
-msgstr ""
+msgstr "Suggesting 特性"
 
 #: ../../development/contributing.rst:60 f071cb27612744ca987c82a4e44e58e1
 #, fuzzy
@@ -182,7 +186,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:82 72c96e1b9cad4b7a9049001a1a48ece1
 msgid "Use Doxygen backslash style comments (``\\brief``, ``\\param``)"
-msgstr ""
+msgstr "Use Doxygen backslash style comments (``\\brief``, ``\\param``)"
 
 #: ../../development/contributing.rst:83 21b7000a89cf42d0a15a5c63c71cd6dd
 msgid "80 character line limit"
@@ -190,11 +194,11 @@ msgstr ""
 
 #: ../../development/contributing.rst:84 828f85665f9946c185259cfc981a467f
 msgid "4 space indentation (no tabs)"
-msgstr ""
+msgstr "4 space indentation (no tabs)"
 
 #: ../../development/contributing.rst:85 fe00e7085da64953b86aea033a2fd21f
 msgid "Pointer alignment: left (``int* ptr``)"
-msgstr ""
+msgstr "Pointer alignment: left (``int* ptr``)"
 
 #: ../../development/contributing.rst:88 98b2d8b23c844103a80f4b1be95b3ce3
 msgid "Commit Messages"
@@ -202,9 +206,9 @@ msgstr "提交信息"
 
 #: ../../development/contributing.rst:90 da6ccf3c9ed24cae901356350372cb2a
 msgid ""
-"Use `Conventional Commits <https://www.conventionalcommits.org/>`_ "
-"format::"
+"Use `Conventional Commits <https://www.conventionalcommits.org/>`_ format::"
 msgstr ""
+"Use `Conventional Commits <https://www.conventionalcommits.org/>`_ format::"
 
 #: ../../development/contributing.rst:92 d21706d654a24cb8b3307479ebbd1af8
 msgid ""
@@ -214,6 +218,11 @@ msgid ""
 "\n"
 "[optional footer]"
 msgstr ""
+"<type>(<scope>): <subject>\n"
+"\n"
+"[optional body]\n"
+"\n"
+"[optional footer]"
 
 #: ../../development/contributing.rst:99 0365a15c545a4d8b8f285335c7e60915
 msgid "Types"
@@ -221,23 +230,23 @@ msgstr ""
 
 #: ../../development/contributing.rst:101 1eb25d682adc44d292c0c8668d854c8b
 msgid "``feat``: New feature"
-msgstr ""
+msgstr "``feat``：新功能"
 
 #: ../../development/contributing.rst:102 f9771e2151a944b4bdacfb262a594cda
 msgid "``fix``: Bug fix"
-msgstr ""
+msgstr "``fix``：错误修复"
 
 #: ../../development/contributing.rst:103 4e22965e7380456eb841c0b2609f7470
 msgid "``docs``: Documentation changes"
-msgstr ""
+msgstr "``docs``：文档更改"
 
 #: ../../development/contributing.rst:104 c42c99319aee4d5abc5886dbdd6d2d10
 msgid "``style``: Code style changes (formatting, no logic change)"
-msgstr ""
+msgstr "``style``: Code style changes (formatting, no logic change)"
 
 #: ../../development/contributing.rst:105 090b9f3b948341a9831b26a3f32fc45e
 msgid "``refactor``: Code refactoring"
-msgstr ""
+msgstr "``refactor``：代码重构"
 
 #: ../../development/contributing.rst:106 f1ad0a1deceb46bbab7ccb74833343c8
 msgid "``perf``: Performance improvements"
@@ -261,7 +270,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:113 f7c5ebe0a59f4c9a97cd830332ec06f4
 msgid "Examples"
-msgstr ""
+msgstr "示例"
 
 #: ../../development/contributing.rst:117 1ec824054cca42419889774ef4499781
 msgid ""
@@ -273,6 +282,13 @@ msgid ""
 "\n"
 "test(log): add unit tests for log filtering"
 msgstr ""
+"feat(hal): add PWM support for STM32F4\n"
+"\n"
+"fix(osal): fix mutex deadlock in FreeRTOS adapter\n"
+"\n"
+"docs(api): update GPIO documentation\n"
+"\n"
+"test(log): add unit tests for log filtering"
 
 #: ../../development/contributing.rst:126 98792beb60d446e3b9c6c3e0295e7b1f
 msgid "Pre-Submit Checklist"
@@ -297,10 +313,22 @@ msgid ""
 "# 4. Documentation builds without warnings\n"
 "doxygen Doxyfile"
 msgstr ""
+"# 1. Build passes\n"
+"cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\n"
+"cmake --build build --config Release\n"
+"\n"
+"# 2. Tests pass\n"
+"ctest --test-dir build -C Release --output-on-failure\n"
+"\n"
+"# 3. Code format check\n"
+"clang-format --dry-run --Werror hal/**/*.c hal/**/*.h\n"
+"\n"
+"# 4. Documentation builds without warnings\n"
+"doxygen Doxyfile"
 
 #: ../../development/contributing.rst:144 f983129905db40cba21f4f27921f61da
 msgid "Review Process"
-msgstr ""
+msgstr "审查流程"
 
 #: ../../development/contributing.rst:146 49fcef02c047432eae8d40674009f267
 msgid "Automated CI checks must pass"
@@ -312,7 +340,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:148 734de30801b44172a5c6ca07c5e4630f
 msgid "Address all review comments"
-msgstr ""
+msgstr "处理所有审查评论"
 
 #: ../../development/contributing.rst:149 bb21ac84ef39480ab6ab82eb5b747647
 msgid "Squash commits if requested"
@@ -320,7 +348,7 @@ msgstr ""
 
 #: ../../development/contributing.rst:152 0fef64b71f4f4ee7b5dc937488505dc3
 msgid "CI/CD"
-msgstr ""
+msgstr "CI/CD"
 
 #: ../../development/contributing.rst:154 bd6e6975067e4da8a45f5442f2706ad5
 msgid "All PRs trigger GitHub Actions workflows:"
@@ -331,6 +359,8 @@ msgid ""
 "``build.yml``: Multi-platform build (Windows, Linux, macOS) + ARM cross-"
 "compilation"
 msgstr ""
+"``build.yml``: Multi-platform build (Windows, Linux, macOS) + ARM cross-"
+"compilation"
 
 #: ../../development/contributing.rst:157 08b39bcea440449994b4e0e2db5e1e88
 msgid "``test.yml``: Unit tests, coverage, sanitizers, MISRA checks"
@@ -340,7 +370,6 @@ msgstr ""
 msgid "Questions?"
 msgstr ""
 
-#: ../../development/contributing.rst:162 1eb15d156be54d24a334462dc0ee0c09
 msgid "Open a discussion or reach out to maintainers."
 msgstr ""
 
@@ -367,4 +396,3 @@ msgstr ""
 
 #~ msgid "Contact"
 #~ msgstr "联系方式"
-

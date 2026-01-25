@@ -1,0 +1,1876 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../development/script_validation.rst:2 39142191a9fa4e64ab5eba79adbc1b3a
+msgid "Script Validation System"
+msgstr "脚本验证系统"
+
+#: ../../development/script_validation.rst:4 2725e20e6b6549a8be40fd9a77130eec
+msgid ""
+"The Script Validation System is a comprehensive cross-platform script "
+"verification framework designed specifically for the Nexus Embedded System "
+"project. It automates the validation of all project scripts across Windows, "
+"WSL, and Linux environments."
+msgstr ""
+
+#: ../../development/script_validation.rst:8 6e09d54d42b1415ba2296f1107c808b4
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../development/script_validation.rst:11 064218c153dd46ea8be21a91d6473a0d
+msgid "Overview"
+msgstr "概述"
+
+#: ../../development/script_validation.rst:13 d8c9cadcdb734077a2b40171bb3d7810
+msgid ""
+"The system automatically validates the functionality, compatibility, and "
+"reliability of all project scripts across multiple platforms."
+msgstr ""
+
+#: ../../development/script_validation.rst:16 541deac494754fe8afae6877859c1568
+msgid "Key Features"
+msgstr "主要特性"
+
+#: ../../development/script_validation.rst:18 addd6377af9a40f8bec510cfd7aefcd4
+msgid ""
+"**Cross-Platform Validation**: Supports Windows, WSL, and Linux platforms"
+msgstr "**跨平台验证**：支持 Windows、WSL 和 Linux 平台"
+
+#: ../../development/script_validation.rst:19 34fffe0b4bdf4d7f85f5a34ca6bcaa65
+msgid ""
+"**Multiple Validators**: Functional, compatibility, performance, and "
+"documentation validation"
+msgstr "**多种验证器**：功能、兼容性、性能和文档验证"
+
+#: ../../development/script_validation.rst:20 4543a9cc80774a6780e866856bb7e597
+msgid "**Multiple Report Formats**: HTML, JSON, Summary, and JUnit XML"
+msgstr "**多种报告格式**：HTML、JSON、摘要和 JUnit XML"
+
+#: ../../development/script_validation.rst:21 9532a78032b24980a871b2f05ca52876
+msgid ""
+"**CI/CD Integration**: Supports GitHub Actions, GitLab CI, Jenkins, Azure "
+"DevOps"
+msgstr "**CI/CD 集成**：支持 GitHub Actions、GitLab CI、Jenkins、Azure DevOps"
+
+#: ../../development/script_validation.rst:22 27e5ceef862040349220f11e595ee490
+msgid ""
+"**Flexible Configuration**: Command-line arguments and configuration files"
+msgstr "**灵活配置**：命令行参数和配置文件"
+
+#: ../../development/script_validation.rst:25 8f209de8876f4ed5aca5ed7f89140088
+msgid "Architecture"
+msgstr "架构"
+
+#: ../../development/script_validation.rst:28 0a7b775acebb458881715592314f09c0
+msgid "Directory Structure"
+msgstr "目录结构"
+
+#: ../../development/script_validation.rst:30 b62fd3be1a014705b3578d784d8c1c0f
+msgid ""
+"script_validation/\n"
+"├── adapters/           # Platform adapters (Windows/WSL/Linux)\n"
+"├── controllers/        # Validation controllers\n"
+"├── handlers/           # Error handling and resource management\n"
+"├── managers/           # Script and platform managers\n"
+"├── reporters/          # Report generators (HTML/JSON/JUnit/Summary)\n"
+"├── validators/         # Validators (functional/compatibility/performance/documentation)\n"
+"├── __init__.py         # Module entry point\n"
+"├── __main__.py         # CLI entry point\n"
+"├── ci_integration.py   # CI/CD integration\n"
+"├── discovery.py        # Script discovery\n"
+"├── integration.py      # Component integration\n"
+"├── interfaces.py       # Interface definitions\n"
+"└── models.py           # Data models"
+msgstr ""
+
+#: ../../development/script_validation.rst:48 ba074a991abe4479b5d4c3e189f4508a
+msgid "Components"
+msgstr "组件"
+
+#: ../../development/script_validation.rst:50 08eceed3badf4276ba79b405ef6d3fc7
+msgid "**Platform Adapters**"
+msgstr "**Platform Adapters**"
+
+#: ../../development/script_validation.rst:51 6eb1104e10d54fc28f6747920c99a7fb
+msgid "Handle platform-specific script execution and environment setup"
+msgstr "处理平台特定的脚本执行和环境设置"
+
+#: ../../development/script_validation.rst:53 568af71791c845f2924e58ddc93b7577
+msgid "**Validators**"
+msgstr "**Validators**"
+
+#: ../../development/script_validation.rst:54 a5fd361344444f42a84af90570d50b30
+msgid "Perform different types of validation:"
+msgstr "执行不同类型的验证："
+
+#: ../../development/script_validation.rst:56 83317bbe7d4b4fad89d304be61ef800b
+msgid "Functional: Verify script functionality"
+msgstr "功能：验证脚本功能"
+
+#: ../../development/script_validation.rst:57 2337eeea6fa14642b76954ea707f1db4
+msgid "Compatibility: Check cross-platform compatibility"
+msgstr "兼容性：检查跨平台兼容性"
+
+#: ../../development/script_validation.rst:58 2a38a0a85707488b8ac0cc7ddae1f37f
+msgid "Performance: Measure execution performance"
+msgstr "性能：测量执行性能"
+
+#: ../../development/script_validation.rst:59 db249c48d4c4426d8c9db689fd452ed3
+msgid "Documentation: Validate documentation completeness"
+msgstr "文档：验证文档完整性"
+
+#: ../../development/script_validation.rst:61 16fa959227854b8baff18c68771c9285
+msgid "**Reporters**"
+msgstr "**Reporters**"
+
+#: ../../development/script_validation.rst:62 8f0c4bf19c384dccbab37a73a74f1268
+msgid "Generate validation reports in various formats"
+msgstr "生成各种格式的验证报告"
+
+#: ../../development/script_validation.rst:64 920f84deafe043a1a0fc74c33f1abcc1
+msgid "**Controllers**"
+msgstr "**Controllers**"
+
+#: ../../development/script_validation.rst:65 99b39ca1d8f34054901a17baae5f16c9
+msgid "Orchestrate the validation workflow"
+msgstr "编排验证工作流"
+
+#: ../../development/script_validation.rst:68 c42e6d915f3f4d1c84473718afd71508
+msgid "Quick Start"
+msgstr "快速开始"
+
+#: ../../development/script_validation.rst:71 c3a9ee4d122246a8884e0cdbbc9b3e00
+msgid "Command-Line Usage"
+msgstr "命令行用法"
+
+#: ../../development/script_validation.rst:73 ac7d5e497ece4c38ba5e80a4efff314d
+msgid "**Full validation:**"
+msgstr "**Full validation:**"
+
+#: ../../development/script_validation.rst:75 f78732e21317452a9ed69abf907955cf
+msgid "python -m script_validation --mode full"
+msgstr "python -m script_validation --mode full"
+
+#: ../../development/script_validation.rst:79 248dc4fcee994fc68373438084a2f308
+msgid "**Quick validation:**"
+msgstr "**Quick validation:**"
+
+#: ../../development/script_validation.rst:81 daf7862be5a34eedbf65c5e4a96eb63d
+msgid "python -m script_validation --mode quick"
+msgstr "python -m script_validation --mode quick"
+
+#: ../../development/script_validation.rst:85 322cf5b1b4044f49bfe215ed37f7e9f9
+msgid "**Platform-specific validation:**"
+msgstr "**Platform-specific validation:**"
+
+#: ../../development/script_validation.rst:87 2da7c870d92d4e6895d9850ad0bb4f34
+msgid "python -m script_validation --platforms windows wsl"
+msgstr "python -m script_validation --platforms windows wsl"
+
+#: ../../development/script_validation.rst:91 ce42ca869a4c4512b24ec3359fb7d6dd
+msgid "**Generate specific format reports:**"
+msgstr "**Generate specific format reports:**"
+
+#: ../../development/script_validation.rst:93 b2a01d4deb6b4c63a4a768b99250ce15
+msgid "python -m script_validation --report-format html json"
+msgstr "python -m script_validation --report-format html json"
+
+#: ../../development/script_validation.rst:97 dd128a77b02a411f8e56810eb2cc42fe
+msgid "**CI mode:**"
+msgstr "**CI mode:**"
+
+#: ../../development/script_validation.rst:99 2f744a78fab54a3a93d5258ca7381ec7
+msgid "python -m script_validation --ci"
+msgstr "python -m script_validation --ci"
+
+#: ../../development/script_validation.rst:103
+#: 5722eeb4cc3b4f3dac6cd520a9de6612
+msgid "**Generate JUnit XML report:**"
+msgstr "**Generate JUnit XML report:**"
+
+#: ../../development/script_validation.rst:105
+#: 35d872da50e34fcc83443095bc25a9b9
+msgid "python -m script_validation --ci --report-format junit"
+msgstr "python -m script_validation --ci --report-format junit"
+
+#: ../../development/script_validation.rst:109
+#: a1b082ac09d2465385d0284e2e6bd744
+msgid "**List discovered scripts:**"
+msgstr "**List discovered scripts:**"
+
+#: ../../development/script_validation.rst:111
+#: 8a6ef6f2099647fdace98fc632533e9c
+msgid "python -m script_validation --list-scripts"
+msgstr "python -m script_validation --list-scripts"
+
+#: ../../development/script_validation.rst:115
+#: acad080ded9b495ebf091ec7caffd85f
+msgid "**Check platform availability:**"
+msgstr "**Check platform availability:**"
+
+#: ../../development/script_validation.rst:117
+#: 7c46c4ba0b7f4738b2506d0cdd8ecba0
+msgid "python -m script_validation --check-platforms"
+msgstr "python -m script_validation --check-platforms"
+
+#: ../../development/script_validation.rst:122
+#: 2a278771e55843f8b71a54f2a0fb2aaa
+msgid "Programming Interface"
+msgstr "编程接口"
+
+#: ../../development/script_validation.rst:124
+#: e37bad2dc78f4691a91aeafdca89ca23
+msgid "**Method 1: Using convenience functions:**"
+msgstr "**Method 1: Using convenience functions:**"
+
+#: ../../development/script_validation.rst:126
+#: a15101dfee604b38a8cf66e6f2a1b463
+msgid ""
+"from script_validation import run_validation\n"
+"\n"
+"report = run_validation(mode='full')"
+msgstr ""
+"from script_validation import run_validation\n"
+"\n"
+"report = run_validation(mode='full')"
+
+#: ../../development/script_validation.rst:132
+#: 1fd5a427fd854d0aaddd433182f88440
+msgid "**Method 2: Using workflow:**"
+msgstr "**Method 2: Using workflow:**"
+
+#: ../../development/script_validation.rst:134
+#: 8992027396b74a2888190b2bc737e112
+msgid ""
+"from script_validation import create_workflow, Platform\n"
+"\n"
+"workflow = create_workflow(\n"
+"    platforms=[Platform.WINDOWS, Platform.WSL],\n"
+"    validators=['functional', 'compatibility'],\n"
+"    report_formats=['html', 'json']\n"
+")\n"
+"report = workflow.run()"
+msgstr ""
+"from script_validation import create_workflow, Platform\n"
+"\n"
+"workflow = create_workflow(\n"
+"    platforms=[Platform.WINDOWS, Platform.WSL],\n"
+"    validators=['functional', 'compatibility'],\n"
+"    report_formats=['html', 'json']\n"
+")\n"
+"report = workflow.run()"
+
+#: ../../development/script_validation.rst:145
+#: c98dd49acfa841168a22d1eaecac48d0
+msgid "**Method 3: Using builder pattern:**"
+msgstr "**Method 3: Using builder pattern:**"
+
+#: ../../development/script_validation.rst:147
+#: 2763387917f34573b3c0aa020f3c0ab6
+msgid ""
+"from script_validation import ValidationBuilder, Platform\n"
+"from pathlib import Path\n"
+"\n"
+"workflow = (ValidationBuilder()\n"
+"    .root_path(Path('./'))\n"
+"    .platforms(Platform.WINDOWS, Platform.LINUX)\n"
+"    .validators('functional', 'performance')\n"
+"    .report_formats('html', 'junit')\n"
+"    .timeout(600)\n"
+"    .ci_mode(True)\n"
+"    .build())\n"
+"report = workflow.run()"
+msgstr ""
+"from script_validation import ValidationBuilder, Platform\n"
+"from pathlib import Path\n"
+"\n"
+"workflow = (ValidationBuilder()\n"
+"    .root_path(Path('./'))\n"
+"    .platforms(Platform.WINDOWS, Platform.LINUX)\n"
+"    .validators('functional', 'performance')\n"
+"    .report_formats('html', 'junit')\n"
+"    .timeout(600)\n"
+"    .ci_mode(True)\n"
+"    .build())\n"
+"report = workflow.run()"
+
+#: ../../development/script_validation.rst:163
+#: 0f558bf82ac9404f955bdaf7aa06e2b4
+msgid "Command-Line Arguments"
+msgstr "命令行参数"
+
+#: ../../development/script_validation.rst:169
+#: 93f91cf8e0a84508906253110f4345ff
+msgid "Argument"
+msgstr ""
+
+#: ../../development/script_validation.rst:170
+#: 00559683e56f497ea55746f18db0b5ae
+msgid "Short"
+msgstr ""
+
+#: ../../development/script_validation.rst:171
+#: c2ce0611d9f843089d4f2d4c70d3c2b1
+msgid "Description"
+msgstr "描述"
+
+#: ../../development/script_validation.rst:172
+#: bfcfd806e3a64def878fb45a0833e17c
+msgid "Default"
+msgstr "默认"
+
+#: ../../development/script_validation.rst:173
+#: 350d1513b75f44b9bfa73231af977dc3
+msgid "``--root-path``"
+msgstr "``--root-path``"
+
+#: ../../development/script_validation.rst:174
+#: 3b3bbb1f0a824d5d84a6362d2ee9aac7
+msgid "``-r``"
+msgstr "``-r``"
+
+#: ../../development/script_validation.rst:175
+#: b06721b4848f41f89617fddc780d4079
+msgid "Project root directory path"
+msgstr "项目根目录路径"
+
+#: ../../development/script_validation.rst:176
+#: 0d0200b1f11c4c81adf5a880b2419e2f
+msgid "Current directory"
+msgstr "当前目录"
+
+#: ../../development/script_validation.rst:177
+#: 28a742acf0324b3eba72d9c3d1b36366
+msgid "``--mode``"
+msgstr "``--mode``"
+
+#: ../../development/script_validation.rst:178
+#: fc3ee1266d0a4a8fbf1b02767dceb05b
+msgid "``-m``"
+msgstr "``-m``"
+
+#: ../../development/script_validation.rst:179
+#: 45a13e396818447b91d258f7fc7101e8
+msgid "Validation mode: full/quick/platform-specific"
+msgstr "验证模式：完整/快速/平台特定"
+
+#: ../../development/script_validation.rst:180
+#: 10d4b8f8f00c4233b660e2a5ab6206eb
+msgid "full"
+msgstr ""
+
+#: ../../development/script_validation.rst:181
+#: 4b246438c4564cb99a9d2533930eedfa
+msgid "``--platforms``"
+msgstr "``--platforms``"
+
+#: ../../development/script_validation.rst:182
+#: 89e7600cc4804fe497a94af492c23690
+msgid "``-p``"
+msgstr "``-p``"
+
+#: ../../development/script_validation.rst:183
+#: f0976f96917c44dc8af5f52b2869961c
+msgid "Target platforms: windows/wsl/linux"
+msgstr "目标平台：windows/wsl/linux"
+
+#: ../../development/script_validation.rst:184
+#: 136d968b39ac4d8a82d8cc36a93b2c85
+msgid "All available"
+msgstr ""
+
+#: ../../development/script_validation.rst:185
+#: 30765cf578524302942bb47c096d7c39
+msgid "``--report-format``"
+msgstr "``--report-format``"
+
+#: ../../development/script_validation.rst:186
+#: 4ee0ce8f60024da29a43b7945321f579
+msgid "``-f``"
+msgstr "``-f``"
+
+#: ../../development/script_validation.rst:187
+#: e94951adef2b42529a60f6b4be0a9e65
+msgid "Report format: html/json/summary/junit/all"
+msgstr "报告格式：html/json/summary/junit/all"
+
+#: ../../development/script_validation.rst:188
+#: 9142ef7c0a7f415ea733b60ec7dc063a
+msgid "all"
+msgstr ""
+
+#: ../../development/script_validation.rst:189
+#: 60680cee05664c9c99b20e174a5c9bd7
+msgid "``--output-dir``"
+msgstr "``--output-dir``"
+
+#: ../../development/script_validation.rst:190
+#: e73958f4e9b14d2496ce6d255bc11614
+msgid "``-o``"
+msgstr "``-o``"
+
+#: ../../development/script_validation.rst:191
+#: 56adc85a0cd4495d9f48c6908783cdd7
+msgid "Report output directory"
+msgstr "报告输出目录"
+
+#: ../../development/script_validation.rst:192
+#: 99c914cd544a4dc79cad838964a3b232
+msgid "./validation_reports"
+msgstr "./validation_reports"
+
+#: ../../development/script_validation.rst:193
+#: 4a42181b9a1b4d8989a489e9d1d2722b
+msgid "``--validators``"
+msgstr "``--validators``"
+
+#: ../../development/script_validation.rst:194
+#: 9acb00ea80b944a9928e6e378ab7ae9c
+msgid "``-v``"
+msgstr "``-v``"
+
+#: ../../development/script_validation.rst:195
+#: d840687397bb48fab4f1d0f6d21f3fd1
+msgid "Validators: functional/compatibility/performance/documentation"
+msgstr "验证器：功能/兼容性/性能/文档"
+
+#: ../../development/script_validation.rst:196
+#: 86f9874378a34dc881698d86e8a1c9e9
+msgid "All"
+msgstr ""
+
+#: ../../development/script_validation.rst:197
+#: aeaebe73c8b641da9524ec832978c524
+msgid "``--timeout``"
+msgstr "``--timeout``"
+
+#: ../../development/script_validation.rst:199
+#: 5b7b4cf9e3144432ad52d0cd7f62168b
+msgid "Script execution timeout (seconds)"
+msgstr "Script execution timeout (seconds)"
+
+#: ../../development/script_validation.rst:200
+#: 94f002aed46a4739ab15de6788219c0c
+msgid "300"
+msgstr "300"
+
+#: ../../development/script_validation.rst:201
+#: cb849264449649cfabbeea02c406b472
+msgid "``--max-memory``"
+msgstr "``--max-memory``"
+
+#: ../../development/script_validation.rst:203
+#: d8c6d9ef3dd347409f59ff25d406f8fb
+msgid "Maximum memory limit (MB)"
+msgstr "Maximum memory limit (MB)"
+
+#: ../../development/script_validation.rst:204
+#: f16c615faf0e4644b8c7c6a545700afe
+msgid "1024"
+msgstr "1024"
+
+#: ../../development/script_validation.rst:205
+#: d4d7f42ba48a4a26abe65030e2ac24af
+msgid "``--ci``"
+msgstr "``--ci``"
+
+#: ../../development/script_validation.rst:207
+#: c443b9e52910474c989468949d499bcd
+msgid "CI mode"
+msgstr ""
+
+#: ../../development/script_validation.rst:208
+#: ../../development/script_validation.rst:212
+#: ../../development/script_validation.rst:216
+#: 38db1c444a7e40088c0caf088ff16add 60b800f5ca1f42c3b229712cca76663a
+#: 9ba3f518ed0e4ac596d53a0c57f9c669
+msgid "false"
+msgstr "假"
+
+#: ../../development/script_validation.rst:209
+#: 8e59cac8ecfd49659c243698d9b3aceb
+msgid "``--verbose``"
+msgstr "``--verbose``"
+
+#: ../../development/script_validation.rst:211
+#: 21b691ee44c84e10be223938eac5f9ee
+msgid "Verbose output"
+msgstr "详细输出"
+
+#: ../../development/script_validation.rst:213
+#: c9bdcc4d331541fdb9b45c8d2328c7d5
+msgid "``--no-parallel``"
+msgstr "``--no-parallel``"
+
+#: ../../development/script_validation.rst:215
+#: 8e2d2be572fb46a1a0af5beaee77b496
+msgid "Disable parallel execution"
+msgstr "禁用并行执行"
+
+#: ../../development/script_validation.rst:219
+#: 7109135d25a04a69962764cb09b587a7
+msgid "Cross-Platform Testing Guide"
+msgstr "跨平台测试指南"
+
+#: ../../development/script_validation.rst:222
+#: 2a30aaa2f9aa46d3a20031ffff0ad076
+msgid "Platform Support"
+msgstr "平台支持"
+
+#: ../../development/script_validation.rst:224
+#: a0c8ed912b9a4c2ba478bce2127f7f3a
+msgid "The script validation system supports three platforms:"
+msgstr "脚本验证系统支持三个平台："
+
+#: ../../development/script_validation.rst:226
+#: df9e0d3e0efe48498d58d1a7422747d2
+msgid "**Windows**: Native Windows environment"
+msgstr "**Windows**：原生 Windows 环境"
+
+#: ../../development/script_validation.rst:227
+#: bc9dc64f8b1f421ba882b2881c8ba742
+msgid "**WSL**: Windows Subsystem for Linux"
+msgstr "**WSL**：Windows Linux 子系统"
+
+#: ../../development/script_validation.rst:228
+#: 98d0424bd828470f931a345c908a6f16
+msgid "**Linux**: Native Linux environment"
+msgstr "**Linux**：原生 Linux 环境"
+
+#: ../../development/script_validation.rst:231
+#: 9aee3c5bd7ef427486c4d14bc41ef84e
+msgid "Testing on Windows"
+msgstr "在 Windows 上测试"
+
+#: ../../development/script_validation.rst:233
+#: ../../development/script_validation.rst:258
+#: ../../development/script_validation.rst:283
+#: 2bb3b815dd6e48c8b5bfb32a228fdd65 c0f2d8892e704285bd846a0159dcf921
+#: fc03927be5cf47c4b04ac1d8f73bb762
+msgid "**Prerequisites:**"
+msgstr "**Prerequisites:**"
+
+#: ../../development/script_validation.rst:235
+#: ../../development/script_validation.rst:285
+#: 276b183a888e4ccd97d17b98323b54d3 56d0a198f0844bbb85e5e69141ea008d
+msgid "Python 3.8+"
+msgstr ""
+
+#: ../../development/script_validation.rst:236
+#: 8e8bc2b28d2c46aa8d66df19d71d9ea3
+msgid "PowerShell 5.1+"
+msgstr ""
+
+#: ../../development/script_validation.rst:237
+#: 8f2a94a610e14a6fa82bb8d4d3c626c1
+msgid "Git for Windows"
+msgstr ""
+
+#: ../../development/script_validation.rst:239
+#: ../../development/script_validation.rst:264
+#: ../../development/script_validation.rst:289
+#: 03f13eab4ccb49bda2eb1b0a1073f8dd 60ed86fc0565468ab9e4450197e01f14
+#: 7ff7f1ed4c63462e99d8b2f63b8e88af
+msgid "**Running validation:**"
+msgstr "**Running validation:**"
+
+#: ../../development/script_validation.rst:241
+#: 20186041f4a346b6a6c6d65be3b3e5ae
+msgid ""
+"# Full validation on Windows\n"
+"python -m script_validation --platforms windows\n"
+"\n"
+"# Test specific script types\n"
+"python -m script_validation --platforms windows --validators functional"
+msgstr ""
+"# Full validation on Windows\n"
+"python -m script_validation --platforms windows\n"
+"\n"
+"# Test specific script types\n"
+"python -m script_validation --platforms windows --validators functional"
+
+#: ../../development/script_validation.rst:249
+#: ../../development/script_validation.rst:274
+#: ../../development/script_validation.rst:299
+#: 2717b894e74e44e0a1aedd7bb4231884 41bbcc89d8df40bfa8ff5e8f3225f9d9
+#: 5d4e860a924e480f8d4b3a1a42dc69fb
+msgid "**Common issues:**"
+msgstr "**Common issues:**"
+
+#: ../../development/script_validation.rst:251
+#: 84e77dff51d743b3b196eb1381395e58
+msgid "Path separators: Use ``Path`` objects for cross-platform compatibility"
+msgstr "路径分隔符：使用 ``Path`` 对象实现跨平台兼容性"
+
+#: ../../development/script_validation.rst:252
+#: 7c7c7e7eeaf148fb8e684c7ef4a040b2
+msgid "Line endings: Ensure scripts handle both CRLF and LF"
+msgstr "行结束符：确保脚本处理 CRLF 和 LF"
+
+#: ../../development/script_validation.rst:253
+#: bcd4548b698e4cdfa4cdd9d5ba61d57a
+msgid "Shell differences: Test both CMD and PowerShell execution"
+msgstr "Shell 差异：测试 CMD 和 PowerShell 执行"
+
+#: ../../development/script_validation.rst:256
+#: 08177ebe1c7d4566b33303a8d817185d
+msgid "Testing on WSL"
+msgstr "在 WSL 上测试"
+
+#: ../../development/script_validation.rst:260
+#: 1615187c371044f5998ec6ccee8bee91
+msgid "WSL 2 installed"
+msgstr ""
+
+#: ../../development/script_validation.rst:261
+#: 94480dd2dca3485d80dcabb13bd32d71
+msgid "Python 3.8+ in WSL"
+msgstr "WSL 中的 Python 3.8+"
+
+#: ../../development/script_validation.rst:262
+#: 19458177486c495ba54608dcd919748e
+msgid "Access to Windows filesystem"
+msgstr "访问 Windows 文件系统"
+
+#: ../../development/script_validation.rst:266
+#: 5503abda19e34041b4be6e4ea25a3010
+msgid ""
+"# Full validation on WSL\n"
+"python -m script_validation --platforms wsl\n"
+"\n"
+"# Test cross-platform compatibility\n"
+"python -m script_validation --platforms windows wsl --validators compatibility"
+msgstr ""
+"# Full validation on WSL\n"
+"python -m script_validation --platforms wsl\n"
+"\n"
+"# Test cross-platform compatibility\n"
+"python -m script_validation --platforms windows wsl --validators compatibility"
+
+#: ../../development/script_validation.rst:276
+#: 36d4d40cf00d47768405438ed954e93a
+msgid "File permissions: WSL may have different permissions than Windows"
+msgstr "文件权限：WSL 可能与 Windows 有不同的权限"
+
+#: ../../development/script_validation.rst:277
+#: 9a3eaebda92c41f8af74a37437a6083c
+msgid "Path translation: Windows paths need conversion in WSL"
+msgstr "路径转换：Windows 路径在 WSL 中需要转换"
+
+#: ../../development/script_validation.rst:278
+#: 8aefa3dd7a404ec89b3d9316dbf82535
+msgid "Performance: File I/O may be slower across filesystem boundaries"
+msgstr ""
+
+#: ../../development/script_validation.rst:281
+#: 0cd4203172ae42d1890915458bcfdd09
+msgid "Testing on Linux"
+msgstr "在 Linux 上测试"
+
+#: ../../development/script_validation.rst:286
+#: d32d4845efc942748667ea83465c0185
+msgid "Bash shell"
+msgstr ""
+
+#: ../../development/script_validation.rst:287
+#: f903390e27a9469b9c4d9916b87d3aa4
+msgid "Standard Unix utilities"
+msgstr ""
+
+#: ../../development/script_validation.rst:291
+#: e9391cc8a80d401fa1041e2e38682a20
+msgid ""
+"# Full validation on Linux\n"
+"python -m script_validation --platforms linux\n"
+"\n"
+"# Performance testing\n"
+"python -m script_validation --platforms linux --validators performance"
+msgstr ""
+"# Full validation on Linux\n"
+"python -m script_validation --platforms linux\n"
+"\n"
+"# Performance testing\n"
+"python -m script_validation --platforms linux --validators performance"
+
+#: ../../development/script_validation.rst:301
+#: 92cdc3c33fd24da9ad5a4313714a29aa
+msgid "Shell differences: Test with both bash and sh"
+msgstr ""
+
+#: ../../development/script_validation.rst:302
+#: 9a76f021916c4ca2ad9de5128a1badce
+msgid "Dependencies: Ensure all required tools are installed"
+msgstr ""
+
+#: ../../development/script_validation.rst:303
+#: 91ffc248717c4557a4d63beb8cc48acb
+msgid "Permissions: Check execute permissions on scripts"
+msgstr ""
+
+#: ../../development/script_validation.rst:306
+#: 9ddd38f306104cd589ef7d60acc19573
+msgid "Cross-Platform Testing Examples"
+msgstr ""
+
+#: ../../development/script_validation.rst:308
+#: 4a0f504e02e74b42b003770b024d8a8f
+msgid "**Example 1: Full Cross-Platform Validation**"
+msgstr "**Example 1: Full Cross-Platform Validation**"
+
+#: ../../development/script_validation.rst:310
+#: cdbe56e98c544ee29cfd3986c97f1af5
+msgid ""
+"# Test on all available platforms\n"
+"python -m script_validation --mode full --platforms windows wsl linux\n"
+"\n"
+"# View HTML report\n"
+"open validation_reports/report.html"
+msgstr ""
+"# Test on all available platforms\n"
+"python -m script_validation --mode full --platforms windows wsl linux\n"
+"\n"
+"# View HTML report\n"
+"open validation_reports/report.html"
+
+#: ../../development/script_validation.rst:318
+#: 0cd7939beac04729bb3f3ccb51508857
+msgid "**Example 2: Compatibility Testing**"
+msgstr "**Example 2: Compatibility Testing**"
+
+#: ../../development/script_validation.rst:320
+#: 3fa174f5d6f442a9bfe18952c7ddc5d3
+msgid ""
+"# Focus on compatibility issues\n"
+"python -m script_validation \\\n"
+"    --validators compatibility \\\n"
+"    --platforms windows linux \\\n"
+"    --report-format html"
+msgstr ""
+"# Focus on compatibility issues\n"
+"python -m script_validation \\\n"
+"    --validators compatibility \\\n"
+"    --platforms windows linux \\\n"
+"    --report-format html"
+
+#: ../../development/script_validation.rst:328
+#: a21ffea81b3144218cc7f7c802d6172f
+msgid "**Example 3: Performance Comparison**"
+msgstr "**Example 3: Performance Comparison**"
+
+#: ../../development/script_validation.rst:330
+#: c5245c90534a4ccca82c79ca04700674
+msgid ""
+"# Compare performance across platforms\n"
+"python -m script_validation \\\n"
+"    --validators performance \\\n"
+"    --platforms windows wsl linux \\\n"
+"    --report-format json\n"
+"\n"
+"# Analyze results\n"
+"python -c \"\n"
+"import json\n"
+"with open('validation_reports/report.json') as f:\n"
+"    data = json.load(f)\n"
+"    for platform, results in data['performance'].items():\n"
+"        print(f'{platform}: {results[\\\"avg_time\\\"]}s')\n"
+"\""
+msgstr ""
+"# Compare performance across platforms\n"
+"python -m script_validation \\\n"
+"    --validators performance \\\n"
+"    --platforms windows wsl linux \\\n"
+"    --report-format json\n"
+"\n"
+"# Analyze results\n"
+"python -c \"\n"
+"import json\n"
+"with open('validation_reports/report.json') as f:\n"
+"    data = json.load(f)\n"
+"    for platform, results in data['performance'].items():\n"
+"        print(f'{platform}: {results[\\\"avg_time\\\"]}s')\n"
+"\""
+
+#: ../../development/script_validation.rst:347
+#: 4210a9ca40ec47bb956d52543af23d7a
+msgid "**Example 4: CI Pipeline Testing**"
+msgstr "**Example 4: CI Pipeline Testing**"
+
+#: ../../development/script_validation.rst:349
+#: ebbcb1c3a1e844428fe71b05c6c373f4
+msgid ""
+"# Simulate CI environment\n"
+"python -m script_validation \\\n"
+"    --ci \\\n"
+"    --platforms linux \\\n"
+"    --report-format junit \\\n"
+"    --timeout 600\n"
+"\n"
+"# Check exit code\n"
+"echo $?"
+msgstr ""
+"# Simulate CI environment\n"
+"python -m script_validation \\\n"
+"    --ci \\\n"
+"    --platforms linux \\\n"
+"    --report-format junit \\\n"
+"    --timeout 600\n"
+"\n"
+"# Check exit code\n"
+"echo $?"
+
+#: ../../development/script_validation.rst:361
+#: b28e515dae424ba0bd497f6ab657206d
+msgid "**Example 5: Selective Script Testing**"
+msgstr "**Example 5: Selective Script Testing**"
+
+#: ../../development/script_validation.rst:363
+#: 712d48a6ddf6468e8c850da3bf5febfe
+msgid ""
+"from script_validation import ValidationBuilder, Platform\n"
+"from pathlib import Path\n"
+"\n"
+"# Test only build scripts\n"
+"workflow = (ValidationBuilder()\n"
+"    .root_path(Path('./scripts/building'))\n"
+"    .platforms(Platform.WINDOWS, Platform.LINUX)\n"
+"    .validators('functional')\n"
+"    .build())\n"
+"\n"
+"report = workflow.run()\n"
+"\n"
+"if report.success:\n"
+"    print(\"Build scripts validated successfully\")\n"
+"else:\n"
+"    print(f\"Validation failed: {report.failures}\")"
+msgstr ""
+"from script_validation import ValidationBuilder, Platform\n"
+"from pathlib import Path\n"
+"\n"
+"# Test only build scripts\n"
+"workflow = (ValidationBuilder()\n"
+"    .root_path(Path('./scripts/building'))\n"
+"    .platforms(Platform.WINDOWS, Platform.LINUX)\n"
+"    .validators('functional')\n"
+"    .build())\n"
+"\n"
+"report = workflow.run()\n"
+"\n"
+"if report.success:\n"
+"    print(\"Build scripts validated successfully\")\n"
+"else:\n"
+"    print(f\"Validation failed: {report.failures}\")"
+
+#: ../../development/script_validation.rst:383
+#: 19f90c28f33d48b0918dda3976399741
+msgid "CI/CD Integration"
+msgstr ""
+
+#: ../../development/script_validation.rst:385
+#: cb5e5894995d4b8dbbb0d203fb9b75af
+msgid ""
+"The system automatically detects CI environments and adjusts output format:"
+msgstr ""
+
+#: ../../development/script_validation.rst:387
+#: bdf3f1b683d64ce9b5321a731ba1b1f7
+msgid "**GitHub Actions**: Uses ``::error::`` and ``::warning::`` annotations"
+msgstr ""
+
+#: ../../development/script_validation.rst:388
+#: c7d038a4f8294b4c8a837ccab91c6a6d
+msgid "**GitLab CI**: Uses collapsible sections"
+msgstr ""
+
+#: ../../development/script_validation.rst:389
+#: 854005749dc342abb6f8d3284d7d46a4
+msgid "**Azure DevOps**: Uses ``##vso`` commands"
+msgstr ""
+
+#: ../../development/script_validation.rst:390
+#: 463a89bb99a942d181252a60d7ec0081
+msgid "**Jenkins**: Standard output format"
+msgstr ""
+
+#: ../../development/script_validation.rst:393
+#: e67f4badcf0342e5ad9db335b06c61b2
+msgid "Exit Codes"
+msgstr ""
+
+#: ../../development/script_validation.rst:399
+#: f65d8db914ec47a381d36074e8f2adc6
+msgid "Code"
+msgstr "代码"
+
+#: ../../development/script_validation.rst:400
+#: f072c7fa6e544ba88c159a989fa360ca
+msgid "Meaning"
+msgstr ""
+
+#: ../../development/script_validation.rst:401
+#: 5aaa7247362d49508139ee13930cc27e
+msgid "0"
+msgstr "0"
+
+#: ../../development/script_validation.rst:402
+#: a4dd4d9af7e146898ff003c111137d0e
+msgid "Validation successful"
+msgstr ""
+
+#: ../../development/script_validation.rst:403
+#: 56a76192ac764cd7b92e2477115103c9
+msgid "1"
+msgstr "1"
+
+#: ../../development/script_validation.rst:404
+#: 1f7c18bf3f964343931519378f391efb
+msgid "Validation failed"
+msgstr "验证失败"
+
+#: ../../development/script_validation.rst:405
+#: 195bdb912c1a42aba53321c9acab2e11
+msgid "2"
+msgstr "2"
+
+#: ../../development/script_validation.rst:406
+#: f3325964691c4230875d9eb3cdd44434
+msgid "Execution error"
+msgstr "执行错误"
+
+#: ../../development/script_validation.rst:409
+#: d13ab1f7f89341298903157a21621d91
+msgid "GitHub Actions Example"
+msgstr ""
+
+#: ../../development/script_validation.rst:411
+#: 6abc6b2093df46d7a2831556965939ec
+msgid ""
+"name: Script Validation\n"
+"on: [push, pull_request]\n"
+"\n"
+"jobs:\n"
+"  validate:\n"
+"    runs-on: ${{ matrix.os }}\n"
+"    strategy:\n"
+"      matrix:\n"
+"        os: [ubuntu-latest, windows-latest]\n"
+"\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"\n"
+"      - name: Set up Python\n"
+"        uses: actions/setup-python@v4\n"
+"        with:\n"
+"          python-version: '3.10'\n"
+"\n"
+"      - name: Install dependencies\n"
+"        run: pip install -r requirements.txt\n"
+"\n"
+"      - name: Validate Scripts\n"
+"        run: python -m script_validation --ci --report-format junit\n"
+"\n"
+"      - name: Upload Report\n"
+"        if: always()\n"
+"        uses: actions/upload-artifact@v3\n"
+"        with:\n"
+"          name: validation-report-${{ matrix.os }}\n"
+"          path: validation_reports/\n"
+"\n"
+"      - name: Publish Test Results\n"
+"        if: always()\n"
+"        uses: EnricoMi/publish-unit-test-result-action@v2\n"
+"        with:\n"
+"          files: validation_reports/junit.xml"
+msgstr ""
+"name: Script Validation\n"
+"on: [push, pull_request]\n"
+"\n"
+"jobs:\n"
+"  validate:\n"
+"    runs-on: ${{ matrix.os }}\n"
+"    strategy:\n"
+"      matrix:\n"
+"        os: [ubuntu-latest, windows-latest]\n"
+"\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"\n"
+"      - name: Set up Python\n"
+"        uses: actions/setup-python@v4\n"
+"        with:\n"
+"          python-version: '3.10'\n"
+"\n"
+"      - name: Install dependencies\n"
+"        run: pip install -r requirements.txt\n"
+"\n"
+"      - name: Validate Scripts\n"
+"        run: python -m script_validation --ci --report-format junit\n"
+"\n"
+"      - name: Upload Report\n"
+"        if: always()\n"
+"        uses: actions/upload-artifact@v3\n"
+"        with:\n"
+"          name: validation-report-${{ matrix.os }}\n"
+"          path: validation_reports/\n"
+"\n"
+"      - name: Publish Test Results\n"
+"        if: always()\n"
+"        uses: EnricoMi/publish-unit-test-result-action@v2\n"
+"        with:\n"
+"          files: validation_reports/junit.xml"
+
+#: ../../development/script_validation.rst:451
+#: 33271202380148e0a7e427f26c08f549
+msgid "GitLab CI Example"
+msgstr ""
+
+#: ../../development/script_validation.rst:453
+#: 318f07d745c04a669333bb3288b386ff
+msgid ""
+"script_validation:\n"
+"  stage: test\n"
+"  parallel:\n"
+"    matrix:\n"
+"      - PLATFORM: [windows, linux]\n"
+"  script:\n"
+"    - pip install -r requirements.txt\n"
+"    - python -m script_validation --ci --platforms $PLATFORM --report-format junit\n"
+"  artifacts:\n"
+"    reports:\n"
+"      junit: validation_reports/junit.xml\n"
+"    paths:\n"
+"      - validation_reports/\n"
+"    when: always"
+msgstr ""
+"script_validation:\n"
+"  stage: test\n"
+"  parallel:\n"
+"    matrix:\n"
+"      - PLATFORM: [windows, linux]\n"
+"  script:\n"
+"    - pip install -r requirements.txt\n"
+"    - python -m script_validation --ci --platforms $PLATFORM --report-format junit\n"
+"  artifacts:\n"
+"    reports:\n"
+"      junit: validation_reports/junit.xml\n"
+"    paths:\n"
+"      - validation_reports/\n"
+"    when: always"
+
+#: ../../development/script_validation.rst:471
+#: 98f09b5b1af3499e92e57a78597bdb6c
+msgid "Jenkins Example"
+msgstr ""
+
+#: ../../development/script_validation.rst:473
+#: c63a302e931e4a41b9fd9543caf243e4
+msgid ""
+"pipeline {\n"
+"    agent any\n"
+"\n"
+"    stages {\n"
+"        stage('Validate Scripts') {\n"
+"            parallel {\n"
+"                stage('Windows') {\n"
+"                    agent { label 'windows' }\n"
+"                    steps {\n"
+"                        bat 'python -m script_validation --ci --platforms windows --report-format junit'\n"
+"                    }\n"
+"                }\n"
+"                stage('Linux') {\n"
+"                    agent { label 'linux' }\n"
+"                    steps {\n"
+"                        sh 'python -m script_validation --ci --platforms linux --report-format junit'\n"
+"                    }\n"
+"                }\n"
+"            }\n"
+"        }\n"
+"    }\n"
+"\n"
+"    post {\n"
+"        always {\n"
+"            junit 'validation_reports/junit.xml'\n"
+"            publishHTML([\n"
+"                reportDir: 'validation_reports',\n"
+"                reportFiles: 'report.html',\n"
+"                reportName: 'Script Validation Report'\n"
+"            ])\n"
+"        }\n"
+"    }\n"
+"}"
+msgstr ""
+"pipeline {\n"
+"    agent any\n"
+"\n"
+"    stages {\n"
+"        stage('Validate Scripts') {\n"
+"            parallel {\n"
+"                stage('Windows') {\n"
+"                    agent { label 'windows' }\n"
+"                    steps {\n"
+"                        bat 'python -m script_validation --ci --platforms windows --report-format junit'\n"
+"                    }\n"
+"                }\n"
+"                stage('Linux') {\n"
+"                    agent { label 'linux' }\n"
+"                    steps {\n"
+"                        sh 'python -m script_validation --ci --platforms linux --report-format junit'\n"
+"                    }\n"
+"                }\n"
+"            }\n"
+"        }\n"
+"    }\n"
+"\n"
+"    post {\n"
+"        always {\n"
+"            junit 'validation_reports/junit.xml'\n"
+"            publishHTML([\n"
+"                reportDir: 'validation_reports',\n"
+"                reportFiles: 'report.html',\n"
+"                reportName: 'Script Validation Report'\n"
+"            ])\n"
+"        }\n"
+"    }\n"
+"}"
+
+#: ../../development/script_validation.rst:510
+#: 357bc081a6f145d4b933cacc0f7da8da
+msgid "Azure DevOps Example"
+msgstr ""
+
+#: ../../development/script_validation.rst:512
+#: 5ed36a9b5ff74547ad5688060f3cfc6f
+msgid ""
+"trigger:\n"
+"  - main\n"
+"\n"
+"pool:\n"
+"  vmImage: 'ubuntu-latest'\n"
+"\n"
+"steps:\n"
+"  - task: UsePythonVersion@0\n"
+"    inputs:\n"
+"      versionSpec: '3.10'\n"
+"\n"
+"  - script: |\n"
+"      pip install -r requirements.txt\n"
+"      python -m script_validation --ci --report-format junit\n"
+"    displayName: 'Validate Scripts'\n"
+"\n"
+"  - task: PublishTestResults@2\n"
+"    condition: always()\n"
+"    inputs:\n"
+"      testResultsFormat: 'JUnit'\n"
+"      testResultsFiles: 'validation_reports/junit.xml'\n"
+"\n"
+"  - task: PublishBuildArtifacts@1\n"
+"    condition: always()\n"
+"    inputs:\n"
+"      pathToPublish: 'validation_reports'\n"
+"      artifactName: 'validation-report'"
+msgstr ""
+"trigger:\n"
+"  - main\n"
+"\n"
+"pool:\n"
+"  vmImage: 'ubuntu-latest'\n"
+"\n"
+"steps:\n"
+"  - task: UsePythonVersion@0\n"
+"    inputs:\n"
+"      versionSpec: '3.10'\n"
+"\n"
+"  - script: |\n"
+"      pip install -r requirements.txt\n"
+"      python -m script_validation --ci --report-format junit\n"
+"    displayName: 'Validate Scripts'\n"
+"\n"
+"  - task: PublishTestResults@2\n"
+"    condition: always()\n"
+"    inputs:\n"
+"      testResultsFormat: 'JUnit'\n"
+"      testResultsFiles: 'validation_reports/junit.xml'\n"
+"\n"
+"  - task: PublishBuildArtifacts@1\n"
+"    condition: always()\n"
+"    inputs:\n"
+"      pathToPublish: 'validation_reports'\n"
+"      artifactName: 'validation-report'"
+
+#: ../../development/script_validation.rst:543
+#: 509372ded1ca4e1289773c2300171a9f
+msgid "Validators"
+msgstr ""
+
+#: ../../development/script_validation.rst:546
+#: 769a9e383bbe4d4184545dba191c18ee
+msgid "Functional Validator"
+msgstr ""
+
+#: ../../development/script_validation.rst:548
+#: 7123ebaa16fc4f8ead4c43b88a4fe266
+msgid "Verifies that scripts execute correctly and produce expected results."
+msgstr ""
+
+#: ../../development/script_validation.rst:550
+#: ../../development/script_validation.rst:571
+#: ../../development/script_validation.rst:613
+#: 2ae644ecd1844b46bf09778c65ce98d3 692ea48ca97d4cd0a8eb2dbeb48e45a4
+#: 7df31000e8174183b1a614a4178a3e9b
+msgid "**Checks:**"
+msgstr "**Checks:**"
+
+#: ../../development/script_validation.rst:552
+#: f26b25793cf6429b9151da8bd2255a39
+msgid "Script exits with code 0 on success"
+msgstr ""
+
+#: ../../development/script_validation.rst:553
+#: 1199cc15eb8342178ef71106a557779e
+msgid "Required output files are created"
+msgstr ""
+
+#: ../../development/script_validation.rst:554
+#: 1128ac5cdfdb4d149376073e26ef6d02
+msgid "Output matches expected format"
+msgstr ""
+
+#: ../../development/script_validation.rst:555
+#: c56984abc62e44ceaf496205a80db9c9
+msgid "Error handling works correctly"
+msgstr ""
+
+#: ../../development/script_validation.rst:557
+#: ../../development/script_validation.rst:578
+#: ../../development/script_validation.rst:599
+#: ../../development/script_validation.rst:620
+#: 0e2837a0af0e4dfc86a6b4a9d4c70c13 619c48e734f7431cb0cfc3339e3da6af
+#: f4fe522715ac4c8b8e4c5bd2eef0b574 f71bfaaf820e4f2fb861513acd91001b
+msgid "**Example:**"
+msgstr "**Example:**"
+
+#: ../../development/script_validation.rst:559
+#: b09dfe028d3145f08f6ffd259665ab37
+msgid ""
+"from script_validation.validators import FunctionalValidator\n"
+"\n"
+"validator = FunctionalValidator()\n"
+"result = validator.validate_script(script_path, platform)"
+msgstr ""
+"from script_validation.validators import FunctionalValidator\n"
+"\n"
+"validator = FunctionalValidator()\n"
+"result = validator.validate_script(script_path, platform)"
+
+#: ../../development/script_validation.rst:567
+#: 86de602e41804de9914390fc67ebbe01
+msgid "Compatibility Validator"
+msgstr ""
+
+#: ../../development/script_validation.rst:569
+#: 98f2f1df4fd54f7eb68c5ab10c73bb83
+msgid "Checks cross-platform compatibility issues."
+msgstr ""
+
+#: ../../development/script_validation.rst:573
+#: 2ced146cf7d7405e807dc5a4924904cf
+msgid "Path separators are handled correctly"
+msgstr ""
+
+#: ../../development/script_validation.rst:574
+#: 41e24c688bd745e6be365702f3c26570
+msgid "Line endings are compatible"
+msgstr ""
+
+#: ../../development/script_validation.rst:575
+#: 0207b4414de546648fd8b51c05bc691a
+msgid "Shell commands work on all platforms"
+msgstr ""
+
+#: ../../development/script_validation.rst:576
+#: 43d197486b1947a58bf769b81ef928dc
+msgid "Dependencies are available"
+msgstr ""
+
+#: ../../development/script_validation.rst:580
+#: 98fa59a620414bd0a145ee01476ba643
+msgid ""
+"from script_validation.validators import CompatibilityValidator\n"
+"\n"
+"validator = CompatibilityValidator()\n"
+"result = validator.validate_script(script_path, platforms)"
+msgstr ""
+"from script_validation.validators import CompatibilityValidator\n"
+"\n"
+"validator = CompatibilityValidator()\n"
+"result = validator.validate_script(script_path, platforms)"
+
+#: ../../development/script_validation.rst:588
+#: ce98a2506d3d47f48b494b17b5d78e21
+msgid "Performance Validator"
+msgstr ""
+
+#: ../../development/script_validation.rst:590
+#: b6ce2d150aac4bc688e9d8490a5ca514
+msgid "Measures script execution performance."
+msgstr ""
+
+#: ../../development/script_validation.rst:592
+#: 543d4e3e2f8149e98a5e61f8526d6a30
+msgid "**Metrics:**"
+msgstr "**Metrics:**"
+
+#: ../../development/script_validation.rst:594
+#: bff3675aaa2d47c5811f6c3842d65ada
+msgid "Execution time"
+msgstr "执行时间"
+
+#: ../../development/script_validation.rst:595
+#: 52d9cd3665fd47ed95c54b7549cd86bf
+msgid "Memory usage"
+msgstr "内存使用"
+
+#: ../../development/script_validation.rst:596
+#: 3c62f43d23d04623a0d9720f52d1beb5
+msgid "CPU usage"
+msgstr "CPU 使用"
+
+#: ../../development/script_validation.rst:597
+#: d09cfdb4aa75409bb3dfb60a0961bffe
+msgid "I/O operations"
+msgstr ""
+
+#: ../../development/script_validation.rst:601
+#: e0de2352ee984492930d9f12b558c985
+msgid ""
+"from script_validation.validators import PerformanceValidator\n"
+"\n"
+"validator = PerformanceValidator()\n"
+"result = validator.validate_script(script_path, platform)"
+msgstr ""
+"from script_validation.validators import PerformanceValidator\n"
+"\n"
+"validator = PerformanceValidator()\n"
+"result = validator.validate_script(script_path, platform)"
+
+#: ../../development/script_validation.rst:609
+#: ce027ec5752c46aea6f0364380e1ab20
+msgid "Documentation Validator"
+msgstr ""
+
+#: ../../development/script_validation.rst:611
+#: 5ff3a4db7a8e4d15b6f203893fd0f332
+msgid "Validates script documentation completeness."
+msgstr ""
+
+#: ../../development/script_validation.rst:615
+#: f80f2a5183d242a8b7a3e36e950c96c1
+msgid "Help text is available"
+msgstr ""
+
+#: ../../development/script_validation.rst:616
+#: a14032a10057418b95bbb27fc4228461
+msgid "Usage examples are provided"
+msgstr ""
+
+#: ../../development/script_validation.rst:617
+#: 4504b25a51d54d18bdd8237b702710af
+msgid "All options are documented"
+msgstr ""
+
+#: ../../development/script_validation.rst:618
+#: 140e2e810a7547b6bfce2b9adcf324c9
+msgid "Error messages are clear"
+msgstr ""
+
+#: ../../development/script_validation.rst:622
+#: dd18121bbf164727aaa9d13eb7ffefcd
+msgid ""
+"from script_validation.validators import DocumentationValidator\n"
+"\n"
+"validator = DocumentationValidator()\n"
+"result = validator.validate_script(script_path)"
+msgstr ""
+"from script_validation.validators import DocumentationValidator\n"
+"\n"
+"validator = DocumentationValidator()\n"
+"result = validator.validate_script(script_path)"
+
+#: ../../development/script_validation.rst:630
+#: 9c409fd9f42e4d33b5288de99f0f48d5
+msgid "Report Formats"
+msgstr ""
+
+#: ../../development/script_validation.rst:633
+#: a25486e740e44d9c90d207b8c5e30f9f
+msgid "HTML Report"
+msgstr "HTML 报告"
+
+#: ../../development/script_validation.rst:635
+#: 4bc61565e100486199fe3059f3f4d350
+msgid "Interactive HTML report with:"
+msgstr ""
+
+#: ../../development/script_validation.rst:637
+#: a13715ee5fe74dac8b82221cdf0f8dea
+msgid "Summary dashboard"
+msgstr ""
+
+#: ../../development/script_validation.rst:638
+#: e2c265ec11ba48c7b37fa38dceae740e
+msgid "Platform-specific results"
+msgstr ""
+
+#: ../../development/script_validation.rst:639
+#: 5cf1f03d70b9412db835db87e1357da9
+msgid "Detailed failure information"
+msgstr ""
+
+#: ../../development/script_validation.rst:640
+#: 645c71aea7224e40b548b5f89dcf9dff
+msgid "Performance charts"
+msgstr ""
+
+#: ../../development/script_validation.rst:641
+#: c7095be6e1a04c29b3e0a80b8bedd77a
+msgid "Filtering and search"
+msgstr ""
+
+#: ../../development/script_validation.rst:643
+#: cde8378a07264ac7b7d85ca2cf3115df
+msgid "**Location:** ``validation_reports/report.html``"
+msgstr ""
+
+#: ../../development/script_validation.rst:646
+#: 1e3bff5880ff4e32aef62cc5ffa2663b
+msgid "JSON Report"
+msgstr "JSON 报告"
+
+#: ../../development/script_validation.rst:648
+#: 29a58b5238fd492cbf98a118300b2a4e
+msgid "Machine-readable JSON format:"
+msgstr ""
+
+#: ../../development/script_validation.rst:650
+#: d31dc8793b994afaaa8df75664e763fb
+msgid ""
+"{\n"
+"  \"summary\": {\n"
+"    \"total_scripts\": 42,\n"
+"    \"passed\": 40,\n"
+"    \"failed\": 2,\n"
+"    \"platforms\": [\"windows\", \"linux\"]\n"
+"  },\n"
+"  \"results\": [\n"
+"    {\n"
+"      \"script\": \"build.py\",\n"
+"      \"platform\": \"windows\",\n"
+"      \"status\": \"passed\",\n"
+"      \"duration\": 1.23\n"
+"    }\n"
+"  ]\n"
+"}"
+msgstr ""
+"{\n"
+"  \"summary\": {\n"
+"    \"total_scripts\": 42,\n"
+"    \"passed\": 40,\n"
+"    \"failed\": 2,\n"
+"    \"platforms\": [\"windows\", \"linux\"]\n"
+"  },\n"
+"  \"results\": [\n"
+"    {\n"
+"      \"script\": \"build.py\",\n"
+"      \"platform\": \"windows\",\n"
+"      \"status\": \"passed\",\n"
+"      \"duration\": 1.23\n"
+"    }\n"
+"  ]\n"
+"}"
+
+#: ../../development/script_validation.rst:669
+#: a883c54af5c147fcbed04e2ac994e2f5
+msgid "**Location:** ``validation_reports/report.json``"
+msgstr ""
+
+#: ../../development/script_validation.rst:672
+#: 18e8b6d3bca542baaa967c89d77c483e
+msgid "JUnit XML Report"
+msgstr "JUnit XML 报告"
+
+#: ../../development/script_validation.rst:674
+#: 13d8e088dd344d148a39beb2354a7a34
+msgid "Standard JUnit XML format for CI integration:"
+msgstr ""
+
+#: ../../development/script_validation.rst:676
+#: b54430c93a5049578cf502e6c9d86956
+msgid ""
+"<testsuites>\n"
+"  <testsuite name=\"script_validation\" tests=\"42\" failures=\"2\">\n"
+"    <testcase name=\"build.py[windows]\" time=\"1.23\"/>\n"
+"    <testcase name=\"test.py[linux]\" time=\"2.45\">\n"
+"      <failure message=\"Script failed\">...</failure>\n"
+"    </testcase>\n"
+"  </testsuite>\n"
+"</testsuites>"
+msgstr ""
+"<testsuites>\n"
+"  <testsuite name=\"script_validation\" tests=\"42\" failures=\"2\">\n"
+"    <testcase name=\"build.py[windows]\" time=\"1.23\"/>\n"
+"    <testcase name=\"test.py[linux]\" time=\"2.45\">\n"
+"      <failure message=\"Script failed\">...</failure>\n"
+"    </testcase>\n"
+"  </testsuite>\n"
+"</testsuites>"
+
+#: ../../development/script_validation.rst:687
+#: e63b6368922c41e1b3d3c2390f6aec1f
+msgid "**Location:** ``validation_reports/junit.xml``"
+msgstr ""
+
+#: ../../development/script_validation.rst:690
+#: c8868cc3b1dd4e30b7289fe7f4e54188
+msgid "Summary Report"
+msgstr "摘要报告"
+
+#: ../../development/script_validation.rst:692
+#: 89be072e664c44c8bfbe1d2ad638ba4d
+msgid "Concise text summary:"
+msgstr ""
+
+#: ../../development/script_validation.rst:694
+#: 0708c7f20ea04375b1c6d81f68decd5e
+msgid ""
+"Script Validation Summary\n"
+"=========================\n"
+"Total Scripts: 42\n"
+"Passed: 40\n"
+"Failed: 2\n"
+"Success Rate: 95.2%\n"
+"\n"
+"Failures:\n"
+"- test.py [linux]: Exit code 1\n"
+"- format.py [windows]: Timeout"
+msgstr ""
+"Script Validation Summary\n"
+"=========================\n"
+"Total Scripts: 42\n"
+"Passed: 40\n"
+"Failed: 2\n"
+"Success Rate: 95.2%\n"
+"\n"
+"Failures:\n"
+"- test.py [linux]: Exit code 1\n"
+"- format.py [windows]: Timeout"
+
+#: ../../development/script_validation.rst:707
+#: 204cbcf8b2174ca3a32e5f12662237eb
+msgid "**Location:** ``validation_reports/summary.txt``"
+msgstr ""
+
+#: ../../development/script_validation.rst:710
+#: 50ebf80d1bd34fae8e47636017d53ed2
+msgid "Testing"
+msgstr "测试"
+
+#: ../../development/script_validation.rst:713
+#: 87028809eff24bba96e39ad547562120
+msgid "Running Tests"
+msgstr ""
+
+#: ../../development/script_validation.rst:715
+#: c991015839ec458d86b64384a1c74a39
+msgid ""
+"# Run all tests\n"
+"python -m pytest tests/script_validation/ -v\n"
+"\n"
+"# Run property tests\n"
+"python -m pytest tests/script_validation/ -v --hypothesis-show-statistics\n"
+"\n"
+"# Generate coverage report\n"
+"python -m pytest tests/script_validation/ --cov=script_validation --cov-report=html"
+msgstr ""
+"# Run all tests\n"
+"python -m pytest tests/script_validation/ -v\n"
+"\n"
+"# Run property tests\n"
+"python -m pytest tests/script_validation/ -v --hypothesis-show-statistics\n"
+"\n"
+"# Generate coverage report\n"
+"python -m pytest tests/script_validation/ --cov=script_validation --cov-report=html"
+
+#: ../../development/script_validation.rst:727
+#: 9ae81f34ce1043e7919f6a43566aa5e0
+msgid "Test Structure"
+msgstr ""
+
+#: ../../development/script_validation.rst:729
+#: 79a3f6c0ff784a4ebf77ea02e86556ee
+msgid ""
+"tests/script_validation/\n"
+"├── test_adapters.py           # Platform adapter tests\n"
+"├── test_validators.py         # Validator tests\n"
+"├── test_reporters.py          # Reporter tests\n"
+"├── test_integration.py        # Integration tests\n"
+"└── test_properties.py         # Property-based tests"
+msgstr ""
+
+#: ../../development/script_validation.rst:739
+#: ac53b06b5eb34fde849e02cb76da93e0
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../development/script_validation.rst:742
+#: a5a5c9a31496478b9a0305d38e68cc93
+msgid "Common Issues"
+msgstr ""
+
+#: ../../development/script_validation.rst:744
+#: d83a7ed5b5b5425a9cb85906d07219bf
+msgid "**1. Platform Not Available**"
+msgstr "**1. Platform Not Available**"
+
+#: ../../development/script_validation.rst:746
+#: 0e5c6508557342b0a5a90f96fce47765
+msgid "Error: Platform 'wsl' not available"
+msgstr ""
+
+#: ../../development/script_validation.rst:750
+#: ../../development/script_validation.rst:762
+#: ../../development/script_validation.rst:774
+#: ../../development/script_validation.rst:786
+#: 51e980be6752453782c055b9ee20d5b7 a55cb6c8ca344df8a055f7828b2e056d
+#: e210f997dc2a4c66869eb5c767a675f5 f9340f178bef426fb8e190dd782858d4
+msgid "**Solution:**"
+msgstr "**Solution:**"
+
+#: ../../development/script_validation.rst:752
+#: 237b5695b0fe4226834b310ab71d0e40
+msgid "Check platform is installed"
+msgstr ""
+
+#: ../../development/script_validation.rst:753
+#: daa858af832347b88d4d1d4f7705899d
+msgid "Verify Python is accessible on platform"
+msgstr ""
+
+#: ../../development/script_validation.rst:754
+#: 079ced277f184f3ebb3feb22f8591ddc
+msgid "Use ``--check-platforms`` to diagnose"
+msgstr ""
+
+#: ../../development/script_validation.rst:756
+#: 506b1fcef8d543c182638d30b024d6ab
+msgid "**2. Script Timeout**"
+msgstr "**2. Script Timeout**"
+
+#: ../../development/script_validation.rst:758
+#: 3e8498c55dd848b0bb5786c0bab30658
+msgid "Error: Script timeout after 300 seconds"
+msgstr ""
+
+#: ../../development/script_validation.rst:764
+#: 8a2cafacb1cd48d7a64f41965cd2ac26
+msgid "Increase timeout: ``--timeout 600``"
+msgstr ""
+
+#: ../../development/script_validation.rst:765
+#: d33f89f1ecfc4ca586553b80f087f5f2
+msgid "Check for infinite loops"
+msgstr ""
+
+#: ../../development/script_validation.rst:766
+#: 074c6e8b7a2142fbb41e5c1eebdccef5
+msgid "Optimize script performance"
+msgstr ""
+
+#: ../../development/script_validation.rst:768
+#: ac28db71ae00405aa90474b2bdcf0493
+msgid "**3. Permission Denied**"
+msgstr "**3. Permission Denied**"
+
+#: ../../development/script_validation.rst:770
+#: 1fde2257b580469b82e54f9ee70c8561
+msgid "Error: Permission denied: script.sh"
+msgstr ""
+
+#: ../../development/script_validation.rst:776
+#: 1c034707dae246d5a34f0fbad2db9a5e
+msgid "Add execute permission: ``chmod +x script.sh``"
+msgstr ""
+
+#: ../../development/script_validation.rst:777
+#: 971b2e73d98846ef8aa856a8c822fa74
+msgid "Check file ownership"
+msgstr ""
+
+#: ../../development/script_validation.rst:778
+#: d764dfc1968f4ca397d78ecf2f83b1f2
+msgid "Verify platform permissions"
+msgstr ""
+
+#: ../../development/script_validation.rst:780
+#: e693c82e94cd418a8a10e76637234713
+msgid "**4. Missing Dependencies**"
+msgstr "**4. Missing Dependencies**"
+
+#: ../../development/script_validation.rst:782
+#: 6812925dd0964ca4b0bab0f9c830b323
+msgid "Error: Command not found: cmake"
+msgstr ""
+
+#: ../../development/script_validation.rst:788
+#: 7aae8d8d0ecd4145ae9b3ae9ac4c608c
+msgid "Install required dependencies"
+msgstr ""
+
+#: ../../development/script_validation.rst:789
+#: 592ce845671646f2b86b51b8f0a0813e
+msgid "Check PATH environment variable"
+msgstr ""
+
+#: ../../development/script_validation.rst:790
+#: 3d731fa4179b428dab474ba02228e7fe
+msgid "Use platform-specific package manager"
+msgstr ""
+
+#: ../../development/script_validation.rst:793
+#: f84d374b1b434103aeb07d623030cb6a
+msgid "API Reference"
+msgstr "API 参考"
+
+#: ../../development/script_validation.rst:796
+#: 4e85bb02afe84b70be7216d4b2b07b22
+msgid "ValidationBuilder"
+msgstr ""
+
+#: ../../development/script_validation.rst:798
+#: b977afcf829c4004aca91c8bdbccedcb
+msgid "Builder for creating validation workflows:"
+msgstr ""
+
+#: ../../development/script_validation.rst:800
+#: 57efcfad5edd4d4e8b3014261a5adffa
+msgid ""
+"from script_validation import ValidationBuilder, Platform\n"
+"\n"
+"workflow = (ValidationBuilder()\n"
+"    .root_path(Path('./'))\n"
+"    .platforms(Platform.WINDOWS, Platform.LINUX)\n"
+"    .validators('functional', 'compatibility')\n"
+"    .report_formats('html', 'junit')\n"
+"    .timeout(600)\n"
+"    .max_memory(2048)\n"
+"    .ci_mode(True)\n"
+"    .parallel(True)\n"
+"    .verbose(True)\n"
+"    .build())"
+msgstr ""
+"from script_validation import ValidationBuilder, Platform\n"
+"\n"
+"workflow = (ValidationBuilder()\n"
+"    .root_path(Path('./'))\n"
+"    .platforms(Platform.WINDOWS, Platform.LINUX)\n"
+"    .validators('functional', 'compatibility')\n"
+"    .report_formats('html', 'junit')\n"
+"    .timeout(600)\n"
+"    .max_memory(2048)\n"
+"    .ci_mode(True)\n"
+"    .parallel(True)\n"
+"    .verbose(True)\n"
+"    .build())"
+
+#: ../../development/script_validation.rst:817
+#: 65418fd67b3f4cac9298348b0cfd0055
+msgid "Platform Enum"
+msgstr ""
+
+#: ../../development/script_validation.rst:819
+#: 1f610ad7ff094ef59560ede9ea456689
+msgid "Available platforms:"
+msgstr ""
+
+#: ../../development/script_validation.rst:821
+#: 0cde51b685ad4937af7d84a4d71c1bfa
+msgid ""
+"from script_validation import Platform\n"
+"\n"
+"Platform.WINDOWS  # Native Windows\n"
+"Platform.WSL      # Windows Subsystem for Linux\n"
+"Platform.LINUX    # Native Linux"
+msgstr ""
+
+#: ../../development/script_validation.rst:830
+#: 744d9010cd8d4ddea0884f2ae0748f86
+msgid "ValidationResult"
+msgstr ""
+
+#: ../../development/script_validation.rst:832
+#: a88db7544be94ba58b22340c9c4129ee
+msgid "Result of validation:"
+msgstr ""
+
+#: ../../development/script_validation.rst:834
+#: 4a7a12c7afc74374a25b07eddb2fa2cf
+msgid ""
+"class ValidationResult:\n"
+"    success: bool\n"
+"    total_scripts: int\n"
+"    passed: int\n"
+"    failed: int\n"
+"    platforms: List[Platform]\n"
+"    failures: List[FailureInfo]\n"
+"    duration: float"
+msgstr ""
+"class ValidationResult:\n"
+"    success: bool\n"
+"    total_scripts: int\n"
+"    passed: int\n"
+"    failed: int\n"
+"    platforms: List[Platform]\n"
+"    failures: List[FailureInfo]\n"
+"    duration: float"
+
+#: ../../development/script_validation.rst:846
+#: b7beb55059994f77892843e67b65d818
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../development/script_validation.rst:848
+#: aed9c1ded6b5498e87a150fc344e3732
+msgid ":doc:`validation_framework` - System validation framework"
+msgstr ":doc:`validation_framework` - System validation framework"
+
+#: ../../development/script_validation.rst:849
+#: 3fd71a08934f415887d004d4fcd61d69
+msgid ":doc:`scripts` - Build scripts documentation"
+msgstr ":doc:`scripts` - Build scripts documentation"
+
+#: ../../development/script_validation.rst:850
+#: b9c9cf8244174d6a80d184bdc08b7463
+msgid ":doc:`testing` - General testing guide"
+msgstr ":doc:`testing` - General testing guide"
+
+#: ../../development/script_validation.rst:851
+#: d5702ca82f824fa8a532051bd8979c6d
+msgid ":doc:`contributing` - Contribution guidelines"
+msgstr ":doc:`contributing` - Contribution guidelines"

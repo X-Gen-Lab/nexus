@@ -1,0 +1,964 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../platform_guides/native.rst:2 a2861352b489483b80ea3807935210d1
+msgid "Native Platform Guide"
+msgstr "Native 平台 Guide"
+
+#: ../../platform_guides/native.rst:5 512c265320a14d8c8278d239f7f7c8f4
+msgid "Overview"
+msgstr "概述"
+
+#: ../../platform_guides/native.rst:7 e81472c8b40541bcad6b69faf307b31d
+msgid ""
+"The Native platform provides a simulated hardware environment for "
+"development and testing on PC (Windows, Linux, macOS). It enables developers"
+" to build and test embedded applications without physical hardware, making "
+"it ideal for rapid prototyping, automated testing, and CI/CD integration."
+msgstr ""
+"The Native platform provides a simulated hardware environment for "
+"development and testing on PC (Windows, Linux, macOS). It enables developers"
+" to build and test embedded applications without physical hardware, making "
+"it ideal for rapid prototyping, automated testing, and CI/CD integration."
+
+#: ../../platform_guides/native.rst:9 0ca420be88434262bc450f9c2f1adb85
+msgid "**Key Features:**"
+msgstr "**Key Features:**"
+
+#: ../../platform_guides/native.rst:11 7045e6ba896e416786f6ab52eb7b19bd
+msgid "Cross-platform support (Windows, Linux, macOS)"
+msgstr "Cross-platform support (Windows, Linux, macOS)"
+
+#: ../../platform_guides/native.rst:12 84d14d97843e450fa6a3d9de45cc56b9
+msgid "Simulated peripheral interfaces"
+msgstr ""
+
+#: ../../platform_guides/native.rst:13 62f011e5f94c4b7cb44ac01b71007c76
+msgid "Data injection for testing"
+msgstr ""
+
+#: ../../platform_guides/native.rst:14 8a4c8a7ddd3648a4bc0c52c63ba303f9
+msgid "No hardware dependencies"
+msgstr ""
+
+#: ../../platform_guides/native.rst:15 db633a616da64e419530874a81726f72
+msgid "Fast build and test cycles"
+msgstr ""
+
+#: ../../platform_guides/native.rst:16 e0d52b72fae34e24aa77c7454ebd1c69
+msgid "CI/CD friendly"
+msgstr ""
+
+#: ../../platform_guides/native.rst:19 977608024c204f48b5ceedf7c5147260
+msgid "Platform Capabilities"
+msgstr "平台 Capabilities"
+
+#: ../../platform_guides/native.rst:22 d445e308318a46d89f0dfab7aa988dd8
+msgid "Supported Peripherals"
+msgstr "支持 Peripherals"
+
+#: ../../platform_guides/native.rst:24 99803a1a18ad4550ba41c431d15f9663
+msgid "The Native platform supports the following peripherals:"
+msgstr ""
+
+#: ../../platform_guides/native.rst:30 50eb840236064097939575f54f11f04e
+msgid "Peripheral"
+msgstr "外设"
+
+#: ../../platform_guides/native.rst:31 fe2d99e1d0ce439a87597658d5784068
+msgid "Max Instances"
+msgstr ""
+
+#: ../../platform_guides/native.rst:32 7480dbb5654e46f19867cbf60d07f0e0
+msgid "Capabilities"
+msgstr ""
+
+#: ../../platform_guides/native.rst:33 49dc8d8c7f404e869b16d9b4a5875703
+msgid "UART"
+msgstr "UART"
+
+#: 7be7c4edde344209b2ee70efbb380b02 85eb5f49dd414ae9ba673884003d6144
+msgid "4"
+msgstr "4"
+
+#: ../../platform_guides/native.rst:35 a58ce1d784fe4fd189b844840bde3fd6
+msgid "Async/Sync TX/RX, configurable baud rate, data injection"
+msgstr ""
+
+#: ../../platform_guides/native.rst:36 eab7ba3c0e554cb9b7bffa7295c729ea
+msgid "GPIO"
+msgstr "GPIO"
+
+#: ../../platform_guides/native.rst:37 c7fe42d7e93c4cf7bcdc52d961994d61
+msgid "32 pins"
+msgstr ""
+
+#: ../../platform_guides/native.rst:38 7a28ae9482f342eba51454c74d006c9f
+msgid "Input/Output, interrupt simulation, state queries"
+msgstr ""
+
+#: ../../platform_guides/native.rst:39 3eb1f27ecf5148ec929c9de176cb9c02
+msgid "SPI"
+msgstr "SPI"
+
+#: 405a5bcf44a9422b9ea3a5b13c61e3fb ec190ffb1cde41769759df451e1ddac2
+msgid "2"
+msgstr "2"
+
+#: 1f3c392fda994d66ab6a5b6b7320b735 631a629a71294c69ab6177439ba85d75
+msgid "Master/Slave modes, data injection, state verification"
+msgstr ""
+
+#: ../../platform_guides/native.rst:42 6af3981ab9c4484c95fde69d1b2fe121
+msgid "I2C"
+msgstr "I2C"
+
+#: ../../platform_guides/native.rst:45 135ee8fff33d4375bb69704860c4cf5b
+msgid "Timer"
+msgstr "定时器"
+
+#: ../../platform_guides/native.rst:47 78be9725c94d49fda8b648e2e598fae2
+msgid "One-shot/Periodic modes, callback support"
+msgstr ""
+
+#: ../../platform_guides/native.rst:48 f4de9306ab4b45dd9ff60a369418422e
+msgid "ADC"
+msgstr "ADC"
+
+#: 46787560fd9146f3b2bff4b70c316ee9 e41f0b0f8f2c4eb2b9d54d0b8e0020ee
+msgid "Optional"
+msgstr "可选"
+
+#: ../../platform_guides/native.rst:50 0d2facbdf06f4973a68af298e7759092
+msgid "Simulated analog input"
+msgstr ""
+
+#: ../../platform_guides/native.rst:51 c408cd94d21b4d29be3d3d12d0049223
+msgid "DAC"
+msgstr "DAC"
+
+#: ../../platform_guides/native.rst:53 9dc9a5b462af4af5a42b6acbc3dcb073
+msgid "Simulated analog output"
+msgstr ""
+
+#: ../../platform_guides/native.rst:54 bd2c804f16cc42c8aa117c6d83f855ff
+msgid "CRC"
+msgstr "CRC"
+
+#: bf41ed098190428698e4638b5fb3f4f2 d3adae3e86b34fe8aa8a5c39485fcf6a
+msgid "1"
+msgstr "1"
+
+#: ../../platform_guides/native.rst:56 3d50dd5ba6bc4fe49ac14aaec937cae0
+msgid "CRC32 calculation"
+msgstr ""
+
+#: ../../platform_guides/native.rst:57 7ba74e686bf64fd3b5bc48581f1308a1
+msgid "Flash"
+msgstr "Flash"
+
+#: ../../platform_guides/native.rst:59 2a9da4696f0246faa01069caff915f9f
+msgid "Simulated non-volatile storage"
+msgstr ""
+
+#: ../../platform_guides/native.rst:60 9f5c8239e8d4424b9a3b70008d8fe217
+msgid "RTC"
+msgstr "RTC"
+
+#: ../../platform_guides/native.rst:62 6bbe77fef4394aca9ffabe0ea8549737
+msgid "Real-time clock simulation"
+msgstr ""
+
+#: ../../platform_guides/native.rst:63 60dc6df6145a403eb7366b019b97501c
+msgid "Watchdog"
+msgstr ""
+
+#: ../../platform_guides/native.rst:65 8025804a470b46bf9fbaf7f8f75e663c
+msgid "Watchdog timer simulation"
+msgstr ""
+
+#: ../../platform_guides/native.rst:68 1d22eb61d31048a38af1733748c119ad
+msgid "Platform Limitations"
+msgstr "平台 Limitations"
+
+#: ../../platform_guides/native.rst:70 4f19772b6ac0453e82686d527981a849
+msgid "The Native platform has the following limitations:"
+msgstr ""
+
+#: ../../platform_guides/native.rst:72 0aeb8a3c131b418d9a059d0fba5ef368
+msgid "**No Real Hardware**: All peripherals are simulated"
+msgstr ""
+
+#: ../../platform_guides/native.rst:73 c094b95df17b4323be072a21b183a6e1
+msgid "**Timing Accuracy**: Timing may not match real hardware exactly"
+msgstr ""
+
+#: ../../platform_guides/native.rst:74 c0cd2a2810ef42e4aab505fb94c3c7c7
+msgid "**No DMA**: DMA operations are simulated but not hardware-accelerated"
+msgstr ""
+
+#: ../../platform_guides/native.rst:75 7648ff069511421792790c3e47baf0f0
+msgid "**No Interrupts**: Interrupts are simulated through callbacks"
+msgstr ""
+
+#: ../../platform_guides/native.rst:76 9d663784784d459d914f5b4f48edcd91
+msgid "**Performance**: Performance characteristics differ from real hardware"
+msgstr ""
+
+#: ../../platform_guides/native.rst:79 7259a52cb85641bab3a53881db604175
+msgid "Build Instructions"
+msgstr "构建 Instructions"
+
+#: ../../platform_guides/native.rst:82 5bf8ed9df95c44008379cddf3f555742
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../platform_guides/native.rst:84 b4279eb767d54c27a3097e107b93c7d1
+msgid "CMake 3.15 or higher"
+msgstr ""
+
+#: ../../platform_guides/native.rst:85 8b55b564f13d483db089c0d84ea23c6a
+msgid "C compiler (GCC, Clang, MSVC)"
+msgstr "C compiler (GCC, Clang, MSVC)"
+
+#: ../../platform_guides/native.rst:86 b5bc5b9572ed4778a27c7e2a1d7f589d
+msgid "Python 3.7+ (for build scripts)"
+msgstr "Python 3.7+ (for build scripts)"
+
+#: ../../platform_guides/native.rst:89 6aff6197a2824327969ad0a2c671fe6b
+msgid "Basic Build"
+msgstr "Basic 构建"
+
+#: ../../platform_guides/native.rst:91 044fea7f48c14878bbf33493d569f9dd
+msgid ""
+"# Configure for Native platform\n"
+"cmake -B build -DPLATFORM=native\n"
+"\n"
+"# Build\n"
+"cmake --build build\n"
+"\n"
+"# Run tests\n"
+"cd build\n"
+"ctest"
+msgstr ""
+"# Configure for Native platform\n"
+"cmake -B build -DPLATFORM=native\n"
+"\n"
+"# Build\n"
+"cmake --build build\n"
+"\n"
+"# Run tests\n"
+"cd build\n"
+"ctest"
+
+#: ../../platform_guides/native.rst:104 c68a3ecdae014841966dbdde76607353
+msgid "Using Build Scripts"
+msgstr "Using 构建 Scripts"
+
+#: ../../platform_guides/native.rst:106 4c1396661d99475f91d14ff4f63f16e0
+msgid "The project provides Python build scripts for convenience:"
+msgstr "project提供"
+
+#: ../../platform_guides/native.rst:108 8ee7e9f9aee5493fb02ce21c94926051
+msgid ""
+"# Build for Native platform\n"
+"python scripts/nexus.py build --platform native\n"
+"\n"
+"# Build and run tests\n"
+"python scripts/nexus.py test --platform native\n"
+"\n"
+"# Clean build artifacts\n"
+"python scripts/nexus.py clean"
+msgstr ""
+"# Build for Native platform\n"
+"python scripts/nexus.py build --platform native\n"
+"\n"
+"# Build and run tests\n"
+"python scripts/nexus.py test --platform native\n"
+"\n"
+"# Clean build artifacts\n"
+"python scripts/nexus.py clean"
+
+#: ../../platform_guides/native.rst:120 9eb4546523b94d8e80b15fb8072bb74b
+msgid "Cross-Platform Build"
+msgstr "Cross-Platform 构建"
+
+#: ../../platform_guides/native.rst:122 a43217edf0744887975414ff0b9035dd
+msgid "**Windows (PowerShell):**"
+msgstr "**Windows (PowerShell):**"
+
+#: ../../platform_guides/native.rst:124 1c7d5496d255450c8e1213848378f008
+msgid ""
+"# Using CMake directly\n"
+"cmake -B build -G \"Visual Studio 17 2022\" -DPLATFORM=native\n"
+"cmake --build build --config Release\n"
+"\n"
+"# Using build script\n"
+"python scripts/nexus.py build --platform native --config Release"
+msgstr ""
+"# Using CMake directly\n"
+"cmake -B build -G \"Visual Studio 17 2022\" -DPLATFORM=native\n"
+"cmake --build build --config Release\n"
+"\n"
+"# Using build script\n"
+"python scripts/nexus.py build --platform native --config Release"
+
+#: ../../platform_guides/native.rst:133 7e5d3b717817490c83f130cae557b35b
+msgid "**Linux/macOS:**"
+msgstr "**Linux/macOS:**"
+
+#: ../../platform_guides/native.rst:135 1545fcb1562e46ea87214b390248bfee
+msgid ""
+"# Using CMake directly\n"
+"cmake -B build -G \"Unix Makefiles\" -DPLATFORM=native\n"
+"cmake --build build\n"
+"\n"
+"# Using build script\n"
+"python scripts/nexus.py build --platform native"
+msgstr ""
+"# Using CMake directly\n"
+"cmake -B build -G \"Unix Makefiles\" -DPLATFORM=native\n"
+"cmake --build build\n"
+"\n"
+"# Using build script\n"
+"python scripts/nexus.py build --platform native"
+
+#: ../../platform_guides/native.rst:145 a6ab7bac3175477899989610108538b3
+msgid "Kconfig Options"
+msgstr "Kconfig 选项"
+
+#: ../../platform_guides/native.rst:148 e258dcd4af214d91ba0bd8c08be27877
+msgid "Platform Selection"
+msgstr "平台 Selection"
+
+#: ../../platform_guides/native.rst:150 03ec1bc4c6994d15a36db8598292ca97
+msgid ""
+"CONFIG_PLATFORM_NATIVE=y\n"
+"CONFIG_PLATFORM_NAME=\"native\""
+msgstr ""
+"CONFIG_PLATFORM_NATIVE=y\n"
+"CONFIG_PLATFORM_NAME=\"native\""
+
+#: ../../platform_guides/native.rst:156 7768108f79ab4f0c8561a2b1cd9915a3
+msgid "Platform Settings"
+msgstr "平台 Settings"
+
+#: ../../platform_guides/native.rst:158 e1552a1dd23241c4bca62b1113c25dfd
+msgid ""
+"# Platform identification\n"
+"CONFIG_NATIVE_PLATFORM_NAME=\"Native Platform (PC Simulation)\"\n"
+"CONFIG_NATIVE_PLATFORM_VERSION=\"1.0.0\"\n"
+"\n"
+"# Logging\n"
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3  # 0=Error, 1=Warn, 2=Info, 3=Debug\n"
+"\n"
+"# Statistics\n"
+"CONFIG_NATIVE_ENABLE_STATISTICS=y\n"
+"\n"
+"# Memory alignment\n"
+"CONFIG_NATIVE_BUFFER_ALIGNMENT=4"
+msgstr ""
+"# Platform identification\n"
+"CONFIG_NATIVE_PLATFORM_NAME=\"Native Platform (PC Simulation)\"\n"
+"CONFIG_NATIVE_PLATFORM_VERSION=\"1.0.0\"\n"
+"\n"
+"# Logging\n"
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3  # 0=Error, 1=Warn, 2=Info, 3=Debug\n"
+"\n"
+"# Statistics\n"
+"CONFIG_NATIVE_ENABLE_STATISTICS=y\n"
+"\n"
+"# Memory alignment\n"
+"CONFIG_NATIVE_BUFFER_ALIGNMENT=4"
+
+#: ../../platform_guides/native.rst:175 503b4112552d43e78024fa109c65555b
+msgid "Resource Managers"
+msgstr ""
+
+#: ../../platform_guides/native.rst:177 07428a17282b43b7bc481dc923e81e4b
+msgid ""
+"# DMA channels\n"
+"CONFIG_NATIVE_DMA_CHANNELS=8\n"
+"\n"
+"# Interrupt service routine slots\n"
+"CONFIG_NATIVE_ISR_SLOTS=64"
+msgstr ""
+"# DMA channels\n"
+"CONFIG_NATIVE_DMA_CHANNELS=8\n"
+"\n"
+"# Interrupt service routine slots\n"
+"CONFIG_NATIVE_ISR_SLOTS=64"
+
+#: ../../platform_guides/native.rst:186 cae29a94e13e468eb866c40a187859a6
+msgid "Peripheral Configuration"
+msgstr "外设 配置"
+
+#: ../../platform_guides/native.rst:188 b31450620d5b4eb6ba89c821a1e259f2
+msgid "**UART Configuration:**"
+msgstr "**UART Configuration:**"
+
+#: ../../platform_guides/native.rst:190 d274d7b164a543e4b83610c5cfd027f6
+msgid ""
+"CONFIG_UART_ENABLE=y\n"
+"CONFIG_UART_MAX_INSTANCES=4\n"
+"CONFIG_INSTANCE_NATIVE_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_UART0_PARITY_VALUE=0  # 0=None, 1=Odd, 2=Even\n"
+"CONFIG_UART0_MODE_VALUE=0    # 0=Polling, 1=Interrupt, 2=DMA\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=256"
+msgstr ""
+"CONFIG_UART_ENABLE=y\n"
+"CONFIG_UART_MAX_INSTANCES=4\n"
+"CONFIG_INSTANCE_NATIVE_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_UART0_PARITY_VALUE=0  # 0=None, 1=Odd, 2=Even\n"
+"CONFIG_UART0_MODE_VALUE=0    # 0=Polling, 1=Interrupt, 2=DMA\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=256"
+
+#: ../../platform_guides/native.rst:203 efa75f0838114f408e4a63c8f13fa822
+msgid "**GPIO Configuration:**"
+msgstr "**GPIO Configuration:**"
+
+#: ../../platform_guides/native.rst:205 b69696bc09a54c249cb01129eec7d3c3
+msgid ""
+"CONFIG_GPIO_ENABLE=y\n"
+"CONFIG_GPIO_MAX_PINS=32"
+msgstr ""
+"CONFIG_GPIO_ENABLE=y\n"
+"CONFIG_GPIO_MAX_PINS=32"
+
+#: ../../platform_guides/native.rst:210 2fe3ca209027407ab070756504bd3e58
+msgid "**SPI Configuration:**"
+msgstr "**SPI Configuration:**"
+
+#: ../../platform_guides/native.rst:212 da41e9e513804d7d8292ffc01d29f44a
+msgid ""
+"CONFIG_SPI_ENABLE=y\n"
+"CONFIG_SPI_MAX_INSTANCES=2"
+msgstr ""
+"CONFIG_SPI_ENABLE=y\n"
+"CONFIG_SPI_MAX_INSTANCES=2"
+
+#: ../../platform_guides/native.rst:217 35f9924c2c92481a889c59440b9d6279
+msgid "**I2C Configuration:**"
+msgstr "**I2C Configuration:**"
+
+#: ../../platform_guides/native.rst:219 aefb936be700476f95c093a12556ba3b
+msgid ""
+"CONFIG_I2C_ENABLE=y\n"
+"CONFIG_I2C_MAX_INSTANCES=2"
+msgstr ""
+"CONFIG_I2C_ENABLE=y\n"
+"CONFIG_I2C_MAX_INSTANCES=2"
+
+#: ../../platform_guides/native.rst:225 bf66e6e6f7f24f65b1649797e91759f3
+msgid "Hardware Setup"
+msgstr "硬件设置"
+
+#: ../../platform_guides/native.rst:228 c99e40f9fb5244f4ad1f6089e98f1b79
+msgid "No Physical Hardware Required"
+msgstr ""
+
+#: ../../platform_guides/native.rst:230 e2523637ce374235b578a015b8503d6d
+msgid ""
+"The Native platform does not require any physical hardware. All peripherals "
+"are simulated in software."
+msgstr ""
+
+#: ../../platform_guides/native.rst:233 f857606f0d6d456ba020f738db3d53be
+msgid "Development Environment"
+msgstr "开发 Environment"
+
+#: ../../platform_guides/native.rst:235 5bcdec75edc142d3b10aafc1a239fbe8
+msgid "**Recommended IDEs:**"
+msgstr "**Recommended IDEs:**"
+
+#: ../../platform_guides/native.rst:237 e15bb5c4b32b484a9369c0ceca168262
+msgid "Visual Studio Code (with C/C++ extension)"
+msgstr "Visual Studio Code (with C/C++ extension)"
+
+#: ../../platform_guides/native.rst:238 9f7dc720ac7c47b79e3980d67a042498
+msgid "CLion"
+msgstr "CLion"
+
+#: ../../platform_guides/native.rst:239 dcda3d2399884da1abac4af16bfa0dea
+msgid "Visual Studio 2022"
+msgstr ""
+
+#: ../../platform_guides/native.rst:241 01efc593978146588106c5dc5d91b9cd
+msgid "**Required Tools:**"
+msgstr "**Required Tools:**"
+
+#: ../../platform_guides/native.rst:243 ad3aab9c7af74e96b4ef8521578e24e5
+msgid "CMake 3.15+"
+msgstr ""
+
+#: ../../platform_guides/native.rst:244 755ebbb298e84881aa607e63d6dea537
+msgid "C compiler (GCC 7+, Clang 10+, MSVC 2019+)"
+msgstr "C compiler (GCC 7+, Clang 10+, MSVC 2019+)"
+
+#: ../../platform_guides/native.rst:245 9b3221b40f854c8db4e4352b6186fbb0
+msgid "Python 3.7+"
+msgstr ""
+
+#: ../../platform_guides/native.rst:248 494098658b3941b885aa150be97f3404
+msgid "Example Projects"
+msgstr "示例 Projects"
+
+#: ../../platform_guides/native.rst:251 a9d6633c521140dd82640cd58322b784
+msgid "Basic UART Example"
+msgstr "Basic UART 示例"
+
+#: ../../platform_guides/native.rst:253 3a1fc36e91e642378ad2a3eb3e769ed5
+msgid ""
+"#include \"hal/nx_uart.h\"\n"
+"#include \"hal/nx_factory.h\"\n"
+"\n"
+"int main(void) {\n"
+"    /* Get UART instance */\n"
+"    nx_uart_t* uart = nx_factory_uart(0);\n"
+"    if (!uart) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Initialize UART */\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    if (lc->init(lc) != NX_OK) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Send data */\n"
+"    nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"    const uint8_t data[] = \"Hello, Native Platform!\";\n"
+"    size_t len = sizeof(data) - 1;\n"
+"    tx->transmit(tx, data, len);\n"
+"\n"
+"    /* Clean up */\n"
+"    lc->deinit(lc);\n"
+"    return 0;\n"
+"}"
+msgstr ""
+"#include \"hal/nx_uart.h\"\n"
+"#include \"hal/nx_factory.h\"\n"
+"\n"
+"int main(void) {\n"
+"    /* Get UART instance */\n"
+"    nx_uart_t* uart = nx_factory_uart(0);\n"
+"    if (!uart) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Initialize UART */\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    if (lc->init(lc) != NX_OK) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Send data */\n"
+"    nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"    const uint8_t data[] = \"Hello, Native Platform!\";\n"
+"    size_t len = sizeof(data) - 1;\n"
+"    tx->transmit(tx, data, len);\n"
+"\n"
+"    /* Clean up */\n"
+"    lc->deinit(lc);\n"
+"    return 0;\n"
+"}"
+
+#: ../../platform_guides/native.rst:283 fd75918e1b3144aca28a8dfe24011553
+msgid "GPIO Control Example"
+msgstr "GPIO Control 示例"
+
+#: ../../platform_guides/native.rst:285 f970450a70b047ba86d29b2ec068c34e
+msgid ""
+"#include \"hal/nx_gpio.h\"\n"
+"#include \"hal/nx_factory.h\"\n"
+"\n"
+"int main(void) {\n"
+"    /* Get GPIO instance */\n"
+"    nx_gpio_t* gpio = nx_factory_gpio(0);\n"
+"    if (!gpio) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Initialize GPIO */\n"
+"    nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);\n"
+"    if (lc->init(lc) != NX_OK) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Configure pin as output */\n"
+"    nx_gpio_config_t config = {\n"
+"        .pin = 0,\n"
+"        .mode = NX_GPIO_MODE_OUTPUT,\n"
+"        .pull = NX_GPIO_PULL_NONE,\n"
+"        .speed = NX_GPIO_SPEED_LOW\n"
+"    };\n"
+"    gpio->configure(gpio, &config);\n"
+"\n"
+"    /* Toggle pin */\n"
+"    gpio->write_pin(gpio, 0, 1);  /* Set high */\n"
+"    gpio->write_pin(gpio, 0, 0);  /* Set low */\n"
+"\n"
+"    /* Clean up */\n"
+"    lc->deinit(lc);\n"
+"    return 0;\n"
+"}"
+msgstr ""
+"#include \"hal/nx_gpio.h\"\n"
+"#include \"hal/nx_factory.h\"\n"
+"\n"
+"int main(void) {\n"
+"    /* Get GPIO instance */\n"
+"    nx_gpio_t* gpio = nx_factory_gpio(0);\n"
+"    if (!gpio) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Initialize GPIO */\n"
+"    nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);\n"
+"    if (lc->init(lc) != NX_OK) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Configure pin as output */\n"
+"    nx_gpio_config_t config = {\n"
+"        .pin = 0,\n"
+"        .mode = NX_GPIO_MODE_OUTPUT,\n"
+"        .pull = NX_GPIO_PULL_NONE,\n"
+"        .speed = NX_GPIO_SPEED_LOW\n"
+"    };\n"
+"    gpio->configure(gpio, &config);\n"
+"\n"
+"    /* Toggle pin */\n"
+"    gpio->write_pin(gpio, 0, 1);  /* Set high */\n"
+"    gpio->write_pin(gpio, 0, 0);  /* Set low */\n"
+"\n"
+"    /* Clean up */\n"
+"    lc->deinit(lc);\n"
+"    return 0;\n"
+"}"
+
+#: ../../platform_guides/native.rst:322 2996fc2db0374f57aec796af41140859
+msgid "Testing with Data Injection"
+msgstr ""
+
+#: ../../platform_guides/native.rst:324 e959ff906db0459881bfff73a2a0ae32
+msgid ""
+"#include \"hal/nx_uart.h\"\n"
+"#include \"platforms/native/src/uart/nx_uart_test.h\"\n"
+"\n"
+"void test_uart_receive(void) {\n"
+"    /* Get UART instance */\n"
+"    nx_uart_t* uart = nx_factory_uart(0);\n"
+"\n"
+"    /* Initialize */\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    lc->init(lc);\n"
+"\n"
+"    /* Inject test data */\n"
+"    const uint8_t test_data[] = \"Test Data\";\n"
+"    nx_uart_test_inject_rx_data(0, test_data, sizeof(test_data));\n"
+"\n"
+"    /* Read injected data */\n"
+"    nx_rx_async_t* rx = uart->get_rx_async(uart);\n"
+"    uint8_t buffer[32];\n"
+"    size_t len = sizeof(buffer);\n"
+"    rx->receive(rx, buffer, &len);\n"
+"\n"
+"    /* Verify */\n"
+"    assert(len == sizeof(test_data));\n"
+"    assert(memcmp(buffer, test_data, len) == 0);\n"
+"\n"
+"    /* Clean up */\n"
+"    nx_uart_test_reset(0);\n"
+"    lc->deinit(lc);\n"
+"}"
+msgstr ""
+"#include \"hal/nx_uart.h\"\n"
+"#include \"platforms/native/src/uart/nx_uart_test.h\"\n"
+"\n"
+"void test_uart_receive(void) {\n"
+"    /* Get UART instance */\n"
+"    nx_uart_t* uart = nx_factory_uart(0);\n"
+"\n"
+"    /* Initialize */\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    lc->init(lc);\n"
+"\n"
+"    /* Inject test data */\n"
+"    const uint8_t test_data[] = \"Test Data\";\n"
+"    nx_uart_test_inject_rx_data(0, test_data, sizeof(test_data));\n"
+"\n"
+"    /* Read injected data */\n"
+"    nx_rx_async_t* rx = uart->get_rx_async(uart);\n"
+"    uint8_t buffer[32];\n"
+"    size_t len = sizeof(buffer);\n"
+"    rx->receive(rx, buffer, &len);\n"
+"\n"
+"    /* Verify */\n"
+"    assert(len == sizeof(test_data));\n"
+"    assert(memcmp(buffer, test_data, len) == 0);\n"
+"\n"
+"    /* Clean up */\n"
+"    nx_uart_test_reset(0);\n"
+"    lc->deinit(lc);\n"
+"}"
+
+#: ../../platform_guides/native.rst:357 683eeb62e904468294ffa70206e62055
+msgid "Debugging Procedures"
+msgstr ""
+
+#: ../../platform_guides/native.rst:360 eec1b0572c564985849af3ac28ef2a04
+msgid "Using GDB"
+msgstr ""
+
+#: ../../platform_guides/native.rst:362 30f93a1f07204234802d82b1c2af0c72
+msgid ""
+"# Build with debug symbols\n"
+"cmake -B build -DPLATFORM=native -DCMAKE_BUILD_TYPE=Debug\n"
+"cmake --build build\n"
+"\n"
+"# Run with GDB\n"
+"gdb build/applications/blinky/blinky"
+msgstr ""
+"# Build with debug symbols\n"
+"cmake -B build -DPLATFORM=native -DCMAKE_BUILD_TYPE=Debug\n"
+"cmake --build build\n"
+"\n"
+"# Run with GDB\n"
+"gdb build/applications/blinky/blinky"
+
+#: ../../platform_guides/native.rst:372 921a835d8882469f9e2ecb483abc0d09
+msgid "Using Visual Studio Code"
+msgstr "使用 Visual Studio Code"
+
+#: ../../platform_guides/native.rst:374 75116918af414a8f8282648120bfe0b0
+msgid "Create ``.vscode/launch.json``:"
+msgstr "创建 ``.vscode/launch.json``："
+
+#: ../../platform_guides/native.rst:376 ace0638eb8254c58abf811b77c5fa1f2
+msgid ""
+"{\n"
+"    \"version\": \"0.2.0\",\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"Debug Native Platform\",\n"
+"            \"type\": \"cppdbg\",\n"
+"            \"request\": \"launch\",\n"
+"            \"program\": \"${workspaceFolder}/build/applications/blinky/blinky\",\n"
+"            \"args\": [],\n"
+"            \"stopAtEntry\": false,\n"
+"            \"cwd\": \"${workspaceFolder}\",\n"
+"            \"environment\": [],\n"
+"            \"externalConsole\": false,\n"
+"            \"MIMode\": \"gdb\",\n"
+"            \"setupCommands\": [\n"
+"                {\n"
+"                    \"description\": \"Enable pretty-printing for gdb\",\n"
+"                    \"text\": \"-enable-pretty-printing\",\n"
+"                    \"ignoreFailures\": true\n"
+"                }\n"
+"            ]\n"
+"        }\n"
+"    ]\n"
+"}"
+msgstr ""
+"{\n"
+"    \"version\": \"0.2.0\",\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"Debug Native Platform\",\n"
+"            \"type\": \"cppdbg\",\n"
+"            \"request\": \"launch\",\n"
+"            \"program\": \"${workspaceFolder}/build/applications/blinky/blinky\",\n"
+"            \"args\": [],\n"
+"            \"stopAtEntry\": false,\n"
+"            \"cwd\": \"${workspaceFolder}\",\n"
+"            \"environment\": [],\n"
+"            \"externalConsole\": false,\n"
+"            \"MIMode\": \"gdb\",\n"
+"            \"setupCommands\": [\n"
+"                {\n"
+"                    \"description\": \"Enable pretty-printing for gdb\",\n"
+"                    \"text\": \"-enable-pretty-printing\",\n"
+"                    \"ignoreFailures\": true\n"
+"                }\n"
+"            ]\n"
+"        }\n"
+"    ]\n"
+"}"
+
+#: ../../platform_guides/native.rst:404 3f784779dd2f4b0384f6eee48af79c7f
+msgid "Logging and Diagnostics"
+msgstr ""
+
+#: ../../platform_guides/native.rst:406 a373decfe5964e0bb26c949568a403d2
+msgid "Enable detailed logging:"
+msgstr ""
+
+#: ../../platform_guides/native.rst:408 a9420b6bb679435d8e10567897d2fe08
+msgid ""
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3  # Debug level"
+msgstr ""
+"CONFIG_NATIVE_ENABLE_LOGGING=y\n"
+"CONFIG_NATIVE_LOG_LEVEL=3  # Debug level"
+
+#: ../../platform_guides/native.rst:413 2be456cc25bc4b8681326116472746c2
+msgid "View diagnostic information:"
+msgstr ""
+
+#: ../../platform_guides/native.rst:415 1d4b48ab9b2b4e7f9e0e7ca28dfd8106
+msgid ""
+"#include \"hal/nx_uart.h\"\n"
+"\n"
+"nx_uart_t* uart = nx_factory_uart(0);\n"
+"nx_diagnostic_t* diag = uart->get_diagnostic(uart);\n"
+"\n"
+"/* Get statistics */\n"
+"nx_uart_stats_t stats;\n"
+"diag->get_stats(diag, &stats);\n"
+"\n"
+"/* Print statistics */\n"
+"printf(\"TX Count: %zu\\n\", stats.tx_count);\n"
+"printf(\"RX Count: %zu\\n\", stats.rx_count);\n"
+"printf(\"Errors: %zu\\n\", stats.error_count);"
+msgstr ""
+"#include \"hal/nx_uart.h\"\n"
+"\n"
+"nx_uart_t* uart = nx_factory_uart(0);\n"
+"nx_diagnostic_t* diag = uart->get_diagnostic(uart);\n"
+"\n"
+"/* Get statistics */\n"
+"nx_uart_stats_t stats;\n"
+"diag->get_stats(diag, &stats);\n"
+"\n"
+"/* Print statistics */\n"
+"printf(\"TX Count: %zu\\n\", stats.tx_count);\n"
+"printf(\"RX Count: %zu\\n\", stats.rx_count);\n"
+"printf(\"Errors: %zu\\n\", stats.error_count);"
+
+#: ../../platform_guides/native.rst:432 82ab5aa633d64c85bf06a9b2a05c2941
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../platform_guides/native.rst:435 1936174a108b4c1793027ae8799ba1c9
+msgid "Common Issues"
+msgstr ""
+
+#: ../../platform_guides/native.rst:437 ee215f2dfe9743c6ab2bd1fae98906af
+msgid "**Build Fails with \"Platform not found\":**"
+msgstr "**Build Fails with \"Platform not found\":**"
+
+#: ../../platform_guides/native.rst:439 819a352b15704c108b2551b045e87242
+msgid ""
+"Solution: Ensure ``-DPLATFORM=native`` is specified in CMake configuration."
+msgstr ""
+"Solution: Ensure ``-DPLATFORM=native`` is specified in CMake configuration."
+
+#: ../../platform_guides/native.rst:441 8a524798cd5147f7ab604d29fdaf7c4d
+msgid "**Tests Fail with \"Device not initialized\":**"
+msgstr "**Tests Fail with \"Device not initialized\":**"
+
+#: ../../platform_guides/native.rst:443 d5512ab59acb42969364180a22ee9ec0
+msgid ""
+"Solution: Ensure lifecycle ``init()`` is called before using peripherals."
+msgstr ""
+"Solution: Ensure lifecycle ``init()`` is called before using peripherals."
+
+#: ../../platform_guides/native.rst:445 65a407ea70be4d73847ec7afa79f3f74
+msgid "**Data Injection Not Working:**"
+msgstr "**Data Injection Not Working:**"
+
+#: ../../platform_guides/native.rst:447 72886dcf4995423d8596fc4d00db317d
+msgid ""
+"Solution: Verify test support functions are available and instance ID is "
+"correct."
+msgstr ""
+
+#: ../../platform_guides/native.rst:450 626d2fa1ffb3476d9707be75e7478a09
+msgid "Performance Considerations"
+msgstr "性能考虑"
+
+#: ../../platform_guides/native.rst:452 1d928563ce424285924fb9ba16a2357c
+msgid "The Native platform is optimized for testing, not performance:"
+msgstr ""
+
+#: ../../platform_guides/native.rst:454 b143f68ea0d44ed78b2aefecd24f574e
+msgid "Use for functional testing, not performance benchmarking"
+msgstr ""
+
+#: ../../platform_guides/native.rst:455 770ab9a7ec84452ba45e953f899d50f0
+msgid "Timing may not match real hardware"
+msgstr ""
+
+#: ../../platform_guides/native.rst:456 9bc8bbb23415491c98f426afe085773e
+msgid "Consider using real hardware for performance-critical testing"
+msgstr ""
+
+#: ../../platform_guides/native.rst:459 f032e6638cf34ef28564e65301883a8d
+msgid "CI/CD Integration"
+msgstr ""
+
+#: ../../platform_guides/native.rst:461 3183797a3c44430ebb1d3ec94bd923e9
+msgid "The Native platform is ideal for CI/CD:"
+msgstr ""
+
+#: ../../platform_guides/native.rst:463 92cdd736951e49b4a855cb9f4742233a
+msgid ""
+"# GitHub Actions example\n"
+"- name: Build and Test Native Platform\n"
+"  run: |\n"
+"    cmake -B build -DPLATFORM=native\n"
+"    cmake --build build\n"
+"    cd build && ctest --output-on-failure"
+msgstr ""
+"# GitHub Actions example\n"
+"- name: Build and Test Native Platform\n"
+"  run: |\n"
+"    cmake -B build -DPLATFORM=native\n"
+"    cmake --build build\n"
+"    cd build && ctest --output-on-failure"
+
+#: ../../platform_guides/native.rst:473 2c82b6de685d4d9fa6ebbf9861a41124
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../platform_guides/native.rst:475 166ba8e6957d4f4aa4eb017d215a2862
+msgid ":doc:`../user_guide/build_system` - Build system documentation"
+msgstr ":doc:`../user_guide/build_system` - Build system documentation"
+
+#: ../../platform_guides/native.rst:476 cfbc14ad3ada4c1ab1233f90f86d83dd
+msgid ":doc:`../user_guide/kconfig_platforms` - Platform configuration guide"
+msgstr ":doc:`../user_guide/kconfig_platforms` - Platform configuration guide"
+
+#: ../../platform_guides/native.rst:477 70222e2d9eee4a7a8071b769a31ef37e
+msgid ":doc:`../development/testing` - Testing guide"
+msgstr ":doc:`../development/testing` - Testing guide"
+
+#: ../../platform_guides/native.rst:478 1d19abbed34942d0bf267296ed0070cd
+msgid ":doc:`stm32f4` - STM32F4 platform guide"
+msgstr ":doc:`stm32f4` - STM32F4 platform guide"
+
+#: ../../platform_guides/native.rst:479 a35beb566e754386b17c71b7f6021aaa
+msgid ":doc:`stm32h7` - STM32H7 platform guide"
+msgstr ":doc:`stm32h7` - STM32H7 platform guide"
+
+#: ../../platform_guides/native.rst:480 84b338c880394f858c873fed7656691d
+msgid ":doc:`gd32` - GD32 platform guide"
+msgstr ":doc:`gd32` - GD32 platform guide"

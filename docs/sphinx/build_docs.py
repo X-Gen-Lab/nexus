@@ -52,7 +52,7 @@ def print_error(msg):
     print(f"{Colors.RED}  ✗ {msg}{Colors.RESET}")
 
 def print_success(msg):
-    print(f"{Colors.GREEN}  ✓ {msg}{Colors.RESET}")
+    print(f"{Colors.GREEN}  [OK] {msg}{Colors.RESET}")
 
 def run_command(cmd, cwd=None, check=True):
     """Run a command and return success status."""
@@ -317,9 +317,9 @@ Examples:
                         help='Initialize translation for a new language')
     args = parser.parse_args()
 
-    print_header("\n╔════════════════════════════════════════╗")
-    print_header("║   Nexus Documentation Builder (i18n)   ║")
-    print_header("╚════════════════════════════════════════╝\n")
+    print_header("\n" + "="*44)
+    print_header("   Nexus Documentation Builder (i18n)   ")
+    print_header("="*44 + "\n")
 
     # Check dependencies
     if not check_dependencies():
@@ -336,7 +336,7 @@ Examples:
             return 1
         if not update_po_files():
             return 1
-        print_header("\n✓ Translation files updated!")
+        print_header("\n[OK] Translation files updated!")
         print(f"  Edit files in: locale/<lang>/LC_MESSAGES/*.po")
         return 0
 
@@ -364,9 +364,9 @@ Examples:
         create_index_page()
 
     # Summary
-    print_header("\n╔════════════════════════════════════════╗")
-    print_header("║         Build Completed!               ║")
-    print_header("╚════════════════════════════════════════╝")
+    print_header("\n" + "="*44)
+    print_header("         Build Completed!               ")
+    print_header("="*44)
     print()
     print("  Output locations:")
     if not args.lang:

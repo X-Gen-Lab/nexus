@@ -1,177 +1,290 @@
-# Config API - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
-#: ../../api/config.rst:2 d07fd82f8e904db9adb3f2f550f1566a
+#: ../../api/config.rst:2 c8b37c91216c471b99b901c8ffca6b3a
 msgid "Config Manager API Reference"
 msgstr "配置管理器 API 参考"
 
-#: ../../api/config.rst:4 3ed237b83f8449a1838d70f1caac49b3
+#: ../../api/config.rst:4 a0aa8d5f3dab4875a984f94093a4e682
 msgid "This section documents the Configuration Manager API."
 msgstr "本节记录配置管理器 API。"
 
-#: ../../api/config.rst:7 59415b469f084c4bb2e78add2ac782d1
+#: ../../api/config.rst:7 3abf95f9ccdf43b69beb9dc7925f5dd5
+msgid "Overview"
+msgstr "概述"
+
+#: ../../api/config.rst:9 536f5f443a2244dc99d95ab1b4ca8b24
+msgid ""
+"The Nexus Config Manager provides a flexible configuration storage system "
+"with support for multiple data types and storage backends (RAM, Flash). It's"
+" designed for embedded systems requiring persistent configuration "
+"management."
+msgstr ""
+"The Nexus Config Manager provides a flexible configuration storage system "
+"with support for multiple data types and storage backends (RAM, Flash). It's"
+" designed for embedded systems requiring persistent configuration "
+"management."
+
+#: ../../api/config.rst:14 a1b2551d6e83423e88c8d63aa91c3417
+msgid "Usage Examples"
+msgstr "用法 示例"
+
+#: ../../api/config.rst:17 222e0ff4228a47b69603bd6af1af9448
+msgid "Basic Configuration"
+msgstr "Basic 配置"
+
+#: ../../api/config.rst:19 8afa02d0fbd740de925b5692dd486443
+msgid ""
+"#include \"config/config.h\"\n"
+"\n"
+"/* Initialize config manager */\n"
+"config_init();\n"
+"\n"
+"/* Set configuration values */\n"
+"int32_t value = 42;\n"
+"config_set_int32(\"system.timeout\", value);\n"
+"\n"
+"config_set_string(\"system.name\", \"MyDevice\");\n"
+"\n"
+"bool enabled = true;\n"
+"config_set_bool(\"feature.enabled\", enabled);\n"
+"\n"
+"/* Get configuration values */\n"
+"int32_t timeout;\n"
+"if (config_get_int32(\"system.timeout\", &timeout) == CONFIG_OK) {\n"
+"    /* Use timeout value */\n"
+"}"
+msgstr ""
+"#include \"config/config.h\"\n"
+"\n"
+"/* Initialize config manager */\n"
+"config_init();\n"
+"\n"
+"/* Set configuration values */\n"
+"int32_t value = 42;\n"
+"config_set_int32(\"system.timeout\", value);\n"
+"\n"
+"config_set_string(\"system.name\", \"MyDevice\");\n"
+"\n"
+"bool enabled = true;\n"
+"config_set_bool(\"feature.enabled\", enabled);\n"
+"\n"
+"/* Get configuration values */\n"
+"int32_t timeout;\n"
+"if (config_get_int32(\"system.timeout\", &timeout) == CONFIG_OK) {\n"
+"    /* Use timeout value */\n"
+"}"
+
+#: ../../api/config.rst:42 493723d3687e4bf79327d362af9229e6
+msgid "Namespaces"
+msgstr "命名空间"
+
+#: ../../api/config.rst:44 4a43d2c6561c498fbebafdd5de0536a5
+msgid ""
+"#include \"config/config.h\"\n"
+"\n"
+"/* Create namespace */\n"
+"config_namespace_create(\"network\");\n"
+"\n"
+"/* Set values in namespace */\n"
+"config_set_string(\"network.ip\", \"192.168.1.100\");\n"
+"config_set_int32(\"network.port\", 8080);\n"
+"\n"
+"/* Iterate namespace */\n"
+"config_namespace_iterate(\"network\", my_callback, user_data);"
+msgstr ""
+"#include \"config/config.h\"\n"
+"\n"
+"/* Create namespace */\n"
+"config_namespace_create(\"network\");\n"
+"\n"
+"/* Set values in namespace */\n"
+"config_set_string(\"network.ip\", \"192.168.1.100\");\n"
+"config_set_int32(\"network.port\", 8080);\n"
+"\n"
+"/* Iterate namespace */\n"
+"config_namespace_iterate(\"network\", my_callback, user_data);"
+
+#: 02f8e7c522804f268e3f69d8a77ea481 1bc8825de7f8497fb733d9b6b737f76b
+msgid "Flash Backend"
+msgstr "Flash 后端"
+
+#: ../../api/config.rst:61 ec98857d7d5f4fe6af970c3560b9a254
+msgid ""
+"#include \"config/config.h\"\n"
+"#include \"config/config_backend.h\"\n"
+"\n"
+"/* Initialize with Flash backend */\n"
+"config_backend* flash_backend = config_flash_backend_create();\n"
+"config_set_backend(flash_backend);\n"
+"\n"
+"/* Configuration is now persisted to Flash */\n"
+"config_set_int32(\"system.boot_count\", boot_count);\n"
+"\n"
+"/* Commit changes to Flash */\n"
+"config_commit();"
+msgstr ""
+"#include \"config/config.h\"\n"
+"#include \"config/config_backend.h\"\n"
+"\n"
+"/* Initialize with Flash backend */\n"
+"config_backend* flash_backend = config_flash_backend_create();\n"
+"config_set_backend(flash_backend);\n"
+"\n"
+"/* Configuration is now persisted to Flash */\n"
+"config_set_int32(\"system.boot_count\", boot_count);\n"
+"\n"
+"/* Commit changes to Flash */\n"
+"config_commit();"
+
+#: ../../api/config.rst:77 f24023d9fc1642909c8356e71086fa93
+msgid "Import/Export"
+msgstr "Import/Export"
+
+#: ../../api/config.rst:79 33c446551b0d43dfbe6bc143233d088e
+msgid ""
+"#include \"config/config.h\"\n"
+"\n"
+"/* Export configuration to JSON */\n"
+"char buffer[1024];\n"
+"size_t size = sizeof(buffer);\n"
+"config_export_json(buffer, &size);\n"
+"\n"
+"/* Import configuration from JSON */\n"
+"config_import_json(json_string, strlen(json_string));"
+msgstr ""
+"#include \"config/config.h\"\n"
+"\n"
+"/* Export configuration to JSON */\n"
+"char buffer[1024];\n"
+"size_t size = sizeof(buffer);\n"
+"config_export_json(buffer, &size);\n"
+"\n"
+"/* Import configuration from JSON */\n"
+"config_import_json(json_string, strlen(json_string));"
+
+#: ../../api/config.rst:92 bfa060f7a8274a118c307ff21cf5c815
+msgid "Thread Safety"
+msgstr "线程 Safety"
+
+#: ../../api/config.rst:94 07494c61acc540aa865087eb7aa954ed
+msgid ""
+"The Config Manager is **thread-safe** when using the Flash backend with "
+"proper locking. The RAM backend requires external synchronization for multi-"
+"threaded access."
+msgstr ""
+
+#: ../../api/config.rst:97 3aaaaeb8a3a04535a15b2c1f46a6659e
+msgid "**Flash backend**: Thread-safe with internal locking"
+msgstr "**Flash 后端**：使用内部锁实现线程安全"
+
+#: ../../api/config.rst:98 050f99b055b44cbe8c03b9b2e75cb0a0
+msgid "**RAM backend**: Not thread-safe, requires external mutex"
+msgstr "**RAM 后端**：非线程安全，需要外部互斥锁"
+
+#: ../../api/config.rst:101 5baff4c0353f485893f364bf91524841
 msgid "Config Core"
 msgstr "配置核心"
 
-#: ../../api/config.rst 04c99d540f9247efac8795bf649eb398
-#: 06d0da4cba414323856556b581f460a8 09c14b47e1b1440c806606682f338625
-#: 0c6d95732fab42e58d8f25b7f9ea023a 1027da08c4834150b7bba2db9094f216
-#: 12eda464c0fe47039d41d178a64c605e 16557f8408bc4fd0b3077287d4c58cb7
-#: 168b7a89db6340779ee10e9071f329b7 17034c6e004a442d8f84791d29a8c719
-#: 1ce0fb600d964664a70a58c4d0c2d9b3 211a74b837ed474d914b3994b4c14390
-#: 24b0edeebf734bb59120ec3d642498ca 3103d041f5444749b4960367555a19ed
-#: 31ea91b34bfa4ff58a7aec3151ed6bd3 32106465cf6943d5a2c248884906d268
-#: 351f48f4349a4f798a533cbc1a60854b 420f5014e6f0402caa1c1b91c53b4d6b
-#: 42e4c7e7e6364eab86e2b311f12691f7 4ac5142dc9a64d8a9d3d973f3d8196cd
-#: 4c328dac39574e30b5ee7cba31d6a39d 4d887f35df2e41129394ef14f385cdf4
-#: 594ae85d6ce34eafa175db86ff219c26 665c090a79e341d8ad9c54e28687ecea
-#: 6999a1690b724a9e9f2b08d081d87e7e 6a80c9d74d3245c786873d9218f699e8
-#: 6b89f19aeace47f485d1d0fc0b92b041 6ea96282096b4ec58f5dd2bdf0abdc16
-#: 703de342b7d2441da8504e3c16b6aa46 718f307fdc684b4ebdc08429b57f8216
-#: 78fa1c1b9be540c8b8c5fc2d40bcc331 81882ccd67784a09abc596abd668fd7d
-#: 83c436c72f914edabcd9c2afedca5e3e 8bdb114f1da648558b7c9a152b77f440
-#: 8d3d08b96275450eaa8b63c5ef2a1de2 8d5999d3802d48bdb0883ec50884afa3
-#: 8ef1a5271cc34d64b4c61acb02ec1047 98000f26de2f4eccbc39df3451bda150
-#: 98c7fc0ea0734f19ae15ead5efddd1cb 9b21f43bddd44b0e878309ad5d202256
-#: 9d454cd9b8f44d61a52e68199ba81d4a 9d7b66a8bad64829bb90ecb6424005e5
-#: a64ac568e97249ffbaf14799871c8019 a67cb2f0698d4eb598b364da14dde784
-#: b26c775cf797413787385ea0d282e938 c530d8f9e1cf40e7bd9c206937710958
-#: cb5ec5ee23284f2cb3bf28814080076c cbfe3e1ca6854bb88cd6c3f08ec3008e
-#: d1fd27540f5a43c3b43fc3d228444ab8 d375eadd7661450a93fc17243138eab3
-#: d5983989f27840d5aeae81ba5736b95d d64ce2579abf4a72b89b57aa514e8d35
-#: dc53e306b1d84672bee352c488cb3fe5 de04f579260741169ee1d03befdcee97
-#: ded96343dc7f4d0691476a2dc57c0c13 dfc2e973623b4940a1e6af5f85252627
-#: e1bba5c89b7e4c13bf2b355883cb5bec e92a0ec960134f73832a7dafda88537e
-#: ed3c7d4a28b5426283d5ca63c9e77c51 ed8e00b121ff4be1b81ae7997a31f3ff
-#: f08763c5d50f4fd681d799ffddf45cf3 f1799534d01f4013a83eeb9c5d21da65
-#: f6c6149e3bd94da68cf9693c7f09ae3e fb59d4f82eca4e6e83251122c5a95f65
+#: f91948d2d52948b786f2d2b04a7fbb1a fbcfe90be4564825877d1e2fc7ba0c60
 msgid "Parameters"
-msgstr ""
+msgstr "参数"
 
-#: ../../api/config.rst 043ddebc791c42eeb58f41e49af89ad0
-#: 0e560ad922ea43a7aada626bb84bf12c 1277817be3344ea8a5c763b00486af3d
-#: 139bf145c5484fa0bce8e5e93e81abb4 14f8d167ea1b4ed2bc47d36ae687c718
-#: 1790a32691484be4ba2de623a9001241 19e8abe651554fdea9a7d1aabfa9aeb1
-#: 1fe1e7ffc4f24b56b4c8d6043fbf2ca5 20ed8704d8984195bddb2a1da0e7f57c
-#: 2243b20c2e254424afe6c26adeecac38 2b242a958520466d8ad5783a1c7fd9a7
-#: 2ca5832dc7da4b1f90d5757839935b56 33e7f861d50347b3b0167757f26a08d5
-#: 3887f020cea24040801777a40d55e727 43ad185fdebf444c9d3433a178f40b16
-#: 46bd08dc940b4a59b5685b3dca3a0dfd 4942cad57d914b1998ecf262645ca184
-#: 4ce1034e59e34a94854d0cfeb9a1c09f 4e49b401eca84a11bfd6da18fb1fd725
-#: 556207aebb6e418c8512296dee411704 570ff604af234e649fe8c05a170d992a
-#: 592a886799c84e449143ccd4fb34a582 5d27a03cf8f241d0865ae804219f719b
-#: 6576042bb5f444f9a5b44955452195d7 6842f4a597f843cab78da6bd7903dad8
-#: 6a7e73d520504cd1b2436a22661432c5 6d1b61ba83454d3c8271909730664388
-#: 725fa98056db488fa11ab6dd92fbba62 7340e63c875a4106992500ea77a1e7a7
-#: 772037fa84b146fab3e1c60feff6e08d 7a10aa2b9e664aabb0f8345b0e3ef06b
-#: 7d8fb22629c74973abefe7e2da38dcce 806cbc1f850444678bb2291596f55d82
-#: 85715db6a11e4e718456315d45b0562f 95179a948f014dfeb7d83c2827191394
-#: 95947a9facea49dfa86760bec60a5d39 95ec04031bc84d8a9e607538bb1da60c
-#: 9a9d9fca0866414089e613dbbce691df 9c4918d7bdca4350a5e5c1152de5e249
-#: 9ce30a6257aa4ac4b4823ee950016082 9f2f515a3e694de6b3ab2ecf56d33234
-#: a0d2c61c40c94bdfbb4a7a6656a829a4 a0fcc611b83f4659be14ce87f1db0221
-#: a1709ccfaa46435c8eeb5d6f6a3229ec a56461cc1cfa4d878b11386ca4ed88ca
-#: ab0bdfef136b418abd0b188b3f81b972 ab2887568f5a4f61b147425369e4cc54
-#: adbfb3f1cd534a559cba8c136f776793 ae2ec9dd306a41439e34a29bc97bf0f1
-#: af36ab87e85e42e1b8e12ee0eac923c9 b1f4dc569dee4ddc8adc03ee81168b02
-#: b5e1447c66064de1ad1b61dd29fc5553 bf17a647afeb4283ba1087a36ab41aa9
-#: c2bc3c5822cc424381fc22115ee3fa9d c45411aed5da49b69b42d076a385ce2f
-#: c663703ed8e748c3a2a915dbe9d1ee1c d6d1dbc49e45460dacaaf66931ae8100
-#: d7d60e5b542b499d82165a60ad21f317 d97bb1f01cdb4e10ad4f9f3e8c809de6
-#: dad0d14e779b4d22b43d62906cf9b8c2 df4a08573e3f45d596d936aaf1b94f41
-#: e10ecebf34b94cf0a26a388455a3d502 e13a8fbc187e4585bc03c1c6c73ef796
-#: e53e6b642f4045a7bc9a1d6fdc186af9 e8238cf5741743ada52805bbd8bea5e0
-#: ef8e0eddd5f74c579723004444a60b57 f052e720a6ac4fbcb67f25afa4f4bbe3
-#: f726c3848c0d43d089a38996188de7d5 f9ae573438b14bd988723594c42634de
-#: fb6e3ff184914c5e97e5f23ffcd45851
+#: f9f8c3b54a2b4e2ebfb930cf2392d07b
 msgid "Returns"
-msgstr ""
+msgstr "返回值"
 
-#: ../../api/config.rst 6d6804c673914d32970131a766b3f87b
-#: 8256471cb753414f9d58b292a770e612 c60b154d3dda49f8b8ca723dc4cd426d
-#: d55ab0bbefd148eda0b21d9e9634d15b
+#: 79775b83f35e484794ca02026f9f6d59
 #, fuzzy
 msgid "Param key"
 msgstr "RAM 后端"
 
-#: ../../api/config.rst 4d828d6c29df499db491a0d72a7acc43
+#: ../../api/config.rst b9ae0c3dde2c4b309f3ff801030614ee
 msgid "Param type"
-msgstr ""
+msgstr "参数 type"
 
-#: ../../api/config.rst 81865d5f44174eb5bf149834575bfd88
+#: ../../api/config.rst fc61e6a454d546e2a89d0379efca5e95
 msgid "Param old_value"
-msgstr ""
+msgstr "参数 old_value"
 
-#: ../../api/config.rst 9288e8cbabba4880bd119a9cdb222c73
+#: ../../api/config.rst 99a9f5e0f4e345a9ac679776866ed4c9
 msgid "Param new_value"
-msgstr ""
+msgstr "参数 new_value"
 
-#: ../../api/config.rst 7adddd081fa94900a4ea6906ac43ec33
-#: deeff4425d224db28ee85ee3cd264a5a
+#: b127e478b49c4eb899eafa8293555652
 msgid "Param user_data"
-msgstr ""
+msgstr "参数 user_data"
 
-#: ../../api/config.rst 136ac488b49249af8273b7c4db8e9e71
+#: ../../api/config.rst 02f4b5f579f2498c8114f033f4e7805f
 msgid "Param info"
-msgstr ""
+msgstr "参数 info"
 
-#: ../../api/config.rst 0f6c7f143753401a939ca52e81a799e7
-#: 31766921a5854534acf34ec7c16606f8 451fd37a625e4a5e952ed0cd1a7509b5
-#: 502f0601b76649f98f9437e1c107bb65 6abb8401c8454c4b85dae3c76854bc7e
-#: 9a3c7df73c3e4a83b78dcf6949deaa7b c8fefbce82d2483db88c5d90e1f5ce68
-#: f4940dd7c4d648419b6c274e15bdb44a
+#: c3852a72fdef4cb3ba12650f60342acf
 msgid "Return"
-msgstr ""
+msgstr "返回"
 
-#: ../../api/config.rst 00a03e08c11c44eda4ab647281dda858
-#: 0d842040a43745889e2566f9621a24cf a1d1962ec4154756905d03925e61addb
-#: f8e37b6ec5824cb0946b8e9b66889051
+#: f9567150712045f9acfaa28522e4fa5c
 msgid "Public Members"
-msgstr ""
+msgstr "公共成员"
 
-#: ../../api/config.rst:14 b2c0b475d27b4410a1038622b24e6464
+#: ../../api/config.rst:108 9ceb6c7a487e4e8b984b92166e1a744f
 msgid "Config Definitions"
 msgstr "配置定义"
 
-#: ../../api/config.rst:21 e9ef2fe3912d497aa722abc8b892c710
+#: ../../api/config.rst:115 175c8d643f8747e5826047f66813d6e5
 msgid "Backend Interface"
 msgstr "后端接口"
 
-#: ../../api/config.rst 0170ceb6cc1b401bb50b612ceb0e5a10
-#: 739680f4375b4113a872b3d15b1e3538 b5272e51fdd1429b939ce9ea4de74250
-#: bc6abe66a16342c8b3b2fe7522be6e88 c7e6c2040cf84d3fae6a25ee688cb559
-#: d344a444cdcf4465b19b9f9bbf0054ae f81ea8b4c36f423097fcedba4232bc0c
+#: 89cb9b5a317443a3b369a2590f30f097 a194fb93f3934f8d9283fb208c059b01
 msgid "Param ctx"
 msgstr ""
 
-#: ../../api/config.rst 4c8b3d15ab4e4d75941b7fe36d88d2b4
-#: 75ec26ad9e124f7ca47584177269a29f
+#: 6f22fdb15ae74d5fa068118a8f21eff1
 msgid "Param data"
-msgstr ""
+msgstr "参数 data"
 
-#: ../../api/config.rst 3ae10dd5f277455a9a5f8e92dbcf3834
-#: e803fc0c222449248221453a96dedc9b
+#: d3f54a762c1d43428f8be2d8cfa770bc
 msgid "Param size"
-msgstr ""
+msgstr "参数 size"
 
-#: ../../api/config.rst:28 9b278890d16d4f65a9abeb55f6e395eb
+#: ../../api/config.rst:122 d024f4bf49cd443589a03041c59a4760
 msgid "RAM Backend"
 msgstr "RAM 后端"
 
-#: ../../api/config.rst:35 37b5aff8c7d841448a61cdf8da9bee0f
-msgid "Flash Backend"
-msgstr "Flash 后端"
+#: ../../api/config.rst:137 407f24ec4ab24042afb62ad064ccfd1f
+msgid "Related APIs"
+msgstr ""
 
+#: ../../api/config.rst:139 3337252bbb8e42a59151402b43f88162
+msgid ":doc:`hal` - HAL (for Flash backend)"
+msgstr ":doc:`hal` - HAL (for Flash backend)"
+
+#: ../../api/config.rst:140 a17123ecf4b74dd9ada7ddfa59717c84
+msgid ":doc:`init` - Automatic initialization system"
+msgstr ":doc:`init` - Automatic initialization system"
+
+#: ../../api/config.rst:141 5942278a0d63476b8a933a6759b90c02
+msgid ":doc:`log` - Logging framework"
+msgstr ":doc:`log` - Logging framework"
+
+#: ../../api/config.rst:142 65a70267518745488c2e9853094c6dd3
+msgid ":doc:`osal` - OS abstraction (for thread safety)"
+msgstr ":doc:`osal` - OS abstraction (for thread safety)"
+
+#: ../../api/config.rst:145 4c6cfb2262e649ed8f9e170142b6e0c3
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../api/config.rst:147 34da866ce4014789831c92610a28695f
+msgid ":doc:`../user_guide/config` - Config Manager User Guide"
+msgstr ":doc:`../user_guide/config` - Config Manager User Guide"
+
+#: ../../api/config.rst:148 7df1d9adedce4df981fcc1d47918db91
+msgid ":doc:`../reference/error_codes` - Error Code Reference"
+msgstr ":doc:`../reference/error_codes` - Error Code Reference"

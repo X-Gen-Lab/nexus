@@ -1,0 +1,100 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../tutorials/index.rst:6
+msgid "Contents:"
+msgstr ""
+
+#: ../../tutorials/index.rst:2 303b0e2e05a94fd08366174dbdbc54c7
+msgid "Tutorials"
+msgstr "教程"
+
+#: ../../tutorials/index.rst:4 3312f11220de40be946ac5e5b2d40cd6
+msgid ""
+"This section provides step-by-step tutorials to help you learn the Nexus "
+"platform through practical examples."
+msgstr ""
+
+#: ../../tutorials/index.rst:17 05a652bd4ded4a39bf6957579fa7f2cb
+msgid "Getting Started"
+msgstr "快速入门"
+
+#: ../../tutorials/index.rst:19 bfcfd7924bc04300bde4a9c51f24910c
+msgid "If you're new to Nexus, start with these tutorials in order:"
+msgstr ""
+
+#: ../../tutorials/index.rst:21 eb8c9626ae704440ad6fef614f46e5fc
+msgid ""
+":doc:`first_application` - Build your first Nexus application from scratch"
+msgstr ""
+":doc:`first_application` - Build your first Nexus application from scratch"
+
+#: ../../tutorials/index.rst:22 7520f870237a47979bf654353ddbddfd
+msgid ":doc:`gpio_control` - Learn GPIO control and LED manipulation"
+msgstr ":doc:`gpio_control` - Learn GPIO control and LED manipulation"
+
+#: ../../tutorials/index.rst:23 89ceb93f77e841798914ae8274f7a14f
+msgid ""
+":doc:`uart_communication` - Add serial communication to your application"
+msgstr ""
+":doc:`uart_communication` - Add serial communication to your application"
+
+#: ../../tutorials/index.rst:24 5a0bfcaa7d2144f382e6e69df2cd08bc
+msgid ":doc:`task_creation` - Create multi-tasking applications with OSAL"
+msgstr ":doc:`task_creation` - Create multi-tasking applications with OSAL"
+
+#: ../../tutorials/index.rst:26 45456d3cb0fc49caa03bcd3d92b5c341
+msgid ""
+"Each tutorial builds on concepts from previous ones, so we recommend "
+"following them in sequence."
+msgstr ""
+
+#: ../../tutorials/index.rst:29 b631592d36764ed29831ff7b1be62891
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../tutorials/index.rst:31 cadbe738aa2448a99e12f4e48a6aadaf
+msgid "Before starting these tutorials, make sure you have:"
+msgstr ""
+
+#: ../../tutorials/index.rst:33 97e20ac0f5774afb8fb3e39b9e23017e
+msgid "Completed the :doc:`../getting_started/installation` guide"
+msgstr "完成了 :doc:`../getting_started/installation` 指南"
+
+#: ../../tutorials/index.rst:34 e6af0e3e84fd4fb798af699587af3a44
+msgid "A supported development board (STM32F4 Discovery recommended)"
+msgstr "A supported development board (STM32F4 Discovery recommended)"
+
+#: ../../tutorials/index.rst:35 e6644622b7764c12b8c3032b3bf25a1b
+msgid "Basic knowledge of C programming"
+msgstr ""
+
+#: ../../tutorials/index.rst:36 071b616243994095a39065816622c1a3
+msgid "Familiarity with embedded systems concepts"
+msgstr ""
+
+#: ../../tutorials/index.rst:39 2396132400724ce0b6dba1a0275c39f2
+msgid "Additional Resources"
+msgstr ""
+
+#: ../../tutorials/index.rst:41 a244ceb7f18f427585a31cdd8385fadc
+msgid ":doc:`../user_guide/hal` - HAL API reference"
+msgstr ":doc:`../user_guide/hal` - HAL API reference"
+
+#: ../../tutorials/index.rst:42 30304b5478df47ecbf81846dd07425c8
+msgid ":doc:`../user_guide/osal` - OSAL API reference"
+msgstr ":doc:`../user_guide/osal` - OSAL API reference"
+
+#: ../../tutorials/index.rst:43 d50df28ce77c40a48072574729029eae
+msgid ":doc:`../platform_guides/index` - Platform-specific guides"
+msgstr ":doc:`../platform_guides/index` - Platform-specific guides"
+
+#: ../../tutorials/index.rst:44 1143b3e32c3a4cbdb8a12b11cd19fc38
+msgid ":doc:`../development/testing` - Testing your applications"
+msgstr ":doc:`../development/testing` - Testing your applications"

@@ -1,0 +1,1149 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../user_guide/build_system.rst:2 d452804abbe647798ee4c306f6ddd944
+msgid "Build System"
+msgstr "构建系统"
+
+#: ../../user_guide/build_system.rst:4 90b7064b349843a0911e2bfe1dfcfcd8
+msgid ""
+"The Nexus Embedded Platform uses CMake as its build system, providing a "
+"flexible and cross-platform build infrastructure. This guide covers the "
+"CMake structure, build options, and cross-compilation setup."
+msgstr ""
+
+#: ../../user_guide/build_system.rst:8 c1fc7990d89144db97ddfa30274ee4c0
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../user_guide/build_system.rst:11 0980355090c247f3884776fc534644de
+msgid "Overview"
+msgstr "概述"
+
+#: ../../user_guide/build_system.rst:13 8cfbd5c9fab945a281908ddfe065f425
+msgid "The Nexus build system is designed to support:"
+msgstr "Nexus 构建系统旨在支持："
+
+#: ../../user_guide/build_system.rst:15 65c15161703145b3af07be6be5ed6382
+msgid "Multiple target platforms (Native, STM32F4, STM32H7, ESP32, nRF52)"
+msgstr "Multiple target platforms (Native, STM32F4, STM32H7, ESP32, nRF52)"
+
+#: ../../user_guide/build_system.rst:16 f5ed7a481e7e43f88883f1c83c2040e3
+msgid "Multiple OSAL backends (Bare-metal, FreeRTOS, RT-Thread, Zephyr)"
+msgstr "Multiple OSAL backends (Bare-metal, FreeRTOS, RT-Thread, Zephyr)"
+
+#: ../../user_guide/build_system.rst:17 b5f6d971a4ac491c8ec6a27868078102
+msgid "Cross-compilation for ARM targets"
+msgstr "ARM 目标的交叉编译"
+
+#: ../../user_guide/build_system.rst:18 c5fcff8ae0d24c80934d1ac08ba58b74
+msgid "Automated configuration generation via Kconfig"
+msgstr "通过 Kconfig 自动生成配置"
+
+#: ../../user_guide/build_system.rst:19 3638e2e1e9d6421e87c5c425f28c982b
+msgid "Unit testing with GoogleTest"
+msgstr "使用 GoogleTest 进行单元测试"
+
+#: ../../user_guide/build_system.rst:20 317929cca4764ec399d68c757bd2fd1d
+msgid "Code coverage analysis"
+msgstr "代码覆盖率分析"
+
+#: ../../user_guide/build_system.rst:21 21209dfe604d488b9a8ce6f12ee361dc
+msgid "Documentation generation"
+msgstr "文档生成"
+
+#: ../../user_guide/build_system.rst:25 c9a503c947224a238217e3054dfde02c
+#, fuzzy
+msgid ":doc:`kconfig` - Configuration system overview"
+msgstr "配置 System"
+
+#: ../../user_guide/build_system.rst:26 c9a503c947224a238217e3054dfde02c
+msgid ":doc:`kconfig_tutorial` - Kconfig tutorial"
+msgstr ":doc:`kconfig_tutorial` - Kconfig tutorial"
+
+#: ../../user_guide/build_system.rst:27 ../../user_guide/build_system.rst:638
+#: bda4933c2ad945e98fcae1d22e1f5955
+msgid ":doc:`ide_integration` - IDE integration guides"
+msgstr ":doc:`ide_integration` - IDE integration guides"
+
+#: ../../user_guide/build_system.rst:28 af24d57639414ea2a1bc2ec0b4bf3a76
+msgid ":doc:`../development/scripts` - Build scripts documentation"
+msgstr ":doc:`../development/scripts` - Build scripts documentation"
+
+#: ../../user_guide/build_system.rst:29 47eb8cab25ab45fb83570a36b3c12e70
+msgid ":doc:`../platform_guides/index` - Platform-specific build instructions"
+msgstr ""
+":doc:`../platform_guides/index` - Platform-specific build instructions"
+
+#: ../../user_guide/build_system.rst:30 6d4d457138314c60aec7a70663097bc5
+msgid ""
+":doc:`../tutorials/first_application` - Building your first application"
+msgstr ""
+":doc:`../tutorials/first_application` - Building your first application"
+
+#: ../../user_guide/build_system.rst:33 c0f563fff2f14f47b095cc9736948db6
+msgid "Build Workflow"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:35 8aea0a2fa38f4bb88deddfd747fb01d8
+msgid ""
+"The following diagram illustrates the complete build workflow from "
+"configuration to final binary:"
+msgstr "下图说明了从配置到最终二进制文件的完整构建工作流程："
+
+#: ../../user_guide/build_system.rst:78 9f6abd33de1c4745b120216598853851
+msgid "CMake Structure"
+msgstr "CMake 结构体"
+
+#: ../../user_guide/build_system.rst:81 2fc4b978e9c84a7aafb5a8de140b57b9
+msgid "Project Organization"
+msgstr "项目组织"
+
+#: ../../user_guide/build_system.rst:83 aa619b8f50b04779b5a4565401af9c3c
+msgid "The project follows a hierarchical CMake structure:"
+msgstr "项目遵循分层的 CMake 结构："
+
+#: ../../user_guide/build_system.rst:85 9d802eb672204932a4a1a380e4d06d6d
+msgid ""
+"nexus/\n"
+"├── CMakeLists.txt              # Root CMake configuration\n"
+"├── cmake/\n"
+"│   ├── modules/                # CMake helper modules\n"
+"│   │   ├── FreeRTOS.cmake      # FreeRTOS integration\n"
+"│   │   └── NexusHelpers.cmake  # Utility functions\n"
+"│   ├── toolchains/             # Toolchain files\n"
+"│   │   └── arm-none-eabi.cmake # ARM cross-compilation\n"
+"│   ├── linker/                 # Linker scripts\n"
+"│   │   ├── nx_sections.ld      # GCC linker script\n"
+"│   │   └── nx_sections.sct     # ARM linker script\n"
+"│   ├── CTestConfig.cmake       # CTest configuration\n"
+"│   └── CTestScript.cmake       # CTest script\n"
+"├── hal/CMakeLists.txt          # HAL library\n"
+"├── osal/CMakeLists.txt         # OSAL library\n"
+"├── framework/CMakeLists.txt    # Framework libraries\n"
+"├── platforms/CMakeLists.txt    # Platform-specific code\n"
+"├── applications/CMakeLists.txt # Example applications\n"
+"└── tests/CMakeLists.txt        # Unit tests"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:108 1c21c463e47f411995b676e544360d53
+msgid "Root CMakeLists.txt"
+msgstr "根 CMakeLists.txt"
+
+#: ../../user_guide/build_system.rst:110 592af705b10c4689a857ca7c7c6aa61e
+msgid "The root ``CMakeLists.txt`` file:"
+msgstr "根 ``CMakeLists.txt`` 文件："
+
+#: ../../user_guide/build_system.rst:112 261efef58a594decaeaa5f5e3c495931
+msgid "Defines project metadata (name, version, languages)"
+msgstr "Defines project metadata (name, version, languages)"
+
+#: ../../user_guide/build_system.rst:113 33530f33c60c4486ad65fe0dd2aa6c10
+msgid "Prevents in-source builds"
+msgstr "防止源码内构建"
+
+#: ../../user_guide/build_system.rst:114 2fde61105f1049d0976cdf4fed2e985f
+msgid "Declares build options"
+msgstr "声明构建选项"
+
+#: ../../user_guide/build_system.rst:115 6d13b3092a9a40bda1baaf44d77b29bb
+msgid "Configures compiler flags"
+msgstr "配置编译器标志"
+
+#: ../../user_guide/build_system.rst:116 2a55d3cd848444b3b696f45860cba25f
+msgid "Integrates Kconfig configuration system"
+msgstr "集成 Kconfig 配置系统"
+
+#: ../../user_guide/build_system.rst:117 59337623c21e4e4796ec9249dc645909
+msgid "Includes subdirectories"
+msgstr "包含子目录"
+
+#: ../../user_guide/build_system.rst:119 5b4a799d6311413da9ac7171f75a2134
+msgid "Key sections:"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:121 aeacfe63c1064cd9843326c71ffed711
+msgid ""
+"# Project definition\n"
+"project(nexus\n"
+"    VERSION 0.1.0\n"
+"    DESCRIPTION \"Nexus Embedded Software Development Platform\"\n"
+"    LANGUAGES C CXX ASM\n"
+")\n"
+"\n"
+"# Options\n"
+"option(NEXUS_BUILD_TESTS \"Build unit tests\" ON)\n"
+"option(NEXUS_BUILD_EXAMPLES \"Build example applications\" ON)\n"
+"option(NEXUS_BUILD_DOCS \"Build documentation\" OFF)\n"
+"option(NEXUS_ENABLE_COVERAGE \"Enable code coverage\" OFF)\n"
+"\n"
+"# Platform selection\n"
+"set(NEXUS_PLATFORM \"native\" CACHE STRING \"Target platform\")\n"
+"\n"
+"# OSAL backend selection\n"
+"set(NEXUS_OSAL_BACKEND \"baremetal\" CACHE STRING \"OSAL backend\")"
+msgstr ""
+"# Project definition\n"
+"project(nexus\n"
+"    VERSION 0.1.0\n"
+"    DESCRIPTION \"Nexus Embedded Software Development Platform\"\n"
+"    LANGUAGES C CXX ASM\n"
+")\n"
+"\n"
+"# Options\n"
+"option(NEXUS_BUILD_TESTS \"Build unit tests\" ON)\n"
+"option(NEXUS_BUILD_EXAMPLES \"Build example applications\" ON)\n"
+"option(NEXUS_BUILD_DOCS \"Build documentation\" OFF)\n"
+"option(NEXUS_ENABLE_COVERAGE \"Enable code coverage\" OFF)\n"
+"\n"
+"# Platform selection\n"
+"set(NEXUS_PLATFORM \"native\" CACHE STRING \"Target platform\")\n"
+"\n"
+"# OSAL backend selection\n"
+"set(NEXUS_OSAL_BACKEND \"baremetal\" CACHE STRING \"OSAL backend\")"
+
+#: ../../user_guide/build_system.rst:143 94affbdf643843da8c9598057f9a39b8
+msgid "Build Options"
+msgstr "构建 Options"
+
+#: ../../user_guide/build_system.rst:145 92e5dcfb4324486a8b3361135532a88e
+msgid "The following CMake options control the build configuration:"
+msgstr "以下 CMake 选项控制构建配置："
+
+#: ../../user_guide/build_system.rst:148 08884cd3ad8240e68cf9a5c98215f295
+msgid "Core Build Options"
+msgstr "Core 构建 Options"
+
+#: ../../user_guide/build_system.rst:154 ../../user_guide/build_system.rst:236
+#: c9350e8461e8402fb25d32c1503d1a93
+msgid "Option"
+msgstr "选项"
+
+#: ../../user_guide/build_system.rst:155 d70a463d3bf84329933b2052e93a69bb
+msgid "Type"
+msgstr "类型"
+
+#: ../../user_guide/build_system.rst:156 49f9d679e6e24bbe92b7d26e8f01aa4e
+msgid "Default"
+msgstr "默认"
+
+#: ../../user_guide/build_system.rst:157 ../../user_guide/build_system.rst:185
+#: ../../user_guide/build_system.rst:213 ../../user_guide/build_system.rst:237
+#: ../../user_guide/build_system.rst:255 a736ff0c3cc747adb5997bf38996ef62
+msgid "Description"
+msgstr "描述"
+
+#: ../../user_guide/build_system.rst:158 a20e1c58321f49e58c033c47475328b2
+msgid "``NEXUS_BUILD_TESTS``"
+msgstr "``NEXUS_BUILD_TESTS``"
+
+#: ../../user_guide/build_system.rst:159 ../../user_guide/build_system.rst:163
+#: ../../user_guide/build_system.rst:167 ../../user_guide/build_system.rst:171
+#: 953dbfa54b684e119400ae2941fb387f ebdebf82f67a4684b8f15d6e35755b33
+#: fa5c8d0b970545728956b38f840d0237
+msgid "BOOL"
+msgstr "BOOL"
+
+#: ../../user_guide/build_system.rst:160 ../../user_guide/build_system.rst:164
+#: 3f829a5fe99647a3988a25d5291a97e7
+msgid "ON"
+msgstr "ON"
+
+#: ../../user_guide/build_system.rst:161 2433150b7a5c477ca58a148d682bc705
+msgid "Build unit tests (requires GoogleTest)"
+msgstr "Build unit tests (requires GoogleTest)"
+
+#: ../../user_guide/build_system.rst:162 a7b5ac607eec4c69af40307559aeac51
+msgid "``NEXUS_BUILD_EXAMPLES``"
+msgstr "``NEXUS_BUILD_EXAMPLES``"
+
+#: ../../user_guide/build_system.rst:165 5ea35ddfc2394f2c8f4fc898aa5f207c
+msgid "Build example applications"
+msgstr "构建 example applications"
+
+#: ../../user_guide/build_system.rst:166 6f9c7e69c9b441b5b4277a46c751e4b6
+msgid "``NEXUS_BUILD_DOCS``"
+msgstr "``NEXUS_BUILD_DOCS``"
+
+#: ../../user_guide/build_system.rst:168 ../../user_guide/build_system.rst:172
+#: 33105ab24ea7447da55b4cd825593508
+msgid "OFF"
+msgstr "OFF"
+
+#: ../../user_guide/build_system.rst:169 dad38677001c48a6a17ed9e08085e3ae
+msgid "Build documentation (requires Doxygen/Sphinx)"
+msgstr "Build documentation (requires Doxygen/Sphinx)"
+
+#: ../../user_guide/build_system.rst:170 9deba67ae4154e938f71a6292bb89572
+msgid "``NEXUS_ENABLE_COVERAGE``"
+msgstr "``NEXUS_ENABLE_COVERAGE``"
+
+#: ../../user_guide/build_system.rst:173 79cdb3d95bff4785afda194b183ef6d9
+msgid "Enable code coverage instrumentation"
+msgstr "启用代码覆盖率检测"
+
+#: ../../user_guide/build_system.rst:176 50869d8d0d5944ab96422bbef8e4d8e7
+msgid "Platform Selection"
+msgstr "平台 Selection"
+
+#: ../../user_guide/build_system.rst:178 4d20a5833b334f4a90f3cdd86cf190ec
+msgid ""
+"The ``NEXUS_PLATFORM`` option selects the target platform. Type: STRING, "
+"Default: ``native``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:184 5bf5ee5693a94426a07c610fa041dae7
+msgid "Platform"
+msgstr "平台"
+
+#: ../../user_guide/build_system.rst:186 91b0235222b54062a7b33e533f204981
+msgid "``native``"
+msgstr "``native``"
+
+#: ../../user_guide/build_system.rst:187 0cd3b5f00ea243f0b8e6831d4200aadc
+msgid "Native platform for host testing (Windows/Linux/macOS)"
+msgstr "Native platform for host testing (Windows/Linux/macOS)"
+
+#: ../../user_guide/build_system.rst:188 5df5002a3802471a8e2e9e1e8b23452b
+msgid "``stm32f4``"
+msgstr "``stm32f4``"
+
+#: ../../user_guide/build_system.rst:189 330f1b38038040eda7bc80cc178effc8
+msgid "STM32F4 series microcontrollers (Cortex-M4)"
+msgstr "STM32F4 series microcontrollers (Cortex-M4)"
+
+#: ../../user_guide/build_system.rst:190 079ccd8e748c454f82f1b01be06fe7ea
+msgid "``stm32h7``"
+msgstr "``stm32h7``"
+
+#: ../../user_guide/build_system.rst:191 1c294dd9d7364f5e8c2c1163d9c29f5e
+msgid "STM32H7 series microcontrollers (Cortex-M7)"
+msgstr "STM32H7 series microcontrollers (Cortex-M7)"
+
+#: ../../user_guide/build_system.rst:192 aa55e7eb8b1d48f187284056a85ec7dc
+msgid "``esp32``"
+msgstr "``esp32``"
+
+#: ../../user_guide/build_system.rst:193 24feaa087d454462b64086b2c607c626
+msgid "ESP32 series microcontrollers (Xtensa LX6)"
+msgstr "ESP32 series microcontrollers (Xtensa LX6)"
+
+#: ../../user_guide/build_system.rst:194 8239fd0c3148432a93d01db4e53e35ef
+msgid "``nrf52``"
+msgstr "``nrf52``"
+
+#: ../../user_guide/build_system.rst:195 84ddc65e4bfd4e789dde69431e27d0ad
+msgid "nRF52 series microcontrollers (Cortex-M4)"
+msgstr "nRF52 series microcontrollers (Cortex-M4)"
+
+#: ../../user_guide/build_system.rst:197 d701f35dba5948bab679b601a49624c9
+msgid "Set platform using:"
+msgstr "设置平台："
+
+#: ../../user_guide/build_system.rst:199 d24985f95cda454db5c43a37516bb2cf
+msgid "cmake -DNEXUS_PLATFORM=stm32f4 .."
+msgstr "cmake -DNEXUS_PLATFORM=stm32f4 .."
+
+#: ../../user_guide/build_system.rst:204 4774e6a84a1b40d8bf91bc475ee118e9
+msgid "OSAL Backend Selection"
+msgstr "OSAL 后端 Selection"
+
+#: ../../user_guide/build_system.rst:206 034e2f3d535b4abdb954c5b9e5a268df
+msgid ""
+"The ``NEXUS_OSAL_BACKEND`` option selects the RTOS backend. Type: STRING, "
+"Default: ``baremetal``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:212 d476ecc209b44002978c8ff2a7654b56
+msgid "Backend"
+msgstr "后端"
+
+#: ../../user_guide/build_system.rst:214 fae0718b7a9e4bec841eff1014a03afa
+msgid "``baremetal``"
+msgstr "``baremetal``"
+
+#: ../../user_guide/build_system.rst:215 29c5f96acf734f9294f18febe2a78c9d
+msgid "Bare-metal (no RTOS)"
+msgstr "裸机 (no RTOS)"
+
+#: ../../user_guide/build_system.rst:216 0efbff3fc1db4234897017b43b7c0ec1
+msgid "``freertos``"
+msgstr "``freertos``"
+
+#: ../../user_guide/build_system.rst:217 6bc988a9b4864e2caec91dac873f5e85
+msgid "FreeRTOS integration"
+msgstr "FreeRTOS 集成"
+
+#: ../../user_guide/build_system.rst:218 d708eb335e7447d882d19e9b13377443
+msgid "``rtthread``"
+msgstr "``rtthread``"
+
+#: ../../user_guide/build_system.rst:219 df461945b0dc4ba3b851b9ed5c58de0d
+msgid "RT-Thread integration"
+msgstr "RT-Thread 集成"
+
+#: ../../user_guide/build_system.rst:220 bf65163cc3b34037a5f1669326c7f0ec
+msgid "``zephyr``"
+msgstr "``zephyr``"
+
+#: ../../user_guide/build_system.rst:221 b3b4f5745ea249f8ab372b5d5924cdae
+msgid "Zephyr RTOS integration"
+msgstr "Zephyr RTOS 集成"
+
+#: ../../user_guide/build_system.rst:223 cb84e1fab2e54c94af4d5761ab9686fc
+msgid "Set OSAL backend using:"
+msgstr "设置 OSAL 后端："
+
+#: ../../user_guide/build_system.rst:225 05584887654e47acb8e2504f964b5d2c
+msgid "cmake -DNEXUS_OSAL_BACKEND=freertos .."
+msgstr "cmake -DNEXUS_OSAL_BACKEND=freertos .."
+
+#: ../../user_guide/build_system.rst:230 dbdb347f4a094d148f086df20c0a4fa7
+msgid "Kconfig Options"
+msgstr "Kconfig 选项"
+
+#: ../../user_guide/build_system.rst:238 910292816c434a52836e4d7aae3393de
+msgid "``NEXUS_KCONFIG_FILE``"
+msgstr "``NEXUS_KCONFIG_FILE``"
+
+#: ../../user_guide/build_system.rst:239 d13ee3325e2d48689708ed3547db2927
+msgid "Path to root Kconfig file (default: ``Kconfig``)"
+msgstr "Path to root Kconfig file (default: ``Kconfig``)"
+
+#: ../../user_guide/build_system.rst:240 470240ee0ef642eba69465e74506a01e
+msgid "``NEXUS_CONFIG_FILE``"
+msgstr "``NEXUS_CONFIG_FILE``"
+
+#: ../../user_guide/build_system.rst:241 2a52ef43aba94449bcda42f50fb4ff2a
+msgid "Path to configuration file (default: ``.config``)"
+msgstr "Path to configuration file (default: ``.config``)"
+
+#: ../../user_guide/build_system.rst:242 8576c2e491e94b60ade996fcbe5fe6c1
+msgid "``NEXUS_CONFIG_HEADER``"
+msgstr "``NEXUS_CONFIG_HEADER``"
+
+#: ../../user_guide/build_system.rst:243 bf6830a2af2a48ddb5e5ece1a6a7735f
+msgid "Path to generated header (default: ``nexus_config.h``)"
+msgstr "Path to generated header (default: ``nexus_config.h``)"
+
+#: ../../user_guide/build_system.rst:246 a6d3a2c13b8448efae81adebe8859faa
+msgid "Build Types"
+msgstr "构建 Types"
+
+#: ../../user_guide/build_system.rst:248 db3818dbf50b47eca51238183d270fea
+msgid "CMake supports standard build types:"
+msgstr "CMake 支持标准构建类型："
+
+#: ../../user_guide/build_system.rst:254 72777de7955c45b080d6c513556fded0
+msgid "Build Type"
+msgstr "构建 类型"
+
+#: ../../user_guide/build_system.rst:256 6d69168e56684791ba9bcb4228e5e6b5
+msgid "``Debug``"
+msgstr "``Debug``"
+
+#: ../../user_guide/build_system.rst:257 3e2428141dac431ba245cb847d930997
+msgid "Debug build with symbols, no optimization (``-Og -g3``)"
+msgstr "Debug build with symbols, no optimization (``-Og -g3``)"
+
+#: ../../user_guide/build_system.rst:258 e57a1d189c2f41d48b35d975f8918a10
+msgid "``Release``"
+msgstr "``Release``"
+
+#: ../../user_guide/build_system.rst:259 a03d1ce7566f4e359d3306c725255b8e
+msgid "Release build with optimization (``-O2``)"
+msgstr "Release build with optimization (``-O2``)"
+
+#: ../../user_guide/build_system.rst:260 37da053668d940909ada72632bcbacd8
+msgid "``RelWithDebInfo``"
+msgstr "``RelWithDebInfo``"
+
+#: ../../user_guide/build_system.rst:261 3107f1772b56479aad7f6c5689bbe746
+msgid "Release with debug info (``-O2 -g``)"
+msgstr "Release with debug info (``-O2 -g``)"
+
+#: ../../user_guide/build_system.rst:262 786b24b28ad84d06bb9c8255ee7c53b5
+msgid "``MinSizeRel``"
+msgstr "``MinSizeRel``"
+
+#: ../../user_guide/build_system.rst:263 542e680538ce405aad27fd0c3f64f1c1
+msgid "Minimum size release (``-Os``)"
+msgstr "Minimum size release (``-Os``)"
+
+#: ../../user_guide/build_system.rst:265 1643c36c64044307b8ddcc4c80334465
+msgid "Set build type using:"
+msgstr "设置构建类型："
+
+#: ../../user_guide/build_system.rst:267 9f65013338314f698e9b6d23b6755f6e
+msgid "cmake -DCMAKE_BUILD_TYPE=Release .."
+msgstr "cmake -DCMAKE_BUILD_TYPE=Release .."
+
+#: ../../user_guide/build_system.rst:272 1da0e9b8058543f9ae1a009b4e9867e0
+msgid "Building the Project"
+msgstr "构建项目"
+
+#: ../../user_guide/build_system.rst:275 88dced6b6433468bbe61e2f5bb0971c5
+msgid "Basic Build"
+msgstr "Basic 构建"
+
+#: ../../user_guide/build_system.rst:277 078e2fc23d22451a832721b9dd7d1150
+msgid "Native platform (host testing):"
+msgstr "Native platform (host testing):"
+
+#: ../../user_guide/build_system.rst:279 275584b3421645a898145dc828603deb
+msgid ""
+"# Create build directory\n"
+"mkdir build\n"
+"cd build\n"
+"\n"
+"# Configure\n"
+"cmake ..\n"
+"\n"
+"# Build\n"
+"cmake --build .\n"
+"\n"
+"# Run tests\n"
+"ctest --output-on-failure"
+msgstr ""
+"# Create build directory\n"
+"mkdir build\n"
+"cd build\n"
+"\n"
+"# Configure\n"
+"cmake ..\n"
+"\n"
+"# Build\n"
+"cmake --build .\n"
+"\n"
+"# Run tests\n"
+"ctest --output-on-failure"
+
+#: ../../user_guide/build_system.rst:294 5b60ebb347f34c13812ab96ef1a286e2
+msgid "With specific options:"
+msgstr "使用特定选项："
+
+#: ../../user_guide/build_system.rst:296 218c1bd0b57049aba170cd1df002b4bc
+msgid ""
+"cmake -DNEXUS_BUILD_TESTS=ON \\\n"
+"      -DNEXUS_BUILD_EXAMPLES=ON \\\n"
+"      -DCMAKE_BUILD_TYPE=Debug \\\n"
+"      .."
+msgstr ""
+"cmake -DNEXUS_BUILD_TESTS=ON \\\n"
+"      -DNEXUS_BUILD_EXAMPLES=ON \\\n"
+"      -DCMAKE_BUILD_TYPE=Debug \\\n"
+"      .."
+
+#: ../../user_guide/build_system.rst:304 feb94a74e46b42c4b08ea02282a55895
+msgid "Cross-Compilation"
+msgstr "交叉编译"
+
+#: ../../user_guide/build_system.rst:307 07bb699515a743cfacc17a87863598fc
+msgid "ARM Cortex-M Targets"
+msgstr "ARM Cortex-M 目标"
+
+#: ../../user_guide/build_system.rst:310 d14ec6b85c8248babfd5beecedf73073
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../user_guide/build_system.rst:312 68f5c73f26b14ec2aaa234a52d24ae5d
+msgid "Install ARM GNU Toolchain:"
+msgstr "安装 ARM GNU 工具链："
+
+#: ../../user_guide/build_system.rst:314 08681bcd524e4dfb82c46ac1ed3f503b
+msgid ""
+"**Windows**: Download from `ARM Developer <https://developer.arm.com/tools-"
+"and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm>`_"
+msgstr ""
+"**Windows**: Download from `ARM Developer <https://developer.arm.com/tools-"
+"and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm>`_"
+
+#: ../../user_guide/build_system.rst:315 3b807f6418794bf4b39cb375612b0ab2
+msgid "**Linux**: ``sudo apt-get install gcc-arm-none-eabi``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:316 642197c13cc943e7917752e204793885
+msgid "**macOS**: ``brew install gcc-arm-embedded``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:318 7220a73812a04fec8461b348150fc188
+msgid "Verify installation:"
+msgstr "验证安装："
+
+#: ../../user_guide/build_system.rst:320 85ed83341afd40e1a83f714ec681d7c0
+msgid "arm-none-eabi-gcc --version"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:325 c70b4812091143608de41c1d0b6988ef
+msgid "STM32F4 Build"
+msgstr "STM32F4 构建"
+
+#: ../../user_guide/build_system.rst:327 de0850452e6946e795da14af57f5eade
+msgid ""
+"mkdir build-stm32f4\n"
+"cd build-stm32f4\n"
+"\n"
+"cmake -DNEXUS_PLATFORM=stm32f4 \\\n"
+"      -DCMAKE_BUILD_TYPE=Release \\\n"
+"      -DNEXUS_BUILD_TESTS=OFF \\\n"
+"      ..\n"
+"\n"
+"cmake --build ."
+msgstr ""
+"mkdir build-stm32f4\n"
+"cd build-stm32f4\n"
+"\n"
+"cmake -DNEXUS_PLATFORM=stm32f4 \\\n"
+"      -DCMAKE_BUILD_TYPE=Release \\\n"
+"      -DNEXUS_BUILD_TESTS=OFF \\\n"
+"      ..\n"
+"\n"
+"cmake --build ."
+
+#: ../../user_guide/build_system.rst:340 2a7c35438f87485a887d59a55cad5fd0
+msgid "STM32H7 Build"
+msgstr "STM32H7 构建"
+
+#: ../../user_guide/build_system.rst:342 afab5663ca044df4a671f6040e457857
+msgid ""
+"mkdir build-stm32h7\n"
+"cd build-stm32h7\n"
+"\n"
+"cmake -DNEXUS_PLATFORM=stm32h7 \\\n"
+"      -DCMAKE_BUILD_TYPE=Release \\\n"
+"      -DNEXUS_BUILD_TESTS=OFF \\\n"
+"      ..\n"
+"\n"
+"cmake --build ."
+msgstr ""
+"mkdir build-stm32h7\n"
+"cd build-stm32h7\n"
+"\n"
+"cmake -DNEXUS_PLATFORM=stm32h7 \\\n"
+"      -DCMAKE_BUILD_TYPE=Release \\\n"
+"      -DNEXUS_BUILD_TESTS=OFF \\\n"
+"      ..\n"
+"\n"
+"cmake --build ."
+
+#: ../../user_guide/build_system.rst:355 03f5e1ec8cb749ab89a3aa82c20e235a
+msgid "Toolchain Configuration"
+msgstr "工具链 配置"
+
+#: ../../user_guide/build_system.rst:357 1f823cfbd0f546509429a009a84febaf
+msgid ""
+"The ARM toolchain file (``cmake/toolchains/arm-none-eabi.cmake``) "
+"configures:"
+msgstr ""
+"The ARM toolchain file (``cmake/toolchains/arm-none-eabi.cmake``) "
+"configures:"
+
+#: ../../user_guide/build_system.rst:359 588507f88b4e48819ea8cf805a66a8fd
+msgid "Compiler: ``arm-none-eabi-gcc``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:360 b60f22b004c34b03b23f9cc30d7258f1
+msgid "Linker: ``arm-none-eabi-ld``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:361 f1d1dbfebe6f435a9c696f4a0bbad474
+msgid "Archiver: ``arm-none-eabi-ar``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:362 c6cfba9a5ea7401f8c0d3a5308208c07
+msgid "Objcopy: ``arm-none-eabi-objcopy``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:363 0cee4001166242ed90e5e9215c34afb7
+msgid "Size: ``arm-none-eabi-size``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:365 ab152cf0c36f4197ad5fc0dd9bd9ca0b
+msgid "Compiler flags for ARM:"
+msgstr "ARM 编译器标志："
+
+#: ../../user_guide/build_system.rst:367 d3be079419ca462d83ee893d4e41962e
+msgid ""
+"-mcpu=cortex-m4\n"
+"-mthumb\n"
+"-mfloat-abi=hard\n"
+"-mfpu=fpv4-sp-d16\n"
+"-ffunction-sections\n"
+"-fdata-sections"
+msgstr ""
+"-mcpu=cortex-m4\n"
+"-mthumb\n"
+"-mfloat-abi=hard\n"
+"-mfpu=fpv4-sp-d16\n"
+"-ffunction-sections\n"
+"-fdata-sections"
+
+#: ../../user_guide/build_system.rst:376 b5bd91a745024ec19cc7127808046c03
+msgid "Linker flags:"
+msgstr "链接器 flags:"
+
+#: ../../user_guide/build_system.rst:378 71d855a3951b4e91a0573d1b673fab78
+msgid ""
+"-Wl,--gc-sections\n"
+"-Wl,--print-memory-usage\n"
+"-specs=nano.specs\n"
+"-specs=nosys.specs"
+msgstr ""
+"-Wl,--gc-sections\n"
+"-Wl,--print-memory-usage\n"
+"-specs=nano.specs\n"
+"-specs=nosys.specs"
+
+#: ../../user_guide/build_system.rst:386 6ec0dd3e24c94a19bb4a9e9cb05517ab
+msgid "Custom Toolchain Path"
+msgstr "Custom 工具链 Path"
+
+#: ../../user_guide/build_system.rst:388 2b88ac876664474890022f334cedd772
+msgid "If the toolchain is not in PATH:"
+msgstr "如果工具链不在 PATH 中："
+
+#: ../../user_guide/build_system.rst:390 2f5a8164c8714e648fca1d826036b8ee
+msgid ""
+"cmake -DNEXUS_PLATFORM=stm32f4 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"      -DTOOLCHAIN_PREFIX=/path/to/gcc-arm-none-eabi \\\n"
+"      .."
+msgstr ""
+"cmake -DNEXUS_PLATFORM=stm32f4 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"      -DTOOLCHAIN_PREFIX=/path/to/gcc-arm-none-eabi \\\n"
+"      .."
+
+#: ../../user_guide/build_system.rst:398 747618bec41f46bb97f0bb93f9f2f60b
+msgid "Configuration System"
+msgstr "配置 System"
+
+#: ../../user_guide/build_system.rst:401 0599bf21671e459694722ff4356f9562
+msgid "Kconfig Integration"
+msgstr "Kconfig 集成"
+
+#: ../../user_guide/build_system.rst:403 ec49e7e0429e47d9811365cbd231dae5
+msgid "The build system integrates with Kconfig for configuration management:"
+msgstr "构建系统与 Kconfig 集成以进行配置管理："
+
+#: ../../user_guide/build_system.rst:405 ffb62fdd30df445ea7f6b79243b02b1f
+msgid ""
+"**Configuration Generation**: During CMake configuration, the "
+"``generate_config.py`` script generates ``nexus_config.h`` from ``.config``"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:407 fa2c02ef5a1e42ec8647f795bfa11cc4
+msgid ""
+"**Dependency Tracking**: CMake tracks all Kconfig files and reconfigures "
+"when they change"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:409 665ca7b352bd49db8ba436f7daa95345
+msgid ""
+"**Default Configuration**: If no ``.config`` exists, a default configuration"
+" is generated"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:411 c0f563fff2f14f47b095cc9736948db6
+msgid "Configuration Workflow:"
+msgstr "配置 Workflow:"
+
+#: ../../user_guide/build_system.rst:413 2736d45a96f7448ca7dfe6cd4aee8985
+msgid ""
+"# 1. Configure with menuconfig (if available)\n"
+"python scripts/kconfig/generate_config.py --menuconfig\n"
+"\n"
+"# 2. Or use a defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"\n"
+"# 3. Generate header\n"
+"python scripts/kconfig/generate_config.py --config .config --output nexus_config.h\n"
+"\n"
+"# 4. Build\n"
+"cmake --build build"
+msgstr ""
+"# 1. Configure with menuconfig (if available)\n"
+"python scripts/kconfig/generate_config.py --menuconfig\n"
+"\n"
+"# 2. Or use a defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"\n"
+"# 3. Generate header\n"
+"python scripts/kconfig/generate_config.py --config .config --output nexus_config.h\n"
+"\n"
+"# 4. Build\n"
+"cmake --build build"
+
+#: ../../user_guide/build_system.rst:428 df9d2d737f834823a5039fa7736d25aa
+msgid "Generated Header"
+msgstr "生成的头文件"
+
+#: ../../user_guide/build_system.rst:430 f225f3d5a7434f3fab514903e70e4d68
+msgid "The ``nexus_config.h`` header contains:"
+msgstr "``nexus_config.h`` 头文件包含："
+
+#: ../../user_guide/build_system.rst:432 0f952e74ac124c6db2dd68a30291ab06
+msgid ""
+"/* Generated configuration header */\n"
+"#ifndef NEXUS_CONFIG_H\n"
+"#define NEXUS_CONFIG_H\n"
+"\n"
+"/* Platform configuration */\n"
+"#define CONFIG_PLATFORM_STM32F4 1\n"
+"#define CONFIG_CHIP_STM32F407 1\n"
+"\n"
+"/* Peripheral configuration */\n"
+"#define CONFIG_HAL_GPIO 1\n"
+"#define CONFIG_HAL_UART 1\n"
+"#define CONFIG_HAL_UART_COUNT 3\n"
+"\n"
+"/* OSAL configuration */\n"
+"#define CONFIG_OSAL_FREERTOS 1\n"
+"#define CONFIG_FREERTOS_HEAP_SIZE 32768\n"
+"\n"
+"#endif /* NEXUS_CONFIG_H */"
+msgstr ""
+"/* Generated configuration header */\n"
+"#ifndef NEXUS_CONFIG_H\n"
+"#define NEXUS_CONFIG_H\n"
+"\n"
+"/* Platform configuration */\n"
+"#define CONFIG_PLATFORM_STM32F4 1\n"
+"#define CONFIG_CHIP_STM32F407 1\n"
+"\n"
+"/* Peripheral configuration */\n"
+"#define CONFIG_HAL_GPIO 1\n"
+"#define CONFIG_HAL_UART 1\n"
+"#define CONFIG_HAL_UART_COUNT 3\n"
+"\n"
+"/* OSAL configuration */\n"
+"#define CONFIG_OSAL_FREERTOS 1\n"
+"#define CONFIG_FREERTOS_HEAP_SIZE 32768\n"
+"\n"
+"#endif /* NEXUS_CONFIG_H */"
+
+#: ../../user_guide/build_system.rst:454 79f4016b90f24a1b8a926160cfa42144
+msgid "Build Directory Structure"
+msgstr "构建 Directory 结构体"
+
+#: ../../user_guide/build_system.rst:456 0a43a6e08d6b4236ba1e8ee271c3fcdc
+msgid "After building, the directory structure:"
+msgstr "构建后的目录结构："
+
+#: ../../user_guide/build_system.rst:458 7efbc366172447719d694661aec6f85c
+msgid ""
+"build/\n"
+"├── CMakeCache.txt              # CMake cache\n"
+"├── CMakeFiles/                 # CMake internal files\n"
+"├── compile_commands.json       # Compilation database\n"
+"├── hal/\n"
+"│   └── libnexus_hal.a          # HAL library\n"
+"├── osal/\n"
+"│   └── libnexus_osal.a         # OSAL library\n"
+"├── framework/\n"
+"│   ├── config/\n"
+"│   │   └── libnexus_config.a   # Config library\n"
+"│   ├── log/\n"
+"│   │   └── libnexus_log.a      # Log library\n"
+"│   └── shell/\n"
+"│       └── libnexus_shell.a    # Shell library\n"
+"├── platforms/\n"
+"│   └── native/\n"
+"│       └── libnexus_platform.a # Platform library\n"
+"├── applications/\n"
+"│   ├── blinky/\n"
+"│   │   └── blinky.exe          # Blinky application\n"
+"│   └── shell_demo/\n"
+"│       └── shell_demo.exe      # Shell demo\n"
+"└── tests/\n"
+"    └── nexus_tests.exe         # Unit tests"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:487 3a5a9d8c91ea424c8bde99eb40330a4e
+msgid "Output Artifacts"
+msgstr "输出文件"
+
+#: ../../user_guide/build_system.rst:489 48894686718e4567b8bf8dccabe8e6d0
+msgid "For embedded targets:"
+msgstr "对于嵌入式目标："
+
+#: ../../user_guide/build_system.rst:491 79d84dff1b39474cbf6914a3ce14ad86
+msgid "``.elf`` - Executable with debug symbols"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:492 114ac321fc8b41f9a67ffd56896d3eed
+msgid "``.bin`` - Raw binary for flashing"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:493 4af067251d9845a79a59572c2ab3ea6c
+msgid "``.hex`` - Intel HEX format"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:494 b5f41eb75d9d4e308b5581f50c972f29
+msgid "``.map`` - Memory map file"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:497 c891180a22cb46b5b0457c9a71545c3b
+msgid "Advanced Build Features"
+msgstr "Advanced 构建 特性"
+
+#: ../../user_guide/build_system.rst:500 75664b2c891f429ea16f2bde80d80ef7
+msgid "Parallel Builds"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:502 618df8a0c5aa420fb8e18fa45015c80e
+msgid "Use multiple cores for faster builds:"
+msgstr "使用多核加快构建速度："
+
+#: ../../user_guide/build_system.rst:504 d8b3b7e528da41e3a37d2275cbb0ef6b
+msgid ""
+"# Unix/Linux/macOS\n"
+"cmake --build . -- -j$(nproc)\n"
+"\n"
+"# Windows\n"
+"cmake --build . -- /m"
+msgstr ""
+"# Unix/Linux/macOS\n"
+"cmake --build . -- -j$(nproc)\n"
+"\n"
+"# Windows\n"
+"cmake --build . -- /m"
+
+#: ../../user_guide/build_system.rst:513 3b3dfe1fc2034072949fa787ef9a87a5
+msgid "Verbose Build"
+msgstr "Verbose 构建"
+
+#: ../../user_guide/build_system.rst:515 a4918de361b34bc79e50872ffe256428
+msgid "Show full compiler commands:"
+msgstr "显示完整的编译器命令："
+
+#: ../../user_guide/build_system.rst:517 944a7d65576d483fbeb0021873cd0a6e
+msgid ""
+"cmake --build . --verbose\n"
+"\n"
+"# Or\n"
+"make VERBOSE=1"
+msgstr ""
+"cmake --build . --verbose\n"
+"\n"
+"# Or\n"
+"make VERBOSE=1"
+
+#: ../../user_guide/build_system.rst:525 3243f387aaf545b59192f261f1e40cc3
+msgid "Clean Build"
+msgstr "清理 构建"
+
+#: ../../user_guide/build_system.rst:527 a825395d45c246b299308200da95bc7f
+msgid ""
+"# Clean build artifacts\n"
+"cmake --build . --target clean\n"
+"\n"
+"# Or delete build directory\n"
+"rm -rf build"
+msgstr ""
+"# Clean build artifacts\n"
+"cmake --build . --target clean\n"
+"\n"
+"# Or delete build directory\n"
+"rm -rf build"
+
+#: ../../user_guide/build_system.rst:536 71b3dc2df565435eada4273d2ebb46e1
+msgid "Install"
+msgstr "安装"
+
+#: ../../user_guide/build_system.rst:538 0117d49f237d4ea1a302aff19dd2a464
+msgid "Install built artifacts:"
+msgstr "安装 built artifacts:"
+
+#: ../../user_guide/build_system.rst:540 d854b44d70c140abb5bafeef71dd9ae9
+msgid ""
+"cmake --build . --target install\n"
+"\n"
+"# With custom prefix\n"
+"cmake -DCMAKE_INSTALL_PREFIX=/opt/nexus ..\n"
+"cmake --build . --target install"
+msgstr ""
+"cmake --build . --target install\n"
+"\n"
+"# With custom prefix\n"
+"cmake -DCMAKE_INSTALL_PREFIX=/opt/nexus ..\n"
+"cmake --build . --target install"
+
+#: ../../user_guide/build_system.rst:549 72e8c74da04b4be9ba1a80c8b98eba39
+msgid "Code Coverage"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:551 3519da1847b84ad881bb8212bc615108
+msgid "Enable coverage and generate reports:"
+msgstr "启用覆盖率并生成报告："
+
+#: ../../user_guide/build_system.rst:553 fda491d338674fc3ae8037f01f851628
+msgid ""
+"# Configure with coverage\n"
+"cmake -DNEXUS_ENABLE_COVERAGE=ON \\\n"
+"      -DCMAKE_BUILD_TYPE=Debug \\\n"
+"      ..\n"
+"\n"
+"# Build and run tests\n"
+"cmake --build .\n"
+"ctest\n"
+"\n"
+"# Generate coverage report (Linux/macOS)\n"
+"lcov --capture --directory . --output-file coverage.info\n"
+"lcov --remove coverage.info '/usr/*' '*/ext/*' '*/tests/*' --output-file coverage.info\n"
+"genhtml coverage.info --output-directory coverage_html\n"
+"\n"
+"# Or use scripts\n"
+"bash scripts/coverage/run_coverage_linux.sh"
+msgstr ""
+"# Configure with coverage\n"
+"cmake -DNEXUS_ENABLE_COVERAGE=ON \\\n"
+"      -DCMAKE_BUILD_TYPE=Debug \\\n"
+"      ..\n"
+"\n"
+"# Build and run tests\n"
+"cmake --build .\n"
+"ctest\n"
+"\n"
+"# Generate coverage report (Linux/macOS)\n"
+"lcov --capture --directory . --output-file coverage.info\n"
+"lcov --remove coverage.info '/usr/*' '*/ext/*' '*/tests/*' --output-file coverage.info\n"
+"genhtml coverage.info --output-directory coverage_html\n"
+"\n"
+"# Or use scripts\n"
+"bash scripts/coverage/run_coverage_linux.sh"
+
+#: ../../user_guide/build_system.rst:573 2ee386041f9e41178c473b97c6fc4304
+msgid "IDE Integration"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:575 41e9e7ad0c854d789e907b2c145b5973
+msgid "See :doc:`ide_integration` for detailed IDE setup guides."
+msgstr "查看 :doc:`ide_integration` 了解详细的 IDE 设置指南。"
+
+#: ../../user_guide/build_system.rst:578 639df335631d45b78f858735c3d54aa9
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../user_guide/build_system.rst:581 8ddde4f210124bdda69ee7a8dd9ec582
+msgid "Common Issues"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:583 43bbe6ea6fac4bb8915843eea844ac82
+msgid "**CMake version too old**"
+msgstr "**CMake version too old**"
+
+#: ../../user_guide/build_system.rst:585 dc4b5872c3b740bf9742a59885e6616e
+msgid "CMake Error: CMake 3.16 or higher is required."
+msgstr ""
+
+#: ../../user_guide/build_system.rst:589 702f8ec9c74645f2941a686c61c970ec
+msgid "Solution: Upgrade CMake to version 3.16 or higher."
+msgstr "解决方案：将 CMake 升级到 3.16 或更高版本。"
+
+#: ../../user_guide/build_system.rst:591 4392cff80805496495d5f8acb114e69f
+msgid "**Toolchain not found**"
+msgstr "**Toolchain not found**"
+
+#: ../../user_guide/build_system.rst:593 9fc3b3e0d15f46e889c265d21855a52f
+msgid "CMake Error: Could not find toolchain file"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:597 9e4147a00acd45e3b250d1cc6fdd3cf9
+msgid ""
+"Solution: Install ARM toolchain and ensure it's in PATH, or specify "
+"``TOOLCHAIN_PREFIX``."
+msgstr "解决方案：安装 ARM 工具链并确保它在 PATH 中，或指定 ``TOOLCHAIN_PREFIX``。"
+
+#: ../../user_guide/build_system.rst:599 c0965e51be6b4e3da1b8329283ad08c2
+msgid "**Configuration generation failed**"
+msgstr "**Configuration generation failed**"
+
+#: ../../user_guide/build_system.rst:601 74e5dac340a945e3bc53cf1a3d99d0bb
+msgid "Failed to generate HAL config from .config file"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:605 acdbe201462a4722981d43bb6c9e64a7
+msgid "Solution: Validate ``.config`` file or regenerate from defconfig:"
+msgstr "解决方案：验证 ``.config`` 文件或从 defconfig 重新生成："
+
+#: ../../user_guide/build_system.rst:607 e89ac58177064e9ab31789b7f9e02508
+msgid ""
+"python scripts/kconfig/validate_kconfig.py --config .config\n"
+"# Or use defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config"
+msgstr ""
+"python scripts/kconfig/validate_kconfig.py --config .config\n"
+"# Or use defconfig\n"
+"cp platforms/stm32/defconfig_stm32f4 .config"
+
+#: ../../user_guide/build_system.rst:613 743fbd7dfcab4ee7a7e404c9d5514d52
+msgid "**Missing dependencies**"
+msgstr "**Missing dependencies**"
+
+#: ../../user_guide/build_system.rst:615 36f2744ea7724e11851ed8aaf15e63c7
+msgid "Could NOT find Python3 (missing: Python3_EXECUTABLE)"
+msgstr "Could NOT find Python3 (missing: Python3_EXECUTABLE)"
+
+#: ../../user_guide/build_system.rst:619 5048fd5578334cceb1683e596d0e436e
+msgid "Solution: Install Python 3.7 or higher."
+msgstr "解决方案：安装 Python 3.7 或更高版本。"
+
+#: ../../user_guide/build_system.rst:621 d161978ee94649188f8f8a614944fe8d
+msgid "**Build fails on Windows**"
+msgstr "**Build fails on Windows**"
+
+#: ../../user_guide/build_system.rst:623 9552fd4ac9da409885f41d9b92f2a628
+msgid ""
+"Solution: Use Visual Studio Developer Command Prompt or install MinGW-w64."
+msgstr "解决方案：使用 Visual Studio 开发人员命令提示符或安装 MinGW-w64。"
+
+#: ../../user_guide/build_system.rst:626 7fbc11148b7e4220bbb5a9d1b1267e82
+msgid "Getting Help"
+msgstr ""
+
+#: ../../user_guide/build_system.rst:628 af24d57639414ea2a1bc2ec0b4bf3a76
+msgid "Check :doc:`../development/contributing` for contribution guidelines"
+msgstr "查看 :doc:`../development/contributing` 了解贡献指南"
+
+#: ../../user_guide/build_system.rst:629 d6e0cc9bca3648b3843aa8ee722c3dc7
+msgid "Visit `GitHub Issues <https://github.com/X-Gen-Lab/nexus/issues>`_"
+msgstr "Visit `GitHub Issues <https://github.com/X-Gen-Lab/nexus/issues>`_"
+
+#: ../../user_guide/build_system.rst:630 08c53fff1b194e0a935a7ebee570ea97
+msgid ""
+"Join `GitHub Discussions <https://github.com/X-Gen-Lab/nexus/discussions>`_"
+msgstr ""
+"Join `GitHub Discussions <https://github.com/X-Gen-Lab/nexus/discussions>`_"
+
+#: ../../user_guide/build_system.rst:633 61826f185c764482ab7d81b37cb63fa0
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../user_guide/build_system.rst:635 c9a503c947224a238217e3054dfde02c
+msgid ":doc:`kconfig` - Kconfig configuration system"
+msgstr ":doc:`kconfig` - Kconfig configuration system"
+
+#: ../../user_guide/build_system.rst:636 df4a56e9cfb94f69badce72415b28288
+msgid ":doc:`../development/testing` - Testing guide"
+msgstr ":doc:`../development/testing` - Testing guide"
+
+#: ../../user_guide/build_system.rst:637 fbd4ead52cf94d389035ba7eaa34d187
+msgid ":doc:`../getting_started/installation` - Installation guide"
+msgstr ":doc:`../getting_started/installation` - Installation guide"

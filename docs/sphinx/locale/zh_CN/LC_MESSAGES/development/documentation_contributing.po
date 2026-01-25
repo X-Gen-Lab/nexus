@@ -1,0 +1,1075 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../development/documentation_contributing.rst:2
+#: 2956b87326cc4c3cbd7cb179d843ad42
+msgid "Contributing to Documentation"
+msgstr "为文档做贡献"
+
+#: ../../development/documentation_contributing.rst:4
+#: 91f62e2b91c3488a88a28235998774bf
+msgid ""
+"Thank you for your interest in improving the Nexus documentation! This guide"
+" will help you contribute effectively."
+msgstr "感谢您对改进 Nexus 文档的关注！本指南将帮助您有效地做出贡献。"
+
+#: ../../development/documentation_contributing.rst:7
+#: bcf1553e630c441fac56b12683b4f0c4
+msgid "Getting Started"
+msgstr "快速开始"
+
+#: ../../development/documentation_contributing.rst:10
+#: f18892e386f74a1cbe4cffa37f2296e1
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../development/documentation_contributing.rst:12
+#: e55c022ae4ea47bba34204c3f500170a
+msgid "Before contributing to documentation, ensure you have:"
+msgstr "在为文档做出贡献之前，请确保您具备："
+
+#: ../../development/documentation_contributing.rst:14
+#: b5b1e26718594d3d966e2476fbef96f9
+msgid "Python 3.8 or later"
+msgstr "Python 3.8 或更高版本"
+
+#: ../../development/documentation_contributing.rst:15
+#: 8573c123f5cb4dd6b50a2dd3453cd1af
+msgid "Sphinx and required extensions"
+msgstr "Sphinx 和所需的扩展"
+
+#: ../../development/documentation_contributing.rst:16
+#: 37b3dc558bff4579b6295c24628ac9ca
+msgid "Git for version control"
+msgstr "用于版本控制的 Git"
+
+#: ../../development/documentation_contributing.rst:17
+#: a3c67046f73a451e8936c8cb61a7fe70
+msgid "A text editor (VS Code, Vim, etc.)"
+msgstr "A text editor (VS Code, Vim, etc.)"
+
+#: ../../development/documentation_contributing.rst:20
+#: 4779f38b30fe441280cf244fca214a33
+msgid "Setting Up the Environment"
+msgstr "设置环境"
+
+#: ../../development/documentation_contributing.rst:22
+#: 8ce1c50ef4dd4c7a88f76c96111a2dd1
+msgid "Clone the repository:"
+msgstr "克隆仓库："
+
+#: ../../development/documentation_contributing.rst:24
+#: 9bec0c687db340e1bb1b965acd288df6
+msgid ""
+"git clone https://github.com/nexus-team/nexus.git\n"
+"cd nexus"
+msgstr ""
+"git clone https://github.com/nexus-team/nexus.git\n"
+"cd nexus"
+
+#: ../../development/documentation_contributing.rst:29
+#: e38047762eed4d3fb796215816ff6722
+msgid "Install documentation dependencies:"
+msgstr "安装文档依赖："
+
+#: ../../development/documentation_contributing.rst:31
+#: 84bbe4dc61744b9e96c8fe99477dc7a0
+msgid "pip install -r docs/sphinx/requirements.txt"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:35
+#: b35ec1face10460698cfddf13cd6cba1
+msgid "Build the documentation locally:"
+msgstr "在本地构建文档："
+
+#: ../../development/documentation_contributing.rst:37
+#: ../../development/documentation_contributing.rst:282
+#: 63b13ee9bda243aa849ab5ebbe8feb3f dee61c0c163f44df863cadc7b66b7e36
+msgid ""
+"cd docs/sphinx\n"
+"python build_docs.py"
+msgstr ""
+"cd docs/sphinx\n"
+"python build_docs.py"
+
+#: ../../development/documentation_contributing.rst:42
+#: 0440d71b0a384e6197a11ec99795efb0
+msgid "View the documentation:"
+msgstr "查看文档："
+
+#: ../../development/documentation_contributing.rst:44
+#: fc60d051dc3840319be8c2e3c000b748
+msgid "Open ``_build/html/index.html`` in your web browser."
+msgstr "在您的网络浏览器中打开 ``_build/html/index.html``。"
+
+#: ../../development/documentation_contributing.rst:47
+#: d1762e48e03a43ecb609d33d8bdd7d97
+msgid "Documentation Structure"
+msgstr "文档结构"
+
+#: ../../development/documentation_contributing.rst:49
+#: 3495449cd80d4f87bbd0c618b025bb73
+msgid "The documentation is organized as follows:"
+msgstr "文档组织如下："
+
+#: ../../development/documentation_contributing.rst:51
+#: a30fb504e5ef4f81b517aef3bc09e0a7
+msgid ""
+"docs/sphinx/\n"
+"├── getting_started/     # Installation and quickstart guides\n"
+"├── user_guide/          # User guides for modules and features\n"
+"├── platform_guides/     # Platform-specific documentation\n"
+"├── api/                 # API reference (auto-generated)\n"
+"├── tutorials/           # Step-by-step tutorials\n"
+"├── development/         # Development guides\n"
+"├── reference/           # Reference materials\n"
+"└── _templates/          # Documentation templates"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:64
+#: 0abfa84e58a44009879cab38b9f9ea6f
+msgid "Types of Contributions"
+msgstr "贡献类型"
+
+#: ../../development/documentation_contributing.rst:66
+#: 3ced0204476644249318fb3ee9d9c8fb
+msgid "We welcome the following types of documentation contributions:"
+msgstr "我们欢迎以下类型的文档贡献："
+
+#: ../../development/documentation_contributing.rst:69
+#: d419970fabab40e881bc31fe83e8ef45
+msgid "Fixing Errors"
+msgstr "修复错误"
+
+#: ../../development/documentation_contributing.rst:71
+#: 519ff84057fc4abc9e334df5179fd203
+msgid "Typos and grammar mistakes"
+msgstr "拼写和语法错误"
+
+#: ../../development/documentation_contributing.rst:72
+#: ../../development/documentation_contributing.rst:290
+#: 4cd08d147e17473d96e67ab977a708b0 db3ba49a817f4909894318989381bfcd
+msgid "Broken links"
+msgstr "损坏的链接"
+
+#: ../../development/documentation_contributing.rst:73
+#: 62a2c66c27c24b44a6313a5b956549d5
+msgid "Incorrect code examples"
+msgstr "不正确的代码示例"
+
+#: ../../development/documentation_contributing.rst:74
+#: 74a87821517c46b99dc65fe55466d617
+msgid "Outdated information"
+msgstr "过时的信息"
+
+#: ../../development/documentation_contributing.rst:77
+#: 70c209da39ab4268b7e69ccf8e02fd0a
+msgid "Improving Existing Documentation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:79
+#: 3df293f2960d4ed1bcbc591d3874e7ae
+msgid "Adding missing details"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:80
+#: 379cce35912e46b780a7bd821faff9ad
+msgid "Clarifying confusing sections"
+msgstr "澄清令人困惑的部分"
+
+#: ../../development/documentation_contributing.rst:81
+#: 3e3574f23ce74d0196ae6eeb73ba485a
+msgid "Adding diagrams and illustrations"
+msgstr "添加图表和插图"
+
+#: ../../development/documentation_contributing.rst:82
+#: c3a4bcac5cb345b4bc52dc34eea29068
+msgid "Improving code examples"
+msgstr "改进代码示例"
+
+#: ../../development/documentation_contributing.rst:85
+#: 26c4a1abad6b496587dbac574fc5a753
+msgid "Adding New Documentation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:87
+#: e0b54910fc66412998d55ec9609c86d7
+msgid "New tutorials"
+msgstr "新教程"
+
+#: ../../development/documentation_contributing.rst:88
+#: 959095b1fa96429ea916cd6406c6662f
+msgid "Platform guides"
+msgstr "平台指南"
+
+#: ../../development/documentation_contributing.rst:89
+#: 57a08c40d9b24e25877f5b182519cce1
+msgid "Module documentation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:90
+#: 402174739b294e2ba67803167aed8a98
+msgid "API documentation"
+msgstr "API 文档"
+
+#: ../../development/documentation_contributing.rst:93
+#: e0a7317c213248ca96a6abf1bac18b3b
+msgid "Translation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:95
+#: 6fe488a6539243099ef35fa4f2609b01
+msgid "Translating documentation to Chinese"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:96
+#: e64ba57c7644486b8c5fefe01f0a2c9b
+msgid "Maintaining translation consistency"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:97
+#: 31b1061b9e6f402fb5a06f9a7de02ca1
+msgid "Updating translations when English docs change"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:100
+#: 5930007832b847bf90fa24ca78cc4a86
+msgid "Writing Guidelines"
+msgstr "写作指南"
+
+#: ../../development/documentation_contributing.rst:103
+#: 9067d2930f5d458a8bfd1e273d3d4fdc
+msgid "Style Guide"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:105
+#: 90ecbe9ba3584568ab3c141badb693ce
+msgid "**Tone and Voice**"
+msgstr "**Tone and Voice**"
+
+#: ../../development/documentation_contributing.rst:107
+#: 9e7875d7f7ec408a8c660d178b591709
+msgid "Use clear, concise language"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:108
+#: 8651803f51ab476988e5fe78982cd3c3
+msgid "Write in present tense"
+msgstr "使用现在时态"
+
+#: ../../development/documentation_contributing.rst:109
+#: c9dec55fbc384e3786c03d97880e659f
+msgid "Use active voice"
+msgstr "使用主动语态"
+
+#: ../../development/documentation_contributing.rst:110
+#: 2436aa38b8624a0da1d3364e580b4400
+msgid "Be direct and specific"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:112
+#: 1c12c2a75d6542d49f84545a15bd4d85
+msgid "**Formatting**"
+msgstr "**Formatting**"
+
+#: ../../development/documentation_contributing.rst:114
+#: 80602f1abc644827a77d90f53cacb516
+msgid "Use consistent heading levels"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:115
+#: 0e98c9a5484245168470d4a95304f8fa
+msgid "Keep line length under 120 characters"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:116
+#: 16eed3c731c64fbfbf8566403d298ad4
+msgid "Use code blocks with language specification"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:117
+#: ec9607fa4df24fb497d029f6bf111d90
+msgid "Include alt text for images"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:119
+#: 980e444882f147cbb0eed28b6c64a159
+msgid "**Terminology**"
+msgstr "**Terminology**"
+
+#: ../../development/documentation_contributing.rst:121
+#: 4106f5fe5be742509b04a40547cc4bb5
+msgid "Use consistent terminology throughout:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:123
+#: f7bd54341c914fecbd5b9609d9fbf9c3
+msgid "CMake (not cmake)"
+msgstr "CMake (not cmake)"
+
+#: ../../development/documentation_contributing.rst:124
+#: eaecbb9d8a7742c7b03e2f5ef7b4ef80
+msgid "Kconfig (not kconfig)"
+msgstr "Kconfig (not kconfig)"
+
+#: ../../development/documentation_contributing.rst:125
+#: d2ecbbd0957d482a8149d9632d8f7040
+msgid "FreeRTOS (not freertos)"
+msgstr "FreeRTOS (not freertos)"
+
+#: ../../development/documentation_contributing.rst:126
+#: 586dc478636e4164bc272ea81bf4850d
+msgid "STM32 (not stm32)"
+msgstr "STM32 (not stm32)"
+
+#: ../../development/documentation_contributing.rst:127
+#: bc1dd2cb9d734fe58753334a3184d34e
+msgid "GPIO, UART, SPI, I2C (all caps)"
+msgstr "GPIO, UART, SPI, I2C (all caps)"
+
+#: ../../development/documentation_contributing.rst:130
+#: 5092dbf8779941f2b5c0118d40f936bd
+msgid "Code Examples"
+msgstr "代码示例"
+
+#: ../../development/documentation_contributing.rst:132
+#: b5a054f948ca43489311f1b68a1ac0a7
+msgid "All code examples should:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:134
+#: 9648ce9001884e89a682c8151b222410
+msgid "Be complete and runnable when possible"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:135
+#: ee130572f5fa4bb2b0b0ea1196530ef7
+msgid "Include necessary headers and includes"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:136
+#: c86cbf6bc12d42d8b4d8637061f46db7
+msgid "Use meaningful variable names"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:137
+#: b1903a72e3994e8cafe03479aec39859
+msgid "Include comments for complex sections"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:138
+#: c89b60137bc248c5b2d7934454dac1d4
+msgid "Follow the project's coding standards"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:140
+#: 6af5ddde04b741679ba8b8e2418fc98f
+msgid "Example:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:142
+#: 190b6bf86f0641b4acdd91fe11215727
+msgid ""
+"#include \"hal/nx_gpio.h\"\n"
+"\n"
+"/* Initialize GPIO for LED */\n"
+"nx_gpio_config_t led_config = {\n"
+"    .mode = NX_GPIO_MODE_OUTPUT_PP,\n"
+"    .pull = NX_GPIO_PULL_NONE,\n"
+"    .speed = NX_GPIO_SPEED_LOW,\n"
+"};\n"
+"\n"
+"nx_gpio_t* led = nx_factory_gpio(NX_GPIO_PORT_A, 5);\n"
+"led->init(led, &led_config);\n"
+"\n"
+"/* Turn on LED */\n"
+"led->write(led, 1);"
+msgstr ""
+"#include \"hal/nx_gpio.h\"\n"
+"\n"
+"/* Initialize GPIO for LED */\n"
+"nx_gpio_config_t led_config = {\n"
+"    .mode = NX_GPIO_MODE_OUTPUT_PP,\n"
+"    .pull = NX_GPIO_PULL_NONE,\n"
+"    .speed = NX_GPIO_SPEED_LOW,\n"
+"};\n"
+"\n"
+"nx_gpio_t* led = nx_factory_gpio(NX_GPIO_PORT_A, 5);\n"
+"led->init(led, &led_config);\n"
+"\n"
+"/* Turn on LED */\n"
+"led->write(led, 1);"
+
+#: ../../development/documentation_contributing.rst:160
+#: 7fdf83d3e48a4ac481fd11e49c8f890a
+msgid "RST Syntax"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:162
+#: 99d588e3e8814ab7a1aef6cfff1556ef
+msgid "**Headings**"
+msgstr "**Headings**"
+
+#: ../../development/documentation_contributing.rst:164
+#: d88cd3313b1f429285051e02c078cbe0
+msgid "Use consistent underline characters:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:166
+#: cfad43338c544efa91e155932ba79d96
+msgid ""
+"Level 1 Heading\n"
+"===============\n"
+"\n"
+"Level 2 Heading\n"
+"---------------\n"
+"\n"
+"Level 3 Heading\n"
+"~~~~~~~~~~~~~~~\n"
+"\n"
+"Level 4 Heading\n"
+"^^^^^^^^^^^^^^^"
+msgstr ""
+"Level 1 Heading\n"
+"===============\n"
+"\n"
+"Level 2 Heading\n"
+"---------------\n"
+"\n"
+"Level 3 Heading\n"
+"~~~~~~~~~~~~~~~\n"
+"\n"
+"Level 4 Heading\n"
+"^^^^^^^^^^^^^^^"
+
+#: ../../development/documentation_contributing.rst:180
+#: e41a43f10d464780ac621d52a77f97ac
+msgid "**Code Blocks**"
+msgstr "**Code Blocks**"
+
+#: ../../development/documentation_contributing.rst:182
+#: b5150448e3a84f399ef5c047763d3e48
+msgid "Always specify the language:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:184
+#: 8d44e4f4fac14e3f92bd542f793c523f
+msgid ""
+".. code-block:: c\n"
+"\n"
+"    int main(void) {\n"
+"        return 0;\n"
+"    }"
+msgstr ""
+".. code-block:: c\n"
+"\n"
+"    int main(void) {\n"
+"        return 0;\n"
+"    }"
+
+#: ../../development/documentation_contributing.rst:192
+#: 3559990535dc4e8b939ef432b41a9aa5
+msgid "**Lists**"
+msgstr "**Lists**"
+
+#: ../../development/documentation_contributing.rst:194
+#: c85328f3cf434928a489dde200d575f5
+msgid ""
+"- Bullet item 1\n"
+"- Bullet item 2\n"
+"\n"
+"1. Numbered item 1\n"
+"2. Numbered item 2"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:202
+#: 67e8bb3e7d404737abcaae0390bc0970
+msgid "**Links**"
+msgstr "**Links**"
+
+#: ../../development/documentation_contributing.rst:204
+#: ce7575ed94064be183364b3d8503804f
+msgid ""
+":doc:`../user_guide/hal`  # Internal link\n"
+"`External Link <https://example.com>`_  # External link"
+msgstr ""
+":doc:`../user_guide/hal`  # Internal link\n"
+"`External Link <https://example.com>`_  # External link"
+
+#: ../../development/documentation_contributing.rst:209
+#: dd5bfb9b46c5462fb706073721c0374b
+msgid "**Tables**"
+msgstr "**Tables**"
+
+#: ../../development/documentation_contributing.rst:211
+#: c46f0f0fa0434072aadd037d718e2ff6
+msgid ""
+".. list-table::\n"
+"   :header-rows: 1\n"
+"   :widths: 30 70\n"
+"\n"
+"   * - Column 1\n"
+"     - Column 2\n"
+"   * - Value 1\n"
+"     - Value 2"
+msgstr ""
+".. list-table::\n"
+"   :header-rows: 1\n"
+"   :widths: 30 70\n"
+"\n"
+"   * - Column 1\n"
+"     - Column 2\n"
+"   * - Value 1\n"
+"     - Value 2"
+
+#: ../../development/documentation_contributing.rst:222
+#: d7da382e3d214356b9d3570b4b3b36ff
+msgid "**Diagrams**"
+msgstr "**Diagrams**"
+
+#: ../../development/documentation_contributing.rst:224
+#: 9fe9a5ed16c546af8fc497b935e4f3fc
+msgid ""
+".. mermaid::\n"
+"\n"
+"   graph TD\n"
+"       A[Start] --> B[Process]\n"
+"       B --> C[End]"
+msgstr ""
+".. mermaid::\n"
+"\n"
+"   graph TD\n"
+"       A[Start] --> B[Process]\n"
+"       B --> C[End]"
+
+#: ../../development/documentation_contributing.rst:233
+#: f43561efdc36422aa037ad6905d7e321
+msgid "Using Templates"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:235
+#: feed10a8fa134fa382c1ac4340d5ed46
+msgid "We provide templates for common documentation types:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:238
+#: af626eb9f4ef48f1a398dc96f4e6b1dd
+msgid "Module Documentation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:240
+#: 1859aff3b1884c348da53bec3d45c30d
+msgid ""
+"cp docs/sphinx/_templates/module_template.rst "
+"docs/sphinx/user_guide/my_module.rst"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:245
+#: c2e6fd7f067c42e38c59bab20a643082
+msgid "Tutorial Documentation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:247
+#: 7207935d32794bfa99afc069234718b0
+msgid ""
+"cp docs/sphinx/_templates/tutorial_template.rst "
+"docs/sphinx/tutorials/my_tutorial.rst"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:252
+#: 78f2fc35c9cc4415abcaa3a55336de9a
+msgid "Platform Guide"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:254
+#: 3323ab99969d4db7bfb087172d17bb7e
+msgid ""
+"cp docs/sphinx/_templates/platform_guide_template.rst "
+"docs/sphinx/platform_guides/my_platform.rst"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:258
+#: 45863430e85b4b2bb628f8f2e1b6b304
+msgid ""
+"See the template files in ``docs/sphinx/_templates/`` for detailed template "
+"usage."
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:261
+#: 68bf20151c884a3d92e75fb89f22ea77
+msgid "Contribution Workflow"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:264
+#: f47bc3f20c6c42539049c0b8c7dc0ce6
+msgid "1. Create a Branch"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:266
+#: e2d3c62b1db0496aba2923a012c858ef
+msgid "git checkout -b docs/improve-hal-guide"
+msgstr "git checkout -b docs/improve-hal-guide"
+
+#: ../../development/documentation_contributing.rst:270
+#: 45f7d193f4634642beea38677cee93ee
+msgid "Use descriptive branch names with ``docs/`` prefix."
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:273
+#: c29b13735d0a4b5eadf97256d1994d23
+msgid "2. Make Changes"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:275
+#: a97e8dffe89c443cbf1605c0ea05bc4e
+msgid "Edit the relevant RST files"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:276
+#: 8763f599c6a748269c57758b3abc8d2f
+msgid "Add new files if needed"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:277
+#: 17d48b4db92b4d1c8c07b7fa215139cb
+msgid "Update the table of contents (``index.rst``)"
+msgstr "Update the table of contents (``index.rst``)"
+
+#: ../../development/documentation_contributing.rst:280
+#: 3ad61a7600794716b53cd4330cae298d
+msgid "3. Build and Test"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:287
+#: 856f3061a3b64fd6870b8d0f32d8d895
+msgid "Check for:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:289
+#: 55ef80397d244cf0bdd545505c82ac87
+msgid "Build warnings or errors"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:291
+#: b6cacfd9d7734dc58d474f1cf4b902ab
+msgid "Formatting issues"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:292
+#: 4f473e6022ca405c815cb715ce8a227a
+msgid "Code example correctness"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:295
+#: a5c533f48bc247ae942dc875fe40d854
+msgid "4. Run Quality Checks"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:297
+#: fa1766b0b2c04d0694f2c4e4abbb3662
+msgid ""
+"# Check style\n"
+"python check_style.py\n"
+"\n"
+"# Check spelling\n"
+"python check_spelling.py\n"
+"\n"
+"# Validate code examples\n"
+"python validate_code_examples.py"
+msgstr ""
+"# Check style\n"
+"python check_style.py\n"
+"\n"
+"# Check spelling\n"
+"python check_spelling.py\n"
+"\n"
+"# Validate code examples\n"
+"python validate_code_examples.py"
+
+#: ../../development/documentation_contributing.rst:309
+#: db02f3ba7c4e4a5f8e54c54aa135b838
+msgid "5. Commit Changes"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:311
+#: 2c31d7ee00604b4ab8a92acb54483baa
+msgid ""
+"git add docs/sphinx/user_guide/my_module.rst\n"
+"git commit -m \"docs: improve HAL GPIO documentation\n"
+"\n"
+"- Add missing configuration examples\n"
+"- Clarify interrupt handling\n"
+"- Fix code example errors\""
+msgstr ""
+"git add docs/sphinx/user_guide/my_module.rst\n"
+"git commit -m \"docs: improve HAL GPIO documentation\n"
+"\n"
+"- Add missing configuration examples\n"
+"- Clarify interrupt handling\n"
+"- Fix code example errors\""
+
+#: ../../development/documentation_contributing.rst:320
+#: 7a77e7350db24650a91f10b01b94d855
+msgid "Use conventional commit format:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:322
+#: c2ba3bba183c4b5cb43571f7f0a4715e
+msgid "``docs: description`` for documentation changes"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:323
+#: d6418f8a86ac41a0a828336d387947d9
+msgid "``docs(module): description`` for module-specific changes"
+msgstr "``docs(module): description`` for module-specific changes"
+
+#: ../../development/documentation_contributing.rst:326
+#: 49c7272515814418af4fa2710583f512
+msgid "6. Push and Create Pull Request"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:328
+#: a3185c1ada9b4f8ea142052d083f0c70
+msgid "git push origin docs/improve-hal-guide"
+msgstr "git push origin docs/improve-hal-guide"
+
+#: ../../development/documentation_contributing.rst:332
+#: 676c9147dbee450da9f0e41375845130
+msgid "Then create a pull request on GitHub with:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:334
+#: 3f69f0b66d51459ebe37ca5beb0c5330
+msgid "Clear title describing the change"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:335
+#: 6834d75b66cd48e8a0493ea2ef109b96
+msgid "Description of what was changed and why"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:336
+#: d98396be963440b5bd028989115faa89
+msgid "Reference to any related issues"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:339
+#: 7c31cfdb981045529df3a07aba598d38
+msgid "Review Process"
+msgstr "审查流程"
+
+#: ../../development/documentation_contributing.rst:342
+#: c1f567565d454360aae7cab1f71c71d6
+msgid "What to Expect"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:344
+#: 773e70726590417fb7e41c0a2c7402a6
+msgid ""
+"**Automated Checks**: CI will run style checks, spell checking, and link "
+"validation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:345
+#: 6a7c9f459c5a43139b074f0eb00f34c9
+msgid "**Peer Review**: Maintainers will review your changes"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:346
+#: 82d7560d1a0e4ce8aefc2cbf4efc318e
+msgid "**Feedback**: You may receive suggestions for improvements"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:347
+#: 6cf5debf4f0643518822e4aff29ab691
+msgid "**Approval**: Once approved, your changes will be merged"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:350
+#: f763a43221de4761b235288cd7bb5b98
+msgid "Responding to Feedback"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:352
+#: 1edbaf65cfac46daa6859904b0ce456a
+msgid "Address all review comments"
+msgstr "处理所有审查评论"
+
+#: ../../development/documentation_contributing.rst:353
+#: df622035550f4de993be20ab7d02512f
+msgid "Ask questions if something is unclear"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:354
+#: 0c69c9eeda994f0a89845f8f3617b72d
+msgid "Make requested changes promptly"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:355
+#: 9b480a1aff264f29b958788098a2d162
+msgid "Update your pull request with fixes"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:358
+#: 70bf244678ff407eb615bbec5a29cadb
+msgid "Translation Guidelines"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:360
+#: e7ebf27e3c2b41b5b25f175c3d740158
+msgid "If you're contributing translations:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:363
+#: eb1fbce330df475f8518bcdc13da52c0
+msgid "Workflow"
+msgstr "工作流"
+
+#: ../../development/documentation_contributing.rst:365
+#: 3316bbf5669c4bb2be33d7e0e4854773
+msgid "Extract translatable strings:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:367
+#: 03e8dca7999d42d390c5e70b59f2eb4e
+msgid "sphinx-build -b gettext . _build/gettext"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:371
+#: cac831f2ec194c278d90b2e941dda9d7
+msgid "Update translation files:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:373
+#: 23f8f18e05544851baac6eb8de7cbae2
+msgid "sphinx-intl update -p _build/gettext -l zh_CN"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:377
+#: 4dde9f64c98849fcbf21d6327dbac31d
+msgid "Edit ``.po`` files in ``locale/zh_CN/LC_MESSAGES/``"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:379
+#: ad80d557451c4339905a3a31062b51af
+msgid "Build translated documentation:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:381
+#: 063ddddeed7d4797ab67f16b1b720a6d
+msgid "sphinx-build -b html -D language=zh_CN . _build/html/zh_CN"
+msgstr "sphinx-build -b html -D language=zh_CN . _build/html/zh_CN"
+
+#: ../../development/documentation_contributing.rst:386
+#: 39175bef190b4d41a8270b6ad7934bf1
+msgid "Translation Best Practices"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:388
+#: 88d5128978c74eb0ae5a58bbf1724c86
+msgid "Maintain consistent terminology"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:389
+#: 9a98d95284974fe5be08edcc0d2ef2aa
+msgid "Preserve formatting and markup"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:390
+#: d44e8f2c9ed04bd289f513a66a570384
+msgid "Keep technical terms in English when appropriate"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:391
+#: 79bc046476e94044b6f2ef0d22557542
+msgid "Test the translated documentation"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:394
+#: 5524ececf5e84fa4b3b1e8c6b6e69a90
+msgid "Common Issues"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:397
+#: 04d540bb2f6f43d0abeb1fe08fc8bbe0
+msgid "Build Errors"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:399
+#: c8965bff2c16493a816e3c3f4d40b0be
+msgid "**Issue**: ``WARNING: document isn't included in any toctree``"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:401
+#: f43beaf35b134ee79334dc4e1bacdcc7
+msgid "**Solution**: Add the document to an ``index.rst`` file:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:403
+#: dc37cbcf85504e8c842527b68ed39efc
+msgid ""
+".. toctree::\n"
+"   :maxdepth: 2\n"
+"\n"
+"   my_new_document"
+msgstr ""
+".. toctree::\n"
+"   :maxdepth: 2\n"
+"\n"
+"   my_new_document"
+
+#: ../../development/documentation_contributing.rst:410
+#: ccb6374930994437a03b99727f9d2884
+msgid "**Issue**: ``ERROR: Unknown directive type \"code-block\"``"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:412
+#: 99cafeb5188446eea770058a7cb80e39
+msgid "**Solution**: Ensure proper indentation and blank lines:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:414
+#: bb4f0657a7a34d809194359ce1832ace
+msgid ""
+".. code-block:: c\n"
+"\n"
+"   int main(void) {\n"
+"       return 0;\n"
+"   }"
+msgstr ""
+".. code-block:: c\n"
+"\n"
+"   int main(void) {\n"
+"       return 0;\n"
+"   }"
+
+#: ../../development/documentation_contributing.rst:423
+#: 1d6de48d21984402bf83dd56de3f8e2d
+msgid "Link Errors"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:425
+#: 76ec0105a9a64f8b9bfa5bd37014429d
+msgid "**Issue**: ``WARNING: undefined label``"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:427
+#: ab455dc8bf4a4daea37e33fef449fca6
+msgid ""
+"**Solution**: Check that the referenced document exists and is in the "
+"toctree."
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:430
+#: c06fb075fe4e42a7a6914adb197d0a91
+msgid "Style Violations"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:432
+#: c8d4d79024fa438ab4ed2503f3a94cfb
+msgid "**Issue**: Heading underline length mismatch"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:434
+#: ed0dae762ab54ad488fb16a566b2862f
+msgid "**Solution**: Ensure underline matches heading length exactly:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:436
+#: b06efeb68db3468484848090aafacbce
+msgid ""
+"My Heading\n"
+"=========="
+msgstr ""
+"My Heading\n"
+"=========="
+
+#: ../../development/documentation_contributing.rst:442
+#: 5816b3b2377643f0a7c55eba763e7dd9
+msgid "Getting Help"
+msgstr "获取帮助"
+
+#: ../../development/documentation_contributing.rst:444
+#: d41d04efe1f34032a9ad7498b1c3debd
+msgid "If you need help:"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:446
+#: d1965668f2e94342bf0b7450e44a5137
+msgid "Check existing documentation in ``docs/sphinx/``"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:447
+#: 176527e70a3441e984b4eb85167bdb65
+msgid "Review this contributing guide"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:448
+#: 8e2cfbbfdc95440fa9990fff9ab0e080
+msgid "Ask questions in pull request comments"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:449
+#: 30317f433dde44e28a4b593e6bdf9e46
+msgid "Contact maintainers via GitHub issues"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:452
+#: 6be6d953d0934727a59df7c558b139d2
+msgid "Resources"
+msgstr "资源"
+
+#: ../../development/documentation_contributing.rst:454
+#: 7149c72372ca4bc194e01d9e567fc972
+msgid "`Sphinx Documentation <https://www.sphinx-doc.org/>`_"
+msgstr "`Sphinx Documentation <https://www.sphinx-doc.org/>`_"
+
+#: ../../development/documentation_contributing.rst:455
+#: 9ecbdec177e34f8cb61730adbb04f649
+msgid ""
+"`reStructuredText Primer <https://www.sphinx-"
+"doc.org/en/master/usage/restructuredtext/basics.html>`_"
+msgstr ""
+"`reStructuredText Primer <https://www.sphinx-"
+"doc.org/en/master/usage/restructuredtext/basics.html>`_"
+
+#: ../../development/documentation_contributing.rst:456
+#: af870a01b7714c33b47a62b22a547ffd
+msgid "`Breathe Documentation <https://breathe.readthedocs.io/>`_"
+msgstr "`Breathe Documentation <https://breathe.readthedocs.io/>`_"
+
+#: ../../development/documentation_contributing.rst:457
+#: 2aae79e6924e4c4bbe67ccb79319d5ce
+msgid "`Mermaid Documentation <https://mermaid-js.github.io/>`_"
+msgstr "`Mermaid Documentation <https://mermaid-js.github.io/>`_"
+
+#: ../../development/documentation_contributing.rst:460
+#: 42672243a53c45c6b7948f3f7f8a9f80
+msgid "Thank You!"
+msgstr ""
+
+#: ../../development/documentation_contributing.rst:462
+#: a028f7e9dcee4c39b3cf2ffe73eb4c72
+msgid ""
+"Your contributions help make Nexus better for everyone. We appreciate your "
+"time and effort!"
+msgstr ""

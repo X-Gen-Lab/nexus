@@ -16,28 +16,85 @@ Key features:
 * Support for both synchronous and asynchronous operations
 * Power management and diagnostic interfaces
 
+.. seealso::
+
+   * :doc:`osal` - OS Abstraction Layer for RTOS integration
+   * :doc:`kconfig_peripherals` - Peripheral configuration guide
+   * :doc:`../platform_guides/index` - Platform-specific guides
+   * :doc:`../tutorials/gpio_control` - GPIO tutorial
+   * :doc:`../tutorials/uart_communication` - UART tutorial
+   * :doc:`../api/hal` - Complete HAL API reference
+
 Architecture
 ------------
 
 The HAL is organized into several layers:
 
-::
+.. mermaid::
+   :alt: HAL architecture showing factory pattern and device lifecycle
 
-    +------------------+
-    |   Application    |
-    +------------------+
-           |
-    +------------------+
-    |   nx_factory     |  Device creation and management
-    +------------------+
-           |
-    +------------------+
-    |   Interfaces     |  nx_gpio_t, nx_uart_t, nx_spi_t, etc.
-    +------------------+
-           |
-    +------------------+
-    |   Platform HAL   |  STM32F4, Native, etc.
-    +------------------+
+   graph TB
+       APP[Application Code] --> FACTORY[nx_factory]
+       FACTORY --> CREATE[Create Device]
+       CREATE --> INTERFACE[Device Interface]
+       INTERFACE --> GPIO[nx_gpio_t]
+       INTERFACE --> UART[nx_uart_t]
+       INTERFACE --> SPI[nx_spi_t]
+       INTERFACE --> I2C[nx_i2c_t]
+
+       GPIO --> PLATFORM[Platform Implementation]
+       UART --> PLATFORM
+       SPI --> PLATFORM
+       I2C --> PLATFORM
+
+       PLATFORM --> STM32F4[STM32F4 HAL]
+       PLATFORM --> STM32H7[STM32H7 HAL]
+       PLATFORM --> NATIVE[Native HAL]
+
+       STM32F4 --> HW[Hardware]
+       STM32H7 --> HW
+
+       style APP fill:#e1f5ff
+       style FACTORY fill:#fff4e1
+       style INTERFACE fill:#ffe1f5
+       style PLATFORM fill:#e1ffe1
+       style HW fill:#cccccc
+
+Device Lifecycle
+~~~~~~~~~~~~~~~~
+
+The following diagram shows the complete device lifecycle from creation to release:
+
+.. mermaid::
+   :alt: Device lifecycle workflow showing creation, configuration, usage, and release
+
+   sequenceDiagram
+       participant App as Application
+       participant Factory as nx_factory
+       participant Device as Device Instance
+       participant Platform as Platform HAL
+       participant HW as Hardware
+
+       App->>Factory: nx_factory_gpio(port, pin)
+       Factory->>Platform: Allocate device
+       Platform->>HW: Initialize hardware
+       HW-->>Platform: Hardware ready
+       Platform-->>Factory: Device created
+       Factory-->>App: Return device pointer
+
+       App->>Device: write(device, value)
+       Device->>Platform: Platform-specific write
+       Platform->>HW: Set pin state
+       HW-->>Platform: State set
+       Platform-->>Device: Write complete
+       Device-->>App: Operation complete
+
+       App->>Factory: nx_factory_gpio_release(device)
+       Factory->>Platform: Decrement ref count
+       Platform->>HW: Deinitialize hardware
+       HW-->>Platform: Hardware released
+       Platform-->>Factory: Device released
+       Factory-->>App: Release complete
 
 Supported Peripherals
 ---------------------

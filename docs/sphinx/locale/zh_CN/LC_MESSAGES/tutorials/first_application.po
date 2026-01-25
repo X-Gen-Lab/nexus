@@ -1,0 +1,1021 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../tutorials/first_application.rst:2 8ff92ed268664749a11adf85ac5f54d9
+msgid "Your First Nexus Application"
+msgstr "您的第一个 Nexus 应用程序"
+
+#: ../../tutorials/first_application.rst:4 311b444706dd4730a786e8641b7c13cc
+msgid ""
+"This tutorial guides you through creating your first Nexus application from "
+"scratch. You'll learn how to set up a project, configure the build system, "
+"and create a simple LED blinky application."
+msgstr ""
+
+#: ../../tutorials/first_application.rst:7 44eada4097ce43eab89205d6b788c654
+msgid "Learning Objectives"
+msgstr "学习目标"
+
+#: ../../tutorials/first_application.rst:9 471bfedc26a24f62b97a6c746cc0f46d
+msgid "By the end of this tutorial, you will:"
+msgstr "完成本教程后，您将能够："
+
+#: ../../tutorials/first_application.rst:11 829e403c8c644c21a4d086e3d44bff2f
+msgid "Understand the basic structure of a Nexus application"
+msgstr "理解 Nexus 应用程序的基本结构"
+
+#: ../../tutorials/first_application.rst:12 98775e20382c4b80aa6766976a1a9d03
+msgid "Know how to configure CMake for Nexus projects"
+msgstr "了解如何为 Nexus 项目配置 CMake"
+
+#: ../../tutorials/first_application.rst:13 415760afc4974211ae3d2213167108f7
+msgid "Be able to initialize the HAL subsystem"
+msgstr "能够初始化 HAL 子系统"
+
+#: ../../tutorials/first_application.rst:14 62f63cdc81f64d35a5c3b8abb1b60596
+msgid "Create and control GPIO devices"
+msgstr "创建和控制 GPIO 设备"
+
+#: ../../tutorials/first_application.rst:15 7b09794696994dd0b3fb49f5e2b7d67d
+msgid "Build and flash your application to hardware"
+msgstr "构建应用程序并烧录到硬件"
+
+#: ../../tutorials/first_application.rst:18 565c0d245ba9471282f469611ce20239
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../tutorials/first_application.rst:20 62752450f8fd4480b51bd4db405e46cb
+msgid "Before starting, ensure you have:"
+msgstr "开始之前，请确保您已："
+
+#: ../../tutorials/first_application.rst:22 9670b4b50acc4963b0bc970a41c96d9f
+msgid "Completed the :doc:`../getting_started/installation` guide"
+msgstr "完成了 :doc:`../getting_started/installation` 指南"
+
+#: ../../tutorials/first_application.rst:23 9b2ca59e058f49d4a0932c1e69e0d7f8
+msgid "A supported development board (we'll use STM32F4 Discovery)"
+msgstr "A supported development board (we'll use STM32F4 Discovery)"
+
+#: ../../tutorials/first_application.rst:24 933bcc122eec4895aeee9164aee43538
+msgid "ARM GCC toolchain installed"
+msgstr "已安装 ARM GCC 工具链"
+
+#: ../../tutorials/first_application.rst:25 c18b914f4fda485fb94bced96a01f10f
+msgid "OpenOCD or ST-Link tools for flashing"
+msgstr "用于烧录的 OpenOCD 或 ST-Link 工具"
+
+#: ../../tutorials/first_application.rst:29 c3c3b1408de34d4dbc08ba8bbc924e47
+msgid ":doc:`../user_guide/build_system` - Build system overview"
+msgstr ":doc:`../user_guide/build_system` - Build system overview"
+
+#: ../../tutorials/first_application.rst:30 a879c7d2dd2547ada978d8da4bf59aea
+msgid ":doc:`../user_guide/hal` - HAL API documentation"
+msgstr ":doc:`../user_guide/hal` - HAL API documentation"
+
+#: ../../tutorials/first_application.rst:31 b44c93318f384253b502c07149dc4432
+msgid ":doc:`../platform_guides/stm32f4` - STM32F4 platform guide"
+msgstr ":doc:`../platform_guides/stm32f4` - STM32F4 platform guide"
+
+#: ../../tutorials/first_application.rst:32 7cf59c8eac014279ba74ca5a85d12992
+msgid ":doc:`gpio_control` - GPIO control tutorial"
+msgstr ":doc:`gpio_control` - GPIO control tutorial"
+
+#: ../../tutorials/first_application.rst:33 c3c3b1408de34d4dbc08ba8bbc924e47
+msgid ":doc:`../user_guide/kconfig_tutorial` - Configuration tutorial"
+msgstr ":doc:`../user_guide/kconfig_tutorial` - Configuration tutorial"
+
+#: ../../tutorials/first_application.rst:36 16a97f76faf24490af6b8de89bfffcdb
+msgid "Step 1: Create Project Structure"
+msgstr "步骤 1：创建项目结构"
+
+#: ../../tutorials/first_application.rst:38 1de9689f0a734468967be60538f54253
+msgid "First, create a new directory for your project:"
+msgstr "首先，为您的项目创建一个新目录："
+
+#: ../../tutorials/first_application.rst:40 8565f0c2507a45e5b8979fb21803debe
+msgid ""
+"mkdir my_first_nexus_app\n"
+"cd my_first_nexus_app"
+msgstr ""
+"mkdir my_first_nexus_app\n"
+"cd my_first_nexus_app"
+
+#: ../../tutorials/first_application.rst:45 909802c07e364480b797a9b5e0e1401d
+msgid "Create the following directory structure:"
+msgstr "创建以下目录结构："
+
+#: ../../tutorials/first_application.rst:47 0f395251fbca4b02995c5c2de7185f6f
+msgid ""
+"my_first_nexus_app/\n"
+"├── CMakeLists.txt\n"
+"├── main.c\n"
+"└── nexus/           (git submodule or copy of Nexus)"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:55 b63688f211ba4f7993bfdfa3daffcfa3
+msgid "Step 2: Add Nexus as Dependency"
+msgstr "步骤 2：添加 Nexus 依赖"
+
+#: ../../tutorials/first_application.rst:57 cb1f487668b744b6b01c29ada584084a
+msgid "You can add Nexus to your project in two ways:"
+msgstr "您可以通过两种方式将 Nexus 添加到项目中："
+
+#: ../../tutorials/first_application.rst:59 6d90e0539bc84c14b1bc11ada8a685e8
+msgid "**Option A: Git Submodule (Recommended)**"
+msgstr "**Option A: Git Submodule (Recommended)**"
+
+#: ../../tutorials/first_application.rst:61 be4179465b774f4ba5ee62856d391514
+msgid ""
+"git init\n"
+"git submodule add https://github.com/X-Gen-Lab/nexus.git nexus\n"
+"git submodule update --init --recursive"
+msgstr ""
+"git init\n"
+"git submodule add https://github.com/X-Gen-Lab/nexus.git nexus\n"
+"git submodule update --init --recursive"
+
+#: ../../tutorials/first_application.rst:67 a6eb4592f90b4898aa780ad8ac5350c9
+msgid "**Option B: Copy Nexus**"
+msgstr "**Option B: Copy Nexus**"
+
+#: ../../tutorials/first_application.rst:69 92b6cf61b6334a4392eae7240e742b88
+msgid "cp -r /path/to/nexus ./nexus"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:74 eb3b695f3a0940fbac0890550495cbee
+msgid "Step 3: Create CMakeLists.txt"
+msgstr "步骤 3：创建 CMakeLists.txt"
+
+#: ../../tutorials/first_application.rst:76 bc8d5e662d7e459391f3b47d85315a91
+msgid "Create ``CMakeLists.txt`` with the following content:"
+msgstr "创建包含以下内容的 ``CMakeLists.txt``："
+
+#: ../../tutorials/first_application.rst:78 0f46636d852e4705b283d912d5871a59
+msgid ""
+"cmake_minimum_required(VERSION 3.16)\n"
+"\n"
+"# Project name and language\n"
+"project(my_first_nexus_app C ASM)\n"
+"\n"
+"# Set C standard\n"
+"set(CMAKE_C_STANDARD 11)\n"
+"set(CMAKE_C_STANDARD_REQUIRED ON)\n"
+"\n"
+"# Add Nexus as subdirectory\n"
+"add_subdirectory(nexus)\n"
+"\n"
+"# Create executable\n"
+"add_executable(${PROJECT_NAME}\n"
+"    main.c\n"
+")\n"
+"\n"
+"# Link against Nexus libraries\n"
+"target_link_libraries(${PROJECT_NAME} PRIVATE\n"
+"    nexus::hal\n"
+"    nexus::platform\n"
+")\n"
+"\n"
+"# Set output name\n"
+"set_target_properties(${PROJECT_NAME} PROPERTIES\n"
+"    OUTPUT_NAME \"app\"\n"
+")"
+msgstr ""
+"cmake_minimum_required(VERSION 3.16)\n"
+"\n"
+"# Project name and language\n"
+"project(my_first_nexus_app C ASM)\n"
+"\n"
+"# Set C standard\n"
+"set(CMAKE_C_STANDARD 11)\n"
+"set(CMAKE_C_STANDARD_REQUIRED ON)\n"
+"\n"
+"# Add Nexus as subdirectory\n"
+"add_subdirectory(nexus)\n"
+"\n"
+"# Create executable\n"
+"add_executable(${PROJECT_NAME}\n"
+"    main.c\n"
+")\n"
+"\n"
+"# Link against Nexus libraries\n"
+"target_link_libraries(${PROJECT_NAME} PRIVATE\n"
+"    nexus::hal\n"
+"    nexus::platform\n"
+")\n"
+"\n"
+"# Set output name\n"
+"set_target_properties(${PROJECT_NAME} PROPERTIES\n"
+"    OUTPUT_NAME \"app\"\n"
+")"
+
+#: ../../tutorials/first_application.rst:108 390da978e80e4032a7d89b34f92ea8da
+msgid "**Understanding the CMakeLists.txt:**"
+msgstr "**Understanding the CMakeLists.txt:**"
+
+#: ../../tutorials/first_application.rst:110 0c4ed3245cd444cd908cc1bcb9d3141e
+msgid "``add_subdirectory(nexus)`` - Includes Nexus build system"
+msgstr "``add_subdirectory(nexus)`` - Includes Nexus build system"
+
+#: ../../tutorials/first_application.rst:111 5972f16e61d7479ca4ec7ccfc8424d62
+msgid "``nexus::hal`` - Links the Hardware Abstraction Layer"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:112 f29daab2bb2e4c7485105e5ef5885abd
+msgid "``nexus::platform`` - Links platform-specific code"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:115 69b0104f5e1e472a90e88e1484d3493a
+msgid "Step 4: Write Your First Application"
+msgstr "步骤 4：编写您的第一个应用程序"
+
+#: ../../tutorials/first_application.rst:117 795c3bd39c964c7982ee1689136e244d
+msgid "Create ``main.c`` with a simple LED blinky:"
+msgstr "创建一个简单的 LED 闪烁程序 ``main.c``："
+
+#: ../../tutorials/first_application.rst:119 e8b0fa21e0b9468e8d5c5b20c97aa78e
+msgid ""
+"/**\n"
+" * \\file            main.c\n"
+" * \\brief           My First Nexus Application\n"
+" * \\author          Your Name\n"
+" */\n"
+"\n"
+"#include \"hal/hal.h\"\n"
+"\n"
+"/*-----------------------------------------------------------------------*/\n"
+"/* Configuration                                                         */\n"
+"/*-----------------------------------------------------------------------*/\n"
+"\n"
+"/** LED pin definitions for STM32F4 Discovery */\n"
+"#define LED_PORT    HAL_GPIO_PORT_D\n"
+"#define LED_PIN     12  /* Green LED */\n"
+"\n"
+"/** Blink delay in milliseconds */\n"
+"#define BLINK_DELAY_MS  500\n"
+"\n"
+"/*-----------------------------------------------------------------------*/\n"
+"/* Helper Functions                                                      */\n"
+"/*-----------------------------------------------------------------------*/\n"
+"\n"
+"/**\n"
+" * \\brief           Initialize LED GPIO\n"
+" * \\return          HAL_OK on success, error code otherwise\n"
+" */\n"
+"static hal_status_t led_init(void) {\n"
+"    /* Configure GPIO as output */\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"\n"
+"    /* Initialize GPIO */\n"
+"    return hal_gpio_init(LED_PORT, LED_PIN, &config);\n"
+"}\n"
+"\n"
+"/*-----------------------------------------------------------------------*/\n"
+"/* Main Function                                                         */\n"
+"/*-----------------------------------------------------------------------*/\n"
+"\n"
+"/**\n"
+" * \\brief           Main entry point\n"
+" * \\return          Should never return\n"
+" */\n"
+"int main(void) {\n"
+"    /* Initialize HAL subsystem */\n"
+"    if (hal_init() != HAL_OK) {\n"
+"        /* Initialization failed - stay in error loop */\n"
+"        while (1) {\n"
+"            /* Error state */\n"
+"        }\n"
+"    }\n"
+"\n"
+"    /* Initialize LED */\n"
+"    if (led_init() != HAL_OK) {\n"
+"        /* LED initialization failed */\n"
+"        while (1) {\n"
+"            /* Error state */\n"
+"        }\n"
+"    }\n"
+"\n"
+"    /* Main loop: blink LED */\n"
+"    while (1) {\n"
+"        /* Toggle LED state */\n"
+"        hal_gpio_toggle(LED_PORT, LED_PIN);\n"
+"\n"
+"        /* Wait for blink period */\n"
+"        hal_delay_ms(BLINK_DELAY_MS);\n"
+"    }\n"
+"\n"
+"    return 0;\n"
+"}"
+msgstr ""
+"/**\n"
+" * \\file            main.c\n"
+" * \\brief           My First Nexus Application\n"
+" * \\author          Your Name\n"
+" */\n"
+"\n"
+"#include \"hal/hal.h\"\n"
+"\n"
+"/*-----------------------------------------------------------------------*/\n"
+"/* Configuration                                                         */\n"
+"/*-----------------------------------------------------------------------*/\n"
+"\n"
+"/** LED pin definitions for STM32F4 Discovery */\n"
+"#define LED_PORT    HAL_GPIO_PORT_D\n"
+"#define LED_PIN     12  /* Green LED */\n"
+"\n"
+"/** Blink delay in milliseconds */\n"
+"#define BLINK_DELAY_MS  500\n"
+"\n"
+"/*-----------------------------------------------------------------------*/\n"
+"/* Helper Functions                                                      */\n"
+"/*-----------------------------------------------------------------------*/\n"
+"\n"
+"/**\n"
+" * \\brief           Initialize LED GPIO\n"
+" * \\return          HAL_OK on success, error code otherwise\n"
+" */\n"
+"static hal_status_t led_init(void) {\n"
+"    /* Configure GPIO as output */\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"\n"
+"    /* Initialize GPIO */\n"
+"    return hal_gpio_init(LED_PORT, LED_PIN, &config);\n"
+"}\n"
+"\n"
+"/*-----------------------------------------------------------------------*/\n"
+"/* Main Function                                                         */\n"
+"/*-----------------------------------------------------------------------*/\n"
+"\n"
+"/**\n"
+" * \\brief           Main entry point\n"
+" * \\return          Should never return\n"
+" */\n"
+"int main(void) {\n"
+"    /* Initialize HAL subsystem */\n"
+"    if (hal_init() != HAL_OK) {\n"
+"        /* Initialization failed - stay in error loop */\n"
+"        while (1) {\n"
+"            /* Error state */\n"
+"        }\n"
+"    }\n"
+"\n"
+"    /* Initialize LED */\n"
+"    if (led_init() != HAL_OK) {\n"
+"        /* LED initialization failed */\n"
+"        while (1) {\n"
+"            /* Error state */\n"
+"        }\n"
+"    }\n"
+"\n"
+"    /* Main loop: blink LED */\n"
+"    while (1) {\n"
+"        /* Toggle LED state */\n"
+"        hal_gpio_toggle(LED_PORT, LED_PIN);\n"
+"\n"
+"        /* Wait for blink period */\n"
+"        hal_delay_ms(BLINK_DELAY_MS);\n"
+"    }\n"
+"\n"
+"    return 0;\n"
+"}"
+
+#: ../../tutorials/first_application.rst:199 0452efb4c5ce4e45b74fb1855b4a0894
+msgid "**Understanding the Code:**"
+msgstr "**Understanding the Code:**"
+
+#: ../../tutorials/first_application.rst:201 26f479577fb14bdaab25c2c9b13a97e9
+msgid ""
+"**HAL Initialization**: ``hal_init()`` initializes the HAL subsystem, "
+"including system clock, SysTick timer, and platform-specific hardware."
+msgstr ""
+"**HAL Initialization**: ``hal_init()`` initializes the HAL subsystem, "
+"including system clock, SysTick timer, and platform-specific hardware."
+
+#: ../../tutorials/first_application.rst:203 8f77e543f53e42cda0cd15472ee6274d
+msgid ""
+"**GPIO Configuration**: The ``hal_gpio_config_t`` structure defines GPIO "
+"behavior:"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:205 677e369d227544dabf8bf93e527213cc
+msgid "``direction``: Input or output mode"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:206 9e658be0239c461c8bd2a69e8a624f65
+msgid "``pull``: Pull-up, pull-down, or none"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:207 912dd70caa5343188e715857fa334605
+msgid "``output_mode``: Push-pull or open-drain"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:208 c8b435c6034f4016863d027ad76d0c81
+msgid "``speed``: GPIO speed (low, medium, high, very high)"
+msgstr "``speed``: GPIO speed (low, medium, high, very high)"
+
+#: ../../tutorials/first_application.rst:209 8ae93f7b74eb4a66ae36f79feb23cd44
+msgid "``init_level``: Initial output level (high or low)"
+msgstr "``init_level``: Initial output level (high or low)"
+
+#: ../../tutorials/first_application.rst:211 c6b5aafa33884db0ba273ae10004cf18
+msgid "**GPIO Operations**:"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:213 20bfdec445a34121940ce2f98e6c31fc
+msgid "``hal_gpio_init()``: Initialize GPIO with configuration"
+msgstr "``hal_gpio_init()``: Initialize GPIO with configuration"
+
+#: ../../tutorials/first_application.rst:214 0884993b61de49568104ce9e3c0dd6c4
+msgid "``hal_gpio_toggle()``: Toggle GPIO output state"
+msgstr "``hal_gpio_toggle()``: Toggle GPIO output state"
+
+#: ../../tutorials/first_application.rst:215 750aaa546a7a4c94a69913cac9e671ef
+msgid "``hal_delay_ms()``: Blocking delay in milliseconds"
+msgstr "``hal_delay_ms()``: Blocking delay in milliseconds"
+
+#: ../../tutorials/first_application.rst:218 613e638d6b4e4be1bc52de732fdddc9f
+msgid "Step 5: Build for Native Platform (Testing)"
+msgstr "Step 5: Build for Native Platform (Testing)"
+
+#: ../../tutorials/first_application.rst:220 3d5d6964c62e438e960742b2e8caf365
+msgid "First, let's build for the native platform to test our code structure:"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:222 0d51f52c57a84f2591f56093704096c6
+msgid ""
+"# Configure for native platform\n"
+"cmake -B build-native -DNEXUS_PLATFORM=native\n"
+"\n"
+"# Build\n"
+"cmake --build build-native\n"
+"\n"
+"# Run (LED operations will be simulated)\n"
+"./build-native/app"
+msgstr ""
+"# Configure for native platform\n"
+"cmake -B build-native -DNEXUS_PLATFORM=native\n"
+"\n"
+"# Build\n"
+"cmake --build build-native\n"
+"\n"
+"# Run (LED operations will be simulated)\n"
+"./build-native/app"
+
+#: ../../tutorials/first_application.rst:233 5a3d7b888c38444ba6127cf92462a787
+msgid "The native platform is useful for:"
+msgstr "本地平台适用于："
+
+#: ../../tutorials/first_application.rst:235 4501e3dff20745f2a45b48637eaa5d23
+msgid "Testing application logic without hardware"
+msgstr "在没有硬件的情况下测试应用程序逻辑"
+
+#: ../../tutorials/first_application.rst:236 a8baf294d4fa428c8e158761c1481a4a
+msgid "Running unit tests"
+msgstr "运行单元测试"
+
+#: ../../tutorials/first_application.rst:237 9512a2e9eb4d4ec99a6a84fb629ddeb6
+msgid "Debugging on your development machine"
+msgstr "在开发机器上调试"
+
+#: ../../tutorials/first_application.rst:240 502426d2e9144bfc8fc248806c500670
+msgid "Step 6: Build for STM32F4"
+msgstr "步骤 6：为 STM32F4 构建"
+
+#: ../../tutorials/first_application.rst:242 0b64fce6e4bc489ab19af4a81b13f7de
+msgid "Now let's build for the actual target hardware:"
+msgstr "现在让我们为实际目标硬件构建："
+
+#: ../../tutorials/first_application.rst:244 baaf40d8ab124b1e978404aee30da893
+msgid ""
+"# Configure for STM32F4 with ARM toolchain\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=nexus/cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4"
+msgstr ""
+"# Configure for STM32F4 with ARM toolchain\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=nexus/cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4"
+
+#: ../../tutorials/first_application.rst:254 92ee373d84cc4bd6bd59e4775cecc767
+msgid ""
+"This creates ``build-stm32f4/app.elf`` and ``build-stm32f4/app.bin`` files."
+msgstr "这将创建 ``build-stm32f4/app.elf`` 和 ``build-stm32f4/app.bin`` 文件。"
+
+#: ../../tutorials/first_application.rst:257 f8ece65c5bcc4e968edcb722774a9721
+msgid "Step 7: Flash to Hardware"
+msgstr "步骤 7：烧录到硬件"
+
+#: ../../tutorials/first_application.rst:259 f2f5bd6eabf04c7a970adda38d0acc12
+msgid "**Using OpenOCD:**"
+msgstr "**Using OpenOCD:**"
+
+#: ../../tutorials/first_application.rst:261 c8992b1b108b497abea7e40b02ab97be
+msgid ""
+"# Flash with OpenOCD\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/app.elf verify reset exit\""
+msgstr ""
+"# Flash with OpenOCD\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/app.elf verify reset exit\""
+
+#: ../../tutorials/first_application.rst:267 49f06e6ac1934c0f94131b8eeddab964
+msgid "**Using ST-Link Utility (Windows):**"
+msgstr "**Using ST-Link Utility (Windows):**"
+
+#: ../../tutorials/first_application.rst:269 3a01e9732576449ab7ce4bce212ff7a0
+msgid "Open ST-Link Utility"
+msgstr "打开 ST-Link 实用程序"
+
+#: ../../tutorials/first_application.rst:270 4e631df7799d4605b5aa84db4e06cd20
+msgid "Connect to the board"
+msgstr "连接到开发板"
+
+#: ../../tutorials/first_application.rst:271 502749161ea34a1eaa518e4a9c843623
+msgid "Load ``build-stm32f4/app.bin`` at address ``0x08000000``"
+msgstr "在地址 ``0x08000000`` 加载 ``build-stm32f4/app.bin``"
+
+#: ../../tutorials/first_application.rst:272 133c1abb4e5346b9999f800e7602278d
+msgid "Click \"Program & Verify\""
+msgstr "点击\"编程和验证\""
+
+#: ../../tutorials/first_application.rst:274 1037bc18a53e4f93b6e44a673a164c83
+msgid "**Using st-flash (Linux/macOS):**"
+msgstr "**Using st-flash (Linux/macOS):**"
+
+#: ../../tutorials/first_application.rst:276 8cffbd19a12d43b1be0b7e93279fbfe3
+msgid "st-flash write build-stm32f4/app.bin 0x08000000"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:281 ee38729542e44fb694dda1df11dff4e3
+msgid "Step 8: Verify Operation"
+msgstr "步骤 8：验证运行"
+
+#: ../../tutorials/first_application.rst:283 29be758f273047fabc278f0f5d0c02e4
+msgid "After flashing:"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:285 c5deaa5821dd447cbb710db65f0998ef
+msgid "The green LED (PD12) on the STM32F4 Discovery board should blink"
+msgstr "The green LED (PD12) on the STM32F4 Discovery board should blink"
+
+#: ../../tutorials/first_application.rst:286 4d24007ad40942bebf9ad2f0c5a2f9b1
+msgid "The LED should toggle every 500ms"
+msgstr "LED 应该每 500 毫秒切换一次"
+
+#: ../../tutorials/first_application.rst:287 2850f1c852d248009266b02025b3e423
+msgid "Press the reset button to restart the application"
+msgstr "按下复位按钮重启应用程序"
+
+#: ../../tutorials/first_application.rst:289 9d421c0f6a6e417eba09cc4d4a3b9fb4
+msgid "If the LED doesn't blink:"
+msgstr "如果 LED 不闪烁："
+
+#: ../../tutorials/first_application.rst:291 f910874308d94247b6447c08168ce0cd
+msgid "Check that the board is powered"
+msgstr "检查开发板是否通电"
+
+#: ../../tutorials/first_application.rst:292 40251d88f6f547ad9cf2c801e2f90066
+msgid "Verify the correct LED pin is configured"
+msgstr "验证是否配置了正确的 LED 引脚"
+
+#: ../../tutorials/first_application.rst:293 2bc41ca08322470cbfa8d1c5e81a0a05
+msgid "Check that the application was flashed successfully"
+msgstr "检查应用程序是否成功烧录"
+
+#: ../../tutorials/first_application.rst:294 1788bc1a420444488c286fdeb5804591
+msgid "Try debugging with GDB (see :doc:`../development/testing`)"
+msgstr "Try debugging with GDB (see :doc:`../development/testing`)"
+
+#: ../../tutorials/first_application.rst:297 614bc18277044f769747bc1a8223b560
+msgid "Understanding HAL Initialization"
+msgstr "Understanding HAL 初始化"
+
+#: ../../tutorials/first_application.rst:299 b411672500d64e4fbb624f31e090f9a3
+msgid "The ``hal_init()`` function performs several important tasks:"
+msgstr "The ``hal_init()`` function performs several important tasks:"
+
+#: ../../tutorials/first_application.rst:301 d31458e89da640658abeb939f3edaac2
+msgid ""
+"**System Clock Configuration**: Sets up the main system clock (typically 168"
+" MHz for STM32F4)"
+msgstr ""
+"**System Clock Configuration**: Sets up the main system clock (typically 168"
+" MHz for STM32F4)"
+
+#: ../../tutorials/first_application.rst:302 ffb249bf478843b0a430d60be152620b
+msgid ""
+"**SysTick Timer**: Configures the SysTick timer for ``hal_delay_ms()`` and "
+"``hal_get_tick()``"
+msgstr ""
+"**SysTick Timer**: Configures the SysTick timer for ``hal_delay_ms()`` and "
+"``hal_get_tick()``"
+
+#: ../../tutorials/first_application.rst:303 cdb949f78ebb4e6caec03e21c266169d
+msgid "**FPU Initialization**: Enables the Floating Point Unit (if available)"
+msgstr ""
+"**FPU Initialization**: Enables the Floating Point Unit (if available)"
+
+#: ../../tutorials/first_application.rst:304 c5b538fd15a945fe9c7a3dc9237e76a6
+msgid "**Platform-Specific Setup**: Initializes platform-specific hardware"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:306 0c12dac14083467ca0327895b1d13db7
+msgid "Always call ``hal_init()`` before using any HAL functions."
+msgstr "Always call ``hal_init()`` before using any HAL functions."
+
+#: ../../tutorials/first_application.rst:309 c97ff7a2f4c343c89bfaf7e5c9cf0753
+msgid "GPIO Configuration Options"
+msgstr "GPIO 配置 Options"
+
+#: ../../tutorials/first_application.rst:311 56611cc6be43441095ead3d02e0f4492
+msgid "The ``hal_gpio_config_t`` structure provides fine-grained control:"
+msgstr "``hal_gpio_config_t`` 结构提供了细粒度控制："
+
+#: ../../tutorials/first_application.rst:313 0743414ab4b4482181120428661fa63b
+msgid "**Direction:**"
+msgstr "**Direction:**"
+
+#: ../../tutorials/first_application.rst:315 0bd0a63701ee4cc58a7d76d19ec4fd05
+msgid "``HAL_GPIO_DIR_INPUT``: Configure as input"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:316 eed7f60d8d984c3381a6b5fc04b23c58
+msgid "``HAL_GPIO_DIR_OUTPUT``: Configure as output"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:318 234ad8130ff340b69055141e2c91f7ac
+msgid "**Pull Resistors:**"
+msgstr "**Pull Resistors:**"
+
+#: ../../tutorials/first_application.rst:320 2efaef7547c54e3e8a784b269b5cc3e2
+msgid "``HAL_GPIO_PULL_NONE``: No pull resistor"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:321 447e557a18764c4eacb0a31b0d3e354b
+msgid "``HAL_GPIO_PULL_UP``: Enable pull-up resistor"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:322 f65397b14c0f4a88a8cca2804e7fa986
+msgid "``HAL_GPIO_PULL_DOWN``: Enable pull-down resistor"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:324 a912bdc786e24b5fb3f24e4bd304f602
+msgid "**Output Mode:**"
+msgstr "**Output Mode:**"
+
+#: ../../tutorials/first_application.rst:326 6d9d591f8636446b848fb06e1370c4dc
+msgid "``HAL_GPIO_OUTPUT_PP``: Push-pull output (can drive high and low)"
+msgstr "``HAL_GPIO_OUTPUT_PP``: Push-pull output (can drive high and low)"
+
+#: ../../tutorials/first_application.rst:327 f156053295c84eff99c55a29e8a566b1
+msgid "``HAL_GPIO_OUTPUT_OD``: Open-drain output (can only pull low)"
+msgstr "``HAL_GPIO_OUTPUT_OD``: Open-drain output (can only pull low)"
+
+#: ../../tutorials/first_application.rst:329 eef58b7e119f421f89e9057ba7414786
+msgid "**Speed:**"
+msgstr "**Speed:**"
+
+#: ../../tutorials/first_application.rst:331 e9bb43704d5a496288fc7d00f5a9abcc
+msgid "``HAL_GPIO_SPEED_LOW``: Low speed (2 MHz)"
+msgstr "``HAL_GPIO_SPEED_LOW``: Low speed (2 MHz)"
+
+#: ../../tutorials/first_application.rst:332 e56b8f75e0234d9991ac186cb33d0fed
+msgid "``HAL_GPIO_SPEED_MEDIUM``: Medium speed (25 MHz)"
+msgstr "``HAL_GPIO_SPEED_MEDIUM``: Medium speed (25 MHz)"
+
+#: ../../tutorials/first_application.rst:333 57fcc38567a046ef8cb045801a3c7af0
+msgid "``HAL_GPIO_SPEED_HIGH``: High speed (50 MHz)"
+msgstr "``HAL_GPIO_SPEED_HIGH``: High speed (50 MHz)"
+
+#: ../../tutorials/first_application.rst:334 d2d61faab192449bb555618577253e4c
+msgid "``HAL_GPIO_SPEED_VERY_HIGH``: Very high speed (100 MHz)"
+msgstr "``HAL_GPIO_SPEED_VERY_HIGH``: Very high speed (100 MHz)"
+
+#: ../../tutorials/first_application.rst:336 1ef9a4129d0d44b8a7bcd58c252cfd33
+msgid ""
+"For LED control, low speed is sufficient. Use higher speeds for high-"
+"frequency signals."
+msgstr "对于 LED 控制，低速就足够了。对于高频信号使用更高的速度。"
+
+#: ../../tutorials/first_application.rst:339 f0b58dcd238f48f2ae40cf21381cc3d9
+msgid "Common Issues and Solutions"
+msgstr "常见问题和解决方案"
+
+#: ../../tutorials/first_application.rst:341 51341e70c74d42bf86df93e93c740d95
+msgid "**Issue: Build fails with \"nexus not found\"**"
+msgstr "**Issue: Build fails with \"nexus not found\"**"
+
+#: ../../tutorials/first_application.rst:343 2381312d4d8a4c828b4ad5131930b41f
+msgid ""
+"Solution: Ensure Nexus is properly added as a subdirectory and the path in "
+"``add_subdirectory()`` is correct."
+msgstr ""
+"Solution: Ensure Nexus is properly added as a subdirectory and the path in "
+"``add_subdirectory()`` is correct."
+
+#: ../../tutorials/first_application.rst:345 7aa52678e3bf41b4a959c09f3163fa77
+msgid "**Issue: Linker errors about undefined references**"
+msgstr "**Issue: Linker errors about undefined references**"
+
+#: ../../tutorials/first_application.rst:347 d4dec08544e3427b9b3982fdde7397a9
+msgid ""
+"Solution: Make sure you're linking against the correct Nexus libraries "
+"(``nexus::hal`` and ``nexus::platform``)."
+msgstr ""
+"Solution: Make sure you're linking against the correct Nexus libraries "
+"(``nexus::hal`` and ``nexus::platform``)."
+
+#: ../../tutorials/first_application.rst:349 abd71142807c4200b965fbdca0166b28
+msgid "**Issue: Application doesn't run after flashing**"
+msgstr "**Issue: Application doesn't run after flashing**"
+
+#: ../../tutorials/first_application.rst:351 fe55a98ffe28420f9a7673072c0e934c
+msgid ""
+"Solution: - Verify the correct flash address (0x08000000 for STM32F4) - "
+"Check that the toolchain file is specified correctly - Ensure the platform "
+"is set to ``stm32f4``"
+msgstr ""
+"Solution: - Verify the correct flash address (0x08000000 for STM32F4) - "
+"Check that the toolchain file is specified correctly - Ensure the platform "
+"is set to ``stm32f4``"
+
+#: ../../tutorials/first_application.rst:356 730cba33ba5d44df8ee02c756f796164
+msgid "**Issue: LED doesn't blink**"
+msgstr "**Issue: LED doesn't blink**"
+
+#: ../../tutorials/first_application.rst:358 586fa4a7856e40f4b35671fa03f326a8
+msgid ""
+"Solution: - Verify the LED pin number matches your board - Check that "
+"``hal_init()`` succeeded - Try a longer delay to make blinking more visible"
+msgstr ""
+"Solution: - Verify the LED pin number matches your board - Check that "
+"``hal_init()`` succeeded - Try a longer delay to make blinking more visible"
+
+#: ../../tutorials/first_application.rst:364 b9128244ffb5419db6d7d91d724ec37e
+msgid "Next Steps"
+msgstr "下一步"
+
+#: ../../tutorials/first_application.rst:366 d9547a6990e54c8a801bb64c05266f2a
+msgid ""
+"Congratulations! You've created your first Nexus application. Now you can:"
+msgstr "恭喜！您已创建了第一个 Nexus 应用程序。现在您可以："
+
+#: ../../tutorials/first_application.rst:368 7cf59c8eac014279ba74ca5a85d12992
+msgid ":doc:`gpio_control` - Learn advanced GPIO techniques"
+msgstr ":doc:`gpio_control` - Learn advanced GPIO techniques"
+
+#: ../../tutorials/first_application.rst:369 694f02a17de047ef8ec7d31f57fe82d3
+msgid ":doc:`uart_communication` - Add serial communication"
+msgstr ":doc:`uart_communication` - Add serial communication"
+
+#: ../../tutorials/first_application.rst:370 49a5ae9b4d0d455dbc6a6825a7b96fae
+msgid ":doc:`task_creation` - Create multi-tasking applications"
+msgstr ":doc:`task_creation` - Create multi-tasking applications"
+
+#: ../../tutorials/first_application.rst:371 a2ba763cc843405487bce2e786627ac0
+msgid "Explore the :doc:`../user_guide/hal` for more HAL features"
+msgstr "探索 :doc:`../user_guide/hal` 了解更多 HAL 特性"
+
+#: ../../tutorials/first_application.rst:374 e6873fcfad8b490c9bf224c8642fee94
+msgid "Additional Exercises"
+msgstr "附加练习"
+
+#: ../../tutorials/first_application.rst:376 eb0fa97b8c1d43b088b36b08a5328341
+msgid "Try these exercises to reinforce your learning:"
+msgstr "尝试这些练习来巩固您的学习："
+
+#: ../../tutorials/first_application.rst:378 37a860ce40644d17a4c1dbc9d924ec04
+msgid ""
+"**Multiple LEDs**: Modify the code to blink all four LEDs on the STM32F4 "
+"Discovery board in sequence"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:380 b079bfdcc66c4aea9278faebcfc51a0a
+msgid ""
+"**Variable Speed**: Add a button to change the blink speed when pressed"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:382 466c57b441964e5e8c1cbce4355da1a4
+msgid ""
+"**Pattern**: Create a custom blink pattern (e.g., two quick blinks, pause, "
+"repeat)"
+msgstr ""
+"**Pattern**: Create a custom blink pattern (e.g., two quick blinks, pause, "
+"repeat)"
+
+#: ../../tutorials/first_application.rst:384 8536a63b3cad4d64a37ce52d6ac22be7
+msgid ""
+"**Error Handling**: Add more robust error handling with LED error indicators"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:387 53b481884d654e788ce309d028ddb9b7
+msgid "Example: Blinking Multiple LEDs"
+msgstr "示例：闪烁多个 LED"
+
+#: ../../tutorials/first_application.rst:389 40257477cbd148db8e94825c256861d3
+msgid ""
+"/* LED definitions */\n"
+"#define LED_GREEN_PORT   HAL_GPIO_PORT_D\n"
+"#define LED_GREEN_PIN    12\n"
+"#define LED_ORANGE_PORT  HAL_GPIO_PORT_D\n"
+"#define LED_ORANGE_PIN   13\n"
+"#define LED_RED_PORT     HAL_GPIO_PORT_D\n"
+"#define LED_RED_PIN      14\n"
+"#define LED_BLUE_PORT    HAL_GPIO_PORT_D\n"
+"#define LED_BLUE_PIN     15\n"
+"\n"
+"/* Initialize all LEDs */\n"
+"static hal_status_t leds_init(void) {\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"\n"
+"    if (hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"    if (hal_gpio_init(LED_ORANGE_PORT, LED_ORANGE_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"    if (hal_gpio_init(LED_RED_PORT, LED_RED_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"    if (hal_gpio_init(LED_BLUE_PORT, LED_BLUE_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"\n"
+"    return HAL_OK;\n"
+"}\n"
+"\n"
+"/* Main loop with sequence */\n"
+"while (1) {\n"
+"    hal_gpio_toggle(LED_GREEN_PORT, LED_GREEN_PIN);\n"
+"    hal_delay_ms(250);\n"
+"    hal_gpio_toggle(LED_ORANGE_PORT, LED_ORANGE_PIN);\n"
+"    hal_delay_ms(250);\n"
+"    hal_gpio_toggle(LED_RED_PORT, LED_RED_PIN);\n"
+"    hal_delay_ms(250);\n"
+"    hal_gpio_toggle(LED_BLUE_PORT, LED_BLUE_PIN);\n"
+"    hal_delay_ms(250);\n"
+"}"
+msgstr ""
+"/* LED definitions */\n"
+"#define LED_GREEN_PORT   HAL_GPIO_PORT_D\n"
+"#define LED_GREEN_PIN    12\n"
+"#define LED_ORANGE_PORT  HAL_GPIO_PORT_D\n"
+"#define LED_ORANGE_PIN   13\n"
+"#define LED_RED_PORT     HAL_GPIO_PORT_D\n"
+"#define LED_RED_PIN      14\n"
+"#define LED_BLUE_PORT    HAL_GPIO_PORT_D\n"
+"#define LED_BLUE_PIN     15\n"
+"\n"
+"/* Initialize all LEDs */\n"
+"static hal_status_t leds_init(void) {\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"\n"
+"    if (hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"    if (hal_gpio_init(LED_ORANGE_PORT, LED_ORANGE_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"    if (hal_gpio_init(LED_RED_PORT, LED_RED_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"    if (hal_gpio_init(LED_BLUE_PORT, LED_BLUE_PIN, &config) != HAL_OK) {\n"
+"        return HAL_ERR_FAIL;\n"
+"    }\n"
+"\n"
+"    return HAL_OK;\n"
+"}\n"
+"\n"
+"/* Main loop with sequence */\n"
+"while (1) {\n"
+"    hal_gpio_toggle(LED_GREEN_PORT, LED_GREEN_PIN);\n"
+"    hal_delay_ms(250);\n"
+"    hal_gpio_toggle(LED_ORANGE_PORT, LED_ORANGE_PIN);\n"
+"    hal_delay_ms(250);\n"
+"    hal_gpio_toggle(LED_RED_PORT, LED_RED_PIN);\n"
+"    hal_delay_ms(250);\n"
+"    hal_gpio_toggle(LED_BLUE_PORT, LED_BLUE_PIN);\n"
+"    hal_delay_ms(250);\n"
+"}"
+
+#: ../../tutorials/first_application.rst:440 096e32574d5644e8ad0a5beb281b96e7
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../tutorials/first_application.rst:442 d56498ebd1bc4cbeba65dd4d0cf489d7
+msgid ""
+"**Always Initialize HAL First**: Call ``hal_init()`` before using any HAL "
+"functions"
+msgstr ""
+"**Always Initialize HAL First**: Call ``hal_init()`` before using any HAL "
+"functions"
+
+#: ../../tutorials/first_application.rst:444 f7864dae62a24da9ac42446f48d73592
+msgid ""
+"**Check Return Values**: Always check return values from HAL functions for "
+"errors"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:446 f64d8d49ce60423f9695714d77f585fe
+msgid ""
+"**Use Appropriate GPIO Speed**: Don't use high-speed GPIO for slow signals "
+"(wastes power)"
+msgstr ""
+"**Use Appropriate GPIO Speed**: Don't use high-speed GPIO for slow signals "
+"(wastes power)"
+
+#: ../../tutorials/first_application.rst:448 76c2a85cd30f4bd3bcac21c2e2e372ee
+msgid ""
+"**Document Pin Assignments**: Clearly document which pins are used for what "
+"purpose"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:450 2a219502e5f342ef8faa2f341c5ac310
+msgid ""
+"**Error Handling**: Implement proper error handling with visual indicators "
+"(LEDs)"
+msgstr ""
+"**Error Handling**: Implement proper error handling with visual indicators "
+"(LEDs)"
+
+#: ../../tutorials/first_application.rst:452 3e3b32cdd2994df3b0acde60e136b748
+msgid ""
+"**Code Organization**: Keep initialization code separate from main loop "
+"logic"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:454 98e825b2a95143cda668a5f914572f17
+msgid ""
+"**Use Meaningful Names**: Use descriptive names for constants and functions"
+msgstr ""
+
+#: ../../tutorials/first_application.rst:457 44e34e9442404799affa83f5e9788728
+msgid "Resources"
+msgstr "资源"
+
+#: ../../tutorials/first_application.rst:459 a879c7d2dd2547ada978d8da4bf59aea
+msgid ":doc:`../user_guide/hal` - Complete HAL API documentation"
+msgstr ":doc:`../user_guide/hal` - Complete HAL API documentation"
+
+#: ../../tutorials/first_application.rst:460 b44c93318f384253b502c07149dc4432
+msgid ":doc:`../platform_guides/stm32f4` - STM32F4-specific information"
+msgstr ":doc:`../platform_guides/stm32f4` - STM32F4-specific information"
+
+#: ../../tutorials/first_application.rst:461 c3c3b1408de34d4dbc08ba8bbc924e47
+msgid ":doc:`../user_guide/build_system` - Advanced build configuration"
+msgstr ":doc:`../user_guide/build_system` - Advanced build configuration"
+
+#: ../../tutorials/first_application.rst:462 b259e3fadb214b059ab96b3ede8d2f26
+msgid ""
+"`STM32F4 Discovery User Manual "
+"<https://www.st.com/resource/en/user_manual/dm00039084.pdf>`_"
+msgstr ""
+"`STM32F4 Discovery User Manual "
+"<https://www.st.com/resource/en/user_manual/dm00039084.pdf>`_"

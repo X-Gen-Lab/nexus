@@ -1,850 +1,1397 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2026, Nexus Team
-# This file is distributed under the same license as the Nexus Embedded
-# Platform package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
-#: ../../development/kconfig_guide.rst:2 fe2c60ef919f484e9b679274b170022b
+#: ../../development/kconfig_guide.rst:2 eaf7b6c293ed4dea818af41610d09e61
 msgid "Kconfig Writing Guide"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:4 8f1a25799ba040c19009ec2f2342b1fb
+#: ../../development/kconfig_guide.rst:4 6632014a31814bd09f84dc30f9a7f3f4
 msgid ""
+"This guide explains how to write Kconfig files for the Nexus platform, "
+"following best practices and conventions."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:8 171f5c533ed84877a0718f7f96470a52
+#: ../../development/kconfig_guide.rst:8 698d81ad442c4c1f8832586d33e4ad69
 msgid "Overview"
 msgstr "概述"
 
-#: ../../development/kconfig_guide.rst:10 fe06590a0acd46f89f567d9225020ebe
+#: ../../development/kconfig_guide.rst:10 1940f2c4ecca43a7b271a70f305973f1
 msgid ""
+"Kconfig is a configuration language used by the Linux kernel and many "
+"embedded projects. It provides a hierarchical, type-safe way to define "
+"build-time configuration options."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:14 f0e9a82a3346417b8615d8c0f513b5fa
+#: ../../development/kconfig_guide.rst:14 4b7a5700e3e74607bfdbc33c0ddc603d
 msgid "**Key Concepts:**"
-msgstr ""
+msgstr "**Key Concepts:**"
 
-#: ../../development/kconfig_guide.rst:16 49856630eaf54f659abea02a9d9aac47
+#: ../../development/kconfig_guide.rst:16 84f8d61a4942411c96665b6086ec1ae4
 msgid "**config**: Define a configuration symbol"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:17 807087f9fa19407e881809ea1366b1c1
+#: ../../development/kconfig_guide.rst:17 bcf6c26a40184be8b5a468cedc478c33
 msgid "**menuconfig**: Define a configuration symbol that opens a menu"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:18 f9f77f9f25cc4de2a66b63fcf0d605c4
+#: ../../development/kconfig_guide.rst:18 0861a126d30e4e6b9567dfca03daef7a
 msgid "**choice**: Define mutually exclusive options"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:19 f37ad1d390f446dda3ac591ab4f1f9f7
+#: ../../development/kconfig_guide.rst:19 52182274d61e47df951f300e81f94e1f
 msgid "**menu**: Group related options"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:20 6474e462c97248769d89a69ef670d450
+#: ../../development/kconfig_guide.rst:20 4a777f354b5b4f2bb2d9589aefa917a4
 msgid "**if/endif**: Conditional inclusion"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:21 2fcf9a9b0f97462e8a762dca3b4fb941
+#: ../../development/kconfig_guide.rst:21 7a3e1f78426a46e78cc8e26676cad824
 msgid "**depends on**: Specify dependencies"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:22 4d4bed0cea2548d185a33a3da0f453f6
+#: ../../development/kconfig_guide.rst:22 f524ed76041343548b4f53549604f55c
 msgid "**select**: Automatically enable dependencies"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:23 5f693ffec3f8475bbdcd3cc54f844659
+#: ../../development/kconfig_guide.rst:23 67f7f77cdd6748dc9569e408b3986924
 msgid "**default**: Specify default values"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:24 229e43eca8f8418492fb7162510d610f
+#: ../../development/kconfig_guide.rst:24 90d7909a753e497593a4ec4776b9af37
 msgid "**range**: Specify valid value ranges"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:25 d5d71bd6de1d404aba0436c3ff4d2801
+#: ../../development/kconfig_guide.rst:25 04161f8b515341e2a3130a664b9c8173
 msgid "**help**: Provide documentation"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:28 f6ae52c4c6b343ffb914b4c43f97aba6
+#: ../../development/kconfig_guide.rst:28 6fd34e6130614b5a92740f3fdb84cbc2
 msgid "Basic Syntax"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:31 5ee9ed672b10422f8d7029974b847023
+#: ../../development/kconfig_guide.rst:31 aec92c82f549461991d773b27e403e7c
 msgid "Configuration Symbol"
 msgstr "配置 Symbol"
 
-#: ../../development/kconfig_guide.rst:33 2f98a965a2e1462a90bd1201bde6f737
+#: ../../development/kconfig_guide.rst:33 77a24bc6eda1457796ebbe1fbed454e5
 msgid ""
+"config SYMBOL_NAME\n"
+"    bool \"Human-readable description\"\n"
+"    default y\n"
+"    help\n"
+"      Detailed help text explaining what this option does.\n"
+"      Can span multiple lines."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:42 817443a3caba4e84b7f2c21d1f3524af
+#: ../../development/kconfig_guide.rst:42 9944114309234076a4da183930c9a979
 msgid "**Types:**"
-msgstr ""
+msgstr "**Types:**"
 
-#: ../../development/kconfig_guide.rst:44 3684f5b766d2412aa659dcd152bdb6c0
+#: ../../development/kconfig_guide.rst:44 08dda95bd9494829bbed39408d0d15b8
 msgid "``bool``: Boolean (y/n)"
 msgstr "``bool``: 布尔 (y/n)"
 
-#: ../../development/kconfig_guide.rst:45 9f1266ac3e38470db22207d59c9918b9
+#: ../../development/kconfig_guide.rst:45 74769b894f6e46c6945a2fd10d350692
 msgid "``int``: Integer"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:46 3c50d9b22481415fad329cefe88ff36f
+#: ../../development/kconfig_guide.rst:46 742184e18c9b49dbae51af4a88ddceb7
 msgid "``hex``: Hexadecimal"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:47 7b4f4401c8f14d3d923e455d2488b06c
+#: ../../development/kconfig_guide.rst:47 31c3b9eb4f6f4685a4c23cc2393bd879
 msgid "``string``: String"
 msgstr "``字符串``: String"
 
-#: ../../development/kconfig_guide.rst:49
-#: ../../development/kconfig_guide.rst:153
-#: ../../development/kconfig_guide.rst:378
-#: ../../development/kconfig_guide.rst:539 412609a4e2494e4f82aeaf4395d6b9c1
-#: 6ee3526a7d0641ef80f9ddcd570ed6dc 6f8c17cbb8c5456baac687ca2608a73b
-#: 835a413d6914409db0948e72cd946349
+#: f359d25990af4294b461049a9f350e7f
 msgid "**Example:**"
 msgstr "**示例:**"
 
-#: ../../development/kconfig_guide.rst:51 fbe0faf4884147af9730b8e05bc0b190
+#: ../../development/kconfig_guide.rst:51 86d06e944eba474da0883329be4c23ee
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    range 9600 921600\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"      Common values: 9600, 19200, 38400, 57600, 115200"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:62 94feec79d6ab4300a9ccf530c482c45c
+#: ../../development/kconfig_guide.rst:62 5607280ee16a4a1e97cbdcf7f917f53f
 msgid "Menu Configuration"
 msgstr "Menu 配置"
 
-#: ../../development/kconfig_guide.rst:64 09b33f2fc9c24941981aa948e961208e
-msgid "``menuconfig`` creates a configuration symbol that also opens a submenu:"
-msgstr ""
-
-#: ../../development/kconfig_guide.rst:66 ac1850f96d5b4bc29b7a63491b561de0
+#: ../../development/kconfig_guide.rst:64 84766e964b1d4731a0471f25f1584917
 msgid ""
+"``menuconfig`` creates a configuration symbol that also opens a submenu:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:84 cdc4e98816404d80817d80775895a948
+#: ../../development/kconfig_guide.rst:66 9c3378ac4eb24806b798490a126622a7
+msgid ""
+"menuconfig UART_ENABLE\n"
+"    bool \"Enable UART support\"\n"
+"    default y\n"
+"    help\n"
+"      Enable UART peripheral support.\n"
+"\n"
+"if UART_ENABLE\n"
+"\n"
+"config UART_MAX_INSTANCES\n"
+"    int \"Maximum UART instances\"\n"
+"    default 4\n"
+"    range 1 8\n"
+"\n"
+"endif # UART_ENABLE"
+msgstr ""
+
+#: ../../development/kconfig_guide.rst:84 222d2fa9209a4f95aed75b740e43b448
 msgid "Choice Menu"
-msgstr ""
+msgstr "选择 菜单"
 
-#: ../../development/kconfig_guide.rst:86 5badb472b5c5416aa852c5e92e09b9c6
+#: ../../development/kconfig_guide.rst:86 7b9cc5a0656149d580656bbc2c0cac8d
 msgid "``choice`` creates mutually exclusive options:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:88 c8699f9ac24a46f0b5b03f91d115080a
+#: ../../development/kconfig_guide.rst:88 2fddcc05a614494b8c97a29ea612a7de
 msgid ""
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"    help\n"
+"      Select the target hardware platform.\n"
+"\n"
+"config PLATFORM_NATIVE\n"
+"    bool \"Native Platform (PC Simulation)\"\n"
+"\n"
+"config PLATFORM_STM32\n"
+"    bool \"STM32 Platform\"\n"
+"\n"
+"config PLATFORM_GD32\n"
+"    bool \"GD32 Platform\"\n"
+"\n"
+"endchoice"
 msgstr ""
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"    help\n"
+"      Select the target hardware platform.\n"
+"\n"
+"config PLATFORM_NATIVE\n"
+"    bool \"Native Platform (PC Simulation)\"\n"
+"\n"
+"config PLATFORM_STM32\n"
+"    bool \"STM32 Platform\"\n"
+"\n"
+"config PLATFORM_GD32\n"
+"    bool \"GD32 Platform\"\n"
+"\n"
+"endchoice"
 
-#: ../../development/kconfig_guide.rst:108 ff0a46af4e3f4a1da89f963c25fcf898
+#: ../../development/kconfig_guide.rst:108 9c3a98028d3b4fff90ef713ec30d17e6
 msgid "Regular Menu"
-msgstr ""
+msgstr "Regular 菜单"
 
-#: ../../development/kconfig_guide.rst:110 dc41fee4d5084b34a7b118178ac04ec5
+#: ../../development/kconfig_guide.rst:110 99c0214de9734111ba6620ff5c630ee2
 msgid "``menu`` groups related options without creating a symbol:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:112 7ea488dfa52442e3a95f607d880f3af2
+#: ../../development/kconfig_guide.rst:112 0ce21034dd0b42fea3d257d917fd2022
 msgid ""
+"menu \"System Parameters\"\n"
+"\n"
+"config TICK_RATE_HZ\n"
+"    int \"System tick rate (Hz)\"\n"
+"    default 1000\n"
+"    range 100 10000\n"
+"\n"
+"config HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768\n"
+"    range 4096 1048576\n"
+"\n"
+"endmenu"
 msgstr ""
-"menu \System 参数\\n\n"
-"\n\n"
-"config TICK_RATE_HZ\n\n"
-"    int \System tick rate (Hz)\\n\n"
-"    default 1000\n\n"
-"    range 100 10000\n\n"
-"\n\n"
-"config HEAP_SIZE\n\n"
-"    int \Heap size (bytes)\\n\n"
-"    default 32768\n\n"
-"    range 4096 1048576\n\n"
-"\n\n"
-"endmenu\n"
+"menu \"System Parameters\"\n"
+"\n"
+"config TICK_RATE_HZ\n"
+"    int \"System tick rate (Hz)\"\n"
+"    default 1000\n"
+"    range 100 10000\n"
+"\n"
+"config HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768\n"
+"    range 4096 1048576\n"
+"\n"
+"endmenu"
 
-#: ../../development/kconfig_guide.rst:129
-#: ../../development/kconfig_guide.rst:618 07b67e8aa9da4e7c93f4c0e0a8bc1903
-#: 0ecc4e6a5b0b420fb2017ea40cd0d482
+#: b36f573eb53b48cca27cf4f5c1defa7e
 msgid "Dependencies"
 msgstr "依赖"
 
-#: ../../development/kconfig_guide.rst:132 9834d40a83864960809b0307aa1e70b2
+#: ../../development/kconfig_guide.rst:132 cdeb0cc9c3d44e4a8b73a195fcdb8ea4
 msgid "depends on"
-msgstr ""
+msgstr "依赖于"
 
-#: ../../development/kconfig_guide.rst:134 8dfdfb744ba14058a62b1e9824ff81a0
+#: ../../development/kconfig_guide.rst:134 422c783a7bf94d178f35235ace4047d8
 msgid "``depends on`` makes an option visible only when dependencies are met:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:136 d3e6eda0c4e54e7091818a90d1a1dd2e
+#: ../../development/kconfig_guide.rst:136 94686d95d35a4d84815d3c8cd39b72c6
 msgid ""
+"config UART1_DMA_ENABLE\n"
+"    bool \"Enable DMA for UART1\"\n"
+"    depends on UART1_ENABLE && DMA_ENABLE\n"
+"    default y\n"
+"    help\n"
+"      Use DMA for UART1 transfers."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:145 24a90dfd2963484a8c5eca4f31aa9b7c
+#: ../../development/kconfig_guide.rst:145 cffa96f68c534cfbbc1ad2f2fdeb7b69
 msgid "**Operators:**"
-msgstr ""
+msgstr "**Operators:**"
 
-#: ../../development/kconfig_guide.rst:147 8be7e43e2cf34f598b551950cb779024
+#: ../../development/kconfig_guide.rst:147 6587e1c6aff6428090ecb5da912ada9c
 msgid "``&&``: Logical AND"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:148 59a86c0385404cae81ee12955cda863f
+#: ../../development/kconfig_guide.rst:148 7ba285ff075c42038dd8bd03d58b9041
 msgid "``||``: Logical OR"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:149 58f4580ab92149b3af5acfe29398dcef
+#: ../../development/kconfig_guide.rst:149 774ce55ee72c473f91da3331b510c0e9
 msgid "``!``: Logical NOT"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:150 3157436eb87c4843bba7fcaeade77f5a
+#: ../../development/kconfig_guide.rst:150 b0604108c5ab4c3ca3c9b1cae0cfd8dd
 msgid "``=``: Equality"
-msgstr ""
+msgstr "``=``: Equality"
 
-#: ../../development/kconfig_guide.rst:151 00ebfe6e60a24c3390e64e1bb5fa27f3
+#: ../../development/kconfig_guide.rst:151 c14b65bb286247878bd5f18de4b8c69b
 msgid "``!=``: Inequality"
-msgstr ""
+msgstr "``!=``: Inequality"
 
-#: ../../development/kconfig_guide.rst:155 92a75499f3024ed09b0de10693d5c4b0
+#: ../../development/kconfig_guide.rst:155 77ffea92aa674a07800dd652b18a3340
 msgid ""
+"config ADVANCED_FEATURE\n"
+"    bool \"Advanced feature\"\n"
+"    depends on PLATFORM_STM32 && (STM32F4 || STM32H7)\n"
+"    depends on !MINIMAL_BUILD"
 msgstr ""
+"config ADVANCED_FEATURE\n"
+"    bool \"Advanced feature\"\n"
+"    depends on PLATFORM_STM32 && (STM32F4 || STM32H7)\n"
+"    depends on !MINIMAL_BUILD"
 
-#: ../../development/kconfig_guide.rst:163 d9d80835a6b14e2daab8bcdfa536c63a
+#: ../../development/kconfig_guide.rst:163 e75108b39eb347c683eb6b0ef4dcbf31
 msgid "select"
-msgstr ""
+msgstr "选择"
 
-#: ../../development/kconfig_guide.rst:165 936f3ce893fd4cdfbc6706a375465af9
+#: ../../development/kconfig_guide.rst:165 cc79650465124b9e86c3f5e51b9aba4b
 msgid "``select`` automatically enables dependencies:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:167 0511ef97c1f44a1b96ea01d5e4fd0fe6
+#: ../../development/kconfig_guide.rst:167 ee46754646ce4e6eba62bf0f9b228c22
 msgid ""
+"config USB_DEVICE\n"
+"    bool \"USB Device support\"\n"
+"    select USB_CORE\n"
+"    select DMA_ENABLE\n"
+"    help\n"
+"      Enable USB device functionality."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:176 3795da505c6c47e3bdfa37299c790669
-msgid "**Note:** Use ``select`` sparingly. Prefer ``depends on`` when possible."
+#: ../../development/kconfig_guide.rst:176 eb4df45fca6348cc99b27f8b105d63d0
+msgid ""
+"**Note:** Use ``select`` sparingly. Prefer ``depends on`` when possible."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:179 b30071f9f5884d958167ded14dbfbd98
+#: ../../development/kconfig_guide.rst:179 a744f53d491441fa9a133c21bb12df75
 msgid "Conditional Inclusion"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:181 f4ddcb9c7a834f57b0dd553739f75503
+#: ../../development/kconfig_guide.rst:181 2d91f0ea022d4a3b8e82dfb22ab7c3e5
 msgid "``if/endif`` blocks conditionally include configuration options:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:183 f5e9711dd12d49c198b3c70e2ac2b833
+#: ../../development/kconfig_guide.rst:183 fb8ef864f8794e5abb2990ade1057b2e
 msgid ""
+"if PLATFORM_STM32\n"
+"\n"
+"config STM32_CHIP_NAME\n"
+"    string \"STM32 chip name\"\n"
+"    default \"STM32F407xx\"\n"
+"\n"
+"source \"platforms/stm32/Kconfig_chip\"\n"
+"\n"
+"endif # PLATFORM_STM32"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:196 1056cfa173c94940862b2460a4359c79
+#: ../../development/kconfig_guide.rst:196 1c0c03edfee041eba23e9577510498db
 msgid "Default Values"
 msgstr "默认值"
 
-#: ../../development/kconfig_guide.rst:199 1ac263386d934e22b52769e1d5684f8c
+#: ../../development/kconfig_guide.rst:199 e34d61e118cb43bca606260baaf85e9a
 msgid "Simple Defaults"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:201
-#: ../../development/kconfig_guide.rst:695 06597a75c6954c90826500a27b7b907e
-#: 64bddb0fca014c6e94928738dbdf6ca1
+#: 9eb63ac98ca744fa8d9d116e5e261f94
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:208 855e7e10fb094ecd9dcafaf8ed1a2e4f
+#: ../../development/kconfig_guide.rst:208 a064dcdfc3e84ba9a43228e05d0feab1
 msgid "Conditional Defaults"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:210 2d650c7d09cb4eb086840b3be6dbc004
+#: ../../development/kconfig_guide.rst:210 500ae6b2491b495886c561376753485f
 msgid "Defaults can depend on other options:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:212 a92332f8a1124d5e993112fc04f206eb
+#: ../../development/kconfig_guide.rst:212 e6e301b307eb4046b7b38be43d5ee5e0
 msgid ""
+"config HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768 if OSAL_FREERTOS\n"
+"    default 16384 if OSAL_BAREMETAL\n"
+"    default 65536"
 msgstr ""
+"config HEAP_SIZE\n"
+"    int \"Heap size (bytes)\"\n"
+"    default 32768 if OSAL_FREERTOS\n"
+"    default 16384 if OSAL_BAREMETAL\n"
+"    default 65536"
 
-#: ../../development/kconfig_guide.rst:220 aa4c5bd8e9e143069d952beb017285a6
+#: ../../development/kconfig_guide.rst:220 1283cf04a5654b738553526f90d148b5
 msgid "**Evaluation order:** First matching condition is used."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:223 5b50ab28e5b24cae8999d4a9234586ec
+#: ../../development/kconfig_guide.rst:223 abdd9f78acbb404a8dc0b0200eda4081
 msgid "Expression Defaults"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:225 da354a2dad42474991f0d3537f98a00b
+#: ../../development/kconfig_guide.rst:225 3bdbc210989a493bbfa289e7fb27ba09
 msgid ""
+"config PLATFORM_NAME\n"
+"    string\n"
+"    default \"native\" if PLATFORM_NATIVE\n"
+"    default \"stm32\" if PLATFORM_STM32\n"
+"    default \"gd32\" if PLATFORM_GD32"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:234 c3cf519a1efa4e1d964af8c3c004cb59
+#: ../../development/kconfig_guide.rst:234 28ceafe7bbf34e98913b96a49210618f
 msgid "Range Constraints"
-msgstr ""
+msgstr "范围 Constraints"
 
-#: ../../development/kconfig_guide.rst:237 1cd14cf029df4abeb416db75578adfa0
+#: ../../development/kconfig_guide.rst:237 4594a1276e4a45498c70049dc438f4a8
 msgid "Integer Ranges"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:239 0e66239928c846ff818663ca20e5cfb3
+#: ../../development/kconfig_guide.rst:239 2692ee05282a4de7a2847b85491890a8
 msgid ""
+"config BUFFER_SIZE\n"
+"    int \"Buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"    help\n"
+"      Buffer size in bytes. Must be between 16 and 4096."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:249 ad7100a00c874ab29db0231b0c10b997
+#: ../../development/kconfig_guide.rst:249 b337dba086764fe6844c6db472974d6a
 msgid "Conditional Ranges"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:251 3ed28b28b0b0463b96cb4e9435536a5b
+#: ../../development/kconfig_guide.rst:251 20b4539bbf414e02954869c0e5bfdaf7
 msgid ""
+"config STACK_SIZE\n"
+"    int \"Stack size (bytes)\"\n"
+"    default 2048\n"
+"    range 512 8192 if PLATFORM_STM32\n"
+"    range 1024 16384 if PLATFORM_NATIVE"
 msgstr ""
+"config STACK_SIZE\n"
+"    int \"Stack size (bytes)\"\n"
+"    default 2048\n"
+"    range 512 8192 if PLATFORM_STM32\n"
+"    range 1024 16384 if PLATFORM_NATIVE"
 
-#: ../../development/kconfig_guide.rst:260 e936080b12bf41348bce0d2f2b20d4f8
+#: ../../development/kconfig_guide.rst:260 4f7adc50621f4b609f6837d5fc4d3124
 msgid "Hexadecimal Values"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:262 7807fffcda6a43cea7921917bda6fc41
+#: ../../development/kconfig_guide.rst:262 b65451b1d79d4041a33c521f773904ec
 msgid ""
+"config RAM_START\n"
+"    hex \"RAM start address\"\n"
+"    default 0x20000000\n"
+"    range 0x20000000 0x2FFFFFFF"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:270 c7a0666246e74432be1f51e7b263341d
+#: ../../development/kconfig_guide.rst:270 ce26db488cb14198b0a591348d9b6999
 msgid "File Inclusion"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:273 f1cb83f941d04b3081ef15fe47140ab8
+#: ../../development/kconfig_guide.rst:273 c21760b285fa4fd6bd5317c1930fe6a4
 msgid "source Directive"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:275 f393f535415748ae9a0642737748284c
+#: ../../development/kconfig_guide.rst:275 17b64b1c443349a1939ba8386ad25cf2
 msgid "``source`` includes a file with absolute or relative path:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:277 709292ebbccf4773a78043a43a03cea5
+#: ../../development/kconfig_guide.rst:277 08ac24e55e834f1ba9d723fb32579197
 msgid ""
+"# Absolute path from project root\n"
+"source \"platforms/stm32/Kconfig\"\n"
+"\n"
+"# Relative path\n"
+"source \"Kconfig_chip\""
 msgstr ""
+"# Absolute path from project root\n"
+"source \"platforms/stm32/Kconfig\"\n"
+"\n"
+"# Relative path\n"
+"source \"Kconfig_chip\""
 
-#: ../../development/kconfig_guide.rst:286 de5a242c14254be78eb46cb605f1de4c
+#: ../../development/kconfig_guide.rst:286 71e98b37b2204e42a5c53a8535dfbcb1
 msgid "rsource Directive"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:288 63529c8bfca946deb88b6112d21381f1
+#: ../../development/kconfig_guide.rst:288 28b5a0f79de44e018987a6fa9ff9466e
 msgid "``rsource`` includes a file with path relative to current file:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:290 359cb04a33364ef8a12bcd9bb0fd18eb
+#: ../../development/kconfig_guide.rst:290 150b2fb451bb4953800893cebcc57195
 msgid ""
+"# In platforms/Kconfig\n"
+"rsource \"native/Kconfig\"\n"
+"rsource \"stm32/Kconfig\"\n"
+"rsource \"gd32/Kconfig\""
 msgstr ""
+"# In platforms/Kconfig\n"
+"rsource \"native/Kconfig\"\n"
+"rsource \"stm32/Kconfig\"\n"
+"rsource \"gd32/Kconfig\""
 
-#: ../../development/kconfig_guide.rst:297 0569cb84a12a441eadb869e740ecbd5a
+#: ../../development/kconfig_guide.rst:297 ecbb3c73652547de98cff9a6a44a553a
 msgid "**Best Practice:** Use ``rsource`` for platform-specific includes."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:300 7d9cf450fe2a462a8ecaacab0f552f84
+#: ../../development/kconfig_guide.rst:300 c186d2ffa25f4dfba0560b15c727d5c2
 msgid "Naming Conventions"
 msgstr "命名约定"
 
-#: ../../development/kconfig_guide.rst:303 d79e7136c059449d84787845c7070cbb
+#: ../../development/kconfig_guide.rst:303 2b95ccb4e9034521a05a60bc597a7188
 msgid "Symbol Names"
-msgstr ""
+msgstr "符号 Names"
 
-#: ../../development/kconfig_guide.rst:305 a6557b8f316440fc8a78ea27ff4f01ca
+#: ../../development/kconfig_guide.rst:305 2a34e3c543ea447982d4ea407aa89507
 msgid "**Platform symbols:**"
 msgstr "**平台 symbols:**"
 
-#: ../../development/kconfig_guide.rst:307 1fb610496b0742b9a50f569c3fd951a9
+#: ../../development/kconfig_guide.rst:307 c0f2d5a518924acdb69a296e4df8af8a
 msgid ""
+"PLATFORM_<NAME>                 # Platform selection\n"
+"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific"
 msgstr ""
-"PLATFORM_<NAME>                 # 平台选择\n\n"
-"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific\n"
+"PLATFORM_<NAME>                 # Platform selection\n"
+"<PLATFORM>_<COMPONENT>_<PARAM>  # Platform-specific"
 
-#: ../../development/kconfig_guide.rst:312
-#: ../../development/kconfig_guide.rst:327
-#: ../../development/kconfig_guide.rst:342
-#: ../../development/kconfig_guide.rst:357 34d709db0bd24e1498e0755ab5faebe4
-#: 362e1a81c5c3431998ac3cbc4b8f2ed9 62fccb5d26494831bdab20048c4ba9e8
-#: c29088b82417404eb20a64426da8cea9
+#: e69f5ac839aa4e4ba37825b80d1e73ba
 msgid "**Examples:**"
 msgstr "**示例:**"
 
-#: ../../development/kconfig_guide.rst:314 6b105475074a4a4dbc8074c03d1ccab1
+#: ../../development/kconfig_guide.rst:314 b71afbf5929141df804c38e707898e84
 msgid ""
+"PLATFORM_STM32\n"
+"STM32_UART_ENABLE\n"
+"STM32_CHIP_NAME"
 msgstr ""
+"PLATFORM_STM32\n"
+"STM32_UART_ENABLE\n"
+"STM32_CHIP_NAME"
 
-#: ../../development/kconfig_guide.rst:320 e34f6679f6504368baca51dd80906aa9
+#: ../../development/kconfig_guide.rst:320 6e423f08993f4f469cd328b85dc8bd89
 msgid "**Peripheral instances:**"
 msgstr "**外设 instances:**"
 
-#: ../../development/kconfig_guide.rst:322 1062b51871bc4589b65563948dd009c9
+#: ../../development/kconfig_guide.rst:322 91a6b0643e984102bf4ac87cf989574b
 msgid ""
+"INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>  # Instance enable\n"
+"<PERIPHERAL><N>_<PARAMETER>           # Instance parameter"
 msgstr ""
+"INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>  # Instance enable\n"
+"<PERIPHERAL><N>_<PARAMETER>           # Instance parameter"
 
-#: ../../development/kconfig_guide.rst:329 09c8ae3d40444644a855c5666416b5b5
+#: ../../development/kconfig_guide.rst:329 e28291fa8dea48749c291042e83a6df0
 msgid ""
+"INSTANCE_STM32_UART_1\n"
+"UART1_BAUDRATE\n"
+"UART1_MODE_DMA"
 msgstr ""
+"INSTANCE_STM32_UART_1\n"
+"UART1_BAUDRATE\n"
+"UART1_MODE_DMA"
 
-#: ../../development/kconfig_guide.rst:335 b58c42580e844e158e5d2ff4158731af
+#: ../../development/kconfig_guide.rst:335 459ffd1aae9a44b48da38af31c70d3da
 msgid "**OSAL symbols:**"
-msgstr ""
+msgstr "**OSAL symbols:**"
 
-#: ../../development/kconfig_guide.rst:337 c91716462a8f4fbd916c16d03bebf12d
+#: ../../development/kconfig_guide.rst:337 61a1079c21fb414da8a34fe8d84441d2
 msgid ""
+"OSAL_<BACKEND>                  # Backend selection\n"
+"OSAL_<PARAMETER>                # OSAL parameter"
 msgstr ""
+"OSAL_<BACKEND>                  # Backend selection\n"
+"OSAL_<PARAMETER>                # OSAL parameter"
 
-#: ../../development/kconfig_guide.rst:344 0dad35920c9544ff91426f0414236831
+#: ../../development/kconfig_guide.rst:344 64ec2f35c8b54043905b06c9d43529a1
 msgid ""
+"OSAL_FREERTOS\n"
+"OSAL_TICK_RATE_HZ\n"
+"OSAL_HEAP_SIZE"
 msgstr ""
+"OSAL_FREERTOS\n"
+"OSAL_TICK_RATE_HZ\n"
+"OSAL_HEAP_SIZE"
 
-#: ../../development/kconfig_guide.rst:351 a9974b3a234d47028bb59dc926f9a7f3
+#: ../../development/kconfig_guide.rst:351 87f76f20fcde4b5ab883467ce576d303
 msgid "Prompt Text"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:353 2b19e13ce6d0489db3747b596a562e2c
+#: ../../development/kconfig_guide.rst:353 626fd4cda761452fb2ed58afae43b2f8
 msgid "Use sentence case"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:354 6c70f95c385941d59ff11f565bd7c705
+#: ../../development/kconfig_guide.rst:354 e278d5f9273e40729a0674cfc0b4f972
 msgid "Be concise but descriptive"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:355 0eb9f0b3854b4037890f36e614f6e0ac
+#: ../../development/kconfig_guide.rst:355 4dce25dd82cc45d9884f4eeb70c81a7b
 msgid "Include units in parentheses"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:359 3c08b0ef1c1b4006be4b6703c9d61272
+#: ../../development/kconfig_guide.rst:359 12f9eb00cd0f42c6bef15e7317dd4844
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"  # Good\n"
+"\n"
+"config UART1_BAUDRATE\n"
+"    int \"Baud Rate For UART1\"  # Bad: wrong case\n"
+"\n"
+"config TIMEOUT\n"
+"    int \"Timeout (ms)\"  # Good: includes unit"
 msgstr ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"  # Good\n"
+"\n"
+"config UART1_BAUDRATE\n"
+"    int \"Baud Rate For UART1\"  # Bad: wrong case\n"
+"\n"
+"config TIMEOUT\n"
+"    int \"Timeout (ms)\"  # Good: includes unit"
 
-#: ../../development/kconfig_guide.rst:371 170da5556f044c099f770af429cf85eb
+#: ../../development/kconfig_guide.rst:371 6dca4aa9f3414a80a1e3c7b7f2375561
 msgid "Help Text"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:373 41ff546319454eaab339b4f67c849fbd
+#: ../../development/kconfig_guide.rst:373 0a73abfee2114a9a8ac493f22c41a16b
 msgid "First line: brief description"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:374 9ffb09f7369c4fbcab7146fe2c5b0717
+#: ../../development/kconfig_guide.rst:374 d1c782d552bd40fa9554ae2ee94ff17a
 msgid "Following lines: detailed explanation"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:375 548f2708c94044faadc5d3ffaadeffaf
+#: ../../development/kconfig_guide.rst:375 7bfb7367f5994afd9c24f6797367b9aa
 msgid "Include examples if helpful"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:376 6cdacf66ac3c4636a9559d2dce1f6b51
+#: ../../development/kconfig_guide.rst:376 8888ae84669f406a837bb50b2ca99ac4
 msgid "Document valid ranges and common values"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:380 e4a23ee7591648cfa10e16c09c83b980
+#: ../../development/kconfig_guide.rst:380 c89fe4b3f70242c59f2dcfb4af2ed174
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"\n"
+"      Common values:\n"
+"      - 9600: Low-speed communication\n"
+"      - 115200: Standard debug console\n"
+"      - 921600: High-speed data transfer\n"
+"\n"
+"      Note: Higher baud rates require more accurate\n"
+"      clock configuration."
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:397 73faeb01d74c413ea5fd7c78a71e35f7
+#: ../../development/kconfig_guide.rst:397 4e0a3ddb6b1646a692077515e9d5f63d
 msgid "Configuration Patterns"
 msgstr "配置 Patterns"
 
-#: ../../development/kconfig_guide.rst:400 3f83b0a9ab3b423f8c14e868105cf728
+#: ../../development/kconfig_guide.rst:400 c175471e8948456ebfc33361ac7d3ded
 msgid "Platform Configuration"
 msgstr "平台配置"
 
-#: ../../development/kconfig_guide.rst:402
-#: ../../development/kconfig_guide.rst:432
-#: ../../development/kconfig_guide.rst:468
-#: ../../development/kconfig_guide.rst:497 368da32efbfb4b9095c0d06f8f72bfad
-#: 444e30d7f567428584aadc56698f2c0a 6411a8de4ed644319ea5d25988ac8b38
-#: c903f1b20f244d90b20f6fc1f32381cd
+#: e58be8292ac54316baad3067dd9d39e0
 msgid "**Pattern:**"
-msgstr ""
+msgstr "**Pattern:**"
 
-#: ../../development/kconfig_guide.rst:404 3c84c28aa0e84ab2b8740686344182cc
+#: ../../development/kconfig_guide.rst:404 1c5d3eae08a94112a0539ad140b1d524
 msgid ""
+"# Platform selection (choice)\n"
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"\n"
+"config PLATFORM_<NAME>\n"
+"    bool \"Platform description\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"# Platform-specific configuration\n"
+"if PLATFORM_<NAME>\n"
+"\n"
+"# Platform settings\n"
+"menu \"Platform Settings\"\n"
+"    # ...\n"
+"endmenu\n"
+"\n"
+"# Peripheral configuration\n"
+"source \"platforms/<name>/Kconfig_peripherals\"\n"
+"\n"
+"endif"
 msgstr ""
-"# 平台选择 (choice)\n\n"
-"choice\n\n"
-"    prompt \Target Platform\\n\n"
-"    default PLATFORM_NATIVE\n\n"
-"\n\n"
-"config PLATFORM_<NAME>\n\n"
-"    bool \Platform description\\n\n"
-"\n\n"
-"endchoice\n\n"
-"\n\n"
-"# Platform-specific configuration\n\n"
-"if PLATFORM_<NAME>\n\n"
-"\n\n"
-"# Platform settings\n\n"
-"menu \Platform Settings\\n\n"
-"    # ...\n\n"
-"endmenu\n\n"
-"\n\n"
-"# 外设配置uration\n\n"
-"source \platforms/<name>/Kconfig_peripherals\\n\n"
-"\n\n"
-"endif\n"
+"# Platform selection (choice)\n"
+"choice\n"
+"    prompt \"Target Platform\"\n"
+"    default PLATFORM_NATIVE\n"
+"\n"
+"config PLATFORM_<NAME>\n"
+"    bool \"Platform description\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"# Platform-specific configuration\n"
+"if PLATFORM_<NAME>\n"
+"\n"
+"# Platform settings\n"
+"menu \"Platform Settings\"\n"
+"    # ...\n"
+"endmenu\n"
+"\n"
+"# Peripheral configuration\n"
+"source \"platforms/<name>/Kconfig_peripherals\"\n"
+"\n"
+"endif"
 
-#: ../../development/kconfig_guide.rst:430 1507e4867bec4e2ca81bdd361afc84d3
+#: ../../development/kconfig_guide.rst:430 9d92055f312b497383d042f3f170f340
 msgid "Peripheral Configuration"
 msgstr "外设配置"
 
-#: ../../development/kconfig_guide.rst:434 e6b2dea8949446198ffaca422a25f4b7
+#: ../../development/kconfig_guide.rst:434 48c8a11313c1499c8cab33e4e1155ddc
 msgid ""
+"# Peripheral enable (menuconfig)\n"
+"menuconfig <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"    bool \"Enable <peripheral> support\"\n"
+"    default y\n"
+"\n"
+"if <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"\n"
+"# Max instances\n"
+"config <PLATFORM>_<PERIPHERAL>_MAX_INSTANCES\n"
+"    int \"Maximum instances\"\n"
+"    default 4\n"
+"    range 1 8\n"
+"\n"
+"# Instance configuration\n"
+"menuconfig INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"    bool \"Enable <peripheral><N>\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"\n"
+"# Instance parameters\n"
+"config <PERIPHERAL><N>_<PARAMETER>\n"
+"    int/bool/string \"Parameter description\"\n"
+"    default <value>\n"
+"\n"
+"endif\n"
+"\n"
+"endif"
 msgstr ""
+"# Peripheral enable (menuconfig)\n"
+"menuconfig <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"    bool \"Enable <peripheral> support\"\n"
+"    default y\n"
+"\n"
+"if <PLATFORM>_<PERIPHERAL>_ENABLE\n"
+"\n"
+"# Max instances\n"
+"config <PLATFORM>_<PERIPHERAL>_MAX_INSTANCES\n"
+"    int \"Maximum instances\"\n"
+"    default 4\n"
+"    range 1 8\n"
+"\n"
+"# Instance configuration\n"
+"menuconfig INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"    bool \"Enable <peripheral><N>\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_<PLATFORM>_<PERIPHERAL>_<N>\n"
+"\n"
+"# Instance parameters\n"
+"config <PERIPHERAL><N>_<PARAMETER>\n"
+"    int/bool/string \"Parameter description\"\n"
+"    default <value>\n"
+"\n"
+"endif\n"
+"\n"
+"endif"
 
-#: ../../development/kconfig_guide.rst:466 a81d450db0494dac876009bd8140f771
+#: ../../development/kconfig_guide.rst:466 1bfb059c274b4518becdc1cb4a5cf71d
 msgid "Transfer Mode Selection"
 msgstr "Transfer Mode 选择ion"
 
-#: ../../development/kconfig_guide.rst:470 11bed6dd7db84cc2b442da1e0ca4e545
+#: ../../development/kconfig_guide.rst:470 708f2056374340b0a30b5ceb3edc5af2
 msgid ""
+"choice\n"
+"    prompt \"Transfer mode\"\n"
+"    default <PERIPHERAL><N>_MODE_DMA\n"
+"\n"
+"config <PERIPHERAL><N>_MODE_POLLING\n"
+"    bool \"Polling\"\n"
+"\n"
+"config <PERIPHERAL><N>_MODE_INTERRUPT\n"
+"    bool \"Interrupt\"\n"
+"\n"
+"config <PERIPHERAL><N>_MODE_DMA\n"
+"    bool \"DMA\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"# Mode value for code\n"
+"config <PERIPHERAL><N>_MODE_VALUE\n"
+"    int\n"
+"    default 0 if <PERIPHERAL><N>_MODE_POLLING\n"
+"    default 1 if <PERIPHERAL><N>_MODE_INTERRUPT\n"
+"    default 2 if <PERIPHERAL><N>_MODE_DMA"
 msgstr ""
+"choice\n"
+"    prompt \"Transfer mode\"\n"
+"    default <PERIPHERAL><N>_MODE_DMA\n"
+"\n"
+"config <PERIPHERAL><N>_MODE_POLLING\n"
+"    bool \"Polling\"\n"
+"\n"
+"config <PERIPHERAL><N>_MODE_INTERRUPT\n"
+"    bool \"Interrupt\"\n"
+"\n"
+"config <PERIPHERAL><N>_MODE_DMA\n"
+"    bool \"DMA\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"# Mode value for code\n"
+"config <PERIPHERAL><N>_MODE_VALUE\n"
+"    int\n"
+"    default 0 if <PERIPHERAL><N>_MODE_POLLING\n"
+"    default 1 if <PERIPHERAL><N>_MODE_INTERRUPT\n"
+"    default 2 if <PERIPHERAL><N>_MODE_DMA"
 
-#: ../../development/kconfig_guide.rst:495 13d826c21b634772815465e3bb9c2455
+#: ../../development/kconfig_guide.rst:495 9fa0fc013ab04c7c81826122ab15f8cf
 msgid "Buffer Configuration"
 msgstr "Buffer 配置"
 
-#: ../../development/kconfig_guide.rst:499 5b50e157f16c41658537637bede27e45
+#: ../../development/kconfig_guide.rst:499 f66cfad39122425692e194cf2edf5f80
 msgid ""
+"config <PERIPHERAL><N>_TX_BUFFER_SIZE\n"
+"    int \"TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"config <PERIPHERAL><N>_RX_BUFFER_SIZE\n"
+"    int \"RX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096"
 msgstr ""
+"config <PERIPHERAL><N>_TX_BUFFER_SIZE\n"
+"    int \"TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"config <PERIPHERAL><N>_RX_BUFFER_SIZE\n"
+"    int \"RX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096"
 
-#: ../../development/kconfig_guide.rst:512
-#: ../../development/kconfig_guide.rst:633 a5bc9df3270046058befaf9ee5904f06
-#: e0072d7a294c412bb01beebbb6b7db32
+#: 0fdc186c74ed47708ac82257f7175f16
 msgid "Validation"
 msgstr "验证"
 
-#: ../../development/kconfig_guide.rst:515 b8fbf1eb00d042808bedefb380abfa7d
+#: ../../development/kconfig_guide.rst:515 c17f1ecdf23e476d9bae756b46c7b6e7
 msgid "Syntax Validation"
 msgstr "Syntax 验证"
 
-#: ../../development/kconfig_guide.rst:517 a4263478e86a481e818b7a079c632dcf
+#: ../../development/kconfig_guide.rst:517 147461fc5cf343c2a8d96435c27d334c
 msgid "Always validate Kconfig files:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:519 19155dea074a4d92a898329f8fb45f21
+#: ../../development/kconfig_guide.rst:519 5e09946fef0e4b2f828f795f061307e0
 msgid "python scripts/kconfig/validate_kconfig.py Kconfig"
-msgstr ""
+msgstr "python scripts/kconfig/validate_kconfig.py Kconfig"
 
-#: ../../development/kconfig_guide.rst:523 efbc07c5b0884948b43d94e1074c9116
+#: ../../development/kconfig_guide.rst:523 ee7d6e45c3f9494abd73335da9b98214
 msgid "**Common errors:**"
-msgstr ""
+msgstr "**Common errors:**"
 
-#: ../../development/kconfig_guide.rst:525 c65fd880bd4c480a802006b1d55b1840
+#: ../../development/kconfig_guide.rst:525 05c8a2fc761142e499f5018511c04d28
 msgid "Unclosed blocks (if/endif, menu/endmenu, choice/endchoice)"
-msgstr ""
+msgstr "Unclosed blocks (if/endif, menu/endmenu, choice/endchoice)"
 
-#: ../../development/kconfig_guide.rst:526 25d67fea9d694936a7ef8246c84ced24
+#: ../../development/kconfig_guide.rst:526 4f20a3329d72448684bb73965f02d7ad
 msgid "Missing source files"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:527 4adb5cc029f146fa9915fac664b7073f
+#: ../../development/kconfig_guide.rst:527 3bc803e71ad54e6383b305e69a171def
 msgid "Undefined symbols in dependencies"
 msgstr "未定义的符号 in dependencies"
 
-#: ../../development/kconfig_guide.rst:528 f840e9422178444ea97b2fa13d55abad
+#: ../../development/kconfig_guide.rst:528 27402be8289b46f18d3b0dc81f8a4b7d
 msgid "Invalid range constraints"
 msgstr "Invalid 范围约束"
 
-#: ../../development/kconfig_guide.rst:531 5b5a812d9bf1476fa9c020bc0a8e64c1
+#: ../../development/kconfig_guide.rst:531 75049efe63de467eb8c4be7d6d3c3d38
 msgid "Dependency Validation"
 msgstr "Dependency 验证"
 
-#: ../../development/kconfig_guide.rst:533 042e4923d9e4446187c2291e0d1de561
+#: ../../development/kconfig_guide.rst:533 62802fe162094914b76acdd7aa350291
 msgid "Check for:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:535 4996155810f0422d9d15763f6ad5f41d
+#: ../../development/kconfig_guide.rst:535 d106bd6f1ce0474ebf33fae59f6eee65
 msgid "Circular dependencies"
 msgstr "循环依赖"
 
-#: ../../development/kconfig_guide.rst:536 de8a4823247a4f61ade9e045b0c90de7
+#: ../../development/kconfig_guide.rst:536 91ed7f55a1de467893c063fb81e939fa
 msgid "Undefined symbols"
 msgstr "未定义的符号"
 
-#: ../../development/kconfig_guide.rst:537 f1cfab74dd0849ea8681f6536df4831b
+#: ../../development/kconfig_guide.rst:537 00d9d0c2a1974002939696d7a7ed63d2
 msgid "Conflicting dependencies"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:541 ca27991fc2af41ffb9f76e1c67b90c3e
+#: ../../development/kconfig_guide.rst:541 dd2c945260dd41ae81874e7dbcccccfe
 msgid ""
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Output:\n"
+"# Errors:\n"
+"#   Circular dependency: A -> B -> C -> A\n"
+"#   Undefined symbol: INVALID_SYMBOL"
 msgstr ""
+"python scripts/kconfig/validate_kconfig.py Kconfig\n"
+"\n"
+"# Output:\n"
+"# Errors:\n"
+"#   Circular dependency: A -> B -> C -> A\n"
+"#   Undefined symbol: INVALID_SYMBOL"
 
-#: ../../development/kconfig_guide.rst:551 edfedff00f024f2e8e56d46d9d96e93e
+#: ../../development/kconfig_guide.rst:551 bb0e8d08aeda4e0eac0bb04a0aa0009a
 msgid "Testing"
 msgstr "测试"
 
-#: ../../development/kconfig_guide.rst:554 eb2552fea14b42ee8f55139bac0ba2d0
+#: ../../development/kconfig_guide.rst:554 a46552f3aa9947f8945419f84a13bc3a
 msgid "Test Configuration"
 msgstr "Test 配置"
 
-#: ../../development/kconfig_guide.rst:556 848ebac8bfdf437caaaf0507f12cb388
+#: ../../development/kconfig_guide.rst:556 10be1f7076dd4df49caa6ef6432833f9
 msgid "Create test configurations:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:558 7ab214cdd577481abb8ada670a527753
+#: ../../development/kconfig_guide.rst:558 69b4bb496f4f47438e257be0fbaa5724
 msgid ""
+"# Test with minimal config\n"
+"echo \"CONFIG_PLATFORM_NATIVE=y\" > test.config\n"
+"python scripts/kconfig/generate_config.py --config test.config\n"
+"\n"
+"# Test with full config\n"
+"cp platforms/stm32/defconfig_stm32f4 test.config\n"
+"python scripts/kconfig/generate_config.py --config test.config"
 msgstr ""
+"# Test with minimal config\n"
+"echo \"CONFIG_PLATFORM_NATIVE=y\" > test.config\n"
+"python scripts/kconfig/generate_config.py --config test.config\n"
+"\n"
+"# Test with full config\n"
+"cp platforms/stm32/defconfig_stm32f4 test.config\n"
+"python scripts/kconfig/generate_config.py --config test.config"
 
-#: ../../development/kconfig_guide.rst:569 05b10179fe2d41e29cd59d9e7a139093
+#: ../../development/kconfig_guide.rst:569 3ab51f92e2a149d789591009a67c2d94
 msgid "Verify Generated Headers"
 msgstr "Verify 生成d Headers"
 
-#: ../../development/kconfig_guide.rst:571 96635b5580234faf970e11b8ecb2ec0a
+#: ../../development/kconfig_guide.rst:571 9e82d2689307481090e61a3cbb12f583
 msgid "Check generated headers:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:573 e4ff09026a6f4e69b633a1e511e0bcef
+#: ../../development/kconfig_guide.rst:573 470230dc6aa94bcc90cd41c00b9a9d81
 msgid ""
+"# Generate header\n"
+"python scripts/kconfig/generate_config.py --config .config\n"
+"\n"
+"# Verify macros\n"
+"grep \"NX_CONFIG_\" nexus_config.h"
 msgstr ""
+"# Generate header\n"
+"python scripts/kconfig/generate_config.py --config .config\n"
+"\n"
+"# Verify macros\n"
+"grep \"NX_CONFIG_\" nexus_config.h"
 
-#: ../../development/kconfig_guide.rst:582 8b2b8cd51fb5402f9cce92fbc303274c
+#: ../../development/kconfig_guide.rst:582 99a0dfc8e01c4248a33966ff3847b417
 msgid "Property-Based Testing"
 msgstr "Property-Based 测试"
 
-#: ../../development/kconfig_guide.rst:584 2f158754256140aea24b60c495f121bd
+#: ../../development/kconfig_guide.rst:584 c2e8bf6ce43b4e8788cb7de181bed3ce
 msgid "Write property tests for configuration:"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:586 26eac92ab100463bab95a8a62a64e7e9
+#: ../../development/kconfig_guide.rst:586 d8d65fdad8df44c4b7c7f47d2750c299
 msgid ""
+"from hypothesis import given, strategies as st\n"
+"from validate_kconfig import KconfigValidator\n"
+"\n"
+"@given(st.integers(min_value=9600, max_value=921600))\n"
+"def test_baudrate_range(baudrate):\n"
+"    \"\"\"Test that all valid baudrates are accepted\"\"\"\n"
+"    config = f\"CONFIG_UART1_BAUDRATE={baudrate}\"\n"
+"    # Validate configuration\n"
+"    assert validate_config(config)"
 msgstr ""
+"from hypothesis import given, strategies as st\n"
+"from validate_kconfig import KconfigValidator\n"
+"\n"
+"@given(st.integers(min_value=9600, max_value=921600))\n"
+"def test_baudrate_range(baudrate):\n"
+"    \"\"\"Test that all valid baudrates are accepted\"\"\"\n"
+"    config = f\"CONFIG_UART1_BAUDRATE={baudrate}\"\n"
+"    # Validate configuration\n"
+"    assert validate_config(config)"
 
-#: ../../development/kconfig_guide.rst:599 73c954f7ec9f4147bc2cc2610e4b7dad
+#: ../../development/kconfig_guide.rst:599 1cb03cecaa45489d9a8d8ec7c30918d8
 msgid "Best Practices"
 msgstr "最佳实践"
 
-#: ../../development/kconfig_guide.rst:602 48be9a99e66d443a9a2820dc9236f13d
+#: ../../development/kconfig_guide.rst:602 fcb87dfcd1ec44f1b87f68f658da2721
 msgid "Organization"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:604 a93a7183124a4e8bb8ef7d6be44f3116
+#: ../../development/kconfig_guide.rst:604 eb270f20448c48f6b93ca0981456a3b5
 msgid "**Group related options** in menus"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:605 ccb25b64ffc54b7a8f6ea93223f7530b
+#: ../../development/kconfig_guide.rst:605 a9d6ac6fe06246a1a825e8b2501bc00e
 msgid "**Use menuconfig** for enable + settings pattern"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:606 14d9992a3c8e40879b1ddaf6c2d3fdad
+#: ../../development/kconfig_guide.rst:606 ffb7754d9273419d8995a2b6b56ab9e6
 msgid "**Keep files focused** on single component"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:607 91849d07e30844339758ff014af126f3
+#: ../../development/kconfig_guide.rst:607 ae7867293d034ff7812863c46ac1dce9
 msgid "**Use consistent naming** across platforms"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:610 ad4ce77264d24da7bb8a210191c5e448
+#: ../../development/kconfig_guide.rst:610 f3e211daf4214c95bbb7215f500d0599
 msgid "Documentation"
-msgstr ""
+msgstr "文档"
 
-#: ../../development/kconfig_guide.rst:612 f3213cad2dbb4aee818cc7fee4d22f76
+#: ../../development/kconfig_guide.rst:612 2049e3c237334cb39924668534fbea56
 msgid "**Always provide help text**"
-msgstr ""
+msgstr "**Always provide help text**"
 
-#: ../../development/kconfig_guide.rst:613 0c861c7d3b1a4a678cd4bd0daf340df1
+#: ../../development/kconfig_guide.rst:613 ccc6838e4f62468c8fd6fbb7c51cb2d3
 msgid "**Document valid ranges**"
-msgstr ""
+msgstr "**Document valid ranges**"
 
-#: ../../development/kconfig_guide.rst:614 f325a0f3f84641c4aa6d0fc9abc6fe5d
+#: ../../development/kconfig_guide.rst:614 4b38c718a9c945daa305c4ee5a2a43bc
 msgid "**Include examples** for complex options"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:615 9d243b2584774ad39a5ac2bca9760965
+#: ../../development/kconfig_guide.rst:615 b3e2bc0b91384ef193ca8a92b5a3f68c
 msgid "**Explain dependencies**"
-msgstr ""
+msgstr "**Explain dependencies**"
 
-#: ../../development/kconfig_guide.rst:620 50e237f5ebd540a6b1702ee12d95bedd
+#: ../../development/kconfig_guide.rst:620 f94fc4e7843940499291a888efea6f01
 msgid "**Prefer depends on** over select"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:621 f5a6d7415f374a6a87dacacc64d91652
+#: ../../development/kconfig_guide.rst:621 4da20f27a98840bd9e6bd56b68e12a02
 msgid "**Avoid circular dependencies**"
-msgstr ""
+msgstr "**Avoid circular dependencies**"
 
-#: ../../development/kconfig_guide.rst:622 d2520e6dd5eb45deace92b9caf228708
+#: ../../development/kconfig_guide.rst:622 b3ba23c846794ceaa09be7dd35d8e6e1
 msgid "**Keep dependency chains short**"
-msgstr ""
+msgstr "**Keep dependency chains short**"
 
-#: ../../development/kconfig_guide.rst:623 9cdcafcc6ef1436f8815c9ea8eec82d6
+#: ../../development/kconfig_guide.rst:623 a26d5b012a194a51986ad1cd0dc0518e
 msgid "**Document why dependencies exist**"
-msgstr ""
+msgstr "**Document why dependencies exist**"
 
-#: ../../development/kconfig_guide.rst:626 3f0f870a60454485a95c2f35f211e06b
+#: ../../development/kconfig_guide.rst:626 4643d7db51574ced8a75c7c9447e2ed6
 msgid "Defaults"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:628 1e554b248f62438e8db0129126a46ccb
+#: ../../development/kconfig_guide.rst:628 c8efdc7c46ae438ba71646e9b95c48e7
 msgid "**Provide sensible defaults**"
-msgstr ""
+msgstr "**Provide sensible defaults**"
 
-#: ../../development/kconfig_guide.rst:629 226a01d517374add817491fb7da3f920
+#: ../../development/kconfig_guide.rst:629 e4bf7c9c406840189c4249ad1995967c
 msgid "**Use conditional defaults** for platform-specific values"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:630 204ad1c592024e95835f6de17e87f11d
+#: ../../development/kconfig_guide.rst:630 c5fb0a357e4e4177b68afa1a4ac2b175
 msgid "**Document default rationale** in help text"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:635 63526c34132d4ebdbeb7c0af9c59d68e
+#: ../../development/kconfig_guide.rst:635 ba9f1f6a94c04abf8deabc0a20b8654e
 msgid "**Use range constraints** for integers"
 msgstr "**Use 范围约束** for 整数s"
 
-#: ../../development/kconfig_guide.rst:636 b6f83c7718f3462289cad0a97c068884
+#: ../../development/kconfig_guide.rst:636 2a9f284c137a4f6e9d8bd80eaffb931d
 msgid "**Validate before committing**"
 msgstr "**验证 before committing**"
 
-#: ../../development/kconfig_guide.rst:637 38f44e253adf46d885e1ead0c8e7dcae
+#: ../../development/kconfig_guide.rst:637 5e6a70c3e0d845aea5f80c72e799a5eb
 msgid "**Test with multiple configurations**"
-msgstr ""
+msgstr "**Test with multiple configurations**"
 
-#: ../../development/kconfig_guide.rst:638 def2689f5dbb436db13ad81cd59beb52
+#: ../../development/kconfig_guide.rst:638 8303b76d1ea6443ca52f2d21ea6be7e9
 msgid "**Check generated headers**"
-msgstr ""
+msgstr "**Check generated headers**"
 
-#: ../../development/kconfig_guide.rst:641 1ffc0deebd74420886651fdb5b771a30
+#: ../../development/kconfig_guide.rst:641 d9a5364306d64e26aab31a11bd5a8e9e
 msgid "Common Pitfalls"
 msgstr "常见陷阱"
 
-#: ../../development/kconfig_guide.rst:644 9cf1a393e4a644ddbf438af6e65306d3
+#: ../../development/kconfig_guide.rst:644 01f2c9ab6d964119ba63ab06050bf68f
 msgid "Circular Dependencies"
 msgstr "Circular 依赖"
 
-#: ../../development/kconfig_guide.rst:646
-#: ../../development/kconfig_guide.rst:672
-#: ../../development/kconfig_guide.rst:693
-#: ../../development/kconfig_guide.rst:715 161d56d4161b4ce9b359adf407680ac0
-#: 5bdc3d6123ed4bd7ae6b001873088b44 7bf22d49beb9465684e0ee82ce692112
-#: c447152ca52d4a7881260e9853d78675
+#: d0a393b546e548988a85ac6a1b4bb3e8
 msgid "**Bad:**"
-msgstr ""
+msgstr "**Bad:**"
 
-#: ../../development/kconfig_guide.rst:648 8d79772448f54d8ebeab813b660448fa
+#: ../../development/kconfig_guide.rst:648 b393bfe17586416b8014bc224cd82451
 msgid ""
+"config A\n"
+"    bool \"Feature A\"\n"
+"    depends on B\n"
+"\n"
+"config B\n"
+"    bool \"Feature B\"\n"
+"    depends on A"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:658
-#: ../../development/kconfig_guide.rst:682
-#: ../../development/kconfig_guide.rst:701
-#: ../../development/kconfig_guide.rst:725 3de2c81882e54449944f6ca4150cfc47
-#: 5094ccf3acc243f6a29627b97d9afe17 b3d298ae1c764dcc980083f366394912
-#: e7457e515b07476693dd93c2a87b1cdf
+#: dae2b97408f2400a8e4a960d30b1ebd5
 msgid "**Good:**"
-msgstr ""
+msgstr "**Good:**"
 
-#: ../../development/kconfig_guide.rst:660 de6df38e95cf42c7a328a96daf320c29
+#: ../../development/kconfig_guide.rst:660 9b56a5495d8e43a1bcb9f8d4246c552d
 msgid ""
+"config A\n"
+"    bool \"Feature A\"\n"
+"\n"
+"config B\n"
+"    bool \"Feature B\"\n"
+"    depends on A"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:670 f503e1b3245442eb99623ff32ab1db0c
+#: ../../development/kconfig_guide.rst:670 3a9c45895dd64034a443bd5a8ecc4bb6
 msgid "Overuse of select"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:674 9eb8a20598ac4b71a1ed81c984b6f5b5
+#: ../../development/kconfig_guide.rst:674 00e6ffff171b4a51b36d0bb7a8927a5f
 msgid ""
+"config FEATURE\n"
+"    bool \"Feature\"\n"
+"    select DEPENDENCY1\n"
+"    select DEPENDENCY2\n"
+"    select DEPENDENCY3"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:684 077af827ba6244759687fa82c79f4c73
+#: ../../development/kconfig_guide.rst:684 c89b9d9b925b4e1da80c62fad2c809ac
 msgid ""
+"config FEATURE\n"
+"    bool \"Feature\"\n"
+"    depends on DEPENDENCY1 && DEPENDENCY2 && DEPENDENCY3"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:691 56dbd66150e64ec78c0bef3805b7f25f
+#: ../../development/kconfig_guide.rst:691 5466b6d0bc0344f28caf352465680a3e
 msgid "Missing Help Text"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:703 d2b08d93eb13494c82b75e9376730028
+#: ../../development/kconfig_guide.rst:703 05ccde063b51456ea4dd8d982bdcac20
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"      Common values: 9600, 19200, 38400, 57600, 115200"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:713 3649fa03004e43f0b3ffef5b18bdbfff
+#: ../../development/kconfig_guide.rst:713 4914e866229c4ffa926ed2a3d9c3aa6a
 msgid "Inconsistent Naming"
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:717 650255103d9b4fd5a901e6ee406fdb08
+#: ../../development/kconfig_guide.rst:717 f2a6873d5f974702881b0166b2e6f20d
 msgid ""
+"config UART1_BAUD\n"
+"    int \"UART1 baud rate\"\n"
+"\n"
+"config UART2_BAUDRATE\n"
+"    int \"UART2 baud rate\""
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:727 43840d5fb1f14b3da541527ce679b075
+#: ../../development/kconfig_guide.rst:727 45761b30b9a44f88976fcdbe9568b055
 msgid ""
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"\n"
+"config UART2_BAUDRATE\n"
+"    int \"UART2 baud rate\""
 msgstr ""
 
-#: ../../development/kconfig_guide.rst:736 76712b31fddb47ec9e8824059365338c
+#: ../../development/kconfig_guide.rst:736 99755d5ef15f4a58aeb53a41940e0f9c
 msgid "Examples"
 msgstr "示例"
 
-#: ../../development/kconfig_guide.rst:739 e73f1e4d55164341aedbd86b71eb1bba
+#: ../../development/kconfig_guide.rst:739 d2a8343a19ac4ce18ed328338da31d33
 msgid "Complete Platform Configuration"
 msgstr "Complete 平台配置"
 
-#: ../../development/kconfig_guide.rst:741 824542762e6a451cb8102b8ae8e6c39c
+#: ../../development/kconfig_guide.rst:741 580c2694620f4b569ed152d291ab2e32
 msgid ""
+"# platforms/stm32/Kconfig\n"
+"if PLATFORM_STM32\n"
+"\n"
+"config STM32_PLATFORM_NAME\n"
+"    string\n"
+"    default \"STM32 Platform\"\n"
+"\n"
+"config STM32_PLATFORM_VERSION\n"
+"    string\n"
+"    default \"1.0.0\"\n"
+"\n"
+"# Chip selection\n"
+"source \"platforms/stm32/Kconfig_chip\"\n"
+"\n"
+"menu \"STM32 Platform Settings\"\n"
+"\n"
+"config STM32_ENABLE_LOGGING\n"
+"    bool \"Enable platform logging\"\n"
+"    default y\n"
+"\n"
+"config STM32_LOG_LEVEL\n"
+"    int \"Platform log level\"\n"
+"    default 3\n"
+"    range 0 4\n"
+"    depends on STM32_ENABLE_LOGGING\n"
+"\n"
+"endmenu\n"
+"\n"
+"# Peripheral configuration\n"
+"source \"platforms/stm32/Kconfig_peripherals\"\n"
+"\n"
+"endif # PLATFORM_STM32"
 msgstr ""
-"# platforms/stm32/Kconfig\n\n"
-"if PLATFORM_STM32\n\n"
-"\n\n"
-"config STM32_PLATFORM_NAME\n\n"
-"    string\n\n"
-"    default \STM32 Platform\\n\n"
-"\n\n"
-"config STM32_PLATFORM_VERSION\n\n"
-"    string\n\n"
-"    default \1.0.0\\n\n"
-"\n\n"
-"# 芯片选择\n\n"
-"source \platforms/stm32/Kconfig_chip\\n\n"
-"\n\n"
-"menu \STM32 Platform Settings\\n\n"
-"\n\n"
-"config STM32_ENABLE_LOGGING\n\n"
-"    bool \Enable platform logging\\n\n"
-"    default y\n\n"
-"\n\n"
-"config STM32_LOG_LEVEL\n\n"
-"    int \Platform log level\\n\n"
-"    default 3\n\n"
-"    range 0 4\n\n"
-"    depends on STM32_ENABLE_LOGGING\n\n"
-"\n\n"
-"endmenu\n\n"
-"\n\n"
-"# 外设配置uration\n\n"
-"source \platforms/stm32/Kconfig_peripherals\\n\n"
-"\n\n"
-"endif # PLATFORM_STM32\n"
+"# platforms/stm32/Kconfig\n"
+"if PLATFORM_STM32\n"
+"\n"
+"config STM32_PLATFORM_NAME\n"
+"    string\n"
+"    default \"STM32 Platform\"\n"
+"\n"
+"config STM32_PLATFORM_VERSION\n"
+"    string\n"
+"    default \"1.0.0\"\n"
+"\n"
+"# Chip selection\n"
+"source \"platforms/stm32/Kconfig_chip\"\n"
+"\n"
+"menu \"STM32 Platform Settings\"\n"
+"\n"
+"config STM32_ENABLE_LOGGING\n"
+"    bool \"Enable platform logging\"\n"
+"    default y\n"
+"\n"
+"config STM32_LOG_LEVEL\n"
+"    int \"Platform log level\"\n"
+"    default 3\n"
+"    range 0 4\n"
+"    depends on STM32_ENABLE_LOGGING\n"
+"\n"
+"endmenu\n"
+"\n"
+"# Peripheral configuration\n"
+"source \"platforms/stm32/Kconfig_peripherals\"\n"
+"\n"
+"endif # PLATFORM_STM32"
 
-#: ../../development/kconfig_guide.rst:777 bd5c6b7e77b945b7bdd76cd3a89466aa
+#: ../../development/kconfig_guide.rst:777 82ffa9703d5647e8b0ed5352706eeee5
 msgid "Complete Peripheral Configuration"
 msgstr "Complete 外设配置"
 
-#: ../../development/kconfig_guide.rst:779 c8b09635bd4d490f9bf981f38878ddf2
+#: ../../development/kconfig_guide.rst:779 5d7388aabb30429e9dadb0684edc0293
 msgid ""
+"# platforms/stm32/src/uart/Kconfig\n"
+"config STM32_UART_MAX_INSTANCES\n"
+"    int \"Maximum UART instances\"\n"
+"    default 6\n"
+"    range 1 8\n"
+"\n"
+"menuconfig INSTANCE_STM32_UART_1\n"
+"    bool \"Enable UART1\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_STM32_UART_1\n"
+"\n"
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"\n"
+"config UART1_DATA_BITS\n"
+"    int \"UART1 data bits\"\n"
+"    default 8\n"
+"    range 7 9\n"
+"\n"
+"choice\n"
+"    prompt \"UART1 transfer mode\"\n"
+"    default UART1_MODE_DMA\n"
+"\n"
+"config UART1_MODE_POLLING\n"
+"    bool \"Polling\"\n"
+"\n"
+"config UART1_MODE_INTERRUPT\n"
+"    bool \"Interrupt\"\n"
+"\n"
+"config UART1_MODE_DMA\n"
+"    bool \"DMA\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"config UART1_MODE_VALUE\n"
+"    int\n"
+"    default 0 if UART1_MODE_POLLING\n"
+"    default 1 if UART1_MODE_INTERRUPT\n"
+"    default 2 if UART1_MODE_DMA\n"
+"\n"
+"config UART1_TX_BUFFER_SIZE\n"
+"    int \"UART1 TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"config UART1_RX_BUFFER_SIZE\n"
+"    int \"UART1 RX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"endif # INSTANCE_STM32_UART_1"
 msgstr ""
+"# platforms/stm32/src/uart/Kconfig\n"
+"config STM32_UART_MAX_INSTANCES\n"
+"    int \"Maximum UART instances\"\n"
+"    default 6\n"
+"    range 1 8\n"
+"\n"
+"menuconfig INSTANCE_STM32_UART_1\n"
+"    bool \"Enable UART1\"\n"
+"    default y\n"
+"\n"
+"if INSTANCE_STM32_UART_1\n"
+"\n"
+"config UART1_BAUDRATE\n"
+"    int \"UART1 baud rate\"\n"
+"    default 115200\n"
+"    help\n"
+"      Baud rate for UART1 in bits per second.\n"
+"\n"
+"config UART1_DATA_BITS\n"
+"    int \"UART1 data bits\"\n"
+"    default 8\n"
+"    range 7 9\n"
+"\n"
+"choice\n"
+"    prompt \"UART1 transfer mode\"\n"
+"    default UART1_MODE_DMA\n"
+"\n"
+"config UART1_MODE_POLLING\n"
+"    bool \"Polling\"\n"
+"\n"
+"config UART1_MODE_INTERRUPT\n"
+"    bool \"Interrupt\"\n"
+"\n"
+"config UART1_MODE_DMA\n"
+"    bool \"DMA\"\n"
+"\n"
+"endchoice\n"
+"\n"
+"config UART1_MODE_VALUE\n"
+"    int\n"
+"    default 0 if UART1_MODE_POLLING\n"
+"    default 1 if UART1_MODE_INTERRUPT\n"
+"    default 2 if UART1_MODE_DMA\n"
+"\n"
+"config UART1_TX_BUFFER_SIZE\n"
+"    int \"UART1 TX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"config UART1_RX_BUFFER_SIZE\n"
+"    int \"UART1 RX buffer size\"\n"
+"    default 256\n"
+"    range 16 4096\n"
+"\n"
+"endif # INSTANCE_STM32_UART_1"
 
-#: ../../development/kconfig_guide.rst:838 4dbf6f2a3aa24a70bbaa6328d7a777d2
+#: ../../development/kconfig_guide.rst:838 19ab952abf9e4a6a9425d97c06ff27a4
 msgid "See Also"
-msgstr ""
+msgstr "另请参阅"
 
-#: ../../development/kconfig_guide.rst:840 1a6b71888a134c02afea3e2d43072742
+#: ../../development/kconfig_guide.rst:840 7fae324419c8433994b96c9b575c97b6
 msgid ":doc:`../user_guide/kconfig` - Kconfig user guide"
-msgstr ""
+msgstr ":doc:`../user_guide/kconfig` - Kconfig user guide"
 
-#: ../../development/kconfig_guide.rst:841 4ba2715929e4445da713267422437406
+#: ../../development/kconfig_guide.rst:841 f2ac694d7089450baf2b52fd371812b0
 msgid ":doc:`../api/kconfig_tools` - Kconfig tools API"
-msgstr ""
+msgstr ":doc:`../api/kconfig_tools` - Kconfig tools API"
 
-#: ../../development/kconfig_guide.rst:842 fcad3c8ca52c417093cc9b28cbb0f550
+#: ../../development/kconfig_guide.rst:842 fe5fc33eaff44f0b9ed12e448296c527
 msgid ":doc:`contributing` - Contributing guidelines"
-msgstr ""
+msgstr ":doc:`contributing` - Contributing guidelines"
 
-#: ../../development/kconfig_guide.rst:843 e2773812e37a47008bf26c51b52ac84c
+#: ../../development/kconfig_guide.rst:843 195a74a3d82c443bae7750724b4ebaf1
 msgid "Configuration Guide: ``docs/configuration_guide.md``"
 msgstr "配置 Guide: ``docs/configuration_guide.md``"
 
-#: ../../development/kconfig_guide.rst:844 fd7e1a76c86449988d9dc26b8c232379
+#: ../../development/kconfig_guide.rst:844 f21918a541e24d6c8ec4ff58eb2dd8b2
 msgid "Kconfig Writing Guide: ``docs/kconfig_writing_guide.md``"
 msgstr ""
-

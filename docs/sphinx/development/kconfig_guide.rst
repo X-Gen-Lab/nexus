@@ -30,7 +30,7 @@ Basic Syntax
 Configuration Symbol
 ^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config SYMBOL_NAME
         bool "Human-readable description"
@@ -48,7 +48,7 @@ Configuration Symbol
 
 **Example:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -63,7 +63,7 @@ Menu Configuration
 
 ``menuconfig`` creates a configuration symbol that also opens a submenu:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menuconfig UART_ENABLE
         bool "Enable UART support"
@@ -85,7 +85,7 @@ Choice Menu
 
 ``choice`` creates mutually exclusive options:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     choice
         prompt "Target Platform"
@@ -109,7 +109,7 @@ Regular Menu
 
 ``menu`` groups related options without creating a symbol:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menu "System Parameters"
 
@@ -133,7 +133,7 @@ depends on
 
 ``depends on`` makes an option visible only when dependencies are met:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_DMA_ENABLE
         bool "Enable DMA for UART1"
@@ -152,7 +152,7 @@ depends on
 
 **Example:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config ADVANCED_FEATURE
         bool "Advanced feature"
@@ -164,7 +164,7 @@ select
 
 ``select`` automatically enables dependencies:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config USB_DEVICE
         bool "USB Device support"
@@ -180,7 +180,7 @@ Conditional Inclusion
 
 ``if/endif`` blocks conditionally include configuration options:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     if PLATFORM_STM32
 
@@ -188,7 +188,7 @@ Conditional Inclusion
         string "STM32 chip name"
         default "STM32F407xx"
 
-    source "platforms/stm32/Kconfig_chip"
+    source "platforms/STM32/Kconfig_chip"
 
     endif # PLATFORM_STM32
 
@@ -198,7 +198,7 @@ Default Values
 Simple Defaults
 ^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -209,7 +209,7 @@ Conditional Defaults
 
 Defaults can depend on other options:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config HEAP_SIZE
         int "Heap size (bytes)"
@@ -222,13 +222,13 @@ Defaults can depend on other options:
 Expression Defaults
 ^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config PLATFORM_NAME
         string
         default "native" if PLATFORM_NATIVE
-        default "stm32" if PLATFORM_STM32
-        default "gd32" if PLATFORM_GD32
+        default "STM32" if PLATFORM_STM32
+        default "GD32" if PLATFORM_GD32
 
 Range Constraints
 -----------------
@@ -236,7 +236,7 @@ Range Constraints
 Integer Ranges
 ^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config BUFFER_SIZE
         int "Buffer size"
@@ -248,7 +248,7 @@ Integer Ranges
 Conditional Ranges
 ^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config STACK_SIZE
         int "Stack size (bytes)"
@@ -259,7 +259,7 @@ Conditional Ranges
 Hexadecimal Values
 ^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config RAM_START
         hex "RAM start address"
@@ -274,10 +274,10 @@ source Directive
 
 ``source`` includes a file with absolute or relative path:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     # Absolute path from project root
-    source "platforms/stm32/Kconfig"
+    source "platforms/STM32/Kconfig"
 
     # Relative path
     source "Kconfig_chip"
@@ -287,12 +287,12 @@ rsource Directive
 
 ``rsource`` includes a file with path relative to current file:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     # In platforms/Kconfig
     rsource "native/Kconfig"
-    rsource "stm32/Kconfig"
-    rsource "gd32/Kconfig"
+    rsource "STM32/Kconfig"
+    rsource "GD32/Kconfig"
 
 **Best Practice:** Use ``rsource`` for platform-specific includes.
 
@@ -356,7 +356,7 @@ Prompt Text
 
 **Examples:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"  # Good
@@ -377,7 +377,7 @@ Help Text
 
 **Example:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -401,7 +401,7 @@ Platform Configuration
 
 **Pattern:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     # Platform selection (choice)
     choice
@@ -431,7 +431,7 @@ Peripheral Configuration
 
 **Pattern:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     # Peripheral enable (menuconfig)
     menuconfig <PLATFORM>_<PERIPHERAL>_ENABLE
@@ -463,11 +463,11 @@ Peripheral Configuration
     endif
 
 Transfer Mode Selection
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 **Pattern:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     choice
         prompt "Transfer mode"
@@ -496,7 +496,7 @@ Buffer Configuration
 
 **Pattern:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config <PERIPHERAL><N>_TX_BUFFER_SIZE
         int "TX buffer size"
@@ -518,7 +518,7 @@ Always validate Kconfig files:
 
 .. code-block:: bash
 
-    python scripts/kconfig/validate_kconfig.py Kconfig
+    python scripts/Kconfig/validate_kconfig.py Kconfig
 
 **Common errors:**
 
@@ -540,7 +540,7 @@ Check for:
 
 .. code-block:: bash
 
-    python scripts/kconfig/validate_kconfig.py Kconfig
+    python scripts/Kconfig/validate_kconfig.py Kconfig
 
     # Output:
     # Errors:
@@ -559,21 +559,21 @@ Create test configurations:
 
     # Test with minimal config
     echo "CONFIG_PLATFORM_NATIVE=y" > test.config
-    python scripts/kconfig/generate_config.py --config test.config
+    python scripts/Kconfig/generate_config.py --config test.config
 
     # Test with full config
-    cp platforms/stm32/defconfig_stm32f4 test.config
-    python scripts/kconfig/generate_config.py --config test.config
+    cp platforms/STM32/defconfig_stm32f4 test.config
+    python scripts/Kconfig/generate_config.py --config test.config
 
 Verify Generated Headers
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Check generated headers:
 
 .. code-block:: bash
 
     # Generate header
-    python scripts/kconfig/generate_config.py --config .config
+    python scripts/Kconfig/generate_config.py --config .config
 
     # Verify macros
     grep "NX_CONFIG_" nexus_config.h
@@ -645,7 +645,7 @@ Circular Dependencies
 
 **Bad:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config A
         bool "Feature A"
@@ -657,7 +657,7 @@ Circular Dependencies
 
 **Good:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config A
         bool "Feature A"
@@ -671,7 +671,7 @@ Overuse of select
 
 **Bad:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config FEATURE
         bool "Feature"
@@ -681,7 +681,7 @@ Overuse of select
 
 **Good:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config FEATURE
         bool "Feature"
@@ -692,7 +692,7 @@ Missing Help Text
 
 **Bad:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -700,7 +700,7 @@ Missing Help Text
 
 **Good:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -714,7 +714,7 @@ Inconsistent Naming
 
 **Bad:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUD
         int "UART1 baud rate"
@@ -724,7 +724,7 @@ Inconsistent Naming
 
 **Good:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -736,11 +736,11 @@ Examples
 --------
 
 Complete Platform Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
-    # platforms/stm32/Kconfig
+    # platforms/STM32/Kconfig
     if PLATFORM_STM32
 
     config STM32_PLATFORM_NAME
@@ -752,7 +752,7 @@ Complete Platform Configuration
         default "1.0.0"
 
     # Chip selection
-    source "platforms/stm32/Kconfig_chip"
+    source "platforms/STM32/Kconfig_chip"
 
     menu "STM32 Platform Settings"
 
@@ -769,16 +769,16 @@ Complete Platform Configuration
     endmenu
 
     # Peripheral configuration
-    source "platforms/stm32/Kconfig_peripherals"
+    source "platforms/STM32/Kconfig_peripherals"
 
     endif # PLATFORM_STM32
 
 Complete Peripheral Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
-    # platforms/stm32/src/uart/Kconfig
+    # platforms/STM32/src/uart/Kconfig
     config STM32_UART_MAX_INSTANCES
         int "Maximum UART instances"
         default 6

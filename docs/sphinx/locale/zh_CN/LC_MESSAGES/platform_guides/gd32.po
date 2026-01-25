@@ -1,0 +1,1323 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../platform_guides/gd32.rst:2 24c8525e5b064e16af7662706fe186e1
+msgid "GD32 Platform Guide"
+msgstr "GD32 平台 Guide"
+
+#: ../../platform_guides/gd32.rst:5 17ec8d0da0e94560a0f83dbca8db6cb8
+msgid "Overview"
+msgstr "概述"
+
+#: ../../platform_guides/gd32.rst:7 cfadba3a08da435cbebd6f43c809ac58
+msgid ""
+"The GD32 platform provides support for GD32 series microcontrollers from "
+"GigaDevice Semiconductor. GD32 MCUs are ARM Cortex-M based microcontrollers "
+"that offer high performance and cost-effectiveness, with many variants "
+"compatible with STM32 series."
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:9 bc0749727a1b43aeb86f1758972674dc
+msgid "**Supported Variants:**"
+msgstr "**Supported Variants:**"
+
+#: ../../platform_guides/gd32.rst:11 f7374835839146189f0dc93cbd0b3eb4
+msgid "GD32F103 (STM32F1 compatible)"
+msgstr "GD32F103 (STM32F1 compatible)"
+
+#: ../../platform_guides/gd32.rst:12 be8b076148e34f7cb862cb5e6ebb0f4a
+msgid "GD32F303 (STM32F3 compatible)"
+msgstr "GD32F303 (STM32F3 compatible)"
+
+#: ../../platform_guides/gd32.rst:13 e3321609c57a4a55961064afafbab88c
+msgid "GD32F407 (STM32F4 compatible)"
+msgstr "GD32F407 (STM32F4 compatible)"
+
+#: ../../platform_guides/gd32.rst:15 57325d97a3174d4f890a0ee1cc789a52
+msgid "**Key Features:**"
+msgstr "**Key Features:**"
+
+#: ../../platform_guides/gd32.rst:17 035e98ecf5f0425e813fac9304e12902
+msgid "ARM Cortex-M3/M4 cores"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:18 5b3ea3074772442aa0e2850aaf14c684
+msgid "Up to 120 MHz operation"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:19 ca285d52d63549a994f81d955d300494
+msgid "Up to 3 MB Flash, 256 KB SRAM"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:20 fccc872cbe8041d9ad9f293c0861dc50
+msgid "Rich peripheral set"
+msgstr "丰富的外设集"
+
+#: ../../platform_guides/gd32.rst:21 9431ca06b1ba4fb3a007fbf2c69dc0cd
+msgid "Cost-effective alternative to STM32"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:22 7c3303f508684b62811e18077202f526
+msgid "Pin-compatible with STM32 variants"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:23 8ff30145086f44538f2ef867a247a4a7
+msgid "FreeRTOS integration"
+msgstr "FreeRTOS 集成"
+
+#: ../../platform_guides/gd32.rst:26 0d49c33f5f6248359a062474937993b9
+msgid "Platform Capabilities"
+msgstr "平台 Capabilities"
+
+#: ../../platform_guides/gd32.rst:29 01c2d206710d47bf9b004f81be88ce4a
+msgid "Supported Peripherals"
+msgstr "支持 Peripherals"
+
+#: ../../platform_guides/gd32.rst:31 9441950320e24434bacf16baebcd2a9f
+msgid "The GD32 platform supports the following peripherals:"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:37 feefb6351af94a239263a6de908000af
+msgid "Peripheral"
+msgstr "外设"
+
+#: ../../platform_guides/gd32.rst:38 d83b110f3c734453b48f9cc08aa536b1
+msgid "Max Instances"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:39 65335c47aa184f929079f422bc31c5fb
+msgid "Capabilities"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:40 bbaf40e9c2d1410fb4c5e47b53856232
+msgid "UART/USART"
+msgstr "UART/USART"
+
+#: ../../platform_guides/gd32.rst:41 79042e4158d84804bc3cdebb4ab88e69
+msgid "5"
+msgstr "5"
+
+#: ../../platform_guides/gd32.rst:42 f122c892d6cf48a988070485d1243dd1
+msgid "Async/Sync TX/RX, DMA, hardware flow control"
+msgstr "异步/同步 TX/RX、DMA、硬件流控制"
+
+#: ../../platform_guides/gd32.rst:43 45620e5a00fb4361a7019eef502cc75c
+msgid "GPIO"
+msgstr "GPIO"
+
+#: ../../platform_guides/gd32.rst:44 4265bfd50d0d46db83acf66fd777a08c
+msgid "16 pins per port"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:45 6c16913235ed4a1f94425183b81db651
+msgid "Input/Output, alternate functions, interrupts"
+msgstr "输入/输出、复用功能、中断"
+
+#: ../../platform_guides/gd32.rst:46 ed2dc017168f4371ae0a81d1fd3effa0
+msgid "SPI"
+msgstr "SPI"
+
+#: d1c7245b42d34cfa81e7d7e34d8adaa4 e59f876324b4461ba9a1294da97bbfae
+msgid "3"
+msgstr "3"
+
+#: ../../platform_guides/gd32.rst:48 363f6f938b64423cb1cab035bf46ab19
+msgid "Master/Slave, DMA, NSS management"
+msgstr "主/从模式、DMA、NSS 管理"
+
+#: ../../platform_guides/gd32.rst:49 e227c03f292942269cd0b8e579942bec
+msgid "I2C"
+msgstr "I2C"
+
+#: 382692dbddaa4e8695b3748a82103bff fc92aa7f42784c43872e7338636c9111
+msgid "2"
+msgstr "2"
+
+#: ../../platform_guides/gd32.rst:51 37ecf0608aea4358b2733520f52de918
+msgid "Master/Slave, DMA, 10-bit addressing"
+msgstr "主/从模式、DMA、10 位寻址"
+
+#: ../../platform_guides/gd32.rst:52 8f10d4af72214b518b4f693d32d9792c
+msgid "Timer"
+msgstr "定时器"
+
+#: ../../platform_guides/gd32.rst:53 2c0cf97ca2e44fd781390d52b861a93f
+msgid "14"
+msgstr "14"
+
+#: ../../platform_guides/gd32.rst:54 f081e41f4e7a4a008f96fa37e5aa329c
+msgid "General-purpose, advanced, basic timers"
+msgstr "通用定时器、高级定时器、基本定时器"
+
+#: ../../platform_guides/gd32.rst:55 eb3dd8f593f241559d64da0de72d3dfc
+msgid "ADC"
+msgstr "ADC"
+
+#: ../../platform_guides/gd32.rst:57 700eced372d0492b943f139c16b6fd65
+msgid "12-bit resolution, DMA, multi-channel"
+msgstr "12 位分辨率、DMA、多通道"
+
+#: ../../platform_guides/gd32.rst:58 e8080e50a48b4bb582c5ec44f630b987
+msgid "DAC"
+msgstr "DAC"
+
+#: ../../platform_guides/gd32.rst:60 1bfce60da1284724996a89337f39337a
+msgid "12-bit resolution, DMA"
+msgstr "12 位分辨率、DMA"
+
+#: ../../platform_guides/gd32.rst:61 23758f28f1694f009c6ed7dd3d05813c
+msgid "CAN"
+msgstr "CAN"
+
+#: ../../platform_guides/gd32.rst:63 3925c7c605884bdc986716719b3aae1a
+msgid "CAN 2.0A/B, up to 1 Mbps"
+msgstr "CAN 2.0A/B，最高 1 Mbps"
+
+#: ../../platform_guides/gd32.rst:64 c197db3321c94457927abda9707b6177
+msgid "USB"
+msgstr "USB"
+
+#: ../../platform_guides/gd32.rst:66 e8c3256a0f4e44938c46d95a43341163
+msgid "USB OTG FS/HS"
+msgstr "USB OTG FS/HS"
+
+#: ../../platform_guides/gd32.rst:67 6e79049fcabf4d9e8edb97f6a416c754
+msgid "SDIO"
+msgstr "SDIO"
+
+#: 5990493f19474ff7a46219c549d11535 821e8202a0844b979b3d25fb2479ba27
+msgid "1"
+msgstr "1"
+
+#: ../../platform_guides/gd32.rst:69 a3adc2aab6fd4853b3f0f0ab0c897a24
+msgid "SD/MMC card interface"
+msgstr "SD/MMC 卡接口"
+
+#: ../../platform_guides/gd32.rst:70 508efa3d76f7479dad14825f612d12b7
+msgid "RTC"
+msgstr "RTC"
+
+#: ../../platform_guides/gd32.rst:72 7538c559482746f7b8153c28e84b1525
+msgid "Calendar, alarm, tamper detection"
+msgstr "日历、闹钟、篡改检测"
+
+#: ../../platform_guides/gd32.rst:73 d177dd8584b14cb3993568beb7346d4c
+msgid "Watchdog"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:75 7f2fca1e29ed4dbd8d060d67c8d35fa1
+msgid "Independent and window watchdog"
+msgstr "独立看门狗和窗口看门狗"
+
+#: ../../platform_guides/gd32.rst:78 66a68467329a4da1bfc4184d5686efb6
+msgid "Platform Limitations"
+msgstr "平台 Limitations"
+
+#: ../../platform_guides/gd32.rst:80 ec92a2a7542f4438881f08b270110432
+msgid ""
+"**STM32 Compatibility**: While largely compatible, some differences exist"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:81 f2762b43bc3746ab80e2c51486a54fa1
+msgid "**Documentation**: Less comprehensive than STM32 documentation"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:82 a5e1cdf285d24299b4e9e3e4ec69104e
+msgid "**Tooling**: Fewer third-party tools and libraries"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:83 37c7d2a07dc34a87bdcf7fd6702644c0
+msgid ""
+"**Peripheral Differences**: Some peripherals have subtle differences from "
+"STM32"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:84 8139e20e9ed14882858011fe7f4c869b
+msgid "**Errata**: Check GigaDevice errata sheets for known issues"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:87 a2c2c224e9984b8c853453fa5a4ba5b8
+msgid "Build Instructions"
+msgstr "构建 Instructions"
+
+#: ../../platform_guides/gd32.rst:90 9672942a42b544a78e2e8cb0a06a5834
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../platform_guides/gd32.rst:92 39f8117fb1594120bd265eb0a7eaa842
+msgid "CMake 3.15 or higher"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:93 e40fd0de03034185a6b1cd1908f6d38c
+msgid "ARM GCC toolchain (arm-none-eabi-gcc)"
+msgstr "ARM GCC toolchain (arm-none-eabi-gcc)"
+
+#: ../../platform_guides/gd32.rst:94 2f2850c8f6f041ed81d9cb9d7e01bf95
+msgid "Python 3.7+ (for build scripts)"
+msgstr "Python 3.7+ (for build scripts)"
+
+#: ../../platform_guides/gd32.rst:95 02ba4475d4ab4880b98591dc57f6f9c7
+msgid "OpenOCD or GD-Link utilities (for flashing)"
+msgstr "OpenOCD or GD-Link utilities (for flashing)"
+
+#: ../../platform_guides/gd32.rst:98 44e0f4c62acd438e9cfc58985a5dffd7
+msgid "Toolchain Installation"
+msgstr "工具链 安装"
+
+#: ../../platform_guides/gd32.rst:100 1c102fd7cdeb43fda74b95319a227070
+msgid "**Windows:**"
+msgstr "**Windows:**"
+
+#: ../../platform_guides/gd32.rst:102 6c25631d67b04f6ca4bd926dfd740cff
+msgid ""
+"# Download ARM GCC from ARM website\n"
+"# Add to PATH\n"
+"$env:PATH += \";C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\bin\""
+msgstr ""
+"# Download ARM GCC from ARM website\n"
+"# Add to PATH\n"
+"$env:PATH += \";C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\bin\""
+
+#: ../../platform_guides/gd32.rst:108 b08d3875e98e40cd8aa3498f9b16ebfd
+msgid "**Linux:**"
+msgstr "**Linux:**"
+
+#: ../../platform_guides/gd32.rst:110 5dee344abfd14218a6f4d9ce21c19e5a
+msgid ""
+"# Ubuntu/Debian\n"
+"sudo apt-get install gcc-arm-none-eabi\n"
+"\n"
+"# Arch Linux\n"
+"sudo pacman -S arm-none-eabi-gcc"
+msgstr ""
+"# Ubuntu/Debian\n"
+"sudo apt-get install gcc-arm-none-eabi\n"
+"\n"
+"# Arch Linux\n"
+"sudo pacman -S arm-none-eabi-gcc"
+
+#: ../../platform_guides/gd32.rst:118 7a198d2a02fd498085c13129d801b460
+msgid "**macOS:**"
+msgstr "**macOS:**"
+
+#: ../../platform_guides/gd32.rst:120 0700bf8987fd48eabd2d394d97ef14e5
+msgid ""
+"# Using Homebrew\n"
+"brew install --cask gcc-arm-embedded"
+msgstr ""
+"# Using Homebrew\n"
+"brew install --cask gcc-arm-embedded"
+
+#: ../../platform_guides/gd32.rst:126 903656eb72794aa58a5d4c2689514795
+msgid "Basic Build"
+msgstr "Basic 构建"
+
+#: ../../platform_guides/gd32.rst:128 cbc64b2d98894c57ad5d0b27936f2983
+msgid ""
+"# Configure for GD32 platform\n"
+"cmake -B build -DPLATFORM=gd32 -DGD32_CHIP=GD32F407 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"\n"
+"# Build\n"
+"cmake --build build\n"
+"\n"
+"# Generate binary\n"
+"arm-none-eabi-objcopy -O binary build/app.elf build/app.bin"
+msgstr ""
+"# Configure for GD32 platform\n"
+"cmake -B build -DPLATFORM=gd32 -DGD32_CHIP=GD32F407 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"\n"
+"# Build\n"
+"cmake --build build\n"
+"\n"
+"# Generate binary\n"
+"arm-none-eabi-objcopy -O binary build/app.elf build/app.bin"
+
+#: ../../platform_guides/gd32.rst:141 4d9c7bb8e764496b970121a6ca1b92f3
+msgid "Using Build Scripts"
+msgstr "Using 构建 Scripts"
+
+#: ../../platform_guides/gd32.rst:143 e766bad28b5247439bb24c026e56cceb
+msgid ""
+"# Build for GD32\n"
+"python scripts/nexus.py build --platform gd32 --chip gd32f407\n"
+"\n"
+"# Build with specific configuration\n"
+"python scripts/nexus.py build --platform gd32 --chip gd32f407 \\\n"
+"       --config Release"
+msgstr ""
+"# Build for GD32\n"
+"python scripts/nexus.py build --platform gd32 --chip gd32f407\n"
+"\n"
+"# Build with specific configuration\n"
+"python scripts/nexus.py build --platform gd32 --chip gd32f407 \\\n"
+"       --config Release"
+
+#: ../../platform_guides/gd32.rst:153 7116ccc03d534bc181548cc08aceb800
+msgid "Kconfig Options"
+msgstr "Kconfig 选项"
+
+#: ../../platform_guides/gd32.rst:156 225ace2566014da7ac964e20461a53b1
+msgid "Platform Selection"
+msgstr "平台 Selection"
+
+#: ../../platform_guides/gd32.rst:158 0be21549ae184c00aa421a10183d9c19
+msgid ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_PLATFORM_NAME=\"gd32\""
+msgstr ""
+"CONFIG_PLATFORM_GD32=y\n"
+"CONFIG_PLATFORM_NAME=\"gd32\""
+
+#: ../../platform_guides/gd32.rst:164 63978be513a1456bade21c1dc2ada7f0
+msgid "Chip Selection"
+msgstr "芯片 Selection"
+
+#: ../../platform_guides/gd32.rst:166 9e48345dde7c45ffbdbeb55252758615
+msgid ""
+"# GD32 family\n"
+"CONFIG_GD32F4=y\n"
+"\n"
+"# Specific variant\n"
+"CONFIG_GD32F407=y\n"
+"# CONFIG_GD32F103 is not set\n"
+"# CONFIG_GD32F303 is not set\n"
+"\n"
+"CONFIG_GD32_CHIP_NAME=\"GD32F407xx\""
+msgstr ""
+"# GD32 family\n"
+"CONFIG_GD32F4=y\n"
+"\n"
+"# Specific variant\n"
+"CONFIG_GD32F407=y\n"
+"# CONFIG_GD32F103 is not set\n"
+"# CONFIG_GD32F303 is not set\n"
+"\n"
+"CONFIG_GD32_CHIP_NAME=\"GD32F407xx\""
+
+#: ../../platform_guides/gd32.rst:179 88fc43a7b270462f957c0fb70eceb1d5
+msgid "Platform Settings"
+msgstr "平台 Settings"
+
+#: ../../platform_guides/gd32.rst:181 20a40ca289b34930acbfea79e9d7701f
+msgid ""
+"# Platform identification\n"
+"CONFIG_GD32_PLATFORM_NAME=\"GD32 Platform\"\n"
+"CONFIG_GD32_PLATFORM_VERSION=\"1.0.0\"\n"
+"\n"
+"# Logging\n"
+"CONFIG_GD32_ENABLE_LOGGING=y\n"
+"CONFIG_GD32_LOG_LEVEL=3\n"
+"\n"
+"# Statistics\n"
+"CONFIG_GD32_ENABLE_STATISTICS=y\n"
+"\n"
+"# Memory alignment\n"
+"CONFIG_GD32_BUFFER_ALIGNMENT=4"
+msgstr ""
+"# Platform identification\n"
+"CONFIG_GD32_PLATFORM_NAME=\"GD32 Platform\"\n"
+"CONFIG_GD32_PLATFORM_VERSION=\"1.0.0\"\n"
+"\n"
+"# Logging\n"
+"CONFIG_GD32_ENABLE_LOGGING=y\n"
+"CONFIG_GD32_LOG_LEVEL=3\n"
+"\n"
+"# Statistics\n"
+"CONFIG_GD32_ENABLE_STATISTICS=y\n"
+"\n"
+"# Memory alignment\n"
+"CONFIG_GD32_BUFFER_ALIGNMENT=4"
+
+#: ../../platform_guides/gd32.rst:198 b3b993dba34a4f0ca3fe733d8c869e30
+msgid "Resource Managers"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:200 8253ac8caeb6430ca4dd9b3c19b3edb4
+msgid ""
+"# DMA channels\n"
+"CONFIG_GD32_DMA_CHANNELS=8\n"
+"\n"
+"# ISR slots\n"
+"CONFIG_GD32_ISR_SLOTS=64"
+msgstr ""
+"# DMA channels\n"
+"CONFIG_GD32_DMA_CHANNELS=8\n"
+"\n"
+"# ISR slots\n"
+"CONFIG_GD32_ISR_SLOTS=64"
+
+#: ../../platform_guides/gd32.rst:209 d4ad3845cb994beca6a457e04601a980
+msgid "Peripheral Configuration"
+msgstr "外设 配置"
+
+#: ../../platform_guides/gd32.rst:211 8fd169876d70445d96599bedfe1a34c2
+msgid "**UART Configuration:**"
+msgstr "**UART Configuration:**"
+
+#: ../../platform_guides/gd32.rst:213 6392b99652cf4ab59aab65392a4100eb
+msgid ""
+"CONFIG_GD32_UART_ENABLE=y\n"
+"CONFIG_GD32_UART_MAX_INSTANCES=5\n"
+"CONFIG_INSTANCE_GD32_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_UART0_PARITY_NONE=y\n"
+"CONFIG_UART0_MODE_DMA=y\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=256"
+msgstr ""
+"CONFIG_GD32_UART_ENABLE=y\n"
+"CONFIG_GD32_UART_MAX_INSTANCES=5\n"
+"CONFIG_INSTANCE_GD32_UART_0=y\n"
+"CONFIG_UART0_BAUDRATE=115200\n"
+"CONFIG_UART0_DATA_BITS=8\n"
+"CONFIG_UART0_STOP_BITS=1\n"
+"CONFIG_UART0_PARITY_NONE=y\n"
+"CONFIG_UART0_MODE_DMA=y\n"
+"CONFIG_UART0_TX_BUFFER_SIZE=256\n"
+"CONFIG_UART0_RX_BUFFER_SIZE=256"
+
+#: ../../platform_guides/gd32.rst:226 e427e4d046a9426282875ed784d2f560
+msgid "**GPIO Configuration:**"
+msgstr "**GPIO Configuration:**"
+
+#: ../../platform_guides/gd32.rst:228 568ca1c1ecd74b1eafb550bca8dea594
+msgid "CONFIG_GD32_GPIO_ENABLE=y"
+msgstr "CONFIG_GD32_GPIO_ENABLE=y"
+
+#: ../../platform_guides/gd32.rst:232 2320eb62f5124612ab27b38fdb6e7e71
+msgid "**SPI Configuration:**"
+msgstr "**SPI Configuration:**"
+
+#: ../../platform_guides/gd32.rst:234 0fcc4df0891d4736a39c32caeaa5a210
+msgid "CONFIG_GD32_SPI_ENABLE=y"
+msgstr "CONFIG_GD32_SPI_ENABLE=y"
+
+#: ../../platform_guides/gd32.rst:238 64683c88bb8846168699e5cc58aeb61f
+msgid "**I2C Configuration:**"
+msgstr "**I2C Configuration:**"
+
+#: ../../platform_guides/gd32.rst:240 82aa17dc330d40c1add85c3098e683e9
+msgid "CONFIG_GD32_I2C_ENABLE=y"
+msgstr "CONFIG_GD32_I2C_ENABLE=y"
+
+#: ../../platform_guides/gd32.rst:245 f22e9c1eb07f46379a7ec2fc67e9be21
+msgid "OSAL Configuration"
+msgstr "OSAL 配置"
+
+#: ../../platform_guides/gd32.rst:247 40d616722d134d95bb014dac5062ccc0
+msgid ""
+"# FreeRTOS backend\n"
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"# FreeRTOS backend\n"
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\"\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../platform_guides/gd32.rst:258 ea96e87db7914eb784a0f382dd2fd583
+msgid "Linker Configuration"
+msgstr "链接器 配置"
+
+#: ../../platform_guides/gd32.rst:260 f07bb549f6804172a2def2bfffee991a
+msgid ""
+"# Memory layout for GD32F407\n"
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00030000    # 192 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00300000  # 3 MB"
+msgstr ""
+"# Memory layout for GD32F407\n"
+"CONFIG_LINKER_RAM_START=0x20000000\n"
+"CONFIG_LINKER_RAM_SIZE=0x00030000    # 192 KB\n"
+"CONFIG_LINKER_FLASH_START=0x08000000\n"
+"CONFIG_LINKER_FLASH_SIZE=0x00300000  # 3 MB"
+
+#: ../../platform_guides/gd32.rst:269 911f5ae05a4f4d1f9e5ac3fbcf20064f
+msgid "Hardware Setup"
+msgstr "硬件设置"
+
+#: ../../platform_guides/gd32.rst:272 2d0d382e830648dfab9644a24efb1f05
+msgid "Development Boards"
+msgstr "开发 Boards"
+
+#: ../../platform_guides/gd32.rst:274 cfd05f2dd9ce488ca4f12d26f23c5659
+msgid "**Recommended Boards:**"
+msgstr "**Recommended Boards:**"
+
+#: ../../platform_guides/gd32.rst:276 4792544803794484b5f9db6280fc3dd7
+msgid "GD32F407V-START"
+msgstr "GD32F407V-START"
+
+#: ../../platform_guides/gd32.rst:277 b5678bce61c14d42a9aa3e5b0ed0f0e5
+msgid "GD32F407Z-EVAL"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:278 404771c68de04cb4b764d50dc43121f5
+msgid "Custom boards with GD32 series"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:281 134fee7a9b2b4782a25bcf4db5a16705
+msgid "Pin Configuration"
+msgstr "引脚 配置"
+
+#: ../../platform_guides/gd32.rst:283 313691ecc1a34576be73d0c8343c49c8
+msgid "**UART0 Pins (Default):**"
+msgstr "**UART0 Pins (Default):**"
+
+#: ../../platform_guides/gd32.rst:285 19930a925eae47fb93b2b9a2ef7a7d92
+msgid ""
+"TX: PA9  (USART0_TX)\n"
+"RX: PA10 (USART0_RX)"
+msgstr ""
+"TX: PA9  (USART0_TX)\n"
+"RX: PA10 (USART0_RX)"
+
+#: ../../platform_guides/gd32.rst:290 31e12f23588043e2821df43655c78d91
+msgid "**SPI0 Pins:**"
+msgstr "**SPI0 Pins:**"
+
+#: ../../platform_guides/gd32.rst:292 92144d8674874a548d7921cba39d5406
+msgid ""
+"SCK:  PA5  (SPI0_SCK)\n"
+"MISO: PA6  (SPI0_MISO)\n"
+"MOSI: PA7  (SPI0_MOSI)\n"
+"NSS:  PA4  (SPI0_NSS)"
+msgstr ""
+"SCK:  PA5  (SPI0_SCK)\n"
+"MISO: PA6  (SPI0_MISO)\n"
+"MOSI: PA7  (SPI0_MOSI)\n"
+"NSS:  PA4  (SPI0_NSS)"
+
+#: ../../platform_guides/gd32.rst:299 66a3e5f9b3d7482bbc4f37be2146bb76
+msgid "**I2C0 Pins:**"
+msgstr "**I2C0 Pins:**"
+
+#: ../../platform_guides/gd32.rst:301 28aff68a6a934036a370f52d3f631b35
+msgid ""
+"SCL: PB6 (I2C0_SCL)\n"
+"SDA: PB7 (I2C0_SDA)"
+msgstr ""
+"SCL: PB6 (I2C0_SCL)\n"
+"SDA: PB7 (I2C0_SDA)"
+
+#: ../../platform_guides/gd32.rst:307 2717b04beb6145efbb7c369111000eb3
+msgid "Power Supply"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:309 91ba68a451924c5ca37e38c39f938b43
+msgid "**VDD**: 2.6V to 3.6V"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:310 a5d6d4a91a194e9aa66645cde535a7d2
+msgid "**VDDA**: Analog supply (same as VDD or separate)"
+msgstr "**VDDA**: Analog supply (same as VDD or separate)"
+
+#: ../../platform_guides/gd32.rst:311 8a550cb8099540bea43aba676b49b7d5
+msgid "**VBAT**: Battery backup for RTC (optional)"
+msgstr "**VBAT**: Battery backup for RTC (optional)"
+
+#: ../../platform_guides/gd32.rst:313 1a0ce5316b4a4084ba0a5dd42e903de8
+msgid "**Recommended Power Setup:**"
+msgstr "**Recommended Power Setup:**"
+
+#: ../../platform_guides/gd32.rst:315 9e306c9d90c7424e876f2ce2f3864b53
+msgid "Use 3.3V regulated supply"
+msgstr "使用 3.3V 稳压电源"
+
+#: ../../platform_guides/gd32.rst:316 f9dbf0885b764e2f8e890a4f19319fc1
+msgid "Add decoupling capacitors (100nF) near each VDD pin"
+msgstr "Add decoupling capacitors (100nF) near each VDD pin"
+
+#: ../../platform_guides/gd32.rst:317 04f5670f488f48df93d58bd5349a452a
+msgid "Add bulk capacitor (10µF) near power input"
+msgstr "在电源输入附近添加大容量电容（10µF）"
+
+#: ../../platform_guides/gd32.rst:320 3847efaf169f4966baeef267efb306ed
+msgid "Clock Configuration"
+msgstr "时钟 配置"
+
+#: ../../platform_guides/gd32.rst:322 721b62ef0e2948a6923b8225cbf3dc3a
+msgid "**External Crystal:**"
+msgstr "**External Crystal:**"
+
+#: ../../platform_guides/gd32.rst:324 a31e15eea6ac460e974eda0fe975d3ef
+msgid "HXTAL: 8 MHz or 25 MHz (typical)"
+msgstr "HXTAL: 8 MHz or 25 MHz (typical)"
+
+#: ../../platform_guides/gd32.rst:325 a877a216b9e54ce398e042c55cb89d9c
+msgid "LXTAL: 32.768 kHz (for RTC)"
+msgstr "LXTAL: 32.768 kHz (for RTC)"
+
+#: ../../platform_guides/gd32.rst:327 5ee73b453bee43a39689b183288d46cd
+msgid "**PLL Configuration for 120 MHz:**"
+msgstr "**PLL Configuration for 120 MHz:**"
+
+#: ../../platform_guides/gd32.rst:329 0e272906ee0443c3af3c9e5bb016b233
+msgid ""
+"/* HXTAL = 8 MHz */\n"
+"/* PLL_M = 8, PLL_N = 240, PLL_P = 2 */\n"
+"/* SYSCLK = 120 MHz */\n"
+"/* AHB = 120 MHz, APB1 = 60 MHz, APB2 = 120 MHz */"
+msgstr ""
+"/* HXTAL = 8 MHz */\n"
+"/* PLL_M = 8, PLL_N = 240, PLL_P = 2 */\n"
+"/* SYSCLK = 120 MHz */\n"
+"/* AHB = 120 MHz, APB1 = 60 MHz, APB2 = 120 MHz */"
+
+#: ../../platform_guides/gd32.rst:337 586be48265ef46638ecebcba274d10b2
+msgid "Example Projects"
+msgstr "示例 Projects"
+
+#: ../../platform_guides/gd32.rst:340 cfab40a2bc2d440f99d1fd58bfab4ac1
+msgid "Basic UART Example"
+msgstr "Basic UART 示例"
+
+#: ../../platform_guides/gd32.rst:342 d04efd26b2ff4e0e886abf7f5b5b3482
+msgid ""
+"#include \"hal/nx_uart.h\"\n"
+"#include \"hal/nx_factory.h\"\n"
+"#include \"osal/nx_osal.h\"\n"
+"\n"
+"int main(void) {\n"
+"    /* Initialize OSAL */\n"
+"    nx_osal_init();\n"
+"\n"
+"    /* Get UART instance */\n"
+"    nx_uart_t* uart = nx_factory_uart(0);  /* UART0 */\n"
+"    if (!uart) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Initialize UART */\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    if (lc->init(lc) != NX_OK) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Send data */\n"
+"    nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"    const uint8_t data[] = \"Hello, GD32!\";\n"
+"    size_t len = sizeof(data) - 1;\n"
+"    tx->transmit(tx, data, len);\n"
+"\n"
+"    /* Start RTOS scheduler */\n"
+"    nx_osal_start();\n"
+"\n"
+"    /* Should never reach here */\n"
+"    return 0;\n"
+"}"
+msgstr ""
+"#include \"hal/nx_uart.h\"\n"
+"#include \"hal/nx_factory.h\"\n"
+"#include \"osal/nx_osal.h\"\n"
+"\n"
+"int main(void) {\n"
+"    /* Initialize OSAL */\n"
+"    nx_osal_init();\n"
+"\n"
+"    /* Get UART instance */\n"
+"    nx_uart_t* uart = nx_factory_uart(0);  /* UART0 */\n"
+"    if (!uart) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Initialize UART */\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    if (lc->init(lc) != NX_OK) {\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    /* Send data */\n"
+"    nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"    const uint8_t data[] = \"Hello, GD32!\";\n"
+"    size_t len = sizeof(data) - 1;\n"
+"    tx->transmit(tx, data, len);\n"
+"\n"
+"    /* Start RTOS scheduler */\n"
+"    nx_osal_start();\n"
+"\n"
+"    /* Should never reach here */\n"
+"    return 0;\n"
+"}"
+
+#: ../../platform_guides/gd32.rst:378 f279fa9859234406a87343ec788576a9
+msgid "FreeRTOS Task Example"
+msgstr "FreeRTOS 任务 示例"
+
+#: ../../platform_guides/gd32.rst:380 1d20d8a1c94c4a1db2fd2bfd7858761f
+msgid ""
+"#include \"osal/nx_osal.h\"\n"
+"#include \"hal/nx_gpio.h\"\n"
+"\n"
+"void led_task(void* param) {\n"
+"    nx_gpio_t* gpio = nx_factory_gpio(0);\n"
+"    nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);\n"
+"    lc->init(lc);\n"
+"\n"
+"    /* Configure LED pin */\n"
+"    nx_gpio_config_t config = {\n"
+"        .pin = 7,  /* PD7 on GD32F407V-START */\n"
+"        .mode = NX_GPIO_MODE_OUTPUT,\n"
+"        .pull = NX_GPIO_PULL_NONE,\n"
+"        .speed = NX_GPIO_SPEED_LOW\n"
+"    };\n"
+"    gpio->configure(gpio, &config);\n"
+"\n"
+"    /* Blink LED */\n"
+"    while (1) {\n"
+"        gpio->write_pin(gpio, 7, 1);\n"
+"        nx_osal_delay_ms(500);\n"
+"        gpio->write_pin(gpio, 7, 0);\n"
+"        nx_osal_delay_ms(500);\n"
+"    }\n"
+"}\n"
+"\n"
+"int main(void) {\n"
+"    nx_osal_init();\n"
+"\n"
+"    /* Create task */\n"
+"    nx_osal_task_create(led_task, \"LED\", 512, NULL, 1, NULL);\n"
+"\n"
+"    /* Start scheduler */\n"
+"    nx_osal_start();\n"
+"    return 0;\n"
+"}"
+msgstr ""
+"#include \"osal/nx_osal.h\"\n"
+"#include \"hal/nx_gpio.h\"\n"
+"\n"
+"void led_task(void* param) {\n"
+"    nx_gpio_t* gpio = nx_factory_gpio(0);\n"
+"    nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);\n"
+"    lc->init(lc);\n"
+"\n"
+"    /* Configure LED pin */\n"
+"    nx_gpio_config_t config = {\n"
+"        .pin = 7,  /* PD7 on GD32F407V-START */\n"
+"        .mode = NX_GPIO_MODE_OUTPUT,\n"
+"        .pull = NX_GPIO_PULL_NONE,\n"
+"        .speed = NX_GPIO_SPEED_LOW\n"
+"    };\n"
+"    gpio->configure(gpio, &config);\n"
+"\n"
+"    /* Blink LED */\n"
+"    while (1) {\n"
+"        gpio->write_pin(gpio, 7, 1);\n"
+"        nx_osal_delay_ms(500);\n"
+"        gpio->write_pin(gpio, 7, 0);\n"
+"        nx_osal_delay_ms(500);\n"
+"    }\n"
+"}\n"
+"\n"
+"int main(void) {\n"
+"    nx_osal_init();\n"
+"\n"
+"    /* Create task */\n"
+"    nx_osal_task_create(led_task, \"LED\", 512, NULL, 1, NULL);\n"
+"\n"
+"    /* Start scheduler */\n"
+"    nx_osal_start();\n"
+"    return 0;\n"
+"}"
+
+#: ../../platform_guides/gd32.rst:420 8ad228c0cf7f445c84d881244947761a
+msgid "DMA UART Example"
+msgstr "DMA UART 示例"
+
+#: ../../platform_guides/gd32.rst:422 5a32680eecc249fdb32ae0b81a334999
+msgid ""
+"#include \"hal/nx_uart.h\"\n"
+"\n"
+"void uart_dma_example(void) {\n"
+"    nx_uart_t* uart = nx_factory_uart(0);\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    lc->init(lc);\n"
+"\n"
+"    /* DMA is configured via Kconfig */\n"
+"    /* CONFIG_UART0_MODE_DMA=y */\n"
+"\n"
+"    /* Transmit with DMA */\n"
+"    nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"    const uint8_t data[] = \"DMA Transfer\";\n"
+"    size_t len = sizeof(data) - 1;\n"
+"    tx->transmit(tx, data, len);\n"
+"\n"
+"    /* DMA handles transfer in background */\n"
+"}"
+msgstr ""
+"#include \"hal/nx_uart.h\"\n"
+"\n"
+"void uart_dma_example(void) {\n"
+"    nx_uart_t* uart = nx_factory_uart(0);\n"
+"    nx_lifecycle_t* lc = uart->get_lifecycle(uart);\n"
+"    lc->init(lc);\n"
+"\n"
+"    /* DMA is configured via Kconfig */\n"
+"    /* CONFIG_UART0_MODE_DMA=y */\n"
+"\n"
+"    /* Transmit with DMA */\n"
+"    nx_tx_async_t* tx = uart->get_tx_async(uart);\n"
+"    const uint8_t data[] = \"DMA Transfer\";\n"
+"    size_t len = sizeof(data) - 1;\n"
+"    tx->transmit(tx, data, len);\n"
+"\n"
+"    /* DMA handles transfer in background */\n"
+"}"
+
+#: ../../platform_guides/gd32.rst:444 dc9bde6e4f964137a196ac09f17aa3e2
+msgid "Debugging Procedures"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:447 fa26628d9aa244d7bd494d75577308fa
+msgid "Using OpenOCD"
+msgstr "使用 OpenOCD"
+
+#: ../../platform_guides/gd32.rst:449 f6df0092ea074f3291e599dac33aeecc
+msgid "**Install OpenOCD:**"
+msgstr "**Install OpenOCD:**"
+
+#: ../../platform_guides/gd32.rst:451 3e2d639a182f4565bff653f4d1049be4
+msgid ""
+"# Linux\n"
+"sudo apt-get install openocd\n"
+"\n"
+"# macOS\n"
+"brew install openocd"
+msgstr ""
+"# Linux\n"
+"sudo apt-get install openocd\n"
+"\n"
+"# macOS\n"
+"brew install openocd"
+
+#: ../../platform_guides/gd32.rst:459 bb4bc52805a74b3c8f24c258d3804aef
+msgid "**Start OpenOCD:**"
+msgstr "**Start OpenOCD:**"
+
+#: ../../platform_guides/gd32.rst:461 ad5bbc55224c4bb7bc7c8f7e067a5ebf
+msgid ""
+"# For GD32F407 (using STM32F4 configuration)\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg"
+msgstr ""
+"# For GD32F407 (using STM32F4 configuration)\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg"
+
+#: ../../platform_guides/gd32.rst:466 bc26e2506a3c4cb996b0b2d7ecc4eda7
+msgid "**Connect GDB:**"
+msgstr "**Connect GDB:**"
+
+#: ../../platform_guides/gd32.rst:468 5d8d356b733a42eab03ae71a84b018a4
+msgid ""
+"arm-none-eabi-gdb build/app.elf\n"
+"(gdb) target remote localhost:3333\n"
+"(gdb) monitor reset halt\n"
+"(gdb) load\n"
+"(gdb) continue"
+msgstr ""
+"arm-none-eabi-gdb build/app.elf\n"
+"(gdb) target remote localhost:3333\n"
+"(gdb) monitor reset halt\n"
+"(gdb) load\n"
+"(gdb) continue"
+
+#: ../../platform_guides/gd32.rst:477 a5090b08a5b54c629acb4d538c01c4c7
+msgid "Using GD-Link Utility"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:479 7820edc6272242c2a4e26d4ceac1b199
+msgid "**Flash Firmware:**"
+msgstr "**Flash Firmware:**"
+
+#: ../../platform_guides/gd32.rst:481 b7ffc0271c3242f8849a55b408fc1e92
+msgid ""
+"# Using GD-Link programmer\n"
+"# Refer to GigaDevice documentation for specific commands"
+msgstr ""
+"# Using GD-Link programmer\n"
+"# Refer to GigaDevice documentation for specific commands"
+
+#: ../../platform_guides/gd32.rst:487 46a09fce61ad466c8500c8ece9366f58
+msgid "Using Visual Studio Code"
+msgstr "使用 Visual Studio Code"
+
+#: ../../platform_guides/gd32.rst:489 ca8762d4ce5f4c7c95576690593e0b2c
+msgid "Create ``.vscode/launch.json``:"
+msgstr "创建 ``.vscode/launch.json``："
+
+#: ../../platform_guides/gd32.rst:491 d3e1f06e1db64fa9992ff44d196d866d
+msgid ""
+"{\n"
+"    \"version\": \"0.2.0\",\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"Debug GD32\",\n"
+"            \"type\": \"cortex-debug\",\n"
+"            \"request\": \"launch\",\n"
+"            \"servertype\": \"openocd\",\n"
+"            \"cwd\": \"${workspaceRoot}\",\n"
+"            \"executable\": \"${workspaceRoot}/build/app.elf\",\n"
+"            \"device\": \"GD32F407VG\",\n"
+"            \"configFiles\": [\n"
+"                \"interface/stlink.cfg\",\n"
+"                \"target/stm32f4x.cfg\"\n"
+"            ]\n"
+"        }\n"
+"    ]\n"
+"}"
+msgstr ""
+"{\n"
+"    \"version\": \"0.2.0\",\n"
+"    \"configurations\": [\n"
+"        {\n"
+"            \"name\": \"Debug GD32\",\n"
+"            \"type\": \"cortex-debug\",\n"
+"            \"request\": \"launch\",\n"
+"            \"servertype\": \"openocd\",\n"
+"            \"cwd\": \"${workspaceRoot}\",\n"
+"            \"executable\": \"${workspaceRoot}/build/app.elf\",\n"
+"            \"device\": \"GD32F407VG\",\n"
+"            \"configFiles\": [\n"
+"                \"interface/stlink.cfg\",\n"
+"                \"target/stm32f4x.cfg\"\n"
+"            ]\n"
+"        }\n"
+"    ]\n"
+"}"
+
+#: ../../platform_guides/gd32.rst:513 62853b7b94ce41ffa80afc89d924b9ad
+msgid "Serial Console"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:515 a0319e3a83a64dfe86e916762a199c87
+msgid "**Connect to UART:**"
+msgstr "**Connect to UART:**"
+
+#: ../../platform_guides/gd32.rst:517 5f51a5e63ad243eea769ce877c91fab1
+msgid ""
+"# Linux\n"
+"screen /dev/ttyUSB0 115200\n"
+"\n"
+"# Windows (using PuTTY)\n"
+"# COM port, 115200 baud, 8N1"
+msgstr ""
+"# Linux\n"
+"screen /dev/ttyUSB0 115200\n"
+"\n"
+"# Windows (using PuTTY)\n"
+"# COM port, 115200 baud, 8N1"
+
+#: ../../platform_guides/gd32.rst:526 7d7f65d7314b41ce80e5285a2f549712
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../platform_guides/gd32.rst:529 51a64165b5e245e8bc15c6922ed16557
+msgid "Common Issues"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:531 e991320373a44b78abc4c0ab6545ffbf
+msgid "**Build Fails with \"arm-none-eabi-gcc not found\":**"
+msgstr "**Build Fails with \"arm-none-eabi-gcc not found\":**"
+
+#: ../../platform_guides/gd32.rst:533 637a742df619413da18ebb5d0d5858ba
+msgid "Solution: Install ARM GCC toolchain and add to PATH."
+msgstr "解决方案：安装 ARM GCC 工具链并添加到 PATH。"
+
+#: ../../platform_guides/gd32.rst:535 a7ccf3d351af437b879725d1ffa12d60
+msgid "**Flash Fails with \"Error: init mode failed\":**"
+msgstr "**Flash Fails with \"Error: init mode failed\":**"
+
+#: ../../platform_guides/gd32.rst:537 4dbad8b7436b427c808de5cf811836ae
+msgid ""
+"Solution: Check programmer connection, try different USB port, update "
+"programmer firmware."
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:539 02e9fe7603be4e07848593bb57601c90
+msgid "**UART Not Working:**"
+msgstr "**UART Not Working:**"
+
+#: ../../platform_guides/gd32.rst:541 a043c4b2174c410294e778e254992b1d
+msgid ""
+"Solution: Verify pin configuration matches hardware, check baud rate, ensure"
+" clock is configured."
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:543 73ed6780b1434c72bbcefee1d5db8ac0
+msgid "**DMA Not Transferring:**"
+msgstr "**DMA Not Transferring:**"
+
+#: ../../platform_guides/gd32.rst:545 0ee699d90df044d88766d484817627a4
+msgid ""
+"Solution: Verify DMA channel configuration, check buffer alignment, ensure "
+"DMA clock is enabled."
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:548 8eb15644b1224fafa6d15ab8e2871ed0
+msgid "STM32 Compatibility Issues"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:550 dd37c88f19154c32a41da2e027df40ee
+msgid "While GD32 is largely compatible with STM32, some differences exist:"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:552 262d9ff86d754377bc5e6e686323f071
+msgid "**Register Naming**: Some registers have different names"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:553 83f939a075494756bcf4795ed1e9c604
+msgid ""
+"**Peripheral Features**: Some peripherals have additional or missing "
+"features"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:554 150c5c007a794030bc3251b566eba4a7
+msgid "**Clock Configuration**: Clock tree may differ slightly"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:555 f3671beb29734c85994548b1a439dfbf
+msgid "**Errata**: Check GD32 errata for known issues"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:557 d2132c10de26452a9cefc5f61ded88c8
+msgid "**Migration Tips:**"
+msgstr "**Migration Tips:**"
+
+#: ../../platform_guides/gd32.rst:559 56a6330d57544ac79ca2fea9b038ea0f
+msgid "Review GD32 datasheet for differences"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:560 e262c9a5c0044e9dbeb114fd4b486307
+msgid "Test thoroughly on actual hardware"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:561 0a763fd7ef8445d18f59134fa36c0fe1
+msgid "Check peripheral initialization sequences"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:562 e92b8243bde845049f4ae4f8f6d8839a
+msgid "Verify DMA channel assignments"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:565 cf7b2bc639ad421bb3b59a2c1260deb1
+msgid "Clock Configuration Issues"
+msgstr "时钟 配置 Issues"
+
+#: ../../platform_guides/gd32.rst:567 66e4139c78804de994d3ca1697285f33
+msgid "If system doesn't start or runs at wrong speed:"
+msgstr "如果系统无法启动或以错误速度运行："
+
+#: ../../platform_guides/gd32.rst:569 5de478e12313400da0e3acdfcbadcc97
+msgid "Verify HXTAL frequency matches hardware"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:570 2069bdf451e142248265907076915dfa
+msgid "Check PLL configuration"
+msgstr "检查 PLL 配置"
+
+#: ../../platform_guides/gd32.rst:571 db5be1ffd1334e2e8ab600b4a41e4a23
+msgid "Ensure flash wait states are configured for clock speed"
+msgstr "确保为时钟速度配置了 Flash 等待状态"
+
+#: ../../platform_guides/gd32.rst:572 a077f0956c5340b8844717de433b1a86
+msgid "Verify voltage regulator setting"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:575 1fb4235c77554c2da328bad8463016d0
+msgid "Memory Issues"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:577 24cdb806641b41609ff50c29d80cea40
+msgid "**Stack Overflow:**"
+msgstr "**Stack Overflow:**"
+
+#: ../../platform_guides/gd32.rst:579 f5987d7232b643cebbece08738936b4e
+msgid ""
+"Solution: Increase stack size in Kconfig (``CONFIG_OSAL_MAIN_STACK_SIZE``)."
+msgstr ""
+"Solution: Increase stack size in Kconfig (``CONFIG_OSAL_MAIN_STACK_SIZE``)."
+
+#: ../../platform_guides/gd32.rst:581 12350251ca18480b85949f9de9a2d00a
+msgid "**Heap Exhausted:**"
+msgstr "**Heap Exhausted:**"
+
+#: ../../platform_guides/gd32.rst:583 5f248ffaeefe40478bc85cbb786a9bf3
+msgid ""
+"Solution: Increase heap size (``CONFIG_OSAL_HEAP_SIZE``) or use static "
+"allocation."
+msgstr ""
+"Solution: Increase heap size (``CONFIG_OSAL_HEAP_SIZE``) or use static "
+"allocation."
+
+#: ../../platform_guides/gd32.rst:585 0879196d0a79447cb85c16980f3a88ef
+msgid "**Linker Error \"region RAM overflowed\":**"
+msgstr "**Linker Error \"region RAM overflowed\":**"
+
+#: ../../platform_guides/gd32.rst:587 b154b261855d4ba8b608b3be823b5b60
+msgid "Solution: Reduce memory usage or check memory layout."
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:590 1cdc8fa2da4f423caa05657d3cfc55e2
+msgid "Performance Optimization"
+msgstr "性能优化"
+
+#: ../../platform_guides/gd32.rst:592 7735d1a7354a4db0885fe56970934d6e
+msgid "Enable compiler optimizations (``-O2`` or ``-O3``)"
+msgstr "Enable compiler optimizations (``-O2`` or ``-O3``)"
+
+#: ../../platform_guides/gd32.rst:593 a76b2386eade46c794f0940cf7b203b4
+msgid "Use DMA for data transfers"
+msgstr "使用 DMA 进行数据传输"
+
+#: ../../platform_guides/gd32.rst:594 6ccdef561ca1475c955d8047ca2c89a9
+msgid "Enable instruction and data caches (if available)"
+msgstr "Enable instruction and data caches (if available)"
+
+#: ../../platform_guides/gd32.rst:595 dff05fd760a749628f8be94ce00ed501
+msgid "Use FPU for floating-point operations (Cortex-M4)"
+msgstr "Use FPU for floating-point operations (Cortex-M4)"
+
+#: ../../platform_guides/gd32.rst:596 7a192bcbf5bc4498b4395fc8894966ee
+msgid "Optimize interrupt priorities"
+msgstr "优化中断优先级"
+
+#: ../../platform_guides/gd32.rst:599 6d500abc07ed4a74814bf234e3dfe35d
+msgid "Differences from STM32"
+msgstr "与 STM32 的差异"
+
+#: ../../platform_guides/gd32.rst:602 a09f946fa2c941bfbb8463b7bde3002a
+msgid "Register Naming"
+msgstr "寄存器 Naming"
+
+#: ../../platform_guides/gd32.rst:604 86f4d0d4a14b481ea071aa098adcc449
+msgid "Some registers have different names:"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:610 17690dc74f074445bd1ae988803179d5
+msgid "Function"
+msgstr "函数"
+
+#: ../../platform_guides/gd32.rst:611 5e89dfb801294b6ba2c119dccd7cde06
+msgid "STM32"
+msgstr "STM32"
+
+#: ../../platform_guides/gd32.rst:612 292b950c4b7244d4bba0e1a77c8ae766
+msgid "GD32"
+msgstr "GD32"
+
+#: ../../platform_guides/gd32.rst:613 efd8c02ab37146c0be2c5b83ad439adf
+msgid "UART Control Register"
+msgstr "UART Control 寄存器"
+
+#: ../../platform_guides/gd32.rst:614 bbd9fea68d594a57bc3a224ea4c33ccd
+msgid "USART_CR1"
+msgstr "USART_CR1"
+
+#: ../../platform_guides/gd32.rst:615 ed933cbf1e924a9d8a75dfd0ee2978d1
+msgid "USART_CTL0"
+msgstr "USART_CTL0"
+
+#: ../../platform_guides/gd32.rst:616 4b03081b4368471b9876b0f9b4b65abd
+msgid "GPIO Output Data"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:617 0546db91f2ab45faa05598a8f76783b7
+msgid "GPIO_ODR"
+msgstr "GPIO_ODR"
+
+#: ../../platform_guides/gd32.rst:618 19cb60a18f6e4dab9e8b3c40f5252b48
+msgid "GPIO_OCTL"
+msgstr "GPIO_OCTL"
+
+#: ../../platform_guides/gd32.rst:619 896356090b3444028aa26897523f5d93
+msgid "RCC Clock Enable"
+msgstr "RCC 时钟 Enable"
+
+#: ../../platform_guides/gd32.rst:620 f8e296d120ff42d8a9bf67ee9f1346d7
+msgid "RCC_AHB1ENR"
+msgstr "RCC_AHB1ENR"
+
+#: ../../platform_guides/gd32.rst:621 ca240308f6544cbd934723cc18634198
+msgid "RCC_AHB1EN"
+msgstr "RCC_AHB1EN"
+
+#: ../../platform_guides/gd32.rst:624 62dccdc3e15b40c1832d089635c999c0
+msgid "Peripheral Differences"
+msgstr "外设 Differences"
+
+#: ../../platform_guides/gd32.rst:626 4ae0c3913d84424ea01f85d32bf3f1c6
+msgid "**UART**: GD32 UART may have different FIFO depths"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:627 451d0f9456894e36b4a955a3b3d0f0f9
+msgid "**Timer**: Some advanced timer features may differ"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:628 6e329292b31241e99a56498ddd26b120
+msgid "**ADC**: Sampling time configuration may differ"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:629 d7994a5e84494b6a961d6f100c47afd1
+msgid "**DMA**: Channel assignments may differ"
+msgstr ""
+
+#: ../../platform_guides/gd32.rst:632 2b7545a1af6f4ac3b3195ce8da1a8a36
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../platform_guides/gd32.rst:634 85934c9ef0884cfe873f943d23fc17e6
+msgid ":doc:`../user_guide/build_system` - Build system documentation"
+msgstr ":doc:`../user_guide/build_system` - Build system documentation"
+
+#: ../../platform_guides/gd32.rst:635 078b61e274bf43d783c761b030e097c2
+msgid ":doc:`../user_guide/kconfig_platforms` - Platform configuration guide"
+msgstr ":doc:`../user_guide/kconfig_platforms` - Platform configuration guide"
+
+#: ../../platform_guides/gd32.rst:636 446294a35bd94d57b6ceb78f62c0839d
+msgid ":doc:`../development/testing` - Testing guide"
+msgstr ":doc:`../development/testing` - Testing guide"
+
+#: ../../platform_guides/gd32.rst:637 e9c9596281c6403da8fa912fb2fd9b71
+msgid ":doc:`native` - Native platform guide"
+msgstr ":doc:`native` - Native platform guide"
+
+#: ../../platform_guides/gd32.rst:638 2c73acf62f15464695a04688a3065bce
+msgid ":doc:`stm32f4` - STM32F4 platform guide"
+msgstr ":doc:`stm32f4` - STM32F4 platform guide"
+
+#: ../../platform_guides/gd32.rst:639 27fdda72228c4f6ca8e483e8014aa2e4
+msgid ":doc:`stm32h7` - STM32H7 platform guide"
+msgstr ":doc:`stm32h7` - STM32H7 platform guide"
+
+#: ../../platform_guides/gd32.rst:640 cbb88577a988439f9b45f38810402ba9
+msgid ""
+"`GD32F407 Datasheet "
+"<https://www.gigadevice.com/products/microcontrollers/gd32/arm-cortex-m4/>`_"
+msgstr ""
+"`GD32F407 Datasheet "
+"<https://www.gigadevice.com/products/microcontrollers/gd32/arm-cortex-m4/>`_"
+
+#: ../../platform_guides/gd32.rst:641 e86820c595844bc4b200e66c94c77d16
+msgid ""
+"`GD32F407 User Manual "
+"<https://www.gigadevice.com/products/microcontrollers/gd32/arm-cortex-m4/>`_"
+msgstr ""
+"`GD32F407 User Manual "
+"<https://www.gigadevice.com/products/microcontrollers/gd32/arm-cortex-m4/>`_"

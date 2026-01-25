@@ -1,0 +1,269 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../api/init.rst:2 2965fcc952a04c74ae7767803509fa9b
+msgid "Init Framework API Reference"
+msgstr ""
+
+#: ../../api/init.rst:4 fdaed7f5ba484d2782bf4b1997cbe01d
+msgid "This section documents the Initialization Framework API."
+msgstr ""
+
+#: ../../api/init.rst:7 3a7a8430c99d43bcb53c7a66f415a3bb
+msgid "Overview"
+msgstr "概述"
+
+#: ../../api/init.rst:9 e06b57ef3fef446db8cc8e29bdc40cd8
+msgid ""
+"The Nexus Init Framework provides a compile-time automatic initialization "
+"system similar to Linux initcall. Initialization functions are registered at"
+" compile time using linker sections and executed in level order at system "
+"startup."
+msgstr ""
+
+#: ../../api/init.rst:14 837a6d9d66c74f23b7cf3c733437a890
+msgid "Initialization Levels"
+msgstr "初始化 Levels"
+
+#: ../../api/init.rst:16 ff57ef1beefe4cb3b39a98c79b689e13
+msgid "The framework defines six initialization levels that execute in order:"
+msgstr ""
+
+#: ../../api/init.rst:18 7800fffc8019474d86c56aaca6aac3a7
+msgid "**BOARD** - Board-level initialization (clock, power)"
+msgstr "**BOARD** - Board-level initialization (clock, power)"
+
+#: ../../api/init.rst:19 08659083aef740c989c540b7d9273ec5
+msgid "**PREV** - Pre-initialization (memory, debug)"
+msgstr "**PREV** - Pre-initialization (memory, debug)"
+
+#: ../../api/init.rst:20 a935cb4cc34d440187db8453e5f724d6
+msgid "**BSP** - BSP initialization (peripheral configuration)"
+msgstr "**BSP** - BSP initialization (peripheral configuration)"
+
+#: ../../api/init.rst:21 47c474466da34c6e8cc72ff7a31f811f
+msgid "**DRIVER** - Driver initialization"
+msgstr ""
+
+#: ../../api/init.rst:22 d766168656f34db6a3657d893601ea63
+msgid "**COMPONENT** - Component initialization (middleware)"
+msgstr "**COMPONENT** - Component initialization (middleware)"
+
+#: ../../api/init.rst:23 a5d6845aa7e1433db2a9373efbdcf945
+msgid "**APP** - Application initialization"
+msgstr ""
+
+#: ../../api/init.rst:26 f68388763e67448e96b65e123cf2c81a
+msgid "Core Functions"
+msgstr ""
+
+#: 9ae272e42e3843a2896934602dd3fcc4 ace182420a20481f8b0f622c80fadb27
+msgid "Returns"
+msgstr "返回值"
+
+#: ea9a3883d6f0456dbb18b75ac7594108 ecfc736c726f4fe2a1cb6e800d47a678
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../api/init.rst:38 13738dd5958a4db18262f251021c25a1
+msgid "Type Definitions"
+msgstr "类型 Definitions"
+
+#: ../../api/init.rst 7c9906e8d4e241058356a6d2ef50a5c7
+msgid "Return"
+msgstr "返回"
+
+#: ../../api/init.rst c3c20e0ba17947028dfafadc1cb964b6
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../api/init.rst:51 cbbefae4b74545d3abce211d165c60a9
+msgid "Export Macros"
+msgstr ""
+
+#: ../../api/init.rst:53 7b839b498bda4b9fb93f86a354c2b853
+msgid "Use these macros to register initialization functions at compile time:"
+msgstr ""
+
+#: ../../api/init.rst:74 0ea72c474c6a4894a9328cfb47253725
+msgid "Usage Example"
+msgstr "用法 示例"
+
+#: ../../api/init.rst:76 046342f74b6c4904a8548cff68f63b05
+msgid ""
+"#include \"nx_init.h\"\n"
+"\n"
+"/* Board-level initialization function */\n"
+"static int board_clock_init(void) {\n"
+"    /* Configure system clock */\n"
+"    return 0;  /* Success */\n"
+"}\n"
+"\n"
+"/* Register the function to run at BOARD level */\n"
+"NX_INIT_BOARD_EXPORT(board_clock_init);\n"
+"\n"
+"/* Driver initialization function */\n"
+"static int uart_driver_init(void) {\n"
+"    /* Initialize UART driver */\n"
+"    return 0;  /* Success */\n"
+"}\n"
+"\n"
+"/* Register the function to run at DRIVER level */\n"
+"NX_INIT_DRIVER_EXPORT(uart_driver_init);\n"
+"\n"
+"/* In main() */\n"
+"int main(void) {\n"
+"    nx_status_t status;\n"
+"\n"
+"    /* Run all registered initialization functions */\n"
+"    status = nx_init_run();\n"
+"    if (status != NX_OK) {\n"
+"        /* Handle initialization failure */\n"
+"    }\n"
+"\n"
+"    /* Check if all initializations succeeded */\n"
+"    if (!nx_init_is_complete()) {\n"
+"        /* Some initializations failed */\n"
+"        nx_init_stats_t stats;\n"
+"        nx_init_get_stats(&stats);\n"
+"        /* Log or handle the failure */\n"
+"    }\n"
+"\n"
+"    /* Application code */\n"
+"    while (1) {\n"
+"        /* ... */\n"
+"    }\n"
+"}"
+msgstr ""
+"#include \"nx_init.h\"\n"
+"\n"
+"/* Board-level initialization function */\n"
+"static int board_clock_init(void) {\n"
+"    /* Configure system clock */\n"
+"    return 0;  /* Success */\n"
+"}\n"
+"\n"
+"/* Register the function to run at BOARD level */\n"
+"NX_INIT_BOARD_EXPORT(board_clock_init);\n"
+"\n"
+"/* Driver initialization function */\n"
+"static int uart_driver_init(void) {\n"
+"    /* Initialize UART driver */\n"
+"    return 0;  /* Success */\n"
+"}\n"
+"\n"
+"/* Register the function to run at DRIVER level */\n"
+"NX_INIT_DRIVER_EXPORT(uart_driver_init);\n"
+"\n"
+"/* In main() */\n"
+"int main(void) {\n"
+"    nx_status_t status;\n"
+"\n"
+"    /* Run all registered initialization functions */\n"
+"    status = nx_init_run();\n"
+"    if (status != NX_OK) {\n"
+"        /* Handle initialization failure */\n"
+"    }\n"
+"\n"
+"    /* Check if all initializations succeeded */\n"
+"    if (!nx_init_is_complete()) {\n"
+"        /* Some initializations failed */\n"
+"        nx_init_stats_t stats;\n"
+"        nx_init_get_stats(&stats);\n"
+"        /* Log or handle the failure */\n"
+"    }\n"
+"\n"
+"    /* Application code */\n"
+"    while (1) {\n"
+"        /* ... */\n"
+"    }\n"
+"}"
+
+#: ../../api/init.rst:123 e631eb996ed546b8af63c56f0bfef20a
+msgid "Thread Safety"
+msgstr "线程 Safety"
+
+#: ../../api/init.rst:125 56d49c3f44ad4faea7e964b51dc877a7
+msgid ""
+"The Init Framework is **not thread-safe**. All initialization functions "
+"should be called during system startup before any threads are created. The "
+"``nx_init_run()`` function should only be called once from the main thread."
+msgstr ""
+"The Init Framework is **not thread-safe**. All initialization functions "
+"should be called during system startup before any threads are created. The "
+"``nx_init_run()`` function should only be called once from the main thread."
+
+#: ../../api/init.rst:130 b1b25512bf1b4d60b221c6cae6e7fae1
+msgid "Notes"
+msgstr "注意事项"
+
+#: ../../api/init.rst:132 403ad521fb08416e8dc82dd928171520
+msgid ""
+"Initialization functions execute in level order (BOARD → PREV → BSP → DRIVER"
+" → COMPONENT → APP)"
+msgstr ""
+
+#: ../../api/init.rst:133 0716a868286149c0ba585e3cb0757e7b
+msgid "Within the same level, execution order is undefined"
+msgstr ""
+
+#: ../../api/init.rst:134 f9ff3d8310cb411698ba661ce9437bd3
+msgid ""
+"If an initialization function fails (returns non-zero), execution continues "
+"with remaining functions"
+msgstr ""
+"If an initialization function fails (returns non-zero), execution continues "
+"with remaining functions"
+
+#: ../../api/init.rst:135 b4245770d94c45caa301329f26ea2190
+msgid ""
+"Use ``nx_init_get_stats()`` to check for failures after ``nx_init_run()``"
+msgstr ""
+"Use ``nx_init_get_stats()`` to check for failures after ``nx_init_run()``"
+
+#: ../../api/init.rst:136 c5414498dc7e4fadaf905c4180ab7b94
+msgid ""
+"Initialization functions should be lightweight and avoid blocking operations"
+msgstr ""
+
+#: ../../api/init.rst:139 8ff67ee9ac0746c6b5a867cfddaeb841
+msgid "Related APIs"
+msgstr ""
+
+#: ../../api/init.rst:141 356f104bf1594509b9b8e8cd95b05574
+msgid ":doc:`hal` - HAL initialization typically uses DRIVER level"
+msgstr ":doc:`hal` - HAL initialization typically uses DRIVER level"
+
+#: ../../api/init.rst:142 467e662831cd4fbbb4cca30c1fd94a2d
+msgid ":doc:`osal` - OSAL initialization typically uses PREV level"
+msgstr ":doc:`osal` - OSAL initialization typically uses PREV level"
+
+#: ../../api/init.rst:143 0539f9ed7b33499c8ace3cf049cc1b7a
+msgid ":doc:`log` - Log framework initialization"
+msgstr ":doc:`log` - Log framework initialization"
+
+#: ../../api/init.rst:144 5e7df4725ef94039a02b0a0eb1e14fcf
+msgid ":doc:`config` - Config manager initialization"
+msgstr ":doc:`config` - Config manager initialization"
+
+#: ../../api/init.rst:147 0ebc70dc3db84ef2be1f5c5d8189d977
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../api/init.rst:149 8ee3f97dd4bf45019980696abb12db9e
+msgid ":doc:`../user_guide/architecture` - System Architecture"
+msgstr ":doc:`../user_guide/architecture` - System Architecture"
+
+#: ../../api/init.rst:150 26e0b9e9bc8242af80b76b0024ccb116
+msgid ":doc:`../reference/error_codes` - Error Code Reference"
+msgstr ":doc:`../reference/error_codes` - Error Code Reference"
+
+#: ../../api/init.rst:151 afcc40713484431fbe0973daa5fd73d8
+msgid ":doc:`hal` - HAL API Reference"
+msgstr ":doc:`hal` - HAL API Reference"

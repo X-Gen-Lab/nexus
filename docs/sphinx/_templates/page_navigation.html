@@ -1,0 +1,124 @@
+{# Page navigation (previous/next) #}
+<div class="page-navigation" role="navigation" aria-label="page navigation">
+    <div class="nav-links">
+        {% if prev %}
+        <div class="nav-link nav-prev">
+            <a href="{{ prev.link|e }}" rel="prev">
+                <span class="nav-arrow">←</span>
+                <div class="nav-content">
+                    <div class="nav-label">{{ _('Previous') }}</div>
+                    <div class="nav-title">{{ prev.title }}</div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+
+        {% if next %}
+        <div class="nav-link nav-next">
+            <a href="{{ next.link|e }}" rel="next">
+                <div class="nav-content">
+                    <div class="nav-label">{{ _('Next') }}</div>
+                    <div class="nav-title">{{ next.title }}</div>
+                </div>
+                <span class="nav-arrow">→</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .page-navigation {
+        margin: 40px 0 20px;
+        padding: 20px 0;
+        border-top: 1px solid #e1e4e8;
+    }
+
+    .nav-links {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .nav-link {
+        flex: 1;
+        max-width: 48%;
+    }
+
+    .nav-link a {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background: #f6f8fa;
+        border: 1px solid #e1e4e8;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #24292e;
+        transition: all 0.2s;
+    }
+
+    .nav-link a:hover {
+        background: #fff;
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+
+    .nav-prev a {
+        justify-content: flex-start;
+    }
+
+    .nav-next a {
+        justify-content: flex-end;
+    }
+
+    .nav-arrow {
+        font-size: 24px;
+        color: #667eea;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .nav-prev .nav-arrow {
+        margin-right: 12px;
+    }
+
+    .nav-next .nav-arrow {
+        margin-left: 12px;
+    }
+
+    .nav-content {
+        flex: 1;
+    }
+
+    .nav-prev .nav-content {
+        text-align: left;
+    }
+
+    .nav-next .nav-content {
+        text-align: right;
+    }
+
+    .nav-label {
+        font-size: 12px;
+        color: #586069;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .nav-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: #24292e;
+    }
+
+    @media (max-width: 768px) {
+        .nav-links {
+            flex-direction: column;
+        }
+
+        .nav-link {
+            max-width: 100%;
+        }
+    }
+</style>

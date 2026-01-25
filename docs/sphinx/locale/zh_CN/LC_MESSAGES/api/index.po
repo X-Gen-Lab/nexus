@@ -1,0 +1,236 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../api/index.rst:2 a59edf9fd22d4423a3855b08ddb32ee0
+msgid "API Reference"
+msgstr "API 参考"
+
+#: ../../api/index.rst:4 be9f364c38934f2e83d4e68dd9b5504a
+msgid ""
+"This section provides comprehensive API documentation for all Nexus modules."
+" The API documentation is automatically generated from source code using "
+"Doxygen and integrated via Breathe."
+msgstr "本节提供所有 Nexus 模块的完整 API 文档。API 文档使用 Doxygen 从源代码自动生成，并通过 Breathe 集成。"
+
+#: ../../api/index.rst:9 28088ed4a35e49a1941e6683ce2f1a95
+msgid "Core Layers"
+msgstr "核心层"
+
+#: ../../api/index.rst:12 a5607b0a03a3409f9d8d91a0cc92b40a
+msgid "Hardware Abstraction Layer (HAL)"
+msgstr "Hardware Abstraction Layer (HAL)"
+
+#: ../../api/index.rst:14 93035849c83243e986034297f8108d97
+msgid ""
+"The HAL provides a unified interface for hardware peripherals across "
+"different platforms."
+msgstr "HAL提供"
+
+#: ../../api/index.rst:16 971ad1daccf84633aeb22930a2226409
+msgid ":doc:`hal`"
+msgstr ":doc:`hal`"
+
+#: ../../api/index.rst:17 5ff9ab08cfde4b4b8edefe23dde9979f
+msgid ""
+"Complete HAL API reference including GPIO, UART, SPI, I2C, Timer, ADC, and "
+"more."
+msgstr "完整的 HAL API 参考，包括 GPIO、UART、SPI、I2C、定时器、ADC 等。"
+
+#: ../../api/index.rst:20 defed7b63f2d400baea6dd902731471a
+msgid "OS Abstraction Layer (OSAL)"
+msgstr "OS Abstraction Layer (OSAL)"
+
+#: ../../api/index.rst:22 275e26050e534754bac024ee7cde096a
+msgid ""
+"The OSAL provides a portable RTOS interface supporting multiple backends."
+msgstr "OSAL提供"
+
+#: ../../api/index.rst:24 ec23d35e67d1494a9b9229276f61b848
+msgid ":doc:`osal`"
+msgstr ":doc:`osal`"
+
+#: ../../api/index.rst:25 a1721137b1db4f68afa86cdc15148629
+msgid ""
+"Complete OSAL API reference including tasks, mutexes, semaphores, queues, "
+"and timers."
+msgstr "完整的 OSAL API 参考，包括任务、互斥锁、信号量、队列和定时器。"
+
+#: ../../api/index.rst:28 7504033f144243859b209d23aa40549a
+msgid "Framework Modules"
+msgstr "框架 Modules"
+
+#: ../../api/index.rst:31 f91937e1c437447a95f59f849cfc59ac
+msgid "Init Framework"
+msgstr "Init 框架"
+
+#: ../../api/index.rst:33 ccda9974c4bb427885bfd7dc6ab55286
+msgid "Automatic initialization system using linker sections."
+msgstr "使用链接器段的自动初始化系统。"
+
+#: ../../api/index.rst:35 8a8d7024173e488282215288732922c1
+msgid ":doc:`init`"
+msgstr ":doc:`init`"
+
+#: ../../api/index.rst:36 892d86b6c25249548d64f052f35c3fd9
+msgid ""
+"Init Framework API reference with initialization levels and export macros."
+msgstr "Init 框架 API 参考，包含初始化级别和导出宏。"
+
+#: ../../api/index.rst:39 1fa8224341b04275815608bd0a25e60b
+msgid "Log Framework"
+msgstr "Log 框架"
+
+#: ../../api/index.rst:41 bd41d1e2f67445c5b34abf8f7eab2de5
+msgid "Flexible logging system with multiple backends and async support."
+msgstr "灵活的日志系统，支持多个后端和异步支持。"
+
+#: ../../api/index.rst:43 7151ea1cff044c0aaf6afeb04321a21c
+msgid ":doc:`log`"
+msgstr ":doc:`log`"
+
+#: ../../api/index.rst:44 30b4b0b32e9448158432b1d0d1b7c369
+msgid ""
+"Log Framework API reference including log levels, backends, and "
+"configuration."
+msgstr "Log 框架 API 参考，包括日志级别、后端和配置。"
+
+#: ../../api/index.rst:47 e2652948d9f94cd8b5487dc896abfe67
+msgid "Shell Framework"
+msgstr "Shell 框架"
+
+#: ../../api/index.rst:49 df44b4d7915f47adb2b1e935ae0e457f
+msgid "Interactive command-line interface with autocomplete and history."
+msgstr "交互式命令行界面，支持自动完成和历史记录。"
+
+#: ../../api/index.rst:51 649c04c9a3b148dfaebe65126557ecaa
+msgid ":doc:`shell`"
+msgstr ":doc:`shell`"
+
+#: ../../api/index.rst:52 a858cc1f20064ffc9194e18282eaf3bb
+msgid ""
+"Shell Framework API reference including command registration and line "
+"editing."
+msgstr "Shell 框架 API 参考，包括命令注册和行编辑。"
+
+#: ../../api/index.rst:55 c21c78e2f39d41dd93f349504cdb94ca
+msgid "Config Manager"
+msgstr "配置管理器"
+
+#: ../../api/index.rst:57 7de1f2946b274f1989eb28ac1a149d19
+msgid "Configuration management system with multiple storage backends."
+msgstr "配置管理系统，支持多个存储后端。"
+
+#: ../../api/index.rst:59 fb621c14fbe84d67b72c8b1b71cfd365
+msgid ":doc:`config`"
+msgstr ":doc:`config`"
+
+#: ../../api/index.rst:60 abac7b5c304a42a39551b482389feaa3
+msgid "Config Manager API reference including data types and backends."
+msgstr "配置管理器 API 参考，包括数据类型和后端。"
+
+#: ../../api/index.rst:63 2a10b9f4c4f34badbc579f734ab05e07
+msgid "Development Tools"
+msgstr "开发 Tools"
+
+#: ../../api/index.rst:66 79a65c209d4041ec8cf0ca4fd0c72902
+msgid "Kconfig Tools"
+msgstr "Kconfig 工具"
+
+#: ../../api/index.rst:68 fbce730172ae42e29f6090138b2ed9fd
+msgid "Tools for managing Kconfig-based configuration."
+msgstr "用于管理基于 Kconfig 的配置的工具。"
+
+#: ../../api/index.rst:70 03b1ec2534bf4af686fe0fb6766bc480
+msgid ":doc:`kconfig_tools`"
+msgstr ":doc:`kconfig_tools`"
+
+#: ../../api/index.rst:71 15b052693bcb4a3987bf19136c2c9285
+msgid ""
+"Kconfig tools API reference for configuration generation and validation."
+msgstr "Kconfig 工具 API 参考，用于配置生成和验证。"
+
+#: ../../api/index.rst:74 52b0336ec7e04df3a448581d38ddccb2
+msgid "Module Organization"
+msgstr "模块 Organization"
+
+#: ../../api/index.rst:76 4e95aa6b6a9a4219b55e36c67482bcc3
+msgid "The Nexus API is organized into the following categories:"
+msgstr "Nexus API 组织为以下类别："
+
+#: ../../api/index.rst:78 194d818ed0d54f1698deb987dc105c7e
+msgid "**Core Layers:**"
+msgstr "**Core Layers:**"
+
+#: ../../api/index.rst:80 eeda5de422094353b7fc9c6c3152b4c6
+msgid "**HAL** - Hardware abstraction for peripherals"
+msgstr "**HAL** - 外设的硬件抽象"
+
+#: ../../api/index.rst:81 b12924a7e78d4274b5692bbec0b499ab
+msgid "**OSAL** - Operating system abstraction"
+msgstr "**OSAL** - 操作系统抽象"
+
+#: ../../api/index.rst:83 38b2c86379f047a18c7571bb91606a57
+msgid "**Framework Modules:**"
+msgstr "**Framework Modules:**"
+
+#: ../../api/index.rst:85 680cc87d97e34568bac44e3e098ac51a
+msgid "**Init** - Automatic initialization system"
+msgstr "**Init** - 自动初始化系统"
+
+#: ../../api/index.rst:86 5f7ce55704d04a8ea62732504bff8c4d
+msgid "**Log** - Logging framework"
+msgstr "**Log** - 日志框架"
+
+#: ../../api/index.rst:87 5edfe3da8b6b41b9881e22e90410675c
+msgid "**Shell** - Command-line interface"
+msgstr "**Shell** - 命令行界面"
+
+#: ../../api/index.rst:88 b7732378c8634b13a95e6bc8ad220969
+msgid "**Config** - Configuration management"
+msgstr "**Config** - 配置管理"
+
+#: ../../api/index.rst:90 aa2f4736dd5549eea07fb1870543b0c0
+msgid "**Development Tools:**"
+msgstr "**Development Tools:**"
+
+#: ../../api/index.rst:92 eb1658c2210b499096810ec2a90e57dc
+msgid "**Kconfig Tools** - Configuration management tools"
+msgstr "**Kconfig Tools** - 配置管理工具"
+
+#: ../../api/index.rst:95 d3c8c5ee6b134ec18e692ea424f9f9c8
+msgid "API Documentation Standards"
+msgstr "API 文档标准"
+
+#: ../../api/index.rst:97 ade64cffef174f2f82700b66752bb9bc
+msgid "All API functions follow these documentation standards:"
+msgstr "所有 API 函数都遵循以下文档标准："
+
+#: ../../api/index.rst:99 cd49e4e4244a4bbe9f05d5c647cf230f
+msgid "**Function signatures** with parameter types and return values"
+msgstr "**函数签名**，包含参数类型和返回值"
+
+#: ../../api/index.rst:100 7585b15ba5e34870879c98840c4c6755
+msgid "**Parameter descriptions** with direction (in/out/in-out)"
+msgstr "**Parameter descriptions** with direction (in/out/in-out)"
+
+#: ../../api/index.rst:101 b6ba408e2ba9425f9c7d9e33983dd6c9
+msgid "**Return value descriptions** including error codes"
+msgstr "**返回值描述**，包括错误代码"
+
+#: ../../api/index.rst:102 7a0c4e11bf4640e9a079eb1b24748e22
+msgid "**Usage examples** for common patterns"
+msgstr "常见模式的**使用示例**"
+
+#: ../../api/index.rst:103 aa71a3e0f31245a28de1059a1fce21a6
+msgid "**Thread-safety information** for concurrent usage"
+msgstr "并发使用的**线程安全信息**"
+
+#: ../../api/index.rst:104 01494e7979e545e89d19c5bdcfdfb77d
+msgid "**Cross-references** to related functions"
+msgstr ""

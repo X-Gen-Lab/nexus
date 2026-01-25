@@ -1,0 +1,515 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../reference/api_index.rst:2 1defc2432ac54938a19fbf4b97393d90
+msgid "API Functions Index"
+msgstr ""
+
+#: ../../reference/api_index.rst:4 5ef758384b324eb58332f65e5d12a4f3
+msgid ""
+"This page provides a comprehensive index of all API functions available in "
+"the Nexus Embedded Platform, organized by module."
+msgstr ""
+
+#: ../../reference/api_index.rst:8 a5271594efcd40cfa61d0e6038bea94a
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../reference/api_index.rst:11 7bb81ebb25984db5beef11f57d4c9b4b
+msgid "HAL API"
+msgstr ""
+
+#: ../../reference/api_index.rst:14 9afc111e227a4740bc5618bb00ca08dd
+msgid "Core HAL Functions"
+msgstr ""
+
+#: ../../reference/api_index.rst:21 140b8d3d6bfb41ae8fe2b35f8b7ee563
+msgid "``nx_hal_init()`` - Initialize HAL subsystem"
+msgstr "``nx_hal_init()`` - Initialize HAL subsystem"
+
+#: ../../reference/api_index.rst:22 0e3a4fbfe9f44d5597a9d291bb616024
+msgid "``nx_hal_deinit()`` - Deinitialize HAL subsystem"
+msgstr "``nx_hal_deinit()`` - Deinitialize HAL subsystem"
+
+#: ../../reference/api_index.rst:23 5cfd55c2c43f443fa9c2d3ec6001507b
+msgid "``nx_hal_get_version()`` - Get HAL version"
+msgstr "``nx_hal_get_version()`` - Get HAL version"
+
+#: ../../reference/api_index.rst:25 125926bc73ca46af9fa7647a6e386af4
+msgid "See :doc:`../api/hal` for complete HAL API documentation."
+msgstr ""
+
+#: ../../reference/api_index.rst:28 b70c8c5ddd8e40698241c635f069e41d
+msgid "Factory Functions"
+msgstr ""
+
+#: ../../reference/api_index.rst:31 8c8d94021d7d4a699dd516eaf521da90
+msgid "GPIO Factory"
+msgstr ""
+
+#: ../../reference/api_index.rst:38 cfdc810759184e3e8ee6771a0b90efcc
+msgid "``nx_factory_gpio(port, pin)`` - Create GPIO device"
+msgstr "``nx_factory_gpio(port, pin)`` - Create GPIO device"
+
+#: ../../reference/api_index.rst:39 75f625e041fa4f6b9501bce8f96df524
+msgid ""
+"``nx_factory_gpio_with_config(port, pin, config)`` - Create GPIO with "
+"configuration"
+msgstr ""
+"``nx_factory_gpio_with_config(port, pin, config)`` - Create GPIO with "
+"configuration"
+
+#: ../../reference/api_index.rst:40 1d3b643be38b411a8d3f5c2e6a5e5654
+msgid "``nx_factory_gpio_release(device)`` - Release GPIO device"
+msgstr "``nx_factory_gpio_release(device)`` - Release GPIO device"
+
+#: ../../reference/api_index.rst:43 f4d0103bacef49ef840ff316bb39d973
+msgid "UART Factory"
+msgstr ""
+
+#: ../../reference/api_index.rst:50 90580ff9ff9641938749d971e099d4dd
+msgid "``nx_factory_uart(instance)`` - Create UART device"
+msgstr "``nx_factory_uart(instance)`` - Create UART device"
+
+#: ../../reference/api_index.rst:51 b65b7f9d592443daa5d57f8dad4a4bfd
+msgid ""
+"``nx_factory_uart_with_config(instance, config)`` - Create UART with "
+"configuration"
+msgstr ""
+"``nx_factory_uart_with_config(instance, config)`` - Create UART with "
+"configuration"
+
+#: ../../reference/api_index.rst:52 f86ef39c06284edaa99f5130f724ad47
+msgid "``nx_factory_uart_release(device)`` - Release UART device"
+msgstr "``nx_factory_uart_release(device)`` - Release UART device"
+
+#: ../../reference/api_index.rst:55 efc8627ff1314cd8838d58b317b990df
+msgid "SPI Factory"
+msgstr ""
+
+#: ../../reference/api_index.rst:62 5f47067bb0a942f3bb6d2dbd08896c9c
+msgid "``nx_factory_spi(instance)`` - Create SPI device"
+msgstr "``nx_factory_spi(instance)`` - Create SPI device"
+
+#: ../../reference/api_index.rst:63 c1f5833ff86b4ed6bacc1ec594eeb119
+msgid ""
+"``nx_factory_spi_with_config(instance, config)`` - Create SPI with "
+"configuration"
+msgstr ""
+"``nx_factory_spi_with_config(instance, config)`` - Create SPI with "
+"configuration"
+
+#: ../../reference/api_index.rst:64 e8f801c0555d4635ac601539b07773d1
+msgid "``nx_factory_spi_release(device)`` - Release SPI device"
+msgstr "``nx_factory_spi_release(device)`` - Release SPI device"
+
+#: ../../reference/api_index.rst:67 6d901e50147743379d5742caf6221d82
+msgid "I2C Factory"
+msgstr ""
+
+#: ../../reference/api_index.rst:74 684a6b898ad348be93a8db2898a9cfc9
+msgid "``nx_factory_i2c(instance)`` - Create I2C device"
+msgstr "``nx_factory_i2c(instance)`` - Create I2C device"
+
+#: ../../reference/api_index.rst:75 fc4fac92dcd84cdea593d01a3ce58aac
+msgid ""
+"``nx_factory_i2c_with_config(instance, config)`` - Create I2C with "
+"configuration"
+msgstr ""
+"``nx_factory_i2c_with_config(instance, config)`` - Create I2C with "
+"configuration"
+
+#: ../../reference/api_index.rst:76 0237162d6c4b4a058d6c982b39db6c23
+msgid "``nx_factory_i2c_release(device)`` - Release I2C device"
+msgstr "``nx_factory_i2c_release(device)`` - Release I2C device"
+
+#: ../../reference/api_index.rst:79 9be7d9f983bf445fa483e992f5d861c5
+msgid "GPIO Interface"
+msgstr ""
+
+#: ../../reference/api_index.rst:90 c85d21d3b51747d493251d9ac9675e4a
+msgid "``gpio->write(gpio, value)`` - Write GPIO pin"
+msgstr "``gpio->write(gpio, value)`` - Write GPIO pin"
+
+#: ../../reference/api_index.rst:91 145c2b94fbe5408f8e65a4f1ba74e27c
+msgid "``gpio->read(gpio)`` - Read GPIO pin"
+msgstr "``gpio->read(gpio)`` - Read GPIO pin"
+
+#: ../../reference/api_index.rst:92 1883a639b8c849198b607075f9ba1e15
+msgid "``gpio->toggle(gpio)`` - Toggle GPIO pin"
+msgstr "``gpio->toggle(gpio)`` - Toggle GPIO pin"
+
+#: ../../reference/api_index.rst:93 db3a8838308a47bbbdd79e92d65bbc27
+msgid "``gpio->set_mode(gpio, mode)`` - Set GPIO mode"
+msgstr "``gpio->set_mode(gpio, mode)`` - Set GPIO mode"
+
+#: ../../reference/api_index.rst:94 b5f573aacd7044abb4ae19b49feba3d6
+msgid "``gpio->set_pull(gpio, pull)`` - Set GPIO pull resistor"
+msgstr "``gpio->set_pull(gpio, pull)`` - Set GPIO pull resistor"
+
+#: ../../reference/api_index.rst:95 0ff3f7f894204629b2d4ba2641ffacdc
+msgid ""
+"``gpio->set_exti(gpio, trigger, callback, ctx)`` - Configure external "
+"interrupt"
+msgstr ""
+"``gpio->set_exti(gpio, trigger, callback, ctx)`` - Configure external "
+"interrupt"
+
+#: ../../reference/api_index.rst:98 aa156f46e1c44e5f8c4245ec6d143fb6
+msgid "UART Interface"
+msgstr ""
+
+#: ../../reference/api_index.rst:107 604414bebc9241f790e0eb390282f1e6
+msgid "``uart->get_tx_sync(uart)`` - Get synchronous TX interface"
+msgstr "``uart->get_tx_sync(uart)`` - Get synchronous TX interface"
+
+#: ../../reference/api_index.rst:108 fe1b7d60937348a8bb4dbb0ea68616bc
+msgid "``uart->get_rx_sync(uart)`` - Get synchronous RX interface"
+msgstr "``uart->get_rx_sync(uart)`` - Get synchronous RX interface"
+
+#: ../../reference/api_index.rst:109 3f80db2048274081b61b534960d181c2
+msgid "``uart->get_tx_async(uart)`` - Get asynchronous TX interface"
+msgstr "``uart->get_tx_async(uart)`` - Get asynchronous TX interface"
+
+#: ../../reference/api_index.rst:110 e75e60d95429495194da8fd7efa024da
+msgid "``uart->get_rx_async(uart)`` - Get asynchronous RX interface"
+msgstr "``uart->get_rx_async(uart)`` - Get asynchronous RX interface"
+
+#: ../../reference/api_index.rst:113 db48df2487444f66acc14f58e61b6ccd
+msgid "OSAL API"
+msgstr ""
+
+#: ../../reference/api_index.rst:116 461466bab4c446079f071aab2787f5d3
+msgid "Core OSAL Functions"
+msgstr ""
+
+#: ../../reference/api_index.rst:123 7258ad9e869c44a99b0d82ba01c4dcd3
+msgid "``osal_init()`` - Initialize OSAL"
+msgstr "``osal_init()`` - Initialize OSAL"
+
+#: ../../reference/api_index.rst:124 8844bdd870df49e1a03207ad1c1088e8
+msgid "``osal_start()`` - Start OSAL scheduler"
+msgstr "``osal_start()`` - Start OSAL scheduler"
+
+#: ../../reference/api_index.rst:125 960c4181c0dc47d0a516b502e56ea835
+msgid "``osal_get_backend()`` - Get current backend name"
+msgstr "``osal_get_backend()`` - Get current backend name"
+
+#: ../../reference/api_index.rst:127 8d6098fec0224a6594260e425ce63aac
+msgid "See :doc:`../api/osal` for complete OSAL API documentation."
+msgstr ""
+
+#: ../../reference/api_index.rst:130 ced45d9535e84a189299907f52962f85
+msgid "Task Management"
+msgstr ""
+
+#: ../../reference/api_index.rst:140 3a04d68663934c7993e16cca1a243494
+msgid ""
+"``osal_task_create(name, func, arg, priority, stack_size)`` - Create task"
+msgstr ""
+"``osal_task_create(name, func, arg, priority, stack_size)`` - Create task"
+
+#: ../../reference/api_index.rst:141 6d532469efdb4274a6361cfd1ece36eb
+msgid "``osal_task_delete(task)`` - Delete task"
+msgstr "``osal_task_delete(task)`` - Delete task"
+
+#: ../../reference/api_index.rst:142 8288e95401264102a06fe1fe0c588f0d
+msgid "``osal_task_suspend(task)`` - Suspend task"
+msgstr "``osal_task_suspend(task)`` - Suspend task"
+
+#: ../../reference/api_index.rst:143 c1e17d2783704bcbacb79a7c2dcc86c2
+msgid "``osal_task_resume(task)`` - Resume task"
+msgstr "``osal_task_resume(task)`` - Resume task"
+
+#: ../../reference/api_index.rst:144 a4838df30e3348fea33fbba4c0d09eb8
+msgid "``osal_task_delay(ms)`` - Delay task"
+msgstr "``osal_task_delay(ms)`` - Delay task"
+
+#: ../../reference/api_index.rst:145 1e57039adbd34a158f89b86144a8f2b5
+msgid "``osal_task_get_current()`` - Get current task handle"
+msgstr "``osal_task_get_current()`` - Get current task handle"
+
+#: ../../reference/api_index.rst:148 e3c402613c9e47f68f215bea93f6bc03
+msgid "Synchronization"
+msgstr ""
+
+#: ../../reference/api_index.rst:151 527293529c0c4eb8b8e7253bcb347778
+msgid "Mutex"
+msgstr "互斥锁"
+
+#: ../../reference/api_index.rst:160 13fb3636258242da897e1e5b04a9ed54
+msgid "``osal_mutex_create()`` - Create mutex"
+msgstr "``osal_mutex_create()`` - Create mutex"
+
+#: ../../reference/api_index.rst:161 ecd0c31e28224ac6876800fcc6b30c17
+msgid "``osal_mutex_delete(mutex)`` - Delete mutex"
+msgstr "``osal_mutex_delete(mutex)`` - Delete mutex"
+
+#: ../../reference/api_index.rst:162 ebfc3be564954508857ebc484d0b657a
+msgid "``osal_mutex_lock(mutex, timeout)`` - Lock mutex"
+msgstr "``osal_mutex_lock(mutex, timeout)`` - Lock mutex"
+
+#: ../../reference/api_index.rst:163 8f4d01e08dd3465a9ee947da850170b6
+msgid "``osal_mutex_unlock(mutex)`` - Unlock mutex"
+msgstr "``osal_mutex_unlock(mutex)`` - Unlock mutex"
+
+#: ../../reference/api_index.rst:164 1e11ecc4789a47628792d983e504574e
+msgid "``osal_mutex_try_lock(mutex)`` - Try to lock mutex"
+msgstr "``osal_mutex_try_lock(mutex)`` - Try to lock mutex"
+
+#: ../../reference/api_index.rst:167 9129f5c8414c48dd971cefdf2609d114
+msgid "Semaphore"
+msgstr "信号量"
+
+#: ../../reference/api_index.rst:176 bc80b8a0ac7a4e01a95eea9cac17b0e3
+msgid "``osal_sem_create(initial_count, max_count)`` - Create semaphore"
+msgstr "``osal_sem_create(initial_count, max_count)`` - Create semaphore"
+
+#: ../../reference/api_index.rst:177 0b7fa4d2ad2446a3869405b078d7b577
+msgid "``osal_sem_delete(sem)`` - Delete semaphore"
+msgstr "``osal_sem_delete(sem)`` - Delete semaphore"
+
+#: ../../reference/api_index.rst:178 bd095e78d8484dfab68d2e40d2b1206e
+msgid "``osal_sem_wait(sem, timeout)`` - Wait on semaphore"
+msgstr "``osal_sem_wait(sem, timeout)`` - Wait on semaphore"
+
+#: ../../reference/api_index.rst:179 d5cf2d11664149f786f2300b08ec232c
+msgid "``osal_sem_post(sem)`` - Post semaphore"
+msgstr "``osal_sem_post(sem)`` - Post semaphore"
+
+#: ../../reference/api_index.rst:180 0ed33db288ef4c07bb60c3395d9dc370
+msgid "``osal_sem_get_count(sem)`` - Get semaphore count"
+msgstr "``osal_sem_get_count(sem)`` - Get semaphore count"
+
+#: ../../reference/api_index.rst:183 013ad45b97274f7a86e7d17b164e55c3
+msgid "Message Queue"
+msgstr "消息队列"
+
+#: ../../reference/api_index.rst:192 ce9f77c3cd724913b6515d7ec33b6315
+msgid "``osal_queue_create(length, item_size)`` - Create queue"
+msgstr "``osal_queue_create(length, item_size)`` - Create queue"
+
+#: ../../reference/api_index.rst:193 987b3fdfdab141f38e0253a9be388fd4
+msgid "``osal_queue_delete(queue)`` - Delete queue"
+msgstr "``osal_queue_delete(queue)`` - Delete queue"
+
+#: ../../reference/api_index.rst:194 d710e66d67c14233b8d39026deec1e05
+msgid "``osal_queue_send(queue, item, timeout)`` - Send to queue"
+msgstr "``osal_queue_send(queue, item, timeout)`` - Send to queue"
+
+#: ../../reference/api_index.rst:195 2a3f44530b7747adb7157e30512c97b8
+msgid "``osal_queue_receive(queue, item, timeout)`` - Receive from queue"
+msgstr "``osal_queue_receive(queue, item, timeout)`` - Receive from queue"
+
+#: ../../reference/api_index.rst:196 0c3f335c7e5147d18063ca6211c7d36a
+msgid "``osal_queue_available(queue)`` - Get available items"
+msgstr "``osal_queue_available(queue)`` - Get available items"
+
+#: ../../reference/api_index.rst:199 9992b523de65435cb3d84d6d246a1658
+msgid "Timer"
+msgstr "定时器"
+
+#: ../../reference/api_index.rst:208 c1751c6d21264dfab0d842594b9e125a
+msgid ""
+"``osal_timer_create(name, period, auto_reload, callback, arg)`` - Create "
+"timer"
+msgstr ""
+"``osal_timer_create(name, period, auto_reload, callback, arg)`` - Create "
+"timer"
+
+#: ../../reference/api_index.rst:209 5e11fc32652e4825a774af8931ca08ff
+msgid "``osal_timer_delete(timer)`` - Delete timer"
+msgstr "``osal_timer_delete(timer)`` - Delete timer"
+
+#: ../../reference/api_index.rst:210 315cece615234e2b99c948642c1576c7
+msgid "``osal_timer_start(timer)`` - Start timer"
+msgstr "``osal_timer_start(timer)`` - Start timer"
+
+#: ../../reference/api_index.rst:211 6ccad27f317b48a6a618d6942059223d
+msgid "``osal_timer_stop(timer)`` - Stop timer"
+msgstr "``osal_timer_stop(timer)`` - Stop timer"
+
+#: ../../reference/api_index.rst:212 df3aa3bd6e1142beb5697d12e1f7ecfe
+msgid "``osal_timer_reset(timer)`` - Reset timer"
+msgstr "``osal_timer_reset(timer)`` - Reset timer"
+
+#: ../../reference/api_index.rst:215 66ea2df01a7140b696f3c8743b86c41d
+msgid "Config Manager API"
+msgstr ""
+
+#: ../../reference/api_index.rst:226 4a6266c911d641f49a1815a36201b0d1
+msgid "``nx_config_init()`` - Initialize Config Manager"
+msgstr "``nx_config_init()`` - Initialize Config Manager"
+
+#: ../../reference/api_index.rst:227 b594fcd006284f2690ec7991f5a3fbc3
+msgid "``nx_config_deinit()`` - Deinitialize Config Manager"
+msgstr "``nx_config_deinit()`` - Deinitialize Config Manager"
+
+#: ../../reference/api_index.rst:228 55a3ebf4de244d6b9e27c746aed39bab
+msgid "``nx_config_set(key, value, type)`` - Set configuration value"
+msgstr "``nx_config_set(key, value, type)`` - Set configuration value"
+
+#: ../../reference/api_index.rst:229 44366b61b1194abb8d8af011dbfff17f
+msgid "``nx_config_get(key, value, type)`` - Get configuration value"
+msgstr "``nx_config_get(key, value, type)`` - Get configuration value"
+
+#: ../../reference/api_index.rst:230 55e24c75e66247ad8cf163fcb15f88dd
+msgid "``nx_config_delete(key)`` - Delete configuration key"
+msgstr "``nx_config_delete(key)`` - Delete configuration key"
+
+#: ../../reference/api_index.rst:231 9c11c8752620423c8df202345baa951f
+msgid "``nx_config_commit()`` - Commit changes to storage"
+msgstr "``nx_config_commit()`` - Commit changes to storage"
+
+#: ../../reference/api_index.rst:232 8b088ed29dff451faa25ac70e285382b
+msgid "``nx_config_rollback()`` - Rollback uncommitted changes"
+msgstr "``nx_config_rollback()`` - Rollback uncommitted changes"
+
+#: ../../reference/api_index.rst:234 728108014e904e07bdbfdd29d8438973
+msgid ""
+"See :doc:`../api/config` for complete Config Manager API documentation."
+msgstr ""
+
+#: ../../reference/api_index.rst:237 1c1c85a7400742ea9b67880a512e3cbc
+msgid "Log Framework API"
+msgstr ""
+
+#: ../../reference/api_index.rst:248 8c3bcfb6f358400897d1b2a36add2a16
+msgid "``nx_log_init()`` - Initialize Log Framework"
+msgstr "``nx_log_init()`` - Initialize Log Framework"
+
+#: ../../reference/api_index.rst:249 f9103d9de2a74776888018cc6deb672f
+msgid "``nx_log_deinit()`` - Deinitialize Log Framework"
+msgstr "``nx_log_deinit()`` - Deinitialize Log Framework"
+
+#: ../../reference/api_index.rst:250 47813d385a26425ab360510ac5c97fe1
+msgid "``NX_LOG_ERROR(tag, fmt, ...)`` - Log error message"
+msgstr "``NX_LOG_ERROR(tag, fmt, ...)`` - Log error message"
+
+#: ../../reference/api_index.rst:251 837208b3d1fa46819d3029a5ed20fa77
+msgid "``NX_LOG_WARN(tag, fmt, ...)`` - Log warning message"
+msgstr "``NX_LOG_WARN(tag, fmt, ...)`` - Log warning message"
+
+#: ../../reference/api_index.rst:252 c0f860be71014b249613fdfba19c204b
+msgid "``NX_LOG_INFO(tag, fmt, ...)`` - Log info message"
+msgstr "``NX_LOG_INFO(tag, fmt, ...)`` - Log info message"
+
+#: ../../reference/api_index.rst:253 e09b38333bcc4662bd3c41ea519337a4
+msgid "``NX_LOG_DEBUG(tag, fmt, ...)`` - Log debug message"
+msgstr "``NX_LOG_DEBUG(tag, fmt, ...)`` - Log debug message"
+
+#: ../../reference/api_index.rst:254 343f913784f944ed8c4e0ef400fe1b2c
+msgid "``NX_LOG_TRACE(tag, fmt, ...)`` - Log trace message"
+msgstr "``NX_LOG_TRACE(tag, fmt, ...)`` - Log trace message"
+
+#: ../../reference/api_index.rst:256 4fef1cb2d71043b9b85f841d1906b9b0
+msgid "See :doc:`../api/log` for complete Log Framework API documentation."
+msgstr ""
+
+#: ../../reference/api_index.rst:259 8d5bbb99668047678440b7460e9ee475
+msgid "Shell Framework API"
+msgstr ""
+
+#: ../../reference/api_index.rst:268 e735d55cbe2347219f4ee0c3525d7bea
+msgid "``nx_shell_init()`` - Initialize Shell Framework"
+msgstr "``nx_shell_init()`` - Initialize Shell Framework"
+
+#: ../../reference/api_index.rst:269 847cdce4c93e429f8bc814558aa2b0cd
+msgid "``nx_shell_deinit()`` - Deinitialize Shell Framework"
+msgstr "``nx_shell_deinit()`` - Deinitialize Shell Framework"
+
+#: ../../reference/api_index.rst:270 1b9b240c9e1547ad9b3c6b5759e7c28c
+msgid "``nx_shell_register_command(name, handler, help)`` - Register command"
+msgstr "``nx_shell_register_command(name, handler, help)`` - Register command"
+
+#: ../../reference/api_index.rst:271 8567467bcaaa44a9ad46f704f6ca2e6f
+msgid "``nx_shell_unregister_command(name)`` - Unregister command"
+msgstr "``nx_shell_unregister_command(name)`` - Unregister command"
+
+#: ../../reference/api_index.rst:272 53b96be98ae44d238f11d1f3945654fc
+msgid "``nx_shell_run()`` - Run shell main loop"
+msgstr "``nx_shell_run()`` - Run shell main loop"
+
+#: ../../reference/api_index.rst:274 c26bf416f4d4420186938ea9b7f12646
+msgid ""
+"See :doc:`../api/shell` for complete Shell Framework API documentation."
+msgstr ""
+
+#: ../../reference/api_index.rst:277 e10637c34ce04c4d90165041e53e7665
+msgid "Init Framework API"
+msgstr ""
+
+#: ../../reference/api_index.rst:288 f0b7d6f25e9546659262856a4464086b
+msgid "``nx_init_register(level, func)`` - Register initialization function"
+msgstr "``nx_init_register(level, func)`` - Register initialization function"
+
+#: ../../reference/api_index.rst:289 32f0442c7c48415cb0ede2c6c038c830
+msgid "``NX_INIT_BOARD(func)`` - Register board-level init"
+msgstr "``NX_INIT_BOARD(func)`` - Register board-level init"
+
+#: ../../reference/api_index.rst:290 fcb1a83c28a84a43b7c8402b81b80b1a
+msgid "``NX_INIT_PREV(func)`` - Register pre-BSP init"
+msgstr "``NX_INIT_PREV(func)`` - Register pre-BSP init"
+
+#: ../../reference/api_index.rst:291 ae553f23183147b8869607664358a74b
+msgid "``NX_INIT_BSP(func)`` - Register BSP-level init"
+msgstr "``NX_INIT_BSP(func)`` - Register BSP-level init"
+
+#: ../../reference/api_index.rst:292 02490adcf7924ad4a7fb573f519d4bf7
+msgid "``NX_INIT_DRIVER(func)`` - Register driver-level init"
+msgstr "``NX_INIT_DRIVER(func)`` - Register driver-level init"
+
+#: ../../reference/api_index.rst:293 6d4ea7558078454091549e182dec3915
+msgid "``NX_INIT_COMPONENT(func)`` - Register component-level init"
+msgstr "``NX_INIT_COMPONENT(func)`` - Register component-level init"
+
+#: ../../reference/api_index.rst:294 d13472dae55143208d1be416ca6b5714
+msgid "``NX_INIT_APP(func)`` - Register application-level init"
+msgstr "``NX_INIT_APP(func)`` - Register application-level init"
+
+#: ../../reference/api_index.rst:296 715b2105fee2481db4a67330c09528f0
+msgid "See :doc:`../api/init` for complete Init Framework API documentation."
+msgstr ""
+
+#: ../../reference/api_index.rst:299 4b9e45e6da354f7ab11a2dc2b33a5d1e
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../reference/api_index.rst:301 e155adaedb0a48d484b008b4bf77eecb
+msgid ":doc:`../api/index` - API Reference Overview"
+msgstr ":doc:`../api/index` - API Reference Overview"
+
+#: ../../reference/api_index.rst:302 66611a46e61b483298d0ade28c850368
+msgid ":doc:`kconfig_index` - Configuration Options Index"
+msgstr ":doc:`kconfig_index` - Configuration Options Index"
+
+#: ../../reference/api_index.rst:303 d112f7e1f6504dfabe8dc2a29454ee73
+msgid ":ref:`genindex` - General Index"
+msgstr ":ref:`genindex` - General Index"
+
+#: ../../reference/api_index.rst:304 7d41f5bdb773402eae6d51559b1a4381
+msgid ":ref:`modindex` - Module Index"
+msgstr ":ref:`modindex` - Module Index"
+
+#: ../../reference/api_index.rst:305 11d6358d82664a59a9b3198d4cd22c28
+msgid ":ref:`search` - Search Documentation"
+msgstr ":ref:`search` - Search Documentation"

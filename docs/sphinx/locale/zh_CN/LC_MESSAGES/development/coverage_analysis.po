@@ -1,0 +1,1380 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../development/coverage_analysis.rst:2 c5617c9e37e74f1cbd90f3c1a6b7dc38
+msgid "Coverage Analysis Workflow"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:4 5fa0cacf690f4e14bb953fc0fbba832c
+msgid ""
+"This guide covers the complete workflow for code coverage analysis in the "
+"Nexus Embedded Platform, including setup, execution, reporting, and "
+"integration with CI/CD systems."
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:8 2371f6aa00c846fa9ffc943ea05801df
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../development/coverage_analysis.rst:11 62bee1ba28ea46ec9fca7936275c2384
+msgid "Overview"
+msgstr "概述"
+
+#: ../../development/coverage_analysis.rst:13 04f24b344e65456f8e9ba43526b97d8f
+msgid ""
+"Code coverage analysis measures which parts of your code are executed during"
+" testing. The Nexus platform uses:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:15 6c955d600c37476fa101ce7c699f1453
+msgid "**gcov**: GNU coverage tool for C/C++ code"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:16 6488a454ab754947bb02bd145dc0c71a
+msgid "**lcov**: Frontend for gcov with HTML report generation"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:17 07240b0e793449c0b6943d6d2e0f4a61
+msgid "**Hypothesis**: Property-based testing with coverage tracking"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:20 7726d582f26049cc9938fe220b157e7e
+msgid "Coverage Metrics"
+msgstr "覆盖率指标"
+
+#: ../../development/coverage_analysis.rst:22 b92294e7606648e5bd50849d0e45a7ee
+msgid "The system tracks three types of coverage:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:24 a682ed95362243d0a36dcae30ec3f8ae
+msgid "**Line Coverage**: Percentage of code lines executed"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:25 1e36391f6cbe480c8a91975f587cb2b9
+msgid "**Branch Coverage**: Percentage of conditional branches taken"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:26 00a8740ec26f40a3bac3b816387ba03e
+msgid "**Function Coverage**: Percentage of functions called"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:29 a3fec39a27784dd7acf9c44fee14cb04
+msgid "Setup"
+msgstr "设置"
+
+#: ../../development/coverage_analysis.rst:32 a9f33885c2cf4692b49feafa9c70fc93
+msgid "Prerequisites"
+msgstr "前置条件"
+
+#: ../../development/coverage_analysis.rst:34 03ccf32f6c1b448d80b00d4bd8d75814
+msgid "**Linux/macOS:**"
+msgstr "**Linux/macOS:**"
+
+#: ../../development/coverage_analysis.rst:36 5967fc4f48a04ac7bc732b7671e3acd1
+msgid ""
+"# Ubuntu/Debian\n"
+"sudo apt-get install -y lcov\n"
+"\n"
+"# macOS\n"
+"brew install lcov"
+msgstr ""
+"# Ubuntu/Debian\n"
+"sudo apt-get install -y lcov\n"
+"\n"
+"# macOS\n"
+"brew install lcov"
+
+#: ../../development/coverage_analysis.rst:44 1a90d175977a447daf1b675041ff8a54
+msgid "**Windows:**"
+msgstr "**Windows:**"
+
+#: ../../development/coverage_analysis.rst:46 9802b18b9f034c97af31a4586e7d0c13
+msgid ""
+"# OpenCppCoverage (optional)\n"
+"choco install opencppcoverage"
+msgstr ""
+"# OpenCppCoverage (optional)\n"
+"choco install opencppcoverage"
+
+#: ../../development/coverage_analysis.rst:52 456aa192fc6740f59503f70ed48a5784
+msgid "Python Dependencies"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:54 44eb0b05cbc04e91967da198f2b47c37
+msgid "pip install -r scripts/validation/requirements.txt"
+msgstr "pip install -r scripts/validation/requirements.txt"
+
+#: ../../development/coverage_analysis.rst:58 2a758f50d20f46c495084e62260a3d50
+msgid "The main dependencies are:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:60 4f4fb22f627b4c0198c41a53bc21c7a8
+msgid "``hypothesis``: Property-based testing"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:61 a20c5366fe4f49ff89b5c62d4e85db9c
+msgid "``pytest``: Test framework"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:62 1d08082c25f3483885860111c7bec3ca
+msgid "``pytest-cov``: Coverage plugin for pytest"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:65 84e856468d4d430ba3b2467200a05867
+msgid "CMake Configuration"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:67 4b4bb0d5d5254e489a53b762c3e97616
+msgid "Enable coverage in CMake:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:69 d318b85a832d4afa9d33a57b56f5a485
+msgid ""
+"cmake -B build \\\n"
+"    -DCMAKE_BUILD_TYPE=Debug \\\n"
+"    -DNEXUS_BUILD_TESTS=ON \\\n"
+"    -DNEXUS_ENABLE_COVERAGE=ON"
+msgstr ""
+"cmake -B build \\\n"
+"    -DCMAKE_BUILD_TYPE=Debug \\\n"
+"    -DNEXUS_BUILD_TESTS=ON \\\n"
+"    -DNEXUS_ENABLE_COVERAGE=ON"
+
+#: ../../development/coverage_analysis.rst:76 c9803cbb4eb44c33b49a7f116c0d8cd1
+msgid "This adds the necessary compiler flags:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:78 80a915eca4f441a78682b419f9e96153
+msgid "GCC/Clang: ``-fprofile-arcs -ftest-coverage``"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:79 d3140543aadd4c44b7f79c527ae9d3e3
+msgid "MSVC: ``/PROFILE`` (if using OpenCppCoverage)"
+msgstr "MSVC: ``/PROFILE`` (if using OpenCppCoverage)"
+
+#: ../../development/coverage_analysis.rst:82 9b785d2b56de46d7a873dbe94f089358
+msgid "Basic Workflow"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:85 deae811a46514b78b5805c746c1389da
+msgid "Step 1: Build with Coverage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:87 1156bb9bd4f84c729df5634c960d3a1f
+msgid ""
+"# Configure with coverage enabled\n"
+"cmake -B build \\\n"
+"    -DCMAKE_BUILD_TYPE=Debug \\\n"
+"    -DNEXUS_BUILD_TESTS=ON \\\n"
+"    -DNEXUS_ENABLE_COVERAGE=ON\n"
+"\n"
+"# Build\n"
+"cmake --build build"
+msgstr ""
+"# Configure with coverage enabled\n"
+"cmake -B build \\\n"
+"    -DCMAKE_BUILD_TYPE=Debug \\\n"
+"    -DNEXUS_BUILD_TESTS=ON \\\n"
+"    -DNEXUS_ENABLE_COVERAGE=ON\n"
+"\n"
+"# Build\n"
+"cmake --build build"
+
+#: ../../development/coverage_analysis.rst:99 494ad41ec702499c92c700720acc35e6
+msgid "Step 2: Run Tests"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:101
+#: 39891c4a72c74805a44641268e8e6316
+msgid ""
+"# Run all tests\n"
+"cd build\n"
+"ctest --output-on-failure"
+msgstr ""
+"# Run all tests\n"
+"cd build\n"
+"ctest --output-on-failure"
+
+#: ../../development/coverage_analysis.rst:107
+#: 45929bcf2569411687bfeb9788ac8258
+msgid "This generates ``.gcda`` and ``.gcno`` files containing coverage data."
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:110
+#: c5fa1c16a978460185eb2735bb9e8db1
+msgid "Step 3: Collect Coverage Data"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:112
+#: 2c6628d9ebb14f09aa2cf63db4184f56
+msgid ""
+"# Capture coverage data\n"
+"lcov --capture \\\n"
+"    --directory build \\\n"
+"    --output-file build/coverage.info \\\n"
+"    --rc lcov_branch_coverage=1"
+msgstr ""
+"# Capture coverage data\n"
+"lcov --capture \\\n"
+"    --directory build \\\n"
+"    --output-file build/coverage.info \\\n"
+"    --rc lcov_branch_coverage=1"
+
+#: ../../development/coverage_analysis.rst:121
+#: 6259eb40bc7f4e0987ba382a520a39fe
+msgid "Step 4: Filter Coverage Data"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:123
+#: f2cdb258a2af461f92a3eccbf679e71a
+msgid ""
+"# Remove external libraries and test files\n"
+"lcov --remove build/coverage.info \\\n"
+"    '*/ext/*' \\\n"
+"    '*/tests/*' \\\n"
+"    '*/build/*' \\\n"
+"    '/usr/*' \\\n"
+"    --output-file build/coverage_filtered.info \\\n"
+"    --rc lcov_branch_coverage=1"
+msgstr ""
+"# Remove external libraries and test files\n"
+"lcov --remove build/coverage.info \\\n"
+"    '*/ext/*' \\\n"
+"    '*/tests/*' \\\n"
+"    '*/build/*' \\\n"
+"    '/usr/*' \\\n"
+"    --output-file build/coverage_filtered.info \\\n"
+"    --rc lcov_branch_coverage=1"
+
+#: ../../development/coverage_analysis.rst:135
+#: 7539a5ca623346beb66de22a29a1967d
+msgid "Step 5: Generate HTML Report"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:137
+#: 1997d71f8fbb4f8e850fc01d04845eea
+msgid ""
+"# Generate HTML report\n"
+"genhtml build/coverage_filtered.info \\\n"
+"    --output-directory build/coverage_html \\\n"
+"    --title \"Nexus Coverage Report\" \\\n"
+"    --legend \\\n"
+"    --branch-coverage \\\n"
+"    --rc lcov_branch_coverage=1\n"
+"\n"
+"# View report\n"
+"open build/coverage_html/index.html"
+msgstr ""
+"# Generate HTML report\n"
+"genhtml build/coverage_filtered.info \\\n"
+"    --output-directory build/coverage_html \\\n"
+"    --title \"Nexus Coverage Report\" \\\n"
+"    --legend \\\n"
+"    --branch-coverage \\\n"
+"    --rc lcov_branch_coverage=1\n"
+"\n"
+"# View report\n"
+"open build/coverage_html/index.html"
+
+#: ../../development/coverage_analysis.rst:151
+#: 10b2701c65464007a7585a8b32f601b0
+msgid "Automated Workflow"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:154
+#: f2b36c9ee3c046df84b7a41dcc39b4aa
+msgid "Using Validation Framework"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:156
+#: b7fe35ff0072478cba1be0779ec6648e
+msgid "The simplest way to run coverage analysis:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:158
+#: edf113726bc94decb6457bbe03828a3d
+msgid "python scripts/validation/validate.py --coverage"
+msgstr "python scripts/validation/validate.py --coverage"
+
+#: ../../development/coverage_analysis.rst:162
+#: cee306309292426b80bece8cd0dc4237
+msgid "This automatically:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:164
+#: e890e0f1069c499f89220322210f04c3
+msgid "Configures CMake with coverage enabled"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:165
+#: 2165f491fa9346b395d4a4f0f5c63f9a
+msgid "Builds the project"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:166
+#: cc09a9bdd6e3481dbe44a045cfe5166a
+msgid "Runs all tests"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:167
+#: 7d2faa5680c9402897edaeb95fe45502
+msgid "Collects coverage data"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:168
+#: b07756bb48b14f12a6f780005a4eb3e4
+msgid "Generates HTML and XML reports"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:169
+#: 8267557df28b4112a73adc32d17953b8
+msgid "Checks coverage threshold"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:172
+#: 61a576b1b968492ab10cc778ca725ead
+msgid "With Custom Threshold"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:174
+#: cb9f8033d1de4e078bec32121e259dbe
+msgid ""
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.85"
+msgstr ""
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.85"
+
+#: ../../development/coverage_analysis.rst:180
+#: 1d85a31cfdca4435a2989f02fd6dfe14
+msgid "This fails if coverage is below 85%."
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:183
+#: 4d8d1a044c8f4956a98603d80143bbb3
+msgid "Parallel Execution"
+msgstr "并行执行"
+
+#: ../../development/coverage_analysis.rst:185
+#: b4692b829a6246618b4b51e6fa50e537
+msgid ""
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --parallel 8"
+msgstr ""
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --parallel 8"
+
+#: ../../development/coverage_analysis.rst:191
+#: fedb47c695624b6bac10188606b86175
+msgid "Runs tests in parallel for faster execution."
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:194
+#: 6035978c77cc462fbbe552bf5f038cda
+msgid "Advanced Usage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:197
+#: 63b25f26bff0491d9e010bec30fa8bb7
+msgid "Module-Specific Coverage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:199
+#: 42bb62373db8487b9d980d2898de7753
+msgid "**Analyze coverage for a specific module:**"
+msgstr "**Analyze coverage for a specific module:**"
+
+#: ../../development/coverage_analysis.rst:201
+#: 6a13dc0ce44c404b97008504b754f708
+msgid ""
+"# Run tests for config module only\n"
+"cd build\n"
+"ctest -R \"config_.*\" --verbose\n"
+"\n"
+"# Capture coverage\n"
+"lcov --capture \\\n"
+"    --directory . \\\n"
+"    --output-file config_coverage.info\n"
+"\n"
+"# Extract config module only\n"
+"lcov --extract config_coverage.info \\\n"
+"    \"*/framework/config/*\" \\\n"
+"    --output-file config_filtered.info\n"
+"\n"
+"# Generate report\n"
+"genhtml config_filtered.info \\\n"
+"    --output-directory config_coverage_html"
+msgstr ""
+"# Run tests for config module only\n"
+"cd build\n"
+"ctest -R \"config_.*\" --verbose\n"
+"\n"
+"# Capture coverage\n"
+"lcov --capture \\\n"
+"    --directory . \\\n"
+"    --output-file config_coverage.info\n"
+"\n"
+"# Extract config module only\n"
+"lcov --extract config_coverage.info \\\n"
+"    \"*/framework/config/*\" \\\n"
+"    --output-file config_filtered.info\n"
+"\n"
+"# Generate report\n"
+"genhtml config_filtered.info \\\n"
+"    --output-directory config_coverage_html"
+
+#: ../../development/coverage_analysis.rst:222
+#: ddcd7b94505a40d0b8fdd7ed22138021
+msgid "Incremental Coverage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:224
+#: 13d080390cbf4c51bd0482c510a07fee
+msgid "**Track coverage changes between commits:**"
+msgstr "**Track coverage changes between commits:**"
+
+#: ../../development/coverage_analysis.rst:226
+#: 368160e663c04da7accf325283f807a8
+msgid ""
+"# Baseline coverage\n"
+"python scripts/validation/validate.py --coverage\n"
+"cp build/coverage.info baseline_coverage.info\n"
+"\n"
+"# Make changes and test again\n"
+"# ... make code changes ...\n"
+"python scripts/validation/validate.py --coverage\n"
+"\n"
+"# Compare coverage\n"
+"lcov --diff baseline_coverage.info build/coverage.info \\\n"
+"    --output-file coverage_diff.info\n"
+"\n"
+"# Generate diff report\n"
+"genhtml coverage_diff.info \\\n"
+"    --output-directory coverage_diff_html"
+msgstr ""
+"# Baseline coverage\n"
+"python scripts/validation/validate.py --coverage\n"
+"cp build/coverage.info baseline_coverage.info\n"
+"\n"
+"# Make changes and test again\n"
+"# ... make code changes ...\n"
+"python scripts/validation/validate.py --coverage\n"
+"\n"
+"# Compare coverage\n"
+"lcov --diff baseline_coverage.info build/coverage.info \\\n"
+"    --output-file coverage_diff.info\n"
+"\n"
+"# Generate diff report\n"
+"genhtml coverage_diff.info \\\n"
+"    --output-directory coverage_diff_html"
+
+#: ../../development/coverage_analysis.rst:245
+#: e7bddd7906374a1b884c09de49811383
+msgid "Coverage by Test Type"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:247
+#: 12b7af1abbd74b65bfaa914a3345f445
+msgid "**Separate coverage for unit tests and property tests:**"
+msgstr "**Separate coverage for unit tests and property tests:**"
+
+#: ../../development/coverage_analysis.rst:249
+#: 2476fc5b7f1c495c840d8310ce61da9a
+msgid ""
+"# Unit tests only\n"
+"cd build\n"
+"ctest -R \"test_.*\" --verbose\n"
+"lcov --capture --directory . --output-file unit_coverage.info\n"
+"\n"
+"# Property tests only\n"
+"ctest -R \".*_properties\" --verbose\n"
+"lcov --capture --directory . --output-file property_coverage.info\n"
+"\n"
+"# Compare\n"
+"lcov --diff unit_coverage.info property_coverage.info"
+msgstr ""
+"# Unit tests only\n"
+"cd build\n"
+"ctest -R \"test_.*\" --verbose\n"
+"lcov --capture --directory . --output-file unit_coverage.info\n"
+"\n"
+"# Property tests only\n"
+"ctest -R \".*_properties\" --verbose\n"
+"lcov --capture --directory . --output-file property_coverage.info\n"
+"\n"
+"# Compare\n"
+"lcov --diff unit_coverage.info property_coverage.info"
+
+#: ../../development/coverage_analysis.rst:264
+#: 8395590ec7be4e8a9f72227dca8b90e7
+msgid "Coverage Hotspots"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:266
+#: c71327c21f454b1ca41c2e8fd29c5aa9
+msgid "**Identify files with low coverage:**"
+msgstr "**Identify files with low coverage:**"
+
+#: ../../development/coverage_analysis.rst:268
+#: 4e5321146f5c441fbdcf2f49e78afa05
+#, python-format
+msgid ""
+"# Generate coverage summary\n"
+"lcov --summary build/coverage.info\n"
+"\n"
+"# List files by coverage\n"
+"lcov --list build/coverage.info | sort -k 2 -n\n"
+"\n"
+"# Find files below 80% coverage\n"
+"lcov --list build/coverage.info | awk '$2 < 80.0 {print $0}'"
+msgstr ""
+"# Generate coverage summary\n"
+"lcov --summary build/coverage.info\n"
+"\n"
+"# List files by coverage\n"
+"lcov --list build/coverage.info | sort -k 2 -n\n"
+"\n"
+"# Find files below 80% coverage\n"
+"lcov --list build/coverage.info | awk '$2 < 80.0 {print $0}'"
+
+#: ../../development/coverage_analysis.rst:280
+#: 9e4104ed9cb94f66a1b3e58a72ccc581
+msgid "Report Formats"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:283
+#: 4f69002cf61642e9904aa1ba6783ad67
+msgid "HTML Report"
+msgstr "HTML 报告"
+
+#: ../../development/coverage_analysis.rst:285
+#: 72c5e92cfcf0457da790ed2ae68eaf54
+msgid "The HTML report provides:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:287
+#: 7a700dc86f1b47d8b715e99c9056b7cb
+msgid "**File-level statistics**: Coverage percentage per file"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:288
+#: 0e6aa46169b5431187d7e29e2bb56bcc
+msgid "**Source code view**: Line-by-line coverage visualization"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:289
+#: a004750bea3644d98ef6624aca315293
+msgid "**Branch coverage**: Conditional branch analysis"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:290
+#: 79ca58dce39048258d35a2644a02942f
+msgid "**Function coverage**: Function call tracking"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:292
+#: 97e0210c6ead4f628f11f4f03613c0b8
+msgid "**Color coding:**"
+msgstr "**Color coding:**"
+
+#: ../../development/coverage_analysis.rst:294
+#: 5118726354ee4e2199eabd3e3d532c2c
+msgid "🟢 **Green**: Covered lines (executed)"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:295
+#: e82426d6e794445db7735fe477f14cc4
+msgid "🔴 **Red**: Uncovered lines (not executed)"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:296
+#: ee8a21d276c346de892f24ccd46e9c7b
+msgid "🟡 **Yellow**: Partially covered branches"
+msgstr "🟡 **黄色**：部分覆盖的分支"
+
+#: ../../development/coverage_analysis.rst:299
+#: cba4ecd39b39439f93637efe98c108bb
+msgid "XML Report (Cobertura)"
+msgstr "XML Report (Cobertura)"
+
+#: ../../development/coverage_analysis.rst:301
+#: e0ec588c32454c1ca84538427c1f0697
+msgid "For CI/CD integration:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:303
+#: 66ef3336a7804170be9df68f960c02a5
+msgid ""
+"# Install lcov_cobertura\n"
+"pip install lcov_cobertura\n"
+"\n"
+"# Convert to Cobertura XML\n"
+"python -m lcov_cobertura build/coverage.info \\\n"
+"    --output build/coverage.xml"
+msgstr ""
+"# Install lcov_cobertura\n"
+"pip install lcov_cobertura\n"
+"\n"
+"# Convert to Cobertura XML\n"
+"python -m lcov_cobertura build/coverage.info \\\n"
+"    --output build/coverage.xml"
+
+#: ../../development/coverage_analysis.rst:313
+#: 6d6a5a6244ba4647a9f12a056e21972a
+msgid "JSON Report"
+msgstr "JSON 报告"
+
+#: ../../development/coverage_analysis.rst:315
+#: 3ab83790525c44f595d0dadec4d57b3f
+msgid "For programmatic analysis:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:317
+#: 6174a22bc610442a84f2655f97367e6d
+msgid ""
+"# Generate JSON summary\n"
+"lcov --summary build/coverage.info --output-file coverage_summary.json"
+msgstr ""
+"# Generate JSON summary\n"
+"lcov --summary build/coverage.info --output-file coverage_summary.json"
+
+#: ../../development/coverage_analysis.rst:323
+#: 77f71d36968746bdab68ca4a0fdb57f6
+msgid "Text Summary"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:325
+#: 6337fe0da36d4dc8940e67c6ec590bbd
+msgid "For quick overview:"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:327
+#: 3fb68340d64f49b98a6f21f36052354c
+msgid ""
+"# Print summary to console\n"
+"lcov --summary build/coverage.info\n"
+"\n"
+"# Example output:\n"
+"# Overall coverage rate:\n"
+"#   lines......: 85.2% (1234 of 1448 lines)\n"
+"#   functions..: 90.1% (123 of 137 functions)\n"
+"#   branches...: 78.5% (456 of 581 branches)"
+msgstr ""
+"# Print summary to console\n"
+"lcov --summary build/coverage.info\n"
+"\n"
+"# Example output:\n"
+"# Overall coverage rate:\n"
+"#   lines......: 85.2% (1234 of 1448 lines)\n"
+"#   functions..: 90.1% (123 of 137 functions)\n"
+"#   branches...: 78.5% (456 of 581 branches)"
+
+#: ../../development/coverage_analysis.rst:339
+#: 9f7819595b6740b986418c512ef32c5d
+msgid "Coverage Thresholds"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:342
+#: 97903b98b21144918e8347555e5f7775
+msgid "Setting Thresholds"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:344
+#: f936602f74b64668ba0fbb5157919dcc
+msgid "**Project-wide threshold:**"
+msgstr "**Project-wide threshold:**"
+
+#: ../../development/coverage_analysis.rst:346
+#: 148487227379491ca991fbeedc0a6587
+msgid ""
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.80"
+msgstr ""
+"python scripts/validation/validate.py \\\n"
+"    --coverage \\\n"
+"    --threshold 0.80"
+
+#: ../../development/coverage_analysis.rst:352
+#: 166d5d96722e4250a1ccfc4ee4e63dba
+msgid "**Module-specific thresholds:**"
+msgstr "**Module-specific thresholds:**"
+
+#: ../../development/coverage_analysis.rst:354
+#: d95d280f4a6d46989684ddbc1fc36d30
+msgid ""
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"config = ConfigManager().load_default()\n"
+"config.coverage_enabled = True\n"
+"\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"\n"
+"# Check different thresholds for different modules\n"
+"thresholds = {\n"
+"    'framework/config': 0.90,\n"
+"    'framework/log': 0.85,\n"
+"    'hal': 0.80,\n"
+"    'osal': 0.80\n"
+"}\n"
+"\n"
+"for module, threshold in thresholds.items():\n"
+"    module_coverage = get_module_coverage(coverage_data, module)\n"
+"    assert module_coverage >= threshold, \\\n"
+"        f\"{module} coverage {module_coverage} below threshold {threshold}\""
+msgstr ""
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"config = ConfigManager().load_default()\n"
+"config.coverage_enabled = True\n"
+"\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"\n"
+"# Check different thresholds for different modules\n"
+"thresholds = {\n"
+"    'framework/config': 0.90,\n"
+"    'framework/log': 0.85,\n"
+"    'hal': 0.80,\n"
+"    'osal': 0.80\n"
+"}\n"
+"\n"
+"for module, threshold in thresholds.items():\n"
+"    module_coverage = get_module_coverage(coverage_data, module)\n"
+"    assert module_coverage >= threshold, \\\n"
+"        f\"{module} coverage {module_coverage} below threshold {threshold}\""
+
+#: ../../development/coverage_analysis.rst:379
+#: ecedf24a0b0f426b86389f0661cd1ef0
+msgid "Enforcing Thresholds"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:381
+#: 4616435eb88a43838d55e04b8d773d63
+msgid "**In CI/CD:**"
+msgstr "**In CI/CD:**"
+
+#: ../../development/coverage_analysis.rst:383
+#: 8e2d8d69bec44aeab0e99d3388a066bf
+msgid ""
+"# GitHub Actions\n"
+"- name: Check Coverage\n"
+"  run: |\n"
+"    python scripts/validation/validate.py --coverage --threshold 0.80\n"
+"    if [ $? -ne 0 ]; then\n"
+"      echo \"Coverage below threshold\"\n"
+"      exit 1\n"
+"    fi"
+msgstr ""
+"# GitHub Actions\n"
+"- name: Check Coverage\n"
+"  run: |\n"
+"    python scripts/validation/validate.py --coverage --threshold 0.80\n"
+"    if [ $? -ne 0 ]; then\n"
+"      echo \"Coverage below threshold\"\n"
+"      exit 1\n"
+"    fi"
+
+#: ../../development/coverage_analysis.rst:394
+#: 493012b5a2d2471c89bb132639f767cc
+msgid "**Pre-commit hook:**"
+msgstr "**Pre-commit hook:**"
+
+#: ../../development/coverage_analysis.rst:396
+#: af8e2305f54e4a248bbeb8b00f1278a9
+msgid ""
+"#!/bin/bash\n"
+"# .git/hooks/pre-commit\n"
+"\n"
+"# Run coverage check\n"
+"python scripts/validation/validate.py --coverage --threshold 0.80\n"
+"\n"
+"if [ $? -ne 0 ]; then\n"
+"    echo \"Coverage check failed. Commit rejected.\"\n"
+"    exit 1\n"
+"fi"
+msgstr ""
+"#!/bin/bash\n"
+"# .git/hooks/pre-commit\n"
+"\n"
+"# Run coverage check\n"
+"python scripts/validation/validate.py --coverage --threshold 0.80\n"
+"\n"
+"if [ $? -ne 0 ]; then\n"
+"    echo \"Coverage check failed. Commit rejected.\"\n"
+"    exit 1\n"
+"fi"
+
+#: ../../development/coverage_analysis.rst:410
+#: fd0ef46bc4034700bf4b143f8b3e7dc5
+msgid "CI/CD Integration"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:413
+#: 4e683df9ac6b4678a36ca5c02c01accb
+msgid "GitHub Actions"
+msgstr "GitHub Actions"
+
+#: ../../development/coverage_analysis.rst:415
+#: 50cef40b7e4a4d35bdf8a2deb05d34c1
+msgid ""
+"name: Coverage\n"
+"on: [push, pull_request]\n"
+"\n"
+"jobs:\n"
+"  coverage:\n"
+"    runs-on: ubuntu-latest\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"        with:\n"
+"          submodules: recursive\n"
+"\n"
+"      - name: Install dependencies\n"
+"        run: |\n"
+"          sudo apt-get install -y lcov\n"
+"          pip install -r scripts/validation/requirements.txt\n"
+"\n"
+"      - name: Run coverage\n"
+"        run: python scripts/validation/validate.py --coverage\n"
+"\n"
+"      - name: Upload to Codecov\n"
+"        uses: codecov/codecov-action@v3\n"
+"        with:\n"
+"          files: ./build/coverage.info\n"
+"          flags: unittests\n"
+"          name: codecov-nexus\n"
+"\n"
+"      - name: Upload coverage report\n"
+"        uses: actions/upload-artifact@v3\n"
+"        with:\n"
+"          name: coverage-report\n"
+"          path: validation_reports/coverage_html/"
+msgstr ""
+"name: Coverage\n"
+"on: [push, pull_request]\n"
+"\n"
+"jobs:\n"
+"  coverage:\n"
+"    runs-on: ubuntu-latest\n"
+"    steps:\n"
+"      - uses: actions/checkout@v3\n"
+"        with:\n"
+"          submodules: recursive\n"
+"\n"
+"      - name: Install dependencies\n"
+"        run: |\n"
+"          sudo apt-get install -y lcov\n"
+"          pip install -r scripts/validation/requirements.txt\n"
+"\n"
+"      - name: Run coverage\n"
+"        run: python scripts/validation/validate.py --coverage\n"
+"\n"
+"      - name: Upload to Codecov\n"
+"        uses: codecov/codecov-action@v3\n"
+"        with:\n"
+"          files: ./build/coverage.info\n"
+"          flags: unittests\n"
+"          name: codecov-nexus\n"
+"\n"
+"      - name: Upload coverage report\n"
+"        uses: actions/upload-artifact@v3\n"
+"        with:\n"
+"          name: coverage-report\n"
+"          path: validation_reports/coverage_html/"
+
+#: ../../development/coverage_analysis.rst:450
+#: 2010652ecd154a2c8042a181d2e49707
+msgid "GitLab CI"
+msgstr "GitLab CI"
+
+#: ../../development/coverage_analysis.rst:452
+#: 91c713ef8c974447aee43fd5380cd6fa
+msgid ""
+"coverage:\n"
+"  stage: test\n"
+"  script:\n"
+"    - pip install -r scripts/validation/requirements.txt\n"
+"    - python scripts/validation/validate.py --coverage\n"
+"  coverage: '/line_coverage: (\\d+\\.\\d+)%/'\n"
+"  artifacts:\n"
+"    reports:\n"
+"      coverage_report:\n"
+"        coverage_format: cobertura\n"
+"        path: build/coverage.xml"
+msgstr ""
+"coverage:\n"
+"  stage: test\n"
+"  script:\n"
+"    - pip install -r scripts/validation/requirements.txt\n"
+"    - python scripts/validation/validate.py --coverage\n"
+"  coverage: '/line_coverage: (\\d+\\.\\d+)%/'\n"
+"  artifacts:\n"
+"    reports:\n"
+"      coverage_report:\n"
+"        coverage_format: cobertura\n"
+"        path: build/coverage.xml"
+
+#: ../../development/coverage_analysis.rst:467
+#: c16a69ba27f8460ab23beaeee58188ab
+msgid "Jenkins"
+msgstr "Jenkins"
+
+#: ../../development/coverage_analysis.rst:469
+#: 3568ae268e2b43b784c6b8ee9a919638
+msgid ""
+"stage('Coverage') {\n"
+"    steps {\n"
+"        sh 'python scripts/validation/validate.py --coverage'\n"
+"        publishHTML([\n"
+"            reportDir: 'validation_reports/coverage_html',\n"
+"            reportFiles: 'index.html',\n"
+"            reportName: 'Coverage Report'\n"
+"        ])\n"
+"        publishCoverage adapters: [\n"
+"            coberturaAdapter('build/coverage.xml')\n"
+"        ]\n"
+"    }\n"
+"}"
+msgstr ""
+"stage('Coverage') {\n"
+"    steps {\n"
+"        sh 'python scripts/validation/validate.py --coverage'\n"
+"        publishHTML([\n"
+"            reportDir: 'validation_reports/coverage_html',\n"
+"            reportFiles: 'index.html',\n"
+"            reportName: 'Coverage Report'\n"
+"        ])\n"
+"        publishCoverage adapters: [\n"
+"            coberturaAdapter('build/coverage.xml')\n"
+"        ]\n"
+"    }\n"
+"}"
+
+#: ../../development/coverage_analysis.rst:486
+#: 2eec4fdee8cb4e1a881a09019aed0578
+msgid "Codecov Integration"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:488
+#: b9e0da8f97fc46fa90001096be310187
+msgid ""
+"# Install Codecov uploader\n"
+"curl -Os https://uploader.codecov.io/latest/linux/codecov\n"
+"chmod +x codecov\n"
+"\n"
+"# Upload coverage\n"
+"./codecov -f build/coverage.info -t ${CODECOV_TOKEN}"
+msgstr ""
+"# Install Codecov uploader\n"
+"curl -Os https://uploader.codecov.io/latest/linux/codecov\n"
+"chmod +x codecov\n"
+"\n"
+"# Upload coverage\n"
+"./codecov -f build/coverage.info -t ${CODECOV_TOKEN}"
+
+#: ../../development/coverage_analysis.rst:498
+#: 776e46ee8b37497d9a27320a43f8f528
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../development/coverage_analysis.rst:501
+#: aae2bed224c5458ca0f53eb1f5936fde
+msgid "No Coverage Data"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:503
+#: 0f95e148410343d2adf441836a8137b2
+msgid "**Problem:** No ``.gcda`` files generated"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:505
+#: ../../development/coverage_analysis.rst:524
+#: ../../development/coverage_analysis.rst:542
+#: ../../development/coverage_analysis.rst:559
+#: 01562c95216341a2abb867e6e11b7904 8b16d1e4588d4f44870cefc824f66538
+#: ab5b97e8f86b4522ae6fec4b5d5a0c76 b470efbc02534a01995226e551b88689
+msgid "**Solution:**"
+msgstr "**Solution:**"
+
+#: ../../development/coverage_analysis.rst:507
+#: 710b1586870b4dd5bd340af4d7f40acc
+msgid ""
+"# Verify coverage flags are set\n"
+"cmake -B build -DNEXUS_ENABLE_COVERAGE=ON\n"
+"cmake -L build | grep COVERAGE\n"
+"\n"
+"# Check compiler flags\n"
+"cmake --build build --verbose | grep \"fprofile-arcs\"\n"
+"\n"
+"# Ensure tests actually run\n"
+"cd build && ctest --verbose"
+msgstr ""
+"# Verify coverage flags are set\n"
+"cmake -B build -DNEXUS_ENABLE_COVERAGE=ON\n"
+"cmake -L build | grep COVERAGE\n"
+"\n"
+"# Check compiler flags\n"
+"cmake --build build --verbose | grep \"fprofile-arcs\"\n"
+"\n"
+"# Ensure tests actually run\n"
+"cd build && ctest --verbose"
+
+#: ../../development/coverage_analysis.rst:520
+#: 8e16b750624e48449173a4cf1bd330d7
+msgid "Low Coverage Numbers"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:522
+#: 6db26fd2a47047fcbadc83fc3394343a
+msgid "**Problem:** Coverage lower than expected"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:526
+#: 31383e0a1af344b79d8756afeb8a074f
+msgid ""
+"# Check which files are included\n"
+"lcov --list build/coverage.info\n"
+"\n"
+"# Verify test execution\n"
+"ctest --verbose --output-on-failure\n"
+"\n"
+"# Check for excluded files\n"
+"lcov --list build/coverage.info | grep \"excluded\""
+msgstr ""
+"# Check which files are included\n"
+"lcov --list build/coverage.info\n"
+"\n"
+"# Verify test execution\n"
+"ctest --verbose --output-on-failure\n"
+"\n"
+"# Check for excluded files\n"
+"lcov --list build/coverage.info | grep \"excluded\""
+
+#: ../../development/coverage_analysis.rst:538
+#: d0617e3fbcba4c70a32daacd0febc3a4
+msgid "Coverage Data Corruption"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:540
+#: ed69575be28140429975da352b6a6134
+msgid "**Problem:** Invalid coverage data"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:544
+#: 86f0374b9f62468e82ac2ff3249adf17
+msgid ""
+"# Clean all coverage data\n"
+"find build -name \"*.gcda\" -delete\n"
+"find build -name \"*.gcno\" -delete\n"
+"\n"
+"# Rebuild and retest\n"
+"cmake --build build --clean-first\n"
+"cd build && ctest"
+msgstr ""
+"# Clean all coverage data\n"
+"find build -name \"*.gcda\" -delete\n"
+"find build -name \"*.gcno\" -delete\n"
+"\n"
+"# Rebuild and retest\n"
+"cmake --build build --clean-first\n"
+"cd build && ctest"
+
+#: ../../development/coverage_analysis.rst:555
+#: 4d7c49e6386841f29592b79bc19d474c
+msgid "Missing Branch Coverage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:557
+#: 027dfd74f0974d798cfdf2b0fd9c4019
+msgid "**Problem:** Branch coverage not reported"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:561
+#: 320e83638a22415eadc8db1e9cb7741e
+msgid ""
+"# Ensure branch coverage is enabled\n"
+"lcov --capture \\\n"
+"    --directory build \\\n"
+"    --output-file coverage.info \\\n"
+"    --rc lcov_branch_coverage=1\n"
+"\n"
+"# Generate report with branch coverage\n"
+"genhtml coverage.info \\\n"
+"    --output-directory coverage_html \\\n"
+"    --branch-coverage \\\n"
+"    --rc lcov_branch_coverage=1"
+msgstr ""
+"# Ensure branch coverage is enabled\n"
+"lcov --capture \\\n"
+"    --directory build \\\n"
+"    --output-file coverage.info \\\n"
+"    --rc lcov_branch_coverage=1\n"
+"\n"
+"# Generate report with branch coverage\n"
+"genhtml coverage.info \\\n"
+"    --output-directory coverage_html \\\n"
+"    --branch-coverage \\\n"
+"    --rc lcov_branch_coverage=1"
+
+#: ../../development/coverage_analysis.rst:576
+#: 3d32f86f09524a4088dc1db5cb8b3b45
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../development/coverage_analysis.rst:579
+#: 99b6adc8e2df4228a1810b6af86f5a9b
+msgid "Regular Coverage Checks"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:581
+#: b7a3da84febc4f31a36f80a6300e32a3
+msgid "Run coverage analysis on every commit"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:582
+#: fa0aa729d5dd4e6dab74c6cb41878e96
+msgid "Set up pre-commit hooks for local checks"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:583
+#: ba06638224a740a7a415569ee7066b87
+msgid "Configure CI/CD to fail on coverage drops"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:586
+#: 3941175b4e584e7995630c718b35ad51
+msgid "Coverage Goals"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:588
+#: 8256cbdfd48246418fe014edbddc8dca
+#, python-format
+msgid "**Minimum threshold**: 80% overall coverage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:589
+#: 89489d274b6e4b3386d4b713c50faa70
+msgid "**Critical modules**: 90%+ coverage (config, HAL core)"
+msgstr "**Critical modules**: 90%+ coverage (config, HAL core)"
+
+#: ../../development/coverage_analysis.rst:590
+#: 9afca90e78fd48c2badfdcd1ec856e42
+#, python-format
+msgid "**New code**: 100% coverage for new features"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:593
+#: 92ca25bf10ca44ac8ca24594ff87e56b
+msgid "Focus on Quality"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:595
+#: 4b5fc46772ad46a39c99e45395fa48ee
+msgid "High coverage doesn't guarantee quality"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:596
+#: 8ad27a4b34d241a5a0559a603aa06cab
+msgid "Focus on meaningful tests, not just coverage numbers"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:597
+#: e601f7d0948f463a85ba603a2159730a
+msgid "Use property-based testing for better coverage"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:600
+#: f3424c285a9b4edb94862494282f0abe
+msgid "Incremental Improvement"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:602
+#: 3f2ab7e6c8854e80a3239630d11f6cc4
+msgid "Track coverage trends over time"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:603
+#: 005f1fe3cadf44899d462f696d456f2b
+msgid "Set incremental goals (e.g., +5% per quarter)"
+msgstr "Set incremental goals (e.g., +5% per quarter)"
+
+#: ../../development/coverage_analysis.rst:604
+#: 1b8fa168ccf84864bf14abe6cf9787a9
+msgid "Prioritize uncovered critical paths"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:607
+#: 54e8a01cef34477cb7e7feed8f6fadc2
+msgid "Documentation"
+msgstr "文档"
+
+#: ../../development/coverage_analysis.rst:609
+#: 16439ad6c25e463588ea26e2ef9cb4f9
+msgid "Document coverage requirements in README"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:610
+#: 8505867d03824cd7901820f6ecf29096
+msgid "Include coverage badges in documentation"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:611
+#: ce77a0c3669441eea963283cfe630df4
+msgid "Explain coverage gaps and plans to address them"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:614
+#: a4d722c3f2704f849bde6e3fc9a5d8b6
+msgid "API Reference"
+msgstr "API 参考"
+
+#: ../../development/coverage_analysis.rst:617
+#: 43d486fc2988419cb15bca9b7a802012
+msgid "CoverageAnalyzer Class"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:619
+#: b7db5505b51b425a9759dc7a54ad2397
+msgid ""
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"# Create analyzer\n"
+"config = ConfigManager().load_default()\n"
+"config.coverage_enabled = True\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"\n"
+"# Enable coverage\n"
+"analyzer.enable_coverage()\n"
+"\n"
+"# Collect data\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"\n"
+"# Generate reports\n"
+"html_report = analyzer.generate_coverage_report(format=\"html\")\n"
+"xml_report = analyzer.generate_coverage_report(format=\"xml\")\n"
+"\n"
+"# Check threshold\n"
+"meets_threshold = analyzer.check_threshold(0.80)\n"
+"\n"
+"# Get uncovered regions\n"
+"uncovered = analyzer.identify_uncovered_regions()\n"
+"\n"
+"# Get summary\n"
+"summary = analyzer.get_coverage_summary()"
+msgstr ""
+"from scripts.validation.coverage_analyzer import CoverageAnalyzer\n"
+"from scripts.validation.config import ConfigManager\n"
+"\n"
+"# Create analyzer\n"
+"config = ConfigManager().load_default()\n"
+"config.coverage_enabled = True\n"
+"analyzer = CoverageAnalyzer(config)\n"
+"\n"
+"# Enable coverage\n"
+"analyzer.enable_coverage()\n"
+"\n"
+"# Collect data\n"
+"coverage_data = analyzer.collect_coverage_data()\n"
+"\n"
+"# Generate reports\n"
+"html_report = analyzer.generate_coverage_report(format=\"html\")\n"
+"xml_report = analyzer.generate_coverage_report(format=\"xml\")\n"
+"\n"
+"# Check threshold\n"
+"meets_threshold = analyzer.check_threshold(0.80)\n"
+"\n"
+"# Get uncovered regions\n"
+"uncovered = analyzer.identify_uncovered_regions()\n"
+"\n"
+"# Get summary\n"
+"summary = analyzer.get_coverage_summary()"
+
+#: ../../development/coverage_analysis.rst:649
+#: 6ffe09d90bdf4ec8a18a0b267f524fc5
+msgid "CoverageData Model"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:651
+#: 6c7e3b4232204fb78581004ab74feccc
+msgid ""
+"@dataclass\n"
+"class CoverageData:\n"
+"    line_coverage: float          # 0.0 to 1.0\n"
+"    branch_coverage: float        # 0.0 to 1.0\n"
+"    function_coverage: float      # 0.0 to 1.0\n"
+"    uncovered_lines: List[CodeLocation]\n"
+"    uncovered_branches: List[CodeLocation]"
+msgstr ""
+"@dataclass\n"
+"class CoverageData:\n"
+"    line_coverage: float          # 0.0 to 1.0\n"
+"    branch_coverage: float        # 0.0 to 1.0\n"
+"    function_coverage: float      # 0.0 to 1.0\n"
+"    uncovered_lines: List[CodeLocation]\n"
+"    uncovered_branches: List[CodeLocation]"
+
+#: ../../development/coverage_analysis.rst:662
+#: 21a195c72d634224a5cf8a960eb9e8a9
+msgid "CodeLocation Model"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:664
+#: 727d1104783a41078a3dac36fdd096f7
+msgid ""
+"@dataclass\n"
+"class CodeLocation:\n"
+"    file_path: str\n"
+"    line_number: int"
+msgstr ""
+
+#: ../../development/coverage_analysis.rst:672
+#: 10c372c25e0f42c7ad6833b5ff2a5603
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../development/coverage_analysis.rst:674
+#: 1b49cab1511a4a289cec9905e052eacd
+msgid ":doc:`validation_framework` - System validation framework"
+msgstr ":doc:`validation_framework` - System validation framework"
+
+#: ../../development/coverage_analysis.rst:675
+#: c2e9ca4e61f44c48ac108d3720e369fe
+msgid ":doc:`testing` - General testing guide"
+msgstr ":doc:`testing` - General testing guide"
+
+#: ../../development/coverage_analysis.rst:676
+#: 9807b82f255c4b838e4f684b1894bdaf
+msgid ":doc:`ci_cd_integration` - CI/CD integration"
+msgstr ":doc:`ci_cd_integration` - CI/CD integration"
+
+#: ../../development/coverage_analysis.rst:677
+#: 8198a42163024331bddae03b8325918f
+msgid ":doc:`contributing` - Contribution guidelines"
+msgstr ":doc:`contributing` - Contribution guidelines"

@@ -1,18 +1,11 @@
-# Porting Guide - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
 #: ../../user_guide/porting.rst:2 43d3e9c9a3614120bcbd377c4e9b639c
 msgid "Porting Guide"
@@ -30,9 +23,12 @@ msgstr "概述"
 #: ../../user_guide/porting.rst:9 6e9153d17fed4b4faeeebf6ba8085475
 msgid ""
 "Porting Nexus to a new platform involves implementing the Hardware "
-"Abstraction Layer (HAL) for your target MCU. The OSAL and middleware "
-"layers are platform-independent and require no modification."
+"Abstraction Layer (HAL) for your target MCU. The OSAL and middleware layers "
+"are platform-independent and require no modification."
 msgstr ""
+"Porting Nexus to a new platform involves implementing the Hardware "
+"Abstraction Layer (HAL) for your target MCU. The OSAL and middleware layers "
+"are platform-independent and require no modification."
 
 #: ../../user_guide/porting.rst:14 43f97d7ed9394a968d02cf54fd35da2f
 msgid "Prerequisites"
@@ -40,7 +36,7 @@ msgstr "前置条件"
 
 #: ../../user_guide/porting.rst:16 c84bccfec08e4a2d9a36014a61546b07
 msgid "Before starting, ensure you have:"
-msgstr ""
+msgstr "开始之前，请确保您已："
 
 #: ../../user_guide/porting.rst:18 984032ffa04049c4a5adcfc61d65dfad
 msgid "MCU datasheet and reference manual"
@@ -52,7 +48,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:20 922b2b9740684f5e9d4921e68b5aa924
 msgid "ARM GCC toolchain (for ARM Cortex-M targets)"
-msgstr ""
+msgstr "ARM GCC toolchain (for ARM Cortex-M targets)"
 
 #: ../../user_guide/porting.rst:21 4ac1639f37dc4315bce9ab154245924f
 msgid "Basic understanding of the target MCU architecture"
@@ -101,7 +97,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:54 567031eecc684ed5901bfff008abe2ac
 msgid "**hal_gpio.c:**"
-msgstr ""
+msgstr "**hal_gpio.c:**"
 
 #: ../../user_guide/porting.rst:56 2d37ab736b5b448bafc6b5a676d2eff3
 msgid ""
@@ -156,6 +152,56 @@ msgid ""
 "\n"
 "/* Implement remaining GPIO functions... */"
 msgstr ""
+"/**\n"
+" * \\file            hal_gpio.c\n"
+" * \\brief           GPIO HAL implementation for my_platform\n"
+" */\n"
+"\n"
+"#include \"hal/hal_gpio.h\"\n"
+"#include \"my_platform_registers.h\"\n"
+"\n"
+"hal_status_t hal_gpio_init(hal_gpio_port_t port, uint8_t pin,\n"
+"                           const hal_gpio_config_t* config)\n"
+"{\n"
+"    if (config == NULL) {\n"
+"        return HAL_ERROR_NULL_POINTER;\n"
+"    }\n"
+"\n"
+"    if (port >= HAL_GPIO_PORT_MAX || pin > 15) {\n"
+"        return HAL_ERROR_INVALID_PARAM;\n"
+"    }\n"
+"\n"
+"    /* Platform-specific initialization */\n"
+"    GPIO_TypeDef* gpio = get_gpio_base(port);\n"
+"\n"
+"    /* Configure direction */\n"
+"    if (config->direction == HAL_GPIO_DIR_OUTPUT) {\n"
+"        gpio->MODER |= (1 << (pin * 2));\n"
+"    } else {\n"
+"        gpio->MODER &= ~(3 << (pin * 2));\n"
+"    }\n"
+"\n"
+"    /* Configure pull-up/pull-down */\n"
+"    /* ... */\n"
+"\n"
+"    return HAL_OK;\n"
+"}\n"
+"\n"
+"hal_status_t hal_gpio_write(hal_gpio_port_t port, uint8_t pin,\n"
+"                            hal_gpio_level_t level)\n"
+"{\n"
+"    GPIO_TypeDef* gpio = get_gpio_base(port);\n"
+"\n"
+"    if (level == HAL_GPIO_LEVEL_HIGH) {\n"
+"        gpio->BSRR = (1 << pin);\n"
+"    } else {\n"
+"        gpio->BSRR = (1 << (pin + 16));\n"
+"    }\n"
+"\n"
+"    return HAL_OK;\n"
+"}\n"
+"\n"
+"/* Implement remaining GPIO functions... */"
 
 #: ../../user_guide/porting.rst:110 2ba4e047375345a1891cafa16259e629
 #, fuzzy
@@ -189,10 +235,8 @@ msgid ""
 "/* Weak interrupt handlers */\n"
 "void Default_Handler(void) { while(1); }\n"
 "void Reset_Handler(void);\n"
-"void NMI_Handler(void)      __attribute__((weak, "
-"alias(\"Default_Handler\")));\n"
-"void HardFault_Handler(void) __attribute__((weak, "
-"alias(\"Default_Handler\")));\n"
+"void NMI_Handler(void)      __attribute__((weak, alias(\"Default_Handler\")));\n"
+"void HardFault_Handler(void) __attribute__((weak, alias(\"Default_Handler\")));\n"
 "/* ... more handlers ... */\n"
 "\n"
 "/* Vector table */\n"
@@ -215,6 +259,45 @@ msgid ""
 "    while(1);\n"
 "}"
 msgstr ""
+"/**\n"
+" * \\file            startup.c\n"
+" * \\brief           Startup code for my_platform\n"
+" */\n"
+"\n"
+"#include <stdint.h>\n"
+"\n"
+"/* Stack pointer (defined in linker script) */\n"
+"extern uint32_t _estack;\n"
+"\n"
+"/* Entry point */\n"
+"extern int main(void);\n"
+"\n"
+"/* Weak interrupt handlers */\n"
+"void Default_Handler(void) { while(1); }\n"
+"void Reset_Handler(void);\n"
+"void NMI_Handler(void)      __attribute__((weak, alias(\"Default_Handler\")));\n"
+"void HardFault_Handler(void) __attribute__((weak, alias(\"Default_Handler\")));\n"
+"/* ... more handlers ... */\n"
+"\n"
+"/* Vector table */\n"
+"__attribute__((section(\".isr_vector\")))\n"
+"const void* vector_table[] = {\n"
+"    &_estack,\n"
+"    Reset_Handler,\n"
+"    NMI_Handler,\n"
+"    HardFault_Handler,\n"
+"    /* ... more vectors ... */\n"
+"};\n"
+"\n"
+"void Reset_Handler(void)\n"
+"{\n"
+"    /* Copy .data section */\n"
+"    /* Zero .bss section */\n"
+"    /* Call system init */\n"
+"    /* Call main */\n"
+"    main();\n"
+"    while(1);\n"
+"}"
 
 #: ../../user_guide/porting.rst:159 849bd46883d74cd0b1926e1c8e454985
 #, fuzzy
@@ -227,7 +310,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:163 021567ea03e1460d80db0d9bc4eacbb8
 msgid "**my_platform.ld:**"
-msgstr ""
+msgstr "**my_platform.ld:**"
 
 #: ../../user_guide/porting.rst:165 a40deaf6fe664f20b60ee56ea05a8975
 msgid ""
@@ -262,6 +345,36 @@ msgid ""
 "    /* ... more sections ... */\n"
 "}"
 msgstr ""
+"/* Memory layout */\n"
+"MEMORY\n"
+"{\n"
+"    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 512K\n"
+"    RAM (rwx)   : ORIGIN = 0x20000000, LENGTH = 128K\n"
+"}\n"
+"\n"
+"/* Entry point */\n"
+"ENTRY(Reset_Handler)\n"
+"\n"
+"/* Sections */\n"
+"SECTIONS\n"
+"{\n"
+"    .isr_vector :\n"
+"    {\n"
+"        . = ALIGN(4);\n"
+"        KEEP(*(.isr_vector))\n"
+"        . = ALIGN(4);\n"
+"    } > FLASH\n"
+"\n"
+"    .text :\n"
+"    {\n"
+"        . = ALIGN(4);\n"
+"        *(.text)\n"
+"        *(.text*)\n"
+"        . = ALIGN(4);\n"
+"    } > FLASH\n"
+"\n"
+"    /* ... more sections ... */\n"
+"}"
 
 #: ../../user_guide/porting.rst:199 4a7f9abd5fb940a2884d15e82c0d4207
 #, fuzzy
@@ -274,7 +387,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:203 754097e638e54a008555ff096c8c19ff
 msgid "**CMakeLists.txt:**"
-msgstr ""
+msgstr "**CMakeLists.txt:**"
 
 #: ../../user_guide/porting.rst:205 0e286fcb8fe546c79f51e924a3fb8503
 msgid ""
@@ -307,6 +420,34 @@ msgid ""
 "    -T${LINKER_SCRIPT}\n"
 ")"
 msgstr ""
+"# Platform: my_platform\n"
+"\n"
+"set(PLATFORM_SOURCES\n"
+"    src/startup.c\n"
+"    src/system_init.c\n"
+"    src/hal/hal_gpio.c\n"
+"    src/hal/hal_uart.c\n"
+"    src/hal/hal_spi.c\n"
+"    src/hal/hal_i2c.c\n"
+"    src/hal/hal_timer.c\n"
+")\n"
+"\n"
+"add_library(platform_my_platform STATIC ${PLATFORM_SOURCES})\n"
+"\n"
+"target_include_directories(platform_my_platform PUBLIC\n"
+"    include\n"
+"    ${CMAKE_SOURCE_DIR}/hal/include\n"
+")\n"
+"\n"
+"target_link_libraries(platform_my_platform PUBLIC\n"
+"    hal_interface\n"
+")\n"
+"\n"
+"# Linker script\n"
+"set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker/my_platform.ld)\n"
+"target_link_options(platform_my_platform PUBLIC\n"
+"    -T${LINKER_SCRIPT}\n"
+")"
 
 #: ../../user_guide/porting.rst:237 71922f8e84df4c79afca014832f555d9
 #, fuzzy
@@ -319,7 +460,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:241 b690de567bd44982b7eb3972aa0b1dea
 msgid "**cmake/toolchains/my_platform.cmake:**"
-msgstr ""
+msgstr "**cmake/toolchains/my_platform.cmake:**"
 
 #: ../../user_guide/porting.rst:243 e2973eeea5b5480991f7d3a1d3593ab1
 msgid ""
@@ -332,6 +473,14 @@ msgid ""
 "set(CMAKE_C_FLAGS_INIT \"-mcpu=cortex-m4 -mthumb -mfloat-abi=hard\")\n"
 "set(CMAKE_CXX_FLAGS_INIT \"-mcpu=cortex-m4 -mthumb -mfloat-abi=hard\")"
 msgstr ""
+"set(CMAKE_SYSTEM_NAME Generic)\n"
+"set(CMAKE_SYSTEM_PROCESSOR arm)\n"
+"\n"
+"set(CMAKE_C_COMPILER arm-none-eabi-gcc)\n"
+"set(CMAKE_CXX_COMPILER arm-none-eabi-g++)\n"
+"\n"
+"set(CMAKE_C_FLAGS_INIT \"-mcpu=cortex-m4 -mthumb -mfloat-abi=hard\")\n"
+"set(CMAKE_CXX_FLAGS_INIT \"-mcpu=cortex-m4 -mthumb -mfloat-abi=hard\")"
 
 #: ../../user_guide/porting.rst:255 486ec04462c74c5ab8794d9b531803c7
 #, fuzzy
@@ -340,30 +489,27 @@ msgstr "HAL 实现"
 
 #: ../../user_guide/porting.rst:257 7f011e244dd04e89868ef80344dad7cf
 msgid "Implement these HAL modules (in recommended order):"
-msgstr ""
+msgstr "Implement these HAL modules (in recommended order):"
 
 #: ../../user_guide/porting.rst:260 acdd718806b24541bba15a8c3cf8a37c
 msgid "Module"
-msgstr ""
+msgstr "模块"
 
 #: ../../user_guide/porting.rst:260 ba16f88f2812407bb96e3342a5d9d725
 msgid "Priority"
-msgstr ""
+msgstr "优先级"
 
 #: ../../user_guide/porting.rst:260 41139e85efb84a758914a45608cf42ba
 msgid "Notes"
-msgstr ""
+msgstr "注意事项"
 
 #: ../../user_guide/porting.rst:262 3c11f0e302cf41a49e82a3e30638c35a
 msgid "GPIO"
-msgstr ""
+msgstr "GPIO"
 
-#: ../../user_guide/porting.rst:262 ../../user_guide/porting.rst:264
-#: ../../user_guide/porting.rst:266 ../../user_guide/porting.rst:268
-#: 0994c53d8a7d4a698307129847ba135d 1408ba448d13474fae8396cf78152479
 #: 24fe3c6a442e4f6f8f030c181a533e26 ea331b76af6b4b8f9b0140e146532f2c
 msgid "Required"
-msgstr ""
+msgstr "必需"
 
 #: ../../user_guide/porting.rst:262 41980f57a70245a28f6e92547703c5de
 msgid "Start here, simplest module"
@@ -379,7 +525,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:266 782e693e5012446a85bfb087ac79fc88
 msgid "UART"
-msgstr ""
+msgstr "UART"
 
 #: ../../user_guide/porting.rst:266 99ab236a5d3d44cab4868ebc1da3f3b7
 msgid "Essential for debugging"
@@ -387,7 +533,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:268 87190d5d033b4fcd9832cd3cb76fd585
 msgid "Timer"
-msgstr ""
+msgstr "定时器"
 
 #: ../../user_guide/porting.rst:268 d2db8caca6fb468cb4d7651b993c4c42
 msgid "Needed for OSAL timing"
@@ -395,13 +541,11 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:270 3dfeabcb796e43cba9b14fe1395ec4ee
 msgid "SPI"
-msgstr ""
+msgstr "SPI"
 
-#: ../../user_guide/porting.rst:270 ../../user_guide/porting.rst:272
-#: ../../user_guide/porting.rst:274 13dde1726af84360bd0bbc9169f98233
 #: 36da813b69be42658a0ae99ba4909cd1 cf8412dfb7a44240933013fa566172f5
 msgid "Optional"
-msgstr ""
+msgstr "可选"
 
 #: ../../user_guide/porting.rst:270 772ec70ef7144d45befe027d3ad02056
 msgid "If SPI peripherals are used"
@@ -409,7 +553,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:272 5b30407c5bfa4b98b384d2f97c19cece
 msgid "I2C"
-msgstr ""
+msgstr "I2C"
 
 #: ../../user_guide/porting.rst:272 676ae12279294aad8bfa52352ef0b246
 msgid "If I2C peripherals are used"
@@ -417,7 +561,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:274 1aca40300347422b95ee1ddd79d9b7b1
 msgid "ADC"
-msgstr ""
+msgstr "ADC"
 
 #: ../../user_guide/porting.rst:274 f36a040dea4949cd8057a51571fd892b
 msgid "If analog inputs are used"
@@ -425,11 +569,11 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:278 0dd87362ec624796a296795fd0e9c8cc
 msgid "Testing Your Port"
-msgstr ""
+msgstr "测试 Your 端口"
 
 #: ../../user_guide/porting.rst:280 e7be9b7fc37b4b43965655ddf9bb94ae
 msgid "**Build the blinky example:**"
-msgstr ""
+msgstr "**Build the blinky example:**"
 
 #: ../../user_guide/porting.rst:282 16c5f19d208d4ac29012e52eb55e60a9
 msgid ""
@@ -438,14 +582,18 @@ msgid ""
 "    -DNEXUS_PLATFORM=my_platform\n"
 "cmake --build build"
 msgstr ""
+"cmake -B build \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/my_platform.cmake \\\n"
+"    -DNEXUS_PLATFORM=my_platform\n"
+"cmake --build build"
 
 #: ../../user_guide/porting.rst:289 181de25373bc4a2e9a48ea33bb6e4787
 msgid "**Flash and verify LED blinks**"
-msgstr ""
+msgstr "**Flash and verify LED blinks**"
 
 #: ../../user_guide/porting.rst:291 c5e61903c1974fbfb780fe40fae33053
 msgid "**Run unit tests on native platform:**"
-msgstr ""
+msgstr "**Run unit tests on native platform:**"
 
 #: ../../user_guide/porting.rst:293 cf652f8ed19b496697935e03e5e398f0
 msgid ""
@@ -453,10 +601,13 @@ msgid ""
 "cmake --build build-test\n"
 "ctest --test-dir build-test"
 msgstr ""
+"cmake -B build-test -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON\n"
+"cmake --build build-test\n"
+"ctest --test-dir build-test"
 
 #: ../../user_guide/porting.rst:299 23efdd11ea22450e9ecef056e5c1bfe5
 msgid "**Test each HAL module individually**"
-msgstr ""
+msgstr "**Test each HAL module individually**"
 
 #: ../../user_guide/porting.rst:302 f6793a52fd1f4595ad846bcedeae1dad
 #, fuzzy
@@ -493,7 +644,7 @@ msgstr "常见问题"
 
 #: ../../user_guide/porting.rst:316 918c486fd70c4013a1ea97f402358580
 msgid "**Linker errors about undefined symbols:**"
-msgstr ""
+msgstr "**Linker errors about undefined symbols:**"
 
 #: ../../user_guide/porting.rst:317 1d39d5563fac47689e528220a19c2f32
 msgid "Ensure all HAL functions are implemented, even if as stubs."
@@ -501,7 +652,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:319 ad242c69e6134ee98a0b49c693f806f9
 msgid "**Hard fault on startup:**"
-msgstr ""
+msgstr "**Hard fault on startup:**"
 
 #: ../../user_guide/porting.rst:320 fe00cf807b2741bd9e26740331e9bc7f
 msgid "Check vector table alignment and stack pointer initialization."
@@ -509,7 +660,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:322 ea736005a99d4b58a5334fc223a871a4
 msgid "**Interrupts not working:**"
-msgstr ""
+msgstr "**Interrupts not working:**"
 
 #: ../../user_guide/porting.rst:323 75096a8c07c44aad94403db425c6546b
 msgid "Verify NVIC configuration and interrupt handler names."
@@ -517,7 +668,7 @@ msgstr ""
 
 #: ../../user_guide/porting.rst:325 fa3c9477ad3d4df69ce9bba0c332276f
 msgid "**Timing issues:**"
-msgstr ""
+msgstr "**Timing issues:**"
 
 #: ../../user_guide/porting.rst:326 a31dd459f96c4c0d81696228abf7a011
 msgid "Ensure system clock is configured correctly."
@@ -540,7 +691,6 @@ msgstr "定时器实现"
 msgid "Review MCU documentation"
 msgstr ""
 
-#: ../../user_guide/porting.rst:335 e675a4d02b54484caf4e4326b4012387
 msgid "Open an issue on GitHub with details about your platform"
 msgstr ""
 
@@ -576,4 +726,3 @@ msgstr ""
 
 #~ msgid "Dependencies"
 #~ msgstr "依赖"
-

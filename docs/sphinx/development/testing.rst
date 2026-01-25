@@ -17,8 +17,8 @@ Building Tests
 
 Configure and build with tests enabled::
 
-    cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
-    cmake --build build --config Release
+    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
+    CMake --build build --config Release
 
 Running Tests
 -------------
@@ -26,28 +26,28 @@ Running Tests
 Run All Tests
 ~~~~~~~~~~~~~
 
-::
+
 
     ctest --test-dir build -C Release --output-on-failure
 
 Run Specific Test Suite
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-::
 
-    ./build/tests/Release/nexus_tests --gtest_filter="HalGpioTest.*"
+
+    ./build/tests/Release/nexus_tests --gtest_filter="HalGpioTest.\*"
 
 Run with Verbose Output
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-::
 
-    ./build/tests/Release/nexus_tests --gtest_filter="*" --gtest_print_time=1
+
+    ./build/tests/Release/nexus_tests --gtest_filter="\*" --gtest_print_time=1
 
 List Available Tests
 ~~~~~~~~~~~~~~~~~~~~
 
-::
+
 
     ./build/tests/Release/nexus_tests --gtest_list_tests
 
@@ -146,20 +146,20 @@ Code Coverage
 Enable Coverage
 ~~~~~~~~~~~~~~~
 
-::
 
-    cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON -DNEXUS_ENABLE_COVERAGE=ON
-    cmake --build build
+
+    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON -DNEXUS_ENABLE_COVERAGE=ON
+    CMake --build build
 
 Generate Coverage Report
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+
 
     cd build
     ctest --output-on-failure
     lcov --capture --directory . --output-file coverage.info
-    lcov --remove coverage.info '/usr/*' '*/tests/*' --output-file coverage.info
+    lcov --remove coverage.info '/usr/\*' '\*/tests/\*' --output-file coverage.info
     genhtml coverage.info --output-directory coverage_report
 
 Coverage Requirements
@@ -185,7 +185,7 @@ Address Sanitizer
 
 Build with sanitizers for memory error detection::
 
-    cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON \
+    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON \
           -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
           -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
 

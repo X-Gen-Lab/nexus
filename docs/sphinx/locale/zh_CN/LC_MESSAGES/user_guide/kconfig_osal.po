@@ -1,0 +1,1214 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../user_guide/kconfig_osal.rst:2 beb8e6b097f94cbeb9acb14c9db2e519
+msgid "OSAL Backend Configuration Guide"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:4 6f88317c118944d2af806247fc81c166
+msgid ""
+"This guide provides detailed configuration information for OSAL (Operating "
+"System Abstraction Layer) backends in the Nexus Embedded Platform."
+msgstr ""
+"This guide provides detailed configuration information for OSAL (Operating "
+"System Abstraction Layer) backends in the Nexus Embedded Platform."
+
+#: ../../user_guide/kconfig_osal.rst:8 b7703151eff945acbc8b76b337d448e4
+msgid "Table of Contents"
+msgstr "目录"
+
+#: faffdf8d471e4482a5885664b21aaf29 fe2d8b9fa7444faaa277973279945088
+msgid "Overview"
+msgstr "概述"
+
+#: ../../user_guide/kconfig_osal.rst:13 25293f1b972b49948f9eb819104a288a
+msgid ""
+"The OSAL provides a unified API for different operating systems and "
+"execution environments. Configuration includes:"
+msgstr "OSAL提供"
+
+#: ../../user_guide/kconfig_osal.rst:15 07b5ebe577684f8c9014b5c8fca2f02b
+msgid ""
+"Backend selection (Bare-metal, FreeRTOS, RT-Thread, Zephyr, Linux, Native)"
+msgstr ""
+"Backend selection (Bare-metal, FreeRTOS, RT-Thread, Zephyr, Linux, Native)"
+
+#: ../../user_guide/kconfig_osal.rst:16 25e2b332704c410d99d727899f34b026
+msgid "System parameters (tick rate, heap size, stack size)"
+msgstr "System parameters (tick rate, heap size, stack size)"
+
+#: ../../user_guide/kconfig_osal.rst:17 f72a56b5bcad4eee8285341857ad6dd4
+msgid "Linker script configuration"
+msgstr "链接器 script configuration"
+
+#: ../../user_guide/kconfig_osal.rst:18 29bb7e7eeebb4ec1ab8ec4229432fa48
+msgid "Backend-specific options"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:21 85d497aab2694e4b86e9fc4bcf2de1b1
+msgid "Backend Selection"
+msgstr "后端 Selection"
+
+#: ../../user_guide/kconfig_osal.rst:23 43cc0bbff4b44b459eb4c803280f0dbb
+msgid "Select one OSAL backend using the choice menu:"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:25 a77d18723cdd407c9fccfd773c675546
+msgid ""
+"choice\n"
+"    prompt \"OSAL Backend\"\n"
+"    default OSAL_BAREMETAL\n"
+"\n"
+"config OSAL_BAREMETAL\n"
+"    bool \"Bare-metal (No OS)\"\n"
+"\n"
+"config OSAL_FREERTOS\n"
+"    bool \"FreeRTOS\"\n"
+"\n"
+"config OSAL_RTTHREAD\n"
+"    bool \"RT-Thread\"\n"
+"\n"
+"config OSAL_ZEPHYR\n"
+"    bool \"Zephyr RTOS\"\n"
+"\n"
+"config OSAL_LINUX\n"
+"    bool \"Linux\"\n"
+"\n"
+"config OSAL_NATIVE\n"
+"    bool \"Native (PC Simulation)\"\n"
+"\n"
+"endchoice"
+msgstr ""
+"choice\n"
+"    prompt \"OSAL Backend\"\n"
+"    default OSAL_BAREMETAL\n"
+"\n"
+"config OSAL_BAREMETAL\n"
+"    bool \"Bare-metal (No OS)\"\n"
+"\n"
+"config OSAL_FREERTOS\n"
+"    bool \"FreeRTOS\"\n"
+"\n"
+"config OSAL_RTTHREAD\n"
+"    bool \"RT-Thread\"\n"
+"\n"
+"config OSAL_ZEPHYR\n"
+"    bool \"Zephyr RTOS\"\n"
+"\n"
+"config OSAL_LINUX\n"
+"    bool \"Linux\"\n"
+"\n"
+"config OSAL_NATIVE\n"
+"    bool \"Native (PC Simulation)\"\n"
+"\n"
+"endchoice"
+
+#: ../../user_guide/kconfig_osal.rst:51 a30c2b7140984686936f3418a4177e43
+msgid "Only one backend can be selected at a time."
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:55 e72da6b68a6c4fc280b828e21379b8ac
+msgid "Bare-Metal Backend"
+msgstr "Bare-Metal 后端"
+
+#: ../../user_guide/kconfig_osal.rst:60 f23acedf93b74cf08bdd3528936bae17
+msgid ""
+"The bare-metal backend provides minimal RTOS functionality without a full "
+"operating system."
+msgstr ""
+
+#: ac357b4466234d23ba27777417c4f989 be23ebf441164750bad97ca4d7e8e2d8
+msgid "**Features:**"
+msgstr "**Features:**"
+
+#: ../../user_guide/kconfig_osal.rst:64 3066044886a9417c861f1573aba3dae4
+msgid "No RTOS overhead"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:65 8d3c5a8de5c944aa96a42ca2e3364b5b
+msgid "Simple cooperative scheduler"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:66 707094d3c12a48538c672e8f76e6c0d0
+msgid "Basic synchronization primitives"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:67 50feda7de6904ae79f762a1dbf21032a
+msgid "Minimal memory footprint"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:68 6792f4b904b64ea2a916d4d6abbc5014
+msgid "Deterministic behavior"
+msgstr ""
+
+#: e3d370e2b9a54a36a539dd1ced51ee8e f1f30ea7ef024043a52cda878d697ec9
+msgid "**Use Cases:**"
+msgstr "**Use Cases:**"
+
+#: 84d072ddb56f489e9425a1525fbe8d8f 95afef083f004026be4f685370a8990d
+msgid "Simple applications"
+msgstr ""
+
+#: 7de3f2487bea4cd6a5d0bac731023a35 d94222c83aa745549456656124959638
+msgid "Resource-constrained systems"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:74 dbc1e6abf3b54693b0e2a9ba53dd6aed
+msgid "Real-time critical systems"
+msgstr ""
+
+#: 189b27b2eaeb4a60bc0440be7ce81189 2112eaf91a944c37b0a61f5ea23669cf
+msgid "Bootloaders"
+msgstr ""
+
+#: cdc62a85f29646a0a6a1a4b50f037875 e01a35dbf267436d870dac5590b17035
+msgid "Configuration"
+msgstr "配置"
+
+#: afbee0c3f0b04c079de01716323b27c3 be1824bad16240128556e8d23d884fb8
+msgid "**Basic configuration:**"
+msgstr "**Basic configuration:**"
+
+#: ../../user_guide/kconfig_osal.rst:82 87e45354d0a74d9388e0baca9910bafd
+msgid ""
+"CONFIG_OSAL_BAREMETAL=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"baremetal\""
+msgstr ""
+"CONFIG_OSAL_BAREMETAL=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"baremetal\""
+
+#: b28fe7c0e9b047acaf6325a00eb195a0 b7af8b48c64343ecb30c9211a0936174
+msgid "**System parameters:**"
+msgstr "**System parameters:**"
+
+#: ../../user_guide/kconfig_osal.rst:89 86f6e893661d47ce94c3bbb73456672f
+msgid ""
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=16384\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+msgstr ""
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=16384\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+
+#: 2f74eb4eaab742e9916f639c05a9e922 b99d8e71821c4b639eee63fef149c770
+msgid "**Generated configuration:**"
+msgstr "**Generated configuration:**"
+
+#: ../../user_guide/kconfig_osal.rst:97 aed9b17fe5aa49fe8b3e489a4f4db872
+msgid ""
+"#define NX_CONFIG_OSAL_BAREMETAL 1\n"
+"#define NX_CONFIG_OSAL_BACKEND_NAME \"baremetal\"\n"
+"#define NX_CONFIG_OSAL_TICK_RATE_HZ 1000\n"
+"#define NX_CONFIG_OSAL_HEAP_SIZE 16384\n"
+"#define NX_CONFIG_OSAL_MAIN_STACK_SIZE 4096"
+msgstr ""
+"#define NX_CONFIG_OSAL_BAREMETAL 1\n"
+"#define NX_CONFIG_OSAL_BACKEND_NAME \"baremetal\"\n"
+"#define NX_CONFIG_OSAL_TICK_RATE_HZ 1000\n"
+"#define NX_CONFIG_OSAL_HEAP_SIZE 16384\n"
+"#define NX_CONFIG_OSAL_MAIN_STACK_SIZE 4096"
+
+#: 97c13c83214b44569d073524a2986d85 c4ce7b388d734788a0184adff3193464
+msgid "Available APIs"
+msgstr "可用 APIs"
+
+#: 0d1d07af416e43ca97162df0079d48f9 58ab4d1d75d5483383b8f394b471cd3d
+msgid "**Task Management:**"
+msgstr "**Task Management:**"
+
+#: ../../user_guide/kconfig_osal.rst:110 0c252157b482407982c21369213d4603
+msgid "``osal_task_create()`` - Create cooperative task"
+msgstr "``osal_task_create()`` - Create cooperative task"
+
+#: 22a1e0cb77b34998a26e702239da8c9d 31aa6e7a8ff34586a4c20bf89188217c
+msgid "``osal_task_delete()`` - Delete task"
+msgstr "``osal_task_delete()`` - Delete task"
+
+#: 021eadcd3adf4d5f94eb350c2bec8c7f 1a6fa951c01648549681423ffd48b54d
+msgid "``osal_task_delay()`` - Delay task"
+msgstr "``osal_task_delay()`` - Delay task"
+
+#: ../../user_guide/kconfig_osal.rst:113 d9116ca7ef484868911d4235a006e628
+msgid "``osal_task_yield()`` - Yield to other tasks"
+msgstr "``osal_task_yield()`` - Yield to other tasks"
+
+#: 465ae318bb2c404c924e88994a1b5116 7baafb0db8364091a9eedbbb8fbd4efe
+msgid "**Synchronization:**"
+msgstr "**Synchronization:**"
+
+#: ../../user_guide/kconfig_osal.rst:117 877a341460b04a72abdaf836a66a3f4f
+msgid "``osal_mutex_create()`` - Create mutex (simple lock)"
+msgstr "``osal_mutex_create()`` - Create mutex (simple lock)"
+
+#: ../../user_guide/kconfig_osal.rst:118 4e69cb5f7a0040cd89ab67fa6baa2e6c
+msgid "``osal_semaphore_create()`` - Create counting semaphore"
+msgstr "``osal_semaphore_create()`` - Create counting semaphore"
+
+#: ../../user_guide/kconfig_osal.rst:119 89bbcafc726e49f2ae58fd56d57c49f3
+msgid "``osal_queue_create()`` - Create message queue"
+msgstr "``osal_queue_create()`` - Create message queue"
+
+#: 3f8d741cb9fd4aa0ac7cc88b5caf09e1 e7ff5bac720a48df9e6f7986bf3aa5b6
+msgid "**Time:**"
+msgstr "**Time:**"
+
+#: 21894181a886496081ef3a1cf1fcc767 cc76b08e7acd422f8570422092a1a744
+msgid "``osal_get_tick_count()`` - Get system tick count"
+msgstr "``osal_get_tick_count()`` - Get system tick count"
+
+#: 08c5e4177b544aa1bacddc9d107c8f59 43ca15a9c1a14d829b84635b3d8f34fd
+msgid "``osal_delay_ms()`` - Delay in milliseconds"
+msgstr "``osal_delay_ms()`` - Delay in milliseconds"
+
+#: ../../user_guide/kconfig_osal.rst:127 1379ab4b106d4f0e850cf72d5a9a113a
+msgid "Limitations"
+msgstr "限制"
+
+#: ../../user_guide/kconfig_osal.rst:129 9a5bb74865494269ab1e3320a04294de
+msgid "No preemptive scheduling"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:130 bae0933521f24605a96da9847df69f19
+msgid "No priority-based scheduling"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:131 de96cfd4c69e4a71b203a93be0cec413
+msgid "Limited synchronization primitives"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:132 3d302a3c1c58499dae3f5f7898493468
+msgid "No advanced RTOS features"
+msgstr ""
+
+#: a57d2187093d4ee5accf4b05a486fb74 af5a4d0adbd24a0fba29c735b7decf3d
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../user_guide/kconfig_osal.rst:137 75f94c1d5e63405fb074813eb2a8fde3
+msgid "Keep tasks short and cooperative"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:138 8aeadbff60564ac180b7f37d794081c5
+msgid "Use delays to yield CPU"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:139 264a6ddaa416432b93ea65355127d12c
+msgid "Minimize heap usage"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:140 c33e2d041c604f44b09d6f02063c7edb
+msgid "Avoid blocking operations"
+msgstr ""
+
+#: aa54404a3f2b4ad49fb9f51193477e69 b53a51ab70e54ddfa881283dca812b5f
+msgid "Example Configuration"
+msgstr "示例 配置"
+
+#: ../../user_guide/kconfig_osal.rst:145 c97e9caebd084451b97a2269fe8794ee
+msgid "**Minimal bare-metal system:**"
+msgstr "**Minimal bare-metal system:**"
+
+#: ../../user_guide/kconfig_osal.rst:147 0a6bd6a4557243c49d52a0d5e5e4fd01
+msgid ""
+"CONFIG_OSAL_BAREMETAL=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=8192\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048"
+msgstr ""
+"CONFIG_OSAL_BAREMETAL=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=8192\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048"
+
+#: ../../user_guide/kconfig_osal.rst:156 24f31796e7d64fe08b0ac010675ec085
+msgid "FreeRTOS Backend"
+msgstr "FreeRTOS 后端"
+
+#: ../../user_guide/kconfig_osal.rst:161 10d2d1b2b3814a02bbbc0a4d4335b2dc
+msgid ""
+"FreeRTOS is the most popular real-time operating system for embedded "
+"systems."
+msgstr ""
+
+#: 24c9bb6570e6474c8a79849cdec225d2 7fdfcf16c2aa4eefab02d5b92359e4dc
+msgid "Preemptive multitasking"
+msgstr ""
+
+#: 84c0e6f589fc4a31ba5138386cb471e1 ef115b8beb1d4afe9f240540d23bd3fb
+msgid "Priority-based scheduling"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:167 69efd9589e2c42d68379a0c7a4a10b8c
+msgid "Rich synchronization primitives"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:168 a075658f0f724c35b35ece7063a4eb82
+msgid "Mature and well-tested"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:169 b2725463b06e4c8c84e86e9b55e0a4ba
+msgid "Large ecosystem"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:170 fefbd1f7c29041eab032599223fb6a56
+msgid "Commercial support available"
+msgstr ""
+
+#: 1c1b5be0493d4573af59cb3d57b1e20a 78d06c7570a64b1e8449225993e0152e
+msgid "General embedded applications"
+msgstr "通用嵌入式应用"
+
+#: d78bba4a91e549629105e6b37b5402ba da6d402066ef4d6fbbc8ba780296cd0c
+msgid "Multi-threaded applications"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:176 57788e3f801b49c08059212a4eb0f4c8
+msgid "Real-time systems"
+msgstr ""
+
+#: 88df07ff40014811bf4ed2d10434d8f7 b5d3b28af011466586df46af0af08cf1
+msgid "Production systems"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:184 d42c69b43baa4a15990ea4345523981c
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\""
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"freertos\""
+
+#: 09928f625ac84d06961fa24ace250a65 65e86f94b3f14fae860185a66b0ad2d0
+msgid ""
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:200 7103381e0795411486a7e5241a06d0ae
+msgid ""
+"#define NX_CONFIG_OSAL_FREERTOS 1\n"
+"#define NX_CONFIG_OSAL_BACKEND_NAME \"freertos\"\n"
+"#define NX_CONFIG_OSAL_TICK_RATE_HZ 1000\n"
+"#define NX_CONFIG_OSAL_HEAP_SIZE 32768\n"
+"#define NX_CONFIG_OSAL_MAIN_STACK_SIZE 2048\n"
+"#define NX_CONFIG_OSAL_MAX_PRIORITIES 32"
+msgstr ""
+"#define NX_CONFIG_OSAL_FREERTOS 1\n"
+"#define NX_CONFIG_OSAL_BACKEND_NAME \"freertos\"\n"
+"#define NX_CONFIG_OSAL_TICK_RATE_HZ 1000\n"
+"#define NX_CONFIG_OSAL_HEAP_SIZE 32768\n"
+"#define NX_CONFIG_OSAL_MAIN_STACK_SIZE 2048\n"
+"#define NX_CONFIG_OSAL_MAX_PRIORITIES 32"
+
+#: ../../user_guide/kconfig_osal.rst:214 6ebf56d4fc0042219f1fbfd510237859
+msgid "``osal_task_create()`` - Create task with priority"
+msgstr "``osal_task_create()`` - Create task with priority"
+
+#: ../../user_guide/kconfig_osal.rst:216 e088685887544bf19e08d22b7d51d637
+msgid "``osal_task_suspend()`` - Suspend task"
+msgstr "``osal_task_suspend()`` - Suspend task"
+
+#: ../../user_guide/kconfig_osal.rst:217 d78a2ac415c546b8abfffd59fb87c891
+msgid "``osal_task_resume()`` - Resume task"
+msgstr "``osal_task_resume()`` - Resume task"
+
+#: ../../user_guide/kconfig_osal.rst:219 0289d77bb198423c937d1d0780cdc30b
+msgid "``osal_task_delay_until()`` - Delay until absolute time"
+msgstr "``osal_task_delay_until()`` - Delay until absolute time"
+
+#: ../../user_guide/kconfig_osal.rst:220 a83876c153994c1aab212430daf24a30
+msgid "``osal_task_get_priority()`` - Get task priority"
+msgstr "``osal_task_get_priority()`` - Get task priority"
+
+#: ../../user_guide/kconfig_osal.rst:221 06b052fdef9240ada8a92e1b42aaa107
+msgid "``osal_task_set_priority()`` - Set task priority"
+msgstr "``osal_task_set_priority()`` - Set task priority"
+
+#: ../../user_guide/kconfig_osal.rst:225 bd20bf94ca4745ec8fd23e11c9d2f489
+msgid "``osal_mutex_create()`` - Create mutex"
+msgstr "``osal_mutex_create()`` - Create mutex"
+
+#: ../../user_guide/kconfig_osal.rst:226 f4ad49865b7448d3a6a6e92e6924f8c3
+msgid "``osal_mutex_lock()`` - Lock mutex"
+msgstr "``osal_mutex_lock()`` - Lock mutex"
+
+#: ../../user_guide/kconfig_osal.rst:227 1c7f099360e3465d98666c45643a744d
+msgid "``osal_mutex_unlock()`` - Unlock mutex"
+msgstr "``osal_mutex_unlock()`` - Unlock mutex"
+
+#: ../../user_guide/kconfig_osal.rst:228 d9b3674f1b854e79b528eceec3b8bb7f
+msgid "``osal_semaphore_create()`` - Create semaphore"
+msgstr "``osal_semaphore_create()`` - Create semaphore"
+
+#: ../../user_guide/kconfig_osal.rst:229 819d6a08c5dc4be8b2200b0f7eac4ca2
+msgid "``osal_semaphore_give()`` - Give semaphore"
+msgstr "``osal_semaphore_give()`` - Give semaphore"
+
+#: ../../user_guide/kconfig_osal.rst:230 9fd76f612b0649a0a45ba2ac9f1bc9e8
+msgid "``osal_semaphore_take()`` - Take semaphore"
+msgstr "``osal_semaphore_take()`` - Take semaphore"
+
+#: ../../user_guide/kconfig_osal.rst:231 5dbf719e4af24dfd961da57fb1406859
+msgid "``osal_queue_create()`` - Create queue"
+msgstr "``osal_queue_create()`` - Create queue"
+
+#: ../../user_guide/kconfig_osal.rst:232 7e267324de30456c9a2580ddadae7130
+msgid "``osal_queue_send()`` - Send to queue"
+msgstr "``osal_queue_send()`` - Send to queue"
+
+#: ../../user_guide/kconfig_osal.rst:233 8721361241394c0eab5371511b642d2d
+msgid "``osal_queue_receive()`` - Receive from queue"
+msgstr "``osal_queue_receive()`` - Receive from queue"
+
+#: ../../user_guide/kconfig_osal.rst:234 7da50b86e70a42d7ba0f25fede890a47
+msgid "``osal_event_group_create()`` - Create event group"
+msgstr "``osal_event_group_create()`` - Create event group"
+
+#: ../../user_guide/kconfig_osal.rst:236 1b9116d2de134e8c8cf422c7d0b8a1c0
+msgid "**Memory:**"
+msgstr "**Memory:**"
+
+#: ../../user_guide/kconfig_osal.rst:238 d16b862d55b9485f8ac417a13d91a006
+msgid "``osal_malloc()`` - Allocate memory"
+msgstr "``osal_malloc()`` - Allocate memory"
+
+#: ../../user_guide/kconfig_osal.rst:239 d6a5eb1ba85a43f1b26ba5fd95d73345
+msgid "``osal_free()`` - Free memory"
+msgstr "``osal_free()`` - Free memory"
+
+#: ../../user_guide/kconfig_osal.rst:247 5f00cd4a3d5d452ab31717d9502a42e5
+msgid "Tick Rate Configuration"
+msgstr "Tick Rate 配置"
+
+#: ../../user_guide/kconfig_osal.rst:249 be5eb5ee2c28463c8314f328e68b0dd4
+msgid "**Standard tick rate (1000 Hz):**"
+msgstr "**Standard tick rate (1000 Hz):**"
+
+#: ../../user_guide/kconfig_osal.rst:251 4ee5e9f3686346c689e4ceabf5925df2
+msgid "CONFIG_OSAL_TICK_RATE_HZ=1000"
+msgstr "CONFIG_OSAL_TICK_RATE_HZ=1000"
+
+#: ../../user_guide/kconfig_osal.rst:255 0c9660b91bd14b4998f5bf1642d76d3f
+msgid "1 ms resolution"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:256 fb1d7672e88f4476aa4b8860c4ef2e18
+msgid "Good balance"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:257 627a36469e3e4377bc416fb80a874562
+msgid "Most common"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:259 3a7b6f41d71643fda06a1b73185830dd
+msgid "**High resolution (10000 Hz):**"
+msgstr "**High resolution (10000 Hz):**"
+
+#: ../../user_guide/kconfig_osal.rst:261 46712c7869f1439a896eeae4c278467a
+msgid "CONFIG_OSAL_TICK_RATE_HZ=10000"
+msgstr "CONFIG_OSAL_TICK_RATE_HZ=10000"
+
+#: ../../user_guide/kconfig_osal.rst:265 4e30397195c44135bfdf7f57c362cdae
+msgid "0.1 ms resolution"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:266 865eafc901604c12ae3e8e17ae0f4fe8
+msgid "Higher CPU overhead"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:267 420a0ed7448d410a9c824ee8bcb341ef
+msgid "For precise timing"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:269 6f5288d6a467481f9e9c90d81bfbb77b
+msgid "**Low resolution (100 Hz):**"
+msgstr "**Low resolution (100 Hz):**"
+
+#: ../../user_guide/kconfig_osal.rst:271 54d7ad6e373b48f08913c41d06d023ab
+msgid "CONFIG_OSAL_TICK_RATE_HZ=100"
+msgstr "CONFIG_OSAL_TICK_RATE_HZ=100"
+
+#: ../../user_guide/kconfig_osal.rst:275 7062a83154fa4db3b23fbcbde5019b8d
+msgid "10 ms resolution"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:276 a4da7712bb46466787debda0b13af2dc
+msgid "Lower CPU overhead"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:277 ea5754f55a0145c787cc3cf4625c0726
+msgid "For power-sensitive applications"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:280 643cf78408e44084be10c5baa6c3bd0a
+msgid "Heap Configuration"
+msgstr "堆 配置"
+
+#: ../../user_guide/kconfig_osal.rst:282 e4e317e3ab224b18a311a8113ce85a72
+msgid "**Small system (16 KB):**"
+msgstr "**Small system (16 KB):**"
+
+#: ../../user_guide/kconfig_osal.rst:284 035fba5e73e348fa9611b7988435f5f2
+msgid "CONFIG_OSAL_HEAP_SIZE=16384"
+msgstr "CONFIG_OSAL_HEAP_SIZE=16384"
+
+#: ../../user_guide/kconfig_osal.rst:288 cd8e21576dc54e7db3f6d01f8abd0335
+msgid "**Medium system (32 KB):**"
+msgstr "**Medium system (32 KB):**"
+
+#: ../../user_guide/kconfig_osal.rst:290 2a97aee5464645c389abde2a9eab47fe
+msgid "CONFIG_OSAL_HEAP_SIZE=32768"
+msgstr "CONFIG_OSAL_HEAP_SIZE=32768"
+
+#: ../../user_guide/kconfig_osal.rst:294 9e2eef5c41194231be009f067a1211ad
+msgid "**Large system (64 KB):**"
+msgstr "**Large system (64 KB):**"
+
+#: ../../user_guide/kconfig_osal.rst:296 47d322778caf4b1fa4b33a82bf7e03b0
+msgid "CONFIG_OSAL_HEAP_SIZE=65536"
+msgstr "CONFIG_OSAL_HEAP_SIZE=65536"
+
+#: ../../user_guide/kconfig_osal.rst:301 0d28b8d6f75741c8ad1f6c7c4ae0f22a
+msgid "Priority Configuration"
+msgstr "优先级 配置"
+
+#: ../../user_guide/kconfig_osal.rst:303 5a7f58fa3bbf421d8b9c6fd23fc79525
+msgid "**Standard priorities (32 levels):**"
+msgstr "**Standard priorities (32 levels):**"
+
+#: ../../user_guide/kconfig_osal.rst:305 c3a904288f6e4cfa8ff469a024020f5b
+msgid "CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr "CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:309 8b61054d3ddf458c9631832fd239adbe
+msgid "0 = Idle priority"
+msgstr "0 = Idle priority"
+
+#: ../../user_guide/kconfig_osal.rst:310 34096b8d18214ea986c38602e30a6abd
+msgid "1-30 = Application priorities"
+msgstr "1-30 = Application priorities"
+
+#: ../../user_guide/kconfig_osal.rst:311 de5c886500774667ac85fb4004cd9f66
+msgid "31 = Highest priority"
+msgstr "31 = Highest priority"
+
+#: ../../user_guide/kconfig_osal.rst:313 c62f9366cabb41e39bf7773d27d528a5
+msgid "**Minimal priorities (8 levels):**"
+msgstr "**Minimal priorities (8 levels):**"
+
+#: ../../user_guide/kconfig_osal.rst:315 3ad9191f523441468de1cbbccbc9b7c4
+msgid "CONFIG_OSAL_MAX_PRIORITIES=8"
+msgstr "CONFIG_OSAL_MAX_PRIORITIES=8"
+
+#: ../../user_guide/kconfig_osal.rst:319 91fae34f4c594185ad5f66cd40cd33e6
+msgid "Lower memory usage"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:320 5153200a173e43d8a8fb99546ec728b8
+msgid "Simpler scheduling"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:325 83f39d4d733c49b493895114f615173e
+msgid "Use appropriate task priorities"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:326 d0654da7051d46f5a87d1c549df58867
+msgid "Avoid priority inversion"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:327 7a9c648b614b40fabf6396afe0d2243b
+msgid "Use mutexes for shared resources"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:328 c61de29ad4114cfb832169002633572e
+msgid "Keep ISRs short"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:329 10e57d0c6375481589b48b59ec99890f
+msgid "Use queues for inter-task communication"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:330 445f6c7310fd48d5b82716359e63b7b5
+msgid "Monitor stack usage"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:331 83fcf762237e43eebb7cdce95a942db5
+msgid "Configure heap size appropriately"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:334 bf5cee12ea5a42108eafff8c581b7e88
+msgid "Example Configurations"
+msgstr "示例 Configurations"
+
+#: ../../user_guide/kconfig_osal.rst:336 3585582a000d43f293e6ca2c0bfecb27
+msgid "**General purpose application:**"
+msgstr "**General purpose application:**"
+
+#: ../../user_guide/kconfig_osal.rst:338 fc95dac2d9654271bfc6e966649157e0
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:346 9d1e3f0f7dfa4afd9b1dce410492df55
+msgid "**Resource-constrained system:**"
+msgstr "**Resource-constrained system:**"
+
+#: ../../user_guide/kconfig_osal.rst:348 636ce469009a451c99a60a0bf7ff1f16
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=16384\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=1024\n"
+"CONFIG_OSAL_MAX_PRIORITIES=8"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=16384\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=1024\n"
+"CONFIG_OSAL_MAX_PRIORITIES=8"
+
+#: ../../user_guide/kconfig_osal.rst:356 b90fca1f53bb43ae99cf22c9338adc8d
+msgid "**High-performance system:**"
+msgstr "**High-performance system:**"
+
+#: ../../user_guide/kconfig_osal.rst:358 7ab3814b720c45ad9edca1c606836023
+msgid ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_FREERTOS=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:368 d3af88e4ec4f45efa9d515048c5ed453
+msgid "RT-Thread Backend"
+msgstr "RT-Thread 后端"
+
+#: ../../user_guide/kconfig_osal.rst:373 2741363bb10b436fbc25633e9c0b86a7
+msgid ""
+"RT-Thread is a Chinese open-source RTOS with rich features and IoT support."
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:379 02d1faee6f9b4b169c82ad2fa7c1734c
+msgid "Rich middleware (file system, network stack)"
+msgstr "Rich middleware (file system, network stack)"
+
+#: ../../user_guide/kconfig_osal.rst:380 a6961661fcd84943996740b5b68da70c
+msgid "IoT protocols (MQTT, CoAP)"
+msgstr "IoT protocols (MQTT, CoAP)"
+
+#: ../../user_guide/kconfig_osal.rst:381 54d2d719e42f468aa5e8a80066e5e417
+msgid "Device driver framework"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:382 51ac35bce664451eabc727bc5493b813
+msgid "Package manager"
+msgstr ""
+
+#: 60153299ad2b444db9f6448ff33935fd c004469d43414b89b91a15222746c6b4
+msgid "IoT applications"
+msgstr ""
+
+#: 13c7017a4e824ddd8efd9a9199b109a9 2892d2291a53441594568dacfb86d888
+msgid "Connected devices"
+msgstr ""
+
+#: 37187ca178e1411c957433fb23a9f999 6efa2e7b2dd4418a87a6dab3cef1daec
+msgid "Applications requiring middleware"
+msgstr ""
+
+#: 43cb0d5d63c24d7c87b19f5bdd7c5ced 56facd9efbe940c89bbd43195cb31b90
+msgid "Chinese market"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:396 f067c51b2bf3489a956176f5b684269b
+msgid ""
+"CONFIG_OSAL_RTTHREAD=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"rtthread\""
+msgstr ""
+"CONFIG_OSAL_RTTHREAD=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"rtthread\""
+
+#: ../../user_guide/kconfig_osal.rst:413 824da90fe5ee423dbc1c770c773fa221
+msgid ""
+"RT-Thread provides similar APIs to FreeRTOS through the OSAL abstraction:"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:415 46d6d575107645d4ae1a45ba2baeb348
+msgid "Task management"
+msgstr "任务 management"
+
+#: ../../user_guide/kconfig_osal.rst:416 d38bf05d5eeb4ede89ba8617dcb16b22
+msgid "Synchronization primitives"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:417 988dc429a59f4ec7bd43b0ba5d9a0c00
+msgid "Memory management"
+msgstr "内存管理"
+
+#: ../../user_guide/kconfig_osal.rst:418 ef95ac3057fe4dd983748bad8d9941da
+msgid "Time management"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:423 46df3f4a3b1d49b4aad6f7dc1a1d32de
+msgid "Use RT-Thread's device driver framework"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:424 650ab00e842a43aab48ebf420d920b9a
+msgid "Leverage built-in middleware"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:425 b72f15285c9843099ff173caf15efb6e
+msgid "Use package manager for components"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:426 4edbff768e2347fc8abcacebfdd25eb8
+msgid "Follow RT-Thread conventions"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:431 cea1f3ec9da944b28268f7e49267e75e
+msgid ""
+"CONFIG_OSAL_RTTHREAD=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_RTTHREAD=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:440 56306322f8e34636b1ffc8f021ca0a28
+msgid "Zephyr Backend"
+msgstr "Zephyr 后端"
+
+#: ../../user_guide/kconfig_osal.rst:445 befeeeec9b2e4a0a97347f43f8195272
+msgid ""
+"Zephyr is a Linux Foundation RTOS with modern architecture and extensive "
+"hardware support."
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:449 63af017ce22d44ef9b8f3d7c806b8b85
+msgid "Modern C-based RTOS"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:450 90afe1e8e9a940429ca5c955c2f504b3
+msgid "Extensive hardware support"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:451 d873ed4e8d6c4bb897adc8fd0ccb2b15
+msgid "Device tree configuration"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:452 74a8f73c2a8747c986e1a53be8b8ebde
+msgid "Networking stack"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:453 3eeb16600e034653bf4b7b9b24533afa
+msgid "Bluetooth stack"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:454 3d6371252f7249e2965cc430a7ad7aee
+msgid "Security features"
+msgstr ""
+
+#: 8d4c4933ca3a40cc8a9675c6fe65c79d 94d1e213fbd940bd98a6910c919cd234
+msgid "Modern embedded applications"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:459 fd41fa3ccae4411c9599fac9e48a19b6
+msgid "IoT devices"
+msgstr ""
+
+#: 2e0a41a694cb4974a0367d72859bb425 58e2064ce7a0403592716ee9cbf22872
+msgid "Bluetooth applications"
+msgstr ""
+
+#: c7c3296f0af1410185d1da0a2a1e3e82 efc4dc32a936417d98423364aefff097
+msgid "Security-critical systems"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:468 f73876f8973e436c8f5b6be69e62c17c
+msgid ""
+"CONFIG_OSAL_ZEPHYR=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"zephyr\""
+msgstr ""
+"CONFIG_OSAL_ZEPHYR=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"zephyr\""
+
+#: ../../user_guide/kconfig_osal.rst:475 4d77a32107804bb1990b735f9d461b5e
+msgid ""
+"CONFIG_OSAL_TICK_RATE_HZ=100\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_TICK_RATE_HZ=100\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:485 b2df7d300f264b29816e0e078dbeaa6d
+msgid "Use device tree for hardware configuration"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:486 d010235c325042b8b28f9cda8ef27011
+msgid "Leverage Zephyr's networking stack"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:487 0aaa5434766f423687ec8475da5f4487
+msgid "Use Zephyr's security features"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:488 274d094fb50445b289ef830226a46b16
+msgid "Follow Zephyr conventions"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:493 27a74b51338e4d5aaa62b01c681e69d5
+msgid ""
+"CONFIG_OSAL_ZEPHYR=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=100\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+msgstr ""
+"CONFIG_OSAL_ZEPHYR=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=100\n"
+"CONFIG_OSAL_HEAP_SIZE=32768\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=2048\n"
+"CONFIG_OSAL_MAX_PRIORITIES=32"
+
+#: ../../user_guide/kconfig_osal.rst:502 354b7c982c8e40c49ae239b4b06b23fb
+msgid "Linux Backend"
+msgstr "Linux 后端"
+
+#: ../../user_guide/kconfig_osal.rst:507 a91a29a8b8844a99b8066ee336459c9d
+msgid "The Linux backend uses POSIX threads for testing on Linux systems."
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:511 cb3f6916030c41e6923383132232fc14
+msgid "POSIX threads"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:512 ccd7f63c47f64c5782e8932152463cee
+msgid "Standard Linux tools"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:513 1438955ba46b436aa0ce75512a293e75
+msgid "Easy debugging"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:514 d315f7f96479496ab7b5dca49667bc77
+msgid "Fast development"
+msgstr ""
+
+#: 951e43c7d97d43e7bfbc4b935b5020aa 9bccaff0d1b04d6186f26ae923681edf
+msgid "Development and testing"
+msgstr "开发 and testing"
+
+#: 66ab57d0e5d34fa3adc7c938e1c21d46 82729e2b5dbc4703a9b0013088a3c71a
+msgid "Algorithm validation"
+msgstr ""
+
+#: a831456a6ae14318a29498725aa50cc1 ac2204fc9331473f820e95a6d156ff20
+msgid "CI/CD pipelines"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:527 403c12b6e5e540df980aa13522579e17
+msgid ""
+"CONFIG_OSAL_LINUX=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"linux\""
+msgstr ""
+"CONFIG_OSAL_LINUX=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"linux\""
+
+#: 0afc200bf8bb49578edd8f876a8537fd dfe07a0dab184d4fb10ce45e876c3742
+msgid ""
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+msgstr ""
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+
+#: 70c2a8f8414f44609e463b54bb252ffc 85011d89069a493a9ed37c6688c67cce
+msgid "Use for development and testing"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:544 c917519c2966442783fe7f86187b612f
+msgid "Validate algorithms before hardware deployment"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:545 26bb3420b9df445aacee768a23713c79
+msgid "Use standard Linux debugging tools"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:550 872992235d4142169c037e203888713f
+msgid ""
+"CONFIG_OSAL_LINUX=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+msgstr ""
+"CONFIG_OSAL_LINUX=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+
+#: ../../user_guide/kconfig_osal.rst:558 eb2c9da715c041d29186e895e1812aac
+msgid "Native Backend"
+msgstr "Native 后端"
+
+#: ../../user_guide/kconfig_osal.rst:563 e835f460706444918b87f386ae85a7de
+msgid "The Native backend provides PC simulation for development and testing."
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:567 87ba56cd1b594d6f8f4a163499b63ace
+msgid "Cross-platform (Windows, Linux, macOS)"
+msgstr "Cross-platform (Windows, Linux, macOS)"
+
+#: ../../user_guide/kconfig_osal.rst:568 41d562c24cc243df93cf3c2a1ec44560
+msgid "Fast development iteration"
+msgstr "快速开发迭代"
+
+#: ../../user_guide/kconfig_osal.rst:569 f09a68d33f7847cd9f1fae96c3043207
+msgid "No hardware required"
+msgstr "无需硬件"
+
+#: ../../user_guide/kconfig_osal.rst:570 5477c1f658674a80aa1654df24e1f7ec
+msgid "Standard debugging tools"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:583 40283abb47b446c0aa6f0e3e5ce224cd
+msgid ""
+"CONFIG_OSAL_NATIVE=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"native\""
+msgstr ""
+"CONFIG_OSAL_NATIVE=y\n"
+"CONFIG_OSAL_BACKEND_NAME=\"native\""
+
+#: ../../user_guide/kconfig_osal.rst:600 20951b11b9dc46d984928f5e8a64c8de
+msgid "Validate configuration before hardware deployment"
+msgstr "在硬件部署前验证配置"
+
+#: ../../user_guide/kconfig_osal.rst:601 9e20896cd0c745f2b0f02c61841dfc0d
+msgid "Use for CI/CD testing"
+msgstr "用于 CI/CD 测试"
+
+#: ../../user_guide/kconfig_osal.rst:606 e8b2f795cea943d590f650b58a7bfdc0
+msgid ""
+"CONFIG_OSAL_NATIVE=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+msgstr ""
+"CONFIG_OSAL_NATIVE=y\n"
+"CONFIG_OSAL_TICK_RATE_HZ=1000\n"
+"CONFIG_OSAL_HEAP_SIZE=65536\n"
+"CONFIG_OSAL_MAIN_STACK_SIZE=4096"
+
+#: ../../user_guide/kconfig_osal.rst:614 1532c9fc690a4f768fdf7448cd8d78ee
+msgid "Backend Comparison"
+msgstr "后端 Comparison"
+
+#: ../../user_guide/kconfig_osal.rst:617 3dcabc2c97f04090b11a5f871df16f35
+msgid "Feature Comparison"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:623 8de5808b167a4a19bdeabd8b07a55cce
+msgid "Feature"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:624 fec14f3393804434b08d742be50a2344
+msgid "Bare-metal"
+msgstr "裸机"
+
+#: ../../user_guide/kconfig_osal.rst:625 57fa406b81fd441b8194a609f00389d5
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+#: ../../user_guide/kconfig_osal.rst:626 338f6ffa6c49439f8617495f6d83cd7f
+msgid "RT-Thread"
+msgstr "RT-Thread"
+
+#: ../../user_guide/kconfig_osal.rst:627 ae095b7817754f77b1b1cce02214b224
+msgid "Zephyr"
+msgstr "Zephyr"
+
+#: ../../user_guide/kconfig_osal.rst:628 ec75a67ec4e44d27917eb26157c34b96
+msgid "Linux"
+msgstr "Linux"
+
+#: ../../user_guide/kconfig_osal.rst:629 810a56022c7a44e194d45f7f49b71bbc
+msgid "Native"
+msgstr "Native"
+
+#: ../../user_guide/kconfig_osal.rst:630 de43b4885e88400fb667eb0856f7b7f5
+msgid "Preemptive"
+msgstr ""
+
+#: a93921047cd74e3cbb2e5953f40156a5 b7ce9394f8fe4f1aa221e26fa78174c4
+msgid "No"
+msgstr "否"
+
+#: e8c9d2f24a584c16a667a91edc2bd670 edcd50074a714a3dae75d24ae17d3b55
+msgid "Yes"
+msgstr "是"
+
+#: ../../user_guide/kconfig_osal.rst:637 696a195ce9b3467883f31ec155b21970
+msgid "Priorities"
+msgstr "优先级"
+
+#: ../../user_guide/kconfig_osal.rst:644 ea9370f9125c45849fb5d3907b94ae4a
+msgid "Memory"
+msgstr "内存"
+
+#: ../../user_guide/kconfig_osal.rst:645 3817f6730da34032a964a98abb40dea1
+msgid "Minimal"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:646 194ed351244c468197845a7db7522221
+msgid "Small"
+msgstr ""
+
+#: b0da928d75284172bca17a0e349a3ace e684c5bea7e04c79b377700267e363ec
+msgid "Medium"
+msgstr ""
+
+#: b72582cc3a8d4704af2bb842f443a212 ba3723bef08b4e4ab34a77f676ffc692
+msgid "Large"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:651 eb0e1ad6065b498fb4ee019c9c5660cb
+msgid "Middleware"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:653 c16ed3d984704d8cbfc72e7025effaca
+msgid "Limited"
+msgstr ""
+
+#: 07111f00b36d4e8fb73ac8d55305ba51 0c7a1bd0be5f4f3e9b5a3c08d7d69718
+msgid "Rich"
+msgstr ""
+
+#: 215c27ef885f4d5ab13435b0bfd3d7a1 4715da74b3d34f75941abcc67b78d4b4
+msgid "Full"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:658 79fc36708d0c4cb6a43fe5b44dd48ed9
+msgid "Maturity"
+msgstr ""
+
+#: c93234c1e06e4bbe9314dcbea00aafa3 f7722230cd4749a1927b1d65853c8d01
+msgid "N/A"
+msgstr "N/A"
+
+#: 5be6f4c7fd51420cb45d9eb9e0835e4d f86e1541e27347a19a92fb174240c714
+msgid "Very High"
+msgstr ""
+
+#: 0c48ad25aa4c448c81dfb79d9d9a0d9d d7fefa6509f44fb4b0c2262c12553245
+msgid "High"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:665 ac113d3d95f84adba5cb41cae82d6b88
+msgid "Ecosystem"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:670 6461525247ce49e09c5817471f509a0e
+msgid "Very Large"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:674 9e3900aa753c4b0da4630d0d29c3ff50
+msgid "Use Case Recommendations"
+msgstr "用例建议"
+
+#: ../../user_guide/kconfig_osal.rst:676 2758a735cc074224891300a2d3c9c143
+msgid "**Bare-metal:**"
+msgstr "**Bare-metal:**"
+
+#: ../../user_guide/kconfig_osal.rst:681 9961cc92b4a04a27a9b4ceaebffe849f
+msgid "Deterministic behavior required"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:683 370874d841e84c9ebfe03b2be3f8ed0a
+msgid "**FreeRTOS:**"
+msgstr "**FreeRTOS:**"
+
+#: ../../user_guide/kconfig_osal.rst:688 66455e680d9b43f4b807b3f87a1816e4
+msgid "Industry standard"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:690 3de292b8d7ab4c328e5e8569f1656382
+msgid "**RT-Thread:**"
+msgstr "**RT-Thread:**"
+
+#: ../../user_guide/kconfig_osal.rst:697 dc75cb4ad7184b7cbd84810c8bec1af1
+msgid "**Zephyr:**"
+msgstr "**Zephyr:**"
+
+#: ../../user_guide/kconfig_osal.rst:702 6fe8926c50f5447ba658048be6115478
+msgid "Extensive hardware support needed"
+msgstr ""
+
+#: ../../user_guide/kconfig_osal.rst:704 407580d399d34de2b2cbe576031c4020
+msgid "**Linux:**"
+msgstr "**Linux:**"
+
+#: ../../user_guide/kconfig_osal.rst:710 fe0a19121ca34e0680e8c4b9176910bd
+msgid "**Native:**"
+msgstr "**Native:**"
+
+#: ../../user_guide/kconfig_osal.rst:713 94582e0472f24e1aa3ff8ec5c4b30648
+msgid "Cross-platform development"
+msgstr "跨平台开发"
+
+#: ../../user_guide/kconfig_osal.rst:717 aeb7288fc0bd44de9d2695670ec5a572
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../user_guide/kconfig_osal.rst:719 f5194821dca04821a8dc5627e87deab0
+msgid ":doc:`kconfig_tutorial` - Kconfig tutorial"
+msgstr ":doc:`kconfig_tutorial` - Kconfig tutorial"
+
+#: ../../user_guide/kconfig_osal.rst:720 f5da757bea6a4416a7219cce53f010e4
+msgid ":doc:`kconfig_platforms` - Platform-specific configuration"
+msgstr ":doc:`kconfig_platforms` - Platform-specific configuration"
+
+#: ../../user_guide/kconfig_osal.rst:721 4647a83a44594fa7bd877d9d5d0b4387
+msgid ":doc:`../api/osal` - OSAL API reference"
+msgstr ":doc:`../api/osal` - OSAL API reference"
+
+#: ../../user_guide/kconfig_osal.rst:722 9ce16bf81eb94607b5543d65fc846b7d
+msgid ":doc:`porting` - Platform porting guide"
+msgstr ":doc:`porting` - Platform porting guide"

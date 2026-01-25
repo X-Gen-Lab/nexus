@@ -1,0 +1,89 @@
+GD32 Platform Guide
+===================
+
+.. note::
+
+   GD32 platform support is currently under development. This guide will be updated as features become available.
+
+Overview
+--------
+
+GD32 is a series of 32-bit general-purpose microcontrollers based on the ARM Cortex-M core, developed by GigaDevice Semiconductor.
+
+Nexus provides support for GD32 microcontrollers, offering similar features to STM32 platforms.
+
+Supported Devices
+-----------------
+
+**GD32F4 Series**
+
+* GD32F450
+* GD32F470
+* More devices coming soon...
+
+**GD32F3 Series**
+
+* GD32F303
+* GD32F307
+* More devices coming soon...
+
+Getting Started
+---------------
+
+.. note::
+
+   Detailed setup instructions will be added soon.
+
+Basic setup steps:
+
+1. Install ARM toolchain
+2. Configure CMake for GD32 platform
+3. Build and flash your application
+
+See :doc:`stm32f4` for similar setup process.
+
+Hardware Setup
+--------------
+
+Coming soon...
+
+Building for GD32
+-----------------
+
+.. code-block:: bash
+
+   # Configure for GD32
+   cmake -B build-gd32 \
+       -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
+       -DNEXUS_PLATFORM=gd32 \
+       -DCMAKE_BUILD_TYPE=Release
+
+   # Build
+   cmake --build build-gd32
+
+Flashing
+--------
+
+Coming soon...
+
+Platform-Specific Features
+---------------------------
+
+Coming soon...
+
+Troubleshooting
+---------------
+
+Coming soon...
+
+See Also
+--------
+
+* :doc:`stm32f4` - Similar platform guide
+* :doc:`stm32h7` - Another ARM Cortex-M platform
+* :doc:`../user_guide/porting` - Porting guide
+
+---
+
+**Status**: Under Development
+**Last Updated**: 2026-01-25

@@ -1,0 +1,53 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 12:00+0000\n"
+"PO-Revision-Date: 2026-01-25 12:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Chinese (Simplified)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: _templates/platform_guide_template.rst:2
+msgid "Platform Name"
+msgstr "平台名称"
+
+#: _templates/platform_guide_template.rst:5
+msgid "Overview"
+msgstr "概述"
+
+#: _templates/platform_guide_template.rst:10
+msgid "Hardware Requirements"
+msgstr "硬件要求"
+
+#: _templates/platform_guide_template.rst:15
+msgid "Supported Peripherals"
+msgstr "支持的外设"
+
+#: _templates/platform_guide_template.rst:20
+msgid "Build Instructions"
+msgstr "构建说明"
+
+#: _templates/platform_guide_template.rst:25
+msgid "Configuration"
+msgstr "配置"
+
+#: _templates/platform_guide_template.rst:30
+msgid "Examples"
+msgstr "示例"
+
+#: _templates/platform_guide_template.rst:35
+msgid "Debugging"
+msgstr "调试"
+
+#: _templates/platform_guide_template.rst:40
+msgid "Limitations"
+msgstr "限制"

@@ -1,0 +1,584 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../platform_guides/index.rst:2 35c6f36079554c0fa97f64d98f4e313f
+msgid "Platform Guides"
+msgstr "平台 Guides"
+
+#: ../../platform_guides/index.rst:4 8dfff1c25e5040dfaf03dcb99bd12940
+msgid ""
+"This section provides comprehensive platform-specific documentation for all "
+"supported platforms in the Nexus Embedded Platform. Each guide covers "
+"platform capabilities, build instructions, configuration options, hardware "
+"setup, example projects, and debugging procedures."
+msgstr ""
+
+#: ../../platform_guides/index.rst:7 1f69f964218943318e350af025b1b593
+msgid "Supported Platforms"
+msgstr "支持 Platforms"
+
+#: ../../platform_guides/index.rst:9 7d599d4d8d9e49328e3c56f4a34a3232
+msgid "The Nexus platform supports the following hardware platforms:"
+msgstr ""
+
+#: ../../platform_guides/index.rst:20 74343cec545f4786a1749ba3b57254d5
+msgid "Platform Comparison"
+msgstr "平台 Comparison"
+
+#: ../../platform_guides/index.rst:26 b4983fe0c87b4c5b8146693492565c31
+msgid "Feature"
+msgstr ""
+
+#: ../../platform_guides/index.rst:27 c0994f974166475a871436e79d35f6c8
+msgid "Native"
+msgstr "Native"
+
+#: ../../platform_guides/index.rst:28 2d5efd3d233149cdb69afd10629de289
+msgid "STM32F4"
+msgstr "STM32F4"
+
+#: ../../platform_guides/index.rst:29 3501415c47c04907b0a49f0ab6ea291a
+msgid "STM32H7"
+msgstr "STM32H7"
+
+#: ../../platform_guides/index.rst:30 4a6d16b541d54d45b8b2f47693e26fea
+msgid "GD32"
+msgstr "GD32"
+
+#: ../../platform_guides/index.rst:31 69463cbb9fe4470abfdb72ab7c6e2035
+msgid "**Core**"
+msgstr "**Core**"
+
+#: ../../platform_guides/index.rst:32 08c33bca51cc426e99996e6f40f516fa
+msgid "Simulated"
+msgstr ""
+
+#: ../../platform_guides/index.rst:33 21e4515ab6c14b4b9909eeb21d95da05
+msgid "Cortex-M4"
+msgstr ""
+
+#: ../../platform_guides/index.rst:34 e477af323b1a4883b362a5940babc60c
+msgid "Cortex-M7"
+msgstr ""
+
+#: ../../platform_guides/index.rst:35 feb26b929eb944008fce8385364320bf
+msgid "Cortex-M3/M4"
+msgstr "Cortex-M3/M4"
+
+#: ../../platform_guides/index.rst:36 50313c0a5b5440479993b728e017f4bb
+msgid "**Max Frequency**"
+msgstr "**Max Frequency**"
+
+#: ../../platform_guides/index.rst:37 ../../platform_guides/index.rst:42
+#: ../../platform_guides/index.rst:47 ../../platform_guides/index.rst:52
+#: 101626b9b3324cf78cf5e17e620e117d 7e2d1246228f40b8963f09735720ece0
+#: 98dda73d95444ccfa7cb7f81771f8561 c5aecb415c224c779d7b083e386d3dfd
+msgid "N/A"
+msgstr "N/A"
+
+#: ../../platform_guides/index.rst:38 3ed9b644a75145c683eefb488d74b300
+msgid "180 MHz"
+msgstr ""
+
+#: ../../platform_guides/index.rst:39 5e3417eeaf9c4211873504c94b66c4f5
+msgid "480 MHz"
+msgstr ""
+
+#: ../../platform_guides/index.rst:40 c56249c919794dc7a354c01c72b60d72
+msgid "120 MHz"
+msgstr ""
+
+#: ../../platform_guides/index.rst:41 cad12582521644ddb96565dd11d833f9
+msgid "**Flash**"
+msgstr "**Flash**"
+
+#: ../../platform_guides/index.rst:43 ../../platform_guides/index.rst:44
+#: bcd781bb1c2d4f1b8335963b2bc812b5 eb67b879df8444be85e8092d502efef1
+msgid "Up to 2 MB"
+msgstr ""
+
+#: ../../platform_guides/index.rst:45 508e9e4af0864b6e8ddb747d4b493607
+msgid "Up to 3 MB"
+msgstr ""
+
+#: ../../platform_guides/index.rst:46 e218e7e109b6470f9d71e527fd6022fe
+msgid "**SRAM**"
+msgstr "**SRAM**"
+
+#: ../../platform_guides/index.rst:48 ../../platform_guides/index.rst:50
+#: 3ae6a51c04074cc7b78bf8b8b35daebe 8258bd1fc9084f6eb7bef84742edcb47
+msgid "Up to 256 KB"
+msgstr ""
+
+#: ../../platform_guides/index.rst:49 89ed00777bb0442fa92e7986cd0518a4
+msgid "Up to 1 MB"
+msgstr ""
+
+#: ../../platform_guides/index.rst:51 005d7fe2da754ede9557518fe5d7b5e5
+msgid "**FPU**"
+msgstr "**FPU**"
+
+#: ../../platform_guides/index.rst:53 ../../platform_guides/index.rst:55
+#: 40a894fe1e424423bd89f831e775f442 f26f8f88c5c34ae998734f22b6c5a325
+msgid "Single"
+msgstr ""
+
+#: ../../platform_guides/index.rst:54 97e0180367674bdaac941c81f7df2b1c
+msgid "Double"
+msgstr ""
+
+#: ../../platform_guides/index.rst:56 3c32c84713e54686a21d0173ea4c516d
+msgid "**UART**"
+msgstr "**UART**"
+
+#: ../../platform_guides/index.rst:57 ../../platform_guides/index.rst:69
+#: ../../platform_guides/index.rst:72 0fd65c643aa8430d8f630335a54ecade
+#: 1c24253461354728abe5bf55334976e1 9685c9d2130b4f12bef9b37ed3ec4bce
+msgid "4"
+msgstr "4"
+
+#: ../../platform_guides/index.rst:58 ../../platform_guides/index.rst:63
+#: ../../platform_guides/index.rst:64 1a40042cc21440f98eeb912f1e0e0724
+#: 35ec6e9ec9cf487ab512619aca73d927 ff5229cdcb3649dc8e5c6698ca24ec16
+msgid "6"
+msgstr "6"
+
+#: ../../platform_guides/index.rst:59 84962376edf5493692b335c164f41ef3
+msgid "8"
+msgstr "8"
+
+#: ../../platform_guides/index.rst:60 6c36632603954e5eae77880910815a36
+msgid "5"
+msgstr "5"
+
+#: ../../platform_guides/index.rst:61 8e411556183744309c5a541742111d97
+msgid "**SPI**"
+msgstr "**SPI**"
+
+#: ../../platform_guides/index.rst:62 ../../platform_guides/index.rst:67
+#: ../../platform_guides/index.rst:70 ../../platform_guides/index.rst:88
+#: ../../platform_guides/index.rst:89 ../../platform_guides/index.rst:90
+#: 02b588a3eb5e45bc997c6201c1eaf8a2 5c519fc9f0cc4daa91eac8cb430f1548
+#: 96521e8e06d64a6087029eca3359d66b bf964a820f0444d48ba81059895b97e4
+#: cde7e0d6a9e347b591c66cc269885fb2 d2bff4ff58ce46edada4212c3fd729e9
+msgid "2"
+msgstr "2"
+
+#: ../../platform_guides/index.rst:65 ../../platform_guides/index.rst:68
+#: 21888130cb2d4b7ca88d6a7653c2ee4d cf410478304946859462b5b7216f1050
+msgid "3"
+msgstr "3"
+
+#: ../../platform_guides/index.rst:66 addee11d9e29492e97459f84d7ad698d
+msgid "**I2C**"
+msgstr "**I2C**"
+
+#: ../../platform_guides/index.rst:71 7f96983cc70a491a98e2621faa4e04df
+msgid "**Timer**"
+msgstr "**Timer**"
+
+#: ../../platform_guides/index.rst:73 ../../platform_guides/index.rst:75
+#: 915c0eeb0d894586b40f07275ac13242 f058061d4af84d1980465ca0cef03330
+msgid "14"
+msgstr "14"
+
+#: ../../platform_guides/index.rst:74 a4beb3b5d7974b619da433013286b2e1
+msgid "22"
+msgstr "22"
+
+#: ../../platform_guides/index.rst:76 7eacbc0c6bdb47999adc2ea6262e9fd7
+msgid "**ADC**"
+msgstr "**ADC**"
+
+#: ../../platform_guides/index.rst:77 1aa8035ed3164b378fec317cc48d86d0
+msgid "Optional"
+msgstr "可选"
+
+#: ../../platform_guides/index.rst:78 ../../platform_guides/index.rst:80
+#: 58c77a7ade3e4be2894703aaf039f070 a6e77cec3d2d416ab7281c542aa85dee
+msgid "3 (12-bit)"
+msgstr "3 (12-bit)"
+
+#: ../../platform_guides/index.rst:79 bef56a36cf0a47938735098994063480
+msgid "3 (16-bit)"
+msgstr "3 (16-bit)"
+
+#: ../../platform_guides/index.rst:81 8d98073f8bd447f6be915cf8b5e1b5ab
+msgid "**Ethernet**"
+msgstr "**Ethernet**"
+
+#: ../../platform_guides/index.rst:82 ../../platform_guides/index.rst:83
+#: ../../platform_guides/index.rst:85 ../../platform_guides/index.rst:87
+#: 220c93bb69bc4888bee8f4e8601c853a b3f03e8efe764a9e90ae7df8cc6c33cb
+#: c9158357977a4fb7b4571b353a5fb211 fef1c049049d4880b1a74dcc6ab6ee96
+msgid "No"
+msgstr "否"
+
+#: ../../platform_guides/index.rst:84 1e3000caba944315986c4c8510c1eec6
+msgid "Yes"
+msgstr "是"
+
+#: ../../platform_guides/index.rst:86 0f47c07229f54bbdbe9cea640f15544e
+msgid "**USB**"
+msgstr "**USB**"
+
+#: ../../platform_guides/index.rst:91 6ba064250828462cbac11076ae441e8f
+msgid "**Use Case**"
+msgstr "**Use Case**"
+
+#: ../../platform_guides/index.rst:92 7a1881b7f70343cf945e8ae26b4ca7f6
+msgid "Testing/CI"
+msgstr "Testing/CI"
+
+#: ../../platform_guides/index.rst:93 a91396893e734ed7b13cb423d494909b
+msgid "General"
+msgstr ""
+
+#: ../../platform_guides/index.rst:94 246dc7e05fac4238bbe0b08c25f05713
+msgid "High-perf"
+msgstr ""
+
+#: ../../platform_guides/index.rst:95 fa71c90c28bb408598877ee68bfa3087
+msgid "Cost-effective"
+msgstr ""
+
+#: ../../platform_guides/index.rst:98 bbb46052134043b7a1b8295994070933
+msgid "Choosing a Platform"
+msgstr "Choosing a 平台"
+
+#: ../../platform_guides/index.rst:101 543f0cb2c80b44f6ba4ffb26fc9e0c86
+msgid "Native Platform"
+msgstr "Native 平台"
+
+#: ../../platform_guides/index.rst:103 ../../platform_guides/index.rst:120
+#: ../../platform_guides/index.rst:136 ../../platform_guides/index.rst:152
+#: 1bdfb8193dc74dd5a584688284e02c09 6e2752b62fa34c8fb3f7a1c87ac753bc
+#: c40bddbd0dcf4524a747c534f4a55f7c ca7ea0c7b29d4f3084a88fb42a1a33cf
+msgid "**Best for:**"
+msgstr "**Best for:**"
+
+#: ../../platform_guides/index.rst:105 a1a6750e512949819cb22eb664fcfeab
+msgid "Development without hardware"
+msgstr "开发 without hardware"
+
+#: ../../platform_guides/index.rst:106 0f4a206ce6734ef7ab58eeea46553b52
+msgid "Automated testing in CI/CD"
+msgstr ""
+
+#: ../../platform_guides/index.rst:107 586828753b7d4fcab28e4a47ebc48106
+msgid "Rapid prototyping"
+msgstr ""
+
+#: ../../platform_guides/index.rst:108 e1f852817513463fa2327282945e4797
+msgid "Learning the Nexus platform"
+msgstr ""
+
+#: ../../platform_guides/index.rst:110 35e67f78899e4aa6b3edc14ad97cd50b
+msgid "**Not suitable for:**"
+msgstr "**Not suitable for:**"
+
+#: ../../platform_guides/index.rst:112 1a5c18e2b15145e4b578a88b88b2abcb
+msgid "Production deployment"
+msgstr ""
+
+#: ../../platform_guides/index.rst:113 63ad321f65e6430f8d63c3087c387200
+msgid "Performance benchmarking"
+msgstr ""
+
+#: ../../platform_guides/index.rst:114 e03f36437c4f4474b4a2ebd59ec7b3ac
+msgid "Real-time requirements"
+msgstr ""
+
+#: ../../platform_guides/index.rst:115 87f2bd2e8bde4fc08ffd3cc6793c6fbd
+msgid "Hardware-specific features"
+msgstr ""
+
+#: ../../platform_guides/index.rst:118 b8349bddbf5a471b96a65c89a9b0d45c
+msgid "STM32F4 Platform"
+msgstr "STM32F4 平台"
+
+#: ../../platform_guides/index.rst:122 0cf1bef166e94b60be81688e9af31900
+msgid "General-purpose embedded applications"
+msgstr ""
+
+#: ../../platform_guides/index.rst:123 ../../platform_guides/index.rst:154
+#: 5f1f2f5dd0f64233917db60b7f691ac0 6c5cf4b8fa3e46f88d33edd009cce7bb
+msgid "Cost-sensitive projects"
+msgstr "成本敏感型项目"
+
+#: ../../platform_guides/index.rst:124 54f5f3cb70c14d1f9cc0c52d64507feb
+msgid "Moderate performance requirements"
+msgstr ""
+
+#: ../../platform_guides/index.rst:125 d4b16fe503084db495c8607d3b81539e
+msgid "Wide peripheral support"
+msgstr ""
+
+#: ../../platform_guides/index.rst:127 ../../platform_guides/index.rst:143
+#: ../../platform_guides/index.rst:158 686edf454efc41d1bde6ee82c26f6a0a
+#: d0e453229c394d489847b3887b1423eb f3a30262842948d1ac5430d515b61e8e
+msgid "**Considerations:**"
+msgstr "**Considerations:**"
+
+#: ../../platform_guides/index.rst:129 f66c3d7f54524e3391c7cfa855398237
+msgid "Lower performance than STM32H7"
+msgstr ""
+
+#: ../../platform_guides/index.rst:130 409a07e127974fbdb707321b83525a81
+msgid "No Ethernet support"
+msgstr ""
+
+#: ../../platform_guides/index.rst:131 207f7775b58d4f52a44f8b007d45e557
+msgid "Single-precision FPU only"
+msgstr "仅单精度 FPU"
+
+#: ../../platform_guides/index.rst:134 535498419bdc4446bd19227c381e3144
+msgid "STM32H7 Platform"
+msgstr "STM32H7 平台"
+
+#: ../../platform_guides/index.rst:138 a1a83bc6826b48e98aa0f36756b8cc6f
+msgid "High-performance applications"
+msgstr "高性能应用"
+
+#: ../../platform_guides/index.rst:139 671920da23cc4b97b2e35bd19390cb43
+msgid "Ethernet connectivity"
+msgstr ""
+
+#: ../../platform_guides/index.rst:140 da8d76f448c044398d97214fee4652e3
+msgid "Advanced peripherals"
+msgstr ""
+
+#: ../../platform_guides/index.rst:141 026a9f4125194410a83a86c305d065d3
+msgid "DSP and signal processing"
+msgstr ""
+
+#: ../../platform_guides/index.rst:145 85c77808a9cd43d7ba275e79e188ed65
+msgid "Higher cost than STM32F4"
+msgstr ""
+
+#: ../../platform_guides/index.rst:146 437163dbf88c442fb7c3d56f6219101c
+msgid "More complex clock configuration"
+msgstr ""
+
+#: ../../platform_guides/index.rst:147 21a6c662cf204fdc8e7d54ba50483482
+msgid "Cache management required for DMA"
+msgstr ""
+
+#: ../../platform_guides/index.rst:150 178f5797862c4d26b812286ba09a6ef4
+msgid "GD32 Platform"
+msgstr "GD32 平台"
+
+#: ../../platform_guides/index.rst:155 c102263f040e475399ebfaac6bf488f8
+msgid "STM32 alternative"
+msgstr ""
+
+#: ../../platform_guides/index.rst:156 8f2fd227f4554e1db5f9844eedc5d208
+msgid "General-purpose applications"
+msgstr ""
+
+#: ../../platform_guides/index.rst:160 cfbbd6caec7c4c8999f970d4739df279
+msgid "Less documentation than STM32"
+msgstr ""
+
+#: ../../platform_guides/index.rst:161 be8389335e5142a5b150028f124705e0
+msgid "Some compatibility differences"
+msgstr ""
+
+#: ../../platform_guides/index.rst:162 348a7641d38644a1aa0d3b23a644deab
+msgid "Fewer third-party tools"
+msgstr ""
+
+#: ../../platform_guides/index.rst:165 47003c4933e342e5897eba7a109665c2
+msgid "Platform Selection Guide"
+msgstr "平台 Selection Guide"
+
+#: ../../platform_guides/index.rst:167 fc8ad7d2724c4edc9360fd9272fc7377
+msgid "Use this decision tree to select the appropriate platform:"
+msgstr ""
+
+#: ../../platform_guides/index.rst:184 f88abb533df64cdba8efe0279cb71647
+msgid "Getting Started"
+msgstr "快速入门"
+
+#: ../../platform_guides/index.rst:186 d10db66b0d5449c6b40cd04c8d5679f8
+msgid "To get started with a specific platform:"
+msgstr ""
+
+#: ../../platform_guides/index.rst:188 e1ea480937f749f89297a3e840edc815
+msgid "**Read the platform guide** - Understand capabilities and limitations"
+msgstr ""
+
+#: ../../platform_guides/index.rst:189 75492372a9634d5c89de0b351683f3c2
+msgid "**Install toolchain** - Set up the development environment"
+msgstr ""
+
+#: ../../platform_guides/index.rst:190 eedb89eccc90435ca39d08f9956b4c3a
+msgid "**Configure platform** - Use Kconfig to configure peripherals"
+msgstr ""
+
+#: ../../platform_guides/index.rst:191 024a0802775542aa9fe76c602695fecf
+msgid "**Build example** - Build and run an example project"
+msgstr ""
+
+#: ../../platform_guides/index.rst:192 20d869b02546467991a482302ebc9ab2
+msgid "**Debug and test** - Use debugging tools to verify functionality"
+msgstr ""
+
+#: ../../platform_guides/index.rst:195 84217e56cbe24db8b6feddcc915a1522
+msgid "Common Tasks"
+msgstr ""
+
+#: ../../platform_guides/index.rst:198 8597bb7f2d26410ba92137ca77063437
+msgid "Building for a Platform"
+msgstr ""
+
+#: ../../platform_guides/index.rst:200 1471daaa7b9b4ffd83a1eb50a102e41f
+msgid ""
+"# Native\n"
+"cmake -B build -DPLATFORM=native\n"
+"cmake --build build\n"
+"\n"
+"# STM32F4\n"
+"cmake -B build -DPLATFORM=stm32 -DSTM32_CHIP=STM32F407 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"cmake --build build\n"
+"\n"
+"# STM32H7\n"
+"cmake -B build -DPLATFORM=stm32 -DSTM32_CHIP=STM32H743 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"cmake --build build\n"
+"\n"
+"# GD32\n"
+"cmake -B build -DPLATFORM=gd32 -DGD32_CHIP=GD32F407 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"cmake --build build"
+msgstr ""
+"# Native\n"
+"cmake -B build -DPLATFORM=native\n"
+"cmake --build build\n"
+"\n"
+"# STM32F4\n"
+"cmake -B build -DPLATFORM=stm32 -DSTM32_CHIP=STM32F407 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"cmake --build build\n"
+"\n"
+"# STM32H7\n"
+"cmake -B build -DPLATFORM=stm32 -DSTM32_CHIP=STM32H743 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"cmake --build build\n"
+"\n"
+"# GD32\n"
+"cmake -B build -DPLATFORM=gd32 -DGD32_CHIP=GD32F407 \\\n"
+"      -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake\n"
+"cmake --build build"
+
+#: ../../platform_guides/index.rst:222 463de5f96fc042bb9158de12cbb4710e
+msgid "Configuring Peripherals"
+msgstr ""
+
+#: ../../platform_guides/index.rst:224 0104b902d6f240598ee4c2a3f234a682
+msgid ""
+"All platforms use Kconfig for configuration. See the platform-specific "
+"guides for detailed configuration options."
+msgstr ""
+
+#: ../../platform_guides/index.rst:226 07854d7f262b4772a20f6b8915896ad2
+msgid ""
+"# Copy platform defconfig\n"
+"cp platforms/native/defconfig .config\n"
+"\n"
+"# Or for STM32F4\n"
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"\n"
+"# Customize configuration\n"
+"# Edit .config or use menuconfig\n"
+"\n"
+"# Build with configuration\n"
+"cmake -B build\n"
+"cmake --build build"
+msgstr ""
+"# Copy platform defconfig\n"
+"cp platforms/native/defconfig .config\n"
+"\n"
+"# Or for STM32F4\n"
+"cp platforms/stm32/defconfig_stm32f4 .config\n"
+"\n"
+"# Customize configuration\n"
+"# Edit .config or use menuconfig\n"
+"\n"
+"# Build with configuration\n"
+"cmake -B build\n"
+"cmake --build build"
+
+#: ../../platform_guides/index.rst:242 19909c6ea8f142c189e80db80bc84a68
+msgid "Porting Between Platforms"
+msgstr ""
+
+#: ../../platform_guides/index.rst:244 a26954253e0348d884ac6cba146dbb66
+msgid ""
+"The Nexus platform provides a unified HAL API, making it easy to port "
+"applications between platforms:"
+msgstr ""
+
+#: ../../platform_guides/index.rst:246 6144f7e44e0049208ad4c23851de8bdd
+msgid "**Change platform in CMake** - Update ``-DPLATFORM=`` flag"
+msgstr "**Change platform in CMake** - Update ``-DPLATFORM=`` flag"
+
+#: ../../platform_guides/index.rst:247 08fdc76952134982b950a18a939546fe
+msgid "**Update Kconfig** - Copy appropriate defconfig"
+msgstr ""
+
+#: ../../platform_guides/index.rst:248 c9fda4fd92504151a75dfb53ed2602e5
+msgid "**Adjust pin mappings** - Update GPIO/peripheral pin assignments"
+msgstr ""
+
+#: ../../platform_guides/index.rst:249 9cb360b1730941ec987eb1cdacb8d85e
+msgid "**Rebuild** - Recompile for new platform"
+msgstr ""
+
+#: ../../platform_guides/index.rst:250 ec4a403adccb498a986b7b5a57d1c08c
+msgid "**Test** - Verify functionality on new platform"
+msgstr ""
+
+#: ../../platform_guides/index.rst:253 ca726665eb934fa2952c0fe977ff1c8c
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../platform_guides/index.rst:255 aae8af23d6e347caa0893a0eccac8626
+msgid ":doc:`../user_guide/build_system` - Build system documentation"
+msgstr ":doc:`../user_guide/build_system` - Build system documentation"
+
+#: ../../platform_guides/index.rst:256 f1da9fd0ce324868a4901e8ce8ec6590
+msgid ":doc:`../user_guide/kconfig_platforms` - Platform configuration guide"
+msgstr ":doc:`../user_guide/kconfig_platforms` - Platform configuration guide"
+
+#: ../../platform_guides/index.rst:257 504fe6bdc08742019401f5daa9c9e4b8
+msgid ":doc:`../user_guide/hal` - HAL API documentation"
+msgstr ":doc:`../user_guide/hal` - HAL API documentation"
+
+#: ../../platform_guides/index.rst:258 67fd8c3a0ae84501b74b5a048f8c1427
+msgid ":doc:`../user_guide/osal` - OSAL API documentation"
+msgstr ":doc:`../user_guide/osal` - OSAL API documentation"
+
+#: ../../platform_guides/index.rst:259 698727d07096462084f7c2cd61532570
+msgid ":doc:`../user_guide/porting` - Porting guide"
+msgstr ":doc:`../user_guide/porting` - Porting guide"
+
+#~ msgid ":doc:`../development/porting` - Porting guide"
+#~ msgstr ""

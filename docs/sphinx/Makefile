@@ -1,4 +1,8 @@
+# Nexus Documentation Makefile
 # Makefile for Sphinx documentation with i18n support
+#
+# Recommended: Use Python build script for better cross-platform support
+#   python build_docs.py --help
 #
 # Usage:
 #   make html          - Build English documentation
@@ -14,25 +18,38 @@ SPHINXINTL    ?= sphinx-intl
 SOURCEDIR     = .
 BUILDDIR      = _build
 LANGUAGES     = en zh_CN
+PYTHON        ?= python
 
 # Default target
 .PHONY: help
 help:
-	@echo "Nexus Documentation Build System (i18n)"
+	@echo "╔════════════════════════════════════════════════════════════╗"
+	@echo "║   Nexus Documentation Build System (i18n)                 ║"
+	@echo "╚════════════════════════════════════════════════════════════╝"
 	@echo ""
-	@echo "Build targets:"
+	@echo "📚 Build targets:"
 	@echo "  html          Build English documentation"
 	@echo "  html-zh_CN    Build Chinese documentation"
 	@echo "  html-all      Build all languages"
+	@echo "  full          Clean, run Doxygen, build all"
 	@echo ""
-	@echo "Translation targets:"
+	@echo "🌍 Translation targets:"
 	@echo "  gettext       Extract translatable strings to .pot files"
 	@echo "  update-po     Update .po files from .pot files"
-	@echo "  init-po LANG=xx  Initialize new language (e.g., make init-po LANG=ja)"
+	@echo "  init-po       Initialize new language (LANG=xx)"
+	@echo "  stats         Show translation statistics"
+	@echo "  validate      Validate translation files"
+	@echo "  auto-trans    Auto-translate common terms"
 	@echo ""
-	@echo "Other targets:"
+	@echo "🔧 Other targets:"
 	@echo "  clean         Remove build directory"
 	@echo "  serve         Serve documentation locally (port 8000)"
+	@echo "  doxygen       Run Doxygen to generate API docs"
+	@echo "  linkcheck     Check for broken links"
+	@echo "  watch         Auto-rebuild on file changes"
+	@echo ""
+	@echo "💡 Recommended: Use Python script for better experience"
+	@echo "  $(PYTHON) build_docs.py --help"
 
 # Build English (default)
 .PHONY: html
@@ -104,3 +121,56 @@ serve: html-all
 # Rebuild everything from scratch
 .PHONY: rebuild
 rebuild: clean html-all
+
+# Translation statistics
+.PHONY: stats
+stats:
+	@$(PYTHON) translate_helper.py zh_CN --stats
+
+# Validate translations
+.PHONY: validate
+validate:
+	@$(PYTHON) translate_helper.py zh_CN --validate
+
+# Auto-translate common terms
+.PHONY: auto-trans
+auto-trans:
+	@$(PYTHON) translate_helper.py zh_CN --auto-translate
+
+# Run Doxygen
+.PHONY: doxygen
+doxygen:
+	@echo "Running Doxygen..."
+	@cd ../.. && doxygen Doxyfile
+	@echo "✓ Doxygen API documentation generated"
+
+# Check for broken links
+.PHONY: linkcheck
+linkcheck:
+	@echo "Checking for broken links..."
+	$(SPHINXBUILD) -b linkcheck $(SPHINXOPTS) "$(SOURCEDIR)" "$(BUILDDIR)/linkcheck"
+	@echo "✓ Link check complete. See $(BUILDDIR)/linkcheck/output.txt"
+
+# Full build: clean, doxygen, build all
+.PHONY: full
+full: clean doxygen html-all
+	@echo ""
+	@echo "╔════════════════════════════════════════════════════════════╗"
+	@echo "║   ✓ Full documentation build complete!                    ║"
+	@echo "╚════════════════════════════════════════════════════════════╝"
+
+# Watch for changes (requires sphinx-autobuild)
+.PHONY: watch
+watch:
+	@echo "Watching for changes... (Press Ctrl+C to stop)"
+	@sphinx-autobuild $(SOURCEDIR) $(BUILDDIR)/html/en --port 8000
+
+# Quick build using Python script (recommended)
+.PHONY: quick
+quick:
+	@$(PYTHON) build_docs.py
+
+# Quick serve using Python script
+.PHONY: quick-serve
+quick-serve:
+	@$(PYTHON) build_docs.py --serve

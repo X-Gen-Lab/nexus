@@ -1,0 +1,889 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../reference/error_codes.rst:2 56776b0bcc594ee78736eaf06fd3a0b7
+msgid "Error Code Reference"
+msgstr "Error Code 参考"
+
+#: ../../reference/error_codes.rst:4 aae26c3cd3b3473eac59b439f440aa95
+msgid ""
+"This page documents all error codes used throughout the Nexus platform. All "
+"HAL and framework functions return ``nx_status_t`` to indicate success or "
+"failure."
+msgstr ""
+
+#: ../../reference/error_codes.rst:8 64e43be9193b4ee1b4b075e47b0deebe
+msgid "Error Code Categories"
+msgstr ""
+
+#: ../../reference/error_codes.rst:10 4310d7c0816249c09ebc4df98879278e
+msgid "Error codes are organized into categories for easy identification:"
+msgstr ""
+
+#: ../../reference/error_codes.rst:12 c7493801eac34e4e82423b6e07dc195e
+msgid "**0**: Success"
+msgstr ""
+
+#: ../../reference/error_codes.rst:13 00761dd5cec34ba6a0ceaaf2610c7be3
+msgid "**1-19**: General errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:14 1742005ed15946868d5af643a8eab3e7
+msgid "**20-39**: State errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:15 7b4e859761174ae2a9a866386949ed69
+msgid "**40-59**: Resource errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:16 98d4094e19f34e32a0f5ab73e3fdf023
+msgid "**60-79**: Timeout errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:17 23344c384c19414e8c9f0d044f8796ae
+msgid "**80-99**: IO errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:18 0cc1f347c5864a28b21f1c0a5cd67bcd
+msgid "**100-119**: DMA errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:19 d636550d84ac4857bb4c34009d0f7440
+msgid "**120-139**: Data errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:20 a3b064831c8241f199ec61ac9f01e776
+msgid "**140-159**: Permission errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:23 6fc0c1eb442b41129d5a97f4c0b040d0
+msgid "Success Code"
+msgstr ""
+
+#: df409cf7b17a432bb6d5485d73cd35f2 fc426578432d4b98a8b834bafe48d260
+msgid "Code"
+msgstr "代码"
+
+#: 9e2db31ad9e54085bef64bdf46da7988 f549cef5ac2c4ff2829478a5124206e9
+msgid "Value"
+msgstr "值"
+
+#: 95750c5dd85c4a0780fb728aa2c88a3c ff078b9439b44153893beae21596e858
+msgid "Description"
+msgstr "描述"
+
+#: ../../reference/error_codes.rst:32 cc71a490da2f4fd9b7ccccf262292444
+msgid "``NX_OK``"
+msgstr "``NX_OK``"
+
+#: ../../reference/error_codes.rst:33 f03512b6f7d64fe1b0a814c618c81701
+msgid "0"
+msgstr "0"
+
+#: ../../reference/error_codes.rst:34 dbea24a4e9ec41b5a14d3b31aaccd131
+msgid "Operation completed successfully"
+msgstr "操作成功完成"
+
+#: ../../reference/error_codes.rst:37 c1c73dd680bd4584808ddfbf35a08366
+msgid "General Errors (1-19)"
+msgstr "General Errors (1-19)"
+
+#: ../../reference/error_codes.rst:46 13d2fc5ee2f540488bec5db44538136c
+msgid "``NX_ERR_GENERIC``"
+msgstr "``NX_ERR_GENERIC``"
+
+#: ../../reference/error_codes.rst:47 8f68c6b073ad496281138028c9e3b313
+msgid "1"
+msgstr "1"
+
+#: ../../reference/error_codes.rst:48 f4e2ab01e45d4408b15008144021239f
+msgid "Generic error (use more specific codes when possible)"
+msgstr "Generic error (use more specific codes when possible)"
+
+#: ../../reference/error_codes.rst:49 8b1c59e85a7a4c67a802d4616571b524
+msgid "``NX_ERR_INVALID_PARAM``"
+msgstr "``NX_ERR_INVALID_PARAM``"
+
+#: ../../reference/error_codes.rst:50 7145cf4f7aa64a90a102d8315d6d8369
+msgid "2"
+msgstr "2"
+
+#: ../../reference/error_codes.rst:51 ebf1b97315c44fcc8a79b3a38367e1c3
+msgid "Invalid parameter passed to function"
+msgstr ""
+
+#: ../../reference/error_codes.rst:52 a6ef8944d94e448a8456ed4fa6dadfcc
+msgid "``NX_ERR_NULL_PTR``"
+msgstr "``NX_ERR_NULL_PTR``"
+
+#: ../../reference/error_codes.rst:53 b611bc555cf64a54b7a0ca078c718b93
+msgid "3"
+msgstr "3"
+
+#: ../../reference/error_codes.rst:54 1c6923963bf74a9397837fbd25912036
+msgid "Null pointer passed where valid pointer required"
+msgstr ""
+
+#: ../../reference/error_codes.rst:55 a0543143a0904a6e98caca188381a9c4
+msgid "``NX_ERR_NOT_SUPPORTED``"
+msgstr "``NX_ERR_NOT_SUPPORTED``"
+
+#: ../../reference/error_codes.rst:56 913cf6b574a7435eac4b75ad02dbfe97
+msgid "4"
+msgstr "4"
+
+#: ../../reference/error_codes.rst:57 c59430c6f847447ca831236ab1935f3d
+msgid "Operation not supported by this device/platform"
+msgstr ""
+
+#: ../../reference/error_codes.rst:58 4e2339e195d34b83b747420c4cf4d887
+msgid "``NX_ERR_NOT_FOUND``"
+msgstr "``NX_ERR_NOT_FOUND``"
+
+#: ../../reference/error_codes.rst:59 bc8d169b74ae4854b79ad9ab00c0a7bd
+msgid "5"
+msgstr "5"
+
+#: ../../reference/error_codes.rst:60 66a6e0e6b4e842869fd6837c41e22739
+msgid "Requested item not found"
+msgstr ""
+
+#: ../../reference/error_codes.rst:61 9351a7adc4e741d6a8ed2b1910b530c0
+msgid "``NX_ERR_INVALID_SIZE``"
+msgstr "``NX_ERR_INVALID_SIZE``"
+
+#: ../../reference/error_codes.rst:62 0bd6cb782aac4f0eb5f35dbf38329b5d
+msgid "6"
+msgstr "6"
+
+#: ../../reference/error_codes.rst:63 a0aeeb49586e441da3ebe5cfdd86ef4e
+msgid "Invalid size parameter"
+msgstr ""
+
+#: ../../reference/error_codes.rst:66 cfe53a61dfd142dfbb54da82cbca893c
+msgid "State Errors (20-39)"
+msgstr "State Errors (20-39)"
+
+#: ../../reference/error_codes.rst:75 07a573485cda4679bb4a0cb18f1ffe20
+msgid "``NX_ERR_NOT_INIT``"
+msgstr "``NX_ERR_NOT_INIT``"
+
+#: ../../reference/error_codes.rst:76 5b7357fd4aa94abf80c2a7afbfb41c98
+msgid "20"
+msgstr "20"
+
+#: ../../reference/error_codes.rst:77 e816d32b1d3a4eb1872bca98c6f4959e
+msgid "Device or module not initialized"
+msgstr ""
+
+#: ../../reference/error_codes.rst:78 e0a26cf59c5747c59edc627d4b5e704e
+msgid "``NX_ERR_ALREADY_INIT``"
+msgstr "``NX_ERR_ALREADY_INIT``"
+
+#: ../../reference/error_codes.rst:79 f7e890fc561743d08cb7519c04ce51d0
+msgid "21"
+msgstr "21"
+
+#: ../../reference/error_codes.rst:80 fcb1edc6fbd041f6a90ddc8a721b1d67
+msgid "Device or module already initialized"
+msgstr ""
+
+#: ../../reference/error_codes.rst:81 eaa02acdee1a4d58a3e9a12af95d7254
+msgid "``NX_ERR_INVALID_STATE``"
+msgstr "``NX_ERR_INVALID_STATE``"
+
+#: ../../reference/error_codes.rst:82 7cecbce18b93475981f876da96eb73f8
+msgid "22"
+msgstr "22"
+
+#: ../../reference/error_codes.rst:83 905b66de6dc84cb18d2d8e0ff4497f9b
+msgid "Operation invalid in current state"
+msgstr ""
+
+#: ../../reference/error_codes.rst:84 1387c3da917842ecbb8405a1d1ed2242
+msgid "``NX_ERR_BUSY``"
+msgstr "``NX_ERR_BUSY``"
+
+#: ../../reference/error_codes.rst:85 2a31aab81bee4424abfa2101daac5068
+msgid "23"
+msgstr "23"
+
+#: ../../reference/error_codes.rst:86 f6acab116a8c41d0a9961b7a643a7930
+msgid "Device is busy with another operation"
+msgstr ""
+
+#: ../../reference/error_codes.rst:87 44e7120d82c94d929b4aa172f46a74b0
+msgid "``NX_ERR_SUSPENDED``"
+msgstr "``NX_ERR_SUSPENDED``"
+
+#: ../../reference/error_codes.rst:88 41cbd1e4d798402fbfffbc253c61ff28
+msgid "24"
+msgstr "24"
+
+#: ../../reference/error_codes.rst:89 d1997f2a82144e6ab6d95c2ee3b25a5c
+msgid "Device is in suspended state"
+msgstr ""
+
+#: ../../reference/error_codes.rst:92 3a996cb0434143acae8b99c51eac8537
+msgid "Resource Errors (40-59)"
+msgstr "Resource Errors (40-59)"
+
+#: ../../reference/error_codes.rst:101 aa59a4129240456cb0258f6d2d269f19
+msgid "``NX_ERR_NO_MEMORY``"
+msgstr "``NX_ERR_NO_MEMORY``"
+
+#: ../../reference/error_codes.rst:102 74d280f70f80474ca73cf3c6d11676e6
+msgid "40"
+msgstr "40"
+
+#: ../../reference/error_codes.rst:103 12ff3d04047a4a618d3d681301992fdb
+msgid "Out of memory"
+msgstr ""
+
+#: ../../reference/error_codes.rst:104 442f0ae1ff8d4b4c8566062df0f62168
+msgid "``NX_ERR_NO_RESOURCE``"
+msgstr "``NX_ERR_NO_RESOURCE``"
+
+#: ../../reference/error_codes.rst:105 de9ba66553034d18b09399c33b20c4e6
+msgid "41"
+msgstr "41"
+
+#: ../../reference/error_codes.rst:106 b9036d4dea2941a4827f087ee98602f0
+msgid "Required resource unavailable"
+msgstr "必需 resource unavailable"
+
+#: ../../reference/error_codes.rst:107 d9f186d79ce745ffacceefee01169e4c
+msgid "``NX_ERR_RESOURCE_BUSY``"
+msgstr "``NX_ERR_RESOURCE_BUSY``"
+
+#: ../../reference/error_codes.rst:108 869c034e1327492b8239a201007527fd
+msgid "42"
+msgstr "42"
+
+#: ../../reference/error_codes.rst:109 c38fe82726bf430788a7046c3890f0c1
+msgid "Resource is busy"
+msgstr ""
+
+#: ../../reference/error_codes.rst:110 c1e936846a384590bc2e380a6bcda539
+msgid "``NX_ERR_LOCKED``"
+msgstr "``NX_ERR_LOCKED``"
+
+#: ../../reference/error_codes.rst:111 14341b037129434b8f8f2ab89fafd36c
+msgid "43"
+msgstr "43"
+
+#: ../../reference/error_codes.rst:112 48fc81f501dc443ba6a91615c451394a
+msgid "Resource is locked"
+msgstr ""
+
+#: ../../reference/error_codes.rst:113 b00af08a7e294064961dc3c45779e41c
+msgid "``NX_ERR_FULL``"
+msgstr "``NX_ERR_FULL``"
+
+#: ../../reference/error_codes.rst:114 b18b169c2ecc409e997cf91be62ed045
+msgid "44"
+msgstr "44"
+
+#: ../../reference/error_codes.rst:115 e1ed41805e9b4d528463a80739c1600d
+msgid "Buffer or queue is full"
+msgstr ""
+
+#: ../../reference/error_codes.rst:116 a767ce23fa0245f19b3021a822b4ec03
+msgid "``NX_ERR_EMPTY``"
+msgstr "``NX_ERR_EMPTY``"
+
+#: ../../reference/error_codes.rst:117 e4b5cced1aa347e6a9f389b4466f8f22
+msgid "45"
+msgstr "45"
+
+#: ../../reference/error_codes.rst:118 c3628d0f18e74c60bf1114e0ba3ba008
+msgid "Buffer or queue is empty"
+msgstr ""
+
+#: ../../reference/error_codes.rst:121 a671c82b113f4a3cb8d8e95d1b6a79fd
+msgid "Timeout Errors (60-79)"
+msgstr "Timeout Errors (60-79)"
+
+#: ../../reference/error_codes.rst:130 06b8bc3d53f3429c8962a9f3d77d60e6
+msgid "``NX_ERR_TIMEOUT``"
+msgstr "``NX_ERR_TIMEOUT``"
+
+#: ../../reference/error_codes.rst:131 a6176c2bc2504be18dc5bafecf7bb018
+msgid "60"
+msgstr "60"
+
+#: ../../reference/error_codes.rst:132 71e09ccdb6894830b241215b4c1b2c74
+msgid "Operation timed out"
+msgstr ""
+
+#: ../../reference/error_codes.rst:133 749bf8afdb3d4d74afa3a2ac80508a6e
+msgid "``NX_ERR_WOULD_BLOCK``"
+msgstr "``NX_ERR_WOULD_BLOCK``"
+
+#: ../../reference/error_codes.rst:134 1bb5f339355c4e688a64f43f3ab767a0
+msgid "61"
+msgstr "61"
+
+#: ../../reference/error_codes.rst:135 6aaf218816a845bb87e90b9d2f8aceff
+msgid "Operation would block (non-blocking mode)"
+msgstr "Operation would block (non-blocking mode)"
+
+#: ../../reference/error_codes.rst:138 78fdd42a628745dbaf15fb5f2fde8fd0
+msgid "IO Errors (80-99)"
+msgstr "IO Errors (80-99)"
+
+#: ../../reference/error_codes.rst:147 136ba0d23019435e81a9fa9976d6d27b
+msgid "``NX_ERR_IO``"
+msgstr "``NX_ERR_IO``"
+
+#: ../../reference/error_codes.rst:148 0f3fdb5ff35d441cb0aceeada9ae8be7
+msgid "80"
+msgstr "80"
+
+#: ../../reference/error_codes.rst:149 925e93fb2646412aaa64421422a4bd19
+msgid "Generic IO error"
+msgstr ""
+
+#: ../../reference/error_codes.rst:150 b377b16f8871443fbe9d5b0240925f2a
+msgid "``NX_ERR_OVERRUN``"
+msgstr "``NX_ERR_OVERRUN``"
+
+#: ../../reference/error_codes.rst:151 0ce77f2bba984a989632e5737fa52e8d
+msgid "81"
+msgstr "81"
+
+#: ../../reference/error_codes.rst:152 61045220acd843bc96299996bbf76103
+msgid "Buffer overrun occurred"
+msgstr ""
+
+#: ../../reference/error_codes.rst:153 b4b5852710884e21b0b096062ff57fe1
+msgid "``NX_ERR_UNDERRUN``"
+msgstr "``NX_ERR_UNDERRUN``"
+
+#: ../../reference/error_codes.rst:154 c88e130be9d44012a4bb71c3f8deb5ae
+msgid "82"
+msgstr "82"
+
+#: ../../reference/error_codes.rst:155 af49426544314d2fa4c02269f95b0236
+msgid "Buffer underrun occurred"
+msgstr ""
+
+#: ../../reference/error_codes.rst:156 30a10d349df34c4782d4781bd0e49c61
+msgid "``NX_ERR_PARITY``"
+msgstr "``NX_ERR_PARITY``"
+
+#: ../../reference/error_codes.rst:157 6207f48d6a2942eb92d86a621bde191e
+msgid "83"
+msgstr "83"
+
+#: ../../reference/error_codes.rst:158 fb6df4e2d8ed42f6afdd2d39c555d14d
+msgid "Parity error detected"
+msgstr ""
+
+#: ../../reference/error_codes.rst:159 d508f133a22043bf8eedc1aac28a1fbf
+msgid "``NX_ERR_FRAMING``"
+msgstr "``NX_ERR_FRAMING``"
+
+#: ../../reference/error_codes.rst:160 9553a3e7c88b48d29fec19e2144f43d8
+msgid "84"
+msgstr "84"
+
+#: ../../reference/error_codes.rst:161 df801f83ee1c4d28a1cca49819bd09ab
+msgid "Framing error detected"
+msgstr ""
+
+#: ../../reference/error_codes.rst:162 1d6620e076d54dbfbe71691c6f787c6a
+msgid "``NX_ERR_NOISE``"
+msgstr "``NX_ERR_NOISE``"
+
+#: ../../reference/error_codes.rst:163 8f2d5e01fb07430dbda25c98c29d8e68
+msgid "85"
+msgstr "85"
+
+#: ../../reference/error_codes.rst:164 d3be37367de7448ca1e59072a511e561
+msgid "Noise error detected"
+msgstr ""
+
+#: ../../reference/error_codes.rst:165 fa24f812ddc040a6968564c89335c846
+msgid "``NX_ERR_NACK``"
+msgstr "``NX_ERR_NACK``"
+
+#: ../../reference/error_codes.rst:166 cbe48a45defe4801ae130a0c97e1f6be
+msgid "86"
+msgstr "86"
+
+#: ../../reference/error_codes.rst:167 9743b8955b1940468d584ffbd31d7450
+msgid "NACK received (I2C communication)"
+msgstr "NACK received (I2C communication)"
+
+#: ../../reference/error_codes.rst:168 5d0653ea3b4d4a7c8e78935dedeeb43f
+msgid "``NX_ERR_BUS``"
+msgstr "``NX_ERR_BUS``"
+
+#: ../../reference/error_codes.rst:169 803ed6435c5943dcbf052c786af62052
+msgid "87"
+msgstr "87"
+
+#: ../../reference/error_codes.rst:170 4e58bd9f0d3d4d5d95df00e6e41181a5
+msgid "Bus error occurred"
+msgstr ""
+
+#: ../../reference/error_codes.rst:171 d659b30f57eb4feb884807834900cd8f
+msgid "``NX_ERR_ARBITRATION``"
+msgstr "``NX_ERR_ARBITRATION``"
+
+#: ../../reference/error_codes.rst:172 d87d301c36d8450dae54045ec711ddab
+msgid "88"
+msgstr "88"
+
+#: ../../reference/error_codes.rst:173 d1c17c51f7724455b3c05b54ff5283bf
+msgid "Arbitration lost (I2C/CAN)"
+msgstr "Arbitration lost (I2C/CAN)"
+
+#: ../../reference/error_codes.rst:176 a8fc832cecbf4560b24a9df11fc7f465
+msgid "DMA Errors (100-119)"
+msgstr "DMA Errors (100-119)"
+
+#: ../../reference/error_codes.rst:185 5db43d3825ee431cbc6012f1117b2971
+msgid "``NX_ERR_DMA``"
+msgstr "``NX_ERR_DMA``"
+
+#: ../../reference/error_codes.rst:186 ccbc9ae8e2814cc89338156202850653
+msgid "100"
+msgstr "100"
+
+#: ../../reference/error_codes.rst:187 6807e5d7ea884c5b98abec095002e9b4
+msgid "Generic DMA error"
+msgstr ""
+
+#: ../../reference/error_codes.rst:188 9072b3f7ea804519a1e9453aafa716ae
+msgid "``NX_ERR_DMA_TRANSFER``"
+msgstr "``NX_ERR_DMA_TRANSFER``"
+
+#: ../../reference/error_codes.rst:189 317fbebcf43a4901b76ce719e2ffffb8
+msgid "101"
+msgstr "101"
+
+#: ../../reference/error_codes.rst:190 40bf45ecd8bc487dad56288f662c40e4
+msgid "DMA transfer error"
+msgstr ""
+
+#: ../../reference/error_codes.rst:191 ca141b61c44440738581aaab26e9780b
+msgid "``NX_ERR_DMA_CONFIG``"
+msgstr "``NX_ERR_DMA_CONFIG``"
+
+#: ../../reference/error_codes.rst:192 25ce4f8eacfa41df876d71dd72ef3603
+msgid "102"
+msgstr "102"
+
+#: ../../reference/error_codes.rst:193 328fc7f05b9a47958f1a42d87b13ecc7
+msgid "DMA configuration error"
+msgstr ""
+
+#: ../../reference/error_codes.rst:196 900bbb8aa7734dae84f56961275e9f2e
+msgid "Data Errors (120-139)"
+msgstr "Data Errors (120-139)"
+
+#: ../../reference/error_codes.rst:205 a74f245c60534e2b946ecc73551a0480
+msgid "``NX_ERR_NO_DATA``"
+msgstr "``NX_ERR_NO_DATA``"
+
+#: ../../reference/error_codes.rst:206 c2be236d81954567b34bcb4e17f7ce20
+msgid "120"
+msgstr "120"
+
+#: ../../reference/error_codes.rst:207 7a9ae88cc91244da8714d73573862722
+msgid "No data available"
+msgstr ""
+
+#: ../../reference/error_codes.rst:208 1fc3a5cab1914fd0b2648e532652a017
+msgid "``NX_ERR_DATA_SIZE``"
+msgstr "``NX_ERR_DATA_SIZE``"
+
+#: ../../reference/error_codes.rst:209 c1e2a37a0b9a467b8f5cb1050323e995
+msgid "121"
+msgstr "121"
+
+#: ../../reference/error_codes.rst:210 2feb06708b9a44ec8f28b8d7474b96ff
+msgid "Data size error"
+msgstr ""
+
+#: ../../reference/error_codes.rst:211 9b4a43604d7546f4a0ba929b53d33f2a
+msgid "``NX_ERR_CRC``"
+msgstr "``NX_ERR_CRC``"
+
+#: ../../reference/error_codes.rst:212 83566ebdd8c24a44bf4cd86e35324843
+msgid "122"
+msgstr "122"
+
+#: ../../reference/error_codes.rst:213 8a05b8e30af04ee99530ebcc8a3c33dc
+msgid "CRC check failed"
+msgstr ""
+
+#: ../../reference/error_codes.rst:214 15c82b4815d6451aad0f707104a146af
+msgid "``NX_ERR_CHECKSUM``"
+msgstr "``NX_ERR_CHECKSUM``"
+
+#: ../../reference/error_codes.rst:215 645998b73728465f80fccfbb8a388726
+msgid "123"
+msgstr "123"
+
+#: ../../reference/error_codes.rst:216 764d815e226a4735b764ae970e4df33f
+msgid "Checksum verification failed"
+msgstr ""
+
+#: ../../reference/error_codes.rst:219 b5a0b9e14da246df80ab73740f2ff9c8
+msgid "Permission Errors (140-159)"
+msgstr "Permission Errors (140-159)"
+
+#: ../../reference/error_codes.rst:228 1769783f005e42078344f2f970163e7c
+msgid "``NX_ERR_PERMISSION``"
+msgstr "``NX_ERR_PERMISSION``"
+
+#: ../../reference/error_codes.rst:229 b1748c5202614c1f8e8ad031ba537aff
+msgid "140"
+msgstr "140"
+
+#: ../../reference/error_codes.rst:230 1faf9bfd2af4401db2561ca86c0235dd
+msgid "Permission denied"
+msgstr ""
+
+#: ../../reference/error_codes.rst:231 2163ce58db874709b5d4f233a840bed3
+msgid "``NX_ERR_READ_ONLY``"
+msgstr "``NX_ERR_READ_ONLY``"
+
+#: ../../reference/error_codes.rst:232 b5c6c0bad2d64f6383ce5efa6e22fa0a
+msgid "141"
+msgstr "141"
+
+#: ../../reference/error_codes.rst:233 209a17afd1f14c09a5dde4383c400079
+msgid "Attempted write to read-only resource"
+msgstr ""
+
+#: ../../reference/error_codes.rst:236 4f84f2a56c404958a87b58243a442823
+msgid "Error Handling Utilities"
+msgstr ""
+
+#: ../../reference/error_codes.rst:239 ad6bf37a63e4421eb178b9c4e4928874
+msgid "Checking Status"
+msgstr ""
+
+#: ../../reference/error_codes.rst:241 f2b766fb13c94235976d8e07a72fe263
+msgid ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t status = some_function();\n"
+"\n"
+"/* Check if operation succeeded */\n"
+"if (NX_IS_OK(status)) {\n"
+"    /* Success */\n"
+"}\n"
+"\n"
+"/* Check if operation failed */\n"
+"if (NX_IS_ERROR(status)) {\n"
+"    /* Handle error */\n"
+"}"
+msgstr ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t status = some_function();\n"
+"\n"
+"/* Check if operation succeeded */\n"
+"if (NX_IS_OK(status)) {\n"
+"    /* Success */\n"
+"}\n"
+"\n"
+"/* Check if operation failed */\n"
+"if (NX_IS_ERROR(status)) {\n"
+"    /* Handle error */\n"
+"}"
+
+#: ../../reference/error_codes.rst:258 8990373a43704084a6225fe30af9abb3
+msgid "Error Propagation"
+msgstr ""
+
+#: ../../reference/error_codes.rst:260 6176bf2f96664bf8af67287f493c1683
+msgid ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t my_function(void) {\n"
+"    nx_status_t status;\n"
+"\n"
+"    /* Return immediately if error occurs */\n"
+"    status = some_operation();\n"
+"    NX_RETURN_IF_ERROR(status);\n"
+"\n"
+"    /* Check for NULL pointer */\n"
+"    void* ptr = get_pointer();\n"
+"    NX_RETURN_IF_NULL(ptr);\n"
+"\n"
+"    /* Continue with normal flow */\n"
+"    return NX_OK;\n"
+"}"
+msgstr ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t my_function(void) {\n"
+"    nx_status_t status;\n"
+"\n"
+"    /* Return immediately if error occurs */\n"
+"    status = some_operation();\n"
+"    NX_RETURN_IF_ERROR(status);\n"
+"\n"
+"    /* Check for NULL pointer */\n"
+"    void* ptr = get_pointer();\n"
+"    NX_RETURN_IF_NULL(ptr);\n"
+"\n"
+"    /* Continue with normal flow */\n"
+"    return NX_OK;\n"
+"}"
+
+#: ../../reference/error_codes.rst:280 09dd496544214111b316b81295b572e8
+msgid "Error Cleanup"
+msgstr ""
+
+#: ../../reference/error_codes.rst:282 0183cfb5af784c4ebd501d0a41643a57
+msgid ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t my_function(void) {\n"
+"    nx_status_t result = NX_OK;\n"
+"    void* resource = NULL;\n"
+"\n"
+"    /* Allocate resource */\n"
+"    resource = allocate();\n"
+"    if (!resource) {\n"
+"        result = NX_ERR_NO_MEMORY;\n"
+"        goto cleanup;\n"
+"    }\n"
+"\n"
+"    /* Use resource */\n"
+"    NX_GOTO_IF_ERROR(operation(resource), cleanup, result);\n"
+"\n"
+"cleanup:\n"
+"    if (resource) {\n"
+"        free(resource);\n"
+"    }\n"
+"    return result;\n"
+"}"
+msgstr ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t my_function(void) {\n"
+"    nx_status_t result = NX_OK;\n"
+"    void* resource = NULL;\n"
+"\n"
+"    /* Allocate resource */\n"
+"    resource = allocate();\n"
+"    if (!resource) {\n"
+"        result = NX_ERR_NO_MEMORY;\n"
+"        goto cleanup;\n"
+"    }\n"
+"\n"
+"    /* Use resource */\n"
+"    NX_GOTO_IF_ERROR(operation(resource), cleanup, result);\n"
+"\n"
+"cleanup:\n"
+"    if (resource) {\n"
+"        free(resource);\n"
+"    }\n"
+"    return result;\n"
+"}"
+
+#: ../../reference/error_codes.rst:308 d2557df504334c40b33f1650933b2fa8
+msgid "Error Callbacks"
+msgstr ""
+
+#: ../../reference/error_codes.rst:310 8f4bcbfd8cf84097babae34d1b8525fe
+#, python-format
+msgid ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"/* Error callback function */\n"
+"void error_handler(void* user_data, nx_status_t status,\n"
+"                  const char* module, const char* msg) {\n"
+"    /* Log error */\n"
+"    LOG_ERROR(module, \"Error %d: %s\", status, msg);\n"
+"}\n"
+"\n"
+"/* Register error callback */\n"
+"nx_set_error_callback(error_handler, NULL);\n"
+"\n"
+"/* Errors will now be reported through callback */"
+msgstr ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"/* Error callback function */\n"
+"void error_handler(void* user_data, nx_status_t status,\n"
+"                  const char* module, const char* msg) {\n"
+"    /* Log error */\n"
+"    LOG_ERROR(module, \"Error %d: %s\", status, msg);\n"
+"}\n"
+"\n"
+"/* Register error callback */\n"
+"nx_set_error_callback(error_handler, NULL);\n"
+"\n"
+"/* Errors will now be reported through callback */"
+
+#: ../../reference/error_codes.rst:327 d31b56d88d4341e788c6b0569c0a810a
+msgid "Converting to String"
+msgstr ""
+
+#: ../../reference/error_codes.rst:329 08b4188ff292444a80e2d2b1ea24b48b
+#, python-format
+msgid ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t status = some_function();\n"
+"if (NX_IS_ERROR(status)) {\n"
+"    const char* error_str = nx_status_to_string(status);\n"
+"    printf(\"Error: %s\\n\", error_str);\n"
+"}"
+msgstr ""
+"#include \"hal/nx_status.h\"\n"
+"\n"
+"nx_status_t status = some_function();\n"
+"if (NX_IS_ERROR(status)) {\n"
+"    const char* error_str = nx_status_to_string(status);\n"
+"    printf(\"Error: %s\\n\", error_str);\n"
+"}"
+
+#: ../../reference/error_codes.rst:340 c4af8aaaf906424e8ecb882fc21b1e98
+msgid "Best Practices"
+msgstr "最佳实践"
+
+#: ../../reference/error_codes.rst:342 800334ee3fe044d2861970f4f8c9561d
+msgid ""
+"**Always check return values**: Never ignore status codes from HAL functions"
+msgstr ""
+
+#: ../../reference/error_codes.rst:343 852690a1b39c42c59b64620bea71b34a
+msgid ""
+"**Use specific error codes**: Prefer specific codes over ``NX_ERR_GENERIC``"
+msgstr ""
+
+#: ../../reference/error_codes.rst:344 b3c63558623a4b1ebc5f51884bfd72a9
+msgid ""
+"**Propagate errors**: Use ``NX_RETURN_IF_ERROR`` to propagate errors up the "
+"call stack"
+msgstr ""
+
+#: ../../reference/error_codes.rst:345 5a05d58ee3d24b8199d9afaac6f7cc55
+msgid ""
+"**Clean up resources**: Use ``NX_GOTO_IF_ERROR`` for proper cleanup on error"
+msgstr ""
+
+#: ../../reference/error_codes.rst:346 813dc9672b6c43418320355180f24f1b
+msgid ""
+"**Log errors**: Use error callbacks or logging to track errors in production"
+msgstr ""
+
+#: ../../reference/error_codes.rst:347 315328fb590b40b4835bf67b5c577383
+msgid ""
+"**Document error conditions**: Document which errors each function can "
+"return"
+msgstr ""
+
+#: ../../reference/error_codes.rst:350 f8431fe79093441a862d9f7a7733424e
+msgid "Common Error Scenarios"
+msgstr ""
+
+#: ../../reference/error_codes.rst:353 e3839407c29640e598fb063634bddf62
+msgid "Initialization Errors"
+msgstr "初始化 Errors"
+
+#: ../../reference/error_codes.rst:355 d16e14fb878b451c96e2977e0f2e8a6e
+msgid ""
+"/* Device not initialized */\n"
+"status = device_operation();\n"
+"if (status == NX_ERR_NOT_INIT) {\n"
+"    /* Initialize device first */\n"
+"    device_init();\n"
+"}"
+msgstr ""
+"/* Device not initialized */\n"
+"status = device_operation();\n"
+"if (status == NX_ERR_NOT_INIT) {\n"
+"    /* Initialize device first */\n"
+"    device_init();\n"
+"}"
+
+#: ../../reference/error_codes.rst:365 fb7327349eab40b4a233af97805e5bf0
+msgid "Timeout Handling"
+msgstr ""
+
+#: ../../reference/error_codes.rst:367 fdbf8ad305974963a660f3dfe9aa65dc
+msgid ""
+"/* Operation with timeout */\n"
+"status = device_read(buffer, size, 1000);\n"
+"if (status == NX_ERR_TIMEOUT) {\n"
+"    /* Retry or handle timeout */\n"
+"}"
+msgstr ""
+"/* Operation with timeout */\n"
+"status = device_read(buffer, size, 1000);\n"
+"if (status == NX_ERR_TIMEOUT) {\n"
+"    /* Retry or handle timeout */\n"
+"}"
+
+#: ../../reference/error_codes.rst:376 c802dc86667f4b89aa4c9ab7c6d758be
+msgid "Resource Management"
+msgstr ""
+
+#: ../../reference/error_codes.rst:378 13311db43d1c4082a736bb9dc52a6e96
+msgid ""
+"/* Check for resource availability */\n"
+"status = allocate_resource();\n"
+"if (status == NX_ERR_NO_MEMORY) {\n"
+"    /* Free some memory and retry */\n"
+"}"
+msgstr ""
+"/* Check for resource availability */\n"
+"status = allocate_resource();\n"
+"if (status == NX_ERR_NO_MEMORY) {\n"
+"    /* Free some memory and retry */\n"
+"}"
+
+#: ../../reference/error_codes.rst:387 1215c4f3ec04427b8636c9fb1827f85d
+msgid "Communication Errors"
+msgstr ""
+
+#: ../../reference/error_codes.rst:389 6e6efe0101f246c19214968d11269944
+msgid ""
+"/* I2C communication */\n"
+"status = i2c_write(addr, data, len);\n"
+"if (status == NX_ERR_NACK) {\n"
+"    /* Device not responding */\n"
+"} else if (status == NX_ERR_ARBITRATION) {\n"
+"    /* Bus arbitration lost, retry */\n"
+"}"
+msgstr ""
+"/* I2C communication */\n"
+"status = i2c_write(addr, data, len);\n"
+"if (status == NX_ERR_NACK) {\n"
+"    /* Device not responding */\n"
+"} else if (status == NX_ERR_ARBITRATION) {\n"
+"    /* Bus arbitration lost, retry */\n"
+"}"
+
+#: ../../reference/error_codes.rst:400 d05af588c012452b8916aae2580f0c1a
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../reference/error_codes.rst:402 e3e90cd87641421d9107735a164fcbcb
+msgid ":doc:`../api/hal` - HAL API Reference"
+msgstr ":doc:`../api/hal` - HAL API Reference"
+
+#: ../../reference/error_codes.rst:403 7334961977824d2fbfba75378783633a
+msgid ":doc:`../user_guide/hal` - HAL User Guide"
+msgstr ":doc:`../user_guide/hal` - HAL User Guide"
+
+#: ../../reference/error_codes.rst:404 4336a50f051c42f9aedca0164f64d5c0
+msgid ":doc:`../development/coding_standards` - Coding Standards"
+msgstr ":doc:`../development/coding_standards` - Coding Standards"

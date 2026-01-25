@@ -324,7 +324,7 @@ Compile-Time Configuration
 
 Remove low-level logs at compile time to reduce code size:
 
-.. code-block:: cmake
+.. code-block:: CMake
 
     # CMakeLists.txt
     add_definitions(-DLOG_COMPILE_LEVEL=LOG_LEVEL_INFO)
@@ -335,7 +335,7 @@ This completely removes ``LOG_TRACE()`` and ``LOG_DEBUG()`` calls from the binar
 
 Disable dynamic memory allocation:
 
-.. code-block:: cmake
+.. code-block:: CMake
 
     add_definitions(-DLOG_USE_STATIC_ALLOC=1)
 

@@ -308,3 +308,20 @@ Base Interfaces
         nx_status_t (*get_error_count)(nx_diagnostic_t* self, uint32_t* count);
         nx_status_t (*clear_errors)(nx_diagnostic_t* self);
     };
+
+
+Related APIs
+------------
+
+- :doc:`osal` - OS abstraction for threading and synchronization
+- :doc:`init` - Automatic initialization system
+- :doc:`config` - Configuration management
+- :doc:`log` - Logging framework
+
+See Also
+--------
+
+- :doc:`../user_guide/hal` - HAL User Guide
+- :doc:`../user_guide/porting` - Porting Guide
+- :doc:`../reference/error_codes` - Error Code Reference
+- :doc:`../platform_guides/index` - Platform-Specific Guides

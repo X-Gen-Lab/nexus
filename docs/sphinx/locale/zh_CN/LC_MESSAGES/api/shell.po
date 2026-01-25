@@ -1,164 +1,336 @@
-# Shell API - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
-#: ../../api/shell.rst:2 5ada397680d4495bb2d6b3a6dc3f836b
+#: ../../api/shell.rst:2 add036dc8ae24f34b4f25b70bf6e2b9f
 msgid "Shell Framework API Reference"
 msgstr "Shell 框架 API 参考"
 
-#: ../../api/shell.rst:4 1bb9604123ec405fba3be8f1e825193b
+#: ../../api/shell.rst:4 dfdc7a8480f34d7faa3871fd244f704e
 msgid "This section documents the Shell Framework API."
 msgstr "本节记录 Shell 框架 API。"
 
-#: ../../api/shell.rst:7 c63db8ce39d4422789c76798d6d649bf
+#: ../../api/shell.rst:7 0197a5d673b541fba052e24bae2ad20a
+msgid "Overview"
+msgstr "概述"
+
+#: ../../api/shell.rst:9 e04c6c4e69c54e51b6d89132a434257a
+msgid ""
+"The Nexus Shell Framework provides an interactive command-line interface "
+"with features like command registration, autocomplete, history, and line "
+"editing. It's designed for embedded systems with minimal memory footprint."
+msgstr ""
+
+#: ../../api/shell.rst:14 ae0712cdff2e4092858b267bae06de1f
+msgid "Usage Examples"
+msgstr "用法 示例"
+
+#: ../../api/shell.rst:17 99570937fbca47ec884ae2d033169f35
+msgid "Basic Shell Setup"
+msgstr ""
+
+#: ../../api/shell.rst:19 a7018385b2f44ba7bc2bbe507af42342
+msgid ""
+"#include \"shell/shell.h\"\n"
+"\n"
+"/* Initialize shell with UART backend */\n"
+"shell_config_t config = {\n"
+"    .prompt = \"nexus> \",\n"
+"    .history_size = 10,\n"
+"    .max_line_length = 128\n"
+"};\n"
+"\n"
+"shell_init(&config);\n"
+"\n"
+"/* Start shell processing loop */\n"
+"while (1) {\n"
+"    shell_process();\n"
+"}"
+msgstr ""
+"#include \"shell/shell.h\"\n"
+"\n"
+"/* Initialize shell with UART backend */\n"
+"shell_config_t config = {\n"
+"    .prompt = \"nexus> \",\n"
+"    .history_size = 10,\n"
+"    .max_line_length = 128\n"
+"};\n"
+"\n"
+"shell_init(&config);\n"
+"\n"
+"/* Start shell processing loop */\n"
+"while (1) {\n"
+"    shell_process();\n"
+"}"
+
+#: ../../api/shell.rst:38 a58e88e274d94d579ae7a070e569e403
+msgid "Command Registration"
+msgstr "命令注册"
+
+#: ../../api/shell.rst:40 643b4c7a82374ae6a9fd948dfc27a4a4
+#, python-format
+msgid ""
+"#include \"shell/shell.h\"\n"
+"#include \"shell/shell_command.h\"\n"
+"\n"
+"/* Define command handler */\n"
+"static int cmd_hello(int argc, char** argv) {\n"
+"    shell_printf(\"Hello, World!\\n\");\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"/* Register command */\n"
+"SHELL_CMD_REGISTER(hello, cmd_hello, \"Print hello message\");\n"
+"\n"
+"/* Command with arguments */\n"
+"static int cmd_echo(int argc, char** argv) {\n"
+"    for (int i = 1; i < argc; i++) {\n"
+"        shell_printf(\"%s \", argv[i]);\n"
+"    }\n"
+"    shell_printf(\"\\n\");\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"SHELL_CMD_REGISTER(echo, cmd_echo, \"Echo arguments\");"
+msgstr ""
+"#include \"shell/shell.h\"\n"
+"#include \"shell/shell_command.h\"\n"
+"\n"
+"/* Define command handler */\n"
+"static int cmd_hello(int argc, char** argv) {\n"
+"    shell_printf(\"Hello, World!\\n\");\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"/* Register command */\n"
+"SHELL_CMD_REGISTER(hello, cmd_hello, \"Print hello message\");\n"
+"\n"
+"/* Command with arguments */\n"
+"static int cmd_echo(int argc, char** argv) {\n"
+"    for (int i = 1; i < argc; i++) {\n"
+"        shell_printf(\"%s \", argv[i]);\n"
+"    }\n"
+"    shell_printf(\"\\n\");\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"SHELL_CMD_REGISTER(echo, cmd_echo, \"Echo arguments\");"
+
+#: ../../api/shell.rst:66 63f0e96df77d49529870d01321f00c11
+msgid "Command with Subcommands"
+msgstr ""
+
+#: ../../api/shell.rst:68 26031a09a44845f5a9d9471c2dd08214
+msgid ""
+"#include \"shell/shell.h\"\n"
+"#include \"shell/shell_command.h\"\n"
+"\n"
+"static int cmd_gpio_set(int argc, char** argv) {\n"
+"    /* Set GPIO pin */\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"static int cmd_gpio_get(int argc, char** argv) {\n"
+"    /* Get GPIO pin state */\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"/* Register subcommands */\n"
+"SHELL_CMD_REGISTER(gpio_set, cmd_gpio_set, \"Set GPIO pin\");\n"
+"SHELL_CMD_REGISTER(gpio_get, cmd_gpio_get, \"Get GPIO pin state\");"
+msgstr ""
+"#include \"shell/shell.h\"\n"
+"#include \"shell/shell_command.h\"\n"
+"\n"
+"static int cmd_gpio_set(int argc, char** argv) {\n"
+"    /* Set GPIO pin */\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"static int cmd_gpio_get(int argc, char** argv) {\n"
+"    /* Get GPIO pin state */\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"/* Register subcommands */\n"
+"SHELL_CMD_REGISTER(gpio_set, cmd_gpio_set, \"Set GPIO pin\");\n"
+"SHELL_CMD_REGISTER(gpio_get, cmd_gpio_get, \"Get GPIO pin state\");"
+
+#: ../../api/shell.rst:88 6b3382a355084c4382e87df23db2a467
+msgid "Custom Backend"
+msgstr "Custom 后端"
+
+#: ../../api/shell.rst:90 e7c61ccdbcdf4de9bb8933f7de1494a8
+msgid ""
+"#include \"shell/shell.h\"\n"
+"#include \"shell/shell_backend.h\"\n"
+"\n"
+"/* Implement custom backend */\n"
+"static int my_backend_read(char* buf, size_t len) {\n"
+"    /* Read from custom input */\n"
+"    return bytes_read;\n"
+"}\n"
+"\n"
+"static int my_backend_write(const char* buf, size_t len) {\n"
+"    /* Write to custom output */\n"
+"    return bytes_written;\n"
+"}\n"
+"\n"
+"static shell_backend_t custom_backend = {\n"
+"    .read = my_backend_read,\n"
+"    .write = my_backend_write\n"
+"};\n"
+"\n"
+"/* Set custom backend */\n"
+"shell_set_backend(&custom_backend);"
+msgstr ""
+"#include \"shell/shell.h\"\n"
+"#include \"shell/shell_backend.h\"\n"
+"\n"
+"/* Implement custom backend */\n"
+"static int my_backend_read(char* buf, size_t len) {\n"
+"    /* Read from custom input */\n"
+"    return bytes_read;\n"
+"}\n"
+"\n"
+"static int my_backend_write(const char* buf, size_t len) {\n"
+"    /* Write to custom output */\n"
+"    return bytes_written;\n"
+"}\n"
+"\n"
+"static shell_backend_t custom_backend = {\n"
+"    .read = my_backend_read,\n"
+"    .write = my_backend_write\n"
+"};\n"
+"\n"
+"/* Set custom backend */\n"
+"shell_set_backend(&custom_backend);"
+
+#: ../../api/shell.rst:115 635c88f41b2e4c6f923823592fe5f62e
+msgid "Thread Safety"
+msgstr "线程 Safety"
+
+#: ../../api/shell.rst:117 58f14612d0a84ac3a75529d951ef5418
+msgid ""
+"The Shell Framework is **not thread-safe**. Shell commands should only be "
+"processed from a single thread. If multiple threads need to interact with "
+"the shell, external synchronization is required."
+msgstr ""
+
+#: ../../api/shell.rst:122 b76f0bf050cc4ed890fa0f32209b4f6d
 msgid "Shell Core"
 msgstr "Shell 核心"
 
-#: ../../api/shell.rst 07282b78d7cf47afa5480fdab8b9b6ef
-#: 08bcb18c799b4d43992f42cefb34ad50 0a9712e5c92f47e3848ef9ab964a02a5
-#: 0c44ae24daea4ddb8cc5a0cd63838905 0e4fe8460271407fac43112a72093950
-#: 14e3afe8aba74b6398af6a93fa63d03e 15ca74ae028e4b12a508049c7beb73de
-#: 1e0b445234b54aabb00a1deeaba67699 3ba8247f911a4d8c9713671692bdba5b
-#: 4b12bbb3d8ae434296658b7724f1e450 4d0b453e20be4ec08d8f483d9d423e1a
-#: 531b6a80f9ac4e91b5452dfee90f68f9 5362491551af4d5eaf1feb69bd4e28a8
-#: 67b57f4c2fb442a4a67a98829085aa1d 67d1d57d59c745e899ea4ad6eacdc0f2
-#: 68314b04695e44d0beb7f373fb43a42d 6d9d2bffc9a5437392eba8851ea471b6
-#: 6e35d59f60244d1caef3c0f75ee00be1 70ca6bb3bcf5499da221c1cf925e2703
-#: 80dcf0b18ed4452fa14e5b1e88e1dfa8 8d692b4101a74fcc87c6dcbf9f2fd791
-#: 9028cb10d0724d37b8e05128eeb7a2f7 92fa768406c54d3ba3ba20f0280096ea
-#: 9783507f33a34783a5dbd9f548f21591 a4021c93826a49439ace3333099b0242
-#: a731d10e7ae847a09519c84043c30936 ab2cd29d3f2e47d9aa30adb2a69e3a50
-#: ad9018f2a40d4e5f932b48361ebc5439 b0be00f362744601a8fcff821c36bca4
-#: b12dc34ea02f4c128aad77af2c194789 b2a7f751f7824a7c843f21d3d1e82787
-#: b2c2763665c246b9a86a3cc6b162454d b55c8566afef457e97b66bd1020bbf61
-#: b65cf601d2a44d0f99e113d649c40216 bb1c5f37625c4214ba5a804fa84ad0ef
-#: cb4a13aea32b4f3988047a7620d7b815 cf16dcc44a3f4096aa179ac2ef49775c
-#: d3afa1b0b2644683802d634d5b728085 d4bcd2a2b3894ae89cfff3a7af1708f2
-#: d9ded37cd4a84c7e9a990bd97b8d45b9 dff0a656259a499db8f4c841d66ece94
-#: e33c95cf421e4364a19fca4b85a3ed38 e3d55428158a43c0901589458c965bc5
-#: eacf9c91d04b45d6a203ee819035a114 ece909180fca45b6836be7626f3a5c6b
-#: f49db200ffb44bacab5cd96986ebef23 fee0ef5fd97048a795c799bc9c5b4dcd
-#: fee70a9a7bf341c2910936db88e9bffb ff94ec3f5c1043b883c7b115b407ea47
+#: f3ad58cc0eeb4dae9d8ff90de1529fb5 f532650fd19541e89e4ca1e9f91a3301
 #, fuzzy
 msgid "Parameters"
 msgstr "解析器"
 
-#: ../../api/shell.rst 0700c376585a4d929f7836aa16ea4f58
-#: 0f9bd783df8042479dae9c284ca9b93c 11249dab3bf04724a708797aad864d56
-#: 1d66a38d7c2742a999791752cec67426 1e8543cccd5941ef8286fe892d5b54f8
-#: 1f3e682400674860827255ed033ec42a 21101ba47a7d45a9b4ef696a62ec8a8d
-#: 228bfd7424d444cd8b32a4376191e4ab 2722b48b5a2147f8b615d42c44aa7083
-#: 2b82e9d4667b4dd38477899510202b06 2ca16a980d0d42bca0b5de8978fb5d9d
-#: 2d4b07803c0d46a0b1e280831d5f0a9b 2f05e0274fd5415794dde353759aa6cf
-#: 30e1b7f9e3964f7382854171173c6526 55fb4b0081d74e009250977020be95af
-#: 5b539fac38914308a2229a9108f7958c 608af57bded54fcf890303a035e80d19
-#: 67f8dabdce744dcabbd12337c0fe8f2e 6941ab50543243e4a7c1d8d144ab0071
-#: 6a4d05a6253c49f88bdf5ddce499ffc4 6acecb693357404f8c903a22a639302e
-#: 6e36717f3f964c99a5ae25ac54b30dbe 705c1467b8f84b439db9043fd8f14d72
-#: 70f893c1f4574bf3aaf410fb21dc9697 7a18be8167944668b3b59d7d6630b244
-#: 7b29afbabe9a4ae7a7a54a269636d7ac 7bc2e61b45034027951c0ddf490e56b2
-#: 7c665231165d4d989f082120bb3cd4a5 81da3e8ff582403e840c8472f761d653
-#: 8360c229dad34376b61f020ffcd5d1d6 8459323ac521463f89bfd17e4bf53e8a
-#: 845c7ff4feba429a9d0e46e7e3494f96 895fd2a647c8484ca8998e8b639587ff
-#: 897900f4687b485596d1199928d2b0d1 8a411feb60274a3f9bd3844dbf97f1e4
-#: 8b225b21461c4603a7ed0a7ef48cbecc 8e452008a4864583ba992059f065d38c
-#: 8ed815796f2b48ba9207377d922c7b6b 98fa1cf4190b405c9afc5406bc3de9d3
-#: 9eb6e0d92774440e94919bfcfdfa00c4 a81c212b2b5d4527b05380c5e902a9c2
-#: a84857cbad4649209593d34b9068808d a9078188b7dc490fa508a60ea6b9d80b
-#: aa16e42df1dd4a94abeb228d070ce0b3 aa8457d693764ac4b518f59f472539ea
-#: ab664649cabb4007bb8270b89d57fd18 af0099156b2d458da0417e9428352b88
-#: b3a28e9edf124e03872a19817212f6e8 b90700b8f9fd43fd94b77064fa36d717
-#: be4ba6bd04df49c780e45bf0a5297c88 bfb47e983de842c692c6bcfa20e0980a
-#: c5eac720bf0a4052849f95fffd69cba1 c78171511de442f282c8cad953cd9a1c
-#: cb27b5cc52a74579afd65136832c5774 ce2c6ffc042e41dbb58e4489bc5e1d3e
-#: db1ee9a2b2b44ddb80dee3616a2d3a0f ef0e1f29220f48d099f247f324d73a09
-#: f9264019104e4e089b5a4e6e19789d43
+#: f91b688c492a4912b1fab6d78f043adb
 msgid "Returns"
-msgstr ""
+msgstr "返回值"
 
-#: ../../api/shell.rst 181d457b4a8c4a38b1be4d4f1254c7e6
-#: 1a5f26ddd8124e8a961f2cfcf275440a 212d9096e01646e4bede0fc058ae253c
-#: 239a1073175647e7be303a183aa76c5f 39b8bf902981408e8dedab49822cf06b
-#: a63aa53a6f864dd19ac3357ed85d9716 b2262bcf6c434c36a9d9eee9e5ada40c
-#: f15596f4557945a1baa6f01363093ba3
+#: e9639d6bd62d4ef0bba4f6b64114f781
 msgid "Public Members"
-msgstr ""
+msgstr "公共成员"
 
-#: ../../api/shell.rst:14 08d923eab50d425bbed11547fec4cb47
+#: ../../api/shell.rst:129 ebdd763765fd42e3b4ca183dbcbba7da
 msgid "Definitions & Constants"
 msgstr "定义和常量"
 
-#: ../../api/shell.rst:25 f0217e50658347b684d94c065c2de6de
+#: ../../api/shell.rst:140 e084c4550fb5401890d2234f462bb000
 msgid "Command Management"
 msgstr "命令管理"
 
-#: ../../api/shell.rst 65df4f84a81a4307a255ce8bad07ac37
+#: ../../api/shell.rst 9ef49f905ea2459cb3ae4997161c4a88
 msgid "Param argc"
 msgstr ""
 
-#: ../../api/shell.rst 7e2703a412254d18bada33fe811925f0
+#: ../../api/shell.rst 9161addcdfdb4c909a668a74a0c48efe
 msgid "Param argv"
 msgstr ""
 
-#: ../../api/shell.rst 7b57e8f4fc78492bacb616bc1248254a
-#: b0d35e4ef3084d51bf143ef95a6f90bc e821c76695c84a1a8131570251083696
+#: 511d3ad52ad5428484ae3f84282b451c 60c82d77d27b4cc09b5af0b375f129d5
 msgid "Return"
-msgstr ""
+msgstr "返回"
 
-#: ../../api/shell.rst 437c7be9ce204530a4fd21928f51f821
+#: ../../api/shell.rst a4f276cfd2854949a2984350ec6ed8c4
 msgid "Param partial"
 msgstr ""
 
-#: ../../api/shell.rst 393dc1d130b0497b93302e3c849247ca
+#: ../../api/shell.rst d61bc83f2f8e488887a2be7956af389e
 msgid "Param completions"
 msgstr ""
 
-#: ../../api/shell.rst 55c9b4efea264aa7aa39bcec890619f1
+#: ../../api/shell.rst 28cf87400a674589a9f41e377dc3a127
 msgid "Param count"
-msgstr ""
+msgstr "参数 count"
 
-#: ../../api/shell.rst:32 21ef6034f65e47229c3cba8bf8f39ddc
+#: ../../api/shell.rst:147 53ef4e47bae24377b8df834e481e3a47
 msgid "Line Editor"
 msgstr "行编辑器"
 
-#: ../../api/shell.rst:39 1d80400efb5044a0aa55b0fcfb85fcf4
+#: ../../api/shell.rst:154 0f7c0b3955264a37bf7550632c0d4f7b
 msgid "History"
 msgstr "历史"
 
-#: ../../api/shell.rst:46 0769bd6b778947b1a01c0751d257cf3f
+#: ../../api/shell.rst:161 15a22da65aa8449ab9fe0538c6a602e9
 msgid "Autocomplete"
 msgstr "自动补全"
 
-#: ../../api/shell.rst:53 d9b355014ee5498699d437f3485e23b7
+#: ../../api/shell.rst:168 12a2c2631f384badaf2b88b7d3be6f3a
 msgid "Parser"
 msgstr "解析器"
 
-#: ../../api/shell.rst:60 7533c31b5f1247869a1e5b3c9ec99567
+#: ../../api/shell.rst:175 a0d92d4ea9514e97a5b3d4a5151c5a62
 msgid "Backend Interface"
 msgstr "后端接口"
 
-#: ../../api/shell.rst 74831f5de898426fb74c3239a3f2c5e2
-#: 940c1bc4dfbe4f1c87040b56f0686928
+#: e5047ad9feec4bfbb3b6630f50434899
 msgid "Param data"
-msgstr ""
+msgstr "参数 data"
 
-#: ../../api/shell.rst 703fa3aa2d2346f28318cb134b0dce4d
+#: ../../api/shell.rst ec471ab9111f48418ae4038e64a2146f
 msgid "Param max_len"
 msgstr ""
 
-#: ../../api/shell.rst ccae15472b8348acb9fc0222db24bc69
+#: ../../api/shell.rst 906d2e3908c347c2958ffd78f28249f7
 msgid "Param len"
 msgstr ""
 
+#: ../../api/shell.rst:183 0225e5d45ec8414d92b0bf201a618b98
+msgid "Related APIs"
+msgstr ""
+
+#: ../../api/shell.rst:185 2121a2f91ae3464494dffb4501aa90b6
+msgid ":doc:`osal` - OS abstraction (used for task management)"
+msgstr ":doc:`osal` - OS abstraction (used for task management)"
+
+#: ../../api/shell.rst:186 ea0fa64f1c284927b253de482a6c285d
+msgid ":doc:`init` - Automatic initialization system"
+msgstr ":doc:`init` - Automatic initialization system"
+
+#: ../../api/shell.rst:187 315195208b724b9f99dac09e40af1d8e
+msgid ":doc:`log` - Logging framework"
+msgstr ":doc:`log` - Logging framework"
+
+#: ../../api/shell.rst:188 f826f9aa0c524798be5f98bab6afa218
+msgid ":doc:`hal` - HAL (for UART backend)"
+msgstr ":doc:`hal` - HAL (for UART backend)"
+
+#: ../../api/shell.rst:191 a40d5887123b4703817b8479ea81966f
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../api/shell.rst:193 3e06c6f374c2406f8c9e6ca5e395dd9d
+msgid ":doc:`../user_guide/shell` - Shell Framework User Guide"
+msgstr ":doc:`../user_guide/shell` - Shell Framework User Guide"
+
+#: ../../api/shell.rst:194 290164dd2d0e47958edc415c72e37b63
+msgid ":doc:`../reference/error_codes` - Error Code Reference"
+msgstr ":doc:`../reference/error_codes` - Error Code Reference"

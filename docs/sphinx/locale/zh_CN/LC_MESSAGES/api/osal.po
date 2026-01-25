@@ -1,89 +1,349 @@
-# OSAL API - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
-#: ../../api/osal.rst:2 136d348a555f48579c4ad9076ed12ad6
+#: ../../api/osal.rst:2 d6d864fa476a43fca5a81708f9d0b497
 msgid "OSAL API Reference"
 msgstr "OSAL API 参考"
 
-#: ../../api/osal.rst:4 fe68910a674e4261a9cd41ddc27f2237
+#: ../../api/osal.rst:4 f4d573dbe570485aa151461ac6f58e65
 msgid "This section documents the OS Abstraction Layer (OSAL) API."
 msgstr "本节记录操作系统抽象层 (OSAL) API。"
 
-#: ../../api/osal.rst:7 d955cfb9cf9b4d5f9d7f2df0a706e9aa
+#: ../../api/osal.rst:7 031bd32ae5a7473a95b3f15e99e6e9ac
+msgid "Overview"
+msgstr "概述"
+
+#: ../../api/osal.rst:9 4f871c2380b1499abcbd7488585403f7
+msgid ""
+"The Nexus OSAL provides a portable RTOS interface that works across multiple"
+" backends including FreeRTOS, RT-Thread, and bare-metal. It provides a "
+"unified API for tasks, synchronization primitives, and memory management."
+msgstr ""
+
+#: ../../api/osal.rst:14 02faeb49a6c3462a8c2594d8824426e7
+msgid "Usage Examples"
+msgstr "用法 示例"
+
+#: ../../api/osal.rst:17 d91b66ae09ee4d7a8b680d01571da6e5
+#, fuzzy
+msgid "Task Creation"
+msgstr "任务 API"
+
+#: ../../api/osal.rst:19 af8686481c44432abe5f948e77209e33
+msgid ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Task function */\n"
+"void my_task(void* arg) {\n"
+"    while (1) {\n"
+"        /* Task work */\n"
+"        osal_task_delay(1000);  /* Delay 1000ms */\n"
+"    }\n"
+"}\n"
+"\n"
+"/* Create task */\n"
+"osal_task_t task;\n"
+"osal_task_config_t config = {\n"
+"    .name = \"MyTask\",\n"
+"    .stack_size = 2048,\n"
+"    .priority = 5\n"
+"};\n"
+"\n"
+"osal_task_create(&task, my_task, NULL, &config);"
+msgstr ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Task function */\n"
+"void my_task(void* arg) {\n"
+"    while (1) {\n"
+"        /* Task work */\n"
+"        osal_task_delay(1000);  /* Delay 1000ms */\n"
+"    }\n"
+"}\n"
+"\n"
+"/* Create task */\n"
+"osal_task_t task;\n"
+"osal_task_config_t config = {\n"
+"    .name = \"MyTask\",\n"
+"    .stack_size = 2048,\n"
+"    .priority = 5\n"
+"};\n"
+"\n"
+"osal_task_create(&task, my_task, NULL, &config);"
+
+#: ../../api/osal.rst:42 5066dfd127554ba7915045a7a4e8f143
+#, fuzzy
+msgid "Mutex Usage"
+msgstr "互斥锁 API"
+
+#: ../../api/osal.rst:44 413d5562671a44999bb79ff39926cdae
+msgid ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Create mutex */\n"
+"osal_mutex_t mutex;\n"
+"osal_mutex_create(&mutex);\n"
+"\n"
+"/* Lock mutex */\n"
+"if (osal_mutex_lock(&mutex, 1000) == OSAL_OK) {\n"
+"    /* Critical section */\n"
+"\n"
+"    /* Unlock mutex */\n"
+"    osal_mutex_unlock(&mutex);\n"
+"}\n"
+"\n"
+"/* Delete mutex when done */\n"
+"osal_mutex_delete(&mutex);"
+msgstr ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Create mutex */\n"
+"osal_mutex_t mutex;\n"
+"osal_mutex_create(&mutex);\n"
+"\n"
+"/* Lock mutex */\n"
+"if (osal_mutex_lock(&mutex, 1000) == OSAL_OK) {\n"
+"    /* Critical section */\n"
+"\n"
+"    /* Unlock mutex */\n"
+"    osal_mutex_unlock(&mutex);\n"
+"}\n"
+"\n"
+"/* Delete mutex when done */\n"
+"osal_mutex_delete(&mutex);"
+
+#: ../../api/osal.rst:64 2c2a12fba6874e96b3e03bc8a792b524
+#, fuzzy
+msgid "Semaphore Usage"
+msgstr "信号量 API"
+
+#: ../../api/osal.rst:66 72c10be7f5be4c2f844ffbef83de24d5
+msgid ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Create binary semaphore */\n"
+"osal_sem_t sem;\n"
+"osal_sem_create(&sem, 0, 1);\n"
+"\n"
+"/* Wait for semaphore */\n"
+"if (osal_sem_wait(&sem, OSAL_WAIT_FOREVER) == OSAL_OK) {\n"
+"    /* Semaphore acquired */\n"
+"}\n"
+"\n"
+"/* Signal semaphore */\n"
+"osal_sem_post(&sem);\n"
+"\n"
+"/* Delete semaphore */\n"
+"osal_sem_delete(&sem);"
+msgstr ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Create binary semaphore */\n"
+"osal_sem_t sem;\n"
+"osal_sem_create(&sem, 0, 1);\n"
+"\n"
+"/* Wait for semaphore */\n"
+"if (osal_sem_wait(&sem, OSAL_WAIT_FOREVER) == OSAL_OK) {\n"
+"    /* Semaphore acquired */\n"
+"}\n"
+"\n"
+"/* Signal semaphore */\n"
+"osal_sem_post(&sem);\n"
+"\n"
+"/* Delete semaphore */\n"
+"osal_sem_delete(&sem);"
+
+#: ../../api/osal.rst:86 a0aca4047ac1405abd1fe853e7f543e2
+#, fuzzy
+msgid "Queue Usage"
+msgstr "队列 API"
+
+#: ../../api/osal.rst:88 338c7cda2c794289a55ccede394d9dc7
+msgid ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Create queue */\n"
+"osal_queue_t queue;\n"
+"osal_queue_create(&queue, 10, sizeof(int));\n"
+"\n"
+"/* Send to queue */\n"
+"int data = 42;\n"
+"osal_queue_send(&queue, &data, 1000);\n"
+"\n"
+"/* Receive from queue */\n"
+"int received;\n"
+"if (osal_queue_receive(&queue, &received, 1000) == OSAL_OK) {\n"
+"    /* Process received data */\n"
+"}\n"
+"\n"
+"/* Delete queue */\n"
+"osal_queue_delete(&queue);"
+msgstr ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Create queue */\n"
+"osal_queue_t queue;\n"
+"osal_queue_create(&queue, 10, sizeof(int));\n"
+"\n"
+"/* Send to queue */\n"
+"int data = 42;\n"
+"osal_queue_send(&queue, &data, 1000);\n"
+"\n"
+"/* Receive from queue */\n"
+"int received;\n"
+"if (osal_queue_receive(&queue, &received, 1000) == OSAL_OK) {\n"
+"    /* Process received data */\n"
+"}\n"
+"\n"
+"/* Delete queue */\n"
+"osal_queue_delete(&queue);"
+
+#: ../../api/osal.rst:110 396d4258cb704d5ca9775cedacfd0c4f
+msgid "Timer Usage"
+msgstr "定时器 用法"
+
+#: ../../api/osal.rst:112 590079f9cb19437f937fcfaa9d3fda37
+msgid ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Timer callback */\n"
+"void timer_callback(void* arg) {\n"
+"    /* Timer expired */\n"
+"}\n"
+"\n"
+"/* Create timer */\n"
+"osal_timer_t timer;\n"
+"osal_timer_config_t config = {\n"
+"    .name = \"MyTimer\",\n"
+"    .period_ms = 1000,\n"
+"    .auto_reload = true\n"
+"};\n"
+"\n"
+"osal_timer_create(&timer, timer_callback, NULL, &config);\n"
+"\n"
+"/* Start timer */\n"
+"osal_timer_start(&timer);\n"
+"\n"
+"/* Stop timer */\n"
+"osal_timer_stop(&timer);\n"
+"\n"
+"/* Delete timer */\n"
+"osal_timer_delete(&timer);"
+msgstr ""
+"#include \"osal/osal.h\"\n"
+"\n"
+"/* Timer callback */\n"
+"void timer_callback(void* arg) {\n"
+"    /* Timer expired */\n"
+"}\n"
+"\n"
+"/* Create timer */\n"
+"osal_timer_t timer;\n"
+"osal_timer_config_t config = {\n"
+"    .name = \"MyTimer\",\n"
+"    .period_ms = 1000,\n"
+"    .auto_reload = true\n"
+"};\n"
+"\n"
+"osal_timer_create(&timer, timer_callback, NULL, &config);\n"
+"\n"
+"/* Start timer */\n"
+"osal_timer_start(&timer);\n"
+"\n"
+"/* Stop timer */\n"
+"osal_timer_stop(&timer);\n"
+"\n"
+"/* Delete timer */\n"
+"osal_timer_delete(&timer);"
+
+#: ../../api/osal.rst:141 a60157a1d0a147aa9d1e83a8b07d7cae
+msgid "Thread Safety"
+msgstr "线程 Safety"
+
+#: ../../api/osal.rst:143 a0cad9665171418b82c5705c78824f39
+msgid ""
+"All OSAL functions are **thread-safe** and can be called from multiple tasks"
+" simultaneously. The OSAL handles all necessary synchronization internally."
+msgstr ""
+
+#: ../../api/osal.rst:147 1a12c2900de645a9b0e3de1b02dfd011
 msgid "OSAL Definitions"
 msgstr "OSAL 定义"
 
-#: ../../api/osal.rst:14 fe60aa8868c845d5ad4af92d13c7f535
+#: f9e1ffbc7e9140378009732bebcf7638 fed56625f8f046a8ac270a65ad0c5bc2
+msgid "Parameters"
+msgstr "参数"
+
+#: f875763c8a5c4477b1c14cd42beae197
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../api/osal.rst:154 21af90cede104c90b1581beaeeb76dca
 msgid "Task API"
 msgstr "任务 API"
 
-#: ../../api/osal.rst 9208a68b61864c73859097552ac7373a
+#: ../../api/osal.rst eac57bf634f94bfb925e6a1be7910878
 msgid "Param arg"
 msgstr ""
 
-#: ../../api/osal.rst 08dc2f2428874442b26706be52f4c693
-#: 0be0f0524acf4fa69fee32d717a68c53 0d2697e646a2465eb5c1115959868b09
-#: 14f89bd79ee842b5b0490cf0a0a2f9c4 1ab8f3a6fe7941c3a81941e34443046c
-#: 20cd48942d4349a38fdbf0cc26003efa 2a926d5853394036bb4c98f4ab455d32
-#: 360808c1ae694585bcc28fca159052ed 4138c186f2cd418abd14be31b93bf991
-#: 47224a38983f4a7fa579a64db76942cf 5a92f246b3b147659e391b29e3e23fad
-#: 60c860265cf547338e44516d1b6dcf64 64555dab1bea40418c3bcac1d7b6400e
-#: 767e1bd9822e42d19e0746f51876589b 8792827071f146e9b2a7fe5afe1fb329
-#: 9f6aabeb4bc14cf4a878d4969327b224 c088a76f895f42ef8a337206620e6661
-#: c2d42c976ef148dbb4aac94d8802b258 c2ed57697e0340b29e4343144ebeb8e1
-#: c78e344b728646ecbfb55b75a526d551 c8d5ff341cba4c438b7ead8c570083ac
-#: cc6d6a8f5466456da3f2dfd6c6da89ef cc96d6735b1f46f9bbc4314f11db18fd
-#: cfb74150d1ad467dbb1ac8506be6710a d3ef8c2ff5e04b2d9f3e9dd31319bf1a
-#: e99652f18d984711a3092b355dd6a58d ee54ab32926d4605b6790701071c9cd5
-#: f4e2aacb82204ab69b6a221d27760a64
-msgid "Parameters"
-msgstr ""
+#: f1d9e5dbe3b04883af586f2d081e9504 f77b6ccd42bb4b38b47cf4c9d6a7ceb7
+msgid "Return values"
+msgstr "返回值"
 
-#: ../../api/osal.rst 03e6a78b3e764fe29d842a4e5b491268
-#: 05f9c3b1d49e4a6a8185ba3dcdb6632a 06f77f2b6008492bbd27fca2476747c3
-#: 07097bf43f424278b58a496f65d694a7 08da4e6e2da34f5d8384dd1f9b416d80
-#: 171888c7161c44f5b0fd26bac78dfadd 26395263ef9f489394a7f19232adc833
-#: 29eafd53239a4a4e82a620f2553ba7bb 2d9664bc6f784b6e80eb43660f6eb881
-#: 45411c9610c44630b9d33d68d478599f 570b4eaf316f49b6a94a22bedda271b2
-#: 67f858b84a7340f8ade80534bc1a04df 68c0e4b76e5d4d44b2d43782761d9763
-#: 75021dd8bf9d4b22aef1ae92af70c43a 80a9484a9c17488a84f84e0f3613fd26
-#: 874df1caaba84d07a60307a592d757f7 8b20ec413daa4c929c8d4db019e0d700
-#: 97a33411bacf4a70b689cebd49bac040 ab604cae326549c796ec5a65326d3cbe
-#: ac1ec51d5c4940c5b0781d70b8bc2ea1 b959b6c5e68f405f931877b521c83b96
-#: c1c80ee3a42d4cb29a5aab2ac94f4ef2 c7eb7012ba064e5fa85a8cb8dcef26dc
-#: cdb41badf23f44abae5c77078d8bd6d4 d44c2746d3d2401d8ca6c15f4f497e3d
-#: da80a09b03874b57be508330281b05a4 e7724b9195c64081a9630aa26beeea26
-#: ec2e580b07ee4e5cb19405238498b45f ec964163f7c84202bc08fe027ca1ad2c
-#: fb18b40b2d094205b0d5f3d2ca1d3ea4
-msgid "Returns"
-msgstr ""
-
-#: ../../api/osal.rst d719a2a35be84c80a055390806f98112
+#: ../../api/osal.rst beb9c8284ba545b2af5641358f4bab07
 msgid "Public Members"
-msgstr ""
+msgstr "公共成员"
 
-#: ../../api/osal.rst:21 b096da6a331a423d9c1fb52488246952
+#: ../../api/osal.rst:161 ad6c996de41b493eb4d84b78ffd65b0b
 msgid "Mutex API"
 msgstr "互斥锁 API"
 
-#: ../../api/osal.rst:28 f5a5b14521324f7092871fe003d9988b
+#: ../../api/osal.rst:168 a0366d53742f4de38eb5719ae6918c5d
 msgid "Semaphore API"
 msgstr "信号量 API"
 
-#: ../../api/osal.rst:35 f1e429d3f9564e56ad89e3f7552c9a57
+#: ../../api/osal.rst:175 dba61957f5724ddb99a0a480de917d3c
 msgid "Queue API"
 msgstr "队列 API"
 
+#: ../../api/osal.rst:183 3afe244634274a74b22a3a1ff3ac6673
+msgid "Related APIs"
+msgstr ""
+
+#: ../../api/osal.rst:185 eabeea596ad940db9286ef0a5befa59f
+msgid ":doc:`hal` - Hardware abstraction layer"
+msgstr ":doc:`hal` - Hardware abstraction layer"
+
+#: ../../api/osal.rst:186 36613c90f45f4f4e9aa450911d00e777
+msgid ":doc:`init` - Automatic initialization system"
+msgstr ":doc:`init` - Automatic initialization system"
+
+#: ../../api/osal.rst:187 14fdd670c40a4e6fa82090d14d0a9c93
+msgid ":doc:`log` - Logging framework (uses OSAL for thread safety)"
+msgstr ":doc:`log` - Logging framework (uses OSAL for thread safety)"
+
+#: ../../api/osal.rst:188 d67f674133d54717b1834854281c7c04
+msgid ":doc:`shell` - Shell framework (uses OSAL for task management)"
+msgstr ":doc:`shell` - Shell framework (uses OSAL for task management)"
+
+#: ../../api/osal.rst:191 6401dc5219cf47849940c98592116629
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../api/osal.rst:193 da8a70c06612450c82724c683ad7e76a
+msgid ":doc:`../user_guide/osal` - OSAL User Guide"
+msgstr ":doc:`../user_guide/osal` - OSAL User Guide"
+
+#: ../../api/osal.rst:194 5f2327d6a3f14f69976df9163ad2aa13
+msgid ":doc:`../reference/error_codes` - Error Code Reference"
+msgstr ":doc:`../reference/error_codes` - Error Code Reference"
+
+#: ../../api/osal.rst:195 b934105fe5ee40709135f8c342890fbd
+msgid ":doc:`../platform_guides/index` - Platform-Specific Guides"
+msgstr ":doc:`../platform_guides/index` - Platform-Specific Guides"

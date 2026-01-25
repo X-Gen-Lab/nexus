@@ -118,59 +118,143 @@ Data Types
 Type Operations
 ---------------
 
-**Integer operations:**
+32-bit Signed Integer (int32)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c
 
-    // 32-bit signed
+    // Store 32-bit signed integer
     config_set_i32("app.timeout", 5000);
+    config_set_i32("sensor.offset", -100);
+
+    // Read with default value
     int32_t timeout;
-    config_get_i32("app.timeout", &timeout, 1000);
+    config_get_i32("app.timeout", &timeout, 1000);  // Default: 1000
 
-    // 32-bit unsigned
+    // Check if exists before reading
+    bool exists;
+    config_exists("app.timeout", &exists);
+    if (exists) {
+        config_get_i32("app.timeout", &timeout, 0);
+    }
+
+32-bit Unsigned Integer (uint32)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: c
+
+    // Store 32-bit unsigned integer
     config_set_u32("app.count", 100);
-    uint32_t count;
-    config_get_u32("app.count", &count, 0);
+    config_set_u32("network.retry_count", 5);
 
-    // 64-bit signed
+    // Read with default value
+    uint32_t count;
+    config_get_u32("app.count", &count, 0);  // Default: 0
+
+    // Use for counters and IDs
+    uint32_t device_id;
+    config_get_u32("device.id", &device_id, 0xFFFFFFFF);
+
+64-bit Signed Integer (int64)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: c
+
+    // Store 64-bit signed integer (timestamps, large values)
     config_set_i64("app.timestamp", 1234567890123LL);
+    config_set_i64("system.boot_time", -1000000LL);
+
+    // Read with default value
     int64_t timestamp;
     config_get_i64("app.timestamp", &timestamp, 0);
 
-**Float and boolean:**
+    // Use for timestamps
+    int64_t last_sync;
+    config_get_i64("network.last_sync", &last_sync, 0);
+
+Float (Single-Precision)
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c
 
-    // Float
+    // Store floating-point values
     config_set_float("sensor.threshold", 3.14f);
+    config_set_float("calibration.offset", -0.5f);
+    config_set_float("pid.kp", 1.2f);
+
+    // Read with default value
     float threshold;
     config_get_float("sensor.threshold", &threshold, 0.0f);
 
-    // Boolean
-    config_set_bool("app.debug", true);
-    bool debug;
-    config_get_bool("app.debug", &debug, false);
+    // Use for sensor calibration
+    float temp_offset;
+    config_get_float("sensor.temp_offset", &temp_offset, 0.0f);
 
-**String and blob:**
+Boolean
+^^^^^^^
 
 .. code-block:: c
 
-    // String
+    // Store boolean values
+    config_set_bool("app.debug", true);
+    config_set_bool("network.dhcp_enabled", false);
+    config_set_bool("sensor.auto_calibrate", true);
+
+    // Read with default value
+    bool debug;
+    config_get_bool("app.debug", &debug, false);
+
+    // Use for feature flags
+    bool use_ssl;
+    config_get_bool("network.use_ssl", &use_ssl, true);
+
+String
+^^^^^^
+
+.. code-block:: c
+
+    // Store string values
     config_set_str("app.name", "MyApp");
+    config_set_str("network.hostname", "device-001");
+    config_set_str("wifi.ssid", "MyNetwork");
+
+    // Read string
     char name[32];
     config_get_str("app.name", name, sizeof(name));
 
-    // Get string length
+    // Get string length first
     size_t len;
     config_get_str_len("app.name", &len);
+    char* dynamic_buf = malloc(len + 1);
+    config_get_str("app.name", dynamic_buf, len + 1);
 
-    // Binary blob
-    uint8_t data[] = {0x01, 0x02, 0x03, 0x04};
-    config_set_blob("app.data", data, sizeof(data));
+    // Use for configuration strings
+    char server_url[128];
+    config_get_str("network.server_url", server_url, sizeof(server_url));
 
-    uint8_t buffer[64];
+Binary Blob
+^^^^^^^^^^^
+
+.. code-block:: c
+
+    // Store binary data (certificates, keys, raw data)
+    uint8_t cert_data[] = {0x30, 0x82, 0x01, 0x0A, ...};
+    config_set_blob("security.certificate", cert_data, sizeof(cert_data));
+
+    // Store encryption key
+    uint8_t aes_key[16] = {0x00, 0x01, 0x02, ...};
+    config_set_blob("security.aes_key", aes_key, sizeof(aes_key));
+
+    // Read binary data
+    uint8_t buffer[256];
     size_t actual_size;
-    config_get_blob("app.data", buffer, sizeof(buffer), &actual_size);
+    config_get_blob("security.certificate", buffer, sizeof(buffer), &actual_size);
+
+    // Get blob size first
+    size_t blob_size;
+    config_get_blob_len("security.certificate", &blob_size);
+    uint8_t* dynamic_buf = malloc(blob_size);
+    config_get_blob("security.certificate", dynamic_buf, blob_size, &actual_size);
 
 Namespaces
 ----------
@@ -279,70 +363,278 @@ Change Notifications
 Storage Backends
 ----------------
 
-RAM Backend
-^^^^^^^^^^^
+The Config Manager supports multiple storage backends for different use cases.
+Each backend implements the same interface, allowing easy switching between
+storage types.
 
-For testing and volatile storage:
+RAM Backend (Volatile)
+^^^^^^^^^^^^^^^^^^^^^^
+
+The RAM backend stores configuration in memory. Data is lost on power cycle.
+Ideal for testing, temporary storage, and development.
 
 .. code-block:: c
 
     #include "config/config_backend.h"
 
-    // Create RAM backend
+    // Create RAM backend with 4KB buffer
     config_backend_t* ram = config_backend_ram_create(4096);
+    if (ram == NULL) {
+        printf("Failed to create RAM backend\n");
+        return -1;
+    }
+
+    // Set as active backend
     config_set_backend(ram);
 
-    // When done
+    // Use configuration normally
+    config_set_i32("app.timeout", 5000);
+    config_set_str("app.name", "TestApp");
+
+    // Data is stored in RAM
+    config_commit();  // No-op for RAM backend
+
+    // When done, destroy backend
     config_backend_ram_destroy(ram);
 
-Flash Backend
-^^^^^^^^^^^^^
+**Use cases:**
+- Unit testing
+- Temporary configuration
+- Development and debugging
+- Systems without persistent storage
 
-For persistent storage:
+Flash Backend (Persistent)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Flash backend stores configuration in non-volatile Flash memory.
+Data persists across power cycles. Requires HAL Flash driver.
 
 .. code-block:: c
 
+    #include "config/config_backend.h"
+    #include "hal/hal_flash.h"
+
+    // Define Flash partition for configuration
+    #define CONFIG_FLASH_ADDR   0x08080000  // Flash address
+    #define CONFIG_FLASH_SIZE   0x00010000  // 64KB partition
+
+    // Initialize Flash HAL
+    hal_flash_init();
+
     // Create Flash backend
     config_backend_t* flash = config_backend_flash_create(
-        FLASH_CONFIG_ADDR,    // Flash start address
-        FLASH_CONFIG_SIZE     // Partition size
+        CONFIG_FLASH_ADDR,
+        CONFIG_FLASH_SIZE
     );
+    if (flash == NULL) {
+        printf("Failed to create Flash backend\n");
+        return -1;
+    }
+
+    // Set as active backend
     config_set_backend(flash);
 
-    // Load from Flash
-    config_load();
+    // Load existing configuration from Flash
+    config_status_t status = config_load();
+    if (status != CONFIG_OK) {
+        printf("No existing config, using defaults\n");
+        // Set default values
+        config_set_i32("app.timeout", 5000);
+        config_set_str("app.name", "MyApp");
+    }
+
+    // Modify configuration
+    config_set_bool("app.debug", true);
 
     // Save to Flash
     config_commit();
 
+    // When done, destroy backend
+    config_backend_flash_destroy(flash);
+    hal_flash_deinit();
+
+**Use cases:**
+- Production systems
+- Persistent user settings
+- Device configuration
+- Calibration data
+
+**Flash considerations:**
+- Wear leveling: Flash has limited write cycles
+- Erase granularity: Flash erases in sectors/pages
+- Write time: Flash writes are slower than RAM
+- Power loss: Use atomic writes or checksums
+
 Custom Backend
 ^^^^^^^^^^^^^^
 
+Implement a custom backend for specialized storage needs (EEPROM, SD card,
+network storage, etc.).
+
 .. code-block:: c
 
-    static config_status_t my_read(void* ctx, const char* key,
-                                   void* value, size_t* size)
+    #include "config/config_backend.h"
+
+    // Custom context (your storage state)
+    typedef struct {
+        void* storage_handle;
+        uint32_t base_address;
+    } my_backend_ctx_t;
+
+    // Read function
+    static config_status_t my_backend_read(void* ctx, const char* key,
+                                           void* value, size_t* size)
     {
+        my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;
+
         // Implement read logic
+        // 1. Find key in storage
+        // 2. Read value
+        // 3. Copy to value buffer
+        // 4. Set size
+
         return CONFIG_OK;
     }
 
-    static config_status_t my_write(void* ctx, const char* key,
-                                    const void* value, size_t size)
+    // Write function
+    static config_status_t my_backend_write(void* ctx, const char* key,
+                                            const void* value, size_t size)
     {
+        my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;
+
         // Implement write logic
+        // 1. Find or allocate space for key
+        // 2. Write value
+        // 3. Update metadata
+
         return CONFIG_OK;
     }
 
-    static const config_backend_t my_backend = {
-        .read = my_read,
-        .write = my_write,
-        .erase = my_erase,
-        .commit = my_commit,
-        .ctx = &my_context
-    };
+    // Erase function
+    static config_status_t my_backend_erase(void* ctx, const char* key)
+    {
+        my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;
 
-    config_set_backend(&my_backend);
+        // Implement erase logic
+        // 1. Find key
+        // 2. Mark as deleted or reclaim space
+
+        return CONFIG_OK;
+    }
+
+    // Commit function (flush to storage)
+    static config_status_t my_backend_commit(void* ctx)
+    {
+        my_backend_ctx_t* backend = (my_backend_ctx_t*)ctx;
+
+        // Implement commit logic
+        // 1. Flush any cached writes
+        // 2. Update checksums
+        // 3. Ensure data integrity
+
+        return CONFIG_OK;
+    }
+
+    // Create custom backend
+    config_backend_t* my_backend_create(void)
+    {
+        // Allocate context
+        my_backend_ctx_t* ctx = malloc(sizeof(my_backend_ctx_t));
+        if (ctx == NULL) {
+            return NULL;
+        }
+
+        // Initialize context
+        ctx->storage_handle = open_storage();
+        ctx->base_address = 0x1000;
+
+        // Allocate backend structure
+        config_backend_t* backend = malloc(sizeof(config_backend_t));
+        if (backend == NULL) {
+            free(ctx);
+            return NULL;
+        }
+
+        // Set function pointers
+        backend->read = my_backend_read;
+        backend->write = my_backend_write;
+        backend->erase = my_backend_erase;
+        backend->commit = my_backend_commit;
+        backend->ctx = ctx;
+
+        return backend;
+    }
+
+    // Destroy custom backend
+    void my_backend_destroy(config_backend_t* backend)
+    {
+        if (backend != NULL) {
+            my_backend_ctx_t* ctx = (my_backend_ctx_t*)backend->ctx;
+            if (ctx != NULL) {
+                close_storage(ctx->storage_handle);
+                free(ctx);
+            }
+            free(backend);
+        }
+    }
+
+    // Usage
+    config_backend_t* backend = my_backend_create();
+    config_set_backend(backend);
+
+    // Use configuration
+    config_set_i32("app.value", 42);
+    config_commit();
+
+    // Cleanup
+    my_backend_destroy(backend);
+
+**Custom backend use cases:**
+- EEPROM storage
+- SD card configuration files
+- Network-based configuration (cloud sync)
+- Database storage
+- Encrypted storage with custom crypto
+
+Backend Comparison
+^^^^^^^^^^^^^^^^^^
+
++----------------+------------+------------+-------------+---------------+
+| Feature        | RAM        | Flash      | Custom      | Notes         |
++================+============+============+=============+===============+
+| Persistent     | No         | Yes        | Depends     | Across reboot |
++----------------+------------+------------+-------------+---------------+
+| Speed          | Fast       | Medium     | Varies      | Read/write    |
++----------------+------------+------------+-------------+---------------+
+| Wear leveling  | N/A        | Required   | Depends     | Write cycles  |
++----------------+------------+------------+-------------+---------------+
+| Size limit     | RAM size   | Flash size | Varies      | Storage cap   |
++----------------+------------+------------+-------------+---------------+
+| Power loss     | Data lost  | Safe       | Depends     | Data integrity|
++----------------+------------+------------+-------------+---------------+
+| Complexity     | Simple     | Medium     | High        | Implementation|
++----------------+------------+------------+-------------+---------------+
+
+Backend Selection Guide
+^^^^^^^^^^^^^^^^^^^^^^^
+
+**Choose RAM backend when:**
+- Testing and development
+- Temporary configuration
+- No persistent storage needed
+- Maximum performance required
+
+**Choose Flash backend when:**
+- Production deployment
+- Configuration must persist
+- Limited RAM available
+- Standard embedded system
+
+**Choose Custom backend when:**
+- Special storage requirements
+- External storage (SD, EEPROM)
+- Network/cloud synchronization
+- Custom encryption or compression
 
 Import/Export
 -------------

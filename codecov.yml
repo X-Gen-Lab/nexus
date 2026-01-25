@@ -1,0 +1,91 @@
+# Codecov Configuration for Nexus Native HAL Validation
+# https://docs.codecov.io/docs/codecov-yaml
+
+codecov:
+  require_ci_to_pass: yes
+  notify:
+    wait_for_ci: yes
+    after_n_builds: 1
+
+coverage:
+  precision: 2
+  round: down
+  range: "95...100"
+
+  status:
+    project:
+      default:
+        target: 100%
+        threshold: 0.5%
+        if_ci_failed: error
+        informational: false
+        only_pulls: false
+
+      # Separate status for HAL implementation
+      hal:
+        target: 100%
+        threshold: 0.3%
+        paths:
+          - "hal/"
+          - "platforms/native/"
+
+      # Separate status for OSAL implementation
+      osal:
+        target: 100%
+        threshold: 0.3%
+        paths:
+          - "osal/"
+
+    patch:
+      default:
+        target: 95%
+        threshold: 1%
+        if_ci_failed: error
+        informational: false
+        only_pulls: true
+
+  # Coverage thresholds
+  thresholds:
+    project:
+      default:
+        target: 100%
+        threshold: 0.5%
+    patch:
+      default:
+        target: 95%
+        threshold: 1%
+
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+  require_changes: false
+  require_base: no
+  require_head: yes
+  show_carryforward_flags: true
+
+# GitHub status checks
+github_checks:
+  annotations: true
+
+# Notifications
+slack:
+  enabled: false
+
+flags:
+  native-hal:
+    paths:
+      - platforms/native/
+      - hal/
+      - osal/
+    carryforward: false
+
+ignore:
+  - "ext/**/*"
+  - "tests/**/*"
+  - "build/**/*"
+  - "docs/**/*"
+  - "scripts/**/*"
+  - "cmake/**/*"
+  - "**/*.md"
+  - "**/*.txt"
+

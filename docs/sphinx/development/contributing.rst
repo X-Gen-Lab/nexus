@@ -18,23 +18,23 @@ Prerequisites
 
 **Linux (Ubuntu/Debian)**::
 
-    sudo apt-get install cmake gcc g++ git
+    sudo apt-get install CMake gcc g++ git
 
 **macOS**::
 
-    brew install cmake git
+    brew install CMake git
 
 Clone and Build
 ~~~~~~~~~~~~~~~
 
-::
+
 
     git clone https://github.com/nexus-platform/nexus.git
     cd nexus
 
     # Native build (for testing)
-    cmake -B build -DCMAKE_BUILD_TYPE=Debug -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
-    cmake --build build --config Debug
+    CMake -B build -DCMAKE_BUILD_TYPE=Debug -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
+    CMake --build build --config Debug
 
     # Run tests
     ctest --test-dir build -C Debug --output-on-failure
@@ -112,7 +112,7 @@ Types
 Examples
 ~~~~~~~~
 
-::
+
 
     feat(hal): add PWM support for STM32F4
 
@@ -128,8 +128,8 @@ Pre-Submit Checklist
 Before submitting a PR, verify locally::
 
     # 1. Build passes
-    cmake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
-    cmake --build build --config Release
+    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
+    CMake --build build --config Release
 
     # 2. Tests pass
     ctest --test-dir build -C Release --output-on-failure

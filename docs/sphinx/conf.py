@@ -27,6 +27,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.mermaid',
 ]
 
 templates_path = ['_templates']
@@ -54,12 +55,40 @@ gettext_location = True
 # Additional targets for translation extraction
 gettext_additional_targets = ['literal-block', 'doctest-block', 'raw', 'image']
 
+# Supported languages
+supported_languages = {
+    'en': 'English',
+    'zh_CN': '中文 (简体)',
+}
+
+# Language-specific settings
+if language == 'zh_CN':
+    # Chinese-specific search configuration
+    html_search_language = 'zh'
+    # Enhanced Chinese search with word segmentation
+    html_search_options = {
+        'type': 'default',
+        'lang': 'zh',
+    }
+else:
+    html_search_language = 'en'
+    # Enhanced English search
+    html_search_options = {
+        'type': 'default',
+        'lang': 'en',
+    }
+
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
 html_logo = None
 html_favicon = None
+
+# Custom CSS
+html_css_files = [
+    'custom.css',
+]
 
 # Language-specific theme options
 html_theme_options = {
@@ -71,6 +100,9 @@ html_theme_options = {
     'github_type': 'star',
     'fixed_sidebar': True,
     'sidebar_collapse': True,
+    # Navigation options
+    'show_related': True,
+    'show_relbars': True,
 }
 
 html_sidebars = {
@@ -83,6 +115,13 @@ html_sidebars = {
     ]
 }
 
+# Additional sidebar templates
+# These are included in the page content, not the sidebar
+html_additional_pages = {}
+
+# Show relations bar (previous/next) at top and bottom of page
+html_show_sphinx = True
+
 # Add language switcher context
 html_context = {
     'languages': [
@@ -91,6 +130,29 @@ html_context = {
     ],
     'current_language': language,
 }
+
+# Enhanced search configuration
+html_search_options = {
+    'type': 'default',
+}
+
+# Show source link
+html_show_sourcelink = True
+
+# Show copyright in footer
+html_show_copyright = True
+
+# Show Sphinx info in footer
+html_show_sphinx = True
+
+# Add "Edit on GitHub" links
+html_context.update({
+    'display_github': True,
+    'github_user': 'nexus-team',
+    'github_repo': 'nexus',
+    'github_version': 'main',
+    'conf_py_path': '/docs/sphinx/',
+})
 
 # -- Breathe configuration ---------------------------------------------------
 # Note: Doxygen must be run first from project root: doxygen Doxyfile
@@ -103,7 +165,55 @@ breathe_default_project = 'nexus'
 breathe_default_members = ('members', 'undoc-members')
 
 # Suppress breathe warnings if Doxygen XML not found
-suppress_warnings = ['breathe.doxygen']
+# Also suppress duplicate C++ declaration warnings from forward declarations
+suppress_warnings = [
+    'breathe.doxygen',
+    'cpp.duplicate_declaration',
+    'ref.cpp'
+]
+
+# -- Mermaid configuration ---------------------------------------------------
+# Mermaid is used for creating diagrams from text descriptions
+# Supported diagram types: flowchart, sequence, class, state, ER, etc.
+
+mermaid_version = "10.6.1"  # Use specific version for consistency
+mermaid_init_js = """
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    themeVariables: {
+        primaryColor: '#667eea',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#5568d3',
+        lineColor: '#667eea',
+        secondaryColor: '#764ba2',
+        tertiaryColor: '#f093fb'
+    },
+    flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+    },
+    sequence: {
+        useMaxWidth: true,
+        mirrorActors: true
+    }
+});
+"""
+
+# -- Graphviz configuration --------------------------------------------------
+# Graphviz is used for generating graphs and diagrams
+# Note: Graphviz must be installed on the system
+
+graphviz_output_format = 'svg'  # Use SVG for better quality
+graphviz_dot_args = [
+    '-Gfontname=Arial',
+    '-Nfontname=Arial',
+    '-Efontname=Arial',
+    '-Gfontsize=10',
+    '-Nfontsize=10',
+    '-Efontsize=10',
+]
 
 # -- Todo extension configuration --------------------------------------------
 
@@ -124,6 +234,20 @@ source_suffix = '.rst'
 # -- Master document ---------------------------------------------------------
 
 master_doc = 'index'
+
+# -- Index generation --------------------------------------------------------
+
+# Generate index for configuration options
+html_domain_indices = True
+
+# Generate module index
+html_use_modindex = True
+
+# Generate index
+html_use_index = True
+
+# Split index by letter
+html_split_index = False
 
 # -- Intersphinx configuration -----------------------------------------------
 

@@ -8,12 +8,12 @@ msgstr ""
 "POT-Creation-Date: 2026-01-18 00:13+0800\n"
 "PO-Revision-Date: 2026-01-15 01:30+0800\n"
 "Last-Translator: Nexus Team\n"
-"Language: zh_CN\n"
 "Language-Team: Chinese\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.16.0\n"
 
 #: ../../user_guide/shell.rst:2 450983a6664341adaccde0f2a3555ae7
@@ -26,8 +26,8 @@ msgstr "概述"
 
 #: ../../user_guide/shell.rst:7 97be938fb53449e9ab9fb0daa006fd95
 msgid ""
-"The Shell Framework provides an interactive command-line interface (CLI) "
-"for the Nexus embedded platform. It supports command registration, line "
+"The Shell Framework provides an interactive command-line interface (CLI) for"
+" the Nexus embedded platform. It supports command registration, line "
 "editing, command history, auto-completion, and multiple I/O backends."
 msgstr "Shell 框架为 Nexus 嵌入式平台提供交互式命令行界面（CLI）。它支持命令注册、行编辑、命令历史、自动补全和多种 I/O 后端。"
 
@@ -36,7 +36,8 @@ msgid "Features"
 msgstr "特性"
 
 #: ../../user_guide/shell.rst:14 dc50c16b63024bb78ef5256212536b09
-msgid "**Command Registration**: Dynamic command registration with help and usage"
+msgid ""
+"**Command Registration**: Dynamic command registration with help and usage"
 msgstr "**命令注册**: 动态注册命令，支持帮助和用法说明"
 
 #: ../../user_guide/shell.rst:15 d1b782347a9042ec8537430d3815e66c
@@ -134,6 +135,58 @@ msgid ""
 "    shell_process();\n"
 "}"
 msgstr ""
+"#include \"shell/shell.h\"\n"
+"\n"
+"// Custom command handler\n"
+"static int cmd_led(int argc, char* argv[])\n"
+"{\n"
+"    if (argc < 2) {\n"
+"        shell_printf(\"Usage: led <on|off>\\r\\n\");\n"
+"        return -1;\n"
+"    }\n"
+"\n"
+"    if (strcmp(argv[1], \"on\") == 0) {\n"
+"        hal_gpio_write(LED_PIN, 1);\n"
+"        shell_printf(\"LED turned on\\r\\n\");\n"
+"    } else if (strcmp(argv[1], \"off\") == 0) {\n"
+"        hal_gpio_write(LED_PIN, 0);\n"
+"        shell_printf(\"LED turned off\\r\\n\");\n"
+"    }\n"
+"    return 0;\n"
+"}\n"
+"\n"
+"// Command definition\n"
+"static const shell_command_t led_cmd = {\n"
+"    .name = \"led\",\n"
+"    .handler = cmd_led,\n"
+"    .help = \"Control LED state\",\n"
+"    .usage = \"led <on|off>\"\n"
+"};\n"
+"\n"
+"void app_init(void)\n"
+"{\n"
+"    // Initialize Shell\n"
+"    shell_config_t config = SHELL_CONFIG_DEFAULT;\n"
+"    shell_init(&config);\n"
+"\n"
+"    // Set backend (UART)\n"
+"    shell_set_backend(&shell_uart_backend);\n"
+"\n"
+"    // Register built-in commands\n"
+"    shell_register_builtin_commands();\n"
+"\n"
+"    // Register custom command\n"
+"    shell_register_command(&led_cmd);\n"
+"\n"
+"    // Print prompt\n"
+"    shell_print_prompt();\n"
+"}\n"
+"\n"
+"void app_loop(void)\n"
+"{\n"
+"    // Process Shell input (non-blocking)\n"
+"    shell_process();\n"
+"}"
 
 #: ../../user_guide/shell.rst:85 15ac875ac387413eb762a5664b30c918
 msgid "Configuration"
@@ -154,6 +207,14 @@ msgid ""
 "\n"
 "shell_init(&config);"
 msgstr ""
+"shell_config_t config = {\n"
+"    .prompt = \"nexus> \",        // Custom prompt\n"
+"    .cmd_buffer_size = 128,     // Command buffer size\n"
+"    .history_depth = 16,        // History depth\n"
+"    .max_commands = 64          // Max command count\n"
+"};\n"
+"\n"
+"shell_init(&config);"
 
 #: ../../user_guide/shell.rst:100 d7e8e5237a404541925ba513aa866150
 msgid "**Default configuration:**"
@@ -177,12 +238,12 @@ msgstr "描述"
 
 #: ../../user_guide/shell.rst:105 2fb65ba9b5c642ae94bf7f66a8623122
 msgid "``prompt``"
-msgstr ""
+msgstr "``prompt``"
 
 #: ../../user_guide/shell.rst:105 ../../user_guide/shell.rst:328
 #: 7d660894b9e9439e8bc0df37ac6c9da6 f75549dafc2840a19faae06509cfa1e0
 msgid "``\"$ \"``"
-msgstr ""
+msgstr "``\"$ \"``"
 
 #: ../../user_guide/shell.rst:105 0ceed8ffe26d48908a7cea22260801c7
 msgid "Shell prompt string"
@@ -196,7 +257,7 @@ msgstr "命令缓冲区大小"
 #: ../../user_guide/shell.rst:107 ../../user_guide/shell.rst:322
 #: 2577b78a13a1489b9dc855d0e3ba17c1 9d2e7623ade64c7486ac3e90c836ad47
 msgid "``128``"
-msgstr ""
+msgstr "``128``"
 
 #: ../../user_guide/shell.rst:107 0a8e454722cb49af8898cf5fccd1987c
 msgid "Command buffer size"
@@ -210,7 +271,7 @@ msgstr "默认历史深度"
 #: ../../user_guide/shell.rst:109 ../../user_guide/shell.rst:324
 #: 2082887939de444e892d09711ccf1baf 83611be0b8d24eba8b01e06ff1b8a542
 msgid "``8``"
-msgstr ""
+msgstr "``8``"
 
 #: ../../user_guide/shell.rst:109 f27ebd307de34a6d8f346d9a1b6851d1
 msgid "History entry count"
@@ -224,7 +285,7 @@ msgstr "命令"
 #: ../../user_guide/shell.rst:111 ../../user_guide/shell.rst:320
 #: 498ecd8a760f4f1e88ad27381755fb62 7901651921724daba13731a4d41d5cf5
 msgid "``32``"
-msgstr ""
+msgstr "``32``"
 
 #: ../../user_guide/shell.rst:111 c25301662f284a00a0b19d2b20b0775a
 msgid "Max registered commands"
@@ -248,6 +309,13 @@ msgid ""
 "    shell_completion_t completion;  // Auto-completion (optional)\n"
 "} shell_command_t;"
 msgstr ""
+"typedef struct {\n"
+"    const char* name;               // Command name\n"
+"    shell_cmd_handler_t handler;    // Handler function\n"
+"    const char* help;               // Help text\n"
+"    const char* usage;              // Usage string\n"
+"    shell_completion_t completion;  // Auto-completion (optional)\n"
+"} shell_command_t;"
 
 #: ../../user_guide/shell.rst:129 ec958fdfb2a848a697cad8d9a9bc19cb
 msgid "**Handler function signature:**"
@@ -255,7 +323,7 @@ msgstr "**处理函数签名：**"
 
 #: ../../user_guide/shell.rst:131 358e8f0a07d74f0d8145c07001c4f03b
 msgid "typedef int (*shell_cmd_handler_t)(int argc, char* argv[]);"
-msgstr ""
+msgstr "typedef int (*shell_cmd_handler_t)(int argc, char* argv[]);"
 
 #: ../../user_guide/shell.rst:135 8b471e617c5141afb5fd492e84364b60
 msgid "``argc``: Argument count (including command name)"
@@ -276,8 +344,7 @@ msgstr "**带自动补全的命令示例：**"
 #: ../../user_guide/shell.rst:141 f2dfd05641124408b3613db3ad0cb00c
 msgid ""
 "// Auto-completion function\n"
-"static int led_completion(const char* partial, char* completions[], int "
-"max)\n"
+"static int led_completion(const char* partial, char* completions[], int max)\n"
 "{\n"
 "    const char* options[] = {\"on\", \"off\", \"toggle\", \"status\"};\n"
 "    int count = 0;\n"
@@ -298,6 +365,27 @@ msgid ""
 "    .completion = led_completion\n"
 "};"
 msgstr ""
+"// Auto-completion function\n"
+"static int led_completion(const char* partial, char* completions[], int max)\n"
+"{\n"
+"    const char* options[] = {\"on\", \"off\", \"toggle\", \"status\"};\n"
+"    int count = 0;\n"
+"\n"
+"    for (int i = 0; i < 4 && count < max; i++) {\n"
+"        if (strncmp(options[i], partial, strlen(partial)) == 0) {\n"
+"            completions[count++] = (char*)options[i];\n"
+"        }\n"
+"    }\n"
+"    return count;\n"
+"}\n"
+"\n"
+"static const shell_command_t led_cmd = {\n"
+"    .name = \"led\",\n"
+"    .handler = cmd_led,\n"
+"    .help = \"Control LED state\",\n"
+"    .usage = \"led <on|off|toggle|status>\",\n"
+"    .completion = led_completion\n"
+"};"
 
 #: ../../user_guide/shell.rst:166 f63deeed03a549acafb6975146a2ad5b
 msgid "Built-in Commands"
@@ -313,7 +401,7 @@ msgstr "用法"
 
 #: ../../user_guide/shell.rst:171 8d0d4589cf2346e881fae8ac03b495cc
 msgid "``help``"
-msgstr ""
+msgstr "``help``"
 
 #: ../../user_guide/shell.rst:171 868db8d6e9da4d45aaecef85dbbfc054
 msgid "Show available commands"
@@ -321,12 +409,12 @@ msgstr "显示可用命令"
 
 #: ../../user_guide/shell.rst:171 eae8dd89cdb744368b56676e1b1a6a1f
 msgid "``help [command]``"
-msgstr ""
+msgstr "``help [command]``"
 
 #: ../../user_guide/shell.rst:173 1b5e094d94234535a6e21824dc20f415
 #: b3c689c4d0674c6883a1e18a7be16982
 msgid "``version``"
-msgstr ""
+msgstr "``version``"
 
 #: ../../user_guide/shell.rst:173 756a11a98df1484b8090c1cae0920d18
 msgid "Show Shell version"
@@ -335,7 +423,7 @@ msgstr "显示 Shell 版本"
 #: ../../user_guide/shell.rst:175 605a0828873b46aa8a405e6dfb62e7d8
 #: 964f5cd4126c415bb2fcbc508a83ef21
 msgid "``clear``"
-msgstr ""
+msgstr "``clear``"
 
 #: ../../user_guide/shell.rst:175 0981a7e24d5e49c29c465779469059d9
 msgid "Clear terminal screen"
@@ -353,7 +441,7 @@ msgstr "显示命令历史"
 
 #: ../../user_guide/shell.rst:179 278ee6af60654c30852051399b897939
 msgid "``echo``"
-msgstr ""
+msgstr "``echo``"
 
 #: ../../user_guide/shell.rst:179 f6001ef3821b44b6b1042f7fb35b3848
 msgid "Print arguments"
@@ -361,7 +449,7 @@ msgstr "打印参数"
 
 #: ../../user_guide/shell.rst:179 fc475470fdc445b4b4d2b02491fe9460
 msgid "``echo [text...]``"
-msgstr ""
+msgstr "``echo [text...]``"
 
 #: ../../user_guide/shell.rst:183 22f8acf80823482fb720a857b906df35
 msgid "Line Editing Keys"
@@ -377,7 +465,7 @@ msgstr "功能"
 
 #: ../../user_guide/shell.rst:188 58113150eff74de2a812c93491c6ef45
 msgid "``←`` / ``Ctrl+B``"
-msgstr ""
+msgstr "``←`` / ``Ctrl+B``"
 
 #: ../../user_guide/shell.rst:188 7b2d06ed6b2145dd8d3cc251f377e001
 msgid "Move cursor left"
@@ -385,7 +473,7 @@ msgstr "光标左移"
 
 #: ../../user_guide/shell.rst:190 d47b8121e8404afda4f3df12bdbe37e1
 msgid "``→`` / ``Ctrl+F``"
-msgstr ""
+msgstr "``→`` / ``Ctrl+F``"
 
 #: ../../user_guide/shell.rst:190 acbf16ec179147c1abc8ef27eb44afe8
 msgid "Move cursor right"
@@ -393,7 +481,7 @@ msgstr "光标右移"
 
 #: ../../user_guide/shell.rst:192 35d349a3363645c7a181bc3d42e8f86d
 msgid "``Home`` / ``Ctrl+A``"
-msgstr ""
+msgstr "``Home`` / ``Ctrl+A``"
 
 #: ../../user_guide/shell.rst:192 ec03b7e31c3746e384d53da40a4bdb79
 msgid "Move to line start"
@@ -401,7 +489,7 @@ msgstr "移到行首"
 
 #: ../../user_guide/shell.rst:194 08fb313e4ef145978687851d1c06191a
 msgid "``End`` / ``Ctrl+E``"
-msgstr ""
+msgstr "``End`` / ``Ctrl+E``"
 
 #: ../../user_guide/shell.rst:194 967bc071777443d281906e405aa167d2
 msgid "Move to line end"
@@ -409,7 +497,7 @@ msgstr "移到行尾"
 
 #: ../../user_guide/shell.rst:196 4f497ca3d3f04aa6ab59ff1d1d4ec849
 msgid "``Backspace``"
-msgstr ""
+msgstr "``Backspace``"
 
 #: ../../user_guide/shell.rst:196 7fa489fc95dd459c97df7326494a9b1f
 msgid "Delete previous character"
@@ -417,7 +505,7 @@ msgstr "删除前一字符"
 
 #: ../../user_guide/shell.rst:198 d7424859a48f49deb20a07e18597616c
 msgid "``Delete`` / ``Ctrl+D``"
-msgstr ""
+msgstr "``Delete`` / ``Ctrl+D``"
 
 #: ../../user_guide/shell.rst:198 4260605c9da3415188009fc69d0f3f29
 msgid "Delete current character"
@@ -425,7 +513,7 @@ msgstr "删除当前字符"
 
 #: ../../user_guide/shell.rst:200 5721114392134c819db0438518dc5ddb
 msgid "``Ctrl+K``"
-msgstr ""
+msgstr "``Ctrl+K``"
 
 #: ../../user_guide/shell.rst:200 87e3ea8646ea435792aa1c00b5c699bb
 msgid "Delete to end of line"
@@ -433,7 +521,7 @@ msgstr "删除到行尾"
 
 #: ../../user_guide/shell.rst:202 486e33e88545419cb671a3daf10d8db0
 msgid "``Ctrl+U``"
-msgstr ""
+msgstr "``Ctrl+U``"
 
 #: ../../user_guide/shell.rst:202 2c2d652d6e04472da3695d8113db00e2
 msgid "Delete to start of line"
@@ -441,7 +529,7 @@ msgstr "删除到行首"
 
 #: ../../user_guide/shell.rst:204 91b8b0a0cd9546b093e9548d4593f234
 msgid "``↑`` / ``Ctrl+P``"
-msgstr ""
+msgstr "``↑`` / ``Ctrl+P``"
 
 #: ../../user_guide/shell.rst:204 19a70424db5a4ba8920d0b97f6791304
 msgid "Previous history"
@@ -449,7 +537,7 @@ msgstr "上一条历史"
 
 #: ../../user_guide/shell.rst:206 054c2a3007004787ba658bb8c6f24711
 msgid "``↓`` / ``Ctrl+N``"
-msgstr ""
+msgstr "``↓`` / ``Ctrl+N``"
 
 #: ../../user_guide/shell.rst:206 afed1fc3e94043138f7f13b05d9a66d5
 msgid "Next history"
@@ -457,7 +545,7 @@ msgstr "下一条历史"
 
 #: ../../user_guide/shell.rst:208 77ec6a4d684a41a88ccbc597f3212b79
 msgid "``Tab``"
-msgstr ""
+msgstr "``Tab``"
 
 #: ../../user_guide/shell.rst:208 3035474a4f5f4d2492fc9bd11ba6159c
 msgid "Auto-complete"
@@ -465,7 +553,7 @@ msgstr "自动补全"
 
 #: ../../user_guide/shell.rst:210 48db2a5405214da0bcd8a19be915cbf9
 msgid "``Ctrl+C``"
-msgstr ""
+msgstr "``Ctrl+C``"
 
 #: ../../user_guide/shell.rst:210 04cbd76894a44da1bfccd5872de063f0
 msgid "Cancel current input"
@@ -473,7 +561,7 @@ msgstr "取消当前输入"
 
 #: ../../user_guide/shell.rst:212 a9fae1cee16f4073aceb57e94225990b
 msgid "``Ctrl+L``"
-msgstr ""
+msgstr "``Ctrl+L``"
 
 #: ../../user_guide/shell.rst:212 e05fd969fc8d4aa682f219cad3b7beac
 msgid "Clear screen"
@@ -503,6 +591,19 @@ msgid ""
 "// Use UART backend\n"
 "shell_set_backend(&shell_uart_backend);"
 msgstr ""
+"#include \"shell/shell_backend.h\"\n"
+"\n"
+"// Initialize UART\n"
+"hal_uart_config_t uart_cfg = {\n"
+"    .baudrate = 115200,\n"
+"    .wordlen = HAL_UART_WORDLEN_8,\n"
+"    .stopbits = HAL_UART_STOPBITS_1,\n"
+"    .parity = HAL_UART_PARITY_NONE\n"
+"};\n"
+"hal_uart_init(HAL_UART_0, &uart_cfg);\n"
+"\n"
+"// Use UART backend\n"
+"shell_set_backend(&shell_uart_backend);"
 
 #: ../../user_guide/shell.rst:238 8130c336bdea4ee1ab45c784f7698833
 msgid "Custom Backend"
@@ -529,6 +630,24 @@ msgid ""
 "\n"
 "shell_set_backend(&my_backend);"
 msgstr ""
+"static int my_read(char* buf, size_t len)\n"
+"{\n"
+"    // Implement read logic\n"
+"    return bytes_read;\n"
+"}\n"
+"\n"
+"static int my_write(const char* buf, size_t len)\n"
+"{\n"
+"    // Implement write logic\n"
+"    return bytes_written;\n"
+"}\n"
+"\n"
+"static const shell_backend_t my_backend = {\n"
+"    .read = my_read,\n"
+"    .write = my_write\n"
+"};\n"
+"\n"
+"shell_set_backend(&my_backend);"
 
 #: ../../user_guide/shell.rst:262 8df3094d9cab47d691814be40bd4b2b9
 msgid "Output Functions"
@@ -552,6 +671,20 @@ msgid ""
 "// Clear screen\n"
 "shell_clear_screen();"
 msgstr ""
+"// Formatted output\n"
+"shell_printf(\"Value: %d\\r\\n\", 42);\n"
+"\n"
+"// String output\n"
+"shell_puts(\"Hello World\\r\\n\");\n"
+"\n"
+"// Character output\n"
+"shell_putc('A');\n"
+"\n"
+"// Print prompt\n"
+"shell_print_prompt();\n"
+"\n"
+"// Clear screen\n"
+"shell_clear_screen();"
 
 #: ../../user_guide/shell.rst:282 e8ff25859a5d40f5b53494969e71191b
 msgid "Error Handling"
@@ -566,6 +699,11 @@ msgid ""
 "    printf(\"Error: %s\\n\", msg);\n"
 "}"
 msgstr ""
+"shell_status_t status = shell_register_command(&cmd);\n"
+"if (status != SHELL_OK) {\n"
+"    const char* msg = shell_get_error_message(status);\n"
+"    printf(\"Error: %s\\n\", msg);\n"
+"}"
 
 #: ../../user_guide/shell.rst:292 4705d00a5be84c49b58257e81689b49b
 msgid "**Status codes:**"
@@ -577,7 +715,7 @@ msgstr "状态"
 
 #: ../../user_guide/shell.rst:297 692d4bd30ead458aa4349654391c4cc0
 msgid "``SHELL_OK``"
-msgstr ""
+msgstr "``SHELL_OK``"
 
 #: ../../user_guide/shell.rst:297 6f2d4effae714bed960ca6ce3438895b
 msgid "Success"
@@ -585,7 +723,7 @@ msgstr "成功"
 
 #: ../../user_guide/shell.rst:299 ffa9f49c3dc04dbfb466eb12dbe58b16
 msgid "``SHELL_ERROR_INVALID_PARAM``"
-msgstr ""
+msgstr "``SHELL_ERROR_INVALID_PARAM``"
 
 #: ../../user_guide/shell.rst:299 b60adbc7e84e48788dbc57a8f06dfe9f
 msgid "Invalid parameter"
@@ -593,7 +731,7 @@ msgstr "无效参数"
 
 #: ../../user_guide/shell.rst:301 30ed2670b1e14856a811452ebeda5f67
 msgid "``SHELL_ERROR_NOT_INIT``"
-msgstr ""
+msgstr "``SHELL_ERROR_NOT_INIT``"
 
 #: ../../user_guide/shell.rst:301 1c8519ce6f3040398d4488cd71546762
 msgid "Not initialized"
@@ -601,7 +739,7 @@ msgstr "未初始化"
 
 #: ../../user_guide/shell.rst:303 cf4eb762b49643efa930fa412a0c6e02
 msgid "``SHELL_ERROR_ALREADY_INIT``"
-msgstr ""
+msgstr "``SHELL_ERROR_ALREADY_INIT``"
 
 #: ../../user_guide/shell.rst:303 8a01799af7ee41f6bea95c86739e1840
 msgid "Already initialized"
@@ -609,7 +747,7 @@ msgstr "已初始化"
 
 #: ../../user_guide/shell.rst:305 8fa02225a80e46d395db7ba3699a4166
 msgid "``SHELL_ERROR_NO_BACKEND``"
-msgstr ""
+msgstr "``SHELL_ERROR_NO_BACKEND``"
 
 #: ../../user_guide/shell.rst:305 2deae50e9f024276964e503a98484cc3
 msgid "No backend configured"
@@ -617,7 +755,7 @@ msgstr "未配置后端"
 
 #: ../../user_guide/shell.rst:307 54886fc39c2d425488d98abe45f4196e
 msgid "``SHELL_ERROR_CMD_NOT_FOUND``"
-msgstr ""
+msgstr "``SHELL_ERROR_CMD_NOT_FOUND``"
 
 #: ../../user_guide/shell.rst:307 515ceae1995f4a898ffaf930e56efda1
 msgid "Command not found"
@@ -625,7 +763,7 @@ msgstr "命令未找到"
 
 #: ../../user_guide/shell.rst:309 345b81fc27c3402caee0f32abb197e24
 msgid "``SHELL_ERROR_CMD_EXISTS``"
-msgstr ""
+msgstr "``SHELL_ERROR_CMD_EXISTS``"
 
 #: ../../user_guide/shell.rst:309 2304bd3fff5846278dcdf444c0b13566
 msgid "Command already exists"
@@ -633,7 +771,7 @@ msgstr "命令已存在"
 
 #: ../../user_guide/shell.rst:311 e2d175ab1a2549aab43e3297b7e27d23
 msgid "``SHELL_ERROR_BUFFER_FULL``"
-msgstr ""
+msgstr "``SHELL_ERROR_BUFFER_FULL``"
 
 #: ../../user_guide/shell.rst:311 65b365b2df5f4f448474c9814405acf6
 msgid "Buffer full"
@@ -649,7 +787,7 @@ msgstr "宏定义"
 
 #: ../../user_guide/shell.rst:320 f6c35af495a04212b3c733e64a2a3112
 msgid "``SHELL_MAX_COMMANDS``"
-msgstr ""
+msgstr "``SHELL_MAX_COMMANDS``"
 
 #: ../../user_guide/shell.rst:320 1ac50384eced4a7c8f564f0b6ba42cf1
 msgid "Max command count"
@@ -657,7 +795,7 @@ msgstr "最大命令数"
 
 #: ../../user_guide/shell.rst:322 03cb6265b53f41bb9e5e600189f144f3
 msgid "``SHELL_DEFAULT_CMD_BUFFER_SIZE``"
-msgstr ""
+msgstr "``SHELL_DEFAULT_CMD_BUFFER_SIZE``"
 
 #: ../../user_guide/shell.rst:322 3ebfd6c477cd4bddad8466665382449a
 msgid "Default command buffer"
@@ -674,11 +812,11 @@ msgstr "默认历史深度"
 
 #: ../../user_guide/shell.rst:326 122a2c8e94b740d09cba7638c12ba185
 msgid "``SHELL_MAX_ARGS``"
-msgstr ""
+msgstr "``SHELL_MAX_ARGS``"
 
 #: ../../user_guide/shell.rst:326 3665026f97b748fbbdf0bb7005e58c82
 msgid "``16``"
-msgstr ""
+msgstr "``16``"
 
 #: ../../user_guide/shell.rst:326 c463b589fb9b40e99e576af95f338e26
 msgid "Max argument count"
@@ -712,4 +850,3 @@ msgstr "API 参考"
 #: ../../user_guide/shell.rst:340 2651f0b03f2146ccb6e308c4d5455c61
 msgid "See :doc:`../api/shell` for complete API documentation."
 msgstr "完整 API 文档请参阅 :doc:`../api/shell`。"
-

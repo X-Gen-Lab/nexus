@@ -1,0 +1,479 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Nexus Team
+# This file is distributed under the same license as the Nexus Embedded
+# Platform package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../reference/kconfig_index.rst:2 fe08dabd9c9f4276bc2624a5e5796681
+msgid "Configuration Options Index"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:4 18b128f05bb94c22a9c90ed76b64f829
+msgid ""
+"This page provides a comprehensive index of all Kconfig configuration "
+"options available in the Nexus Embedded Platform."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:8 9f5df1337ece4cd4b29e38f68ed50856
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../reference/kconfig_index.rst:11 43bf2b46f3b241d4a8cc58df03747a2e
+msgid "Platform Configuration"
+msgstr "平台配置"
+
+#: ../../reference/kconfig_index.rst:14 c7fb84cdc5534d5ab04bf056dd76d9f8
+msgid "Platform Selection"
+msgstr "平台选择"
+
+#: ../../reference/kconfig_index.rst:24 3343d6695d9142b6bff2a9908f930c70
+msgid "``PLATFORM`` - Target platform selection"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:25 7191c2927e0548649f015142743ee4ed
+msgid "``PLATFORM_NATIVE`` - Native platform (Linux/Windows/macOS)"
+msgstr "``PLATFORM_NATIVE`` - Native platform (Linux/Windows/macOS)"
+
+#: ../../reference/kconfig_index.rst:26 98af65bb52a34ddaad7658446426d119
+msgid "``PLATFORM_STM32F4`` - STM32F4 series MCUs"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:27 25ac8a1b68fc4e42b862cbe574a90c06
+msgid "``PLATFORM_STM32H7`` - STM32H7 series MCUs"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:28 5dc7239ab3544297809dc1d8c8d50cd5
+msgid "``PLATFORM_GD32`` - GigaDevice GD32 series MCUs"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:29 d15e99122e994c038bd400732c7cdf78
+msgid "``PLATFORM_ESP32`` - Espressif ESP32 series"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:31 16fba08237db401cb14fd58c27f22792
+msgid ""
+"See :doc:`../user_guide/kconfig_platforms` for detailed platform "
+"configuration."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:34 bfd6a851f3df44f2b6f64d13e7e79310
+msgid "Chip Selection"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:42 0b7c92457c6645b792d342444b8fca9e
+msgid "STM32F4 Series:"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:44 6e9b04ae74074f258c4aa3fc58674edf
+msgid "``CHIP_STM32F407`` - STM32F407 MCU"
+msgstr "``CHIP_STM32F407`` - STM32F407 MCU"
+
+#: ../../reference/kconfig_index.rst:45 9ab8f101c6d64a9e9b0cec2f7d43b62f
+msgid "``CHIP_STM32F429`` - STM32F429 MCU"
+msgstr "``CHIP_STM32F429`` - STM32F429 MCU"
+
+#: ../../reference/kconfig_index.rst:47 1a0d47fe27744cb497bd2424666e938d
+msgid "STM32H7 Series:"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:49 6662691292a94940bc5cfa2ee6559d01
+msgid "``CHIP_STM32H743`` - STM32H743 MCU"
+msgstr "``CHIP_STM32H743`` - STM32H743 MCU"
+
+#: ../../reference/kconfig_index.rst:50 891c4e17468344a68c37ceee150d9507
+msgid "``CHIP_STM32H750`` - STM32H750 MCU"
+msgstr "``CHIP_STM32H750`` - STM32H750 MCU"
+
+#: ../../reference/kconfig_index.rst:53 7ea455dbe1ee499ab7eaef012fdab373
+msgid "OSAL Configuration"
+msgstr "OSAL 配置"
+
+#: ../../reference/kconfig_index.rst:56 aa96b5311a9f4ad68d1f2022b37fa7e4
+msgid "Backend Selection"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:65 5f1f0145571943ff850b067635416250
+msgid "``OSAL_BACKEND`` - OSAL backend selection"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:66 d39b81f9400c4aaa9eb50880413f5ade
+msgid "``OSAL_BAREMETAL`` - Bare-metal (no RTOS)"
+msgstr "``OSAL_BAREMETAL`` - Bare-metal (no RTOS)"
+
+#: ../../reference/kconfig_index.rst:67 241a54039cd046ae95c8c5eb4a4cbeae
+msgid "``OSAL_FREERTOS`` - FreeRTOS backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:68 da32e226ff6f4e3e9f6e79bc486bd34d
+msgid "``OSAL_RTTHREAD`` - RT-Thread backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:69 48bc1352784a471b8d4497bbd67a3a2c
+msgid "``OSAL_ZEPHYR`` - Zephyr RTOS backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:71 117bfd63fab84922a67bbad1541c35d5
+msgid "See :doc:`../user_guide/kconfig_osal` for OSAL backend configuration."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:74 04267bd47f074b75b32b72c3d4fbaa16
+msgid "FreeRTOS Configuration"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:82 60176f4f66ae4f59a6f79627ce47adbc
+msgid "``FREERTOS_HEAP_SIZE`` - FreeRTOS heap size in bytes"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:83 8876af8dbf9c476b9572026cb1b24f2c
+msgid "``FREERTOS_TOTAL_HEAP_SIZE`` - Total heap size"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:84 75907d7174924b6e8812c94815a17c7f
+msgid "``FREERTOS_MINIMAL_STACK_SIZE`` - Minimum stack size for tasks"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:85 02d338c154314ed0b9d0effac720f0bd
+msgid "``FREERTOS_MAX_PRIORITIES`` - Maximum number of task priorities"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:88 a4bc3b6aeb6948639ed141d45e0739de
+msgid "Peripheral Configuration"
+msgstr "外设配置"
+
+#: ../../reference/kconfig_index.rst:91 893aa269493d4c1b91a7cfd7a6dcbb36
+msgid "GPIO Configuration"
+msgstr "GPIO 配置"
+
+#: ../../reference/kconfig_index.rst:99 289a3b60ba6f4da6aec715b37d0c51d4
+msgid "``GPIO_ENABLED`` - Enable GPIO support"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:100 5936c83df03b4f51b3cd457cf5fc3dda
+msgid "``GPIO_PORT_A_ENABLED`` - Enable GPIO Port A"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:101 1c2724a40b904d969aff5c23c2e4ba36
+msgid "``GPIO_PORT_B_ENABLED`` - Enable GPIO Port B"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:102 f15892af830a4c2bac5dc197c0294515
+msgid "``GPIO_PORT_C_ENABLED`` - Enable GPIO Port C"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:103 badcff507ab64f87b3624bbe02edc3c0
+msgid "``GPIO_PORT_D_ENABLED`` - Enable GPIO Port D"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:104 9ded6d52571347a285876fb1b7081996
+msgid "``GPIO_PORT_E_ENABLED`` - Enable GPIO Port E"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:106 e49df5fedd0d4a94b9e3dcf267ee0b9f
+msgid ""
+"See :doc:`../user_guide/kconfig_peripherals` for peripheral configuration "
+"examples."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:109 232bec70471a4e4bbee40cf5483d406e
+msgid "UART Configuration"
+msgstr "UART 配置"
+
+#: ../../reference/kconfig_index.rst:117 839c43aa58b948c68202296e75ee2229
+msgid "``UART_ENABLED`` - Enable UART support"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:118 5bd0bece439348fc80a5cc8c2447dc97
+msgid "``UART_INSTANCE_COUNT`` - Number of UART instances"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:119 0d76b4d2659f45f6ae968e9fe323df73
+msgid "``UART_DEFAULT_BAUDRATE`` - Default baud rate"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:120 dce7d12700fc4aa7a3e4ef25373ad306
+msgid "``UART_BUFFER_SIZE`` - UART buffer size"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:123 ce09b9e008084e33a3a5c7ad177966c9
+msgid "SPI Configuration"
+msgstr "SPI 配置"
+
+#: ../../reference/kconfig_index.rst:131 a076d398a21f443a919854aa46403b4f
+msgid "``SPI_ENABLED`` - Enable SPI support"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:132 539e7b8c5c334f50a337939172ea89a1
+msgid "``SPI_INSTANCE_COUNT`` - Number of SPI instances"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:133 225f3fff2b4e4d65b705dcce2c0a23c4
+msgid "``SPI_DEFAULT_SPEED`` - Default SPI clock speed"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:134 d9fb97fe829a4dc9922e7e79b570f4d5
+msgid "``SPI_DMA_ENABLED`` - Enable DMA for SPI"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:137 36527ca524d34fa88f1d34bc3265fc8a
+msgid "I2C Configuration"
+msgstr "I2C 配置"
+
+#: ../../reference/kconfig_index.rst:145 7c898a49023e4a7e962252c01d35b555
+msgid "``I2C_ENABLED`` - Enable I2C support"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:146 6db2726551da4cc4817cc361b79ff8ee
+msgid "``I2C_INSTANCE_COUNT`` - Number of I2C instances"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:147 68ad8bf3998644ebba12a29e7acc5f4e
+msgid "``I2C_DEFAULT_SPEED`` - Default I2C clock speed"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:148 e5a43c66fa11482380bd7d7db5eda05d
+msgid "``I2C_TIMEOUT`` - I2C operation timeout"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:151 0d9830ed75b24760a8e9a43422700c52
+msgid "Timer Configuration"
+msgstr "定时器配置"
+
+#: ../../reference/kconfig_index.rst:158 ff0fd1b89ddb42d3a8f64188e484a718
+msgid "``TIMER_ENABLED`` - Enable Timer support"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:159 ab174ae8a841403fa331065ff573ca0e
+msgid "``TIMER_INSTANCE_COUNT`` - Number of timer instances"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:160 17fdf04a59d44d6aabd3cf246e889f41
+msgid "``TIMER_RESOLUTION`` - Timer resolution in microseconds"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:163 def1abfb7efb4c8dab621153fb8d74e3
+msgid "ADC Configuration"
+msgstr "ADC 配置"
+
+#: ../../reference/kconfig_index.rst:171 c98ba22dc7e64ab3988b36aa69eecf80
+msgid "``ADC_ENABLED`` - Enable ADC support"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:172 8cb96bd1fd8a4cf6bec8077da6c090e2
+msgid "``ADC_INSTANCE_COUNT`` - Number of ADC instances"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:173 01ebb23e80f4492bb15beb2140f7d0ef
+msgid "``ADC_RESOLUTION`` - ADC resolution (bits)"
+msgstr "``ADC_RESOLUTION`` - ADC resolution (bits)"
+
+#: ../../reference/kconfig_index.rst:174 bbc12a5555ef476cbcb3655284fa7202
+msgid "``ADC_SAMPLE_TIME`` - ADC sample time"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:177 a134787f3608418f9384c111eba9282e
+msgid "Framework Configuration"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:180 35364d9e7d6843a991ce5d66e4717b70
+msgid "Config Manager"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:188 c626604f1cbb4d3194863d86bca5ee44
+msgid "``CONFIG_ENABLED`` - Enable Config Manager"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:189 159c670693bf418897d6271000046944
+msgid "``CONFIG_BACKEND_RAM`` - RAM backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:190 479f59a3a6fc4d61a709b020ffe8baa2
+msgid "``CONFIG_BACKEND_FLASH`` - Flash backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:191 071acb2c4b0d421188ab48c670ae83d7
+msgid "``CONFIG_MAX_KEYS`` - Maximum number of configuration keys"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:193 d42433db611040ff99202bedae6e7128
+msgid "See :doc:`../user_guide/config` for Config Manager documentation."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:196 8cfba56fbf7348df800ff889d4ced201
+msgid "Log Framework"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:205 acdfb09c448740b385fc6ac9412ed4ea
+msgid "``LOG_ENABLED`` - Enable Log Framework"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:206 e8ab6efbb5834b898cfc4f5e1c04b251
+msgid "``LOG_LEVEL`` - Default log level"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:207 62665ce4045c4ed3871a9787f8bbe5d9
+msgid "``LOG_BACKEND_CONSOLE`` - Console backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:208 d383fc15cf53483c8fea27b161ac0972
+msgid "``LOG_BACKEND_UART`` - UART backend"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:209 a15bb039e9e14c24a50af8cb4389b5fc
+msgid "``LOG_ASYNC_ENABLED`` - Enable async logging"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:211 c44f8f8b2ab140f1a632f1afb1eb0d55
+msgid "See :doc:`../user_guide/log` for Log Framework documentation."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:214 c23d0c6502cc43e9b5535fcf330fa9a8
+msgid "Shell Framework"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:222 67fdf6684e1a4cf4a31fa5c3b532c002
+msgid "``SHELL_ENABLED`` - Enable Shell Framework"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:223 bab9dcd7fbe9459c96a31cabea767a7b
+msgid "``SHELL_MAX_COMMANDS`` - Maximum number of commands"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:224 f2ca4bd3eae94972a50e07baa7ca18fb
+msgid "``SHELL_HISTORY_SIZE`` - Command history size"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:225 bf42202eb9284905b7c8fcc96fa343be
+msgid "``SHELL_PROMPT`` - Shell prompt string"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:227 05475b7b0e09456c9f7a017f76ad83b8
+msgid "See :doc:`../user_guide/shell` for Shell Framework documentation."
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:230 5fa7866c6f4345da82d449f02ed531a5
+msgid "Init Framework"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:238 335d4ecd5dd24ad5b5bb37a406ed9125
+msgid "``INIT_ENABLED`` - Enable Init Framework"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:239 3d4300efc954470d84cabc2746cfc0db
+msgid "``INIT_LEVEL_BOARD`` - Board-level initialization"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:240 82ca6fe013ad4f638ed036ba4f601678
+msgid "``INIT_LEVEL_DRIVER`` - Driver-level initialization"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:241 b45f48c7157345d78dac76984a07a093
+msgid "``INIT_LEVEL_APP`` - Application-level initialization"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:244 770f2d9e73514570b3ed1461cd7d8e9f
+msgid "Build Configuration"
+msgstr "构建配置"
+
+#: ../../reference/kconfig_index.rst:247 95a2ef6d5b3840078d3d9051ca23f658
+msgid "Build Options"
+msgstr "构建选项"
+
+#: ../../reference/kconfig_index.rst:255 96c4177280bf47c4a8bd140f5378ec5b
+msgid "``BUILD_TYPE`` - Build type (Debug/Release)"
+msgstr "``BUILD_TYPE`` - Build type (Debug/Release)"
+
+#: ../../reference/kconfig_index.rst:256 654637ce93f44d9188b3655a3afbeaad
+msgid "``BUILD_TESTS`` - Build unit tests"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:257 415e2a2b968145329ed2a93d55845770
+msgid "``BUILD_EXAMPLES`` - Build example applications"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:258 7aafe9f9da1b483ab1ccbd0af292a7ed
+msgid "``BUILD_DOCS`` - Build documentation"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:261 6bdd416d75b04cc0ad41267b3c78dc68
+msgid "Optimization"
+msgstr "优化"
+
+#: ../../reference/kconfig_index.rst:268 adad914177ca4965816ce03a4ce1e018
+msgid "``OPTIMIZATION_LEVEL`` - Compiler optimization level"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:269 5c1ddd13fb5f479183493ef6be862c5a
+msgid "``LTO_ENABLED`` - Enable Link-Time Optimization"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:270 9dbaa026c6084ea390159c8f1a43f749
+msgid "``SIZE_OPTIMIZATION`` - Optimize for size"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:273 ffcbed8169e1412689b69899ce0d987a
+msgid "Debugging"
+msgstr "调试"
+
+#: ../../reference/kconfig_index.rst:280 0567befb887942f88355b332feb04218
+msgid "``DEBUG_ENABLED`` - Enable debug features"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:281 7b020057b4cd42fdbc325fb5c7091902
+msgid "``ASSERT_ENABLED`` - Enable assertions"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:282 ac9a6480a48d4e87ae64c8040f698729
+msgid "``TRACE_ENABLED`` - Enable tracing"
+msgstr ""
+
+#: ../../reference/kconfig_index.rst:285 d10dc8b4ab424708bee4a6a04ba3939f
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../reference/kconfig_index.rst:287 b942cb283fa94fd4b0e3d328a11d8928
+msgid ":doc:`../user_guide/kconfig` - Kconfig system overview"
+msgstr ":doc:`../user_guide/kconfig` - Kconfig system overview"
+
+#: ../../reference/kconfig_index.rst:288 d6dedd3929024a9d9fd71d66b1a4d972
+msgid ":doc:`../user_guide/kconfig_tutorial` - Kconfig tutorial"
+msgstr ":doc:`../user_guide/kconfig_tutorial` - Kconfig tutorial"
+
+#: ../../reference/kconfig_index.rst:289 3e2c85a46ed14679ba0a80e514fb97a0
+msgid ":doc:`../user_guide/kconfig_peripherals` - Peripheral configuration"
+msgstr ":doc:`../user_guide/kconfig_peripherals` - Peripheral configuration"
+
+#: ../../reference/kconfig_index.rst:290 ebdfd6f80462427a9913671d69a4c95d
+msgid ":doc:`../user_guide/kconfig_platforms` - Platform configuration"
+msgstr ":doc:`../user_guide/kconfig_platforms` - Platform configuration"
+
+#: ../../reference/kconfig_index.rst:291 dcf51b67ab9f4251bc0ffe8a734ed2fd
+msgid ":doc:`../user_guide/kconfig_osal` - OSAL configuration"
+msgstr ":doc:`../user_guide/kconfig_osal` - OSAL configuration"
+
+#: ../../reference/kconfig_index.rst:292 b22d9e94f93d4bcbaf7828d81bcc6173
+msgid ":doc:`../user_guide/kconfig_tools` - Kconfig tools"
+msgstr ":doc:`../user_guide/kconfig_tools` - Kconfig tools"
+
+#: ../../reference/kconfig_index.rst:293 2d0b807487d842e78191ddbe0f5ba8f4
+msgid ":ref:`genindex` - General index"
+msgstr ":ref:`genindex` - General index"
+
+#: ../../reference/kconfig_index.rst:294 7e3fdf2723314c83a7fed61612c1e76c
+msgid ":ref:`search` - Search documentation"
+msgstr ":ref:`search` - Search documentation"

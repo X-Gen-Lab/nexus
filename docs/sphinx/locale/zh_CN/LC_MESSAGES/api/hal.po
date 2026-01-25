@@ -5,41 +5,42 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nexus Embedded Platform 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
+"POT-Creation-Date: 2026-01-25 03:02+0800\n"
 "PO-Revision-Date: 2026-01-16 00:00+0000\n"
 "Last-Translator: Nexus Team\n"
-"Language: zh_CN\n"
 "Language-Team: Chinese\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: ../../api/hal.rst:2 1d864c326c1f4decb1cd6b462a85b85d
+#: ../../api/hal.rst:2 d85cbcbe10d04476b48924d769570fe2
 msgid "HAL API Reference"
 msgstr "HAL API 参考"
 
-#: ../../api/hal.rst:4 345bbf277d0e497fad6b1b1706ead3f4
+#: ../../api/hal.rst:4 d454c4583239400390ae2821d5af2793
 msgid "This section documents the Hardware Abstraction Layer (HAL) API."
 msgstr "本节介绍硬件抽象层 (HAL) API。"
 
-#: ../../api/hal.rst:7 0f3efd2bb1fc4338ba1457e423bcdbe7
+#: ../../api/hal.rst:7 7be2abefafe04dd28f47222e1be9e8eb
 msgid "Overview"
 msgstr "概述"
 
-#: ../../api/hal.rst:9 36b3e51e249e4c5b8497bd8caeadb3aa
+#: ../../api/hal.rst:9 4b333ef2d01b42acba296734ba4ae0b0
 msgid ""
-"The Nexus HAL uses a factory pattern for device creation and interface-"
-"based design for operations. Include ``hal/nx_hal.h`` to access all HAL "
+"The Nexus HAL uses a factory pattern for device creation and interface-based"
+" design for operations. Include ``hal/nx_hal.h`` to access all HAL "
 "functionality."
-msgstr "Nexus HAL 使用工厂模式创建设备，并采用基于接口的设计进行操作。包含 ``hal/nx_hal.h`` 即可访问所有 HAL 功能。"
+msgstr ""
+"Nexus HAL 使用工厂模式创建设备，并采用基于接口的设计进行操作。包含 ``hal/nx_hal.h`` 即可访问所有 HAL 功能。"
 
-#: ../../api/hal.rst:13 36618c9d302f4bb59f225ce32cfb43c3
+#: ../../api/hal.rst:13 a84a233381db498e8b3e6d9fe2eb09f1
 msgid "Core Functions"
 msgstr "核心函数"
 
-#: ../../api/hal.rst:15 db0bda3f9c974553a6df8572ed4348ca
+#: ../../api/hal.rst:15 befc6a45bb264082b86c43dae9ec3b0f
 msgid ""
 "/* Initialize HAL subsystem */\n"
 "nx_status_t nx_hal_init(void);\n"
@@ -53,12 +54,23 @@ msgid ""
 "/* Get HAL version string */\n"
 "const char* nx_hal_get_version(void);"
 msgstr ""
+"/* Initialize HAL subsystem */\n"
+"nx_status_t nx_hal_init(void);\n"
+"\n"
+"/* Deinitialize HAL subsystem */\n"
+"nx_status_t nx_hal_deinit(void);\n"
+"\n"
+"/* Check if HAL is initialized */\n"
+"bool nx_hal_is_initialized(void);\n"
+"\n"
+"/* Get HAL version string */\n"
+"const char* nx_hal_get_version(void);"
 
-#: ../../api/hal.rst:30 3088851cccfb4cb7a431fc698d506dd0
+#: ../../api/hal.rst:30 edcb88c57e9b4da3913af2a9cec5995b
 msgid "Status Codes"
 msgstr "状态码"
 
-#: ../../api/hal.rst:32 c8f13a5ccbfd4431bad601574645b500
+#: ../../api/hal.rst:32 fda46853fc9743d8ad1fb1ff3b172ad3
 msgid ""
 "typedef enum {\n"
 "    NX_OK = 0,           /* Success */\n"
@@ -72,21 +84,32 @@ msgid ""
 "    NX_ERR_IO,           /* I/O error */\n"
 "} nx_status_t;"
 msgstr ""
+"typedef enum {\n"
+"    NX_OK = 0,           /* Success */\n"
+"    NX_ERR_PARAM,        /* Invalid parameter */\n"
+"    NX_ERR_STATE,        /* Invalid state */\n"
+"    NX_ERR_TIMEOUT,      /* Operation timeout */\n"
+"    NX_ERR_BUSY,         /* Resource busy */\n"
+"    NX_ERR_NO_MEM,       /* Out of memory */\n"
+"    NX_ERR_NOT_FOUND,    /* Resource not found */\n"
+"    NX_ERR_NOT_SUPPORTED,/* Operation not supported */\n"
+"    NX_ERR_IO,           /* I/O error */\n"
+"} nx_status_t;"
 
-#: ../../api/hal.rst:47 c3affcbc60ce4e998acad6666fed8186
+#: ../../api/hal.rst:47 5d4119a87bca4bd6bdb8d0d4374d4e30
 msgid "GPIO API"
 msgstr "GPIO API"
 
 #: ../../api/hal.rst:49 ../../api/hal.rst:125 ../../api/hal.rst:214
 #: ../../api/hal.rst:228 ../../api/hal.rst:238 ../../api/hal.rst:249
-#: 519a40a7f4bf42649d9e41461d6507cf 7a77df4dfce3430aa1ec66af41b4d247
-#: 886ae3dc5e3d418f9dbecf66d03c2a91 8c1b11245517484b9297963649b62bdd
-#: a5f897a5357c4c0a8eacde3ce6033724 bdc1f73c55e840c4a0bb9558216c7739
+#: 00c5a568229441e6ae9e84904dcca7a6 26816cf8c7c94ac299078110081916ce
+#: 5a8eda719e1b40baa2836daa36589153 bfafbe0665784a019440c61d7bf7e42b
+#: c5bb4bfa6cf34608875f6a354ddc732f ddc6a10d81b04cf585b43b629ca67b53
 #, fuzzy
 msgid "**Factory Functions:**"
 msgstr "工厂函数："
 
-#: ../../api/hal.rst:51 152209d2b2964e70b5f8a16c2f6241f2
+#: ../../api/hal.rst:51 24f0bae7897d430f9f5b53d1bd16b9ae
 msgid ""
 "/* Get GPIO device */\n"
 "nx_gpio_t* nx_factory_gpio(uint8_t port, uint8_t pin);\n"
@@ -98,14 +121,23 @@ msgid ""
 "/* Release GPIO device */\n"
 "void nx_factory_gpio_release(nx_gpio_t* gpio);"
 msgstr ""
+"/* Get GPIO device */\n"
+"nx_gpio_t* nx_factory_gpio(uint8_t port, uint8_t pin);\n"
+"\n"
+"/* Get GPIO device with configuration */\n"
+"nx_gpio_t* nx_factory_gpio_with_config(uint8_t port, uint8_t pin,\n"
+"                                       const nx_gpio_config_t* cfg);\n"
+"\n"
+"/* Release GPIO device */\n"
+"void nx_factory_gpio_release(nx_gpio_t* gpio);"
 
-#: ../../api/hal.rst:63 ../../api/hal.rst:139 bc0bc1fcebec4b3ba457d3574d2e8614
-#: c0a84e3205254c49a4e74b27ff3b826b
+#: ../../api/hal.rst:63 ../../api/hal.rst:139 972a7cb70141407c82ae248aa1828100
+#: f65c337c19b1443790a03c7cdd490200
 #, fuzzy
 msgid "**Configuration:**"
 msgstr "配置："
 
-#: ../../api/hal.rst:65 b54b81fc929141819891192c0d1acbdd
+#: ../../api/hal.rst:65 43e6813269ee4c67b9d2515572d49aef
 msgid ""
 "typedef enum {\n"
 "    NX_GPIO_MODE_INPUT = 0,\n"
@@ -136,14 +168,42 @@ msgid ""
 "    uint8_t af_index;\n"
 "} nx_gpio_config_t;"
 msgstr ""
+"typedef enum {\n"
+"    NX_GPIO_MODE_INPUT = 0,\n"
+"    NX_GPIO_MODE_OUTPUT_PP,\n"
+"    NX_GPIO_MODE_OUTPUT_OD,\n"
+"    NX_GPIO_MODE_AF_PP,\n"
+"    NX_GPIO_MODE_AF_OD,\n"
+"    NX_GPIO_MODE_ANALOG,\n"
+"} nx_gpio_mode_t;\n"
+"\n"
+"typedef enum {\n"
+"    NX_GPIO_PULL_NONE = 0,\n"
+"    NX_GPIO_PULL_UP,\n"
+"    NX_GPIO_PULL_DOWN,\n"
+"} nx_gpio_pull_t;\n"
+"\n"
+"typedef enum {\n"
+"    NX_GPIO_SPEED_LOW = 0,\n"
+"    NX_GPIO_SPEED_MEDIUM,\n"
+"    NX_GPIO_SPEED_HIGH,\n"
+"    NX_GPIO_SPEED_VERY_HIGH,\n"
+"} nx_gpio_speed_t;\n"
+"\n"
+"typedef struct {\n"
+"    nx_gpio_mode_t mode;\n"
+"    nx_gpio_pull_t pull;\n"
+"    nx_gpio_speed_t speed;\n"
+"    uint8_t af_index;\n"
+"} nx_gpio_config_t;"
 
-#: ../../api/hal.rst:96 ../../api/hal.rst:155 d77c94a9aa764890bd3cf8b417b11b2a
-#: f6ab7e593dc14abbab5713b76b14eeb2
+#: ../../api/hal.rst:96 ../../api/hal.rst:155 a98ac40494b2439eb5b7462d05a065af
+#: c520e62c687b4a4e96ab965eebb1efa4
 #, fuzzy
 msgid "**Interface:**"
 msgstr "接口："
 
-#: ../../api/hal.rst:98 0a2ca2600d2f42ea9332f824749b468c
+#: ../../api/hal.rst:98 b558e57f47e446dfbf2505fb0db7b0b8
 msgid ""
 "struct nx_gpio_s {\n"
 "    /* Basic operations */\n"
@@ -155,8 +215,7 @@ msgid ""
 "    nx_status_t (*set_mode)(nx_gpio_t* self, nx_gpio_mode_t mode);\n"
 "    nx_status_t (*set_pull)(nx_gpio_t* self, nx_gpio_pull_t pull);\n"
 "    nx_status_t (*get_config)(nx_gpio_t* self, nx_gpio_config_t* cfg);\n"
-"    nx_status_t (*set_config)(nx_gpio_t* self, const nx_gpio_config_t* "
-"cfg);\n"
+"    nx_status_t (*set_config)(nx_gpio_t* self, const nx_gpio_config_t* cfg);\n"
 "\n"
 "    /* Interrupt configuration */\n"
 "    nx_status_t (*set_exti)(nx_gpio_t* self, nx_gpio_exti_trig_t trig,\n"
@@ -168,12 +227,33 @@ msgid ""
 "    nx_power_t* (*get_power)(nx_gpio_t* self);\n"
 "};"
 msgstr ""
+"struct nx_gpio_s {\n"
+"    /* Basic operations */\n"
+"    uint8_t (*read)(nx_gpio_t* self);\n"
+"    void (*write)(nx_gpio_t* self, uint8_t state);\n"
+"    void (*toggle)(nx_gpio_t* self);\n"
+"\n"
+"    /* Runtime configuration */\n"
+"    nx_status_t (*set_mode)(nx_gpio_t* self, nx_gpio_mode_t mode);\n"
+"    nx_status_t (*set_pull)(nx_gpio_t* self, nx_gpio_pull_t pull);\n"
+"    nx_status_t (*get_config)(nx_gpio_t* self, nx_gpio_config_t* cfg);\n"
+"    nx_status_t (*set_config)(nx_gpio_t* self, const nx_gpio_config_t* cfg);\n"
+"\n"
+"    /* Interrupt configuration */\n"
+"    nx_status_t (*set_exti)(nx_gpio_t* self, nx_gpio_exti_trig_t trig,\n"
+"                            nx_gpio_exti_callback_t cb, void* ctx);\n"
+"    nx_status_t (*clear_exti)(nx_gpio_t* self);\n"
+"\n"
+"    /* Base interfaces */\n"
+"    nx_lifecycle_t* (*get_lifecycle)(nx_gpio_t* self);\n"
+"    nx_power_t* (*get_power)(nx_gpio_t* self);\n"
+"};"
 
-#: ../../api/hal.rst:123 78e0e4aada19434db54a32ee11dd0709
+#: ../../api/hal.rst:123 fcb4792d03b14e189f37956242e13d15
 msgid "UART API"
 msgstr "UART API"
 
-#: ../../api/hal.rst:127 d472e79a9a3e42f4abb72e5dbcaa1bfd
+#: ../../api/hal.rst:127 7cf03ab42d9649f4897dd5e70f486d51
 msgid ""
 "/* Get UART device */\n"
 "nx_uart_t* nx_factory_uart(uint8_t index);\n"
@@ -185,8 +265,17 @@ msgid ""
 "/* Release UART device */\n"
 "void nx_factory_uart_release(nx_uart_t* uart);"
 msgstr ""
+"/* Get UART device */\n"
+"nx_uart_t* nx_factory_uart(uint8_t index);\n"
+"\n"
+"/* Get UART device with configuration */\n"
+"nx_uart_t* nx_factory_uart_with_config(uint8_t index,\n"
+"                                       const nx_uart_config_t* cfg);\n"
+"\n"
+"/* Release UART device */\n"
+"void nx_factory_uart_release(nx_uart_t* uart);"
 
-#: ../../api/hal.rst:141 3c1a28a43b6741f5b991992d982757d8
+#: ../../api/hal.rst:141 66601f898e8c48768b772d1338b041a7
 msgid ""
 "typedef struct {\n"
 "    uint32_t baudrate;\n"
@@ -200,8 +289,19 @@ msgid ""
 "    size_t rx_buf_size;\n"
 "} nx_uart_config_t;"
 msgstr ""
+"typedef struct {\n"
+"    uint32_t baudrate;\n"
+"    uint8_t word_length;   /* 8 or 9 */\n"
+"    uint8_t stop_bits;     /* 1 or 2 */\n"
+"    uint8_t parity;        /* 0=none, 1=odd, 2=even */\n"
+"    uint8_t flow_control;  /* 0=none, 1=rts, 2=cts, 3=rts_cts */\n"
+"    bool dma_tx_enable;\n"
+"    bool dma_rx_enable;\n"
+"    size_t tx_buf_size;\n"
+"    size_t rx_buf_size;\n"
+"} nx_uart_config_t;"
 
-#: ../../api/hal.rst:157 d5e9100f190945c9a8304a23a19917be
+#: ../../api/hal.rst:157 a039ed0de9c84c18a4a5af625c83b2d1
 msgid ""
 "struct nx_uart_s {\n"
 "    /* Operation interfaces */\n"
@@ -213,8 +313,7 @@ msgid ""
 "    /* Runtime configuration */\n"
 "    nx_status_t (*set_baudrate)(nx_uart_t* self, uint32_t baudrate);\n"
 "    nx_status_t (*get_config)(nx_uart_t* self, nx_uart_config_t* cfg);\n"
-"    nx_status_t (*set_config)(nx_uart_t* self, const nx_uart_config_t* "
-"cfg);\n"
+"    nx_status_t (*set_config)(nx_uart_t* self, const nx_uart_config_t* cfg);\n"
 "\n"
 "    /* Base interfaces */\n"
 "    nx_lifecycle_t* (*get_lifecycle)(nx_uart_t* self);\n"
@@ -226,13 +325,34 @@ msgid ""
 "    nx_status_t (*clear_errors)(nx_uart_t* self);\n"
 "};"
 msgstr ""
+"struct nx_uart_s {\n"
+"    /* Operation interfaces */\n"
+"    nx_tx_async_t* (*get_tx_async)(nx_uart_t* self);\n"
+"    nx_rx_async_t* (*get_rx_async)(nx_uart_t* self);\n"
+"    nx_tx_sync_t* (*get_tx_sync)(nx_uart_t* self);\n"
+"    nx_rx_sync_t* (*get_rx_sync)(nx_uart_t* self);\n"
+"\n"
+"    /* Runtime configuration */\n"
+"    nx_status_t (*set_baudrate)(nx_uart_t* self, uint32_t baudrate);\n"
+"    nx_status_t (*get_config)(nx_uart_t* self, nx_uart_config_t* cfg);\n"
+"    nx_status_t (*set_config)(nx_uart_t* self, const nx_uart_config_t* cfg);\n"
+"\n"
+"    /* Base interfaces */\n"
+"    nx_lifecycle_t* (*get_lifecycle)(nx_uart_t* self);\n"
+"    nx_power_t* (*get_power)(nx_uart_t* self);\n"
+"    nx_diagnostic_t* (*get_diagnostic)(nx_uart_t* self);\n"
+"\n"
+"    /* Diagnostics */\n"
+"    nx_status_t (*get_stats)(nx_uart_t* self, nx_uart_stats_t* stats);\n"
+"    nx_status_t (*clear_errors)(nx_uart_t* self);\n"
+"};"
 
-#: ../../api/hal.rst:181 56d89f7ccce04a948102a78622969a0b
+#: ../../api/hal.rst:181 b4cea030a7ac4dc0a5b68edf19f2aeea
 #, fuzzy
 msgid "**TX/RX Interfaces:**"
 msgstr "TX/RX 接口："
 
-#: ../../api/hal.rst:183 202d26dc8374487398d558911d5bfad1
+#: ../../api/hal.rst:183 2ad7959a40484f9ba46a44c1abea5009
 msgid ""
 "/* Synchronous TX */\n"
 "struct nx_tx_sync_s {\n"
@@ -248,8 +368,7 @@ msgid ""
 "\n"
 "/* Asynchronous TX */\n"
 "struct nx_tx_async_s {\n"
-"    nx_status_t (*send)(nx_tx_async_t* self, const uint8_t* data, size_t "
-"len);\n"
+"    nx_status_t (*send)(nx_tx_async_t* self, const uint8_t* data, size_t len);\n"
 "    size_t (*get_free_space)(nx_tx_async_t* self);\n"
 "    bool (*is_busy)(nx_tx_async_t* self);\n"
 "};\n"
@@ -258,66 +377,100 @@ msgid ""
 "struct nx_rx_async_s {\n"
 "    size_t (*read)(nx_rx_async_t* self, uint8_t* data, size_t max_len);\n"
 "    size_t (*available)(nx_rx_async_t* self);\n"
-"    nx_status_t (*set_callback)(nx_rx_async_t* self, void (*cb)(void*), "
-"void* ctx);\n"
+"    nx_status_t (*set_callback)(nx_rx_async_t* self, void (*cb)(void*), void* ctx);\n"
 "};"
 msgstr ""
+"/* Synchronous TX */\n"
+"struct nx_tx_sync_s {\n"
+"    nx_status_t (*send)(nx_tx_sync_t* self, const uint8_t* data,\n"
+"                        size_t len, uint32_t timeout_ms);\n"
+"};\n"
+"\n"
+"/* Synchronous RX */\n"
+"struct nx_rx_sync_s {\n"
+"    nx_status_t (*receive)(nx_rx_sync_t* self, uint8_t* data,\n"
+"                           size_t len, uint32_t timeout_ms);\n"
+"};\n"
+"\n"
+"/* Asynchronous TX */\n"
+"struct nx_tx_async_s {\n"
+"    nx_status_t (*send)(nx_tx_async_t* self, const uint8_t* data, size_t len);\n"
+"    size_t (*get_free_space)(nx_tx_async_t* self);\n"
+"    bool (*is_busy)(nx_tx_async_t* self);\n"
+"};\n"
+"\n"
+"/* Asynchronous RX */\n"
+"struct nx_rx_async_s {\n"
+"    size_t (*read)(nx_rx_async_t* self, uint8_t* data, size_t max_len);\n"
+"    size_t (*available)(nx_rx_async_t* self);\n"
+"    nx_status_t (*set_callback)(nx_rx_async_t* self, void (*cb)(void*), void* ctx);\n"
+"};"
 
-#: ../../api/hal.rst:212 3ca2cbae2a7645e9a28dfc42c20546fc
+#: ../../api/hal.rst:212 c1b5cf2e3bde48839961eb88e9b2ef3e
 msgid "SPI API"
 msgstr "SPI API"
 
-#: ../../api/hal.rst:216 314efc1cd1704181a973ff5425966f39
+#: ../../api/hal.rst:216 3c1fb4363ef24a5797ab621bdc47a838
 msgid ""
 "nx_spi_t* nx_factory_spi(uint8_t index);\n"
 "void nx_factory_spi_release(nx_spi_t* spi);"
 msgstr ""
+"nx_spi_t* nx_factory_spi(uint8_t index);\n"
+"void nx_factory_spi_release(nx_spi_t* spi);"
 
-#: ../../api/hal.rst:222 f2b3f8e55f8c40b0bd0f4abee24f2045
+#: ../../api/hal.rst:222 4e5dd57c05e34e7683beacd3b0dd6507
 msgid ""
-"The ``nx_factory_spi_with_config()`` function has been removed. Use "
-"Kconfig for compile-time bus configuration."
+"The ``nx_factory_spi_with_config()`` function has been removed. Use Kconfig "
+"for compile-time bus configuration."
 msgstr ""
+"The ``nx_factory_spi_with_config()`` function has been removed. Use Kconfig "
+"for compile-time bus configuration."
 
-#: ../../api/hal.rst:226 704183cbfc754c9896933c27cb44a501
+#: ../../api/hal.rst:226 41483b6851b54ec9a267ad247acb4a9e
 msgid "I2C API"
 msgstr "I2C API"
 
-#: ../../api/hal.rst:230 0d23ebc5eea441cab311463226be0738
+#: ../../api/hal.rst:230 a107cd470e0840359f99d70a1efda55b
 msgid ""
 "nx_i2c_t* nx_factory_i2c(uint8_t index);\n"
 "void nx_factory_i2c_release(nx_i2c_t* i2c);"
 msgstr ""
+"nx_i2c_t* nx_factory_i2c(uint8_t index);\n"
+"void nx_factory_i2c_release(nx_i2c_t* i2c);"
 
-#: ../../api/hal.rst:236 4f6875bc7a49446a9d63c00ab8eff7c4
+#: ../../api/hal.rst:236 bb5f426c9e7f46ec9c7bf216a5b51251
 msgid "Timer API"
 msgstr "定时器 API"
 
-#: ../../api/hal.rst:240 71cf7fc383574feebd80420ba39e7b95
+#: ../../api/hal.rst:240 d40ad5af8a924827bc57eca54855f89e
 msgid ""
 "nx_timer_t* nx_factory_timer(uint8_t index);\n"
-"nx_timer_t* nx_factory_timer_with_config(uint8_t index, const "
-"nx_timer_config_t* cfg);\n"
+"nx_timer_t* nx_factory_timer_with_config(uint8_t index, const nx_timer_config_t* cfg);\n"
 "void nx_factory_timer_release(nx_timer_t* timer);"
 msgstr ""
+"nx_timer_t* nx_factory_timer(uint8_t index);\n"
+"nx_timer_t* nx_factory_timer_with_config(uint8_t index, const nx_timer_config_t* cfg);\n"
+"void nx_factory_timer_release(nx_timer_t* timer);"
 
-#: ../../api/hal.rst:247 e919163adb1a4279a339c9cfcbdfc80c
+#: ../../api/hal.rst:247 60545add7f6b49ee973f4629e5bee2b0
 msgid "ADC API"
 msgstr "ADC API"
 
-#: ../../api/hal.rst:251 5a5b11cf69d640f5a21509d2fc29027c
+#: ../../api/hal.rst:251 fb2bb41276a949cca0317d4066a48e58
 msgid ""
 "nx_adc_t* nx_factory_adc(uint8_t index);\n"
-"nx_adc_t* nx_factory_adc_with_config(uint8_t index, const "
-"nx_adc_config_t* cfg);\n"
+"nx_adc_t* nx_factory_adc_with_config(uint8_t index, const nx_adc_config_t* cfg);\n"
 "void nx_factory_adc_release(nx_adc_t* adc);"
 msgstr ""
+"nx_adc_t* nx_factory_adc(uint8_t index);\n"
+"nx_adc_t* nx_factory_adc_with_config(uint8_t index, const nx_adc_config_t* cfg);\n"
+"void nx_factory_adc_release(nx_adc_t* adc);"
 
-#: ../../api/hal.rst:258 6f930f59d46244f185f7b0f209d58376
+#: ../../api/hal.rst:258 bf92f93b316c4d3e8f6edd9fd3ebc5a4
 msgid "Device Enumeration"
 msgstr "设备枚举"
 
-#: ../../api/hal.rst:260 db7754b094704b39acb5162cbe47189d
+#: ../../api/hal.rst:260 763d32f431624bd79d555cef3e898589
 msgid ""
 "typedef struct {\n"
 "    const char* name;\n"
@@ -329,17 +482,26 @@ msgid ""
 "/* Enumerate all devices */\n"
 "size_t nx_factory_enumerate(nx_device_info_t* list, size_t max_count);"
 msgstr ""
+"typedef struct {\n"
+"    const char* name;\n"
+"    const char* type;\n"
+"    nx_device_state_t state;\n"
+"    uint8_t ref_count;\n"
+"} nx_device_info_t;\n"
+"\n"
+"/* Enumerate all devices */\n"
+"size_t nx_factory_enumerate(nx_device_info_t* list, size_t max_count);"
 
-#: ../../api/hal.rst:273 03cb8277f8ce4ef98b0a52f81bc9e378
+#: ../../api/hal.rst:273 ae416b9ee8db460bb5b6dfa6e1aa14a5
 msgid "Base Interfaces"
 msgstr "基础接口"
 
-#: ../../api/hal.rst:275 f89e87f9566d48eea2af493868512ab0
+#: ../../api/hal.rst:275 3a4b21e820d84f16b74e252d0fdd5f4b
 #, fuzzy
 msgid "**Lifecycle Interface:**"
 msgstr "生命周期接口："
 
-#: ../../api/hal.rst:277 06309cf66c6f4af9b2be46bea7f1439b
+#: ../../api/hal.rst:277 8a861ceaa1df4a8f915ab1ed8504278f
 msgid ""
 "struct nx_lifecycle_s {\n"
 "    nx_status_t (*init)(nx_lifecycle_t* self);\n"
@@ -349,13 +511,20 @@ msgid ""
 "    nx_device_state_t (*get_state)(nx_lifecycle_t* self);\n"
 "};"
 msgstr ""
+"struct nx_lifecycle_s {\n"
+"    nx_status_t (*init)(nx_lifecycle_t* self);\n"
+"    nx_status_t (*deinit)(nx_lifecycle_t* self);\n"
+"    nx_status_t (*suspend)(nx_lifecycle_t* self);\n"
+"    nx_status_t (*resume)(nx_lifecycle_t* self);\n"
+"    nx_device_state_t (*get_state)(nx_lifecycle_t* self);\n"
+"};"
 
-#: ../../api/hal.rst:287 22003e754a194429b4ae26f0e799f239
+#: ../../api/hal.rst:287 07f795c4ec734ccbb4b3c98f52990ae1
 #, fuzzy
 msgid "**Power Interface:**"
 msgstr "电源接口："
 
-#: ../../api/hal.rst:289 822d24394cd242f284a3ac4c99c24692
+#: ../../api/hal.rst:289 f5172fd8305847449d7d106fce606cdd
 msgid ""
 "typedef enum {\n"
 "    NX_POWER_MODE_NORMAL = 0,\n"
@@ -368,19 +537,73 @@ msgid ""
 "    nx_power_mode_t (*get_mode)(nx_power_t* self);\n"
 "};"
 msgstr ""
+"typedef enum {\n"
+"    NX_POWER_MODE_NORMAL = 0,\n"
+"    NX_POWER_MODE_SLEEP,\n"
+"    NX_POWER_MODE_DEEP_SLEEP,\n"
+"} nx_power_mode_t;\n"
+"\n"
+"struct nx_power_s {\n"
+"    nx_status_t (*set_mode)(nx_power_t* self, nx_power_mode_t mode);\n"
+"    nx_power_mode_t (*get_mode)(nx_power_t* self);\n"
+"};"
 
-#: ../../api/hal.rst:302 209ca4f00d4241f19db7afb07a9b6ede
+#: ../../api/hal.rst:302 4e60461b63384628995e911e0ec40ea9
 #, fuzzy
 msgid "**Diagnostic Interface:**"
 msgstr "诊断接口："
 
-#: ../../api/hal.rst:304 c0cd99c81c36421b85246ba184d0c8da
+#: ../../api/hal.rst:304 dd076bc7e3fd4d98b2c8a40101820dd2
 msgid ""
 "struct nx_diagnostic_s {\n"
 "    nx_status_t (*self_test)(nx_diagnostic_t* self);\n"
-"    nx_status_t (*get_error_count)(nx_diagnostic_t* self, uint32_t* "
-"count);\n"
+"    nx_status_t (*get_error_count)(nx_diagnostic_t* self, uint32_t* count);\n"
 "    nx_status_t (*clear_errors)(nx_diagnostic_t* self);\n"
 "};"
 msgstr ""
+"struct nx_diagnostic_s {\n"
+"    nx_status_t (*self_test)(nx_diagnostic_t* self);\n"
+"    nx_status_t (*get_error_count)(nx_diagnostic_t* self, uint32_t* count);\n"
+"    nx_status_t (*clear_errors)(nx_diagnostic_t* self);\n"
+"};"
 
+#: ../../api/hal.rst:314 e4c8dc664b574f0c8fbdbd1f6ec0cb63
+#, fuzzy
+msgid "Related APIs"
+msgstr "ADC API"
+
+#: ../../api/hal.rst:316 0d919e678c9c4b1abc7055a642552ebd
+msgid ":doc:`osal` - OS abstraction for threading and synchronization"
+msgstr ":doc:`osal` - OS abstraction for threading and synchronization"
+
+#: ../../api/hal.rst:317 d2f56d1bd7e2439abc750e312609b61b
+msgid ":doc:`init` - Automatic initialization system"
+msgstr ":doc:`init` - Automatic initialization system"
+
+#: ../../api/hal.rst:318 322cd6a0a263424caaab470c95cb9063
+msgid ":doc:`config` - Configuration management"
+msgstr ":doc:`config` - Configuration management"
+
+#: ../../api/hal.rst:319 a5769698b40c498ba69bd96bb9824cc3
+msgid ":doc:`log` - Logging framework"
+msgstr ":doc:`log` - Logging framework"
+
+#: ../../api/hal.rst:322 5e7aa5aabd1c4ce7b7c938a8c18846aa
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../api/hal.rst:324 93d4401f3d2e49ca9c0de23afcdd1966
+msgid ":doc:`../user_guide/hal` - HAL User Guide"
+msgstr ":doc:`../user_guide/hal` - HAL User Guide"
+
+#: ../../api/hal.rst:325 beb554fc89b54a18843d8839cbbae675
+msgid ":doc:`../user_guide/porting` - Porting Guide"
+msgstr ":doc:`../user_guide/porting` - Porting Guide"
+
+#: ../../api/hal.rst:326 c956dec04e554268a0108108e614793d
+msgid ":doc:`../reference/error_codes` - Error Code Reference"
+msgstr ":doc:`../reference/error_codes` - Error Code Reference"
+
+#: ../../api/hal.rst:327 864d186ccf484164bb0c415d8c51d9cd
+msgid ":doc:`../platform_guides/index` - Platform-Specific Guides"
+msgstr ":doc:`../platform_guides/index` - Platform-Specific Guides"

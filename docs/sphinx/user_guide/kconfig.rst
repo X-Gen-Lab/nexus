@@ -67,7 +67,7 @@ File Organization
     │   │       ├── gpio/Kconfig
     │   │       └── ...
     │   │
-    │   └── stm32/
+    │   └── STM32/
     │       ├── Kconfig                      # STM32 platform config
     │       ├── Kconfig_chip                 # Chip selection
     │       ├── Kconfig_peripherals          # Peripheral config
@@ -82,7 +82,7 @@ File Organization
     │   └── include/hal/
     │       └── nexus_config.h              # Generated header
     │
-    └── scripts/kconfig/
+    └── scripts/Kconfig/
         ├── generate_config.py           # Config → C header
         ├── validate_kconfig.py              # Validation tool
         ├── kconfig_migrate.py               # Migration tool
@@ -98,7 +98,7 @@ Basic Configuration
 
 Edit ``.config`` or use menuconfig:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     CONFIG_PLATFORM_STM32=y
     CONFIG_STM32F4=y
@@ -106,7 +106,7 @@ Edit ``.config`` or use menuconfig:
 
 **2. Configure Peripherals:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     CONFIG_STM32_UART_ENABLE=y
     CONFIG_INSTANCE_STM32_UART_1=y
@@ -115,7 +115,7 @@ Edit ``.config`` or use menuconfig:
 
 **3. Select OSAL Backend:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     CONFIG_OSAL_FREERTOS=y
     CONFIG_OSAL_TICK_RATE_HZ=1000
@@ -125,7 +125,7 @@ Edit ``.config`` or use menuconfig:
 
 .. code-block:: bash
 
-    python scripts/kconfig/generate_config.py --config .config
+    python scripts/Kconfig/generate_config.py --config .config
 
 This generates ``nexus_config.h``:
 
@@ -137,46 +137,46 @@ This generates ``nexus_config.h``:
     #define NX_CONFIG_OSAL_FREERTOS 1
 
 Using Default Configurations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Native Platform:**
 
 .. code-block:: bash
 
     cp platforms/native/defconfig .config
-    python scripts/kconfig/generate_config.py
+    python scripts/Kconfig/generate_config.py
 
 **STM32F4 Platform:**
 
 .. code-block:: bash
 
-    cp platforms/stm32/defconfig_stm32f4 .config
-    python scripts/kconfig/generate_config.py
+    cp platforms/STM32/defconfig_stm32f4 .config
+    python scripts/Kconfig/generate_config.py
 
 **STM32H7 Platform:**
 
 .. code-block:: bash
 
-    cp platforms/stm32/defconfig_stm32h7 .config
-    python scripts/kconfig/generate_config.py
+    cp platforms/STM32/defconfig_stm32h7 .config
+    python scripts/Kconfig/generate_config.py
 
 Configuration Tools
 -------------------
 
 Generate Configuration Header
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Convert ``.config`` to C header file:
 
 .. code-block:: bash
 
     # From .config file
-    python scripts/kconfig/generate_config.py \
+    python scripts/Kconfig/generate_config.py \
         --config .config \
         --output nexus_config.h
 
     # Generate default configuration
-    python scripts/kconfig/generate_config.py --default
+    python scripts/Kconfig/generate_config.py --default
 
 Validate Configuration
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -186,10 +186,10 @@ Check Kconfig syntax and dependencies:
 .. code-block:: bash
 
     # Validate root Kconfig
-    python scripts/kconfig/validate_kconfig.py Kconfig
+    python scripts/Kconfig/validate_kconfig.py Kconfig
 
     # Validate specific file
-    python scripts/kconfig/validate_kconfig.py platforms/stm32/Kconfig
+    python scripts/Kconfig/validate_kconfig.py platforms/STM32/Kconfig
 
 **Validation checks:**
 
@@ -208,10 +208,10 @@ Show differences between two configurations:
 .. code-block:: bash
 
     # Text format (default)
-    python scripts/kconfig/kconfig_diff.py .config platforms/native/.config
+    python scripts/Kconfig/kconfig_diff.py .config platforms/native/.config
 
     # JSON format
-    python scripts/kconfig/kconfig_diff.py \
+    python scripts/Kconfig/kconfig_diff.py \
         --format json \
         config1 config2 \
         --output diff.json
@@ -223,19 +223,19 @@ Migrate configuration to new version:
 
 .. code-block:: bash
 
-    python scripts/kconfig/kconfig_migrate.py \
+    python scripts/Kconfig/kconfig_migrate.py \
         --input old.config \
         --output new.config \
         --version 2.0
 
 Generate Documentation
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 Generate configuration reference documentation:
 
 .. code-block:: bash
 
-    python scripts/kconfig/generate_config_docs.py \
+    python scripts/Kconfig/generate_config_docs.py \
         Kconfig \
         --output docs/config_reference.md
 
@@ -266,7 +266,7 @@ Platform Selection
 
 Select one platform from available options:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     choice
         prompt "Target Platform"
@@ -294,7 +294,7 @@ STM32 Platform
 
 **Chip Family Selection:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     choice
         prompt "STM32 Chip Family"
@@ -313,7 +313,7 @@ STM32 Platform
 
 **Chip Variant:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     if STM32F4
 
@@ -336,7 +336,7 @@ STM32 Platform
 
 **Example Configuration:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     CONFIG_PLATFORM_STM32=y
     CONFIG_STM32F4=y
@@ -351,7 +351,7 @@ UART Configuration
 
 **Enable UART:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menuconfig STM32_UART_ENABLE
         bool "Enable UART support"
@@ -359,7 +359,7 @@ UART Configuration
 
 **Configure UART Instance:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     if STM32_UART_ENABLE
 
@@ -409,7 +409,7 @@ UART Configuration
 
 **Example Configuration:**
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     CONFIG_STM32_UART_ENABLE=y
     CONFIG_INSTANCE_STM32_UART_1=y
@@ -422,7 +422,7 @@ UART Configuration
 GPIO Configuration
 ^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menuconfig NATIVE_GPIO_ENABLE
         bool "Enable GPIO support"
@@ -457,7 +457,7 @@ OSAL Configuration
 Backend Selection
 ^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     choice
         prompt "OSAL Backend"
@@ -486,7 +486,7 @@ Backend Selection
 System Parameters
 ^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menu "System Parameters"
 
@@ -517,9 +517,9 @@ System Parameters
     endmenu
 
 Linker Script Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menu "Linker Script Configuration"
         depends on !PLATFORM_NATIVE
@@ -555,7 +555,7 @@ HAL Configuration
 Debug Configuration
 ^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menu "Debug Configuration"
 
@@ -580,7 +580,7 @@ Debug Configuration
 Statistics Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     menu "Statistics Configuration"
 
@@ -597,7 +597,7 @@ Statistics Configuration
     endmenu
 
 Using Configuration in Code
-----------------------------
+---------------------------
 
 Include Generated Header
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -629,7 +629,7 @@ Conditional Compilation
     #endif
 
 Using Configuration Values
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: c
 
@@ -648,18 +648,18 @@ Using Configuration Values
     #endif
 
 Build System Integration
--------------------------
+------------------------
 
 CMake Integration
 ^^^^^^^^^^^^^^^^^
 
 The configuration system is integrated into CMake:
 
-.. code-block:: cmake
+.. code-block:: CMake
 
     # CMakeLists.txt
     function(nexus_generate_config)
-        set(GENERATOR_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/kconfig/generate_config.py")
+        set(GENERATOR_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/Kconfig/generate_config.py")
         set(CONFIG_FILE "${CMAKE_SOURCE_DIR}/.config")
         set(OUTPUT_FILE "${CMAKE_SOURCE_DIR}/nexus_config.h")
 
@@ -736,7 +736,7 @@ Always validate configuration before building:
 .. code-block:: bash
 
     # Validate syntax
-    python scripts/kconfig/validate_kconfig.py Kconfig
+    python scripts/Kconfig/validate_kconfig.py Kconfig
 
     # Check for errors
     if [ $? -ne 0 ]; then
@@ -745,14 +745,14 @@ Always validate configuration before building:
     fi
 
     # Generate header
-    python scripts/kconfig/generate_config.py
+    python scripts/Kconfig/generate_config.py
 
 Documentation
 ^^^^^^^^^^^^^
 
 Document all configuration options:
 
-.. code-block:: kconfig
+.. code-block:: Kconfig
 
     config UART1_BAUDRATE
         int "UART1 baud rate"
@@ -775,19 +775,19 @@ Common Issues
 .. code-block:: bash
 
     # Regenerate configuration header
-    python scripts/kconfig/generate_config.py --config .config
+    python scripts/Kconfig/generate_config.py --config .config
 
     # Clean and rebuild
     rm -rf build
-    cmake -B build
-    cmake --build build
+    CMake -B build
+    CMake --build build
 
 **Issue: Validation errors**
 
 .. code-block:: bash
 
     # Check validation output
-    python scripts/kconfig/validate_kconfig.py Kconfig
+    python scripts/Kconfig/validate_kconfig.py Kconfig
 
     # Fix reported errors in Kconfig files
 
@@ -806,10 +806,10 @@ Common Issues
 .. code-block:: bash
 
     # Use platform-specific defconfig
-    cp platforms/stm32/defconfig_stm32f4 .config
+    cp platforms/STM32/defconfig_stm32f4 .config
 
     # Or generate default configuration
-    python scripts/kconfig/generate_config.py --default
+    python scripts/Kconfig/generate_config.py --default
 
 See Also
 --------

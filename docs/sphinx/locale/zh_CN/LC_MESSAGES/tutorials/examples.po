@@ -1,0 +1,1348 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-25 10:45+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../tutorials/examples.rst:2 ../../tutorials/examples.rst:13
+#: 286267e81137404ca4c128050481cd90 b45f39a70f8e489b9fe6e7dc16b8c25c
+msgid "Example Applications"
+msgstr "示例 Applications"
+
+#: ../../tutorials/examples.rst:4 f36fbf7e18ed4055906e2923b4109dc6
+msgid ""
+"This page documents the example applications included in the Nexus "
+"repository. Each example demonstrates specific features and serves as a "
+"reference for building your own applications."
+msgstr "本页面记录了 Nexus 仓库中包含的示例应用程序。每个示例演示特定功能，并作为构建您自己应用程序的参考。"
+
+#: ../../tutorials/examples.rst:6 b5468e81c1e64d3ea61bebb9f3ea59a3
+msgid ""
+"All examples are located in the ``applications/`` directory of the "
+"repository."
+msgstr "所有示例都位于仓库的 ``applications/`` 目录中。"
+
+#: ../../tutorials/examples.rst:9 c17c34e220124ec092404c99b23a6168
+msgid "Overview"
+msgstr "概述"
+
+#: ../../tutorials/examples.rst:11 25c06ca13fe1489ba51daf0c15f59bef
+msgid "The Nexus repository includes the following example applications:"
+msgstr "Nexus 仓库包含以下示例应用程序："
+
+#: ../../tutorials/examples.rst:17 0cbb80f8c68f40abb1c9923d6d95ff2f
+msgid "Example"
+msgstr "示例"
+
+#: ../../tutorials/examples.rst:18 f62b304108214db0a300dc04a4031908
+msgid "Purpose"
+msgstr "目的"
+
+#: ../../tutorials/examples.rst:19 e86ffe21395b4e36b9dda55c935b5d4e
+msgid "Key Features"
+msgstr "Key 特性"
+
+#: ../../tutorials/examples.rst:20 4a1668f4505b473fa805c1f7f63532e2
+msgid "blinky"
+msgstr "blinky"
+
+#: ../../tutorials/examples.rst:21 d85e932c83514389bf2914ade56df529
+msgid "Basic GPIO control"
+msgstr "基本 GPIO 控制"
+
+#: ../../tutorials/examples.rst:22 318bd83f710f41f88d2b702987ac1b44
+msgid "LED blinking, GPIO initialization, HAL basics"
+msgstr "LED 闪烁、GPIO 初始化、HAL 基础"
+
+#: ../../tutorials/examples.rst:23 2ff7b9896fbd426a8e2c1f799011e5af
+msgid "config_demo"
+msgstr "config_demo"
+
+#: ../../tutorials/examples.rst:24 62bd75c133f34ab3b9758190f5e9fa42
+msgid "Configuration management"
+msgstr "配置 management"
+
+#: ../../tutorials/examples.rst:25 6a4869ec341c4ba881e2cb00d12154a4
+msgid "Config storage, namespaces, import/export, UART output"
+msgstr "配置存储、命名空间、导入/导出、UART 输出"
+
+#: ../../tutorials/examples.rst:26 bc8b0d1025174143a683d6b7e272fe62
+msgid "freertos_demo"
+msgstr "freertos_demo"
+
+#: ../../tutorials/examples.rst:27 8880728dffa54f26822b70e069609982
+msgid "Multi-tasking with OSAL"
+msgstr "使用 OSAL 的多任务"
+
+#: ../../tutorials/examples.rst:28 5c2d4ee96ae446d88e3403874367ae9b
+msgid "Tasks, mutexes, semaphores, queues, producer-consumer pattern"
+msgstr "任务、互斥锁、信号量、队列、生产者-消费者模式"
+
+#: ../../tutorials/examples.rst:29 7a881ec77d6842b2a0465176b8ed19c9
+msgid "shell_demo"
+msgstr "shell_demo"
+
+#: ../../tutorials/examples.rst:30 d0112d97886545cb8250b90e65922a4e
+msgid "Command-line interface"
+msgstr "命令行界面"
+
+#: ../../tutorials/examples.rst:31 37871beffd714baaa68d58e7b9f35748
+msgid "Shell commands, UART CLI, command registration, line editing"
+msgstr "Shell 命令、UART CLI、命令注册、行编辑"
+
+#: ../../tutorials/examples.rst:34 26dc4aeb02ec4566a2634bd9307d844b
+msgid "Blinky Example"
+msgstr "Blinky 示例"
+
+#: ../../tutorials/examples.rst:36 077a77ab38a2411d9ec10603a4b54e41
+msgid "**Location**: ``applications/blinky/``"
+msgstr "**位置**：``applications/blinky/``"
+
+#: ../../tutorials/examples.rst:38 a7cc9a596f3c494aa7a6b8400a454bf1
+msgid ""
+"**Description**: A simple LED blinky application that demonstrates basic "
+"GPIO control and HAL initialization."
+msgstr "**描述**：一个简单的 LED 闪烁应用程序，演示基本的 GPIO 控制和 HAL 初始化。"
+
+#: ../../tutorials/examples.rst:41 ../../tutorials/examples.rst:150
+#: ../../tutorials/examples.rst:268 ../../tutorials/examples.rst:404
+#: 631fdb44bd864fb6a4e7e13b07f854a3 a9986f6911154dbca8ee0b4dd98199fa
+#: ec74a52488f543dbb21ffc3aea3a84f2 f0892329ef0a43bd9e46fba077489238
+msgid "Features"
+msgstr "特性"
+
+#: ../../tutorials/examples.rst:43 11c3acd41ea845788f6c23191a6f7970
+msgid "HAL system initialization"
+msgstr "HAL 系统初始化"
+
+#: ../../tutorials/examples.rst:44 f20e505b222e4f8b8ca0960f984ebc3f
+msgid "GPIO configuration as output"
+msgstr "GPIO 配置为输出"
+
+#: ../../tutorials/examples.rst:45 85112fea78554e999ce7ca4a3a8bd850
+msgid "LED blinking in sequence"
+msgstr "LED 顺序闪烁"
+
+#: ../../tutorials/examples.rst:46 158098e86a554f44990a842e4fe22a4d
+msgid "Error handling with LED indicators"
+msgstr "使用 LED 指示器的错误处理"
+
+#: ../../tutorials/examples.rst:49 ../../tutorials/examples.rst:161
+#: ../../tutorials/examples.rst:279 ../../tutorials/examples.rst:415
+#: 0bef557210ea4d5e801ec642bd494852 0f8b1d2c454f4979b898c4b661338628
+#: d404f5fa5c944e7da9a24494214671b8 f9eb7e1caab04698a43732799319d484
+msgid "Hardware Requirements"
+msgstr "Hardware 要求"
+
+#: ../../tutorials/examples.rst:51 65e5cb113cd840318778fc5233c51af4
+msgid "STM32F4 Discovery board (or compatible)"
+msgstr "STM32F4 Discovery board (or compatible)"
+
+#: ../../tutorials/examples.rst:52 10ae69cf5dc447d0954cf1bfdb8e5fcc
+msgid "LEDs on PD12 (Green), PD13 (Orange), PD14 (Red), PD15 (Blue)"
+msgstr "LEDs on PD12 (Green), PD13 (Orange), PD14 (Red), PD15 (Blue)"
+
+#: ../../tutorials/examples.rst:55 ../../tutorials/examples.rst:168
+#: ../../tutorials/examples.rst:285 ../../tutorials/examples.rst:422
+#: 016794fb5e0d4b79a646c112ef1666f2 33c9be01334c4ec9a0f251c36046d018
+#: 6ddb3ef3a6f6481c950f7c24370f38bb b22c3d835f0644d28b1ebc4ab9dce10c
+msgid "Building and Running"
+msgstr "构建和运行"
+
+#: ../../tutorials/examples.rst:57 20ea1d8c2a3e43f4b50c2daf85de9c45
+msgid ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target blinky\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/blinky/blinky.elf verify reset exit\""
+msgstr ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target blinky\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/blinky/blinky.elf verify reset exit\""
+
+#: ../../tutorials/examples.rst:72 ../../tutorials/examples.rst:185
+#: ../../tutorials/examples.rst:303 ../../tutorials/examples.rst:439
+#: 318739b6bd404365860088fd196d93f9 9a5b95001b4a4bc9b6b0c6151da10083
+#: a780ac142d0f4a56b470af7da9d49383 d8e065628e43440a95f200afbb6b45f1
+msgid "Expected Behavior"
+msgstr "预期行为"
+
+#: ../../tutorials/examples.rst:74 cba286664490487a9c644f858a72abdf
+msgid "All four LEDs on the STM32F4 Discovery board blink in sequence:"
+msgstr "STM32F4 Discovery 板上的所有四个 LED 按顺序闪烁："
+
+#: ../../tutorials/examples.rst:76 b82e38e05b04479bbc170672529ae915
+msgid "Green LED toggles (500ms)"
+msgstr "Green LED toggles (500ms)"
+
+#: ../../tutorials/examples.rst:77 90ca504efaea45409b8bea8d40191c7b
+msgid "Orange LED toggles (500ms)"
+msgstr "Orange LED toggles (500ms)"
+
+#: ../../tutorials/examples.rst:78 bf5c9434343d4e088219333f1d8bbd4a
+msgid "Red LED toggles (500ms)"
+msgstr "Red LED toggles (500ms)"
+
+#: ../../tutorials/examples.rst:79 8c2cc85f68b349f7945b06d7351e37d5
+msgid "Blue LED toggles (500ms)"
+msgstr "Blue LED toggles (500ms)"
+
+#: ../../tutorials/examples.rst:80 2d813e5933dd4f5396a803cb22b65e20
+msgid "Repeat"
+msgstr "重复"
+
+#: ../../tutorials/examples.rst:83 ../../tutorials/examples.rst:198
+#: ../../tutorials/examples.rst:320 ../../tutorials/examples.rst:484
+#: 11b6459b92a74dd796749447f5fe01d1 2c6997089344401e81f2b1750c4a6666
+#: 80f0c9510dfd4f7082d1416240eac9e2 942afb14304f4a7eba2506ba502967e7
+msgid "Key Code Sections"
+msgstr "关键代码部分"
+
+#: ../../tutorials/examples.rst:85 5b8631b4c1594752a0d13e2809d22829
+msgid "**LED Initialization**:"
+msgstr "**LED 初始化**："
+
+#: ../../tutorials/examples.rst:87 ecb13c72fe6c4acc8759ecafb958ea08
+msgid ""
+"static hal_status_t led_init(void) {\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"\n"
+"    /* Initialize all LEDs */\n"
+"    hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config);\n"
+"    hal_gpio_init(LED_ORANGE_PORT, LED_ORANGE_PIN, &config);\n"
+"    hal_gpio_init(LED_RED_PORT, LED_RED_PIN, &config);\n"
+"    hal_gpio_init(LED_BLUE_PORT, LED_BLUE_PIN, &config);\n"
+"\n"
+"    return HAL_OK;\n"
+"}"
+msgstr ""
+"static hal_status_t led_init(void) {\n"
+"    hal_gpio_config_t config = {\n"
+"        .direction = HAL_GPIO_DIR_OUTPUT,\n"
+"        .pull = HAL_GPIO_PULL_NONE,\n"
+"        .output_mode = HAL_GPIO_OUTPUT_PP,\n"
+"        .speed = HAL_GPIO_SPEED_LOW,\n"
+"        .init_level = HAL_GPIO_LEVEL_LOW\n"
+"    };\n"
+"\n"
+"    /* Initialize all LEDs */\n"
+"    hal_gpio_init(LED_GREEN_PORT, LED_GREEN_PIN, &config);\n"
+"    hal_gpio_init(LED_ORANGE_PORT, LED_ORANGE_PIN, &config);\n"
+"    hal_gpio_init(LED_RED_PORT, LED_RED_PIN, &config);\n"
+"    hal_gpio_init(LED_BLUE_PORT, LED_BLUE_PIN, &config);\n"
+"\n"
+"    return HAL_OK;\n"
+"}"
+
+#: ../../tutorials/examples.rst:107 b77d033f20bf43bf9a1a97a9afaf5fc7
+msgid "**Main Loop**:"
+msgstr "**主循环**："
+
+#: ../../tutorials/examples.rst:109 d32007efd7bc4ede8d517a95b609f6d3
+msgid ""
+"while (1) {\n"
+"    hal_gpio_toggle(LED_GREEN_PORT, LED_GREEN_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"\n"
+"    hal_gpio_toggle(LED_ORANGE_PORT, LED_ORANGE_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"\n"
+"    hal_gpio_toggle(LED_RED_PORT, LED_RED_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"\n"
+"    hal_gpio_toggle(LED_BLUE_PORT, LED_BLUE_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"}"
+msgstr ""
+"while (1) {\n"
+"    hal_gpio_toggle(LED_GREEN_PORT, LED_GREEN_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"\n"
+"    hal_gpio_toggle(LED_ORANGE_PORT, LED_ORANGE_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"\n"
+"    hal_gpio_toggle(LED_RED_PORT, LED_RED_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"\n"
+"    hal_gpio_toggle(LED_BLUE_PORT, LED_BLUE_PIN);\n"
+"    hal_delay_ms(BLINK_DELAY_MS);\n"
+"}"
+
+#: ../../tutorials/examples.rst:126 ../../tutorials/examples.rst:243
+#: ../../tutorials/examples.rst:378 ../../tutorials/examples.rst:546
+#: 860dd3c5473549deb9829679bd8ed42c a48fca9835494520873d8a6328ce0b1b
+#: e9af4051c2b64a1288cdc1ee839755bf fc6b4d79c7ca4f7e899c908b2bbe0fb2
+msgid "Learning Outcomes"
+msgstr "学习成果"
+
+#: ../../tutorials/examples.rst:128 ../../tutorials/examples.rst:245
+#: ../../tutorials/examples.rst:380 ../../tutorials/examples.rst:548
+#: 9375570b6d22402981a2bf4cc286c22a a7248d37a51f447da95c8b25c7593d46
+#: b63b0106e8aa426b9f1695afbc4a0597 f3cd191253584b348e332e6bd3b7f671
+msgid "After studying this example, you will understand:"
+msgstr "学习此示例后，您将理解："
+
+#: ../../tutorials/examples.rst:130 064327e80cab4b88bafebd99bc90dffa
+msgid "How to initialize the HAL subsystem"
+msgstr "如何初始化 HAL 子系统"
+
+#: ../../tutorials/examples.rst:131 8fd5e95fff6042db8974991cd9f2aefa
+msgid "How to configure GPIO pins as outputs"
+msgstr "如何将 GPIO 引脚配置为输出"
+
+#: ../../tutorials/examples.rst:132 bc9d8a0b4b0e4def870fc3293c06b485
+msgid "How to control LED states"
+msgstr "如何控制 LED 状态"
+
+#: ../../tutorials/examples.rst:133 cf2cae00347f4bdd8f6d931c74341efb
+msgid "How to use HAL delay functions"
+msgstr "如何使用 HAL 延迟函数"
+
+#: ../../tutorials/examples.rst:134 b960040f863e4ba0acc2cc2dd1f96b33
+msgid "Basic error handling patterns"
+msgstr "基本错误处理模式"
+
+#: ../../tutorials/examples.rst:137 77ab6cbd172e4f3fba4b3bfe6f6f9f62
+msgid "Related Tutorials"
+msgstr "相关教程"
+
+#: ../../tutorials/examples.rst:139 d4680aac35a042a88131ad56ea2123ad
+msgid ":doc:`first_application` - Build your first Nexus application"
+msgstr ":doc:`first_application` - Build your first Nexus application"
+
+#: ../../tutorials/examples.rst:140 301221a9b6a3497fb6016408ed4a8362
+msgid ":doc:`gpio_control` - Advanced GPIO techniques"
+msgstr ":doc:`gpio_control` - Advanced GPIO techniques"
+
+#: ../../tutorials/examples.rst:143 67701638a37c455ca9ba09308813acc3
+msgid "Config Demo Example"
+msgstr "Config Demo 示例"
+
+#: ../../tutorials/examples.rst:145 01d64006772340218e5c1063714e49f9
+msgid "**Location**: ``applications/config_demo/``"
+msgstr "**位置**：``applications/config_demo/``"
+
+#: ../../tutorials/examples.rst:147 d4c6ee18d8ae4fa6a00f03aba033e052
+msgid ""
+"**Description**: Demonstrates the Config Manager middleware for storing and "
+"retrieving configuration data."
+msgstr "**描述**：演示用于存储和检索配置数据的配置管理器中间件。"
+
+#: ../../tutorials/examples.rst:152 d9eec88ae9df4467abb355437290b0bf
+msgid "Configuration storage and retrieval"
+msgstr "配置存储和检索"
+
+#: ../../tutorials/examples.rst:153 3123e21b76234b0f9a7859e2dd50ee61
+msgid "Multiple data types (int32, uint32, float, bool, string, blob)"
+msgstr "Multiple data types (int32, uint32, float, bool, string, blob)"
+
+#: ../../tutorials/examples.rst:154 be31c70d3eba4837ab6b8a5fa7b8170d
+msgid "Namespace isolation"
+msgstr "命名空间隔离"
+
+#: ../../tutorials/examples.rst:155 7f0afd8715f64587aa8335fef48f8ec5
+msgid "Configuration query and enumeration"
+msgstr "配置查询和枚举"
+
+#: ../../tutorials/examples.rst:156 ebc94c3c0583455ebf3866af4023ccc6
+msgid "JSON import/export"
+msgstr "JSON 导入/导出"
+
+#: ../../tutorials/examples.rst:157 e265d94298c345bfba9e7d0266718684
+msgid "Binary import/export"
+msgstr "二进制导入/导出"
+
+#: ../../tutorials/examples.rst:158 14aa6b969dfe4eb79532b5b48a4bd87a
+msgid "UART output for demonstration"
+msgstr "用于演示的 UART 输出"
+
+#: ../../tutorials/examples.rst:163 ../../tutorials/examples.rst:417
+#: 104345e69b764f959509d2a46e7f8d0d 761e8a1f0f4948bd8effc92250bf174f
+msgid "STM32F4 Discovery board"
+msgstr "STM32F4 Discovery 板"
+
+#: ../../tutorials/examples.rst:164 ../../tutorials/examples.rst:418
+#: 8bc4f2fba3244baf8d911ea9d1395f5d c957d052daed4830b67e2d6b2b6617f0
+msgid "USB-to-Serial adapter connected to UART2 (PA2/PA3)"
+msgstr "USB-to-Serial adapter connected to UART2 (PA2/PA3)"
+
+#: ../../tutorials/examples.rst:165 ../../tutorials/examples.rst:419
+#: 047289afb65f44f5a62891a4bf5c559b f40505234dde4e2cab6d12c2aca35a60
+msgid "Serial terminal at 115200 baud"
+msgstr "115200 波特率的串口终端"
+
+#: ../../tutorials/examples.rst:170 229465da5dad4fc38e89192305dc6108
+msgid ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target config_demo\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/config_demo/config_demo.elf verify reset exit\""
+msgstr ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target config_demo\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/config_demo/config_demo.elf verify reset exit\""
+
+#: ../../tutorials/examples.rst:187 87a105023d9d4b9ea6b92878f338ae9d
+msgid "The application runs through several demonstrations:"
+msgstr "应用程序运行多个演示："
+
+#: ../../tutorials/examples.rst:189 436a4a4f353140a5bf6a4e893e322128
+msgid "**Basic Configuration**: Stores and retrieves various data types"
+msgstr "**基本配置**：存储和检索各种数据类型"
+
+#: ../../tutorials/examples.rst:190 37ea537882114788a3c6076e4f658c6c
+msgid ""
+"**Namespaces**: Demonstrates namespace isolation (WiFi and BLE configs)"
+msgstr ""
+"**Namespaces**: Demonstrates namespace isolation (WiFi and BLE configs)"
+
+#: ../../tutorials/examples.rst:191 00ac31588fa04b34bc3fd7eb35251e53
+msgid "**Query**: Lists all configuration entries"
+msgstr "**查询**：列出所有配置条目"
+
+#: ../../tutorials/examples.rst:192 f6561873010e468885b4d2846cd9e15e
+msgid "**JSON Export/Import**: Exports config to JSON and reimports"
+msgstr "**JSON 导出/导入**：将配置导出为 JSON 并重新导入"
+
+#: ../../tutorials/examples.rst:193 d4bf99ecbf1f4289b86e368caa35b83a
+msgid ""
+"**Binary Export/Import**: Exports config to binary format and reimports"
+msgstr "**二进制导出/导入**：将配置导出为二进制格式并重新导入"
+
+#: ../../tutorials/examples.rst:195 bef453617b244c749bcc528c221f64c2
+msgid "Green LED turns on when ready, and blinks slowly when complete."
+msgstr "就绪时绿色 LED 点亮，完成时缓慢闪烁。"
+
+#: ../../tutorials/examples.rst:200 050c5948dcaf4a218700bb6e4fdcd3e0
+msgid "**Basic Configuration Storage**:"
+msgstr "**Basic 配置 Storage**:"
+
+#: ../../tutorials/examples.rst:202 bfdbdb527efd41fa80db7eae078c258b
+msgid ""
+"/* Store different data types */\n"
+"config_set_i32(\"app.timeout\", 5000);\n"
+"config_set_u32(\"app.retry\", 3);\n"
+"config_set_float(\"sensor.threshold\", 25.5f);\n"
+"config_set_bool(\"feature.enabled\", true);\n"
+"config_set_str(\"device.name\", \"Nexus-Demo\");\n"
+"\n"
+"/* Read values back */\n"
+"int32_t timeout = 0;\n"
+"config_get_i32(\"app.timeout\", &timeout, 0);"
+msgstr ""
+"/* Store different data types */\n"
+"config_set_i32(\"app.timeout\", 5000);\n"
+"config_set_u32(\"app.retry\", 3);\n"
+"config_set_float(\"sensor.threshold\", 25.5f);\n"
+"config_set_bool(\"feature.enabled\", true);\n"
+"config_set_str(\"device.name\", \"Nexus-Demo\");\n"
+"\n"
+"/* Read values back */\n"
+"int32_t timeout = 0;\n"
+"config_get_i32(\"app.timeout\", &timeout, 0);"
+
+#: ../../tutorials/examples.rst:215 c12e9d9b1e46436c85eed129e8c90a5c
+msgid "**Namespace Usage**:"
+msgstr "**命名空间使用**："
+
+#: ../../tutorials/examples.rst:217 a111a742597745b98310cebf42487644
+msgid ""
+"/* Open namespaces */\n"
+"config_ns_handle_t wifi_ns, ble_ns;\n"
+"config_open_namespace(\"wifi\", &wifi_ns);\n"
+"config_open_namespace(\"ble\", &ble_ns);\n"
+"\n"
+"/* Store WiFi settings */\n"
+"config_ns_set_str(wifi_ns, \"ssid\", \"MyNetwork\");\n"
+"config_ns_set_bool(wifi_ns, \"auto_connect\", true);\n"
+"\n"
+"/* Close namespaces */\n"
+"config_close_namespace(wifi_ns);\n"
+"config_close_namespace(ble_ns);"
+msgstr ""
+"/* Open namespaces */\n"
+"config_ns_handle_t wifi_ns, ble_ns;\n"
+"config_open_namespace(\"wifi\", &wifi_ns);\n"
+"config_open_namespace(\"ble\", &ble_ns);\n"
+"\n"
+"/* Store WiFi settings */\n"
+"config_ns_set_str(wifi_ns, \"ssid\", \"MyNetwork\");\n"
+"config_ns_set_bool(wifi_ns, \"auto_connect\", true);\n"
+"\n"
+"/* Close namespaces */\n"
+"config_close_namespace(wifi_ns);\n"
+"config_close_namespace(ble_ns);"
+
+#: ../../tutorials/examples.rst:232 739a972148774a8487206d4c0b828ad5
+msgid "**JSON Export**:"
+msgstr "**JSON 导出**："
+
+#: ../../tutorials/examples.rst:234 215ffc79c327420e95a1382c76a9a759
+msgid ""
+"/* Export to JSON */\n"
+"char buffer[1024];\n"
+"size_t actual_size = 0;\n"
+"config_status_t status = config_export(CONFIG_FORMAT_JSON, 0, buffer,\n"
+"                                       sizeof(buffer), &actual_size);"
+msgstr ""
+"/* Export to JSON */\n"
+"char buffer[1024];\n"
+"size_t actual_size = 0;\n"
+"config_status_t status = config_export(CONFIG_FORMAT_JSON, 0, buffer,\n"
+"                                       sizeof(buffer), &actual_size);"
+
+#: ../../tutorials/examples.rst:247 ea33382efd004786a2a11bf723722c71
+msgid "How to initialize and use the Config Manager"
+msgstr "如何初始化和使用配置管理器"
+
+#: ../../tutorials/examples.rst:248 de87d6c59d614f43b07e786fdebb8759
+msgid "How to store and retrieve different data types"
+msgstr "如何存储和检索不同的数据类型"
+
+#: ../../tutorials/examples.rst:249 bffe79e6f5534b32bd66c0302d95b16d
+msgid "How to use namespaces for configuration isolation"
+msgstr "如何使用命名空间进行配置隔离"
+
+#: ../../tutorials/examples.rst:250 8c68e3c34f0d4de3a9ef3434f3fc75f8
+msgid "How to export and import configurations"
+msgstr "如何导出和导入配置"
+
+#: ../../tutorials/examples.rst:251 634943961d3c4d29a4f1dec3a4c769ad
+msgid "How to query configuration entries"
+msgstr "如何查询配置条目"
+
+#: ../../tutorials/examples.rst:252 b8aaf660dd12428c95289d48153ada31
+msgid "How to use UART for debug output"
+msgstr "如何使用 UART 进行调试输出"
+
+#: ../../tutorials/examples.rst:255 ../../tutorials/examples.rst:391
+#: ../../tutorials/examples.rst:559 09e06a20f2eb4653ac42b2b4a10c3a36
+#: 29aea76d9fc64f3eb3d9148d9576c797 c68598f42a0f4009a9c12a2c0c75bed9
+msgid "Related Documentation"
+msgstr "相关文档"
+
+#: ../../tutorials/examples.rst:257 0e37ee9a85c949109a367d2da0535691
+msgid ":doc:`../user_guide/config` - Config Manager user guide"
+msgstr ":doc:`../user_guide/config` - Config Manager user guide"
+
+#: ../../tutorials/examples.rst:258 ../../tutorials/examples.rst:562
+#: 40c88732da21415ebb281628bfebeb27 aa8cece7d0ad424eb30a1ae7d50f1e2d
+msgid ":doc:`uart_communication` - UART communication tutorial"
+msgstr ":doc:`uart_communication` - UART communication tutorial"
+
+#: ../../tutorials/examples.rst:261 9d205a64f02b452f96c165340389a2b5
+msgid "FreeRTOS Demo Example"
+msgstr "FreeRTOS Demo 示例"
+
+#: ../../tutorials/examples.rst:263 30cf5fa3cc8e430696da9914d576807b
+msgid "**Location**: ``applications/freertos_demo/``"
+msgstr "**位置**：``applications/freertos_demo/``"
+
+#: ../../tutorials/examples.rst:265 a4b82fe432ed46258c247c4a643847c1
+msgid ""
+"**Description**: Demonstrates multi-tasking using the OSAL with FreeRTOS "
+"backend."
+msgstr "**描述**：演示使用带有 FreeRTOS 后端的 OSAL 进行多任务处理。"
+
+#: ../../tutorials/examples.rst:270 99ff90bea1e744a883cb15fc5e336971
+msgid "Multiple concurrent tasks"
+msgstr "多个并发任务"
+
+#: ../../tutorials/examples.rst:271 d590785f701f4717accaf9aca4f42829
+msgid "Task priorities and scheduling"
+msgstr "任务优先级和调度"
+
+#: ../../tutorials/examples.rst:272 2bd240e2fac94f11ae534a08735488cd
+msgid "Mutex for resource protection"
+msgstr "用于资源保护的互斥锁"
+
+#: ../../tutorials/examples.rst:273 448ff4df6760402e8882b5d1a359ec20
+msgid "Semaphore for task synchronization"
+msgstr "用于任务同步的信号量"
+
+#: ../../tutorials/examples.rst:274 81583902592e4bce8e32335d4a2ea338
+msgid "Message queue for inter-task communication"
+msgstr "用于任务间通信的消息队列"
+
+#: ../../tutorials/examples.rst:275 4c949d7fe0e0413f8f99417298d82e39
+msgid "Producer-consumer pattern"
+msgstr "生产者-消费者模式"
+
+#: ../../tutorials/examples.rst:276 84603477250a4bbd9fd1c96a21552493
+msgid "System statistics tracking"
+msgstr "系统统计跟踪"
+
+#: ../../tutorials/examples.rst:281 254c581fdd384677ba10894c01ba4528
+msgid "STM32F4 Discovery board with FreeRTOS support"
+msgstr "支持 FreeRTOS 的 STM32F4 Discovery 板"
+
+#: ../../tutorials/examples.rst:282 dd1968dcfcea4a9fa9b9ba8bad0a4ef3
+msgid "LEDs for visual feedback"
+msgstr "用于视觉反馈的 LED"
+
+#: ../../tutorials/examples.rst:287 4578b8bd843148a9a9a32f38e934f417
+msgid ""
+"# Configure for STM32F4 with FreeRTOS\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4 \\\n"
+"    -DNEXUS_OSAL_BACKEND=freertos\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target freertos_demo\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/freertos_demo/freertos_demo.elf verify reset exit\""
+msgstr ""
+"# Configure for STM32F4 with FreeRTOS\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4 \\\n"
+"    -DNEXUS_OSAL_BACKEND=freertos\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target freertos_demo\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/freertos_demo/freertos_demo.elf verify reset exit\""
+
+#: ../../tutorials/examples.rst:305 5c9c75b3bb09448b92e7b0319d4d7368
+msgid "The application creates four tasks:"
+msgstr "应用程序创建四个任务："
+
+#: ../../tutorials/examples.rst:307 b3e62e5b5ecb454a83c5099f05566613
+msgid "**Producer Task**: Generates sensor data every 100ms, sends to queue"
+msgstr ""
+
+#: ../../tutorials/examples.rst:308 a7457e653b504754a2316eb2fffa1f79
+msgid "**Consumer Task**: Receives data from queue, processes it"
+msgstr ""
+
+#: ../../tutorials/examples.rst:309 968da388e27b46a9a82bd3740d7337f2
+msgid "**LED Task**: Blinks green LED as heartbeat (500ms)"
+msgstr "**LED Task**: Blinks green LED as heartbeat (500ms)"
+
+#: ../../tutorials/examples.rst:310 b903bc83da99441fa53248606ee64aba
+msgid "**Stats Task**: Periodically reports system statistics (2s)"
+msgstr "**Stats Task**: Periodically reports system statistics (2s)"
+
+#: ../../tutorials/examples.rst:312 6c1c096271df4f18b653cf351e37c7ab
+msgid "LED Indicators:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:314 0b63cfe7600241c58fb8fa804db78594
+msgid "Green: Heartbeat (system running)"
+msgstr "Green: Heartbeat (system running)"
+
+#: ../../tutorials/examples.rst:315 2751fbd2bb5e412ab70c9c4c29904159
+msgid "Orange: Consumer processing data"
+msgstr ""
+
+#: ../../tutorials/examples.rst:316 c92d931fc69042d09368aab74827852c
+msgid "Blue: Producer sending data"
+msgstr ""
+
+#: ../../tutorials/examples.rst:317 89a5e9c8eb1d42e68c48ae234e4fd4dd
+msgid "Red: Queue overflow or error"
+msgstr ""
+
+#: ../../tutorials/examples.rst:322 373aa2c9646d4056ab8b37f6a2a818ea
+msgid "**Task Creation**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:324 cfe71428b4354bc58a5d7b477309153a
+msgid ""
+"/* Producer task - Normal priority */\n"
+"osal_task_config_t producer_config = {\n"
+"    .name = \"Producer\",\n"
+"    .func = producer_task,\n"
+"    .arg = NULL,\n"
+"    .priority = OSAL_TASK_PRIORITY_NORMAL,\n"
+"    .stack_size = TASK_STACK_SIZE\n"
+"};\n"
+"osal_task_create(&producer_config, &g_producer_task);"
+msgstr ""
+"/* Producer task - Normal priority */\n"
+"osal_task_config_t producer_config = {\n"
+"    .name = \"Producer\",\n"
+"    .func = producer_task,\n"
+"    .arg = NULL,\n"
+"    .priority = OSAL_TASK_PRIORITY_NORMAL,\n"
+"    .stack_size = TASK_STACK_SIZE\n"
+"};\n"
+"osal_task_create(&producer_config, &g_producer_task);"
+
+#: ../../tutorials/examples.rst:336 28023b9cfd5043c49de8daf2917f5462
+msgid "**Message Queue**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:338 989597f7a4ec43fabae7df4d690d8984
+msgid ""
+"/* Create message queue for sensor data */\n"
+"osal_queue_create(sizeof(sensor_data_t), SENSOR_QUEUE_SIZE,\n"
+"                 &g_sensor_queue);\n"
+"\n"
+"/* Send to queue */\n"
+"osal_queue_send(g_sensor_queue, &data, 10);\n"
+"\n"
+"/* Receive from queue */\n"
+"osal_queue_receive(g_sensor_queue, &data, OSAL_WAIT_FOREVER);"
+msgstr ""
+"/* Create message queue for sensor data */\n"
+"osal_queue_create(sizeof(sensor_data_t), SENSOR_QUEUE_SIZE,\n"
+"                 &g_sensor_queue);\n"
+"\n"
+"/* Send to queue */\n"
+"osal_queue_send(g_sensor_queue, &data, 10);\n"
+"\n"
+"/* Receive from queue */\n"
+"osal_queue_receive(g_sensor_queue, &data, OSAL_WAIT_FOREVER);"
+
+#: ../../tutorials/examples.rst:350 95ae06a0202c454380fa07537ae706cd
+msgid "**Mutex Protection**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:352 d069bb0740d24eaa9056f5c8e4c46c99
+msgid ""
+"/* Create mutex */\n"
+"osal_mutex_create(&g_stats_mutex);\n"
+"\n"
+"/* Lock mutex */\n"
+"if (osal_mutex_lock(g_stats_mutex, 100) == OSAL_OK) {\n"
+"    /* Critical section - update shared statistics */\n"
+"    g_stats.samples_produced++;\n"
+"    osal_mutex_unlock(g_stats_mutex);\n"
+"}"
+msgstr ""
+"/* Create mutex */\n"
+"osal_mutex_create(&g_stats_mutex);\n"
+"\n"
+"/* Lock mutex */\n"
+"if (osal_mutex_lock(g_stats_mutex, 100) == OSAL_OK) {\n"
+"    /* Critical section - update shared statistics */\n"
+"    g_stats.samples_produced++;\n"
+"    osal_mutex_unlock(g_stats_mutex);\n"
+"}"
+
+#: ../../tutorials/examples.rst:364 07f01d45de5b464281b5cf1e8e85bf66
+msgid "**Semaphore Signaling**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:366 d2eb39504aee4077a0ee479e7b4e19dd
+msgid ""
+"/* Create semaphore */\n"
+"osal_sem_create_counting(SENSOR_QUEUE_SIZE, 0, &g_data_ready_sem);\n"
+"\n"
+"/* Signal data ready */\n"
+"osal_sem_give(g_data_ready_sem);\n"
+"\n"
+"/* Wait for data */\n"
+"osal_sem_take(g_data_ready_sem, 500);"
+msgstr ""
+"/* Create semaphore */\n"
+"osal_sem_create_counting(SENSOR_QUEUE_SIZE, 0, &g_data_ready_sem);\n"
+"\n"
+"/* Signal data ready */\n"
+"osal_sem_give(g_data_ready_sem);\n"
+"\n"
+"/* Wait for data */\n"
+"osal_sem_take(g_data_ready_sem, 500);"
+
+#: ../../tutorials/examples.rst:382 2bae02d1996a4ff5973b8ae4956bb2b9
+msgid "How to initialize OSAL and create tasks"
+msgstr ""
+
+#: ../../tutorials/examples.rst:383 b84bb34626744160a04e7e2b5a4f90c1
+msgid "How to use task priorities"
+msgstr ""
+
+#: ../../tutorials/examples.rst:384 b7f34babd14f4e618e27aaecb2ab27d8
+msgid "How to protect shared resources with mutexes"
+msgstr ""
+
+#: ../../tutorials/examples.rst:385 bbb409c5d8234acc8da95aec8c712b17
+msgid "How to synchronize tasks with semaphores"
+msgstr ""
+
+#: ../../tutorials/examples.rst:386 bb6ec9417e62434189c5babd57994a9a
+msgid "How to pass messages between tasks with queues"
+msgstr ""
+
+#: ../../tutorials/examples.rst:387 da895d8c55344ede98651379c029df3f
+msgid "How to implement producer-consumer patterns"
+msgstr ""
+
+#: ../../tutorials/examples.rst:388 59fe238eb12b4cf6a7f6eaa9971ed907
+msgid "How to start the RTOS scheduler"
+msgstr ""
+
+#: ../../tutorials/examples.rst:393 223f17472cdb4969b8cfa6765037a9c1
+msgid ":doc:`task_creation` - Multi-tasking tutorial"
+msgstr ":doc:`task_creation` - Multi-tasking tutorial"
+
+#: ../../tutorials/examples.rst:394 beaf94f9891c45c4bf999b529671f427
+msgid ":doc:`../user_guide/osal` - OSAL user guide"
+msgstr ":doc:`../user_guide/osal` - OSAL user guide"
+
+#: ../../tutorials/examples.rst:397 c14aa80ba2544104ae3a27fdffc1a649
+msgid "Shell Demo Example"
+msgstr "Shell Demo 示例"
+
+#: ../../tutorials/examples.rst:399 dc170e62727043edbb72d9a07b971618
+msgid "**Location**: ``applications/shell_demo/``"
+msgstr "**位置**：``applications/shell_demo/``"
+
+#: ../../tutorials/examples.rst:401 6cdb27e2155f4dfa865f986a41d1d2e0
+msgid ""
+"**Description**: Demonstrates the Shell/CLI middleware for interactive "
+"command-line interfaces."
+msgstr ""
+
+#: ../../tutorials/examples.rst:406 be48b1a75b404810958478b6e602d3ef
+msgid "Interactive command-line interface over UART"
+msgstr ""
+
+#: ../../tutorials/examples.rst:407 df072d2dfba34a9982a62a482f43d820
+msgid "Custom command registration"
+msgstr ""
+
+#: ../../tutorials/examples.rst:408 33ecb21339494044a49db41bf73aa3ff
+msgid "Command parsing and execution"
+msgstr ""
+
+#: ../../tutorials/examples.rst:409 1e53b68fb4ba4a7ca2d5bf16b5388ea5
+msgid "Command completion"
+msgstr ""
+
+#: ../../tutorials/examples.rst:410 3492a027a49742958b220714c0bce393
+msgid "Built-in commands (help, version, etc.)"
+msgstr "Built-in commands (help, version, etc.)"
+
+#: ../../tutorials/examples.rst:411 aa50bf54dfb54f02a7135a6ed0b47694
+msgid "LED control commands"
+msgstr ""
+
+#: ../../tutorials/examples.rst:412 70d9d49f8df6427884c9dbd8940847df
+msgid "System commands (tick, delay, reboot)"
+msgstr "System commands (tick, delay, reboot)"
+
+#: ../../tutorials/examples.rst:424 0c7e45d852c74b5f9ca8950a6f9ef064
+msgid ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target shell_demo\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/shell_demo/shell_demo.elf verify reset exit\""
+msgstr ""
+"# Configure for STM32F4\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target shell_demo\n"
+"\n"
+"# Flash\n"
+"openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \\\n"
+"    -c \"program build-stm32f4/applications/shell_demo/shell_demo.elf verify reset exit\""
+
+#: ../../tutorials/examples.rst:441 3b3a95d23afe46fd80653e98a357af92
+msgid "After flashing, open a serial terminal and you'll see:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:443 90a12d5cf89a481d8b9d713e3964f8db
+msgid ""
+"========================================\n"
+"  Nexus Shell Demo v1.0.0\n"
+"  STM32F4 Discovery Board\n"
+"  Type 'help' for available commands\n"
+"========================================\n"
+"nexus>"
+msgstr ""
+"========================================\n"
+"  Nexus Shell Demo v1.0.0\n"
+"  STM32F4 Discovery Board\n"
+"  Type 'help' for available commands\n"
+"========================================\n"
+"nexus>"
+
+#: ../../tutorials/examples.rst:452 98820cd8b22d40ed8e433b338231cc82
+msgid "Available Commands:"
+msgstr "可用 Commands:"
+
+#: ../../tutorials/examples.rst:454 e83dcf4941084f6bbc7bbad7b47f04bf
+msgid "``help`` - Show available commands"
+msgstr ""
+
+#: ../../tutorials/examples.rst:455 9ffa3d7e5a5b478097f78e00094c7006
+msgid ""
+"``led <color> <on|off|toggle>`` - Control LEDs (green, orange, red, blue, "
+"all)"
+msgstr ""
+"``led <color> <on|off|toggle>`` - Control LEDs (green, orange, red, blue, "
+"all)"
+
+#: ../../tutorials/examples.rst:456 1b1875cf16684d7eaf571b4c91bf9843
+msgid "``button`` - Read user button status"
+msgstr ""
+
+#: ../../tutorials/examples.rst:457 5db0c05f6d544e6c841d0d6c3e1d092a
+msgid "``tick`` - Show system tick count"
+msgstr ""
+
+#: ../../tutorials/examples.rst:458 921fa53ec175442bbf1549276bb87c1b
+msgid "``delay <ms>`` - Delay for specified milliseconds"
+msgstr "``delay <ms>`` - Delay for specified milliseconds"
+
+#: ../../tutorials/examples.rst:459 749265c496a043cbab57a640e80a4891
+msgid "``reboot`` - Reboot the system"
+msgstr ""
+
+#: ../../tutorials/examples.rst:461 ec3f12c09153458aa2171c53f6ef060b
+msgid "Example Session:"
+msgstr "示例 Session:"
+
+#: ../../tutorials/examples.rst:463 437e25967dcc46f88a4ee66f0cd2a3ca
+msgid ""
+"nexus> help\n"
+"Available commands:\n"
+"  help     - Show this help\n"
+"  led      - Control LEDs on the board\n"
+"  button   - Read user button status\n"
+"  tick     - Show system tick count\n"
+"  delay    - Delay for specified milliseconds\n"
+"  reboot   - Reset system\n"
+"\n"
+"nexus> led green on\n"
+"LED green ON\n"
+"\n"
+"nexus> tick\n"
+"System tick: 12345 ms\n"
+"\n"
+"nexus> button\n"
+"User button: RELEASED"
+msgstr ""
+"nexus> help\n"
+"Available commands:\n"
+"  help     - Show this help\n"
+"  led      - Control LEDs on the board\n"
+"  button   - Read user button status\n"
+"  tick     - Show system tick count\n"
+"  delay    - Delay for specified milliseconds\n"
+"  reboot   - Reset system\n"
+"\n"
+"nexus> led green on\n"
+"LED green ON\n"
+"\n"
+"nexus> tick\n"
+"System tick: 12345 ms\n"
+"\n"
+"nexus> button\n"
+"User button: RELEASED"
+
+#: ../../tutorials/examples.rst:486 2797fc8dd84943239dea7ca9afa30ca9
+msgid "**Command Handler**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:488 aa6741e32d4d45b483445aacf2fd0419
+#, python-format
+msgid ""
+"static int cmd_led(int argc, char* argv[]) {\n"
+"    if (argc < 3) {\n"
+"        shell_printf(\"Usage: led <color> <on|off|toggle>\\n\");\n"
+"        return 1;\n"
+"    }\n"
+"\n"
+"    const char* color = argv[1];\n"
+"    const char* action = argv[2];\n"
+"\n"
+"    /* Determine which LED and perform action */\n"
+"    if (strcmp(action, \"on\") == 0) {\n"
+"        hal_gpio_write(port, pin, HAL_GPIO_LEVEL_HIGH);\n"
+"        shell_printf(\"LED %s ON\\n\", color);\n"
+"    }\n"
+"\n"
+"    return 0;\n"
+"}"
+msgstr ""
+"static int cmd_led(int argc, char* argv[]) {\n"
+"    if (argc < 3) {\n"
+"        shell_printf(\"Usage: led <color> <on|off|toggle>\\n\");\n"
+"        return 1;\n"
+"    }\n"
+"\n"
+"    const char* color = argv[1];\n"
+"    const char* action = argv[2];\n"
+"\n"
+"    /* Determine which LED and perform action */\n"
+"    if (strcmp(action, \"on\") == 0) {\n"
+"        hal_gpio_write(port, pin, HAL_GPIO_LEVEL_HIGH);\n"
+"        shell_printf(\"LED %s ON\\n\", color);\n"
+"    }\n"
+"\n"
+"    return 0;\n"
+"}"
+
+#: ../../tutorials/examples.rst:508 537924ae61f340fba26dec31be22c1c2
+msgid "**Command Registration**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:510 4cab28dfb64a4d48bd36629cb4fc831a
+msgid ""
+"static const shell_command_t cmd_led_def = {\n"
+"    .name = \"led\",\n"
+"    .handler = cmd_led,\n"
+"    .help = \"Control LEDs on the board\",\n"
+"    .usage = \"led <color> <on|off|toggle>\",\n"
+"    .completion = led_color_completion\n"
+"};\n"
+"\n"
+"/* Register command */\n"
+"shell_register_command(&cmd_led_def);"
+msgstr ""
+"static const shell_command_t cmd_led_def = {\n"
+"    .name = \"led\",\n"
+"    .handler = cmd_led,\n"
+"    .help = \"Control LEDs on the board\",\n"
+"    .usage = \"led <color> <on|off|toggle>\",\n"
+"    .completion = led_color_completion\n"
+"};\n"
+"\n"
+"/* Register command */\n"
+"shell_register_command(&cmd_led_def);"
+
+#: ../../tutorials/examples.rst:523 51a4c53feb1249379d9693e69f6906b9
+msgid "**Shell Initialization**:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:525 05fb7907fd2f4dafb6a3488e9056240e
+msgid ""
+"/* Configure shell */\n"
+"shell_config_t config = {\n"
+"    .prompt = \"nexus> \",\n"
+"    .cmd_buffer_size = 128,\n"
+"    .history_depth = 16,\n"
+"    .max_commands = 32\n"
+"};\n"
+"\n"
+"/* Initialize shell */\n"
+"shell_init(&config);\n"
+"\n"
+"/* Set UART backend */\n"
+"shell_set_backend(&shell_uart_backend);\n"
+"\n"
+"/* Register commands */\n"
+"shell_register_builtin_commands();\n"
+"shell_register_command(&cmd_led_def);"
+msgstr ""
+"/* Configure shell */\n"
+"shell_config_t config = {\n"
+"    .prompt = \"nexus> \",\n"
+"    .cmd_buffer_size = 128,\n"
+"    .history_depth = 16,\n"
+"    .max_commands = 32\n"
+"};\n"
+"\n"
+"/* Initialize shell */\n"
+"shell_init(&config);\n"
+"\n"
+"/* Set UART backend */\n"
+"shell_set_backend(&shell_uart_backend);\n"
+"\n"
+"/* Register commands */\n"
+"shell_register_builtin_commands();\n"
+"shell_register_command(&cmd_led_def);"
+
+#: ../../tutorials/examples.rst:550 04687eef7626430984f4b0eee7d5db04
+msgid "How to initialize the Shell framework"
+msgstr ""
+
+#: ../../tutorials/examples.rst:551 7214141057f94d7cba803cf1f94d67be
+msgid "How to register custom commands"
+msgstr ""
+
+#: ../../tutorials/examples.rst:552 007972ad6c934c6b98b86db4c4bf011d
+msgid "How to parse command arguments"
+msgstr ""
+
+#: ../../tutorials/examples.rst:553 563db9462e21401689022ae7514da467
+msgid "How to implement command handlers"
+msgstr ""
+
+#: ../../tutorials/examples.rst:554 aaf9f0078dc04b7a98d02fab6a1fc701
+msgid "How to use UART for interactive CLI"
+msgstr ""
+
+#: ../../tutorials/examples.rst:555 ab027036c5b444198fa7f84bd0d4b2a9
+msgid "How to provide command completion"
+msgstr ""
+
+#: ../../tutorials/examples.rst:556 034ed36d80964e8ea76162e7d1bbd825
+msgid "How to integrate shell with your application"
+msgstr ""
+
+#: ../../tutorials/examples.rst:561 efacab73823d4cfe85961b7f50198193
+msgid ":doc:`../user_guide/shell` - Shell framework user guide"
+msgstr ":doc:`../user_guide/shell` - Shell framework user guide"
+
+#: ../../tutorials/examples.rst:565 a81437514a844f72b3571bb1f940a827
+msgid "Building All Examples"
+msgstr "Building All 示例"
+
+#: ../../tutorials/examples.rst:567 56345ff19bf141b6ab7d74cf5fdd32d9
+msgid "To build all examples at once:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:569 7d97c540c2b34c49babd9f837f88d7fe
+msgid ""
+"# Configure\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build all examples\n"
+"cmake --build build-stm32f4 --target all"
+msgstr ""
+"# Configure\n"
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"\n"
+"# Build all examples\n"
+"cmake --build build-stm32f4 --target all"
+
+#: ../../tutorials/examples.rst:579 bd84c05fa70744d281227266cb7efbe0
+msgid "Example binaries will be located in:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:581 815283c4da4b4d1abb2a9494bf5bf14f
+msgid "``build-stm32f4/applications/blinky/blinky.elf``"
+msgstr "``build-stm32f4/applications/blinky/blinky.elf``"
+
+#: ../../tutorials/examples.rst:582 09a92f06c545492dac7cbdc9dd3f50c3
+msgid "``build-stm32f4/applications/config_demo/config_demo.elf``"
+msgstr "``build-stm32f4/applications/config_demo/config_demo.elf``"
+
+#: ../../tutorials/examples.rst:583 b86a7964ffc8411aa72e2dbc1322cb21
+msgid "``build-stm32f4/applications/freertos_demo/freertos_demo.elf``"
+msgstr "``build-stm32f4/applications/freertos_demo/freertos_demo.elf``"
+
+#: ../../tutorials/examples.rst:584 c56318c1b2d740bfbc4ecfe5f4ebd7a6
+msgid "``build-stm32f4/applications/shell_demo/shell_demo.elf``"
+msgstr "``build-stm32f4/applications/shell_demo/shell_demo.elf``"
+
+#: ../../tutorials/examples.rst:587 b75ec0ec47fb4253b0ed4de2a75c4862
+msgid "Modifying Examples"
+msgstr "Modifying 示例"
+
+#: ../../tutorials/examples.rst:589 692cb13b8ca44624b5a4eaac109dd618
+msgid "All examples are designed to be easily modified and extended:"
+msgstr ""
+
+#: ../../tutorials/examples.rst:591 3eb273d069e54bc0ab46b17e5150cf71
+msgid ""
+"**Copy the Example**: Copy the example directory to create your own "
+"application"
+msgstr ""
+
+#: ../../tutorials/examples.rst:592 0df77380099a436cb3cf09e462be1837
+msgid "**Modify CMakeLists.txt**: Update project name and dependencies"
+msgstr ""
+
+#: ../../tutorials/examples.rst:593 c0dc70853d8b43d993f9633620520abc
+msgid "**Modify main.c**: Add your custom functionality"
+msgstr ""
+
+#: ../../tutorials/examples.rst:594 d6a6229f3bcc472497ae2eadba542954
+msgid "**Build and Test**: Build and flash to your hardware"
+msgstr ""
+
+#: ../../tutorials/examples.rst:597 d1cfb7bf8cec40819a3b5628f8b607bc
+msgid "Example: Creating a Custom Application from Blinky"
+msgstr ""
+
+#: ../../tutorials/examples.rst:599 c61100cbc98649d9931df684c2c67e2e
+msgid ""
+"# Copy blinky example\n"
+"cp -r applications/blinky applications/my_app\n"
+"\n"
+"# Edit CMakeLists.txt\n"
+"# Change: project(blinky C)\n"
+"# To:     project(my_app C)\n"
+"\n"
+"# Edit main.c with your custom code\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target my_app"
+msgstr ""
+"# Copy blinky example\n"
+"cp -r applications/blinky applications/my_app\n"
+"\n"
+"# Edit CMakeLists.txt\n"
+"# Change: project(blinky C)\n"
+"# To:     project(my_app C)\n"
+"\n"
+"# Edit main.c with your custom code\n"
+"\n"
+"# Build\n"
+"cmake --build build-stm32f4 --target my_app"
+
+#: ../../tutorials/examples.rst:614 10cf88e7769944d09d90663845e5f27b
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../tutorials/examples.rst:616 3cc47b2508ea48efba0a80761d6926d4
+msgid "**Example doesn't build:**"
+msgstr "**Example doesn't build:**"
+
+#: ../../tutorials/examples.rst:618 1fce06bc8f2f4a01ab757ca71fe5b8f4
+msgid "Ensure you have the correct toolchain installed"
+msgstr ""
+
+#: ../../tutorials/examples.rst:619 7b8e887de31545ad983ed62fb56a1322
+msgid ""
+"Check that the platform is set correctly (``-DNEXUS_PLATFORM=stm32f4``)"
+msgstr ""
+"Check that the platform is set correctly (``-DNEXUS_PLATFORM=stm32f4``)"
+
+#: ../../tutorials/examples.rst:620 ce872e2747c846f1b646faebfe05f018
+msgid "Verify all dependencies are available"
+msgstr ""
+
+#: ../../tutorials/examples.rst:622 f8665928466443a3a3b5ce6579f8f17c
+msgid "**Example doesn't run after flashing:**"
+msgstr "**Example doesn't run after flashing:**"
+
+#: ../../tutorials/examples.rst:624 19155582cc8243abaa36bb2c19fa1075
+msgid "Check that you flashed the correct .elf file"
+msgstr ""
+
+#: ../../tutorials/examples.rst:625 1979748cd4fd490fb69c60b565014e5b
+msgid "Verify the board is powered correctly"
+msgstr ""
+
+#: ../../tutorials/examples.rst:626 3f46d2f678444b7fa3f34b21def34aeb
+msgid "Try resetting the board"
+msgstr ""
+
+#: ../../tutorials/examples.rst:627 9ac028d6c6084befab83908b9a1b967a
+msgid "Check LED indicators for error states"
+msgstr ""
+
+#: ../../tutorials/examples.rst:629 e0d1a21b08904b298ecd806b722f293d
+msgid "**UART examples show no output:**"
+msgstr "**UART examples show no output:**"
+
+#: ../../tutorials/examples.rst:631 9ad9a5b733ee42c7b86617e155a16364
+msgid "Verify UART wiring (TX/RX crossed correctly)"
+msgstr "Verify UART wiring (TX/RX crossed correctly)"
+
+#: ../../tutorials/examples.rst:632 6ebd2786f6d34c5cb8998fbe4e1909ae
+msgid "Check baud rate matches (115200)"
+msgstr "Check baud rate matches (115200)"
+
+#: ../../tutorials/examples.rst:633 89c6a48a5a5b4409b756a2ffafb38ffc
+msgid "Ensure correct COM port is selected in terminal"
+msgstr ""
+
+#: ../../tutorials/examples.rst:634 e8ecc3b427dc484082ba1e02fc137ea9
+msgid "Try a different USB-to-Serial adapter"
+msgstr ""
+
+#: ../../tutorials/examples.rst:636 f73315b2a3c646afa18212f66c09e296
+msgid "**FreeRTOS example crashes:**"
+msgstr "**FreeRTOS example crashes:**"
+
+#: ../../tutorials/examples.rst:638 00dac18f37a542ceadee7d84495e468c
+msgid "Increase task stack sizes if needed"
+msgstr ""
+
+#: ../../tutorials/examples.rst:639 6a9ab75dd33c44588ccc6893d80f8f62
+msgid "Check for stack overflow"
+msgstr ""
+
+#: ../../tutorials/examples.rst:640 eb1041144c8f4f5695d3e0c43c088841
+msgid "Verify FreeRTOS is configured correctly"
+msgstr ""
+
+#: ../../tutorials/examples.rst:643 11a015bfc1f04310934d90b5647ca168
+msgid "Next Steps"
+msgstr "下一步"
+
+#: ../../tutorials/examples.rst:645 8a3eae6426e94a2c82682600fc429aba
+msgid "Try modifying the examples to add your own features"
+msgstr ""
+
+#: ../../tutorials/examples.rst:646 495755639a6644068156bb928ced3e56
+msgid "Combine concepts from multiple examples"
+msgstr ""
+
+#: ../../tutorials/examples.rst:647 849adb63f0b545cd9e831f2d1e7fe058
+msgid "Create your own application based on these examples"
+msgstr ""
+
+#: ../../tutorials/examples.rst:648 255b7f9749a94acca9cc1ae4f13d3020
+msgid ""
+"Explore the :doc:`../user_guide/hal` and :doc:`../user_guide/osal` for more "
+"advanced features"
+msgstr ""
+
+#~ msgid "Explore the :doc:`../user_guide/index` for more advanced features"
+#~ msgstr ""

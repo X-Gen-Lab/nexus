@@ -1,0 +1,1300 @@
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: ../../development/scripts.rst:2 8254a93d8f874fada8a021c4988954d1
+msgid "Build Scripts and Tools"
+msgstr ""
+
+#: ../../development/scripts.rst:4 626dcd4420494542a4ffe8b4dc435b60
+msgid ""
+"The Nexus project includes a comprehensive set of Python scripts for "
+"building, testing, formatting, cleaning, and generating documentation. This "
+"guide covers all available scripts and their usage."
+msgstr ""
+
+#: ../../development/scripts.rst:8 41544554ed4f4aebbca7d8ae51104235
+msgid "Table of Contents"
+msgstr "目录"
+
+#: ../../development/scripts.rst:11 6e5a5c6379d449b99bead3344589a8bf
+msgid "Overview"
+msgstr "概述"
+
+#: ../../development/scripts.rst:13 e94adc726a0249b7a54a2b2491e8844c
+msgid ""
+"All scripts are located in the ``scripts/`` directory and can be invoked "
+"directly or through the unified ``nexus.py`` entry point."
+msgstr ""
+
+#: ../../development/scripts.rst:16 a7390c38f62745eb95e69d924ed8a278
+msgid "Script Organization"
+msgstr ""
+
+#: ../../development/scripts.rst:18 232ff829ace34ab98f594a6e1854572d
+msgid ""
+"scripts/\n"
+"├── nexus.py                    # Unified entry point\n"
+"├── nexus.sh                    # Bash wrapper\n"
+"├── nexus.ps1                   # PowerShell wrapper\n"
+"├── nexus.bat                   # Windows batch wrapper\n"
+"├── setup/\n"
+"│   └── setup.py                # Environment setup\n"
+"├── building/\n"
+"│   └── build.py                # Build script\n"
+"├── test/\n"
+"│   └── test.py                 # Test runner\n"
+"├── tools/\n"
+"│   ├── format.py               # Code formatter\n"
+"│   ├── clean.py                # Cleanup script\n"
+"│   └── docs.py                 # Documentation generator\n"
+"├── ci/\n"
+"│   └── ci_build.py             # CI pipeline\n"
+"├── kconfig/\n"
+"│   ├── generate_config.py      # Config generator\n"
+"│   ├── validate_kconfig.py     # Config validator\n"
+"│   └── kconfig_migrate.py      # Config migration\n"
+"├── coverage/\n"
+"│   ├── run_coverage_linux.sh   # Linux coverage\n"
+"│   └── run_coverage_windows.ps1 # Windows coverage\n"
+"└── validation/\n"
+"    └── validate.py             # System validation"
+msgstr ""
+
+#: ../../development/scripts.rst:48 564e9c99fa9c4b32b363635c258d824f
+msgid "Unified Entry Point"
+msgstr ""
+
+#: ../../development/scripts.rst:51 d6795318ec1e4849b3cff75f7821f077
+msgid "nexus.py"
+msgstr ""
+
+#: ../../development/scripts.rst:53 119a250d664c43fd913e2ffe3bb3ff7d
+msgid ""
+"The ``nexus.py`` script provides a unified interface to all project "
+"operations."
+msgstr ""
+
+#: f6d7159a2dd34d1885bea866147a6470 fe955a1fe6554fdb9f84ee6e20f363d8
+msgid "**Usage**:"
+msgstr ""
+
+#: ../../development/scripts.rst:57 56e352e971774a8182b8b7f79c7eba4d
+msgid "python nexus.py <command> [arguments...]"
+msgstr "python nexus.py <command> [arguments...]"
+
+#: ../../development/scripts.rst:61 6f89e20899fd4ad1abcf27fe2a2b6bbe
+msgid "**Commands**:"
+msgstr ""
+
+#: ../../development/scripts.rst:63 f788b6ce08024477a3bc4df78275a631
+msgid "``setup`` - Environment setup and configuration"
+msgstr ""
+
+#: ../../development/scripts.rst:64 380a4972f4a545f28c1eeced808efc41
+msgid "``build`` - Build the project"
+msgstr ""
+
+#: ../../development/scripts.rst:65 c681d2657923496caf92f837872fe5f9
+msgid "``test`` - Run tests"
+msgstr ""
+
+#: ../../development/scripts.rst:66 766a7ed9287241b98a5ca532bfe73821
+msgid "``format`` - Format source code"
+msgstr ""
+
+#: ../../development/scripts.rst:67 6879e351f0e24c30b6080b0dd268e807
+msgid "``clean`` - Clean build artifacts"
+msgstr ""
+
+#: ../../development/scripts.rst:68 ec412e5c86614e0f8d479516d74a8f60
+msgid "``docs`` - Generate documentation"
+msgstr ""
+
+#: ../../development/scripts.rst:69 98e0ae76a9ab4d8c8cf93b819a10c9c1
+msgid "``ci`` - Run CI pipeline"
+msgstr ""
+
+#: ../../development/scripts.rst:70 44b571da98764d0fa7fa2bc8e2450d33
+msgid "``help`` - Show help information"
+msgstr ""
+
+#: 9a29b90c68e648d19d9b07ba4722328f c322cd58c18243fdb7fc9cc44cee6ce5
+msgid "**Options**:"
+msgstr ""
+
+#: ../../development/scripts.rst:74 cc20daf8b2ef4d79bd784517c31baf8e
+msgid "``--list`` - List all available commands"
+msgstr ""
+
+#: ../../development/scripts.rst:75 1e89bc8665c64450ac1a85c2dd811bf9
+msgid "``--version`` - Show version information"
+msgstr ""
+
+#: ../../development/scripts.rst:76 eb97b988c3c64096ab7bfc38a34a35b7
+msgid "``--help`` - Show help information"
+msgstr ""
+
+#: f581adf375f749fc83c667bb07d2227e f94bee5c16f34b85af8f3e010c032792
+msgid "**Examples**:"
+msgstr ""
+
+#: ../../development/scripts.rst:80 f70e67387efd4dc69ecb2ece0762fd73
+msgid ""
+"# Show version\n"
+"python nexus.py --version\n"
+"\n"
+"# List commands\n"
+"python nexus.py --list\n"
+"\n"
+"# Setup development environment\n"
+"python nexus.py setup --dev --docs\n"
+"\n"
+"# Build in Release mode\n"
+"python nexus.py build --type release\n"
+"\n"
+"# Run tests with verbose output\n"
+"python nexus.py test --verbose\n"
+"\n"
+"# Format code\n"
+"python nexus.py format --check\n"
+"\n"
+"# Clean all artifacts\n"
+"python nexus.py clean --all\n"
+"\n"
+"# Generate documentation\n"
+"python nexus.py docs --target all\n"
+"\n"
+"# Run CI pipeline\n"
+"python nexus.py ci --stage all --coverage"
+msgstr ""
+"# Show version\n"
+"python nexus.py --version\n"
+"\n"
+"# List commands\n"
+"python nexus.py --list\n"
+"\n"
+"# Setup development environment\n"
+"python nexus.py setup --dev --docs\n"
+"\n"
+"# Build in Release mode\n"
+"python nexus.py build --type release\n"
+"\n"
+"# Run tests with verbose output\n"
+"python nexus.py test --verbose\n"
+"\n"
+"# Format code\n"
+"python nexus.py format --check\n"
+"\n"
+"# Clean all artifacts\n"
+"python nexus.py clean --all\n"
+"\n"
+"# Generate documentation\n"
+"python nexus.py docs --target all\n"
+"\n"
+"# Run CI pipeline\n"
+"python nexus.py ci --stage all --coverage"
+
+#: ../../development/scripts.rst:110 d3896c5c5b164efcb4d33fc73fbd99b8
+msgid "Platform-Specific Wrappers"
+msgstr ""
+
+#: ../../development/scripts.rst:112 9fca8b4d7c9d4a44b5a10e6a3059399b
+msgid "**Bash (Linux/macOS)**:"
+msgstr "**Bash (Linux/macOS)**:"
+
+#: ../../development/scripts.rst:114 ce982227d24947fe9f64dc3328ef50cf
+msgid "./scripts/nexus.sh build --type release"
+msgstr "./scripts/nexus.sh build --type release"
+
+#: ../../development/scripts.rst:118 f56c911ee54547498f317a6539d27c62
+msgid "**PowerShell (Windows)**:"
+msgstr "**PowerShell (Windows)**:"
+
+#: ../../development/scripts.rst:120 590b2aa603df4535b8e3ba45cc42ec83
+msgid ".\\scripts\\nexus.ps1 build --type release"
+msgstr ""
+
+#: ../../development/scripts.rst:124 cecf8d01c4c042ce8b197bb64a671189
+msgid "**Batch (Windows)**:"
+msgstr "**Batch (Windows)**:"
+
+#: ../../development/scripts.rst:126 da3586ba785541c39573efe79a181e9d
+msgid "scripts\\nexus.bat build --type release"
+msgstr ""
+
+#: ../../development/scripts.rst:131 4d19979c9b844173b5c5b26a6a0d17fd
+msgid "Build Scripts"
+msgstr "构建 Scripts"
+
+#: ../../development/scripts.rst:134 bc96741010444e8ba87fabad9fafb676
+msgid "build.py"
+msgstr ""
+
+#: ../../development/scripts.rst:136 24decb33c1b140cbb0c05e10776a0fc5
+msgid ""
+"Located at ``scripts/building/build.py``, this script builds the project "
+"using CMake."
+msgstr ""
+
+#: ../../development/scripts.rst:140 9520270a1f69452db66c0c443558c0a0
+msgid "python scripts/building/build.py [options]"
+msgstr "python scripts/building/build.py [options]"
+
+#: e7ee919fdf184e13bd2377a927731c81 fa52142653cf4ace93842779af4b13fc
+msgid "Option"
+msgstr "选项"
+
+#: cb94af7aa2ea426fa14460f0c7f8009e eb2bdd63d71042ecb26332bae7c5ee35
+msgid "Description"
+msgstr "描述"
+
+#: ../../development/scripts.rst:152 0398b62548164b33bb482e8c962bf263
+msgid "``--type, -t``"
+msgstr "``--type, -t``"
+
+#: ../../development/scripts.rst:153 34eaf462ed874554bfe6cd74445ecb00
+msgid ""
+"Build type: debug, release, relwithdebinfo, minsizerel (default: debug)"
+msgstr ""
+"Build type: debug, release, relwithdebinfo, minsizerel (default: debug)"
+
+#: ../../development/scripts.rst:154 d86276adf0fe42d4aa10b384468a1af0
+msgid "``--platform, -p``"
+msgstr "``--platform, -p``"
+
+#: ../../development/scripts.rst:155 096cd4e541ce4084bb522eba0ed17d0e
+msgid ""
+"Target platform: native, stm32f4, stm32h7, esp32, nrf52 (default: native)"
+msgstr ""
+"Target platform: native, stm32f4, stm32h7, esp32, nrf52 (default: native)"
+
+#: ../../development/scripts.rst:156 c3f6a5acafa0462bad27075ede598c90
+msgid "``--osal``"
+msgstr "``--osal``"
+
+#: ../../development/scripts.rst:157 d479283b80d0449d87b7f9ec701954cb
+msgid ""
+"OSAL backend: baremetal, freertos, rtthread, zephyr (default: baremetal)"
+msgstr ""
+"OSAL backend: baremetal, freertos, rtthread, zephyr (default: baremetal)"
+
+#: b7a3e7d049734a19b6110dccb7682150 ff4b99620df249918c4dc28b2aa38ea4
+msgid "``--build-dir``"
+msgstr "``--build-dir``"
+
+#: ../../development/scripts.rst:159 a9cb897877904f02a3e6d4cd5f132d68
+msgid "Build directory (default: build-<type>)"
+msgstr "Build directory (default: build-<type>)"
+
+#: ../../development/scripts.rst:160 1296f1389f8142e3a0594d741bd687bd
+msgid "``--clean``"
+msgstr "``--clean``"
+
+#: ../../development/scripts.rst:161 a1568f37941549afbd560b8331164889
+msgid "Clean before building"
+msgstr "清理 before building"
+
+#: ../../development/scripts.rst:162 89b7d06cd31540dfafbcfa041053cf0c
+msgid "``--tests``"
+msgstr "``--tests``"
+
+#: ../../development/scripts.rst:163 7da0b9bace6743c0813dcf793d047538
+msgid "Build tests (default: ON for native, OFF for embedded)"
+msgstr "Build tests (default: ON for native, OFF for embedded)"
+
+#: ../../development/scripts.rst:164 ba9f3c754d704b7798940418bade2f0e
+msgid "``--examples``"
+msgstr "``--examples``"
+
+#: ../../development/scripts.rst:165 bdf38af1f73f4f5ebac4111567589d80
+msgid "Build examples (default: ON)"
+msgstr "Build examples (default: ON)"
+
+#: 5120b5be722c49d7bf14d7ff2b08492f bc2219104d0740f584ad195d93ff1a98
+msgid "``--docs``"
+msgstr "``--docs``"
+
+#: ../../development/scripts.rst:167 93e35fd7d0704f6e95980a58c813ccf6
+msgid "Build documentation (default: OFF)"
+msgstr "Build documentation (default: OFF)"
+
+#: e269159053a145b7a346b30817fdcf80 f39b93e171704ba1b43328a2833b9d7b
+msgid "``--coverage``"
+msgstr "``--coverage``"
+
+#: ../../development/scripts.rst:169 9e94f94fccbe4a1cb59987525183ecd2
+msgid "Enable code coverage (default: OFF)"
+msgstr "Enable code coverage (default: OFF)"
+
+#: ../../development/scripts.rst:170 2c941110224f44009759e1f39f5da8e8
+msgid "``--jobs, -j``"
+msgstr "``--jobs, -j``"
+
+#: ../../development/scripts.rst:171 dda3109e18ba4321bda6250423953269
+msgid "Number of parallel jobs (default: CPU count)"
+msgstr "Number of parallel jobs (default: CPU count)"
+
+#: bde0cec5d7e04aa8a6b3c90ffa38f0c9 de13b433f3b34220b93035d732f32d48
+msgid "``--verbose, -v``"
+msgstr "``--verbose, -v``"
+
+#: bccd99a90e764469a802dd628b0bc294 e81759c162f34e14a86b36cfdf2dd1e6
+msgid "Verbose output"
+msgstr "详细输出"
+
+#: b78f27b3a8504507bd5632aa4f6f4bdd d80617c0ab9d41b19d52346821ec8d2b
+msgid "``--help, -h``"
+msgstr "``--help, -h``"
+
+#: fd667fd907924da08773dbc75bdb31cf ffe4db124823422e93b198ad67771d71
+msgid "Show help message"
+msgstr ""
+
+#: ../../development/scripts.rst:179 2fc40170728e4771bc67f8975c103823
+msgid ""
+"# Debug build for native platform\n"
+"python scripts/building/build.py\n"
+"\n"
+"# Release build for STM32F4\n"
+"python scripts/building/build.py --type release --platform stm32f4\n"
+"\n"
+"# Build with FreeRTOS\n"
+"python scripts/building/build.py --osal freertos\n"
+"\n"
+"# Clean build with tests and coverage\n"
+"python scripts/building/build.py --clean --tests --coverage\n"
+"\n"
+"# Parallel build with 8 jobs\n"
+"python scripts/building/build.py --jobs 8\n"
+"\n"
+"# Verbose build\n"
+"python scripts/building/build.py --verbose"
+msgstr ""
+"# Debug build for native platform\n"
+"python scripts/building/build.py\n"
+"\n"
+"# Release build for STM32F4\n"
+"python scripts/building/build.py --type release --platform stm32f4\n"
+"\n"
+"# Build with FreeRTOS\n"
+"python scripts/building/build.py --osal freertos\n"
+"\n"
+"# Clean build with tests and coverage\n"
+"python scripts/building/build.py --clean --tests --coverage\n"
+"\n"
+"# Parallel build with 8 jobs\n"
+"python scripts/building/build.py --jobs 8\n"
+"\n"
+"# Verbose build\n"
+"python scripts/building/build.py --verbose"
+
+#: ../../development/scripts.rst:200 b8e7390796a64223ad73472a744cf51b
+msgid "Test Scripts"
+msgstr "测试 Scripts"
+
+#: ../../development/scripts.rst:203 5c46bc239fe04b5885f25eb51e0853dc
+msgid "test.py"
+msgstr ""
+
+#: ../../development/scripts.rst:205 bcd268c3aa98426c80651284c1bb27c1
+msgid ""
+"Located at ``scripts/test/test.py``, this script runs unit tests using CTest"
+" and GoogleTest."
+msgstr ""
+
+#: ../../development/scripts.rst:209 4740a73d9d934d90b02c91f5c23551d9
+msgid "python scripts/test/test.py [options]"
+msgstr "python scripts/test/test.py [options]"
+
+#: ../../development/scripts.rst:221 926954814ef346e78f13e668f13b4e7c
+msgid "``--filter, -f``"
+msgstr "``--filter, -f``"
+
+#: ../../development/scripts.rst:222 cb24c841e410452c90ca67a14ac65342
+msgid "Test filter pattern (default: *)"
+msgstr "Test filter pattern (default: *)"
+
+#: ../../development/scripts.rst:225 ffb2ace3f6bf4fe586a9a954fb7cf9c2
+msgid "``--xml``"
+msgstr "``--xml``"
+
+#: ../../development/scripts.rst:226 76ff7a1369d44200963653ad74ee9ae2
+msgid "Generate XML report"
+msgstr ""
+
+#: ../../development/scripts.rst:228 9902383545784fd396873c6e1894b0c8
+msgid "Build directory (default: build-Debug)"
+msgstr "Build directory (default: build-Debug)"
+
+#: ../../development/scripts.rst:234 12f2c768b78842cf9c273b1b118bb0c3
+msgid ""
+"# Run all tests\n"
+"python scripts/test/test.py\n"
+"\n"
+"# Run specific test suite\n"
+"python scripts/test/test.py --filter \"ConfigTest.*\"\n"
+"\n"
+"# Run with verbose output\n"
+"python scripts/test/test.py --verbose\n"
+"\n"
+"# Generate XML report\n"
+"python scripts/test/test.py --xml test_results.xml\n"
+"\n"
+"# Use custom build directory\n"
+"python scripts/test/test.py --build-dir build-Release"
+msgstr ""
+"# Run all tests\n"
+"python scripts/test/test.py\n"
+"\n"
+"# Run specific test suite\n"
+"python scripts/test/test.py --filter \"ConfigTest.*\"\n"
+"\n"
+"# Run with verbose output\n"
+"python scripts/test/test.py --verbose\n"
+"\n"
+"# Generate XML report\n"
+"python scripts/test/test.py --xml test_results.xml\n"
+"\n"
+"# Use custom build directory\n"
+"python scripts/test/test.py --build-dir build-Release"
+
+#: ../../development/scripts.rst:251 3531d0d670c7418184fbb790d3953972
+msgid "**Test Filters**:"
+msgstr ""
+
+#: ../../development/scripts.rst:253 772f4768ca4a43a3a0beea5542855c13
+msgid "GoogleTest filter patterns:"
+msgstr ""
+
+#: ../../development/scripts.rst:255 8ac8aa263f2149548a728a4390a19287
+msgid "``*`` - All tests"
+msgstr ""
+
+#: ../../development/scripts.rst:256 384a19e2dec54ab39061f7699d36ffd8
+msgid "``TestSuite.*`` - All tests in TestSuite"
+msgstr ""
+
+#: ../../development/scripts.rst:257 47e166d0c2b8495fa12d2051dbaf1ccb
+msgid "``TestSuite.TestName`` - Specific test"
+msgstr ""
+
+#: ../../development/scripts.rst:258 f438e8d468074f93ba7013a664b21957
+msgid "``*Math*`` - All tests containing \"Math\""
+msgstr ""
+
+#: ../../development/scripts.rst:259 c06fe32c39b342e8bc4339d62d466e44
+msgid "``TestSuite.*:-TestSuite.SkipThis`` - All except SkipThis"
+msgstr ""
+
+#: ../../development/scripts.rst:262 2f635ca56523428a81db71901b28b1fd
+msgid "Code Formatting"
+msgstr "代码格式化"
+
+#: ../../development/scripts.rst:265 0c1d7503a01843839b0d3e744ec8d01e
+msgid "format.py"
+msgstr ""
+
+#: ../../development/scripts.rst:267 31eee4ce769041fbba7da7278cbf0c1d
+msgid ""
+"Located at ``scripts/tools/format.py``, this script formats C/C++ code using"
+" clang-format."
+msgstr ""
+
+#: ../../development/scripts.rst:271 696ad8e093234a07afd270867addb97f
+msgid "python scripts/tools/format.py [options]"
+msgstr "python scripts/tools/format.py [options]"
+
+#: 3df760b2eb8f4f1298a0a1a6f78e26f8 ea1e5740d3de4cdd848b9f8b45392f41
+msgid "``--check``"
+msgstr "``--check``"
+
+#: ../../development/scripts.rst:284 072a28dd88464b158883a7c1727fa01f
+msgid "Check formatting without modifying files"
+msgstr ""
+
+#: ../../development/scripts.rst:285 ce1cb94d886d44a99733d14efb74068b
+msgid "``--fix``"
+msgstr "``--fix``"
+
+#: ../../development/scripts.rst:286 68852ee9ebbe41279f25d1170e077575
+msgid "Fix formatting issues (default)"
+msgstr "Fix formatting issues (default)"
+
+#: ../../development/scripts.rst:287 0d4da8a827b940f999d374cb1a0e88f1
+msgid "``--paths``"
+msgstr "``--paths``"
+
+#: ../../development/scripts.rst:288 69584e3a5f404d1a96923ddd0a7fe9d4
+msgid "Specific paths to format (default: all)"
+msgstr "Specific paths to format (default: all)"
+
+#: ../../development/scripts.rst:296 37acc2249b4c4544ac88541e28ee0264
+msgid ""
+"# Format all code\n"
+"python scripts/tools/format.py\n"
+"\n"
+"# Check formatting without changes\n"
+"python scripts/tools/format.py --check\n"
+"\n"
+"# Format specific directory\n"
+"python scripts/tools/format.py --paths hal/\n"
+"\n"
+"# Format multiple paths\n"
+"python scripts/tools/format.py --paths hal/ osal/ framework/"
+msgstr ""
+"# Format all code\n"
+"python scripts/tools/format.py\n"
+"\n"
+"# Check formatting without changes\n"
+"python scripts/tools/format.py --check\n"
+"\n"
+"# Format specific directory\n"
+"python scripts/tools/format.py --paths hal/\n"
+"\n"
+"# Format multiple paths\n"
+"python scripts/tools/format.py --paths hal/ osal/ framework/"
+
+#: ../../development/scripts.rst:310 e01f4558b3274bbe98212f6eab6fba49
+msgid "**Configuration**:"
+msgstr ""
+
+#: ../../development/scripts.rst:312 3bda833ac728469b9495234b76b73315
+msgid "Formatting rules are defined in ``.clang-format`` at the project root."
+msgstr ""
+
+#: ../../development/scripts.rst:315 8de7115a4678435799a2d70018515a62
+msgid "Cleanup Scripts"
+msgstr ""
+
+#: ../../development/scripts.rst:318 dc4b43724bca4a6da3b6a2fbdd813fcd
+msgid "clean.py"
+msgstr ""
+
+#: ../../development/scripts.rst:320 065a7156cec04d4f9ba0f8df467108dc
+msgid ""
+"Located at ``scripts/tools/clean.py``, this script cleans build artifacts."
+msgstr ""
+
+#: ../../development/scripts.rst:324 d59276e9ad27427596f2400c3cd48b10
+msgid "python scripts/tools/clean.py [options]"
+msgstr "python scripts/tools/clean.py [options]"
+
+#: 1d09ace7d2d14da799bc16f2a8b43c3c 2c5c7c6791e14078a4e8e0e8b22394f5
+msgid "``--all``"
+msgstr "``--all``"
+
+#: ../../development/scripts.rst:337 2c2c15f264184e9c8f463efe97eaf85a
+msgid "Clean all build directories"
+msgstr ""
+
+#: ../../development/scripts.rst:339 a5e44cbd7d9e4ee9b9e358504fc0adae
+msgid "Specific build directory to clean"
+msgstr ""
+
+#: ../../development/scripts.rst:341 17c1b9b6c20d4d919fb54fd1b02a69de
+msgid "Clean documentation artifacts"
+msgstr "清理 documentation artifacts"
+
+#: ../../development/scripts.rst:343 f0d935f81bd74e2c9b5f1935137d9cf3
+msgid "Clean coverage data"
+msgstr "清理 coverage data"
+
+#: ../../development/scripts.rst:344 c2afd6a7cbee4c27a926e33c3aa55324
+msgid "``--cache``"
+msgstr "``--cache``"
+
+#: ../../development/scripts.rst:345 54f19f0f0fbb47c9b66779369bd91e5a
+msgid "Clean CMake cache"
+msgstr "清理 CMake cache"
+
+#: ../../development/scripts.rst:353 e53ffe78daf1429a92fe18aeb47b1075
+msgid ""
+"# Clean default build directory\n"
+"python scripts/tools/clean.py\n"
+"\n"
+"# Clean all build directories\n"
+"python scripts/tools/clean.py --all\n"
+"\n"
+"# Clean specific build directory\n"
+"python scripts/tools/clean.py --build-dir build-Release\n"
+"\n"
+"# Clean documentation\n"
+"python scripts/tools/clean.py --docs\n"
+"\n"
+"# Clean coverage data\n"
+"python scripts/tools/clean.py --coverage\n"
+"\n"
+"# Clean everything\n"
+"python scripts/tools/clean.py --all --docs --coverage"
+msgstr ""
+"# Clean default build directory\n"
+"python scripts/tools/clean.py\n"
+"\n"
+"# Clean all build directories\n"
+"python scripts/tools/clean.py --all\n"
+"\n"
+"# Clean specific build directory\n"
+"python scripts/tools/clean.py --build-dir build-Release\n"
+"\n"
+"# Clean documentation\n"
+"python scripts/tools/clean.py --docs\n"
+"\n"
+"# Clean coverage data\n"
+"python scripts/tools/clean.py --coverage\n"
+"\n"
+"# Clean everything\n"
+"python scripts/tools/clean.py --all --docs --coverage"
+
+#: ../../development/scripts.rst:374 c5a3e2c7ef7e4a74898f514d661cdb7b
+msgid "Documentation Scripts"
+msgstr ""
+
+#: ../../development/scripts.rst:377 27621d0f4b544aec9b8b21024eb74ee0
+msgid "docs.py"
+msgstr ""
+
+#: ../../development/scripts.rst:379 5c058df730884e7c8cf77db54ce5e6ba
+msgid ""
+"Located at ``scripts/tools/docs.py``, this script generates documentation "
+"using Doxygen and Sphinx."
+msgstr ""
+
+#: ../../development/scripts.rst:383 7d4c99b30cb044608c6e0ebca11bd114
+msgid "python scripts/tools/docs.py [options]"
+msgstr "python scripts/tools/docs.py [options]"
+
+#: ../../development/scripts.rst:395 2fa8de2c95a14aeb91f15048943900ec
+msgid "``--target, -t``"
+msgstr "``--target, -t``"
+
+#: ../../development/scripts.rst:396 e36930b70006473b87c9996fdfdb29e2
+msgid "Target: doxygen, sphinx, or all (default: all)"
+msgstr "Target: doxygen, sphinx, or all (default: all)"
+
+#: ../../development/scripts.rst:404 195dc72295f44b36bed17182f1683e74
+msgid ""
+"# Generate all documentation\n"
+"python scripts/tools/docs.py\n"
+"\n"
+"# Generate only Doxygen API docs\n"
+"python scripts/tools/docs.py --target doxygen\n"
+"\n"
+"# Generate only Sphinx user docs\n"
+"python scripts/tools/docs.py --target sphinx\n"
+"\n"
+"# Verbose output\n"
+"python scripts/tools/docs.py --verbose"
+msgstr ""
+"# Generate all documentation\n"
+"python scripts/tools/docs.py\n"
+"\n"
+"# Generate only Doxygen API docs\n"
+"python scripts/tools/docs.py --target doxygen\n"
+"\n"
+"# Generate only Sphinx user docs\n"
+"python scripts/tools/docs.py --target sphinx\n"
+"\n"
+"# Verbose output\n"
+"python scripts/tools/docs.py --verbose"
+
+#: ../../development/scripts.rst:418 9a36d579268348beaf106c6de190716d
+msgid "**Output Locations**:"
+msgstr ""
+
+#: ../../development/scripts.rst:420 3e81ac5513bd49cea55973fed3cba963
+msgid "Doxygen: ``docs/api/html/index.html``"
+msgstr ""
+
+#: ../../development/scripts.rst:421 18744fd3d7d245aa8b5f992c2d2b1312
+msgid "Sphinx: ``docs/sphinx/_build/html/index.html``"
+msgstr ""
+
+#: ../../development/scripts.rst:424 8756ae5b418043af937e1e2e6918a317
+msgid "Kconfig Tools"
+msgstr ""
+
+#: ../../development/scripts.rst:427 ac3993bdffd94a279ab8a91b699f3ce9
+msgid "generate_config.py"
+msgstr ""
+
+#: ../../development/scripts.rst:429 c6eef864380245a0862d658092902e06
+msgid ""
+"Located at ``scripts/kconfig/generate_config.py``, this script generates "
+"configuration headers from Kconfig."
+msgstr ""
+
+#: ../../development/scripts.rst:433 6bc20a65707843deb03df92115b6a950
+msgid "python scripts/kconfig/generate_config.py [options]"
+msgstr "python scripts/kconfig/generate_config.py [options]"
+
+#: 2726129574644268995b62d2a62d137e d1f7715eab3c430a9b3a57fa75003cb6
+msgid "``--config``"
+msgstr "``--config``"
+
+#: ../../development/scripts.rst:446 fdba627d990441dc8291cfc21295bbc0
+msgid "Input .config file"
+msgstr ""
+
+#: ../../development/scripts.rst:447 d976ac16624643fc96bb768c730006f1
+msgid "``--output``"
+msgstr "``--output``"
+
+#: ../../development/scripts.rst:448 b9735180125743c8bb1e4d7ba3ea1f1b
+msgid "Output header file (default: nexus_config.h)"
+msgstr "Output header file (default: nexus_config.h)"
+
+#: ../../development/scripts.rst:449 29066b65587242f4abb886d9c3723e0b
+msgid "``--default``"
+msgstr "``--default``"
+
+#: ../../development/scripts.rst:450 9fe8a5e4d5304077b4ad43ff2f3cfce1
+msgid "Generate default configuration"
+msgstr ""
+
+#: ../../development/scripts.rst:451 554517df3f11451b9afe2a1e72e2b663
+msgid "``--menuconfig``"
+msgstr "``--menuconfig``"
+
+#: ../../development/scripts.rst:452 9e0d52bbea6b4d1f98b259c8afd80689
+msgid "Launch interactive menuconfig"
+msgstr ""
+
+#: ../../development/scripts.rst:458 a9d5095f0a5b4b25a5e9293e7d8e6bcb
+msgid ""
+"# Generate from .config\n"
+"python scripts/kconfig/generate_config.py --config .config --output nexus_config.h\n"
+"\n"
+"# Generate default configuration\n"
+"python scripts/kconfig/generate_config.py --default --output nexus_config.h\n"
+"\n"
+"# Launch menuconfig\n"
+"python scripts/kconfig/generate_config.py --menuconfig"
+msgstr ""
+"# Generate from .config\n"
+"python scripts/kconfig/generate_config.py --config .config --output nexus_config.h\n"
+"\n"
+"# Generate default configuration\n"
+"python scripts/kconfig/generate_config.py --default --output nexus_config.h\n"
+"\n"
+"# Launch menuconfig\n"
+"python scripts/kconfig/generate_config.py --menuconfig"
+
+#: ../../development/scripts.rst:470 d41589f10c1c4089a82c154369da4161
+msgid "validate_kconfig.py"
+msgstr ""
+
+#: ../../development/scripts.rst:472 d0fee77a0c324569bf4f222ea4bcfd48
+msgid ""
+"Located at ``scripts/kconfig/validate_kconfig.py``, this script validates "
+"Kconfig files and configurations."
+msgstr ""
+
+#: ../../development/scripts.rst:476 9606c1203c5c40c2902b675896fce03f
+msgid "python scripts/kconfig/validate_kconfig.py [options]"
+msgstr "python scripts/kconfig/validate_kconfig.py [options]"
+
+#: ../../development/scripts.rst:489 c6b65c72d0054a079af78468d036f9da
+msgid "Configuration file to validate"
+msgstr ""
+
+#: 8f435e7cc4cf4e4e8ed2eb1c6932d7e3 d0ce016ae6eb4327ab8c5acdb193ce4c
+msgid "``--kconfig``"
+msgstr "``--kconfig``"
+
+#: ../../development/scripts.rst:491 16a1ea2e24b84a61a2961aea6c7df11f
+msgid "Kconfig file to validate (default: Kconfig)"
+msgstr "Kconfig file to validate (default: Kconfig)"
+
+#: ../../development/scripts.rst:492 c1b7361187394687b6af88ba9cd4e327
+msgid "``--strict``"
+msgstr "``--strict``"
+
+#: ../../development/scripts.rst:493 c15ee83d2ac54196b9909b20b07f2d3a
+msgid "Strict validation mode"
+msgstr ""
+
+#: ../../development/scripts.rst:499 7f68ea22be5247b0928d9f5edbaba34e
+msgid ""
+"# Validate .config\n"
+"python scripts/kconfig/validate_kconfig.py --config .config\n"
+"\n"
+"# Validate Kconfig structure\n"
+"python scripts/kconfig/validate_kconfig.py --kconfig Kconfig\n"
+"\n"
+"# Strict validation\n"
+"python scripts/kconfig/validate_kconfig.py --config .config --strict"
+msgstr ""
+"# Validate .config\n"
+"python scripts/kconfig/validate_kconfig.py --config .config\n"
+"\n"
+"# Validate Kconfig structure\n"
+"python scripts/kconfig/validate_kconfig.py --kconfig Kconfig\n"
+"\n"
+"# Strict validation\n"
+"python scripts/kconfig/validate_kconfig.py --config .config --strict"
+
+#: ../../development/scripts.rst:511 dbf58a14516946dba518c33ce1d58f11
+msgid "kconfig_migrate.py"
+msgstr ""
+
+#: ../../development/scripts.rst:513 0822a55ab956401d96c3e614f1c1369e
+msgid ""
+"Located at ``scripts/kconfig/migrate_kconfig.py``, this script migrates "
+"configurations between versions."
+msgstr ""
+
+#: ../../development/scripts.rst:517 eae90e6defc545a58d1b00e9fe5ec70f
+msgid "python scripts/kconfig/kconfig_migrate.py [options]"
+msgstr "python scripts/kconfig/kconfig_migrate.py [options]"
+
+#: ../../development/scripts.rst:529 dc563876d1454a19b3d4fb1e99a91b68
+msgid "``--old-config``"
+msgstr "``--old-config``"
+
+#: ../../development/scripts.rst:530 b86b436edf32467db9404cc39a7209a2
+msgid "Old configuration file"
+msgstr ""
+
+#: ../../development/scripts.rst:531 0093121cb2d34f7ea61e1e6f30f79f1c
+msgid "``--new-config``"
+msgstr "``--new-config``"
+
+#: ../../development/scripts.rst:532 6706511dd2ff4b6493566c22878dea1d
+msgid "New configuration file"
+msgstr ""
+
+#: ../../development/scripts.rst:534 d362e5bf9aa6435b89ab1582ada0975b
+msgid "New Kconfig file"
+msgstr ""
+
+#: ../../development/scripts.rst:540 41724fd4587046bea86544bae2cfd583
+msgid ""
+"# Migrate configuration\n"
+"python scripts/kconfig/kconfig_migrate.py --old-config .config.old --new-config .config"
+msgstr ""
+"# Migrate configuration\n"
+"python scripts/kconfig/kconfig_migrate.py --old-config .config.old --new-config .config"
+
+#: ../../development/scripts.rst:546 28a4aab3b34f4e6ca50acea5c579ee5b
+msgid "Coverage Scripts"
+msgstr ""
+
+#: ../../development/scripts.rst:549 20097255af664d33b7d087b0c29e718e
+msgid "run_coverage_linux.sh"
+msgstr ""
+
+#: ../../development/scripts.rst:551 199d95c930d84dda987fabfe2660ab1f
+msgid ""
+"Located at ``scripts/coverage/run_coverage_linux.sh``, this script generates"
+" code coverage reports on Linux."
+msgstr ""
+
+#: ../../development/scripts.rst:555 ab091edabc99482a9ff2f3c67c1d2258
+msgid "bash scripts/coverage/run_coverage_linux.sh"
+msgstr ""
+
+#: ../../development/scripts.rst:559 c2052ae8329846278270b0dbd2f84e28
+msgid "**Output**:"
+msgstr ""
+
+#: ../../development/scripts.rst:561 106110368567489aa74d7aab0def47a0
+msgid "Coverage data: ``coverage.info``"
+msgstr ""
+
+#: ../../development/scripts.rst:562 57b31e52969a40d7bb1dde435601264d
+msgid "HTML report: ``coverage_html/index.html``"
+msgstr ""
+
+#: ../../development/scripts.rst:565 a316cf82c1584cdc9932e84585ead7c0
+msgid "run_coverage_windows.ps1"
+msgstr ""
+
+#: ../../development/scripts.rst:567 4dbf96a449944822aafe70e9e64022ef
+msgid ""
+"Located at ``scripts/coverage/run_coverage_windows.ps1``, this script "
+"generates code coverage reports on Windows."
+msgstr ""
+
+#: ../../development/scripts.rst:571 0ae753f8ae4845e5a33a42fccd7b4d7f
+msgid ".\\scripts\\coverage\\run_coverage_windows.ps1"
+msgstr ""
+
+#: ../../development/scripts.rst:575 2aa8965ec16e461e9c74c3b7e7ac93d6
+msgid "**Requirements**:"
+msgstr ""
+
+#: ../../development/scripts.rst:577 87641607fcf74ab7a9c34314650dcc61
+msgid "OpenCppCoverage or Visual Studio Code Coverage tools"
+msgstr ""
+
+#: ../../development/scripts.rst:580 0ba6dfa6be5c440fbf6cbbb08dc86a90
+msgid "CI Scripts"
+msgstr ""
+
+#: ../../development/scripts.rst:583 477f1a48d65e4cc8837d4f9eaac3b5be
+msgid "ci_build.py"
+msgstr ""
+
+#: ../../development/scripts.rst:585 5a1625b73b6d4251bb67ef043ddef895
+msgid ""
+"Located at ``scripts/ci/ci_build.py``, this script runs the CI pipeline."
+msgstr ""
+
+#: ../../development/scripts.rst:589 839a035535b4475f9df23b1bea32a446
+msgid "python scripts/ci/ci_build.py [options]"
+msgstr "python scripts/ci/ci_build.py [options]"
+
+#: ../../development/scripts.rst:601 2003d285999944aabce02bacf52c5506
+msgid "``--stage``"
+msgstr "``--stage``"
+
+#: ../../development/scripts.rst:602 8c1e996caff346f58cebbe47114efb6c
+msgid "CI stage: build, test, coverage, docs, all (default: all)"
+msgstr "CI stage: build, test, coverage, docs, all (default: all)"
+
+#: 330012d705784861b668dd97da9dd9a9 b29c8cf0b9b943fd8ed242ae32d4b403
+msgid "``--platform``"
+msgstr "``--platform``"
+
+#: ../../development/scripts.rst:604 a0832df70c7b4153873f395f7490cba6
+msgid "Target platform (default: native)"
+msgstr "Target platform (default: native)"
+
+#: ../../development/scripts.rst:606 99763d7c3de54c54af66be43fd0b3bb5
+msgid "Enable coverage reporting"
+msgstr ""
+
+#: ../../development/scripts.rst:614 38fc839aecec44f7893e1d1b23367394
+msgid ""
+"# Run full CI pipeline\n"
+"python scripts/ci/ci_build.py --stage all\n"
+"\n"
+"# Run only build stage\n"
+"python scripts/ci/ci_build.py --stage build\n"
+"\n"
+"# Run with coverage\n"
+"python scripts/ci/ci_build.py --stage all --coverage\n"
+"\n"
+"# CI for STM32F4\n"
+"python scripts/ci/ci_build.py --platform stm32f4"
+msgstr ""
+"# Run full CI pipeline\n"
+"python scripts/ci/ci_build.py --stage all\n"
+"\n"
+"# Run only build stage\n"
+"python scripts/ci/ci_build.py --stage build\n"
+"\n"
+"# Run with coverage\n"
+"python scripts/ci/ci_build.py --stage all --coverage\n"
+"\n"
+"# CI for STM32F4\n"
+"python scripts/ci/ci_build.py --platform stm32f4"
+
+#: ../../development/scripts.rst:629 78b84e4e428b4c4e90e1e2842515b225
+msgid "Setup Scripts"
+msgstr ""
+
+#: ../../development/scripts.rst:632 550d578db77648b59961ec65f98e77ea
+msgid "setup.py"
+msgstr ""
+
+#: ../../development/scripts.rst:634 7296b1c0ec5a4538bb9912c86739c61e
+msgid ""
+"Located at ``scripts/setup/setup.py``, this script sets up the development "
+"environment."
+msgstr ""
+
+#: ../../development/scripts.rst:638 ad5e2e00c2ab43ee84cc3f032852daa9
+msgid "python scripts/setup/setup.py [options]"
+msgstr "python scripts/setup/setup.py [options]"
+
+#: ../../development/scripts.rst:650 2815094ad5194ffeb5b8c3b6cdb69238
+msgid "``--dev``"
+msgstr "``--dev``"
+
+#: ../../development/scripts.rst:651 175de10388f64a789a8577a50782fd22
+msgid "Install development dependencies"
+msgstr "安装 development dependencies"
+
+#: ../../development/scripts.rst:653 b10b83efbbf54a6f8868fb4e6f4b62e4
+msgid "Install documentation dependencies"
+msgstr "安装 documentation dependencies"
+
+#: ../../development/scripts.rst:654 84ab849098554eb48f05207a26b7609e
+msgid "``--test``"
+msgstr "``--test``"
+
+#: ../../development/scripts.rst:655 b73ad9cb825842a08507a0300a603e11
+msgid "Install testing dependencies"
+msgstr "安装 testing dependencies"
+
+#: ../../development/scripts.rst:657 55f0f0c0dce048c583cfef06322bdc9c
+msgid "Install all dependencies"
+msgstr "安装 all dependencies"
+
+#: ../../development/scripts.rst:659 c17016f13b134b5c9e4458da0cfc999d
+msgid "Check environment without installing"
+msgstr ""
+
+#: ../../development/scripts.rst:665 6f56387a88e1486faef58148d50fa441
+msgid ""
+"# Setup development environment\n"
+"python scripts/setup/setup.py --dev\n"
+"\n"
+"# Setup for documentation\n"
+"python scripts/setup/setup.py --docs\n"
+"\n"
+"# Setup everything\n"
+"python scripts/setup/setup.py --all\n"
+"\n"
+"# Check environment\n"
+"python scripts/setup/setup.py --check"
+msgstr ""
+"# Setup development environment\n"
+"python scripts/setup/setup.py --dev\n"
+"\n"
+"# Setup for documentation\n"
+"python scripts/setup/setup.py --docs\n"
+"\n"
+"# Setup everything\n"
+"python scripts/setup/setup.py --all\n"
+"\n"
+"# Check environment\n"
+"python scripts/setup/setup.py --check"
+
+#: ../../development/scripts.rst:680 0d0183380b434d6cad9770d8ff6b251c
+msgid "Validation Scripts"
+msgstr "验证 Scripts"
+
+#: ../../development/scripts.rst:683 3390fd02505a47cca2dc753148e76fef
+msgid "validate.py"
+msgstr ""
+
+#: ../../development/scripts.rst:685 c3b4e48a851e4d6baebd1c4a87ff8f5e
+msgid ""
+"Located at ``scripts/validation/validate.py``, this script validates the "
+"system configuration and tests."
+msgstr ""
+
+#: ../../development/scripts.rst:689 3ae0862e480e40c8a6b357efe4d1c40c
+msgid "python scripts/validation/validate.py [options]"
+msgstr "python scripts/validation/validate.py [options]"
+
+#: ../../development/scripts.rst:702 c527d756c70e42ba8212a584490c2a86
+msgid "Platform to validate (default: all)"
+msgstr "Platform to validate (default: all)"
+
+#: ../../development/scripts.rst:704 466414815c5f47bb8f047ed5b8afba35
+msgid "Include coverage analysis"
+msgstr ""
+
+#: ../../development/scripts.rst:705 8fb057a9a12a4e56ac24f1c50cf1add1
+msgid "``--report``"
+msgstr "``--report``"
+
+#: ../../development/scripts.rst:706 8518f762560241cc8d65c77e3a1b3b5b
+msgid "Generate validation report"
+msgstr ""
+
+#: ../../development/scripts.rst:712 9404696314ff4825a597cc0427e87549
+msgid ""
+"# Validate all platforms\n"
+"python scripts/validation/validate.py\n"
+"\n"
+"# Validate specific platform\n"
+"python scripts/validation/validate.py --platform native\n"
+"\n"
+"# Validate with coverage\n"
+"python scripts/validation/validate.py --coverage\n"
+"\n"
+"# Generate report\n"
+"python scripts/validation/validate.py --report"
+msgstr ""
+"# Validate all platforms\n"
+"python scripts/validation/validate.py\n"
+"\n"
+"# Validate specific platform\n"
+"python scripts/validation/validate.py --platform native\n"
+"\n"
+"# Validate with coverage\n"
+"python scripts/validation/validate.py --coverage\n"
+"\n"
+"# Generate report\n"
+"python scripts/validation/validate.py --report"
+
+#: ../../development/scripts.rst:727 816c749ef9b0449d917fe9ea0d245b3d
+msgid "Common Workflows"
+msgstr ""
+
+#: ../../development/scripts.rst:730 a491c69ad3e741dc8c840fe7577dced8
+msgid "Development Workflow"
+msgstr "开发 Workflow"
+
+#: ../../development/scripts.rst:732 d1819ad00ab942c3a160f52ce23a67ce
+msgid ""
+"# 1. Setup environment\n"
+"python nexus.py setup --dev\n"
+"\n"
+"# 2. Build in debug mode\n"
+"python nexus.py build --type debug\n"
+"\n"
+"# 3. Run tests\n"
+"python nexus.py test --verbose\n"
+"\n"
+"# 4. Format code\n"
+"python nexus.py format\n"
+"\n"
+"# 5. Clean artifacts\n"
+"python nexus.py clean"
+msgstr ""
+"# 1. Setup environment\n"
+"python nexus.py setup --dev\n"
+"\n"
+"# 2. Build in debug mode\n"
+"python nexus.py build --type debug\n"
+"\n"
+"# 3. Run tests\n"
+"python nexus.py test --verbose\n"
+"\n"
+"# 4. Format code\n"
+"python nexus.py format\n"
+"\n"
+"# 5. Clean artifacts\n"
+"python nexus.py clean"
+
+#: ../../development/scripts.rst:750 6c066be90a48483a96203be807054a50
+msgid "Release Workflow"
+msgstr "发布 Workflow"
+
+#: ../../development/scripts.rst:752 56e2d766d0d74e959cae098b1396f1d9
+msgid ""
+"# 1. Clean everything\n"
+"python nexus.py clean --all\n"
+"\n"
+"# 2. Build release for all platforms\n"
+"python nexus.py build --type release --platform native\n"
+"python nexus.py build --type release --platform stm32f4\n"
+"python nexus.py build --type release --platform stm32h7\n"
+"\n"
+"# 3. Run tests\n"
+"python nexus.py test\n"
+"\n"
+"# 4. Generate documentation\n"
+"python nexus.py docs --target all"
+msgstr ""
+"# 1. Clean everything\n"
+"python nexus.py clean --all\n"
+"\n"
+"# 2. Build release for all platforms\n"
+"python nexus.py build --type release --platform native\n"
+"python nexus.py build --type release --platform stm32f4\n"
+"python nexus.py build --type release --platform stm32h7\n"
+"\n"
+"# 3. Run tests\n"
+"python nexus.py test\n"
+"\n"
+"# 4. Generate documentation\n"
+"python nexus.py docs --target all"
+
+#: ../../development/scripts.rst:769 d3d5d31e618a431491e9a71e6062c4a4
+msgid "CI/CD Workflow"
+msgstr ""
+
+#: ../../development/scripts.rst:771 a97b2af006434b6fac5be9c69e05edf5
+msgid ""
+"# Run full CI pipeline with coverage\n"
+"python nexus.py ci --stage all --coverage"
+msgstr ""
+"# Run full CI pipeline with coverage\n"
+"python nexus.py ci --stage all --coverage"
+
+#: ../../development/scripts.rst:777 e15b7e8af6e441b896473dc489089fe4
+msgid "Troubleshooting"
+msgstr "故障排除"
+
+#: ../../development/scripts.rst:780 7d9aa3f65d6d435d833696138d00d998
+msgid "Common Issues"
+msgstr ""
+
+#: ../../development/scripts.rst:782 b2aea79e378a4e928bfe4736bb9441c7
+msgid "**Script not found**"
+msgstr "**Script not found**"
+
+#: ../../development/scripts.rst:784 ac812152d0dd4b339fbdc1226f6a7293
+msgid "FileNotFoundError: [Errno 2] No such file or directory: 'scripts/...'"
+msgstr "FileNotFoundError: [Errno 2] No such file or directory: 'scripts/...'"
+
+#: ../../development/scripts.rst:788 9874ce6bacae49f19188dbac622cad59
+msgid ""
+"Solution: Ensure you're running scripts from the project root directory."
+msgstr ""
+
+#: ../../development/scripts.rst:790 842d7148e7114132962183903224af55
+msgid "**Python version too old**"
+msgstr "**Python version too old**"
+
+#: ../../development/scripts.rst:792 5a1be93894bc472c9e1cdf5496763b24
+msgid "Python 3.7 or higher is required"
+msgstr ""
+
+#: ../../development/scripts.rst:796 87be52973ef840f6a4fbc117cdbcb567
+msgid "Solution: Upgrade Python to version 3.7 or higher."
+msgstr ""
+
+#: ../../development/scripts.rst:798 ed732a356a0c4615bd86d1c584ecc8d8
+msgid "**Missing dependencies**"
+msgstr "**Missing dependencies**"
+
+#: ../../development/scripts.rst:800 1a874252893242659c4a53005d0a75ac
+msgid "ModuleNotFoundError: No module named 'kconfiglib'"
+msgstr ""
+
+#: ../../development/scripts.rst:804 92bce5fb6e334b738a20bd3a586830a9
+msgid "Solution: Install dependencies:"
+msgstr "Solution: 安装 dependencies:"
+
+#: ../../development/scripts.rst:806 ce16087102a5423383206a69cc2e9141
+msgid "pip install -r requirements.txt"
+msgstr "pip install -r requirements.txt"
+
+#: ../../development/scripts.rst:810 62799204bab348fbb395ceccdbf46469
+msgid "**Permission denied (Linux/macOS)**"
+msgstr "**Permission denied (Linux/macOS)**"
+
+#: ../../development/scripts.rst:812 410c1ce9a5324259b5f55a8a69a4d421
+msgid "Permission denied: './scripts/nexus.sh'"
+msgstr ""
+
+#: ../../development/scripts.rst:816 487b91602a0f4c81aad0c669d3726ece
+msgid "Solution: Make scripts executable:"
+msgstr ""
+
+#: ../../development/scripts.rst:818 c95fdd52173f451da5c1ad57355c22d5
+msgid "chmod +x scripts/*.sh"
+msgstr ""
+
+#: ../../development/scripts.rst:823 0366448835ff4c92b25aa92944d55e40
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../development/scripts.rst:825 bcb7c22d9e6f4f33bce29095ba0c7588
+msgid ":doc:`../user_guide/build_system` - Build system documentation"
+msgstr ":doc:`../user_guide/build_system` - Build system documentation"
+
+#: ../../development/scripts.rst:826 04fdcb509cfd4bc68f248ba26b193026
+msgid ":doc:`testing` - Testing guide"
+msgstr ":doc:`testing` - Testing guide"
+
+#: ../../development/scripts.rst:827 dc603d8224254513af2ebc8b070a9a44
+msgid ":doc:`contributing` - Contribution guidelines"
+msgstr ":doc:`contributing` - Contribution guidelines"
+
+#: ../../development/scripts.rst:828 3d13058e3e67420ab58aea99084b2921
+msgid ":doc:`kconfig_guide` - Kconfig configuration guide"
+msgstr ":doc:`kconfig_guide` - Kconfig configuration guide"

@@ -16,6 +16,49 @@ Key features:
 * Critical section and interrupt management
 * Memory allocation abstraction
 
+.. seealso::
+
+   * :doc:`hal` - Hardware Abstraction Layer
+   * :doc:`kconfig_osal` - OSAL backend configuration
+   * :doc:`../tutorials/task_creation` - Task creation tutorial
+   * :doc:`../api/osal` - Complete OSAL API reference
+   * :doc:`../platform_guides/index` - Platform-specific RTOS support
+
+OSAL Architecture
+~~~~~~~~~~~~~~~~~
+
+.. mermaid::
+   :alt: OSAL architecture showing abstraction layer and backend adapters
+
+   graph TB
+       APP[Application Code] --> OSAL[OSAL API]
+       OSAL --> TASK[Task Management]
+       OSAL --> SYNC[Synchronization]
+       OSAL --> QUEUE[Message Queues]
+       OSAL --> TIMER[Software Timers]
+
+       TASK --> ADAPTER[Backend Adapter]
+       SYNC --> ADAPTER
+       QUEUE --> ADAPTER
+       TIMER --> ADAPTER
+
+       ADAPTER --> FREERTOS[FreeRTOS]
+       ADAPTER --> NATIVE[Native/POSIX]
+       ADAPTER --> BAREMETAL[Bare Metal]
+       ADAPTER --> RTTHREAD[RT-Thread]
+
+       style APP fill:#e1f5ff
+       style OSAL fill:#fff4e1
+       style TASK fill:#ffe1f5
+       style SYNC fill:#ffe1f5
+       style QUEUE fill:#ffe1f5
+       style TIMER fill:#ffe1f5
+       style ADAPTER fill:#e1ffe1
+       style FREERTOS fill:#f5e1ff
+       style NATIVE fill:#f5e1ff
+       style BAREMETAL fill:#f5e1ff
+       style RTTHREAD fill:#f5e1ff
+
 Supported Backends
 ------------------
 
@@ -48,6 +91,25 @@ Getting Started
 
 Task Management
 ---------------
+
+Task Lifecycle
+~~~~~~~~~~~~~~
+
+The following diagram shows the complete task lifecycle:
+
+.. mermaid::
+   :alt: Task lifecycle state machine showing task states and transitions
+
+   stateDiagram-v2
+       [*] --> Ready: osal_task_create()
+       Ready --> Running: Scheduler
+       Running --> Ready: Preempted
+       Running --> Blocked: Wait/Delay
+       Blocked --> Ready: Event/Timeout
+       Running --> Suspended: osal_task_suspend()
+       Suspended --> Ready: osal_task_resume()
+       Running --> [*]: osal_task_delete()
+       Suspended --> [*]: osal_task_delete()
 
 **Create a task:**
 
@@ -93,6 +155,36 @@ Task Management
 
 Mutex
 -----
+
+Mutex Usage Pattern
+~~~~~~~~~~~~~~~~~~~
+
+The following diagram shows a typical mutex usage pattern for protecting shared resources:
+
+.. mermaid::
+   :alt: Mutex usage workflow showing lock, critical section, and unlock
+
+   sequenceDiagram
+       participant T1 as Task 1
+       participant M as Mutex
+       participant R as Shared Resource
+       participant T2 as Task 2
+
+       T1->>M: osal_mutex_lock(timeout)
+       M-->>T1: Lock acquired
+       T1->>R: Access resource
+
+       T2->>M: osal_mutex_lock(timeout)
+       Note over T2,M: Task 2 blocks waiting
+
+       T1->>R: Modify resource
+       T1->>M: osal_mutex_unlock()
+       M-->>T1: Lock released
+
+       M-->>T2: Lock acquired
+       T2->>R: Access resource
+       T2->>M: osal_mutex_unlock()
+       M-->>T2: Lock released
 
 **Create and use mutex:**
 

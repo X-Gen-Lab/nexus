@@ -1,18 +1,11 @@
-# Log Framework - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
 #: ../../user_guide/log.rst:2 c69c5cb3b5d5470d90cc2bda085fafc0
 msgid "Log Framework"
@@ -47,7 +40,8 @@ msgid "**Module Filtering**: Per-module log levels with wildcard support"
 msgstr "**模块级过滤**: 支持通配符的模块级别过滤"
 
 #: ../../user_guide/log.rst:17 7c6fa147092f4535bf5efa4a65421177
-msgid "**Customizable Format**: Timestamp, level, module, file, line, function"
+msgid ""
+"**Customizable Format**: Timestamp, level, module, file, line, function"
 msgstr "**可定制格式**: 时间戳、级别、模块、文件、行号、函数"
 
 #: ../../user_guide/log.rst:18 eef1fc30e7de46be9abe0f8b0e2f9d1f
@@ -64,8 +58,7 @@ msgstr "**编译时优化**: 编译时移除低级别日志"
 
 #: ../../user_guide/log.rst:21 b6d18818a8ac4931878291c5e1cf9ee2
 msgid ""
-"**Resource Configurable**: Static allocation support for constrained "
-"systems"
+"**Resource Configurable**: Static allocation support for constrained systems"
 msgstr "**资源可配置**: 支持静态分配，适用于资源受限系统"
 
 #: ../../user_guide/log.rst:24 ae6b11e0822643b4bb7141f7f876539c
@@ -99,14 +92,35 @@ msgid ""
 "    log_deinit();\n"
 "}"
 msgstr ""
+"#define LOG_MODULE \"app\"\n"
+"#include \"log/log.h\"\n"
+"\n"
+"void app_init(void)\n"
+"{\n"
+"    // Initialize with default config\n"
+"    log_init(NULL);\n"
+"\n"
+"    // Use convenience macros\n"
+"    LOG_TRACE(\"Detailed trace info\");\n"
+"    LOG_DEBUG(\"Debug value: %d\", 42);\n"
+"    LOG_INFO(\"Application started\");\n"
+"    LOG_WARN(\"Resource usage at 80%%\");\n"
+"    LOG_ERROR(\"Failed to open file: %s\", \"config.txt\");\n"
+"    LOG_FATAL(\"Critical system failure\");\n"
+"\n"
+"    // Cleanup\n"
+"    log_deinit();\n"
+"}"
 
 #: ../../user_guide/log.rst:51 3a3018c3910e409990ad60d99b388132
 msgid "Log Levels"
 msgstr "日志级别"
 
 #: ../../user_guide/log.rst:53 9f44f231895f4ecca611570c3b455243
-msgid "Log levels are ordered from most verbose (TRACE) to least verbose (FATAL):"
+msgid ""
+"Log levels are ordered from most verbose (TRACE) to least verbose (FATAL):"
 msgstr ""
+"Log levels are ordered from most verbose (TRACE) to least verbose (FATAL):"
 
 #: ../../user_guide/log.rst:56 94b6d755c9e74bfaadaace0aa17ce015
 msgid "Level"
@@ -116,9 +130,6 @@ msgstr "级别"
 msgid "Value"
 msgstr "值"
 
-#: ../../user_guide/log.rst:56 ../../user_guide/log.rst:97
-#: ../../user_guide/log.rst:268 ../../user_guide/log.rst:345
-#: 9d1c1ad6a33746dc98a71e7092d9886c 9fe2ca865d7f4c5786aefd9fd8ed7bb2
 #: badb633d2c3347929073ff16c87d8502 f8f8da3e494f4369a726cf3c5e3f3f9d
 msgid "Description"
 msgstr "描述"
@@ -130,7 +141,7 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:58 f037f079accd4ef29446e0de78bce2f8
 msgid "0"
-msgstr ""
+msgstr "0"
 
 #: ../../user_guide/log.rst:58 91911532c5094819acb84666ef89ce78
 msgid "Most detailed tracing info"
@@ -143,11 +154,11 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:60 e9d9122218014aed99b5303f19361477
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: ../../user_guide/log.rst:60 031e1ba459f34322879bf8b0a6744ebc
 msgid "Debug information"
-msgstr ""
+msgstr "调试 information"
 
 #: ../../user_guide/log.rst:62 d3d49974926e4d6489f095acd34e43ec
 #, fuzzy
@@ -156,7 +167,7 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:62 033001e4cf42402989062c7b4f3646d5
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: ../../user_guide/log.rst:62 17526794b539415084eb38792b42270a
 msgid "General information"
@@ -169,11 +180,11 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:64 d5b3771d33314b0fa56d2d92b98709d3
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: ../../user_guide/log.rst:64 b68407a50b2745f494c9954dac3f3090
 msgid "Warning messages"
-msgstr ""
+msgstr "警告 messages"
 
 #: ../../user_guide/log.rst:66 fbf02cf42da84146992eac6cabdee056
 #, fuzzy
@@ -182,11 +193,11 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:66 1c10e7a919ce4242b3f413cdfbacbabd
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: ../../user_guide/log.rst:66 671b9a0480464d5ab4f17eed8a6693a0
 msgid "Error messages"
-msgstr ""
+msgstr "错误消息"
 
 #: ../../user_guide/log.rst:68 63351abba55747cd8536fd085923c994
 #, fuzzy
@@ -195,7 +206,7 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:68 7e5c998e006048e09073540cf6fa5180
 msgid "5"
-msgstr ""
+msgstr "5"
 
 #: ../../user_guide/log.rst:68 b3ece09d52f643009b51fc9bad8da038
 msgid "Fatal error messages"
@@ -208,7 +219,7 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:70 ebd298b2a1054b11bb26ce08e927a6e1
 msgid "6"
-msgstr ""
+msgstr "6"
 
 #: ../../user_guide/log.rst:70 1390ed13c2e44fb88a56478cc0faa291
 msgid "Disable all logging"
@@ -235,6 +246,16 @@ msgid ""
 "\n"
 "log_init(&config);"
 msgstr ""
+"log_config_t config = {\n"
+"    .level = LOG_LEVEL_DEBUG,           // Filter out TRACE\n"
+"    .format = \"[%T] [%L] [%M] %m\",      // Custom format\n"
+"    .async_mode = false,                // Synchronous mode\n"
+"    .buffer_size = 0,                   // Not used in sync mode\n"
+"    .max_msg_len = 256,                 // Max message length\n"
+"    .color_enabled = true               // Enable ANSI colors\n"
+"};\n"
+"\n"
+"log_init(&config);"
 
 #: ../../user_guide/log.rst:92 31d3fa398d474a9c84da9f13b391290e
 msgid "Format Tokens"
@@ -254,68 +275,68 @@ msgstr "示例"
 
 #: ../../user_guide/log.rst:99 488fb03270d64b67ab848a89adcd733a
 msgid "``%T``"
-msgstr ""
+msgstr "``%T``"
 
 #: ../../user_guide/log.rst:99 2fa527af08bd45748d34e5ad3ce8f3a3
 msgid "Timestamp (milliseconds)"
-msgstr ""
+msgstr "Timestamp (milliseconds)"
 
 #: ../../user_guide/log.rst:99 8b941da182374193b55fd34f1f0f8bfc
 msgid "``12345678``"
-msgstr ""
+msgstr "``12345678``"
 
 #: ../../user_guide/log.rst:101 be76bea3c4b7493abbad7794fcbb9d7c
 msgid "``%t``"
-msgstr ""
+msgstr "``%t``"
 
 #: ../../user_guide/log.rst:101 b3cbc460c30a4eb6abaaadfba8b8024c
 msgid "Time (HH:MM:SS)"
-msgstr ""
+msgstr "Time (HH:MM:SS)"
 
 #: ../../user_guide/log.rst:101 a380dbc51aac4aba9a522df89ade2b61
 msgid "``14:30:25``"
-msgstr ""
+msgstr "``14:30:25``"
 
 #: ../../user_guide/log.rst:103 9cc3d6ec053a46e48ffbb0b6b7394605
 msgid "``%L``"
-msgstr ""
+msgstr "``%L``"
 
 #: ../../user_guide/log.rst:103 1989ed10a05946b098591dc125b3d166
 msgid "Level name (full)"
-msgstr ""
+msgstr "Level name (full)"
 
 #: ../../user_guide/log.rst:103 1aba68942051427ca2aec2a8219ed815
 msgid "``INFO``"
-msgstr ""
+msgstr "``INFO``"
 
 #: ../../user_guide/log.rst:105 0b199b4b68cc49c3a9617327a65424f0
 msgid "``%l``"
-msgstr ""
+msgstr "``%l``"
 
 #: ../../user_guide/log.rst:105 c293045894494e3fbac7823ec1e0d734
 msgid "Level name (short)"
-msgstr ""
+msgstr "Level name (short)"
 
 #: ../../user_guide/log.rst:105 2f4a532ba09b4b7799ea4f6583a98302
 msgid "``I``"
-msgstr ""
+msgstr "``I``"
 
 #: ../../user_guide/log.rst:107 0a42c2b0228e448db23e73971336ba37
 msgid "``%M``"
-msgstr ""
+msgstr "``%M``"
 
 #: ../../user_guide/log.rst:107 e7e60427f0a74307860d9a1ab8afdc07
 msgid "Module name"
-msgstr ""
+msgstr "模块 name"
 
 #: ../../user_guide/log.rst:107 1c167d9530fe42e1939554218e3fe6b1
 msgid "``app``"
-msgstr ""
+msgstr "``app``"
 
 #: ../../user_guide/log.rst:109 ffdd2d96939c41fbb659bcfb08dff6f1
 #, python-format
 msgid "``%F``"
-msgstr ""
+msgstr "``%F``"
 
 #: ../../user_guide/log.rst:109 c61144fe483346b9b6a9095b0d83a229
 msgid "File name"
@@ -323,24 +344,24 @@ msgstr ""
 
 #: ../../user_guide/log.rst:109 fe3826fc33374385a593bcdde671f5e1
 msgid "``main.c``"
-msgstr ""
+msgstr "``main.c``"
 
 #: ../../user_guide/log.rst:111 f08d032bbd3d4b74bd0db55622e5e8c4
 #, python-format
 msgid "``%f``"
-msgstr ""
+msgstr "``%f``"
 
 #: ../../user_guide/log.rst:111 c40e97407a7348cf842b29f065172c18
 msgid "Function name"
-msgstr ""
+msgstr "函数 name"
 
 #: ../../user_guide/log.rst:111 0c6e2e4ba0754899b7b70e9492e08dcc
 msgid "``app_init``"
-msgstr ""
+msgstr "``app_init``"
 
 #: ../../user_guide/log.rst:113 f5d41117cd7e45ae9b79af6cc4bb04fc
 msgid "``%n``"
-msgstr ""
+msgstr "``%n``"
 
 #: ../../user_guide/log.rst:113 feb02fb1f363492ba10d249cec82b989
 msgid "Line number"
@@ -348,11 +369,11 @@ msgstr ""
 
 #: ../../user_guide/log.rst:113 bb75f3f7d01140c1834381b530195693
 msgid "``42``"
-msgstr ""
+msgstr "``42``"
 
 #: ../../user_guide/log.rst:115 5e354b4a6ebe40849575dcd4435b2f79
 msgid "``%m``"
-msgstr ""
+msgstr "``%m``"
 
 #: ../../user_guide/log.rst:115 3761c9b7c7c34fc8857382d9c1277da2
 msgid "Message content"
@@ -360,12 +381,12 @@ msgstr ""
 
 #: ../../user_guide/log.rst:115 35682ee55e424b19998381fcf4334e2a
 msgid "``Hello``"
-msgstr ""
+msgstr "``Hello``"
 
 #: ../../user_guide/log.rst:117 8356c68974934141a696f2a76d28bd3b
 #, python-format
 msgid "``%c``"
-msgstr ""
+msgstr "``%c``"
 
 #: ../../user_guide/log.rst:117 4badf25da97947cb832cc26cc66a9ebf
 msgid "ANSI color code"
@@ -373,7 +394,7 @@ msgstr ""
 
 #: ../../user_guide/log.rst:119 86ea60a3247e400f8558d2ad399167b5
 msgid "``%C``"
-msgstr ""
+msgstr "``%C``"
 
 #: ../../user_guide/log.rst:119 8b86b59d9a594feab6283dcd65df173b
 msgid "ANSI color reset"
@@ -382,7 +403,7 @@ msgstr ""
 #: ../../user_guide/log.rst:121 7facac4e18d341f4999b5fb45d631c11
 #, python-format
 msgid "``%%``"
-msgstr ""
+msgstr "``%%``"
 
 #: ../../user_guide/log.rst:121 f05f445646894342856afa027892d4f1
 msgid "Literal percent sign"
@@ -390,11 +411,11 @@ msgstr ""
 
 #: ../../user_guide/log.rst:121 6ead2d1eee904327b5e028bf972ef1be
 msgid "``%``"
-msgstr ""
+msgstr "``%``"
 
 #: ../../user_guide/log.rst:124 4abaffdc0a7e4fdb8028f2f335d5a6a0
 msgid "**Default format:** ``[%T] [%L] [%M] %m``"
-msgstr ""
+msgstr "**Default format:** ``[%T] [%L] [%M] %m``"
 
 #: ../../user_guide/log.rst:127 5a587c5624ce49d78639ea811a162633
 msgid "Backends"
@@ -417,6 +438,12 @@ msgid ""
 "log_backend_unregister(\"console\");\n"
 "log_backend_console_destroy(console);"
 msgstr ""
+"log_backend_t* console = log_backend_console_create();\n"
+"log_backend_register(console);\n"
+"\n"
+"// When done\n"
+"log_backend_unregister(\"console\");\n"
+"log_backend_console_destroy(console);"
 
 #: ../../user_guide/log.rst:144 fc9ea1c6c88940d48ae7b47c0e34ea5d
 msgid "UART Backend"
@@ -447,6 +474,24 @@ msgid ""
 "log_backend_uart_destroy(uart);\n"
 "hal_uart_deinit(HAL_UART_0);"
 msgstr ""
+"// Initialize UART first\n"
+"hal_uart_config_t uart_cfg = {\n"
+"    .baudrate = 115200,\n"
+"    .wordlen = HAL_UART_WORDLEN_8,\n"
+"    .stopbits = HAL_UART_STOPBITS_1,\n"
+"    .parity = HAL_UART_PARITY_NONE,\n"
+"    .flowctrl = HAL_UART_FLOWCTRL_NONE\n"
+"};\n"
+"hal_uart_init(HAL_UART_0, &uart_cfg);\n"
+"\n"
+"// Create and register UART backend\n"
+"log_backend_t* uart = log_backend_uart_create(HAL_UART_0);\n"
+"log_backend_register(uart);\n"
+"\n"
+"// When done\n"
+"log_backend_unregister(\"uart\");\n"
+"log_backend_uart_destroy(uart);\n"
+"hal_uart_deinit(HAL_UART_0);"
 
 #: ../../user_guide/log.rst:170 9648d141c1ba4c699798878833828d1a
 msgid "Memory Backend"
@@ -472,6 +517,19 @@ msgid ""
 "log_backend_unregister(\"memory\");\n"
 "log_backend_memory_destroy(memory);"
 msgstr ""
+"log_backend_t* memory = log_backend_memory_create(4096);\n"
+"log_backend_register(memory);\n"
+"\n"
+"// Read buffer contents\n"
+"char buf[256];\n"
+"size_t len = log_backend_memory_read(memory, buf, sizeof(buf));\n"
+"\n"
+"// Clear buffer\n"
+"log_backend_memory_clear(memory);\n"
+"\n"
+"// When done\n"
+"log_backend_unregister(\"memory\");\n"
+"log_backend_memory_destroy(memory);"
 
 #: ../../user_guide/log.rst:191 31ccbdc315e2400187f41ef6b0ac0183
 msgid "Multiple Backends"
@@ -495,6 +553,17 @@ msgid ""
 "// Message goes to both backends\n"
 "LOG_INFO(\"Message to console and memory\");"
 msgstr ""
+"log_init(NULL);\n"
+"\n"
+"// Register multiple backends\n"
+"log_backend_t* console = log_backend_console_create();\n"
+"log_backend_register(console);\n"
+"\n"
+"log_backend_t* memory = log_backend_memory_create(4096);\n"
+"log_backend_register(memory);\n"
+"\n"
+"// Message goes to both backends\n"
+"LOG_INFO(\"Message to console and memory\");"
 
 #: ../../user_guide/log.rst:210 f7729c7e2c7f44f7ad7fe8623e794188
 msgid "Module Filtering"
@@ -516,10 +585,8 @@ msgid ""
 "log_module_set_level(\"network\", LOG_LEVEL_WARN);\n"
 "\n"
 "// Get effective level for a module\n"
-"log_level_t level = log_module_get_level(\"hal.gpio\");  // Returns DEBUG"
-"\n"
-"log_level_t level2 = log_module_get_level(\"app\");      // Returns INFO "
-"(global)\n"
+"log_level_t level = log_module_get_level(\"hal.gpio\");  // Returns DEBUG\n"
+"log_level_t level2 = log_module_get_level(\"app\");      // Returns INFO (global)\n"
 "\n"
 "// Clear module-specific level\n"
 "log_module_clear_level(\"network\");\n"
@@ -527,6 +594,24 @@ msgid ""
 "// Clear all module-specific levels\n"
 "log_module_clear_all();"
 msgstr ""
+"log_init(NULL);\n"
+"log_set_level(LOG_LEVEL_INFO);  // Global level: INFO\n"
+"\n"
+"// Enable DEBUG for HAL modules (wildcard)\n"
+"log_module_set_level(\"hal.*\", LOG_LEVEL_DEBUG);\n"
+"\n"
+"// Only show WARN and above for network module\n"
+"log_module_set_level(\"network\", LOG_LEVEL_WARN);\n"
+"\n"
+"// Get effective level for a module\n"
+"log_level_t level = log_module_get_level(\"hal.gpio\");  // Returns DEBUG\n"
+"log_level_t level2 = log_module_get_level(\"app\");      // Returns INFO (global)\n"
+"\n"
+"// Clear module-specific level\n"
+"log_module_clear_level(\"network\");\n"
+"\n"
+"// Clear all module-specific levels\n"
+"log_module_clear_all();"
 
 #: ../../user_guide/log.rst:236 93d13c9a21ee4839a80a26a209966fc6
 msgid "Asynchronous Mode"
@@ -562,6 +647,28 @@ msgid ""
 "// Check pending message count\n"
 "size_t pending = log_async_pending();"
 msgstr ""
+"log_config_t config = {\n"
+"    .level = LOG_LEVEL_DEBUG,\n"
+"    .format = \"[%T] [%L] %m\",\n"
+"    .async_mode = true,                          // Enable async\n"
+"    .buffer_size = 4096,                         // Async buffer size\n"
+"    .max_msg_len = 128,\n"
+"    .async_queue_size = 32,                      // Queue depth\n"
+"    .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST // Policy when full\n"
+"};\n"
+"\n"
+"log_init(&config);\n"
+"\n"
+"// Log writes return immediately\n"
+"for (int i = 0; i < 100; i++) {\n"
+"    LOG_INFO(\"Async message %d\", i);\n"
+"}\n"
+"\n"
+"// Wait for all messages to be processed\n"
+"log_async_flush();\n"
+"\n"
+"// Check pending message count\n"
+"size_t pending = log_async_pending();"
 
 #: ../../user_guide/log.rst:265 7aff51b78e3b4c17b26547978191a760
 msgid "**Buffer full policies:**"
@@ -573,7 +680,7 @@ msgstr ""
 
 #: ../../user_guide/log.rst:270 a0ab5c3255664ddfa36c2d11313b40d9
 msgid "``LOG_ASYNC_POLICY_DROP_OLDEST``"
-msgstr ""
+msgstr "``LOG_ASYNC_POLICY_DROP_OLDEST``"
 
 #: ../../user_guide/log.rst:270 70da3cf2f6fc41eaafcaef11af76ced2
 msgid "Drop oldest message when full"
@@ -581,7 +688,7 @@ msgstr ""
 
 #: ../../user_guide/log.rst:272 552c170a253f4d98a675965b3fa1d8b7
 msgid "``LOG_ASYNC_POLICY_DROP_NEWEST``"
-msgstr ""
+msgstr "``LOG_ASYNC_POLICY_DROP_NEWEST``"
 
 #: ../../user_guide/log.rst:272 2a72c7d604c24230ab1cb3781973b48f
 msgid "Drop newest message when full"
@@ -589,7 +696,7 @@ msgstr ""
 
 #: ../../user_guide/log.rst:274 f1b6518df79a42da87c7c7510a138118
 msgid "``LOG_ASYNC_POLICY_BLOCK``"
-msgstr ""
+msgstr "``LOG_ASYNC_POLICY_BLOCK``"
 
 #: ../../user_guide/log.rst:274 633151eedccc438d9a3d757d77113e60
 msgid "Block until space available"
@@ -621,6 +728,21 @@ msgid ""
 "LOG_DEBUG(\"Only to console\");\n"
 "LOG_WARN(\"To console and UART\");"
 msgstr ""
+"log_init(NULL);\n"
+"log_set_level(LOG_LEVEL_TRACE);  // Global: allow all\n"
+"\n"
+"// Console shows all messages\n"
+"log_backend_t* console = log_backend_console_create();\n"
+"console->min_level = LOG_LEVEL_TRACE;\n"
+"log_backend_register(console);\n"
+"\n"
+"// UART only shows WARN and above\n"
+"log_backend_t* uart = log_backend_uart_create(HAL_UART_0);\n"
+"uart->min_level = LOG_LEVEL_WARN;\n"
+"log_backend_register(uart);\n"
+"\n"
+"LOG_DEBUG(\"Only to console\");\n"
+"LOG_WARN(\"To console and UART\");"
 
 #: ../../user_guide/log.rst:301 a36877d21ba2495381ac596c120a7a05
 msgid "Runtime Reconfiguration"
@@ -645,6 +767,18 @@ msgid ""
 "log_backend_enable(\"uart\", false);\n"
 "log_backend_enable(\"uart\", true);"
 msgstr ""
+"// Change log level\n"
+"log_set_level(LOG_LEVEL_DEBUG);\n"
+"\n"
+"// Change format\n"
+"log_set_format(\"[%l] %m\");\n"
+"\n"
+"// Change max message length\n"
+"log_set_max_msg_len(64);\n"
+"\n"
+"// Enable/disable backends\n"
+"log_backend_enable(\"uart\", false);\n"
+"log_backend_enable(\"uart\", true);"
 
 #: ../../user_guide/log.rst:321 550348411e2e4706a64674396b321714
 msgid "Compile-Time Configuration"
@@ -664,16 +798,20 @@ msgid ""
 "# CMakeLists.txt\n"
 "add_definitions(-DLOG_COMPILE_LEVEL=LOG_LEVEL_INFO)"
 msgstr ""
+"# CMakeLists.txt\n"
+"add_definitions(-DLOG_COMPILE_LEVEL=LOG_LEVEL_INFO)"
 
 #: ../../user_guide/log.rst:332 a59ac09ab05c425fa14802fc16f6b997
 msgid ""
-"This completely removes ``LOG_TRACE()`` and ``LOG_DEBUG()`` calls from "
-"the binary."
+"This completely removes ``LOG_TRACE()`` and ``LOG_DEBUG()`` calls from the "
+"binary."
 msgstr ""
+"This completely removes ``LOG_TRACE()`` and ``LOG_DEBUG()`` calls from the "
+"binary."
 
 #: ../../user_guide/log.rst:334 d68ed746b71a4102abd0c1794b987a57
 msgid "**Static allocation mode:**"
-msgstr ""
+msgstr "**Static allocation mode:**"
 
 #: ../../user_guide/log.rst:336 9197998731834669b0fb7571429772f7
 msgid "Disable dynamic memory allocation:"
@@ -681,7 +819,7 @@ msgstr ""
 
 #: ../../user_guide/log.rst:338 fa6fc8c6b80f4c10b7c00452f47ebf16
 msgid "add_definitions(-DLOG_USE_STATIC_ALLOC=1)"
-msgstr ""
+msgstr "add_definitions(-DLOG_USE_STATIC_ALLOC=1)"
 
 #: ../../user_guide/log.rst:342 c56db82d7c3c485fadf6ff3b7ab95450
 #, fuzzy
@@ -698,11 +836,11 @@ msgstr "默认值"
 
 #: ../../user_guide/log.rst:347 0dda1708e73141788c5511e4fdb68648
 msgid "``LOG_DEFAULT_LEVEL``"
-msgstr ""
+msgstr "``LOG_DEFAULT_LEVEL``"
 
 #: ../../user_guide/log.rst:347 cacd8cf13cd5458f932344ac76953869
 msgid "``LOG_LEVEL_INFO``"
-msgstr ""
+msgstr "``LOG_LEVEL_INFO``"
 
 #: ../../user_guide/log.rst:347 3422ccc84fe84c2693df7efad6215729
 #, fuzzy
@@ -711,11 +849,11 @@ msgstr "日志级别"
 
 #: ../../user_guide/log.rst:349 95481db63ac443a6b28a92a1c2fff079
 msgid "``LOG_MAX_MSG_LEN``"
-msgstr ""
+msgstr "``LOG_MAX_MSG_LEN``"
 
 #: ../../user_guide/log.rst:349 bdfa2d3d13a1408db169520ee9a15ebe
 msgid "``128``"
-msgstr ""
+msgstr "``128``"
 
 #: ../../user_guide/log.rst:349 e15e6d713612406699777a5e20e81038
 msgid "Max message length"
@@ -723,11 +861,11 @@ msgstr ""
 
 #: ../../user_guide/log.rst:351 76e9d81c65004b17bc1a66c765229eb1
 msgid "``LOG_MAX_BACKENDS``"
-msgstr ""
+msgstr "``LOG_MAX_BACKENDS``"
 
 #: ../../user_guide/log.rst:351 07405a1f3ce240d98fac9830ea830343
 msgid "``4``"
-msgstr ""
+msgstr "``4``"
 
 #: ../../user_guide/log.rst:351 e63bc899fcfa4660bb4123c28ae855ff
 #, fuzzy
@@ -736,11 +874,11 @@ msgstr "UART 后端"
 
 #: ../../user_guide/log.rst:353 df47c970f2224ea1a1d9e7c2f1111916
 msgid "``LOG_MAX_MODULE_FILTERS``"
-msgstr ""
+msgstr "``LOG_MAX_MODULE_FILTERS``"
 
 #: ../../user_guide/log.rst:353 78347ec7b80b4d04ba430cd3c74d6610
 msgid "``16``"
-msgstr ""
+msgstr "``16``"
 
 #: ../../user_guide/log.rst:353 5a1668ce9e694798ab6dc8e2924b137a
 #, fuzzy
@@ -749,11 +887,11 @@ msgstr "模块过滤"
 
 #: ../../user_guide/log.rst:355 0afba5f15608421b829112a7bd5ed655
 msgid "``LOG_COMPILE_LEVEL``"
-msgstr ""
+msgstr "``LOG_COMPILE_LEVEL``"
 
 #: ../../user_guide/log.rst:355 29560d71d76940b0bee20e3b52ff9b4a
 msgid "``LOG_LEVEL_TRACE``"
-msgstr ""
+msgstr "``LOG_LEVEL_TRACE``"
 
 #: ../../user_guide/log.rst:355 fc651417688b44799967011122ce63c8
 msgid "Compile-time level"
@@ -761,11 +899,11 @@ msgstr ""
 
 #: ../../user_guide/log.rst:357 96351e8deb634fb091e84cf4d6acdf8d
 msgid "``LOG_USE_STATIC_ALLOC``"
-msgstr ""
+msgstr "``LOG_USE_STATIC_ALLOC``"
 
 #: ../../user_guide/log.rst:357 ba3e516f6eff471d9353e4b2488a2218
 msgid "``0``"
-msgstr ""
+msgstr "``0``"
 
 #: ../../user_guide/log.rst:357 f285aad4b2fd4935beff2963db317aba
 msgid "Static allocation mode"
@@ -781,8 +919,7 @@ msgstr ""
 
 #: ../../user_guide/log.rst:365 2a1948d75f294eafb840e6deba7f68d2
 msgid ""
-"static log_status_t my_backend_write(void* ctx, const char* msg, size_t "
-"len)\n"
+"static log_status_t my_backend_write(void* ctx, const char* msg, size_t len)\n"
 "{\n"
 "    // Custom output logic (file, network, etc.)\n"
 "    return LOG_OK;\n"
@@ -801,6 +938,24 @@ msgid ""
 "\n"
 "log_backend_register(&my_backend);"
 msgstr ""
+"static log_status_t my_backend_write(void* ctx, const char* msg, size_t len)\n"
+"{\n"
+"    // Custom output logic (file, network, etc.)\n"
+"    return LOG_OK;\n"
+"}\n"
+"\n"
+"static log_backend_t my_backend = {\n"
+"    .name = \"custom\",\n"
+"    .init = NULL,              // Optional\n"
+"    .write = my_backend_write, // Required\n"
+"    .flush = NULL,             // Optional\n"
+"    .deinit = NULL,            // Optional\n"
+"    .ctx = NULL,               // Custom context\n"
+"    .min_level = LOG_LEVEL_INFO,\n"
+"    .enabled = true\n"
+"};\n"
+"\n"
+"log_backend_register(&my_backend);"
 
 #: ../../user_guide/log.rst:387 fb7a10b8b6664306a1a9068ceb660770
 msgid "Thread Safety"
@@ -829,11 +984,11 @@ msgstr "依赖"
 
 #: ../../user_guide/log.rst:398 ee333ad8f446418da9797a5ab43328a0
 msgid "**OSAL**: OS Abstraction Layer (Mutex, Queue, Task)"
-msgstr ""
+msgstr "**OSAL**: OS Abstraction Layer (Mutex, Queue, Task)"
 
 #: ../../user_guide/log.rst:399 187da386fa204518ad4e2c325a42b37e
 msgid "**HAL**: Hardware Abstraction Layer (UART)"
-msgstr ""
+msgstr "**HAL**: Hardware Abstraction Layer (UART)"
 
 #: ../../user_guide/log.rst:402 90d2d4aadac741a8ba540d78b5782d64
 msgid "API Reference"
@@ -842,4 +997,3 @@ msgstr "API 参考"
 #: ../../user_guide/log.rst:404 45225ac60120406dbf71546de551c9bd
 msgid "See :doc:`../api/log` for complete API documentation."
 msgstr ""
-

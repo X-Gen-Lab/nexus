@@ -1,18 +1,11 @@
-# Installation - Chinese Translation
+# Chinese (Simplified) translations for Nexus.
+# Copyright (C) 2026 Nexus Team
+# This file is distributed under the same license as the Nexus project.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus 1.0.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 00:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 
 #: ../../getting_started/installation.rst:2 a47e9045d38e45c0b89cc0d0d80a6b48
 msgid "Installation"
@@ -29,7 +22,7 @@ msgstr "安装 Nexus 之前，请确保已安装以下工具："
 
 #: ../../getting_started/installation.rst:9 fc8751106d304ce0852b96b761430901
 msgid "**Required:**"
-msgstr ""
+msgstr "**Required:**"
 
 #: ../../getting_started/installation.rst:11 786c7f2f8e564fbdaf6f7f069a9e9648
 #, fuzzy
@@ -38,19 +31,19 @@ msgstr "**CMake**（3.16 或更高版本）"
 
 #: ../../getting_started/installation.rst:12 1134c58ef1d84ee4a9dbb41921db0b5c
 msgid "C compiler (GCC, Clang, or MSVC)"
-msgstr ""
+msgstr "C compiler (GCC, Clang, or MSVC)"
 
 #: ../../getting_started/installation.rst:13 6eaa8252ce4749689034acb6c77efbbb
 msgid "Git"
-msgstr ""
+msgstr "Git"
 
 #: ../../getting_started/installation.rst:15 f70b1fd92a694bb38738d77ed5f6d078
 msgid "**For ARM targets:**"
-msgstr ""
+msgstr "**For ARM targets:**"
 
 #: ../../getting_started/installation.rst:17 8e75db69f2aa4925bad93e1bbcf70a31
 msgid "ARM GCC toolchain (arm-none-eabi-gcc)"
-msgstr ""
+msgstr "ARM GCC toolchain (arm-none-eabi-gcc)"
 
 #: ../../getting_started/installation.rst:18 3221fdc9f5c44b0284d10a8b15482931
 msgid "OpenOCD or J-Link for debugging"
@@ -88,10 +81,13 @@ msgid ""
 "choco install cmake git\n"
 "choco install gcc-arm-embedded"
 msgstr ""
+"# Install with Chocolatey\n"
+"choco install cmake git\n"
+"choco install gcc-arm-embedded"
 
 #: ../../getting_started/installation.rst:37 faacddbee62d47eb843bf021fff8e7e8
 msgid "**Linux (Ubuntu/Debian):**"
-msgstr ""
+msgstr "**Linux (Ubuntu/Debian):**"
 
 #: ../../getting_started/installation.rst:39 e1a830266a4f40fa921e0ce7226dac92
 msgid ""
@@ -124,6 +120,8 @@ msgid ""
 "git clone https://github.com/nexus-team/nexus.git\n"
 "cd nexus"
 msgstr ""
+"git clone https://github.com/nexus-team/nexus.git\n"
+"cd nexus"
 
 #: ../../getting_started/installation.rst:63 c436fd981a95453fa4d21ebb3ee99fab
 msgid "Building"
@@ -139,10 +137,12 @@ msgid ""
 "cmake -B build -DNEXUS_PLATFORM=native\n"
 "cmake --build build"
 msgstr ""
+"cmake -B build -DNEXUS_PLATFORM=native\n"
+"cmake --build build"
 
 #: ../../getting_started/installation.rst:72 1170fcd7a3814bdab14af42fcd1b4175
 msgid "**STM32F4 cross-compile:**"
-msgstr ""
+msgstr "**STM32F4 cross-compile:**"
 
 #: ../../getting_started/installation.rst:74 8349310a286e4c1fa1b9ac66fb0f95de
 msgid ""
@@ -151,6 +151,10 @@ msgid ""
 "    -DNEXUS_PLATFORM=stm32f4\n"
 "cmake --build build-stm32f4"
 msgstr ""
+"cmake -B build-stm32f4 \\\n"
+"    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \\\n"
+"    -DNEXUS_PLATFORM=stm32f4\n"
+"cmake --build build-stm32f4"
 
 #: ../../getting_started/installation.rst:82 f657ecde1fb64f898376924e1bd757c0
 msgid "Running Tests"
@@ -161,6 +165,8 @@ msgid ""
 "cd build\n"
 "ctest --output-on-failure"
 msgstr ""
+"cd build\n"
+"ctest --output-on-failure"
 
 #: ../../getting_started/installation.rst:90 aa0b08c72bff4a9195b38d23f0c96dc9
 msgid "Building Documentation"
@@ -175,6 +181,12 @@ msgid ""
 "cd docs/sphinx\n"
 "sphinx-build -b html . _build/html"
 msgstr ""
+"# Generate API docs\n"
+"doxygen Doxyfile\n"
+"\n"
+"# Build Sphinx docs\n"
+"cd docs/sphinx\n"
+"sphinx-build -b html . _build/html"
 
 #: ../../getting_started/installation.rst:102 b55f8f3da1674cb699f3a8c3a938b204
 msgid "Next Steps"
@@ -185,11 +197,11 @@ msgstr "下一步"
 msgid ":doc:`quickstart` - Build your first Nexus application"
 msgstr ":doc:`quickstart` - 构建你的第一个应用"
 
-#: ../../getting_started/installation.rst:105 247b8cd5f52841bca4bac8173a6739b3
-#, fuzzy
-msgid ":doc:`../user_guide/architecture` - Understand the platform architecture"
+msgid ""
+":doc:`../user_guide/architecture` - Understand the platform architecture"
 msgstr ":doc:`../user_guide/architecture` - 了解架构"
 
+#, fuzzy
 #~ msgid "**Python** (3.8 or later)"
 #~ msgstr "**Python**（3.8 或更高版本）"
 
@@ -207,4 +219,3 @@ msgstr ":doc:`../user_guide/architecture` - 了解架构"
 
 #~ msgid "After installation, proceed to:"
 #~ msgstr "安装完成后，请继续："
-
