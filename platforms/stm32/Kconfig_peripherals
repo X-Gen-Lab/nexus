@@ -18,7 +18,7 @@ menuconfig STM32_UART_ENABLE
       for the STM32 platform. UART is used for serial communication.
 
 if STM32_UART_ENABLE
-    source "platforms/stm32/src/uart/Kconfig"
+    # source "platforms/stm32/src/uart/Kconfig"
 endif
 
 #
