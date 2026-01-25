@@ -12,6 +12,7 @@
 #define OSAL_MUTEX_H
 
 #include "osal_def.h"
+#include "osal_task.h" /* For osal_task_handle_t */
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,11 +23,6 @@ extern "C" {
  * \brief           Mutex interface for synchronization
  * \{
  */
-
-/**
- * \brief           Forward declaration of task handle type
- */
-typedef void* osal_task_handle_t;
 
 /**
  * \brief           Mutex handle type
