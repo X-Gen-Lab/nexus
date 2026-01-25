@@ -103,7 +103,6 @@ shell_status_t autocomplete_command(const char* partial,
                                     completion_result_t* result) {
     const shell_command_t** commands = NULL;
     int command_count = 0;
-    int partial_len;
     int i;
 
     /* Validate parameters */
@@ -119,7 +118,6 @@ shell_status_t autocomplete_command(const char* partial,
     if (partial == NULL) {
         partial = "";
     }
-    partial_len = (int)strlen(partial);
 
     /* Get registered commands */
     if (shell_get_commands(&commands, &command_count) != SHELL_OK) {

@@ -128,7 +128,7 @@ typedef struct {
 /**
  * \brief           Module filters array
  */
-static log_module_filter_t s_module_filters[LOG_MAX_MODULE_FILTERS] = {{0}};
+static log_module_filter_t s_module_filters[LOG_MAX_MODULE_FILTERS] = {0};
 
 /**
  * \brief           Number of active module filters
