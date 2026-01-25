@@ -150,7 +150,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y doxygen graphviz
-        pip install sphinx sphinx-intl breathe sphinx-rtd-theme
+        pip install -r docs/sphinx/requirements.txt
 
     - name: Build Documentation
       run: |

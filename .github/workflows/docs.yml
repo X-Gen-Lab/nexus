@@ -45,7 +45,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y doxygen graphviz
-        pip install sphinx sphinx-intl breathe alabaster
+        pip install -r docs/sphinx/requirements.txt
 
     - name: Build Doxygen (API Reference)
       run: doxygen Doxyfile

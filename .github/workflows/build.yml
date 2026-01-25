@@ -264,7 +264,7 @@ jobs:
 
     - name: Install Sphinx
       run: |
-        pip install sphinx breathe sphinx-rtd-theme sphinx-intl
+        pip install -r docs/sphinx/requirements.txt
 
     - name: Build Doxygen
       run: doxygen Doxyfile
