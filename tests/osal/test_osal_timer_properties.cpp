@@ -519,7 +519,7 @@ TEST_F(OsalTimerPropertyTest, Property7_TimerPeriodQueryConsistency) {
 TEST_F(OsalTimerPropertyTest, Property8_TimerRemainingTimeValidity) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Generate random timer configuration with longer period for testing */
-        uint32_t period_ms = 100 + randomPeriod();  /* 110-300ms */
+        uint32_t period_ms = 100 + randomPeriod(); /* 110-300ms */
 
         /* Initialize callback state */
         s_callback_state.callback_count = 0;
@@ -627,9 +627,8 @@ TEST_F(OsalTimerPropertyTest, Property9_TimerCallbackChange) {
             << "Iteration " << test_iter << ": timer create failed";
 
         /* Change callback before starting */
-        ASSERT_EQ(OSAL_OK,
-                  osal_timer_set_callback(timer, test_timer_callback_second,
-                                          &arg_value))
+        ASSERT_EQ(OSAL_OK, osal_timer_set_callback(
+                               timer, test_timer_callback_second, &arg_value))
             << "Iteration " << test_iter << ": set callback failed";
 
         /* Start timer */
@@ -644,8 +643,7 @@ TEST_F(OsalTimerPropertyTest, Property9_TimerCallbackChange) {
             << "Iteration " << test_iter << ": callback was not invoked";
 
         EXPECT_EQ(arg_value + 1000, s_callback_state.last_arg_value)
-            << "Iteration " << test_iter
-            << ": wrong callback was invoked "
+            << "Iteration " << test_iter << ": wrong callback was invoked "
             << "(expected " << (arg_value + 1000) << ", got "
             << s_callback_state.last_arg_value << ")";
 

@@ -100,7 +100,8 @@ struct nx_spi_bus_s {
                                           nx_spi_device_config_t config);
 
     /**
-     * \brief           Get async TX/RX handle for a specific device configuration
+     * \brief           Get async TX/RX handle for a specific device
+     *                  configuration
      * \param[in]       self: SPI bus pointer
      * \param[in]       config: Device configuration
      * \param[in]       callback: Callback for received data
@@ -126,7 +127,8 @@ struct nx_spi_bus_s {
                                         nx_spi_device_config_t config);
 
     /**
-     * \brief           Get sync TX/RX handle for a specific device configuration
+     * \brief           Get sync TX/RX handle for a specific device
+     *                  configuration
      * \param[in]       self: SPI bus pointer
      * \param[in]       config: Device configuration
      * \return          Sync TX/RX interface pointer, NULL on error

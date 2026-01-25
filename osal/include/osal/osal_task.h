@@ -50,11 +50,11 @@ typedef enum {
  * \brief           Task state enumeration
  */
 typedef enum {
-    OSAL_TASK_STATE_READY = 0,       /**< Task is ready to run */
-    OSAL_TASK_STATE_RUNNING = 1,     /**< Task is currently running */
-    OSAL_TASK_STATE_BLOCKED = 2,     /**< Task is blocked */
-    OSAL_TASK_STATE_SUSPENDED = 3,   /**< Task is suspended */
-    OSAL_TASK_STATE_DELETED = 4      /**< Task has been deleted */
+    OSAL_TASK_STATE_READY = 0,     /**< Task is ready to run */
+    OSAL_TASK_STATE_RUNNING = 1,   /**< Task is currently running */
+    OSAL_TASK_STATE_BLOCKED = 2,   /**< Task is blocked */
+    OSAL_TASK_STATE_SUSPENDED = 3, /**< Task is suspended */
+    OSAL_TASK_STATE_DELETED = 4    /**< Task has been deleted */
 } osal_task_state_t;
 
 /**

@@ -35,29 +35,29 @@ typedef struct {
     /*-----------------------------------------------------------------------*/
     /* Current counts                                                        */
     /*-----------------------------------------------------------------------*/
-    uint16_t task_count;        /**< Active task count */
-    uint16_t mutex_count;       /**< Active mutex count */
-    uint16_t sem_count;         /**< Active semaphore count */
-    uint16_t queue_count;       /**< Active queue count */
-    uint16_t event_count;       /**< Active event flags count */
-    uint16_t timer_count;       /**< Active timer count */
+    uint16_t task_count;  /**< Active task count */
+    uint16_t mutex_count; /**< Active mutex count */
+    uint16_t sem_count;   /**< Active semaphore count */
+    uint16_t queue_count; /**< Active queue count */
+    uint16_t event_count; /**< Active event flags count */
+    uint16_t timer_count; /**< Active timer count */
 
     /*-----------------------------------------------------------------------*/
     /* Watermarks (peak usage)                                               */
     /*-----------------------------------------------------------------------*/
-    uint16_t task_watermark;    /**< Peak task count */
-    uint16_t mutex_watermark;   /**< Peak mutex count */
-    uint16_t sem_watermark;     /**< Peak semaphore count */
-    uint16_t queue_watermark;   /**< Peak queue count */
-    uint16_t event_watermark;   /**< Peak event flags count */
-    uint16_t timer_watermark;   /**< Peak timer count */
+    uint16_t task_watermark;  /**< Peak task count */
+    uint16_t mutex_watermark; /**< Peak mutex count */
+    uint16_t sem_watermark;   /**< Peak semaphore count */
+    uint16_t queue_watermark; /**< Peak queue count */
+    uint16_t event_watermark; /**< Peak event flags count */
+    uint16_t timer_watermark; /**< Peak timer count */
 
     /*-----------------------------------------------------------------------*/
     /* Memory statistics                                                     */
     /*-----------------------------------------------------------------------*/
-    size_t mem_allocated;       /**< Total bytes currently allocated */
-    size_t mem_peak;            /**< Peak memory allocation */
-    size_t mem_alloc_count;     /**< Number of active allocations */
+    size_t mem_allocated;   /**< Total bytes currently allocated */
+    size_t mem_peak;        /**< Peak memory allocation */
+    size_t mem_alloc_count; /**< Number of active allocations */
 } osal_stats_t;
 
 /*---------------------------------------------------------------------------*/
@@ -74,8 +74,7 @@ typedef struct {
  *                  such as memory corruption or stack overflow detection.
  *                  The callback should be kept short and should not block.
  */
-typedef void (*osal_error_callback_t)(osal_status_t error,
-                                      const char* file,
+typedef void (*osal_error_callback_t)(osal_status_t error, const char* file,
                                       uint32_t line);
 
 /*---------------------------------------------------------------------------*/
@@ -144,8 +143,7 @@ void osal_report_error(osal_status_t error, const char* file, uint32_t line);
  * \brief           Macro to report error with current file and line
  * \param[in]       error: Error code to report
  */
-#define OSAL_REPORT_ERROR(error)                                            \
-    osal_report_error((error), __FILE__, __LINE__)
+#define OSAL_REPORT_ERROR(error) osal_report_error((error), __FILE__, __LINE__)
 
 #ifdef __cplusplus
 }

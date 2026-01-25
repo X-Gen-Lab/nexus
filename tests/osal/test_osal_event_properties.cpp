@@ -1122,7 +1122,8 @@ TEST_F(OsalEventPropertyTest, Property20_EventSyncBasicFunctionality) {
 
         /* Verify bits_out contains the wait_bits */
         EXPECT_EQ(wait_bits, bits_out & wait_bits)
-            << "Iteration " << test_iter << ": bits_out should contain wait_bits "
+            << "Iteration " << test_iter
+            << ": bits_out should contain wait_bits "
             << "(wait_bits=0x" << std::hex << wait_bits << ", bits_out=0x"
             << bits_out << std::dec << ")";
 
@@ -1214,7 +1215,8 @@ TEST_F(OsalEventPropertyTest, Property22_EventSyncTimeout) {
         osal_event_handle_t handle = nullptr;
         ASSERT_EQ(OSAL_OK, osal_event_create(&handle));
 
-        /* Generate non-overlapping bits - set_bits should NOT contain wait_bits */
+        /* Generate non-overlapping bits - set_bits should NOT contain wait_bits
+         */
         osal_event_bits_t set_bits = randomSingleBit();
         osal_event_bits_t wait_bits = randomSingleBit();
 
@@ -1224,9 +1226,8 @@ TEST_F(OsalEventPropertyTest, Property22_EventSyncTimeout) {
         }
 
         /* Use short timeout for faster tests */
-        osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ALL,
-                                             .auto_clear = false,
-                                             .timeout_ms = 50};
+        osal_event_wait_options_t options = {
+            .mode = OSAL_EVENT_WAIT_ALL, .auto_clear = false, .timeout_ms = 50};
 
         auto start = std::chrono::steady_clock::now();
         osal_status_t status =

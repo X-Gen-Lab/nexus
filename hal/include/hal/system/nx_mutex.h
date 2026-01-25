@@ -11,7 +11,6 @@
 #include "hal/nx_types.h"
 #include "nexus_config.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

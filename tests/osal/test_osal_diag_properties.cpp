@@ -119,63 +119,63 @@ TEST_F(OsalDiagPropertyTest, Property3_ResourceStatisticsAccuracy) {
             int resource_type = randomResourceType();
 
             switch (resource_type) {
-            case 0: {
-                /* Create mutex */
-                osal_mutex_handle_t mutex = nullptr;
-                osal_status_t status = osal_mutex_create(&mutex);
-                if (status == OSAL_OK) {
-                    mutexes.push_back(mutex);
-                    expected_mutex_count++;
+                case 0: {
+                    /* Create mutex */
+                    osal_mutex_handle_t mutex = nullptr;
+                    osal_status_t status = osal_mutex_create(&mutex);
+                    if (status == OSAL_OK) {
+                        mutexes.push_back(mutex);
+                        expected_mutex_count++;
+                    }
+                    break;
                 }
-                break;
-            }
-            case 1: {
-                /* Create semaphore */
-                osal_sem_handle_t sem = nullptr;
-                osal_status_t status = osal_sem_create(1, 10, &sem);
-                if (status == OSAL_OK) {
-                    sems.push_back(sem);
-                    expected_sem_count++;
+                case 1: {
+                    /* Create semaphore */
+                    osal_sem_handle_t sem = nullptr;
+                    osal_status_t status = osal_sem_create(1, 10, &sem);
+                    if (status == OSAL_OK) {
+                        sems.push_back(sem);
+                        expected_sem_count++;
+                    }
+                    break;
                 }
-                break;
-            }
-            case 2: {
-                /* Create queue */
-                osal_queue_handle_t queue = nullptr;
-                osal_status_t status = osal_queue_create(sizeof(int), 10, &queue);
-                if (status == OSAL_OK) {
-                    queues.push_back(queue);
-                    expected_queue_count++;
+                case 2: {
+                    /* Create queue */
+                    osal_queue_handle_t queue = nullptr;
+                    osal_status_t status =
+                        osal_queue_create(sizeof(int), 10, &queue);
+                    if (status == OSAL_OK) {
+                        queues.push_back(queue);
+                        expected_queue_count++;
+                    }
+                    break;
                 }
-                break;
-            }
-            case 3: {
-                /* Create event */
-                osal_event_handle_t event = nullptr;
-                osal_status_t status = osal_event_create(&event);
-                if (status == OSAL_OK) {
-                    events.push_back(event);
-                    expected_event_count++;
+                case 3: {
+                    /* Create event */
+                    osal_event_handle_t event = nullptr;
+                    osal_status_t status = osal_event_create(&event);
+                    if (status == OSAL_OK) {
+                        events.push_back(event);
+                        expected_event_count++;
+                    }
+                    break;
                 }
-                break;
-            }
-            case 4: {
-                /* Create timer */
-                osal_timer_handle_t timer = nullptr;
-                osal_timer_config_t config = {
-                    .name = "test_timer",
-                    .period_ms = 100,
-                    .mode = OSAL_TIMER_ONE_SHOT,
-                    .callback = dummy_timer_callback,
-                    .arg = nullptr
-                };
-                osal_status_t status = osal_timer_create(&config, &timer);
-                if (status == OSAL_OK) {
-                    timers.push_back(timer);
-                    expected_timer_count++;
+                case 4: {
+                    /* Create timer */
+                    osal_timer_handle_t timer = nullptr;
+                    osal_timer_config_t config = {.name = "test_timer",
+                                                  .period_ms = 100,
+                                                  .mode = OSAL_TIMER_ONE_SHOT,
+                                                  .callback =
+                                                      dummy_timer_callback,
+                                                  .arg = nullptr};
+                    osal_status_t status = osal_timer_create(&config, &timer);
+                    if (status == OSAL_OK) {
+                        timers.push_back(timer);
+                        expected_timer_count++;
+                    }
+                    break;
                 }
-                break;
-            }
             }
         }
 
@@ -235,9 +235,8 @@ TEST_F(OsalDiagPropertyTest, Property3_ResourceStatisticsAccuracy) {
 
         /* Verify statistics match expected counts after deletion */
         status = osal_get_stats(&stats);
-        ASSERT_EQ(OSAL_OK, status)
-            << "Iteration " << test_iter
-            << ": osal_get_stats failed after deletion";
+        ASSERT_EQ(OSAL_OK, status) << "Iteration " << test_iter
+                                   << ": osal_get_stats failed after deletion";
 
         EXPECT_EQ(expected_mutex_count, stats.mutex_count)
             << "Iteration " << test_iter
@@ -274,9 +273,8 @@ TEST_F(OsalDiagPropertyTest, Property3_ResourceStatisticsAccuracy) {
 
         /* Verify all counts are back to zero (relative to start) */
         status = osal_get_stats(&stats);
-        ASSERT_EQ(OSAL_OK, status)
-            << "Iteration " << test_iter
-            << ": osal_get_stats failed after cleanup";
+        ASSERT_EQ(OSAL_OK, status) << "Iteration " << test_iter
+                                   << ": osal_get_stats failed after cleanup";
     }
 }
 
@@ -323,48 +321,48 @@ TEST_F(OsalDiagPropertyTest, Property4_ResourceWatermarkTracking) {
                 int resource_type = randomResourceType();
 
                 switch (resource_type) {
-                case 0: {
-                    osal_mutex_handle_t mutex = nullptr;
-                    if (osal_mutex_create(&mutex) == OSAL_OK) {
-                        mutexes.push_back(mutex);
+                    case 0: {
+                        osal_mutex_handle_t mutex = nullptr;
+                        if (osal_mutex_create(&mutex) == OSAL_OK) {
+                            mutexes.push_back(mutex);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 1: {
-                    osal_sem_handle_t sem = nullptr;
-                    if (osal_sem_create(1, 10, &sem) == OSAL_OK) {
-                        sems.push_back(sem);
+                    case 1: {
+                        osal_sem_handle_t sem = nullptr;
+                        if (osal_sem_create(1, 10, &sem) == OSAL_OK) {
+                            sems.push_back(sem);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 2: {
-                    osal_queue_handle_t queue = nullptr;
-                    if (osal_queue_create(sizeof(int), 10, &queue) == OSAL_OK) {
-                        queues.push_back(queue);
+                    case 2: {
+                        osal_queue_handle_t queue = nullptr;
+                        if (osal_queue_create(sizeof(int), 10, &queue) ==
+                            OSAL_OK) {
+                            queues.push_back(queue);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 3: {
-                    osal_event_handle_t event = nullptr;
-                    if (osal_event_create(&event) == OSAL_OK) {
-                        events.push_back(event);
+                    case 3: {
+                        osal_event_handle_t event = nullptr;
+                        if (osal_event_create(&event) == OSAL_OK) {
+                            events.push_back(event);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 4: {
-                    osal_timer_handle_t timer = nullptr;
-                    osal_timer_config_t config = {
-                        .name = "test_timer",
-                        .period_ms = 100,
-                        .mode = OSAL_TIMER_ONE_SHOT,
-                        .callback = dummy_timer_callback,
-                        .arg = nullptr
-                    };
-                    if (osal_timer_create(&config, &timer) == OSAL_OK) {
-                        timers.push_back(timer);
+                    case 4: {
+                        osal_timer_handle_t timer = nullptr;
+                        osal_timer_config_t config = {
+                            .name = "test_timer",
+                            .period_ms = 100,
+                            .mode = OSAL_TIMER_ONE_SHOT,
+                            .callback = dummy_timer_callback,
+                            .arg = nullptr};
+                        if (osal_timer_create(&config, &timer) == OSAL_OK) {
+                            timers.push_back(timer);
+                        }
+                        break;
                     }
-                    break;
-                }
                 }
             }
 
@@ -444,7 +442,8 @@ TEST_F(OsalDiagPropertyTest, Property4_ResourceWatermarkTracking) {
                 << "Iteration " << test_iter << ", cycle " << cycle
                 << ": osal_get_stats failed after deletion";
 
-            /* Property: watermark >= current count (still holds after delete) */
+            /* Property: watermark >= current count (still holds after delete)
+             */
             EXPECT_GE(stats.mutex_watermark, stats.mutex_count)
                 << "Iteration " << test_iter << ", cycle " << cycle
                 << ": mutex watermark < count after delete";
@@ -551,9 +550,8 @@ TEST_F(OsalDiagPropertyTest, Property4_WatermarkResetBehavior) {
         /* Verify watermarks now equal counts */
         osal_stats_t stats_after;
         status = osal_get_stats(&stats_after);
-        ASSERT_EQ(OSAL_OK, status)
-            << "Iteration " << test_iter
-            << ": osal_get_stats failed after reset";
+        ASSERT_EQ(OSAL_OK, status) << "Iteration " << test_iter
+                                   << ": osal_get_stats failed after reset";
 
         EXPECT_EQ(stats_after.mutex_count, stats_after.mutex_watermark)
             << "Iteration " << test_iter

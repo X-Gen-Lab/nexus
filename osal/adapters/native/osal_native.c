@@ -55,7 +55,7 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    osal_handle_header_t header;        /**< Handle validation header */
+    osal_handle_header_t header; /**< Handle validation header */
     bool used;
     bool running;
     bool suspended;
@@ -79,10 +79,10 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    osal_handle_header_t header;        /**< Handle validation header */
+    osal_handle_header_t header; /**< Handle validation header */
     bool used;
-    bool locked;                        /**< Lock state for tracking */
-    osal_task_internal_t* owner;        /**< Owner task pointer */
+    bool locked;                 /**< Lock state for tracking */
+    osal_task_internal_t* owner; /**< Owner task pointer */
 #ifdef _WIN32
     CRITICAL_SECTION cs;
 #else
@@ -95,7 +95,7 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    osal_handle_header_t header;        /**< Handle validation header */
+    osal_handle_header_t header; /**< Handle validation header */
     bool used;
     uint32_t count;
     uint32_t max_count;
@@ -112,7 +112,7 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
-    osal_handle_header_t header;        /**< Handle validation header */
+    osal_handle_header_t header; /**< Handle validation header */
     bool used;
     uint8_t* buffer;
     size_t item_size;
@@ -120,7 +120,7 @@ typedef struct {
     size_t head;
     size_t tail;
     size_t count;
-    osal_queue_mode_t mode;             /**< Queue mode (normal/overwrite) */
+    osal_queue_mode_t mode; /**< Queue mode (normal/overwrite) */
 #ifdef _WIN32
     CRITICAL_SECTION cs;
     HANDLE not_empty;
@@ -198,20 +198,20 @@ static void ms_to_timespec(uint32_t ms, struct timespec* ts) {
  * \brief           Resource statistics structure for internal tracking
  */
 typedef struct {
-    volatile uint16_t count;        /**< Current count */
-    volatile uint16_t watermark;    /**< Peak count (high watermark) */
+    volatile uint16_t count;     /**< Current count */
+    volatile uint16_t watermark; /**< Peak count (high watermark) */
 } osal_resource_stats_internal_t;
 
 /**
  * \brief           Global statistics context
  */
 typedef struct {
-    osal_resource_stats_internal_t tasks;    /**< Task statistics */
-    osal_resource_stats_internal_t mutexes;  /**< Mutex statistics */
-    osal_resource_stats_internal_t sems;     /**< Semaphore statistics */
-    osal_resource_stats_internal_t queues;   /**< Queue statistics */
-    osal_resource_stats_internal_t events;   /**< Event flags statistics */
-    osal_resource_stats_internal_t timers;   /**< Timer statistics */
+    osal_resource_stats_internal_t tasks;   /**< Task statistics */
+    osal_resource_stats_internal_t mutexes; /**< Mutex statistics */
+    osal_resource_stats_internal_t sems;    /**< Semaphore statistics */
+    osal_resource_stats_internal_t queues;  /**< Queue statistics */
+    osal_resource_stats_internal_t events;  /**< Event flags statistics */
+    osal_resource_stats_internal_t timers;  /**< Timer statistics */
 } osal_global_stats_t;
 
 /** \brief          Global statistics instance */
@@ -2000,8 +2000,7 @@ osal_status_t osal_queue_set_mode(osal_queue_handle_t handle,
  *
  * \note            Requirements: 8.5
  */
-osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle,
-                                       void* item) {
+osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle, void* item) {
     /* In native platform, ISR context is the same as normal context */
     return osal_queue_peek(handle, item);
 }
@@ -2013,7 +2012,7 @@ osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle,
 #define OSAL_TIMER_NAME_MAX 32
 
 typedef struct {
-    osal_handle_header_t header;        /**< Handle validation header */
+    osal_handle_header_t header; /**< Handle validation header */
     bool used;
     bool active;
     bool delete_pending;
@@ -2657,7 +2656,7 @@ osal_status_t osal_timer_set_callback(osal_timer_handle_t handle,
 #define OSAL_EVENT_BITS_MASK 0x00FFFFFF /* 24-bit support */
 
 typedef struct {
-    osal_handle_header_t header;        /**< Handle validation header */
+    osal_handle_header_t header; /**< Handle validation header */
     bool used;
     osal_event_bits_t bits;
 #ifdef _WIN32
@@ -3071,7 +3070,8 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
  * \brief           Clear event bits from ISR context
  *
  * \details         In native platform, ISR context is the same as normal
- *                  context, so this function simply delegates to osal_event_clear().
+ *                  context, so this function simply delegates to
+ * osal_event_clear().
  *
  * \note            Requirements: 7.2
  */
@@ -3122,7 +3122,7 @@ osal_status_t osal_event_sync(osal_event_handle_t handle,
 
     /* Set the bits first */
     event->bits |= set_bits;
-    SetEvent(event->cond);  /* Signal all waiting threads */
+    SetEvent(event->cond); /* Signal all waiting threads */
 
     /* Check if wait condition is already met */
     bool condition_met = ((event->bits & wait_bits) == wait_bits);
@@ -3130,7 +3130,8 @@ osal_status_t osal_event_sync(osal_event_handle_t handle,
     if (condition_met) {
         /* Condition already met - clear the wait bits and return */
         osal_event_bits_t matched_bits = event->bits & wait_bits;
-        event->bits &= ~wait_bits;  /* xEventGroupSync clears wait bits on exit */
+        event->bits &=
+            ~wait_bits; /* xEventGroupSync clears wait bits on exit */
 
         if (event->bits == 0) {
             ResetEvent(event->cond);
@@ -3200,7 +3201,7 @@ osal_status_t osal_event_sync(osal_event_handle_t handle,
 
     /* Set the bits first */
     event->bits |= set_bits;
-    pthread_cond_broadcast(&event->cond);  /* Wake all waiting threads */
+    pthread_cond_broadcast(&event->cond); /* Wake all waiting threads */
 
     /* Check if wait condition is already met */
     bool condition_met = ((event->bits & wait_bits) == wait_bits);
@@ -3208,7 +3209,8 @@ osal_status_t osal_event_sync(osal_event_handle_t handle,
     if (condition_met) {
         /* Condition already met - clear the wait bits and return */
         osal_event_bits_t matched_bits = event->bits & wait_bits;
-        event->bits &= ~wait_bits;  /* xEventGroupSync clears wait bits on exit */
+        event->bits &=
+            ~wait_bits; /* xEventGroupSync clears wait bits on exit */
 
         if (bits_out != NULL) {
             *bits_out = matched_bits;
@@ -3737,7 +3739,8 @@ size_t osal_mem_get_allocation_count(void) {
  * \brief           Check heap integrity
  *
  * \details         Performs a basic integrity check on the tracked allocations.
- *                  Validates the linked list structure and statistics consistency.
+ *                  Validates the linked list structure and statistics
+ * consistency.
  *
  * \note            Requirements: 6.3
  */
@@ -3793,10 +3796,11 @@ osal_status_t osal_mem_check_integrity(void) {
         return OSAL_ERROR;
     }
 
-    /* Verify total size matches (approximately - aligned allocations may differ) */
+    /* Verify total size matches (approximately - aligned allocations may
+     * differ) */
     /* Allow some tolerance for alignment overhead */
-    if (total_size > s_mem_stats.total_allocated + 
-        (s_mem_stats.allocation_count * 64)) {
+    if (total_size >
+        s_mem_stats.total_allocated + (s_mem_stats.allocation_count * 64)) {
         mem_unlock();
         return OSAL_ERROR;
     }
@@ -3808,8 +3812,9 @@ osal_status_t osal_mem_check_integrity(void) {
 /**
  * \brief           Free aligned memory
  *
- * \details         Frees memory that was allocated with osal_mem_alloc_aligned().
- *                  Retrieves the original pointer stored in the header and frees it.
+ * \details         Frees memory that was allocated with
+ * osal_mem_alloc_aligned(). Retrieves the original pointer stored in the header
+ * and frees it.
  *
  * \note            Requirements: 6.4
  */

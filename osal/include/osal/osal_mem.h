@@ -137,7 +137,8 @@ osal_status_t osal_mem_check_integrity(void);
  *                       osal_mem_alloc_aligned() (can be NULL)
  * \note            Safe to call with NULL pointer (no-op)
  * \note            This function is thread-safe
- * \note            Must only be used with pointers from osal_mem_alloc_aligned()
+ * \note            Must only be used with pointers from
+ * osal_mem_alloc_aligned()
  * \note            Requirements: 6.4
  */
 void osal_mem_free_aligned(void* ptr);

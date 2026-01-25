@@ -62,8 +62,8 @@ struct nx_rtc_s {
     /**
      * \brief           Set Unix timestamp
      * \param[in]       self: RTC interface pointer
-     * \param[in]       timestamp: Unix timestamp (seconds since 1970-01-01 00:00:00
-     * UTC)
+     * \param[in]       timestamp: Unix timestamp (seconds since 1970-01-01
+     *                  00:00:00 UTC)
      * \return          NX_OK on success, error code otherwise
      */
     nx_status_t (*set_timestamp)(nx_rtc_t* self, uint32_t timestamp);
@@ -95,7 +95,8 @@ struct nx_rtc_s {
      * \brief           Set alarm with callback
      * \param[in]       self: RTC interface pointer
      * \param[in]       alarm: Pointer to alarm date/time structure
-     * \param[in]       callback: Callback function to invoke when alarm triggers
+     * \param[in]       callback: Callback function to invoke when alarm
+     *                  triggers
      * \param[in]       user_data: User data passed to callback
      * \return          NX_OK on success, error code otherwise
      * \note            Pass NULL callback to disable alarm

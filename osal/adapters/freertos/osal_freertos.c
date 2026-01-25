@@ -112,26 +112,28 @@
  * \details         Wraps FreeRTOS TaskHandle_t with handle validation header
  */
 typedef struct {
-    osal_handle_header_t header;    /**< Handle validation header */
-    TaskHandle_t handle;            /**< FreeRTOS task handle */
+    osal_handle_header_t header; /**< Handle validation header */
+    TaskHandle_t handle;         /**< FreeRTOS task handle */
 } osal_task_wrapper_t;
 
 /**
  * \brief           Internal mutex wrapper structure
- * \details         Wraps FreeRTOS SemaphoreHandle_t with handle validation header
+ * \details         Wraps FreeRTOS SemaphoreHandle_t with handle validation
+ * header
  */
 typedef struct {
-    osal_handle_header_t header;    /**< Handle validation header */
-    SemaphoreHandle_t handle;       /**< FreeRTOS mutex handle */
+    osal_handle_header_t header; /**< Handle validation header */
+    SemaphoreHandle_t handle;    /**< FreeRTOS mutex handle */
 } osal_mutex_wrapper_t;
 
 /**
  * \brief           Internal semaphore wrapper structure
- * \details         Wraps FreeRTOS SemaphoreHandle_t with handle validation header
+ * \details         Wraps FreeRTOS SemaphoreHandle_t with handle validation
+ * header
  */
 typedef struct {
-    osal_handle_header_t header;    /**< Handle validation header */
-    SemaphoreHandle_t handle;       /**< FreeRTOS semaphore handle */
+    osal_handle_header_t header; /**< Handle validation header */
+    SemaphoreHandle_t handle;    /**< FreeRTOS semaphore handle */
 } osal_sem_wrapper_t;
 
 /**
@@ -139,19 +141,20 @@ typedef struct {
  * \details         Wraps FreeRTOS QueueHandle_t with handle validation header
  */
 typedef struct {
-    osal_handle_header_t header;    /**< Handle validation header */
-    QueueHandle_t handle;           /**< FreeRTOS queue handle */
-    osal_queue_mode_t mode;         /**< Queue mode (normal/overwrite) */
-    size_t item_count;              /**< Queue capacity for space calculation */
+    osal_handle_header_t header; /**< Handle validation header */
+    QueueHandle_t handle;        /**< FreeRTOS queue handle */
+    osal_queue_mode_t mode;      /**< Queue mode (normal/overwrite) */
+    size_t item_count;           /**< Queue capacity for space calculation */
 } osal_queue_wrapper_t;
 
 /**
  * \brief           Internal event flags wrapper structure
- * \details         Wraps FreeRTOS EventGroupHandle_t with handle validation header
+ * \details         Wraps FreeRTOS EventGroupHandle_t with handle validation
+ * header
  */
 typedef struct {
-    osal_handle_header_t header;    /**< Handle validation header */
-    EventGroupHandle_t handle;      /**< FreeRTOS event group handle */
+    osal_handle_header_t header; /**< Handle validation header */
+    EventGroupHandle_t handle;   /**< FreeRTOS event group handle */
 } osal_event_wrapper_t;
 
 /**
@@ -188,23 +191,23 @@ static volatile UBaseType_t s_isr_saved_mask = 0;
  * \brief           Resource statistics structure for internal tracking
  */
 typedef struct {
-    volatile uint16_t count;        /**< Current count */
-    volatile uint16_t watermark;    /**< Peak count (high watermark) */
+    volatile uint16_t count;     /**< Current count */
+    volatile uint16_t watermark; /**< Peak count (high watermark) */
 } osal_resource_stats_internal_t;
 
 /**
  * \brief           Global statistics context
  */
 typedef struct {
-    osal_resource_stats_internal_t tasks;    /**< Task statistics */
-    osal_resource_stats_internal_t mutexes;  /**< Mutex statistics */
-    osal_resource_stats_internal_t sems;     /**< Semaphore statistics */
-    osal_resource_stats_internal_t queues;   /**< Queue statistics */
-    osal_resource_stats_internal_t events;   /**< Event flags statistics */
-    osal_resource_stats_internal_t timers;   /**< Timer statistics */
-    volatile size_t mem_allocated;           /**< Total bytes allocated */
-    volatile size_t mem_peak;                /**< Peak memory allocation */
-    volatile size_t mem_alloc_count;         /**< Number of active allocations */
+    osal_resource_stats_internal_t tasks;   /**< Task statistics */
+    osal_resource_stats_internal_t mutexes; /**< Mutex statistics */
+    osal_resource_stats_internal_t sems;    /**< Semaphore statistics */
+    osal_resource_stats_internal_t queues;  /**< Queue statistics */
+    osal_resource_stats_internal_t events;  /**< Event flags statistics */
+    osal_resource_stats_internal_t timers;  /**< Timer statistics */
+    volatile size_t mem_allocated;          /**< Total bytes allocated */
+    volatile size_t mem_peak;               /**< Peak memory allocation */
+    volatile size_t mem_alloc_count;        /**< Number of active allocations */
 } osal_global_stats_t;
 
 /** \brief          Global statistics instance */
@@ -1655,8 +1658,8 @@ osal_status_t osal_queue_send_from_isr(osal_queue_handle_t handle,
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    if (xQueueSendFromISR(wrapper->handle, item,
-                          &xHigherPriorityTaskWoken) != pdTRUE) {
+    if (xQueueSendFromISR(wrapper->handle, item, &xHigherPriorityTaskWoken) !=
+        pdTRUE) {
         /* Queue is full */
         return OSAL_ERROR_FULL;
     }
@@ -1802,8 +1805,7 @@ osal_status_t osal_queue_set_mode(osal_queue_handle_t handle,
  *
  * \note            Requirements: 8.5
  */
-osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle,
-                                       void* item) {
+osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle, void* item) {
     /* Parameter validation - NULL pointer checks */
     if (handle == NULL || item == NULL) {
         return OSAL_ERROR_NULL_POINTER;
@@ -1912,9 +1914,9 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
 
     /* Create the FreeRTOS timer */
     wrapper->handle =
-        xTimerCreate(timer_name,   /* Timer name */
-                     period_ticks, /* Timer period in ticks */
-                     auto_reload,  /* Auto-reload (periodic) or one-shot */
+        xTimerCreate(timer_name,     /* Timer name */
+                     period_ticks,   /* Timer period in ticks */
+                     auto_reload,    /* Auto-reload (periodic) or one-shot */
                      (void*)wrapper, /* Timer ID (stores our wrapper) */
                      osal_timer_callback_wrapper /* Callback wrapper function */
         );
@@ -2329,8 +2331,7 @@ osal_status_t osal_timer_set_callback(osal_timer_handle_t handle,
     TimerHandle_t timer = (TimerHandle_t)handle;
 
     /* Get the timer context from the timer ID */
-    osal_timer_context_t* ctx =
-        (osal_timer_context_t*)pvTimerGetTimerID(timer);
+    osal_timer_context_t* ctx = (osal_timer_context_t*)pvTimerGetTimerID(timer);
 
     if (ctx == NULL) {
         return OSAL_ERROR_INVALID_PARAM;
@@ -2624,7 +2625,8 @@ size_t osal_mem_get_min_free_size(void) {
  * \brief           Get active allocation count
  *
  * \details         Returns the number of active memory allocations.
- *                  This is tracked internally when OSAL_STATS_ENABLE is defined.
+ *                  This is tracked internally when OSAL_STATS_ENABLE is
+ * defined.
  *
  * \note            Requirements: 6.1
  */
@@ -2686,9 +2688,9 @@ osal_status_t osal_mem_check_integrity(void) {
 /**
  * \brief           Free aligned memory
  *
- * \details         Frees memory that was allocated with osal_mem_alloc_aligned().
- *                  Retrieves the original pointer stored before the aligned
- *                  address and frees it.
+ * \details         Frees memory that was allocated with
+ * osal_mem_alloc_aligned(). Retrieves the original pointer stored before the
+ * aligned address and frees it.
  *
  * \note            Requirements: 6.4
  */
@@ -2911,9 +2913,8 @@ osal_status_t osal_event_wait(osal_event_handle_t handle,
     BaseType_t clear_on_exit = options->auto_clear ? pdTRUE : pdFALSE;
 
     /* Wait for the event bits */
-    EventBits_t result =
-        xEventGroupWaitBits(wrapper->handle, (EventBits_t)bits,
-                            clear_on_exit, wait_for_all, ticks);
+    EventBits_t result = xEventGroupWaitBits(
+        wrapper->handle, (EventBits_t)bits, clear_on_exit, wait_for_all, ticks);
 
     /* Store the result bits if requested */
     if (bits_out != NULL) {
@@ -2994,9 +2995,8 @@ osal_status_t osal_event_set_from_isr(osal_event_handle_t handle,
      */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    BaseType_t result =
-        xEventGroupSetBitsFromISR(wrapper->handle, (EventBits_t)bits,
-                                  &xHigherPriorityTaskWoken);
+    BaseType_t result = xEventGroupSetBitsFromISR(
+        wrapper->handle, (EventBits_t)bits, &xHigherPriorityTaskWoken);
 
     /* Check if the operation succeeded */
     if (result != pdPASS) {
@@ -3057,7 +3057,8 @@ osal_status_t osal_event_clear_from_isr(osal_event_handle_t handle,
  *
  * \details         Atomically sets event bits and then waits for a different
  *                  set of bits to be set. This is useful for task rendezvous
- *                  synchronization patterns. Uses xEventGroupSync() FreeRTOS API.
+ *                  synchronization patterns. Uses xEventGroupSync() FreeRTOS
+ * API.
  *
  * \note            Requirements: 7.3
  */
@@ -3095,11 +3096,8 @@ osal_status_t osal_event_sync(osal_event_handle_t handle,
      * for all the wait_bits to be set. The bits that were set are cleared
      * on exit (similar to auto_clear behavior).
      */
-    EventBits_t result =
-        xEventGroupSync(wrapper->handle,
-                        (EventBits_t)set_bits,
-                        (EventBits_t)wait_bits,
-                        ticks);
+    EventBits_t result = xEventGroupSync(wrapper->handle, (EventBits_t)set_bits,
+                                         (EventBits_t)wait_bits, ticks);
 
     /* Store the result bits if requested */
     if (bits_out != NULL) {
@@ -3178,7 +3176,8 @@ osal_status_t osal_get_stats(osal_stats_t* stats) {
  *
  * \details         Resets all watermark values to current counts. This is
  *                  useful for monitoring peak usage over specific time periods.
- *                  This function is safe to call from any context, including ISR.
+ *                  This function is safe to call from any context, including
+ * ISR.
  *
  * \note            Requirements: 2.3
  */

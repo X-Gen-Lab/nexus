@@ -32,8 +32,8 @@ typedef void* osal_queue_handle_t;
  * \brief           Queue mode enumeration
  */
 typedef enum {
-    OSAL_QUEUE_MODE_NORMAL = 0,     /**< Normal mode - block when full */
-    OSAL_QUEUE_MODE_OVERWRITE = 1   /**< Overwrite mode - overwrite oldest */
+    OSAL_QUEUE_MODE_NORMAL = 0,   /**< Normal mode - block when full */
+    OSAL_QUEUE_MODE_OVERWRITE = 1 /**< Overwrite mode - overwrite oldest */
 } osal_queue_mode_t;
 
 /**
@@ -217,8 +217,7 @@ osal_status_t osal_queue_set_mode(osal_queue_handle_t handle,
  * \note            This function is safe to call from interrupt context
  * \note            Requirements: 8.5
  */
-osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle,
-                                       void* item);
+osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle, void* item);
 
 /**
  * \}

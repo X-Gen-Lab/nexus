@@ -522,8 +522,7 @@ TEST_F(OsalTaskPropertyTest, Property16_TaskPriorityRoundTrip) {
         uint8_t new_priority = randomPriority();
         osal_status_t set_status = osal_task_set_priority(handle, new_priority);
         EXPECT_EQ(OSAL_OK, set_status)
-            << "Iteration " << test_iter
-            << ": Setting priority should succeed";
+            << "Iteration " << test_iter << ": Setting priority should succeed";
 
         /* Verify round-trip: get should return what we set */
         read_priority = osal_task_get_priority(handle);

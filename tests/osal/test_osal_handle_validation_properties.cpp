@@ -321,13 +321,11 @@ TEST_F(OsalHandleValidationPropertyTest,
         osal_timer_handle_t timer = nullptr;
 
         /* Create timer */
-        osal_timer_config_t config = {
-            .name = "test_timer",
-            .period_ms = 1000,
-            .mode = OSAL_TIMER_ONE_SHOT,
-            .callback = dummy_timer_callback,
-            .arg = nullptr
-        };
+        osal_timer_config_t config = {.name = "test_timer",
+                                      .period_ms = 1000,
+                                      .mode = OSAL_TIMER_ONE_SHOT,
+                                      .callback = dummy_timer_callback,
+                                      .arg = nullptr};
 
         osal_status_t status = osal_timer_create(&config, &timer);
         ASSERT_EQ(OSAL_OK, status)
@@ -409,16 +407,13 @@ TEST_F(OsalHandleValidationPropertyTest, Property5_HandleSlotReuseWorks) {
         /* New mutex should work correctly */
         status = osal_mutex_lock(mutex2, OSAL_NO_WAIT);
         EXPECT_EQ(OSAL_OK, status)
-            << "Iteration " << test_iter
-            << ": new mutex lock should succeed";
+            << "Iteration " << test_iter << ": new mutex lock should succeed";
 
         status = osal_mutex_unlock(mutex2);
         EXPECT_EQ(OSAL_OK, status)
-            << "Iteration " << test_iter
-            << ": new mutex unlock should succeed";
+            << "Iteration " << test_iter << ": new mutex unlock should succeed";
 
         /* Clean up */
         osal_mutex_delete(mutex2);
     }
 }
-

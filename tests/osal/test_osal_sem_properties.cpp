@@ -558,18 +558,16 @@ TEST_F(OsalSemPropertyTest, Property20_SemaphoreCountTracking) {
 
         /* Verify initial count */
         uint32_t count = osal_sem_get_count(sem);
-        EXPECT_EQ(initial_count, count)
-            << "Iteration " << test_iter
-            << ": initial count mismatch. Expected " << initial_count
-            << ", got " << count;
+        EXPECT_EQ(initial_count, count) << "Iteration " << test_iter
+                                        << ": initial count mismatch. Expected "
+                                        << initial_count << ", got " << count;
 
         /* Track expected count */
         uint32_t expected_count = initial_count;
 
         /* Perform random number of take operations */
-        uint32_t num_takes = (expected_count > 0)
-                                 ? (randomInitialCount(expected_count))
-                                 : 0;
+        uint32_t num_takes =
+            (expected_count > 0) ? (randomInitialCount(expected_count)) : 0;
         for (uint32_t i = 0; i < num_takes; i++) {
             ASSERT_EQ(OSAL_OK, osal_sem_take(sem, OSAL_NO_WAIT))
                 << "Iteration " << test_iter << ": take " << i << " failed";
@@ -579,15 +577,14 @@ TEST_F(OsalSemPropertyTest, Property20_SemaphoreCountTracking) {
             count = osal_sem_get_count(sem);
             EXPECT_EQ(expected_count, count)
                 << "Iteration " << test_iter << ", after take " << i
-                << ": count mismatch. Expected " << expected_count
-                << ", got " << count;
+                << ": count mismatch. Expected " << expected_count << ", got "
+                << count;
         }
 
         /* Perform random number of give operations */
         uint32_t available_gives = max_count - expected_count;
-        uint32_t num_gives = (available_gives > 0)
-                                 ? randomInitialCount(available_gives)
-                                 : 0;
+        uint32_t num_gives =
+            (available_gives > 0) ? randomInitialCount(available_gives) : 0;
         for (uint32_t i = 0; i < num_gives; i++) {
             ASSERT_EQ(OSAL_OK, osal_sem_give(sem))
                 << "Iteration " << test_iter << ": give " << i << " failed";
@@ -597,8 +594,8 @@ TEST_F(OsalSemPropertyTest, Property20_SemaphoreCountTracking) {
             count = osal_sem_get_count(sem);
             EXPECT_EQ(expected_count, count)
                 << "Iteration " << test_iter << ", after give " << i
-                << ": count mismatch. Expected " << expected_count
-                << ", got " << count;
+                << ": count mismatch. Expected " << expected_count << ", got "
+                << count;
         }
 
         /* Clean up */
@@ -618,8 +615,7 @@ TEST_F(OsalSemPropertyTest, Property20b_SemaphoreCountNullHandle) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* NULL handle should return 0 */
         EXPECT_EQ(0u, osal_sem_get_count(nullptr))
-            << "Iteration " << test_iter
-            << ": get_count(NULL) should return 0";
+            << "Iteration " << test_iter << ": get_count(NULL) should return 0";
     }
 }
 
@@ -650,9 +646,8 @@ TEST_F(OsalSemPropertyTest, Property21_SemaphoreReset) {
         uint32_t current_count = initial_count;
 
         /* Take some */
-        uint32_t num_takes = (current_count > 0)
-                                 ? randomInitialCount(current_count)
-                                 : 0;
+        uint32_t num_takes =
+            (current_count > 0) ? randomInitialCount(current_count) : 0;
         for (uint32_t i = 0; i < num_takes; i++) {
             osal_sem_take(sem, OSAL_NO_WAIT);
             current_count--;
@@ -660,9 +655,8 @@ TEST_F(OsalSemPropertyTest, Property21_SemaphoreReset) {
 
         /* Give some */
         uint32_t available_gives = max_count - current_count;
-        uint32_t num_gives = (available_gives > 0)
-                                 ? randomInitialCount(available_gives)
-                                 : 0;
+        uint32_t num_gives =
+            (available_gives > 0) ? randomInitialCount(available_gives) : 0;
         for (uint32_t i = 0; i < num_gives; i++) {
             osal_sem_give(sem);
             current_count++;

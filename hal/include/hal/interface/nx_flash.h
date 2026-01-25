@@ -55,7 +55,8 @@ struct nx_internal_flash_s {
      * \brief           Erase flash pages
      * \param[in]       self: Flash interface pointer
      * \param[in]       addr: Start address of pages to erase
-     * \param[in]       size: Size in bytes to erase (rounded up to page boundary)
+     * \param[in]       size: Size in bytes to erase (rounded up to page
+     *                  boundary)
      * \return          NX_OK on success, error code otherwise
      * \note            Flash must be unlocked before erasing
      */

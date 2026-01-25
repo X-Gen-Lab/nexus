@@ -24,7 +24,6 @@ extern "C" {
 #include "hal/resource/nx_dma_manager.h"
 #include "hal/resource/nx_isr_manager.h"
 
-
 /* Platform initialization functions */
 nx_status_t nx_platform_init(void);
 nx_status_t nx_platform_deinit(void);

@@ -54,7 +54,8 @@ struct nx_watchdog_s {
     /**
      * \brief           Stop watchdog timer
      * \param[in]       self: Watchdog interface pointer
-     * \return          NX_OK on success, NX_ERR_NOT_SUPPORTED if stop not supported
+     * \return          NX_OK on success, NX_ERR_NOT_SUPPORTED if stop not
+     *                  supported
      * \note            Many hardware watchdogs cannot be stopped once started
      */
     nx_status_t (*stop)(nx_watchdog_t* self);

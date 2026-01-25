@@ -992,7 +992,7 @@ osal_status_t osal_sem_take(osal_sem_handle_t handle, uint32_t timeout_ms) {
     /* Busy-wait with timeout */
     uint32_t elapsed = 0;
     while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
-        osal_platform_delay_us(1000);  /* 1ms delay */
+        osal_platform_delay_us(1000); /* 1ms delay */
         elapsed++;
 
         osal_enter_critical();
@@ -1170,19 +1170,42 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
     /* Validate queue pointer */
     bool valid = false;
     for (int i = 0; i < OSAL_MAX_QUEUES; i++) {
-        if (&s_queues[i] == queue) {
-            valid = true;
-            break;
-        }
+    if (&s_queues[i] == queue) {
+        valid = true;
+        break;
+    }
     }
 
     if (!valid || !queue->used) {
-        return OSAL_ERROR_INVALID_PARAM;
+    return OSAL_ERROR_INVALID_PARAM;
     }
 
     osal_enter_critical();
 
     /* Try to send immediately */
+    if (queue->count < queue->item_count) {
+    memcpy(&queue->buffer[queue->tail * queue->item_size], item,
+           queue->item_size);
+    queue->tail = (queue->tail + 1) % queue->item_count;
+    queue->count++;
+    osal_exit_critical();
+    return OSAL_OK;
+    }
+
+    osal_exit_critical();
+
+    /* Queue is full */
+    if (timeout_ms == OSAL_NO_WAIT) {
+    return OSAL_ERROR_FULL;
+    }
+
+    /* Busy-wait with timeout */
+    uint32_t elapsed = 0;
+    while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
+    osal_platform_delay_us(1000); /* 1ms delay */
+    elapsed++;
+
+    osal_enter_critical();
     if (queue->count < queue->item_count) {
         memcpy(&queue->buffer[queue->tail * queue->item_size], item,
                queue->item_size);
@@ -1191,34 +1214,11 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
         osal_exit_critical();
         return OSAL_OK;
     }
-
     osal_exit_critical();
 
-    /* Queue is full */
-    if (timeout_ms == OSAL_NO_WAIT) {
-        return OSAL_ERROR_FULL;
+    if (timeout_ms != OSAL_WAIT_FOREVER && elapsed >= timeout_ms) {
+        break;
     }
-
-    /* Busy-wait with timeout */
-    uint32_t elapsed = 0;
-    while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
-        osal_platform_delay_us(1000); /* 1ms delay */
-        elapsed++;
-
-        osal_enter_critical();
-        if (queue->count < queue->item_count) {
-            memcpy(&queue->buffer[queue->tail * queue->item_size], item,
-                   queue->item_size);
-            queue->tail = (queue->tail + 1) % queue->item_count;
-            queue->count++;
-            osal_exit_critical();
-            return OSAL_OK;
-        }
-        osal_exit_critical();
-
-        if (timeout_ms != OSAL_WAIT_FOREVER && elapsed >= timeout_ms) {
-            break;
-        }
     }
 
     return OSAL_ERROR_TIMEOUT;
@@ -1238,21 +1238,44 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
     /* Validate queue pointer */
     bool valid = false;
     for (int i = 0; i < OSAL_MAX_QUEUES; i++) {
-        if (&s_queues[i] == queue) {
-            valid = true;
-            break;
-        }
+    if (&s_queues[i] == queue) {
+        valid = true;
+        break;
+    }
     }
 
     if (!valid || !queue->used) {
-        return OSAL_ERROR_INVALID_PARAM;
+    return OSAL_ERROR_INVALID_PARAM;
     }
 
     osal_enter_critical();
 
     /* Try to send immediately */
     if (queue->count < queue->item_count) {
-        /* Move head back */
+    /* Move head back */
+    queue->head = (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
+    memcpy(&queue->buffer[queue->head * queue->item_size], item,
+           queue->item_size);
+    queue->count++;
+    osal_exit_critical();
+    return OSAL_OK;
+    }
+
+    osal_exit_critical();
+
+    /* Queue is full */
+    if (timeout_ms == OSAL_NO_WAIT) {
+    return OSAL_ERROR_FULL;
+    }
+
+    /* Busy-wait with timeout */
+    uint32_t elapsed = 0;
+    while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
+    osal_platform_delay_us(1000);
+    elapsed++;
+
+    osal_enter_critical();
+    if (queue->count < queue->item_count) {
         queue->head =
             (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
         memcpy(&queue->buffer[queue->head * queue->item_size], item,
@@ -1261,35 +1284,11 @@ osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
         osal_exit_critical();
         return OSAL_OK;
     }
-
     osal_exit_critical();
 
-    /* Queue is full */
-    if (timeout_ms == OSAL_NO_WAIT) {
-        return OSAL_ERROR_FULL;
+    if (timeout_ms != OSAL_WAIT_FOREVER && elapsed >= timeout_ms) {
+        break;
     }
-
-    /* Busy-wait with timeout */
-    uint32_t elapsed = 0;
-    while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
-        osal_platform_delay_us(1000);
-        elapsed++;
-
-        osal_enter_critical();
-        if (queue->count < queue->item_count) {
-            queue->head =
-                (queue->head == 0) ? queue->item_count - 1 : queue->head - 1;
-            memcpy(&queue->buffer[queue->head * queue->item_size], item,
-                   queue->item_size);
-            queue->count++;
-            osal_exit_critical();
-            return OSAL_OK;
-        }
-        osal_exit_critical();
-
-        if (timeout_ms != OSAL_WAIT_FOREVER && elapsed >= timeout_ms) {
-            break;
-        }
     }
 
     return OSAL_ERROR_TIMEOUT;
@@ -1309,19 +1308,42 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
     /* Validate queue pointer */
     bool valid = false;
     for (int i = 0; i < OSAL_MAX_QUEUES; i++) {
-        if (&s_queues[i] == queue) {
-            valid = true;
-            break;
-        }
+    if (&s_queues[i] == queue) {
+        valid = true;
+        break;
+    }
     }
 
     if (!valid || !queue->used) {
-        return OSAL_ERROR_INVALID_PARAM;
+    return OSAL_ERROR_INVALID_PARAM;
     }
 
     osal_enter_critical();
 
     /* Try to receive immediately */
+    if (queue->count > 0) {
+    memcpy(item, &queue->buffer[queue->head * queue->item_size],
+           queue->item_size);
+    queue->head = (queue->head + 1) % queue->item_count;
+    queue->count--;
+    osal_exit_critical();
+    return OSAL_OK;
+    }
+
+    osal_exit_critical();
+
+    /* Queue is empty */
+    if (timeout_ms == OSAL_NO_WAIT) {
+    return OSAL_ERROR_EMPTY;
+    }
+
+    /* Busy-wait with timeout */
+    uint32_t elapsed = 0;
+    while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
+    osal_platform_delay_us(1000);
+    elapsed++;
+
+    osal_enter_critical();
     if (queue->count > 0) {
         memcpy(item, &queue->buffer[queue->head * queue->item_size],
                queue->item_size);
@@ -1330,34 +1352,11 @@ osal_status_t osal_queue_receive(osal_queue_handle_t handle, void* item,
         osal_exit_critical();
         return OSAL_OK;
     }
-
     osal_exit_critical();
 
-    /* Queue is empty */
-    if (timeout_ms == OSAL_NO_WAIT) {
-        return OSAL_ERROR_EMPTY;
+    if (timeout_ms != OSAL_WAIT_FOREVER && elapsed >= timeout_ms) {
+        break;
     }
-
-    /* Busy-wait with timeout */
-    uint32_t elapsed = 0;
-    while (elapsed < timeout_ms || timeout_ms == OSAL_WAIT_FOREVER) {
-        osal_platform_delay_us(1000);
-        elapsed++;
-
-        osal_enter_critical();
-        if (queue->count > 0) {
-            memcpy(item, &queue->buffer[queue->head * queue->item_size],
-                   queue->item_size);
-            queue->head = (queue->head + 1) % queue->item_count;
-            queue->count--;
-            osal_exit_critical();
-            return OSAL_OK;
-        }
-        osal_exit_critical();
-
-        if (timeout_ms != OSAL_WAIT_FOREVER && elapsed >= timeout_ms) {
-            break;
-        }
     }
 
     return OSAL_ERROR_TIMEOUT;

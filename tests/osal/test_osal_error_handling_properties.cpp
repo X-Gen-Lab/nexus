@@ -29,9 +29,9 @@
 extern "C" {
 #include "osal/osal.h"
 #include "osal/osal_diag.h"
-#include "osal/osal_timer.h"
 #include "osal/osal_event.h"
 #include "osal/osal_mem.h"
+#include "osal/osal_timer.h"
 }
 
 /**
@@ -114,13 +114,11 @@ TEST_F(OsalErrorHandlingPropertyTest, Property1_TimerNullPointerHandling) {
         osal_status_t status;
 
         /* Test osal_timer_create with NULL handle */
-        osal_timer_config_t timer_config = {
-            .name = "test",
-            .period_ms = 100,
-            .mode = OSAL_TIMER_ONE_SHOT,
-            .callback = [](void*) {},
-            .arg = nullptr
-        };
+        osal_timer_config_t timer_config = {.name = "test",
+                                            .period_ms = 100,
+                                            .mode = OSAL_TIMER_ONE_SHOT,
+                                            .callback = [](void*) {},
+                                            .arg = nullptr};
         status = osal_timer_create(&timer_config, nullptr);
         EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
             << "Iteration " << test_iter
@@ -238,11 +236,9 @@ TEST_F(OsalErrorHandlingPropertyTest, Property1_EventNullPointerHandling) {
             << ": osal_event_clear(NULL) should return NULL_POINTER";
 
         /* Test osal_event_wait with NULL handle */
-        osal_event_wait_options_t options = {
-            .mode = OSAL_EVENT_WAIT_ANY,
-            .auto_clear = false,
-            .timeout_ms = OSAL_NO_WAIT
-        };
+        osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ANY,
+                                             .auto_clear = false,
+                                             .timeout_ms = OSAL_NO_WAIT};
         osal_event_bits_t bits_out = 0;
         status = osal_event_wait(nullptr, 0x01, &options, &bits_out);
         EXPECT_EQ(OSAL_ERROR_NULL_POINTER, status)
@@ -299,10 +295,10 @@ TEST_F(OsalErrorHandlingPropertyTest, Property1_MemoryNullPointerHandling) {
             << ": osal_mem_get_stats(NULL) should return NULL_POINTER";
 
         /* Test osal_mem_free with NULL - should be safe (no-op) */
-        osal_mem_free(nullptr);  /* Should not crash */
+        osal_mem_free(nullptr); /* Should not crash */
 
         /* Test osal_mem_free_aligned with NULL - should be safe (no-op) */
-        osal_mem_free_aligned(nullptr);  /* Should not crash */
+        osal_mem_free_aligned(nullptr); /* Should not crash */
 
         /* Test osal_mem_realloc with NULL ptr - should behave like alloc */
         void* ptr = osal_mem_realloc(nullptr, 64);
@@ -320,7 +316,8 @@ TEST_F(OsalErrorHandlingPropertyTest, Property1_MemoryNullPointerHandling) {
  *
  * **Validates: Requirements 1.2, 2.4**
  */
-TEST_F(OsalErrorHandlingPropertyTest, Property1_DiagnosticsNullPointerHandling) {
+TEST_F(OsalErrorHandlingPropertyTest,
+       Property1_DiagnosticsNullPointerHandling) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         osal_status_t status;
 
@@ -339,14 +336,16 @@ TEST_F(OsalErrorHandlingPropertyTest, Property1_DiagnosticsNullPointerHandling) 
 }
 
 /**
- * Feature: osal-refactor, Property 1: NULL Pointer Error Handling - Enhanced APIs
+ * Feature: osal-refactor, Property 1: NULL Pointer Error Handling - Enhanced
+ * APIs
  *
  * *For any* enhanced OSAL API that accepts pointer parameters, passing NULL
  * SHALL return OSAL_ERROR_NULL_POINTER.
  *
  * **Validates: Requirements 1.2, 2.4**
  */
-TEST_F(OsalErrorHandlingPropertyTest, Property1_EnhancedAPINullPointerHandling) {
+TEST_F(OsalErrorHandlingPropertyTest,
+       Property1_EnhancedAPINullPointerHandling) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         osal_status_t status;
 

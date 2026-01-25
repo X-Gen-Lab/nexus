@@ -808,7 +808,8 @@ TEST_F(OsalQueuePropertyTest, Property14_QueueOverwriteModeBehavior) {
             << "Iteration " << test_iter << ": queue create failed";
 
         /* Set overwrite mode - should succeed */
-        EXPECT_EQ(OSAL_OK, osal_queue_set_mode(queue, OSAL_QUEUE_MODE_OVERWRITE))
+        EXPECT_EQ(OSAL_OK,
+                  osal_queue_set_mode(queue, OSAL_QUEUE_MODE_OVERWRITE))
             << "Iteration " << test_iter << ": set overwrite mode failed";
 
         /* Set normal mode - should succeed */
@@ -824,8 +825,7 @@ TEST_F(OsalQueuePropertyTest, Property14_QueueOverwriteModeBehavior) {
         /* Test NULL handle */
         EXPECT_EQ(OSAL_ERROR_NULL_POINTER,
                   osal_queue_set_mode(nullptr, OSAL_QUEUE_MODE_NORMAL))
-            << "Iteration " << test_iter
-            << ": NULL handle should return error";
+            << "Iteration " << test_iter << ": NULL handle should return error";
 
         /* Clean up */
         ASSERT_EQ(OSAL_OK, osal_queue_delete(queue))

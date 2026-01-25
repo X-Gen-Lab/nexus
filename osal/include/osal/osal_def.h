@@ -74,11 +74,11 @@ typedef enum {
  *
  * \note            Requirements: 1.2
  */
-#define OSAL_VALIDATE_PTR(ptr)                                              \
-    do {                                                                    \
-        if ((ptr) == NULL) {                                                \
-            return OSAL_ERROR_NULL_POINTER;                                 \
-        }                                                                   \
+#define OSAL_VALIDATE_PTR(ptr)                                                 \
+    do {                                                                       \
+        if ((ptr) == NULL) {                                                   \
+            return OSAL_ERROR_NULL_POINTER;                                    \
+        }                                                                      \
     } while (0)
 
 /**
@@ -89,11 +89,11 @@ typedef enum {
  *
  * \note            Requirements: 1.3
  */
-#define OSAL_VALIDATE_PARAM(cond, err)                                      \
-    do {                                                                    \
-        if (!(cond)) {                                                      \
-            return (err);                                                   \
-        }                                                                   \
+#define OSAL_VALIDATE_PARAM(cond, err)                                         \
+    do {                                                                       \
+        if (!(cond)) {                                                         \
+            return (err);                                                      \
+        }                                                                      \
     } while (0)
 
 /**
@@ -103,11 +103,11 @@ typedef enum {
  * \note            Requirements: 1.4
  * \note            Requires osal_is_isr() to be declared before use
  */
-#define OSAL_CHECK_NOT_ISR()                                                \
-    do {                                                                    \
-        if (osal_is_isr()) {                                                \
-            return OSAL_ERROR_ISR;                                          \
-        }                                                                   \
+#define OSAL_CHECK_NOT_ISR()                                                   \
+    do {                                                                       \
+        if (osal_is_isr()) {                                                   \
+            return OSAL_ERROR_ISR;                                             \
+        }                                                                      \
     } while (0)
 
 /**
@@ -119,11 +119,11 @@ typedef enum {
  * \note            For full handle validation with magic number checking,
  *                  use OSAL_VALIDATE_HANDLE from osal_internal.h
  */
-#define OSAL_VALIDATE_HANDLE_PTR(handle)                                    \
-    do {                                                                    \
-        if ((handle) == NULL) {                                             \
-            return OSAL_ERROR_NULL_POINTER;                                 \
-        }                                                                   \
+#define OSAL_VALIDATE_HANDLE_PTR(handle)                                       \
+    do {                                                                       \
+        if ((handle) == NULL) {                                                \
+            return OSAL_ERROR_NULL_POINTER;                                    \
+        }                                                                      \
     } while (0)
 
 /**
