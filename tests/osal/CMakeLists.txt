@@ -48,7 +48,7 @@ target_include_directories(osal_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 target_link_libraries(osal_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(osal_tests
+nexus_discover_tests(osal_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "osal;unit;property"

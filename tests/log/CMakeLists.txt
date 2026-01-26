@@ -38,7 +38,7 @@ target_include_directories(log_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 target_link_libraries(log_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(log_tests
+nexus_discover_tests(log_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "log;framework;unit;property"

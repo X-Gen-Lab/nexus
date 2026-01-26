@@ -54,6 +54,15 @@ bool native_flash_is_erased(uint8_t index, uint32_t address, uint32_t length);
  */
 void native_flash_reset_all(void);
 
+/**
+ * \brief           Set unique backing file for Flash instance
+ * \param[in]       index: Flash index
+ * \param[in]       filename: Unique filename for persistence
+ * \return          NX_OK on success, error code otherwise
+ * \note            Use this to avoid file conflicts in parallel tests
+ */
+nx_status_t native_flash_set_backing_file(uint8_t index, const char* filename);
+
 #ifdef __cplusplus
 }
 #endif

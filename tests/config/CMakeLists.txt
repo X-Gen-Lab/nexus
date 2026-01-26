@@ -52,7 +52,7 @@ target_include_directories(config_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 target_link_libraries(config_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(config_tests
+nexus_discover_tests(config_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "config;framework;unit;property"

@@ -127,3 +127,27 @@ void native_flash_reset_all(void) {
         }
     }
 }
+
+/**
+ * \brief           Set unique backing file for Flash instance
+ */
+nx_status_t native_flash_set_backing_file(uint8_t index, const char* filename) {
+    nx_flash_impl_t* impl = get_flash_impl(index);
+    if (impl == NULL || impl->state == NULL) {
+        return NX_ERR_INVALID_PARAM;
+    }
+
+    if (filename == NULL) {
+        return NX_ERR_INVALID_PARAM;
+    }
+
+    /* Set the backing file path */
+    size_t len = strlen(filename);
+    if (len >= sizeof(impl->state->backing_file)) {
+        len = sizeof(impl->state->backing_file) - 1;
+    }
+    memcpy(impl->state->backing_file, filename, len);
+    impl->state->backing_file[len] = '\0';
+
+    return NX_OK;
+}

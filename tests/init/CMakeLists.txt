@@ -40,7 +40,7 @@ target_include_directories(init_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 target_link_libraries(init_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(init_tests
+nexus_discover_tests(init_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "init;framework;unit;property"

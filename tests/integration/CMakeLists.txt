@@ -31,7 +31,7 @@ target_include_directories(integration_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 target_link_libraries(integration_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(integration_tests
+nexus_discover_tests(integration_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "integration"

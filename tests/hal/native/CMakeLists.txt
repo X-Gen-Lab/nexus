@@ -83,7 +83,7 @@ target_include_directories(hal_native_tests
 target_link_libraries(hal_native_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(hal_native_tests
+nexus_discover_tests(hal_native_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "hal;native;unit;property"

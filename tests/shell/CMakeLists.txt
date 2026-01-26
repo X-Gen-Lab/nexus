@@ -45,7 +45,7 @@ target_include_directories(shell_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 target_link_libraries(shell_tests PRIVATE ${NEXUS_TEST_LIBS})
 
 # Discover tests
-gtest_discover_tests(shell_tests
+nexus_discover_tests(shell_tests
     PROPERTIES
         TIMEOUT 300
         LABELS "shell;framework;unit;property"

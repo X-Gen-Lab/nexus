@@ -71,6 +71,32 @@ if(MSVC)
 endif()
 
 ##############################################################################
+# Helper Function for Test Discovery
+##############################################################################
+
+# Wrapper function for gtest_discover_tests that handles generator-specific issues
+function(nexus_discover_tests TARGET)
+    # Parse additional arguments
+    set(options "")
+    set(oneValueArgs "")
+    set(multiValueArgs PROPERTIES LABELS)
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # Use PRE_TEST mode for Visual Studio generator to avoid path issues
+    # Use POST_BUILD for other generators for better performance
+    if(CMAKE_GENERATOR MATCHES "Visual Studio")
+        gtest_discover_tests(${TARGET}
+            DISCOVERY_MODE PRE_TEST
+            PROPERTIES ${ARG_PROPERTIES}
+        )
+    else()
+        gtest_discover_tests(${TARGET}
+            PROPERTIES ${ARG_PROPERTIES}
+        )
+    endif()
+endfunction()
+
+##############################################################################
 # Test Subdirectories
 ##############################################################################
 
@@ -105,9 +131,6 @@ endif()
 
 # Configure test output on failure
 set(CTEST_OUTPUT_ON_FAILURE ON CACHE BOOL "Show test output on failure")
-
-# Configure test discovery mode
-set(CMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST CACHE STRING "Test discovery mode")
 
 message(STATUS "")
 message(STATUS "=== CTest Configuration ===")

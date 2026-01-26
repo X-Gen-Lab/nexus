@@ -16,6 +16,7 @@
  * **Validates: Requirements 4.2, 4.9**
  */
 
+#include <cstdio>
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
@@ -39,9 +40,26 @@ class FlashPropertyTest : public ::testing::Test {
   protected:
     std::mt19937 rng;
     nx_internal_flash_t* flash = nullptr;
+    std::string unique_filename;
 
     void SetUp() override {
         rng.seed(std::random_device{}());
+
+        /* Generate unique filename for this test instance */
+        /* Use test name and timestamp to ensure uniqueness */
+        const ::testing::TestInfo* test_info =
+            ::testing::UnitTest::GetInstance()->current_test_info();
+        std::string test_name = test_info->name();
+
+        /* Replace invalid filename characters */
+        for (char& c : test_name) {
+            if (c == ':' || c == '/' || c == '\\' || c == '*' || c == '?' ||
+                c == '"' || c == '<' || c == '>' || c == '|') {
+                c = '_';
+            }
+        }
+
+        unique_filename = "flash_test_" + test_name + ".bin";
 
         /* Reset all Flash instances */
         native_flash_reset_all();
@@ -49,6 +67,10 @@ class FlashPropertyTest : public ::testing::Test {
         /* Get Flash0 instance */
         flash = nx_factory_flash(0);
         ASSERT_NE(nullptr, flash);
+
+        /* Set unique backing file before initialization */
+        ASSERT_EQ(NX_OK,
+                  native_flash_set_backing_file(0, unique_filename.c_str()));
 
         /* Initialize Flash */
         nx_lifecycle_t* lifecycle = flash->get_lifecycle(flash);
@@ -70,6 +92,9 @@ class FlashPropertyTest : public ::testing::Test {
 
         /* Reset all instances */
         native_flash_reset_all();
+
+        /* Clean up test file */
+        std::remove(unique_filename.c_str());
     }
 
     /**
