@@ -18,12 +18,6 @@
 #define _GNU_SOURCE
 #endif
 
-/* Disable MSVC deprecation warnings */
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#pragma warning(disable : 4996)
-#endif
-
 #include "osal/osal.h"
 #include "osal/osal_internal.h"
 #include <stdio.h>
