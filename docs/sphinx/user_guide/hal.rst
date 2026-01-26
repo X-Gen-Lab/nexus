@@ -131,13 +131,34 @@ Getting Started
     int main(void)
     {
         /* Initialize HAL */
-        nx_hal_init();
+        nx_status_t status = nx_hal_init();
+        if (status != NX_OK) {
+            return -1;
+        }
 
-        /* Get a GPIO device */
-        nx_gpio_t* led = nx_factory_gpio(0, 5);  /* Port A, Pin 5 */
+        /* Get a GPIO device (port is character 'A', 'B', etc.) */
+        nx_gpio_write_t* led = nx_factory_gpio_write('A', 5);
         if (led) {
-            led->write(led, 1);  /* Turn on */
-            nx_factory_gpio_release(led);
+            /* Initialize GPIO device */
+            nx_lifecycle_t* lc = led->get_lifecycle(led);
+            status = lc->init(lc);
+            if (status == NX_OK) {
+                led->write(led, 1);  /* Turn on */
+                led->toggle(led);    /* Toggle */
+            }
+        }
+
+        /* Get UART device */
+        nx_uart_t* uart = nx_factory_uart(0);
+        if (uart) {
+            /* Initialize UART device */
+            nx_lifecycle_t* lc = uart->get_lifecycle(uart);
+            status = lc->init(lc);
+            if (status == NX_OK) {
+                nx_tx_sync_t* tx = uart->get_tx_sync(uart);
+                const char* msg = "Hello!\n";
+                tx->send(tx, (const uint8_t*)msg, strlen(msg), 1000);
+            }
         }
 
         /* Cleanup */
@@ -148,151 +169,280 @@ Getting Started
 GPIO Module
 -----------
 
-**Get GPIO with default configuration:**
+**Get GPIO device:**
 
 .. code-block:: c
 
-    nx_gpio_t* gpio = nx_factory_gpio(port, pin);
+    /* Get GPIO read-write interface (port is a character 'A', 'B', etc.) */
+    nx_gpio_t* gpio = nx_factory_gpio('A', 5);  /* Port A, Pin 5 */
 
-**Get GPIO with custom configuration:**
+    /* Or get specific interfaces */
+    nx_gpio_read_t* input = nx_factory_gpio_read('B', 0);
+    nx_gpio_write_t* output = nx_factory_gpio_write('C', 13);
 
-.. code-block:: c
-
-    nx_gpio_config_t cfg = {
-        .mode  = NX_GPIO_MODE_OUTPUT_PP,
-        .pull  = NX_GPIO_PULL_NONE,
-        .speed = NX_GPIO_SPEED_LOW,
-    };
-
-    nx_gpio_t* led = nx_factory_gpio_with_config(0, 5, &cfg);
-
-**Operations:**
+**Write operations:**
 
 .. code-block:: c
 
-    /* Write */
-    led->write(led, 1);  /* High */
-    led->write(led, 0);  /* Low */
+    nx_gpio_write_t* led = nx_factory_gpio_write('A', 5);
+    if (led) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = led->get_lifecycle(led);
+        nx_status_t status = lc->init(lc);
+        if (status == NX_OK) {
+            led->write(led, 1);  /* High */
+            led->write(led, 0);  /* Low */
+            led->toggle(led);    /* Toggle state */
+        }
+    }
 
-    /* Read */
-    uint8_t state = led->read(led);
+**Read operations:**
 
-    /* Toggle */
-    led->toggle(led);
+.. code-block:: c
 
-    /* Runtime configuration */
-    led->set_mode(led, NX_GPIO_MODE_INPUT);
-    led->set_pull(led, NX_GPIO_PULL_UP);
-
-    /* Release when done */
-    nx_factory_gpio_release(led);
+    nx_gpio_read_t* button = nx_factory_gpio_read('B', 0);
+    if (button) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = button->get_lifecycle(button);
+        nx_status_t status = lc->init(lc);
+        if (status == NX_OK) {
+            uint8_t state = button->read(button);
+        }
+    }
 
 **External interrupt:**
 
 .. code-block:: c
 
-    void button_callback(void* ctx)
+    void button_callback(void* user_data)
     {
         /* Handle button press */
     }
 
-    nx_gpio_t* btn = nx_factory_gpio(0, 0);
-    btn->set_mode(btn, NX_GPIO_MODE_INPUT);
-    btn->set_exti(btn, NX_GPIO_EXTI_FALLING, button_callback, NULL);
+    nx_gpio_read_t* btn = nx_factory_gpio_read('B', 0);
+    if (btn) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = btn->get_lifecycle(btn);
+        nx_status_t status = lc->init(lc);
+        if (status == NX_OK) {
+            btn->register_exti(btn, button_callback, NULL, NX_GPIO_TRIGGER_FALLING);
+        }
+    }
 
 UART Module
 -----------
 
-**Get UART with default configuration:**
+**Get UART device:**
+
+.. code-block:: c
+
+    nx_uart_t* uart = nx_factory_uart(0);  /* UART0 */
+
+.. note::
+   UART configuration (baudrate, parity, stop bits, etc.) is done through
+   Kconfig at compile-time. The factory function returns a configured device.
+
+**Synchronous operations (blocking):**
 
 .. code-block:: c
 
     nx_uart_t* uart = nx_factory_uart(0);
+    if (uart) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = uart->get_lifecycle(uart);
+        nx_status_t status = lc->init(lc);
+        if (status != NX_OK) {
+            return;
+        }
 
-**Get UART with custom configuration:**
+        nx_tx_sync_t* tx = uart->get_tx_sync(uart);
+        nx_rx_sync_t* rx = uart->get_rx_sync(uart);
 
-.. code-block:: c
+        /* Transmit with timeout */
+        const char* msg = "Hello, Nexus!";
+        status = tx->send(tx, (const uint8_t*)msg, strlen(msg), 1000);
 
-    nx_uart_config_t cfg = {
-        .baudrate     = 115200,
-        .word_length  = 8,
-        .stop_bits    = 1,
-        .parity       = 0,  /* None */
-        .flow_control = 0,  /* None */
-    };
+        /* Receive with timeout */
+        uint8_t buf[64];
+        size_t len = sizeof(buf);
+        status = rx->receive(rx, buf, &len, 1000);
 
-    nx_uart_t* uart = nx_factory_uart_with_config(0, &cfg);
-
-**Synchronous operations:**
-
-.. code-block:: c
-
-    nx_tx_sync_t* tx = uart->get_tx_sync(uart);
-    nx_rx_sync_t* rx = uart->get_rx_sync(uart);
-
-    /* Transmit with timeout */
-    const char* msg = "Hello, Nexus!";
-    tx->send(tx, (uint8_t*)msg, strlen(msg), 1000);
-
-    /* Receive with timeout */
-    uint8_t buf[64];
-    rx->receive(rx, buf, sizeof(buf), 1000);
-
-**Asynchronous operations:**
-
-.. code-block:: c
-
-    nx_tx_async_t* tx = uart->get_tx_async(uart);
-    nx_rx_async_t* rx = uart->get_rx_async(uart);
-
-    /* Non-blocking send */
-    tx->send(tx, data, len);
-
-    /* Check available data */
-    size_t avail = rx->available(rx);
-    if (avail > 0) {
-        size_t read = rx->read(rx, buf, avail);
+        /* Receive exact length */
+        len = 10;
+        status = rx->receive_all(rx, buf, &len, 1000);
     }
 
-    /* Set receive callback */
-    rx->set_callback(rx, my_rx_callback, NULL);
-
-**Release when done:**
+**Asynchronous operations (non-blocking):**
 
 .. code-block:: c
 
-    nx_factory_uart_release(uart);
+    nx_uart_t* uart = nx_factory_uart(0);
+    if (uart) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = uart->get_lifecycle(uart);
+        nx_status_t status = lc->init(lc);
+        if (status != NX_OK) {
+            return;
+        }
+
+        nx_tx_async_t* tx = uart->get_tx_async(uart);
+        nx_rx_async_t* rx = uart->get_rx_async(uart);
+
+        /* Non-blocking send */
+        status = tx->send(tx, data, len);
+        if (status == NX_ERR_BUSY) {
+            /* Device busy, try later */
+        }
+
+        /* Non-blocking receive */
+        uint8_t buf[64];
+        size_t len = sizeof(buf);
+        status = rx->receive(rx, buf, &len);
+        if (status == NX_OK) {
+            /* Data received, len contains actual bytes read */
+        }
+    }
 
 SPI Module
 ----------
 
-**Get SPI device:**
+**Get SPI bus:**
+
+.. code-block:: c
+
+    nx_spi_t* spi = nx_factory_spi(0);  /* SPI0 bus */
+
+.. note::
+   Bus-level configuration (clock frequency, pin mapping) is done through
+   Kconfig at compile-time. Device-specific parameters (CS pin, speed, mode)
+   are specified when acquiring communication handles.
+
+**Synchronous operations (blocking):**
 
 .. code-block:: c
 
     nx_spi_t* spi = nx_factory_spi(0);
+    if (spi) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = spi->get_lifecycle(spi);
+        nx_status_t status = lc->init(lc);
+        if (status != NX_OK) {
+            return;
+        }
 
-    /* Use SPI... */
+        /* Configure device parameters */
+        nx_spi_device_config_t dev_cfg = NX_SPI_DEVICE_CONFIG_DEFAULT(5, 1000000);
+        dev_cfg.mode = NX_SPI_MODE_0;
+        dev_cfg.bit_order = NX_SPI_BIT_ORDER_MSB;
 
-    nx_factory_spi_release(spi);
+        /* Get sync TX/RX handle for this device */
+        nx_tx_rx_sync_t* txrx = spi->get_tx_rx_sync_handle(spi, dev_cfg);
+        if (txrx) {
+            uint8_t tx_data[] = {0x01, 0x02, 0x03};
+            uint8_t rx_data[3];
+            size_t rx_len = sizeof(rx_data);
 
-.. note::
-   Bus-level configuration (clock frequency, pin mapping) should be done
-   through Kconfig at compile-time. Device-specific parameters (CS pin,
-   speed, mode) are specified when acquiring communication handles.
+            status = txrx->tx_rx(txrx, tx_data, sizeof(tx_data),
+                                rx_data, &rx_len, 1000);
+        }
+    }
+
+**Asynchronous operations (non-blocking):**
+
+.. code-block:: c
+
+    nx_spi_t* spi = nx_factory_spi(0);
+    if (spi) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = spi->get_lifecycle(spi);
+        nx_status_t status = lc->init(lc);
+        if (status != NX_OK) {
+            return;
+        }
+
+        nx_spi_device_config_t dev_cfg = NX_SPI_DEVICE_CONFIG_DEFAULT(5, 1000000);
+
+        /* Get async TX/RX handle */
+        nx_tx_rx_async_t* txrx = spi->get_tx_rx_async_handle(spi, dev_cfg,
+                                                             my_callback, NULL);
+        if (txrx) {
+            uint8_t tx_data[] = {0x01, 0x02, 0x03};
+            status = txrx->tx_rx(txrx, tx_data, sizeof(tx_data), 1000);
+            /* Received data will be delivered via callback */
+        }
+    }
 
 I2C Module
 ----------
 
-**Get I2C device:**
+**Get I2C bus:**
+
+.. code-block:: c
+
+    nx_i2c_t* i2c = nx_factory_i2c(0);  /* I2C0 bus */
+
+.. note::
+   Bus-level configuration (speed, pin mapping) is done through Kconfig at
+   compile-time. Device address is specified when acquiring communication handles.
+
+**Synchronous operations (blocking):**
 
 .. code-block:: c
 
     nx_i2c_t* i2c = nx_factory_i2c(0);
+    if (i2c) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = i2c->get_lifecycle(i2c);
+        nx_status_t status = lc->init(lc);
+        if (status != NX_OK) {
+            return;
+        }
 
-    /* Use I2C... */
+        uint8_t dev_addr = 0x50;  /* Device address (7-bit) */
 
-    nx_factory_i2c_release(i2c);
+        /* Get sync TX/RX handle for this device */
+        nx_tx_rx_sync_t* txrx = i2c->get_tx_rx_sync_handle(i2c, dev_addr);
+        if (txrx) {
+            uint8_t tx_data[] = {0x00, 0x10};  /* Register address */
+            uint8_t rx_data[16];
+            size_t rx_len = sizeof(rx_data);
+
+            status = txrx->tx_rx(txrx, tx_data, sizeof(tx_data),
+                                rx_data, &rx_len, 1000);
+        }
+
+        /* Or use TX-only handle */
+        nx_tx_sync_t* tx = i2c->get_tx_sync_handle(i2c, dev_addr);
+        if (tx) {
+            uint8_t data[] = {0x00, 0x10, 0xAA};
+            status = tx->send(tx, data, sizeof(data), 1000);
+        }
+    }
+
+**Asynchronous operations (non-blocking):**
+
+.. code-block:: c
+
+    nx_i2c_t* i2c = nx_factory_i2c(0);
+    if (i2c) {
+        /* Initialize device */
+        nx_lifecycle_t* lc = i2c->get_lifecycle(i2c);
+        nx_status_t status = lc->init(lc);
+        if (status != NX_OK) {
+            return;
+        }
+
+        uint8_t dev_addr = 0x50;
+
+        /* Get async TX/RX handle */
+        nx_tx_rx_async_t* txrx = i2c->get_tx_rx_async_handle(i2c, dev_addr,
+                                                             my_callback, NULL);
+        if (txrx) {
+            uint8_t tx_data[] = {0x00, 0x10};
+            status = txrx->tx_rx(txrx, tx_data, sizeof(tx_data), 1000);
+            /* Received data will be delivered via callback */
+        }
+    }
 
 Error Handling
 --------------
@@ -302,25 +452,31 @@ All factory functions return ``NULL`` on failure. Interface methods return
 
 .. code-block:: c
 
-    nx_gpio_t* gpio = nx_factory_gpio(port, pin);
+    nx_gpio_t* gpio = nx_factory_gpio('A', 5);
     if (!gpio) {
         /* Handle error: device not available */
         return -1;
     }
 
-    nx_status_t status = gpio->set_mode(gpio, NX_GPIO_MODE_OUTPUT_PP);
+    /* Check operation status */
+    nx_lifecycle_t* lc = gpio->read.get_lifecycle(&gpio->read);
+    nx_status_t status = lc->init(lc);
     if (status != NX_OK) {
         /* Handle error */
+        const char* err_str = nx_status_to_string(status);
     }
 
 Common status codes:
 
 - ``NX_OK`` - Success
-- ``NX_ERR_PARAM`` - Invalid parameter
-- ``NX_ERR_STATE`` - Invalid state
+- ``NX_ERR_INVALID_PARAM`` - Invalid parameter
+- ``NX_ERR_INVALID_STATE`` - Invalid state
 - ``NX_ERR_TIMEOUT`` - Operation timeout
 - ``NX_ERR_BUSY`` - Resource busy
-- ``NX_ERR_NO_MEM`` - Out of memory
+- ``NX_ERR_NO_MEMORY`` - Out of memory
+- ``NX_ERR_NO_DATA`` - No data available
+- ``NX_ERR_NACK`` - NACK received (I2C)
+- ``NX_ERR_BUS`` - Bus error
 
 Lifecycle Management
 --------------------
@@ -329,14 +485,25 @@ Devices support lifecycle operations through the ``nx_lifecycle_t`` interface:
 
 .. code-block:: c
 
-    nx_gpio_t* gpio = nx_factory_gpio(0, 5);
-    nx_lifecycle_t* lc = gpio->get_lifecycle(gpio);
+    nx_uart_t* uart = nx_factory_uart(0);
+    if (uart) {
+        nx_lifecycle_t* lc = uart->get_lifecycle(uart);
 
-    /* Suspend device */
-    lc->suspend(lc);
+        /* Initialize device */
+        nx_status_t status = lc->init(lc);
 
-    /* Resume device */
-    lc->resume(lc);
+        /* Check device state */
+        nx_device_state_t state = lc->get_state(lc);
+
+        /* Suspend device */
+        status = lc->suspend(lc);
+
+        /* Resume device */
+        status = lc->resume(lc);
+
+        /* Deinitialize device */
+        status = lc->deinit(lc);
+    }
 
 Power Management
 ----------------
@@ -346,13 +513,18 @@ Devices support power management through the ``nx_power_t`` interface:
 .. code-block:: c
 
     nx_uart_t* uart = nx_factory_uart(0);
-    nx_power_t* pwr = uart->get_power(uart);
+    if (uart) {
+        nx_power_t* pwr = uart->get_power(uart);
 
-    /* Enter low power mode */
-    pwr->set_mode(pwr, NX_POWER_MODE_SLEEP);
+        /* Disable peripheral clock to save power */
+        nx_status_t status = pwr->disable(pwr);
 
-    /* Wake up */
-    pwr->set_mode(pwr, NX_POWER_MODE_NORMAL);
+        /* Enable peripheral clock */
+        status = pwr->enable(pwr);
+
+        /* Check power state */
+        bool enabled = pwr->is_enabled(pwr);
+    }
 
 API Reference
 -------------

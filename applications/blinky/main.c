@@ -66,6 +66,23 @@ int main(void) {
         }
     }
 
+    /* Initialize all GPIO devices */
+    nx_lifecycle_t* lc0 = led0->get_lifecycle(led0);
+    nx_lifecycle_t* lc1 = led1->get_lifecycle(led1);
+    nx_lifecycle_t* lc2 = led2->get_lifecycle(led2);
+    nx_lifecycle_t* lc3 = led3->get_lifecycle(led3);
+
+    status = lc0->init(lc0);
+    status |= lc1->init(lc1);
+    status |= lc2->init(lc2);
+    status |= lc3->init(lc3);
+
+    if (status != NX_OK) {
+        while (1) {
+            /* GPIO initialization failed */
+        }
+    }
+
     /* Main loop: blink LEDs in sequence */
     while (1) {
         /* LED 0 */
@@ -86,10 +103,6 @@ int main(void) {
     }
 
     /* Cleanup (never reached) */
-    nx_factory_gpio_release((nx_gpio_t*)led0);
-    nx_factory_gpio_release((nx_gpio_t*)led1);
-    nx_factory_gpio_release((nx_gpio_t*)led2);
-    nx_factory_gpio_release((nx_gpio_t*)led3);
     nx_hal_deinit();
 
     return 0;
