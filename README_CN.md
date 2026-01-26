@@ -1,8 +1,8 @@
 # Nexus 嵌入式平台
 
-[![构建状态](https://github.com/nexus-platform/nexus/workflows/Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![测试状态](https://github.com/nexus-platform/nexus/workflows/Test/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![文档状态](https://github.com/nexus-platform/nexus/workflows/Documentation/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![CI 状态](https://github.com/nexus-platform/nexus/workflows/CI/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![构建矩阵](https://github.com/nexus-platform/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![文档构建](https://github.com/nexus-platform/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
 [![codecov](https://codecov.io/gh/nexus-platform/nexus/branch/main/graph/badge.svg)](https://codecov.io/gh/nexus-platform/nexus)
 [![许可证: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![版本](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
@@ -72,10 +72,17 @@
 git clone https://github.com/nexus-platform/nexus.git
 cd nexus
 
-# 使用 Python 脚本（推荐，跨平台）
+# 方法 1：使用 Python 脚本（推荐，跨平台）
 python scripts/building/build.py
 
-# 或直接使用 CMake
+# 方法 2：使用 CMake 预设（推荐用于 CMake 3.19+）
+cmake --preset native-debug      # 调试构建
+cmake --build --preset native-debug
+
+cmake --preset native-release    # 发布构建
+cmake --build --preset native-release
+
+# 方法 3：直接使用 CMake
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DNEXUS_PLATFORM=native
 cmake --build build --config Release
 
@@ -87,10 +94,17 @@ python scripts/test/test.py
 ### 构建 STM32F4 版本
 
 ```bash
-# 使用 Python 脚本
+# 方法 1：使用 Python 脚本
 python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
 
-# 或直接使用 CMake
+# 方法 2：使用 CMake 预设（推荐用于 CMake 3.19+）
+cmake --preset stm32f4-debug     # 调试构建
+cmake --build --preset stm32f4-debug
+
+cmake --preset stm32f4-release   # 发布构建
+cmake --build --preset stm32f4-release
+
+# 方法 3：直接使用 CMake
 cmake -B build-stm32f4 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
@@ -111,6 +125,25 @@ cmake --build build-stm32f4 --config Release
 | `NEXUS_BUILD_EXAMPLES` | `ON` | 构建示例应用 |
 | `NEXUS_ENABLE_COVERAGE` | `OFF` | 启用代码覆盖率分析 |
 | `CMAKE_BUILD_TYPE` | `Debug` | 构建类型: `Debug`, `Release`, `MinSizeRel`, `RelWithDebInfo` |
+
+### CMake 预设
+
+项目包含 CMakePresets.json 用于标准化配置：
+
+```bash
+# 列出可用预设
+cmake --list-presets
+
+# 使用预设
+cmake --preset native-debug
+cmake --build --preset native-debug
+
+# 常用预设：
+# - native-debug: Native 平台调试构建
+# - native-release: Native 平台发布构建
+# - stm32f4-debug: STM32F4 调试构建
+# - stm32f4-release: STM32F4 发布构建
+```
 
 ## 📖 第一个项目
 
@@ -221,9 +254,12 @@ nexus/
 │   ├── freertos/           #   FreeRTOS 内核
 │   └── googletest/         #   Google Test 框架
 └── .github/workflows/      # CI/CD 流水线
-    ├── build.yml           #   多平台构建
-    ├── test.yml            #   单元测试和覆盖率
-    └── docs.yml            #   文档部署
+    ├── ci.yml              #   统一持续集成
+    ├── build-matrix.yml    #   多平台构建矩阵
+    ├── docs-build.yml      #   文档构建和部署
+    ├── quality-checks.yml  #   代码质量检查
+    ├── performance.yml     #   性能测试
+    └── release.yml         #   发布自动化
 ```
 
 ## 📚 文档
@@ -403,9 +439,20 @@ GitHub Actions 工作流在每次推送和拉取请求时自动运行：
 
 | 工作流 | 说明 | 触发条件 |
 |--------|------|---------|
-| **build.yml** | 多平台构建（Windows、Linux、macOS）+ ARM 交叉编译 | Push、PR |
-| **test.yml** | 单元测试 + 覆盖率 + 消毒器 + 静态分析 | Push、PR |
-| **docs.yml** | 构建并部署文档到 GitHub Pages | Push to main |
+| **ci.yml** | 统一的持续集成流水线 | Push、PR |
+| **build-matrix.yml** | 多平台构建测试（Windows、Linux、macOS、ARM） | Push、PR |
+| **docs-build.yml** | 构建并部署文档到 GitHub Pages | Push to main |
+| **quality-checks.yml** | 代码质量验证和静态分析 | Push、PR |
+| **performance.yml** | 性能基准测试和回归测试 | Push to main、手动 |
+| **release.yml** | 自动化发布流程和产物发布 | Tag push |
+
+### 模块化架构
+
+CI/CD 系统采用模块化架构，使用可复用的 actions：
+
+- **可复用 Actions** 位于 `.github/actions/`：
+  - `setup-build/` - 通用构建环境设置
+  - 在多个工作流之间共享以保持一致性
 
 ### CI 状态
 
@@ -413,6 +460,7 @@ GitHub Actions 工作流在每次推送和拉取请求时自动运行：
 - ✅ 1539+ 个测试通过
 - ✅ 代码覆盖率 > 95%
 - ✅ 文档构建成功
+- ✅ 质量检查通过
 
 ## 🤝 贡献
 

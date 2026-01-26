@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### CI/CD Infrastructure
+- Modular GitHub Actions workflow architecture:
+  - New `ci.yml` workflow for unified continuous integration
+  - `build-matrix.yml` for multi-platform build testing
+  - `docs-build.yml` for automated documentation generation
+  - `quality-checks.yml` for code quality validation
+  - Reusable actions in `.github/actions/` for better maintainability
+- Enhanced performance testing and release automation workflows
+- Improved workflow documentation in `.github/workflows/README.md`
+
+#### Build System Enhancements
+- CMakePresets.json for standardized build configurations across platforms
+- NexusPlatform.cmake module for platform-specific configurations
+- Enhanced CTestScript.cmake with better error handling and reporting
+- Improved root CMakeLists.txt with better project structure
+
+#### Testing Infrastructure
+- Comprehensive test infrastructure improvements:
+  - Consistent target naming across all test CMakeLists.txt
+  - New native_flash_helpers.c/h for flash device testing utilities
+  - Enhanced test_nx_flash_properties.cpp with additional test cases
+  - Better test organization and maintainability
+
+#### Documentation
+- Complete rewrite of CI/CD integration documentation (ci_cd_integration.rst)
+- Expanded build system documentation with detailed CMake configuration guide (build_system.rst)
+- Updated Chinese translations for all documentation changes
+- Improved documentation structure and readability
+
+#### Scripts
+- Enhanced build.py with better error handling and logging
+- Improved setup.py with code cleanup
+- Better script maintainability and user feedback
+
+### Changed
+- Refactored GitHub Actions workflows from monolithic to modular architecture
+- Replaced old workflows (build.yml, test.yml, docs.yml, validation.yml) with new modular structure
+- Updated performance.yml and release.yml to align with new architecture
+- Improved test infrastructure organization
+
+### Removed
+- Obsolete monolithic workflow files (build.yml, test.yml, docs.yml, validation.yml)
+- Unused code in osal_native.c
+
+### Fixed
+- Configuration file line ending consistency (.config, nexus_config.h)
+
 ### Breaking Changes
 - **HAL Configuration Removal**: Removed all runtime configuration methods from HAL interfaces
   - Removed `nx_uart_config_t`, `nx_gpio_config_t`, `nx_can_config_t`, `nx_spi_config_t`, and `nx_i2c_config_t` structures

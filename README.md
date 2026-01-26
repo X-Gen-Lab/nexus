@@ -1,8 +1,8 @@
 # Nexus Embedded Platform
 
-[![Build Status](https://github.com/nexus-platform/nexus/workflows/Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![Test Status](https://github.com/nexus-platform/nexus/workflows/Test/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![Documentation](https://github.com/nexus-platform/nexus/workflows/Documentation/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![CI Status](https://github.com/nexus-platform/nexus/workflows/CI/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![Build Matrix](https://github.com/nexus-platform/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![Documentation](https://github.com/nexus-platform/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
 [![codecov](https://codecov.io/gh/nexus-platform/nexus/branch/main/graph/badge.svg)](https://codecov.io/gh/nexus-platform/nexus)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
@@ -74,10 +74,17 @@
 git clone https://github.com/nexus-platform/nexus.git
 cd nexus
 
-# Using Python script (recommended, cross-platform)
+# Method 1: Using Python script (recommended, cross-platform)
 python scripts/building/build.py
 
-# Or using CMake directly
+# Method 2: Using CMake Presets (recommended for CMake 3.19+)
+cmake --preset native-debug      # Debug build
+cmake --build --preset native-debug
+
+cmake --preset native-release    # Release build
+cmake --build --preset native-release
+
+# Method 3: Using CMake directly
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DNEXUS_PLATFORM=native
 cmake --build build --config Release
 
@@ -89,10 +96,17 @@ python scripts/test/test.py
 ### Build for STM32F4
 
 ```bash
-# Using Python script
+# Method 1: Using Python script
 python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
 
-# Or using CMake directly
+# Method 2: Using CMake Presets (recommended for CMake 3.19+)
+cmake --preset stm32f4-debug     # Debug build
+cmake --build --preset stm32f4-debug
+
+cmake --preset stm32f4-release   # Release build
+cmake --build --preset stm32f4-release
+
+# Method 3: Using CMake directly
 cmake -B build-stm32f4 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
@@ -113,6 +127,25 @@ cmake --build build-stm32f4 --config Release
 | `NEXUS_BUILD_EXAMPLES` | `ON` | Build example applications |
 | `NEXUS_ENABLE_COVERAGE` | `OFF` | Enable code coverage analysis |
 | `CMAKE_BUILD_TYPE` | `Debug` | Build type: `Debug`, `Release`, `MinSizeRel`, `RelWithDebInfo` |
+
+### CMake Presets
+
+The project includes CMakePresets.json for standardized configurations:
+
+```bash
+# List available presets
+cmake --list-presets
+
+# Use a preset
+cmake --preset native-debug
+cmake --build --preset native-debug
+
+# Common presets:
+# - native-debug: Native platform debug build
+# - native-release: Native platform release build
+# - stm32f4-debug: STM32F4 debug build
+# - stm32f4-release: STM32F4 release build
+```
 
 ## 📖 First Project
 
@@ -405,9 +438,20 @@ GitHub Actions workflows automatically run on every push and pull request:
 
 | Workflow | Description | Triggers |
 |----------|-------------|----------|
-| **build.yml** | Multi-platform build (Windows, Linux, macOS) + ARM cross-compilation | Push, PR |
-| **test.yml** | Unit tests with coverage + sanitizers + static analysis | Push, PR |
-| **docs.yml** | Build and deploy documentation to GitHub Pages | Push to main |
+| **ci.yml** | Unified continuous integration pipeline | Push, PR |
+| **build-matrix.yml** | Multi-platform build testing (Windows, Linux, macOS, ARM) | Push, PR |
+| **docs-build.yml** | Build and deploy documentation to GitHub Pages | Push to main |
+| **quality-checks.yml** | Code quality validation and static analysis | Push, PR |
+| **performance.yml** | Performance benchmarking and regression testing | Push to main, Manual |
+| **release.yml** | Automated release process and artifact publishing | Tag push |
+
+### Modular Architecture
+
+The CI/CD system uses a modular architecture with reusable actions:
+
+- **Reusable Actions** in `.github/actions/`:
+  - `setup-build/` - Common build environment setup
+  - Shared across multiple workflows for consistency
 
 ### CI Status
 
@@ -415,6 +459,7 @@ GitHub Actions workflows automatically run on every push and pull request:
 - ✅ 1539+ tests passing
 - ✅ Code coverage > 95%
 - ✅ Documentation builds successfully
+- ✅ Quality checks passing
 
 ## 🤝 Contributing
 
