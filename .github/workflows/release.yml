@@ -1,6 +1,3 @@
-# Nexus Release Workflow
-# Automated release process with changelog generation
-
 name: Release
 
 on:
@@ -10,16 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., v0.1.0)'
+        description: 'Release version (e.g., v1.0.0)'
         required: true
         type: string
 
-env:
-  BUILD_TYPE: Release
-  PYTHON_VERSION: '3.11'
-
 jobs:
-  # Create release
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
@@ -28,150 +20,101 @@ jobs:
       version: ${{ steps.get_version.outputs.version }}
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Get Version
-      id: get_version
-      run: |
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          VERSION="${{ github.event.inputs.version }}"
-        else
-          VERSION=${GITHUB_REF#refs/tags/}
-        fi
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Release version: $VERSION"
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
 
-    - name: Generate Changelog
-      id: changelog
-      run: |
-        # Extract changelog for this version
-        VERSION=${{ steps.get_version.outputs.version }}
-        if [ -f CHANGELOG.md ]; then
-          # Extract section for this version
-          sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > release-notes.md
-        else
-          echo "Release $VERSION" > release-notes.md
-        fi
+      - name: Generate changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            sed -n "/## \[${{ steps.get_version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | head -n -1 > release_notes.md
+          else
+            echo "Release ${{ steps.get_version.outputs.version }}" > release_notes.md
+          fi
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        release_name: Nexus ${{ steps.get_version.outputs.version }}
-        body_path: release-notes.md
-        draft: false
-        prerelease: ${{ contains(steps.get_version.outputs.version, 'rc') || contains(steps.get_version.outputs.version, 'beta') }}
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          name: Release ${{ steps.get_version.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
 
-  # Build release artifacts
   build-release:
-    name: Build Release (${{ matrix.platform }})
+    name: Build ${{ matrix.name }}
     needs: create-release
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        platform: [stm32f4, stm32h7]
+        include:
+          - name: Windows MSVC
+            os: windows-latest
+            preset: windows-msvc-release
+            artifact: nexus-windows-msvc
+          - name: Linux GCC
+            os: ubuntu-latest
+            preset: linux-gcc-release
+            artifact: nexus-linux-gcc
+          - name: macOS Clang
+            os: macos-latest
+            preset: macos-clang-release
+            artifact: nexus-macos-clang
+          - name: ARM Cortex-M4
+            os: ubuntu-latest
+            preset: cross-arm-release
+            artifact: nexus-arm-cortex-m4
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          os: ${{ matrix.os }}
+          preset: ${{ matrix.preset }}
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
 
-    - name: Build ${{ matrix.platform }}
-      run: |
-        cmake -B build-${{ matrix.platform }} \
-          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-          -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
-          -DNEXUS_PLATFORM=${{ matrix.platform }} \
-          -DNEXUS_BUILD_EXAMPLES=ON
-        cmake --build build-${{ matrix.platform }} --config ${{ env.BUILD_TYPE }} --parallel
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --parallel
 
-    - name: Package Artifacts
-      run: |
-        VERSION=${{ needs.create-release.outputs.version }}
-        PLATFORM=${{ matrix.platform }}
-        mkdir -p release-package
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p release/${{ matrix.artifact }}
+          cp -r build/${{ matrix.preset }}/bin/* release/${{ matrix.artifact }}/ 2>/dev/null || true
+          cp -r build/${{ matrix.preset }}/lib/* release/${{ matrix.artifact }}/ 2>/dev/null || true
+          cp README.md LICENSE release/${{ matrix.artifact }}/
 
-        # Copy binaries
-        find build-$PLATFORM -name "*.bin" -o -name "*.hex" -o -name "*.elf" | \
-          xargs -I {} cp {} release-package/
+      - name: Create Archive
+        shell: bash
+        run: |
+          cd release
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            7z a ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip ${{ matrix.artifact }}
+            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip" >> $GITHUB_ENV
+          else
+            tar czf ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz ${{ matrix.artifact }}
+            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz" >> $GITHUB_ENV
+          fi
 
-        # Generate size report
-        find build-$PLATFORM -name "*.elf" -exec arm-none-eabi-size {} \; > release-package/size-report.txt
-
-        # Create archive
-        tar -czf nexus-${VERSION}-${PLATFORM}.tar.gz release-package/
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./nexus-${{ needs.create-release.outputs.version }}-${{ matrix.platform }}.tar.gz
-        asset_name: nexus-${{ needs.create-release.outputs.version }}-${{ matrix.platform }}.tar.gz
-        asset_content_type: application/gzip
-
-  # Build documentation for release
-  build-docs:
-    name: Build Release Documentation
-    needs: create-release
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y doxygen graphviz
-        pip install -r docs/sphinx/requirements.txt
-
-    - name: Build Documentation
-      run: |
-        # Build Doxygen
-        doxygen Doxyfile
-
-        # Build Sphinx
-        cd docs/sphinx
-        sphinx-build -b html . _build/html/en
-        sphinx-build -b html -D language=zh_CN . _build/html/zh_CN
-        cd ../..
-
-        # Package documentation
-        tar -czf nexus-${{ needs.create-release.outputs.version }}-docs.tar.gz docs/
-
-    - name: Upload Documentation Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./nexus-${{ needs.create-release.outputs.version }}-docs.tar.gz
-        asset_name: nexus-${{ needs.create-release.outputs.version }}-docs.tar.gz
-        asset_content_type: application/gzip
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.create-release.outputs.version }}
+          files: ${{ env.ASSET_PATH }}

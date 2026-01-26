@@ -1,0 +1,220 @@
+name: Build Matrix
+
+on:
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+env:
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+
+jobs:
+  matrix-build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows builds
+          - name: Windows MSVC Debug
+            os: windows-latest
+            preset: windows-msvc-debug
+            upload_artifacts: false
+          - name: Windows MSVC Release
+            os: windows-latest
+            preset: windows-msvc-release
+            upload_artifacts: true
+          - name: Windows GCC Release
+            os: windows-latest
+            preset: windows-gcc-release
+            upload_artifacts: false
+
+          # Linux builds
+          - name: Linux GCC Debug
+            os: ubuntu-latest
+            preset: linux-gcc-debug
+            upload_artifacts: false
+          - name: Linux GCC Release
+            os: ubuntu-latest
+            preset: linux-gcc-release
+            upload_artifacts: true
+          - name: Linux Clang Release
+            os: ubuntu-latest
+            preset: linux-clang-release
+            upload_artifacts: false
+
+          # macOS builds
+          - name: macOS Clang Release
+            os: macos-latest
+            preset: macos-clang-release
+            upload_artifacts: true
+
+          # ARM cross-compile
+          - name: ARM Cortex-M4 Release
+            os: ubuntu-latest
+            preset: cross-arm-release
+            upload_artifacts: true
+            is_arm: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          os: ${{ matrix.os }}
+          preset: ${{ matrix.preset }}
+
+      - name: Cache Build
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/${{ matrix.preset }}
+            !build/${{ matrix.preset }}/**/*.obj
+            !build/${{ matrix.preset }}/**/*.o
+          key: ${{ runner.os }}-${{ matrix.preset }}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.preset }}-
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --parallel
+
+      - name: Test
+        if: ${{ !matrix.is_arm }}
+        run: ctest --preset ${{ matrix.preset }} --output-on-failure --parallel 4
+
+      - name: Upload Artifacts
+        if: matrix.upload_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.preset }}
+          path: |
+            build/${{ matrix.preset }}/bin/*
+            build/${{ matrix.preset }}/lib/*
+          retention-days: 7
+
+  coverage:
+    name: Coverage Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          os: ubuntu-latest
+          preset: linux-gcc-coverage
+
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: coverage
+          max-size: 500M
+
+      - name: Configure
+        run: |
+          export PATH="/usr/lib/ccache:$PATH"
+          cmake --preset linux-gcc-coverage
+
+      - name: Build
+        run: |
+          export PATH="/usr/lib/ccache:$PATH"
+          cmake --build --preset linux-gcc-coverage --parallel $(nproc)
+
+      - name: Test
+        run: ctest --preset linux-gcc-coverage --output-on-failure --parallel $(nproc)
+
+      - name: Generate Coverage
+        run: |
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/ext/*' --output-file coverage.info
+          genhtml coverage.info --output-directory coverage_html
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.info
+          flags: unittests
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage_html/
+          retention-days: 30
+
+  sanitizer:
+    name: Sanitizer - ${{ matrix.sanitizer }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, undefined, thread]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          os: ubuntu-latest
+          preset: linux-gcc-debug
+
+      - name: Configure with Sanitizer
+        run: |
+          SANITIZER_FLAG=""
+          case "${{ matrix.sanitizer }}" in
+            address)
+              SANITIZER_FLAG="-fsanitize=address -fno-omit-frame-pointer"
+              ;;
+            undefined)
+              SANITIZER_FLAG="-fsanitize=undefined -fno-omit-frame-pointer"
+              ;;
+            thread)
+              SANITIZER_FLAG="-fsanitize=thread"
+              ;;
+          esac
+
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DNEXUS_PLATFORM=native \
+            -DNEXUS_BUILD_TESTS=ON \
+            -DCMAKE_C_FLAGS="$SANITIZER_FLAG" \
+            -DCMAKE_CXX_FLAGS="$SANITIZER_FLAG"
+
+      - name: Build
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Test with Sanitizer
+        run: ctest --test-dir build --output-on-failure --parallel $(nproc)
+        env:
+          ASAN_OPTIONS: detect_leaks=1:check_initialization_order=1
+          UBSAN_OPTIONS: print_stacktrace=1
+          TSAN_OPTIONS: second_deadlock_stack=1
+
+      - name: Upload Sanitizer Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanitizer-logs-${{ matrix.sanitizer }}
+          path: |
+            build/Testing/Temporary/*.log
+          retention-days: 7

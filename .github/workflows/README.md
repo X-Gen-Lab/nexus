@@ -2,50 +2,84 @@
 
 本目录包含 Nexus 项目的所有 GitHub Actions 工作流配置。
 
+## 工作流架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         ci.yml                              │
+│                    (主工作流调度器)                          │
+│  - 智能检测变更                                              │
+│  - 按需触发子工作流                                          │
+│  - 统一状态报告                                              │
+└────────┬────────────────────────────────────────────────────┘
+         │
+         ├─► build-matrix.yml (构建和测试)
+         ├─► quality-checks.yml (代码质量)
+         └─► docs-build.yml (文档)
+
+独立工作流:
+  • release.yml (发布)
+  • performance.yml (性能测试 - 定时)
+  • security.yml (安全扫描 - 定时)
+```
+
 ## 工作流概览
 
 ### 核心工作流
 
-#### 1. Build Workflow (`build.yml`)
-**触发条件**: Push 到 main/develop 分支，Pull Request
+#### 1. CI Workflow (`ci.yml`)
+**触发条件**: Push, Pull Request, 手动触发, 定时构建
 
 **功能**:
-- 多平台原生构建 (Ubuntu, Windows, macOS)
-- 多编译器支持 (GCC, Clang, MSVC)
-- ARM 交叉编译 (STM32F4, STM32H7)
-- 静态代码分析 (cppcheck, clang-format, clang-tidy)
-- 文档构建检查
+- 智能检测代码、文档、工作流变更
+- 根据变更类型触发相应的子工作流
+- 并发控制，避免重复构建
+- 统一的状态检查和报告
 
-**优化特性**:
-- 使用缓存加速构建 (CMake 构建缓存, ARM 工具链缓存)
-- 并行构建和测试
-- 构建报告生成
-- 失败时继续其他任务 (fail-fast: false)
+**子工作流调用**:
+- `build-matrix.yml` - 构建和测试
+- `quality-checks.yml` - 代码质量检查
+- `docs-build.yml` - 文档构建
 
-#### 2. Test Workflow (`test.yml`)
-**触发条件**: Push 到 main/develop 分支，Pull Request
+#### 2. Build Matrix (`build-matrix.yml`)
+**触发方式**: 由 `ci.yml` 调用
 
 **功能**:
+- 多平台构建 (Windows MSVC/GCC, Linux GCC/Clang, macOS Clang)
+- ARM 交叉编译 (Cortex-M4)
 - 单元测试执行
 - 代码覆盖率分析 (lcov)
-- 覆盖率阈值检查 (最低 95%, 目标 100%)
-- 多种 Sanitizer 测试 (Address, Undefined, Thread)
-- MISRA C 合规性检查
-- 覆盖率对比 (PR vs 基础分支)
-
-**覆盖率报告**:
 - 自动上传到 Codecov
-- PR 评论显示覆盖率变化
-- 详细的 HTML 报告
 
-#### 3. Documentation Workflow (`docs.yml`)
-**触发条件**: Push 到 main 分支，手动触发
+**优化特性**:
+- 使用 Composite Action 统一环境设置
+- 构建缓存 (CMake, ccache)
+- 并行构建和测试
+- 仅上传 Release 版本产物
+
+#### 3. Quality Checks (`quality-checks.yml`)
+**触发方式**: 由 `ci.yml` 调用
+
+**功能**:
+- 代码格式检查 (clang-format-14)
+- 静态分析 (clang-tidy, cppcheck)
+- 复杂度分析 (lizard, CCN < 15)
+- 注释规范检查 (Doxygen 风格)
+
+**检查项目**:
+- ✅ 格式必须符合 `.clang-format`
+- ✅ 不使用 `@` 风格的 Doxygen 标签
+- ✅ 不使用 `//` 单行注释
+- ✅ 函数复杂度和长度限制
+
+#### 4. Documentation Build (`docs-build.yml`)
+**触发方式**: 由 `ci.yml` 调用
 
 **功能**:
 - Doxygen API 文档生成
 - Sphinx 用户文档构建 (英文/中文)
-- 自动部署到 GitHub Pages
-- 多语言支持
+- 自动部署到 GitHub Pages (仅 main 分支)
+- 精美的语言选择页面
 
 **部署地址**:
 - 主页: https://nexus-platform.github.io/nexus/
@@ -53,18 +87,94 @@
 - 中文文档: https://nexus-platform.github.io/nexus/zh_CN/
 - API 文档: https://nexus-platform.github.io/nexus/api/
 
-#### 4. Validation Workflow (`validation.yml`)
-**触发条件**: Push 到 main/develop 分支，Pull Request，手动触发
-
-**功能**:
-- 综合验证测试 (单元测试 + 属性测试 + 集成测试)
-- 多平台验证矩阵
-- 覆盖率分析 (仅 Ubuntu Debug)
-- 验证报告生成
-
-### 增强工作流
+### 独立工作流
 
 #### 5. Release Workflow (`release.yml`)
+**触发条件**: 推送版本标签 (v*.*.*), 手动触发
+
+**功能**:
+- 自动创建 GitHub Release
+- 从 CHANGELOG.md 提取发布说明
+- 构建多平台发布包
+- 打包和上传发布资产
+
+**使用方法**:
+```bash
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+#### 6. Performance Workflow (`performance.yml`)
+**触发条件**: 每周一定时, 手动触发
+
+**功能**:
+- 性能基准测试
+- 内存分析 (Valgrind)
+- 代码大小分析 (ARM 平台)
+
+#### 7. Security Workflow (`security.yml`)
+**触发条件**: 每周日定时, 手动触发
+
+**功能**:
+- Python 依赖安全扫描 (Safety)
+- CodeQL 代码安全分析
+- 密钥泄露扫描 (TruffleHog)
+- 许可证合规性检查
+
+## Composite Action
+
+### Setup Build (`.github/actions/setup-build`)
+
+封装所有平台的构建环境设置，避免重复代码。
+
+**支持**:
+- Python 环境和依赖
+- MSVC / MinGW (Windows)
+- GCC / Clang (Linux)
+- Clang (macOS)
+- ARM 交叉编译工具链
+- ccache 编译缓存
+
+**使用示例**:
+```yaml
+- name: Setup Build Environment
+  uses: ./.github/actions/setup-build
+  with:
+    os: ubuntu-latest
+    preset: linux-gcc-release
+```
+
+## 工作流依赖关系
+
+```
+ci.yml (主调度器)
+├── build-matrix.yml
+│   ├── matrix-build (多平台)
+│   └── coverage (覆盖率)
+├── quality-checks.yml
+│   ├── format-check
+│   ├── static-analysis
+│   ├── complexity
+│   └── comment-style
+└── docs-build.yml
+    ├── build (构建文档)
+    └── deploy (部署到 Pages)
+
+release.yml (独立)
+├── create-release
+└── build-release (多平台)
+
+performance.yml (定时)
+├── benchmark
+├── memory-profile
+└── size-analysis
+
+security.yml (定时)
+├── dependency-scan
+├── codeql
+├── secret-scan
+└── license-check
+```
 **触发条件**: 推送版本标签 (v*.*.*), 手动触发
 
 **功能**:

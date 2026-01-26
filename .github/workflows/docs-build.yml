@@ -1,0 +1,179 @@
+name: Documentation Build
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y doxygen graphviz
+          pip install -r docs/sphinx/requirements.txt
+
+      - name: Build Doxygen
+        run: doxygen Doxyfile
+
+      - name: Build Sphinx (English)
+        working-directory: docs/sphinx
+        run: sphinx-build -b html . _build/html/en
+
+      - name: Build Sphinx (Chinese)
+        working-directory: docs/sphinx
+        run: sphinx-build -b html -D language=zh_CN . _build/html/zh_CN
+
+      - name: Prepare Pages
+        run: |
+          mkdir -p public
+
+          # Copy API documentation
+          if [ -d "docs/api/html" ]; then
+            cp -r docs/api/html public/api
+          fi
+
+          # Copy Sphinx documentation
+          cp -r docs/sphinx/_build/html/* public/
+
+          # Create language selection index page
+          cat > public/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <meta http-equiv="refresh" content="3; url=en/index.html">
+              <title>Nexus Documentation - Language Selection</title>
+              <style>
+                  * { box-sizing: border-box; margin: 0; padding: 0; }
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      min-height: 100vh;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  }
+                  .container {
+                      text-align: center;
+                      padding: 60px 40px;
+                      background: white;
+                      border-radius: 16px;
+                      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                      max-width: 500px;
+                      width: 90%;
+                  }
+                  .logo { font-size: 48px; margin-bottom: 20px; }
+                  h1 {
+                      color: #333;
+                      margin-bottom: 10px;
+                      font-size: 28px;
+                      font-weight: 600;
+                  }
+                  .subtitle {
+                      color: #666;
+                      margin-bottom: 30px;
+                      font-size: 16px;
+                  }
+                  .languages {
+                      display: flex;
+                      justify-content: center;
+                      gap: 20px;
+                      flex-wrap: wrap;
+                      margin-bottom: 20px;
+                  }
+                  a {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      padding: 20px 30px;
+                      background: #f8f9fa;
+                      color: #333;
+                      text-decoration: none;
+                      border-radius: 12px;
+                      transition: all 0.3s ease;
+                      border: 2px solid transparent;
+                      min-width: 140px;
+                  }
+                  a:hover {
+                      background: #667eea;
+                      color: white;
+                      transform: translateY(-4px);
+                      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+                  }
+                  a.api {
+                      background: #27ae60;
+                      color: white;
+                  }
+                  a.api:hover {
+                      background: #219a52;
+                  }
+                  .flag { font-size: 32px; margin-bottom: 8px; }
+                  .lang-name { font-weight: 500; font-size: 16px; }
+                  .redirect-notice {
+                      margin-top: 20px;
+                      color: #999;
+                      font-size: 14px;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="logo">📚</div>
+                  <h1>Nexus Embedded Platform</h1>
+                  <p class="subtitle">Select your preferred language</p>
+                  <div class="languages">
+                      <a href="en/index.html">
+                          <span class="flag">🇺🇸</span>
+                          <span class="lang-name">English</span>
+                      </a>
+                      <a href="zh_CN/index.html">
+                          <span class="flag">🇨🇳</span>
+                          <span class="lang-name">中文</span>
+                      </a>
+                      <a href="api/index.html" class="api">
+                          <span class="flag">📖</span>
+                          <span class="lang-name">API Docs</span>
+                      </a>
+                  </div>
+                  <p class="redirect-notice">Redirecting to English in 3 seconds...</p>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    name: Deploy to Pages
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

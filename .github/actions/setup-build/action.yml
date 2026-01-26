@@ -1,0 +1,86 @@
+name: Setup Build Environment
+description: Setup build tools and dependencies for Nexus
+
+inputs:
+  os:
+    description: 'Operating system (windows-latest, ubuntu-latest, macos-latest)'
+    required: true
+  preset:
+    description: 'CMake preset name'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Python Dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Setup MSVC (Windows)
+      if: runner.os == 'Windows' && contains(inputs.preset, 'msvc')
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Setup MinGW (Windows)
+      if: runner.os == 'Windows' && contains(inputs.preset, 'gcc')
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-ninja
+
+    - name: Install Build Tools (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build ccache
+
+        if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
+          sudo apt-get install -y clang-14 clang-tidy-14
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-14 100
+        fi
+
+        if [[ "${{ inputs.preset }}" == *"gcc"* ]]; then
+          sudo apt-get install -y gcc g++
+        fi
+
+        if [[ "${{ inputs.preset }}" == *"coverage"* ]]; then
+          sudo apt-get install -y lcov
+        fi
+
+        if [[ "${{ inputs.preset }}" == *"arm"* ]]; then
+          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+        fi
+
+    - name: Setup ccache (Linux)
+      if: runner.os == 'Linux'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ inputs.preset }}
+        max-size: 500M
+
+    - name: Install Build Tools (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: brew install cmake ninja ccache
+
+    - name: Setup ccache (macOS)
+      if: runner.os == 'macOS'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ inputs.preset }}
+        max-size: 500M
