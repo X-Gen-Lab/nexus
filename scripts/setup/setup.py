@@ -647,10 +647,6 @@ def main():
     else:
         print_error(f"不支持的操作系统: {system}")
         return 1
-        success = install_macos_dependencies(args.platform, args.dev, args.docs)
-    else:
-        print_error(f"不支持的操作系统: {system}")
-        return 1
 
     if not success:
         print_error("依赖安装失败")
