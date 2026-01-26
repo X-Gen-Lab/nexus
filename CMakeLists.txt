@@ -53,6 +53,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Include CMake modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
+# Platform detection and configuration
+include(NexusPlatform)
+nexus_set_default_build_type()
+nexus_configure_platform()
+nexus_configure_output_directories()
+
 # Find Python for configuration generation
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 message(STATUS "Found Python: ${Python3_EXECUTABLE}")
@@ -81,64 +87,14 @@ endif()
 ##############################################################################
 # Compiler Flags
 ##############################################################################
-if(MSVC)
-    # MSVC compiler flags
-    add_compile_options(
-        /W4
-        /WX
-        /wd4100  # unreferenced formal parameter
-        /FS      # Allow parallel compilation with shared PDB
-    )
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_definitions(DEBUG)
-    else()
-        add_compile_definitions(NDEBUG)
-    endif()
 
-    # Coverage support for MSVC
-    # Note: Use OpenCppCoverage or Visual Studio Code Coverage tools
-    # CMake does not directly support coverage flags for MSVC
-    if(NEXUS_ENABLE_COVERAGE)
-        message(STATUS "Code coverage enabled for MSVC")
-        message(STATUS "Use OpenCppCoverage or Visual Studio Code Coverage tools")
-    endif()
+# Configure compiler flags based on detected platform and compiler
+# Only apply if not cross-compiling (native platform)
+if(NEXUS_PLATFORM STREQUAL "native")
+    nexus_configure_compiler_flags()
 else()
-    # GCC/Clang compiler flags
-    add_compile_options(
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Werror
-        -Wno-unused-parameter
-        -ffunction-sections
-        -fdata-sections
-    )
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(-Og -g3)
-        add_compile_definitions(DEBUG)
-    else()
-        add_compile_options(-O2)
-        add_compile_definitions(NDEBUG)
-    endif()
-
-    # Coverage flags (GCC/Clang only)
-    if(NEXUS_ENABLE_COVERAGE)
-        message(STATUS "Code coverage enabled")
-        add_compile_options(--coverage -O0 -g)
-        add_link_options(--coverage)
-
-        # Additional flags for better coverage data
-        if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-            add_compile_options(-fprofile-arcs -ftest-coverage)
-        endif()
-
-        # Disable unused warnings for coverage build (device registration disabled)
-        add_compile_options(
-            -Wno-unused-function
-            -Wno-unused-variable
-            -Wno-unused-const-variable
-        )
-    endif()
+    # Cross-compilation: flags are set by toolchain file
+    message(STATUS "Using toolchain-provided compiler flags for ${NEXUS_PLATFORM}")
 endif()
 
 ##############################################################################
@@ -191,8 +147,10 @@ function(nexus_generate_config)
         # Use existing .config file
         execute_process(
             COMMAND ${Python3_EXECUTABLE} ${GENERATOR_SCRIPT}
+                    --kconfig ${NEXUS_KCONFIG_FILE}
                     --config ${NEXUS_CONFIG_FILE}
                     --output ${NEXUS_CONFIG_HEADER}
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             RESULT_VARIABLE RESULT
             OUTPUT_VARIABLE OUTPUT
             ERROR_VARIABLE ERROR
@@ -210,8 +168,10 @@ function(nexus_generate_config)
             # Fall back to default configuration
             execute_process(
                 COMMAND ${Python3_EXECUTABLE} ${GENERATOR_SCRIPT}
+                        --kconfig ${NEXUS_KCONFIG_FILE}
                         --default
                         --output ${NEXUS_CONFIG_HEADER}
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 RESULT_VARIABLE RESULT
                 ERROR_QUIET
             )
@@ -225,8 +185,10 @@ function(nexus_generate_config)
         message(STATUS "No .config file found, generating default configuration...")
         execute_process(
             COMMAND ${Python3_EXECUTABLE} ${GENERATOR_SCRIPT}
+                    --kconfig ${NEXUS_KCONFIG_FILE}
                     --default
                     --output ${NEXUS_CONFIG_HEADER}
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             RESULT_VARIABLE RESULT
             OUTPUT_VARIABLE OUTPUT
             ERROR_QUIET
