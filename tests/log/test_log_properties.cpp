@@ -96,7 +96,9 @@ TEST_F(LogPropertyTest, Property2_LevelFilteringConsistency) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -214,7 +216,10 @@ TEST_F(LogPropertyTest, Property_LevelOrderingInvariant) {
                                    .async_mode = false,
                                    .buffer_size = 0,
                                    .max_msg_len = 0,
-                                   .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                                   .color_enabled = false,
+                                   .async_queue_size = 0,
+                                   .async_policy =
+                                       LOG_ASYNC_POLICY_DROP_OLDEST};
 
             ASSERT_EQ(LOG_OK, log_init(&config))
                 << "Iteration " << test_iter << ": init failed";
@@ -284,7 +289,9 @@ TEST_F(LogPropertyTest, Property_InitDeinitIdempotence) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         /* Init should succeed */
         ASSERT_EQ(LOG_OK, log_init(&config))
@@ -428,7 +435,9 @@ TEST_F(LogPropertyTest, Property5_FormatPatternSubstitution) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -476,7 +485,9 @@ TEST_F(LogPropertyTest, Property6_MessageTruncation) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = max_len,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -595,7 +606,9 @@ TEST_F(LogPropertyTest, Property7_MultiBackendDelivery) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -688,7 +701,9 @@ TEST_F(LogPropertyTest, Property8_BackendRegistrationUnregistration) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -799,7 +814,9 @@ TEST_F(LogPropertyTest, Property9_BackendFailureIsolation) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -915,7 +932,9 @@ TEST_F(LogPropertyTest, Property10_ModuleLevelFiltering) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -1014,7 +1033,9 @@ TEST_F(LogPropertyTest, Property11_ModuleLevelFallback) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -1136,7 +1157,9 @@ TEST_F(LogPropertyTest, Property12_WildcardPatternMatching) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -1512,7 +1535,9 @@ TEST_F(LogPropertyTest, Property16_ThreadSafetyMessageIntegrity) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 128,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -1630,7 +1655,9 @@ TEST_F(LogPropertyTest, Property17_MaxMessageLengthEnforcement) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = max_msg_len,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -1739,7 +1766,10 @@ TEST_F(LogPropertyTest, Property18_InitDeinitLifecycle) {
                                    .async_mode = false,
                                    .buffer_size = 0,
                                    .max_msg_len = 0,
-                                   .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                                   .color_enabled = false,
+                                   .async_queue_size = 0,
+                                   .async_policy =
+                                       LOG_ASYNC_POLICY_DROP_OLDEST};
 
             /* Init should succeed */
             log_status_t init_status = log_init(&config);
@@ -1874,7 +1904,9 @@ TEST_F(LogPropertyTest, Property19_RuntimeReconfiguration) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -1983,7 +2015,9 @@ TEST_F(LogPropertyTest, Property19b_FormatRuntimeReconfiguration) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";
@@ -2067,7 +2101,9 @@ TEST_F(LogPropertyTest, Property19c_MaxMsgLenRuntimeReconfiguration) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 128,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         ASSERT_EQ(LOG_OK, log_init(&config))
             << "Iteration " << test_iter << ": init failed";

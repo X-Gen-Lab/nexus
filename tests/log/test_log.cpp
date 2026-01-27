@@ -61,7 +61,9 @@ TEST_F(LogTest, InitWithValidConfig) {
                            .async_mode = false,
                            .buffer_size = 512,
                            .max_msg_len = 64,
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
     EXPECT_TRUE(log_is_initialized());
@@ -83,7 +85,9 @@ TEST_F(LogTest, InitWithAllLevels) {
                                .async_mode = false,
                                .buffer_size = 0,
                                .max_msg_len = 0,
-                               .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                               .color_enabled = false,
+                               .async_queue_size = 0,
+                               .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
         EXPECT_EQ(LOG_OK, log_init(&config)) << "Failed for level " << level;
         EXPECT_EQ(level, log_get_level()) << "Level mismatch for " << level;
@@ -111,7 +115,9 @@ TEST_F(LogTest, InitWithInvalidLevel) {
         .async_mode = false,
         .buffer_size = 0,
         .max_msg_len = 0,
-        .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+        .color_enabled = false,
+        .async_queue_size = 0,
+        .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_ERROR_INVALID_PARAM, log_init(&config));
     EXPECT_FALSE(log_is_initialized());
@@ -275,7 +281,9 @@ TEST_F(LogTest, StateResetAfterDeinit) {
                            .async_mode = false,
                            .buffer_size = 0,
                            .max_msg_len = 0,
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
     EXPECT_EQ(LOG_LEVEL_ERROR, log_get_level());
@@ -393,7 +401,9 @@ TEST_F(LogTest, MaxMessageLengthConfig) {
                            .async_mode = false,
                            .buffer_size = 0,
                            .max_msg_len = 32,
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
     EXPECT_EQ(32u, log_get_max_msg_len());
@@ -427,7 +437,9 @@ TEST_F(LogTest, CustomFormatInConfig) {
                            .async_mode = false,
                            .buffer_size = 0,
                            .max_msg_len = 0,
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
     EXPECT_STREQ("[%l] %m", log_get_format());
@@ -1608,7 +1620,9 @@ TEST_F(LogTest, MessageTruncationWithBackend) {
                            .async_mode = false,
                            .buffer_size = 0,
                            .max_msg_len = 20,
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
     EXPECT_EQ(20u, log_get_max_msg_len());
@@ -1649,7 +1663,9 @@ TEST_F(LogTest, MessageWithinLengthLimit) {
                            .async_mode = false,
                            .buffer_size = 0,
                            .max_msg_len = 100,
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
 
@@ -1737,7 +1753,9 @@ TEST_F(LogTest, MinimumMaxMsgLen) {
                            .async_mode = false,
                            .buffer_size = 0,
                            .max_msg_len = 5, /* Very small */
-                           .color_enabled = false, .async_queue_size = 0, .async_policy = LOG_ASYNC_POLICY_DROP};
+                           .color_enabled = false,
+                           .async_queue_size = 0,
+                           .async_policy = LOG_ASYNC_POLICY_DROP_OLDEST};
 
     EXPECT_EQ(LOG_OK, log_init(&config));
     EXPECT_EQ(5u, log_get_max_msg_len());
