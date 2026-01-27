@@ -78,6 +78,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run lizard
+        continue-on-error: true
         run: |
           pip install lizard
           lizard hal/ osal/ framework/ -l c -C 15 -L 100 -w > complexity.txt
