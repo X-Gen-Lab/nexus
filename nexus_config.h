@@ -4,7 +4,7 @@
  * \author          Nexus Team
  *
  * This file is auto-generated from Kconfig. Do not edit manually.
- * Generated: 2026-01-27 21:12:23
+ * Generated: 2026-01-27 21:59:24
  */
 
 #ifndef NEXUS_CONFIG_H

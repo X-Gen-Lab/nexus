@@ -221,7 +221,7 @@ typedef volatile uint8_t nx_reg8_t;
 
 /** Get offset of member in structure */
 #ifndef offsetof
-#define offsetof(type, member) ((size_t) & ((type*)0)->member)
+#define offsetof(type, member) ((size_t)&((type*)0)->member)
 #endif
 
 /** Get container structure from member pointer */
