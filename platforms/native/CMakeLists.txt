@@ -213,6 +213,7 @@ target_sources(platform_native
 target_sources(platform_native
     PRIVATE
         src/platform/nx_platform_init.c
+        src/platform/nx_init_sections_stub.c
 )
 
 #-----------------------------------------------------------------------------
@@ -246,3 +247,15 @@ if(MSVC)
 endif()
 
 # Native platform doesn't need linker script
+
+#-----------------------------------------------------------------------------
+# Windows MinGW/GCC Linker Flags
+#-----------------------------------------------------------------------------
+# Force inclusion of init function section symbols for Windows MinGW/GCC
+if(MINGW OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+    target_link_options(platform_native
+        PUBLIC
+            -Wl,--undefined=__nx_init_fn_start
+            -Wl,--undefined=__nx_init_fn_end
+    )
+endif()

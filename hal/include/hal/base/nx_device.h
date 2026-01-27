@@ -31,6 +31,26 @@ extern "C" {
 #define NX_CONCAT(a, ...)  _NX_CONCAT(a, __VA_ARGS__)
 
 /*---------------------------------------------------------------------------*/
+/* Platform Detection                                                        */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           Determine if manual device registration is needed
+ * \details         Manual registration is used when:
+ *                  - Native platform (for testing on host)
+ *                  - MSVC compiler (no linker section support)
+ *                  - Unknown compilers without linker section support
+ */
+#if defined(NEXUS_PLATFORM_NATIVE) || defined(_MSC_VER) ||                     \
+    (!defined(__GNUC__) && !defined(__ARMCC_VERSION) &&                        \
+     !defined(__ICCARM__) && !defined(__TI_ARM__) && !defined(__TASKING__) &&  \
+     !defined(__CC_ARM))
+#define NX_DEVICE_MANUAL_REGISTRATION 1
+#else
+#define NX_DEVICE_MANUAL_REGISTRATION 0
+#endif
+
+/*---------------------------------------------------------------------------*/
 /* Device State Structure                                                    */
 /*---------------------------------------------------------------------------*/
 
@@ -83,8 +103,8 @@ typedef struct nx_device_s {
  *                    &uart0_state, uart0_init);
  * \endcode
  */
-#if defined(_MSC_VER)
-/* MSVC: Devices are not static so they can be manually registered */
+#if NX_DEVICE_MANUAL_REGISTRATION
+/* Manual registration: Devices are not static */
 #define NX_DEVICE_REGISTER(device_type, index, device_name, device_config,     \
                            device_state, init)                                 \
     const nx_device_t NX_CONCAT(device_type, index) = {                        \
@@ -94,7 +114,7 @@ typedef struct nx_device_s {
         .device_init = init,                                                   \
     }
 #else
-/* GCC/Clang style attributes */
+/* Linker section: Devices are static and placed in .nx_device section */
 #define NX_DEVICE_REGISTER(device_type, index, device_name, device_config,     \
                            device_state, init)                                 \
     NX_USED NX_SECTION(".nx_device")                                           \
@@ -161,17 +181,16 @@ void* nx_device_init(const nx_device_t* dev);
 void* nx_device_get(const char* name);
 
 /*---------------------------------------------------------------------------*/
-/* Manual Registration (for MSVC and testing)                                */
+/* Manual Registration (for MSVC, native platform, and testing)              */
 /*---------------------------------------------------------------------------*/
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
+#if NX_DEVICE_MANUAL_REGISTRATION
 
 /**
  * \brief           Manually register a device
  * \param[in]       dev: Device descriptor pointer
  * \return          NX_OK on success, error code otherwise
- * \note            Only available on platforms without linker section support
+ * \note            Available on platforms without linker section support
  *                  This function is not thread-safe
  */
 nx_status_t nx_device_register(const nx_device_t* dev);

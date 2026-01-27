@@ -8,12 +8,12 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 
+#include "hal/base/nx_device.h"
 #include <gtest/gtest.h>
 
-/* Include native test helpers for MSVC device setup */
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
-#include "hal/native/native_test_helpers.h"
+/* Include native test helpers for manual device registration */
+#if NX_DEVICE_MANUAL_REGISTRATION
+#include "native_test_helpers.h"
 #endif
 
 /**
@@ -25,17 +25,15 @@
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
-    /* MSVC: Setup devices before running tests */
+#if NX_DEVICE_MANUAL_REGISTRATION
+    /* Setup devices before running tests (manual registration) */
     native_test_setup_devices();
 #endif
 
     int result = RUN_ALL_TESTS();
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
-    /* MSVC: Cleanup devices after running tests */
+#if NX_DEVICE_MANUAL_REGISTRATION
+    /* Cleanup devices after running tests */
     native_test_cleanup_devices();
 #endif
 

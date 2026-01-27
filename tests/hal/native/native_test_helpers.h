@@ -43,22 +43,21 @@ nx_status_t native_get_device_state(const char* device_name, bool* initialized,
 void native_reset_all(void);
 
 /*---------------------------------------------------------------------------*/
-/* MSVC Test Support                                                         */
+/* Manual Device Registration Support                                        */
 /*---------------------------------------------------------------------------*/
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
+#if NX_DEVICE_MANUAL_REGISTRATION
 
 /**
- * \brief           Setup test devices for MSVC
- * \note            Call this before running tests on MSVC
+ * \brief           Setup test devices
+ * \note            Call this before running tests
  *                  Registers all test devices manually
  */
 void native_test_setup_devices(void);
 
 /**
- * \brief           Cleanup test devices for MSVC
- * \note            Call this after running tests on MSVC
+ * \brief           Cleanup test devices
+ * \note            Call this after running tests
  *                  Clears all registered devices
  */
 void native_test_cleanup_devices(void);

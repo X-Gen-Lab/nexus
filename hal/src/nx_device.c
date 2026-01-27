@@ -43,9 +43,11 @@ static const nx_device_t __nx_device_default[1] = {{0}};
     (&Image$$nx_device$$Limit ? (const nx_device_t*)&Image$$nx_device$$Limit   \
                               : __nx_device_default)
 
-/* GCC / Clang / Arm Compiler 6 / IAR / TI / TASKING use standard symbols */
-#elif defined(__GNUC__) || defined(__ARMCC_VERSION) || defined(__ICCARM__) ||  \
-    defined(__TI_ARM__) || defined(__TASKING__)
+/* GCC / Clang / Arm Compiler 6 / IAR / TI / TASKING use linker sections */
+/* Native platform always uses manual registration even with GCC */
+#elif !defined(NEXUS_PLATFORM_NATIVE) &&                                       \
+    (defined(__GNUC__) || defined(__ARMCC_VERSION) || defined(__ICCARM__) ||   \
+     defined(__TI_ARM__) || defined(__TASKING__))
 
 /**
  * \brief           Start of device registry section
@@ -63,7 +65,7 @@ static const nx_device_t __nx_device_default[1] = {{0}};
     (__nx_device_start ? __nx_device_start : __nx_device_default)
 #define DEVICE_END (__nx_device_end ? __nx_device_end : __nx_device_default)
 
-/* MSVC and unknown compilers without weak symbol support */
+/* Native platform, MSVC, and other compilers use manual registration */
 #else
 
 #ifndef NX_DEVICE_REGISTRY_SIZE
@@ -90,9 +92,8 @@ const nx_device_t* nx_device_find(const char* name) {
         return NULL;
     }
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
-    /* MSVC: iterate through pointer array */
+#if NX_DEVICE_MANUAL_REGISTRATION
+    /* Manual registration: iterate through pointer array */
     for (size_t i = 0; i < __nx_device_count; i++) {
         const nx_device_t* dev = __nx_device_registry[i];
         if (dev->name != NULL && strcmp(dev->name, name) == 0) {
@@ -100,7 +101,7 @@ const nx_device_t* nx_device_find(const char* name) {
         }
     }
 #else
-    /* GCC/Clang: iterate through linker section */
+    /* Linker section: iterate through section */
     for (const nx_device_t* dev = DEVICE_START; dev < DEVICE_END; dev++) {
         if (dev->name != NULL && strcmp(dev->name, name) == 0) {
             return dev;
@@ -156,17 +157,16 @@ void* nx_device_get(const char* name) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Manual Registration (for MSVC and testing)                                */
+/* Manual Registration (for MSVC, native platform, and testing)              */
 /*---------------------------------------------------------------------------*/
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
+#if NX_DEVICE_MANUAL_REGISTRATION
 
 /**
  * \brief           Manually register a device
- * \details         This function is only available on platforms without
- *                  linker section support (e.g., MSVC). It allows manual
- *                  registration of devices for testing purposes.
+ * \details         This function is available on platforms without linker
+ *                  section support (e.g., MSVC, Windows native testing).
+ *                  It allows manual registration of devices.
  * \note            This function is not thread-safe
  */
 nx_status_t nx_device_register(const nx_device_t* dev) {

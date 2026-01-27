@@ -53,11 +53,10 @@ void native_reset_all(void) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* MSVC Test Support                                                         */
+/* Manual Device Registration Support                                        */
 /*---------------------------------------------------------------------------*/
 
-#if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
-    !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
+#if NX_DEVICE_MANUAL_REGISTRATION
 
 /* Forward declarations of device descriptors */
 /* These will be defined by NX_DEVICE_REGISTER in device helper files */
