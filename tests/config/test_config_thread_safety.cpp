@@ -52,7 +52,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentWrites) {
 
     /* Each thread writes to its own key */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations]() {
+        threads.emplace_back([t]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "thread%d.value", t);
@@ -92,7 +92,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentReads) {
 
     /* Multiple threads reading same keys */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([iterations, &error_count]() {
+        threads.emplace_back([&error_count]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "read.key%d", i % 10);
@@ -125,7 +125,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentReadWrite) {
 
     /* Writer threads */
     for (int t = 0; t < num_writers; t++) {
-        threads.emplace_back([t, iterations]() {
+        threads.emplace_back([t]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "rw.key%d", t);
@@ -136,7 +136,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentReadWrite) {
 
     /* Reader threads */
     for (int t = 0; t < num_readers; t++) {
-        threads.emplace_back([num_writers, iterations, &error_count]() {
+        threads.emplace_back([&error_count]() {
             for (int i = 0; i < iterations; i++) {
                 for (int w = 0; w < num_writers; w++) {
                     char key[32];
@@ -175,7 +175,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentNamespaceOperations) {
 
     /* Each thread operates on its own namespace */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations, &error_count]() {
+        threads.emplace_back([t, &error_count]() {
             char ns_name[32];
             snprintf(ns_name, sizeof(ns_name), "ns%d", t);
 
@@ -245,7 +245,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentCallbackTriggers) {
 
     /* Multiple threads triggering callbacks */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations]() {
+        threads.emplace_back([t]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "cb.thread%d", t);
@@ -281,7 +281,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentDeleteAndCreate) {
 
     /* Threads alternately create and delete keys */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations, &error_count]() {
+        threads.emplace_back([t, &error_count]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "del.thread%d", t);
@@ -323,7 +323,7 @@ TEST_F(ConfigThreadSafetyTest, StressTestManyThreads) {
 
     /* Mix of operations from many threads */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations, &error_count]() {
+        threads.emplace_back([&error_count]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "stress.key%d", i % 20);
@@ -377,7 +377,7 @@ TEST_F(ConfigThreadSafetyTest, NoDataRaceOnSameKey) {
 
     /* Multiple threads writing to same key */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations]() {
+        threads.emplace_back([t]() {
             for (int i = 0; i < iterations; i++) {
                 /* All threads write to same key */
                 config_set_i32("race.test", t * 1000 + i);
@@ -423,7 +423,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentMixedTypes) {
 
     /* Each thread uses different data types */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations, &error_count]() {
+        threads.emplace_back([t, &error_count]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "type.thread%d", t);
@@ -483,7 +483,7 @@ TEST_F(ConfigThreadSafetyTest, ConcurrentCommit) {
 
     /* Multiple threads setting values and committing */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations, &error_count]() {
+        threads.emplace_back([t, &error_count]() {
             for (int i = 0; i < iterations; i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "commit.thread%d", t);
@@ -532,7 +532,7 @@ TEST_F(ConfigThreadSafetyTest, NoDeadlockWithCallbacks) {
 
     /* Worker threads */
     for (int t = 0; t < num_threads; t++) {
-        threads.emplace_back([t, iterations, &timeout, &completed]() {
+        threads.emplace_back([t, &timeout]() {
             for (int i = 0; i < iterations && !timeout.load(); i++) {
                 char key[32];
                 snprintf(key, sizeof(key), "deadlock.thread%d.key%d", t, i);
@@ -545,7 +545,7 @@ TEST_F(ConfigThreadSafetyTest, NoDeadlockWithCallbacks) {
     }
 
     /* Timeout thread - reduced timeout */
-    std::thread timeout_thread([&timeout, &completed, &threads]() {
+    std::thread timeout_thread([&timeout, &completed]() {
         std::this_thread::sleep_for(std::chrono::seconds(2));
         if (!completed.load()) {
             timeout.store(true);
