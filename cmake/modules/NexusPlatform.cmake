@@ -189,6 +189,7 @@ macro(nexus_configure_compiler_flags)
             add_compile_options(
                 -Wno-unused-function
                 -Wno-unused-variable
+                -Wno-missing-field-initializers
             )
         endif()
     endif()
