@@ -437,4 +437,4 @@ static nx_power_t* sdio_get_power(nx_sdio_t* self) {
 /**
  * \brief           Register all enabled SDIO instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_SDIO_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_SDIO_DEVICE_REGISTER, DEVICE_TYPE)

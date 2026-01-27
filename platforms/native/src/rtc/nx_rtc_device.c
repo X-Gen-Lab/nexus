@@ -144,4 +144,4 @@ NX_UNUSED static void* nx_rtc_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled RTC instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_RTC_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_RTC_DEVICE_REGISTER, DEVICE_TYPE)

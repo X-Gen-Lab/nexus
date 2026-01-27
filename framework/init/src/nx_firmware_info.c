@@ -60,8 +60,8 @@ const nx_firmware_info_t* nx_get_firmware_info(void) {
     return _nx_get_firmware_info_test();
 #else
     /* Check if firmware info was defined (weak symbol check) */
-    /* If the weak symbol is not overridden, it will be zero/null */
-    if (&nx_firmware_info != NULL && nx_firmware_info.product[0] != '\0') {
+    /* If the weak symbol is not overridden, product field will be empty */
+    if (nx_firmware_info.product[0] != '\0') {
         return &nx_firmware_info;
     }
     return NULL;

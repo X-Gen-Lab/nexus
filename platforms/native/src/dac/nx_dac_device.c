@@ -248,4 +248,4 @@ static void* nx_dac_device_init(const nx_device_t* dev) {
 /**
  * \brief           Configuration macro - reads from Kconfig
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_DAC_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_DAC_DEVICE_REGISTER, DEVICE_TYPE)

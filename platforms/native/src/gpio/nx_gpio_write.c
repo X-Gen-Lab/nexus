@@ -88,7 +88,7 @@ static nx_power_t* gpio_write_get_power(nx_gpio_write_t* self) {
 /**
  * \brief           Initialize GPIO write interface
  */
-static void gpio_init_write(nx_gpio_write_t* write) {
+void gpio_init_write(nx_gpio_write_t* write) {
     write->write = gpio_write;
     write->toggle = gpio_toggle;
     write->get_lifecycle = gpio_write_get_lifecycle;

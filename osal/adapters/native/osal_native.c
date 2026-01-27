@@ -33,6 +33,11 @@
 #include <sched.h>
 #include <time.h>
 #include <unistd.h>
+
+/* macOS compatibility: Define PTHREAD_STACK_MIN if not available */
+#ifndef PTHREAD_STACK_MIN
+#define PTHREAD_STACK_MIN 16384
+#endif
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -448,8 +453,8 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
     if (config->stack_size > 0) {
         size_t stack_size = config->stack_size;
         /* Ensure minimum stack size */
-        if (stack_size < PTHREAD_STACK_MIN) {
-            stack_size = PTHREAD_STACK_MIN;
+        if (stack_size < (size_t)PTHREAD_STACK_MIN) {
+            stack_size = (size_t)PTHREAD_STACK_MIN;
         }
         pthread_attr_setstacksize(&attr, stack_size);
     }
@@ -955,6 +960,21 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
         }
         return OSAL_ERROR_TIMEOUT;
     } else {
+#ifdef __APPLE__
+        /* macOS doesn't support pthread_mutex_timedlock */
+        /* Use polling approach with small sleeps */
+        uint32_t elapsed = 0;
+        while (elapsed < timeout_ms) {
+            if (pthread_mutex_trylock(&mutex->mutex) == 0) {
+                mutex->locked = true;
+                mutex->owner = current_task;
+                return OSAL_OK;
+            }
+            usleep(1000); /* Sleep 1ms */
+            elapsed++;
+        }
+        return OSAL_ERROR_TIMEOUT;
+#else
         struct timespec ts;
         ms_to_timespec(timeout_ms, &ts);
 
@@ -967,6 +987,7 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
             return OSAL_ERROR_TIMEOUT;
         }
         return OSAL_ERROR;
+#endif
     }
 #endif
 }

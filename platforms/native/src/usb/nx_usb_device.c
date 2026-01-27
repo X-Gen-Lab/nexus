@@ -242,4 +242,4 @@ static void* nx_usb_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled USB instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_USB_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_USB_DEVICE_REGISTER, DEVICE_TYPE)

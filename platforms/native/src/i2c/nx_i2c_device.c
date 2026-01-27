@@ -290,4 +290,4 @@ static void* nx_i2c_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled I2C instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_I2C_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_I2C_DEVICE_REGISTER, DEVICE_TYPE)

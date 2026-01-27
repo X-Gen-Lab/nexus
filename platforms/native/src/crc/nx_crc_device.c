@@ -141,4 +141,4 @@ static void* nx_crc_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled CRC instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_CRC_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_CRC_DEVICE_REGISTER, DEVICE_TYPE)

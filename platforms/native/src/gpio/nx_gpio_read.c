@@ -93,7 +93,7 @@ static nx_power_t* gpio_read_get_power(nx_gpio_read_t* self) {
 /**
  * \brief           Initialize GPIO read interface
  */
-static void gpio_init_read(nx_gpio_read_t* read) {
+void gpio_init_read(nx_gpio_read_t* read) {
     read->read = gpio_read;
     read->register_exti = gpio_register_exti;
     read->get_lifecycle = gpio_read_get_lifecycle;

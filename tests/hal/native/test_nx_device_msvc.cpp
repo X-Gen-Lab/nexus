@@ -55,7 +55,8 @@ class MSVCDeviceRegistrationTest : public ::testing::Test {
 };
 
 /* Static member initialization */
-nx_device_config_state_t MSVCDeviceRegistrationTest::test_state = {0, false};
+nx_device_config_state_t MSVCDeviceRegistrationTest::test_state = {0, false,
+                                                                   nullptr};
 
 /*---------------------------------------------------------------------------*/
 /* Basic Registration Tests - Requirements 1.2, 1.3                          */
@@ -89,9 +90,9 @@ TEST_F(MSVCDeviceRegistrationTest, RegisterMultipleDevices) {
 #if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
     !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
     /* Create multiple test devices */
-    nx_device_config_state_t state1 = {0, false};
-    nx_device_config_state_t state2 = {0, false};
-    nx_device_config_state_t state3 = {0, false};
+    nx_device_config_state_t state1 = {0, false, nullptr};
+    nx_device_config_state_t state2 = {0, false, nullptr};
+    nx_device_config_state_t state3 = {0, false, nullptr};
 
     nx_device_t device1 = {
         .name = "DEVICE1",
@@ -144,8 +145,8 @@ TEST_F(MSVCDeviceRegistrationTest, ClearRemovesAllDevices) {
 #if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
     !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
     /* Register multiple devices */
-    nx_device_config_state_t state1 = {0, false};
-    nx_device_config_state_t state2 = {0, false};
+    nx_device_config_state_t state1 = {0, false, nullptr};
+    nx_device_config_state_t state2 = {0, false, nullptr};
 
     nx_device_t device1 = {
         .name = "CLEAR_TEST1",
@@ -363,8 +364,8 @@ TEST_F(MSVCDeviceRegistrationTest, RegisterDuplicateNames) {
 #if !defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__ICCARM__) && \
     !defined(__TI_ARM__) && !defined(__TASKING__) && !defined(__CC_ARM)
     /* Create two devices with same name */
-    nx_device_config_state_t state1 = {0, false};
-    nx_device_config_state_t state2 = {0, false};
+    nx_device_config_state_t state1 = {0, false, nullptr};
+    nx_device_config_state_t state2 = {0, false, nullptr};
 
     nx_device_t device1 = {
         .name = "DUPLICATE",

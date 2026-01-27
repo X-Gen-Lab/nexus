@@ -117,4 +117,4 @@ static void* nx_flash_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled Flash instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_FLASH_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_FLASH_DEVICE_REGISTER, DEVICE_TYPE)

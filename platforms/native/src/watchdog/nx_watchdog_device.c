@@ -140,4 +140,4 @@ static void* nx_watchdog_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled ADC instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_WATCHDOG_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_WATCHDOG_DEVICE_REGISTER, DEVICE_TYPE)

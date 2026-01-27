@@ -301,4 +301,4 @@ NX_UNUSED static void* nx_uart_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled UART instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_UART_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_UART_DEVICE_REGISTER, DEVICE_TYPE)

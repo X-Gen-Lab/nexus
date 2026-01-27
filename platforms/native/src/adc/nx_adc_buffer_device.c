@@ -271,4 +271,4 @@ static void* nx_adc_buffer_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled ADC buffer instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_ADC_BUFFER_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_ADC_BUFFER_DEVICE_REGISTER, DEVICE_TYPE)

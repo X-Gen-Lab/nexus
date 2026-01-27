@@ -290,4 +290,4 @@ static void* nx_spi_device_init(const nx_device_t* dev) {
 /**
  * \brief           Register all enabled SPI instances
  */
-NX_TRAVERSE_EACH_INSTANCE(NX_SPI_DEVICE_REGISTER, DEVICE_TYPE);
+NX_TRAVERSE_EACH_INSTANCE(NX_SPI_DEVICE_REGISTER, DEVICE_TYPE)
