@@ -63,7 +63,9 @@ typedef unsigned int size_t;
 #ifndef _STDBOOL_H
 #ifndef __cplusplus
 typedef unsigned char bool;
+// clang-format off
 #define true  1
+// clang-format on
 #define false 0
 #endif
 #define __bool_true_false_are_defined 1
@@ -211,29 +213,41 @@ typedef volatile uint8_t nx_reg8_t;
 #define NX_CLAMP(val, min, max) (NX_MIN(NX_MAX((val), (min)), (max)))
 
 /** Check if value is power of 2 */
+// clang-format off
 #define NX_IS_POWER_OF_2(x) (((x) != 0) && (((x) & ((x) - 1)) == 0))
+// clang-format on
 
 /** Align value up to alignment boundary */
+// clang-format off
 #define NX_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
+// clang-format on
 
 /** Align value down to alignment boundary */
+// clang-format off
 #define NX_ALIGN_DOWN(x, align) ((x) & ~((align) - 1))
+// clang-format on
 
 /** Get offset of member in structure */
 #ifndef offsetof
+// clang-format off
 #define offsetof(type, member) ((size_t)&((type*)0)->member)
+// clang-format on
 #endif
 
 /** Get container structure from member pointer */
+// clang-format off
 #define NX_CONTAINER_OF(ptr, type, member)                                     \
     ((type*)((char*)(ptr) - offsetof(type, member)))
+// clang-format on
 
 /** Bit manipulation macros */
 #define NX_BIT(n)           (1UL << (n))
 #define NX_BIT_SET(x, n)    ((x) |= NX_BIT(n))
 #define NX_BIT_CLEAR(x, n)  ((x) &= ~NX_BIT(n))
 #define NX_BIT_TOGGLE(x, n) ((x) ^= NX_BIT(n))
+// clang-format off
 #define NX_BIT_CHECK(x, n)  (((x) & NX_BIT(n)) != 0)
+// clang-format on
 
 /*---------------------------------------------------------------------------*/
 /* Assertion macros                                                          */
