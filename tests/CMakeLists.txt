@@ -56,11 +56,11 @@ set(NEXUS_TEST_LIBS
     platform_native
     hal_interface
     hal
-    osal
     log_framework
     shell_framework
     config_framework
     init_framework
+    osal
     ${THREAD_LIBS}
 )
 
