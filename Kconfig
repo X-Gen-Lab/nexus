@@ -1,21 +1,440 @@
-#Kconfig - Root configuration file for Nexus Embedded Platform
+# Kconfig - Root configuration file for Nexus Embedded Platform
 #
-#This is the main entry point for the Kconfig - based configuration system.
-#It includes platform, HAL, and OSAL configuration files.
+# This is the main entry point for the Kconfig-based configuration system.
+# It includes build, platform, toolchain, HAL, and OSAL configuration files.
 
 mainmenu "Nexus Embedded Platform Configuration"
 
-#Platform selection and configuration
+#-----------------------------------------------------------------------------
+# Build Configuration
+#-----------------------------------------------------------------------------
+
+menu "Build Configuration"
+
+choice
+    prompt "Build Type"
+    default BUILD_TYPE_DEBUG
+    help
+      Select the build type for the project.
+      This affects optimization level and debug information.
+
+config BUILD_TYPE_DEBUG
+    bool "Debug"
+    help
+      Debug build with minimal optimization and full debug information.
+      Best for development and debugging.
+      - Optimization: -Og (GCC) / -O1 (Clang)
+      - Debug info: Full (-g3)
+      - Defines: DEBUG
+
+config BUILD_TYPE_RELEASE
+    bool "Release"
+    help
+      Release build with full optimization and no debug information.
+      Best for production deployment.
+      - Optimization: -O2/-O3
+      - Debug info: None
+      - Defines: NDEBUG
+
+config BUILD_TYPE_MINSIZEREL
+    bool "MinSizeRel"
+    help
+      Release build optimized for minimum size.
+      Best for memory-constrained devices.
+      - Optimization: -Os/-Oz
+      - Debug info: None
+      - Defines: NDEBUG
+
+config BUILD_TYPE_RELWITHDEBINFO
+    bool "RelWithDebInfo"
+    help
+      Release build with debug information.
+      Best for profiling and debugging optimized code.
+      - Optimization: -O2
+      - Debug info: Full (-g)
+      - Defines: NDEBUG
+
+endchoice
+
+config BUILD_TYPE
+    string
+    default "Debug" if BUILD_TYPE_DEBUG
+    default "Release" if BUILD_TYPE_RELEASE
+    default "MinSizeRel" if BUILD_TYPE_MINSIZEREL
+    default "RelWithDebInfo" if BUILD_TYPE_RELWITHDEBINFO
+
+config BUILD_TESTS
+    bool "Build unit tests"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Build unit tests for the Nexus platform.
+      Tests are only available for native platform.
+
+config BUILD_EXAMPLES
+    bool "Build example applications"
+    default y
+    help
+      Build example applications demonstrating platform features.
+
+config ENABLE_COVERAGE
+    bool "Enable code coverage"
+    default n
+    depends on PLATFORM_NATIVE
+    help
+      Enable code coverage instrumentation for testing.
+      Only available for native platform with GCC/Clang.
+
+config ENABLE_SANITIZERS
+    bool "Enable sanitizers (ASan/UBSan)"
+    default n
+    depends on PLATFORM_NATIVE
+    help
+      Enable address and undefined behavior sanitizers.
+      Useful for detecting memory errors and undefined behavior.
+
+endmenu
+
+#-----------------------------------------------------------------------------
+# Toolchain Configuration
+#-----------------------------------------------------------------------------
+
+menu "Toolchain Configuration"
+
+choice
+    prompt "Toolchain"
+    default TOOLCHAIN_GCC if PLATFORM_NATIVE
+    default TOOLCHAIN_ARM_GCC if !PLATFORM_NATIVE
+    help
+      Select the compiler toolchain for building the project.
+      Available toolchains depend on the target platform.
+
+config TOOLCHAIN_GCC
+    bool "GCC (GNU Compiler Collection)"
+    depends on PLATFORM_NATIVE
+    help
+      GCC compiler for native platform development.
+      Free and open-source with excellent optimization.
+
+config TOOLCHAIN_CLANG
+    bool "Clang/LLVM"
+    depends on PLATFORM_NATIVE
+    help
+      Clang/LLVM compiler for native platform development.
+      Modern compiler with excellent diagnostics.
+
+config TOOLCHAIN_MSVC
+    bool "MSVC (Microsoft Visual C++)"
+    depends on PLATFORM_NATIVE
+    help
+      Microsoft Visual C++ compiler for Windows development.
+      Best integration with Visual Studio IDE.
+
+config TOOLCHAIN_ARM_GCC
+    bool "ARM GCC (arm-none-eabi-gcc)"
+    depends on !PLATFORM_NATIVE
+    help
+      ARM GCC toolchain for embedded ARM development.
+      Free and open-source with wide community support.
+      Supports Cortex-M0/M0+/M3/M4/M7/M33 cores.
+
+config TOOLCHAIN_ARM_CLANG
+    bool "ARM Clang (armclang)"
+    depends on !PLATFORM_NATIVE
+    help
+      ARM Compiler 6 (armclang) for embedded ARM development.
+      Official ARM toolchain with excellent optimization.
+      Requires commercial license from ARM.
+
+config TOOLCHAIN_IAR
+    bool "IAR EWARM (iccarm)"
+    depends on !PLATFORM_NATIVE
+    help
+      IAR Embedded Workbench for ARM compiler.
+      Commercial toolchain with excellent code size optimization.
+      Requires commercial license from IAR Systems.
+
+endchoice
+
+config TOOLCHAIN_NAME
+    string
+    default "gcc" if TOOLCHAIN_GCC
+    default "clang" if TOOLCHAIN_CLANG
+    default "msvc" if TOOLCHAIN_MSVC
+    default "arm-none-eabi-gcc" if TOOLCHAIN_ARM_GCC
+    default "armclang" if TOOLCHAIN_ARM_CLANG
+    default "iar-arm" if TOOLCHAIN_IAR
+
+config TOOLCHAIN_FILE
+    string
+    default "" if PLATFORM_NATIVE
+    default "cmake/toolchains/arm-none-eabi.cmake" if TOOLCHAIN_ARM_GCC
+    default "cmake/toolchains/armclang.cmake" if TOOLCHAIN_ARM_CLANG
+    default "cmake/toolchains/iar-arm.cmake" if TOOLCHAIN_IAR
+    help
+      Path to CMake toolchain file (relative to project root).
+
+# ARM-specific CPU configuration
+if !PLATFORM_NATIVE
+
+menu "ARM CPU Configuration"
+
+choice
+    prompt "CPU Architecture"
+    default CPU_CORTEX_M4
+    help
+      Select the ARM Cortex-M CPU architecture.
+      This determines instruction set and available features.
+
+config CPU_CORTEX_M0
+    bool "Cortex-M0"
+    help
+      ARM Cortex-M0 processor (ARMv6-M architecture).
+      Entry-level processor with minimal power consumption.
+
+config CPU_CORTEX_M0PLUS
+    bool "Cortex-M0+"
+    help
+      ARM Cortex-M0+ processor (ARMv6-M architecture).
+      Enhanced M0 with better performance and lower power.
+
+config CPU_CORTEX_M3
+    bool "Cortex-M3"
+    help
+      ARM Cortex-M3 processor (ARMv7-M architecture).
+      Mainstream processor with Thumb-2 instruction set.
+
+config CPU_CORTEX_M4
+    bool "Cortex-M4"
+    help
+      ARM Cortex-M4 processor (ARMv7E-M architecture).
+      High-performance processor with DSP and optional FPU.
+
+config CPU_CORTEX_M7
+    bool "Cortex-M7"
+    help
+      ARM Cortex-M7 processor (ARMv7E-M architecture).
+      High-performance processor with superscalar pipeline.
+
+config CPU_CORTEX_M33
+    bool "Cortex-M33"
+    help
+      ARM Cortex-M33 processor (ARMv8-M architecture).
+      Advanced processor with TrustZone security.
+
+endchoice
+
+config CPU_ARCH
+    string
+    default "cortex-m0" if CPU_CORTEX_M0
+    default "cortex-m0plus" if CPU_CORTEX_M0PLUS
+    default "cortex-m3" if CPU_CORTEX_M3
+    default "cortex-m4" if CPU_CORTEX_M4
+    default "cortex-m7" if CPU_CORTEX_M7
+    default "cortex-m33" if CPU_CORTEX_M33
+
+choice
+    prompt "FPU Type"
+    default FPU_NONE if CPU_CORTEX_M0 || CPU_CORTEX_M0PLUS || CPU_CORTEX_M3
+    default FPU_FPV4_SP if CPU_CORTEX_M4
+    default FPU_FPV5_D16 if CPU_CORTEX_M7
+    default FPU_FPV5_SP if CPU_CORTEX_M33
+    help
+      Select the Floating Point Unit (FPU) type.
+      Not all CPUs support FPU.
+
+config FPU_NONE
+    bool "No FPU"
+    help
+      No hardware floating point support.
+      Floating point operations use software emulation.
+
+config FPU_FPV4_SP
+    bool "FPv4-SP (Single Precision)"
+    depends on CPU_CORTEX_M4 || CPU_CORTEX_M7
+    help
+      FPv4 single-precision FPU (32-bit float).
+      Available on Cortex-M4 and M7.
+
+config FPU_FPV5_SP
+    bool "FPv5-SP (Single Precision)"
+    depends on CPU_CORTEX_M7 || CPU_CORTEX_M33
+    help
+      FPv5 single-precision FPU (32-bit float).
+      Available on Cortex-M7 and M33.
+
+config FPU_FPV5_D16
+    bool "FPv5-D16 (Double Precision)"
+    depends on CPU_CORTEX_M7
+    help
+      FPv5 double-precision FPU (64-bit double).
+      Only available on Cortex-M7.
+
+endchoice
+
+config FPU_TYPE
+    string
+    default "" if FPU_NONE
+    default "fpv4-sp-d16" if FPU_FPV4_SP
+    default "fpv5-sp-d16" if FPU_FPV5_SP
+    default "fpv5-d16" if FPU_FPV5_D16
+
+choice
+    prompt "Float ABI"
+    default FLOAT_ABI_SOFT if FPU_NONE
+    default FLOAT_ABI_HARD if !FPU_NONE
+    help
+      Select the floating point ABI (Application Binary Interface).
+
+config FLOAT_ABI_SOFT
+    bool "Soft"
+    help
+      Software floating point (no FPU usage).
+      Compatible with all code but slower.
+
+config FLOAT_ABI_SOFTFP
+    bool "Soft FP"
+    depends on !FPU_NONE
+    help
+      Hardware FPU with software calling convention.
+      Uses FPU but maintains compatibility.
+
+config FLOAT_ABI_HARD
+    bool "Hard"
+    depends on !FPU_NONE
+    help
+      Hardware FPU with hardware calling convention.
+      Best performance but requires FPU-aware code.
+
+endchoice
+
+config FLOAT_ABI
+    string
+    default "soft" if FLOAT_ABI_SOFT
+    default "softfp" if FLOAT_ABI_SOFTFP
+    default "hard" if FLOAT_ABI_HARD
+
+endmenu
+
+menu "Linker Configuration"
+
+config LINKER_SCRIPT
+    string "Linker script path"
+    default ""
+    help
+      Path to linker script file (relative to project root).
+      Leave empty to use platform default.
+
+      Examples:
+      - GCC: platforms/stm32/linker/STM32F407VGTx_FLASH.ld
+      - IAR: platforms/stm32/linker/STM32F407VGTx_FLASH.icf
+      - ARM Clang: platforms/stm32/linker/STM32F407VGTx_FLASH.sct
+
+config STACK_SIZE
+    hex "Stack size (bytes)"
+    default 0x400
+    help
+      Size of the main stack in bytes.
+      Typical values: 0x400 (1KB) to 0x2000 (8KB).
+
+config HEAP_SIZE
+    hex "Heap size (bytes)"
+    default 0x200
+    help
+      Size of the heap in bytes.
+      Typical values: 0x200 (512B) to 0x10000 (64KB).
+
+endmenu
+
+endif # !PLATFORM_NATIVE
+
+endmenu
+
+#-----------------------------------------------------------------------------
+# Platform Selection and Configuration
+#-----------------------------------------------------------------------------
+
+menu "Platform Configuration"
+
+choice
+    prompt "Target Platform"
+    default PLATFORM_NATIVE
+    help
+      Select the target platform for the Nexus HAL.
+
+      Available platforms:
+      - Native: PC-based simulation for development and testing
+      - STM32: STMicroelectronics STM32 microcontrollers
+      - GD32: GigaDevice GD32 microcontrollers
+      - ESP32: Espressif ESP32 microcontrollers
+      - NRF52: Nordic Semiconductor nRF52 series
+
+config PLATFORM_NATIVE
+    bool "Native Platform (PC Simulation)"
+    help
+      Native platform for PC-based development and testing.
+      Provides simulation environment for HAL operations.
+
+config PLATFORM_STM32
+    bool "STM32 Platform"
+    help
+      STM32 microcontroller platform support.
+      Supports STM32F4, STM32H7, STM32L4 series and more.
+
+config PLATFORM_GD32
+    bool "GD32 Platform"
+    help
+      GD32 microcontroller platform support.
+      Supports GD32F30x, GD32F40x series and more.
+
+config PLATFORM_ESP32
+    bool "ESP32 Platform"
+    help
+      ESP32 microcontroller platform support.
+      Supports ESP32, ESP32-S2, ESP32-C3 series.
+
+config PLATFORM_NRF52
+    bool "NRF52 Platform"
+    help
+      Nordic nRF52 series platform support.
+      Supports nRF52832, nRF52840 and more.
+
+endchoice
+
+# Platform name string (used in code for platform identification)
+config PLATFORM_NAME
+    string
+    default "native" if PLATFORM_NATIVE
+    default "stm32" if PLATFORM_STM32
+    default "gd32" if PLATFORM_GD32
+    default "esp32" if PLATFORM_ESP32
+    default "nrf52" if PLATFORM_NRF52
+
+# Include platform-specific configuration files
 source "platforms/Kconfig"
 
-#HAL layer configuration
+endmenu
+
+#-----------------------------------------------------------------------------
+# HAL Layer Configuration
+#-----------------------------------------------------------------------------
+
 source "hal/Kconfig"
 
-#OSAL configuration
+#-----------------------------------------------------------------------------
+# OSAL Configuration
+#-----------------------------------------------------------------------------
+
 source "osal/Kconfig"
 
-#Framework layer configuration(future expansion)
-#source "framework/Kconfig"
+#-----------------------------------------------------------------------------
+# Framework Layer Configuration (Future Expansion)
+#-----------------------------------------------------------------------------
 
-#Middleware configuration(future expansion)
-#source "middleware/Kconfig"
+# source "framework/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Middleware Configuration (Future Expansion)
+#-----------------------------------------------------------------------------
+
+# source "middleware/Kconfig"
