@@ -4,30 +4,44 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-# Enable testing
+message(STATUS "Configuring Nexus Test Framework...")
+
+#-----------------------------------------------------------------------------
+# Enable Testing
+#-----------------------------------------------------------------------------
+
 enable_testing()
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Google Test Setup
-##############################################################################
+#-----------------------------------------------------------------------------
 
 include(FetchContent)
+
+# Declare Google Test dependency
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG        v1.14.0
+    GIT_SHALLOW    TRUE
 )
 
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# Configure Google Test options
+set(gtest_force_shared_crt ON CACHE BOOL "Force shared CRT for MSVC" FORCE)
+set(BUILD_GMOCK ON CACHE BOOL "Build GMock" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "Disable GTest installation" FORCE)
+
+# Make Google Test available
 FetchContent_MakeAvailable(googletest)
 
-# Include Google Test
+# Include Google Test module for test discovery
 include(GoogleTest)
 
-##############################################################################
+message(STATUS "Google Test: v1.14.0")
+
+#-----------------------------------------------------------------------------
 # Common Test Configuration
-##############################################################################
+#-----------------------------------------------------------------------------
 
 # Platform-specific threading libraries
 if(WIN32)
@@ -67,14 +81,21 @@ set(NEXUS_TEST_LIBS
 # Common compile options
 set(NEXUS_TEST_COMPILE_OPTIONS "")
 if(MSVC)
-    list(APPEND NEXUS_TEST_COMPILE_OPTIONS /FS)
+    list(APPEND NEXUS_TEST_COMPILE_OPTIONS /W4 /FS)
+else()
+    list(APPEND NEXUS_TEST_COMPILE_OPTIONS -Wall -Wextra)
 endif()
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Helper Function for Test Discovery
-##############################################################################
+#-----------------------------------------------------------------------------
 
-# Wrapper function for gtest_discover_tests that handles generator-specific issues
+# Wrapper function for gtest_discover_tests
+# Handles generator-specific issues and provides consistent interface
+# Arguments:
+#   TARGET: Test executable target name
+#   PROPERTIES: Optional test properties
+#   LABELS: Optional test labels
 function(nexus_discover_tests TARGET)
     # Parse additional arguments
     set(options "")
@@ -82,7 +103,7 @@ function(nexus_discover_tests TARGET)
     set(multiValueArgs PROPERTIES LABELS)
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    # Use PRE_TEST mode for Visual Studio generator to avoid path issues
+    # Use PRE_TEST mode for Visual Studio to avoid path issues
     # Use POST_BUILD for other generators for better performance
     if(CMAKE_GENERATOR MATCHES "Visual Studio")
         gtest_discover_tests(${TARGET}
@@ -94,23 +115,42 @@ function(nexus_discover_tests TARGET)
             PROPERTIES ${ARG_PROPERTIES}
         )
     endif()
+
+    message(STATUS "Test suite registered: ${TARGET}")
 endfunction()
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Test Subdirectories
-##############################################################################
+#-----------------------------------------------------------------------------
 
+message(STATUS "Adding test subdirectories...")
+
+# HAL tests
 add_subdirectory(hal)
+
+# OSAL tests
 add_subdirectory(osal)
+
+# Framework tests
 add_subdirectory(config)
 add_subdirectory(log)
 add_subdirectory(shell)
 add_subdirectory(init)
+
+# Integration tests
 add_subdirectory(integration)
 
-##############################################################################
+# Platform tests
+add_subdirectory(platform)
+
+# Build system tests
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/build_system)
+    add_subdirectory(build_system)
+endif()
+
+#-----------------------------------------------------------------------------
 # CTest Configuration
-##############################################################################
+#-----------------------------------------------------------------------------
 
 # Enable parallel test execution
 if(NOT DEFINED CTEST_PARALLEL_LEVEL)
@@ -118,7 +158,6 @@ if(NOT DEFINED CTEST_PARALLEL_LEVEL)
     ProcessorCount(N)
     if(NOT N EQUAL 0)
         set(CTEST_PARALLEL_LEVEL ${N} CACHE STRING "Number of parallel test jobs")
-        message(STATUS "CTest parallel level: ${CTEST_PARALLEL_LEVEL}")
     else()
         set(CTEST_PARALLEL_LEVEL 1 CACHE STRING "Number of parallel test jobs")
     endif()
@@ -132,10 +171,19 @@ endif()
 # Configure test output on failure
 set(CTEST_OUTPUT_ON_FAILURE ON CACHE BOOL "Show test output on failure")
 
+#-----------------------------------------------------------------------------
+# Test Summary
+#-----------------------------------------------------------------------------
+
 message(STATUS "")
-message(STATUS "=== CTest Configuration ===")
+message(STATUS "=== Nexus Test Configuration ===")
+message(STATUS "  Google Test:    v1.14.0")
 message(STATUS "  Parallel level: ${CTEST_PARALLEL_LEVEL}")
 message(STATUS "  Test timeout:   ${CTEST_TEST_TIMEOUT}s")
 message(STATUS "  Output on fail: ${CTEST_OUTPUT_ON_FAILURE}")
-message(STATUS "===========================")
+message(STATUS "================================")
 message(STATUS "")
+
+#-----------------------------------------------------------------------------
+# End of Nexus Test Framework
+#-----------------------------------------------------------------------------

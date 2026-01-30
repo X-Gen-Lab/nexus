@@ -2,7 +2,10 @@
 # Log Framework Library
 ##############################################################################
 
-# Log interface library (header-only)
+#-----------------------------------------------------------------------------
+# Log Interface Library (Header-Only)
+#-----------------------------------------------------------------------------
+
 add_library(log_interface INTERFACE)
 
 target_include_directories(log_interface
@@ -10,15 +13,28 @@ target_include_directories(log_interface
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Log implementation library
-add_library(log_framework STATIC)
+#-----------------------------------------------------------------------------
+# Log Implementation Library
+#-----------------------------------------------------------------------------
 
-target_sources(log_framework
-    PRIVATE
-        src/log.c
-        src/log_backend_uart.c
+# Log framework sources
+set(LOG_SOURCES
+    src/log.c
+    src/log_backend_uart.c
 )
 
+# Create log framework static library
+add_library(log_framework STATIC ${LOG_SOURCES})
+
+# Include directories
+target_include_directories(log_framework
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Link dependencies
 target_link_libraries(log_framework
     PUBLIC
         log_interface
@@ -27,4 +43,21 @@ target_link_libraries(log_framework
         hal_interface
 )
 
-message(STATUS "Log Framework: Enabled")
+# Compile definitions
+target_compile_definitions(log_framework
+    PRIVATE
+        $<$<CONFIG:Debug>:LOG_DEBUG_ENABLED>
+)
+
+# Compiler options
+if(MSVC)
+    target_compile_options(log_framework PRIVATE /W4 /FS)
+else()
+    target_compile_options(log_framework PRIVATE -Wall -Wextra)
+endif()
+
+message(STATUS "Log Framework: Configured")
+
+#-----------------------------------------------------------------------------
+# End of Log Framework Library
+#-----------------------------------------------------------------------------

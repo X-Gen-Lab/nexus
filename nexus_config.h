@@ -4,7 +4,7 @@
  * \author          Nexus Team
  *
  * This file is auto-generated from Kconfig. Do not edit manually.
- * Generated: 2026-01-27 21:59:24
+ * Generated: 2026-01-30 23:34:52
  */
 
 #ifndef NEXUS_CONFIG_H
@@ -75,7 +75,6 @@ extern "C" {
 /* #undef NX_CONFIG_NX_ADC_BUFFER3_TRIGGER_EXTERNAL */
 /* #undef NX_CONFIG_NX_ADC_BUFFER3_TRIGGER_SOFTWARE */
 /* #undef NX_CONFIG_NX_ADC_BUFFER3_TRIGGER_TIMER */
-/* #undef NX_CONFIG_STM32_ADC_ENABLE */
 
 /*---------------------------------------------------------------------------*/
 /* Assert Configuration                                                      */
@@ -151,7 +150,6 @@ extern "C" {
 /* #undef NX_CONFIG_NX_DAC3_TRIGGER_EXTERNAL */
 /* #undef NX_CONFIG_NX_DAC3_TRIGGER_SOFTWARE */
 /* #undef NX_CONFIG_NX_DAC3_TRIGGER_TIMER */
-/* #undef NX_CONFIG_STM32_DAC_ENABLE */
 
 /*---------------------------------------------------------------------------*/
 /* DMA Configuration                                                         */
@@ -199,24 +197,16 @@ extern "C" {
 #define NX_CONFIG_GPIOA_PIN0_OUTPUT_VALUE 0
 #define NX_CONFIG_GPIOA_PIN0_PULL_VALUE 0
 #define NX_CONFIG_GPIOA_PIN0_SPEED_VALUE 1
-#define NX_CONFIG_GPIOA_PIN1_MODE 1
-#define NX_CONFIG_GPIOA_PIN1_OUTPUT_VALUE 0
-#define NX_CONFIG_GPIOA_PIN1_PULL_VALUE 0
-#define NX_CONFIG_GPIOA_PIN1_SPEED_VALUE 1
 #define NX_CONFIG_GPIOA_PIN2_MODE 1
 #define NX_CONFIG_GPIOA_PIN2_OUTPUT_VALUE 0
 #define NX_CONFIG_GPIOA_PIN2_PULL_VALUE 0
 #define NX_CONFIG_GPIOA_PIN2_SPEED_VALUE 1
-#define NX_CONFIG_GPIOB_PIN0_MODE 1
-#define NX_CONFIG_GPIOB_PIN0_OUTPUT_VALUE 0
-#define NX_CONFIG_GPIOB_PIN0_PULL_VALUE 0
-#define NX_CONFIG_GPIOB_PIN0_SPEED_VALUE 1
 #define NX_CONFIG_INSTANCE_NX_GPIOA 1
 #define NX_CONFIG_INSTANCE_NX_GPIOA_PIN0 1
-#define NX_CONFIG_INSTANCE_NX_GPIOA_PIN1 1
+/* #undef NX_CONFIG_INSTANCE_NX_GPIOA_PIN1 */
 #define NX_CONFIG_INSTANCE_NX_GPIOA_PIN2 1
-#define NX_CONFIG_INSTANCE_NX_GPIOB 1
-#define NX_CONFIG_INSTANCE_NX_GPIOB_PIN0 1
+/* #undef NX_CONFIG_INSTANCE_NX_GPIOB */
+/* #undef NX_CONFIG_INSTANCE_NX_GPIOB_PIN0 */
 /* #undef NX_CONFIG_INSTANCE_NX_GPIOC */
 /* #undef NX_CONFIG_INSTANCE_NX_GPIOC_PIN0 */
 #define NX_CONFIG_NATIVE_GPIO_ENABLE 1
@@ -238,13 +228,13 @@ extern "C" {
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_MODE_ANALOG */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_MODE_INPUT */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_MODE_OUTPUT_OD */
-#define NX_CONFIG_NX_GPIOA_PIN1_MODE_OUTPUT_PP 1
+/* #undef NX_CONFIG_NX_GPIOA_PIN1_MODE_OUTPUT_PP */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_PULL_DOWN */
-#define NX_CONFIG_NX_GPIOA_PIN1_PULL_NONE 1
+/* #undef NX_CONFIG_NX_GPIOA_PIN1_PULL_NONE */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_PULL_UP */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_SPEED_HIGH */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_SPEED_LOW */
-#define NX_CONFIG_NX_GPIOA_PIN1_SPEED_MEDIUM 1
+/* #undef NX_CONFIG_NX_GPIOA_PIN1_SPEED_MEDIUM */
 /* #undef NX_CONFIG_NX_GPIOA_PIN1_SPEED_VERY_HIGH */
 /* #undef NX_CONFIG_NX_GPIOA_PIN2_MODE_AF_OD */
 /* #undef NX_CONFIG_NX_GPIOA_PIN2_MODE_AF_PP */
@@ -264,13 +254,13 @@ extern "C" {
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_MODE_ANALOG */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_MODE_INPUT */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_MODE_OUTPUT_OD */
-#define NX_CONFIG_NX_GPIOB_PIN0_MODE_OUTPUT_PP 1
+/* #undef NX_CONFIG_NX_GPIOB_PIN0_MODE_OUTPUT_PP */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_PULL_DOWN */
-#define NX_CONFIG_NX_GPIOB_PIN0_PULL_NONE 1
+/* #undef NX_CONFIG_NX_GPIOB_PIN0_PULL_NONE */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_PULL_UP */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_SPEED_HIGH */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_SPEED_LOW */
-#define NX_CONFIG_NX_GPIOB_PIN0_SPEED_MEDIUM 1
+/* #undef NX_CONFIG_NX_GPIOB_PIN0_SPEED_MEDIUM */
 /* #undef NX_CONFIG_NX_GPIOB_PIN0_SPEED_VERY_HIGH */
 /* #undef NX_CONFIG_NX_GPIOC_PIN0_MODE_AF_OD */
 /* #undef NX_CONFIG_NX_GPIOC_PIN0_MODE_AF_PP */
@@ -285,7 +275,6 @@ extern "C" {
 /* #undef NX_CONFIG_NX_GPIOC_PIN0_SPEED_LOW */
 /* #undef NX_CONFIG_NX_GPIOC_PIN0_SPEED_MEDIUM */
 /* #undef NX_CONFIG_NX_GPIOC_PIN0_SPEED_VERY_HIGH */
-/* #undef NX_CONFIG_STM32_GPIO_ENABLE */
 
 /*---------------------------------------------------------------------------*/
 /* HAL Enable                                                                */
@@ -328,7 +317,6 @@ extern "C" {
 /* #undef NX_CONFIG_NX_I2C3_SPEED_FAST */
 /* #undef NX_CONFIG_NX_I2C3_SPEED_FAST_PLUS */
 /* #undef NX_CONFIG_NX_I2C3_SPEED_STANDARD */
-/* #undef NX_CONFIG_STM32_I2C_ENABLE */
 
 /*---------------------------------------------------------------------------*/
 /* Memory Configuration                                                      */
@@ -513,7 +501,6 @@ extern "C" {
 #define NX_CONFIG_SPI0_MSB_VALUE 0
 #define NX_CONFIG_SPI0_RX_BUFFER_SIZE 256
 #define NX_CONFIG_SPI0_TX_BUFFER_SIZE 256
-/* #undef NX_CONFIG_STM32_SPI_ENABLE */
 
 /*---------------------------------------------------------------------------*/
 /* STM32 Platform                                                            */
@@ -529,8 +516,17 @@ extern "C" {
 /* #undef NX_CONFIG_STM32L4 */
 /* #undef NX_CONFIG_STM32L432 */
 /* #undef NX_CONFIG_STM32L476 */
+/* #undef NX_CONFIG_STM32_DATA_CACHE_ENABLE */
+/* #undef NX_CONFIG_STM32_ENABLE_BOOT_LOGGING */
+/* #undef NX_CONFIG_STM32_ENABLE_FPU */
 /* #undef NX_CONFIG_STM32_ENABLE_LOGGING */
 /* #undef NX_CONFIG_STM32_ENABLE_STATISTICS */
+/* #undef NX_CONFIG_STM32_HSE_ENABLE */
+/* #undef NX_CONFIG_STM32_INSTRUCTION_CACHE_ENABLE */
+/* #undef NX_CONFIG_STM32_LSE_ENABLE */
+/* #undef NX_CONFIG_STM32_PREFETCH_ENABLE */
+/* #undef NX_CONFIG_STM32_USE_FULL_ASSERT */
+/* #undef NX_CONFIG_STM32_USE_RTOS */
 
 /*---------------------------------------------------------------------------*/
 /* Statistics Configuration                                                  */
@@ -574,7 +570,6 @@ extern "C" {
 /* #undef NX_CONFIG_NX_TIMER3_MODE_CENTER */
 /* #undef NX_CONFIG_NX_TIMER3_MODE_DOWN */
 /* #undef NX_CONFIG_NX_TIMER3_MODE_UP */
-/* #undef NX_CONFIG_STM32_TIMER_ENABLE */
 #define NX_CONFIG_TIMER0_CHANNEL_COUNT 4
 #define NX_CONFIG_TIMER0_FREQUENCY 1000000
 #define NX_CONFIG_TIMER0_MODE_VALUE 0
@@ -584,8 +579,8 @@ extern "C" {
 /*---------------------------------------------------------------------------*/
 
 #define NX_CONFIG_INSTANCE_NX_UART_0 1
-#define NX_CONFIG_INSTANCE_NX_UART_1 1
-#define NX_CONFIG_INSTANCE_NX_UART_2 1
+/* #undef NX_CONFIG_INSTANCE_NX_UART_1 */
+/* #undef NX_CONFIG_INSTANCE_NX_UART_2 */
 /* #undef NX_CONFIG_INSTANCE_NX_UART_3 */
 #define NX_CONFIG_NATIVE_UART_ENABLE 1
 #define NX_CONFIG_NATIVE_UART_MAX_INSTANCES 4
@@ -596,16 +591,16 @@ extern "C" {
 #define NX_CONFIG_NX_UART0_PARITY_NONE 1
 /* #undef NX_CONFIG_NX_UART0_PARITY_ODD */
 /* #undef NX_CONFIG_NX_UART1_MODE_DMA */
-#define NX_CONFIG_NX_UART1_MODE_INTERRUPT 1
+/* #undef NX_CONFIG_NX_UART1_MODE_INTERRUPT */
 /* #undef NX_CONFIG_NX_UART1_MODE_POLLING */
 /* #undef NX_CONFIG_NX_UART1_PARITY_EVEN */
-#define NX_CONFIG_NX_UART1_PARITY_NONE 1
+/* #undef NX_CONFIG_NX_UART1_PARITY_NONE */
 /* #undef NX_CONFIG_NX_UART1_PARITY_ODD */
 /* #undef NX_CONFIG_NX_UART2_MODE_DMA */
-#define NX_CONFIG_NX_UART2_MODE_INTERRUPT 1
+/* #undef NX_CONFIG_NX_UART2_MODE_INTERRUPT */
 /* #undef NX_CONFIG_NX_UART2_MODE_POLLING */
 /* #undef NX_CONFIG_NX_UART2_PARITY_EVEN */
-#define NX_CONFIG_NX_UART2_PARITY_NONE 1
+/* #undef NX_CONFIG_NX_UART2_PARITY_NONE */
 /* #undef NX_CONFIG_NX_UART2_PARITY_ODD */
 /* #undef NX_CONFIG_NX_UART3_MODE_DMA */
 /* #undef NX_CONFIG_NX_UART3_MODE_INTERRUPT */
@@ -621,20 +616,6 @@ extern "C" {
 #define NX_CONFIG_UART0_RX_BUFFER_SIZE 256
 #define NX_CONFIG_UART0_STOP_BITS 1
 #define NX_CONFIG_UART0_TX_BUFFER_SIZE 256
-#define NX_CONFIG_UART1_BAUDRATE 115200
-#define NX_CONFIG_UART1_DATA_BITS 8
-#define NX_CONFIG_UART1_MODE_VALUE 1
-#define NX_CONFIG_UART1_PARITY_VALUE 0
-#define NX_CONFIG_UART1_RX_BUFFER_SIZE 256
-#define NX_CONFIG_UART1_STOP_BITS 1
-#define NX_CONFIG_UART1_TX_BUFFER_SIZE 256
-#define NX_CONFIG_UART2_BAUDRATE 115200
-#define NX_CONFIG_UART2_DATA_BITS 8
-#define NX_CONFIG_UART2_MODE_VALUE 1
-#define NX_CONFIG_UART2_PARITY_VALUE 0
-#define NX_CONFIG_UART2_RX_BUFFER_SIZE 256
-#define NX_CONFIG_UART2_STOP_BITS 1
-#define NX_CONFIG_UART2_TX_BUFFER_SIZE 256
 
 /*---------------------------------------------------------------------------*/
 /* USB Configuration                                                         */
@@ -684,13 +665,11 @@ extern "C" {
  * Example:
  *   NX_DEFINE_INSTANCE_NX_GPIO(MY_REGISTER_FUNC)
  *   expands to:
- *   MY_REGISTER_FUNC(A, 0) MY_REGISTER_FUNC(A, 1) ...
+ *   MY_REGISTER_FUNC(A, 0) MY_REGISTER_FUNC(A, 2)
  */
 #define NX_DEFINE_INSTANCE_NX_GPIO(fn) \
     fn(A, 0) \
-    fn(A, 1) \
-    fn(A, 2) \
-    fn(B, 0)
+    fn(A, 2)
 
 /**
  * \brief           ADC instance traversal macro
@@ -943,12 +922,10 @@ extern "C" {
  * Example:
  *   NX_DEFINE_INSTANCE_NX_UART(MY_REGISTER_FUNC)
  *   expands to:
- *   MY_REGISTER_FUNC(0) MY_REGISTER_FUNC(1) MY_REGISTER_FUNC(2)
+ *   MY_REGISTER_FUNC(0)
  */
 #define NX_DEFINE_INSTANCE_NX_UART(fn) \
-    _NX_UART_INSTANCE_0(fn) \
-    _NX_UART_INSTANCE_1(fn) \
-    _NX_UART_INSTANCE_2(fn)
+    _NX_UART_INSTANCE_0(fn)
 
 #ifdef NX_CONFIG_INSTANCE_NX_UART_0
 #define _NX_UART_INSTANCE_0(fn) fn(0)
@@ -956,22 +933,6 @@ extern "C" {
 #else
 #define _NX_UART_INSTANCE_0(fn)
 #define NX_CONFIG_UART0_ENABLED 0
-#endif
-
-#ifdef NX_CONFIG_INSTANCE_NX_UART_1
-#define _NX_UART_INSTANCE_1(fn) fn(1)
-#define NX_CONFIG_UART1_ENABLED 1
-#else
-#define _NX_UART_INSTANCE_1(fn)
-#define NX_CONFIG_UART1_ENABLED 0
-#endif
-
-#ifdef NX_CONFIG_INSTANCE_NX_UART_2
-#define _NX_UART_INSTANCE_2(fn) fn(2)
-#define NX_CONFIG_UART2_ENABLED 1
-#else
-#define _NX_UART_INSTANCE_2(fn)
-#define NX_CONFIG_UART2_ENABLED 0
 #endif
 
 /**

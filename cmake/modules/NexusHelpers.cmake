@@ -1,8 +1,29 @@
 ##############################################################################
-# Nexus CMake Helper Functions
+# NexusHelpers.cmake - CMake Helper Functions
+##############################################################################
+#
+# NexusHelpers.cmake
+# CMake helper functions for Nexus build system
+# Author: Nexus Team
+#
+# This module provides convenient helper functions for adding libraries,
+# executables, and tests with standard Nexus configurations.
+#
 ##############################################################################
 
+include_guard(GLOBAL)
+
+##############################################################################
+# Library Functions
+##############################################################################
+
+#
 # Add a Nexus library with standard settings
+# TARGET: Library target name
+# SOURCES: Source files
+# INCLUDES: Include directories
+# DEPS: Dependencies
+#
 function(nexus_add_library TARGET)
     cmake_parse_arguments(ARG "" "" "SOURCES;INCLUDES;DEPS" ${ARGN})
 
@@ -23,7 +44,17 @@ function(nexus_add_library TARGET)
     )
 endfunction()
 
+##############################################################################
+# Executable Functions
+##############################################################################
+
+#
 # Add a Nexus executable with standard settings
+# TARGET: Executable target name
+# SOURCES: Source files
+# DEPS: Dependencies
+# LINKER_SCRIPT: Linker script path (optional)
+#
 function(nexus_add_executable TARGET)
     cmake_parse_arguments(ARG "" "LINKER_SCRIPT" "SOURCES;DEPS" ${ARGN})
 
@@ -49,7 +80,16 @@ function(nexus_add_executable TARGET)
     endif()
 endfunction()
 
+##############################################################################
+# Test Functions
+##############################################################################
+
+#
 # Add a Nexus test executable
+# TARGET: Test target name
+# SOURCES: Test source files
+# DEPS: Dependencies
+#
 function(nexus_add_test TARGET)
     cmake_parse_arguments(ARG "" "" "SOURCES;DEPS" ${ARGN})
 
@@ -66,3 +106,7 @@ function(nexus_add_test TARGET)
     # Register with CTest
     gtest_discover_tests(${TARGET})
 endfunction()
+
+##############################################################################
+# End of NexusHelpers.cmake
+##############################################################################

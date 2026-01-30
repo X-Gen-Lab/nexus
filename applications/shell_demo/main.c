@@ -18,9 +18,10 @@
  *                  GPIO pins are configured via Kconfig.
  */
 
-#include "framework/shell/shell.h"
 #include "hal/nx_hal.h"
 #include "osal/osal.h"
+#include "shell/shell.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -158,8 +159,8 @@ static int cmd_tick(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
-    uint32_t tick = osal_get_tick();
-    uart_printf("System tick: %lu ms\r\n", (unsigned long)tick);
+    /* Note: OSAL does not provide tick counter in baremetal mode */
+    uart_print("System tick: Not available in baremetal mode\r\n");
 
     return 0;
 }

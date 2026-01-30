@@ -18,9 +18,10 @@
  * \note            UART0 is used for output (115200 baud).
  */
 
-#include "framework/config/config.h"
+#include "config/config.h"
 #include "hal/nx_hal.h"
 #include "osal/osal.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -173,7 +174,7 @@ static bool list_config_cb(const config_entry_info_t* info, void* user_data) {
         case CONFIG_TYPE_BOOL:
             type_str = "bool";
             break;
-        case CONFIG_TYPE_STR:
+        case CONFIG_TYPE_STRING:
             type_str = "str";
             break;
         case CONFIG_TYPE_BLOB:

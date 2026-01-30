@@ -2,7 +2,10 @@
 # Init Framework Library
 ##############################################################################
 
-# Init interface library (header-only)
+#-----------------------------------------------------------------------------
+# Init Interface Library (Header-Only)
+#-----------------------------------------------------------------------------
+
 add_library(init_interface INTERFACE)
 
 target_include_directories(init_interface
@@ -10,16 +13,29 @@ target_include_directories(init_interface
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Init implementation library
-add_library(init_framework STATIC)
+#-----------------------------------------------------------------------------
+# Init Implementation Library
+#-----------------------------------------------------------------------------
 
-target_sources(init_framework
-    PRIVATE
-        src/nx_init.c
-        src/nx_startup.c
-        src/nx_firmware_info.c
+# Init framework sources
+set(INIT_SOURCES
+    src/nx_init.c
+    src/nx_startup.c
+    src/nx_firmware_info.c
 )
 
+# Create init framework static library
+add_library(init_framework STATIC ${INIT_SOURCES})
+
+# Include directories
+target_include_directories(init_framework
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Link dependencies
 target_link_libraries(init_framework
     PUBLIC
         init_interface
@@ -28,9 +44,22 @@ target_link_libraries(init_framework
         osal_interface
 )
 
-# Enable test mode when building tests
-if(NEXUS_BUILD_TESTS)
-    target_compile_definitions(init_framework PRIVATE NX_STARTUP_TEST_MODE)
+# Compile definitions
+target_compile_definitions(init_framework
+    PRIVATE
+        $<$<CONFIG:Debug>:INIT_DEBUG_ENABLED>
+        $<$<BOOL:${NEXUS_BUILD_TESTS}>:NX_STARTUP_TEST_MODE>
+)
+
+# Compiler options
+if(MSVC)
+    target_compile_options(init_framework PRIVATE /W4 /FS)
+else()
+    target_compile_options(init_framework PRIVATE -Wall -Wextra)
 endif()
 
-message(STATUS "Init Framework: Enabled")
+message(STATUS "Init Framework: Configured")
+
+#-----------------------------------------------------------------------------
+# End of Init Framework Library
+#-----------------------------------------------------------------------------
