@@ -122,12 +122,10 @@ nexus_validate_kconfig(CONFIG_FILE ${NEXUS_CONFIG_FILE})
 include(LoadKconfig)
 load_kconfig(${NEXUS_CONFIG_FILE})
 
-# Override CMake variables with Kconfig values if available
-if(DEFINED CONFIG_PLATFORM_NAME)
-    set(NEXUS_PLATFORM "${CONFIG_PLATFORM_NAME}" CACHE STRING "Target platform from Kconfig" FORCE)
-    message(STATUS "Platform from Kconfig: ${CONFIG_PLATFORM_NAME}")
-endif()
+# Apply Kconfig configuration to CMake variables
+apply_kconfig_to_cmake()
 
+# Override OSAL backend if configured in Kconfig
 if(DEFINED CONFIG_OSAL_BACKEND_NAME)
     set(NEXUS_OSAL_BACKEND "${CONFIG_OSAL_BACKEND_NAME}" CACHE STRING "OSAL backend from Kconfig" FORCE)
     message(STATUS "OSAL backend from Kconfig: ${CONFIG_OSAL_BACKEND_NAME}")
@@ -163,6 +161,9 @@ if(NEXUS_TARGET_NATIVE)
 else()
     message(STATUS "Using toolchain-provided compiler flags")
 endif()
+
+# Apply Kconfig-specific compiler flags
+apply_kconfig_compiler_flags()
 
 #-----------------------------------------------------------------------------
 # Phase 3: Dependency Management
@@ -302,21 +303,8 @@ message(STATUS "========================================")
 message(STATUS "=== Nexus Build Configuration ===")
 message(STATUS "========================================")
 message(STATUS "  Version:        ${PROJECT_VERSION}")
-
-# Platform information with source indicator
-if(DEFINED CONFIG_PLATFORM_NAME)
-    message(STATUS "  Platform:       ${NEXUS_PLATFORM} (from Kconfig)")
-else()
-    message(STATUS "  Platform:       ${NEXUS_PLATFORM}")
-endif()
-
-# OSAL backend information with source indicator
-if(DEFINED CONFIG_OSAL_BACKEND_NAME)
-    message(STATUS "  OSAL Backend:   ${NEXUS_OSAL_BACKEND} (from Kconfig)")
-else()
-    message(STATUS "  OSAL Backend:   ${NEXUS_OSAL_BACKEND}")
-endif()
-
+message(STATUS "  Platform:       ${NEXUS_PLATFORM}")
+message(STATUS "  OSAL Backend:   ${NEXUS_OSAL_BACKEND}")
 message(STATUS "  Build Type:     ${CMAKE_BUILD_TYPE}")
 message(STATUS "  Compiler:       ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
 message(STATUS "  Generator:      ${CMAKE_GENERATOR}")
@@ -330,14 +318,42 @@ message(STATUS "----------------------------------------")
 message(STATUS "  Parallel Jobs:  ${PARALLEL_JOBS}")
 message(STATUS "  Binary Dir:     ${CMAKE_BINARY_DIR}")
 
-# Additional Kconfig information
+# Print Kconfig-specific configuration if available
 if(DEFINED CONFIG_PLATFORM_NAME)
     message(STATUS "----------------------------------------")
-    message(STATUS "  Kconfig Details:")
-    message(STATUS "    Platform:   ${CONFIG_PLATFORM_NAME}")
-    if(CONFIG_PLATFORM_NATIVE)
-        message(STATUS "    Logging:    ${CONFIG_NATIVE_ENABLE_LOGGING}")
-        message(STATUS "    Log Level:  ${CONFIG_NATIVE_LOG_LEVEL}")
+    message(STATUS "  Kconfig Configuration:")
+
+    # Toolchain info
+    if(DEFINED NEXUS_TOOLCHAIN_NAME)
+        message(STATUS "    Toolchain:    ${NEXUS_TOOLCHAIN_NAME}")
+    endif()
+
+    # ARM CPU configuration
+    if(DEFINED NEXUS_CPU_ARCH)
+        message(STATUS "    CPU Arch:     ${NEXUS_CPU_ARCH}")
+    endif()
+
+    if(DEFINED NEXUS_FPU_TYPE AND NEXUS_FPU_TYPE)
+        message(STATUS "    FPU Type:     ${NEXUS_FPU_TYPE}")
+    endif()
+
+    if(DEFINED NEXUS_FLOAT_ABI)
+        message(STATUS "    Float ABI:    ${NEXUS_FLOAT_ABI}")
+    endif()
+
+    # Linker script
+    if(DEFINED NEXUS_LINKER_SCRIPT AND NEXUS_LINKER_SCRIPT)
+        get_filename_component(LINKER_NAME ${NEXUS_LINKER_SCRIPT} NAME)
+        message(STATUS "    Linker:       ${LINKER_NAME}")
+    endif()
+
+    # Memory configuration
+    if(DEFINED NEXUS_STACK_SIZE)
+        message(STATUS "    Stack Size:   ${NEXUS_STACK_SIZE}")
+    endif()
+
+    if(DEFINED NEXUS_HEAP_SIZE)
+        message(STATUS "    Heap Size:    ${NEXUS_HEAP_SIZE}")
     endif()
 endif()
 
