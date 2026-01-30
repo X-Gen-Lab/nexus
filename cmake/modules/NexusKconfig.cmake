@@ -216,29 +216,58 @@ function(nexus_validate_kconfig)
         )
     endif()
 
-    # Check for common configuration conflicts
-    # Example: Check if mutually exclusive features are both enabled
-    if(DEFINED CONFIG_FEATURE_A AND CONFIG_FEATURE_A)
-        if(DEFINED CONFIG_FEATURE_B AND CONFIG_FEATURE_B)
-            message(WARNING
-                "CONFIG_FEATURE_A and CONFIG_FEATURE_B are mutually exclusive.\n"
-                "Please disable one of them in Kconfig."
-            )
-        endif()
-    endif()
-
-    # Check for dependency requirements
-    # Example: Feature C requires Feature D
-    if(DEFINED CONFIG_FEATURE_C AND CONFIG_FEATURE_C)
-        if(NOT DEFINED CONFIG_FEATURE_D OR NOT CONFIG_FEATURE_D)
+    # Check toolchain consistency for embedded platforms
+    if(DEFINED CONFIG_TOOLCHAIN_ARM_GCC OR DEFINED CONFIG_TOOLCHAIN_ARM_CLANG OR DEFINED CONFIG_TOOLCHAIN_IAR)
+        if(DEFINED CONFIG_PLATFORM_NATIVE AND CONFIG_PLATFORM_NATIVE)
             message(FATAL_ERROR
-                "CONFIG_FEATURE_C requires CONFIG_FEATURE_D to be enabled.\n"
-                "Please enable CONFIG_FEATURE_D in Kconfig."
+                "Configuration conflict: ARM toolchain selected but native platform configured.\n"
+                "Please select a compatible toolchain for native platform (GCC/Clang/MSVC)."
             )
         endif()
     endif()
 
-    message(STATUS "Kconfig configuration validated successfully")
+    # Check FPU configuration consistency
+    if(DEFINED CONFIG_FPU_TYPE AND CONFIG_FPU_TYPE)
+        if(DEFINED CONFIG_CPU_CORTEX_M0 OR DEFINED CONFIG_CPU_CORTEX_M0PLUS OR DEFINED CONFIG_CPU_CORTEX_M3)
+            message(FATAL_ERROR
+                "Configuration conflict: FPU configured but CPU does not support FPU.\n"
+                "Cortex-M0/M0+/M3 do not have FPU. Please select FPU_NONE."
+            )
+        endif()
+    endif()
+
+    # Check linker script for embedded platforms
+    if(NOT DEFINED CONFIG_PLATFORM_NATIVE OR NOT CONFIG_PLATFORM_NATIVE)
+        if(NOT DEFINED CONFIG_LINKER_SCRIPT OR NOT CONFIG_LINKER_SCRIPT)
+            message(WARNING
+                "No linker script configured for embedded platform.\n"
+                "Please configure CONFIG_LINKER_SCRIPT in Kconfig or provide via platform defaults."
+            )
+        endif()
+    endif()
+
+    # Check build tests on embedded platforms
+    if(DEFINED CONFIG_BUILD_TESTS AND CONFIG_BUILD_TESTS)
+        if(NOT DEFINED CONFIG_PLATFORM_NATIVE OR NOT CONFIG_PLATFORM_NATIVE)
+            message(WARNING
+                "Tests are enabled but platform is not native.\n"
+                "Tests are only supported on native platform. Disabling tests."
+            )
+            set(NEXUS_BUILD_TESTS OFF CACHE BOOL "Tests disabled for embedded platform" FORCE)
+        endif()
+    endif()
+
+    # Check sanitizers on embedded platforms
+    if(DEFINED CONFIG_ENABLE_SANITIZERS AND CONFIG_ENABLE_SANITIZERS)
+        if(NOT DEFINED CONFIG_PLATFORM_NATIVE OR NOT CONFIG_PLATFORM_NATIVE)
+            message(WARNING
+                "Sanitizers are enabled but platform is not native.\n"
+                "Sanitizers are only supported on native platform."
+            )
+        endif()
+    endif()
+
+    message(STATUS "Kconfig configuration validation passed")
 endfunction()
 
 # Update conditional dependencies based on Kconfig changes

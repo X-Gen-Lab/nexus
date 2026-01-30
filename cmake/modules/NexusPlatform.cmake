@@ -45,17 +45,21 @@ endfunction()
 
 # Detect target platform from Kconfig or CMake variables
 # Detects STM32, ESP32, nRF52, GD32, or native platform
-#                  Validates: Requirements 4.2
+# Validates: Requirements 4.2
 function(nexus_detect_target_platform)
-    # Check if platform is already set via CMake variable
-    if(DEFINED NEXUS_TARGET_PLATFORM)
-        set(PLATFORM_NAME ${NEXUS_TARGET_PLATFORM})
-        message(VERBOSE "Target platform set via CMake: ${PLATFORM_NAME}")
-    # Check Kconfig configuration
-    elseif(DEFINED CONFIG_PLATFORM_NAME)
+    # Priority 1: Check Kconfig configuration (new structure)
+    if(DEFINED CONFIG_PLATFORM_NAME)
         set(PLATFORM_NAME ${CONFIG_PLATFORM_NAME})
         message(VERBOSE "Target platform from Kconfig: ${PLATFORM_NAME}")
-    # Check individual platform flags
+    # Priority 2: Check if platform is already set via CMake variable
+    elseif(DEFINED NEXUS_TARGET_PLATFORM)
+        set(PLATFORM_NAME ${NEXUS_TARGET_PLATFORM})
+        message(VERBOSE "Target platform set via CMake: ${PLATFORM_NAME}")
+    # Priority 3: Check NEXUS_PLATFORM variable (legacy)
+    elseif(DEFINED NEXUS_PLATFORM)
+        set(PLATFORM_NAME ${NEXUS_PLATFORM})
+        message(VERBOSE "Target platform from NEXUS_PLATFORM: ${PLATFORM_NAME}")
+    # Priority 4: Check individual platform flags
     elseif(CONFIG_PLATFORM_STM32)
         set(PLATFORM_NAME "stm32")
     elseif(CONFIG_PLATFORM_ESP32)
@@ -66,7 +70,7 @@ function(nexus_detect_target_platform)
         set(PLATFORM_NAME "gd32")
     elseif(CONFIG_PLATFORM_NATIVE)
         set(PLATFORM_NAME "native")
-    # Check CMAKE_SYSTEM_NAME for cross-compilation
+    # Priority 5: Check CMAKE_SYSTEM_NAME for cross-compilation
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Generic")
         # Generic embedded system - try to detect from toolchain
         if(CMAKE_C_COMPILER MATCHES "arm-none-eabi")
@@ -114,6 +118,7 @@ function(nexus_detect_compiler)
         set(NEXUS_COMPILER_MSVC TRUE PARENT_SCOPE)
         set(NEXUS_COMPILER_NAME "MSVC" PARENT_SCOPE)
         set(NEXUS_COMPILER_FAMILY "msvc" PARENT_SCOPE)
+        set(NEXUS_TOOLCHAIN_NAME "msvc" PARENT_SCOPE)
     elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
         # Check if it's ARM GCC
         if(CMAKE_C_COMPILER MATCHES "arm-none-eabi-gcc")
@@ -169,15 +174,22 @@ endfunction()
 
 # Detect toolchain from compiler and platform
 # Determines the toolchain name for platform switching
-#                  Validates: Requirements 4.3
+# Validates: Requirements 4.3
 function(nexus_detect_toolchain)
-    # If toolchain is already set, use it
+    # Priority 1: Check Kconfig toolchain configuration
+    if(DEFINED CONFIG_TOOLCHAIN_NAME)
+        set(NEXUS_TOOLCHAIN_NAME "${CONFIG_TOOLCHAIN_NAME}" PARENT_SCOPE)
+        message(VERBOSE "Toolchain from Kconfig: ${CONFIG_TOOLCHAIN_NAME}")
+        return()
+    endif()
+
+    # Priority 2: If toolchain is already set, use it
     if(DEFINED NEXUS_TOOLCHAIN_NAME)
         message(VERBOSE "Toolchain already set: ${NEXUS_TOOLCHAIN_NAME}")
         return()
     endif()
 
-    # Detect toolchain based on compiler
+    # Priority 3: Detect toolchain based on compiler
     if(NEXUS_COMPILER_ARM_GCC)
         set(NEXUS_TOOLCHAIN_NAME "arm-none-eabi-gcc" PARENT_SCOPE)
     elseif(NEXUS_COMPILER_ARM_CLANG)
@@ -558,23 +570,43 @@ endfunction()
 # Set platform-specific compile flags
 # PLATFORM: Target platform name
 # Configures platform-specific compiler definitions and flags
-#                  Validates: Requirements 4.4
+# Validates: Requirements 4.4
 function(nexus_set_platform_compile_flags PLATFORM)
     # Platform-specific definitions
     if(PLATFORM MATCHES "^(stm32|stm32f4|stm32h7|stm32l4)$")
         # STM32-specific definitions
-        if(DEFINED CONFIG_STM32_CHIP)
+        # Priority 1: Use Kconfig chip name
+        if(DEFINED CONFIG_STM32_CHIP_NAME)
+            add_compile_definitions(${CONFIG_STM32_CHIP_NAME})
+            message(VERBOSE "STM32 chip from Kconfig: ${CONFIG_STM32_CHIP_NAME}")
+        elseif(DEFINED NEXUS_STM32_CHIP)
+            add_compile_definitions(${NEXUS_STM32_CHIP})
+            message(VERBOSE "STM32 chip from CMake: ${NEXUS_STM32_CHIP}")
+        elseif(DEFINED CONFIG_STM32_CHIP)
             add_compile_definitions(${CONFIG_STM32_CHIP})
         endif()
         add_compile_definitions(USE_HAL_DRIVER)
 
         # Set ARM math definitions based on CPU
-        if(NEXUS_CPU_ARCH MATCHES "cortex-m4")
-            add_compile_definitions(ARM_MATH_CM4)
-        elseif(NEXUS_CPU_ARCH MATCHES "cortex-m7")
-            add_compile_definitions(ARM_MATH_CM7)
-        elseif(NEXUS_CPU_ARCH MATCHES "cortex-m3")
-            add_compile_definitions(ARM_MATH_CM3)
+        # Priority 1: Use Kconfig CPU configuration
+        if(DEFINED CONFIG_CPU_ARCH)
+            set(CPU_ARCH ${CONFIG_CPU_ARCH})
+        elseif(DEFINED NEXUS_CPU_ARCH)
+            set(CPU_ARCH ${NEXUS_CPU_ARCH})
+        endif()
+
+        if(DEFINED CPU_ARCH)
+            if(CPU_ARCH MATCHES "cortex-m4")
+                add_compile_definitions(ARM_MATH_CM4)
+            elseif(CPU_ARCH MATCHES "cortex-m7")
+                add_compile_definitions(ARM_MATH_CM7)
+            elseif(CPU_ARCH MATCHES "cortex-m3")
+                add_compile_definitions(ARM_MATH_CM3)
+            elseif(CPU_ARCH MATCHES "cortex-m0")
+                add_compile_definitions(ARM_MATH_CM0)
+            elseif(CPU_ARCH MATCHES "cortex-m33")
+                add_compile_definitions(ARM_MATH_CM33)
+            endif()
         endif()
 
     elseif(PLATFORM STREQUAL "gd32")
@@ -607,8 +639,8 @@ endfunction()
 
 # Auto-configure platform based on Kconfig
 # Main entry point for platform auto-switching
-#                  Selects toolchain, linker script, and compile flags
-#                  Validates: Requirements 4.4
+# Selects toolchain, linker script, and compile flags
+# Validates: Requirements 4.4
 macro(nexus_auto_configure_platform)
     # Get target platform from detection
     if(NOT DEFINED NEXUS_TARGET_PLATFORM)
@@ -628,8 +660,17 @@ macro(nexus_auto_configure_platform)
         endif()
     endif()
 
-    # Select linker script based on platform and chip
-    if(DEFINED CONFIG_STM32_CHIP)
+    # Select linker script based on Kconfig or platform configuration
+    # Priority 1: Use Kconfig linker script
+    if(DEFINED CONFIG_LINKER_SCRIPT AND CONFIG_LINKER_SCRIPT)
+        set(NEXUS_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/${CONFIG_LINKER_SCRIPT}")
+        message(STATUS "Linker script from Kconfig: ${CONFIG_LINKER_SCRIPT}")
+    # Priority 2: Auto-select based on platform and chip
+    elseif(DEFINED CONFIG_STM32_CHIP_NAME)
+        nexus_select_linker_script(${NEXUS_TARGET_PLATFORM}
+            CHIP ${CONFIG_STM32_CHIP_NAME}
+            OUTPUT_VAR NEXUS_LINKER_SCRIPT)
+    elseif(DEFINED CONFIG_STM32_CHIP)
         nexus_select_linker_script(${NEXUS_TARGET_PLATFORM}
             CHIP ${CONFIG_STM32_CHIP}
             OUTPUT_VAR NEXUS_LINKER_SCRIPT)
@@ -641,8 +682,15 @@ macro(nexus_auto_configure_platform)
     # Print platform configuration
     message(STATUS "Platform auto-configuration:")
     message(STATUS "  Target Platform: ${NEXUS_TARGET_PLATFORM}")
-    if(DEFINED NEXUS_LINKER_SCRIPT)
-        message(STATUS "  Linker Script:   ${NEXUS_LINKER_SCRIPT}")
+    if(DEFINED NEXUS_LINKER_SCRIPT AND NEXUS_LINKER_SCRIPT)
+        get_filename_component(LINKER_NAME ${NEXUS_LINKER_SCRIPT} NAME)
+        message(STATUS "  Linker Script:   ${LINKER_NAME}")
+    endif()
+    if(DEFINED NEXUS_CPU_ARCH AND NEXUS_CPU_ARCH)
+        message(STATUS "  CPU Arch:        ${NEXUS_CPU_ARCH}")
+    endif()
+    if(DEFINED NEXUS_FPU_TYPE AND NEXUS_FPU_TYPE)
+        message(STATUS "  FPU Type:        ${NEXUS_FPU_TYPE}")
     endif()
 endmacro()
 
