@@ -163,29 +163,3 @@ static nx_power_t* gpio_rw_write_get_power(nx_gpio_write_t* self) {
                                 offsetof(nx_gpio_read_write_t, write)));
     return impl ? &impl->power : NULL;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Interface Initialization (used by device registration)                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize GPIO read interface for read-write
- * \note            This is called from nx_gpio_device.c
- */
-void gpio_init_read(nx_gpio_read_t* read) {
-    read->read = gpio_rw_read;
-    read->register_exti = gpio_rw_register_exti;
-    read->get_lifecycle = gpio_rw_read_get_lifecycle;
-    read->get_power = gpio_rw_read_get_power;
-}
-
-/**
- * \brief           Initialize GPIO write interface for read-write
- * \note            This is called from nx_gpio_device.c
- */
-void gpio_init_write(nx_gpio_write_t* write) {
-    write->write = gpio_rw_write;
-    write->toggle = gpio_rw_toggle;
-    write->get_lifecycle = gpio_rw_write_get_lifecycle;
-    write->get_power = gpio_rw_write_get_power;
-}
