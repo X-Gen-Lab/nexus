@@ -246,7 +246,7 @@ function(nexus_test_generate_report)
     set(REPORT_SCRIPT "${CMAKE_BINARY_DIR}/generate_test_report.cmake")
     file(WRITE "${REPORT_SCRIPT}" "
 # Test Report Generation Script
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 
 # Run tests and capture results
 execute_process(
@@ -341,7 +341,7 @@ function(nexus_test_configure_coverage)
         set(COVERAGE_SCRIPT "${CMAKE_BINARY_DIR}/generate_coverage.cmake")
         file(WRITE "${COVERAGE_SCRIPT}" "
 # Coverage Report Generation Script
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 
 # Run tests first
 execute_process(

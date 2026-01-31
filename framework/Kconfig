@@ -1,0 +1,69 @@
+# Framework Layer Configuration
+# This file defines configuration options for all framework components
+
+menu "Framework Configuration"
+
+#-----------------------------------------------------------------------------
+# Core Framework Components
+#-----------------------------------------------------------------------------
+
+config FRAMEWORK_LOG
+    bool "Enable Log Framework"
+    default y
+    help
+      Enable the logging framework for system-wide logging support.
+      Provides formatted logging with multiple log levels and output backends.
+
+config FRAMEWORK_SHELL
+    bool "Enable Shell Framework"
+    default y
+    depends on FRAMEWORK_LOG
+    help
+      Enable the command-line shell framework.
+      Provides an interactive command-line interface for debugging and control.
+
+config FRAMEWORK_CONFIG
+    bool "Enable Config Manager Framework"
+    default y
+    help
+      Enable the configuration manager framework.
+      Provides runtime configuration management with persistence support.
+
+config FRAMEWORK_INIT
+    bool "Enable Init Framework"
+    default y
+    help
+      Enable the system initialization framework.
+      Provides ordered initialization of system components.
+
+#-----------------------------------------------------------------------------
+# Optional Framework Components
+#-----------------------------------------------------------------------------
+
+config FRAMEWORK_EVENT
+    bool "Enable Event Framework"
+    default n
+    help
+      Enable the event framework for event-driven programming.
+      Provides publish-subscribe event handling mechanism.
+
+config FRAMEWORK_STATE_MACHINE
+    bool "Enable State Machine Framework"
+    default n
+    help
+      Enable the state machine framework.
+      Provides hierarchical state machine implementation.
+
+#-----------------------------------------------------------------------------
+# Framework-wide Settings
+#-----------------------------------------------------------------------------
+
+config FRAMEWORK_DEBUG
+    bool "Enable Framework Debug Output"
+    default n
+    depends on FRAMEWORK_LOG
+    help
+      Enable debug output for framework components.
+      Useful for debugging framework issues.
+
+endmenu

@@ -37,12 +37,31 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define OSAL_MAX_TASKS      8
-#define OSAL_MAX_MUTEXES    8
-#define OSAL_MAX_SEMS       8
-#define OSAL_MAX_QUEUES     4
+/* Configuration values are now defined in osal_config.h */
+/* These defaults are only used if not already defined */
+#ifndef OSAL_MAX_TASKS
+#define OSAL_MAX_TASKS 8
+#endif
+
+#ifndef OSAL_MAX_MUTEXES
+#define OSAL_MAX_MUTEXES 8
+#endif
+
+#ifndef OSAL_MAX_SEMS
+#define OSAL_MAX_SEMS 8
+#endif
+
+#ifndef OSAL_MAX_QUEUES
+#define OSAL_MAX_QUEUES 4
+#endif
+
+#ifndef OSAL_QUEUE_MAX_SIZE
 #define OSAL_QUEUE_MAX_SIZE 256
-#define OSAL_TASK_NAME_MAX  16
+#endif
+
+#ifndef OSAL_TASK_NAME_MAX
+#define OSAL_TASK_NAME_MAX 16
+#endif
 
 /*---------------------------------------------------------------------------*/
 /* Platform-specific functions                                               */

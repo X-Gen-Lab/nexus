@@ -181,10 +181,19 @@ menu "ARM CPU Configuration"
 
 choice
     prompt "CPU Architecture"
+    default CPU_CORTEX_M0 if STM32F0
+    default CPU_CORTEX_M0PLUS if STM32L0 || STM32U0 || STM32G0 || STM32C0
+    default CPU_CORTEX_M3 if STM32F1 || STM32F2 || STM32L1
+    default CPU_CORTEX_M4 if STM32F3 || STM32F4 || STM32L4 || STM32WB || STM32WL || STM32G4
+    default CPU_CORTEX_M7 if STM32F7 || STM32H7
+    default CPU_CORTEX_M33 if STM32H5 || STM32L5 || STM32U3 || STM32U5
     default CPU_CORTEX_M4
     help
       Select the ARM Cortex-M CPU architecture.
       This determines instruction set and available features.
+
+      For STM32 platform, this is automatically set based on the
+      selected STM32 series.
 
 config CPU_CORTEX_M0
     bool "Cortex-M0"
@@ -431,7 +440,13 @@ source "osal/Kconfig"
 # Framework Layer Configuration (Future Expansion)
 #-----------------------------------------------------------------------------
 
-# source "framework/Kconfig"
+source "framework/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Applications Configuration
+#-----------------------------------------------------------------------------
+
+source "applications/Kconfig"
 
 #-----------------------------------------------------------------------------
 # Middleware Configuration (Future Expansion)
