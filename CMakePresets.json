@@ -188,23 +188,157 @@
             }
         },
         {
-            "name": "cross-arm-debug",
-            "displayName": "ARM Cross-Compile Debug (STM32F4)",
-            "description": "Cross-compilation for ARM Cortex-M4 (STM32F4)",
+            "name": "stm32-armgcc-debug",
+            "displayName": "STM32 ARM GCC Debug",
+            "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Debug",
             "inherits": "base",
             "generator": "Ninja",
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_PLATFORM": "stm32f4",
-                "NEXUS_BUILD_TESTS": "OFF"
+                "NEXUS_PLATFORM": "stm32",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_EXAMPLES": "ON"
             }
         },
         {
-            "name": "cross-arm-release",
-            "displayName": "ARM Cross-Compile Release (STM32F4)",
-            "description": "Cross-compilation for ARM Cortex-M4 (STM32F4)",
-            "inherits": "cross-arm-debug",
+            "name": "stm32-armgcc-release",
+            "displayName": "STM32 ARM GCC Release",
+            "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "stm32-armgcc-minsizerel",
+            "displayName": "STM32 ARM GCC MinSizeRel",
+            "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Minimum Size Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel"
+            }
+        },
+        {
+            "name": "stm32-armclang-debug",
+            "displayName": "STM32 ARM Clang Debug",
+            "description": "STM32 build with ARM Clang (armclang) - Debug",
+            "inherits": "base",
+            "generator": "Ninja",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/armclang.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_PLATFORM": "stm32",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_EXAMPLES": "ON"
+            }
+        },
+        {
+            "name": "stm32-armclang-release",
+            "displayName": "STM32 ARM Clang Release",
+            "description": "STM32 build with ARM Clang (armclang) - Release",
+            "inherits": "stm32-armclang-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "stm32-armclang-minsizerel",
+            "displayName": "STM32 ARM Clang MinSizeRel",
+            "description": "STM32 build with ARM Clang (armclang) - Minimum Size Release",
+            "inherits": "stm32-armclang-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel"
+            }
+        },
+        {
+            "name": "windows-stm32-armclang-debug",
+            "displayName": "Windows → STM32 ARM Clang Debug",
+            "description": "Windows host, STM32 target with ARM Clang (armclang) - Debug",
+            "inherits": [
+                "windows-base",
+                "stm32-armclang-debug"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "windows-stm32-armclang-release",
+            "displayName": "Windows → STM32 ARM Clang Release",
+            "description": "Windows host, STM32 target with ARM Clang (armclang) - Release",
+            "inherits": "windows-stm32-armclang-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-stm32-armclang-debug",
+            "displayName": "Linux → STM32 ARM Clang Debug",
+            "description": "Linux host, STM32 target with ARM Clang (armclang) - Debug",
+            "inherits": [
+                "linux-base",
+                "stm32-armclang-debug"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "linux-stm32-armclang-release",
+            "displayName": "Linux → STM32 ARM Clang Release",
+            "description": "Linux host, STM32 target with ARM Clang (armclang) - Release",
+            "inherits": "linux-stm32-armclang-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "windows-stm32-armgcc-debug",
+            "displayName": "Windows → STM32 ARM GCC Debug",
+            "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
+            "inherits": [
+                "windows-base",
+                "stm32-armgcc-debug"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "windows-stm32-armgcc-release",
+            "displayName": "Windows → STM32 ARM GCC Release",
+            "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Release",
+            "inherits": "windows-stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-stm32-armgcc-debug",
+            "displayName": "Linux → STM32 ARM GCC Debug",
+            "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
+            "inherits": [
+                "linux-base",
+                "stm32-armgcc-debug"
+            ],
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "linux-stm32-armgcc-release",
+            "displayName": "Linux → STM32 ARM GCC Release",
+            "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Release",
+            "inherits": "linux-stm32-armgcc-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -266,12 +400,60 @@
             "configurePreset": "linux-gcc-coverage"
         },
         {
-            "name": "cross-arm-debug",
-            "configurePreset": "cross-arm-debug"
+            "name": "stm32-armgcc-debug",
+            "configurePreset": "stm32-armgcc-debug"
         },
         {
-            "name": "cross-arm-release",
-            "configurePreset": "cross-arm-release"
+            "name": "stm32-armgcc-release",
+            "configurePreset": "stm32-armgcc-release"
+        },
+        {
+            "name": "stm32-armgcc-minsizerel",
+            "configurePreset": "stm32-armgcc-minsizerel"
+        },
+        {
+            "name": "stm32-armclang-debug",
+            "configurePreset": "stm32-armclang-debug"
+        },
+        {
+            "name": "stm32-armclang-release",
+            "configurePreset": "stm32-armclang-release"
+        },
+        {
+            "name": "stm32-armclang-minsizerel",
+            "configurePreset": "stm32-armclang-minsizerel"
+        },
+        {
+            "name": "windows-stm32-armclang-debug",
+            "configurePreset": "windows-stm32-armclang-debug"
+        },
+        {
+            "name": "windows-stm32-armclang-release",
+            "configurePreset": "windows-stm32-armclang-release"
+        },
+        {
+            "name": "linux-stm32-armclang-debug",
+            "configurePreset": "linux-stm32-armclang-debug"
+        },
+        {
+            "name": "linux-stm32-armclang-release",
+            "configurePreset": "linux-stm32-armclang-release"
+        },
+        {
+            "name": "windows-stm32-armgcc-debug",
+            "configurePreset": "windows-stm32-armgcc-debug"
+        },
+        {
+            "name": "windows-stm32-armgcc-release",
+            "configurePreset": "windows-stm32-armgcc-release"
+        },
+        {
+            "name": "linux-stm32-armgcc-debug",
+            "configurePreset": "linux-stm32-armgcc-debug"
+        },
+        {
+            "name": "linux-stm32-armgcc-release",
+            "configurePreset": "linux-stm32-armgcc-release"
         }
     ],
     "testPresets": [

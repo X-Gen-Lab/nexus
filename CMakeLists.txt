@@ -18,7 +18,8 @@
 #
 ##############################################################################
 
-cmake_minimum_required(VERSION 3.16)
+# CMake 3.21+ required for ARM Clang toolchain support (Policy CMP0123)
+cmake_minimum_required(VERSION 3.21)
 
 #-----------------------------------------------------------------------------
 # Project Definition
@@ -81,6 +82,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Include CMake modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/application)
 
 #-----------------------------------------------------------------------------
 # Find Required Tools
@@ -124,6 +126,10 @@ load_kconfig(${NEXUS_CONFIG_FILE})
 
 # Apply Kconfig configuration to CMake variables
 apply_kconfig_to_cmake()
+
+# Auto-configure toolchain from Kconfig
+include(NexusToolchain)
+nexus_validate_toolchain()
 
 # Override OSAL backend if configured in Kconfig
 if(DEFINED CONFIG_OSAL_BACKEND_NAME)
