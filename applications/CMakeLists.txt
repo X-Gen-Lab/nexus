@@ -1,49 +1,59 @@
-##############################################################################
-# Nexus Example Applications
-##############################################################################
-
-message(STATUS "Configuring example applications...")
-
 #-----------------------------------------------------------------------------
-# Platform-Specific Applications
+# Nexus Example Applications
+#-----------------------------------------------------------------------------
+# This file manages the build of example applications based on Kconfig
+# configuration. Applications are only built for embedded platforms.
+#
+# Configuration options are defined in applications/Kconfig
 #-----------------------------------------------------------------------------
 
 # Only build embedded examples for non-native platforms
 if(NOT NEXUS_PLATFORM STREQUAL "native")
 
+    message(STATUS "Configuring example applications...")
+
+    #-------------------------------------------------------------------------
+    # Application Build Control
+    #-------------------------------------------------------------------------
+    # Applications are built based on Kconfig configuration options:
+    #   - CONFIG_BUILD_APP_BLINKY
+    #   - CONFIG_BUILD_APP_SHELL_DEMO
+    #   - CONFIG_BUILD_APP_CONFIG_DEMO
+    #   - CONFIG_BUILD_APP_STM32_BLINKY
+    #   - CONFIG_BUILD_APP_FREERTOS_DEMO
+    #-------------------------------------------------------------------------
+
     # Basic blinky example
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/blinky)
+    if(CONFIG_BUILD_APP_BLINKY AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/blinky)
         add_subdirectory(blinky)
-        message(STATUS "Application: blinky")
+        message(STATUS "  [+] blinky")
     endif()
 
     # Shell demo example
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/shell_demo)
+    if(CONFIG_BUILD_APP_SHELL_DEMO AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/shell_demo)
         add_subdirectory(shell_demo)
-        message(STATUS "Application: shell_demo")
+        message(STATUS "  [+] shell_demo")
     endif()
 
     # Config demo example
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config_demo)
+    if(CONFIG_BUILD_APP_CONFIG_DEMO AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/config_demo)
         add_subdirectory(config_demo)
-        message(STATUS "Application: config_demo")
+        message(STATUS "  [+] config_demo")
     endif()
 
-    # STM32-specific examples
-    if(NEXUS_PLATFORM MATCHES "^stm32")
-        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/stm32_blinky)
-            add_subdirectory(stm32_blinky)
-            message(STATUS "Application: stm32_blinky")
-        endif()
+    # STM32 minimal blinky example
+    if(CONFIG_BUILD_APP_STM32_BLINKY AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/stm32_blinky)
+        add_subdirectory(stm32_blinky)
+        message(STATUS "  [+] stm32_blinky")
     endif()
 
-    # FreeRTOS demo (only when FreeRTOS backend is selected)
-    if(NEXUS_OSAL_BACKEND STREQUAL "freertos")
-        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/freertos_demo)
-            add_subdirectory(freertos_demo)
-            message(STATUS "Application: freertos_demo")
-        endif()
+    # FreeRTOS demo example
+    if(CONFIG_BUILD_APP_FREERTOS_DEMO AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/freertos_demo)
+        add_subdirectory(freertos_demo)
+        message(STATUS "  [+] freertos_demo")
     endif()
+
+    message(STATUS "Example applications configured")
 
 else()
     message(STATUS "Native platform: Skipping embedded applications")

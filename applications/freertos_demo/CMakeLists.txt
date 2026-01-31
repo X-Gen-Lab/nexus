@@ -1,48 +1,57 @@
-##############################################################################
+#-----------------------------------------------------------------------------
 # FreeRTOS Demo Application
-##############################################################################
+#-----------------------------------------------------------------------------
+# FreeRTOS OSAL adapter demonstration.
 #
-# This example demonstrates the FreeRTOS OSAL adapter features:
-# - Multi-task creation and management
-# - Mutex for resource protection
-# - Semaphore for task synchronization
-# - Message queue for inter-task communication
+# Features:
+#   - Multi-task creation and management
+#   - Mutex for resource protection
+#   - Semaphore for task synchronization
+#   - Message queue for inter-task communication
 #
-# Requirements: 2.4 - FreeRTOS adapter example
-##############################################################################
+# Requirements: FreeRTOS OSAL backend
+#-----------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.16)
 
-# Application name
+# Include common application utilities
+include(ApplicationCommon)
+
+#-----------------------------------------------------------------------------
+# Application Configuration
+#-----------------------------------------------------------------------------
+
 set(APP_NAME freertos_demo)
 
-# Application sources
+#-----------------------------------------------------------------------------
+# Create Executable
+#-----------------------------------------------------------------------------
+
 add_executable(${APP_NAME}
     main.c
+)
+
+# Include directories
+target_include_directories(${APP_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # Link with platform, HAL, and OSAL
 target_link_libraries(${APP_NAME}
     PRIVATE
-        platform_stm32f4
+        platform_stm32
         hal_interface
+        osal_interface
         osal
 )
 
-# Set linker script
-if(DEFINED NEXUS_LINKER_SCRIPT)
-    target_link_options(${APP_NAME}
-        PRIVATE
-            -T${NEXUS_LINKER_SCRIPT}
-            -Wl,-Map=${APP_NAME}.map
-            -Wl,--gc-sections
-    )
-endif()
+# Setup linker script
+nexus_application_linker_script(${APP_NAME})
 
-# Generate binary and hex files
-add_custom_command(TARGET ${APP_NAME} POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${APP_NAME}> ${APP_NAME}.bin
-    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${APP_NAME}> ${APP_NAME}.hex
-    COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${APP_NAME}>
-    COMMENT "Generating ${APP_NAME}.bin and ${APP_NAME}.hex"
-)
+# Apply common application setup (definitions, post-build actions)
+nexus_application_setup(${APP_NAME} VERSION "1.0.0")
+
+#-----------------------------------------------------------------------------
+# End of FreeRTOS Demo Application
+#-----------------------------------------------------------------------------

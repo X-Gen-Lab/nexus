@@ -1,0 +1,200 @@
+#-----------------------------------------------------------------------------
+# Applications Configuration
+#-----------------------------------------------------------------------------
+# This file defines configuration options for example applications.
+# Applications are only built for embedded platforms (not native).
+#-----------------------------------------------------------------------------
+
+if !PLATFORM_NATIVE
+
+menu "Example Applications"
+
+config BUILD_APP_BLINKY
+    bool "Build Blinky Example"
+    default y
+    help
+      Basic LED blinky example demonstrating GPIO control.
+
+      Features:
+        - GPIO initialization and control
+        - Basic delay functions
+        - Minimal resource usage
+
+      Suitable for: All platforms
+      Requirements: GPIO peripheral
+
+config BUILD_APP_SHELL_DEMO
+    bool "Build Shell Demo"
+    default y
+    depends on FRAMEWORK_SHELL
+    help
+      Interactive shell demo with command-line interface.
+
+      Features:
+        - Command registration and execution
+        - UART communication
+        - Built-in commands (help, version, etc.)
+
+      Suitable for: All platforms
+      Requirements: UART peripheral, Shell framework
+
+config BUILD_APP_CONFIG_DEMO
+    bool "Build Config Demo"
+    default y
+    help
+      Configuration system demonstration.
+
+      Features:
+        - Kconfig-based configuration
+        - Runtime parameter access
+        - Configuration validation
+
+      Suitable for: All platforms
+      Requirements: None
+
+config BUILD_APP_STM32_BLINKY
+    bool "Build STM32 Minimal Blinky"
+    default y if PLATFORM_STM32
+    depends on PLATFORM_STM32
+    help
+      Minimal STM32 blinky example with direct register access.
+
+      Features:
+        - Minimal boot code
+        - Direct register manipulation
+        - No HAL/OSAL dependencies
+        - Smallest code size
+
+      Suitable for: STM32 platform only
+      Requirements: None (bare metal)
+
+config BUILD_APP_FREERTOS_DEMO
+    bool "Build FreeRTOS Demo"
+    default y if OSAL_FREERTOS
+    depends on OSAL_FREERTOS
+    help
+      FreeRTOS OSAL adapter demonstration.
+
+      Features:
+        - Multi-task creation and management
+        - Mutex for resource protection
+        - Semaphore for task synchronization
+        - Message queue for inter-task communication
+
+      Suitable for: All platforms
+      Requirements: FreeRTOS OSAL backend
+
+#-----------------------------------------------------------------------------
+# Application Common Settings
+#-----------------------------------------------------------------------------
+
+menu "Application Common Settings"
+
+config APP_VERSION_MAJOR
+    int "Application version (major)"
+    default 1
+    range 0 255
+    help
+      Major version number for applications.
+
+config APP_VERSION_MINOR
+    int "Application version (minor)"
+    default 0
+    range 0 255
+    help
+      Minor version number for applications.
+
+config APP_VERSION_PATCH
+    int "Application version (patch)"
+    default 0
+    range 0 255
+    help
+      Patch version number for applications.
+
+config APP_ENABLE_VERSION_INFO
+    bool "Enable version information"
+    default y
+    help
+      Include version information in application binary.
+      Adds version string and build timestamp.
+
+config APP_ENABLE_DEBUG_OUTPUT
+    bool "Enable debug output"
+    default y if BUILD_TYPE_DEBUG
+    default n
+    help
+      Enable debug output in applications.
+      Uses UART or other configured output peripheral.
+
+config APP_STACK_SIZE
+    hex "Application stack size"
+    default 0x1000
+    range 0x400 0x10000
+    help
+      Stack size for application main task (in bytes).
+
+      Recommended values:
+        - Simple applications: 0x400 (1KB)
+        - Standard applications: 0x1000 (4KB)
+        - Complex applications: 0x2000 (8KB)
+
+config APP_HEAP_SIZE
+    hex "Application heap size"
+    default 0x2000
+    range 0x200 0x100000
+    help
+      Heap size for dynamic memory allocation (in bytes).
+
+      Recommended values:
+        - Minimal: 0x200 (512B)
+        - Standard: 0x2000 (8KB)
+        - Large: 0x10000 (64KB)
+
+endmenu
+
+#-----------------------------------------------------------------------------
+# Post-Build Options
+#-----------------------------------------------------------------------------
+
+menu "Post-Build Options"
+
+config APP_GENERATE_BIN
+    bool "Generate binary (.bin) files"
+    default y
+    help
+      Generate binary files for flashing.
+      Uses objcopy to create .bin files from ELF.
+
+config APP_GENERATE_HEX
+    bool "Generate Intel HEX (.hex) files"
+    default y
+    help
+      Generate Intel HEX files for flashing.
+      Uses objcopy to create .hex files from ELF.
+
+config APP_GENERATE_MAP
+    bool "Generate linker map files"
+    default y
+    help
+      Generate detailed linker map files.
+      Useful for analyzing memory usage and symbol locations.
+
+config APP_PRINT_SIZE
+    bool "Print size information"
+    default y
+    help
+      Print memory usage information after build.
+      Shows text, data, and bss section sizes.
+
+config APP_PRINT_MEMORY_USAGE
+    bool "Print detailed memory usage"
+    default y
+    help
+      Print detailed memory region usage.
+      Shows usage of FLASH, RAM, and other memory regions.
+
+endmenu
+
+endmenu
+
+endif  # !PLATFORM_NATIVE

@@ -1,26 +1,34 @@
-##############################################################################
+#-----------------------------------------------------------------------------
 # Config Demo Example Application
-##############################################################################
+#-----------------------------------------------------------------------------
+# Configuration system demonstration.
+#
+# Features:
+#   - Kconfig-based configuration
+#   - Runtime parameter access
+#   - Configuration validation
+#
+# Requirements: None
+#-----------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.16)
+
+# Include common application utilities
+include(ApplicationCommon)
 
 #-----------------------------------------------------------------------------
 # Application Configuration
 #-----------------------------------------------------------------------------
 
-# Application name
 set(APP_NAME config_demo)
-
-# Application sources
-set(APP_SOURCES
-    main.c
-)
 
 #-----------------------------------------------------------------------------
 # Create Executable
 #-----------------------------------------------------------------------------
 
-add_executable(${APP_NAME} ${APP_SOURCES})
+add_executable(${APP_NAME}
+    main.c
+)
 
 # Include directories
 target_include_directories(${APP_NAME}
@@ -39,35 +47,11 @@ target_link_libraries(${APP_NAME}
         osal
 )
 
-# Compile definitions
-target_compile_definitions(${APP_NAME}
-    PRIVATE
-        APP_NAME="${APP_NAME}"
-        APP_VERSION="1.0.0"
-)
+# Setup linker script
+nexus_application_linker_script(${APP_NAME})
 
-#-----------------------------------------------------------------------------
-# Post-Build Actions
-#-----------------------------------------------------------------------------
-
-# Generate binary and hex files
-if(CMAKE_OBJCOPY)
-    add_custom_command(TARGET ${APP_NAME} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${APP_NAME}> ${APP_NAME}.bin
-        COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${APP_NAME}> ${APP_NAME}.hex
-        COMMENT "Generating ${APP_NAME}.bin and ${APP_NAME}.hex"
-    )
-endif()
-
-# Print size information
-if(CMAKE_SIZE)
-    add_custom_command(TARGET ${APP_NAME} POST_BUILD
-        COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${APP_NAME}>
-        COMMENT "Size of ${APP_NAME}:"
-    )
-endif()
-
-message(STATUS "Configured application: ${APP_NAME}")
+# Apply common application setup (definitions, post-build actions)
+nexus_application_setup(${APP_NAME} VERSION "1.0.0")
 
 #-----------------------------------------------------------------------------
 # End of Config Demo Example Application
