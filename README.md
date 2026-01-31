@@ -50,9 +50,9 @@
 ### Prerequisites
 
 **All Platforms:**
-- CMake 3.16+
+- CMake 3.21+
 - Git
-- Python 3.8+ (for build scripts)
+- Python 3.8+ (for build scripts and Kconfig)
 
 **For Native Build (Testing):**
 - Windows: Visual Studio 2019+ or MSVC Build Tools
@@ -67,6 +67,39 @@
 - Doxygen 1.9+
 - Python packages: `pip install sphinx breathe sphinx_rtd_theme`
 
+### Automatic Build (Recommended)
+
+The easiest way to build is using the automatic build scripts with Kconfig:
+
+```bash
+# Clone repository
+git clone https://github.com/nexus-platform/nexus.git
+cd nexus
+
+# Install Kconfig tool
+pip install kconfiglib
+
+# Configure and build in one command
+# Windows
+scripts\build.bat --config
+
+# Linux/macOS
+./scripts/build.sh --config
+
+# In menuconfig:
+# 1. Select Platform Configuration → STM32 Platform (or Native Platform)
+# 2. Select Toolchain Configuration → ARM GCC (or GCC/Clang/MSVC for native)
+# 3. Select Build Configuration → Debug/Release
+# 4. Save with 'S' and exit
+
+# The script automatically:
+# - Detects the correct CMake preset from your configuration
+# - Configures CMake with the right toolchain
+# - Builds the project
+```
+
+See [Toolchain Auto-Selection Guide](docs/TOOLCHAIN_AUTO_SELECTION.md) for details.
+
 ### Build for Native (Host Testing)
 
 ```bash
@@ -77,7 +110,7 @@ cd nexus
 # Method 1: Using Python script (recommended, cross-platform)
 python scripts/building/build.py
 
-# Method 2: Using CMake Presets (recommended for CMake 3.19+)
+# Method 2: Using CMake Presets (CMake 3.21+)
 cmake --preset native-debug      # Debug build
 cmake --build --preset native-debug
 
@@ -99,7 +132,7 @@ python scripts/test/test.py
 # Method 1: Using Python script
 python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
 
-# Method 2: Using CMake Presets (recommended for CMake 3.19+)
+# Method 2: Using CMake Presets (CMake 3.21+)
 cmake --preset stm32f4-debug     # Debug build
 cmake --build --preset stm32f4-debug
 

@@ -48,7 +48,7 @@
 ### 环境要求
 
 **所有平台：**
-- CMake 3.16+
+- CMake 3.21+
 - Git
 - Python 3.8+（用于构建脚本）
 
@@ -75,7 +75,7 @@ cd nexus
 # 方法 1：使用 Python 脚本（推荐，跨平台）
 python scripts/building/build.py
 
-# 方法 2：使用 CMake 预设（推荐用于 CMake 3.19+）
+# 方法 2：使用 CMake 预设（CMake 3.21+）
 cmake --preset native-debug      # 调试构建
 cmake --build --preset native-debug
 
@@ -97,7 +97,7 @@ python scripts/test/test.py
 # 方法 1：使用 Python 脚本
 python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
 
-# 方法 2：使用 CMake 预设（推荐用于 CMake 3.19+）
+# 方法 2：使用 CMake 预设（CMake 3.21+）
 cmake --preset stm32f4-debug     # 调试构建
 cmake --build --preset stm32f4-debug
 

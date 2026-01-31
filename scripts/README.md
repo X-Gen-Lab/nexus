@@ -89,7 +89,7 @@ scripts\tools\docs.bat                           REM 文档
 ## 依赖
 
 - Python 3.7+ (Python 脚本)
-- CMake 3.16+
+- CMake 3.21+
 - C/C++ 编译器 (GCC, Clang, MSVC)
 - clang-format (代码格式化)
 - Doxygen (API 文档)
