@@ -1,0 +1,31 @@
+#-----------------------------------------------------------------------------
+# STM32C0 Series Chip Variant Selection
+#-----------------------------------------------------------------------------
+# This file defines chip variants for STM32C0 series.
+# TODO: Add specific chip variants (C011, C031)
+#-----------------------------------------------------------------------------
+
+if STM32C0
+
+# Placeholder for STM32C0 chip variant selection
+# Add choice block and chip variants here
+
+config STM32_CHIP_NAME
+    string
+    default "STM32C0xx"
+    help
+      STM32 chip name for HAL driver selection and conditional compilation.
+
+config STM32_FLASH_SIZE
+    hex "Flash size (bytes)"
+    default 0x8000
+    help
+      Flash memory size in bytes.
+
+config STM32_SRAM_SIZE
+    hex "SRAM size (bytes)"
+    default 0x3000
+    help
+      SRAM memory size in bytes.
+
+endif # STM32C0

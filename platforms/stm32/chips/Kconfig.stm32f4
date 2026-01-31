@@ -1,0 +1,400 @@
+#-----------------------------------------------------------------------------
+# STM32F4 Series Chip Variant Selection
+#-----------------------------------------------------------------------------
+# STM32F4 series includes multiple sub-series:
+#   - STM32F401: Entry-level, 84 MHz
+#   - STM32F405/407: Mainstream, 168 MHz
+#   - STM32F410: Compact, 100 MHz
+#   - STM32F411: High cost-performance, 100 MHz
+#   - STM32F412: Enhanced, 100 MHz
+#   - STM32F413/423: High integration, 100 MHz
+#   - STM32F427/437: High performance, 180 MHz
+#   - STM32F429/439: Graphics display, 180 MHz
+#   - STM32F446: Audio processing, 180 MHz
+#   - STM32F469/479: Advanced graphics, 180 MHz
+#-----------------------------------------------------------------------------
+
+if STM32F4
+
+choice
+    prompt "STM32F4 Chip Variant"
+    default STM32F407
+    help
+      Select specific STM32F4 chip variant.
+      Different variants have different memory sizes, peripheral
+      configurations and package options.
+
+#-----------------------------------------------------------------------------
+# STM32F401 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F401xB
+    bool "STM32F401xB (128KB Flash, 64KB SRAM)"
+    help
+      STM32F401xB variant:
+      - Flash: 128 KB
+      - SRAM: 64 KB
+      - Frequency: 84 MHz
+      - Package: LQFP48, LQFP64, UFQFPN48
+
+config STM32F401xC
+    bool "STM32F401xC (256KB Flash, 64KB SRAM)"
+    help
+      STM32F401xC variant:
+      - Flash: 256 KB
+      - SRAM: 64 KB
+      - Frequency: 84 MHz
+      - Package: LQFP48, LQFP64, UFQFPN48
+
+config STM32F401xD
+    bool "STM32F401xD (384KB Flash, 96KB SRAM)"
+    help
+      STM32F401xD variant:
+      - Flash: 384 KB
+      - SRAM: 96 KB
+      - Frequency: 84 MHz
+      - Package: LQFP64, LQFP100, UFBGA100
+
+config STM32F401xE
+    bool "STM32F401xE (512KB Flash, 96KB SRAM)"
+    help
+      STM32F401xE variant:
+      - Flash: 512 KB
+      - SRAM: 96 KB
+      - Frequency: 84 MHz
+      - Package: LQFP64, LQFP100, UFBGA100
+
+#-----------------------------------------------------------------------------
+# STM32F405/407 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F405
+    bool "STM32F405 (1MB Flash, 192KB SRAM)"
+    help
+      STM32F405 variant:
+      - Flash: 1 MB
+      - SRAM: 192 KB (128+64 KB)
+      - Frequency: 168 MHz
+      - Features: USB OTG FS/HS, CAN
+      - Package: LQFP64, LQFP100, LQFP144, UFBGA176
+
+config STM32F407
+    bool "STM32F407 (1MB Flash, 192KB SRAM)"
+    help
+      STM32F407 variant:
+      - Flash: 1 MB
+      - SRAM: 192 KB (128+64 KB)
+      - Frequency: 168 MHz
+      - Features: USB OTG FS/HS, Ethernet MAC, CAN
+      - Package: LQFP64, LQFP100, LQFP144, UFBGA176
+
+#-----------------------------------------------------------------------------
+# STM32F410 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F410Tx
+    bool "STM32F410Tx (128KB Flash, 32KB SRAM, LQFP36)"
+    help
+      STM32F410Tx variant:
+      - Flash: 128 KB
+      - SRAM: 32 KB
+      - Frequency: 100 MHz
+      - Package: LQFP36
+
+config STM32F410Cx
+    bool "STM32F410Cx (256KB Flash, 32KB SRAM, UFQFPN48)"
+    help
+      STM32F410Cx variant:
+      - Flash: 256 KB
+      - SRAM: 32 KB
+      - Frequency: 100 MHz
+      - Package: UFQFPN48
+
+config STM32F410Rx
+    bool "STM32F410Rx (128KB Flash, 32KB SRAM, LQFP64)"
+    help
+      STM32F410Rx variant:
+      - Flash: 128 KB
+      - SRAM: 32 KB
+      - Frequency: 100 MHz
+      - Package: LQFP64
+
+#-----------------------------------------------------------------------------
+# STM32F411 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F411xC
+    bool "STM32F411xC (256KB Flash, 128KB SRAM)"
+    help
+      STM32F411xC variant:
+      - Flash: 256 KB
+      - SRAM: 128 KB
+      - Frequency: 100 MHz
+      - Features: USB OTG FS
+      - Package: LQFP48, LQFP64, LQFP100, UFQFPN48
+
+config STM32F411xE
+    bool "STM32F411xE (512KB Flash, 128KB SRAM)"
+    help
+      STM32F411xE variant:
+      - Flash: 512 KB
+      - SRAM: 128 KB
+      - Frequency: 100 MHz
+      - Features: USB OTG FS
+      - Package: LQFP48, LQFP64, LQFP100, UFQFPN48, UFBGA100
+
+#-----------------------------------------------------------------------------
+# STM32F412 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F412Cx
+    bool "STM32F412Cx (256KB Flash, 256KB SRAM, UFQFPN48)"
+    help
+      STM32F412Cx variant:
+      - Flash: 256 KB
+      - SRAM: 256 KB
+      - Frequency: 100 MHz
+      - Package: UFQFPN48
+
+config STM32F412Rx
+    bool "STM32F412Rx (1MB Flash, 256KB SRAM, LQFP64)"
+    help
+      STM32F412Rx variant:
+      - Flash: 1 MB
+      - SRAM: 256 KB
+      - Frequency: 100 MHz
+      - Package: LQFP64
+
+config STM32F412Vx
+    bool "STM32F412Vx (1MB Flash, 256KB SRAM, LQFP100)"
+    help
+      STM32F412Vx variant:
+      - Flash: 1 MB
+      - SRAM: 256 KB
+      - Frequency: 100 MHz
+      - Package: LQFP100
+
+config STM32F412Zx
+    bool "STM32F412Zx (1MB Flash, 256KB SRAM, LQFP144)"
+    help
+      STM32F412Zx variant:
+      - Flash: 1 MB
+      - SRAM: 256 KB
+      - Frequency: 100 MHz
+      - Package: LQFP144
+
+#-----------------------------------------------------------------------------
+# STM32F413/423 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F413xx
+    bool "STM32F413 (1.5MB Flash, 320KB SRAM)"
+    help
+      STM32F413 variant:
+      - Flash: 1.5 MB
+      - SRAM: 320 KB
+      - Frequency: 100 MHz
+      - Features: USB OTG FS, DFSDM, QSPI
+      - Package: LQFP64, LQFP100, LQFP144, UFBGA100, UFBGA144
+
+config STM32F423xx
+    bool "STM32F423 (1.5MB Flash, 320KB SRAM, AES)"
+    help
+      STM32F423 variant:
+      - Flash: 1.5 MB
+      - SRAM: 320 KB
+      - Frequency: 100 MHz
+      - Features: USB OTG FS, DFSDM, QSPI, AES crypto
+      - Package: LQFP100, LQFP144, UFBGA100, UFBGA144
+
+#-----------------------------------------------------------------------------
+# STM32F427/437 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F427
+    bool "STM32F427 (2MB Flash, 256KB SRAM)"
+    help
+      STM32F427 variant:
+      - Flash: 2 MB
+      - SRAM: 256 KB (192+64 KB)
+      - Frequency: 180 MHz
+      - Features: USB OTG FS/HS, Ethernet MAC, CAN
+      - Package: LQFP100, LQFP144, LQFP176, UFBGA176
+
+config STM32F437
+    bool "STM32F437 (2MB Flash, 256KB SRAM, Crypto)"
+    help
+      STM32F437 variant:
+      - Flash: 2 MB
+      - SRAM: 256 KB (192+64 KB)
+      - Frequency: 180 MHz
+      - Features: USB OTG FS/HS, Ethernet MAC, CAN, crypto accelerator
+      - Package: LQFP100, LQFP144, LQFP176, UFBGA176
+
+#-----------------------------------------------------------------------------
+# STM32F429/439 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F429
+    bool "STM32F429 (2MB Flash, 256KB SRAM, LCD-TFT)"
+    help
+      STM32F429 variant:
+      - Flash: 2 MB
+      - SRAM: 256 KB (192+64 KB)
+      - Frequency: 180 MHz
+      - Features: LCD-TFT controller, Chrom-ART graphics accelerator
+      - Package: LQFP100, LQFP144, LQFP176, UFBGA176
+
+config STM32F439
+    bool "STM32F439 (2MB Flash, 256KB SRAM, LCD-TFT, Crypto)"
+    help
+      STM32F439 variant:
+      - Flash: 2 MB
+      - SRAM: 256 KB (192+64 KB)
+      - Frequency: 180 MHz
+      - Features: LCD-TFT, Chrom-ART, crypto accelerator
+      - Package: LQFP100, LQFP144, LQFP176, UFBGA176
+
+#-----------------------------------------------------------------------------
+# STM32F446 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F446
+    bool "STM32F446 (512KB Flash, 128KB SRAM, SAI)"
+    help
+      STM32F446 variant:
+      - Flash: 512 KB
+      - SRAM: 128 KB
+      - Frequency: 180 MHz
+      - Features: Quad SPI, SAI audio interface, HDMI-CEC
+      - Package: LQFP64, LQFP100, LQFP144, UFBGA144
+
+#-----------------------------------------------------------------------------
+# STM32F469/479 Sub-series
+#-----------------------------------------------------------------------------
+
+config STM32F469
+    bool "STM32F469 (2MB Flash, 384KB SRAM, DSI)"
+    help
+      STM32F469 variant:
+      - Flash: 2 MB
+      - SRAM: 384 KB (320+64 KB)
+      - Frequency: 180 MHz
+      - Features: MIPI-DSI, LCD-TFT, Chrom-ART, QSPI
+      - Package: LQFP176, UFBGA176
+
+config STM32F479
+    bool "STM32F479 (2MB Flash, 384KB SRAM, DSI, Crypto)"
+    help
+      STM32F479 variant:
+      - Flash: 2 MB
+      - SRAM: 384 KB (320+64 KB)
+      - Frequency: 180 MHz
+      - Features: MIPI-DSI, LCD-TFT, Chrom-ART, QSPI, crypto accelerator
+      - Package: LQFP176, UFBGA176
+
+endchoice
+
+#-----------------------------------------------------------------------------
+# Chip Name Definition
+#-----------------------------------------------------------------------------
+
+config STM32_CHIP_NAME
+    string
+    default "STM32F401xB" if STM32F401xB
+    default "STM32F401xC" if STM32F401xC
+    default "STM32F401xD" if STM32F401xD
+    default "STM32F401xE" if STM32F401xE
+    default "STM32F405xx" if STM32F405
+    default "STM32F407xx" if STM32F407
+    default "STM32F410Tx" if STM32F410Tx
+    default "STM32F410Cx" if STM32F410Cx
+    default "STM32F410Rx" if STM32F410Rx
+    default "STM32F411xC" if STM32F411xC
+    default "STM32F411xE" if STM32F411xE
+    default "STM32F412Cx" if STM32F412Cx
+    default "STM32F412Rx" if STM32F412Rx
+    default "STM32F412Vx" if STM32F412Vx
+    default "STM32F412Zx" if STM32F412Zx
+    default "STM32F413xx" if STM32F413xx
+    default "STM32F423xx" if STM32F423xx
+    default "STM32F427xx" if STM32F427
+    default "STM32F437xx" if STM32F437
+    default "STM32F429xx" if STM32F429
+    default "STM32F439xx" if STM32F439
+    default "STM32F446xx" if STM32F446
+    default "STM32F469xx" if STM32F469
+    default "STM32F479xx" if STM32F479
+    help
+      STM32 chip name for HAL driver selection and conditional compilation.
+
+#-----------------------------------------------------------------------------
+# Memory Configuration
+#-----------------------------------------------------------------------------
+
+config STM32_FLASH_SIZE
+    hex "Flash size (bytes)"
+    default 0x20000 if STM32F401xB || STM32F410Tx || STM32F410Rx
+    default 0x40000 if STM32F401xC || STM32F410Cx || STM32F411xC || STM32F412Cx
+    default 0x60000 if STM32F401xD
+    default 0x80000 if STM32F401xE || STM32F411xE || STM32F446
+    default 0x100000 if STM32F405 || STM32F407 || STM32F412Rx || STM32F412Vx || STM32F412Zx
+    default 0x180000 if STM32F413xx || STM32F423xx
+    default 0x200000 if STM32F427 || STM32F437 || STM32F429 || STM32F439 || STM32F469 || STM32F479
+    help
+      Flash memory size in bytes.
+
+config STM32_SRAM_SIZE
+    hex "SRAM size (bytes)"
+    default 0x8000 if STM32F410Tx || STM32F410Cx || STM32F410Rx
+    default 0x10000 if STM32F401xB || STM32F401xC
+    default 0x18000 if STM32F401xD || STM32F401xE
+    default 0x20000 if STM32F411xC || STM32F411xE || STM32F446
+    default 0x30000 if STM32F405 || STM32F407
+    default 0x40000 if STM32F412Cx || STM32F412Rx || STM32F412Vx || STM32F412Zx || STM32F427 || STM32F437 || STM32F429 || STM32F439
+    default 0x50000 if STM32F413xx || STM32F423xx
+    default 0x60000 if STM32F469 || STM32F479
+    help
+      SRAM memory size in bytes.
+
+#-----------------------------------------------------------------------------
+# Peripheral Feature Flags
+#-----------------------------------------------------------------------------
+
+config STM32F4_HAS_ETHERNET
+    bool
+    default y if STM32F407 || STM32F427 || STM32F437 || STM32F429 || STM32F439
+    help
+      Whether the chip has Ethernet MAC peripheral.
+
+config STM32F4_HAS_LTDC
+    bool
+    default y if STM32F429 || STM32F439 || STM32F469 || STM32F479
+    help
+      Whether the chip has LCD-TFT display controller.
+
+config STM32F4_HAS_DSI
+    bool
+    default y if STM32F469 || STM32F479
+    help
+      Whether the chip has MIPI-DSI interface.
+
+config STM32F4_HAS_CRYPTO
+    bool
+    default y if STM32F423xx || STM32F437 || STM32F439 || STM32F479
+    help
+      Whether the chip has hardware crypto accelerator.
+
+config STM32F4_HAS_QSPI
+    bool
+    default y if STM32F413xx || STM32F423xx || STM32F446 || STM32F469 || STM32F479
+    help
+      Whether the chip has Quad SPI interface.
+
+config STM32F4_HAS_SAI
+    bool
+    default y if STM32F446
+    help
+      Whether the chip has SAI audio interface.
+
+endif # STM32F4

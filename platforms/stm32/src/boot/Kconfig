@@ -1,0 +1,102 @@
+menu "Boot Configuration"
+
+config STM32_ENABLE_FPU
+    bool "Enable FPU (Floating Point Unit)"
+    default y
+    depends on STM32F4 || STM32F7 || STM32H7
+    help
+      Enable the Floating Point Unit (FPU) during system initialization.
+      The FPU provides hardware acceleration for floating-point operations.
+
+      Available on:
+      - STM32F4 series (Cortex-M4F)
+      - STM32F7 series (Cortex-M7F)
+      - STM32H7 series (Cortex-M7F)
+
+      When enabled, the FPU coprocessors (CP10 and CP11) are granted
+      full access during SystemInit().
+
+config STM32_STACK_SIZE
+    hex "Stack size (bytes)"
+    default 0x1000
+    range 0x400 0x10000
+    help
+      Stack size in bytes for the main stack.
+      Default: 0x1000 (4KB)
+      Minimum: 0x400 (1KB)
+      Maximum: 0x10000 (64KB)
+
+      The stack is used for:
+      - Function call frames
+      - Local variables
+      - Interrupt service routines
+
+      Increase this value if you experience stack overflow or use
+      deeply nested function calls.
+
+config STM32_HEAP_SIZE
+    hex "Heap size (bytes)"
+    default 0x1000
+    range 0x400 0x10000
+    help
+      Heap size in bytes for dynamic memory allocation.
+      Default: 0x1000 (4KB)
+      Minimum: 0x400 (1KB)
+      Maximum: 0x10000 (64KB)
+
+      The heap is used for:
+      - malloc() and free() operations
+      - C++ new and delete operators
+      - Dynamic data structures
+
+      Increase this value if you use dynamic memory allocation
+      extensively in your application.
+
+config STM32_VTOR_OFFSET
+    hex "Vector table offset"
+    default 0x00000000
+    help
+      Offset of the vector table from the base address.
+      Default: 0x00000000 (no offset)
+
+      This is typically 0x00000000 for applications running from
+      Flash start address (0x08000000).
+
+      Set a non-zero value if:
+      - Using a bootloader (e.g., 0x00008000 for 32KB bootloader)
+      - Running from RAM
+      - Using custom memory layout
+
+config STM32_BOOT_TIMEOUT
+    int "Boot timeout (ms)"
+    default 100
+    range 10 5000
+    help
+      Maximum time allowed for boot initialization in milliseconds.
+      Default: 100ms
+
+      This timeout applies to:
+      - Clock configuration
+      - HAL library initialization
+      - Platform initialization
+
+      If initialization takes longer than this timeout, the system
+      will enter error handling mode.
+
+config STM32_ENABLE_BOOT_LOGGING
+    bool "Enable boot logging"
+    default y if DEBUG
+    default n
+    help
+      Enable logging output during boot process.
+      Useful for debugging boot issues.
+
+      When enabled, the boot process will output:
+      - Clock configuration status
+      - HAL initialization status
+      - Platform initialization status
+      - Error messages if initialization fails
+
+      Automatically enabled in DEBUG builds.
+
+endmenu

@@ -1,0 +1,66 @@
+menu "Interrupt Configuration"
+
+config STM32_NVIC_PRIORITY_GROUP
+    int "NVIC priority grouping"
+    default 4
+    range 0 4
+    help
+      NVIC priority grouping configuration.
+      Determines how interrupt priority bits are split between
+      preemption priority and sub-priority.
+
+      Values:
+        0 = NVIC_PRIORITYGROUP_0 (0 bits preemption, 4 bits sub-priority)
+        1 = NVIC_PRIORITYGROUP_1 (1 bit preemption, 3 bits sub-priority)
+        2 = NVIC_PRIORITYGROUP_2 (2 bits preemption, 2 bits sub-priority)
+        3 = NVIC_PRIORITYGROUP_3 (3 bits preemption, 1 bit sub-priority)
+        4 = NVIC_PRIORITYGROUP_4 (4 bits preemption, 0 bits sub-priority)
+
+      Recommended: 4 (all bits for preemption priority)
+
+config STM32_ENABLE_FAULT_HANDLERS
+    bool "Enable detailed fault handlers"
+    default y if DEBUG
+    default n
+    help
+      Enable detailed fault exception handlers with debugging support.
+      When enabled, fault handlers will:
+        - Save fault status registers
+        - Trigger breakpoints in debug mode
+        - Provide detailed fault information
+
+      Automatically enabled in DEBUG builds.
+
+config STM32_FAULT_HANDLER_LOGGING
+    bool "Enable fault handler logging"
+    default y if DEBUG
+    default n
+    depends on STM32_ENABLE_FAULT_HANDLERS && STM32_ENABLE_LOGGING
+    help
+      Enable logging output in fault exception handlers.
+      Provides detailed information about fault causes and registers.
+
+      Requires STM32_ENABLE_LOGGING to be enabled.
+
+config STM32_SYSTICK_PRIORITY
+    int "SysTick interrupt priority"
+    default 15
+    range 0 15
+    help
+      SysTick timer interrupt priority (0-15).
+      Lower values = higher priority.
+
+      Recommended: 15 (lowest priority) to allow other interrupts
+      to preempt SysTick.
+
+config STM32_PENDSV_PRIORITY
+    int "PendSV interrupt priority"
+    default 15
+    range 0 15
+    help
+      PendSV interrupt priority (0-15).
+      Lower values = higher priority.
+
+      Recommended: 15 (lowest priority) for RTOS context switching.
+
+endmenu

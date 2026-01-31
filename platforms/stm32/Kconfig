@@ -1,26 +1,124 @@
+#-----------------------------------------------------------------------------
+# STM32 Platform Configuration
+#-----------------------------------------------------------------------------
+# This file defines the top-level configuration structure for STM32 platform
+# with modular design to support all STM32 series.
 #
-#STM32 Platform Configuration
+# Directory structure (configuration files are co-located with their code):
+#   chips/       - Chip series and variant selection + Kconfig files
+#   src/boot/    - Boot and startup code + Kconfig
+#   src/clock/   - Clock configuration code + Kconfig
+#   src/hal/     - HAL integration code + Kconfig files
+#   src/peripheral/ - Peripheral drivers + Kconfig files
+#   src/system/  - System-level code + Kconfig
+#   config/      - HAL configuration headers (stm32xxx_hal_conf.h)
 #
-#This file defines the STM32 platform configuration and imports
-#chip - specific and peripheral - specific Kconfig files.
-#
+# Configuration hierarchy:
+#   1. Chip series and variant selection (chips/Kconfig)
+#   2. Clock configuration (src/clock/Kconfig)
+#   3. Boot configuration (src/boot/Kconfig)
+#   4. Interrupt configuration (src/interrupt/Kconfig)
+#   5. Peripheral configuration (src/peripheral/Kconfig)
+#   6. HAL module auto-selection (src/hal/Kconfig.modules)
+#   7. HAL callback configuration (src/hal/Kconfig.callbacks)
+#   8. Peripheral detailed configuration (src/peripheral/Kconfig.detail)
+#   9. System configuration (src/system/Kconfig)
+#-----------------------------------------------------------------------------
 
 if PLATFORM_STM32
+
+#-----------------------------------------------------------------------------
+# Platform Identification
+#-----------------------------------------------------------------------------
 
 config STM32_PLATFORM_NAME
     string
     default "STM32 Platform"
     help
-      STM32 platform name for identification.
+      STM32 platform name for identification and logging.
 
 config STM32_PLATFORM_VERSION
     string
-    default "1.0.0"
+    default "2.0.0"
     help
-      STM32 platform version.
+      STM32 platform version following semantic versioning.
 
-#Chip family and variant selection
-source "platforms/stm32/Kconfig_chip"
+#-----------------------------------------------------------------------------
+# Chip Series and Variant Selection
+#-----------------------------------------------------------------------------
+# Supported series: C0, F0, F1, F2, F3, F4, F7, G0, G4, H5, H7, L0, L1, L4,
+#                   L5, U0, U3, U5, WB, WL
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/chips/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Clock Configuration
+#-----------------------------------------------------------------------------
+# Configure system clock, peripheral clocks and clock sources
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/clock/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Boot Configuration
+#-----------------------------------------------------------------------------
+# Configure boot mode, vector table location and boot options
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/boot/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Interrupt Configuration
+#-----------------------------------------------------------------------------
+# Configure NVIC priority grouping and interrupt handlers
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/interrupt/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Peripheral Configuration
+#-----------------------------------------------------------------------------
+# User interface for enabling/disabling peripheral features
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/peripheral/Kconfig"
+
+#-----------------------------------------------------------------------------
+# HAL Module Auto-Selection (Internal)
+#-----------------------------------------------------------------------------
+# Automatically select required HAL modules based on peripheral configuration
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/hal/Kconfig.modules"
+
+#-----------------------------------------------------------------------------
+# HAL Callback Configuration
+#-----------------------------------------------------------------------------
+# Configure HAL library callback function support
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/hal/Kconfig.callbacks"
+
+#-----------------------------------------------------------------------------
+# Peripheral Detailed Configuration
+#-----------------------------------------------------------------------------
+# Detailed parameter configuration for each peripheral
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/peripheral/Kconfig.detail"
+
+#-----------------------------------------------------------------------------
+# System Configuration
+#-----------------------------------------------------------------------------
+# System-level configuration options
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/src/system/Kconfig"
+
+#-----------------------------------------------------------------------------
+# Platform Settings
+#-----------------------------------------------------------------------------
 
 menu "STM32 Platform Settings"
 
@@ -28,8 +126,9 @@ config STM32_ENABLE_LOGGING
     bool "Enable platform logging"
     default y
     help
-      Enable logging output for the STM32 platform.
-      Useful for debugging and development.
+      Enable logging output for STM32 platform.
+      Useful for debugging and development, can be disabled in production
+      to save resources.
 
 config STM32_LOG_LEVEL
     int "Platform log level"
@@ -37,47 +136,131 @@ config STM32_LOG_LEVEL
     range 0 4
     depends on STM32_ENABLE_LOGGING
     help
-      Log level for STM32 platform:
-      0 = None, 1 = Error, 2 = Warning, 3 = Info, 4 = Debug
+      STM32 platform log level:
+        0 = None
+        1 = Error
+        2 = Warning
+        3 = Info
+        4 = Debug
 
 config STM32_ENABLE_STATISTICS
     bool "Enable performance statistics"
-    default y
+    default n
     help
-      Enable performance statistics collection for peripherals.
-      Provides diagnostic information about peripheral usage.
+      Enable peripheral performance statistics collection.
+      Provides diagnostic information about peripheral usage with slight
+      memory and CPU overhead.
 
 config STM32_BUFFER_ALIGNMENT
     int "Buffer alignment (bytes)"
     default 4
     range 1 64
     help
-      Memory alignment for peripheral buffers.
+      Memory alignment for peripheral buffers in bytes.
       Must be a power of 2 for optimal DMA performance.
 
+      Recommended values:
+        - Cortex-M0/M0+/M3: 4 bytes
+        - Cortex-M4/M7: 4 or 32 bytes (cache line aligned)
+        - With DCache: 32 bytes
+
+config STM32_USE_FULL_ASSERT
+    bool "Enable full assert checks"
+    default y if BUILD_TYPE_DEBUG
+    default n
+    help
+      Enable full assertion checks in HAL library.
+      Recommended for debug builds, can be disabled in production
+      to reduce code size.
+
 endmenu
+
+#-----------------------------------------------------------------------------
+# Resource Managers
+#-----------------------------------------------------------------------------
 
 menu "Resource Managers"
 
 config STM32_DMA_CHANNELS
     int "Number of DMA channels"
-    default 8
+    default 16 if STM32H7
+    default 8 if STM32F4 || STM32F7
+    default 7 if STM32L4 || STM32G4
+    default 5 if STM32F0 || STM32L0
     range 1 32
     help
-      Number of DMA channels available on the STM32 chip.
-      Actual availability depends on the selected chip variant.
+      Number of DMA channels available.
+      Actual availability depends on selected chip variant.
+
+      Typical values:
+        - STM32F0/L0: 5-7 channels
+        - STM32F1/F3: 7-12 channels
+        - STM32F4/L4: 8-16 channels
+        - STM32H7: 16 channels (per DMA controller)
 
 config STM32_ISR_SLOTS
     int "Number of ISR slots"
-    default 64
+    default 128 if STM32H7
+    default 96 if STM32F7
+    default 64 if STM32F4 || STM32L4
+    default 32 if STM32F0 || STM32L0
     range 1 256
     help
-      Number of interrupt service routine slots available.
+      Number of interrupt service routine slots.
       Each peripheral can register interrupt callbacks.
+
+      Should be greater than or equal to the number of interrupt vectors
+      available on the chip.
+
+config STM32_GPIO_PORTS
+    int "Number of GPIO ports"
+    default 11 if STM32H7
+    default 9 if STM32F4 || STM32F7
+    default 8 if STM32L4
+    default 6 if STM32F0 || STM32L0
+    range 1 16
+    help
+      Number of GPIO ports (A-K).
+      Actual availability depends on selected chip variant and package.
 
 endmenu
 
-#Peripheral configuration
-source "platforms/stm32/Kconfig_peripherals"
+#-----------------------------------------------------------------------------
+# Advanced Features
+#-----------------------------------------------------------------------------
 
-endif # PLATFORM_STM32
+menu "Advanced Features"
+
+config STM32_USE_HAL_DRIVER
+    bool
+    default y
+    help
+      Use STM32 HAL driver library (automatically selected, non-configurable).
+
+config STM32_USE_LL_DRIVER
+    bool "Enable LL (Low-Layer) driver support"
+    default n
+    help
+      Enable STM32 LL (Low-Layer) driver library support.
+      LL drivers provide lower-level register access with smaller code size
+      and higher performance. Can be used together with HAL drivers.
+
+config STM32_ENABLE_RTOS_SUPPORT
+    bool "Enable RTOS support in HAL"
+    default y if OSAL_FREERTOS
+    default n
+    help
+      Enable RTOS support in HAL library.
+      When enabled, HAL library will use RTOS mutexes and delay functions.
+
+config STM32_HAL_TIMEOUT_VALUE
+    int "HAL timeout value (ms)"
+    default 1000
+    range 100 10000
+    help
+      Default timeout value for HAL library operations in milliseconds.
+      Used for peripheral initialization and data transfer operations.
+
+endmenu
+
+endif  # PLATFORM_STM32

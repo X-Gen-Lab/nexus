@@ -1,0 +1,31 @@
+#-----------------------------------------------------------------------------
+# STM32WB Series Chip Variant Selection
+#-----------------------------------------------------------------------------
+# This file defines chip variants for STM32WB series.
+# TODO: Add specific chip variants (WB10, WB15, WB30, WB35, WB50, WB55, WB5M)
+#-----------------------------------------------------------------------------
+
+if STM32WB
+
+# Placeholder for STM32WB chip variant selection
+# Add choice block and chip variants here
+
+config STM32_CHIP_NAME
+    string
+    default "STM32WBxx"
+    help
+      STM32 chip name for HAL driver selection and conditional compilation.
+
+config STM32_FLASH_SIZE
+    hex "Flash size (bytes)"
+    default 0x100000
+    help
+      Flash memory size in bytes.
+
+config STM32_SRAM_SIZE
+    hex "SRAM size (bytes)"
+    default 0x40000
+    help
+      SRAM memory size in bytes.
+
+endif # STM32WB

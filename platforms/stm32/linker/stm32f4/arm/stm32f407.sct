@@ -1,0 +1,57 @@
+;******************************************************************************
+;* File Name          : stm32f407.sct
+;* Description        : ARM Clang scatter file for STM32F407VG
+;*                      1024KB Flash, 128KB RAM, 64KB CCM RAM
+;* Author             : Nexus Team
+;******************************************************************************
+;* Copyright (c) 2026 Nexus Team
+;*
+;* This scatter file defines memory layout and section placement for
+;* STM32F407VG microcontroller using ARM Clang toolchain.
+;*
+;* Note: Stack and Heap are managed by startup_stm32f407xx.s using
+;*       __use_two_region_memory model.
+;******************************************************************************
+
+;******************************************************************************
+;* Memory Regions
+;******************************************************************************
+
+LR_IROM1 0x08000000 0x00100000  {    ; Load region, 1MB Flash
+
+  ;****************************************************************************
+  ;* Vector Table and Code
+  ;****************************************************************************
+
+  ER_IROM1 0x08000000 0x00100000  {  ; Execution region, Flash
+    *.o (RESET, +First)              ; Vector table must be first
+    *(InRoot$$Sections)              ; All library sections
+    .ANY (+RO)                       ; All read-only sections
+    .ANY (+XO)                       ; All execute-only sections
+  }
+
+  ;****************************************************************************
+  ;* RAM Data and BSS
+  ;****************************************************************************
+
+  RW_IRAM1 0x20000000 0x00020000  {  ; 128KB RAM
+    .ANY (+RW +ZI)                   ; All read-write and zero-init data
+  }
+
+  ;****************************************************************************
+  ;* CCM RAM (optional, for critical data)
+  ;****************************************************************************
+
+  RW_IRAM2 0x10000000 UNINIT 0x00010000  {  ; 64KB CCM RAM
+    .ANY (.ccmram)                   ; CCM RAM sections
+  }
+}
+
+;******************************************************************************
+;* Entry Point: Reset_Handler
+;******************************************************************************
+; Note: This sets the ELF entry point to Reset_Handler instead of __main
+
+;******************************************************************************
+;* End of scatter file
+;******************************************************************************

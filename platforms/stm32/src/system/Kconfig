@@ -1,0 +1,61 @@
+menu "System Configuration"
+
+config STM32_VDD_VALUE
+    int "VDD voltage (mV)"
+    default 3300
+    range 1800 3600
+    help
+      Supply voltage in millivolts.
+      Typical values: 3300 (3.3V), 1800 (1.8V)
+
+config STM32_TICK_INT_PRIORITY
+    hex "SysTick interrupt priority"
+    default 0x0F
+    range 0x00 0x0F
+    help
+      Priority for SysTick timer interrupt.
+      Lower values = higher priority.
+      Default 0x0F is lowest priority.
+
+config STM32_USE_RTOS
+    bool "Use RTOS"
+    default n
+    help
+      Enable RTOS support in HAL driver.
+      Affects timeout and delay implementations.
+
+config STM32_PREFETCH_ENABLE
+    bool "Enable instruction prefetch"
+    default y
+    help
+      Enable instruction prefetch buffer.
+      Improves performance for code in Flash.
+
+config STM32_INSTRUCTION_CACHE_ENABLE
+    bool "Enable instruction cache"
+    default y
+    depends on STM32F4 || STM32F7 || STM32H7
+    help
+      Enable instruction cache (I-Cache).
+      Significantly improves performance.
+      Available on STM32F4, STM32F7, and STM32H7 series.
+
+config STM32_DATA_CACHE_ENABLE
+    bool "Enable data cache"
+    default y
+    depends on STM32F4 || STM32F7 || STM32H7
+    help
+      Enable data cache (D-Cache).
+      Improves data access performance.
+      Available on STM32F4, STM32F7, and STM32H7 series.
+
+config STM32_USE_FULL_ASSERT
+    bool "Enable full assert"
+    default y if DEBUG
+    default n
+    help
+      Enable assert_param macro in HAL drivers.
+      Useful for debugging but increases code size.
+      Automatically enabled in DEBUG builds.
+
+endmenu

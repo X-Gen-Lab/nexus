@@ -1,0 +1,201 @@
+#-----------------------------------------------------------------------------
+# STM32H7 Series Chip Variant Selection
+#-----------------------------------------------------------------------------
+# STM32H7 series includes:
+#   - STM32H743/753: Single-core, up to 480 MHz
+#   - STM32H750: Value line with 128KB Flash
+#   - STM32H7A3/7B3: Advanced line with graphics
+#   - STM32H745/755: Dual-core (M7+M4)
+#   - STM32H747/757: Dual-core with graphics
+#-----------------------------------------------------------------------------
+
+if STM32H7
+
+choice
+    prompt "STM32H7 Chip Variant"
+    default STM32H743
+    help
+      Select specific STM32H7 chip variant.
+      Different variants have different core configurations, memory sizes
+      and peripheral features.
+
+config STM32H743
+    bool "STM32H743 (2MB Flash, 1MB SRAM, Single-core)"
+    help
+      STM32H743 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Single Cortex-M7 @ 480 MHz
+      - Features: High-speed USB, Ethernet, CAN FD
+      - Package: LQFP100, LQFP144, LQFP176, TFBGA240
+
+config STM32H750
+    bool "STM32H750 (128KB Flash, 1MB SRAM, Value line)"
+    help
+      STM32H750 variant:
+      - Flash: 128 KB (value line)
+      - SRAM: 1 MB
+      - Core: Single Cortex-M7 @ 480 MHz
+      - Features: Optimized for external memory applications
+      - Package: LQFP100, LQFP144, TFBGA240
+
+config STM32H753
+    bool "STM32H753 (2MB Flash, 1MB SRAM, Crypto)"
+    help
+      STM32H753 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Single Cortex-M7 @ 480 MHz
+      - Features: Crypto/hash accelerator, high-speed USB, Ethernet
+      - Package: LQFP100, LQFP144, LQFP176, TFBGA240
+
+config STM32H7A3
+    bool "STM32H7A3 (2MB Flash, 1MB SRAM, Advanced)"
+    help
+      STM32H7A3 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Single Cortex-M7 @ 280 MHz
+      - Features: Advanced analog, SMPS, low power
+      - Package: LQFP100, LQFP144, TFBGA100, TFBGA225
+
+config STM32H7B3
+    bool "STM32H7B3 (2MB Flash, 1MB SRAM, Graphics)"
+    help
+      STM32H7B3 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Single Cortex-M7 @ 280 MHz
+      - Features: LCD-TFT, JPEG codec, advanced analog
+      - Package: LQFP100, LQFP144, TFBGA225
+
+config STM32H745
+    bool "STM32H745 (2MB Flash, 1MB SRAM, Dual-core)"
+    help
+      STM32H745 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Dual-core Cortex-M7 @ 480 MHz + Cortex-M4 @ 240 MHz
+      - Features: High-speed USB, Ethernet, CAN FD
+      - Package: LQFP100, LQFP144, TFBGA240
+
+config STM32H747
+    bool "STM32H747 (2MB Flash, 1MB SRAM, Dual-core + Graphics)"
+    help
+      STM32H747 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Dual-core Cortex-M7 @ 480 MHz + Cortex-M4 @ 240 MHz
+      - Features: LCD-TFT, JPEG codec, USB, Ethernet
+      - Package: LQFP100, LQFP144, TFBGA240
+
+config STM32H755
+    bool "STM32H755 (2MB Flash, 1MB SRAM, Dual-core + Crypto)"
+    help
+      STM32H755 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Dual-core Cortex-M7 @ 480 MHz + Cortex-M4 @ 240 MHz
+      - Features: Crypto/hash accelerator, USB, Ethernet
+      - Package: LQFP100, LQFP144, TFBGA240
+
+config STM32H757
+    bool "STM32H757 (2MB Flash, 1MB SRAM, Dual-core + Graphics + Crypto)"
+    help
+      STM32H757 variant:
+      - Flash: 2 MB
+      - SRAM: 1 MB
+      - Core: Dual-core Cortex-M7 @ 480 MHz + Cortex-M4 @ 240 MHz
+      - Features: LCD-TFT, JPEG, crypto accelerator, USB, Ethernet
+      - Package: LQFP100, LQFP144, TFBGA240
+
+endchoice
+
+#-----------------------------------------------------------------------------
+# Chip Name Definition
+#-----------------------------------------------------------------------------
+
+config STM32_CHIP_NAME
+    string
+    default "STM32H743xx" if STM32H743
+    default "STM32H750xx" if STM32H750
+    default "STM32H753xx" if STM32H753
+    default "STM32H7A3xx" if STM32H7A3
+    default "STM32H7B3xx" if STM32H7B3
+    default "STM32H745xx" if STM32H745
+    default "STM32H747xx" if STM32H747
+    default "STM32H755xx" if STM32H755
+    default "STM32H757xx" if STM32H757
+    help
+      STM32 chip name for HAL driver selection and conditional compilation.
+
+#-----------------------------------------------------------------------------
+# Memory Configuration
+#-----------------------------------------------------------------------------
+
+config STM32_FLASH_SIZE
+    hex "Flash size (bytes)"
+    default 0x20000 if STM32H750
+    default 0x200000 if STM32H743 || STM32H753 || STM32H7A3 || STM32H7B3 || STM32H745 || STM32H747 || STM32H755 || STM32H757
+    help
+      Flash memory size in bytes.
+
+config STM32_SRAM_SIZE
+    hex "SRAM size (bytes)"
+    default 0x100000
+    help
+      Total SRAM memory size in bytes (1 MB).
+      STM32H7 has multiple SRAM regions (DTCM, AXI SRAM, SRAM1-4).
+
+#-----------------------------------------------------------------------------
+# Core Configuration
+#-----------------------------------------------------------------------------
+
+config STM32H7_DUAL_CORE
+    bool
+    default y if STM32H745 || STM32H747 || STM32H755 || STM32H757
+    help
+      Whether the chip has dual-core architecture (M7+M4).
+
+config STM32H7_M4_CORE_FREQ
+    int
+    default 240000000 if STM32H7_DUAL_CORE
+    default 0
+    help
+      Cortex-M4 core frequency in Hz (for dual-core variants).
+
+#-----------------------------------------------------------------------------
+# Peripheral Feature Flags
+#-----------------------------------------------------------------------------
+
+config STM32H7_HAS_ETHERNET
+    bool
+    default y if STM32H743 || STM32H753 || STM32H745 || STM32H747 || STM32H755 || STM32H757
+    help
+      Whether the chip has Ethernet MAC peripheral.
+
+config STM32H7_HAS_LTDC
+    bool
+    default y if STM32H7B3 || STM32H747 || STM32H757
+    help
+      Whether the chip has LCD-TFT display controller.
+
+config STM32H7_HAS_JPEG
+    bool
+    default y if STM32H7B3 || STM32H747 || STM32H757
+    help
+      Whether the chip has JPEG codec.
+
+config STM32H7_HAS_CRYPTO
+    bool
+    default y if STM32H753 || STM32H755 || STM32H757
+    help
+      Whether the chip has hardware crypto/hash accelerator.
+
+config STM32H7_HAS_SMPS
+    bool
+    default y if STM32H7A3 || STM32H7B3
+    help
+      Whether the chip has integrated SMPS (Switched-Mode Power Supply).
+
+endif # STM32H7

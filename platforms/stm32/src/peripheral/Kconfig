@@ -1,0 +1,26 @@
+#
+# STM32 Peripheral Configuration
+#
+# This is the main user interface for configuring STM32 peripherals.
+# Enabling peripherals here automatically enables required HAL modules.
+#
+
+menu "Peripheral Configuration"
+
+#
+# UART Configuration
+#
+menuconfig STM32_UART_ENABLE
+    bool "Enable UART support"
+    default y
+    help
+      Enable UART (Universal Asynchronous Receiver/Transmitter) support
+      for the STM32 platform. UART is used for serial communication.
+
+      Automatically enables: HAL_UART_MODULE, HAL_USART_MODULE
+
+if STM32_UART_ENABLE
+# source "src/uart/Kconfig"
+endif # STM32_UART_ENABLE
+
+endmenu # Peripheral Configuration

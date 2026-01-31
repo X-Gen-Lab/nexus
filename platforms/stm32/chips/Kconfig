@@ -1,0 +1,357 @@
+#-----------------------------------------------------------------------------
+# STM32 Chip Series and Variant Selection
+#-----------------------------------------------------------------------------
+# This file uses hierarchical architecture design to support all STM32 series:
+#   - Mainstream: F0, F1, F2, F3, F4, F7
+#   - High Performance: H5, H7
+#   - Ultra-Low-Power: L0, L1, L4, L5
+#   - Ultra-Low-Power Plus: U0, U3, U5
+#   - Wireless: WB, WL
+#   - Value Line: C0
+#   - General Purpose: G0, G4
+#-----------------------------------------------------------------------------
+
+choice
+    prompt "STM32 Chip Series"
+    default STM32F4
+    help
+      Select STM32 chip series.
+      Different series have different performance, power consumption
+      and peripheral features.
+
+#-----------------------------------------------------------------------------
+# Mainstream Series
+#-----------------------------------------------------------------------------
+
+config STM32F0
+    bool "STM32F0 Series (Cortex-M0)"
+    help
+      STM32F0 series - Entry-level 32-bit microcontrollers
+      - Core: ARM Cortex-M0
+      - Frequency: up to 48 MHz
+      - Features: Low cost, easy to use, rich peripherals
+      - Applications: Consumer electronics, industrial control, sensor nodes
+
+config STM32F1
+    bool "STM32F1 Series (Cortex-M3)"
+    help
+      STM32F1 series - Classic mainstream microcontrollers
+      - Core: ARM Cortex-M3
+      - Frequency: up to 72 MHz
+      - Features: Mature and stable, rich ecosystem
+      - Applications: Industrial control, motor drive, communication devices
+
+config STM32F2
+    bool "STM32F2 Series (Cortex-M3)"
+    help
+      STM32F2 series - High-performance mainstream microcontrollers
+      - Core: ARM Cortex-M3
+      - Frequency: up to 120 MHz
+      - Features: High performance, rich connectivity
+      - Applications: Industrial automation, medical devices, network equipment
+
+config STM32F3
+    bool "STM32F3 Series (Cortex-M4)"
+    help
+      STM32F3 series - Mixed-signal microcontrollers
+      - Core: ARM Cortex-M4 with FPU
+      - Frequency: up to 72 MHz
+      - Features: High-precision ADC/DAC, comparators
+      - Applications: Motor control, digital power, sensor fusion
+
+config STM32F4
+    bool "STM32F4 Series (Cortex-M4)"
+    help
+      STM32F4 series - High-performance microcontrollers
+      - Core: ARM Cortex-M4 with FPU and DSP
+      - Frequency: up to 180 MHz
+      - Features: High performance, rich peripherals, USB/Ethernet
+      - Applications: Audio processing, GUI, communication gateway
+
+config STM32F7
+    bool "STM32F7 Series (Cortex-M7)"
+    help
+      STM32F7 series - Very high-performance microcontrollers
+      - Core: ARM Cortex-M7 with FPU and DSP
+      - Frequency: up to 216 MHz
+      - Features: Very high performance, graphics acceleration, high-speed interfaces
+      - Applications: Industrial HMI, multimedia, high-speed data acquisition
+
+#-----------------------------------------------------------------------------
+# High Performance Series
+#-----------------------------------------------------------------------------
+
+config STM32H5
+    bool "STM32H5 Series (Cortex-M33)"
+    help
+      STM32H5 series - High-performance secure microcontrollers
+      - Core: ARM Cortex-M33 with TrustZone
+      - Frequency: up to 250 MHz
+      - Features: High performance, secure boot, crypto acceleration
+      - Applications: Industrial IoT, secure gateway, edge computing
+
+config STM32H7
+    bool "STM32H7 Series (Cortex-M7)"
+    help
+      STM32H7 series - Flagship high-performance microcontrollers
+      - Core: ARM Cortex-M7 (some models support dual-core M7+M4)
+      - Frequency: up to 480 MHz
+      - Features: Very high performance, large memory, rich high-speed interfaces
+      - Applications: High-end industrial control, video processing, AI edge computing
+
+#-----------------------------------------------------------------------------
+# Ultra-Low-Power Series
+#-----------------------------------------------------------------------------
+
+config STM32L0
+    bool "STM32L0 Series (Cortex-M0+)"
+    help
+      STM32L0 series - Ultra-low-power microcontrollers
+      - Core: ARM Cortex-M0+
+      - Frequency: up to 32 MHz
+      - Features: Ultra-low power, multiple low-power modes
+      - Applications: Battery-powered devices, sensor nodes, wearables
+
+config STM32L1
+    bool "STM32L1 Series (Cortex-M3)"
+    help
+      STM32L1 series - Low-power microcontrollers
+      - Core: ARM Cortex-M3
+      - Frequency: up to 32 MHz
+      - Features: Low power, LCD controller
+      - Applications: Portable medical, smart metering, handheld devices
+
+config STM32L4
+    bool "STM32L4 Series (Cortex-M4)"
+    help
+      STM32L4 series - Ultra-low-power high-performance microcontrollers
+      - Core: ARM Cortex-M4 with FPU
+      - Frequency: up to 120 MHz
+      - Features: Ultra-low power, high performance, rich peripherals
+      - Applications: IoT devices, smart home, industrial sensors
+
+config STM32L5
+    bool "STM32L5 Series (Cortex-M33)"
+    help
+      STM32L5 series - Ultra-low-power secure microcontrollers
+      - Core: ARM Cortex-M33 with TrustZone
+      - Frequency: up to 110 MHz
+      - Features: Ultra-low power, secure boot, crypto acceleration
+      - Applications: Secure IoT, payment terminals, smart locks
+
+#-----------------------------------------------------------------------------
+# Ultra-Low-Power Plus Series
+#-----------------------------------------------------------------------------
+
+config STM32U0
+    bool "STM32U0 Series (Cortex-M0+)"
+    help
+      STM32U0 series - Next-generation ultra-low-power microcontrollers
+      - Core: ARM Cortex-M0+
+      - Frequency: up to 56 MHz
+      - Features: Extremely low power, high energy efficiency
+      - Applications: Battery-powered devices, energy harvesting applications
+
+config STM32U3
+    bool "STM32U3 Series (Cortex-M33)"
+    help
+      STM32U3 series - Ultra-low-power high-performance microcontrollers
+      - Core: ARM Cortex-M33 with TrustZone
+      - Frequency: up to 160 MHz
+      - Features: Ultra-low power, high performance, graphics acceleration
+      - Applications: Wearables, portable medical, smart sensors
+
+config STM32U5
+    bool "STM32U5 Series (Cortex-M33)"
+    help
+      STM32U5 series - Flagship ultra-low-power microcontrollers
+      - Core: ARM Cortex-M33 with TrustZone
+      - Frequency: up to 160 MHz
+      - Features: Extremely low power, high performance, rich security features
+      - Applications: High-end IoT, Industry 4.0, smart city
+
+#-----------------------------------------------------------------------------
+# Wireless Series
+#-----------------------------------------------------------------------------
+
+config STM32WB
+    bool "STM32WB Series (Cortex-M4 + Cortex-M0+)"
+    help
+      STM32WB series - Dual-core wireless microcontrollers
+      - Core: ARM Cortex-M4 (application) + Cortex-M0+ (wireless)
+      - Frequency: up to 64 MHz
+      - Features: BLE 5.3, 802.15.4, ultra-low power
+      - Applications: Smart home, wearables, healthcare
+
+config STM32WL
+    bool "STM32WL Series (Cortex-M4)"
+    help
+      STM32WL series - LoRa wireless microcontrollers
+      - Core: ARM Cortex-M4
+      - Frequency: up to 48 MHz
+      - Features: Integrated LoRa transceiver, ultra-low power
+      - Applications: LoRaWAN nodes, smart metering, asset tracking
+
+#-----------------------------------------------------------------------------
+# General Purpose Series
+#-----------------------------------------------------------------------------
+
+config STM32G0
+    bool "STM32G0 Series (Cortex-M0+)"
+    help
+      STM32G0 series - Next-generation mainstream microcontrollers
+      - Core: ARM Cortex-M0+
+      - Frequency: up to 64 MHz
+      - Features: High cost-performance, rich peripherals, low power
+      - Applications: Consumer electronics, industrial control, motor drive
+
+config STM32G4
+    bool "STM32G4 Series (Cortex-M4)"
+    help
+      STM32G4 series - High-performance mixed-signal microcontrollers
+      - Core: ARM Cortex-M4 with FPU
+      - Frequency: up to 170 MHz
+      - Features: High-precision ADC, math accelerator, rich timers
+      - Applications: Digital power, motor control, industrial automation
+
+#-----------------------------------------------------------------------------
+# Value Line Series
+#-----------------------------------------------------------------------------
+
+config STM32C0
+    bool "STM32C0 Series (Cortex-M0+)"
+    help
+      STM32C0 series - Value line entry-level microcontrollers
+      - Core: ARM Cortex-M0+
+      - Frequency: up to 48 MHz
+      - Features: Ultra-low cost, easy to use, basic peripherals
+      - Applications: Cost-sensitive applications, simple control, sensor interface
+
+endchoice
+
+#-----------------------------------------------------------------------------
+# Series Identifier
+#-----------------------------------------------------------------------------
+
+config STM32_SERIES
+    string
+    default "stm32c0" if STM32C0
+    default "stm32f0" if STM32F0
+    default "stm32f1" if STM32F1
+    default "stm32f2" if STM32F2
+    default "stm32f3" if STM32F3
+    default "stm32f4" if STM32F4
+    default "stm32f7" if STM32F7
+    default "stm32g0" if STM32G0
+    default "stm32g4" if STM32G4
+    default "stm32h5" if STM32H5
+    default "stm32h7" if STM32H7
+    default "stm32l0" if STM32L0
+    default "stm32l1" if STM32L1
+    default "stm32l4" if STM32L4
+    default "stm32l5" if STM32L5
+    default "stm32u0" if STM32U0
+    default "stm32u3" if STM32U3
+    default "stm32u5" if STM32U5
+    default "stm32wb" if STM32WB
+    default "stm32wl" if STM32WL
+    help
+      STM32 series identifier for use in code.
+
+#-----------------------------------------------------------------------------
+# Series Feature Flags
+#-----------------------------------------------------------------------------
+
+config STM32_HAS_DCACHE
+    bool
+    default y if STM32F7 || STM32H7
+    help
+      Whether the chip has data cache (DCache).
+
+config STM32_HAS_ICACHE
+    bool
+    default y if STM32F7 || STM32H7 || STM32L4 || STM32L5 || STM32U5
+    help
+      Whether the chip has instruction cache (ICache).
+
+config STM32_HAS_MPU
+    bool
+    default y if !STM32F0 && !STM32L0 && !STM32G0 && !STM32C0
+    help
+      Whether the chip has Memory Protection Unit (MPU).
+
+config STM32_HAS_FPU
+    bool
+    default y if STM32F3 || STM32F4 || STM32F7 || STM32G4 || STM32H5 || STM32H7 || STM32L4 || STM32L5 || STM32U3 || STM32U5 || STM32WB || STM32WL
+    help
+      Whether the chip has Floating Point Unit (FPU).
+
+config STM32_HAS_TRUSTZONE
+    bool
+    default y if STM32H5 || STM32L5 || STM32U3 || STM32U5
+    help
+      Whether the chip supports ARM TrustZone security features.
+
+#-----------------------------------------------------------------------------
+# Chip Variant Selection
+#-----------------------------------------------------------------------------
+
+# STM32C0 series variants
+source "platforms/stm32/chips/Kconfig.stm32c0"
+
+# STM32F0 series variants
+source "platforms/stm32/chips/Kconfig.stm32f0"
+
+# STM32F1 series variants
+source "platforms/stm32/chips/Kconfig.stm32f1"
+
+# STM32F2 series variants
+source "platforms/stm32/chips/Kconfig.stm32f2"
+
+# STM32F3 series variants
+source "platforms/stm32/chips/Kconfig.stm32f3"
+
+# STM32F4 series variants
+source "platforms/stm32/chips/Kconfig.stm32f4"
+
+# STM32F7 series variants
+source "platforms/stm32/chips/Kconfig.stm32f7"
+
+# STM32G0 series variants
+source "platforms/stm32/chips/Kconfig.stm32g0"
+
+# STM32G4 series variants
+source "platforms/stm32/chips/Kconfig.stm32g4"
+
+# STM32H5 series variants
+source "platforms/stm32/chips/Kconfig.stm32h5"
+
+# STM32H7 series variants
+source "platforms/stm32/chips/Kconfig.stm32h7"
+
+# STM32L0 series variants
+source "platforms/stm32/chips/Kconfig.stm32l0"
+
+# STM32L1 series variants
+source "platforms/stm32/chips/Kconfig.stm32l1"
+
+# STM32L4 series variants
+source "platforms/stm32/chips/Kconfig.stm32l4"
+
+# STM32L5 series variants
+source "platforms/stm32/chips/Kconfig.stm32l5"
+
+# STM32U0 series variants
+source "platforms/stm32/chips/Kconfig.stm32u0"
+
+# STM32U3 series variants
+source "platforms/stm32/chips/Kconfig.stm32u3"
+
+# STM32U5 series variants
+source "platforms/stm32/chips/Kconfig.stm32u5"
+
+# STM32WB series variants
+source "platforms/stm32/chips/Kconfig.stm32wb"
+
+# STM32WL series variants
+source "platforms/stm32/chips/Kconfig.stm32wl"

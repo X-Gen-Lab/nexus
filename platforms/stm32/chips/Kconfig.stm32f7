@@ -1,0 +1,31 @@
+#-----------------------------------------------------------------------------
+# STM32F7 Series Chip Variant Selection
+#-----------------------------------------------------------------------------
+# This file defines chip variants for STM32F7 series.
+# TODO: Add specific chip variants (F722, F723, F730, F732, F733, F745, F746, F750, F756, F765, F767, F769, F777, F778, F779)
+#-----------------------------------------------------------------------------
+
+if STM32F7
+
+# Placeholder for STM32F7 chip variant selection
+# Add choice block and chip variants here
+
+config STM32_CHIP_NAME
+    string
+    default "STM32F7xx"
+    help
+      STM32 chip name for HAL driver selection and conditional compilation.
+
+config STM32_FLASH_SIZE
+    hex "Flash size (bytes)"
+    default 0x100000
+    help
+      Flash memory size in bytes.
+
+config STM32_SRAM_SIZE
+    hex "SRAM size (bytes)"
+    default 0x50000
+    help
+      SRAM memory size in bytes.
+
+endif # STM32F7

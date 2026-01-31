@@ -1,0 +1,149 @@
+#-----------------------------------------------------------------------------
+# STM32L4 Series Chip Variant Selection
+#-----------------------------------------------------------------------------
+# STM32L4 series includes:
+#   - STM32L431/432/433: Compact, up to 80 MHz
+#   - STM32L451/452/462: Mainstream, up to 80 MHz
+#   - STM32L471/475/476: High performance, up to 80 MHz
+#   - STM32L496/4A6: Advanced, up to 80 MHz
+#   - STM32L4+: Enhanced performance, up to 120 MHz
+#-----------------------------------------------------------------------------
+
+if STM32L4
+
+choice
+    prompt "STM32L4 Chip Variant"
+    default STM32L476
+    help
+      Select specific STM32L4 chip variant.
+      Different variants have different memory sizes, peripheral
+      configurations and ultra-low-power features.
+
+config STM32L432
+    bool "STM32L432 (256KB Flash, 64KB SRAM)"
+    help
+      STM32L432 variant:
+      - Flash: 256 KB
+      - SRAM: 64 KB
+      - Frequency: 80 MHz
+      - Features: USB, compact package
+      - Package: LQFP32, LQFP48, UFQFPN32, UFQFPN48
+
+config STM32L476
+    bool "STM32L476 (1MB Flash, 128KB SRAM)"
+    help
+      STM32L476 variant:
+      - Flash: 1 MB
+      - SRAM: 128 KB
+      - Frequency: 80 MHz
+      - Features: USB OTG FS, LCD controller, DFSDM
+      - Package: LQFP64, LQFP100, UFBGA132, WLCSP100
+
+config STM32L496
+    bool "STM32L496 (1MB Flash, 320KB SRAM)"
+    help
+      STM32L496 variant:
+      - Flash: 1 MB
+      - SRAM: 320 KB
+      - Frequency: 80 MHz
+      - Features: USB OTG FS, LCD, DFSDM, QSPI, AES
+      - Package: LQFP100, LQFP144, UFBGA132, UFBGA169
+
+config STM32L4R5
+    bool "STM32L4R5 (2MB Flash, 640KB SRAM, L4+)"
+    help
+      STM32L4R5 variant (L4+ series):
+      - Flash: 2 MB
+      - SRAM: 640 KB
+      - Frequency: 120 MHz
+      - Features: Enhanced performance, USB OTG FS, OCTOSPI
+      - Package: LQFP100, LQFP144, UFBGA132, UFBGA169
+
+config STM32L4S5
+    bool "STM32L4S5 (2MB Flash, 640KB SRAM, L4+ with AES)"
+    help
+      STM32L4S5 variant (L4+ series):
+      - Flash: 2 MB
+      - SRAM: 640 KB
+      - Frequency: 120 MHz
+      - Features: Enhanced performance, USB OTG FS, OCTOSPI, AES
+      - Package: LQFP100, LQFP144, UFBGA132, UFBGA169
+
+endchoice
+
+#-----------------------------------------------------------------------------
+# Chip Name Definition
+#-----------------------------------------------------------------------------
+
+config STM32_CHIP_NAME
+    string
+    default "STM32L432xx" if STM32L432
+    default "STM32L476xx" if STM32L476
+    default "STM32L496xx" if STM32L496
+    default "STM32L4R5xx" if STM32L4R5
+    default "STM32L4S5xx" if STM32L4S5
+    help
+      STM32 chip name for HAL driver selection and conditional compilation.
+
+#-----------------------------------------------------------------------------
+# Memory Configuration
+#-----------------------------------------------------------------------------
+
+config STM32_FLASH_SIZE
+    hex "Flash size (bytes)"
+    default 0x40000 if STM32L432
+    default 0x100000 if STM32L476 || STM32L496
+    default 0x200000 if STM32L4R5 || STM32L4S5
+    help
+      Flash memory size in bytes.
+
+config STM32_SRAM_SIZE
+    hex "SRAM size (bytes)"
+    default 0x10000 if STM32L432
+    default 0x20000 if STM32L476
+    default 0x50000 if STM32L496
+    default 0xA0000 if STM32L4R5 || STM32L4S5
+    help
+      SRAM memory size in bytes.
+
+#-----------------------------------------------------------------------------
+# Series Feature Flags
+#-----------------------------------------------------------------------------
+
+config STM32L4_PLUS
+    bool
+    default y if STM32L4R5 || STM32L4S5
+    help
+      Whether this is an L4+ variant with enhanced performance (120 MHz).
+
+config STM32L4_HAS_LCD
+    bool
+    default y if STM32L476 || STM32L496
+    help
+      Whether the chip has LCD controller.
+
+config STM32L4_HAS_DFSDM
+    bool
+    default y if STM32L476 || STM32L496
+    help
+      Whether the chip has DFSDM (Digital Filter for Sigma-Delta Modulators).
+
+config STM32L4_HAS_QSPI
+    bool
+    default y if STM32L496
+    help
+      Whether the chip has Quad SPI interface.
+
+config STM32L4_HAS_OCTOSPI
+    bool
+    default y if STM32L4R5 || STM32L4S5
+    help
+      Whether the chip has Octo SPI interface.
+
+config STM32L4_HAS_AES
+    bool
+    default y if STM32L496 || STM32L4S5
+    help
+      Whether the chip has AES hardware accelerator.
+
+endif # STM32L4
