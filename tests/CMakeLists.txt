@@ -143,6 +143,9 @@ add_subdirectory(integration)
 # Platform tests
 add_subdirectory(platform)
 
+# Refactoring tests
+add_subdirectory(refactoring)
+
 # Build system tests
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/build_system)
     add_subdirectory(build_system)
