@@ -1,22 +1,20 @@
-##############################################################################
+#-----------------------------------------------------------------------------
 # Nexus Embedded Platform - Root CMake Configuration
-##############################################################################
-#
+#-----------------------------------------------------------------------------
 # Nexus Embedded Platform
 # Root CMake configuration file
 # Author: Nexus Team
 # Version: 0.1.0
 #
 # This is the main CMake configuration file for the Nexus embedded platform.
-# It orchestrates the build process through multiple phases:
-#   1. Kconfig configuration system
-#   2. Platform detection and configuration
-#   3. Dependency management
-#   4. Build scheduling and cache
-#   5. FreeRTOS integration (if selected)
-#   6. Build targets (subdirectories)
+# It orchestrates the build process through streamlined phases:
+#   1. Configuration Management (Kconfig)
+#   2. Core Platform Setup (Platform/Toolchain/Compiler)
+#   3. Build Optimization (Cache/Performance)
+#   4. Quality Assurance (Tests/Diagnostics)
+#   5. Build Targets (Subdirectories)
 #
-##############################################################################
+#-----------------------------------------------------------------------------
 
 # CMake 3.21+ required for ARM Clang toolchain support (Policy CMP0123)
 cmake_minimum_required(VERSION 3.21)
@@ -48,7 +46,7 @@ option(NEXUS_BUILD_TESTS "Build unit tests" ON)
 option(NEXUS_BUILD_EXAMPLES "Build example applications" ON)
 option(NEXUS_BUILD_DOCS "Build documentation" OFF)
 option(NEXUS_ENABLE_COVERAGE "Enable code coverage" OFF)
-option(NEXUS_ENABLE_CACHE "Enable build cache" OFF)
+option(NEXUS_ENABLE_CACHE "Enable build cache" ON)
 
 # Platform selection (can be overridden by Kconfig)
 # These are fallback values if Kconfig is not configured
@@ -93,11 +91,14 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 message(STATUS "Python: ${Python3_EXECUTABLE}")
 
 #-----------------------------------------------------------------------------
-# Phase 1: Kconfig Configuration System
+# Phase 1: Configuration Management
+#-----------------------------------------------------------------------------
+# Load and process Kconfig configuration, generate configuration header,
+# and apply configuration to CMake variables.
 #-----------------------------------------------------------------------------
 
 message(STATUS "")
-message(STATUS "=== Phase 1: Kconfig Configuration ===")
+message(STATUS "=== Phase 1: Configuration Management ===")
 
 # Define configuration file paths
 set(NEXUS_KCONFIG_FILE "${CMAKE_SOURCE_DIR}/Kconfig"
@@ -107,8 +108,8 @@ set(NEXUS_CONFIG_FILE "${CMAKE_SOURCE_DIR}/.config"
 set(NEXUS_CONFIG_HEADER "${CMAKE_SOURCE_DIR}/nexus_config.h"
     CACHE FILEPATH "Generated configuration header")
 
-# Load Kconfig module
-include(NexusKconfig)
+# Load NexusConfig module (Kconfig + Dependency management)
+include(NexusConfig)
 
 # Generate configuration header from Kconfig
 nexus_load_kconfig(
@@ -121,15 +122,10 @@ nexus_load_kconfig(
 nexus_validate_kconfig(CONFIG_FILE ${NEXUS_CONFIG_FILE})
 
 # Load Kconfig configuration into CMake variables
-include(LoadKconfig)
 load_kconfig(${NEXUS_CONFIG_FILE})
 
 # Apply Kconfig configuration to CMake variables
 apply_kconfig_to_cmake()
-
-# Auto-configure toolchain from Kconfig
-include(NexusToolchain)
-nexus_validate_toolchain()
 
 # Override OSAL backend if configured in Kconfig
 if(DEFINED CONFIG_OSAL_BACKEND_NAME)
@@ -137,17 +133,22 @@ if(DEFINED CONFIG_OSAL_BACKEND_NAME)
     message(STATUS "OSAL backend from Kconfig: ${CONFIG_OSAL_BACKEND_NAME}")
 endif()
 
-message(STATUS "Kconfig: Configured")
+message(STATUS "Configuration management: Complete")
 
 #-----------------------------------------------------------------------------
-# Phase 2: Platform Detection and Configuration
+# Phase 2: Core Platform Setup
+#-----------------------------------------------------------------------------
+# Detect and configure platform, toolchain, and compiler settings.
 #-----------------------------------------------------------------------------
 
 message(STATUS "")
-message(STATUS "=== Phase 2: Platform Configuration ===")
+message(STATUS "=== Phase 2: Core Platform Setup ===")
 
-# Load platform module
-include(NexusPlatform)
+# Load NexusCore module (Platform + Toolchain + Compiler)
+include(NexusCore)
+
+# Configure platform (detects host, target, compiler, toolchain, generator)
+nexus_configure_platform()
 
 # Set default build type
 nexus_set_default_build_type()
@@ -155,21 +156,10 @@ nexus_set_default_build_type()
 # Configure output directories
 nexus_configure_output_directories()
 
-# Detect and configure platform (reads Kconfig variables)
-nexus_configure_platform()
-
-# Auto-select toolchain and linker script based on platform
-nexus_auto_configure_platform()
-
 # Configure compiler flags
-if(NEXUS_TARGET_NATIVE)
-    nexus_configure_compiler_flags()
-else()
-    message(STATUS "Using toolchain-provided compiler flags")
-endif()
+nexus_configure_compiler_flags()
 
-# Apply Kconfig-specific compiler flags
-apply_kconfig_compiler_flags()
+message(STATUS "Core platform setup: Complete")
 
 #-----------------------------------------------------------------------------
 # Phase 3: Dependency Management
@@ -178,85 +168,98 @@ apply_kconfig_compiler_flags()
 message(STATUS "")
 message(STATUS "=== Phase 3: Dependency Management ===")
 
-# Load dependency management module
-include(NexusDependency)
-
-# Add module dependencies to dependency graph
-nexus_add_module_dependencies(hal DEPS "")
-nexus_add_module_dependencies(osal DEPS hal)
-nexus_add_module_dependencies(framework DEPS hal osal)
-
-# Check for circular dependencies
-nexus_check_circular_dependencies(HAS_CYCLE)
-if(HAS_CYCLE)
-    message(FATAL_ERROR "Circular dependency detected in module graph")
-endif()
-
-# Get dependency order for build scheduling
-nexus_get_dependency_order(BUILD_ORDER)
-message(STATUS "Build order: ${BUILD_ORDER}")
-
 # Load dependency lock file if exists
 if(EXISTS ${CMAKE_SOURCE_DIR}/nexus.lock)
     nexus_load_lockfile()
     message(STATUS "Dependency lock file: Loaded")
 endif()
 
+message(STATUS "Dependency management: Complete")
+
 #-----------------------------------------------------------------------------
-# Phase 4: Build Scheduling and Cache
+# Phase 4: Build Optimization
 #-----------------------------------------------------------------------------
 
 message(STATUS "")
 message(STATUS "=== Phase 4: Build Optimization ===")
 
-# Load cache management module
-include(NexusCache)
+# Load NexusOptimization module (Cache + Performance + Resource)
+include(NexusOptimization)
 
 # Enable build cache if configured
 if(NEXUS_ENABLE_CACHE OR DEFINED ENV{NEXUS_ENABLE_CACHE})
     nexus_enable_cache(
         LOCAL_DIR "${CMAKE_BINARY_DIR}/.cache"
-        MAX_SIZE 1024
+        MAX_SIZE 4096  # Increased to 4GB for better cache utilization
     )
-    nexus_cache_init_stats()
     message(STATUS "Build cache: Enabled")
 else()
     message(STATUS "Build cache: Disabled (set NEXUS_ENABLE_CACHE=ON to enable)")
 endif()
 
 # Configure parallel build based on available resources
-include(ProcessorCount)
-ProcessorCount(N_CORES)
-if(N_CORES EQUAL 0)
-    set(N_CORES 1)
-endif()
+nexus_configure_parallel_build()
 
-# Reserve one core for system
-math(EXPR PARALLEL_JOBS "${N_CORES} - 1")
-if(PARALLEL_JOBS LESS 1)
-    set(PARALLEL_JOBS 1)
-endif()
-
-set(CMAKE_BUILD_PARALLEL_LEVEL ${PARALLEL_JOBS}
-    CACHE STRING "Number of parallel build jobs")
-message(STATUS "Parallel jobs: ${PARALLEL_JOBS} (${N_CORES} cores available)")
+message(STATUS "Build optimization: Complete")
 
 #-----------------------------------------------------------------------------
-# Phase 5: FreeRTOS Integration (if selected)
+# Phase 5: Quality Assurance Setup
+#-----------------------------------------------------------------------------
+
+message(STATUS "")
+message(STATUS "=== Phase 5: Quality Assurance Setup ===")
+
+# Load NexusQuality module (Tests + Diagnostics + Reproducible builds)
+include(NexusQuality)
+
+# Initialize test framework if tests are enabled
+if(NEXUS_BUILD_TESTS AND NEXUS_PLATFORM STREQUAL "native")
+    nexus_test_init_gtest()
+    message(STATUS "Test framework: Initialized")
+endif()
+
+# Enable reproducible builds if configured
+if(DEFINED CONFIG_REPRODUCIBLE_BUILD AND CONFIG_REPRODUCIBLE_BUILD)
+    nexus_init_reproducible_build()
+    message(STATUS "Reproducible builds: Enabled")
+endif()
+
+message(STATUS "Quality assurance setup: Complete")
+
+#-----------------------------------------------------------------------------
+# Phase 6: Extension System (Optional)
+#-----------------------------------------------------------------------------
+
+# Load NexusExtension module (Plugin system + Build isolation)
+include(NexusExtension)
+
+# Load plugins if any are configured
+if(EXISTS ${CMAKE_SOURCE_DIR}/cmake/plugins)
+    file(GLOB PLUGIN_FILES ${CMAKE_SOURCE_DIR}/cmake/plugins/*.cmake)
+    foreach(PLUGIN_FILE ${PLUGIN_FILES})
+        include(${PLUGIN_FILE})
+    endforeach()
+endif()
+
+#-----------------------------------------------------------------------------
+# Phase 7: FreeRTOS Integration (if selected)
 #-----------------------------------------------------------------------------
 
 if(NEXUS_OSAL_BACKEND STREQUAL "freertos")
     message(STATUS "")
-    message(STATUS "=== Phase 5: FreeRTOS Integration ===")
+    message(STATUS "=== Phase 7: FreeRTOS Integration ===")
     include(FreeRTOS)
 endif()
 
 #-----------------------------------------------------------------------------
-# Phase 6: Build Targets (Subdirectories)
+# Phase 8: Build Targets (Subdirectories)
 #-----------------------------------------------------------------------------
 
 message(STATUS "")
-message(STATUS "=== Phase 6: Build Targets ===")
+message(STATUS "=== Phase 8: Build Targets ===")
+
+# Load NexusBuild module for target creation helpers
+include(NexusBuild)
 
 # Core libraries
 add_subdirectory(hal)
@@ -285,12 +288,13 @@ endif()
 
 # Tests (only for native platform)
 if(NEXUS_BUILD_TESTS AND NEXUS_PLATFORM STREQUAL "native")
-    # Include CTest configuration if it exists
-    if(EXISTS ${CMAKE_SOURCE_DIR}/cmake/CTestConfig.cmake)
-        include(${CMAKE_SOURCE_DIR}/cmake/CTestConfig.cmake)
-    endif()
     enable_testing()
     add_subdirectory(tests)
+
+    # Configure parallel test execution
+    if(NEXUS_TEST_ENABLE_PARALLEL)
+        nexus_test_configure_parallel()
+    endif()
 endif()
 
 # Documentation
@@ -369,3 +373,4 @@ message(STATUS "")
 #-----------------------------------------------------------------------------
 # End of Root CMake Configuration
 #-----------------------------------------------------------------------------
+

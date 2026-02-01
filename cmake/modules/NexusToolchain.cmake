@@ -1,406 +1,433 @@
 #-----------------------------------------------------------------------------
-# NexusToolchain.cmake - Toolchain Abstraction Layer
+# NexusToolchain.cmake - Unified Toolchain Management
 #-----------------------------------------------------------------------------
-# Provides unified interface for different ARM toolchains
+# NexusToolchain.cmake
+# Unified toolchain detection, configuration, and management
 # Author: Nexus Team
 #
-# This module provides toolchain-agnostic functions that work across
-# ARM GCC, ARM Clang, and IAR EWARM toolchains.
+# This module provides:
+# - Automatic toolchain detection
+# - Unified toolchain configuration interface
+# - Toolchain-agnostic helper functions
+# - Consistent binary generation across toolchains
 #
-# Architecture:
-#   Layer 2 - Toolchain Abstraction Layer (this file)
-#   - Auto-detects toolchain once when included
-#   - Provides unified cross-toolchain functions
-#   - Handles toolchain-specific differences internally
-#
-# Usage:
-#   include(NexusToolchain)  # Auto-initializes
-#   nexus_generate_bin(my_app)
-#   nexus_set_linker_script(my_app path/to/script)
 #-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Internal: Toolchain Detection
-#-----------------------------------------------------------------------------
-
-#
-# Internal function to detect toolchain
-# Called automatically when module is included
-# Results are cached to avoid repeated detection
-#
-function(_nexus_detect_toolchain_internal)
-    # Detect based on compiler ID
-    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(NEXUS_TOOLCHAIN_IS_GCC TRUE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_CLANG FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_IAR FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_NAME "arm-none-eabi-gcc" PARENT_SCOPE)
-        message(STATUS "Toolchain detected: ARM GCC")
-
-    elseif(CMAKE_C_COMPILER_ID MATCHES "Clang|ARMClang")
-        set(NEXUS_TOOLCHAIN_IS_GCC FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_CLANG TRUE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_IAR FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_NAME "armclang" PARENT_SCOPE)
-        message(STATUS "Toolchain detected: ARM Clang")
-
-    elseif(CMAKE_C_COMPILER_ID STREQUAL "IAR")
-        set(NEXUS_TOOLCHAIN_IS_GCC FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_CLANG FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_IAR TRUE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_NAME "iar-arm" PARENT_SCOPE)
-        message(STATUS "Toolchain detected: IAR EWARM")
-
-    else()
-        set(NEXUS_TOOLCHAIN_IS_GCC FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_CLANG FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_IS_IAR FALSE PARENT_SCOPE)
-        set(NEXUS_TOOLCHAIN_NAME "unknown" PARENT_SCOPE)
-        message(WARNING "Unknown toolchain: ${CMAKE_C_COMPILER_ID}")
-    endif()
-endfunction()
-
-#
-# Public function for manual toolchain detection (backward compatibility)
-# Normally not needed as detection is automatic
-#
-function(nexus_detect_toolchain)
-    # Detection already done during module initialization
-    # This function exists for backward compatibility
-    if(NOT DEFINED NEXUS_TOOLCHAIN_INITIALIZED)
-        message(WARNING "nexus_detect_toolchain() called before module initialization")
-    endif()
-endfunction()
+include_guard(GLOBAL)
 
 #-----------------------------------------------------------------------------
-# Binary Generation Functions
+# Toolchain Registry
 #-----------------------------------------------------------------------------
 
+# Define all supported toolchains with metadata
+set(_NEXUS_TOOLCHAIN_REGISTRY "")
+
 #
-# Generate binary file from ELF
+# Register a toolchain
 # Arguments:
-#   TARGET: Target name
-#   OUTPUT: Output binary file path (optional, defaults to TARGET.bin)
+#   NAME: Toolchain identifier
+#   DESCRIPTION: Human-readable description
+#   FAMILY: Toolchain family (gcc, clang, iar)
+#   VENDOR: Toolchain vendor
+#   COMPILER_ID: CMake compiler ID pattern
+#   PROGRAMS: List of required programs
 #
-function(nexus_generate_bin TARGET)
-    cmake_parse_arguments(ARG "" "OUTPUT" "" ${ARGN})
-
-    if(NOT ARG_OUTPUT)
-        set(ARG_OUTPUT "${TARGET}.bin")
-    endif()
-
-    if(NEXUS_TOOLCHAIN_IS_GCC)
-        # ARM GCC: objcopy
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} -O binary
-                    $<TARGET_FILE:${TARGET}> ${ARG_OUTPUT}
-            COMMENT "Generating ${ARG_OUTPUT}"
-            VERBATIM
-        )
-
-    elseif(NEXUS_TOOLCHAIN_IS_CLANG)
-        # ARM Clang: fromelf
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --bin -o ${ARG_OUTPUT}
-                    $<TARGET_FILE:${TARGET}>
-            COMMENT "Generating ${ARG_OUTPUT}"
-            VERBATIM
-        )
-
-    elseif(NEXUS_TOOLCHAIN_IS_IAR)
-        # IAR EWARM: ielftool
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --bin
-                    $<TARGET_FILE:${TARGET}> ${ARG_OUTPUT}
-            COMMENT "Generating ${ARG_OUTPUT}"
-            VERBATIM
-        )
-    endif()
-endfunction()
-
-#
-# Generate Intel HEX file from ELF
-# Arguments:
-#   TARGET: Target name
-#   OUTPUT: Output hex file path (optional, defaults to TARGET.hex)
-#
-function(nexus_generate_hex TARGET)
-    cmake_parse_arguments(ARG "" "OUTPUT" "" ${ARGN})
-
-    if(NOT ARG_OUTPUT)
-        set(ARG_OUTPUT "${TARGET}.hex")
-    endif()
-
-    if(NEXUS_TOOLCHAIN_IS_GCC)
-        # ARM GCC: objcopy
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} -O ihex
-                    $<TARGET_FILE:${TARGET}> ${ARG_OUTPUT}
-            COMMENT "Generating ${ARG_OUTPUT}"
-            VERBATIM
-        )
-
-    elseif(NEXUS_TOOLCHAIN_IS_CLANG)
-        # ARM Clang: fromelf
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --i32 -o ${ARG_OUTPUT}
-                    $<TARGET_FILE:${TARGET}>
-            COMMENT "Generating ${ARG_OUTPUT}"
-            VERBATIM
-        )
-
-    elseif(NEXUS_TOOLCHAIN_IS_IAR)
-        # IAR EWARM: ielftool
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --ihex
-                    $<TARGET_FILE:${TARGET}> ${ARG_OUTPUT}
-            COMMENT "Generating ${ARG_OUTPUT}"
-            VERBATIM
-        )
-    endif()
-endfunction()
-
-#
-# Print target size information
-# Arguments:
-#   TARGET: Target name
-#
-function(nexus_print_target_size TARGET)
-    if(NEXUS_TOOLCHAIN_IS_GCC)
-        # ARM GCC: size utility
-        if(CMAKE_SIZE)
-            add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ${CMAKE_SIZE} --format=berkeley
-                        $<TARGET_FILE:${TARGET}>
-                COMMENT "Size of ${TARGET}:"
-                VERBATIM
-            )
-        endif()
-
-    elseif(NEXUS_TOOLCHAIN_IS_CLANG)
-        # ARM Clang: fromelf --info
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --info sizes,totals
-                    $<TARGET_FILE:${TARGET}>
-            COMMENT "Size of ${TARGET}:"
-            VERBATIM
-        )
-
-    elseif(NEXUS_TOOLCHAIN_IS_IAR)
-        # IAR EWARM: ielftool --size
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} --size
-                    $<TARGET_FILE:${TARGET}>
-            COMMENT "Size of ${TARGET}:"
-            VERBATIM
-        )
-    endif()
-endfunction()
-
-#-----------------------------------------------------------------------------
-# Linker Script Configuration
-#-----------------------------------------------------------------------------
-
-#
-# Set linker script for target
-# Arguments:
-#   TARGET: Target name
-#   SCRIPT: Path to linker script
-#
-function(nexus_set_linker_script TARGET SCRIPT)
-    if(NOT EXISTS ${SCRIPT})
-        message(WARNING "Linker script not found: ${SCRIPT}")
-        return()
-    endif()
-
-    if(NEXUS_TOOLCHAIN_IS_GCC)
-        # ARM GCC: -T flag
-        target_link_options(${TARGET} PRIVATE -T${SCRIPT})
-
-    elseif(NEXUS_TOOLCHAIN_IS_CLANG)
-        # ARM Clang: --scatter flag
-        target_link_options(${TARGET} PRIVATE --scatter=${SCRIPT})
-
-    elseif(NEXUS_TOOLCHAIN_IS_IAR)
-        # IAR EWARM: --config flag
-        target_link_options(${TARGET} PRIVATE --config ${SCRIPT})
-    endif()
-
-    message(STATUS "Linker script for ${TARGET}: ${SCRIPT}")
-endfunction()
-
-#
-# Enable map file generation for target
-# Arguments:
-#   TARGET: Target name
-#   OUTPUT: Output map file path (optional, defaults to TARGET.map)
-#
-function(nexus_generate_map TARGET)
-    cmake_parse_arguments(ARG "" "OUTPUT" "" ${ARGN})
-
-    if(NOT ARG_OUTPUT)
-        set(ARG_OUTPUT "${TARGET}.map")
-    endif()
-
-    if(NEXUS_TOOLCHAIN_IS_GCC)
-        # ARM GCC: -Wl,-Map=file.map
-        target_link_options(${TARGET} PRIVATE -Wl,-Map=${ARG_OUTPUT})
-
-    elseif(NEXUS_TOOLCHAIN_IS_CLANG)
-        # ARM Clang: --map --list=file.map
-        target_link_options(${TARGET} PRIVATE --map --list=${ARG_OUTPUT})
-
-    elseif(NEXUS_TOOLCHAIN_IS_IAR)
-        # IAR EWARM: --map file.map
-        target_link_options(${TARGET} PRIVATE --map ${ARG_OUTPUT})
-    endif()
-
-    message(STATUS "Map file for ${TARGET}: ${ARG_OUTPUT}")
-endfunction()
-
-#-----------------------------------------------------------------------------
-# Compiler Flags Configuration
-#-----------------------------------------------------------------------------
-
-#
-# Add toolchain-specific compile options
-# Arguments:
-#   TARGET: Target name
-#   OPTIONS: List of options (toolchain-agnostic)
-#
-function(nexus_add_compile_options TARGET)
-    set(OPTIONS ${ARGN})
-
-    foreach(OPT ${OPTIONS})
-        if(OPT STREQUAL "WARNINGS_AS_ERRORS")
-            if(NEXUS_TOOLCHAIN_IS_GCC OR NEXUS_TOOLCHAIN_IS_CLANG)
-                target_compile_options(${TARGET} PRIVATE -Werror)
-            elseif(NEXUS_TOOLCHAIN_IS_IAR)
-                target_compile_options(${TARGET} PRIVATE --warnings_are_errors)
-            endif()
-
-        elseif(OPT STREQUAL "NO_BUILTIN")
-            if(NEXUS_TOOLCHAIN_IS_GCC OR NEXUS_TOOLCHAIN_IS_CLANG)
-                target_compile_options(${TARGET} PRIVATE -fno-builtin)
-            elseif(NEXUS_TOOLCHAIN_IS_IAR)
-                target_compile_options(${TARGET} PRIVATE --no_builtin)
-            endif()
-
-        elseif(OPT STREQUAL "FUNCTION_SECTIONS")
-            if(NEXUS_TOOLCHAIN_IS_GCC OR NEXUS_TOOLCHAIN_IS_CLANG)
-                target_compile_options(${TARGET} PRIVATE
-                    -ffunction-sections -fdata-sections)
-            endif()
-        endif()
-    endforeach()
-endfunction()
-
-#-----------------------------------------------------------------------------
-# High-Level Configuration Function
-#-----------------------------------------------------------------------------
-
-#
-# Configure ARM target with all necessary settings
-# Arguments:
-#   TARGET: Target name
-#   LINKER_SCRIPT: Path to linker script (optional)
-#   GENERATE_BIN: Generate .bin file (default: ON)
-#   GENERATE_HEX: Generate .hex file (default: ON)
-#   GENERATE_MAP: Generate .map file (default: ON)
-#   PRINT_SIZE: Print size information (default: ON)
-#
-function(nexus_configure_target TARGET)
-    cmake_parse_arguments(ARG
+macro(nexus_register_toolchain)
+    cmake_parse_arguments(
+        _ARG
         ""
-        "LINKER_SCRIPT;GENERATE_BIN;GENERATE_HEX;GENERATE_MAP;PRINT_SIZE"
-        ""
+        "NAME;DESCRIPTION;FAMILY;VENDOR;COMPILER_ID"
+        "PROGRAMS"
         ${ARGN}
     )
 
-    # Set defaults
-    if(NOT DEFINED ARG_GENERATE_BIN)
-        set(ARG_GENERATE_BIN ON)
+    set(_ENTRY "")
+    list(APPEND _ENTRY "name=${_ARG_NAME}")
+    list(APPEND _ENTRY "description=${_ARG_DESCRIPTION}")
+    list(APPEND _ENTRY "family=${_ARG_FAMILY}")
+    list(APPEND _ENTRY "vendor=${_ARG_VENDOR}")
+    list(APPEND _ENTRY "compiler_id=${_ARG_COMPILER_ID}")
+
+    if(_ARG_PROGRAMS)
+        string(REPLACE ";" "," _PROGRAMS_STR "${_ARG_PROGRAMS}")
+        list(APPEND _ENTRY "programs=${_PROGRAMS_STR}")
     endif()
 
-    if(NOT DEFINED ARG_GENERATE_HEX)
-        set(ARG_GENERATE_HEX ON)
-    endif()
+    string(REPLACE ";" "|" _ENTRY_STR "${_ENTRY}")
+    list(APPEND _NEXUS_TOOLCHAIN_REGISTRY "${_ENTRY_STR}")
 
-    if(NOT DEFINED ARG_GENERATE_MAP)
-        set(ARG_GENERATE_MAP ON)
-    endif()
+    message(VERBOSE "Registered toolchain: ${_ARG_NAME}")
+endmacro()
 
-    if(NOT DEFINED ARG_PRINT_SIZE)
-        set(ARG_PRINT_SIZE ON)
-    endif()
+# Register supported toolchains
+nexus_register_toolchain(
+    NAME "arm-none-eabi-gcc"
+    DESCRIPTION "ARM GCC (Free, Open Source)"
+    FAMILY "gcc"
+    VENDOR "ARM"
+    COMPILER_ID "GNU"
+    PROGRAMS "arm-none-eabi-gcc;arm-none-eabi-g++;arm-none-eabi-as;arm-none-eabi-ar;arm-none-eabi-objcopy;arm-none-eabi-size"
+)
 
-    # Detect toolchain if not already done
-    nexus_detect_toolchain()
+nexus_register_toolchain(
+    NAME "armclang"
+    DESCRIPTION "ARM Clang (Commercial)"
+    FAMILY "clang"
+    VENDOR "ARM"
+    COMPILER_ID "ARMClang"
+    PROGRAMS "armclang;armasm;armlink;armar;fromelf"
+)
 
-    # Set linker script
-    if(ARG_LINKER_SCRIPT)
-        nexus_set_linker_script(${TARGET} ${ARG_LINKER_SCRIPT})
-    endif()
+nexus_register_toolchain(
+    NAME "iar-arm"
+    DESCRIPTION "IAR Embedded Workbench for ARM (Commercial)"
+    FAMILY "iar"
+    VENDOR "IAR"
+    COMPILER_ID "IAR"
+    PROGRAMS "iccarm;iasmarm;ilinkarm;iarchive;ielftool"
+)
 
-    # Generate map file
-    if(ARG_GENERATE_MAP)
-        nexus_generate_map(${TARGET})
-    endif()
+nexus_register_toolchain(
+    NAME "gcc"
+    DESCRIPTION "GNU Compiler Collection (Native)"
+    FAMILY "gcc"
+    VENDOR "GNU"
+    COMPILER_ID "GNU"
+    PROGRAMS "gcc;g++;as;ar"
+)
 
-    # Generate binary files
-    if(ARG_GENERATE_BIN)
-        nexus_generate_bin(${TARGET})
-    endif()
+nexus_register_toolchain(
+    NAME "clang"
+    DESCRIPTION "LLVM Clang (Native)"
+    FAMILY "clang"
+    VENDOR "LLVM"
+    COMPILER_ID "Clang"
+    PROGRAMS "clang;clang++;llvm-ar"
+)
 
-    if(ARG_GENERATE_HEX)
-        nexus_generate_hex(${TARGET})
-    endif()
+nexus_register_toolchain(
+    NAME "msvc"
+    DESCRIPTION "Microsoft Visual C++ (Native)"
+    FAMILY "msvc"
+    VENDOR "Microsoft"
+    COMPILER_ID "MSVC"
+    PROGRAMS "cl;link;lib"
+)
 
-    # Print size information
-    if(ARG_PRINT_SIZE)
-        nexus_print_target_size(${TARGET})
-    endif()
+#-----------------------------------------------------------------------------
+# Toolchain Detection
+#-----------------------------------------------------------------------------
 
-    message(STATUS "Configured target: ${TARGET}")
+#
+# Detect available toolchains on the system
+# Arguments:
+#   OUTPUT_VAR: Output variable (list of available toolchain names)
+#   PLATFORM: Target platform (optional, filters by platform)
+#
+function(nexus_detect_toolchains OUTPUT_VAR)
+    cmake_parse_arguments(ARG "" "PLATFORM" "" ${ARGN})
+
+    set(AVAILABLE_TOOLCHAINS "")
+
+    foreach(ENTRY ${_NEXUS_TOOLCHAIN_REGISTRY})
+        string(REPLACE "|" ";" ENTRY_LIST "${ENTRY}")
+
+        # Extract toolchain info
+        foreach(FIELD ${ENTRY_LIST})
+            if(FIELD MATCHES "^name=(.+)$")
+                set(TC_NAME ${CMAKE_MATCH_1})
+            elseif(FIELD MATCHES "^programs=(.+)$")
+                set(TC_PROGRAMS ${CMAKE_MATCH_1})
+            endif()
+        endforeach()
+
+        # Check if all required programs are available
+        if(TC_PROGRAMS)
+            string(REPLACE "," ";" PROGRAM_LIST "${TC_PROGRAMS}")
+            set(ALL_FOUND TRUE)
+
+            foreach(PROGRAM ${PROGRAM_LIST})
+                find_program(_PROG_${PROGRAM} ${PROGRAM})
+                if(NOT _PROG_${PROGRAM})
+                    set(ALL_FOUND FALSE)
+                    break()
+                endif()
+            endforeach()
+
+            if(ALL_FOUND)
+                list(APPEND AVAILABLE_TOOLCHAINS ${TC_NAME})
+                message(VERBOSE "Found toolchain: ${TC_NAME}")
+            endif()
+        endif()
+    endforeach()
+
+    set(${OUTPUT_VAR} ${AVAILABLE_TOOLCHAINS} PARENT_SCOPE)
 endfunction()
 
-#-----------------------------------------------------------------------------
-# Toolchain Validation
-#-----------------------------------------------------------------------------
-
 #
-# Validate toolchain configuration
-# Checks if required tools are available and properly configured
+# Get current toolchain information
+# Arguments:
+#   OUTPUT_VAR: Output variable (toolchain name)
 #
-function(nexus_validate_toolchain)
-    # Check if toolchain was initialized
-    if(NOT DEFINED NEXUS_TOOLCHAIN_INITIALIZED)
-        message(WARNING "Toolchain not initialized. Module should auto-initialize on include.")
+function(nexus_get_current_toolchain OUTPUT_VAR)
+    # Check compiler path for ARM toolchains
+    if(CMAKE_C_COMPILER MATCHES "arm-none-eabi")
+        set(${OUTPUT_VAR} "arm-none-eabi-gcc" PARENT_SCOPE)
         return()
     endif()
 
-    # Validate C compiler
-    if(NOT CMAKE_C_COMPILER)
-        message(FATAL_ERROR "C compiler not found")
+    if(CMAKE_C_COMPILER_ID MATCHES "ARMClang")
+        set(${OUTPUT_VAR} "armclang" PARENT_SCOPE)
+        return()
     endif()
 
-    # Validate assembler for embedded targets
-    if(NOT NEXUS_TARGET_NATIVE AND NOT CMAKE_ASM_COMPILER)
-        message(WARNING "ASM compiler not found for embedded target")
+    if(CMAKE_C_COMPILER_ID MATCHES "IAR")
+        set(${OUTPUT_VAR} "iar-arm" PARENT_SCOPE)
+        return()
     endif()
 
-    # Validate objcopy for binary generation
-    if(NOT CMAKE_OBJCOPY)
-        if(NEXUS_TOOLCHAIN_IS_GCC)
-            message(WARNING "objcopy not found - binary generation will be disabled")
-        elseif(NEXUS_TOOLCHAIN_IS_CLANG)
-            message(WARNING "fromelf not found - binary generation will be disabled")
-        elseif(NEXUS_TOOLCHAIN_IS_IAR)
-            message(WARNING "ielftool not found - binary generation will be disabled")
+    # Try to match compiler ID with registered toolchains
+    foreach(ENTRY ${_NEXUS_TOOLCHAIN_REGISTRY})
+        string(REPLACE "|" ";" ENTRY_LIST "${ENTRY}")
+
+        foreach(FIELD ${ENTRY_LIST})
+            if(FIELD MATCHES "^name=(.+)$")
+                set(TC_NAME ${CMAKE_MATCH_1})
+            elseif(FIELD MATCHES "^compiler_id=(.+)$")
+                set(TC_COMPILER_ID ${CMAKE_MATCH_1})
+            endif()
+        endforeach()
+
+        if(CMAKE_C_COMPILER_ID MATCHES "${TC_COMPILER_ID}")
+            set(${OUTPUT_VAR} ${TC_NAME} PARENT_SCOPE)
+            return()
+        endif()
+    endforeach()
+
+    # Fallback to compiler ID
+    set(${OUTPUT_VAR} ${CMAKE_C_COMPILER_ID} PARENT_SCOPE)
+endfunction()
+
+#-----------------------------------------------------------------------------
+# Unified Binary Generation
+#-----------------------------------------------------------------------------
+
+#
+# Generate binary files from ELF (toolchain-agnostic)
+# Arguments:
+#   TARGET: Target name
+#   FORMATS: Output formats (BIN, HEX, LST, MAP)
+#
+function(nexus_generate_outputs TARGET)
+    cmake_parse_arguments(ARG "" "" "FORMATS" ${ARGN})
+
+    if(NOT ARG_FORMATS)
+        set(ARG_FORMATS "BIN;HEX")
+    endif()
+
+    # Detect toolchain
+    nexus_get_current_toolchain(TOOLCHAIN)
+
+    # Generate outputs based on toolchain (case-insensitive matching)
+    string(TOLOWER "${TOOLCHAIN}" TOOLCHAIN_LOWER)
+    if(TOOLCHAIN_LOWER MATCHES "arm.*gcc|gnu.*arm")
+        _nexus_generate_outputs_gcc(${TARGET} "${ARG_FORMATS}")
+    elseif(TOOLCHAIN_LOWER MATCHES "armclang")
+        _nexus_generate_outputs_armclang(${TARGET} "${ARG_FORMATS}")
+    elseif(TOOLCHAIN_LOWER MATCHES "iar")
+        _nexus_generate_outputs_iar(${TARGET} "${ARG_FORMATS}")
+    else()
+        message(WARNING "Unknown toolchain for binary generation: ${TOOLCHAIN}")
+    endif()
+endfunction()
+
+#
+# GCC binary generation
+#
+function(_nexus_generate_outputs_gcc TARGET FORMATS)
+    find_program(OBJCOPY arm-none-eabi-objcopy)
+    find_program(OBJDUMP arm-none-eabi-objdump)
+    find_program(SIZE arm-none-eabi-size)
+
+    # Get the directory where the ELF file will be placed
+    get_target_property(TARGET_OUTPUT_DIR ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
+    if(NOT TARGET_OUTPUT_DIR)
+        set(TARGET_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
+
+    if("BIN" IN_LIST FORMATS AND OBJCOPY)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${OBJCOPY} -O binary $<TARGET_FILE:${TARGET}> ${TARGET}.bin
+            WORKING_DIRECTORY ${TARGET_OUTPUT_DIR}
+            COMMENT "Generating ${TARGET}.bin"
+            BYPRODUCTS ${TARGET_OUTPUT_DIR}/${TARGET}.bin
+            VERBATIM
+        )
+    endif()
+
+    if("HEX" IN_LIST FORMATS AND OBJCOPY)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${OBJCOPY} -O ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
+            WORKING_DIRECTORY ${TARGET_OUTPUT_DIR}
+            COMMENT "Generating ${TARGET}.hex"
+            BYPRODUCTS ${TARGET_OUTPUT_DIR}/${TARGET}.hex
+            VERBATIM
+        )
+    endif()
+
+    if("LST" IN_LIST FORMATS AND OBJDUMP)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${OBJDUMP} -h -S $<TARGET_FILE:${TARGET}> > ${TARGET}.lst
+            WORKING_DIRECTORY ${TARGET_OUTPUT_DIR}
+            COMMENT "Generating ${TARGET}.lst"
+            BYPRODUCTS ${TARGET_OUTPUT_DIR}/${TARGET}.lst
+            VERBATIM
+        )
+    endif()
+
+    if(SIZE)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${SIZE} $<TARGET_FILE:${TARGET}>
+            COMMENT "Program Size:"
+            VERBATIM
+        )
+    endif()
+endfunction()
+
+#
+# ARM Clang binary generation
+#
+function(_nexus_generate_outputs_armclang TARGET FORMATS)
+    # Try to find fromelf in the same directory as armlink
+    if(CMAKE_LINKER)
+        get_filename_component(ARMCLANG_BIN_DIR "${CMAKE_LINKER}" DIRECTORY)
+        find_program(FROMELF fromelf HINTS "${ARMCLANG_BIN_DIR}" NO_DEFAULT_PATH)
+    endif()
+
+    # Fallback to system PATH
+    if(NOT FROMELF)
+        find_program(FROMELF fromelf)
+    endif()
+
+    if(NOT FROMELF)
+        message(WARNING "fromelf not found, cannot generate binary outputs")
+        return()
+    endif()
+
+    # Get the directory where the ELF file will be placed
+    get_target_property(TARGET_OUTPUT_DIR ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
+    if(NOT TARGET_OUTPUT_DIR)
+        set(TARGET_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
+
+    if("BIN" IN_LIST FORMATS)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${FROMELF} --bin --output ${TARGET}.bin $<TARGET_FILE:${TARGET}>
+            WORKING_DIRECTORY ${TARGET_OUTPUT_DIR}
+            COMMENT "Generating ${TARGET}.bin"
+            BYPRODUCTS ${TARGET_OUTPUT_DIR}/${TARGET}.bin
+            VERBATIM
+        )
+    endif()
+
+    if("HEX" IN_LIST FORMATS)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${FROMELF} --i32 --output ${TARGET}.hex $<TARGET_FILE:${TARGET}>
+            WORKING_DIRECTORY ${TARGET_OUTPUT_DIR}
+            COMMENT "Generating ${TARGET}.hex"
+            BYPRODUCTS ${TARGET_OUTPUT_DIR}/${TARGET}.hex
+            VERBATIM
+        )
+    endif()
+
+    if("LST" IN_LIST FORMATS)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${FROMELF} --text -c --output ${TARGET}.lst $<TARGET_FILE:${TARGET}>
+            WORKING_DIRECTORY ${TARGET_OUTPUT_DIR}
+            COMMENT "Generating ${TARGET}.lst"
+            BYPRODUCTS ${TARGET_OUTPUT_DIR}/${TARGET}.lst
+            VERBATIM
+        )
+    endif()
+
+    # ARM Clang prints size info during linking
+endfunction()
+
+#
+# IAR binary generation
+#
+function(_nexus_generate_outputs_iar TARGET FORMATS)
+    find_program(IELFTOOL ielftool)
+
+    if(NOT IELFTOOL)
+        message(WARNING "ielftool not found, cannot generate binary outputs")
+        return()
+    endif()
+
+    if("BIN" IN_LIST FORMATS)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${IELFTOOL} --bin $<TARGET_FILE:${TARGET}> ${TARGET}.bin
+            COMMENT "Generating ${TARGET}.bin"
+            VERBATIM
+        )
+    endif()
+
+    if("HEX" IN_LIST FORMATS)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${IELFTOOL} --ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
+            COMMENT "Generating ${TARGET}.hex"
+            VERBATIM
+        )
+    endif()
+
+    if("LST" IN_LIST FORMATS)
+        add_custom_command(TARGET ${TARGET} POST_BUILD
+            COMMAND ${IELFTOOL} --code $<TARGET_FILE:${TARGET}> ${TARGET}.lst
+            COMMENT "Generating ${TARGET}.lst"
+            VERBATIM
+        )
+    endif()
+endfunction()
+
+#-----------------------------------------------------------------------------
+# Unified Target Configuration
+#-----------------------------------------------------------------------------
+
+#
+# Configure ARM target (toolchain-agnostic)
+# Arguments:
+#   TARGET: Target name
+#   LINKER_SCRIPT: Path to linker script
+#   GENERATE: Output formats to generate (BIN, HEX, LST)
+#
+function(nexus_configure_arm_target TARGET)
+    cmake_parse_arguments(ARG "" "LINKER_SCRIPT" "GENERATE" ${ARGN})
+
+    if(NOT ARG_GENERATE)
+        set(ARG_GENERATE "BIN;HEX")
+    endif()
+
+    # Detect toolchain
+    nexus_get_current_toolchain(TOOLCHAIN)
+
+    # Configure linker script
+    if(ARG_LINKER_SCRIPT)
+        if(TOOLCHAIN MATCHES "arm-none-eabi-gcc")
+            target_link_options(${TARGET} PRIVATE -T${ARG_LINKER_SCRIPT})
+        elseif(TOOLCHAIN MATCHES "armclang")
+            target_link_options(${TARGET} PRIVATE --scatter=${ARG_LINKER_SCRIPT})
+        elseif(TOOLCHAIN MATCHES "iar-arm")
+            target_link_options(${TARGET} PRIVATE --config ${ARG_LINKER_SCRIPT})
         endif()
     endif()
 
-    message(STATUS "Toolchain validation: OK")
+    # Add standard libraries (GCC only)
+    if(TOOLCHAIN MATCHES "arm-none-eabi-gcc")
+        target_link_libraries(${TARGET} PRIVATE c m nosys)
+    endif()
+
+    # Generate binary outputs
+    nexus_generate_outputs(${TARGET} FORMATS ${ARG_GENERATE})
 endfunction()
 
 #-----------------------------------------------------------------------------
@@ -408,52 +435,60 @@ endfunction()
 #-----------------------------------------------------------------------------
 
 #
-# Print toolchain information
+# Print toolchain registry
 #
-function(nexus_print_toolchain_info)
-    message(STATUS "=== Toolchain Information ===")
-    message(STATUS "  Name:       ${NEXUS_TOOLCHAIN_NAME}")
-    message(STATUS "  Family:     ${NEXUS_TOOLCHAIN_FAMILY}")
-    message(STATUS "  Vendor:     ${NEXUS_TOOLCHAIN_VENDOR}")
-    message(STATUS "  Compiler:   ${CMAKE_C_COMPILER}")
+function(nexus_print_toolchain_registry)
+    message(STATUS "")
+    message(STATUS "========================================")
+    message(STATUS "Toolchain Registry")
+    message(STATUS "========================================")
 
-    if(CMAKE_ASM_COMPILER)
-        message(STATUS "  Assembler:  ${CMAKE_ASM_COMPILER}")
-    endif()
+    foreach(ENTRY ${_NEXUS_TOOLCHAIN_REGISTRY})
+        string(REPLACE "|" ";" ENTRY_LIST "${ENTRY}")
 
-    if(CMAKE_LINKER)
-        message(STATUS "  Linker:     ${CMAKE_LINKER}")
-    endif()
+        foreach(FIELD ${ENTRY_LIST})
+            if(FIELD MATCHES "^name=(.+)$")
+                set(TC_NAME ${CMAKE_MATCH_1})
+            elseif(FIELD MATCHES "^description=(.+)$")
+                set(TC_DESC ${CMAKE_MATCH_1})
+            elseif(FIELD MATCHES "^family=(.+)$")
+                set(TC_FAMILY ${CMAKE_MATCH_1})
+            endif()
+        endforeach()
 
-    if(NEXUS_CPU_ARCH)
-        message(STATUS "  CPU Arch:   ${NEXUS_CPU_ARCH}")
-    endif()
+        message(STATUS "")
+        message(STATUS "  ${TC_NAME}")
+        message(STATUS "    Description: ${TC_DESC}")
+        message(STATUS "    Family:      ${TC_FAMILY}")
+    endforeach()
 
-    if(NEXUS_FPU_TYPE)
-        message(STATUS "  FPU Type:   ${NEXUS_FPU_TYPE}")
-    endif()
-
-    message(STATUS "=============================")
+    message(STATUS "")
+    message(STATUS "========================================")
 endfunction()
 
-#-----------------------------------------------------------------------------
-# Module Initialization
-#-----------------------------------------------------------------------------
+#
+# Print available toolchains
+#
+function(nexus_print_available_toolchains)
+    nexus_detect_toolchains(AVAILABLE)
 
-# Auto-detect toolchain when module is included
-# This ensures toolchain is detected once and results are cached
-if(NOT DEFINED NEXUS_TOOLCHAIN_INITIALIZED)
-    _nexus_detect_toolchain_internal()
+    message(STATUS "")
+    message(STATUS "========================================")
+    message(STATUS "Available Toolchains")
+    message(STATUS "========================================")
 
-    # Cache detection results in parent scope
-    set(NEXUS_TOOLCHAIN_IS_GCC ${NEXUS_TOOLCHAIN_IS_GCC} CACHE INTERNAL "")
-    set(NEXUS_TOOLCHAIN_IS_CLANG ${NEXUS_TOOLCHAIN_IS_CLANG} CACHE INTERNAL "")
-    set(NEXUS_TOOLCHAIN_IS_IAR ${NEXUS_TOOLCHAIN_IS_IAR} CACHE INTERNAL "")
-    set(NEXUS_TOOLCHAIN_NAME ${NEXUS_TOOLCHAIN_NAME} CACHE INTERNAL "")
-    set(NEXUS_TOOLCHAIN_INITIALIZED TRUE CACHE INTERNAL "Toolchain detection completed")
+    if(AVAILABLE)
+        foreach(TC ${AVAILABLE})
+            message(STATUS "  ✓ ${TC}")
+        endforeach()
+    else()
+        message(STATUS "  (none detected)")
+    endif()
 
-    message(STATUS "NexusToolchain: Initialized (${NEXUS_TOOLCHAIN_NAME})")
-endif()
+    message(STATUS "========================================")
+endfunction()
+
+message(STATUS "NexusToolchain module loaded")
 
 #-----------------------------------------------------------------------------
 # End of NexusToolchain.cmake

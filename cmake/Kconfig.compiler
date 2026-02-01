@@ -1,0 +1,279 @@
+# Compiler Configuration Options
+# This file defines compiler-related configuration options
+
+menu "Compiler Configuration"
+
+#-----------------------------------------------------------------------------
+# Character Type Configuration
+#-----------------------------------------------------------------------------
+
+config COMPILER_UNSIGNED_CHAR
+    bool "Use unsigned char by default"
+    default n
+    help
+      Make 'char' type unsigned by default.
+      This matches Keil MDK default behavior.
+
+      GCC/Clang: -funsigned-char
+      IAR: --char_is_unsigned
+
+config COMPILER_SHORT_ENUMS
+    bool "Use short enums"
+    default n
+    help
+      Use the smallest integer type for enums.
+      This can save memory but may affect ABI compatibility.
+
+      GCC/Clang: -fshort-enums
+      IAR: --enum_is_int
+
+config COMPILER_SHORT_WCHAR
+    bool "Use short wchar_t"
+    default n
+    help
+      Use 16-bit wchar_t instead of 32-bit.
+
+      GCC/Clang: -fshort-wchar
+      IAR: (not supported)
+
+#-----------------------------------------------------------------------------
+# Code Generation Options
+#-----------------------------------------------------------------------------
+
+config COMPILER_NO_BUILTIN
+    bool "Disable builtin functions"
+    default n
+    help
+      Disable compiler builtin functions.
+      This can help with debugging and code size.
+
+      GCC/Clang: -fno-builtin
+      IAR: --no_builtin
+
+config COMPILER_FUNCTION_SECTIONS
+    bool "Place each function in its own section"
+    default y
+    help
+      Place each function and data item in its own section.
+      This enables the linker to remove unused code (--gc-sections).
+
+      GCC/Clang: -ffunction-sections -fdata-sections
+      IAR: (automatic)
+
+config COMPILER_NO_COMMON
+    bool "Disable common blocks"
+    default y
+    help
+      Do not use common blocks for uninitialized global variables.
+
+      GCC/Clang: -fno-common
+      IAR: (not applicable)
+
+#-----------------------------------------------------------------------------
+# Warning Level Configuration
+#-----------------------------------------------------------------------------
+
+choice COMPILER_WARNING_LEVEL
+    prompt "Warning level"
+    default COMPILER_WARNING_STANDARD
+    help
+      Select the compiler warning level.
+
+config COMPILER_WARNING_NONE
+    bool "No warnings"
+    help
+      Disable all compiler warnings.
+
+config COMPILER_WARNING_BASIC
+    bool "Basic warnings"
+    help
+      Enable basic warnings (-Wall).
+
+config COMPILER_WARNING_STANDARD
+    bool "Standard warnings"
+    help
+      Enable standard warnings (-Wall -Wextra).
+
+config COMPILER_WARNING_EXTRA
+    bool "Extra warnings"
+    help
+      Enable extra warnings (-Wall -Wextra -Wshadow -Wconversion).
+
+config COMPILER_WARNING_PEDANTIC
+    bool "Pedantic warnings"
+    help
+      Enable pedantic warnings (-Wall -Wextra -Wpedantic -Wshadow -Wconversion).
+
+endchoice
+
+config COMPILER_WARNING_LEVEL
+    string
+    default "NONE" if COMPILER_WARNING_NONE
+    default "BASIC" if COMPILER_WARNING_BASIC
+    default "STANDARD" if COMPILER_WARNING_STANDARD
+    default "EXTRA" if COMPILER_WARNING_EXTRA
+    default "PEDANTIC" if COMPILER_WARNING_PEDANTIC
+
+config COMPILER_WARNINGS_AS_ERRORS
+    bool "Treat warnings as errors"
+    default n
+    help
+      Treat all compiler warnings as errors.
+
+      GCC/Clang: -Werror
+      IAR: --warnings_are_errors
+
+#-----------------------------------------------------------------------------
+# Debug Information Configuration
+#-----------------------------------------------------------------------------
+
+choice COMPILER_DEBUG_FORMAT
+    prompt "Debug information format"
+    default COMPILER_DEBUG_DWARF4
+    depends on BUILD_TYPE_DEBUG || BUILD_TYPE_RELWITHDEBINFO
+    help
+      Select the debug information format.
+
+config COMPILER_DEBUG_DWARF2
+    bool "DWARF 2"
+    help
+      Generate DWARF 2 debug information.
+
+config COMPILER_DEBUG_DWARF3
+    bool "DWARF 3"
+    help
+      Generate DWARF 3 debug information.
+
+config COMPILER_DEBUG_DWARF4
+    bool "DWARF 4"
+    help
+      Generate DWARF 4 debug information (recommended).
+
+config COMPILER_DEBUG_DWARF5
+    bool "DWARF 5"
+    help
+      Generate DWARF 5 debug information (latest).
+
+endchoice
+
+config COMPILER_DEBUG_FORMAT
+    string
+    default "DWARF2" if COMPILER_DEBUG_DWARF2
+    default "DWARF3" if COMPILER_DEBUG_DWARF3
+    default "DWARF4" if COMPILER_DEBUG_DWARF4
+    default "DWARF5" if COMPILER_DEBUG_DWARF5
+    default "DWARF4"
+
+#-----------------------------------------------------------------------------
+# Optimization Configuration
+#-----------------------------------------------------------------------------
+
+config COMPILER_LTO
+    bool "Enable Link Time Optimization (LTO)"
+    default n
+    depends on !BUILD_TYPE_DEBUG
+    help
+      Enable Link Time Optimization for better code size and performance.
+      This increases build time but can significantly reduce code size.
+
+      GCC/Clang: -flto
+      IAR: --lto
+
+config COMPILER_OPTIMIZE_SIZE
+    bool "Optimize for size over speed"
+    default n
+    depends on BUILD_TYPE_RELEASE
+    help
+      Optimize for code size instead of speed in Release builds.
+
+      GCC/Clang: -Os instead of -O3
+      IAR: -Ohz instead of -Oh
+
+#-----------------------------------------------------------------------------
+# Standard Library Configuration
+#-----------------------------------------------------------------------------
+
+config COMPILER_USE_MICROLIB
+    bool "Use microlib (ARM Clang only)"
+    default n
+    depends on TOOLCHAIN_ARM_CLANG
+    help
+      Use ARM microlib instead of standard C library.
+      Microlib is a highly optimized library for embedded systems.
+
+      Note: Microlib has limitations:
+        - No file I/O
+        - No locale support
+        - Limited stdio functions
+
+config COMPILER_USE_NANO
+    bool "Use nano specs (ARM GCC only)"
+    default n
+    depends on TOOLCHAIN_ARM_GCC
+    help
+      Use newlib-nano instead of standard newlib.
+      Nano specs provide a smaller C library implementation.
+
+config COMPILER_USE_NOSYS
+    bool "Use nosys specs (ARM GCC only)"
+    default y
+    depends on TOOLCHAIN_ARM_GCC
+    help
+      Use nosys specs to provide stubs for system calls.
+      This is required for bare-metal targets without OS.
+
+#-----------------------------------------------------------------------------
+# Linker Configuration
+#-----------------------------------------------------------------------------
+
+config LINKER_GC_SECTIONS
+    bool "Enable garbage collection of unused sections"
+    default y
+    help
+      Remove unused code and data sections during linking.
+      This can significantly reduce binary size.
+
+      GCC: -Wl,--gc-sections
+      Clang: --remove
+      IAR: --vfe
+
+config LINKER_CROSS_REFERENCE
+    bool "Generate cross-reference in map file"
+    default n
+    help
+      Generate cross-reference information in the map file.
+      This shows which symbols reference each other.
+
+      GCC: -Wl,--cref
+      Clang: --xref
+      IAR: --log all
+
+config LINKER_PRINT_MEMORY_USAGE
+    bool "Print memory usage after linking"
+    default y
+    help
+      Print memory usage statistics after linking.
+
+      GCC: -Wl,--print-memory-usage
+      Clang: --info=sizes,totals
+      IAR: (automatic in map file)
+
+#-----------------------------------------------------------------------------
+# Advanced Options
+#-----------------------------------------------------------------------------
+
+config COMPILER_CUSTOM_FLAGS
+    string "Custom compiler flags"
+    default ""
+    help
+      Additional custom compiler flags to append.
+      Use with caution as these flags are passed directly to the compiler.
+
+config LINKER_CUSTOM_FLAGS
+    string "Custom linker flags"
+    default ""
+    help
+      Additional custom linker flags to append.
+      Use with caution as these flags are passed directly to the linker.
+
+endmenu
