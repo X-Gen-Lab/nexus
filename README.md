@@ -67,6 +67,51 @@
 - Doxygen 1.9+
 - Python packages: `pip install sphinx breathe sphinx_rtd_theme`
 
+### Dependency Management
+
+Nexus uses Git submodules for vendor libraries (CMSIS, HAL drivers, FreeRTOS, GoogleTest). The build system automatically initializes required dependencies, but you can also manage them manually:
+
+**Automatic (Recommended):**
+
+```bash
+# One-command setup - automatically detects platform from .config
+./scripts/setup_deps.sh                          # Linux/macOS
+scripts\setup_deps.bat                           # Windows
+
+# Or specify platform explicitly
+./scripts/setup_deps.sh --platform=stm32 --series=f4
+./scripts/setup_deps.sh --platform=native
+```
+
+**Manual:**
+
+```bash
+# Initialize all submodules (not recommended, ~2GB)
+git submodule update --init --recursive
+
+# Initialize only what you need (recommended)
+# For STM32F4 development:
+git submodule update --init vendors/arm/CMSIS_5
+git submodule update --init vendors/st/cmsis_device_f4
+git submodule update --init vendors/st/stm32f4xx_hal_driver
+
+# For native testing:
+git submodule update --init ext/googletest
+
+# For FreeRTOS:
+git submodule update --init ext/freertos
+```
+
+**CMake Auto-initialization:**
+
+The build system automatically initializes missing submodules during configuration. If you encounter dependency errors, run:
+
+```bash
+./scripts/setup_deps.sh --platform=stm32 --series=f4
+```
+
+See [Dependency Management Guide](docs/dependency-management-solution.md) for advanced usage.
+
 ### Automatic Build (Recommended)
 
 The easiest way to build is using the automatic build scripts with Kconfig:
