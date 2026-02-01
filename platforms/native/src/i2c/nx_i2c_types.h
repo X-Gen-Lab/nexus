@@ -117,6 +117,7 @@ typedef struct nx_i2c_state_s {
     nx_i2c_buffer_t tx_buf;                /**< TX buffer */
     nx_i2c_buffer_t rx_buf;                /**< RX buffer */
     nx_i2c_device_handle_t current_device; /**< Current device handle */
+    uint8_t current_dev_addr;              /**< Current device address */
     bool initialized;                      /**< Initialization flag */
     bool suspended;                        /**< Suspend flag */
     bool busy;                             /**< Busy flag */

@@ -38,8 +38,8 @@ nx_status_t nx_i2c_tx_async_send(nx_tx_async_t* self, const uint8_t* data,
 
     /* Simulate transmission */
     state->stats.tx_count += (uint32_t)len;
-    printf("[I2C%d] TX to 0x%02X: %zu bytes\n", state->index,
-           state->current_dev_addr, len);
+    printf("[I2C%d] TX to 0x%02X: %u bytes\n", state->index,
+           state->current_dev_addr, (unsigned int)len);
 
     return NX_OK;
 }
@@ -77,8 +77,8 @@ nx_status_t nx_i2c_tx_rx_async_send(nx_tx_rx_async_t* self, const uint8_t* data,
     }
 
     state->stats.tx_count += (uint32_t)len;
-    printf("[I2C%d] TX/RX to 0x%02X: %zu bytes\n", state->index,
-           state->current_dev_addr, len);
+    printf("[I2C%d] TX/RX to 0x%02X: %u bytes\n", state->index,
+           state->current_dev_addr, (unsigned int)len);
 
     return NX_OK;
 }
@@ -142,8 +142,8 @@ nx_status_t nx_i2c_tx_sync_send(nx_tx_sync_t* self, const uint8_t* data,
 
     (void)timeout_ms;
     state->stats.tx_count += (uint32_t)len;
-    printf("[I2C%d] TX Sync to 0x%02X: %zu bytes\n", state->index,
-           state->current_dev_addr, len);
+    printf("[I2C%d] TX Sync to 0x%02X: %u bytes\n", state->index,
+           state->current_dev_addr, (unsigned int)len);
 
     return NX_OK;
 }
@@ -196,8 +196,8 @@ nx_status_t nx_i2c_tx_rx_sync_receive(nx_tx_rx_sync_t* self, uint8_t* data,
         data[i] = (uint8_t)(i & 0xFF);
     }
     state->stats.rx_count += (uint32_t)*len;
-    printf("[I2C%d] RX Sync from 0x%02X: %zu bytes\n", state->index,
-           state->current_dev_addr, *len);
+    printf("[I2C%d] RX Sync from 0x%02X: %u bytes\n", state->index,
+           state->current_dev_addr, (unsigned int)*len);
 
     return NX_OK;
 }

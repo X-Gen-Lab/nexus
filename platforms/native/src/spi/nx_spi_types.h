@@ -122,6 +122,7 @@ typedef struct nx_spi_state_s {
     bool initialized;                      /**< Initialization flag */
     bool suspended;                        /**< Suspend flag */
     bool busy;                             /**< Busy flag */
+    bool locked; /**< Lock flag for exclusive access */
 } nx_spi_state_t;
 
 /*---------------------------------------------------------------------------*/
