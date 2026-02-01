@@ -9,6 +9,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Build System Refactoring
+- New simplified CMake module architecture:
+  - NexusCore: Core build system functionality
+  - NexusBuild: Target creation and management (nx_add_executable, nx_add_library)
+  - NexusConfig: Kconfig integration and configuration management
+  - NexusHelpers: Utility functions for build system
+  - NexusToolchain: Toolchain detection and configuration
+  - NexusExtension: Extension system for custom build logic
+  - NexusOptimization: Build optimization and performance tuning
+  - NexusQuality: Code quality tools integration
+  - NexusVendor: Vendor library management
+- Kconfig compiler configuration (cmake/Kconfig.compiler)
+- Vendor library management system (cmake/vendors/)
+- Dependency setup scripts:
+  - setup_deps.sh for Linux/macOS
+  - setup_deps.bat for Windows
+  - Automatic platform detection from .config
+  - Intelligent submodule initialization based on platform needs
+
+#### Documentation
+- Comprehensive dependency management guide in README
+- Automatic, manual, and CMake auto-initialization methods
+- Platform-specific dependency examples (STM32, native, FreeRTOS)
+
+### Changed
+- Simplified root CMakeLists.txt structure
+- Updated all application CMakeLists to use new NexusBuild module
+- Updated framework, HAL, and OSAL build files for new system
+- Updated all platform build files (native, STM32)
+- Updated test infrastructure for new build system
+- Modernized all toolchain files (arm-none-eabi, armclang, iar-arm, native)
+- Improved configuration management (Kconfig, nexus_config.h)
+
+### Removed
+- Complex modular build system (13 specialized modules):
+  - LoadKconfig.cmake
+  - NexusCache.cmake
+  - NexusDependency.cmake
+  - NexusDiagnostics.cmake
+  - NexusIncremental.cmake
+  - NexusIsolation.cmake
+  - NexusKconfig.cmake
+  - NexusPerformance.cmake
+  - NexusPlatform.cmake
+  - NexusPlugin.cmake
+  - NexusReproducible.cmake
+  - NexusResource.cmake
+  - NexusTest.cmake
+- ApplicationCommon.cmake (functionality moved to NexusBuild)
+- Completed build system redesign spec files
+
+### Fixed
+- Code quality improvements in OSAL baremetal adapter
+- Comment formatting in native platform I2C and SPI implementations
+- Missing file header comments aligned with Nexus standards
+
+### Added
+
 #### CI/CD Infrastructure
 - Modular GitHub Actions workflow architecture:
   - New `ci.yml` workflow for unified continuous integration

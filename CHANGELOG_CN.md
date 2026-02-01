@@ -9,6 +9,64 @@
 
 ### 新增
 
+#### 构建系统重构
+- 新的简化 CMake 模块架构：
+  - NexusCore：核心构建系统功能
+  - NexusBuild：目标创建和管理（nx_add_executable、nx_add_library）
+  - NexusConfig：Kconfig 集成和配置管理
+  - NexusHelpers：构建系统实用函数
+  - NexusToolchain：工具链检测和配置
+  - NexusExtension：自定义构建逻辑的扩展系统
+  - NexusOptimization：构建优化和性能调优
+  - NexusQuality：代码质量工具集成
+  - NexusVendor：供应商库管理
+- Kconfig 编译器配置（cmake/Kconfig.compiler）
+- 供应商库管理系统（cmake/vendors/）
+- 依赖设置脚本：
+  - setup_deps.sh 用于 Linux/macOS
+  - setup_deps.bat 用于 Windows
+  - 从 .config 自动检测平台
+  - 基于平台需求的智能子模块初始化
+
+#### 文档
+- README 中的全面依赖管理指南
+- 自动、手动和 CMake 自动初始化方法
+- 平台特定的依赖示例（STM32、native、FreeRTOS）
+
+### 变更
+- 简化根目录 CMakeLists.txt 结构
+- 更新所有应用程序 CMakeLists 以使用新的 NexusBuild 模块
+- 更新框架、HAL 和 OSAL 构建文件以适配新系统
+- 更新所有平台构建文件（native、STM32）
+- 更新测试基础设施以适配新构建系统
+- 现代化所有工具链文件（arm-none-eabi、armclang、iar-arm、native）
+- 改进配置管理（Kconfig、nexus_config.h）
+
+### 移除
+- 复杂的模块化构建系统（13 个专用模块）：
+  - LoadKconfig.cmake
+  - NexusCache.cmake
+  - NexusDependency.cmake
+  - NexusDiagnostics.cmake
+  - NexusIncremental.cmake
+  - NexusIsolation.cmake
+  - NexusKconfig.cmake
+  - NexusPerformance.cmake
+  - NexusPlatform.cmake
+  - NexusPlugin.cmake
+  - NexusReproducible.cmake
+  - NexusResource.cmake
+  - NexusTest.cmake
+- ApplicationCommon.cmake（功能移至 NexusBuild）
+- 已完成的构建系统重构规范文件
+
+### 修复
+- OSAL 裸机适配器的代码质量改进
+- 原生平台 I2C 和 SPI 实现的注释格式化
+- 添加缺失的文件头注释，符合 Nexus 标准
+
+### 新增（续）
+
 #### CI/CD 基础设施
 - 模块化的 GitHub Actions 工作流架构：
   - 新增 `ci.yml` 工作流用于统一的持续集成
