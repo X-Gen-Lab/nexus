@@ -82,30 +82,22 @@ if(NEXUS_FPU_TYPE)
     set(CPU_FLAGS "${CPU_FLAGS} -mfpu=${NEXUS_FPU_TYPE} -mfloat-abi=${NEXUS_FLOAT_ABI}")
 endif()
 
-# Initialize compiler flags
+# Initialize compiler flags with CPU architecture
 set(CMAKE_C_FLAGS_INIT "${CPU_FLAGS}")
 set(CMAKE_CXX_FLAGS_INIT "${CPU_FLAGS}")
 set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS}")
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Build Type Specific Flags
-##############################################################################
-
-# Debug build flags
-set(CMAKE_C_FLAGS_DEBUG "-Og -g3 -DDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3 -DDEBUG" CACHE STRING "" FORCE)
-
-# Release build flags
-set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG" CACHE STRING "" FORCE)
-
-# Minimum size release flags
-set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG" CACHE STRING "" FORCE)
-
-# Release with debug info flags
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG" CACHE STRING "" FORCE)
+#-----------------------------------------------------------------------------
+# Note: Build type flags are now managed centrally by NexusCompilerFlags.cmake
+# This provides better consistency and allows easier customization.
+# The flags are set in the main CMakeLists.txt after toolchain detection.
+#
+# To customize build type flags, use one of these methods:
+#   1. Command line: cmake -DCMAKE_C_FLAGS_DEBUG="-O0 -g3"
+#   2. CMakePresets.json: "CMAKE_C_FLAGS_DEBUG": "-O0 -g3"
+#   3. Before project(): set(CMAKE_C_FLAGS_DEBUG "-O0 -g3" CACHE STRING "")
 
 ##############################################################################
 # Linker Flags

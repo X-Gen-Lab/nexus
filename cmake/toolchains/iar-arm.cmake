@@ -78,29 +78,18 @@ set(CMAKE_C_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal")
 set(CMAKE_CXX_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal")
 set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS}")
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Build Type Specific Flags
-##############################################################################
-
-# Debug build flags
-# -On: No optimization
-# -r: Generate debug information
-set(CMAKE_C_FLAGS_DEBUG "-On -r -DDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "-On -r -DDEBUG" CACHE STRING "" FORCE)
-
-# Release build flags
-# -Oh: High optimization for speed
-set(CMAKE_C_FLAGS_RELEASE "-Oh -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "-Oh -DNDEBUG" CACHE STRING "" FORCE)
-
-# Minimum size release flags
-# -Ohz: High optimization for size
-set(CMAKE_C_FLAGS_MINSIZEREL "-Ohz -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Ohz -DNDEBUG" CACHE STRING "" FORCE)
-
-# Release with debug info flags
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-Oh -r -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Oh -r -DNDEBUG" CACHE STRING "" FORCE)
+#-----------------------------------------------------------------------------
+# Note: Build type flags are now managed centrally by NexusCompilerFlags.cmake
+# See cmake/modules/NexusCompilerFlags.cmake::nexus_set_default_build_type_flags()
+#
+# IAR-specific optimization flags:
+#   -On:  No optimization
+#   -Om:  Medium optimization
+#   -Oh:  High optimization for speed
+#   -Ohz: High optimization for size
+#   -r:   Generate debug information
 
 ##############################################################################
 # Linker Flags

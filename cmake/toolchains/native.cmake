@@ -48,46 +48,21 @@ else()
     set(NEXUS_TOOLCHAIN_VENDOR "Unknown")
 endif()
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Build Type Specific Flags
-##############################################################################
-
-if(MSVC)
-    # MSVC-specific flags
-    # Debug build flags
-    set(CMAKE_C_FLAGS_DEBUG "/Od /Zi /RTC1 /DDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi /RTC1 /DDEBUG" CACHE STRING "" FORCE)
-
-    # Release build flags
-    set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /Oi /DNDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /Oi /DNDEBUG" CACHE STRING "" FORCE)
-
-    # Minimum size release flags
-    set(CMAKE_C_FLAGS_MINSIZEREL "/O1 /Ob1 /DNDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "/O1 /Ob1 /DNDEBUG" CACHE STRING "" FORCE)
-
-    # Release with debug info flags
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "/O2 /Zi /DNDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/O2 /Zi /DNDEBUG" CACHE STRING "" FORCE)
-
-else()
-    # GCC/Clang-specific flags
-    # Debug build flags
-    set(CMAKE_C_FLAGS_DEBUG "-Og -g3 -DDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3 -DDEBUG" CACHE STRING "" FORCE)
-
-    # Release build flags
-    set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG" CACHE STRING "" FORCE)
-
-    # Minimum size release flags
-    set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG" CACHE STRING "" FORCE)
-
-    # Release with debug info flags
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG" CACHE STRING "" FORCE)
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG" CACHE STRING "" FORCE)
-endif()
+#-----------------------------------------------------------------------------
+# Note: Build type flags are now managed centrally by NexusCompilerFlags.cmake
+# See cmake/modules/NexusCompilerFlags.cmake::nexus_set_default_build_type_flags()
+#
+# This provides:
+#   - Consistent flags across all toolchains
+#   - Easier customization through command line or presets
+#   - Better maintainability
+#
+# To customize build type flags, use one of these methods:
+#   1. Command line: cmake -DCMAKE_C_FLAGS_DEBUG="-O0 -g3"
+#   2. CMakePresets.json: "CMAKE_C_FLAGS_DEBUG": "-O0 -g3"
+#   3. Before project(): set(CMAKE_C_FLAGS_DEBUG "-O0 -g3" CACHE STRING "")
 
 ##############################################################################
 # Platform-Specific Settings

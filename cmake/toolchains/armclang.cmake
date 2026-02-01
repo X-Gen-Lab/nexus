@@ -90,22 +90,13 @@ set(CMAKE_ASM_FLAGS_INIT "")
 #-----------------------------------------------------------------------------
 # Build Type Specific Flags
 #-----------------------------------------------------------------------------
-
-# Debug build flags
-set(CMAKE_C_FLAGS_DEBUG "-O1 -g -DDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "-O1 -g -DDEBUG" CACHE STRING "" FORCE)
-
-# Release build flags
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG" CACHE STRING "" FORCE)
-
-# Minimum size release flags
-set(CMAKE_C_FLAGS_MINSIZEREL "-Oz -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Oz -DNDEBUG" CACHE STRING "" FORCE)
-
-# Release with debug info flags
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG" CACHE STRING "" FORCE)
+# Note: Build type flags are now managed centrally by NexusCompilerFlags.cmake
+# See cmake/modules/NexusCompilerFlags.cmake::nexus_set_default_build_type_flags()
+#
+# ARM Clang uses slightly different optimization levels than GCC:
+#   Debug:   -O1 (better debugging experience than -O0)
+#   Release: -O3 (maximum optimization)
+#   MinSize: -Oz (optimize for size)
 
 #-----------------------------------------------------------------------------
 # Linker Flags
