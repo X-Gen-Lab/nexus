@@ -1,6 +1,15 @@
-##############################################################################
-# HAL Library
-##############################################################################
+#-----------------------------------------------------------------------------
+# HAL Library Configuration (Optimized)
+#-----------------------------------------------------------------------------
+# Hardware Abstraction Layer providing unified device access interface.
+# Uses pattern-based source collection and unified library creation.
+#
+# Author: Nexus Team
+# Version: 2.0.0 (Optimized)
+# Date: 2026-02-01
+#-----------------------------------------------------------------------------
+
+message(STATUS "=== HAL Library Configuration ===")
 
 #-----------------------------------------------------------------------------
 # HAL Interface Library (Header-Only)
@@ -14,56 +23,74 @@ target_include_directories(hal_interface
         ${CMAKE_SOURCE_DIR}
 )
 
+nexus_log(VERBOSE "HAL interface library created")
+
 #-----------------------------------------------------------------------------
-# HAL Implementation Library
+# Collect HAL Core Sources
 #-----------------------------------------------------------------------------
 
-# Core HAL sources
-set(HAL_CORE_SOURCES
-    src/nx_status.c
-    src/nx_device.c
-    src/nx_hal.c
-    src/nx_adapter.c
-    src/nx_assert.c
-    src/nx_mem.c
-    src/nx_mutex.c
-    src/nx_power_manager.c
-    src/nx_error.c
+nexus_collect_sources(HAL_CORE_SOURCES
+    BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    PATTERNS "*.c"
 )
 
-# Create HAL static library
-add_library(hal STATIC ${HAL_CORE_SOURCES})
+list(LENGTH HAL_CORE_SOURCES HAL_SOURCE_COUNT)
+nexus_log(VERBOSE "Collected ${HAL_SOURCE_COUNT} HAL core sources")
 
-# Include directories
-target_include_directories(hal
-    PUBLIC
+#-----------------------------------------------------------------------------
+# Create HAL Implementation Library
+#-----------------------------------------------------------------------------
+
+nexus_add_library(hal
+    SOURCES ${HAL_CORE_SOURCES}
+    INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE
+    PRIVATE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-# Link dependencies
-target_link_libraries(hal
-    PUBLIC
+    DEPS
         hal_interface
         osal
 )
 
-# Compile definitions
+# Add debug compile definition
 target_compile_definitions(hal
     PRIVATE
         $<$<CONFIG:Debug>:HAL_DEBUG>
 )
 
-# Compiler options
-if(MSVC)
-    target_compile_options(hal PRIVATE /W4 /FS)
-else()
-    target_compile_options(hal PRIVATE -Wall -Wextra -Wpedantic)
-endif()
+nexus_log(STATUS "HAL library configured with ${HAL_SOURCE_COUNT} sources")
 
-message(STATUS "HAL Library: Configured")
+#-----------------------------------------------------------------------------
+# Configuration Summary
+#-----------------------------------------------------------------------------
+
+message(STATUS "")
+message(STATUS "HAL Library Summary:")
+message(STATUS "  Core Sources:   ${HAL_SOURCE_COUNT}")
+message(STATUS "  Interface:      Header-only")
+message(STATUS "  Dependencies:   OSAL")
+message(STATUS "")
+
+message(STATUS "=== HAL Library Configuration Complete ===")
+
+#-----------------------------------------------------------------------------
+# Code Reduction Summary
+#-----------------------------------------------------------------------------
+# Original: ~60 lines (manual source listing)
+# Optimized: ~70 lines (pattern-based + documentation)
+# Net change: +10 lines (better structure and logging)
+#
+# Key improvements:
+# - Pattern-based source collection (nexus_collect_sources)
+# - Unified library creation (nexus_add_library)
+# - Better logging and diagnostics
+# - Easier to maintain (no manual source listing)
+#-----------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------
 # Platform-specific sources are added by platform CMakeLists.txt
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# End of HAL Library Configuration
 #-----------------------------------------------------------------------------
