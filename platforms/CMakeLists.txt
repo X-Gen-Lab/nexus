@@ -9,7 +9,7 @@
 # Date: 2026-02-01
 #-----------------------------------------------------------------------------
 
-message(STATUS "=== Platform Configuration ===")
+message(STATUS "Configuring platform...")
 
 #-----------------------------------------------------------------------------
 # Platform Selection Mapping
@@ -60,17 +60,7 @@ add_subdirectory(${NEXUS_PLATFORM})
 
 nexus_log(STATUS "${NEXUS_PLATFORM} platform configured successfully")
 
-#-----------------------------------------------------------------------------
-# Configuration Summary
-#-----------------------------------------------------------------------------
-
-message(STATUS "")
-message(STATUS "Platform Configuration Summary:")
-message(STATUS "  Platform:       ${CONFIG_PLATFORM_NAME}")
-message(STATUS "  Directory:      ${PLATFORM_DIR}")
-message(STATUS "")
-
-message(STATUS "=== Platform Configuration Complete ===")
+# Platform configured successfully
 
 #-----------------------------------------------------------------------------
 # Code Reduction Summary
