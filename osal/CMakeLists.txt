@@ -9,7 +9,7 @@
 # Date: 2026-02-01
 #-----------------------------------------------------------------------------
 
-message(STATUS "=== OSAL Library Configuration ===")
+message(STATUS "Configuring OSAL library...")
 
 #-----------------------------------------------------------------------------
 # OSAL Interface Library (Header-Only)
@@ -128,18 +128,9 @@ if(OSAL_BACKEND STREQUAL "freertos")
     endif()
 endif()
 
-#-----------------------------------------------------------------------------
-# Configuration Summary
-#-----------------------------------------------------------------------------
+nexus_log(STATUS "OSAL configured with ${OSAL_BACKEND_NAME} backend")
 
-message(STATUS "")
-message(STATUS "OSAL Library Summary:")
-message(STATUS "  Backend:        ${OSAL_BACKEND_NAME}")
-message(STATUS "  Adapter:        ${OSAL_ADAPTER_SOURCES}")
-message(STATUS "  Interface:      Header-only")
-message(STATUS "")
-
-message(STATUS "=== OSAL Library Configuration Complete ===")
+# OSAL library configured successfully
 
 #-----------------------------------------------------------------------------
 # Code Reduction Summary

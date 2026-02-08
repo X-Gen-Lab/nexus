@@ -9,7 +9,7 @@
 # Date: 2026-02-01
 #-----------------------------------------------------------------------------
 
-message(STATUS "=== HAL Library Configuration ===")
+message(STATUS "Configuring HAL library...")
 
 #-----------------------------------------------------------------------------
 # HAL Interface Library (Header-Only)
@@ -60,18 +60,7 @@ target_compile_definitions(hal
 
 nexus_log(STATUS "HAL library configured with ${HAL_SOURCE_COUNT} sources")
 
-#-----------------------------------------------------------------------------
-# Configuration Summary
-#-----------------------------------------------------------------------------
-
-message(STATUS "")
-message(STATUS "HAL Library Summary:")
-message(STATUS "  Core Sources:   ${HAL_SOURCE_COUNT}")
-message(STATUS "  Interface:      Header-only")
-message(STATUS "  Dependencies:   OSAL")
-message(STATUS "")
-
-message(STATUS "=== HAL Library Configuration Complete ===")
+# HAL library configured successfully
 
 #-----------------------------------------------------------------------------
 # Code Reduction Summary
