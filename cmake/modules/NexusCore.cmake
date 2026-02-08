@@ -314,74 +314,73 @@ endfunction()
 ##############################################################################
 
 #
-# Configure compiler flags
+# Configure compiler flags (baseline/required flags only)
+# Note: Most compiler flags are configured via Kconfig in NexusCompilerConfig
 #
 macro(nexus_configure_compiler_flags)
+    # MSVC-specific required flags
     if(NEXUS_COMPILER_MSVC)
-        add_compile_options(
-            /W4 /WX /wd4100 /wd4996
-            /permissive- /Zc:__cplusplus
-        )
-        # Debug configuration
-        add_compile_options($<$<CONFIG:Debug>:/Od>)
-        add_compile_options($<$<CONFIG:Debug>:/Zi>)
-        add_compile_options($<$<CONFIG:Debug>:/RTC1>)
-        # Release configuration
-        add_compile_options($<$<CONFIG:Release>:/O2>)
-        add_compile_options($<$<CONFIG:Release>:/Ob2>)
-        add_compile_options($<$<CONFIG:Release>:/Oi>)
+        # Multi-processor compilation
+        add_compile_options(/MP)
+
+        # CRT security warnings suppression
+        add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+
+        # C++ standard compliance
+        add_compile_options(/permissive- /Zc:__cplusplus)
+
+        # Build type definitions
         add_compile_definitions(
             $<$<CONFIG:Debug>:DEBUG>
             $<$<CONFIG:Debug>:_DEBUG>
             $<$<CONFIG:Release>:NDEBUG>
-            _CRT_SECURE_NO_WARNINGS
         )
-    elseif(NEXUS_COMPILER_GCC OR NEXUS_COMPILER_CLANG OR NEXUS_COMPILER_APPLECLANG OR
-           NEXUS_COMPILER_ARM_GCC)
-        add_compile_options(
-            -Wall -Wextra -Wpedantic -Werror
-            -Wno-unused-parameter
-            -ffunction-sections -fdata-sections
-        )
-        add_compile_options($<$<CONFIG:Debug>:-Og>)
-        add_compile_options($<$<CONFIG:Debug>:-g3>)
-        add_compile_options($<$<CONFIG:Release>:-O2>)
+    endif()
+
+    # GCC/Clang/ARM GCC/ARM Clang common settings
+    if(NEXUS_COMPILER_GCC OR NEXUS_COMPILER_CLANG OR NEXUS_COMPILER_APPLECLANG OR
+       NEXUS_COMPILER_ARM_GCC OR NEXUS_COMPILER_ARM_CLANG)
+        # Project-wide warning suppressions (not configurable via Kconfig)
+        add_compile_options(-Wno-unused-parameter)
+
+        # Build type definitions
         add_compile_definitions(
             $<$<CONFIG:Debug>:DEBUG>
             $<$<CONFIG:Release>:NDEBUG>
         )
-        add_link_options(-Wl,--gc-sections)
+    endif()
 
-        if(NEXUS_ENABLE_COVERAGE)
+    # IAR-specific settings
+    if(NEXUS_COMPILER_IAR)
+        # Build type definitions
+        add_compile_definitions(
+            $<$<CONFIG:Debug>:DEBUG>
+            $<$<CONFIG:Release>:NDEBUG>
+        )
+    endif()
+
+    # Coverage support (when enabled)
+    if(NEXUS_ENABLE_COVERAGE)
+        if(NEXUS_COMPILER_GCC OR NEXUS_COMPILER_ARM_GCC OR
+           NEXUS_COMPILER_CLANG OR NEXUS_COMPILER_APPLECLANG)
             add_compile_options(--coverage -O0 -g)
             add_link_options(--coverage)
             if(NEXUS_COMPILER_GCC OR NEXUS_COMPILER_ARM_GCC)
                 add_compile_options(-fprofile-arcs -ftest-coverage)
             endif()
         endif()
-    elseif(NEXUS_COMPILER_ARM_CLANG)
-        # ARM Clang specific flags
-        add_compile_options(
-            -Wall -Wextra -Wpedantic -Werror
-            -Wno-unused-parameter
-            -ffunction-sections -fdata-sections
-        )
-        # Set optimization and debug flags based on build type
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            add_compile_options(-O1 -g)
-            add_compile_definitions(DEBUG)
-        elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-            add_compile_options(-O2)
-            add_compile_definitions(NDEBUG)
+    endif()
+
+    # Sanitizers support (when enabled)
+    if(DEFINED CONFIG_ENABLE_SANITIZERS AND CONFIG_ENABLE_SANITIZERS)
+        if(PLATFORM_NATIVE)
+            if(NEXUS_COMPILER_GCC OR NEXUS_COMPILER_CLANG OR NEXUS_COMPILER_APPLECLANG)
+                add_compile_options(-fsanitize=address -fsanitize=undefined)
+                add_link_options(-fsanitize=address -fsanitize=undefined)
+            elseif(NEXUS_COMPILER_MSVC)
+                add_compile_options(/fsanitize=address)
+            endif()
         endif()
-    elseif(NEXUS_COMPILER_IAR)
-        add_compile_options(--strict --warnings_are_errors)
-        add_compile_options($<$<CONFIG:Debug>:-On -r>)
-        add_compile_options($<$<CONFIG:Release>:-Oh>)
-        add_compile_definitions(
-            $<$<CONFIG:Debug>:DEBUG>
-            $<$<CONFIG:Release>:NDEBUG>
-        )
     endif()
 endmacro()
 
