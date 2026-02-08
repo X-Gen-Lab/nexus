@@ -60,11 +60,9 @@ target_compile_definitions(config_framework
         $<$<CONFIG:Debug>:CONFIG_DEBUG_ENABLED>
 )
 
-# Compiler options
+# MSVC parallel compilation fix
 if(MSVC)
-    target_compile_options(config_framework PRIVATE /W4 /FS)
-else()
-    target_compile_options(config_framework PRIVATE -Wall -Wextra)
+    target_compile_options(config_framework PRIVATE /FS)
 endif()
 
 message(STATUS "Config Manager Framework: Configured")

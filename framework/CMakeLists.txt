@@ -9,7 +9,7 @@
 # Date: 2026-02-01
 #-----------------------------------------------------------------------------
 
-message(STATUS "=== Framework Layer Configuration ===")
+message(STATUS "Configuring framework layer...")
 
 #-----------------------------------------------------------------------------
 # Core Framework Components
@@ -102,28 +102,10 @@ if(CONFIG_FRAMEWORK_DEBUG)
     nexus_log(STATUS "Framework debug mode enabled")
 endif()
 
-#-----------------------------------------------------------------------------
-# Configuration Summary
-#-----------------------------------------------------------------------------
-
 list(LENGTH ENABLED_COMPONENTS COMPONENT_COUNT)
+nexus_log(STATUS "Framework layer configured with ${COMPONENT_COUNT} components")
 
-message(STATUS "")
-message(STATUS "Framework Layer Summary:")
-message(STATUS "  Enabled Components: ${COMPONENT_COUNT}")
-if(ENABLED_COMPONENTS)
-    foreach(COMPONENT ${ENABLED_COMPONENTS})
-        message(STATUS "    - ${COMPONENT}")
-    endforeach()
-else()
-    message(STATUS "    (none)")
-endif()
-if(CONFIG_FRAMEWORK_DEBUG)
-    message(STATUS "  Debug Mode:         Enabled")
-endif()
-message(STATUS "")
-
-message(STATUS "=== Framework Layer Configuration Complete ===")
+# Framework layer configured successfully
 
 #-----------------------------------------------------------------------------
 # Code Reduction Summary

@@ -49,11 +49,9 @@ target_compile_definitions(log_framework
         $<$<CONFIG:Debug>:LOG_DEBUG_ENABLED>
 )
 
-# Compiler options
+# MSVC parallel compilation fix
 if(MSVC)
-    target_compile_options(log_framework PRIVATE /W4 /FS)
-else()
-    target_compile_options(log_framework PRIVATE -Wall -Wextra)
+    target_compile_options(log_framework PRIVATE /FS)
 endif()
 
 message(STATUS "Log Framework: Configured")

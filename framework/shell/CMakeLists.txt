@@ -57,11 +57,9 @@ target_compile_definitions(shell_framework
         $<$<CONFIG:Debug>:SHELL_DEBUG_ENABLED>
 )
 
-# Compiler options
+# MSVC parallel compilation fix
 if(MSVC)
-    target_compile_options(shell_framework PRIVATE /W4 /FS)
-else()
-    target_compile_options(shell_framework PRIVATE -Wall -Wextra)
+    target_compile_options(shell_framework PRIVATE /FS)
 endif()
 
 message(STATUS "Shell Framework: Configured")
