@@ -98,7 +98,7 @@ message(STATUS "Python: ${Python3_EXECUTABLE}")
 #-----------------------------------------------------------------------------
 
 message(STATUS "")
-message(STATUS "=== Phase 1: Configuration Management ===")
+message(STATUS "=== Configuration Management ===")
 
 # Define configuration file paths
 set(NEXUS_KCONFIG_FILE "${CMAKE_SOURCE_DIR}/Kconfig"
@@ -130,10 +130,7 @@ apply_kconfig_to_cmake()
 # Override OSAL backend if configured in Kconfig
 if(DEFINED CONFIG_OSAL_BACKEND_NAME)
     set(NEXUS_OSAL_BACKEND "${CONFIG_OSAL_BACKEND_NAME}" CACHE STRING "OSAL backend from Kconfig" FORCE)
-    message(STATUS "OSAL backend from Kconfig: ${CONFIG_OSAL_BACKEND_NAME}")
 endif()
-
-message(STATUS "Configuration management: Complete")
 
 #-----------------------------------------------------------------------------
 # Phase 2: Core Platform Setup
@@ -141,8 +138,7 @@ message(STATUS "Configuration management: Complete")
 # Detect and configure platform, toolchain, and compiler settings.
 #-----------------------------------------------------------------------------
 
-message(STATUS "")
-message(STATUS "=== Phase 2: Core Platform Setup ===")
+message(STATUS "=== Core Platform Setup ===")
 
 # Load NexusCore module (Platform + Toolchain + Compiler)
 include(NexusCore)
@@ -156,17 +152,23 @@ nexus_set_default_build_type()
 # Configure output directories
 nexus_configure_output_directories()
 
-# Configure compiler flags
-nexus_configure_compiler_flags()
+# Apply Kconfig compiler and linker configurations
+# This must be done AFTER platform detection to ensure toolchain variables are set
+if(EXISTS ${CMAKE_SOURCE_DIR}/cmake/modules/NexusCompilerConfig.cmake)
+    include(NexusCompilerConfig)
+    nexus_apply_compiler_kconfig()
+    nexus_apply_linker_kconfig()
+endif()
 
-message(STATUS "Core platform setup: Complete")
+# Configure compiler flags (applies default/baseline flags)
+# Kconfig flags are already applied above, this adds any additional required flags
+nexus_configure_compiler_flags()
 
 #-----------------------------------------------------------------------------
 # Phase 3: Dependency Management
 #-----------------------------------------------------------------------------
 
-message(STATUS "")
-message(STATUS "=== Phase 3: Dependency Management ===")
+message(STATUS "=== Dependency Management ===")
 
 # Load dependency lock file if exists
 if(EXISTS ${CMAKE_SOURCE_DIR}/nexus.lock)
@@ -174,14 +176,11 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/nexus.lock)
     message(STATUS "Dependency lock file: Loaded")
 endif()
 
-message(STATUS "Dependency management: Complete")
-
 #-----------------------------------------------------------------------------
 # Phase 4: Build Optimization
 #-----------------------------------------------------------------------------
 
-message(STATUS "")
-message(STATUS "=== Phase 4: Build Optimization ===")
+message(STATUS "=== Build Optimization ===")
 
 # Load NexusOptimization module (Cache + Performance + Resource)
 include(NexusOptimization)
@@ -194,20 +193,17 @@ if(NEXUS_ENABLE_CACHE OR DEFINED ENV{NEXUS_ENABLE_CACHE})
     )
     message(STATUS "Build cache: Enabled")
 else()
-    message(STATUS "Build cache: Disabled (set NEXUS_ENABLE_CACHE=ON to enable)")
+    message(STATUS "Build cache: Disabled")
 endif()
 
 # Configure parallel build based on available resources
 nexus_configure_parallel_build()
 
-message(STATUS "Build optimization: Complete")
-
 #-----------------------------------------------------------------------------
 # Phase 5: Quality Assurance Setup
 #-----------------------------------------------------------------------------
 
-message(STATUS "")
-message(STATUS "=== Phase 5: Quality Assurance Setup ===")
+message(STATUS "=== Quality Assurance ===")
 
 # Load NexusQuality module (Tests + Diagnostics + Reproducible builds)
 include(NexusQuality)
@@ -215,16 +211,12 @@ include(NexusQuality)
 # Initialize test framework if tests are enabled
 if(NEXUS_BUILD_TESTS AND NEXUS_PLATFORM STREQUAL "native")
     nexus_test_init_gtest()
-    message(STATUS "Test framework: Initialized")
 endif()
 
 # Enable reproducible builds if configured
 if(DEFINED CONFIG_REPRODUCIBLE_BUILD AND CONFIG_REPRODUCIBLE_BUILD)
     nexus_init_reproducible_build()
-    message(STATUS "Reproducible builds: Enabled")
 endif()
-
-message(STATUS "Quality assurance setup: Complete")
 
 #-----------------------------------------------------------------------------
 # Phase 6: Extension System (Optional)
@@ -255,8 +247,7 @@ endif()
 # Phase 8: Build Targets (Subdirectories)
 #-----------------------------------------------------------------------------
 
-message(STATUS "")
-message(STATUS "=== Phase 8: Build Targets ===")
+message(STATUS "=== Build Targets ===")
 
 # Load NexusBuild module for target creation helpers
 include(NexusBuild)
@@ -367,7 +358,103 @@ if(DEFINED CONFIG_PLATFORM_NAME)
     endif()
 endif()
 
+message(STATUS "----------------------------------------")
+message(STATUS "  Compiler/Linker Flags:")
+
+# C Compiler flags - compact format
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(_COMBINED_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(_COMBINED_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}")
+else()
+    set(_COMBINED_C_FLAGS "${CMAKE_C_FLAGS}")
+endif()
+string(STRIP "${_COMBINED_C_FLAGS}" _COMBINED_C_FLAGS)
+message(STATUS "    C (${CMAKE_BUILD_TYPE}):  ${_COMBINED_C_FLAGS}")
+
+# Assembler flags - compact format
+if(NEXUS_CPU_ARCH)
+    # Map to assembler format
+    if(NEXUS_CPU_ARCH STREQUAL "cortex-m4")
+        set(_asm_display "--cpu=Cortex-M4")
+    elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m7")
+        set(_asm_display "--cpu=Cortex-M7")
+    elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m3")
+        set(_asm_display "--cpu=Cortex-M3")
+    elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m0")
+        set(_asm_display "--cpu=Cortex-M0")
+    elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m0plus")
+        set(_asm_display "--cpu=Cortex-M0plus")
+    endif()
+
+    if(NEXUS_FPU_TYPE)
+        if(NEXUS_FPU_TYPE STREQUAL "fpv4-sp-d16")
+            string(APPEND _asm_display " --fpu=FPv4-SP")
+        elseif(NEXUS_FPU_TYPE STREQUAL "fpv5-d16")
+            string(APPEND _asm_display " --fpu=FPv5-D16")
+        elseif(NEXUS_FPU_TYPE STREQUAL "fpv5-sp-d16")
+            string(APPEND _asm_display " --fpu=FPv5-SP")
+        endif()
+    endif()
+
+    # Add MicroLIB info if applicable
+    if(NEXUS_COMPILER_ARM_CLANG)
+        if(DEFINED CONFIG_COMPILER_USE_MICROLIB AND CONFIG_COMPILER_USE_MICROLIB)
+            string(APPEND _asm_display " --pd \"__MICROLIB SETA 1\"")
+        endif()
+    endif()
+
+    message(STATUS "    ASM:      ${_asm_display}")
+endif()
+
+# Linker flags - compact format
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(_COMBINED_LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(_COMBINED_LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+else()
+    set(_COMBINED_LINK_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+endif()
+string(STRIP "${_COMBINED_LINK_FLAGS}" _COMBINED_LINK_FLAGS)
+message(STATUS "    Link (${CMAKE_BUILD_TYPE}): ${_COMBINED_LINK_FLAGS}")
+
+# Additional Kconfig flags (applied via add_compile_options)
+set(_KCONFIG_FLAGS "")
+
+# C/C++ Standard (from CMAKE_C_STANDARD/CMAKE_CXX_STANDARD)
+if(CMAKE_C_STANDARD)
+    list(APPEND _KCONFIG_FLAGS "-std=c${CMAKE_C_STANDARD}")
+endif()
+
+if(DEFINED CONFIG_COMPILER_WARNING_LEVEL)
+    if(CONFIG_COMPILER_WARNING_LEVEL STREQUAL "STANDARD")
+        list(APPEND _KCONFIG_FLAGS "-Wall" "-Wextra")
+    elseif(CONFIG_COMPILER_WARNING_LEVEL STREQUAL "PEDANTIC")
+        list(APPEND _KCONFIG_FLAGS "-Wall" "-Wextra" "-Wpedantic")
+    endif()
+endif()
+if(DEFINED CONFIG_COMPILER_DEBUG_FORMAT AND CONFIG_COMPILER_DEBUG_FORMAT STREQUAL "DWARF4")
+    list(APPEND _KCONFIG_FLAGS "-gdwarf-4" "-g3")
+endif()
+if(DEFINED CONFIG_COMPILER_UNSIGNED_CHAR AND CONFIG_COMPILER_UNSIGNED_CHAR)
+    list(APPEND _KCONFIG_FLAGS "-funsigned-char")
+endif()
+if(DEFINED CONFIG_COMPILER_SHORT_ENUMS AND CONFIG_COMPILER_SHORT_ENUMS)
+    list(APPEND _KCONFIG_FLAGS "-fshort-enums")
+endif()
+if(DEFINED CONFIG_COMPILER_FUNCTION_SECTIONS AND CONFIG_COMPILER_FUNCTION_SECTIONS)
+    list(APPEND _KCONFIG_FLAGS "-ffunction-sections" "-fdata-sections")
+endif()
+
+if(_KCONFIG_FLAGS)
+    string(JOIN " " _KCONFIG_FLAGS_STR ${_KCONFIG_FLAGS})
+    message(STATUS "    Kconfig:  ${_KCONFIG_FLAGS_STR}")
+endif()
+
 message(STATUS "========================================")
+message(STATUS "")
+message(STATUS "Note: Run 'cmake --build --preset <preset> --verbose' to see")
+message(STATUS "      complete compilation commands with all flags.")
 message(STATUS "")
 
 #-----------------------------------------------------------------------------
