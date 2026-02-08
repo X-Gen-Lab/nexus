@@ -126,6 +126,9 @@ function(apply_kconfig_to_cmake)
     endif()
 
     message(STATUS "Kconfig configuration applied to CMake")
+
+    # Note: Compiler and linker flags are applied separately via NexusCompilerConfig module
+    # This is done after platform detection to ensure correct toolchain variables are set
 endfunction()
 
 ##############################################################################
