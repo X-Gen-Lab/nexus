@@ -58,4 +58,52 @@ config STM32_USE_FULL_ASSERT
       Useful for debugging but increases code size.
       Automatically enabled in DEBUG builds.
 
+config STM32_ENABLE_PERFORMANCE_MEASUREMENT
+    bool "Enable performance measurement"
+    default y
+    help
+      Enable DWT-based performance measurement features.
+      Provides boot time measurement, code size analysis,
+      and function profiling capabilities.
+      Minimal overhead when not actively profiling.
+
+config STM32_BOOT_TIME_MEASUREMENT
+    bool "Enable boot time measurement"
+    default y
+    depends on STM32_ENABLE_PERFORMANCE_MEASUREMENT
+    help
+      Automatically measure boot time from reset to platform_init.
+      Results can be retrieved via stm32_boot_time_get() or
+      printed via stm32_boot_time_report().
+      Target: < 10ms total boot time.
+
+config STM32_CODE_SIZE_REPORTING
+    bool "Enable code size reporting"
+    default y
+    depends on STM32_ENABLE_PERFORMANCE_MEASUREMENT
+    help
+      Enable code size measurement and reporting.
+      Calculates Flash and RAM usage from linker symbols.
+      Target: < 10KB for core functionality.
+
+config STM32_ENABLE_PROFILING
+    bool "Enable advanced profiling"
+    default n
+    depends on STM32_ENABLE_PERFORMANCE_MEASUREMENT
+    help
+      Enable advanced profiling features for hot path analysis.
+      Provides zone-based profiling with detailed statistics.
+      Use STM32_PROFILE_ZONE() and STM32_PROFILE_FUNCTION() macros.
+      Minimal overhead when zones are not active.
+
+config STM32_PROFILER_MAX_ZONES
+    int "Maximum profiling zones"
+    default 32
+    range 8 128
+    depends on STM32_ENABLE_PROFILING
+    help
+      Maximum number of profiling zones that can be tracked.
+      Each zone uses approximately 32 bytes of RAM.
+      Increase if you see overflow warnings.
+
 endmenu

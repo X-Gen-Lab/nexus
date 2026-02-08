@@ -8,8 +8,7 @@
 #   chips/       - Chip series and variant selection + Kconfig files
 #   src/boot/    - Boot and startup code + Kconfig
 #   src/clock/   - Clock configuration code + Kconfig
-#   src/hal/     - HAL integration code + Kconfig files
-#   src/peripheral/ - Peripheral drivers + Kconfig files
+#   src/hal/     - HAL drivers (UART, SPI, I2C, etc.) + Kconfig files
 #   src/system/  - System-level code + Kconfig
 #   config/      - HAL configuration headers (stm32xxx_hal_conf.h)
 #
@@ -18,11 +17,11 @@
 #   2. Clock configuration (src/clock/Kconfig)
 #   3. Boot configuration (src/boot/Kconfig)
 #   4. Interrupt configuration (src/interrupt/Kconfig)
-#   5. Peripheral configuration (src/peripheral/Kconfig)
-#   6. HAL module auto-selection (src/hal/Kconfig.modules)
-#   7. HAL callback configuration (src/hal/Kconfig.callbacks)
-#   8. Peripheral detailed configuration (src/peripheral/Kconfig.detail)
-#   9. System configuration (src/system/Kconfig)
+#   5. HAL driver configuration (src/hal/Kconfig)
+#      - UART, SPI, I2C, Timer, ADC, DAC, etc.
+#      - HAL module auto-selection
+#      - HAL callback configuration
+#   6. System configuration (src/system/Kconfig)
 #-----------------------------------------------------------------------------
 
 if PLATFORM_STM32
@@ -77,36 +76,13 @@ source "platforms/stm32/src/boot/Kconfig"
 source "platforms/stm32/src/interrupt/Kconfig"
 
 #-----------------------------------------------------------------------------
-# Peripheral Configuration
+# HAL Driver Configuration
 #-----------------------------------------------------------------------------
-# User interface for enabling/disabling peripheral features
-#-----------------------------------------------------------------------------
-
-source "platforms/stm32/src/peripheral/Kconfig"
-
-#-----------------------------------------------------------------------------
-# HAL Module Auto-Selection (Internal)
-#-----------------------------------------------------------------------------
-# Automatically select required HAL modules based on peripheral configuration
+# HAL drivers implement Nexus peripheral interfaces using STM32 HAL library.
+# Each driver is a thin wrapper with maximum STM32 HAL reuse.
 #-----------------------------------------------------------------------------
 
-source "platforms/stm32/src/hal/Kconfig.modules"
-
-#-----------------------------------------------------------------------------
-# HAL Callback Configuration
-#-----------------------------------------------------------------------------
-# Configure HAL library callback function support
-#-----------------------------------------------------------------------------
-
-source "platforms/stm32/src/hal/Kconfig.callbacks"
-
-#-----------------------------------------------------------------------------
-# Peripheral Detailed Configuration
-#-----------------------------------------------------------------------------
-# Detailed parameter configuration for each peripheral
-#-----------------------------------------------------------------------------
-
-source "platforms/stm32/src/peripheral/Kconfig.detail"
+source "platforms/stm32/src/hal/Kconfig"
 
 #-----------------------------------------------------------------------------
 # System Configuration
@@ -260,6 +236,15 @@ config STM32_HAL_TIMEOUT_VALUE
     help
       Default timeout value for HAL library operations in milliseconds.
       Used for peripheral initialization and data transfer operations.
+
+config EXPERT_MODE
+    bool "Enable expert mode"
+    default n
+    help
+      Enable expert mode to show advanced configuration options.
+      This includes HAL module selection and callback configuration.
+
+      Normal users should keep this disabled.
 
 endmenu
 

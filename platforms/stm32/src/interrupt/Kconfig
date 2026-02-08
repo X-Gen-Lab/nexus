@@ -18,30 +18,6 @@ config STM32_NVIC_PRIORITY_GROUP
 
       Recommended: 4 (all bits for preemption priority)
 
-config STM32_ENABLE_FAULT_HANDLERS
-    bool "Enable detailed fault handlers"
-    default y if DEBUG
-    default n
-    help
-      Enable detailed fault exception handlers with debugging support.
-      When enabled, fault handlers will:
-        - Save fault status registers
-        - Trigger breakpoints in debug mode
-        - Provide detailed fault information
-
-      Automatically enabled in DEBUG builds.
-
-config STM32_FAULT_HANDLER_LOGGING
-    bool "Enable fault handler logging"
-    default y if DEBUG
-    default n
-    depends on STM32_ENABLE_FAULT_HANDLERS && STM32_ENABLE_LOGGING
-    help
-      Enable logging output in fault exception handlers.
-      Provides detailed information about fault causes and registers.
-
-      Requires STM32_ENABLE_LOGGING to be enabled.
-
 config STM32_SYSTICK_PRIORITY
     int "SysTick interrupt priority"
     default 15

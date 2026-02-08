@@ -52,6 +52,55 @@ config STM32_HEAP_SIZE
       Increase this value if you use dynamic memory allocation
       extensively in your application.
 
+config STM32_ENABLE_CCM
+    bool "Enable CCM RAM usage"
+    default y
+    depends on STM32F4 || STM32F7
+    help
+      Enable Core Coupled Memory (CCM) RAM usage.
+      CCM is a fast SRAM region that is not accessible by DMA.
+
+      Available on:
+      - STM32F4 series (64KB at 0x10000000)
+      - STM32F7 series (varies by model)
+
+      When enabled, you can place data in CCM using:
+        __attribute__((section(".ccmram"))) int my_data;
+
+      Note: CCM cannot be used for DMA buffers.
+
+config STM32_ENABLE_DTCM
+    bool "Enable DTCM RAM usage"
+    default y
+    depends on STM32F7 || STM32H7
+    help
+      Enable Data Tightly Coupled Memory (DTCM) RAM usage.
+      DTCM provides zero wait-state access for the CPU.
+
+      Available on:
+      - STM32F7 series (64KB at 0x20000000)
+      - STM32H7 series (128KB at 0x20000000)
+
+      DTCM is typically used for stack, heap, and frequently
+      accessed variables.
+
+config STM32_ENABLE_ITCM
+    bool "Enable ITCM RAM usage"
+    default n
+    depends on STM32F7 || STM32H7
+    help
+      Enable Instruction Tightly Coupled Memory (ITCM) RAM usage.
+      ITCM provides zero wait-state instruction fetch.
+
+      Available on:
+      - STM32F7 series (16KB at 0x00000000)
+      - STM32H7 series (64KB at 0x00000000)
+
+      When enabled, you can place time-critical code in ITCM:
+        __attribute__((section(".itcmram"))) void fast_function(void);
+
+      Note: Requires special linker script configuration.
+
 config STM32_VTOR_OFFSET
     hex "Vector table offset"
     default 0x00000000

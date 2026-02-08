@@ -1,3 +1,6 @@
+# Clock Configuration
+# This file configures the system clock and oscillator settings for STM32 platform
+
 menu "Clock Configuration"
 
 config STM32_HSE_ENABLE
@@ -6,15 +9,22 @@ config STM32_HSE_ENABLE
     help
       Enable the external high-speed oscillator.
       Required for most applications using external crystal.
+      If HSE fails to start, the system will automatically fall back to HSI.
 
 config STM32_HSE_VALUE
     int "HSE frequency (Hz)"
-    default 25000000
+    default 8000000 if STM32F0 || STM32F1 || STM32F4
+    default 25000000 if STM32H7
+    default 8000000
     range 4000000 50000000
     depends on STM32_HSE_ENABLE
     help
       Frequency of the external high-speed oscillator in Hz.
-      Common values: 8MHz, 12MHz, 16MHz, 25MHz
+      Common values:
+        - STM32F0/F1/F4: 8MHz, 12MHz, 16MHz
+        - STM32H7: 25MHz
+
+      This value must match your hardware crystal frequency.
 
 config STM32_HSE_STARTUP_TIMEOUT
     int "HSE startup timeout (ms)"
@@ -23,14 +33,82 @@ config STM32_HSE_STARTUP_TIMEOUT
     depends on STM32_HSE_ENABLE
     help
       Timeout value for HSE oscillator startup in milliseconds.
-      Typical value is 100ms.
+      Typical value is 100ms. If HSE fails to start within this
+      timeout, the system will fall back to HSI.
 
 config STM32_HSI_VALUE
     int "HSI frequency (Hz)"
+    default 8000000 if STM32F0 || STM32F1
+    default 16000000 if STM32F4
+    default 64000000 if STM32H7
+    default 16000000 if STM32L4
     default 16000000
     help
       Internal high-speed oscillator frequency.
-      This is fixed by hardware (typically 16MHz for most STM32).
+      This is fixed by hardware:
+        - STM32F0/F1: 8MHz
+        - STM32F2/F3/F4/F7: 16MHz
+        - STM32H7: 64MHz
+        - STM32L4: 16MHz
+
+      This value is used as fallback when HSE fails.
+
+config STM32_MSI_ENABLE
+    bool "Enable MSI (Multi-Speed Internal oscillator)"
+    default n
+    depends on STM32L4
+    help
+      Enable the multi-speed internal oscillator (MSI).
+      MSI is available on STM32L4 series and provides
+      multiple frequency ranges from 100kHz to 48MHz.
+      MSI can be used as system clock or PLL source.
+
+config STM32_MSI_VALUE
+    int "MSI frequency (Hz)"
+    default 4000000
+    range 100000 48000000
+    depends on STM32_MSI_ENABLE
+    help
+      Multi-speed internal oscillator frequency.
+      Available ranges for STM32L4:
+        - Range 0: ~100 kHz
+        - Range 1: ~200 kHz
+        - Range 2: ~400 kHz
+        - Range 3: ~800 kHz
+        - Range 4: ~1 MHz
+        - Range 5: ~2 MHz
+        - Range 6: ~4 MHz (default after reset)
+        - Range 7: ~8 MHz
+        - Range 8: ~16 MHz
+        - Range 9: ~24 MHz
+        - Range 10: ~32 MHz
+        - Range 11: ~48 MHz
+
+      Default is 4MHz (Range 6).
+
+config STM32_SYSCLK_FREQ
+    int "Target system clock frequency (Hz)"
+    default 48000000 if STM32F0
+    default 72000000 if STM32F1
+    default 168000000 if STM32F407xx
+    default 180000000 if STM32F429xx || STM32F446xx
+    default 480000000 if STM32H7
+    default 80000000 if STM32L4
+    default 168000000
+    help
+      Target system clock frequency in Hz.
+      The PLL parameters will be automatically calculated to achieve
+      this frequency from the selected clock source (HSE or HSI).
+
+      Maximum frequencies:
+        - STM32F0: 48MHz
+        - STM32F1: 72MHz
+        - STM32F407: 168MHz
+        - STM32F429/F446: 180MHz (with Over-Drive mode)
+        - STM32H7: 480MHz
+        - STM32L4: 80MHz
+
+      Note: Actual frequency may differ slightly due to PLL limitations.
 
 config STM32_LSE_ENABLE
     bool "Enable LSE (External Low Speed oscillator)"
@@ -45,7 +123,7 @@ config STM32_LSE_VALUE
     depends on STM32_LSE_ENABLE
     help
       Frequency of the external low-speed oscillator in Hz.
-      Standard value is 32768 Hz (32.768 kHz).
+      Standard value is 32768 Hz (32.768 kHz) for RTC applications.
 
 config STM32_LSE_STARTUP_TIMEOUT
     int "LSE startup timeout (ms)"
@@ -62,6 +140,7 @@ config STM32_LSI_VALUE
     help
       Internal low-speed oscillator frequency.
       Approximate value, actual frequency varies (typically 32kHz).
+      Used for watchdog and RTC when LSE is not available.
 
 config STM32_EXTERNAL_CLOCK_VALUE
     int "External clock source for I2S (Hz)"
@@ -70,16 +149,5 @@ config STM32_EXTERNAL_CLOCK_VALUE
     help
       External clock source frequency for I2S peripheral in Hz.
       Common value is 12.288 MHz for audio applications.
-
-config STM32_SYSCLK_FREQ
-    int "Target system clock frequency (Hz)"
-    default 180000000 if STM32F4
-    default 480000000 if STM32H7
-    default 80000000 if STM32L4
-    help
-      Target system clock frequency in Hz.
-      STM32F4: up to 180MHz
-      STM32H7: up to 480MHz
-      STM32L4: up to 80MHz
 
 endmenu

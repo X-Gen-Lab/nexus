@@ -355,3 +355,9 @@ source "platforms/stm32/chips/Kconfig.stm32wb"
 
 # STM32WL series variants
 source "platforms/stm32/chips/Kconfig.stm32wl"
+
+#-----------------------------------------------------------------------------
+# Chip-Specific Features
+#-----------------------------------------------------------------------------
+
+source "platforms/stm32/chips/Kconfig.features"

@@ -20,7 +20,7 @@ menuconfig STM32_UART_ENABLE
       Automatically enables: HAL_UART_MODULE, HAL_USART_MODULE
 
 if STM32_UART_ENABLE
-# source "src/uart/Kconfig"
+source "platforms/stm32/src/hal/uart/Kconfig"
 endif # STM32_UART_ENABLE
 
 endmenu # Peripheral Configuration

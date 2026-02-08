@@ -20,7 +20,7 @@
 include(NexusVendor)
 include(NexusToolchain)
 
-message(STATUS "=== STM32 Platform Configuration ===")
+# STM32 platform configuration
 
 #-----------------------------------------------------------------------------
 # Step 1: STM32 Series Detection
@@ -191,14 +191,67 @@ nexus_collect_sources(CLOCK_SOURCES
     PATTERNS "clock/*.c"
 )
 
+# Remove all series-specific clock files from CLOCK_SOURCES
+list(FILTER CLOCK_SOURCES EXCLUDE REGEX ".*stm32f0_clock\\.c$")
+list(FILTER CLOCK_SOURCES EXCLUDE REGEX ".*stm32f1_clock\\.c$")
+list(FILTER CLOCK_SOURCES EXCLUDE REGEX ".*stm32f4_clock\\.c$")
+list(FILTER CLOCK_SOURCES EXCLUDE REGEX ".*stm32h7_clock\\.c$")
+list(FILTER CLOCK_SOURCES EXCLUDE REGEX ".*stm32l4_clock\\.c$")
+
+# Add series-specific clock implementation based on selected series
+if(CONFIG_STM32F0)
+    list(APPEND CLOCK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/clock/stm32f0_clock.c")
+elseif(CONFIG_STM32F1)
+    list(APPEND CLOCK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/clock/stm32f1_clock.c")
+elseif(CONFIG_STM32F4)
+    list(APPEND CLOCK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/clock/stm32f4_clock.c")
+elseif(CONFIG_STM32H7)
+    list(APPEND CLOCK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/clock/stm32h7_clock.c")
+elseif(CONFIG_STM32L4)
+    list(APPEND CLOCK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/clock/stm32l4_clock.c")
+else()
+    # For other series, use common implementation or show warning
+    message(WARNING "No series-specific clock implementation for ${STM32_SERIES_UPPER}. Using common implementation only.")
+endif()
+
+# Collect interrupt sources (excluding series-specific handlers)
 nexus_collect_sources(INTERRUPT_SOURCES
     BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src"
     PATTERNS "interrupt/*.c"
 )
 
+# Remove all series-specific interrupt handler files
+list(FILTER INTERRUPT_SOURCES EXCLUDE REGEX ".*stm32f1_it\\.c$")
+list(FILTER INTERRUPT_SOURCES EXCLUDE REGEX ".*stm32f4_it\\.c$")
+list(FILTER INTERRUPT_SOURCES EXCLUDE REGEX ".*stm32h7_it\\.c$")
+
+# Add series-specific interrupt handler based on selected series
+if(CONFIG_STM32F1)
+    list(APPEND INTERRUPT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/interrupt/stm32f1_it.c")
+elseif(CONFIG_STM32F4 OR CONFIG_STM32F7)
+    list(APPEND INTERRUPT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/interrupt/stm32f4_it.c")
+elseif(CONFIG_STM32H7)
+    list(APPEND INTERRUPT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/interrupt/stm32h7_it.c")
+else()
+    # For other series, no series-specific handler yet
+    message(WARNING "No series-specific interrupt handler for ${STM32_SERIES_UPPER}. Core handlers only.")
+endif()
+
 nexus_collect_sources(SYSTEM_SOURCES
     BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src"
     PATTERNS "system/*.c"
+)
+
+# Collect HAL UART sources
+nexus_collect_sources(HAL_UART_SOURCES
+    BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    PATTERNS "hal/uart/*.c"
+)
+
+# Collect HAL GPIO sources
+nexus_collect_sources(HAL_GPIO_SOURCES
+    BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    PATTERNS "hal/gpio/*.c"
 )
 
 # Combine all core sources
@@ -207,6 +260,8 @@ set(CORE_SOURCES
     ${CLOCK_SOURCES}
     ${INTERRUPT_SOURCES}
     ${SYSTEM_SOURCES}
+    ${HAL_UART_SOURCES}
+    ${HAL_GPIO_SOURCES}
 )
 
 #-----------------------------------------------------------------------------
@@ -360,43 +415,18 @@ if(CONFIG_STM32_ENABLE_RTOS_SUPPORT)
 endif()
 
 #-----------------------------------------------------------------------------
-# Step 10: Platform-Specific Compile Options
+# Step 10: Platform-Specific Compiler Configuration
 #-----------------------------------------------------------------------------
 
-# Enable function and data sections for better dead code elimination
-target_compile_options(platform_stm32 PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>
-)
+# Note: Compiler and linker flags from Kconfig are applied globally in the
+# root CMakeLists.txt via nexus_apply_compiler_kconfig() and
+# nexus_apply_linker_kconfig(). No target-specific application needed here.
 
-# Note: HAL driver warnings are already suppressed in Step 3
+# HAL driver warnings are already suppressed in Step 3
 
-#-----------------------------------------------------------------------------
-# Configuration Summary
-#-----------------------------------------------------------------------------
+nexus_log(STATUS "STM32 ${STM32_SERIES_UPPER} platform configured: ${STM32_DEVICE}")
 
-message(STATUS "")
-message(STATUS "STM32 Platform Configuration Summary:")
-message(STATUS "  Series:         ${STM32_SERIES_UPPER}")
-message(STATUS "  Family:         ${STM32_FAMILY}")
-message(STATUS "  Device:         ${STM32_DEVICE}")
-message(STATUS "  Variant:        ${STM32_VARIANT}")
-message(STATUS "  Toolchain:      ${NEXUS_TOOLCHAIN_NAME}")
-
-if(DEFINED CONFIG_STM32_FLASH_SIZE)
-    message(STATUS "  Flash:          ${CONFIG_STM32_FLASH_SIZE} bytes")
-endif()
-
-if(DEFINED CONFIG_STM32_SRAM_SIZE)
-    message(STATUS "  SRAM:           ${CONFIG_STM32_SRAM_SIZE} bytes")
-endif()
-
-message(STATUS "  CMSIS Core:     ${CMSIS_CORE_DIR}")
-message(STATUS "  CMSIS Device:   ${CMSIS_DEVICE_DIR}")
-message(STATUS "  HAL Driver:     ${HAL_DRIVER_DIR}")
-message(STATUS "  Linker Scripts: ${NEXUS_LINKER_SCRIPT_BASE}")
-message(STATUS "")
-
-message(STATUS "=== STM32 Platform Configuration Complete ===")
+# STM32 platform configured successfully
 
 #-----------------------------------------------------------------------------
 # Code Reduction Summary
