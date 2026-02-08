@@ -8,11 +8,16 @@
 #   - Pattern-based source file collection
 #   - Unified platform library creation
 #   - Cleaner peripheral organization
+#   - Kconfig-driven compiler and linker configuration
 #
 # Author: Nexus Team
 # Version: 2.0.0 (Optimized)
 # Date: 2026-02-01
 #-----------------------------------------------------------------------------
+
+# Load required modules
+include(NexusCompilerConfig)
+include(NexusLinkerConfig)
 
 message(STATUS "=== Native Platform Configuration ===")
 
@@ -81,10 +86,14 @@ nexus_add_platform_library(
 )
 
 #-----------------------------------------------------------------------------
-# Step 4: Platform-Specific Compiler Options
+# Step 4: Apply Kconfig-Based Compiler Configuration
 #-----------------------------------------------------------------------------
 
-# MSVC-specific options
+# Apply compiler configuration from Kconfig to platform target
+# This applies all compiler options configured in Kconfig
+nexus_apply_compiler_config(TARGET platform_native)
+
+# MSVC-specific options (in addition to Kconfig)
 if(MSVC)
     # Fix parallel compilation PDB issue
     target_compile_options(platform_native PRIVATE /FS)
@@ -100,8 +109,12 @@ if(MSVC)
 endif()
 
 #-----------------------------------------------------------------------------
-# Step 5: Platform-Specific Linker Options
+# Step 5: Apply Kconfig-Based Linker Configuration
 #-----------------------------------------------------------------------------
+
+# Apply linker configuration from Kconfig to platform target
+# This applies linker optimization, output settings, and memory configuration
+nexus_apply_linker_config(TARGET platform_native)
 
 # Windows MinGW/GCC: Force inclusion of init function section symbols
 # This is required for the init system to work correctly on Windows
