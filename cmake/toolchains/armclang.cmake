@@ -18,10 +18,9 @@ set(CMAKE_SYSTEM_NAME Generic)
 # CPU Architecture Configuration (must be set before project())
 #-----------------------------------------------------------------------------
 
-# Default to Cortex-M4 with FPU if not specified
-if(NOT DEFINED NEXUS_CPU_ARCH)
-    set(NEXUS_CPU_ARCH "cortex-m4")
-endif()
+# NEXUS_CPU_ARCH, NEXUS_FPU_TYPE, and NEXUS_FLOAT_ABI are set by Kconfig
+# via NexusConfig.cmake before the toolchain file is loaded.
+# These values come from CONFIG_CPU_ARCH, CONFIG_FPU_TYPE, CONFIG_FLOAT_ABI.
 
 # CPU flags are set explicitly in CMAKE_C_FLAGS_INIT
 # Do NOT set CMAKE_SYSTEM_PROCESSOR or CMAKE_SYSTEM_ARCH
@@ -63,12 +62,25 @@ set(NEXUS_TOOLCHAIN_VENDOR "ARM")
 # Configure CPU flags based on target platform
 # Supports Cortex-M0/M0+/M3/M4/M7/M33 with optional FPU
 
+# Set default FPU configuration based on CPU if not specified
 if(NOT DEFINED NEXUS_FPU_TYPE)
-    set(NEXUS_FPU_TYPE "fpv4-sp-d16")
+    if(NEXUS_CPU_ARCH MATCHES "cortex-m4")
+        set(NEXUS_FPU_TYPE "fpv4-sp-d16")
+    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m7")
+        set(NEXUS_FPU_TYPE "fpv5-d16")
+    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m33")
+        set(NEXUS_FPU_TYPE "fpv5-sp-d16")
+    else()
+        set(NEXUS_FPU_TYPE "")
+    endif()
 endif()
 
 if(NOT DEFINED NEXUS_FLOAT_ABI)
-    set(NEXUS_FLOAT_ABI "hard")
+    if(NEXUS_FPU_TYPE)
+        set(NEXUS_FLOAT_ABI "hard")
+    else()
+        set(NEXUS_FLOAT_ABI "soft")
+    endif()
 endif()
 
 # Build CPU flags based on configuration
@@ -129,8 +141,8 @@ set(NEXUS_ASM_CPU_NAME "${ASM_CPU_NAME}" CACHE INTERNAL "Assembler CPU name")
 #-----------------------------------------------------------------------------
 # Build Type Specific Flags
 #-----------------------------------------------------------------------------
-# Note: Build type flags are now managed centrally by NexusCompilerFlags.cmake
-# See cmake/modules/NexusCompilerFlags.cmake::nexus_set_default_build_type_flags()
+# Note: Build type flags are now managed centrally by NexusCompilerConfig.cmake
+# This provides better consistency and allows easier customization.
 #
 # ARM Clang uses slightly different optimization levels than GCC:
 #   Debug:   -O1 (better debugging experience than -O0)

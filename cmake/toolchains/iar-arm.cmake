@@ -18,10 +18,9 @@ set(CMAKE_SYSTEM_NAME Generic)
 # CPU Architecture Configuration (must be set before project())
 #-----------------------------------------------------------------------------
 
-# Default to Cortex-M4 with FPU if not specified
-if(NOT DEFINED NEXUS_CPU_ARCH)
-    set(NEXUS_CPU_ARCH "cortex-m4")
-endif()
+# NEXUS_CPU_ARCH and NEXUS_FPU_TYPE are set by Kconfig via NexusConfig.cmake
+# before the toolchain file is loaded.
+# These values come from CONFIG_CPU_ARCH and CONFIG_FPU_TYPE.
 
 # CPU flags are set explicitly in CMAKE_C_FLAGS_INIT
 # Do NOT set CMAKE_SYSTEM_PROCESSOR here to avoid CMake auto-detection issues
@@ -61,6 +60,26 @@ set(NEXUS_TOOLCHAIN_VENDOR "IAR")
 
 # Configure CPU flags based on target platform
 # Supports Cortex-M0/M0+/M3/M4/M7/M33 with optional FPU
+# Set default FPU configuration based on CPU if not specified
+if(NOT DEFINED NEXUS_FPU_TYPE)
+    if(NEXUS_CPU_ARCH MATCHES "cortex-m4")
+        set(NEXUS_FPU_TYPE "fpv4-sp-d16")
+    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m7")
+        set(NEXUS_FPU_TYPE "fpv5-d16")
+    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m33")
+        set(NEXUS_FPU_TYPE "fpv5-sp-d16")
+    else()
+        set(NEXUS_FPU_TYPE "")
+    endif()
+endif()
+
+if(NOT DEFINED NEXUS_FLOAT_ABI)
+    if(NEXUS_FPU_TYPE)
+        set(NEXUS_FLOAT_ABI "hard")
+    else()
+        set(NEXUS_FLOAT_ABI "soft")
+    endif()
+endif()
 
 # Map lowercase CPU names to IAR's capitalized format
 set(IAR_CPU_MAP_cortex-m0 "Cortex-M0")
@@ -84,19 +103,6 @@ if(NOT IAR_CPU_NAME)
     set(IAR_CPU_NAME "${FIRST_CHAR_UPPER}${REST_CHARS}")
 endif()
 
-# Set default FPU configuration based on CPU if not specified
-if(NOT DEFINED NEXUS_FPU_TYPE)
-    if(NEXUS_CPU_ARCH MATCHES "cortex-m4")
-        set(NEXUS_FPU_TYPE "fpv4-sp-d16")
-    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m7")
-        set(NEXUS_FPU_TYPE "fpv5-d16")
-    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m33")
-        set(NEXUS_FPU_TYPE "fpv5-sp-d16")
-    else()
-        set(NEXUS_FPU_TYPE "")
-    endif()
-endif()
-
 # Map FPU type to IAR FPU name
 set(IAR_FPU_MAP_fpv4-sp-d16 "VFPv4_sp")
 set(IAR_FPU_MAP_fpv5-sp-d16 "VFPv5_sp")
@@ -113,7 +119,7 @@ if(IAR_FPU_NAME)
 endif()
 
 # Initialize compiler flags
-set(CMAKE_C_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal")
+set(CMAKE_C_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal --c99")
 set(CMAKE_CXX_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal")
 set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS}")
 
@@ -165,17 +171,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
-
-#-----------------------------------------------------------------------------
-# IAR-Specific Settings
-#-----------------------------------------------------------------------------
-
-# Disable compiler warnings about unknown pragmas
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --diag_suppress=Pe1665")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --diag_suppress=Pe1665")
-
-# Enable C99 mode
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --c99")
 
 #-----------------------------------------------------------------------------
 # Toolchain Information

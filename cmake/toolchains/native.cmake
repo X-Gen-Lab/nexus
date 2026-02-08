@@ -20,31 +20,9 @@ set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
 # Toolchain Detection
 #-----------------------------------------------------------------------------
 
-# Detect compiler automatically
-# CMake will use the default system compiler
-
-# Set toolchain identification
-if(MSVC)
-    set(NEXUS_TOOLCHAIN_NAME "msvc")
-    set(NEXUS_TOOLCHAIN_FAMILY "msvc")
-    set(NEXUS_TOOLCHAIN_VENDOR "Microsoft")
-elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    set(NEXUS_TOOLCHAIN_NAME "gcc")
-    set(NEXUS_TOOLCHAIN_FAMILY "gcc")
-    set(NEXUS_TOOLCHAIN_VENDOR "GNU")
-elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-    set(NEXUS_TOOLCHAIN_NAME "clang")
-    set(NEXUS_TOOLCHAIN_FAMILY "clang")
-    if(APPLE)
-        set(NEXUS_TOOLCHAIN_VENDOR "Apple")
-    else()
-        set(NEXUS_TOOLCHAIN_VENDOR "LLVM")
-    endif()
-else()
-    set(NEXUS_TOOLCHAIN_NAME "unknown")
-    set(NEXUS_TOOLCHAIN_FAMILY "unknown")
-    set(NEXUS_TOOLCHAIN_VENDOR "Unknown")
-endif()
+# Note: Toolchain identification is set after project() in main CMakeLists.txt
+# because MSVC and compiler ID variables are not available in toolchain files.
+# This file only sets up the basic system configuration for native builds.
 
 #-----------------------------------------------------------------------------
 # Build Type Specific Flags
@@ -58,34 +36,13 @@ endif()
 #   3. Before project(): set(CMAKE_C_FLAGS_DEBUG "-O0 -g3" CACHE STRING "")
 
 #-----------------------------------------------------------------------------
-# Platform-Specific Settings
-#-----------------------------------------------------------------------------
-
-if(WIN32)
-    # Windows-specific settings
-    if(MSVC)
-        # Enable multi-processor compilation
-        add_compile_options(/MP)
-    endif()
-elseif(UNIX AND NOT APPLE)
-    # Linux-specific settings
-    # Enable position independent code
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-elseif(APPLE)
-    # macOS-specific settings
-    set(CMAKE_MACOSX_RPATH ON)
-endif()
-
-#-----------------------------------------------------------------------------
 # Toolchain Information
 #-----------------------------------------------------------------------------
 
 message(STATUS "Native Platform Toolchain Configuration:")
 message(STATUS "  System:     ${CMAKE_SYSTEM_NAME}")
 message(STATUS "  Processor:  ${CMAKE_SYSTEM_PROCESSOR}")
-message(STATUS "  Compiler:   ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
-message(STATUS "  Toolchain:  ${NEXUS_TOOLCHAIN_NAME}")
-message(STATUS "  Vendor:     ${NEXUS_TOOLCHAIN_VENDOR}")
+message(STATUS "  Note: Compiler detection happens after project() call")
 
 #-----------------------------------------------------------------------------
 # End of native.cmake

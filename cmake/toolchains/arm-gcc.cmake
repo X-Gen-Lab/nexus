@@ -18,10 +18,9 @@ set(CMAKE_SYSTEM_NAME Generic)
 # CPU Architecture Configuration (must be set before project())
 #-----------------------------------------------------------------------------
 
-# Default to Cortex-M4 with FPU if not specified
-if(NOT DEFINED NEXUS_CPU_ARCH)
-    set(NEXUS_CPU_ARCH "cortex-m4")
-endif()
+# NEXUS_CPU_ARCH, NEXUS_FPU_TYPE, and NEXUS_FLOAT_ABI are set by Kconfig
+# via NexusConfig.cmake before the toolchain file is loaded.
+# These values come from CONFIG_CPU_ARCH, CONFIG_FPU_TYPE, CONFIG_FLOAT_ABI.
 
 # CPU flags are set explicitly in CMAKE_C_FLAGS_INIT
 # Do NOT set CMAKE_SYSTEM_PROCESSOR here to avoid CMake auto-detection issues
