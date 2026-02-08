@@ -1,5 +1,21 @@
-# Compiler Configuration Options
-# This file defines compiler-related configuration options
+# cmake/Kconfig.compiler - Compiler Configuration
+#
+# This file defines compiler-specific options for all supported toolchains:
+#   - GCC (GNU Compiler Collection)
+#   - Clang/LLVM
+#   - MSVC (Microsoft Visual C++)
+#   - ARM GCC (arm-none-eabi-gcc)
+#   - ARM Clang (armclang)
+#   - IAR EWARM (iccarm)
+#
+# Configuration categories:
+#   - Character type settings
+#   - Code generation options
+#   - Warning levels
+#   - Debug information format
+#   - Optimization settings
+#   - Standard library configuration
+#   - Toolchain-specific options
 
 menu "Compiler Configuration"
 
@@ -12,29 +28,91 @@ config COMPILER_UNSIGNED_CHAR
     default n
     help
       Make 'char' type unsigned by default.
-      This matches Keil MDK default behavior.
 
-      GCC/Clang: -funsigned-char
-      IAR: --char_is_unsigned
+      By default, 'char' signedness is implementation-defined:
+      - Most platforms: signed char
+      - ARM Keil MDK: unsigned char
+
+      This option makes it consistently unsigned across all platforms.
+
+      Benefits:
+      - Matches Keil MDK default behavior
+      - Consistent behavior across platforms
+      - Avoids sign extension issues with byte operations
+      - Prevents unexpected negative values
+
+      Drawbacks:
+      - May break code expecting signed char
+      - ABI incompatibility with libraries using signed char
+
+      Toolchain flags:
+      - GCC:       -funsigned-char
+      - Clang:     -funsigned-char
+      - MSVC:      /J
+      - ARM GCC:   -funsigned-char
+      - ARM Clang: -funsigned-char
+      - IAR:       --char_is_unsigned
 
 config COMPILER_SHORT_ENUMS
     bool "Use short enums"
     default n
     help
       Use the smallest integer type for enums.
-      This can save memory but may affect ABI compatibility.
 
-      GCC/Clang: -fshort-enums
-      IAR: --enum_is_int
+      Standard behavior: enums use 'int' (4 bytes)
+      With this option: enums use smallest type (1, 2, or 4 bytes)
+
+      Benefits:
+      - Saves memory (enums use 1 byte if values fit)
+      - Reduces struct padding
+      - Smaller data structures
+
+      Drawbacks:
+      - ABI incompatibility (cannot mix with normal enums)
+      - May break code assuming enum is int-sized
+      - Affects struct layout and alignment
+
+      Example:
+        enum { A = 0, B = 1 };  // 1 byte with short enums, 4 bytes normally
+
+      Toolchain flags:
+      - GCC:       -fshort-enums
+      - Clang:     -fshort-enums
+      - MSVC:      (not supported)
+      - ARM GCC:   -fshort-enums
+      - ARM Clang: -fshort-enums
+      - IAR:       --enum_is_int (opposite: forces int)
 
 config COMPILER_SHORT_WCHAR
-    bool "Use short wchar_t"
+    bool "Use short wchar_t (16-bit)"
     default n
     help
       Use 16-bit wchar_t instead of 32-bit.
 
-      GCC/Clang: -fshort-wchar
-      IAR: (not supported)
+      Standard behavior:
+      - Linux/GCC:   wchar_t is 32-bit (UTF-32)
+      - Windows:     wchar_t is 16-bit (UTF-16)
+
+      This option forces 16-bit wchar_t on all platforms.
+
+      Benefits:
+      - Saves memory for wide character strings
+      - Compatible with Windows wchar_t
+      - Matches UTF-16 encoding
+
+      Drawbacks:
+      - Cannot represent all Unicode characters (only BMP)
+      - Requires surrogate pairs for characters > U+FFFF
+      - May affect portability
+      - ABI incompatibility
+
+      Toolchain flags:
+      - GCC:       -fshort-wchar
+      - Clang:     -fshort-wchar
+      - MSVC:      (default is 16-bit)
+      - ARM GCC:   -fshort-wchar
+      - ARM Clang: -fshort-wchar
+      - IAR:       (not supported)
 
 #-----------------------------------------------------------------------------
 # Code Generation Options
@@ -45,20 +123,64 @@ config COMPILER_NO_BUILTIN
     default n
     help
       Disable compiler builtin functions.
-      This can help with debugging and code size.
 
-      GCC/Clang: -fno-builtin
-      IAR: --no_builtin
+      Builtin functions are compiler-provided optimized implementations
+      of standard library functions (memcpy, strlen, strcpy, etc.).
+
+      The compiler recognizes these functions and may:
+      - Replace them with inline code
+      - Use specialized CPU instructions
+      - Apply optimizations
+
+      Benefits of disabling:
+      - Easier debugging (use your own implementations)
+      - Consistent behavior across platforms
+      - Smaller code size in some cases
+      - Full control over implementation
+
+      Drawbacks:
+      - May reduce performance significantly
+      - Loses compiler optimizations
+      - Larger code in some cases
+
+      Toolchain flags:
+      - GCC:       -fno-builtin
+      - Clang:     -fno-builtin
+      - MSVC:      (not applicable, use /Oi- to disable intrinsics)
+      - ARM GCC:   -fno-builtin
+      - ARM Clang: -fno-builtin
+      - IAR:       --no_builtin
 
 config COMPILER_FUNCTION_SECTIONS
     bool "Place each function in its own section"
     default y
     help
       Place each function and data item in its own section.
-      This enables the linker to remove unused code (--gc-sections).
 
-      GCC/Clang: -ffunction-sections -fdata-sections
-      IAR: (automatic)
+      Normal behavior: All functions in .text, all data in .data/.bss
+      With this option: Each function in .text.function_name
+
+      Benefits:
+      - Enables linker garbage collection (--gc-sections)
+      - Removes unused code automatically
+      - Reduces final binary size (10-30% reduction typical)
+      - Better dead code elimination
+
+      Drawbacks:
+      - Slightly larger object files
+      - Slightly slower linking
+      - More sections in ELF file
+
+      Requirements:
+      - Must enable LINKER_GC_SECTIONS for effect
+
+      Toolchain flags:
+      - GCC:       -ffunction-sections -fdata-sections
+      - Clang:     -ffunction-sections -fdata-sections
+      - MSVC:      /Gy (function-level linking)
+      - ARM GCC:   -ffunction-sections -fdata-sections
+      - ARM Clang: -ffunction-sections -fdata-sections
+      - IAR:       (automatic, always enabled)
 
 config COMPILER_NO_COMMON
     bool "Disable common blocks"
@@ -66,8 +188,92 @@ config COMPILER_NO_COMMON
     help
       Do not use common blocks for uninitialized global variables.
 
-      GCC/Clang: -fno-common
-      IAR: (not applicable)
+      Common blocks (C89 feature):
+      - Allow multiple definitions of same variable
+      - Linker merges them into single instance
+      - Can hide bugs
+
+      With this option:
+      - Uninitialized globals go to .bss section
+      - Multiple definitions cause link error
+
+      Benefits:
+      - Catches multiple definition errors at link time
+      - More predictable behavior
+      - Better compatibility with C++
+      - Follows C99/C11 standard behavior
+
+      Drawbacks:
+      - May break old code relying on common blocks
+
+      Toolchain flags:
+      - GCC:       -fno-common (default in GCC 10+)
+      - Clang:     -fno-common (default)
+      - MSVC:      (not applicable, no common blocks)
+      - ARM GCC:   -fno-common
+      - ARM Clang: -fno-common
+      - IAR:       (not applicable)
+
+config COMPILER_STACK_PROTECTOR
+    bool "Enable stack protection"
+    default n
+    depends on PLATFORM_NATIVE
+    help
+      Enable stack smashing protection (stack canaries).
+
+      Adds canary values to detect stack buffer overflows:
+      - Places canary before return address
+      - Checks canary before function return
+      - Aborts if canary is corrupted
+
+      Benefits:
+      - Detects stack buffer overflows
+      - Prevents some exploits
+      - Improves security
+
+      Drawbacks:
+      - Small performance overhead
+      - Increases code size
+      - Requires runtime support
+      - Not suitable for bare-metal embedded
+
+      Toolchain flags:
+      - GCC:   -fstack-protector-strong
+      - Clang: -fstack-protector-strong
+      - MSVC:  /GS
+
+      Note: Only available for native platform
+
+config COMPILER_OMIT_FRAME_POINTER
+    bool "Omit frame pointer"
+    default n
+    depends on !BUILD_TYPE_DEBUG
+    help
+      Omit frame pointer in functions that don't need it.
+
+      Frame pointer (EBP/RBP on x86, R11 on ARM):
+      - Points to current stack frame
+      - Used for stack unwinding and debugging
+
+      Benefits of omitting:
+      - Frees up one register for general use
+      - Slightly better performance
+      - Smaller code size
+
+      Drawbacks:
+      - Harder to debug (stack traces may be incomplete)
+      - Profiling tools may not work correctly
+      - Exception handling may be affected
+
+      Toolchain flags:
+      - GCC:       -fomit-frame-pointer (default in -O1+)
+      - Clang:     -fomit-frame-pointer (default in -O1+)
+      - MSVC:      /Oy
+      - ARM GCC:   -fomit-frame-pointer
+      - ARM Clang: -fomit-frame-pointer
+      - IAR:       (automatic in optimization modes)
+
+      Note: Not recommended for Debug builds
 
 #-----------------------------------------------------------------------------
 # Warning Level Configuration
@@ -79,30 +285,125 @@ choice COMPILER_WARNING_LEVEL
     help
       Select the compiler warning level.
 
+      Higher warning levels help catch more potential bugs
+      but may produce false positives.
+
+      Recommendation: Start with Standard, increase if needed.
+
 config COMPILER_WARNING_NONE
     bool "No warnings"
     help
       Disable all compiler warnings.
+
+      Use cases:
+      - Third-party code that cannot be modified
+      - Legacy code with many warnings
+      - Temporary workaround
+
+      Not recommended for production code.
+
+      Toolchain flags:
+      - GCC:       -w
+      - Clang:     -w
+      - MSVC:      /w
+      - ARM GCC:   -w
+      - ARM Clang: -w
+      - IAR:       --no_warnings
 
 config COMPILER_WARNING_BASIC
     bool "Basic warnings"
     help
       Enable basic warnings (-Wall).
 
+      Catches common issues:
+      - Unused variables
+      - Uninitialized variables
+      - Missing return statements
+      - Type mismatches
+      - Implicit function declarations
+      - Format string errors
+
+      Toolchain flags:
+      - GCC:       -Wall
+      - Clang:     -Wall
+      - MSVC:      /W3
+      - ARM GCC:   -Wall
+      - ARM Clang: -Wall
+      - IAR:       (default warnings)
+
 config COMPILER_WARNING_STANDARD
-    bool "Standard warnings"
+    bool "Standard warnings (Recommended)"
     help
       Enable standard warnings (-Wall -Wextra).
+
+      Catches additional issues beyond -Wall:
+      - Sign comparison warnings
+      - Missing field initializers
+      - Unused parameters
+      - Type conversions
+      - Comparison between signed and unsigned
+      - Pointer sign mismatches
+
+      Recommended for most projects.
+      Good balance between strictness and practicality.
+
+      Toolchain flags:
+      - GCC:       -Wall -Wextra
+      - Clang:     -Wall -Wextra
+      - MSVC:      /W4
+      - ARM GCC:   -Wall -Wextra
+      - ARM Clang: -Wall -Wextra
+      - IAR:       --remarks
 
 config COMPILER_WARNING_EXTRA
     bool "Extra warnings"
     help
       Enable extra warnings (-Wall -Wextra -Wshadow -Wconversion).
 
+      Catches more subtle issues:
+      - Variable shadowing (local hides outer scope)
+      - Implicit type conversions
+      - Sign conversions
+      - Float to integer conversions
+      - Narrowing conversions
+
+      May produce false positives in some cases.
+      Requires careful code review.
+
+      Toolchain flags:
+      - GCC:       -Wall -Wextra -Wshadow -Wconversion
+      - Clang:     -Wall -Wextra -Wshadow -Wconversion
+      - MSVC:      /W4 /Wall (very verbose)
+      - ARM GCC:   -Wall -Wextra -Wshadow -Wconversion
+      - ARM Clang: -Wall -Wextra -Wshadow -Wconversion
+      - IAR:       --remarks (all)
+
 config COMPILER_WARNING_PEDANTIC
     bool "Pedantic warnings"
     help
-      Enable pedantic warnings (-Wall -Wextra -Wpedantic -Wshadow -Wconversion).
+      Enable pedantic warnings (strict ISO C/C++ compliance).
+
+      Enforces strict ISO C/C++ compliance:
+      - Non-standard extensions
+      - Compiler-specific features
+      - All extra warnings
+      - Language standard violations
+
+      Catches:
+      - GCC/Clang extensions
+      - Non-portable code
+      - Standard violations
+
+      May be too strict for some projects.
+      May reject valid code using extensions.
+
+      Toolchain flags:
+      - GCC:       -Wall -Wextra -Wpedantic -Wshadow -Wconversion
+      - Clang:     -Wall -Wextra -Wpedantic -Wshadow -Wconversion
+      - MSVC:      /Wall /permissive-
+      - ARM GCC:   -Wall -Wextra -Wpedantic -Wshadow -Wconversion
+      - ARM Clang: -Wall -Wextra -Wpedantic -Wshadow -Wconversion
+      - IAR:       --strict
 
 endchoice
 
@@ -120,8 +421,36 @@ config COMPILER_WARNINGS_AS_ERRORS
     help
       Treat all compiler warnings as errors.
 
-      GCC/Clang: -Werror
-      IAR: --warnings_are_errors
+      Build will fail if any warnings are generated.
+
+      Benefits:
+      - Forces fixing all warnings
+      - Prevents warning accumulation
+      - Improves code quality
+      - Ensures clean builds
+
+      Drawbacks:
+      - May block builds on minor issues
+      - Requires clean code
+      - May be too strict for development
+      - Can slow down development
+
+      Recommended for:
+      - CI/CD pipelines
+      - Production code
+      - Release builds
+
+      Not recommended for:
+      - Development builds
+      - Experimental code
+
+      Toolchain flags:
+      - GCC:       -Werror
+      - Clang:     -Werror
+      - MSVC:      /WX
+      - ARM GCC:   -Werror
+      - ARM Clang: -Werror
+      - IAR:       --warnings_are_errors
 
 #-----------------------------------------------------------------------------
 # Debug Information Configuration
@@ -134,25 +463,123 @@ choice COMPILER_DEBUG_FORMAT
     help
       Select the debug information format.
 
+      DWARF is the standard debug format for ELF binaries (GCC/Clang/ARM).
+      PDB is used by MSVC.
+
+      Newer DWARF versions provide better debugging experience.
+
 config COMPILER_DEBUG_DWARF2
     bool "DWARF 2"
+    depends on !TOOLCHAIN_MSVC
     help
       Generate DWARF 2 debug information.
 
+      Characteristics:
+      - Older format (1993)
+      - Widely supported by all debuggers
+      - Larger debug info size
+      - Basic debugging features
+
+      Use when:
+      - Need compatibility with very old debuggers
+      - Using old GDB versions (< 6.0)
+
+      Toolchain flags:
+      - GCC:       -gdwarf-2
+      - Clang:     -gdwarf-2
+      - ARM GCC:   -gdwarf-2
+      - ARM Clang: -gdwarf-2
+      - IAR:       --debug (DWARF 2/3)
+
 config COMPILER_DEBUG_DWARF3
     bool "DWARF 3"
+    depends on !TOOLCHAIN_MSVC
     help
       Generate DWARF 3 debug information.
 
+      Characteristics:
+      - Improved over DWARF 2 (2005)
+      - Better C++ support
+      - Smaller debug info
+      - Better namespace support
+
+      Use when:
+      - Need balance of compatibility and features
+      - Using GDB 6.0+
+
+      Toolchain flags:
+      - GCC:       -gdwarf-3
+      - Clang:     -gdwarf-3
+      - ARM GCC:   -gdwarf-3
+      - ARM Clang: -gdwarf-3
+      - IAR:       --debug (DWARF 2/3)
+
 config COMPILER_DEBUG_DWARF4
-    bool "DWARF 4"
+    bool "DWARF 4 (Recommended)"
+    depends on !TOOLCHAIN_MSVC
     help
-      Generate DWARF 4 debug information (recommended).
+      Generate DWARF 4 debug information.
+
+      Characteristics:
+      - Modern format (2010)
+      - Better optimization support
+      - Smaller debug info (20-30% reduction)
+      - Better type information
+      - Improved C++11/14 support
+
+      Recommended for most projects.
+
+      Requirements:
+      - GDB 7.0+ or LLDB 3.0+
+
+      Toolchain flags:
+      - GCC:       -gdwarf-4 (default in GCC 4.8+)
+      - Clang:     -gdwarf-4 (default)
+      - ARM GCC:   -gdwarf-4
+      - ARM Clang: -gdwarf-4
+      - IAR:       --debug (DWARF 4)
 
 config COMPILER_DEBUG_DWARF5
     bool "DWARF 5"
+    depends on !TOOLCHAIN_MSVC
     help
       Generate DWARF 5 debug information (latest).
+
+      Characteristics:
+      - Latest format (2017)
+      - Best debugging experience
+      - Smallest debug info (30-40% reduction)
+      - Advanced features
+      - Better C++17/20 support
+      - Split debug info support
+
+      Requirements:
+      - GDB 8.0+ or LLDB 9.0+
+      - GCC 5.0+ or Clang 8.0+
+
+      Note: May not be supported by all tools yet.
+
+      Toolchain flags:
+      - GCC:       -gdwarf-5 (default in GCC 11+)
+      - Clang:     -gdwarf-5
+      - ARM GCC:   -gdwarf-5
+      - ARM Clang: -gdwarf-5
+      - IAR:       (not yet supported)
+
+config COMPILER_DEBUG_PDB
+    bool "PDB (Program Database)"
+    depends on TOOLCHAIN_MSVC
+    help
+      Generate PDB debug information (MSVC only).
+
+      Characteristics:
+      - Microsoft proprietary format
+      - Best Visual Studio integration
+      - Supports Edit and Continue
+      - Incremental linking support
+
+      Toolchain flags:
+      - MSVC: /Zi (default)
 
 endchoice
 
@@ -162,7 +589,34 @@ config COMPILER_DEBUG_FORMAT
     default "DWARF3" if COMPILER_DEBUG_DWARF3
     default "DWARF4" if COMPILER_DEBUG_DWARF4
     default "DWARF5" if COMPILER_DEBUG_DWARF5
+    default "PDB" if COMPILER_DEBUG_PDB
     default "DWARF4"
+
+config COMPILER_DEBUG_LEVEL
+    int "Debug information level (0-3)"
+    default 3 if BUILD_TYPE_DEBUG
+    default 2 if BUILD_TYPE_RELWITHDEBINFO
+    default 0
+    range 0 3
+    depends on BUILD_TYPE_DEBUG || BUILD_TYPE_RELWITHDEBINFO
+    help
+      Select the amount of debug information to generate.
+
+      Levels:
+      - 0: No debug info
+      - 1: Minimal debug info (line numbers only)
+      - 2: Default debug info (line numbers + local variables)
+      - 3: Maximum debug info (includes macro definitions)
+
+      Higher levels:
+      - Better debugging experience
+      - Larger debug info size
+      - Slower compilation
+
+      Toolchain flags:
+      - GCC/Clang/ARM: -g0, -g1, -g2, -g3
+      - MSVC:          /Z7 (minimal), /Zi (full)
+      - IAR:           --debug (full only)
 
 #-----------------------------------------------------------------------------
 # Optimization Configuration
@@ -174,10 +628,38 @@ config COMPILER_LTO
     depends on !BUILD_TYPE_DEBUG
     help
       Enable Link Time Optimization for better code size and performance.
-      This increases build time but can significantly reduce code size.
 
-      GCC/Clang: -flto
-      IAR: --lto
+      LTO performs optimization across translation units at link time:
+      - Inlines functions across files
+      - Removes unused code globally
+      - Optimizes function calls
+      - Better constant propagation
+
+      Benefits:
+      - Better cross-module optimization
+      - Smaller code size (10-20% reduction typical)
+      - Better performance (5-10% improvement)
+      - Removes unused code across modules
+      - Better dead code elimination
+
+      Drawbacks:
+      - Significantly increases build time (2-5x slower)
+      - Requires more memory during linking (2-4 GB+)
+      - May complicate debugging
+      - Not all toolchains support it well
+      - May expose hidden bugs
+
+      Toolchain support:
+      - GCC:       -flto (good support, GCC 4.5+)
+      - Clang:     -flto (excellent support)
+      - MSVC:      /GL /LTCG (good support)
+      - ARM GCC:   -flto (good support, GCC 4.9+)
+      - ARM Clang: -flto (excellent support)
+      - IAR:       --lto (limited support)
+
+      Recommended for: Production release builds
+
+      Note: Requires linker plugin support
 
 config COMPILER_OPTIMIZE_SIZE
     bool "Optimize for size over speed"
@@ -186,8 +668,105 @@ config COMPILER_OPTIMIZE_SIZE
     help
       Optimize for code size instead of speed in Release builds.
 
-      GCC/Clang: -Os instead of -O3
-      IAR: -Ohz instead of -Oh
+      Changes optimization strategy:
+      - Prefers smaller code over faster code
+      - Disables optimizations that increase size
+      - May use slower but smaller instructions
+      - Reduces loop unrolling
+      - Reduces function inlining
+
+      Benefits:
+      - Smaller binary size (20-40% reduction)
+      - Better cache utilization
+      - Lower memory footprint
+      - Faster loading time
+
+      Drawbacks:
+      - May reduce performance (10-30% slower)
+      - Less aggressive optimizations
+
+      Toolchain flags:
+      - GCC:       -Os (optimize for size)
+      - Clang:     -Oz (aggressive size optimization)
+      - MSVC:      /O1 /Os (favor size)
+      - ARM GCC:   -Os
+      - ARM Clang: -Oz
+      - IAR:       -Ohz (high size optimization)
+
+      Recommended for: Memory-constrained embedded devices
+
+      Note: Can be combined with LTO for best results
+
+config COMPILER_FAST_MATH
+    bool "Enable fast math optimizations"
+    default n
+    depends on !BUILD_TYPE_DEBUG
+    help
+      Enable aggressive floating-point optimizations.
+
+      Allows compiler to:
+      - Assume no NaN or Inf values
+      - Reorder floating-point operations
+      - Use reciprocal instead of division
+      - Ignore IEEE 754 compliance
+
+      Benefits:
+      - Faster floating-point operations (20-50% faster)
+      - Better vectorization
+      - Smaller code size
+
+      Drawbacks:
+      - May produce incorrect results
+      - Not IEEE 754 compliant
+      - May break code expecting exact FP behavior
+      - Harder to debug FP issues
+
+      Toolchain flags:
+      - GCC:       -ffast-math
+      - Clang:     -ffast-math
+      - MSVC:      /fp:fast
+      - ARM GCC:   -ffast-math
+      - ARM Clang: -ffast-math
+      - IAR:       --relaxed_fp
+
+      Warning: Use with caution! Test thoroughly!
+
+      Recommended for: Performance-critical FP code where
+      exact IEEE 754 compliance is not required
+
+config COMPILER_UNROLL_LOOPS
+    bool "Enable loop unrolling"
+    default n
+    depends on BUILD_TYPE_RELEASE || BUILD_TYPE_RELWITHDEBINFO
+    help
+      Enable aggressive loop unrolling optimization.
+
+      Loop unrolling:
+      - Duplicates loop body multiple times
+      - Reduces loop overhead
+      - Enables better instruction scheduling
+      - May enable vectorization
+
+      Benefits:
+      - Faster loop execution (10-30% faster)
+      - Better CPU pipeline utilization
+      - Reduced branch mispredictions
+
+      Drawbacks:
+      - Significantly increases code size
+      - May hurt cache performance
+      - Longer compilation time
+
+      Toolchain flags:
+      - GCC:       -funroll-loops
+      - Clang:     -funroll-loops
+      - MSVC:      (automatic in /O2)
+      - ARM GCC:   -funroll-loops
+      - ARM Clang: -funroll-loops
+      - IAR:       (automatic in high optimization)
+
+      Recommended for: Performance-critical loops in
+      applications with sufficient code memory
 
 #-----------------------------------------------------------------------------
 # Standard Library Configuration
@@ -199,20 +778,78 @@ config COMPILER_USE_MICROLIB
     depends on TOOLCHAIN_ARM_CLANG
     help
       Use ARM microlib instead of standard C library.
-      Microlib is a highly optimized library for embedded systems.
 
-      Note: Microlib has limitations:
-        - No file I/O
-        - No locale support
-        - Limited stdio functions
+      Microlib is a highly optimized library for embedded systems:
+      - Designed for ARM Cortex-M processors
+      - Significantly smaller than standard library
+      - Optimized for size and performance
+      - Single-threaded only
+
+      Benefits:
+      - Significantly smaller code size (30-50% reduction)
+      - Lower memory footprint
+      - Faster startup
+      - Lower stack usage
+      - Optimized for embedded systems
+
+      Limitations:
+      - No file I/O (fopen, fread, fwrite, etc.)
+      - No locale support
+      - Limited stdio functions
+      - No wide character support (wchar_t)
+      - No C++ exception support
+      - Single-threaded only (no thread safety)
+      - Limited printf/scanf formats
+
+      Typical size savings:
+      - printf: ~5 KB smaller
+      - malloc: ~2 KB smaller
+      - Total: 10-20 KB reduction
+
+      Toolchain flags:
+      - ARM Clang: --library_type=microlib
+
+      Recommended for: Size-constrained embedded systems
+      without file I/O requirements
+
+      Note: Only available with ARM Compiler 6 (armclang)
 
 config COMPILER_USE_NANO
-    bool "Use nano specs (ARM GCC only)"
+    bool "Use newlib-nano (ARM GCC only)"
     default n
     depends on TOOLCHAIN_ARM_GCC
     help
       Use newlib-nano instead of standard newlib.
-      Nano specs provide a smaller C library implementation.
+
+      Newlib-nano is a smaller C library implementation:
+      - Optimized for embedded ARM systems
+      - Reduced functionality
+      - Smaller code size
+
+      Benefits:
+      - Smaller code size (20-40% reduction)
+      - Lower memory footprint
+      - Optimized for embedded systems
+      - Lower stack usage
+
+      Limitations:
+      - Reduced printf/scanf functionality
+      - No long long support in printf (%lld)
+      - Limited floating point support
+      - No C99 stdio functions
+      - Smaller FILE buffer
+
+      Typical size savings:
+      - printf: ~10 KB smaller
+      - scanf: ~5 KB smaller
+      - Total: 15-30 KB reduction
+
+      Toolchain flags:
+      - ARM GCC: --specs=nano.specs
+
+      Recommended for: Size-constrained ARM embedded systems
+
+      Note: Can be combined with nosys specs
 
 config COMPILER_USE_NOSYS
     bool "Use nosys specs (ARM GCC only)"
@@ -220,60 +857,440 @@ config COMPILER_USE_NOSYS
     depends on TOOLCHAIN_ARM_GCC
     help
       Use nosys specs to provide stubs for system calls.
+
+      Nosys provides stub implementations for POSIX system calls:
+      - _exit, _kill, _getpid
+      - _sbrk (heap management)
+      - _write, _read, _close, _lseek, _fstat, _isatty
+      - _open, _link, _unlink
+
+      These stubs:
+      - Return error codes
+      - Prevent undefined references
+      - Allow linking without OS
+
       This is required for bare-metal targets without OS.
 
-#-----------------------------------------------------------------------------
-# Linker Configuration
-#-----------------------------------------------------------------------------
+      Toolchain flags:
+      - ARM GCC: --specs=nosys.specs
 
-config LINKER_GC_SECTIONS
-    bool "Enable garbage collection of unused sections"
+      Note: Can be combined with nano specs:
+        --specs=nano.specs --specs=nosys.specs
+
+      Recommended for: All bare-metal ARM embedded systems
+
+config COMPILER_PRINTF_FLOAT
+    bool "Enable floating point in printf/scanf"
     default y
+    depends on TOOLCHAIN_ARM_GCC && COMPILER_USE_NANO
     help
-      Remove unused code and data sections during linking.
-      This can significantly reduce binary size.
+      Enable floating point support in printf/scanf with newlib-nano.
 
-      GCC: -Wl,--gc-sections
-      Clang: --remove
-      IAR: --vfe
+      By default, newlib-nano disables floating point in printf/scanf
+      to save code size.
 
-config LINKER_CROSS_REFERENCE
-    bool "Generate cross-reference in map file"
+      This option re-enables it by linking with:
+      - _printf_float.o
+      - _scanf_float.o
+
+      Impact:
+      - Adds ~7 KB for printf float support
+      - Adds ~5 KB for scanf float support
+
+      Toolchain flags:
+      - ARM GCC: -u _printf_float -u _scanf_float
+
+      Disable if: Not using %f, %e, %g in printf/scanf
+
+config COMPILER_RETARGET_IO
+    bool "Retarget I/O functions"
+    default n
+    depends on !PLATFORM_NATIVE
+    help
+      Provide custom implementations of low-level I/O functions.
+
+      Allows redirecting:
+      - printf/scanf to UART
+      - File operations to custom storage
+      - System calls to custom implementations
+
+      Functions to implement:
+      - _write() - for printf output
+      - _read() - for scanf input
+      - _sbrk() - for malloc/free
+
+      Benefits:
+      - printf output to UART/SWO
+      - Custom heap management
+      - File system integration
+
+      Note: Requires user implementation of retarget functions
+
+#-----------------------------------------------------------------------------
+# ARM-Specific Configuration
+#-----------------------------------------------------------------------------
+
+if TOOLCHAIN_ARM_CLANG || TOOLCHAIN_ARM_GCC
+
+menu "ARM-Specific Options"
+
+config ARM_APCS_INTERWORK
+    bool "Enable ARM/Thumb interworking"
+    default y
+    depends on TOOLCHAIN_ARM_CLANG
+    help
+      Enable interworking between ARM and Thumb instruction sets.
+
+      Interworking allows:
+      - Calling ARM code from Thumb code
+      - Calling Thumb code from ARM code
+      - Mixed ARM/Thumb libraries
+
+      This is required for mixed ARM/Thumb code.
+
+      Note: Cortex-M processors are Thumb-only, so this is
+      typically not needed for Cortex-M targets.
+
+      ARM Clang assembler flag:
+      - --apcs=interwork
+
+      For ARM GCC:
+      - Controlled by -mthumb-interwork flag
+      - Not needed for Cortex-M (Thumb-only) processors
+
+      Recommended: Enable for compatibility
+
+config ARM_ROPI
+    bool "Enable Read-Only Position Independent (ROPI)"
+    default n
+    depends on TOOLCHAIN_ARM_CLANG
+    help
+      Generate position-independent code for read-only sections.
+
+      ROPI allows code to run at any address without modification:
+      - Code section can be relocated
+      - No absolute addresses in code
+      - Uses PC-relative addressing
+
+      Use cases:
+      - XIP (Execute In Place) from ROM at different addresses
+      - Relocatable code modules
+      - Shared libraries
+      - Bootloaders
+
+      Benefits:
+      - Code can run at any address
+      - Multiple instances possible
+      - Flexible memory layout
+
+      Drawbacks:
+      - Slightly larger code size (5-10%)
+      - Small performance overhead
+      - More complex addressing
+
+      ARM Clang flag:
+      - -fropi
+
+      Note: Cannot be used with -fPIC
+
+config ARM_RWPI
+    bool "Enable Read-Write Position Independent (RWPI)"
+    default n
+    depends on TOOLCHAIN_ARM_CLANG
+    help
+      Generate position-independent code for read-write sections.
+
+      RWPI allows data to be relocated at runtime:
+      - Data section can be relocated
+      - No absolute addresses for data
+      - Uses base register for data access
+
+      Use cases:
+      - Relocatable data sections
+      - Multiple instances of same code with different data
+      - Shared libraries with separate data
+      - Dynamic loading
+
+      Benefits:
+      - Data can be at any address
+      - Multiple instances with separate data
+      - Flexible memory layout
+
+      Drawbacks:
+      - Larger code size (10-15%)
+      - Performance overhead (data access slower)
+      - Uses one register for data base
+      - More complex addressing
+
+      ARM Clang flag:
+      - -frwpi
+
+      Note: Uses R9 as data base register
+
+config ARM_SPLIT_LDMSTM
+    bool "Split LDM/STM instructions"
+    default n
+    depends on TOOLCHAIN_ARM_CLANG
+    help
+      Split LDM/STM instructions into multiple LDR/STR instructions.
+
+      LDM/STM (Load/Store Multiple):
+      - Load/store multiple registers in one instruction
+      - Efficient for stack operations
+      - May cause issues with unaligned access
+
+      This option splits them into individual LDR/STR:
+      - Safer for unaligned access
+      - May improve performance on some processors
+
+      Benefits:
+      - Better for unaligned access handling
+      - Can improve performance on some Cortex-M processors
+      - More predictable timing
+
+      Drawbacks:
+      - Increases code size (10-20%)
+      - May reduce performance on some processors
+      - More instructions to execute
+
+      ARM Clang flag:
+      - -mno-unaligned-access
+
+      Recommended: Disable unless you have specific issues
+
+config ARM_THUMB_MODE
+    bool "Force Thumb mode"
+    default y
+    depends on TOOLCHAIN_ARM_GCC
+    help
+      Force Thumb instruction set mode.
+
+      ARM processors support two instruction sets:
+      - ARM: 32-bit instructions (more powerful)
+      - Thumb: 16-bit instructions (more compact)
+
+      Cortex-M processors:
+      - Only support Thumb mode
+      - This option should be enabled
+
+      Benefits:
+      - Smaller code size (30-40% reduction)
+      - Better code density
+      - Required for Cortex-M
+
+      ARM GCC flag:
+      - -mthumb
+
+      Note: Always enable for Cortex-M processors
+
+config ARM_UNALIGNED_ACCESS
+    bool "Enable unaligned access"
+    default y
+    depends on CPU_CORTEX_M4 || CPU_CORTEX_M7 || CPU_CORTEX_M33
+    help
+      Enable hardware unaligned memory access.
+
+      Unaligned access support:
+      - Cortex-M0/M0+/M3: Not supported (causes fault)
+      - Cortex-M4/M7/M33: Supported in hardware
+
+      When enabled:
+      - Allows accessing data at non-aligned addresses
+      - Hardware handles unaligned access
+      - No performance penalty on M4/M7/M33
+
+      When disabled:
+      - Compiler ensures all accesses are aligned
+      - May increase code size
+      - Safer but less flexible
+
+      Toolchain flags:
+      - GCC:       -munaligned-access
+      - ARM Clang: -munaligned-access
+
+      Recommended: Enable for M4/M7/M33, disable for M0/M0+/M3
+
+endmenu
+
+endif # TOOLCHAIN_ARM_CLANG || TOOLCHAIN_ARM_GCC
+
+#-----------------------------------------------------------------------------
+# Advanced Compiler Options
+#-----------------------------------------------------------------------------
+
+menu "Advanced Options"
+
+config COMPILER_DIAGNOSTICS_COLOR
+    bool "Enable colored diagnostics"
+    default y
+    depends on !TOOLCHAIN_MSVC && !TOOLCHAIN_IAR
+    help
+      Enable colored compiler diagnostics output.
+
+      Makes compiler output more readable:
+      - Errors in red
+      - Warnings in yellow/magenta
+      - Notes in cyan
+      - Code snippets highlighted
+
+      Benefits:
+      - Easier to spot errors and warnings
+      - Better readability
+      - Faster problem identification
+
+      Toolchain flags:
+      - GCC:       -fdiagnostics-color=always
+      - Clang:     -fcolor-diagnostics
+      - ARM GCC:   -fdiagnostics-color=always
+      - ARM Clang: -fcolor-diagnostics
+
+      Note: Requires terminal with color support
+
+config COMPILER_SAVE_TEMPS
+    bool "Save temporary files"
     default n
     help
-      Generate cross-reference information in the map file.
-      This shows which symbols reference each other.
+      Save intermediate compilation files.
 
-      GCC: -Wl,--cref
-      Clang: --xref
-      IAR: --log all
+      Saves:
+      - Preprocessed files (.i, .ii)
+      - Assembly files (.s)
+      - Object files (.o)
 
-config LINKER_PRINT_MEMORY_USAGE
-    bool "Print memory usage after linking"
-    default y
+      Benefits:
+      - Useful for debugging compilation issues
+      - Inspect preprocessor output
+      - Analyze generated assembly
+      - Understand optimization effects
+
+      Drawbacks:
+      - Increases disk space usage
+      - Slower compilation
+      - More files to manage
+
+      Toolchain flags:
+      - GCC:       -save-temps
+      - Clang:     -save-temps
+      - MSVC:      /FA (assembly only)
+      - ARM GCC:   -save-temps
+      - ARM Clang: -save-temps
+      - IAR:       --preprocess (preprocessor only)
+
+      Recommended: Enable only when debugging
+
+config COMPILER_TIME_REPORT
+    bool "Generate compilation time report"
+    default n
     help
-      Print memory usage statistics after linking.
+      Generate detailed compilation time report.
 
-      GCC: -Wl,--print-memory-usage
-      Clang: --info=sizes,totals
-      IAR: (automatic in map file)
+      Reports time spent in:
+      - Preprocessing
+      - Parsing
+      - Optimization passes
+      - Code generation
 
-#-----------------------------------------------------------------------------
-# Advanced Options
-#-----------------------------------------------------------------------------
+      Benefits:
+      - Identify slow compilation bottlenecks
+      - Optimize build performance
+      - Understand compiler behavior
+
+      Toolchain flags:
+      - GCC:       -ftime-report
+      - Clang:     -ftime-trace (generates JSON)
+      - MSVC:      /Bt (basic timing)
+      - ARM GCC:   -ftime-report
+      - ARM Clang: -ftime-trace
+
+      Note: Increases compilation time slightly
+
+config COMPILER_STACK_USAGE
+    bool "Generate stack usage information"
+    default n
+    depends on TOOLCHAIN_GCC || TOOLCHAIN_ARM_GCC
+    help
+      Generate stack usage information for each function.
+
+      Creates .su files with:
+      - Function name
+      - Stack size used
+      - Whether size is static or dynamic
+
+      Benefits:
+      - Analyze stack usage
+      - Detect stack overflow risks
+      - Optimize stack size
+      - Find functions with large stack frames
+
+      Drawbacks:
+      - Slightly slower compilation
+      - Additional .su files generated
+
+      GCC flag:
+      - -fstack-usage
+
+      Output format:
+        function_name:line:column:stack_size:qualifier
+
+      Recommended: Enable for embedded systems with
+      limited stack space
+
+config COMPILER_VERBOSE
+    bool "Verbose compiler output"
+    default n
+    help
+      Enable verbose compiler output.
+
+      Shows:
+      - Compiler version
+      - Search paths
+      - Linked libraries
+      - Compilation phases
+      - Internal commands
+
+      Benefits:
+      - Debugging compilation issues
+      - Understanding compiler behavior
+      - Verifying include paths
+      - Checking library linkage
+
+      Drawbacks:
+      - Very verbose output
+      - Harder to read
+      - Slower compilation
+
+      Toolchain flags:
+      - GCC:       -v
+      - Clang:     -v
+      - MSVC:      /verbose
+      - ARM GCC:   -v
+      - ARM Clang: -v
+      - IAR:       (not supported)
 
 config COMPILER_CUSTOM_FLAGS
     string "Custom compiler flags"
     default ""
     help
       Additional custom compiler flags to append.
+
       Use with caution as these flags are passed directly to the compiler.
 
-config LINKER_CUSTOM_FLAGS
-    string "Custom linker flags"
-    default ""
-    help
-      Additional custom linker flags to append.
-      Use with caution as these flags are passed directly to the linker.
+      Examples:
+      - "-fstack-usage" - Generate stack usage information
+      - "-DCUSTOM_DEFINE=1" - Define preprocessor macro
+      - "-include header.h" - Force include header
+      - "-Wno-unused-parameter" - Disable specific warning
+
+      Separate multiple flags with spaces.
+
+      Note: These flags are added after all other flags,
+      so they can override previous settings.
+
+      Validation:
+      - Flags are not validated
+      - Invalid flags will cause compilation errors
+      - Test thoroughly after adding custom flags
+
+endmenu
 
 endmenu
