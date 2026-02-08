@@ -118,7 +118,7 @@ config TOOLCHAIN_NAME
 config TOOLCHAIN_FILE
     string
     default "" if PLATFORM_NATIVE
-    default "cmake/toolchains/arm-none-eabi.cmake" if TOOLCHAIN_ARM_GCC
+    default "cmake/toolchains/arm-gcc.cmake" if TOOLCHAIN_ARM_GCC
     default "cmake/toolchains/armclang.cmake" if TOOLCHAIN_ARM_CLANG
     default "cmake/toolchains/iar-arm.cmake" if TOOLCHAIN_IAR
     help
