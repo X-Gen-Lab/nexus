@@ -13,7 +13,18 @@
 #-----------------------------------------------------------------------------
 
 set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR ARM)
+
+#-----------------------------------------------------------------------------
+# CPU Architecture Configuration (must be set before project())
+#-----------------------------------------------------------------------------
+
+# Default to Cortex-M4 with FPU if not specified
+if(NOT DEFINED NEXUS_CPU_ARCH)
+    set(NEXUS_CPU_ARCH "cortex-m4")
+endif()
+
+# CPU flags are set explicitly in CMAKE_C_FLAGS_INIT
+# Do NOT set CMAKE_SYSTEM_PROCESSOR here to avoid CMake auto-detection issues
 
 #-----------------------------------------------------------------------------
 # Toolchain Programs
@@ -51,23 +62,31 @@ set(NEXUS_TOOLCHAIN_FAMILY "gcc")
 set(NEXUS_TOOLCHAIN_VENDOR "ARM")
 
 #-----------------------------------------------------------------------------
-# CPU Architecture Configuration
+# CPU Architecture Flags Configuration
 #-----------------------------------------------------------------------------
 
 # Configure CPU flags based on target platform
 # Supports Cortex-M0/M0+/M3/M4/M7/M33 with optional FPU
 
-# Default to Cortex-M4 with FPU if not specified
-if(NOT DEFINED NEXUS_CPU_ARCH)
-    set(NEXUS_CPU_ARCH "cortex-m4")
-endif()
-
+# Set default FPU configuration based on CPU if not specified
 if(NOT DEFINED NEXUS_FPU_TYPE)
-    set(NEXUS_FPU_TYPE "fpv4-sp-d16")
+    if(NEXUS_CPU_ARCH MATCHES "cortex-m4")
+        set(NEXUS_FPU_TYPE "fpv4-sp-d16")
+    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m7")
+        set(NEXUS_FPU_TYPE "fpv5-d16")
+    elseif(NEXUS_CPU_ARCH MATCHES "cortex-m33")
+        set(NEXUS_FPU_TYPE "fpv5-sp-d16")
+    else()
+        set(NEXUS_FPU_TYPE "")
+    endif()
 endif()
 
 if(NOT DEFINED NEXUS_FLOAT_ABI)
-    set(NEXUS_FLOAT_ABI "hard")
+    if(NEXUS_FPU_TYPE)
+        set(NEXUS_FLOAT_ABI "hard")
+    else()
+        set(NEXUS_FLOAT_ABI "soft")
+    endif()
 endif()
 
 # Build CPU flags based on configuration
@@ -99,10 +118,16 @@ set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS}")
 # Linker Flags
 #-----------------------------------------------------------------------------
 
-# Initialize linker flags
-set(CMAKE_EXE_LINKER_FLAGS_INIT
-    "-specs=nano.specs -specs=nosys.specs -Wl,--gc-sections -Wl,--print-memory-usage"
-)
+# Build base linker flags with CPU configuration
+set(LINKER_FLAGS "-specs=nano.specs -specs=nosys.specs")
+
+# Add garbage collection and memory usage reporting
+set(LINKER_FLAGS "${LINKER_FLAGS} -Wl,--gc-sections -Wl,--print-memory-usage")
+
+# Note: --map option will be added per-target with specific filename
+# Note: Additional linker options controlled via Kconfig
+
+set(CMAKE_EXE_LINKER_FLAGS_INIT "${LINKER_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Cross-Compilation Settings
@@ -187,12 +212,16 @@ endfunction()
 message(STATUS "ARM GCC Toolchain Configuration:")
 message(STATUS "  Compiler:   ${CMAKE_C_COMPILER}")
 message(STATUS "  Assembler:  ${CMAKE_ASM_COMPILER}")
+message(STATUS "  Linker:     ${CMAKE_C_COMPILER}")
+message(STATUS "  Archiver:   ${CMAKE_AR}")
 message(STATUS "  Objcopy:    ${CMAKE_OBJCOPY}")
 message(STATUS "  Size:       ${CMAKE_SIZE}")
 message(STATUS "  CPU Arch:   ${NEXUS_CPU_ARCH}")
 message(STATUS "  FPU Type:   ${NEXUS_FPU_TYPE}")
 message(STATUS "  Float ABI:  ${NEXUS_FLOAT_ABI}")
-message(STATUS "  CPU Flags:  ${CPU_FLAGS}")
+message(STATUS "  C Flags:    ${CPU_FLAGS}")
+message(STATUS "  ASM Flags:  ${CMAKE_ASM_FLAGS_INIT}")
+message(STATUS "  Link Flags: ${LINKER_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # End of arm-gcc.cmake
