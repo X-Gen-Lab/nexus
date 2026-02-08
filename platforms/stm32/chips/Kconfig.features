@@ -1,0 +1,311 @@
+#-----------------------------------------------------------------------------
+# STM32 Chip-Specific Features Configuration
+#-----------------------------------------------------------------------------
+# This file configures chip-specific features that are not available on all
+# STM32 series. Features are automatically enabled/disabled based on the
+# selected chip series and variant.
+#-----------------------------------------------------------------------------
+
+menu "Chip-Specific Features"
+
+#-----------------------------------------------------------------------------
+# STM32F4 Over-Drive Mode
+#-----------------------------------------------------------------------------
+
+config STM32F4_OVERDRIVE_ENABLE
+    bool "Enable Over-Drive mode (STM32F4)"
+    default y if STM32F427 || STM32F437 || STM32F429 || STM32F439 || STM32F446 || STM32F469 || STM32F479
+    default n
+    depends on STM32F4
+    depends on STM32F427 || STM32F437 || STM32F429 || STM32F439 || STM32F446 || STM32F469 || STM32F479
+    help
+      Enable Over-Drive mode for STM32F4 series.
+
+      Over-Drive mode allows the CPU and core logic to operate at higher
+      frequencies than normal mode:
+        - Normal mode: up to 168 MHz
+        - Over-Drive mode: up to 180 MHz
+
+      Supported chips:
+        - STM32F427/437: 180 MHz
+        - STM32F429/439: 180 MHz
+        - STM32F446: 180 MHz
+        - STM32F469/479: 180 MHz
+
+      Note: Over-Drive mode is automatically enabled when system clock
+      frequency exceeds 168 MHz. This option allows manual control.
+
+      It is recommended to enter or exit Over-Drive mode when:
+        - Application is not running critical tasks
+        - System clock source is HSI or HSE
+        - No peripheral clocks are enabled during the switch
+
+config STM32F4_OVERDRIVE_AUTO
+    bool "Automatically enable Over-Drive when needed"
+    default y
+    depends on STM32F4_OVERDRIVE_ENABLE
+    help
+      Automatically enable Over-Drive mode when system clock frequency
+      exceeds 168 MHz. This is the recommended setting.
+
+      If disabled, Over-Drive mode must be manually enabled in code
+      by calling HAL_PWREx_EnableOverDrive().
+
+#-----------------------------------------------------------------------------
+# STM32F7 Over-Drive Mode
+#-----------------------------------------------------------------------------
+
+config STM32F7_OVERDRIVE_ENABLE
+    bool "Enable Over-Drive mode (STM32F7)"
+    default y
+    depends on STM32F7
+    help
+      Enable Over-Drive mode for STM32F7 series.
+
+      Over-Drive mode allows the CPU to operate at maximum frequency:
+        - Normal mode: up to 180 MHz
+        - Over-Drive mode: up to 216 MHz
+
+      Note: Over-Drive mode is required for frequencies above 180 MHz.
+
+config STM32F7_OVERDRIVE_AUTO
+    bool "Automatically enable Over-Drive when needed"
+    default y
+    depends on STM32F7_OVERDRIVE_ENABLE
+    help
+      Automatically enable Over-Drive mode when system clock frequency
+      exceeds 180 MHz.
+
+#-----------------------------------------------------------------------------
+# STM32H7 Dual-Core Configuration
+#-----------------------------------------------------------------------------
+
+config STM32H7_DUAL_CORE
+    bool "Enable dual-core support (STM32H7)"
+    default n
+    depends on STM32H7
+    help
+      Enable dual-core support for STM32H7 series with Cortex-M7 + Cortex-M4.
+
+      Supported chips:
+        - STM32H745/755: M7 @ 480MHz + M4 @ 240MHz
+        - STM32H747/757: M7 @ 480MHz + M4 @ 240MHz
+
+      When enabled, additional configuration is required for:
+        - Inter-core communication (HSEM, shared memory)
+        - Resource allocation (peripherals, memory)
+        - Boot sequence coordination
+
+config STM32H7_SMPS_ENABLE
+    bool "Enable SMPS (Switched-Mode Power Supply)"
+    default n
+    depends on STM32H7
+    help
+      Enable SMPS for STM32H7 series.
+
+      SMPS provides better power efficiency compared to LDO regulator.
+      Available on STM32H7 chips with SMPS capability.
+
+      Benefits:
+        - Lower power consumption
+        - Reduced heat generation
+        - Better efficiency at high frequencies
+
+      Note: Requires external components (inductor, capacitors).
+      Check your hardware design before enabling.
+
+#-----------------------------------------------------------------------------
+# STM32L4 Low-Power Modes
+#-----------------------------------------------------------------------------
+
+config STM32L4_LPRUN_ENABLE
+    bool "Enable Low-Power Run mode (STM32L4)"
+    default n
+    depends on STM32L4
+    help
+      Enable Low-Power Run mode for STM32L4 series.
+
+      In Low-Power Run mode:
+        - System clock limited to 2 MHz
+        - Voltage regulator in low-power mode
+        - Reduced power consumption
+
+      Use for applications that need to run continuously
+      at low speed with minimal power consumption.
+
+config STM32L4_STOP2_ENABLE
+    bool "Enable Stop 2 mode (STM32L4)"
+    default y
+    depends on STM32L4
+    help
+      Enable Stop 2 mode for STM32L4 series.
+
+      Stop 2 mode provides the lowest power consumption while
+      maintaining SRAM and register contents:
+        - All clocks stopped
+        - SRAM and registers retained
+        - Wake-up time: ~5 µs
+        - Current consumption: ~1 µA
+
+      Recommended for battery-powered applications.
+
+#-----------------------------------------------------------------------------
+# STM32WB Wireless Configuration
+#-----------------------------------------------------------------------------
+
+config STM32WB_BLE_ENABLE
+    bool "Enable BLE stack (STM32WB)"
+    default y
+    depends on STM32WB
+    help
+      Enable Bluetooth Low Energy stack for STM32WB series.
+
+      Features:
+        - BLE 5.3 compliant
+        - Concurrent BLE and 802.15.4
+        - Low power consumption
+
+      Note: Requires STM32WB firmware stack from ST.
+
+config STM32WB_ZIGBEE_ENABLE
+    bool "Enable Zigbee stack (STM32WB)"
+    default n
+    depends on STM32WB
+    help
+      Enable Zigbee (802.15.4) stack for STM32WB series.
+
+      Features:
+        - Zigbee 3.0 compliant
+        - Thread protocol support
+        - Concurrent with BLE
+
+      Note: Requires STM32WB firmware stack from ST.
+
+#-----------------------------------------------------------------------------
+# STM32WL LoRa Configuration
+#-----------------------------------------------------------------------------
+
+config STM32WL_LORA_ENABLE
+    bool "Enable LoRa transceiver (STM32WL)"
+    default y
+    depends on STM32WL
+    help
+      Enable integrated LoRa transceiver for STM32WL series.
+
+      Features:
+        - Integrated sub-GHz radio
+        - LoRaWAN 1.0.4 support
+        - Long range communication
+        - Low power consumption
+
+      Note: Requires LoRaWAN stack (e.g., LoRaMac-node).
+
+config STM32WL_LORA_FREQUENCY_BAND
+    int "LoRa frequency band (MHz)"
+    default 868
+    range 150 960
+    depends on STM32WL_LORA_ENABLE
+    help
+      LoRa operating frequency band in MHz.
+
+      Common bands:
+        - 868 MHz: Europe (EU868)
+        - 915 MHz: North America (US915)
+        - 433 MHz: Asia
+
+      Check local regulations for allowed frequency bands.
+
+#-----------------------------------------------------------------------------
+# Cache Configuration
+#-----------------------------------------------------------------------------
+
+config STM32_ICACHE_ENABLE
+    bool "Enable Instruction Cache"
+    default y
+    depends on STM32_HAS_ICACHE
+    help
+      Enable instruction cache for improved performance.
+
+      Available on:
+        - STM32F7 series
+        - STM32H7 series
+        - STM32L4 series
+        - STM32L5 series
+        - STM32U5 series
+
+      Recommended for applications running from Flash.
+
+config STM32_DCACHE_ENABLE
+    bool "Enable Data Cache"
+    default y
+    depends on STM32_HAS_DCACHE
+    help
+      Enable data cache for improved performance.
+
+      Available on:
+        - STM32F7 series
+        - STM32H7 series
+
+      Note: When using DMA, ensure proper cache coherency
+      by using cache maintenance operations or placing
+      DMA buffers in non-cacheable memory regions.
+
+#-----------------------------------------------------------------------------
+# MPU Configuration
+#-----------------------------------------------------------------------------
+
+config STM32_MPU_ENABLE
+    bool "Enable Memory Protection Unit (MPU)"
+    default n
+    depends on STM32_HAS_MPU
+    help
+      Enable Memory Protection Unit for memory access control.
+
+      MPU provides:
+        - Memory region protection
+        - Access permission control
+        - Prevention of unauthorized access
+
+      Recommended for safety-critical applications.
+
+config STM32_MPU_REGIONS
+    int "Number of MPU regions to configure"
+    default 4
+    range 0 16
+    depends on STM32_MPU_ENABLE
+    help
+      Number of MPU regions to configure.
+
+      Typical usage:
+        - Region 0: Flash (read-only, executable)
+        - Region 1: SRAM (read-write, non-executable)
+        - Region 2: Peripheral (read-write, non-executable, device)
+        - Region 3: Stack guard (no access)
+
+#-----------------------------------------------------------------------------
+# TrustZone Configuration
+#-----------------------------------------------------------------------------
+
+config STM32_TRUSTZONE_ENABLE
+    bool "Enable ARM TrustZone"
+    default n
+    depends on STM32_HAS_TRUSTZONE
+    help
+      Enable ARM TrustZone security features.
+
+      Available on:
+        - STM32H5 series (Cortex-M33)
+        - STM32L5 series (Cortex-M33)
+        - STM32U3 series (Cortex-M33)
+        - STM32U5 series (Cortex-M33)
+
+      TrustZone provides:
+        - Secure and non-secure execution states
+        - Secure boot
+        - Secure storage
+        - Isolation of critical code and data
+
+      Note: Requires careful system design and configuration.
+
+endmenu
+
