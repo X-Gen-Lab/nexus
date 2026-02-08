@@ -1,0 +1,283 @@
+#-----------------------------------------------------------------------------
+# STM32 HAL Driver Configuration
+#-----------------------------------------------------------------------------
+# HAL (Hardware Abstraction Layer) drivers implement Nexus peripheral
+# interfaces using STM32 HAL library as the underlying implementation.
+#
+# Architecture:
+#   - Each HAL driver is a thin wrapper around STM32 HAL
+#   - Maximum reuse of STM32 HAL capabilities
+#   - Minimal code (<2000 lines per driver)
+#   - Zero-copy data paths where possible
+#
+# Directory structure:
+#   hal/uart/    - UART driver + Kconfig
+#   hal/spi/     - SPI driver + Kconfig
+#   hal/i2c/     - I2C driver + Kconfig
+#   hal/timer/   - Timer driver + Kconfig
+#   ...
+#-----------------------------------------------------------------------------
+
+menu "HAL Drivers"
+
+#-----------------------------------------------------------------------------
+# UART Driver
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_UART_ENABLE
+    bool "Enable UART driver"
+    default y
+    select HAL_UART_MODULE
+    select HAL_USART_MODULE
+    select HAL_GPIO_MODULE
+    select HAL_RCC_MODULE
+    select HAL_CORTEX_MODULE
+    help
+      Enable UART (Universal Asynchronous Receiver/Transmitter) driver.
+
+      This driver implements Nexus HAL UART interface using STM32 HAL
+      as the underlying implementation. It provides:
+        - Synchronous and asynchronous TX/RX
+        - DMA support for high-throughput transfers
+        - Circular buffer management
+        - Error handling and statistics
+        - Multi-instance support
+
+      Code size: ~1800 lines
+      Architecture: Thin wrapper, maximum STM32 HAL reuse
+
+if STM32_UART_ENABLE
+source "platforms/stm32/src/hal/uart/Kconfig"
+endif
+
+#-----------------------------------------------------------------------------
+# GPIO Driver
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_GPIO_ENABLE
+    bool "Enable GPIO driver"
+    default y
+    select HAL_GPIO_MODULE
+    select HAL_RCC_MODULE
+    help
+      Enable GPIO (General Purpose Input/Output) driver.
+
+      This driver implements Nexus HAL GPIO interface using STM32 HAL
+      as the underlying implementation. It provides:
+        - Digital input/output operations
+        - Pin read/write/toggle
+        - Configurable mode, pull, and speed
+        - Lifecycle management
+        - Power management support
+
+      Code size: ~500 lines
+      Architecture: Thin wrapper, maximum STM32 HAL reuse
+
+if STM32_GPIO_ENABLE
+source "platforms/stm32/src/hal/gpio/Kconfig"
+endif
+
+#-----------------------------------------------------------------------------
+# SPI Driver
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_SPI_ENABLE
+    bool "Enable SPI driver"
+    default n
+    select HAL_SPI_MODULE
+    select HAL_GPIO_MODULE
+    select HAL_RCC_MODULE
+    help
+      Enable SPI (Serial Peripheral Interface) driver.
+
+      This driver implements Nexus HAL SPI interface using STM32 HAL
+      as the underlying implementation. It provides:
+        - Synchronous and asynchronous TX/RX
+        - DMA support for high-throughput transfers
+        - Multi-device support with Handle acquisition
+        - Error handling and statistics
+        - Multi-instance support
+
+      Code size: ~1500 lines
+      Architecture: Thin wrapper, maximum STM32 HAL reuse
+
+if STM32_SPI_ENABLE
+source "platforms/stm32/src/hal/spi/Kconfig"
+endif
+
+#-----------------------------------------------------------------------------
+# I2C Driver (Future)
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_I2C_ENABLE
+    bool "Enable I2C driver"
+    default n
+    select HAL_I2C_MODULE
+    select HAL_GPIO_MODULE
+    select HAL_RCC_MODULE
+    help
+      Enable I2C (Inter-Integrated Circuit) driver.
+
+      Status: Not yet implemented
+
+#-----------------------------------------------------------------------------
+# Timer Driver (Future)
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_TIMER_ENABLE
+    bool "Enable Timer driver"
+    default n
+    select HAL_TIM_MODULE
+    select HAL_RCC_MODULE
+    help
+      Enable Timer driver for PWM, input capture, and timing.
+
+      Status: Not yet implemented
+
+#-----------------------------------------------------------------------------
+# ADC Driver (Future)
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_ADC_ENABLE
+    bool "Enable ADC driver"
+    default n
+    select HAL_ADC_MODULE
+    select HAL_GPIO_MODULE
+    select HAL_RCC_MODULE
+    help
+      Enable ADC (Analog-to-Digital Converter) driver.
+
+      Status: Not yet implemented
+
+#-----------------------------------------------------------------------------
+# DAC Driver (Future)
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_DAC_ENABLE
+    bool "Enable DAC driver"
+    default n
+    select HAL_DAC_MODULE
+    select HAL_GPIO_MODULE
+    select HAL_RCC_MODULE
+    help
+      Enable DAC (Digital-to-Analog Converter) driver.
+
+      Status: Not yet implemented
+
+endmenu  # HAL Drivers
+
+#-----------------------------------------------------------------------------
+# HAL Module Auto-Selection (Internal)
+#-----------------------------------------------------------------------------
+# These symbols are automatically selected by HAL drivers above.
+# Users should not configure these directly.
+#-----------------------------------------------------------------------------
+
+menu "HAL Module Selection (Auto-configured)"
+    visible if EXPERT_MODE
+
+config HAL_UART_MODULE
+    bool "HAL UART module"
+    help
+      STM32 HAL UART module support.
+      Automatically selected when UART driver is enabled.
+
+config HAL_USART_MODULE
+    bool "HAL USART module"
+    help
+      STM32 HAL USART module support.
+      Automatically selected when UART driver is enabled.
+
+config HAL_SPI_MODULE
+    bool "HAL SPI module"
+    help
+      STM32 HAL SPI module support.
+      Automatically selected when SPI driver is enabled.
+
+config HAL_I2C_MODULE
+    bool "HAL I2C module"
+    help
+      STM32 HAL I2C module support.
+      Automatically selected when I2C driver is enabled.
+
+config HAL_TIM_MODULE
+    bool "HAL Timer module"
+    help
+      STM32 HAL Timer module support.
+      Automatically selected when Timer driver is enabled.
+
+config HAL_ADC_MODULE
+    bool "HAL ADC module"
+    help
+      STM32 HAL ADC module support.
+      Automatically selected when ADC driver is enabled.
+
+config HAL_DAC_MODULE
+    bool "HAL DAC module"
+    help
+      STM32 HAL DAC module support.
+      Automatically selected when DAC driver is enabled.
+
+config HAL_DMA_MODULE
+    bool "HAL DMA module"
+    default y if STM32_UART_USE_DMA
+    help
+      STM32 HAL DMA module support.
+      Automatically selected when DMA is used by any driver.
+
+config HAL_GPIO_MODULE
+    bool "HAL GPIO module"
+    default y
+    help
+      STM32 HAL GPIO module support.
+      Required by most peripheral drivers for pin configuration.
+
+config HAL_RCC_MODULE
+    bool "HAL RCC module"
+    default y
+    help
+      STM32 HAL RCC (Reset and Clock Control) module support.
+      Required for peripheral clock configuration.
+
+config HAL_CORTEX_MODULE
+    bool "HAL Cortex module"
+    default y
+    help
+      STM32 HAL Cortex module support.
+      Required for NVIC and SysTick configuration.
+
+endmenu  # HAL Module Selection
+
+#-----------------------------------------------------------------------------
+# HAL Callback Configuration
+#-----------------------------------------------------------------------------
+# Configure which HAL callbacks are enabled.
+# Disabling unused callbacks can reduce code size.
+#-----------------------------------------------------------------------------
+
+menu "HAL Callback Configuration"
+    visible if EXPERT_MODE
+
+config HAL_UART_TX_COMPLETE_CALLBACK
+    bool "UART TX complete callback"
+    default y if STM32_UART_ENABLE
+    help
+      Enable HAL_UART_TxCpltCallback support.
+      Required for asynchronous UART transmission.
+
+config HAL_UART_RX_COMPLETE_CALLBACK
+    bool "UART RX complete callback"
+    default y if STM32_UART_ENABLE
+    help
+      Enable HAL_UART_RxCpltCallback support.
+      Required for asynchronous UART reception.
+
+config HAL_UART_ERROR_CALLBACK
+    bool "UART error callback"
+    default y if STM32_UART_ENABLE
+    help
+      Enable HAL_UART_ErrorCallback support.
+      Required for UART error handling.
+
+endmenu  # HAL Callback Configuration
+
