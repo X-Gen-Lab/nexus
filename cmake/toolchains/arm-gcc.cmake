@@ -1,14 +1,14 @@
 #-----------------------------------------------------------------------------
-# iar-arm.cmake - IAR ARM Toolchain Configuration
+# arm-gcc.cmake - ARM GCC Toolchain Configuration
 #-----------------------------------------------------------------------------
-# IAR ARM toolchain configuration for Nexus build system
+# ARM GCC toolchain configuration for Nexus build system
 # Author: Nexus Team
 #
-# This toolchain file configures IAR Embedded Workbench for ARM (iccarm)
-# compiler for ARM Cortex-M microcontrollers. IAR is a commercial toolchain
-# with excellent code optimization and debugging capabilities.
+# This toolchain file configures ARM GCC (arm-none-eabi-gcc) compiler for
+# ARM Cortex-M microcontrollers. ARM GCC is a free and open-source toolchain
+# with excellent community support and wide adoption in embedded development.
 #
-# Requires: CMake 3.21+, IAR Embedded Workbench for ARM license
+# Requires: CMake 3.21+
 # Validates: Requirements 4.3
 #-----------------------------------------------------------------------------
 
@@ -19,30 +19,36 @@ set(CMAKE_SYSTEM_PROCESSOR ARM)
 # Toolchain Programs
 #-----------------------------------------------------------------------------
 
-# Find IAR toolchain programs
-find_program(CMAKE_C_COMPILER iccarm)
-find_program(CMAKE_CXX_COMPILER iccarm)
-find_program(CMAKE_ASM_COMPILER iasmarm)
-find_program(CMAKE_AR iarchive)
-find_program(CMAKE_LINKER ilinkarm)
-find_program(CMAKE_OBJCOPY ielftool)
+# Toolchain prefix
+set(TOOLCHAIN_PREFIX arm-none-eabi-)
+
+# Find toolchain programs
+find_program(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+find_program(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+find_program(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+find_program(CMAKE_AR ${TOOLCHAIN_PREFIX}ar)
+find_program(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
+find_program(CMAKE_OBJDUMP ${TOOLCHAIN_PREFIX}objdump)
+find_program(CMAKE_SIZE ${TOOLCHAIN_PREFIX}size)
+find_program(CMAKE_GDB ${TOOLCHAIN_PREFIX}gdb)
 
 # Verify compiler was found
 if(NOT CMAKE_C_COMPILER)
     message(FATAL_ERROR
-        "iccarm compiler not found.\n"
-        "Please install IAR Embedded Workbench for ARM and add it to PATH.\n"
+        "arm-none-eabi-gcc compiler not found.\n"
+        "Please install ARM GCC toolchain and add it to PATH.\n"
         "\n"
         "Installation instructions:\n"
-        "  - Download from: https://www.iar.com/products/architectures/arm/\n"
-        "  - Requires commercial license from IAR Systems\n"
+        "  - Windows: Download from https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm\n"
+        "  - Linux:   sudo apt install gcc-arm-none-eabi\n"
+        "  - macOS:   brew install --cask gcc-arm-embedded\n"
     )
 endif()
 
 # Set toolchain identification
-set(NEXUS_TOOLCHAIN_NAME "iar-arm")
-set(NEXUS_TOOLCHAIN_FAMILY "iar")
-set(NEXUS_TOOLCHAIN_VENDOR "IAR")
+set(NEXUS_TOOLCHAIN_NAME "arm-gcc")
+set(NEXUS_TOOLCHAIN_FAMILY "gcc")
+set(NEXUS_TOOLCHAIN_VENDOR "ARM")
 
 #-----------------------------------------------------------------------------
 # CPU Architecture Configuration
@@ -53,24 +59,28 @@ set(NEXUS_TOOLCHAIN_VENDOR "IAR")
 
 # Default to Cortex-M4 with FPU if not specified
 if(NOT DEFINED NEXUS_CPU_ARCH)
-    set(NEXUS_CPU_ARCH "Cortex-M4")
+    set(NEXUS_CPU_ARCH "cortex-m4")
 endif()
 
 if(NOT DEFINED NEXUS_FPU_TYPE)
-    set(NEXUS_FPU_TYPE "VFPv4_sp")
+    set(NEXUS_FPU_TYPE "fpv4-sp-d16")
+endif()
+
+if(NOT DEFINED NEXUS_FLOAT_ABI)
+    set(NEXUS_FLOAT_ABI "hard")
 endif()
 
 # Build CPU flags based on configuration
-set(CPU_FLAGS "--cpu=${NEXUS_CPU_ARCH}")
+set(CPU_FLAGS "-mcpu=${NEXUS_CPU_ARCH} -mthumb")
 
 # Add FPU flags if specified
 if(NEXUS_FPU_TYPE)
-    set(CPU_FLAGS "${CPU_FLAGS} --fpu=${NEXUS_FPU_TYPE}")
+    set(CPU_FLAGS "${CPU_FLAGS} -mfpu=${NEXUS_FPU_TYPE} -mfloat-abi=${NEXUS_FLOAT_ABI}")
 endif()
 
-# Initialize compiler flags
-set(CMAKE_C_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal")
-set(CMAKE_CXX_FLAGS_INIT "${CPU_FLAGS} --endian=little --dlib_config normal")
+# Initialize compiler flags with CPU architecture
+set(CMAKE_C_FLAGS_INIT "${CPU_FLAGS}")
+set(CMAKE_CXX_FLAGS_INIT "${CPU_FLAGS}")
 set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS}")
 
 #-----------------------------------------------------------------------------
@@ -78,22 +88,20 @@ set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS}")
 #-----------------------------------------------------------------------------
 # Note: Build type flags are now managed centrally by NexusCompilerConfig.cmake
 # This provides better consistency and allows easier customization.
+# The flags are set in the main CMakeLists.txt after toolchain detection.
 #
-# IAR-specific optimization flags:
-#   -On:  No optimization
-#   -Om:  Medium optimization
-#   -Oh:  High optimization for speed
-#   -Ohz: High optimization for size
-#   -r:   Generate debug information
+# To customize build type flags, use one of these methods:
+#   1. Command line: cmake -DCMAKE_C_FLAGS_DEBUG="-O0 -g3"
+#   2. CMakePresets.json: "CMAKE_C_FLAGS_DEBUG": "-O0 -g3"
+#   3. Before project(): set(CMAKE_C_FLAGS_DEBUG "-O0 -g3" CACHE STRING "")
 
 #-----------------------------------------------------------------------------
 # Linker Flags
 #-----------------------------------------------------------------------------
 
 # Initialize linker flags
-# Note: Linker script will be added by platform CMakeLists.txt
 set(CMAKE_EXE_LINKER_FLAGS_INIT
-    "--semihosting --entry __iar_program_start"
+    "-specs=nano.specs -specs=nosys.specs -Wl,--gc-sections -Wl,--print-memory-usage"
 )
 
 #-----------------------------------------------------------------------------
@@ -110,17 +118,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 #-----------------------------------------------------------------------------
-# IAR-Specific Settings
-#-----------------------------------------------------------------------------
-
-# Disable compiler warnings about unknown pragmas
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --diag_suppress=Pe1665")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --diag_suppress=Pe1665")
-
-# Enable C99 mode
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --c99")
-
-#-----------------------------------------------------------------------------
 # Toolchain Adapter Functions
 #-----------------------------------------------------------------------------
 
@@ -129,8 +126,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --c99")
 #   TARGET: Target name
 function(nexus_generate_binary TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --bin $<TARGET_FILE:${TARGET}> ${TARGET}.bin
-        COMMAND ${CMAKE_OBJCOPY} --ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
+        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${TARGET}> ${TARGET}.bin
+        COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
+        COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${TARGET}>
         COMMENT "Generating ${TARGET}.bin and ${TARGET}.hex"
     )
 endfunction()
@@ -140,7 +138,7 @@ endfunction()
 #   TARGET: Target name
 function(nexus_print_size TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --size $<TARGET_FILE:${TARGET}>
+        COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${TARGET}>
         COMMENT "Size of ${TARGET}:"
     )
 endfunction()
@@ -150,15 +148,15 @@ endfunction()
 #   TARGET: Target name
 function(nexus_generate_listing TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --code $<TARGET_FILE:${TARGET}> ${TARGET}.lst
+        COMMAND ${CMAKE_OBJDUMP} -h -S $<TARGET_FILE:${TARGET}> > ${TARGET}.lst
         COMMENT "Generating ${TARGET}.lst"
     )
 endfunction()
 
-# Configure target for IAR toolchain
+# Configure target for ARM GCC toolchain
 # Arguments:
 #   TARGET: Target name
-#   LINKER_SCRIPT: Path to linker script (ICF file)
+#   LINKER_SCRIPT: Path to linker script
 function(nexus_configure_arm_target TARGET)
     # Parse arguments
     cmake_parse_arguments(ARG "" "LINKER_SCRIPT" "" ${ARGN})
@@ -166,9 +164,16 @@ function(nexus_configure_arm_target TARGET)
     # Set linker script if provided
     if(ARG_LINKER_SCRIPT)
         target_link_options(${TARGET} PRIVATE
-            --config ${ARG_LINKER_SCRIPT}
+            -T${ARG_LINKER_SCRIPT}
         )
     endif()
+
+    # Add standard ARM libraries
+    target_link_libraries(${TARGET} PRIVATE
+        c
+        m
+        nosys
+    )
 
     # Generate binary and hex files
     nexus_generate_binary(${TARGET})
@@ -179,15 +184,16 @@ endfunction()
 # Toolchain Information
 #-----------------------------------------------------------------------------
 
-message(STATUS "IAR ARM Toolchain Configuration:")
+message(STATUS "ARM GCC Toolchain Configuration:")
 message(STATUS "  Compiler:   ${CMAKE_C_COMPILER}")
 message(STATUS "  Assembler:  ${CMAKE_ASM_COMPILER}")
-message(STATUS "  Linker:     ${CMAKE_LINKER}")
-message(STATUS "  Archiver:   ${CMAKE_AR}")
+message(STATUS "  Objcopy:    ${CMAKE_OBJCOPY}")
+message(STATUS "  Size:       ${CMAKE_SIZE}")
 message(STATUS "  CPU Arch:   ${NEXUS_CPU_ARCH}")
 message(STATUS "  FPU Type:   ${NEXUS_FPU_TYPE}")
+message(STATUS "  Float ABI:  ${NEXUS_FLOAT_ABI}")
 message(STATUS "  CPU Flags:  ${CPU_FLAGS}")
 
 #-----------------------------------------------------------------------------
-# End of iar-arm.cmake
+# End of arm-gcc.cmake
 #-----------------------------------------------------------------------------
