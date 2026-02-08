@@ -13,7 +13,8 @@
 
 include_guard(GLOBAL)
 
-message(STATUS "NexusHelpers module loaded")
+# Module loaded (silent - only show in verbose mode)
+# message(STATUS "NexusHelpers module loaded")
 
 #-----------------------------------------------------------------------------
 # Error Handling
