@@ -345,13 +345,7 @@ function(nexus_configure_parallel_build)
         set(CMAKE_JOB_POOL_LINK "link" PARENT_SCOPE)
     endif()
 
-    message(STATUS "Parallel build configuration:")
-    message(STATUS "  CPU cores:        ${CPU_CORES}")
-    if(AVAILABLE_MEMORY GREATER 0)
-        message(STATUS "  Available memory: ${AVAILABLE_MEMORY} MB")
-    endif()
-    message(STATUS "  Compile jobs:     ${COMPILE_JOBS}")
-    message(STATUS "  Link jobs:        ${LINK_JOBS}")
+    nexus_log(STATUS "Parallel build: ${COMPILE_JOBS} compile jobs, ${LINK_JOBS} link jobs (${CPU_CORES} cores, ${AVAILABLE_MEMORY} MB)")
 endfunction()
 
 #
@@ -471,7 +465,6 @@ endfunction()
 #
 function(nexus_resource_init_adaptive_parallelism)
     if(NOT NEXUS_RESOURCE_ADAPTIVE_PARALLELISM)
-        message(STATUS "Adaptive parallelism disabled")
         return()
     endif()
 
@@ -486,9 +479,7 @@ function(nexus_resource_init_adaptive_parallelism)
         set(CMAKE_JOB_POOL_LINK "link" PARENT_SCOPE)
     endif()
 
-    message(STATUS "Adaptive parallelism initialized: ${OPTIMAL_JOBS} jobs")
-    message(STATUS "  CPU Cores: ${NEXUS_RESOURCE_CPU_CORES}")
-    message(STATUS "  Available Memory: ${NEXUS_RESOURCE_AVAILABLE_MEMORY} MB")
+    nexus_log(VERBOSE "Adaptive parallelism: ${OPTIMAL_JOBS} jobs (${NEXUS_RESOURCE_CPU_CORES} cores, ${NEXUS_RESOURCE_AVAILABLE_MEMORY} MB)")
 endfunction()
 
 #
@@ -557,13 +548,8 @@ endfunction()
 # Initialize resource management
 #
 function(nexus_resource_init)
-    message(STATUS "Initializing Nexus Resource Management...")
-
     nexus_resource_init_adaptive_parallelism()
-
     file(MAKE_DIRECTORY ${NEXUS_RESOURCE_TEMP_DIR})
-
-    message(STATUS "Nexus Resource Management initialized successfully")
 endfunction()
 
 #
@@ -579,9 +565,9 @@ function(nexus_resource_finalize)
     message(STATUS "Nexus Resource Management finalized")
 endfunction()
 
-# Auto-initialize
-nexus_configure_parallel_build()
-nexus_resource_init()
+# Auto-initialize is done in CMakeLists.txt
+# nexus_configure_parallel_build()
+# nexus_resource_init()
 
 message(STATUS "NexusOptimization module loaded")
 
