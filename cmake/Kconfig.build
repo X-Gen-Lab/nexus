@@ -1,0 +1,221 @@
+# cmake/Kconfig.build - Build Type and Options Configuration
+#
+# This file defines build type selection and build-related options
+# such as tests, examples, coverage, and sanitizers.
+
+menu "Build Configuration"
+
+#-----------------------------------------------------------------------------
+# Build Type Selection
+#-----------------------------------------------------------------------------
+
+choice
+    prompt "Build Type"
+    default BUILD_TYPE_DEBUG
+    help
+      Select the build type for the project.
+      This affects optimization level and debug information.
+
+config BUILD_TYPE_DEBUG
+    bool "Debug"
+    help
+      Debug build with minimal optimization and full debug information.
+      Best for development and debugging.
+
+      Characteristics:
+      - Optimization: -Og (GCC) / -O1 (Clang)
+      - Debug info: Full (-g3)
+      - Defines: DEBUG
+      - Assertions: Enabled
+
+config BUILD_TYPE_RELEASE
+    bool "Release"
+    help
+      Release build with full optimization and no debug information.
+      Best for production deployment.
+
+      Characteristics:
+      - Optimization: -O2/-O3
+      - Debug info: None
+      - Defines: NDEBUG
+      - Assertions: Disabled
+
+config BUILD_TYPE_MINSIZEREL
+    bool "MinSizeRel"
+    help
+      Release build optimized for minimum size.
+      Best for memory-constrained devices.
+
+      Characteristics:
+      - Optimization: -Os (GCC) / -Oz (Clang)
+      - Debug info: None
+      - Defines: NDEBUG
+      - Assertions: Disabled
+
+config BUILD_TYPE_RELWITHDEBINFO
+    bool "RelWithDebInfo"
+    help
+      Release build with debug information.
+      Best for profiling and debugging optimized code.
+
+      Characteristics:
+      - Optimization: -O2
+      - Debug info: Full (-g)
+      - Defines: NDEBUG
+      - Assertions: Disabled
+
+endchoice
+
+config BUILD_TYPE
+    string
+    default "Debug" if BUILD_TYPE_DEBUG
+    default "Release" if BUILD_TYPE_RELEASE
+    default "MinSizeRel" if BUILD_TYPE_MINSIZEREL
+    default "RelWithDebInfo" if BUILD_TYPE_RELWITHDEBINFO
+
+#-----------------------------------------------------------------------------
+# Build Targets
+#-----------------------------------------------------------------------------
+
+config BUILD_TESTS
+    bool "Build unit tests"
+    default y
+    depends on PLATFORM_NATIVE
+    help
+      Build unit tests for the Nexus platform.
+
+      Tests are only available for native platform and require:
+      - Google Test framework
+      - CMock for mocking
+
+      Tests will be built in the 'tests' directory.
+
+config BUILD_EXAMPLES
+    bool "Build example applications"
+    default y
+    help
+      Build example applications demonstrating platform features.
+
+      Examples include:
+      - Basic HAL usage
+      - OSAL demonstrations
+      - Peripheral drivers
+      - Communication protocols
+
+      Examples will be built in the 'applications/examples' directory.
+
+config BUILD_BENCHMARKS
+    bool "Build benchmark applications"
+    default n
+    depends on PLATFORM_NATIVE
+    help
+      Build performance benchmark applications.
+
+      Benchmarks measure:
+      - HAL operation performance
+      - Memory usage
+      - Context switch time
+      - Interrupt latency
+
+config BUILD_DOCUMENTATION
+    bool "Build documentation"
+    default n
+    help
+      Build project documentation using Doxygen.
+
+      Requires:
+      - Doxygen
+      - Graphviz (for diagrams)
+
+      Documentation will be generated in 'build/docs'.
+
+#-----------------------------------------------------------------------------
+# Code Quality and Analysis
+#-----------------------------------------------------------------------------
+
+config ENABLE_COVERAGE
+    bool "Enable code coverage"
+    default n
+    depends on PLATFORM_NATIVE
+    help
+      Enable code coverage instrumentation for testing.
+
+      Supported tools:
+      - gcov (GCC)
+      - llvm-cov (Clang)
+
+      Coverage reports will be generated in 'build/coverage'.
+      Only available for native platform with GCC/Clang.
+
+config ENABLE_SANITIZERS
+    bool "Enable sanitizers (ASan/UBSan)"
+    default n
+    depends on PLATFORM_NATIVE
+    help
+      Enable address and undefined behavior sanitizers.
+
+      Sanitizers detect:
+      - Memory leaks
+      - Buffer overflows
+      - Use-after-free
+      - Undefined behavior
+
+      Note: Significantly increases binary size and reduces performance.
+
+config ENABLE_STATIC_ANALYSIS
+    bool "Enable static analysis"
+    default n
+    help
+      Enable static analysis during build.
+
+      Tools used:
+      - clang-tidy (if available)
+      - cppcheck (if available)
+
+      Analysis results will be shown during compilation.
+
+config ENABLE_CLANG_FORMAT
+    bool "Enable clang-format checks"
+    default n
+    help
+      Check code formatting with clang-format during build.
+
+      Uses .clang-format configuration file.
+      Build will fail if formatting issues are found.
+
+#-----------------------------------------------------------------------------
+# Build Performance
+#-----------------------------------------------------------------------------
+
+config ENABLE_CCACHE
+    bool "Enable ccache"
+    default y
+    help
+      Use ccache to speed up recompilation.
+
+      ccache caches compilation results to speed up rebuilds.
+      Requires ccache to be installed on the system.
+
+config ENABLE_PARALLEL_BUILD
+    bool "Enable parallel build"
+    default y
+    help
+      Enable parallel compilation using multiple CPU cores.
+
+      Significantly speeds up build time on multi-core systems.
+      Number of parallel jobs is automatically determined.
+
+#-----------------------------------------------------------------------------
+# Verbose Output
+#-----------------------------------------------------------------------------
+
+config VERBOSE_BUILD
+    bool "Verbose build output"
+    default n
+    help
+      Show detailed compilation commands during build.
+
+      When enabled, shows full compiler command lines.
+      Useful for debugging build issues.
+
+endmenu

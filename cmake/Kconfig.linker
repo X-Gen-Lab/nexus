@@ -1,0 +1,190 @@
+# cmake/Kconfig.linker - Linker Configuration
+#
+# This file defines linker script selection and memory layout configuration
+# for embedded targets.
+
+if !PLATFORM_NATIVE
+
+menu "Linker Configuration"
+
+#-----------------------------------------------------------------------------
+# Linker Script
+#-----------------------------------------------------------------------------
+
+config LINKER_SCRIPT
+    string "Linker script path"
+    default ""
+    help
+      Path to linker script file (relative to project root).
+      Leave empty to use platform default.
+
+      Linker script defines:
+      - Memory regions (FLASH, RAM, etc.)
+      - Section placement
+      - Stack and heap locations
+
+      Examples by toolchain:
+      - GCC:       platforms/stm32/linker/STM32F407VGTx_FLASH.ld
+      - IAR:       platforms/stm32/linker/STM32F407VGTx_FLASH.icf
+      - ARM Clang: platforms/stm32/linker/STM32F407VGTx_FLASH.sct
+
+#-----------------------------------------------------------------------------
+# Memory Configuration
+#-----------------------------------------------------------------------------
+
+config STACK_SIZE
+    hex "Stack size (bytes)"
+    default 0x400
+    help
+      Size of the main stack in bytes (hexadecimal).
+
+      Stack is used for:
+      - Local variables
+      - Function call frames
+      - Interrupt context
+
+      Typical values:
+      - 0x400  (1 KB)  - Minimal, simple applications
+      - 0x800  (2 KB)  - Small applications
+      - 0x1000 (4 KB)  - Medium applications
+      - 0x2000 (8 KB)  - Large applications, deep call stacks
+
+      Note: Too small causes stack overflow, too large wastes RAM.
+
+config HEAP_SIZE
+    hex "Heap size (bytes)"
+    default 0x200
+    help
+      Size of the heap in bytes (hexadecimal).
+
+      Heap is used for:
+      - Dynamic memory allocation (malloc/free)
+      - C++ new/delete operators
+      - Runtime allocations
+
+      Typical values:
+      - 0x0    (0 B)   - No dynamic allocation
+      - 0x200  (512 B) - Minimal dynamic allocation
+      - 0x1000 (4 KB)  - Small dynamic allocation
+      - 0x4000 (16 KB) - Medium dynamic allocation
+      - 0x10000 (64 KB) - Large dynamic allocation
+
+      Note: Set to 0 if not using dynamic memory allocation.
+
+#-----------------------------------------------------------------------------
+# Linker Optimization
+#-----------------------------------------------------------------------------
+
+config LINKER_GC_SECTIONS
+    bool "Enable garbage collection of unused sections"
+    default y
+    help
+      Remove unused code and data sections during linking.
+
+      Benefits:
+      - Significantly reduces binary size
+      - Removes unused library code
+      - Removes unused static functions
+
+      Requirements:
+      - Compiler must use -ffunction-sections -fdata-sections
+
+      Toolchain flags:
+      - GCC:       -Wl,--gc-sections
+      - ARM Clang: --remove
+      - IAR:       --vfe
+
+config LINKER_LTO
+    bool "Enable Link Time Optimization (LTO)"
+    default n
+    depends on !BUILD_TYPE_DEBUG
+    help
+      Enable Link Time Optimization for better code size and performance.
+
+      Benefits:
+      - Better optimization across translation units
+      - Smaller code size (5-15% reduction)
+      - Better performance
+
+      Drawbacks:
+      - Significantly increases link time
+      - Requires more memory during linking
+      - May complicate debugging
+
+      Recommended for: Release builds with size constraints
+
+#-----------------------------------------------------------------------------
+# Linker Output
+#-----------------------------------------------------------------------------
+
+config LINKER_MAP_FILE
+    bool "Generate linker map file"
+    default y
+    help
+      Generate a map file showing memory layout and symbol addresses.
+
+      Map file contains:
+      - Memory region usage
+      - Section sizes
+      - Symbol addresses
+      - Cross-references (if enabled)
+
+      Map file location: build/<target>.map
+
+config LINKER_CROSS_REFERENCE
+    bool "Generate cross-reference in map file"
+    default n
+    depends on LINKER_MAP_FILE
+    help
+      Generate cross-reference information in the map file.
+
+      Cross-reference shows:
+      - Which symbols reference each other
+      - Where symbols are defined
+      - Where symbols are used
+
+      Note: Increases map file size significantly.
+
+      Toolchain flags:
+      - GCC:       -Wl,--cref
+      - ARM Clang: --xref
+      - IAR:       --log all
+
+config LINKER_PRINT_MEMORY_USAGE
+    bool "Print memory usage after linking"
+    default y
+    help
+      Print memory usage statistics after linking.
+
+      Shows:
+      - FLASH usage (code + const data)
+      - RAM usage (data + bss)
+      - Percentage of memory used
+
+      Toolchain support:
+      - GCC:       -Wl,--print-memory-usage
+      - ARM Clang: --info=sizes,totals
+      - IAR:       (automatic in map file)
+
+#-----------------------------------------------------------------------------
+# Advanced Linker Options
+#-----------------------------------------------------------------------------
+
+config LINKER_CUSTOM_FLAGS
+    string "Custom linker flags"
+    default ""
+    help
+      Additional custom linker flags to append.
+
+      Use with caution as these flags are passed directly to the linker.
+
+      Examples:
+      - "--wrap=malloc" - Wrap malloc function
+      - "--defsym=_stack_size=0x1000" - Define symbol
+      - "-L/path/to/libs" - Add library search path
+
+      Separate multiple flags with spaces.
+
+endmenu
+
+endif # !PLATFORM_NATIVE

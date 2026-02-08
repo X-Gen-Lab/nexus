@@ -1,0 +1,401 @@
+# cmake/Kconfig.toolchain - Toolchain Selection and Configuration
+#
+# This file defines toolchain selection and architecture-specific
+# configuration for ARM embedded targets.
+
+menu "Toolchain Configuration"
+
+#-----------------------------------------------------------------------------
+# Toolchain Selection
+#-----------------------------------------------------------------------------
+
+choice
+    prompt "Toolchain"
+    default TOOLCHAIN_GCC if PLATFORM_NATIVE
+    default TOOLCHAIN_ARM_GCC if !PLATFORM_NATIVE
+    help
+      Select the compiler toolchain for building the project.
+      Available toolchains depend on the target platform.
+
+config TOOLCHAIN_GCC
+    bool "GCC (GNU Compiler Collection)"
+    depends on PLATFORM_NATIVE
+    help
+      GCC compiler for native platform development.
+
+      Features:
+      - Free and open-source
+      - Excellent optimization
+      - Wide platform support
+      - Mature and stable
+
+      Recommended for: Linux/Windows native development
+
+config TOOLCHAIN_CLANG
+    bool "Clang/LLVM"
+    depends on PLATFORM_NATIVE
+    help
+      Clang/LLVM compiler for native platform development.
+
+      Features:
+      - Modern compiler infrastructure
+      - Excellent diagnostics
+      - Fast compilation
+      - Better error messages
+
+      Recommended for: Development with advanced diagnostics
+
+config TOOLCHAIN_MSVC
+    bool "MSVC (Microsoft Visual C++)"
+    depends on PLATFORM_NATIVE
+    help
+      Microsoft Visual C++ compiler for Windows development.
+
+      Features:
+      - Best Windows integration
+      - Visual Studio IDE support
+      - Windows-specific optimizations
+      - Excellent debugging tools
+
+      Recommended for: Windows-only development
+
+config TOOLCHAIN_ARM_GCC
+    bool "ARM GCC (arm-none-eabi-gcc)"
+    depends on !PLATFORM_NATIVE
+    help
+      ARM GCC toolchain for embedded ARM development.
+
+      Features:
+      - Free and open-source
+      - Wide community support
+      - Supports all Cortex-M cores
+      - Regular updates
+
+      Supported cores: Cortex-M0/M0+/M3/M4/M7/M33
+      Recommended for: General embedded development
+
+config TOOLCHAIN_ARM_CLANG
+    bool "ARM Clang (armclang)"
+    depends on !PLATFORM_NATIVE
+    help
+      ARM Compiler 6 (armclang) for embedded ARM development.
+
+      Features:
+      - Official ARM toolchain
+      - Excellent optimization
+      - Best code density
+      - Advanced features
+
+      Note: Requires commercial license from ARM
+      Recommended for: Production with size constraints
+
+config TOOLCHAIN_IAR
+    bool "IAR EWARM (iccarm)"
+    depends on !PLATFORM_NATIVE
+    help
+      IAR Embedded Workbench for ARM compiler.
+
+      Features:
+      - Excellent code size optimization
+      - Comprehensive IDE
+      - Strong debugging support
+      - Industry standard
+
+      Note: Requires commercial license from IAR Systems
+      Recommended for: Safety-critical applications
+
+endchoice
+
+config TOOLCHAIN_NAME
+    string
+    default "gcc" if TOOLCHAIN_GCC
+    default "clang" if TOOLCHAIN_CLANG
+    default "msvc" if TOOLCHAIN_MSVC
+    default "arm-none-eabi-gcc" if TOOLCHAIN_ARM_GCC
+    default "armclang" if TOOLCHAIN_ARM_CLANG
+    default "iar-arm" if TOOLCHAIN_IAR
+
+config TOOLCHAIN_FILE
+    string
+    default "" if PLATFORM_NATIVE
+    default "cmake/toolchains/arm-none-eabi.cmake" if TOOLCHAIN_ARM_GCC
+    default "cmake/toolchains/armclang.cmake" if TOOLCHAIN_ARM_CLANG
+    default "cmake/toolchains/iar-arm.cmake" if TOOLCHAIN_IAR
+    help
+      Path to CMake toolchain file (relative to project root).
+
+      Toolchain files configure:
+      - Compiler paths
+      - Compiler flags
+      - Linker flags
+      - Target architecture
+
+#-----------------------------------------------------------------------------
+# ARM Architecture Configuration
+#-----------------------------------------------------------------------------
+
+if !PLATFORM_NATIVE
+
+menu "ARM Architecture"
+
+#-----------------------------------------------------------------------------
+# CPU Selection
+#-----------------------------------------------------------------------------
+
+choice
+    prompt "CPU Architecture"
+    default CPU_CORTEX_M0 if STM32F0
+    default CPU_CORTEX_M0PLUS if STM32L0 || STM32U0 || STM32G0 || STM32C0
+    default CPU_CORTEX_M3 if STM32F1 || STM32F2 || STM32L1
+    default CPU_CORTEX_M4 if STM32F3 || STM32F4 || STM32L4 || STM32WB || STM32WL || STM32G4
+    default CPU_CORTEX_M7 if STM32F7 || STM32H7
+    default CPU_CORTEX_M33 if STM32H5 || STM32L5 || STM32U3 || STM32U5
+    default CPU_CORTEX_M4
+    help
+      Select the ARM Cortex-M CPU architecture.
+      This determines instruction set and available features.
+
+      For STM32 platform, this is automatically set based on
+      the selected STM32 series.
+
+config CPU_CORTEX_M0
+    bool "Cortex-M0"
+    help
+      ARM Cortex-M0 processor (ARMv6-M architecture).
+
+      Features:
+      - Entry-level processor
+      - Minimal power consumption
+      - Thumb instruction set only
+      - No FPU support
+
+      Typical frequency: 24-48 MHz
+      Use cases: Simple control, IoT sensors
+
+config CPU_CORTEX_M0PLUS
+    bool "Cortex-M0+"
+    help
+      ARM Cortex-M0+ processor (ARMv6-M architecture).
+
+      Features:
+      - Enhanced M0 core
+      - Better performance than M0
+      - Lower power than M0
+      - Optional MTB (Micro Trace Buffer)
+
+      Typical frequency: 32-64 MHz
+      Use cases: Battery-powered devices, wearables
+
+config CPU_CORTEX_M3
+    bool "Cortex-M3"
+    help
+      ARM Cortex-M3 processor (ARMv7-M architecture).
+
+      Features:
+      - Thumb-2 instruction set
+      - Hardware divide
+      - MPU (Memory Protection Unit)
+      - No FPU
+
+      Typical frequency: 72-120 MHz
+      Use cases: General embedded applications
+
+config CPU_CORTEX_M4
+    bool "Cortex-M4"
+    help
+      ARM Cortex-M4 processor (ARMv7E-M architecture).
+
+      Features:
+      - DSP instructions
+      - Optional FPU (single precision)
+      - SIMD operations
+      - MPU
+
+      Typical frequency: 80-180 MHz
+      Use cases: Digital signal processing, motor control
+
+config CPU_CORTEX_M7
+    bool "Cortex-M7"
+    help
+      ARM Cortex-M7 processor (ARMv7E-M architecture).
+
+      Features:
+      - Superscalar pipeline
+      - Optional FPU (single/double precision)
+      - Cache (I-Cache, D-Cache)
+      - TCM (Tightly Coupled Memory)
+
+      Typical frequency: 200-600 MHz
+      Use cases: High-performance applications, graphics
+
+config CPU_CORTEX_M33
+    bool "Cortex-M33"
+    help
+      ARM Cortex-M33 processor (ARMv8-M architecture).
+
+      Features:
+      - TrustZone security
+      - Optional FPU (single precision)
+      - DSP instructions
+      - Co-processor interface
+
+      Typical frequency: 100-200 MHz
+      Use cases: Secure IoT, payment systems
+
+endchoice
+
+config CPU_ARCH
+    string
+    default "cortex-m0" if CPU_CORTEX_M0
+    default "cortex-m0plus" if CPU_CORTEX_M0PLUS
+    default "cortex-m3" if CPU_CORTEX_M3
+    default "cortex-m4" if CPU_CORTEX_M4
+    default "cortex-m7" if CPU_CORTEX_M7
+    default "cortex-m33" if CPU_CORTEX_M33
+
+#-----------------------------------------------------------------------------
+# FPU Configuration
+#-----------------------------------------------------------------------------
+
+choice
+    prompt "FPU Type"
+    default FPU_NONE if CPU_CORTEX_M0 || CPU_CORTEX_M0PLUS || CPU_CORTEX_M3
+    default FPU_FPV4_SP if CPU_CORTEX_M4
+    default FPU_FPV5_D16 if CPU_CORTEX_M7
+    default FPU_FPV5_SP if CPU_CORTEX_M33
+    help
+      Select the Floating Point Unit (FPU) type.
+      Not all CPUs support FPU.
+
+      FPU provides hardware acceleration for floating point operations.
+      Without FPU, floating point uses software emulation (slower).
+
+config FPU_NONE
+    bool "No FPU"
+    help
+      No hardware floating point support.
+
+      Characteristics:
+      - Floating point uses software emulation
+      - Slower floating point operations
+      - Smaller code size
+      - Lower power consumption
+
+      Use when: Floating point not needed or rare
+
+config FPU_FPV4_SP
+    bool "FPv4-SP (Single Precision)"
+    depends on CPU_CORTEX_M4 || CPU_CORTEX_M7
+    help
+      FPv4 single-precision FPU (32-bit float).
+
+      Characteristics:
+      - Hardware float (32-bit) operations
+      - Fast floating point math
+      - Available on Cortex-M4 and M7
+
+      Use when: Need fast float calculations
+
+config FPU_FPV5_SP
+    bool "FPv5-SP (Single Precision)"
+    depends on CPU_CORTEX_M7 || CPU_CORTEX_M33
+    help
+      FPv5 single-precision FPU (32-bit float).
+
+      Characteristics:
+      - Enhanced FPv4 with better performance
+      - Hardware float (32-bit) operations
+      - Available on Cortex-M7 and M33
+
+      Use when: Need fast float on M7/M33
+
+config FPU_FPV5_D16
+    bool "FPv5-D16 (Double Precision)"
+    depends on CPU_CORTEX_M7
+    help
+      FPv5 double-precision FPU (64-bit double).
+
+      Characteristics:
+      - Hardware double (64-bit) operations
+      - Highest precision
+      - Only available on Cortex-M7
+      - Larger code size
+
+      Use when: Need high precision calculations
+
+endchoice
+
+config FPU_TYPE
+    string
+    default "" if FPU_NONE
+    default "fpv4-sp-d16" if FPU_FPV4_SP
+    default "fpv5-sp-d16" if FPU_FPV5_SP
+    default "fpv5-d16" if FPU_FPV5_D16
+
+#-----------------------------------------------------------------------------
+# Float ABI Configuration
+#-----------------------------------------------------------------------------
+
+choice
+    prompt "Float ABI"
+    default FLOAT_ABI_SOFT if FPU_NONE
+    default FLOAT_ABI_HARD if !FPU_NONE
+    help
+      Select the floating point ABI (Application Binary Interface).
+
+      This affects how floating point parameters are passed between functions.
+
+config FLOAT_ABI_SOFT
+    bool "Soft"
+    help
+      Software floating point (no FPU usage).
+
+      Characteristics:
+      - All floating point in software
+      - Compatible with all code
+      - Slower performance
+      - Smaller code size
+
+      Use when: No FPU or maximum compatibility needed
+
+config FLOAT_ABI_SOFTFP
+    bool "Soft FP"
+    depends on !FPU_NONE
+    help
+      Hardware FPU with software calling convention.
+
+      Characteristics:
+      - FPU used for calculations
+      - Software calling convention
+      - Compatible with soft-float libraries
+      - Moderate performance
+
+      Use when: Need to mix FPU and non-FPU code
+
+config FLOAT_ABI_HARD
+    bool "Hard"
+    depends on !FPU_NONE
+    help
+      Hardware FPU with hardware calling convention.
+
+      Characteristics:
+      - FPU used for calculations and calls
+      - Best performance
+      - Requires FPU-aware libraries
+      - Larger code size
+
+      Use when: Maximum FPU performance needed
+
+endchoice
+
+config FLOAT_ABI
+    string
+    default "soft" if FLOAT_ABI_SOFT
+    default "softfp" if FLOAT_ABI_SOFTFP
+    default "hard" if FLOAT_ABI_HARD
+
+endmenu
+
+endif # !PLATFORM_NATIVE
+
+endmenu

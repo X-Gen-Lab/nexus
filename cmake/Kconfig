@@ -1,0 +1,36 @@
+# cmake/Kconfig - Build System Configuration
+#
+# This is the main entry point for build system configuration.
+# It organizes build-related settings into logical modules:
+#   - Build type and options
+#   - Toolchain selection
+#   - Compiler settings
+#   - Linker settings
+
+menu "Build System Configuration"
+
+#-----------------------------------------------------------------------------
+# Build Configuration
+#-----------------------------------------------------------------------------
+
+source "cmake/Kconfig.build"
+
+#-----------------------------------------------------------------------------
+# Toolchain Configuration
+#-----------------------------------------------------------------------------
+
+source "cmake/Kconfig.toolchain"
+
+#-----------------------------------------------------------------------------
+# Compiler Configuration
+#-----------------------------------------------------------------------------
+
+source "cmake/Kconfig.compiler"
+
+#-----------------------------------------------------------------------------
+# Linker Configuration
+#-----------------------------------------------------------------------------
+
+source "cmake/Kconfig.linker"
+
+endmenu
