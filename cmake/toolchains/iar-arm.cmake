@@ -178,61 +178,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --diag_suppress=Pe1665")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --c99")
 
 #-----------------------------------------------------------------------------
-# Toolchain Adapter Functions
-#-----------------------------------------------------------------------------
-
-# Generate binary files from ELF
-# Arguments:
-#   TARGET: Target name
-function(nexus_generate_binary TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --bin $<TARGET_FILE:${TARGET}> ${TARGET}.bin
-        COMMAND ${CMAKE_OBJCOPY} --ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
-        COMMENT "Generating ${TARGET}.bin and ${TARGET}.hex"
-    )
-endfunction()
-
-# Print section sizes
-# Arguments:
-#   TARGET: Target name
-function(nexus_print_size TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --size $<TARGET_FILE:${TARGET}>
-        COMMENT "Size of ${TARGET}:"
-    )
-endfunction()
-
-# Generate disassembly listing
-# Arguments:
-#   TARGET: Target name
-function(nexus_generate_listing TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --code $<TARGET_FILE:${TARGET}> ${TARGET}.lst
-        COMMENT "Generating ${TARGET}.lst"
-    )
-endfunction()
-
-# Configure target for IAR toolchain
-# Arguments:
-#   TARGET: Target name
-#   LINKER_SCRIPT: Path to linker script (ICF file)
-function(nexus_configure_arm_target TARGET)
-    # Parse arguments
-    cmake_parse_arguments(ARG "" "LINKER_SCRIPT" "" ${ARGN})
-
-    # Set linker script if provided
-    if(ARG_LINKER_SCRIPT)
-        target_link_options(${TARGET} PRIVATE
-            --config ${ARG_LINKER_SCRIPT}
-        )
-    endif()
-
-    # Generate binary and hex files
-    nexus_generate_binary(${TARGET})
-    nexus_print_size(${TARGET})
-endfunction()
-
-#-----------------------------------------------------------------------------
 # Toolchain Information
 #-----------------------------------------------------------------------------
 

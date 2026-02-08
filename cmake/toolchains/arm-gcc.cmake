@@ -143,69 +143,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 #-----------------------------------------------------------------------------
-# Toolchain Adapter Functions
-#-----------------------------------------------------------------------------
-
-# Generate binary files from ELF
-# Arguments:
-#   TARGET: Target name
-function(nexus_generate_binary TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${TARGET}> ${TARGET}.bin
-        COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${TARGET}> ${TARGET}.hex
-        COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${TARGET}>
-        COMMENT "Generating ${TARGET}.bin and ${TARGET}.hex"
-    )
-endfunction()
-
-# Print section sizes
-# Arguments:
-#   TARGET: Target name
-function(nexus_print_size TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${TARGET}>
-        COMMENT "Size of ${TARGET}:"
-    )
-endfunction()
-
-# Generate disassembly listing
-# Arguments:
-#   TARGET: Target name
-function(nexus_generate_listing TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-        COMMAND ${CMAKE_OBJDUMP} -h -S $<TARGET_FILE:${TARGET}> > ${TARGET}.lst
-        COMMENT "Generating ${TARGET}.lst"
-    )
-endfunction()
-
-# Configure target for ARM GCC toolchain
-# Arguments:
-#   TARGET: Target name
-#   LINKER_SCRIPT: Path to linker script
-function(nexus_configure_arm_target TARGET)
-    # Parse arguments
-    cmake_parse_arguments(ARG "" "LINKER_SCRIPT" "" ${ARGN})
-
-    # Set linker script if provided
-    if(ARG_LINKER_SCRIPT)
-        target_link_options(${TARGET} PRIVATE
-            -T${ARG_LINKER_SCRIPT}
-        )
-    endif()
-
-    # Add standard ARM libraries
-    target_link_libraries(${TARGET} PRIVATE
-        c
-        m
-        nosys
-    )
-
-    # Generate binary and hex files
-    nexus_generate_binary(${TARGET})
-    nexus_print_size(${TARGET})
-endfunction()
-
-#-----------------------------------------------------------------------------
 # Toolchain Information
 #-----------------------------------------------------------------------------
 

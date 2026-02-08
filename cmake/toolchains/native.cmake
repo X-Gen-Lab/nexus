@@ -77,18 +77,6 @@ elseif(APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Toolchain Adapter Functions
-#-----------------------------------------------------------------------------
-
-# Configure target for native platform
-# Arguments:
-#   TARGET: Target name
-function(nexus_configure_native_target TARGET)
-    # No special configuration needed for native targets
-    # Standard CMake target configuration applies
-endfunction()
-
-#-----------------------------------------------------------------------------
 # Toolchain Information
 #-----------------------------------------------------------------------------
 
