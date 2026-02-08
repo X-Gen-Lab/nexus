@@ -452,36 +452,51 @@ def generate_header(config, output_path):
         header.append('/*' + '-' * 75 + '*/')
         header.append('')
 
-        # Generate GPIO instance macro first (special case)
+        # Generate GPIO instance macros (special case - group by platform)
         if gpio_instances:
-            # Sort GPIO instances by port then pin
-            gpio_instances_sorted = sorted(gpio_instances, key=lambda x: (x[0], int(x[1])))
+            # Group GPIO instances by platform
+            gpio_by_platform = {}
+            for platform, peripheral, instance_id, original_suffix, is_gpio_pin, gpio_info in [
+                parse_instance_symbol(f'NX_CONFIG_INSTANCE_{key.replace("CONFIG_", "")}', value)
+                for key, value in config.items()
+                if 'INSTANCE_' in key and 'GPIO' in key and '_PIN' in key and value is True
+            ]:
+                if is_gpio_pin and gpio_info:
+                    if platform not in gpio_by_platform:
+                        gpio_by_platform[platform] = []
+                    gpio_by_platform[platform].append(gpio_info)
 
-            header.append('/**')
-            header.append(' * \\brief           GPIO instance traversal macro')
-            header.append(' *')
-            header.append(' * This macro expands to call the provided function for each enabled')
-            header.append(' * GPIO instance. Used by the device registration system.')
-            header.append(' *')
-            header.append(' * Example:')
-            header.append(' *   NX_DEFINE_INSTANCE_NX_GPIO(MY_REGISTER_FUNC)')
-            header.append(' *   expands to:')
-            examples = [f'MY_REGISTER_FUNC({port}, {pin})' for port, pin in gpio_instances_sorted[:2]]
-            if len(gpio_instances_sorted) > 2:
-                examples.append('...')
-            header.append(' *   ' + ' '.join(examples))
-            header.append(' */')
+            # Generate macro for each platform
+            for platform in sorted(gpio_by_platform.keys()):
+                instances = gpio_by_platform[platform]
+                # Sort GPIO instances by port then pin
+                instances_sorted = sorted(instances, key=lambda x: (x[0], int(x[1])))
 
-            # Generate the macro definition
-            macro_lines = []
-            for port, pin in gpio_instances_sorted:
-                macro_lines.append(f'    fn({port}, {pin})')
+                header.append('/**')
+                header.append(f' * \\brief           {platform} GPIO instance traversal macro')
+                header.append(' *')
+                header.append(' * This macro expands to call the provided function for each enabled')
+                header.append(' * GPIO instance. Used by the device registration system.')
+                header.append(' *')
+                header.append(' * Example:')
+                header.append(f' *   NX_DEFINE_INSTANCE_{platform}_GPIO(MY_REGISTER_FUNC)')
+                header.append(' *   expands to:')
+                examples = [f'MY_REGISTER_FUNC({port}, {pin})' for port, pin in instances_sorted[:2]]
+                if len(instances_sorted) > 2:
+                    examples.append('...')
+                header.append(' *   ' + ' '.join(examples))
+                header.append(' */')
 
-            header.append('#define NX_DEFINE_INSTANCE_NX_GPIO(fn) \\')
-            header.append(' \\\n'.join(macro_lines))
-            header.append('')
+                # Generate the macro definition
+                macro_lines = []
+                for port, pin in instances_sorted:
+                    macro_lines.append(f'    fn({port}, {pin})')
 
-            print(f"Generated GPIO instance macro with {len(gpio_instances_sorted)} instances")
+                header.append(f'#define NX_DEFINE_INSTANCE_{platform}_GPIO(fn) \\')
+                header.append(' \\\n'.join(macro_lines))
+                header.append('')
+
+                print(f"Generated {platform} GPIO instance macro with {len(instances_sorted)} instances")
 
         # Generate other peripheral instance macros
         # Group by platform_peripheral key
