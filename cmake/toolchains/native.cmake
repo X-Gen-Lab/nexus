@@ -1,8 +1,6 @@
-##############################################################################
+#-----------------------------------------------------------------------------
 # native.cmake - Native Platform Toolchain Configuration
-##############################################################################
-#
-# native.cmake
+#-----------------------------------------------------------------------------
 # Native platform toolchain configuration for Nexus build system
 # Author: Nexus Team
 #
@@ -10,17 +8,17 @@
 # for PC-based development and testing. Supports Windows (MSVC), Linux
 # (GCC/Clang), and macOS (Clang/AppleClang) for native platform builds.
 #
+# Requires: CMake 3.21+
 # Validates: Requirements 4.3
-#
-##############################################################################
+#-----------------------------------------------------------------------------
 
 # Native platform - no cross-compilation
 set(CMAKE_SYSTEM_NAME ${CMAKE_HOST_SYSTEM_NAME})
 set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Toolchain Detection
-##############################################################################
+#-----------------------------------------------------------------------------
 
 # Detect compiler automatically
 # CMake will use the default system compiler
@@ -51,22 +49,17 @@ endif()
 #-----------------------------------------------------------------------------
 # Build Type Specific Flags
 #-----------------------------------------------------------------------------
-# Note: Build type flags are now managed centrally by NexusCompilerFlags.cmake
-# See cmake/modules/NexusCompilerFlags.cmake::nexus_set_default_build_type_flags()
-#
-# This provides:
-#   - Consistent flags across all toolchains
-#   - Easier customization through command line or presets
-#   - Better maintainability
+# Note: Build type flags are now managed centrally by NexusCompilerConfig.cmake
+# This provides better consistency and allows easier customization.
 #
 # To customize build type flags, use one of these methods:
 #   1. Command line: cmake -DCMAKE_C_FLAGS_DEBUG="-O0 -g3"
 #   2. CMakePresets.json: "CMAKE_C_FLAGS_DEBUG": "-O0 -g3"
 #   3. Before project(): set(CMAKE_C_FLAGS_DEBUG "-O0 -g3" CACHE STRING "")
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Platform-Specific Settings
-##############################################################################
+#-----------------------------------------------------------------------------
 
 if(WIN32)
     # Windows-specific settings
@@ -83,22 +76,21 @@ elseif(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif()
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Toolchain Adapter Functions
-##############################################################################
+#-----------------------------------------------------------------------------
 
-#
 # Configure target for native platform
-# TARGET: Target name
-#
+# Arguments:
+#   TARGET: Target name
 function(nexus_configure_native_target TARGET)
     # No special configuration needed for native targets
     # Standard CMake target configuration applies
 endfunction()
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # Toolchain Information
-##############################################################################
+#-----------------------------------------------------------------------------
 
 message(STATUS "Native Platform Toolchain Configuration:")
 message(STATUS "  System:     ${CMAKE_SYSTEM_NAME}")
@@ -107,6 +99,6 @@ message(STATUS "  Compiler:   ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
 message(STATUS "  Toolchain:  ${NEXUS_TOOLCHAIN_NAME}")
 message(STATUS "  Vendor:     ${NEXUS_TOOLCHAIN_VENDOR}")
 
-##############################################################################
+#-----------------------------------------------------------------------------
 # End of native.cmake
-##############################################################################
+#-----------------------------------------------------------------------------
