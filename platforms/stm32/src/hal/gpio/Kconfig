@@ -1,0 +1,111 @@
+# STM32 GPIO Driver Configuration
+# This file is sourced from platforms/stm32/src/hal/Kconfig
+# when STM32_GPIO_ENABLE is selected
+# Author: Nexus Team
+
+#-----------------------------------------------------------------------------
+# GPIO Driver Features
+#-----------------------------------------------------------------------------
+
+config STM32_GPIO_USE_EXTI
+    bool "Enable external interrupt support"
+    default n
+    help
+      Enable external interrupt (EXTI) support for GPIO pins.
+
+      When enabled, GPIO pins can be configured to trigger interrupts
+      on rising edge, falling edge, or both edges.
+
+#-----------------------------------------------------------------------------
+# GPIO Pin Configuration
+#-----------------------------------------------------------------------------
+# GPIO instances are configured using the format:
+#   INSTANCE_STM32_GPIO<PORT>_PIN<NUM>
+#
+# For example: INSTANCE_STM32_GPIOA_PIN5 for PA5
+#
+# The generate_config.py script will generate traversal macros in nexus_config.h:
+#   NX_DEFINE_INSTANCE_STM32_GPIO(fn) -> fn(A, 5) fn(B, 0) ...
+#
+# Each GPIO pin can be configured with mode, pull, speed, and alternate function.
+#-----------------------------------------------------------------------------
+
+menu "GPIO Pin Configuration"
+
+# Source chip-specific GPIO configuration based on selected chip series
+# Each chip series has different GPIO port availability and pin counts
+
+if STM32F1
+rsource "Kconfig_gpio_stm32f1"
+endif
+
+if STM32F4
+rsource "Kconfig_gpio_stm32f4"
+endif
+
+# TODO: Generate and add other series configurations
+# if STM32C0
+# rsource "Kconfig_gpio_stm32c0"
+# endif
+#
+# if STM32F0
+# rsource "Kconfig_gpio_stm32f0"
+# endif
+#
+# if STM32F2
+# rsource "Kconfig_gpio_stm32f2"
+# endif
+#
+# if STM32F3
+# rsource "Kconfig_gpio_stm32f3"
+# endif
+#
+# if STM32F7
+# rsource "Kconfig_gpio_stm32f7"
+# endif
+#
+# if STM32G0
+# rsource "Kconfig_gpio_stm32g0"
+# endif
+#
+# if STM32G4
+# rsource "Kconfig_gpio_stm32g4"
+# endif
+#
+# if STM32H5
+# rsource "Kconfig_gpio_stm32h5"
+# endif
+#
+# if STM32H7
+# rsource "Kconfig_gpio_stm32h7"
+# endif
+#
+# if STM32L0
+# rsource "Kconfig_gpio_stm32l0"
+# endif
+#
+# if STM32L1
+# rsource "Kconfig_gpio_stm32l1"
+# endif
+#
+# if STM32L4
+# rsource "Kconfig_gpio_stm32l4"
+# endif
+#
+# if STM32L5
+# rsource "Kconfig_gpio_stm32l5"
+# endif
+#
+# if STM32U0
+# rsource "Kconfig_gpio_stm32u0"
+# endif
+#
+# if STM32U3
+# rsource "Kconfig_gpio_stm32u3"
+# endif
+#
+# if STM32U5
+# rsource "Kconfig_gpio_stm32u5"
+# endif
+
+endmenu  # GPIO Pin Configuration

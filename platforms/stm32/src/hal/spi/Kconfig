@@ -1,0 +1,207 @@
+# STM32 SPI Driver Configuration
+# This file is sourced from platforms/stm32/src/hal/Kconfig
+# when STM32_SPI_ENABLE is selected
+
+config STM32_SPI_MAX_INSTANCES
+    int "Maximum number of SPI instances"
+    default 6
+    range 1 8
+    help
+      Maximum number of SPI instances supported by the platform.
+      This determines the size of the SPI instance array.
+
+config STM32_SPI_USE_OSAL
+    bool "Use OSAL for thread safety"
+    default n
+    depends on OSAL_ENABLE
+    help
+      Enable OSAL integration for SPI driver.
+      When enabled, SPI operations are protected by mutexes
+      and DMA transfers use semaphores for synchronization.
+
+      This is required for multi-threaded applications using RTOS.
+      For bare-metal applications, this can be disabled.
+
+config STM32_SPI_USE_DMA
+    bool "Enable DMA support for SPI"
+    default n
+    help
+      Enable DMA (Direct Memory Access) support for SPI transfers.
+      DMA can significantly reduce CPU load for large data transfers.
+
+      Note: DMA support requires proper DMA channel configuration
+      and may require OSAL for synchronization.
+
+config STM32_SPI_DEFAULT_MODE
+    int "Default SPI mode"
+    default 0
+    range 0 3
+    help
+      Default SPI mode (CPOL/CPHA combination).
+      0 = Mode 0 (CPOL=0, CPHA=0)
+      1 = Mode 1 (CPOL=0, CPHA=1)
+      2 = Mode 2 (CPOL=1, CPHA=0)
+      3 = Mode 3 (CPOL=1, CPHA=1)
+
+config STM32_SPI_DEFAULT_PRESCALER
+    int "Default baud rate prescaler"
+    default 4
+    help
+      Default baud rate prescaler for SPI.
+      0 = /2, 1 = /4, 2 = /8, 3 = /16, 4 = /32, 5 = /64, 6 = /128, 7 = /256
+
+#-----------------------------------------------------------------------------
+# Debug and Diagnostics
+#-----------------------------------------------------------------------------
+
+menu "SPI Debug Options"
+
+config STM32_SPI_DEBUG
+    bool "Enable SPI debug output"
+    default n
+    help
+      Enable debug output for SPI driver.
+      Useful for troubleshooting but increases code size.
+
+config STM32_SPI_STATS_EXTENDED
+    bool "Enable extended statistics"
+    default n
+    help
+      Track additional metrics:
+      - Transfer count
+      - Error count
+      - Average transfer size
+      Increases memory usage slightly.
+
+config STM32_SPI_TEST_SUPPORT
+    bool "Enable test support functions"
+    default n
+    help
+      Enable test helper functions for unit testing.
+      Should be disabled in production builds.
+
+endmenu
+
+#-----------------------------------------------------------------------------
+# SPI Instance Configuration
+#-----------------------------------------------------------------------------
+
+menuconfig STM32_SPI0_ENABLE
+    bool "Enable SPI0"
+    default n
+    help
+      Enable SPI0 instance.
+
+if STM32_SPI0_ENABLE
+
+config STM32_SPI0_USE_OSAL
+    bool "SPI0 use OSAL"
+    default STM32_SPI_USE_OSAL
+    depends on STM32_SPI_USE_OSAL
+
+config STM32_SPI0_USE_DMA
+    bool "SPI0 use DMA"
+    default STM32_SPI_USE_DMA
+    depends on STM32_SPI_USE_DMA
+
+endif # STM32_SPI0_ENABLE
+
+menuconfig STM32_SPI1_ENABLE
+    bool "Enable SPI1"
+    default n
+    help
+      Enable SPI1 instance.
+
+if STM32_SPI1_ENABLE
+
+config STM32_SPI1_USE_OSAL
+    bool "SPI1 use OSAL"
+    default STM32_SPI_USE_OSAL
+    depends on STM32_SPI_USE_OSAL
+
+config STM32_SPI1_USE_DMA
+    bool "SPI1 use DMA"
+    default STM32_SPI_USE_DMA
+    depends on STM32_SPI_USE_DMA
+
+endif # STM32_SPI1_ENABLE
+
+menuconfig STM32_SPI2_ENABLE
+    bool "Enable SPI2"
+    default n
+    help
+      Enable SPI2 instance.
+
+if STM32_SPI2_ENABLE
+
+config STM32_SPI2_USE_OSAL
+    bool "SPI2 use OSAL"
+    default STM32_SPI_USE_OSAL
+    depends on STM32_SPI_USE_OSAL
+
+config STM32_SPI2_USE_DMA
+    bool "SPI2 use DMA"
+    default STM32_SPI_USE_DMA
+    depends on STM32_SPI_USE_DMA
+
+endif # STM32_SPI2_ENABLE
+
+menuconfig STM32_SPI3_ENABLE
+    bool "Enable SPI3"
+    default n
+    help
+      Enable SPI3 instance.
+
+if STM32_SPI3_ENABLE
+
+config STM32_SPI3_USE_OSAL
+    bool "SPI3 use OSAL"
+    default STM32_SPI_USE_OSAL
+    depends on STM32_SPI_USE_OSAL
+
+config STM32_SPI3_USE_DMA
+    bool "SPI3 use DMA"
+    default STM32_SPI_USE_DMA
+    depends on STM32_SPI_USE_DMA
+
+endif # STM32_SPI3_ENABLE
+
+menuconfig STM32_SPI4_ENABLE
+    bool "Enable SPI4"
+    default n
+    help
+      Enable SPI4 instance.
+
+if STM32_SPI4_ENABLE
+
+config STM32_SPI4_USE_OSAL
+    bool "SPI4 use OSAL"
+    default STM32_SPI_USE_OSAL
+    depends on STM32_SPI_USE_OSAL
+
+config STM32_SPI4_USE_DMA
+    bool "SPI4 use DMA"
+    default STM32_SPI_USE_DMA
+    depends on STM32_SPI_USE_DMA
+
+endif # STM32_SPI4_ENABLE
+
+menuconfig STM32_SPI5_ENABLE
+    bool "Enable SPI5"
+    default n
+    help
+      Enable SPI5 instance.
+
+if STM32_SPI5_ENABLE
+
+config STM32_SPI5_USE_OSAL
+    bool "SPI5 use OSAL"
+    default STM32_SPI_USE_OSAL
+    depends on STM32_SPI_USE_OSAL
+
+config STM32_SPI5_USE_DMA
+    bool "SPI5 use DMA"
+    default STM32_SPI_USE_DMA
+    depends on STM32_SPI_USE_DMA
+
+endif # STM32_SPI5_ENABLE
