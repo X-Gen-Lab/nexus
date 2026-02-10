@@ -54,8 +54,6 @@ static nx_status_t uart_lifecycle_init(nx_lifecycle_t* self) {
         impl->state->rx_buf.count = 0;
     }
 
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_uart_stats_t));
 
     /* Set state flags */
     impl->state->initialized = true;
@@ -90,8 +88,6 @@ static nx_status_t uart_lifecycle_deinit(nx_lifecycle_t* self) {
         impl->state->rx_buf.count = 0;
     }
 
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_uart_stats_t));
 
     /* Clear state flags */
     impl->state->initialized = false;

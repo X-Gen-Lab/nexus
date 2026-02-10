@@ -44,7 +44,6 @@ static nx_tx_rx_sync_t* i2c_get_tx_rx_sync_handle(nx_i2c_bus_t* self,
                                                   uint8_t dev_addr);
 static nx_lifecycle_t* i2c_get_lifecycle(nx_i2c_bus_t* self);
 static nx_power_t* i2c_get_power(nx_i2c_bus_t* self);
-static nx_diagnostic_t* i2c_get_diagnostic(nx_i2c_bus_t* self);
 
 /* Interface implementations (defined in separate files) */
 extern void i2c_init_tx_async(nx_tx_async_t* tx_async);
@@ -53,7 +52,6 @@ extern void i2c_init_tx_sync(nx_tx_sync_t* tx_sync);
 extern void i2c_init_tx_rx_sync(nx_tx_rx_sync_t* tx_rx_sync);
 extern void i2c_init_lifecycle(nx_lifecycle_t* lifecycle);
 extern void i2c_init_power(nx_power_t* power);
-extern void i2c_init_diagnostic(nx_diagnostic_t* diagnostic);
 
 /*---------------------------------------------------------------------------*/
 /* Base Interface Getters                                                    */
@@ -147,14 +145,6 @@ static nx_power_t* i2c_get_power(nx_i2c_bus_t* self) {
     return impl ? &impl->power : NULL;
 }
 
-/**
- * \brief           Get diagnostic interface
- */
-static nx_diagnostic_t* i2c_get_diagnostic(nx_i2c_bus_t* self) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    return impl ? &impl->diagnostic : NULL;
-}
-
 /*---------------------------------------------------------------------------*/
 /* Instance Initialization                                                   */
 /*---------------------------------------------------------------------------*/
@@ -171,7 +161,6 @@ static void i2c_init_instance(nx_i2c_impl_t* impl, uint8_t index,
     impl->base.get_tx_rx_sync_handle = i2c_get_tx_rx_sync_handle;
     impl->base.get_lifecycle = i2c_get_lifecycle;
     impl->base.get_power = i2c_get_power;
-    impl->base.get_diagnostic = i2c_get_diagnostic;
 
     /* Initialize interfaces (implemented in separate files) */
     i2c_init_tx_async(&impl->tx_async);
@@ -180,7 +169,6 @@ static void i2c_init_instance(nx_i2c_impl_t* impl, uint8_t index,
     i2c_init_tx_rx_sync(&impl->tx_rx_sync);
     i2c_init_lifecycle(&impl->lifecycle);
     i2c_init_power(&impl->power);
-    i2c_init_diagnostic(&impl->diagnostic);
 
     /* Allocate and initialize state */
     impl->state = (nx_i2c_state_t*)nx_mem_alloc(sizeof(nx_i2c_state_t));
@@ -220,8 +208,6 @@ static void i2c_init_instance(nx_i2c_impl_t* impl, uint8_t index,
         impl->state->rx_buf.count = 0;
     }
 
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_i2c_stats_t));
 
     /* Clear device handle */
     memset(&impl->state->current_device, 0, sizeof(nx_i2c_device_handle_t));

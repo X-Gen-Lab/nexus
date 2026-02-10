@@ -37,7 +37,6 @@ static void adc_trigger(nx_adc_t* self);
 static nx_adc_channel_t* adc_get_channel(nx_adc_t* self, uint8_t channel_index);
 static nx_lifecycle_t* adc_get_lifecycle(nx_adc_t* self);
 static nx_power_t* adc_get_power(nx_adc_t* self);
-static nx_diagnostic_t* adc_get_diagnostic(nx_adc_t* self);
 
 /* Channel interface method */
 static uint32_t adc_channel_get_value(nx_adc_channel_t* self);
@@ -45,7 +44,6 @@ static uint32_t adc_channel_get_value(nx_adc_channel_t* self);
 /* Interface implementations (defined in separate files) */
 extern void adc_init_lifecycle(nx_lifecycle_t* lifecycle);
 extern void adc_init_power(nx_power_t* power);
-extern void adc_init_diagnostic(nx_diagnostic_t* diagnostic);
 
 /*---------------------------------------------------------------------------*/
 /* Channel Interface Implementation                                          */
@@ -109,14 +107,6 @@ static nx_power_t* adc_get_power(nx_adc_t* self) {
     return impl ? &impl->power : NULL;
 }
 
-/**
- * \brief           Get diagnostic interface
- */
-static nx_diagnostic_t* adc_get_diagnostic(nx_adc_t* self) {
-    nx_adc_impl_t* impl = adc_get_impl(self);
-    return impl ? &impl->diagnostic : NULL;
-}
-
 /*---------------------------------------------------------------------------*/
 /* Instance Initialization                                                   */
 /*---------------------------------------------------------------------------*/
@@ -131,12 +121,10 @@ static void adc_init_instance(nx_adc_impl_t* impl, uint8_t index,
     impl->base.get_channel = adc_get_channel;
     impl->base.get_lifecycle = adc_get_lifecycle;
     impl->base.get_power = adc_get_power;
-    impl->base.get_diagnostic = adc_get_diagnostic;
 
     /* Initialize interfaces (implemented in separate files) */
     adc_init_lifecycle(&impl->lifecycle);
     adc_init_power(&impl->power);
-    adc_init_diagnostic(&impl->diagnostic);
 
     /* Allocate and initialize state */
     impl->state = (nx_adc_state_t*)nx_mem_alloc(sizeof(nx_adc_state_t));

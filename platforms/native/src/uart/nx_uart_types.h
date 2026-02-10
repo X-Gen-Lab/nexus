@@ -12,7 +12,6 @@
 #define NX_UART_TYPES_H
 
 #include "hal/base/nx_comm.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/interface/nx_uart.h"
@@ -101,7 +100,6 @@ typedef struct nx_uart_config_s {
 typedef struct nx_uart_state_s {
     uint8_t index;           /**< Instance index */
     nx_uart_config_t config; /**< Configuration */
-    nx_uart_stats_t stats;   /**< Statistics */
     nx_uart_buffer_t tx_buf; /**< TX buffer */
     nx_uart_buffer_t rx_buf; /**< RX buffer */
     bool initialized;        /**< Initialization flag */
@@ -119,16 +117,15 @@ typedef struct nx_uart_state_s {
  * Contains all interfaces and state pointer.
  */
 typedef struct nx_uart_impl_s {
-    nx_uart_t base;             /**< Base UART interface */
-    nx_tx_async_t tx_async;     /**< TX async interface */
-    nx_rx_async_t rx_async;     /**< RX async interface */
-    nx_tx_sync_t tx_sync;       /**< TX sync interface */
-    nx_rx_sync_t rx_sync;       /**< RX sync interface */
-    nx_lifecycle_t lifecycle;   /**< Lifecycle interface */
-    nx_power_t power;           /**< Power interface */
-    nx_diagnostic_t diagnostic; /**< Diagnostic interface */
-    nx_uart_state_t* state;     /**< State pointer */
-    nx_device_t* device;        /**< Device descriptor */
+    nx_uart_t base;           /**< Base UART interface */
+    nx_tx_async_t tx_async;   /**< TX async interface */
+    nx_rx_async_t rx_async;   /**< RX async interface */
+    nx_tx_sync_t tx_sync;     /**< TX sync interface */
+    nx_rx_sync_t rx_sync;     /**< RX sync interface */
+    nx_lifecycle_t lifecycle; /**< Lifecycle interface */
+    nx_power_t power;         /**< Power interface */
+    nx_uart_state_t* state;   /**< State pointer */
+    nx_device_t* device;      /**< Device descriptor */
 } nx_uart_impl_t;
 
 #ifdef __cplusplus

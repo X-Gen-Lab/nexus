@@ -38,7 +38,6 @@ static nx_tx_sync_t* uart_get_tx_sync(nx_uart_t* self);
 static nx_rx_sync_t* uart_get_rx_sync(nx_uart_t* self);
 static nx_lifecycle_t* uart_get_lifecycle(nx_uart_t* self);
 static nx_power_t* uart_get_power(nx_uart_t* self);
-static nx_diagnostic_t* uart_get_diagnostic(nx_uart_t* self);
 
 /* Interface implementations (defined in separate files) */
 extern void uart_init_tx_async(nx_tx_async_t* tx_async);
@@ -47,7 +46,6 @@ extern void uart_init_tx_sync(nx_tx_sync_t* tx_sync);
 extern void uart_init_rx_sync(nx_rx_sync_t* rx_sync);
 extern void uart_init_lifecycle(nx_lifecycle_t* lifecycle);
 extern void uart_init_power(nx_power_t* power);
-extern void uart_init_diagnostic(nx_diagnostic_t* diagnostic);
 
 /*---------------------------------------------------------------------------*/
 /* Base Interface Getters                                                    */
@@ -101,14 +99,6 @@ static nx_power_t* uart_get_power(nx_uart_t* self) {
     return impl ? &impl->power : NULL;
 }
 
-/**
- * \brief           Get diagnostic interface
- */
-static nx_diagnostic_t* uart_get_diagnostic(nx_uart_t* self) {
-    nx_uart_impl_t* impl = uart_get_impl(self);
-    return impl ? &impl->diagnostic : NULL;
-}
-
 /*---------------------------------------------------------------------------*/
 /* Instance Initialization                                                   */
 /*---------------------------------------------------------------------------*/
@@ -125,7 +115,6 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
     impl->base.get_rx_sync = uart_get_rx_sync;
     impl->base.get_lifecycle = uart_get_lifecycle;
     impl->base.get_power = uart_get_power;
-    impl->base.get_diagnostic = uart_get_diagnostic;
 
     /* Initialize interfaces (implemented in separate files) */
     uart_init_tx_async(&impl->tx_async);
@@ -134,7 +123,6 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
     uart_init_rx_sync(&impl->rx_sync);
     uart_init_lifecycle(&impl->lifecycle);
     uart_init_power(&impl->power);
-    uart_init_diagnostic(&impl->diagnostic);
 
     /* Allocate and initialize state */
     impl->state = (nx_uart_state_t*)nx_mem_alloc(sizeof(nx_uart_state_t));
@@ -230,8 +218,6 @@ static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
         }
     }
 
-    /* Clear statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_uart_stats_t));
 }
 
 /*---------------------------------------------------------------------------*/

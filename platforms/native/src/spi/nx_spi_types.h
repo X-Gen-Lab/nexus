@@ -12,7 +12,6 @@
 #define NX_SPI_TYPES_H
 
 #include "hal/base/nx_comm.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/interface/nx_spi.h"
@@ -110,12 +109,11 @@ typedef struct nx_spi_device_handle_s {
 /**
  * \brief           SPI state structure
  *
- * Contains runtime state and statistics.
+ * Contains runtime state.
  */
 typedef struct nx_spi_state_s {
     uint8_t index;                         /**< Instance index */
     nx_spi_config_t config;                /**< Configuration */
-    nx_spi_stats_t stats;                  /**< Statistics */
     nx_spi_buffer_t tx_buf;                /**< TX buffer */
     nx_spi_buffer_t rx_buf;                /**< RX buffer */
     nx_spi_device_handle_t current_device; /**< Current device handle */
@@ -142,7 +140,6 @@ typedef struct nx_spi_impl_s {
     nx_tx_rx_sync_t tx_rx_sync;   /**< TX/RX sync interface */
     nx_lifecycle_t lifecycle;     /**< Lifecycle interface */
     nx_power_t power;             /**< Power interface */
-    nx_diagnostic_t diagnostic;   /**< Diagnostic interface */
     nx_spi_state_t* state;        /**< State pointer */
     nx_device_t* device;          /**< Device descriptor */
 } nx_spi_impl_t;

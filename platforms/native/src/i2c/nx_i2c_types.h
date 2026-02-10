@@ -12,7 +12,6 @@
 #define NX_I2C_TYPES_H
 
 #include "hal/base/nx_comm.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_i2c.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
@@ -108,12 +107,11 @@ typedef struct nx_i2c_device_handle_s {
 /**
  * \brief           I2C state structure
  *
- * Contains runtime state and statistics.
+ * Contains runtime state.
  */
 typedef struct nx_i2c_state_s {
     uint8_t index;                         /**< Instance index */
     nx_i2c_config_t config;                /**< Configuration */
-    nx_i2c_stats_t stats;                  /**< Statistics */
     nx_i2c_buffer_t tx_buf;                /**< TX buffer */
     nx_i2c_buffer_t rx_buf;                /**< RX buffer */
     nx_i2c_device_handle_t current_device; /**< Current device handle */
@@ -140,7 +138,6 @@ typedef struct nx_i2c_impl_s {
     nx_tx_rx_sync_t tx_rx_sync;   /**< TX/RX sync interface */
     nx_lifecycle_t lifecycle;     /**< Lifecycle interface */
     nx_power_t power;             /**< Power interface */
-    nx_diagnostic_t diagnostic;   /**< Diagnostic interface */
     nx_i2c_state_t* state;        /**< State pointer */
     nx_device_t* device;          /**< Device descriptor */
 } nx_i2c_impl_t;

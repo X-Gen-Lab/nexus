@@ -11,7 +11,6 @@
 #ifndef NX_GPIO_TYPES_H
 #define NX_GPIO_TYPES_H
 
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_gpio.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
@@ -31,6 +30,41 @@ extern "C" {
 
 /* Forward declare device type */
 typedef struct nx_device_s nx_device_t;
+
+/*---------------------------------------------------------------------------*/
+/* GPIO Configuration Enumerations                                           */
+/*---------------------------------------------------------------------------*/
+
+/**
+ * \brief           GPIO mode enumeration
+ */
+typedef enum nx_gpio_mode_e {
+    NX_GPIO_MODE_INPUT = 0, /**< Input mode */
+    NX_GPIO_MODE_OUTPUT_PP, /**< Output push-pull */
+    NX_GPIO_MODE_OUTPUT_OD, /**< Output open-drain */
+    NX_GPIO_MODE_AF_PP,     /**< Alternate function push-pull */
+    NX_GPIO_MODE_AF_OD,     /**< Alternate function open-drain */
+    NX_GPIO_MODE_ANALOG,    /**< Analog mode */
+} nx_gpio_mode_t;
+
+/**
+ * \brief           GPIO pull-up/pull-down enumeration
+ */
+typedef enum nx_gpio_pull_e {
+    NX_GPIO_PULL_NONE = 0, /**< No pull-up/pull-down */
+    NX_GPIO_PULL_UP,       /**< Pull-up */
+    NX_GPIO_PULL_DOWN,     /**< Pull-down */
+} nx_gpio_pull_t;
+
+/**
+ * \brief           GPIO speed enumeration
+ */
+typedef enum nx_gpio_speed_e {
+    NX_GPIO_SPEED_LOW = 0,   /**< Low speed */
+    NX_GPIO_SPEED_MEDIUM,    /**< Medium speed */
+    NX_GPIO_SPEED_HIGH,      /**< High speed */
+    NX_GPIO_SPEED_VERY_HIGH, /**< Very high speed */
+} nx_gpio_speed_t;
 
 /*---------------------------------------------------------------------------*/
 /* Platform Configuration Structure                                          */

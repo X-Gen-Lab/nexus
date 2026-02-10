@@ -12,7 +12,6 @@
 #define NX_ADC_TYPES_H
 
 #include "hal/interface/nx_adc.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_status.h"
@@ -115,9 +114,7 @@ typedef struct nx_adc_state_s {
 typedef struct nx_adc_impl_s {
     nx_adc_t base;              /**< Base ADC interface */
     nx_lifecycle_t lifecycle;   /**< Lifecycle interface */
-    nx_power_t power;           /**< Power interface */
-    nx_diagnostic_t diagnostic; /**< Diagnostic interface */
-    nx_adc_state_t* state;      /**< State pointer */
+    nx_power_t power;           /**< Power interface */    nx_adc_state_t* state;      /**< State pointer */
     nx_device_t* device;        /**< Device descriptor */
     nx_adc_channel_impl_t
         channels[NX_ADC_MAX_CHANNELS]; /**< Channel instances */
