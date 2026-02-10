@@ -193,12 +193,15 @@
             "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Debug",
             "inherits": "base",
             "generator": "Ninja",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-none-eabi.cmake",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "NEXUS_PLATFORM": "stm32",
                 "NEXUS_BUILD_TESTS": "OFF",
-                "NEXUS_BUILD_EXAMPLES": "ON"
+                "NEXUS_BUILD_EXAMPLES": "ON",
+                "NEXUS_CPU_ARCH": "cortex-m4",
+                "NEXUS_FPU_TYPE": "fpv4-sp-d16",
+                "NEXUS_FLOAT_ABI": "hard"
             }
         },
         {

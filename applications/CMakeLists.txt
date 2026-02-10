@@ -35,6 +35,7 @@ if(NOT NEXUS_PLATFORM STREQUAL "native")
         shell_demo
         config_demo
         stm32_blinky
+        stm32_config_test
         freertos_demo
     )
 
@@ -44,6 +45,7 @@ if(NOT NEXUS_PLATFORM STREQUAL "native")
         CONFIG_BUILD_APP_SHELL_DEMO
         CONFIG_BUILD_APP_CONFIG_DEMO
         CONFIG_BUILD_APP_STM32_BLINKY
+        CONFIG_BUILD_APP_STM32_CONFIG_TEST
         CONFIG_BUILD_APP_FREERTOS_DEMO
     )
 
@@ -53,6 +55,7 @@ if(NOT NEXUS_PLATFORM STREQUAL "native")
         "Interactive shell demo"
         "Configuration system demo"
         "STM32 minimal blinky"
+        "STM32 Kconfig validation test"
         "FreeRTOS OSAL demo"
     )
 

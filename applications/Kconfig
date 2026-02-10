@@ -68,6 +68,23 @@ config BUILD_APP_STM32_BLINKY
       Suitable for: STM32 platform only
       Requirements: None (bare metal)
 
+config BUILD_APP_STM32_CONFIG_TEST
+    bool "Build STM32 Configuration Test"
+    default y if PLATFORM_STM32
+    depends on PLATFORM_STM32
+    help
+      STM32 Kconfig configuration validation test application.
+
+      Features:
+        - LED blinking using SysTick timer
+        - Configuration display via UART/ITM
+        - Validates Kconfig settings are applied
+        - Tests interrupt priority configuration
+        - Tests peripheral configuration
+
+      Suitable for: STM32 platform only
+      Requirements: STM32 HAL library
+
 config BUILD_APP_FREERTOS_DEMO
     bool "Build FreeRTOS Demo"
     default y if OSAL_FREERTOS
