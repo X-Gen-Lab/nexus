@@ -257,11 +257,9 @@ def parse_instance_symbol(nx_key, value):
                 port = gpio_match.split('_PIN')[0]  # A, B, C, etc.
                 pin = gpio_match.split('_PIN')[1]   # 0, 1, 2, etc.
                 return platform, 'GPIO_PIN', None, None, True, (port, pin)
-        else:
-            # GPIO port instance (GPIOA, GPIOB, etc.)
-            # These should be included in config but not generate traversal macros
-            # Return None to skip traversal macro generation
-            return None, None, None, None, False, None
+        # GPIO port instance (GPIOA, GPIOB, etc.) - skip traversal macro but continue processing
+        # Return special marker to indicate this should be in config but not generate macros
+        return None, None, None, None, False, None
 
     # Known composite peripheral names (must be checked before splitting)
     composite_peripherals = {
@@ -456,15 +454,24 @@ def generate_header(config, output_path):
         if gpio_instances:
             # Group GPIO instances by platform
             gpio_by_platform = {}
-            for platform, peripheral, instance_id, original_suffix, is_gpio_pin, gpio_info in [
-                parse_instance_symbol(f'NX_CONFIG_INSTANCE_{key.replace("CONFIG_", "")}', value)
-                for key, value in config.items()
-                if 'INSTANCE_' in key and 'GPIO' in key and '_PIN' in key and value is True
-            ]:
-                if is_gpio_pin and gpio_info:
-                    if platform not in gpio_by_platform:
-                        gpio_by_platform[platform] = []
-                    gpio_by_platform[platform].append(gpio_info)
+            for port, pin in gpio_instances:
+                # Extract platform from the original config keys
+                # Find the platform by checking which INSTANCE_<PLATFORM>_GPIO config is enabled
+                for key, value in config.items():
+                    if value is True and 'INSTANCE_' in key and 'GPIO' in key and f'_PIN{pin}' in key:
+                        # Extract platform from key like CONFIG_INSTANCE_STM32_GPIOA_PIN0
+                        nx_key = key.replace('CONFIG_', 'NX_CONFIG_', 1)
+                        instance_part = nx_key.replace('NX_CONFIG_INSTANCE_', '')
+                        # Get platform prefix
+                        for platform_prefix in ['NX_', 'STM32_', 'GD32_', 'ESP32_', 'NRF52_']:
+                            if instance_part.startswith(platform_prefix):
+                                platform = platform_prefix.rstrip('_')
+                                if platform not in gpio_by_platform:
+                                    gpio_by_platform[platform] = []
+                                if (port, pin) not in gpio_by_platform[platform]:
+                                    gpio_by_platform[platform].append((port, pin))
+                                break
+                        break
 
             # Generate macro for each platform
             for platform in sorted(gpio_by_platform.keys()):
@@ -490,7 +497,7 @@ def generate_header(config, output_path):
                 # Generate the macro definition
                 macro_lines = []
                 for port, pin in instances_sorted:
-                    macro_lines.append(f'    fn({port}, {pin})')
+                    macro_lines.append(f'    fn({port}, {pin});')
 
                 header.append(f'#define NX_DEFINE_INSTANCE_{platform}_GPIO(fn) \\')
                 header.append(' \\\n'.join(macro_lines))
@@ -510,7 +517,7 @@ def generate_header(config, output_path):
             instances_sorted = sorted(instances, key=lambda x: int(x) if x.isdigit() else x)
 
             header.append('/**')
-            header.append(f' * \\brief           {peripheral} instance traversal macro')
+            header.append(f' * \\brief           {platform} {peripheral} instance traversal macro')
             header.append(' *')
             header.append(' * This macro expands to call the provided function for each enabled')
             header.append(f' * {peripheral} instance. Used by the device registration system.')
@@ -571,6 +578,8 @@ def generate_header(config, output_path):
                 header.append(f'#define {enabled_symbol} 0')
                 header.append('#endif')
                 header.append('')
+
+            print(f"Generated {platform} {peripheral} instance macro with {len(instances_sorted)} instances")
 
     # File footer
     header.append('#ifdef __cplusplus')
