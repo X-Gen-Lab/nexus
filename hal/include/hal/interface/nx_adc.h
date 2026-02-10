@@ -7,7 +7,6 @@
 #ifndef NX_ADC_H
 #define NX_ADC_H
 
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_status.h"
@@ -80,13 +79,6 @@ struct nx_adc_s {
      * \return          Power interface pointer
      */
     nx_power_t* (*get_power)(nx_adc_t* self);
-
-    /**
-     * \brief           Get diagnostic interface
-     * \param[in]       self: ADC interface pointer
-     * \return          Diagnostic interface pointer
-     */
-    nx_diagnostic_t* (*get_diagnostic)(nx_adc_t* self);
 };
 
 /**
@@ -167,16 +159,13 @@ struct nx_adc_buffer_s {
  * \param[in]       _get_channel: get_channel function pointer
  * \param[in]       _get_lifecycle: get_lifecycle function pointer
  * \param[in]       _get_power: get_power function pointer
- * \param[in]       _get_diagnostic: get_diagnostic function pointer
  */
-#define NX_INIT_ADC(p, _trigger, _get_channel, _get_lifecycle, _get_power,     \
-                    _get_diagnostic)                                           \
+#define NX_INIT_ADC(p, _trigger, _get_channel, _get_lifecycle, _get_power)     \
     do {                                                                       \
         (p)->trigger = (_trigger);                                             \
         (p)->get_channel = (_get_channel);                                     \
         (p)->get_lifecycle = (_get_lifecycle);                                 \
         (p)->get_power = (_get_power);                                         \
-        (p)->get_diagnostic = (_get_diagnostic);                               \
         NX_ASSERT((p)->trigger && (p)->get_channel);                           \
         NX_ASSERT((p)->get_lifecycle);                                         \
     } while (0)

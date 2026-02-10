@@ -52,7 +52,6 @@ extern "C" {
 /* Base Interfaces                                                           */
 /*---------------------------------------------------------------------------*/
 
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 

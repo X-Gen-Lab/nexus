@@ -1,6 +1,6 @@
 /**
  * \file            nx_isr_manager.h
- * \brief           Interrupt service routine manager interface
+ * \brief           Interrupt service routine manager interface (simplified)
  * \author          Nexus Team
  */
 
@@ -15,21 +15,6 @@ extern "C" {
 #endif
 
 /**
- * \brief           ISR callback priority enumeration
- */
-typedef enum nx_isr_priority_e {
-    NX_ISR_PRIORITY_HIGHEST = 0, /**< Highest priority */
-    NX_ISR_PRIORITY_HIGH = 1,    /**< High priority */
-    NX_ISR_PRIORITY_NORMAL = 2,  /**< Normal priority */
-    NX_ISR_PRIORITY_LOW = 3,     /**< Low priority */
-} nx_isr_priority_t;
-
-/**
- * \brief           ISR callback handle (opaque)
- */
-typedef struct nx_isr_handle_s nx_isr_handle_t;
-
-/**
  * \brief           ISR handler function type
  * \param[in]       user_data: User data pointer
  */
@@ -42,57 +27,32 @@ typedef void (*nx_isr_handler_t)(void* user_data);
 typedef nx_isr_handler_t nx_isr_func_t;
 
 /**
- * \brief           ISR manager interface
+ * \brief           ISR manager interface (simplified)
  */
 typedef struct nx_isr_manager_s nx_isr_manager_t;
 struct nx_isr_manager_s {
     /**
-     * \brief           Connect ISR callback to interrupt
+     * \brief           Connect ISR callback to interrupt (one-step setup)
      * \param[in]       self: ISR manager instance
      * \param[in]       irq: IRQ number
      * \param[in]       func: Callback function
      * \param[in]       data: User data pointer
-     * \param[in]       priority: Callback priority
-     * \return          ISR handle, NULL on failure
+     * \param[in]       priority: Hardware priority (0-15, lower is higher)
+     * \return          NX_OK on success, error code otherwise
+     * \note            Automatically clears pending, sets priority, and
+     *                  enables interrupt. Only one callback per interrupt.
      */
-    nx_isr_handle_t* (*connect)(nx_isr_manager_t* self, uint32_t irq,
-                                nx_isr_func_t func, void* data,
-                                nx_isr_priority_t priority);
+    nx_status_t (*connect)(nx_isr_manager_t* self, uint32_t irq,
+                           nx_isr_func_t func, void* data, uint8_t priority);
 
     /**
      * \brief           Disconnect ISR callback
      * \param[in]       self: ISR manager instance
-     * \param[in]       handle: ISR handle
-     * \return          NX_OK on success, error code otherwise
-     */
-    nx_status_t (*disconnect)(nx_isr_manager_t* self, nx_isr_handle_t* handle);
-
-    /**
-     * \brief           Set interrupt priority
-     * \param[in]       self: ISR manager instance
-     * \param[in]       irq: IRQ number
-     * \param[in]       priority: Hardware priority (0-15, lower is higher
-     * priority)
-     * \return          NX_OK on success, error code otherwise
-     */
-    nx_status_t (*set_priority)(nx_isr_manager_t* self, uint32_t irq,
-                                uint8_t priority);
-
-    /**
-     * \brief           Enable interrupt
-     * \param[in]       self: ISR manager instance
      * \param[in]       irq: IRQ number
      * \return          NX_OK on success, error code otherwise
+     * \note            Automatically disables interrupt.
      */
-    nx_status_t (*enable)(nx_isr_manager_t* self, uint32_t irq);
-
-    /**
-     * \brief           Disable interrupt
-     * \param[in]       self: ISR manager instance
-     * \param[in]       irq: IRQ number
-     * \return          NX_OK on success, error code otherwise
-     */
-    nx_status_t (*disable)(nx_isr_manager_t* self, uint32_t irq);
+    nx_status_t (*disconnect)(nx_isr_manager_t* self, uint32_t irq);
 };
 
 /**

@@ -11,7 +11,6 @@
 #define NX_SPI_H
 
 #include "hal/base/nx_comm.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_status.h"
@@ -63,16 +62,6 @@ typedef struct nx_spi_device_config_s {
     uint8_t mode;   /**< SPI mode (0-3), see nx_spi_mode_t (device-specific) */
     uint8_t bit_order; /**< Bit order: 0=MSB, 1=LSB (device-specific) */
 } nx_spi_device_config_t;
-
-/**
- * \brief           SPI statistics structure
- */
-typedef struct nx_spi_stats_s {
-    bool busy;            /**< Busy flag */
-    uint32_t tx_count;    /**< Total bytes transmitted */
-    uint32_t rx_count;    /**< Total bytes received */
-    uint32_t error_count; /**< Error count */
-} nx_spi_stats_t;
 
 /*---------------------------------------------------------------------------*/
 /* SPI Bus Interface                                                         */
@@ -153,13 +142,6 @@ struct nx_spi_bus_s {
      * \return          Power interface pointer
      */
     nx_power_t* (*get_power)(nx_spi_bus_t* self);
-
-    /**
-     * \brief           Get diagnostic interface
-     * \param[in]       self: SPI bus pointer
-     * \return          Diagnostic interface pointer
-     */
-    nx_diagnostic_t* (*get_diagnostic)(nx_spi_bus_t* self);
 };
 /*---------------------------------------------------------------------------*/
 /* SPI Bus Initialization Macro                                              */
@@ -174,11 +156,10 @@ struct nx_spi_bus_s {
  * \param[in]       _get_tx_rx_sync_handle: Get TX/RX sync handle function
  * \param[in]       _get_lifecycle: Get lifecycle function pointer
  * \param[in]       _get_power: Get power function pointer
- * \param[in]       _get_diagnostic: Get diagnostic function pointer
  */
 #define NX_INIT_SPI_BUS(p, _get_tx_async_handle, _get_tx_rx_async_handle,      \
                         _get_tx_sync_handle, _get_tx_rx_sync_handle,           \
-                        _get_lifecycle, _get_power, _get_diagnostic)           \
+                        _get_lifecycle, _get_power)                            \
     do {                                                                       \
         (p)->get_tx_async_handle = (_get_tx_async_handle);                     \
         (p)->get_tx_rx_async_handle = (_get_tx_rx_async_handle);               \
@@ -186,7 +167,6 @@ struct nx_spi_bus_s {
         (p)->get_tx_rx_sync_handle = (_get_tx_rx_sync_handle);                 \
         (p)->get_lifecycle = (_get_lifecycle);                                 \
         (p)->get_power = (_get_power);                                         \
-        (p)->get_diagnostic = (_get_diagnostic);                               \
         NX_ASSERT((p)->get_tx_async_handle != NULL);                           \
         NX_ASSERT((p)->get_tx_rx_async_handle != NULL);                        \
         NX_ASSERT((p)->get_tx_sync_handle != NULL);                            \

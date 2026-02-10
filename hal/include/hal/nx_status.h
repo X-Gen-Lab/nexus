@@ -52,6 +52,7 @@ typedef enum nx_status_e {
     NX_ERR_INVALID_STATE = 22, /**< Invalid state */
     NX_ERR_BUSY = 23,          /**< Device busy */
     NX_ERR_SUSPENDED = 24,     /**< Device suspended */
+    NX_ERR_NOT_READY = 25,     /**< Device not ready */
 
     /* Resource errors (40-59) */
     NX_ERR_NO_MEMORY = 40,     /**< Out of memory */
@@ -75,6 +76,7 @@ typedef enum nx_status_e {
     NX_ERR_NACK = 86,        /**< NACK received (I2C) */
     NX_ERR_BUS = 87,         /**< Bus error */
     NX_ERR_ARBITRATION = 88, /**< Arbitration lost */
+    NX_ERR_HARDWARE = 89,    /**< Hardware error */
 
     /* DMA errors (100-119) */
     NX_ERR_DMA = 100,          /**< DMA error */

@@ -11,7 +11,6 @@
 #define NX_I2C_H
 
 #include "hal/base/nx_comm.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_status.h"
@@ -20,30 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*---------------------------------------------------------------------------*/
-/* I2C Configuration Types                                                   */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           I2C speed enumeration
- */
-typedef enum nx_i2c_speed_e {
-    NX_I2C_SPEED_STANDARD = 0, /**< Standard mode: 100 kHz */
-    NX_I2C_SPEED_FAST,         /**< Fast mode: 400 kHz */
-    NX_I2C_SPEED_FAST_PLUS,    /**< Fast mode plus: 1 MHz */
-} nx_i2c_speed_t;
-
-/**
- * \brief           I2C statistics structure
- */
-typedef struct nx_i2c_stats_s {
-    bool busy;                /**< Busy flag */
-    uint32_t tx_count;        /**< Total bytes transmitted */
-    uint32_t rx_count;        /**< Total bytes received */
-    uint32_t nack_count;      /**< NACK count */
-    uint32_t bus_error_count; /**< Bus error count */
-} nx_i2c_stats_t;
 
 /*---------------------------------------------------------------------------*/
 /* I2C Bus Interface                                                         */
@@ -136,13 +111,6 @@ struct nx_i2c_bus_s {
      * \return          Power interface pointer
      */
     nx_power_t* (*get_power)(nx_i2c_bus_t* self);
-
-    /**
-     * \brief           Get diagnostic interface
-     * \param[in]       self: I2C bus pointer
-     * \return          Diagnostic interface pointer
-     */
-    nx_diagnostic_t* (*get_diagnostic)(nx_i2c_bus_t* self);
 };
 
 /*---------------------------------------------------------------------------*/
@@ -158,11 +126,10 @@ struct nx_i2c_bus_s {
  * \param[in]       _get_tx_rx_async_handle: Get TX/RX async handle function
  * \param[in]       _get_lifecycle: Get lifecycle function pointer
  * \param[in]       _get_power: Get power function pointer
- * \param[in]       _get_diagnostic: Get diagnostic function pointer
  */
 #define NX_INIT_I2C_BUS(p, _get_tx_sync_handle, _get_tx_rx_sync_handle,        \
                         _get_tx_async_handle, _get_tx_rx_async_handle,         \
-                        _get_lifecycle, _get_power, _get_diagnostic)           \
+                        _get_lifecycle, _get_power)                            \
     do {                                                                       \
         (p)->get_tx_sync_handle = (_get_tx_sync_handle);                       \
         (p)->get_tx_rx_sync_handle = (_get_tx_rx_sync_handle);                 \
@@ -170,7 +137,6 @@ struct nx_i2c_bus_s {
         (p)->get_tx_rx_async_handle = (_get_tx_rx_async_handle);               \
         (p)->get_lifecycle = (_get_lifecycle);                                 \
         (p)->get_power = (_get_power);                                         \
-        (p)->get_diagnostic = (_get_diagnostic);                               \
         NX_ASSERT((p)->get_tx_sync_handle != NULL);                            \
         NX_ASSERT((p)->get_tx_rx_sync_handle != NULL);                         \
         NX_ASSERT((p)->get_tx_async_handle != NULL);                           \

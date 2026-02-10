@@ -11,7 +11,6 @@
 #define NX_CAN_H
 
 #include "hal/base/nx_comm.h"
-#include "hal/interface/nx_diagnostic.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_status.h"
@@ -20,40 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*---------------------------------------------------------------------------*/
-/* CAN Configuration Types                                                   */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           CAN frame type enumeration
- */
-typedef enum nx_can_frame_type_e {
-    NX_CAN_FRAME_STANDARD = 0, /**< Standard frame (11-bit ID) */
-    NX_CAN_FRAME_EXTENDED,     /**< Extended frame (29-bit ID) */
-} nx_can_frame_type_t;
-
-/**
- * \brief           CAN bus mode enumeration
- */
-typedef enum nx_can_mode_e {
-    NX_CAN_MODE_NORMAL = 0,      /**< Normal operation mode */
-    NX_CAN_MODE_LOOPBACK,        /**< Loopback mode for testing */
-    NX_CAN_MODE_SILENT,          /**< Silent mode (receive only) */
-    NX_CAN_MODE_SILENT_LOOPBACK, /**< Silent loopback mode */
-} nx_can_mode_t;
-
-/**
- * \brief           CAN statistics structure
- */
-typedef struct nx_can_stats_s {
-    uint32_t tx_count;       /**< Total frames transmitted */
-    uint32_t rx_count;       /**< Total frames received */
-    uint32_t error_count;    /**< Total error count */
-    uint16_t tx_error_count; /**< TX error counter */
-    uint16_t rx_error_count; /**< RX error counter */
-    bool bus_off;            /**< Bus-off state flag */
-} nx_can_stats_t;
 
 /*---------------------------------------------------------------------------*/
 /* CAN Bus Interface                                                         */
@@ -130,13 +95,6 @@ struct nx_can_bus_s {
      * \return          Power interface pointer
      */
     nx_power_t* (*get_power)(nx_can_bus_t* self);
-
-    /**
-     * \brief           Get diagnostic interface
-     * \param[in]       self: CAN bus pointer
-     * \return          Diagnostic interface pointer
-     */
-    nx_diagnostic_t* (*get_diagnostic)(nx_can_bus_t* self);
 };
 
 /*---------------------------------------------------------------------------*/
@@ -152,11 +110,9 @@ struct nx_can_bus_s {
  * \param[in]       _set_filter: Set filter function pointer
  * \param[in]       _get_lifecycle: Get lifecycle function pointer
  * \param[in]       _get_power: Get power function pointer
- * \param[in]       _get_diagnostic: Get diagnostic function pointer
  */
 #define NX_INIT_CAN_BUS(p, _get_tx_handle, _get_rx_handle, _get_error_count,   \
-                        _set_filter, _get_lifecycle, _get_power,               \
-                        _get_diagnostic)                                       \
+                        _set_filter, _get_lifecycle, _get_power)               \
     do {                                                                       \
         (p)->get_tx_handle = (_get_tx_handle);                                 \
         (p)->get_rx_handle = (_get_rx_handle);                                 \
@@ -164,27 +120,12 @@ struct nx_can_bus_s {
         (p)->set_filter = (_set_filter);                                       \
         (p)->get_lifecycle = (_get_lifecycle);                                 \
         (p)->get_power = (_get_power);                                         \
-        (p)->get_diagnostic = (_get_diagnostic);                               \
         NX_ASSERT((p)->get_tx_handle != NULL);                                 \
         NX_ASSERT((p)->get_rx_handle != NULL);                                 \
         NX_ASSERT((p)->get_error_count != NULL);                               \
         NX_ASSERT((p)->set_filter != NULL);                                    \
         NX_ASSERT((p)->get_lifecycle != NULL);                                 \
     } while (0)
-
-/**
- * \brief           Create default CAN bus configuration
- * \deprecated      Use Kconfig for compile-time configuration instead.
- *                  This macro is kept for backward compatibility only.
- * \param[in]       _baudrate: Baud rate in bps
- * \return          nx_can_config_t structure
- */
-#define NX_CAN_CONFIG_DEFAULT(_baudrate)                                       \
-    (nx_can_config_t) {                                                        \
-        .baudrate = (_baudrate), .mode = NX_CAN_MODE_NORMAL,                   \
-        .auto_retransmit = true, .auto_bus_off = true, .sjw = 1, .bs1 = 4,     \
-        .bs2 = 3,                                                              \
-    }
 
 #ifdef __cplusplus
 }
