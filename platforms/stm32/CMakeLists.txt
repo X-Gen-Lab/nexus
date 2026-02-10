@@ -29,26 +29,26 @@ include(NexusToolchain)
 # Detect STM32 series from Kconfig
 # This creates a mapping table for all supported series
 set(STM32_SERIES_MAP
-    "CONFIG_STM32C0:c0:STM32C0xx:C0"
-    "CONFIG_STM32F0:f0:STM32F0xx:F0"
-    "CONFIG_STM32F1:f1:STM32F1xx:F1"
-    "CONFIG_STM32F2:f2:STM32F2xx:F2"
-    "CONFIG_STM32F3:f3:STM32F3xx:F3"
-    "CONFIG_STM32F4:f4:STM32F4xx:F4"
-    "CONFIG_STM32F7:f7:STM32F7xx:F7"
-    "CONFIG_STM32G0:g0:STM32G0xx:G0"
-    "CONFIG_STM32G4:g4:STM32G4xx:G4"
-    "CONFIG_STM32H5:h5:STM32H5xx:H5"
-    "CONFIG_STM32H7:h7:STM32H7xx:H7"
-    "CONFIG_STM32L0:l0:STM32L0xx:L0"
-    "CONFIG_STM32L1:l1:STM32L1xx:L1"
-    "CONFIG_STM32L4:l4:STM32L4xx:L4"
-    "CONFIG_STM32L5:l5:STM32L5xx:L5"
-    "CONFIG_STM32U0:u0:STM32U0xx:U0"
-    "CONFIG_STM32U3:u3:STM32U3xx:U3"
-    "CONFIG_STM32U5:u5:STM32U5xx:U5"
-    "CONFIG_STM32WB:wb:STM32WBxx:WB"
-    "CONFIG_STM32WL:wl:STM32WLxx:WL"
+    "CONFIG_STM32C0:c0:STM32C0xx:STM32C0"
+    "CONFIG_STM32F0:f0:STM32F0xx:STM32F0"
+    "CONFIG_STM32F1:f1:STM32F1xx:STM32F1"
+    "CONFIG_STM32F2:f2:STM32F2xx:STM32F2"
+    "CONFIG_STM32F3:f3:STM32F3xx:STM32F3"
+    "CONFIG_STM32F4:f4:STM32F4xx:STM32F4"
+    "CONFIG_STM32F7:f7:STM32F7xx:STM32F7"
+    "CONFIG_STM32G0:g0:STM32G0xx:STM32G0"
+    "CONFIG_STM32G4:g4:STM32G4xx:STM32G4"
+    "CONFIG_STM32H5:h5:STM32H5xx:STM32H5"
+    "CONFIG_STM32H7:h7:STM32H7xx:STM32H7"
+    "CONFIG_STM32L0:l0:STM32L0xx:STM32L0"
+    "CONFIG_STM32L1:l1:STM32L1xx:STM32L1"
+    "CONFIG_STM32L4:l4:STM32L4xx:STM32L4"
+    "CONFIG_STM32L5:l5:STM32L5xx:STM32L5"
+    "CONFIG_STM32U0:u0:STM32U0xx:STM32U0"
+    "CONFIG_STM32U3:u3:STM32U3xx:STM32U3"
+    "CONFIG_STM32U5:u5:STM32U5xx:STM32U5"
+    "CONFIG_STM32WB:wb:STM32WBxx:STM32WB"
+    "CONFIG_STM32WL:wl:STM32WLxx:STM32WL"
 )
 
 # Find the selected series
@@ -149,6 +149,7 @@ if(NOT TARGET hal_driver)
     # Add device definition to HAL driver
     target_compile_definitions(hal_driver PUBLIC
         ${STM32_DEVICE}
+        ${STM32_SERIES_UPPER}
         USE_HAL_DRIVER
     )
 
@@ -362,6 +363,7 @@ endif()
 target_compile_definitions(platform_stm32
     PUBLIC
         ${STM32_DEVICE}
+        ${STM32_SERIES_UPPER}
         USE_HAL_DRIVER
         $<$<CONFIG:Debug>:DEBUG>
         $<$<CONFIG:Release>:NDEBUG>
@@ -423,6 +425,22 @@ endif()
 # nexus_apply_linker_kconfig(). No target-specific application needed here.
 
 # HAL driver warnings are already suppressed in Step 3
+
+# Force linker to keep SystemCoreClock and AHBPrescTable symbols
+# These are required by STM32 HAL library but may be optimized out by --gc-sections
+if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
+    # ARM Clang: Symbols are kept automatically if referenced
+    # The --keep option doesn't work as expected with ARM Clang
+    # These symbols are defined in system_stm32f4xx.c and will be kept
+    # if any code references them
+else()
+    # GCC uses -Wl,--undefined to force keeping symbols
+    target_link_options(platform_stm32 PUBLIC
+        -Wl,--undefined=SystemCoreClock
+        -Wl,--undefined=AHBPrescTable
+        -Wl,--undefined=APBPrescTable
+    )
+endif()
 
 nexus_log(STATUS "STM32 ${STM32_SERIES_UPPER} platform configured: ${STM32_DEVICE}")
 

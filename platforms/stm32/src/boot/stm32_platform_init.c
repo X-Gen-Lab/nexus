@@ -43,6 +43,7 @@
 
 #include "boot/stm32_boot.h"
 #include "clock/stm32_clock.h"
+#include "system/stm32_performance.h"
 
 #if defined(STM32F407xx) || defined(STM32F429xx) || defined(STM32F446xx) ||    \
     defined(STM32F4)
@@ -60,8 +61,18 @@
 /*---------------------------------------------------------------------------*/
 
 /* Default NVIC priority grouping */
-#ifndef CONFIG_STM32_NVIC_PRIORITY_GROUP
-#define CONFIG_STM32_NVIC_PRIORITY_GROUP NVIC_PRIORITYGROUP_4
+#ifndef NX_CONFIG_STM32_NVIC_PRIORITY_GROUP
+#define NX_CONFIG_STM32_NVIC_PRIORITY_GROUP NVIC_PRIORITYGROUP_4
+#endif
+
+/* Default SysTick priority */
+#ifndef NX_CONFIG_STM32_SYSTICK_PRIORITY
+#define NX_CONFIG_STM32_SYSTICK_PRIORITY 15
+#endif
+
+/* Default PendSV priority */
+#ifndef NX_CONFIG_STM32_PENDSV_PRIORITY
+#define NX_CONFIG_STM32_PENDSV_PRIORITY 15
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -81,12 +92,16 @@ static volatile uint32_t g_platform_initialized = 0;
 /**
  * \brief           Initialize STM32 platform
  * \details         Performs complete platform initialization including:
- *                  - HAL library initialization
+ *                  - HAL library initialization (includes SysTick 1ms setup)
  *                  - System clock configuration
  *                  - NVIC priority grouping configuration
- *                  - SysTick timer setup (1ms tick)
+ *                  - SysTick and PendSV priority configuration
+ *                  - Performance measurement initialization
  * \note            This function should be called early in main() before
- *                  any peripheral initialization
+ *                  any peripheral initialization.
+ *                  SysTick timer is automatically configured to 1ms time base
+ *                  by HAL_Init(), and its priority is set according to
+ *                  NX_CONFIG_STM32_SYSTICK_PRIORITY.
  */
 int stm32_platform_init(void) {
     HAL_StatusTypeDef hal_status;
@@ -110,9 +125,19 @@ int stm32_platform_init(void) {
     }
 
     /* Configure NVIC priority grouping */
-    HAL_NVIC_SetPriorityGrouping(CONFIG_STM32_NVIC_PRIORITY_GROUP);
+    HAL_NVIC_SetPriorityGrouping(NX_CONFIG_STM32_NVIC_PRIORITY_GROUP);
 
-    /* SysTick is already configured by HAL_Init() to 1ms */
+    /* Configure SysTick priority (1ms time base already set by HAL_Init) */
+    HAL_NVIC_SetPriority(SysTick_IRQn, NX_CONFIG_STM32_SYSTICK_PRIORITY, 0);
+
+    /* Configure PendSV priority for RTOS context switching */
+    HAL_NVIC_SetPriority(PendSV_IRQn, NX_CONFIG_STM32_PENDSV_PRIORITY, 0);
+
+    /* Initialize performance measurement (DWT cycle counter) */
+    stm32_perf_init();
+
+    /* Mark boot time checkpoint: platform_init complete */
+    stm32_boot_time_mark(3);
 
     /* Mark as initialized */
     g_platform_initialized = 1;

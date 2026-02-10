@@ -62,12 +62,13 @@
  * \brief           Fault information structure
  */
 typedef struct {
-    uint32_t cfsr;  /**< Configurable Fault Status Register */
-    uint32_t hfsr;  /**< Hard Fault Status Register */
-    uint32_t mmfar; /**< Memory Management Fault Address Register */
-    uint32_t bfar;  /**< Bus Fault Address Register */
-    uint32_t lr;    /**< Link Register (return address) */
-    uint32_t pc;    /**< Program Counter */
+    uint32_t cfsr;      /**< Configurable Fault Status Register */
+    uint32_t hfsr;      /**< Hard Fault Status Register */
+    uint32_t mmfar;     /**< Memory Management Fault Address Register */
+    uint32_t bfar;      /**< Bus Fault Address Register */
+    uint32_t lr;        /**< Link Register (return address) */
+    uint32_t pc;        /**< Program Counter */
+    uint32_t timestamp; /**< Timestamp when fault occurred (ms) */
 } fault_info_t;
 
 /**
@@ -96,6 +97,14 @@ static volatile assert_info_t g_assert_info;
 #endif
 
 /*---------------------------------------------------------------------------*/
+/* Private function declarations                                             */
+/*---------------------------------------------------------------------------*/
+
+#ifdef DEBUG
+static void save_fault_info(void);
+#endif
+
+/*---------------------------------------------------------------------------*/
 /* Public functions                                                          */
 /*---------------------------------------------------------------------------*/
 
@@ -103,8 +112,8 @@ static volatile assert_info_t g_assert_info;
  * \brief           Error handler for fatal errors
  * \details         This function is called when a fatal error occurs that
  *                  prevents the system from continuing operation. It disables
- *                  interrupts and enters an infinite loop. In debug mode,
- *                  it triggers a breakpoint for debugging.
+ *                  interrupts, saves fault information (debug mode), triggers
+ *                  a breakpoint (debug mode), and enters an infinite loop.
  * \note            This function does not return
  */
 void Error_Handler(void) {
@@ -112,6 +121,9 @@ void Error_Handler(void) {
     __disable_irq();
 
 #ifdef DEBUG
+    /* Save fault information for debugging */
+    save_fault_info();
+
     /* Trigger breakpoint for debugging */
     __asm volatile("BKPT #01");
 #endif
@@ -127,11 +139,11 @@ void Error_Handler(void) {
  * \brief           Save fault information for debugging
  * \details         This function saves processor fault status registers for
  *                  post-mortem debugging. It should be called from fault
- *                  exception handlers.
+ *                  exception handlers. Records timestamp using HAL_GetTick().
  * \note            This function is only available in debug builds
  */
 #ifdef DEBUG
-void save_fault_info(void) {
+static void save_fault_info(void) {
     /* Save Configurable Fault Status Register */
     g_fault_info.cfsr = SCB->CFSR;
 
@@ -143,6 +155,9 @@ void save_fault_info(void) {
 
     /* Save Bus Fault Address Register */
     g_fault_info.bfar = SCB->BFAR;
+
+    /* Record timestamp */
+    g_fault_info.timestamp = HAL_GetTick();
 
     /* Note: LR and PC should be saved from exception stack frame */
     /* This is typically done in the fault handler assembly code */
@@ -189,12 +204,12 @@ uint32_t get_error_code(void) {
  *                  file name and line number for debugging, then calls
  *                  Error_Handler().
  * \note            This function is only compiled when USE_FULL_ASSERT is
- * defined
+ *                  defined
  */
 #ifdef USE_FULL_ASSERT
 void assert_failed(uint8_t* file, uint32_t line) {
 #ifdef DEBUG
-    /* Save assertion information */
+    /* Save assertion information for debugging */
     g_assert_info.file = (const char*)file;
     g_assert_info.line = line;
 
@@ -202,7 +217,7 @@ void assert_failed(uint8_t* file, uint32_t line) {
     __asm volatile("BKPT #01");
 #endif
 
-    /* Call error handler */
+    /* Call error handler - this will not return */
     Error_Handler();
 }
 #endif /* USE_FULL_ASSERT */

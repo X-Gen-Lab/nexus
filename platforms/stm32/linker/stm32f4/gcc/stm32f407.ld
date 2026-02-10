@@ -114,6 +114,16 @@ SECTIONS
         . = ALIGN(4);
     } >FLASH
 
+    /* Nexus HAL device registration section */
+    .nx_device :
+    {
+        . = ALIGN(4);
+        __nx_device_start = .;
+        KEEP(*(SORT(.nx_device*)))
+        __nx_device_end = .;
+        . = ALIGN(4);
+    } >FLASH
+
     /* Used by startup to initialize data */
     _sidata = LOADADDR(.data);
 

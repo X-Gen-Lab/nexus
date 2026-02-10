@@ -42,6 +42,22 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
+ * \brief           STM32 platform error codes
+ */
+typedef enum {
+    STM32_OK = 0,              /**< Success */
+    STM32_ERR_INVALID_PARAM,   /**< Invalid parameter */
+    STM32_ERR_NOT_INITIALIZED, /**< Not initialized */
+    STM32_ERR_ALREADY_INIT,    /**< Already initialized */
+    STM32_ERR_TIMEOUT,         /**< Timeout */
+    STM32_ERR_BUSY,            /**< Device busy */
+    STM32_ERR_NOT_SUPPORTED,   /**< Not supported */
+    STM32_ERR_HARDWARE,        /**< Hardware error */
+    STM32_ERR_CLOCK_FAIL,      /**< Clock configuration failed */
+    STM32_ERR_RESOURCE,        /**< Resource insufficient */
+} stm32_error_t;
+
+/**
  * \brief           Error handler for fatal errors
  */
 void Error_Handler(void);
