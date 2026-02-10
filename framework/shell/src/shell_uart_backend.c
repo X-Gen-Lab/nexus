@@ -135,7 +135,6 @@ shell_status_t shell_uart_backend_init(int uart_instance) {
     if (lifecycle != NULL) {
         nx_status_t status = lifecycle->init(lifecycle);
         if (status != NX_OK) {
-            nx_factory_uart_release(g_uart);
             g_uart = NULL;
             return SHELL_ERROR;
         }
@@ -155,8 +154,7 @@ shell_status_t shell_uart_backend_deinit(void) {
             lifecycle->deinit(lifecycle);
         }
 
-        /* Release UART */
-        nx_factory_uart_release(g_uart);
+        /* Clear UART reference */
         g_uart = NULL;
     }
 

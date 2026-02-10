@@ -358,8 +358,8 @@ static size_t log_format_with_pattern(char* buf, size_t buf_size,
 
             switch (token) {
                 case 'T': /* Timestamp in milliseconds */
-                    written = snprintf(buf + pos, buf_size - pos, "%u",
-                                       log_get_timestamp_ms());
+                    written = snprintf(buf + pos, buf_size - pos, "%lu",
+                                       (unsigned long)log_get_timestamp_ms());
                     break;
 
                 case 't': /* Time in HH:MM:SS format */
