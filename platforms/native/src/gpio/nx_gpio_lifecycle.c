@@ -38,15 +38,8 @@ static nx_status_t gpio_lifecycle_init(nx_lifecycle_t* self) {
         return NX_ERR_ALREADY_INIT;
     }
 
-    /* Initialize pin state based on mode */
-    if (impl->state->config.mode == NX_GPIO_MODE_OUTPUT_PP ||
-        impl->state->config.mode == NX_GPIO_MODE_OUTPUT_OD) {
-        /* Output mode - set to low by default */
-        impl->state->pin_state = 0;
-    } else {
-        /* Input mode - read current state (simulated as 0) */
-        impl->state->pin_state = 0;
-    }
+    /* The Native model starts both input and output pins low. */
+    impl->state->pin_state = 0;
 
     /* Mark as initialized */
     impl->state->initialized = true;

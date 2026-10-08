@@ -14,6 +14,7 @@
 #include "nx_flash_helpers.h"
 #include "hal/nx_types.h"
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -24,7 +25,9 @@
  * \brief           Erase flash sector
  */
 nx_status_t flash_erase_sector(nx_flash_state_t* state, uint32_t sector) {
-    NX_ASSERT(state != NULL);
+    if (state == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
 
     if (sector >= NX_FLASH_NUM_SECTORS) {
         return NX_ERR_INVALID_PARAM;
@@ -47,8 +50,9 @@ nx_status_t flash_erase_sector(nx_flash_state_t* state, uint32_t sector) {
  */
 nx_status_t flash_write(nx_flash_state_t* state, uint32_t addr,
                         const uint8_t* data, size_t len) {
-    NX_ASSERT(state != NULL);
-    NX_ASSERT(data != NULL);
+    if (state == NULL || data == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
 
     if (!flash_is_valid_address(addr, len)) {
         return NX_ERR_INVALID_PARAM;
@@ -98,8 +102,9 @@ nx_status_t flash_write(nx_flash_state_t* state, uint32_t addr,
  */
 nx_status_t flash_read(nx_flash_state_t* state, uint32_t addr, uint8_t* data,
                        size_t len) {
-    NX_ASSERT(state != NULL);
-    NX_ASSERT(data != NULL);
+    if (state == NULL || data == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
 
     if (!flash_is_valid_address(addr, len)) {
         return NX_ERR_INVALID_PARAM;
@@ -134,7 +139,9 @@ nx_status_t flash_read(nx_flash_state_t* state, uint32_t addr, uint8_t* data,
  * \brief           Check if address range is erased
  */
 bool flash_is_erased(nx_flash_state_t* state, uint32_t addr, size_t len) {
-    NX_ASSERT(state != NULL);
+    if (state == NULL) {
+        return false;
+    }
 
     if (!flash_is_valid_address(addr, len)) {
         return false;
@@ -179,7 +186,7 @@ bool flash_is_valid_address(uint32_t addr, size_t len) {
         return false;
     }
 
-    if (addr + len > NX_FLASH_TOTAL_SIZE) {
+    if (len > NX_FLASH_TOTAL_SIZE - addr) {
         return false;
     }
 
@@ -209,7 +216,9 @@ bool flash_is_aligned(uint32_t addr, size_t len) {
  * \brief           Save flash contents to file
  */
 nx_status_t flash_save_to_file(nx_flash_state_t* state) {
-    NX_ASSERT(state != NULL);
+    if (state == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
 
     if (state->backing_file[0] == '\0') {
         return NX_ERR_INVALID_PARAM;
@@ -220,33 +229,36 @@ nx_status_t flash_save_to_file(nx_flash_state_t* state) {
         return NX_ERR_IO;
     }
 
-    /* Write all sectors to file */
+    nx_status_t status = NX_OK;
+    /* fwrite success alone does not cover a buffered flush/close failure. */
     for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; i++) {
-        size_t written =
-            fwrite(state->sectors[i].data, 1, NX_FLASH_SECTOR_SIZE, file);
+        size_t written = fwrite(state->sectors[i].data, 1,
+                                NX_FLASH_SECTOR_SIZE, file);
         if (written != NX_FLASH_SECTOR_SIZE) {
-            fclose(file);
-            return NX_ERR_IO;
+            status = NX_ERR_IO;
+            break;
         }
     }
-
-    fclose(file);
-    return NX_OK;
+    if (fclose(file) != 0) {
+        status = NX_ERR_IO;
+    }
+    return status;
 }
 
-/**
- * \brief           Load flash contents from file
- */
+/** Load one complete raw image. Missing files represent erased first boot;
+ * unreadable or truncated existing files must never look like a valid image. */
 nx_status_t flash_load_from_file(nx_flash_state_t* state) {
-    NX_ASSERT(state != NULL);
-
+    if (state == NULL) {
+        return NX_ERR_NULL_PTR;
+    }
     if (state->backing_file[0] == '\0') {
         return NX_ERR_INVALID_PARAM;
     }
-
     FILE* file = fopen(state->backing_file, "rb");
     if (file == NULL) {
-        /* File doesn't exist, initialize with erased state */
+        if (errno != ENOENT) {
+            return NX_ERR_IO;
+        }
         for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; i++) {
             memset(state->sectors[i].data, NX_FLASH_ERASED_BYTE,
                    NX_FLASH_SECTOR_SIZE);
@@ -254,29 +266,14 @@ nx_status_t flash_load_from_file(nx_flash_state_t* state) {
         }
         return NX_OK;
     }
-
-    /* Read all sectors from file */
+    nx_status_t status = NX_OK;
     for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; i++) {
-        size_t read_bytes =
-            fread(state->sectors[i].data, 1, NX_FLASH_SECTOR_SIZE, file);
+        size_t read_bytes = fread(state->sectors[i].data, 1,
+                                 NX_FLASH_SECTOR_SIZE, file);
         if (read_bytes != NX_FLASH_SECTOR_SIZE) {
-            /* Partial read or error, initialize remaining with erased state */
-            if (read_bytes > 0) {
-                memset(&state->sectors[i].data[read_bytes],
-                       NX_FLASH_ERASED_BYTE, NX_FLASH_SECTOR_SIZE - read_bytes);
-            }
-            state->sectors[i].erased = false;
-
-            /* Initialize remaining sectors */
-            for (uint32_t j = i + 1; j < NX_FLASH_NUM_SECTORS; j++) {
-                memset(state->sectors[j].data, NX_FLASH_ERASED_BYTE,
-                       NX_FLASH_SECTOR_SIZE);
-                state->sectors[j].erased = true;
-            }
+            status = NX_ERR_IO;
             break;
         }
-
-        /* Check if sector is erased */
         state->sectors[i].erased = true;
         for (size_t j = 0; j < NX_FLASH_SECTOR_SIZE; j++) {
             if (state->sectors[i].data[j] != NX_FLASH_ERASED_BYTE) {
@@ -285,7 +282,8 @@ nx_status_t flash_load_from_file(nx_flash_state_t* state) {
             }
         }
     }
-
-    fclose(file);
-    return NX_OK;
+    if (fclose(file) != 0) {
+        status = NX_ERR_IO;
+    }
+    return status;
 }

@@ -21,6 +21,17 @@ extern "C" {
 /* Helper Functions                                                          */
 /*---------------------------------------------------------------------------*/
 
+/* Host sample patterns are reproducible test data, not an entropy source.
+ * Unsigned arithmetic intentionally wraps the per-device LCG state. */
+static inline uint32_t adc_simulation_seed(uint8_t index) {
+    return UINT32_C(0x4e584144) ^ ((uint32_t)index * UINT32_C(0x9e3779b9));
+}
+
+static inline uint16_t adc_simulation_sample(uint32_t* seed, uint8_t channel) {
+    *seed = *seed * UINT32_C(1664525) + UINT32_C(1013904223);
+    return (uint16_t)(((*seed >> 20) + (uint32_t)channel * 100u) & 0xfffu);
+}
+
 /**
  * \brief           Get ADC implementation from base interface
  * \param[in]       self: ADC interface pointer

@@ -61,9 +61,9 @@ nx_status_t usb_validate_state(nx_usb_state_t* state) {
  * \brief           Initialize circular buffer
  */
 void buffer_init(nx_usb_buffer_t* buf, uint8_t* data, size_t size) {
-    NX_ASSERT(buf != NULL);
-    NX_ASSERT(data != NULL);
-    NX_ASSERT(size > 0);
+    if (buf == NULL || data == NULL || size == 0) {
+        return;
+    }
 
     buf->data = data;
     buf->size = size;

@@ -194,6 +194,34 @@ TEST_F(DeviceRegistrationTest, FactoryFunctionsWork) {
     EXPECT_NE(nullptr, i2c);
 }
 
+TEST_F(DeviceRegistrationTest, FactoryUnknownMaximumIndicesDoNotAliasDevices) {
+    /* The widest uint8_t index must resolve its full name, never device zero. */
+    const uint8_t unknown = UINT8_MAX;
+    EXPECT_EQ(nullptr, nx_factory_gpio_read_write('A', unknown));
+    EXPECT_EQ(nullptr, nx_factory_gpio_read('A', unknown));
+    EXPECT_EQ(nullptr, nx_factory_gpio_write('A', unknown));
+    EXPECT_EQ(nullptr, nx_factory_uart(unknown));
+    EXPECT_EQ(nullptr, nx_factory_spi(unknown));
+    EXPECT_EQ(nullptr, nx_factory_i2c(unknown));
+    EXPECT_EQ(nullptr, nx_factory_timer(unknown));
+    EXPECT_EQ(nullptr, nx_factory_timer_pwm(unknown));
+    EXPECT_EQ(nullptr, nx_factory_timer_encoder(unknown));
+    EXPECT_EQ(nullptr, nx_factory_adc(unknown));
+    EXPECT_EQ(nullptr, nx_factory_flash(unknown));
+    EXPECT_EQ(nullptr, nx_factory_can(unknown));
+    EXPECT_EQ(nullptr, nx_factory_usb(unknown));
+    EXPECT_EQ(nullptr, nx_factory_rtc(unknown));
+    EXPECT_EQ(nullptr, nx_factory_watchdog(unknown));
+    EXPECT_EQ(nullptr, nx_factory_dac(unknown));
+    EXPECT_EQ(nullptr, nx_factory_sdio(unknown));
+    EXPECT_EQ(nullptr, nx_factory_crc(unknown));
+    EXPECT_EQ(nullptr, nx_factory_option_bytes(unknown));
+
+    EXPECT_EQ(nx_device_get("UART0"), nx_factory_uart(0));
+    EXPECT_EQ(nx_device_get("SPI0"), nx_factory_spi(0));
+    EXPECT_EQ(nx_device_get("I2C0"), nx_factory_i2c(0));
+}
+
 /*---------------------------------------------------------------------------*/
 /* DMA Channel Management Tests - Requirements 16.1-16.5                     */
 /*---------------------------------------------------------------------------*/

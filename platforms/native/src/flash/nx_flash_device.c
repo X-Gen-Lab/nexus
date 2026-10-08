@@ -60,8 +60,14 @@ static void flash_init_instance(nx_flash_impl_t* impl, uint8_t index) {
     impl->state->locked = true;
 
     /* Set backing file path */
-    snprintf(impl->state->backing_file, sizeof(impl->state->backing_file),
-             "native_flash%d.bin", index);
+    int path_size = snprintf(impl->state->backing_file,
+                             sizeof(impl->state->backing_file),
+                             "native_flash%d.bin", index);
+    if (path_size < 0 || (size_t)path_size >= sizeof(impl->state->backing_file)) {
+        nx_mem_free(impl->state);
+        impl->state = NULL;
+        return;
+    }
 
     /* Initialize all sectors as erased */
     for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; i++) {

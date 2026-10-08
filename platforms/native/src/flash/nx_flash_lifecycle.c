@@ -42,7 +42,7 @@ static nx_status_t flash_lifecycle_init(nx_lifecycle_t* self) {
 
     /* Load from file if exists */
     nx_status_t status = flash_load_from_file(state);
-    if (status != NX_OK && status != NX_ERR_IO) {
+    if (status != NX_OK) {
         return status;
     }
 
@@ -76,7 +76,10 @@ static nx_status_t flash_lifecycle_deinit(nx_lifecycle_t* self) {
     }
 
     /* Save to file before deinit */
-    flash_save_to_file(state);
+    nx_status_t status = flash_save_to_file(state);
+    if (status != NX_OK) {
+        return status; /* Keep the initialized image/resources for a retry. */
+    }
 
     /* Mark as uninitialized */
     state->initialized = false;
@@ -111,7 +114,10 @@ static nx_status_t flash_lifecycle_suspend(nx_lifecycle_t* self) {
     }
 
     /* Save to file before suspend */
-    flash_save_to_file(state);
+    nx_status_t status = flash_save_to_file(state);
+    if (status != NX_OK) {
+        return status; /* Keep the initialized image/resources for a retry. */
+    }
 
     /* Mark as suspended */
     state->suspended = true;

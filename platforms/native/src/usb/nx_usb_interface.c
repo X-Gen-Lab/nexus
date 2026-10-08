@@ -252,7 +252,9 @@ static bool usb_is_connected(nx_usb_t* self) {
  * \brief           Initialize TX async interface
  */
 void usb_init_tx_async(nx_tx_async_t* tx_async) {
-    NX_ASSERT(tx_async != NULL);
+    if (tx_async == NULL) {
+        return;
+    }
     NX_INIT_TX_ASYNC(tx_async, usb_tx_async_send, usb_tx_async_get_state);
 }
 
@@ -260,7 +262,9 @@ void usb_init_tx_async(nx_tx_async_t* tx_async) {
  * \brief           Initialize RX async interface
  */
 void usb_init_rx_async(nx_rx_async_t* rx_async) {
-    NX_ASSERT(rx_async != NULL);
+    if (rx_async == NULL) {
+        return;
+    }
     NX_INIT_RX_ASYNC(rx_async, usb_rx_async_receive);
 }
 
@@ -268,7 +272,9 @@ void usb_init_rx_async(nx_rx_async_t* rx_async) {
  * \brief           Initialize TX sync interface
  */
 void usb_init_tx_sync(nx_tx_sync_t* tx_sync) {
-    NX_ASSERT(tx_sync != NULL);
+    if (tx_sync == NULL) {
+        return;
+    }
     NX_INIT_TX_SYNC(tx_sync, usb_tx_sync_send);
 }
 
@@ -276,7 +282,9 @@ void usb_init_tx_sync(nx_tx_sync_t* tx_sync) {
  * \brief           Initialize RX sync interface
  */
 void usb_init_rx_sync(nx_rx_sync_t* rx_sync) {
-    NX_ASSERT(rx_sync != NULL);
+    if (rx_sync == NULL) {
+        return;
+    }
     NX_INIT_RX_SYNC(rx_sync, usb_rx_sync_receive, usb_rx_sync_receive_all);
 }
 
@@ -284,7 +292,9 @@ void usb_init_rx_sync(nx_rx_sync_t* rx_sync) {
  * \brief           Initialize USB base interface
  */
 void usb_init_base(nx_usb_t* base) {
-    NX_ASSERT(base != NULL);
+    if (base == NULL) {
+        return;
+    }
     base->is_connected = usb_is_connected;
 }
 

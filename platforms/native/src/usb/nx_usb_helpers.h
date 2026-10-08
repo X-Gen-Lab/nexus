@@ -55,6 +55,7 @@ nx_status_t usb_validate_state(nx_usb_state_t* state);
  * \param[in]       buf: Buffer pointer
  * \param[in]       data: Data storage pointer
  * \param[in]       size: Buffer size
+ * \note            NULL pointers or zero size leave the buffer unchanged.
  */
 void buffer_init(nx_usb_buffer_t* buf, uint8_t* data, size_t size);
 
@@ -177,6 +178,8 @@ nx_status_t usb_simulate_resume(nx_usb_state_t* state);
 /*---------------------------------------------------------------------------*/
 /* Interface Initialization Functions                                        */
 /*---------------------------------------------------------------------------*/
+
+/* NULL interface pointers are ignored by these void initializers. */
 
 /**
  * \brief           Initialize TX async interface

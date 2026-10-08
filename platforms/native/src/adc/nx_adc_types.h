@@ -95,6 +95,7 @@ typedef struct nx_adc_state_s {
     uint8_t index;          /**< Instance index */
     nx_adc_config_t config; /**< Configuration */
     nx_adc_stats_t stats;   /**< Statistics */
+    uint32_t simulation_seed; /**< Per-device deterministic sample state */
     bool initialized;       /**< Initialization flag */
     bool suspended;         /**< Suspend flag */
     bool clock_enabled;     /**< Clock enable flag */
@@ -145,6 +146,7 @@ typedef struct nx_adc_buffer_platform_config_s {
 typedef struct nx_adc_buffer_state_s {
     uint8_t index;                     /**< Instance index */
     uint8_t channel_count;             /**< Number of channels */
+    uint32_t simulation_seed;          /**< Per-device deterministic sample state */
     bool initialized;                  /**< Initialization flag */
     bool clock_enabled;                /**< Clock enable flag */
     bool sampling_active;              /**< Sampling active flag */

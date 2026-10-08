@@ -14,7 +14,6 @@
 #include "nx_adc_helpers.h"
 #include "nx_adc_types.h"
 #include <stddef.h>
-#include <stdlib.h>
 
 /*---------------------------------------------------------------------------*/
 /* Lifecycle Operations                                                      */
@@ -41,9 +40,11 @@ static nx_status_t adc_lifecycle_init(nx_lifecycle_t* self) {
     impl->state->stats.conversion_count = 0;
     impl->state->stats.error_count = 0;
 
-    /* Initialize simulated channel values with random data */
+    /* Each fresh initialization replays this device's bounded sample pattern. */
+    impl->state->simulation_seed = adc_simulation_seed(impl->state->index);
     for (int i = 0; i < NX_ADC_MAX_CHANNELS; i++) {
-        impl->channels[i].simulated_value = (uint16_t)(rand() % 4096);
+        impl->channels[i].simulated_value = adc_simulation_sample(
+            &impl->state->simulation_seed, (uint8_t)i);
     }
 
     return NX_OK;

@@ -18,7 +18,6 @@
 #include "nx_adc_helpers.h"
 #include "nx_adc_types.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -53,15 +52,17 @@ extern void adc_buffer_init_power(nx_power_t* power);
  * \brief           Simulate DMA transfer filling buffer with samples
  */
 static void adc_buffer_simulate_dma_transfer(nx_adc_buffer_impl_t* impl) {
-    if (!impl || !impl->state || !impl->state->buffer) {
+    if (!impl || !impl->state || !impl->state->buffer ||
+        !impl->state->channel_count) {
         return;
     }
 
     /* Fill buffer with simulated interleaved samples */
     for (size_t i = 0; i < impl->state->buffer_size; i++) {
         uint8_t channel = i % impl->state->channel_count;
-        /* Generate simulated ADC value (0-4095 for 12-bit ADC) */
-        impl->state->buffer[i] = (uint32_t)(rand() % 4096) + (channel * 100);
+        /* Channel mixing remains within the 12-bit sample range. */
+        impl->state->buffer[i] = adc_simulation_sample(
+            &impl->state->simulation_seed, channel);
     }
 
     impl->state->current_index = impl->state->buffer_size;

@@ -18,6 +18,8 @@ extern "C" {
 #include "hal/interface/nx_flash.h"
 #include "hal/nx_factory.h"
 #include "devices/native_flash_helpers.h"
+#include "../../../platforms/native/src/flash/nx_flash_helpers.h"
+void flash_init_lifecycle(nx_lifecycle_t*);
 }
 
 /**
@@ -365,3 +367,81 @@ TEST_F(FlashTest, Error_Suspended) {
     EXPECT_EQ(NX_ERR_INVALID_STATE, flash->write(flash, 0, data, sizeof(data)));
     EXPECT_EQ(NX_ERR_INVALID_STATE, flash->erase(flash, 0, sizeof(data)));
 }
+
+/* Exercise the production helpers directly: these can also be called during
+ * lifecycle persistence, before a fully initialized public Flash exists. */
+TEST(FlashHelperValidation, NullStateAndDataReturnWithoutDereference) {
+    uint8_t data[4]={1,2,3,4};
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_save_to_file(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_load_from_file(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_erase_sector(nullptr,0));
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_read(nullptr,0,data,sizeof(data)));
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_write(nullptr,0,data,sizeof(data)));
+    EXPECT_FALSE(flash_is_erased(nullptr,0,sizeof(data)));
+    auto* state=new nx_flash_state_t{};
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_read(state,0,nullptr,sizeof(data)));
+    EXPECT_EQ(NX_ERR_NULL_PTR,flash_write(state,0,nullptr,sizeof(data)));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,flash_save_to_file(state));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,flash_load_from_file(state));
+    delete state;
+}
+
+TEST(FlashHelperValidation, AddressLengthOverflowIsRejected) {
+    EXPECT_FALSE(flash_is_valid_address(4,SIZE_MAX));
+    EXPECT_FALSE(flash_is_valid_address(NX_FLASH_TOTAL_SIZE,0));
+    EXPECT_FALSE(flash_is_valid_address(NX_FLASH_TOTAL_SIZE-4,8));
+    EXPECT_TRUE(flash_is_valid_address(NX_FLASH_TOTAL_SIZE-4,4));
+}
+
+#ifndef _WIN32
+#include <cstdlib>
+#include <cstdio>
+#include <memory>
+#include <unistd.h>
+
+TEST(FlashPersistenceValidation, IOFailuresPropagateAndDeinitCanBeRetried) {
+    auto state=std::make_unique<nx_flash_state_t>();
+    std::strcpy(state->backing_file,"/dev/full");
+    EXPECT_EQ(NX_ERR_IO,flash_save_to_file(state.get()));
+    nx_flash_impl_t impl{};
+    impl.state=state.get();
+    flash_init_lifecycle(&impl.lifecycle);
+    state->initialized=true;
+    EXPECT_EQ(NX_ERR_IO,impl.lifecycle.deinit(&impl.lifecycle));
+    EXPECT_TRUE(state->initialized);
+    char path[]="/tmp/nexus-flash-model-XXXXXX";
+    int descriptor=mkstemp(path);
+    ASSERT_GE(descriptor,0);
+    ASSERT_EQ(0,close(descriptor));
+    std::strcpy(state->backing_file,path);
+    EXPECT_EQ(NX_OK,impl.lifecycle.deinit(&impl.lifecycle));
+    EXPECT_FALSE(state->initialized);
+    EXPECT_EQ(0,std::remove(path));
+}
+
+TEST(FlashPersistenceValidation, MissingFileIsFirstBootButShortOrUnreadableImageIsError) {
+    auto state=std::make_unique<nx_flash_state_t>();
+    char path[]="/tmp/nexus-flash-load-XXXXXX";
+    int descriptor=mkstemp(path);
+    ASSERT_GE(descriptor,0);
+    const uint8_t partial[]={0x12,0x34};
+    ASSERT_EQ(static_cast<ssize_t>(sizeof(partial)),write(descriptor,partial,sizeof(partial)));
+    ASSERT_EQ(0,close(descriptor));
+    std::strcpy(state->backing_file,path);
+    EXPECT_EQ(NX_ERR_IO,flash_load_from_file(state.get()));
+    nx_flash_impl_t impl{}; impl.state=state.get();
+    flash_init_lifecycle(&impl.lifecycle);
+    EXPECT_EQ(NX_ERR_IO,impl.lifecycle.init(&impl.lifecycle));
+    EXPECT_FALSE(state->initialized);
+    EXPECT_EQ(0,std::remove(path));
+    ASSERT_EQ(NX_OK,impl.lifecycle.init(&impl.lifecycle));
+    EXPECT_TRUE(state->initialized);
+    EXPECT_TRUE(flash_is_erased(state.get(),0,NX_FLASH_TOTAL_SIZE));
+    ASSERT_EQ(NX_OK,impl.lifecycle.deinit(&impl.lifecycle));
+    EXPECT_EQ(0,std::remove(path));
+    std::strcpy(state->backing_file,"/tmp");
+    EXPECT_EQ(NX_ERR_IO,flash_load_from_file(state.get()));
+    EXPECT_EQ(NX_ERR_IO,impl.lifecycle.init(&impl.lifecycle));
+    EXPECT_FALSE(state->initialized);
+}
+#endif

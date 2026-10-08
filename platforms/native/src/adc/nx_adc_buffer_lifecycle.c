@@ -38,6 +38,7 @@ static nx_status_t adc_buffer_lifecycle_init(nx_lifecycle_t* self) {
     impl->state->initialized = true;
     impl->state->sampling_active = false;
     impl->state->current_index = 0;
+    impl->state->simulation_seed = adc_simulation_seed(impl->state->index);
 
     return NX_OK;
 }

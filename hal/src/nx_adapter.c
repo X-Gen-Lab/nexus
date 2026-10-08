@@ -167,7 +167,7 @@ static nx_status_t rx_async_to_sync_receive_all(nx_rx_sync_t* self,
 
         if (nx_get_tick_ms() - start > timeout_ms) {
             *len = received;
-            return (received > 0) ? NX_ERR_TIMEOUT : NX_ERR_TIMEOUT;
+            return NX_ERR_TIMEOUT;
         }
 
         if (status == NX_ERR_NO_DATA) {

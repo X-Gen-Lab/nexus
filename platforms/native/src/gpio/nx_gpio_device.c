@@ -49,6 +49,10 @@ extern void gpio_init_power(nx_power_t* power);
 NX_UNUSED static void
 gpio_init_instance(nx_gpio_read_write_impl_t* impl,
                    const nx_gpio_platform_config_t* platform_cfg) {
+    if (impl == NULL || platform_cfg == NULL) {
+        return;
+    }
+
     /* Initialize interfaces (implemented in separate files) */
     gpio_init_read_write(&impl->base);
     gpio_init_lifecycle(&impl->lifecycle);
@@ -68,14 +72,12 @@ gpio_init_instance(nx_gpio_read_write_impl_t* impl,
     impl->state->pin_state = 0;
 
     /* Set configuration from Kconfig */
-    if (platform_cfg != NULL) {
-        impl->state->config.port = platform_cfg->port;
-        impl->state->config.pin = platform_cfg->pin;
-        impl->state->config.mode = platform_cfg->mode;
-        impl->state->config.pull = platform_cfg->pull;
-        impl->state->config.speed = platform_cfg->speed;
-        impl->state->config.af = platform_cfg->af;
-    }
+    impl->state->config.port = platform_cfg->port;
+    impl->state->config.pin = platform_cfg->pin;
+    impl->state->config.mode = platform_cfg->mode;
+    impl->state->config.pull = platform_cfg->pull;
+    impl->state->config.speed = platform_cfg->speed;
+    impl->state->config.af = platform_cfg->af;
 
     /* Clear interrupt context */
     impl->state->exti.callback = NULL;
@@ -96,6 +98,10 @@ gpio_init_instance(nx_gpio_read_write_impl_t* impl,
  * \note            Ensures proper cleanup of allocated resources on failure.
  */
 NX_UNUSED static void* nx_gpio_device_init(const nx_device_t* dev) {
+    if (dev == NULL) {
+        return NULL;
+    }
+
     const nx_gpio_platform_config_t* config =
         (const nx_gpio_platform_config_t*)dev->config;
 

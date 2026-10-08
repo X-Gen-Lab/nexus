@@ -14,6 +14,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
+#include "hal/base/nx_device.h"
 #include "hal/interface/nx_gpio.h"
 #include "hal/nx_factory.h"
 #include "devices/native_gpio_helpers.h"
@@ -598,4 +599,19 @@ TEST_F(GPIOTest, MultipleInterruptRegistrations) {
     native_gpio_state_t state;
     EXPECT_EQ(NX_OK, native_gpio_get_state(0, 0, &state));
     EXPECT_EQ(NX_GPIO_TRIGGER_FALLING, state.trigger);
+}
+
+TEST_F(GPIOTest, DeviceRegistrationRejectsNullDescriptorAndConfiguration) {
+    const nx_device_t* registered=nx_device_find("GPIOA0");
+    ASSERT_NE(nullptr,registered);
+    ASSERT_NE(nullptr,registered->device_init);
+    EXPECT_EQ(nullptr,registered->device_init(nullptr));
+    nx_device_t malformed=*registered;
+    malformed.config=nullptr;
+    EXPECT_EQ(nullptr,registered->device_init(&malformed));
+    /* A rejected construction must not damage the existing registered pin. */
+    nx_gpio_read_write_t* pin=nx_factory_gpio_read_write('A',0);
+    ASSERT_NE(nullptr,pin);
+    pin->write.write(&pin->write,1);
+    EXPECT_EQ(1,pin->read.read(&pin->read));
 }

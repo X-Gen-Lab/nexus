@@ -23,9 +23,9 @@ extern "C" {
 /* Flash Configuration                                                       */
 /*---------------------------------------------------------------------------*/
 
-#define NX_FLASH_SECTOR_SIZE 4096
-#define NX_FLASH_NUM_SECTORS 128
-#define NX_FLASH_TOTAL_SIZE  (NX_FLASH_SECTOR_SIZE * NX_FLASH_NUM_SECTORS)
+#define NX_FLASH_SECTOR_SIZE 4096u
+#define NX_FLASH_NUM_SECTORS 128u
+#define NX_FLASH_TOTAL_SIZE  ((size_t)NX_FLASH_SECTOR_SIZE * NX_FLASH_NUM_SECTORS)
 #define NX_FLASH_WRITE_UNIT  4
 #define NX_FLASH_ERASED_BYTE 0xFF
 

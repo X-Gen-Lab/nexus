@@ -112,9 +112,12 @@ Both ADC and ADC Buffer use the unified device registration mechanism:
 
 ### Simulation
 
-- ADC values are randomly generated (0-4095 for 12-bit)
+- Initial channel values and buffered samples use per-device deterministic
+  patterns bounded to 0-4095; fresh lifecycle initialization resets the pattern.
 - ADC Buffer simulates DMA transfer with interleaved samples
-- Channel values are updated on each trigger
+- Buffered samples advance on each trigger; channel test inputs remain unchanged
+  until explicitly overridden. These patterns do not provide entropy or model
+  electrical sampling timing.
 
 ### Testing Support
 
