@@ -1,17 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 📚 Documentation
-    url: https://nexus-platform.github.io/nexus/
-    about: Check the comprehensive documentation before opening an issue
-  - name: 💬 Discussions
-    url: https://github.com/nexus-platform/nexus/discussions
-    about: Ask questions, share ideas, and discuss with the community
-  - name: 🔒 Security Advisory
-    url: https://github.com/nexus-platform/nexus/security/advisories/new
-    about: Report security vulnerabilities privately (for critical issues)
-  - name: 📖 API Reference
-    url: https://nexus-platform.github.io/nexus/api/
-    about: Browse the complete API documentation
-  - name: 🚀 Quick Start Guide
-    url: https://nexus-platform.github.io/nexus/en/getting-started.html
-    about: Get started with Nexus in minutes
+  - name: Platform architecture and maintenance plan
+    url: https://github.com/X-Gen-Lab/nexus/tree/main/docs/strategy
+    about: Read scope, architectural decisions and acceptance criteria before opening a requirement.
+  - name: Security advisory
+    url: https://github.com/X-Gen-Lab/nexus/security/advisories/new
+    about: Use the private advisory channel for sensitive vulnerability details; do not include credentials in public issues.

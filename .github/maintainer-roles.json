@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "assignment_status": "roles_defined_named_team_assignment_pending",
+  "roles": [
+    {"id": "technical-lead", "seats": 1, "scope": ["architecture", "product-requirements", "support-policy"], "backup_role": "core-interfaces"},
+    {"id": "core-interfaces", "seats": 2, "scope": ["hal", "osal", "storage", "security-contracts"], "backup_role": "bsp-ports"},
+    {"id": "bsp-ports", "seats": 2, "scope": ["arch", "soc", "boards", "platforms/stm32", "platforms/gd32"], "backup_role": "core-interfaces"},
+    {"id": "industrial-apps", "seats": 2, "scope": ["applications", "services/industrial", "communication", "manufacturing-interface"], "backup_role": "bsp-ports"},
+    {"id": "quality-hil", "seats": 2, "scope": ["tests", "scripts/hil", "fault-injection", "field-regressions"], "backup_role": "build-release"},
+    {"id": "build-release", "seats": 1, "scope": ["cmake", ".github/workflows", "scripts/evidence", "artifact-provenance"], "backup_role": "quality-hil"}
+  ],
+  "interfaces": {
+    "security": "core-interfaces",
+    "manufacturing": "industrial-apps",
+    "field-maintenance": "quality-hil"
+  },
+  "note": "Role responsibilities are executable review routing metadata. These are not GitHub usernames or configured branch protection."
+}

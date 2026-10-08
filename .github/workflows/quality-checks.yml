@@ -9,7 +9,7 @@ jobs:
     name: Required static analysis
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: false
       - name: Initialize pinned maintained dependencies
@@ -31,7 +31,7 @@ jobs:
         run: python3 scripts/ci/quality_tools.py cppcheck --build-dir build/linux-clang-debug --tool cppcheck --report build/quality/cppcheck.txt
       - name: Retain reports on success and failure
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: required-static-analysis
           path: build/quality/

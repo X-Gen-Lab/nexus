@@ -2,9 +2,6 @@ name: Build Matrix
 
 on:
   workflow_call:
-    secrets:
-      CODECOV_TOKEN:
-        required: false
 
 env:
   CCACHE_DIR: ${{ github.workspace }}/.ccache
@@ -17,21 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Windows builds
-          - name: Windows MSVC Debug
-            os: windows-latest
-            preset: windows-msvc-debug
-            upload_artifacts: false
-          - name: Windows MSVC Release
-            os: windows-latest
-            preset: windows-msvc-release
-            upload_artifacts: true
-          - name: Windows GCC Release
-            os: windows-latest
-            preset: windows-gcc-release
-            upload_artifacts: false
-
-          # Linux builds
           - name: Linux GCC Debug
             os: ubuntu-latest
             preset: linux-gcc-debug
@@ -44,25 +26,22 @@ jobs:
             os: ubuntu-latest
             preset: linux-clang-release
             upload_artifacts: false
-
-          # macOS builds
-          - name: macOS Clang Release
-            os: macos-latest
-            preset: macos-clang-release
-            upload_artifacts: true
-
-          # ARM cross-compile
-          - name: ARM Cortex-M4 Release
+          - name: STM32F407 Baremetal Release
             os: ubuntu-latest
-            preset: linux-stm32-armgcc-release
+            preset: stm32-armgcc-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407 FreeRTOS Release
+            os: ubuntu-latest
+            preset: stm32-armgcc-freertos-release
             upload_artifacts: true
             is_arm: true
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
 
       - name: Setup Build Environment
@@ -71,35 +50,31 @@ jobs:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
 
-      - name: Cache Build
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/${{ matrix.preset }}
-            !build/${{ matrix.preset }}/**/*.obj
-            !build/${{ matrix.preset }}/**/*.o
-          key: ${{ runner.os }}-${{ matrix.preset }}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.preset }}-
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
 
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
 
       - name: Build
-        run: cmake --build --preset ${{ matrix.preset }} --parallel
+        run: cmake --build --preset ${{ matrix.preset }} --parallel 4
 
       - name: Test
         if: ${{ !matrix.is_arm }}
-        run: ctest --preset ${{ matrix.preset }} --output-on-failure --no-tests=error --parallel 4
+        run: ctest --preset ${{ matrix.preset }} --output-on-failure --no-tests=error --parallel 4 --output-junit "${{ github.workspace }}/build/${{ matrix.preset }}/ctest-results.xml"
 
       - name: Upload Artifacts
         if: matrix.upload_artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binaries-${{ matrix.preset }}
           path: |
             build/${{ matrix.preset }}/bin/*
             build/${{ matrix.preset }}/lib/*
+            build/${{ matrix.preset }}/generated/*
+            build/${{ matrix.preset }}/CMakeCache.txt
+            build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/ctest-results.xml
           retention-days: 7
 
   coverage:
@@ -107,9 +82,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
 
       - name: Setup Build Environment
@@ -118,11 +93,8 @@ jobs:
           os: ubuntu-latest
           preset: linux-gcc-coverage
 
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: coverage
-          max-size: 500M
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
 
       - name: Configure
         run: |
@@ -132,10 +104,10 @@ jobs:
       - name: Build
         run: |
           export PATH="/usr/lib/ccache:$PATH"
-          cmake --build --preset linux-gcc-coverage --parallel $(nproc)
+          cmake --build --preset linux-gcc-coverage --parallel 4
 
       - name: Test
-        run: ctest --preset linux-gcc-coverage --output-on-failure --no-tests=error --parallel $(nproc)
+        run: ctest --preset linux-gcc-coverage --output-on-failure --no-tests=error --parallel 4
 
       - name: Generate Coverage
         run: |
@@ -143,79 +115,54 @@ jobs:
           lcov --remove coverage.info '/usr/*' '*/tests/*' '*/ext/*' --output-file coverage.info
           genhtml coverage.info --output-directory coverage_html
 
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage.info
-          flags: unittests
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
           path: coverage_html/
           retention-days: 30
 
   sanitizer:
-    name: Sanitizer - ${{ matrix.sanitizer }}
+    name: ASan and UBSan service contracts
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        sanitizer: [address, undefined, thread]
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
-
+          submodules: false
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
-          preset: linux-gcc-debug
-
-      - name: Configure with Sanitizer
-        run: |
-          SANITIZER_FLAG=""
-          case "${{ matrix.sanitizer }}" in
-            address)
-              SANITIZER_FLAG="-fsanitize=address -fno-omit-frame-pointer"
-              ;;
-            undefined)
-              SANITIZER_FLAG="-fsanitize=undefined -fno-omit-frame-pointer"
-              ;;
-            thread)
-              SANITIZER_FLAG="-fsanitize=thread"
-              ;;
-          esac
-
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DNEXUS_PLATFORM=native \
-            -DNEXUS_CONFIG_FILE="${GITHUB_WORKSPACE}/platforms/native/defconfig" \
-            -DNEXUS_BUILD_TESTS=ON \
-            -DCMAKE_C_FLAGS="$SANITIZER_FLAG" \
-            -DCMAKE_CXX_FLAGS="$SANITIZER_FLAG"
-
-      - name: Build
-        run: cmake --build build --parallel $(nproc)
-
-      - name: Test with Sanitizer
-        run: ctest --test-dir build --output-on-failure --no-tests=error --parallel $(nproc)
+          preset: linux-gcc-sanitizers
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - name: Configure
+        run: cmake --preset linux-gcc-sanitizers
+      - name: Build Contract Targets
+        run: >-
+          cmake --build --preset linux-gcc-sanitizers --parallel 4 --target
+          osal_contract_tests baremetal_contract_tests init_registry_tests nexus_industrial_tests
+          native_registry_contract_tests posix_event_contract_tests unbound_platform_contract_tests log_contract_tests
+          blinky config_demo shell_demo freertos_demo nexus_industrial_controller
+          crypto_tests crypto_partial_tests crypto_unconfigured_tests
+          storage_tests config_persistence_tests update_tests update_storage_tests
+          test_driver_stm32_spi_bare test_driver_stm32_spi_osal test_driver_stm32_gpio
+      - name: Run Contract Targets
+        run: >-
+          ctest --preset linux-gcc-sanitizers --parallel 1 --output-on-failure --no-tests=error
+          -R '^(osal_contract_tests|baremetal_contract_tests|init_registry_tests|crypto_tests|crypto_partial_tests|crypto_unconfigured_tests|storage_tests|config_persistence_tests|update_tests|update_storage_tests|driver_stm32_spi_bare|driver_stm32_spi_osal|driver_stm32_gpio|nexus_industrial_tests|native_registry_contract_tests|posix_event_contract_tests|unbound_platform_contract_tests|log_contract_tests|native_blinky_smoke|native_config_demo_smoke|native_shell_demo_smoke|native_freertos_demo_smoke|native_industrial_controller_smoke)$'
+          --output-junit "${{ github.workspace }}/build/linux-gcc-sanitizers/ctest-results.xml"
         env:
-          ASAN_OPTIONS: detect_leaks=1:check_initialization_order=1
-          UBSAN_OPTIONS: print_stacktrace=1
-          TSAN_OPTIONS: second_deadlock_stack=1
-
-      - name: Upload Sanitizer Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      - name: Upload Sanitizer Evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: sanitizer-logs-${{ matrix.sanitizer }}
+          name: sanitizer-contract-evidence
           path: |
-            build/Testing/Temporary/*.log
+            build/linux-gcc-sanitizers/Testing/Temporary/*.log
+            build/linux-gcc-sanitizers/ctest-results.xml
+            build/linux-gcc-sanitizers/generated/*
           retention-days: 7

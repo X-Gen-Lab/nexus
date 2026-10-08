@@ -1,5 +1,9 @@
 name: CI
 
+permissions:
+  contents: read
+  pull-requests: read
+
 on:
   push:
     branches: [ main, develop ]
@@ -22,8 +26,8 @@ jobs:
       docs: ${{ steps.filter.outputs.docs }}
       workflows: ${{ steps.filter.outputs.workflows }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
@@ -31,6 +35,10 @@ jobs:
               - 'hal/**'
               - 'osal/**'
               - 'framework/**'
+              - 'services/**'
+              - 'boards/**'
+              - 'soc/**'
+              - 'profiles/**'
               - 'platforms/**'
               - 'applications/**'
               - 'tests/**'
@@ -100,7 +108,9 @@ jobs:
     needs: [changes, build-test, code-quality, docs]
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Verify locked external actions
+        run: python3 scripts/ci/check_action_pins.py
       - name: Test CI gate policy
         run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
       - name: Check required results

@@ -13,7 +13,7 @@ runs:
   using: composite
   steps:
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -21,18 +21,17 @@ runs:
     - name: Install Python Dependencies
       shell: bash
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        python -m pip install kconfiglib==14.1.0
 
     - name: Setup MSVC (Windows)
       if: runner.os == 'Windows' && contains(inputs.preset, 'msvc')
-      uses: ilammy/msvc-dev-cmd@v1
+      uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
       with:
         arch: x64
 
     - name: Setup MinGW (Windows)
       if: runner.os == 'Windows' && contains(inputs.preset, 'gcc')
-      uses: msys2/setup-msys2@v2
+      uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2.33.0
       with:
         msystem: MINGW64
         update: true
@@ -46,7 +45,7 @@ runs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake ninja-build ccache
+        sudo apt-get install -y cmake ninja-build ccache libssl-dev
 
         if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
           sudo apt-get install -y clang-14 clang-tidy-14
@@ -68,7 +67,7 @@ runs:
 
     - name: Setup ccache (Linux)
       if: runner.os == 'Linux'
-      uses: hendrikmuhs/ccache-action@v1.2
+      uses: hendrikmuhs/ccache-action@f09c25b45002a07be2955cbe52e8cee55643f89d # v1.2.24
       with:
         key: ${{ inputs.preset }}
         max-size: 500M
@@ -80,7 +79,7 @@ runs:
 
     - name: Setup ccache (macOS)
       if: runner.os == 'macOS'
-      uses: hendrikmuhs/ccache-action@v1.2
+      uses: hendrikmuhs/ccache-action@f09c25b45002a07be2955cbe52e8cee55643f89d # v1.2.24
       with:
         key: ${{ inputs.preset }}
         max-size: 500M

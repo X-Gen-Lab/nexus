@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "resolved_date": "2026-10-08",
+  "validation": "GitHub API commit resolution; runtime workflow execution pending",
+  "actions": [
+    {
+      "repository": "actions/checkout",
+      "previous_ref": "v4",
+      "ref": "v7.0.1",
+      "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "url": "https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "release_url": "https://github.com/actions/checkout/releases/tag/v7.0.1"
+    },
+    {
+      "repository": "actions/setup-python",
+      "previous_ref": "v5",
+      "ref": "v7.0.0",
+      "sha": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+      "url": "https://github.com/actions/setup-python/commit/5fda3b95a4ea91299a34e894583c3862153e4b97",
+      "release_url": "https://github.com/actions/setup-python/releases/tag/v7.0.0"
+    },
+    {
+      "repository": "actions/upload-artifact",
+      "previous_ref": "v4",
+      "ref": "v7.0.2",
+      "sha": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+      "url": "https://github.com/actions/upload-artifact/commit/cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+      "release_url": "https://github.com/actions/upload-artifact/releases/tag/v7.0.2"
+    },
+    {
+      "repository": "actions/download-artifact",
+      "previous_ref": "v4",
+      "ref": "v8.0.2",
+      "sha": "9000827ccba6bdab643e8b6fd33ac0654aef8333",
+      "url": "https://github.com/actions/download-artifact/commit/9000827ccba6bdab643e8b6fd33ac0654aef8333",
+      "release_url": "https://github.com/actions/download-artifact/releases/tag/v8.0.2"
+    },
+    {
+      "repository": "actions/upload-pages-artifact",
+      "previous_ref": "v3",
+      "ref": "v5.0.0",
+      "sha": "fc324d3547104276b827a68afc52ff2a11cc49c9",
+      "url": "https://github.com/actions/upload-pages-artifact/commit/fc324d3547104276b827a68afc52ff2a11cc49c9",
+      "release_url": "https://github.com/actions/upload-pages-artifact/releases/tag/v5.0.0"
+    },
+    {
+      "repository": "actions/deploy-pages",
+      "previous_ref": "v4",
+      "ref": "v5.0.1",
+      "sha": "368f82528645a54fb793d4d04e342629a3f51346",
+      "url": "https://github.com/actions/deploy-pages/commit/368f82528645a54fb793d4d04e342629a3f51346",
+      "release_url": "https://github.com/actions/deploy-pages/releases/tag/v5.0.1"
+    },
+    {
+      "repository": "dorny/paths-filter",
+      "previous_ref": "v3",
+      "ref": "v4.0.3",
+      "sha": "ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d",
+      "url": "https://github.com/dorny/paths-filter/commit/ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d",
+      "release_url": "https://github.com/dorny/paths-filter/releases/tag/v4.0.3"
+    },
+    {
+      "repository": "hendrikmuhs/ccache-action",
+      "previous_ref": "v1.2",
+      "ref": "v1.2.24",
+      "sha": "f09c25b45002a07be2955cbe52e8cee55643f89d",
+      "url": "https://github.com/hendrikmuhs/ccache-action/commit/f09c25b45002a07be2955cbe52e8cee55643f89d",
+      "release_url": "https://github.com/hendrikmuhs/ccache-action/releases/tag/v1.2.24"
+    },
+    {
+      "repository": "codecov/codecov-action",
+      "previous_ref": "v4",
+      "ref": "v7.1.1",
+      "sha": "303a32d7a59b442fa8d48b6a1cc6825c09c847a5",
+      "url": "https://github.com/codecov/codecov-action/commit/303a32d7a59b442fa8d48b6a1cc6825c09c847a5",
+      "release_url": "https://github.com/codecov/codecov-action/releases/tag/v7.1.1"
+    },
+    {
+      "repository": "ilammy/msvc-dev-cmd",
+      "previous_ref": "v1",
+      "ref": "v1.13.0",
+      "sha": "0b201ec74fa43914dc39ae48a89fd1d8cb592756",
+      "url": "https://github.com/ilammy/msvc-dev-cmd/commit/0b201ec74fa43914dc39ae48a89fd1d8cb592756",
+      "release_url": "https://github.com/ilammy/msvc-dev-cmd/releases/tag/v1.13.0"
+    },
+    {
+      "repository": "msys2/setup-msys2",
+      "previous_ref": "v2",
+      "ref": "v2.33.0",
+      "sha": "ec48f7c5447b3140e2b088413ae3a55687bccb6e",
+      "url": "https://github.com/msys2/setup-msys2/commit/ec48f7c5447b3140e2b088413ae3a55687bccb6e",
+      "release_url": "https://github.com/msys2/setup-msys2/releases/tag/v2.33.0"
+    },
+    {
+      "repository": "github/codeql-action",
+      "previous_ref": "v3",
+      "ref": "v4",
+      "sha": "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+      "url": "https://github.com/github/codeql-action/commit/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2"
+    },
+    {
+      "repository": "trufflesecurity/trufflehog",
+      "previous_ref": "main",
+      "ref": "v3.99.1",
+      "sha": "005b692bdfd0764e5da402887d9ab9196f8023dc",
+      "url": "https://github.com/trufflesecurity/trufflehog/commit/005b692bdfd0764e5da402887d9ab9196f8023dc",
+      "release_url": "https://github.com/trufflesecurity/trufflehog/releases/tag/v3.99.1"
+    }
+  ]
+}

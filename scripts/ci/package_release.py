@@ -11,9 +11,11 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import shlex
 import stat
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 import zipfile
 
 
@@ -23,32 +25,46 @@ VERSION_RE = re.compile(
 )
 NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
 CACHE_KEYS = (
-    "CMAKE_BUILD_TYPE", "CMAKE_GENERATOR", "CMAKE_C_COMPILER",
+    "CMAKE_BUILD_TYPE", "CMAKE_GENERATOR", "CMAKE_HOME_DIRECTORY", "CMAKE_C_COMPILER",
     "CMAKE_CXX_COMPILER", "CMAKE_TOOLCHAIN_FILE", "CMAKE_C_FLAGS",
     "CMAKE_C_FLAGS_RELEASE", "CMAKE_CXX_FLAGS_RELEASE", "NEXUS_PLATFORM",
-    "NEXUS_TOOLCHAIN_NAME",
     "NEXUS_OSAL_BACKEND", "NEXUS_BUILD_TESTS", "NEXUS_BUILD_EXAMPLES",
-    "NEXUS_CPU_ARCH", "NEXUS_FPU_TYPE", "NEXUS_FLOAT_ABI",
+    "NEXUS_ENABLE_COVERAGE", "NEXUS_ENABLE_SANITIZERS",
 )
 # Deliberately explicit: extending the release matrix requires a reviewed target
 # profile rather than treating a filename/preset label as evidence of its target.
 RELEASE_PROFILES = {
-    "windows-msvc-release": {
-        "artifact": "nexus-windows-msvc", "platform": "native", "compiler": "cl",
-    },
     "linux-gcc-release": {
         "artifact": "nexus-linux-gcc", "platform": "native", "compiler": "gcc",
+        "board": "native-reference", "chip": None, "osal": "native",
+        "support_profile": "native-contracts", "architecture": "x86_64",
+        "toolchain": "gcc", "fragment": "platforms/native/defconfig",
+        "dependencies": ("ext/googletest", "ext/freertos"),
     },
-    "macos-clang-release": {
-        "artifact": "nexus-macos-clang", "platform": "native", "compiler": "clang",
-    },
-    "linux-stm32-armgcc-release": {
-        "artifact": "nexus-arm-cortex-m4", "platform": "stm32",
+    "stm32-armgcc-release": {
+        "artifact": "nexus-stm32f407-baremetal", "platform": "stm32",
         "compiler": "arm-none-eabi-gcc", "cpu": "cortex-m4",
-        "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-gcc",
+        "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
         "toolchain_file": "cmake/toolchains/arm-gcc.cmake",
+        "board": "stm32f4discovery-mb997", "chip": "STM32F407xx", "osal": "baremetal",
+        "support_profile": "stm32f407-discovery-baremetal", "architecture": "armv7e-m",
+        "fragment": "configs/stm32f407_baremetal_defconfig",
+        "dependencies": ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
+                         "vendors/st/stm32f4xx_hal_driver"),
+    },
+    "stm32-armgcc-freertos-release": {
+        "artifact": "nexus-stm32f407-freertos", "platform": "stm32",
+        "compiler": "arm-none-eabi-gcc", "cpu": "cortex-m4",
+        "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
+        "toolchain_file": "cmake/toolchains/arm-gcc.cmake",
+        "board": "stm32f4discovery-mb997", "chip": "STM32F407xx", "osal": "freertos",
+        "support_profile": "stm32f407-discovery-freertos", "architecture": "armv7e-m",
+        "fragment": "configs/stm32f407_freertos_defconfig",
+        "dependencies": ("ext/freertos", "vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
+                         "vendors/st/stm32f4xx_hal_driver"),
     },
 }
+CONFIGURATION_FILES = ("effective.config", "nexus_config.h", "config.cmake")
 
 
 class ReleaseError(ValueError):
@@ -140,12 +156,18 @@ def sha256_file(path):
 
 
 def cmake_cache(path):
+    return cmake_cache_contents(path.read_text(encoding="utf-8"))
+
+
+def cmake_cache_contents(contents):
     values = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in contents.splitlines():
         if line.startswith(("#", "//")) or ":" not in line or "=" not in line:
             continue
         key_type, value = line.split("=", 1)
         key, _ = key_type.split(":", 1)
+        if key in values:
+            raise ReleaseError("CMake cache contains duplicate entries")
         values[key] = value
     return values
 
@@ -159,9 +181,118 @@ def release_profile(preset, artifact):
     return profile
 
 
-def validate_effective_build(cache, profile, configuration):
+def config_value(value):
+    if value in ("y", "n"):
+        return value == "y"
+    if value.startswith('"'):
+        result = json.loads(value)
+        if isinstance(result, str):
+            return result
+    if re.fullmatch(r"-?[0-9]+|0[xX][0-9a-fA-F]+", value):
+        return int(value, 16 if value.lower().startswith("0x") else 10)
+    raise ReleaseError("Invalid effective configuration value")
+
+
+def effective_config(value):
+    values = {}
+    for line in value.splitlines():
+        assigned = re.fullmatch(r"(CONFIG_[A-Za-z0-9_]+)=(.+)", line)
+        unset = re.fullmatch(r"# (CONFIG_[A-Za-z0-9_]+) is not set", line)
+        if assigned:
+            key, result = assigned[1], config_value(assigned[2])
+        elif unset:
+            key, result = unset[1], False
+        elif not line or line.startswith("#"):
+            continue
+        else:
+            raise ReleaseError("Malformed effective configuration")
+        if key in values:
+            raise ReleaseError("Duplicate effective configuration symbol")
+        values[key] = result
+    if not values:
+        raise ReleaseError("Effective configuration is empty")
+    return values
+
+
+def generated_cmake(value):
+    values = {}
+    for line in value.splitlines():
+        if not line or line.startswith("#"):
+            continue
+        match = re.fullmatch(r"set\((CONFIG_[A-Za-z0-9_]+) \[(=+)\[(.*?)\]\2\]\)", line)
+        if not match or match[1] in values:
+            raise ReleaseError("Malformed or duplicate generated CMake configuration")
+        values[match[1]] = match[3]
+    return values
+
+
+def generated_header(value, symbols):
+    values = {}
+    derived = False
+    for line in value.splitlines():
+        # Everything below this marker is conditional derived helper macros,
+        # including both branches of *_ENABLED. It is not the symbol table.
+        if "Peripheral Instance Traversal Macros" in line:
+            derived = True
+            continue
+        defined = re.fullmatch(r"#define NX_(CONFIG_[A-Za-z0-9_]+) (.+)", line)
+        unset = re.fullmatch(r"/\* #undef NX_(CONFIG_[A-Za-z0-9_]+) \*/", line)
+        if defined:
+            key, result = defined[1], config_value(defined[2])
+        elif unset:
+            key, result = unset[1], False
+        elif "NX_CONFIG_" in line and not re.fullmatch(r"#ifdef NX_CONFIG_[A-Za-z0-9_]+", line):
+            raise ReleaseError("Malformed generated configuration header")
+        else:
+            continue
+        if derived:
+            if key in symbols:
+                raise ReleaseError("Generated helpers redefine an effective configuration symbol")
+            continue
+        if key in values:
+            raise ReleaseError("Duplicate generated header symbol")
+        values[key] = result
+    return values
+
+
+def validate_configuration_bundle(contents):
+    """Read data without executing CMake or trusting removed cache aliases."""
+    values = effective_config(contents["effective.config"])
+    cmake = generated_cmake(contents["config.cmake"])
+    header = generated_header(contents["nexus_config.h"], cmake)
+    for key, value in values.items():
+        expected_cmake = ("ON" if value else "OFF") if isinstance(value, bool) else str(value)
+        actual_cmake = cmake.get(key)
+        if isinstance(value, int) and not isinstance(value, bool) and actual_cmake is not None:
+            try:
+                actual_cmake = str(config_value(actual_cmake))
+            except ReleaseError:
+                pass
+        if actual_cmake != expected_cmake:
+            raise ReleaseError(f"Effective configuration and CMake disagree on {key}")
+        # The generator omits empty/inactive non-boolean symbols from the header.
+        expected_header = 1 if value is True else value
+        if value == "":
+            valid = key not in header
+        else:
+            valid = (key in header and type(header[key]) is type(expected_header)
+                     and header[key] == expected_header)
+        if not valid:
+            raise ReleaseError(f"Effective configuration and header disagree on {key}")
+    for key in set(cmake) - set(values):
+        if not ((cmake[key] == "OFF" and header.get(key) is False)
+                or (cmake[key] == "" and key not in header)):
+            raise ReleaseError(f"Generated configuration contains an unrecorded value: {key}")
+    if set(header) - set(cmake):
+        raise ReleaseError("Generated header contains unrecorded configuration symbols")
+    return values
+
+
+def validate_effective_build(cache, profile, configuration, config):
     if configuration != "Release" or cache.get("CMAKE_BUILD_TYPE") != "Release":
         raise ReleaseError("Requested configuration does not match an effective Release build")
+    if config.get("CONFIG_BUILD_TYPE") != "Release" or config.get("CONFIG_BUILD_TYPE_RELEASE") is not True:
+        raise ReleaseError("Effective configuration does not describe a Release build")
     if cache.get("NEXUS_PLATFORM") != profile["platform"]:
         raise ReleaseError("Effective platform does not match the release target")
     compiler_path = cache.get("CMAKE_C_COMPILER", "").replace("\\", "/")
@@ -170,20 +301,79 @@ def validate_effective_build(cache, profile, configuration):
         compiler_name = compiler_name[:-4]
     if compiler_name != profile["compiler"]:
         raise ReleaseError("Effective compiler does not match the release target")
+    for field, expected in (
+        ("CONFIG_PLATFORM_NAME", profile["platform"]), ("CONFIG_BOARD_NAME", profile["board"]),
+        ("CONFIG_OSAL_BACKEND_NAME", profile["osal"]), ("CONFIG_TOOLCHAIN_NAME", profile["toolchain"]),
+    ):
+        if config.get(field) != expected:
+            raise ReleaseError(f"Effective {field} does not match the release target")
+    if cache.get("NEXUS_OSAL_BACKEND") and cache["NEXUS_OSAL_BACKEND"] != profile["osal"]:
+        raise ReleaseError("Effective OSAL cache constraint disagrees with the release target")
+    for option, symbol in (("NEXUS_BUILD_TESTS", "CONFIG_BUILD_TESTS"),
+                           ("NEXUS_BUILD_EXAMPLES", "CONFIG_BUILD_EXAMPLES"),
+                           ("NEXUS_ENABLE_COVERAGE", "CONFIG_ENABLE_COVERAGE"),
+                           ("NEXUS_ENABLE_SANITIZERS", "CONFIG_ENABLE_SANITIZERS")):
+        expected = config.get(symbol)
+        if not isinstance(expected, bool) or cache.get(option) not in ("ON", "OFF"):
+            raise ReleaseError(f"Missing effective build option: {option}")
+        if (cache[option] == "ON") != expected:
+            raise ReleaseError(f"Effective configuration disagrees with {option}")
+    if config["CONFIG_ENABLE_COVERAGE"] or config["CONFIG_ENABLE_SANITIZERS"]:
+        raise ReleaseError("Instrumented output cannot form a release candidate")
+    if not config["CONFIG_BUILD_EXAMPLES"]:
+        raise ReleaseError("Release candidates require built reference applications")
     if profile["platform"] == "native":
         if cache.get("CMAKE_TOOLCHAIN_FILE"):
             raise ReleaseError("Native release target unexpectedly uses a cross-toolchain file")
+        if not config["CONFIG_BUILD_TESTS"]:
+            raise ReleaseError("Native release requires host tests")
         return
     for field, expected in (
-        ("NEXUS_CPU_ARCH", profile["cpu"]), ("NEXUS_FPU_TYPE", profile["fpu"]),
-        ("NEXUS_FLOAT_ABI", profile["float_abi"]), ("NEXUS_TOOLCHAIN_NAME", profile["toolchain"]),
+        ("CONFIG_CPU_ARCH", profile["cpu"]), ("CONFIG_FPU_TYPE", profile["fpu"]),
+        ("CONFIG_FLOAT_ABI", profile["float_abi"]), ("CONFIG_STM32_CHIP_NAME", profile["chip"]),
     ):
-        if cache.get(field) != expected:
+        if config.get(field) != expected:
             raise ReleaseError(f"Effective {field} does not match the release target")
     toolchain_file = cache.get("CMAKE_TOOLCHAIN_FILE", "").replace("\\", "/")
     if not (toolchain_file == profile["toolchain_file"]
             or toolchain_file.endswith("/" + profile["toolchain_file"])):
         raise ReleaseError("Effective toolchain file does not match the release target")
+
+
+def target_identity(profile):
+    return {key: profile[key] for key in ("platform", "board", "chip", "osal", "architecture",
+                                         "toolchain", "support_profile")} | {
+        "board_revision": None, "hardware_verified": False,
+    }
+
+
+def test_report(contents):
+    try:
+        root = ET.fromstring(contents)
+    except ET.ParseError as exc:
+        raise ReleaseError("Invalid host test report") from exc
+    if root.tag not in ("testsuite", "testsuites"):
+        raise ReleaseError("Invalid host test report root")
+    cases = list(root.iter("testcase"))
+    if not cases:
+        raise ReleaseError("Host test report contains zero tests")
+    if any(node.tag in ("failure", "error") for node in root.iter()):
+        raise ReleaseError("Host test report contains failing tests")
+    for suite in (node for node in root.iter() if node.tag in ("testsuite", "testsuites")):
+        for key in ("failures", "errors"):
+            if suite.get(key, "0") != "0":
+                raise ReleaseError("Host test report contains failing tests")
+        try:
+            if suite.get("tests") is not None and int(suite.get("tests")) != len(list(suite.iter("testcase"))):
+                raise ReleaseError("Host test report count disagrees with executed entries")
+        except ValueError as exc:
+            raise ReleaseError("Host test report contains an invalid test count") from exc
+    skipped = sum(case.find("skipped") is not None for case in cases)
+    executed = len(cases) - skipped
+    if executed <= 0 or any(case.get("status", "run") != "run" and case.find("skipped") is None for case in cases):
+        raise ReleaseError("Host test report has no complete successful execution")
+    return {"kind": "native-host-tests", "executed": executed, "skipped": skipped,
+            "failed": 0, "hardware_verified": False}
 
 
 def compiled_header(header, size):
@@ -208,6 +398,53 @@ def compiled_file(path):
     with path.open("rb") as handle:
         header = handle.read(4096)
     return compiled_header(header, path.stat().st_size)
+
+
+def validate_target_outputs(outputs, profile):
+    machine = 62 if profile["platform"] == "native" else 40
+    elf_class = 2 if profile["platform"] == "native" else 1
+    executable = False
+    for name, header in outputs:
+        if not header.startswith(b"\x7fELF"):
+            continue
+        if (len(header) < 20 or header[4] != elf_class or header[5] != 1
+                or int.from_bytes(header[18:20], "little") != machine):
+            raise ReleaseError("Compiled ELF architecture does not match the release target")
+        if name.startswith("bin/") and int.from_bytes(header[16:18], "little") in (2, 3):
+            executable = True
+    if not executable:
+        raise ReleaseError("No target ELF reference application found under build bin")
+
+
+def validate_compile_commands(contents, profile, generated_directory=None, source=None):
+    commands = json.loads(contents)
+    if not isinstance(commands, list) or not commands:
+        raise ReleaseError("Compile command database is empty or invalid")
+    production = []
+    for entry in commands:
+        if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
+            raise ReleaseError("Compile command database contains an invalid entry")
+        filename = entry["file"].replace("\\", "/")
+        if not any(f"/{directory}/" in filename for directory in
+                   ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "applications")):
+            continue
+        if source is not None:
+            checked_path(filename, source)
+        arguments = entry.get("arguments")
+        if arguments is None and isinstance(entry.get("command"), str):
+            arguments = shlex.split(entry["command"])
+        if not isinstance(arguments, list) or not all(isinstance(arg, str) for arg in arguments):
+            raise ReleaseError("Compile command database contains an invalid command")
+        if generated_directory is not None and f"-I{generated_directory}" not in arguments:
+            raise ReleaseError("Production compile command does not consume its generated configuration")
+        if profile["platform"] == "stm32":
+            required = {f"-mcpu={profile['cpu']}", "-mthumb", f"-mfpu={profile['fpu']}",
+                        f"-mfloat-abi={profile['float_abi']}"}
+            if not required.issubset(arguments):
+                raise ReleaseError("Production compile command does not match the ARM target flags")
+        production.append(entry)
+    if not production:
+        raise ReleaseError("Compile command database contains no Nexus production source")
 
 
 def build_outputs(build, source, configuration):
@@ -235,9 +472,10 @@ def build_outputs(build, source, configuration):
     return files
 
 
-def submodules(source):
+def submodules(source, paths=()):
     modules = []
-    output = git(source, "submodule", "status", "--recursive")
+    arguments = ("--", *paths) if paths else ()
+    output = git(source, "submodule", "status", "--recursive", *arguments)
     # git() strips the first leading status space, so restore that marker only.
     if output and re.match(r"[0-9a-f]{40,64} ", output):
         output = " " + output
@@ -246,7 +484,35 @@ def submodules(source):
         if not match:
             raise ReleaseError("Submodules must be initialized at their recorded commits")
         modules.append({"path": match[2], "commit": match[1]})
+    if paths and not set(paths).issubset(module["path"] for module in modules):
+        raise ReleaseError("Required release dependencies are missing")
     return modules
+
+
+def validate_dependency_identity(source, modules, profile):
+    recorded = {module.get("path"): module.get("commit") for module in modules}
+    if len(recorded) != len(modules) or not set(profile["dependencies"]).issubset(recorded):
+        raise ReleaseError("Archive lacks the required dependency identity")
+    for path in profile["dependencies"]:
+        entry = git(source, "ls-tree", "HEAD", "--", path)
+        match = re.fullmatch(r"160000 commit ([0-9a-f]{40,64})\t" + re.escape(path), entry)
+        if not match or recorded[path] != match[1]:
+            raise ReleaseError("Archive dependency identity does not match the source commit")
+
+
+def validate_clean_source(source, build, output, version):
+    if git(source, "status", "--porcelain", "--untracked-files=no"):
+        raise ReleaseError("Tracked source files changed after checkout; provenance would be ambiguous")
+    build_relative = build.relative_to(source)
+    output_relative = output.relative_to(source)
+    if build_relative == Path(".") or output_relative == Path("."):
+        raise ReleaseError("Release build and output directories must be separate from the source root")
+    assets = {output_relative / f"{profile['artifact']}-{version}.zip{suffix}"
+              for profile in RELEASE_PROFILES.values() for suffix in ("", ".sha256")}
+    for filename in git(source, "ls-files", "--others", "--exclude-standard").splitlines():
+        path = Path(filename)
+        if not path.is_relative_to(build_relative) and path not in assets:
+            raise ReleaseError("Untracked source files could affect the build; commit them before packaging")
 
 
 def package(source, version, commit, preset, artifact, build, output, configuration):
@@ -258,19 +524,40 @@ def package(source, version, commit, preset, artifact, build, output, configurat
     build = checked_path(build, source, directory=True)
     output = checked_path(output, source, directory=True, required=False)
     cache = cmake_cache(checked_path(build / "CMakeCache.txt", source))
-    validate_effective_build(cache, profile, configuration)
-    entries = build_outputs(build, source, configuration)
-    compiled = [name for name, path in entries if compiled_file(path)]
+    if not cache.get("CMAKE_HOME_DIRECTORY") or checked_path(cache["CMAKE_HOME_DIRECTORY"], source, directory=True) != source:
+        raise ReleaseError("Build cache does not identify the selected source tree")
     config_paths = {}
-    for key, target in (
-        ("NEXUS_CONFIG_FILE", "configuration/.config"),
-        ("NEXUS_CONFIG_HEADER", "configuration/nexus_config.h"),
-    ):
-        if not cache.get(key):
-            raise ReleaseError(f"CMake cache does not record {key}")
-        path = checked_path(cache[key], source)
-        entries.append((target, path))
-        config_paths[key] = path.relative_to(source).as_posix()
+    configuration_entries = []
+    contents = {}
+    for name in CONFIGURATION_FILES:
+        path = checked_path(build / "generated" / name, source)
+        contents[name] = path.read_text(encoding="utf-8")
+        target = f"configuration/{name}"
+        config_paths[target] = path.relative_to(source).as_posix()
+        configuration_entries.append((target, path))
+    config = validate_configuration_bundle(contents)
+    validate_effective_build(cache, profile, configuration, config)
+    entries = build_outputs(build, source, configuration)
+    validate_target_outputs(((name, path.read_bytes()[:64]) for name, path in entries), profile)
+    compiled = [name for name, path in entries if compiled_file(path)]
+    entries.extend(configuration_entries)
+    fragment = checked_path(cache.get("NEXUS_CONFIG_FILE") or profile["fragment"], source)
+    entries.append(("configuration/input.fragment", fragment))
+    config_paths["configuration/input.fragment"] = fragment.relative_to(source).as_posix()
+    for name in ("CMakeCache.txt", "compile_commands.json"):
+        path = checked_path(build / name, source)
+        entries.append((f"build/{name}", path))
+    validate_compile_commands((build / "compile_commands.json").read_text(encoding="utf-8"),
+                              profile, build / "generated", source)
+    if profile["platform"] == "native":
+        report = checked_path(build / "ctest-results.xml", source)
+        validation = test_report(report.read_bytes())
+        entries.append(("validation/ctest-results.xml", report))
+        log = checked_path(build / "Testing/Temporary/LastTest.log", source, required=False)
+        if log.exists():
+            entries.append(("validation/LastTest.log", log))
+    else:
+        validation = {"kind": "cross-compile-only", "hardware_verified": False}
     for filename in ("CMakePresets.json", "README.md", "LICENSE"):
         entries.append((filename, checked_path(source / filename, source)))
     gitmodules = checked_path(source / ".gitmodules", source, required=False)
@@ -279,15 +566,14 @@ def package(source, version, commit, preset, artifact, build, output, configurat
     toolchain = cache.get("CMAKE_TOOLCHAIN_FILE")
     if toolchain:
         entries.append(("configuration/toolchain.cmake", checked_path(toolchain, source)))
-    dirty = git(source, "status", "--porcelain", "--untracked-files=no")
-    if dirty:
-        raise ReleaseError("Tracked source files changed after checkout; provenance would be ambiguous")
+    validate_clean_source(source, build, output, version)
     provenance = {
-        "schema_version": 1, **info, "artifact": artifact, "preset": preset,
+        "schema_version": 2, **info, "artifact": artifact, "preset": preset,
         "configuration": configuration, "source_worktree_dirty": False,
-        "configuration_paths": config_paths,
+        "configuration_paths": config_paths, "target": target_identity(profile),
+        "validation": validation,
         "cmake": {key: cache[key] for key in CACHE_KEYS if key in cache},
-        "submodules": submodules(source), "compiled_outputs": compiled,
+        "submodules": submodules(source, profile["dependencies"]), "compiled_outputs": compiled,
         "files": {name: {"sha256": sha256_file(path), "size": path.stat().st_size}
                   for name, path in entries},
         "limitations": ["unsigned provenance", "not a reproducible-build attestation",
@@ -348,8 +634,13 @@ def verify_bundle(archive, artifact, preset, version, commit):
                 raise ReleaseError(f"Archive provenance does not match {key}")
         if not provenance.get("compiled_outputs") or provenance.get("source_worktree_dirty") is not False:
             raise ReleaseError("Archive lacks clean compiled-output provenance")
+        if provenance.get("schema_version") != 2 or provenance.get("target") != target_identity(profile):
+            raise ReleaseError("Archive target identity does not match its reviewed support profile")
+        contents = {name: bundle.read(f"{artifact}/configuration/{name}").decode("utf-8")
+                    for name in CONFIGURATION_FILES}
+        config = validate_configuration_bundle(contents)
         validate_effective_build(provenance.get("cmake", {}), profile,
-                                 provenance.get("configuration"))
+                                 provenance.get("configuration"), config)
         checksums = parse_checksums(bundle.read(f"{artifact}/SHA256SUMS").decode())
         expected_names = {f"{artifact}/{name}" for name in checksums}
         if expected_names != set(names) - {f"{artifact}/SHA256SUMS"}:
@@ -358,11 +649,36 @@ def verify_bundle(archive, artifact, preset, version, commit):
             with bundle.open(f"{artifact}/{name}") as handle:
                 if hashlib.file_digest(handle, "sha256").hexdigest() != digest:
                     raise ReleaseError("Archive member checksum mismatch")
+        files = provenance.get("files", {})
+        if set(files) != set(checksums) - {"provenance.json"}:
+            raise ReleaseError("Archive provenance file list does not cover its contents")
+        for name, record in files.items():
+            if record.get("sha256") != checksums[name] or record.get("size") != bundle.getinfo(f"{artifact}/{name}").file_size:
+                raise ReleaseError("Archive provenance file identity disagrees with its contents")
+        packaged_cache = cmake_cache_contents(bundle.read(f"{artifact}/build/CMakeCache.txt").decode("utf-8"))
+        if {key: packaged_cache[key] for key in CACHE_KEYS if key in packaged_cache} != provenance["cmake"]:
+            raise ReleaseError("Archive cache does not match build provenance")
+        effective_path = provenance.get("configuration_paths", {}).get("configuration/effective.config", "")
+        if not effective_path:
+            raise ReleaseError("Archive lacks the effective configuration location")
+        validate_archive_path(effective_path)
+        generated_directory = Path(packaged_cache["CMAKE_HOME_DIRECTORY"]) / Path(effective_path).parent
+        validate_compile_commands(bundle.read(f"{artifact}/build/compile_commands.json").decode("utf-8"),
+                                  profile, generated_directory)
+        if profile["platform"] == "native":
+            validation = test_report(bundle.read(f"{artifact}/validation/ctest-results.xml"))
+        else:
+            validation = {"kind": "cross-compile-only", "hardware_verified": False}
+        if provenance.get("validation") != validation:
+            raise ReleaseError("Archive validation identity disagrees with its test evidence")
         for name in provenance["compiled_outputs"]:
             member = bundle.getinfo(f"{artifact}/{name}")
             with bundle.open(member) as handle:
                 if not compiled_header(handle.read(4096), member.file_size):
                     raise ReleaseError("Archive compiled output has an unrecognized format")
+        validate_target_outputs(((name, bundle.read(f"{artifact}/{name}")[:64])
+                                 for name in provenance["compiled_outputs"]), profile)
+        return provenance
 
 
 def verify_assets(source, version, commit, assets, expected, notes):
@@ -385,13 +701,16 @@ def verify_assets(source, version, commit, assets, expected, notes):
     if {path.name for path in assets.iterdir()} != required:
         raise ReleaseError("Downloaded release assets do not match the complete build matrix")
     lines = []
+    validations = {}
     for artifact, preset in sorted(expected_map.items()):
         archive = checked_path(assets / f"{artifact}-{version}.zip", source)
         sidecar = checked_path(assets / f"{archive.name}.sha256", source)
         actual = sha256_file(archive)
         if parse_checksums(sidecar.read_text(encoding="utf-8")) != {archive.name: actual}:
             raise ReleaseError("Downloaded archive checksum mismatch")
-        verify_bundle(archive, artifact, preset, version, commit)
+        provenance = verify_bundle(archive, artifact, preset, version, commit)
+        validate_dependency_identity(source, provenance.get("submodules", []), release_profile(preset, artifact))
+        validations[artifact] = provenance["validation"]
         lines.append(f"{actual}  {archive.name}\n")
     sums = checked_path(assets / "SHA256SUMS", source, required=False)
     with sums.open("x", encoding="utf-8", newline="\n") as handle:
@@ -402,12 +721,16 @@ def verify_assets(source, version, commit, assets, expected, notes):
             "This draft stages outputs from the complete release build matrix. "
             "A maintainer must review and publish it explicitly.\n\n"
             f"Source commit: `{commit}`.\n\n"
-            "Native host tests passed before packaging; the ARM target was cross-compiled. "
+            "Native host test reports and ARM cross-compile identities are included where applicable. "
             "Hardware qualification and firmware signing are not provided by this workflow.\n\n"
             "Archives include build configuration, submodule commits, and unsigned provenance. "
             "SHA256SUMS checks transfer integrity; it is not an authenticity signature or "
             "a reproducible-build attestation.\n\n"
-            + "".join(f"- `{artifact}`: `{preset}`\n" for artifact, preset in sorted(expected_map.items()))
+            + "".join(
+                f"- `{artifact}`: `{preset}`; " + (
+                    f"{validations[artifact]['executed']} host tests passed, {validations[artifact]['skipped']} skipped.\n"
+                    if validations[artifact]["kind"] == "native-host-tests" else "cross-compiled; HIL pending.\n"
+                ) for artifact, preset in sorted(expected_map.items()))
         )
 
 

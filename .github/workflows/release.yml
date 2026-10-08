@@ -27,11 +27,11 @@ jobs:
       commit: ${{ steps.validate.outputs.commit }}
       prerelease: ${{ steps.validate.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
       - name: Validate version and tag commit
@@ -48,25 +48,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Windows MSVC
-            os: windows-latest
-            preset: windows-msvc-release
-            artifact: nexus-windows-msvc
-            host_tests: true
           - name: Linux GCC
             os: ubuntu-latest
             preset: linux-gcc-release
             artifact: nexus-linux-gcc
             host_tests: true
-          - name: macOS Clang
-            os: macos-latest
-            preset: macos-clang-release
-            artifact: nexus-macos-clang
-            host_tests: true
-          - name: ARM Cortex-M4
+          - name: STM32F407 Baremetal
             os: ubuntu-latest
-            preset: linux-stm32-armgcc-release
-            artifact: nexus-arm-cortex-m4
+            preset: stm32-armgcc-release
+            artifact: nexus-stm32f407-baremetal
+            host_tests: false
+          - name: STM32F407 FreeRTOS
+            os: ubuntu-latest
+            preset: stm32-armgcc-freertos-release
+            artifact: nexus-stm32f407-freertos
             host_tests: false
     env:
       BUILD_PRESET: ${{ matrix.preset }}
@@ -77,24 +72,28 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.metadata.outputs.commit }}
           fetch-depth: 0
-          submodules: recursive
+          submodules: false
           persist-credentials: false
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
       - name: Configure
         run: cmake --preset "$BUILD_PRESET"
       - name: Build
-        run: cmake --build --preset "$BUILD_PRESET" --parallel
+        run: cmake --build --preset "$BUILD_PRESET" --parallel 4
       - name: Test native host build
         if: matrix.host_tests
-        run: ctest --preset "$BUILD_PRESET" --output-on-failure --no-tests=error
+        run: >-
+          ctest --preset "$BUILD_PRESET" --output-on-failure --no-tests=error --parallel 4
+          --output-junit "$GITHUB_WORKSPACE/build/$BUILD_PRESET/ctest-results.xml"
       - name: Package compiled outputs and provenance
         run: |
           python scripts/ci/package_release.py package \
@@ -102,13 +101,26 @@ jobs:
             --preset "$BUILD_PRESET" --artifact "$RELEASE_ARTIFACT" \
             --build-dir "build/$BUILD_PRESET" --output-dir release
       - name: Stage candidate assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-${{ matrix.artifact }}
           path: |
             release/*.zip
             release/*.sha256
           if-no-files-found: error
+          retention-days: 14
+      - name: Retain Build and Test Evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: evidence-${{ matrix.artifact }}
+          path: |
+            build/${{ matrix.preset }}/CMakeCache.txt
+            build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/generated/*
+            build/${{ matrix.preset }}/ctest-results.xml
+            build/${{ matrix.preset }}/Testing/Temporary/*.log
+          if-no-files-found: warn
           retention-days: 14
 
   candidate-release:
@@ -122,16 +134,16 @@ jobs:
       SOURCE_COMMIT: ${{ needs.metadata.outputs.commit }}
       RELEASE_PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.metadata.outputs.commit }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
       - name: Download complete candidate asset set
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: release-nexus-*
           path: release
@@ -140,10 +152,9 @@ jobs:
         run: |
           python scripts/ci/package_release.py verify-assets \
             --version "$RELEASE_VERSION" --source-commit "$SOURCE_COMMIT" \
-            --expected nexus-windows-msvc=windows-msvc-release \
             --expected nexus-linux-gcc=linux-gcc-release \
-            --expected nexus-macos-clang=macos-clang-release \
-            --expected nexus-arm-cortex-m4=linux-stm32-armgcc-release
+            --expected nexus-stm32f407-baremetal=stm32-armgcc-release \
+            --expected nexus-stm32f407-freertos=stm32-armgcc-freertos-release
       - name: Create draft candidate after every build succeeds
         env:
           GH_TOKEN: ${{ github.token }}

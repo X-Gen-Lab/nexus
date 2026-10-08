@@ -1,144 +1,107 @@
-# Nexus Security Workflow
-# Security scanning and dependency auditing
-
-name: Security
+name: Security Analysis
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday
+    - cron: '0 0 * * 0'
   workflow_dispatch:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
-  # Dependency scanning
-  dependency-scan:
-    name: Dependency Scanning
+  python-dependency-audit:
+    name: Audit resolved Python dependencies
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Resolve project dependencies and isolate the scanner
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip freeze > resolved-python.txt
+          python -m venv .audit-tools
+          .audit-tools/bin/python -m pip install pip-audit==2.9.0
+      - name: Audit the actual resolved project environment
+        run: |
+          .audit-tools/bin/pip-audit --requirement resolved-python.txt \
+            --no-deps --disable-pip --format json --output pip-audit.json
+          test -s pip-audit.json
+      - name: Preserve scanner evidence on success or failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: python-dependency-audit
+          path: |
+            resolved-python.txt
+            pip-audit.json
+          if-no-files-found: error
+          retention-days: 30
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install Safety
-      run: pip install safety
-
-    - name: Check Python Dependencies
-      run: |
-        pip install -r requirements.txt
-        safety check --json > safety-report.json || true
-
-    - name: Upload Safety Report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: safety-report
-        path: safety-report.json
-
-  # CodeQL analysis
   codeql:
-    name: CodeQL Analysis
+    name: CodeQL analysis (${{ matrix.language }})
     runs-on: ubuntu-latest
-
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      security-events: write
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'cpp', 'python' ]
-
+        language: [cpp, python]
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+      - name: Initialize pinned build dependencies
+        if: matrix.language == 'cpp'
+        run: |
+          git submodule update --init ext/freertos ext/googletest vendors/arm/CMSIS_5 \
+            vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+          build-mode: ${{ matrix.language == 'cpp' && 'manual' || 'none' }}
+      - name: Configure native compiler environment
+        if: matrix.language == 'cpp'
+        uses: ./.github/actions/setup-build
+        with:
+          os: ubuntu-latest
+          preset: linux-gcc-debug
+      - name: Trace the actual native build
+        if: matrix.language == 'cpp'
+        run: |
+          cmake --preset linux-gcc-debug
+          cmake --build --preset linux-gcc-debug --parallel 2
+          test -s build/linux-gcc-debug/compile_commands.json
+      - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        with:
+          category: /language:${{ matrix.language }}
+          upload: true
+      # Extraction/upload is execution evidence; findings still need triage.
+      # This job does not assert that the product has zero vulnerabilities.
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        queries: security-and-quality
-
-    - name: Setup Python
-      if: matrix.language == 'cpp'
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install Dependencies
-      if: matrix.language == 'cpp'
-      run: |
-        pip install -r requirements.txt
-
-    - name: Build for CodeQL
-      if: matrix.language == 'cpp'
-      run: |
-        cmake -B build \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DNEXUS_PLATFORM=native \
-          -DNEXUS_BUILD_TESTS=OFF
-        cmake --build build --parallel
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{ matrix.language }}"
-
-  # Secret scanning
   secret-scan:
-    name: Secret Scanning
+    name: Secret scan
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: TruffleHog Scan
-      uses: trufflesecurity/trufflehog@main
-      with:
-        path: ./
-        base: ${{ github.event.repository.default_branch }}
-        head: HEAD
-        extra_args: --debug --only-verified
-
-  # License compliance
-  license-check:
-    name: License Compliance
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install License Checker
-      run: pip install licensecheck
-
-    - name: Check Licenses
-      run: |
-        licensecheck --format json > license-report.json || true
-
-    - name: Upload License Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: license-report
-        path: license-report.json
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Detect verified and unknown secret candidates
+        uses: trufflesecurity/trufflehog@005b692bdfd0764e5da402887d9ab9196f8023dc # v3.99.1
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          head: ${{ github.event.pull_request.head.sha || github.sha }}
+          extra_args: --results=verified,unknown --fail
+      # The action revision is pinned by the repository dependency lock.
+      # Scanner/tool failures are failures; no blanket exception suppression.
