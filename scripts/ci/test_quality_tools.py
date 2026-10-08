@@ -1,10 +1,11 @@
 import json
 import os
 from pathlib import Path
+import shlex
 import sys
 import tempfile
 import unittest
-from quality_tools import commands, run
+from quality_tools import commands, compiler_query, run
 
 
 @unittest.skipUnless(os.name == "posix", "analyzer process fixtures require POSIX; CI analysis runs on Linux")
@@ -69,6 +70,111 @@ class RequiredAnalysisTests(unittest.TestCase):
     def test_missing_owned_source_fails(self):
         self.source.unlink()
         self.assertEqual(run("tidy", self.root, self.build, self.tool(0), self.report), 1)
+
+    def compiler(self, name="fixture-gcc", identity="17", failure=0, empty=False):
+        path = self.root / name
+        log = self.root / (name + ".queries.jsonl")
+        lines = "" if empty else f"#define __GNUC__ {identity}\n#define __SIZEOF_POINTER__ {{size}}\n#define {{target_macro}} 1\n#define __INT32_C(x) x\n#define PROJECT_ONLY 123\n"
+        path.write_text(
+            f"#!{sys.executable}\nimport json, sys\n"
+            f"with open({str(log)!r}, 'a') as log: log.write(json.dumps(sys.argv[1:]) + '\\n')\n"
+            "if '--version' in sys.argv:\n print('fixture compiler identity'); sys.exit(0)\n"
+            f"if {failure}: sys.exit({failure})\n"
+            "assert '-E' in sys.argv and '-dM' in sys.argv and sys.argv[-1] == '-'\n"
+            "assert '-c' not in sys.argv and '-o' not in sys.argv\n"
+            "arm = '--target=arm-fixture' in sys.argv\n"
+            "size = '4' if arm else '8'\n"
+            "target_macro = '__arm__' if arm else '__x86_64__'\n"
+            f"print({lines!r}.format(size=size, target_macro=target_macro), end='')\n")
+        path.chmod(0o700)
+        return str(path), log
+
+    def recording_analyzer(self):
+        path = self.root / "recording-analyzer"
+        self.analyzer_log = self.root / "analyzer.jsonl"
+        path.write_text(
+            f"#!{sys.executable}\nimport json, sys\n"
+            "if '--version' in sys.argv: print('fixture cppcheck'); sys.exit(0)\n"
+            f"with open({str(self.analyzer_log)!r}, 'a') as log: log.write(json.dumps(sys.argv[1:]) + '\\n')\n"
+            "assert any(a.startswith('-D__GNUC__=') for a in sys.argv)\n"
+            "assert not any(a.startswith('-DPROJECT_ONLY=') or a.startswith('-D__INT32_C') for a in sys.argv)\n"
+            "print('fixture analysis executed')\n")
+        path.chmod(0o700)
+        return str(path)
+
+    def test_cppcheck_imports_actual_compiler_and_target_per_duplicate_source(self):
+        first, first_log = self.compiler("one-gcc", "17")
+        second, second_log = self.compiler("two-gcc", "23")
+        entries = [
+            {"directory": str(self.root), "file": str(self.source), "arguments": [first, "--target=arm-fixture", "-mabi=ilp32", "-std=c11", "-o", "discard.o", "-c", str(self.source)]},
+            {"directory": str(self.root), "file": str(self.source), "arguments": [second, "--target=x86-fixture", "-std=c11", "-c", str(self.source)]},
+        ]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
+        analyzed = [json.loads(line) for line in self.analyzer_log.read_text().splitlines()]
+        self.assertEqual(len(analyzed), 2)
+        self.assertIn("-D__GNUC__=17", analyzed[0])
+        self.assertIn("-D__arm__=1", analyzed[0])
+        self.assertIn("-D__SIZEOF_POINTER__=4", analyzed[0])
+        self.assertNotIn("-D__x86_64__=1", analyzed[0])
+        self.assertIn("-D__GNUC__=23", analyzed[1])
+        self.assertIn("-D__SIZEOF_POINTER__=8", analyzed[1])
+        self.assertNotIn("-D__arm__=1", analyzed[1])
+        query = json.loads(first_log.read_text().splitlines()[-1])
+        self.assertIn("-mabi=ilp32", query)
+        self.assertIn("--target=arm-fixture", query)
+        self.assertIn("Compiler predefined output SHA256:", self.report.read_text())
+
+    def test_command_string_with_spaces_uses_argv_without_shell(self):
+        driver, log = self.compiler()
+        spaced = self.source.with_name("source with spaces.c")
+        spaced.write_text("int sample;\n")
+        marker = self.root / "shell-marker"
+        argv = [driver, "--target=arm-fixture", "-DOPAQUE=a;touch " + str(marker), "-c", str(spaced)]
+        (self.build / "compile_commands.json").write_text(json.dumps([
+            {"directory": str(self.root), "file": str(spaced), "command": shlex.join(argv)}]))
+        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
+        self.assertFalse(marker.exists())
+        self.assertIn(argv[2], json.loads(log.read_text().splitlines()[-1]))
+
+    def test_compiler_query_failure_never_runs_analysis(self):
+        driver, _ = self.compiler(failure=71)
+        self.database([self.source])
+        entries = json.loads((self.build / "compile_commands.json").read_text())
+        entries[0]["arguments"][0] = driver
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        tool = self.recording_analyzer()
+        self.assertEqual(run("cppcheck", self.root, self.build, tool, self.report), 1)
+        self.assertFalse(self.analyzer_log.exists())
+        self.assertIn("Compiler query exit code: 71", self.report.read_text())
+
+    def test_empty_compiler_predefines_never_pass(self):
+        driver, _ = self.compiler(empty=True)
+        entries = [{"directory": str(self.root), "file": str(self.source), "arguments": [driver, "-c", str(self.source)]}]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertIn("query failed or empty", self.report.read_text())
+
+    def test_missing_compiler_never_passes(self):
+        entries = [{"directory": str(self.root), "file": str(self.source), "arguments": [str(self.root / "missing-gcc"), "-c", str(self.source)]}]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertFalse(self.analyzer_log.exists())
+
+    def test_language_and_target_flags_preserved_without_compile_outputs(self):
+        entry = {"directory": str(self.root), "file": str(self.source),
+                 "arguments": ["arm-none-eabi-gcc", "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", "-x", "c++", "-DREAL=1", "-UOTHER", "-Iinclude", "-MMD", "-MF", "deps.d", "-MT", "target", "-oresult.o", "-c", str(self.source)]}
+        version, query = compiler_query(entry)
+        self.assertEqual(version, ["arm-none-eabi-gcc", "--version"])
+        for flag in ("-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", "-DREAL=1", "-UOTHER", "-Iinclude", "c++"):
+            self.assertIn(flag, query)
+        for flag in ("-MMD", "-MF", "deps.d", "-MT", "target", "-oresult.o", "-c", str(self.source)):
+            self.assertNotIn(flag, query)
+
+    def test_unsupported_response_file_fails_closed(self):
+        entry = {"directory": str(self.root), "file": str(self.source), "arguments": ["cc", "@unexpanded.rsp", "-c", str(self.source)]}
+        with self.assertRaises(ValueError):
+            compiler_query(entry)
 
 
 if __name__ == "__main__":
