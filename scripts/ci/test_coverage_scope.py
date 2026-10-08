@@ -16,7 +16,9 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
-OWNED = ("hal", "osal", "framework", "services", "platforms", "boards", "soc")
+# boards/soc have no instrumented translation units in the Native profile.
+# Physical/ARM coverage needs its own execution evidence and source scope.
+NATIVE_INSTRUMENTED = ("hal", "osal", "framework", "services", "platforms")
 
 
 def coverage_commands():
@@ -59,6 +61,12 @@ def options(name):
     return [args[i + 1] for i, arg in enumerate(args[:-1]) if arg == name]
 includes = options("--include")
 excludes = options("--exclude")
+for kind, patterns in (("include", includes), ("exclude", excludes)):
+    for pattern in patterns:
+        if not any(fnmatch.fnmatchcase(str(root / source), pattern)
+                   for source in fixture["sources"]):
+            print("controlled unused " + kind + " pattern: " + pattern, file=sys.stderr)
+            sys.exit(24)
 records = []
 if fixture["mode"] != "empty":
     for relative in fixture["sources"]:
@@ -95,8 +103,8 @@ class CoverageScopeTests(unittest.TestCase):
                              str(self.root), coverage_commands())
 
     def execute(self, mode="normal"):
-        sources = [f"{directory}/src/owned.c" for directory in OWNED]
-        sources += ["tests/contract.cpp", "ext/googletest/gtest.cpp", "vendors/st/hal.c"]
+        sources = [f"{directory}/src/owned.c" for directory in NATIVE_INSTRUMENTED]
+        sources += ["tests/contract.cpp", "ext/googletest/gtest.cpp"]
         (self.root / "capture-fixture.json").write_text(json.dumps({"mode": mode, "sources": sources}))
         return subprocess.run(["bash", "-e", "-o", "pipefail", "-c", self.script],
                               cwd=self.root, env=self.env, text=True,
@@ -110,15 +118,28 @@ class CoverageScopeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         captured = [line[3:] for line in (self.root / "coverage.info").read_text().splitlines()
                     if line.startswith("SF:")]
-        self.assertEqual(set(captured), {str(self.root / f"{directory}/src/owned.c") for directory in OWNED})
+        self.assertEqual(set(captured), {str(self.root / f"{directory}/src/owned.c")
+                                        for directory in NATIVE_INSTRUMENTED})
         self.assertEqual([call["tool"] for call in self.calls()], ["lcov", "genhtml"])
         arguments = self.calls()[0]["args"]
         self.assertFalse(any("ignore-errors" in arg for arg in arguments))
         self.assertEqual(arguments[arguments.index("--directory") + 1], "build/linux-gcc-coverage")
+        inclusions = [arguments[i + 1] for i, arg in enumerate(arguments[:-1]) if arg == "--include"]
+        self.assertEqual(set(inclusions), {str(self.root / directory / "*")
+                                          for directory in NATIVE_INSTRUMENTED})
         exclusions = [arguments[i + 1] for i, arg in enumerate(arguments[:-1]) if arg == "--exclude"]
+        self.assertEqual(exclusions, [])
         for relative in ("tests/contract.cpp", "ext/googletest/gtest.cpp", "vendors/st/hal.c"):
-            self.assertTrue(any(fnmatch.fnmatchcase(str(self.root / relative), pattern) for pattern in exclusions),
-                            f"Capture lacks an exclusion for {relative}")
+            self.assertFalse(any(fnmatch.fnmatchcase(str(self.root / relative), pattern) for pattern in inclusions),
+                             f"Capture includes third-party source {relative}")
+
+    def test_unused_exclude_is_rejected_before_report(self):
+        self.script = self.script.replace('--output-file coverage.info',
+                                          f'--exclude "{self.root}/vendors/*" --output-file coverage.info')
+        result = self.execute()
+        self.assertEqual(result.returncode, 24, result.stderr)
+        self.assertIn('unused exclude pattern', result.stderr)
+        self.assertEqual([call["tool"] for call in self.calls()], ["lcov"])
 
     def test_nonempty_trace_without_source_records_stops_before_report(self):
         result = self.execute("empty")
