@@ -102,6 +102,9 @@ jobs:
           path: ./
           base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
           head: ${{ github.event.pull_request.head.sha || github.sha }}
-          extra_args: --results=verified,unknown --fail
+          version: '3.99.1'
+          extra_args: --results=verified,unknown
       # The action revision is pinned by the repository dependency lock.
+      # Its implementation supplies --fail; repeating it prevents scanning.
+      # The container version is explicit; a verified image digest is pending.
       # Scanner/tool failures are failures; no blanket exception suppression.
