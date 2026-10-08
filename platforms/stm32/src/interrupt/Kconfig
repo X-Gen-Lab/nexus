@@ -3,6 +3,7 @@ menu "Interrupt Configuration"
 config STM32_NVIC_PRIORITY_GROUP
     int "NVIC priority grouping"
     default 4
+    range 4 4 if OSAL_FREERTOS
     range 0 4
     help
       NVIC priority grouping configuration.
@@ -21,6 +22,7 @@ config STM32_NVIC_PRIORITY_GROUP
 config STM32_SYSTICK_PRIORITY
     int "SysTick interrupt priority"
     default 15
+    range 15 15 if OSAL_FREERTOS
     range 0 15
     help
       SysTick timer interrupt priority (0-15).
@@ -32,6 +34,7 @@ config STM32_SYSTICK_PRIORITY
 config STM32_PENDSV_PRIORITY
     int "PendSV interrupt priority"
     default 15
+    range 15 15 if OSAL_FREERTOS
     range 0 15
     help
       PendSV interrupt priority (0-15).

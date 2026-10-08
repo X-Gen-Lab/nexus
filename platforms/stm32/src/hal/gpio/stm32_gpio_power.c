@@ -13,134 +13,47 @@
 #include "hal/nx_types.h"
 #include "stm32_gpio.h"
 
-/*---------------------------------------------------------------------------*/
-/* Unified Power Implementation                                              */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Unified power suspend implementation
- */
-static nx_status_t stm32_gpio_power_suspend_impl(stm32_gpio_state_t* state) {
-    NX_ASSERT(state);
-
-    if (!state->initialized || state->suspended) {
-        return NX_OK;
+/* Logical suspend retains the pin's electrical state. No shared port clock
+ * is disabled, and applications cannot treat this as a measured power saving. */
+#define DEFINE_POWER(kind, type)                                               \
+    static type* kind##_impl(nx_power_t* self) {                               \
+        return self ? NX_CONTAINER_OF(self, type, power) : NULL;              \
+    }                                                                         \
+    static nx_status_t kind##_enable(nx_power_t* self) {                       \
+        type* impl = kind##_impl(self);                                       \
+        if (!impl || !impl->state) return NX_ERR_INVALID_PARAM;               \
+        bool changed = impl->state->suspended;                                \
+        nx_status_t r = impl->lifecycle.resume(&impl->lifecycle);             \
+        if (r == NX_OK && changed && impl->state->power_callback)              \
+            impl->state->power_callback(impl->state->power_context, true);    \
+        return r;                                                             \
+    }                                                                         \
+    static nx_status_t kind##_disable(nx_power_t* self) {                      \
+        type* impl = kind##_impl(self);                                       \
+        if (!impl || !impl->state) return NX_ERR_INVALID_PARAM;               \
+        bool changed = !impl->state->suspended;                               \
+        nx_status_t r = impl->lifecycle.suspend(&impl->lifecycle);            \
+        if (r == NX_OK && changed && impl->state->power_callback)              \
+            impl->state->power_callback(impl->state->power_context, false);   \
+        return r;                                                             \
+    }                                                                         \
+    static bool kind##_enabled(nx_power_t* self) {                            \
+        type* impl = kind##_impl(self);                                       \
+        return impl && impl->state && impl->state->initialized &&             \
+               !impl->state->suspended;                                      \
+    }                                                                         \
+    static nx_status_t kind##_callback(nx_power_t* self,                       \
+                                       nx_power_callback_t fn, void* ctx) {   \
+        type* impl = kind##_impl(self);                                       \
+        if (!impl || !impl->state) return NX_ERR_INVALID_PARAM;               \
+        if (__get_IPSR()) return NX_ERR_INVALID_STATE;                         \
+        impl->state->power_callback = fn; impl->state->power_context = ctx;   \
+        return NX_OK;                                                         \
+    }                                                                         \
+    void stm32_gpio_init_power_##kind(nx_power_t* iface) {                     \
+        iface->enable = kind##_enable; iface->disable = kind##_disable;       \
+        iface->is_enabled = kind##_enabled; iface->set_callback = kind##_callback; \
     }
-
-    state->suspended = true;
-    return NX_OK;
-}
-
-/**
- * \brief           Unified power resume implementation
- */
-static nx_status_t stm32_gpio_power_resume_impl(stm32_gpio_state_t* state) {
-    NX_ASSERT(state);
-
-    if (!state->initialized || !state->suspended) {
-        return NX_OK;
-    }
-
-    state->suspended = false;
-    return NX_OK;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Read Mode Power Wrappers                                                  */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Power suspend for read mode
- */
-static nx_status_t stm32_gpio_power_read_suspend(nx_power_t* self) {
-    stm32_gpio_read_impl_t* impl =
-        NX_CONTAINER_OF(self, stm32_gpio_read_impl_t, power);
-    NX_ASSERT(impl && impl->state);
-    return stm32_gpio_power_suspend_impl(impl->state);
-}
-
-/**
- * \brief           Power resume for read mode
- */
-static nx_status_t stm32_gpio_power_read_resume(nx_power_t* self) {
-    stm32_gpio_read_impl_t* impl =
-        NX_CONTAINER_OF(self, stm32_gpio_read_impl_t, power);
-    NX_ASSERT(impl && impl->state);
-    return stm32_gpio_power_resume_impl(impl->state);
-}
-
-/*---------------------------------------------------------------------------*/
-/* Write Mode Power Wrappers                                                 */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Power suspend for write mode
- */
-static nx_status_t stm32_gpio_power_write_suspend(nx_power_t* self) {
-    stm32_gpio_write_impl_t* impl =
-        NX_CONTAINER_OF(self, stm32_gpio_write_impl_t, power);
-    NX_ASSERT(impl && impl->state);
-    return stm32_gpio_power_suspend_impl(impl->state);
-}
-
-/**
- * \brief           Power resume for write mode
- */
-static nx_status_t stm32_gpio_power_write_resume(nx_power_t* self) {
-    stm32_gpio_write_impl_t* impl =
-        NX_CONTAINER_OF(self, stm32_gpio_write_impl_t, power);
-    NX_ASSERT(impl && impl->state);
-    return stm32_gpio_power_resume_impl(impl->state);
-}
-
-/*---------------------------------------------------------------------------*/
-/* Read-Write Mode Power Wrappers                                            */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Power suspend for read-write mode
- */
-static nx_status_t stm32_gpio_power_read_write_suspend(nx_power_t* self) {
-    stm32_gpio_read_write_impl_t* impl =
-        NX_CONTAINER_OF(self, stm32_gpio_read_write_impl_t, power);
-    NX_ASSERT(impl && impl->state);
-    return stm32_gpio_power_suspend_impl(impl->state);
-}
-
-/**
- * \brief           Power resume for read-write mode
- */
-static nx_status_t stm32_gpio_power_read_write_resume(nx_power_t* self) {
-    stm32_gpio_read_write_impl_t* impl =
-        NX_CONTAINER_OF(self, stm32_gpio_read_write_impl_t, power);
-    NX_ASSERT(impl && impl->state);
-    return stm32_gpio_power_resume_impl(impl->state);
-}
-
-/*---------------------------------------------------------------------------*/
-/* Interface Initialization                                                  */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize power interface for read mode
- */
-void stm32_gpio_init_power_read(nx_power_t* power) {
-    power->enable = stm32_gpio_power_read_resume;
-    power->disable = stm32_gpio_power_read_suspend;
-}
-
-/**
- * \brief           Initialize power interface for write mode
- */
-void stm32_gpio_init_power_write(nx_power_t* power) {
-    power->enable = stm32_gpio_power_write_resume;
-    power->disable = stm32_gpio_power_write_suspend;
-}
-
-/**
- * \brief           Initialize power interface for read-write mode
- */
-void stm32_gpio_init_power_read_write(nx_power_t* power) {
-    power->enable = stm32_gpio_power_read_write_resume;
-    power->disable = stm32_gpio_power_read_write_suspend;
-}
+DEFINE_POWER(read, stm32_gpio_read_impl_t)
+DEFINE_POWER(write, stm32_gpio_write_impl_t)
+DEFINE_POWER(read_write, stm32_gpio_read_write_impl_t)

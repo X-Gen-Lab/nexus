@@ -19,7 +19,7 @@ extern "C" {
 #include "hal/interface/nx_option_bytes.h"
 #include "hal/interface/nx_power.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_option_bytes_helpers.h"
+#include "devices/native_option_bytes_helpers.h"
 }
 
 /**
@@ -315,7 +315,7 @@ TEST_F(OptionBytesTest, PowerCallback) {
     static bool callback_called = false;
     static bool callback_enabled = false;
 
-    auto callback = [](void* user_data, bool enabled) {
+    auto callback = [](void*, bool enabled) {
         callback_called = true;
         callback_enabled = enabled;
     };

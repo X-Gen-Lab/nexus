@@ -25,9 +25,8 @@
  */
 static nx_status_t gpio_lifecycle_init(nx_lifecycle_t* self) {
     nx_gpio_read_write_impl_t* impl =
-        (nx_gpio_read_write_impl_t*)((char*)self -
-                                     offsetof(nx_gpio_read_write_impl_t,
-                                              lifecycle));
+        self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, lifecycle)
+             : NULL;
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -61,9 +60,8 @@ static nx_status_t gpio_lifecycle_init(nx_lifecycle_t* self) {
  */
 static nx_status_t gpio_lifecycle_deinit(nx_lifecycle_t* self) {
     nx_gpio_read_write_impl_t* impl =
-        (nx_gpio_read_write_impl_t*)((char*)self -
-                                     offsetof(nx_gpio_read_write_impl_t,
-                                              lifecycle));
+        self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, lifecycle)
+             : NULL;
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -82,6 +80,7 @@ static nx_status_t gpio_lifecycle_deinit(nx_lifecycle_t* self) {
 
     /* Mark as uninitialized */
     impl->state->initialized = false;
+    impl->state->suspended = false;
 
     return NX_OK;
 }
@@ -91,9 +90,8 @@ static nx_status_t gpio_lifecycle_deinit(nx_lifecycle_t* self) {
  */
 static nx_status_t gpio_lifecycle_suspend(nx_lifecycle_t* self) {
     nx_gpio_read_write_impl_t* impl =
-        (nx_gpio_read_write_impl_t*)((char*)self -
-                                     offsetof(nx_gpio_read_write_impl_t,
-                                              lifecycle));
+        self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, lifecycle)
+             : NULL;
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -121,9 +119,8 @@ static nx_status_t gpio_lifecycle_suspend(nx_lifecycle_t* self) {
  */
 static nx_status_t gpio_lifecycle_resume(nx_lifecycle_t* self) {
     nx_gpio_read_write_impl_t* impl =
-        (nx_gpio_read_write_impl_t*)((char*)self -
-                                     offsetof(nx_gpio_read_write_impl_t,
-                                              lifecycle));
+        self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, lifecycle)
+             : NULL;
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -151,9 +148,8 @@ static nx_status_t gpio_lifecycle_resume(nx_lifecycle_t* self) {
  */
 static nx_device_state_t gpio_lifecycle_get_state(nx_lifecycle_t* self) {
     nx_gpio_read_write_impl_t* impl =
-        (nx_gpio_read_write_impl_t*)((char*)self -
-                                     offsetof(nx_gpio_read_write_impl_t,
-                                              lifecycle));
+        self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, lifecycle)
+             : NULL;
 
     /* Parameter check */
     if (!impl || !impl->state) {

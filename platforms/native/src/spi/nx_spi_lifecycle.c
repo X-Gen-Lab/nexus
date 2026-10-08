@@ -1,176 +1,76 @@
-/**
- * \file            nx_spi_lifecycle.c
- * \brief           SPI lifecycle interface implementation for Native platform
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-18
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements SPI lifecycle operations including init,
- *                  deinit, suspend, resume, and state query functions.
- */
-
-#include "hal/base/nx_device.h"
-#include "hal/nx_status.h"
+/** Lifecycle changes reject executing, queued, waiting and callback work. */
 #include "nx_spi_helpers.h"
-#include "nx_spi_types.h"
+#include "osal/osal.h"
 #include <string.h>
-
-/*---------------------------------------------------------------------------*/
-/* External Buffer References                                                */
-/*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
-/* Lifecycle Interface Implementation                                        */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize implementation
- */
-static nx_status_t spi_lifecycle_init(nx_lifecycle_t* self) {
-    nx_spi_impl_t* impl = NX_CONTAINER_OF(self, nx_spi_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-    if (impl->state->initialized) {
-        return NX_ERR_ALREADY_INIT;
-    }
-
-    /* Clear buffer data */
-    if (impl->state->tx_buf.data != NULL) {
-        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-    }
-
-    if (impl->state->rx_buf.data != NULL) {
-        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-    }
-
-    /* Set state flags */
-    impl->state->initialized = true;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    return NX_OK;
+static bool occupied(nx_spi_impl_t* b) {
+    if(b->users || b->worker_active) return true;
+    for(unsigned i=0;i<NATIVE_SPI_DEVICE_CAPACITY;++i)
+        if(b->devices[i].pending || b->devices[i].servicing) return true;
+    return false;
 }
-
-/**
- * \brief           Deinitialize implementation
- */
-static nx_status_t spi_lifecycle_deinit(nx_lifecycle_t* self) {
-    nx_spi_impl_t* impl = NX_CONTAINER_OF(self, nx_spi_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
+static nx_status_t init(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_PARAM;
+    nx_spi_impl_t* b=NX_CONTAINER_OF(self,nx_spi_impl_t,lifecycle);
+    native_spi_lock();
+    nx_status_t r=b->state->initialized ? NX_ERR_ALREADY_INIT :
+        occupied(b) ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK && osal_mutex_create(&b->mutex)!=OSAL_OK) r=NX_ERR_NO_RESOURCE;
+    if(r==NX_OK) {
+        spi_buffer_clear(&b->state->tx_buf); spi_buffer_clear(&b->state->rx_buf);
+        b->state->initialized=true; b->state->suspended=false; b->state->busy=false;
     }
-
-    /* Clear buffer data */
-    if (impl->state->tx_buf.data != NULL) {
-        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-    }
-
-    if (impl->state->rx_buf.data != NULL) {
-        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-    }
-
-    /* Clear state flags */
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    return NX_OK;
+    native_spi_unlock(); return r;
 }
-
-/**
- * \brief           Suspend implementation
- */
-static nx_status_t spi_lifecycle_suspend(nx_lifecycle_t* self) {
-    nx_spi_impl_t* impl = NX_CONTAINER_OF(self, nx_spi_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
+static nx_status_t deinit(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_PARAM;
+    nx_spi_impl_t* b=NX_CONTAINER_OF(self,nx_spi_impl_t,lifecycle);
+    native_spi_lock();
+    nx_status_t r=!b->state->initialized ? NX_ERR_NOT_INIT : occupied(b) ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK && osal_mutex_delete(b->mutex)!=OSAL_OK) r=NX_ERR_BUSY;
+    if(r==NX_OK) {
+        b->mutex=NULL; b->state->initialized=false; b->state->suspended=false;
+        spi_buffer_clear(&b->state->tx_buf); spi_buffer_clear(&b->state->rx_buf);
+        for(unsigned i=0;i<NATIVE_SPI_DEVICE_CAPACITY;++i)
+            if(!b->devices[i].legacy) b->devices[i].allocated=false;
     }
-
-    /* Check if already suspended */
-    if (impl->state->suspended) {
-        return NX_ERR_INVALID_STATE;
-    }
-
-    /* Set suspend flag */
-    impl->state->suspended = true;
-
-    return NX_OK;
+    native_spi_unlock(); return r;
 }
-
-/**
- * \brief           Resume implementation
- */
-static nx_status_t spi_lifecycle_resume(nx_lifecycle_t* self) {
-    nx_spi_impl_t* impl = NX_CONTAINER_OF(self, nx_spi_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    /* Check if not suspended */
-    if (!impl->state->suspended) {
-        return NX_ERR_INVALID_STATE;
-    }
-
-    /* Clear suspend flag */
-    impl->state->suspended = false;
-
-    return NX_OK;
+static nx_status_t suspend(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_PARAM;
+    nx_spi_impl_t* b=NX_CONTAINER_OF(self,nx_spi_impl_t,lifecycle);
+    native_spi_lock();
+    nx_status_t r=!b->state->initialized ? NX_ERR_NOT_INIT : occupied(b) ? NX_ERR_BUSY : b->state->suspended ? NX_ERR_INVALID_STATE : NX_OK;
+    if(r==NX_OK) b->state->suspended=true;
+    native_spi_unlock(); return r;
 }
-
-/**
- * \brief           Get state implementation
- */
-static nx_device_state_t spi_lifecycle_get_state(nx_lifecycle_t* self) {
-    nx_spi_impl_t* impl = NX_CONTAINER_OF(self, nx_spi_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state) {
-        return NX_DEV_STATE_ERROR;
-    }
-    if (!impl->state->initialized) {
-        return NX_DEV_STATE_UNINITIALIZED;
-    }
-    if (impl->state->suspended) {
-        return NX_DEV_STATE_SUSPENDED;
-    }
-
-    return NX_DEV_STATE_RUNNING;
+static nx_status_t resume(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_PARAM;
+    nx_spi_impl_t* b=NX_CONTAINER_OF(self,nx_spi_impl_t,lifecycle);
+    native_spi_lock();
+    nx_status_t r=!b->state->initialized ? NX_ERR_NOT_INIT : !b->state->suspended ? NX_ERR_INVALID_STATE : NX_OK;
+    if(r==NX_OK) b->state->suspended=false;
+    native_spi_unlock(); return r;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Interface Initialization                                                  */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize lifecycle interface
- */
-void spi_init_lifecycle(nx_lifecycle_t* lifecycle) {
-    lifecycle->init = spi_lifecycle_init;
-    lifecycle->deinit = spi_lifecycle_deinit;
-    lifecycle->suspend = spi_lifecycle_suspend;
-    lifecycle->resume = spi_lifecycle_resume;
-    lifecycle->get_state = spi_lifecycle_get_state;
+static nx_device_state_t state(nx_lifecycle_t* self) {
+    if(!self) return NX_DEV_STATE_ERROR;
+    nx_spi_impl_t* b=NX_CONTAINER_OF(self,nx_spi_impl_t,lifecycle);
+    native_spi_lock(); nx_device_state_t r=!b->state->initialized ? NX_DEV_STATE_UNINITIALIZED : b->state->suspended ? NX_DEV_STATE_SUSPENDED : NX_DEV_STATE_RUNNING;
+    native_spi_unlock(); return r;
+}
+nx_status_t native_spi_reset_impl(nx_spi_impl_t* b) {
+    if(!b) return NX_ERR_INVALID_PARAM;
+    native_spi_lock();
+    if(occupied(b)) { native_spi_unlock(); return NX_ERR_BUSY; }
+    if(b->state->initialized && osal_mutex_delete(b->mutex)!=OSAL_OK) { native_spi_unlock(); return NX_ERR_BUSY; }
+    b->mutex=NULL; b->state->initialized=false; b->state->suspended=false; b->state->busy=false;
+    b->state->locked=false; b->transfer_delay_ms=0; b->trace_count=0;
+    memset(&b->state->stats,0,sizeof(b->state->stats));
+    memset(&b->state->current_device,0,sizeof(b->state->current_device));
+    spi_buffer_clear(&b->state->tx_buf); spi_buffer_clear(&b->state->rx_buf);
+    /* Test reset invalidates handles; token/sequence counters never reset. */
+    for(unsigned i=0;i<NATIVE_SPI_DEVICE_CAPACITY;++i) b->devices[i].allocated=false;
+    native_spi_unlock(); return NX_OK;
+}
+void spi_init_lifecycle(nx_lifecycle_t* self) {
+    self->init=init; self->deinit=deinit; self->suspend=suspend; self->resume=resume; self->get_state=state;
 }

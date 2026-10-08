@@ -20,6 +20,14 @@
 extern "C" {
 #endif
 
+/* A short process-wide metadata guard. Never held across OSAL waits/callbacks. */
+void native_spi_lock(void);
+void native_spi_unlock(void);
+uint32_t native_spi_now(void);
+nx_status_t native_spi_reset_impl(nx_spi_impl_t* bus);
+void spi_init_lifecycle(nx_lifecycle_t* lifecycle);
+void spi_init_power(nx_power_t* power);
+
 /*---------------------------------------------------------------------------*/
 /* Helper Functions                                                          */
 /*---------------------------------------------------------------------------*/
@@ -100,34 +108,6 @@ size_t spi_buffer_write(nx_spi_buffer_t* buf, const uint8_t* data, size_t len);
  * \return          Number of bytes read
  */
 size_t spi_buffer_read(nx_spi_buffer_t* buf, uint8_t* data, size_t len);
-
-/**
- * \brief           Inject data into RX buffer for testing
- * \param[in]       state: SPI state pointer
- * \param[in]       data: Data to inject
- * \param[in]       len: Data length
- * \return          Number of bytes injected
- * \note            This function is for testing purposes only
- */
-size_t spi_inject_rx_data(nx_spi_state_t* state, const uint8_t* data,
-                          size_t len);
-
-/**
- * \brief           Get TX buffer data for testing
- * \param[in]       state: SPI state pointer
- * \param[out]      data: Data buffer
- * \param[in]       len: Maximum bytes to read
- * \return          Number of bytes read
- * \note            This function is for testing purposes only
- */
-size_t spi_get_tx_data(nx_spi_state_t* state, uint8_t* data, size_t len);
-
-/**
- * \brief           Reset SPI state for testing
- * \param[in]       state: SPI state pointer
- * \note            This function is for testing purposes only
- */
-void spi_reset_state(nx_spi_state_t* state);
 
 #ifdef __cplusplus
 }

@@ -20,12 +20,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_flash.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_flash_helpers.h"
+#include "devices/native_flash_helpers.h"
 }
 
 /**
@@ -43,7 +44,7 @@ class FlashPropertyTest : public ::testing::Test {
     std::string unique_filename;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Generate unique filename for this test instance */
         /* Use test name and timestamp to ensure uniqueness */

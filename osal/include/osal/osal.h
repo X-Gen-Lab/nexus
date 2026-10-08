@@ -65,13 +65,17 @@ bool osal_is_running(void);
 
 /**
  * \brief           Enter critical section
- * \note            Disables interrupts to protect critical code sections
+ * \note            Task context; nested calls must be balanced on the same task.
+ *                  Native uses a recursive thread lock. Baremetal saves the
+ *                  original interrupt mask. FreeRTOS uses its port mask.
+ *                  No allocation, sleep, or blocking API is allowed inside.
+ *                  Use a saved-mask HAL primitive for mixed task/ISR regions.
  */
 void osal_enter_critical(void);
 
 /**
  * \brief           Exit critical section
- * \note            Re-enables interrupts after critical code section
+ * \note            Restores the corresponding nested task critical region.
  */
 void osal_exit_critical(void);
 
@@ -82,6 +86,11 @@ void osal_exit_critical(void);
  * \retval          false Currently executing in task context
  */
 bool osal_is_isr(void);
+
+/** Read the backend's monotonic millisecond clock (modulo UINT32_MAX + 1).
+ * Finite deadlines use unsigned subtraction with budgets below 2^31 ms.
+ * Baremetal returns NOT_SUPPORTED until the board installs its clock. */
+osal_status_t osal_get_time_ms(uint32_t* milliseconds);
 
 /**
  * \}

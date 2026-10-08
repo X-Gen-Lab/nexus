@@ -41,7 +41,12 @@
  * Author:          Nexus Team
  */
 
+#include "nexus_config.h"
 #include "boot/stm32_boot.h"
+#include "hal/nx_status.h"
+#ifdef NX_CONFIG_OSAL_BAREMETAL
+#include "osal/osal_baremetal.h"
+#endif
 #include "clock/stm32_clock.h"
 #include "system/stm32_performance.h"
 
@@ -62,7 +67,13 @@
 
 /* Default NVIC priority grouping */
 #ifndef NX_CONFIG_STM32_NVIC_PRIORITY_GROUP
-#define NX_CONFIG_STM32_NVIC_PRIORITY_GROUP NVIC_PRIORITYGROUP_4
+#define NX_CONFIG_STM32_NVIC_PRIORITY_GROUP 4
+#endif
+#if NX_CONFIG_STM32_NVIC_PRIORITY_GROUP < 0 || NX_CONFIG_STM32_NVIC_PRIORITY_GROUP > 4
+#error "STM32 NVIC priority group must be a logical value from 0 to 4"
+#endif
+#if defined(NX_CONFIG_OSAL_FREERTOS) && NX_CONFIG_STM32_NVIC_PRIORITY_GROUP != 4
+#error "FreeRTOS requires all STM32 priority bits assigned to preemption"
 #endif
 
 /* Default SysTick priority */
@@ -118,6 +129,15 @@ int stm32_platform_init(void) {
         return -1;
     }
 
+#ifdef NX_CONFIG_OSAL_BAREMETAL
+    /* SysTick is a board-owned monotonic millisecond source. OSAL must never
+     * include vendor headers or pretend that it owns a cooperative scheduler. */
+    if (osal_baremetal_set_clock(HAL_GetTick) != OSAL_OK) {
+        (void)HAL_DeInit();
+        return -1;
+    }
+#endif
+
     /* Configure system clock */
     clock_status = SystemClock_Config();
     if (clock_status != 0) {
@@ -125,7 +145,9 @@ int stm32_platform_init(void) {
     }
 
     /* Configure NVIC priority grouping */
-    HAL_NVIC_SetPriorityGrouping(NX_CONFIG_STM32_NVIC_PRIORITY_GROUP);
+    /* Kconfig names the number of preemption bits (0..4). CMSIS/HAL expects
+     * the AIRCR PRIGROUP encoding: group 4 is 3, not the integer 4. */
+    HAL_NVIC_SetPriorityGrouping(7U - NX_CONFIG_STM32_NVIC_PRIORITY_GROUP);
 
     /* Configure SysTick priority (1ms time base already set by HAL_Init) */
     HAL_NVIC_SetPriority(SysTick_IRQn, NX_CONFIG_STM32_SYSTICK_PRIORITY, 0);
@@ -145,9 +167,17 @@ int stm32_platform_init(void) {
     return 0;
 }
 
+/* Production HAL startup must execute the selected platform rather than rely
+ * on an unbound weak success. Call only during serialized task-context boot. */
+nx_status_t nx_platform_init(void) {
+    return stm32_platform_init() == 0 ? NX_OK : NX_ERR_IO;
+}
+
 /**
  * \brief           Deinitialize STM32 platform
- * \details         Performs platform cleanup and deinitialization
+ * \details         In-process global shutdown needs product-owned quiescence
+ *                  of IRQ, DMA, devices and scheduler. It is unsupported here;
+ *                  an initialized platform remains owned until reset.
  */
 int stm32_platform_deinit(void) {
     /* Check if initialized */
@@ -155,13 +185,7 @@ int stm32_platform_deinit(void) {
         return 0;
     }
 
-    /* Deinitialize HAL */
-    HAL_DeInit();
-
-    /* Mark as not initialized */
-    g_platform_initialized = 0;
-
-    return 0;
+    return -1;
 }
 
 /**

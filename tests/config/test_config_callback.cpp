@@ -227,6 +227,95 @@ TEST_F(ConfigCallbackTest, UnregisterCallbackTwice) {
     EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(handle));
 }
 
+TEST_F(ConfigCallbackTest, StaleCallbackHandleCannotUnregisterReusedSlot) {
+    config_cb_handle_t stale = nullptr, current = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_register_callback("old", test_counting_callback, nullptr, &stale));
+    ASSERT_EQ(CONFIG_OK, config_unregister_callback(stale));
+    ASSERT_EQ(CONFIG_OK, config_register_callback("new", test_counting_callback, nullptr, &current));
+    EXPECT_NE(stale, current);
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(stale));
+    ASSERT_EQ(CONFIG_OK, config_set_i32("new", 17)); EXPECT_EQ(1, g_callback_count);
+    ASSERT_EQ(CONFIG_OK, config_unregister_callback(current));
+    for (size_t i = 0; i < 1000; ++i) {
+        ASSERT_EQ(CONFIG_OK, config_register_wildcard_callback(test_counting_callback, nullptr, &current));
+        EXPECT_NE(stale, current);
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(stale));
+        ASSERT_EQ(CONFIG_OK, config_unregister_callback(current));
+    }
+}
+
+TEST_F(ConfigCallbackTest, CallbackHandlesRemainInvalidAfterManagerReinitialization) {
+    config_cb_handle_t stale = nullptr, current = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_register_wildcard_callback(test_counting_callback, nullptr, &stale));
+    ASSERT_EQ(CONFIG_OK, config_deinit());
+    ASSERT_EQ(CONFIG_OK, config_init(nullptr));
+    ASSERT_EQ(CONFIG_OK, config_register_callback("new", test_counting_callback, nullptr, &current));
+    EXPECT_NE(stale, current);
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(stale));
+    ASSERT_EQ(CONFIG_OK, config_set_i32("new", 17)); EXPECT_EQ(1, g_callback_count);
+    ASSERT_EQ(CONFIG_OK, config_unregister_callback(current));
+}
+
+TEST_F(ConfigCallbackTest, ForgedCallbackTokensCannotRemoveCurrentListener) {
+    config_cb_handle_t current = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_register_wildcard_callback(test_counting_callback, nullptr, &current));
+    int local = 0;
+    const config_cb_handle_t invalid[] = {
+        reinterpret_cast<config_cb_handle_t>(uintptr_t(1)),
+        reinterpret_cast<config_cb_handle_t>(UINTPTR_MAX),
+        reinterpret_cast<config_cb_handle_t>(&local),
+        reinterpret_cast<config_cb_handle_t>(uintptr_t(0xb))};
+    for (config_cb_handle_t handle : invalid)
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(handle));
+    config_ns_handle_t ns = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_open_namespace("motor", &ns));
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(reinterpret_cast<config_cb_handle_t>(ns)));
+    ASSERT_EQ(CONFIG_OK, config_close_namespace(ns));
+    ASSERT_EQ(CONFIG_OK, config_set_i32("new", 17)); EXPECT_EQ(1, g_callback_count);
+    ASSERT_EQ(CONFIG_OK, config_unregister_callback(current));
+}
+
+TEST_F(ConfigCallbackTest, NotificationPinsExecutingContextAndDefersNewListeners) {
+    struct State {
+        config_cb_handle_t self = nullptr, victim = nullptr, replacement = nullptr;
+        int originalCalls = 0, replacementCalls = 0, readValue = 0;
+        config_status_t unregisterSelf = CONFIG_OK, deinit = CONFIG_OK, read = CONFIG_ERROR;
+    } state;
+    auto replacement = +[](const char*, config_type_t, const void*, const void*, void* context) {
+        ++static_cast<State*>(context)->replacementCalls;
+    };
+    auto original = +[](const char* key, config_type_t, const void*, const void*, void* context) {
+        State* s = static_cast<State*>(context);
+        ++s->originalCalls;
+        s->read = config_get_i32(key, &s->readValue, 0);
+        s->unregisterSelf = config_unregister_callback(s->self);
+        s->deinit = config_deinit();
+        if (s->victim) {
+            EXPECT_EQ(CONFIG_OK, config_unregister_callback(s->victim));
+            auto future = +[](const char*, config_type_t, const void*, const void*, void* data) {
+                ++static_cast<State*>(data)->replacementCalls;
+            };
+            EXPECT_EQ(CONFIG_OK, config_register_wildcard_callback(future, s, &s->replacement));
+            s->victim = nullptr;
+        }
+    };
+    ASSERT_EQ(CONFIG_OK, config_register_callback("key", original, &state, &state.self));
+    ASSERT_EQ(CONFIG_OK, config_register_callback("key", replacement, &state, &state.victim));
+    config_cb_handle_t retiredVictim = state.victim;
+    ASSERT_EQ(CONFIG_OK, config_set_i32("key", 17));
+    EXPECT_EQ(1, state.originalCalls); EXPECT_EQ(0, state.replacementCalls);
+    EXPECT_EQ(CONFIG_OK, state.read); EXPECT_EQ(17, state.readValue);
+    EXPECT_EQ(CONFIG_ERROR_BUSY, state.unregisterSelf); EXPECT_EQ(CONFIG_ERROR_BUSY, state.deinit);
+    EXPECT_TRUE(config_is_initialized());
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_unregister_callback(retiredVictim));
+    ASSERT_EQ(CONFIG_OK, config_set_i32("key", 19));
+    EXPECT_EQ(2, state.originalCalls); EXPECT_EQ(1, state.replacementCalls);
+    EXPECT_EQ(19, state.readValue);
+    ASSERT_EQ(CONFIG_OK, config_unregister_callback(state.self));
+    ASSERT_EQ(CONFIG_OK, config_unregister_callback(state.replacement));
+    EXPECT_EQ(CONFIG_OK, config_deinit());
+}
+
 /*---------------------------------------------------------------------------*/
 /* Callback Invocation Tests - Requirement 7.2                               */
 /*---------------------------------------------------------------------------*/

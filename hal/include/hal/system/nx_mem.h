@@ -33,6 +33,8 @@ typedef struct nx_mem_pool_s {
     uint32_t* bitmap;   /**< Allocation bitmap */
     size_t allocated;   /**< Currently allocated blocks */
     size_t peak;        /**< Peak allocation count */
+    size_t buffer_bytes; /**< Actual backing buffer capacity */
+    size_t bitmap_words; /**< Actual bitmap capacity in uint32_t words */
 } nx_mem_pool_t;
 
 /**
@@ -59,24 +61,44 @@ typedef struct nx_mem_allocator_s {
 /**
  * \brief           Define static memory pool
  */
+#ifdef __cplusplus
+#define NX_MEM_ALIGNAS(type) alignas(type)
+#define NX_MEM_ALIGNOF(type) alignof(type)
+#else
+#define NX_MEM_ALIGNAS(type) _Alignas(type)
+#define NX_MEM_ALIGNOF(type) _Alignof(type)
+#endif
+#define NX_MEM_POOL_STRIDE(size)                                              \
+    (((size_t)(size) + NX_MEM_ALIGNOF(max_align_t) - 1u) &                     \
+     ~((size_t)NX_MEM_ALIGNOF(max_align_t) - 1u))
 #define NX_MEM_POOL_DEFINE(_name, _block_size, _block_count)                   \
-    static uint8_t _name##_buffer[(_block_size) * (_block_count)];             \
-    static uint32_t _name##_bitmap[((_block_count) + 31) / 32];                \
-    static nx_mem_pool_t _name = {                                             \
-        .buffer = _name##_buffer,                                              \
-        .block_size = (_block_size),                                           \
-        .block_count = (_block_count),                                         \
-        .bitmap = _name##_bitmap,                                              \
-        .allocated = 0,                                                        \
-        .peak = 0,                                                             \
+    NX_STATIC_ASSERT((_block_size) > 0 && (_block_count) > 0, pool_positive);  \
+    NX_STATIC_ASSERT((size_t)(_block_size) <=                                 \
+        SIZE_MAX - (NX_MEM_ALIGNOF(max_align_t) - 1u), pool_stride_overflow);  \
+    NX_STATIC_ASSERT(NX_MEM_POOL_STRIDE(_block_size) <=                        \
+        SIZE_MAX / (size_t)(_block_count), pool_storage_overflow);            \
+    NX_MEM_ALIGNAS(max_align_t) static uint8_t _name##_buffer[                \
+        NX_MEM_POOL_STRIDE(_block_size) * (size_t)(_block_count)];             \
+    static uint32_t _name##_bitmap[(size_t)(_block_count) / 32u +             \
+        ((size_t)(_block_count) % 32u != 0)];                                 \
+    static nx_mem_pool_t _name = {                                            \
+        .buffer = _name##_buffer,                                             \
+        .block_size = NX_MEM_POOL_STRIDE(_block_size),                         \
+        .block_count = (_block_count),                                        \
+        .bitmap = _name##_bitmap,                                             \
+        .allocated = 0,                                                       \
+        .peak = 0,                                                            \
+        .buffer_bytes = sizeof(_name##_buffer),                               \
+        .bitmap_words = sizeof(_name##_bitmap) / sizeof(uint32_t),             \
     }
 
 /**
- * \brief           Initialize memory management system
+ * \brief           Configure allocator at boot or after all allocations are reclaimed
+ * \return          NX_ERR_BUSY if live allocations prevent reset
  * \param[in]       mode: Memory allocation mode
  * \param[in]       custom: Custom allocator (only for NX_MEM_MODE_CUSTOM)
  */
-void nx_mem_init(nx_mem_mode_t mode, nx_mem_allocator_t* custom);
+nx_status_t nx_mem_init(nx_mem_mode_t mode, nx_mem_allocator_t* custom);
 
 /**
  * \brief           Allocate memory
@@ -99,11 +121,12 @@ void* nx_mem_alloc_from_pool(nx_mem_pool_t* pool);
 void nx_mem_free(void* ptr);
 
 /**
- * \brief           Free memory to specific pool
+ * \brief           Free a currently allocated block to a pool
+ * \return          NX_ERR_INVALID_STATE on double free; malformed pointers are rejected
  * \param[in]       pool: Memory pool pointer
  * \param[in]       ptr: Pointer to memory to free
  */
-void nx_mem_free_to_pool(nx_mem_pool_t* pool, void* ptr);
+nx_status_t nx_mem_free_to_pool(nx_mem_pool_t* pool, void* ptr);
 
 /**
  * \brief           Get memory statistics

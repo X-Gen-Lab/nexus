@@ -17,6 +17,13 @@
 #include "config/config.h"
 #include "config_namespace.h"
 #include "config_store.h"
+#include "config_wire.h"
+#include "config_crypto.h"
+#include "config_backend_internal.h"
+#include "security/crypto.h"
+#include <errno.h>
+#include <limits.h>
+#include <math.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,50 +32,121 @@
 /* Binary Format Constants (must match config_export.c)                      */
 /*---------------------------------------------------------------------------*/
 
-#define CONFIG_BINARY_MAGIC   0x43464742 /* "CFGB" */
-#define CONFIG_BINARY_VERSION 1
-
-/**
- * \brief           Binary import header structure
- */
-#ifdef _MSC_VER
-#pragma pack(push, 1)
-#endif
+/* Import is a management transaction: parse/authenticate first, then one RAM
+ * swap and optional snapshot commit. Heap use is bounded by store limits. */
 typedef struct {
-    uint32_t magic;       /**< Magic number */
-    uint8_t version;      /**< Format version */
-    uint8_t reserved[3];  /**< Reserved for alignment */
-    uint32_t entry_count; /**< Number of entries */
-    uint32_t data_size;   /**< Total data size */
-}
-#ifdef __GNUC__
-__attribute__((packed))
-#endif
-config_binary_header_t;
-#ifdef _MSC_VER
-#pragma pack(pop)
-#endif
+    config_store_replacement_t* items;
+    config_store_replacement_t* original;
+    bool imported[CONFIG_MAX_MAX_KEYS];
+    uint8_t* new_values[CONFIG_MAX_MAX_KEYS];
+    size_t count, original_count, collected, new_count;
+    bool clear_all, namespace_only;
+    int clear_namespace;
+    config_status_t status;
+} import_transaction_t;
 
-/**
- * \brief           Binary entry header structure
- */
-#ifdef _MSC_VER
-#pragma pack(push, 1)
-#endif
-typedef struct {
-    uint8_t key_len;      /**< Key length */
-    uint8_t type;         /**< Value type */
-    uint8_t flags;        /**< Entry flags */
-    uint8_t namespace_id; /**< Namespace ID */
-    uint16_t value_size;  /**< Value size */
+static bool collect_original(const config_store_entry_info_t* info, void* context) {
+    import_transaction_t* tx = (import_transaction_t*)context;
+    config_store_replacement_t* old = &tx->original[tx->collected++];
+    old->info = *info; old->size = info->value_size;
+    uint8_t* copy = (uint8_t*)malloc(old->size ? old->size : 1);
+    if (!copy) { tx->status = CONFIG_ERROR_NO_MEMORY; return false; }
+    old->value = copy;
+    tx->status = config_store_get(info->key, NULL, copy, &old->size, NULL, info->namespace_id);
+    if (tx->status != CONFIG_OK) return false;
+    bool removed = tx->clear_all || tx->clear_namespace == info->namespace_id;
+    if (removed && (info->flags & CONFIG_FLAG_READONLY)) {
+        tx->status = CONFIG_ERROR_READ_ONLY; return false;
+    }
+    if (!removed) tx->items[tx->count++] = *old;
+    return true;
 }
-#ifdef __GNUC__
-__attribute__((packed))
-#endif
-config_binary_entry_header_t;
-#ifdef _MSC_VER
-#pragma pack(pop)
-#endif
+
+static void destroy_transaction(import_transaction_t* tx) {
+    for (size_t i = 0; i < tx->collected; ++i) {
+        if (tx->original[i].value) {
+            nx_crypto_secure_zero((void*)tx->original[i].value, tx->original[i].size);
+            free((void*)tx->original[i].value);
+        }
+    }
+    for (size_t i = 0; i < tx->new_count; ++i) {
+        /* Data size is bounded by the record limit. Erase its allocated extent. */
+        for (size_t j = 0; j < tx->count; ++j) {
+            if (tx->items[j].value == tx->new_values[i]) {
+                nx_crypto_secure_zero(tx->new_values[i], tx->items[j].size); break;
+            }
+        }
+        free(tx->new_values[i]);
+    }
+    free(tx->items); free(tx->original);
+}
+
+static config_status_t stage_entry(import_transaction_t* tx, const char* key,
+    config_type_t type, const void* value, size_t size, uint8_t flags, uint8_t ns) {
+    if (!key[0] || strlen(key) >= CONFIG_MAX_MAX_KEY_LEN || size > CONFIG_MAX_MAX_VALUE_SIZE ||
+        (unsigned)type > CONFIG_TYPE_BLOB ||
+        (flags & ~(CONFIG_FLAG_ENCRYPTED | CONFIG_FLAG_READONLY | CONFIG_FLAG_PERSISTENT)))
+        return CONFIG_ERROR_INVALID_FORMAT;
+    if (!(flags & CONFIG_FLAG_ENCRYPTED) && type == CONFIG_TYPE_STRING &&
+        (!size || ((const uint8_t*)value)[size - 1] != 0 || memchr(value, 0, size - 1)))
+        return CONFIG_ERROR_INVALID_FORMAT;
+    /* CLEAR changes which values survive the transaction, not permission to
+     * remove a surviving key's security policy. Check the original identity
+     * even when collect_original omitted it from the replacement batch. */
+    for (size_t i = 0; i < tx->original_count; ++i) {
+        const config_store_replacement_t* old = &tx->original[i];
+        if (old->info.namespace_id != ns || strcmp(old->info.key, key)) continue;
+        if (old->info.flags & CONFIG_FLAG_READONLY) return CONFIG_ERROR_READ_ONLY;
+        if ((old->info.flags & CONFIG_FLAG_ENCRYPTED) && !(flags & CONFIG_FLAG_ENCRYPTED))
+            return CONFIG_ERROR_CRYPTO_FAILED;
+        flags |= old->info.flags & CONFIG_FLAG_PERSISTENT;
+        break;
+    }
+    size_t index = 0;
+    while (index < tx->count && (tx->items[index].info.namespace_id != ns ||
+           strcmp(tx->items[index].info.key, key))) ++index;
+    if (index < tx->count) {
+        if (tx->imported[index]) return CONFIG_ERROR_INVALID_FORMAT;
+        uint8_t old_flags = tx->items[index].info.flags;
+        if (old_flags & CONFIG_FLAG_READONLY) return CONFIG_ERROR_READ_ONLY;
+        if ((old_flags & CONFIG_FLAG_ENCRYPTED) && !(flags & CONFIG_FLAG_ENCRYPTED))
+            return CONFIG_ERROR_CRYPTO_FAILED;
+        flags |= old_flags & CONFIG_FLAG_PERSISTENT;
+    } else if (tx->count >= CONFIG_MAX_MAX_KEYS) return CONFIG_ERROR_NO_SPACE;
+    if (flags & CONFIG_FLAG_ENCRYPTED) {
+        uint8_t plaintext[CONFIG_MAX_MAX_VALUE_SIZE];
+        size_t plaintext_size = sizeof(plaintext);
+        config_status_t status = config_crypto_decrypt_record((const uint8_t*)value,
+            size, plaintext, &plaintext_size, key, ns, type);
+        if (status == CONFIG_OK && type == CONFIG_TYPE_STRING &&
+            (!plaintext_size || plaintext[plaintext_size - 1] != 0 ||
+             memchr(plaintext, 0, plaintext_size - 1))) status = CONFIG_ERROR_INVALID_FORMAT;
+        nx_crypto_secure_zero(plaintext, sizeof(plaintext));
+        if (status != CONFIG_OK) return status;
+    }
+    uint8_t* copy = (uint8_t*)malloc(size ? size : 1);
+    if (!copy) return CONFIG_ERROR_NO_MEMORY;
+    if (size) memcpy(copy, value, size);
+    config_store_replacement_t* item = &tx->items[index];
+    config_store_replacement_t previous = *item;
+    memset(item, 0, sizeof(*item));
+    memcpy(item->info.key, key, strlen(key) + 1);
+    item->info.namespace_id = ns; item->info.type = type;
+    item->info.flags = flags; item->info.value_size = (uint16_t)size;
+    item->value = copy; item->size = size;
+    bool appended = index == tx->count;
+    if (appended) ++tx->count;
+    config_status_t valid = config_store_replace_all(tx->items, tx->count, false);
+    if (valid != CONFIG_OK) {
+        *item = previous;
+        if (appended) --tx->count;
+        nx_crypto_secure_zero(copy, size); free(copy);
+        return valid;
+    }
+    tx->new_values[tx->new_count++] = copy;
+    tx->imported[index] = true;
+    return CONFIG_OK;
+}
 
 /*---------------------------------------------------------------------------*/
 /* JSON Parser Structures                                                    */
@@ -84,6 +162,7 @@ typedef struct {
     config_import_flags_t flags; /**< Import flags */
     uint8_t namespace_id;        /**< Target namespace ID */
     config_status_t status;      /**< Parse status */
+    import_transaction_t* transaction;
 } json_parser_ctx_t;
 
 /*---------------------------------------------------------------------------*/
@@ -127,59 +206,79 @@ static bool json_expect_char(json_parser_ctx_t* ctx, char expected) {
  * \param[in]       out_size: Output buffer size
  * \return          true on success
  */
-static bool json_parse_string(json_parser_ctx_t* ctx, char* out,
-                              size_t out_size) {
-    json_skip_whitespace(ctx);
-
-    if (ctx->pos >= ctx->size || ctx->data[ctx->pos] != '"') {
-        return false;
+static int hex_digit(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+static bool parse_hex4(json_parser_ctx_t* ctx, uint32_t* code) {
+    if (ctx->size - ctx->pos < 4) return false;
+    *code = 0;
+    for (size_t i = 0; i < 4; ++i) {
+        int nibble = hex_digit(ctx->data[ctx->pos++]);
+        if (nibble < 0) return false;
+        *code = (*code << 4) | (uint32_t)nibble;
     }
-    ctx->pos++; /* Skip opening quote */
-
-    size_t out_idx = 0;
-    while (ctx->pos < ctx->size && out_idx < out_size - 1) {
-        char c = ctx->data[ctx->pos++];
-
+    return true;
+}
+static bool json_parse_string(json_parser_ctx_t* ctx, char* out, size_t out_size) {
+    if (!out || !out_size || !json_expect_char(ctx, '"')) return false;
+    size_t written = 0;
+    while (ctx->pos < ctx->size) {
+        uint32_t c = (unsigned char)ctx->data[ctx->pos++];
         if (c == '"') {
-            out[out_idx] = '\0';
-            return true;
+            out[written] = 0;
+            return config_utf8_valid((const uint8_t*)out, written);
         }
-
-        if (c == '\\' && ctx->pos < ctx->size) {
+        if (c < 0x20) return false;
+        if (c == '\\') {
+            if (ctx->pos == ctx->size) return false;
             char escaped = ctx->data[ctx->pos++];
             switch (escaped) {
-                case '"':
-                    out[out_idx++] = '"';
-                    break;
-                case '\\':
-                    out[out_idx++] = '\\';
-                    break;
-                case 'n':
-                    out[out_idx++] = '\n';
-                    break;
-                case 'r':
-                    out[out_idx++] = '\r';
-                    break;
-                case 't':
-                    out[out_idx++] = '\t';
-                    break;
-                case 'u':
-                    /* Unicode escape - simplified handling */
-                    if (ctx->pos + 4 <= ctx->size) {
-                        ctx->pos += 4;        /* Skip 4 hex digits */
-                        out[out_idx++] = '?'; /* Placeholder */
+                case '"': c = '"'; break;
+                case '\\': c = '\\'; break;
+                case '/': c = '/'; break;
+                case 'n': c = '\n'; break;
+                case 'r': c = '\r'; break;
+                case 't': c = '\t'; break;
+                case 'b': c = '\b'; break;
+                case 'f': c = '\f'; break;
+                case 'u': {
+                    if (!parse_hex4(ctx, &c) || c == 0) return false;
+                    if (c >= 0xd800 && c <= 0xdbff) {
+                        uint32_t low;
+                        if (ctx->size - ctx->pos < 6 || ctx->data[ctx->pos++] != '\\' ||
+                            ctx->data[ctx->pos++] != 'u' || !parse_hex4(ctx, &low) ||
+                            low < 0xdc00 || low > 0xdfff) return false;
+                        c = 0x10000u + ((c - 0xd800u) << 10) + low - 0xdc00u;
+                    } else if (c >= 0xdc00 && c <= 0xdfff) return false;
+                    unsigned char bytes[4]; size_t count;
+                    if (c < 0x80) { bytes[0] = (unsigned char)c; count = 1; }
+                    else if (c < 0x800) {
+                        bytes[0] = (unsigned char)(0xc0 | (c >> 6));
+                        bytes[1] = (unsigned char)(0x80 | (c & 63)); count = 2;
+                    } else if (c < 0x10000) {
+                        bytes[0] = (unsigned char)(0xe0 | (c >> 12));
+                        bytes[1] = (unsigned char)(0x80 | ((c >> 6) & 63));
+                        bytes[2] = (unsigned char)(0x80 | (c & 63)); count = 3;
+                    } else {
+                        bytes[0] = (unsigned char)(0xf0 | (c >> 18));
+                        bytes[1] = (unsigned char)(0x80 | ((c >> 12) & 63));
+                        bytes[2] = (unsigned char)(0x80 | ((c >> 6) & 63));
+                        bytes[3] = (unsigned char)(0x80 | (c & 63)); count = 4;
                     }
-                    break;
-                default:
-                    out[out_idx++] = escaped;
-                    break;
+                    if (count >= out_size - written) return false;
+                    memcpy(out + written, bytes, count); written += count;
+                    continue;
+                }
+                default: return false;
             }
-        } else {
-            out[out_idx++] = c;
         }
+        if (written >= out_size - 1) return false;
+        out[written++] = (char)c;
     }
-
-    return false; /* Unterminated string */
+    return false;
 }
 
 /**
@@ -221,7 +320,10 @@ static bool json_parse_int64(json_parser_ctx_t* ctx, int64_t* value) {
     }
 
     num_buf[num_idx] = '\0';
-    *value = strtoll(num_buf, NULL, 10);
+    errno = 0; char* end;
+    long long parsed = strtoll(num_buf, &end, 10);
+    if (errno == ERANGE || *end) return false;
+    *value = (int64_t)parsed;
     return true;
 }
 
@@ -258,8 +360,11 @@ static bool json_parse_float(json_parser_ctx_t* ctx, float* value) {
     }
 
     num_buf[num_idx] = '\0';
-    *value = (float)strtod(num_buf, NULL);
-    return true;
+    errno = 0; char* end;
+    double parsed = strtod(num_buf, &end);
+    if (errno == ERANGE || *end || !isfinite(parsed)) return false;
+    *value = (float)parsed;
+    return isfinite(*value);
 }
 
 /**
@@ -381,318 +486,125 @@ static int get_type_from_name(const char* type_name) {
  * \param[in]       key: Configuration key
  * \return          CONFIG_OK on success, error code otherwise
  */
-static config_status_t json_import_entry(json_parser_ctx_t* ctx,
-                                         const char* key) {
-    char type_name[16] = {0};
-    config_type_t type = CONFIG_TYPE_I32;
-    bool has_type = false;
-    bool has_value = false;
-    uint8_t flags = 0;
-
-    /* Temporary storage for value */
-    union {
-        int32_t i32;
-        uint32_t u32;
-        int64_t i64;
-        float f;
-        bool b;
-        char str[CONFIG_MAX_MAX_VALUE_SIZE];
-        uint8_t blob[CONFIG_MAX_MAX_VALUE_SIZE];
-    } value;
-    size_t value_size = 0;
-
-    /* Expect opening brace for entry object */
-    if (!json_expect_char(ctx, '{')) {
-        return CONFIG_ERROR_INVALID_FORMAT;
+static bool valid_number(const char* text) {
+    size_t i = text[0] == '-' ? 1 : 0;
+    if (text[i] == '0') ++i;
+    else {
+        if (text[i] < '1' || text[i] > '9') return false;
+        while (isdigit((unsigned char)text[i])) ++i;
     }
-
-    /* Parse entry fields */
-    bool first_field = true;
+    if (text[i] == '.') {
+        ++i; if (!isdigit((unsigned char)text[i])) return false;
+        while (isdigit((unsigned char)text[i])) ++i;
+    }
+    if (text[i] == 'e' || text[i] == 'E') {
+        ++i; if (text[i] == '+' || text[i] == '-') ++i;
+        if (!isdigit((unsigned char)text[i])) return false;
+        while (isdigit((unsigned char)text[i])) ++i;
+    }
+    return text[i] == 0;
+}
+static config_status_t json_import_entry(json_parser_ctx_t* ctx, const char* key) {
+    enum { TEXT, NUMBER, BOOLEAN } kind = TEXT;
+    char text[CONFIG_MAX_MAX_VALUE_SIZE * 2 + 1] = {0};
+    char number[64] = {0};
+    int type = -1;
+    bool has_type = false, has_value = false, has_encrypted = false;
+    bool boolean = false, encrypted = false, invalid = false, first = true, closed = false;
+    /* SKIP_ERRORS applies only after a complete syntactically valid entry.
+     * Unconsumed or malformed JSON must never authorize CLEAR or partial data. */
+    ctx->status = CONFIG_ERROR_INVALID_FORMAT;
+    if (!json_expect_char(ctx, '{')) return CONFIG_ERROR_INVALID_FORMAT;
     while (ctx->pos < ctx->size) {
         json_skip_whitespace(ctx);
-
-        /* Check for closing brace */
         if (ctx->pos < ctx->size && ctx->data[ctx->pos] == '}') {
-            ctx->pos++;
-            break;
+            ++ctx->pos; closed = true; break;
         }
-
-        /* Expect comma between fields */
-        if (!first_field) {
-            if (!json_expect_char(ctx, ',')) {
-                return CONFIG_ERROR_INVALID_FORMAT;
-            }
-        }
-        first_field = false;
-
-        /* Parse field name */
-        char field_name[32];
-        if (!json_parse_string(ctx, field_name, sizeof(field_name))) {
+        if (!first && !json_expect_char(ctx, ',')) return CONFIG_ERROR_INVALID_FORMAT;
+        first = false;
+        char field[32];
+        if (!json_parse_string(ctx, field, sizeof(field)) || !json_expect_char(ctx, ':'))
             return CONFIG_ERROR_INVALID_FORMAT;
-        }
-
-        /* Expect colon */
-        if (!json_expect_char(ctx, ':')) {
-            return CONFIG_ERROR_INVALID_FORMAT;
-        }
-
-        /* Parse field value based on field name */
-        if (strcmp(field_name, "type") == 0) {
-            if (!json_parse_string(ctx, type_name, sizeof(type_name))) {
-                return CONFIG_ERROR_INVALID_FORMAT;
-            }
-            int type_val = get_type_from_name(type_name);
-            if (type_val < 0) {
-                /* Unknown type - mark as invalid but continue parsing to skip
-                 * the entry */
-                has_type = false;
-                /* Skip the rest of this entry by finding the closing brace */
-                int depth = 1;
-                while (ctx->pos < ctx->size && depth > 0) {
-                    char c = ctx->data[ctx->pos];
-                    if (c == '{')
-                        depth++;
-                    else if (c == '}')
-                        depth--;
-                    else if (c == '"') {
-                        /* Skip string content */
-                        ctx->pos++;
-                        while (ctx->pos < ctx->size &&
-                               ctx->data[ctx->pos] != '"') {
-                            if (ctx->data[ctx->pos] == '\\' &&
-                                ctx->pos + 1 < ctx->size) {
-                                ctx->pos++; /* Skip escaped char */
-                            }
-                            ctx->pos++;
-                        }
-                    }
-                    ctx->pos++;
-                }
-                return CONFIG_ERROR_INVALID_FORMAT;
-            }
-            type = (config_type_t)type_val;
-            has_type = true;
-        } else if (strcmp(field_name, "value") == 0) {
-            /* Parse value based on type (need type first) */
-            if (!has_type) {
-                /* Type not yet parsed, try to infer from JSON value */
-                json_skip_whitespace(ctx);
-                if (ctx->pos >= ctx->size) {
-                    return CONFIG_ERROR_INVALID_FORMAT;
-                }
-
-                char c = ctx->data[ctx->pos];
-                if (c == '"') {
-                    /* String or blob - assume string for now */
-                    type = CONFIG_TYPE_STRING;
-                    if (!json_parse_string(ctx, value.str, sizeof(value.str))) {
-                        return CONFIG_ERROR_INVALID_FORMAT;
-                    }
-                    value_size = strlen(value.str) + 1;
-                } else if (c == 't' || c == 'f') {
-                    type = CONFIG_TYPE_BOOL;
-                    if (!json_parse_bool(ctx, &value.b)) {
-                        return CONFIG_ERROR_INVALID_FORMAT;
-                    }
-                    value_size = sizeof(bool);
-                } else if (c == '-' || isdigit((unsigned char)c)) {
-                    /* Number - check if float */
-                    size_t start_pos = ctx->pos;
-                    bool is_float = false;
-                    while (ctx->pos < ctx->size) {
-                        char nc = ctx->data[ctx->pos];
-                        if (nc == '.' || nc == 'e' || nc == 'E') {
-                            is_float = true;
-                        }
-                        if (!isdigit((unsigned char)nc) && nc != '-' &&
-                            nc != '+' && nc != '.' && nc != 'e' && nc != 'E') {
-                            break;
-                        }
-                        ctx->pos++;
-                    }
-                    ctx->pos = start_pos; /* Reset position */
-
-                    if (is_float) {
-                        type = CONFIG_TYPE_FLOAT;
-                        if (!json_parse_float(ctx, &value.f)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value_size = sizeof(float);
-                    } else {
-                        type = CONFIG_TYPE_I32;
-                        int64_t i64_val;
-                        if (!json_parse_int64(ctx, &i64_val)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value.i32 = (int32_t)i64_val;
-                        value_size = sizeof(int32_t);
-                    }
-                } else {
-                    return CONFIG_ERROR_INVALID_FORMAT;
-                }
-                has_type = true;
-            } else {
-                /* Type is known, parse accordingly */
-                switch (type) {
-                    case CONFIG_TYPE_I32: {
-                        int64_t i64_val;
-                        if (!json_parse_int64(ctx, &i64_val)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value.i32 = (int32_t)i64_val;
-                        value_size = sizeof(int32_t);
-                        break;
-                    }
-                    case CONFIG_TYPE_U32: {
-                        int64_t i64_val;
-                        if (!json_parse_int64(ctx, &i64_val)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value.u32 = (uint32_t)i64_val;
-                        value_size = sizeof(uint32_t);
-                        break;
-                    }
-                    case CONFIG_TYPE_I64: {
-                        if (!json_parse_int64(ctx, &value.i64)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value_size = sizeof(int64_t);
-                        break;
-                    }
-                    case CONFIG_TYPE_FLOAT: {
-                        if (!json_parse_float(ctx, &value.f)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value_size = sizeof(float);
-                        break;
-                    }
-                    case CONFIG_TYPE_BOOL: {
-                        if (!json_parse_bool(ctx, &value.b)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value_size = sizeof(bool);
-                        break;
-                    }
-                    case CONFIG_TYPE_STRING: {
-                        if (!json_parse_string(ctx, value.str,
-                                               sizeof(value.str))) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        value_size = strlen(value.str) + 1;
-                        break;
-                    }
-                    case CONFIG_TYPE_BLOB: {
-                        char hex_str[CONFIG_MAX_MAX_VALUE_SIZE * 2 + 1];
-                        if (!json_parse_string(ctx, hex_str, sizeof(hex_str))) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        if (!hex_decode(hex_str, strlen(hex_str), value.blob,
-                                        sizeof(value.blob), &value_size)) {
-                            return CONFIG_ERROR_INVALID_FORMAT;
-                        }
-                        break;
-                    }
-                    default:
-                        return CONFIG_ERROR_INVALID_FORMAT;
-                }
-            }
-            has_value = true;
-        } else if (strcmp(field_name, "encrypted") == 0) {
-            bool encrypted;
-            if (!json_parse_bool(ctx, &encrypted)) {
-                return CONFIG_ERROR_INVALID_FORMAT;
-            }
-            if (encrypted) {
-                flags |= CONFIG_FLAG_ENCRYPTED;
-            }
-        } else {
-            /* Unknown field - skip value */
-            json_skip_whitespace(ctx);
-            if (ctx->pos >= ctx->size) {
-                return CONFIG_ERROR_INVALID_FORMAT;
-            }
-
+        if (!strcmp(field, "type")) {
+            char name[16];
+            if (!json_parse_string(ctx, name, sizeof(name))) return CONFIG_ERROR_INVALID_FORMAT;
+            if (has_type) invalid = true;
+            has_type = true; type = get_type_from_name(name);
+        } else if (!strcmp(field, "encrypted")) {
+            if (has_encrypted) invalid = true;
+            has_encrypted = true;
+            if (!json_parse_bool(ctx, &encrypted)) return CONFIG_ERROR_INVALID_FORMAT;
+        } else if (!strcmp(field, "value")) {
+            if (has_value) invalid = true;
+            has_value = true; json_skip_whitespace(ctx);
+            if (ctx->pos >= ctx->size) return CONFIG_ERROR_INVALID_FORMAT;
             char c = ctx->data[ctx->pos];
             if (c == '"') {
-                char skip_buf[256];
-                json_parse_string(ctx, skip_buf, sizeof(skip_buf));
+                kind = TEXT;
+                if (!json_parse_string(ctx, text, sizeof(text))) return CONFIG_ERROR_INVALID_FORMAT;
             } else if (c == 't' || c == 'f') {
-                bool skip_bool;
-                json_parse_bool(ctx, &skip_bool);
-            } else if (c == '-' || isdigit((unsigned char)c)) {
-                int64_t skip_num;
-                json_parse_int64(ctx, &skip_num);
-            } else if (c == '{') {
-                /* Skip nested object - simplified */
-                int depth = 1;
-                ctx->pos++;
-                while (ctx->pos < ctx->size && depth > 0) {
-                    if (ctx->data[ctx->pos] == '{')
-                        depth++;
-                    else if (ctx->data[ctx->pos] == '}')
-                        depth--;
-                    ctx->pos++;
+                kind = BOOLEAN;
+                if (!json_parse_bool(ctx, &boolean)) return CONFIG_ERROR_INVALID_FORMAT;
+            } else {
+                kind = NUMBER; size_t length = 0;
+                while (ctx->pos < ctx->size) {
+                    c = ctx->data[ctx->pos];
+                    if (!isdigit((unsigned char)c) && c != '-' && c != '+' && c != '.' && c != 'e' && c != 'E') break;
+                    if (length < sizeof(number) - 1) number[length++] = c; else invalid = true;
+                    ++ctx->pos;
                 }
-            } else if (c == '[') {
-                /* Skip array - simplified */
-                int depth = 1;
-                ctx->pos++;
-                while (ctx->pos < ctx->size && depth > 0) {
-                    if (ctx->data[ctx->pos] == '[')
-                        depth++;
-                    else if (ctx->data[ctx->pos] == ']')
-                        depth--;
-                    ctx->pos++;
-                }
-            } else if (c == 'n' && ctx->pos + 4 <= ctx->size &&
-                       strncmp(ctx->data + ctx->pos, "null", 4) == 0) {
-                ctx->pos += 4;
+                number[length] = 0;
+                if (!valid_number(number)) return CONFIG_ERROR_INVALID_FORMAT;
             }
+        } else {
+            /* This schema has no untyped extension fields; reject them explicitly. */
+            return CONFIG_ERROR_INVALID_FORMAT;
         }
     }
-
-    /* Validate we have required fields */
-    if (!has_value) {
-        return CONFIG_ERROR_INVALID_FORMAT;
+    if (!closed) return CONFIG_ERROR_INVALID_FORMAT;
+    ctx->status = CONFIG_OK;
+    if (!has_value || invalid || (has_type && type < 0)) return CONFIG_ERROR_INVALID_FORMAT;
+    if (!has_type) type = kind == TEXT ? CONFIG_TYPE_STRING : kind == BOOLEAN ? CONFIG_TYPE_BOOL :
+        (strpbrk(number, ".eE") ? CONFIG_TYPE_FLOAT : CONFIG_TYPE_I32);
+    union { int32_t i32; uint32_t u32; int64_t i64; float f; bool b;
+            uint8_t data[CONFIG_MAX_MAX_VALUE_SIZE]; } value;
+    size_t size = 0;
+    if (encrypted || type == CONFIG_TYPE_BLOB) {
+        if (kind != TEXT || !hex_decode(text, strlen(text), value.data, sizeof(value.data), &size))
+            return CONFIG_ERROR_INVALID_FORMAT;
+    } else if (type == CONFIG_TYPE_STRING) {
+        if (kind != TEXT) return CONFIG_ERROR_INVALID_FORMAT;
+        size = strlen(text) + 1;
+        if (size > sizeof(value.data)) return CONFIG_ERROR_VALUE_TOO_LARGE;
+        memcpy(value.data, text, size);
+    } else if (type == CONFIG_TYPE_BOOL) {
+        if (kind != BOOLEAN) return CONFIG_ERROR_INVALID_FORMAT;
+        value.b = boolean; size = sizeof(value.b);
+    } else {
+        if (kind != NUMBER) return CONFIG_ERROR_INVALID_FORMAT;
+        json_parser_ctx_t number_ctx = {.data = number, .size = strlen(number), .pos = 0};
+        if (type == CONFIG_TYPE_FLOAT) {
+            if (!json_parse_float(&number_ctx, &value.f)) return CONFIG_ERROR_INVALID_FORMAT;
+            size = sizeof(value.f);
+        } else {
+            int64_t integer;
+            if (!json_parse_int64(&number_ctx, &integer) || number_ctx.pos != number_ctx.size)
+                return CONFIG_ERROR_INVALID_FORMAT;
+            if (type == CONFIG_TYPE_I32) {
+                if (integer < INT32_MIN || integer > INT32_MAX) return CONFIG_ERROR_INVALID_FORMAT;
+                value.i32 = (int32_t)integer; size = sizeof(value.i32);
+            } else if (type == CONFIG_TYPE_U32) {
+                if (integer < 0 || (uint64_t)integer > UINT32_MAX) return CONFIG_ERROR_INVALID_FORMAT;
+                value.u32 = (uint32_t)integer; size = sizeof(value.u32);
+            } else if (type == CONFIG_TYPE_I64) { value.i64 = integer; size = sizeof(value.i64); }
+            else return CONFIG_ERROR_INVALID_FORMAT;
+        }
     }
-
-    /* Store the value */
-    config_status_t status;
-    switch (type) {
-        case CONFIG_TYPE_I32:
-            status = config_store_set(key, type, &value.i32, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        case CONFIG_TYPE_U32:
-            status = config_store_set(key, type, &value.u32, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        case CONFIG_TYPE_I64:
-            status = config_store_set(key, type, &value.i64, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        case CONFIG_TYPE_FLOAT:
-            status = config_store_set(key, type, &value.f, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        case CONFIG_TYPE_BOOL:
-            status = config_store_set(key, type, &value.b, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        case CONFIG_TYPE_STRING:
-            status = config_store_set(key, type, value.str, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        case CONFIG_TYPE_BLOB:
-            status = config_store_set(key, type, value.blob, value_size, flags,
-                                      ctx->namespace_id);
-            break;
-        default:
-            status = CONFIG_ERROR_INVALID_FORMAT;
-            break;
-    }
-
-    return status;
+    config_status_t result = stage_entry(ctx->transaction, key, (config_type_t)type, &value,
+        size, encrypted ? CONFIG_FLAG_ENCRYPTED : CONFIG_FLAG_NONE, ctx->namespace_id);
+    nx_crypto_secure_zero(&value, sizeof(value));
+    nx_crypto_secure_zero(text, sizeof(text));
+    return result;
 }
 
 /**
@@ -705,13 +617,14 @@ static config_status_t json_import_entry(json_parser_ctx_t* ctx,
  */
 static config_status_t import_json(const void* data, size_t size,
                                    config_import_flags_t flags,
-                                   uint8_t namespace_id) {
+                                   uint8_t namespace_id, import_transaction_t* transaction) {
     json_parser_ctx_t ctx = {.data = (const char*)data,
                              .size = size,
                              .pos = 0,
                              .flags = flags,
                              .namespace_id = namespace_id,
-                             .status = CONFIG_OK};
+                             .status = CONFIG_OK,
+                             .transaction = transaction};
 
     /* Expect opening brace */
     if (!json_expect_char(&ctx, '{')) {
@@ -753,6 +666,7 @@ static config_status_t import_json(const void* data, size_t size,
         /* Parse entry value */
         config_status_t status = json_import_entry(&ctx, key);
         if (status != CONFIG_OK) {
+            if (ctx.status != CONFIG_OK) return ctx.status;
             if (flags & CONFIG_IMPORT_FLAG_SKIP_ERRORS) {
                 /* Skip this entry and continue */
                 continue;
@@ -766,6 +680,9 @@ static config_status_t import_json(const void* data, size_t size,
         return CONFIG_ERROR_INVALID_FORMAT;
     }
 
+    json_skip_whitespace(&ctx);
+    if (ctx.pos < ctx.size && ctx.data[ctx.pos] == '\0') ++ctx.pos;
+    if (ctx.pos != ctx.size) return CONFIG_ERROR_INVALID_FORMAT;
     return CONFIG_OK;
 }
 
@@ -782,160 +699,91 @@ static config_status_t import_json(const void* data, size_t size,
  * \return          CONFIG_OK on success, error code otherwise
  */
 static config_status_t import_binary(const void* data, size_t size,
-                                     config_import_flags_t flags,
-                                     uint8_t namespace_id) {
-    const uint8_t* ptr = (const uint8_t*)data;
-    size_t offset = 0;
-
-    /* Validate minimum size for header */
-    if (size < sizeof(config_binary_header_t)) {
-        return CONFIG_ERROR_INVALID_FORMAT;
-    }
-
-    /* Read and validate header */
-    config_binary_header_t header;
-    memcpy(&header, ptr, sizeof(header));
-    offset += sizeof(header);
-
-    if (header.magic != CONFIG_BINARY_MAGIC) {
-        return CONFIG_ERROR_INVALID_FORMAT;
-    }
-
-    if (header.version != CONFIG_BINARY_VERSION) {
-        return CONFIG_ERROR_INVALID_FORMAT;
-    }
-
-    /* Validate data size */
-    if (size < sizeof(header) + header.data_size) {
-        return CONFIG_ERROR_INVALID_FORMAT;
-    }
-
-    /* Read entries */
-    for (uint32_t i = 0; i < header.entry_count; ++i) {
-        /* Check remaining size for entry header */
-        if (offset + sizeof(config_binary_entry_header_t) > size) {
+    config_import_flags_t flags, uint8_t namespace_id, import_transaction_t* tx) {
+    const uint8_t* bytes = (const uint8_t*)data;
+    if (size < CONFIG_BINARY_HEADER_SIZE || config_wire_get(bytes, 4) != CONFIG_BINARY_MAGIC ||
+        bytes[4] != CONFIG_BINARY_VERSION || bytes[5] || bytes[6] || bytes[7] ||
+        config_wire_get(bytes + 12, 4) != size - CONFIG_BINARY_HEADER_SIZE) return CONFIG_ERROR_INVALID_FORMAT;
+    size_t count = (size_t)config_wire_get(bytes + 8, 4), position = CONFIG_BINARY_HEADER_SIZE;
+    if (count > CONFIG_MAX_MAX_KEYS) return CONFIG_ERROR_INVALID_FORMAT;
+    for (size_t i = 0; i < count; ++i) {
+        if (position > size || size - position < CONFIG_BINARY_ENTRY_SIZE) return CONFIG_ERROR_INVALID_FORMAT;
+        const uint8_t* entry = bytes + position;
+        size_t key_size = entry[0], value_size = (size_t)config_wire_get(entry + 4, 2);
+        config_type_t type = (config_type_t)entry[1]; uint8_t entry_flags = entry[2];
+        uint8_t ns = tx->namespace_only ? namespace_id : entry[3];
+        position += CONFIG_BINARY_ENTRY_SIZE;
+        if (key_size > size - position || value_size > size - position - key_size)
             return CONFIG_ERROR_INVALID_FORMAT;
+        config_status_t status = CONFIG_OK;
+        char key[CONFIG_MAX_MAX_KEY_LEN]; uint8_t value[CONFIG_MAX_MAX_VALUE_SIZE];
+        if (!key_size || key_size >= sizeof(key) || memchr(bytes + position, 0, key_size) ||
+            value_size > sizeof(value) || !config_namespace_is_valid_id(ns)) status = CONFIG_ERROR_INVALID_FORMAT;
+        if (status == CONFIG_OK) {
+            memcpy(key, bytes + position, key_size); key[key_size] = 0;
+            if (!config_wire_value(type, entry_flags, bytes + position + key_size,
+                                   value_size, value, false)) status = CONFIG_ERROR_INVALID_FORMAT;
+            else status = stage_entry(tx, key, type, value, value_size, entry_flags, ns);
+            nx_crypto_secure_zero(value, sizeof(value));
         }
-
-        /* Read entry header */
-        config_binary_entry_header_t entry_header;
-        memcpy(&entry_header, ptr + offset, sizeof(entry_header));
-        offset += sizeof(entry_header);
-
-        /* Validate entry data size */
-        size_t entry_data_size =
-            (size_t)entry_header.key_len + (size_t)entry_header.value_size;
-        if (offset + entry_data_size > size) {
-            return CONFIG_ERROR_INVALID_FORMAT;
-        }
-
-        /* Read key */
-        char key[CONFIG_MAX_MAX_KEY_LEN];
-        if (entry_header.key_len >= sizeof(key)) {
-            if (flags & CONFIG_IMPORT_FLAG_SKIP_ERRORS) {
-                offset += entry_data_size;
-                continue;
-            }
-            return CONFIG_ERROR_KEY_TOO_LONG;
-        }
-        memcpy(key, ptr + offset, entry_header.key_len);
-        key[entry_header.key_len] = '\0';
-        offset += entry_header.key_len;
-
-        /* Read value */
-        uint8_t value_buf[CONFIG_MAX_MAX_VALUE_SIZE];
-        if (entry_header.value_size > sizeof(value_buf)) {
-            if (flags & CONFIG_IMPORT_FLAG_SKIP_ERRORS) {
-                offset += entry_header.value_size;
-                continue;
-            }
-            return CONFIG_ERROR_VALUE_TOO_LARGE;
-        }
-        memcpy(value_buf, ptr + offset, entry_header.value_size);
-        offset += entry_header.value_size;
-
-        /* Store the value */
-        config_status_t status = config_store_set(
-            key, (config_type_t)entry_header.type, value_buf,
-            entry_header.value_size, entry_header.flags, namespace_id);
-
-        if (status != CONFIG_OK) {
-            if (flags & CONFIG_IMPORT_FLAG_SKIP_ERRORS) {
-                continue;
-            }
-            return status;
-        }
+        position += key_size + value_size;
+        if (status != CONFIG_OK && !(flags & CONFIG_IMPORT_FLAG_SKIP_ERRORS)) return status;
     }
-
-    return CONFIG_OK;
+    return position == size ? CONFIG_OK : CONFIG_ERROR_INVALID_FORMAT;
 }
 
 /*---------------------------------------------------------------------------*/
 /* Public API Implementation                                                 */
 /*---------------------------------------------------------------------------*/
 
-config_status_t config_import(config_format_t format,
-                              config_import_flags_t flags, const void* data,
-                              size_t size) {
-    if (!config_is_initialized()) {
-        return CONFIG_ERROR_NOT_INIT;
-    }
-
-    if (data == NULL || size == 0) {
-        return CONFIG_ERROR_INVALID_PARAM;
-    }
-
-    /* Clear existing data if requested */
+static config_status_t import_transaction(config_format_t format,
+    config_import_flags_t flags, const void* data, size_t size, uint8_t ns, bool namespace_only) {
+    if ((flags & ~(CONFIG_IMPORT_FLAG_CLEAR | CONFIG_IMPORT_FLAG_SKIP_ERRORS)) ||
+        (format != CONFIG_FORMAT_JSON && format != CONFIG_FORMAT_BINARY)) return CONFIG_ERROR_INVALID_PARAM;
+    import_transaction_t tx = {0}; tx.clear_namespace = -1; tx.namespace_only = namespace_only;
     if (flags & CONFIG_IMPORT_FLAG_CLEAR) {
-        config_status_t status = config_store_clear_all();
+        if (namespace_only) tx.clear_namespace = ns; else tx.clear_all = true;
+    }
+    config_status_t status = config_store_get_count(&tx.original_count);
+    if (status != CONFIG_OK) return status;
+    tx.original = (config_store_replacement_t*)calloc(tx.original_count ? tx.original_count : 1,
+        sizeof(*tx.original));
+    tx.items = (config_store_replacement_t*)calloc(CONFIG_MAX_MAX_KEYS, sizeof(*tx.items));
+    if (!tx.original || !tx.items) { free(tx.original); free(tx.items); return CONFIG_ERROR_NO_MEMORY; }
+    status = config_store_iterate(collect_original, &tx);
+    if (status == CONFIG_OK) status = tx.status;
+    if (status == CONFIG_OK) {
+        status = format == CONFIG_FORMAT_JSON ? import_json(data, size, flags, ns, &tx) :
+                                                import_binary(data, size, flags, ns, &tx);
+    }
+    if (status == CONFIG_OK) status = config_store_replace_all(tx.items, tx.count, true);
+    if (status == CONFIG_OK) {
+        config_backend_set_dirty(true);
+        status = config_backend_auto_commit_if_enabled();
         if (status != CONFIG_OK) {
-            return status;
+            config_status_t rollback = config_store_replace_all(tx.original, tx.original_count, true);
+            config_backend_set_dirty(true);
+            if (rollback != CONFIG_OK) status = rollback;
         }
     }
-
-    /* Import based on format */
-    if (format == CONFIG_FORMAT_JSON) {
-        return import_json(data, size, flags, CONFIG_DEFAULT_NAMESPACE_ID);
-    } else if (format == CONFIG_FORMAT_BINARY) {
-        return import_binary(data, size, flags, CONFIG_DEFAULT_NAMESPACE_ID);
-    }
-
-    return CONFIG_ERROR_INVALID_PARAM;
+    destroy_transaction(&tx);
+    return status;
 }
-
-config_status_t config_import_namespace(const char* ns_name,
-                                        config_format_t format,
-                                        config_import_flags_t flags,
-                                        const void* data, size_t size) {
-    if (!config_is_initialized()) {
-        return CONFIG_ERROR_NOT_INIT;
-    }
-
-    if (ns_name == NULL || data == NULL || size == 0) {
-        return CONFIG_ERROR_INVALID_PARAM;
-    }
-
-    /* Get or create namespace */
-    uint8_t ns_id;
-    config_status_t status = config_namespace_create(ns_name, &ns_id);
-    if (status != CONFIG_OK) {
-        return status;
-    }
-
-    /* Clear namespace if requested */
-    if (flags & CONFIG_IMPORT_FLAG_CLEAR) {
-        status = config_store_clear_namespace(ns_id);
-        if (status != CONFIG_OK) {
-            return status;
-        }
-    }
-
-    /* Import based on format */
-    if (format == CONFIG_FORMAT_JSON) {
-        return import_json(data, size, flags, ns_id);
-    } else if (format == CONFIG_FORMAT_BINARY) {
-        return import_binary(data, size, flags, ns_id);
-    }
-
-    return CONFIG_ERROR_INVALID_PARAM;
+config_status_t config_import(config_format_t format,
+    config_import_flags_t flags, const void* data, size_t size) {
+    if (!config_is_initialized()) return CONFIG_ERROR_NOT_INIT;
+    if (!data || !size) return CONFIG_ERROR_INVALID_PARAM;
+    return import_transaction(format, flags, data, size, CONFIG_DEFAULT_NAMESPACE_ID, false);
+}
+config_status_t config_import_namespace(const char* name, config_format_t format,
+    config_import_flags_t flags, const void* data, size_t size) {
+    if (!config_is_initialized()) return CONFIG_ERROR_NOT_INIT;
+    if (!name || !data || !size) return CONFIG_ERROR_INVALID_PARAM;
+    uint8_t ns;
+    bool existing = config_namespace_get_id(name, &ns) == CONFIG_OK;
+    config_status_t status = config_namespace_create(name, &ns);
+    if (status != CONFIG_OK) return status;
+    status = import_transaction(format, flags, data, size, ns, true);
+    if (status != CONFIG_OK && !existing) (void)config_erase_namespace(name);
+    return status;
 }

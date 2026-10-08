@@ -1,0 +1,8 @@
+add_library(nexus_security STATIC src/crypto.c)
+target_include_directories(nexus_security PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(nexus_security PUBLIC nexus_build_options)
+if(NEXUS_PLATFORM STREQUAL "native")
+    target_sources(nexus_security PRIVATE src/crypto_openssl.c)
+    target_compile_definitions(nexus_security PRIVATE NX_SECURITY_OPENSSL=1)
+    target_link_libraries(nexus_security PRIVATE OpenSSL::Crypto)
+endif()

@@ -17,7 +17,7 @@
 extern "C" {
 #include "hal/interface/nx_usb.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_usb_helpers.h"
+#include "devices/native_usb_helpers.h"
 }
 
 /*---------------------------------------------------------------------------*/

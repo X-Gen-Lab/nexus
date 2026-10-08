@@ -16,7 +16,7 @@
 extern "C" {
 #include "hal/interface/nx_adc.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_adc_helpers.h"
+#include "devices/native_adc_helpers.h"
 }
 
 /**
@@ -111,13 +111,10 @@ TEST_F(AdcTest, GetInvalidChannel) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Diagnostic Tests - Requirement 6.6                                        */
+/* Simulator Counter Tests - Requirement 6.6                                        */
 /*---------------------------------------------------------------------------*/
 
-TEST_F(AdcTest, DiagnosticInterface) {
-    /* Get diagnostic interface */
-    nx_diagnostic_t* diag = adc->get_diagnostic(adc);
-    ASSERT_NE(nullptr, diag);
+TEST_F(AdcTest, ConversionCounters) {
 
     /* Trigger some conversions */
     adc->trigger(adc);

@@ -1,176 +1,74 @@
-/**
- * \file            nx_i2c_lifecycle.c
- * \brief           I2C lifecycle interface implementation for Native platform
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-18
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements I2C lifecycle operations including init,
- *                  deinit, suspend, resume, and state query functions.
- */
-
-#include "hal/base/nx_device.h"
-#include "hal/nx_status.h"
+/** Lifecycle transitions reject queued, waiting, active and callback owners. */
 #include "nx_i2c_helpers.h"
-#include "nx_i2c_types.h"
+#include "osal/osal.h"
 #include <string.h>
-
-/*---------------------------------------------------------------------------*/
-/* External Buffer References                                                */
-/*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
-/* Lifecycle Interface Implementation                                        */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize implementation
- */
-static nx_status_t i2c_lifecycle_init(nx_lifecycle_t* self) {
-    nx_i2c_impl_t* impl = NX_CONTAINER_OF(self, nx_i2c_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-    if (impl->state->initialized) {
-        return NX_ERR_ALREADY_INIT;
-    }
-
-    /* Clear buffer data */
-    if (impl->state->tx_buf.data != NULL) {
-        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-    }
-
-    if (impl->state->rx_buf.data != NULL) {
-        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-    }
-
-    /* Set state flags */
-    impl->state->initialized = true;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    return NX_OK;
+static void clear(nx_i2c_impl_t* b) {
+    i2c_buffer_clear(&b->state->tx_buf); i2c_buffer_clear(&b->state->rx_buf);
+    memset(b->responses,0,sizeof(b->responses));
+    for(unsigned i=0;i<NATIVE_I2C_DEVICE_CAPACITY;++i) b->devices[i].allocated=false;
+    b->state->initialized=false; b->state->suspended=false; b->state->busy=false;
+    b->pending=NULL; b->active=NULL; b->next_failure=NX_OK;
 }
-
-/**
- * \brief           Deinitialize implementation
- */
-static nx_status_t i2c_lifecycle_deinit(nx_lifecycle_t* self) {
-    nx_i2c_impl_t* impl = NX_CONTAINER_OF(self, nx_i2c_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    /* Clear buffer data */
-    if (impl->state->tx_buf.data != NULL) {
-        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-    }
-
-    if (impl->state->rx_buf.data != NULL) {
-        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-    }
-
-    /* Clear state flags */
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    return NX_OK;
+static nx_status_t init(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=NX_CONTAINER_OF(self,nx_i2c_impl_t,lifecycle);
+    native_i2c_lock();
+    nx_status_t r=b->state->initialized ? NX_ERR_ALREADY_INIT :
+        b->users || b->worker_active ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK && !b->mutex && osal_mutex_create(&b->mutex)!=OSAL_OK) r=NX_ERR_NO_RESOURCE;
+    if(r==NX_OK) { clear(b); b->state->initialized=true; }
+    native_i2c_unlock(); return r;
 }
-
-/**
- * \brief           Suspend implementation
- */
-static nx_status_t i2c_lifecycle_suspend(nx_lifecycle_t* self) {
-    nx_i2c_impl_t* impl = NX_CONTAINER_OF(self, nx_i2c_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
+static nx_status_t deinit(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=NX_CONTAINER_OF(self,nx_i2c_impl_t,lifecycle);
+    native_i2c_lock(); nx_status_t r=!b->state->initialized ? NX_ERR_NOT_INIT :
+        b->users || b->worker_active ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK && b->mutex) {
+        if(osal_mutex_delete(b->mutex)!=OSAL_OK) r=NX_ERR_IO;
+        else b->mutex=NULL;
     }
-
-    /* Check if already suspended */
-    if (impl->state->suspended) {
-        return NX_ERR_INVALID_STATE;
-    }
-
-    /* Set suspend flag */
-    impl->state->suspended = true;
-
-    return NX_OK;
+    if(r==NX_OK) clear(b);
+    native_i2c_unlock(); return r;
 }
-
-/**
- * \brief           Resume implementation
- */
-static nx_status_t i2c_lifecycle_resume(nx_lifecycle_t* self) {
-    nx_i2c_impl_t* impl = NX_CONTAINER_OF(self, nx_i2c_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state || !impl->state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    /* Check if not suspended */
-    if (!impl->state->suspended) {
-        return NX_ERR_INVALID_STATE;
-    }
-
-    /* Clear suspend flag */
-    impl->state->suspended = false;
-
-    return NX_OK;
+static nx_status_t suspend(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=NX_CONTAINER_OF(self,nx_i2c_impl_t,lifecycle);
+    native_i2c_lock(); nx_status_t r=native_i2c_bus_status(b);
+    if(r==NX_OK && (b->users || b->worker_active)) r=NX_ERR_BUSY;
+    if(r==NX_OK) b->state->suspended=true;
+    native_i2c_unlock(); return r;
 }
-
-/**
- * \brief           Get state implementation
- */
-static nx_device_state_t i2c_lifecycle_get_state(nx_lifecycle_t* self) {
-    nx_i2c_impl_t* impl = NX_CONTAINER_OF(self, nx_i2c_impl_t, lifecycle);
-
-    /* Parameter validation */
-    if (!impl->state) {
-        return NX_DEV_STATE_ERROR;
-    }
-    if (!impl->state->initialized) {
-        return NX_DEV_STATE_UNINITIALIZED;
-    }
-    if (impl->state->suspended) {
-        return NX_DEV_STATE_SUSPENDED;
-    }
-
-    return NX_DEV_STATE_RUNNING;
+static nx_status_t resume(nx_lifecycle_t* self) {
+    if(!self || osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=NX_CONTAINER_OF(self,nx_i2c_impl_t,lifecycle);
+    native_i2c_lock(); nx_status_t r=!b->state->initialized ? NX_ERR_NOT_INIT :
+        !b->state->suspended ? NX_ERR_INVALID_STATE : NX_OK;
+    if(r==NX_OK) b->state->suspended=false;
+    native_i2c_unlock(); return r;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Interface Initialization                                                  */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize lifecycle interface
- */
-void i2c_init_lifecycle(nx_lifecycle_t* lifecycle) {
-    lifecycle->init = i2c_lifecycle_init;
-    lifecycle->deinit = i2c_lifecycle_deinit;
-    lifecycle->suspend = i2c_lifecycle_suspend;
-    lifecycle->resume = i2c_lifecycle_resume;
-    lifecycle->get_state = i2c_lifecycle_get_state;
+static nx_device_state_t state(nx_lifecycle_t* self) {
+    if(!self) return NX_DEV_STATE_ERROR;
+    nx_i2c_impl_t* b=NX_CONTAINER_OF(self,nx_i2c_impl_t,lifecycle);
+    native_i2c_lock(); nx_device_state_t r=!b->state->initialized ? NX_DEV_STATE_UNINITIALIZED :
+        b->state->suspended ? NX_DEV_STATE_SUSPENDED : NX_DEV_STATE_RUNNING;
+    native_i2c_unlock(); return r;
+}
+nx_status_t native_i2c_reset_impl(nx_i2c_impl_t* b) {
+    if(!b || !b->state || osal_is_isr()) return NX_ERR_INVALID_PARAM;
+    native_i2c_lock(); nx_status_t r=b->users || b->worker_active ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK && b->mutex) {
+        if(osal_mutex_delete(b->mutex)!=OSAL_OK) r=NX_ERR_IO;
+        else b->mutex=NULL;
+    }
+    if(r==NX_OK) {
+        clear(b); memset(&b->state->stats,0,sizeof(b->state->stats));
+        memset(&b->state->current_device,0,sizeof(b->state->current_device));
+        b->state->current_dev_addr=0; b->transfer_delay_ms=0;
+        for(unsigned i=0;i<NATIVE_I2C_LEGACY_CAPACITY;++i) b->legacy_devices[i].last_result=NX_OK;
+    }
+    native_i2c_unlock(); return r;
+}
+void i2c_init_lifecycle(nx_lifecycle_t* out) {
+    out->init=init; out->deinit=deinit; out->suspend=suspend; out->resume=resume; out->get_state=state;
 }

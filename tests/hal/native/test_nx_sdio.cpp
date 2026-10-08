@@ -7,7 +7,7 @@
 #include "hal/interface/nx_sdio.h"
 #include "hal/nx_factory.h"
 #include "hal/nx_status.h"
-#include "tests/hal/native/devices/native_sdio_helpers.h"
+#include "devices/native_sdio_helpers.h"
 #include <cstring>
 #include <gtest/gtest.h>
 

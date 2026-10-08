@@ -111,6 +111,15 @@ extern "C" {
 #define OSAL_MAX_QUEUES 8
 #endif
 
+/** Maximum copied item size; bounds critical-section copy work. */
+#ifndef OSAL_MAX_QUEUE_ITEM_SIZE
+#define OSAL_MAX_QUEUE_ITEM_SIZE 1024u
+#endif
+/** Per-queue storage ceiling, independent of allocation overflow checks. */
+#ifndef OSAL_MAX_QUEUE_BYTES
+#define OSAL_MAX_QUEUE_BYTES (64u * 1024u)
+#endif
+
 /**
  * \brief           Maximum number of event flags
  */

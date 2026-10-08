@@ -1,149 +1,93 @@
-/**
- * \file            nx_i2c_types.h
- * \brief           I2C type definitions for Native platform
- * \author          Nexus Team
- */
-
-/*
- * Copyright (c) 2026 Nexus Team
- */
-
+/** Native I2C model: immutable device identities and bounded resources. */
 #ifndef NX_I2C_TYPES_H
 #define NX_I2C_TYPES_H
-
-#include "hal/base/nx_comm.h"
 #include "hal/interface/nx_i2c.h"
-#include "hal/interface/nx_lifecycle.h"
-#include "hal/interface/nx_power.h"
-#include "hal/nx_status.h"
-#include "hal/nx_types.h"
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "osal/osal_mutex.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define NATIVE_I2C_DEVICE_CAPACITY 16u
+#define NATIVE_I2C_LEGACY_CAPACITY 256u
+#define NATIVE_I2C_RESPONSE_CAPACITY 16u
+#define NATIVE_I2C_PAYLOAD_CAPACITY 256u
 
-/*---------------------------------------------------------------------------*/
-/* Forward Declarations                                                      */
-/*---------------------------------------------------------------------------*/
-
-/* Forward declare device type */
 typedef struct nx_device_s nx_device_t;
-
-/*---------------------------------------------------------------------------*/
-/* Platform Configuration Structure                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           I2C platform configuration structure
- *
- * Contains compile-time configuration from Kconfig.
- */
+typedef struct nx_i2c_impl_s nx_i2c_impl_t;
 typedef struct nx_i2c_platform_config_s {
-    uint8_t i2c_index;  /**< I2C instance index */
-    uint32_t speed;     /**< I2C speed (Hz) */
-    uint8_t scl_pin;    /**< SCL pin number */
-    uint8_t sda_pin;    /**< SDA pin number */
-    size_t tx_buf_size; /**< TX buffer size */
-    size_t rx_buf_size; /**< RX buffer size */
+    uint8_t i2c_index;
+    uint32_t speed;
+    uint8_t scl_pin, sda_pin;
+    size_t tx_buf_size, rx_buf_size;
 } nx_i2c_platform_config_t;
-
-/*---------------------------------------------------------------------------*/
-/* Circular Buffer Structure                                                 */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Circular buffer structure
- *
- * Used for TX and RX buffering.
- */
 typedef struct nx_i2c_buffer_s {
-    uint8_t* data; /**< Buffer data pointer */
-    size_t size;   /**< Buffer size */
-    size_t head;   /**< Write position */
-    size_t tail;   /**< Read position */
-    size_t count;  /**< Number of bytes in buffer */
+    uint8_t* data;
+    size_t size, head, tail, count;
 } nx_i2c_buffer_t;
-
-/*---------------------------------------------------------------------------*/
-/* I2C Configuration Structure                                               */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           I2C runtime configuration structure
- */
 typedef struct nx_i2c_config_s {
-    uint32_t speed;     /**< I2C speed (Hz) */
-    uint8_t scl_pin;    /**< SCL pin number */
-    uint8_t sda_pin;    /**< SDA pin number */
-    bool dma_tx_enable; /**< DMA TX enable flag */
-    bool dma_rx_enable; /**< DMA RX enable flag */
-    size_t tx_buf_size; /**< TX buffer size */
-    size_t rx_buf_size; /**< RX buffer size */
+    uint32_t speed;
+    uint8_t scl_pin, sda_pin;
+    bool dma_tx_enable, dma_rx_enable;
+    size_t tx_buf_size, rx_buf_size;
 } nx_i2c_config_t;
-
-/*---------------------------------------------------------------------------*/
-/* I2C Device Handle Structure                                               */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           I2C device handle structure
- *
- * Stores device-specific configuration for handle acquisition pattern.
- */
 typedef struct nx_i2c_device_handle_s {
-    uint8_t dev_addr;            /**< Device address */
-    nx_comm_callback_t callback; /**< Callback for async operations */
-    void* user_data;             /**< User data for callback */
-    bool in_use;                 /**< Handle in use flag */
+    uint8_t dev_addr;
+    nx_comm_callback_t callback;
+    void* user_data;
+    bool in_use;
 } nx_i2c_device_handle_t;
-
-/*---------------------------------------------------------------------------*/
-/* I2C State Structure                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           I2C state structure
- *
- * Contains runtime state.
- */
+typedef struct nx_i2c_stats_s {
+    uint32_t tx_count, rx_count, nack_count, bus_error_count;
+} nx_i2c_stats_t;
 typedef struct nx_i2c_state_s {
-    uint8_t index;                         /**< Instance index */
-    nx_i2c_config_t config;                /**< Configuration */
-    nx_i2c_buffer_t tx_buf;                /**< TX buffer */
-    nx_i2c_buffer_t rx_buf;                /**< RX buffer */
-    nx_i2c_device_handle_t current_device; /**< Current device handle */
-    uint8_t current_dev_addr;              /**< Current device address */
-    bool initialized;                      /**< Initialization flag */
-    bool suspended;                        /**< Suspend flag */
-    bool busy;                             /**< Busy flag */
+    nx_i2c_stats_t stats;
+    uint8_t index;
+    nx_i2c_config_t config;
+    nx_i2c_buffer_t tx_buf, rx_buf; /* RX buffer is the explicit wildcard fixture. */
+    nx_i2c_device_handle_t current_device; /* Last executed diagnostic snapshot. */
+    uint8_t current_dev_addr;
+    bool initialized, suspended, busy;
 } nx_i2c_state_t;
-
-/*---------------------------------------------------------------------------*/
-/* I2C Implementation Structure                                              */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           I2C implementation structure
- *
- * Contains all interfaces and state pointer.
- */
-typedef struct nx_i2c_impl_s {
-    nx_i2c_bus_t base;            /**< Base I2C bus interface */
-    nx_tx_async_t tx_async;       /**< TX async interface */
-    nx_tx_rx_async_t tx_rx_async; /**< TX/RX async interface */
-    nx_tx_sync_t tx_sync;         /**< TX sync interface */
-    nx_tx_rx_sync_t tx_rx_sync;   /**< TX/RX sync interface */
-    nx_lifecycle_t lifecycle;     /**< Lifecycle interface */
-    nx_power_t power;             /**< Power interface */
-    nx_i2c_state_t* state;        /**< State pointer */
-    nx_device_t* device;          /**< Device descriptor */
-} nx_i2c_impl_t;
-
-#ifdef __cplusplus
-}
+typedef struct native_i2c_device_s {
+    nx_i2c_device_t base;
+    nx_i2c_impl_t* bus;
+    uint8_t address;
+    bool allocated, legacy, cancelled, completing;
+    unsigned users;
+    nx_comm_callback_t receive_callback;
+    void* receive_context;
+    nx_status_t last_result;
+    nx_tx_sync_t tx_sync;
+    nx_tx_rx_sync_t tx_rx_sync;
+    nx_tx_async_t tx_async;
+    nx_tx_rx_async_t tx_rx_async;
+} native_i2c_device_t;
+typedef struct native_i2c_response_s {
+    bool used;
+    uint8_t address;
+    uint8_t data[NATIVE_I2C_PAYLOAD_CAPACITY];
+    size_t length, offset;
+} native_i2c_response_t;
+struct nx_i2c_impl_s {
+    nx_i2c_bus_t base;
+    nx_lifecycle_t lifecycle;
+    nx_power_t power;
+    nx_i2c_state_t* state;
+    nx_device_t* device;
+    osal_mutex_handle_t mutex;
+    unsigned users;
+    uint64_t next_token;
+    native_i2c_device_t devices[NATIVE_I2C_DEVICE_CAPACITY];
+    native_i2c_device_t legacy_devices[NATIVE_I2C_LEGACY_CAPACITY];
+    native_i2c_response_t responses[NATIVE_I2C_RESPONSE_CAPACITY];
+    native_i2c_device_t* pending;
+    native_i2c_device_t* active;
+    nx_i2c_transaction_t queued;
+    uint64_t queued_at;
+    bool worker_active;
+    uint8_t tx_copy[NATIVE_I2C_PAYLOAD_CAPACITY];
+    uint8_t rx_copy[NATIVE_I2C_PAYLOAD_CAPACITY];
+    size_t received_length;
+    uint32_t transfer_delay_ms;
+    nx_status_t next_failure;
+    nx_power_callback_t power_callback;
+    void* power_context;
+};
 #endif
-
-#endif /* NX_I2C_TYPES_H */

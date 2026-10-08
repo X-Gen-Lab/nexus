@@ -16,7 +16,7 @@
 extern "C" {
 #include "hal/interface/nx_dac.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_dac_helpers.h"
+#include "devices/native_dac_helpers.h"
 }
 
 /**

@@ -95,3 +95,7 @@ docs/api/latex/
 # Test result files
 osal_test_results.xml
 osal_property_test_results.xml
+
+# Developer configuration and generated headers never belong to the source tree.
+/.config
+/nexus_config.h

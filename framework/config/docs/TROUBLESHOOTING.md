@@ -1,3 +1,5 @@
+> Persistence/crypto refactor: Flash requires an explicit `config_backend_flash_bind` partition; keys are externally persisted and reloaded before encrypted load; AES-GCM records replace CBC. Follow [the current implementation contract](../../../docs/implementation/storage-security.md) for atomic snapshots, error recovery and support evidence.
+
 # Config Manager 故障排查指南
 
 本文档提供 Config Manager 常见问题的诊断和解决方案。
@@ -518,7 +520,7 @@ void main_loop(void) {
 /* 设置密钥 */
 uint8_t key[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 config_status_t status = config_set_encryption_key(key, sizeof(key), 
-                                                    CONFIG_CRYPTO_AES128);
+                                                    CONFIG_CRYPTO_AES128_GCM);
 if (status != CONFIG_OK) {
     printf("Failed to set encryption key\n");
 }
@@ -582,7 +584,7 @@ uint8_t new_key[16];
 generate_random_key(new_key, sizeof(new_key));
 
 config_status_t status = config_rotate_encryption_key(new_key, sizeof(new_key),
-                                                      CONFIG_CRYPTO_AES128);
+                                                      CONFIG_CRYPTO_AES128_GCM);
 if (status != CONFIG_OK) {
     printf("Key rotation failed, restoring backup\n");
     /* 恢复备份 */
@@ -593,76 +595,11 @@ if (status != CONFIG_OK) {
 free(backup);
 ```
 
-## 7. 线程安全问题
+## 7. 管理 owner 问题
 
-### 问题 7.1: 数据竞争
+Config 不支持未经外部串行化的并发修改。发生竞争时先确认set/get/namespace/lifecycle/load/commit/rotation是否由同一个管理owner处理；不同锁不能互相保护。回调不要修改配置，应把请求排队给owner。
 
-**症状**: 多线程环境下数据不一致
-
-**诊断**:
-```c
-/* 使用线程消毒器（Thread Sanitizer）*/
-/* 编译选项: -fsanitize=thread */
-
-/* 或添加调试日志 */
-void debug_config_set(const char* key, int32_t value) {
-    printf("[Thread %d] Setting %s = %d\n", 
-           get_thread_id(), key, value);
-    config_set_i32(key, value);
-}
-```
-
-**解决方案**:
-Config Manager 的公共 API 已经是线程安全的，但要注意：
-
-```c
-/* 错误: 在回调中调用 Config API */
-void bad_callback(const char* key, config_type_t type,
-                  const void* old_value, const void* new_value,
-                  void* user_data) {
-    config_set_i32("another_key", 100);  /* 可能死锁！ */
-}
-
-/* 正确: 使用标志延迟处理 */
-static volatile bool g_need_update = false;
-
-void good_callback(const char* key, config_type_t type,
-                   const void* old_value, const void* new_value,
-                   void* user_data) {
-    g_need_update = true;  /* 只设置标志 */
-}
-
-void worker_thread(void) {
-    while (1) {
-        if (g_need_update) {
-            g_need_update = false;
-            config_set_i32("another_key", 100);  /* 安全 */
-        }
-        sleep(100);
-    }
-}
-```
-
-### 问题 7.2: 死锁
-
-**症状**: 程序挂起，无响应
-
-**可能原因**:
-1. 回调函数中调用 Config API
-2. 多个互斥锁的获取顺序不一致
-
-**诊断**:
-```c
-/* 启用死锁检测 */
-#define CONFIG_ENABLE_DEADLOCK_DETECTION 1
-
-/* 添加超时机制 */
-config_status_t config_set_i32_with_timeout(const char* key, 
-                                            int32_t value,
-                                            uint32_t timeout_ms) {
-    /* 实现带超时的锁获取 */
-}
-```
+BUSY表示另一个snapshot工作区事务或provider重入；不能无期限重试阻塞控制线程。先完成已有管理事务，再重试。硬件擦写暂停和密码计算预算需要实际测量。
 
 ## 8. 调试技巧
 

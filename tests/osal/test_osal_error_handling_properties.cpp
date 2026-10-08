@@ -19,6 +19,7 @@
  * - Property 14: Invalid Parameter Error Handling (freertos-adapter)
  */
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <gtest/gtest.h>
@@ -899,8 +900,8 @@ TEST_F(OsalErrorHandlingPropertyTest, Property14_ValidParametersSucceed) {
 
         /* Test queue creation with valid parameters */
         osal_queue_handle_t queue = nullptr;
-        size_t item_size = randomPositiveSize();
-        size_t item_count = randomPositiveSize();
+        size_t item_size = std::min(randomPositiveSize(), size_t(OSAL_MAX_QUEUE_ITEM_SIZE));
+        size_t item_count = std::min(randomPositiveSize(), size_t(OSAL_MAX_QUEUE_BYTES) / item_size);
         status = osal_queue_create(item_size, item_count, &queue);
         EXPECT_EQ(OSAL_OK, status)
             << "Iteration " << test_iter

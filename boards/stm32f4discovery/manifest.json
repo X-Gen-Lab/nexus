@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "stm32f4discovery-mb997",
+  "soc": "stm32f407vg",
+  "board_family": "MB997",
+  "revision_policy": "Record the physical PCB revision before HIL; no revision is validated yet",
+  "status": "implementation-candidate",
+  "clock": {"hse_hz": 8000000, "target_sysclk_hz": 168000000},
+  "debug": {"transport": "SWD", "probe": "ST-LINK", "device_uid": "96-bit ST device UID; read at runtime"},
+  "wiring": {
+    "led": "PD12",
+    "spi1": {"sck": "PA5", "miso": "PA6", "mosi": "PA7", "logical_cs_0": "PB0", "logical_cs_1": "PB1"},
+    "spi1_dma": {"tx": "DMA2 stream 3 channel 3", "rx": "DMA2 stream 0 channel 3", "irq_priority": 5}
+  },
+  "storage": {
+    "application_flash_bytes": 786432,
+    "partition_start": "0x080C0000",
+    "partition_size": 262144,
+    "erase_size": 131072,
+    "program_size": 4,
+    "minimum_program_vdd": 2.7,
+    "maximum_program_vdd": 3.6,
+    "policy": "Reserved sectors 10 and 11; erase/program only in a product maintenance window"
+  },
+  "fixture": "External SPI loopback/slave and CS observation require an explicit harness record",
+  "hardware_verification": "not-executed"
+}

@@ -45,6 +45,7 @@ typedef enum nx_status_e {
     NX_ERR_NOT_SUPPORTED = 4, /**< Operation not supported */
     NX_ERR_NOT_FOUND = 5,     /**< Item not found */
     NX_ERR_INVALID_SIZE = 6,  /**< Invalid size */
+    NX_ERR_CANCELLED = 7,     /**< Operation cancelled; buffer ownership returned */
 
     /* State errors (20-39) */
     NX_ERR_NOT_INIT = 20,      /**< Not initialized */

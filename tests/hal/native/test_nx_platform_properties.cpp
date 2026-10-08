@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <set>
 #include <vector>
 
@@ -44,7 +45,7 @@ class PlatformPropertyTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Seed random number generator */
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Ensure platform is deinitialized */
         nx_platform_deinit();
@@ -77,9 +78,9 @@ class PlatformPropertyTest : public ::testing::Test {
     }
 
     /* Helper: Generate random ISR priority */
-    nx_isr_priority_t randomPriority() {
-        std::uniform_int_distribution<int> dist(0, 3);
-        return static_cast<nx_isr_priority_t>(dist(rng));
+    uint8_t randomPriority() {
+        std::uniform_int_distribution<int> dist(0, 15);
+        return static_cast<uint8_t>(dist(rng));
     }
 };
 
@@ -237,7 +238,7 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
         uint32_t irq = randomIRQ();
 
         /* Generate random priority */
-        nx_isr_priority_t priority = randomPriority();
+        uint8_t priority = randomPriority();
 
         /* Create handler with call counter */
         int call_count = 0;
@@ -247,15 +248,11 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
         };
 
         /* Register handler */
-        nx_isr_handle_t* handle =
+        nx_status_t status =
             isr_mgr->connect(isr_mgr, irq, handler, &call_count, priority);
 
-        ASSERT_NE(nullptr, handle) << "Failed to register ISR for IRQ " << irq
+        ASSERT_EQ(NX_OK, status) << "Failed to register ISR for IRQ " << irq
                                    << " in iteration " << iteration;
-
-        /* Enable interrupt */
-        EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, irq))
-            << "Failed to enable IRQ " << irq << " in iteration " << iteration;
 
         /* Simulate interrupt */
         nx_isr_simulate(irq);
@@ -275,7 +272,7 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
             << iteration;
 
         /* Disconnect handler */
-        EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, handle))
+        EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, irq))
             << "Failed to disconnect ISR for IRQ " << irq << " in iteration "
             << iteration;
 

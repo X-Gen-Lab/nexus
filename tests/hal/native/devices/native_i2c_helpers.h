@@ -62,10 +62,19 @@ nx_status_t native_i2c_get_state(uint8_t instance, native_i2c_state_t* state);
  * \param[in]       len: Data length
  * \return          NX_OK on success, error code otherwise
  * \note            This simulates data arriving from the hardware into
- *                  the RX buffer, making it available for reading.
+ *                  a wildcard RX fixture, making it available to any next
+ *                  addressed transaction. Use the address-specific fixture
+ *                  below for device isolation tests.
  */
 nx_status_t native_i2c_inject_rx_data(uint8_t instance, const uint8_t* data,
                                       size_t len);
+
+/** Addressed responses never satisfy a transaction for another address. */
+nx_status_t native_i2c_inject_rx_for_device(uint8_t instance, uint8_t address,
+                                           const uint8_t* data, size_t len);
+/** Delay/error fixtures model controller latency and injected terminal errors. */
+nx_status_t native_i2c_set_transfer_delay(uint8_t instance, uint32_t delay_ms);
+nx_status_t native_i2c_fail_next_transfer(uint8_t instance, nx_status_t failure);
 
 /**
  * \brief           Get transmitted data (capture hardware transmission)

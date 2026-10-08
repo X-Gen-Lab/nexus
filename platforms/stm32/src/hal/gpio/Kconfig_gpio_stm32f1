@@ -25,7 +25,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN0
 
 if INSTANCE_STM32_GPIOA_PIN0
 
-choice
+choice GPIO_A0_RW_MODE_CHOICE
     prompt "PA0 Read/Write Mode"
     default GPIO_A0_RW_MODE_WRITE
     help
@@ -54,7 +54,7 @@ config GPIO_A0_RW_MODE
     default 1 if GPIO_A0_RW_MODE_WRITE
     default 2 if GPIO_A0_RW_MODE_READWRITE
 
-choice
+choice GPIO_A0_MODE_CHOICE
     prompt "PA0 GPIO Mode"
     default GPIO_A0_MODE_OUTPUT_PP if GPIO_A0_RW_MODE_WRITE
     default GPIO_A0_MODE_INPUT if GPIO_A0_RW_MODE_READ
@@ -102,7 +102,7 @@ config GPIO_A0_MODE
     default 0x00000012 if GPIO_A0_MODE_AF_OD
     default 0x00000003 if GPIO_A0_MODE_ANALOG
 
-choice
+choice GPIO_A0_PULL_CHOICE
     prompt "PA0 Pull-up/Pull-down"
     default GPIO_A0_PULL_NONE
     help
@@ -131,7 +131,7 @@ config GPIO_A0_PULL
     default 0x00000001 if GPIO_A0_PULL_UP
     default 0x00000002 if GPIO_A0_PULL_DOWN
 
-choice
+choice GPIO_A0_SPEED_CHOICE
     prompt "PA0 Speed"
     default GPIO_A0_SPEED_MEDIUM
     help
@@ -192,7 +192,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN1
 
 if INSTANCE_STM32_GPIOA_PIN1
 
-choice
+choice GPIO_A1_RW_MODE_CHOICE
     prompt "PA1 Read/Write Mode"
     default GPIO_A1_RW_MODE_WRITE
     help
@@ -221,7 +221,7 @@ config GPIO_A1_RW_MODE
     default 1 if GPIO_A1_RW_MODE_WRITE
     default 2 if GPIO_A1_RW_MODE_READWRITE
 
-choice
+choice GPIO_A1_MODE_CHOICE
     prompt "PA1 GPIO Mode"
     default GPIO_A1_MODE_OUTPUT_PP if GPIO_A1_RW_MODE_WRITE
     default GPIO_A1_MODE_INPUT if GPIO_A1_RW_MODE_READ
@@ -269,7 +269,7 @@ config GPIO_A1_MODE
     default 0x00000012 if GPIO_A1_MODE_AF_OD
     default 0x00000003 if GPIO_A1_MODE_ANALOG
 
-choice
+choice GPIO_A1_PULL_CHOICE
     prompt "PA1 Pull-up/Pull-down"
     default GPIO_A1_PULL_NONE
     help
@@ -298,7 +298,7 @@ config GPIO_A1_PULL
     default 0x00000001 if GPIO_A1_PULL_UP
     default 0x00000002 if GPIO_A1_PULL_DOWN
 
-choice
+choice GPIO_A1_SPEED_CHOICE
     prompt "PA1 Speed"
     default GPIO_A1_SPEED_MEDIUM
     help
@@ -359,7 +359,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN2
 
 if INSTANCE_STM32_GPIOA_PIN2
 
-choice
+choice GPIO_A2_RW_MODE_CHOICE
     prompt "PA2 Read/Write Mode"
     default GPIO_A2_RW_MODE_WRITE
     help
@@ -388,7 +388,7 @@ config GPIO_A2_RW_MODE
     default 1 if GPIO_A2_RW_MODE_WRITE
     default 2 if GPIO_A2_RW_MODE_READWRITE
 
-choice
+choice GPIO_A2_MODE_CHOICE
     prompt "PA2 GPIO Mode"
     default GPIO_A2_MODE_OUTPUT_PP if GPIO_A2_RW_MODE_WRITE
     default GPIO_A2_MODE_INPUT if GPIO_A2_RW_MODE_READ
@@ -436,7 +436,7 @@ config GPIO_A2_MODE
     default 0x00000012 if GPIO_A2_MODE_AF_OD
     default 0x00000003 if GPIO_A2_MODE_ANALOG
 
-choice
+choice GPIO_A2_PULL_CHOICE
     prompt "PA2 Pull-up/Pull-down"
     default GPIO_A2_PULL_NONE
     help
@@ -465,7 +465,7 @@ config GPIO_A2_PULL
     default 0x00000001 if GPIO_A2_PULL_UP
     default 0x00000002 if GPIO_A2_PULL_DOWN
 
-choice
+choice GPIO_A2_SPEED_CHOICE
     prompt "PA2 Speed"
     default GPIO_A2_SPEED_MEDIUM
     help
@@ -526,7 +526,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN3
 
 if INSTANCE_STM32_GPIOA_PIN3
 
-choice
+choice GPIO_A3_RW_MODE_CHOICE
     prompt "PA3 Read/Write Mode"
     default GPIO_A3_RW_MODE_WRITE
     help
@@ -555,7 +555,7 @@ config GPIO_A3_RW_MODE
     default 1 if GPIO_A3_RW_MODE_WRITE
     default 2 if GPIO_A3_RW_MODE_READWRITE
 
-choice
+choice GPIO_A3_MODE_CHOICE
     prompt "PA3 GPIO Mode"
     default GPIO_A3_MODE_OUTPUT_PP if GPIO_A3_RW_MODE_WRITE
     default GPIO_A3_MODE_INPUT if GPIO_A3_RW_MODE_READ
@@ -603,7 +603,7 @@ config GPIO_A3_MODE
     default 0x00000012 if GPIO_A3_MODE_AF_OD
     default 0x00000003 if GPIO_A3_MODE_ANALOG
 
-choice
+choice GPIO_A3_PULL_CHOICE
     prompt "PA3 Pull-up/Pull-down"
     default GPIO_A3_PULL_NONE
     help
@@ -632,7 +632,7 @@ config GPIO_A3_PULL
     default 0x00000001 if GPIO_A3_PULL_UP
     default 0x00000002 if GPIO_A3_PULL_DOWN
 
-choice
+choice GPIO_A3_SPEED_CHOICE
     prompt "PA3 Speed"
     default GPIO_A3_SPEED_MEDIUM
     help
@@ -693,7 +693,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN4
 
 if INSTANCE_STM32_GPIOA_PIN4
 
-choice
+choice GPIO_A4_RW_MODE_CHOICE
     prompt "PA4 Read/Write Mode"
     default GPIO_A4_RW_MODE_WRITE
     help
@@ -722,7 +722,7 @@ config GPIO_A4_RW_MODE
     default 1 if GPIO_A4_RW_MODE_WRITE
     default 2 if GPIO_A4_RW_MODE_READWRITE
 
-choice
+choice GPIO_A4_MODE_CHOICE
     prompt "PA4 GPIO Mode"
     default GPIO_A4_MODE_OUTPUT_PP if GPIO_A4_RW_MODE_WRITE
     default GPIO_A4_MODE_INPUT if GPIO_A4_RW_MODE_READ
@@ -770,7 +770,7 @@ config GPIO_A4_MODE
     default 0x00000012 if GPIO_A4_MODE_AF_OD
     default 0x00000003 if GPIO_A4_MODE_ANALOG
 
-choice
+choice GPIO_A4_PULL_CHOICE
     prompt "PA4 Pull-up/Pull-down"
     default GPIO_A4_PULL_NONE
     help
@@ -799,7 +799,7 @@ config GPIO_A4_PULL
     default 0x00000001 if GPIO_A4_PULL_UP
     default 0x00000002 if GPIO_A4_PULL_DOWN
 
-choice
+choice GPIO_A4_SPEED_CHOICE
     prompt "PA4 Speed"
     default GPIO_A4_SPEED_MEDIUM
     help
@@ -860,7 +860,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN5
 
 if INSTANCE_STM32_GPIOA_PIN5
 
-choice
+choice GPIO_A5_RW_MODE_CHOICE
     prompt "PA5 Read/Write Mode"
     default GPIO_A5_RW_MODE_WRITE
     help
@@ -889,7 +889,7 @@ config GPIO_A5_RW_MODE
     default 1 if GPIO_A5_RW_MODE_WRITE
     default 2 if GPIO_A5_RW_MODE_READWRITE
 
-choice
+choice GPIO_A5_MODE_CHOICE
     prompt "PA5 GPIO Mode"
     default GPIO_A5_MODE_OUTPUT_PP if GPIO_A5_RW_MODE_WRITE
     default GPIO_A5_MODE_INPUT if GPIO_A5_RW_MODE_READ
@@ -937,7 +937,7 @@ config GPIO_A5_MODE
     default 0x00000012 if GPIO_A5_MODE_AF_OD
     default 0x00000003 if GPIO_A5_MODE_ANALOG
 
-choice
+choice GPIO_A5_PULL_CHOICE
     prompt "PA5 Pull-up/Pull-down"
     default GPIO_A5_PULL_NONE
     help
@@ -966,7 +966,7 @@ config GPIO_A5_PULL
     default 0x00000001 if GPIO_A5_PULL_UP
     default 0x00000002 if GPIO_A5_PULL_DOWN
 
-choice
+choice GPIO_A5_SPEED_CHOICE
     prompt "PA5 Speed"
     default GPIO_A5_SPEED_MEDIUM
     help
@@ -1027,7 +1027,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN6
 
 if INSTANCE_STM32_GPIOA_PIN6
 
-choice
+choice GPIO_A6_RW_MODE_CHOICE
     prompt "PA6 Read/Write Mode"
     default GPIO_A6_RW_MODE_WRITE
     help
@@ -1056,7 +1056,7 @@ config GPIO_A6_RW_MODE
     default 1 if GPIO_A6_RW_MODE_WRITE
     default 2 if GPIO_A6_RW_MODE_READWRITE
 
-choice
+choice GPIO_A6_MODE_CHOICE
     prompt "PA6 GPIO Mode"
     default GPIO_A6_MODE_OUTPUT_PP if GPIO_A6_RW_MODE_WRITE
     default GPIO_A6_MODE_INPUT if GPIO_A6_RW_MODE_READ
@@ -1104,7 +1104,7 @@ config GPIO_A6_MODE
     default 0x00000012 if GPIO_A6_MODE_AF_OD
     default 0x00000003 if GPIO_A6_MODE_ANALOG
 
-choice
+choice GPIO_A6_PULL_CHOICE
     prompt "PA6 Pull-up/Pull-down"
     default GPIO_A6_PULL_NONE
     help
@@ -1133,7 +1133,7 @@ config GPIO_A6_PULL
     default 0x00000001 if GPIO_A6_PULL_UP
     default 0x00000002 if GPIO_A6_PULL_DOWN
 
-choice
+choice GPIO_A6_SPEED_CHOICE
     prompt "PA6 Speed"
     default GPIO_A6_SPEED_MEDIUM
     help
@@ -1194,7 +1194,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN7
 
 if INSTANCE_STM32_GPIOA_PIN7
 
-choice
+choice GPIO_A7_RW_MODE_CHOICE
     prompt "PA7 Read/Write Mode"
     default GPIO_A7_RW_MODE_WRITE
     help
@@ -1223,7 +1223,7 @@ config GPIO_A7_RW_MODE
     default 1 if GPIO_A7_RW_MODE_WRITE
     default 2 if GPIO_A7_RW_MODE_READWRITE
 
-choice
+choice GPIO_A7_MODE_CHOICE
     prompt "PA7 GPIO Mode"
     default GPIO_A7_MODE_OUTPUT_PP if GPIO_A7_RW_MODE_WRITE
     default GPIO_A7_MODE_INPUT if GPIO_A7_RW_MODE_READ
@@ -1271,7 +1271,7 @@ config GPIO_A7_MODE
     default 0x00000012 if GPIO_A7_MODE_AF_OD
     default 0x00000003 if GPIO_A7_MODE_ANALOG
 
-choice
+choice GPIO_A7_PULL_CHOICE
     prompt "PA7 Pull-up/Pull-down"
     default GPIO_A7_PULL_NONE
     help
@@ -1300,7 +1300,7 @@ config GPIO_A7_PULL
     default 0x00000001 if GPIO_A7_PULL_UP
     default 0x00000002 if GPIO_A7_PULL_DOWN
 
-choice
+choice GPIO_A7_SPEED_CHOICE
     prompt "PA7 Speed"
     default GPIO_A7_SPEED_MEDIUM
     help
@@ -1361,7 +1361,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN8
 
 if INSTANCE_STM32_GPIOA_PIN8
 
-choice
+choice GPIO_A8_RW_MODE_CHOICE
     prompt "PA8 Read/Write Mode"
     default GPIO_A8_RW_MODE_WRITE
     help
@@ -1390,7 +1390,7 @@ config GPIO_A8_RW_MODE
     default 1 if GPIO_A8_RW_MODE_WRITE
     default 2 if GPIO_A8_RW_MODE_READWRITE
 
-choice
+choice GPIO_A8_MODE_CHOICE
     prompt "PA8 GPIO Mode"
     default GPIO_A8_MODE_OUTPUT_PP if GPIO_A8_RW_MODE_WRITE
     default GPIO_A8_MODE_INPUT if GPIO_A8_RW_MODE_READ
@@ -1438,7 +1438,7 @@ config GPIO_A8_MODE
     default 0x00000012 if GPIO_A8_MODE_AF_OD
     default 0x00000003 if GPIO_A8_MODE_ANALOG
 
-choice
+choice GPIO_A8_PULL_CHOICE
     prompt "PA8 Pull-up/Pull-down"
     default GPIO_A8_PULL_NONE
     help
@@ -1467,7 +1467,7 @@ config GPIO_A8_PULL
     default 0x00000001 if GPIO_A8_PULL_UP
     default 0x00000002 if GPIO_A8_PULL_DOWN
 
-choice
+choice GPIO_A8_SPEED_CHOICE
     prompt "PA8 Speed"
     default GPIO_A8_SPEED_MEDIUM
     help
@@ -1528,7 +1528,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN9
 
 if INSTANCE_STM32_GPIOA_PIN9
 
-choice
+choice GPIO_A9_RW_MODE_CHOICE
     prompt "PA9 Read/Write Mode"
     default GPIO_A9_RW_MODE_WRITE
     help
@@ -1557,7 +1557,7 @@ config GPIO_A9_RW_MODE
     default 1 if GPIO_A9_RW_MODE_WRITE
     default 2 if GPIO_A9_RW_MODE_READWRITE
 
-choice
+choice GPIO_A9_MODE_CHOICE
     prompt "PA9 GPIO Mode"
     default GPIO_A9_MODE_OUTPUT_PP if GPIO_A9_RW_MODE_WRITE
     default GPIO_A9_MODE_INPUT if GPIO_A9_RW_MODE_READ
@@ -1605,7 +1605,7 @@ config GPIO_A9_MODE
     default 0x00000012 if GPIO_A9_MODE_AF_OD
     default 0x00000003 if GPIO_A9_MODE_ANALOG
 
-choice
+choice GPIO_A9_PULL_CHOICE
     prompt "PA9 Pull-up/Pull-down"
     default GPIO_A9_PULL_NONE
     help
@@ -1634,7 +1634,7 @@ config GPIO_A9_PULL
     default 0x00000001 if GPIO_A9_PULL_UP
     default 0x00000002 if GPIO_A9_PULL_DOWN
 
-choice
+choice GPIO_A9_SPEED_CHOICE
     prompt "PA9 Speed"
     default GPIO_A9_SPEED_MEDIUM
     help
@@ -1695,7 +1695,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN10
 
 if INSTANCE_STM32_GPIOA_PIN10
 
-choice
+choice GPIO_A10_RW_MODE_CHOICE
     prompt "PA10 Read/Write Mode"
     default GPIO_A10_RW_MODE_WRITE
     help
@@ -1724,7 +1724,7 @@ config GPIO_A10_RW_MODE
     default 1 if GPIO_A10_RW_MODE_WRITE
     default 2 if GPIO_A10_RW_MODE_READWRITE
 
-choice
+choice GPIO_A10_MODE_CHOICE
     prompt "PA10 GPIO Mode"
     default GPIO_A10_MODE_OUTPUT_PP if GPIO_A10_RW_MODE_WRITE
     default GPIO_A10_MODE_INPUT if GPIO_A10_RW_MODE_READ
@@ -1772,7 +1772,7 @@ config GPIO_A10_MODE
     default 0x00000012 if GPIO_A10_MODE_AF_OD
     default 0x00000003 if GPIO_A10_MODE_ANALOG
 
-choice
+choice GPIO_A10_PULL_CHOICE
     prompt "PA10 Pull-up/Pull-down"
     default GPIO_A10_PULL_NONE
     help
@@ -1801,7 +1801,7 @@ config GPIO_A10_PULL
     default 0x00000001 if GPIO_A10_PULL_UP
     default 0x00000002 if GPIO_A10_PULL_DOWN
 
-choice
+choice GPIO_A10_SPEED_CHOICE
     prompt "PA10 Speed"
     default GPIO_A10_SPEED_MEDIUM
     help
@@ -1862,7 +1862,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN11
 
 if INSTANCE_STM32_GPIOA_PIN11
 
-choice
+choice GPIO_A11_RW_MODE_CHOICE
     prompt "PA11 Read/Write Mode"
     default GPIO_A11_RW_MODE_WRITE
     help
@@ -1891,7 +1891,7 @@ config GPIO_A11_RW_MODE
     default 1 if GPIO_A11_RW_MODE_WRITE
     default 2 if GPIO_A11_RW_MODE_READWRITE
 
-choice
+choice GPIO_A11_MODE_CHOICE
     prompt "PA11 GPIO Mode"
     default GPIO_A11_MODE_OUTPUT_PP if GPIO_A11_RW_MODE_WRITE
     default GPIO_A11_MODE_INPUT if GPIO_A11_RW_MODE_READ
@@ -1939,7 +1939,7 @@ config GPIO_A11_MODE
     default 0x00000012 if GPIO_A11_MODE_AF_OD
     default 0x00000003 if GPIO_A11_MODE_ANALOG
 
-choice
+choice GPIO_A11_PULL_CHOICE
     prompt "PA11 Pull-up/Pull-down"
     default GPIO_A11_PULL_NONE
     help
@@ -1968,7 +1968,7 @@ config GPIO_A11_PULL
     default 0x00000001 if GPIO_A11_PULL_UP
     default 0x00000002 if GPIO_A11_PULL_DOWN
 
-choice
+choice GPIO_A11_SPEED_CHOICE
     prompt "PA11 Speed"
     default GPIO_A11_SPEED_MEDIUM
     help
@@ -2029,7 +2029,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN12
 
 if INSTANCE_STM32_GPIOA_PIN12
 
-choice
+choice GPIO_A12_RW_MODE_CHOICE
     prompt "PA12 Read/Write Mode"
     default GPIO_A12_RW_MODE_WRITE
     help
@@ -2058,7 +2058,7 @@ config GPIO_A12_RW_MODE
     default 1 if GPIO_A12_RW_MODE_WRITE
     default 2 if GPIO_A12_RW_MODE_READWRITE
 
-choice
+choice GPIO_A12_MODE_CHOICE
     prompt "PA12 GPIO Mode"
     default GPIO_A12_MODE_OUTPUT_PP if GPIO_A12_RW_MODE_WRITE
     default GPIO_A12_MODE_INPUT if GPIO_A12_RW_MODE_READ
@@ -2106,7 +2106,7 @@ config GPIO_A12_MODE
     default 0x00000012 if GPIO_A12_MODE_AF_OD
     default 0x00000003 if GPIO_A12_MODE_ANALOG
 
-choice
+choice GPIO_A12_PULL_CHOICE
     prompt "PA12 Pull-up/Pull-down"
     default GPIO_A12_PULL_NONE
     help
@@ -2135,7 +2135,7 @@ config GPIO_A12_PULL
     default 0x00000001 if GPIO_A12_PULL_UP
     default 0x00000002 if GPIO_A12_PULL_DOWN
 
-choice
+choice GPIO_A12_SPEED_CHOICE
     prompt "PA12 Speed"
     default GPIO_A12_SPEED_MEDIUM
     help
@@ -2196,7 +2196,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN13
 
 if INSTANCE_STM32_GPIOA_PIN13
 
-choice
+choice GPIO_A13_RW_MODE_CHOICE
     prompt "PA13 Read/Write Mode"
     default GPIO_A13_RW_MODE_WRITE
     help
@@ -2225,7 +2225,7 @@ config GPIO_A13_RW_MODE
     default 1 if GPIO_A13_RW_MODE_WRITE
     default 2 if GPIO_A13_RW_MODE_READWRITE
 
-choice
+choice GPIO_A13_MODE_CHOICE
     prompt "PA13 GPIO Mode"
     default GPIO_A13_MODE_OUTPUT_PP if GPIO_A13_RW_MODE_WRITE
     default GPIO_A13_MODE_INPUT if GPIO_A13_RW_MODE_READ
@@ -2273,7 +2273,7 @@ config GPIO_A13_MODE
     default 0x00000012 if GPIO_A13_MODE_AF_OD
     default 0x00000003 if GPIO_A13_MODE_ANALOG
 
-choice
+choice GPIO_A13_PULL_CHOICE
     prompt "PA13 Pull-up/Pull-down"
     default GPIO_A13_PULL_NONE
     help
@@ -2302,7 +2302,7 @@ config GPIO_A13_PULL
     default 0x00000001 if GPIO_A13_PULL_UP
     default 0x00000002 if GPIO_A13_PULL_DOWN
 
-choice
+choice GPIO_A13_SPEED_CHOICE
     prompt "PA13 Speed"
     default GPIO_A13_SPEED_MEDIUM
     help
@@ -2363,7 +2363,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN14
 
 if INSTANCE_STM32_GPIOA_PIN14
 
-choice
+choice GPIO_A14_RW_MODE_CHOICE
     prompt "PA14 Read/Write Mode"
     default GPIO_A14_RW_MODE_WRITE
     help
@@ -2392,7 +2392,7 @@ config GPIO_A14_RW_MODE
     default 1 if GPIO_A14_RW_MODE_WRITE
     default 2 if GPIO_A14_RW_MODE_READWRITE
 
-choice
+choice GPIO_A14_MODE_CHOICE
     prompt "PA14 GPIO Mode"
     default GPIO_A14_MODE_OUTPUT_PP if GPIO_A14_RW_MODE_WRITE
     default GPIO_A14_MODE_INPUT if GPIO_A14_RW_MODE_READ
@@ -2440,7 +2440,7 @@ config GPIO_A14_MODE
     default 0x00000012 if GPIO_A14_MODE_AF_OD
     default 0x00000003 if GPIO_A14_MODE_ANALOG
 
-choice
+choice GPIO_A14_PULL_CHOICE
     prompt "PA14 Pull-up/Pull-down"
     default GPIO_A14_PULL_NONE
     help
@@ -2469,7 +2469,7 @@ config GPIO_A14_PULL
     default 0x00000001 if GPIO_A14_PULL_UP
     default 0x00000002 if GPIO_A14_PULL_DOWN
 
-choice
+choice GPIO_A14_SPEED_CHOICE
     prompt "PA14 Speed"
     default GPIO_A14_SPEED_MEDIUM
     help
@@ -2530,7 +2530,7 @@ menuconfig INSTANCE_STM32_GPIOA_PIN15
 
 if INSTANCE_STM32_GPIOA_PIN15
 
-choice
+choice GPIO_A15_RW_MODE_CHOICE
     prompt "PA15 Read/Write Mode"
     default GPIO_A15_RW_MODE_WRITE
     help
@@ -2559,7 +2559,7 @@ config GPIO_A15_RW_MODE
     default 1 if GPIO_A15_RW_MODE_WRITE
     default 2 if GPIO_A15_RW_MODE_READWRITE
 
-choice
+choice GPIO_A15_MODE_CHOICE
     prompt "PA15 GPIO Mode"
     default GPIO_A15_MODE_OUTPUT_PP if GPIO_A15_RW_MODE_WRITE
     default GPIO_A15_MODE_INPUT if GPIO_A15_RW_MODE_READ
@@ -2607,7 +2607,7 @@ config GPIO_A15_MODE
     default 0x00000012 if GPIO_A15_MODE_AF_OD
     default 0x00000003 if GPIO_A15_MODE_ANALOG
 
-choice
+choice GPIO_A15_PULL_CHOICE
     prompt "PA15 Pull-up/Pull-down"
     default GPIO_A15_PULL_NONE
     help
@@ -2636,7 +2636,7 @@ config GPIO_A15_PULL
     default 0x00000001 if GPIO_A15_PULL_UP
     default 0x00000002 if GPIO_A15_PULL_DOWN
 
-choice
+choice GPIO_A15_SPEED_CHOICE
     prompt "PA15 Speed"
     default GPIO_A15_SPEED_MEDIUM
     help
@@ -2705,7 +2705,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN0
 
 if INSTANCE_STM32_GPIOB_PIN0
 
-choice
+choice GPIO_B0_RW_MODE_CHOICE
     prompt "PB0 Read/Write Mode"
     default GPIO_B0_RW_MODE_WRITE
     help
@@ -2734,7 +2734,7 @@ config GPIO_B0_RW_MODE
     default 1 if GPIO_B0_RW_MODE_WRITE
     default 2 if GPIO_B0_RW_MODE_READWRITE
 
-choice
+choice GPIO_B0_MODE_CHOICE
     prompt "PB0 GPIO Mode"
     default GPIO_B0_MODE_OUTPUT_PP if GPIO_B0_RW_MODE_WRITE
     default GPIO_B0_MODE_INPUT if GPIO_B0_RW_MODE_READ
@@ -2782,7 +2782,7 @@ config GPIO_B0_MODE
     default 0x00000012 if GPIO_B0_MODE_AF_OD
     default 0x00000003 if GPIO_B0_MODE_ANALOG
 
-choice
+choice GPIO_B0_PULL_CHOICE
     prompt "PB0 Pull-up/Pull-down"
     default GPIO_B0_PULL_NONE
     help
@@ -2811,7 +2811,7 @@ config GPIO_B0_PULL
     default 0x00000001 if GPIO_B0_PULL_UP
     default 0x00000002 if GPIO_B0_PULL_DOWN
 
-choice
+choice GPIO_B0_SPEED_CHOICE
     prompt "PB0 Speed"
     default GPIO_B0_SPEED_MEDIUM
     help
@@ -2872,7 +2872,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN1
 
 if INSTANCE_STM32_GPIOB_PIN1
 
-choice
+choice GPIO_B1_RW_MODE_CHOICE
     prompt "PB1 Read/Write Mode"
     default GPIO_B1_RW_MODE_WRITE
     help
@@ -2901,7 +2901,7 @@ config GPIO_B1_RW_MODE
     default 1 if GPIO_B1_RW_MODE_WRITE
     default 2 if GPIO_B1_RW_MODE_READWRITE
 
-choice
+choice GPIO_B1_MODE_CHOICE
     prompt "PB1 GPIO Mode"
     default GPIO_B1_MODE_OUTPUT_PP if GPIO_B1_RW_MODE_WRITE
     default GPIO_B1_MODE_INPUT if GPIO_B1_RW_MODE_READ
@@ -2949,7 +2949,7 @@ config GPIO_B1_MODE
     default 0x00000012 if GPIO_B1_MODE_AF_OD
     default 0x00000003 if GPIO_B1_MODE_ANALOG
 
-choice
+choice GPIO_B1_PULL_CHOICE
     prompt "PB1 Pull-up/Pull-down"
     default GPIO_B1_PULL_NONE
     help
@@ -2978,7 +2978,7 @@ config GPIO_B1_PULL
     default 0x00000001 if GPIO_B1_PULL_UP
     default 0x00000002 if GPIO_B1_PULL_DOWN
 
-choice
+choice GPIO_B1_SPEED_CHOICE
     prompt "PB1 Speed"
     default GPIO_B1_SPEED_MEDIUM
     help
@@ -3039,7 +3039,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN2
 
 if INSTANCE_STM32_GPIOB_PIN2
 
-choice
+choice GPIO_B2_RW_MODE_CHOICE
     prompt "PB2 Read/Write Mode"
     default GPIO_B2_RW_MODE_WRITE
     help
@@ -3068,7 +3068,7 @@ config GPIO_B2_RW_MODE
     default 1 if GPIO_B2_RW_MODE_WRITE
     default 2 if GPIO_B2_RW_MODE_READWRITE
 
-choice
+choice GPIO_B2_MODE_CHOICE
     prompt "PB2 GPIO Mode"
     default GPIO_B2_MODE_OUTPUT_PP if GPIO_B2_RW_MODE_WRITE
     default GPIO_B2_MODE_INPUT if GPIO_B2_RW_MODE_READ
@@ -3116,7 +3116,7 @@ config GPIO_B2_MODE
     default 0x00000012 if GPIO_B2_MODE_AF_OD
     default 0x00000003 if GPIO_B2_MODE_ANALOG
 
-choice
+choice GPIO_B2_PULL_CHOICE
     prompt "PB2 Pull-up/Pull-down"
     default GPIO_B2_PULL_NONE
     help
@@ -3145,7 +3145,7 @@ config GPIO_B2_PULL
     default 0x00000001 if GPIO_B2_PULL_UP
     default 0x00000002 if GPIO_B2_PULL_DOWN
 
-choice
+choice GPIO_B2_SPEED_CHOICE
     prompt "PB2 Speed"
     default GPIO_B2_SPEED_MEDIUM
     help
@@ -3206,7 +3206,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN3
 
 if INSTANCE_STM32_GPIOB_PIN3
 
-choice
+choice GPIO_B3_RW_MODE_CHOICE
     prompt "PB3 Read/Write Mode"
     default GPIO_B3_RW_MODE_WRITE
     help
@@ -3235,7 +3235,7 @@ config GPIO_B3_RW_MODE
     default 1 if GPIO_B3_RW_MODE_WRITE
     default 2 if GPIO_B3_RW_MODE_READWRITE
 
-choice
+choice GPIO_B3_MODE_CHOICE
     prompt "PB3 GPIO Mode"
     default GPIO_B3_MODE_OUTPUT_PP if GPIO_B3_RW_MODE_WRITE
     default GPIO_B3_MODE_INPUT if GPIO_B3_RW_MODE_READ
@@ -3283,7 +3283,7 @@ config GPIO_B3_MODE
     default 0x00000012 if GPIO_B3_MODE_AF_OD
     default 0x00000003 if GPIO_B3_MODE_ANALOG
 
-choice
+choice GPIO_B3_PULL_CHOICE
     prompt "PB3 Pull-up/Pull-down"
     default GPIO_B3_PULL_NONE
     help
@@ -3312,7 +3312,7 @@ config GPIO_B3_PULL
     default 0x00000001 if GPIO_B3_PULL_UP
     default 0x00000002 if GPIO_B3_PULL_DOWN
 
-choice
+choice GPIO_B3_SPEED_CHOICE
     prompt "PB3 Speed"
     default GPIO_B3_SPEED_MEDIUM
     help
@@ -3373,7 +3373,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN4
 
 if INSTANCE_STM32_GPIOB_PIN4
 
-choice
+choice GPIO_B4_RW_MODE_CHOICE
     prompt "PB4 Read/Write Mode"
     default GPIO_B4_RW_MODE_WRITE
     help
@@ -3402,7 +3402,7 @@ config GPIO_B4_RW_MODE
     default 1 if GPIO_B4_RW_MODE_WRITE
     default 2 if GPIO_B4_RW_MODE_READWRITE
 
-choice
+choice GPIO_B4_MODE_CHOICE
     prompt "PB4 GPIO Mode"
     default GPIO_B4_MODE_OUTPUT_PP if GPIO_B4_RW_MODE_WRITE
     default GPIO_B4_MODE_INPUT if GPIO_B4_RW_MODE_READ
@@ -3450,7 +3450,7 @@ config GPIO_B4_MODE
     default 0x00000012 if GPIO_B4_MODE_AF_OD
     default 0x00000003 if GPIO_B4_MODE_ANALOG
 
-choice
+choice GPIO_B4_PULL_CHOICE
     prompt "PB4 Pull-up/Pull-down"
     default GPIO_B4_PULL_NONE
     help
@@ -3479,7 +3479,7 @@ config GPIO_B4_PULL
     default 0x00000001 if GPIO_B4_PULL_UP
     default 0x00000002 if GPIO_B4_PULL_DOWN
 
-choice
+choice GPIO_B4_SPEED_CHOICE
     prompt "PB4 Speed"
     default GPIO_B4_SPEED_MEDIUM
     help
@@ -3540,7 +3540,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN5
 
 if INSTANCE_STM32_GPIOB_PIN5
 
-choice
+choice GPIO_B5_RW_MODE_CHOICE
     prompt "PB5 Read/Write Mode"
     default GPIO_B5_RW_MODE_WRITE
     help
@@ -3569,7 +3569,7 @@ config GPIO_B5_RW_MODE
     default 1 if GPIO_B5_RW_MODE_WRITE
     default 2 if GPIO_B5_RW_MODE_READWRITE
 
-choice
+choice GPIO_B5_MODE_CHOICE
     prompt "PB5 GPIO Mode"
     default GPIO_B5_MODE_OUTPUT_PP if GPIO_B5_RW_MODE_WRITE
     default GPIO_B5_MODE_INPUT if GPIO_B5_RW_MODE_READ
@@ -3617,7 +3617,7 @@ config GPIO_B5_MODE
     default 0x00000012 if GPIO_B5_MODE_AF_OD
     default 0x00000003 if GPIO_B5_MODE_ANALOG
 
-choice
+choice GPIO_B5_PULL_CHOICE
     prompt "PB5 Pull-up/Pull-down"
     default GPIO_B5_PULL_NONE
     help
@@ -3646,7 +3646,7 @@ config GPIO_B5_PULL
     default 0x00000001 if GPIO_B5_PULL_UP
     default 0x00000002 if GPIO_B5_PULL_DOWN
 
-choice
+choice GPIO_B5_SPEED_CHOICE
     prompt "PB5 Speed"
     default GPIO_B5_SPEED_MEDIUM
     help
@@ -3707,7 +3707,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN6
 
 if INSTANCE_STM32_GPIOB_PIN6
 
-choice
+choice GPIO_B6_RW_MODE_CHOICE
     prompt "PB6 Read/Write Mode"
     default GPIO_B6_RW_MODE_WRITE
     help
@@ -3736,7 +3736,7 @@ config GPIO_B6_RW_MODE
     default 1 if GPIO_B6_RW_MODE_WRITE
     default 2 if GPIO_B6_RW_MODE_READWRITE
 
-choice
+choice GPIO_B6_MODE_CHOICE
     prompt "PB6 GPIO Mode"
     default GPIO_B6_MODE_OUTPUT_PP if GPIO_B6_RW_MODE_WRITE
     default GPIO_B6_MODE_INPUT if GPIO_B6_RW_MODE_READ
@@ -3784,7 +3784,7 @@ config GPIO_B6_MODE
     default 0x00000012 if GPIO_B6_MODE_AF_OD
     default 0x00000003 if GPIO_B6_MODE_ANALOG
 
-choice
+choice GPIO_B6_PULL_CHOICE
     prompt "PB6 Pull-up/Pull-down"
     default GPIO_B6_PULL_NONE
     help
@@ -3813,7 +3813,7 @@ config GPIO_B6_PULL
     default 0x00000001 if GPIO_B6_PULL_UP
     default 0x00000002 if GPIO_B6_PULL_DOWN
 
-choice
+choice GPIO_B6_SPEED_CHOICE
     prompt "PB6 Speed"
     default GPIO_B6_SPEED_MEDIUM
     help
@@ -3874,7 +3874,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN7
 
 if INSTANCE_STM32_GPIOB_PIN7
 
-choice
+choice GPIO_B7_RW_MODE_CHOICE
     prompt "PB7 Read/Write Mode"
     default GPIO_B7_RW_MODE_WRITE
     help
@@ -3903,7 +3903,7 @@ config GPIO_B7_RW_MODE
     default 1 if GPIO_B7_RW_MODE_WRITE
     default 2 if GPIO_B7_RW_MODE_READWRITE
 
-choice
+choice GPIO_B7_MODE_CHOICE
     prompt "PB7 GPIO Mode"
     default GPIO_B7_MODE_OUTPUT_PP if GPIO_B7_RW_MODE_WRITE
     default GPIO_B7_MODE_INPUT if GPIO_B7_RW_MODE_READ
@@ -3951,7 +3951,7 @@ config GPIO_B7_MODE
     default 0x00000012 if GPIO_B7_MODE_AF_OD
     default 0x00000003 if GPIO_B7_MODE_ANALOG
 
-choice
+choice GPIO_B7_PULL_CHOICE
     prompt "PB7 Pull-up/Pull-down"
     default GPIO_B7_PULL_NONE
     help
@@ -3980,7 +3980,7 @@ config GPIO_B7_PULL
     default 0x00000001 if GPIO_B7_PULL_UP
     default 0x00000002 if GPIO_B7_PULL_DOWN
 
-choice
+choice GPIO_B7_SPEED_CHOICE
     prompt "PB7 Speed"
     default GPIO_B7_SPEED_MEDIUM
     help
@@ -4041,7 +4041,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN8
 
 if INSTANCE_STM32_GPIOB_PIN8
 
-choice
+choice GPIO_B8_RW_MODE_CHOICE
     prompt "PB8 Read/Write Mode"
     default GPIO_B8_RW_MODE_WRITE
     help
@@ -4070,7 +4070,7 @@ config GPIO_B8_RW_MODE
     default 1 if GPIO_B8_RW_MODE_WRITE
     default 2 if GPIO_B8_RW_MODE_READWRITE
 
-choice
+choice GPIO_B8_MODE_CHOICE
     prompt "PB8 GPIO Mode"
     default GPIO_B8_MODE_OUTPUT_PP if GPIO_B8_RW_MODE_WRITE
     default GPIO_B8_MODE_INPUT if GPIO_B8_RW_MODE_READ
@@ -4118,7 +4118,7 @@ config GPIO_B8_MODE
     default 0x00000012 if GPIO_B8_MODE_AF_OD
     default 0x00000003 if GPIO_B8_MODE_ANALOG
 
-choice
+choice GPIO_B8_PULL_CHOICE
     prompt "PB8 Pull-up/Pull-down"
     default GPIO_B8_PULL_NONE
     help
@@ -4147,7 +4147,7 @@ config GPIO_B8_PULL
     default 0x00000001 if GPIO_B8_PULL_UP
     default 0x00000002 if GPIO_B8_PULL_DOWN
 
-choice
+choice GPIO_B8_SPEED_CHOICE
     prompt "PB8 Speed"
     default GPIO_B8_SPEED_MEDIUM
     help
@@ -4208,7 +4208,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN9
 
 if INSTANCE_STM32_GPIOB_PIN9
 
-choice
+choice GPIO_B9_RW_MODE_CHOICE
     prompt "PB9 Read/Write Mode"
     default GPIO_B9_RW_MODE_WRITE
     help
@@ -4237,7 +4237,7 @@ config GPIO_B9_RW_MODE
     default 1 if GPIO_B9_RW_MODE_WRITE
     default 2 if GPIO_B9_RW_MODE_READWRITE
 
-choice
+choice GPIO_B9_MODE_CHOICE
     prompt "PB9 GPIO Mode"
     default GPIO_B9_MODE_OUTPUT_PP if GPIO_B9_RW_MODE_WRITE
     default GPIO_B9_MODE_INPUT if GPIO_B9_RW_MODE_READ
@@ -4285,7 +4285,7 @@ config GPIO_B9_MODE
     default 0x00000012 if GPIO_B9_MODE_AF_OD
     default 0x00000003 if GPIO_B9_MODE_ANALOG
 
-choice
+choice GPIO_B9_PULL_CHOICE
     prompt "PB9 Pull-up/Pull-down"
     default GPIO_B9_PULL_NONE
     help
@@ -4314,7 +4314,7 @@ config GPIO_B9_PULL
     default 0x00000001 if GPIO_B9_PULL_UP
     default 0x00000002 if GPIO_B9_PULL_DOWN
 
-choice
+choice GPIO_B9_SPEED_CHOICE
     prompt "PB9 Speed"
     default GPIO_B9_SPEED_MEDIUM
     help
@@ -4375,7 +4375,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN10
 
 if INSTANCE_STM32_GPIOB_PIN10
 
-choice
+choice GPIO_B10_RW_MODE_CHOICE
     prompt "PB10 Read/Write Mode"
     default GPIO_B10_RW_MODE_WRITE
     help
@@ -4404,7 +4404,7 @@ config GPIO_B10_RW_MODE
     default 1 if GPIO_B10_RW_MODE_WRITE
     default 2 if GPIO_B10_RW_MODE_READWRITE
 
-choice
+choice GPIO_B10_MODE_CHOICE
     prompt "PB10 GPIO Mode"
     default GPIO_B10_MODE_OUTPUT_PP if GPIO_B10_RW_MODE_WRITE
     default GPIO_B10_MODE_INPUT if GPIO_B10_RW_MODE_READ
@@ -4452,7 +4452,7 @@ config GPIO_B10_MODE
     default 0x00000012 if GPIO_B10_MODE_AF_OD
     default 0x00000003 if GPIO_B10_MODE_ANALOG
 
-choice
+choice GPIO_B10_PULL_CHOICE
     prompt "PB10 Pull-up/Pull-down"
     default GPIO_B10_PULL_NONE
     help
@@ -4481,7 +4481,7 @@ config GPIO_B10_PULL
     default 0x00000001 if GPIO_B10_PULL_UP
     default 0x00000002 if GPIO_B10_PULL_DOWN
 
-choice
+choice GPIO_B10_SPEED_CHOICE
     prompt "PB10 Speed"
     default GPIO_B10_SPEED_MEDIUM
     help
@@ -4542,7 +4542,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN11
 
 if INSTANCE_STM32_GPIOB_PIN11
 
-choice
+choice GPIO_B11_RW_MODE_CHOICE
     prompt "PB11 Read/Write Mode"
     default GPIO_B11_RW_MODE_WRITE
     help
@@ -4571,7 +4571,7 @@ config GPIO_B11_RW_MODE
     default 1 if GPIO_B11_RW_MODE_WRITE
     default 2 if GPIO_B11_RW_MODE_READWRITE
 
-choice
+choice GPIO_B11_MODE_CHOICE
     prompt "PB11 GPIO Mode"
     default GPIO_B11_MODE_OUTPUT_PP if GPIO_B11_RW_MODE_WRITE
     default GPIO_B11_MODE_INPUT if GPIO_B11_RW_MODE_READ
@@ -4619,7 +4619,7 @@ config GPIO_B11_MODE
     default 0x00000012 if GPIO_B11_MODE_AF_OD
     default 0x00000003 if GPIO_B11_MODE_ANALOG
 
-choice
+choice GPIO_B11_PULL_CHOICE
     prompt "PB11 Pull-up/Pull-down"
     default GPIO_B11_PULL_NONE
     help
@@ -4648,7 +4648,7 @@ config GPIO_B11_PULL
     default 0x00000001 if GPIO_B11_PULL_UP
     default 0x00000002 if GPIO_B11_PULL_DOWN
 
-choice
+choice GPIO_B11_SPEED_CHOICE
     prompt "PB11 Speed"
     default GPIO_B11_SPEED_MEDIUM
     help
@@ -4709,7 +4709,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN12
 
 if INSTANCE_STM32_GPIOB_PIN12
 
-choice
+choice GPIO_B12_RW_MODE_CHOICE
     prompt "PB12 Read/Write Mode"
     default GPIO_B12_RW_MODE_WRITE
     help
@@ -4738,7 +4738,7 @@ config GPIO_B12_RW_MODE
     default 1 if GPIO_B12_RW_MODE_WRITE
     default 2 if GPIO_B12_RW_MODE_READWRITE
 
-choice
+choice GPIO_B12_MODE_CHOICE
     prompt "PB12 GPIO Mode"
     default GPIO_B12_MODE_OUTPUT_PP if GPIO_B12_RW_MODE_WRITE
     default GPIO_B12_MODE_INPUT if GPIO_B12_RW_MODE_READ
@@ -4786,7 +4786,7 @@ config GPIO_B12_MODE
     default 0x00000012 if GPIO_B12_MODE_AF_OD
     default 0x00000003 if GPIO_B12_MODE_ANALOG
 
-choice
+choice GPIO_B12_PULL_CHOICE
     prompt "PB12 Pull-up/Pull-down"
     default GPIO_B12_PULL_NONE
     help
@@ -4815,7 +4815,7 @@ config GPIO_B12_PULL
     default 0x00000001 if GPIO_B12_PULL_UP
     default 0x00000002 if GPIO_B12_PULL_DOWN
 
-choice
+choice GPIO_B12_SPEED_CHOICE
     prompt "PB12 Speed"
     default GPIO_B12_SPEED_MEDIUM
     help
@@ -4876,7 +4876,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN13
 
 if INSTANCE_STM32_GPIOB_PIN13
 
-choice
+choice GPIO_B13_RW_MODE_CHOICE
     prompt "PB13 Read/Write Mode"
     default GPIO_B13_RW_MODE_WRITE
     help
@@ -4905,7 +4905,7 @@ config GPIO_B13_RW_MODE
     default 1 if GPIO_B13_RW_MODE_WRITE
     default 2 if GPIO_B13_RW_MODE_READWRITE
 
-choice
+choice GPIO_B13_MODE_CHOICE
     prompt "PB13 GPIO Mode"
     default GPIO_B13_MODE_OUTPUT_PP if GPIO_B13_RW_MODE_WRITE
     default GPIO_B13_MODE_INPUT if GPIO_B13_RW_MODE_READ
@@ -4953,7 +4953,7 @@ config GPIO_B13_MODE
     default 0x00000012 if GPIO_B13_MODE_AF_OD
     default 0x00000003 if GPIO_B13_MODE_ANALOG
 
-choice
+choice GPIO_B13_PULL_CHOICE
     prompt "PB13 Pull-up/Pull-down"
     default GPIO_B13_PULL_NONE
     help
@@ -4982,7 +4982,7 @@ config GPIO_B13_PULL
     default 0x00000001 if GPIO_B13_PULL_UP
     default 0x00000002 if GPIO_B13_PULL_DOWN
 
-choice
+choice GPIO_B13_SPEED_CHOICE
     prompt "PB13 Speed"
     default GPIO_B13_SPEED_MEDIUM
     help
@@ -5043,7 +5043,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN14
 
 if INSTANCE_STM32_GPIOB_PIN14
 
-choice
+choice GPIO_B14_RW_MODE_CHOICE
     prompt "PB14 Read/Write Mode"
     default GPIO_B14_RW_MODE_WRITE
     help
@@ -5072,7 +5072,7 @@ config GPIO_B14_RW_MODE
     default 1 if GPIO_B14_RW_MODE_WRITE
     default 2 if GPIO_B14_RW_MODE_READWRITE
 
-choice
+choice GPIO_B14_MODE_CHOICE
     prompt "PB14 GPIO Mode"
     default GPIO_B14_MODE_OUTPUT_PP if GPIO_B14_RW_MODE_WRITE
     default GPIO_B14_MODE_INPUT if GPIO_B14_RW_MODE_READ
@@ -5120,7 +5120,7 @@ config GPIO_B14_MODE
     default 0x00000012 if GPIO_B14_MODE_AF_OD
     default 0x00000003 if GPIO_B14_MODE_ANALOG
 
-choice
+choice GPIO_B14_PULL_CHOICE
     prompt "PB14 Pull-up/Pull-down"
     default GPIO_B14_PULL_NONE
     help
@@ -5149,7 +5149,7 @@ config GPIO_B14_PULL
     default 0x00000001 if GPIO_B14_PULL_UP
     default 0x00000002 if GPIO_B14_PULL_DOWN
 
-choice
+choice GPIO_B14_SPEED_CHOICE
     prompt "PB14 Speed"
     default GPIO_B14_SPEED_MEDIUM
     help
@@ -5210,7 +5210,7 @@ menuconfig INSTANCE_STM32_GPIOB_PIN15
 
 if INSTANCE_STM32_GPIOB_PIN15
 
-choice
+choice GPIO_B15_RW_MODE_CHOICE
     prompt "PB15 Read/Write Mode"
     default GPIO_B15_RW_MODE_WRITE
     help
@@ -5239,7 +5239,7 @@ config GPIO_B15_RW_MODE
     default 1 if GPIO_B15_RW_MODE_WRITE
     default 2 if GPIO_B15_RW_MODE_READWRITE
 
-choice
+choice GPIO_B15_MODE_CHOICE
     prompt "PB15 GPIO Mode"
     default GPIO_B15_MODE_OUTPUT_PP if GPIO_B15_RW_MODE_WRITE
     default GPIO_B15_MODE_INPUT if GPIO_B15_RW_MODE_READ
@@ -5287,7 +5287,7 @@ config GPIO_B15_MODE
     default 0x00000012 if GPIO_B15_MODE_AF_OD
     default 0x00000003 if GPIO_B15_MODE_ANALOG
 
-choice
+choice GPIO_B15_PULL_CHOICE
     prompt "PB15 Pull-up/Pull-down"
     default GPIO_B15_PULL_NONE
     help
@@ -5316,7 +5316,7 @@ config GPIO_B15_PULL
     default 0x00000001 if GPIO_B15_PULL_UP
     default 0x00000002 if GPIO_B15_PULL_DOWN
 
-choice
+choice GPIO_B15_SPEED_CHOICE
     prompt "PB15 Speed"
     default GPIO_B15_SPEED_MEDIUM
     help
@@ -5385,7 +5385,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN0
 
 if INSTANCE_STM32_GPIOC_PIN0
 
-choice
+choice GPIO_C0_RW_MODE_CHOICE
     prompt "PC0 Read/Write Mode"
     default GPIO_C0_RW_MODE_WRITE
     help
@@ -5414,7 +5414,7 @@ config GPIO_C0_RW_MODE
     default 1 if GPIO_C0_RW_MODE_WRITE
     default 2 if GPIO_C0_RW_MODE_READWRITE
 
-choice
+choice GPIO_C0_MODE_CHOICE
     prompt "PC0 GPIO Mode"
     default GPIO_C0_MODE_OUTPUT_PP if GPIO_C0_RW_MODE_WRITE
     default GPIO_C0_MODE_INPUT if GPIO_C0_RW_MODE_READ
@@ -5462,7 +5462,7 @@ config GPIO_C0_MODE
     default 0x00000012 if GPIO_C0_MODE_AF_OD
     default 0x00000003 if GPIO_C0_MODE_ANALOG
 
-choice
+choice GPIO_C0_PULL_CHOICE
     prompt "PC0 Pull-up/Pull-down"
     default GPIO_C0_PULL_NONE
     help
@@ -5491,7 +5491,7 @@ config GPIO_C0_PULL
     default 0x00000001 if GPIO_C0_PULL_UP
     default 0x00000002 if GPIO_C0_PULL_DOWN
 
-choice
+choice GPIO_C0_SPEED_CHOICE
     prompt "PC0 Speed"
     default GPIO_C0_SPEED_MEDIUM
     help
@@ -5552,7 +5552,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN1
 
 if INSTANCE_STM32_GPIOC_PIN1
 
-choice
+choice GPIO_C1_RW_MODE_CHOICE
     prompt "PC1 Read/Write Mode"
     default GPIO_C1_RW_MODE_WRITE
     help
@@ -5581,7 +5581,7 @@ config GPIO_C1_RW_MODE
     default 1 if GPIO_C1_RW_MODE_WRITE
     default 2 if GPIO_C1_RW_MODE_READWRITE
 
-choice
+choice GPIO_C1_MODE_CHOICE
     prompt "PC1 GPIO Mode"
     default GPIO_C1_MODE_OUTPUT_PP if GPIO_C1_RW_MODE_WRITE
     default GPIO_C1_MODE_INPUT if GPIO_C1_RW_MODE_READ
@@ -5629,7 +5629,7 @@ config GPIO_C1_MODE
     default 0x00000012 if GPIO_C1_MODE_AF_OD
     default 0x00000003 if GPIO_C1_MODE_ANALOG
 
-choice
+choice GPIO_C1_PULL_CHOICE
     prompt "PC1 Pull-up/Pull-down"
     default GPIO_C1_PULL_NONE
     help
@@ -5658,7 +5658,7 @@ config GPIO_C1_PULL
     default 0x00000001 if GPIO_C1_PULL_UP
     default 0x00000002 if GPIO_C1_PULL_DOWN
 
-choice
+choice GPIO_C1_SPEED_CHOICE
     prompt "PC1 Speed"
     default GPIO_C1_SPEED_MEDIUM
     help
@@ -5719,7 +5719,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN2
 
 if INSTANCE_STM32_GPIOC_PIN2
 
-choice
+choice GPIO_C2_RW_MODE_CHOICE
     prompt "PC2 Read/Write Mode"
     default GPIO_C2_RW_MODE_WRITE
     help
@@ -5748,7 +5748,7 @@ config GPIO_C2_RW_MODE
     default 1 if GPIO_C2_RW_MODE_WRITE
     default 2 if GPIO_C2_RW_MODE_READWRITE
 
-choice
+choice GPIO_C2_MODE_CHOICE
     prompt "PC2 GPIO Mode"
     default GPIO_C2_MODE_OUTPUT_PP if GPIO_C2_RW_MODE_WRITE
     default GPIO_C2_MODE_INPUT if GPIO_C2_RW_MODE_READ
@@ -5796,7 +5796,7 @@ config GPIO_C2_MODE
     default 0x00000012 if GPIO_C2_MODE_AF_OD
     default 0x00000003 if GPIO_C2_MODE_ANALOG
 
-choice
+choice GPIO_C2_PULL_CHOICE
     prompt "PC2 Pull-up/Pull-down"
     default GPIO_C2_PULL_NONE
     help
@@ -5825,7 +5825,7 @@ config GPIO_C2_PULL
     default 0x00000001 if GPIO_C2_PULL_UP
     default 0x00000002 if GPIO_C2_PULL_DOWN
 
-choice
+choice GPIO_C2_SPEED_CHOICE
     prompt "PC2 Speed"
     default GPIO_C2_SPEED_MEDIUM
     help
@@ -5886,7 +5886,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN3
 
 if INSTANCE_STM32_GPIOC_PIN3
 
-choice
+choice GPIO_C3_RW_MODE_CHOICE
     prompt "PC3 Read/Write Mode"
     default GPIO_C3_RW_MODE_WRITE
     help
@@ -5915,7 +5915,7 @@ config GPIO_C3_RW_MODE
     default 1 if GPIO_C3_RW_MODE_WRITE
     default 2 if GPIO_C3_RW_MODE_READWRITE
 
-choice
+choice GPIO_C3_MODE_CHOICE
     prompt "PC3 GPIO Mode"
     default GPIO_C3_MODE_OUTPUT_PP if GPIO_C3_RW_MODE_WRITE
     default GPIO_C3_MODE_INPUT if GPIO_C3_RW_MODE_READ
@@ -5963,7 +5963,7 @@ config GPIO_C3_MODE
     default 0x00000012 if GPIO_C3_MODE_AF_OD
     default 0x00000003 if GPIO_C3_MODE_ANALOG
 
-choice
+choice GPIO_C3_PULL_CHOICE
     prompt "PC3 Pull-up/Pull-down"
     default GPIO_C3_PULL_NONE
     help
@@ -5992,7 +5992,7 @@ config GPIO_C3_PULL
     default 0x00000001 if GPIO_C3_PULL_UP
     default 0x00000002 if GPIO_C3_PULL_DOWN
 
-choice
+choice GPIO_C3_SPEED_CHOICE
     prompt "PC3 Speed"
     default GPIO_C3_SPEED_MEDIUM
     help
@@ -6053,7 +6053,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN4
 
 if INSTANCE_STM32_GPIOC_PIN4
 
-choice
+choice GPIO_C4_RW_MODE_CHOICE
     prompt "PC4 Read/Write Mode"
     default GPIO_C4_RW_MODE_WRITE
     help
@@ -6082,7 +6082,7 @@ config GPIO_C4_RW_MODE
     default 1 if GPIO_C4_RW_MODE_WRITE
     default 2 if GPIO_C4_RW_MODE_READWRITE
 
-choice
+choice GPIO_C4_MODE_CHOICE
     prompt "PC4 GPIO Mode"
     default GPIO_C4_MODE_OUTPUT_PP if GPIO_C4_RW_MODE_WRITE
     default GPIO_C4_MODE_INPUT if GPIO_C4_RW_MODE_READ
@@ -6130,7 +6130,7 @@ config GPIO_C4_MODE
     default 0x00000012 if GPIO_C4_MODE_AF_OD
     default 0x00000003 if GPIO_C4_MODE_ANALOG
 
-choice
+choice GPIO_C4_PULL_CHOICE
     prompt "PC4 Pull-up/Pull-down"
     default GPIO_C4_PULL_NONE
     help
@@ -6159,7 +6159,7 @@ config GPIO_C4_PULL
     default 0x00000001 if GPIO_C4_PULL_UP
     default 0x00000002 if GPIO_C4_PULL_DOWN
 
-choice
+choice GPIO_C4_SPEED_CHOICE
     prompt "PC4 Speed"
     default GPIO_C4_SPEED_MEDIUM
     help
@@ -6220,7 +6220,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN5
 
 if INSTANCE_STM32_GPIOC_PIN5
 
-choice
+choice GPIO_C5_RW_MODE_CHOICE
     prompt "PC5 Read/Write Mode"
     default GPIO_C5_RW_MODE_WRITE
     help
@@ -6249,7 +6249,7 @@ config GPIO_C5_RW_MODE
     default 1 if GPIO_C5_RW_MODE_WRITE
     default 2 if GPIO_C5_RW_MODE_READWRITE
 
-choice
+choice GPIO_C5_MODE_CHOICE
     prompt "PC5 GPIO Mode"
     default GPIO_C5_MODE_OUTPUT_PP if GPIO_C5_RW_MODE_WRITE
     default GPIO_C5_MODE_INPUT if GPIO_C5_RW_MODE_READ
@@ -6297,7 +6297,7 @@ config GPIO_C5_MODE
     default 0x00000012 if GPIO_C5_MODE_AF_OD
     default 0x00000003 if GPIO_C5_MODE_ANALOG
 
-choice
+choice GPIO_C5_PULL_CHOICE
     prompt "PC5 Pull-up/Pull-down"
     default GPIO_C5_PULL_NONE
     help
@@ -6326,7 +6326,7 @@ config GPIO_C5_PULL
     default 0x00000001 if GPIO_C5_PULL_UP
     default 0x00000002 if GPIO_C5_PULL_DOWN
 
-choice
+choice GPIO_C5_SPEED_CHOICE
     prompt "PC5 Speed"
     default GPIO_C5_SPEED_MEDIUM
     help
@@ -6387,7 +6387,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN6
 
 if INSTANCE_STM32_GPIOC_PIN6
 
-choice
+choice GPIO_C6_RW_MODE_CHOICE
     prompt "PC6 Read/Write Mode"
     default GPIO_C6_RW_MODE_WRITE
     help
@@ -6416,7 +6416,7 @@ config GPIO_C6_RW_MODE
     default 1 if GPIO_C6_RW_MODE_WRITE
     default 2 if GPIO_C6_RW_MODE_READWRITE
 
-choice
+choice GPIO_C6_MODE_CHOICE
     prompt "PC6 GPIO Mode"
     default GPIO_C6_MODE_OUTPUT_PP if GPIO_C6_RW_MODE_WRITE
     default GPIO_C6_MODE_INPUT if GPIO_C6_RW_MODE_READ
@@ -6464,7 +6464,7 @@ config GPIO_C6_MODE
     default 0x00000012 if GPIO_C6_MODE_AF_OD
     default 0x00000003 if GPIO_C6_MODE_ANALOG
 
-choice
+choice GPIO_C6_PULL_CHOICE
     prompt "PC6 Pull-up/Pull-down"
     default GPIO_C6_PULL_NONE
     help
@@ -6493,7 +6493,7 @@ config GPIO_C6_PULL
     default 0x00000001 if GPIO_C6_PULL_UP
     default 0x00000002 if GPIO_C6_PULL_DOWN
 
-choice
+choice GPIO_C6_SPEED_CHOICE
     prompt "PC6 Speed"
     default GPIO_C6_SPEED_MEDIUM
     help
@@ -6554,7 +6554,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN7
 
 if INSTANCE_STM32_GPIOC_PIN7
 
-choice
+choice GPIO_C7_RW_MODE_CHOICE
     prompt "PC7 Read/Write Mode"
     default GPIO_C7_RW_MODE_WRITE
     help
@@ -6583,7 +6583,7 @@ config GPIO_C7_RW_MODE
     default 1 if GPIO_C7_RW_MODE_WRITE
     default 2 if GPIO_C7_RW_MODE_READWRITE
 
-choice
+choice GPIO_C7_MODE_CHOICE
     prompt "PC7 GPIO Mode"
     default GPIO_C7_MODE_OUTPUT_PP if GPIO_C7_RW_MODE_WRITE
     default GPIO_C7_MODE_INPUT if GPIO_C7_RW_MODE_READ
@@ -6631,7 +6631,7 @@ config GPIO_C7_MODE
     default 0x00000012 if GPIO_C7_MODE_AF_OD
     default 0x00000003 if GPIO_C7_MODE_ANALOG
 
-choice
+choice GPIO_C7_PULL_CHOICE
     prompt "PC7 Pull-up/Pull-down"
     default GPIO_C7_PULL_NONE
     help
@@ -6660,7 +6660,7 @@ config GPIO_C7_PULL
     default 0x00000001 if GPIO_C7_PULL_UP
     default 0x00000002 if GPIO_C7_PULL_DOWN
 
-choice
+choice GPIO_C7_SPEED_CHOICE
     prompt "PC7 Speed"
     default GPIO_C7_SPEED_MEDIUM
     help
@@ -6721,7 +6721,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN8
 
 if INSTANCE_STM32_GPIOC_PIN8
 
-choice
+choice GPIO_C8_RW_MODE_CHOICE
     prompt "PC8 Read/Write Mode"
     default GPIO_C8_RW_MODE_WRITE
     help
@@ -6750,7 +6750,7 @@ config GPIO_C8_RW_MODE
     default 1 if GPIO_C8_RW_MODE_WRITE
     default 2 if GPIO_C8_RW_MODE_READWRITE
 
-choice
+choice GPIO_C8_MODE_CHOICE
     prompt "PC8 GPIO Mode"
     default GPIO_C8_MODE_OUTPUT_PP if GPIO_C8_RW_MODE_WRITE
     default GPIO_C8_MODE_INPUT if GPIO_C8_RW_MODE_READ
@@ -6798,7 +6798,7 @@ config GPIO_C8_MODE
     default 0x00000012 if GPIO_C8_MODE_AF_OD
     default 0x00000003 if GPIO_C8_MODE_ANALOG
 
-choice
+choice GPIO_C8_PULL_CHOICE
     prompt "PC8 Pull-up/Pull-down"
     default GPIO_C8_PULL_NONE
     help
@@ -6827,7 +6827,7 @@ config GPIO_C8_PULL
     default 0x00000001 if GPIO_C8_PULL_UP
     default 0x00000002 if GPIO_C8_PULL_DOWN
 
-choice
+choice GPIO_C8_SPEED_CHOICE
     prompt "PC8 Speed"
     default GPIO_C8_SPEED_MEDIUM
     help
@@ -6888,7 +6888,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN9
 
 if INSTANCE_STM32_GPIOC_PIN9
 
-choice
+choice GPIO_C9_RW_MODE_CHOICE
     prompt "PC9 Read/Write Mode"
     default GPIO_C9_RW_MODE_WRITE
     help
@@ -6917,7 +6917,7 @@ config GPIO_C9_RW_MODE
     default 1 if GPIO_C9_RW_MODE_WRITE
     default 2 if GPIO_C9_RW_MODE_READWRITE
 
-choice
+choice GPIO_C9_MODE_CHOICE
     prompt "PC9 GPIO Mode"
     default GPIO_C9_MODE_OUTPUT_PP if GPIO_C9_RW_MODE_WRITE
     default GPIO_C9_MODE_INPUT if GPIO_C9_RW_MODE_READ
@@ -6965,7 +6965,7 @@ config GPIO_C9_MODE
     default 0x00000012 if GPIO_C9_MODE_AF_OD
     default 0x00000003 if GPIO_C9_MODE_ANALOG
 
-choice
+choice GPIO_C9_PULL_CHOICE
     prompt "PC9 Pull-up/Pull-down"
     default GPIO_C9_PULL_NONE
     help
@@ -6994,7 +6994,7 @@ config GPIO_C9_PULL
     default 0x00000001 if GPIO_C9_PULL_UP
     default 0x00000002 if GPIO_C9_PULL_DOWN
 
-choice
+choice GPIO_C9_SPEED_CHOICE
     prompt "PC9 Speed"
     default GPIO_C9_SPEED_MEDIUM
     help
@@ -7055,7 +7055,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN10
 
 if INSTANCE_STM32_GPIOC_PIN10
 
-choice
+choice GPIO_C10_RW_MODE_CHOICE
     prompt "PC10 Read/Write Mode"
     default GPIO_C10_RW_MODE_WRITE
     help
@@ -7084,7 +7084,7 @@ config GPIO_C10_RW_MODE
     default 1 if GPIO_C10_RW_MODE_WRITE
     default 2 if GPIO_C10_RW_MODE_READWRITE
 
-choice
+choice GPIO_C10_MODE_CHOICE
     prompt "PC10 GPIO Mode"
     default GPIO_C10_MODE_OUTPUT_PP if GPIO_C10_RW_MODE_WRITE
     default GPIO_C10_MODE_INPUT if GPIO_C10_RW_MODE_READ
@@ -7132,7 +7132,7 @@ config GPIO_C10_MODE
     default 0x00000012 if GPIO_C10_MODE_AF_OD
     default 0x00000003 if GPIO_C10_MODE_ANALOG
 
-choice
+choice GPIO_C10_PULL_CHOICE
     prompt "PC10 Pull-up/Pull-down"
     default GPIO_C10_PULL_NONE
     help
@@ -7161,7 +7161,7 @@ config GPIO_C10_PULL
     default 0x00000001 if GPIO_C10_PULL_UP
     default 0x00000002 if GPIO_C10_PULL_DOWN
 
-choice
+choice GPIO_C10_SPEED_CHOICE
     prompt "PC10 Speed"
     default GPIO_C10_SPEED_MEDIUM
     help
@@ -7222,7 +7222,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN11
 
 if INSTANCE_STM32_GPIOC_PIN11
 
-choice
+choice GPIO_C11_RW_MODE_CHOICE
     prompt "PC11 Read/Write Mode"
     default GPIO_C11_RW_MODE_WRITE
     help
@@ -7251,7 +7251,7 @@ config GPIO_C11_RW_MODE
     default 1 if GPIO_C11_RW_MODE_WRITE
     default 2 if GPIO_C11_RW_MODE_READWRITE
 
-choice
+choice GPIO_C11_MODE_CHOICE
     prompt "PC11 GPIO Mode"
     default GPIO_C11_MODE_OUTPUT_PP if GPIO_C11_RW_MODE_WRITE
     default GPIO_C11_MODE_INPUT if GPIO_C11_RW_MODE_READ
@@ -7299,7 +7299,7 @@ config GPIO_C11_MODE
     default 0x00000012 if GPIO_C11_MODE_AF_OD
     default 0x00000003 if GPIO_C11_MODE_ANALOG
 
-choice
+choice GPIO_C11_PULL_CHOICE
     prompt "PC11 Pull-up/Pull-down"
     default GPIO_C11_PULL_NONE
     help
@@ -7328,7 +7328,7 @@ config GPIO_C11_PULL
     default 0x00000001 if GPIO_C11_PULL_UP
     default 0x00000002 if GPIO_C11_PULL_DOWN
 
-choice
+choice GPIO_C11_SPEED_CHOICE
     prompt "PC11 Speed"
     default GPIO_C11_SPEED_MEDIUM
     help
@@ -7389,7 +7389,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN12
 
 if INSTANCE_STM32_GPIOC_PIN12
 
-choice
+choice GPIO_C12_RW_MODE_CHOICE
     prompt "PC12 Read/Write Mode"
     default GPIO_C12_RW_MODE_WRITE
     help
@@ -7418,7 +7418,7 @@ config GPIO_C12_RW_MODE
     default 1 if GPIO_C12_RW_MODE_WRITE
     default 2 if GPIO_C12_RW_MODE_READWRITE
 
-choice
+choice GPIO_C12_MODE_CHOICE
     prompt "PC12 GPIO Mode"
     default GPIO_C12_MODE_OUTPUT_PP if GPIO_C12_RW_MODE_WRITE
     default GPIO_C12_MODE_INPUT if GPIO_C12_RW_MODE_READ
@@ -7466,7 +7466,7 @@ config GPIO_C12_MODE
     default 0x00000012 if GPIO_C12_MODE_AF_OD
     default 0x00000003 if GPIO_C12_MODE_ANALOG
 
-choice
+choice GPIO_C12_PULL_CHOICE
     prompt "PC12 Pull-up/Pull-down"
     default GPIO_C12_PULL_NONE
     help
@@ -7495,7 +7495,7 @@ config GPIO_C12_PULL
     default 0x00000001 if GPIO_C12_PULL_UP
     default 0x00000002 if GPIO_C12_PULL_DOWN
 
-choice
+choice GPIO_C12_SPEED_CHOICE
     prompt "PC12 Speed"
     default GPIO_C12_SPEED_MEDIUM
     help
@@ -7556,7 +7556,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN13
 
 if INSTANCE_STM32_GPIOC_PIN13
 
-choice
+choice GPIO_C13_RW_MODE_CHOICE
     prompt "PC13 Read/Write Mode"
     default GPIO_C13_RW_MODE_WRITE
     help
@@ -7585,7 +7585,7 @@ config GPIO_C13_RW_MODE
     default 1 if GPIO_C13_RW_MODE_WRITE
     default 2 if GPIO_C13_RW_MODE_READWRITE
 
-choice
+choice GPIO_C13_MODE_CHOICE
     prompt "PC13 GPIO Mode"
     default GPIO_C13_MODE_OUTPUT_PP if GPIO_C13_RW_MODE_WRITE
     default GPIO_C13_MODE_INPUT if GPIO_C13_RW_MODE_READ
@@ -7633,7 +7633,7 @@ config GPIO_C13_MODE
     default 0x00000012 if GPIO_C13_MODE_AF_OD
     default 0x00000003 if GPIO_C13_MODE_ANALOG
 
-choice
+choice GPIO_C13_PULL_CHOICE
     prompt "PC13 Pull-up/Pull-down"
     default GPIO_C13_PULL_NONE
     help
@@ -7662,7 +7662,7 @@ config GPIO_C13_PULL
     default 0x00000001 if GPIO_C13_PULL_UP
     default 0x00000002 if GPIO_C13_PULL_DOWN
 
-choice
+choice GPIO_C13_SPEED_CHOICE
     prompt "PC13 Speed"
     default GPIO_C13_SPEED_MEDIUM
     help
@@ -7723,7 +7723,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN14
 
 if INSTANCE_STM32_GPIOC_PIN14
 
-choice
+choice GPIO_C14_RW_MODE_CHOICE
     prompt "PC14 Read/Write Mode"
     default GPIO_C14_RW_MODE_WRITE
     help
@@ -7752,7 +7752,7 @@ config GPIO_C14_RW_MODE
     default 1 if GPIO_C14_RW_MODE_WRITE
     default 2 if GPIO_C14_RW_MODE_READWRITE
 
-choice
+choice GPIO_C14_MODE_CHOICE
     prompt "PC14 GPIO Mode"
     default GPIO_C14_MODE_OUTPUT_PP if GPIO_C14_RW_MODE_WRITE
     default GPIO_C14_MODE_INPUT if GPIO_C14_RW_MODE_READ
@@ -7800,7 +7800,7 @@ config GPIO_C14_MODE
     default 0x00000012 if GPIO_C14_MODE_AF_OD
     default 0x00000003 if GPIO_C14_MODE_ANALOG
 
-choice
+choice GPIO_C14_PULL_CHOICE
     prompt "PC14 Pull-up/Pull-down"
     default GPIO_C14_PULL_NONE
     help
@@ -7829,7 +7829,7 @@ config GPIO_C14_PULL
     default 0x00000001 if GPIO_C14_PULL_UP
     default 0x00000002 if GPIO_C14_PULL_DOWN
 
-choice
+choice GPIO_C14_SPEED_CHOICE
     prompt "PC14 Speed"
     default GPIO_C14_SPEED_MEDIUM
     help
@@ -7890,7 +7890,7 @@ menuconfig INSTANCE_STM32_GPIOC_PIN15
 
 if INSTANCE_STM32_GPIOC_PIN15
 
-choice
+choice GPIO_C15_RW_MODE_CHOICE
     prompt "PC15 Read/Write Mode"
     default GPIO_C15_RW_MODE_WRITE
     help
@@ -7919,7 +7919,7 @@ config GPIO_C15_RW_MODE
     default 1 if GPIO_C15_RW_MODE_WRITE
     default 2 if GPIO_C15_RW_MODE_READWRITE
 
-choice
+choice GPIO_C15_MODE_CHOICE
     prompt "PC15 GPIO Mode"
     default GPIO_C15_MODE_OUTPUT_PP if GPIO_C15_RW_MODE_WRITE
     default GPIO_C15_MODE_INPUT if GPIO_C15_RW_MODE_READ
@@ -7967,7 +7967,7 @@ config GPIO_C15_MODE
     default 0x00000012 if GPIO_C15_MODE_AF_OD
     default 0x00000003 if GPIO_C15_MODE_ANALOG
 
-choice
+choice GPIO_C15_PULL_CHOICE
     prompt "PC15 Pull-up/Pull-down"
     default GPIO_C15_PULL_NONE
     help
@@ -7996,7 +7996,7 @@ config GPIO_C15_PULL
     default 0x00000001 if GPIO_C15_PULL_UP
     default 0x00000002 if GPIO_C15_PULL_DOWN
 
-choice
+choice GPIO_C15_SPEED_CHOICE
     prompt "PC15 Speed"
     default GPIO_C15_SPEED_MEDIUM
     help
@@ -8065,7 +8065,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN0
 
 if INSTANCE_STM32_GPIOD_PIN0
 
-choice
+choice GPIO_D0_RW_MODE_CHOICE
     prompt "PD0 Read/Write Mode"
     default GPIO_D0_RW_MODE_WRITE
     help
@@ -8094,7 +8094,7 @@ config GPIO_D0_RW_MODE
     default 1 if GPIO_D0_RW_MODE_WRITE
     default 2 if GPIO_D0_RW_MODE_READWRITE
 
-choice
+choice GPIO_D0_MODE_CHOICE
     prompt "PD0 GPIO Mode"
     default GPIO_D0_MODE_OUTPUT_PP if GPIO_D0_RW_MODE_WRITE
     default GPIO_D0_MODE_INPUT if GPIO_D0_RW_MODE_READ
@@ -8142,7 +8142,7 @@ config GPIO_D0_MODE
     default 0x00000012 if GPIO_D0_MODE_AF_OD
     default 0x00000003 if GPIO_D0_MODE_ANALOG
 
-choice
+choice GPIO_D0_PULL_CHOICE
     prompt "PD0 Pull-up/Pull-down"
     default GPIO_D0_PULL_NONE
     help
@@ -8171,7 +8171,7 @@ config GPIO_D0_PULL
     default 0x00000001 if GPIO_D0_PULL_UP
     default 0x00000002 if GPIO_D0_PULL_DOWN
 
-choice
+choice GPIO_D0_SPEED_CHOICE
     prompt "PD0 Speed"
     default GPIO_D0_SPEED_MEDIUM
     help
@@ -8232,7 +8232,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN1
 
 if INSTANCE_STM32_GPIOD_PIN1
 
-choice
+choice GPIO_D1_RW_MODE_CHOICE
     prompt "PD1 Read/Write Mode"
     default GPIO_D1_RW_MODE_WRITE
     help
@@ -8261,7 +8261,7 @@ config GPIO_D1_RW_MODE
     default 1 if GPIO_D1_RW_MODE_WRITE
     default 2 if GPIO_D1_RW_MODE_READWRITE
 
-choice
+choice GPIO_D1_MODE_CHOICE
     prompt "PD1 GPIO Mode"
     default GPIO_D1_MODE_OUTPUT_PP if GPIO_D1_RW_MODE_WRITE
     default GPIO_D1_MODE_INPUT if GPIO_D1_RW_MODE_READ
@@ -8309,7 +8309,7 @@ config GPIO_D1_MODE
     default 0x00000012 if GPIO_D1_MODE_AF_OD
     default 0x00000003 if GPIO_D1_MODE_ANALOG
 
-choice
+choice GPIO_D1_PULL_CHOICE
     prompt "PD1 Pull-up/Pull-down"
     default GPIO_D1_PULL_NONE
     help
@@ -8338,7 +8338,7 @@ config GPIO_D1_PULL
     default 0x00000001 if GPIO_D1_PULL_UP
     default 0x00000002 if GPIO_D1_PULL_DOWN
 
-choice
+choice GPIO_D1_SPEED_CHOICE
     prompt "PD1 Speed"
     default GPIO_D1_SPEED_MEDIUM
     help
@@ -8399,7 +8399,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN2
 
 if INSTANCE_STM32_GPIOD_PIN2
 
-choice
+choice GPIO_D2_RW_MODE_CHOICE
     prompt "PD2 Read/Write Mode"
     default GPIO_D2_RW_MODE_WRITE
     help
@@ -8428,7 +8428,7 @@ config GPIO_D2_RW_MODE
     default 1 if GPIO_D2_RW_MODE_WRITE
     default 2 if GPIO_D2_RW_MODE_READWRITE
 
-choice
+choice GPIO_D2_MODE_CHOICE
     prompt "PD2 GPIO Mode"
     default GPIO_D2_MODE_OUTPUT_PP if GPIO_D2_RW_MODE_WRITE
     default GPIO_D2_MODE_INPUT if GPIO_D2_RW_MODE_READ
@@ -8476,7 +8476,7 @@ config GPIO_D2_MODE
     default 0x00000012 if GPIO_D2_MODE_AF_OD
     default 0x00000003 if GPIO_D2_MODE_ANALOG
 
-choice
+choice GPIO_D2_PULL_CHOICE
     prompt "PD2 Pull-up/Pull-down"
     default GPIO_D2_PULL_NONE
     help
@@ -8505,7 +8505,7 @@ config GPIO_D2_PULL
     default 0x00000001 if GPIO_D2_PULL_UP
     default 0x00000002 if GPIO_D2_PULL_DOWN
 
-choice
+choice GPIO_D2_SPEED_CHOICE
     prompt "PD2 Speed"
     default GPIO_D2_SPEED_MEDIUM
     help
@@ -8566,7 +8566,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN3
 
 if INSTANCE_STM32_GPIOD_PIN3
 
-choice
+choice GPIO_D3_RW_MODE_CHOICE
     prompt "PD3 Read/Write Mode"
     default GPIO_D3_RW_MODE_WRITE
     help
@@ -8595,7 +8595,7 @@ config GPIO_D3_RW_MODE
     default 1 if GPIO_D3_RW_MODE_WRITE
     default 2 if GPIO_D3_RW_MODE_READWRITE
 
-choice
+choice GPIO_D3_MODE_CHOICE
     prompt "PD3 GPIO Mode"
     default GPIO_D3_MODE_OUTPUT_PP if GPIO_D3_RW_MODE_WRITE
     default GPIO_D3_MODE_INPUT if GPIO_D3_RW_MODE_READ
@@ -8643,7 +8643,7 @@ config GPIO_D3_MODE
     default 0x00000012 if GPIO_D3_MODE_AF_OD
     default 0x00000003 if GPIO_D3_MODE_ANALOG
 
-choice
+choice GPIO_D3_PULL_CHOICE
     prompt "PD3 Pull-up/Pull-down"
     default GPIO_D3_PULL_NONE
     help
@@ -8672,7 +8672,7 @@ config GPIO_D3_PULL
     default 0x00000001 if GPIO_D3_PULL_UP
     default 0x00000002 if GPIO_D3_PULL_DOWN
 
-choice
+choice GPIO_D3_SPEED_CHOICE
     prompt "PD3 Speed"
     default GPIO_D3_SPEED_MEDIUM
     help
@@ -8733,7 +8733,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN4
 
 if INSTANCE_STM32_GPIOD_PIN4
 
-choice
+choice GPIO_D4_RW_MODE_CHOICE
     prompt "PD4 Read/Write Mode"
     default GPIO_D4_RW_MODE_WRITE
     help
@@ -8762,7 +8762,7 @@ config GPIO_D4_RW_MODE
     default 1 if GPIO_D4_RW_MODE_WRITE
     default 2 if GPIO_D4_RW_MODE_READWRITE
 
-choice
+choice GPIO_D4_MODE_CHOICE
     prompt "PD4 GPIO Mode"
     default GPIO_D4_MODE_OUTPUT_PP if GPIO_D4_RW_MODE_WRITE
     default GPIO_D4_MODE_INPUT if GPIO_D4_RW_MODE_READ
@@ -8810,7 +8810,7 @@ config GPIO_D4_MODE
     default 0x00000012 if GPIO_D4_MODE_AF_OD
     default 0x00000003 if GPIO_D4_MODE_ANALOG
 
-choice
+choice GPIO_D4_PULL_CHOICE
     prompt "PD4 Pull-up/Pull-down"
     default GPIO_D4_PULL_NONE
     help
@@ -8839,7 +8839,7 @@ config GPIO_D4_PULL
     default 0x00000001 if GPIO_D4_PULL_UP
     default 0x00000002 if GPIO_D4_PULL_DOWN
 
-choice
+choice GPIO_D4_SPEED_CHOICE
     prompt "PD4 Speed"
     default GPIO_D4_SPEED_MEDIUM
     help
@@ -8900,7 +8900,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN5
 
 if INSTANCE_STM32_GPIOD_PIN5
 
-choice
+choice GPIO_D5_RW_MODE_CHOICE
     prompt "PD5 Read/Write Mode"
     default GPIO_D5_RW_MODE_WRITE
     help
@@ -8929,7 +8929,7 @@ config GPIO_D5_RW_MODE
     default 1 if GPIO_D5_RW_MODE_WRITE
     default 2 if GPIO_D5_RW_MODE_READWRITE
 
-choice
+choice GPIO_D5_MODE_CHOICE
     prompt "PD5 GPIO Mode"
     default GPIO_D5_MODE_OUTPUT_PP if GPIO_D5_RW_MODE_WRITE
     default GPIO_D5_MODE_INPUT if GPIO_D5_RW_MODE_READ
@@ -8977,7 +8977,7 @@ config GPIO_D5_MODE
     default 0x00000012 if GPIO_D5_MODE_AF_OD
     default 0x00000003 if GPIO_D5_MODE_ANALOG
 
-choice
+choice GPIO_D5_PULL_CHOICE
     prompt "PD5 Pull-up/Pull-down"
     default GPIO_D5_PULL_NONE
     help
@@ -9006,7 +9006,7 @@ config GPIO_D5_PULL
     default 0x00000001 if GPIO_D5_PULL_UP
     default 0x00000002 if GPIO_D5_PULL_DOWN
 
-choice
+choice GPIO_D5_SPEED_CHOICE
     prompt "PD5 Speed"
     default GPIO_D5_SPEED_MEDIUM
     help
@@ -9067,7 +9067,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN6
 
 if INSTANCE_STM32_GPIOD_PIN6
 
-choice
+choice GPIO_D6_RW_MODE_CHOICE
     prompt "PD6 Read/Write Mode"
     default GPIO_D6_RW_MODE_WRITE
     help
@@ -9096,7 +9096,7 @@ config GPIO_D6_RW_MODE
     default 1 if GPIO_D6_RW_MODE_WRITE
     default 2 if GPIO_D6_RW_MODE_READWRITE
 
-choice
+choice GPIO_D6_MODE_CHOICE
     prompt "PD6 GPIO Mode"
     default GPIO_D6_MODE_OUTPUT_PP if GPIO_D6_RW_MODE_WRITE
     default GPIO_D6_MODE_INPUT if GPIO_D6_RW_MODE_READ
@@ -9144,7 +9144,7 @@ config GPIO_D6_MODE
     default 0x00000012 if GPIO_D6_MODE_AF_OD
     default 0x00000003 if GPIO_D6_MODE_ANALOG
 
-choice
+choice GPIO_D6_PULL_CHOICE
     prompt "PD6 Pull-up/Pull-down"
     default GPIO_D6_PULL_NONE
     help
@@ -9173,7 +9173,7 @@ config GPIO_D6_PULL
     default 0x00000001 if GPIO_D6_PULL_UP
     default 0x00000002 if GPIO_D6_PULL_DOWN
 
-choice
+choice GPIO_D6_SPEED_CHOICE
     prompt "PD6 Speed"
     default GPIO_D6_SPEED_MEDIUM
     help
@@ -9234,7 +9234,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN7
 
 if INSTANCE_STM32_GPIOD_PIN7
 
-choice
+choice GPIO_D7_RW_MODE_CHOICE
     prompt "PD7 Read/Write Mode"
     default GPIO_D7_RW_MODE_WRITE
     help
@@ -9263,7 +9263,7 @@ config GPIO_D7_RW_MODE
     default 1 if GPIO_D7_RW_MODE_WRITE
     default 2 if GPIO_D7_RW_MODE_READWRITE
 
-choice
+choice GPIO_D7_MODE_CHOICE
     prompt "PD7 GPIO Mode"
     default GPIO_D7_MODE_OUTPUT_PP if GPIO_D7_RW_MODE_WRITE
     default GPIO_D7_MODE_INPUT if GPIO_D7_RW_MODE_READ
@@ -9311,7 +9311,7 @@ config GPIO_D7_MODE
     default 0x00000012 if GPIO_D7_MODE_AF_OD
     default 0x00000003 if GPIO_D7_MODE_ANALOG
 
-choice
+choice GPIO_D7_PULL_CHOICE
     prompt "PD7 Pull-up/Pull-down"
     default GPIO_D7_PULL_NONE
     help
@@ -9340,7 +9340,7 @@ config GPIO_D7_PULL
     default 0x00000001 if GPIO_D7_PULL_UP
     default 0x00000002 if GPIO_D7_PULL_DOWN
 
-choice
+choice GPIO_D7_SPEED_CHOICE
     prompt "PD7 Speed"
     default GPIO_D7_SPEED_MEDIUM
     help
@@ -9401,7 +9401,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN8
 
 if INSTANCE_STM32_GPIOD_PIN8
 
-choice
+choice GPIO_D8_RW_MODE_CHOICE
     prompt "PD8 Read/Write Mode"
     default GPIO_D8_RW_MODE_WRITE
     help
@@ -9430,7 +9430,7 @@ config GPIO_D8_RW_MODE
     default 1 if GPIO_D8_RW_MODE_WRITE
     default 2 if GPIO_D8_RW_MODE_READWRITE
 
-choice
+choice GPIO_D8_MODE_CHOICE
     prompt "PD8 GPIO Mode"
     default GPIO_D8_MODE_OUTPUT_PP if GPIO_D8_RW_MODE_WRITE
     default GPIO_D8_MODE_INPUT if GPIO_D8_RW_MODE_READ
@@ -9478,7 +9478,7 @@ config GPIO_D8_MODE
     default 0x00000012 if GPIO_D8_MODE_AF_OD
     default 0x00000003 if GPIO_D8_MODE_ANALOG
 
-choice
+choice GPIO_D8_PULL_CHOICE
     prompt "PD8 Pull-up/Pull-down"
     default GPIO_D8_PULL_NONE
     help
@@ -9507,7 +9507,7 @@ config GPIO_D8_PULL
     default 0x00000001 if GPIO_D8_PULL_UP
     default 0x00000002 if GPIO_D8_PULL_DOWN
 
-choice
+choice GPIO_D8_SPEED_CHOICE
     prompt "PD8 Speed"
     default GPIO_D8_SPEED_MEDIUM
     help
@@ -9568,7 +9568,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN9
 
 if INSTANCE_STM32_GPIOD_PIN9
 
-choice
+choice GPIO_D9_RW_MODE_CHOICE
     prompt "PD9 Read/Write Mode"
     default GPIO_D9_RW_MODE_WRITE
     help
@@ -9597,7 +9597,7 @@ config GPIO_D9_RW_MODE
     default 1 if GPIO_D9_RW_MODE_WRITE
     default 2 if GPIO_D9_RW_MODE_READWRITE
 
-choice
+choice GPIO_D9_MODE_CHOICE
     prompt "PD9 GPIO Mode"
     default GPIO_D9_MODE_OUTPUT_PP if GPIO_D9_RW_MODE_WRITE
     default GPIO_D9_MODE_INPUT if GPIO_D9_RW_MODE_READ
@@ -9645,7 +9645,7 @@ config GPIO_D9_MODE
     default 0x00000012 if GPIO_D9_MODE_AF_OD
     default 0x00000003 if GPIO_D9_MODE_ANALOG
 
-choice
+choice GPIO_D9_PULL_CHOICE
     prompt "PD9 Pull-up/Pull-down"
     default GPIO_D9_PULL_NONE
     help
@@ -9674,7 +9674,7 @@ config GPIO_D9_PULL
     default 0x00000001 if GPIO_D9_PULL_UP
     default 0x00000002 if GPIO_D9_PULL_DOWN
 
-choice
+choice GPIO_D9_SPEED_CHOICE
     prompt "PD9 Speed"
     default GPIO_D9_SPEED_MEDIUM
     help
@@ -9735,7 +9735,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN10
 
 if INSTANCE_STM32_GPIOD_PIN10
 
-choice
+choice GPIO_D10_RW_MODE_CHOICE
     prompt "PD10 Read/Write Mode"
     default GPIO_D10_RW_MODE_WRITE
     help
@@ -9764,7 +9764,7 @@ config GPIO_D10_RW_MODE
     default 1 if GPIO_D10_RW_MODE_WRITE
     default 2 if GPIO_D10_RW_MODE_READWRITE
 
-choice
+choice GPIO_D10_MODE_CHOICE
     prompt "PD10 GPIO Mode"
     default GPIO_D10_MODE_OUTPUT_PP if GPIO_D10_RW_MODE_WRITE
     default GPIO_D10_MODE_INPUT if GPIO_D10_RW_MODE_READ
@@ -9812,7 +9812,7 @@ config GPIO_D10_MODE
     default 0x00000012 if GPIO_D10_MODE_AF_OD
     default 0x00000003 if GPIO_D10_MODE_ANALOG
 
-choice
+choice GPIO_D10_PULL_CHOICE
     prompt "PD10 Pull-up/Pull-down"
     default GPIO_D10_PULL_NONE
     help
@@ -9841,7 +9841,7 @@ config GPIO_D10_PULL
     default 0x00000001 if GPIO_D10_PULL_UP
     default 0x00000002 if GPIO_D10_PULL_DOWN
 
-choice
+choice GPIO_D10_SPEED_CHOICE
     prompt "PD10 Speed"
     default GPIO_D10_SPEED_MEDIUM
     help
@@ -9902,7 +9902,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN11
 
 if INSTANCE_STM32_GPIOD_PIN11
 
-choice
+choice GPIO_D11_RW_MODE_CHOICE
     prompt "PD11 Read/Write Mode"
     default GPIO_D11_RW_MODE_WRITE
     help
@@ -9931,7 +9931,7 @@ config GPIO_D11_RW_MODE
     default 1 if GPIO_D11_RW_MODE_WRITE
     default 2 if GPIO_D11_RW_MODE_READWRITE
 
-choice
+choice GPIO_D11_MODE_CHOICE
     prompt "PD11 GPIO Mode"
     default GPIO_D11_MODE_OUTPUT_PP if GPIO_D11_RW_MODE_WRITE
     default GPIO_D11_MODE_INPUT if GPIO_D11_RW_MODE_READ
@@ -9979,7 +9979,7 @@ config GPIO_D11_MODE
     default 0x00000012 if GPIO_D11_MODE_AF_OD
     default 0x00000003 if GPIO_D11_MODE_ANALOG
 
-choice
+choice GPIO_D11_PULL_CHOICE
     prompt "PD11 Pull-up/Pull-down"
     default GPIO_D11_PULL_NONE
     help
@@ -10008,7 +10008,7 @@ config GPIO_D11_PULL
     default 0x00000001 if GPIO_D11_PULL_UP
     default 0x00000002 if GPIO_D11_PULL_DOWN
 
-choice
+choice GPIO_D11_SPEED_CHOICE
     prompt "PD11 Speed"
     default GPIO_D11_SPEED_MEDIUM
     help
@@ -10069,7 +10069,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN12
 
 if INSTANCE_STM32_GPIOD_PIN12
 
-choice
+choice GPIO_D12_RW_MODE_CHOICE
     prompt "PD12 Read/Write Mode"
     default GPIO_D12_RW_MODE_WRITE
     help
@@ -10098,7 +10098,7 @@ config GPIO_D12_RW_MODE
     default 1 if GPIO_D12_RW_MODE_WRITE
     default 2 if GPIO_D12_RW_MODE_READWRITE
 
-choice
+choice GPIO_D12_MODE_CHOICE
     prompt "PD12 GPIO Mode"
     default GPIO_D12_MODE_OUTPUT_PP if GPIO_D12_RW_MODE_WRITE
     default GPIO_D12_MODE_INPUT if GPIO_D12_RW_MODE_READ
@@ -10146,7 +10146,7 @@ config GPIO_D12_MODE
     default 0x00000012 if GPIO_D12_MODE_AF_OD
     default 0x00000003 if GPIO_D12_MODE_ANALOG
 
-choice
+choice GPIO_D12_PULL_CHOICE
     prompt "PD12 Pull-up/Pull-down"
     default GPIO_D12_PULL_NONE
     help
@@ -10175,7 +10175,7 @@ config GPIO_D12_PULL
     default 0x00000001 if GPIO_D12_PULL_UP
     default 0x00000002 if GPIO_D12_PULL_DOWN
 
-choice
+choice GPIO_D12_SPEED_CHOICE
     prompt "PD12 Speed"
     default GPIO_D12_SPEED_MEDIUM
     help
@@ -10236,7 +10236,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN13
 
 if INSTANCE_STM32_GPIOD_PIN13
 
-choice
+choice GPIO_D13_RW_MODE_CHOICE
     prompt "PD13 Read/Write Mode"
     default GPIO_D13_RW_MODE_WRITE
     help
@@ -10265,7 +10265,7 @@ config GPIO_D13_RW_MODE
     default 1 if GPIO_D13_RW_MODE_WRITE
     default 2 if GPIO_D13_RW_MODE_READWRITE
 
-choice
+choice GPIO_D13_MODE_CHOICE
     prompt "PD13 GPIO Mode"
     default GPIO_D13_MODE_OUTPUT_PP if GPIO_D13_RW_MODE_WRITE
     default GPIO_D13_MODE_INPUT if GPIO_D13_RW_MODE_READ
@@ -10313,7 +10313,7 @@ config GPIO_D13_MODE
     default 0x00000012 if GPIO_D13_MODE_AF_OD
     default 0x00000003 if GPIO_D13_MODE_ANALOG
 
-choice
+choice GPIO_D13_PULL_CHOICE
     prompt "PD13 Pull-up/Pull-down"
     default GPIO_D13_PULL_NONE
     help
@@ -10342,7 +10342,7 @@ config GPIO_D13_PULL
     default 0x00000001 if GPIO_D13_PULL_UP
     default 0x00000002 if GPIO_D13_PULL_DOWN
 
-choice
+choice GPIO_D13_SPEED_CHOICE
     prompt "PD13 Speed"
     default GPIO_D13_SPEED_MEDIUM
     help
@@ -10403,7 +10403,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN14
 
 if INSTANCE_STM32_GPIOD_PIN14
 
-choice
+choice GPIO_D14_RW_MODE_CHOICE
     prompt "PD14 Read/Write Mode"
     default GPIO_D14_RW_MODE_WRITE
     help
@@ -10432,7 +10432,7 @@ config GPIO_D14_RW_MODE
     default 1 if GPIO_D14_RW_MODE_WRITE
     default 2 if GPIO_D14_RW_MODE_READWRITE
 
-choice
+choice GPIO_D14_MODE_CHOICE
     prompt "PD14 GPIO Mode"
     default GPIO_D14_MODE_OUTPUT_PP if GPIO_D14_RW_MODE_WRITE
     default GPIO_D14_MODE_INPUT if GPIO_D14_RW_MODE_READ
@@ -10480,7 +10480,7 @@ config GPIO_D14_MODE
     default 0x00000012 if GPIO_D14_MODE_AF_OD
     default 0x00000003 if GPIO_D14_MODE_ANALOG
 
-choice
+choice GPIO_D14_PULL_CHOICE
     prompt "PD14 Pull-up/Pull-down"
     default GPIO_D14_PULL_NONE
     help
@@ -10509,7 +10509,7 @@ config GPIO_D14_PULL
     default 0x00000001 if GPIO_D14_PULL_UP
     default 0x00000002 if GPIO_D14_PULL_DOWN
 
-choice
+choice GPIO_D14_SPEED_CHOICE
     prompt "PD14 Speed"
     default GPIO_D14_SPEED_MEDIUM
     help
@@ -10570,7 +10570,7 @@ menuconfig INSTANCE_STM32_GPIOD_PIN15
 
 if INSTANCE_STM32_GPIOD_PIN15
 
-choice
+choice GPIO_D15_RW_MODE_CHOICE
     prompt "PD15 Read/Write Mode"
     default GPIO_D15_RW_MODE_WRITE
     help
@@ -10599,7 +10599,7 @@ config GPIO_D15_RW_MODE
     default 1 if GPIO_D15_RW_MODE_WRITE
     default 2 if GPIO_D15_RW_MODE_READWRITE
 
-choice
+choice GPIO_D15_MODE_CHOICE
     prompt "PD15 GPIO Mode"
     default GPIO_D15_MODE_OUTPUT_PP if GPIO_D15_RW_MODE_WRITE
     default GPIO_D15_MODE_INPUT if GPIO_D15_RW_MODE_READ
@@ -10647,7 +10647,7 @@ config GPIO_D15_MODE
     default 0x00000012 if GPIO_D15_MODE_AF_OD
     default 0x00000003 if GPIO_D15_MODE_ANALOG
 
-choice
+choice GPIO_D15_PULL_CHOICE
     prompt "PD15 Pull-up/Pull-down"
     default GPIO_D15_PULL_NONE
     help
@@ -10676,7 +10676,7 @@ config GPIO_D15_PULL
     default 0x00000001 if GPIO_D15_PULL_UP
     default 0x00000002 if GPIO_D15_PULL_DOWN
 
-choice
+choice GPIO_D15_SPEED_CHOICE
     prompt "PD15 Speed"
     default GPIO_D15_SPEED_MEDIUM
     help
@@ -10745,7 +10745,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN0
 
 if INSTANCE_STM32_GPIOE_PIN0
 
-choice
+choice GPIO_E0_RW_MODE_CHOICE
     prompt "PE0 Read/Write Mode"
     default GPIO_E0_RW_MODE_WRITE
     help
@@ -10774,7 +10774,7 @@ config GPIO_E0_RW_MODE
     default 1 if GPIO_E0_RW_MODE_WRITE
     default 2 if GPIO_E0_RW_MODE_READWRITE
 
-choice
+choice GPIO_E0_MODE_CHOICE
     prompt "PE0 GPIO Mode"
     default GPIO_E0_MODE_OUTPUT_PP if GPIO_E0_RW_MODE_WRITE
     default GPIO_E0_MODE_INPUT if GPIO_E0_RW_MODE_READ
@@ -10822,7 +10822,7 @@ config GPIO_E0_MODE
     default 0x00000012 if GPIO_E0_MODE_AF_OD
     default 0x00000003 if GPIO_E0_MODE_ANALOG
 
-choice
+choice GPIO_E0_PULL_CHOICE
     prompt "PE0 Pull-up/Pull-down"
     default GPIO_E0_PULL_NONE
     help
@@ -10851,7 +10851,7 @@ config GPIO_E0_PULL
     default 0x00000001 if GPIO_E0_PULL_UP
     default 0x00000002 if GPIO_E0_PULL_DOWN
 
-choice
+choice GPIO_E0_SPEED_CHOICE
     prompt "PE0 Speed"
     default GPIO_E0_SPEED_MEDIUM
     help
@@ -10912,7 +10912,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN1
 
 if INSTANCE_STM32_GPIOE_PIN1
 
-choice
+choice GPIO_E1_RW_MODE_CHOICE
     prompt "PE1 Read/Write Mode"
     default GPIO_E1_RW_MODE_WRITE
     help
@@ -10941,7 +10941,7 @@ config GPIO_E1_RW_MODE
     default 1 if GPIO_E1_RW_MODE_WRITE
     default 2 if GPIO_E1_RW_MODE_READWRITE
 
-choice
+choice GPIO_E1_MODE_CHOICE
     prompt "PE1 GPIO Mode"
     default GPIO_E1_MODE_OUTPUT_PP if GPIO_E1_RW_MODE_WRITE
     default GPIO_E1_MODE_INPUT if GPIO_E1_RW_MODE_READ
@@ -10989,7 +10989,7 @@ config GPIO_E1_MODE
     default 0x00000012 if GPIO_E1_MODE_AF_OD
     default 0x00000003 if GPIO_E1_MODE_ANALOG
 
-choice
+choice GPIO_E1_PULL_CHOICE
     prompt "PE1 Pull-up/Pull-down"
     default GPIO_E1_PULL_NONE
     help
@@ -11018,7 +11018,7 @@ config GPIO_E1_PULL
     default 0x00000001 if GPIO_E1_PULL_UP
     default 0x00000002 if GPIO_E1_PULL_DOWN
 
-choice
+choice GPIO_E1_SPEED_CHOICE
     prompt "PE1 Speed"
     default GPIO_E1_SPEED_MEDIUM
     help
@@ -11079,7 +11079,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN2
 
 if INSTANCE_STM32_GPIOE_PIN2
 
-choice
+choice GPIO_E2_RW_MODE_CHOICE
     prompt "PE2 Read/Write Mode"
     default GPIO_E2_RW_MODE_WRITE
     help
@@ -11108,7 +11108,7 @@ config GPIO_E2_RW_MODE
     default 1 if GPIO_E2_RW_MODE_WRITE
     default 2 if GPIO_E2_RW_MODE_READWRITE
 
-choice
+choice GPIO_E2_MODE_CHOICE
     prompt "PE2 GPIO Mode"
     default GPIO_E2_MODE_OUTPUT_PP if GPIO_E2_RW_MODE_WRITE
     default GPIO_E2_MODE_INPUT if GPIO_E2_RW_MODE_READ
@@ -11156,7 +11156,7 @@ config GPIO_E2_MODE
     default 0x00000012 if GPIO_E2_MODE_AF_OD
     default 0x00000003 if GPIO_E2_MODE_ANALOG
 
-choice
+choice GPIO_E2_PULL_CHOICE
     prompt "PE2 Pull-up/Pull-down"
     default GPIO_E2_PULL_NONE
     help
@@ -11185,7 +11185,7 @@ config GPIO_E2_PULL
     default 0x00000001 if GPIO_E2_PULL_UP
     default 0x00000002 if GPIO_E2_PULL_DOWN
 
-choice
+choice GPIO_E2_SPEED_CHOICE
     prompt "PE2 Speed"
     default GPIO_E2_SPEED_MEDIUM
     help
@@ -11246,7 +11246,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN3
 
 if INSTANCE_STM32_GPIOE_PIN3
 
-choice
+choice GPIO_E3_RW_MODE_CHOICE
     prompt "PE3 Read/Write Mode"
     default GPIO_E3_RW_MODE_WRITE
     help
@@ -11275,7 +11275,7 @@ config GPIO_E3_RW_MODE
     default 1 if GPIO_E3_RW_MODE_WRITE
     default 2 if GPIO_E3_RW_MODE_READWRITE
 
-choice
+choice GPIO_E3_MODE_CHOICE
     prompt "PE3 GPIO Mode"
     default GPIO_E3_MODE_OUTPUT_PP if GPIO_E3_RW_MODE_WRITE
     default GPIO_E3_MODE_INPUT if GPIO_E3_RW_MODE_READ
@@ -11323,7 +11323,7 @@ config GPIO_E3_MODE
     default 0x00000012 if GPIO_E3_MODE_AF_OD
     default 0x00000003 if GPIO_E3_MODE_ANALOG
 
-choice
+choice GPIO_E3_PULL_CHOICE
     prompt "PE3 Pull-up/Pull-down"
     default GPIO_E3_PULL_NONE
     help
@@ -11352,7 +11352,7 @@ config GPIO_E3_PULL
     default 0x00000001 if GPIO_E3_PULL_UP
     default 0x00000002 if GPIO_E3_PULL_DOWN
 
-choice
+choice GPIO_E3_SPEED_CHOICE
     prompt "PE3 Speed"
     default GPIO_E3_SPEED_MEDIUM
     help
@@ -11413,7 +11413,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN4
 
 if INSTANCE_STM32_GPIOE_PIN4
 
-choice
+choice GPIO_E4_RW_MODE_CHOICE
     prompt "PE4 Read/Write Mode"
     default GPIO_E4_RW_MODE_WRITE
     help
@@ -11442,7 +11442,7 @@ config GPIO_E4_RW_MODE
     default 1 if GPIO_E4_RW_MODE_WRITE
     default 2 if GPIO_E4_RW_MODE_READWRITE
 
-choice
+choice GPIO_E4_MODE_CHOICE
     prompt "PE4 GPIO Mode"
     default GPIO_E4_MODE_OUTPUT_PP if GPIO_E4_RW_MODE_WRITE
     default GPIO_E4_MODE_INPUT if GPIO_E4_RW_MODE_READ
@@ -11490,7 +11490,7 @@ config GPIO_E4_MODE
     default 0x00000012 if GPIO_E4_MODE_AF_OD
     default 0x00000003 if GPIO_E4_MODE_ANALOG
 
-choice
+choice GPIO_E4_PULL_CHOICE
     prompt "PE4 Pull-up/Pull-down"
     default GPIO_E4_PULL_NONE
     help
@@ -11519,7 +11519,7 @@ config GPIO_E4_PULL
     default 0x00000001 if GPIO_E4_PULL_UP
     default 0x00000002 if GPIO_E4_PULL_DOWN
 
-choice
+choice GPIO_E4_SPEED_CHOICE
     prompt "PE4 Speed"
     default GPIO_E4_SPEED_MEDIUM
     help
@@ -11580,7 +11580,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN5
 
 if INSTANCE_STM32_GPIOE_PIN5
 
-choice
+choice GPIO_E5_RW_MODE_CHOICE
     prompt "PE5 Read/Write Mode"
     default GPIO_E5_RW_MODE_WRITE
     help
@@ -11609,7 +11609,7 @@ config GPIO_E5_RW_MODE
     default 1 if GPIO_E5_RW_MODE_WRITE
     default 2 if GPIO_E5_RW_MODE_READWRITE
 
-choice
+choice GPIO_E5_MODE_CHOICE
     prompt "PE5 GPIO Mode"
     default GPIO_E5_MODE_OUTPUT_PP if GPIO_E5_RW_MODE_WRITE
     default GPIO_E5_MODE_INPUT if GPIO_E5_RW_MODE_READ
@@ -11657,7 +11657,7 @@ config GPIO_E5_MODE
     default 0x00000012 if GPIO_E5_MODE_AF_OD
     default 0x00000003 if GPIO_E5_MODE_ANALOG
 
-choice
+choice GPIO_E5_PULL_CHOICE
     prompt "PE5 Pull-up/Pull-down"
     default GPIO_E5_PULL_NONE
     help
@@ -11686,7 +11686,7 @@ config GPIO_E5_PULL
     default 0x00000001 if GPIO_E5_PULL_UP
     default 0x00000002 if GPIO_E5_PULL_DOWN
 
-choice
+choice GPIO_E5_SPEED_CHOICE
     prompt "PE5 Speed"
     default GPIO_E5_SPEED_MEDIUM
     help
@@ -11747,7 +11747,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN6
 
 if INSTANCE_STM32_GPIOE_PIN6
 
-choice
+choice GPIO_E6_RW_MODE_CHOICE
     prompt "PE6 Read/Write Mode"
     default GPIO_E6_RW_MODE_WRITE
     help
@@ -11776,7 +11776,7 @@ config GPIO_E6_RW_MODE
     default 1 if GPIO_E6_RW_MODE_WRITE
     default 2 if GPIO_E6_RW_MODE_READWRITE
 
-choice
+choice GPIO_E6_MODE_CHOICE
     prompt "PE6 GPIO Mode"
     default GPIO_E6_MODE_OUTPUT_PP if GPIO_E6_RW_MODE_WRITE
     default GPIO_E6_MODE_INPUT if GPIO_E6_RW_MODE_READ
@@ -11824,7 +11824,7 @@ config GPIO_E6_MODE
     default 0x00000012 if GPIO_E6_MODE_AF_OD
     default 0x00000003 if GPIO_E6_MODE_ANALOG
 
-choice
+choice GPIO_E6_PULL_CHOICE
     prompt "PE6 Pull-up/Pull-down"
     default GPIO_E6_PULL_NONE
     help
@@ -11853,7 +11853,7 @@ config GPIO_E6_PULL
     default 0x00000001 if GPIO_E6_PULL_UP
     default 0x00000002 if GPIO_E6_PULL_DOWN
 
-choice
+choice GPIO_E6_SPEED_CHOICE
     prompt "PE6 Speed"
     default GPIO_E6_SPEED_MEDIUM
     help
@@ -11914,7 +11914,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN7
 
 if INSTANCE_STM32_GPIOE_PIN7
 
-choice
+choice GPIO_E7_RW_MODE_CHOICE
     prompt "PE7 Read/Write Mode"
     default GPIO_E7_RW_MODE_WRITE
     help
@@ -11943,7 +11943,7 @@ config GPIO_E7_RW_MODE
     default 1 if GPIO_E7_RW_MODE_WRITE
     default 2 if GPIO_E7_RW_MODE_READWRITE
 
-choice
+choice GPIO_E7_MODE_CHOICE
     prompt "PE7 GPIO Mode"
     default GPIO_E7_MODE_OUTPUT_PP if GPIO_E7_RW_MODE_WRITE
     default GPIO_E7_MODE_INPUT if GPIO_E7_RW_MODE_READ
@@ -11991,7 +11991,7 @@ config GPIO_E7_MODE
     default 0x00000012 if GPIO_E7_MODE_AF_OD
     default 0x00000003 if GPIO_E7_MODE_ANALOG
 
-choice
+choice GPIO_E7_PULL_CHOICE
     prompt "PE7 Pull-up/Pull-down"
     default GPIO_E7_PULL_NONE
     help
@@ -12020,7 +12020,7 @@ config GPIO_E7_PULL
     default 0x00000001 if GPIO_E7_PULL_UP
     default 0x00000002 if GPIO_E7_PULL_DOWN
 
-choice
+choice GPIO_E7_SPEED_CHOICE
     prompt "PE7 Speed"
     default GPIO_E7_SPEED_MEDIUM
     help
@@ -12081,7 +12081,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN8
 
 if INSTANCE_STM32_GPIOE_PIN8
 
-choice
+choice GPIO_E8_RW_MODE_CHOICE
     prompt "PE8 Read/Write Mode"
     default GPIO_E8_RW_MODE_WRITE
     help
@@ -12110,7 +12110,7 @@ config GPIO_E8_RW_MODE
     default 1 if GPIO_E8_RW_MODE_WRITE
     default 2 if GPIO_E8_RW_MODE_READWRITE
 
-choice
+choice GPIO_E8_MODE_CHOICE
     prompt "PE8 GPIO Mode"
     default GPIO_E8_MODE_OUTPUT_PP if GPIO_E8_RW_MODE_WRITE
     default GPIO_E8_MODE_INPUT if GPIO_E8_RW_MODE_READ
@@ -12158,7 +12158,7 @@ config GPIO_E8_MODE
     default 0x00000012 if GPIO_E8_MODE_AF_OD
     default 0x00000003 if GPIO_E8_MODE_ANALOG
 
-choice
+choice GPIO_E8_PULL_CHOICE
     prompt "PE8 Pull-up/Pull-down"
     default GPIO_E8_PULL_NONE
     help
@@ -12187,7 +12187,7 @@ config GPIO_E8_PULL
     default 0x00000001 if GPIO_E8_PULL_UP
     default 0x00000002 if GPIO_E8_PULL_DOWN
 
-choice
+choice GPIO_E8_SPEED_CHOICE
     prompt "PE8 Speed"
     default GPIO_E8_SPEED_MEDIUM
     help
@@ -12248,7 +12248,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN9
 
 if INSTANCE_STM32_GPIOE_PIN9
 
-choice
+choice GPIO_E9_RW_MODE_CHOICE
     prompt "PE9 Read/Write Mode"
     default GPIO_E9_RW_MODE_WRITE
     help
@@ -12277,7 +12277,7 @@ config GPIO_E9_RW_MODE
     default 1 if GPIO_E9_RW_MODE_WRITE
     default 2 if GPIO_E9_RW_MODE_READWRITE
 
-choice
+choice GPIO_E9_MODE_CHOICE
     prompt "PE9 GPIO Mode"
     default GPIO_E9_MODE_OUTPUT_PP if GPIO_E9_RW_MODE_WRITE
     default GPIO_E9_MODE_INPUT if GPIO_E9_RW_MODE_READ
@@ -12325,7 +12325,7 @@ config GPIO_E9_MODE
     default 0x00000012 if GPIO_E9_MODE_AF_OD
     default 0x00000003 if GPIO_E9_MODE_ANALOG
 
-choice
+choice GPIO_E9_PULL_CHOICE
     prompt "PE9 Pull-up/Pull-down"
     default GPIO_E9_PULL_NONE
     help
@@ -12354,7 +12354,7 @@ config GPIO_E9_PULL
     default 0x00000001 if GPIO_E9_PULL_UP
     default 0x00000002 if GPIO_E9_PULL_DOWN
 
-choice
+choice GPIO_E9_SPEED_CHOICE
     prompt "PE9 Speed"
     default GPIO_E9_SPEED_MEDIUM
     help
@@ -12415,7 +12415,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN10
 
 if INSTANCE_STM32_GPIOE_PIN10
 
-choice
+choice GPIO_E10_RW_MODE_CHOICE
     prompt "PE10 Read/Write Mode"
     default GPIO_E10_RW_MODE_WRITE
     help
@@ -12444,7 +12444,7 @@ config GPIO_E10_RW_MODE
     default 1 if GPIO_E10_RW_MODE_WRITE
     default 2 if GPIO_E10_RW_MODE_READWRITE
 
-choice
+choice GPIO_E10_MODE_CHOICE
     prompt "PE10 GPIO Mode"
     default GPIO_E10_MODE_OUTPUT_PP if GPIO_E10_RW_MODE_WRITE
     default GPIO_E10_MODE_INPUT if GPIO_E10_RW_MODE_READ
@@ -12492,7 +12492,7 @@ config GPIO_E10_MODE
     default 0x00000012 if GPIO_E10_MODE_AF_OD
     default 0x00000003 if GPIO_E10_MODE_ANALOG
 
-choice
+choice GPIO_E10_PULL_CHOICE
     prompt "PE10 Pull-up/Pull-down"
     default GPIO_E10_PULL_NONE
     help
@@ -12521,7 +12521,7 @@ config GPIO_E10_PULL
     default 0x00000001 if GPIO_E10_PULL_UP
     default 0x00000002 if GPIO_E10_PULL_DOWN
 
-choice
+choice GPIO_E10_SPEED_CHOICE
     prompt "PE10 Speed"
     default GPIO_E10_SPEED_MEDIUM
     help
@@ -12582,7 +12582,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN11
 
 if INSTANCE_STM32_GPIOE_PIN11
 
-choice
+choice GPIO_E11_RW_MODE_CHOICE
     prompt "PE11 Read/Write Mode"
     default GPIO_E11_RW_MODE_WRITE
     help
@@ -12611,7 +12611,7 @@ config GPIO_E11_RW_MODE
     default 1 if GPIO_E11_RW_MODE_WRITE
     default 2 if GPIO_E11_RW_MODE_READWRITE
 
-choice
+choice GPIO_E11_MODE_CHOICE
     prompt "PE11 GPIO Mode"
     default GPIO_E11_MODE_OUTPUT_PP if GPIO_E11_RW_MODE_WRITE
     default GPIO_E11_MODE_INPUT if GPIO_E11_RW_MODE_READ
@@ -12659,7 +12659,7 @@ config GPIO_E11_MODE
     default 0x00000012 if GPIO_E11_MODE_AF_OD
     default 0x00000003 if GPIO_E11_MODE_ANALOG
 
-choice
+choice GPIO_E11_PULL_CHOICE
     prompt "PE11 Pull-up/Pull-down"
     default GPIO_E11_PULL_NONE
     help
@@ -12688,7 +12688,7 @@ config GPIO_E11_PULL
     default 0x00000001 if GPIO_E11_PULL_UP
     default 0x00000002 if GPIO_E11_PULL_DOWN
 
-choice
+choice GPIO_E11_SPEED_CHOICE
     prompt "PE11 Speed"
     default GPIO_E11_SPEED_MEDIUM
     help
@@ -12749,7 +12749,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN12
 
 if INSTANCE_STM32_GPIOE_PIN12
 
-choice
+choice GPIO_E12_RW_MODE_CHOICE
     prompt "PE12 Read/Write Mode"
     default GPIO_E12_RW_MODE_WRITE
     help
@@ -12778,7 +12778,7 @@ config GPIO_E12_RW_MODE
     default 1 if GPIO_E12_RW_MODE_WRITE
     default 2 if GPIO_E12_RW_MODE_READWRITE
 
-choice
+choice GPIO_E12_MODE_CHOICE
     prompt "PE12 GPIO Mode"
     default GPIO_E12_MODE_OUTPUT_PP if GPIO_E12_RW_MODE_WRITE
     default GPIO_E12_MODE_INPUT if GPIO_E12_RW_MODE_READ
@@ -12826,7 +12826,7 @@ config GPIO_E12_MODE
     default 0x00000012 if GPIO_E12_MODE_AF_OD
     default 0x00000003 if GPIO_E12_MODE_ANALOG
 
-choice
+choice GPIO_E12_PULL_CHOICE
     prompt "PE12 Pull-up/Pull-down"
     default GPIO_E12_PULL_NONE
     help
@@ -12855,7 +12855,7 @@ config GPIO_E12_PULL
     default 0x00000001 if GPIO_E12_PULL_UP
     default 0x00000002 if GPIO_E12_PULL_DOWN
 
-choice
+choice GPIO_E12_SPEED_CHOICE
     prompt "PE12 Speed"
     default GPIO_E12_SPEED_MEDIUM
     help
@@ -12916,7 +12916,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN13
 
 if INSTANCE_STM32_GPIOE_PIN13
 
-choice
+choice GPIO_E13_RW_MODE_CHOICE
     prompt "PE13 Read/Write Mode"
     default GPIO_E13_RW_MODE_WRITE
     help
@@ -12945,7 +12945,7 @@ config GPIO_E13_RW_MODE
     default 1 if GPIO_E13_RW_MODE_WRITE
     default 2 if GPIO_E13_RW_MODE_READWRITE
 
-choice
+choice GPIO_E13_MODE_CHOICE
     prompt "PE13 GPIO Mode"
     default GPIO_E13_MODE_OUTPUT_PP if GPIO_E13_RW_MODE_WRITE
     default GPIO_E13_MODE_INPUT if GPIO_E13_RW_MODE_READ
@@ -12993,7 +12993,7 @@ config GPIO_E13_MODE
     default 0x00000012 if GPIO_E13_MODE_AF_OD
     default 0x00000003 if GPIO_E13_MODE_ANALOG
 
-choice
+choice GPIO_E13_PULL_CHOICE
     prompt "PE13 Pull-up/Pull-down"
     default GPIO_E13_PULL_NONE
     help
@@ -13022,7 +13022,7 @@ config GPIO_E13_PULL
     default 0x00000001 if GPIO_E13_PULL_UP
     default 0x00000002 if GPIO_E13_PULL_DOWN
 
-choice
+choice GPIO_E13_SPEED_CHOICE
     prompt "PE13 Speed"
     default GPIO_E13_SPEED_MEDIUM
     help
@@ -13083,7 +13083,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN14
 
 if INSTANCE_STM32_GPIOE_PIN14
 
-choice
+choice GPIO_E14_RW_MODE_CHOICE
     prompt "PE14 Read/Write Mode"
     default GPIO_E14_RW_MODE_WRITE
     help
@@ -13112,7 +13112,7 @@ config GPIO_E14_RW_MODE
     default 1 if GPIO_E14_RW_MODE_WRITE
     default 2 if GPIO_E14_RW_MODE_READWRITE
 
-choice
+choice GPIO_E14_MODE_CHOICE
     prompt "PE14 GPIO Mode"
     default GPIO_E14_MODE_OUTPUT_PP if GPIO_E14_RW_MODE_WRITE
     default GPIO_E14_MODE_INPUT if GPIO_E14_RW_MODE_READ
@@ -13160,7 +13160,7 @@ config GPIO_E14_MODE
     default 0x00000012 if GPIO_E14_MODE_AF_OD
     default 0x00000003 if GPIO_E14_MODE_ANALOG
 
-choice
+choice GPIO_E14_PULL_CHOICE
     prompt "PE14 Pull-up/Pull-down"
     default GPIO_E14_PULL_NONE
     help
@@ -13189,7 +13189,7 @@ config GPIO_E14_PULL
     default 0x00000001 if GPIO_E14_PULL_UP
     default 0x00000002 if GPIO_E14_PULL_DOWN
 
-choice
+choice GPIO_E14_SPEED_CHOICE
     prompt "PE14 Speed"
     default GPIO_E14_SPEED_MEDIUM
     help
@@ -13250,7 +13250,7 @@ menuconfig INSTANCE_STM32_GPIOE_PIN15
 
 if INSTANCE_STM32_GPIOE_PIN15
 
-choice
+choice GPIO_E15_RW_MODE_CHOICE
     prompt "PE15 Read/Write Mode"
     default GPIO_E15_RW_MODE_WRITE
     help
@@ -13279,7 +13279,7 @@ config GPIO_E15_RW_MODE
     default 1 if GPIO_E15_RW_MODE_WRITE
     default 2 if GPIO_E15_RW_MODE_READWRITE
 
-choice
+choice GPIO_E15_MODE_CHOICE
     prompt "PE15 GPIO Mode"
     default GPIO_E15_MODE_OUTPUT_PP if GPIO_E15_RW_MODE_WRITE
     default GPIO_E15_MODE_INPUT if GPIO_E15_RW_MODE_READ
@@ -13327,7 +13327,7 @@ config GPIO_E15_MODE
     default 0x00000012 if GPIO_E15_MODE_AF_OD
     default 0x00000003 if GPIO_E15_MODE_ANALOG
 
-choice
+choice GPIO_E15_PULL_CHOICE
     prompt "PE15 Pull-up/Pull-down"
     default GPIO_E15_PULL_NONE
     help
@@ -13356,7 +13356,7 @@ config GPIO_E15_PULL
     default 0x00000001 if GPIO_E15_PULL_UP
     default 0x00000002 if GPIO_E15_PULL_DOWN
 
-choice
+choice GPIO_E15_SPEED_CHOICE
     prompt "PE15 Speed"
     default GPIO_E15_SPEED_MEDIUM
     help
@@ -13425,7 +13425,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN0
 
 if INSTANCE_STM32_GPIOF_PIN0
 
-choice
+choice GPIO_F0_RW_MODE_CHOICE
     prompt "PF0 Read/Write Mode"
     default GPIO_F0_RW_MODE_WRITE
     help
@@ -13454,7 +13454,7 @@ config GPIO_F0_RW_MODE
     default 1 if GPIO_F0_RW_MODE_WRITE
     default 2 if GPIO_F0_RW_MODE_READWRITE
 
-choice
+choice GPIO_F0_MODE_CHOICE
     prompt "PF0 GPIO Mode"
     default GPIO_F0_MODE_OUTPUT_PP if GPIO_F0_RW_MODE_WRITE
     default GPIO_F0_MODE_INPUT if GPIO_F0_RW_MODE_READ
@@ -13502,7 +13502,7 @@ config GPIO_F0_MODE
     default 0x00000012 if GPIO_F0_MODE_AF_OD
     default 0x00000003 if GPIO_F0_MODE_ANALOG
 
-choice
+choice GPIO_F0_PULL_CHOICE
     prompt "PF0 Pull-up/Pull-down"
     default GPIO_F0_PULL_NONE
     help
@@ -13531,7 +13531,7 @@ config GPIO_F0_PULL
     default 0x00000001 if GPIO_F0_PULL_UP
     default 0x00000002 if GPIO_F0_PULL_DOWN
 
-choice
+choice GPIO_F0_SPEED_CHOICE
     prompt "PF0 Speed"
     default GPIO_F0_SPEED_MEDIUM
     help
@@ -13592,7 +13592,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN1
 
 if INSTANCE_STM32_GPIOF_PIN1
 
-choice
+choice GPIO_F1_RW_MODE_CHOICE
     prompt "PF1 Read/Write Mode"
     default GPIO_F1_RW_MODE_WRITE
     help
@@ -13621,7 +13621,7 @@ config GPIO_F1_RW_MODE
     default 1 if GPIO_F1_RW_MODE_WRITE
     default 2 if GPIO_F1_RW_MODE_READWRITE
 
-choice
+choice GPIO_F1_MODE_CHOICE
     prompt "PF1 GPIO Mode"
     default GPIO_F1_MODE_OUTPUT_PP if GPIO_F1_RW_MODE_WRITE
     default GPIO_F1_MODE_INPUT if GPIO_F1_RW_MODE_READ
@@ -13669,7 +13669,7 @@ config GPIO_F1_MODE
     default 0x00000012 if GPIO_F1_MODE_AF_OD
     default 0x00000003 if GPIO_F1_MODE_ANALOG
 
-choice
+choice GPIO_F1_PULL_CHOICE
     prompt "PF1 Pull-up/Pull-down"
     default GPIO_F1_PULL_NONE
     help
@@ -13698,7 +13698,7 @@ config GPIO_F1_PULL
     default 0x00000001 if GPIO_F1_PULL_UP
     default 0x00000002 if GPIO_F1_PULL_DOWN
 
-choice
+choice GPIO_F1_SPEED_CHOICE
     prompt "PF1 Speed"
     default GPIO_F1_SPEED_MEDIUM
     help
@@ -13759,7 +13759,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN2
 
 if INSTANCE_STM32_GPIOF_PIN2
 
-choice
+choice GPIO_F2_RW_MODE_CHOICE
     prompt "PF2 Read/Write Mode"
     default GPIO_F2_RW_MODE_WRITE
     help
@@ -13788,7 +13788,7 @@ config GPIO_F2_RW_MODE
     default 1 if GPIO_F2_RW_MODE_WRITE
     default 2 if GPIO_F2_RW_MODE_READWRITE
 
-choice
+choice GPIO_F2_MODE_CHOICE
     prompt "PF2 GPIO Mode"
     default GPIO_F2_MODE_OUTPUT_PP if GPIO_F2_RW_MODE_WRITE
     default GPIO_F2_MODE_INPUT if GPIO_F2_RW_MODE_READ
@@ -13836,7 +13836,7 @@ config GPIO_F2_MODE
     default 0x00000012 if GPIO_F2_MODE_AF_OD
     default 0x00000003 if GPIO_F2_MODE_ANALOG
 
-choice
+choice GPIO_F2_PULL_CHOICE
     prompt "PF2 Pull-up/Pull-down"
     default GPIO_F2_PULL_NONE
     help
@@ -13865,7 +13865,7 @@ config GPIO_F2_PULL
     default 0x00000001 if GPIO_F2_PULL_UP
     default 0x00000002 if GPIO_F2_PULL_DOWN
 
-choice
+choice GPIO_F2_SPEED_CHOICE
     prompt "PF2 Speed"
     default GPIO_F2_SPEED_MEDIUM
     help
@@ -13926,7 +13926,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN3
 
 if INSTANCE_STM32_GPIOF_PIN3
 
-choice
+choice GPIO_F3_RW_MODE_CHOICE
     prompt "PF3 Read/Write Mode"
     default GPIO_F3_RW_MODE_WRITE
     help
@@ -13955,7 +13955,7 @@ config GPIO_F3_RW_MODE
     default 1 if GPIO_F3_RW_MODE_WRITE
     default 2 if GPIO_F3_RW_MODE_READWRITE
 
-choice
+choice GPIO_F3_MODE_CHOICE
     prompt "PF3 GPIO Mode"
     default GPIO_F3_MODE_OUTPUT_PP if GPIO_F3_RW_MODE_WRITE
     default GPIO_F3_MODE_INPUT if GPIO_F3_RW_MODE_READ
@@ -14003,7 +14003,7 @@ config GPIO_F3_MODE
     default 0x00000012 if GPIO_F3_MODE_AF_OD
     default 0x00000003 if GPIO_F3_MODE_ANALOG
 
-choice
+choice GPIO_F3_PULL_CHOICE
     prompt "PF3 Pull-up/Pull-down"
     default GPIO_F3_PULL_NONE
     help
@@ -14032,7 +14032,7 @@ config GPIO_F3_PULL
     default 0x00000001 if GPIO_F3_PULL_UP
     default 0x00000002 if GPIO_F3_PULL_DOWN
 
-choice
+choice GPIO_F3_SPEED_CHOICE
     prompt "PF3 Speed"
     default GPIO_F3_SPEED_MEDIUM
     help
@@ -14093,7 +14093,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN4
 
 if INSTANCE_STM32_GPIOF_PIN4
 
-choice
+choice GPIO_F4_RW_MODE_CHOICE
     prompt "PF4 Read/Write Mode"
     default GPIO_F4_RW_MODE_WRITE
     help
@@ -14122,7 +14122,7 @@ config GPIO_F4_RW_MODE
     default 1 if GPIO_F4_RW_MODE_WRITE
     default 2 if GPIO_F4_RW_MODE_READWRITE
 
-choice
+choice GPIO_F4_MODE_CHOICE
     prompt "PF4 GPIO Mode"
     default GPIO_F4_MODE_OUTPUT_PP if GPIO_F4_RW_MODE_WRITE
     default GPIO_F4_MODE_INPUT if GPIO_F4_RW_MODE_READ
@@ -14170,7 +14170,7 @@ config GPIO_F4_MODE
     default 0x00000012 if GPIO_F4_MODE_AF_OD
     default 0x00000003 if GPIO_F4_MODE_ANALOG
 
-choice
+choice GPIO_F4_PULL_CHOICE
     prompt "PF4 Pull-up/Pull-down"
     default GPIO_F4_PULL_NONE
     help
@@ -14199,7 +14199,7 @@ config GPIO_F4_PULL
     default 0x00000001 if GPIO_F4_PULL_UP
     default 0x00000002 if GPIO_F4_PULL_DOWN
 
-choice
+choice GPIO_F4_SPEED_CHOICE
     prompt "PF4 Speed"
     default GPIO_F4_SPEED_MEDIUM
     help
@@ -14260,7 +14260,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN5
 
 if INSTANCE_STM32_GPIOF_PIN5
 
-choice
+choice GPIO_F5_RW_MODE_CHOICE
     prompt "PF5 Read/Write Mode"
     default GPIO_F5_RW_MODE_WRITE
     help
@@ -14289,7 +14289,7 @@ config GPIO_F5_RW_MODE
     default 1 if GPIO_F5_RW_MODE_WRITE
     default 2 if GPIO_F5_RW_MODE_READWRITE
 
-choice
+choice GPIO_F5_MODE_CHOICE
     prompt "PF5 GPIO Mode"
     default GPIO_F5_MODE_OUTPUT_PP if GPIO_F5_RW_MODE_WRITE
     default GPIO_F5_MODE_INPUT if GPIO_F5_RW_MODE_READ
@@ -14337,7 +14337,7 @@ config GPIO_F5_MODE
     default 0x00000012 if GPIO_F5_MODE_AF_OD
     default 0x00000003 if GPIO_F5_MODE_ANALOG
 
-choice
+choice GPIO_F5_PULL_CHOICE
     prompt "PF5 Pull-up/Pull-down"
     default GPIO_F5_PULL_NONE
     help
@@ -14366,7 +14366,7 @@ config GPIO_F5_PULL
     default 0x00000001 if GPIO_F5_PULL_UP
     default 0x00000002 if GPIO_F5_PULL_DOWN
 
-choice
+choice GPIO_F5_SPEED_CHOICE
     prompt "PF5 Speed"
     default GPIO_F5_SPEED_MEDIUM
     help
@@ -14427,7 +14427,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN6
 
 if INSTANCE_STM32_GPIOF_PIN6
 
-choice
+choice GPIO_F6_RW_MODE_CHOICE
     prompt "PF6 Read/Write Mode"
     default GPIO_F6_RW_MODE_WRITE
     help
@@ -14456,7 +14456,7 @@ config GPIO_F6_RW_MODE
     default 1 if GPIO_F6_RW_MODE_WRITE
     default 2 if GPIO_F6_RW_MODE_READWRITE
 
-choice
+choice GPIO_F6_MODE_CHOICE
     prompt "PF6 GPIO Mode"
     default GPIO_F6_MODE_OUTPUT_PP if GPIO_F6_RW_MODE_WRITE
     default GPIO_F6_MODE_INPUT if GPIO_F6_RW_MODE_READ
@@ -14504,7 +14504,7 @@ config GPIO_F6_MODE
     default 0x00000012 if GPIO_F6_MODE_AF_OD
     default 0x00000003 if GPIO_F6_MODE_ANALOG
 
-choice
+choice GPIO_F6_PULL_CHOICE
     prompt "PF6 Pull-up/Pull-down"
     default GPIO_F6_PULL_NONE
     help
@@ -14533,7 +14533,7 @@ config GPIO_F6_PULL
     default 0x00000001 if GPIO_F6_PULL_UP
     default 0x00000002 if GPIO_F6_PULL_DOWN
 
-choice
+choice GPIO_F6_SPEED_CHOICE
     prompt "PF6 Speed"
     default GPIO_F6_SPEED_MEDIUM
     help
@@ -14594,7 +14594,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN7
 
 if INSTANCE_STM32_GPIOF_PIN7
 
-choice
+choice GPIO_F7_RW_MODE_CHOICE
     prompt "PF7 Read/Write Mode"
     default GPIO_F7_RW_MODE_WRITE
     help
@@ -14623,7 +14623,7 @@ config GPIO_F7_RW_MODE
     default 1 if GPIO_F7_RW_MODE_WRITE
     default 2 if GPIO_F7_RW_MODE_READWRITE
 
-choice
+choice GPIO_F7_MODE_CHOICE
     prompt "PF7 GPIO Mode"
     default GPIO_F7_MODE_OUTPUT_PP if GPIO_F7_RW_MODE_WRITE
     default GPIO_F7_MODE_INPUT if GPIO_F7_RW_MODE_READ
@@ -14671,7 +14671,7 @@ config GPIO_F7_MODE
     default 0x00000012 if GPIO_F7_MODE_AF_OD
     default 0x00000003 if GPIO_F7_MODE_ANALOG
 
-choice
+choice GPIO_F7_PULL_CHOICE
     prompt "PF7 Pull-up/Pull-down"
     default GPIO_F7_PULL_NONE
     help
@@ -14700,7 +14700,7 @@ config GPIO_F7_PULL
     default 0x00000001 if GPIO_F7_PULL_UP
     default 0x00000002 if GPIO_F7_PULL_DOWN
 
-choice
+choice GPIO_F7_SPEED_CHOICE
     prompt "PF7 Speed"
     default GPIO_F7_SPEED_MEDIUM
     help
@@ -14761,7 +14761,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN8
 
 if INSTANCE_STM32_GPIOF_PIN8
 
-choice
+choice GPIO_F8_RW_MODE_CHOICE
     prompt "PF8 Read/Write Mode"
     default GPIO_F8_RW_MODE_WRITE
     help
@@ -14790,7 +14790,7 @@ config GPIO_F8_RW_MODE
     default 1 if GPIO_F8_RW_MODE_WRITE
     default 2 if GPIO_F8_RW_MODE_READWRITE
 
-choice
+choice GPIO_F8_MODE_CHOICE
     prompt "PF8 GPIO Mode"
     default GPIO_F8_MODE_OUTPUT_PP if GPIO_F8_RW_MODE_WRITE
     default GPIO_F8_MODE_INPUT if GPIO_F8_RW_MODE_READ
@@ -14838,7 +14838,7 @@ config GPIO_F8_MODE
     default 0x00000012 if GPIO_F8_MODE_AF_OD
     default 0x00000003 if GPIO_F8_MODE_ANALOG
 
-choice
+choice GPIO_F8_PULL_CHOICE
     prompt "PF8 Pull-up/Pull-down"
     default GPIO_F8_PULL_NONE
     help
@@ -14867,7 +14867,7 @@ config GPIO_F8_PULL
     default 0x00000001 if GPIO_F8_PULL_UP
     default 0x00000002 if GPIO_F8_PULL_DOWN
 
-choice
+choice GPIO_F8_SPEED_CHOICE
     prompt "PF8 Speed"
     default GPIO_F8_SPEED_MEDIUM
     help
@@ -14928,7 +14928,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN9
 
 if INSTANCE_STM32_GPIOF_PIN9
 
-choice
+choice GPIO_F9_RW_MODE_CHOICE
     prompt "PF9 Read/Write Mode"
     default GPIO_F9_RW_MODE_WRITE
     help
@@ -14957,7 +14957,7 @@ config GPIO_F9_RW_MODE
     default 1 if GPIO_F9_RW_MODE_WRITE
     default 2 if GPIO_F9_RW_MODE_READWRITE
 
-choice
+choice GPIO_F9_MODE_CHOICE
     prompt "PF9 GPIO Mode"
     default GPIO_F9_MODE_OUTPUT_PP if GPIO_F9_RW_MODE_WRITE
     default GPIO_F9_MODE_INPUT if GPIO_F9_RW_MODE_READ
@@ -15005,7 +15005,7 @@ config GPIO_F9_MODE
     default 0x00000012 if GPIO_F9_MODE_AF_OD
     default 0x00000003 if GPIO_F9_MODE_ANALOG
 
-choice
+choice GPIO_F9_PULL_CHOICE
     prompt "PF9 Pull-up/Pull-down"
     default GPIO_F9_PULL_NONE
     help
@@ -15034,7 +15034,7 @@ config GPIO_F9_PULL
     default 0x00000001 if GPIO_F9_PULL_UP
     default 0x00000002 if GPIO_F9_PULL_DOWN
 
-choice
+choice GPIO_F9_SPEED_CHOICE
     prompt "PF9 Speed"
     default GPIO_F9_SPEED_MEDIUM
     help
@@ -15095,7 +15095,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN10
 
 if INSTANCE_STM32_GPIOF_PIN10
 
-choice
+choice GPIO_F10_RW_MODE_CHOICE
     prompt "PF10 Read/Write Mode"
     default GPIO_F10_RW_MODE_WRITE
     help
@@ -15124,7 +15124,7 @@ config GPIO_F10_RW_MODE
     default 1 if GPIO_F10_RW_MODE_WRITE
     default 2 if GPIO_F10_RW_MODE_READWRITE
 
-choice
+choice GPIO_F10_MODE_CHOICE
     prompt "PF10 GPIO Mode"
     default GPIO_F10_MODE_OUTPUT_PP if GPIO_F10_RW_MODE_WRITE
     default GPIO_F10_MODE_INPUT if GPIO_F10_RW_MODE_READ
@@ -15172,7 +15172,7 @@ config GPIO_F10_MODE
     default 0x00000012 if GPIO_F10_MODE_AF_OD
     default 0x00000003 if GPIO_F10_MODE_ANALOG
 
-choice
+choice GPIO_F10_PULL_CHOICE
     prompt "PF10 Pull-up/Pull-down"
     default GPIO_F10_PULL_NONE
     help
@@ -15201,7 +15201,7 @@ config GPIO_F10_PULL
     default 0x00000001 if GPIO_F10_PULL_UP
     default 0x00000002 if GPIO_F10_PULL_DOWN
 
-choice
+choice GPIO_F10_SPEED_CHOICE
     prompt "PF10 Speed"
     default GPIO_F10_SPEED_MEDIUM
     help
@@ -15262,7 +15262,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN11
 
 if INSTANCE_STM32_GPIOF_PIN11
 
-choice
+choice GPIO_F11_RW_MODE_CHOICE
     prompt "PF11 Read/Write Mode"
     default GPIO_F11_RW_MODE_WRITE
     help
@@ -15291,7 +15291,7 @@ config GPIO_F11_RW_MODE
     default 1 if GPIO_F11_RW_MODE_WRITE
     default 2 if GPIO_F11_RW_MODE_READWRITE
 
-choice
+choice GPIO_F11_MODE_CHOICE
     prompt "PF11 GPIO Mode"
     default GPIO_F11_MODE_OUTPUT_PP if GPIO_F11_RW_MODE_WRITE
     default GPIO_F11_MODE_INPUT if GPIO_F11_RW_MODE_READ
@@ -15339,7 +15339,7 @@ config GPIO_F11_MODE
     default 0x00000012 if GPIO_F11_MODE_AF_OD
     default 0x00000003 if GPIO_F11_MODE_ANALOG
 
-choice
+choice GPIO_F11_PULL_CHOICE
     prompt "PF11 Pull-up/Pull-down"
     default GPIO_F11_PULL_NONE
     help
@@ -15368,7 +15368,7 @@ config GPIO_F11_PULL
     default 0x00000001 if GPIO_F11_PULL_UP
     default 0x00000002 if GPIO_F11_PULL_DOWN
 
-choice
+choice GPIO_F11_SPEED_CHOICE
     prompt "PF11 Speed"
     default GPIO_F11_SPEED_MEDIUM
     help
@@ -15429,7 +15429,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN12
 
 if INSTANCE_STM32_GPIOF_PIN12
 
-choice
+choice GPIO_F12_RW_MODE_CHOICE
     prompt "PF12 Read/Write Mode"
     default GPIO_F12_RW_MODE_WRITE
     help
@@ -15458,7 +15458,7 @@ config GPIO_F12_RW_MODE
     default 1 if GPIO_F12_RW_MODE_WRITE
     default 2 if GPIO_F12_RW_MODE_READWRITE
 
-choice
+choice GPIO_F12_MODE_CHOICE
     prompt "PF12 GPIO Mode"
     default GPIO_F12_MODE_OUTPUT_PP if GPIO_F12_RW_MODE_WRITE
     default GPIO_F12_MODE_INPUT if GPIO_F12_RW_MODE_READ
@@ -15506,7 +15506,7 @@ config GPIO_F12_MODE
     default 0x00000012 if GPIO_F12_MODE_AF_OD
     default 0x00000003 if GPIO_F12_MODE_ANALOG
 
-choice
+choice GPIO_F12_PULL_CHOICE
     prompt "PF12 Pull-up/Pull-down"
     default GPIO_F12_PULL_NONE
     help
@@ -15535,7 +15535,7 @@ config GPIO_F12_PULL
     default 0x00000001 if GPIO_F12_PULL_UP
     default 0x00000002 if GPIO_F12_PULL_DOWN
 
-choice
+choice GPIO_F12_SPEED_CHOICE
     prompt "PF12 Speed"
     default GPIO_F12_SPEED_MEDIUM
     help
@@ -15596,7 +15596,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN13
 
 if INSTANCE_STM32_GPIOF_PIN13
 
-choice
+choice GPIO_F13_RW_MODE_CHOICE
     prompt "PF13 Read/Write Mode"
     default GPIO_F13_RW_MODE_WRITE
     help
@@ -15625,7 +15625,7 @@ config GPIO_F13_RW_MODE
     default 1 if GPIO_F13_RW_MODE_WRITE
     default 2 if GPIO_F13_RW_MODE_READWRITE
 
-choice
+choice GPIO_F13_MODE_CHOICE
     prompt "PF13 GPIO Mode"
     default GPIO_F13_MODE_OUTPUT_PP if GPIO_F13_RW_MODE_WRITE
     default GPIO_F13_MODE_INPUT if GPIO_F13_RW_MODE_READ
@@ -15673,7 +15673,7 @@ config GPIO_F13_MODE
     default 0x00000012 if GPIO_F13_MODE_AF_OD
     default 0x00000003 if GPIO_F13_MODE_ANALOG
 
-choice
+choice GPIO_F13_PULL_CHOICE
     prompt "PF13 Pull-up/Pull-down"
     default GPIO_F13_PULL_NONE
     help
@@ -15702,7 +15702,7 @@ config GPIO_F13_PULL
     default 0x00000001 if GPIO_F13_PULL_UP
     default 0x00000002 if GPIO_F13_PULL_DOWN
 
-choice
+choice GPIO_F13_SPEED_CHOICE
     prompt "PF13 Speed"
     default GPIO_F13_SPEED_MEDIUM
     help
@@ -15763,7 +15763,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN14
 
 if INSTANCE_STM32_GPIOF_PIN14
 
-choice
+choice GPIO_F14_RW_MODE_CHOICE
     prompt "PF14 Read/Write Mode"
     default GPIO_F14_RW_MODE_WRITE
     help
@@ -15792,7 +15792,7 @@ config GPIO_F14_RW_MODE
     default 1 if GPIO_F14_RW_MODE_WRITE
     default 2 if GPIO_F14_RW_MODE_READWRITE
 
-choice
+choice GPIO_F14_MODE_CHOICE
     prompt "PF14 GPIO Mode"
     default GPIO_F14_MODE_OUTPUT_PP if GPIO_F14_RW_MODE_WRITE
     default GPIO_F14_MODE_INPUT if GPIO_F14_RW_MODE_READ
@@ -15840,7 +15840,7 @@ config GPIO_F14_MODE
     default 0x00000012 if GPIO_F14_MODE_AF_OD
     default 0x00000003 if GPIO_F14_MODE_ANALOG
 
-choice
+choice GPIO_F14_PULL_CHOICE
     prompt "PF14 Pull-up/Pull-down"
     default GPIO_F14_PULL_NONE
     help
@@ -15869,7 +15869,7 @@ config GPIO_F14_PULL
     default 0x00000001 if GPIO_F14_PULL_UP
     default 0x00000002 if GPIO_F14_PULL_DOWN
 
-choice
+choice GPIO_F14_SPEED_CHOICE
     prompt "PF14 Speed"
     default GPIO_F14_SPEED_MEDIUM
     help
@@ -15930,7 +15930,7 @@ menuconfig INSTANCE_STM32_GPIOF_PIN15
 
 if INSTANCE_STM32_GPIOF_PIN15
 
-choice
+choice GPIO_F15_RW_MODE_CHOICE
     prompt "PF15 Read/Write Mode"
     default GPIO_F15_RW_MODE_WRITE
     help
@@ -15959,7 +15959,7 @@ config GPIO_F15_RW_MODE
     default 1 if GPIO_F15_RW_MODE_WRITE
     default 2 if GPIO_F15_RW_MODE_READWRITE
 
-choice
+choice GPIO_F15_MODE_CHOICE
     prompt "PF15 GPIO Mode"
     default GPIO_F15_MODE_OUTPUT_PP if GPIO_F15_RW_MODE_WRITE
     default GPIO_F15_MODE_INPUT if GPIO_F15_RW_MODE_READ
@@ -16007,7 +16007,7 @@ config GPIO_F15_MODE
     default 0x00000012 if GPIO_F15_MODE_AF_OD
     default 0x00000003 if GPIO_F15_MODE_ANALOG
 
-choice
+choice GPIO_F15_PULL_CHOICE
     prompt "PF15 Pull-up/Pull-down"
     default GPIO_F15_PULL_NONE
     help
@@ -16036,7 +16036,7 @@ config GPIO_F15_PULL
     default 0x00000001 if GPIO_F15_PULL_UP
     default 0x00000002 if GPIO_F15_PULL_DOWN
 
-choice
+choice GPIO_F15_SPEED_CHOICE
     prompt "PF15 Speed"
     default GPIO_F15_SPEED_MEDIUM
     help
@@ -16105,7 +16105,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN0
 
 if INSTANCE_STM32_GPIOG_PIN0
 
-choice
+choice GPIO_G0_RW_MODE_CHOICE
     prompt "PG0 Read/Write Mode"
     default GPIO_G0_RW_MODE_WRITE
     help
@@ -16134,7 +16134,7 @@ config GPIO_G0_RW_MODE
     default 1 if GPIO_G0_RW_MODE_WRITE
     default 2 if GPIO_G0_RW_MODE_READWRITE
 
-choice
+choice GPIO_G0_MODE_CHOICE
     prompt "PG0 GPIO Mode"
     default GPIO_G0_MODE_OUTPUT_PP if GPIO_G0_RW_MODE_WRITE
     default GPIO_G0_MODE_INPUT if GPIO_G0_RW_MODE_READ
@@ -16182,7 +16182,7 @@ config GPIO_G0_MODE
     default 0x00000012 if GPIO_G0_MODE_AF_OD
     default 0x00000003 if GPIO_G0_MODE_ANALOG
 
-choice
+choice GPIO_G0_PULL_CHOICE
     prompt "PG0 Pull-up/Pull-down"
     default GPIO_G0_PULL_NONE
     help
@@ -16211,7 +16211,7 @@ config GPIO_G0_PULL
     default 0x00000001 if GPIO_G0_PULL_UP
     default 0x00000002 if GPIO_G0_PULL_DOWN
 
-choice
+choice GPIO_G0_SPEED_CHOICE
     prompt "PG0 Speed"
     default GPIO_G0_SPEED_MEDIUM
     help
@@ -16272,7 +16272,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN1
 
 if INSTANCE_STM32_GPIOG_PIN1
 
-choice
+choice GPIO_G1_RW_MODE_CHOICE
     prompt "PG1 Read/Write Mode"
     default GPIO_G1_RW_MODE_WRITE
     help
@@ -16301,7 +16301,7 @@ config GPIO_G1_RW_MODE
     default 1 if GPIO_G1_RW_MODE_WRITE
     default 2 if GPIO_G1_RW_MODE_READWRITE
 
-choice
+choice GPIO_G1_MODE_CHOICE
     prompt "PG1 GPIO Mode"
     default GPIO_G1_MODE_OUTPUT_PP if GPIO_G1_RW_MODE_WRITE
     default GPIO_G1_MODE_INPUT if GPIO_G1_RW_MODE_READ
@@ -16349,7 +16349,7 @@ config GPIO_G1_MODE
     default 0x00000012 if GPIO_G1_MODE_AF_OD
     default 0x00000003 if GPIO_G1_MODE_ANALOG
 
-choice
+choice GPIO_G1_PULL_CHOICE
     prompt "PG1 Pull-up/Pull-down"
     default GPIO_G1_PULL_NONE
     help
@@ -16378,7 +16378,7 @@ config GPIO_G1_PULL
     default 0x00000001 if GPIO_G1_PULL_UP
     default 0x00000002 if GPIO_G1_PULL_DOWN
 
-choice
+choice GPIO_G1_SPEED_CHOICE
     prompt "PG1 Speed"
     default GPIO_G1_SPEED_MEDIUM
     help
@@ -16439,7 +16439,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN2
 
 if INSTANCE_STM32_GPIOG_PIN2
 
-choice
+choice GPIO_G2_RW_MODE_CHOICE
     prompt "PG2 Read/Write Mode"
     default GPIO_G2_RW_MODE_WRITE
     help
@@ -16468,7 +16468,7 @@ config GPIO_G2_RW_MODE
     default 1 if GPIO_G2_RW_MODE_WRITE
     default 2 if GPIO_G2_RW_MODE_READWRITE
 
-choice
+choice GPIO_G2_MODE_CHOICE
     prompt "PG2 GPIO Mode"
     default GPIO_G2_MODE_OUTPUT_PP if GPIO_G2_RW_MODE_WRITE
     default GPIO_G2_MODE_INPUT if GPIO_G2_RW_MODE_READ
@@ -16516,7 +16516,7 @@ config GPIO_G2_MODE
     default 0x00000012 if GPIO_G2_MODE_AF_OD
     default 0x00000003 if GPIO_G2_MODE_ANALOG
 
-choice
+choice GPIO_G2_PULL_CHOICE
     prompt "PG2 Pull-up/Pull-down"
     default GPIO_G2_PULL_NONE
     help
@@ -16545,7 +16545,7 @@ config GPIO_G2_PULL
     default 0x00000001 if GPIO_G2_PULL_UP
     default 0x00000002 if GPIO_G2_PULL_DOWN
 
-choice
+choice GPIO_G2_SPEED_CHOICE
     prompt "PG2 Speed"
     default GPIO_G2_SPEED_MEDIUM
     help
@@ -16606,7 +16606,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN3
 
 if INSTANCE_STM32_GPIOG_PIN3
 
-choice
+choice GPIO_G3_RW_MODE_CHOICE
     prompt "PG3 Read/Write Mode"
     default GPIO_G3_RW_MODE_WRITE
     help
@@ -16635,7 +16635,7 @@ config GPIO_G3_RW_MODE
     default 1 if GPIO_G3_RW_MODE_WRITE
     default 2 if GPIO_G3_RW_MODE_READWRITE
 
-choice
+choice GPIO_G3_MODE_CHOICE
     prompt "PG3 GPIO Mode"
     default GPIO_G3_MODE_OUTPUT_PP if GPIO_G3_RW_MODE_WRITE
     default GPIO_G3_MODE_INPUT if GPIO_G3_RW_MODE_READ
@@ -16683,7 +16683,7 @@ config GPIO_G3_MODE
     default 0x00000012 if GPIO_G3_MODE_AF_OD
     default 0x00000003 if GPIO_G3_MODE_ANALOG
 
-choice
+choice GPIO_G3_PULL_CHOICE
     prompt "PG3 Pull-up/Pull-down"
     default GPIO_G3_PULL_NONE
     help
@@ -16712,7 +16712,7 @@ config GPIO_G3_PULL
     default 0x00000001 if GPIO_G3_PULL_UP
     default 0x00000002 if GPIO_G3_PULL_DOWN
 
-choice
+choice GPIO_G3_SPEED_CHOICE
     prompt "PG3 Speed"
     default GPIO_G3_SPEED_MEDIUM
     help
@@ -16773,7 +16773,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN4
 
 if INSTANCE_STM32_GPIOG_PIN4
 
-choice
+choice GPIO_G4_RW_MODE_CHOICE
     prompt "PG4 Read/Write Mode"
     default GPIO_G4_RW_MODE_WRITE
     help
@@ -16802,7 +16802,7 @@ config GPIO_G4_RW_MODE
     default 1 if GPIO_G4_RW_MODE_WRITE
     default 2 if GPIO_G4_RW_MODE_READWRITE
 
-choice
+choice GPIO_G4_MODE_CHOICE
     prompt "PG4 GPIO Mode"
     default GPIO_G4_MODE_OUTPUT_PP if GPIO_G4_RW_MODE_WRITE
     default GPIO_G4_MODE_INPUT if GPIO_G4_RW_MODE_READ
@@ -16850,7 +16850,7 @@ config GPIO_G4_MODE
     default 0x00000012 if GPIO_G4_MODE_AF_OD
     default 0x00000003 if GPIO_G4_MODE_ANALOG
 
-choice
+choice GPIO_G4_PULL_CHOICE
     prompt "PG4 Pull-up/Pull-down"
     default GPIO_G4_PULL_NONE
     help
@@ -16879,7 +16879,7 @@ config GPIO_G4_PULL
     default 0x00000001 if GPIO_G4_PULL_UP
     default 0x00000002 if GPIO_G4_PULL_DOWN
 
-choice
+choice GPIO_G4_SPEED_CHOICE
     prompt "PG4 Speed"
     default GPIO_G4_SPEED_MEDIUM
     help
@@ -16940,7 +16940,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN5
 
 if INSTANCE_STM32_GPIOG_PIN5
 
-choice
+choice GPIO_G5_RW_MODE_CHOICE
     prompt "PG5 Read/Write Mode"
     default GPIO_G5_RW_MODE_WRITE
     help
@@ -16969,7 +16969,7 @@ config GPIO_G5_RW_MODE
     default 1 if GPIO_G5_RW_MODE_WRITE
     default 2 if GPIO_G5_RW_MODE_READWRITE
 
-choice
+choice GPIO_G5_MODE_CHOICE
     prompt "PG5 GPIO Mode"
     default GPIO_G5_MODE_OUTPUT_PP if GPIO_G5_RW_MODE_WRITE
     default GPIO_G5_MODE_INPUT if GPIO_G5_RW_MODE_READ
@@ -17017,7 +17017,7 @@ config GPIO_G5_MODE
     default 0x00000012 if GPIO_G5_MODE_AF_OD
     default 0x00000003 if GPIO_G5_MODE_ANALOG
 
-choice
+choice GPIO_G5_PULL_CHOICE
     prompt "PG5 Pull-up/Pull-down"
     default GPIO_G5_PULL_NONE
     help
@@ -17046,7 +17046,7 @@ config GPIO_G5_PULL
     default 0x00000001 if GPIO_G5_PULL_UP
     default 0x00000002 if GPIO_G5_PULL_DOWN
 
-choice
+choice GPIO_G5_SPEED_CHOICE
     prompt "PG5 Speed"
     default GPIO_G5_SPEED_MEDIUM
     help
@@ -17107,7 +17107,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN6
 
 if INSTANCE_STM32_GPIOG_PIN6
 
-choice
+choice GPIO_G6_RW_MODE_CHOICE
     prompt "PG6 Read/Write Mode"
     default GPIO_G6_RW_MODE_WRITE
     help
@@ -17136,7 +17136,7 @@ config GPIO_G6_RW_MODE
     default 1 if GPIO_G6_RW_MODE_WRITE
     default 2 if GPIO_G6_RW_MODE_READWRITE
 
-choice
+choice GPIO_G6_MODE_CHOICE
     prompt "PG6 GPIO Mode"
     default GPIO_G6_MODE_OUTPUT_PP if GPIO_G6_RW_MODE_WRITE
     default GPIO_G6_MODE_INPUT if GPIO_G6_RW_MODE_READ
@@ -17184,7 +17184,7 @@ config GPIO_G6_MODE
     default 0x00000012 if GPIO_G6_MODE_AF_OD
     default 0x00000003 if GPIO_G6_MODE_ANALOG
 
-choice
+choice GPIO_G6_PULL_CHOICE
     prompt "PG6 Pull-up/Pull-down"
     default GPIO_G6_PULL_NONE
     help
@@ -17213,7 +17213,7 @@ config GPIO_G6_PULL
     default 0x00000001 if GPIO_G6_PULL_UP
     default 0x00000002 if GPIO_G6_PULL_DOWN
 
-choice
+choice GPIO_G6_SPEED_CHOICE
     prompt "PG6 Speed"
     default GPIO_G6_SPEED_MEDIUM
     help
@@ -17274,7 +17274,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN7
 
 if INSTANCE_STM32_GPIOG_PIN7
 
-choice
+choice GPIO_G7_RW_MODE_CHOICE
     prompt "PG7 Read/Write Mode"
     default GPIO_G7_RW_MODE_WRITE
     help
@@ -17303,7 +17303,7 @@ config GPIO_G7_RW_MODE
     default 1 if GPIO_G7_RW_MODE_WRITE
     default 2 if GPIO_G7_RW_MODE_READWRITE
 
-choice
+choice GPIO_G7_MODE_CHOICE
     prompt "PG7 GPIO Mode"
     default GPIO_G7_MODE_OUTPUT_PP if GPIO_G7_RW_MODE_WRITE
     default GPIO_G7_MODE_INPUT if GPIO_G7_RW_MODE_READ
@@ -17351,7 +17351,7 @@ config GPIO_G7_MODE
     default 0x00000012 if GPIO_G7_MODE_AF_OD
     default 0x00000003 if GPIO_G7_MODE_ANALOG
 
-choice
+choice GPIO_G7_PULL_CHOICE
     prompt "PG7 Pull-up/Pull-down"
     default GPIO_G7_PULL_NONE
     help
@@ -17380,7 +17380,7 @@ config GPIO_G7_PULL
     default 0x00000001 if GPIO_G7_PULL_UP
     default 0x00000002 if GPIO_G7_PULL_DOWN
 
-choice
+choice GPIO_G7_SPEED_CHOICE
     prompt "PG7 Speed"
     default GPIO_G7_SPEED_MEDIUM
     help
@@ -17441,7 +17441,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN8
 
 if INSTANCE_STM32_GPIOG_PIN8
 
-choice
+choice GPIO_G8_RW_MODE_CHOICE
     prompt "PG8 Read/Write Mode"
     default GPIO_G8_RW_MODE_WRITE
     help
@@ -17470,7 +17470,7 @@ config GPIO_G8_RW_MODE
     default 1 if GPIO_G8_RW_MODE_WRITE
     default 2 if GPIO_G8_RW_MODE_READWRITE
 
-choice
+choice GPIO_G8_MODE_CHOICE
     prompt "PG8 GPIO Mode"
     default GPIO_G8_MODE_OUTPUT_PP if GPIO_G8_RW_MODE_WRITE
     default GPIO_G8_MODE_INPUT if GPIO_G8_RW_MODE_READ
@@ -17518,7 +17518,7 @@ config GPIO_G8_MODE
     default 0x00000012 if GPIO_G8_MODE_AF_OD
     default 0x00000003 if GPIO_G8_MODE_ANALOG
 
-choice
+choice GPIO_G8_PULL_CHOICE
     prompt "PG8 Pull-up/Pull-down"
     default GPIO_G8_PULL_NONE
     help
@@ -17547,7 +17547,7 @@ config GPIO_G8_PULL
     default 0x00000001 if GPIO_G8_PULL_UP
     default 0x00000002 if GPIO_G8_PULL_DOWN
 
-choice
+choice GPIO_G8_SPEED_CHOICE
     prompt "PG8 Speed"
     default GPIO_G8_SPEED_MEDIUM
     help
@@ -17608,7 +17608,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN9
 
 if INSTANCE_STM32_GPIOG_PIN9
 
-choice
+choice GPIO_G9_RW_MODE_CHOICE
     prompt "PG9 Read/Write Mode"
     default GPIO_G9_RW_MODE_WRITE
     help
@@ -17637,7 +17637,7 @@ config GPIO_G9_RW_MODE
     default 1 if GPIO_G9_RW_MODE_WRITE
     default 2 if GPIO_G9_RW_MODE_READWRITE
 
-choice
+choice GPIO_G9_MODE_CHOICE
     prompt "PG9 GPIO Mode"
     default GPIO_G9_MODE_OUTPUT_PP if GPIO_G9_RW_MODE_WRITE
     default GPIO_G9_MODE_INPUT if GPIO_G9_RW_MODE_READ
@@ -17685,7 +17685,7 @@ config GPIO_G9_MODE
     default 0x00000012 if GPIO_G9_MODE_AF_OD
     default 0x00000003 if GPIO_G9_MODE_ANALOG
 
-choice
+choice GPIO_G9_PULL_CHOICE
     prompt "PG9 Pull-up/Pull-down"
     default GPIO_G9_PULL_NONE
     help
@@ -17714,7 +17714,7 @@ config GPIO_G9_PULL
     default 0x00000001 if GPIO_G9_PULL_UP
     default 0x00000002 if GPIO_G9_PULL_DOWN
 
-choice
+choice GPIO_G9_SPEED_CHOICE
     prompt "PG9 Speed"
     default GPIO_G9_SPEED_MEDIUM
     help
@@ -17775,7 +17775,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN10
 
 if INSTANCE_STM32_GPIOG_PIN10
 
-choice
+choice GPIO_G10_RW_MODE_CHOICE
     prompt "PG10 Read/Write Mode"
     default GPIO_G10_RW_MODE_WRITE
     help
@@ -17804,7 +17804,7 @@ config GPIO_G10_RW_MODE
     default 1 if GPIO_G10_RW_MODE_WRITE
     default 2 if GPIO_G10_RW_MODE_READWRITE
 
-choice
+choice GPIO_G10_MODE_CHOICE
     prompt "PG10 GPIO Mode"
     default GPIO_G10_MODE_OUTPUT_PP if GPIO_G10_RW_MODE_WRITE
     default GPIO_G10_MODE_INPUT if GPIO_G10_RW_MODE_READ
@@ -17852,7 +17852,7 @@ config GPIO_G10_MODE
     default 0x00000012 if GPIO_G10_MODE_AF_OD
     default 0x00000003 if GPIO_G10_MODE_ANALOG
 
-choice
+choice GPIO_G10_PULL_CHOICE
     prompt "PG10 Pull-up/Pull-down"
     default GPIO_G10_PULL_NONE
     help
@@ -17881,7 +17881,7 @@ config GPIO_G10_PULL
     default 0x00000001 if GPIO_G10_PULL_UP
     default 0x00000002 if GPIO_G10_PULL_DOWN
 
-choice
+choice GPIO_G10_SPEED_CHOICE
     prompt "PG10 Speed"
     default GPIO_G10_SPEED_MEDIUM
     help
@@ -17942,7 +17942,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN11
 
 if INSTANCE_STM32_GPIOG_PIN11
 
-choice
+choice GPIO_G11_RW_MODE_CHOICE
     prompt "PG11 Read/Write Mode"
     default GPIO_G11_RW_MODE_WRITE
     help
@@ -17971,7 +17971,7 @@ config GPIO_G11_RW_MODE
     default 1 if GPIO_G11_RW_MODE_WRITE
     default 2 if GPIO_G11_RW_MODE_READWRITE
 
-choice
+choice GPIO_G11_MODE_CHOICE
     prompt "PG11 GPIO Mode"
     default GPIO_G11_MODE_OUTPUT_PP if GPIO_G11_RW_MODE_WRITE
     default GPIO_G11_MODE_INPUT if GPIO_G11_RW_MODE_READ
@@ -18019,7 +18019,7 @@ config GPIO_G11_MODE
     default 0x00000012 if GPIO_G11_MODE_AF_OD
     default 0x00000003 if GPIO_G11_MODE_ANALOG
 
-choice
+choice GPIO_G11_PULL_CHOICE
     prompt "PG11 Pull-up/Pull-down"
     default GPIO_G11_PULL_NONE
     help
@@ -18048,7 +18048,7 @@ config GPIO_G11_PULL
     default 0x00000001 if GPIO_G11_PULL_UP
     default 0x00000002 if GPIO_G11_PULL_DOWN
 
-choice
+choice GPIO_G11_SPEED_CHOICE
     prompt "PG11 Speed"
     default GPIO_G11_SPEED_MEDIUM
     help
@@ -18109,7 +18109,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN12
 
 if INSTANCE_STM32_GPIOG_PIN12
 
-choice
+choice GPIO_G12_RW_MODE_CHOICE
     prompt "PG12 Read/Write Mode"
     default GPIO_G12_RW_MODE_WRITE
     help
@@ -18138,7 +18138,7 @@ config GPIO_G12_RW_MODE
     default 1 if GPIO_G12_RW_MODE_WRITE
     default 2 if GPIO_G12_RW_MODE_READWRITE
 
-choice
+choice GPIO_G12_MODE_CHOICE
     prompt "PG12 GPIO Mode"
     default GPIO_G12_MODE_OUTPUT_PP if GPIO_G12_RW_MODE_WRITE
     default GPIO_G12_MODE_INPUT if GPIO_G12_RW_MODE_READ
@@ -18186,7 +18186,7 @@ config GPIO_G12_MODE
     default 0x00000012 if GPIO_G12_MODE_AF_OD
     default 0x00000003 if GPIO_G12_MODE_ANALOG
 
-choice
+choice GPIO_G12_PULL_CHOICE
     prompt "PG12 Pull-up/Pull-down"
     default GPIO_G12_PULL_NONE
     help
@@ -18215,7 +18215,7 @@ config GPIO_G12_PULL
     default 0x00000001 if GPIO_G12_PULL_UP
     default 0x00000002 if GPIO_G12_PULL_DOWN
 
-choice
+choice GPIO_G12_SPEED_CHOICE
     prompt "PG12 Speed"
     default GPIO_G12_SPEED_MEDIUM
     help
@@ -18276,7 +18276,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN13
 
 if INSTANCE_STM32_GPIOG_PIN13
 
-choice
+choice GPIO_G13_RW_MODE_CHOICE
     prompt "PG13 Read/Write Mode"
     default GPIO_G13_RW_MODE_WRITE
     help
@@ -18305,7 +18305,7 @@ config GPIO_G13_RW_MODE
     default 1 if GPIO_G13_RW_MODE_WRITE
     default 2 if GPIO_G13_RW_MODE_READWRITE
 
-choice
+choice GPIO_G13_MODE_CHOICE
     prompt "PG13 GPIO Mode"
     default GPIO_G13_MODE_OUTPUT_PP if GPIO_G13_RW_MODE_WRITE
     default GPIO_G13_MODE_INPUT if GPIO_G13_RW_MODE_READ
@@ -18353,7 +18353,7 @@ config GPIO_G13_MODE
     default 0x00000012 if GPIO_G13_MODE_AF_OD
     default 0x00000003 if GPIO_G13_MODE_ANALOG
 
-choice
+choice GPIO_G13_PULL_CHOICE
     prompt "PG13 Pull-up/Pull-down"
     default GPIO_G13_PULL_NONE
     help
@@ -18382,7 +18382,7 @@ config GPIO_G13_PULL
     default 0x00000001 if GPIO_G13_PULL_UP
     default 0x00000002 if GPIO_G13_PULL_DOWN
 
-choice
+choice GPIO_G13_SPEED_CHOICE
     prompt "PG13 Speed"
     default GPIO_G13_SPEED_MEDIUM
     help
@@ -18443,7 +18443,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN14
 
 if INSTANCE_STM32_GPIOG_PIN14
 
-choice
+choice GPIO_G14_RW_MODE_CHOICE
     prompt "PG14 Read/Write Mode"
     default GPIO_G14_RW_MODE_WRITE
     help
@@ -18472,7 +18472,7 @@ config GPIO_G14_RW_MODE
     default 1 if GPIO_G14_RW_MODE_WRITE
     default 2 if GPIO_G14_RW_MODE_READWRITE
 
-choice
+choice GPIO_G14_MODE_CHOICE
     prompt "PG14 GPIO Mode"
     default GPIO_G14_MODE_OUTPUT_PP if GPIO_G14_RW_MODE_WRITE
     default GPIO_G14_MODE_INPUT if GPIO_G14_RW_MODE_READ
@@ -18520,7 +18520,7 @@ config GPIO_G14_MODE
     default 0x00000012 if GPIO_G14_MODE_AF_OD
     default 0x00000003 if GPIO_G14_MODE_ANALOG
 
-choice
+choice GPIO_G14_PULL_CHOICE
     prompt "PG14 Pull-up/Pull-down"
     default GPIO_G14_PULL_NONE
     help
@@ -18549,7 +18549,7 @@ config GPIO_G14_PULL
     default 0x00000001 if GPIO_G14_PULL_UP
     default 0x00000002 if GPIO_G14_PULL_DOWN
 
-choice
+choice GPIO_G14_SPEED_CHOICE
     prompt "PG14 Speed"
     default GPIO_G14_SPEED_MEDIUM
     help
@@ -18610,7 +18610,7 @@ menuconfig INSTANCE_STM32_GPIOG_PIN15
 
 if INSTANCE_STM32_GPIOG_PIN15
 
-choice
+choice GPIO_G15_RW_MODE_CHOICE
     prompt "PG15 Read/Write Mode"
     default GPIO_G15_RW_MODE_WRITE
     help
@@ -18639,7 +18639,7 @@ config GPIO_G15_RW_MODE
     default 1 if GPIO_G15_RW_MODE_WRITE
     default 2 if GPIO_G15_RW_MODE_READWRITE
 
-choice
+choice GPIO_G15_MODE_CHOICE
     prompt "PG15 GPIO Mode"
     default GPIO_G15_MODE_OUTPUT_PP if GPIO_G15_RW_MODE_WRITE
     default GPIO_G15_MODE_INPUT if GPIO_G15_RW_MODE_READ
@@ -18687,7 +18687,7 @@ config GPIO_G15_MODE
     default 0x00000012 if GPIO_G15_MODE_AF_OD
     default 0x00000003 if GPIO_G15_MODE_ANALOG
 
-choice
+choice GPIO_G15_PULL_CHOICE
     prompt "PG15 Pull-up/Pull-down"
     default GPIO_G15_PULL_NONE
     help
@@ -18716,7 +18716,7 @@ config GPIO_G15_PULL
     default 0x00000001 if GPIO_G15_PULL_UP
     default 0x00000002 if GPIO_G15_PULL_DOWN
 
-choice
+choice GPIO_G15_SPEED_CHOICE
     prompt "PG15 Speed"
     default GPIO_G15_SPEED_MEDIUM
     help

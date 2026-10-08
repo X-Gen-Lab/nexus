@@ -91,7 +91,7 @@ def show_next_steps(platform):
     
     print("\n🛠️ 常用命令:")
     print("  # 构建项目")
-    print("  python scripts/building/build.py")
+    print("  python scripts/building/build.py --preset linux-gcc-debug --stage all")
     print("")
     print("  # 运行测试")
     print("  python scripts/test/test.py")
@@ -105,7 +105,7 @@ def show_next_steps(platform):
     if platform == "stm32f4":
         print("\n🔌 STM32F4 开发:")
         print("  # 构建 STM32F4 固件")
-        print("  python scripts/building/build.py -p stm32f4")
+        print("  python scripts/building/build.py --preset stm32-armgcc-debug --stage build")
         print("")
         print("  # 输出文件位置:")
         print("  build-stm32f4/applications/blinky/blinky.elf")

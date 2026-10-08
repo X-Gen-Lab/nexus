@@ -1,255 +1,300 @@
-/**
- * \file            nx_spi_device.c
- * \brief           SPI device registration for Native platform
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-18
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements SPI device registration using Kconfig-driven
- *                  configuration. Provides factory functions for test access
- *                  and manages SPI instance lifecycle.
- */
-
+#if !defined(_WIN32) && !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L
+#endif
+/** Native SPI uses the same bounded bus/device/transaction contract as STM32.
+ * This host backend captures transmitted bytes and echoes uninjected RX data;
+ * it does not validate electrical timing, DMA or a vendor peripheral. */
 #include "hal/base/nx_device.h"
-#include "hal/interface/nx_spi.h"
 #include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_spi_helpers.h"
-#include "nx_spi_types.h"
-#include <stdio.h>
+#include "osal/osal.h"
+#include <stdatomic.h>
 #include <string.h>
-
-/*---------------------------------------------------------------------------*/
-/* Configuration                                                             */
-/*---------------------------------------------------------------------------*/
-
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <time.h>
+#endif
 #define DEVICE_TYPE NX_SPI
-
-/*---------------------------------------------------------------------------*/
-/* Forward Declarations                                                      */
-/*---------------------------------------------------------------------------*/
-
-/* Base interface getters */
-static nx_tx_async_t* spi_get_tx_async_handle(nx_spi_bus_t* self,
-                                              nx_spi_device_config_t config);
-static nx_tx_rx_async_t*
-spi_get_tx_rx_async_handle(nx_spi_bus_t* self, nx_spi_device_config_t config,
-                           nx_comm_callback_t callback, void* user_data);
-static nx_tx_sync_t* spi_get_tx_sync_handle(nx_spi_bus_t* self,
-                                            nx_spi_device_config_t config);
-static nx_tx_rx_sync_t*
-spi_get_tx_rx_sync_handle(nx_spi_bus_t* self, nx_spi_device_config_t config);
-static nx_lifecycle_t* spi_get_lifecycle(nx_spi_bus_t* self);
-static nx_power_t* spi_get_power(nx_spi_bus_t* self);
-
-/* Interface implementations (defined in separate files) */
-extern void spi_init_tx_async(nx_tx_async_t* tx_async);
-extern void spi_init_tx_rx_async(nx_tx_rx_async_t* tx_rx_async);
-extern void spi_init_tx_sync(nx_tx_sync_t* tx_sync);
-extern void spi_init_tx_rx_sync(nx_tx_rx_sync_t* tx_rx_sync);
-extern void spi_init_lifecycle(nx_lifecycle_t* lifecycle);
-extern void spi_init_power(nx_power_t* power);
-
-/*---------------------------------------------------------------------------*/
-/* Base Interface Getters                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get TX async handle
- */
-static nx_tx_async_t* spi_get_tx_async_handle(nx_spi_bus_t* self,
-                                              nx_spi_device_config_t config) {
-    nx_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
+static atomic_flag metadata = ATOMIC_FLAG_INIT;
+void native_spi_lock(void) {
+    while (atomic_flag_test_and_set_explicit(&metadata, memory_order_acquire)) {}
+}
+void native_spi_unlock(void) {
+    atomic_flag_clear_explicit(&metadata, memory_order_release);
+}
+uint32_t native_spi_now(void) {
+#ifdef _WIN32
+    return (uint32_t)GetTickCount64();
+#else
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint32_t)((uint64_t)ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+#endif
+}
+static uint32_t remaining(uint32_t at, uint32_t budget) {
+    uint32_t elapsed = native_spi_now() - at;
+    return budget == UINT32_MAX ? UINT32_MAX : elapsed >= budget ? 0 : budget-elapsed;
+}
+static bool config_valid(const nx_spi_device_config_t* c, nx_spi_impl_t* b) {
+    return c && c->speed && c->speed <= b->state->config.max_speed &&
+           c->mode <= NX_SPI_MODE_3 && c->bit_order <= NX_SPI_BIT_ORDER_LSB;
+}
+static bool equal(const nx_spi_device_config_t* a, const nx_spi_device_config_t* b) {
+    return a->cs_pin==b->cs_pin && a->speed==b->speed && a->mode==b->mode && a->bit_order==b->bit_order;
+}
+/* Call only under metadata guard. Caller-owned handles never alias pool slots. */
+static native_spi_device_t* resolve(nx_spi_impl_t* b, uint64_t token) {
+    if (!token) return NULL;
+    for(unsigned i=0;i<NATIVE_SPI_DEVICE_CAPACITY;++i)
+        if(b->devices[i].allocated && b->devices[i].base.token==token) return &b->devices[i];
+    return NULL;
+}
+static nx_status_t status(nx_spi_impl_t* b) {
+    return !b->state->initialized ? NX_ERR_NOT_INIT : b->state->suspended ? NX_ERR_SUSPENDED : NX_OK;
+}
+static bool valid_transaction(const nx_spi_transaction_t* t, bool async) {
+    return t && t->tx_data && t->length && t->length<=UINT16_MAX &&
+        (t->timeout_ms<=INT32_MAX || (!async && t->timeout_ms==UINT32_MAX)) &&
+        (!async || (t->callback && t->timeout_ms));
+}
+static nx_status_t transfer(nx_spi_impl_t* b, uint64_t token,
+    const nx_spi_transaction_t* t, uint32_t at, bool worker) {
+    if(!valid_transaction(t,false)) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    native_spi_lock();
+    native_spi_device_t* d=resolve(b,token);
+    nx_status_t r=d ? status(b) : NX_ERR_INVALID_STATE;
+    if(r==NX_OK && (d->users || d->pending || (d->servicing && !worker))) r=NX_ERR_BUSY;
+    if(r!=NX_OK) { native_spi_unlock(); return r; }
+    ++b->users; ++d->users; d->completing=false;
+    native_spi_unlock();
+    bool locked=false;
+    uint32_t left=remaining(at,t->timeout_ms);
+    if(!left) { r=NX_ERR_TIMEOUT; goto finish; }
+    /* Poll at bounded intervals so cancellation of a lock waiter is observable.
+     * Every iteration consumes the original total deadline. */
+    for(;;) {
+        native_spi_lock(); bool cancelled=d->cancelled; native_spi_unlock();
+        if(cancelled) { r=NX_ERR_CANCELLED; goto finish; }
+        left=remaining(at,t->timeout_ms);
+        if(!left) { r=NX_ERR_TIMEOUT; goto finish; }
+        osal_status_t os=osal_mutex_lock(b->mutex,left==UINT32_MAX || left>2 ? 2 : left);
+        if(os==OSAL_OK) { locked=true; break; }
+        if(os!=OSAL_ERROR_TIMEOUT) { r=NX_ERR_IO; goto finish; }
     }
-
-    /* Store device configuration */
-    impl->state->current_device.config = config;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_async;
-}
-
-/**
- * \brief           Get TX/RX async handle
- */
-static nx_tx_rx_async_t*
-spi_get_tx_rx_async_handle(nx_spi_bus_t* self, nx_spi_device_config_t config,
-                           nx_comm_callback_t callback, void* user_data) {
-    nx_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
+    native_spi_lock(); b->active=d; b->state->busy=true;
+    b->state->current_device.config=d->config; /* Last executed, informational. */
+    b->state->current_device.in_use=true;
+    uint32_t delay=b->transfer_delay_ms; native_spi_unlock();
+    uint32_t io_at=native_spi_now();
+    for(;;) {
+        native_spi_lock(); bool cancelled=d->cancelled; native_spi_unlock();
+        if(cancelled) { r=NX_ERR_CANCELLED; goto finish; }
+        if(!remaining(at,t->timeout_ms)) { r=NX_ERR_TIMEOUT; goto finish; }
+        if(native_spi_now()-io_at>=delay) break;
+        if(osal_task_delay(1)!=OSAL_OK) { r=NX_ERR_IO; goto finish; }
     }
-
-    /* Store device configuration and callback */
-    impl->state->current_device.config = config;
-    impl->state->current_device.callback = callback;
-    impl->state->current_device.user_data = user_data;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_rx_async;
-}
-
-/**
- * \brief           Get TX sync handle
- */
-static nx_tx_sync_t* spi_get_tx_sync_handle(nx_spi_bus_t* self,
-                                            nx_spi_device_config_t config) {
-    nx_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
+    native_spi_lock();
+    if(d->cancelled) r=NX_ERR_CANCELLED;
+    else if(!remaining(at,t->timeout_ms)) r=NX_ERR_TIMEOUT;
+    else if(t->length>b->state->tx_buf.size-b->state->tx_buf.count) r=NX_ERR_FULL;
+    else {
+        spi_buffer_write(&b->state->tx_buf,t->tx_data,t->length);
+        b->state->stats.tx_count+=(uint32_t)t->length;
+        if(b->trace_count<NATIVE_SPI_TRACE_CAPACITY)
+            b->trace[b->trace_count++]=(native_spi_trace_t){d->config,d->base.token,t->tx_data[0]};
+        if(t->rx_data) {
+            if(b->state->rx_buf.count>=t->length)
+                spi_buffer_read(&b->state->rx_buf,t->rx_data,t->length);
+            else { memmove(t->rx_data,t->tx_data,t->length); b->state->stats.rx_count+=(uint32_t)t->length; }
+        }
+        r=NX_OK;
     }
-
-    /* Store device configuration */
-    impl->state->current_device.config = config;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_sync;
-}
-
-/**
- * \brief           Get TX/RX sync handle
- */
-static nx_tx_rx_sync_t*
-spi_get_tx_rx_sync_handle(nx_spi_bus_t* self, nx_spi_device_config_t config) {
-    nx_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
+    d->completing=true; /* No accepted cancellation after the last buffer access. */
+    native_spi_unlock();
+finish:
+    if(locked) {
+        native_spi_lock(); b->active=NULL; b->state->busy=false; native_spi_unlock();
+        if(osal_mutex_unlock(b->mutex)!=OSAL_OK) r=NX_ERR_IO;
     }
-
-    /* Store device configuration */
-    impl->state->current_device.config = config;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_rx_sync;
-}
-
-/**
- * \brief           Get lifecycle interface
- */
-static nx_lifecycle_t* spi_get_lifecycle(nx_spi_bus_t* self) {
-    nx_spi_impl_t* impl = spi_get_impl(self);
-    return impl ? &impl->lifecycle : NULL;
-}
-
-/**
- * \brief           Get power interface
- */
-static nx_power_t* spi_get_power(nx_spi_bus_t* self) {
-    nx_spi_impl_t* impl = spi_get_impl(self);
-    return impl ? &impl->power : NULL;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Instance Initialization                                                   */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize SPI instance with platform configuration
- */
-static void spi_init_instance(nx_spi_impl_t* impl, uint8_t index,
-                              const nx_spi_platform_config_t* platform_cfg) {
-    /* Initialize base interface */
-    impl->base.get_tx_async_handle = spi_get_tx_async_handle;
-    impl->base.get_tx_rx_async_handle = spi_get_tx_rx_async_handle;
-    impl->base.get_tx_sync_handle = spi_get_tx_sync_handle;
-    impl->base.get_tx_rx_sync_handle = spi_get_tx_rx_sync_handle;
-    impl->base.get_lifecycle = spi_get_lifecycle;
-    impl->base.get_power = spi_get_power;
-
-    /* Initialize interfaces (implemented in separate files) */
-    spi_init_tx_async(&impl->tx_async);
-    spi_init_tx_rx_async(&impl->tx_rx_async);
-    spi_init_tx_sync(&impl->tx_sync);
-    spi_init_tx_rx_sync(&impl->tx_rx_sync);
-    spi_init_lifecycle(&impl->lifecycle);
-    spi_init_power(&impl->power);
-
-    /* Allocate and initialize state */
-    impl->state = (nx_spi_state_t*)nx_mem_alloc(sizeof(nx_spi_state_t));
-    if (!impl->state) {
-        return;
+    native_spi_lock();
+    bool notify=!worker && t->callback;
+    if(notify) ++b->users; /* Bus lifecycle stays pinned through callback. */
+    --b->users; --d->users; d->cancelled=false; d->completing=true;
+    d->last_result=r;
+    if(r!=NX_OK) ++b->state->stats.error_count;
+    native_spi_unlock();
+    /* No use of d after notification: callback can close and reuse its slot. */
+    if(notify) {
+        t->callback(t->user_data,r);
+        native_spi_lock(); --b->users; native_spi_unlock();
     }
-    memset(impl->state, 0, sizeof(nx_spi_state_t));
-
-    impl->state->index = index;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    /* Set configuration from Kconfig */
-    if (platform_cfg != NULL) {
-        impl->state->config.max_speed = platform_cfg->max_speed;
-        impl->state->config.mosi_pin = platform_cfg->mosi_pin;
-        impl->state->config.miso_pin = platform_cfg->miso_pin;
-        impl->state->config.sck_pin = platform_cfg->sck_pin;
-        impl->state->config.dma_tx_enable = false;
-        impl->state->config.dma_rx_enable = false;
-        impl->state->config.tx_buf_size = platform_cfg->tx_buf_size;
-        impl->state->config.rx_buf_size = platform_cfg->rx_buf_size;
-
-        /* Allocate buffers dynamically */
-        impl->state->tx_buf.data =
-            (uint8_t*)nx_mem_alloc(platform_cfg->tx_buf_size);
-        impl->state->tx_buf.size = platform_cfg->tx_buf_size;
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-
-        impl->state->rx_buf.data =
-            (uint8_t*)nx_mem_alloc(platform_cfg->rx_buf_size);
-        impl->state->rx_buf.size = platform_cfg->rx_buf_size;
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-    }
-
-
-    /* Clear device handle */
-    memset(&impl->state->current_device, 0, sizeof(nx_spi_device_handle_t));
+    return r;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Device Registration                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- */
+static nx_status_t submit_locked(nx_spi_impl_t* b, native_spi_device_t* d,
+                                  const nx_spi_transaction_t* t, uint32_t at) {
+    nx_status_t r=d ? status(b) : NX_ERR_INVALID_STATE;
+    if(r==NX_OK && (d->users || d->pending || d->servicing)) r=NX_ERR_BUSY;
+    if(r==NX_OK && b->next_sequence==UINT64_MAX) r=NX_ERR_NO_RESOURCE;
+    if(r==NX_OK) {
+        d->queued=*t; d->queued_at=at; d->sequence=++b->next_sequence;
+        d->pending=true; d->cancelled=false; d->completing=false; d->last_result=NX_ERR_BUSY;
+    }
+    return r;
+}
+static nx_status_t device_transfer(nx_spi_device_t* self,const nx_spi_transaction_t* t) {
+    if(!self || !self->owner) return NX_ERR_INVALID_PARAM;
+    return transfer(spi_get_impl(self->owner),self->token,t,native_spi_now(),false);
+}
+static nx_status_t device_submit(nx_spi_device_t* self,const nx_spi_transaction_t* t) {
+    uint32_t at=native_spi_now();
+    if(!self || !self->owner || !valid_transaction(t,true)) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_spi_impl_t* b=spi_get_impl(self->owner);
+    native_spi_lock(); nx_status_t r=submit_locked(b,resolve(b,self->token),t,at); native_spi_unlock();
+    return r;
+}
+static nx_status_t device_cancel(nx_spi_device_t* self) {
+    if(!self || !self->owner) return NX_ERR_INVALID_PARAM;
+    nx_spi_impl_t* b=spi_get_impl(self->owner);
+    native_spi_lock(); native_spi_device_t* d=resolve(b,self->token);
+    nx_status_t r=!d ? NX_ERR_INVALID_STATE :
+        d->pending || ((d->users || d->servicing) && !d->completing) ? NX_OK : NX_ERR_NOT_FOUND;
+    if(r==NX_OK) d->cancelled=true;
+    native_spi_unlock(); return r;
+}
+static nx_status_t service(nx_spi_bus_t* self) {
+    if(!self) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_spi_impl_t* b=spi_get_impl(self);
+    native_spi_lock();
+    if(b->worker_active) { native_spi_unlock(); return NX_ERR_BUSY; }
+    native_spi_device_t* d=NULL;
+    for(unsigned i=0;i<NATIVE_SPI_DEVICE_CAPACITY;++i)
+        if(b->devices[i].pending && (!d || b->devices[i].sequence<d->sequence)) d=&b->devices[i];
+    if(!d) { native_spi_unlock(); return NX_ERR_NO_DATA; }
+    b->worker_active=true; d->pending=false; d->servicing=true;
+    bool cancelled=d->cancelled; nx_spi_transaction_t t=d->queued;
+    uint64_t token=d->base.token; uint32_t at=d->queued_at;
+    native_spi_unlock();
+    nx_status_t r=cancelled ? NX_ERR_CANCELLED : transfer(b,token,&t,at,true);
+    native_spi_lock(); d->last_result=r; d->servicing=false; d->completing=true; d->cancelled=false; native_spi_unlock();
+    t.callback(t.user_data,r);
+    native_spi_lock(); b->worker_active=false; native_spi_unlock();
+    return r;
+}
+static void legacy_terminal(void* context,nx_status_t r) {
+    native_spi_device_t* d=context;
+    if(r==NX_OK && d->receive_callback) d->receive_callback(d->receive_context,d->rx_copy,d->queued.length);
+}
+static nx_status_t legacy_submit(native_spi_device_t* d,const uint8_t* data,size_t n,uint32_t timeout,bool rx) {
+    uint32_t at=native_spi_now();
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    if(!data || !n) return NX_ERR_INVALID_PARAM;
+    if(n>NATIVE_SPI_ASYNC_CAPACITY) return NX_ERR_INVALID_SIZE;
+    if(!timeout || timeout>INT32_MAX) return NX_ERR_INVALID_PARAM;
+    native_spi_lock();
+    nx_status_t r=status(d->bus);
+    if(r==NX_OK && (d->users || d->pending || d->servicing)) r=NX_ERR_BUSY;
+    if(r==NX_OK) {
+        memcpy(d->tx_copy,data,n);
+        nx_spi_transaction_t t={d->tx_copy,rx ? d->rx_copy : NULL,n,timeout,legacy_terminal,d};
+        r=submit_locked(d->bus,d,&t,at);
+    }
+    native_spi_unlock(); return r;
+}
+static nx_status_t send(nx_tx_sync_t* self,const uint8_t* data,size_t n,uint32_t timeout) {
+    if(!self) return NX_ERR_INVALID_PARAM;
+    native_spi_device_t* d=NX_CONTAINER_OF(self,native_spi_device_t,tx_sync);
+    nx_spi_transaction_t t={data,NULL,n,timeout,NULL,NULL};
+    return transfer(d->bus,d->base.token,&t,native_spi_now(),false);
+}
+static nx_status_t tx_rx(nx_tx_rx_sync_t* self,const uint8_t* tx,size_t n,uint8_t* rx,size_t* rx_n,uint32_t timeout) {
+    if(!self || !rx || !rx_n) return NX_ERR_INVALID_PARAM;
+    size_t cap=*rx_n; *rx_n=0;
+    if(cap<n) return NX_ERR_INVALID_SIZE;
+    native_spi_device_t* d=NX_CONTAINER_OF(self,native_spi_device_t,tx_rx_sync);
+    nx_spi_transaction_t t={tx,rx,n,timeout,NULL,NULL};
+    nx_status_t r=transfer(d->bus,d->base.token,&t,native_spi_now(),false);
+    if(r==NX_OK) *rx_n=n;
+    return r;
+}
+static nx_status_t async_send(nx_tx_async_t* self,const uint8_t* data,size_t n) {
+    return self ? legacy_submit(NX_CONTAINER_OF(self,native_spi_device_t,tx_async),data,n,1000,false) : NX_ERR_INVALID_PARAM;
+}
+static nx_status_t async_rx(nx_tx_rx_async_t* self,const uint8_t* data,size_t n,uint32_t timeout) {
+    return self ? legacy_submit(NX_CONTAINER_OF(self,native_spi_device_t,tx_rx_async),data,n,timeout,true) : NX_ERR_INVALID_PARAM;
+}
+static nx_status_t get_state(native_spi_device_t* d) {
+    native_spi_lock(); nx_status_t r=status(d->bus);
+    if(r==NX_OK) r=d->users || d->pending || d->servicing ? NX_ERR_BUSY : d->last_result;
+    native_spi_unlock(); return r;
+}
+static nx_status_t async_state(nx_tx_async_t* self) { return self ? get_state(NX_CONTAINER_OF(self,native_spi_device_t,tx_async)) : NX_ERR_INVALID_PARAM; }
+static nx_status_t async_rx_state(nx_tx_rx_async_t* self) { return self ? get_state(NX_CONTAINER_OF(self,native_spi_device_t,tx_rx_async)) : NX_ERR_INVALID_PARAM; }
+static native_spi_device_t* allocate(nx_spi_impl_t* b,nx_spi_device_config_t config,bool legacy,nx_comm_callback_t cb,void* ctx) {
+    native_spi_device_t* d=NULL;
+    for(unsigned i=0;i<NATIVE_SPI_DEVICE_CAPACITY;++i) {
+        native_spi_device_t* slot=&b->devices[i];
+        if(!slot->allocated) { if(!d) d=slot; }
+        else if(legacy && slot->legacy && equal(&slot->config,&config) && slot->receive_callback==cb && slot->receive_context==ctx) return slot;
+    }
+    if(!d || b->next_token==UINT64_MAX) return NULL;
+    memset(d,0,sizeof(*d)); d->bus=b; d->allocated=true; d->legacy=legacy;
+    d->config=config; d->receive_callback=cb; d->receive_context=ctx;
+    d->base=(nx_spi_device_t){&b->base,++b->next_token,device_transfer,device_submit,device_cancel};
+    NX_INIT_TX_SYNC(&d->tx_sync,send); NX_INIT_TX_RX_SYNC(&d->tx_rx_sync,tx_rx);
+    NX_INIT_TX_ASYNC(&d->tx_async,async_send,async_state);
+    NX_INIT_TX_RX_ASYNC(&d->tx_rx_async,async_rx,async_rx_state);
+    return d;
+}
+static nx_status_t open_device(nx_spi_bus_t* self,const nx_spi_device_config_t* config,nx_spi_device_t* out) {
+    if(out) memset(out,0,sizeof(*out));
+    if(!self || !out || !config_valid(config,spi_get_impl(self))) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    native_spi_lock(); native_spi_device_t* d=allocate(spi_get_impl(self),*config,false,NULL,NULL);
+    if(d) *out=d->base;
+    native_spi_unlock(); return d ? NX_OK : NX_ERR_NO_RESOURCE;
+}
+static nx_status_t close_device(nx_spi_bus_t* self,nx_spi_device_t* value) {
+    if(!self || !value) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    native_spi_lock(); native_spi_device_t* d=value->owner==self ? resolve(spi_get_impl(self),value->token) : NULL;
+    nx_status_t r=!d ? NX_ERR_INVALID_STATE : d->legacy ? NX_ERR_NOT_SUPPORTED : d->users || d->pending || d->servicing ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK) d->allocated=false;
+    native_spi_unlock(); return r;
+}
+static native_spi_device_t* legacy(nx_spi_bus_t* self,nx_spi_device_config_t config,nx_comm_callback_t cb,void* ctx) {
+    if(!self || !config_valid(&config,spi_get_impl(self)) || osal_is_isr()) return NULL;
+    native_spi_lock(); native_spi_device_t* d=allocate(spi_get_impl(self),config,true,cb,ctx); native_spi_unlock(); return d;
+}
+static nx_tx_sync_t* get_tx_sync(nx_spi_bus_t* self,nx_spi_device_config_t config) { native_spi_device_t* d=legacy(self,config,NULL,NULL); return d ? &d->tx_sync : NULL; }
+static nx_tx_rx_sync_t* get_tx_rx_sync(nx_spi_bus_t* self,nx_spi_device_config_t config) { native_spi_device_t* d=legacy(self,config,NULL,NULL); return d ? &d->tx_rx_sync : NULL; }
+static nx_tx_async_t* get_tx_async(nx_spi_bus_t* self,nx_spi_device_config_t config) { native_spi_device_t* d=legacy(self,config,NULL,NULL); return d ? &d->tx_async : NULL; }
+static nx_tx_rx_async_t* get_tx_rx_async(nx_spi_bus_t* self,nx_spi_device_config_t config,nx_comm_callback_t cb,void* ctx) { native_spi_device_t* d=legacy(self,config,cb,ctx); return d ? &d->tx_rx_async : NULL; }
+static nx_lifecycle_t* get_lifecycle(nx_spi_bus_t* self) { return self ? &spi_get_impl(self)->lifecycle : NULL; }
+static nx_power_t* get_power(nx_spi_bus_t* self) { return self ? &spi_get_impl(self)->power : NULL; }
 static void* nx_spi_device_init(const nx_device_t* dev) {
-    const nx_spi_platform_config_t* config =
-        (const nx_spi_platform_config_t*)dev->config;
-
-    if (config == NULL) {
-        return NULL;
+    const nx_spi_platform_config_t* cfg=dev->config;
+    if(!cfg || !cfg->tx_buf_size || !cfg->rx_buf_size) return NULL;
+    nx_spi_impl_t* b=nx_mem_alloc(sizeof(*b));
+    if(!b) return NULL;
+    memset(b,0,sizeof(*b)); b->state=nx_mem_alloc(sizeof(*b->state));
+    if(!b->state) { nx_mem_free(b); return NULL; }
+    memset(b->state,0,sizeof(*b->state)); b->state->index=cfg->spi_index;
+    b->state->config=(nx_spi_config_t){cfg->max_speed,cfg->mosi_pin,cfg->miso_pin,cfg->sck_pin,false,false,cfg->tx_buf_size,cfg->rx_buf_size};
+    b->state->tx_buf.data=nx_mem_alloc(cfg->tx_buf_size); b->state->tx_buf.size=cfg->tx_buf_size;
+    b->state->rx_buf.data=nx_mem_alloc(cfg->rx_buf_size); b->state->rx_buf.size=cfg->rx_buf_size;
+    if(!b->state->tx_buf.data || !b->state->rx_buf.data) {
+        nx_mem_free(b->state->tx_buf.data); nx_mem_free(b->state->rx_buf.data); nx_mem_free(b->state); nx_mem_free(b); return NULL;
     }
-
-    /* Allocate implementation structure */
-    nx_spi_impl_t* impl = (nx_spi_impl_t*)nx_mem_alloc(sizeof(nx_spi_impl_t));
-    if (!impl) {
-        return NULL;
-    }
-    memset(impl, 0, sizeof(nx_spi_impl_t));
-
-    /* Initialize instance with platform configuration */
-    spi_init_instance(impl, config->spi_index, config);
-
-    /* Check if state allocation succeeded */
-    if (!impl->state) {
-        nx_mem_free(impl);
-        return NULL;
-    }
-
-    /* Device is created but not initialized - tests will call init() */
-    return &impl->base;
+    NX_INIT_SPI_BUS(&b->base,get_tx_async,get_tx_rx_async,get_tx_sync,get_tx_rx_sync,get_lifecycle,get_power);
+    b->base.open_device=open_device; b->base.close_device=close_device; b->base.service=service;
+    spi_init_lifecycle(&b->lifecycle); spi_init_power(&b->power);
+    return &b->base;
 }
-
-/**
- * \brief           Configuration macro - reads from Kconfig
- */
 #define NX_SPI_CONFIG(index)                                                   \
     static const nx_spi_platform_config_t spi_config_##index = {               \
         .spi_index = index,                                                    \

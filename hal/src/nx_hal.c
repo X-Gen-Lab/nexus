@@ -8,8 +8,8 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  *
  * \details         This module provides HAL-level initialization and cleanup.
- *                  Device instances are created dynamically via factory
- * functions (nx_factory_*) rather than through a static registry.
+ *                  The selected platform registers effective-config device
+ * descriptors; factories initialize and cache their APIs on first use.
  */
 
 #include "hal/nx_hal.h"
@@ -46,25 +46,25 @@ static bool hal_initialized = false;
  *                  - Platform-specific peripheral initialization
  *
  * \note            This is a weak symbol. If not overridden by platform code,
- *                  the default implementation returns NX_OK.
+ *                  the default implementation reports unsupported.
  */
 #if defined(_MSC_VER)
 /* MSVC weak symbol support */
 #pragma comment(linker,                                                        \
                 "/alternatename:nx_platform_init=nx_platform_init_default")
 nx_status_t nx_platform_init_default(void) {
-    return NX_OK;
+    return NX_ERR_NOT_SUPPORTED;
 }
 nx_status_t nx_platform_init(void);
 #elif defined(__GNUC__) || defined(__clang__)
 /* GCC/Clang weak symbol support */
 __attribute__((weak)) nx_status_t nx_platform_init(void) {
-    return NX_OK;
+    return NX_ERR_NOT_SUPPORTED;
 }
 #else
 /* Fallback for other compilers */
 nx_status_t nx_platform_init(void) {
-    return NX_OK;
+    return NX_ERR_NOT_SUPPORTED;
 }
 #endif
 
@@ -79,25 +79,25 @@ nx_status_t nx_platform_init(void) {
  *                  - Power management cleanup
  *
  * \note            This is a weak symbol. If not overridden by platform code,
- *                  the default implementation returns NX_OK.
+ *                  the default implementation reports unsupported.
  */
 #if defined(_MSC_VER)
 /* MSVC weak symbol support */
 #pragma comment(                                                               \
     linker, "/alternatename:nx_platform_deinit=nx_platform_deinit_default")
 nx_status_t nx_platform_deinit_default(void) {
-    return NX_OK;
+    return NX_ERR_NOT_SUPPORTED;
 }
 nx_status_t nx_platform_deinit(void);
 #elif defined(__GNUC__) || defined(__clang__)
 /* GCC/Clang weak symbol support */
 __attribute__((weak)) nx_status_t nx_platform_deinit(void) {
-    return NX_OK;
+    return NX_ERR_NOT_SUPPORTED;
 }
 #else
 /* Fallback for other compilers */
 nx_status_t nx_platform_deinit(void) {
-    return NX_OK;
+    return NX_ERR_NOT_SUPPORTED;
 }
 #endif
 

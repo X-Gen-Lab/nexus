@@ -126,6 +126,8 @@ typedef struct {
     stm32_gpio_stats_t stats;          /**< Statistics */
     bool initialized;                  /**< Initialization flag */
     bool suspended;                    /**< Suspend flag */
+    nx_power_callback_t power_callback;
+    void* power_context;
 } stm32_gpio_state_t;
 
 /*---------------------------------------------------------------------------*/

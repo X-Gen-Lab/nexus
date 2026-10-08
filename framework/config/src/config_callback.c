@@ -31,6 +31,7 @@ typedef struct {
     void* user_data;                  /**< User-provided context */
     bool wildcard;                    /**< Is this a wildcard callback */
     bool in_use;                      /**< Entry is in use */
+    uint32_t references;               /**< Active notification ownership */
 } config_callback_entry_t;
 
 /**
@@ -39,6 +40,7 @@ typedef struct {
 struct config_callback {
     size_t index; /**< Index in callback array */
     bool valid;   /**< Handle is valid */
+    config_cb_handle_t token; /**< Opaque lifetime identity */
 };
 
 /**
@@ -62,6 +64,19 @@ typedef struct {
  * \brief           Global callback manager context
  */
 static config_callback_ctx_t g_cb_ctx;
+static uintptr_t g_next_callback = 1;
+static uint32_t g_notify_depth;
+
+static struct config_callback* callback_lookup(const struct config_callback* token) {
+    if (!g_cb_ctx.initialized || !token) return NULL;
+    for (size_t i = 0; i < g_cb_ctx.max_callbacks; ++i) {
+        struct config_callback* slot = &g_cb_ctx.handles[i];
+        if (slot->valid && slot->token == token) return slot;
+    }
+    return NULL;
+}
+
+bool config_callback_is_busy(void) { return g_notify_depth != 0; }
 
 /*---------------------------------------------------------------------------*/
 /* Internal Functions                                                        */
@@ -119,6 +134,7 @@ static bool config_callback_key_matches(const config_callback_entry_t* entry,
 /*---------------------------------------------------------------------------*/
 
 config_status_t config_callback_init(uint8_t max_callbacks) {
+    if (config_callback_is_busy()) return CONFIG_ERROR_BUSY;
     if (max_callbacks == 0 || max_callbacks > CONFIG_DEFAULT_MAX_CALLBACKS) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -135,6 +151,7 @@ config_status_t config_callback_deinit(void) {
     if (!g_cb_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
+    if (config_callback_is_busy()) return CONFIG_ERROR_BUSY;
 
     memset(&g_cb_ctx, 0, sizeof(g_cb_ctx));
     return CONFIG_OK;
@@ -158,19 +175,30 @@ config_status_t config_callback_notify(const char* key, config_type_t type,
     CONFIG_UNUSED(old_size);
     CONFIG_UNUSED(new_size);
 
-    /* Iterate through all callbacks and invoke matching ones */
-    for (uint8_t i = 0; i < g_cb_ctx.max_callbacks; ++i) {
-        config_callback_entry_t* entry = &g_cb_ctx.callbacks[i];
-
-        if (!entry->in_use || entry->callback == NULL) {
-            continue;
-        }
-
-        if (config_callback_key_matches(entry, key)) {
-            /* Invoke callback - continue even if it fails (Requirement 7.6) */
-            entry->callback(key, type, old_value, new_value, entry->user_data);
-        }
+    if (g_notify_depth == UINT32_MAX) return CONFIG_ERROR_BUSY;
+    /* Capture lifetime identities, not reusable slot pointers. A callback may
+     * remove another idle listener or register a listener for future changes;
+     * neither operation redirects this notification to a new slot lifetime. */
+    config_cb_handle_t selected[CONFIG_DEFAULT_MAX_CALLBACKS];
+    size_t count = 0;
+    for (size_t i = 0; i < g_cb_ctx.max_callbacks; ++i) {
+        struct config_callback* slot = &g_cb_ctx.handles[i];
+        if (slot->valid && config_callback_key_matches(&g_cb_ctx.callbacks[slot->index], key))
+            selected[count++] = slot->token;
     }
+    ++g_notify_depth;
+    for (size_t i = 0; i < count; ++i) {
+        struct config_callback* slot = callback_lookup(selected[i]);
+        if (!slot) continue;
+        config_callback_entry_t* entry = &g_cb_ctx.callbacks[slot->index];
+        if (!entry->in_use || !entry->callback || entry->references == UINT32_MAX) continue;
+        ++entry->references;
+        config_change_cb_t callback = entry->callback;
+        void* context = entry->user_data;
+        callback(key, type, old_value, new_value, context);
+        --entry->references;
+    }
+    --g_notify_depth;
 
     return CONFIG_OK;
 }
@@ -207,6 +235,7 @@ config_status_t config_register_callback(const char* key,
     if (key == NULL || callback == NULL || handle == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
+    *handle = NULL;
 
     /* Check key length */
     size_t key_len = strlen(key);
@@ -222,7 +251,7 @@ config_status_t config_register_callback(const char* key,
 
     /* Find free handle */
     struct config_callback* cb_handle = config_callback_find_free_handle();
-    if (cb_handle == NULL) {
+    if (cb_handle == NULL || g_next_callback > (UINTPTR_MAX >> 4)) {
         return CONFIG_ERROR_NO_SPACE;
     }
 
@@ -241,10 +270,11 @@ config_status_t config_register_callback(const char* key,
 
     /* Initialize handle */
     cb_handle->index = (size_t)slot;
+    cb_handle->token = (config_cb_handle_t)((g_next_callback++ << 4) | 0xbu);
     cb_handle->valid = true;
 
     g_cb_ctx.callback_count++;
-    *handle = cb_handle;
+    *handle = cb_handle->token;
 
     return CONFIG_OK;
 }
@@ -263,6 +293,7 @@ config_status_t config_register_wildcard_callback(config_change_cb_t callback,
     if (callback == NULL || handle == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
+    *handle = NULL;
 
     /* Find free callback slot */
     int slot = config_callback_find_free_slot();
@@ -272,7 +303,7 @@ config_status_t config_register_wildcard_callback(config_change_cb_t callback,
 
     /* Find free handle */
     struct config_callback* cb_handle = config_callback_find_free_handle();
-    if (cb_handle == NULL) {
+    if (cb_handle == NULL || g_next_callback > (UINTPTR_MAX >> 4)) {
         return CONFIG_ERROR_NO_SPACE;
     }
 
@@ -286,10 +317,11 @@ config_status_t config_register_wildcard_callback(config_change_cb_t callback,
 
     /* Initialize handle */
     cb_handle->index = (size_t)slot;
+    cb_handle->token = (config_cb_handle_t)((g_next_callback++ << 4) | 0xbu);
     cb_handle->valid = true;
 
     g_cb_ctx.callback_count++;
-    *handle = cb_handle;
+    *handle = cb_handle->token;
 
     return CONFIG_OK;
 }
@@ -303,11 +335,12 @@ config_status_t config_unregister_callback(config_cb_handle_t handle) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (handle == NULL || !handle->valid) {
+    struct config_callback* slot = callback_lookup(handle);
+    if (!slot) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    size_t index = handle->index;
+    size_t index = slot->index;
     if (index >= g_cb_ctx.max_callbacks) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
@@ -316,13 +349,14 @@ config_status_t config_unregister_callback(config_cb_handle_t handle) {
     if (!entry->in_use) {
         return CONFIG_ERROR_NOT_FOUND;
     }
+    if (entry->references) return CONFIG_ERROR_BUSY;
 
     /* Clear the callback entry */
     memset(entry, 0, sizeof(*entry));
     entry->in_use = false;
 
     /* Invalidate the handle */
-    handle->valid = false;
+    slot->valid = false;
 
     if (g_cb_ctx.callback_count > 0) {
         g_cb_ctx.callback_count--;

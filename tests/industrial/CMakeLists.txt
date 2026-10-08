@@ -1,0 +1,7 @@
+add_executable(nexus_industrial_tests test_industrial.c)
+target_link_libraries(nexus_industrial_tests PRIVATE nexus_modbus_rtu nexus_industrial)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(nexus_industrial_tests PRIVATE -Werror -UNDEBUG)
+endif()
+add_test(NAME nexus_industrial_tests COMMAND nexus_industrial_tests)
+set_tests_properties(nexus_industrial_tests PROPERTIES TIMEOUT 30 LABELS "service;industrial;contract")

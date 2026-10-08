@@ -20,6 +20,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include "test_config_flash_fixture.h"
 
 extern "C" {
 #include "config/config.h"
@@ -37,8 +38,12 @@ static constexpr int PROPERTY_TEST_ITERATIONS = 100;
 class ConfigBackendPropertyTest : public ::testing::Test {
   protected:
     std::mt19937 rng;
+    ConfigFlashModel flash_model;
 
     void SetUp() override {
+#if defined(_WIN32)
+        GTEST_SKIP() << "Persistent Flash fixture currently requires POSIX";
+#endif
         rng.seed(std::random_device{}());
         /* Ensure config is deinitialized before each test */
         if (config_is_initialized()) {
@@ -46,6 +51,7 @@ class ConfigBackendPropertyTest : public ::testing::Test {
         }
         /* Reset mock backend state */
         config_backend_mock_reset();
+        ASSERT_TRUE(flash_model.Bind());
     }
 
     void TearDown() override {
@@ -54,6 +60,7 @@ class ConfigBackendPropertyTest : public ::testing::Test {
             config_deinit();
         }
         config_backend_mock_reset();
+        flash_model.Release();
     }
 
     /**

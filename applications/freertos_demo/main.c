@@ -1,409 +1,273 @@
-/**
- * \file            main.c
- * \brief           FreeRTOS/OSAL Demo Application
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-25
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         This example demonstrates the OSAL (OS Abstraction Layer)
- *                  features with multi-task operation:
- *                  - Multi-task creation and management
- *                  - Mutex for resource protection
- *                  - Semaphore for task synchronization
- *                  - Message queue for inter-task communication
- *
- *                  The demo creates a producer-consumer pattern with LED
- *                  feedback:
- *                  - Producer task: generates sensor data and sends to queue
- *                  - Consumer task: receives data and processes it
- *                  - LED task: blinks LED as heartbeat indicator
- *                  - Stats task: periodically reports system statistics
- *
- * \note            Requires OSAL backend with multi-tasking support
- *                  (FreeRTOS, RT-Thread, or Zephyr).
- */
-
+/** OSAL producer/consumer example for the selected board.
+ * Queue waits are bounded; the queue owns data-ready synchronization. A
+ * separate semaphore gates worker startup until all tasks/resources exist. */
 #include "hal/nx_hal.h"
+#include "nexus_board.h"
+#include "nexus_config.h"
 #include "osal/osal.h"
+#include <stdatomic.h>
+#include <stdio.h>
+#if defined(NX_CONFIG_PLATFORM_NATIVE)
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+static unsigned long run_ms;
+#endif
 
-/*---------------------------------------------------------------------------*/
-/* Configuration                                                             */
-/*---------------------------------------------------------------------------*/
+#if !defined(NX_CONFIG_OSAL_FREERTOS) && !defined(NX_CONFIG_OSAL_NATIVE)
+#error "The task demo requires the Native or FreeRTOS backend"
+#endif
 
-#define TASK_STACK_SIZE     1024 /**< Stack size for tasks (in bytes) */
-#define SENSOR_QUEUE_SIZE   10   /**< Queue capacity for sensor data */
-#define LED_BLINK_PERIOD_MS 500  /**< LED blink period in milliseconds */
-#define SENSOR_SAMPLE_PERIOD_MS                                                \
-    100                      /**< Sensor sampling period in milliseconds */
-#define STATS_PERIOD_MS 2000 /**< Statistics report period in milliseconds */
+#if defined(NX_CONFIG_PLATFORM_STM32)
+#include "boot/stm32_boot.h"
+#endif
 
-/*---------------------------------------------------------------------------*/
-/* Data Structures                                                           */
-/*---------------------------------------------------------------------------*/
+#define TASK_COUNT 4U
+#define TASK_STACK_BYTES 1024U
+#define QUEUE_CAPACITY 10U
 
-/**
- * \brief           Sensor data message structure
- */
 typedef struct {
-    uint32_t timestamp; /**< Timestamp in milliseconds */
-    uint32_t sensor_id; /**< Sensor identifier */
-    int32_t value;      /**< Sensor reading value */
-    uint8_t status;     /**< Sensor status (0=OK, 1=Warning, 2=Error) */
-} sensor_data_t;
+    uint32_t sequence;
+    int32_t value;
+} sample_t;
 
-/**
- * \brief           System statistics structure
- */
 typedef struct {
-    uint32_t samples_produced; /**< Total samples produced */
-    uint32_t samples_consumed; /**< Total samples consumed */
-    uint32_t queue_overflows;  /**< Queue overflow count */
-    uint32_t errors;           /**< Error count */
-} system_stats_t;
+    uint32_t produced;
+    uint32_t consumed;
+    uint32_t dropped;
+} statistics_t;
 
-/*---------------------------------------------------------------------------*/
-/* Global Variables                                                          */
-/*---------------------------------------------------------------------------*/
+static osal_queue_handle_t samples;
+static osal_mutex_handle_t statistics_lock;
+static osal_sem_handle_t start_gate;
+static osal_task_handle_t workers[TASK_COUNT];
+static nx_gpio_write_t* led;
+static nx_lifecycle_t* led_lifecycle;
+static statistics_t statistics;
+static atomic_bool stopping;
 
-static osal_queue_handle_t g_sensor_queue =
-    NULL; /**< Message queue for sensor data */
-static osal_mutex_handle_t g_stats_mutex =
-    NULL; /**< Mutex for protecting shared statistics */
-static osal_sem_handle_t g_data_ready_sem =
-    NULL; /**< Semaphore for signaling new data available */
-static system_stats_t g_stats = {
-    0}; /**< System statistics (protected by mutex) */
-static volatile bool g_system_running = true; /**< System running flag */
-
-static osal_task_handle_t g_producer_task = NULL; /**< Producer task handle */
-static osal_task_handle_t g_consumer_task = NULL; /**< Consumer task handle */
-static osal_task_handle_t g_led_task = NULL;      /**< LED task handle */
-static osal_task_handle_t g_stats_task = NULL;    /**< Statistics task handle */
-
-static nx_gpio_write_t* g_led0 = NULL; /**< LED 0 (heartbeat) */
-static nx_gpio_write_t* g_led1 = NULL; /**< LED 1 (producer activity) */
-static nx_gpio_write_t* g_led2 = NULL; /**< LED 2 (consumer activity) */
-static nx_gpio_write_t* g_led3 = NULL; /**< LED 3 (error indicator) */
-
-/*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Simulate sensor reading
- */
-static int32_t simulate_sensor_reading(uint32_t sensor_id) {
-    /* Simple pseudo-random value based on tick and sensor ID */
-    uint32_t tick = osal_get_tick();
-    return (int32_t)((tick * (sensor_id + 1)) % 1000);
+static void fail(osal_status_t status) {
+    atomic_store(&stopping, true);
+    OSAL_REPORT_ERROR(status);
 }
 
-/**
- * \brief           Update statistics safely
- * \details         Uses mutex to protect shared statistics structure
- */
-static void update_stats(int produced, int consumed, int overflow, int error) {
-    if (osal_mutex_lock(g_stats_mutex, 100) == OSAL_OK) {
-        g_stats.samples_produced += produced;
-        g_stats.samples_consumed += consumed;
-        g_stats.queue_overflows += overflow;
-        g_stats.errors += error;
-        osal_mutex_unlock(g_stats_mutex);
-    }
+static bool should_stop(void) {
+    return atomic_load(&stopping) || osal_task_should_stop();
 }
 
-/*---------------------------------------------------------------------------*/
-/* Task Functions                                                            */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Producer task - generates sensor data
- * \details         This task simulates sensor readings and sends them
- *                  to the message queue. It demonstrates:
- *                  - Periodic task execution with osal_task_delay()
- *                  - Queue send operations
- *                  - Semaphore signaling
- */
-static void producer_task(void* arg) {
-    (void)arg;
-    uint32_t sample_count = 0;
-    uint32_t sensor_id = 0;
-
-    while (g_system_running) {
-        /* Create sensor data message */
-        sensor_data_t data = {
-            .timestamp = osal_get_tick(),
-            .sensor_id = sensor_id,
-            .value = simulate_sensor_reading(sensor_id),
-            .status = 0 /* OK */
-        };
-
-        /* Send to queue */
-        osal_status_t status = osal_queue_send(g_sensor_queue, &data, 10);
-
+static bool await_start(void) {
+    while (!should_stop()) {
+        osal_status_t status = osal_sem_take(start_gate, 100U);
         if (status == OSAL_OK) {
-            /* Signal consumer that data is available */
-            osal_sem_give(g_data_ready_sem);
-            update_stats(1, 0, 0, 0);
-            sample_count++;
+            return !should_stop();
+        }
+        if (status != OSAL_ERROR_TIMEOUT) {
+            fail(status);
+            return false;
+        }
+    }
+    return false;
+}
 
-            /* Toggle LED 1 on successful send */
-            if ((sample_count % 10) == 0 && g_led1) {
-                g_led1->toggle(g_led1);
-            }
+static bool record(uint32_t produced, uint32_t consumed, uint32_t dropped) {
+    osal_status_t status = osal_mutex_lock(statistics_lock, 50U);
+    if (status != OSAL_OK) {
+        fail(status);
+        return false;
+    }
+    statistics.produced += produced;
+    statistics.consumed += consumed;
+    statistics.dropped += dropped;
+    status = osal_mutex_unlock(statistics_lock);
+    if (status != OSAL_OK) {
+        fail(status);
+        return false;
+    }
+    return true;
+}
+
+static void produce(void* unused) {
+    (void)unused;
+    if (!await_start()) return;
+    uint32_t sequence = 0;
+    while (!should_stop()) {
+        uint32_t current = sequence++;
+        sample_t sample = {.sequence = current,
+                           .value = (int32_t)(current % 1000U)};
+        osal_status_t status = osal_queue_send(samples, &sample, OSAL_NO_WAIT);
+        if (status == OSAL_OK) {
+            if (!record(1, 0, 0)) break;
         } else if (status == OSAL_ERROR_FULL) {
-            /* Queue overflow */
-            update_stats(0, 0, 1, 0);
-            if (g_led3) {
-                g_led3->write(g_led3, 1);
-            }
+            if (!record(0, 0, 1)) break;
         } else {
-            /* Other error */
-            update_stats(0, 0, 0, 1);
+            fail(status);
+            break;
         }
-
-        /* Cycle through sensors */
-        sensor_id = (sensor_id + 1) % 4;
-
-        /* Wait for next sample period */
-        osal_task_delay(SENSOR_SAMPLE_PERIOD_MS);
-    }
-
-    /* Task cleanup */
-    osal_task_delete(NULL);
-}
-
-/**
- * \brief           Consumer task - processes sensor data
- * \details         This task receives sensor data from the queue and
- *                  processes it. It demonstrates:
- *                  - Semaphore wait for synchronization
- *                  - Queue receive operations
- *                  - Data processing
- */
-static void consumer_task(void* arg) {
-    (void)arg;
-    sensor_data_t data;
-    uint32_t process_count = 0;
-
-    while (g_system_running) {
-        /* Wait for data available signal */
-        if (osal_sem_take(g_data_ready_sem, 500) == OSAL_OK) {
-            /* Receive data from queue */
-            if (osal_queue_receive(g_sensor_queue, &data, 10) == OSAL_OK) {
-                /* Process the data (simulate processing time) */
-                osal_task_delay(5);
-
-                update_stats(0, 1, 0, 0);
-                process_count++;
-
-                /* Toggle LED 2 on successful processing */
-                if ((process_count % 10) == 0 && g_led2) {
-                    g_led2->toggle(g_led2);
-                }
-
-                /* Check for warning/error status */
-                if (data.status > 0 && g_led3) {
-                    g_led3->write(g_led3, 1);
-                }
-            }
+        status = osal_task_delay(100U);
+        if (status != OSAL_OK) {
+            if (status != OSAL_ERROR_CANCELLED) fail(status);
+            break;
         }
     }
-
-    /* Task cleanup */
-    osal_task_delete(NULL);
 }
 
-/**
- * \brief           LED task - heartbeat indicator
- * \details         This task blinks the LED as a heartbeat indicator.
- *                  It demonstrates simple periodic task execution.
- */
-static void led_task(void* arg) {
-    (void)arg;
-
-    while (g_system_running) {
-        /* Toggle LED 0 as heartbeat */
-        if (g_led0) {
-            g_led0->toggle(g_led0);
+static void consume(void* unused) {
+    (void)unused;
+    if (!await_start()) return;
+    uint32_t previous = 0;
+    bool have_previous = false;
+    while (!should_stop()) {
+        sample_t sample;
+        osal_status_t status = osal_queue_receive(samples, &sample, 100U);
+        if (status == OSAL_ERROR_TIMEOUT) continue;
+        if (status != OSAL_OK) {
+            if (status != OSAL_ERROR_CANCELLED) fail(status);
+            break;
         }
-
-        /* Wait for blink period */
-        osal_task_delay(LED_BLINK_PERIOD_MS);
+        /* Gaps are allowed when the producer drops on queue saturation.
+         * Duplicates/reordering violate the queue contract. */
+        if (have_previous && (int32_t)(sample.sequence - previous) <= 0) {
+            fail(OSAL_ERROR_INVALID_PARAM);
+            break;
+        }
+        previous = sample.sequence;
+        have_previous = true;
+        if (!record(0, 1, 0)) break;
     }
-
-    /* Turn off LED before exit */
-    if (g_led0) {
-        g_led0->write(g_led0, 0);
-    }
-
-    /* Task cleanup */
-    osal_task_delete(NULL);
 }
 
-/**
- * \brief           Statistics task - reports system status
- * \details         This task periodically reports system statistics.
- *                  It demonstrates mutex usage for protecting shared data.
- */
-static void stats_task(void* arg) {
-    (void)arg;
-    system_stats_t local_stats;
-
-    while (g_system_running) {
-        /* Wait for report period */
-        osal_task_delay(STATS_PERIOD_MS);
-
-        /* Get statistics snapshot with mutex protection */
-        if (osal_mutex_lock(g_stats_mutex, 100) == OSAL_OK) {
-            local_stats = g_stats;
-            osal_mutex_unlock(g_stats_mutex);
-
-            /* Report statistics (would normally go to UART/debug output) */
-            /* For now, just check queue status */
-            size_t queue_count = osal_queue_get_count(g_sensor_queue);
-
-            /* Clear error LED if no recent errors */
-            if (local_stats.errors == 0 && local_stats.queue_overflows == 0 &&
-                g_led3) {
-                g_led3->write(g_led3, 0);
-            }
-
-            /* Yield to other tasks */
-            osal_task_yield();
-
-            (void)queue_count; /* Suppress unused warning */
+static void heartbeat(void* unused) {
+    (void)unused;
+    if (!await_start()) return;
+    /* This is the sole GPIO writer after startup. */
+    while (!should_stop()) {
+        led->toggle(led);
+        osal_status_t status = osal_task_delay(500U);
+        if (status != OSAL_OK) {
+            if (status != OSAL_ERROR_CANCELLED) fail(status);
+            break;
         }
     }
-
-    /* Task cleanup */
-    osal_task_delete(NULL);
+    led->write(led, 0);
 }
 
-/*---------------------------------------------------------------------------*/
-/* Main Entry Point                                                          */
-/*---------------------------------------------------------------------------*/
+static void report(void* unused) {
+    (void)unused;
+    if (!await_start()) return;
+    while (!should_stop()) {
+        osal_status_t status = osal_task_delay(2000U);
+        if (status != OSAL_OK) {
+            if (status != OSAL_ERROR_CANCELLED) fail(status);
+            break;
+        }
+        statistics_t snapshot;
+        status = osal_mutex_lock(statistics_lock, 50U);
+        if (status != OSAL_OK) { fail(status); break; }
+        snapshot = statistics;
+        status = osal_mutex_unlock(statistics_lock);
+        if (status != OSAL_OK) { fail(status); break; }
+        /* Transport output happens outside the shared statistics mutex. */
+        printf("[%s] produced=%lu consumed=%lu dropped=%lu pending=%lu\n",
+               NX_BOARD_NAME, (unsigned long)snapshot.produced,
+               (unsigned long)snapshot.consumed, (unsigned long)snapshot.dropped,
+               (unsigned long)osal_queue_get_count(samples));
+#if defined(NX_CONFIG_PLATFORM_NATIVE)
+        fflush(stdout);
+#endif
+    }
+}
 
-/**
- * \brief           Main entry point
- * \details         Initializes the system and creates all tasks.
- *                  Demonstrates:
- *                  - OSAL initialization
- *                  - Resource creation (mutex, semaphore, queue)
- *                  - Task creation with different priorities
- *                  - Starting the OSAL scheduler
- */
+static int stop_and_cleanup(int result) {
+    atomic_store(&stopping, true);
+    for (size_t i = 0; i < TASK_COUNT; ++i) {
+        if (workers[i]) (void)osal_task_request_stop(workers[i]);
+    }
+#if defined(NX_CONFIG_OSAL_NATIVE)
+    /* Native workers may already exist before osal_start. Join them before
+     * deleting any shared resource; retain resources if a join fails. */
+    bool joined = true;
+    for (size_t i = 0; i < TASK_COUNT; ++i) {
+        if (workers[i] && osal_task_join(workers[i], 3000U) != OSAL_OK)
+            joined = false;
+    }
+    if (joined) {
+        if (result == 0 &&
+            (statistics.produced == 0 || statistics.consumed == 0)) {
+            result = 1;
+        }
+        for (size_t i = 0; i < TASK_COUNT; ++i) {
+            if (workers[i] && osal_task_delete(workers[i]) != OSAL_OK)
+                result = 1;
+        }
+        if (samples && osal_queue_delete(samples) != OSAL_OK) result = 1;
+        if (start_gate && osal_sem_delete(start_gate) != OSAL_OK) result = 1;
+        if (statistics_lock && osal_mutex_delete(statistics_lock) != OSAL_OK)
+            result = 1;
+        printf("[%s] stopped: produced=%lu consumed=%lu dropped=%lu\n",
+               NX_BOARD_NAME, (unsigned long)statistics.produced,
+               (unsigned long)statistics.consumed,
+               (unsigned long)statistics.dropped);
+        if (led_lifecycle && led_lifecycle->deinit(led_lifecycle) != NX_OK)
+            result = 1;
+    } else {
+        result = 1;
+    }
+#endif
+    /* A not-yet-started FreeRTOS scheduler cannot join ready tasks. Preserve
+     * their resources and never start a partially configured application. */
+    if (led) led->write(led, 0);
+    return result;
+}
+
+#if defined(NX_CONFIG_PLATFORM_NATIVE)
+int main(int argc, char** argv) {
+    if (argc != 1) {
+        if (argc != 3 || strcmp(argv[1], "--run-ms") != 0) return 2;
+        char* end = NULL;
+        errno = 0;
+        run_ms = strtoul(argv[2], &end, 10);
+        if (argv[2][0] < '0' || argv[2][0] > '9' || *end != '\0' ||
+            errno == ERANGE || run_ms < 100U || run_ms > 10000U) return 2;
+    }
+#else
 int main(void) {
-    osal_status_t status;
+#endif
+#if defined(NX_CONFIG_PLATFORM_STM32)
+    if (stm32_platform_init() != 0) return 1;
+#endif
+    if (osal_init() != OSAL_OK || nx_hal_init() != NX_OK) return 1;
+    led = nx_factory_gpio_write(NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN);
+    if (!led) return 1;
+    led_lifecycle = led->get_lifecycle(led);
+    if (!led_lifecycle || led_lifecycle->init(led_lifecycle) != NX_OK) return 1;
+    led->write(led, 0);
+    if (osal_queue_create(sizeof(sample_t), QUEUE_CAPACITY, &samples) != OSAL_OK ||
+        osal_mutex_create(&statistics_lock) != OSAL_OK ||
+        osal_sem_create_counting(TASK_COUNT, 0, &start_gate) != OSAL_OK)
+        return stop_and_cleanup(1);
 
-    /* Initialize OSAL */
-    status = osal_init();
-    if (status != OSAL_OK) {
-        while (1) {
-            /* Error state */
-        }
+    const osal_task_config_t tasks[TASK_COUNT] = {
+        {.name="Producer", .func=produce, .arg=NULL,
+         .priority=OSAL_TASK_PRIORITY_NORMAL, .stack_size=TASK_STACK_BYTES},
+        {.name="Consumer", .func=consume, .arg=NULL,
+         .priority=OSAL_TASK_PRIORITY_HIGH, .stack_size=TASK_STACK_BYTES},
+        {.name="Heartbeat", .func=heartbeat, .arg=NULL,
+         .priority=OSAL_TASK_PRIORITY_LOW, .stack_size=TASK_STACK_BYTES},
+        {.name="Statistics", .func=report, .arg=NULL,
+         .priority=OSAL_TASK_PRIORITY_LOW, .stack_size=TASK_STACK_BYTES},
+    };
+    for (size_t i = 0; i < TASK_COUNT; ++i)
+        if (osal_task_create(&tasks[i], &workers[i]) != OSAL_OK)
+            return stop_and_cleanup(1);
+    for (size_t i = 0; i < TASK_COUNT; ++i)
+        if (osal_sem_give(start_gate) != OSAL_OK) return stop_and_cleanup(1);
+#if defined(NX_CONFIG_PLATFORM_NATIVE)
+    if (run_ms) {
+        osal_status_t status = osal_task_delay((uint32_t)run_ms);
+        int result = status == OSAL_OK && !atomic_load(&stopping) ? 0 : 1;
+        return stop_and_cleanup(result);
     }
-
-    /* Initialize HAL */
-    if (nx_hal_init() != NX_OK) {
-        while (1) {
-            /* Error state */
-        }
-    }
-
-    /* Get GPIO devices */
-    g_led0 = nx_factory_gpio_write('A', 0);
-    g_led1 = nx_factory_gpio_write('A', 1);
-    g_led2 = nx_factory_gpio_write('A', 2);
-    g_led3 = nx_factory_gpio_write('B', 0);
-
-    /*-----------------------------------------------------------------------*/
-    /* Create synchronization primitives                                     */
-    /*-----------------------------------------------------------------------*/
-
-    /* Create message queue for sensor data */
-    status = osal_queue_create(sizeof(sensor_data_t), SENSOR_QUEUE_SIZE,
-                               &g_sensor_queue);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /* Create mutex for statistics protection */
-    status = osal_mutex_create(&g_stats_mutex);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /* Create semaphore for data ready signaling */
-    status = osal_sem_create_counting(SENSOR_QUEUE_SIZE, 0, &g_data_ready_sem);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /*-----------------------------------------------------------------------*/
-    /* Create tasks                                                          */
-    /*-----------------------------------------------------------------------*/
-
-    /* Producer task - Normal priority */
-    osal_task_config_t producer_config = {.name = "Producer",
-                                          .func = producer_task,
-                                          .arg = NULL,
-                                          .priority = OSAL_TASK_PRIORITY_NORMAL,
-                                          .stack_size = TASK_STACK_SIZE};
-    status = osal_task_create(&producer_config, &g_producer_task);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /* Consumer task - High priority (process data quickly) */
-    osal_task_config_t consumer_config = {.name = "Consumer",
-                                          .func = consumer_task,
-                                          .arg = NULL,
-                                          .priority = OSAL_TASK_PRIORITY_HIGH,
-                                          .stack_size = TASK_STACK_SIZE};
-    status = osal_task_create(&consumer_config, &g_consumer_task);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /* LED task - Low priority (background heartbeat) */
-    osal_task_config_t led_config = {.name = "LED",
-                                     .func = led_task,
-                                     .arg = NULL,
-                                     .priority = OSAL_TASK_PRIORITY_LOW,
-                                     .stack_size = TASK_STACK_SIZE};
-    status = osal_task_create(&led_config, &g_led_task);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /* Statistics task - Low priority (periodic reporting) */
-    osal_task_config_t stats_config = {.name = "Stats",
-                                       .func = stats_task,
-                                       .arg = NULL,
-                                       .priority = OSAL_TASK_PRIORITY_LOW,
-                                       .stack_size = TASK_STACK_SIZE};
-    status = osal_task_create(&stats_config, &g_stats_task);
-    if (status != OSAL_OK) {
-        while (1) { /* Error */
-        }
-    }
-
-    /*-----------------------------------------------------------------------*/
-    /* Start scheduler                                                       */
-    /*-----------------------------------------------------------------------*/
-
-    /* Start OSAL scheduler - this function does not return */
+#endif
     osal_start();
-
-    /* Should never reach here */
-    return 0;
+    return stop_and_cleanup(1);
 }

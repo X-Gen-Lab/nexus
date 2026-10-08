@@ -24,9 +24,10 @@ static uint64_t g_simulated_time_ms = 0;
  * \brief           Get current simulated time in milliseconds
  * \return          Current simulated time
  */
-uint64_t nx_get_time_ms(void) {
+uint64_t nx_native_monotonic_time_ms(void) {
     return g_simulated_time_ms;
 }
+uint64_t nx_get_time_ms(void) { return nx_native_monotonic_time_ms(); }
 
 /**
  * \brief           Advance simulated time

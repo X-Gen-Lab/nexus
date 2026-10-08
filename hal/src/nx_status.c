@@ -29,6 +29,7 @@ static const struct {
     /* General errors */
     {NX_ERR_GENERIC, "Generic error"},
     {NX_ERR_INVALID_PARAM, "Invalid parameter"},
+    {NX_ERR_CANCELLED, "Operation cancelled"},
     {NX_ERR_NULL_PTR, "Null pointer"},
     {NX_ERR_NOT_SUPPORTED, "Not supported"},
     {NX_ERR_NOT_FOUND, "Not found"},

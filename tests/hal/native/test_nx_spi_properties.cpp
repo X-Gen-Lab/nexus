@@ -15,12 +15,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
-#include "hal/include/hal/interface/nx_spi.h"
+#include "hal/interface/nx_spi.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_spi_helpers.h"
+#include "devices/native_spi_helpers.h"
 }
 
 /**
@@ -37,7 +38,7 @@ class SPIPropertyTest : public ::testing::Test {
     nx_spi_bus_t* spi = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all SPI instances */
         native_spi_reset_all();
@@ -93,7 +94,9 @@ class SPIPropertyTest : public ::testing::Test {
      */
     nx_spi_device_config_t randomDeviceConfig() {
         std::uniform_int_distribution<int> cs_dist(0, 15);
-        std::uniform_int_distribution<uint32_t> speed_dist(100000, 10000000);
+        native_spi_state_t state;
+        EXPECT_EQ(NX_OK, native_spi_get_state(0, &state));
+        std::uniform_int_distribution<uint32_t> speed_dist(100000, state.max_speed);
         std::uniform_int_distribution<int> mode_dist(0, 3);
         std::uniform_int_distribution<int> order_dist(0, 1);
 
@@ -300,10 +303,13 @@ TEST_F(SPIPropertyTest, Property7_TransmissionRoundTrip) {
         nx_spi_device_config_t config = randomDeviceConfig();
 
         /* Send data */
-        nx_tx_async_t* tx_async = spi->get_tx_async_handle(spi, config);
-        ASSERT_NE(nullptr, tx_async);
+        nx_spi_device_t device;
+        ASSERT_EQ(NX_OK, spi->open_device(spi, &config, &device));
+        EXPECT_NE(0U, device.token);
+        nx_spi_transaction_t transaction={test_data.data(), nullptr, test_data.size(), 1000, nullptr, nullptr};
         EXPECT_EQ(NX_OK,
-                  tx_async->send(tx_async, test_data.data(), test_data.size()));
+                  device.transfer(&device, &transaction));
+        ASSERT_EQ(NX_OK, spi->close_device(spi, &device));
 
         /* Capture transmitted data */
         std::vector<uint8_t> captured_data(test_data.size() + 10);
@@ -338,15 +344,18 @@ TEST_F(SPIPropertyTest, Property7_MultipleTransmissionsPreserveOrder) {
 
         /* Send multiple buffers */
         std::vector<uint8_t> all_data;
-        nx_tx_async_t* tx_async = spi->get_tx_async_handle(spi, config);
+        nx_spi_device_t device;
+        ASSERT_EQ(NX_OK, spi->open_device(spi, &config, &device));
 
         for (int i = 0; i < tx_count; ++i) {
             std::vector<uint8_t> chunk = randomData(1, 20);
+            nx_spi_transaction_t transaction={chunk.data(), nullptr, chunk.size(), 1000, nullptr, nullptr};
             EXPECT_EQ(NX_OK,
-                      tx_async->send(tx_async, chunk.data(), chunk.size()));
+                      device.transfer(&device, &transaction));
             all_data.insert(all_data.end(), chunk.begin(), chunk.end());
         }
 
+        ASSERT_EQ(NX_OK, spi->close_device(spi, &device));
         /* Capture all transmitted data */
         std::vector<uint8_t> captured_data(all_data.size() + 10);
         size_t captured_len = captured_data.size();
@@ -399,14 +408,14 @@ TEST_F(SPIPropertyTest, Property8_ReceptionIntegrity) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Property 10: Diagnostic Count Accuracy                                    */
+/* Property 10: Simulator Count Accuracy                                    */
 /* *For any* SPI, executing N operations SHALL result in diagnostic count    */
 /* equal to N.                                                               */
 /* **Validates: Requirements 3.7**                                           */
 /*---------------------------------------------------------------------------*/
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* number of transmit operations, the TX count should equal the
  * total bytes transmitted.
@@ -430,7 +439,8 @@ TEST_F(SPIPropertyTest, Property10_TxCountAccuracy) {
         /* Send data and track total bytes - limit to buffer size */
         size_t total_bytes = 0;
         const size_t MAX_BUFFER_SIZE = 256; /* TX buffer size limit */
-        nx_tx_async_t* tx_async = spi->get_tx_async_handle(spi, config);
+        nx_spi_device_t device;
+        ASSERT_EQ(NX_OK, spi->open_device(spi, &config, &device));
 
         for (int i = 0; i < tx_count; ++i) {
             /* Calculate remaining buffer space */
@@ -443,16 +453,17 @@ TEST_F(SPIPropertyTest, Property10_TxCountAccuracy) {
             size_t max_chunk = (remaining < 50) ? remaining : 50;
             std::vector<uint8_t> data = randomData(1, max_chunk);
 
+            nx_spi_transaction_t transaction={data.data(), nullptr, data.size(), 1000, nullptr, nullptr};
             EXPECT_EQ(NX_OK,
-                      tx_async->send(tx_async, data.data(), data.size()));
+                      device.transfer(&device, &transaction));
             total_bytes += data.size();
         }
 
+        ASSERT_EQ(NX_OK, spi->close_device(spi, &device));
         /* Query diagnostic statistics */
-        nx_diagnostic_t* diag = spi->get_diagnostic(spi);
-        ASSERT_NE(nullptr, diag);
-        nx_spi_stats_t stats;
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+
+        native_spi_state_t stats;
+        EXPECT_EQ(NX_OK, native_spi_get_state(0, &stats));
 
         /* Verify TX count matches */
         EXPECT_EQ(total_bytes, stats.tx_count)
@@ -461,7 +472,7 @@ TEST_F(SPIPropertyTest, Property10_TxCountAccuracy) {
 }
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* number of receive operations, the RX count should equal the
  * total bytes received.
@@ -500,10 +511,9 @@ TEST_F(SPIPropertyTest, Property10_RxCountAccuracy) {
         }
 
         /* Query diagnostic statistics */
-        nx_diagnostic_t* diag = spi->get_diagnostic(spi);
-        ASSERT_NE(nullptr, diag);
-        nx_spi_stats_t stats;
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+
+        native_spi_state_t stats;
+        EXPECT_EQ(NX_OK, native_spi_get_state(0, &stats));
 
         /* Verify RX count matches */
         EXPECT_EQ(total_bytes, stats.rx_count)
@@ -512,28 +522,33 @@ TEST_F(SPIPropertyTest, Property10_RxCountAccuracy) {
 }
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* SPI, resetting diagnostics should clear all counts to zero.
  *
  * **Validates: Requirements 3.7**
  */
-TEST_F(SPIPropertyTest, Property10_DiagnosticResetClearsCount) {
+TEST_F(SPIPropertyTest, Property10_SimulatorResetClearsCount) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Send some data to generate counts */
         std::vector<uint8_t> data = randomData(10, 50);
         nx_spi_device_config_t config = randomDeviceConfig();
-        nx_tx_async_t* tx_async = spi->get_tx_async_handle(spi, config);
-        tx_async->send(tx_async, data.data(), data.size());
+        nx_spi_device_t device;
+        ASSERT_EQ(NX_OK, spi->open_device(spi, &config, &device));
+        nx_spi_transaction_t transaction={data.data(), nullptr, data.size(), 1000, nullptr, nullptr};
+        ASSERT_EQ(NX_OK, device.transfer(&device, &transaction));
+        ASSERT_EQ(NX_OK, spi->close_device(spi, &device));
 
-        /* Reset diagnostics */
-        nx_diagnostic_t* diag = spi->get_diagnostic(spi);
-        ASSERT_NE(nullptr, diag);
-        EXPECT_EQ(NX_OK, diag->clear_statistics(diag));
+        /* Reset simulator state */
+
+        ASSERT_EQ(NX_OK, native_spi_reset(0));
+        nx_lifecycle_t* reset_lifecycle = spi->get_lifecycle(spi);
+        ASSERT_NE(nullptr, reset_lifecycle);
+        ASSERT_EQ(NX_OK, reset_lifecycle->init(reset_lifecycle));
 
         /* Query statistics - should be zero */
-        nx_spi_stats_t stats;
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+        native_spi_state_t stats;
+        EXPECT_EQ(NX_OK, native_spi_get_state(0, &stats));
 
         EXPECT_EQ(0U, stats.tx_count)
             << "Iteration " << test_iter << ": TX count not cleared";

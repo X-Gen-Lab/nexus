@@ -41,6 +41,8 @@ typedef enum {
     OSAL_ERROR_FULL = 9,          /**< Queue/buffer full */
     OSAL_ERROR_EMPTY = 10,        /**< Queue/buffer empty */
     OSAL_ERROR_ISR = 11,          /**< Called from ISR context */
+    OSAL_ERROR_CANCELLED = 12,    /**< Wait cancelled by object deletion */
+    OSAL_ERROR_NOT_SUPPORTED = 13, /**< Backend does not provide this operation */
 } osal_status_t;
 
 /**

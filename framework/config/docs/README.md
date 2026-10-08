@@ -1,3 +1,5 @@
+> Persistence/crypto refactor: Flash requires an explicit `config_backend_flash_bind` partition; keys are externally persisted and reloaded before encrypted load; AES-GCM records replace CBC. Follow [the current implementation contract](../../../docs/implementation/storage-security.md) for atomic snapshots, error recovery and support evidence.
+
 # Config Manager 文档索引
 
 欢迎查阅 Nexus Config Manager 的完整文档。

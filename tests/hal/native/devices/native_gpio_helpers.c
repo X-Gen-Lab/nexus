@@ -13,6 +13,7 @@
 
 /* Include platform-specific types */
 #include "../../../../platforms/native/src/gpio/nx_gpio_types.h"
+#include "../../../../platforms/native/src/gpio/nx_gpio_helpers.h"
 
 #include <string.h>
 
@@ -100,49 +101,9 @@ nx_status_t native_gpio_simulate_pin_change(uint8_t port, uint8_t pin,
         return NX_ERR_INVALID_PARAM;
     }
 
-    /* Normalize level to 0 or 1 */
-    uint8_t new_level = (level != 0) ? 1 : 0;
-    uint8_t old_level = impl->state->pin_state;
-
-    /* Update pin state */
-    impl->state->pin_state = new_level;
-
-    /* Check if interrupt should be triggered */
-    if (impl->state->exti.enabled && impl->state->exti.callback != NULL) {
-        bool trigger_interrupt = false;
-
-        switch (impl->state->exti.trigger) {
-            case NX_GPIO_TRIGGER_RISING:
-                /* Trigger on 0 -> 1 transition */
-                if (old_level == 0 && new_level == 1) {
-                    trigger_interrupt = true;
-                }
-                break;
-
-            case NX_GPIO_TRIGGER_FALLING:
-                /* Trigger on 1 -> 0 transition */
-                if (old_level == 1 && new_level == 0) {
-                    trigger_interrupt = true;
-                }
-                break;
-
-            case NX_GPIO_TRIGGER_BOTH:
-                /* Trigger on any transition */
-                if (old_level != new_level) {
-                    trigger_interrupt = true;
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        /* Trigger callback if conditions met */
-        if (trigger_interrupt) {
-            impl->state->stats.exti_count++;
-            impl->state->exti.callback(impl->state->exti.user_data);
-        }
-    }
+    /* Exercise the production simulator input/EXTI path. Test helpers must
+     * not implement an independent callback engine. */
+    gpio_trigger_exti(impl->state, level);
 
     return NX_OK;
 }

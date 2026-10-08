@@ -17,7 +17,7 @@
 extern "C" {
 #include "hal/interface/nx_flash.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_flash_helpers.h"
+#include "devices/native_flash_helpers.h"
 }
 
 /**

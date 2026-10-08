@@ -18,7 +18,7 @@
 extern "C" {
 #include "hal/base/nx_device.h"
 #include "hal/nx_status.h"
-#include "tests/hal/native/native_test_helpers.h"
+#include "native_test_helpers.h"
 }
 
 /*---------------------------------------------------------------------------*/

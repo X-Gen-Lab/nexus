@@ -41,7 +41,7 @@ python scripts/setup/setup.py --dev --docs
 python scripts/setup/check-env.py
 
 # 3. 构建项目
-python scripts/building/build.py
+python scripts/building/build.py --preset linux-gcc-debug --stage all
 
 # 4. 运行测试
 python scripts/test/test.py
@@ -182,7 +182,7 @@ python scripts/setup/docker-setup.py --shell
 
 # 在容器中开发
 cd nexus
-python scripts/building/build.py
+python scripts/building/build.py --preset linux-gcc-debug --stage all
 python scripts/test/test.py
 ```
 

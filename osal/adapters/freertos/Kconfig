@@ -5,17 +5,18 @@ if OSAL_FREERTOS
 menu "FreeRTOS Configuration"
 
 config FREERTOS_USE_PREEMPTION
-    bool "Use preemptive scheduling"
+    bool
     default y
     help
-      Enable preemptive multitasking.
-      Disable for cooperative scheduling.
+      Required by the supported OSAL scheduling contract. Cooperative
+      scheduling is not implemented by this backend.
 
 config FREERTOS_USE_TIMERS
-    bool "Enable software timers"
+    bool
     default y
     help
-      Enable FreeRTOS software timer functionality.
+      The timer daemon is required for timer lifetime acknowledgements.
+      Disabling it is not supported by this backend.
 
 config FREERTOS_TIMER_TASK_PRIORITY
     int "Timer task priority"

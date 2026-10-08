@@ -18,12 +18,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_crc.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_crc_helpers.h"
+#include "devices/native_crc_helpers.h"
 }
 
 /**
@@ -40,7 +41,7 @@ class CRCPropertyTest : public ::testing::Test {
     nx_crc_t* crc = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all CRC instances */
         native_crc_reset_all();

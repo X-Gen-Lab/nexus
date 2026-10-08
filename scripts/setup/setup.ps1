@@ -498,13 +498,13 @@ function Show-NextSteps {
     Write-Host ""
     Write-Host "Next Steps:" -ForegroundColor Cyan
     Write-Host "1. Restart terminal to ensure environment variables take effect"
-    Write-Host "2. Run build script: python scripts/building/build.py"
+    Write-Host "2. Run build script: python scripts/building/build.py --preset linux-gcc-debug --stage all"
     Write-Host "3. Run tests: python scripts/test/test.py"
 
     if ($Platform -eq "stm32f4") {
         Write-Host ""
         Write-Host "STM32F4 Development:" -ForegroundColor Magenta
-        Write-Host "  Build firmware: python scripts/building/build.py -p stm32f4"
+        Write-Host "  Build firmware: python scripts/building/build.py --preset stm32-armgcc-debug --stage build"
         Write-Host "  Output location: build-stm32f4/applications/blinky/"
     }
 

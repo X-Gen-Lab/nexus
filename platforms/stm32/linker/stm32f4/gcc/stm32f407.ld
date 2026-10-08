@@ -27,10 +27,15 @@ PROVIDE(_Min_Heap_Size = 0x200);   /* 512B default */
 /* Memory Regions */
 MEMORY
 {
-    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 1024K
+    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 768K
     RAM (rw)    : ORIGIN = 0x20000000, LENGTH = 128K
     CCMRAM (rw) : ORIGIN = 0x10000000, LENGTH = 64K
 }
+
+/* Sectors 10 and 11 are reserved for the two-bank parameter journal.
+ * The image cannot link into the storage partition. Physical Flash is 1 MiB. */
+__nexus_storage_start = 0x080C0000;
+__nexus_storage_end = 0x08100000;
 
 /* Sections */
 SECTIONS
@@ -114,6 +119,14 @@ SECTIONS
         . = ALIGN(4);
     } >FLASH
 
+    .nx_init_fn :
+    {
+        . = ALIGN(4);
+        __nx_init_fn_start = .;
+        KEEP(*(SORT_BY_NAME(.nx_init_fn.*)))
+        __nx_init_fn_end = .;
+    } >FLASH
+
     /* Nexus HAL device registration section */
     .nx_device :
     {
@@ -173,14 +186,6 @@ SECTIONS
         . = . + _Min_Stack_Size;
         . = ALIGN(8);
     } >RAM
-
-    /* Remove information from the compiler libraries */
-    /DISCARD/ :
-    {
-        libc.a ( * )
-        libm.a ( * )
-        libgcc.a ( * )
-    }
 
     .ARM.attributes 0 : { *(.ARM.attributes) }
 }

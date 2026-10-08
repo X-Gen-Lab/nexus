@@ -200,10 +200,7 @@
                 "NEXUS_PLATFORM": "stm32",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_EXAMPLES": "ON",
-                "NEXUS_CPU_ARCH": "cortex-m4",
-                "NEXUS_FPU_TYPE": "fpv4-sp-d16",
-                "NEXUS_FLOAT_ABI": "hard",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/.config"
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407_baremetal_defconfig"
             }
         },
         {
@@ -225,87 +222,8 @@
             }
         },
         {
-            "name": "stm32-armclang-debug",
-            "displayName": "STM32 ARM Clang Debug",
-            "description": "STM32 build with ARM Clang (armclang) - Debug",
-            "inherits": "base",
-            "generator": "Ninja",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/armclang.cmake",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_PLATFORM": "stm32",
-                "NEXUS_BUILD_TESTS": "OFF",
-                "NEXUS_BUILD_EXAMPLES": "ON",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/.config"
-            }
-        },
-        {
-            "name": "stm32-armclang-release",
-            "displayName": "STM32 ARM Clang Release",
-            "description": "STM32 build with ARM Clang (armclang) - Release",
-            "inherits": "stm32-armclang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "stm32-armclang-minsizerel",
-            "displayName": "STM32 ARM Clang MinSizeRel",
-            "description": "STM32 build with ARM Clang (armclang) - Minimum Size Release",
-            "inherits": "stm32-armclang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "MinSizeRel"
-            }
-        },
-        {
-            "name": "windows-stm32-armclang-debug",
-            "displayName": "Windows → STM32 ARM Clang Debug",
-            "description": "Windows host, STM32 target with ARM Clang (armclang) - Debug",
-            "inherits": [
-                "stm32-armclang-debug",
-                "windows-base"
-            ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            }
-        },
-        {
-            "name": "windows-stm32-armclang-release",
-            "displayName": "Windows → STM32 ARM Clang Release",
-            "description": "Windows host, STM32 target with ARM Clang (armclang) - Release",
-            "inherits": "windows-stm32-armclang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "linux-stm32-armclang-debug",
-            "displayName": "Linux → STM32 ARM Clang Debug",
-            "description": "Linux host, STM32 target with ARM Clang (armclang) - Debug",
-            "inherits": [
-                "stm32-armclang-debug",
-                "linux-base"
-            ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            }
-        },
-        {
-            "name": "linux-stm32-armclang-release",
-            "displayName": "Linux → STM32 ARM Clang Release",
-            "description": "Linux host, STM32 target with ARM Clang (armclang) - Release",
-            "inherits": "linux-stm32-armclang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
             "name": "windows-stm32-armgcc-debug",
-            "displayName": "Windows → STM32 ARM GCC Debug",
+            "displayName": "Windows \u2192 STM32 ARM GCC Debug",
             "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
             "inherits": [
                 "stm32-armgcc-debug",
@@ -319,7 +237,7 @@
         },
         {
             "name": "windows-stm32-armgcc-release",
-            "displayName": "Windows → STM32 ARM GCC Release",
+            "displayName": "Windows \u2192 STM32 ARM GCC Release",
             "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Release",
             "inherits": "windows-stm32-armgcc-debug",
             "cacheVariables": {
@@ -328,7 +246,7 @@
         },
         {
             "name": "linux-stm32-armgcc-debug",
-            "displayName": "Linux → STM32 ARM GCC Debug",
+            "displayName": "Linux \u2192 STM32 ARM GCC Debug",
             "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
             "inherits": [
                 "stm32-armgcc-debug",
@@ -342,11 +260,44 @@
         },
         {
             "name": "linux-stm32-armgcc-release",
-            "displayName": "Linux → STM32 ARM GCC Release",
+            "displayName": "Linux \u2192 STM32 ARM GCC Release",
             "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Release",
             "inherits": "linux-stm32-armgcc-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-gcc-sanitizers",
+            "displayName": "Linux GCC ASan/UBSan",
+            "inherits": "linux-gcc-debug",
+            "cacheVariables": {
+                "NEXUS_ENABLE_SANITIZERS": "ON"
+            }
+        },
+        {
+            "name": "stm32-armgcc-freertos-debug",
+            "displayName": "STM32F407 FreeRTOS ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407_freertos_defconfig"
+            }
+        },
+        {
+            "name": "stm32-armgcc-freertos-release",
+            "displayName": "STM32F407 FreeRTOS ARM GCC Release",
+            "inherits": "stm32-armgcc-freertos-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "native-services-debug",
+            "displayName": "Native OSAL finite resource example",
+            "inherits": "linux-gcc-debug",
+            "cacheVariables": {
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_services_demo_defconfig",
+                "NEXUS_BUILD_TESTS": "OFF"
             }
         }
     ],
@@ -418,34 +369,6 @@
             "configurePreset": "stm32-armgcc-minsizerel"
         },
         {
-            "name": "stm32-armclang-debug",
-            "configurePreset": "stm32-armclang-debug"
-        },
-        {
-            "name": "stm32-armclang-release",
-            "configurePreset": "stm32-armclang-release"
-        },
-        {
-            "name": "stm32-armclang-minsizerel",
-            "configurePreset": "stm32-armclang-minsizerel"
-        },
-        {
-            "name": "windows-stm32-armclang-debug",
-            "configurePreset": "windows-stm32-armclang-debug"
-        },
-        {
-            "name": "windows-stm32-armclang-release",
-            "configurePreset": "windows-stm32-armclang-release"
-        },
-        {
-            "name": "linux-stm32-armclang-debug",
-            "configurePreset": "linux-stm32-armclang-debug"
-        },
-        {
-            "name": "linux-stm32-armclang-release",
-            "configurePreset": "linux-stm32-armclang-release"
-        },
-        {
             "name": "windows-stm32-armgcc-debug",
             "configurePreset": "windows-stm32-armgcc-debug"
         },
@@ -460,6 +383,22 @@
         {
             "name": "linux-stm32-armgcc-release",
             "configurePreset": "linux-stm32-armgcc-release"
+        },
+        {
+            "name": "linux-gcc-sanitizers",
+            "configurePreset": "linux-gcc-sanitizers"
+        },
+        {
+            "name": "stm32-armgcc-freertos-debug",
+            "configurePreset": "stm32-armgcc-freertos-debug"
+        },
+        {
+            "name": "stm32-armgcc-freertos-release",
+            "configurePreset": "stm32-armgcc-freertos-release"
+        },
+        {
+            "name": "native-services-debug",
+            "configurePreset": "native-services-debug"
         }
     ],
     "testPresets": [
@@ -539,6 +478,11 @@
         {
             "name": "macos-clang-release",
             "configurePreset": "macos-clang-release",
+            "inherits": "base-test"
+        },
+        {
+            "name": "linux-gcc-sanitizers",
+            "configurePreset": "linux-gcc-sanitizers",
             "inherits": "base-test"
         }
     ]

@@ -51,7 +51,7 @@ menuconfig INSTANCE_STM32_GPIO{port}_PIN{pin}
 
 if INSTANCE_STM32_GPIO{port}_PIN{pin}
 
-choice
+choice GPIO_{port}{pin}_RW_MODE_CHOICE
     prompt "P{port}{pin} Read/Write Mode"
     default GPIO_{port}{pin}_RW_MODE_WRITE
     help
@@ -80,7 +80,7 @@ config GPIO_{port}{pin}_RW_MODE
     default 1 if GPIO_{port}{pin}_RW_MODE_WRITE
     default 2 if GPIO_{port}{pin}_RW_MODE_READWRITE
 
-choice
+choice GPIO_{port}{pin}_MODE_CHOICE
     prompt "P{port}{pin} GPIO Mode"
     default GPIO_{port}{pin}_MODE_OUTPUT_PP if GPIO_{port}{pin}_RW_MODE_WRITE
     default GPIO_{port}{pin}_MODE_INPUT if GPIO_{port}{pin}_RW_MODE_READ
@@ -128,7 +128,7 @@ config GPIO_{port}{pin}_MODE
     default 0x00000012 if GPIO_{port}{pin}_MODE_AF_OD
     default 0x00000003 if GPIO_{port}{pin}_MODE_ANALOG
 
-choice
+choice GPIO_{port}{pin}_PULL_CHOICE
     prompt "P{port}{pin} Pull-up/Pull-down"
     default GPIO_{port}{pin}_PULL_NONE
     help
@@ -157,7 +157,7 @@ config GPIO_{port}{pin}_PULL
     default 0x00000001 if GPIO_{port}{pin}_PULL_UP
     default 0x00000002 if GPIO_{port}{pin}_PULL_DOWN
 
-choice
+choice GPIO_{port}{pin}_SPEED_CHOICE
     prompt "P{port}{pin} Speed"
     default GPIO_{port}{pin}_SPEED_MEDIUM
     help

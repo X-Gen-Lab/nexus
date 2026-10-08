@@ -81,7 +81,9 @@ struct log_backend {
  * \param[in]       backend: Pointer to backend structure
  * \return          LOG_OK on success, error code otherwise
  * \note            The backend structure must remain valid for the lifetime
- *                  of the registration
+ *                  of the registration. Callbacks execute under the logger
+ *                  lock and must be short and nonblocking. Recursive writes,
+ *                  unregister, flush, and shutdown return LOG_ERROR_BUSY.
  */
 log_status_t log_backend_register(log_backend_t* backend);
 
@@ -127,8 +129,10 @@ log_backend_t* log_backend_console_create(void);
 /**
  * \brief           Destroy a console backend
  * \param[in]       backend: Pointer to backend to destroy
+ * \note            Task context. Unregister first and stop independent users.
+ *                  A registered or in-use backend returns LOG_ERROR_BUSY.
  */
-void log_backend_console_destroy(log_backend_t* backend);
+log_status_t log_backend_console_destroy(log_backend_t* backend);
 
 /**
  * \}
@@ -150,8 +154,10 @@ log_backend_t* log_backend_memory_create(size_t size);
 /**
  * \brief           Destroy a memory backend
  * \param[in]       backend: Pointer to backend to destroy
+ * \note            Task context. Unregister first and stop independent users.
+ *                  A registered or in-use backend returns LOG_ERROR_BUSY.
  */
-void log_backend_memory_destroy(log_backend_t* backend);
+log_status_t log_backend_memory_destroy(log_backend_t* backend);
 
 /**
  * \brief           Read data from memory backend buffer
@@ -197,6 +203,8 @@ log_backend_t* log_backend_uart_create(nx_uart_t* uart);
 /**
  * \brief           Destroy a UART backend
  * \param[in]       backend: Pointer to backend to destroy
+ * \note            Task context. Unregister first and stop independent users.
+ *                  A registered or in-use backend returns LOG_ERROR_BUSY.
  */
 void log_backend_uart_destroy(log_backend_t* backend);
 

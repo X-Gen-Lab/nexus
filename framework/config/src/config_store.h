@@ -191,6 +191,18 @@ config_status_t config_store_iterate_namespace(
 config_status_t config_store_get_flags(const char* key, uint8_t namespace_id,
                                        uint8_t* flags);
 
+/* All replacements are checked before the first write. Caller owns buffers;
+ * task context under the config management owner lock. Metadata must match. */
+typedef struct {
+    config_store_entry_info_t info;
+    const uint8_t* value;
+    size_t size;
+} config_store_replacement_t;
+config_status_t config_store_replace_encrypted(
+    const config_store_replacement_t* replacements, size_t count);
+config_status_t config_store_replace_all(
+    const config_store_replacement_t* replacements, size_t count, bool apply);
+
 #ifdef __cplusplus
 }
 #endif

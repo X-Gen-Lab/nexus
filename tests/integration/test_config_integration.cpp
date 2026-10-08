@@ -531,7 +531,7 @@ TEST_F(ConfigIntegrationTest, EncryptionBasicFunctionality) {
     uint8_t enc_key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                            0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
     EXPECT_EQ(CONFIG_OK, config_set_encryption_key(enc_key, sizeof(enc_key),
-                                                   CONFIG_CRYPTO_AES128));
+                                                   CONFIG_CRYPTO_AES128_GCM));
 
     /* Store encrypted values */
     EXPECT_EQ(CONFIG_OK,
@@ -581,7 +581,7 @@ TEST_F(ConfigIntegrationTest, EncryptedBlobStorage) {
     uint8_t enc_key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                            0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
     EXPECT_EQ(CONFIG_OK, config_set_encryption_key(enc_key, sizeof(enc_key),
-                                                   CONFIG_CRYPTO_AES128));
+                                                   CONFIG_CRYPTO_AES128_GCM));
 
     /* Store encrypted blob */
     uint8_t secret_data[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE};
@@ -616,7 +616,7 @@ TEST_F(ConfigIntegrationTest, ExportWithDecryptFlag) {
     uint8_t enc_key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                            0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
     EXPECT_EQ(CONFIG_OK, config_set_encryption_key(enc_key, sizeof(enc_key),
-                                                   CONFIG_CRYPTO_AES128));
+                                                   CONFIG_CRYPTO_AES128_GCM));
 
     /* Store encrypted value */
     const char* secret = "my secret value";
@@ -767,7 +767,7 @@ TEST_F(ConfigIntegrationTest, CompleteWorkflow) {
     uint8_t enc_key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                            0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
     EXPECT_EQ(CONFIG_OK, config_set_encryption_key(enc_key, sizeof(enc_key),
-                                                   CONFIG_CRYPTO_AES128));
+                                                   CONFIG_CRYPTO_AES128_GCM));
 
     /* Register callback */
     reset_callback_state();
@@ -796,13 +796,13 @@ TEST_F(ConfigIntegrationTest, CompleteWorkflow) {
     /* Export configuration */
     size_t export_size = 0;
     EXPECT_EQ(CONFIG_OK,
-              config_get_export_size(CONFIG_FORMAT_JSON,
+              config_get_export_size(CONFIG_FORMAT_BINARY,
                                      CONFIG_EXPORT_FLAG_NONE, &export_size));
 
     std::vector<char> export_buffer(export_size + 1);
     size_t actual_size = 0;
     EXPECT_EQ(CONFIG_OK,
-              config_export(CONFIG_FORMAT_JSON, CONFIG_EXPORT_FLAG_NONE,
+              config_export(CONFIG_FORMAT_BINARY, CONFIG_EXPORT_FLAG_NONE,
                             export_buffer.data(), export_buffer.size(),
                             &actual_size));
 

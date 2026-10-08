@@ -162,6 +162,9 @@ osal_status_t osal_event_clear_from_isr(osal_event_handle_t handle,
  *                                           wait_bits is zero
  * \retval          OSAL_ERROR_TIMEOUT Wait timed out
  * \retval          OSAL_ERROR_ISR Called from ISR context
+ * \note            Barrier contract: mode must be WAIT_ALL and auto_clear true.
+ *                  All waiters matched by one set receive the same snapshot.
+ *                  Portable event bits occupy bits 0..23.
  * \note            Requirements: 7.3
  */
 osal_status_t osal_event_sync(osal_event_handle_t handle,

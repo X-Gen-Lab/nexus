@@ -80,7 +80,11 @@ static const clock_limits_t g_f4_limits = {
     .vco_input_max = 2000000U,
     .vco_output_min = 100000000U, /* 100-432 MHz */
     .vco_output_max = 432000000U,
-    .sysclk_max = 180000000U, /* Max 180 MHz with Over-Drive */
+#if defined(STM32F405xx) || defined(STM32F407xx) || defined(STM32F415xx) || defined(STM32F417xx)
+    .sysclk_max = 168000000U,
+#else
+    .sysclk_max = 180000000U, /* Only devices that support Over-Drive */
+#endif
     .pllm_min = 2,            /* PLLM: 2-63 */
     .pllm_max = 63,
     .plln_min = 50, /* PLLN: 50-432 */
@@ -88,7 +92,11 @@ static const clock_limits_t g_f4_limits = {
     .pllq_min = 2, /* PLLQ: 2-15 */
     .pllq_max = 15,
     .has_pllr = false,     /* No PLLR in F4 */
-    .has_overdrive = true, /* F429/F446 support Over-Drive */
+#if defined(STM32F405xx) || defined(STM32F407xx) || defined(STM32F415xx) || defined(STM32F417xx)
+    .has_overdrive = false,
+#else
+    .has_overdrive = true,
+#endif
 };
 
 /*---------------------------------------------------------------------------*/

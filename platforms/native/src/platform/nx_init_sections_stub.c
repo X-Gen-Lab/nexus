@@ -14,7 +14,7 @@
  *                  framework.
  */
 
-#include "framework/init/include/nx_init.h"
+#include "nx_init.h"
 
 /*---------------------------------------------------------------------------*/
 /* Init Function Section Symbols                                             */

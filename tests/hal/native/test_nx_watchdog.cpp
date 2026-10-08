@@ -20,7 +20,7 @@ extern "C" {
 #include "hal/interface/nx_power.h"
 #include "hal/interface/nx_watchdog.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_watchdog_helpers.h"
+#include "devices/native_watchdog_helpers.h"
 }
 
 /**

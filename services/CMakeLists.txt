@@ -1,0 +1,5 @@
+add_subdirectory(storage)
+add_subdirectory(security)
+add_subdirectory(update)
+add_subdirectory(protocols)
+add_subdirectory(industrial)

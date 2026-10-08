@@ -39,6 +39,9 @@ config_status_t config_callback_deinit(void);
  */
 bool config_callback_is_initialized(void);
 
+/** True while a notification borrows Config state or callback contexts. */
+bool config_callback_is_busy(void);
+
 /**
  * \brief           Notify callbacks of a value change
  * \param[in]       key: Configuration key that changed

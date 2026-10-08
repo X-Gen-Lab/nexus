@@ -53,3 +53,23 @@ nexus_discover_tests(osal_tests
         TIMEOUT 300
         LABELS "osal;unit;property"
 )
+
+if(UNIX)
+    add_executable(osal_contract_tests test_core_contracts.c)
+    target_link_libraries(osal_contract_tests PRIVATE osal hal Threads::Threads)
+    target_compile_options(osal_contract_tests PRIVATE -UNDEBUG)
+    add_test(NAME osal_contract_tests COMMAND osal_contract_tests)
+    set_tests_properties(osal_contract_tests PROPERTIES TIMEOUT 30 LABELS "osal;contract")
+
+    add_executable(baremetal_contract_tests
+        test_baremetal_contracts.c
+        ${CMAKE_SOURCE_DIR}/osal/adapters/baremetal/osal_baremetal.c)
+    target_include_directories(baremetal_contract_tests PRIVATE ${CMAKE_SOURCE_DIR}/osal/include)
+    target_link_libraries(baremetal_contract_tests PRIVATE nexus_build_options)
+    target_compile_options(baremetal_contract_tests PRIVATE -UNDEBUG -Werror)
+    add_test(NAME baremetal_contract_tests COMMAND baremetal_contract_tests)
+    set_tests_properties(baremetal_contract_tests PROPERTIES TIMEOUT 30 LABELS "osal;baremetal;host-model;contract")
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_subdirectory(freertos_runtime)
+endif()

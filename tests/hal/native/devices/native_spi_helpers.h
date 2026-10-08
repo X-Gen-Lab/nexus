@@ -30,6 +30,7 @@ extern "C" {
 typedef struct native_spi_state_s {
     bool initialized;          /**< Initialization flag */
     bool suspended;            /**< Suspend flag */
+    unsigned users; /* Admitted active/waiting transactions. */
     bool busy;                 /**< Busy flag */
     uint32_t max_speed;        /**< Maximum SPI speed in Hz */
     uint8_t mosi_pin;          /**< MOSI pin number */
@@ -93,6 +94,14 @@ nx_status_t native_spi_reset(uint8_t instance);
  * \brief           Reset all SPI instances to initial state
  */
 void native_spi_reset_all(void);
+/* Host simulation delay, never a hardware timing claim. */
+nx_status_t native_spi_set_transfer_delay(uint8_t instance, uint32_t delay_ms);
+typedef struct native_spi_operation_s {
+    nx_spi_device_config_t config;
+    uint64_t token;
+    uint8_t first_tx;
+} native_spi_operation_t;
+nx_status_t native_spi_get_trace(uint8_t instance, native_spi_operation_t* output, size_t* count);
 
 #ifdef __cplusplus
 }

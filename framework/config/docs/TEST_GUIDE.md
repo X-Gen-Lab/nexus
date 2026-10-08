@@ -1,3 +1,5 @@
+> Persistence/crypto refactor: Flash requires an explicit `config_backend_flash_bind` partition; keys are externally persisted and reloaded before encrypted load; AES-GCM records replace CBC. Follow [the current implementation contract](../../../docs/implementation/storage-security.md) for atomic snapshots, error recovery and support evidence.
+
 # Config Manager 测试文档
 
 ## 1. 测试策略
@@ -21,7 +23,7 @@
 - **功能正确性**: 验证所有 API 按预期工作
 - **边界条件**: 测试极限值和边界情况
 - **错误处理**: 验证错误码和错误恢复
-- **线程安全**: 验证多线程环境下的正确性
+- **管理 owner**: 验证外部串行化的多任务请求
 - **性能**: 验证性能指标满足要求
 - **内存安全**: 检测内存泄漏和越界访问
 
@@ -573,7 +575,7 @@ void test_encryption(void) {
     
     /* 设置加密密钥 */
     uint8_t key[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);
+    config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128_GCM);
     
     /* 加密存储 */
     const char* secret = "MySecretPassword";
@@ -597,7 +599,7 @@ void test_key_rotation(void) {
     
     /* 设置初始密钥 */
     uint8_t old_key[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    config_set_encryption_key(old_key, sizeof(old_key), CONFIG_CRYPTO_AES128);
+    config_set_encryption_key(old_key, sizeof(old_key), CONFIG_CRYPTO_AES128_GCM);
     
     /* 加密存储多个值 */
     config_set_str_encrypted("secret1", "value1");
@@ -606,7 +608,7 @@ void test_key_rotation(void) {
     /* 轮换密钥 */
     uint8_t new_key[16] = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
     config_status_t status = config_rotate_encryption_key(new_key, sizeof(new_key),
-                                                          CONFIG_CRYPTO_AES128);
+                                                          CONFIG_CRYPTO_AES128_GCM);
     assert(status == CONFIG_OK);
     
     /* 验证仍可读取 */
@@ -790,112 +792,11 @@ void stress_test_many_keys(void) {
 }
 ```
 
-## 5. 线程安全测试
+## 5. 管理任务工作流测试
 
-### 5.1 并发读写测试
+`test_config_thread_safety.cpp` 当前验证多个请求方通过同一外部管理锁串行访问，读取/写入和namespace会话保持正确。这些结果不证明未加锁的并发调用安全。存储 provider 重入 load/commit 的真实 BUSY 防护在 `test_config_persistence.c` 中验证。
 
-```c
-#include <pthread.h>
-
-#define NUM_THREADS 4
-#define ITERATIONS 1000
-
-void* writer_thread(void* arg) {
-    int thread_id = *(int*)arg;
-    
-    for (int i = 0; i < ITERATIONS; i++) {
-        char key[32];
-        snprintf(key, sizeof(key), "thread%d.value", thread_id);
-        config_set_i32(key, i);
-    }
-    
-    return NULL;
-}
-
-void* reader_thread(void* arg) {
-    int thread_id = *(int*)arg;
-    
-    for (int i = 0; i < ITERATIONS; i++) {
-        char key[32];
-        snprintf(key, sizeof(key), "thread%d.value", thread_id);
-        int32_t value;
-        config_get_i32(key, &value, 0);
-    }
-    
-    return NULL;
-}
-
-void test_concurrent_access(void) {
-    config_init(NULL);
-    
-    pthread_t threads[NUM_THREADS * 2];
-    int thread_ids[NUM_THREADS * 2];
-    
-    /* 创建写线程 */
-    for (int i = 0; i < NUM_THREADS; i++) {
-        thread_ids[i] = i;
-        pthread_create(&threads[i], NULL, writer_thread, &thread_ids[i]);
-    }
-    
-    /* 创建读线程 */
-    for (int i = 0; i < NUM_THREADS; i++) {
-        thread_ids[NUM_THREADS + i] = i;
-        pthread_create(&threads[NUM_THREADS + i], NULL, reader_thread,
-                      &thread_ids[NUM_THREADS + i]);
-    }
-    
-    /* 等待所有线程完成 */
-    for (int i = 0; i < NUM_THREADS * 2; i++) {
-        pthread_join(threads[i], NULL);
-    }
-    
-    printf("Concurrent access test passed\n");
-    
-    config_deinit();
-}
-```
-
-### 5.2 回调线程安全测试
-
-```c
-static volatile int g_callback_counter = 0;
-
-void thread_safe_callback(const char* key, config_type_t type,
-                          const void* old_value, const void* new_value,
-                          void* user_data) {
-    __atomic_fetch_add(&g_callback_counter, 1, __ATOMIC_SEQ_CST);
-}
-
-void test_callback_thread_safety(void) {
-    config_init(NULL);
-    
-    /* 注册回调 */
-    config_cb_handle_t handle;
-    config_register_wildcard_callback(thread_safe_callback, NULL, &handle);
-    
-    g_callback_counter = 0;
-    
-    /* 多线程触发回调 */
-    pthread_t threads[NUM_THREADS];
-    int thread_ids[NUM_THREADS];
-    
-    for (int i = 0; i < NUM_THREADS; i++) {
-        thread_ids[i] = i;
-        pthread_create(&threads[i], NULL, writer_thread, &thread_ids[i]);
-    }
-    
-    for (int i = 0; i < NUM_THREADS; i++) {
-        pthread_join(threads[i], NULL);
-    }
-    
-    /* 验证回调次数 */
-    int expected = NUM_THREADS * ITERATIONS;
-    assert(g_callback_counter == expected);
-    
-    config_unregister_callback(handle);
-    config_deinit();
-}
-```
+真实Flash、整代key轮换和AEAD更新元数据故障边界见[实际执行记录](../../../docs/implementation/storage-security.md)。
 
 ## 6. 属性测试（Property-Based Testing）
 

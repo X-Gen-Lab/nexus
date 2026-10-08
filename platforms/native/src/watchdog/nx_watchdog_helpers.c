@@ -1,3 +1,6 @@
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
 /**
  * \file            nx_watchdog_helpers.c
  * \brief           Watchdog helper functions implementation
@@ -18,6 +21,7 @@
 
 #include "nx_watchdog_helpers.h"
 #include <string.h>
+#include <stdlib.h>
 #include <time.h>
 
 #ifdef _WIN32
@@ -30,17 +34,23 @@
 /* System Time Functions                                                     */
 /*---------------------------------------------------------------------------*/
 
-/* External time simulation function for testing */
-extern uint64_t nx_get_time_ms(void);
-
-/**
- * \brief           Get current system time in milliseconds
- * \details         Uses simulated time if available (for testing),
- *                  otherwise falls back to real system time
- */
+/* Production monotonic clock with an explicit link-time injection point for
+ * deterministic tests. No production symbol depends on test-only objects. */
+NX_WEAK uint64_t nx_native_monotonic_time_ms(void) {
+#ifdef _WIN32
+    LARGE_INTEGER counter, frequency;
+    if (!QueryPerformanceFrequency(&frequency) || !QueryPerformanceCounter(&counter))
+        abort();
+    return (uint64_t)(counter.QuadPart/frequency.QuadPart)*1000U +
+           (uint64_t)(counter.QuadPart%frequency.QuadPart)*1000U/(uint64_t)frequency.QuadPart;
+#else
+    struct timespec now;
+    if (clock_gettime(CLOCK_MONOTONIC,&now)!=0) abort();
+    return (uint64_t)now.tv_sec*1000U+(uint64_t)now.tv_nsec/1000000U;
+#endif
+}
 uint64_t watchdog_get_system_time_ms(void) {
-    /* Use simulated time for testing */
-    return nx_get_time_ms();
+    return nx_native_monotonic_time_ms();
 }
 
 /*---------------------------------------------------------------------------*/

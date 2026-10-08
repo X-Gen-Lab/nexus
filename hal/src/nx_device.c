@@ -14,6 +14,8 @@
  */
 
 #include "hal/base/nx_device.h"
+#include "hal/system/nx_mutex.h"
+#include "osal/osal.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -93,13 +95,16 @@ const nx_device_t* nx_device_find(const char* name) {
     }
 
 #if NX_DEVICE_MANUAL_REGISTRATION
+    uint32_t saved = nx_critical_enter();
     /* Manual registration: iterate through pointer array */
     for (size_t i = 0; i < __nx_device_count; i++) {
         const nx_device_t* dev = __nx_device_registry[i];
         if (dev->name != NULL && strcmp(dev->name, name) == 0) {
+            nx_critical_exit(saved);
             return dev;
         }
     }
+    nx_critical_exit(saved);
 #else
     /* Linker section: iterate through section */
     for (const nx_device_t* dev = DEVICE_START; dev < DEVICE_END; dev++) {
@@ -116,22 +121,28 @@ const nx_device_t* nx_device_find(const char* name) {
  * \brief           Initialize device and cache the API pointer
  */
 void* nx_device_init(const nx_device_t* dev) {
-    if (dev == NULL) {
+    if (osal_is_isr() || dev == NULL || dev->state == NULL || dev->device_init == NULL) {
         return NULL;
     }
 
     /* Return cached API if already initialized */
+    uint32_t saved = nx_critical_enter();
     if (dev->state->initialized) {
-        return dev->state->api;
+        void* api = dev->state->api;
+        nx_critical_exit(saved);
+        return api;
     }
 
     /* Call device-specific initialization function */
-    if (dev->device_init == NULL) {
+    if (dev->state->initializing) {
+        nx_critical_exit(saved);
         return NULL;
     }
+    dev->state->initializing = true;
+    nx_critical_exit(saved);
 
     void* api = dev->device_init(dev);
-
+    saved = nx_critical_enter();
     if (api != NULL) {
         /* Cache the API pointer in state (which is writable) */
         dev->state->api = api;
@@ -140,6 +151,8 @@ void* nx_device_init(const nx_device_t* dev) {
     } else {
         dev->state->init_res = 1;
     }
+    dev->state->initializing = false;
+    nx_critical_exit(saved);
 
     return api;
 }
@@ -167,28 +180,44 @@ void* nx_device_get(const char* name) {
  * \details         This function is available on platforms without linker
  *                  section support (e.g., MSVC, Windows native testing).
  *                  It allows manual registration of devices.
- * \note            This function is not thread-safe
+ * \note            Registry updates are protected by the architecture port.
  */
 nx_status_t nx_device_register(const nx_device_t* dev) {
     if (dev == NULL) {
         return NX_ERR_NULL_PTR;
     }
 
+    uint32_t saved = nx_critical_enter();
+    for (size_t i = 0; i < __nx_device_count; ++i) {
+        if (__nx_device_registry[i] == dev) {
+            nx_critical_exit(saved);
+            return NX_OK;
+        }
+        if (dev->name && __nx_device_registry[i]->name &&
+            strcmp(dev->name, __nx_device_registry[i]->name) == 0) {
+            nx_critical_exit(saved);
+            return NX_ERR_ALREADY_INIT;
+        }
+    }
     if (__nx_device_count >= NX_DEVICE_REGISTRY_SIZE) {
+        nx_critical_exit(saved);
         return NX_ERR_NO_MEMORY;
     }
 
     __nx_device_registry[__nx_device_count++] = dev;
+    nx_critical_exit(saved);
     return NX_OK;
 }
 
 /**
  * \brief           Clear all manually registered devices
  * \details         This function is useful for test cleanup
- * \note            This function is not thread-safe
+ * \note            Registry updates are protected by the architecture port.
  */
 void nx_device_clear_all(void) {
+    uint32_t saved = nx_critical_enter();
     __nx_device_count = 0;
+    nx_critical_exit(saved);
 }
 
 #endif

@@ -26,7 +26,7 @@ static uint8_t stm32_gpio_read_impl(nx_gpio_read_t* self) {
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* state = impl->state;
-    if (!state->initialized) {
+    if (!state->initialized || state->suspended) {
         return 0;
     }
 
@@ -45,10 +45,13 @@ static nx_status_t stm32_gpio_register_exti_impl(nx_gpio_read_t* self,
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* state = impl->state;
-    if (!state->initialized) {
+    if (!state->initialized || state->suspended) {
         return NX_ERR_NOT_INIT;
     }
 
+    /* EXTI pin routing/IRQ acknowledgement is not implemented by this driver.
+     * Never advertise successful registration when no interrupt can arrive. */
+    if (callback) return NX_ERR_NOT_SUPPORTED;
     state->exti.callback = callback;
     state->exti.user_data = user_data;
     state->exti.trigger = trigger;
@@ -85,7 +88,7 @@ static void stm32_gpio_write_impl(nx_gpio_write_t* self, uint8_t state) {
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* gpio_state = impl->state;
-    if (!gpio_state->initialized) {
+    if (!gpio_state->initialized || gpio_state->suspended) {
         return;
     }
 
@@ -102,7 +105,7 @@ static void stm32_gpio_toggle_impl(nx_gpio_write_t* self) {
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* state = impl->state;
-    if (!state->initialized) {
+    if (!state->initialized || state->suspended) {
         return;
     }
 
@@ -139,7 +142,7 @@ static uint8_t stm32_gpio_rw_read_impl(nx_gpio_read_t* self) {
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* state = impl->state;
-    if (!state->initialized) {
+    if (!state->initialized || state->suspended) {
         return 0;
     }
 
@@ -159,10 +162,13 @@ static nx_status_t stm32_gpio_rw_register_exti_impl(nx_gpio_read_t* self,
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* state = impl->state;
-    if (!state->initialized) {
+    if (!state->initialized || state->suspended) {
         return NX_ERR_NOT_INIT;
     }
 
+    /* EXTI pin routing/IRQ acknowledgement is not implemented by this driver.
+     * Never advertise successful registration when no interrupt can arrive. */
+    if (callback) return NX_ERR_NOT_SUPPORTED;
     state->exti.callback = callback;
     state->exti.user_data = user_data;
     state->exti.trigger = trigger;
@@ -198,7 +204,7 @@ static void stm32_gpio_rw_write_impl(nx_gpio_write_t* self, uint8_t state) {
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* gpio_state = impl->state;
-    if (!gpio_state->initialized) {
+    if (!gpio_state->initialized || gpio_state->suspended) {
         return;
     }
 
@@ -216,7 +222,7 @@ static void stm32_gpio_rw_toggle_impl(nx_gpio_write_t* self) {
     NX_ASSERT(impl && impl->state);
 
     stm32_gpio_state_t* state = impl->state;
-    if (!state->initialized) {
+    if (!state->initialized || state->suspended) {
         return;
     }
 

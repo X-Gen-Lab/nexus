@@ -18,11 +18,12 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_usb.h"
-#include "tests/hal/native/devices/native_usb_helpers.h"
+#include "devices/native_usb_helpers.h"
 }
 
 /**
@@ -39,7 +40,7 @@ class USBPropertyTest : public ::testing::Test {
     nx_usb_t* usb = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all USB instances */
         native_usb_reset_all();

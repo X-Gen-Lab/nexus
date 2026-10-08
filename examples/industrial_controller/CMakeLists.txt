@@ -1,0 +1,5 @@
+add_executable(nexus_industrial_controller main.c)
+target_link_libraries(nexus_industrial_controller PRIVATE nexus_modbus_rtu nexus_industrial)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_link_options(nexus_industrial_controller PRIVATE "-Wl,-Map,${CMAKE_BINARY_DIR}/bin/nexus_industrial_controller.map")
+endif()

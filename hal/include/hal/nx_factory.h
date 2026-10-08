@@ -69,12 +69,18 @@ static inline nx_gpio_t* nx_factory_gpio(char port, uint8_t pin) {
  * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO read interface pointer, NULL on failure
- * \note            Device name format: "GPIO<port><pin>_R"
+ * \note            Uses the dedicated _R registration if present, otherwise
+ *                  projects the read capability from the registered RW device.
  */
 static inline nx_gpio_read_t* nx_factory_gpio_read(char port, uint8_t pin) {
     char name[16];
     snprintf(name, sizeof(name), "GPIO%c%d_R", port, pin);
-    return (nx_gpio_read_t*)nx_device_get(name);
+    const nx_device_t* dedicated = nx_device_find(name);
+    if (dedicated) {
+        return (nx_gpio_read_t*)nx_device_init(dedicated);
+    }
+    nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(port, pin);
+    return gpio ? &gpio->read : NULL;
 }
 
 /**
@@ -82,12 +88,18 @@ static inline nx_gpio_read_t* nx_factory_gpio_read(char port, uint8_t pin) {
  * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO write interface pointer, NULL on failure
- * \note            Device name format: "GPIO<port><pin>_W"
+ * \note            Uses the dedicated _W registration if present, otherwise
+ *                  projects the write capability from the registered RW device.
  */
 static inline nx_gpio_write_t* nx_factory_gpio_write(char port, uint8_t pin) {
     char name[16];
     snprintf(name, sizeof(name), "GPIO%c%d_W", port, pin);
-    return (nx_gpio_write_t*)nx_device_get(name);
+    const nx_device_t* dedicated = nx_device_find(name);
+    if (dedicated) {
+        return (nx_gpio_write_t*)nx_device_init(dedicated);
+    }
+    nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(port, pin);
+    return gpio ? &gpio->write : NULL;
 }
 
 /*---------------------------------------------------------------------------*/

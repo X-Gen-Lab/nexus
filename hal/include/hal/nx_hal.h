@@ -100,6 +100,8 @@ extern "C" {
  *
  * \note            This function is idempotent - calling it multiple times
  *                  has no additional effect after the first successful call.
+ * \note            Task context. The application serializes global HAL lifetime
+ *                  against device users. An unbound platform is unsupported.
  */
 nx_status_t nx_hal_init(void);
 
@@ -117,6 +119,9 @@ nx_status_t nx_hal_init(void);
  *
  * \warning         After calling this function, no HAL functions should be
  *                  called until nx_hal_init() is called again.
+ * \note            Task context. An unsupported or busy platform retains global
+ *                  initialized state. STM32 reference shutdown requires a
+ *                  product-owned quiescence implementation and controlled reset.
  */
 nx_status_t nx_hal_deinit(void);
 

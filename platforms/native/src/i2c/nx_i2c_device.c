@@ -1,279 +1,176 @@
-/**
- * \file            nx_i2c_device.c
- * \brief           I2C device registration for Native platform
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-18
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements I2C device registration using Kconfig-driven
- *                  configuration. Provides factory functions for test access
- *                  and manages I2C instance lifecycle.
- */
-
+#if !defined(_WIN32) && !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L
+#endif
+/** Native I2C bus registry, bounded devices and caller-owned generations. */
 #include "hal/base/nx_device.h"
-#include "hal/interface/nx_i2c.h"
 #include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_i2c_helpers.h"
-#include "nx_i2c_types.h"
-#include <stdio.h>
+#include "osal/osal.h"
+#include <stdatomic.h>
 #include <string.h>
-
-/*---------------------------------------------------------------------------*/
-/* Configuration                                                             */
-/*---------------------------------------------------------------------------*/
-
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <time.h>
+#endif
 #define DEVICE_TYPE NX_I2C
-
-/*---------------------------------------------------------------------------*/
-/* Forward Declarations                                                      */
-/*---------------------------------------------------------------------------*/
-
-/* Base interface getters */
-static nx_tx_async_t* i2c_get_tx_async_handle(nx_i2c_bus_t* self,
-                                              uint8_t dev_addr);
-static nx_tx_rx_async_t* i2c_get_tx_rx_async_handle(nx_i2c_bus_t* self,
-                                                    uint8_t dev_addr,
-                                                    nx_comm_callback_t callback,
-                                                    void* user_data);
-static nx_tx_sync_t* i2c_get_tx_sync_handle(nx_i2c_bus_t* self,
-                                            uint8_t dev_addr);
-static nx_tx_rx_sync_t* i2c_get_tx_rx_sync_handle(nx_i2c_bus_t* self,
-                                                  uint8_t dev_addr);
-static nx_lifecycle_t* i2c_get_lifecycle(nx_i2c_bus_t* self);
-static nx_power_t* i2c_get_power(nx_i2c_bus_t* self);
-
-/* Interface implementations (defined in separate files) */
-extern void i2c_init_tx_async(nx_tx_async_t* tx_async);
-extern void i2c_init_tx_rx_async(nx_tx_rx_async_t* tx_rx_async);
-extern void i2c_init_tx_sync(nx_tx_sync_t* tx_sync);
-extern void i2c_init_tx_rx_sync(nx_tx_rx_sync_t* tx_rx_sync);
-extern void i2c_init_lifecycle(nx_lifecycle_t* lifecycle);
-extern void i2c_init_power(nx_power_t* power);
-
-/*---------------------------------------------------------------------------*/
-/* Base Interface Getters                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get TX async handle
- */
-static nx_tx_async_t* i2c_get_tx_async_handle(nx_i2c_bus_t* self,
-                                              uint8_t dev_addr) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
+static atomic_flag metadata=ATOMIC_FLAG_INIT;
+void native_i2c_lock(void) {
+    while(atomic_flag_test_and_set_explicit(&metadata,memory_order_acquire)) {}
+}
+void native_i2c_unlock(void) { atomic_flag_clear_explicit(&metadata,memory_order_release); }
+uint64_t native_i2c_now(void) {
+#ifdef _WIN32
+    return GetTickCount64();
+#else
+    struct timespec ts;
+    if(clock_gettime(CLOCK_MONOTONIC,&ts)!=0) return 0;
+    return (uint64_t)ts.tv_sec*1000u+(uint64_t)ts.tv_nsec/1000000u;
+#endif
+}
+extern void i2c_init_tx_sync(nx_tx_sync_t*);
+extern void i2c_init_tx_rx_sync(nx_tx_rx_sync_t*);
+extern void i2c_init_tx_async(nx_tx_async_t*);
+extern void i2c_init_tx_rx_async(nx_tx_rx_async_t*);
+static native_i2c_device_t* resolve(nx_i2c_impl_t* b,uint64_t token) {
+    if(!token) return NULL;
+    for(unsigned i=0;i<NATIVE_I2C_DEVICE_CAPACITY;++i)
+        if(b->devices[i].allocated && b->devices[i].base.token==token) return &b->devices[i];
+    return NULL;
+}
+static nx_status_t transfer(nx_i2c_device_t* self,const nx_i2c_transaction_t* t) {
+    uint64_t at=native_i2c_now();
+    if(!self || !self->owner || !native_i2c_transaction_valid(t,false)) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=i2c_get_impl(self->owner);
+    native_i2c_lock(); native_i2c_device_t* d=resolve(b,self->token);
+    nx_status_t r=d ? native_i2c_admit_locked(d) : NX_ERR_INVALID_STATE;
+    native_i2c_unlock();
+    return r==NX_OK ? native_i2c_execute(d,t,at,true) : r;
+}
+static nx_status_t submit(nx_i2c_device_t* self,const nx_i2c_transaction_t* t) {
+    uint64_t at=native_i2c_now();
+    if(!self || !self->owner || !native_i2c_transaction_valid(t,true)) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=i2c_get_impl(self->owner);
+    native_i2c_lock(); native_i2c_device_t* d=resolve(b,self->token);
+    nx_status_t r=d ? native_i2c_submit(d,t,at) : NX_ERR_INVALID_STATE;
+    native_i2c_unlock(); return r;
+}
+static nx_status_t cancel(nx_i2c_device_t* self) {
+    if(!self || !self->owner) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    native_i2c_lock(); native_i2c_device_t* d=resolve(i2c_get_impl(self->owner),self->token);
+    nx_status_t r=!d ? NX_ERR_INVALID_STATE : d->users && !d->completing ? NX_OK : NX_ERR_NOT_FOUND;
+    if(r==NX_OK) d->cancelled=true;
+    native_i2c_unlock(); return r;
+}
+static void initialize(native_i2c_device_t* d,nx_i2c_impl_t* b,uint8_t addr,bool legacy,
+                       nx_comm_callback_t cb,void* context) {
+    memset(d,0,sizeof(*d)); d->bus=b; d->address=addr;
+    d->allocated=true; d->legacy=legacy;
+    d->receive_callback=cb; d->receive_context=context;
+    d->base=(nx_i2c_device_t){&b->base,++b->next_token,transfer,submit,cancel};
+    i2c_init_tx_sync(&d->tx_sync); i2c_init_tx_rx_sync(&d->tx_rx_sync);
+    i2c_init_tx_async(&d->tx_async); i2c_init_tx_rx_async(&d->tx_rx_async);
+}
+static nx_status_t open_device(nx_i2c_bus_t* self,uint8_t addr,nx_i2c_device_t* out) {
+    if(out) memset(out,0,sizeof(*out));
+    if(!self || !out || addr>0x7f) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=i2c_get_impl(self);
+    native_i2c_lock(); nx_status_t r=native_i2c_bus_status(b);
+    native_i2c_device_t* d=NULL;
+    if(r==NX_OK) {
+        for(unsigned i=0;i<NATIVE_I2C_DEVICE_CAPACITY;++i)
+            if(!b->devices[i].allocated) { d=&b->devices[i]; break; }
+        if(!d || b->next_token==UINT64_MAX) r=NX_ERR_NO_RESOURCE;
+        else { initialize(d,b,addr,false,NULL,NULL); *out=d->base; }
     }
-
-    /* Store device address */
-    impl->state->current_device.dev_addr = dev_addr;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_async;
+    native_i2c_unlock(); return r;
 }
-
-/**
- * \brief           Get TX/RX async handle
- */
-static nx_tx_rx_async_t* i2c_get_tx_rx_async_handle(nx_i2c_bus_t* self,
-                                                    uint8_t dev_addr,
-                                                    nx_comm_callback_t callback,
-                                                    void* user_data) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
+static nx_status_t close_device(nx_i2c_bus_t* self,nx_i2c_device_t* value) {
+    if(!self || !value) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=i2c_get_impl(self);
+    native_i2c_lock(); native_i2c_device_t* d=value->owner==self ? resolve(b,value->token) : NULL;
+    nx_status_t r=!d ? NX_ERR_INVALID_STATE : d->users ? NX_ERR_BUSY : NX_OK;
+    if(r==NX_OK) d->allocated=false;
+    native_i2c_unlock(); return r;
+}
+static nx_status_t service(nx_i2c_bus_t* self) {
+    if(!self) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=i2c_get_impl(self);
+    native_i2c_lock();
+    if(b->worker_active) { native_i2c_unlock(); return NX_ERR_BUSY; }
+    native_i2c_device_t* d=b->pending;
+    if(!d) { native_i2c_unlock(); return NX_ERR_NO_DATA; }
+    b->pending=NULL; b->worker_active=true;
+    nx_i2c_transaction_t t=b->queued; uint64_t at=b->queued_at;
+    native_i2c_unlock();
+    nx_status_t r=native_i2c_execute(d,&t,at,true);
+    native_i2c_lock(); b->worker_active=false; native_i2c_unlock();
+    return r;
+}
+static native_i2c_device_t* legacy(nx_i2c_bus_t* self,uint8_t addr,
+                                  nx_comm_callback_t cb,void* context) {
+    if(!self || addr>0x7f || osal_is_isr()) return NULL;
+    nx_i2c_impl_t* b=i2c_get_impl(self);
+    native_i2c_lock(); native_i2c_device_t* empty=NULL;
+    for(unsigned i=0;i<NATIVE_I2C_LEGACY_CAPACITY;++i) {
+        native_i2c_device_t* d=&b->legacy_devices[i];
+        if(d->allocated && d->address==addr && d->receive_callback==cb && d->receive_context==context) {
+            native_i2c_unlock(); return d;
+        }
+        if(!d->allocated && !empty) empty=d;
     }
-
-    /* Store device address and callback */
-    impl->state->current_device.dev_addr = dev_addr;
-    impl->state->current_device.callback = callback;
-    impl->state->current_device.user_data = user_data;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_rx_async;
+    if(empty && b->next_token!=UINT64_MAX) initialize(empty,b,addr,true,cb,context);
+    else empty=NULL;
+    native_i2c_unlock(); return empty;
 }
-
-/**
- * \brief           Get TX sync handle
- */
-static nx_tx_sync_t* i2c_get_tx_sync_handle(nx_i2c_bus_t* self,
-                                            uint8_t dev_addr) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
-    }
-
-    /* Store device address */
-    impl->state->current_device.dev_addr = dev_addr;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_sync;
+static nx_tx_sync_t* get_tx_sync(nx_i2c_bus_t* b,uint8_t addr) {
+    native_i2c_device_t* d=legacy(b,addr,NULL,NULL); return d ? &d->tx_sync : NULL;
 }
-
-/**
- * \brief           Get TX/RX sync handle
- */
-static nx_tx_rx_sync_t* i2c_get_tx_rx_sync_handle(nx_i2c_bus_t* self,
-                                                  uint8_t dev_addr) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    if (!impl || !impl->state) {
-        return NULL;
-    }
-
-    /* Store device address */
-    impl->state->current_device.dev_addr = dev_addr;
-    impl->state->current_device.in_use = true;
-
-    return &impl->tx_rx_sync;
+static nx_tx_rx_sync_t* get_tx_rx_sync(nx_i2c_bus_t* b,uint8_t addr) {
+    native_i2c_device_t* d=legacy(b,addr,NULL,NULL); return d ? &d->tx_rx_sync : NULL;
 }
-
-/**
- * \brief           Get lifecycle interface
- */
-static nx_lifecycle_t* i2c_get_lifecycle(nx_i2c_bus_t* self) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    return impl ? &impl->lifecycle : NULL;
+static nx_tx_async_t* get_tx_async(nx_i2c_bus_t* b,uint8_t addr) {
+    native_i2c_device_t* d=legacy(b,addr,NULL,NULL); return d ? &d->tx_async : NULL;
 }
-
-/**
- * \brief           Get power interface
- */
-static nx_power_t* i2c_get_power(nx_i2c_bus_t* self) {
-    nx_i2c_impl_t* impl = i2c_get_impl(self);
-    return impl ? &impl->power : NULL;
+static nx_tx_rx_async_t* get_tx_rx_async(nx_i2c_bus_t* b,uint8_t addr,nx_comm_callback_t cb,void* ctx) {
+    native_i2c_device_t* d=legacy(b,addr,cb,ctx); return d ? &d->tx_rx_async : NULL;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Instance Initialization                                                   */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize I2C instance with platform configuration
- */
-static void i2c_init_instance(nx_i2c_impl_t* impl, uint8_t index,
-                              const nx_i2c_platform_config_t* platform_cfg) {
-    /* Initialize base interface */
-    impl->base.get_tx_async_handle = i2c_get_tx_async_handle;
-    impl->base.get_tx_rx_async_handle = i2c_get_tx_rx_async_handle;
-    impl->base.get_tx_sync_handle = i2c_get_tx_sync_handle;
-    impl->base.get_tx_rx_sync_handle = i2c_get_tx_rx_sync_handle;
-    impl->base.get_lifecycle = i2c_get_lifecycle;
-    impl->base.get_power = i2c_get_power;
-
-    /* Initialize interfaces (implemented in separate files) */
-    i2c_init_tx_async(&impl->tx_async);
-    i2c_init_tx_rx_async(&impl->tx_rx_async);
-    i2c_init_tx_sync(&impl->tx_sync);
-    i2c_init_tx_rx_sync(&impl->tx_rx_sync);
-    i2c_init_lifecycle(&impl->lifecycle);
-    i2c_init_power(&impl->power);
-
-    /* Allocate and initialize state */
-    impl->state = (nx_i2c_state_t*)nx_mem_alloc(sizeof(nx_i2c_state_t));
-    if (!impl->state) {
-        return;
-    }
-    memset(impl->state, 0, sizeof(nx_i2c_state_t));
-
-    impl->state->index = index;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    /* Set configuration from Kconfig */
-    if (platform_cfg != NULL) {
-        impl->state->config.speed = platform_cfg->speed;
-        impl->state->config.scl_pin = platform_cfg->scl_pin;
-        impl->state->config.sda_pin = platform_cfg->sda_pin;
-        impl->state->config.dma_tx_enable = false;
-        impl->state->config.dma_rx_enable = false;
-        impl->state->config.tx_buf_size = platform_cfg->tx_buf_size;
-        impl->state->config.rx_buf_size = platform_cfg->rx_buf_size;
-
-        /* Allocate buffers dynamically */
-        impl->state->tx_buf.data =
-            (uint8_t*)nx_mem_alloc(platform_cfg->tx_buf_size);
-        impl->state->tx_buf.size = platform_cfg->tx_buf_size;
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-
-        impl->state->rx_buf.data =
-            (uint8_t*)nx_mem_alloc(platform_cfg->rx_buf_size);
-        impl->state->rx_buf.size = platform_cfg->rx_buf_size;
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-    }
-
-
-    /* Clear device handle */
-    memset(&impl->state->current_device, 0, sizeof(nx_i2c_device_handle_t));
-}
-
-/*---------------------------------------------------------------------------*/
-/* Device Registration                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- */
+static nx_lifecycle_t* get_lifecycle(nx_i2c_bus_t* b) { return b ? &i2c_get_impl(b)->lifecycle : NULL; }
+static nx_power_t* get_power(nx_i2c_bus_t* b) { return b ? &i2c_get_impl(b)->power : NULL; }
 static void* nx_i2c_device_init(const nx_device_t* dev) {
-    const nx_i2c_platform_config_t* config =
-        (const nx_i2c_platform_config_t*)dev->config;
-
-    if (config == NULL) {
-        return NULL;
+    const nx_i2c_platform_config_t* cfg=dev->config;
+    if(!cfg || !cfg->tx_buf_size || !cfg->rx_buf_size) return NULL;
+    nx_i2c_impl_t* b=nx_mem_alloc(sizeof(*b));
+    if(!b) return NULL;
+    memset(b,0,sizeof(*b)); b->state=nx_mem_alloc(sizeof(*b->state));
+    if(!b->state) { nx_mem_free(b); return NULL; }
+    memset(b->state,0,sizeof(*b->state)); b->state->index=cfg->i2c_index;
+    b->state->config=(nx_i2c_config_t){cfg->speed,cfg->scl_pin,cfg->sda_pin,false,false,cfg->tx_buf_size,cfg->rx_buf_size};
+    b->state->tx_buf.data=nx_mem_alloc(cfg->tx_buf_size); b->state->tx_buf.size=cfg->tx_buf_size;
+    b->state->rx_buf.data=nx_mem_alloc(cfg->rx_buf_size); b->state->rx_buf.size=cfg->rx_buf_size;
+    if(!b->state->tx_buf.data || !b->state->rx_buf.data) {
+        nx_mem_free(b->state->tx_buf.data); nx_mem_free(b->state->rx_buf.data);
+        nx_mem_free(b->state); nx_mem_free(b); return NULL;
     }
-
-    /* Allocate implementation structure */
-    nx_i2c_impl_t* impl = (nx_i2c_impl_t*)nx_mem_alloc(sizeof(nx_i2c_impl_t));
-    if (!impl) {
-        return NULL;
-    }
-    memset(impl, 0, sizeof(nx_i2c_impl_t));
-
-    /* Initialize instance with platform configuration */
-    i2c_init_instance(impl, config->i2c_index, config);
-
-    /* Check if state allocation succeeded */
-    if (!impl->state) {
-        nx_mem_free(impl);
-        return NULL;
-    }
-
-    /* Device is created but not initialized - tests will call init() */
-    return &impl->base;
+    NX_INIT_I2C_BUS(&b->base,get_tx_sync,get_tx_rx_sync,get_tx_async,get_tx_rx_async,get_lifecycle,get_power);
+    b->base.open_device=open_device; b->base.close_device=close_device; b->base.service=service;
+    i2c_init_lifecycle(&b->lifecycle); i2c_init_power(&b->power);
+    return &b->base;
 }
-
-/**
- * \brief           Configuration macro - reads from Kconfig
- */
-#define NX_I2C_CONFIG(index)                                                   \
-    static const nx_i2c_platform_config_t i2c_config_##index = {               \
-        .i2c_index = index,                                                    \
-        .speed = NX_CONFIG_I2C##index##_SPEED,                                 \
-        .scl_pin = 0,                                                          \
-        .sda_pin = 1,                                                          \
-        .tx_buf_size = NX_CONFIG_I2C##index##_TX_BUFFER_SIZE,                  \
-        .rx_buf_size = NX_CONFIG_I2C##index##_RX_BUFFER_SIZE,                  \
-    }
-
-/**
- * \brief           Device registration macro
- */
-#define NX_I2C_DEVICE_REGISTER(index)                                          \
-    NX_I2C_CONFIG(index);                                                      \
-    static nx_device_config_state_t i2c_kconfig_state_##index = {              \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-    };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "I2C" #index, &i2c_config_##index,  \
-                       &i2c_kconfig_state_##index, nx_i2c_device_init);
-
-/**
- * \brief           Register all enabled I2C instances
- */
-NX_TRAVERSE_EACH_INSTANCE(NX_I2C_DEVICE_REGISTER, DEVICE_TYPE)
+#define NX_I2C_CONFIG(index) \
+    static const nx_i2c_platform_config_t i2c_config_##index={ \
+        index,NX_CONFIG_I2C##index##_SPEED,0,1, \
+        NX_CONFIG_I2C##index##_TX_BUFFER_SIZE,NX_CONFIG_I2C##index##_RX_BUFFER_SIZE}
+#define NX_I2C_DEVICE_REGISTER(index) \
+    NX_I2C_CONFIG(index); \
+    static nx_device_config_state_t i2c_kconfig_state_##index={.init_res=0,.initialized=false,.api=NULL}; \
+    NX_DEVICE_REGISTER(DEVICE_TYPE,index,"I2C" #index,&i2c_config_##index, \
+                       &i2c_kconfig_state_##index,nx_i2c_device_init);
+NX_TRAVERSE_EACH_INSTANCE(NX_I2C_DEVICE_REGISTER,DEVICE_TYPE)

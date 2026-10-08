@@ -1,236 +1,143 @@
-/**
- * \file            nx_i2c_comm.c
- * \brief           I2C communication interface implementations
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-18
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements I2C communication operations shared between
- *                  sync and async interfaces.
- */
-
-#include "hal/nx_status.h"
+/** Serialized Native I2C transactions. No electrical/DMA emulation or echo. */
 #include "nx_i2c_helpers.h"
-#include <stdio.h>
+#include "osal/osal.h"
+#include <limits.h>
 #include <string.h>
 
-/*---------------------------------------------------------------------------*/
-/* TX Async Interface                                                        */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Send data asynchronously (I2C master transmit)
- */
-nx_status_t nx_i2c_tx_async_send(nx_tx_async_t* self, const uint8_t* data,
-                                 size_t len) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_async));
-    if (!impl || !impl->state || !data) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    /* Simulate transmission */
-    state->stats.tx_count += (uint32_t)len;
-    printf("[I2C%d] TX to 0x%02X: %u bytes\n", state->index,
-           state->current_dev_addr, (unsigned int)len);
-
-    return NX_OK;
+bool native_i2c_transaction_valid(const nx_i2c_transaction_t* t,bool async) {
+    return t && (!t->tx_length || t->tx_data) &&
+        (!t->rx_capacity || (t->rx_data && t->received_length)) &&
+        (t->tx_length || t->rx_capacity) && t->tx_length<=UINT32_MAX &&
+        (t->timeout_ms<=INT32_MAX || (!async && t->timeout_ms==UINT32_MAX)) &&
+        (!async || (t->callback && t->timeout_ms));
 }
-
-/**
- * \brief           Get TX async state
- */
-nx_status_t nx_i2c_tx_async_get_state(nx_tx_async_t* self) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_async));
-    if (!impl || !impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-    return impl->state->initialized ? NX_OK : NX_ERR_NOT_INIT;
+nx_status_t native_i2c_bus_status(nx_i2c_impl_t* b) {
+    return !b->state->initialized ? NX_ERR_NOT_INIT :
+        b->state->suspended ? NX_ERR_SUSPENDED : NX_OK;
 }
-
-/*---------------------------------------------------------------------------*/
-/* TX/RX Async Interface                                                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Send data asynchronously (TX/RX)
- */
-nx_status_t nx_i2c_tx_rx_async_send(nx_tx_rx_async_t* self, const uint8_t* data,
-                                    size_t len) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_rx_async));
-    if (!impl || !impl->state || !data) {
-        return NX_ERR_NULL_PTR;
+nx_status_t native_i2c_admit_locked(native_i2c_device_t* d) {
+    nx_status_t r=native_i2c_bus_status(d->bus);
+    if(r==NX_OK && d->users) r=NX_ERR_BUSY;
+    if(r==NX_OK) {
+        ++d->users; ++d->bus->users; d->cancelled=false;
+        d->completing=false; d->last_result=NX_ERR_BUSY;
     }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    state->stats.tx_count += (uint32_t)len;
-    printf("[I2C%d] TX/RX to 0x%02X: %u bytes\n", state->index,
-           state->current_dev_addr, (unsigned int)len);
-
-    return NX_OK;
+    return r;
 }
-
-/**
- * \brief           Receive data asynchronously
- */
-nx_status_t nx_i2c_tx_rx_async_receive(nx_tx_rx_async_t* self, uint8_t* data,
-                                       size_t* len) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_rx_async));
-    if (!impl || !impl->state || !data || !len) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    /* Simulate: fill with dummy data */
-    for (size_t i = 0; i < *len; i++) {
-        data[i] = (uint8_t)(i & 0xFF);
-    }
-    state->stats.rx_count += (uint32_t)*len;
-
-    return NX_OK;
+static uint32_t remaining(uint64_t at,uint32_t budget) {
+    if(budget==UINT32_MAX) return UINT32_MAX;
+    uint64_t elapsed=native_i2c_now()-at;
+    return elapsed>=budget ? 0 : budget-(uint32_t)elapsed;
 }
-
-/**
- * \brief           Get TX/RX async state
- */
-nx_status_t nx_i2c_tx_rx_async_get_state(nx_tx_rx_async_t* self) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_rx_async));
-    if (!impl || !impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-    return impl->state->initialized ? NX_OK : NX_ERR_NOT_INIT;
+static native_i2c_response_t* response(nx_i2c_impl_t* b,uint8_t address) {
+    for(unsigned i=0;i<NATIVE_I2C_RESPONSE_CAPACITY;++i)
+        if(b->responses[i].used && b->responses[i].address==address)
+            return &b->responses[i];
+    return NULL;
 }
-
-/*---------------------------------------------------------------------------*/
-/* TX Sync Interface                                                         */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Send data synchronously (I2C master transmit)
- */
-nx_status_t nx_i2c_tx_sync_send(nx_tx_sync_t* self, const uint8_t* data,
-                                size_t len, uint32_t timeout_ms) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_sync));
-    if (!impl || !impl->state || !data) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    (void)timeout_ms;
-    state->stats.tx_count += (uint32_t)len;
-    printf("[I2C%d] TX Sync to 0x%02X: %u bytes\n", state->index,
-           state->current_dev_addr, (unsigned int)len);
-
-    return NX_OK;
+static void finish(native_i2c_device_t* d,const nx_i2c_transaction_t* t,
+                   nx_status_t result) {
+    nx_i2c_impl_t* b=d->bus;
+    native_i2c_lock();
+    d->completing=true; d->last_result=result;
+    if(result==NX_ERR_NACK) ++b->state->stats.nack_count;
+    else if(result==NX_ERR_BUS || result==NX_ERR_IO || result==NX_ERR_ARBITRATION)
+        ++b->state->stats.bus_error_count;
+    native_i2c_unlock();
+    /* Pins deliberately survive notification: close/deinit inside callback
+     * returns BUSY, and a reused slot cannot change callback ownership. */
+    if(t->callback) t->callback(t->user_data,result);
+    native_i2c_lock();
+    --d->users; --b->users; d->cancelled=false;
+    native_i2c_unlock();
 }
-
-/*---------------------------------------------------------------------------*/
-/* TX/RX Sync Interface                                                      */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Send data synchronously (TX/RX)
- */
-nx_status_t nx_i2c_tx_rx_sync_send(nx_tx_rx_sync_t* self, const uint8_t* data,
-                                   size_t len, uint32_t timeout_ms) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_rx_sync));
-    if (!impl || !impl->state || !data) {
-        return NX_ERR_NULL_PTR;
+nx_status_t native_i2c_execute(native_i2c_device_t* d,
+    const nx_i2c_transaction_t* t,uint64_t at,bool admitted) {
+    if(!native_i2c_transaction_valid(t,false)) return NX_ERR_INVALID_PARAM;
+    if(osal_is_isr()) return NX_ERR_INVALID_STATE;
+    nx_i2c_impl_t* b=d->bus;
+    nx_status_t r=NX_OK;
+    if(!admitted) {
+        native_i2c_lock(); r=native_i2c_admit_locked(d); native_i2c_unlock();
+        if(r!=NX_OK) return r;
     }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
+    if(t->received_length) *t->received_length=0;
+    bool locked=false;
+    for(;;) {
+        native_i2c_lock(); bool cancelled=d->cancelled; native_i2c_unlock();
+        if(cancelled) { r=NX_ERR_CANCELLED; goto done; }
+        uint32_t left=remaining(at,t->timeout_ms);
+        if(!left) { r=NX_ERR_TIMEOUT; goto done; }
+        osal_status_t os=osal_mutex_lock(b->mutex,left==UINT32_MAX || left>2 ? 2 : left);
+        if(os==OSAL_OK) { locked=true; break; }
+        if(os!=OSAL_ERROR_TIMEOUT) { r=NX_ERR_IO; goto done; }
     }
-
-    (void)timeout_ms;
-    state->stats.tx_count += (uint32_t)len;
-
-    return NX_OK;
+    native_i2c_lock();
+    b->active=d; b->state->busy=true;
+    b->state->current_dev_addr=d->address;
+    b->state->current_device=(nx_i2c_device_handle_t){
+        d->address,d->receive_callback,d->receive_context,true};
+    uint32_t delay=b->transfer_delay_ms;
+    nx_status_t failure=b->next_failure; b->next_failure=NX_OK;
+    native_i2c_unlock();
+    uint64_t io_at=native_i2c_now();
+    for(;;) {
+        native_i2c_lock();
+        if(d->cancelled) r=NX_ERR_CANCELLED;
+        else if(!remaining(at,t->timeout_ms)) r=NX_ERR_TIMEOUT;
+        else if(native_i2c_now()-io_at>=delay) {
+            native_i2c_response_t* packet=response(b,d->address);
+            bool ready=!t->rx_capacity || packet || b->state->rx_buf.count;
+            if(failure!=NX_OK) r=failure;
+            else if(t->tx_length>b->state->tx_buf.size-b->state->tx_buf.count)
+                r=NX_ERR_FULL;
+            else if(ready) {
+                if(t->tx_length) {
+                    i2c_buffer_write(&b->state->tx_buf,t->tx_data,t->tx_length);
+                    b->state->stats.tx_count+=(uint32_t)t->tx_length;
+                }
+                if(t->rx_capacity) {
+                    size_t received;
+                    if(packet) {
+                        size_t available=packet->length-packet->offset;
+                        received=available<t->rx_capacity ? available : t->rx_capacity;
+                        memcpy(t->rx_data,packet->data+packet->offset,received);
+                        packet->offset+=received;
+                        if(packet->offset==packet->length) packet->used=false;
+                    } else received=i2c_buffer_read(&b->state->rx_buf,t->rx_data,t->rx_capacity);
+                    *t->received_length=received;
+                    b->state->stats.rx_count+=(uint32_t)received;
+                }
+                r=NX_OK;
+            } else { native_i2c_unlock(); goto wait; }
+            d->completing=true;
+            native_i2c_unlock();
+            break;
+        } else { native_i2c_unlock(); goto wait; }
+        d->completing=true;
+        native_i2c_unlock();
+        break;
+wait:
+        if(osal_task_delay(1)!=OSAL_OK) { r=NX_ERR_IO; break; }
+    }
+done:
+    native_i2c_lock();
+    if(d->cancelled && !d->completing) r=NX_ERR_CANCELLED;
+    d->completing=true;
+    native_i2c_unlock();
+    if(locked) {
+        native_i2c_lock(); b->active=NULL; b->state->busy=false; native_i2c_unlock();
+        if(osal_mutex_unlock(b->mutex)!=OSAL_OK) r=NX_ERR_IO;
+    }
+    finish(d,t,r);
+    return r;
 }
-
-/**
- * \brief           Receive data synchronously (I2C master receive)
- */
-nx_status_t nx_i2c_tx_rx_sync_receive(nx_tx_rx_sync_t* self, uint8_t* data,
-                                      size_t* len, uint32_t timeout_ms) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_rx_sync));
-    if (!impl || !impl->state || !data || !len) {
-        return NX_ERR_NULL_PTR;
+nx_status_t native_i2c_submit(native_i2c_device_t* d,
+    const nx_i2c_transaction_t* t,uint64_t started) {
+    nx_i2c_impl_t* b=d->bus;
+    nx_status_t r=b->pending || b->worker_active ? NX_ERR_BUSY : native_i2c_admit_locked(d);
+    if(r==NX_OK) {
+        b->queued=*t; b->queued_at=started; b->pending=d;
     }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    (void)timeout_ms;
-    /* Simulate: fill with dummy data */
-    for (size_t i = 0; i < *len; i++) {
-        data[i] = (uint8_t)(i & 0xFF);
-    }
-    state->stats.rx_count += (uint32_t)*len;
-    printf("[I2C%d] RX Sync from 0x%02X: %u bytes\n", state->index,
-           state->current_dev_addr, (unsigned int)*len);
-
-    return NX_OK;
-}
-
-/**
- * \brief           Transfer data synchronously (combined TX/RX)
- */
-nx_status_t nx_i2c_tx_rx_sync_transfer(nx_tx_rx_sync_t* self, const uint8_t* tx,
-                                       uint8_t* rx, size_t len,
-                                       uint32_t timeout_ms) {
-    nx_i2c_impl_t* impl =
-        (nx_i2c_impl_t*)((char*)self - offsetof(nx_i2c_impl_t, tx_rx_sync));
-    if (!impl || !impl->state) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_i2c_state_t* state = impl->state;
-    if (!state->initialized) {
-        return NX_ERR_NOT_INIT;
-    }
-
-    (void)timeout_ms;
-
-    /* Simulate transfer */
-    if (tx) {
-        state->stats.tx_count += (uint32_t)len;
-    }
-    if (rx) {
-        for (size_t i = 0; i < len; i++) {
-            rx[i] = tx ? tx[i] : (uint8_t)(i & 0xFF);
-        }
-        state->stats.rx_count += (uint32_t)len;
-    }
-
-    return NX_OK;
+    return r;
 }

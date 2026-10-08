@@ -126,8 +126,12 @@ class LogTestBase : public ::testing::Test {
      */
     std::string ReadMemoryBackend(log_backend_t* backend) {
         char buf[4096];
-        size_t len = log_backend_memory_read(backend, buf, sizeof(buf));
-        return std::string(buf, len);
+        std::string content;
+        size_t len;
+        while ((len = log_backend_memory_read(backend, buf, sizeof(buf))) != 0) {
+            content.append(buf, len);
+        }
+        return content;
     }
 
     /**

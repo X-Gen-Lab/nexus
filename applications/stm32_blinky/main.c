@@ -13,9 +13,8 @@
  *                  - Blinking the LED in an infinite loop
  *                  - Verifying that the system boots correctly and runs
  *
- * \note            This example uses the STM32 HAL library directly.
- *                  Default LED is on GPIOA Pin 5 (common on STM32 Nucleo
- * boards). Adjust LED_GPIO_PORT and LED_GPIO_PIN for your hardware.
+ * \note            This example uses STM32 HAL directly on the MB997
+ *                  reference board. LD4 is PD12; PA5 belongs to SPI1.
  */
 
 /*---------------------------------------------------------------------------*/
@@ -23,17 +22,19 @@
 /*---------------------------------------------------------------------------*/
 
 #include "boot/stm32_boot.h"
+#include "nexus_board.h"
 #include "stm32f4xx_hal.h"
 
 /*---------------------------------------------------------------------------*/
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-#define LED_GPIO_PORT GPIOG       /**< LED GPIO port */
-#define LED_GPIO_PIN  GPIO_PIN_13 /**< LED GPIO pin */
-#define LED_GPIO_CLK_ENABLE                                                    \
-    __HAL_RCC_GPIOG_CLK_ENABLE /**< GPIO clock enable                          \
-                                */
+#if NX_BOARD_LED_GPIO_PORT != 'D'
+#error "This direct STM32 HAL example requires the MB997 board profile"
+#endif
+#define LED_GPIO_PORT GPIOD
+#define LED_GPIO_PIN (1U << NX_BOARD_LED_GPIO_PIN)
+#define LED_GPIO_CLK_ENABLE __HAL_RCC_GPIOD_CLK_ENABLE
 #define BLINK_DELAY_MS 500     /**< Blink delay in milliseconds */
 
 /*---------------------------------------------------------------------------*/

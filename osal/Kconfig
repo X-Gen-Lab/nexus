@@ -9,7 +9,7 @@ choice
       Select the operating system backend for OSAL.
 
       Available backends:
-      - Bare-metal: No RTOS, simple scheduler
+      - Bare-metal: Control loop and hardware ISRs, no task scheduler
       - FreeRTOS: Popular real-time operating system
       - RT-Thread: Chinese RTOS with rich features
       - Zephyr: Linux Foundation RTOS
@@ -20,7 +20,8 @@ config OSAL_BAREMETAL
     bool "Bare-metal (No OS)"
     help
       Bare-metal implementation without RTOS.
-      Provides basic task scheduling and synchronization.
+      Provides bounded synchronization for one control thread and hardware
+      ISRs. Tasks, a dynamic OSAL heap and software timers are unsupported.
 
 config OSAL_FREERTOS
     bool "FreeRTOS"
@@ -67,19 +68,75 @@ config OSAL_BACKEND_NAME
 # System parameters configuration
 menu "System Parameters"
 
+config OSAL_MAX_TASKS
+    int "Maximum task handles"
+    default 16 if PLATFORM_NATIVE
+    default 8
+    range 1 64
+
+config OSAL_MAX_MUTEXES
+    int "Maximum mutex handles"
+    default 16 if PLATFORM_NATIVE
+    default 8
+    range 1 64
+
+config OSAL_MAX_SEMS
+    int "Maximum semaphore handles"
+    default 16 if PLATFORM_NATIVE
+    default 8
+    range 1 64
+
+config OSAL_MAX_QUEUES
+    int "Maximum queue handles"
+    default 8 if PLATFORM_NATIVE
+    default 4
+    range 1 32
+
+config OSAL_MAX_EVENTS
+    int "Maximum event handles"
+    default 8 if PLATFORM_NATIVE
+    default 4
+    range 1 32
+
+config OSAL_MAX_TIMERS
+    int "Maximum software timer handles"
+    default 8 if PLATFORM_NATIVE
+    default 4
+    range 1 32
+
+config OSAL_MAX_QUEUE_ITEM_SIZE
+    int "Maximum queue item size (bytes)"
+    default 1024
+    range 16 4096
+    help
+      Bound each queue copy. The default includes the asynchronous logging
+      entry and its metadata; oversized items fail before allocation.
+
+config OSAL_MAX_QUEUE_BYTES
+    int "Maximum allocation for one queue (bytes)"
+    default 65536 if PLATFORM_NATIVE
+    default 8192
+    range 256 1048576
+    help
+      Product memory budget, independently checked before multiplication.
+
 config OSAL_TICK_RATE_HZ
-    int "System tick rate (Hz)"
+    int "System tick rate (Hz)" if OSAL_FREERTOS
     default 1000 if OSAL_FREERTOS
     default 1000 if OSAL_RTTHREAD
     default 100 if OSAL_ZEPHYR
     default 1000
+    range 1000 1000 if PLATFORM_NATIVE || (PLATFORM_STM32 && OSAL_FREERTOS)
     range 100 10000
     help
       System tick rate in Hz.
       Higher rates provide better timing resolution but increase overhead.
+      The F407 reference shares the 1 ms HAL time base and currently requires
+      exactly 1,000 Hz. Other rates require an independent HAL time base.
 
 config OSAL_HEAP_SIZE
-    int "Heap size (bytes)"
+    int "FreeRTOS heap size (bytes)"
+    depends on OSAL_FREERTOS
     default 32768 if OSAL_FREERTOS
     default 32768 if OSAL_RTTHREAD
     default 16384 if OSAL_BAREMETAL
@@ -89,24 +146,13 @@ config OSAL_HEAP_SIZE
       Total heap size in bytes.
       Used for dynamic memory allocation.
 
-config OSAL_MAIN_STACK_SIZE
-    int "Main stack size (bytes)"
-    default 2048 if OSAL_FREERTOS
-    default 2048 if OSAL_RTTHREAD
-    default 4096 if OSAL_BAREMETAL
-    default 4096
-    range 512 65536
-    help
-      Main task/thread stack size in bytes.
-      Must be large enough for application needs.
-
 config OSAL_MAX_PRIORITIES
     int "Maximum priority levels"
     default 32 if OSAL_FREERTOS
     default 32 if OSAL_RTTHREAD
     default 16
-    range 8 256
-    depends on !OSAL_BAREMETAL
+    range 8 32
+    depends on OSAL_FREERTOS
     help
       Maximum number of priority levels.
       More levels provide finer control but increase overhead.
@@ -114,11 +160,11 @@ config OSAL_MAX_PRIORITIES
 endmenu
 
 # Linker script configuration
-menu "Linker Script Configuration"
+menu "SoC physical memory identity (read-only)"
     depends on !PLATFORM_NATIVE
 
 config LINKER_RAM_START
-    hex "RAM start address"
+    hex
     default 0x20000000 if STM32F4
     default 0x24000000 if STM32H7
     default 0x20000000 if GD32F30X
@@ -128,7 +174,7 @@ config LINKER_RAM_START
       Platform-specific value.
 
 config LINKER_RAM_SIZE
-    hex "RAM size"
+    hex
     default 0x00020000 if STM32F407
     default 0x00080000 if STM32H743
     default 0x00010000 if GD32F303
@@ -138,7 +184,7 @@ config LINKER_RAM_SIZE
       Platform-specific value.
 
 config LINKER_FLASH_START
-    hex "Flash start address"
+    hex
     default 0x08000000 if PLATFORM_STM32
     default 0x08000000 if PLATFORM_GD32
     default 0x08000000
@@ -147,7 +193,7 @@ config LINKER_FLASH_START
       Platform-specific value.
 
 config LINKER_FLASH_SIZE
-    hex "Flash size"
+    hex
     default 0x00100000 if STM32F407
     default 0x00200000 if STM32H743
     default 0x00040000 if GD32F303
@@ -159,7 +205,7 @@ config LINKER_FLASH_SIZE
 endmenu
 
 # Include backend-specific configuration files
-rsource "adapters/baremetal/Kconfig"
+# Baremetal has no scheduler configuration or software task limits.
 rsource "adapters/freertos/Kconfig"
 rsource "adapters/rtthread/Kconfig"
 rsource "adapters/zephyr/Kconfig"

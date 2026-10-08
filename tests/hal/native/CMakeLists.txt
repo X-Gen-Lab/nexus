@@ -38,7 +38,6 @@ set(HAL_NATIVE_TEST_SOURCES
     test_nx_watchdog.cpp
     test_nx_option_bytes.cpp
     test_nx_platform.cpp
-    test_nx_device_msvc.cpp
     # Property-based tests
     test_nx_crc_properties.cpp
     test_nx_flash_properties.cpp
@@ -56,6 +55,10 @@ set(HAL_NATIVE_TEST_SOURCES
     test_nx_option_bytes_properties.cpp
     test_nx_platform_properties.cpp
 )
+
+if(MSVC)
+    list(APPEND HAL_NATIVE_TEST_SOURCES test_nx_device_msvc.cpp)
+endif()
 
 # Create test executable
 add_executable(hal_native_tests
@@ -88,3 +91,24 @@ nexus_discover_tests(hal_native_tests
         TIMEOUT 300
         LABELS "hal;native;unit;property"
 )
+
+add_executable(native_registry_contract_tests test_native_registry.c)
+target_link_libraries(native_registry_contract_tests PRIVATE platform_native hal osal)
+if(MSVC)
+    target_compile_options(native_registry_contract_tests PRIVATE /UNDEBUG)
+else()
+    target_compile_options(native_registry_contract_tests PRIVATE -UNDEBUG -Werror)
+endif()
+add_test(NAME native_registry_contract_tests COMMAND native_registry_contract_tests)
+set_tests_properties(native_registry_contract_tests PROPERTIES TIMEOUT 10 LABELS "hal;native;registration;contract")
+
+add_executable(unbound_platform_contract_tests
+    test_unbound_platform.c "${CMAKE_SOURCE_DIR}/hal/src/nx_hal.c")
+target_link_libraries(unbound_platform_contract_tests PRIVATE hal_interface nexus_build_options)
+if(MSVC)
+    target_compile_options(unbound_platform_contract_tests PRIVATE /UNDEBUG)
+else()
+    target_compile_options(unbound_platform_contract_tests PRIVATE -UNDEBUG -Werror)
+endif()
+add_test(NAME unbound_platform_contract_tests COMMAND unbound_platform_contract_tests)
+set_tests_properties(unbound_platform_contract_tests PROPERTIES TIMEOUT 10 LABELS "hal;platform;contract")

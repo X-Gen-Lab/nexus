@@ -13,6 +13,8 @@
 
 #include "nx_i2c_helpers.h"
 #include "hal/base/nx_device.h"
+#include "hal/nx_factory.h"
+#include "nx_i2c_native.h"
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -25,7 +27,7 @@
  * \note            Optimized to use memcpy for contiguous blocks
  */
 size_t i2c_buffer_write(nx_i2c_buffer_t* buf, const uint8_t* data, size_t len) {
-    if (!buf || !data || len == 0) {
+    if (!buf || !buf->data || !buf->size || !data || len == 0) {
         return 0;
     }
 
@@ -55,7 +57,7 @@ size_t i2c_buffer_write(nx_i2c_buffer_t* buf, const uint8_t* data, size_t len) {
  * \note            Optimized to use memcpy for contiguous blocks
  */
 size_t i2c_buffer_read(nx_i2c_buffer_t* buf, uint8_t* data, size_t len) {
-    if (!buf || !data || len == 0) {
+    if (!buf || !buf->data || !buf->size || !data || len == 0) {
         return 0;
     }
 
@@ -77,4 +79,14 @@ size_t i2c_buffer_read(nx_i2c_buffer_t* buf, uint8_t* data, size_t len) {
     }
 
     return read_count;
+}
+
+
+nx_i2c_bus_t* nx_i2c_native_get(uint8_t index) {
+    return index<8 ? nx_factory_i2c(index) : NULL;
+}
+const nx_device_t* nx_i2c_native_get_device(uint8_t index) {
+    if(index>=8) return NULL;
+    char name[]={'I','2','C',(char)('0'+index),'\0'};
+    return nx_device_find(name);
 }

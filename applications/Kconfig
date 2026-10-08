@@ -2,10 +2,9 @@
 # Applications Configuration
 #-----------------------------------------------------------------------------
 # This file defines configuration options for example applications.
-# Applications are only built for embedded platforms (not native).
+# Generic applications can also execute against the Native reference board.
 #-----------------------------------------------------------------------------
 
-if !PLATFORM_NATIVE
 
 menu "Example Applications"
 
@@ -26,71 +25,47 @@ config BUILD_APP_BLINKY
 config BUILD_APP_SHELL_DEMO
     bool "Build Shell Demo"
     default y
-    depends on FRAMEWORK_SHELL
+    depends on PLATFORM_NATIVE && FRAMEWORK_SHELL
     help
-      Interactive shell demo with command-line interface.
-
-      Features:
-        - Command registration and execution
-        - UART communication
-        - Built-in commands (help, version, etc.)
-
-      Suitable for: All platforms
-      Requirements: UART peripheral, Shell framework
+      Native standard-stream console with a real Shell framework backend,
+      one board LED, checked command outcomes and a finite --smoke mode.
+      MCU consoles require an explicit product transport binding and are
+      not provided by this reference application.
 
 config BUILD_APP_CONFIG_DEMO
     bool "Build Config Demo"
+    depends on FRAMEWORK_CONFIG
     default y
     help
-      Configuration system demonstration.
-
-      Features:
-        - Kconfig-based configuration
-        - Runtime parameter access
-        - Configuration validation
-
-      Suitable for: All platforms
-      Requirements: None
+      Finite checked volatile parameter-store demonstration: typed values,
+      namespace isolation, JSON and binary v2 round trips and explicit error
+      outcomes. Persistence requires a separate backend and is not claimed.
 
 config BUILD_APP_STM32_BLINKY
     bool "Build STM32 Minimal Blinky"
     default y if PLATFORM_STM32
     depends on PLATFORM_STM32
     help
-      Minimal STM32 blinky example with direct register access.
-
-      Features:
-        - Minimal boot code
-        - Direct register manipulation
-        - No HAL/OSAL dependencies
-        - Smallest code size
-
-      Suitable for: STM32 platform only
-      Requirements: None (bare metal)
+      Direct ST HAL GPIO demonstration for the STM32F4DISCOVERY PD12 LED.
+      This uses the selected SDK, startup, clock and board wiring. Build
+      evidence does not establish boot or timing on a physical board.
 
 config BUILD_APP_STM32_CONFIG_TEST
     bool "Build STM32 Configuration Test"
     default y if PLATFORM_STM32
     depends on PLATFORM_STM32
     help
-      STM32 Kconfig configuration validation test application.
-
-      Features:
-        - LED blinking using SysTick timer
-        - Configuration display via UART/ITM
-        - Validates Kconfig settings are applied
-        - Tests interrupt priority configuration
-        - Tests peripheral configuration
-
-      Suitable for: STM32 platform only
-      Requirements: STM32 HAL library
+      Read-only STM32F407 diagnostics using shared platform startup:
+      effective configuration, observed clock/identity, NVIC and heartbeat.
+      The product must provide a printf transport; no Flash erase/program
+      or peripheral qualification is performed by this application.
 
 config BUILD_APP_FREERTOS_DEMO
     bool "Build FreeRTOS Demo"
     default y if OSAL_FREERTOS
-    depends on OSAL_FREERTOS
+    depends on OSAL_FREERTOS || OSAL_NATIVE
     help
-      FreeRTOS OSAL adapter demonstration.
+      OSAL adapter demonstration with tasks and bounded resources.
 
       Features:
         - Multi-task creation and management
@@ -98,50 +73,13 @@ config BUILD_APP_FREERTOS_DEMO
         - Semaphore for task synchronization
         - Message queue for inter-task communication
 
-      Suitable for: All platforms
-      Requirements: FreeRTOS OSAL backend
+      Requires Native or FreeRTOS OSAL; baremetal tasks are unsupported.
 
 #-----------------------------------------------------------------------------
 # Application Common Settings
 #-----------------------------------------------------------------------------
 
 menu "Application Common Settings"
-
-config APP_VERSION_MAJOR
-    int "Application version (major)"
-    default 1
-    range 0 255
-    help
-      Major version number for applications.
-
-config APP_VERSION_MINOR
-    int "Application version (minor)"
-    default 0
-    range 0 255
-    help
-      Minor version number for applications.
-
-config APP_VERSION_PATCH
-    int "Application version (patch)"
-    default 0
-    range 0 255
-    help
-      Patch version number for applications.
-
-config APP_ENABLE_VERSION_INFO
-    bool "Enable version information"
-    default y
-    help
-      Include version information in application binary.
-      Adds version string and build timestamp.
-
-config APP_ENABLE_DEBUG_OUTPUT
-    bool "Enable debug output"
-    default y if BUILD_TYPE_DEBUG
-    default n
-    help
-      Enable debug output in applications.
-      Uses UART or other configured output peripheral.
 
 config APP_STACK_SIZE
     hex "Application stack size"
@@ -190,11 +128,11 @@ config APP_GENERATE_HEX
       Uses objcopy to create .hex files from ELF.
 
 config APP_GENERATE_MAP
-    bool "Generate linker map files"
+    bool
     default y
     help
-      Generate detailed linker map files.
-      Useful for analyzing memory usage and symbol locations.
+      A detailed linker map is mandatory firmware evidence. It records
+      memory usage and symbol locations for each application.
 
 config APP_PRINT_SIZE
     bool "Print size information"
@@ -213,5 +151,3 @@ config APP_PRINT_MEMORY_USAGE
 endmenu
 
 endmenu
-
-endif  # !PLATFORM_NATIVE

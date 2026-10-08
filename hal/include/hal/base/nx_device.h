@@ -61,6 +61,7 @@ typedef struct nx_device_config_state_s {
     uint8_t init_res; /**< Initialization result */
     bool initialized; /**< Initialization flag */
     void* api;        /**< Cached API pointer */
+    bool initializing; /**< Initialization in progress; protected by port critical region */
 } nx_device_config_state_t;
 
 /*---------------------------------------------------------------------------*/
@@ -170,6 +171,9 @@ const nx_device_t* nx_device_find(const char* name);
  * \note            This function caches the API pointer after first init
  *                  Subsequent calls return the cached pointer
  */
+/** Task context only. Returns NULL while another caller initializes this
+ * descriptor; the caller may retry. Device initialization never runs while
+ * holding the port critical region. Descriptors and cached API are static. */
 void* nx_device_init(const nx_device_t* dev);
 
 /**

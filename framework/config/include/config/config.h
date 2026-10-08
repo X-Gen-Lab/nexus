@@ -93,6 +93,8 @@ config_status_t config_init(const config_manager_config_t* config);
  * \brief           Deinitialize the Config Manager
  * \return          CONFIG_OK on success, error code otherwise
  * \note            Releases all resources
+ * \note            Failure retains initialization, backend ownership and keys.
+ *                  Resolve the backend error and retry before freeing contexts.
  */
 config_status_t config_deinit(void);
 
@@ -301,6 +303,10 @@ config_status_t config_get_blob_len(const char* key, size_t* len);
 
 /**
  * \brief           Namespace handle type
+ * \note            Opaque lifetime token, never an object address to dereference.
+ *                  Closed handles remain invalid after slot reuse or manager
+ *                  reinitialization. Serialize all namespace calls through the
+ *                  management owner. Tokens are identities, not access credentials.
  */
 typedef struct config_namespace* config_ns_handle_t;
 
@@ -535,6 +541,9 @@ config_status_t config_register_defaults(const config_default_t* defaults,
 
 /**
  * \brief           Configuration change callback function type
+ * \note            Synchronous task context under the management owner.
+ *                  Values are borrowed and readonly until return; callbacks
+ *                  may read Config and must keep their execution bounded.
  * \param[in]       key: Key that changed
  * \param[in]       type: Value type
  * \param[in]       old_value: Previous value (may be NULL)
@@ -547,6 +556,9 @@ typedef void (*config_change_cb_t)(const char* key, config_type_t type,
 
 /**
  * \brief           Callback handle type
+ * \note            Opaque lifetime token. Never dereference it or use it as an
+ *                  access credential. Reuse and reinitialization do not revive
+ *                  retired tokens; exhaustion fails explicitly.
  */
 typedef struct config_callback* config_cb_handle_t;
 
@@ -576,6 +588,10 @@ config_status_t config_register_wildcard_callback(config_change_cb_t callback,
 
 /**
  * \brief           Unregister a callback
+ * \note            BUSY while this callback is executing; retain its context
+ *                  until a later unregister succeeds. Config deinit is also
+ *                  BUSY during notification. New listeners registered during
+ *                  notification participate only in subsequent changes.
  * \param[in]       handle: Callback handle
  * \return          CONFIG_OK on success, error code otherwise
  */
@@ -680,6 +696,13 @@ config_status_t config_get_export_size(config_format_t format,
 
 /**
  * \brief           Export all configurations
+ * \note            Task context, serialized by the management owner. Global
+ *                  JSON supports the default namespace only; use per-namespace
+ *                  JSON or binary v2 for namespaced values. Binary v2 uses fixed
+ *                  little-endian fields and requires an existing namespace map.
+ *                  NXCS persistence snapshots carry the complete namespace map.
+ *                  Authentication errors clear output; DECRYPT never silently
+ *                  substitutes ciphertext. Exported ciphertext is JSON hex.
  * \param[in]       format: Export format
  * \param[in]       flags: Export flags
  * \param[out]      buffer: Buffer to store exported data
@@ -709,6 +732,20 @@ config_status_t config_export_namespace(const char* ns_name,
 
 /**
  * \brief           Import configurations
+ * \note            Synchronous task context under the management owner. Caller
+ *                  retains input ownership. Entire input is staged and validated
+ *                  before mutation, including CLEAR; malformed framing or failed
+ *                  authentication preserves live values. SKIP_ERRORS explicitly
+ *                  permits valid items despite other semantic errors. Staging
+ *                  allocates bounded management heap; NO_MEMORY is recoverable.
+ *                  Auto-commit errors restore old RAM; reopen/load to resolve
+ *                  ambiguous durable writes. Binary v1 is deliberately rejected.
+ *                  CLEAR does not authorize a same-identity encrypted value to
+ *                  become plaintext. Explicitly delete that key before a
+ *                  product-authorized plaintext replacement; readonly keys
+ *                  require the separate trusted migration/load boundary.
+ *                  Products separately authorize parameter changes: encryption
+ *                  is not user access control or a signature on plaintext input.
  * \param[in]       format: Import format
  * \param[in]       flags: Import flags
  * \param[in]       data: Data to import
@@ -743,14 +780,39 @@ config_status_t config_import_namespace(const char* ns_name,
  */
 
 /**
- * \brief           Set the encryption key
+ * \brief           Select a known key or replace the keyring with a new key
  * \param[in]       key: Encryption key
  * \param[in]       key_len: Key length in bytes
  * \param[in]       algo: Encryption algorithm
  * \return          CONFIG_OK on success, error code otherwise
+ * \note            Task/maintenance context only; serialize all Config access.
+ *                  Existing ciphertext requires the old key. Use register to
+ *                  restore generations from a product secure key vault, and
+ *                  rotate to migrate records. MCU without a maintained crypto
+ *                  provider returns CONFIG_ERROR_UNSUPPORTED. CBC is rejected.
  */
 config_status_t config_set_encryption_key(const uint8_t* key, size_t key_len,
                                           config_crypto_algo_t algo);
+
+/** Register a generation without discarding other keys (maximum four).
+ * Product must durably protect both old and new keys BEFORE rotating persistent
+ * records, reload the keyring before config_load(), and retain both keys until
+ * successful mount/read-back confirms migration. No key is stored by Config.
+ * Set make_active to choose the key for subsequent writes. IDs are stable,
+ * domain-separated SHA256(key+algorithm) truncated to 16 bytes, public metadata.
+ * No thread/ISR safety: caller serializes keyring/store/commit operations. */
+config_status_t config_register_encryption_key(const uint8_t* key, size_t key_len,
+    config_crypto_algo_t algo, bool make_active);
+
+/** Calculate stable public lookup metadata; never use the ID as a credential. */
+config_status_t config_get_encryption_key_id(const uint8_t* key, size_t key_len,
+    config_crypto_algo_t algo, uint8_t id[16]);
+
+/** Securely erase an inactive generation after external durable confirmation.
+ * Refuses retirement while any current RAM record references it. This API cannot
+ * inspect old bank snapshots or a product key vault: caller must confirm those
+ * recovery sources are no longer needed before retiring their durable key. */
+config_status_t config_retire_encryption_key(const uint8_t id[16]);
 
 /**
  * \brief           Clear the encryption key
@@ -790,7 +852,14 @@ config_status_t config_is_encrypted(const char* key, bool* encrypted);
  * \param[in]       key_len: Key length in bytes
  * \param[in]       algo: Encryption algorithm
  * \return          CONFIG_OK on success, error code otherwise
- * \note            Re-encrypts all encrypted keys with the new key
+ * \note            Authenticates and stages every encrypted record before an
+ *                  atomic RAM batch replacement. Commits a backend snapshot if
+ *                  configured; any reported failure restores RAM + active key.
+ *                  Both generations remain registered on ambiguous I/O failure.
+ *                  Pre-register durable keys in the product secure vault (above).
+ *                  Heap workspace is bounded by encrypted record count/sizes;
+ *                  failure to allocate leaves records unchanged. Task-only;
+ *                  serialize Config access, use a maintenance time budget.
  */
 config_status_t config_rotate_encryption_key(const uint8_t* new_key,
                                              size_t key_len,

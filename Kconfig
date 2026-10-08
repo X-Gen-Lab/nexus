@@ -16,6 +16,7 @@ source "cmake/Kconfig"
 #-----------------------------------------------------------------------------
 
 source "platforms/Kconfig"
+source "boards/Kconfig"
 
 #-----------------------------------------------------------------------------
 # HAL Layer Configuration

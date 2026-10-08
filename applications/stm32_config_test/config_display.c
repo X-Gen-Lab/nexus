@@ -5,7 +5,10 @@
  */
 
 #include "config_display.h"
+#include "identity.h"
+#include "nexus_board.h"
 #include "nexus_config.h"
+#include "stm32f4xx_hal.h"
 #include <stdio.h>
 
 /*---------------------------------------------------------------------------*/
@@ -30,8 +33,22 @@ static void print_section_header(const char* title) {
 void config_display_print_platform(void) {
     print_section_header("Platform Configuration");
 
+    nx_stm32f407_identity_t identity = {0};
+    nx_stm32f407_identity(&identity);
+    printf("Board profile: %s (physical PCB revision is a HIL input)\n",
+           NX_BOARD_NAME);
+    printf("Observed SYSCLK: %lu Hz\n",
+           (unsigned long)HAL_RCC_GetSysClockFreq());
+    printf("Observed silicon: device 0x%03X, revision 0x%04X, Flash %u KiB\n",
+           (unsigned int)identity.silicon_device_id,
+           (unsigned int)identity.silicon_revision_id,
+           (unsigned int)identity.flash_kib);
+    printf("Observed UID: %08lX-%08lX-%08lX\n",
+           (unsigned long)identity.uid[0], (unsigned long)identity.uid[1],
+           (unsigned long)identity.uid[2]);
+
 #ifdef NX_CONFIG_STM32_SYSCLK_FREQ
-    printf("System Clock: %lu Hz\n",
+    printf("Configured System Clock: %lu Hz\n",
            (unsigned long)NX_CONFIG_STM32_SYSCLK_FREQ);
 #else
     printf("System Clock: Not configured\n");
@@ -63,6 +80,8 @@ void config_display_print_platform(void) {
  */
 void config_display_print_interrupt(void) {
     print_section_header("Interrupt Configuration");
+    printf("Observed AIRCR PRIGROUP encoding: %lu\n",
+           (unsigned long)HAL_NVIC_GetPriorityGrouping());
 
 #ifdef NX_CONFIG_STM32_NVIC_PRIORITY_GROUP
     printf("NVIC Priority Group: %d\n", NX_CONFIG_STM32_NVIC_PRIORITY_GROUP);

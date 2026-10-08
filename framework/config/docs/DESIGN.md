@@ -1,3 +1,5 @@
+> Persistence/crypto refactor: Flash requires an explicit `config_backend_flash_bind` partition; keys are externally persisted and reloaded before encrypted load; AES-GCM records replace CBC. Follow [the current implementation contract](../../../docs/implementation/storage-security.md) for atomic snapshots, error recovery and support evidence.
+
 # Config Manager 架构设计文档
 
 ## 1. 概述
@@ -22,7 +24,7 @@ Config Manager 是 Nexus 嵌入式平台的配置管理框架，提供灵活、�
 - 可插拔存储后端（RAM、Flash、自定义）
 - 导入/导出功能（JSON、二进制格式）
 - AES-128/256 加密支持
-- 线程安全保护
+- 外部管理 owner 串行化
 
 ## 2. 系统架构
 
@@ -289,89 +291,21 @@ config_load()
 
 ## 5. 存储后端接口
 
-### 5.1 后端接口定义
+持久化 backend 的 `save_snapshot/load_snapshot` 原子替换全部配置。Flash 绑定 `nx_storage_t` 的双银行分区；无绑定显式 UNSUPPORTED。RAM 是易失存储，Mock 仅用于测试。keyed-only 自定义 backend 不能执行新的原子 commit/load。
 
-```c
-struct config_backend {
-    const char* name;                      /* 后端名称 */
-    config_backend_init_fn init;           /* 初始化 */
-    config_backend_deinit_fn deinit;       /* 反初始化 */
-    config_backend_read_fn read;           /* 读取 */
-    config_backend_write_fn write;         /* 写入 */
-    config_backend_erase_fn erase;         /* 删除 */
-    config_backend_erase_all_fn erase_all; /* 删除全部 */
-    config_backend_commit_fn commit;       /* 提交 */
-    void* ctx;                             /* 上下文 */
-};
-```
+详见[当前存储格式、端口和恢复契约](../../../docs/implementation/storage-security.md)。
 
-### 5.2 后端实现要求
+## 6. 管理任务串行化
 
-#### 必需接口
-- `read()`: 根据键读取数据
-- `write()`: 根据键写入数据
-- `erase()`: 根据键删除数据
+Config 的完整 API 由一个管理 owner 串行调用。它没有全局 OSAL mutex，不支持没有外部串行化的并发修改。其他任务经产品队列提交请求，或在所有调用外使用相同的管理锁。load/commit 另有原子工作区门禁，重入返回 BUSY；回调不应修改配置。
 
-#### 可选接口
-- `init()`: 后端初始化（如打开文件、初始化 Flash）
-- `deinit()`: 后端清理
-- `erase_all()`: 批量删除（性能优化）
-- `commit()`: 提交事务（用于支持事务的后端）
-
-### 5.3 内置后端
-
-#### RAM Backend
-- **用途**: 测试、临时存储
-- **特点**: 快速、易失性
-- **实现**: 使用内存数组或哈希表
-
-#### Flash Backend
-- **用途**: 生产环境持久化存储
-- **特点**: 非易失、磨损均衡
-- **实现**: 基于 HAL Flash 接口，使用键值对格式
-
-#### Mock Backend
-- **用途**: 单元测试
-- **特点**: 可控制行为、记录操作
-- **实现**: 内存存储 + 操作日志
-
-## 6. 线程安全设计
-
-### 6.1 保护策略
-
-使用全局互斥锁保护所有公共 API：
-
-```c
-static osal_mutex_t g_config_mutex;
-
-config_status_t config_set_i32(const char* key, int32_t value) {
-    osal_mutex_lock(&g_config_mutex);
-    
-    /* 执行操作 */
-    config_status_t status = config_store_set(...);
-    
-    osal_mutex_unlock(&g_config_mutex);
-    return status;
-}
-```
-
-### 6.2 死锁避免
-
-- 回调函数中不允许调用 Config API
-- 后端接口实现不应持有其他锁
-- 使用超时机制防止永久阻塞
-
-### 6.3 性能考虑
-
-- 读多写少场景可考虑读写锁
-- 命名空间级别的细粒度锁
-- 无锁数据结构（高级优化）
+控制任务和 ISR 不执行 Flash/crypto。并发工作流测试显式使用外部管理锁，不能据此宣称无锁多线程安全。
 
 ## 7. 内存管理
 
 ### 7.1 静态分配策略
 
-所有内存在初始化时静态分配：
+store/namespace/default/callback与snapshot工作区按编译profile静态分配；crypto open/rotation使用有界管理域暂存，分配失败必须返回错误：
 
 ```c
 static config_entry_t g_config_entries[CONFIG_MAX_KEYS];
@@ -407,33 +341,11 @@ static config_default_entry_t g_defaults[CONFIG_MAX_DEFAULTS];
 - 对不常用功能禁用相关模块
 - 考虑使用压缩算法（高级）
 
-## 8. 加密设计
+## 8. 认证配置记录
 
-### 8.1 加密架构
+维护中的 provider 提供 AES-GCM、CSPRNG、SHA256、Ed25519。Native 使用 OpenSSL，MCU 无 provider 时显式失败。记录认证版本、算法、key id、key 名、namespace、type，96位随机 nonce 和16字节 tag，固定开销56字节。旧 CBC不接受。
 
-```
-明文数据 → AES 加密 → 添加元数据 → 存储
-存储数据 → 解析元数据 → AES 解密 → 明文数据
-```
-
-### 8.2 加密元数据格式
-
-```
-[1 byte: 算法标识][1 byte: IV 长度][N bytes: IV][加密数据]
-```
-
-### 8.3 密钥管理
-
-- 密钥存储在内存中（运行时设置）
-- 支持密钥轮换（重新加密所有加密项）
-- 建议使用硬件安全模块（HSM）存储密钥
-
-### 8.4 安全考虑
-
-- 使用随机 IV（初始化向量）
-- 定期轮换密钥
-- 敏感数据使用加密存储
-- 防止侧信道攻击（时间攻击）
+轮换先暂存全部旧/新记录，完整成功才修改 RAM 和原子提交；提交错误恢复旧 RAM/active key，但保留两代 key，重新 load 解析实际 durable 世代。key vault 的持久化和重载属于产品，不能把密钥存入参数 Flash。详见[实际安全格式和测试证据](../../../docs/implementation/storage-security.md)。
 
 ## 9. 错误处理
 
@@ -460,7 +372,7 @@ typedef enum {
 
 - 参数错误：返回错误，不改变状态
 - 内存不足：返回错误，可能部分成功
-- 后端错误：返回错误，保持内存状态一致
+- 后端错误：返回错误；auto-commit的RAM可能已修改，需要重新load；密钥轮换另行恢复旧RAM并保留两代key
 
 ## 10. 性能优化
 

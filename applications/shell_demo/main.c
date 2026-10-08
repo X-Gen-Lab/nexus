@@ -1,328 +1,235 @@
-/**
- * \file            main.c
- * \brief           Shell Demo Example Application
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-25
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         This example demonstrates the Shell/CLI framework with
- *                  interactive command-line interface over UART. It shows:
- *                  - HAL and OSAL initialization
- *                  - UART device usage for console I/O
- *                  - GPIO control via shell commands
- *                  - Custom command registration
- *
- * \note            UART0 is used for shell I/O (115200 baud).
- *                  GPIO pins are configured via Kconfig.
- */
-
+/** Native standard-stream shell with one board LED and bounded smoke mode. */
 #include "hal/nx_hal.h"
+#include "nexus_board.h"
+#include "nexus_config.h"
 #include "osal/osal.h"
 #include "shell/shell.h"
-#include <stdarg.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/*---------------------------------------------------------------------------*/
-/* Global Variables                                                          */
-/*---------------------------------------------------------------------------*/
+#if !defined(NX_CONFIG_PLATFORM_NATIVE)
+#error "Shell demo needs a product-owned MCU console binding; use Native only"
+#endif
 
-static nx_uart_t* g_uart = NULL; /**< UART device for shell I/O */
+#define INPUT_CAPACITY 128U
+static nx_gpio_write_t* led;
+static nx_gpio_read_t* observer;
+static const char* input;
+static size_t input_size;
+static size_t input_offset;
+static bool output_failed;
+static bool quit_requested;
+static unsigned int completed_commands;
+static int last_command_status;
 
-static nx_gpio_write_t* g_led0 = NULL; /**< LED 0 (GPIOA0) */
-static nx_gpio_write_t* g_led1 = NULL; /**< LED 1 (GPIOA1) */
-static nx_gpio_write_t* g_led2 = NULL; /**< LED 2 (GPIOA2) */
-static nx_gpio_write_t* g_led3 = NULL; /**< LED 3 (GPIOB0) */
-
-/*---------------------------------------------------------------------------*/
-/* UART Output Functions                                                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Print string to UART
- */
-static void uart_print(const char* str) {
-    if (g_uart) {
-        nx_tx_sync_t* tx = g_uart->get_tx_sync(g_uart);
-        if (tx) {
-            tx->send(tx, (const uint8_t*)str, strlen(str), 1000);
-        }
+/* fgets blocks in the application, outside shell_process(). The backend only
+ * consumes an already buffered line, so its read operation is nonblocking. */
+static int console_read(uint8_t* data, int max_len) {
+    if (!data || max_len <= 0) return -1;
+    size_t available = input_size - input_offset;
+    size_t count = available < (size_t)max_len ? available : (size_t)max_len;
+    if (count) {
+        memcpy(data, input + input_offset, count);
+        input_offset += count;
     }
+    return (int)count;
 }
 
-/**
- * \brief           Print formatted string to UART
- */
-static void uart_printf(const char* fmt, ...) {
-    char buf[128];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    va_end(args);
-    uart_print(buf);
-}
-
-/*---------------------------------------------------------------------------*/
-/* Custom Command Handlers                                                   */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           LED control command
- * \details         Controls LEDs (on/off/toggle)
- */
-static int cmd_led(int argc, char* argv[]) {
-    if (argc < 3) {
-        uart_print("Usage: led <0|1|2|3|all> <on|off|toggle>\r\n");
-        return 1;
-    }
-
-    const char* led_id = argv[1];
-    const char* action = argv[2];
-
-    nx_gpio_write_t* led = NULL;
-    bool all_leds = false;
-
-    /* Determine which LED */
-    if (strcmp(led_id, "0") == 0) {
-        led = g_led0;
-    } else if (strcmp(led_id, "1") == 0) {
-        led = g_led1;
-    } else if (strcmp(led_id, "2") == 0) {
-        led = g_led2;
-    } else if (strcmp(led_id, "3") == 0) {
-        led = g_led3;
-    } else if (strcmp(led_id, "all") == 0) {
-        all_leds = true;
-    } else {
-        uart_printf("Unknown LED: %s\r\n", led_id);
-        return 1;
-    }
-
-    /* Perform action */
-    if (strcmp(action, "on") == 0) {
-        if (all_leds) {
-            if (g_led0)
-                g_led0->write(g_led0, 1);
-            if (g_led1)
-                g_led1->write(g_led1, 1);
-            if (g_led2)
-                g_led2->write(g_led2, 1);
-            if (g_led3)
-                g_led3->write(g_led3, 1);
-        } else if (led) {
-            led->write(led, 1);
-        }
-        uart_printf("LED %s ON\r\n", led_id);
-    } else if (strcmp(action, "off") == 0) {
-        if (all_leds) {
-            if (g_led0)
-                g_led0->write(g_led0, 0);
-            if (g_led1)
-                g_led1->write(g_led1, 0);
-            if (g_led2)
-                g_led2->write(g_led2, 0);
-            if (g_led3)
-                g_led3->write(g_led3, 0);
-        } else if (led) {
-            led->write(led, 0);
-        }
-        uart_printf("LED %s OFF\r\n", led_id);
-    } else if (strcmp(action, "toggle") == 0) {
-        if (all_leds) {
-            if (g_led0)
-                g_led0->toggle(g_led0);
-            if (g_led1)
-                g_led1->toggle(g_led1);
-            if (g_led2)
-                g_led2->toggle(g_led2);
-            if (g_led3)
-                g_led3->toggle(g_led3);
-        } else if (led) {
-            led->toggle(led);
-        }
-        uart_printf("LED %s toggled\r\n", led_id);
-    } else {
-        uart_printf("Unknown action: %s\r\n", action);
-        return 1;
-    }
-
-    return 0;
-}
-
-/**
- * \brief           System tick command
- */
-static int cmd_tick(int argc, char* argv[]) {
-    (void)argc;
-    (void)argv;
-
-    /* Note: OSAL does not provide tick counter in baremetal mode */
-    uart_print("System tick: Not available in baremetal mode\r\n");
-
-    return 0;
-}
-
-/**
- * \brief           Delay command
- */
-static int cmd_delay(int argc, char* argv[]) {
-    if (argc < 2) {
-        uart_print("Usage: delay <ms>\r\n");
-        return 1;
-    }
-
-    uint32_t ms = (uint32_t)atoi(argv[1]);
-    uart_printf("Delaying %lu ms...\r\n", (unsigned long)ms);
-    osal_task_delay(ms);
-    uart_print("Done\r\n");
-
-    return 0;
-}
-
-/**
- * \brief           HAL version command
- */
-static int cmd_version(int argc, char* argv[]) {
-    (void)argc;
-    (void)argv;
-
-    uart_printf("Nexus HAL Version: %s\r\n", nx_hal_get_version());
-    uart_printf("OSAL Backend: %s\r\n", NX_CONFIG_OSAL_BACKEND_NAME);
-
-    return 0;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Command Definitions                                                       */
-/*---------------------------------------------------------------------------*/
-
-static const shell_command_t cmd_led_def = {
-    .name = "led",
-    .handler = cmd_led,
-    .help = "Control LEDs",
-    .usage = "led <0|1|2|3|all> <on|off|toggle>",
-    .completion = NULL};
-
-static const shell_command_t cmd_tick_def = {.name = "tick",
-                                             .handler = cmd_tick,
-                                             .help = "Show system tick count",
-                                             .usage = "tick",
-                                             .completion = NULL};
-
-static const shell_command_t cmd_delay_def = {
-    .name = "delay",
-    .handler = cmd_delay,
-    .help = "Delay for specified milliseconds",
-    .usage = "delay <ms>",
-    .completion = NULL};
-
-static const shell_command_t cmd_version_def = {.name = "version",
-                                                .handler = cmd_version,
-                                                .help =
-                                                    "Show HAL and OSAL version",
-                                                .usage = "version",
-                                                .completion = NULL};
-
-/*---------------------------------------------------------------------------*/
-/* Initialization                                                            */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize shell
- * \details         Configures shell with UART backend and registers commands
- */
-static int shell_app_init(void) {
-    /* Configure shell */
-    shell_config_t config = {.prompt = "nexus> ",
-                             .cmd_buffer_size = 128,
-                             .history_depth = 16,
-                             .max_commands = 32};
-
-    /* Initialize shell */
-    if (shell_init(&config) != SHELL_OK) {
+static int console_write(const uint8_t* data, int len) {
+    if (!data || len <= 0) return -1;
+    size_t written = fwrite(data, 1, (size_t)len, stdout);
+    if (written != (size_t)len || fflush(stdout) != 0) {
+        output_failed = true;
         return -1;
     }
-
-    /* Register built-in commands */
-    shell_register_builtin_commands();
-
-    /* Register custom commands */
-    shell_register_command(&cmd_led_def);
-    shell_register_command(&cmd_tick_def);
-    shell_register_command(&cmd_delay_def);
-    shell_register_command(&cmd_version_def);
-
-    return 0;
+    return len;
 }
 
-/*---------------------------------------------------------------------------*/
-/* Main Entry Point                                                          */
-/*---------------------------------------------------------------------------*/
+static const shell_backend_t console = {
+    .read = console_read,
+    .write = console_write,
+};
 
-/**
- * \brief           Main entry point
- */
-int main(void) {
-    /* Initialize OSAL */
-    if (osal_init() != OSAL_OK) {
-        while (1) {
-            /* OSAL initialization failed */
+static int command_result(int status) {
+    last_command_status = status;
+    ++completed_commands;
+    return status;
+}
+
+static int cmd_led(int argc, char* argv[]) {
+    if (argc != 2) {
+        if (shell_puts("Usage: led <on|off|toggle|status>\r\n") <= 0)
+            output_failed = true;
+        return command_result(1);
+    }
+    if (strcmp(argv[1], "on") == 0) led->write(led, 1);
+    else if (strcmp(argv[1], "off") == 0) led->write(led, 0);
+    else if (strcmp(argv[1], "toggle") == 0) led->toggle(led);
+    else if (strcmp(argv[1], "status") != 0) {
+        if (shell_puts("Invalid LED action\r\n") <= 0) output_failed = true;
+        return command_result(1);
+    }
+    int written = shell_printf("[%s] P%c%u=%u\r\n", NX_BOARD_NAME,
+                               NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN,
+                               (unsigned int)observer->read(observer));
+    return command_result(written > 0 ? 0 : 1);
+}
+
+static int cmd_delay(int argc, char* argv[]) {
+    char* end = NULL;
+    unsigned long delay = 0;
+    if (argc == 2 && argv[1][0] >= '0' && argv[1][0] <= '9') {
+        errno = 0;
+        delay = strtoul(argv[1], &end, 10);
+        if (errno == ERANGE || *end != '\0') delay = 0;
+    }
+    if (delay == 0 || delay > 1000) {
+        if (shell_puts("Usage: delay <1..1000 ms>\r\n") <= 0)
+            output_failed = true;
+        return command_result(1);
+    }
+    if (osal_task_delay((uint32_t)delay) != OSAL_OK) return command_result(1);
+    return command_result(shell_printf("Delayed %lu ms\r\n", delay) > 0 ? 0 : 1);
+}
+
+static int cmd_info(int argc, char* argv[]) {
+    (void)argv;
+    if (argc != 1) return command_result(1);
+    return command_result(shell_printf("Board: %s; HAL: %s; OSAL: %s\r\n",
+                                        NX_BOARD_NAME, nx_hal_get_version(),
+                                        NX_CONFIG_OSAL_BACKEND_NAME) > 0 ? 0 : 1);
+}
+
+static int cmd_quit(int argc, char* argv[]) {
+    (void)argv;
+    if (argc != 1) return command_result(1);
+    if (shell_puts("Closing shell\r\n") <= 0) return command_result(1);
+    quit_requested = true;
+    return command_result(0);
+}
+
+static const shell_command_t commands[] = {
+    {.name = "led", .handler = cmd_led, .help = "Control the board LED",
+     .usage = "led <on|off|toggle|status>", .completion = NULL},
+    {.name = "delay", .handler = cmd_delay, .help = "Bounded OSAL delay",
+     .usage = "delay <1..1000 ms>", .completion = NULL},
+    {.name = "info", .handler = cmd_info, .help = "Show board and backend",
+     .usage = "info", .completion = NULL},
+    {.name = "quit", .handler = cmd_quit, .help = "Exit and release resources",
+     .usage = "quit", .completion = NULL},
+};
+
+static bool shell_ok(shell_status_t status, const char* operation) {
+    if (status == SHELL_OK) return true;
+    (void)fprintf(stderr, "%s: %s\n", operation, shell_get_error_message(status));
+    return false;
+}
+
+static bool process_line(const char* line) {
+    char buffer[INPUT_CAPACITY];
+    size_t length = strcspn(line, "\r\n");
+    if (length > sizeof(buffer) - 2) return false;
+    memcpy(buffer, line, length);
+    buffer[length++] = '\r';
+    input = buffer;
+    input_size = length;
+    input_offset = 0;
+    bool passed = true;
+    while (input_offset < input_size) {
+        size_t previous = input_offset;
+        if (!shell_ok(shell_process(), "shell_process") || output_failed ||
+            input_offset == previous) {
+            passed = false;
+            break;
         }
     }
+    input = NULL;
+    input_size = input_offset = 0;
+    return passed;
+}
 
-    /* Initialize HAL */
-    if (nx_hal_init() != NX_OK) {
-        while (1) {
-            /* HAL initialization failed */
+static bool smoke(void) {
+    static const struct {
+        const char* line;
+        int status;
+        unsigned int pin;
+    } cases[] = {
+        {"led on", 0, 1}, {"led toggle", 0, 0}, {"led status", 0, 0},
+        {"led off", 0, 0}, {"delay 1", 0, 0}, {"delay -1", 1, 0},
+        {"led invalid", 1, 0}, {"led on extra", 1, 0},
+        {"info", 0, 0}, {"quit", 0, 0},
+    };
+    if (shell_register_command(&commands[0]) != SHELL_ERROR_ALREADY_EXISTS ||
+        shell_register_command(NULL) != SHELL_ERROR_INVALID_PARAM) return false;
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        unsigned int before = completed_commands;
+        if (!process_line(cases[i].line) || completed_commands != before + 1 ||
+            last_command_status != cases[i].status ||
+            (unsigned int)observer->read(observer) != cases[i].pin) return false;
+    }
+    if (!quit_requested) return false;
+    return shell_puts("Shell smoke passed: 10 commands, LED readback and "
+                      "expected invalid requests verified.\r\n") > 0;
+}
+
+static bool run_stdio(void) {
+    char line[INPUT_CAPACITY];
+    if (shell_puts("Native line console; use help, led, info, delay, quit.\r\n") <= 0)
+        return false;
+    shell_print_prompt();
+    while (!quit_requested && !output_failed) {
+        if (!fgets(line, sizeof(line), stdin)) return !ferror(stdin);
+        size_t length = strlen(line);
+        if (!strchr(line, '\n') && !feof(stdin)) {
+            /* Reject an oversized line instead of executing a truncated command. */
+            (void)fprintf(stderr, "Input line exceeds %u bytes\n",
+                          (unsigned int)sizeof(line) - 2);
+            return false;
         }
+        if (length && !process_line(line)) return false;
     }
+    return !output_failed;
+}
 
-    /* Get UART device for shell I/O */
-    g_uart = nx_factory_uart(0);
-    if (!g_uart) {
-        while (1) {
-            /* UART device not available */
-        }
+int main(int argc, char** argv) {
+    bool run_smoke = argc == 2 && strcmp(argv[1], "--smoke") == 0;
+    if (argc != 1 && !run_smoke) return 2;
+    if (osal_init() != OSAL_OK) return 1;
+    if (nx_hal_init() != NX_OK) return 1;
+    bool passed = false;
+    bool initialized = false;
+    nx_lifecycle_t* lifecycle = NULL;
+    led = nx_factory_gpio_write(NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN);
+    observer = nx_factory_gpio_read(NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN);
+    if (!led || !observer) goto cleanup;
+    lifecycle = led->get_lifecycle(led);
+    if (!lifecycle || lifecycle->init(lifecycle) != NX_OK) goto cleanup;
+    initialized = true;
+    led->write(led, 0);
+    const shell_config_t config = {
+        .prompt = "nexus> ", .cmd_buffer_size = INPUT_CAPACITY,
+        .history_depth = 8, .max_commands = 16,
+    };
+    if (!shell_ok(shell_init(&config), "shell_init")) goto cleanup;
+    if (!shell_ok(shell_set_backend(&console), "shell_set_backend") ||
+        !shell_ok(shell_register_builtin_commands(), "register builtins"))
+        goto cleanup;
+    for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i) {
+        if (!shell_ok(shell_register_command(&commands[i]), "register command"))
+            goto cleanup;
     }
-
-    /* Get GPIO devices */
-    g_led0 = nx_factory_gpio_write('A', 0);
-    g_led1 = nx_factory_gpio_write('A', 1);
-    g_led2 = nx_factory_gpio_write('A', 2);
-    g_led3 = nx_factory_gpio_write('B', 0);
-
-    /* Initialize shell */
-    if (shell_app_init() != 0) {
-        while (1) {
-            /* Shell initialization failed */
-        }
+    passed = run_smoke ? smoke() : run_stdio();
+cleanup:
+    if (shell_is_initialized() && !shell_ok(shell_deinit(), "shell_deinit"))
+        passed = false;
+    if (!shell_ok(shell_set_backend(NULL), "detach console")) passed = false;
+    if (initialized) {
+        led->write(led, 0);
+        if (lifecycle->deinit(lifecycle) != NX_OK) passed = false;
     }
-
-    /* Print welcome message */
-    uart_print("\r\n");
-    uart_print("========================================\r\n");
-    uart_print("  Nexus Shell Demo\r\n");
-    uart_printf("  HAL Version: %s\r\n", nx_hal_get_version());
-    uart_print("  Type 'help' for available commands\r\n");
-    uart_print("========================================\r\n");
-    uart_print("nexus> ");
-
-    /* Turn on LED 0 to indicate ready */
-    if (g_led0) {
-        g_led0->write(g_led0, 1);
-    }
-
-    /* Main loop */
-    while (1) {
-        /* Process shell input (non-blocking) */
-        shell_process();
-
-        /* Small delay to prevent busy-waiting */
-        osal_task_delay(10);
-    }
-
-    return 0;
+    if (nx_hal_deinit() != NX_OK) passed = false;
+    if (output_failed || fflush(stdout) != 0 || ferror(stdout)) passed = false;
+    return passed ? 0 : 1;
 }

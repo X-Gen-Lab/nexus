@@ -90,6 +90,16 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
  */
 osal_status_t osal_task_delete(osal_task_handle_t handle);
 
+/** Request cooperative stop; callers must use bounded waits and return.
+ * Native/FreeRTOS deletion of a running task requests stop and returns BUSY. */
+osal_status_t osal_task_request_stop(osal_task_handle_t handle);
+/** True when the current task has a pending cooperative stop request. */
+bool osal_task_should_stop(void);
+/** Wait for task function completion, without destroying its handle.
+ * Task context only. timeout follows the ordinary OSAL millisecond contract. */
+osal_status_t osal_task_join(osal_task_handle_t handle, uint32_t timeout_ms);
+
+
 /**
  * \brief           Suspend a task
  * \param[in]       handle: Task handle

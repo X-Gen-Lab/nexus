@@ -149,40 +149,6 @@ typedef struct nx_gpio_state_s {
 } nx_gpio_state_t;
 
 /*---------------------------------------------------------------------------*/
-/* GPIO Read Implementation Structure                                        */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           GPIO read implementation structure
- *
- * Contains read interface and state pointer.
- */
-typedef struct nx_gpio_read_impl_s {
-    nx_gpio_read_t base;      /**< Base GPIO read interface */
-    nx_lifecycle_t lifecycle; /**< Lifecycle interface */
-    nx_power_t power;         /**< Power interface */
-    nx_gpio_state_t* state;   /**< State pointer */
-    nx_device_t* device;      /**< Device descriptor */
-} nx_gpio_read_impl_t;
-
-/*---------------------------------------------------------------------------*/
-/* GPIO Write Implementation Structure                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           GPIO write implementation structure
- *
- * Contains write interface and state pointer.
- */
-typedef struct nx_gpio_write_impl_s {
-    nx_gpio_write_t base;     /**< Base GPIO write interface */
-    nx_lifecycle_t lifecycle; /**< Lifecycle interface */
-    nx_power_t power;         /**< Power interface */
-    nx_gpio_state_t* state;   /**< State pointer */
-    nx_device_t* device;      /**< Device descriptor */
-} nx_gpio_write_impl_t;
-
-/*---------------------------------------------------------------------------*/
 /* GPIO Read-Write Implementation Structure                                  */
 /*---------------------------------------------------------------------------*/
 

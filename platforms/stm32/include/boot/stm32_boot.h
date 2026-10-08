@@ -61,8 +61,11 @@ typedef struct {
 int stm32_platform_init(void);
 
 /**
- * \brief           Deinitialize STM32 platform
- * \return          0 on success, -1 on failure
+ * \brief           Check global platform shutdown availability
+ * \return          0 if never initialized, -1 while initialized
+ * \note            The reference is startup-only. It retains initialized IRQ,
+ *                  DMA and scheduler ownership until a controlled reset; a
+ *                  product quiescence implementation is required for shutdown.
  */
 int stm32_platform_deinit(void);
 

@@ -50,6 +50,9 @@ target_include_directories(config_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 
 # Link libraries
 target_link_libraries(config_tests PRIVATE ${NEXUS_TEST_LIBS})
+if(TARGET nexus_file_flash)
+    target_link_libraries(config_tests PRIVATE nexus_file_flash)
+endif()
 
 # Discover tests
 nexus_discover_tests(config_tests

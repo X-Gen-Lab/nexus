@@ -12,6 +12,7 @@
 #define CONFIG_BACKEND_H
 
 #include "config_def.h"
+#include "nexus/storage.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,6 +87,9 @@ typedef config_status_t (*config_backend_erase_all_fn)(void* ctx);
  * \return          CONFIG_OK on success, error code otherwise
  */
 typedef config_status_t (*config_backend_commit_fn)(void* ctx);
+typedef config_status_t (*config_backend_snapshot_save_fn)(void*, const void*,
+                                                          size_t);
+typedef config_status_t (*config_backend_snapshot_load_fn)(void*, void*, size_t*);
 
 /**
  * \brief           Config backend structure
@@ -104,6 +108,10 @@ struct config_backend {
     config_backend_erase_all_fn erase_all; /**< Erase all function (optional) */
     config_backend_commit_fn commit;       /**< Commit function (optional) */
     void* ctx;                             /**< Backend-specific context */
+    /* Required for atomic config_commit/config_load. Legacy keyed calls are
+     * available for direct backend tests but cannot express atomic snapshots. */
+    config_backend_snapshot_save_fn save_snapshot;
+    config_backend_snapshot_load_fn load_snapshot;
 };
 
 /**
@@ -139,6 +147,22 @@ const config_backend_t* config_backend_ram_get(void);
  * \note            Flash backend provides persistent storage
  */
 const config_backend_t* config_backend_flash_get(void);
+/* Explicit caller-owned partition binding. Unbound Flash returns UNSUPPORTED;
+ * the library never creates RAM-backed persistence or chooses a host path.
+ * Configure only while the backend is deinitialized. */
+config_status_t config_backend_flash_bind(nx_storage_t* storage);
+
+#ifndef CONFIG_PERSISTENCE_BUFFER_SIZE
+#if defined(NX_CONFIG_MANAGER_PERSISTENCE_BUFFER)
+#define CONFIG_PERSISTENCE_BUFFER_SIZE NX_CONFIG_MANAGER_PERSISTENCE_BUFFER
+#else
+#define CONFIG_PERSISTENCE_BUFFER_SIZE 32768u
+#endif
+#endif
+/* Optional caller-owned scratch, retained through deinit. NULL resets default.
+ * Must be set while config is deinitialized. Whole serialized config must fit;
+ * otherwise commit returns NO_SPACE without changing durable storage. */
+config_status_t config_backend_set_snapshot_buffer(void* buffer, size_t capacity);
 
 /**
  * \}

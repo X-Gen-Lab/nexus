@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "id": "native-driver-contracts",
+      "architecture": "host",
+      "board": null,
+      "tests": ["driver_stm32_spi_bare", "driver_stm32_spi_osal"],
+      "status": "host-contract-tested",
+      "evidence_scope": "Production driver control flow against a test-only ST HAL model",
+      "hardware_verification": false
+    },
+    {
+      "id": "stm32f407-discovery-baremetal",
+      "soc": "stm32f407vg",
+      "board": "stm32f4discovery-mb997",
+      "board_revision": null,
+      "rtos": "baremetal",
+      "toolchain": "ARM GNU embedded",
+      "config": "configs/stm32f407_baremetal_defconfig",
+      "status": "implementation-candidate",
+      "hardware_verification": false,
+      "required_hil": ["boot-clock-uart", "gpio", "spi-two-slaves", "dma-timeout-cancel-error", "flash-power-cut", "control-latency-under-management-load"]
+    },
+    {
+      "id": "stm32f407-discovery-freertos",
+      "soc": "stm32f407vg",
+      "board": "stm32f4discovery-mb997",
+      "board_revision": null,
+      "rtos": "FreeRTOS",
+      "status": "requires-integration-validation",
+      "hardware_verification": false,
+      "required_hil": ["IRQ-syscall-priority", "two-task-two-slave-arbitration", "deadline-and-cancellation", "control-latency"]
+    },
+    {
+      "id": "gd32f407-candidate",
+      "soc": "gd32f407",
+      "board": null,
+      "rtos": null,
+      "status": "blocked-official-sdk-and-board-selection",
+      "hardware_verification": false
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+> Persistence/crypto refactor: Flash requires an explicit `config_backend_flash_bind` partition; keys are externally persisted and reloaded before encrypted load; AES-GCM records replace CBC. Follow [the current implementation contract](../../../docs/implementation/storage-security.md) for atomic snapshots, error recovery and support evidence.
+
 # Config Manager 变更日志
 
 本文档记录 Config Manager 模块的所有重要变更。
@@ -60,7 +62,7 @@
   - 密钥轮换
 
 - 线程安全
-  - 全局互斥锁保护
+  - 历史设计中的全局互斥锁未实现；当前完整 API 采用外部管理 owner 串行化
   - 多线程环境支持
 
 - 错误处理

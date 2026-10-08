@@ -1,153 +1,68 @@
 #!/usr/bin/env python3
-"""
-Nexus CI Build Script
-Continuous Integration build script for automated pipelines.
-
-Usage:
-    python ci_build.py [options]
-
-Options:
-    --stage         CI stage: build, test, lint, docs, all (default)
-    --platform      Target platform: native (default), stm32f4
-    --coverage      Enable code coverage
-    --help, -h      Show this help message
-"""
-
+"""Run the maintained CMake/CTest preset workflow without a second build model."""
 import argparse
+import json
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
-def get_project_root():
-    """Get the project root directory."""
-    return Path(__file__).parent.parent.parent.resolve()
+def run(command):
+    print("+ " + " ".join(map(str, command)), flush=True)
+    subprocess.run(list(map(str, command)), cwd=ROOT, check=True)
 
 
-def run_command(cmd, cwd=None, env=None):
-    """Run a command and return success status."""
-    print(f"\n>>> {' '.join(cmd)}")
-    result = subprocess.run(cmd, cwd=cwd, env=env)
-    return result.returncode == 0
-
-
-def stage_build(project_root, platform, coverage):
-    """Build stage."""
-    print("\n" + "=" * 50)
-    print("STAGE: Build")
-    print("=" * 50)
-    
-    build_dir = project_root / "build-ci"
-    build_dir.mkdir(exist_ok=True)
-    
-    cmake_args = [
-        "cmake",
-        "-DCMAKE_BUILD_TYPE=Debug",
-        "-DNEXUS_BUILD_TESTS=ON",
-        f"-DNEXUS_PLATFORM={platform}",
-    ]
-    if coverage:
-        cmake_args.append("-DNEXUS_COVERAGE=ON")
-    cmake_args.append("..")
-    
-    if not run_command(cmake_args, cwd=build_dir):
-        return False
-    
-    return run_command(["cmake", "--build", ".", "-j4"], cwd=build_dir)
-
-
-def stage_test(project_root):
-    """Test stage."""
-    print("\n" + "=" * 50)
-    print("STAGE: Test")
-    print("=" * 50)
-    
-    build_dir = project_root / "build-ci"
-    
-    # Find test executable
-    test_exe = None
-    for path in [
-        build_dir / "tests" / "Debug" / "nexus_tests.exe",
-        build_dir / "tests" / "nexus_tests.exe",
-        build_dir / "tests" / "nexus_tests",
-    ]:
-        if path.exists():
-            test_exe = path
-            break
-    
-    if not test_exe:
-        print("Test executable not found!")
-        return False
-    
-    return run_command([
-        str(test_exe),
-        "--gtest_output=xml:test_results.xml",
-        "--gtest_color=yes"
-    ], cwd=project_root)
-
-
-def stage_lint(project_root):
-    """Lint stage (format check)."""
-    print("\n" + "=" * 50)
-    print("STAGE: Lint")
-    print("=" * 50)
-    
-    format_script = project_root / "scripts" / "tools" / "format.py"
-    return run_command([sys.executable, str(format_script), "--check"])
-
-
-def stage_docs(project_root):
-    """Documentation stage."""
-    print("\n" + "=" * 50)
-    print("STAGE: Documentation")
-    print("=" * 50)
-    
-    docs_script = project_root / "scripts" / "tools" / "docs.py"
-    return run_command([sys.executable, str(docs_script), "-t", "doxygen"])
+def settings_for(presets, name):
+    preset = presets[name]
+    parents = preset.get("inherits", [])
+    if isinstance(parents, str):
+        parents = [parents]
+    values = {}
+    for parent in reversed(parents):
+        values.update(settings_for(presets, parent))
+    values.update(preset.get("cacheVariables", {}))
+    return values
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Nexus CI Build Script")
-    parser.add_argument("--stage", choices=["build", "test", "lint", "docs", "all"],
-                        default="all", help="CI stage to run")
-    parser.add_argument("--platform", default="native",
-                        help="Target platform")
-    parser.add_argument("--coverage", action="store_true",
-                        help="Enable code coverage")
+    data = json.loads((ROOT / "CMakePresets.json").read_text())
+    presets = {item["name"]: item for item in data["configurePresets"]}
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--preset", required=True,
+                        choices=[name for name, item in presets.items() if not item.get("hidden")])
+    parser.add_argument("--stage", choices=["configure", "build", "test", "lint", "docs", "all"], default="all")
+    parser.add_argument("--jobs", type=int, default=4)
     args = parser.parse_args()
-
-    print("=" * 50)
-    print("Nexus CI Build")
-    print(f"Stage:    {args.stage}")
-    print(f"Platform: {args.platform}")
-    print("=" * 50)
-
-    project_root = get_project_root()
-    success = True
-    
-    stages = {
-        "build": lambda: stage_build(project_root, args.platform, args.coverage),
-        "test": lambda: stage_test(project_root),
-        "lint": lambda: stage_lint(project_root),
-        "docs": lambda: stage_docs(project_root),
-    }
-    
-    if args.stage == "all":
-        for stage_name in ["lint", "build", "test"]:
-            if not stages[stage_name]():
-                success = False
-                break
-    else:
-        success = stages[args.stage]()
-
-    print("\n" + "=" * 50)
-    if success:
-        print("CI PASSED")
-    else:
-        print("CI FAILED")
-    print("=" * 50)
-
-    return 0 if success else 1
+    if args.jobs < 1:
+        parser.error("--jobs must be positive")
+    settings = settings_for(presets, args.preset)
+    host_tests = settings.get("NEXUS_BUILD_TESTS") == "ON"
+    if args.stage == "test" and not host_tests:
+        parser.error("this preset disables host tests; use a test-enabled Native preset or the corresponding HIL workflow")
+    try:
+        if args.stage in ("configure", "build", "all"):
+            run(["cmake", "--preset", args.preset])
+        if args.stage in ("build", "all"):
+            run(["cmake", "--build", "--preset", args.preset, "--parallel", args.jobs])
+        if args.stage == "test" or (args.stage == "all" and host_tests):
+            report = ROOT / "build" / args.preset / "ctest-results.xml"
+            run(["ctest", "--preset", args.preset, "--parallel", args.jobs,
+                 "--output-on-failure", "--no-tests=error", "--output-junit", report])
+        if args.stage == "all" and not host_tests:
+            if settings.get("NEXUS_PLATFORM") == "native":
+                print("Application build completed; this preset runs its finite Native example separately.")
+            else:
+                print("Embedded compilation completed. Hardware execution requires HIL evidence.")
+        if args.stage == "lint":
+            run([sys.executable, ROOT / "scripts/tools/format.py", "--check"])
+        if args.stage == "docs":
+            run([sys.executable, ROOT / "scripts/tools/docs.py", "-t", "doxygen"])
+    except (subprocess.CalledProcessError, OSError) as error:
+        print(f"CI command failed: {error}", file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

@@ -39,6 +39,8 @@ static inline nx_watchdog_impl_t* watchdog_get_impl(nx_watchdog_t* self) {
  * \brief           Get current system time in milliseconds
  * \return          Current time in milliseconds
  */
+/* Monotonic production source; tests may supply a strong implementation. */
+uint64_t nx_native_monotonic_time_ms(void);
 uint64_t watchdog_get_system_time_ms(void);
 
 /**

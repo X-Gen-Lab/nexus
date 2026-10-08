@@ -13,12 +13,13 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_timer.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_timer_helpers.h"
+#include "devices/native_timer_helpers.h"
 }
 
 /**
@@ -28,7 +29,7 @@ class TimerPropertyTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize random number generator */
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all Timer instances */
         native_timer_reset_all();
@@ -271,7 +272,7 @@ TEST_F(TimerPropertyTest, Property13_TimerCountAccuracy) {
 
 static int overflow_count = 0;
 
-static void property_overflow_callback(void* user_data) {
+static void property_overflow_callback(void*) {
     overflow_count++;
 }
 

@@ -1,0 +1,15 @@
+choice
+    prompt "Reference board"
+    default BOARD_NATIVE_REFERENCE if PLATFORM_NATIVE
+    default BOARD_STM32F4DISCOVERY if PLATFORM_STM32 && STM32F407
+config BOARD_NATIVE_REFERENCE
+    bool "Native simulation"
+    depends on PLATFORM_NATIVE
+config BOARD_STM32F4DISCOVERY
+    bool "STM32F4DISCOVERY MB997 (hardware verification pending)"
+    depends on PLATFORM_STM32 && STM32F407
+endchoice
+config BOARD_NAME
+    string
+    default "native-reference" if BOARD_NATIVE_REFERENCE
+    default "stm32f4discovery-mb997" if BOARD_STM32F4DISCOVERY

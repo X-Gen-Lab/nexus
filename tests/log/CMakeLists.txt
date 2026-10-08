@@ -43,3 +43,11 @@ nexus_discover_tests(log_tests
         TIMEOUT 300
         LABELS "log;framework;unit;property"
 )
+
+if(UNIX)
+    add_executable(log_contract_tests test_log_contracts.c)
+    target_link_libraries(log_contract_tests PRIVATE log_framework osal Threads::Threads)
+    target_compile_options(log_contract_tests PRIVATE -UNDEBUG -Werror)
+    add_test(NAME log_contract_tests COMMAND log_contract_tests)
+    set_tests_properties(log_contract_tests PROPERTIES TIMEOUT 30 LABELS "log;concurrency;contract")
+endif()

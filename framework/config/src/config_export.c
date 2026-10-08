@@ -18,7 +18,9 @@
 #include "config_crypto.h"
 #include "config_namespace.h"
 #include "config_store.h"
+#include "config_wire.h"
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -53,51 +55,6 @@ typedef struct {
 /* Binary Format Constants                                                   */
 /*---------------------------------------------------------------------------*/
 
-#define CONFIG_BINARY_MAGIC   0x43464742 /* "CFGB" */
-#define CONFIG_BINARY_VERSION 1
-
-/**
- * \brief           Binary export header structure
- */
-#ifdef _MSC_VER
-#pragma pack(push, 1)
-#endif
-typedef struct {
-    uint32_t magic;       /**< Magic number */
-    uint8_t version;      /**< Format version */
-    uint8_t reserved[3];  /**< Reserved for alignment */
-    uint32_t entry_count; /**< Number of entries */
-    uint32_t data_size;   /**< Total data size */
-}
-#ifdef __GNUC__
-__attribute__((packed))
-#endif
-config_binary_header_t;
-#ifdef _MSC_VER
-#pragma pack(pop)
-#endif
-
-/**
- * \brief           Binary entry header structure
- */
-#ifdef _MSC_VER
-#pragma pack(push, 1)
-#endif
-typedef struct {
-    uint8_t key_len;      /**< Key length */
-    uint8_t type;         /**< Value type */
-    uint8_t flags;        /**< Entry flags */
-    uint8_t namespace_id; /**< Namespace ID */
-    uint16_t value_size;  /**< Value size */
-}
-#ifdef __GNUC__
-__attribute__((packed))
-#endif
-config_binary_entry_header_t;
-#ifdef _MSC_VER
-#pragma pack(pop)
-#endif
-
 /*---------------------------------------------------------------------------*/
 /* Internal Helper Functions                                                 */
 /*---------------------------------------------------------------------------*/
@@ -109,12 +66,12 @@ config_binary_entry_header_t;
  * \return          Number of bytes written
  */
 static size_t export_write_str(export_write_ctx_t* ctx, const char* str) {
-    if (ctx == NULL || str == NULL) {
+    if (ctx == NULL || str == NULL || ctx->status != CONFIG_OK) {
         return 0;
     }
 
     size_t len = strlen(str);
-    if (ctx->offset + len > ctx->buf_size) {
+    if (ctx->offset > ctx->buf_size || len > ctx->buf_size - ctx->offset) {
         ctx->status = CONFIG_ERROR_BUFFER_TOO_SMALL;
         return 0;
     }
@@ -133,11 +90,11 @@ static size_t export_write_str(export_write_ctx_t* ctx, const char* str) {
  */
 static size_t export_write_bytes(export_write_ctx_t* ctx, const void* data,
                                  size_t size) {
-    if (ctx == NULL || data == NULL || size == 0) {
+    if (ctx == NULL || data == NULL || size == 0 || ctx->status != CONFIG_OK) {
         return 0;
     }
 
-    if (ctx->offset + size > ctx->buf_size) {
+    if (ctx->offset > ctx->buf_size || size > ctx->buf_size - ctx->offset) {
         ctx->status = CONFIG_ERROR_BUFFER_TOO_SMALL;
         return 0;
     }
@@ -154,46 +111,21 @@ static size_t export_write_bytes(export_write_ctx_t* ctx, const void* data,
  * \param[in]       str: Input string
  * \return          Length of escaped string
  */
-static size_t json_escape_string(char* out, size_t out_size, const char* str) {
-    if (out == NULL || str == NULL || out_size == 0) {
-        return 0;
+static void json_escape_string(export_write_ctx_t* ctx, const char* string) {
+    static const char hex[] = "0123456789abcdef";
+    if (!config_utf8_valid((const uint8_t*)string, strlen(string))) {
+        ctx->status = CONFIG_ERROR_INVALID_FORMAT; return;
     }
-
-    size_t out_idx = 0;
-    for (size_t i = 0; str[i] != '\0' && out_idx < out_size - 1; ++i) {
-        char c = str[i];
+    for (size_t i = 0; string[i] && ctx->status == CONFIG_OK; ++i) {
+        unsigned char c = (unsigned char)string[i];
         if (c == '"' || c == '\\') {
-            if (out_idx + 2 >= out_size)
-                break;
-            out[out_idx++] = '\\';
-            out[out_idx++] = c;
-        } else if (c == '\n') {
-            if (out_idx + 2 >= out_size)
-                break;
-            out[out_idx++] = '\\';
-            out[out_idx++] = 'n';
-        } else if (c == '\r') {
-            if (out_idx + 2 >= out_size)
-                break;
-            out[out_idx++] = '\\';
-            out[out_idx++] = 'r';
-        } else if (c == '\t') {
-            if (out_idx + 2 >= out_size)
-                break;
-            out[out_idx++] = '\\';
-            out[out_idx++] = 't';
-        } else if ((unsigned char)c < 0x20) {
-            /* Control character - skip or encode as \uXXXX */
-            if (out_idx + 6 >= out_size)
-                break;
-            out_idx += snprintf(out + out_idx, out_size - out_idx, "\\u%04x",
-                                (unsigned char)c);
-        } else {
-            out[out_idx++] = c;
-        }
+            char pair[2] = {'\\', (char)c};
+            export_write_bytes(ctx, pair, sizeof(pair));
+        } else if (c < 0x20) {
+            char escape[6] = {'\\', 'u', '0', '0', hex[c >> 4], hex[c & 15]};
+            export_write_bytes(ctx, escape, sizeof(escape));
+        } else { export_write_bytes(ctx, &c, 1); }
     }
-    out[out_idx] = '\0';
-    return out_idx;
 }
 
 /**
@@ -234,13 +166,15 @@ static size_t calc_json_entry_size(const config_store_entry_info_t* info,
     bool pretty = (flags & CONFIG_EXPORT_FLAG_PRETTY) != 0;
 
     /* Key and structure overhead */
-    size += strlen(info->key) + 20; /* "key": { ... } */
+    size += strlen(info->key) * 6 + 20; /* "key": { ... } */
 
     /* Type field */
     size += 20; /* "type": "xxx", */
 
-    /* Value field - estimate based on type */
-    switch (info->type) {
+    /* A control byte expands to six JSON bytes. Ciphertext is always hex. */
+    if ((info->flags & CONFIG_FLAG_ENCRYPTED) && !(flags & CONFIG_EXPORT_FLAG_DECRYPT)) {
+        size += info->value_size * 2 + 15;
+    } else switch (info->type) {
         case CONFIG_TYPE_I32:
         case CONFIG_TYPE_U32:
             size += 25; /* "value": -2147483648 */
@@ -255,7 +189,7 @@ static size_t calc_json_entry_size(const config_store_entry_info_t* info,
             size += 20; /* "value": false */
             break;
         case CONFIG_TYPE_STRING:
-            size += info->value_size * 2 + 15; /* Escaped string */
+            size += info->value_size * 6 + 15; /* Worst-case escaped string */
             break;
         case CONFIG_TYPE_BLOB:
             size += info->value_size * 2 + 15; /* Hex encoded */
@@ -298,6 +232,12 @@ static bool calc_json_size_cb(const config_store_entry_info_t* info,
     return true;
 }
 
+static bool default_json_namespace(const config_store_entry_info_t* info, void* context) {
+    bool* supported = (bool*)context;
+    if (info->namespace_id != CONFIG_DEFAULT_NAMESPACE_ID) *supported = false;
+    return *supported;
+}
+
 /**
  * \brief           Callback for calculating binary export size
  * \param[in]       info: Entry information
@@ -309,7 +249,7 @@ static bool calc_binary_size_cb(const config_store_entry_info_t* info,
     export_size_ctx_t* ctx = (export_size_ctx_t*)user_data;
 
     /* Entry header + key + value */
-    ctx->size += sizeof(config_binary_entry_header_t);
+    ctx->size += CONFIG_BINARY_ENTRY_SIZE;
     ctx->size += strlen(info->key);
     ctx->size += info->value_size;
     ctx->entry_count++;
@@ -330,7 +270,7 @@ static bool calc_binary_size_cb(const config_store_entry_info_t* info,
 static bool write_json_entry_cb(const config_store_entry_info_t* info,
                                 void* user_data) {
     export_write_ctx_t* ctx = (export_write_ctx_t*)user_data;
-    char temp_buf[512];
+    char temp_buf[64];
     uint8_t value_buf[CONFIG_MAX_MAX_VALUE_SIZE];
     uint8_t decrypted_buf[CONFIG_MAX_MAX_VALUE_SIZE];
     size_t value_size = sizeof(value_buf);
@@ -346,24 +286,24 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
     config_status_t status = config_store_get(
         info->key, NULL, value_buf, &value_size, NULL, info->namespace_id);
     if (status != CONFIG_OK) {
-        return true; /* Skip this entry but continue */
+        ctx->status = status; return false;
     }
 
     /* Decrypt if requested and value is encrypted */
     uint8_t* output_buf = value_buf;
     size_t output_size = value_size;
 
-    if (is_encrypted && decrypt && config_crypto_is_enabled()) {
+    if (is_encrypted && decrypt) {
         size_t decrypted_size = sizeof(decrypted_buf);
-        status = config_crypto_decrypt(value_buf, value_size, decrypted_buf,
-                                       &decrypted_size);
+        status = config_crypto_decrypt_record(value_buf, value_size, decrypted_buf,
+            &decrypted_size, info->key, info->namespace_id, info->type);
         if (status == CONFIG_OK) {
             output_buf = decrypted_buf;
             output_size = decrypted_size;
             show_encrypted_flag =
                 false; /* Don't show encrypted flag for decrypted values */
         }
-        /* If decryption fails, export the encrypted value as-is */
+        if (status != CONFIG_OK) { ctx->status = status; return false; }
     }
 
     /* Write comma separator if not first entry */
@@ -378,8 +318,7 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
     export_write_str(ctx, "\"");
 
     /* Escape key for JSON */
-    json_escape_string(temp_buf, sizeof(temp_buf), info->key);
-    export_write_str(ctx, temp_buf);
+    json_escape_string(ctx, info->key);
 
     export_write_str(ctx, "\":");
     export_write_str(ctx, space);
@@ -400,7 +339,15 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
     export_write_str(ctx, "\"value\":");
     export_write_str(ctx, space);
 
-    switch (info->type) {
+    if (show_encrypted_flag) {
+        static const char hex[] = "0123456789abcdef";
+        export_write_str(ctx, "\"");
+        for (size_t i = 0; i < output_size && ctx->status == CONFIG_OK; ++i) {
+            char pair[2] = {hex[output_buf[i] >> 4], hex[output_buf[i] & 15]};
+            export_write_bytes(ctx, pair, sizeof(pair));
+        }
+        export_write_str(ctx, "\"");
+    } else switch (info->type) {
         case CONFIG_TYPE_I32: {
             int32_t val;
             memcpy(&val, output_buf, sizeof(val));
@@ -425,7 +372,8 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
         case CONFIG_TYPE_FLOAT: {
             float val;
             memcpy(&val, output_buf, sizeof(val));
-            snprintf(temp_buf, sizeof(temp_buf), "%g", (double)val);
+            if (!isfinite(val)) { ctx->status = CONFIG_ERROR_INVALID_FORMAT; return false; }
+            snprintf(temp_buf, sizeof(temp_buf), "%.*g", FLT_DECIMAL_DIG, (double)val);
             export_write_str(ctx, temp_buf);
             break;
         }
@@ -437,9 +385,11 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
         }
         case CONFIG_TYPE_STRING: {
             export_write_str(ctx, "\"");
-            json_escape_string(temp_buf, sizeof(temp_buf),
-                               (const char*)output_buf);
-            export_write_str(ctx, temp_buf);
+            if (!output_size || output_buf[output_size - 1] != 0 ||
+                memchr(output_buf, 0, output_size - 1)) {
+                ctx->status = CONFIG_ERROR_INVALID_FORMAT; return false;
+            }
+            json_escape_string(ctx, (const char*)output_buf);
             export_write_str(ctx, "\"");
             break;
         }
@@ -500,7 +450,7 @@ static bool write_binary_entry_cb(const config_store_entry_info_t* info,
     config_status_t status = config_store_get(
         info->key, NULL, value_buf, &value_size, NULL, info->namespace_id);
     if (status != CONFIG_OK) {
-        return true; /* Skip this entry but continue */
+        ctx->status = status; return false;
     }
 
     /* Decrypt if requested and value is encrypted */
@@ -508,33 +458,28 @@ static bool write_binary_entry_cb(const config_store_entry_info_t* info,
     size_t output_size = value_size;
     uint8_t output_flags = info->flags;
 
-    if (is_encrypted && decrypt && config_crypto_is_enabled()) {
+    if (is_encrypted && decrypt) {
         size_t decrypted_size = sizeof(decrypted_buf);
-        status = config_crypto_decrypt(value_buf, value_size, decrypted_buf,
-                                       &decrypted_size);
+        status = config_crypto_decrypt_record(value_buf, value_size, decrypted_buf,
+            &decrypted_size, info->key, info->namespace_id, info->type);
         if (status == CONFIG_OK) {
             output_buf = decrypted_buf;
             output_size = decrypted_size;
             output_flags &= ~CONFIG_FLAG_ENCRYPTED; /* Clear encrypted flag */
         }
-        /* If decryption fails, export the encrypted value as-is */
+        if (status != CONFIG_OK) { ctx->status = status; return false; }
     }
 
-    /* Write entry header */
-    config_binary_entry_header_t header;
-    header.key_len = (uint8_t)strlen(info->key);
-    header.type = (uint8_t)info->type;
-    header.flags = output_flags;
-    header.namespace_id = info->namespace_id;
-    header.value_size = (uint16_t)output_size;
-
-    export_write_bytes(ctx, &header, sizeof(header));
-
-    /* Write key (without null terminator) */
-    export_write_bytes(ctx, info->key, header.key_len);
-
-    /* Write value */
-    export_write_bytes(ctx, output_buf, output_size);
+    uint8_t header[CONFIG_BINARY_ENTRY_SIZE] = {(uint8_t)strlen(info->key),
+        (uint8_t)info->type, output_flags, info->namespace_id, 0, 0};
+    config_wire_put(header + 4, output_size, 2);
+    uint8_t wire[CONFIG_MAX_MAX_VALUE_SIZE];
+    if (!config_wire_value(info->type, output_flags, output_buf, output_size, wire, true)) {
+        ctx->status = CONFIG_ERROR_INVALID_FORMAT; return false;
+    }
+    export_write_bytes(ctx, header, sizeof(header));
+    export_write_bytes(ctx, info->key, header[0]);
+    export_write_bytes(ctx, wire, output_size);
 
     return ctx->status == CONFIG_OK;
 }
@@ -563,6 +508,10 @@ config_status_t config_get_export_size(config_format_t format,
     config_status_t status;
 
     if (format == CONFIG_FORMAT_JSON) {
+        bool supported = true;
+        status = config_store_iterate(default_json_namespace, &supported);
+        if (status != CONFIG_OK) return status;
+        if (!supported) return CONFIG_ERROR_UNSUPPORTED;
         /* JSON overhead: { ... } */
         ctx.size = 3; /* "{}" + null terminator */
         if (flags & CONFIG_EXPORT_FLAG_PRETTY) {
@@ -580,7 +529,7 @@ config_status_t config_get_export_size(config_format_t format,
         }
     } else if (format == CONFIG_FORMAT_BINARY) {
         /* Binary header */
-        ctx.size = sizeof(config_binary_header_t);
+        ctx.size = CONFIG_BINARY_HEADER_SIZE;
 
         status = config_store_iterate(calc_binary_size_cb, &ctx);
         if (status != CONFIG_OK) {
@@ -604,6 +553,7 @@ config_status_t config_export(config_format_t format,
     if (buffer == NULL || actual_size == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
+    *actual_size = 0;
 
     /* Check required size first */
     size_t required_size = 0;
@@ -637,6 +587,7 @@ config_status_t config_export(config_format_t format,
         /* Write entries */
         status = config_store_iterate(write_json_entry_cb, &ctx);
         if (status != CONFIG_OK || ctx.status != CONFIG_OK) {
+            memset(buffer, 0, buf_size);
             return ctx.status != CONFIG_OK ? ctx.status : status;
         }
 
@@ -657,24 +608,29 @@ config_status_t config_export(config_format_t format,
         }
 
         /* Write header */
-        config_binary_header_t header = {
-            .magic = CONFIG_BINARY_MAGIC,
-            .version = CONFIG_BINARY_VERSION,
-            .reserved = {0},
-            .entry_count = (uint32_t)size_ctx.entry_count,
-            .data_size =
-                (uint32_t)(size_ctx.size - sizeof(config_binary_header_t))};
-        export_write_bytes(&ctx, &header, sizeof(header));
+        uint8_t header[CONFIG_BINARY_HEADER_SIZE] = {0};
+        config_wire_put(header, CONFIG_BINARY_MAGIC, 4);
+        header[4] = CONFIG_BINARY_VERSION;
+        config_wire_put(header + 8, size_ctx.entry_count, 4);
+        export_write_bytes(&ctx, header, sizeof(header));
 
         /* Write entries */
         status = config_store_iterate(write_binary_entry_cb, &ctx);
         if (status != CONFIG_OK || ctx.status != CONFIG_OK) {
+            memset(buffer, 0, buf_size);
             return ctx.status != CONFIG_OK ? ctx.status : status;
         }
     } else {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
+    if (ctx.status != CONFIG_OK || (format == CONFIG_FORMAT_JSON && ctx.offset >= buf_size)) {
+        memset(buffer, 0, buf_size);
+        return ctx.status != CONFIG_OK ? ctx.status : CONFIG_ERROR_BUFFER_TOO_SMALL;
+    }
+    if (format == CONFIG_FORMAT_BINARY) {
+        config_wire_put((uint8_t*)buffer + 12, ctx.offset - CONFIG_BINARY_HEADER_SIZE, 4);
+    }
     *actual_size = ctx.offset;
     return CONFIG_OK;
 }
@@ -691,6 +647,7 @@ config_status_t config_export_namespace(const char* ns_name,
     if (ns_name == NULL || buffer == NULL || actual_size == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
+    *actual_size = 0;
 
     /* Get namespace ID */
     uint8_t ns_id;
@@ -714,7 +671,7 @@ config_status_t config_export_namespace(const char* ns_name,
         status =
             config_store_iterate_namespace(ns_id, calc_json_size_cb, &size_ctx);
     } else if (format == CONFIG_FORMAT_BINARY) {
-        size_ctx.size = sizeof(config_binary_header_t);
+        size_ctx.size = CONFIG_BINARY_HEADER_SIZE;
         status = config_store_iterate_namespace(ns_id, calc_binary_size_cb,
                                                 &size_ctx);
     } else {
@@ -754,6 +711,7 @@ config_status_t config_export_namespace(const char* ns_name,
         status =
             config_store_iterate_namespace(ns_id, write_json_entry_cb, &ctx);
         if (status != CONFIG_OK || ctx.status != CONFIG_OK) {
+            memset(buffer, 0, buf_size);
             return ctx.status != CONFIG_OK ? ctx.status : status;
         }
 
@@ -764,22 +722,27 @@ config_status_t config_export_namespace(const char* ns_name,
             ctx.buffer[ctx.offset] = '\0';
         }
     } else if (format == CONFIG_FORMAT_BINARY) {
-        config_binary_header_t header = {
-            .magic = CONFIG_BINARY_MAGIC,
-            .version = CONFIG_BINARY_VERSION,
-            .reserved = {0},
-            .entry_count = (uint32_t)size_ctx.entry_count,
-            .data_size =
-                (uint32_t)(size_ctx.size - sizeof(config_binary_header_t))};
-        export_write_bytes(&ctx, &header, sizeof(header));
+        uint8_t header[CONFIG_BINARY_HEADER_SIZE] = {0};
+        config_wire_put(header, CONFIG_BINARY_MAGIC, 4);
+        header[4] = CONFIG_BINARY_VERSION;
+        config_wire_put(header + 8, size_ctx.entry_count, 4);
+        export_write_bytes(&ctx, header, sizeof(header));
 
         status =
             config_store_iterate_namespace(ns_id, write_binary_entry_cb, &ctx);
         if (status != CONFIG_OK || ctx.status != CONFIG_OK) {
+            memset(buffer, 0, buf_size);
             return ctx.status != CONFIG_OK ? ctx.status : status;
         }
     }
 
+    if (ctx.status != CONFIG_OK || (format == CONFIG_FORMAT_JSON && ctx.offset >= buf_size)) {
+        memset(buffer, 0, buf_size);
+        return ctx.status != CONFIG_OK ? ctx.status : CONFIG_ERROR_BUFFER_TOO_SMALL;
+    }
+    if (format == CONFIG_FORMAT_BINARY) {
+        config_wire_put((uint8_t*)buffer + 12, ctx.offset - CONFIG_BINARY_HEADER_SIZE, 4);
+    }
     *actual_size = ctx.offset;
     return CONFIG_OK;
 }

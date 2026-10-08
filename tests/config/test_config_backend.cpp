@@ -13,6 +13,7 @@
 
 #include <cstring>
 #include <gtest/gtest.h>
+#include "test_config_flash_fixture.h"
 
 extern "C" {
 #include "config/config.h"
@@ -24,13 +25,18 @@ extern "C" {
  */
 class ConfigBackendTest : public ::testing::Test {
   protected:
+    ConfigFlashModel flash_model;
     void SetUp() override {
+#if defined(_WIN32)
+        GTEST_SKIP() << "Persistent Flash fixture currently requires POSIX";
+#endif
         /* Ensure config is deinitialized before each test */
         if (config_is_initialized()) {
             config_deinit();
         }
         /* Reset mock backend state */
         config_backend_mock_reset();
+        ASSERT_TRUE(flash_model.Bind());
         /* Initialize with default config */
         ASSERT_EQ(CONFIG_OK, config_init(NULL));
     }
@@ -41,6 +47,7 @@ class ConfigBackendTest : public ::testing::Test {
             config_deinit();
         }
         config_backend_mock_reset();
+        flash_model.Release();
     }
 };
 

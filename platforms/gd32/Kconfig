@@ -1,12 +1,10 @@
-# platforms/gd32/Kconfig - GD32 platform configuration
-#
-# This file will be implemented in future tasks
-
+# A family candidate is not an implemented production backend.
 if PLATFORM_GD32
-
-# Placeholder - to be implemented
-config GD32_PLACEHOLDER
+config GD32F407
     bool
     default y
-
-endif # PLATFORM_GD32
+    help
+      GD32F407 is the first migration candidate. The build must reject this
+      target until an official SDK, exact chip, board and implementation exist.
+      STM32 startup/clock/DMA/flash code must not be reused as a GD32 backend.
+endif

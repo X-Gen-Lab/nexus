@@ -1108,7 +1108,7 @@ TEST_F(OsalEventPropertyTest, Property20_EventSyncBasicFunctionality) {
         ASSERT_EQ(OSAL_OK, osal_event_set(handle, wait_bits));
 
         osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ALL,
-                                             .auto_clear = false,
+                                             .auto_clear = true,
                                              .timeout_ms = 100};
 
         osal_event_bits_t bits_out = 0;
@@ -1166,7 +1166,7 @@ TEST_F(OsalEventPropertyTest, Property21_EventSyncErrorHandling) {
 
         osal_event_bits_t bits = randomSmallBitsMask();
         osal_event_wait_options_t options = {.mode = OSAL_EVENT_WAIT_ALL,
-                                             .auto_clear = false,
+                                             .auto_clear = true,
                                              .timeout_ms = 100};
 
         /* Test sync with NULL handle */
@@ -1227,7 +1227,7 @@ TEST_F(OsalEventPropertyTest, Property22_EventSyncTimeout) {
 
         /* Use short timeout for faster tests */
         osal_event_wait_options_t options = {
-            .mode = OSAL_EVENT_WAIT_ALL, .auto_clear = false, .timeout_ms = 50};
+            .mode = OSAL_EVENT_WAIT_ALL, .auto_clear = true, .timeout_ms = 50};
 
         auto start = std::chrono::steady_clock::now();
         osal_status_t status =

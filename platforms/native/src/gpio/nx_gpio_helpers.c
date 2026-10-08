@@ -24,14 +24,21 @@
  * \note            Frequently called functions moved to inline in header
  */
 void gpio_trigger_exti(nx_gpio_state_t* state, uint8_t pin_state) {
-    if (!state || !state->exti.enabled || !state->exti.callback) {
+    if (!state) {
+        return;
+    }
+    uint8_t old_state = state->pin_state;
+    uint8_t new_state = pin_state ? 1 : 0;
+    /* External input changes are observable even without an interrupt. A
+     * suspended or deinitialized device must not deliver its old callback. */
+    state->pin_state = new_state;
+    if (!state->initialized || state->suspended || !state->exti.enabled ||
+        !state->exti.callback) {
         return;
     }
 
     /* Check trigger condition */
     bool should_trigger = false;
-    uint8_t old_state = state->pin_state;
-    uint8_t new_state = pin_state ? 1 : 0;
 
     switch (state->exti.trigger) {
         case NX_GPIO_TRIGGER_RISING:
@@ -46,9 +53,6 @@ void gpio_trigger_exti(nx_gpio_state_t* state, uint8_t pin_state) {
         default:
             break;
     }
-
-    /* Update pin state */
-    state->pin_state = new_state;
 
     /* Trigger callback if condition met */
     if (should_trigger) {

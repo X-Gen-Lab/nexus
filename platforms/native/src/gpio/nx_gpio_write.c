@@ -23,7 +23,7 @@
  * \brief           Write GPIO pin state
  */
 static void gpio_write(nx_gpio_write_t* self, uint8_t state) {
-    nx_gpio_write_impl_t* impl = gpio_write_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_write_get_impl(self);
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -31,7 +31,7 @@ static void gpio_write(nx_gpio_write_t* self, uint8_t state) {
     }
 
     /* Check initialization */
-    if (!impl->state->initialized) {
+    if (!impl->state->initialized || impl->state->suspended) {
         return;
     }
 
@@ -46,7 +46,7 @@ static void gpio_write(nx_gpio_write_t* self, uint8_t state) {
  * \brief           Toggle GPIO pin state
  */
 static void gpio_toggle(nx_gpio_write_t* self) {
-    nx_gpio_write_impl_t* impl = gpio_write_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_write_get_impl(self);
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -54,7 +54,7 @@ static void gpio_toggle(nx_gpio_write_t* self) {
     }
 
     /* Check initialization */
-    if (!impl->state->initialized) {
+    if (!impl->state->initialized || impl->state->suspended) {
         return;
     }
 
@@ -69,7 +69,7 @@ static void gpio_toggle(nx_gpio_write_t* self) {
  * \brief           Get lifecycle interface
  */
 static nx_lifecycle_t* gpio_write_get_lifecycle(nx_gpio_write_t* self) {
-    nx_gpio_write_impl_t* impl = gpio_write_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_write_get_impl(self);
     return impl ? &impl->lifecycle : NULL;
 }
 
@@ -77,7 +77,7 @@ static nx_lifecycle_t* gpio_write_get_lifecycle(nx_gpio_write_t* self) {
  * \brief           Get power interface
  */
 static nx_power_t* gpio_write_get_power(nx_gpio_write_t* self) {
-    nx_gpio_write_impl_t* impl = gpio_write_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_write_get_impl(self);
     return impl ? &impl->power : NULL;
 }
 

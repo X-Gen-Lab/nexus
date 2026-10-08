@@ -23,21 +23,21 @@
  * \brief           Maximum number of entries in Mock backend
  */
 #ifndef CONFIG_MOCK_BACKEND_MAX_ENTRIES
-#define CONFIG_MOCK_BACKEND_MAX_ENTRIES 64
+#define CONFIG_MOCK_BACKEND_MAX_ENTRIES CONFIG_DEFAULT_MAX_KEYS
 #endif
 
 /**
  * \brief           Maximum key length in Mock backend
  */
 #ifndef CONFIG_MOCK_BACKEND_MAX_KEY_LEN
-#define CONFIG_MOCK_BACKEND_MAX_KEY_LEN 64
+#define CONFIG_MOCK_BACKEND_MAX_KEY_LEN CONFIG_MAX_MAX_KEY_LEN
 #endif
 
 /**
  * \brief           Maximum value size in Mock backend
  */
 #ifndef CONFIG_MOCK_BACKEND_MAX_VALUE_SIZE
-#define CONFIG_MOCK_BACKEND_MAX_VALUE_SIZE 256
+#define CONFIG_MOCK_BACKEND_MAX_VALUE_SIZE CONFIG_MAX_MAX_VALUE_SIZE
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -103,6 +103,9 @@ typedef struct {
  * \brief           Global Mock backend context
  */
 static mock_backend_ctx_t g_mock_ctx;
+static uint8_t g_snapshot[CONFIG_PERSISTENCE_BUFFER_SIZE];
+static size_t g_snapshot_size;
+static bool g_snapshot_exists;
 
 /*---------------------------------------------------------------------------*/
 /* Internal Functions                                                        */
@@ -372,6 +375,31 @@ static config_status_t mock_backend_commit(void* ctx) {
     return CONFIG_OK;
 }
 
+static config_status_t mock_save_snapshot(void* ctx, const void* data, size_t size) {
+    (void)ctx;
+    if (!g_mock_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if (g_mock_ctx.error_injection.inject_write_error)
+        return g_mock_ctx.error_injection.write_error_code;
+    config_status_t status = mock_backend_commit(NULL);
+    if (status != CONFIG_OK) return status;
+    if (size > sizeof(g_snapshot)) return CONFIG_ERROR_NO_SPACE;
+    memcpy(g_snapshot, data, size); g_snapshot_size = size;
+    g_snapshot_exists = true; return CONFIG_OK;
+}
+static config_status_t mock_load_snapshot(void* ctx, void* data, size_t* size) {
+    (void)ctx;
+    if (!g_mock_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if (!size) return CONFIG_ERROR_INVALID_PARAM;
+    if (g_mock_ctx.error_injection.inject_read_error)
+        return g_mock_ctx.error_injection.read_error_code;
+    if (!g_snapshot_exists) return CONFIG_ERROR_NOT_FOUND;
+    if (data && *size < g_snapshot_size) {
+        *size = g_snapshot_size; return CONFIG_ERROR_NO_SPACE;
+    }
+    if (data) memcpy(data, g_snapshot, g_snapshot_size);
+    *size = g_snapshot_size; return CONFIG_OK;
+}
+
 /*---------------------------------------------------------------------------*/
 /* Backend Instance                                                          */
 /*---------------------------------------------------------------------------*/
@@ -388,7 +416,9 @@ static const config_backend_t g_mock_backend = {.name = "mock",
                                                 .erase_all =
                                                     mock_backend_erase_all,
                                                 .commit = mock_backend_commit,
-                                                .ctx = NULL};
+                                                .ctx = NULL,
+                                                .save_snapshot = mock_save_snapshot,
+                                                .load_snapshot = mock_load_snapshot};
 
 /*---------------------------------------------------------------------------*/
 /* Public API                                                                */
@@ -400,4 +430,6 @@ const config_backend_t* config_backend_mock_get(void) {
 
 void config_backend_mock_reset(void) {
     memset(&g_mock_ctx, 0, sizeof(g_mock_ctx));
+    memset(g_snapshot, 0, sizeof(g_snapshot));
+    g_snapshot_size = 0; g_snapshot_exists = false;
 }

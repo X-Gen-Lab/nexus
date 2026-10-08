@@ -14,6 +14,7 @@
 
 #include "config_store.h"
 #include "config/config.h"
+#include "config_backend_internal.h"
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -53,6 +54,10 @@ typedef struct {
  * \brief           Global config store context
  */
 static config_store_ctx_t g_store_ctx;
+static config_status_t changed(void) {
+    config_backend_set_dirty(true);
+    return config_backend_auto_commit_if_enabled();
+}
 
 /*---------------------------------------------------------------------------*/
 /* Internal Functions                                                        */
@@ -186,6 +191,13 @@ config_status_t config_store_set(const char* key, config_type_t type,
     /* Find existing entry or allocate new one */
     config_entry_internal_t* entry = config_store_find_entry(key, namespace_id);
 
+    if (entry != NULL && (entry->flags & CONFIG_FLAG_READONLY))
+        return CONFIG_ERROR_READ_ONLY;
+    if (entry != NULL && (entry->flags & CONFIG_FLAG_ENCRYPTED) &&
+        !(flags & CONFIG_FLAG_ENCRYPTED))
+        return CONFIG_ERROR_INVALID_PARAM; /* No implicit plaintext downgrade. */
+    if (entry != NULL) flags |= entry->flags & CONFIG_FLAG_PERSISTENT;
+
     if (entry == NULL) {
         /* Allocate new entry */
         entry = config_store_find_free_entry();
@@ -210,7 +222,7 @@ config_status_t config_store_set(const char* key, config_type_t type,
     memcpy(entry->value, value, size);
     entry->in_use = true;
 
-    return CONFIG_OK;
+    return changed();
 }
 
 /**
@@ -331,12 +343,14 @@ config_status_t config_store_delete(const char* key, uint8_t namespace_id) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
+    if (entry->flags & CONFIG_FLAG_READONLY) return CONFIG_ERROR_READ_ONLY;
+
     /* Clear the entry */
     memset(entry, 0, sizeof(*entry));
     entry->in_use = false;
     g_store_ctx.entry_count--;
 
-    return CONFIG_OK;
+    return changed();
 }
 
 /**
@@ -366,12 +380,16 @@ config_status_t config_store_clear_all(void) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
+    for (size_t i = 0; i < g_store_ctx.max_keys; ++i)
+        if (g_store_ctx.entries[i].in_use &&
+            (g_store_ctx.entries[i].flags & CONFIG_FLAG_READONLY))
+            return CONFIG_ERROR_READ_ONLY;
     for (size_t i = 0; i < g_store_ctx.max_keys; ++i) {
         memset(&g_store_ctx.entries[i], 0, sizeof(g_store_ctx.entries[i]));
     }
     g_store_ctx.entry_count = 0;
 
-    return CONFIG_OK;
+    return changed();
 }
 
 /**
@@ -410,6 +428,11 @@ config_status_t config_store_clear_namespace(uint8_t namespace_id) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
+    for (size_t i = 0; i < g_store_ctx.max_keys; ++i)
+        if (g_store_ctx.entries[i].in_use &&
+            g_store_ctx.entries[i].namespace_id == namespace_id &&
+            (g_store_ctx.entries[i].flags & CONFIG_FLAG_READONLY))
+            return CONFIG_ERROR_READ_ONLY;
     for (size_t i = 0; i < g_store_ctx.max_keys; ++i) {
         if (g_store_ctx.entries[i].in_use &&
             g_store_ctx.entries[i].namespace_id == namespace_id) {
@@ -418,7 +441,7 @@ config_status_t config_store_clear_namespace(uint8_t namespace_id) {
         }
     }
 
-    return CONFIG_OK;
+    return changed();
 }
 
 /**
@@ -562,5 +585,89 @@ config_status_t config_store_get_flags(const char* key, uint8_t namespace_id,
     }
 
     *flags = entry->flags;
+    return CONFIG_OK;
+}
+
+config_status_t config_store_replace_encrypted(
+    const config_store_replacement_t* replacements, size_t count) {
+    if (!g_store_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if ((!replacements && count) || count > g_store_ctx.max_keys)
+        return CONFIG_ERROR_INVALID_PARAM;
+    config_entry_internal_t* validated[CONFIG_MAX_MAX_KEYS];
+    for (size_t i = 0; i < count; ++i) {
+        const config_store_replacement_t* item = &replacements[i];
+        config_entry_internal_t* entry = config_store_find_entry(
+            item->info.key, item->info.namespace_id);
+        if (!entry) return CONFIG_ERROR_NOT_FOUND;
+        validated[i] = entry;
+        if (!item->value || item->size > g_store_ctx.max_value_size)
+            return CONFIG_ERROR_VALUE_TOO_LARGE;
+        if (!(entry->flags & CONFIG_FLAG_ENCRYPTED) ||
+            entry->type != item->info.type || entry->flags != item->info.flags)
+            return CONFIG_ERROR_INVALID_PARAM;
+        for (size_t j = 0; j < i; ++j)
+            if (item->info.namespace_id == replacements[j].info.namespace_id &&
+                !strcmp(item->info.key, replacements[j].info.key))
+                return CONFIG_ERROR_INVALID_PARAM;
+    }
+    for (size_t i = 0; i < count; ++i) {
+        config_entry_internal_t* entry = validated[i];
+        memset(entry->value, 0, sizeof(entry->value));
+        memcpy(entry->value, replacements[i].value, replacements[i].size);
+        entry->value_size = (uint16_t)replacements[i].size;
+    }
+    return CONFIG_OK;
+}
+
+config_status_t config_store_replace_all(
+    const config_store_replacement_t* items, size_t count, bool apply) {
+    if (!g_store_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if ((!items && count) || count > g_store_ctx.max_keys)
+        return CONFIG_ERROR_NO_SPACE;
+    for (size_t i = 0; i < count; ++i) {
+        const config_store_replacement_t* item = &items[i];
+        size_t keylen = strlen(item->info.key);
+        if (!keylen || keylen >= g_store_ctx.max_key_len ||
+            !item->value || item->size > g_store_ctx.max_value_size ||
+            item->info.type > CONFIG_TYPE_BLOB ||
+            (item->info.flags & ~(CONFIG_FLAG_ENCRYPTED | CONFIG_FLAG_READONLY |
+                                  CONFIG_FLAG_PERSISTENT)))
+            return CONFIG_ERROR_INVALID_FORMAT;
+        if (!(item->info.flags & CONFIG_FLAG_ENCRYPTED)) {
+            size_t expected = 0;
+            switch (item->info.type) {
+                case CONFIG_TYPE_I32: case CONFIG_TYPE_U32:
+                case CONFIG_TYPE_FLOAT: expected = 4; break;
+                case CONFIG_TYPE_I64: expected = 8; break;
+                case CONFIG_TYPE_BOOL: expected = 1; break;
+                case CONFIG_TYPE_STRING:
+                    if (!item->size || item->value[item->size - 1] != 0)
+                        return CONFIG_ERROR_INVALID_FORMAT;
+                    break;
+                case CONFIG_TYPE_BLOB: break;
+            }
+            if (expected && item->size != expected)
+                return CONFIG_ERROR_INVALID_FORMAT;
+            if (item->info.type == CONFIG_TYPE_BOOL && item->value[0] > 1)
+                return CONFIG_ERROR_INVALID_FORMAT;
+        }
+        for (size_t j = 0; j < i; ++j)
+            if (item->info.namespace_id == items[j].info.namespace_id &&
+                !strcmp(item->info.key, items[j].info.key))
+                return CONFIG_ERROR_INVALID_FORMAT;
+    }
+    if (!apply) return CONFIG_OK;
+    memset(g_store_ctx.entries, 0, sizeof(g_store_ctx.entries));
+    for (size_t i = 0; i < count; ++i) {
+        config_entry_internal_t* entry = &g_store_ctx.entries[i];
+        memcpy(entry->key, items[i].info.key, strlen(items[i].info.key) + 1);
+        entry->type = items[i].info.type;
+        entry->flags = items[i].info.flags;
+        entry->namespace_id = items[i].info.namespace_id;
+        entry->value_size = (uint16_t)items[i].size;
+        memcpy(entry->value, items[i].value, items[i].size);
+        entry->in_use = true;
+    }
+    g_store_ctx.entry_count = count;
     return CONFIG_OK;
 }

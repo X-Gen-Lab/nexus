@@ -669,7 +669,7 @@ def main():
     print_success("Nexus 开发环境已准备就绪!")
     print("\n下一步:")
     print("1. 重启终端以确保环境变量生效")
-    print("2. 运行构建脚本: python scripts/building/build.py")
+    print("2. 运行构建脚本: python scripts/building/build.py --preset linux-gcc-debug --stage all")
     print("3. 运行测试: python scripts/test/test.py")
 
     return 0

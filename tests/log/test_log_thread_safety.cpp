@@ -131,6 +131,7 @@ TEST_F(LogThreadSafetyTest, ConcurrentLevelChanges) {
     ClearBackendCache();
 
     /* System should still be functional */
+    ASSERT_LOG_OK(log_set_level(LOG_LEVEL_INFO));
     LOG_INFO("Final message");
 
     /* Give time for message to be written */
@@ -489,8 +490,8 @@ TEST_F(LogThreadSafetyTest, NoDataCorruption) {
             count++;
             pos += marker.length();
         }
-        /* Should have some messages from each thread */
-        EXPECT_GT(count, 0u) << "No messages from thread " << t;
+        EXPECT_EQ(static_cast<size_t>(MESSAGES_PER_THREAD), count)
+            << "Missing or duplicated messages from thread " << t;
     }
 
     CleanupMemoryBackend(backend);

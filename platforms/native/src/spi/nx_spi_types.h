@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "osal/osal_mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,7 +112,14 @@ typedef struct nx_spi_device_handle_s {
  *
  * Contains runtime state.
  */
+typedef struct nx_spi_stats_s {
+    uint32_t tx_count;
+    uint32_t rx_count;
+    uint32_t error_count;
+} nx_spi_stats_t;
+
 typedef struct nx_spi_state_s {
+    nx_spi_stats_t stats;
     uint8_t index;                         /**< Instance index */
     nx_spi_config_t config;                /**< Configuration */
     nx_spi_buffer_t tx_buf;                /**< TX buffer */
@@ -132,16 +140,51 @@ typedef struct nx_spi_state_s {
  *
  * Contains all interfaces and state pointer.
  */
+#define NATIVE_SPI_DEVICE_CAPACITY 8
+#define NATIVE_SPI_ASYNC_CAPACITY 256
+struct nx_spi_impl_s;
+typedef struct native_spi_device_s {
+    nx_spi_device_t base;
+    struct nx_spi_impl_s* bus;
+    nx_spi_device_config_t config;
+    nx_comm_callback_t receive_callback;
+    void* receive_context;
+    nx_tx_async_t tx_async;
+    nx_tx_rx_async_t tx_rx_async;
+    nx_tx_sync_t tx_sync;
+    nx_tx_rx_sync_t tx_rx_sync;
+    nx_spi_transaction_t queued;
+    uint8_t tx_copy[NATIVE_SPI_ASYNC_CAPACITY];
+    uint8_t rx_copy[NATIVE_SPI_ASYNC_CAPACITY];
+    uint32_t queued_at;
+    uint64_t sequence;
+    unsigned users;
+    nx_status_t last_result;
+    bool allocated, legacy, pending, servicing, cancelled, completing;
+} native_spi_device_t;
+typedef struct native_spi_trace_s {
+    nx_spi_device_config_t config;
+    uint64_t token;
+    uint8_t first_tx;
+} native_spi_trace_t;
+#define NATIVE_SPI_TRACE_CAPACITY 128
 typedef struct nx_spi_impl_s {
-    nx_spi_bus_t base;            /**< Base SPI bus interface */
-    nx_tx_async_t tx_async;       /**< TX async interface */
-    nx_tx_rx_async_t tx_rx_async; /**< TX/RX async interface */
-    nx_tx_sync_t tx_sync;         /**< TX sync interface */
-    nx_tx_rx_sync_t tx_rx_sync;   /**< TX/RX sync interface */
-    nx_lifecycle_t lifecycle;     /**< Lifecycle interface */
-    nx_power_t power;             /**< Power interface */
-    nx_spi_state_t* state;        /**< State pointer */
-    nx_device_t* device;          /**< Device descriptor */
+    nx_spi_bus_t base;
+    nx_lifecycle_t lifecycle;
+    nx_power_t power;
+    nx_spi_state_t* state;
+    nx_device_t* device;
+    osal_mutex_handle_t mutex;
+    native_spi_device_t devices[NATIVE_SPI_DEVICE_CAPACITY];
+    native_spi_device_t* active;
+    uint64_t next_token, next_sequence;
+    unsigned users;
+    bool worker_active;
+    uint32_t transfer_delay_ms; /* Host simulation only: deterministic slow IO. */
+    native_spi_trace_t trace[NATIVE_SPI_TRACE_CAPACITY];
+    unsigned trace_count;
+    nx_power_callback_t power_callback;
+    void* power_context;
 } nx_spi_impl_t;
 
 #ifdef __cplusplus

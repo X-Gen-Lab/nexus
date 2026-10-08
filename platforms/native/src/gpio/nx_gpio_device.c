@@ -32,8 +32,7 @@
 /*---------------------------------------------------------------------------*/
 
 /* Interface implementations (defined in separate files) */
-extern void gpio_init_read(nx_gpio_read_t* read);
-extern void gpio_init_write(nx_gpio_write_t* write);
+extern void gpio_init_read_write(nx_gpio_read_write_t* gpio);
 extern void gpio_init_lifecycle(nx_lifecycle_t* lifecycle);
 extern void gpio_init_power(nx_power_t* power);
 
@@ -44,16 +43,14 @@ extern void gpio_init_power(nx_power_t* power);
 /**
  * \brief           Initialize GPIO instance with platform configuration
  * \param[in]       impl: GPIO implementation structure pointer
- * \param[in]       index: Device index calculated from port and pin
  * \param[in]       platform_cfg: Platform configuration from Kconfig
  * \note            Allocates state memory and initializes all interfaces
  */
 NX_UNUSED static void
-gpio_init_instance(nx_gpio_read_write_impl_t* impl, uint8_t index,
+gpio_init_instance(nx_gpio_read_write_impl_t* impl,
                    const nx_gpio_platform_config_t* platform_cfg) {
     /* Initialize interfaces (implemented in separate files) */
-    gpio_init_read(&impl->base.read);
-    gpio_init_write(&impl->base.write);
+    gpio_init_read_write(&impl->base);
     gpio_init_lifecycle(&impl->lifecycle);
     gpio_init_power(&impl->power);
 
@@ -116,8 +113,7 @@ NX_UNUSED static void* nx_gpio_device_init(const nx_device_t* dev) {
     memset(impl, 0, sizeof(nx_gpio_read_write_impl_t));
 
     /* Initialize instance with platform configuration */
-    uint8_t index = (config->port * 16 + config->pin);
-    gpio_init_instance(impl, index, config);
+    gpio_init_instance(impl, config);
 
     /* Check if state allocation succeeded */
     if (!impl->state) {

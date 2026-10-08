@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "gd32f407",
+  "vendor": "GigaDevice",
+  "family_candidate": "GD32F407",
+  "exact_part": null,
+  "vendor_sdk": null,
+  "build_status": "blocked",
+  "reason": "No pinned official SDK, exact part, board revision or hardware evidence is available",
+  "required_before_build": [
+    "Pin official GigaDevice SDK and licenses",
+    "Select exact GD32F407 package, flash and RAM capacity",
+    "Review independent reset, clocks, vector table, peripheral IRQs and DMA routing",
+    "Implement GPIO, UART, monotonic clock and flash against the actual SDK",
+    "Run the same driver contracts and board HIL"
+  ],
+  "stm32_binary_compatibility": false,
+  "hardware_verification": "not-executed"
+}

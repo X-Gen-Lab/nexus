@@ -47,8 +47,14 @@
 /*---------------------------------------------------------------------------*/
 
 #include "interrupt/stm32_interrupt.h"
+#include "nexus_config.h"
 #include "stm32f4xx_hal.h"
 
+#if defined(NX_CONFIG_OSAL_FREERTOS)
+#include "FreeRTOS.h"
+#include "task.h"
+extern void xPortSysTickHandler(void);
+#endif
 
 /*---------------------------------------------------------------------------*/
 /* Cortex-M4 Processor Exceptions                                            */
@@ -97,8 +103,10 @@ void UsageFault_Handler(void) {
 /**
  * \brief           SVC handler
  */
+#if !defined(NX_CONFIG_OSAL_FREERTOS)
 void SVC_Handler(void) {
 }
+#endif
 
 /**
  * \brief           Debug monitor handler
@@ -109,14 +117,24 @@ void DebugMon_Handler(void) {
 /**
  * \brief           PendSV handler
  */
+#if !defined(NX_CONFIG_OSAL_FREERTOS)
 void PendSV_Handler(void) {
 }
+#endif
 
 /**
  * \brief           SysTick timer interrupt handler
  */
 void SysTick_Handler(void) {
     HAL_IncTick();
+#if defined(NX_CONFIG_OSAL_FREERTOS)
+    /* HAL_Init starts the 1ms timebase before a kernel task exists. The RTOS
+     * tick must run only after scheduler startup; the platform owns this sole
+     * wrapper and the port owns SVC/PendSV. The profile fixes tick rate to 1kHz. */
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        xPortSysTickHandler();
+    }
+#endif
 }
 
 /*---------------------------------------------------------------------------*/

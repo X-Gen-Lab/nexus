@@ -154,7 +154,7 @@ def show_usage():
 
 4. 在容器中开发:
    cd nexus
-   python scripts/building/build.py
+   python scripts/building/build.py --preset linux-gcc-debug --stage all
    python scripts/test/test.py
 
 5. 停止容器:

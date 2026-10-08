@@ -791,13 +791,13 @@ main() {
     echo ""
     echo "下一步操作:"
     echo "1. 重启终端以确保环境变量生效"
-    echo "2. 运行构建脚本: python scripts/building/build.py"
+    echo "2. 运行构建脚本: python scripts/building/build.py --preset linux-gcc-debug --stage all"
     echo "3. 运行测试: python scripts/test/test.py"
 
     if [[ "$PLATFORM" == "stm32f4" || "$PLATFORM" == "all" ]]; then
         echo ""
         echo "STM32F4 开发:"
-        echo "  构建固件: python scripts/building/build.py -p stm32f4"
+        echo "  构建固件: python scripts/building/build.py --preset stm32-armgcc-debug --stage build"
         echo "  输出位置: build-stm32f4/applications/blinky/"
     fi
 

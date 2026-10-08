@@ -1,86 +1,36 @@
-/**
- * \file            stm32_spi_power.c
- * \brief           STM32 SPI power interface implementation
- * \author          Nexus Team
- */
-
-/*
- * Copyright (c) 2026 Nexus Team
- */
-
+/** Power interface uses the same serialized lifecycle contract. */
 #include "stm32_spi.h"
-#include "stm32_spi_types.h"
-
-/*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get implementation from power interface
- */
-static inline stm32_spi_impl_t* spi_power_get_impl(nx_power_t* self) {
-    return self ? NX_CONTAINER_OF(self, stm32_spi_impl_t, power) : NULL;
+static nx_status_t enable(nx_power_t* self) {
+    if (!self) return NX_ERR_INVALID_PARAM;
+    stm32_spi_impl_t* b = NX_CONTAINER_OF(self, stm32_spi_impl_t, power);
+    bool changed = b->state->suspended;
+    nx_status_t r = b->lifecycle.resume(&b->lifecycle);
+    if (r == NX_OK && changed && b->power_callback) b->power_callback(b->power_context, true);
+    return r;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Power Interface Implementation                                            */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Suspend SPI peripheral
- */
-static nx_status_t spi_power_suspend(nx_power_t* self) {
-    stm32_spi_impl_t* impl = spi_power_get_impl(self);
-    if (!impl || !impl->state) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    if (!impl->state->initialized) {
-        return NX_ERR_NOT_INITIALIZED;
-    }
-
-    if (impl->state->suspended) {
-        return NX_OK;
-    }
-
-    /* Disable SPI peripheral */
-    __HAL_SPI_DISABLE(&impl->hspi);
-
-    impl->state->suspended = true;
+static nx_status_t disable(nx_power_t* self) {
+    if (!self) return NX_ERR_INVALID_PARAM;
+    stm32_spi_impl_t* b = NX_CONTAINER_OF(self, stm32_spi_impl_t, power);
+    bool changed = !b->state->suspended;
+    nx_status_t r = b->lifecycle.suspend(&b->lifecycle);
+    if (r == NX_OK && changed && b->power_callback) b->power_callback(b->power_context, false);
+    return r;
+}
+static bool enabled(nx_power_t* self) {
+    if (!self) return false;
+    stm32_spi_impl_t* b = NX_CONTAINER_OF(self, stm32_spi_impl_t, power);
+    return b->state->initialized && !b->state->suspended && !b->state->fault;
+}
+static nx_status_t set_callback(nx_power_t* self, nx_power_callback_t callback, void* context) {
+    if (!self) return NX_ERR_INVALID_PARAM;
+    if (__get_IPSR()) return NX_ERR_INVALID_STATE;
+    stm32_spi_impl_t* b = NX_CONTAINER_OF(self, stm32_spi_impl_t, power);
+    uint32_t saved = spi_critical_enter();
+    b->power_callback = callback; b->power_context = context;
+    spi_critical_leave(saved);
     return NX_OK;
 }
-
-/**
- * \brief           Resume SPI peripheral
- */
-static nx_status_t spi_power_resume(nx_power_t* self) {
-    stm32_spi_impl_t* impl = spi_power_get_impl(self);
-    if (!impl || !impl->state) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    if (!impl->state->initialized) {
-        return NX_ERR_NOT_INITIALIZED;
-    }
-
-    if (!impl->state->suspended) {
-        return NX_OK;
-    }
-
-    /* Enable SPI peripheral */
-    __HAL_SPI_ENABLE(&impl->hspi);
-
-    impl->state->suspended = false;
-    return NX_OK;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Interface Initialization                                                  */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize power interface
- */
-void spi_init_power(nx_power_t* power) {
-    NX_INIT_POWER(power, spi_power_suspend, spi_power_resume);
+void spi_init_power(nx_power_t* iface) {
+    iface->enable = enable; iface->disable = disable;
+    iface->is_enabled = enabled; iface->set_callback = set_callback;
 }

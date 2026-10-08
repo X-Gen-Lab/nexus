@@ -45,3 +45,11 @@ nexus_discover_tests(init_tests
         TIMEOUT 300
         LABELS "init;framework;unit;property"
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_executable(init_registry_tests test_init_registry.cpp)
+    target_link_libraries(init_registry_tests PRIVATE init_framework)
+    target_compile_options(init_registry_tests PRIVATE -UNDEBUG)
+    add_test(NAME init_registry_tests COMMAND init_registry_tests)
+    set_tests_properties(init_registry_tests PROPERTIES LABELS "init;contract" TIMEOUT 10)
+endif()

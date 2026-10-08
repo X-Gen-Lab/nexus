@@ -1,296 +1,255 @@
-/**
- * \file            stm32_spi_device.c
- * \brief           STM32 SPI device registration
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-02-05
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements SPI device registration using Kconfig-driven
- *                  configuration with dynamic memory allocation.
- */
-
-/*
- * Copyright (c) 2026 Nexus Team
- */
-
+/** STM32 SPI bus owns arbitration; each slave owns immutable configuration. */
 #include "hal/base/nx_device.h"
-#include "hal/interface/nx_spi.h"
-#include "hal/system/nx_mem.h"
-#include "nexus_config.h"
 #include "stm32_spi.h"
-#include "stm32_spi_types.h"
 #include <string.h>
 
-/*---------------------------------------------------------------------------*/
-/* Configuration                                                             */
-/*---------------------------------------------------------------------------*/
-
-#define DEVICE_TYPE NX_SPI
-
-/*---------------------------------------------------------------------------*/
-/* Forward Declarations                                                      */
-/*---------------------------------------------------------------------------*/
-
-/* Base interface getters */
-static nx_tx_async_t* spi_get_tx_async_handle(nx_spi_bus_t* self,
-                                              nx_spi_device_config_t config);
-static nx_tx_rx_async_t*
-spi_get_tx_rx_async_handle(nx_spi_bus_t* self, nx_spi_device_config_t config,
-                           nx_comm_callback_t callback, void* user_data);
-static nx_tx_sync_t* spi_get_tx_sync_handle(nx_spi_bus_t* self,
-                                            nx_spi_device_config_t config);
-static nx_tx_rx_sync_t*
-spi_get_tx_rx_sync_handle(nx_spi_bus_t* self, nx_spi_device_config_t config);
-static nx_lifecycle_t* spi_get_lifecycle(nx_spi_bus_t* self);
-static nx_power_t* spi_get_power(nx_spi_bus_t* self);
-
-/* Interface implementations (defined in separate files) */
-extern void spi_init_tx_async(nx_tx_async_t* tx_async);
-extern void spi_init_tx_rx_async(nx_tx_rx_async_t* tx_rx_async);
-extern void spi_init_tx_sync(nx_tx_sync_t* tx_sync);
-extern void spi_init_tx_rx_sync(nx_tx_rx_sync_t* tx_rx_sync);
-extern void spi_init_lifecycle(nx_lifecycle_t* lifecycle);
-extern void spi_init_power(nx_power_t* power);
-
-/*---------------------------------------------------------------------------*/
-/* Helper Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get implementation from base interface
- */
-static inline stm32_spi_impl_t* spi_get_impl(nx_spi_bus_t* self) {
-    return self ? NX_CONTAINER_OF(self, stm32_spi_impl_t, base) : NULL;
+static stm32_spi_device_t* resolve_device(nx_spi_device_t* self) {
+    if (!self || !self->owner || !self->token) return NULL;
+    stm32_spi_impl_t* bus = NX_CONTAINER_OF(self->owner, stm32_spi_impl_t, base);
+    for (unsigned i = 0; i < STM32_SPI_MAX_DEVICES; ++i)
+        if (bus->devices[i].allocated && bus->devices[i].base.token == self->token)
+            return &bus->devices[i];
+    return NULL;
 }
-
-/*---------------------------------------------------------------------------*/
-/* Base Interface Getters                                                    */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get TX async handle
- */
-static nx_tx_async_t* spi_get_tx_async_handle(nx_spi_bus_t* self,
-                                              nx_spi_device_config_t config) {
-    stm32_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl) {
-        return NULL;
+static nx_status_t device_transfer(nx_spi_device_t* self,
+                                    const nx_spi_transaction_t* transaction) {
+    if (!self || !self->owner) return NX_ERR_INVALID_PARAM;
+    uint32_t started_at = HAL_GetTick();
+    uint32_t saved = spi_critical_enter();
+    stm32_spi_device_t* d = resolve_device(self);
+    uint64_t token = self ? self->token : 0;
+    spi_critical_leave(saved);
+    return d ? spi_transfer(d, transaction, started_at, false, token) : NX_ERR_INVALID_STATE;
+}
+static nx_status_t device_submit(nx_spi_device_t* self,
+                                  const nx_spi_transaction_t* transaction) {
+    if (!self || !self->owner) return NX_ERR_INVALID_PARAM;
+    uint32_t started_at = HAL_GetTick();
+    uint32_t saved = spi_critical_enter();
+    stm32_spi_device_t* d = resolve_device(self);
+    uint64_t token = self ? self->token : 0;
+    spi_critical_leave(saved);
+    return d ? spi_submit(d, transaction, token, started_at) : NX_ERR_INVALID_STATE;
+}
+static nx_status_t device_cancel(nx_spi_device_t* self) {
+    if (!self || !self->owner) return NX_ERR_INVALID_PARAM;
+    uint32_t saved = spi_critical_enter();
+    stm32_spi_device_t* d = resolve_device(self);
+    uint64_t token = self ? self->token : 0;
+    spi_critical_leave(saved);
+    return d ? spi_cancel(d, token) : NX_ERR_INVALID_STATE;
+}
+static bool config_valid(const nx_spi_device_config_t* c) {
+    return c && c->speed && c->mode <= NX_SPI_MODE_3 &&
+           c->bit_order <= NX_SPI_BIT_ORDER_LSB;
+}
+static bool config_equal(const nx_spi_device_config_t* a,
+                           const nx_spi_device_config_t* b) {
+    return a->cs_pin == b->cs_pin && a->speed == b->speed &&
+           a->mode == b->mode && a->bit_order == b->bit_order;
+}
+static stm32_spi_device_t* allocate_device(stm32_spi_impl_t* bus,
+                                           nx_spi_device_config_t config,
+                                           bool legacy,
+                                           nx_comm_callback_t callback,
+                                           void* context) {
+    stm32_spi_device_t* free_slot = NULL;
+    uint32_t saved = spi_critical_enter();
+    for (unsigned i = 0; i < STM32_SPI_MAX_DEVICES; ++i) {
+        stm32_spi_device_t* d = &bus->devices[i];
+        if (!d->allocated) {
+            if (!free_slot) free_slot = d;
+        } else if (legacy && d->legacy && config_equal(&d->config, &config) &&
+                   d->receive_callback == callback &&
+                   d->receive_context == context) {
+            spi_critical_leave(saved);
+            return d;
+        }
     }
-
-    /* Store current device configuration */
-    impl->current_config = config;
-
-    return &impl->tx_async;
-}
-
-/**
- * \brief           Get TX/RX async handle
- */
-static nx_tx_rx_async_t*
-spi_get_tx_rx_async_handle(nx_spi_bus_t* self, nx_spi_device_config_t config,
-                           nx_comm_callback_t callback, void* user_data) {
-    stm32_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl) {
-        return NULL;
+    if (free_slot && bus->next_token == UINT64_MAX) free_slot = NULL;
+    if (free_slot) {
+        /* Reservation and initialization are one atomic bounded operation. */
+        memset(free_slot, 0, sizeof(*free_slot));
+        free_slot->bus = bus;
+        free_slot->config = config;
+        free_slot->legacy = legacy;
+        free_slot->receive_callback = callback;
+        free_slot->receive_context = context;
+        free_slot->base.owner = &bus->base;
+        free_slot->base.token = ++bus->next_token;
+        free_slot->base.transfer = device_transfer;
+        free_slot->base.submit = device_submit;
+        free_slot->base.cancel = device_cancel;
+        spi_init_tx_sync(&free_slot->tx_sync);
+        spi_init_tx_rx_sync(&free_slot->tx_rx_sync);
+        spi_init_tx_async(&free_slot->tx_async);
+        spi_init_tx_rx_async(&free_slot->tx_rx_async);
+        free_slot->allocated = true;
     }
-
-    /* Store current device configuration */
-    impl->current_config = config;
-
-    /* Store callback (if needed for async operations) */
-    (void)callback;
-    (void)user_data;
-
-    return &impl->tx_rx_async;
+    spi_critical_leave(saved);
+    return free_slot;
+}
+static nx_status_t open_device(nx_spi_bus_t* self,
+                                const nx_spi_device_config_t* config,
+                                nx_spi_device_t* out) {
+    if (out) memset(out, 0, sizeof(*out));
+    if (!self || !out || !config_valid(config)) return NX_ERR_INVALID_PARAM;
+    if (__get_IPSR()) return NX_ERR_INVALID_STATE;
+    stm32_spi_impl_t* bus = NX_CONTAINER_OF(self, stm32_spi_impl_t, base);
+    uint32_t saved = spi_critical_enter();
+    stm32_spi_device_t* d = allocate_device(bus, *config, false, NULL, NULL);
+    if (d) *out = d->base;
+    spi_critical_leave(saved);
+    return d ? NX_OK : NX_ERR_NO_RESOURCE;
+}
+static nx_status_t close_device(nx_spi_bus_t* self, nx_spi_device_t* device) {
+    if (!self || !device) return NX_ERR_INVALID_PARAM;
+    if (__get_IPSR()) return NX_ERR_INVALID_STATE;
+    uint32_t saved = spi_critical_enter();
+    stm32_spi_device_t* d = device->owner == self ? resolve_device(device) : NULL;
+    nx_status_t r = !d ? NX_ERR_INVALID_STATE : d->legacy ? NX_ERR_NOT_SUPPORTED :
+                    d->users || d->pending || d->servicing ? NX_ERR_BUSY : NX_OK;
+    if (r == NX_OK) d->allocated = false;
+    spi_critical_leave(saved);
+    return r;
+}
+static stm32_spi_device_t* legacy_device(nx_spi_bus_t* self,
+                                          nx_spi_device_config_t config,
+                                          nx_comm_callback_t callback,
+                                          void* context) {
+    if (!self || !config_valid(&config) || __get_IPSR()) return NULL;
+    return allocate_device(NX_CONTAINER_OF(self, stm32_spi_impl_t, base),
+                            config, true, callback, context);
+}
+static nx_tx_sync_t* get_tx_sync(nx_spi_bus_t* self,
+                                 nx_spi_device_config_t config) {
+    stm32_spi_device_t* d = legacy_device(self, config, NULL, NULL);
+    return d ? &d->tx_sync : NULL;
+}
+static nx_tx_rx_sync_t* get_tx_rx_sync(nx_spi_bus_t* self,
+                                       nx_spi_device_config_t config) {
+    stm32_spi_device_t* d = legacy_device(self, config, NULL, NULL);
+    return d ? &d->tx_rx_sync : NULL;
+}
+static nx_tx_async_t* get_tx_async(nx_spi_bus_t* self,
+                                   nx_spi_device_config_t config) {
+    stm32_spi_device_t* d = legacy_device(self, config, NULL, NULL);
+    return d ? &d->tx_async : NULL;
+}
+static nx_tx_rx_async_t* get_tx_rx_async(nx_spi_bus_t* self,
+                                         nx_spi_device_config_t config,
+                                         nx_comm_callback_t callback,
+                                         void* context) {
+    if (!callback) return NULL;
+    stm32_spi_device_t* d = legacy_device(self, config, callback, context);
+    return d ? &d->tx_rx_async : NULL;
+}
+static nx_lifecycle_t* get_lifecycle(nx_spi_bus_t* self) {
+    return self ? &NX_CONTAINER_OF(self, stm32_spi_impl_t, base)->lifecycle : NULL;
+}
+static nx_power_t* get_power(nx_spi_bus_t* self) {
+    return self ? &NX_CONTAINER_OF(self, stm32_spi_impl_t, base)->power : NULL;
+}
+void stm32_spi_construct(stm32_spi_impl_t* bus,
+                         const stm32_spi_platform_config_t* cfg) {
+    memset(bus, 0, sizeof(*bus));
+    bus->state = &bus->storage;
+    bus->state->instance = cfg->spi_index;
+    bus->dma_tx_enabled = cfg->use_dma;
+    bus->dma_rx_enabled = cfg->use_dma;
+    bus->hspi.Instance = cfg->spi_base;
+    bus->hspi.Init.Mode = cfg->mode;
+    bus->hspi.Init.Direction = cfg->direction;
+    bus->hspi.Init.DataSize = cfg->data_size;
+    bus->hspi.Init.CLKPolarity = cfg->clk_polarity;
+    bus->hspi.Init.CLKPhase = cfg->clk_phase;
+    bus->hspi.Init.NSS = cfg->nss;
+    bus->hspi.Init.BaudRatePrescaler = cfg->baud_prescaler;
+    bus->hspi.Init.FirstBit = cfg->first_bit;
+    bus->hspi.Init.TIMode = cfg->ti_mode;
+    bus->hspi.Init.CRCCalculation = cfg->crc_calculation;
+    bus->hspi.Init.CRCPolynomial = cfg->crc_polynomial;
+    NX_INIT_SPI_BUS(&bus->base, get_tx_async, get_tx_rx_async, get_tx_sync,
+                     get_tx_rx_sync, get_lifecycle, get_power);
+    bus->base.open_device = open_device;
+    bus->base.close_device = close_device;
+    bus->base.service = spi_service;
+    spi_init_lifecycle(&bus->lifecycle);
+    spi_init_power(&bus->power);
 }
 
-/**
- * \brief           Get TX sync handle
- */
-static nx_tx_sync_t* spi_get_tx_sync_handle(nx_spi_bus_t* self,
-                                            nx_spi_device_config_t config) {
-    stm32_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl) {
-        return NULL;
-    }
-
-    /* Store current device configuration */
-    impl->current_config = config;
-
-    return &impl->tx_sync;
+/* A board profile may override these hooks. Missing wiring fails explicitly. */
+NX_WEAK nx_status_t stm32_spi_board_prepare(stm32_spi_impl_t* bus) {
+    (void)bus;
+    return NX_ERR_NOT_SUPPORTED;
 }
-
-/**
- * \brief           Get TX/RX sync handle
- */
-static nx_tx_rx_sync_t*
-spi_get_tx_rx_sync_handle(nx_spi_bus_t* self, nx_spi_device_config_t config) {
-    stm32_spi_impl_t* impl = spi_get_impl(self);
-    if (!impl) {
-        return NULL;
-    }
-
-    /* Store current device configuration */
-    impl->current_config = config;
-
-    return &impl->tx_rx_sync;
+NX_WEAK nx_status_t stm32_spi_board_select(stm32_spi_impl_t* bus, uint8_t cs,
+                                           bool active) {
+    (void)bus; (void)cs; (void)active;
+    return NX_ERR_NOT_SUPPORTED;
 }
-
-/**
- * \brief           Get lifecycle interface
- */
-static nx_lifecycle_t* spi_get_lifecycle(nx_spi_bus_t* self) {
-    stm32_spi_impl_t* impl = spi_get_impl(self);
-    return impl ? &impl->lifecycle : NULL;
+NX_WEAK uint32_t stm32_spi_board_clock_hz(stm32_spi_impl_t* bus) {
+    (void)bus;
+    return 0;
 }
-
-/**
- * \brief           Get power interface
- */
-static nx_power_t* spi_get_power(nx_spi_bus_t* self) {
-    stm32_spi_impl_t* impl = spi_get_impl(self);
-    return impl ? &impl->power : NULL;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Instance Initialization                                                   */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Initialize SPI instance with platform configuration
- */
-static void spi_init_instance(stm32_spi_impl_t* impl, uint8_t index,
-                              const stm32_spi_platform_config_t* platform_cfg) {
-    /* Initialize base interface using NX_INIT_SPI_BUS macro */
-    NX_INIT_SPI_BUS(&impl->base, spi_get_tx_async_handle,
-                    spi_get_tx_rx_async_handle, spi_get_tx_sync_handle,
-                    spi_get_tx_rx_sync_handle, spi_get_lifecycle,
-                    spi_get_power);
-
-    /* Initialize interfaces (implemented in separate files) */
-    spi_init_tx_async(&impl->tx_async);
-    spi_init_tx_rx_async(&impl->tx_rx_async);
-    spi_init_tx_sync(&impl->tx_sync);
-    spi_init_tx_rx_sync(&impl->tx_rx_sync);
-    spi_init_lifecycle(&impl->lifecycle);
-    spi_init_power(&impl->power);
-
-    /* Allocate and initialize state */
-    impl->state = (stm32_spi_state_t*)nx_mem_alloc(sizeof(stm32_spi_state_t));
-    if (!impl->state) {
-        return;
-    }
-    memset(impl->state, 0, sizeof(stm32_spi_state_t));
-
-    impl->state->instance = index;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    /* Configure ST HAL SPI handle */
-    impl->hspi.Instance = platform_cfg->spi_base;
-    impl->hspi.Init.Mode = platform_cfg->mode;
-    impl->hspi.Init.Direction = platform_cfg->direction;
-    impl->hspi.Init.DataSize = platform_cfg->data_size;
-    impl->hspi.Init.CLKPolarity = platform_cfg->clk_polarity;
-    impl->hspi.Init.CLKPhase = platform_cfg->clk_phase;
-    impl->hspi.Init.NSS = platform_cfg->nss;
-    impl->hspi.Init.BaudRatePrescaler = platform_cfg->baud_prescaler;
-    impl->hspi.Init.FirstBit = platform_cfg->first_bit;
-    impl->hspi.Init.TIMode = platform_cfg->ti_mode;
-    impl->hspi.Init.CRCCalculation = platform_cfg->crc_calculation;
-    impl->hspi.Init.CRCPolynomial = platform_cfg->crc_polynomial;
-
-
-    /* Initialize DMA configuration */
-    memset(&impl->dma, 0, sizeof(stm32_spi_dma_t));
-    impl->dma.dma_tx_enabled = platform_cfg->use_dma;
-    impl->dma.dma_rx_enabled = platform_cfg->use_dma;
-
-#ifdef NX_CONFIG_STM32_SPI_USE_OSAL
-    /* OSAL objects will be created in lifecycle_init */
-    impl->mutex = NULL;
-    impl->dma_sem = NULL;
+NX_WEAK void stm32_spi_board_release(stm32_spi_impl_t* bus) { (void)bus; }
+NX_WEAK bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length,
+                                              bool write) {
+#if defined(STM32F407xx)
+    uintptr_t begin = (uintptr_t)data;
+    if (!length || length > UINTPTR_MAX - begin) return false;
+    uintptr_t end = begin + length;
+    /* F407VG: 128 KiB SRAM on AHB; 64 KiB CCM is NOT DMA-accessible. */
+    if (begin >= 0x20000000U && end <= 0x20020000U) return true;
+    return !write && begin >= 0x08000000U && end <= 0x08100000U;
+#else
+    (void)data; (void)length; (void)write;
+    return false; /* Require an explicit memory map for another device. */
 #endif
 }
 
-/*---------------------------------------------------------------------------*/
-/* Device Registration                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- */
-NX_UNUSED static void* stm32_spi_device_init(const nx_device_t* dev) {
-    const stm32_spi_platform_config_t* config =
-        (const stm32_spi_platform_config_t*)dev->config;
-
-    if (config == NULL) {
-        return NULL;
-    }
-
-    /* Allocate implementation structure */
-    stm32_spi_impl_t* impl =
-        (stm32_spi_impl_t*)nx_mem_alloc(sizeof(stm32_spi_impl_t));
-    if (!impl) {
-        return NULL;
-    }
-    memset(impl, 0, sizeof(stm32_spi_impl_t));
-
-    /* Initialize instance with platform configuration */
-    spi_init_instance(impl, config->spi_index, config);
-
-    /* Check if state allocation succeeded */
-    if (!impl->state) {
-        nx_mem_free(impl);
-        return NULL;
-    }
-
-    /* Store device reference */
-    impl->device = (nx_device_t*)dev;
-
-    /* Device is created but not initialized - user will call lifecycle init()
-     */
-    return &impl->base;
-}
-
-/**
- * \brief           Configuration macro - reads from Kconfig
- */
-#define STM32_SPI_CONFIG(index)                                                \
-    static const stm32_spi_platform_config_t spi_config_##index = {            \
-        .spi_index = index,                                                    \
-        .spi_base = SPI##index,                                                \
-        .mode = SPI_MODE_MASTER,                                               \
-        .direction = SPI_DIRECTION_2LINES,                                     \
-        .data_size = SPI_DATASIZE_8BIT,                                        \
-        .clk_polarity = SPI_POLARITY_LOW,                                      \
-        .clk_phase = SPI_PHASE_1EDGE,                                          \
-        .nss = SPI_NSS_SOFT,                                                   \
-        .baud_prescaler = SPI_BAUDRATEPRESCALER_16,                            \
-        .first_bit = SPI_FIRSTBIT_MSB,                                         \
-        .ti_mode = SPI_TIMODE_DISABLE,                                         \
-        .crc_calculation = SPI_CRCCALCULATION_DISABLE,                         \
-        .crc_polynomial = 7,                                                   \
-        .use_osal = false,                                                     \
-        .use_dma = false,                                                      \
-    }
-
-/**
- * \brief           Device registration macro
- */
-#define STM32_SPI_DEVICE_REGISTER(index)                                       \
-    STM32_SPI_CONFIG(index);                                                   \
-    static nx_device_config_state_t spi_kconfig_state_##index = {              \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-    };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "SPI" #index, &spi_config_##index,  \
-                       &spi_kconfig_state_##index, stm32_spi_device_init);
-
-/**
- * \brief           Register all enabled SPI instances
- */
-NX_TRAVERSE_EACH_INSTANCE(STM32_SPI_DEVICE_REGISTER, DEVICE_TYPE)
+/* SPI instances are bounded static objects. STM32 uses SPI1..SPI6, not SPI0. */
+#define REGISTER_SPI(index)                                                    \
+    static stm32_spi_impl_t spi_bus_##index;                                   \
+    static const stm32_spi_platform_config_t spi_cfg_##index = {               \
+        .spi_base = SPI##index, .spi_index = index, .mode = SPI_MODE_MASTER,    \
+        .direction = SPI_DIRECTION_2LINES, .data_size = SPI_DATASIZE_8BIT,     \
+        .clk_polarity = SPI_POLARITY_LOW, .clk_phase = SPI_PHASE_1EDGE,         \
+        .nss = SPI_NSS_SOFT, .baud_prescaler = SPI_BAUDRATEPRESCALER_16,       \
+        .first_bit = SPI_FIRSTBIT_MSB, .ti_mode = SPI_TIMODE_DISABLE,           \
+        .crc_calculation = SPI_CRCCALCULATION_DISABLE, .crc_polynomial = 7,    \
+        .use_dma = SPI_DMA_ENABLED,                                           \
+    };                                                                        \
+    static void* spi_create_##index(const nx_device_t* dev) {                  \
+        stm32_spi_construct(&spi_bus_##index, dev->config);                    \
+        return &spi_bus_##index.base;                                         \
+    }                                                                         \
+    static nx_device_config_state_t spi_reg_##index;                           \
+    NX_DEVICE_REGISTER(NX_SPI, index, "SPI" #index, &spi_cfg_##index,         \
+                        &spi_reg_##index, spi_create_##index)
+#ifdef NX_CONFIG_STM32_SPI_USE_DMA
+#define SPI_DMA_ENABLED true
+#else
+#define SPI_DMA_ENABLED false
+#endif
+#if defined(NX_CONFIG_STM32_SPI0_ENABLE)
+#error "STM32 SPI0 does not exist; select SPI1, SPI2 or SPI3"
+#endif
+#if defined(NX_CONFIG_STM32_SPI1_ENABLE)
+REGISTER_SPI(1);
+#endif
+#if defined(NX_CONFIG_STM32_SPI2_ENABLE)
+REGISTER_SPI(2);
+#endif
+#if defined(NX_CONFIG_STM32_SPI3_ENABLE)
+REGISTER_SPI(3);
+#endif
+#if defined(NX_CONFIG_STM32_SPI4_ENABLE)
+REGISTER_SPI(4);
+#endif
+#if defined(NX_CONFIG_STM32_SPI5_ENABLE)
+REGISTER_SPI(5);
+#endif
+#if defined(NX_CONFIG_STM32_SPI6_ENABLE)
+REGISTER_SPI(6);
+#endif

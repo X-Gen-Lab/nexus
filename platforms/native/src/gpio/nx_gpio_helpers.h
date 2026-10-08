@@ -51,8 +51,10 @@ extern "C" {
  * \return          Implementation pointer or NULL
  * \note            Optimized as inline for performance
  */
-static inline nx_gpio_read_impl_t* gpio_read_get_impl(nx_gpio_read_t* self) {
-    return self ? (nx_gpio_read_impl_t*)self : NULL;
+static inline nx_gpio_read_write_impl_t*
+gpio_read_get_impl(nx_gpio_read_t* self) {
+    return self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, base.read)
+                : NULL;
 }
 
 /**
@@ -61,8 +63,10 @@ static inline nx_gpio_read_impl_t* gpio_read_get_impl(nx_gpio_read_t* self) {
  * \return          Implementation pointer or NULL
  * \note            Optimized as inline for performance
  */
-static inline nx_gpio_write_impl_t* gpio_write_get_impl(nx_gpio_write_t* self) {
-    return self ? (nx_gpio_write_impl_t*)self : NULL;
+static inline nx_gpio_read_write_impl_t*
+gpio_write_get_impl(nx_gpio_write_t* self) {
+    return self ? NX_CONTAINER_OF(self, nx_gpio_read_write_impl_t, base.write)
+                : NULL;
 }
 
 /**

@@ -97,7 +97,18 @@ typedef struct nx_uart_config_s {
  *
  * Contains runtime state and statistics.
  */
+typedef struct nx_uart_stats_s {
+    uint32_t tx_count;
+    uint32_t rx_count;
+    uint32_t tx_errors;
+    uint32_t rx_errors;
+    uint32_t overrun_errors;
+    uint32_t framing_errors;
+} nx_uart_stats_t;
+
 typedef struct nx_uart_state_s {
+    nx_uart_stats_t stats;
+    bool rx_busy;
     uint8_t index;           /**< Instance index */
     nx_uart_config_t config; /**< Configuration */
     nx_uart_buffer_t tx_buf; /**< TX buffer */

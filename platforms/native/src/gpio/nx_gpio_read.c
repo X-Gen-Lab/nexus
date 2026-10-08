@@ -23,7 +23,7 @@
  * \brief           Read GPIO pin state
  */
 static uint8_t gpio_read(nx_gpio_read_t* self) {
-    nx_gpio_read_impl_t* impl = gpio_read_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_read_get_impl(self);
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -31,7 +31,7 @@ static uint8_t gpio_read(nx_gpio_read_t* self) {
     }
 
     /* Check initialization */
-    if (!impl->state->initialized) {
+    if (!impl->state->initialized || impl->state->suspended) {
         return 0;
     }
 
@@ -49,7 +49,7 @@ static nx_status_t gpio_register_exti(nx_gpio_read_t* self,
                                       nx_gpio_callback_t callback,
                                       void* user_data,
                                       nx_gpio_trigger_t trigger) {
-    nx_gpio_read_impl_t* impl = gpio_read_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_read_get_impl(self);
 
     /* Parameter check */
     if (!impl || !impl->state) {
@@ -57,8 +57,13 @@ static nx_status_t gpio_register_exti(nx_gpio_read_t* self,
     }
 
     /* Check initialization */
-    if (!impl->state->initialized) {
+    if (!impl->state->initialized || impl->state->suspended) {
         return NX_ERR_NOT_INIT;
+    }
+
+    if (trigger != NX_GPIO_TRIGGER_RISING &&
+        trigger != NX_GPIO_TRIGGER_FALLING && trigger != NX_GPIO_TRIGGER_BOTH) {
+        return NX_ERR_INVALID_PARAM;
     }
 
     /* Register callback */
@@ -74,7 +79,7 @@ static nx_status_t gpio_register_exti(nx_gpio_read_t* self,
  * \brief           Get lifecycle interface
  */
 static nx_lifecycle_t* gpio_read_get_lifecycle(nx_gpio_read_t* self) {
-    nx_gpio_read_impl_t* impl = gpio_read_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_read_get_impl(self);
     return impl ? &impl->lifecycle : NULL;
 }
 
@@ -82,7 +87,7 @@ static nx_lifecycle_t* gpio_read_get_lifecycle(nx_gpio_read_t* self) {
  * \brief           Get power interface
  */
 static nx_power_t* gpio_read_get_power(nx_gpio_read_t* self) {
-    nx_gpio_read_impl_t* impl = gpio_read_get_impl(self);
+    nx_gpio_read_write_impl_t* impl = gpio_read_get_impl(self);
     return impl ? &impl->power : NULL;
 }
 

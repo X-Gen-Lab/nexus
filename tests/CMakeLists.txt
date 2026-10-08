@@ -16,28 +16,24 @@ enable_testing()
 # Google Test Setup
 #-----------------------------------------------------------------------------
 
-include(FetchContent)
-
-# Declare Google Test dependency
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        v1.14.0
-    GIT_SHALLOW    TRUE
-)
-
-# Configure Google Test options
-set(gtest_force_shared_crt ON CACHE BOOL "Force shared CRT for MSVC" FORCE)
-set(BUILD_GMOCK ON CACHE BOOL "Build GMock" FORCE)
-set(INSTALL_GTEST OFF CACHE BOOL "Disable GTest installation" FORCE)
-
-# Make Google Test available
-FetchContent_MakeAvailable(googletest)
+# Use the exact repository-pinned dependency. Configuration performs no downloads.
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/ext/googletest/googletest/src/gtest-all.cc")
+    message(FATAL_ERROR "Initialize ext/googletest with git submodule update --init")
+endif()
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+# The pinned dependency declares CMake 2.8 compatibility. CMake 4 removed it.
+# Limit the compatibility floor to this known legacy dependency subtree.
+set(_saved_policy_minimum "${CMAKE_POLICY_VERSION_MINIMUM}")
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+add_subdirectory("${CMAKE_SOURCE_DIR}/ext/googletest" "${CMAKE_BINARY_DIR}/ext/googletest")
+set(CMAKE_POLICY_VERSION_MINIMUM "${_saved_policy_minimum}")
 
 # Include Google Test module for test discovery
 include(GoogleTest)
 
-message(STATUS "Google Test: v1.14.0")
+message(STATUS "Google Test: pinned submodule")
 
 #-----------------------------------------------------------------------------
 # Common Test Configuration
@@ -60,7 +56,7 @@ set(NEXUS_TEST_INCLUDES
     ${CMAKE_SOURCE_DIR}/framework/shell/include
     ${CMAKE_SOURCE_DIR}/framework/config/include
     ${CMAKE_SOURCE_DIR}/framework/init/include
-    ${CMAKE_SOURCE_DIR}
+    ${NEXUS_CONFIG_DIR}
 )
 
 # Common link libraries for all tests
@@ -103,6 +99,13 @@ function(nexus_discover_tests TARGET)
     set(multiValueArgs PROPERTIES LABELS)
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    # LABELS is parsed separately even when callers place it after PROPERTIES.
+    # Preserve the list as one property value rather than silently dropping it.
+    if(ARG_LABELS)
+        string(REPLACE ";" "\\;" _labels "${ARG_LABELS}")
+        list(APPEND ARG_PROPERTIES LABELS "${_labels}")
+    endif()
+
     # Use PRE_TEST mode for Visual Studio to avoid path issues
     # Use POST_BUILD for other generators for better performance
     if(CMAKE_GENERATOR MATCHES "Visual Studio")
@@ -142,6 +145,9 @@ add_subdirectory(integration)
 
 # Platform tests
 add_subdirectory(platform)
+add_subdirectory(storage_security)
+add_subdirectory(drivers)
+add_subdirectory(industrial)
 
 # Build system tests
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/build_system)
@@ -177,7 +183,7 @@ set(CTEST_OUTPUT_ON_FAILURE ON CACHE BOOL "Show test output on failure")
 
 message(STATUS "")
 message(STATUS "=== Nexus Test Configuration ===")
-message(STATUS "  Google Test:    v1.14.0")
+message(STATUS "  Google Test:    pinned submodule")
 message(STATUS "  Parallel level: ${CTEST_PARALLEL_LEVEL}")
 message(STATUS "  Test timeout:   ${CTEST_TEST_TIMEOUT}s")
 message(STATUS "  Output on fail: ${CTEST_OUTPUT_ON_FAILURE}")
@@ -187,3 +193,33 @@ message(STATUS "")
 #-----------------------------------------------------------------------------
 # End of Nexus Test Framework
 #-----------------------------------------------------------------------------
+
+# Run real configuration generation and CMake consumer regressions.
+add_test(NAME effective_configuration
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/kconfig/test_effective_config.py")
+set_tests_properties(effective_configuration PROPERTIES LABELS "build;configuration" TIMEOUT 60)
+
+if(TARGET blinky)
+    # Execute the real application and production factory, without fixture setup.
+    add_test(NAME native_blinky_smoke COMMAND blinky --cycles 3)
+    set_tests_properties(native_blinky_smoke PROPERTIES LABELS "application;native;contract" TIMEOUT 10)
+endif()
+
+if(TARGET nexus_industrial_controller)
+    add_test(NAME native_industrial_controller_smoke COMMAND nexus_industrial_controller)
+    set_tests_properties(native_industrial_controller_smoke PROPERTIES LABELS "application;industrial;native;contract" TIMEOUT 10)
+endif()
+
+if(TARGET config_demo)
+    add_test(NAME native_config_demo_smoke COMMAND config_demo)
+    set_tests_properties(native_config_demo_smoke PROPERTIES LABELS "application;configuration;native;contract" TIMEOUT 10)
+endif()
+if(TARGET shell_demo)
+    add_test(NAME native_shell_demo_smoke COMMAND shell_demo --smoke)
+    set_tests_properties(native_shell_demo_smoke PROPERTIES LABELS "application;shell;native;contract" TIMEOUT 10)
+endif()
+
+if(TARGET freertos_demo)
+    add_test(NAME native_freertos_demo_smoke COMMAND freertos_demo --run-ms 500)
+    set_tests_properties(native_freertos_demo_smoke PROPERTIES LABELS "application;osal;native;contract" TIMEOUT 10)
+endif()
