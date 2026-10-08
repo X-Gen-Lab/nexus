@@ -10,6 +10,7 @@ owned buffers, callback arguments or backend contexts.
 | Area | Implemented contract |
 | --- | --- |
 | Critical sections | Cortex-M HAL saves/restores PRIMASK using architecture selection; Native OSAL uses a recursive thread lock. Nesting preserves the initial state. Allocation, sleep and blocking calls are forbidden inside critical regions. |
+| Power manager | Static interface initialization; NULL/foreign instances fail explicitly, invalid queries return `NX_POWER_UNKNOWN`, and unimplemented SLEEP/STOP return NOT_SUPPORTED without claiming a hardware transition. |
 | HAL atomic access | HAL atomic operations serialize the complete access using the architecture primitive. Ordinary/volatile field access does not implement synchronization. |
 | Devices | Static device descriptors are initialized once under a protected state transition. Concurrent initialization returns NULL for retry. Vendor initialization executes outside the common lock. ISR initialization is rejected. GPIO factories resolve dedicated read/write descriptors first, then the capabilities of a combined GPIO device. |
 | Handles | Native, FreeRTOS and baremetal use type-tagged opaque lifetime tokens. Validation does not dereference user handles. A stale token cannot identify a reused slot. Token exhaustion fails rather than wrapping. |
@@ -116,13 +117,13 @@ The real Native CMake build ran these contracts with assertions enabled:
 
 | Executable | Executed cases | Evidence |
 | --- | --- | --- |
-| `osal_contract_tests` | 13 groups | Eight-thread critical/atomic/pool contention; once-only device init; 1,000 stale generations; cancelled blocked queue/sem/event users; fixed deadlines; cooperative task/timer ownership; event barriers; overflow/alignment; zero live OSAL objects. |
+| `osal_contract_tests` | 14 groups | Eight-thread critical/atomic/pool contention; once-only device init; 1,000 stale generations; cancelled blocked queue/sem/event users; fixed deadlines; cooperative task/timer ownership; event barriers; overflow/alignment; invalid power-manager instances and unsupported mode preservation; zero live OSAL objects. |
 | `baremetal_contract_tests` | 7 groups | Saved interrupt-mask model; absent-clock failure; tick wrap; injected ISR boundary; stale handles; bounded queues/events; unsupported capabilities; zero live objects. |
 | `freertos_contract_tests` | 10 groups | Pinned real kernel/POSIX port; waiter pins; positive sub-tick round-up at 100 Hz; daemon settlement; size-aware realloc; event barrier; 30 concurrent timer-delete/retry lifetimes with new-slot isolation and actual heap restoration after idle. Natural process exit is required. |
 | `posix_event_contract_tests` | 5 groups | Local host-port helper regression includes cancellation/unlock and timed-wait behavior; see `freertos-posix-host-port.md`. |
 | `log_contract_tests` | 8 groups | Immediate-stop drain; blocked callbacks/flush; bounded BUSY ownership; callback reentry; concurrent producers/shutdown/ring reads; oversized metadata; backend cleanup failures/retry; late reply after flush timeout; no live objects/allocations. |
 
-The final complete Native build passed **1,696/1,696 CTest entries** in 49.93
+The initial integrated Native build passed **1,696/1,696 CTest entries** in 49.93
 seconds, including **271 OSAL** and **137 log** entries (136 existing log tests
 and one eight-group executable). Existing task tests were migrated to cooperative
 cleanup. The final run includes the unified logger-flush deadline patch. Host latency measurements remain benchmark output; deterministic
@@ -153,3 +154,27 @@ These host/kernel/model results are not STM32/GD32 HIL evidence. This change doe
 not claim measured MCU interrupt latency, board stack watermarks, brownout
 behavior, safe-output fault recovery, DMA/electrical correctness or hardware
 worst-case execution time. Those require the supported board/profile evidence.
+
+## Online CI follow-up
+
+The subsequent online ARM GCC 13.2.1 build exposed a `taskYIELD()` macro shape
+that the POSIX port did not expose: a bare single-line if/else produced a dangling
+else after the ARM macro expansion. `osal_task_delay` now brackets both branches;
+the real kernel contract also executes its zero-delay yield branch.
+
+Cppcheck 2.13 reported two nullable `NX_CONTAINER_OF` paths in the old common
+power manager. Assertions were not a runtime NULL guard. The manager now uses
+static interface initialization and validates the singleton instance before
+access. Invalid queries return `NX_POWER_UNKNOWN`; unsupported hardware power
+transitions fail without changing the reported RUN mode. This also removes the
+unsynchronized first-use interface writes and the status-only simulated sleep.
+
+The existing Native/HAL contract executable now executes 14 groups. The updated
+Native/HAL and real FreeRTOS kernel executables both passed (2/2 CTest entries,
+0.49 seconds), and the updated 14-group Native/HAL executable passed ASan/UBSan
+with leak checking disabled (1/1, 0.40 seconds). Evidence:
+`/tmp/nexus-online-core-fix-tests.log` and
+`/tmp/nexus-online-core-fix-asan-tests.log`. These are targeted follow-up runs;
+they do not restate the earlier complete repository run as execution of the
+follow-up source. Online ARM/static-analysis revalidation is recorded separately
+when the next CI run actually completes.

@@ -118,7 +118,11 @@ osal_status_t osal_task_resume(osal_task_handle_t handle) {
 osal_status_t osal_task_delay(uint32_t ms) {
     RTOS_TASK_ONLY();
     if (osal_task_should_stop()) return OSAL_ERROR_CANCELLED;
-    if (!ms) taskYIELD(); else vTaskDelay(rtos_ticks(ms));
+    if (!ms) {
+        taskYIELD();
+    } else {
+        vTaskDelay(rtos_ticks(ms));
+    }
     return osal_task_should_stop() ? OSAL_ERROR_CANCELLED : OSAL_OK;
 }
 osal_status_t osal_task_yield(void) {

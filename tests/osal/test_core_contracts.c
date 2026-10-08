@@ -5,6 +5,7 @@
 #include "hal/system/nx_mutex.h"
 #include "hal/system/nx_mem.h"
 #include "hal/base/nx_device.h"
+#include "hal/system/nx_power_manager.h"
 #endif
 #include <assert.h>
 #include <pthread.h>
@@ -129,6 +130,24 @@ static void test_device_initialization_race(void) {
     for(unsigned i=0;i<8;++i) assert(pthread_create(&threads[i],NULL,device_worker,NULL)==0);
     for(unsigned i=0;i<8;++i) assert(pthread_join(threads[i],NULL)==0);
     assert(atomic_load(&device_init_count)==1);
+}
+static void test_power_manager_capability_and_invalid_instances(void) {
+    nx_power_manager_t* manager = nx_get_power_manager();
+    assert(manager && manager->enter_mode && manager->get_mode);
+    assert(nx_get_power_manager() == manager);
+    assert(manager->enter_mode(NULL, NX_POWER_RUN) == NX_ERR_NULL_PTR);
+    assert(manager->get_mode(NULL) == NX_POWER_UNKNOWN);
+    nx_power_manager_t foreign = *manager;
+    assert(manager->enter_mode(&foreign, NX_POWER_RUN) == NX_ERR_INVALID_PARAM);
+    assert(manager->get_mode(&foreign) == NX_POWER_UNKNOWN);
+    assert(manager->enter_mode(manager, (nx_power_mode_t)-1) == NX_ERR_INVALID_PARAM);
+    assert(manager->enter_mode(manager, NX_POWER_UNKNOWN) == NX_ERR_INVALID_PARAM);
+    assert(manager->get_mode(manager) == NX_POWER_RUN);
+    assert(manager->enter_mode(manager, NX_POWER_RUN) == NX_OK);
+    assert(manager->enter_mode(manager, NX_POWER_SLEEP) == NX_ERR_NOT_SUPPORTED);
+    assert(manager->get_mode(manager) == NX_POWER_RUN);
+    assert(manager->enter_mode(manager, NX_POWER_STOP) == NX_ERR_NOT_SUPPORTED);
+    assert(manager->get_mode(manager) == NX_POWER_RUN);
 }
 #endif
 static void test_generation_and_validation(void) {
@@ -372,6 +391,7 @@ unsigned groups = 0;
     RUN(test_hal_atomic);
     RUN(test_hal_memory_pool);
     RUN(test_device_initialization_race);
+    RUN(test_power_manager_capability_and_invalid_instances);
 #endif
     RUN(test_generation_and_validation);
     RUN(test_delete_cancels_and_reuse);

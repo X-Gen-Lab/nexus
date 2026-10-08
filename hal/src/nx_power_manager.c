@@ -1,99 +1,38 @@
 /**
  * \file            nx_power_manager.c
- * \brief           System power manager implementation
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-01-17
- *
+ * \brief           Common system power manager capability boundary
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-
 #include "hal/system/nx_power_manager.h"
-#include "hal/nx_status.h"
-#include "hal/nx_types.h"
-
-/*---------------------------------------------------------------------------*/
-/* Private Types                                                             */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Power manager implementation structure
- */
-typedef struct {
-    nx_power_manager_t base;      /**< Base interface (must be first) */
-    nx_power_mode_t current_mode; /**< Current power mode */
-} nx_power_manager_impl_t;
-
-/*---------------------------------------------------------------------------*/
-/* Private Variables                                                         */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Global power manager instance
- */
-static nx_power_manager_impl_t g_power_manager = {
-    .current_mode = NX_POWER_RUN,
-};
-
-/*---------------------------------------------------------------------------*/
-/* Private Function Prototypes                                               */
-/*---------------------------------------------------------------------------*/
+#include "osal/osal.h"
 
 static nx_status_t power_manager_enter_mode(nx_power_manager_t* self,
                                             nx_power_mode_t mode);
 static nx_power_mode_t power_manager_get_mode(nx_power_manager_t* self);
 
-/*---------------------------------------------------------------------------*/
-/* Public Functions                                                          */
-/*---------------------------------------------------------------------------*/
+/* Static initialization avoids concurrent first-use writes to the interface. */
+static nx_power_manager_t g_power_manager = {
+    .enter_mode = power_manager_enter_mode,
+    .get_mode = power_manager_get_mode,
+};
 
-/**
- * \brief           Get power manager instance
- */
 nx_power_manager_t* nx_get_power_manager(void) {
-    /* Initialize function pointers if not already done */
-    if (g_power_manager.base.enter_mode == NULL) {
-        g_power_manager.base.enter_mode = power_manager_enter_mode;
-        g_power_manager.base.get_mode = power_manager_get_mode;
-    }
-    return &g_power_manager.base;
+    return &g_power_manager;
 }
 
-/*---------------------------------------------------------------------------*/
-/* Private Functions                                                         */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Enter specified power mode
- */
 static nx_status_t power_manager_enter_mode(nx_power_manager_t* self,
                                             nx_power_mode_t mode) {
-    NX_ASSERT(self != NULL);
-
-    nx_power_manager_impl_t* impl =
-        NX_CONTAINER_OF(self, nx_power_manager_impl_t, base);
-
-    /* Validate power mode */
-    if (mode > NX_POWER_STOP) {
+    if (!self) return NX_ERR_NULL_PTR;
+    if (self != &g_power_manager) return NX_ERR_INVALID_PARAM;
+    if (mode != NX_POWER_RUN && mode != NX_POWER_SLEEP && mode != NX_POWER_STOP)
         return NX_ERR_INVALID_PARAM;
-    }
-
-    /* Update current mode */
-    impl->current_mode = mode;
-
-    /* Platform-specific power mode transition would go here */
-    /* For now, this is a simplified implementation that just tracks the mode */
-
-    return NX_OK;
+    if (osal_is_isr()) return NX_ERR_INVALID_STATE;
+    /* This layer has no board-specific clock/wakeup transition. A status-only
+     * mode change must never be mistaken for entering a hardware power mode. */
+    return mode == NX_POWER_RUN ? NX_OK : NX_ERR_NOT_SUPPORTED;
 }
 
-/**
- * \brief           Get current power mode
- */
 static nx_power_mode_t power_manager_get_mode(nx_power_manager_t* self) {
-    NX_ASSERT(self != NULL);
-
-    nx_power_manager_impl_t* impl =
-        NX_CONTAINER_OF(self, nx_power_manager_impl_t, base);
-    return impl->current_mode;
+    if (!self || self != &g_power_manager) return NX_POWER_UNKNOWN;
+    return NX_POWER_RUN;
 }

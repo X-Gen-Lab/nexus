@@ -152,6 +152,7 @@ static void test_entry(void* arg) {
     assert(osal_mutex_delete(mutex) == OSAL_OK);
     puts("FreeRTOS bounded queue and recursive mutex passed");
     osal_sem_handle_t empty;
+    assert(osal_task_delay(0) == OSAL_OK);
     assert(osal_sem_create(0, 1, &empty) == OSAL_OK);
     TickType_t before = xTaskGetTickCount();
     assert(osal_sem_take(empty, 1) == OSAL_ERROR_TIMEOUT);
