@@ -475,6 +475,73 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(release.ReleaseError, "outside"):
             self.package()
 
+    def test_production_namespace_uses_only_first_component_below_recorded_root(self):
+        root = Path("/not-present/osal/nexus")
+        generated = root / "build/generated"
+        commands = [{"file": str(root / "hal/device.c"), "arguments": ["gcc", f"-I{generated}", "-c"]}]
+        # The ancestor root itself also contains 'osal'. No substring can
+        # establish component ownership relative to that root.
+        commands.extend({"file": str(root / path), "arguments": ["gcc", "-c"]} for path in
+                        ("tests/osal/freertos_runtime/wait_for_event.c", "tests/hal/model.c",
+                         "ext/vendor/services/library.c", "build/generated/products/model.c"))
+        release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset],
+                                          generated, root, require_local_sources=False)
+
+    def test_nested_owned_names_cannot_supply_a_production_command(self):
+        root = Path("/not-present/hal/nexus")
+        generated = root / "build/generated"
+        for path in ("tests/osal/freertos_runtime/wait_for_event.c", "tests/arch/model.c",
+                     "ext/vendor/hal/driver.c", "build/products/fake.c", "fake.c"):
+            command = {"file": str(root / path), "arguments": ["gcc", f"-I{generated}", "-c"]}
+            with self.subTest(path=path), self.assertRaisesRegex(release.ReleaseError, "no Nexus production"):
+                release.validate_compile_commands(json.dumps([command]), release.RELEASE_PROFILES[self.preset],
+                                                  generated, root, require_local_sources=False)
+
+    def test_owned_relative_compile_path_uses_recorded_command_directory(self):
+        directory = self.source / "hal"
+        directory.mkdir(); (directory / "device.c").write_text("int fixture;\n")
+        generated = self.build / "generated"
+        command = {"file": "device.c", "directory": str(directory),
+                   "arguments": ["gcc", f"-I{generated}", "-c"]}
+        release.validate_compile_commands(json.dumps([command]), release.RELEASE_PROFILES[self.preset], generated, self.source)
+        for bad_directory in ("hal", str(self.source.parent / "other")):
+            command["directory"] = bad_directory
+            with self.subTest(directory=bad_directory), self.assertRaises(release.ReleaseError):
+                release.validate_compile_commands(json.dumps([command]), release.RELEASE_PROFILES[self.preset], generated, self.source)
+
+    def test_recorded_source_identity_and_owned_configuration_remain_required_offline(self):
+        root = Path("/not-present/nexus")
+        generated = root / "build/generated"
+        for directory in ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "arch", "products", "applications"):
+            commands = [{"file": str(root / directory / "source.c"), "arguments": ["gcc", "-c"]}]
+            with self.subTest(directory=directory), self.assertRaisesRegex(release.ReleaseError, "generated configuration"):
+                release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], generated, root,
+                                                  require_local_sources=False)
+        commands = [{"file": str(root / "hal/source.c"), "arguments": ["gcc", f"-I{generated}", "-c"]}]
+        for invalid_root in (None, Path("relative/root"), root / "../nexus"):
+            with self.subTest(root=invalid_root), self.assertRaises(release.ReleaseError):
+                release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], generated, invalid_root,
+                                                  require_local_sources=False)
+        commands.append({"file": "/outside/vendor.c", "arguments": ["gcc", "-c"]})
+        with self.assertRaisesRegex(release.ReleaseError, "outside"):
+            release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], generated, root,
+                                              require_local_sources=False)
+
+    def test_bundle_compile_identity_does_not_require_build_machine_source_on_verifier(self):
+        self.add_output(); archive = self.package()
+        foreign = self.source.parent / "not-present-build-machine/nexus"
+        self.assertFalse(foreign.exists())
+        prefix = self.artifact + "/"
+        with zipfile.ZipFile(archive) as bundle:
+            cache = bundle.read(prefix + "build/CMakeCache.txt").decode().replace(str(self.source), str(foreign))
+            commands = bundle.read(prefix + "build/compile_commands.json").decode().replace(str(self.source), str(foreign))
+            provenance = json.loads(bundle.read(prefix + "provenance.json"))
+        provenance["cmake"]["CMAKE_HOME_DIRECTORY"] = str(foreign)
+        self.rewrite_archive(archive, changes={prefix + "build/CMakeCache.txt": cache.encode(),
+                prefix + "build/compile_commands.json": commands.encode(),
+                prefix + "provenance.json": json.dumps(provenance).encode()}, refresh_manifests=True)
+        release.verify_bundle(archive, self.artifact, self.preset, "v1.2.3", self.commit)
+
     def test_path_traversal_and_outside_config_are_rejected(self):
         self.add_output()
         with self.assertRaises(release.ReleaseError):
@@ -960,6 +1027,41 @@ class ReleaseTests(unittest.TestCase):
         self.add_output()
         with self.assertRaisesRegex(release.ReleaseError, "Unsupported"):
             self.package(preset="stm32-unknown-armgcc-release", artifact="nexus-unknown")
+
+
+@unittest.skipUnless(os.environ.get("NEXUS_RELEASE_TEST_BUILD"),
+                     "actual compile database requires NEXUS_RELEASE_TEST_BUILD")
+class ActualReleaseCompileDatabaseTests(unittest.TestCase):
+    """Read a real maintained build; no toy report substitutes for its commands."""
+
+    def test_actual_effective_build_and_compile_database(self):
+        build = Path(os.environ["NEXUS_RELEASE_TEST_BUILD"]).resolve()
+        preset = os.environ.get("NEXUS_RELEASE_TEST_PRESET", "linux-gcc-release")
+        profile = release.RELEASE_PROFILES[preset]
+        cache = release.cmake_cache(build / "CMakeCache.txt")
+        contents = {name: (build / "generated" / name).read_text() for name in release.CONFIGURATION_FILES}
+        config = release.validate_configuration_bundle(contents)
+        release.validate_effective_build(cache, profile, "Release", config)
+        commands = (build / "compile_commands.json").read_text()
+        generated = build / "generated"
+        release.validate_compile_commands(commands, profile, generated, Path(cache["CMAKE_HOME_DIRECTORY"]))
+        if profile["platform"] == "native":
+            nested_kernel = [entry for entry in json.loads(commands)
+                             if entry["file"].endswith("/tests/osal/freertos_runtime/wait_for_event.c")]
+            self.assertGreater(len(nested_kernel), 0)
+            without_generated = 0
+            for entry in nested_kernel:
+                arguments = entry.get("arguments")
+                if arguments is None:
+                    import shlex
+                    arguments = shlex.split(entry["command"])
+                without_generated += f"-I{generated}" not in arguments
+            self.assertGreater(without_generated, 0)
+        else:
+            images = [(file.name, file.read_bytes()) for file in sorted((build / "bin").glob("*.elf"))]
+            result = release.validate_arm_artifacts(config, contents["effective.config"].encode(), images)
+            self.assertGreater(len(result["images"]), 0)
+            self.assertFalse(result["hardware_verified"])
 
 
 if __name__ == "__main__":

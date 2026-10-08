@@ -2,6 +2,7 @@
 #include "gd32f470_platform.h"
 #include <assert.h>
 #include <stdio.h>
+// NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production fault fixture; retain private factory/state checks.
 #include "../../../soc/gd32f470zg/interrupt.c"
 int main(void){
     int initialized=nx_gd32f470_timebase_init();

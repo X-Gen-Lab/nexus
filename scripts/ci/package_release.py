@@ -456,20 +456,40 @@ def validate_target_outputs(outputs, profile):
         raise ReleaseError("No target ELF reference application found under build bin")
 
 
-def validate_compile_commands(contents, profile, generated_directory=None, source=None):
+def validate_compile_commands(contents, profile, generated_directory=None, source=None,
+                              *, require_local_sources=True):
     commands = json.loads(contents)
     if not isinstance(commands, list) or not commands:
         raise ReleaseError("Compile command database is empty or invalid")
+    if source is None:
+        raise ReleaseError("Compile commands lack a recorded source root")
+    recorded_root = Path(str(source).replace("\\", "/"))
+    if not recorded_root.is_absolute() or ".." in recorded_root.parts:
+        raise ReleaseError("Compile commands contain an invalid recorded source root")
+    owned_directories = {"hal", "osal", "framework", "services", "platforms", "boards",
+                         "soc", "arch", "products", "applications"}
     production = []
     for entry in commands:
         if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
             raise ReleaseError("Compile command database contains an invalid entry")
-        filename = entry["file"].replace("\\", "/")
-        if not any(f"/{directory}/" in filename for directory in
-                   ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "arch", "products", "applications")):
+        filename = Path(entry["file"].replace("\\", "/"))
+        if not filename.is_absolute():
+            directory = entry.get("directory")
+            if not isinstance(directory, str) or not Path(directory).is_absolute():
+                raise ReleaseError("Relative compile source lacks an absolute command directory")
+            filename = Path(directory) / filename
+        if ".." in filename.parts:
+            raise ReleaseError("Compile source path traversal is not allowed")
+        try:
+            relative = filename.relative_to(recorded_root)
+        except ValueError as exc:
+            raise ReleaseError("Compile source is outside the recorded source tree") from exc
+        # The root's namespace owns a TU. A nested test/vendor path named osal,
+        # hal, etc. does not turn that file into a Nexus production component.
+        if len(relative.parts) < 2 or relative.parts[0] not in owned_directories:
             continue
-        if source is not None:
-            checked_path(filename, source)
+        if require_local_sources:
+            checked_path(filename, recorded_root)
         arguments = entry.get("arguments")
         if arguments is None and isinstance(entry.get("command"), str):
             arguments = shlex.split(entry["command"])
@@ -772,7 +792,8 @@ def verify_bundle(archive, artifact, preset, version, commit):
         validate_archive_path(effective_path)
         generated_directory = Path(packaged_cache["CMAKE_HOME_DIRECTORY"]) / Path(effective_path).parent
         validate_compile_commands(bundle.read(f"{artifact}/build/compile_commands.json").decode("utf-8"),
-                                  profile, generated_directory)
+                                  profile, generated_directory, Path(packaged_cache["CMAKE_HOME_DIRECTORY"]),
+                                  require_local_sources=False)
         if profile["platform"] == "native":
             validation = test_report(bundle.read(f"{artifact}/validation/ctest-results.xml"))
         else:

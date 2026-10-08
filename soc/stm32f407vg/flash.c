@@ -16,8 +16,8 @@
 #else
 #error "STM32F407 storage requires the exact xE or xG physical Flash size"
 #endif
-#define PARTITION_SIZE (256U * 1024U)
-#define SECTOR_SIZE (128U * 1024U)
+#define PARTITION_SIZE ((size_t)UINT32_C(0x40000))
+#define SECTOR_SIZE ((size_t)UINT32_C(0x20000))
 extern char __nexus_storage_start[] __attribute__((weak));
 extern char __nexus_storage_end[] __attribute__((weak));
 static volatile bool programming;

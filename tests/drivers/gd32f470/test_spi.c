@@ -3,6 +3,7 @@
 #include "gd32f470_platform.h"
 #include <assert.h>
 #include <stdio.h>
+// NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production fault fixture; retain private factory/state checks.
 #include "../../../platforms/gd32f470/src/spi.c"
 uint32_t nx_gd32f470_millis(void){return fake_millis;}
 uint64_t nx_gd32f470_timestamp_us(void){return (uint64_t)fake_millis*1000u;}
