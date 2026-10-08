@@ -1,0 +1,47 @@
+# Planning seed. Status is not an assertion of successful execution.
+schema_version: 1
+reviewed_commit: 7a203266082ad1f655b6686713b2b7950ba31ec6
+review_date: '2026-10-08'
+focus: industrial_control_and_connectivity
+team_size: approximately_10
+horizon_months: [3, 6]
+levels: [planned, experimental, validated, enterprise_supported, lts]
+profiles:
+  - id: native-contracts
+    architecture: host
+    board: not_applicable
+    osal: native
+    status: planned
+    evidence:
+      source_implementation: present
+      full_build: not_executed_in_this_review
+      contract_suite: pending_baseline
+      hardware: not_applicable
+    blockers: [BAS-002, HAL-002, OS-001]
+  - id: stm32-industrial-reference
+    soc: to_be_selected
+    board: to_be_selected
+    existing_soc_candidate: STM32F407
+    osal: [baremetal, freertos]
+    status: planned
+    evidence:
+      gpio_uart_spi_sources: present
+      full_build: pending
+      hardware: pending
+    blockers: [BSP-001, HAL-003, HAL-005, HIL-001]
+  - id: gd32-industrial-reference
+    soc: to_be_selected
+    board: to_be_selected
+    osal: [baremetal, freertos]
+    status: planned
+    evidence:
+      current_platform: configuration_placeholder
+      full_build: pending
+      hardware: pending
+    blockers: [BSP-001, BSP-003, BSP-004, HIL-001]
+promotion_requires:
+  - exact_soc_board_revision_osal_toolchain_and_effective_configuration
+  - linked_capabilities_with_executed_contract_and_hardware_reports
+  - measured_resource_and_deadline_budgets
+  - persistence_and_fault_recovery_evidence
+  - known_limits_owner_and_support_window

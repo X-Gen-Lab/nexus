@@ -15,7 +15,8 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "NEXUS_BUILD_TESTS": "ON",
                 "NEXUS_BUILD_EXAMPLES": "ON",
-                "NEXUS_PLATFORM": "native"
+                "NEXUS_PLATFORM": "native",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/platforms/native/defconfig"
             }
         },
         {
@@ -201,7 +202,8 @@
                 "NEXUS_BUILD_EXAMPLES": "ON",
                 "NEXUS_CPU_ARCH": "cortex-m4",
                 "NEXUS_FPU_TYPE": "fpv4-sp-d16",
-                "NEXUS_FLOAT_ABI": "hard"
+                "NEXUS_FLOAT_ABI": "hard",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/.config"
             }
         },
         {
@@ -233,7 +235,8 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "NEXUS_PLATFORM": "stm32",
                 "NEXUS_BUILD_TESTS": "OFF",
-                "NEXUS_BUILD_EXAMPLES": "ON"
+                "NEXUS_BUILD_EXAMPLES": "ON",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/.config"
             }
         },
         {
@@ -259,8 +262,8 @@
             "displayName": "Windows → STM32 ARM Clang Debug",
             "description": "Windows host, STM32 target with ARM Clang (armclang) - Debug",
             "inherits": [
-                "windows-base",
-                "stm32-armclang-debug"
+                "stm32-armclang-debug",
+                "windows-base"
             ],
             "condition": {
                 "type": "equals",
@@ -282,8 +285,8 @@
             "displayName": "Linux → STM32 ARM Clang Debug",
             "description": "Linux host, STM32 target with ARM Clang (armclang) - Debug",
             "inherits": [
-                "linux-base",
-                "stm32-armclang-debug"
+                "stm32-armclang-debug",
+                "linux-base"
             ],
             "condition": {
                 "type": "equals",
@@ -305,8 +308,8 @@
             "displayName": "Windows → STM32 ARM GCC Debug",
             "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
             "inherits": [
-                "windows-base",
-                "stm32-armgcc-debug"
+                "stm32-armgcc-debug",
+                "windows-base"
             ],
             "condition": {
                 "type": "equals",
@@ -328,8 +331,8 @@
             "displayName": "Linux → STM32 ARM GCC Debug",
             "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
             "inherits": [
-                "linux-base",
-                "stm32-armgcc-debug"
+                "stm32-armgcc-debug",
+                "linux-base"
             ],
             "condition": {
                 "type": "equals",

@@ -1,8 +1,8 @@
 # Nexus 嵌入式平台
 
-[![CI 状态](https://github.com/nexus-platform/nexus/workflows/CI/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![构建矩阵](https://github.com/nexus-platform/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![文档构建](https://github.com/nexus-platform/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![CI 状态](https://github.com/X-Gen-Lab/nexus/workflows/CI/badge.svg)](https://github.com/X-Gen-Lab/nexus/actions)
+[![构建矩阵](https://github.com/X-Gen-Lab/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/X-Gen-Lab/nexus/actions)
+[![文档构建](https://github.com/X-Gen-Lab/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/X-Gen-Lab/nexus/actions)
 [![codecov](https://codecov.io/gh/nexus-platform/nexus/branch/main/graph/badge.svg)](https://codecov.io/gh/nexus-platform/nexus)
 [![许可证: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![版本](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
@@ -13,16 +13,18 @@
 
 **Nexus** 是一个专业的嵌入式软件开发平台，专为构建可靠、安全、可移植的嵌入式应用而设计，支持多种 MCU 平台，具有完善的测试和文档体系。
 
+当前维护方向是工业控制与设备联网，约 10 人团队在 3–6 个月内建立 STM32/GD32 参考组合。架构、企业工作流、支持矩阵和验收路线见 [平台建设方案](docs/strategy/README.md)。当前完整构建和硬件验证仍有阻塞；支持等级以执行证据为准。下面 CMake 命令以 Linux 为例，Windows/macOS 请选择 `cmake --list-presets` 中的宿主预设。
+
 ## ✨ 核心特性
 
 ### 核心层次
 - **🔧 硬件抽象层 (HAL)** - 统一的硬件接口，基于 Kconfig 的编译时配置
-- **⚙️ 操作系统抽象层 (OSAL)** - 支持 FreeRTOS、RT-Thread、Zephyr 和裸机
+- **⚙️ 操作系统抽象层 (OSAL)** - Native、裸机与 FreeRTOS 适配源码；RT-Thread/Zephyr 适配待实现
 - **📦 框架层** - 配置管理、日志、Shell 和初始化系统
 
 ### 开发体验
 - **🌐 跨平台开发** - Windows、Linux、macOS，支持原生模拟
-- **🧪 全面测试** - 1539+ 个测试，原生平台 100% 代码覆盖率
+- **🧪 测试资产** - 单元、属性与集成测试；当前执行数量及覆盖率待恢复基线后核验
 - **📚 双语文档** - 完整的中英文文档
 - **🛠️ Python 构建工具** - 跨平台的构建、测试和格式化脚本
 - **⚡ Kconfig 配置** - 所有外设的编译时配置系统
@@ -36,10 +38,10 @@
 
 | 平台 | 状态 | 外设支持 | RTOS 支持 |
 |------|------|---------|-----------|
-| **Native** | ✅ 生产就绪 | 完整的测试模拟 | 裸机、FreeRTOS |
-| **STM32F4** | ✅ 生产就绪 | GPIO、UART、SPI、I2C、ADC、PWM、定时器、DMA、CAN | 裸机、FreeRTOS |
-| **STM32H7** | 🚧 开发中 | + TrustZone、加密、以太网 | 裸机、FreeRTOS |
-| **GD32** | 🚧 开发中 | GPIO、UART、SPI、I2C | 裸机 |
+| **Native** | 实现存在，验证待恢复 | 主机外设模拟 | Native 后端 |
+| **STM32F4** | 核心驱动存在，验证待完成 | GPIO、UART、SPI；其余按支持矩阵建设 | 裸机、FreeRTOS 待组合验证 |
+| **STM32H7** | 部分配置与时钟源码 | 外设驱动待验证 | 待组合验证 |
+| **GD32** | 首期建设，当前为占位 | 驱动待移植 | 裸机、FreeRTOS 目标 |
 | **ESP32** | 📋 计划中 | + WiFi、BLE、触摸 | FreeRTOS |
 | **nRF52** | 📋 计划中 | + BLE、NFC、加密 | FreeRTOS、Zephyr |
 
@@ -50,7 +52,7 @@
 **所有平台：**
 - CMake 3.21+
 - Git
-- Python 3.8+（用于构建脚本）
+- Python 3.11+（用于构建脚本）
 
 **本地构建（测试）：**
 - Windows: Visual Studio 2019+ 或 MSVC Build Tools
@@ -69,18 +71,18 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/nexus-platform/nexus.git
+git clone https://github.com/X-Gen-Lab/nexus.git
 cd nexus
 
 # 方法 1：使用 Python 脚本（推荐，跨平台）
 python scripts/building/build.py
 
 # 方法 2：使用 CMake 预设（CMake 3.21+）
-cmake --preset native-debug      # 调试构建
-cmake --build --preset native-debug
+cmake --preset linux-gcc-debug      # 调试构建
+cmake --build --preset linux-gcc-debug
 
-cmake --preset native-release    # 发布构建
-cmake --build --preset native-release
+cmake --preset linux-gcc-release    # 发布构建
+cmake --build --preset linux-gcc-release
 
 # 方法 3：直接使用 CMake
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DNEXUS_PLATFORM=native
@@ -98,11 +100,11 @@ python scripts/test/test.py
 python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
 
 # 方法 2：使用 CMake 预设（CMake 3.21+）
-cmake --preset stm32f4-debug     # 调试构建
-cmake --build --preset stm32f4-debug
+cmake --preset linux-stm32-armgcc-debug     # 调试构建
+cmake --build --preset linux-stm32-armgcc-debug
 
-cmake --preset stm32f4-release   # 发布构建
-cmake --build --preset stm32f4-release
+cmake --preset linux-stm32-armgcc-release   # 发布构建
+cmake --build --preset linux-stm32-armgcc-release
 
 # 方法 3：直接使用 CMake
 cmake -B build-stm32f4 \
@@ -135,14 +137,14 @@ cmake --build build-stm32f4 --config Release
 cmake --list-presets
 
 # 使用预设
-cmake --preset native-debug
-cmake --build --preset native-debug
+cmake --preset linux-gcc-debug
+cmake --build --preset linux-gcc-debug
 
 # 常用预设：
-# - native-debug: Native 平台调试构建
-# - native-release: Native 平台发布构建
-# - stm32f4-debug: STM32F4 调试构建
-# - stm32f4-release: STM32F4 发布构建
+# - linux-gcc-debug: Native 平台调试构建
+# - linux-gcc-release: Native 平台发布构建
+# - linux-stm32-armgcc-debug: STM32F4 调试构建
+# - linux-stm32-armgcc-release: STM32F4 发布构建
 ```
 
 ## 📖 第一个项目
@@ -150,7 +152,7 @@ cmake --build --preset native-debug
 创建一个简单的 LED 闪烁应用：
 
 ```c
-#include "hal/nx_factory.h"
+#include "hal/nx_hal.h"
 #include "osal/osal.h"
 
 int main(void)
@@ -165,8 +167,11 @@ int main(void)
         return -1;
     }
 
-    /* 配置为输出（通过 Kconfig 在编译时完成）*/
-    led->set_mode(led, NX_GPIO_MODE_OUTPUT_PP);
+    /* 引脚配置由 Kconfig 提供，设备通过生命周期初始化 */
+    nx_lifecycle_t* lifecycle = led->get_lifecycle(led);
+    if (!lifecycle || lifecycle->init(lifecycle) != NX_OK) {
+        return -1;
+    }
 
     /* 闪烁循环 */
     while (1) {
@@ -175,7 +180,7 @@ int main(void)
     }
 
     /* 清理（永远不会到达）*/
-    nx_factory_gpio_release((nx_gpio_t*)led);
+    lifecycle->deinit(lifecycle);
     nx_hal_deinit();
     return 0;
 }
@@ -402,7 +407,7 @@ ctest -C Release -j8                             # 并行（8 个作业）
 
 ### 测试统计
 
-当前测试套件包含：
+以下是旧文档中的测试规模记录，当前测试数量与覆盖率需要重新执行核验：
 
 - **总测试数**: 1539+ 个测试
 - **HAL 测试**: ~400 个测试（单元 + 属性测试）
@@ -456,11 +461,7 @@ CI/CD 系统采用模块化架构，使用可复用的 actions：
 
 ### CI 状态
 
-- ✅ 所有平台构建成功
-- ✅ 1539+ 个测试通过
-- ✅ 代码覆盖率 > 95%
-- ✅ 文档构建成功
-- ✅ 质量检查通过
+当前成功执行状态以对应提交的 GitHub Actions 和 HIL 报告为准。最新基线存在构建阻塞，详见 [首批迭代记录](docs/strategy/first-iteration.md)。
 
 ## 🤝 贡献
 
@@ -486,8 +487,8 @@ CI/CD 系统采用模块化架构，使用可复用的 actions：
 
 ## 🌟 社区
 
-- **问题反馈**: [GitHub Issues](https://github.com/nexus-platform/nexus/issues)
-- **讨论**: [GitHub Discussions](https://github.com/nexus-platform/nexus/discussions)
+- **问题反馈**: [GitHub Issues](https://github.com/X-Gen-Lab/nexus/issues)
+- **讨论**: [GitHub Discussions](https://github.com/X-Gen-Lab/nexus/discussions)
 - **文档**: [在线文档](https://nexus-platform.github.io/nexus/)
 - **更新日志**: [CHANGELOG.md](CHANGELOG.md)
 

@@ -1,8 +1,8 @@
 # Nexus Embedded Platform
 
-[![CI Status](https://github.com/nexus-platform/nexus/workflows/CI/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![Build Matrix](https://github.com/nexus-platform/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![Documentation](https://github.com/nexus-platform/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
+[![CI Status](https://github.com/X-Gen-Lab/nexus/workflows/CI/badge.svg)](https://github.com/X-Gen-Lab/nexus/actions)
+[![Build Matrix](https://github.com/X-Gen-Lab/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/X-Gen-Lab/nexus/actions)
+[![Documentation](https://github.com/X-Gen-Lab/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/X-Gen-Lab/nexus/actions)
 [![codecov](https://codecov.io/gh/nexus-platform/nexus/branch/main/graph/badge.svg)](https://codecov.io/gh/nexus-platform/nexus)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
@@ -15,16 +15,18 @@
 
 **Nexus** is a professional embedded software development platform designed for building reliable, secure, and portable embedded applications across multiple MCU platforms with comprehensive testing and documentation.
 
+Current maintenance focuses on industrial control and connected devices, with a team of about 10 and a 3–6 month STM32/GD32 reference-platform plan. See the [architecture and enterprise workflow plan](docs/strategy/README.md) for support levels and acceptance gates. Full builds and hardware validation still have blockers; implementation presence is not production qualification. CMake command examples below use Linux; Windows/macOS users should choose a host preset from `cmake --list-presets`.
+
 ## ✨ Key Features
 
 ### Core Layers
 - **🔧 Hardware Abstraction Layer (HAL)** - Unified hardware interface with Kconfig-based compile-time configuration
-- **⚙️ OS Abstraction Layer (OSAL)** - Support for FreeRTOS, RT-Thread, Zephyr, and bare-metal
+- **⚙️ OS Abstraction Layer (OSAL)** - Native, bare-metal and FreeRTOS adapter sources; RT-Thread/Zephyr adapters planned
 - **� Framework Layer** - Config management, logging, shell, and initialization systems
 
 ### Development Experience
 - **🌐 Cross-platform Development** - Windows, Linux, macOS with native simulation
-- **🧪 Comprehensive Testing** - 1539+ tests with 100% code coverage for native platform
+- **🧪 Test Assets** - Unit, property and integration suites; executed counts and coverage require a restored baseline
 - **📚 Bilingual Documentation** - Complete English and Chinese documentation
 - **🛠️ Python Build Tools** - Cross-platform scripts for build, test, and format
 - **⚡ Kconfig Configuration** - Compile-time configuration system for all peripherals
@@ -38,10 +40,10 @@
 
 | Platform | Status | Peripherals | RTOS Support |
 |----------|--------|-------------|--------------|
-| **Native** | ✅ Production | Full simulation for testing | Bare-metal, FreeRTOS |
-| **STM32F4** | ✅ Production | GPIO, UART, SPI, I2C, ADC, PWM, Timer, DMA, CAN | Bare-metal, FreeRTOS |
-| **STM32H7** | 🚧 In Progress | + TrustZone, Crypto, Ethernet | Bare-metal, FreeRTOS |
-| **GD32** | 🚧 In Progress | GPIO, UART, SPI, I2C | Bare-metal |
+| **Native** | Implementation present; validation pending | Host peripheral models | Native backend |
+| **STM32F4** | Core drivers present; validation pending | GPIO, UART, SPI; others follow the support matrix | Bare-metal/FreeRTOS combinations pending |
+| **STM32H7** | Partial configuration/clock sources | Peripheral validation pending | Combinations pending |
+| **GD32** | Initial-phase work; currently a placeholder | Driver port pending | Bare-metal/FreeRTOS target |
 | **ESP32** | 📋 Planned | + WiFi, BLE, Touch | FreeRTOS |
 | **nRF52** | 📋 Planned | + BLE, NFC, Crypto | FreeRTOS, Zephyr |
 
@@ -52,7 +54,7 @@
 **All Platforms:**
 - CMake 3.21+
 - Git
-- Python 3.8+ (for build scripts and Kconfig)
+- Python 3.11+ (for build scripts and Kconfig)
 
 **For Native Build (Testing):**
 - Windows: Visual Studio 2019+ or MSVC Build Tools
@@ -118,7 +120,7 @@ The easiest way to build is using the automatic build scripts with Kconfig:
 
 ```bash
 # Clone repository
-git clone https://github.com/nexus-platform/nexus.git
+git clone https://github.com/X-Gen-Lab/nexus.git
 cd nexus
 
 # Install Kconfig tool
@@ -149,18 +151,18 @@ See [Toolchain Auto-Selection Guide](docs/TOOLCHAIN_AUTO_SELECTION.md) for detai
 
 ```bash
 # Clone repository
-git clone https://github.com/nexus-platform/nexus.git
+git clone https://github.com/X-Gen-Lab/nexus.git
 cd nexus
 
 # Method 1: Using Python script (recommended, cross-platform)
 python scripts/building/build.py
 
 # Method 2: Using CMake Presets (CMake 3.21+)
-cmake --preset native-debug      # Debug build
-cmake --build --preset native-debug
+cmake --preset linux-gcc-debug      # Debug build
+cmake --build --preset linux-gcc-debug
 
-cmake --preset native-release    # Release build
-cmake --build --preset native-release
+cmake --preset linux-gcc-release    # Release build
+cmake --build --preset linux-gcc-release
 
 # Method 3: Using CMake directly
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DNEXUS_PLATFORM=native
@@ -178,11 +180,11 @@ python scripts/test/test.py
 python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
 
 # Method 2: Using CMake Presets (CMake 3.21+)
-cmake --preset stm32f4-debug     # Debug build
-cmake --build --preset stm32f4-debug
+cmake --preset linux-stm32-armgcc-debug     # Debug build
+cmake --build --preset linux-stm32-armgcc-debug
 
-cmake --preset stm32f4-release   # Release build
-cmake --build --preset stm32f4-release
+cmake --preset linux-stm32-armgcc-release   # Release build
+cmake --build --preset linux-stm32-armgcc-release
 
 # Method 3: Using CMake directly
 cmake -B build-stm32f4 \
@@ -215,14 +217,14 @@ The project includes CMakePresets.json for standardized configurations:
 cmake --list-presets
 
 # Use a preset
-cmake --preset native-debug
-cmake --build --preset native-debug
+cmake --preset linux-gcc-debug
+cmake --build --preset linux-gcc-debug
 
 # Common presets:
-# - native-debug: Native platform debug build
-# - native-release: Native platform release build
-# - stm32f4-debug: STM32F4 debug build
-# - stm32f4-release: STM32F4 release build
+# - linux-gcc-debug: Native platform debug build
+# - linux-gcc-release: Native platform release build
+# - linux-stm32-armgcc-debug: STM32F4 debug build
+# - linux-stm32-armgcc-release: STM32F4 release build
 ```
 
 ## 📖 First Project
@@ -230,7 +232,7 @@ cmake --build --preset native-debug
 Create a simple LED blink application:
 
 ```c
-#include "hal/nx_factory.h"
+#include "hal/nx_hal.h"
 #include "osal/osal.h"
 
 int main(void)
@@ -245,8 +247,11 @@ int main(void)
         return -1;
     }
 
-    /* Configure as output (done via Kconfig at compile-time) */
-    led->set_mode(led, NX_GPIO_MODE_OUTPUT_PP);
+    /* Pin configuration comes from Kconfig; initialize the device lifecycle. */
+    nx_lifecycle_t* lifecycle = led->get_lifecycle(led);
+    if (!lifecycle || lifecycle->init(lifecycle) != NX_OK) {
+        return -1;
+    }
 
     /* Blink loop */
     while (1) {
@@ -255,7 +260,7 @@ int main(void)
     }
 
     /* Cleanup (never reached) */
-    nx_factory_gpio_release((nx_gpio_t*)led);
+    lifecycle->deinit(lifecycle);
     nx_hal_deinit();
     return 0;
 }
@@ -479,7 +484,7 @@ ctest -C Release -j8                             # Parallel (8 jobs)
 
 ### Test Statistics
 
-Current test suite contains:
+The following counts are legacy documentation estimates; current executed counts and coverage must be revalidated:
 
 - **Total Tests**: 1539+ tests
 - **HAL Tests**: ~400 tests (unit + property-based)
@@ -533,11 +538,7 @@ The CI/CD system uses a modular architecture with reusable actions:
 
 ### CI Status
 
-- ✅ All platforms build successfully
-- ✅ 1539+ tests passing
-- ✅ Code coverage > 95%
-- ✅ Documentation builds successfully
-- ✅ Quality checks passing
+Use GitHub Actions and HIL reports for the exact commit as execution evidence. The current baseline has build blockers; see the [first iteration record](docs/strategy/first-iteration.md).
 
 ## 🤝 Contributing
 
@@ -563,8 +564,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🌟 Community
 
-- **Issues**: [GitHub Issues](https://github.com/nexus-platform/nexus/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/nexus-platform/nexus/discussions)
+- **Issues**: [GitHub Issues](https://github.com/X-Gen-Lab/nexus/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/X-Gen-Lab/nexus/discussions)
 - **Documentation**: [Online Docs](https://nexus-platform.github.io/nexus/)
 - **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

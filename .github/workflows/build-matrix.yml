@@ -54,7 +54,7 @@ jobs:
           # ARM cross-compile
           - name: ARM Cortex-M4 Release
             os: ubuntu-latest
-            preset: cross-arm-release
+            preset: linux-stm32-armgcc-release
             upload_artifacts: true
             is_arm: true
 
@@ -90,7 +90,7 @@ jobs:
 
       - name: Test
         if: ${{ !matrix.is_arm }}
-        run: ctest --preset ${{ matrix.preset }} --output-on-failure --parallel 4
+        run: ctest --preset ${{ matrix.preset }} --output-on-failure --no-tests=error --parallel 4
 
       - name: Upload Artifacts
         if: matrix.upload_artifacts
@@ -135,7 +135,7 @@ jobs:
           cmake --build --preset linux-gcc-coverage --parallel $(nproc)
 
       - name: Test
-        run: ctest --preset linux-gcc-coverage --output-on-failure --parallel $(nproc)
+        run: ctest --preset linux-gcc-coverage --output-on-failure --no-tests=error --parallel $(nproc)
 
       - name: Generate Coverage
         run: |
@@ -196,6 +196,7 @@ jobs:
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Debug \
             -DNEXUS_PLATFORM=native \
+            -DNEXUS_CONFIG_FILE="${GITHUB_WORKSPACE}/platforms/native/defconfig" \
             -DNEXUS_BUILD_TESTS=ON \
             -DCMAKE_C_FLAGS="$SANITIZER_FLAG" \
             -DCMAKE_CXX_FLAGS="$SANITIZER_FLAG"
@@ -204,7 +205,7 @@ jobs:
         run: cmake --build build --parallel $(nproc)
 
       - name: Test with Sanitizer
-        run: ctest --test-dir build --output-on-failure --parallel $(nproc)
+        run: ctest --test-dir build --output-on-failure --no-tests=error --parallel $(nproc)
         env:
           ASAN_OPTIONS: detect_leaks=1:check_initialization_order=1
           UBSAN_OPTIONS: print_stacktrace=1

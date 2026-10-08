@@ -1,4 +1,4 @@
-name: Release
+name: Release Candidate
 
 on:
   push:
@@ -7,53 +7,42 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., v1.0.0)'
+        description: 'Existing tag matching the selected source commit (e.g., v1.0.0)'
         required: true
         type: string
 
+permissions:
+  contents: read
+
+concurrency:
+  group: release-candidate-${{ github.event.inputs.version || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
-  create-release:
-    name: Create Release
+  metadata:
+    name: Validate Release Source
     runs-on: ubuntu-latest
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.version }}
-
+      version: ${{ steps.validate.outputs.version }}
+      commit: ${{ steps.validate.outputs.commit }}
+      prerelease: ${{ steps.validate.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate changelog
-        run: |
-          if [ -f CHANGELOG.md ]; then
-            sed -n "/## \[${{ steps.get_version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | head -n -1 > release_notes.md
-          else
-            echo "Release ${{ steps.get_version.outputs.version }}" > release_notes.md
-          fi
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
-          body_path: release_notes.md
-          draft: false
-          prerelease: false
+          python-version: '3.11'
+      - name: Validate version and tag commit
+        id: validate
+        env:
+          RELEASE_VERSION: ${{ github.event.inputs.version || github.ref_name }}
+        run: python scripts/ci/package_release.py metadata --version "$RELEASE_VERSION"
 
   build-release:
     name: Build ${{ matrix.name }}
-    needs: create-release
+    needs: metadata
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -63,58 +52,107 @@ jobs:
             os: windows-latest
             preset: windows-msvc-release
             artifact: nexus-windows-msvc
+            host_tests: true
           - name: Linux GCC
             os: ubuntu-latest
             preset: linux-gcc-release
             artifact: nexus-linux-gcc
+            host_tests: true
           - name: macOS Clang
             os: macos-latest
             preset: macos-clang-release
             artifact: nexus-macos-clang
+            host_tests: true
           - name: ARM Cortex-M4
             os: ubuntu-latest
-            preset: cross-arm-release
+            preset: linux-stm32-armgcc-release
             artifact: nexus-arm-cortex-m4
-
+            host_tests: false
+    env:
+      BUILD_PRESET: ${{ matrix.preset }}
+      RELEASE_ARTIFACT: ${{ matrix.artifact }}
+      RELEASE_VERSION: ${{ needs.metadata.outputs.version }}
+      SOURCE_COMMIT: ${{ needs.metadata.outputs.commit }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.metadata.outputs.commit }}
+          fetch-depth: 0
           submodules: recursive
-
+          persist-credentials: false
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
-
       - name: Configure
-        run: cmake --preset ${{ matrix.preset }}
-
+        run: cmake --preset "$BUILD_PRESET"
       - name: Build
-        run: cmake --build --preset ${{ matrix.preset }} --parallel
-
-      - name: Package
-        shell: bash
+        run: cmake --build --preset "$BUILD_PRESET" --parallel
+      - name: Test native host build
+        if: matrix.host_tests
+        run: ctest --preset "$BUILD_PRESET" --output-on-failure --no-tests=error
+      - name: Package compiled outputs and provenance
         run: |
-          mkdir -p release/${{ matrix.artifact }}
-          cp -r build/${{ matrix.preset }}/bin/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp -r build/${{ matrix.preset }}/lib/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp README.md LICENSE release/${{ matrix.artifact }}/
-
-      - name: Create Archive
-        shell: bash
-        run: |
-          cd release
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            7z a ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip" >> $GITHUB_ENV
-          else
-            tar czf ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz" >> $GITHUB_ENV
-          fi
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
+          python scripts/ci/package_release.py package \
+            --version "$RELEASE_VERSION" --source-commit "$SOURCE_COMMIT" \
+            --preset "$BUILD_PRESET" --artifact "$RELEASE_ARTIFACT" \
+            --build-dir "build/$BUILD_PRESET" --output-dir release
+      - name: Stage candidate assets
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ needs.create-release.outputs.version }}
-          files: ${{ env.ASSET_PATH }}
+          name: release-${{ matrix.artifact }}
+          path: |
+            release/*.zip
+            release/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  candidate-release:
+    name: Create Draft Release Candidate
+    needs: [metadata, build-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ needs.metadata.outputs.version }}
+      SOURCE_COMMIT: ${{ needs.metadata.outputs.commit }}
+      RELEASE_PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.metadata.outputs.commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download complete candidate asset set
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-nexus-*
+          path: release
+          merge-multiple: true
+      - name: Verify assets and generate candidate notes
+        run: |
+          python scripts/ci/package_release.py verify-assets \
+            --version "$RELEASE_VERSION" --source-commit "$SOURCE_COMMIT" \
+            --expected nexus-windows-msvc=windows-msvc-release \
+            --expected nexus-linux-gcc=linux-gcc-release \
+            --expected nexus-macos-clang=macos-clang-release \
+            --expected nexus-arm-cortex-m4=linux-stm32-armgcc-release
+      - name: Create draft candidate after every build succeeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          release_options=(--draft --verify-tag)
+          if [[ "$RELEASE_PRERELEASE" == "true" ]]; then
+            release_options+=(--prerelease --latest=false)
+          fi
+          gh release create "$RELEASE_VERSION" "${release_options[@]}" \
+            --target "$SOURCE_COMMIT" --title "Nexus $RELEASE_VERSION candidate" \
+            --notes-file release_notes.md release/*.zip release/SHA256SUMS
