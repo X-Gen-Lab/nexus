@@ -1,0 +1,553 @@
+                                                                        SLA-GD0001-version1.1
+                                                                SOFTWARE LICENSE AGREEMENT
+
+
+SOFTWARE LICENSE AGREEMENT SLA-GD0001-version1.1
+
+This is a legally enforceable Software License Agreement (“SLA”) between GigaDevice
+Semiconductor Inc., a company incorporated under the laws of the People’s Republic of China,
+at the address: Building No.8, IC Park, No.9 Fenghao East Road, Haidian, Beijing, China and/or
+its affiliated companies (GigaDevice) and you, on behalf of yourself, or on behalf of the entity by
+which you are employed and/or engaged (You).
+
+Affiliates shall mean any corporation, partnership, or other entity that, directly or indirectly,
+owns, is owned by, or is under common ownership with GigaDevice, for so long as such
+ownership exists. For the purposes of the foregoing, "own", "owned," or "ownership" shall mean
+ownership of more than fifty percent (50%) of the stock or other equity interests entitled to vote
+for the election of directors or an equivalent governing body.
+
+
+
+
+Please indicate Your acceptance of this agreement by selecting “Accept” or indicate Your
+rejection of this contract by selecting “Decline” as indicated below in the media,
+AND/OR
+
+BY DOWNLOADING, COPYING, INSTALLING, ACCESSING OR OTHERWISE USING THIS
+SOFTWARE PACKAGE OR ANY PART THEREOF (AND THE RELATED DOCUMENTATION),
+YOU AGREE TO BE BOUND BY THIS SOFTWARE LICENSE AGREEMENT. IF YOU DO NOT
+AGREE WITH ANY CONDITION OF THIS SLA, DO NOT DOWNLOAD, COPY, INSTALL,
+ACCESS OR OTHERWISE USE THIS SOFTWARE PACKAGE.
+
+
+
+1.   DEFINITIONS
+
+
+Licensed Software: means this software package including without limitation any
+
+software/firmware, examples, project template and all the related Documentation and design
+tools licensed and delivered in source and/or binary form as the case may be. The Licensed
+Software further includes any software updates and supplements that GigaDevice and/or its
+Affiliates may provide You or make available to You after the date You obtain the Licensed
+Software to the extent that such items are not accompanied by a separate license agreement or
+other terms of use.
+
+
+Documentation: including any comments, annotations, instructions, manuals, and other
+
+materials, whether in printed or electronic form, including without limitation installation
+manuals, user’s guides, and programmer guides, related to any Licensed Software made
+available to You under this SLA.
+
+                                                1 / 12
+                                                                       SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+
+Your Product: means Your and Your end-users’ product or system and all the related
+
+documentation that includes or incorporates the Licensed Software or derivative of the Licensed
+Software in the devices manufactured by or for GigaDevice, provided further that such Licensed
+Software or derivative works of the Licensed Software execute solely and exclusively on the
+devices manufactured by or for GigaDevice.
+
+2.   LIMITED LICENSE
+
+GigaDevice grants You a non-exclusive, worldwide, non-transferable (whether by assignment or
+otherwise unless expressly authorized by GigaDevice), sub-licensable, revocable, royalty-free
+limited license of the Licensed Software to:
+
+     (i) use, make copies, modify and prepare derivative works of Licensed Software, in whole or
+     in part, that is delivered by GigaDevice in source and binary form for the sole purpose of
+     designing, developing and manufacturing Your Products, provided always that that such
+     Licensed Software or derivative works of the Licensed Software must be used and execute
+     solely and exclusively on or in combination with devices manufactured by or for GigaDevice;
+
+     (ii) to distribute the Licensed Software in source form, and any distribution of the source
+     code (modified or not) to any third parties must reproduce the copyright notice and
+     following restrictions, warranty disclaimer, export control notice and compliance notice of
+     this SLA in any documentation and/or other materials provided with the distribution;
+     provided always that such Licensed Software or derivative works of the Licensed Software
+     execute solely and exclusively on the devices manufactured by or for GigaDevice and grant
+     such third parties sublicenses of the rights granted to You in this SLA；
+
+     (iii) to distribute the Licensed Software in binary form, except as embedded into device
+     manufactured by or for GigaDevice or a software update for such device, to any third parties
+     must reproduce the copyright notice and following restrictions, warranty disclaimer, export
+     control notice and compliance notice of this SLA in any documentation and/or other
+     materials provided with the distribution, provided always that that the redistributed Licensed
+     Software or derivative works of the Licensed Software in binary form execute solely and
+     exclusively on the devices manufactured by or for GigaDevice and grant such third parties
+     sublicenses of the rights granted to You in this SLA;
+
+     (iv) to use, copy, modify and/or create derivative works of the Documentation part of the
+     Licensed Software for the sole purpose of providing documentation for Your Products and
+     their usage, provided that the Documentation part is not subject to the terms of
+     CONFIDENTIALITY (reproduced below).
+
+3.   OWNERSHIP AND COPYRIGHT
+
+
+                                                2 / 12
+                                                                       SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+Title to the Licensed Software and all copies thereof remain with GigaDevice and/or its licensors.
+You may not remove any copyright notice, warranty disclaimer, limitation of liabilities and
+indemnification, unintended use or other notice from the Licensed Software or from any
+permitted copies of the Licensed Software. You shall prevent any unauthorized copying of the
+Licensed Software, including without limitation any Documentation.
+
+4.   RESTRICTIONS
+
+(1) Unless otherwise explicitly stated in this SLA, You may not sell, assign, sublicense, lease, rent
+     or otherwise distribute the Licensed Software for any purposes, in whole or in part. You
+     acknowledge and agree that any use, adaptation, translation or transcription of the
+     Licensed Software or any portion or derivative thereof, for use with any devices
+     manufactured by or for any entity other than GigaDevice is a material breach of this SLA.
+     You shall not use the Licensed Software as a basis to create similar or competing software,
+     documentation or product.
+
+(2) Neither the name nor any trademark of GigaDevice nor other contributors to the Licensed
+     Software may be used to endorse or promote software, documentation or products derived
+     from the Licensed Software (including any part thereof) without specific written permission.
+
+(3) You acknowledge that the Licensed Software has not been specifically designed to meet
+     your individual requirements and that You have all information necessary to evaluate
+     whether the Licensed Software meet your requirements or not, and will be suitable for your
+     intended use or application. Therefore the Licensed Software shall be deemed accepted
+     upon delivery to You. You shall use, at your own risk, the Licensed Software. You
+     acknowledge that GigaDevice cannot in any way be held responsible for the consequences
+     resulting from use of the Licensed Software and any development made following such use
+     of the Licensed Software. Notwithstanding anything to the contrary herein, You are not
+     authorized to sublicense to or have used the Licensed Software by a competitor of
+     GigaDevice.
+
+(4) GigaDevice expressly disclaims any responsibility for such usage which shall be made by
+     You at your sole risk, even if GigaDevice has been informed by You in writing of such usage.
+
+(5) You have no rights under this SLA to, and may not under any circumstances use the
+     Licensed Software or any parts thereof to make them subject to any open source terms.
+     these actions include but are not limited to combining the Licensed Software by means of
+     incorporation or linking or otherwise.
+
+(6) The Licensed Software, in whole or in part, may (i) require licenses from third parties
+     claiming intellectual property rights covering implementation of the Licensed Software or
+     (ii) be based on industry recognized standards or software programs published by industry
+     recognized standards bodies and certain third parties may claim to own intellectual
+                                             3 / 12
+                                                                      SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+     property rights that cover implementation of those standards. You acknowledge and agree
+     that this SLA does not convey a license to any such third party intellectual property rights
+     and that You are responsible for any fees or royalties payable to any third party based on
+     such third party's interests in the Licensed Software.
+
+5.   OPEN SOURCE SOFTWARE
+
+The Licensed Software may contain software subject to Open Source Terms (as defined below)
+applicable for each such portion (Open Source Software), as further specified in the Licensed
+Software. Such Open Source Software is supplied under the applicable Open Source Terms and
+is not subject to the terms and conditions of license hereunder. By downloading, copying,
+installing, accessing or otherwise using the Licensed Software, You agree to be bound by such
+Open Source Terms with regard to such Open Source Software. Open Source Terms: mean any
+open source license which requires as part of distribution of software that the source code of
+such software is distributed therewith or otherwise made available, or open source license that
+substantially complies with the Open Source definition specified at www.opensource.org and
+any other comparable open source license.
+
+6.   THIRD PARTY SOFTWARE
+
+Certain portions of the Licensed Software may be subject to third party license terms as
+expressly specified in the Licensed Software. In such event, those portions are supplied under
+the specified third party license terms and are not subject to the license terms of this SLA. By
+downloading, copying, installing, accessing or otherwise using the Licensed Software, You agree
+to be bound by such third party license terms with regard to those portions.
+
+7.   NO OTHER RIGHTS OR LICENSES
+
+No rights or licenses are granted to You, except as expressly stated in this SLA. Without limiting
+the generality of the foregoing, no rights or licenses are granted in any products, technology or
+intellectual property rights of GigaDevice except those embodied in the Licensed Software.
+
+8.   WARRANTY DISCLAIMER
+
+THE LICENSED SOFTWARE IS PROVIDED “AS IS” AND “WITH ALL FAULTS” WITHOUT
+WARRANTY OF ANY KIND EXPRESSED OR IMPLIED. GIGADEVICE AND ITS LICENSORS
+EXPRESSLY DISCLAIM ALL WARRANTIES, EXPRESSED, IMPLIED OR OTHERWISE, INCLUDING
+WITHOUT LIMITATION, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NON-INFRINGEMENT OF INTELLECTUAL PROPERTY RIGHTS. GIGADEVICE DOES
+NOT WARRANT THAT THE USE IN WHOLE OR IN PART OF THE LICENSED SOFTWARE WILL BE
+UNINTERRUPTED OR ERROR FREE, WILL MEET YOUR REQUIREMENTS, OR WILL OPERATE WITH
+THE COMBINATION OF HARDWARE AND SOFTWARE SELECTED BY YOU.
+
+
+
+                                                4 / 12
+                                                                      SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+YOU ARE RESPONSIBLE FOR DETERMINING WHETHER THE LICENSED SOFTWARE WILL BE
+SUITABLE FOR YOUR INTENDED USE OR APPLICATION OR WILL ACHIEVE YOUR INTENDED
+RESULTS. GIGADEVICE WILL NOT BE LIABLE TO YOU AND/OR TO ANY THIRD PARTY FOR THE
+DERIVATIVE WORKS OF THE LICENSED SOFTWARE DEVELOPED BY YOU.
+
+GIGADEVICE HAS NOT AUTHORIZED ANYONE TO MAKE ANY REPRESENTATION OR
+WARRANTY FOR THE LICENSED SOFTWARE, AND ANY TECHNICAL, APPLICATIONS OR DESIGN
+INFORMATION OR ADVICE, QUALITY CHARACTERIZATION, RELIABILITY DATA OR OTHER
+SERVICES PROVIDED BY GIGADEVICE SHALL NOT CONSTITUTE ANY REPRESENTATION OR
+WARRANTY BY GIGADEVICE OR ALTER THIS DISCLAIMER OR WARRANTY, AND NO
+ADDITIONAL OBLIGATIONS OR LIABILITIES BEYOND THOSE EXPLICITLY STATED IN THIS SLA
+SHALL ARISE FROM GIGADEVICE’S PROVIDING SUCH INFORMATION OR SERVICES.
+GIGADEVICE DOES NOT ASSUME OR AUTHORIZE ANY OTHER PERSON TO ASSUME FOR IT ANY
+OTHER LIABILITY IN CONNECTION WITH THE LICENSED SOFTWARE.
+
+Nothing contained in this SLA will be construed as:
+
+(i) a warranty or representation by GigaDevice to maintain production of any GigaDevice device
+or other hardware or software with which the Licensed Software may be used or to otherwise
+maintain or support the Licensed Software in any manner; or
+
+(ii) a commitment from GigaDevice and/or its licensors to bring or prosecute actions or suits
+against third parties for infringement of any of the rights licensed hereby, or conferring any
+rights to bring or prosecute actions or suits against third parties for infringement.
+
+However, GigaDevice has the right to terminate this SLA immediately upon receiving notice of
+any claim, suit or proceeding that alleges that the Licensed Software or Your use or distribution
+of the Licensed Software infringes any third party intellectual property rights.
+
+All other warranties, conditions or other terms implied by law are excluded to the fullest extent
+permitted by law.
+
+9.   LIMITATION OF LIABILITIES AND INDEMNIFICATION
+
+IN NO EVENT SHALL GIGADEVICE OR ITS LICENSORS BE LIABLE TO YOU OR ANY THIRD PARTY
+FOR ANY INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL, PUNITIVE DAMAGES OR OTHER
+DAMAGES (INCLUDING BUT NOT LIMITED TO, THE COST OF LABOR, RE-QUALIFICATION,
+DELAY, LOSS OF PROFITS, LOSS OF REVENUES, LOSS OF DATA, COSTS OF PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES OR THE LIKE) WHETHER BASED ON CONTRACT, TORT, OR
+ANY OTHER LEGAL THEORY, RELATING TO OR IN CONNECTION WITH THE LICENSED
+SOFTWARE, THE DOCUMENTATION OR THIS SLA, EVEN IF GIGADEVICE HAS BEEN ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGES.
+
+
+
+                                               5 / 12
+                                                                          SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+In no event shall GigaDevice’s liability to You or any third party under this SLA, including any
+claim with respect of any third party intellectual property rights, for any cause of action exceed
+100 US$. This section does not apply to the extent prohibited by law. For the purposes of this
+section, any liability of GigaDevice shall be treated in the aggregate.
+
+YOU AGREE TO INDEMNIFY GIGADEVICE PARTIES FOR ANY DAMAGE OR LOSS THAT ANY AND
+ALL OF THE GIGADEVICE PARTIES MAY SUFFER BECAUSE OF ANY THIRD PARTIES CLAIM THAT
+MAY ARISE FROM OR THAT IS IN CONNECTION WITH THE USE YOU HAVE MADE OF THE
+LICENSED SOFTWARE.
+
+10. CONFIDENTIALITY
+
+(1) “Confidential Information”shall include all information provided with the Licensed
+    Software which (a) is designated as “confidential”, “proprietary” or with a similar
+    legend and/or (b) is by its own nature of a type which would reasonably be considered. You
+    shall not disclose, provide or make available the Confidential Information and/or part
+    thereof to any person other than your employees who have a need to know, and shall
+    protect the confidentiality of the Confidential Information provided by GigaDevice under
+    this SLA by using the same degree of care, but not less than a reasonable degree of care, to
+    prevent its unauthorized use, dissemination, or publication as You use to protect your own
+    confidential information of like nature. You shall be liable towards GigaDevice for any
+    damages incurred due to a failure by any employee of Yours having access to the Licensed
+    Software or the other Confidential Information to comply with the provisions in this SLA.
+    You shall immediately notify Licensed Software of any unauthorised use or disclosure of, or
+    of any unauthorised access to, or of any theft or loss of the Licensed Software or other
+    Confidential Information, of which You become aware.
+
+(2) The confidentiality obligations of this SLA shall not apply to Confidential Information, which
+    can be shown by documentary evidence: (i) entered the public domain through no fault of
+    You; or, (ii) was known to You prior to receipt from GigaDevice; or, (iii) was disclosed to You
+    by a third party having the right to disclose; or, (iv) was independently developed by You or
+    employees of You without access to the Licensed Software or other Confidential
+    Information, the burden of proof of independence being on You. These confidentiality
+    obligations shall survive any termination or expiration of the SLA for whatever cause.
+
+(3) You shall be liable towards GigaDevice for any damages incurred due to a failure by any
+    employee or customer having access to the Licensed Software to comply with the
+    provisions in this SLA. You shall immediately notify GigaDevice of any unauthorised use or
+    disclosure of, or of any unauthorised access to, or of any theft or loss of the Licensed
+    Software or part thereof, which comes to your notice.
+
+11. Unintended Use
+
+                                               6 / 12
+                                                                         SLA-GD0001-version1.1
+                                                                 SOFTWARE LICENSE AGREEMENT
+
+(1) You are fully aware and understand and shall procure Your customers to be fully aware and
+    understand that, unless otherwise expressly specified in the applicable documentation of
+    the Licensed Software, the Licensed Software is not designed or intended for use in: (i)
+    safety critical applications such as weapons systems, nuclear facilities, atomic energy
+    controller, combustion controller, aeronautic or aerospace applications, traffic signal
+    instruments, pollution control or hazardous substance management; (ii) life-support
+    systems, other medical equipment or systems (including life support equipment and
+    surgical implants); (iii) automotive applications or environments, including but not limited
+    to applications for active and passive safety of automobiles (regardless of front market or
+    aftermarket); and/or (iv) other uses where equipment or product failure may result in
+    personal injury, death, property or environmental damage.
+
+(2) Items (i) to (iv) above are collectively referred to as “Unintended Uses”.
+
+(3) In the event that You or Your customers use the Licensed Software in such applications
+    contemplated by items (i), (ii), (iii) and/or (iv) above, they shall do so at their sole risk, even
+    if GigaDevice is aware of or has been informed in writing of such usage. As such, You or
+    Your customers assume all risk related to use of Licensed Software in Unintended Uses and
+    GIGADEVICE SHALL NOT BE LIABLE FOR ANY SUCH USE IN UNINTENDED USES BY YOU OR
+    YOUR CUSTOMERS. Accordingly, You will indemnify and hold GigaDevice harmless from
+    any claims, liabilities, damages and associated costs and expenses (including reasonable
+    attorneys’ fees) that GigaDevice may incur related to You or Your customers’
+    incorporation of Licensed Software in any Unintended Uses.
+
+(4) If GigaDevice, at the request of You or Your customers, provides technical support to You or
+    Your customers in relation to Licensed Software, GigaDevice’s goal is to provide advice to
+    You or Your customers so that You and Your customers can design Your/its own end-
+    product solutions to meet applicable functional safety standards and requirements. You or
+    Your customers make the ultimate design decisions regarding Your/its products and are
+    solely responsible for compliance with all legal, regulatory, safety, and security related
+    requirements concerning your/its products, regardless of any information or support that
+    may be provided by GigaDevice.
+
+12. Export Control
+
+(1) You shall obtain all international and national export licenses or similar authorizations
+    required under all applicable export control laws and regulations and shall provide
+    GigaDevice with the information necessary for GigaDevice to comply with such laws and
+    regulations. The aforesaid export control laws and regulations include, but are not limited
+    to, all applicable laws and regulations regulating the export, re-export, import, transfer,
+    distribution, use and other aspects of GigaDevice products and derivatives thereof.
+
+
+                                                 7 / 12
+                                                                       SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+(2) You acknowledge and undertake that You and Your customers shall not use, directly or
+    indirectly, Licensed Software, in whole or in part, to be acquired from GigaDevice for the
+    following:
+
+    (a) export or sell to places and entities subject to embargoes imposed by China, the United
+        Nations, the European Union, the United States and any other applicable governments
+        or organizations;
+
+    (b) support or contribute to the operation, installation, maintenance, repair, overhaul,
+        refurbishing, development, production and any other prohibited end uses, including
+        without limitation, nuclear, weapons of mass destruction, certain rocket
+        systems(including ballistic missile systems, space launch vehicles and sounding
+        rockets),unmanned air vehicles(including cruise missile systems, target drones and
+        reconnaissance drones), chemical or biological weapons, certain maritime nuclear
+        propulsion systems, terrorism, military and other prohibited end uses;
+
+    (c) sell or ship or provide for the design, production, development, production, operation,
+        installation, maintenance, repair, overhaul, refurbishment of supercomputers, or for
+        incorporation into or for the development and production of supercomputer
+        components and equipment, unless the transaction is permitted or authorized by
+        applicable laws and regulations;
+
+    (d) sell or ship or provide to Iran, Russia, Belarus, or to military end users and any customer
+        under prohibitions or restrictions imposed by China, the United States or the United
+        Nations, the European Union and any other applicable government or organization,
+        particularly, to any entity that is subject to the EAR footnote 1, EAR footnote 3 and EAR
+        footnote 4 to Entity List, unless the transaction is permitted or authorized by applicable
+        laws and regulations.
+
+(3) You acknowledge and undertake that neither You nor any of Your end users are subject to
+    any trade restrictions, sanctions or other legal restrictions imposed by any country,
+    international organization or administrative institution, is controlled by or actually
+    controlled by any person or any entity subject to trade restrictions, sanctions or other legal
+    restrictions, or is a non-military end user. In such event, You undertake to immediately
+    notify GigaDevice of the matters regarding restriction and sanctions. If GigaDevice receives
+    notice that You or Your end-user is or has been determined to be a sanctioned or restricted
+    party or military end-user under applicable laws and regulations, and provided that
+    GigaDevice’s performance of this Agreement will result in the breach of such sanctions or
+    restrictions, GigaDevice shall not be obligated to perform its obligations under this
+    Agreement without any liability.
+
+
+
+
+                                               8 / 12
+                                                                         SLA-GD0001-version1.1
+                                                                SOFTWARE LICENSE AGREEMENT
+
+(4) You understand and agree that the obligations in Sections 12.1-12.3 above are required by
+    law and shall be complied with during the Term of, or after termination of, this Agreement;
+    GigaDevice shall have the right to suspend or cease its performance of this Agreement
+    without giving You any opportunity to make corrections and/or seek other legal remedies
+    in the event of any breach by You of the foregoing terms. In addition, You shall defend,
+    indemnify and hold harmless GigaDevice and its directors, officers and employees for and
+    against any prosecution, law enforcement and judicial proceedings, actions, expenses,
+    penalties, and losses resulted from Your such breach.
+
+13. Compliance
+
+(1) You agree to fully comply with all laws, rules, and regulations in relation to anti-bribery and
+    anti-corruption and abide by the code of ethics and the anti-bribery policy communicated
+    by GigaDevice to You from time to time. You shall not provide GigaDevice’s employees
+    and/or their relatives with commissions, rebates and other illegitimate material benefits in
+    any way in exchange for illegitimate support to You by taking advantage of their position. If
+    You are demanded by GigaDevice’s personnel for material benefits, You have the obligation
+    to reject such demand and immediately lodge a written complaint to GigaDevice. You
+    undertake that there are no existing, ongoing or potential anti-corruption and/or anti-
+    bribery allegations, lawsuits and investigations against You or Your directors, management,
+    agents or employees.
+
+(2) You shall support and respect internationally recognized human rights protections and
+    recognize basic requirements for workers’ rights, create a healthy, dignified and fair
+    working environment for their own employees, value and protect employees’ privacy,
+    health, safety and other legitimate rights, and protect the rights and interests of female
+    employees. You undertake that there will be no forced or compulsory labor in any form, nor
+    there will be child labor and other forms of employment that do not meet the requirements
+    of International Labor Organization Conventions. You also undertake that the employees
+    may not be discriminated or unequally treated due to their colors, ages, nations, genders,
+    nations, religious beliefs, political tendencies or other factors.
+
+(3) You shall comply with applicable laws and regulations on personal information protection,
+    including without limitation: undertake that the personal information provided or to be
+    provided to GigaDevice has been duly authorized; and ensure that the personal information
+    provided by GigaDevice will not be handled (including collection, storage, use, processing,
+    transmission, provision, disclosure, deletion, etc.) beyond the scope authorized by
+    GigaDevice.
+
+(4) In the case of You and Your personnel’ s breach of any provisions of this Section, You shall
+    indemnify GigaDevice and its directors, officers and employees for any and all losses
+
+
+                                                9 / 12
+                                                                       SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+    incurred therefrom, including but not limited to the fines imposed by any government
+    agencies, attorney fees, and litigation fees, etc. In addition, any breach of this Section shall
+    be deemed as a material breach of this Agreement and will cause irreparable damage to
+    GigaDevice, entitling GigaDevice to terminate this Agreement and all relevant Purchase
+    Orders immediately at GigaDevice’s sole discretion without liability. You shall have no
+    opportunity to correct such non-compliance.
+
+14. SEVERABILITY
+
+If any provision of this agreement is or becomes, at any time or for any reason, unenforceable
+or invalid, no other provision of this agreement shall be affected thereby, and the remaining
+provisions of this agreement shall continue with the same force and effect as if such
+unenforceable or invalid provisions had not been inserted in this Agreement.
+
+15. WAIVER
+
+The failure or delay of either party to enforce any provision of this Agreement shall not operate
+or be construed as a waiver of any other or a subsequent breach of the same or a different
+provision.
+
+16. ASSIGNMENT
+
+This Agreement may not be assigned by You, nor any of Your rights or obligations hereunder,
+to any third party without prior written consent of GigaDevice. In the event that this Agreement
+is assigned effectively to a third party, this Agreement shall bind upon successors and assigns of
+the parties hereto.
+
+17. RELATIONSHIP OF THE PARTIES
+
+Nothing in this Agreement shall create, or be deemed to create, a partnership or the
+relationship of principal and agent or employer and employee between the Parties. Neither
+Party has the authority or power to bind, to contract in the name of or to create a liability for
+the other in any way or for any purpose.
+
+18. TERMINATION
+
+GigaDevice may terminate this SLA, including its licenses, at any time if You are in material
+breach of any of its terms and conditions and You have failed to cure such breach within 30
+(thirty) days after receiving notification from GigaDevice of such breach. Upon termination, You
+will immediately destroy or return all copies of the Licensed Software (including without
+limitation any software or Documentation) to GigaDevice. After termination, Your sole surviving
+right will be to continue to use the Licensed Software solely to the extent that it was already
+incorporated before Your material breach of this Agreement into Your Products, which were
+sold by You before the date of Your material breach.
+
+                                               10 / 12
+                                                                       SLA-GD0001-version1.1
+                                                               SOFTWARE LICENSE AGREEMENT
+
+19. MISCESLANEOUS
+
+(1) If a court or agency of competent jurisdiction holds any term of this SLA invalid, illegal, or
+    unenforceable for any reason, the remainder of this SLA shall be valid and enforceable and
+    You and GigaDevice shall discuss in good faith a substitute, valid, enforceable provision
+    which most nearly effects the parties intent in entering into this SLA. The failure by
+    GigaDevice to enforce any provisions of this SLA or to exercise any right in respect thereto
+    shall not be construed as constituting a waiver of its rights thereof.
+
+(2) No agency, joint venture, partnership or other business organisation shall be created or be
+    construed as being created by reason of this SLA. You will not have the right or authority to,
+    and shall not, assume or create any obligation of any nature whatsoever on behalf of
+    GigaDevice or bind GigaDevice in any respect whatsoever. You and GigaDevice are
+    independent parties.
+
+(3) Nothing in this SLA shall be construed as making You an employee, agent or legal
+    representative of GigaDevice.
+
+(4) This SLA contains the entire and sole agreement between You and GigaDevice on the
+    subject matter of this SLA, and supersedes all representations, undertakings and
+    agreements previously made between You and GigaDevice and shall prevail over the terms
+    and conditions set forth in any document from You with respect to the subject matter of
+    this SLA. Any amendment to this SLA shall be agreed in writing and be duly signed by You
+    and GigaDevice and shall make reference to this SLA.
+
+20. APPLICABLE LAW AND JURISDICTION
+
+This SLA and matters connected with the validity, interpretation or performance thereof shall be
+governed, construed, interpreted, and applied in all respects by the laws of the People’s
+Republic of China (excluding Hong Kong Special Administrative Region, Macau Special
+Administrative Region for the purpose of this SLA), without resort to conflict of laws principles.
+The Parties expressly agree that the United Nations Convention on Contracts for the
+International Sale of Goods shall not apply to this Agreement or to their relationship.
+
+Dispute Resolution. Any dispute arising from or in connection with this Agreement shall be
+submitted to China International Economic and Trade Arbitration Commission (CIETAC) for
+arbitration which shall be conducted at Beijing, People’s Republic of China, in accordance with
+the CIETAC’s arbitration rules in effect at the time of applying for arbitration. The arbitral
+award is final and binding upon the Parties, and the arbitration shall be conducted in the
+English language.LA00
+
+
+
+
+                                               11 / 12
+                                                             SLA-GD0001-version1.1
+                                                    SOFTWARE LICENSE AGREEMENT
+
+
+Revision history
+
+
+                             Document revision history
+Dat
+      Date         Version                               Changes
+
+  2023-10-25         1.0       Initial release
+
+  2024-03-04         1.1       2nd release
+
+
+
+
+                                        12 / 12
+
