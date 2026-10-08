@@ -53,17 +53,3 @@ int main(void) {
         HAL_Delay(1);
     }
 }
-
-void Error_Handler(void) {
-    __disable_irq();
-    for (;;) {
-        __NOP();
-    }
-}
-
-#ifdef USE_FULL_ASSERT
-void assert_failed(uint8_t* file, uint32_t line) {
-    printf("Assert failed: file %s, line %lu\n", file, (unsigned long)line);
-    Error_Handler();
-}
-#endif

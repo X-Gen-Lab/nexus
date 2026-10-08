@@ -18,6 +18,9 @@
 
 #include <cstdio>
 #include <cstring>
+#include <chrono>
+#include <filesystem>
+#include <string>
 #include <gtest/gtest.h>
 #include <random>
 #include "native_property_seed.h"
@@ -34,6 +37,22 @@ extern "C" {
  */
 static constexpr int PROPERTY_TEST_ITERATIONS = 100;
 
+/* Atomic directory creation isolates repeated subprocesses as well as test
+ * names. The timestamp is only a candidate name; mkdir decides ownership. */
+static std::filesystem::path flash_test_directory() {
+    std::error_code error;
+    auto parent = std::filesystem::temp_directory_path(error);
+    if (error) return {};
+    const auto stamp = std::chrono::steady_clock::now().time_since_epoch().count();
+    for (unsigned attempt = 0; attempt < 128; ++attempt) {
+        auto directory = parent / ("nexus-flash-" + std::to_string(stamp) +
+                                   "-" + std::to_string(attempt));
+        if (std::filesystem::create_directory(directory, error)) return directory;
+        if (error) return {};
+    }
+    return {};
+}
+
 /**
  * \brief           Flash Property Test Fixture
  */
@@ -41,26 +60,16 @@ class FlashPropertyTest : public ::testing::Test {
   protected:
     std::mt19937 rng;
     nx_internal_flash_t* flash = nullptr;
+    std::filesystem::path directory;
     std::string unique_filename;
 
     void SetUp() override {
         native_property_seed(rng);
 
-        /* Generate unique filename for this test instance */
-        /* Use test name and timestamp to ensure uniqueness */
-        const ::testing::TestInfo* test_info =
-            ::testing::UnitTest::GetInstance()->current_test_info();
-        std::string test_name = test_info->name();
-
-        /* Replace invalid filename characters */
-        for (char& c : test_name) {
-            if (c == ':' || c == '/' || c == '\\' || c == '*' || c == '?' ||
-                c == '"' || c == '<' || c == '>' || c == '|') {
-                c = '_';
-            }
-        }
-
-        unique_filename = "flash_test_" + test_name + ".bin";
+        directory = flash_test_directory();
+        ASSERT_FALSE(directory.empty());
+        unique_filename = (directory / "flash.bin").string();
+        ASSERT_LT(unique_filename.size(), 256u);
 
         /* Reset all Flash instances */
         native_flash_reset_all();
@@ -86,16 +95,21 @@ class FlashPropertyTest : public ::testing::Test {
         /* Deinitialize Flash */
         if (flash != nullptr) {
             nx_lifecycle_t* lifecycle = flash->get_lifecycle(flash);
-            if (lifecycle != nullptr) {
-                lifecycle->deinit(lifecycle);
+            if (lifecycle != nullptr &&
+                lifecycle->get_state(lifecycle) != NX_DEV_STATE_UNINITIALIZED) {
+                EXPECT_EQ(NX_OK, lifecycle->deinit(lifecycle));
             }
         }
 
         /* Reset all instances */
         native_flash_reset_all();
 
-        /* Clean up test file */
-        std::remove(unique_filename.c_str());
+        /* Remove this test invocation's directory, including partial images. */
+        if (!directory.empty()) {
+            std::error_code error;
+            std::filesystem::remove_all(directory, error);
+            EXPECT_FALSE(error) << error.message();
+        }
     }
 
     /**

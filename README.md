@@ -80,7 +80,8 @@ Read the implementation records for [build/config](docs/implementation/build-con
 [drivers](docs/implementation/platform-drivers.md),
 [storage/security](docs/implementation/storage-security.md),
 [update](docs/implementation/update.md) and
-[reference applications](docs/implementation/reference-applications.md).
+[reference applications](docs/implementation/reference-applications.md), plus
+[integrated validation and live CI](docs/implementation/integration-validation.md).
 Software fault injection is separate from physical power-loss, electrical and
 control-deadline measurements.
 

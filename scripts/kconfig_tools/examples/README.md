@@ -1,226 +1,37 @@
-# Kconfig 工具示例配置文件
+# Kconfig 示例
 
-本目录包含 Kconfig 命名规范系统的示例配置文件，演示如何使用批量生成和自定义外设模板功能。
+这些示例调用现有 Python 模板 API，生成供审核的外设 schema 草稿。模板生成、产品配置解析、驱动实现和板卡验证分别提供对应证据；生成一个 SPI 或 TIMER 文件不会自动增加硬件支持。输出放在专用目录，已有文件会明确拒绝覆盖。
 
-## 文件说明
+从仓库根执行：
 
-### batch_config.yaml
+```sh
+# 生成八种内置模板的草稿。
+python3 scripts/kconfig_tools/examples/generate_all_peripherals.py NATIVE build/kconfig-examples/all
 
-完整的批量生成配置示例，包含所有支持的外设类型（UART、GPIO、SPI、I2C、ADC、DAC、CRC、WATCHDOG）。
+# 只生成两个 UART 实例，实例数超出模板上限时失败。
+python3 scripts/kconfig_tools/examples/generate_all_peripherals.py NATIVE build/kconfig-examples/uart --peripheral UART --instances 2
 
-**使用方法**:
-```bash
-python scripts/kconfig_tools/cli.py batch-generate \
-    -c scripts/kconfig_tools/examples/batch_config.yaml \
-    -o platforms/native/src/
+# 使用 Python 或本目录的 JSON 数据生成自定义 TIMER 草稿。
+python3 scripts/kconfig_tools/examples/custom_peripheral_example.py code NATIVE build/kconfig-examples/timer-code
+python3 scripts/kconfig_tools/examples/custom_peripheral_example.py json scripts/kconfig_tools/examples/custom_peripheral.json NATIVE build/kconfig-examples/timer-json
+
+# 对草稿执行命名 lint，读取失败、空目录或 error 均返回非零。
+python3 scripts/kconfig_tools/examples/validate_project.py build/kconfig-examples/all --report build/kconfig-examples/naming-report.txt
+
+# 交互菜单：0 返回/退出；执行失败传播为进程失败。
+python3 scripts/kconfig_tools/examples/quick_start.py
 ```
 
-**特点**:
-- 包含所有 8 种预定义外设类型
-- 为 NATIVE 平台配置
-- 包含详细的描述和注释
-- 配置了全局选项（覆盖、验证、详细日志）
+所有脚本支持 `--help`。`quick_start.py` 将参数列表交给 `subprocess.run()`；文件路径中的空格或 shell 字符保持为普通参数。外设/文件选择检查正整数范围，实例数检查正整数，非法输入不会索引到列表末项。
 
-### stm32_config.yaml
+八种内置模板的生成物通过命名 lint。每实例 choice 的隐藏整数 VALUE 必须以完整选项符号建立条件默认值；错误实例、类别名称或缺失映射均导致失败。静态枚举 choice 无需生成每实例 VALUE。
 
-STM32 平台的批量生成配置示例，展示如何为不同平台生成配置。
+命名 lint 只检查 schema 的命名结构。产品 fragment 使用维护中的 Kconfig 解析器验证，未知符号、冲突或依赖问题导致失败：
 
-**使用方法**:
-```bash
-python scripts/kconfig_tools/cli.py batch-generate \
-    -c scripts/kconfig_tools/examples/stm32_config.yaml \
-    -o platforms/stm32/src/
+```sh
+python3 scripts/nexus_config.py validate --config configs/stm32f407_baremetal_defconfig
+python3 scripts/nexus_config.py generate --config configs/stm32f407_baremetal_defconfig --build-dir build/profile-inspection
+cmake --preset stm32-armgcc-debug
 ```
 
-**特点**:
-- 针对 STM32 平台
-- 更多的实例数量（如 6 个 UART，11 个 GPIO 端口）
-- 适用于资源丰富的 MCU
-
-### minimal_config.yaml
-
-最小化配置示例，适用于快速原型开发或测试。
-
-**使用方法**:
-```bash
-python scripts/kconfig_tools/cli.py batch-generate \
-    -c scripts/kconfig_tools/examples/minimal_config.yaml \
-    -o test_output/
-```
-
-**特点**:
-- 只包含 UART 和 GPIO 两种外设
-- 实例数量较少
-- 启用覆盖模式，方便测试
-- 简洁的配置，易于理解
-
-### custom_peripheral.json
-
-自定义外设模板示例（JSON 格式），展示如何定义新的外设类型。
-
-**使用方法**:
-```python
-import json
-from kconfig_tools import KconfigGenerator, PeripheralTemplate, ParameterConfig, ChoiceConfig
-
-# 加载自定义模板
-with open('scripts/kconfig_tools/examples/custom_peripheral.json', 'r') as f:
-    template_data = json.load(f)
-
-# 转换为 PeripheralTemplate 对象
-template = PeripheralTemplate(
-    name=template_data['name'],
-    platform=template_data['platform'],
-    max_instances=template_data['max_instances'],
-    instance_type=template_data['instance_type'],
-    parameters=[ParameterConfig(**p) for p in template_data['parameters']],
-    choices=[ChoiceConfig(**c) for c in template_data['choices']],
-    help_text=template_data['help_text']
-)
-
-# 生成 Kconfig 文件
-generator = KconfigGenerator(template)
-generator.generate_file('output/timer_kconfig')
-```
-
-**特点**:
-- 定义了 TIMER 外设
-- 包含 4 个参数配置
-- 包含 3 个选择项配置
-- JSON 格式，易于编辑和扩展
-
-## 配置文件格式说明
-
-### YAML 格式
-
-```yaml
-peripherals:
-  - type: <外设类型>           # UART, GPIO, SPI, I2C, ADC, DAC, CRC, WATCHDOG
-    platform: <平台名称>        # NATIVE, STM32, GD32 等
-    instances: <实例数量>       # 整数
-    output: <输出路径>          # 相对于输出目录的路径
-    description: <描述>         # 可选，用于文档
-
-options:
-  overwrite: <true/false>      # 是否覆盖已存在的文件
-  validate: <true/false>       # 是否在生成后自动验证
-  verbose: <true/false>        # 是否输出详细日志
-```
-
-### JSON 格式（自定义外设模板）
-
-```json
-{
-  "name": "外设名称",
-  "platform": "平台名称",
-  "max_instances": 实例数量,
-  "instance_type": "numeric 或 alpha",
-  "help_text": "外设帮助文本",
-  "parameters": [
-    {
-      "name": "参数名称",
-      "type": "int, hex, bool, 或 string",
-      "default": 默认值,
-      "range": [最小值, 最大值],  // 可选，仅用于 int/hex
-      "help": "参数帮助文本"
-    }
-  ],
-  "choices": [
-    {
-      "name": "选择项名称",
-      "options": ["选项1", "选项2", "选项3"],
-      "default": "默认选项",
-      "help": "选择项帮助文本",
-      "values": {
-        "选项1": 0,
-        "选项2": 1,
-        "选项3": 2
-      }
-    }
-  ]
-}
-```
-
-## 快速开始
-
-### 1. 生成单个外设
-
-```bash
-# 生成 UART 外设配置
-python scripts/kconfig_tools/cli.py generate \
-    -p UART -P NATIVE -n 4 \
-    -o platforms/native/src/uart/Kconfig
-```
-
-### 2. 批量生成（使用示例配置）
-
-```bash
-# 使用完整配置
-python scripts/kconfig_tools/cli.py batch-generate \
-    -c scripts/kconfig_tools/examples/batch_config.yaml \
-    -o platforms/native/src/
-
-# 使用最小配置（测试）
-python scripts/kconfig_tools/cli.py batch-generate \
-    -c scripts/kconfig_tools/examples/minimal_config.yaml \
-    -o test_output/
-```
-
-### 3. 验证生成的文件
-
-```bash
-# 验证单个文件
-python scripts/kconfig_tools/cli.py validate \
-    -f platforms/native/src/uart/Kconfig
-
-# 批量验证目录
-python scripts/kconfig_tools/cli.py batch-validate \
-    -d platforms/native/src/ \
-    -r validation_report.txt
-```
-
-## 自定义配置
-
-### 创建自己的批量配置
-
-1. 复制 `minimal_config.yaml` 作为起点
-2. 根据需要添加或修改外设配置
-3. 调整实例数量和输出路径
-4. 运行批量生成命令
-
-### 创建自定义外设模板
-
-1. 复制 `custom_peripheral.json` 作为起点
-2. 修改外设名称、参数和选择项
-3. 使用 Python API 加载并生成
-
-## 注意事项
-
-1. **输出路径**: 配置文件中的 `output` 路径是相对于 `-o` 参数指定的输出目录的
-2. **覆盖模式**: 设置 `overwrite: true` 会覆盖已存在的文件，请谨慎使用
-3. **验证模式**: 建议始终启用 `validate: true`，确保生成的文件符合规范
-4. **实例数量**: GPIO 使用字母标识（A-Z），最多支持 26 个实例；其他外设使用数字标识
-5. **平台名称**: 平台名称会自动转换为大写，确保命名一致性
-
-## 故障排除
-
-**问题**: 批量生成失败，提示文件已存在
-
-**解决**: 设置 `overwrite: true` 或删除已存在的文件
-
----
-
-**问题**: 自定义外设模板加载失败
-
-**解决**: 检查 JSON 格式是否正确，确保所有必需字段都已填写
-
----
-
-**问题**: 生成的文件验证失败
-
-**解决**: 检查模板配置是否符合命名规范，查看验证报告中的具体错误信息
-
-## 更多示例
-
-查看主 README 文档获取更多使用示例和 API 文档：
-- `scripts/kconfig_tools/README.md`
+维护中的 STM32 reference 由明确的 SoC、板卡和构建 profile 选择。`stm32_config.yaml`、`batch_config.yaml` 和 `minimal_config.yaml` 保留为模板数据示例，不要将其输出直接覆盖已经审核的 `platforms/*` schema。JSON 模式使用 `custom_peripheral.json`；参数的 `range` 数组在传入 API 前转换为 tuple。

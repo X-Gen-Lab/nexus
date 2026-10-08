@@ -43,6 +43,7 @@ class ConfigItem:
     line: int  # Line number where config is defined
     prompt: str = ""  # Prompt text
     default: str = ""  # Default value
+    defaults: List[str] = None  # All conditional defaults, preserving each option
     depends_on: List[str] = None  # List of dependencies
     help_text: str = ""  # Help text
     is_menuconfig: bool = False  # Whether this is a menuconfig item
@@ -50,6 +51,8 @@ class ConfigItem:
     def __post_init__(self):
         if self.depends_on is None:
             self.depends_on = []
+        if self.defaults is None:
+            self.defaults = []
 
 
 @dataclass
@@ -114,6 +117,7 @@ class KconfigValidator:
                 config_type = ""
                 prompt = ""
                 default = ""
+                defaults = []
                 depends_on = []
                 help_text = ""
 
@@ -133,22 +137,23 @@ class KconfigValidator:
                         break
 
                     # Parse type
-                    if detail_stripped.startswith('bool '):
+                    if detail_stripped == 'bool' or detail_stripped.startswith('bool '):
                         config_type = "bool"
                         prompt = detail_stripped[5:].strip('"')
-                    elif detail_stripped.startswith('int '):
+                    elif detail_stripped == 'int' or detail_stripped.startswith('int '):
                         config_type = "int"
                         prompt = detail_stripped[4:].strip('"')
-                    elif detail_stripped.startswith('hex '):
+                    elif detail_stripped == 'hex' or detail_stripped.startswith('hex '):
                         config_type = "hex"
                         prompt = detail_stripped[4:].strip('"')
-                    elif detail_stripped.startswith('string '):
+                    elif detail_stripped == 'string' or detail_stripped.startswith('string '):
                         config_type = "string"
                         prompt = detail_stripped[7:].strip('"')
 
                     # Parse default
                     if detail_stripped.startswith('default '):
                         default = detail_stripped[8:]
+                        defaults.append(default)
 
                     # Parse depends on
                     if detail_stripped.startswith('depends on '):
@@ -172,6 +177,7 @@ class KconfigValidator:
                     line=i + 1,
                     prompt=prompt,
                     default=default,
+                    defaults=defaults,
                     depends_on=depends_on,
                     help_text=help_text.strip(),
                     is_menuconfig=is_menuconfig
@@ -321,7 +327,7 @@ class KconfigValidator:
                 config_name = stripped.split()[1]
 
                 # Check peripheral enable pattern (PLATFORM_PERIPHERAL_ENABLE)
-                if '_ENABLE' in config_name and config_name.count('_') >= 2:
+                if config_name.endswith('_ENABLE') and config_name.count('_') >= 2:
                     # Skip instance-level enables (INSTANCE_NX_*)
                     if not config_name.startswith('INSTANCE_NX_'):
                         if not self.rules.validate_pattern(config_name, self.rules.PERIPHERAL_ENABLE_PATTERN):
@@ -455,6 +461,13 @@ class KconfigValidator:
         """
         issues = []
         config_items, choice_items = self._parse_kconfig(content)
+        instance_prefixes = []
+        for item in config_items:
+            match = re.fullmatch(r'INSTANCE_NX_(.+)_([0-9]+|[A-Z])', item.name)
+            if match:
+                instance_prefixes.append('NX_' + match[1] + match[2] + '_')
+            elif re.fullmatch(r'INSTANCE_NX_GPIO[A-Z]', item.name):
+                instance_prefixes.append(item.name[len('INSTANCE_'):] + '_')
 
         # Check help text existence for all config items
         for item in config_items:
@@ -503,35 +516,38 @@ class KconfigValidator:
                     suggestion="Add at least one 'config' option within the choice block"
                 ))
 
-            # Check if choice has corresponding VALUE config
-            if choice.options:
-                # Extract peripheral and instance from first option
-                # Format: NX_PERIPHERAL{N}_CATEGORY_OPTION
-                first_option = choice.options[0]
-                if first_option.startswith('NX_'):
-                    # Extract the value config name pattern
-                    # NX_UART0_PARITY_NONE -> UART0_PARITY_VALUE
-                    parts = first_option.split('_')
-                    if len(parts) >= 4:
-                        # NX_UART0_PARITY_NONE -> UART0_PARITY
-                        value_prefix = '_'.join(parts[1:-1])
-                        expected_value_config = f"{value_prefix}_VALUE"
-
-                        # Check if this VALUE config exists
-                        value_config_found = any(
-                            item.name == expected_value_config
-                            for item in config_items
-                        )
-
-                        if not value_config_found:
-                            issues.append(ValidationIssue(
-                                file=file_path,
-                                line=choice.end_line,
-                                severity="error",
-                                rule="choice_value_config_missing",
-                                message=f"Choice at line {choice.line} is missing corresponding VALUE config '{expected_value_config}'",
-                                suggestion=f"Add 'config {expected_value_config}' with int type and default values for each option"
-                            ))
+            # Static enums need no per-instance numeric VALUE. Bind instance
+            # choices through all conditional defaults: an option may contain
+            # several underscores, so splitting its last word loses its category.
+            instance_choice = any(
+                option.startswith(prefix)
+                for option in choice.options for prefix in instance_prefixes
+            ) or any('INSTANCE_NX_' in dependency for dependency in choice.depends_on)
+            if choice.options and instance_choice:
+                value_configs = []
+                for item in config_items:
+                    if item.type != 'int' or not item.name.endswith('_VALUE'):
+                        continue
+                    prefix = 'NX_' + item.name[:-len('_VALUE')] + '_'
+                    if not all(option.startswith(prefix) for option in choice.options):
+                        continue
+                    if not any(prefix.startswith(instance) for instance in instance_prefixes):
+                        continue
+                    defaults = [re.fullmatch(r'\S+\s+if\s+([A-Z][A-Z0-9_]*)', value)
+                                for value in item.defaults]
+                    if (len(defaults) == len(choice.options) and
+                            all(defaults) and
+                            {match[1] for match in defaults} == set(choice.options)):
+                        value_configs.append(item.name)
+                if len(value_configs) != 1:
+                    issues.append(ValidationIssue(
+                        file=file_path,
+                        line=choice.end_line,
+                        severity="error",
+                        rule="choice_value_config_missing",
+                        message=f"Instance choice at line {choice.line} requires one matching int VALUE config covering every option",
+                        suggestion="Use PERIPHERAL{N}_CATEGORY_VALUE and one conditional default per full option symbol"
+                    ))
 
         # Check file structure order (peripheral enable should come before instances)
         peripheral_enable_line = None

@@ -113,6 +113,33 @@ TEST_F(NxInitTest, InitRun_Success) {
     EXPECT_TRUE(status == NX_OK || status == NX_ERR_GENERIC);
 }
 
+TEST_F(NxInitTest, LinkerSpanRejectsInvalidBoundaries) {
+    const nx_init_fn_t entries[2] = {nullptr, nullptr};
+    uintptr_t start = reinterpret_cast<uintptr_t>(entries);
+    size_t count = 99;
+    EXPECT_EQ(nx_init_validate_span_for_test(start, start + sizeof(entries),
+                                            &count), NX_OK);
+    EXPECT_EQ(count, 2u);
+    EXPECT_EQ(nx_init_validate_span_for_test(start, start, &count), NX_OK);
+    EXPECT_EQ(count, 0u);
+    EXPECT_EQ(nx_init_validate_span_for_test(start + sizeof(entries), start,
+                                            &count), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(count, 0u);
+    EXPECT_EQ(nx_init_validate_span_for_test(start + 1, start + sizeof(entries),
+                                            &count), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_init_validate_span_for_test(start, start + sizeof(entries) - 1,
+                                            &count), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_init_validate_span_for_test(0, sizeof(entries), &count),
+              NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_init_validate_span_for_test(start, start, nullptr),
+              NX_ERR_NULL_PTR);
+    constexpr uintptr_t aligned_start = 4096;
+    constexpr uintptr_t excessive_bytes =
+        (static_cast<uintptr_t>(UINT16_MAX) + 1) * sizeof(nx_init_fn_t);
+    EXPECT_EQ(nx_init_validate_span_for_test(aligned_start,
+        aligned_start + excessive_bytes, &count), NX_ERR_INVALID_STATE);
+}
+
 /**
  * \brief           Test that nx_init_run() is idempotent
  */

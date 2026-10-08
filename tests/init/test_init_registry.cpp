@@ -21,7 +21,7 @@ int main() {
     assert(stats.total_count == 3 && stats.success_count == 2);
     assert(stats.fail_count == 1 && stats.last_error == -37);
     assert(!nx_init_is_complete());
-    nx_init_run();
+    assert(nx_init_run() == NX_ERR_GENERIC);
     assert(calls == 3); // No callback is executed twice.
     assert(nx_init_get_stats(&stats) == NX_OK && stats.fail_count == 1);
     return 0;

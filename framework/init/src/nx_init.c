@@ -116,6 +116,28 @@ static void update_stats(int result) {
     }
 }
 
+/* Linker boundaries denote addresses, not elements of one C array object. */
+static nx_status_t validate_init_span(uintptr_t start, uintptr_t end,
+                                      size_t* count) {
+    if (count == NULL) return NX_ERR_NULL_PTR;
+    *count = 0;
+    if (start == 0 || end == 0 || end < start ||
+        start % _Alignof(nx_init_fn_t) != 0 ||
+        end % _Alignof(nx_init_fn_t) != 0) return NX_ERR_INVALID_STATE;
+    uintptr_t bytes = end - start;
+    if (bytes % sizeof(nx_init_fn_t) != 0 ||
+        bytes / sizeof(nx_init_fn_t) > UINT16_MAX) return NX_ERR_INVALID_STATE;
+    *count = (size_t)(bytes / sizeof(nx_init_fn_t));
+    return NX_OK;
+}
+
+#ifdef NX_STARTUP_TEST_MODE
+nx_status_t nx_init_validate_span_for_test(uintptr_t start, uintptr_t end,
+                                          size_t* count) {
+    return validate_init_span(start, end, count);
+}
+#endif
+
 /*---------------------------------------------------------------------------*/
 /* Public Functions                                                          */
 /*---------------------------------------------------------------------------*/
@@ -124,30 +146,40 @@ static void update_stats(int result) {
  * \brief           Execute all registered initialization functions
  */
 nx_status_t nx_init_run(void) {
-    const nx_init_fn_t* fn_ptr;
     int result;
     bool has_error = false;
 
     /* If already run, return immediately (idempotent) */
     if (g_init_complete) {
-        return NX_OK;
+        return g_init_stats.fail_count ? NX_ERR_GENERIC : NX_OK;
     }
 
     /* Reset statistics */
     memset(&g_init_stats, 0, sizeof(g_init_stats));
 
+    uintptr_t start = (uintptr_t)NX_INIT_FN_START;
+    uintptr_t end = (uintptr_t)NX_INIT_FN_END;
+    size_t count;
+    nx_status_t status = validate_init_span(start, end, &count);
+    if (status != NX_OK) {
+        g_init_stats.last_error = (int)status;
+        return status;
+    }
+
     /* Iterate through all registered init functions */
-    for (fn_ptr = NX_INIT_FN_START; fn_ptr < NX_INIT_FN_END; fn_ptr++) {
+    for (size_t index = 0; index < count; ++index) {
+        nx_init_fn_t fn;
+        uintptr_t address = start + index * sizeof(fn);
+        memcpy(&fn, (const void*)address, sizeof(fn));
 #ifndef _MSC_VER
         /* Skip boundary markers (not used in MSVC) */
-        if (*fn_ptr == _nx_init_boundary_start ||
-            *fn_ptr == _nx_init_boundary_end) {
+        if (fn == _nx_init_boundary_start || fn == _nx_init_boundary_end) {
             continue;
         }
 #endif
 
         /* Execute function */
-        result = execute_init_fn(*fn_ptr);
+        result = execute_init_fn(fn);
 
         /* Update statistics */
         update_stats(result);
