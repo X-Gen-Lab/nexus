@@ -180,5 +180,110 @@ class CMakeConfigurationTests(unittest.TestCase):
         self.assertEqual(previous, (directory / 'generated/nexus_config.h').read_bytes())
 
 
+@unittest.skipUnless(sys.platform.startswith('linux') and shutil.which('cmake') and
+                     shutil.which('cc') and shutil.which('nm') and shutil.which('readelf'),
+                     'Linux CMake, GNU-compatible compiler and ELF tools are required')
+class ApplicationTargetTests(unittest.TestCase):
+    """Link real host ELF fixtures through nested platform/application scopes.
+
+    The fixture checks target ownership and ELF entry points, not ARM execution.
+    """
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.work = Path(self.directory.name)
+        self.source = self.work / 'source'
+        self.build = self.work / 'build'
+        for directory in ('platforms/stm32', 'applications'):
+            (self.source / directory).mkdir(parents=True)
+        self.layout = self.source / 'platforms/stm32/layout.ld'
+        self.layout.write_text(self.layout_at(0x10000))
+        (self.source / 'platforms/stm32/startup.s').write_text(
+            '.text\n.globl Reset_Handler\nReset_Handler:\n.byte 0\n'
+            '.section .note.GNU-stack,"",@progbits\n')
+        (self.source / 'platforms/stm32/dummy.c').write_text('int platform_dummy;\n')
+        (self.source / 'applications/main.c').write_text('int main(void) { return 0; }\n')
+        (self.source / 'CMakeLists.txt').write_text(
+            'cmake_minimum_required(VERSION 3.21)\n'
+            'project(platform_scope_probe C ASM)\n'
+            'set(NEXUS_PLATFORM stm32)\n'
+            'set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")\n'
+            'set(CONFIG_APP_STACK_SIZE 0x1000)\nset(CONFIG_APP_HEAP_SIZE 0x2000)\n'
+            'add_library(hal INTERFACE)\nadd_library(osal INTERFACE)\n'
+            'add_subdirectory(platforms)\n'
+            f'include("{(ROOT / "cmake/modules/NexusApplications.cmake").as_posix()}")\n'
+            'add_subdirectory(applications)\n')
+        (self.source / 'platforms/CMakeLists.txt').write_text('add_subdirectory(stm32)\n')
+        (self.source / 'applications/CMakeLists.txt').write_text(
+            'nexus_add_application(TARGET link_probe SOURCES main.c)\n'
+            'target_compile_options(link_probe PRIVATE -ffreestanding -fno-pie '
+            '-fno-asynchronous-unwind-tables -fno-stack-protector)\n'
+            'target_link_options(link_probe PRIVATE -nostdlib -no-pie -Wl,--build-id=none)\n')
+
+    @staticmethod
+    def layout_at(address):
+        return ('ENTRY(Reset_Handler)\nSECTIONS { '
+                f'. = 0x{address:x}; '
+                '.text : { *(.text .text.*) } '
+                '/DISCARD/ : { *(.note*) *(.eh_frame*) } }\n')
+
+    def configure(self, defect=''):
+        source = 'dummy.c' if defect == 'unowned_startup' else 'startup.s'
+        startup = '' if defect == 'missing_startup' else '${CMAKE_CURRENT_SOURCE_DIR}/startup.s'
+        script = '' if defect == 'missing_layout' else '${CMAKE_CURRENT_SOURCE_DIR}/layout.ld'
+        (self.source / 'platforms/stm32/CMakeLists.txt').write_text(
+            f'add_library(platform_stm32 OBJECT {source})\n'
+            # SOURCES must carry the same absolute startup identity as the property.
+            'get_target_property(_sources platform_stm32 SOURCES)\n'
+            'list(TRANSFORM _sources PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")\n'
+            'set_property(TARGET platform_stm32 PROPERTY SOURCES "${_sources}")\n'
+            'set_target_properties(platform_stm32 PROPERTIES '
+            f'NEXUS_STARTUP_SOURCE "{startup}" NEXUS_LINKER_SCRIPT "{script}")\n'
+            'target_link_options(platform_stm32 INTERFACE "-T${CMAKE_CURRENT_SOURCE_DIR}/layout.ld")\n'
+            'set_property(TARGET platform_stm32 PROPERTY INTERFACE_LINK_DEPENDS '
+            '"${CMAKE_CURRENT_SOURCE_DIR}/layout.ld")\n')
+        return subprocess.run(['cmake', '-S', str(self.source), '-B', str(self.build)],
+                              text=True, capture_output=True)
+
+    def build_probe(self):
+        result = subprocess.run(['cmake', '--build', str(self.build), '--target', 'link_probe'],
+                                text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        elf = self.build / 'bin/link_probe.elf'
+        self.assertTrue(elf.is_file())
+        symbols = subprocess.run(['nm', '--defined-only', str(elf)],
+                                 text=True, capture_output=True, check=True).stdout
+        reset = next(int(line.split()[0], 16) for line in symbols.splitlines()
+                     if line.split()[-1] == 'Reset_Handler')
+        header = subprocess.run(['readelf', '-h', str(elf)],
+                                text=True, capture_output=True, check=True).stdout
+        entry = next(int(line.split(':', 1)[1].strip(), 16)
+                     for line in header.splitlines() if 'Entry point address:' in line)
+        self.assertEqual(entry, reset)
+        self.assertTrue((self.build / 'bin/link_probe.map').is_file())
+        return entry
+
+    def test_nested_platform_owns_startup_and_layout_in_actual_elf(self):
+        result = self.configure()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.build_probe()
+
+    def test_missing_or_uncompiled_startup_and_layout_fail_configuration(self):
+        for defect in ('missing_startup', 'missing_layout', 'unowned_startup'):
+            with self.subTest(defect=defect):
+                result = self.configure(defect)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('platform_stm32', result.stderr)
+                self.assertFalse((self.build / 'bin/link_probe.elf').exists())
+
+    def test_platform_layout_change_relinks_elf_entry_without_source_edits(self):
+        result = self.configure()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        first = self.build_probe()
+        self.layout.write_text(self.layout_at(0x20000))
+        self.assertEqual(self.build_probe() - first, 0x10000)
+
+
 if __name__ == '__main__':
     unittest.main()
