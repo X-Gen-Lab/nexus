@@ -111,8 +111,19 @@ jobs:
 
       - name: Generate Coverage
         run: |
-          lcov --capture --directory . --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/ext/*' --output-file coverage.info
+          lcov --capture --directory build/linux-gcc-coverage --output-file coverage.info \
+            --include "${{ github.workspace }}/hal/*" \
+            --include "${{ github.workspace }}/osal/*" \
+            --include "${{ github.workspace }}/framework/*" \
+            --include "${{ github.workspace }}/services/*" \
+            --include "${{ github.workspace }}/platforms/*" \
+            --include "${{ github.workspace }}/boards/*" \
+            --include "${{ github.workspace }}/soc/*" \
+            --exclude "${{ github.workspace }}/tests/*" \
+            --exclude "${{ github.workspace }}/ext/*" \
+            --exclude "${{ github.workspace }}/vendors/*"
+          test -s coverage.info
+          grep -q '^SF:' coverage.info
           genhtml coverage.info --output-directory coverage_html
 
       - name: Upload Coverage Report
