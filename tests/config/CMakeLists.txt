@@ -32,7 +32,7 @@ set(CONFIG_TEST_SOURCES
 
 # Create test executable
 add_executable(config_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main_common.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
     ${CONFIG_TEST_SOURCES}
 )
 

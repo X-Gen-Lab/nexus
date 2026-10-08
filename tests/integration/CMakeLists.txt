@@ -11,7 +11,7 @@ set(INTEGRATION_TEST_SOURCES
 
 # Create test executable
 add_executable(integration_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main_common.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
     ${INTEGRATION_TEST_SOURCES}
 )
 

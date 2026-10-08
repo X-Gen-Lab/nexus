@@ -1,5 +1,5 @@
 # Execute the pinned kernel with its real POSIX port. This is not MCU/HIL evidence.
-set(kernel "${CMAKE_SOURCE_DIR}/ext/freertos")
+set(kernel "${NEXUS_SOURCE_DIR}/ext/freertos")
 set(port "${kernel}/portable/ThirdParty/GCC/Posix")
 add_library(freertos_contract_kernel STATIC
     "${kernel}/tasks.c" "${kernel}/queue.c" "${kernel}/list.c"
@@ -12,8 +12,8 @@ target_compile_definitions(freertos_contract_kernel PRIVATE _DEFAULT_SOURCE)
 target_compile_options(freertos_contract_kernel PRIVATE -UNDEBUG)
 target_link_libraries(freertos_contract_kernel PUBLIC Threads::Threads)
 
-add_library(freertos_contract_adapter STATIC "${CMAKE_SOURCE_DIR}/osal/adapters/freertos/osal_freertos.c")
-target_include_directories(freertos_contract_adapter PUBLIC "${CMAKE_SOURCE_DIR}/osal/include")
+add_library(freertos_contract_adapter STATIC "${NEXUS_SOURCE_DIR}/osal/adapters/freertos/osal_freertos.c")
+target_include_directories(freertos_contract_adapter PUBLIC "${NEXUS_SOURCE_DIR}/osal/include")
 target_link_libraries(freertos_contract_adapter PUBLIC freertos_contract_kernel nexus_build_options)
 target_compile_options(freertos_contract_adapter PRIVATE -Werror -UNDEBUG)
 add_executable(freertos_contract_tests test_freertos_contracts.c)

@@ -12,6 +12,8 @@ Nexus 的首期定位是工业控制与设备联网 MCU 平台，面向约 10 �
 | [实施记录](../implementation/) | 已落地的构建、驱动、存储、安全、工业服务和交付工具 |
 | [支持矩阵](support-matrix.yaml) | 每个组合的验证范围与阻塞；没有企业支持或 LTS 宣称 |
 | [目标架构](target-architecture.md) / [架构决策](architecture-decisions.md) | 依赖方向、资源所有权、配置与版本格式边界 |
+| [平台重构详细设计](platform-architecture-v2.md) | HAL/OSAL、Arch/SoC/Board/Product、源码 SDK 与构建目标的具体边界 |
+| [主流平台比较](platform-comparison.md) / [HAL/OSAL 设计](hal-osal-design.md) | 官方架构对照、底座选择、设备与异步操作契约及迁移条件 |
 | [企业研发工作流](enterprise-workflow.md) | 需求、开发、验证、发布、制造和现场维护的责任与证据 |
 | [质量与安全](quality-security.md) / [路线图](roadmap.md) | 产品预算、风险以及 3–6 个月阶段退出条件 |
 | [独立边界审查](../implementation/independent-review.md) | 定向发现、修复、回归和仍未关闭的审查项 |
@@ -29,9 +31,9 @@ Nexus 的首期定位是工业控制与设备联网 MCU 平台，面向约 10 �
 
 ## 当前实现与支持范围
 
-Linux GCC Debug Native 已编译链接维护目标，完整 CMake/CTest 检查点执行 1696 项、failure/error/skip 均为 0，包含真实生产初始化和四个有限运行示例。新增第五个 OSAL demo smoke 在独立报告中 1/1 通过，ASan/UBSan 的 23 个选定契约/应用也通过；本地 LeakSanitizer 受 ptrace 限制，未计通过。最终 source/config/ELF 身份在源码提交后重新构建归档，不把分开的报告冒充一份已执行 1697 项的全量报告。pinned FreeRTOS kernel 的 POSIX 端口用于软件行为检查，不能代表 ARM 中断端口已上板。
+重构审查基线 `affaa86f` 的线上 Native GCC、Clang 和 coverage 配置各执行 1711 项 CMake/CTest，均通过；线上选定 ASan/UBSan 23 项使用 LeakSanitizer 执行通过。本地 LeakSanitizer 受 ptrace 限制，不计通过。指定生产源码范围的行覆盖率为 80.8%，不能解释为完整 MCU 行为、分支覆盖或硬件验收。pinned FreeRTOS kernel 的 POSIX 端口用于软件行为检查，不能代表 ARM 中断端口已上板。后续重构须重新验证，不能继承这些历史结果。
 
-嵌入式实现参考为 STM32F407VG + STM32F4DISCOVERY/MB997，包含 168 MHz 启动、PD12 LED、SPI1/DMA 绑定、保留 Flash sector 10/11 和 UID 端口。真实 SDK 语法检查与 host driver fakes 已执行，完整 ARM 编译/链接与 PCB revision、供电、电气时序、IRQ、DMA、断电和最坏负载预算需要独立证据。MB997 没有板载 RS485 transceiver，通信服务仍需产品 UART/DE/RE adapter 和明确外接器件。
+嵌入式实现参考为 STM32F407VG + STM32F4DISCOVERY/MB997，包含 168 MHz 启动、PD12 LED、SPI1/DMA 绑定、保留 Flash sector 10/11 和 UID 端口。基线已有官方 SDK 裸机/FreeRTOS 的线上 ARM 编译链接及 host driver fakes；9 个 ARM ELF 的静态核验未观察到应用与保留 Flash 重叠。PR 工件记录的测试提交为 `d4134c3b`，源码树与 `affaa86f` 相同。PCB revision、供电、电气时序、IRQ、DMA、断电和最坏负载预算仍需独立证据。UART 尚有资源绑定与生命周期缺口，MB997 没有板载 RS485 transceiver，通信服务仍需产品 UART/DE/RE adapter 和明确外接器件。
 
 GD32 的具体型号、板卡和固定官方 SDK 未确定，构建明确失败而不是返回成功的空库。CAN/CANopen 和 Ethernet/MQTT 是 COM-002/003 的产品选项，未实现成虚假的成功占位。
 

@@ -40,7 +40,7 @@ F407 的最高 SYSCLK 限制修正为 168 MHz，不能从其他 F4 型号推导�
 
 `soc/stm32f407vg/flash.c` 提供真实 ST HAL Flash port：只允许保留的 sector 10/11，128 KiB erase、4 字节 program、写前验证 1→0、HAL 错误传播、读回验证和 data-cache flush。provider 必须看到链接器 `__nexus_storage_start/end` 正确保留 0x080C0000..0x08100000，否则返回 NULL；应用可执行 Flash 限为前 768 KiB。VDD 必须满足 2.7..3.6 V 的 word program/erase 条件。读取、program、erase 均为同步任务操作，不保留 caller buffers。Flash 擦写会暂停 Flash 指令访问，只能在产品维护窗口安排，不能将其当作控制任务非阻塞服务。
 
-`boards/stm32f4discovery/identity.c` 读取实际 96 位 UID、硅片 device/revision 和 Flash 容量；PCB revision 必须来自板卡资产/工装记录，不能用硅片 revision 代替。
+`soc/stm32f407vg/identity.c` 读取实际 96 位 UID、硅片 device/revision 和 Flash 容量；PCB revision 必须来自板卡资产/工装记录，不能用硅片 revision 代替。
 
 ## 执行证据与限制
 

@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
-project(nexus VERSION 0.1.0 LANGUAGES C CXX ASM)
+project(nexus VERSION 0.1.0 LANGUAGES C ASM)
 
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+set(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}")
+set(NEXUS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+if(NEXUS_SOURCE_DIR STREQUAL NEXUS_BINARY_DIR)
     message(FATAL_ERROR "Use an out-of-source build directory")
 endif()
 set(CMAKE_C_STANDARD 11)
@@ -11,11 +13,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(PROJECT_IS_TOP_LEVEL AND NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build mode" FORCE)
 endif()
-option(NEXUS_BUILD_TESTS "Build host tests" ON)
-option(NEXUS_BUILD_EXAMPLES "Build applications" ON)
+option(NEXUS_BUILD_TESTS "Build host tests" ${PROJECT_IS_TOP_LEVEL})
+option(NEXUS_BUILD_EXAMPLES "Build applications" ${PROJECT_IS_TOP_LEVEL})
+if(NEXUS_BUILD_TESTS)
+    enable_language(CXX)
+endif()
 option(NEXUS_ENABLE_SANITIZERS "Instrument host code with ASan/UBSan" OFF)
 option(NEXUS_ENABLE_COVERAGE "Instrument host code for coverage" OFF)
 set(NEXUS_PLATFORM native CACHE STRING "Target platform")
@@ -33,14 +38,14 @@ target_compile_definitions(nexus_build_options INTERFACE "NEXUS_PLATFORM_${nexus
 file(SHA256 "${NEXUS_CONFIG_DIR}/effective.config" nexus_config_sha256)
 set(nexus_source_revision "unknown-source")
 find_package(Git QUIET)
-if(Git_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if(Git_FOUND)
     execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --verify HEAD
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" RESULT_VARIABLE revision_result
+        WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE revision_result
         OUTPUT_VARIABLE revision OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
     if(revision_result EQUAL 0)
         set(nexus_source_revision "${revision}")
-        execute_process(COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=normal
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" RESULT_VARIABLE status_result
+        execute_process(COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=normal -- .
+            WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE status_result
             OUTPUT_VARIABLE source_changes ERROR_QUIET)
         if(NOT status_result EQUAL 0 OR source_changes)
             string(APPEND nexus_source_revision "-dirty")
@@ -58,6 +63,15 @@ foreach(resource TASKS MUTEXES SEMS QUEUES EVENTS TIMERS)
         OSAL_MAX_${resource}=${CONFIG_OSAL_MAX_${resource}})
 endforeach()
 target_include_directories(nexus_build_options INTERFACE "${NEXUS_CONFIG_DIR}")
+target_compile_features(nexus_build_options INTERFACE c_std_11)
+set_target_properties(nexus_build_options PROPERTIES
+    NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}"
+    NEXUS_BINARY_DIR "${NEXUS_BINARY_DIR}"
+    NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}"
+    NEXUS_CONFIG_CMAKE "${NEXUS_CONFIG_DIR}/config.cmake"
+    NEXUS_PLATFORM "${NEXUS_PLATFORM}"
+    NEXUS_PLATFORM_TARGET "platform_${NEXUS_PLATFORM}")
+add_library(Nexus::Config ALIAS nexus_build_options)
 if(MSVC)
     target_compile_options(nexus_build_options INTERFACE /W4 /FS)
 else()
@@ -91,18 +105,30 @@ if(NEXUS_ENABLE_SANITIZERS)
     target_compile_options(nexus_build_options INTERFACE -fsanitize=address,undefined -fno-omit-frame-pointer)
     target_link_options(nexus_build_options INTERFACE -fsanitize=address,undefined)
 endif()
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/bin")
 
-if(NEXUS_PLATFORM STREQUAL "native")
-    find_package(OpenSSL 3.0 REQUIRED COMPONENTS Crypto)
-endif()
 add_subdirectory(osal)
 add_subdirectory(hal)
 add_subdirectory(services)
 add_subdirectory(framework)
 add_subdirectory(platforms)
+add_library(Nexus::HAL ALIAS hal)
+add_library(Nexus::HALInterface ALIAS hal_interface)
+add_library(Nexus::OSAL ALIAS osal)
+add_library(Nexus::OSALInterface ALIAS osal_interface)
+add_library(Nexus::Platform ALIAS "platform_${NEXUS_PLATFORM}")
+foreach(pair "Storage;nexus_storage" "Security;nexus_security" "Update;nexus_update"
+             "ModbusRTU;nexus_modbus_rtu" "Industrial;nexus_industrial"
+             "ConfigManager;config_framework" "Log;log_framework"
+             "Shell;shell_framework" "Init;init_framework")
+    list(GET pair 0 public_name)
+    list(GET pair 1 implementation)
+    if(TARGET "${implementation}")
+        add_library(Nexus::${public_name} ALIAS "${implementation}")
+    endif()
+endforeach()
 include(NexusApplications)
 if(NEXUS_BUILD_EXAMPLES)
     add_subdirectory(applications)

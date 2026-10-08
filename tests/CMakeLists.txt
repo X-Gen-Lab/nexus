@@ -17,7 +17,7 @@ enable_testing()
 #-----------------------------------------------------------------------------
 
 # Use the exact repository-pinned dependency. Configuration performs no downloads.
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/ext/googletest/googletest/src/gtest-all.cc")
+if(NOT EXISTS "${NEXUS_SOURCE_DIR}/ext/googletest/googletest/src/gtest-all.cc")
     message(FATAL_ERROR "Initialize ext/googletest with git submodule update --init")
 endif()
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -27,7 +27,7 @@ set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 # Limit the compatibility floor to this known legacy dependency subtree.
 set(_saved_policy_minimum "${CMAKE_POLICY_VERSION_MINIMUM}")
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-add_subdirectory("${CMAKE_SOURCE_DIR}/ext/googletest" "${CMAKE_BINARY_DIR}/ext/googletest")
+add_subdirectory("${NEXUS_SOURCE_DIR}/ext/googletest" "${NEXUS_BINARY_DIR}/ext/googletest")
 set(CMAKE_POLICY_VERSION_MINIMUM "${_saved_policy_minimum}")
 
 # Include Google Test module for test discovery
@@ -49,13 +49,13 @@ endif()
 
 # Common include directories for all tests
 set(NEXUS_TEST_INCLUDES
-    ${CMAKE_SOURCE_DIR}/hal/include
-    ${CMAKE_SOURCE_DIR}/osal/include
-    ${CMAKE_SOURCE_DIR}/platforms/native/include
-    ${CMAKE_SOURCE_DIR}/framework/log/include
-    ${CMAKE_SOURCE_DIR}/framework/shell/include
-    ${CMAKE_SOURCE_DIR}/framework/config/include
-    ${CMAKE_SOURCE_DIR}/framework/init/include
+    ${NEXUS_SOURCE_DIR}/hal/include
+    ${NEXUS_SOURCE_DIR}/osal/include
+    ${NEXUS_SOURCE_DIR}/platforms/native/include
+    ${NEXUS_SOURCE_DIR}/framework/log/include
+    ${NEXUS_SOURCE_DIR}/framework/shell/include
+    ${NEXUS_SOURCE_DIR}/framework/config/include
+    ${NEXUS_SOURCE_DIR}/framework/init/include
     ${NEXUS_CONFIG_DIR}
 )
 
@@ -196,8 +196,16 @@ message(STATUS "")
 
 # Run real configuration generation and CMake consumer regressions.
 add_test(NAME effective_configuration
-    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/kconfig/test_effective_config.py")
+    COMMAND "${Python3_EXECUTABLE}" "${NEXUS_SOURCE_DIR}/scripts/kconfig/test_effective_config.py")
 set_tests_properties(effective_configuration PROPERTIES LABELS "build;configuration" TIMEOUT 60)
+add_test(NAME external_sdk_consumer
+    COMMAND "${Python3_EXECUTABLE}" "${NEXUS_SOURCE_DIR}/scripts/kconfig/test_external_consumer.py")
+set_tests_properties(external_sdk_consumer PROPERTIES LABELS "build;sdk;configuration" TIMEOUT 120)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    add_test(NAME platform_component_objects
+        COMMAND "${Python3_EXECUTABLE}" "${NEXUS_SOURCE_DIR}/scripts/kconfig/test_component_objects.py")
+    set_tests_properties(platform_component_objects PROPERTIES LABELS "build;platform;host-link" TIMEOUT 120)
+endif()
 
 if(TARGET blinky)
     # Execute the real application and production factory, without fixture setup.

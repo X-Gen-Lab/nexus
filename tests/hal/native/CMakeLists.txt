@@ -62,7 +62,7 @@ endif()
 
 # Create test executable
 add_executable(hal_native_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main.cpp
     ${HAL_NATIVE_TEST_SOURCES}
 )
 
@@ -103,7 +103,7 @@ add_test(NAME native_registry_contract_tests COMMAND native_registry_contract_te
 set_tests_properties(native_registry_contract_tests PROPERTIES TIMEOUT 10 LABELS "hal;native;registration;contract")
 
 add_executable(unbound_platform_contract_tests
-    test_unbound_platform.c "${CMAKE_SOURCE_DIR}/hal/src/nx_hal.c")
+    test_unbound_platform.c "${NEXUS_SOURCE_DIR}/hal/src/nx_hal.c")
 target_link_libraries(unbound_platform_contract_tests PRIVATE hal_interface nexus_build_options)
 if(MSVC)
     target_compile_options(unbound_platform_contract_tests PRIVATE /UNDEBUG)

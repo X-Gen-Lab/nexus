@@ -18,7 +18,7 @@ set(LOG_TEST_SOURCES
 
 # Create test executable
 add_executable(log_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main_common.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
     ${LOG_TEST_SOURCES}
 )
 

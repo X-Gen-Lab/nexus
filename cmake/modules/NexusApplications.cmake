@@ -4,11 +4,24 @@ function(nexus_add_application)
     if(APP_UNPARSED_ARGUMENTS OR NOT APP_TARGET OR NOT APP_SOURCES)
         message(FATAL_ERROR "nexus_add_application requires TARGET, SOURCES and known arguments")
     endif()
-    set(platform_target "platform_${NEXUS_PLATFORM}")
+    if(NOT TARGET Nexus::Config)
+        message(FATAL_ERROR "Add Nexus before declaring a Nexus application")
+    endif()
+    # A function called by the parent does not inherit variables from the Nexus
+    # subdirectory. The selected configuration target owns its build context.
+    get_target_property(platform_target Nexus::Config NEXUS_PLATFORM_TARGET)
+    get_target_property(platform Nexus::Config NEXUS_PLATFORM)
+    get_target_property(binary_dir Nexus::Config NEXUS_BINARY_DIR)
+    get_target_property(configuration Nexus::Config NEXUS_CONFIG_CMAKE)
+    if(NOT platform_target OR NOT platform OR NOT binary_dir OR
+       NOT configuration OR NOT EXISTS "${configuration}")
+        message(FATAL_ERROR "Nexus::Config is missing its resolved application context")
+    endif()
+    include("${configuration}")
     if(NOT TARGET "${platform_target}")
         message(FATAL_ERROR "Application ${APP_TARGET} requires selected platform target ${platform_target}")
     endif()
-    if(NEXUS_PLATFORM STREQUAL "stm32")
+    if(platform STREQUAL "stm32")
         get_target_property(platform_type "${platform_target}" TYPE)
         get_target_property(startup_source "${platform_target}" NEXUS_STARTUP_SOURCE)
         get_target_property(linker_script "${platform_target}" NEXUS_LINKER_SCRIPT)
@@ -24,17 +37,21 @@ function(nexus_add_application)
         endif()
     endif()
     add_executable(${APP_TARGET} ${APP_SOURCES})
+    set_target_properties(${APP_TARGET} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${binary_dir}/bin"
+        ARCHIVE_OUTPUT_DIRECTORY "${binary_dir}/lib"
+        C_EXTENSIONS OFF CXX_EXTENSIONS OFF)
     if(APP_VERSION)
         target_compile_definitions(${APP_TARGET} PRIVATE "NEXUS_APP_VERSION=\"${APP_VERSION}\"")
     endif()
-    target_link_libraries(${APP_TARGET} PRIVATE "${platform_target}" hal osal ${APP_EXTRA_DEPS} ${APP_PLATFORM_DEPS})
-    if(NEXUS_PLATFORM STREQUAL "native" AND CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        target_link_options(${APP_TARGET} PRIVATE "-Wl,-Map,${CMAKE_BINARY_DIR}/bin/${APP_TARGET}.map")
+    target_link_libraries(${APP_TARGET} PRIVATE "${platform_target}" Nexus::HAL Nexus::OSAL ${APP_EXTRA_DEPS} ${APP_PLATFORM_DEPS})
+    if(platform STREQUAL "native" AND CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        target_link_options(${APP_TARGET} PRIVATE "-Wl,-Map,$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map")
     endif()
-    if(NEXUS_PLATFORM STREQUAL "stm32")
+    if(platform STREQUAL "stm32")
         set_target_properties(${APP_TARGET} PROPERTIES SUFFIX ".elf")
         target_link_options(${APP_TARGET} PRIVATE
-            "-Wl,-Map,${CMAKE_BINARY_DIR}/bin/${APP_TARGET}.map"
+            "-Wl,-Map,$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map"
             "-Wl,--defsym,_Min_Stack_Size=${CONFIG_APP_STACK_SIZE}"
             "-Wl,--defsym,_Min_Heap_Size=${CONFIG_APP_HEAP_SIZE}")
         if(CONFIG_APP_PRINT_MEMORY_USAGE)
@@ -42,11 +59,11 @@ function(nexus_add_application)
         endif()
         if(CONFIG_APP_GENERATE_BIN)
             add_custom_command(TARGET ${APP_TARGET} POST_BUILD
-                COMMAND "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:${APP_TARGET}>" "${CMAKE_BINARY_DIR}/bin/${APP_TARGET}.bin" VERBATIM)
+                COMMAND "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:${APP_TARGET}>" "$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin" VERBATIM)
         endif()
         if(CONFIG_APP_GENERATE_HEX)
             add_custom_command(TARGET ${APP_TARGET} POST_BUILD
-                COMMAND "${CMAKE_OBJCOPY}" -O ihex "$<TARGET_FILE:${APP_TARGET}>" "${CMAKE_BINARY_DIR}/bin/${APP_TARGET}.hex" VERBATIM)
+                COMMAND "${CMAKE_OBJCOPY}" -O ihex "$<TARGET_FILE:${APP_TARGET}>" "$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.hex" VERBATIM)
         endif()
         if(CONFIG_APP_PRINT_SIZE)
             add_custom_command(TARGET ${APP_TARGET} POST_BUILD

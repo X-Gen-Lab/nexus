@@ -9,10 +9,10 @@ target_compile_definitions(init_framework PRIVATE
     $<$<BOOL:${NEXUS_BUILD_TESTS}>:NX_STARTUP_TEST_MODE>)
 if(NEXUS_PLATFORM STREQUAL "native")
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        target_link_options(init_interface INTERFACE "LINKER:-T,${CMAKE_SOURCE_DIR}/cmake/linker/nx_native_init.ld")
-        set_property(TARGET init_framework APPEND PROPERTY INTERFACE_LINK_DEPENDS "${CMAKE_SOURCE_DIR}/cmake/linker/nx_native_init.ld")
+        target_link_options(init_interface INTERFACE "LINKER:-T,${NEXUS_SOURCE_DIR}/cmake/linker/nx_native_init.ld")
+        set_property(TARGET init_framework APPEND PROPERTY INTERFACE_LINK_DEPENDS "${NEXUS_SOURCE_DIR}/cmake/linker/nx_native_init.ld")
     elseif(NOT MSVC)
         # These host boundary stubs do not establish initializer support.
-        target_sources(init_framework PRIVATE "${CMAKE_SOURCE_DIR}/platforms/native/src/platform/nx_init_sections_stub.c")
+        target_sources(init_framework PRIVATE "${NEXUS_SOURCE_DIR}/platforms/native/src/platform/nx_init_sections_stub.c")
     endif()
 endif()

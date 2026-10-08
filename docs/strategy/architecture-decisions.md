@@ -18,7 +18,7 @@ SPI/I2C 的现代设备 API 采用调用者持有的 owner/generation 值句柄�
 
 通用能力契约位于 HAL/OSAL；架构端口负责临界区、原子、屏障、cache 和时间源；SoC 驱动负责控制器及厂商 SDK；板卡负责时钟、引脚、外设连接和存储分区；产品负责控制策略、功能选择和业务安全状态。通用层不得包含厂商头文件，产品不得绕过接口依赖寄存器。
 
-维护中已提取临界区端口、STM32F407 SoC 与 MB997 board 描述；仅在仍承担实际设备后端职责时保留 `platforms/stm32`，不以旧路径作为兼容承诺。目录变化必须伴随依赖检查和相同契约测试，不能只移动文件。
+维护中已有 CPU 条件明确的临界区实现、STM32F407 SoC 与 MB997 board 描述；临界区仍分别位于 HAL/OSAL，独立 Arch 模块与板级运行结构解耦继续按详细设计迁移。仅在承担实际装配职责时保留 `platforms/stm32`。目录变化必须伴随依赖检查和相同契约测试，不能只移动文件。
 
 ## ADR 003 配置作为每个构建的输入
 
@@ -61,6 +61,28 @@ Modbus、CANopen、MQTT、TLS、bootloader 等优先评估维护良好、许可�
 Config 完整 namespace 映射以 NXCS 快照保存，binary v2 使用明确 little-endian 格式并要求既有 namespace map。NXCF schema1 使用维护中的 AES-GCM，AAD 绑定记录、namespace数值ID、key和type；它不能独自保护整个快照政策或阻止回放。Native 的 OpenSSL3 provider 提供系统 CSPRNG/SHA-256/Ed25519，MCU 未绑定维护中的 provider 显式失败。nonce 为96-bit CSPRNG随机值，产品需制定碰撞/写次数/轮换预算并验证真实熵，不宣称无限写入无重用。keyring/vault 持久化和退役由产品负责，明文key不写入参数分区。
 
 更新核心实现 NXUF 签名清单、NXUS 状态、错板/摘要拒绝、先持久化试运行次数及健康意图、计数推进后确认的可恢复流程。下载、槽安装、受保护状态/信任库、安全计数器、启动切换和独立恢复由产品端口承担，尚未建立真实启动链。MCUboot 仍是待选候选；分区容量、硬件保护和维护窗口必须由首发产品决定。旧实验格式一律按明确版本边界处理，不静默迁移未认证数据。
+
+## ADR 008 源码 SDK 使用目标上下文而非宿主工程根
+
+状态：采用，实施与执行范围见 [架构基础记录](../implementation/architecture-foundation.md)。
+
+Nexus source/build 根取自身目录；作为子工程默认不创建测试和示例，不污染父工程其他目标的输出。有效配置、选定平台、生成目录与工件设置存入 target context，应用 helper 在父工程读取该上下文。公开 `Nexus::` targets 是源码消费入口，不等于已完成的 installed binary SDK。
+
+一次配置只拥有一组 board/backend/effective config。不同组合使用独立 build root，不增加第二个构建引擎、模块注册 DSL 或全局多产品配置生成器。外部消费以真实 configure/build/link/run 和父工程隔离验证退出；install/export 作为单独工作包。
+
+## ADR 009 平台装配显式保留对象并隔离 SDK 编译接口
+
+状态：采用，首批只落实编译目标边界，运行时 Board/controller 结构继续迁移。
+
+SoC、controller、Board 各自声明源码及私有 SDK/内部头，platform assembly 显式注入对象并直接拥有真实 startup 和 linker。注册段和强 callback 不能只依靠 archive 按需抽取与 linker KEEP。平台对普通产品公开 Nexus 接口；direct SDK bring-up 必须显式声明 SDK 依赖。验证包含真实 ARM 链接与普通应用编译接口隔离，不以 target 名称代替证明。
+
+## ADR 010 常量设备描述与运行操作所有权分离
+
+状态：采用设计，公共接口与运行时迁移尚未完成。
+
+设备描述、driver instance、owner/generation handle 和 operation 是不同对象。发现不启动硬件，打开/关闭显式报告错误；取消和超时经过 hardware settlement，停止失败继续持有 buffer lease 并进入故障恢复。UART memory complete 与 wire TC 分开，RS485 DE 以后者为准。任务锁、CPU saved mask 与 RTOS syscall mask 不互换。迁移需同时更新真实调用者与测试，不能保留弱伪时钟和无法停止传输的通用同步转换作为可靠性承诺。
+
+详细契约及验收见 [HAL/OSAL 设计](hal-osal-design.md)，底座选择见 [平台比较](platform-comparison.md)。
 
 ## 需要产品信息收敛的决策
 

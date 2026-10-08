@@ -28,7 +28,7 @@ set(OSAL_TEST_SOURCES
 
 # Create test executable
 add_executable(osal_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main_common.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
     ${OSAL_TEST_SOURCES}
 )
 
@@ -63,8 +63,8 @@ if(UNIX)
 
     add_executable(baremetal_contract_tests
         test_baremetal_contracts.c
-        ${CMAKE_SOURCE_DIR}/osal/adapters/baremetal/osal_baremetal.c)
-    target_include_directories(baremetal_contract_tests PRIVATE ${CMAKE_SOURCE_DIR}/osal/include)
+        ${NEXUS_SOURCE_DIR}/osal/adapters/baremetal/osal_baremetal.c)
+    target_include_directories(baremetal_contract_tests PRIVATE ${NEXUS_SOURCE_DIR}/osal/include)
     target_link_libraries(baremetal_contract_tests PRIVATE nexus_build_options)
     target_compile_options(baremetal_contract_tests PRIVATE -UNDEBUG -Werror)
     add_test(NAME baremetal_contract_tests COMMAND baremetal_contract_tests)
