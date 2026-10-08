@@ -340,7 +340,7 @@ typedef struct {
     uint8_t capacity;       /**< 历史容量 */
     uint8_t count;          /**< 当前历史数量 */
     uint8_t head;           /**< 环形缓冲区头 */
-    int8_t browse_index;    /**< 浏览索引（-1 表示未浏览） */
+    int16_t browse_index;    /**< 浏览索引（-1 表示未浏览） */
     uint16_t entry_size;    /**< 每条历史的大小 */
 } history_manager_t;
 ```

@@ -126,7 +126,7 @@ static config_status_t load_impl(void) {
                                                      &size);
     if (status == CONFIG_ERROR_NOT_FOUND) return CONFIG_OK;
     if (status != CONFIG_OK) return status;
-    if (size < 8 || memcmp(g_buffer, "NXCS", 4) || g_buffer[4] != 1 ||
+    if (size < 8 || memcmp(g_buffer, "NXCS", 4) != 0 || g_buffer[4] != 1 ||
         !g_buffer[5] || g_buffer[5] > CONFIG_DEFAULT_MAX_NAMESPACES ||
         get16(g_buffer + 6) > CONFIG_MAX_MAX_KEYS)
         return CONFIG_ERROR_INVALID_FORMAT;

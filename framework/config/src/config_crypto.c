@@ -209,7 +209,7 @@ config_status_t config_crypto_decrypt_record(const uint8_t* record, size_t lengt
     uint8_t ns, config_type_t type) {
     if (!g_active) { return CONFIG_ERROR_NO_ENCRYPTION_KEY; }
     if (!record || !plaintext || !plaintext_size) { return CONFIG_ERROR_INVALID_PARAM; }
-    if (length < CONFIG_CRYPTO_RECORD_OVERHEAD || memcmp(record, "NXCF", 4) ||
+    if (length < CONFIG_CRYPTO_RECORD_OVERHEAD || memcmp(record, "NXCF", 4) != 0 ||
         record[4] != 1 || record[6] != CONFIG_CRYPTO_NONCE_SIZE ||
         record[7] != CONFIG_CRYPTO_TAG_SIZE ||
         (record[5] != CONFIG_CRYPTO_AES128_GCM && record[5] != CONFIG_CRYPTO_AES256_GCM)) {

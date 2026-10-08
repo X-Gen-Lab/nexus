@@ -247,5 +247,7 @@ void osal_report_error(osal_status_t error, const char* file, uint32_t line) {
 }
 void osal_assert_failed(const char* file, uint32_t line) {
     osal_report_error(OSAL_ERROR, file, line);
+    /* This is a runtime panic, not a compile-time invariant. */
+    // NOLINTNEXTLINE(cert-dcl03-c)
     configASSERT(0);
 }

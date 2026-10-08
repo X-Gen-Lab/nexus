@@ -6,8 +6,13 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef __linux__
+#include <sys/wait.h>
+#include <unistd.h>
+#endif
 
 static void pause_ms(unsigned ms) {
     struct timespec time = {ms / 1000, (long)(ms % 1000) * 1000000L};
@@ -256,6 +261,30 @@ static void test_late_flush_reply_is_safe(void) {
     assert(log_deinit() == LOG_OK);
     assert_no_resources();
 }
+static void test_console_reports_flush_failure(void) {
+#ifdef __linux__
+    /* Isolate stdout replacement so all other fixtures retain their stream. */
+    assert(fflush(stdout) == 0);
+    pid_t child = fork();
+    assert(child >= 0);
+    if (child == 0) {
+        assert(freopen("/dev/full", "w", stdout) == stdout);
+        char buffer[256];
+        assert(setvbuf(stdout, buffer, _IOFBF, sizeof(buffer)) == 0);
+        log_backend_t* console = log_backend_console_create();
+        assert(console);
+        /* This write fits in stdio buffering; the physical failure is deferred. */
+        assert(console->write(console->ctx, "buffered", 8) == LOG_OK);
+        assert(console->flush(console->ctx) == LOG_ERROR_BACKEND);
+        assert(log_backend_console_destroy(console) == LOG_OK);
+        assert_no_resources();
+        _Exit(0);
+    }
+    int status;
+    assert(waitpid(child, &status, 0) == child);
+    assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+#endif
+}
 int main(void) {
     assert(osal_init() == OSAL_OK);
     test_immediate_shutdown_drains();
@@ -266,6 +295,7 @@ int main(void) {
     test_metadata_truncation();
     test_backend_failure_ownership();
     test_late_flush_reply_is_safe();
-    puts("8 real logging lifetime/concurrency contract groups passed");
+    test_console_reports_flush_failure();
+    puts("9 real logging lifetime/concurrency contract groups passed");
     return 0;
 }

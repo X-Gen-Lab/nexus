@@ -1457,8 +1457,7 @@ static log_status_t console_backend_write(void* ctx, const char* msg,
  */
 static log_status_t console_backend_flush(void* ctx) {
     LOG_UNUSED(ctx);
-    fflush(stdout);
-    return LOG_OK;
+    return fflush(stdout) == 0 ? LOG_OK : LOG_ERROR_BACKEND;
 }
 
 /**

@@ -81,7 +81,12 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
         t->mode = config->mode;
         t->callback = config->callback;
         t->arg = config->arg;
-        snprintf(t->name, sizeof(t->name), "%s", config->name ? config->name : "timer");
+        /* Names are optional diagnostics and deliberately bounded/truncated. */
+        const char* name = config->name ? config->name : "timer";
+        size_t name_length = 0;
+        while (name_length < sizeof(t->name) - 1 && name[name_length]) ++name_length;
+        memcpy(t->name, name, name_length);
+        t->name[name_length] = '\0';
         OSAL_HANDLE_INIT(&t->header, OSAL_TYPE_TIMER);
 #ifdef _WIN32
         t->thread = (HANDLE)_beginthreadex(NULL, 0, timer_thread_func, t, 0, NULL);

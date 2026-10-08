@@ -20,6 +20,7 @@
 #include "config_store.h"
 #include "config_wire.h"
 #include <stdio.h>
+#include <stdarg.h>
 #include <math.h>
 #include <string.h>
 
@@ -102,6 +103,21 @@ static size_t export_write_bytes(export_write_ctx_t* ctx, const void* data,
     memcpy(ctx->buffer + ctx->offset, data, size);
     ctx->offset += size;
     return size;
+}
+
+/* Reject formatter failures and truncation before appending any token. */
+static void export_write_format(export_write_ctx_t* ctx, const char* format, ...) {
+    if (ctx->status != CONFIG_OK) return;
+    char buffer[64];
+    va_list arguments;
+    va_start(arguments, format);
+    int length = vsnprintf(buffer, sizeof(buffer), format, arguments);
+    va_end(arguments);
+    if (length < 0 || (size_t)length >= sizeof(buffer)) {
+        ctx->status = CONFIG_ERROR_INVALID_FORMAT;
+        return;
+    }
+    export_write_bytes(ctx, buffer, (size_t)length);
 }
 
 /**
@@ -270,7 +286,6 @@ static bool calc_binary_size_cb(const config_store_entry_info_t* info,
 static bool write_json_entry_cb(const config_store_entry_info_t* info,
                                 void* user_data) {
     export_write_ctx_t* ctx = (export_write_ctx_t*)user_data;
-    char temp_buf[64];
     uint8_t value_buf[CONFIG_MAX_MAX_VALUE_SIZE];
     uint8_t decrypted_buf[CONFIG_MAX_MAX_VALUE_SIZE];
     size_t value_size = sizeof(value_buf);
@@ -328,9 +343,8 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
     /* Write type */
     export_write_str(ctx, indent);
     export_write_str(ctx, indent);
-    snprintf(temp_buf, sizeof(temp_buf), "\"type\":%s\"%s\",", space,
-             get_type_name(info->type));
-    export_write_str(ctx, temp_buf);
+    export_write_format(ctx, "\"type\":%s\"%s\",", space,
+                        get_type_name(info->type));
     export_write_str(ctx, newline);
 
     /* Write value based on type */
@@ -351,30 +365,26 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
         case CONFIG_TYPE_I32: {
             int32_t val;
             memcpy(&val, output_buf, sizeof(val));
-            snprintf(temp_buf, sizeof(temp_buf), "%d", (int)val);
-            export_write_str(ctx, temp_buf);
+            export_write_format(ctx, "%d", (int)val);
             break;
         }
         case CONFIG_TYPE_U32: {
             uint32_t val;
             memcpy(&val, output_buf, sizeof(val));
-            snprintf(temp_buf, sizeof(temp_buf), "%u", (unsigned)val);
-            export_write_str(ctx, temp_buf);
+            export_write_format(ctx, "%u", (unsigned)val);
             break;
         }
         case CONFIG_TYPE_I64: {
             int64_t val;
             memcpy(&val, output_buf, sizeof(val));
-            snprintf(temp_buf, sizeof(temp_buf), "%lld", (long long)val);
-            export_write_str(ctx, temp_buf);
+            export_write_format(ctx, "%lld", (long long)val);
             break;
         }
         case CONFIG_TYPE_FLOAT: {
             float val;
             memcpy(&val, output_buf, sizeof(val));
             if (!isfinite(val)) { ctx->status = CONFIG_ERROR_INVALID_FORMAT; return false; }
-            snprintf(temp_buf, sizeof(temp_buf), "%.*g", FLT_DECIMAL_DIG, (double)val);
-            export_write_str(ctx, temp_buf);
+            export_write_format(ctx, "%.*g", FLT_DECIMAL_DIG, (double)val);
             break;
         }
         case CONFIG_TYPE_BOOL: {
@@ -395,11 +405,12 @@ static bool write_json_entry_cb(const config_store_entry_info_t* info,
         }
         case CONFIG_TYPE_BLOB: {
             /* Encode as hex string */
+            static const char hex[] = "0123456789abcdef";
             export_write_str(ctx, "\"");
             for (size_t i = 0; i < output_size && ctx->status == CONFIG_OK;
                  ++i) {
-                snprintf(temp_buf, sizeof(temp_buf), "%02x", output_buf[i]);
-                export_write_str(ctx, temp_buf);
+                char pair[2] = {hex[output_buf[i] >> 4], hex[output_buf[i] & 15]};
+                export_write_bytes(ctx, pair, sizeof(pair));
             }
             export_write_str(ctx, "\"");
             break;

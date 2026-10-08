@@ -26,9 +26,11 @@ static nx_crypto_status_t seal(void* ctx, nx_crypto_algorithm_t algorithm,
     if (ok && aad_size) { ok = EVP_EncryptUpdate(cipher, NULL, &bytes, aad, (int)aad_size) == 1; }
     bytes = 0;
     if (ok && input_size) { ok = EVP_EncryptUpdate(cipher, output, &bytes, input, (int)input_size) == 1; }
+    /* Validate provider lengths before pointer arithmetic or unsigned casts. */
+    if (ok) { ok = bytes >= 0 && (size_t)bytes <= input_size; }
     if (ok) { ok = EVP_EncryptFinal_ex(cipher, output + bytes, &tail) == 1 &&
         EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_GET_TAG, NX_CRYPTO_TAG_SIZE, tag) == 1 &&
-        (size_t)(bytes + tail) == input_size; }
+        tail >= 0 && (size_t)tail == input_size - (size_t)bytes; }
     EVP_CIPHER_CTX_free(cipher);
     return ok ? NX_CRYPTO_OK : NX_CRYPTO_FAILED;
 }
@@ -47,11 +49,14 @@ static nx_crypto_status_t open_record(void* ctx, nx_crypto_algorithm_t algorithm
     if (ok && aad_size) { ok = EVP_DecryptUpdate(cipher, NULL, &bytes, aad, (int)aad_size) == 1; }
     bytes = 0;
     if (ok && input_size) { ok = EVP_DecryptUpdate(cipher, output, &bytes, input, (int)input_size) == 1; }
+    /* Validate provider lengths before pointer arithmetic or unsigned casts. */
+    if (ok) { ok = bytes >= 0 && (size_t)bytes <= input_size; }
     if (ok) { ok = EVP_CIPHER_CTX_ctrl(cipher, EVP_CTRL_GCM_SET_TAG, NX_CRYPTO_TAG_SIZE, (void*)tag) == 1; }
     int authenticated = ok ? EVP_DecryptFinal_ex(cipher, output + bytes, &tail) : -1;
     EVP_CIPHER_CTX_free(cipher);
     if (!ok) { return NX_CRYPTO_FAILED; }
-    return authenticated == 1 && (size_t)(bytes + tail) == input_size ? NX_CRYPTO_OK : NX_CRYPTO_AUTH_FAILED;
+    return authenticated == 1 && tail >= 0 &&
+        (size_t)tail == input_size - (size_t)bytes ? NX_CRYPTO_OK : NX_CRYPTO_AUTH_FAILED;
 }
 
 static nx_crypto_status_t sha256(void* ctx, const uint8_t* input, size_t size, uint8_t* output) {

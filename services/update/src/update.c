@@ -2,6 +2,10 @@
 
 #include <string.h>
 
+/* Binary wire tags: exactly four bytes, with no string terminator. */
+static const uint8_t manifest_magic[4] = {'N', 'X', 'U', 'F'};
+static const uint8_t state_magic[4] = {'N', 'X', 'U', 'S'};
+
 static void put32(uint8_t* p, uint32_t x) {
     for (unsigned i = 0; i < 4; ++i) p[i] = (uint8_t)(x >> (8u * i));
 }
@@ -32,7 +36,7 @@ nx_update_status_t nx_update_manifest_encode(const nx_update_manifest_t* m,
                                              uint8_t out[NX_UPDATE_MANIFEST_SIZE]) {
     if (!m || !out || m->schema != NX_UPDATE_MANIFEST_SCHEMA || !m->image_size)
         return NX_UPDATE_EINVAL;
-    memcpy(out, "NXUF", 4);
+    memcpy(out, manifest_magic, sizeof(manifest_magic));
     put32(out + 4, m->schema);
     put32(out + 8, m->board_id);
     put32(out + 12, m->board_revision);
@@ -49,7 +53,8 @@ nx_update_status_t nx_update_manifest_decode(const uint8_t* in, size_t size,
                                              nx_update_manifest_t* m) {
     nx_update_manifest_t decoded;
     if (!in || !m || size != NX_UPDATE_MANIFEST_SIZE) return NX_UPDATE_EINVAL;
-    if (memcmp(in, "NXUF", 4) || get32(in + 4) != NX_UPDATE_MANIFEST_SCHEMA ||
+    if (memcmp(in, manifest_magic, sizeof(manifest_magic)) != 0 ||
+        get32(in + 4) != NX_UPDATE_MANIFEST_SCHEMA ||
         !get32(in + 20)) return NX_UPDATE_ECORRUPT;
     memset(&decoded, 0, sizeof(decoded));
     decoded.schema = get32(in + 4);
@@ -74,7 +79,7 @@ static bool zeros(const uint8_t* p, size_t n) {
 static nx_update_status_t encode_state(const nx_update_state_t* s,
                                        uint8_t out[NX_UPDATE_RECORD_SIZE]) {
     memset(out, 0, NX_UPDATE_RECORD_SIZE);
-    memcpy(out, "NXUS", 4);
+    memcpy(out, state_magic, sizeof(state_magic));
     put32(out + 4, 1);
     put32(out + 8, (uint32_t)s->phase);
     put32(out + 12, (s->has_active ? 1u : 0u) |
@@ -95,7 +100,8 @@ static nx_update_status_t encode_state(const nx_update_state_t* s,
 static nx_update_status_t decode_state(const uint8_t in[NX_UPDATE_RECORD_SIZE],
                                        nx_update_state_t* s) {
     uint32_t flags = get32(in + 12);
-    if (memcmp(in, "NXUS", 4) || get32(in + 4) != 1 || flags > 7 ||
+    if (memcmp(in, state_magic, sizeof(state_magic)) != 0 ||
+        get32(in + 4) != 1 || flags > 7 ||
         get32(in + 8) > NX_UPDATE_ROLLBACK || !zeros(in + 36, 4))
         return NX_UPDATE_ECORRUPT;
     memset(s, 0, sizeof(*s));

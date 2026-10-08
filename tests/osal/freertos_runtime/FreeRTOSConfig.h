@@ -11,6 +11,7 @@
  */
 
 #include <assert.h>
+#include <stddef.h>
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
@@ -75,7 +76,7 @@
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 
 /* Total heap size (32KB for STM32F4 with 128KB RAM) */
-#define configTOTAL_HEAP_SIZE (2 * 1024 * 1024)
+#define configTOTAL_HEAP_SIZE ((size_t)2097152u)
 
 /* Use application-provided heap (0 = use FreeRTOS heap) */
 #define configAPPLICATION_ALLOCATED_HEAP 0

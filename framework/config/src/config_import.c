@@ -95,7 +95,7 @@ static config_status_t stage_entry(import_transaction_t* tx, const char* key,
      * even when collect_original omitted it from the replacement batch. */
     for (size_t i = 0; i < tx->original_count; ++i) {
         const config_store_replacement_t* old = &tx->original[i];
-        if (old->info.namespace_id != ns || strcmp(old->info.key, key)) continue;
+        if (old->info.namespace_id != ns || strcmp(old->info.key, key) != 0) continue;
         if (old->info.flags & CONFIG_FLAG_READONLY) return CONFIG_ERROR_READ_ONLY;
         if ((old->info.flags & CONFIG_FLAG_ENCRYPTED) && !(flags & CONFIG_FLAG_ENCRYPTED))
             return CONFIG_ERROR_CRYPTO_FAILED;
@@ -104,7 +104,7 @@ static config_status_t stage_entry(import_transaction_t* tx, const char* key,
     }
     size_t index = 0;
     while (index < tx->count && (tx->items[index].info.namespace_id != ns ||
-           strcmp(tx->items[index].info.key, key))) ++index;
+           strcmp(tx->items[index].info.key, key) != 0)) ++index;
     if (index < tx->count) {
         if (tx->imported[index]) return CONFIG_ERROR_INVALID_FORMAT;
         uint8_t old_flags = tx->items[index].info.flags;

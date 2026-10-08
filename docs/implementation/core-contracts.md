@@ -178,3 +178,40 @@ with leak checking disabled (1/1, 0.40 seconds). Evidence:
 they do not restate the earlier complete repository run as execution of the
 follow-up source. Online ARM/static-analysis revalidation is recorded separately
 when the next CI run actually completes.
+
+### Correctness review of the online clang-tidy report
+
+The report from revision `3cbfe18` exposed real boundary defects alongside
+diagnostics about deliberate wire-format and runtime-panic operations:
+
+- History navigation now represents all 255 entries accepted by its public
+  capacity type. Zero-byte history entries reject insertion before subtracting
+  a terminator or copying data. Both cases have executable regressions in the
+  existing shell test target.
+- Native heap statistics describe a simulated diagnostic budget. Host malloc
+  may exceed it; remaining/minimum budget saturates at zero, while integrity
+  checks validate allocation-list/count/byte consistency rather than treating
+  a budget overrun as corruption. The existing 14-group contract now exercises
+  an allocation larger than the model budget and its cleanup.
+- Console flush returns backend failure when stdout fails. JSON export checks
+  formatter failures/truncation, and binary hex emission uses bounded two-byte
+  pairs. Optional diagnostic task/timer names use explicitly bounded copies.
+- OpenSSL provider output lengths are checked before final-output pointer
+  arithmetic; separate size conversions and a subtraction check avoid signed
+  addition overflow. Storage/update magic is explicitly a four-byte binary
+  array, preserving the wire format without adding string terminators.
+- Version digit casts operate only on decimal digits 0..9. Heap constants and
+  namespace arithmetic use the receiving size type before multiplication.
+  String/memory comparisons state their equality test explicitly.
+- `configASSERT(0)` remains a deliberate runtime panic. Its single local
+  `cert-dcl03-c` exclusion explains why a compile-time assertion is unsuitable;
+  it does not suppress runtime correctness checks for other code.
+
+The new logging contract was independently compiled into `/tmp` against the
+updated libraries and executed all nine groups with exit zero. Its Linux
+subprocess replaces stdout with `/dev/full`, buffers a successful write, and
+requires the eventual flush to report backend failure; it releases its backend
+and verifies OSAL resource counts before the fixture exits. Evidence:
+`/tmp/nexus-tidy-log-contracts.log`. Final shared Debug/Release/sanitizer and
+online CI results for this review batch are recorded by the integration owner;
+this targeted result is not a substitute for those runs.

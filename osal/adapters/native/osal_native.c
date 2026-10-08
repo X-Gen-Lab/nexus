@@ -420,7 +420,7 @@ typedef struct {
  * \details         This is a simulated value since native platform uses system
  * heap
  */
-#define OSAL_NATIVE_HEAP_SIZE (1024 * 1024) /* 1 MB simulated heap */
+#define OSAL_NATIVE_HEAP_SIZE ((size_t)1024u * 1024u) /* 1 MB simulated heap */
 
 static osal_mem_stats_internal_t s_mem_stats = {0};
 
@@ -767,12 +767,14 @@ osal_status_t osal_mem_get_stats(osal_mem_stats_t* stats) {
 
     /*
      * For native platform, we simulate a fixed heap size.
-     * The free size is calculated as total - allocated.
-     * The min_free_size is calculated from peak allocation.
+     * This is a diagnostic budget, not a limit on the host allocator.
+     * Saturate remaining budget at zero when host usage exceeds the model.
      */
     stats->total_size = OSAL_NATIVE_HEAP_SIZE;
-    stats->free_size = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.total_allocated;
-    stats->min_free_size = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.peak_allocated;
+    stats->free_size = s_mem_stats.total_allocated < OSAL_NATIVE_HEAP_SIZE
+        ? OSAL_NATIVE_HEAP_SIZE - s_mem_stats.total_allocated : 0;
+    stats->min_free_size = s_mem_stats.peak_allocated < OSAL_NATIVE_HEAP_SIZE
+        ? OSAL_NATIVE_HEAP_SIZE - s_mem_stats.peak_allocated : 0;
 
     mem_unlock();
 
@@ -792,7 +794,8 @@ size_t osal_mem_get_free_size(void) {
     mem_init_tracking();
 
     mem_lock();
-    size_t free_size = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.total_allocated;
+    size_t free_size = s_mem_stats.total_allocated < OSAL_NATIVE_HEAP_SIZE
+        ? OSAL_NATIVE_HEAP_SIZE - s_mem_stats.total_allocated : 0;
     mem_unlock();
 
     return free_size;
@@ -811,7 +814,8 @@ size_t osal_mem_get_min_free_size(void) {
     mem_init_tracking();
 
     mem_lock();
-    size_t min_free = OSAL_NATIVE_HEAP_SIZE - s_mem_stats.peak_allocated;
+    size_t min_free = s_mem_stats.peak_allocated < OSAL_NATIVE_HEAP_SIZE
+        ? OSAL_NATIVE_HEAP_SIZE - s_mem_stats.peak_allocated : 0;
     mem_unlock();
 
     return min_free;
@@ -849,17 +853,7 @@ osal_status_t osal_mem_check_integrity(void) {
 
     mem_lock();
 
-    /* Basic sanity checks */
-    if (s_mem_stats.total_allocated > OSAL_NATIVE_HEAP_SIZE) {
-        mem_unlock();
-        return OSAL_ERROR;
-    }
-
-    if (s_mem_stats.peak_allocated > OSAL_NATIVE_HEAP_SIZE) {
-        mem_unlock();
-        return OSAL_ERROR;
-    }
-
+    /* The simulated budget is not an allocation-integrity invariant. */
     if (s_mem_stats.total_allocated > s_mem_stats.peak_allocated) {
         /* Current allocation should never exceed peak */
         mem_unlock();
@@ -873,10 +867,14 @@ osal_status_t osal_mem_check_integrity(void) {
 
     while (current != NULL) {
         counted++;
+        if (current->size > SIZE_MAX - total_size) {
+            mem_unlock();
+            return OSAL_ERROR;
+        }
         total_size += current->size;
 
         /* Check for list corruption (circular reference) */
-        if (counted > s_mem_stats.allocation_count + 1) {
+        if (counted > s_mem_stats.allocation_count) {
             mem_unlock();
             return OSAL_ERROR;
         }

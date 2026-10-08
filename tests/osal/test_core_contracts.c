@@ -376,6 +376,17 @@ static void test_allocation_boundaries_and_concurrency(void) {
     assert(osal_mem_calloc(SIZE_MAX / 2 + 1, 2) == NULL);
     assert(osal_mem_alloc_aligned((size_t)1 << (sizeof(size_t) * 8 - 1),
                                  SIZE_MAX / 2 + 1) == NULL);
+    osal_mem_stats_t memory;
+    assert(osal_mem_get_stats(&memory) == OSAL_OK && memory.total_size < SIZE_MAX);
+    void* above_budget = osal_mem_alloc(memory.total_size + 1);
+    assert(above_budget);
+    assert(osal_mem_get_stats(&memory) == OSAL_OK);
+    assert(memory.free_size == 0 && memory.min_free_size == 0);
+    assert(osal_mem_get_free_size() == 0 && osal_mem_get_min_free_size() == 0);
+    assert(osal_mem_check_integrity() == OSAL_OK);
+    osal_mem_free(above_budget);
+    assert(osal_reset_stats() == OSAL_OK);
+    assert(osal_mem_check_integrity() == OSAL_OK);
     osal_sem_handle_t s;
     assert(osal_sem_create(1, 1, &s) == OSAL_OK);
     assert(osal_sem_give(s) == OSAL_ERROR_FULL);

@@ -13,6 +13,8 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
+#include <stddef.h>
+
 #if defined(NEXUS_EFFECTIVE_CONFIG)
 #include "nexus_config.h"
 #endif
@@ -94,9 +96,9 @@
 
 /* Total heap size (32KB for STM32F4 with 128KB RAM) */
 #if defined(NX_CONFIG_OSAL_HEAP_SIZE)
-#define configTOTAL_HEAP_SIZE NX_CONFIG_OSAL_HEAP_SIZE
+#define configTOTAL_HEAP_SIZE ((size_t)NX_CONFIG_OSAL_HEAP_SIZE)
 #else
-#define configTOTAL_HEAP_SIZE (32 * 1024)
+#define configTOTAL_HEAP_SIZE ((size_t)32768u)
 #endif
 
 /* Use application-provided heap (0 = use FreeRTOS heap) */

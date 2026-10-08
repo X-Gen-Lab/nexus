@@ -6,6 +6,8 @@
  * reserved zero bytes. Header is rounded to a whole program unit; a separate
  * full program unit is committed last. Padding is erased 0xff. CRC is detection
  * only; authentication belongs to the security provider. */
+/* Binary wire tag: exactly four bytes, with no string terminator. */
+static const uint8_t storage_magic[4] = {'N', 'X', 'S', 'T'};
 static uint32_t crc_update(uint32_t crc, const uint8_t* p, size_t n) {
     while (n--) {
         crc ^= *p++;
@@ -51,7 +53,7 @@ static nx_storage_status_t read_bank(nx_storage_t* s, int bank,
         if (b[i] != 0) { *committed = false; return NX_STORAGE_NOT_FOUND; }
     status = s->flash.read(s->flash.ctx, base, b, NX_STORAGE_HEADER_SIZE);
     if (status != NX_STORAGE_OK) return status;
-    if (memcmp(b, "NXST", 4) || get32(b + 4) != 1 ||
+    if (memcmp(b, storage_magic, sizeof(storage_magic)) != 0 || get32(b + 4) != 1 ||
         get32(b + 24) != crc(b, 24) || get32(b + 28) != 0)
         return NX_STORAGE_CORRUPT;
     *size = get32(b + 8);
@@ -146,7 +148,7 @@ nx_storage_status_t nx_storage_save(nx_storage_t* s, const void* data,
     size_t base = bank_offset(s, bank), unit = s->flash.program_size;
     uint8_t block[NX_STORAGE_MAX_PROGRAM_SIZE], header[NX_STORAGE_HEADER_SIZE];
     memset(header, 0, sizeof(header));
-    memcpy(header, "NXST", 4); put32(header + 4, 1);
+    memcpy(header, storage_magic, sizeof(storage_magic)); put32(header + 4, 1);
     put32(header + 8, (uint32_t)size); put64(header + 12, s->generation + 1);
     put32(header + 20, crc(data, size)); put32(header + 24, crc(header, 24));
     nx_storage_status_t status = s->flash.erase(s->flash.ctx, base, s->bank_size);

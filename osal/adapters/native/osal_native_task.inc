@@ -66,7 +66,12 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
         t->func = config->func;
         t->arg = config->arg;
         t->priority = config->priority;
-        snprintf(t->name, sizeof(t->name), "%s", config->name ? config->name : "task");
+        /* Names are optional diagnostics and deliberately bounded/truncated. */
+        const char* name = config->name ? config->name : "task";
+        size_t name_length = 0;
+        while (name_length < sizeof(t->name) - 1 && name[name_length]) ++name_length;
+        memcpy(t->name, name, name_length);
+        t->name[name_length] = '\0';
         OSAL_HANDLE_INIT(&t->header, OSAL_TYPE_TASK);
 #ifdef _WIN32
         t->thread = (HANDLE)_beginthreadex(NULL, (unsigned)config->stack_size,

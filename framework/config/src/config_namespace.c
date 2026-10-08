@@ -169,7 +169,7 @@ config_status_t config_namespace_replace_all(
     if (!g_ns_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
     if (!entries || !count || count > g_ns_ctx.max_namespaces)
         return CONFIG_ERROR_INVALID_FORMAT;
-    for (size_t i = 0; i < g_ns_ctx.max_namespaces * 2u; ++i)
+    for (size_t i = 0; i < (size_t)g_ns_ctx.max_namespaces * 2u; ++i)
         if (g_ns_ctx.handles[i].valid) return CONFIG_ERROR;
     bool has_default = false;
     for (size_t i = 0; i < count; ++i) {
@@ -177,13 +177,13 @@ config_status_t config_namespace_replace_all(
         if (entries[i].id >= g_ns_ctx.max_namespaces || !len ||
             len >= CONFIG_MAX_NS_NAME_LEN) return CONFIG_ERROR_INVALID_FORMAT;
         if (!entries[i].id) {
-            if (strcmp(entries[i].name, "default"))
+            if (strcmp(entries[i].name, "default") != 0)
                 return CONFIG_ERROR_INVALID_FORMAT;
             has_default = true;
         }
         for (size_t j = 0; j < i; ++j)
             if (entries[j].id == entries[i].id ||
-                !strcmp(entries[j].name, entries[i].name))
+                strcmp(entries[j].name, entries[i].name) == 0)
                 return CONFIG_ERROR_INVALID_FORMAT;
     }
     if (!has_default) return CONFIG_ERROR_INVALID_FORMAT;
