@@ -160,12 +160,13 @@ profiles:
   storage_geometry: sectors10_11
   evidence:
     source_implementation: maintained
-    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
+    production_ports: boot_clock_gpio_uart_flash_uid_monotonic_time
     software_fault_models: actual_production_ports_against_vendor_fakes_passed
     current_final_arm_matrix: pending_clean_commit_validation
     hardware: not_executed
     record: docs/implementation/stm32-runtime.md
   limits:
+  - SPI is disabled in both stock profiles; enabling a controller requires an explicit reviewed board resource binding.
   - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
   - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
   - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
@@ -200,12 +201,13 @@ profiles:
   storage_geometry: sectors6_7
   evidence:
     source_implementation: maintained
-    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
+    production_ports: boot_clock_gpio_uart_flash_uid_monotonic_time
     software_fault_models: actual_production_ports_against_vendor_fakes_passed
     current_final_arm_matrix: pending_clean_commit_validation
     hardware: not_executed
     record: docs/implementation/stm32-runtime.md
   limits:
+  - SPI is disabled in both stock profiles; enabling a controller requires an explicit reviewed board resource binding.
   - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
   - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
   - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product

@@ -6,11 +6,19 @@ plugin loader and toolchain inference modules have been removed. CPU flags never
 flags. CMake presets select the compiler, build mode and source configuration
 fragment; Kconfig selects platform resources and OSAL behavior.
 
+Current platform composition and source-bound validation are recorded in
+[platform delivery](platform-delivery.md), [STM32 runtime](stm32-runtime.md), and
+[GD32F470](../../platforms/gd32f470/README.md). The execution section below retains
+the first maintenance checkpoint and does not describe the latest whole matrix.
+
 ## Configuration ownership
 
-The default host fragment is `platforms/native/defconfig`. The maintained ARM
-reference fragments are `configs/stm32f407_baremetal_defconfig` and
-`configs/stm32f407_freertos_defconfig`. A source-root
+The default host fragment is `platforms/native/defconfig`. The ARM
+profiles now cover Discovery F407VG, Qiming F407ZG V3.1, Sky F407VE Youth and
+Liangshan GD32F470ZG, each with explicit baremetal and FreeRTOS fragments.
+Discovery retains `configs/stm32f407_baremetal_defconfig` and
+`configs/stm32f407_freertos_defconfig`; the other fragments are listed in the
+[profile matrix](../../profiles/support-matrix.json). A source-root
 `.config` and source-root generated header are never consumed. They are removed
 from version control. New product profiles must use explicit fragments.
 
@@ -43,7 +51,7 @@ Native exposes its fixed millisecond tick; FreeRTOS heap and priority options
 appear only for that backend. The unused main-stack and framework-debug knobs
 were removed; the application linker settings own the MCU stack reservation.
 SoC physical memory addresses/sizes are read-only identities that agree with the
-fixed F407 linker layout, rather than ignored editable memory settings.
+selected F407 xE/xG or GD32F470 linker layout, rather than ignored editable memory settings.
 
 The single preset workflow is `scripts/ci/ci_build.py --preset ... --stage ...`.
 Build/test shell, batch, Python and PowerShell entry points delegate to it. They
@@ -66,13 +74,15 @@ weakening project policies.
 
 Native platform drivers are an object library so static registrations reach the
 final executable. Project options and generated-header includes propagate through
-`nexus_build_options`. Vendor SDKs and host-only OpenSSL are separate targets. Host builds require
-OpenSSL 3 development headers/libraries; Linux/macOS file-flash simulation uses
-POSIX filesystem operations and is excluded on Windows.
-GD32 and other placeholder platforms fail configuration instead of creating a
-successful empty library. The initial embedded reference is STM32F407 with ARM
-GCC. This build identity is not hardware validation or a general STM32/GD32
-support promise.
+`nexus_build_options`. Vendor SDKs and host-only OpenSSL are separate targets.
+Native profiles with security services enabled require OpenSSL 3 development
+headers/libraries; the minimal profile does not. POSIX file-flash simulation is
+excluded on Windows. Historical `gd32` and other unavailable targets fail
+configuration instead of creating successful empty libraries. The maintained
+`gd32f470` target is an independent official-SDK implementation, alongside the
+three STM32F407 board profiles. Controller/board objects, actual startup and
+strong IRQ entries reach the final firmware explicitly. This build identity is
+not hardware validation or a general STM32/GD32 support promise.
 
 Services build as `nexus_storage`, `nexus_security`, `nexus_update`,
 `nexus_modbus_rtu` and `nexus_industrial`. Native adds
@@ -103,9 +113,9 @@ CMake always regenerates the bundle using the selected preset, so a CLI-generate
 bundle is suitable for inspection and is not an alternative authoritative build
 state.
 
-## Executed validation
+## Historical first integration checkpoint
 
-The final Linux GCC Debug build compiled and linked all selected Native targets
+At this first checkpoint, the Linux GCC Debug build compiled and linked all selected Native targets
 without compiler warnings. Its actual CTest run passed 1,696 of 1,696 registered
 tests, with zero failures, errors or skips, in 49.93 seconds. This includes the
 15 effective-configuration regressions, migrated HAL suites, 271 OSAL-labelled
@@ -149,6 +159,9 @@ Fresh STM32 baremetal and FreeRTOS profiles generated successfully. The final
 strong platform-startup bridge and shared SysTick implementation passed four
 host-GCC syntax checks against the pinned official ST/CMSIS/FreeRTOS headers;
 `/tmp/nexus-final-sdk-syntax.log` records those checks. They produced no ARM
-machine code. ARM GCC/newlib is unavailable in this environment, so real
-Cortex-M4 compilation/linking, final MCU memory-map budgets and HIL remain
-unexecuted release gates.
+machine code. ARM GCC/newlib was unavailable at that checkpoint. The current
+iteration subsequently installed locked ARM GNU 14.3.rel1/newlib and performs
+real eight-profile compilation/linking plus ELF/vector/ABI/partition checks;
+those later results need their own clean source/config/artifact identities in
+[platform delivery](platform-delivery.md). Physical timing, memory high-water
+budgets and HIL remain independent product acceptance gates.

@@ -2,6 +2,8 @@ import json
 import os
 from pathlib import Path
 import shlex
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -170,6 +172,60 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
         self.assertFalse(marker.exists())
         self.assertIn(argv[2], json.loads(log.read_text().splitlines()[-1]))
+
+    def test_analyzer_databases_preserve_two_actual_cmake_compilation_contexts(self):
+        self.assertIsNotNone(shutil.which('cmake'), 'CMake is required for the real database contract')
+        self.assertIsNotNone(shutil.which('cc'), 'A C compiler is required for the real consumer')
+        for profile, value in (('first', 17), ('second', 23)):
+            directory = self.root / ('headers ' + profile) / 'owned'
+            directory.mkdir(parents=True)
+            (directory / 'context.h').write_text(f'#define EXPECTED_VALUE {value}\n')
+        self.source.write_text(
+            '#include "owned/context.h"\n'
+            '_Static_assert(PROFILE_VALUE == EXPECTED_VALUE, "wrong include/define context");\n'
+            'int sample(void) { return PROFILE_VALUE; }\n')
+        (self.root / 'CMakeLists.txt').write_text(
+            'cmake_minimum_required(VERSION 3.21)\nproject(quality_database_contract C)\n'
+            'set(CMAKE_C_STANDARD 11)\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+            'add_library(first OBJECT services/sample.c)\n'
+            'target_include_directories(first PRIVATE "${CMAKE_SOURCE_DIR}/headers first")\n'
+            'target_compile_definitions(first PRIVATE PROFILE_VALUE=17)\n'
+            'add_library(second OBJECT services/sample.c)\n'
+            'target_include_directories(second PRIVATE "${CMAKE_SOURCE_DIR}/headers second")\n'
+            'target_compile_definitions(second PRIVATE PROFILE_VALUE=23)\n')
+        for argv in (['cmake', '-S', str(self.root), '-B', str(self.build)],
+                     ['cmake', '--build', str(self.build), '--parallel', '2']):
+            result = subprocess.run(argv, text=True, capture_output=True, timeout=60)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        tool = self.root / 'strict-database-consumer'
+        log = self.root / 'database-consumer.jsonl'
+        tool.write_text(
+            f'#!{sys.executable}\nimport json, pathlib, shlex, subprocess, sys\n'
+            "if '--version' in sys.argv: print('process fixture with real compiler'); sys.exit(0)\n"
+            "args = sys.argv[1:]\n"
+            "database = (pathlib.Path(args[args.index('-p') + 1]) / 'compile_commands.json' "
+            "if '-p' in args else pathlib.Path(next(a.split('=', 1)[1] for a in args if a.startswith('--project='))))\n"
+            "entries = json.loads(database.read_text())\nassert len(entries) == 1\n"
+            "entry = entries[0]\n"
+            "assert set(entry) <= {'directory', 'file', 'command', 'arguments', 'output'}, 'unknown compilation database key'\n"
+            "argv = entry.get('arguments') or shlex.split(entry['command'])\n"
+            # Consume the original compile invocation, rather than reconstructing
+            # flags in the fixture. Header lookup and the C static assertion
+            # independently verify that both target contexts remain intact.
+            "result = subprocess.run(argv, cwd=entry['directory'])\n"
+            f"with open({str(log)!r}, 'a') as output: output.write(json.dumps(entry) + '\\n')\n"
+            "sys.exit(result.returncode)\n")
+        tool.chmod(0o700)
+        for kind in ('tidy', 'cppcheck'):
+            with self.subTest(kind=kind):
+                log.unlink(missing_ok=True)
+                self.assertEqual(run(kind, self.root, self.build, str(tool), self.report), 0,
+                                 self.report.read_text())
+                consumed = [json.loads(line) for line in log.read_text().splitlines()]
+                self.assertEqual(len(consumed), 2)
+                self.assertIn('PROFILE_VALUE=17', consumed[0].get('command', ''))
+                self.assertIn('PROFILE_VALUE=23', consumed[1].get('command', ''))
+                self.assertIn('Source scope:', self.report.read_text())
 
     def test_compiler_query_failure_never_runs_analysis(self):
         driver, _ = self.compiler(failure=71)

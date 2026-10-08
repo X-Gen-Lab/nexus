@@ -117,7 +117,7 @@ jobs:
         run: |
           case "$BUILD_PRESET" in
             linux-gcc-release)
-              git submodule update --init ext/googletest ext/freertos
+              git submodule update --init --recursive ext/googletest ext/freertos
               ;;
             gd32f470-*)
               python scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
@@ -128,7 +128,7 @@ jobs:
             *) exit 1 ;;
           esac
           if [[ "$BUILD_PRESET" == *freertos-release ]]; then
-            git submodule update --init ext/freertos
+            git submodule update --init --recursive ext/freertos
           fi
       - name: Configure
         run: cmake --preset "$BUILD_PRESET"

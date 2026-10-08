@@ -1,6 +1,6 @@
 # 平台与驱动实施记录
 
-本次对应 HAL-003/004/005、BSP-001/002，并为 BSP-003/004 建立明确的移植边界。STM32F407VG 是实现参考 SoC，STM32F4DISCOVERY/MB997 是板卡候选。没有物理板卡、PCB revision、探针或电气实测记录，因此以下工作不构成工业产品支持或 HIL 通过声明。GD32F407 尚未取得固定版本的官方 SDK 和具体板卡，保持构建阻塞。
+本文保留首次HAL-003/004/005与Discovery SPI重构的契约和执行记录；43项Native SPI与最初3个host CTest target是历史检查点，不能冒充当前完整矩阵。当前实现覆盖F407VG Discovery、F407ZG启明V3.1、F407VE天空星青春版和GD32F470ZG梁山派，各有裸机/FreeRTOS profile。旧GD32F407占位目标仍不受支持，不与实际GD32F470实现混同。当前依赖、类型化SPI façade、UART和源码SDK边界见 [平台交付](platform-delivery.md)、[STM32 runtime](stm32-runtime.md)、[Typed device core](typed-device-core.md) 和 [GD32F470](../../platforms/gd32f470/README.md)。没有物理板卡、PCB revision、探针或电气实测报告，以下软件契约、host fakes与ARM构建均不构成工业资格或HIL通过。
 
 ## 已实现的 SPI 契约
 
@@ -38,7 +38,7 @@ DMA 需要真实板级 prepare 完成时钟、引脚、stream 初始化、HAL li
 
 F407 的最高 SYSCLK 限制修正为 168 MHz，不能从其他 F4 型号推导出 180 MHz/Over-Drive。GPIO 初始化现在开启对应 RCC port clock，先写输出 latch 再切输出模式，填满 lifecycle 与 power 方法，逻辑 suspend 保留电气状态并抑制读写。共享 port clock 不会因一个 pin deinit 被关掉。没有实现的 EXTI routing 返回 NOT_SUPPORTED。
 
-`soc/stm32f407vg/flash.c` 提供真实 ST HAL Flash port：只允许保留的 sector 10/11，128 KiB erase、4 字节 program、写前验证 1→0、HAL 错误传播、读回验证和 data-cache flush。provider 必须看到链接器 `__nexus_storage_start/end` 正确保留 0x080C0000..0x08100000，否则返回 NULL；应用可执行 Flash 限为前 768 KiB。VDD 必须满足 2.7..3.6 V 的 word program/erase 条件。读取、program、erase 均为同步任务操作，不保留 caller buffers。Flash 擦写会暂停 Flash 指令访问，只能在产品维护窗口安排，不能将其当作控制任务非阻塞服务。
+`soc/stm32f407vg/flash.c` 当前提供F407 xG与xE真实ST HAL Flash port：xG的sector10/11保留0x080C0000..0x08100000，应用前768KiB；xE的sector6/7保留0x08040000..0x08080000，应用前256KiB。均为128KiB erase、4字节program，核对实际Flash密度与 `__nexus_storage_start/end`，验证1→0、HAL错误、读回与cache flush。VDD须满足2.7..3.6V条件。GD32F470端口使用末16KiB四个独立4KiB page和2字节program，独立检查1MiB密度及linker fence；它不复用ST sector擦除假设。读取、program、erase是同步任务操作，产品串行管理，不能保留caller buffers；同bank擦写可暂停取指/IRQ，仅允许产品维护窗口，实板供电与断电恢复仍待验收。
 
 `soc/stm32f407vg/identity.c` 读取实际 96 位 UID、硅片 device/revision 和 Flash 容量；PCB revision 必须来自板卡资产/工装记录，不能用硅片 revision 代替。
 
@@ -52,7 +52,7 @@ cmake --build build/driver-contracts
 ctest --test-dir build/driver-contracts --output-on-failure
 ```
 
-3 个 CTest target 通过：`driver_stm32_spi_bare`、`driver_stm32_spi_osal`、`driver_stm32_gpio`。两个 SPI target 每个执行 10 组行为检查、6 种 DMA 完成/错误/重复/超时/取消/部分启动/abort 故障组合及 1000 次固定 seed 的 queued 操作；GPIO 检查时钟、输出顺序、生命周期、电源、ISR 拒绝及未实现 EXTI 的错误。测试链接生产驱动 C 文件与 tests/drivers/fake 的 ST HAL 模型；OSAL 模式使用可控锁和信号量模型。它们验证控制流及所有权，不验证真正的 IRQ 抢占、总线传输、芯片 DMA 时序或 FreeRTOS 调度。
+最初的3个 CTest target 通过：`driver_stm32_spi_bare`、`driver_stm32_spi_osal`、`driver_stm32_gpio`。两个 SPI target 每个执行 10 组行为检查、6 种 DMA 完成/错误/重复/超时/取消/部分启动/abort 故障组合及 1000 次固定 seed 的 queued 操作；GPIO 检查时钟、输出顺序、生命周期、电源、ISR 拒绝及未实现 EXTI 的错误。测试链接生产驱动 C 文件与 tests/drivers/fake 的 ST HAL 模型；OSAL 模式使用可控锁和信号量模型。它们验证控制流及所有权，不验证真正的 IRQ 抢占、总线传输、芯片 DMA 时序或 FreeRTOS 调度。
 
 SPI、board、identity、Flash 及 GPIO 代码还使用 checkout 中固定 commit 的真实 CMSIS/ST HAL headers 通过宿主 `-fsyntax-only` 检查。此项证明 SDK 符号和函数签名一致，不是 ARM 链接、固件运行或硬件证据。完整 ARM 构建的最新结果由主构建验证记录统一管理。
 
@@ -60,8 +60,8 @@ SPI、board、identity、Flash 及 GPIO 代码还使用 checkout 中固定 commi
 
 ## HIL 退出条件
 
-`profiles/support-matrix.json` 区分 host 契约、STM32 候选和 GD32 阻塞。`hil-report.template.json` 所有字段保持未执行；`validate_hil_evidence.py` 拒绝此模板和 host-fake 报告，仅校验可信硬件 runner 的身份、测试记录和镜像摘要关联。它不执行刷写、不制造观测、不验证工装租约唯一性，也不能仅凭 JSON 证明来源。
+`profiles/support-matrix.json` 当前区分host契约与8个STM32/GD32F470软件候选，所有MCU组合均保持 `hardware_verification: false`。旧 `hil-report.template.json` 保存未执行的历史模板，不是通过报告；旧 `validate_hil_evidence.py` 已移除。当前入口是 [`scripts/hil/run_hil.py`](../../scripts/hil/run_hil.py)，adapter与manifest契约见 [HIL说明](../../scripts/hil/README.md)：独占板卡和probe租约，执行真实identify/flash/readback/reset/serial/cleanup，核对身份、摘要、测试、预算和超时；未配置设备不能通过，`--model`报告禁止作为物理HIL。企业准入由 `scripts/evidence/release_gate.py` 检查审核过的policy、物理报告及签名身份，不以JSON字段单独证明设备或工装可信。
 
 STM32 仍需实际执行启动/时钟/UART、GPIO、双 slave 并发、DMA IRQ 故障与取消、Flash 任意 program/erase 断电恢复，以及通信/日志/Flash 压力下的控制时序。记录板卡和 PCB revision、UID、source/config/dependency/toolchain identities、实际执行次数、超时清理上界、波形与故障 seed。FreeRTOS 还需检查实际中断优先级与并发锁等待预算。
 
-GD32 必须先取得合法固定的官方 SDK、具体 part/容量、真实板卡 revision，独立实现 startup、clock、vector/IRQ、DMA 路由和 Flash 几何，再运行同一组行为和 HIL。BSP-003/004 继续标记阻塞，禁止以 STM32 头文件、假寄存器、模拟器或空 target 替代生产实现。
+GD32F470梁山派的官方SDK3.3.3、独立startup/clock/vector/IRQ/GPIO/UART/SPI4/TIMER1/Flash已实现，并有生产端口host fault模型和真实ARM构建。BSP-003/004的软件移植阶段不再标为缺SDK阻塞；GD32 DMA仍明确不支持，实板供电/时钟/IRQ/总线/Flash/控制budget须独立HIL。启明和天空星stock profiles的SPI禁用，启用需另行审核板级资源绑定；Typed I2C未迁移，Native模型不表示这些板有生产I2C。禁止把host模型或cross-build当作对应物理资格。

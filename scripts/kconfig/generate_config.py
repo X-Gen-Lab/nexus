@@ -608,6 +608,22 @@ def cmake_values(kconf):
     return "\n".join(lines) + "\n"
 
 
+def write_effective_config(kconf, path):
+    kconf.write_config(str(path), save_old=False)
+    # Kconfiglib omits hidden false booleans. These build controls also appear
+    # in CMake's cache and must retain an explicit value for release provenance.
+    contents = path.read_text(encoding='utf-8')
+    recorded = set(contents.splitlines())
+    for name in ('BUILD_TESTS', 'BUILD_EXAMPLES', 'ENABLE_COVERAGE', 'ENABLE_SANITIZERS'):
+        sym = kconf.syms.get(name)
+        if sym is None or not sym.nodes:
+            continue
+        line = f'CONFIG_{name}=y' if sym.tri_value == 2 else f'# CONFIG_{name} is not set'
+        if line not in recorded:
+            contents += line + '\n'
+    path.write_text(contents, encoding='utf-8')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Resolve and validate Nexus build configuration')
     parser.add_argument('--kconfig', '-k', default='Kconfig')
@@ -627,7 +643,7 @@ def main():
             generate_header(config_values(kconf), str(stage / 'nexus_config.h'))
             artifacts = [(stage / 'nexus_config.h', output)]
             if args.effective_config:
-                kconf.write_config(str(stage / 'effective.config'), save_old=False)
+                write_effective_config(kconf, stage / 'effective.config')
                 artifacts.append((stage / 'effective.config', Path(args.effective_config)))
             if args.cmake_output:
                 (stage / 'config.cmake').write_text(cmake_values(kconf))

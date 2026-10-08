@@ -2,6 +2,8 @@
 
 本轮从代码中删除 RAM 假 Flash、手写 AES-CBC 和确定性 PRNG，建立维护中的密码 provider、双银行 Flash 快照和完整配置恢复。这里记录已实施的软件契约；Native 模型验证不代替 STM32/GD32 断电及控制时序证据。
 
+当前板卡、工具链和工件验收见 [平台交付](platform-delivery.md)、[STM32 runtime](stm32-runtime.md) 与 [GD32F470](../../platforms/gd32f470/README.md)。本文的630/763/3659故障边界保留最初执行范围，不代表新板卡的物理断电已经通过。
+
 ## 分层和持有关系
 
 `services/storage` 只依赖 C11 和显式 `nx_flash_port_t`，提供独立板级分区内的原子 blob 替换；`services/security` 只提供受维护 provider 的调用边界；`framework/config` 按版本化格式序列化全部 key、namespace、type、flag 和 value，再一次提交。SoC 负责真实读、program、erase 和完成同步，板卡决定分区与维护窗口，产品负责密钥持久化和安全策略。
@@ -70,4 +72,4 @@ Binary v2采用固定字节偏移和little-endian标量，拒绝旧v1/native-C-l
 
 上述持久化和密码 C 文件通过 C11 `-Wall -Wextra -Werror` 编译，服务测试实际执行；部分服务另通过 ASan/UBSan。测试 keys 仅为测试夹具或进程临时生成，不能用于制造。
 
-`nx_file_flash` 是真实文件持久化的 POSIX 故障模型，具有独占文件锁、几何检查和部分写入注入。跨进程测试不等于实际硬件断电。F407真实端口位于 `soc/stm32f407vg/flash.c`，要求 linker 保留最后两个128KiB sector；GD32暂未提供真实Flash端口。尚未完成这些器件的 Flash HIL、擦写暂停测量、熵源认证、安全vault、可信启动、metadata防重放或制造密钥注入验证。
+`nx_file_flash` 是真实文件持久化的 POSIX 故障模型，具有独占文件锁、几何检查和部分写入注入。跨进程测试不等于实际硬件断电。当前F407端口位于 `soc/stm32f407vg/flash.c`：1MiB xG（Discovery/启明）保留sector10/11，512KiB xE（天空星青春版）保留sector6/7，两者均为两个128KiB sector，并检查实际密度和linker fence。GD32F470ZG已在 `soc/gd32f470zg/flash.c` 提供真实官方FMC端口，保留末16KiB的四个独立4KiB page，使用F470专属 `fmc_page_erase()` 而非STM32 sector或F303几何。产品串行调用这些同步端口并安排维护窗口。仍未完成实板Flash断电、擦写暂停、供电/磨损预算、熵源、安全vault、可信启动、metadata防重放或制造密钥注入验证；MCU stock profiles的Config/security/update默认禁用，不表示这些上层能力已经接入产品。

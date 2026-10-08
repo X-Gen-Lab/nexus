@@ -185,12 +185,23 @@ def commands(root: Path, build: Path) -> list[dict]:
     return selected
 
 
+def compilation_entry(entry: dict) -> dict:
+    """Write only the JSON compilation database schema accepted by LLVM.
+
+    Scope metadata belongs in the report. LLVM 14 rejects unknown entry fields
+    and falls back to parsing without the actual compiler flags.
+    """
+    return {name: entry[name] for name in
+            ("directory", "file", "arguments", "command", "output") if name in entry}
+
+
 def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
     report.parent.mkdir(parents=True, exist_ok=True)
     try:
         selected = commands(root.resolve(), build.resolve())
         with tempfile.TemporaryDirectory(prefix="nexus-analysis-") as temp:
-            (Path(temp) / "compile_commands.json").write_text(json.dumps(selected))
+            (Path(temp) / "compile_commands.json").write_text(
+                json.dumps([compilation_entry(entry) for entry in selected]))
             if kind == "tidy":
                 invocations = []
                 for index, entry in enumerate(selected):
@@ -199,7 +210,7 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                     # must not silently reuse the first command for every one.
                     directory = Path(temp) / str(index)
                     directory.mkdir()
-                    (directory / "compile_commands.json").write_text(json.dumps([entry]))
+                    (directory / "compile_commands.json").write_text(json.dumps([compilation_entry(entry)]))
                     invocations.append([tool, entry["file"], "-p", str(directory),
                      "--checks=" + TIDY_CHECKS,
                      "--warnings-as-errors=*",
@@ -230,7 +241,7 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                         # are never merged into one macro environment.
                         directory = Path(temp) / str(index)
                         directory.mkdir()
-                        (directory / "compile_commands.json").write_text(json.dumps([entry]))
+                        (directory / "compile_commands.json").write_text(json.dumps([compilation_entry(entry)]))
                         output.write(f"Predefined source entry {index}: " + json.dumps(entry) + "\n")
                         observed = predefines(entry, output)
                         invocations.append([tool, "--project=" + str(directory / "compile_commands.json"),

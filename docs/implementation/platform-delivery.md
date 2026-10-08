@@ -10,7 +10,7 @@
 
 `osal/` 提供后端能力、初始化状态和资源限制。FreeRTOS 的六类对象及 idle/daemon 使用静态内核对象、有界池和明确栈/payload 预算。Native 提供真实宿主同步语义；裸机仅暴露实际支持的主循环能力。调度前对象创建保存恢复 incoming port mask，运行操作与 FromISR 入口要求已经启动 scheduler。OSAL heap seal 只约束 OSAL 入口。已结束但仍持 mutex 的任务不能回收身份给新任务。
 
-`products/` 提供常量配置身份、串行 HAL→OSAL 启动、部分失败回滚及可重试的所有权。它不假装重新启动 MCU scheduler 或完成全平台 teardown。普通产品使用 `Nexus::Product` 和 Nexus 类型；FreeRTOS 应用在真实 scheduled worker 内执行业务。服务按配置启用，minimal profile 不强制引入 Config/crypto/OpenSSL；源码 SDK 的外部 `add_subdirectory()` 消费与父工程隔离由实际 configure/build/link/run 检查。
+`products/` 提供常量配置身份、串行 HAL→OSAL 启动、部分失败回滚及可重试的所有权。它不假装重新启动 MCU scheduler 或完成全平台 teardown。普通产品使用 `Nexus::Product` 和 Nexus 类型；FreeRTOS 应用在真实 scheduled worker 内执行业务。服务按配置启用，minimal profile 不强制引入 Config/crypto/OpenSSL；源码 SDK 的外部 `add_subdirectory()` 消费与父工程隔离由实际 configure/build/link/run 检查。SDK 当前提供源码消费，尚未提供可安装的二进制或 CMake package。Typed I2C 尚未迁移；Native I2C 模型不代表四块板已提供生产 I2C 支持。
 
 ## 板卡、内存与驱动
 

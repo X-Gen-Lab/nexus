@@ -9,6 +9,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 GENERATOR = ROOT / 'scripts/kconfig/generate_config.py'
+sys.path.insert(0, str(ROOT / 'scripts/ci'))
+from package_release import (RELEASE_PROFILES, ReleaseError, cmake_cache,
+                             validate_configuration_bundle, validate_effective_build)
 
 
 class EffectiveConfigTests(unittest.TestCase):
@@ -35,6 +38,20 @@ class EffectiveConfigTests(unittest.TestCase):
         first = (self.work / 'nexus_config.h').read_bytes()
         self.assertEqual(self.generate('--set', 'BUILD_TYPE_RELEASE=y').returncode, 0)
         self.assertEqual(first, (self.work / 'nexus_config.h').read_bytes())
+
+    def test_disabled_build_controls_remain_explicit_in_the_real_generated_bundle(self):
+        result = self.generate('--set', 'BUILD_TESTS=n', '--set', 'BUILD_EXAMPLES=n',
+                               '--set', 'ENABLE_COVERAGE=n', '--set', 'ENABLE_SANITIZERS=n')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        contents = {name: (self.work / name).read_text() for name in
+                    ('effective.config', 'nexus_config.h', 'config.cmake')}
+        config = validate_configuration_bundle(contents)
+        for name in ('BUILD_TESTS', 'BUILD_EXAMPLES', 'ENABLE_COVERAGE', 'ENABLE_SANITIZERS'):
+            self.assertIs(config['CONFIG_' + name], False)
+        result = self.generate('--set', 'BUILD_TESTS=n', '--set', 'BUILD_EXAMPLES=n',
+                               '--set', 'ENABLE_COVERAGE=n', '--set', 'ENABLE_SANITIZERS=n')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(contents, {name: (self.work / name).read_text() for name in contents})
 
     def test_unknown_symbol_fails_without_artifacts(self):
         self.fragment.write_text('CONFIG_OBSOLETE_DRIVER=y\n')
@@ -222,6 +239,28 @@ class CMakeConfigurationTests(unittest.TestCase):
         return subprocess.run(['cmake', '-S', str(ROOT), '-B', str(directory),
                                '-DNEXUS_BUILD_TESTS=OFF', '-DNEXUS_BUILD_EXAMPLES=OFF', *settings],
                               text=True, capture_output=True)
+
+    @unittest.skipUnless(sys.platform.startswith('linux') and shutil.which('gcc') and
+                         shutil.which('g++') and shutil.which('ninja'),
+                         'The Native GCC release profile requires Linux, GCC and Ninja')
+    def test_actual_cmake_release_bundle_passes_the_release_provenance_gate(self):
+        directory = self.work / 'release'
+        result = subprocess.run(['cmake', '--preset', 'linux-gcc-release', '-B', str(directory)],
+                                cwd=ROOT, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        contents = {name: (directory / 'generated' / name).read_text() for name in
+                    ('effective.config', 'nexus_config.h', 'config.cmake')}
+        config = validate_configuration_bundle(contents)
+        cache = cmake_cache(directory / 'CMakeCache.txt')
+        validate_effective_build(cache, RELEASE_PROFILES['linux-gcc-release'], 'Release', config)
+        self.assertIs(config['CONFIG_BUILD_TESTS'], True)
+        self.assertIs(config['CONFIG_BUILD_EXAMPLES'], True)
+        self.assertIs(config['CONFIG_ENABLE_COVERAGE'], False)
+        self.assertIs(config['CONFIG_ENABLE_SANITIZERS'], False)
+        # A valid header and target graph cannot substitute for absent release metadata.
+        del config['CONFIG_ENABLE_COVERAGE']
+        with self.assertRaisesRegex(ReleaseError, 'Missing effective build option'):
+            validate_effective_build(cache, RELEASE_PROFILES['linux-gcc-release'], 'Release', config)
 
     def test_separate_modes_and_stale_cache_cleanup(self):
         for mode in ('Debug', 'Release'):
