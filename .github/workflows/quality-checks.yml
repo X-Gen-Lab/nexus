@@ -1,144 +1,41 @@
 name: Quality Checks
-
 on:
   workflow_call:
-
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
-  format-check:
-    name: Format Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check clang-format
-        run: |
-          # Install clang-format-19 to match local development environment
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 19
-          sudo apt-get install -y clang-format-19
-
-          # Read directories from .clang-format-dirs (excluding comments and exclusions)
-          DIRS=$(grep -v '^#' .clang-format-dirs | grep -v '^\[' | grep -v '^!' | grep -v '^$' | tr '\n' ' ')
-
-          # Check format for configured directories
-          for dir in $DIRS; do
-            if [ -d "$dir" ]; then
-              echo "Checking format in $dir..."
-              find "$dir" \( -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' \) \
-                -exec clang-format-19 --dry-run --Werror {} +
-            fi
-          done
-
   static-analysis:
-    name: Static Analysis
-    runs-on: ubuntu-latest
+    name: Required static analysis
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+          submodules: false
+      - name: Initialize pinned maintained dependencies
+        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
           preset: linux-clang-debug
-
-      - name: Configure
+      - name: Install analyzers
+        run: sudo apt-get install -y clang-tidy-14 cppcheck
+      - name: Configure actual compilation database
         run: cmake --preset linux-clang-debug
-
-      - name: Run clang-tidy
-        continue-on-error: true
-        run: |
-          run-clang-tidy-14 -p build/linux-clang-debug \
-            -header-filter='hal/.*|osal/.*|framework/.*' \
-            'hal/.*|osal/.*|framework/.*' > clang-tidy.txt 2>&1
-
-      - name: Run cppcheck
-        continue-on-error: true
-        run: |
-          sudo apt-get install -y cppcheck
-          cppcheck --enable=all --inconclusive --xml --xml-version=2 \
-            --suppress=missingIncludeSystem \
-            -I hal/include -I osal/include -I framework/include \
-            hal/ osal/ framework/ 2> cppcheck.xml
-
-      - name: Upload Reports
+      - name: Test analyzer execution policy
+        run: python3 -m unittest discover -s scripts/ci -p 'test_quality_tools.py' -v
+      - name: Run required clang analyzer
+        run: python3 scripts/ci/quality_tools.py tidy --build-dir build/linux-clang-debug --tool clang-tidy-14 --report build/quality/clang-tidy.txt
+      - name: Run required cppcheck
+        if: '!cancelled()'
+        run: python3 scripts/ci/quality_tools.py cppcheck --build-dir build/linux-clang-debug --tool cppcheck --report build/quality/cppcheck.txt
+      - name: Retain reports on success and failure
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: static-analysis
-          path: |
-            clang-tidy.txt
-            cppcheck.xml
-
-  complexity:
-    name: Complexity Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run lizard
-        continue-on-error: true
-        run: |
-          pip install lizard
-          lizard hal/ osal/ framework/ -l c -C 15 -L 100 -w > complexity.txt
-
-      - name: Upload Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: complexity-report
-          path: complexity.txt
-
-  comment-style:
-    name: Comment Style Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check Doxygen style
-        run: |
-          if grep -r "@brief\|@param\|@return" hal/ osal/ framework/ --include="*.h" --include="*.c"; then
-            echo "::error::Found @ style Doxygen tags. Use \\ style instead."
-            exit 1
-          fi
-
-      - name: Check comment style
-        run: |
-          if grep -r "//" hal/ osal/ framework/ --include="*.c" --include="*.h" | grep -v "http://\|https://"; then
-            echo "::warning::Found // style comments. Use /* */ style instead."
-          fi
-
-  misra:
-    name: MISRA Compliance
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
-
-      - name: Run MISRA Check
-        continue-on-error: true
-        run: |
-          cppcheck --addon=misra \
-            --suppress=missingIncludeSystem \
-            --suppress=unmatchedSuppression \
-            -I hal/include -I osal/include -I framework/include \
-            hal/ osal/ framework/ 2> misra-report.txt || true
-
-      - name: Upload MISRA Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: misra-report
-          path: misra-report.txt
-          retention-days: 30
-
-      - name: Check MISRA Results
-        run: |
-          if [ -s misra-report.txt ]; then
-            echo "## MISRA Compliance Issues" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "See artifact for details" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## No MISRA Issues Found ✓" >> $GITHUB_STEP_SUMMARY
-          fi
+          name: required-static-analysis
+          path: build/quality/
+          if-no-files-found: error
+# MISRA qualification needs an agreed rule set and approved deviations.
+# An empty stderr file does not establish compliance. Formatting/complexity
+# remain engineering guidance; required analysis rejects findings/tool failures.
