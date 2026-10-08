@@ -52,20 +52,20 @@ msgid "**Change Notifications**: Callbacks on configuration changes"
 msgstr "**变更通知**: 配置变更时触发回调"
 
 #: ../../user_guide/config.rst:18 ac8e21957698479d810b65b72c3a4426
-msgid "**Persistent Storage**: RAM, Flash, and custom backends"
-msgstr "**持久化存储**: RAM、Flash 和自定义后端"
+msgid "**Storage**: Volatile RAM or explicitly bound persistent Flash"
+msgstr "**存储**: 易失 RAM 或显式绑定的持久化 Flash"
 
 #: ../../user_guide/config.rst:19 763e87fe08e24110ade4b83401eb1aa4
 msgid "**Import/Export**: Binary and JSON format support"
 msgstr "**导入/导出**: 支持二进制和 JSON 格式"
 
 #: ../../user_guide/config.rst:20 2e835fa7d3b741a5bce0b21059333341
-msgid "**Optional Encryption**: AES-128/256 for sensitive data"
-msgstr "**可选加密**: AES-128/256 加密敏感数据"
+msgid "**Optional Encryption**: AES-128/256-GCM for sensitive data"
+msgstr "**可选加密**: AES-128/256-GCM 认证加密敏感数据"
 
 #: ../../user_guide/config.rst:21 74d458c2823146e6848995f9210c372e
-msgid "**Thread-Safe**: Safe for multi-task environments"
-msgstr "**线程安全**: 多任务环境下安全使用"
+msgid "**Management owner**: Serialize calls through one owner"
+msgstr "**管理所有者**: 所有调用由一个管理任务串行执行"
 
 #: ../../user_guide/config.rst:22 01e57be9c37d4d1788d3e00360f1782b
 msgid "**Resource Configurable**: Static allocation for constrained systems"
@@ -1511,10 +1511,10 @@ msgstr "**设置加密密钥：**"
 #: ../../user_guide/config.rst:684 ae9ccec059a14630b27a771521708357
 msgid ""
 "uint8_t key[16] = {0x00, 0x01, 0x02, ...};  // AES-128 key\n"
-"config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);"
+"config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128_GCM);"
 msgstr ""
 "uint8_t key[16] = {0x00, 0x01, 0x02, ...};  // AES-128 key\n"
-"config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);"
+"config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128_GCM);"
 
 #: ../../user_guide/config.rst:689 4a83c974fcfc4c1784a7ea21b0818a25
 msgid "**Store encrypted data:**"
@@ -1560,11 +1560,11 @@ msgstr "**密钥轮换：**"
 msgid ""
 "// Re-encrypt all encrypted data with new key\n"
 "uint8_t new_key[16] = {...};\n"
-"config_rotate_encryption_key(new_key, sizeof(new_key), CONFIG_CRYPTO_AES128);"
+"config_rotate_encryption_key(new_key, sizeof(new_key), CONFIG_CRYPTO_AES128_GCM);"
 msgstr ""
 "// Re-encrypt all encrypted data with new key\n"
 "uint8_t new_key[16] = {...};\n"
-"config_rotate_encryption_key(new_key, sizeof(new_key), CONFIG_CRYPTO_AES128);"
+"config_rotate_encryption_key(new_key, sizeof(new_key), CONFIG_CRYPTO_AES128_GCM);"
 
 #: ../../user_guide/config.rst:717 19ae6fca8fd240568a8d0d7cdd9db046
 msgid "Query Operations"
@@ -1809,8 +1809,8 @@ msgid "Dependencies"
 msgstr "依赖"
 
 #: ../../user_guide/config.rst:807 e8b6d62062774a95945a29567988d1bc
-msgid "**OSAL**: OS Abstraction Layer (Mutex for thread safety)"
-msgstr "**OSAL**: 操作系统抽象层（Mutex 用于线程安全）"
+msgid "**OSAL**: Request transport to the serialized management owner"
+msgstr "**OSAL**: 向串行管理任务传递请求"
 
 #: ../../user_guide/config.rst:808 093ac4cb1142415ba17a706376283476
 msgid "**HAL**: Hardware Abstraction Layer (Flash backend)"

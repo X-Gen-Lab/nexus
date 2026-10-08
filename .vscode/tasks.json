@@ -2,83 +2,137 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Configure CMake (Debug)",
-            "type": "shell",
+            "label": "Configure Native",
+            "type": "process",
             "command": "cmake",
             "args": [
-                "-B", "build",
-                "-G", "Ninja",
-                "-DCMAKE_BUILD_TYPE=Debug",
-                "-DNEXUS_PLATFORM=${input:platform}",
-                "-DNEXUS_BUILD_TESTS=ON"
+                "--preset",
+                "linux-gcc-debug"
             ],
-            "problemMatcher": [],
-            "group": "build"
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
         },
         {
-            "label": "Configure CMake (Release)",
-            "type": "shell",
+            "label": "Build Native",
+            "type": "process",
             "command": "cmake",
             "args": [
-                "-B", "build",
-                "-G", "Ninja",
-                "-DCMAKE_BUILD_TYPE=Release",
-                "-DNEXUS_PLATFORM=${input:platform}"
+                "--build",
+                "--preset",
+                "linux-gcc-debug",
+                "--parallel",
+                "4"
             ],
-            "problemMatcher": [],
-            "group": "build"
-        },
-        {
-            "label": "Build",
-            "type": "shell",
-            "command": "cmake",
-            "args": ["--build", "build", "--parallel"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "Configure Native"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [
+                "$gcc"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "problemMatcher": ["$gcc"]
+            }
         },
         {
-            "label": "Clean",
-            "type": "shell",
+            "label": "Configure STM32 baremetal",
+            "type": "process",
             "command": "cmake",
-            "args": ["--build", "build", "--target", "clean"],
+            "args": [
+                "--preset",
+                "stm32-armgcc-debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "problemMatcher": []
         },
         {
-            "label": "Run Tests",
-            "type": "shell",
+            "label": "Build STM32 baremetal",
+            "type": "process",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "--preset",
+                "stm32-armgcc-debug",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "Configure STM32 baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Configure STM32 FreeRTOS",
+            "type": "process",
+            "command": "cmake",
+            "args": [
+                "--preset",
+                "stm32-armgcc-freertos-debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build STM32 FreeRTOS",
+            "type": "process",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "--preset",
+                "stm32-armgcc-freertos-debug",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "Configure STM32 FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Test Native",
+            "type": "process",
             "command": "ctest",
-            "args": ["--test-dir", "build", "--output-on-failure"],
+            "args": [
+                "--preset",
+                "linux-gcc-debug",
+                "--output-on-failure",
+                "--no-tests=error",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "Build Native"
+            ],
+            "dependsOrder": "sequence",
             "group": "test",
             "problemMatcher": []
-        },
-        {
-            "label": "Format Code",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-Command",
-                "Get-ChildItem -Recurse -Include *.c,*.h | ForEach-Object { clang-format -i $_.FullName }"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Generate Docs",
-            "type": "shell",
-            "command": "doxygen",
-            "args": ["Doxyfile"],
-            "problemMatcher": []
-        }
-    ],
-    "inputs": [
-        {
-            "id": "platform",
-            "type": "pickString",
-            "description": "Select target platform",
-            "options": ["stm32f4", "stm32h7", "esp32", "nrf52", "native"],
-            "default": "stm32f4"
         }
     ]
 }

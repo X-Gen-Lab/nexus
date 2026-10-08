@@ -1,148 +1,138 @@
 Config Manager API Reference
 ============================
 
-This section documents the Configuration Manager API.
+Config Manager provides typed values, namespaces, versioned import/export,
+authenticated records and complete snapshot persistence. Public headers under
+``framework/config/include/config`` define the API.
 
-Overview
---------
+Context and ownership
+---------------------
 
-The Nexus Config Manager provides a flexible configuration storage system with
-support for multiple data types and storage backends (RAM, Flash). It's designed
-for embedded systems requiring persistent configuration management.
+All Config operations run synchronously in one serialized management context.
+The product must serialize init, reads, writes, backend changes, callbacks,
+load/commit, key rotation and deinit across callers for every backend, including
+Flash. Selecting Flash does not add a mutex around the complete Config store.
+Do not use these APIs from an ISR or a control deadline path.
 
-Usage Examples
---------------
+Persistence/encryption can allocate bounded management heap and block on I/O.
+Retain backend context, partition, crypto key sources and scratch until successful
+deinit. A deinit error retains ownership: resolve it and retry before release.
+The persistence workspace gate rejects reentry with ``CONFIG_ERROR_BUSY``;
+it is not a general concurrent-access guarantee.
 
-Basic Configuration
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: c
-
-    #include "config/config.h"
-
-    /* Initialize config manager */
-    config_init();
-
-    /* Set configuration values */
-    int32_t value = 42;
-    config_set_int32("system.timeout", value);
-
-    config_set_string("system.name", "MyDevice");
-
-    bool enabled = true;
-    config_set_bool("feature.enabled", enabled);
-
-    /* Get configuration values */
-    int32_t timeout;
-    if (config_get_int32("system.timeout", &timeout) == CONFIG_OK) {
-        /* Use timeout value */
-    }
-
-Namespaces
-~~~~~~~~~~
-
-.. code-block:: c
-
-    #include "config/config.h"
-
-    /* Create namespace */
-    config_namespace_create("network");
-
-    /* Set values in namespace */
-    config_set_string("network.ip", "192.168.1.100");
-    config_set_int32("network.port", 8080);
-
-    /* Iterate namespace */
-    config_namespace_iterate("network", my_callback, user_data);
-
-Flash Backend
-~~~~~~~~~~~~~
-
-.. code-block:: c
-
-    #include "config/config.h"
-    #include "config/config_backend.h"
-
-    /* Initialize with Flash backend */
-    config_backend* flash_backend = config_flash_backend_create();
-    config_set_backend(flash_backend);
-
-    /* Configuration is now persisted to Flash */
-    config_set_int32("system.boot_count", boot_count);
-
-    /* Commit changes to Flash */
-    config_commit();
-
-Import/Export
-~~~~~~~~~~~~~
-
-.. code-block:: c
-
-    #include "config/config.h"
-
-    /* Export configuration to JSON */
-    char buffer[1024];
-    size_t size = sizeof(buffer);
-    config_export_json(buffer, &size);
-
-    /* Import configuration from JSON */
-    config_import_json(json_string, strlen(json_string));
-
-Thread Safety
--------------
-
-The Config Manager is **thread-safe** when using the Flash backend with proper
-locking. The RAM backend requires external synchronization for multi-threaded access.
-
-- **Flash backend**: Thread-safe with internal locking
-- **RAM backend**: Not thread-safe, requires external mutex
-
-Config Core
------------
-
-.. doxygengroup:: CONFIG
-   :project: nexus
-   :content-only:
-
-Config Definitions
-------------------
-
-.. doxygengroup:: CONFIG_DEF
-   :project: nexus
-   :content-only:
-
-Backend Interface
------------------
-
-.. doxygengroup:: CONFIG_BACKEND
-   :project: nexus
-   :content-only:
-
-RAM Backend
-~~~~~~~~~~~
-
-.. doxygengroup:: CONFIG_BACKEND_RAM
-   :project: nexus
-   :content-only:
-
-Flash Backend
-~~~~~~~~~~~~~
-
-.. doxygengroup:: CONFIG_BACKEND_FLASH
-   :project: nexus
-   :content-only:
-
-
-Related APIs
+Typed values
 ------------
 
-- :doc:`hal` - HAL (for Flash backend)
-- :doc:`init` - Automatic initialization system
-- :doc:`log` - Logging framework
-- :doc:`osal` - OS abstraction (for thread safety)
+This finite RAM-only example uses actual signatures and checks each operation:
 
-See Also
---------
+.. code-block:: c
 
-- :doc:`../user_guide/config` - Config Manager User Guide
-- :doc:`../reference/error_codes` - Error Code Reference
+   #include "config/config.h"
+
+   int example_config(void) {
+       config_status_t status = config_init(NULL);
+       if (status != CONFIG_OK) {
+           return 1;
+       }
+       int failed = 0;
+       int32_t timeout = 0;
+       status = config_set_i32("system.timeout", 42);
+       if (status != CONFIG_OK) {
+           failed = 1;
+       } else {
+           status = config_get_i32("system.timeout", &timeout, 10);
+           if (status != CONFIG_OK || timeout != 42) {
+               failed = 1;
+           }
+       }
+       if (config_deinit() != CONFIG_OK) {
+           failed = 1;
+       }
+       return failed;
+   }
+
+The numeric getter's final argument is a caller-supplied default. String/blob
+reads require explicit capacities; inspect status before using output.
+``config_demo`` checks all seven types, namespace isolation, malformed imports
+and bounded export buffers.
+
+Namespaces and callbacks
+------------------------
+
+Use ``config_open_namespace(name, &handle)`` and
+``config_close_namespace(handle)``. Namespace setters/getters receive that
+handle. A dotted key such as ``network.port`` in the default namespace does not
+automatically create a separate network namespace.
+
+Handles are opaque generation tokens. Do not dereference, manufacture or use
+a handle after close/deinit; stale handles do not bind to new objects. Close
+namespace handles before ``config_load`` replaces the store. Callback
+notifications are synchronous; retain user context, avoid management reentry,
+and respect BUSY when unregistering an executing callback.
+
+Persistence
+-----------
+
+RAM is volatile; a RAM backend's committed snapshot is cleared by deinit/init.
+Flash requires an explicitly opened ``nx_storage_t`` on a real port/partition,
+``config_backend_flash_bind`` while deinitialized, Config initialization, then
+``config_set_backend(config_backend_flash_get())``. Unbound Flash returns
+unsupported; the library never substitutes RAM or selects a filesystem path.
+
+``config_commit`` replaces one complete snapshot. ``config_load`` validates
+all data before replacing live values. Custom backends need snapshot save/load.
+A PERSISTENT flag alone is not a durable write; no-backend commit returns
+``CONFIG_ERROR_NO_BACKEND``.
+
+Dual banks recover a complete old or new committed generation. I/O can fail after
+a new record became durable; reopen/load before deciding what survived. F407
+single-bank Flash can stall instruction fetch during erase/program even from a
+management task. Products define maintenance windows, wear and error policy.
+
+Import/export and security
+--------------------------
+
+Use ``config_get_export_size``, ``config_export`` and ``config_import`` with
+explicit formats, flags and capacities. Global JSON accepts default namespace
+values only; use per-namespace JSON or binary v2 for namespaced data. Binary v2
+retains numeric IDs and requires an existing namespace map. Persistent NXCS
+snapshots carry the complete ID/name mapping.
+
+Imports stage and validate before mutation. Malformed framing, authentication
+failure and invalid numeric syntax preserve live values, including with CLEAR.
+SKIP_ERRORS permits selected semantic errors, not malformed syntax. Ordinary
+import cannot silently remove READONLY or ENCRYPTED policy.
+
+Native uses maintained OpenSSL 3 for AES-GCM, random bytes and signature
+verification. MCU crypto without a provider/entropy source returns unsupported.
+The product owns durable key storage and parameter-change authorization.
+Sensitive-record authentication does not authenticate every plaintext setting or
+grant write permission. Old unauthenticated CBC/native-layout formats are
+rejected; deployed data needs an explicit migration policy.
+
+See ``docs/implementation/storage-security.md`` for exact contracts and fault
+evidence. Physical power loss, entropy, protected vaults and GD32 Flash require
+separate acceptance.
+
+Generated API
+-------------
+
+.. doxygengroup:: CONFIG
+   :project: Nexus
+   :members:
+
+.. doxygengroup:: CONFIG_DEF
+   :project: Nexus
+   :members:
+
+.. doxygengroup:: CONFIG_BACKEND
+   :project: Nexus
+   :members:
+
+.. doxygengroup:: CONFIG_BACKEND_RAM
+   :project: Nexus
+   :members:
+
+.. doxygengroup:: CONFIG_BACKEND_FLASH
+   :project: Nexus
+   :members:

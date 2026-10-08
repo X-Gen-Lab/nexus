@@ -1,234 +1,94 @@
 Testing
 =======
 
-Nexus uses Google Test for unit testing and provides comprehensive testing
-infrastructure for embedded software development.
+Run tests against a named build and retain source revision, resolved
+configuration, dependencies, executed count and result. A configure success or
+empty test run is not validation. Native models, STM32 host fakes and physical
+boards establish different evidence.
 
-Test Framework
---------------
+Build and select tests
+----------------------
 
-- **Unit Testing**: Google Test (gtest)
-- **Mocking**: Google Mock (gmock)
-- **Coverage**: gcov/lcov
-- **Static Analysis**: MISRA C checker
+Use the prerequisites in :doc:`../getting_started/build_and_flash`, including
+pinned Google Test and OpenSSL 3 development libraries.
 
-Building Tests
---------------
+.. code-block:: bash
 
-Configure and build with tests enabled::
+   cmake --preset linux-gcc-debug
+   cmake --build --preset linux-gcc-debug --parallel 4
+   ctest --preset linux-gcc-debug --output-on-failure --no-tests=error --parallel 4
+   ctest --preset linux-gcc-debug -N
+   ctest --preset linux-gcc-debug -L osal --output-on-failure --no-tests=error
+   ctest --preset linux-gcc-debug -L config --output-on-failure --no-tests=error
+   ctest --preset linux-gcc-debug -L contract --output-on-failure --no-tests=error
+   ctest --preset linux-gcc-debug -R '^native_.*_smoke$' --output-on-failure --no-tests=error
 
-    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON
-    CMake --build build --config Release
+Labels come from each suite's CMake target. List cases in actual executables:
 
-Running Tests
--------------
+.. code-block:: bash
 
-Run All Tests
-~~~~~~~~~~~~~
+   build/linux-gcc-debug/bin/hal_native_tests --gtest_list_tests
+   build/linux-gcc-debug/bin/osal_tests --gtest_list_tests
+   build/linux-gcc-debug/bin/config_tests --gtest_list_tests
 
+Use a listed name with ``--gtest_filter`` when narrowing a failure. There is no
+combined ``nexus_tests`` binary or shared ``build/tests/Release`` layout.
 
+Configuration and workflow tools
+--------------------------------
 
-    ctest --test-dir build -C Release --output-on-failure
+These suites exercise real generator/subprocess behavior without Google Test:
 
-Run Specific Test Suite
-~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
 
+   python scripts/kconfig/test_effective_config.py
+   python -m unittest discover -s scripts/ci -p 'test_*.py'
+   python -m unittest discover -s scripts/evidence -p 'test_enterprise_tools.py'
 
+CTest also registers effective-configuration regressions. Enterprise fixtures
+exercise adapters and evidence validation; they do not establish real-board,
+production-signer or manufacturing-line qualification.
 
-    ./build/tests/Release/nexus_tests --gtest_filter="HalGpioTest.\*"
+Sanitizers
+----------
 
-Run with Verbose Output
-~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: bash
 
+   cmake --preset linux-gcc-sanitizers
+   cmake --build --preset linux-gcc-sanitizers --parallel 4
+   ctest --preset linux-gcc-sanitizers -L contract --output-on-failure --no-tests=error
 
+Record sanitizer runtime and environmental overrides. Disabling LeakSanitizer
+because a container restricts tracing leaves leak detection unverified.
+Sanitizers on host fakes do not establish real DMA/IRQ or deadline behavior.
 
-    ./build/tests/Release/nexus_tests --gtest_filter="\*" --gtest_print_time=1
+Useful regressions
+------------------
 
-List Available Tests
-~~~~~~~~~~~~~~~~~~~~
+Place tests alongside their domain under ``tests/hal/native``, ``tests/osal``,
+``tests/config``, ``tests/drivers``, ``tests/storage_security`` or
+``tests/industrial``, and register the target in that directory's CMake file.
+Assert public behavior and failures: stale handles, bounded waits, exhaustion,
+callback ownership, partial I/O, cancellation and clean shutdown. Application
+smokes must use production initialization; fixture-only device registration does
+not establish application readiness.
 
+Preserve reproducible seeds and failing inputs. Persistence tests restart and
+verify a complete old or new snapshot, rather than only a write error. Physical
+power removal, Flash stalls and electrical behavior require board experiments.
 
+Evidence and gates
+------------------
 
-    ./build/tests/Release/nexus_tests --gtest_list_tests
+Save nonzero JUnit results for the matching build:
 
-Writing Tests
--------------
+.. code-block:: bash
 
-Test File Location
-~~~~~~~~~~~~~~~~~~
+   ctest --preset linux-gcc-debug --output-on-failure --no-tests=error --output-junit build/linux-gcc-debug/test-results.xml
 
-Place test files in the ``tests/`` directory with the following structure::
-
-    tests/
-    ├── hal/
-    │   ├── test_hal_gpio.cpp
-    │   ├── test_hal_uart.cpp
-    │   └── test_hal_spi.cpp
-    ├── osal/
-    │   ├── test_osal_task.cpp
-    │   ├── test_osal_mutex.cpp
-    │   └── test_osal_queue.cpp
-    └── framework/
-        └── log/
-            └── test_log.cpp
-
-Test File Template
-~~~~~~~~~~~~~~~~~~
-
-.. code-block:: cpp
-
-    /**
-     * \file            test_hal_gpio.cpp
-     * \brief           HAL GPIO unit tests
-     */
-
-    #include <gtest/gtest.h>
-
-    extern "C" {
-    #include "hal/hal_gpio.h"
-    }
-
-    class HalGpioTest : public ::testing::Test {
-    protected:
-        void SetUp() override {
-            /* Initialize test fixtures */
-        }
-
-        void TearDown() override {
-            /* Clean up test fixtures */
-        }
-    };
-
-    TEST_F(HalGpioTest, InitOutput) {
-        hal_gpio_config_t config = {
-            .direction   = HAL_GPIO_DIR_OUTPUT,
-            .pull        = HAL_GPIO_PULL_NONE,
-            .output_mode = HAL_GPIO_OUTPUT_PP,
-            .speed       = HAL_GPIO_SPEED_LOW,
-            .init_level  = HAL_GPIO_LEVEL_LOW
-        };
-        EXPECT_EQ(HAL_OK, hal_gpio_init(HAL_GPIO_PORT_A, 0, &config));
-    }
-
-    TEST_F(HalGpioTest, InitNullConfig) {
-        EXPECT_EQ(HAL_ERROR_NULL_POINTER,
-                  hal_gpio_init(HAL_GPIO_PORT_A, 0, nullptr));
-    }
-
-    TEST_F(HalGpioTest, WriteOutput) {
-        /* Setup */
-        hal_gpio_config_t config = {
-            .direction = HAL_GPIO_DIR_OUTPUT
-        };
-        hal_gpio_init(HAL_GPIO_PORT_A, 0, &config);
-
-        /* Test */
-        EXPECT_EQ(HAL_OK, hal_gpio_write(HAL_GPIO_PORT_A, 0, HAL_GPIO_LEVEL_HIGH));
-    }
-
-Test Naming Convention
-~~~~~~~~~~~~~~~~~~~~~~
-
-- Test class: ``ModuleNameTest`` (e.g., ``HalGpioTest``, ``OsalMutexTest``)
-- Test case: Descriptive action (e.g., ``InitOutput``, ``WriteInvalidPort``)
-
-Test Categories
-~~~~~~~~~~~~~~~
-
-1. **Positive Tests**: Verify correct behavior with valid inputs
-2. **Negative Tests**: Verify error handling with invalid inputs
-3. **Boundary Tests**: Test edge cases and limits
-4. **Integration Tests**: Test component interactions
-
-Code Coverage
--------------
-
-Enable Coverage
-~~~~~~~~~~~~~~~
-
-
-
-    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON -DNEXUS_ENABLE_COVERAGE=ON
-    CMake --build build
-
-Generate Coverage Report
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-    cd build
-    ctest --output-on-failure
-    lcov --capture --directory . --output-file coverage.info
-    lcov --remove coverage.info '/usr/\*' '\*/tests/\*' --output-file coverage.info
-    genhtml coverage.info --output-directory coverage_report
-
-Coverage Requirements
-~~~~~~~~~~~~~~~~~~~~~
-
-- Minimum code coverage: **90%**
-- All public APIs must have tests
-- All error paths must be tested
-
-Static Analysis
----------------
-
-MISRA C Compliance
-~~~~~~~~~~~~~~~~~~
-
-Run MISRA C checker::
-
-    # Using cppcheck with MISRA addon
-    cppcheck --addon=misra hal/ osal/ framework/
-
-Address Sanitizer
-~~~~~~~~~~~~~~~~~
-
-Build with sanitizers for memory error detection::
-
-    CMake -B build -DNEXUS_PLATFORM=native -DNEXUS_BUILD_TESTS=ON \
-          -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer" \
-          -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
-
-Best Practices
---------------
-
-1. **Test Independence**: Each test should be independent and not rely on other tests
-2. **Clear Assertions**: Use descriptive assertion messages
-3. **Setup/Teardown**: Use fixtures for common setup and cleanup
-4. **Mock External Dependencies**: Use mocks for hardware and OS dependencies
-5. **Test Edge Cases**: Include boundary conditions and error cases
-6. **Keep Tests Fast**: Unit tests should run quickly
-7. **Avoid Test Duplication**: Use parameterized tests for similar cases
-
-Parameterized Tests
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: cpp
-
-    class HalGpioPortTest : public ::testing::TestWithParam<hal_gpio_port_t> {};
-
-    TEST_P(HalGpioPortTest, InitValidPort) {
-        hal_gpio_port_t port = GetParam();
-        hal_gpio_config_t config = { .direction = HAL_GPIO_DIR_OUTPUT };
-        EXPECT_EQ(HAL_OK, hal_gpio_init(port, 0, &config));
-    }
-
-    INSTANTIATE_TEST_SUITE_P(
-        AllPorts,
-        HalGpioPortTest,
-        ::testing::Values(
-            HAL_GPIO_PORT_A,
-            HAL_GPIO_PORT_B,
-            HAL_GPIO_PORT_C
-        )
-    );
-
-CI Integration
---------------
-
-Tests run automatically on every PR via GitHub Actions:
-
-- Multi-platform testing (Windows, Linux, macOS)
-- Coverage reporting
-- Memory sanitizer checks
-- MISRA compliance checks
+``scripts/evidence`` binds test, configuration and artifact digests to source
+identity. Skips, unconfigured adapters and missing evidence retain their real
+status. Required analyzers fail on tool errors, findings and an empty owned
+translation-unit set. A workflow definition is not analyzer execution, and
+there is no blanket MISRA certification claim. Product requirements define
+physical HIL and production release acceptance.

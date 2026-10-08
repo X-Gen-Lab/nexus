@@ -1,96 +1,39 @@
-# Nexus Scripts
+# Nexus scripts
 
-本目录包含 Nexus 项目的常用脚本，支持 Windows (.bat)、Unix (.sh) 和跨平台 Python (.py) 脚本。
+构建与测试共用 CMakePresets.json 和 `scripts/ci/ci_build.py`，必须显式选择
+`--preset`。不同产品、板卡和构建模式使用各自的 build 目录与有效配置。
 
-## 目录结构
-
-```
-scripts/
-├── README.md               # 本文档
-├── building/               # 构建相关脚本
-│   ├── build.bat           # Windows 构建
-│   ├── build.sh            # Unix 构建
-│   └── build.py            # Python 跨平台构建
-├── test/                   # 测试相关脚本
-│   ├── test.bat            # Windows 测试
-│   ├── test.sh             # Unix 测试
-│   └── test.py             # Python 跨平台测试
-├── tools/                  # 开发工具脚本
-│   ├── format.bat          # Windows 格式化
-│   ├── format.sh           # Unix 格式化
-│   ├── format.py           # Python 跨平台格式化
-│   ├── clean.bat           # Windows 清理
-│   ├── clean.sh            # Unix 清理
-│   ├── clean.py            # Python 跨平台清理
-│   ├── docs.bat            # Windows 文档生成
-│   ├── docs.sh             # Unix 文档生成
-│   └── docs.py             # Python 跨平台文档生成
-└── ci/                     # CI/CD 脚本
-    └── ci_build.py         # CI 构建脚本
+```sh
+python scripts/ci/ci_build.py --preset linux-gcc-debug --stage all --jobs 4
+python scripts/ci/ci_build.py --preset linux-gcc-release --stage build --jobs 4
+python scripts/ci/ci_build.py --preset linux-gcc-debug --stage test --jobs 4
+python scripts/ci/ci_build.py --preset stm32-armgcc-release --stage build --jobs 4
 ```
 
-## 使用方法
+`build.sh`、`build.bat`、`building/build.py`、`building/build.sh` 和
+`building/build.bat` 只委托上述 CLI；shell/batch 入口默认 `--stage build`。
+`test/test.py`、`test/test.sh` 与 `test/test.bat` 默认委托 `--stage test`。
+所有入口传递失败退出码。它们不自动探测根 .config、不推断工具链、不删除
+构建目录。过滤已配置的测试使用 `ctest --preset linux-gcc-debug -R <regex>`，
+并保留 `--no-tests=error`。
 
-### Python 脚本 (推荐，跨平台)
+配置工具操作显式输入片段和专用输出目录：
 
-```bash
-# 构建
-python scripts/building/build.py                 # Debug 构建
-python scripts/building/build.py -t release      # Release 构建
-python scripts/building/build.py -c              # 清理后构建
-python scripts/building/build.py -j 8            # 指定并行数
-
-# 测试
-python scripts/test/test.py                      # 运行所有测试
-python scripts/test/test.py -f "HalGpioTest.*"   # 过滤测试
-python scripts/test/test.py -v                   # 详细输出
-python scripts/test/test.py --xml report.xml     # 生成 XML 报告
-
-# 格式化
-python scripts/tools/format.py                   # 格式化代码
-python scripts/tools/format.py -c                # 仅检查格式
-
-# 清理
-python scripts/tools/clean.py                    # 清理构建目录
-python scripts/tools/clean.py -a                 # 清理所有
-
-# 文档
-python scripts/tools/docs.py                     # 生成所有文档
-python scripts/tools/docs.py -t doxygen          # 仅 Doxygen
-
-# CI
-python scripts/ci/ci_build.py                    # 运行完整 CI
-python scripts/ci/ci_build.py --stage build      # 仅构建阶段
-python scripts/ci/ci_build.py --stage test       # 仅测试阶段
+```sh
+python scripts/nexus_config.py validate --config configs/stm32f407_baremetal_defconfig
+python scripts/nexus_config.py generate --build-dir build/inspect --config platforms/native/defconfig
+python scripts/nexus_config.py info --build-dir build/linux-gcc-debug
+python scripts/kconfig/test_effective_config.py
 ```
 
-### Unix (Linux/macOS)
+生产构建由 CMake 再次生成单份 effective.config/header/CMake bundle。
+配置 CLI 的输出用于检查，不能替代预设构建的有效配置。
 
-```bash
-./scripts/building/build.sh                      # 构建
-./scripts/building/build.sh release              # Release 构建
-./scripts/test/test.sh                           # 测试
-./scripts/tools/format.sh                        # 格式化
-./scripts/tools/clean.sh                         # 清理
-./scripts/tools/docs.sh                          # 文档
-```
+企业流程脚本位于 `ci/`、`evidence/`、`hil/` 和 `manufacturing/`；其证据与
+支持范围见 `docs/implementation/`。格式化和文档工具位于 `tools/`，依赖
+工具缺失时不能把检查列为通过。
 
-### Windows
-
-```cmd
-scripts\building\build.bat                       REM 构建
-scripts\building\build.bat release               REM Release 构建
-scripts\test\test.bat                            REM 测试
-scripts\tools\format.bat                         REM 格式化
-scripts\tools\clean.bat                          REM 清理
-scripts\tools\docs.bat                           REM 文档
-```
-
-## 依赖
-
-- Python 3.7+ (Python 脚本)
-- CMake 3.21+
-- C/C++ 编译器 (GCC, Clang, MSVC)
-- clang-format (代码格式化)
-- Doxygen (API 文档)
-- Sphinx (用户文档)
+Linux Native 构建需要 Python 3.9+、Kconfiglib、CMake 3.21+、Ninja、GCC/G++
+以及 OpenSSL 3 开发包。GoogleTest/FreeRTOS/CMSIS/ST HAL 使用仓库固定的
+子模块提交；配置阶段不下载依赖。ARM 构建另外需要 arm-none-eabi 工具链，
+板上执行需要真实 HIL。Windows/macOS 预设保留，但本轮未执行这些平台。

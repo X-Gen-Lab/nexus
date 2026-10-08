@@ -351,14 +351,13 @@ CMake modules and toolchains.
 .. code-block:: text
 
    cmake/
-   ├── modules/                # CMake helper modules
-   │   ├── FreeRTOS.cmake      # FreeRTOS integration
-   │   └── NexusHelpers.cmake  # Utility functions
+   ├── modules/                # Maintained build modules
+   │   ├── NexusConfig.cmake   # Per-build effective configuration
+   │   └── NexusApplications.cmake # Application/startup/linker inputs
    ├── toolchains/             # Toolchain files
-   │   └── arm-none-eabi.cmake # ARM cross-compilation
+   │   └── arm-gcc.cmake       # ARM GNU embedded tools
    ├── linker/                 # Linker scripts
-   │   ├── nx_sections.ld      # GCC linker script
-   │   └── nx_sections.sct     # ARM linker script
+   │   └── nx_native_init.ld   # Native initialization registry
    ├── CTestConfig.cmake       # CTest configuration
    └── CTestScript.cmake       # CTest script
 

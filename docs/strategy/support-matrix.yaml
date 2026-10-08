@@ -1,47 +1,122 @@
-# Planning seed. Status is not an assertion of successful execution.
+# Implementation checkpoint; every claim is scoped to executed evidence.
+# Final source/config/artifact identity belongs in the generated validation package.
 schema_version: 1
-reviewed_commit: 7a203266082ad1f655b6686713b2b7950ba31ec6
+baseline_commit: 7a203266082ad1f655b6686713b2b7950ba31ec6
 review_date: '2026-10-08'
 focus: industrial_control_and_connectivity
 team_size: approximately_10
 horizon_months: [3, 6]
 levels: [planned, experimental, validated, enterprise_supported, lts]
+validation_rule: validated_requires_complete_profile_acceptance_and_bound_evidence
 profiles:
   - id: native-contracts
+    architecture: x86_64
+    host: linux
+    board: native-reference-model
+    osal: native
+    toolchain: GCC_14.2
+    config: platforms/native/defconfig
+    status: experimental
+    evidence:
+      source_implementation: maintained
+      configure_build_link: executed
+      effective_config_regressions: 15_passed
+      spi_contracts: 43_passed
+      i2c_contracts: 36_passed
+      config_independent_subset: 119_passed
+      industrial_contracts: 19_passed_with_fuzz_and_sanitizers
+      enterprise_tools: 68_passed_models_and_real_openssl_signature_verification
+      persistence_fault_boundaries: 630_storage_763_rotation_3659_update
+      full_suite: 1696_passed_zero_failures_errors_or_skips
+      full_suite_seconds: 49.93
+      full_suite_report: build/linux-gcc-debug/ctest-results.xml
+      production_entry_smokes: blinky_industrial_controller_config_demo_shell_demo_passed
+      additional_freertos_demo_smoke: 1_passed_in_separate_junit
+      additional_smoke_report: build/evidence/native-freertos-demo-final.xml
+      expanded_sanitizer_subset: 23_passed_zero_failures_errors_or_skips
+      sanitizer_report: build/linux-gcc-sanitizers/ctest-results.xml
+      sanitizer_seconds: 11.56
+      sanitizer_scope: 18_selected_contracts_and_5_finite_apps
+      local_leak_detection: disabled_due_to_ptrace_no_passing_leak_claim
+      final_source_config_artifact_binding: pending_clean_source_rebuild_after_commits
+      hardware: not_applicable
+      records:
+        - docs/implementation/build-config.md
+        - docs/implementation/native-i2c.md
+        - docs/implementation/native-hal-validation.md
+        - docs/implementation/industrial-reference.md
+        - docs/implementation/independent-review.md
+        - docs/implementation/enterprise-delivery.md
+    limits:
+      - Host models do not establish MCU timing, electrical behavior, ISR or DMA.
+      - OpenSSL and POSIX file flash are host-only integrations.
+      - Windows/macOS presets are not validated by this checkpoint.
+      - The 1696-case full checkpoint and one added smoke are separate reports; final identity requires a unified clean-source rebuild record.
+      - ASan/UBSan selected contracts passed; complete-suite sanitizer and online leak detection are not this evidence.
+    blockers: [DOC-001, HAL-001, OS-001, OS-002]
+  - id: freertos-posix-contracts
     architecture: host
     board: not_applicable
-    osal: native
-    status: planned
+    osal: freertos_pinned_kernel_posix_port
+    config: tests/osal/freertos_runtime/FreeRTOSConfig.h
+    status: experimental
     evidence:
-      source_implementation: present
-      full_build: not_executed_in_this_review
-      contract_suite: pending_baseline
+      actual_kernel: initialized_at_repository_gitlink
+      runtime_contracts: 10_groups_passed_natural_exit_zero
+      timer_delete_reclamation_review: atomic_reclamation_and_30_concurrent_reuse_rounds_passed
+      local_event_helper: 5_groups_passed_200_cancel_reuse_cycles
+      final_source_config_artifact_binding: pending_final_integration
+      record: docs/implementation/freertos-posix-host-port.md
+      arm_interrupt_port: not_executed
       hardware: not_applicable
-    blockers: [BAS-002, HAL-002, OS-001]
+    blockers: [OS-001, OS-002]
   - id: stm32-industrial-reference
-    soc: to_be_selected
-    board: to_be_selected
-    existing_soc_candidate: STM32F407
+    soc: STM32F407VG
+    architecture: cortex_m4f
+    board: stm32f4discovery-mb997
+    board_revision: null
+    product_confirmation: pending
     osal: [baremetal, freertos]
-    status: planned
+    toolchain: arm-none-eabi-gcc
+    configs:
+      - configs/stm32f407_baremetal_defconfig
+      - configs/stm32f407_freertos_defconfig
+    status: experimental
     evidence:
-      gpio_uart_spi_sources: present
-      full_build: pending
-      hardware: pending
-    blockers: [BSP-001, HAL-003, HAL-005, HIL-001]
+      startup_clock_gpio_spi_flash_uid_sources: maintained
+      spi_gpio_host_fake_contracts: 3_ctest_targets_passed
+      real_sdk_header_syntax: executed_host_compiler_only
+      arm_compile_link: pending_toolchain_execution
+      hardware: not_executed
+      record: docs/implementation/platform-drivers.md
+    limits:
+      - PCB revision, 8 MHz HSE wiring, supply and ST HAL Flash conditions need board confirmation.
+      - Flash sectors 10/11 are reserved; application occupies the preceding 768 KiB.
+      - Flash erase/program runs in a product-defined maintenance window.
+      - Production HAL startup executes stm32_platform_init; global in-process shutdown is unsupported.
+      - IRQ/DMA/device/scheduler ownership remains active until controlled reset; HAL_DeInit is not complete teardown.
+      - RS485 requires external transceiver, wiring, termination, biasing and a product UART/DE/RE adapter.
+      - MCU crypto provider and protected boot/update/key-vault ports are not integrated.
+    blockers: [BSP-001, BSP-002, HAL-005, HIL-001, HIL-002, HIL-003, SEC-001, SEC-002]
   - id: gd32-industrial-reference
     soc: to_be_selected
     board: to_be_selected
-    osal: [baremetal, freertos]
+    board_revision: null
+    osal: to_be_selected
     status: planned
     evidence:
-      current_platform: configuration_placeholder
-      full_build: pending
-      hardware: pending
+      current_platform: unavailable_backend_rejected_at_configuration
+      full_build: not_executed
+      hardware: not_executed
     blockers: [BSP-001, BSP-003, BSP-004, HIL-001]
 promotion_requires:
-  - exact_soc_board_revision_osal_toolchain_and_effective_configuration
-  - linked_capabilities_with_executed_contract_and_hardware_reports
+  - exact_product_soc_board_revision_osal_toolchain_and_effective_configuration
+  - clean_source_and_dependency_identity_bound_to_actual_elf_map_and_nonzero_tests
+  - linked_capabilities_with_executed_contract_and_physical_hardware_reports
   - measured_resource_and_deadline_budgets
   - persistence_and_fault_recovery_evidence
-  - known_limits_owner_and_support_window
+  - reviewed_whole_artifact_security_license_and_component_inventory
+  - product_trust_signing_and_same_artifact_release_evidence
+  - named_primary_backup_owner_support_window_and_known_limits
+enterprise_supported_profiles: []
+lts_profiles: []

@@ -2,57 +2,103 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug (J-Link)",
-            "type": "cortex-debug",
+            "name": "Native config_tests",
+            "type": "cppdbg",
             "request": "launch",
-            "servertype": "jlink",
+            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/config_tests",
+            "args": [],
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/applications/blinky/blinky.elf",
-            "device": "STM32F407VG",
-            "interface": "swd",
-            "runToEntryPoint": "main",
-            "svdFile": "${workspaceFolder}/platforms/stm32f4/svd/STM32F407.svd",
-            "preLaunchTask": "Build"
+            "MIMode": "gdb",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build Native"
         },
         {
-            "name": "Debug (ST-Link)",
-            "type": "cortex-debug",
+            "name": "Native osal_tests",
+            "type": "cppdbg",
             "request": "launch",
-            "servertype": "stlink",
+            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/osal_tests",
+            "args": [],
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/applications/blinky/blinky.elf",
-            "device": "STM32F407VG",
-            "interface": "swd",
-            "runToEntryPoint": "main",
-            "svdFile": "${workspaceFolder}/platforms/stm32f4/svd/STM32F407.svd",
-            "preLaunchTask": "Build"
+            "MIMode": "gdb",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build Native"
         },
         {
-            "name": "Debug (OpenOCD)",
+            "name": "Native hal_native_tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/hal_native_tests",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build Native"
+        },
+        {
+            "name": "Native blinky",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/blinky",
+            "args": [
+                "--cycles",
+                "3"
+            ],
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build Native"
+        },
+        {
+            "name": "Native shell_demo",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/shell_demo",
+            "args": [
+                "--smoke"
+            ],
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build Native"
+        },
+        {
+            "name": "Native nexus_industrial_controller",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/nexus_industrial_controller",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build Native"
+        },
+        {
+            "name": "STM32 baremetal MB997 / ST-Link",
             "type": "cortex-debug",
             "request": "launch",
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/applications/blinky/blinky.elf",
+            "executable": "${workspaceFolder}/build/stm32-armgcc-debug/bin/blinky.elf",
+            "device": "STM32F407VG",
             "configFiles": [
-                "interface/stlink.cfg",
-                "target/stm32f4x.cfg"
+                "board/stm32f4discovery.cfg"
             ],
             "runToEntryPoint": "main",
-            "preLaunchTask": "Build"
+            "preLaunchTask": "Build STM32 baremetal"
         },
         {
-            "name": "Debug Unit Tests (Native)",
-            "type": "cppdbg",
+            "name": "STM32 FreeRTOS MB997 / ST-Link",
+            "type": "cortex-debug",
             "request": "launch",
-            "program": "${workspaceFolder}/build/tests/nexus_tests",
-            "args": [],
-            "stopAtEntry": false,
+            "servertype": "openocd",
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "preLaunchTask": "Build"
+            "executable": "${workspaceFolder}/build/stm32-armgcc-freertos-debug/bin/blinky.elf",
+            "device": "STM32F407VG",
+            "configFiles": [
+                "board/stm32f4discovery.cfg"
+            ],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Build STM32 FreeRTOS"
         }
     ]
 }
