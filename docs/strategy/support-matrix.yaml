@@ -20,25 +20,33 @@ profiles:
     evidence:
       source_implementation: maintained
       configure_build_link: executed
-      effective_config_regressions: 15_passed
+      effective_config_regressions: 18_passed
       spi_contracts: 43_passed
       i2c_contracts: 36_passed
       config_independent_subset: 119_passed
       industrial_contracts: 19_passed_with_fuzz_and_sanitizers
       enterprise_tools: 68_passed_models_and_real_openssl_signature_verification
       persistence_fault_boundaries: 630_storage_763_rotation_3659_update
-      full_suite: 1696_passed_zero_failures_errors_or_skips
-      full_suite_seconds: 49.93
-      full_suite_report: build/linux-gcc-debug/ctest-results.xml
-      production_entry_smokes: blinky_industrial_controller_config_demo_shell_demo_passed
-      additional_freertos_demo_smoke: 1_passed_in_separate_junit
-      additional_smoke_report: build/evidence/native-freertos-demo-final.xml
-      expanded_sanitizer_subset: 23_passed_zero_failures_errors_or_skips
-      sanitizer_report: build/linux-gcc-sanitizers/ctest-results.xml
-      sanitizer_seconds: 11.56
-      sanitizer_scope: 18_selected_contracts_and_5_finite_apps
+      source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+      full_suite: 1711_passed_zero_failures_errors_or_skips
+      full_suite_seconds: 48.82
+      full_suite_report: build/linux-gcc-debug/ctest-final-source.xml
+      online_native_profiles: three_profiles_each_1711_passed_at_4a283eb
+      production_entry_smokes: blinky_industrial_controller_config_demo_shell_demo_freertos_demo_passed
+      release_application_checks: 5_passed_zero_failures_errors_or_skips
+      release_application_report: build/linux-gcc-release/ctest-final-applications.xml
+      release_application_seconds: 1.01
+      expanded_sanitizer_subset: 37_passed_zero_failures_errors_or_skips
+      sanitizer_report: build/linux-gcc-sanitizers/ctest-final-contracts.xml
+      sanitizer_seconds: 12.33
+      sanitizer_scope: selected_local_contracts_regressions_and_5_finite_apps
       local_leak_detection: disabled_due_to_ptrace_no_passing_leak_claim
-      final_source_config_artifact_binding: pending_clean_source_rebuild_after_commits
+      online_sanitizer_subset: 23_passed_with_leak_detection_enabled_at_4a283eb
+      source_config_artifact_binding: build/evidence/final-source-4a283ebf6c2f-identity.json
+      required_static_analysis: clang_tidy_and_cppcheck_136_owned_translation_units_passed_at_4a283eb
+      ci_helpers: 107_passed_at_e15df5c
+      tracked_python_syntax: 130_sources_zero_errors_at_e15df5c
+      coverage_export_and_final_documentation_head: see_live_PR_3_checks
       hardware: not_applicable
       records:
         - docs/implementation/build-config.md
@@ -51,8 +59,8 @@ profiles:
       - Host models do not establish MCU timing, electrical behavior, ISR or DMA.
       - OpenSSL and POSIX file flash are host-only integrations.
       - Windows/macOS presets are not validated by this checkpoint.
-      - The 1696-case full checkpoint and one added smoke are separate reports; final identity requires a unified clean-source rebuild record.
-      - ASan/UBSan selected contracts passed; complete-suite sanitizer and online leak detection are not this evidence.
+      - Evidence is bound to the stated source revisions; later commits require their own actual CI records.
+      - Local 37-entry ASan/UBSan and online 23-entry leak-checked runs have different scopes; neither is complete-suite sanitizer evidence.
     blockers: [DOC-001, HAL-001, OS-001, OS-002]
   - id: freertos-posix-contracts
     architecture: host
@@ -65,7 +73,8 @@ profiles:
       runtime_contracts: 10_groups_passed_natural_exit_zero
       timer_delete_reclamation_review: atomic_reclamation_and_30_concurrent_reuse_rounds_passed
       local_event_helper: 5_groups_passed_200_cancel_reuse_cycles
-      final_source_config_artifact_binding: pending_final_integration
+      integrated_source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+      integration_report: build/linux-gcc-debug/ctest-final-source.xml
       record: docs/implementation/freertos-posix-host-port.md
       arm_interrupt_port: not_executed
       hardware: not_applicable
@@ -86,7 +95,9 @@ profiles:
       startup_clock_gpio_spi_flash_uid_sources: maintained
       spi_gpio_host_fake_contracts: 3_ctest_targets_passed
       real_sdk_header_syntax: executed_host_compiler_only
-      arm_compile_link: pending_toolchain_execution
+      arm_compile_link: baremetal_and_freertos_online_passed_at_4a283eb
+      source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+      execution_scope: cross_compile_only_not_physical_hil
       hardware: not_executed
       record: docs/implementation/platform-drivers.md
     limits:

@@ -8,7 +8,7 @@ Nexus 面向工业控制与设备联网，以公共 HAL/OSAL、独立 SoC/board/
 |---|---|---|
 | Linux Native / GCC | 完整目标编译、契约与应用测试 | 主机模型，不代表硬件结果 |
 | FreeRTOS / POSIX port | 锁定的真实 kernel 与 OSAL 契约执行 | 不验证 Cortex-M 中断与时序 |
-| STM32F407VG / MB997 | GPIO、SPI/DMA/IRQ、Flash 分区与启动装配，真实 SDK 头验证 | ARM 完整链接与上板验证待执行 |
+| STM32F407VG / MB997 | 裸机与 FreeRTOS 已在 `4a283eb` 使用官方锁定 SDK、ARM GCC 完成线上编译链接 | 物理 HIL 与 PCB 修订确认待完成 |
 | GD32 | 独立移植约束与候选描述 | 尚无 SDK/具体板验证；配置明确拒绝 |
 | Windows / macOS | 保留 Native 构建预设 | 本次没有执行该平台验证 |
 
@@ -42,7 +42,7 @@ cmake --preset stm32-armgcc-freertos-release
 cmake --build --preset stm32-armgcc-freertos-release --parallel 4
 ```
 
-固件、map、bin、hex 输出至对应 build 目录的 bin。上板前核对芯片、板级修订、供电、Flash 分区与有效配置。本环境没有完成 ARM 链接或 HIL，以上命令是维护入口。
+固件、map、bin、hex 输出至对应 build 目录的 bin。上板前核对芯片、板级修订、供电、Flash 分区与有效配置。GitHub Actions 已在 `4a283eb` 完成两份 STM32F407 配置的编译链接，见[集成验证记录](docs/implementation/integration-validation.md)。本地维护环境缺少完整 ARM 工具链；物理 HIL 与 PCB 修订确认仍待完成。
 
 ## 平台契约
 
@@ -50,7 +50,7 @@ cmake --build --preset stm32-armgcc-freertos-release --parallel 4
 - STM32 SPI 分离 bus、不可变 device 和 transaction，使用有界异步队列；取消/超时先停止并 drain DMA，再结束缓冲所有权。
 - 裸机 OSAL 不伪装调度器；任务、事件和软件定时器等不支持能力明确拒绝。产品用主循环与板级单调时钟组织控制。
 - 持久化使用真实 Flash port 的双银行原子快照；Native 使用跨进程可恢复的文件 Flash 模型。RAM 不被称为持久化。
-- Config 由一个管理 owner 串行访问；AES-GCM 认证记录使用维护中的密码 provider。MCU 未绑定 provider/熵源时返回 unsupported。
+- Config 由一个管理 owner 串行访问；AES-GCM 认证记录使用维护中的密码 provider。当前 MCU provider 与熵源尚未集成，依赖它们的密码操作返回 unsupported。
 - 安全更新包含镜像策略、认证端口和可恢复 trial/confirm/rollback 元数据；产品启动器、安全 vault 与实板证据仍需接入。
 
 ```sh

@@ -11,7 +11,7 @@ The maintained reference is Linux Native plus STM32F407VG / STM32F4DISCOVERY
 |---|---|---|
 | Linux Native / GCC | Full targets build; software contracts and application checks | Host peripheral models |
 | FreeRTOS POSIX port | Pinned real kernel and OSAL contract execution | Does not validate Cortex-M interrupts/timing |
-| STM32F407VG / MB997 | GPIO, SPI/DMA/IRQ, Flash partitions and startup; actual SDK headers | ARM link and physical HIL pending |
+| STM32F407VG / MB997 | Baremetal and FreeRTOS compiled and linked online with official pinned SDKs and ARM GCC at `4a283eb` | Physical HIL and PCB revision confirmation pending |
 | GD32 | Independent porting constraints and candidate metadata | No verified SDK/board backend; configure rejects |
 | Windows / macOS | Native presets retained | Not executed in this maintenance run |
 
@@ -52,7 +52,10 @@ cmake --build --preset stm32-armgcc-freertos-release --parallel 4
 
 ELF/map/bin/hex artifacts use the selected build's bin directory. Match silicon,
 board revision, supply, partition layout and effective configuration before
-flashing. ARM linking and physical HIL were not executed in this environment.
+flashing. GitHub Actions compiled and linked both STM32F407 profiles at revision
+`4a283eb`; see the [integration evidence](docs/implementation/integration-validation.md).
+The local maintenance environment lacked the complete ARM toolchain. Physical
+HIL and PCB revision confirmation remain pending.
 
 ## Runtime contracts
 
@@ -65,7 +68,8 @@ flashing. ARM linking and physical HIL were not executed in this environment.
 - Dual-bank atomic snapshots on a real Flash port; persistent Native file-flash
   simulation. RAM remains volatile.
 - A serialized Config management owner and authenticated AES-GCM records using
-  maintained crypto providers. Missing MCU providers/entropy return unsupported.
+  maintained crypto providers. The MCU crypto provider and entropy source are
+  not integrated; required crypto operations return unsupported.
 - Authenticated update policy and recoverable trial/confirm/rollback metadata.
   Product bootloader, protected vault and hardware evidence still need binding.
 

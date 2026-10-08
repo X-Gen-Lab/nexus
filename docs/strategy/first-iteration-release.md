@@ -10,7 +10,9 @@
 | `stm32-armgcc-release` | `nexus-stm32f407-baremetal` | STM32F407、STM32F4DISCOVERY MB997、裸机交叉编译 |
 | `stm32-armgcc-freertos-release` | `nexus-stm32f407-freertos` | 同一参考板、FreeRTOS 交叉编译 |
 
-Windows/macOS 的 preset 保留供后续验证，当前发布包不承诺对应持久化适配。STM32 包仍是实现候选：实物板版本、时钟、IRQ 优先级、电气行为、DMA 取消、断电恢复和实时预算需要独立 HIL 证据。GD32 尚未进入发布矩阵。
+源码 `4a283ebf6c2fa44162014d6bc7e263c7525775f4` 的实际 GitHub 构建已通过两种 STM32 ARM 配置的编译与完整链接，以及三个 Native 编译/构建组合各 1711 项测试。本地同一干净源码通过 Native Debug 1711 项、Release 5 个有限应用及 ASan/UBSan 37 项；本地未获得 LeakSanitizer 通过，线上所选 23 项已开启 leak 检查并通过。结果及身份记录见 [集成验证](../implementation/integration-validation.md)。这不是带匹配标签的三候选打包、实际 draft Release 或正式发布执行证据。
+
+Windows/macOS 的 preset 保留供后续验证，当前发布包不承诺对应持久化适配。STM32 包仍是实现候选：实物 PCB revision、时钟、IRQ 优先级、电气行为、DMA 取消、断电恢复和实时预算需要独立 HIL 证据。GD32 尚未进入发布矩阵。
 
 ## 配置与身份
 
@@ -35,6 +37,6 @@ Native 还必须提供非零、无失败的 `ctest-results.xml`。包记录实�
 
 `python -m unittest discover -s scripts/ci -p test_package_release.py -v` 验证临时本地 Git 仓库、真实本地子模块、生成配置束与 ELF 格式夹具。覆盖完整三候选、配置与编译参数冲突、源/依赖身份、非零测试、传输与包内校验、以及重算摘要后仍不允许错误配置或虚假硬件/测试声明。
 
-这组测试不运行固件。真实 Native/ARM 构建与合同测试结果记录于 `docs/implementation/`，实际在线候选需在已提交、标签匹配的干净 checkout 中执行。本次迁移还直接核对了实际 Native 构建生成束与编译命令，没有绕过 dirty-source 或标签门禁生成发布包。
+这组测试不运行固件。真实 Native/ARM 构建与合同测试结果记录于 `docs/implementation/`，实际在线候选需在已提交、标签匹配的干净 checkout 中执行。本次迁移还直接核对了实际 Native 构建生成束与编译命令，没有绕过 dirty-source 或标签门禁生成发布包。覆盖率修复 `e15df5c` 和最终文档 HEAD 的线上状态按 [PR 实际检查](https://github.com/X-Gen-Lab/nexus/pull/3/checks) 判断，不沿用之前提交的通过结果。
 
 provenance 和 SHA-256 没有签名，提供完整性核对与追溯，不是真实性或可复现构建证明。HIL、固件签名、SBOM、供应链锁定和企业正式发布准入仍需各自独立完成；MCU 默认未配置密码提供者，不能据此发布要求加密配置或固件认证的产品。

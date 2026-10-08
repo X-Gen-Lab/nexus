@@ -7,6 +7,36 @@ displayed commit; a passing earlier run does not qualify later changes.
 
 ## Executed follow-up checks
 
+The clean source revision `4a283ebf6c2fa44162014d6bc7e263c7525775f4`
+executed **1,711/1,711 Native Debug CTest entries** in 48.82 seconds,
+**5/5 Release application checks** in 1.01 seconds and **37/37 local
+ASan/UBSan entries** in 12.33 seconds, with zero failures, errors or skips.
+Local leak detection was disabled because the execution environment blocks
+LeakSanitizer; these 37 entries are not a passing local leak-check claim.
+The corresponding reports are `build/linux-gcc-debug/ctest-final-source.xml`,
+`build/linux-gcc-release/ctest-final-applications.xml` and
+`build/linux-gcc-sanitizers/ctest-final-contracts.xml`. Source/configuration,
+application ELF/map and report digests are bound in
+`build/evidence/final-source-4a283ebf6c2f-identity.json`.
+
+The actual GitHub run for the same source passed **1,711 tests in each of
+three Native compiler/build profiles**, both **STM32F407 baremetal and
+FreeRTOS ARM compile/link jobs**, the required clang-tidy and cppcheck analyses
+of **136 owned translation units**, the documentation build and **23 selected
+ASan/UBSan entries with leak detection enabled**. ARM compilation uses the pinned
+official SDK and produces linked images; it does not execute those images on a
+board. PCB revision, timing, electrical behavior and physical HIL remain untested.
+
+Coverage testing also passed all 1,711 entries, but report generation rejected
+GTest function endline metadata. Revision `e15df5c` moves production-source
+include/exclude filters into the capture step and rejects zero source records.
+Its **107 local CI-helper tests** and **130 tracked Python syntax checks** passed;
+its online coverage export and the final documentation HEAD remain subject to
+the live [PR checks](https://github.com/X-Gen-Lab/nexus/pull/3/checks).
+No passing coverage percentage is asserted here.
+
+Earlier integration checkpoints below retain their original execution scope.
+
 After reviewing the first real GitHub analyzer reports, the integrated Native
 Debug working tree executed **1,710/1,710 CTest entries**, with zero failures and
 zero skips, in 194.14 seconds. This sequential follow-up run includes 468 Native
