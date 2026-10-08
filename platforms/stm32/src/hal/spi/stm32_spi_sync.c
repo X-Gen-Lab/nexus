@@ -3,7 +3,7 @@
 
 static nx_status_t configure_slave(stm32_spi_device_t* d) {
     stm32_spi_impl_t* b = d->bus;
-    uint32_t hz = stm32_spi_board_clock_hz(b);
+    uint32_t hz = stm32_spi_board_clock_hz(b->state->instance);
     if (!hz) return NX_ERR_NOT_SUPPORTED;
     uint32_t divider = 2;
     static const uint32_t prescalers[] = {
@@ -54,7 +54,7 @@ nx_status_t spi_transfer(stm32_spi_device_t* d,
     if (!d || !d->bus || !t || !t->tx_data || !t->length || t->length > UINT16_MAX ||
         (t->timeout_ms != UINT32_MAX && t->timeout_ms > INT32_MAX))
         return NX_ERR_INVALID_PARAM;
-    if (__get_IPSR()) return NX_ERR_INVALID_STATE;
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     nx_status_t result = admit(d, worker, token);
     if (result != NX_OK) return result;
     stm32_spi_impl_t* b = d->bus;
@@ -80,7 +80,7 @@ nx_status_t spi_transfer(stm32_spi_device_t* d,
     result = configure_slave(d);
     if (result != NX_OK) goto done;
     if (!spi_remaining(started_at, t->timeout_ms)) { result = NX_ERR_TIMEOUT; goto done; }
-    result = stm32_spi_board_select(b, d->config.cs_pin, true);
+    result = stm32_spi_board_select(b->state->instance, d->config.cs_pin, true);
     if (result != NX_OK) goto done;
     selected = true;
 
@@ -151,7 +151,7 @@ settle:
     }
 done:
     if (selected) {
-        nx_status_t cs = stm32_spi_board_select(b, d->config.cs_pin, false);
+        nx_status_t cs = stm32_spi_board_select(b->state->instance, d->config.cs_pin, false);
         if (cs != NX_OK) { b->state->fault = true; result = cs; }
     }
     if (locked) {

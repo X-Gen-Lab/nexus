@@ -4,6 +4,25 @@ if OSAL_FREERTOS
 
 menu "FreeRTOS Configuration"
 
+config OSAL_FREERTOS_TASK_STACK_BYTES
+    int "Static storage bytes per OSAL task stack"
+    default 2048
+    range 512 16384
+    help
+      Each OSAL task has a dedicated static kernel control block and stack.
+      Larger create requests fail rather than allocate from the kernel heap.
+      Total reserved stack bytes scale with OSAL_MAX_TASKS.
+
+config OSAL_FREERTOS_QUEUE_STORAGE_BYTES
+    int "Static payload bytes per OSAL queue"
+    default 1024
+    range 128 16384
+    help
+      Each queue has this fixed payload capacity, a static kernel control
+      block and OSAL_MAX_QUEUE_ITEM_SIZE scratch bytes for overwrite mode.
+      Total reserved bytes scale with OSAL_MAX_QUEUES. Product admission
+      checks both this limit and OSAL_MAX_QUEUE_BYTES.
+
 config FREERTOS_USE_PREEMPTION
     bool
     default y

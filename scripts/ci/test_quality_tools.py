@@ -63,6 +63,40 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.database([self.source, Path("/tmp/foreign.c"), self.root / "vendors" / "sdk.c"])
         self.assertEqual(len(commands(self.root, self.build)), 1)
 
+    def test_explicit_production_host_models_retain_actual_compilation_scope(self):
+        modeled = []
+        for fixture, production in (
+            ('tests/drivers/gd32f470/test_uart.c', 'platforms/gd32f470/src/uart.c'),
+            ('tests/drivers/gd32f470/test_spi.c', 'platforms/gd32f470/src/spi.c'),
+            ('tests/drivers/gd32f470/test_timebase.c', 'soc/gd32f470zg/interrupt.c'),
+        ):
+            source = self.root / production
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text('int production_driver;\n')
+            model = self.root / fixture
+            model.parent.mkdir(parents=True, exist_ok=True)
+            model.write_text('#include "' + str(source) + '"\n')
+            modeled.append(model)
+        ordinary_test = self.root / 'tests/ordinary.c'
+        ordinary_test.write_text('int test_fixture;\n')
+        self.database([self.source, *modeled, ordinary_test, self.root / 'vendors/sdk.c'])
+        selected = commands(self.root, self.build)
+        self.assertEqual(len(selected), 4)
+        self.assertEqual([entry['file'] for entry in selected[1:]], list(map(str, modeled)))
+        self.assertTrue(all(entry['nexus_analysis_scope'] == 'host-model' for entry in selected[1:]))
+        self.assertEqual(selected[1]['nexus_production_source'], 'platforms/gd32f470/src/uart.c')
+        self.assertEqual(run('tidy', self.root, self.build, self.tool(0), self.report), 0)
+        self.assertIn('"kind": "host-model"', self.report.read_text())
+        self.assertIn('do not establish ARM execution', self.report.read_text())
+
+    def test_a_host_model_without_its_production_source_fails(self):
+        model = self.root / 'tests/drivers/gd32f470/test_spi.c'
+        model.parent.mkdir(parents=True)
+        model.write_text('#include "missing-driver.c"\n')
+        self.database([model])
+        with self.assertRaisesRegex(ValueError, 'missing modeled production source'):
+            commands(self.root, self.build)
+
     def test_malformed_database_fails(self):
         (self.build / "compile_commands.json").write_text("{}")
         self.assertEqual(run("tidy", self.root, self.build, self.tool(0), self.report), 1)

@@ -1,0 +1,18 @@
+if(CONFIG_STM32_SPI_ENABLE)
+    message(FATAL_ERROR "Qiming V3.1 SPI resources are not bound; disable SPI for this profile")
+endif()
+if(NOT CONFIG_STM32_HSE_VALUE EQUAL 8000000)
+    message(FATAL_ERROR "Qiming V3.1 board requires its verified 8 MHz HSE")
+endif()
+add_library(board_stm32f407_qiming_v31 INTERFACE)
+target_include_directories(board_stm32f407_qiming_v31 INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(board_stm32f407_qiming_v31 INTERFACE nexus_build_options)
+set(board_sources board.c)
+if(CONFIG_STM32_UART_ENABLE)
+    list(APPEND board_sources uart.c)
+endif()
+add_library(board_stm32f407_qiming_v31_wiring OBJECT ${board_sources})
+target_include_directories(board_stm32f407_qiming_v31_wiring PRIVATE
+    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/uart")
+target_link_libraries(board_stm32f407_qiming_v31_wiring PRIVATE
+    board_stm32f407_qiming_v31 sdk_stm32f4 hal)

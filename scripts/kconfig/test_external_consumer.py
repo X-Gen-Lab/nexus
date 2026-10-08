@@ -99,6 +99,34 @@ class ExternalConsumerTests(unittest.TestCase):
         self.assertIn('Configuration fragment missing', result.stderr)
         self.assertFalse((self.build / 'nexus-owned/generated/nexus_config.h').exists())
 
+    def test_minimal_product_links_and_runs_without_optional_services_or_openssl(self):
+        (self.source / 'application.c').write_text(
+            '#include "product/product.h"\n'
+            '#include <string.h>\n'
+            'int main(void) {\n'
+            '  if (strcmp(nx_product_descriptor()->name, "native-reference")) return 1;\n'
+            '  if (nx_product_boot(0) != NX_OK) return 2;\n'
+            '  return nx_product_shutdown(0) != NX_OK;\n}\n')
+        body = (
+            f'set(NEXUS_CONFIG_FILE "{(ROOT / "configs/native_minimal_defconfig").as_posix()}")\n'
+            'set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL TRUE)\n'
+            + self.add_nexus() +
+            'foreach(excluded Security Storage Update ModbusRTU Industrial '
+            'ConfigManager Log Shell Init)\n'
+            '  if(TARGET Nexus::${excluded})\n'
+            '    message(FATAL_ERROR "Disabled component target was created: ${excluded}")\n'
+            '  endif()\nendforeach()\n'
+            'if(TARGET OpenSSL::Crypto)\n'
+            '  message(FATAL_ERROR "Disabled crypto provider was discovered")\nendif()\n'
+            'nexus_add_application(TARGET minimal_product SOURCES application.c)\n'
+            'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/minimal-path.txt" CONTENT '
+            '"$<TARGET_FILE:minimal_product>\\n")\n')
+        result = self.configure(body)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.run_checked(['cmake', '--build', str(self.build), '--parallel', '2',
+                          '--target', 'minimal_product'])
+        self.run_checked([(self.build / 'minimal-path.txt').read_text().strip()])
+
     def test_external_build_mode_conflict_is_rejected(self):
         (self.source / 'product.config').write_text(
             'CONFIG_PLATFORM_NATIVE=y\nCONFIG_OSAL_NATIVE=y\nCONFIG_BUILD_TYPE_DEBUG=y\n')
@@ -108,6 +136,46 @@ class ExternalConsumerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('cannot be honored', result.stderr)
         self.assertFalse((self.build / 'nexus-owned/generated/nexus_config.h').exists())
+
+    def test_hal_only_consumer_does_not_inherit_osal_headers(self):
+        (self.source / 'hal_consumer.c').write_text(
+            '#include "hal/nx_hal.h"\n'
+            '#if __has_include("osal/osal.h")\n'
+            '#error HAL public target leaked OSAL headers\n#endif\n'
+            '#include <string.h>\n'
+            'int main(void) { return nx_status_to_string(NX_OK) == 0; }\n')
+        body = (
+            f'set(NEXUS_CONFIG_FILE "{(ROOT / "configs/native_minimal_defconfig").as_posix()}")\n'
+            'set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL TRUE)\n'
+            + self.add_nexus() +
+            'add_executable(hal_only hal_consumer.c)\n'
+            'target_link_libraries(hal_only PRIVATE Nexus::HAL)\n'
+            'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/hal-path.txt" CONTENT '
+            '"$<TARGET_FILE:hal_only>\\n")\n')
+        result = self.configure(body)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.run_checked(['cmake', '--build', str(self.build), '--parallel', '2',
+                          '--target', 'hal_only'])
+        self.run_checked([(self.build / 'hal-path.txt').read_text().strip()])
+
+    def test_minimal_profile_enables_only_tests_for_present_components(self):
+        body = (
+            f'set(NEXUS_CONFIG_FILE "{(ROOT / "configs/native_minimal_defconfig").as_posix()}")\n'
+            'set(NEXUS_BUILD_TESTS ON)\n'
+            'set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL TRUE)\n'
+            + self.add_nexus() +
+            'foreach(excluded config_tests shell_tests log_tests init_tests '
+            'integration_tests crypto_tests storage_tests update_tests nexus_industrial_tests)\n'
+            '  if(TARGET ${excluded})\n'
+            '    message(FATAL_ERROR "Tests forced a disabled component: ${excluded}")\n'
+            '  endif()\nendforeach()\n'
+            'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/smoke-path.txt" CONTENT '
+            '"$<TARGET_FILE:product_native_smoke>\\n")\n')
+        result = self.configure(body)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.run_checked(['cmake', '--build', str(self.build), '--parallel', '2',
+                          '--target', 'product_native_smoke'])
+        self.run_checked([(self.build / 'smoke-path.txt').read_text().strip()])
 
     def test_parent_multi_configuration_is_not_silently_rewritten(self):
         self.assertIsNotNone(shutil.which('ninja'), 'Ninja is required for this contract')

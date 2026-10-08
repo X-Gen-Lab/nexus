@@ -18,7 +18,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 # boards/soc have no instrumented translation units in the Native profile.
 # Physical/ARM coverage needs its own execution evidence and source scope.
-NATIVE_INSTRUMENTED = ("hal", "osal", "framework", "services", "platforms")
+NATIVE_INSTRUMENTED = ("arch", "products", "hal", "osal", "framework", "services", "platforms")
 
 
 def coverage_commands():

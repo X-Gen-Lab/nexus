@@ -5,8 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Native wire/plant model. It exercises real protocol and supervisor code;
- * it is not a UART, board watchdog, persistent parameter store or HIL test. */
+/* Service-only Native wire/plant model: intentionally no Product/HAL/OSAL boot.
+ * Its synchronous model owns all ports and contains no hardware/task resources.
+ * It exercises real protocol and supervisor code, but is not a production
+ * firmware, UART, board watchdog, persistent parameter store or HIL test. */
 enum { SENSOR = 0, SETPOINT = 1, OUTPUT = 2, QUALITY = 3, ENABLE = 4, REGISTERS = 5 };
 typedef struct {
     uint64_t time_us;

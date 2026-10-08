@@ -1,140 +1,35 @@
-/**
- * \file            stm32_uart_callbacks.c
- * \brief           STM32 UART callback implementation
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-02-04
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * \details         Implements STM32 HAL UART callbacks and callback
- *                  registration functions. Forwards HAL callbacks to Nexus
- *                  user callbacks with minimal processing.
- */
+/** Strong vendor callbacks. No user callback, wait or OSAL call in IRQ. */
+#include "stm32_uart_runtime.h"
 
-/*
- * Copyright (c) 2026 Nexus Team
- */
-
-#include "stm32_uart_helpers.h"
-#include "stm32_uart_types.h"
-
-#ifdef NX_CONFIG_STM32_UART_USE_OSAL
-#include "osal/osal_sem.h"
-#endif
-
-/*---------------------------------------------------------------------------*/
-/* STM32 HAL Callback Implementations                                        */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           TX complete callback
- * \note            Called by HAL_UART_IRQHandler when transmission completes
- * \details         Updates statistics, clears busy flag, signals semaphore
- *                  (if OSAL enabled), and forwards to user callback.
- */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
-    if (!huart) {
-        return;
-    }
-
-    /* Find UART instance from handle */
-    stm32_uart_impl_t* impl = NX_CONTAINER_OF(huart, stm32_uart_impl_t, huart);
-    if (!impl || !impl->state) {
-        return;
-    }
-
-    /* Clear busy flag */
-    impl->state->tx_busy = false;
-
-#ifdef NX_CONFIG_STM32_UART_USE_OSAL
-    /* Signal TX completion semaphore */
-    if (impl->tx_sem != NULL) {
-        osal_sem_give(impl->tx_sem);
-    }
-#endif
-
-    /* Forward to user TX complete callback */
-    if (impl->callbacks.tx_complete_cb) {
-        impl->callbacks.tx_complete_cb(impl->callbacks.user_data);
+/* Only handles connected by this controller may be converted to impl. */
+extern stm32_uart_impl_t* stm32_uart_from_handle(UART_HandleTypeDef* handle);
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef* handle) {
+    stm32_uart_impl_t* impl = stm32_uart_from_handle(handle);
+    if (impl) stm32_uart_tx_completed(impl);
+}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef* handle) {
+    stm32_uart_impl_t* impl = stm32_uart_from_handle(handle);
+    if (!impl || !impl->state->initialized || impl->state->suspended || impl->faulted || impl->closing) return;
+    stm32_uart_rx_event(impl, true, impl->rx_byte, NX_OK, 0);
+    nx_status_t status = stm32_uart_arm_rx(impl);
+    if (status != NX_OK) stm32_uart_rx_event(impl, false, 0, status, 0);
+}
+void HAL_UART_ErrorCallback(UART_HandleTypeDef* handle) {
+    stm32_uart_impl_t* impl = stm32_uart_from_handle(handle);
+    if (!impl || !impl->state->initialized || impl->faulted || impl->closing) return;
+    uint32_t error = HAL_UART_GetError(handle);
+    nx_status_t status = NX_ERR_IO;
+    if (error & HAL_UART_ERROR_ORE) status = NX_ERR_OVERRUN;
+    else if (error & HAL_UART_ERROR_PE) status = NX_ERR_PARITY;
+    else if (error & HAL_UART_ERROR_FE) status = NX_ERR_FRAMING;
+    else if (error & HAL_UART_ERROR_NE) status = NX_ERR_NOISE;
+    stm32_uart_rx_event(impl, false, 0, status, error);
+    /* F4 HAL terminates reception on overrun; restart only once READY.
+     * Parity/framing/noise are nonblocking and HAL keeps its current RX. */
+    if (handle->RxState == HAL_UART_STATE_READY && !impl->state->suspended) {
+        (void)stm32_uart_arm_rx(impl);
     }
 }
-
-/**
- * \brief           RX complete callback
- * \note            Called by HAL_UART_IRQHandler when reception completes
- * \details         Writes data to circular buffer (if configured), updates
- *                  statistics, clears busy flag, signals semaphore (if OSAL
- *                  enabled), and forwards to user callback.
- */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
-    if (!huart) {
-        return;
-    }
-
-    /* Find UART instance from handle */
-    stm32_uart_impl_t* impl = NX_CONTAINER_OF(huart, stm32_uart_impl_t, huart);
-    if (!impl || !impl->state) {
-        return;
-    }
-
-    /* Write received data to circular buffer (Nexus value-add) */
-    if (impl->state->rx_buf.data != NULL && impl->state->rx_buf.size > 0) {
-        stm32_uart_buffer_write(&impl->state->rx_buf, huart->pRxBuffPtr,
-                                huart->RxXferSize);
-    }
-
-    /* Clear busy flag */
-    impl->state->rx_busy = false;
-
-#ifdef NX_CONFIG_STM32_UART_USE_OSAL
-    /* Signal RX completion semaphore */
-    if (impl->rx_sem != NULL) {
-        osal_sem_give(impl->rx_sem);
-    }
-#endif
-
-    /* Forward to user RX complete callback */
-    if (impl->callbacks.rx_complete_cb) {
-        impl->callbacks.rx_complete_cb(impl->callbacks.user_data);
-    }
-}
-
-/**
- * \brief           Error callback
- * \note            Called by HAL_UART_IRQHandler when error occurs
- * \details         Updates error statistics by type (PE, FE, NE, ORE, DMA),
- *                  clears busy flags, and forwards to user error callback.
- *                  STM32 HAL handles error recovery automatically.
- */
-void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart) {
-    if (!huart) {
-        return;
-    }
-
-    /* Find UART instance from handle */
-    stm32_uart_impl_t* impl = NX_CONTAINER_OF(huart, stm32_uart_impl_t, huart);
-    if (!impl || !impl->state) {
-        return;
-    }
-
-    /* Get error code from HAL */
-    uint32_t error_code = HAL_UART_GetError(huart);
-
-    /* Error handling */
-    (void)error_code;
-
-    /* Clear busy flags */
-    impl->state->tx_busy = false;
-    impl->state->rx_busy = false;
-
-    /* Forward to user error callback with error code */
-    /* Let STM32 HAL handle error recovery */
-    if (impl->callbacks.error_cb) {
-        impl->callbacks.error_cb(impl->callbacks.user_data, error_code);
-    }
-}
-
 /*---------------------------------------------------------------------------*/
 /* Callback Registration Functions                                           */
 /*---------------------------------------------------------------------------*/

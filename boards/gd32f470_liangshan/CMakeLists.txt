@@ -1,0 +1,5 @@
+add_library(board_gd32f470_liangshan INTERFACE)
+target_include_directories(board_gd32f470_liangshan INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(board_gd32f470_liangshan INTERFACE hal_interface)
+add_library(board_gd32f470_wiring OBJECT board.c)
+target_link_libraries(board_gd32f470_wiring PRIVATE board_gd32f470_liangshan sdk_gd32f4xx)

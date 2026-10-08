@@ -1,12 +1,21 @@
-/** Real STM32F407VG 1 MiB Flash port, reserved sectors 10 and 11 only.
+/** Real STM32F407 xE/xG Flash port. xE reserves sectors 6/7; xG 10/11.
  * Flash erase/program can stall instruction fetch. This is a maintenance
  * operation, not a control-loop operation. Runtime power-fail HIL is pending. */
 #include "flash.h"
+#include "flash_geometry.h"
+#include "nexus_config.h"
+#include "arch/nx_arch.h"
 #include "stm32f4xx_hal.h"
 #include <stdint.h>
 #include <string.h>
 
+#if NX_CONFIG_STM32_FLASH_SIZE == (512U * 1024U)
+#define PARTITION_BASE 0x08040000U
+#elif NX_CONFIG_STM32_FLASH_SIZE == (1024U * 1024U)
 #define PARTITION_BASE 0x080C0000U
+#else
+#error "STM32F407 storage requires the exact xE or xG physical Flash size"
+#endif
 #define PARTITION_SIZE (256U * 1024U)
 #define SECTOR_SIZE (128U * 1024U)
 extern char __nexus_storage_start[] __attribute__((weak));
@@ -16,30 +25,35 @@ static bool range(size_t offset, size_t n) {
     return offset <= PARTITION_SIZE && n <= PARTITION_SIZE - offset;
 }
 static bool reserved(void) {
-    return (uintptr_t)__nexus_storage_start == PARTITION_BASE &&
-           (uintptr_t)__nexus_storage_end == PARTITION_BASE + PARTITION_SIZE;
+    nx_stm32f407_flash_geometry_t geometry;
+    uint32_t physical_bytes=(uint32_t)*(volatile const uint16_t*)FLASHSIZE_BASE * 1024U;
+    return nx_stm32f407_flash_geometry(physical_bytes,&geometry) &&
+           geometry.flash_bytes == NX_CONFIG_STM32_FLASH_SIZE &&
+           geometry.partition_base == PARTITION_BASE &&
+           (uintptr_t)__nexus_storage_start == geometry.partition_base &&
+           (uintptr_t)__nexus_storage_end == geometry.partition_base + geometry.partition_bytes;
 }
 static bool take(void) {
-    uint32_t saved = __get_PRIMASK(); __disable_irq();
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
     bool taken = !programming;
     if (taken) programming = true;
-    __DMB(); __set_PRIMASK(saved);
+    nx_arch_dmb(); nx_arch_irq_restore(saved);
     return taken;
 }
 static void give(void) {
-    uint32_t saved = __get_PRIMASK(); __disable_irq();
-    programming = false; __DMB(); __set_PRIMASK(saved);
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    programming = false; nx_arch_dmb(); nx_arch_irq_restore(saved);
 }
 static void flush_data_cache(void) {
     bool enabled = (FLASH->ACR & FLASH_ACR_DCEN) != 0;
     __HAL_FLASH_DATA_CACHE_DISABLE();
     __HAL_FLASH_DATA_CACHE_RESET();
     if (enabled) __HAL_FLASH_DATA_CACHE_ENABLE();
-    __DSB(); __ISB();
+    nx_arch_dsb(); nx_arch_isb();
 }
 static nx_storage_status_t read_data(void* ctx, size_t offset, void* data, size_t n) {
     (void)ctx;
-    if (__get_IPSR() || !reserved() || !range(offset,n) || (!data && n))
+    if (nx_arch_in_isr() || !reserved() || !range(offset,n) || (!data && n))
         return NX_STORAGE_INVALID;
     if (!take()) return NX_STORAGE_IO;
     if (n) memcpy(data, (const void*)(uintptr_t)(PARTITION_BASE+offset), n);
@@ -49,7 +63,7 @@ static nx_storage_status_t read_data(void* ctx, size_t offset, void* data, size_
 static nx_storage_status_t program_data(void* ctx, size_t offset,
                                          const void* data, size_t n) {
     (void)ctx;
-    if (__get_IPSR() || !reserved() || !range(offset,n) || (!data && n) ||
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked() || !reserved() || !range(offset,n) || (!data && n) ||
         (offset & 3U) || (n & 3U)) return NX_STORAGE_INVALID;
     if (!take()) return NX_STORAGE_IO;
     nx_storage_status_t r = NX_STORAGE_OK;
@@ -74,7 +88,7 @@ static nx_storage_status_t program_data(void* ctx, size_t offset,
 }
 static nx_storage_status_t erase_data(void* ctx, size_t offset, size_t n) {
     (void)ctx;
-    if (__get_IPSR() || !reserved() || !range(offset,n) || offset % SECTOR_SIZE ||
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked() || !reserved() || !range(offset,n) || offset % SECTOR_SIZE ||
         n % SECTOR_SIZE) return NX_STORAGE_INVALID;
     if (!n) return NX_STORAGE_OK;
     if (!take()) return NX_STORAGE_IO;
@@ -83,8 +97,14 @@ static nx_storage_status_t erase_data(void* ctx, size_t offset, size_t n) {
                             FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
     FLASH_EraseInitTypeDef erase={0};
     erase.TypeErase=FLASH_TYPEERASE_SECTORS;
-    erase.Sector=offset ? FLASH_SECTOR_11 : FLASH_SECTOR_10;
-    erase.NbSectors=(uint32_t)(n/SECTOR_SIZE);
+    nx_stm32f407_flash_geometry_t geometry;
+    uint32_t first_sector, sector_count;
+    if (!nx_stm32f407_flash_geometry(NX_CONFIG_STM32_FLASH_SIZE,&geometry) ||
+        !nx_stm32f407_flash_erase_sector(&geometry,offset,n,&first_sector,&sector_count)) {
+        (void)HAL_FLASH_Lock(); give(); return NX_STORAGE_INVALID;
+    }
+    erase.Sector=first_sector;
+    erase.NbSectors=sector_count;
     erase.VoltageRange=FLASH_VOLTAGE_RANGE_3; /* VDD 2.7..3.6V board prerequisite. */
     uint32_t failed_sector=UINT32_MAX;
     nx_storage_status_t r=HAL_FLASHEx_Erase(&erase,&failed_sector)==HAL_OK ? NX_STORAGE_OK : NX_STORAGE_IO;
@@ -101,7 +121,7 @@ static nx_storage_status_t erase_data(void* ctx, size_t offset, size_t n) {
 }
 static nx_storage_status_t sync_data(void* ctx) {
     (void)ctx;
-    if (__get_IPSR() || !reserved()) return NX_STORAGE_INVALID;
+    if (nx_arch_in_isr() || !reserved()) return NX_STORAGE_INVALID;
     if (!take()) return NX_STORAGE_IO;
     flush_data_cache(); give();
     return NX_STORAGE_OK;

@@ -120,6 +120,26 @@ extern "C" {
 #define OSAL_MAX_QUEUE_BYTES (64u * 1024u)
 #endif
 
+/* Real FreeRTOS object storage. Values are bytes, never kernel stack words.
+ * A product can lower object counts and these capacities independently. */
+#if defined(NEXUS_EFFECTIVE_CONFIG)
+#include "nexus_config.h"
+#endif
+#ifndef OSAL_FREERTOS_TASK_STACK_BYTES
+#if defined(NX_CONFIG_OSAL_FREERTOS_TASK_STACK_BYTES)
+#define OSAL_FREERTOS_TASK_STACK_BYTES NX_CONFIG_OSAL_FREERTOS_TASK_STACK_BYTES
+#else
+#define OSAL_FREERTOS_TASK_STACK_BYTES 2048u
+#endif
+#endif
+#ifndef OSAL_FREERTOS_QUEUE_STORAGE_BYTES
+#if defined(NX_CONFIG_OSAL_FREERTOS_QUEUE_STORAGE_BYTES)
+#define OSAL_FREERTOS_QUEUE_STORAGE_BYTES NX_CONFIG_OSAL_FREERTOS_QUEUE_STORAGE_BYTES
+#else
+#define OSAL_FREERTOS_QUEUE_STORAGE_BYTES 1024u
+#endif
+#endif
+
 /**
  * \brief           Maximum number of event flags
  */

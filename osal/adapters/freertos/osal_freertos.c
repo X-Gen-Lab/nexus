@@ -2,9 +2,10 @@
  * Pins protect kernel objects for the duration of waits. Delete returns BUSY
  * while an operation or owner still uses an object; stale handles never refer
  * to an allocation or a new lifetime. Supports the pinned single-core port. */
+#include "FreeRTOS.h"
 #include "osal/osal.h"
 #include "osal/osal_internal.h"
-#include "FreeRTOS.h"
+#include "arch/nx_arch.h"
 #include "task.h"
 #include "semphr.h"
 #include "queue.h"
@@ -20,6 +21,39 @@
                            OSAL_MAX_QUEUES + OSAL_MAX_TIMERS + OSAL_MAX_EVENTS)
 #define RTOS_EVENT_MASK 0x00ffffffu
 
+#if configSUPPORT_STATIC_ALLOCATION != 1
+#error "The OSAL FreeRTOS backend requires static kernel object creation"
+#endif
+#define RTOS_STACK_WORDS (OSAL_FREERTOS_TASK_STACK_BYTES / sizeof(StackType_t))
+#define RTOS_QUEUE_BYTES (OSAL_FREERTOS_QUEUE_STORAGE_BYTES < OSAL_MAX_QUEUE_BYTES ? \
+                         OSAL_FREERTOS_QUEUE_STORAGE_BYTES : OSAL_MAX_QUEUE_BYTES)
+#define RTOS_QUEUE_ITEM_BYTES (OSAL_MAX_QUEUE_ITEM_SIZE < RTOS_QUEUE_BYTES ? \
+                              OSAL_MAX_QUEUE_ITEM_SIZE : RTOS_QUEUE_BYTES)
+_Static_assert(configNUMBER_OF_CORES == 1,
+               "The OSAL FreeRTOS lifetime contract supports single-core ports only");
+_Static_assert(RTOS_STACK_WORDS >= configMINIMAL_STACK_SIZE,
+               "OSAL static task storage is smaller than the kernel minimum");
+_Static_assert(OSAL_MAX_TASKS <= 64 && OSAL_MAX_MUTEXES <= 64 &&
+               OSAL_MAX_SEMS <= 64 && OSAL_MAX_QUEUES <= 64 &&
+               OSAL_MAX_EVENTS <= 64 && OSAL_MAX_TIMERS <= 64,
+               "OSAL storage slot mask capacity exceeded");
+
+typedef struct {
+    StaticTask_t control;
+    _Alignas(portBYTE_ALIGNMENT) StackType_t stack[RTOS_STACK_WORDS];
+} rtos_task_storage_t;
+typedef struct {
+    StaticQueue_t control;
+    uint8_t payload[RTOS_QUEUE_BYTES];
+    uint8_t scratch[RTOS_QUEUE_ITEM_BYTES];
+} rtos_queue_storage_t;
+static rtos_task_storage_t s_task_storage[OSAL_MAX_TASKS];
+static StaticSemaphore_t s_mutex_storage[OSAL_MAX_MUTEXES];
+static StaticSemaphore_t s_sem_storage[OSAL_MAX_SEMS];
+static rtos_queue_storage_t s_queue_storage[OSAL_MAX_QUEUES];
+static StaticEventGroup_t s_event_storage[OSAL_MAX_EVENTS];
+static StaticTimer_t s_timer_storage[OSAL_MAX_TIMERS];
+
 typedef struct {
     osal_resource_type_t type;
     bool used, closing;
@@ -32,6 +66,7 @@ typedef struct {
     char name[configMAX_TASK_NAME_LEN];
     osal_queue_mode_t queue_mode;
     size_t capacity;
+    unsigned storage_index;
     void* scratch;
     osal_timer_callback_t callback;
     bool command_pending, command_done, ack_enqueued, delete_enqueued;
@@ -43,6 +78,10 @@ static uintptr_t s_next_token = 1;
 static uint16_t s_counts[7], s_peaks[7];
 static osal_error_callback_t s_error_callback;
 static size_t s_mem_allocated, s_mem_peak, s_mem_count;
+static bool s_mem_sealed;
+static bool s_initialized;
+static uint32_t s_boot_critical_depth;
+static nx_arch_irq_state_t s_boot_critical_state;
 
 /* The supported toolchain is GCC/Clang. Applications may replace these hooks
  * with a board fail-stop that places outputs in their safe state. The callback
@@ -80,16 +119,14 @@ RTOS_WEAK void vApplicationMallocFailedHook(void) {
 #endif
 
 bool osal_is_isr(void) {
-#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || \
-    defined(__ARM_ARCH_8M_BASE__) || defined(__ARM_ARCH_8M_MAIN__)
-    uint32_t ipsr;
-    __asm volatile("mrs %0, ipsr" : "=r"(ipsr));
-    return ipsr != 0;
-#else
-    return false;
-#endif
+    return nx_arch_in_isr();
 }
 static UBaseType_t rtos_lock(void) {
+    /* The Cortex-M kernel intentionally starts with a sentinel critical
+     * nesting value. Its task critical API can keep BASEPRI masked until
+     * scheduler start. Boot metadata queries must not freeze the HAL tick. */
+    if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED)
+        return (UBaseType_t)nx_arch_irq_save().value;
     if (osal_is_isr()) {
 #ifdef portASSERT_IF_INTERRUPT_PRIORITY_INVALID
         portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
@@ -100,16 +137,60 @@ static UBaseType_t rtos_lock(void) {
     return 0;
 }
 static void rtos_unlock(UBaseType_t mask) {
-    if (osal_is_isr()) portCLEAR_INTERRUPT_MASK_FROM_ISR(mask);
+    if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED)
+        nx_arch_irq_restore((nx_arch_irq_state_t){(uint32_t)mask});
+    else if (osal_is_isr()) portCLEAR_INTERRUPT_MASK_FROM_ISR(mask);
     else taskEXIT_CRITICAL();
+}
+
+typedef struct { bool active; UBaseType_t mask; } rtos_boot_kernel_guard_t;
+static rtos_boot_kernel_guard_t rtos_boot_kernel_enter(void) {
+    rtos_boot_kernel_guard_t guard = {
+        .active = xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED, .mask = 0};
+    if (guard.active) guard.mask = portSET_INTERRUPT_MASK_FROM_ISR();
+    return guard;
+}
+static void rtos_boot_kernel_exit(rtos_boot_kernel_guard_t guard) {
+    if (guard.active) portCLEAR_INTERRUPT_MASK_FROM_ISR(guard.mask);
 }
 
 /* Public critical regions are short nonblocking task regions. The HAL provides
  * saved PRIMASK primitives for mixed task/ISR interrupt masking on Cortex-M. */
-void osal_enter_critical(void) { taskENTER_CRITICAL(); }
-void osal_exit_critical(void) { taskEXIT_CRITICAL(); }
-osal_status_t osal_init(void) { return OSAL_OK; }
-void osal_start(void) { vTaskStartScheduler(); }
+void osal_enter_critical(void) {
+    configASSERT(!osal_is_isr());
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        taskENTER_CRITICAL(); return;
+    }
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    configASSERT(s_boot_critical_depth != UINT32_MAX);
+    if (!s_boot_critical_depth) s_boot_critical_state = previous;
+    ++s_boot_critical_depth;
+    if (s_boot_critical_depth > 1) nx_arch_irq_restore(previous);
+}
+void osal_exit_critical(void) {
+    configASSERT(!osal_is_isr());
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        taskEXIT_CRITICAL(); return;
+    }
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    configASSERT(s_boot_critical_depth != 0);
+    bool outer = --s_boot_critical_depth == 0;
+    nx_arch_irq_restore(previous);
+    if (outer) nx_arch_irq_restore(s_boot_critical_state);
+}
+osal_status_t osal_init(void) {
+    if (osal_is_isr()) return OSAL_ERROR_ISR;
+    UBaseType_t m = rtos_lock(); s_initialized = true; rtos_unlock(m);
+    return OSAL_OK;
+}
+bool osal_is_initialized(void) {
+    UBaseType_t m = rtos_lock(); bool initialized = s_initialized; rtos_unlock(m);
+    return initialized;
+}
+void osal_start(void) {
+    configASSERT(s_boot_critical_depth == 0);
+    vTaskStartScheduler();
+}
 bool osal_is_running(void) { return xTaskGetSchedulerState() == taskSCHEDULER_RUNNING; }
 
 static TickType_t rtos_ticks(uint32_t ms) {
@@ -124,7 +205,14 @@ static uint32_t rtos_milliseconds(TickType_t ticks) {
 }
 osal_status_t osal_get_time_ms(uint32_t* milliseconds) {
     if (!milliseconds) return OSAL_ERROR_NULL_POINTER;
-    TickType_t ticks = osal_is_isr() ? xTaskGetTickCountFromISR() : xTaskGetTickCount();
+    bool isr = osal_is_isr();
+    if (isr && xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) {
+        /* The Cortex-M port initializes its ISR priority validation only at
+         * scheduler start. Never reach that kernel entry during boot. */
+        *milliseconds = 0;
+        return OSAL_ERROR_NOT_INIT;
+    }
+    TickType_t ticks = isr ? xTaskGetTickCountFromISR() : xTaskGetTickCount();
     *milliseconds = (uint32_t)((uint64_t)ticks * 1000u / configTICK_RATE_HZ);
     return OSAL_OK;
 }
@@ -142,8 +230,12 @@ static rtos_resource_t* rtos_find(void* handle, osal_resource_type_t type) {
 static rtos_resource_t* rtos_reserve(osal_resource_type_t type) {
     UBaseType_t mask = rtos_lock();
     unsigned count = 0;
+    uint64_t occupied = 0;
     for (unsigned i = 0; i < RTOS_RESOURCE_MAX; ++i)
-        if (s_resources[i].used && s_resources[i].type == type) ++count;
+        if (s_resources[i].used && s_resources[i].type == type) {
+            ++count;
+            occupied |= UINT64_C(1) << s_resources[i].storage_index;
+        }
     if (count >= rtos_limit(type) || s_next_token > (UINTPTR_MAX >> 4)) {
         rtos_unlock(mask); return NULL;
     }
@@ -152,6 +244,8 @@ static rtos_resource_t* rtos_reserve(osal_resource_type_t type) {
         if (r->used) continue;
         memset(r, 0, sizeof(*r));
         r->type = type;
+        while (occupied & (UINT64_C(1) << r->storage_index))
+            ++r->storage_index;
         r->used = r->closing = true;
         r->token = (void*)((s_next_token++ << 4) | (uintptr_t)type);
         rtos_unlock(mask);
@@ -176,7 +270,52 @@ static void rtos_reclaim(rtos_resource_t* r) {
     r->used = false;
     rtos_unlock(mask);
 }
+
+osal_status_t osal_deinit(void) {
+    if (osal_is_isr()) return OSAL_ERROR_ISR;
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        return OSAL_ERROR_BUSY;
+    UBaseType_t m = rtos_lock();
+    for (unsigned i = 0; i < RTOS_RESOURCE_MAX; ++i) {
+        if (s_resources[i].used) {
+            rtos_unlock(m);
+            return OSAL_ERROR_BUSY;
+        }
+    }
+    bool allocated = s_mem_count != 0;
+    if (!allocated) s_initialized = false;
+    rtos_unlock(m);
+    return allocated ? OSAL_ERROR_BUSY : OSAL_OK;
+}
+
+osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
+    if (!info) return OSAL_ERROR_NULL_POINTER;
+    *info = (osal_backend_info_t){
+        .backend = OSAL_BACKEND_FREERTOS,
+        .capabilities = OSAL_CAP_TASKS | OSAL_CAP_SOFTWARE_TIMERS |
+            OSAL_CAP_STATIC_OBJECTS | OSAL_CAP_DYNAMIC_MEMORY |
+            OSAL_CAP_PRIORITY_SCHEDULER |
+            OSAL_CAP_MONOTONIC_CLOCK | OSAL_CAP_MEMORY_SEAL,
+        .delete_policy = OSAL_DELETE_REQUIRES_IDLE,
+        .max_tasks = OSAL_MAX_TASKS, .max_mutexes = OSAL_MAX_MUTEXES,
+        .max_semaphores = OSAL_MAX_SEMS, .max_queues = OSAL_MAX_QUEUES,
+        .max_events = OSAL_MAX_EVENTS, .max_timers = OSAL_MAX_TIMERS,
+        .max_queue_item_bytes = RTOS_QUEUE_ITEM_BYTES,
+        .max_queue_storage_bytes = RTOS_QUEUE_BYTES,
+        .max_task_stack_bytes = RTOS_STACK_WORDS * sizeof(StackType_t),
+        .reserved_object_bytes = sizeof(s_resources) + sizeof(s_task_storage) +
+            sizeof(s_mutex_storage) + sizeof(s_sem_storage) + sizeof(s_queue_storage) +
+            sizeof(s_event_storage) + sizeof(s_timer_storage),
+        .event_bits_mask = RTOS_EVENT_MASK};
+#if defined(__ARM_ARCH_7EM__)
+    info->capabilities |= OSAL_CAP_HARDWARE_ISR;
+#endif
+    return OSAL_OK;
+}
 static rtos_resource_t* rtos_pin(void* handle, osal_resource_type_t type) {
+    /* Boot task queries may borrow metadata. ISR/runtime actions are gated
+     * independently; kernel reads use a boot mask guard. */
+    if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED && osal_is_isr()) return NULL;
     UBaseType_t mask = rtos_lock();
     rtos_resource_t* r = rtos_find(handle, type);
     if (r && !r->closing && r->references != UINT32_MAX) ++r->references;
@@ -194,8 +333,10 @@ static osal_status_t rtos_close(void* handle, osal_resource_type_t type,
     UBaseType_t mask = rtos_lock();
     rtos_resource_t* r = rtos_find(handle, type);
     if (!r || r->closing) { rtos_unlock(mask); return OSAL_ERROR_INVALID_PARAM; }
-    if (r->references || r->command_pending ||
-        (type == OSAL_TYPE_MUTEX && xSemaphoreGetMutexHolder(r->kernel))) {
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
+    bool held = type == OSAL_TYPE_MUTEX && xSemaphoreGetMutexHolder(r->kernel);
+    rtos_boot_kernel_exit(guard);
+    if (r->references || r->command_pending || held) {
         rtos_unlock(mask); return OSAL_ERROR_BUSY;
     }
     r->closing = true;
@@ -203,10 +344,17 @@ static osal_status_t rtos_close(void* handle, osal_resource_type_t type,
     rtos_unlock(mask);
     return OSAL_OK;
 }
-#define RTOS_TASK_ONLY() do { if (osal_is_isr()) return OSAL_ERROR_ISR; } while (0)
+#define RTOS_BOOT_CONTEXT() do { if (osal_is_isr()) return OSAL_ERROR_ISR; } while (0)
+#define RTOS_TASK_ONLY() do {                                                  \
+    RTOS_BOOT_CONTEXT();                                                       \
+    if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED)                  \
+        return OSAL_ERROR_NOT_INIT;                                            \
+} while (0)
 #define RTOS_PIN(handle, type, resource)                                      \
     do {                                                                     \
         if (!(handle)) return OSAL_ERROR_NULL_POINTER;                        \
+        if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED)             \
+            return OSAL_ERROR_NOT_INIT;                                       \
         (resource) = rtos_pin((handle), (type));                              \
         if (!(resource)) return OSAL_ERROR_INVALID_PARAM;                     \
     } while (0)

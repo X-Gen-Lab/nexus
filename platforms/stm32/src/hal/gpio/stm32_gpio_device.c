@@ -14,7 +14,6 @@
 
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_gpio.h"
-#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "stm32_gpio.h"
 #include <string.h>
@@ -50,135 +49,58 @@
  */
 #define GPIO_PIN(pin) GPIO_PIN_##pin
 
-/*---------------------------------------------------------------------------*/
-/* State Initialization Helper                                               */
-/*---------------------------------------------------------------------------*/
+/* Static per-descriptor storage. Opening a GPIO never consumes a heap block. */
+typedef struct {
+    nx_device_config_state_t core; /* First: descriptor state owns this slot. */
+    stm32_gpio_state_t runtime;
+    union {
+        stm32_gpio_read_impl_t read;
+        stm32_gpio_write_impl_t write;
+        stm32_gpio_read_write_impl_t read_write;
+    } implementation;
+} stm32_gpio_slot_t;
 
-/**
- * \brief           Initialize GPIO state structure
- */
-static stm32_gpio_state_t* gpio_alloc_state(const stm32_gpio_config_t* config) {
-    stm32_gpio_state_t* state =
-        (stm32_gpio_state_t*)nx_mem_alloc(sizeof(stm32_gpio_state_t));
-    if (!state) {
-        return NULL;
-    }
-    memset(state, 0, sizeof(stm32_gpio_state_t));
-
-    state->config = config;
-    state->port = config->port;
-    state->pin = config->pin;
-    state->initialized = false;
-    state->suspended = false;
-
-    /* Clear interrupt context */
-    state->exti.callback = NULL;
-    state->exti.user_data = NULL;
-    state->exti.trigger = NX_GPIO_TRIGGER_RISING;
-    state->exti.enabled = false;
-
-    /* Clear statistics */
-    state->stats.read_count = 0;
-    state->stats.write_count = 0;
-    state->stats.toggle_count = 0;
-
-    return state;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Device Initialization                                                     */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- * \details         Only allocates structures and initializes interfaces.
- *                  Hardware initialization is done in lifecycle init.
- */
-static void* stm32_gpio_device_init(const nx_device_t* dev) {
-    const stm32_gpio_config_t* config = (const stm32_gpio_config_t*)dev->config;
-
-    /* Validate configuration */
-    if (!config) {
-        return NULL;
-    }
-
-    void* api = NULL;
-
+static nx_status_t stm32_gpio_construct(const nx_device_t* dev, void** api) {
+    if (!dev || !dev->state || !dev->config || !api) return NX_ERR_INVALID_PARAM;
+    *api = NULL;
+    const stm32_gpio_config_t* config = dev->config;
+    if (config->rw_mode > 2) return NX_ERR_INVALID_PARAM;
+    nx_device_class_t expected = config->rw_mode == 0 ? NX_DEVICE_CLASS_GPIO_READ :
+        config->rw_mode == 1 ? NX_DEVICE_CLASS_GPIO_WRITE : NX_DEVICE_CLASS_GPIO;
+    if (dev->device_class != expected) return NX_ERR_TYPE_MISMATCH;
+    stm32_gpio_slot_t* slot = (stm32_gpio_slot_t*)dev->state;
+    memset(&slot->runtime, 0, sizeof(slot->runtime));
+    memset(&slot->implementation, 0, sizeof(slot->implementation));
+    slot->runtime.config = config;
+    slot->runtime.port = config->port;
+    slot->runtime.pin = config->pin;
+    slot->runtime.exti.trigger = NX_GPIO_TRIGGER_RISING;
     if (config->rw_mode == 0) {
-        /* Read-only mode */
-        stm32_gpio_read_impl_t* impl = (stm32_gpio_read_impl_t*)nx_mem_alloc(
-            sizeof(stm32_gpio_read_impl_t));
-        if (!impl) {
-            return NULL;
-        }
-        memset(impl, 0, sizeof(stm32_gpio_read_impl_t));
-
-        /* Initialize interfaces */
+        stm32_gpio_read_impl_t* impl = &slot->implementation.read;
         stm32_gpio_init_read(&impl->base);
         stm32_gpio_init_lifecycle_read(&impl->lifecycle);
         stm32_gpio_init_power_read(&impl->power);
-
-        /* Allocate and initialize state */
-        impl->state = gpio_alloc_state(config);
-        if (!impl->state) {
-            nx_mem_free(impl);
-            return NULL;
-        }
-
+        impl->state = &slot->runtime;
         impl->device = (nx_device_t*)dev;
-        api = &impl->base;
-
+        *api = &impl->base;
     } else if (config->rw_mode == 1) {
-        /* Write-only mode */
-        stm32_gpio_write_impl_t* impl = (stm32_gpio_write_impl_t*)nx_mem_alloc(
-            sizeof(stm32_gpio_write_impl_t));
-        if (!impl) {
-            return NULL;
-        }
-        memset(impl, 0, sizeof(stm32_gpio_write_impl_t));
-
-        /* Initialize interfaces */
+        stm32_gpio_write_impl_t* impl = &slot->implementation.write;
         stm32_gpio_init_write(&impl->base);
         stm32_gpio_init_lifecycle_write(&impl->lifecycle);
         stm32_gpio_init_power_write(&impl->power);
-
-        /* Allocate and initialize state */
-        impl->state = gpio_alloc_state(config);
-        if (!impl->state) {
-            nx_mem_free(impl);
-            return NULL;
-        }
-
+        impl->state = &slot->runtime;
         impl->device = (nx_device_t*)dev;
-        api = &impl->base;
-
-    } else if (config->rw_mode == 2) {
-        /* Read-write mode */
-        stm32_gpio_read_write_impl_t* impl =
-            (stm32_gpio_read_write_impl_t*)nx_mem_alloc(
-                sizeof(stm32_gpio_read_write_impl_t));
-        if (!impl) {
-            return NULL;
-        }
-        memset(impl, 0, sizeof(stm32_gpio_read_write_impl_t));
-
-        /* Initialize interfaces */
+        *api = &impl->base;
+    } else {
+        stm32_gpio_read_write_impl_t* impl = &slot->implementation.read_write;
         stm32_gpio_init_read_write(&impl->base);
         stm32_gpio_init_lifecycle_read_write(&impl->lifecycle);
         stm32_gpio_init_power_read_write(&impl->power);
-
-        /* Allocate and initialize state */
-        impl->state = gpio_alloc_state(config);
-        if (!impl->state) {
-            nx_mem_free(impl);
-            return NULL;
-        }
-
+        impl->state = &slot->runtime;
         impl->device = (nx_device_t*)dev;
-        api = &impl->base;
+        *api = &impl->base;
     }
-
-    return api;
+    return NX_OK;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -217,18 +139,17 @@ static void* stm32_gpio_device_init(const nx_device_t* dev) {
  */
 #define STM32_GPIO_DEVICE_REGISTER(p, n)                                       \
     STM32_GPIO_CONFIG(p, n);                                                   \
-    static nx_device_config_state_t gpio_state_##p##n = {                      \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-        .api = NULL,                                                           \
-    };                                                                         \
-    NX_DEVICE_REGISTER(                                                        \
+    static stm32_gpio_slot_t gpio_slot_##p##n;                                 \
+    NX_DEVICE_REGISTER_TYPED(                                                \
         DEVICE_TYPE, p##n,                                                     \
         (NX_CONFIG_GPIO_##p##n##_RW_MODE == 0                                  \
              ? GPIO_NAME_READ(p, n)                                            \
              : (NX_CONFIG_GPIO_##p##n##_RW_MODE == 1 ? GPIO_NAME_WRITE(p, n)   \
                                                      : GPIO_NAME_RW(p, n))),   \
-        &gpio_config_##p##n, &gpio_state_##p##n, stm32_gpio_device_init)
+        &gpio_config_##p##n, &gpio_slot_##p##n.core,                            \
+        (NX_CONFIG_GPIO_##p##n##_RW_MODE == 0 ? NX_DEVICE_CLASS_GPIO_READ :     \
+         NX_CONFIG_GPIO_##p##n##_RW_MODE == 1 ? NX_DEVICE_CLASS_GPIO_WRITE :    \
+         NX_DEVICE_CLASS_GPIO), 0, stm32_gpio_construct, NULL)
 
 /*---------------------------------------------------------------------------*/
 /* Instance Traversal                                                        */

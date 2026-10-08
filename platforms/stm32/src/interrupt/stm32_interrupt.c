@@ -45,6 +45,10 @@
 /*---------------------------------------------------------------------------*/
 
 #include "interrupt/stm32_interrupt.h"
+#include "nexus_config.h"
+#ifdef NX_CONFIG_OSAL_FREERTOS
+#include "FreeRTOSConfig.h"
+#endif
 
 /*---------------------------------------------------------------------------*/
 /* Public Functions                                                          */
@@ -112,7 +116,7 @@ void stm32_irq_disable(IRQn_Type irqn) {
  *                  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY.
  */
 static inline uint8_t validate_priority_for_rtos(uint8_t priority) {
-#ifdef CONFIG_OSAL_FREERTOS
+#ifdef NX_CONFIG_OSAL_FREERTOS
 /* FreeRTOS requires interrupt priorities used with FromISR functions
  * to be at or below configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY */
 #ifndef configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY

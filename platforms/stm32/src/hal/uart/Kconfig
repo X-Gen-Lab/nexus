@@ -2,39 +2,20 @@
 #This file is sourced from platforms / stm32 / src / hal / Kconfig
 #when STM32_UART_ENABLE is selected
 
-config STM32_UART_MAX_INSTANCES
-    int "Maximum number of UART instances"
-    default 6
-    range 1 8
-    help
-      Maximum number of UART instances supported by the platform.
-      This determines the size of the UART instance array.
-
-config STM32_UART_USE_OSAL
-    bool "Use OSAL for thread safety"
-    default n
-    depends on OSAL_ENABLE
-    help
-      Enable OSAL integration for UART driver.
-      When enabled, UART operations are protected by mutexes
-      and DMA transfers use semaphores for synchronization.
-
-      This is required for multi-threaded applications using RTOS.
-      For bare-metal applications, this can be disabled.
-
 config STM32_UART_USE_DMA
-    bool "Enable DMA support for UART"
+    bool "UART DMA allocation"
+    depends on n
     default n
     help
-      Enable DMA (Direct Memory Access) support for UART transfers.
-      DMA can significantly reduce CPU load for large data transfers.
-
-      Note: DMA support requires proper DMA channel configuration
-      and may require OSAL for synchronization.
+      UART uses its maintained interrupt-driven backend. No selected board
+      has a validated UART DMA allocation or completion/abort ownership port.
+      This capability remains disabled; an explicit request for y is rejected
+      by configuration resolution before a firmware is compiled.
 
 config STM32_UART_DEFAULT_BAUDRATE
     int "Default UART baud rate"
     default 115200
+    range 1 3000000
     help
       Default baud rate for UART communication.
       Common values: 9600, 19200, 38400, 57600, 115200, 230400, 460800
@@ -42,6 +23,7 @@ config STM32_UART_DEFAULT_BAUDRATE
 config STM32_UART_DEFAULT_WORD_LENGTH
     int "Default word length"
     default 0
+    range 0 1
     help
       Default word length (data bits) for UART.
       0 = 8 bits (UART_WORDLENGTH_8B)
@@ -50,6 +32,7 @@ config STM32_UART_DEFAULT_WORD_LENGTH
 config STM32_UART_DEFAULT_STOP_BITS
     int "Default stop bits"
     default 0
+    range 0 1
     help
       Default stop bits for UART.
       0 = 1 stop bit (UART_STOPBITS_1)
@@ -58,6 +41,7 @@ config STM32_UART_DEFAULT_STOP_BITS
 config STM32_UART_DEFAULT_PARITY
     int "Default parity"
     default 0
+    range 0 2
     help
       Default parity setting for UART.
       0 = No parity (UART_PARITY_NONE)
@@ -80,13 +64,15 @@ config STM32_UART_DEFAULT_TX_BUFFER_SIZE
       Larger buffers improve throughput but consume more RAM.
 
 config STM32_UART_DEFAULT_RX_BUFFER_SIZE
-    int "Default RX buffer size (bytes)"
+    int "Default RX event ring capacity"
     default 256
     range 0 4096
     help
       Default size of RX circular buffer in bytes.
       Set to 0 to disable buffering (direct HAL reception).
-      Larger buffers reduce data loss risk but consume more RAM.
+      This is a count of timestamped/error-aware event records, not bytes.
+      Each event occupies sizeof(nx_uart_rx_event_t). Larger rings reduce
+      data loss but require an explicit product RAM budget.
 
 config STM32_UART_BUFFER_OVERFLOW_POLICY
     int "Buffer overflow policy"
@@ -164,7 +150,8 @@ endmenu
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 menuconfig INSTANCE_STM32_UART_0
-    bool "Enable UART0"
+    bool "Enable UART0 (USART1)"
+    default n if BOARD_STM32F4DISCOVERY
     default y
     help
       Enable UART0 instance.
@@ -174,6 +161,7 @@ if INSTANCE_STM32_UART_0
 config STM32_UART0_BAUDRATE
     int "UART0 baud rate"
     default STM32_UART_DEFAULT_BAUDRATE
+    range 1 3000000
 
 config STM32_UART0_TX_BUFFER_SIZE
     int "UART0 TX buffer size"
@@ -181,14 +169,9 @@ config STM32_UART0_TX_BUFFER_SIZE
     range 0 4096
 
 config STM32_UART0_RX_BUFFER_SIZE
-    int "UART0 RX buffer size"
+    int "UART0 RX event ring capacity"
     default STM32_UART_DEFAULT_RX_BUFFER_SIZE
     range 0 4096
-
-config STM32_UART0_USE_OSAL
-    bool "UART0 use OSAL"
-    default STM32_UART_USE_OSAL
-    depends on STM32_UART_USE_OSAL
 
 config STM32_UART0_USE_DMA
     bool "UART0 use DMA"
@@ -198,7 +181,8 @@ config STM32_UART0_USE_DMA
 endif # INSTANCE_STM32_UART_0
 
 menuconfig INSTANCE_STM32_UART_1
-    bool "Enable UART1"
+    bool "Enable UART1 (USART2)"
+    default y if BOARD_STM32F4DISCOVERY
     default n
     help
       Enable UART1 instance.
@@ -208,6 +192,7 @@ if INSTANCE_STM32_UART_1
 config STM32_UART1_BAUDRATE
     int "UART1 baud rate"
     default STM32_UART_DEFAULT_BAUDRATE
+    range 1 3000000
 
 config STM32_UART1_TX_BUFFER_SIZE
     int "UART1 TX buffer size"
@@ -215,14 +200,9 @@ config STM32_UART1_TX_BUFFER_SIZE
     range 0 4096
 
 config STM32_UART1_RX_BUFFER_SIZE
-    int "UART1 RX buffer size"
+    int "UART1 RX event ring capacity"
     default STM32_UART_DEFAULT_RX_BUFFER_SIZE
     range 0 4096
-
-config STM32_UART1_USE_OSAL
-    bool "UART1 use OSAL"
-    default STM32_UART_USE_OSAL
-    depends on STM32_UART_USE_OSAL
 
 config STM32_UART1_USE_DMA
     bool "UART1 use DMA"
@@ -242,6 +222,7 @@ if INSTANCE_STM32_UART_2
 config STM32_UART2_BAUDRATE
     int "UART2 baud rate"
     default STM32_UART_DEFAULT_BAUDRATE
+    range 1 3000000
 
 config STM32_UART2_TX_BUFFER_SIZE
     int "UART2 TX buffer size"
@@ -249,14 +230,9 @@ config STM32_UART2_TX_BUFFER_SIZE
     range 0 4096
 
 config STM32_UART2_RX_BUFFER_SIZE
-    int "UART2 RX buffer size"
+    int "UART2 RX event ring capacity"
     default STM32_UART_DEFAULT_RX_BUFFER_SIZE
     range 0 4096
-
-config STM32_UART2_USE_OSAL
-    bool "UART2 use OSAL"
-    default STM32_UART_USE_OSAL
-    depends on STM32_UART_USE_OSAL
 
 config STM32_UART2_USE_DMA
     bool "UART2 use DMA"

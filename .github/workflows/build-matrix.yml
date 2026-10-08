@@ -36,6 +36,36 @@ jobs:
             preset: stm32-armgcc-freertos-release
             upload_artifacts: true
             is_arm: true
+          - name: GD32F470ZG Liangshan Baremetal Release
+            os: ubuntu-latest
+            preset: gd32f470-armgcc-baremetal-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407ZG Qiming V3.1 Baremetal Release
+            os: ubuntu-latest
+            preset: stm32-qiming-armgcc-baremetal-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407ZG Qiming V3.1 FreeRTOS Release
+            os: ubuntu-latest
+            preset: stm32-qiming-armgcc-freertos-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407VE Sky Youth Baremetal Release
+            os: ubuntu-latest
+            preset: stm32-sky-armgcc-baremetal-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407VE Sky Youth FreeRTOS Release
+            os: ubuntu-latest
+            preset: stm32-sky-armgcc-freertos-release
+            upload_artifacts: true
+            is_arm: true
+          - name: GD32F470ZG Liangshan FreeRTOS Release
+            os: ubuntu-latest
+            preset: gd32f470-armgcc-freertos-release
+            upload_artifacts: true
+            is_arm: true
 
     steps:
       - name: Checkout
@@ -59,9 +89,22 @@ jobs:
       - name: Build
         run: cmake --build --preset ${{ matrix.preset }} --parallel 4
 
+      - name: Verify ARM Firmware Static Contract
+        if: matrix.is_arm
+        run: >-
+          python3 scripts/ci/validate_firmware_elf.py
+          --build-dir build/${{ matrix.preset }}
+          --report build/${{ matrix.preset }}/firmware-static-contract.json
+
       - name: Test
         if: ${{ !matrix.is_arm }}
         run: ctest --preset ${{ matrix.preset }} --output-on-failure --no-tests=error --parallel 4 --output-junit "${{ github.workspace }}/build/${{ matrix.preset }}/ctest-results.xml"
+
+      - name: Verify ARM Artifact Rejection Paths
+        if: matrix.is_arm
+        run: python3 -m unittest discover -s scripts/ci -p test_validate_firmware_elf.py
+        env:
+          NEXUS_FIRMWARE_TEST_BUILD: build/${{ matrix.preset }}
 
       - name: Upload Artifacts
         if: matrix.upload_artifacts
@@ -75,7 +118,9 @@ jobs:
             build/${{ matrix.preset }}/CMakeCache.txt
             build/${{ matrix.preset }}/compile_commands.json
             build/${{ matrix.preset }}/ctest-results.xml
+            build/${{ matrix.preset }}/firmware-static-contract.json
           retention-days: 7
+          if-no-files-found: error
 
   coverage:
     name: Coverage Analysis
@@ -111,8 +156,10 @@ jobs:
 
       - name: Generate Coverage
         run: |
-          # Native instruments these five runtime trees. boards/soc need separate ARM coverage evidence.
+          # Native runtime scope; boards/soc need separate ARM coverage evidence.
           lcov --capture --directory build/linux-gcc-coverage --output-file coverage.info \
+            --include "${{ github.workspace }}/arch/*" \
+            --include "${{ github.workspace }}/products/*" \
             --include "${{ github.workspace }}/hal/*" \
             --include "${{ github.workspace }}/osal/*" \
             --include "${{ github.workspace }}/framework/*" \
@@ -155,10 +202,18 @@ jobs:
           crypto_tests crypto_partial_tests crypto_unconfigured_tests
           storage_tests config_persistence_tests update_tests update_storage_tests
           test_driver_stm32_spi_bare test_driver_stm32_spi_osal test_driver_stm32_gpio
+          test_driver_stm32_uart test_driver_stm32_uart_clock
+          test_driver_stm32_flash_geometry test_driver_stm32_flash_512k
+          test_driver_stm32_flash_1m test_driver_stm32_flash_mismatched
+          test_driver_gd32_uart test_driver_gd32_spi test_driver_gd32_timebase test_driver_gd32_flash
+          test_driver_gd32_typed_spi
+          arch_contract_tests typed_device_contract_tests typed_native_spi_tests typed_stm32_gpio_registration
+          product_boot_contract_tests product_native_smoke
+          test_board_stm32f407_qiming_v31 test_board_stm32f407ve_sky_qingchun
       - name: Run Contract Targets
         run: >-
           ctest --preset linux-gcc-sanitizers --parallel 1 --output-on-failure --no-tests=error
-          -R '^(osal_contract_tests|baremetal_contract_tests|init_registry_tests|crypto_tests|crypto_partial_tests|crypto_unconfigured_tests|storage_tests|config_persistence_tests|update_tests|update_storage_tests|driver_stm32_spi_bare|driver_stm32_spi_osal|driver_stm32_gpio|nexus_industrial_tests|native_registry_contract_tests|posix_event_contract_tests|unbound_platform_contract_tests|log_contract_tests|native_blinky_smoke|native_config_demo_smoke|native_shell_demo_smoke|native_freertos_demo_smoke|native_industrial_controller_smoke)$'
+          -R '^(osal_contract_tests|baremetal_contract_tests|init_registry_tests|crypto_tests|crypto_partial_tests|crypto_unconfigured_tests|storage_tests|config_persistence_tests|update_tests|update_storage_tests|driver_stm32_spi_bare|driver_stm32_spi_osal|driver_stm32_gpio|driver_stm32_uart|driver_stm32_uart_clock|driver_stm32_flash_.*|driver_gd32_.*|arch_contract_tests|TypedDevice\..*|TypedSPI\..*|TypedNativeSPI\..*|TypedNativeDelayedSPI\..*|typed_stm32_gpio_registration|product_boot_contract_tests|product_native_smoke|board_stm32f407_qiming_v31|board_stm32f407ve_sky_qingchun|nexus_industrial_tests|native_registry_contract_tests|posix_event_contract_tests|unbound_platform_contract_tests|log_contract_tests|native_blinky_smoke|native_config_demo_smoke|native_shell_demo_smoke|native_freertos_demo_smoke|native_industrial_controller_smoke)$'
           --output-junit "${{ github.workspace }}/build/linux-gcc-sanitizers/ctest-results.xml"
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1

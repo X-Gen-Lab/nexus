@@ -67,6 +67,8 @@ uint32_t osal_timer_get_remaining(osal_timer_handle_t h){(void)h;return 0;}
 uint32_t osal_timer_get_period(osal_timer_handle_t h){(void)h;return 0;}
 osal_status_t osal_timer_set_callback(osal_timer_handle_t h,osal_timer_callback_t cb,void*a){(void)h;(void)cb;(void)a;return OSAL_ERROR_NOT_SUPPORTED;}
 /* Control-domain resources are static. This backend provides no heap. */
+osal_status_t osal_mem_seal(void){return OSAL_ERROR_NOT_SUPPORTED;}
+bool osal_mem_is_sealed(void){return false;}
 void* osal_mem_alloc(size_t size){(void)size;return NULL;}
 void* osal_mem_calloc(size_t count,size_t size){(void)count;(void)size;return NULL;}
 void* osal_mem_realloc(void*p,size_t size){(void)p;(void)size;return NULL;}

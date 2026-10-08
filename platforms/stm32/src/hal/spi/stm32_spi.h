@@ -1,17 +1,26 @@
 /** STM32 driver internals. No vendor types escape the common HAL. */
 #ifndef STM32_SPI_H
 #define STM32_SPI_H
+#include "arch/nx_arch.h"
 #include "stm32_spi_types.h"
+#include "stm32_spi_resource.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Board hooks must configure clock, GPIO AF, CS mapping and optional linked
- * DMA handles/IRQs. Weak defaults reject missing board integration. */
-nx_status_t stm32_spi_board_prepare(stm32_spi_impl_t* bus);
-nx_status_t stm32_spi_board_select(stm32_spi_impl_t* bus, uint8_t cs, bool active);
-uint32_t stm32_spi_board_clock_hz(stm32_spi_impl_t* bus);
-void stm32_spi_board_release(stm32_spi_impl_t* bus);
+static inline stm32_spi_board_port_t spi_board_port(stm32_spi_impl_t* bus) {
+    return (stm32_spi_board_port_t){.handle=&bus->hspi,
+        .instance=bus->state->instance,.dma_tx_enabled=bus->dma_tx_enabled,
+        .dma_rx_enabled=bus->dma_rx_enabled};
+}
+static inline nx_status_t spi_board_prepare(stm32_spi_impl_t* bus) {
+    stm32_spi_board_port_t port=spi_board_port(bus);
+    return stm32_spi_board_prepare(&port);
+}
+static inline void spi_board_release(stm32_spi_impl_t* bus) {
+    stm32_spi_board_port_t port=spi_board_port(bus);
+    stm32_spi_board_release(&port);
+}
 bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length, bool write);
 /* Fatal hardware inability to stop DMA cannot return caller-owned buffers. */
 NX_NORETURN void stm32_spi_dma_failstop(stm32_spi_impl_t* bus);

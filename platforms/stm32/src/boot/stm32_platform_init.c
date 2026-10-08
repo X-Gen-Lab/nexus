@@ -138,9 +138,16 @@ int stm32_platform_init(void) {
     }
 #endif
 
+    /* Reject xE/xG image/silicon capacity mismatch before opening resources. */
+    if ((uint32_t)*(volatile const uint16_t*)FLASHSIZE_BASE * 1024U !=
+        NX_CONFIG_STM32_FLASH_SIZE) {
+        (void)HAL_DeInit();
+        return -1;
+    }
     /* Configure system clock */
     clock_status = SystemClock_Config();
     if (clock_status != 0) {
+        (void)HAL_DeInit();
         return -1;
     }
 
@@ -187,6 +194,13 @@ int stm32_platform_deinit(void) {
 
     return -1;
 }
+
+/* Do not let the generic HAL weak success erase platform ownership. The
+ * product may stop individual devices; global MCU shutdown still needs reset. */
+nx_status_t nx_platform_deinit(void) {
+    return stm32_platform_deinit() == 0 ? NX_OK : NX_ERR_NOT_SUPPORTED;
+}
+
 
 /**
  * \brief           Get platform initialization status

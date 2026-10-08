@@ -2,12 +2,9 @@
  * \file            FreeRTOSConfig.h
  * \brief           FreeRTOS configuration for Nexus Platform
  *
- * \details         This is the default FreeRTOS configuration template for
- * STM32F4 platform. Platform-specific configurations can override this by
- * placing a FreeRTOSConfig.h in the platforms/[platform]/ directory.
- *
- * \note            This configuration is optimized for STM32F4 running at
- * 168MHz
+ * \details         Maintained single-core Cortex-M4F kernel configuration.
+ * The selected product's effective configuration supplies CPU frequency,
+ * tick rate, priorities, management heap and bounded OSAL storage capacities.
  */
 
 #ifndef FREERTOS_CONFIG_H
@@ -50,6 +47,8 @@
 /* CPU clock frequency in Hz (STM32F4 @ 168MHz) */
 #if defined(NX_CONFIG_STM32_SYSCLK_FREQ)
 #define configCPU_CLOCK_HZ NX_CONFIG_STM32_SYSCLK_FREQ
+#elif defined(NX_CONFIG_GD32_SYSCLK_FREQ)
+#define configCPU_CLOCK_HZ NX_CONFIG_GD32_SYSCLK_FREQ
 #else
 #define configCPU_CLOCK_HZ 168000000UL
 #endif
@@ -88,10 +87,11 @@
  * Memory Allocation Configuration
  *----------------------------------------------------------*/
 
-/* Static allocation support (0 = disabled, 1 = enabled) */
-#define configSUPPORT_STATIC_ALLOCATION 0
+/* OSAL objects and scheduler idle/timer objects use bounded static storage. */
+#define configSUPPORT_STATIC_ALLOCATION 1
+#define configKERNEL_PROVIDED_STATIC_MEMORY 1
 
-/* Dynamic allocation support (required for OSAL) */
+/* Optional management-domain heap. OSAL object creation does not use it. */
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 
 /* Total heap size (32KB for STM32F4 with 128KB RAM) */

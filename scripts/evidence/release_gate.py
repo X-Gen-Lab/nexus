@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.evidence.common import (EvidenceError, atomic_json, digest, fields,
                                      file_identity, identifier, load_json, regular_file,
                                      run_adapter, sha256_value, verify_file_identity)
-from scripts.evidence.build_inventory import verify as verify_inventory
+from scripts.evidence.build_inventory import verify as verify_inventory, license_expression
 from scripts.hil.run_hil import validate_serial
 
 
@@ -107,8 +107,9 @@ def validate_policy(policy: dict) -> None:
         raise EvidenceError("reviewed toolchain/dynamic runtime inventory required")
     for component in policy["runtime_components"]:
         fields(component, {"name", "version", "license", "evidence"})
-        for name in ("name", "version", "license"):
+        for name in ("name", "version"):
             identifier(component[name], name)
+        license_expression(component["license"])
         verify_file_identity(component["evidence"])
 
 

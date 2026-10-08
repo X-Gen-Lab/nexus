@@ -261,6 +261,135 @@ class InventoryTests(unittest.TestCase):
         atomic_json(self.input, self.manifest)
         return generate(self.input, self.output, self.sbom)
 
+    def vendor_import(self):
+        """Reviewed local fixture import, not evidence of a real SDK or board."""
+        sdk = self.source / "vendors/fixture"
+        (sdk / "Firmware").mkdir(parents=True)
+        (sdk / "LICENSES").mkdir()
+        (sdk / "README.md").write_text("Source import behavioral fixture only.\n")
+        entries = []
+        for name, license_id in (("driver.c", "BSD-3-Clause"), ("startup.c", "LicenseRef-Arm-Cortex-M-2012")):
+            file = sdk / "Firmware" / name
+            file.write_text("/* fixture " + name + " */\n")
+            entries.append({"path": "Firmware/" + name, "sha256": digest(file),
+                            "bytes": file.stat().st_size, "license": license_id})
+            (sdk / "LICENSES" / license_id).write_text("Fixture notice: " + license_id + "\n")
+        atomic_json(sdk / "source.lock.json", {"vendor": "Fixture", "package": "FixtureSDK", "version": "3.3.3",
+                    "source_url": "https://example.invalid/reviewed-sdk.zip", "download_sha256": "a" * 64,
+                    "nested_archive_sha256": "b" * 64, "files": entries})
+        for args in (["add", "."], ["-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "-qm", "reviewed import fixture"]):
+            subprocess.run(["git", "-C", str(self.source), *args], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.commit = subprocess.check_output(["git", "-C", str(self.source), "rev-parse", "HEAD"], text=True).strip()
+        self.manifest["tests"]["source_commit"] = self.commit
+        self.manifest["components"][0].update({"version": "3.3.3", "source_kind": "vendor-source-import",
+                    "source_root": str(sdk), "license": "BSD-3-Clause AND LicenseRef-Arm-Cortex-M-2012",
+                    "license_file": str(sdk / "LICENSES/BSD-3-Clause")})
+        return sdk
+
+    def test_explicit_vendor_import_records_upstream_without_fake_vendor_commit(self):
+        self.vendor_import()
+        inventory = self.inventory()
+        verify(inventory)
+        source = inventory["components"][0]["source"]
+        self.assertEqual(source["kind"], "vendor-source-import")
+        self.assertEqual(source["source_commit"], self.commit)
+        self.assertEqual(source["files"], 2)
+        self.assertEqual(len(source["notices"]), 3)
+        self.assertNotIn("commit", source)
+        component = json.loads(self.sbom.read_text())["components"][0]
+        self.assertEqual(component["licenses"], [{"expression": "BSD-3-Clause AND LicenseRef-Arm-Cortex-M-2012"}])
+        properties = {item["name"]: item["value"] for item in component["properties"]}
+        self.assertNotIn("nexus:source:commit", properties)
+        self.assertEqual(properties["nexus:source:owning-repository-commit"], self.commit)
+        self.assertEqual(promote(self.output, level="candidate")["status"], "pass")
+        with self.assertRaises(EvidenceError):
+            promote(self.output, level="enterprise")
+
+    def test_vendor_subtree_requires_explicit_source_kind(self):
+        self.vendor_import()
+        del self.manifest["components"][0]["source_kind"]
+        with self.assertRaises(EvidenceError):
+            self.inventory()
+
+    def test_unknown_source_kind_rejected(self):
+        self.manifest["components"][0]["source_kind"] = "guess-from-folder"
+        with self.assertRaises(EvidenceError):
+            self.inventory()
+
+    def test_vendor_version_and_all_locked_license_terms_required(self):
+        self.vendor_import()
+        component = self.manifest["components"][0]
+        for field, value in (("version", "3.3.2"), ("license", "BSD-3-Clause"),
+                             ("license", "BSD-3-Clause OR LicenseRef-Arm-Cortex-M-2012"),
+                             ("license", "BSD-3-Clause AND BSD-3-Clause"),
+                             ("license_file", str(self.source / "LICENSE"))):
+            with self.subTest(field=field, value=value):
+                previous = component[field]
+                component[field] = value
+                with self.assertRaises(EvidenceError):
+                    self.inventory()
+                component[field] = previous
+
+    def test_vendor_source_lock_and_notice_tamper_blocks_generation_and_gate(self):
+        sdk = self.vendor_import()
+        inventory = self.inventory()
+        for name in ("Firmware/driver.c", "source.lock.json", "README.md", "LICENSES/BSD-3-Clause"):
+            with self.subTest(path=name):
+                file = sdk / name
+                original = file.read_bytes()
+                file.write_bytes(original + b"tampered\n")
+                with self.assertRaises(EvidenceError):
+                    self.inventory()
+                with self.assertRaises(EvidenceError):
+                    verify(inventory)
+                with self.assertRaises(EvidenceError):
+                    promote(self.output, level="candidate")
+                file.write_bytes(original)
+
+    def test_updating_vendor_lock_does_not_bypass_reviewed_commit(self):
+        sdk = self.vendor_import()
+        file = sdk / "Firmware/driver.c"
+        file.write_text("/* changed without review */\n")
+        lock = json.loads((sdk / "source.lock.json").read_text())
+        lock["files"][0].update({"sha256": digest(file), "bytes": file.stat().st_size})
+        atomic_json(sdk / "source.lock.json", lock)
+        with self.assertRaises(EvidenceError):
+            self.inventory()
+
+    def test_forged_vendor_kind_and_identity_rejected(self):
+        self.vendor_import()
+        inventory = self.inventory()
+        for field, value in (("kind", "git"), ("kind", "unknown"), ("source_commit", "f" * 40),
+                             ("lock_sha256", "f" * 64), ("repository_root", str(self.root))):
+            with self.subTest(field=field):
+                forged = copy.deepcopy(inventory)
+                forged["components"][0]["source"][field] = value
+                with self.assertRaises(EvidenceError):
+                    verify(forged)
+
+    def test_vendor_sbom_upstream_or_license_forgery_rejected_even_with_new_file_digest(self):
+        self.vendor_import()
+        inventory = self.inventory()
+        original = json.loads(self.sbom.read_text())
+        for field, value in (("licenses", [{"license": {"id": "MIT"}}]),
+                             ("externalReferences", [{"type": "distribution", "url": "https://example.invalid/other.zip"}])):
+            with self.subTest(field=field):
+                forged = copy.deepcopy(original)
+                forged["components"][0][field] = value
+                atomic_json(self.sbom, forged)
+                inventory["sbom"] = file_identity(self.sbom)
+                with self.assertRaises(EvidenceError):
+                    verify(inventory)
+
+    def test_vendor_import_does_not_hide_dirty_owner_repository(self):
+        self.vendor_import()
+        (self.source / "code.c").write_text("int unrelated_dirty_source;\n")
+        inventory = self.inventory()
+        self.assertTrue(inventory["source"]["dirty"])
+        self.assertFalse(inventory["components"][0]["source"]["dirty"])
+        with self.assertRaises(EvidenceError):
+            promote(self.output, level="candidate")
+
     def test_inventory_records_actual_map_members_and_verifies(self):
         inventory = self.inventory()
         verify(inventory)
@@ -292,6 +421,21 @@ class InventoryTests(unittest.TestCase):
         inventory["tests"]["artifact_sha256"] = "b" * 64
         with self.assertRaises(EvidenceError):
             verify(inventory)
+
+    def test_sbom_config_or_dependency_forgery_rejected_with_refreshed_digest(self):
+        inventory = self.inventory()
+        original = json.loads(self.sbom.read_text())
+        for defect in ("config", "dependency"):
+            with self.subTest(defect=defect):
+                forged = copy.deepcopy(original)
+                if defect == "config":
+                    forged["metadata"]["properties"][0]["value"] = "f" * 64
+                else:
+                    forged["dependencies"][0]["dependsOn"] = []
+                atomic_json(self.sbom, forged)
+                inventory["sbom"] = file_identity(self.sbom)
+                with self.assertRaises(EvidenceError):
+                    verify(inventory)
 
     def test_forged_sbom_coverage_rejected(self):
         inventory = self.inventory()

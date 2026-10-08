@@ -5,5 +5,7 @@
 #define NX_BOARD_NAME "native-reference"
 #define NX_BOARD_LED_GPIO_PORT 'A'
 #define NX_BOARD_LED_GPIO_PIN 0U
+#define NX_BOARD_LED_ACTIVE_LEVEL 1U
+#define NX_BOARD_LED_INACTIVE_LEVEL 0U
 
 #endif

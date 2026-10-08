@@ -46,6 +46,26 @@ Undeclared archives are listed; dynamic/system/toolchain runtime license and vul
 review remains explicit. It is not a complete firmware SBOM until those inputs are reviewed.
 The generator records dirty builds for analysis; either promotion level rejects them.
 
+Component `source_kind` defaults to `git`, requiring `source_root` to be a real Git
+repository root. A reviewed SDK copied into the Nexus repository must explicitly
+use `"source_kind": "vendor-source-import"`; a folder name never changes the type.
+For example, GD32 SDK components use `source_root` ending in
+`vendors/gigadevice/gd32f4xx`, version `3.3.3`, and license expression
+`BSD-3-Clause AND Apache-2.0 AND LicenseRef-Arm-Cortex-M-2012`. `license_file` must
+point to one of that import's tracked `LICENSES` notices. All source-lock license
+terms must appear exactly once in the expression. Supported expressions are a
+single identifier or an explicit `AND` conjunction; other license semantics need
+reviewed schema support. This records licensing evidence and does not approve it.
+
+Typed imports are verified against `source.lock.json` and the owning Nexus HEAD:
+every imported source, origin README and license notice must be a regular tracked
+blob with unchanged bytes; extra/untracked auxiliary SDK files are rejected.
+Inventory and CycloneDX record the upstream download URL/archive digests, lock
+digest, notice digests and owning repository commit. They never invent a vendor
+Git commit. Vendor version must match the lock. Promotion rechecks the same source
+type and content; changing source and lock together without committing a reviewed
+import also fails. These additions preserve the explicitly partial SBOM scope.
+
 The verifier rereads every file and current source/dependency state. Changed artifact,
 config, map, SBOM, test XML or dependency blocks promotion. Public evidence paths currently
 refer to local regular files; relocation needs a controlled path-rebase operation and

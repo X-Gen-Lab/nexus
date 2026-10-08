@@ -61,9 +61,12 @@ runs:
           sudo apt-get install -y lcov
         fi
 
-        if [[ "${{ inputs.preset }}" == *"arm"* ]]; then
-          sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-        fi
+    - name: Install Locked ARM GNU Toolchain
+      if: runner.os == 'Linux' && contains(inputs.preset, 'arm')
+      shell: bash
+      run: |
+        python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+        echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
 
     - name: Setup ccache (Linux)
       if: runner.os == 'Linux'

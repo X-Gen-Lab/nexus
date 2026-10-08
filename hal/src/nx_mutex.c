@@ -11,6 +11,7 @@
 #include "hal/system/nx_mutex.h"
 #include "hal/system/nx_mem.h"
 #include "osal/osal.h"
+#include "arch/nx_arch.h"
 
 /*---------------------------------------------------------------------------*/
 /* Private Types                                                             */
@@ -28,9 +29,11 @@ typedef struct {
 /* Private Function Prototypes                                               */
 /*---------------------------------------------------------------------------*/
 
+#if NX_CONFIG_HAL_THREAD_SAFE
 static nx_status_t mutex_lock(nx_mutex_t* self, uint32_t timeout_ms);
 static nx_status_t mutex_unlock(nx_mutex_t* self);
 static bool mutex_try_lock(nx_mutex_t* self);
+#endif
 
 /*---------------------------------------------------------------------------*/
 /* Critical Section Functions                                                */
@@ -41,29 +44,7 @@ static bool mutex_try_lock(nx_mutex_t* self);
  * \details         Disables interrupts and returns previous state
  */
 uint32_t nx_critical_enter(void) {
-    /* For ARM Cortex-M, we need to save and return PRIMASK */
-    uint32_t primask;
-
-#if (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) ||                      \
-     defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_BASE__) ||              \
-     defined(__ARM_ARCH_8M_MAIN__)) &&                                        \
-    (defined(__GNUC__) || defined(__clang__))
-    __asm__ volatile("mrs %0, primask" : "=r"(primask));
-    __asm__ volatile("cpsid i\n\tdsb\n\tisb" ::: "memory");
-#elif defined(__ICCARM__) && defined(__ARM_ARCH_PROFILE) &&                    \
-    (__ARM_ARCH_PROFILE == 'M')
-    primask = __get_PRIMASK();
-    __disable_interrupt();
-#elif defined(__CC_ARM) && defined(__TARGET_ARCH_THUMB)
-    primask = __get_PRIMASK();
-    __disable_irq();
-#else
-    /* Fallback to OSAL for other platforms */
-    osal_enter_critical();
-    primask = 0;
-#endif
-
-    return primask;
+    return nx_arch_irq_save().value;
 }
 
 /**
@@ -71,21 +52,7 @@ uint32_t nx_critical_enter(void) {
  * \details         Restores interrupt state from saved primask value
  */
 void nx_critical_exit(uint32_t primask) {
-#if (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) ||                      \
-     defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_BASE__) ||              \
-     defined(__ARM_ARCH_8M_MAIN__)) &&                                        \
-    (defined(__GNUC__) || defined(__clang__))
-    __asm__ volatile("dsb\n\tmsr primask, %0\n\tisb" ::"r"(primask) : "memory");
-#elif defined(__ICCARM__) && defined(__ARM_ARCH_PROFILE) &&                    \
-    (__ARM_ARCH_PROFILE == 'M')
-    __set_PRIMASK(primask);
-#elif defined(__CC_ARM) && defined(__TARGET_ARCH_THUMB)
-    __set_PRIMASK(primask);
-#else
-    /* Fallback to OSAL for other platforms */
-    (void)primask;
-    osal_exit_critical();
-#endif
+    nx_arch_irq_restore((nx_arch_irq_state_t){primask});
 }
 
 #if NX_CONFIG_HAL_THREAD_SAFE

@@ -91,7 +91,7 @@ static osal_status_t rtos_timer_command(rtos_resource_t* r, unsigned operation,
     return result_status;
 }
 osal_status_t osal_timer_create(const osal_timer_config_t* config, osal_timer_handle_t* handle) {
-    RTOS_TASK_ONLY();
+    RTOS_BOOT_CONTEXT();
     if (!config || !handle) return OSAL_ERROR_NULL_POINTER;
     *handle = NULL;
     if (!config->callback || !config->period_ms || config->period_ms == OSAL_WAIT_FOREVER ||
@@ -102,9 +102,12 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config, osal_timer_ha
     r->callback = config->callback;
     r->arg = config->arg;
     r->period_ms = config->period_ms;
-    r->kernel = xTimerCreate(config->name ? config->name : "timer", rtos_ticks(config->period_ms),
+    strncpy(r->name, config->name ? config->name : "timer", sizeof(r->name) - 1u);
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
+    r->kernel = xTimerCreateStatic(r->name, rtos_ticks(config->period_ms),
                              config->mode == OSAL_TIMER_PERIODIC ? pdTRUE : pdFALSE,
-                             r, rtos_timer_callback);
+                             r, rtos_timer_callback, &s_timer_storage[r->storage_index]);
+    rtos_boot_kernel_exit(guard);
     if (!r->kernel) { rtos_abandon(r); return OSAL_ERROR_NO_MEMORY; }
     rtos_publish(r, handle);
     return OSAL_OK;
@@ -181,7 +184,9 @@ osal_status_t osal_timer_set_period(osal_timer_handle_t handle, uint32_t period_
 bool osal_timer_is_active(osal_timer_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_TIMER);
     if (!r) return false;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     bool active = xTimerIsTimerActive(r->kernel) == pdTRUE;
+    rtos_boot_kernel_exit(guard);
     rtos_unpin(r);
     return active;
 }
@@ -204,8 +209,10 @@ osal_status_t osal_timer_reset_from_isr(osal_timer_handle_t handle) { return rto
 uint32_t osal_timer_get_remaining(osal_timer_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_TIMER);
     if (!r) return 0;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     TickType_t remaining = xTimerIsTimerActive(r->kernel) ?
         xTimerGetExpiryTime(r->kernel) - xTaskGetTickCount() : 0;
+    rtos_boot_kernel_exit(guard);
     uint32_t ms = rtos_milliseconds(remaining);
     rtos_unpin(r);
     return ms;

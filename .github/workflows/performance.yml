@@ -98,6 +98,9 @@ jobs:
           cmake --build --preset "${{ matrix.preset }}" --parallel 2
       - name: Measure actual linked sections, reject missing images/tools
         run: |
+          python scripts/ci/validate_firmware_elf.py \
+            --build-dir "build/${{ matrix.preset }}" \
+            --report "build/${{ matrix.preset }}/firmware-static-contract.json"
           python scripts/evidence/resource_checks.py size \
             --build "build/${{ matrix.preset }}" \
             --report "build/${{ matrix.preset }}/size-report.json"
@@ -108,6 +111,7 @@ jobs:
           name: arm-size-${{ matrix.preset }}
           path: |
             build/${{ matrix.preset }}/size-report.json
+            build/${{ matrix.preset }}/firmware-static-contract.json
             build/${{ matrix.preset }}/bin/*.elf
             build/${{ matrix.preset }}/bin/*.map
             build/${{ matrix.preset }}/generated/

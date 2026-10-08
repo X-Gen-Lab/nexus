@@ -35,7 +35,7 @@ static nx_status_t init(nx_lifecycle_t* self) {
         transition_done(b);
         return NX_ERR_NOT_SUPPORTED;
     }
-    r = stm32_spi_board_prepare(b);
+    r = spi_board_prepare(b);
     if (r != NX_OK) { transition_done(b); return r; }
     r = spi_hal_result(HAL_SPI_Init(&b->hspi));
     if (r != NX_OK) goto fail_board;
@@ -67,7 +67,7 @@ fail_hal:
 #endif
     (void)HAL_SPI_DeInit(&b->hspi);
 fail_board:
-    stm32_spi_board_release(b);
+    spi_board_release(b);
     transition_done(b);
     return r;
 }
@@ -93,7 +93,7 @@ static nx_status_t deinit(nx_lifecycle_t* self) {
     b->dma_sem = NULL;
     b->mutex = NULL;
 #endif
-    stm32_spi_board_release(b);
+    spi_board_release(b);
     for (unsigned i = 0; i < STM32_SPI_MAX_DEVICES; ++i)
         if (!b->devices[i].legacy) b->devices[i].allocated = false;
     b->state->initialized = false;

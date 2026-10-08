@@ -5,7 +5,6 @@
  * This host backend captures transmitted bytes and echoes uninjected RX data;
  * it does not validate electrical timing, DMA or a vendor peripheral. */
 #include "hal/base/nx_device.h"
-#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_spi_helpers.h"
 #include "osal/osal.h"
@@ -276,24 +275,33 @@ static nx_tx_async_t* get_tx_async(nx_spi_bus_t* self,nx_spi_device_config_t con
 static nx_tx_rx_async_t* get_tx_rx_async(nx_spi_bus_t* self,nx_spi_device_config_t config,nx_comm_callback_t cb,void* ctx) { native_spi_device_t* d=legacy(self,config,cb,ctx); return d ? &d->tx_rx_async : NULL; }
 static nx_lifecycle_t* get_lifecycle(nx_spi_bus_t* self) { return self ? &spi_get_impl(self)->lifecycle : NULL; }
 static nx_power_t* get_power(nx_spi_bus_t* self) { return self ? &spi_get_impl(self)->power : NULL; }
-static void* nx_spi_device_init(const nx_device_t* dev) {
+typedef struct {
+    nx_device_config_state_t core;
+    nx_spi_impl_t bus;
+    nx_spi_state_t state;
+    uint8_t* tx;
+    uint8_t* rx;
+    size_t tx_size, rx_size;
+} native_spi_storage_t;
+static nx_status_t nx_spi_construct(const nx_device_t* dev, void** api) {
+    if(!dev || !dev->state || !api) return NX_ERR_INVALID_PARAM;
+    *api=NULL;
     const nx_spi_platform_config_t* cfg=dev->config;
-    if(!cfg || !cfg->tx_buf_size || !cfg->rx_buf_size) return NULL;
-    nx_spi_impl_t* b=nx_mem_alloc(sizeof(*b));
-    if(!b) return NULL;
-    memset(b,0,sizeof(*b)); b->state=nx_mem_alloc(sizeof(*b->state));
-    if(!b->state) { nx_mem_free(b); return NULL; }
+    native_spi_storage_t* storage=NX_CONTAINER_OF(dev->state,native_spi_storage_t,core);
+    if(!cfg || !cfg->tx_buf_size || !cfg->rx_buf_size || !storage->tx || !storage->rx ||
+       storage->tx_size!=cfg->tx_buf_size || storage->rx_size!=cfg->rx_buf_size)
+        return NX_ERR_INVALID_PARAM;
+    nx_spi_impl_t* b=&storage->bus;
+    memset(b,0,sizeof(*b)); b->state=&storage->state;
     memset(b->state,0,sizeof(*b->state)); b->state->index=cfg->spi_index;
     b->state->config=(nx_spi_config_t){cfg->max_speed,cfg->mosi_pin,cfg->miso_pin,cfg->sck_pin,false,false,cfg->tx_buf_size,cfg->rx_buf_size};
-    b->state->tx_buf.data=nx_mem_alloc(cfg->tx_buf_size); b->state->tx_buf.size=cfg->tx_buf_size;
-    b->state->rx_buf.data=nx_mem_alloc(cfg->rx_buf_size); b->state->rx_buf.size=cfg->rx_buf_size;
-    if(!b->state->tx_buf.data || !b->state->rx_buf.data) {
-        nx_mem_free(b->state->tx_buf.data); nx_mem_free(b->state->rx_buf.data); nx_mem_free(b->state); nx_mem_free(b); return NULL;
-    }
+    b->state->tx_buf.data=storage->tx; b->state->tx_buf.size=cfg->tx_buf_size;
+    b->state->rx_buf.data=storage->rx; b->state->rx_buf.size=cfg->rx_buf_size;
     NX_INIT_SPI_BUS(&b->base,get_tx_async,get_tx_rx_async,get_tx_sync,get_tx_rx_sync,get_lifecycle,get_power);
     b->base.open_device=open_device; b->base.close_device=close_device; b->base.service=service;
     spi_init_lifecycle(&b->lifecycle); spi_init_power(&b->power);
-    return &b->base;
+    *api=&b->base;
+    return NX_OK;
 }
 #define NX_SPI_CONFIG(index)                                                   \
     static const nx_spi_platform_config_t spi_config_##index = {               \
@@ -311,12 +319,15 @@ static void* nx_spi_device_init(const nx_device_t* dev) {
  */
 #define NX_SPI_DEVICE_REGISTER(index)                                          \
     NX_SPI_CONFIG(index);                                                      \
-    static nx_device_config_state_t spi_kconfig_state_##index = {              \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-    };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "SPI" #index, &spi_config_##index,  \
-                       &spi_kconfig_state_##index, nx_spi_device_init);
+    static uint8_t spi_tx_##index[NX_CONFIG_SPI##index##_TX_BUFFER_SIZE];       \
+    static uint8_t spi_rx_##index[NX_CONFIG_SPI##index##_RX_BUFFER_SIZE];       \
+    static native_spi_storage_t spi_storage_##index = {                        \
+        .tx = spi_tx_##index, .rx = spi_rx_##index,                             \
+        .tx_size = sizeof(spi_tx_##index), .rx_size = sizeof(spi_rx_##index),    \
+    };                                                                        \
+    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index, "SPI" #index,                \
+        &spi_config_##index, &spi_storage_##index.core, NX_DEVICE_CLASS_SPI,    \
+        0, nx_spi_construct, NULL);
 
 /**
  * \brief           Register all enabled SPI instances

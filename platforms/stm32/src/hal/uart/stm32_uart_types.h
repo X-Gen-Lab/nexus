@@ -11,6 +11,7 @@
 #ifndef STM32_UART_TYPES_H
 #define STM32_UART_TYPES_H
 
+#include "arch/nx_arch.h"
 #include "hal/base/nx_comm.h"
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/interface/nx_power.h"
@@ -132,12 +133,6 @@
 #include "stm32wlxx_hal.h"
 #else
 #error "Unsupported STM32 series"
-#endif
-
-/* Include OSAL headers if enabled */
-#ifdef NX_CONFIG_STM32_UART_USE_OSAL
-#include "osal/osal_mutex.h"
-#include "osal/osal_sem.h"
 #endif
 
 #include <stdbool.h>
@@ -400,6 +395,7 @@ struct stm32_uart_callback_s {
  * Contains all interfaces, ST HAL handle, and optional OSAL objects.
  */
 typedef struct stm32_uart_impl_s {
+    nx_uart_operations_t operations;
     nx_uart_t base;           /**< Base UART interface */
     nx_tx_async_t tx_async;   /**< TX async interface */
     nx_rx_async_t rx_async;   /**< RX async interface */
@@ -412,14 +408,21 @@ typedef struct stm32_uart_impl_s {
     stm32_uart_state_t* state;       /**< State pointer */
     struct nx_device_s* device;      /**< Device descriptor */
     stm32_uart_callback_t callbacks; /**< User callbacks */
+    nx_uart_ticket_t ticket;
+    nx_uart_result_t result;
+    uint32_t submitted_ms, timeout_ms;
+    size_t tx_length;
+    bool notification_pending, faulted, irq_connected, board_prepared;
+    bool ticket_active, callback_active, closing;
+    uint8_t rx_byte;
+    nx_uart_rx_event_t* rx_events;
+    size_t rx_capacity, rx_head, rx_tail, rx_count;
+    uint32_t rx_lost;
+    uint64_t rx_lost_timestamp;
+    bool rx_fault_pending;
+    uint64_t rx_fault_timestamp;
     stm32_uart_dma_t dma;            /**< DMA configuration */
 
-    /* Optional OSAL synchronization objects */
-#ifdef NX_CONFIG_STM32_UART_USE_OSAL
-    osal_mutex_handle_t mutex; /**< Mutex for thread safety */
-    osal_sem_handle_t tx_sem;  /**< TX completion semaphore */
-    osal_sem_handle_t rx_sem;  /**< RX completion semaphore */
-#endif
 } stm32_uart_impl_t;
 
 #ifdef __cplusplus

@@ -18,6 +18,8 @@ import sys
 import xml.etree.ElementTree as ET
 import zipfile
 
+from vendor_import_identity import (ImportIdentityError, reviewed_import, validate_import_record)
+
 
 VERSION_RE = re.compile(
     r"v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
@@ -39,6 +41,7 @@ RELEASE_PROFILES = {
         "board": "native-reference", "chip": None, "osal": "native",
         "support_profile": "native-contracts", "architecture": "x86_64",
         "toolchain": "gcc", "fragment": "platforms/native/defconfig",
+        "expected_config": {"CONFIG_PRODUCT_NAME": "native-reference"},
         "dependencies": ("ext/googletest", "ext/freertos"),
     },
     "stm32-armgcc-release": {
@@ -46,7 +49,9 @@ RELEASE_PROFILES = {
         "compiler": "arm-none-eabi-gcc", "cpu": "cortex-m4",
         "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
         "toolchain_file": "cmake/toolchains/arm-gcc.cmake",
-        "board": "stm32f4discovery-mb997", "chip": "STM32F407xx", "osal": "baremetal",
+        "board": "stm32f4discovery-mb997", "chip": "STM32F407VGT6", "osal": "baremetal",
+        "expected_config": {"CONFIG_PRODUCT_NAME": "stm32f407-discovery", "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
+                            "CONFIG_STM32_PART_NAME": "STM32F407VGT6", "CONFIG_STM32_FLASH_SIZE": 0x100000},
         "support_profile": "stm32f407-discovery-baremetal", "architecture": "armv7e-m",
         "fragment": "configs/stm32f407_baremetal_defconfig",
         "dependencies": ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
@@ -57,13 +62,45 @@ RELEASE_PROFILES = {
         "compiler": "arm-none-eabi-gcc", "cpu": "cortex-m4",
         "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
         "toolchain_file": "cmake/toolchains/arm-gcc.cmake",
-        "board": "stm32f4discovery-mb997", "chip": "STM32F407xx", "osal": "freertos",
+        "board": "stm32f4discovery-mb997", "chip": "STM32F407VGT6", "osal": "freertos",
+        "expected_config": {"CONFIG_PRODUCT_NAME": "stm32f407-discovery", "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
+                            "CONFIG_STM32_PART_NAME": "STM32F407VGT6", "CONFIG_STM32_FLASH_SIZE": 0x100000},
         "support_profile": "stm32f407-discovery-freertos", "architecture": "armv7e-m",
         "fragment": "configs/stm32f407_freertos_defconfig",
         "dependencies": ("ext/freertos", "vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
                          "vendors/st/stm32f4xx_hal_driver"),
     },
 }
+# New profiles are explicit reviewed products, not filename-derived platforms.
+for board_id, board_name, part, flash, fragment in (
+    ("qiming", "stm32f407zg-qiming-v31", "STM32F407ZGT6", 0x100000, "stm32f407zg_qiming_v31"),
+    ("sky", "stm32f407ve-sky-qingchun", "STM32F407VET6", 0x80000, "stm32f407ve_sky_qingchun"),
+):
+    for backend in ("baremetal", "freertos"):
+        RELEASE_PROFILES[f"stm32-{board_id}-armgcc-{backend}-release"] = {
+            **RELEASE_PROFILES["stm32-armgcc-release"],
+            "artifact": f"nexus-stm32f407-{board_id}-{backend}", "board": board_name,
+            "chip": part, "osal": backend,
+            "support_profile": f"stm32f407-{board_id}-{backend}",
+            "fragment": f"configs/{fragment}_{backend}_defconfig",
+            "expected_config": {"CONFIG_PRODUCT_NAME": board_name, "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
+                                "CONFIG_STM32_PART_NAME": part, "CONFIG_STM32_FLASH_SIZE": flash},
+            "dependencies": (("ext/freertos",) if backend == "freertos" else ()) +
+                            RELEASE_PROFILES["stm32-armgcc-release"]["dependencies"],
+        }
+for backend in ("baremetal", "freertos"):
+    RELEASE_PROFILES[f"gd32f470-armgcc-{backend}-release"] = {
+        "artifact": f"nexus-gd32f470-liangshan-{backend}", "platform": "gd32f470",
+        "compiler": "arm-none-eabi-gcc", "cpu": "cortex-m4", "fpu": "fpv4-sp-d16",
+        "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
+        "toolchain_file": "cmake/toolchains/arm-gcc.cmake", "board": "gd32f470zg-liangshan",
+        "chip": "GD32F470ZGT6", "osal": backend, "architecture": "armv7e-m",
+        "support_profile": f"gd32f470-liangshan-{backend}",
+        "fragment": f"configs/gd32f470_{backend}_defconfig",
+        "expected_config": {"CONFIG_PRODUCT_NAME": "gd32f470-liangshan", "CONFIG_GD32F470ZG": True},
+        "dependencies": ("ext/freertos",) if backend == "freertos" else (),
+        "imports": ("vendors/gigadevice/gd32f4xx",),
+    }
 CONFIGURATION_FILES = ("effective.config", "nexus_config.h", "config.cmake")
 
 
@@ -330,9 +367,12 @@ def validate_effective_build(cache, profile, configuration, config):
         return
     for field, expected in (
         ("CONFIG_CPU_ARCH", profile["cpu"]), ("CONFIG_FPU_TYPE", profile["fpu"]),
-        ("CONFIG_FLOAT_ABI", profile["float_abi"]), ("CONFIG_STM32_CHIP_NAME", profile["chip"]),
+        ("CONFIG_FLOAT_ABI", profile["float_abi"]),
     ):
         if config.get(field) != expected:
+            raise ReleaseError(f"Effective {field} does not match the release target")
+    for field, expected in profile.get("expected_config", {}).items():
+        if config.get(field) != expected or type(config.get(field)) is not type(expected):
             raise ReleaseError(f"Effective {field} does not match the release target")
     toolchain_file = cache.get("CMAKE_TOOLCHAIN_FILE", "").replace("\\", "/")
     if not (toolchain_file == profile["toolchain_file"]
@@ -426,7 +466,7 @@ def validate_compile_commands(contents, profile, generated_directory=None, sourc
             raise ReleaseError("Compile command database contains an invalid entry")
         filename = entry["file"].replace("\\", "/")
         if not any(f"/{directory}/" in filename for directory in
-                   ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "applications")):
+                   ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "arch", "products", "applications")):
             continue
         if source is not None:
             checked_path(filename, source)
@@ -437,11 +477,20 @@ def validate_compile_commands(contents, profile, generated_directory=None, sourc
             raise ReleaseError("Compile command database contains an invalid command")
         if generated_directory is not None and f"-I{generated_directory}" not in arguments:
             raise ReleaseError("Production compile command does not consume its generated configuration")
-        if profile["platform"] == "stm32":
+        if profile["platform"] != "native":
             required = {f"-mcpu={profile['cpu']}", "-mthumb", f"-mfpu={profile['fpu']}",
                         f"-mfloat-abi={profile['float_abi']}"}
             if not required.issubset(arguments):
                 raise ReleaseError("Production compile command does not match the ARM target flags")
+            for prefix, expected in (("-mcpu=", profile["cpu"]), ("-mfpu=", profile["fpu"]),
+                                     ("-mfloat-abi=", profile["float_abi"])):
+                if any(arg.startswith(prefix) and arg != prefix + expected for arg in arguments):
+                    raise ReleaseError("Production compile command has conflicting ARM target flags")
+            if "-marm" in arguments or any(arg.startswith("@") for arg in arguments):
+                raise ReleaseError("Production compile command has unverified ARM target flags")
+            if any(arg.startswith("-march=") and arg != "-march=" + profile["architecture"]
+                   for arg in arguments):
+                raise ReleaseError("Production compile command has conflicting ARM architecture flags")
         production.append(entry)
     if not production:
         raise ReleaseError("Compile command database contains no Nexus production source")
@@ -498,6 +547,45 @@ def validate_dependency_identity(source, modules, profile):
         match = re.fullmatch(r"160000 commit ([0-9a-f]{40,64})\t" + re.escape(path), entry)
         if not match or recorded[path] != match[1]:
             raise ReleaseError("Archive dependency identity does not match the source commit")
+
+
+def validate_imported_sources(records, profile, commit, read):
+    expected = set(profile.get("imports", ()))
+    if (not isinstance(records, list) or len(records) != len(expected)
+            or {record.get("path") for record in records if isinstance(record, dict)} != expected):
+        raise ReleaseError("Archive lacks its reviewed source import identities")
+    for record in records:
+        relative = record["path"]
+        prefix = f"configuration/imports/{relative}"
+        notices = {}
+        try:
+            for notice in record.get("notices", []):
+                validate_archive_path(notice["path"])
+                notices[notice["path"]] = read(f"{prefix}/{notice['path']}")
+            validate_import_record(record, read(f"{prefix}/source.lock.json"), notices, commit)
+        except (ImportIdentityError, ValueError, TypeError, KeyError, OSError) as exc:
+            raise ReleaseError("Archive source import identity differs from its lock/notices") from exc
+
+
+def validate_arm_artifacts(config, effective_contents, artifacts):
+    # Import lazily: the maintained checker uses the configuration parser in
+    # this module. Validate bytes again; a supplied passing report is not proof.
+    from validate_firmware_elf import validate_image, FirmwareError
+    report = {"schema_version": 1, "kind": "arm-static-link-contract",
+              "hardware_verified": False, "platform": config["CONFIG_PLATFORM_NAME"],
+              "product": config["CONFIG_PRODUCT_NAME"],
+              "config_sha256": hashlib.sha256(effective_contents).hexdigest(), "images": []}
+    try:
+        for name, content in sorted(artifacts):
+            if content[:4] == b"\x7fELF":
+                report["images"].append({"file": Path(name).name,
+                                         "sha256": hashlib.sha256(content).hexdigest(),
+                                         **validate_image(content, config)})
+    except (FirmwareError, ValueError, KeyError, TypeError) as error:
+        raise ReleaseError("ARM firmware static contract rejected") from error
+    if not report["images"] or len({image["file"] for image in report["images"]}) != len(report["images"]):
+        raise ReleaseError("ARM firmware images missing or ambiguous")
+    return report
 
 
 def validate_clean_source(source, build, output, version):
@@ -557,7 +645,13 @@ def package(source, version, commit, preset, artifact, build, output, configurat
         if log.exists():
             entries.append(("validation/LastTest.log", log))
     else:
-        validation = {"kind": "cross-compile-only", "hardware_verified": False}
+        report = checked_path(build / "firmware-static-contract.json", source, required=False)
+        report.unlink(missing_ok=True)
+        validation = validate_arm_artifacts(config, contents["effective.config"].encode("utf-8"),
+                                            ((name, path.read_bytes()) for name, path in entries
+                                             if name in compiled))
+        report.write_text(json.dumps(validation, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        entries.append(("validation/firmware-static-contract.json", report))
     for filename in ("CMakePresets.json", "README.md", "LICENSE"):
         entries.append((filename, checked_path(source / filename, source)))
     gitmodules = checked_path(source / ".gitmodules", source, required=False)
@@ -566,6 +660,19 @@ def package(source, version, commit, preset, artifact, build, output, configurat
     toolchain = cache.get("CMAKE_TOOLCHAIN_FILE")
     if toolchain:
         entries.append(("configuration/toolchain.cmake", checked_path(toolchain, source)))
+    imports = []
+    for relative in profile.get("imports", ()):
+        root = checked_path(source / relative, source, directory=True)
+        try:
+            record = reviewed_import(root, source)
+        except (ImportIdentityError, OSError, ValueError, TypeError) as exc:
+            raise ReleaseError(f"Source import identity invalid: {relative}") from exc
+        imports.append(record)
+        prefix = f"configuration/imports/{relative}"
+        entries.append((f"{prefix}/source.lock.json", checked_path(root / "source.lock.json", source)))
+        for notice in record["notices"]:
+            validate_archive_path(notice["path"])
+            entries.append((f"{prefix}/{notice['path']}", checked_path(root / notice["path"], source)))
     validate_clean_source(source, build, output, version)
     provenance = {
         "schema_version": 2, **info, "artifact": artifact, "preset": preset,
@@ -573,7 +680,8 @@ def package(source, version, commit, preset, artifact, build, output, configurat
         "configuration_paths": config_paths, "target": target_identity(profile),
         "validation": validation,
         "cmake": {key: cache[key] for key in CACHE_KEYS if key in cache},
-        "submodules": submodules(source, profile["dependencies"]), "compiled_outputs": compiled,
+        "submodules": submodules(source, profile["dependencies"]) if profile["dependencies"] else [],
+        "imported_sources": imports, "compiled_outputs": compiled,
         "files": {name: {"sha256": sha256_file(path), "size": path.stat().st_size}
                   for name, path in entries},
         "limitations": ["unsigned provenance", "not a reproducible-build attestation",
@@ -668,9 +776,15 @@ def verify_bundle(archive, artifact, preset, version, commit):
         if profile["platform"] == "native":
             validation = test_report(bundle.read(f"{artifact}/validation/ctest-results.xml"))
         else:
-            validation = {"kind": "cross-compile-only", "hardware_verified": False}
+            validation = validate_arm_artifacts(config, contents["effective.config"].encode("utf-8"),
+                                                ((name, bundle.read(f"{artifact}/{name}"))
+                                                 for name in provenance["compiled_outputs"]))
+            if json.loads(bundle.read(f"{artifact}/validation/firmware-static-contract.json")) != validation:
+                raise ReleaseError("Archive ARM static report differs from its real firmware bytes")
         if provenance.get("validation") != validation:
             raise ReleaseError("Archive validation identity disagrees with its test evidence")
+        validate_imported_sources(provenance.get("imported_sources", []), profile, commit,
+                                  lambda name: bundle.read(f"{artifact}/{name}"))
         for name in provenance["compiled_outputs"]:
             member = bundle.getinfo(f"{artifact}/{name}")
             with bundle.open(member) as handle:
@@ -709,7 +823,15 @@ def verify_assets(source, version, commit, assets, expected, notes):
         if parse_checksums(sidecar.read_text(encoding="utf-8")) != {archive.name: actual}:
             raise ReleaseError("Downloaded archive checksum mismatch")
         provenance = verify_bundle(archive, artifact, preset, version, commit)
-        validate_dependency_identity(source, provenance.get("submodules", []), release_profile(preset, artifact))
+        profile = release_profile(preset, artifact)
+        validate_dependency_identity(source, provenance.get("submodules", []), profile)
+        for record in provenance.get("imported_sources", []):
+            try:
+                observed = reviewed_import(checked_path(source / record["path"], source, directory=True), source)
+            except (ImportIdentityError, OSError, ValueError, TypeError) as exc:
+                raise ReleaseError("Archive source import cannot be verified") from exc
+            if record != observed:
+                raise ReleaseError("Archive source import identity does not match the source commit")
         validations[artifact] = provenance["validation"]
         lines.append(f"{actual}  {archive.name}\n")
     sums = checked_path(assets / "SHA256SUMS", source, required=False)
@@ -721,15 +843,15 @@ def verify_assets(source, version, commit, assets, expected, notes):
             "This draft stages outputs from the complete release build matrix. "
             "A maintainer must review and publish it explicitly.\n\n"
             f"Source commit: `{commit}`.\n\n"
-            "Native host test reports and ARM cross-compile identities are included where applicable. "
+            "Native host test reports and ARM vector/registry/memory static checks are included where applicable. "
             "Hardware qualification and firmware signing are not provided by this workflow.\n\n"
-            "Archives include build configuration, submodule commits, and unsigned provenance. "
+            "Archives include build configuration, pinned submodules or reviewed source-import locks/notices, and unsigned provenance. "
             "SHA256SUMS checks transfer integrity; it is not an authenticity signature or "
             "a reproducible-build attestation.\n\n"
             + "".join(
                 f"- `{artifact}`: `{preset}`; " + (
                     f"{validations[artifact]['executed']} host tests passed, {validations[artifact]['skipped']} skipped.\n"
-                    if validations[artifact]["kind"] == "native-host-tests" else "cross-compiled; HIL pending.\n"
+                    if validations[artifact]["kind"] == "native-host-tests" else "ARM static link contract passed; HIL pending.\n"
                 ) for artifact, preset in sorted(expected_map.items()))
         )
 

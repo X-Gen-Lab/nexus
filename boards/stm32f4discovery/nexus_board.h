@@ -5,5 +5,7 @@
 #define NX_BOARD_NAME "stm32f4discovery-mb997"
 #define NX_BOARD_LED_GPIO_PORT 'D'
 #define NX_BOARD_LED_GPIO_PIN 12U
+#define NX_BOARD_LED_ACTIVE_LEVEL 1U
+#define NX_BOARD_LED_INACTIVE_LEVEL 0U
 
 #endif

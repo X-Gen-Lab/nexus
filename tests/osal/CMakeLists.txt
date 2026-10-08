@@ -61,11 +61,17 @@ if(UNIX)
     add_test(NAME osal_contract_tests COMMAND osal_contract_tests)
     set_tests_properties(osal_contract_tests PROPERTIES TIMEOUT 30 LABELS "osal;contract")
 
+    add_executable(osal_task_mutex_quarantine_tests test_task_mutex_quarantine.c)
+    target_link_libraries(osal_task_mutex_quarantine_tests PRIVATE osal)
+    target_compile_options(osal_task_mutex_quarantine_tests PRIVATE -UNDEBUG -Werror)
+    add_test(NAME osal_task_mutex_quarantine_tests COMMAND osal_task_mutex_quarantine_tests)
+    set_tests_properties(osal_task_mutex_quarantine_tests PROPERTIES TIMEOUT 15 LABELS "osal;contract;fault")
+
     add_executable(baremetal_contract_tests
         test_baremetal_contracts.c
         ${NEXUS_SOURCE_DIR}/osal/adapters/baremetal/osal_baremetal.c)
     target_include_directories(baremetal_contract_tests PRIVATE ${NEXUS_SOURCE_DIR}/osal/include)
-    target_link_libraries(baremetal_contract_tests PRIVATE nexus_build_options)
+    target_link_libraries(baremetal_contract_tests PRIVATE nexus_arch_interface)
     target_compile_options(baremetal_contract_tests PRIVATE -UNDEBUG -Werror)
     add_test(NAME baremetal_contract_tests COMMAND baremetal_contract_tests)
     set_tests_properties(baremetal_contract_tests PROPERTIES TIMEOUT 30 LABELS "osal;baremetal;host-model;contract")

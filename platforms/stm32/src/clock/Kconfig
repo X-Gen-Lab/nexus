@@ -17,9 +17,10 @@ config STM32_HSE_VALUE
     default 25000000 if STM32H7
     default 8000000
     range 4000000 50000000
-    depends on STM32_HSE_ENABLE
     help
       Frequency of the external high-speed oscillator in Hz.
+      This board property is retained even when the selected clock uses HSI;
+      the vendor SDK still needs a valid HSE constant for its clock decoder.
       Common values:
         - STM32F0/F1/F4: 8MHz, 12MHz, 16MHz
         - STM32H7: 25MHz

@@ -395,6 +395,23 @@ static void test_allocation_boundaries_and_concurrency(void) {
 }
 int main(void) {
     assert(osal_init() == OSAL_OK);
+    assert(osal_is_initialized());
+    osal_backend_info_t info;
+    assert(osal_get_backend_info(NULL) == OSAL_ERROR_NULL_POINTER);
+    assert(osal_get_backend_info(&info) == OSAL_OK && info.backend == OSAL_BACKEND_NATIVE);
+    assert((info.capabilities & (OSAL_CAP_TASKS | OSAL_CAP_DYNAMIC_MEMORY |
+        OSAL_CAP_SOFTWARE_TIMERS)) == (OSAL_CAP_TASKS | OSAL_CAP_DYNAMIC_MEMORY |
+        OSAL_CAP_SOFTWARE_TIMERS));
+    assert(!(info.capabilities & (OSAL_CAP_STATIC_OBJECTS | OSAL_CAP_HARDWARE_ISR |
+        OSAL_CAP_PRIORITY_SCHEDULER | OSAL_CAP_MEMORY_SEAL)));
+    assert(info.delete_policy == OSAL_DELETE_CANCELS_WAITERS);
+    assert(osal_mem_seal() == OSAL_ERROR_NOT_SUPPORTED && !osal_mem_is_sealed());
+    osal_sem_handle_t lifecycle;
+    assert(osal_sem_create(0, 1, &lifecycle) == OSAL_OK);
+    assert(osal_deinit() == OSAL_ERROR_BUSY && osal_is_initialized());
+    assert(osal_sem_delete(lifecycle) == OSAL_OK);
+    assert(osal_deinit() == OSAL_OK && !osal_is_initialized());
+    assert(osal_init() == OSAL_OK && osal_is_initialized());
 unsigned groups = 0;
 #define RUN(test) do { test(); ++groups; puts(#test " passed"); } while (0)
     RUN(test_nested_critical);
@@ -418,5 +435,6 @@ unsigned groups = 0;
     assert(stats.mutex_count == 0 && stats.sem_count == 0 && stats.queue_count == 0);
     assert(stats.task_count == 0 && stats.timer_count == 0 && stats.event_count == 0);
     printf("%u core contract groups passed; no live resources\n", groups);
+    assert(osal_deinit() == OSAL_OK && !osal_is_initialized());
     return 0;
 }

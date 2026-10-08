@@ -53,7 +53,7 @@ static inline nx_gpio_read_write_t* nx_factory_gpio_read_write(char port,
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_gpio_read_write_t*)nx_device_get(name);
+    return (nx_gpio_read_write_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_GPIO);
 }
 
 /**
@@ -83,7 +83,8 @@ static inline nx_gpio_read_t* nx_factory_gpio_read(char port, uint8_t pin) {
     }
     const nx_device_t* dedicated = nx_device_find(name);
     if (dedicated) {
-        return (nx_gpio_read_t*)nx_device_init(dedicated);
+        return dedicated->device_class == NX_DEVICE_CLASS_GPIO_READ ?
+            (nx_gpio_read_t*)nx_device_init(dedicated) : NULL;
     }
     nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(port, pin);
     return gpio ? &gpio->read : NULL;
@@ -105,7 +106,8 @@ static inline nx_gpio_write_t* nx_factory_gpio_write(char port, uint8_t pin) {
     }
     const nx_device_t* dedicated = nx_device_find(name);
     if (dedicated) {
-        return (nx_gpio_write_t*)nx_device_init(dedicated);
+        return dedicated->device_class == NX_DEVICE_CLASS_GPIO_WRITE ?
+            (nx_gpio_write_t*)nx_device_init(dedicated) : NULL;
     }
     nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(port, pin);
     return gpio ? &gpio->write : NULL;
@@ -126,7 +128,7 @@ static inline nx_uart_t* nx_factory_uart(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_uart_t*)nx_device_get(name);
+    return (nx_uart_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_UART);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -144,7 +146,7 @@ static inline nx_spi_t* nx_factory_spi(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_spi_t*)nx_device_get(name);
+    return (nx_spi_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_SPI);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -162,7 +164,7 @@ static inline nx_i2c_t* nx_factory_i2c(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_i2c_t*)nx_device_get(name);
+    return (nx_i2c_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_I2C);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -180,7 +182,7 @@ static inline nx_timer_base_t* nx_factory_timer(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_timer_base_t*)nx_device_get(name);
+    return (nx_timer_base_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_TIMER);
 }
 
 /**
@@ -194,7 +196,7 @@ static inline nx_timer_pwm_t* nx_factory_timer_pwm(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_timer_pwm_t*)nx_device_get(name);
+    return (nx_timer_pwm_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_TIMER_PWM);
 }
 
 /**
@@ -208,7 +210,7 @@ static inline nx_timer_encoder_t* nx_factory_timer_encoder(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_timer_encoder_t*)nx_device_get(name);
+    return (nx_timer_encoder_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_TIMER_ENCODER);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -226,7 +228,7 @@ static inline nx_adc_t* nx_factory_adc(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_adc_t*)nx_device_get(name);
+    return (nx_adc_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_ADC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -244,7 +246,7 @@ static inline nx_internal_flash_t* nx_factory_flash(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_internal_flash_t*)nx_device_get(name);
+    return (nx_internal_flash_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_FLASH);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -262,7 +264,7 @@ static inline nx_can_bus_t* nx_factory_can(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_can_bus_t*)nx_device_get(name);
+    return (nx_can_bus_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_CAN);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -279,7 +281,7 @@ static inline nx_usb_t* nx_factory_usb(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_usb_t*)nx_device_get(name);
+    return (nx_usb_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_USB);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -297,7 +299,7 @@ static inline nx_rtc_t* nx_factory_rtc(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_rtc_t*)nx_device_get(name);
+    return (nx_rtc_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_RTC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -315,7 +317,7 @@ static inline nx_watchdog_t* nx_factory_watchdog(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_watchdog_t*)nx_device_get(name);
+    return (nx_watchdog_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_WATCHDOG);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -333,7 +335,7 @@ static inline nx_dac_t* nx_factory_dac(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_dac_t*)nx_device_get(name);
+    return (nx_dac_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_DAC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -351,7 +353,7 @@ static inline nx_sdio_t* nx_factory_sdio(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_sdio_t*)nx_device_get(name);
+    return (nx_sdio_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_SDIO);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -369,7 +371,7 @@ static inline nx_crc_t* nx_factory_crc(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_crc_t*)nx_device_get(name);
+    return (nx_crc_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_CRC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -387,7 +389,7 @@ static inline nx_option_bytes_t* nx_factory_option_bytes(uint8_t index) {
     if (written < 0 || (size_t)written >= sizeof(name)) {
         return NULL;
     }
-    return (nx_option_bytes_t*)nx_device_get(name);
+    return (nx_option_bytes_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_OPTION_BYTES);
 }
 
 #ifdef __cplusplus

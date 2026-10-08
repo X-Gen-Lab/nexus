@@ -151,6 +151,12 @@ osal_status_t osal_task_delete(osal_task_handle_t handle) {
         global_unlock();
         return OSAL_ERROR_BUSY;
     }
+    for (unsigned i = 0; i < OSAL_MAX_MUTEXES; ++i) {
+        if (s_mutexes[i].used && s_mutexes[i].recursion &&
+            s_mutexes[i].owner == t->token) {
+            global_unlock(); return OSAL_ERROR_BUSY;
+        }
+    }
     t->joining = true;
 #ifdef _WIN32
     HANDLE thread = t->thread;

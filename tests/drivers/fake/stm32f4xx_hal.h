@@ -114,4 +114,98 @@ void HAL_GPIO_DeInit(GPIO_TypeDef*, uint32_t);
 void HAL_GPIO_WritePin(GPIO_TypeDef*, uint16_t, GPIO_PinState);
 GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef*, uint16_t);
 void HAL_GPIO_TogglePin(GPIO_TypeDef*, uint16_t);
+/* UART host model: production ISR/cancel code, no electrical simulation. */
+#define __weak __attribute__((weak))
+#define RESET 0U
+#define USART_CR1_UE (1U << 13)
+#define USART_CR1_TXEIE (1U << 7)
+#define USART_CR1_TCIE (1U << 6)
+#define UART_FLAG_TC (1U << 6)
+#define UART_WORDLENGTH_8B 0U
+#define UART_WORDLENGTH_9B 1U
+#define UART_STOPBITS_1 0U
+#define UART_STOPBITS_2 2U
+#define UART_PARITY_NONE 0U
+#define UART_PARITY_EVEN 1U
+#define UART_PARITY_ODD 2U
+#define UART_MODE_TX_RX 3U
+#define UART_HWCONTROL_NONE 0U
+#define UART_OVERSAMPLING_16 0U
+#define HAL_UART_ERROR_PE 1U
+#define HAL_UART_ERROR_NE 2U
+#define HAL_UART_ERROR_FE 4U
+#define HAL_UART_ERROR_ORE 8U
+#define HAL_UART_ERROR_DMA 16U
+typedef int IRQn_Type;
+enum {USART1_IRQn=37,USART2_IRQn=38,USART3_IRQn=39,UART4_IRQn=52,UART5_IRQn=53,USART6_IRQn=71};
+typedef struct { uint32_t SR, DR, CR1, CR2, CR3; } USART_TypeDef;
+extern USART_TypeDef fake_usart[6];
+#define USART1 (&fake_usart[0])
+#define USART2 (&fake_usart[1])
+#define USART3 (&fake_usart[2])
+#define UART4 (&fake_usart[3])
+#define UART5 (&fake_usart[4])
+#define USART6 (&fake_usart[5])
+typedef enum {HAL_UART_STATE_READY=0,HAL_UART_STATE_BUSY_TX=1,HAL_UART_STATE_BUSY_RX=2,HAL_UART_STATE_BUSY_TX_RX=3} HAL_UART_StateTypeDef;
+typedef struct {uint32_t BaudRate,WordLength,StopBits,Parity,Mode,HwFlowCtl,OverSampling;} UART_InitTypeDef;
+typedef struct {
+    USART_TypeDef* Instance;
+    UART_InitTypeDef Init;
+    uint8_t *pTxBuffPtr,*pRxBuffPtr;
+    uint16_t TxXferCount,RxXferCount,TxXferSize,RxXferSize;
+    uint32_t ErrorCode;
+    HAL_UART_StateTypeDef gState,RxState;
+} UART_HandleTypeDef;
+#define __HAL_UART_GET_FLAG(h,flag) ((h)->Instance->SR & (flag))
+#define __HAL_UART_ENABLE(h) ((h)->Instance->CR1 |= USART_CR1_UE)
+#define __HAL_UART_DISABLE(h) ((h)->Instance->CR1 &= ~USART_CR1_UE)
+HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef*);
+HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef*);
+HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef*,uint8_t*,uint16_t);
+HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef*,uint8_t*,uint16_t);
+HAL_StatusTypeDef HAL_UART_AbortTransmit(UART_HandleTypeDef*);
+HAL_StatusTypeDef HAL_UART_AbortReceive(UART_HandleTypeDef*);
+HAL_StatusTypeDef HAL_UART_Abort(UART_HandleTypeDef*);
+uint32_t HAL_UART_GetError(UART_HandleTypeDef*);
+void HAL_UART_IRQHandler(UART_HandleTypeDef*);
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef*);
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef*);
+void HAL_UART_ErrorCallback(UART_HandleTypeDef*);
+void HAL_NVIC_DisableIRQ(IRQn_Type);
+void HAL_NVIC_EnableIRQ(IRQn_Type);
+void HAL_NVIC_ClearPendingIRQ(IRQn_Type);
+typedef struct {uint32_t LOAD, VAL;} TestSysTick;
+typedef struct {uint32_t ICSR;} TestSCB;
+extern TestSysTick fake_systick;
+extern TestSCB fake_scb;
+extern uint32_t SystemCoreClock;
+#define SysTick (&fake_systick)
+#define SCB (&fake_scb)
+#define SCB_ICSR_PENDSTSET_Msk (1U << 26)
+/* Flash fixture model for physical port boundary/failure tests. */
+#define FLASHSIZE_BASE 0x1FFF7A22U
+#define FLASH_ACR_DCEN (1U<<10)
+#define FLASH_FLAG_EOP 1U
+#define FLASH_FLAG_OPERR 2U
+#define FLASH_FLAG_WRPERR 4U
+#define FLASH_FLAG_PGAERR 8U
+#define FLASH_FLAG_PGPERR 16U
+#define FLASH_FLAG_PGSERR 32U
+#define FLASH_TYPEPROGRAM_WORD 2U
+#define FLASH_TYPEERASE_SECTORS 0U
+#define FLASH_VOLTAGE_RANGE_3 3U
+typedef struct {uint32_t ACR;} TestFlash;
+extern TestFlash fake_flash;
+#define FLASH (&fake_flash)
+#define __HAL_FLASH_DATA_CACHE_DISABLE() (fake_flash.ACR &= ~FLASH_ACR_DCEN)
+#define __HAL_FLASH_DATA_CACHE_RESET() fake_flash_cache_reset()
+#define __HAL_FLASH_DATA_CACHE_ENABLE() (fake_flash.ACR |= FLASH_ACR_DCEN)
+#define __HAL_FLASH_CLEAR_FLAG(flags) fake_flash_clear_flags(flags)
+typedef struct {uint32_t TypeErase,Sector,NbSectors,VoltageRange;} FLASH_EraseInitTypeDef;
+void fake_flash_cache_reset(void);
+void fake_flash_clear_flags(uint32_t flags);
+HAL_StatusTypeDef HAL_FLASH_Unlock(void);
+HAL_StatusTypeDef HAL_FLASH_Lock(void);
+HAL_StatusTypeDef HAL_FLASH_Program(uint32_t type,uint32_t address,uint64_t value);
+HAL_StatusTypeDef HAL_FLASHEx_Erase(FLASH_EraseInitTypeDef* erase,uint32_t* failed);
 #endif

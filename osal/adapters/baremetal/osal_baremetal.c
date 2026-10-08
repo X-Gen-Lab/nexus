@@ -5,6 +5,7 @@
 #include "osal/osal.h"
 #include "osal/osal_baremetal.h"
 #include "osal/osal_internal.h"
+#include "arch/nx_arch.h"
 #include <string.h>
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -12,52 +13,41 @@
 #else
 #define OSAL_WEAK
 #endif
-#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || \
-    defined(__ARM_ARCH_8M_BASE__) || defined(__ARM_ARCH_8M_MAIN__)
-#define OSAL_CORTEX_M 1
-#else
-#define OSAL_CORTEX_M 0
-#endif
 #ifndef OSAL_QUEUE_MAX_SIZE
 #define OSAL_QUEUE_MAX_SIZE 256u
 #endif
 
 static uint32_t s_critical_nesting;
-#if OSAL_CORTEX_M
-static uint32_t s_saved_primask;
-#endif
-OSAL_WEAK void osal_platform_enter_critical(void) {
-#if OSAL_CORTEX_M
-    __asm volatile("mrs %0, primask\n\tcpsid i\n\tdsb\n\tisb" : "=r"(s_saved_primask) :: "memory");
-#endif
-}
-OSAL_WEAK void osal_platform_exit_critical(void) {
-#if OSAL_CORTEX_M
-    __asm volatile("dsb\n\tmsr primask, %0\n\tisb" :: "r"(s_saved_primask) : "memory");
-#endif
-}
-OSAL_WEAK bool osal_platform_is_isr(void) {
-#if OSAL_CORTEX_M
-    uint32_t ipsr;
-    __asm volatile("mrs %0, ipsr" : "=r"(ipsr));
-    return ipsr != 0;
-#else
-    return false;
-#endif
-}
+static nx_arch_irq_state_t s_saved_irq;
 OSAL_WEAK void osal_platform_delay_us(uint32_t us) {
     /* Only a yield hint. This loop never claims to be a time source. */
     for (volatile uint32_t i = 0; i < us; ++i) {}
 }
 void osal_enter_critical(void) {
-    if (!s_critical_nesting) osal_platform_enter_critical();
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    if (!s_critical_nesting) s_saved_irq = previous;
     ++s_critical_nesting;
+    /* Keep only the outer architecture region. The depth update itself is
+     * masked, so an interrupt cannot observe a half-entered outer region. */
+    if (s_critical_nesting > 1) nx_arch_irq_restore(previous);
 }
 void osal_exit_critical(void) {
-    if (s_critical_nesting && --s_critical_nesting == 0) osal_platform_exit_critical();
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    bool restore_outer = s_critical_nesting && --s_critical_nesting == 0;
+    nx_arch_irq_restore(previous);
+    if (restore_outer) nx_arch_irq_restore(s_saved_irq);
 }
-bool osal_is_isr(void) { return osal_platform_is_isr(); }
-osal_status_t osal_init(void) { return OSAL_OK; }
+bool osal_is_isr(void) { return nx_arch_in_isr(); }
+static bool s_initialized;
+osal_status_t osal_init(void) {
+    if (osal_is_isr()) return OSAL_ERROR_ISR;
+    osal_enter_critical(); s_initialized = true; osal_exit_critical();
+    return OSAL_OK;
+}
+bool osal_is_initialized(void) {
+    osal_enter_critical(); bool initialized = s_initialized; osal_exit_critical();
+    return initialized;
+}
 void osal_start(void) { /* Product main loop owns scheduling. */ }
 bool osal_is_running(void) { return false; }
 
@@ -86,6 +76,38 @@ static bare_mutex_t s_mutexes[OSAL_MAX_MUTEXES];
 static bare_sem_t s_sems[OSAL_MAX_SEMS];
 static bare_queue_t s_queues[OSAL_MAX_QUEUES];
 static bare_event_t s_events[OSAL_MAX_EVENTS];
+osal_status_t osal_deinit(void) {
+    if (osal_is_isr()) return OSAL_ERROR_ISR;
+    osal_enter_critical();
+    if (s_stats.mutex_count || s_stats.sem_count || s_stats.queue_count || s_stats.event_count) {
+        osal_exit_critical(); return OSAL_ERROR_BUSY;
+    }
+    s_initialized = false;
+    osal_exit_critical();
+    return OSAL_OK;
+}
+osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
+    if (!info) return OSAL_ERROR_NULL_POINTER;
+    osal_enter_critical();
+    *info = (osal_backend_info_t){
+        .backend = OSAL_BACKEND_BAREMETAL,
+        .capabilities = OSAL_CAP_STATIC_OBJECTS,
+        .delete_policy = OSAL_DELETE_CANCELS_WAITERS,
+        .max_mutexes = OSAL_MAX_MUTEXES, .max_semaphores = OSAL_MAX_SEMS,
+        .max_queues = OSAL_MAX_QUEUES, .max_events = OSAL_MAX_EVENTS,
+        .max_queue_item_bytes = OSAL_MAX_QUEUE_ITEM_SIZE < OSAL_QUEUE_MAX_SIZE ?
+            OSAL_MAX_QUEUE_ITEM_SIZE : OSAL_QUEUE_MAX_SIZE,
+        .max_queue_storage_bytes = OSAL_QUEUE_MAX_SIZE < OSAL_MAX_QUEUE_BYTES ?
+            OSAL_QUEUE_MAX_SIZE : OSAL_MAX_QUEUE_BYTES,
+        .reserved_object_bytes = sizeof(s_mutexes) + sizeof(s_sems) +
+            sizeof(s_queues) + sizeof(s_events), .event_bits_mask = UINT32_MAX};
+    if (s_clock) info->capabilities |= OSAL_CAP_MONOTONIC_CLOCK;
+#if defined(__ARM_ARCH_7EM__)
+    info->capabilities |= OSAL_CAP_HARDWARE_ISR;
+#endif
+    osal_exit_critical();
+    return OSAL_OK;
+}
 static void* bare_token(unsigned type) {
     if (s_next_token > (UINTPTR_MAX >> 4)) return NULL;
     return (void*)((s_next_token++ << 4) | type);

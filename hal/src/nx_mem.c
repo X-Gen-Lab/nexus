@@ -30,7 +30,7 @@ static bool pool_valid(const nx_mem_pool_t* p) {
 
 nx_status_t nx_mem_init(nx_mem_mode_t mode, nx_mem_allocator_t* custom) {
     if (osal_is_isr()) return NX_ERR_INVALID_STATE;
-    if (mode < NX_MEM_MODE_STATIC || mode > NX_MEM_MODE_CUSTOM ||
+    if ((unsigned)mode > (unsigned)NX_MEM_MODE_CUSTOM ||
         (mode == NX_MEM_MODE_CUSTOM && (!custom || !custom->alloc || !custom->free)))
         return NX_ERR_INVALID_PARAM;
     uint32_t saved = nx_critical_enter();

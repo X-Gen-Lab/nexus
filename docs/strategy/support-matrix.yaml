@@ -1,23 +1,33 @@
-# Implementation checkpoint; every claim is scoped to executed evidence.
-# Final source/config/artifact identity belongs in the generated validation package.
+# Software evidence and physical qualification are distinct. Final source/config/artifact identity belongs in the validation package.
 schema_version: 1
 baseline_commit: 7a203266082ad1f655b6686713b2b7950ba31ec6
 review_date: '2026-10-08'
 focus: industrial_control_and_connectivity
 team_size: approximately_10
-horizon_months: [3, 6]
-levels: [planned, experimental, validated, enterprise_supported, lts]
+horizon_months:
+- 3
+- 6
+levels:
+- planned
+- experimental
+- validated
+- enterprise_supported
+- lts
 validation_rule: validated_requires_complete_profile_acceptance_and_bound_evidence
 profiles:
-  - id: native-contracts
-    architecture: x86_64
-    host: linux
-    board: native-reference-model
-    osal: native
-    toolchain: GCC_14.2
-    config: platforms/native/defconfig
-    status: experimental
-    evidence:
+- id: native-contracts
+  architecture: x86_64
+  host: linux
+  board: native-reference-model
+  osal: native
+  toolchain: GCC_14.2
+  config: platforms/native/defconfig
+  status: experimental
+  evidence:
+    current_implementation: Arch typed-device Product runtime and opt-in services implemented
+    current_final_integration: pending_clean_commit_validation
+    record: docs/implementation/platform-delivery.md
+    historical_checkpoint:
       source_implementation: maintained
       configure_build_link: executed
       effective_config_regressions: 18_passed
@@ -49,85 +59,217 @@ profiles:
       coverage_export_and_final_documentation_head: see_live_PR_3_checks
       hardware: not_applicable
       records:
-        - docs/implementation/build-config.md
-        - docs/implementation/native-i2c.md
-        - docs/implementation/native-hal-validation.md
-        - docs/implementation/industrial-reference.md
-        - docs/implementation/independent-review.md
-        - docs/implementation/enterprise-delivery.md
-    limits:
-      - Host models do not establish MCU timing, electrical behavior, ISR or DMA.
-      - OpenSSL and POSIX file flash are host-only integrations.
-      - Windows/macOS presets are not validated by this checkpoint.
-      - Evidence is bound to the stated source revisions; later commits require their own actual CI records.
-      - Local 37-entry ASan/UBSan and online 23-entry leak-checked runs have different scopes; neither is complete-suite sanitizer evidence.
-    blockers: [DOC-001, HAL-001, OS-001, OS-002]
-  - id: freertos-posix-contracts
-    architecture: host
-    board: not_applicable
-    osal: freertos_pinned_kernel_posix_port
-    config: tests/osal/freertos_runtime/FreeRTOSConfig.h
-    status: experimental
-    evidence:
-      actual_kernel: initialized_at_repository_gitlink
-      runtime_contracts: 10_groups_passed_natural_exit_zero
-      timer_delete_reclamation_review: atomic_reclamation_and_30_concurrent_reuse_rounds_passed
-      local_event_helper: 5_groups_passed_200_cancel_reuse_cycles
-      integrated_source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
-      integration_report: build/linux-gcc-debug/ctest-final-source.xml
-      record: docs/implementation/freertos-posix-host-port.md
-      arm_interrupt_port: not_executed
-      hardware: not_applicable
-    blockers: [OS-001, OS-002]
-  - id: stm32-industrial-reference
-    soc: STM32F407VG
-    architecture: cortex_m4f
-    board: stm32f4discovery-mb997
-    board_revision: null
-    product_confirmation: pending
-    osal: [baremetal, freertos]
-    toolchain: arm-none-eabi-gcc
-    configs:
-      - configs/stm32f407_baremetal_defconfig
-      - configs/stm32f407_freertos_defconfig
-    status: experimental
-    evidence:
-      startup_clock_gpio_spi_flash_uid_sources: maintained
-      spi_gpio_host_fake_contracts: 3_ctest_targets_passed
-      real_sdk_header_syntax: executed_host_compiler_only
-      arm_compile_link: baremetal_and_freertos_online_passed_at_4a283eb
-      source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
-      execution_scope: cross_compile_only_not_physical_hil
-      hardware: not_executed
-      record: docs/implementation/platform-drivers.md
-    limits:
-      - PCB revision, 8 MHz HSE wiring, supply and ST HAL Flash conditions need board confirmation.
-      - Flash sectors 10/11 are reserved; application occupies the preceding 768 KiB.
-      - Flash erase/program runs in a product-defined maintenance window.
-      - Production HAL startup executes stm32_platform_init; global in-process shutdown is unsupported.
-      - IRQ/DMA/device/scheduler ownership remains active until controlled reset; HAL_DeInit is not complete teardown.
-      - RS485 requires external transceiver, wiring, termination, biasing and a product UART/DE/RE adapter.
-      - MCU crypto provider and protected boot/update/key-vault ports are not integrated.
-    blockers: [BSP-001, BSP-002, HAL-005, HIL-001, HIL-002, HIL-003, SEC-001, SEC-002]
-  - id: gd32-industrial-reference
-    soc: to_be_selected
-    board: to_be_selected
-    board_revision: null
-    osal: to_be_selected
-    status: planned
-    evidence:
-      current_platform: unavailable_backend_rejected_at_configuration
-      full_build: not_executed
-      hardware: not_executed
-    blockers: [BSP-001, BSP-003, BSP-004, HIL-001]
+      - docs/implementation/build-config.md
+      - docs/implementation/native-i2c.md
+      - docs/implementation/native-hal-validation.md
+      - docs/implementation/industrial-reference.md
+      - docs/implementation/independent-review.md
+      - docs/implementation/enterprise-delivery.md
+    hardware: not_applicable
+  limits:
+  - Host models do not establish MCU timing, electrical behavior, ISR or DMA.
+  - OpenSSL and POSIX file flash are host-only integrations.
+  - Windows/macOS presets are not validated by this checkpoint.
+  - Evidence is bound to the stated source revisions; later commits require their own actual CI records.
+  - Local 37-entry ASan/UBSan and online 23-entry leak-checked runs have different scopes; neither is complete-suite
+    sanitizer evidence.
+  blockers:
+  - DOC-001
+  - HAL-001
+  - OS-001
+  - OS-002
+- id: freertos-posix-contracts
+  architecture: host
+  board: not_applicable
+  osal: freertos_pinned_kernel_posix_port
+  config: tests/osal/freertos_runtime/FreeRTOSConfig.h
+  status: experimental
+  evidence:
+    actual_kernel: initialized_at_repository_gitlink
+    runtime_contracts: 10_groups_passed_natural_exit_zero
+    timer_delete_reclamation_review: atomic_reclamation_and_30_concurrent_reuse_rounds_passed
+    local_event_helper: 5_groups_passed_200_cancel_reuse_cycles
+    integrated_source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+    integration_report: build/linux-gcc-debug/ctest-final-source.xml
+    record: docs/implementation/freertos-posix-host-port.md
+    arm_interrupt_port: not_executed
+    hardware: not_applicable
+    static_resources: six_static_object_types_idle_and_timer_daemon
+    boot_mask: real_pinned_kernel_ARM_mask_model_passed_not_ARM_instructions
+    task_mutex_lifetime: TCB_reuse_and_orphaned_mutex_quarantine_regressions_passed
+    current_directed_suite: 275_OSAL_entries_passed_no_failures_or_skips
+  blockers:
+  - OS-001
+  - OS-002
+- id: stm32-industrial-reference
+  soc: STM32F407VGT6
+  architecture: cortex_m4f
+  board: stm32f4discovery-mb997
+  board_revision: null
+  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/stm32f407_baremetal_defconfig
+  - configs/stm32f407_freertos_defconfig
+  status: experimental
+  physical_flash_bytes: 1048576
+  firmware_flash_bytes: 786432
+  storage_geometry: sectors10_11
+  evidence:
+    source_implementation: maintained
+    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
+    software_fault_models: actual_production_ports_against_vendor_fakes_passed
+    current_final_arm_matrix: pending_clean_commit_validation
+    hardware: not_executed
+    record: docs/implementation/stm32-runtime.md
+  limits:
+  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
+  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
+  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
+    policy.
+  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
+  - RS485 requires product transceiver/wiring and measured frame/DE timing.
+  blockers:
+  - BSP-001
+  - BSP-002
+  - HAL-005
+  - HIL-001
+  - HIL-002
+  - HIL-003
+  - SEC-001
+  - SEC-002
+- id: stm32-qiming-v31
+  soc: STM32F407ZGT6
+  architecture: cortex_m4f
+  board: stm32f407zg-qiming-v31
+  board_revision: null
+  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/stm32f407zg_qiming_v31_baremetal_defconfig
+  - configs/stm32f407zg_qiming_v31_freertos_defconfig
+  status: experimental
+  physical_flash_bytes: 1048576
+  firmware_flash_bytes: 786432
+  storage_geometry: sectors10_11
+  evidence:
+    source_implementation: maintained
+    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
+    software_fault_models: actual_production_ports_against_vendor_fakes_passed
+    current_final_arm_matrix: pending_clean_commit_validation
+    hardware: not_executed
+    record: docs/implementation/stm32-runtime.md
+  limits:
+  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
+  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
+  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
+    policy.
+  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
+  - RS485 requires product transceiver/wiring and measured frame/DE timing.
+  blockers:
+  - BSP-001
+  - BSP-002
+  - HAL-005
+  - HIL-001
+  - HIL-002
+  - HIL-003
+  - SEC-001
+  - SEC-002
+- id: stm32-sky-youth
+  soc: STM32F407VET6
+  architecture: cortex_m4f
+  board: stm32f407ve-sky-qingchun
+  board_revision: null
+  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/stm32f407ve_sky_qingchun_baremetal_defconfig
+  - configs/stm32f407ve_sky_qingchun_freertos_defconfig
+  status: experimental
+  physical_flash_bytes: 524288
+  firmware_flash_bytes: 262144
+  storage_geometry: sectors6_7
+  evidence:
+    source_implementation: maintained
+    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
+    software_fault_models: actual_production_ports_against_vendor_fakes_passed
+    current_final_arm_matrix: pending_clean_commit_validation
+    hardware: not_executed
+    record: docs/implementation/stm32-runtime.md
+  limits:
+  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
+  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
+  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
+    policy.
+  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
+  - RS485 requires product transceiver/wiring and measured frame/DE timing.
+  blockers:
+  - BSP-001
+  - BSP-002
+  - HAL-005
+  - HIL-001
+  - HIL-002
+  - HIL-003
+  - SEC-001
+  - SEC-002
+- id: gd32-liangshan
+  soc: GD32F470ZGT6
+  architecture: cortex_m4f
+  board: gd32f470zg-liangshan
+  board_revision: null
+  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/gd32f470_baremetal_defconfig
+  - configs/gd32f470_freertos_defconfig
+  status: experimental
+  physical_flash_bytes: 1048576
+  firmware_flash_bytes: 1032192
+  storage_geometry: last_four_4KiB_F470_independent_erase_pages
+  evidence:
+    source_implementation: maintained
+    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
+    software_fault_models: actual_production_ports_against_vendor_fakes_passed
+    current_final_arm_matrix: pending_clean_commit_validation
+    hardware: not_executed
+    record: platforms/gd32f470/README.md
+  limits:
+  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
+  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
+  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
+    policy.
+  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
+  - RS485 requires product transceiver/wiring and measured frame/DE timing.
+  blockers:
+  - BSP-001
+  - BSP-004
+  - HAL-005
+  - HIL-001
+  - HIL-002
+  - HIL-003
+  - SEC-001
+  - SEC-002
 promotion_requires:
-  - exact_product_soc_board_revision_osal_toolchain_and_effective_configuration
-  - clean_source_and_dependency_identity_bound_to_actual_elf_map_and_nonzero_tests
-  - linked_capabilities_with_executed_contract_and_physical_hardware_reports
-  - measured_resource_and_deadline_budgets
-  - persistence_and_fault_recovery_evidence
-  - reviewed_whole_artifact_security_license_and_component_inventory
-  - product_trust_signing_and_same_artifact_release_evidence
-  - named_primary_backup_owner_support_window_and_known_limits
+- exact_product_soc_board_revision_osal_toolchain_and_effective_configuration
+- clean_source_and_dependency_identity_bound_to_actual_elf_map_and_nonzero_tests
+- linked_capabilities_with_executed_contract_and_physical_hardware_reports
+- measured_resource_and_deadline_budgets
+- persistence_and_fault_recovery_evidence
+- reviewed_whole_artifact_security_license_and_component_inventory
+- product_trust_signing_and_same_artifact_release_evidence
+- named_primary_backup_owner_support_window_and_known_limits
 enterprise_supported_profiles: []
 lts_profiles: []
+target_change: User replaced GD32F303 with GD32F470ZGT6 Liangshan; no F303 support claim.

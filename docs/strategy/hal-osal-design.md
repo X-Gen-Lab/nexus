@@ -1,6 +1,6 @@
 # HAL、OSAL 与 CPU 端口重构设计
 
-状态：架构设计提案，本文的新类型化 API、目标目录与后续迁移步骤尚未实现。本批已删除无生产/测试调用者的旧通用同步/异步转换源文件与公共头，不提供兼容占位替代；现有 UART/SPI 收发接口保留。审查基线为 `affaa86f485886d4bf72fb40e511030de5407ba0`；已删除文件的证据使用该提交的不可变 GitHub 链接，其余源码行号仍对应审查基线。遵循 [AGENTS.md](../../AGENTS.md)、[架构决策](architecture-decisions.md) 中 ADR 001–005，以及 HAL-001/002/003/004/005、OS-001/002、MEM-001、BSP-001/002。
+状态：详细设计与分阶段实施。类型化设备发现/独占打开/世代引用/关闭、GPIO动作、UART operation调度和SPI控制器/子设备交易调度已实施，CPU原语已迁入独立Arch；具体执行与保留的迁移边界见 [设备核心实施记录](../implementation/typed-device-core.md)。下文提案代码与更完整的deadline/通用operation目标仍需按实际API核对，不把尚未迁移的设备/服务计为完成。旧通用同步/异步转换已删除，没有兼容占位替代。审查基线为 `affaa86f485886d4bf72fb40e511030de5407ba0`；已删除文件的证据使用该提交的不可变 GitHub 链接，其余源码行号仍对应审查基线。遵循 [AGENTS.md](../../AGENTS.md)、[架构决策](architecture-decisions.md) 中 ADR 001–005，以及 HAL-001/002/003/004/005、OS-001/002、MEM-001、BSP-001/002。
 
 现有实现已有可保留的基础：有效配置按构建生成、SPI/I2C 的设备世代句柄、OSAL 的资源世代与引用保护、真实 Native 生命周期回归和独立的工业服务。需要重构的是这些基础之间的公共边界。单纯移动目录不能解决 UART 所有权、设备绑定与硬件打开混淆，以及 CPU 原语散落在 HAL/OSAL 的问题；旧通用伪异步转换已先行移除。既有执行证据见 [核心契约](../implementation/core-contracts.md)、[平台驱动](../implementation/platform-drivers.md) 与 [支持矩阵](support-matrix.yaml)；本文的提案不继承为“已通过”。
 

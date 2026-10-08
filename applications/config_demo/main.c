@@ -1,6 +1,6 @@
 /** Finite RAM configuration example; products provide MCU printf transport. */
 #include "config/config.h"
-#include "hal/nx_hal.h"
+#include "product/product.h"
 #include "nexus_board.h"
 #include "nexus_config.h"
 #include "osal/osal.h"
@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#if defined(NX_CONFIG_PLATFORM_STM32)
-#include "boot/stm32_boot.h"
-#endif
 
 /* Management context only, one owner. These bounded example buffers are not
  * a Flash backend or a durable snapshot. Binary v2 retains namespace IDs and
@@ -198,12 +195,7 @@ static bool namespaced_roundtrips(void) {
                   count, actual);
 }
 
-int main(void) {
-#if defined(NX_CONFIG_PLATFORM_STM32)
-    if (stm32_platform_init() != 0) return 1;
-#endif
-    if (osal_init() != OSAL_OK) return 1;
-    if (nx_hal_init() != NX_OK) return 1;
+static int run_configuration_example(void) {
     bool initialized = expect(config_init(NULL), CONFIG_OK, "config_init");
     bool passed = initialized &&
                   output("[%s] Volatile RAM configuration example\n", NX_BOARD_NAME) &&
@@ -214,8 +206,47 @@ int main(void) {
                            "close network namespace")) passed = false;
     if (initialized && !expect(config_deinit(), CONFIG_OK, "config_deinit"))
         passed = false;
-    if (nx_hal_deinit() != NX_OK) passed = false;
+
     if (passed && !output("Configuration example completed.\n")) passed = false;
     if (fflush(stdout) != 0 || ferror(stdout)) passed = false;
     return passed ? 0 : 1;
+}
+
+#if defined(NX_CONFIG_OSAL_FREERTOS)
+static void configuration_task(void* unused) {
+    (void)unused;
+    if (run_configuration_example() != 0)
+        (void)fprintf(stderr, "Configuration example failed.\n");
+    /* The example is finite, but the MCU scheduler owns the firmware lifetime.
+     * Global MCU shutdown/reset is a product policy; do not report a successful
+     * deinit while the scheduler and this task's static TCB remain owned. */
+}
+#endif
+
+int main(void) {
+    if (nx_product_boot(NULL) != NX_OK) return 1;
+#if defined(NX_CONFIG_OSAL_FREERTOS)
+    /* Kernel-backed configuration locking runs in a scheduled task. Bootstrap
+     * only creates the task and immediately starts the scheduler. */
+    osal_task_handle_t task = NULL;
+    const osal_task_config_t config = {
+        .name = "Configuration", .func = configuration_task,
+        .priority = OSAL_TASK_PRIORITY_NORMAL, .stack_size = 2048U
+    };
+    if (osal_task_create(&config, &task) != OSAL_OK) {
+        (void)nx_product_shutdown(NULL);
+        return 1;
+    }
+    osal_start();
+    return 1; /* A stopped or failed scheduler is not a successful run. */
+#else
+    int result = run_configuration_example();
+#if defined(NX_CONFIG_PLATFORM_NATIVE)
+    if (nx_product_shutdown(NULL) != NX_OK) result = 1;
+#else
+    /* Baremetal has no running kernel, but chip-wide deinit is deliberately
+     * unsupported. The board/clock remains owned until a controlled reset. */
+#endif
+    return result;
+#endif
 }

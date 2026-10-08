@@ -6,6 +6,11 @@ enable request, accepts a locally interlocked enable, completes one healthy
 control cycle, and then injects stale sensor data. The output turns off and the
 watchdog feed count stops at one. A failed invariant exits nonzero.
 
+This is an explicitly service-only model, so it deliberately does not call
+`nx_product_boot()` or start HAL/OSAL. It has no real device handles, tasks or
+hardware ownership to shut down. Firmware integrations use `Nexus::Product`,
+boot before opening typed devices and settle objects before product shutdown.
+
 Build with the Native preset and `NEXUS_BUILD_EXAMPLES=ON`, then run
 `nexus_industrial_controller` from that build directory. `nexus_config.h` comes
 from that build's effective configuration. The model uses no physical UART,

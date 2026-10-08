@@ -332,20 +332,39 @@ config STM32_CHIP_NAME
 # Memory Configuration
 #-----------------------------------------------------------------------------
 
+choice
+    prompt "STM32F407 exact package and density"
+    depends on STM32F407
+    default STM32F407VG
+config STM32F407VG
+    bool "STM32F407VGT6 (Discovery, 1 MiB Flash)"
+config STM32F407ZG
+    bool "STM32F407ZGT6 (Qiming V3.1, 1 MiB Flash)"
+config STM32F407VE
+    bool "STM32F407VET6 (Sky youth, 512 KiB Flash)"
+endchoice
+
+config STM32_PART_NAME
+    string
+    default "STM32F407VGT6" if STM32F407VG
+    default "STM32F407ZGT6" if STM32F407ZG
+    default "STM32F407VET6" if STM32F407VE
+
 config STM32_FLASH_SIZE
-    hex "Flash size (bytes)"
+    hex
     default 0x20000 if STM32F401xB || STM32F410Tx || STM32F410Rx
     default 0x40000 if STM32F401xC || STM32F410Cx || STM32F411xC || STM32F412Cx
     default 0x60000 if STM32F401xD
     default 0x80000 if STM32F401xE || STM32F411xE || STM32F446
-    default 0x100000 if STM32F405 || STM32F407 || STM32F412Rx || STM32F412Vx || STM32F412Zx
+    default 0x80000 if STM32F407VE
+    default 0x100000 if STM32F405 || STM32F407VG || STM32F407ZG || STM32F412Rx || STM32F412Vx || STM32F412Zx
     default 0x180000 if STM32F413xx || STM32F423xx
     default 0x200000 if STM32F427 || STM32F437 || STM32F429 || STM32F439 || STM32F469 || STM32F479
     help
       Flash memory size in bytes.
 
 config STM32_SRAM_SIZE
-    hex "SRAM size (bytes)"
+    hex
     default 0x8000 if STM32F410Tx || STM32F410Cx || STM32F410Rx
     default 0x10000 if STM32F401xB || STM32F401xC
     default 0x18000 if STM32F401xD || STM32F401xE

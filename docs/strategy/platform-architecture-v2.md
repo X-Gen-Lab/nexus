@@ -2,7 +2,7 @@
 
 日期：2026-10-08。审查基线：`affaa86f485886d4bf72fb40e511030de5407ba0`，位于 `codex/industrial-platform-modernization`，尚未合入 `main`。适用范围：约 10 人的工业控制与设备联网团队，STM32/GD32，FreeRTOS/裸机，3–6 个月交付窗口。
 
-本文区分现有实现、目标设计和实施退出条件。原有 [目标架构](target-architecture.md) 提供产品背景；本文收敛到 HAL/OSAL、Arch/SoC/Board/Product 与构建目标的具体边界。配套阅读：[主流平台比较](platform-comparison.md)、[HAL/OSAL 详细设计](hal-osal-design.md)、[架构决策](architecture-decisions.md)。这些设计没有自动赋予硬件支持、产品资格或企业发布资格。
+本文保留审查基线的问题与目标设计；后续实现已落地独立 Arch、类型化 GPIO/UART、静态 OSAL、Product 和三首发板。当前代码与实际执行范围见[平台交付记录](../implementation/platform-delivery.md)，不要把下方基线问题当作现 HEAD 的未修复结论。本文区分审查基线、目标设计和实施退出条件。原有 [目标架构](target-architecture.md) 提供产品背景；本文收敛到 HAL/OSAL、Arch/SoC/Board/Product 与构建目标的具体边界。配套阅读：[主流平台比较](platform-comparison.md)、[HAL/OSAL 详细设计](hal-osal-design.md)、[架构决策](architecture-decisions.md)。这些设计没有自动赋予硬件支持、产品资格或企业发布资格。
 
 ## 1. 决策与成功标准
 
@@ -12,9 +12,9 @@
 
 首期选择一份有效配置对应一个平台、板卡、OSAL 后端及资源配置。多个产品/后端使用独立构建目录。单次 CMake 配置内同时建立多个不同 Nexus 配置、SMP、通用热插拔和动态插件框架均不属于首期范围。
 
-## 2. 当前结构及问题归属
+## 2. 审查基线结构及问题归属
 
-以下箭头表示当前 CMake 依赖，省略无关的单个源码文件：
+以下箭头表示审查基线 CMake 依赖，省略无关的单个源码文件：
 
 ```text
 hal_interface / osal_interface -> nexus_build_options
@@ -44,9 +44,9 @@ industrial_controller -> protocols + industrial (Native model)
 | 根目录与输出目录使用宿主工程根变量 | `cmake/modules`, `osal/CMakeLists.txt`, `framework/init/CMakeLists.txt` | 作为外部产品子工程消费时路径和作用域错误 |
 | 部分有效选项不改变目标图 | `hal/Kconfig`, `services/CMakeLists.txt` | 配置关闭、目标创建和依赖安装不是同一个语义 |
 
-表中描述审查基线。首批已移除没有生产/测试调用者的 `nx_adapter.c/.h`，同时移除弱伪时钟、无停止契约的同步转换和内联阻塞的伪异步入口；未增加成功占位替代。其历史源码引用见 HAL/OSAL 设计的固定提交链接，新的类型化操作与同步等待封装仍需实施。
+表中描述审查基线。首批已移除没有生产/测试调用者的 `nx_adapter.c/.h`，同时移除弱伪时钟、无停止契约的同步转换和内联阻塞的伪异步入口；未增加成功占位替代。其历史源码引用见 HAL/OSAL 设计的固定提交链接，类型化设备核心和 GPIO/UART 操作已在后续实施；其他类别与完整运行时等待封装逐项验证。
 
-已有良好边界也必须保留：公共 HAL/OSAL 头没有直接导入厂商 SDK；服务核心通过调用者提供的端口访问设备；有效配置的三个输出来自同一次解析；未维护的 STM32 外设和 GD32 明确拒绝；SPI 已有设备/事务隔离与取消故障模型。
+已有良好边界也必须保留：公共 HAL/OSAL 头没有直接导入厂商 SDK；服务核心通过调用者提供的端口访问设备；有效配置的三个输出来自同一次解析；未维护的 STM32 外设明确拒绝；GD32F470 后续以独立官方 SDK 与实际驱动接入；SPI 已有设备/事务隔离与取消故障模型。
 
 ## 3. 目标依赖图
 

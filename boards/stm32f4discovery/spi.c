@@ -1,7 +1,7 @@
 /** STM32F4DISCOVERY (MB997) SPI1 fixture wiring, pending electrical HIL.
  * PA5/PA6/PA7 = SCK/MISO/MOSI, PB0/PB1 = logical slave CS 0/1.
  * Board revision and external slave wiring must match the evidence record. */
-#include "stm32_spi.h"
+#include "stm32_spi_resource.h"
 #include "hal/resource/nx_isr_manager.h"
 
 static DMA_HandleTypeDef dma_tx, dma_rx;
@@ -11,8 +11,8 @@ static void tx_irq(void* context) { HAL_DMA_IRQHandler(context); }
 static void rx_irq(void* context) { HAL_DMA_IRQHandler(context); }
 static void spi_irq(void* context) { HAL_SPI_IRQHandler(context); }
 
-nx_status_t stm32_spi_board_prepare(stm32_spi_impl_t* b) {
-    if (!b || b->hspi.Instance != SPI1) return NX_ERR_NOT_SUPPORTED;
+nx_status_t stm32_spi_board_prepare(const stm32_spi_board_port_t* port) {
+    if (!port || !port->handle || port->handle->Instance != SPI1 || port->instance != 1) return NX_ERR_NOT_SUPPORTED;
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_SPI1_CLK_ENABLE();
@@ -28,7 +28,7 @@ nx_status_t stm32_spi_board_prepare(stm32_spi_impl_t* b) {
     gpio.Mode = GPIO_MODE_AF_PP;
     gpio.Alternate = GPIO_AF5_SPI1;
     HAL_GPIO_Init(GPIOA, &gpio);
-    if (!b->dma_tx_enabled && !b->dma_rx_enabled) return NX_OK;
+    if (!port->dma_tx_enabled && !port->dma_rx_enabled) return NX_OK;
     __HAL_RCC_DMA2_CLK_ENABLE();
     dma_tx.Instance = DMA2_Stream3;
     dma_tx.Init.Channel = DMA_CHANNEL_3;
@@ -44,35 +44,35 @@ nx_status_t stm32_spi_board_prepare(stm32_spi_impl_t* b) {
     dma_rx.Instance = DMA2_Stream0;
     dma_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
     if (HAL_DMA_Init(&dma_tx) != HAL_OK || HAL_DMA_Init(&dma_rx) != HAL_OK) {
-        stm32_spi_board_release(b);
+        stm32_spi_board_release(port);
         return NX_ERR_DMA_CONFIG;
     }
-    __HAL_LINKDMA(&b->hspi, hdmatx, dma_tx);
-    __HAL_LINKDMA(&b->hspi, hdmarx, dma_rx);
+    __HAL_LINKDMA(port->handle, hdmatx, dma_tx);
+    __HAL_LINKDMA(port->handle, hdmarx, dma_rx);
     manager = nx_isr_manager_get();
-    if (!manager) { stm32_spi_board_release(b); return NX_ERR_NO_RESOURCE; }
+    if (!manager) { stm32_spi_board_release(port); return NX_ERR_NO_RESOURCE; }
     /* Priority 5 is inside the default FreeRTOS syscall-safe range 5..15.
      * A product changing configMAX_SYSCALL_INTERRUPT_PRIORITY must review this. */
     nx_status_t r = manager->connect(manager, DMA2_Stream3_IRQn, tx_irq, &dma_tx, 5);
     if (r == NX_OK) tx_connected = true;
     if (r == NX_OK) r = manager->connect(manager, DMA2_Stream0_IRQn, rx_irq, &dma_rx, 5);
     if (r == NX_OK) rx_connected = true;
-    if (r == NX_OK) r = manager->connect(manager, SPI1_IRQn, spi_irq, &b->hspi, 5);
+    if (r == NX_OK) r = manager->connect(manager, SPI1_IRQn, spi_irq, port->handle, 5);
     if (r == NX_OK) spi_connected = true;
-    if (r != NX_OK) stm32_spi_board_release(b);
+    if (r != NX_OK) stm32_spi_board_release(port);
     return r;
 }
-nx_status_t stm32_spi_board_select(stm32_spi_impl_t* b, uint8_t cs, bool active) {
-    if (!b || b->hspi.Instance != SPI1 || cs > 1) return NX_ERR_INVALID_PARAM;
+nx_status_t stm32_spi_board_select(uint8_t instance, uint8_t cs, bool active) {
+    if (instance != 1 || cs > 1) return NX_ERR_INVALID_PARAM;
     HAL_GPIO_WritePin(GPIOB, cs == 0 ? GPIO_PIN_0 : GPIO_PIN_1,
                        active ? GPIO_PIN_RESET : GPIO_PIN_SET);
     return NX_OK;
 }
-uint32_t stm32_spi_board_clock_hz(stm32_spi_impl_t* b) {
-    return b && b->hspi.Instance == SPI1 ? HAL_RCC_GetPCLK2Freq() : 0;
+uint32_t stm32_spi_board_clock_hz(uint8_t instance) {
+    return instance == 1 ? HAL_RCC_GetPCLK2Freq() : 0;
 }
-void stm32_spi_board_release(stm32_spi_impl_t* b) {
-    if (!b || b->hspi.Instance != SPI1) return;
+void stm32_spi_board_release(const stm32_spi_board_port_t* port) {
+    if (!port || !port->handle || port->handle->Instance != SPI1 || port->instance != 1) return;
     if (manager) {
         if (tx_connected) (void)manager->disconnect(manager, DMA2_Stream3_IRQn);
         if (rx_connected) (void)manager->disconnect(manager, DMA2_Stream0_IRQn);
@@ -88,5 +88,5 @@ void stm32_spi_board_release(stm32_spi_impl_t* b) {
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0 | GPIO_PIN_1);
     __HAL_RCC_SPI1_CLK_DISABLE();
-    b->hspi.hdmatx = b->hspi.hdmarx = NULL;
+    port->handle->hdmatx = port->handle->hdmarx = NULL;
 }

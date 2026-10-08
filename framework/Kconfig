@@ -25,6 +25,7 @@ config FRAMEWORK_SHELL
 config FRAMEWORK_CONFIG
     bool "Enable Config Manager Framework"
     default y
+    depends on SERVICE_STORAGE && SERVICE_SECURITY
     help
       Enable the configuration manager framework.
       Provides runtime configuration management with persistence support.

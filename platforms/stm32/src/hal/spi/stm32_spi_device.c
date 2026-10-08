@@ -179,29 +179,30 @@ void stm32_spi_construct(stm32_spi_impl_t* bus,
 }
 
 /* A board profile may override these hooks. Missing wiring fails explicitly. */
-NX_WEAK nx_status_t stm32_spi_board_prepare(stm32_spi_impl_t* bus) {
-    (void)bus;
+NX_WEAK nx_status_t stm32_spi_board_prepare(const stm32_spi_board_port_t* request) {
+    (void)request;
     return NX_ERR_NOT_SUPPORTED;
 }
-NX_WEAK nx_status_t stm32_spi_board_select(stm32_spi_impl_t* bus, uint8_t cs,
+NX_WEAK nx_status_t stm32_spi_board_select(uint8_t instance, uint8_t cs,
                                            bool active) {
-    (void)bus; (void)cs; (void)active;
+    (void)instance; (void)cs; (void)active;
     return NX_ERR_NOT_SUPPORTED;
 }
-NX_WEAK uint32_t stm32_spi_board_clock_hz(stm32_spi_impl_t* bus) {
-    (void)bus;
+NX_WEAK uint32_t stm32_spi_board_clock_hz(uint8_t instance) {
+    (void)instance;
     return 0;
 }
-NX_WEAK void stm32_spi_board_release(stm32_spi_impl_t* bus) { (void)bus; }
+NX_WEAK void stm32_spi_board_release(const stm32_spi_board_port_t* request) { (void)request; }
 NX_WEAK bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length,
                                               bool write) {
 #if defined(STM32F407xx)
     uintptr_t begin = (uintptr_t)data;
     if (!length || length > UINTPTR_MAX - begin) return false;
     uintptr_t end = begin + length;
-    /* F407VG: 128 KiB SRAM on AHB; 64 KiB CCM is NOT DMA-accessible. */
+    /* F407 xE/xG: 128 KiB AHB SRAM; 64 KiB CCM is not DMA-accessible. */
     if (begin >= 0x20000000U && end <= 0x20020000U) return true;
-    return !write && begin >= 0x08000000U && end <= 0x08100000U;
+    return !write && begin >= 0x08000000U &&
+           end <= 0x08000000U + NX_CONFIG_STM32_FLASH_SIZE;
 #else
     (void)data; (void)length; (void)write;
     return false; /* Require an explicit memory map for another device. */

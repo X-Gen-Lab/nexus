@@ -1,0 +1,54 @@
+if PLATFORM_GD32F470
+
+config GD32F470ZG
+    bool
+    default y
+
+config GD32_SYSCLK_FREQ
+    int
+    default 200000000
+
+config GD32_HXTAL_VALUE
+    int
+    default 25000000
+
+config GD32_RS485_ENABLE
+    bool "External RS485 transceiver on PB1 DE (product wiring required)"
+    default n
+
+config GD32_GPIO_ENABLE
+    bool "Reference board status GPIO"
+    default y
+
+config GD32_UART_ENABLE
+    bool "USART0 interrupt driver"
+    default y
+
+config GD32_UART0_ENABLE
+    bool
+    default y if GD32_UART_ENABLE
+
+config GD32_UART0_BAUDRATE
+    int "USART0 baud rate"
+    range 1200 115200
+    default 115200
+
+config GD32_UART_RX_BUFFER_SIZE
+    int "USART0 timestamped RX event capacity"
+    range 16 512
+    default 128
+
+config GD32_SPI_ENABLE
+    bool "SPI4 polling transaction driver"
+    default y
+
+config GD32_SPI4_ENABLE
+    bool
+    default y if GD32_SPI_ENABLE
+
+config GD32_SPI_DEVICE_CAPACITY
+    int "SPI4 bounded device slots"
+    range 1 8
+    default 4
+
+endif

@@ -66,13 +66,14 @@ set(NEXUS_TEST_LIBS
     platform_native
     hal_interface
     hal
-    log_framework
-    shell_framework
-    config_framework
-    init_framework
     osal
     ${THREAD_LIBS}
 )
+foreach(component log shell config init)
+    if(TARGET "${component}_framework")
+        list(APPEND NEXUS_TEST_LIBS "${component}_framework")
+    endif()
+endforeach()
 
 # Common compile options
 set(NEXUS_TEST_COMPILE_OPTIONS "")
@@ -129,25 +130,35 @@ endfunction()
 message(STATUS "Adding test subdirectories...")
 
 # HAL tests
+add_subdirectory(arch)
+add_subdirectory(boards)
 add_subdirectory(hal)
 
 # OSAL tests
 add_subdirectory(osal)
 
 # Framework tests
-add_subdirectory(config)
-add_subdirectory(log)
-add_subdirectory(shell)
-add_subdirectory(init)
+foreach(component config log shell init)
+    if(TARGET "${component}_framework")
+        add_subdirectory(${component})
+    endif()
+endforeach()
 
 # Integration tests
-add_subdirectory(integration)
+if(TARGET config_framework AND TARGET shell_framework AND TARGET log_framework AND TARGET init_framework)
+    add_subdirectory(integration)
+endif()
 
 # Platform tests
 add_subdirectory(platform)
-add_subdirectory(storage_security)
+if(CONFIG_SERVICE_STORAGE OR CONFIG_SERVICE_SECURITY OR CONFIG_SERVICE_UPDATE)
+    add_subdirectory(storage_security)
+endif()
 add_subdirectory(drivers)
-add_subdirectory(industrial)
+if(CONFIG_SERVICE_PROTOCOLS AND CONFIG_SERVICE_INDUSTRIAL)
+    add_subdirectory(industrial)
+endif()
+add_subdirectory(products)
 
 # Build system tests
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/build_system)

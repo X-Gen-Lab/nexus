@@ -13,7 +13,16 @@ import shlex
 import subprocess
 import tempfile
 
-OWNED = {"hal", "osal", "framework", "services", "platforms", "boards", "soc"}
+OWNED = {"arch", "products", "hal", "osal", "framework", "services", "platforms", "boards", "soc"}
+
+# These production drivers need a host register model to be compiled in the
+# Native database. Their translation units include the actual production .c;
+# selecting the explicit model preserves its real defines and include order.
+HOST_MODELS = {
+    "tests/drivers/gd32f470/test_uart.c": "platforms/gd32f470/src/uart.c",
+    "tests/drivers/gd32f470/test_spi.c": "platforms/gd32f470/src/spi.c",
+    "tests/drivers/gd32f470/test_timebase.c": "soc/gd32f470zg/interrupt.c",
+}
 
 # Required portable-C correctness profile. Advisory exclusions and their
 # reviewed rationale live in docs/implementation/quality-gates.md.
@@ -162,10 +171,15 @@ def commands(root: Path, build: Path) -> list[dict]:
             relative = source.relative_to(root)
         except ValueError:
             continue
-        if relative.parts and relative.parts[0] in OWNED:
+        model_source = HOST_MODELS.get(relative.as_posix())
+        if relative.parts and (relative.parts[0] in OWNED or model_source):
             if not source.is_file():
                 raise ValueError(f"missing compilation source: {source}")
-            selected.append({**entry, "file": str(source), "directory": str(directory)})
+            if model_source and not (root / model_source).is_file():
+                raise ValueError(f"missing modeled production source: {model_source}")
+            selected.append({**entry, "file": str(source), "directory": str(directory),
+                             "nexus_analysis_scope": "host-model" if model_source else "production",
+                             "nexus_production_source": model_source or relative.as_posix()})
     if not selected:
         raise ValueError("zero owned translation units; analysis cannot pass")
     return selected
@@ -189,12 +203,19 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                     invocations.append([tool, entry["file"], "-p", str(directory),
                      "--checks=" + TIDY_CHECKS,
                      "--warnings-as-errors=*",
-                     "--header-filter=" + str(root.resolve()) + "/(hal|osal|framework|services|platforms|boards|soc)/.*"])
+                     "--header-filter=" + str(root.resolve()) + "/(arch|products|hal|osal|framework|services|platforms|boards|soc)/.*"])
             else:
                 invocations = []
             failed = False
             with report.open("w", encoding="utf-8") as output:
                 output.write(f"Owned translation units: {len(selected)}\n")
+                output.write("Scope: actual compilation database; host models do not establish ARM execution or hardware validation.\n")
+                for entry in selected:
+                    output.write("Source scope: " + json.dumps({
+                        "translation_unit": entry["file"],
+                        "kind": entry["nexus_analysis_scope"],
+                        "production_source": entry["nexus_production_source"],
+                    }) + "\n")
                 output.flush()
                 version = subprocess.run([tool, "--version"], cwd=root,
                                          stdout=output, stderr=subprocess.STDOUT,

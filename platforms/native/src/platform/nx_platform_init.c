@@ -40,6 +40,8 @@ static nx_status_t stop(nx_lifecycle_t* lifecycle) {
     return r==NX_ERR_NOT_INIT ? NX_OK : r;
 }
 static nx_status_t shutdown_cached_io(void) {
+    nx_status_t ownership = nx_device_shutdown_check();
+    if (ownership != NX_OK) return ownership;
     char name[16];
     for (unsigned port=0;port<8;++port) for(unsigned pin=0;pin<16;++pin) {
         (void)snprintf(name,sizeof(name),"GPIO%c%u",(char)('A'+port),pin);
@@ -203,7 +205,10 @@ nx_status_t nx_platform_deinit(void) {
 
     /* The caller serializes platform lifetime against applications. Cached
      * factory objects remain valid across re-init and are not allocated here. */
-    nx_status_t result=shutdown_cached_io();
+    nx_status_t result=nx_device_shutdown_begin();
+    if (result!=NX_OK) return result;
+    result=shutdown_cached_io();
+    nx_device_shutdown_end();
     if (result!=NX_OK) return result;
 
     /* Mark as not initialized */

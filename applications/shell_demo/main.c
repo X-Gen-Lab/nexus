@@ -1,5 +1,7 @@
 /** Native standard-stream shell with one board LED and bounded smoke mode. */
 #include "hal/nx_hal.h"
+#include "hal/base/nx_device.h"
+#include "product/product.h"
 #include "nexus_board.h"
 #include "nexus_config.h"
 #include "osal/osal.h"
@@ -14,8 +16,7 @@
 #endif
 
 #define INPUT_CAPACITY 128U
-static nx_gpio_write_t* led;
-static nx_gpio_read_t* observer;
+static nx_device_ref_t led;
 static const char* input;
 static size_t input_size;
 static size_t input_offset;
@@ -64,16 +65,20 @@ static int cmd_led(int argc, char* argv[]) {
             output_failed = true;
         return command_result(1);
     }
-    if (strcmp(argv[1], "on") == 0) led->write(led, 1);
-    else if (strcmp(argv[1], "off") == 0) led->write(led, 0);
-    else if (strcmp(argv[1], "toggle") == 0) led->toggle(led);
+    nx_status_t action = NX_OK;
+    if (strcmp(argv[1], "on") == 0) action = nx_device_gpio_write(led, 1);
+    else if (strcmp(argv[1], "off") == 0) action = nx_device_gpio_write(led, 0);
+    else if (strcmp(argv[1], "toggle") == 0) action = nx_device_gpio_toggle(led);
     else if (strcmp(argv[1], "status") != 0) {
         if (shell_puts("Invalid LED action\r\n") <= 0) output_failed = true;
         return command_result(1);
     }
+    uint8_t state = 0;
+    if (action != NX_OK || nx_device_gpio_read(led, &state) != NX_OK)
+        return command_result(1);
     int written = shell_printf("[%s] P%c%u=%u\r\n", NX_BOARD_NAME,
                                NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN,
-                               (unsigned int)observer->read(observer));
+                               (unsigned int)state);
     return command_result(written > 0 ? 0 : 1);
 }
 
@@ -165,9 +170,10 @@ static bool smoke(void) {
         shell_register_command(NULL) != SHELL_ERROR_INVALID_PARAM) return false;
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
         unsigned int before = completed_commands;
+        uint8_t state = 0;
         if (!process_line(cases[i].line) || completed_commands != before + 1 ||
             last_command_status != cases[i].status ||
-            (unsigned int)observer->read(observer) != cases[i].pin) return false;
+            nx_device_gpio_read(led, &state) != NX_OK || state != cases[i].pin) return false;
     }
     if (!quit_requested) return false;
     return shell_puts("Shell smoke passed: 10 commands, LED readback and "
@@ -196,18 +202,17 @@ static bool run_stdio(void) {
 int main(int argc, char** argv) {
     bool run_smoke = argc == 2 && strcmp(argv[1], "--smoke") == 0;
     if (argc != 1 && !run_smoke) return 2;
-    if (osal_init() != OSAL_OK) return 1;
-    if (nx_hal_init() != NX_OK) return 1;
+    if (nx_product_boot(NULL) != NX_OK) return 1;
     bool passed = false;
     bool initialized = false;
-    nx_lifecycle_t* lifecycle = NULL;
-    led = nx_factory_gpio_write(NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN);
-    observer = nx_factory_gpio_read(NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN);
-    if (!led || !observer) goto cleanup;
-    lifecycle = led->get_lifecycle(led);
-    if (!lifecycle || lifecycle->init(lifecycle) != NX_OK) goto cleanup;
+    char name[16];
+    int written = snprintf(name, sizeof(name), "GPIO%c%u", NX_BOARD_LED_GPIO_PORT,
+                           (unsigned)NX_BOARD_LED_GPIO_PIN);
+    if (written < 0 || (size_t)written >= sizeof(name) ||
+        nx_device_open(name, NX_DEVICE_CLASS_GPIO, (uintptr_t)&led, &led) != NX_OK)
+        goto cleanup;
     initialized = true;
-    led->write(led, 0);
+    if (nx_device_gpio_write(led, 0) != NX_OK) goto cleanup;
     const shell_config_t config = {
         .prompt = "nexus> ", .cmd_buffer_size = INPUT_CAPACITY,
         .history_depth = 8, .max_commands = 16,
@@ -226,10 +231,10 @@ cleanup:
         passed = false;
     if (!shell_ok(shell_set_backend(NULL), "detach console")) passed = false;
     if (initialized) {
-        led->write(led, 0);
-        if (lifecycle->deinit(lifecycle) != NX_OK) passed = false;
+        if (nx_device_gpio_write(led, 0) != NX_OK) passed = false;
+        if (nx_device_close(led) != NX_OK) passed = false;
     }
-    if (nx_hal_deinit() != NX_OK) passed = false;
+    if (nx_product_shutdown(NULL) != NX_OK) passed = false;
     if (output_failed || fflush(stdout) != 0 || ferror(stdout)) passed = false;
     return passed ? 0 : 1;
 }

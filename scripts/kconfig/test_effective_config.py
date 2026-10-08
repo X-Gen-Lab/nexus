@@ -62,6 +62,100 @@ class EffectiveConfigTests(unittest.TestCase):
         self.fragment.unlink()
         self.assertNotEqual(self.generate().returncode, 0)
 
+    def test_disabled_service_rejects_an_explicit_dependent_service(self):
+        self.fragment.write_text('CONFIG_PLATFORM_NATIVE=y\nCONFIG_SERVICE_STORAGE=n\n'
+                                 'CONFIG_SERVICE_UPDATE=y\n')
+        result = self.generate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('CONFIG_SERVICE_UPDATE=y cannot be honored', result.stderr)
+        self.assertFalse((self.work / 'nexus_config.h').exists())
+
+    def test_obsolete_inactive_firmware_budget_fails_with_named_diagnostic(self):
+        self.fragment.write_text('CONFIG_PLATFORM_STM32=y\nCONFIG_STM32_STACK_SIZE=0x2000\n')
+        result = self.generate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Unknown configuration symbol CONFIG_STM32_STACK_SIZE', result.stderr)
+
+    def test_reference_led_exposes_the_class_opened_by_product_application(self):
+        self.fragment.write_text((ROOT / 'configs/stm32f407_baremetal_defconfig').read_text())
+        result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        source = self.work / 'led_identity.c'
+        source.write_text('#include "nexus_config.h"\n'
+                          '_Static_assert(NX_CONFIG_GPIO_D12_RW_MODE == 2, "typed GPIO class");\n'
+                          '_Static_assert(NX_CONFIG_GPIO_D12_MODE == 1, "push-pull output");\n'
+                          '_Static_assert(NX_CONFIG_GPIO_D12_INIT_VALUE == 0, "inactive LD4");\n')
+        result = subprocess.run([shutil.which('cc'), '-std=c11', '-Werror', '-I', str(self.work),
+                                 '-fsyntax-only', str(source)], text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_unimplemented_uart_dma_fails_before_emitting_firmware_configuration(self):
+        self.fragment.write_text((ROOT / 'configs/stm32f407_baremetal_defconfig').read_text()
+                                 .replace('CONFIG_STM32_UART_USE_DMA=n',
+                                          'CONFIG_STM32_UART_USE_DMA=y'))
+        result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('CONFIG_STM32_UART_USE_DMA=y cannot be honored', result.stderr)
+        self.assertFalse((self.work / 'nexus_config.h').exists())
+
+    def test_gd32_physical_identity_and_product_are_resolved_from_one_profile(self):
+        self.fragment.write_text((ROOT / 'configs/gd32f470_baremetal_defconfig').read_text())
+        result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        config = (self.work / 'effective.config').read_text()
+        for setting in ('CONFIG_PLATFORM_NAME="gd32f470"',
+                        'CONFIG_PRODUCT_NAME="gd32f470-liangshan"'):
+            self.assertIn(setting, config)
+        for name, expected in (('LINKER_RAM_SIZE', 0x30000),
+                               ('LINKER_FLASH_SIZE', 0x100000)):
+            value = next(line.split('=', 1)[1] for line in config.splitlines()
+                         if line.startswith('CONFIG_' + name + '='))
+            self.assertEqual(int(value, 16), expected)
+        self.fragment.write_text((ROOT / 'configs/gd32f470_baremetal_defconfig').read_text()
+                                 + 'CONFIG_LINKER_RAM_SIZE=0x20000\n')
+        self.assertNotEqual(self.generate('--set', 'TOOLCHAIN_ARM_GCC=y').returncode, 0)
+
+    def test_hsi_clock_keeps_a_valid_board_crystal_constant_for_vendor_decoder(self):
+        self.fragment.write_text((ROOT / 'configs/stm32f407_baremetal_defconfig').read_text()
+                                 + 'CONFIG_STM32_HSE_ENABLE=n\n')
+        result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        source = self.work / 'clock_identity.c'
+        source.write_text('#include "nexus_config.h"\n'
+                          '#ifdef NX_CONFIG_STM32_HSE_ENABLE\n#error HSE requested disabled\n#endif\n'
+                          '_Static_assert(NX_CONFIG_STM32_HSE_VALUE == 8000000, "board crystal");\n'
+                          '_Static_assert(NX_CONFIG_STM32_HSI_VALUE == 16000000, "silicon HSI");\n')
+        result = subprocess.run([shutil.which('cc'), '-std=c11', '-Werror', '-I', str(self.work),
+                                 '-fsyntax-only', str(source)], text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_customer_board_profiles_bind_density_and_typed_led_safely(self):
+        for stem, part, flash, pin, inactive in (
+            ('stm32f407zg_qiming_v31', 'STM32F407ZGT6', 0x100000, 'E3', 1),
+            ('stm32f407ve_sky_qingchun', 'STM32F407VET6', 0x80000, 'B2', 0),
+        ):
+            for backend in ('baremetal', 'freertos'):
+                with self.subTest(board=stem, backend=backend):
+                    self.fragment.write_text((ROOT / 'configs' / (stem + '_' + backend + '_defconfig')).read_text())
+                    result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    sys.path.insert(0, str(ROOT / 'scripts/ci'))
+                    from package_release import effective_config
+                    config = effective_config((self.work / 'effective.config').read_text())
+                    self.assertEqual(config['CONFIG_STM32_PART_NAME'], part)
+                    self.assertEqual(config['CONFIG_STM32_FLASH_SIZE'], flash)
+                    self.assertEqual(config['CONFIG_LINKER_FLASH_SIZE'], flash)
+                    self.assertEqual(config['CONFIG_LINKER_RAM_SIZE'], 0x20000)
+                    self.assertEqual(config['CONFIG_OSAL_BACKEND_NAME'], backend)
+                    self.assertEqual(config['CONFIG_GPIO_' + pin + '_RW_MODE'], 2)
+                    self.assertEqual(config['CONFIG_GPIO_' + pin + '_MODE'], 1)
+                    self.assertEqual(config['CONFIG_GPIO_' + pin + '_INIT_VALUE'], inactive)
+                    self.assertFalse(config['CONFIG_STM32_SPI_ENABLE'])
+                    self.assertTrue(config['CONFIG_STM32_UART_ENABLE'])
+                    self.assertTrue(config['CONFIG_INSTANCE_STM32_UART_0'])
+
     def test_build_mode_conflict_fails(self):
         self.fragment.write_text('CONFIG_PLATFORM_NATIVE=y\nCONFIG_BUILD_TYPE_RELEASE=y\n')
         self.assertNotEqual(self.generate('--set', 'BUILD_TYPE_DEBUG=y').returncode, 0)

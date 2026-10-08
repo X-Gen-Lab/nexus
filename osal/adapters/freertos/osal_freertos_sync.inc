@@ -1,10 +1,12 @@
 osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
-    RTOS_TASK_ONLY();
+    RTOS_BOOT_CONTEXT();
     if (!handle) return OSAL_ERROR_NULL_POINTER;
     *handle = NULL;
     rtos_resource_t* r = rtos_reserve(OSAL_TYPE_MUTEX);
     if (!r) return OSAL_ERROR_NO_MEMORY;
-    r->kernel = xSemaphoreCreateRecursiveMutex();
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
+    r->kernel = xSemaphoreCreateRecursiveMutexStatic(&s_mutex_storage[r->storage_index]);
+    rtos_boot_kernel_exit(guard);
     if (!r->kernel) { rtos_abandon(r); return OSAL_ERROR_NO_MEMORY; }
     rtos_publish(r, handle);
     return OSAL_OK;
@@ -13,7 +15,9 @@ osal_status_t osal_mutex_delete(osal_mutex_handle_t handle) {
     rtos_resource_t* r;
     osal_status_t result = rtos_close(handle, OSAL_TYPE_MUTEX, &r);
     if (result != OSAL_OK) return result;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     vSemaphoreDelete(r->kernel);
+    rtos_boot_kernel_exit(guard);
     rtos_reclaim(r);
     return OSAL_OK;
 }
@@ -48,21 +52,25 @@ static void* rtos_task_token(TaskHandle_t task) {
 osal_task_handle_t osal_mutex_get_owner(osal_mutex_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_MUTEX);
     if (!r) return NULL;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     void* owner = rtos_task_token(xSemaphoreGetMutexHolder(r->kernel));
+    rtos_boot_kernel_exit(guard);
     rtos_unpin(r);
     return owner;
 }
 bool osal_mutex_is_locked(osal_mutex_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_MUTEX);
     if (!r) return false;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     bool locked = xSemaphoreGetMutexHolder(r->kernel) != NULL;
+    rtos_boot_kernel_exit(guard);
     rtos_unpin(r);
     return locked;
 }
 
 osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
                               osal_sem_handle_t* handle) {
-    RTOS_TASK_ONLY();
+    RTOS_BOOT_CONTEXT();
     if (!handle) return OSAL_ERROR_NULL_POINTER;
     *handle = NULL;
     if (!max_count || initial_count > max_count || (uint64_t)(UBaseType_t)max_count != (uint64_t)max_count)
@@ -70,7 +78,10 @@ osal_status_t osal_sem_create(uint32_t initial_count, uint32_t max_count,
     rtos_resource_t* r = rtos_reserve(OSAL_TYPE_SEM);
     if (!r) return OSAL_ERROR_NO_MEMORY;
     r->capacity = max_count;
-    r->kernel = xSemaphoreCreateCounting((UBaseType_t)max_count, (UBaseType_t)initial_count);
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
+    r->kernel = xSemaphoreCreateCountingStatic((UBaseType_t)max_count,
+        (UBaseType_t)initial_count, &s_sem_storage[r->storage_index]);
+    rtos_boot_kernel_exit(guard);
     if (!r->kernel) { rtos_abandon(r); return OSAL_ERROR_NO_MEMORY; }
     rtos_publish(r, handle);
     return OSAL_OK;
@@ -86,7 +97,9 @@ osal_status_t osal_sem_delete(osal_sem_handle_t handle) {
     rtos_resource_t* r;
     osal_status_t result = rtos_close(handle, OSAL_TYPE_SEM, &r);
     if (result != OSAL_OK) return result;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     vSemaphoreDelete(r->kernel);
+    rtos_boot_kernel_exit(guard);
     rtos_reclaim(r);
     return OSAL_OK;
 }
@@ -122,8 +135,10 @@ osal_status_t osal_sem_give_from_isr(osal_sem_handle_t handle) {
 uint32_t osal_sem_get_count(osal_sem_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_SEM);
     if (!r) return 0;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     UBaseType_t count = osal_is_isr() ? uxQueueMessagesWaitingFromISR(r->kernel) :
                                      uxSemaphoreGetCount(r->kernel);
+    rtos_boot_kernel_exit(guard);
     rtos_unpin(r);
     return (uint32_t)count;
 }
@@ -145,23 +160,25 @@ osal_status_t osal_sem_reset(osal_sem_handle_t handle, uint32_t count) {
 
 osal_status_t osal_queue_create(size_t item_size, size_t item_count,
                                 osal_queue_handle_t* handle) {
-    RTOS_TASK_ONLY();
+    RTOS_BOOT_CONTEXT();
     if (!handle) return OSAL_ERROR_NULL_POINTER;
     *handle = NULL;
     if (!item_size || !item_count || item_size > SIZE_MAX / item_count ||
         item_size > OSAL_MAX_QUEUE_ITEM_SIZE || item_size > OSAL_MAX_QUEUE_BYTES / item_count ||
+        item_size > OSAL_FREERTOS_QUEUE_STORAGE_BYTES / item_count ||
         item_size > (size_t)((UBaseType_t)-1) || item_count > (size_t)((UBaseType_t)-1))
         return OSAL_ERROR_INVALID_PARAM;
     rtos_resource_t* r = rtos_reserve(OSAL_TYPE_QUEUE);
     if (!r) return OSAL_ERROR_NO_MEMORY;
-    r->kernel = xQueueCreate((UBaseType_t)item_count, (UBaseType_t)item_size);
+    rtos_queue_storage_t* storage = &s_queue_storage[r->storage_index];
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
+    r->kernel = xQueueCreateStatic((UBaseType_t)item_count, (UBaseType_t)item_size,
+                                   storage->payload, &storage->control);
+    rtos_boot_kernel_exit(guard);
     r->capacity = item_count;
     r->queue_mode = OSAL_QUEUE_MODE_NORMAL;
     if (!r->kernel) { rtos_abandon(r); return OSAL_ERROR_NO_MEMORY; }
-    r->scratch = pvPortMalloc(item_size);
-    if (!r->scratch) {
-        vQueueDelete(r->kernel); rtos_abandon(r); return OSAL_ERROR_NO_MEMORY;
-    }
+    r->scratch = storage->scratch;
     rtos_publish(r, handle);
     return OSAL_OK;
 }
@@ -169,8 +186,9 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle) {
     rtos_resource_t* r;
     osal_status_t result = rtos_close(handle, OSAL_TYPE_QUEUE, &r);
     if (result != OSAL_OK) return result;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     vQueueDelete(r->kernel);
-    vPortFree(r->scratch);
+    rtos_boot_kernel_exit(guard);
     rtos_reclaim(r);
     return OSAL_OK;
 }
@@ -194,6 +212,7 @@ static osal_status_t rtos_queue_put(osal_queue_handle_t handle, const void* item
                                    uint32_t ms, bool front, bool isr, bool force_overwrite) {
     if (!isr) RTOS_TASK_ONLY();
     if (!handle || !item) return OSAL_ERROR_NULL_POINTER;
+    if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) return OSAL_ERROR_NOT_INIT;
     /* A nonblocking task send publishes data and drops its lifetime pin before
      * a woken receiver can run. This permits immediate reply-queue cleanup. */
     bool atomic_send = !isr && ms == OSAL_NO_WAIT;
@@ -268,16 +287,20 @@ osal_status_t osal_queue_peek_from_isr(osal_queue_handle_t handle, void* item) {
 size_t osal_queue_get_count(osal_queue_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_QUEUE);
     if (!r) return 0;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     UBaseType_t count = osal_is_isr() ? uxQueueMessagesWaitingFromISR(r->kernel) :
                                      uxQueueMessagesWaiting(r->kernel);
+    rtos_boot_kernel_exit(guard);
     rtos_unpin(r);
     return count;
 }
 size_t osal_queue_get_available_space(osal_queue_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_QUEUE);
     if (!r) return 0;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     UBaseType_t count = osal_is_isr() ? uxQueueMessagesWaitingFromISR(r->kernel) :
                                      uxQueueMessagesWaiting(r->kernel);
+    rtos_boot_kernel_exit(guard);
     size_t space = r->capacity - count;
     rtos_unpin(r);
     return space;
@@ -286,8 +309,10 @@ bool osal_queue_is_empty(osal_queue_handle_t handle) { return osal_queue_get_cou
 bool osal_queue_is_full(osal_queue_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_QUEUE);
     if (!r) return false;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     UBaseType_t count = osal_is_isr() ? uxQueueMessagesWaitingFromISR(r->kernel) :
                                      uxQueueMessagesWaiting(r->kernel);
+    rtos_boot_kernel_exit(guard);
     bool full = count == r->capacity;
     rtos_unpin(r);
     return full;
@@ -302,12 +327,14 @@ osal_status_t osal_queue_reset(osal_queue_handle_t handle) {
 }
 
 osal_status_t osal_event_create(osal_event_handle_t* handle) {
-    RTOS_TASK_ONLY();
+    RTOS_BOOT_CONTEXT();
     if (!handle) return OSAL_ERROR_NULL_POINTER;
     *handle = NULL;
     rtos_resource_t* r = rtos_reserve(OSAL_TYPE_EVENT);
     if (!r) return OSAL_ERROR_NO_MEMORY;
-    r->kernel = xEventGroupCreate();
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
+    r->kernel = xEventGroupCreateStatic(&s_event_storage[r->storage_index]);
+    rtos_boot_kernel_exit(guard);
     if (!r->kernel) { rtos_abandon(r); return OSAL_ERROR_NO_MEMORY; }
     rtos_publish(r, handle);
     return OSAL_OK;
@@ -316,7 +343,9 @@ osal_status_t osal_event_delete(osal_event_handle_t handle) {
     rtos_resource_t* r;
     osal_status_t result = rtos_close(handle, OSAL_TYPE_EVENT, &r);
     if (result != OSAL_OK) return result;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     vEventGroupDelete(r->kernel);
+    rtos_boot_kernel_exit(guard);
     rtos_reclaim(r);
     return OSAL_OK;
 }
@@ -401,7 +430,9 @@ osal_status_t osal_event_sync(osal_event_handle_t handle, osal_event_bits_t set_
 osal_event_bits_t osal_event_get(osal_event_handle_t handle) {
     rtos_resource_t* r = rtos_pin(handle, OSAL_TYPE_EVENT);
     if (!r) return 0;
+    rtos_boot_kernel_guard_t guard = rtos_boot_kernel_enter();
     EventBits_t bits = osal_is_isr() ? xEventGroupGetBitsFromISR(r->kernel) : xEventGroupGetBits(r->kernel);
+    rtos_boot_kernel_exit(guard);
     rtos_unpin(r);
     return (uint32_t)bits;
 }

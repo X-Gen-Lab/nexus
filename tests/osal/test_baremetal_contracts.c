@@ -1,19 +1,30 @@
 #include "osal/osal.h"
 #include "osal/osal_baremetal.h"
+#include "arch/nx_arch.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 
 /* A board model supplies interrupt masks and a real, independently advancing
  * tick. Hardware timing and IRQ instruction validation remain HIL work. */
-static bool in_isr, irq_masked, saved_mask;
+static bool in_isr, irq_masked;
 static unsigned enters, exits;
 static uint32_t clock_ms;
 static bool inject_token;
 static osal_sem_handle_t injected_sem;
-void osal_platform_enter_critical(void) { ++enters; saved_mask = irq_masked; irq_masked = true; }
-void osal_platform_exit_critical(void) { ++exits; irq_masked = saved_mask; }
-bool osal_platform_is_isr(void) { return in_isr; }
+/* Explicit fixture implementation, not an override of weak production hooks. */
+nx_arch_irq_state_t nx_arch_irq_save(void) {
+    nx_arch_irq_state_t previous = {irq_masked ? 1u : 0u};
+    ++enters; irq_masked = true; return previous;
+}
+void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
+    ++exits; irq_masked = previous.value != 0;
+}
+bool nx_arch_irq_is_masked(void) { return irq_masked; }
+bool nx_arch_in_isr(void) { return in_isr; }
+void nx_arch_dmb(void) {}
+void nx_arch_dsb(void) {}
+void nx_arch_isb(void) {}
 void osal_platform_delay_us(uint32_t us) {
     (void)us;
     ++clock_ms;
@@ -30,13 +41,25 @@ static uint32_t other_clock(void) { return 0; }
 static void dummy_task(void* arg) { (void)arg; }
 int main(void) {
     assert(osal_init() == OSAL_OK);
+    assert(osal_is_initialized());
+    osal_backend_info_t info;
+    assert(osal_get_backend_info(&info) == OSAL_OK && info.backend == OSAL_BACKEND_BAREMETAL);
+    assert((info.capabilities & OSAL_CAP_STATIC_OBJECTS) &&
+        !(info.capabilities & (OSAL_CAP_TASKS | OSAL_CAP_SOFTWARE_TIMERS |
+        OSAL_CAP_DYNAMIC_MEMORY | OSAL_CAP_MONOTONIC_CLOCK)));
+    assert(info.max_tasks == 0 && info.max_timers == 0 && info.max_queue_storage_bytes == 256);
+    assert(osal_mem_seal() == OSAL_ERROR_NOT_SUPPORTED && !osal_mem_is_sealed());
     irq_masked = true;
     enters = exits = 0;
     osal_enter_critical(); osal_enter_critical();
-    assert(enters == 1 && exits == 0);
-    osal_exit_critical(); assert(irq_masked && exits == 0);
-    osal_exit_critical(); assert(irq_masked && exits == 1);
+    assert(irq_masked && enters > exits);
+    osal_exit_critical(); assert(irq_masked && enters > exits);
+    osal_exit_critical(); assert(irq_masked && enters == exits);
     irq_masked = false;
+    osal_enter_critical(); osal_enter_critical();
+    osal_exit_critical(); assert(irq_masked);
+    osal_exit_critical(); assert(!irq_masked);
+    osal_exit_critical(); assert(!irq_masked); /* Unbalanced exit is harmless. */
     puts("Baremetal nested region preserves initial interrupt state passed");
     osal_sem_handle_t sem;
     assert(osal_sem_create(0, 1, &sem) == OSAL_OK);
@@ -110,6 +133,13 @@ int main(void) {
     assert(!stats.task_count && !stats.mutex_count && !stats.sem_count &&
            !stats.queue_count && !stats.event_count && !stats.timer_count);
     puts("Baremetal capability failures are explicit passed");
+    assert(osal_get_backend_info(&info) == OSAL_OK &&
+        (info.capabilities & OSAL_CAP_MONOTONIC_CLOCK));
+    osal_sem_handle_t lifecycle;
+    assert(osal_sem_create(0, 1, &lifecycle) == OSAL_OK);
+    assert(osal_deinit() == OSAL_ERROR_BUSY && osal_is_initialized());
+    assert(osal_sem_delete(lifecycle) == OSAL_OK);
+    assert(osal_deinit() == OSAL_OK && !osal_is_initialized());
     puts("7 baremetal board-model contract groups passed");
     return 0;
 }

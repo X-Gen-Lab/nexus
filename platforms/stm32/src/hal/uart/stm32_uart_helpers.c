@@ -24,8 +24,8 @@
 /* Critical Section Macros                                                   */
 /*---------------------------------------------------------------------------*/
 
-#define UART_ENTER_CRITICAL() __disable_irq()
-#define UART_EXIT_CRITICAL()  __enable_irq()
+#define UART_ENTER_CRITICAL() nx_arch_irq_state_t uart_irq_state = nx_arch_irq_save()
+#define UART_EXIT_CRITICAL()  nx_arch_irq_restore(uart_irq_state)
 
 /*---------------------------------------------------------------------------*/
 /* Circular Buffer Operations                                                */
@@ -99,6 +99,14 @@ size_t stm32_uart_buffer_write(stm32_uart_buffer_t* buf, const uint8_t* data,
         return 0;
     }
 
+    /* DROP_OLD accepts arbitrarily sized input without size_t underflow or
+     * writing past the allocation. Retain only the newest capacity bytes. */
+    if (len > buf->size && buf->policy == UART_OVERFLOW_DROP_OLD) {
+        data += len - buf->size;
+        len = buf->size;
+        buf->head = buf->tail = buf->count = 0;
+        buf->overflow_count++;
+    }
     size_t free_space = buf->size - buf->count;
     size_t to_write = len;
 
@@ -272,6 +280,8 @@ uart_periph_type_t uart_get_periph_type(USART_TypeDef* instance) {
  * \brief           Get UART IRQ number from instance index
  */
 IRQn_Type stm32_uart_get_irq_number(uint8_t instance) {
+    /* Public logical UART0 is physical USART1. */
+    instance++;
 #if defined(STM32F0xx)
     /* F0 series: USART1-8 (varies by model) */
     switch (instance) {

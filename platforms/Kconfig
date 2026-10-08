@@ -34,11 +34,10 @@ config PLATFORM_STM32
       STM32 microcontroller platform support.
       Supports STM32F4, STM32H7, STM32L4 series and more.
 
-config PLATFORM_GD32
-    bool "GD32 Platform"
+config PLATFORM_GD32F470
+    bool "GD32F470ZG Platform"
     help
-      GD32 microcontroller platform support.
-      Supports GD32F30x, GD32F40x series and more.
+      Maintained GD32F470ZGT6 Cortex-M4 platform, 1 MiB Flash / 512 KiB total SRAM.
 
 config PLATFORM_ESP32
     bool "ESP32 Platform"
@@ -59,7 +58,7 @@ config PLATFORM_NAME
     string
     default "native" if PLATFORM_NATIVE
     default "stm32" if PLATFORM_STM32
-    default "gd32" if PLATFORM_GD32
+    default "gd32f470" if PLATFORM_GD32F470
     default "esp32" if PLATFORM_ESP32
     default "nrf52" if PLATFORM_NRF52
 
@@ -79,8 +78,8 @@ if PLATFORM_STM32
 rsource "stm32/Kconfig"
 endif
 
-if PLATFORM_GD32
-rsource "gd32/Kconfig"
+if PLATFORM_GD32F470
+rsource "gd32f470/Kconfig"
 endif
 
 if PLATFORM_ESP32

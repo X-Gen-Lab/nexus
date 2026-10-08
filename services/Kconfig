@@ -1,0 +1,33 @@
+menu "Product services"
+
+config SERVICE_STORAGE
+    bool "Atomic storage service"
+    default y
+    help
+      Build the storage port and recoverable two-bank snapshot implementation.
+      Disabling it also removes optional SoC Flash port sources.
+
+config SERVICE_SECURITY
+    bool "Cryptographic provider service"
+    default y
+    help
+      Native binds OpenSSL 3 only when selected. MCU implementations require
+      an explicitly supplied maintained provider and report unsupported otherwise.
+
+config SERVICE_UPDATE
+    bool "Authenticated update policy"
+    default y
+    depends on SERVICE_STORAGE && SERVICE_SECURITY
+    help
+      Policy and recovery state only; the product supplies its image installer,
+      boot selection, protected counters and trust boundary.
+
+config SERVICE_PROTOCOLS
+    bool "Modbus RTU protocol"
+    default y
+
+config SERVICE_INDUSTRIAL
+    bool "Industrial health supervision"
+    default y
+
+endmenu

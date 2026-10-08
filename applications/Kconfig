@@ -86,7 +86,8 @@ config APP_STACK_SIZE
     default 0x1000
     range 0x400 0x10000
     help
-      Stack size for application main task (in bytes).
+      Linker reservation for the CPU main/exception stack, in bytes.
+      OSAL task stacks use their independently bounded backend pools.
 
       Recommended values:
         - Simple applications: 0x400 (1KB)
@@ -98,7 +99,8 @@ config APP_HEAP_SIZE
     default 0x2000
     range 0x200 0x100000
     help
-      Heap size for dynamic memory allocation (in bytes).
+      Linker reservation for the C runtime heap, in bytes. FreeRTOS's
+      management heap and static OSAL object pools have separate budgets.
 
       Recommended values:
         - Minimal: 0x200 (512B)

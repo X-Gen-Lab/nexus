@@ -13,6 +13,7 @@ from unittest import mock
 import zipfile
 
 import package_release as release
+from test_validate_firmware_elf import fixture as firmware_fixture
 
 
 def elf(machine=62, elf_class=2):
@@ -73,6 +74,7 @@ class ReleaseTests(unittest.TestCase):
             "CONFIG_ENABLE_SANITIZERS": False, "CONFIG_PLATFORM_NAME": "native",
             "CONFIG_PLATFORM_NATIVE": True, "CONFIG_PLATFORM_STM32": False,
             "CONFIG_BOARD_NAME": "native-reference", "CONFIG_OSAL_BACKEND_NAME": "native",
+            "CONFIG_PRODUCT_NAME": "native-reference",
             "CONFIG_TOOLCHAIN_NAME": "gcc", "CONFIG_TEST_BUDGET": 4096,
         }
         self.write_bundle()
@@ -328,30 +330,104 @@ class ReleaseTests(unittest.TestCase):
         self.commit = self.git("rev-parse", "HEAD")
         self.configure_arm_bundle(toolchain, osal)
 
-    def configure_arm_bundle(self, toolchain, osal="baremetal"):
+    def configure_arm_bundle(self, toolchain, osal="baremetal", profile=None):
+        profile = profile or release.RELEASE_PROFILES["stm32-armgcc-release"]
         cache = self.build / "CMakeCache.txt"
         value = cache.read_text().replace("/usr/bin/gcc", "/usr/bin/arm-none-eabi-gcc")
-        value = value.replace("NEXUS_PLATFORM:STRING=native", "NEXUS_PLATFORM:STRING=stm32")
+        value = value.replace("NEXUS_PLATFORM:STRING=native", "NEXUS_PLATFORM:STRING=" + profile["platform"])
         value = value.replace("NEXUS_BUILD_TESTS:BOOL=ON", "NEXUS_BUILD_TESTS:BOOL=OFF")
         value = re.sub(r"NEXUS_CONFIG_FILE:FILEPATH=.*", f"NEXUS_CONFIG_FILE:FILEPATH={self.fragment}", value)
         cache.write_text(value + (
             f"CMAKE_TOOLCHAIN_FILE:FILEPATH={toolchain}\n"
         ))
-        self.values.update({"CONFIG_PLATFORM_NAME": "stm32", "CONFIG_PLATFORM_NATIVE": False,
-                            "CONFIG_PLATFORM_STM32": True, "CONFIG_BOARD_NAME": "stm32f4discovery-mb997",
-                            "CONFIG_STM32_CHIP_NAME": "STM32F407xx", "CONFIG_OSAL_BACKEND_NAME": osal,
+        self.values.update({"CONFIG_PLATFORM_NAME": profile["platform"], "CONFIG_PLATFORM_NATIVE": False,
+                            "CONFIG_PLATFORM_STM32": profile["platform"] == "stm32",
+                            "CONFIG_BOARD_NAME": profile["board"], "CONFIG_OSAL_BACKEND_NAME": osal,
                             "CONFIG_TOOLCHAIN_NAME": "arm-none-eabi-gcc", "CONFIG_CPU_ARCH": "cortex-m4",
                             "CONFIG_FPU_TYPE": "fpv4-sp-d16", "CONFIG_FLOAT_ABI": "hard",
                             "CONFIG_BUILD_TESTS": False})
+        self.values.update(profile.get("expected_config", {}))
+        self.values.update({"CONFIG_LINKER_RAM_START": 0x20000000,
+                            "CONFIG_LINKER_RAM_SIZE": 0x20000 if profile["platform"] == "stm32" else 0x30000,
+                            "CONFIG_LINKER_FLASH_START": 0x08000000,
+                            "CONFIG_LINKER_FLASH_SIZE": self.values.get("CONFIG_STM32_FLASH_SIZE", 0x100000),
+                            "CONFIG_INSTANCE_STM32_UART_1": profile["platform"] == "stm32",
+                            "CONFIG_GD32_UART_ENABLE": profile["platform"] == "gd32f470"})
         self.write_bundle()
         self.write_compile_commands(("-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"))
-        self.elf = elf(40, 1)
+        self.elf = firmware_fixture(config=self.values)
 
     def test_arm_effective_target_profile_can_be_packaged_and_verified(self):
         self.arm_fixture()
         self.add_output()
         self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
         self.verify(expected=["nexus-stm32f407-baremetal=stm32-armgcc-release"])
+
+    def test_arm_package_cli_executes_static_gate_and_download_verification(self):
+        self.arm_fixture()
+        self.add_output()
+        result = self.cli("package", "--source-commit", self.commit,
+                          "--preset", "stm32-armgcc-release", "--artifact", "nexus-stm32f407-baremetal",
+                          "--build-dir", str(self.build))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.cli("verify-assets", "--source-commit", self.commit,
+                          "--expected", "nexus-stm32f407-baremetal=stm32-armgcc-release")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        report = json.loads((self.build / "firmware-static-contract.json").read_text())
+        self.assertEqual(report["kind"], "arm-static-link-contract")
+
+    def test_arm_package_reruns_actual_elf_checks_instead_of_trusting_a_pass_report(self):
+        self.arm_fixture()
+        for defect in ("missing_vectors", "weak_irq", "rwx", "storage_overlap", "partial_descriptor"):
+            with self.subTest(defect=defect):
+                (self.build / "firmware-static-contract.json").write_text('{"status":"forged-pass"}')
+                self.add_output(content=firmware_fixture(defect, config=self.values))
+                with self.assertRaisesRegex(release.ReleaseError, "static contract"):
+                    self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+                self.assertFalse((self.build / "firmware-static-contract.json").exists())
+        self.assertFalse((self.source / "release").exists())
+
+    def test_arm_report_is_recomputed_archived_and_verified_against_firmware(self):
+        self.arm_fixture()
+        self.add_output()
+        archive = self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+        prefix = "nexus-stm32f407-baremetal"
+        with zipfile.ZipFile(archive) as bundle:
+            report = json.loads(bundle.read(prefix + "/validation/firmware-static-contract.json"))
+            provenance = json.loads(bundle.read(prefix + "/provenance.json"))
+        self.assertEqual(report, provenance["validation"])
+        self.assertEqual(report["kind"], "arm-static-link-contract")
+        self.assertFalse(report["hardware_verified"])
+        self.assertEqual(report["images"][0]["device_descriptor_bytes"], 32)
+        self.assertEqual(report["images"][0]["vector_bytes"], 0x188)
+        self.assertIn("USART2_IRQHandler", report["images"][0]["strong_interrupts"])
+        report["images"][0]["vector_bytes"] = 0
+        self.rewrite_archive(archive, changes={prefix + "/validation/firmware-static-contract.json":
+                                             json.dumps(report).encode()}, refresh_manifests=True)
+        with self.assertRaisesRegex(release.ReleaseError, "real firmware"):
+            self.verify(expected=["nexus-stm32f407-baremetal=stm32-armgcc-release"])
+
+    def test_arm_archive_firmware_mutation_rejected_after_transfer_manifests_refreshed(self):
+        self.arm_fixture()
+        self.add_output()
+        archive = self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+        self.rewrite_archive(archive, changes={"nexus-stm32f407-baremetal/bin/blinky":
+                                             firmware_fixture("missing_vectors", config=self.values)},
+                             refresh_manifests=True)
+        with self.assertRaisesRegex(release.ReleaseError, "static contract"):
+            self.verify(expected=["nexus-stm32f407-baremetal=stm32-armgcc-release"])
+
+    def test_release_workflow_matrix_and_asset_gate_match_reviewed_profiles(self):
+        workflow = (Path(release.__file__).resolve().parents[2] / ".github/workflows/release.yml").read_text()
+        pairs = re.findall(r"^            preset: (\S+)\n            artifact: (\S+)$", workflow, re.MULTILINE)
+        expected = {preset: profile["artifact"] for preset, profile in release.RELEASE_PROFILES.items()}
+        self.assertEqual(dict(pairs), expected)
+        self.assertEqual(len(pairs), len(expected))
+        asset_pairs = re.findall(r"--expected (\S+)=([^\s\\]+)", workflow)
+        self.assertEqual({preset: artifact for artifact, preset in asset_pairs}, expected)
+        self.assertIn("if: ${{ !matrix.host_tests }}", workflow)
+        self.assertIn("python scripts/ci/validate_firmware_elf.py", workflow)
+        self.assertIn("build/${{ matrix.preset }}/firmware-static-contract.json", workflow)
 
     def test_arm_config_toolchain_or_cpu_override_fails_closed(self):
         self.arm_fixture()
@@ -639,7 +715,7 @@ class ReleaseTests(unittest.TestCase):
             provenance = json.loads(bundle.read("nexus-stm32f407-freertos/provenance.json"))
             self.assertEqual(provenance["target"]["osal"], "freertos")
             self.assertEqual(provenance["target"]["support_profile"], "stm32f407-discovery-freertos")
-            self.assertEqual(provenance["validation"]["kind"], "cross-compile-only")
+            self.assertEqual(provenance["validation"]["kind"], "arm-static-link-contract")
             self.assertIs(provenance["target"]["hardware_verified"], False)
             self.assertIn("ext/freertos", {m["path"] for m in provenance["submodules"]})
         self.verify(expected=["nexus-stm32f407-freertos=stm32-armgcc-freertos-release"])
@@ -753,39 +829,137 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(release.ReleaseError, "dependency identity"):
             self.verify()
 
-    def test_complete_maintained_matrix_uses_one_source_and_verified_distinct_candidates(self):
-        native_values = self.values.copy()
+    def add_import(self):
+        root = self.source / "vendors/gigadevice/gd32f4xx"
+        (root / "Firmware").mkdir(parents=True, exist_ok=True)
+        (root / "LICENSES").mkdir(exist_ok=True)
+        data = b"/* SDK identity fixture, not real vendor code. */\n"
+        (root / "Firmware/sdk.c").write_bytes(data)
+        (root / "README.md").write_text("Reviewed source import origin fixture\n")
+        (root / "LICENSES/BSD-3-Clause.txt").write_text("License notice fixture\n")
+        lock = {"vendor": "GigaDevice", "package": "GD32F4xx Firmware Library", "version": "3.3.3",
+                "source_url": "https://example.invalid/sdk.zip", "download_sha256": "a" * 64,
+                "nested_archive_sha256": "b" * 64,
+                "files": [{"path": "Firmware/sdk.c", "sha256": hashlib.sha256(data).hexdigest(),
+                           "bytes": len(data), "license": "BSD-3-Clause"}]}
+        (root / "source.lock.json").write_text(json.dumps(lock))
+        return root
+
+    def all_profiles_fixture(self):
         self.arm_fixture()
-        freertos_fragment = self.source / "configs/stm32f407_freertos_defconfig"
-        freertos_fragment.write_text("CONFIG_PLATFORM_STM32=y\nCONFIG_OSAL_FREERTOS=y\n")
-        self.git("add", "configs")
-        self.git("commit", "--quiet", "-m", "FreeRTOS profile fixture")
+        root = self.add_import()
+        for profile in release.RELEASE_PROFILES.values():
+            fragment = self.source / profile["fragment"]
+            fragment.parent.mkdir(parents=True, exist_ok=True)
+            if not fragment.exists():
+                fragment.write_text("# Product profile fixture\n")
+        self.git("add", ".")
+        self.git("commit", "--quiet", "-m", "Reviewed profile and imported SDK fixture")
         self.git("tag", "-f", "v1.2.3")
         self.commit = self.git("rev-parse", "HEAD")
+        return root
+
+    def select_profile(self, preset):
+        profile = release.RELEASE_PROFILES[preset]
+        self.preset, self.artifact = preset, profile["artifact"]
+        self.fragment = self.source / profile["fragment"]
+        self.build = self.source / "build" / preset
+        self.build.mkdir(exist_ok=True)
+        self.values = {"CONFIG_BUILD_TYPE": "Release", "CONFIG_BUILD_TYPE_RELEASE": True,
+                       "CONFIG_BUILD_TESTS": True, "CONFIG_BUILD_EXAMPLES": True,
+                       "CONFIG_ENABLE_COVERAGE": False, "CONFIG_ENABLE_SANITIZERS": False,
+                       "CONFIG_PLATFORM_NAME": "native", "CONFIG_PLATFORM_NATIVE": True,
+                       "CONFIG_BOARD_NAME": "native-reference", "CONFIG_OSAL_BACKEND_NAME": "native",
+                       "CONFIG_PRODUCT_NAME": "native-reference",
+                       "CONFIG_TOOLCHAIN_NAME": "gcc", "CONFIG_TEST_BUDGET": 4096}
+        self.elf = ELF
+        self.write_bundle(); self.write_cache(); self.write_compile_commands(); self.write_test_report()
+        if profile["platform"] != "native":
+            self.configure_arm_bundle(self.source / "cmake/toolchains/arm-gcc.cmake", profile["osal"], profile)
+        return profile
+
+    def test_complete_maintained_matrix_uses_one_source_and_verified_distinct_candidates(self):
+        self.all_profiles_fixture()
         expected = []
-        for preset, profile in release.RELEASE_PROFILES.items():
-            self.preset, self.artifact = preset, profile["artifact"]
-            self.build = self.source / "build" / preset
-            self.build.mkdir(exist_ok=True)
-            self.fragment = self.source / profile["fragment"]
-            self.values = native_values.copy()
-            self.elf = ELF
-            self.write_bundle()
-            self.write_cache()
-            self.write_compile_commands()
-            self.write_test_report()
-            if profile["platform"] == "stm32":
-                self.configure_arm_bundle(self.source / "cmake/toolchains/arm-gcc.cmake", profile["osal"])
+        for preset in release.RELEASE_PROFILES:
+            self.select_profile(preset)
             self.add_output()
             self.package()
             expected.append(f"{self.artifact}={preset}")
         self.verify(expected=expected)
         sums = (self.source / "release/SHA256SUMS").read_text().splitlines()
-        self.assertEqual(len(sums), 3)
+        self.assertEqual(len(sums), len(release.RELEASE_PROFILES))
         notes = (self.source / "release_notes.md").read_text()
         for profile in release.RELEASE_PROFILES.values():
             self.assertIn(profile["artifact"], notes)
-        self.assertIn("cross-compiled; HIL pending", notes)
+        self.assertEqual(notes.count("ARM static link contract passed; HIL pending"), 8)
+
+    def test_gd32_import_is_recorded_as_source_lock_and_notices_not_vendor_git(self):
+        self.all_profiles_fixture()
+        self.select_profile("gd32f470-armgcc-baremetal-release")
+        self.add_output()
+        archive = self.package()
+        with zipfile.ZipFile(archive) as bundle:
+            provenance = json.loads(bundle.read(f"{self.artifact}/provenance.json"))
+            self.assertEqual(provenance["submodules"], [])
+            record = provenance["imported_sources"][0]
+            self.assertEqual(record["kind"], "vendor-source-import")
+            self.assertEqual(record["upstream"]["version"], "3.3.3")
+            self.assertNotIn("commit", record)
+            self.assertIn(f"{self.artifact}/configuration/imports/{record['path']}/LICENSES/BSD-3-Clause.txt", bundle.namelist())
+        self.verify()
+
+    def test_new_board_part_and_capacity_must_match_reviewed_profile(self):
+        self.all_profiles_fixture()
+        for preset in ("stm32-qiming-armgcc-baremetal-release", "stm32-sky-armgcc-freertos-release"):
+            self.select_profile(preset); self.add_output()
+            original = self.values.copy()
+            for key, value in (("CONFIG_BOARD_NAME", "wrong-board"),
+                               ("CONFIG_STM32_PART_NAME", "STM32F407VGT6"),
+                               ("CONFIG_STM32_FLASH_SIZE", 0x200000)):
+                self.values = original | {key: value}; self.write_bundle()
+                with self.subTest(preset=preset, key=key), self.assertRaisesRegex(release.ReleaseError, "Effective"):
+                    self.package()
+
+    def test_all_arm_platforms_reject_flag_override_including_arch_and_product_units(self):
+        self.all_profiles_fixture()
+        self.select_profile("gd32f470-armgcc-baremetal-release"); self.add_output()
+        for directory in ("arch", "products"):
+            file = self.source / directory / "source.c"; file.parent.mkdir(); file.write_text("int fixture;\n")
+            # Identity is already committed before packaging; only command verification is needed.
+            for override in ("-mcpu=cortex-m7", "-mfpu=fpv5-d16", "-mfloat-abi=soft", "-marm", "@hidden.rsp"):
+                commands = [{"file": str(file), "arguments": ["arm-none-eabi-gcc", f"-I{self.build / 'generated'}",
+                    "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", override]}]
+                with self.subTest(directory=directory, override=override), self.assertRaisesRegex(release.ReleaseError, "ARM"):
+                    release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], self.build / "generated", self.source)
+
+    def test_import_firmware_notice_and_lock_tamper_fail_before_packaging(self):
+        root = self.all_profiles_fixture()
+        self.select_profile("gd32f470-armgcc-baremetal-release"); self.add_output()
+        for relative in ("Firmware/sdk.c", "source.lock.json", "LICENSES/BSD-3-Clause.txt"):
+            file = root / relative; original = file.read_bytes(); file.write_bytes(original + b"tampered")
+            with self.subTest(relative=relative), self.assertRaisesRegex(release.ReleaseError, "import"):
+                self.package()
+            file.write_bytes(original)
+        (root / "Firmware/extra.c").write_text("unreviewed")
+        with self.assertRaisesRegex(release.ReleaseError, "import"):
+            self.package()
+
+    def test_archive_verifier_rejects_refreshed_manifest_import_metadata_forgery(self):
+        self.all_profiles_fixture(); self.select_profile("gd32f470-armgcc-baremetal-release")
+        self.add_output(); archive = self.package()
+        name = f"{self.artifact}/provenance.json"
+        with zipfile.ZipFile(archive) as bundle:
+            provenance = json.loads(bundle.read(name))
+        provenance["imported_sources"][0]["upstream"]["version"] = "unreviewed"
+        self.rewrite_archive(archive, changes={name: json.dumps(provenance).encode()}, refresh_manifests=True)
+        with self.assertRaisesRegex(release.ReleaseError, "import"):
+            self.verify()
+
+    def test_unknown_new_board_profile_still_fails_closed(self):
+        self.add_output()
+        with self.assertRaisesRegex(release.ReleaseError, "Unsupported"):
+            self.package(preset="stm32-unknown-armgcc-release", artifact="nexus-unknown")
 
 
 if __name__ == "__main__":

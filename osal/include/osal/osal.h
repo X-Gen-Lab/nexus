@@ -20,6 +20,7 @@
 
 /* Common definitions */
 #include "osal_def.h"
+#include "osal_backend.h"
 
 /* OSAL modules */
 #include "osal_diag.h"
@@ -46,8 +47,28 @@ extern "C" {
  * \return          OSAL_OK on success, error code otherwise
  * \retval          OSAL_OK Initialization successful
  * \retval          OSAL_ERROR Initialization failed
+ * \note            FreeRTOS constructors may run before the scheduler starts
+ *                  and preserve incoming masks. Operational mutex/semaphore/
+ *                  queue/event/task calls require a started scheduler and
+ *                  return NOT_INIT before start, including ISR calls. Execute
+ *                  application services in a task; initialization alone does
+ *                  not start a RTOS scheduler.
+ *                  Boot task context may query objects, delete unused mutex/
+ *                  semaphore/queue/event objects and use management heap APIs.
+ *                  Task/timer reclaim requires scheduling/daemon settlement;
+ *                  pending boot lifetimes make deinit BUSY. Product boot must
+ *                  precede the bootstrap task; initialize services only in
+ *                  the scheduled worker.
  */
 osal_status_t osal_init(void);
+/** Current backend initialization state; does not start or allocate resources. */
+bool osal_is_initialized(void);
+
+/** Task-only rollback after all producers and objects have been stopped.
+ * Returns BUSY with live objects; never force-deletes them or resets lifetime
+ * tokens. FreeRTOS additionally requires its scheduler not to be running.
+ * Native's process-lifetime synchronization storage remains available. */
+osal_status_t osal_deinit(void);
 
 /**
  * \brief           Start OSAL scheduler
@@ -67,7 +88,8 @@ bool osal_is_running(void);
  * \brief           Enter critical section
  * \note            Task context; nested calls must be balanced on the same task.
  *                  Native uses a recursive thread lock. Baremetal saves the
- *                  original interrupt mask. FreeRTOS uses its port mask.
+ *                  original interrupt mask. FreeRTOS uses saved Arch state
+ *                  before scheduling and its port mask after scheduler start.
  *                  No allocation, sleep, or blocking API is allowed inside.
  *                  Use a saved-mask HAL primitive for mixed task/ISR regions.
  */
@@ -89,7 +111,9 @@ bool osal_is_isr(void);
 
 /** Read the backend's monotonic millisecond clock (modulo UINT32_MAX + 1).
  * Finite deadlines use unsigned subtraction with budgets below 2^31 ms.
- * Baremetal returns NOT_SUPPORTED until the board installs its clock. */
+ * Baremetal returns NOT_SUPPORTED until the board installs its clock.
+ * FreeRTOS task-context boot reads remain valid; an ISR read before scheduler
+ * start returns NOT_INIT and clears the output without entering the kernel. */
 osal_status_t osal_get_time_ms(uint32_t* milliseconds);
 
 /**

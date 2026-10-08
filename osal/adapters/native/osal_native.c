@@ -313,13 +313,13 @@ osal_status_t osal_init(void) {
         return OSAL_OK;
     }
 #ifdef _WIN32
-    s_tls_index = TlsAlloc();
+    if (s_tls_index == TLS_OUT_OF_INDEXES) s_tls_index = TlsAlloc();
     if (s_tls_index == TLS_OUT_OF_INDEXES) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
 #else
-    if (pthread_key_create(&s_tls_key, NULL) != 0) {
+    if (!s_tls_key_created && pthread_key_create(&s_tls_key, NULL) != 0) {
         global_unlock();
         return OSAL_ERROR_NO_MEMORY;
     }
@@ -329,6 +329,48 @@ osal_status_t osal_init(void) {
     global_unlock();
     return OSAL_OK;
 }
+
+bool osal_is_initialized(void) { return atomic_load(&s_osal_initialized); }
+
+osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
+    if (!info) return OSAL_ERROR_NULL_POINTER;
+    *info = (osal_backend_info_t){
+        .backend = OSAL_BACKEND_NATIVE,
+        .capabilities = OSAL_CAP_TASKS | OSAL_CAP_SOFTWARE_TIMERS |
+            OSAL_CAP_DYNAMIC_MEMORY | OSAL_CAP_MONOTONIC_CLOCK,
+        .delete_policy = OSAL_DELETE_CANCELS_WAITERS,
+        .max_tasks = OSAL_MAX_TASKS, .max_mutexes = OSAL_MAX_MUTEXES,
+        .max_semaphores = OSAL_MAX_SEMS, .max_queues = OSAL_MAX_QUEUES,
+        .max_events = OSAL_MAX_EVENTS, .max_timers = OSAL_MAX_TIMERS,
+        .max_queue_item_bytes = OSAL_MAX_QUEUE_ITEM_SIZE,
+        .max_queue_storage_bytes = OSAL_MAX_QUEUE_BYTES,
+        .reserved_object_bytes = sizeof(s_tasks) + sizeof(s_mutexes) +
+            sizeof(s_sems) + sizeof(s_queues) + sizeof(s_events) + sizeof(s_timers),
+        .event_bits_mask = UINT32_MAX};
+    return OSAL_OK;
+}
+
+osal_status_t osal_deinit(void) {
+    /* The caller has quiesced producers. Slot storage/conditions and TLS keys
+     * intentionally live for the process so cancelled old waiters stay safe. */
+    global_lock();
+    bool busy = false;
+    for (unsigned i = 0; i < OSAL_MAX_TASKS; ++i) busy |= s_tasks[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_MUTEXES; ++i) busy |= s_mutexes[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_SEMS; ++i) busy |= s_sems[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_QUEUES; ++i) busy |= s_queues[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_EVENTS; ++i) busy |= s_events[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_TIMERS; ++i) busy |= s_timers[i].used;
+    if (osal_mem_get_allocation_count()) busy = true;
+    if (!busy) {
+        s_osal_running = false;
+        s_osal_initialized = false;
+    }
+    global_unlock();
+    return busy ? OSAL_ERROR_BUSY : OSAL_OK;
+}
+osal_status_t osal_mem_seal(void) { return OSAL_ERROR_NOT_SUPPORTED; }
+bool osal_mem_is_sealed(void) { return false; }
 
 void osal_start(void) {
     s_osal_running = true;

@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.evidence.common import (EvidenceError, atomic_json, command, digest, fields,
                                      file_identity, identifier, load_json, regular_file,
                                      run_adapter, sha256_value, verify_file_identity)
+from scripts.ci.vendor_import_identity import reviewed_import, locked_files
 
 
 def git(root: Path, *args: str) -> str:
@@ -65,6 +66,75 @@ def source_identity(root: Path) -> dict:
             "tracked_content_sha256": content_hash.hexdigest(), "tracked_files": tracked_files,
             "dirty": bool(git(root, "status", "--porcelain", "--untracked-files=normal")),
             "gitlinks": gitlinks, "missing_files": missing_files}
+
+
+def component_source(kind: str, root: Path, repository: Path) -> dict:
+    if kind == "git":
+        return source_identity(root)
+    if kind != "vendor-source-import":
+        raise EvidenceError("unsupported component source_kind")
+    try:
+        identity = reviewed_import(root, repository)
+        lock = load_json(root / "source.lock.json")
+        licenses = sorted({entry["license"] for entry in locked_files(lock)})
+    except (ValueError, OSError, TypeError, KeyError) as error:
+        raise EvidenceError("vendor import differs from its reviewed source/lock/notices") from error
+    return {**identity, "root": str(root.absolute()), "repository_root": str(repository.resolve()),
+            "dirty": False, "licenses": licenses}
+
+
+def license_expression(value: str) -> str:
+    """Accept single identifiers or an explicit conjunction, without licensing inference."""
+    if not isinstance(value, str) or len(value) > 1024:
+        raise EvidenceError("invalid component license expression")
+    terms = value.split(" AND ")
+    for term in terms:
+        identifier(term, "license identifier")
+    if len(terms) != len(set(terms)):
+        raise EvidenceError("duplicate component license term")
+    return value
+
+
+def validate_component_origin(component: dict) -> None:
+    source = component["source"]
+    if not isinstance(source, dict):
+        raise EvidenceError("component source identity must be an object")
+    if source.get("kind", "git") != "vendor-source-import":
+        return
+    if component["version"] != source["upstream"]["version"]:
+        raise EvidenceError("vendor import component version differs from its source lock")
+    if set(component["license"].split(" AND ")) != set(source["licenses"]):
+        raise EvidenceError("vendor import license expression must include every locked source license")
+    root = Path(source["root"])
+    notice_paths = {str(root / notice["path"]) for notice in source["notices"]
+                    if notice["path"].startswith("LICENSES/")}
+    if component["license_file"]["path"] not in notice_paths:
+        raise EvidenceError("vendor import license_file must be one of its reviewed license notices")
+
+
+def sbom_component(component: dict) -> dict:
+    source = component["source"]
+    expression = component["license"]
+    licenses = ([{"expression": expression}] if " AND " in expression or expression.startswith("LicenseRef-")
+                else [{"license": {"id": expression}}])
+    properties = [{"name": "nexus:license-file:sha256", "value": component["license_file"]["sha256"]}]
+    if source.get("kind", "git") == "vendor-source-import":
+        properties.extend([{"name": "nexus:source:kind", "value": "vendor-source-import"},
+                           {"name": "nexus:source:owning-repository-commit", "value": source["source_commit"]},
+                           {"name": "nexus:source:lock:sha256", "value": source["lock_sha256"]},
+                           {"name": "nexus:source:upstream-archive:sha256", "value": source["upstream"]["download_sha256"]},
+                           {"name": "nexus:source:nested-archive:sha256", "value": source["upstream"]["nested_archive_sha256"]}])
+        properties.extend({"name": "nexus:source:notice:" + notice["path"] + ":sha256", "value": notice["sha256"]}
+                          for notice in source["notices"])
+    else:
+        properties.insert(0, {"name": "nexus:source:commit", "value": source["commit"]})
+    result = {"type": "library", "name": component["name"], "version": component["version"],
+              "bom-ref": component["name"], "licenses": licenses,
+              "hashes": [{"alg": "SHA-256", "content": component["archive"]["sha256"]}],
+              "properties": properties}
+    if source.get("kind", "git") == "vendor-source-import":
+        result["externalReferences"] = [{"type": "distribution", "url": source["upstream"]["source_url"]}]
+    return result
 
 
 def test_summary(path: Path) -> dict:
@@ -167,19 +237,21 @@ def generate(manifest_path: Path, output_path: Path, sbom_path: Path) -> dict:
     components = []
     names = set()
     for component in manifest["components"]:
-        fields(component, {"name", "version", "license", "license_file", "source_root", "archive"})
+        fields(component, {"name", "version", "license", "license_file", "source_root", "archive"}, {"source_kind"})
         name = identifier(component["name"], "component name")
         if name in names:
             raise EvidenceError("component identities must be unique")
         names.add(name)
         version = identifier(component["version"], "component version")
-        license_id = identifier(component["license"], "SPDX license identifier")
+        license_id = license_expression(component["license"])
         archive = regular_file(component["archive"])
         components.append({"name": name, "version": version, "license": license_id,
                            "license_file": file_identity(component["license_file"]),
-                           "source": source_identity(Path(component["source_root"])),
+                           "source": component_source(component.get("source_kind", "git"),
+                                                      Path(component["source_root"]), Path(source["root"])),
                            "archive": file_identity(archive),
                            "link_evidence": link_evidence(archive, link_map)})
+        validate_component_origin(components[-1])
     fields(manifest["tests"], {"junit", "source_commit", "config_sha256", "artifact_sha256"})
     test_binding = manifest["tests"]
     sha256_value(test_binding["config_sha256"])
@@ -212,12 +284,7 @@ def generate(manifest_path: Path, output_path: Path, sbom_path: Path) -> dict:
                                        "version": source["commit"], "bom-ref": "nexus-product"},
                          "properties": [{"name": "nexus:configuration:sha256", "value": configuration["effective"]["sha256"]},
                                         {"name": "nexus:source:tree", "value": source["tree"]}]},
-            "components": [{"type": "library", "name": component["name"], "version": component["version"],
-                            "bom-ref": component["name"], "licenses": [{"license": {"id": component["license"]}}],
-                            "hashes": [{"alg": "SHA-256", "content": component["archive"]["sha256"]}],
-                            "properties": [{"name": "nexus:source:commit", "value": component["source"]["commit"]},
-                                           {"name": "nexus:license-file:sha256", "value": component["license_file"]["sha256"]}]}
-                           for component in components],
+            "components": [sbom_component(component) for component in components],
             "dependencies": [{"ref": "nexus-product", "dependsOn": sorted(names)}]}
     atomic_json(sbom_path, sbom)
     inventory["sbom"] = file_identity(sbom_path)
@@ -265,14 +332,19 @@ def verify(inventory: dict) -> None:
         fields(component, {"name", "version", "license", "license_file", "source", "archive", "link_evidence"})
         identifier(component["name"], "component name")
         identifier(component["version"], "component version")
-        identifier(component["license"], "SPDX license identifier")
+        license_expression(component["license"])
         if component["name"] in names:
             raise EvidenceError("duplicate linked component identity")
         names.add(component["name"])
         verify_file_identity(component["archive"])
         verify_file_identity(component["license_file"])
-        if source_identity(Path(component["source"]["root"])) != component["source"]:
+        if not isinstance(component["source"], dict):
+            raise EvidenceError("component source identity must be an object")
+        current_component = component_source(component["source"].get("kind", "git"),
+                                             Path(component["source"]["root"]), Path(current["root"]))
+        if current_component != component["source"]:
             raise EvidenceError("linked dependency source identity changed")
+        validate_component_origin(component)
         if link_evidence(Path(component["archive"]["path"]), map_file) != component["link_evidence"]:
             raise EvidenceError("linked dependency map evidence changed")
     test_record = inventory["tests"]
@@ -300,12 +372,12 @@ def verify(inventory: dict) -> None:
     if (main_component.get("name") != inventory["product"]["id"] or
             main_component.get("version") != inventory["source"]["commit"]):
         raise EvidenceError("SBOM product/source identity differs from inventory")
-    expected_components = [{"type": "library", "name": component["name"], "version": component["version"],
-                            "bom-ref": component["name"], "licenses": [{"license": {"id": component["license"]}}],
-                            "hashes": [{"alg": "SHA-256", "content": component["archive"]["sha256"]}],
-                            "properties": [{"name": "nexus:source:commit", "value": component["source"]["commit"]},
-                                           {"name": "nexus:license-file:sha256", "value": component["license_file"]["sha256"]}]}
-                           for component in inventory["components"]]
+    expected_properties = [{"name": "nexus:configuration:sha256", "value": inventory["configuration"]["effective"]["sha256"]},
+                           {"name": "nexus:source:tree", "value": inventory["source"]["tree"]}]
+    if (sbom.get("metadata", {}).get("properties") != expected_properties or
+            sbom.get("dependencies") != [{"ref": "nexus-product", "dependsOn": sorted(names)}]):
+        raise EvidenceError("SBOM configuration/source/dependency binding differs from inventory")
+    expected_components = [sbom_component(component) for component in inventory["components"]]
     if sbom.get("components") != expected_components:
         raise EvidenceError("SBOM component hashes/licenses differ from inventory")
 

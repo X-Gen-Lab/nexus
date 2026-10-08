@@ -126,7 +126,7 @@ config OSAL_TICK_RATE_HZ
     default 1000 if OSAL_RTTHREAD
     default 100 if OSAL_ZEPHYR
     default 1000
-    range 1000 1000 if PLATFORM_NATIVE || (PLATFORM_STM32 && OSAL_FREERTOS)
+    range 1000 1000 if PLATFORM_NATIVE || ((PLATFORM_STM32 || PLATFORM_GD32F470) && OSAL_FREERTOS)
     range 100 10000
     help
       System tick rate in Hz.
@@ -167,7 +167,7 @@ config LINKER_RAM_START
     hex
     default 0x20000000 if STM32F4
     default 0x24000000 if STM32H7
-    default 0x20000000 if GD32F30X
+    default 0x20000000 if GD32F470ZG
     default 0x20000000
     help
       Starting address of RAM in memory map.
@@ -177,7 +177,7 @@ config LINKER_RAM_SIZE
     hex
     default 0x00020000 if STM32F407
     default 0x00080000 if STM32H743
-    default 0x00010000 if GD32F303
+    default 0x00030000 if GD32F470ZG
     default 0x00020000
     help
       Total RAM size in bytes.
@@ -186,7 +186,7 @@ config LINKER_RAM_SIZE
 config LINKER_FLASH_START
     hex
     default 0x08000000 if PLATFORM_STM32
-    default 0x08000000 if PLATFORM_GD32
+    default 0x08000000 if PLATFORM_GD32F470
     default 0x08000000
     help
       Starting address of Flash in memory map.
@@ -194,9 +194,9 @@ config LINKER_FLASH_START
 
 config LINKER_FLASH_SIZE
     hex
-    default 0x00100000 if STM32F407
+    default STM32_FLASH_SIZE if STM32F407
     default 0x00200000 if STM32H743
-    default 0x00040000 if GD32F303
+    default 0x00100000 if GD32F470ZG
     default 0x00100000
     help
       Total Flash size in bytes.

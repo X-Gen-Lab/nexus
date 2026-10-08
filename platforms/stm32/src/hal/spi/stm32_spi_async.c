@@ -54,7 +54,7 @@ nx_status_t spi_cancel(stm32_spi_device_t* d, uint64_t token) {
 }
 nx_status_t spi_service(nx_spi_bus_t* self) {
     if (!self) return NX_ERR_INVALID_PARAM;
-    if (__get_IPSR()) return NX_ERR_INVALID_STATE;
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     stm32_spi_impl_t* b = NX_CONTAINER_OF(self, stm32_spi_impl_t, base);
     uint32_t saved = spi_critical_enter();
     stm32_spi_device_t* oldest = NULL;

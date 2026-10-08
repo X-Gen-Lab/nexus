@@ -184,7 +184,8 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t handle, uint32_t timeout_ms) {
     global_lock();
     osal_mutex_internal_t* m = native_mutex(handle);
     if (!m) { global_unlock(); return OSAL_ERROR_INVALID_PARAM; }
-    while (m->recursion && !native_same_thread(m->owner_thread, self)) {
+    while (m->recursion && (!native_same_thread(m->owner_thread, self) ||
+                            m->owner != osal_task_get_current())) {
         osal_status_t wait = native_wait(&m->changed, &d);
         if (!m->used || m->token != handle) {
             global_unlock(); return OSAL_ERROR_CANCELLED;
@@ -207,7 +208,8 @@ osal_status_t osal_mutex_unlock(osal_mutex_handle_t handle) {
     osal_mutex_internal_t* m = native_mutex(handle);
     osal_status_t result = OSAL_ERROR_INVALID_PARAM;
     if (m && m->recursion &&
-        native_same_thread(m->owner_thread, native_current_thread())) {
+        native_same_thread(m->owner_thread, native_current_thread()) &&
+        m->owner == osal_task_get_current()) {
         if (--m->recursion == 0) {
             m->owner = NULL;
             native_notify(&m->changed);

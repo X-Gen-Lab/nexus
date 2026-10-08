@@ -70,7 +70,11 @@
  *----------------------------------------------------------*/
 
 /* Static allocation support (0 = disabled, 1 = enabled) */
-#define configSUPPORT_STATIC_ALLOCATION 0
+#define configSUPPORT_STATIC_ALLOCATION 1
+#define configKERNEL_PROVIDED_STATIC_MEMORY 1
+/* POSIX port uses host stacks; deliberately larger than MCU product budgets. */
+#define OSAL_FREERTOS_TASK_STACK_BYTES 32768u
+#define OSAL_FREERTOS_QUEUE_STORAGE_BYTES 1024u
 
 /* Dynamic allocation support (required for OSAL) */
 #define configSUPPORT_DYNAMIC_ALLOCATION 1

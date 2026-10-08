@@ -2,7 +2,7 @@
 
 Requirements: BAS-001/002/004, HAL-001/002, BSP-002, CI-001, DOC-001. Design: [platform architecture](../strategy/platform-architecture-v2.md), [HAL/OSAL contracts](../strategy/hal-osal-design.md), [official platform comparison](../strategy/platform-comparison.md), ADR 008–010.
 
-This iteration establishes build and compilation boundaries. It does not claim that the proposed typed device API, independent CPU port, UART state machine, product bootstrap, board resource model or physical HIL is implemented.
+This historical foundation checkpoint establishes build and compilation boundaries. The subsequent [platform delivery](platform-delivery.md) implements the independent CPU port, typed GPIO/UART core, static OSAL, Product bootstrap and selected board resource bindings. This checkpoint does not establish their later execution results or physical HIL.
 
 ## Source SDK consumption
 

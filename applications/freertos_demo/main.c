@@ -1,7 +1,8 @@
 /** OSAL producer/consumer example for the selected board.
  * Queue waits are bounded; the queue owns data-ready synchronization. A
  * separate semaphore gates worker startup until all tasks/resources exist. */
-#include "hal/nx_hal.h"
+#include "hal/base/nx_device.h"
+#include "product/product.h"
 #include "nexus_board.h"
 #include "nexus_config.h"
 #include "osal/osal.h"
@@ -18,9 +19,6 @@ static unsigned long run_ms;
 #error "The task demo requires the Native or FreeRTOS backend"
 #endif
 
-#if defined(NX_CONFIG_PLATFORM_STM32)
-#include "boot/stm32_boot.h"
-#endif
 
 #define TASK_COUNT 4U
 #define TASK_STACK_BYTES 1024U
@@ -41,8 +39,7 @@ static osal_queue_handle_t samples;
 static osal_mutex_handle_t statistics_lock;
 static osal_sem_handle_t start_gate;
 static osal_task_handle_t workers[TASK_COUNT];
-static nx_gpio_write_t* led;
-static nx_lifecycle_t* led_lifecycle;
+static nx_device_ref_t led;
 static statistics_t statistics;
 static atomic_bool stopping;
 
@@ -69,6 +66,14 @@ static bool await_start(void) {
     return false;
 }
 
+static bool release_start_gate(void) {
+    for (size_t i = 0; i < TASK_COUNT; ++i) {
+        osal_status_t status = osal_sem_give(start_gate);
+        if (status != OSAL_OK) { fail(status); return false; }
+    }
+    return true;
+}
+
 static bool record(uint32_t produced, uint32_t consumed, uint32_t dropped) {
     osal_status_t status = osal_mutex_lock(statistics_lock, 50U);
     if (status != OSAL_OK) {
@@ -88,6 +93,11 @@ static bool record(uint32_t produced, uint32_t consumed, uint32_t dropped) {
 
 static void produce(void* unused) {
     (void)unused;
+#if defined(NX_CONFIG_OSAL_FREERTOS)
+    /* Bootstrap created every task before starting the scheduler. Release
+     * operational semaphores from this scheduled coordinator, never main. */
+    if (!release_start_gate()) return;
+#endif
     if (!await_start()) return;
     uint32_t sequence = 0;
     while (!should_stop()) {
@@ -141,14 +151,14 @@ static void heartbeat(void* unused) {
     if (!await_start()) return;
     /* This is the sole GPIO writer after startup. */
     while (!should_stop()) {
-        led->toggle(led);
+        if (nx_device_gpio_toggle(led) != NX_OK) { fail(OSAL_ERROR); break; }
         osal_status_t status = osal_task_delay(500U);
         if (status != OSAL_OK) {
             if (status != OSAL_ERROR_CANCELLED) fail(status);
             break;
         }
     }
-    led->write(led, 0);
+    (void)nx_device_gpio_write(led, NX_BOARD_LED_INACTIVE_LEVEL);
 }
 
 static void report(void* unused) {
@@ -207,15 +217,16 @@ static int stop_and_cleanup(int result) {
                NX_BOARD_NAME, (unsigned long)statistics.produced,
                (unsigned long)statistics.consumed,
                (unsigned long)statistics.dropped);
-        if (led_lifecycle && led_lifecycle->deinit(led_lifecycle) != NX_OK)
-            result = 1;
+        if (led.descriptor && nx_device_close(led) != NX_OK) result = 1;
+        else led = (nx_device_ref_t){0};
+        if (nx_product_shutdown(NULL) != NX_OK) result = 1;
     } else {
         result = 1;
     }
 #endif
     /* A not-yet-started FreeRTOS scheduler cannot join ready tasks. Preserve
      * their resources and never start a partially configured application. */
-    if (led) led->write(led, 0);
+    if (led.descriptor) (void)nx_device_gpio_write(led, NX_BOARD_LED_INACTIVE_LEVEL);
     return result;
 }
 
@@ -232,15 +243,16 @@ int main(int argc, char** argv) {
 #else
 int main(void) {
 #endif
-#if defined(NX_CONFIG_PLATFORM_STM32)
-    if (stm32_platform_init() != 0) return 1;
-#endif
-    if (osal_init() != OSAL_OK || nx_hal_init() != NX_OK) return 1;
-    led = nx_factory_gpio_write(NX_BOARD_LED_GPIO_PORT, NX_BOARD_LED_GPIO_PIN);
-    if (!led) return 1;
-    led_lifecycle = led->get_lifecycle(led);
-    if (!led_lifecycle || led_lifecycle->init(led_lifecycle) != NX_OK) return 1;
-    led->write(led, 0);
+    if (nx_product_boot(NULL) != NX_OK) return 1;
+    char name[16];
+    int written = snprintf(name, sizeof(name), "GPIO%c%u", NX_BOARD_LED_GPIO_PORT,
+                            (unsigned)NX_BOARD_LED_GPIO_PIN);
+    if (written < 0 || (size_t)written >= sizeof(name) ||
+        nx_device_open(name, NX_DEVICE_CLASS_GPIO, (uintptr_t)&led, &led) != NX_OK) {
+        (void)nx_product_shutdown(NULL);
+        return 1;
+    }
+    if (nx_device_gpio_write(led, NX_BOARD_LED_INACTIVE_LEVEL) != NX_OK) return stop_and_cleanup(1);
     if (osal_queue_create(sizeof(sample_t), QUEUE_CAPACITY, &samples) != OSAL_OK ||
         osal_mutex_create(&statistics_lock) != OSAL_OK ||
         osal_sem_create_counting(TASK_COUNT, 0, &start_gate) != OSAL_OK)
@@ -259,9 +271,8 @@ int main(void) {
     for (size_t i = 0; i < TASK_COUNT; ++i)
         if (osal_task_create(&tasks[i], &workers[i]) != OSAL_OK)
             return stop_and_cleanup(1);
-    for (size_t i = 0; i < TASK_COUNT; ++i)
-        if (osal_sem_give(start_gate) != OSAL_OK) return stop_and_cleanup(1);
 #if defined(NX_CONFIG_PLATFORM_NATIVE)
+    if (!release_start_gate()) return stop_and_cleanup(1);
     if (run_ms) {
         osal_status_t status = osal_task_delay((uint32_t)run_ms);
         int result = status == OSAL_OK && !atomic_load(&stopping) ? 0 : 1;

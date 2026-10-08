@@ -2,6 +2,11 @@
 
 欢迎查阅 Nexus OSAL (Operating System Abstraction Layer) 的完整文档。
 
+当前已实现的后端能力、静态资源预算、关闭与 heap seal 契约以
+[STATIC_RESOURCES.md](STATIC_RESOURCES.md) 和公共头为准。Native、裸机及
+FreeRTOS 三个后端有实际实现；其余后端仍被构建拒绝。下方历史设计中的
+后端扩展或实时性能描述不代表这些组合已经实现或通过实板验收。
+
 ## 文档结构
 
 ### 📖 入门文档

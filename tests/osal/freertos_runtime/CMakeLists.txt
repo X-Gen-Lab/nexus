@@ -15,12 +15,30 @@ target_link_libraries(freertos_contract_kernel PUBLIC Threads::Threads)
 add_library(freertos_contract_adapter STATIC "${NEXUS_SOURCE_DIR}/osal/adapters/freertos/osal_freertos.c")
 target_include_directories(freertos_contract_adapter PUBLIC "${NEXUS_SOURCE_DIR}/osal/include")
 target_link_libraries(freertos_contract_adapter PUBLIC freertos_contract_kernel nexus_build_options)
+target_link_libraries(freertos_contract_adapter PRIVATE nexus_arch)
 target_compile_options(freertos_contract_adapter PRIVATE -Werror -UNDEBUG)
 add_executable(freertos_contract_tests test_freertos_contracts.c)
-target_link_libraries(freertos_contract_tests PRIVATE freertos_contract_adapter)
+target_link_libraries(freertos_contract_tests PRIVATE freertos_contract_adapter nexus_arch_interface)
 target_compile_options(freertos_contract_tests PRIVATE -Werror -UNDEBUG)
 add_test(NAME freertos_contract_tests COMMAND freertos_contract_tests)
 set_tests_properties(freertos_contract_tests PROPERTIES TIMEOUT 60 LABELS "osal;freertos;kernel;contract")
+
+add_executable(freertos_task_mutex_quarantine_tests ../test_task_mutex_quarantine.c)
+target_link_libraries(freertos_task_mutex_quarantine_tests PRIVATE freertos_contract_adapter)
+target_compile_definitions(freertos_task_mutex_quarantine_tests PRIVATE OSAL_TEST_FREERTOS=1)
+target_compile_options(freertos_task_mutex_quarantine_tests PRIVATE -UNDEBUG -Werror)
+add_test(NAME freertos_task_mutex_quarantine_tests COMMAND freertos_task_mutex_quarantine_tests)
+set_tests_properties(freertos_task_mutex_quarantine_tests PROPERTIES TIMEOUT 15 LABELS "osal;freertos;kernel;contract;fault")
+
+add_executable(freertos_boot_kernel_mask_tests test_boot_kernel_mask.c)
+target_link_libraries(freertos_boot_kernel_mask_tests PRIVATE freertos_contract_adapter nexus_arch_interface)
+target_compile_options(freertos_boot_kernel_mask_tests PRIVATE -UNDEBUG -Werror)
+target_link_options(freertos_boot_kernel_mask_tests PRIVATE
+    -Wl,--wrap=vPortEnterCritical -Wl,--wrap=vPortExitCritical
+    -Wl,--wrap=xPortSetInterruptMask -Wl,--wrap=vPortClearInterruptMask
+    -Wl,--wrap=nx_arch_in_isr -Wl,--wrap=xTaskGetTickCountFromISR)
+add_test(NAME freertos_boot_kernel_mask_tests COMMAND freertos_boot_kernel_mask_tests)
+set_tests_properties(freertos_boot_kernel_mask_tests PROPERTIES TIMEOUT 15 LABELS "osal;freertos;kernel;contract;mask-model")
 
 # Keep the local pthread cancellation repair under an executable contract.
 add_executable(posix_event_contract_tests test_posix_event.c wait_for_event.c)

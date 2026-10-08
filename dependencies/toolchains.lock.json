@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "arm_gnu": {
+    "version": "14.3.rel1",
+    "host": "x86_64-linux",
+    "target": "arm-none-eabi",
+    "url": "https://gitlab.arm.com/api/v4/projects/tooling%2Fgnu-toolchains-for-arm/packages/generic/gnu-toolchain/14.3.rel1/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi.tar.xz",
+    "sha256": "8f6903f8ceb084d9227b9ef991490413014d991874a1e34074443c2a72b14dbd",
+    "archive_root": "arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi"
+  }
+}

@@ -299,6 +299,127 @@
                 "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_services_demo_defconfig",
                 "NEXUS_BUILD_TESTS": "OFF"
             }
+        },
+        {
+            "name": "gd32f470-armgcc-baremetal-debug",
+            "displayName": "GD32F470ZG baremetal ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_PLATFORM": "gd32f470",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_baremetal_defconfig"
+            }
+        },
+        {
+            "name": "gd32f470-armgcc-baremetal-release",
+            "displayName": "GD32F470ZG baremetal ARM GCC Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_PLATFORM": "gd32f470",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_baremetal_defconfig"
+            }
+        },
+        {
+            "name": "gd32f470-armgcc-freertos-debug",
+            "displayName": "GD32F470ZG freertos ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_PLATFORM": "gd32f470",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_freertos_defconfig"
+            }
+        },
+        {
+            "name": "gd32f470-armgcc-freertos-release",
+            "displayName": "GD32F470ZG freertos ARM GCC Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_PLATFORM": "gd32f470",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_freertos_defconfig"
+            }
+        },
+        {
+            "name": "native-minimal-debug",
+            "displayName": "Native minimal product without optional services",
+            "inherits": "linux-gcc-debug",
+            "cacheVariables": {
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_minimal_defconfig",
+                "NEXUS_BUILD_TESTS": "OFF"
+            }
+        },
+        {
+            "name": "stm32-qiming-armgcc-baremetal-debug",
+            "displayName": "STM32F407 qiming baremetal ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_baremetal_defconfig"
+            }
+        },
+        {
+            "name": "stm32-qiming-armgcc-baremetal-release",
+            "displayName": "STM32F407 qiming baremetal ARM GCC Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_baremetal_defconfig"
+            }
+        },
+        {
+            "name": "stm32-qiming-armgcc-freertos-debug",
+            "displayName": "STM32F407 qiming freertos ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_freertos_defconfig"
+            }
+        },
+        {
+            "name": "stm32-qiming-armgcc-freertos-release",
+            "displayName": "STM32F407 qiming freertos ARM GCC Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_freertos_defconfig"
+            }
+        },
+        {
+            "name": "stm32-sky-armgcc-baremetal-debug",
+            "displayName": "STM32F407 sky baremetal ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_baremetal_defconfig"
+            }
+        },
+        {
+            "name": "stm32-sky-armgcc-baremetal-release",
+            "displayName": "STM32F407 sky baremetal ARM GCC Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_baremetal_defconfig"
+            }
+        },
+        {
+            "name": "stm32-sky-armgcc-freertos-debug",
+            "displayName": "STM32F407 sky freertos ARM GCC Debug",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_freertos_defconfig"
+            }
+        },
+        {
+            "name": "stm32-sky-armgcc-freertos-release",
+            "displayName": "STM32F407 sky freertos ARM GCC Release",
+            "inherits": "stm32-armgcc-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_freertos_defconfig"
+            }
         }
     ],
     "buildPresets": [
@@ -399,6 +520,58 @@
         {
             "name": "native-services-debug",
             "configurePreset": "native-services-debug"
+        },
+        {
+            "name": "gd32f470-armgcc-baremetal-debug",
+            "configurePreset": "gd32f470-armgcc-baremetal-debug"
+        },
+        {
+            "name": "gd32f470-armgcc-baremetal-release",
+            "configurePreset": "gd32f470-armgcc-baremetal-release"
+        },
+        {
+            "name": "gd32f470-armgcc-freertos-debug",
+            "configurePreset": "gd32f470-armgcc-freertos-debug"
+        },
+        {
+            "name": "gd32f470-armgcc-freertos-release",
+            "configurePreset": "gd32f470-armgcc-freertos-release"
+        },
+        {
+            "name": "native-minimal-debug",
+            "configurePreset": "native-minimal-debug"
+        },
+        {
+            "name": "stm32-qiming-armgcc-baremetal-debug",
+            "configurePreset": "stm32-qiming-armgcc-baremetal-debug"
+        },
+        {
+            "name": "stm32-qiming-armgcc-baremetal-release",
+            "configurePreset": "stm32-qiming-armgcc-baremetal-release"
+        },
+        {
+            "name": "stm32-qiming-armgcc-freertos-debug",
+            "configurePreset": "stm32-qiming-armgcc-freertos-debug"
+        },
+        {
+            "name": "stm32-qiming-armgcc-freertos-release",
+            "configurePreset": "stm32-qiming-armgcc-freertos-release"
+        },
+        {
+            "name": "stm32-sky-armgcc-baremetal-debug",
+            "configurePreset": "stm32-sky-armgcc-baremetal-debug"
+        },
+        {
+            "name": "stm32-sky-armgcc-baremetal-release",
+            "configurePreset": "stm32-sky-armgcc-baremetal-release"
+        },
+        {
+            "name": "stm32-sky-armgcc-freertos-debug",
+            "configurePreset": "stm32-sky-armgcc-freertos-debug"
+        },
+        {
+            "name": "stm32-sky-armgcc-freertos-release",
+            "configurePreset": "stm32-sky-armgcc-freertos-release"
         }
     ],
     "testPresets": [
