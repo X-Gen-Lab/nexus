@@ -34,8 +34,32 @@ CI 增加启明、天空星和梁山派的裸机/FreeRTOS ARM 构建；所有组
 
 ## 验证范围与产品验收
 
-定向证据包括生产 STM32/GD32 驱动的 vendor fakes、真实 pinned FreeRTOS kernel、Native 并发与引用寿命、Product 失败回滚、外部源码 SDK 消费、配置冲突和依赖篡改。最终干净提交的全量 CTest、八份 ARM Release（含实际向量、强IRQ、编译 sizeof ABI、分区与损坏镜像拒绝）和线上门禁另行绑定提交、配置及产物身份；定向或 dirty-tree 构建不冒充该最终记录。
+定向证据包括生产 STM32/GD32 驱动的 vendor fakes、真实 pinned FreeRTOS kernel、Native 并发与引用寿命、Product 失败回滚、外部源码 SDK 消费、配置冲突和依赖篡改。最终干净提交的全量 CTest、八份 ARM Release（含实际向量、强IRQ、编译 sizeof ABI、分区与损坏镜像拒绝）和线上门禁已绑定到下述机器记录；定向或 dirty-tree 构建不冒充该最终记录。
 
 本环境未连接三块实板。HSE/PLL 波形、电源/安全电平、真实 IRQ/TC/DMA、Flash 断电、控制 jitter、栈峰值、RS485 接线和长期运行尚无物理报告。Native UART 新 ticket 能力未实现时明确不支持；MCU 全平台 shutdown、crypto/熵源、受保护 bootloader/vault、安全计数器和完整自动 pin/DMA 拓扑校验没有被声明为完成。CAN/Ethernet 是按产品需求实施的后续能力。软件平台候选与企业支持/LTS 的准入分别记录在支持矩阵和企业工作流。
 
 岗位按用户确认的10人配置：技术负责人1、内核/HAL/OSAL2、STM32/GD32 BSP2、工业应用通信2、QA/HIL2、构建发布1。真实成员账号、实验室和产品预算尚未登记，岗位元数据不等于远程分支保护或实板验收已经生效。
+
+## 干净源码交付验证
+
+软件实现提交为 `3129550d12fcf67a7da52dcb2713ee634bae5415`，tree 为 `ff04e505e860d579e5891879d33f39d3e4829001`。本地 Native 与八个 ARM 配置使用全新构建目录，开始和结束均为该干净源码。完整身份、配置、ELF/map、JUnit 和执行日志摘要保存在 [机器记录](platform-validation.json)；本节之后的文档提交不是另一次本地固件构建。
+
+- Native GCC Release 实际执行 1781 个 CTest，零失败、错误和跳过，用时45.03秒。JUnit 的名称多重集合与完整 CTest 注册列表一致，53个实际执行测试程序的摘要单独记录；测试程序不被标为产品应用。
+- 8个 ARM Release 配置产出15个真实ELF；每个均检查官方 vector/SP/Reset、强IRQ、编译期设备descriptor ABI、只读注册段、Flash/RAM/storage fences及无RWX。56项checker执行完成，60条针对真实ELF的损坏路径被拒绝。
+- 真实九配置的bundle与production compile database验证通过；SDK头保持实现目标私有。156项CI工具、35项Kconfig和78项企业工具回归全部通过，均零跳过；其中实际ELF和实际Native发布数据库测试已执行。
+- [CI 37818767223](https://github.com/X-Gen-Lab/nexus/actions/runs/37818767223)、[Security 37818766787](https://github.com/X-Gen-Lab/nexus/actions/runs/37818766787) 和 [Enterprise 37818766764](https://github.com/X-Gen-Lab/nexus/actions/runs/37818766764) 全部成功。CI包含Native GCC Debug/Release、Clang Release、8 ARM、coverage及87项选定ASan/UBSan/LeakSanitizer契约；clang-tidy/cppcheck各分析170个自有TU。PR的Pages部署为合法跳过。
+
+线上CI检验的是PR merge提交 `2ff199fe7b3afd90536ca0d857838a6b2393bfba`；本地记录对应上述分支提交，不将两者的binary摘要混同。source/config SHA由真实编译命令与外部产物证据绑定，当前ELF不保证内嵌这些SHA。安全workflow成功不等于零CodeQL alerts或工业安全认证。
+
+三块首发板的 `blinky.elf` 静态占用如下，均包含链接器保留项，不是运行时栈峰值或工业控制预算。
+
+| 板卡 | 后端 | Flash加载字节 | 主RAM保留字节 |
+|---|---|---:|---:|
+| 启明F407ZG | 裸机 | 26184 | 13024 |
+| 启明F407ZG | FreeRTOS | 36288 | 41680 |
+| 天空星F407VE | 裸机 | 26144 | 13024 |
+| 天空星F407VE | FreeRTOS | 36208 | 41680 |
+| 梁山派F470ZG | 裸机 | 17924 | 8440 |
+| 梁山派F470ZG | FreeRTOS | 27972 | 28904 |
+
+Discovery宽配置的FreeRTOS `config_demo.elf` 主RAM保留124176/131072字节，仅剩6896字节；它是功能演示，不能作为工业产品资源预算。没有创建tag、正式Release或合并main，也未执行匹配tag的完整候选ZIP组装；已实际执行其配置、依赖与ELF准入校验。

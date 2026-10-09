@@ -36,6 +36,8 @@ Nexus 的首期定位是工业控制与设备联网 MCU 平台，面向约 10 �
 
 本轮独立 Arch、类型化 GPIO/UART、六类静态 FreeRTOS 对象、Product 启动/回滚和源码 SDK 消费已落地。SPI/UART Board 通过窄资源端口连接，SDK 留在实现目标内部，服务真正按配置启用。启动前 BASEPRI 遗留、TCB 与 mutex 身份复用、GPIO 假成功、UART 索引与缓冲取消等问题有生产路径回归。最终完整测试和线上门禁以新提交的实际记录为准。
 
+当前软件验证提交 `3129550d12fc` 的干净Native Release全量1781项通过；八个ARM Release配置产出15 ELF，56项checker及60条实际损坏拒绝路径通过。线上CI、Security、Enterprise全部成功，真实clang-tidy/cppcheck各170个自有TU，选定sanitizer87项通过。source/config/toolchain/artifact与完整JUnit枚举绑定在[机器记录](../implementation/platform-validation.json)，物理HIL仍未执行；后续文档提交的线上记录在PR中单独引用。
+
 首发硬件由用户确认：STM32F407ZGT6 启明欣欣高配 V3.1、STM32F407VET6 天空星青春版、GD32F470ZGT6 梁山派；原 F303 目标被 F470 替换。保留 F407VG Discovery 参考。8个裸机/FreeRTOS ARM Release 配置使用固定 ARM GNU 14.3.rel1；GD32 官方3.3.3 SDK有下载、archive和逐文件身份检查。STM32根据实际密度选择sector10/11或6/7；GD32采用F470专属4KiB页擦除。官方 startup 的真实向量/SP/Reset/强IRQ和内存段均作为静态工件验证条件。
 
 没有连接实板。PCB revision、供电、电气时序、IRQ/DMA/TC、Flash断电和最坏负载预算仍需独立 HIL。RS485服务仍需要产品transceiver/DE/RE连接与测量。CAN/CANopen、Ethernet/MQTT 是 COM-002/003 的产品选项；完整自动资源拓扑校验、MCU全平台shutdown和完整installed binary SDK也没有被声明为完成。

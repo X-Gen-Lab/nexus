@@ -25,8 +25,8 @@ profiles:
   status: experimental
   evidence:
     current_implementation: Arch typed-device Product runtime and opt-in services implemented
-    current_final_integration: pending_clean_commit_validation
-    record: docs/implementation/platform-delivery.md
+    current_final_integration: clean_3129550_Native_1781_passed_and_online_CI_success
+    record: docs/implementation/platform-validation.json
     historical_checkpoint:
       source_implementation: maintained
       configure_build_link: executed
@@ -122,7 +122,7 @@ profiles:
     source_implementation: maintained
     production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
     software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: pending_clean_commit_validation
+    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
     hardware: not_executed
     record: docs/implementation/stm32-runtime.md
   limits:
@@ -162,7 +162,7 @@ profiles:
     source_implementation: maintained
     production_ports: boot_clock_gpio_uart_flash_uid_monotonic_time
     software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: pending_clean_commit_validation
+    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
     hardware: not_executed
     record: docs/implementation/stm32-runtime.md
   limits:
@@ -203,7 +203,7 @@ profiles:
     source_implementation: maintained
     production_ports: boot_clock_gpio_uart_flash_uid_monotonic_time
     software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: pending_clean_commit_validation
+    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
     hardware: not_executed
     record: docs/implementation/stm32-runtime.md
   limits:
@@ -244,7 +244,7 @@ profiles:
     source_implementation: maintained
     production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
     software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: pending_clean_commit_validation
+    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
     hardware: not_executed
     record: platforms/gd32f470/README.md
   limits:

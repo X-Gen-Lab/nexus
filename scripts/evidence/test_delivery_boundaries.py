@@ -62,6 +62,11 @@ class TraceabilityTests(unittest.TestCase):
         repository = Path(__file__).resolve().parents[2]
         self.roles = json.loads((repository / ".github/maintainer-roles.json").read_text())
         self.requirements = json.loads((repository / "docs/requirements/industrial-reference.json").read_text())
+        # Start each policy model without acceptance evidence. Repository
+        # requirements may advance independently after real validation.
+        for requirement in self.requirements["requirements"]:
+            requirement["status"] = "planned"
+            requirement["evidence"] = []
         self.backlog = self.root / "backlog.csv"
         shutil.copyfile(repository / "docs/strategy/backlog.csv", self.backlog)
         self.roles_file = self.root / "roles.json"
