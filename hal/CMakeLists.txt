@@ -41,3 +41,6 @@ add_library(Nexus::HALRuntime ALIAS hal_runtime)
 add_library(hal_runtime_osal STATIC src/nx_deadline_osal.c)
 target_link_libraries(hal_runtime_osal PUBLIC hal_runtime PRIVATE osal)
 add_library(Nexus::HALRuntimeOSAL ALIAS hal_runtime_osal)
+
+# Explicit caller-owned terminal dispatch, with no default OSAL dependency.
+add_subdirectory(runtime)
