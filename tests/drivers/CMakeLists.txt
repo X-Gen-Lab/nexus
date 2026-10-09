@@ -138,7 +138,8 @@ add_executable(test_driver_stm32_isr_manager test_stm32_isr_manager.c
     "${NEXUS_DRIVER_ROOT}/soc/stm32f407/interrupt/stm32_isr_manager.c")
 target_include_directories(test_driver_stm32_isr_manager PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake/interrupt" "${CMAKE_CURRENT_SOURCE_DIR}/fake"
-    "${NEXUS_DRIVER_ROOT}/hal/include" "${NEXUS_DRIVER_ROOT}/soc/stm32f407/private")
+    "${NEXUS_DRIVER_ROOT}/hal/include" "${NEXUS_DRIVER_ROOT}/arch/include"
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/private")
 target_include_directories(test_driver_stm32_isr_manager SYSTEM PRIVATE
     "${NEXUS_DRIVER_ROOT}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_DRIVER_ROOT}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
