@@ -4,6 +4,8 @@ Nexus 仓库负责可复用的 MCU 平台：Arch、SoC/controller、Board、HAL�
 
 用户授权移除不良设计与破坏性重构，已将 GD32 首发改为 GD32F470ZGT6 梁山派。首发还包括 STM32F407ZGT6 启明欣欣 V3.1、STM32F407VET6 天空星青春版，保留 Discovery 参考。约 10 人团队、3–6 个月是投入与阶段规划；具体成员账号和支持责任尚须落实。
 
+[下一代设计](../design/README.md) 从第一性原理重新定义架构、工程与接入，状态为 PROPOSED。它采用编译期静态装配、固定 typed 端口和 caller-owned 请求，不将现有 API、Kconfig、factory、OSAL 或工作流视为必须保留的约束。配套工程手册、接入契约与 33 项执行清单均是待实施设计；本节以下继续描述当前实现和资格范围。
+
 ## 阅读顺序
 
 | 文档 | 作用 |

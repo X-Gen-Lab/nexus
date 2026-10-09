@@ -120,6 +120,16 @@ HAL 与 Runtime 显式 OFFLINE/PARTIAL/READY，失败 init 真实 cleanup 后保
 
 Runtime 先释放 OSAL 后 HAL，仅在 HAL 仍 READY 时尝试 OSALrestore，防止恢复到已停止 clock 的 PARTIAL平台。idle baremetal或FreeRTOS调度前MCU有真实时钟/IRQ/timebase/vendorcleanup与reinit；运行或suspendedkernel仍BUSY。直接SDK资源及产品safe-output由外部caller先停稳。ST peripheralbankreset会改变外设状态，重建窄Board初值不等于执行器电平连续性保证。Nexus不提供全kernel/产品热重启。
 
+## ADR 015 第一性原理下一代设计
+
+状态：PROPOSED，待实施和资格验证；不覆盖 ADR 001–014 的当前实现状态。
+
+用户要求从性能、空间、工程管理、自动化、代码规范、设备接入与扩展重新设计，并明确现有设计不构成约束。[下一代架构蓝图](../design/next-generation-platform.md) 定义默认编译期静态资源规划、固定 typed 端口、普通 C 静态绑定、caller-owned 请求和真实执行状态。默认不设置通用运行时设备注册中心、逐 GPIO owner/ref/generation、强制统一 OSAL、隐藏 worker 或多处重复事务状态；动态撤销/复用等能力需要独立明确合同。
+
+首版配置采用 SoC、Board、外部 assembly 三类输入到单一 resolved 结果，CMake 保持源码与依赖权威；Kconfig 不作为必须保留的前提。编译期资源检查不能证明任意 C 调用遵守 owner，也不能替代实板资格。异步 buffer 借用、取消/timeout 与 settlement 分离、IRQ/DMA drain 和失败保留责任属于必需合同。
+
+配套 [工程手册](../design/engineering-handbook.md)、[接入契约](../design/integration-contracts.md) 和 [33 项执行清单](../design/next-generation-execution.csv) 均待实施。先用垂直切片验证，再同步迁移实现、测试、文档与外部 examples；当前代码、支持矩阵、历史验证和发布资格不会因新增提案而改变。
+
 ## 继续演进的前置条件
 
 用户当前选择先软件和 HIL 工装。新增 MCU/复杂拓扑、cache/MPU、完整热重启、非零 imageoffset/bootloader、安全 vault/entropy、控制 worst-load 和企业 LTS 都需要独立实现与证据。实板预算、PCBrevision、RS485 收发器、掉电工装、产品信任/制造和成员主备由外部产品与团队定义，不以计划、接口或 null 预算冒充能力。
