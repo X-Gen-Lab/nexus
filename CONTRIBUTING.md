@@ -37,6 +37,81 @@ cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure
 ```
 
+### Install Commit Checks
+
+Use Python 3.10 or newer. From the repository root, install the locked tools and
+the `pre-commit` and `commit-msg` hooks:
+
+```bash
+python scripts/setup/install_dev_tools.py
+
+# Linux, macOS or WSL: activate for each development shell
+source .venv/bin/activate
+```
+
+On Windows PowerShell, activate with:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+For Windows Command Prompt, use `.venv\Scripts\activate.bat`. The installer
+creates or reuses the repository `.venv`; matching installed versions skip pip.
+[development-tools.txt](dependencies/development-tools.txt) is the version
+authority and currently pins **pre-commit 4.3.0** and **clang-format 14.0.6**.
+Missing tools or failed version checks fail setup. Existing user hooks use
+pre-commit's default migration; an explicit `core.hooksPath` is rejected rather
+than changed.
+
+Hooks are local Git metadata, so **run the installer for every new clone**.
+`--skip-hooks` installs/verifies tools without hooks for CI; it does not enable
+checks for local commits.
+
+### Run Commit Checks Manually
+
+In an activated shell, run the same style hook used by CI:
+
+```bash
+# Selected indexed paths; check their working-tree contents
+python -m pre_commit run nexus-style --files hal/src/nx_device.c
+
+# All indexed paths; check their working-tree contents
+python -m pre_commit run nexus-style --all-files --show-diff-on-failure
+```
+
+During `git commit`, pre-commit isolates the staged snapshot and restores
+unstaged changes afterward. Manual `--files` and `--all-files` runs check the
+working tree, so they do not prove that a partially staged version passes.
+The checks report failures without formatting source or running `git add`.
+Review and fix the reported files, then stage the intended changes yourself.
+The `commit-msg` hook checks the Conventional Commit header.
+
+The style hook uses the root `.clang-format`, the owned source selection in
+`.clang-format-dirs`, mechanical comment rules, and changed-text checks. The
+initial audit covered **596 owned C/C++ files**, with frozen debt in **337 format
+files** and **291 comment files**; those subsets overlap. A legacy exemption
+requires the exact frozen bytes and the selected trusted base to remain
+unchanged. New or modified files are checked strictly. Do not add debt, increase
+counts, refresh hashes, or rebase the sealed identity to make a check pass.
+Mechanical comment checks do not establish API contract correctness.
+
+For a strict formatter-only check, including legacy formatting failures:
+
+```bash
+python scripts/tools/format.py --check --all
+python scripts/tools/format.py --check --files hal/src/nx_device.c
+python scripts/tools/format.py --help
+```
+
+`--all` selects owned Git-index paths and reads their working-tree contents;
+`--files` selects explicit owned paths and respects the same exclusions. Neither
+check applies the legacy baseline. To apply formatting deliberately, omit
+`--check`, then review the diff; formatting does not stage files.
+
+Commit checks do not run a full firmware build. CI retains separate compilation,
+static analysis and test jobs. See [Required quality gates](docs/implementation/quality-gates.md)
+for the exact scope and baseline policy.
+
 ### IDE Setup
 
 **VS Code** (recommended):
@@ -68,7 +143,7 @@ ctest --test-dir build -C Debug --output-on-failure
 2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Make your changes
 4. Ensure tests pass: `ctest --test-dir build -C Debug`
-5. Follow code style guidelines
+5. Follow code style guidelines and run the commit style checks
 6. Commit with conventional commits: `feat(hal): add PWM support`
 7. Push and create a Pull Request
 
@@ -131,7 +206,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 [optional footer]
 ```
 
-Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
 ## Testing
 
@@ -434,6 +509,7 @@ Before submitting a PR, verify:
 - [ ] Test code follows Nexus coding standards
 - [ ] Test documentation is clear and complete
 - [ ] No test warnings or errors
+- [ ] Commit hooks are installed and the manual style check passes
 
 ## Documentation
 
@@ -465,8 +541,14 @@ All PRs trigger GitHub Actions workflows:
 
 | Workflow | Description |
 |----------|-------------|
-| `build.yml` | Multi-platform build (Windows, Linux, macOS) + ARM cross-compilation |
-| `test.yml` | Unit tests, coverage, sanitizers, MISRA checks |
+| `ci.yml` / `build-matrix.yml` | Change-selected platform compilation and tests |
+| `quality-checks.yml` | Same commit style hook, plus required clang-tidy and cppcheck analysis |
+
+CI installs the same locked development tools with
+`python scripts/setup/install_dev_tools.py --skip-hooks` and runs
+`python -m pre_commit run nexus-style --all-files` on its clean checkout, with a
+full owned-source check and the event's trusted base revision. A style pass is
+separate from compilation, static analysis, tests and hardware qualification.
 
 ### Local CI Verification
 
@@ -480,8 +562,8 @@ cmake --build build --config Release
 # 2. Tests pass
 ctest --test-dir build -C Release --output-on-failure
 
-# 3. Code format check
-clang-format --dry-run --Werror hal/**/*.c hal/**/*.h
+# 3. Same style hook as CI (includes the frozen legacy policy)
+python -m pre_commit run nexus-style --all-files --show-diff-on-failure
 
 # 4. Documentation builds
 doxygen Doxyfile

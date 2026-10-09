@@ -39,6 +39,72 @@ cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure
 ```
 
+### 安装提交检查
+
+使用 Python 3.10 或更新版本。在仓库根目录安装固定工具及 `pre-commit`、
+`commit-msg` 两个 hook：
+
+```bash
+python scripts/setup/install_dev_tools.py
+
+# Linux、macOS 或 WSL：每个开发终端激活一次
+source .venv/bin/activate
+```
+
+Windows PowerShell 的激活命令为：
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Windows Command Prompt 使用 `.venv\Scripts\activate.bat`。安装器创建或复用仓库
+`.venv`，已安装匹配版本时跳过 pip。
+[development-tools.txt](dependencies/development-tools.txt) 是版本权威，当前固定
+**pre-commit 4.3.0** 和 **clang-format 14.0.6**。缺少工具或版本检查失败时安装返回
+非零。已有用户 hook 使用 pre-commit 默认迁移方式保留；显式设置了
+`core.hooksPath` 时拒绝安装，不改写该配置。
+
+hook 是本地 Git 元数据，**每次新 clone 都须运行安装器**。`--skip-hooks` 用于 CI，
+只安装、验证工具，不为本地提交启用检查。
+
+### 手动运行提交检查
+
+在已激活的终端运行与 CI 相同的风格 hook：
+
+```bash
+# 指定已在 index 中的路径，检查其 working-tree 内容
+python -m pre_commit run nexus-style --files hal/src/nx_device.c
+
+# index 中的全部路径，检查其 working-tree 内容
+python -m pre_commit run nexus-style --all-files --show-diff-on-failure
+```
+
+执行 `git commit` 时，pre-commit 隔离暂存快照，结束后恢复未暂存修改。手动
+`--files`、`--all-files` 检查 working tree，不能据此证明部分暂存的版本也通过。
+检查失败只报告问题，不自动格式化源码或执行 `git add`；修复后由贡献者审阅并暂存
+需要的修改。`commit-msg` hook 检查约定式提交的首行。
+
+风格 hook 使用根目录 `.clang-format`、`.clang-format-dirs` 定义的自有源码范围、
+机械注释规则及修改文本检查。初始审计覆盖 **596 个自有 C/C++ 文件**，冻结了
+**337 个格式欠账文件**和 **291 个注释欠账文件**，两组可以重叠。仅与冻结字节和
+所选可信 base 均保持不变的历史文件可豁免；新增或修改的文件严格检查。禁止新增欠账、
+提高计数、刷新 hash 或重定基线身份来绕过失败。机械注释检查不证明 API 合同语义正确。
+
+单独运行严格格式检查，包含历史格式欠账：
+
+```bash
+python scripts/tools/format.py --check --all
+python scripts/tools/format.py --check --files hal/src/nx_device.c
+python scripts/tools/format.py --help
+```
+
+`--all` 按 Git index 选择自有源码路径，再读取 working-tree 内容；`--files` 选择
+显式自有路径，仍遵守相同排除规则。两种格式检查均不应用历史基线。需要明确执行格式化
+时去掉 `--check`，完成后审阅 diff；格式化不会自动暂存。
+
+提交 hook 不运行完整固件构建。CI 保留独立的编译、静态分析和测试任务。完整范围与
+基线策略见 [必需质量门禁](docs/implementation/quality-gates.md)。
+
 ### IDE 设置
 
 **VS Code**（推荐）:
@@ -70,7 +136,7 @@ ctest --test-dir build -C Debug --output-on-failure
 2. 创建功能分支: `git checkout -b feature/my-feature`
 3. 进行修改
 4. 确保测试通过: `ctest --test-dir build -C Debug`
-5. 遵循代码风格指南
+5. 遵循代码风格指南并运行提交风格检查
 6. 使用约定式提交: `feat(hal): add PWM support`
 7. 推送并创建 Pull Request
 
@@ -133,7 +199,7 @@ hal_status_t hal_gpio_init(hal_gpio_port_t port, uint8_t pin,
 [可选的脚注]
 ```
 
-类型: `feat`（新功能）、`fix`（修复）、`docs`（文档）、`style`（格式）、`refactor`（重构）、`perf`（性能）、`test`（测试）、`build`（构建）、`ci`（CI）、`chore`（杂项）
+类型: `feat`（新功能）、`fix`（修复）、`docs`（文档）、`style`（格式）、`refactor`（重构）、`perf`（性能）、`test`（测试）、`build`（构建）、`ci`（CI）、`chore`（杂项）、`revert`（回退）
 
 ## 测试
 
@@ -435,6 +501,7 @@ native_uart_get_state(0, &state);
 - [ ] 测试代码遵循 Nexus 编码标准
 - [ ] 测试文档清晰完整
 - [ ] 没有测试警告或错误
+- [ ] 已安装提交 hook，手动风格检查通过
 
 ## 文档
 
@@ -466,8 +533,13 @@ python -m sphinx -b html . _build/html/cn -D master_doc=index_cn -D language=zh_
 
 | 工作流 | 说明 |
 |--------|------|
-| `build.yml` | 多平台构建（Windows、Linux、macOS）+ ARM 交叉编译 |
-| `test.yml` | 单元测试、覆盖率、消毒器、MISRA 检查 |
+| `ci.yml` / `build-matrix.yml` | 按变更范围选择的平台编译和测试 |
+| `quality-checks.yml` | 相同提交风格 hook，以及必需 clang-tidy、cppcheck 分析 |
+
+CI 用 `python scripts/setup/install_dev_tools.py --skip-hooks` 安装同一份锁定工具，
+在干净 checkout 上运行 `python -m pre_commit run nexus-style --all-files`，启用
+全部自有源码检查并选取事件对应的可信 base。风格检查通过与编译、静态分析、测试及
+硬件资格分别记录。
 
 ### 本地 CI 验证
 
@@ -481,8 +553,8 @@ cmake --build build --config Release
 # 2. 测试通过
 ctest --test-dir build -C Release --output-on-failure
 
-# 3. 代码格式检查
-clang-format --dry-run --Werror hal/**/*.c hal/**/*.h
+# 3. 与 CI 相同的风格 hook（包含冻结历史基线策略）
+python -m pre_commit run nexus-style --all-files --show-diff-on-failure
 
 # 4. 文档构建
 doxygen Doxyfile

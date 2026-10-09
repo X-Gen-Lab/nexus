@@ -15,6 +15,20 @@ Nexus owns the common industrial embedded platform. Read `docs/strategy/README.m
 
 ## Validation and review
 
+Install the pinned local commit tools and hooks for every fresh clone:
+
+```sh
+python scripts/setup/install_dev_tools.py
+```
+
+Git commits run staged style/text checks and Conventional Commit validation.
+Hooks report failures without formatting or staging files. The frozen historical
+baseline only permits unchanged reviewed bytes; modified source is strict. Do
+not add/rebase debt or move owned source into exclusions. Manual pre-commit
+`--files`/`--all-files` checks read working-tree contents, not a different staged
+snapshot. CI runs the same full source check for every invocation and retains
+the actual report. See `docs/implementation/quality-gates.md` for scope and limits.
+
 The CI helper tests require no third-party test framework:
 
 ```sh
