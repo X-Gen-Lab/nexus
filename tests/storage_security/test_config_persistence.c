@@ -1,5 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
+#include "config/config_flash_backend.h"
 #include "config/config.h"
+#include "security/crypto_openssl.h"
 #include "config/config_backend.h"
 #include "config_store.h"
 #include "nexus/file_flash.h"
@@ -16,6 +18,7 @@ static const uint8_t old_key[32]={1,4,7,9,2,8,3,6,5};
 static const uint8_t new_key[32]={7,9,1,5,4,3,2,6,8};
 static bool enable_auto;
 static void start(bool fresh) {
+    CHECK(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     if (fresh) unlink(path);
     CHECK(nx_file_flash_open(&flash,path,1024,128,8)==NX_STORAGE_OK);
     CHECK(nx_storage_open(&store,&flash.port,0,512)==NX_STORAGE_OK);

@@ -17,7 +17,6 @@ config FRAMEWORK_LOG
 config FRAMEWORK_SHELL
     bool "Enable Shell Framework"
     default y
-    depends on FRAMEWORK_LOG
     help
       Enable the command-line shell framework.
       Provides an interactive command-line interface for debugging and control.
@@ -25,7 +24,7 @@ config FRAMEWORK_SHELL
 config FRAMEWORK_CONFIG
     bool "Enable Config Manager Framework"
     default y
-    depends on SERVICE_STORAGE && SERVICE_SECURITY
+    depends on SERVICE_SECURITY
     help
       Enable the configuration manager framework.
       Provides runtime configuration management with persistence support.

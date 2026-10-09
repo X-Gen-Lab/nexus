@@ -12,6 +12,7 @@
 #define _POSIX_C_SOURCE 200809L
 #endif
 #include "log/log.h"
+#include "log/log_format.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,7 +101,18 @@ static bool s_log_initializing;
 static bool s_log_closing;
 static bool s_log_deinit_active;
 static size_t s_log_lock_users;
-static unsigned s_callback_depth; /* Protected by the recursive log mutex. */
+/* Callback admissions are bounded and metadata is protected by s_log_mutex.
+ * A callback keeps its lifetime pin while running outside that mutex. */
+static unsigned s_callback_depth;
+static log_backend_t* s_callback_backends[LOG_MAX_BACKENDS];
+static osal_task_handle_t s_callback_owners[LOG_MAX_BACKENDS];
+#if defined(NEXUS_PLATFORM_NATIVE)
+#if defined(_MSC_VER)
+static __declspec(thread) unsigned s_local_callback_depth;
+#else
+static _Thread_local unsigned s_local_callback_depth;
+#endif
+#endif
 
 #ifndef LOG_OPERATION_TIMEOUT_MS
 #define LOG_OPERATION_TIMEOUT_MS 1000u
@@ -227,79 +239,6 @@ static void log_static_free_backend(log_backend_t* backend) {
 
 #endif /* LOG_USE_STATIC_ALLOC */
 
-/*---------------------------------------------------------------------------*/
-/* Level Name Tables                                                         */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Full level names
- */
-static const char* const s_level_names[] = {"TRACE", "DEBUG", "INFO", "WARN",
-                                            "ERROR", "FATAL", "NONE"};
-
-/**
- * \brief           Short level names (single character)
- */
-static const char s_level_short[] = {'T', 'D', 'I', 'W', 'E', 'F', 'N'};
-
-/**
- * \brief           ANSI color codes for each level
- */
-static const char* const s_level_colors[] = {
-    "\033[37m", /* TRACE - white */
-    "\033[36m", /* DEBUG - cyan */
-    "\033[32m", /* INFO - green */
-    "\033[33m", /* WARN - yellow */
-    "\033[31m", /* ERROR - red */
-    "\033[35m", /* FATAL - magenta */
-    "\033[0m"   /* NONE - reset */
-};
-
-/**
- * \brief           ANSI color reset code
- */
-static const char* const s_color_reset = "\033[0m";
-
-/*---------------------------------------------------------------------------*/
-/* Formatting Helper Functions                                               */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Get level name string
- * \param[in]       level: Log level
- * \return          Level name string
- */
-static const char* log_level_name(log_level_t level) {
-    if (level > LOG_LEVEL_NONE) {
-        return "UNKNOWN";
-    }
-    return s_level_names[level];
-}
-
-/**
- * \brief           Get short level name (single char)
- * \param[in]       level: Log level
- * \return          Short level character
- */
-static char log_level_short(log_level_t level) {
-    if (level > LOG_LEVEL_NONE) {
-        return '?';
-    }
-    return s_level_short[level];
-}
-
-/**
- * \brief           Get color code for level
- * \param[in]       level: Log level
- * \return          ANSI color code string
- */
-static const char* log_level_color(log_level_t level) {
-    if (level > LOG_LEVEL_NONE) {
-        return s_color_reset;
-    }
-    return s_level_colors[level];
-}
-
 /**
  * \brief           Get current timestamp in milliseconds
  * \return          Timestamp in milliseconds
@@ -308,167 +247,6 @@ static uint32_t log_get_timestamp_ms(void) {
     uint32_t milliseconds = 0;
     (void)osal_get_time_ms(&milliseconds);
     return milliseconds;
-}
-
-/**
- * \brief           Extract filename from full path
- * \param[in]       path: Full file path
- * \return          Pointer to filename portion
- */
-static const char* log_extract_filename(const char* path) {
-    if (path == NULL) {
-        return "unknown";
-    }
-
-    const char* filename = path;
-    const char* p = path;
-
-    while (*p != '\0') {
-        if (*p == '/' || *p == '\\') {
-            filename = p + 1;
-        }
-        p++;
-    }
-
-    return filename;
-}
-
-/**
- * \brief           Format message using pattern
- * \param[out]      buf: Output buffer
- * \param[in]       buf_size: Buffer size
- * \param[in]       level: Log level
- * \param[in]       module: Module name
- * \param[in]       file: Source file
- * \param[in]       line: Source line
- * \param[in]       func: Function name
- * \param[in]       user_msg: User message (already formatted)
- * \return          Number of characters written (excluding null terminator)
- */
-static size_t log_format_with_pattern(char* buf, size_t buf_size,
-                                      log_level_t level, const char* module,
-                                      const char* file, int line,
-                                      const char* func, const char* user_msg) {
-    if (buf == NULL || buf_size == 0) {
-        return 0;
-    }
-
-    const char* pattern = s_log_state.format;
-    if (pattern == NULL) {
-        pattern = LOG_DEFAULT_FORMAT;
-    }
-
-    size_t pos = 0;
-    const char* p = pattern;
-
-    while (*p != '\0' && pos < buf_size - 1) {
-        if (*p == '%' && *(p + 1) != '\0') {
-            char token = *(p + 1);
-            int written = 0;
-
-            switch (token) {
-                case 'T': /* Timestamp in milliseconds */
-                    written = snprintf(buf + pos, buf_size - pos, "%lu",
-                                       (unsigned long)log_get_timestamp_ms());
-                    break;
-
-                case 't': /* Time in HH:MM:SS format */
-                {
-                    time_t now = time(NULL);
-                    struct tm time_info;
-#ifdef _WIN32
-                    struct tm* tm_info = localtime_s(&time_info, &now) == 0 ? &time_info : NULL;
-#else
-                    struct tm* tm_info = localtime_r(&now, &time_info);
-#endif
-                    if (tm_info != NULL) {
-                        written = snprintf(buf + pos, buf_size - pos,
-                                           "%02d:%02d:%02d", tm_info->tm_hour,
-                                           tm_info->tm_min, tm_info->tm_sec);
-                    }
-                } break;
-
-                case 'L': /* Level name (full) */
-                    written = snprintf(buf + pos, buf_size - pos, "%s",
-                                       log_level_name(level));
-                    break;
-
-                case 'l': /* Level name (short) */
-                    if (pos < buf_size - 1) {
-                        buf[pos] = log_level_short(level);
-                        written = 1;
-                    }
-                    break;
-
-                case 'M': /* Module name */
-                    written = snprintf(buf + pos, buf_size - pos, "%s",
-                                       module ? module : "default");
-                    break;
-
-                case 'F': /* File name */
-                    written = snprintf(buf + pos, buf_size - pos, "%s",
-                                       log_extract_filename(file));
-                    break;
-
-                case 'f': /* Function name */
-                    written = snprintf(buf + pos, buf_size - pos, "%s",
-                                       func ? func : "unknown");
-                    break;
-
-                case 'n': /* Line number */
-                    written = snprintf(buf + pos, buf_size - pos, "%d", line);
-                    break;
-
-                case 'm': /* Message */
-                    written = snprintf(buf + pos, buf_size - pos, "%s",
-                                       user_msg ? user_msg : "");
-                    break;
-
-                case 'c': /* Color code */
-                    if (s_log_state.color_enabled) {
-                        written = snprintf(buf + pos, buf_size - pos, "%s",
-                                           log_level_color(level));
-                    }
-                    break;
-
-                case 'C': /* Color reset */
-                    if (s_log_state.color_enabled) {
-                        written = snprintf(buf + pos, buf_size - pos, "%s",
-                                           s_color_reset);
-                    }
-                    break;
-
-                case '%': /* Literal percent */
-                    if (pos < buf_size - 1) {
-                        buf[pos] = '%';
-                        written = 1;
-                    }
-                    break;
-
-                default: /* Unknown token, copy as-is */
-                    if (pos < buf_size - 2) {
-                        buf[pos] = '%';
-                        buf[pos + 1] = token;
-                        written = 2;
-                    }
-                    break;
-            }
-
-            if (written > 0) {
-                size_t available = buf_size - pos - 1;
-                pos += (size_t)written < available ? (size_t)written : available;
-            }
-            p += 2; /* Skip % and token */
-        } else {
-            /* Copy regular character */
-            buf[pos++] = *p++;
-        }
-    }
-
-    /* Null terminate */
-    buf[pos] = '\0';
-
-    return pos;
 }
 
 /**
@@ -578,6 +356,61 @@ static void log_unlock(void) {
     log_unpin();
 }
 
+/* Called with the metadata mutex held. Native callers may be external
+ * pthreads with no OSAL token, so their recursion guard uses host TLS. On MCU,
+ * the running OSAL task token identifies callback recursion; baremetal is
+ * single-task and NULL is its execution context. */
+static bool log_in_callback(void) {
+#if defined(NEXUS_PLATFORM_NATIVE)
+    return s_local_callback_depth != 0;
+#else
+    osal_task_handle_t current = osal_task_get_current();
+    for (size_t i = 0; i < LOG_MAX_BACKENDS; ++i)
+        if (s_callback_backends[i] && s_callback_owners[i] == current) return true;
+    return false;
+#endif
+}
+typedef enum { LOG_CALLBACK_INIT, LOG_CALLBACK_WRITE, LOG_CALLBACK_FLUSH,
+               LOG_CALLBACK_DEINIT } log_callback_kind_t;
+/* Runs with a lifetime pin. A sink serializes its callbacks through a no-wait
+ * admission; another synchronous writer reports BUSY instead of waiting on a
+ * slow sink. Metadata and async producers can proceed during the callback. */
+static log_status_t log_call_backend(log_backend_t* backend,
+                                      log_callback_kind_t kind,
+                                      const char* msg, size_t len) {
+    size_t slot = LOG_MAX_BACKENDS;
+    for (size_t i = 0; i < LOG_MAX_BACKENDS; ++i) {
+        if (s_callback_backends[i] == backend) return LOG_ERROR_BUSY;
+        if (!s_callback_backends[i]) slot = i;
+    }
+    if (slot == LOG_MAX_BACKENDS) return LOG_ERROR_BUSY;
+    s_callback_backends[slot] = backend;
+    s_callback_owners[slot] = osal_task_get_current();
+    ++s_callback_depth;
+#if defined(NEXUS_PLATFORM_NATIVE)
+    ++s_local_callback_depth;
+#endif
+    (void)osal_mutex_unlock(s_log_mutex);
+    log_status_t status = LOG_OK;
+    switch (kind) {
+        case LOG_CALLBACK_INIT: status = backend->init(backend->ctx); break;
+        case LOG_CALLBACK_WRITE: status = backend->write(backend->ctx, msg, len); break;
+        case LOG_CALLBACK_FLUSH: status = backend->flush(backend->ctx); break;
+        case LOG_CALLBACK_DEINIT: status = backend->deinit(backend->ctx); break;
+    }
+    /* Reclaiming the callback admission cannot be abandoned on timeout: its
+     * owner still pins the mutex and backend. No user callback runs under it. */
+    while (osal_mutex_lock(s_log_mutex, LOG_OPERATION_TIMEOUT_MS) != OSAL_OK)
+        (void)osal_task_yield();
+#if defined(NEXUS_PLATFORM_NATIVE)
+    --s_local_callback_depth;
+#endif
+    --s_callback_depth;
+    s_callback_backends[slot] = NULL;
+    s_callback_owners[slot] = NULL;
+    return status;
+}
+
 static log_status_t log_unavailable(void) {
     if (osal_is_isr()) return LOG_ERROR_ISR;
     osal_enter_critical();
@@ -592,9 +425,8 @@ static log_status_t log_unavailable(void) {
 
 log_status_t log_init(const log_config_t* config) {
     if (osal_is_isr()) return LOG_ERROR_ISR;
-    if (config && (config->level < LOG_LEVEL_TRACE || config->level > LOG_LEVEL_NONE ||
-                   config->async_policy < LOG_ASYNC_POLICY_DROP_OLDEST ||
-                   config->async_policy > LOG_ASYNC_POLICY_BLOCK))
+    if (config && ((unsigned int)config->level > LOG_LEVEL_NONE ||
+                   (unsigned int)config->async_policy > LOG_ASYNC_POLICY_BLOCK))
         return LOG_ERROR_INVALID_PARAM;
     osal_enter_critical();
     if (s_log_initializing || s_log_closing) {
@@ -643,7 +475,7 @@ log_status_t log_deinit(void) {
     /* Acquiring the recursive mutex first detects a callback attempting to
      * destroy the object whose callback is currently executing. */
     if (log_lock()) {
-        if (s_callback_depth) { log_unlock(); return LOG_ERROR_BUSY; }
+        if (log_in_callback()) { log_unlock(); return LOG_ERROR_BUSY; }
         osal_enter_critical();
         bool claimed = !s_log_deinit_active;
         if (claimed) s_log_closing = s_log_deinit_active = true;
@@ -1076,9 +908,8 @@ static log_status_t log_output_to_backends(const char* msg, size_t len,
         /* Write to backend */
         if (backend->write != NULL) {
             attempted = true;
-            ++s_callback_depth;
-            log_status_t status = backend->write(backend->ctx, msg, len);
-            --s_callback_depth;
+            log_status_t status = log_call_backend(backend, LOG_CALLBACK_WRITE, msg, len);
+            result = status;
             if (status == LOG_OK) {
                 any_success = true;
             }
@@ -1095,10 +926,10 @@ static log_status_t log_output_to_backends(const char* msg, size_t len,
 
 log_status_t log_write(log_level_t level, const char* module, const char* file,
                        int line, const char* func, const char* fmt, ...) {
-    if (!fmt || level < LOG_LEVEL_TRACE || level > LOG_LEVEL_NONE)
+    if (!fmt || (unsigned int)level > LOG_LEVEL_NONE)
         return LOG_ERROR_INVALID_PARAM;
     if (!log_lock()) return log_unavailable();
-    if (s_callback_depth) { log_unlock(); return LOG_ERROR_BUSY; }
+    if (log_in_callback()) { log_unlock(); return LOG_ERROR_BUSY; }
     if (!log_should_output(level, module)) { log_unlock(); return LOG_OK; }
 
     char user_msg[LOG_MAX_MSG_LEN];
@@ -1108,8 +939,32 @@ log_status_t log_write(log_level_t level, const char* module, const char* file,
     va_end(args);
     (void)log_apply_truncation(user_msg, sizeof(user_msg), s_log_state.max_msg_len);
     char formatted_msg[LOG_MAX_MSG_LEN * 2];
-    size_t formatted_len = log_format_with_pattern(formatted_msg, sizeof(formatted_msg),
-        level, module, file, line, func, user_msg);
+    uint32_t timestamp = log_get_timestamp_ms();
+    char clock_text[16];
+#if defined(NEXUS_PLATFORM_NATIVE)
+    time_t wall_time = time(NULL);
+    struct tm clock_info;
+#ifdef _WIN32
+    bool have_clock = localtime_s(&clock_info, &wall_time) == 0;
+#else
+    bool have_clock = localtime_r(&wall_time, &clock_info) != NULL;
+#endif
+    if (have_clock) (void)snprintf(clock_text, sizeof(clock_text), "%02d:%02d:%02d",
+                                  clock_info.tm_hour, clock_info.tm_min, clock_info.tm_sec);
+    else (void)snprintf(clock_text, sizeof(clock_text), "--:--:--");
+#else
+    /* No wall-clock provider is implied on MCU. This is elapsed uptime. */
+    uint32_t seconds = timestamp / 1000u;
+    (void)snprintf(clock_text, sizeof(clock_text), "%02lu:%02lu:%02lu",
+                   (unsigned long)(seconds / 3600u % 24u),
+                   (unsigned long)(seconds / 60u % 60u), (unsigned long)(seconds % 60u));
+#endif
+    log_record_t record = {.level = level, .module = module, .file = file,
+        .line = line, .function = func, .message = user_msg,
+        .timestamp_ms = timestamp, .clock_text = clock_text};
+    log_format_options_t options = {.pattern = s_log_state.format,
+                                     .color_enabled = s_log_state.color_enabled};
+    size_t formatted_len = log_format_record(formatted_msg, sizeof(formatted_msg), &options, &record);
     if (formatted_len && formatted_len < sizeof(formatted_msg) - 1 &&
         formatted_msg[formatted_len - 1] != '\n') {
         formatted_msg[formatted_len++] = '\n';
@@ -1125,7 +980,7 @@ log_status_t log_write(log_level_t level, const char* module, const char* file,
 log_status_t log_write_raw(const char* msg, size_t len) {
     if (!msg || !len) return LOG_ERROR_INVALID_PARAM;
     if (!log_lock()) return log_unavailable();
-    if (s_callback_depth) { log_unlock(); return LOG_ERROR_BUSY; }
+    if (log_in_callback()) { log_unlock(); return LOG_ERROR_BUSY; }
     log_status_t result = log_output_to_backends(msg, len, LOG_LEVEL_INFO);
     log_unlock();
     return result;
@@ -1153,9 +1008,8 @@ static void log_async_task(void* arg) {
             for (size_t i = 0; i < s_backend_count; ++i) {
                 log_backend_t* backend = s_backends[i];
                 if (backend && backend->flush) {
-                    ++s_callback_depth;
-                    if (backend->flush(backend->ctx) != LOG_OK) result = LOG_ERROR_BACKEND;
-                    --s_callback_depth;
+                    if (log_call_backend(backend, LOG_CALLBACK_FLUSH, NULL, 0) != LOG_OK)
+                        result = LOG_ERROR_BACKEND;
                 }
             }
         } else {
@@ -1228,7 +1082,7 @@ log_status_t log_async_flush(void) {
     if (osal_is_isr()) return LOG_ERROR_ISR;
     uint32_t start = log_get_timestamp_ms();
     if (!log_lock()) return log_unavailable();
-    if (s_callback_depth) { log_unlock(); return LOG_ERROR_BUSY; }
+    if (log_in_callback()) { log_unlock(); return LOG_ERROR_BUSY; }
     if (!s_log_state.async_mode) { log_unlock(); return LOG_OK; }
     osal_queue_handle_t queue = s_async_state.queue;
     (void)osal_mutex_unlock(s_log_mutex);
@@ -1270,7 +1124,7 @@ bool log_is_async_mode(void) {
 }
 
 log_status_t log_async_set_policy(log_async_policy_t policy) {
-    if (policy < LOG_ASYNC_POLICY_DROP_OLDEST || policy > LOG_ASYNC_POLICY_BLOCK)
+    if ((unsigned int)policy > LOG_ASYNC_POLICY_BLOCK)
         return LOG_ERROR_INVALID_PARAM;
     if (!log_lock()) return log_unavailable();
     s_async_state.policy = policy;
@@ -1324,9 +1178,7 @@ log_status_t log_backend_register(log_backend_t* backend) {
 
     /* Initialize backend if init function provided */
     if (backend->init != NULL) {
-        ++s_callback_depth;
-        log_status_t status = backend->init(backend->ctx);
-        --s_callback_depth;
+        log_status_t status = log_call_backend(backend, LOG_CALLBACK_INIT, NULL, 0);
         if (status != LOG_OK) {
             log_unlock();
             return LOG_ERROR_BACKEND;
@@ -1359,9 +1211,7 @@ log_status_t log_backend_unregister(const char* name) {
 
             /* Call deinit if provided */
             if (backend->deinit != NULL) {
-                ++s_callback_depth;
-                log_status_t status = backend->deinit(backend->ctx);
-                --s_callback_depth;
+                log_status_t status = log_call_backend(backend, LOG_CALLBACK_DEINIT, NULL, 0);
                 if (status != LOG_OK) { log_unlock(); return LOG_ERROR_BACKEND; }
             }
 
@@ -1531,7 +1381,7 @@ log_backend_t* log_backend_console_create(void) {
     return backend;
 }
 
-static log_status_t log_backend_destroy_check(log_backend_t* backend) {
+log_status_t log_backend_destroy_check(log_backend_t* backend) {
     if (osal_is_isr()) return LOG_ERROR_ISR;
     if (!backend) return LOG_ERROR_INVALID_PARAM;
     if (!log_lock()) {

@@ -42,6 +42,11 @@ typedef enum {
     SHELL_ERROR_ALREADY_EXISTS = 7, /**< Item already exists */
     SHELL_ERROR_NO_BACKEND = 8,     /**< No backend configured */
     SHELL_ERROR_BUFFER_FULL = 9,    /**< Buffer is full */
+    SHELL_ERROR_BUSY = 10,          /**< Ownership retained; retry later */
+    SHELL_ERROR_TIMEOUT = 11,       /**< Deadline expired; cleanup may remain */
+    SHELL_ERROR_ISR = 12,           /**< Task-only operation */
+    SHELL_ERROR_UNSUPPORTED = 13,   /**< Required typed capability unavailable */
+    SHELL_ERROR_BACKEND = 14,       /**< Input/output adapter reported failure */
 } shell_status_t;
 
 /**

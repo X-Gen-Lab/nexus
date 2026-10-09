@@ -15,6 +15,8 @@
  * **Validates: Requirements 6.1, 6.2**
  */
 
+#include "config/config_ram_backend.h"
+#include "config/config_flash_backend.h"
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
@@ -24,6 +26,7 @@
 
 extern "C" {
 #include "config/config.h"
+#include "config_test_backend.h"
 #include "config/config_backend.h"
 }
 

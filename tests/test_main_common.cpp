@@ -11,6 +11,11 @@
  */
 
 #include <gtest/gtest.h>
+#include "nexus_config.h"
+#if defined(NX_CONFIG_CRYPTO_PROVIDER_OPENSSL) && NX_CONFIG_CRYPTO_PROVIDER_OPENSSL
+#include "security/crypto_openssl.h"
+#endif
+
 
 /**
  * \brief           Main entry point for tests
@@ -20,5 +25,9 @@
  */
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
+#if defined(NX_CONFIG_CRYPTO_PROVIDER_OPENSSL) && NX_CONFIG_CRYPTO_PROVIDER_OPENSSL
+    /* Explicit fixture startup, not implicit selection inside the SDK core. */
+    if (nx_crypto_set_provider(nx_crypto_openssl_provider()) != NX_CRYPTO_OK) return 1;
+#endif
     return RUN_ALL_TESTS();
 }

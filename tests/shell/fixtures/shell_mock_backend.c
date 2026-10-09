@@ -13,7 +13,7 @@
  * Requirements: 8.1
  */
 
-#include "shell/shell_backend.h"
+#include "shell/shell_mock_backend.h"
 #include <string.h>
 
 /**

@@ -1,3 +1,4 @@
+#include "hal/provider/nx_device_provider.h"
 #define _GNU_SOURCE
 #include "flash.h"
 #include "identity.h"

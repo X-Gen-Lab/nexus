@@ -2,13 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(NX_SECURITY_OPENSSL) && NX_SECURITY_OPENSSL
-extern const nx_crypto_provider_t* nx_crypto_openssl_provider(void);
-extern const nx_crypto_provider_t nx_crypto_openssl_default_provider;
-static const nx_crypto_provider_t* g_provider = &nx_crypto_openssl_default_provider;
-#else
+/* Registration is explicit and quiescent. Merely linking a provider never
+ * enables capabilities or chooses application entropy/trust policy. */
 static const nx_crypto_provider_t* g_provider;
-#endif
 
 void nx_crypto_secure_zero(void* data, size_t size) {
     volatile uint8_t* bytes = (volatile uint8_t*)data;
@@ -22,14 +18,6 @@ nx_crypto_status_t nx_crypto_set_provider(const nx_crypto_provider_t* provider) 
     }
     g_provider = provider;
     return provider ? NX_CRYPTO_OK : NX_CRYPTO_UNSUPPORTED;
-}
-
-nx_crypto_status_t nx_crypto_use_default_provider(void) {
-#if defined(NX_SECURITY_OPENSSL) && NX_SECURITY_OPENSSL
-    return nx_crypto_set_provider(nx_crypto_openssl_provider());
-#else
-    return nx_crypto_set_provider(NULL);
-#endif
 }
 
 bool nx_crypto_is_available(void) {

@@ -34,7 +34,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
         "${nexus_root}/soc/gd32f470zg/identity.c")
     target_include_directories(test_driver_gd32_flash PRIVATE fake
         "${nexus_root}/soc/gd32f470zg" "${nexus_root}/arch/include"
-        "${nexus_root}/services/storage/include")
+        "${nexus_root}/services/storage/include" "${nexus_root}/hal/include")
     target_compile_features(test_driver_gd32_flash PRIVATE c_std_11)
     if(TARGET nexus_build_options)
         target_link_libraries(test_driver_gd32_flash PRIVATE nexus_build_options)

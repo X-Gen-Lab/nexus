@@ -1,5 +1,6 @@
 /** GPIO registration config reaches production hardware init unchanged. */
 #include "hal/base/nx_device.h"
+#include "hal/provider/nx_device_provider.h"
 #include "stm32_gpio.h"
 #include <assert.h>
 #include <stdio.h>

@@ -1,4 +1,4 @@
-#include "security/crypto.h"
+#include "security/crypto_openssl.h"
 #include <limits.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
@@ -82,11 +82,11 @@ static nx_crypto_status_t verify_ed25519(void* ctx, const uint8_t* key,
     return verified == 1 ? NX_CRYPTO_OK : verified == 0 ? NX_CRYPTO_AUTH_FAILED : NX_CRYPTO_FAILED;
 }
 
-/* Constant initialization permits concurrent first use without a lazy global
- * registration race. Explicit replacement still requires quiescent callers. */
-const nx_crypto_provider_t nx_crypto_openssl_default_provider = {
+/* Immutable provider, explicitly bound by external startup. No constructors,
+ * global default selection, product key store or trust policy are installed. */
+static const nx_crypto_provider_t openssl_provider = {
     NULL, random_bytes, seal, open_record, sha256, verify_ed25519
 };
 const nx_crypto_provider_t* nx_crypto_openssl_provider(void) {
-    return &nx_crypto_openssl_default_provider;
+    return &openssl_provider;
 }

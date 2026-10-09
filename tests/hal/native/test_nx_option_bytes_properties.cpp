@@ -15,6 +15,7 @@
  * **Validates: Requirements 9.4**
  */
 
+#include "hal/nx_factory.h"
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>

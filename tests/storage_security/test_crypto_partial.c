@@ -1,9 +1,10 @@
 #include "security/crypto.h"
+#include "security/crypto_openssl.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 int main(void) {
-    assert(nx_crypto_use_default_provider()==NX_CRYPTO_OK);
+    assert(nx_crypto_set_provider(nx_crypto_openssl_provider())==NX_CRYPTO_OK);
     nx_crypto_provider_t full=*nx_crypto_get_provider();
     nx_crypto_provider_t partial=full;
     partial.verify_ed25519=NULL;

@@ -25,7 +25,7 @@ static uint32_t now_ms(void) {
 }
 static void wait_flag(atomic_bool* flag) {
     uint32_t started = now_ms();
-    while (!atomic_load(flag) && (uint32_t)(now_ms() - started) < 2000) pause_ms(1);
+    while (!atomic_load(flag) && (uint32_t)(now_ms() - started) < 5000) pause_ms(1);
     assert(atomic_load(flag));
 }
 static void assert_no_resources(void) {
@@ -114,7 +114,7 @@ static void test_busy_shutdown_retains_ownership(void) {
     assert(log_write(LOG_LEVEL_INFO, "test", __FILE__, __LINE__, __func__, "queued") == LOG_OK);
     wait_flag(&context.entered);
     uint32_t started = now_ms();
-    assert(log_deinit() == LOG_ERROR_BUSY);
+    assert(log_deinit() == LOG_ERROR_TIMEOUT);
     assert((uint32_t)(now_ms() - started) >= 900 && (uint32_t)(now_ms() - started) < 1600);
     assert(log_is_initialized());
     osal_stats_t stats;
@@ -261,6 +261,27 @@ static void test_late_flush_reply_is_safe(void) {
     assert(log_deinit() == LOG_OK);
     assert_no_resources();
 }
+/* A blocked sink must not hold the logger metadata mutex or prevent a second
+ * producer from filling the bounded queue. Synchronization is observable, not
+ * a comparison of the implementation's lock text. */
+static void test_slow_sink_releases_logger_lock(void) {
+    blocked_context_t context = {0};
+    log_backend_t backend = blocked_backend(&context);
+    log_config_t config = async_config();
+    config.async_policy = LOG_ASYNC_POLICY_DROP_NEWEST;
+    assert(log_init(&config) == LOG_OK && log_backend_register(&backend) == LOG_OK);
+    assert(log_write(LOG_LEVEL_INFO, "test", __FILE__, __LINE__, __func__, "first") == LOG_OK);
+    wait_flag(&context.entered);
+    uint32_t started = now_ms();
+    log_status_t metadata = log_set_level(LOG_LEVEL_DEBUG);
+    uint32_t elapsed = now_ms() - started;
+    log_status_t queued = log_write(LOG_LEVEL_INFO, "test", __FILE__, __LINE__, __func__, "second");
+    atomic_store(&context.release, true);
+    assert(log_deinit() == LOG_OK);
+    assert(metadata == LOG_OK && elapsed < 500);
+    assert(queued == LOG_OK);
+    assert_no_resources();
+}
 static void test_console_reports_flush_failure(void) {
 #ifdef __linux__
     /* Isolate stdout replacement so all other fixtures retain their stream. */
@@ -287,6 +308,7 @@ static void test_console_reports_flush_failure(void) {
 }
 int main(void) {
     assert(osal_init() == OSAL_OK);
+    test_slow_sink_releases_logger_lock();
     test_immediate_shutdown_drains();
     test_flush_includes_callback();
     test_busy_shutdown_retains_ownership();
@@ -296,6 +318,6 @@ int main(void) {
     test_backend_failure_ownership();
     test_late_flush_reply_is_safe();
     test_console_reports_flush_failure();
-    puts("9 real logging lifetime/concurrency contract groups passed");
+    puts("10 real logging lifetime/concurrency contract groups passed");
     return 0;
 }

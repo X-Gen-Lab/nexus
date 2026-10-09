@@ -1,6 +1,7 @@
 /* SEC002 native policy regressions. Ephemeral Ed25519 key, no shipped secrets. */
 #include "nexus/update.h"
 #include "security/crypto.h"
+#include "security/crypto_openssl.h"
 
 #include <openssl/evp.h>
 #include <stdio.h>
@@ -102,7 +103,7 @@ static void start(fixture_t* f, nx_update_t* u) {
     EVP_PKEY_CTX* key_context;
     size_t public_size = sizeof(f->public_key);
     memset(f, 0, sizeof(*f));
-    CHECK(nx_crypto_use_default_provider() == NX_CRYPTO_OK);
+    CHECK(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     key_context = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, NULL);
     CHECK(key_context && EVP_PKEY_keygen_init(key_context) == 1);
     CHECK(EVP_PKEY_keygen(key_context, &f->signer) == 1);
@@ -427,7 +428,7 @@ static void test_load_corruption_and_port_failures(void) {
     f.fail_counter_read = false;
     CHECK(nx_crypto_set_provider(NULL) == NX_CRYPTO_UNSUPPORTED);
     CHECK(nx_update_select(&u, &choice) == NX_UPDATE_EAUTH);
-    CHECK(nx_crypto_use_default_provider() == NX_CRYPTO_OK);
+    CHECK(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     finish(&f);
 }
 

@@ -75,6 +75,11 @@ foreach(component log shell config init)
     endif()
 endforeach()
 
+# Full Native crypto checks explicitly compose their selected provider.
+if(TARGET nexus_security_openssl)
+    list(APPEND NEXUS_TEST_LIBS nexus_security_openssl)
+endif()
+
 # Common compile options
 set(NEXUS_TEST_COMPILE_OPTIONS "")
 if(MSVC)

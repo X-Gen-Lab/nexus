@@ -1,0 +1,8 @@
+config CRYPTO_PROVIDER_OPENSSL
+    bool "OpenSSL 3 crypto provider"
+    depends on SERVICE_SECURITY && PLATFORM_NATIVE
+    default n
+    help
+      Build the explicitly selected Native OpenSSL 3 provider target. Building
+      this target does not activate cryptography: external startup must bind
+      its provider with nx_crypto_set_provider(). MCU providers are external.

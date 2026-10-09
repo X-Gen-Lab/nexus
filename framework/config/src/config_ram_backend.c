@@ -12,6 +12,7 @@
  * reset. Useful for testing and temporary configuration storage.
  */
 
+#include "config/config_ram_backend.h"
 #include "config/config_backend.h"
 #include <string.h>
 

@@ -6,6 +6,7 @@
 #include "nexus/file_flash.h"
 #include "nexus/update.h"
 #include "security/crypto.h"
+#include "security/crypto_openssl.h"
 
 #include <openssl/evp.h>
 #include <stdio.h>
@@ -138,7 +139,7 @@ static void make_fixture(fixture_t* f) {
     memset(f, 0, sizeof(*f));
     f->flash.fd = -1;
     snprintf(f->path, sizeof(f->path), "/tmp/nexus-update-storage-%ld.flash", (long)getpid());
-    CHECK(nx_crypto_use_default_provider() == NX_CRYPTO_OK);
+    CHECK(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     /* Ephemeral test-only key. No hard-coded product signing/manufacturing key. */
     CHECK(nx_crypto_random(f->metadata_key, sizeof(f->metadata_key)) == NX_CRYPTO_OK);
     key_context = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, NULL);

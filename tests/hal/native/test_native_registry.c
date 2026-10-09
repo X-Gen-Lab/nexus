@@ -1,4 +1,5 @@
 /* Exercise production startup without the HAL test registration helpers. */
+#include "hal/nx_factory.h"
 #include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/nx_hal.h"

@@ -1,171 +1,139 @@
-/**
- * \file            shell_uart_backend.c
- * \brief           Shell UART backend implementation
- * \author          Nexus Team
- * \version         2.0.0
- * \date            2026-01-16
- *
- * \copyright       Copyright (c) 2026 Nexus Team
- *
- * Implements the UART backend for Shell I/O operations using the new
- * nx_uart_t interface.
- *
- * Requirements: 8.3, 8.4, 8.5
- */
-
-#include "hal/interface/nx_uart.h"
-#include "hal/nx_factory.h"
-#include "shell/shell_backend.h"
+/** Typed UART adapter with retained teardown ownership. SPDX-License-Identifier: MIT */
+#include "shell/shell_uart.h"
+#include "osal/osal.h"
 #include <string.h>
-
-/**
- * \addtogroup      SHELL_UART_BACKEND
- * \{
- */
-
-/*---------------------------------------------------------------------------*/
-/* Private Data                                                              */
-/*---------------------------------------------------------------------------*/
-
-/** UART interface pointer */
-static nx_uart_t* g_uart = NULL;
-
-/** UART index */
-static uint8_t g_uart_index = 0;
-
-/** Backend initialization flag */
-static bool g_uart_backend_initialized = false;
-
-/** Non-blocking read timeout in milliseconds */
-#define UART_READ_TIMEOUT_MS 0
-
-/** Blocking write timeout in milliseconds */
-#define UART_WRITE_TIMEOUT_MS 1000
-
-/*---------------------------------------------------------------------------*/
-/* Private Functions                                                         */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Non-blocking read from UART
- */
+#define SHELL_UART_TX_CAPACITY 256u
+#define SHELL_UART_TX_TIMEOUT_MS 1000u
+static nx_device_ref_t g_uart;
+static nx_uart_ticket_t g_ticket;
+static uint8_t g_tx[SHELL_UART_TX_CAPACITY];
+static bool g_opened, g_busy, g_active, g_unknown_lease;
+static nx_status_t g_last_status;
+static shell_status_t translated(nx_status_t s) {
+    if (s == NX_OK) return SHELL_OK;
+    if (s == NX_ERR_BUSY) return SHELL_ERROR_BUSY;
+    if (s == NX_ERR_TIMEOUT) return SHELL_ERROR_TIMEOUT;
+    if (s == NX_ERR_CONTEXT) return SHELL_ERROR_ISR;
+    if (s == NX_ERR_NOT_SUPPORTED) return SHELL_ERROR_UNSUPPORTED;
+    return SHELL_ERROR;
+}
+static bool claim(void) {
+    if (osal_is_isr()) return false;
+    osal_enter_critical(); bool ok = !g_busy;
+    if (ok) g_busy = true;
+    osal_exit_critical(); return ok;
+}
+static void release(void) {
+    osal_enter_critical(); g_busy = false; osal_exit_critical();
+}
+static void remember(nx_status_t status) {
+    osal_enter_critical(); g_last_status = status; osal_exit_critical();
+}
 static int uart_backend_read(uint8_t* data, int max_len) {
-    if (!g_uart_backend_initialized || g_uart == NULL) {
-        return 0;
+    if (!data || max_len <= 0 || !claim()) return 0;
+    if (!g_opened || g_active || g_unknown_lease) { release(); return 0; }
+    int n = 0;
+    while (n < max_len) {
+        nx_uart_rx_event_t event;
+        nx_status_t status = nx_device_uart_receive_event(g_uart, &event);
+        if (status == NX_ERR_NO_DATA) break;
+        if (status != NX_OK || event.status != NX_OK || event.raw_error || !event.has_data) {
+            remember(status == NX_OK ? (event.status == NX_OK ? NX_ERR_IO : event.status) : status);
+            release(); return n ? n : -1;
+        }
+        data[n++] = event.data;
     }
-
-    if (data == NULL || max_len <= 0) {
-        return 0;
-    }
-
-    /* Get async RX interface */
-    nx_rx_async_t* rx_async = g_uart->get_rx_async(g_uart);
-    if (rx_async == NULL) {
-        return 0;
-    }
-
-    /* Read available data using new interface */
-    size_t len = (size_t)max_len;
-    nx_status_t status = rx_async->receive(rx_async, data, &len);
-    if (status != NX_OK) {
-        return 0;
-    }
-    return (int)len;
+    release(); return n;
 }
-
-/**
- * \brief           Blocking write to UART
- * \param[in]       data: Data buffer to write
- * \param[in]       len: Number of bytes to write
- * \return          Number of bytes actually written
- */
 static int uart_backend_write(const uint8_t* data, int len) {
-    if (!g_uart_backend_initialized || g_uart == NULL) {
-        return 0;
-    }
-
-    if (data == NULL || len <= 0) {
-        return 0;
-    }
-
-    /* Get sync TX interface */
-    nx_tx_sync_t* tx_sync = g_uart->get_tx_sync(g_uart);
-    if (tx_sync == NULL) {
-        return 0;
-    }
-
-    /* Transmit data */
-    nx_status_t status =
-        tx_sync->send(tx_sync, data, (size_t)len, UART_WRITE_TIMEOUT_MS);
-    if (status != NX_OK) {
-        return 0;
-    }
-
-    return len;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Public Data                                                               */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           UART backend instance
- */
-const shell_backend_t shell_uart_backend = {.read = uart_backend_read,
-                                            .write = uart_backend_write};
-
-/*---------------------------------------------------------------------------*/
-/* Public API Implementation                                                 */
-/*---------------------------------------------------------------------------*/
-
-shell_status_t shell_uart_backend_init(int uart_instance) {
-    /* Validate UART instance */
-    if (uart_instance < 0 || uart_instance > 5) {
-        return SHELL_ERROR_INVALID_PARAM;
-    }
-
-    /* Get UART interface from factory */
-    g_uart = nx_factory_uart((uint8_t)uart_instance);
-    if (g_uart == NULL) {
-        return SHELL_ERROR;
-    }
-
-    /* Initialize UART */
-    nx_lifecycle_t* lifecycle = g_uart->get_lifecycle(g_uart);
-    if (lifecycle != NULL) {
-        nx_status_t status = lifecycle->init(lifecycle);
+    if (!data || len <= 0 || !claim()) return 0;
+    if (!g_opened || g_active || g_unknown_lease) { release(); return 0; }
+    int accepted = 0;
+    uint32_t started;
+    if (osal_get_time_ms(&started) != OSAL_OK) { release(); return 0; }
+    while (accepted < len) {
+        size_t chunk = (size_t)(len - accepted);
+        if (chunk > sizeof(g_tx)) chunk = sizeof(g_tx);
+        memcpy(g_tx, data + accepted, chunk);
+        uint32_t now;
+        if (osal_get_time_ms(&now) != OSAL_OK) break;
+        uint32_t elapsed = now - started;
+        if (elapsed >= SHELL_UART_TX_TIMEOUT_MS) { remember(NX_ERR_TIMEOUT); break; }
+        nx_status_t status = nx_device_uart_submit(g_uart, g_tx, chunk,
+                SHELL_UART_TX_TIMEOUT_MS - elapsed, &g_ticket);
+        remember(status);
         if (status != NX_OK) {
-            g_uart = NULL;
-            return SHELL_ERROR;
+            g_unknown_lease = status == NX_ERR_INVALID_STATE;
+            break;
+        }
+        g_active = true;
+        bool success = false;
+        for (;;) {
+            nx_uart_result_t result;
+            status = nx_device_uart_poll(g_uart, g_ticket, &result);
+            if (status != NX_OK) { remember(status); break; }
+            if (result.settled && result.wire_idle) {
+                g_active = false; g_ticket.sequence = 0; remember(result.status);
+                success = result.status == NX_OK; break;
+            }
+            if (osal_get_time_ms(&now) != OSAL_OK || now - started >= SHELL_UART_TX_TIMEOUT_MS) {
+                remember(NX_ERR_TIMEOUT); break;
+            }
+            if (osal_task_delay(1) != OSAL_OK) { remember(NX_ERR_BUSY); break; }
+        }
+        if (g_active) {
+            status = nx_device_uart_cancel(g_uart, g_ticket);
+            if (status == NX_OK) { g_active = false; g_ticket.sequence = 0; }
+            else remember(status); /* g_tx remains borrowed and cannot be overwritten. */
+        }
+        if (!success) break;
+        accepted += (int)chunk;
+    }
+    release(); return accepted;
+}
+const shell_backend_t shell_uart_backend = {.read = uart_backend_read, .write = uart_backend_write};
+shell_status_t shell_uart_backend_init(const char* name) {
+    if (!name || !*name) return SHELL_ERROR_INVALID_PARAM;
+    if (osal_is_isr()) return SHELL_ERROR_ISR;
+    if (!claim()) return SHELL_ERROR_BUSY;
+    if (g_opened) { release(); return SHELL_ERROR_ALREADY_INIT; }
+    nx_status_t status = nx_device_open(name, NX_DEVICE_CLASS_UART, (uintptr_t)&g_uart, &g_uart);
+    if (status == NX_OK) {
+        osal_enter_critical(); g_opened = true; osal_exit_critical();
+        nx_device_caps_t caps;
+        status = nx_device_query(g_uart, &caps);
+        if (status == NX_OK && ((caps.flags & (NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_RX_EVENTS)) !=
+                    (NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_RX_EVENTS))) status = NX_ERR_NOT_SUPPORTED;
+        if (status != NX_OK && nx_device_close(g_uart) == NX_OK) {
+            osal_enter_critical(); g_opened = false; osal_exit_critical();
+            memset(&g_uart, 0, sizeof(g_uart));
         }
     }
-
-    g_uart_index = (uint8_t)uart_instance;
-    g_uart_backend_initialized = true;
-
-    return SHELL_OK;
+    remember(status); release(); return translated(status);
 }
-
 shell_status_t shell_uart_backend_deinit(void) {
-    if (g_uart != NULL) {
-        /* Deinitialize UART */
-        nx_lifecycle_t* lifecycle = g_uart->get_lifecycle(g_uart);
-        if (lifecycle != NULL) {
-            lifecycle->deinit(lifecycle);
+    if (osal_is_isr()) return SHELL_ERROR_ISR;
+    if (!claim()) return SHELL_ERROR_BUSY;
+    if (!g_opened) { release(); return SHELL_OK; }
+    nx_status_t status = NX_OK;
+    if (g_unknown_lease) status = nx_device_uart_recover(g_uart);
+    else {
+        if (g_active) {
+            status = nx_device_uart_cancel(g_uart, g_ticket);
+            if (status == NX_OK) { g_active = false; g_ticket.sequence = 0; }
         }
-
-        /* Clear UART reference */
-        g_uart = NULL;
+        if (status == NX_OK) status = nx_device_close(g_uart);
     }
-
-    g_uart_backend_initialized = false;
-    return SHELL_OK;
+    if (status == NX_OK) {
+        osal_enter_critical(); g_opened = g_active = g_unknown_lease = false; osal_exit_critical();
+        memset(&g_uart, 0, sizeof(g_uart)); g_ticket.sequence = 0;
+    }
+    /* Failed close/cancel/recover leaves the typed owner and TX bytes intact. */
+    remember(status); release(); return translated(status);
 }
-
 bool shell_uart_backend_is_initialized(void) {
-    return g_uart_backend_initialized;
+    osal_enter_critical(); bool open = g_opened; osal_exit_critical(); return open;
 }
-
-/**
- * \}
- */
+nx_status_t shell_uart_backend_last_status(void) {
+    osal_enter_critical(); nx_status_t status = g_last_status; osal_exit_critical(); return status;
+}

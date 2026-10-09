@@ -38,7 +38,7 @@ typedef struct {
 #define NX_STORAGE_MAX_PROGRAM_SIZE 256u
 #define NX_STORAGE_HEADER_SIZE 32u
 
-/* Two independently erasable banks, supplied by a board partition. Scratch is
+/* Two independently erasable banks, supplied by the external application layout. Scratch is
  * caller-owned and may be freed after open; no allocation or retained buffers.
  * Instance and port remain alive through all calls. The whole blob is atomic;
  * saving many keys is one transaction. Every mutating I/O error invalidates

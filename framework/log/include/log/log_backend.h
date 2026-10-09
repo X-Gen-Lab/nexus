@@ -81,9 +81,12 @@ struct log_backend {
  * \param[in]       backend: Pointer to backend structure
  * \return          LOG_OK on success, error code otherwise
  * \note            The backend structure must remain valid for the lifetime
- *                  of the registration. Callbacks execute under the logger
- *                  lock and must be short and nonblocking. Recursive writes,
- *                  unregister, flush, and shutdown return LOG_ERROR_BUSY.
+ *                  of the registration. Callbacks execute outside the logger metadata lock. A sink is
+ *                  admitted once at a time; concurrent synchronous writes to
+ *                  that sink return BUSY. Backend callbacks must still use
+ *                  bounded work. Recursive writes/flush/shutdown return BUSY;
+ *                  registration changes return BUSY while any callback owns a
+ *                  registered backend. The caller owns backend storage.
  */
 log_status_t log_backend_register(log_backend_t* backend);
 
@@ -93,6 +96,10 @@ log_status_t log_backend_register(log_backend_t* backend);
  * \return          LOG_OK on success, error code otherwise
  */
 log_status_t log_backend_unregister(const char* name);
+
+/** Check before releasing caller-owned adapter storage. Registered, closing,
+ * or in-callback storage returns BUSY. Stop independent adapter users first. */
+log_status_t log_backend_destroy_check(log_backend_t* backend);
 
 /**
  * \brief           Enable or disable a backend
@@ -180,49 +187,6 @@ void log_backend_memory_clear(log_backend_t* backend);
  * \return          Number of bytes in buffer
  */
 size_t log_backend_memory_size(log_backend_t* backend);
-
-/**
- * \}
- */
-
-/**
- * \defgroup        LOG_BACKEND_UART UART Backend
- * \brief           UART output backend
- * \{
- */
-
-#include "hal/interface/nx_uart.h"
-
-/**
- * \brief           Create a UART backend
- * \param[in]       uart: UART interface pointer (nx_uart_t*)
- * \return          Pointer to backend structure, or NULL on failure
- */
-log_backend_t* log_backend_uart_create(nx_uart_t* uart);
-
-/**
- * \brief           Destroy a UART backend
- * \param[in]       backend: Pointer to backend to destroy
- * \note            Task context. Unregister first and stop independent users.
- *                  A registered or in-use backend returns LOG_ERROR_BUSY.
- */
-void log_backend_uart_destroy(log_backend_t* backend);
-
-/**
- * \brief           Set UART backend transmit timeout
- * \param[in]       backend: Pointer to UART backend
- * \param[in]       timeout_ms: Timeout in milliseconds
- * \return          LOG_OK on success, error code otherwise
- */
-log_status_t log_backend_uart_set_timeout(log_backend_t* backend,
-                                          uint32_t timeout_ms);
-
-/**
- * \brief           Get UART interface from backend
- * \param[in]       backend: Pointer to UART backend
- * \return          UART interface pointer, or NULL on error
- */
-nx_uart_t* log_backend_uart_get_interface(log_backend_t* backend);
 
 /**
  * \}

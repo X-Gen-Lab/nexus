@@ -11,12 +11,15 @@
  *                  Requirements: 6.1, 6.2, 6.5, 6.6, 9.1-9.6
  */
 
+#include "config/config_ram_backend.h"
+#include "config/config_flash_backend.h"
 #include <cstring>
 #include <gtest/gtest.h>
 #include "test_config_flash_fixture.h"
 
 extern "C" {
 #include "config/config.h"
+#include "config_test_backend.h"
 #include "config/config_backend.h"
 }
 

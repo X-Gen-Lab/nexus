@@ -15,6 +15,7 @@
  *                  Requirements: 1.1-12.10
  */
 
+#include "config/config_ram_backend.h"
 #include <atomic>
 #include <chrono>
 #include <cstring>
@@ -24,6 +25,7 @@
 
 extern "C" {
 #include "config/config.h"
+#include "config_test_backend.h"
 }
 
 /**

@@ -12,7 +12,6 @@
 #define CONFIG_BACKEND_H
 
 #include "config_def.h"
-#include "nexus/storage.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,40 +117,6 @@ struct config_backend {
  * \}
  */
 
-/**
- * \defgroup        CONFIG_BACKEND_RAM RAM Backend
- * \brief           RAM backend for volatile storage
- * \{
- */
-
-/**
- * \brief           Get the RAM backend instance
- * \return          Pointer to RAM backend structure
- * \note            RAM backend is volatile - data is lost on reset
- */
-const config_backend_t* config_backend_ram_get(void);
-
-/**
- * \}
- */
-
-/**
- * \defgroup        CONFIG_BACKEND_FLASH Flash Backend
- * \brief           Flash backend for persistent storage
- * \{
- */
-
-/**
- * \brief           Get the Flash backend instance
- * \return          Pointer to Flash backend structure
- * \note            Flash backend provides persistent storage
- */
-const config_backend_t* config_backend_flash_get(void);
-/* Explicit caller-owned partition binding. Unbound Flash returns UNSUPPORTED;
- * the library never creates RAM-backed persistence or chooses a host path.
- * Configure only while the backend is deinitialized. */
-config_status_t config_backend_flash_bind(nx_storage_t* storage);
-
 #ifndef CONFIG_PERSISTENCE_BUFFER_SIZE
 #if defined(NX_CONFIG_MANAGER_PERSISTENCE_BUFFER)
 #define CONFIG_PERSISTENCE_BUFFER_SIZE NX_CONFIG_MANAGER_PERSISTENCE_BUFFER
@@ -163,29 +128,6 @@ config_status_t config_backend_flash_bind(nx_storage_t* storage);
  * Must be set while config is deinitialized. Whole serialized config must fit;
  * otherwise commit returns NO_SPACE without changing durable storage. */
 config_status_t config_backend_set_snapshot_buffer(void* buffer, size_t capacity);
-
-/**
- * \}
- */
-
-/**
- * \defgroup        CONFIG_BACKEND_MOCK Mock Backend
- * \brief           Mock backend for testing
- * \{
- */
-
-/**
- * \brief           Get the Mock backend instance
- * \return          Pointer to Mock backend structure
- * \note            Mock backend is for testing purposes
- */
-const config_backend_t* config_backend_mock_get(void);
-
-/**
- * \brief           Reset the Mock backend state
- * \note            Clears all stored data in mock backend
- */
-void config_backend_mock_reset(void);
 
 /**
  * \}

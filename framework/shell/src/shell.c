@@ -838,9 +838,17 @@ shell_status_t shell_process(void) {
 
     /* Non-blocking read (Requirement 9.2, 9.3) */
     bytes_read = backend->read(&c, 1);
-    if (bytes_read <= 0) {
-        return SHELL_OK;
+    if (bytes_read < 0) {
+        /* A transport error must not become empty input or splice a partial
+         * command with bytes received after loss/corruption. */
+        line_editor_clear(&g_shell_ctx.editor);
+        reset_escape_state();
+        history_reset_browse(&g_shell_ctx.history);
+        if (g_shell_ctx.saved_input) g_shell_ctx.saved_input[0] = '\0';
+        g_shell_ctx.last_error = SHELL_ERROR_BACKEND;
+        return SHELL_ERROR_BACKEND;
     }
+    if (bytes_read == 0) return SHELL_OK;
 
     /* Process escape sequences */
     if (g_shell_ctx.escape_state != ESC_STATE_NORMAL || c == SHELL_KEY_ESCAPE) {

@@ -57,10 +57,9 @@ typedef struct {
                                         size_t, const uint8_t*);
 } nx_crypto_provider_t;
 
-/** NULL disables cryptography, including a compiled-in default provider. */
+/** Initially no provider is selected on every platform. External startup must
+ * bind a maintained provider explicitly; NULL disables all capabilities. */
 nx_crypto_status_t nx_crypto_set_provider(const nx_crypto_provider_t* provider);
-/** Native defaults to OpenSSL; unconfigured MCU ports return UNSUPPORTED. */
-nx_crypto_status_t nx_crypto_use_default_provider(void);
 bool nx_crypto_is_available(void);
 /** Borrowed provider for platform composition; do not mutate its callbacks. */
 const nx_crypto_provider_t* nx_crypto_get_provider(void);

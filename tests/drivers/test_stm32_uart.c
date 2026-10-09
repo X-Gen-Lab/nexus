@@ -4,6 +4,7 @@
 #include "stm32_uart_runtime.h"
 #include "stm32_uart_callbacks.h"
 #include "hal/base/nx_device.h"
+#include "hal/provider/nx_device_provider.h"
 #include "hal/resource/nx_isr_manager.h"
 #include <assert.h>
 #include <stdio.h>

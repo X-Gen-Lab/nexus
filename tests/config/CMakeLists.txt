@@ -30,6 +30,11 @@ set(CONFIG_TEST_SOURCES
     test_config_store_properties.cpp
 )
 
+# Explicit test support; error injection is excluded from production targets.
+add_library(config_test_support STATIC fixtures/config_mock_backend.c)
+target_include_directories(config_test_support PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+target_link_libraries(config_test_support PUBLIC config_interface)
+
 # Create test executable
 add_executable(config_tests
     ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
@@ -49,7 +54,7 @@ target_compile_options(config_tests PRIVATE ${NEXUS_TEST_COMPILE_OPTIONS})
 target_include_directories(config_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 
 # Link libraries
-target_link_libraries(config_tests PRIVATE ${NEXUS_TEST_LIBS})
+target_link_libraries(config_tests PRIVATE ${NEXUS_TEST_LIBS} config_test_support)
 if(TARGET nexus_file_flash)
     target_link_libraries(config_tests PRIVATE nexus_file_flash)
 endif()

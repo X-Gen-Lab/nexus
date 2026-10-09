@@ -1,3 +1,4 @@
+#include "shell/shell_mock_backend.h"
 /**
  * \file            test_shell_integration.cpp
  * \brief           Shell/CLI Middleware Integration Tests

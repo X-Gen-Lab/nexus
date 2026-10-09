@@ -1,3 +1,4 @@
+#include "hal/provider/nx_device_provider.h"
 /** Real STM32 Flash port, fixed virtual address memory and faulting HAL model.
  * Exercises runtime physical-size/linker fences. Not erase/power-fail HIL. */
 #define _GNU_SOURCE

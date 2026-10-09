@@ -1,5 +1,6 @@
 #ifndef TEST_CONFIG_FLASH_FIXTURE_H
 #define TEST_CONFIG_FLASH_FIXTURE_H
+#include "config/config_flash_backend.h"
 #include "nexus/file_flash.h"
 #include "config/config_backend.h"
 #include <cstdio>

@@ -22,6 +22,7 @@ extern "C" {
 #include "../../framework/config/src/config_namespace.h"
 #include "../../framework/config/src/config_store.h"
 #include "security/crypto.h"
+#include "security/crypto_openssl.h"
 }
 
 /**
@@ -30,7 +31,7 @@ extern "C" {
 class ConfigCryptoTest : public ::testing::Test {
   protected:
     void SetUp() override {
-        ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_use_default_provider());
+        ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_set_provider(nx_crypto_openssl_provider()));
         if (config_is_initialized()) {
             config_deinit();
         }
@@ -38,7 +39,7 @@ class ConfigCryptoTest : public ::testing::Test {
     }
 
     void TearDown() override {
-        EXPECT_EQ(NX_CRYPTO_OK, nx_crypto_use_default_provider());
+        EXPECT_EQ(NX_CRYPTO_OK, nx_crypto_set_provider(nx_crypto_openssl_provider()));
         if (config_is_initialized()) {
             config_deinit();
         }
@@ -409,7 +410,7 @@ TEST_F(ConfigCryptoTest, EntropyFailureLeavesExistingValueUnchanged) {
     char buffer[32];
     ASSERT_EQ(CONFIG_OK, config_get_str("secret", buffer, sizeof(buffer)));
     EXPECT_STREQ("original", buffer);
-    ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_use_default_provider());
+    ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_set_provider(nx_crypto_openssl_provider()));
 }
 
 TEST_F(ConfigCryptoTest, RepeatedProviderNonceRejected) {
@@ -419,7 +420,7 @@ TEST_F(ConfigCryptoTest, RepeatedProviderNonceRejected) {
     ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_set_provider(&provider));
     ASSERT_EQ(CONFIG_OK, config_set_str_encrypted("first", "original"));
     EXPECT_EQ(CONFIG_ERROR_CRYPTO_FAILED, config_set_str_encrypted("second", "must fail"));
-    ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_use_default_provider());
+    ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_set_provider(nx_crypto_openssl_provider()));
 }
 
 TEST_F(ConfigCryptoTest, EveryRecordByteIsAuthenticatedOrRejectedWithoutPlaintext) {
@@ -523,7 +524,7 @@ TEST_F(ConfigCryptoTest, EntropyFailureDuringRotationLeavesEveryRecordUnchanged)
     EXPECT_STREQ("one", buffer);
     ASSERT_EQ(CONFIG_OK, config_get_str("second", buffer, sizeof(buffer)));
     EXPECT_STREQ("two", buffer);
-    ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_use_default_provider());
+    ASSERT_EQ(NX_CRYPTO_OK, nx_crypto_set_provider(nx_crypto_openssl_provider()));
 }
 
 TEST_F(ConfigCryptoTest, SerializedRecordCanBeRestoredWithRegisteredGenerationsAfterRestart) {

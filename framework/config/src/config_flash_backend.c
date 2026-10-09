@@ -1,3 +1,4 @@
+#include "config/config_flash_backend.h"
 #include "config/config_backend.h"
 
 static nx_storage_t* g_partition;

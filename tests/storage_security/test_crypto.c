@@ -1,5 +1,6 @@
 /** Official published known-answer vectors and failure-contract regressions. */
 #include "security/crypto.h"
+#include "security/crypto_openssl.h"
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
@@ -66,7 +67,9 @@ static nx_crypto_status_t entropy_failure(void* ctx, uint8_t* output, size_t siz
 }
 
 int main(void) {
-    assert(nx_crypto_use_default_provider() == NX_CRYPTO_OK);
+    assert(!nx_crypto_is_available() && nx_crypto_get_provider() == NULL);
+    assert(nx_crypto_openssl_provider() && !nx_crypto_is_available());
+    assert(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     gcm_vector(NX_CRYPTO_AES128_GCM, 16,
         "0388dace60b6a392f328c2b971b2fe78", "ab6e47d42cec13bdf53a67b21257bddf");
     gcm_vector(NX_CRYPTO_AES256_GCM, 32,
@@ -84,7 +87,7 @@ int main(void) {
     assert(nx_crypto_verify_ed25519(public_key, NULL, 0, signature) == NX_CRYPTO_AUTH_FAILED);
     uint8_t first[32], second[32];
     assert(nx_crypto_random(first, sizeof(first)) == NX_CRYPTO_OK);
-    assert(nx_crypto_use_default_provider() == NX_CRYPTO_OK);
+    assert(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     assert(nx_crypto_random(second, sizeof(second)) == NX_CRYPTO_OK);
     assert(memcmp(first, second, sizeof(first)) != 0);
     nx_crypto_provider_t failing = *nx_crypto_get_provider();
@@ -96,7 +99,7 @@ int main(void) {
     assert(nx_crypto_random(first, sizeof(first)) == NX_CRYPTO_UNSUPPORTED);
     assert(nx_crypto_sha256(NULL, 0, digest) == NX_CRYPTO_UNSUPPORTED);
     assert(!nx_crypto_is_available());
-    assert(nx_crypto_use_default_provider() == NX_CRYPTO_OK);
+    assert(nx_crypto_set_provider(nx_crypto_openssl_provider()) == NX_CRYPTO_OK);
     puts("crypto: NIST GCM, SHA256, RFC8032 Ed25519, tamper, entropy and fail-closed checks passed");
     return 0;
 }
