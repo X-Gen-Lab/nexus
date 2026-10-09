@@ -15,11 +15,9 @@
 #include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_gpio.h"
-#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_gpio_helpers.h"
 #include "nx_gpio_types.h"
-#include <stdio.h>
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -37,99 +35,37 @@ extern void gpio_init_read_write(nx_gpio_read_write_t* gpio);
 extern void gpio_init_lifecycle(nx_lifecycle_t* lifecycle);
 extern void gpio_init_power(nx_power_t* power);
 
-/*---------------------------------------------------------------------------*/
-/* Instance Initialization                                                   */
-/*---------------------------------------------------------------------------*/
+/** Stable provider storage belongs to the descriptor, including reopen. */
+typedef struct {
+    nx_device_config_state_t core;
+    nx_gpio_read_write_impl_t impl;
+    nx_gpio_state_t state;
+} native_gpio_storage_t;
 
-/**
- * \brief           Initialize GPIO instance with platform configuration
- * \param[in]       impl: GPIO implementation structure pointer
- * \param[in]       platform_cfg: Platform configuration from Kconfig
- * \note            Allocates state memory and initializes all interfaces
- */
-NX_UNUSED static void
-gpio_init_instance(nx_gpio_read_write_impl_t* impl,
-                   const nx_gpio_platform_config_t* platform_cfg) {
-    if (impl == NULL || platform_cfg == NULL) {
-        return;
-    }
-
-    /* Initialize interfaces (implemented in separate files) */
+static nx_status_t nx_gpio_construct(const nx_device_t* dev, void** out) {
+    if (!out) return NX_ERR_NULL_PTR;
+    *out = NULL;
+    if (!dev || !dev->state || !dev->config) return NX_ERR_INVALID_PARAM;
+    const nx_gpio_platform_config_t* cfg = dev->config;
+    if (cfg->port > 7 || cfg->pin > 15 || cfg->mode > NX_GPIO_MODE_ANALOG ||
+        cfg->pull > NX_GPIO_PULL_DOWN || cfg->speed > NX_GPIO_SPEED_VERY_HIGH ||
+        cfg->af > 15) return NX_ERR_INVALID_PARAM;
+    native_gpio_storage_t* storage = NX_CONTAINER_OF(dev->state, native_gpio_storage_t, core);
+    nx_gpio_read_write_impl_t* impl = &storage->impl;
+    memset(impl, 0, sizeof(*impl));
+    impl->state = &storage->state;
+    memset(impl->state, 0, sizeof(*impl->state));
+    impl->state->port = cfg->port;
+    impl->state->pin = cfg->pin;
+    impl->state->config = (nx_gpio_config_t){cfg->port, cfg->pin, cfg->mode,
+        cfg->pull, cfg->speed, cfg->af};
+    impl->state->exti.trigger = NX_GPIO_TRIGGER_RISING;
+    impl->device = (nx_device_t*)dev;
     gpio_init_read_write(&impl->base);
     gpio_init_lifecycle(&impl->lifecycle);
     gpio_init_power(&impl->power);
-
-    /* Allocate and initialize state */
-    impl->state = (nx_gpio_state_t*)nx_mem_alloc(sizeof(nx_gpio_state_t));
-    if (!impl->state) {
-        return;
-    }
-    memset(impl->state, 0, sizeof(nx_gpio_state_t));
-
-    impl->state->port = platform_cfg->port;
-    impl->state->pin = platform_cfg->pin;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->pin_state = 0;
-
-    /* Set configuration from Kconfig */
-    impl->state->config.port = platform_cfg->port;
-    impl->state->config.pin = platform_cfg->pin;
-    impl->state->config.mode = platform_cfg->mode;
-    impl->state->config.pull = platform_cfg->pull;
-    impl->state->config.speed = platform_cfg->speed;
-    impl->state->config.af = platform_cfg->af;
-
-    /* Clear interrupt context */
-    impl->state->exti.callback = NULL;
-    impl->state->exti.user_data = NULL;
-    impl->state->exti.trigger = NX_GPIO_TRIGGER_RISING;
-    impl->state->exti.enabled = false;
-}
-
-/*---------------------------------------------------------------------------*/
-/* Device Registration                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- * \details         Allocates and initializes GPIO device with error handling.
- *                  Returns NULL on any failure (memory allocation, invalid
- *                  config, or initialization failure).
- * \note            Ensures proper cleanup of allocated resources on failure.
- */
-NX_UNUSED static void* nx_gpio_device_init(const nx_device_t* dev) {
-    if (dev == NULL) {
-        return NULL;
-    }
-
-    const nx_gpio_platform_config_t* config =
-        (const nx_gpio_platform_config_t*)dev->config;
-
-    /* Validate configuration */
-    if (config == NULL) {
-        return NULL;
-    }
-
-    /* Allocate implementation structure */
-    nx_gpio_read_write_impl_t* impl = (nx_gpio_read_write_impl_t*)nx_mem_alloc(
-        sizeof(nx_gpio_read_write_impl_t));
-    if (!impl) {
-        return NULL;
-    }
-    memset(impl, 0, sizeof(nx_gpio_read_write_impl_t));
-
-    /* Initialize instance with platform configuration */
-    gpio_init_instance(impl, config);
-
-    /* Check if state allocation succeeded */
-    if (!impl->state) {
-        nx_mem_free(impl);
-        return NULL;
-    }
-
-    /* Device is created but not initialized - tests will call init() */
-    return &impl->base;
+    *out = &impl->base;
+    return NX_OK;
 }
 
 /**
@@ -181,13 +117,10 @@ NX_UNUSED static void* nx_gpio_device_init(const nx_device_t* dev) {
  */
 #define NX_GPIO_DEVICE_REGISTER(_P, _N)                                        \
     NX_GPIO_CONFIG(_P, _N);                                                    \
-    static nx_device_config_state_t gpio_kconfig_state_##_P##_N = {            \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-    };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, _P##_N, "GPIO" #_P #_N,                    \
-                       &gpio_config_##_P##_N, &gpio_kconfig_state_##_P##_N,    \
-                       nx_gpio_device_init);
+    static native_gpio_storage_t gpio_storage_##_P##_N;                       \
+    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, _P##_N, "GPIO" #_P #_N,              \
+        &gpio_config_##_P##_N, &gpio_storage_##_P##_N.core,                     \
+        NX_DEVICE_CLASS_GPIO, 0, nx_gpio_construct, NULL);
 
 /**
  * \brief           Register all enabled GPIO instances

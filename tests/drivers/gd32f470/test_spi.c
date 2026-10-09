@@ -3,8 +3,16 @@
 #include "gd32f470_platform.h"
 #include <assert.h>
 #include <stdio.h>
+#include "board.h"
+static nx_status_t release_error;
+static nx_status_t provider_test_spi_pins(bool enabled) {
+    return !enabled && release_error != NX_OK ? release_error :
+        nx_gd32_board_spi_pins(enabled);
+}
+#define nx_gd32_board_spi_pins provider_test_spi_pins
 // NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production fault fixture; retain private factory/state checks.
 #include "../../../soc/gd32f470/controllers/spi.c"
+#undef nx_gd32_board_spi_pins
 uint32_t nx_gd32f470_millis(void){return fake_millis;}
 uint64_t nx_gd32f470_timestamp_us(void){return (uint64_t)fake_millis*1000u;}
 static nx_spi_device_t first;
@@ -19,7 +27,13 @@ static void complete(void* unused,nx_status_t status){
 }
 static void cancel_during_poll(void){fake_spi_hook=NULL;assert(first.cancel(&first)==NX_OK);}
 int main(void){
-    nx_spi_bus_t* api=create_spi(NULL);life=api->get_lifecycle(api);
+    assert(NX_SPI4.device_init == NULL && NX_SPI4.construct == construct_spi);
+    void* rejected = (void*)1;
+    assert(construct_spi(NULL, &rejected) == NX_ERR_INVALID_PARAM && rejected == NULL);
+    assert(construct_spi(&NX_SPI4, NULL) == NX_ERR_NULL_PTR);
+    void* constructed = NULL;
+    assert(construct_spi(&NX_SPI4, &constructed) == NX_OK);
+    nx_spi_bus_t* api = constructed;life=api->get_lifecycle(api);
     assert(fake_reset_count==0&&life->init(life)==NX_OK);
     nx_spi_device_config_t config={.cs_pin=0,.speed=1000000,.mode=3,.bit_order=0};
     assert(api->open_device(api,&config,&first)==NX_OK);
@@ -52,6 +66,12 @@ int main(void){
     assert(life->deinit(life)==NX_OK&&life->init(life)==NX_OK);
     assert(first.transfer(&first,&request)==NX_ERR_INVALID_STATE);
     bus.generation=UINT64_MAX;assert(api->open_device(api,&config,&extra)==NX_ERR_FULL);
+    release_error = NX_ERR_IO;
+    assert(life->deinit(life) == NX_ERR_IO);
+    assert(life->get_state(life) == NX_DEV_STATE_RUNNING);
+    release_error = NX_OK;
+    assert(life->deinit(life) == NX_OK);
+    assert(life->get_state(life) == NX_DEV_STATE_UNINITIALIZED);
     puts("GD32 SPI4 mode/divider, timeout/drain, queued deadlines, callback ownership and stale handles passed");
     return 0;
 }

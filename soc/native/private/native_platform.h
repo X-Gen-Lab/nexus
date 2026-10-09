@@ -35,4 +35,9 @@
 #include "hal/nx_factory.h"
 #include "hal/nx_status.h"
 
+/** Private global teardown admission: allocated DMA and connected/active IRQ
+ * owners require caller settlement/release before HAL can stop the platform. */
+nx_status_t nx_native_dma_idle(void);
+nx_status_t nx_native_resources_idle(void);
+
 #endif /* NATIVE_PLATFORM_H */

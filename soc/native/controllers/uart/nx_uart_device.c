@@ -15,11 +15,9 @@
 #include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_uart.h"
-#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_uart_helpers.h"
 #include "nx_uart_types.h"
-#include <stdio.h>
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -100,161 +98,49 @@ static nx_power_t* uart_get_power(nx_uart_t* self) {
     return impl ? &impl->power : NULL;
 }
 
-/*---------------------------------------------------------------------------*/
-/* Instance Initialization                                                   */
-/*---------------------------------------------------------------------------*/
+/** Descriptor-owned storage: construction cannot fail halfway through an
+ * allocation or retarget an escaped pointer on close/reopen. */
+typedef struct {
+    nx_device_config_state_t core;
+    nx_uart_impl_t impl;
+    nx_uart_state_t state;
+    uint8_t* tx;
+    uint8_t* rx;
+    size_t tx_size, rx_size;
+} native_uart_storage_t;
 
-/**
- * \brief           Initialize UART instance with platform configuration
- */
-static void uart_init_instance(nx_uart_impl_t* impl, uint8_t index,
-                               const nx_uart_platform_config_t* platform_cfg) {
-    /* Initialize base interface */
-    impl->base.get_tx_async = uart_get_tx_async;
-    impl->base.get_rx_async = uart_get_rx_async;
-    impl->base.get_tx_sync = uart_get_tx_sync;
-    impl->base.get_rx_sync = uart_get_rx_sync;
-    impl->base.get_lifecycle = uart_get_lifecycle;
-    impl->base.get_power = uart_get_power;
-
-    /* Initialize interfaces (implemented in separate files) */
+static nx_status_t nx_uart_construct(const nx_device_t* dev, void** out) {
+    if (!out) return NX_ERR_NULL_PTR;
+    *out = NULL;
+    if (!dev || !dev->state || !dev->config) return NX_ERR_INVALID_PARAM;
+    const nx_uart_platform_config_t* cfg = dev->config;
+    native_uart_storage_t* storage = NX_CONTAINER_OF(dev->state, native_uart_storage_t, core);
+    if (!cfg->baudrate || cfg->word_length < 5 || cfg->word_length > 9 ||
+        (cfg->stop_bits != 1 && cfg->stop_bits != 2) || cfg->parity > 2 ||
+        cfg->flow_control || !cfg->tx_buf_size || !cfg->rx_buf_size ||
+        !storage->tx || !storage->rx || storage->tx_size != cfg->tx_buf_size ||
+        storage->rx_size != cfg->rx_buf_size) return NX_ERR_INVALID_PARAM;
+    nx_uart_impl_t* impl = &storage->impl;
+    memset(impl, 0, sizeof(*impl));
+    impl->state = &storage->state;
+    memset(impl->state, 0, sizeof(*impl->state));
+    impl->state->index = cfg->uart_index;
+    impl->state->config = (nx_uart_config_t){cfg->baudrate, cfg->word_length,
+        cfg->stop_bits, cfg->parity, cfg->flow_control, false, false,
+        cfg->tx_buf_size, cfg->rx_buf_size};
+    buffer_init(&impl->state->tx_buf, storage->tx, cfg->tx_buf_size);
+    buffer_init(&impl->state->rx_buf, storage->rx, cfg->rx_buf_size);
+    impl->device = (nx_device_t*)dev;
+    NX_INIT_UART(&impl->base, uart_get_tx_async, uart_get_rx_async,
+        uart_get_tx_sync, uart_get_rx_sync, uart_get_lifecycle, uart_get_power);
     uart_init_tx_async(&impl->tx_async);
     uart_init_rx_async(&impl->rx_async);
     uart_init_tx_sync(&impl->tx_sync);
     uart_init_rx_sync(&impl->rx_sync);
     uart_init_lifecycle(&impl->lifecycle);
     uart_init_power(&impl->power);
-
-    /* Allocate and initialize state */
-    impl->state = (nx_uart_state_t*)nx_mem_alloc(sizeof(nx_uart_state_t));
-    if (!impl->state) {
-        return;
-    }
-    memset(impl->state, 0, sizeof(nx_uart_state_t));
-
-    impl->state->index = index;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->tx_busy = false;
-
-    /* Set configuration from Kconfig */
-    if (platform_cfg != NULL) {
-        impl->state->config.baudrate = platform_cfg->baudrate;
-        impl->state->config.word_length = platform_cfg->word_length;
-        impl->state->config.stop_bits = platform_cfg->stop_bits;
-        impl->state->config.parity = platform_cfg->parity;
-        impl->state->config.flow_control = platform_cfg->flow_control;
-        impl->state->config.dma_tx_enable = false;
-        impl->state->config.dma_rx_enable = false;
-        impl->state->config.tx_buf_size = platform_cfg->tx_buf_size;
-        impl->state->config.rx_buf_size = platform_cfg->rx_buf_size;
-
-        /* Allocate buffers dynamically */
-        impl->state->tx_buf.data =
-            (uint8_t*)nx_mem_alloc(platform_cfg->tx_buf_size);
-        impl->state->tx_buf.size = platform_cfg->tx_buf_size;
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-
-        impl->state->rx_buf.data =
-            (uint8_t*)nx_mem_alloc(platform_cfg->rx_buf_size);
-        impl->state->rx_buf.size = platform_cfg->rx_buf_size;
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-
-        /* Check if buffer allocation succeeded */
-        if (impl->state->tx_buf.data == NULL ||
-            impl->state->rx_buf.data == NULL) {
-            /* Allocation failed - clean up */
-            if (impl->state->tx_buf.data != NULL) {
-                nx_mem_free(impl->state->tx_buf.data);
-            }
-            if (impl->state->rx_buf.data != NULL) {
-                nx_mem_free(impl->state->rx_buf.data);
-            }
-            nx_mem_free(impl->state);
-            impl->state = NULL;
-            return;
-        }
-    } else {
-        /* No platform config - set default buffer sizes */
-        impl->state->config.baudrate = 115200;
-        impl->state->config.word_length = 8;
-        impl->state->config.stop_bits = 1;
-        impl->state->config.parity = 0;
-        impl->state->config.flow_control = 0;
-        impl->state->config.dma_tx_enable = false;
-        impl->state->config.dma_rx_enable = false;
-        impl->state->config.tx_buf_size = 256;
-        impl->state->config.rx_buf_size = 256;
-
-        /* Allocate buffers with default sizes */
-        impl->state->tx_buf.data = (uint8_t*)nx_mem_alloc(256);
-        impl->state->tx_buf.size = 256;
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-
-        impl->state->rx_buf.data = (uint8_t*)nx_mem_alloc(256);
-        impl->state->rx_buf.size = 256;
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-
-        /* Check if buffer allocation succeeded */
-        if (impl->state->tx_buf.data == NULL ||
-            impl->state->rx_buf.data == NULL) {
-            /* Allocation failed - clean up */
-            if (impl->state->tx_buf.data != NULL) {
-                nx_mem_free(impl->state->tx_buf.data);
-            }
-            if (impl->state->rx_buf.data != NULL) {
-                nx_mem_free(impl->state->rx_buf.data);
-            }
-            nx_mem_free(impl->state);
-            impl->state = NULL;
-            return;
-        }
-    }
-
-}
-
-/*---------------------------------------------------------------------------*/
-/* Device Registration                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- */
-NX_UNUSED static void* nx_uart_device_init(const nx_device_t* dev) {
-    const nx_uart_platform_config_t* config =
-        (const nx_uart_platform_config_t*)dev->config;
-
-    if (config == NULL) {
-        return NULL;
-    }
-
-    /* Allocate implementation structure */
-    nx_uart_impl_t* impl =
-        (nx_uart_impl_t*)nx_mem_alloc(sizeof(nx_uart_impl_t));
-    if (!impl) {
-        return NULL;
-    }
-    memset(impl, 0, sizeof(nx_uart_impl_t));
-
-    /* Initialize instance with platform configuration */
-    uart_init_instance(impl, config->uart_index, config);
-
-    /* Check if state allocation succeeded */
-    if (!impl->state) {
-        nx_mem_free(impl);
-        return NULL;
-    }
-
-    /* Device is created but not initialized - tests will call init() */
-    return &impl->base;
+    *out = &impl->base;
+    return NX_OK;
 }
 
 /**
@@ -277,13 +163,15 @@ NX_UNUSED static void* nx_uart_device_init(const nx_device_t* dev) {
  */
 #define NX_UART_DEVICE_REGISTER(index)                                         \
     NX_UART_CONFIG(index);                                                     \
-    static nx_device_config_state_t uart_kconfig_state_##index = {             \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-    };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "UART" #index,                      \
-                       &uart_config_##index, &uart_kconfig_state_##index,      \
-                       nx_uart_device_init);
+    static uint8_t uart_tx_##index[NX_CONFIG_UART##index##_TX_BUFFER_SIZE];     \
+    static uint8_t uart_rx_##index[NX_CONFIG_UART##index##_RX_BUFFER_SIZE];     \
+    static native_uart_storage_t uart_storage_##index = {                      \
+        .tx = uart_tx_##index, .rx = uart_rx_##index,                           \
+        .tx_size = sizeof(uart_tx_##index), .rx_size = sizeof(uart_rx_##index), \
+    };                                                                        \
+    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index, "UART" #index,               \
+        &uart_config_##index, &uart_storage_##index.core,                      \
+        NX_DEVICE_CLASS_UART, 0, nx_uart_construct, NULL);
 
 /**
  * \brief           Register all enabled UART instances

@@ -57,7 +57,7 @@ static nx_status_t deinit(nx_lifecycle_t*) {
     }
     return current->close_status;
 }
-static nx_device_state_t state(nx_lifecycle_t*) { return current->hardware; }
+static nx_device_state_t state(nx_lifecycle_t*) { EXPECT_FALSE(nx_arch_irq_is_masked()); return current->hardware; }
 static nx_lifecycle_t* gpio_lifecycle(nx_gpio_write_t*) { return &current->life; }
 static nx_lifecycle_t* read_lifecycle(nx_gpio_read_t*) { return &current->life; }
 static nx_lifecycle_t* uart_lifecycle(nx_uart_t*) { return &current->life; }
@@ -283,6 +283,41 @@ TEST_F(TypedDevice, FailedCloseRetainsReferenceForRetry) {
     port.close_status = NX_OK;
     EXPECT_EQ(nx_device_close(ref), NX_OK); ref = {};
 }
+TEST_F(TypedDevice, LyingCloseKeepsOwnerReferenceAndAllowsTruthfulRetry) {
+    open();
+    port.deinit_lies = true;
+    EXPECT_EQ(nx_device_close(ref), NX_ERR_NOT_READY);
+    EXPECT_EQ(storage.phase, NX_DEVICE_OPEN);
+    EXPECT_EQ(storage.owner, ref.owner);
+    EXPECT_EQ(port.hardware, NX_DEV_STATE_RUNNING);
+    EXPECT_EQ(nx_device_gpio_write(ref, 1), NX_OK);
+    port.life.get_state = nullptr;
+    EXPECT_EQ(nx_device_close(ref), NX_ERR_NOT_SUPPORTED);
+    EXPECT_EQ(storage.phase, NX_DEVICE_OPEN);
+    port.life.get_state = state;
+    port.deinit_lies = false;
+    EXPECT_EQ(nx_device_close(ref), NX_OK);
+    EXPECT_EQ(nx_device_gpio_write(ref, 0), NX_ERR_INVALID_STATE);
+    ref = {};
+}
+TEST_F(TypedDevice, RecoverRejectsFalseNotInitAndPreservesQuarantineForRetry) {
+    port.open_status = NX_ERR_HARDWARE;
+    port.close_status = NX_ERR_BUSY;
+    EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 1, &ref), NX_ERR_BUSY);
+    EXPECT_EQ(storage.phase, NX_DEVICE_RECOVERY_REQUIRED);
+    port.close_status = NX_ERR_NOT_INIT;
+    EXPECT_EQ(nx_device_recover(descriptor.name, 1), NX_ERR_NOT_READY);
+    EXPECT_EQ(storage.phase, NX_DEVICE_RECOVERY_REQUIRED);
+    EXPECT_EQ(storage.owner, 1u);
+    port.close_status = NX_OK;
+    port.deinit_lies = true;
+    EXPECT_EQ(nx_device_recover(descriptor.name, 1), NX_ERR_NOT_READY);
+    EXPECT_EQ(storage.phase, NX_DEVICE_RECOVERY_REQUIRED);
+    port.deinit_lies = false;
+    EXPECT_EQ(nx_device_recover(descriptor.name, 1), NX_OK);
+    EXPECT_EQ(port.hardware, NX_DEV_STATE_UNINITIALIZED);
+    EXPECT_EQ(storage.owner, 0u);
+}
 TEST_F(TypedDevice, ReentrantCloseCannotDestroyRunningDriverCall) {
     open(); port.nested_ref = ref;
     EXPECT_EQ(nx_device_gpio_write(ref, 1), NX_OK);
@@ -319,6 +354,71 @@ TEST_F(TypedDevice, ShutdownFenceRejectsNewOwnerUntilReleased) {
     EXPECT_EQ(nx_device_get_checked(descriptor.name, descriptor.device_class), nullptr);
     EXPECT_EQ(nx_device_shutdown_begin(), NX_ERR_BUSY);
     nx_device_shutdown_end(); open();
+}
+TEST_F(TypedDevice, PrivateQuarantineFenceBlocksNewAdmissionUntilSameOwnerReleases) {
+    open();
+    EXPECT_EQ(nx_device_shutdown_begin_owned(2), NX_ERR_BUSY);
+    ASSERT_EQ(nx_device_shutdown_quarantine_begin(2), NX_OK);
+    EXPECT_EQ(nx_device_shutdown_quarantine_begin(3), NX_ERR_BUSY);
+    nx_device_shutdown_end();
+    EXPECT_TRUE(nx_device_shutdown_is_active());
+    EXPECT_EQ(nx_device_shutdown_end_owned(3), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_device_close(ref), NX_OK); ref = {};
+    nx_device_ref_t rejected{};
+    EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 3, &rejected), NX_ERR_BUSY);
+    EXPECT_EQ(nx_device_get_checked(descriptor.name, descriptor.device_class), nullptr);
+    EXPECT_EQ(nx_device_register(&descriptor), NX_ERR_BUSY);
+    EXPECT_EQ(nx_device_registry_reset(), NX_ERR_BUSY);
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_OK);
+    EXPECT_EQ(nx_device_shutdown_end_owned(2), NX_OK);
+    EXPECT_FALSE(nx_device_shutdown_is_active());
+    open();
+}
+TEST_F(TypedDevice, FailedOpenCleanupCannotClaimClosedWhenLifecycleStillRunning) {
+    port.open_status = NX_ERR_HARDWARE;
+    port.deinit_lies = true;
+    EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 1, &ref), NX_ERR_NOT_READY);
+    EXPECT_EQ(storage.phase, NX_DEVICE_RECOVERY_REQUIRED);
+    EXPECT_EQ(storage.owner, 1u);
+    EXPECT_EQ(ref.descriptor, nullptr);
+    port.deinit_lies = false;
+    EXPECT_EQ(nx_device_recover(descriptor.name, 1), NX_OK);
+    port.open_status = NX_OK;
+    open();
+}
+TEST_F(TypedDevice, ShutdownChecksCachedMigrationLifecycleOutsideMetadataMask) {
+    ASSERT_NE(nx_device_get_checked(descriptor.name, descriptor.device_class), nullptr);
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_device_provider_stop_all(), NX_ERR_INVALID_STATE);
+    port.hardware = NX_DEV_STATE_RUNNING;
+    ASSERT_EQ(nx_device_shutdown_begin(), NX_OK);
+    EXPECT_TRUE(nx_device_shutdown_is_active());
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_ERR_BUSY);
+    port.close_status = NX_ERR_BUSY;
+    EXPECT_EQ(nx_device_provider_stop_all(), NX_ERR_BUSY);
+    EXPECT_EQ(port.hardware, NX_DEV_STATE_RUNNING);
+    port.close_status = NX_OK;
+    EXPECT_EQ(nx_device_provider_stop_all(), NX_OK);
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_OK);
+    EXPECT_EQ(port.hardware, NX_DEV_STATE_UNINITIALIZED);
+    nx_device_shutdown_end();
+    EXPECT_FALSE(nx_device_shutdown_is_active());
+}
+TEST_F(TypedDevice, ShutdownRejectsUnprovableAndLyingMigrationCleanup) {
+    ASSERT_NE(nx_device_get_checked(descriptor.name, descriptor.device_class), nullptr);
+    port.hardware = NX_DEV_STATE_ERROR;
+    ASSERT_EQ(nx_device_shutdown_begin(), NX_OK);
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_ERR_BUSY);
+    port.deinit_lies = true;
+    EXPECT_EQ(nx_device_provider_stop_all(), NX_ERR_NOT_READY);
+    EXPECT_EQ(port.hardware, NX_DEV_STATE_ERROR);
+    port.deinit_lies = false;
+    EXPECT_EQ(nx_device_provider_stop_all(), NX_OK);
+    port.life.get_state = nullptr;
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_ERR_NOT_SUPPORTED);
+    EXPECT_EQ(nx_device_provider_stop_all(), NX_ERR_NOT_SUPPORTED);
+    port.life.get_state = state;
+    EXPECT_EQ(nx_device_provider_quiescence_check(), NX_OK);
 }
 TEST_F(TypedDevice, UartLeaseBlocksCloseEvenWhenMemoryCompletesBeforeWire) {
     uart(); open();

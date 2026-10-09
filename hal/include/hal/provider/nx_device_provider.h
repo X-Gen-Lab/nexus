@@ -210,6 +210,30 @@ void* nx_device_get(const char* name);
  * acquire generation protection retroactively. */
 void* nx_device_get_checked(const char* name, nx_device_class_t expected);
 
+/** Implementation-only lifecycle admission state. Allocation/connect entry
+ * points sharing Arch metadata locking must reject new resource owners while
+ * true. Raw escaped migration APIs still require caller quiescence. */
+bool nx_device_shutdown_is_active(void);
+
+/** Exclusive HAL-private fence. owner is a stable implementation identity,
+ * not a product privilege. Normal begin requires closed metadata; quarantine
+ * begin closes new admission even if existing owners still need settlement.
+ * Ordinary shutdown_end cannot release this owned fence. */
+nx_status_t nx_device_shutdown_begin_owned(uintptr_t owner);
+nx_status_t nx_device_shutdown_quarantine_begin(uintptr_t owner);
+nx_status_t nx_device_shutdown_end_owned(uintptr_t owner);
+
+/** Called after shutdown_begin by the serialized platform hook. Requires all
+ * constructed lifecycle providers to report UNINITIALIZED, including cached
+ * migration instances whose registry phase is CLOSED. Queries execute outside
+ * metadata masks; this does not initialize or tear down any hardware. */
+nx_status_t nx_device_provider_quiescence_check(void);
+
+/** Native migration cleanup under the same fence: deinitialize every cached
+ * lifecycle provider; preserve cache/identity on any error and allow retry.
+ * The caller has already stopped new use of escaped raw migration pointers. */
+nx_status_t nx_device_provider_stop_all(void);
+
 /*---------------------------------------------------------------------------*/
 /* Manual Registration (for MSVC, native platform, and testing)              */
 /*---------------------------------------------------------------------------*/

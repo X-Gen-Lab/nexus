@@ -83,3 +83,13 @@ if(_hal_saved_try_type)
 else()
     unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
 endif()
+
+# Actual maintained Native descriptors and DMA/IRQ admission ownership.
+add_executable(typed_native_provider_tests test_native_providers.cpp)
+target_compile_features(typed_native_provider_tests PRIVATE cxx_std_17)
+target_link_libraries(typed_native_provider_tests PRIVATE
+    Nexus::Firmware Nexus::HALProviders Nexus::Arch GTest::gtest_main ${THREAD_LIBS})
+if(NOT MSVC)
+    target_compile_options(typed_native_provider_tests PRIVATE -Wall -Wextra -Werror)
+endif()
+nexus_discover_tests(typed_native_provider_tests PROPERTIES TIMEOUT 10 LABELS "hal;typed;native;provider;contract")

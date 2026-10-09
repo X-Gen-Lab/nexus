@@ -11,6 +11,7 @@ typedef struct {
     nx_device_state_t state;
 } gpio_instance_t;
 static gpio_instance_t led;
+static nx_device_config_state_t device_state;
 
 static nx_status_t gpio_init_device(nx_lifecycle_t* self) {
     (void)self;
@@ -64,13 +65,16 @@ static nx_lifecycle_t* gpio_read_lifecycle(nx_gpio_read_t* self) { (void)self; r
 static nx_lifecycle_t* gpio_write_lifecycle(nx_gpio_write_t* self) { (void)self; return &led.lifecycle; }
 static nx_power_t* gpio_read_power(nx_gpio_read_t* self) { (void)self; return NULL; }
 static nx_power_t* gpio_write_power(nx_gpio_write_t* self) { (void)self; return NULL; }
-static void* create_gpio(const nx_device_t* descriptor) {
-    (void)descriptor;
+static nx_status_t construct_gpio(const nx_device_t* descriptor, void** out) {
+    if (!out) { return NX_ERR_NULL_PTR; }
+    *out = NULL;
+    if (!descriptor || descriptor->state != &device_state) { return NX_ERR_INVALID_PARAM; }
     led.lifecycle = (nx_lifecycle_t){ .init = gpio_init_device, .deinit = gpio_deinit_device,
         .suspend = gpio_suspend, .resume = gpio_resume, .get_state = gpio_state };
     NX_INIT_GPIO_READ_WRITE(&led.api, gpio_read, gpio_exti, gpio_write, gpio_toggle,
         gpio_read_lifecycle, gpio_read_power, gpio_write_lifecycle, gpio_write_power);
-    return &led.api;
+    *out = &led.api;
+    return NX_OK;
 }
-static nx_device_config_state_t device_state;
-NX_DEVICE_REGISTER(NX_GPIO, D7, "GPIOD7", NULL, &device_state, create_gpio);
+NX_DEVICE_REGISTER_TYPED(NX_GPIO, D7, "GPIOD7", NULL, &device_state, NX_DEVICE_CLASS_GPIO,
+    0, construct_gpio, NULL);

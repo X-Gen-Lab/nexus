@@ -31,6 +31,7 @@ typedef struct {
     bool active;
 } uart_instance_t;
 static uart_instance_t uart;
+static nx_device_config_state_t device_state;
 /* Backend raw-error bit: controller reset may have interrupted an RX frame. */
 #define RX_CONTROLLER_RESET (1u << 31)
 static void enqueue_event(nx_uart_rx_event_t event) {
@@ -115,7 +116,8 @@ static nx_status_t uart_deinit(nx_lifecycle_t* self) {
     usart_disable(USART0);
     usart_deinit(USART0);
     NVIC_ClearPendingIRQ(USART0_IRQn);
-    (void)nx_gd32_board_uart_pins(false);
+    nx_status_t status = nx_gd32_board_uart_pins(false);
+    if (status != NX_OK) { nx_arch_irq_restore(saved); return status; }
     uart.head = uart.count = 0;
     uart.dropped = 0;
     uart.state = NX_DEV_STATE_UNINITIALIZED;
@@ -265,8 +267,10 @@ static nx_tx_sync_t* get_tx_sync(nx_uart_t* self) { (void)self; return &uart.tx_
 static nx_rx_sync_t* get_rx_sync(nx_uart_t* self) { (void)self; return NULL; }
 static nx_lifecycle_t* get_lifecycle(nx_uart_t* self) { (void)self; return &uart.lifecycle; }
 static nx_power_t* get_power(nx_uart_t* self) { (void)self; return NULL; }
-static void* create_uart(const nx_device_t* descriptor) {
-    (void)descriptor;
+static nx_status_t construct_uart(const nx_device_t* descriptor, void** out) {
+    if (!out) { return NX_ERR_NULL_PTR; }
+    *out = NULL;
+    if (!descriptor || descriptor->state != &device_state) { return NX_ERR_INVALID_PARAM; }
     uart.api = (nx_uart_t){ .get_operations = get_operations, .get_tx_async = get_tx_async,
         .get_rx_async = get_rx_async, .get_tx_sync = get_tx_sync,
         .get_rx_sync = get_rx_sync, .get_lifecycle = get_lifecycle, .get_power = get_power };
@@ -276,7 +280,8 @@ static void* create_uart(const nx_device_t* descriptor) {
         .suspend = uart_suspend, .resume = uart_resume, .get_state = uart_state };
     uart.tx_sync.send = uart_send_sync;
     uart.rx_async.receive = uart_receive_legacy;
-    return &uart.api;
+    *out = &uart.api;
+    return NX_OK;
 }
-static nx_device_config_state_t device_state;
-NX_DEVICE_REGISTER(NX_UART, 0, "UART0", NULL, &device_state, create_uart);
+NX_DEVICE_REGISTER_TYPED(NX_UART, 0, "UART0", NULL, &device_state, NX_DEVICE_CLASS_UART,
+    NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_CANCEL | NX_DEVICE_CAP_UART_RX_EVENTS, construct_uart, NULL);

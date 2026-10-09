@@ -1,244 +1,125 @@
-/**
- * \file            nx_dma_native.c
- * \brief           Native platform DMA manager simulation
- * \author          Nexus Team
- */
-
+/** Bounded host DMA ownership model. No hardware/DMA timing is simulated. */
 #include "hal/resource/nx_dma_manager.h"
-#include <stdlib.h>
+#include "hal/provider/nx_device_provider.h"
+#include "arch/nx_arch.h"
+#include "native_platform.h"
 #include <string.h>
 
-/* Maximum number of simulated DMA controllers */
-#define NX_DMA_MAX_CONTROLLERS 2
-
-/* Maximum number of channels per controller */
-#define NX_DMA_MAX_CHANNELS_PER_CTRL 8
-
-/**
- * \brief           DMA channel state enumeration
- */
-typedef enum {
-    NX_DMA_CH_STATE_FREE = 0,
-    NX_DMA_CH_STATE_ALLOCATED,
-    NX_DMA_CH_STATE_BUSY,
-} nx_dma_ch_state_t;
-
-/**
- * \brief           DMA channel implementation structure
- */
+#define NX_DMA_MAX_CONTROLLERS 2u
+#define NX_DMA_MAX_CHANNELS_PER_CTRL 8u
+typedef enum { FREE, ALLOCATED, BUSY } channel_state_t;
 typedef struct {
-    nx_dma_channel_t base;      /**< Base interface */
-    uint8_t dma_index;          /**< DMA controller index */
-    uint8_t channel_num;        /**< Channel number */
-    nx_dma_ch_state_t state;    /**< Channel state */
-    nx_dma_config_t config;     /**< Current configuration */
-    nx_dma_callback_t callback; /**< Completion callback */
-    void* user_data;            /**< User data for callback */
-    size_t remaining;           /**< Remaining transfer count */
-} nx_dma_channel_impl_t;
-
-/* Forward declarations */
-static nx_status_t dma_configure(nx_dma_channel_t* self,
-                                 const nx_dma_config_t* cfg);
-static nx_status_t dma_start(nx_dma_channel_t* self);
-static nx_status_t dma_stop(nx_dma_channel_t* self);
-static size_t dma_get_remaining(nx_dma_channel_t* self);
-static nx_status_t dma_set_callback(nx_dma_channel_t* self,
-                                    nx_dma_callback_t callback,
-                                    void* user_data);
-
-/* Channel pool for all DMA controllers */
-static nx_dma_channel_impl_t g_dma_channels[NX_DMA_MAX_CONTROLLERS]
-                                           [NX_DMA_MAX_CHANNELS_PER_CTRL] = {0};
-
-/**
- * \brief           Configure DMA transfer parameters
- */
-static nx_status_t dma_configure(nx_dma_channel_t* self,
-                                 const nx_dma_config_t* cfg) {
-    if (!self || !cfg) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_dma_channel_impl_t* impl = (nx_dma_channel_impl_t*)self;
-
-    if (impl->state == NX_DMA_CH_STATE_BUSY) {
-        return NX_ERR_BUSY;
-    }
-
-    /* Validate configuration */
-    if (cfg->size == 0) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    if (cfg->data_width != 1 && cfg->data_width != 2 && cfg->data_width != 4) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    /* Store configuration */
-    impl->config = *cfg;
-
-    return NX_OK;
+    nx_dma_channel_t base;
+    channel_state_t state;
+    nx_dma_config_t config;
+    nx_dma_callback_t callback;
+    void* context;
+    size_t remaining;
+    unsigned callbacks;
+} channel_t;
+static channel_t channels[NX_DMA_MAX_CONTROLLERS][NX_DMA_MAX_CHANNELS_PER_CTRL];
+static channel_t* resolve(nx_dma_channel_t* self) {
+    for (unsigned i=0;i<NX_DMA_MAX_CONTROLLERS;++i)
+        for (unsigned j=0;j<NX_DMA_MAX_CHANNELS_PER_CTRL;++j)
+            if (self==&channels[i][j].base) return &channels[i][j];
+    return NULL;
 }
-
-/**
- * \brief           Start DMA transfer
- */
-static nx_status_t dma_start(nx_dma_channel_t* self) {
-    if (!self) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_dma_channel_impl_t* impl = (nx_dma_channel_impl_t*)self;
-
-    if (impl->state != NX_DMA_CH_STATE_ALLOCATED) {
-        return NX_ERR_INVALID_STATE;
-    }
-
-    /* Mark as busy */
-    impl->state = NX_DMA_CH_STATE_BUSY;
-    impl->remaining = impl->config.size;
-
-    /* Simulate immediate transfer completion for non-circular mode */
-    if (!impl->config.circular) {
-        impl->remaining = 0;
-        impl->state = NX_DMA_CH_STATE_ALLOCATED;
-
-        /* Call completion callback */
-        if (impl->callback) {
-            impl->callback(impl->user_data);
+static nx_status_t configure(nx_dma_channel_t* self,const nx_dma_config_t* cfg) {
+    if (!self || !cfg) return NX_ERR_NULL_PTR;
+    if (!cfg->size || (cfg->data_width!=1 && cfg->data_width!=2 && cfg->data_width!=4))
+        return NX_ERR_INVALID_PARAM;
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=resolve(self);
+    nx_status_t r=!c ? NX_ERR_INVALID_PARAM : c->state==FREE ? NX_ERR_INVALID_STATE :
+        c->state==BUSY || c->callbacks ? NX_ERR_BUSY : NX_OK;
+    if (r==NX_OK) c->config=*cfg;
+    nx_arch_irq_restore(saved);
+    return r;
+}
+static nx_status_t start(nx_dma_channel_t* self) {
+    if (!self) return NX_ERR_NULL_PTR;
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=resolve(self);
+    nx_status_t r=!c ? NX_ERR_INVALID_PARAM : c->state!=ALLOCATED ? NX_ERR_INVALID_STATE :
+        c->callbacks ? NX_ERR_BUSY : !c->config.size ? NX_ERR_INVALID_PARAM : NX_OK;
+    nx_dma_callback_t callback=NULL;
+    void* context=NULL;
+    if (r==NX_OK) {
+        c->state=BUSY; c->remaining=c->config.size;
+        if (!c->config.circular) {
+            c->state=ALLOCATED; c->remaining=0;
+            callback=c->callback; context=c->context;
+            if (callback) ++c->callbacks;
         }
     }
-
-    return NX_OK;
-}
-
-/**
- * \brief           Stop DMA transfer
- */
-static nx_status_t dma_stop(nx_dma_channel_t* self) {
-    if (!self) {
-        return NX_ERR_NULL_PTR;
+    nx_arch_irq_restore(saved);
+    if (callback) {
+        callback(context);
+        saved=nx_arch_irq_save(); --c->callbacks; nx_arch_irq_restore(saved);
     }
-
-    nx_dma_channel_impl_t* impl = (nx_dma_channel_impl_t*)self;
-
-    if (impl->state != NX_DMA_CH_STATE_BUSY) {
-        return NX_ERR_INVALID_STATE;
-    }
-
-    /* Mark as allocated (not busy) */
-    impl->state = NX_DMA_CH_STATE_ALLOCATED;
-    impl->remaining = 0;
-
-    return NX_OK;
+    return r;
 }
-
-/**
- * \brief           Get remaining transfer count
- */
-static size_t dma_get_remaining(nx_dma_channel_t* self) {
-    if (!self) {
-        return 0;
-    }
-
-    nx_dma_channel_impl_t* impl = (nx_dma_channel_impl_t*)self;
-
-    return impl->remaining;
+static nx_status_t stop(nx_dma_channel_t* self) {
+    if (!self) return NX_ERR_NULL_PTR;
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=resolve(self);
+    nx_status_t r=!c ? NX_ERR_INVALID_PARAM : c->callbacks ? NX_ERR_BUSY :
+        c->state!=BUSY ? NX_ERR_INVALID_STATE : NX_OK;
+    if (r==NX_OK) { c->state=ALLOCATED; c->remaining=0; }
+    nx_arch_irq_restore(saved);
+    return r;
 }
-
-/**
- * \brief           Set transfer complete callback
- */
-static nx_status_t dma_set_callback(nx_dma_channel_t* self,
-                                    nx_dma_callback_t callback,
-                                    void* user_data) {
-    if (!self) {
-        return NX_ERR_NULL_PTR;
-    }
-
-    nx_dma_channel_impl_t* impl = (nx_dma_channel_impl_t*)self;
-
-    impl->callback = callback;
-    impl->user_data = user_data;
-
-    return NX_OK;
+static size_t remaining(nx_dma_channel_t* self) {
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=resolve(self);
+    size_t value=c && c->state!=FREE ? c->remaining : 0;
+    nx_arch_irq_restore(saved);
+    return value;
 }
-
-/**
- * \brief           Allocate a DMA channel
- */
-nx_dma_channel_t* nx_dma_allocate_channel(uint8_t dma_index, uint8_t channel) {
-    /* Validate parameters */
-    if (dma_index >= NX_DMA_MAX_CONTROLLERS ||
-        channel >= NX_DMA_MAX_CHANNELS_PER_CTRL) {
+static nx_status_t set_callback(nx_dma_channel_t* self,nx_dma_callback_t callback,void* context) {
+    if (!self) return NX_ERR_NULL_PTR;
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=resolve(self);
+    nx_status_t r=!c ? NX_ERR_INVALID_PARAM : c->state==FREE ? NX_ERR_INVALID_STATE :
+        c->state==BUSY || c->callbacks ? NX_ERR_BUSY : NX_OK;
+    if (r==NX_OK) { c->callback=callback; c->context=context; }
+    nx_arch_irq_restore(saved);
+    return r;
+}
+nx_dma_channel_t* nx_dma_allocate_channel(uint8_t controller,uint8_t channel) {
+    if (controller>=NX_DMA_MAX_CONTROLLERS || channel>=NX_DMA_MAX_CHANNELS_PER_CTRL)
         return NULL;
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=&channels[controller][channel];
+    if (nx_device_shutdown_is_active() || c->state!=FREE) {
+        nx_arch_irq_restore(saved); return NULL;
     }
-
-    nx_dma_channel_impl_t* impl = &g_dma_channels[dma_index][channel];
-
-    /* Check if channel is already allocated */
-    if (impl->state != NX_DMA_CH_STATE_FREE) {
-        return NULL;
-    }
-
-    /* Initialize channel */
-    impl->base.configure = dma_configure;
-    impl->base.start = dma_start;
-    impl->base.stop = dma_stop;
-    impl->base.get_remaining = dma_get_remaining;
-    impl->base.set_callback = dma_set_callback;
-
-    impl->dma_index = dma_index;
-    impl->channel_num = channel;
-    impl->state = NX_DMA_CH_STATE_ALLOCATED;
-    impl->callback = NULL;
-    impl->user_data = NULL;
-    impl->remaining = 0;
-    memset(&impl->config, 0, sizeof(impl->config));
-
-    return &impl->base;
+    memset(c,0,sizeof(*c));
+    c->base=(nx_dma_channel_t){.configure=configure,.start=start,.stop=stop,
+        .get_remaining=remaining,.set_callback=set_callback};
+    c->state=ALLOCATED;
+    nx_arch_irq_restore(saved);
+    return &c->base;
 }
-
-/**
- * \brief           Release a DMA channel
- */
-nx_status_t nx_dma_release_channel(nx_dma_channel_t* channel) {
-    if (!channel) {
-        return NX_ERR_NULL_PTR;
+nx_status_t nx_dma_release_channel(nx_dma_channel_t* self) {
+    if (!self) return NX_ERR_NULL_PTR;
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    channel_t* c=resolve(self);
+    nx_status_t r=!c ? NX_ERR_INVALID_PARAM : c->state==FREE ? NX_ERR_INVALID_STATE :
+        c->callbacks ? NX_ERR_BUSY : NX_OK;
+    if (r==NX_OK) {
+        c->state=FREE; c->callback=NULL; c->context=NULL; c->remaining=0;
+        memset(&c->config,0,sizeof(c->config));
     }
-
-    nx_dma_channel_impl_t* impl = (nx_dma_channel_impl_t*)channel;
-
-    /* Validate channel belongs to our pool */
-    bool valid = false;
-    for (uint8_t i = 0; i < NX_DMA_MAX_CONTROLLERS; i++) {
-        for (uint8_t j = 0; j < NX_DMA_MAX_CHANNELS_PER_CTRL; j++) {
-            if (impl == &g_dma_channels[i][j]) {
-                valid = true;
-                break;
-            }
-        }
-        if (valid) {
-            break;
-        }
-    }
-
-    if (!valid) {
-        return NX_ERR_INVALID_PARAM;
-    }
-
-    /* Stop transfer if busy */
-    if (impl->state == NX_DMA_CH_STATE_BUSY) {
-        dma_stop(channel);
-    }
-
-    /* Mark as free */
-    impl->state = NX_DMA_CH_STATE_FREE;
-    impl->callback = NULL;
-    impl->user_data = NULL;
-    impl->remaining = 0;
-    memset(&impl->config, 0, sizeof(impl->config));
-
-    return NX_OK;
+    nx_arch_irq_restore(saved);
+    return r;
+}
+nx_status_t nx_native_dma_idle(void) {
+    nx_arch_irq_state_t saved=nx_arch_irq_save();
+    nx_status_t r=NX_OK;
+    for (unsigned i=0;i<NX_DMA_MAX_CONTROLLERS;++i)
+        for (unsigned j=0;j<NX_DMA_MAX_CHANNELS_PER_CTRL;++j)
+            if (channels[i][j].state!=FREE || channels[i][j].callbacks) r=NX_ERR_BUSY;
+    nx_arch_irq_restore(saved);
+    return r;
 }

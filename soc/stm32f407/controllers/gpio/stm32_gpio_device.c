@@ -62,8 +62,9 @@ typedef struct {
 } stm32_gpio_slot_t;
 
 static nx_status_t stm32_gpio_construct(const nx_device_t* dev, void** api) {
-    if (!dev || !dev->state || !dev->config || !api) return NX_ERR_INVALID_PARAM;
+    if (!api) return NX_ERR_NULL_PTR;
     *api = NULL;
+    if (!dev || !dev->state || !dev->config) return NX_ERR_INVALID_PARAM;
     const stm32_gpio_config_t* config = dev->config;
     if (config->rw_mode > 2) return NX_ERR_INVALID_PARAM;
     nx_device_class_t expected = config->rw_mode == 0 ? NX_DEVICE_CLASS_GPIO_READ :

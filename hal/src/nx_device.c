@@ -13,6 +13,7 @@ NX_USED NX_SECTION(".nx_abi") const uint32_t nx_device_descriptor_bytes = sizeof
 #include <stdint.h>
 #include <string.h>
 static bool shutdown_admission_closed;
+static uintptr_t shutdown_fence_owner;
 static uint32_t metadata_enter(void) { return nx_arch_irq_save().value; }
 static void metadata_exit(uint32_t saved) { nx_arch_irq_restore((nx_arch_irq_state_t){saved}); }
 
@@ -249,7 +250,11 @@ nx_status_t nx_device_open(const char* name, nx_device_class_t expected,
     nx_status_t cleanup = NX_OK;
     if (status != NX_OK && attempted_init) {
         cleanup = life->deinit(life);
-        if (cleanup == NX_ERR_NOT_INIT) cleanup = NX_OK;
+        nx_device_state_t actual = life->get_state(life);
+        if (cleanup == NX_ERR_NOT_INIT && actual == NX_DEV_STATE_UNINITIALIZED)
+            cleanup = NX_OK;
+        if (cleanup == NX_OK && actual != NX_DEV_STATE_UNINITIALIZED)
+            cleanup = NX_ERR_NOT_READY;
     }
     saved = metadata_enter();
     state->last_status = status;
@@ -336,6 +341,21 @@ nx_status_t nx_device_describe(const nx_device_t* dev, nx_device_info_t* out) {
     metadata_exit(saved);
     return status;
 }
+/** A successful status alone is insufficient proof of hardware settlement.
+ * Missing state proof cannot release an owner. For unknown UART storage a
+ * NOT_INIT shortcut is forbidden even if the state claims UNINITIALIZED. */
+static nx_status_t lifecycle_deinit_settled(nx_lifecycle_t* life, bool unknown_lease) {
+    if (!life || !life->deinit || !life->get_state) return NX_ERR_NOT_SUPPORTED;
+    nx_status_t status = life->deinit(life);
+    nx_device_state_t actual = life->get_state(life);
+    if (status == NX_ERR_NOT_INIT) {
+        if (actual != NX_DEV_STATE_UNINITIALIZED) return NX_ERR_NOT_READY;
+        if (!unknown_lease) status = NX_OK;
+    }
+    if (status == NX_OK && actual != NX_DEV_STATE_UNINITIALIZED)
+        status = NX_ERR_NOT_READY;
+    return status;
+}
 nx_status_t nx_device_close(nx_device_ref_t ref) {
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
     uint32_t saved = metadata_enter();
@@ -350,7 +370,7 @@ nx_status_t nx_device_close(nx_device_ref_t ref) {
     void* api = state->api;
     metadata_exit(saved);
     nx_lifecycle_t* life = nx_device_dispatch_lifecycle(ref.descriptor, api);
-    status = life && life->deinit ? life->deinit(life) : NX_ERR_NOT_SUPPORTED;
+    status = lifecycle_deinit_settled(life, false);
     saved = metadata_enter();
     state->last_status = status;
     if (status == NX_OK) {
@@ -382,11 +402,7 @@ nx_status_t nx_device_recover(const char* name, uintptr_t owner) {
     state->phase = NX_DEVICE_CLOSING;
     metadata_exit(saved);
     nx_lifecycle_t* life = nx_device_dispatch_lifecycle(dev, state->api);
-    status = life && life->deinit ? life->deinit(life) : NX_ERR_NOT_SUPPORTED;
-    if (status == NX_ERR_NOT_INIT && !state->uart_unknown_lease) status = NX_OK;
-    if (status == NX_OK && state->uart_unknown_lease &&
-        (!life->get_state || life->get_state(life) != NX_DEV_STATE_UNINITIALIZED))
-        status = NX_ERR_NOT_READY;
+    status = lifecycle_deinit_settled(life, state->uart_unknown_lease);
     saved = metadata_enter();
     state->last_status = status;
     state->phase = status == NX_OK ? NX_DEVICE_CLOSED : NX_DEVICE_RECOVERY_REQUIRED;
@@ -443,7 +459,9 @@ nx_status_t nx_device_shutdown_check(void) {
     nx_status_t status = registry_size(&count);
     if (status == NX_OK) for (size_t i = 0; i < count; ++i) {
         nx_device_config_state_t* state = registry_at(i)->state;
-        if (state && (state->phase != NX_DEVICE_CLOSED || state->initializing)) {
+        if (state && (state->phase != NX_DEVICE_CLOSED || state->initializing ||
+            state->active_calls || state->active_ticket || state->child_refs ||
+            state->uart_unknown_lease)) {
             status = NX_ERR_BUSY;
             break;
         }
@@ -462,8 +480,93 @@ nx_status_t nx_device_shutdown_begin(void) {
 void nx_device_shutdown_end(void) {
     if (nx_arch_in_isr()) return;
     uint32_t saved = metadata_enter();
-    shutdown_admission_closed = false;
+    if (!shutdown_fence_owner) shutdown_admission_closed = false;
     metadata_exit(saved);
+}
+
+bool nx_device_shutdown_is_active(void) {
+    uint32_t saved = metadata_enter();
+    bool active = shutdown_admission_closed;
+    metadata_exit(saved);
+    return active;
+}
+
+static nx_status_t shutdown_acquire(uintptr_t owner, bool quarantine) {
+    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (!owner) return NX_ERR_INVALID_PARAM;
+    uint32_t saved = metadata_enter();
+    nx_status_t status = shutdown_admission_closed ? NX_ERR_BUSY :
+        quarantine ? NX_OK : nx_device_shutdown_check();
+    if (status == NX_OK) {
+        shutdown_fence_owner = owner;
+        shutdown_admission_closed = true;
+    }
+    metadata_exit(saved);
+    return status;
+}
+nx_status_t nx_device_shutdown_begin_owned(uintptr_t owner) {
+    return shutdown_acquire(owner, false);
+}
+nx_status_t nx_device_shutdown_quarantine_begin(uintptr_t owner) {
+    return shutdown_acquire(owner, true);
+}
+nx_status_t nx_device_shutdown_end_owned(uintptr_t owner) {
+    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (!owner) return NX_ERR_INVALID_PARAM;
+    uint32_t saved = metadata_enter();
+    nx_status_t status = !shutdown_admission_closed || shutdown_fence_owner != owner
+        ? NX_ERR_INVALID_STATE : NX_OK;
+    if (status == NX_OK) {
+        shutdown_fence_owner = 0;
+        shutdown_admission_closed = false;
+    }
+    metadata_exit(saved);
+    return status;
+}
+
+static nx_status_t provider_lifecycle_pass(bool stop) {
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) return NX_ERR_CONTEXT;
+    uint32_t saved = metadata_enter();
+    if (!shutdown_admission_closed) {
+        metadata_exit(saved);
+        return NX_ERR_INVALID_STATE;
+    }
+    size_t count = 0;
+    nx_status_t status = registry_size(&count);
+    metadata_exit(saved);
+    /* Registry mutations and construction are fenced until shutdown_end.
+     * The caller must also quiesce previously escaped migration pointers. */
+    for (size_t i = 0; status == NX_OK && i < count; ++i) {
+        saved = metadata_enter();
+        const nx_device_t* dev = registry_at(i);
+        nx_device_config_state_t* storage = dev->state;
+        if (storage && (storage->phase != NX_DEVICE_CLOSED || storage->initializing ||
+            storage->active_calls || storage->active_ticket || storage->child_refs ||
+            storage->uart_unknown_lease)) status = NX_ERR_BUSY;
+        void* api = storage && storage->initialized ? storage->api : NULL;
+        if (storage && storage->initialized && !api) status = NX_ERR_INVALID_STATE;
+        metadata_exit(saved);
+        if (status != NX_OK || !api) continue;
+        nx_lifecycle_t* life = nx_device_dispatch_lifecycle(dev, api);
+        if (!life || !life->get_state) { status = NX_ERR_NOT_SUPPORTED; continue; }
+        nx_device_state_t actual = life->get_state(life);
+        if (actual == NX_DEV_STATE_UNINITIALIZED) continue;
+        if (!stop) { status = NX_ERR_BUSY; continue; }
+        if (!life->deinit) { status = NX_ERR_NOT_SUPPORTED; continue; }
+        status = life->deinit(life);
+        actual = life->get_state(life);
+        if (status == NX_ERR_NOT_INIT && actual == NX_DEV_STATE_UNINITIALIZED)
+            status = NX_OK;
+        if (status == NX_OK && actual != NX_DEV_STATE_UNINITIALIZED)
+            status = NX_ERR_NOT_READY;
+    }
+    return status;
+}
+nx_status_t nx_device_provider_quiescence_check(void) {
+    return provider_lifecycle_pass(false);
+}
+nx_status_t nx_device_provider_stop_all(void) {
+    return provider_lifecycle_pass(true);
 }
 
 #if NX_DEVICE_MANUAL_REGISTRATION
@@ -490,7 +593,9 @@ nx_status_t nx_device_registry_reset(void) {
     if (shutdown_admission_closed) { metadata_exit(saved); return NX_ERR_BUSY; }
     for (size_t i = 0; i < registry_count; ++i) {
         nx_device_config_state_t* state = registry[i]->state;
-        if (state && (state->phase != NX_DEVICE_CLOSED || state->initializing)) {
+        if (state && (state->phase != NX_DEVICE_CLOSED || state->initializing ||
+            state->active_calls || state->active_ticket || state->child_refs ||
+            state->uart_unknown_lease)) {
             metadata_exit(saved);
             return NX_ERR_BUSY;
         }

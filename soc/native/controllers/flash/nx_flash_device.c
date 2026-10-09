@@ -15,7 +15,6 @@
 #include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_flash.h"
-#include "hal/system/nx_mem.h"
 #include "nexus_config.h"
 #include "nx_flash_helpers.h"
 #include "nx_flash_types.h"
@@ -36,92 +35,42 @@
 extern void flash_init_interface(nx_internal_flash_t* flash);
 extern void flash_init_lifecycle(nx_lifecycle_t* lifecycle);
 
-/*---------------------------------------------------------------------------*/
-/* Instance Initialization                                                   */
-/*---------------------------------------------------------------------------*/
+/** Backing image and interface identity remain attached to one descriptor. */
+typedef struct {
+    nx_device_config_state_t core;
+    nx_flash_impl_t impl;
+    nx_flash_state_t state;
+    uint8_t index;
+} native_flash_storage_t;
 
-/**
- * \brief           Initialize Flash instance
- */
-static void flash_init_instance(nx_flash_impl_t* impl, uint8_t index) {
-    /* Initialize interfaces (implemented in separate files) */
-    flash_init_interface(&impl->base);
-    flash_init_lifecycle(&impl->lifecycle);
-
-    /* Allocate and initialize state */
-    impl->state = (nx_flash_state_t*)nx_mem_alloc(sizeof(nx_flash_state_t));
-    if (!impl->state) {
-        return;
-    }
-    memset(impl->state, 0, sizeof(nx_flash_state_t));
-
-    impl->state->index = index;
-    impl->state->initialized = false;
-    impl->state->suspended = false;
+static nx_status_t nx_flash_construct(const nx_device_t* dev, void** out) {
+    if (!out) return NX_ERR_NULL_PTR;
+    *out = NULL;
+    if (!dev || !dev->state) return NX_ERR_INVALID_PARAM;
+    native_flash_storage_t* storage = NX_CONTAINER_OF(dev->state, native_flash_storage_t, core);
+    nx_flash_impl_t* impl = &storage->impl;
+    memset(impl, 0, sizeof(*impl));
+    impl->state = &storage->state;
+    memset(impl->state, 0, sizeof(*impl->state));
+    impl->state->index = storage->index;
     impl->state->locked = true;
-
-    /* Set backing file path */
-    int path_size = snprintf(impl->state->backing_file,
-                             sizeof(impl->state->backing_file),
-                             "native_flash%d.bin", index);
-    if (path_size < 0 || (size_t)path_size >= sizeof(impl->state->backing_file)) {
-        nx_mem_free(impl->state);
-        impl->state = NULL;
-        return;
-    }
-
-    /* Initialize all sectors as erased */
-    for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; i++) {
-        memset(impl->state->sectors[i].data, NX_FLASH_ERASED_BYTE,
-               NX_FLASH_SECTOR_SIZE);
+    int n = snprintf(impl->state->backing_file, sizeof(impl->state->backing_file),
+        "native_flash%u.bin", (unsigned)storage->index);
+    if (n < 0 || (size_t)n >= sizeof(impl->state->backing_file))
+        return NX_ERR_INVALID_PARAM;
+    for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; ++i) {
+        memset(impl->state->sectors[i].data, NX_FLASH_ERASED_BYTE, NX_FLASH_SECTOR_SIZE);
         impl->state->sectors[i].erased = true;
     }
-}
-
-/*---------------------------------------------------------------------------*/
-/* Device Registration                                                       */
-/*---------------------------------------------------------------------------*/
-
-/**
- * \brief           Device initialization function for Kconfig registration
- */
-static void* nx_flash_device_init(const nx_device_t* dev) {
-    /* Allocate implementation structure */
-    nx_flash_impl_t* impl =
-        (nx_flash_impl_t*)nx_mem_alloc(sizeof(nx_flash_impl_t));
-    if (!impl) {
-        return NULL;
-    }
-    memset(impl, 0, sizeof(nx_flash_impl_t));
-
-    /* Initialize instance */
-    flash_init_instance(impl, 0);
-
-    /* Check if state allocation succeeded */
-    if (!impl->state) {
-        nx_mem_free(impl);
-        return NULL;
-    }
-
-    /* Store device pointer */
     impl->device = (nx_device_t*)dev;
-
-    /* Device is created but not initialized - tests will call init() */
-    return &impl->base;
+    flash_init_interface(&impl->base);
+    flash_init_lifecycle(&impl->lifecycle);
+    *out = &impl->base;
+    return NX_OK;
 }
-
-/**
- * \brief           Device registration macro
- */
-#define NX_FLASH_DEVICE_REGISTER(index)                                        \
-    static nx_device_config_state_t flash_kconfig_state_##index = {            \
-        .init_res = 0,                                                         \
-        .initialized = false,                                                  \
-    };                                                                         \
-    NX_DEVICE_REGISTER(DEVICE_TYPE, index, "FLASH" #index, NULL,               \
-                       &flash_kconfig_state_##index, nx_flash_device_init);
-
-/**
- * \brief           Register all enabled Flash instances
- */
+#define NX_FLASH_DEVICE_REGISTER(index_)                                      \
+    static native_flash_storage_t flash_storage_##index_ = {.index = index_}; \
+    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index_, "FLASH" #index_, NULL,      \
+        &flash_storage_##index_.core, NX_DEVICE_CLASS_FLASH,                  \
+        0, nx_flash_construct, NULL);
 NX_TRAVERSE_EACH_INSTANCE(NX_FLASH_DEVICE_REGISTER, DEVICE_TYPE)
