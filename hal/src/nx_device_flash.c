@@ -10,8 +10,15 @@ typedef struct {
     uint64_t generation;
     uint32_t offset, size, permissions;
     bool allocated, running;
+    uint32_t borrowers;
 } region_t;
 static region_t regions[NX_DEVICE_FLASH_MAX_REGIONS];
+typedef struct {
+    nx_device_flash_region_t region;
+    uint64_t generation;
+    bool allocated;
+} borrow_t;
+static borrow_t borrows[NX_DEVICE_FLASH_MAX_REGIONS];
 static uint32_t enter(void) { return nx_arch_irq_save().value; }
 static void leave(uint32_t s) { nx_arch_irq_restore((nx_arch_irq_state_t){s}); }
 static bool same(nx_device_ref_t a, nx_device_ref_t b) {
@@ -120,7 +127,7 @@ nx_status_t nx_device_flash_region_open(nx_device_ref_t ref, uint32_t offset, ui
         if (s == NX_OK && (!available || ref.descriptor->state->child_refs == UINT32_MAX)) s = NX_ERR_NO_RESOURCE;
         if (s == NX_OK) {
             uint64_t next = available->generation + 1;
-            *available = (region_t){ref, next, offset, size, permissions, true, false};
+            *available = (region_t){ref, next, offset, size, permissions, true, false, 0};
             ++ref.descriptor->state->child_refs;
             *out = (nx_device_flash_region_t){ref, next, slot};
         }
@@ -132,9 +139,55 @@ nx_status_t nx_device_flash_region_close(nx_device_flash_region_t ref) {
     nx_internal_flash_t* f = NULL; nx_status_t s = pin(ref.controller, false, &f);
     if (s != NX_OK) return s;
     uint32_t saved = enter(); region_t* r = resolve(ref);
-    s = !r ? NX_ERR_INVALID_STATE : r->running ? NX_ERR_BUSY : NX_OK;
+    s = !r ? NX_ERR_INVALID_STATE : r->running || r->borrowers ? NX_ERR_BUSY : NX_OK;
     if (s == NX_OK) { r->allocated = false; --ref.controller.descriptor->state->child_refs; }
     leave(saved); nx_device_dispatch_unpin(ref.controller); return s;
+}
+nx_status_t nx_device_flash_region_info(nx_device_flash_region_t ref,
+                                       nx_flash_region_info_t* out) {
+    if (!out) return NX_ERR_NULL_PTR;
+    memset(out, 0, sizeof(*out));
+    nx_internal_flash_t* f = NULL; nx_status_t s = pin(ref.controller, false, &f);
+    if (s != NX_OK) return s;
+    uint32_t saved = enter(); region_t* r = resolve(ref);
+    s = r ? NX_OK : NX_ERR_INVALID_STATE;
+    if (r) *out = (nx_flash_region_info_t){r->offset, r->size, r->permissions};
+    leave(saved); nx_device_dispatch_unpin(ref.controller); return s;
+}
+nx_status_t nx_device_flash_region_borrow(nx_device_flash_region_t ref,
+                                         nx_device_flash_borrow_t* out) {
+    if (!out) return NX_ERR_NULL_PTR;
+    memset(out, 0, sizeof(*out));
+    nx_internal_flash_t* f = NULL; nx_status_t s = pin(ref.controller, false, &f);
+    if (s != NX_OK) return s;
+    uint32_t saved = enter(); region_t* r = resolve(ref); borrow_t* loan = NULL; uint32_t slot = 0;
+    s = !r ? NX_ERR_INVALID_STATE : r->borrowers == UINT32_MAX ? NX_ERR_NO_RESOURCE : NX_OK;
+    if (s == NX_OK) {
+        for (uint32_t i = 0; i < NX_DEVICE_FLASH_MAX_REGIONS; ++i) {
+            if (!borrows[i].allocated && borrows[i].generation != UINT64_MAX) {
+                loan = &borrows[i]; slot = i + 1; break;
+            }
+        }
+        if (!loan) s = NX_ERR_NO_RESOURCE;
+        else {
+            ++loan->generation; loan->allocated = true; loan->region = ref;
+            ++r->borrowers;
+            *out = (nx_device_flash_borrow_t){ref, loan->generation, slot};
+        }
+    }
+    leave(saved); nx_device_dispatch_unpin(ref.controller); return s;
+}
+nx_status_t nx_device_flash_region_release(nx_device_flash_borrow_t ref) {
+    nx_internal_flash_t* f = NULL; nx_status_t s = pin(ref.region.controller, false, &f);
+    if (s != NX_OK) return s;
+    uint32_t saved = enter(); region_t* r = resolve(ref.region); borrow_t* loan = NULL;
+    if (ref.slot && ref.slot <= NX_DEVICE_FLASH_MAX_REGIONS && ref.generation)
+        loan = &borrows[ref.slot - 1];
+    s = !r || !loan || !loan->allocated || loan->generation != ref.generation ||
+        loan->region.slot != ref.region.slot || loan->region.generation != ref.region.generation ||
+        !same(loan->region.controller, ref.region.controller) ? NX_ERR_INVALID_STATE : NX_OK;
+    if (s == NX_OK) { loan->allocated = false; --r->borrowers; }
+    leave(saved); nx_device_dispatch_unpin(ref.region.controller); return s;
 }
 static nx_status_t action(nx_device_flash_region_t ref, uint32_t offset, void* data,
                           size_t len, uint32_t budget, uint32_t permission) {

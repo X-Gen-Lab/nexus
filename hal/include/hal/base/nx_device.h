@@ -247,6 +247,24 @@ typedef struct nx_device_flash_region_s {
     uint64_t generation;
     uint32_t slot;
 } nx_device_flash_region_t;
+typedef struct nx_flash_region_info_s {
+    uint32_t offset;
+    uint32_t size;
+    uint32_t permissions;
+} nx_flash_region_info_t;
+/** A separately acquired region loan. Copies do not acquire another loan;
+ * release invalidates all copies. Region close returns BUSY until every loan
+ * is released. Loan slots and generations are bounded and allocation-free. */
+typedef struct nx_device_flash_borrow_s {
+    nx_device_flash_region_t region;
+    uint64_t generation;
+    uint32_t slot;
+} nx_device_flash_borrow_t;
+nx_status_t nx_device_flash_region_info(nx_device_flash_region_t ref,
+                                       nx_flash_region_info_t* out);
+nx_status_t nx_device_flash_region_borrow(nx_device_flash_region_t ref,
+                                         nx_device_flash_borrow_t* out);
+nx_status_t nx_device_flash_region_release(nx_device_flash_borrow_t loan);
 nx_status_t nx_device_flash_geometry(nx_device_ref_t ref,
                                      nx_flash_geometry_t* out);
 nx_status_t nx_device_flash_block(nx_device_ref_t ref, uint32_t offset,

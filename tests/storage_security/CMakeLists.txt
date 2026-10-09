@@ -39,3 +39,12 @@ if(UNIX AND TARGET nexus_update AND TARGET nexus_file_flash AND TARGET nexus_sec
     nexus_service_test(update_storage_tests test_update_storage.c)
     target_link_libraries(update_storage_tests PRIVATE nexus_update nexus_file_flash nexus_security_openssl OpenSSL::Crypto)
 endif()
+
+if(TARGET nexus_storage_hal)
+    nexus_service_test(hal_flash_storage_tests test_hal_flash_storage.c)
+    target_link_libraries(hal_flash_storage_tests PRIVATE Nexus::StorageHAL Nexus::HALProviders nexus_arch)
+    if(NOT MSVC)
+        target_compile_options(hal_flash_storage_tests PRIVATE -Wall -Wextra -Werror)
+    endif()
+    set_tests_properties(hal_flash_storage_tests PROPERTIES LABELS "storage;hal;contract;power-loss-model")
+endif()

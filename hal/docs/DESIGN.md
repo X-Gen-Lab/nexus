@@ -49,6 +49,8 @@ I2C 支持纯写、纯读及组合 TX/RX，并保留 received_length 所有权�
 
 外部调用者以 typed controller 开 region，明确 offset/size/permissions。region 是有限池中的 generation lease，公共句柄不能改写边界；活跃 region 保留 parent。HAL 拒绝 overflow、越界、错误 program alignment、partial erase block、涉及可写 region 的重叠与不允许的操作。擦除不向上取整，锁定 Flash 时不会自动 unlock。所有同步操作的失败返回也要结清 buffer。
 
+`nx_device_flash_region_info()` 返回 metadata 副本，不能改写内部边界。组件显式 `borrow()` 获得独立 generation loan；持有任一 loan 时 owner 关闭 region 返回 BUSY。`release()` 只释放该次借用，副本或旧 generation 不能减少后来借用的计数。region/loan 有界池耗尽、generation 耗尽均拒绝新分配。`Nexus::StorageHAL` 通过此机制保留调用者 region，Storage core 仍只依赖同步端口。
+
 Flash 无法安全中断正在执行的 program/erase pulse 时，provider 必须先结清硬件再返回 TIMEOUT，不能为了数字上的截止时间提前归还 storage。外部应用需据 stall 标志设置维护窗口。region 权限是可信调用者提供的访问合同，不是 MPU、安全隔离或自动保护执行镜像；应用只应从同一份外部 layout 创建明确授权的数据 region。默认全片 geometry 不会自动创建 storage region。
 
 ## 6. 有界等待

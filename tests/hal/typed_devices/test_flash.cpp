@@ -162,4 +162,36 @@ TEST_F(TypedFlash, FlashWaitRejectsISRAndMaskedTaskContext) {
     typed_test_set_isr(true); EXPECT_EQ(nx_device_flash_read(r,0,&b,1),NX_ERR_CONTEXT); typed_test_set_isr(false);
     auto token=nx_arch_irq_save(); EXPECT_EQ(nx_device_flash_read(r,0,&b,1),NX_ERR_INVALID_STATE); nx_arch_irq_restore(token);
 }
+TEST_F(TypedFlash, RegionMetadataCannotRewriteBoundsAndLoanBlocksOwnerClose) {
+    auto r=region(128,128,NX_FLASH_REGION_READ);nx_flash_region_info_t info{};
+    ASSERT_EQ(nx_device_flash_region_info(r,&info),NX_OK);
+    EXPECT_EQ(info.offset,128u);EXPECT_EQ(info.size,128u);EXPECT_EQ(info.permissions,NX_FLASH_REGION_READ);
+    info.size=1024;uint8_t byte=0;
+    EXPECT_EQ(nx_device_flash_read(r,128,&byte,1),NX_ERR_INVALID_PARAM);
+    nx_device_flash_borrow_t loan{};ASSERT_EQ(nx_device_flash_region_borrow(r,&loan),NX_OK);
+    EXPECT_EQ(nx_device_flash_region_close(r),NX_ERR_BUSY);
+    EXPECT_EQ(nx_device_flash_region_release(loan),NX_OK);
+    EXPECT_EQ(nx_device_flash_region_release(loan),NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_device_flash_region_close(r),NX_OK);
+}
+TEST_F(TypedFlash, OldLoanCannotReleaseNewLoanAfterStaticSlotReuse) {
+    auto r=region(0,128,NX_FLASH_REGION_READ);nx_device_flash_borrow_t old{},fresh{};
+    ASSERT_EQ(nx_device_flash_region_borrow(r,&old),NX_OK);
+    ASSERT_EQ(nx_device_flash_region_release(old),NX_OK);
+    ASSERT_EQ(nx_device_flash_region_borrow(r,&fresh),NX_OK);
+    EXPECT_EQ(old.slot,fresh.slot);EXPECT_NE(old.generation,fresh.generation);
+    EXPECT_EQ(nx_device_flash_region_release(old),NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_device_flash_region_close(r),NX_ERR_BUSY);
+    EXPECT_EQ(nx_device_flash_region_release(fresh),NX_OK);
+}
+TEST_F(TypedFlash, BorrowPoolIsFiniteAndEveryOutstandingLoanRetainsRegion) {
+    auto r=region(0,128,NX_FLASH_REGION_READ);
+    nx_device_flash_borrow_t loans[NX_DEVICE_FLASH_MAX_REGIONS]{};
+    for(auto& loan:loans) ASSERT_EQ(nx_device_flash_region_borrow(r,&loan),NX_OK);
+    nx_device_flash_borrow_t rejected{};
+    EXPECT_EQ(nx_device_flash_region_borrow(r,&rejected),NX_ERR_NO_RESOURCE);
+    EXPECT_EQ(rejected.slot,0u);EXPECT_EQ(nx_device_flash_region_close(r),NX_ERR_BUSY);
+    for(auto loan:loans) EXPECT_EQ(nx_device_flash_region_release(loan),NX_OK);
+    EXPECT_EQ(nx_device_flash_region_close(r),NX_OK);
+}
 }

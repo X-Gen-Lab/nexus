@@ -81,6 +81,8 @@ Native I2C 是显式响应模型：没有注入该地址响应时会等待并超
 
 HAL 检查物理边界、overflow、alignment、完整 erase block 和可写重叠；region 关闭前 controller 不能释放。program/erase 不自动解锁，维护窗口内显式调用 `nx_device_flash_set_write_enabled()`，结束后重新锁定。默认全片 geometry 不自动分配 storage 区。
 
+用 `nx_device_flash_region_info()` 查询 region metadata 副本。需要在组件中保留 region 时调用 `nx_device_flash_region_borrow()`，组件停止所有用户后再 release；loan 存在时 owner close 返回 BUSY。loan 是有限池 generation 句柄，复制不会新增借用，成功 release 使所有副本失效。端口型存储可显式链接 `Nexus::StorageHAL`，其生命周期、uniform geometry 与总预算用法见 [Storage HAL adapter](../../services/storage/adapters/README.md)。
+
 region 权限是调用者授予的访问合同，不提供 MPU/客户信任隔离；不要将包含当前执行镜像的 region 授权给数据存储。不能安全中断 Flash pulse 的 provider 可能先结清再返回 TIMEOUT；预算、执行 stall 和 VDD 掉电恢复需板级 HIL。
 
 ## 7. 选择目标与支持范围
