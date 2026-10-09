@@ -20,10 +20,4 @@ config STM32_ENABLE_PROFILING
     bool "Enable DWT profiling zones"
     default n
 
-config STM32_PROFILER_MAX_ZONES
-    int "Maximum profiling zones"
-    default 32
-    range 8 128
-    depends on STM32_ENABLE_PROFILING
-
 endmenu

@@ -1,8 +1,4 @@
-# Platform assembly chooses maintained silicon/controller configuration.
+# The platform assembles its selected SoC; silicon options live with the SoC.
 if PLATFORM_STM32
-source "soc/stm32f407/chips/Kconfig"
-source "soc/stm32f407/clock/Kconfig"
-source "soc/stm32f407/interrupt/Kconfig"
-source "soc/stm32f407/controllers/Kconfig"
-source "soc/stm32f407/system/Kconfig"
+source "soc/stm32f407/Kconfig"
 endif

@@ -71,3 +71,17 @@ config STM32_SRAM_SIZE
     help
       Total physical SRAM: 128 KiB main SRAM and 64 KiB non-DMA CCM.
       The maintained linker uses main SRAM; it does not allocate CCM.
+
+# Physical main-memory identity consumed by the external linker-layout parser.
+config LINKER_RAM_START
+    hex
+    default 0x20000000
+config LINKER_RAM_SIZE
+    hex
+    default 0x20000
+config LINKER_FLASH_START
+    hex
+    default 0x08000000
+config LINKER_FLASH_SIZE
+    hex
+    default STM32_FLASH_SIZE

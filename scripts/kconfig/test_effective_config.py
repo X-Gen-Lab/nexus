@@ -63,12 +63,24 @@ class EffectiveConfigTests(unittest.TestCase):
     def test_unmaintained_platforms_and_silicon_cannot_select_a_fallback(self):
         for symbol in ('PLATFORM_ESP32', 'PLATFORM_NRF52', 'PLATFORM_GD32',
                        'STM32H7', 'STM32L4', 'STM32F429', 'STM32_I2C_ENABLE',
-                       'STM32_ADC_ENABLE', 'STM32_TIMER_ENABLE'):
+                       'STM32_ADC_ENABLE', 'STM32_TIMER_ENABLE', 'OSAL_RTTHREAD',
+                       'OSAL_ZEPHYR', 'OSAL_LINUX', 'NATIVE_ENABLE_STATISTICS',
+                       'NATIVE_DMA_CHANNELS', 'NATIVE_ISR_SLOTS'):
             with self.subTest(symbol=symbol):
                 self.fragment.write_text('CONFIG_PLATFORM_STM32=y\nCONFIG_' + symbol + '=y\n')
                 result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn('Unknown configuration symbol CONFIG_' + symbol, result.stderr)
+                self.assertFalse((self.work / 'nexus_config.h').exists())
+
+    def test_backend_platform_mismatch_fails_during_configuration_resolution(self):
+        for fragment in ('CONFIG_PLATFORM_NATIVE=y\nCONFIG_OSAL_FREERTOS=y\n',
+                         'CONFIG_PLATFORM_STM32=y\nCONFIG_OSAL_NATIVE=y\n'):
+            with self.subTest(fragment=fragment):
+                self.fragment.write_text(fragment)
+                result = self.generate()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('cannot be honored', result.stderr)
                 self.assertFalse((self.work / 'nexus_config.h').exists())
 
     def test_choice_conflict_is_not_silently_coerced(self):

@@ -1,0 +1,17 @@
+# Virtual host resource models; these do not advertise physical MCU capabilities.
+menu "Native Host Models"
+rsource "controllers/uart/Kconfig"
+rsource "controllers/gpio/Kconfig"
+rsource "controllers/spi/Kconfig"
+rsource "controllers/i2c/Kconfig"
+rsource "controllers/timer/Kconfig"
+rsource "controllers/adc/Kconfig"
+rsource "controllers/dac/Kconfig"
+rsource "controllers/crc/Kconfig"
+rsource "controllers/usb/Kconfig"
+rsource "controllers/flash/Kconfig"
+rsource "controllers/rtc/Kconfig"
+rsource "controllers/watchdog/Kconfig"
+rsource "controllers/sdio/Kconfig"
+rsource "controllers/option_bytes/Kconfig"
+endmenu

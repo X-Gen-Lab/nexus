@@ -4,6 +4,7 @@ menu "Operating System Abstraction Layer"
 
 choice
     prompt "OSAL Backend"
+    default OSAL_NATIVE if PLATFORM_NATIVE
     default OSAL_BAREMETAL
     help
       Select the operating system backend for OSAL.
@@ -11,9 +12,6 @@ choice
       Available backends:
       - Bare-metal: Control loop and hardware ISRs, no task scheduler
       - FreeRTOS: Popular real-time operating system
-      - RT-Thread: Chinese RTOS with rich features
-      - Zephyr: Linux Foundation RTOS
-      - Linux: For testing on Linux systems
       - Native: PC simulation backend
 
 config OSAL_BAREMETAL
@@ -24,31 +22,15 @@ config OSAL_BAREMETAL
       ISRs. Tasks, a dynamic OSAL heap and software timers are unsupported.
 
 config OSAL_FREERTOS
-    bool "FreeRTOS"
+    bool "FreeRTOS Cortex-M4F port"
+    depends on PLATFORM_STM32 || PLATFORM_GD32F470
     help
       FreeRTOS real-time operating system.
       Industry-standard RTOS with wide platform support.
 
-config OSAL_RTTHREAD
-    bool "RT-Thread"
-    help
-      RT-Thread real-time operating system.
-      Feature-rich RTOS with IoT support.
-
-config OSAL_ZEPHYR
-    bool "Zephyr RTOS"
-    help
-      Zephyr real-time operating system.
-      Linux Foundation project with modern architecture.
-
-config OSAL_LINUX
-    bool "Linux"
-    help
-      Linux operating system (for testing).
-      Uses POSIX threads and synchronization primitives.
-
 config OSAL_NATIVE
-    bool "Native (PC Simulation)"
+    bool "Native host backend"
+    depends on PLATFORM_NATIVE
     help
       Native PC simulation backend.
       For development and testing on PC.
@@ -60,9 +42,6 @@ config OSAL_BACKEND_NAME
     string
     default "baremetal" if OSAL_BAREMETAL
     default "freertos" if OSAL_FREERTOS
-    default "rtthread" if OSAL_RTTHREAD
-    default "zephyr" if OSAL_ZEPHYR
-    default "linux" if OSAL_LINUX
     default "native" if OSAL_NATIVE
 
 # System parameters configuration
@@ -123,8 +102,6 @@ config OSAL_MAX_QUEUE_BYTES
 config OSAL_TICK_RATE_HZ
     int "System tick rate (Hz)" if OSAL_FREERTOS
     default 1000 if OSAL_FREERTOS
-    default 1000 if OSAL_RTTHREAD
-    default 100 if OSAL_ZEPHYR
     default 1000
     range 1000 1000 if PLATFORM_NATIVE || ((PLATFORM_STM32 || PLATFORM_GD32F470) && OSAL_FREERTOS)
     range 100 10000
@@ -138,8 +115,6 @@ config OSAL_HEAP_SIZE
     int "FreeRTOS heap size (bytes)"
     depends on OSAL_FREERTOS
     default 32768 if OSAL_FREERTOS
-    default 32768 if OSAL_RTTHREAD
-    default 16384 if OSAL_BAREMETAL
     default 65536
     range 4096 1048576
     help
@@ -149,7 +124,6 @@ config OSAL_HEAP_SIZE
 config OSAL_MAX_PRIORITIES
     int "Maximum priority levels"
     default 32 if OSAL_FREERTOS
-    default 32 if OSAL_RTTHREAD
     default 16
     range 8 32
     depends on OSAL_FREERTOS
@@ -159,55 +133,8 @@ config OSAL_MAX_PRIORITIES
 
 endmenu
 
-# Linker script configuration
-menu "SoC physical memory identity (read-only)"
-    depends on !PLATFORM_NATIVE
-
-config LINKER_RAM_START
-    hex
-    default 0x20000000 if STM32F4
-    default 0x24000000 if STM32H7
-    default 0x20000000 if GD32F470ZG
-    default 0x20000000
-    help
-      Starting address of RAM in memory map.
-      Platform-specific value.
-
-config LINKER_RAM_SIZE
-    hex
-    default 0x00020000 if STM32F407
-    default 0x00080000 if STM32H743
-    default 0x00030000 if GD32F470ZG
-    default 0x00020000
-    help
-      Total RAM size in bytes.
-      Platform-specific value.
-
-config LINKER_FLASH_START
-    hex
-    default 0x08000000 if PLATFORM_STM32
-    default 0x08000000 if PLATFORM_GD32F470
-    default 0x08000000
-    help
-      Starting address of Flash in memory map.
-      Platform-specific value.
-
-config LINKER_FLASH_SIZE
-    hex
-    default STM32_FLASH_SIZE if STM32F407
-    default 0x00200000 if STM32H743
-    default 0x00100000 if GD32F470ZG
-    default 0x00100000
-    help
-      Total Flash size in bytes.
-      Platform-specific value.
-
-endmenu
-
 # Include backend-specific configuration files
 # Baremetal has no scheduler configuration or software task limits.
 rsource "adapters/freertos/Kconfig"
-rsource "adapters/rtthread/Kconfig"
-rsource "adapters/zephyr/Kconfig"
 
 endmenu
