@@ -740,7 +740,7 @@ TEST_F(ConfigIntegrationTest, QueryAndEnumeration) {
  * \brief           Test complete workflow with all features
  * \details         Requirements 1.1-12.10
  */
-TEST_F(ConfigIntegrationTest, CompleteWorkflow) {
+TEST_F(ConfigIntegrationTest, CompleteSystemWorkflow) {
     /* Initialize */
     config_manager_config_t config = {.max_keys = 128,
                                       .max_key_len = 48,
