@@ -13,7 +13,7 @@ jobs:
         with:
           submodules: false
       - name: Initialize pinned maintained dependencies
-        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
       - uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest

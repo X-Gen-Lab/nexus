@@ -109,20 +109,26 @@ class WorkflowStructureTests(unittest.TestCase):
             for name in dependencies:
                 git(source, 'submodule', 'add', '--quiet', str(kernel if name == 'ext/freertos' else leaf), name)
             git(source, 'commit', '--quiet', '-am', 'Maintained dependency models')
-            commands = [step(workflow('build-matrix.yml'), 'matrix-build', 'Initialize Maintained Dependencies')['run'],
-                        step(workflow('release.yml'), 'build-release', 'Initialize Maintained Dependencies')['run']]
-            for index, command in enumerate(commands):
-                checkout = root / f'checkout-{index}'
-                git(root, 'clone', '--quiet', '--no-recurse-submodules', str(source), str(checkout))
-                result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', command], cwd=checkout,
-                                        env=env, capture_output=True, text=True, timeout=30)
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                status = git(checkout, 'submodule', 'status', '--recursive')
-                lines = status.splitlines()
-                self.assertEqual(len(lines), 7)
-                self.assertTrue(all(line.startswith(' ') for line in lines), status)
-                for name in dependencies + tuple('ext/freertos/' + name for name in nested):
-                    self.assertTrue(any(' ' + name + ' ' in line for line in lines), status)
+            declarations = (
+                ('build-matrix.yml', 'matrix-build', 'Initialize Maintained Dependencies'),
+                ('release.yml', 'build-release', 'Initialize Maintained Dependencies'),
+                ('quality-checks.yml', 'static-analysis', 'Initialize pinned maintained dependencies'),
+                ('security.yml', 'codeql', 'Initialize pinned build dependencies'),
+            )
+            for index, (filename, job, label) in enumerate(declarations):
+                with self.subTest(workflow=filename):
+                    command = step(workflow(filename), job, label)['run']
+                    checkout = root / f'checkout-{index}'
+                    git(root, 'clone', '--quiet', '--no-recurse-submodules', str(source), str(checkout))
+                    result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', command], cwd=checkout,
+                                            env=env, capture_output=True, text=True, timeout=30)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    status = git(checkout, 'submodule', 'status', '--recursive')
+                    lines = status.splitlines()
+                    self.assertEqual(len(lines), 7)
+                    self.assertTrue(all(line.startswith(' ') for line in lines), status)
+                    for name in dependencies + tuple('ext/freertos/' + name for name in nested):
+                        self.assertTrue(any(' ' + name + ' ' in line for line in lines), status)
 
     def test_actual_arm_workflow_checker_executes(self):
         self.assertIn('NEXUS_FIRMWARE_TEST_BUILD', os.environ,

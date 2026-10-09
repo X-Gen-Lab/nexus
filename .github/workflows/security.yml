@@ -62,7 +62,7 @@ jobs:
       - name: Initialize pinned build dependencies
         if: matrix.language == 'cpp'
         run: |
-          git submodule update --init ext/freertos ext/googletest vendors/arm/CMSIS_5 \
+          git submodule update --init --recursive ext/freertos ext/googletest vendors/arm/CMSIS_5 \
             vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
       - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
         with:
