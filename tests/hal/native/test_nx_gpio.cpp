@@ -14,10 +14,11 @@
 #include <gtest/gtest.h>
 
 extern "C" {
+#include "../../../soc/native/controllers/gpio/nx_gpio_types.h"
+#include "devices/native_gpio_helpers.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_gpio.h"
 #include "hal/nx_factory.h"
-#include "devices/native_gpio_helpers.h"
 }
 
 /**
@@ -464,8 +465,7 @@ TEST_F(GPIOTest, NullPointerHandling) {
     EXPECT_EQ(NX_ERR_NULL_PTR, power->enable(nullptr));
     EXPECT_EQ(NX_ERR_NULL_PTR, power->disable(nullptr));
     EXPECT_FALSE(power->is_enabled(nullptr));
-    EXPECT_EQ(NX_ERR_NULL_PTR,
-              power->set_callback(nullptr, nullptr, nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, power->set_callback(nullptr, nullptr, nullptr));
 }
 
 TEST_F(GPIOTest, InvalidPortHandling) {
@@ -547,8 +547,7 @@ TEST_F(GPIOTest, MultipleGPIOInstances) {
     nx_gpio_t* other = nx_factory_gpio('A', 2);
     ASSERT_NE(nullptr, other);
     ASSERT_NE(gpio, other);
-    nx_lifecycle_t* other_lifecycle =
-        other->write.get_lifecycle(&other->write);
+    nx_lifecycle_t* other_lifecycle = other->write.get_lifecycle(&other->write);
     ASSERT_NE(nullptr, other_lifecycle);
     ASSERT_EQ(NX_OK, other_lifecycle->init(other_lifecycle));
 
@@ -602,16 +601,44 @@ TEST_F(GPIOTest, MultipleInterruptRegistrations) {
 }
 
 TEST_F(GPIOTest, DeviceRegistrationRejectsNullDescriptorAndConfiguration) {
-    const nx_device_t* registered=nx_device_find("GPIOA0");
-    ASSERT_NE(nullptr,registered);
-    ASSERT_NE(nullptr,registered->device_init);
-    EXPECT_EQ(nullptr,registered->device_init(nullptr));
-    nx_device_t malformed=*registered;
-    malformed.config=nullptr;
-    EXPECT_EQ(nullptr,registered->device_init(&malformed));
-    /* A rejected construction must not damage the existing registered pin. */
-    nx_gpio_read_write_t* pin=nx_factory_gpio_read_write('A',0);
-    ASSERT_NE(nullptr,pin);
-    pin->write.write(&pin->write,1);
-    EXPECT_EQ(1,pin->read.read(&pin->read));
+    const nx_device_t* registered = nx_device_find("GPIOA0");
+    ASSERT_NE(nullptr, registered);
+    ASSERT_NE(nullptr, registered->construct);
+    EXPECT_EQ(nullptr, registered->device_init);
+    gpio->write.write(&gpio->write, 1);
+    void* output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(nullptr, &output));
+    EXPECT_EQ(nullptr, output);
+    EXPECT_EQ(NX_ERR_NULL_PTR, registered->construct(registered, nullptr));
+
+    nx_device_t malformed = *registered;
+    malformed.config = nullptr;
+    output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(&malformed, &output));
+    EXPECT_EQ(nullptr, output);
+
+    malformed = *registered;
+    malformed.state = nullptr;
+    output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(&malformed, &output));
+    EXPECT_EQ(nullptr, output);
+
+    ASSERT_NE(nullptr, registered->config);
+    auto invalid_config =
+        *static_cast<const nx_gpio_platform_config_t*>(registered->config);
+    invalid_config.pin = 16;
+    malformed = *registered;
+    malformed.config = &invalid_config;
+    output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(&malformed, &output));
+    EXPECT_EQ(nullptr, output);
+
+    /* Rejected binding leaves the existing initialized pin and value intact. */
+    nx_gpio_read_write_t* pin = nx_factory_gpio_read_write('A', 0);
+    ASSERT_EQ(gpio, pin);
+    nx_lifecycle_t* lifecycle = pin->write.get_lifecycle(&pin->write);
+    EXPECT_EQ(NX_DEV_STATE_RUNNING, lifecycle->get_state(lifecycle));
+    EXPECT_EQ(1, pin->read.read(&pin->read));
+    pin->write.write(&pin->write, 0);
+    EXPECT_EQ(0, pin->read.read(&pin->read));
 }

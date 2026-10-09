@@ -71,11 +71,11 @@ struct nx_internal_flash_s {
                          const uint8_t* data, size_t len);
 
     /**
-     * \brief           Erase flash pages
+     * \brief           Erase complete flash erase blocks
      * \param[in]       self: Flash interface pointer
-     * \param[in]       addr: Start address of pages to erase
-     * \param[in]       size: Size in bytes to erase (rounded up to page
-     *                  boundary)
+     * \param[in]       addr: Start address aligned to an erase block
+     * \param[in]       size: Exact size covering complete erase blocks;
+     *                  partial blocks are rejected without rounding
      * \return          NX_OK on success, error code otherwise
      * \note            Flash must be unlocked before erasing
      */

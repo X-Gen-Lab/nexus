@@ -16,20 +16,20 @@
  * **Validates: Requirements 4.2, 4.9**
  */
 
+#include "native_property_seed.h"
+#include <chrono>
 #include <cstdio>
 #include <cstring>
-#include <chrono>
 #include <filesystem>
-#include <string>
 #include <gtest/gtest.h>
 #include <random>
-#include "native_property_seed.h"
+#include <string>
 #include <vector>
 
 extern "C" {
+#include "devices/native_flash_helpers.h"
 #include "hal/interface/nx_flash.h"
 #include "hal/nx_factory.h"
-#include "devices/native_flash_helpers.h"
 }
 
 /**
@@ -42,13 +42,17 @@ static constexpr int PROPERTY_TEST_ITERATIONS = 100;
 static std::filesystem::path flash_test_directory() {
     std::error_code error;
     auto parent = std::filesystem::temp_directory_path(error);
-    if (error) return {};
-    const auto stamp = std::chrono::steady_clock::now().time_since_epoch().count();
+    if (error)
+        return {};
+    const auto stamp =
+        std::chrono::steady_clock::now().time_since_epoch().count();
     for (unsigned attempt = 0; attempt < 128; ++attempt) {
         auto directory = parent / ("nexus-flash-" + std::to_string(stamp) +
                                    "-" + std::to_string(attempt));
-        if (std::filesystem::create_directory(directory, error)) return directory;
-        if (error) return {};
+        if (std::filesystem::create_directory(directory, error))
+            return directory;
+        if (error)
+            return {};
     }
     return {};
 }
@@ -62,6 +66,8 @@ class FlashPropertyTest : public ::testing::Test {
     nx_internal_flash_t* flash = nullptr;
     std::filesystem::path directory;
     std::string unique_filename;
+    nx_flash_operations_t* operations = nullptr;
+    nx_flash_geometry_t geometry{};
 
     void SetUp() override {
         native_property_seed(rng);
@@ -89,6 +95,10 @@ class FlashPropertyTest : public ::testing::Test {
 
         /* Unlock flash for testing */
         ASSERT_EQ(NX_OK, flash->unlock(flash));
+        ASSERT_NE(nullptr, flash->get_operations);
+        operations = flash->get_operations(flash);
+        ASSERT_NE(nullptr, operations);
+        ASSERT_EQ(NX_OK, operations->get_geometry(operations, &geometry));
     }
 
     void TearDown() override {
@@ -143,6 +153,27 @@ class FlashPropertyTest : public ::testing::Test {
         std::uniform_int_distribution<int> len_dist(1, 64);
         return len_dist(rng) * write_unit;
     }
+
+    /* The write range may span blocks. Resolve actual first/last blocks and
+     * ask the provider to erase that complete span; the driver never rounds. */
+    nx_status_t eraseWriteRange(uint32_t addr, size_t len) {
+        if (!len || addr >= geometry.size_bytes ||
+            len > geometry.size_bytes - addr) {
+            return NX_ERR_INVALID_PARAM;
+        }
+        nx_flash_block_t first{}, last{};
+        nx_status_t status = operations->get_block(operations, addr, &first);
+        if (status != NX_OK) {
+            return status;
+        }
+        status = operations->get_block(
+            operations, addr + static_cast<uint32_t>(len - 1), &last);
+        if (status != NX_OK) {
+            return status;
+        }
+        const size_t end = static_cast<size_t>(last.offset) + last.size;
+        return flash->erase(flash, first.offset, end - first.offset);
+    }
 };
 
 /*---------------------------------------------------------------------------*/
@@ -165,27 +196,30 @@ TEST_F(FlashPropertyTest, Property6_WriteWithoutEraseFails) {
         uint32_t addr = randomAlignedAddress();
         size_t len = randomAlignedLength();
 
-        /* Ensure address is valid */
-        if (addr + len > flash->get_page_size(flash) * 128) {
-            continue;
-        }
+        ASSERT_LT(addr, geometry.size_bytes);
+        ASSERT_LE(len, geometry.size_bytes - addr);
 
         /* Generate random data */
         std::vector<uint8_t> data = randomData(len);
+        data.front() &=
+            0x7f; /* Ensure at least one bit is programmed to zero. */
 
         /* Erase the sector first */
-        ASSERT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(len)));
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
 
         /* Write data once */
         ASSERT_EQ(NX_OK, flash->write(flash, addr, data.data(),
                                       static_cast<uint32_t>(len)));
 
-        /* Attempt to write again without erase - should fail */
-        EXPECT_EQ(
-            NX_ERR_INVALID_STATE,
-            flash->write(flash, addr, data.data(), static_cast<uint32_t>(len)))
+        /* Restoring a zero bit to one without erase must fail unchanged. */
+        const std::vector<uint8_t> unprogrammed(len, geometry.erased_value);
+        EXPECT_EQ(NX_ERR_INVALID_STATE,
+                  flash->write(flash, addr, unprogrammed.data(), len))
             << "Iteration " << test_iter
             << ": Write without erase should fail at address " << addr;
+        std::vector<uint8_t> observed(len);
+        ASSERT_EQ(NX_OK, flash->read(flash, addr, observed.data(), len));
+        EXPECT_EQ(data, observed);
     }
 }
 
@@ -202,13 +236,17 @@ TEST_F(FlashPropertyTest, Property6_EraseMarksAreaAsErased) {
         uint32_t addr = randomAlignedAddress();
         size_t len = randomAlignedLength();
 
-        /* Ensure address is valid */
-        if (addr + len > flash->get_page_size(flash) * 128) {
-            continue;
-        }
+        ASSERT_LT(addr, geometry.size_bytes);
+        ASSERT_LE(len, geometry.size_bytes - addr);
 
-        /* Erase the area */
-        ASSERT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(len)));
+        /* Dirty real bytes first so erase must perform observable work. */
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
+        std::vector<uint8_t> data = randomData(len);
+        data.front() &= 0x7f;
+        ASSERT_EQ(NX_OK, flash->write(flash, addr, data.data(), len));
+        ASSERT_FALSE(
+            native_flash_is_erased(0, addr, static_cast<uint32_t>(len)));
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
 
         /* Verify area is erased */
         EXPECT_TRUE(native_flash_is_erased(0, addr, static_cast<uint32_t>(len)))
@@ -229,17 +267,21 @@ TEST_F(FlashPropertyTest, Property6_WriteAfterEraseSucceeds) {
         /* Generate random aligned address and length */
         uint32_t addr = randomAlignedAddress();
         size_t len = randomAlignedLength();
-
-        /* Ensure address is valid */
-        if (addr + len > flash->get_page_size(flash) * 128) {
-            continue;
+        if (test_iter == 0) {
+            /* Always exercise a range crossing a real erase-block boundary. */
+            const size_t unit = flash->get_write_unit(flash);
+            addr = static_cast<uint32_t>(flash->get_page_size(flash) - unit);
+            len = unit * 2;
         }
+
+        ASSERT_LT(addr, geometry.size_bytes);
+        ASSERT_LE(len, geometry.size_bytes - addr);
 
         /* Generate random data */
         std::vector<uint8_t> data = randomData(len);
 
         /* Erase then write */
-        ASSERT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(len)));
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
         EXPECT_EQ(NX_OK, flash->write(flash, addr, data.data(),
                                       static_cast<uint32_t>(len)))
             << "Iteration " << test_iter
@@ -268,16 +310,14 @@ TEST_F(FlashPropertyTest, Property7_PersistenceRoundTrip) {
         uint32_t addr = randomAlignedAddress();
         size_t len = randomAlignedLength();
 
-        /* Ensure address is valid */
-        if (addr + len > flash->get_page_size(flash) * 128) {
-            continue;
-        }
+        ASSERT_LT(addr, geometry.size_bytes);
+        ASSERT_LE(len, geometry.size_bytes - addr);
 
         /* Generate random data */
         std::vector<uint8_t> write_data = randomData(len);
 
         /* Erase and write data */
-        ASSERT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(len)));
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
         ASSERT_EQ(NX_OK, flash->write(flash, addr, write_data.data(),
                                       static_cast<uint32_t>(len)));
 
@@ -319,7 +359,7 @@ TEST_F(FlashPropertyTest, Property7_MultiplePersistenceCycles) {
         std::vector<uint8_t> write_data = randomData(len);
 
         /* Erase and write data */
-        ASSERT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(len)));
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
         ASSERT_EQ(NX_OK, flash->write(flash, addr, write_data.data(),
                                       static_cast<uint32_t>(len)));
 
@@ -356,16 +396,14 @@ TEST_F(FlashPropertyTest,
         uint32_t addr = randomAlignedAddress();
         size_t len = randomAlignedLength();
 
-        /* Ensure address is valid */
-        if (addr + len > flash->get_page_size(flash) * 128) {
-            continue;
-        }
+        ASSERT_LT(addr, geometry.size_bytes);
+        ASSERT_LE(len, geometry.size_bytes - addr);
 
         /* Generate random data */
         std::vector<uint8_t> write_data = randomData(len);
 
         /* Erase and write data */
-        ASSERT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(len)));
+        ASSERT_EQ(NX_OK, eraseWriteRange(addr, len));
         ASSERT_EQ(NX_OK, flash->write(flash, addr, write_data.data(),
                                       static_cast<uint32_t>(len)));
 

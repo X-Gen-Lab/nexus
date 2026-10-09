@@ -10,8 +10,8 @@ static nx_status_t provider_test_spi_pins(bool enabled) {
                                               : nx_gd32_board_spi_pins(enabled);
 }
 #define nx_gd32_board_spi_pins provider_test_spi_pins
-// NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production
-// fault fixture; retain private factory/state checks.
+// Same-TU production fault fixture retains private factory/state checks.
+// NOLINTNEXTLINE(bugprone-suspicious-include)
 #include "../../../soc/gd32f470/controllers/spi.c"
 #undef nx_gd32_board_spi_pins
 uint32_t nx_gd32f470_millis(void) {
