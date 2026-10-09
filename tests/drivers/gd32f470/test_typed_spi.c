@@ -1,6 +1,7 @@
 /* Vertical host integration: production platform boot/timebase, GD SPI4 and
  * typed device core. Crystal/PLL, NVIC, SysTick, pins and controller registers
  * are explicit host models. This is ownership/fault evidence, not board HIL. */
+#include "hal/provider/nx_device_provider.h"
 #include "model.h"
 #include "hal/base/nx_device.h"
 #include <assert.h>

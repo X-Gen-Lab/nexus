@@ -11,7 +11,7 @@
 #ifndef NX_FACTORY_H
 #define NX_FACTORY_H
 
-#include "hal/base/nx_device.h"
+#include "hal/provider/nx_device_provider.h"
 #include "hal/interface/nx_adc.h"
 #include "hal/interface/nx_can.h"
 #include "hal/interface/nx_crc.h"

@@ -1,4 +1,5 @@
 /** User-visible SPI ownership and settlement outcomes against production HAL. */
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "arch/nx_arch.h"
 #include <gtest/gtest.h>
@@ -25,6 +26,7 @@ struct Bus {
     unsigned opens = 0, closes = 0, transfers = 0, cancels = 0;
     nx_status_t open_status = NX_OK, close_status = NX_OK, cancel_status = NX_OK, submit_status = NX_OK;
     bool malformed_handle = false, queue_supported = true, cancel_supported = true;
+    bool duplicate_terminal = false;
     uint32_t last_budget = 0;
     std::mutex mutex;
     std::condition_variable wake;
@@ -108,7 +110,10 @@ static nx_status_t service(nx_spi_bus_t*) {
         value = {&bus->api, selected->token, execute, submit, cancel};
         transaction = selected->queued; selected->pending = false;
     }
-    return execute(&value, &transaction);
+    nx_status_t status = execute(&value, &transaction);
+    if (bus->duplicate_terminal && transaction.callback)
+        transaction.callback(transaction.user_data, NX_ERR_HARDWARE);
+    return status;
 }
 class TypedSPI : public ::testing::Test {
 protected:
@@ -310,6 +315,17 @@ TEST_F(TypedSPI, SynchronousCallbackAlsoKeepsBothReferencesPinned) {
     auto ref = child(); CallbackContext context{controller, ref, {}, &transaction, 0};
     transaction.callback = reentry; transaction.user_data = &context;
     EXPECT_EQ(nx_device_spi_transfer(ref, &transaction), NX_OK); EXPECT_EQ(context.calls, 1u);
+}
+TEST_F(TypedSPI, DuplicateProviderCompletionCannotRedeliverTerminalOrReplaceResult) {
+    auto ref = child(); CallbackContext context{controller, ref, {}, &transaction, 0};
+    transaction.callback = reentry; transaction.user_data = &context;
+    model.duplicate_terminal = true;
+    ASSERT_EQ(nx_device_spi_submit(ref, &transaction, &context.ticket), NX_OK);
+    EXPECT_EQ(nx_device_spi_service(controller), NX_OK);
+    EXPECT_EQ(context.calls, 1u);
+    nx_device_spi_result_t result{};
+    ASSERT_EQ(nx_device_spi_poll(ref, context.ticket, &result), NX_OK);
+    EXPECT_TRUE(result.settled); EXPECT_EQ(result.status, NX_OK);
 }
 TEST_F(TypedSPI, OldAndForeignTicketsCannotCancelLaterBorrowedStorage) {
     auto ref = child(); nx_device_spi_ticket_t old{}, next{};

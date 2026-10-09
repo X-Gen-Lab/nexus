@@ -1,5 +1,6 @@
 /* Executable contract regressions: observable outcomes, not source matching. */
 #define _POSIX_C_SOURCE 200809L
+#include "hal/provider/nx_device_provider.h"
 #include "osal/osal.h"
 #include "event_mask_contract.h"
 #include "resource_usage_contract.h"

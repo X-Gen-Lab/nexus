@@ -4,6 +4,7 @@
 /** Native SPI uses the same bounded bus/device/transaction contract as STM32.
  * This host backend captures transmitted bytes and echoes uninjected RX data;
  * it does not validate electrical timing, DMA or a vendor peripheral. */
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "nexus_config.h"
 #include "nx_spi_helpers.h"

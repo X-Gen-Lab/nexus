@@ -10,6 +10,7 @@
 #include "hal/interface/nx_lifecycle.h"
 #include "hal/nx_status.h"
 #include "hal/nx_types.h"
+#include "hal/interface/nx_flash_geometry.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,7 +28,25 @@ extern "C" {
  * write protection (lock/unlock), and lifecycle management.
  */
 typedef struct nx_internal_flash_s nx_internal_flash_t;
+typedef struct nx_flash_operations_s nx_flash_operations_t;
+/** Task-only physical offset operations. No automatic product partition,
+ * erase rounding or unlock. A finite total timeout covers hardware waiting;
+ * all calls settle caller buffers before return, including TIMEOUT. Platforms
+ * that cannot safely abort a flash pulse may exceed the requested deadline to
+ * settle hardware, return TIMEOUT and report the stall flag in geometry.
+ * Flash writes require an explicit maintenance window and caller unlock.
+ * get_geometry validates actual chip density against the selected SoC. */
+struct nx_flash_operations_s {
+    nx_status_t (*get_geometry)(nx_flash_operations_t*, nx_flash_geometry_t*);
+    nx_status_t (*get_block)(nx_flash_operations_t*, uint32_t, nx_flash_block_t*);
+    nx_status_t (*read)(nx_flash_operations_t*, uint32_t, uint8_t*, size_t);
+    nx_status_t (*program)(nx_flash_operations_t*, uint32_t, const uint8_t*, size_t, uint32_t);
+    nx_status_t (*erase)(nx_flash_operations_t*, uint32_t, size_t, uint32_t);
+    nx_status_t (*sync)(nx_flash_operations_t*, uint32_t);
+};
 struct nx_internal_flash_s {
+    /** Optional typed physical geometry port; NULL advertises unsupported. */
+    nx_flash_operations_t* (*get_operations)(nx_internal_flash_t*);
     /**
      * \brief           Read data from flash
      * \param[in]       self: Flash interface pointer
@@ -118,6 +137,7 @@ struct nx_internal_flash_s {
                                _get_write_unit, _lock, _unlock,                \
                                _get_lifecycle)                                 \
     do {                                                                       \
+        (p)->get_operations = NULL;                                            \
         (p)->read = (_read);                                                   \
         (p)->write = (_write);                                                 \
         (p)->erase = (_erase);                                                 \

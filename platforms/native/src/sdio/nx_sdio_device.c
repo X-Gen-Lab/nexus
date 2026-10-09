@@ -11,6 +11,7 @@
  *                  using Kconfig-driven configuration.
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/nx_status.h"
 #include "hal/system/nx_mem.h"

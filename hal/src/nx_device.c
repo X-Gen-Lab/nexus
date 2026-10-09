@@ -172,7 +172,7 @@ void* nx_device_get_checked(const char* name, nx_device_class_t expected) {
  * name. Custom typed constructors may provide their own lifecycle getter. */
 #define LIFECYCLE_CASE(cls, type) \
     case cls: { type* value = api; return value->get_lifecycle ? value->get_lifecycle(value) : NULL; }
-static nx_lifecycle_t* lifecycle(const nx_device_t* dev, void* api) {
+nx_lifecycle_t* nx_device_dispatch_lifecycle(const nx_device_t* dev, void* api) {
     if (!api) return NULL;
     if (dev->get_lifecycle) return dev->get_lifecycle(api);
     switch (dev->device_class) {
@@ -233,7 +233,7 @@ nx_status_t nx_device_open(const char* name, nx_device_class_t expected,
     metadata_exit(saved);
     void* api = NULL;
     status = construct_api(dev, true, &api);
-    nx_lifecycle_t* life = status == NX_OK ? lifecycle(dev, api) : NULL;
+    nx_lifecycle_t* life = status == NX_OK ? nx_device_dispatch_lifecycle(dev, api) : NULL;
     bool attempted_init = false;
     if (status == NX_OK && (!life || !life->init || !life->deinit || !life->get_state))
         status = NX_ERR_NOT_SUPPORTED;
@@ -305,11 +305,35 @@ nx_status_t nx_device_query(nx_device_ref_t ref, nx_device_caps_t* out) {
         } else if (ref.device_class == NX_DEVICE_CLASS_SPI) {
             nx_spi_bus_t* bus = api;
             if (bus->open_device && bus->close_device) out->flags |= NX_DEVICE_CAP_SPI_DEVICES;
+        } else if (ref.device_class == NX_DEVICE_CLASS_I2C) {
+            nx_i2c_bus_t* bus = api;
+            if (bus->open_device && bus->close_device) out->flags |= NX_DEVICE_CAP_I2C_DEVICES;
+        } else if (ref.device_class == NX_DEVICE_CLASS_FLASH) {
+            nx_internal_flash_t* flash = api;
+            nx_flash_operations_t* ops = flash->get_operations ? flash->get_operations(flash) : NULL;
+            if (ops && ops->get_geometry && ops->get_block && ops->read)
+                out->flags |= NX_DEVICE_CAP_FLASH_GEOMETRY;
+            if (ops && ops->program) out->flags |= NX_DEVICE_CAP_FLASH_PROGRAM;
+            if (ops && ops->erase) out->flags |= NX_DEVICE_CAP_FLASH_ERASE;
         }
         saved = metadata_enter();
         --state->active_calls;
         metadata_exit(saved);
     }
+    return status;
+}
+nx_status_t nx_device_describe(const nx_device_t* dev, nx_device_info_t* out) {
+    if (!out) return NX_ERR_NULL_PTR;
+    memset(out, 0, sizeof(*out));
+    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    uint32_t saved = metadata_enter();
+    nx_status_t status = registered(dev) ? NX_OK : NX_ERR_NOT_FOUND;
+    if (status == NX_OK) {
+        out->name = dev->name;
+        out->device_class = dev->device_class;
+        out->declared_capabilities = dev->capabilities;
+    }
+    metadata_exit(saved);
     return status;
 }
 nx_status_t nx_device_close(nx_device_ref_t ref) {
@@ -325,7 +349,7 @@ nx_status_t nx_device_close(nx_device_ref_t ref) {
     state->phase = NX_DEVICE_CLOSING;
     void* api = state->api;
     metadata_exit(saved);
-    nx_lifecycle_t* life = lifecycle(ref.descriptor, api);
+    nx_lifecycle_t* life = nx_device_dispatch_lifecycle(ref.descriptor, api);
     status = life && life->deinit ? life->deinit(life) : NX_ERR_NOT_SUPPORTED;
     saved = metadata_enter();
     state->last_status = status;
@@ -351,17 +375,44 @@ nx_status_t nx_device_recover(const char* name, uintptr_t owner) {
         metadata_exit(saved);
         return NX_ERR_INVALID_STATE;
     }
+    if (state->active_calls || state->child_refs) {
+        metadata_exit(saved);
+        return NX_ERR_BUSY;
+    }
     state->phase = NX_DEVICE_CLOSING;
     metadata_exit(saved);
-    nx_lifecycle_t* life = lifecycle(dev, state->api);
+    nx_lifecycle_t* life = nx_device_dispatch_lifecycle(dev, state->api);
     status = life && life->deinit ? life->deinit(life) : NX_ERR_NOT_SUPPORTED;
-    if (status == NX_ERR_NOT_INIT) status = NX_OK;
+    if (status == NX_ERR_NOT_INIT && !state->uart_unknown_lease) status = NX_OK;
+    if (status == NX_OK && state->uart_unknown_lease &&
+        (!life->get_state || life->get_state(life) != NX_DEV_STATE_UNINITIALIZED))
+        status = NX_ERR_NOT_READY;
     saved = metadata_enter();
     state->last_status = status;
     state->phase = status == NX_OK ? NX_DEVICE_CLOSED : NX_DEVICE_RECOVERY_REQUIRED;
-    if (status == NX_OK) state->owner = 0;
+    if (status == NX_OK) {
+        state->owner = 0;
+        state->active_ticket = 0;
+        state->last_ticket = 0;
+        state->uart_unknown_lease = false;
+    }
     metadata_exit(saved);
     return status;
+}
+
+nx_status_t nx_device_dispatch_recover_unknown_uart(nx_device_ref_t ref) {
+    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    uint32_t saved = metadata_enter();
+    if (!registered(ref.descriptor)) { metadata_exit(saved); return NX_ERR_NOT_FOUND; }
+    const nx_device_t* dev = ref.descriptor;
+    nx_device_config_state_t* state = dev->state;
+    bool valid = ref.device_class == NX_DEVICE_CLASS_UART &&
+        dev->device_class == NX_DEVICE_CLASS_UART && state &&
+        ref.owner && state->owner == ref.owner &&
+        ref.generation && state->generation == ref.generation &&
+        state->phase == NX_DEVICE_RECOVERY_REQUIRED && state->uart_unknown_lease;
+    metadata_exit(saved);
+    return valid ? nx_device_recover(dev->name, ref.owner) : NX_ERR_INVALID_STATE;
 }
 
 /* Pin while driver code executes, without holding CPU masks. Close can never
@@ -384,147 +435,6 @@ void nx_device_dispatch_unpin(nx_device_ref_t ref) {
     uint32_t saved = metadata_enter();
     --ref.descriptor->state->active_calls;
     metadata_exit(saved);
-}
-static nx_status_t pin(nx_device_ref_t ref, nx_device_class_t expected, void** api) {
-    return nx_device_dispatch_pin(ref, expected, true, api);
-}
-static void unpin(nx_device_ref_t ref) { nx_device_dispatch_unpin(ref); }
-static nx_status_t gpio_pin(nx_device_ref_t ref, void** api) {
-    if (ref.device_class != NX_DEVICE_CLASS_GPIO && ref.device_class != NX_DEVICE_CLASS_GPIO_READ &&
-        ref.device_class != NX_DEVICE_CLASS_GPIO_WRITE) return NX_ERR_TYPE_MISMATCH;
-    nx_status_t status = pin(ref, ref.device_class, api);
-    if (status != NX_OK) return status;
-    nx_lifecycle_t* life = lifecycle(ref.descriptor, *api);
-    nx_device_state_t hardware = life && life->get_state ? life->get_state(life) : NX_DEV_STATE_ERROR;
-    if (hardware != NX_DEV_STATE_RUNNING) {
-        status = hardware == NX_DEV_STATE_SUSPENDED ? NX_ERR_SUSPENDED :
-            hardware == NX_DEV_STATE_UNINITIALIZED ? NX_ERR_NOT_INIT : NX_ERR_NOT_READY;
-        unpin(ref);
-    }
-    return status;
-}
-nx_status_t nx_device_gpio_read(nx_device_ref_t ref, uint8_t* value) {
-    if (!value) return NX_ERR_NULL_PTR;
-    *value = 0;
-    if (ref.device_class == NX_DEVICE_CLASS_GPIO_WRITE) return NX_ERR_NOT_SUPPORTED;
-    void* api = NULL;
-    nx_status_t status = gpio_pin(ref, &api);
-    if (status != NX_OK) return status;
-    nx_gpio_read_t* gpio = ref.device_class == NX_DEVICE_CLASS_GPIO ? &((nx_gpio_t*)api)->read : api;
-    if (gpio->read) *value = gpio->read(gpio); else status = NX_ERR_NOT_SUPPORTED;
-    unpin(ref);
-    return status;
-}
-nx_status_t nx_device_gpio_write(nx_device_ref_t ref, uint8_t value) {
-    if (value > 1) return NX_ERR_INVALID_PARAM;
-    if (ref.device_class == NX_DEVICE_CLASS_GPIO_READ) return NX_ERR_NOT_SUPPORTED;
-    void* api = NULL;
-    nx_status_t status = gpio_pin(ref, &api);
-    if (status != NX_OK) return status;
-    nx_gpio_write_t* gpio = ref.device_class == NX_DEVICE_CLASS_GPIO ? &((nx_gpio_t*)api)->write : api;
-    if (gpio->write) gpio->write(gpio, value); else status = NX_ERR_NOT_SUPPORTED;
-    unpin(ref);
-    return status;
-}
-nx_status_t nx_device_gpio_toggle(nx_device_ref_t ref) {
-    if (ref.device_class == NX_DEVICE_CLASS_GPIO_READ) return NX_ERR_NOT_SUPPORTED;
-    void* api = NULL;
-    nx_status_t status = gpio_pin(ref, &api);
-    if (status != NX_OK) return status;
-    nx_gpio_write_t* gpio = ref.device_class == NX_DEVICE_CLASS_GPIO ? &((nx_gpio_t*)api)->write : api;
-    if (gpio->toggle) gpio->toggle(gpio); else status = NX_ERR_NOT_SUPPORTED;
-    unpin(ref);
-    return status;
-}
-
-static nx_uart_operations_t* uart_operations(void* api) {
-    nx_uart_t* uart = api;
-    return uart->get_operations ? uart->get_operations(uart) : NULL;
-}
-nx_status_t nx_device_uart_submit(nx_device_ref_t ref, const uint8_t* data,
-                                  size_t len, uint32_t timeout_ms,
-                                  nx_uart_ticket_t* ticket) {
-    if (!ticket) return NX_ERR_NULL_PTR;
-    ticket->sequence = 0;
-    if (!data || !len || timeout_ms > INT32_MAX) return NX_ERR_INVALID_PARAM;
-    void* api = NULL;
-    nx_status_t status = pin(ref, NX_DEVICE_CLASS_UART, &api);
-    if (status != NX_OK) return status;
-    uint32_t saved = metadata_enter();
-    bool active = ref.descriptor->state->active_ticket != 0;
-    metadata_exit(saved);
-    nx_uart_operations_t* ops = uart_operations(api);
-    if (active) status = NX_ERR_BUSY;
-    else if (!ops || !ops->submit || !ops->poll) status = NX_ERR_NOT_SUPPORTED;
-    else status = ops->submit(ops, data, len, timeout_ms, ticket);
-    if (status == NX_OK) {
-        /* A port must never admit a zero ticket. Quarantine rather than close
-         * hardware which may have borrowed storage under a broken contract. */
-        saved = metadata_enter();
-        ref.descriptor->state->active_ticket = ticket->sequence ? ticket->sequence : UINT64_MAX;
-        ref.descriptor->state->last_ticket = ticket->sequence;
-        metadata_exit(saved);
-        if (!ticket->sequence) status = NX_ERR_INVALID_STATE;
-    } else ticket->sequence = 0;
-    unpin(ref);
-    return status;
-}
-nx_status_t nx_device_uart_poll(nx_device_ref_t ref, nx_uart_ticket_t ticket,
-                                nx_uart_result_t* result) {
-    if (!result) return NX_ERR_NULL_PTR;
-    memset(result, 0, sizeof(*result));
-    result->status = NX_ERR_INVALID_STATE;
-    if (!ticket.sequence) return NX_ERR_INVALID_PARAM;
-    void* api = NULL;
-    nx_status_t status = pin(ref, NX_DEVICE_CLASS_UART, &api);
-    if (status != NX_OK) return status;
-    uint32_t saved = metadata_enter();
-    uint64_t active = ref.descriptor->state->active_ticket;
-    uint64_t last = ref.descriptor->state->last_ticket;
-    metadata_exit(saved);
-    nx_uart_operations_t* ops = uart_operations(api);
-    if (last != ticket.sequence || (active && active != ticket.sequence)) status = NX_ERR_INVALID_STATE;
-    else if (!ops || !ops->poll) status = NX_ERR_NOT_SUPPORTED;
-    else status = ops->poll(ops, ticket, result);
-    if (status == NX_OK && result->settled && active == ticket.sequence) {
-        saved = metadata_enter();
-        ref.descriptor->state->active_ticket = 0;
-        metadata_exit(saved);
-    }
-    unpin(ref);
-    return status;
-}
-nx_status_t nx_device_uart_cancel(nx_device_ref_t ref, nx_uart_ticket_t ticket) {
-    if (!ticket.sequence) return NX_ERR_INVALID_PARAM;
-    void* api = NULL;
-    nx_status_t status = pin(ref, NX_DEVICE_CLASS_UART, &api);
-    if (status != NX_OK) return status;
-    uint32_t saved = metadata_enter();
-    uint64_t active = ref.descriptor->state->active_ticket;
-    uint64_t last = ref.descriptor->state->last_ticket;
-    metadata_exit(saved);
-    nx_uart_operations_t* ops = uart_operations(api);
-    if (last != ticket.sequence || (active && active != ticket.sequence)) status = NX_ERR_INVALID_STATE;
-    else if (!ops || !ops->cancel) status = NX_ERR_NOT_SUPPORTED;
-    else status = ops->cancel(ops, ticket);
-    if (status == NX_OK && active == ticket.sequence) {
-        saved = metadata_enter();
-        ref.descriptor->state->active_ticket = 0;
-        metadata_exit(saved);
-    }
-    unpin(ref);
-    return status;
-}
-nx_status_t nx_device_uart_receive_event(nx_device_ref_t ref, nx_uart_rx_event_t* event) {
-    if (!event) return NX_ERR_NULL_PTR;
-    memset(event, 0, sizeof(*event));
-    void* api = NULL;
-    nx_status_t status = pin(ref, NX_DEVICE_CLASS_UART, &api);
-    if (status != NX_OK) return status;
-    nx_uart_operations_t* ops = uart_operations(api);
-    status = ops && ops->receive_event ? ops->receive_event(ops, event) : NX_ERR_NOT_SUPPORTED;
-    unpin(ref);
-    return status;
 }
 nx_status_t nx_device_shutdown_check(void) {
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;

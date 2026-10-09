@@ -1,5 +1,6 @@
 /* GD32F470 SPI4: bounded device values and task-serviced transactions.
  * Hardware is polling only; no DMA or hidden allocation is advertised. */
+#include "hal/provider/nx_device_provider.h"
 #include "arch/nx_arch.h"
 #include "board.h"
 #include "gd32f470_platform.h"

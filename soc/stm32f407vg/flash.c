@@ -1,6 +1,7 @@
 /** Real STM32F407 xE/xG Flash port. xE reserves sectors 6/7; xG 10/11.
  * Flash erase/program can stall instruction fetch. This is a maintenance
  * operation, not a control-loop operation. Runtime power-fail HIL is pending. */
+#include "hal/provider/nx_device_provider.h"
 #include "flash.h"
 #include "flash_geometry.h"
 #include "nexus_config.h"

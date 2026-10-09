@@ -1,4 +1,5 @@
 /* USART0 IRQ implementation. No DMA or hidden heap allocation. */
+#include "hal/provider/nx_device_provider.h"
 #include "arch/nx_arch.h"
 #include "board.h"
 #include "gd32f470_platform.h"

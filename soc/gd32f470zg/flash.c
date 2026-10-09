@@ -1,3 +1,4 @@
+#include "hal/provider/nx_device_provider.h"
 #include "flash.h"
 #include "arch/nx_arch.h"
 #include "gd32f4xx.h"

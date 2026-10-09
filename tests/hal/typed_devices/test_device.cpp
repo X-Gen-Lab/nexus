@@ -1,7 +1,9 @@
 /** Observable lifetime/lease tests against the production registry core.
  * Fault ports model hardware ownership, not electrical timing or DMA behavior. */
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/nx_factory.h"
+#include "hal/runtime/nx_deadline.h"
 #include "arch/nx_arch.h"
 #include <gtest/gtest.h>
 #include <atomic>
@@ -17,6 +19,7 @@ namespace {
 struct Port {
     nx_gpio_t gpio{};
     nx_uart_t uart{};
+    nx_i2c_t i2c{};
     nx_lifecycle_t life{};
     nx_uart_operations_t operations{};
     nx_device_state_t hardware = NX_DEV_STATE_UNINITIALIZED;
@@ -27,6 +30,10 @@ struct Port {
     uint8_t level = 0;
     const uint8_t* borrowed = nullptr;
     bool settled = false, wire_idle = false;
+    bool zero_ticket = false, deinit_lies = false;
+    bool complete_on_wait = false;
+    uint32_t clock = 0, wait_count = 0, last_wait = 0;
+    nx_status_t wait_status = NX_OK;
     uint64_t sequence = 0;
     nx_device_ref_t nested_ref{};
     nx_status_t callback_close_status = NX_OK;
@@ -44,13 +51,17 @@ static nx_status_t init(nx_lifecycle_t*) {
 static nx_status_t deinit(nx_lifecycle_t*) {
     EXPECT_FALSE(nx_arch_irq_is_masked());
     ++current->closes;
-    if (current->close_status == NX_OK) current->hardware = NX_DEV_STATE_UNINITIALIZED;
+    if (current->close_status == NX_OK && !current->deinit_lies) {
+        current->hardware = NX_DEV_STATE_UNINITIALIZED;
+        current->borrowed = nullptr;
+    }
     return current->close_status;
 }
 static nx_device_state_t state(nx_lifecycle_t*) { return current->hardware; }
 static nx_lifecycle_t* gpio_lifecycle(nx_gpio_write_t*) { return &current->life; }
 static nx_lifecycle_t* read_lifecycle(nx_gpio_read_t*) { return &current->life; }
 static nx_lifecycle_t* uart_lifecycle(nx_uart_t*) { return &current->life; }
+static nx_lifecycle_t* i2c_lifecycle(nx_i2c_t*) { return &current->life; }
 static nx_uart_operations_t* operations(nx_uart_t*) { return &current->operations; }
 static uint8_t read(nx_gpio_read_t*) { return current->level; }
 static void write(nx_gpio_write_t*, uint8_t value) {
@@ -69,7 +80,8 @@ static nx_status_t construct(const nx_device_t* dev, void** out) {
     EXPECT_FALSE(nx_arch_irq_is_masked());
     ++current->constructions;
     if (current->construction_status != NX_OK) return current->construction_status;
-    *out = dev->device_class == NX_DEVICE_CLASS_UART ? static_cast<void*>(&current->uart) : static_cast<void*>(&current->gpio);
+    *out = dev->device_class == NX_DEVICE_CLASS_UART ? static_cast<void*>(&current->uart) :
+        dev->device_class == NX_DEVICE_CLASS_I2C ? static_cast<void*>(&current->i2c) : static_cast<void*>(&current->gpio);
     return NX_OK;
 }
 static nx_status_t submit(nx_uart_operations_t*, const uint8_t* data, size_t, uint32_t, nx_uart_ticket_t* ticket) {
@@ -79,6 +91,7 @@ static nx_status_t submit(nx_uart_operations_t*, const uint8_t* data, size_t, ui
     current->settled = false;
     current->wire_idle = false;
     ticket->sequence = ++current->sequence;
+    if (current->zero_ticket) ticket->sequence = 0;
     return NX_OK;
 }
 static nx_status_t poll(nx_uart_operations_t*, nx_uart_ticket_t ticket, nx_uart_result_t* result) {
@@ -96,6 +109,13 @@ static nx_status_t cancel(nx_uart_operations_t*, nx_uart_ticket_t ticket) {
     return NX_OK;
 }
 static nx_status_t receive(nx_uart_operations_t*, nx_uart_rx_event_t*) { return NX_ERR_NO_DATA; }
+static nx_status_t clock_now(void*, uint32_t* out) { *out=current->clock; return NX_OK; }
+static nx_status_t wait_ms(void*,uint32_t duration) {
+    ++current->wait_count; current->last_wait=duration; current->clock+=duration;
+    if(current->complete_on_wait) { current->settled=true; current->wire_idle=true; }
+    return current->wait_status;
+}
+static const nx_hal_wait_port_t wait_port{clock_now,wait_ms,nullptr,5};
 
 class TypedDevice : public ::testing::Test {
 protected:
@@ -110,6 +130,7 @@ protected:
         port.gpio.read.read = read; port.gpio.read.get_lifecycle = read_lifecycle;
         port.gpio.write.write = write; port.gpio.write.toggle = toggle; port.gpio.write.get_lifecycle = gpio_lifecycle;
         port.uart.get_lifecycle = uart_lifecycle; port.uart.get_operations = operations;
+        port.i2c.get_lifecycle = i2c_lifecycle;
         port.operations.submit = submit; port.operations.poll = poll;
         port.operations.cancel = cancel; port.operations.receive_event = receive;
         descriptor.name = "GPIOA0"; descriptor.state = &storage;
@@ -140,6 +161,10 @@ TEST_F(TypedDevice, DiscoveryProvesClassWithoutConstructionOrHardwareOpen) {
     const nx_device_t* found = nullptr;
     ASSERT_EQ(nx_device_discover("GPIOA0", NX_DEVICE_CLASS_GPIO, &found), NX_OK);
     EXPECT_EQ(found, &descriptor); EXPECT_EQ(port.constructions, 0u); EXPECT_EQ(port.opens, 0u);
+    nx_device_info_t info{};
+    ASSERT_EQ(nx_device_describe(found, &info), NX_OK);
+    EXPECT_STREQ(info.name, "GPIOA0"); EXPECT_EQ(info.device_class, NX_DEVICE_CLASS_GPIO);
+    EXPECT_EQ(port.constructions, 0u); EXPECT_EQ(port.opens, 0u);
     found = &descriptor;
     EXPECT_EQ(nx_device_discover("GPIOA0", NX_DEVICE_CLASS_UART, &found), NX_ERR_TYPE_MISMATCH);
     EXPECT_EQ(found, nullptr);
@@ -351,6 +376,80 @@ TEST_F(TypedDevice, NewOwnerCannotQueryPreviousOwnersSettledTicket) {
     open(); nx_uart_result_t result{};
     EXPECT_EQ(nx_device_uart_poll(ref, old, &result), NX_ERR_INVALID_STATE);
     EXPECT_EQ(nx_device_uart_cancel(ref, old), NX_ERR_INVALID_STATE);
+}
+TEST_F(TypedDevice, ZeroTicketQuarantinesBufferUntilHardwareRecoverySettles) {
+    uart(); open(); uint8_t byte = 7; nx_uart_ticket_t ticket{};
+    port.zero_ticket = true;
+    ASSERT_EQ(nx_device_uart_submit(ref, &byte, 1, 20, &ticket), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(ticket.sequence, 0u); EXPECT_EQ(port.borrowed, &byte);
+    EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 2, &ref), NX_ERR_BUSY);
+    // The failed second open clears its output; reconstruct the original owner.
+    ref = {&descriptor, 1, storage.generation, NX_DEVICE_CLASS_UART};
+    port.close_status = NX_ERR_BUSY;
+    EXPECT_EQ(nx_device_uart_recover(ref), NX_ERR_BUSY);
+    EXPECT_EQ(port.borrowed, &byte); EXPECT_NE(storage.active_ticket, 0u);
+    port.close_status = NX_OK; port.deinit_lies = true;
+    EXPECT_EQ(nx_device_uart_recover(ref), NX_ERR_NOT_READY);
+    EXPECT_EQ(port.borrowed, &byte); EXPECT_NE(storage.active_ticket, 0u);
+    port.deinit_lies = false;
+    EXPECT_EQ(nx_device_uart_recover(ref), NX_OK);
+    EXPECT_EQ(port.borrowed, nullptr); EXPECT_EQ(storage.active_ticket, 0u);
+    EXPECT_EQ(nx_device_close(ref), NX_ERR_INVALID_STATE);
+    nx_device_ref_t old = ref; port.zero_ticket = false; open();
+    EXPECT_NE(ref.generation, old.generation);
+    EXPECT_EQ(nx_device_uart_recover(old), NX_ERR_INVALID_STATE);
+    ASSERT_EQ(nx_device_uart_submit(ref, &byte, 1, 20, &ticket), NX_OK);
+    EXPECT_EQ(nx_device_uart_cancel(ref, ticket), NX_OK);
+}
+TEST_F(TypedDevice, UnknownLeaseRecoveryRejectsForgedReferenceWithoutDereference) {
+    nx_device_ref_t unknown{reinterpret_cast<const nx_device_t*>(uintptr_t{1}), 1, 1, NX_DEVICE_CLASS_UART};
+    EXPECT_EQ(nx_device_uart_recover(unknown), NX_ERR_NOT_FOUND);
+}
+TEST_F(TypedDevice, TypedI2CWithoutModernProviderFailsAndKeepsControllerClosable) {
+    descriptor.name="I2C0"; descriptor.device_class=NX_DEVICE_CLASS_I2C; open();
+    nx_device_caps_t caps{}; ASSERT_EQ(nx_device_query(ref,&caps),NX_OK); EXPECT_EQ(caps.flags,0u);
+    nx_device_i2c_ref_t child{}; EXPECT_EQ(nx_device_i2c_open(ref,0x50,&child),NX_ERR_NOT_SUPPORTED);
+    EXPECT_EQ(child.slot,0u); EXPECT_EQ(storage.child_refs,0u);
+}
+TEST_F(TypedDevice, RuntimeWaitReturnsActualTerminalErrorWithSettledStorage) {
+    uart();open();uint8_t byte=1;nx_uart_ticket_t ticket{};nx_uart_result_t result{};
+    port.complete_on_wait=true;port.terminal_status=NX_ERR_HARDWARE;
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,20,&wait_port,&ticket,&result),NX_ERR_HARDWARE);
+    EXPECT_TRUE(result.settled);EXPECT_TRUE(result.wire_idle);EXPECT_EQ(port.borrowed,nullptr);
+}
+TEST_F(TypedDevice, RuntimeDeadlineCapsFinalWaitAndSettlesTimeoutByCancellation) {
+    uart();open();uint8_t byte=1;nx_uart_ticket_t ticket{};nx_uart_result_t result{};
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,7,&wait_port,&ticket,&result),NX_ERR_TIMEOUT);
+    EXPECT_EQ(port.wait_count,2u);EXPECT_EQ(port.last_wait,2u);EXPECT_EQ(port.clock,7u);
+    EXPECT_TRUE(result.settled);EXPECT_FALSE(result.wire_idle);EXPECT_EQ(port.borrowed,nullptr);
+}
+TEST_F(TypedDevice, RuntimeCancellationFailureKeepsTicketAndBufferUntilExplicitPoll) {
+    uart();open();uint8_t byte=1;nx_uart_ticket_t ticket{};nx_uart_result_t result{};
+    port.cancel_status=NX_ERR_HARDWARE;
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,3,&wait_port,&ticket,&result),NX_ERR_HARDWARE);
+    EXPECT_FALSE(result.settled);EXPECT_NE(ticket.sequence,0u);EXPECT_EQ(port.borrowed,&byte);
+    EXPECT_EQ(nx_device_close(ref),NX_ERR_BUSY);
+    port.settled=true;port.terminal_status=NX_ERR_TIMEOUT;
+    EXPECT_EQ(nx_device_uart_poll(ref,ticket,&result),NX_OK);EXPECT_TRUE(result.settled);
+}
+TEST_F(TypedDevice, RuntimeWaitFailureDoesNotBecomeSuccessAndCancelSettles) {
+    uart();open();uint8_t byte=1;nx_uart_ticket_t ticket{};nx_uart_result_t result{};port.wait_status=NX_ERR_IO;
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,20,&wait_port,&ticket,&result),NX_ERR_IO);
+    EXPECT_TRUE(result.settled);EXPECT_EQ(port.borrowed,nullptr);
+}
+TEST_F(TypedDevice, RuntimeZeroBudgetNeverSubmitsAndClockWrapKeepsDeadline) {
+    uart();open();uint8_t byte=1;nx_uart_ticket_t ticket{};nx_uart_result_t result{};
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,0,&wait_port,&ticket,&result),NX_ERR_TIMEOUT);
+    EXPECT_EQ(ticket.sequence,0u);EXPECT_EQ(port.borrowed,nullptr);
+    port.clock=UINT32_MAX-2;
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,7,&wait_port,&ticket,&result),NX_ERR_TIMEOUT);
+    EXPECT_EQ(port.clock,4u);EXPECT_TRUE(result.settled);
+}
+TEST_F(TypedDevice, RuntimeZeroTicketErrorKeepsStorageUntilUnknownLeaseRecovery) {
+    uart();open();uint8_t byte=1;nx_uart_ticket_t ticket{};nx_uart_result_t result{};port.zero_ticket=true;
+    EXPECT_EQ(nx_device_uart_transfer(ref,&byte,1,10,&wait_port,&ticket,&result),NX_ERR_INVALID_STATE);
+    EXPECT_FALSE(result.settled);EXPECT_EQ(port.borrowed,&byte);
+    EXPECT_EQ(nx_device_uart_recover(ref),NX_OK);EXPECT_EQ(port.borrowed,nullptr);
 }
 TEST(RegistryRegion, IntegerBoundsRejectPartialMisalignedOrReversedTables) {
     size_t count = 99;

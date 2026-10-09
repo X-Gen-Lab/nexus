@@ -2,6 +2,7 @@
 #define _POSIX_C_SOURCE 200809L
 #endif
 /** Native I2C bus registry, bounded devices and caller-owned generations. */
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/system/nx_mem.h"
 #include "nexus_config.h"

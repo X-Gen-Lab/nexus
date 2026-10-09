@@ -1,4 +1,5 @@
 /** STM32 SPI bus owns arbitration; each slave owns immutable configuration. */
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "stm32_spi.h"
 #include <string.h>

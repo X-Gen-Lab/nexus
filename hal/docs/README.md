@@ -15,17 +15,8 @@
 
 ### 🏗️ 架构文档
 
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - 架构设计文档
-  - 设计目标和核心理念
-  - 系统架构（分层设计）
-  - 设备注册机制
-  - 工厂模式实现
-  - 接口适配器设计
-  - 资源管理器
-  - 错误处理机制
-  - 跨平台支持策略
-  - 性能优化方案
-  - 设计权衡和未来改进方向
+- **[DESIGN.md](DESIGN.md)** — 当前 core/facade/provider/runtime 目标、opaque consumer 接口、UART/SPI/I2C/Flash 所有权、deadline 与验收边界。
+- **[../../docs/strategy/hal-osal-design.md](../../docs/strategy/hal-osal-design.md)** — 整体演进设计；其中提案须与当前公开 API 和执行证据区分。
 
 ### 📚 使用指南
 

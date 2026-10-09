@@ -14,11 +14,11 @@
  *     // Initialize HAL
  *     nx_hal_init();
  *
- *     // Get UART device
- *     nx_uart_t *uart = nx_factory_uart(0);
- *     if (uart) {
- *         // Use UART...
- *         nx_factory_uart_release(uart);
+ *     // Device actions use an explicit owner and a typed reference.
+ *     nx_device_ref_t led = {0};
+ *     if (nx_device_open("GPIOA0", NX_DEVICE_CLASS_GPIO, 1, &led) == NX_OK) {
+ *         nx_device_gpio_write(led, 1);
+ *         nx_device_close(led);
  *     }
  *
  *     // Cleanup
@@ -80,7 +80,7 @@ extern "C" {
 /* Factory Interface                                                         */
 /*---------------------------------------------------------------------------*/
 
-#include "hal/nx_factory.h"
+/* Explicit provider/migration factories are not part of this consumer umbrella. */
 
 /*---------------------------------------------------------------------------*/
 /* HAL Initialization and Deinitialization                                   */

@@ -12,6 +12,7 @@
  *                  for test access and manages Option Bytes instance lifecycle.
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_option_bytes.h"
 #include "hal/system/nx_mem.h"

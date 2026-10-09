@@ -12,6 +12,7 @@
  *                  on enabled pins in Kconfig.
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_gpio.h"
 #include "nexus_config.h"

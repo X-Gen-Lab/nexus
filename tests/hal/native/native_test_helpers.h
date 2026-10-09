@@ -7,6 +7,7 @@
 #ifndef NATIVE_TEST_HELPERS_H
 #define NATIVE_TEST_HELPERS_H
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/nx_factory.h"
 #include "hal/nx_status.h"
 #include <stdbool.h>

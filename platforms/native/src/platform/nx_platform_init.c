@@ -12,6 +12,7 @@
  *                  used for host-based testing and simulation.
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/nx_status.h"
 #include "nexus_config.h"
 #include "hal/resource/nx_dma_manager.h"

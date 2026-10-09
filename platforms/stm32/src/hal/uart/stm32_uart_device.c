@@ -1,5 +1,6 @@
 /** Statically allocated UART descriptors. Logical UART0/1/2 map to the SoC's
  * USART1/2/3; opening an unbound board resource reports UNSUPPORTED. */
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "nexus_config.h"
 #include "stm32_uart.h"

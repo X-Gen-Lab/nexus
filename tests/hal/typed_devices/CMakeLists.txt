@@ -1,13 +1,18 @@
 # Production core with fault-capable driver ports and the real Native Arch lock.
 add_executable(typed_device_contract_tests
-    test_device.cpp test_spi.cpp "${NEXUS_SOURCE_DIR}/hal/src/nx_device.c"
-    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_spi.c")
+    test_device.cpp test_spi.cpp test_flash.cpp "${NEXUS_SOURCE_DIR}/hal/src/nx_device.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_spi.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_gpio.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_uart.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_flash.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_i2c.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_deadline.c")
 # Override only the ISR context probe in this fault-model executable.
 # The production library uses Arch IPSR; locking/barriers use real Native Arch.
 target_compile_definitions(typed_device_contract_tests PRIVATE nx_arch_in_isr=typed_test_in_isr)
 target_compile_features(typed_device_contract_tests PRIVATE cxx_std_17)
 target_link_libraries(typed_device_contract_tests PRIVATE
-    hal_interface nexus_arch GTest::gtest_main ${THREAD_LIBS})
+    hal_provider_interface nexus_arch GTest::gtest_main ${THREAD_LIBS})
 if(NOT MSVC)
     target_compile_options(typed_device_contract_tests PRIVATE -Wall -Wextra -Werror)
 endif()
@@ -15,6 +20,7 @@ nexus_discover_tests(typed_device_contract_tests PROPERTIES TIMEOUT 10 LABELS "h
 
 add_executable(typed_stm32_gpio_registration
     test_stm32_gpio_registration.c "${NEXUS_SOURCE_DIR}/hal/src/nx_device.c"
+    "${NEXUS_SOURCE_DIR}/hal/src/nx_device_gpio.c"
     "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_device.c"
     "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_lifecycle.c"
     "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_power.c"
@@ -23,7 +29,7 @@ target_include_directories(typed_stm32_gpio_registration PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake"
     "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio")
 target_compile_definitions(typed_stm32_gpio_registration PRIVATE STM32F4 NEXUS_PLATFORM_NATIVE)
-target_link_libraries(typed_stm32_gpio_registration PRIVATE hal_interface nexus_arch)
+target_link_libraries(typed_stm32_gpio_registration PRIVATE hal_provider_interface nexus_arch)
 if(MSVC)
     target_compile_options(typed_stm32_gpio_registration PRIVATE /UNDEBUG)
 else()

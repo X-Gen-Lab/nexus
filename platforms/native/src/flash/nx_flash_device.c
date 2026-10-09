@@ -12,6 +12,7 @@
  *                  and manages Flash instance lifecycle.
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include "hal/interface/nx_flash.h"
 #include "hal/system/nx_mem.h"
