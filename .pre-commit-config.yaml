@@ -1,0 +1,18 @@
+minimum_pre_commit_version: '4.3.0'
+default_install_hook_types: [pre-commit, commit-msg]
+repos:
+  - repo: local
+    hooks:
+      - id: nexus-style
+        name: Nexus format, comment and text checks
+        entry: python scripts/ci/style_gate.py --report build/quality/style-gate.json
+        language: python
+        stages: [pre-commit]
+        pass_filenames: true
+        always_run: true
+        require_serial: true
+      - id: nexus-commit-message
+        name: Nexus conventional commit message
+        entry: python scripts/ci/check_commit_message.py
+        language: python
+        stages: [commit-msg]

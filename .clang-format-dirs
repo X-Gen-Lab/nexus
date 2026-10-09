@@ -13,11 +13,15 @@ hal
 # Operating System Abstraction Layer
 osal
 
-# Platform-specific code
-platforms
+# CPU, silicon and Board code owned by Nexus
+arch
+soc
+boards
 
-# Application code
-applications
+# Platform startup and common infrastructure
+platforms
+runtime
+services
 
 # Framework code
 framework
@@ -37,6 +41,8 @@ tests
 # Vendor SDKs
 !vendors
 !vendors/*
+!vendor
+!vendor/*
 
 # Build directories
 !build
@@ -60,3 +66,4 @@ tests
 .hpp
 .cc
 .hh
+.inc

@@ -68,6 +68,7 @@ __pycache__/
 *.pyc
 .env
 venv/
+.venv/
 *.egg-info/
 
 # OS files

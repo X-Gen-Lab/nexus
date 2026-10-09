@@ -20,7 +20,7 @@ def needs_for(code="false", docs="false", workflows="false"):
             "outputs": {"code": code, "docs": docs, "workflows": workflows},
         },
         "build-test": {"result": "skipped"},
-        "code-quality": {"result": "skipped"},
+        "code-quality": {"result": "success"},
         "docs": {"result": "skipped"},
     }
 
@@ -28,12 +28,12 @@ def needs_for(code="false", docs="false", workflows="false"):
 class RequiredJobsTests(unittest.TestCase):
     def test_trigger_truth_table_and_gate_results(self):
         # Independent policy table: code affects all gates; workflow edits affect
-        # build/quality; docs edits affect docs; manual runs affect all gates.
+        # build/static analysis; style checks always run inside quality.
         for event in ("push", "pull_request", "schedule", "workflow_dispatch"):
             for code, docs, workflows in itertools.product((False, True), repeat=3):
                 expected = {
                     "build-test": event in ("schedule", "workflow_dispatch") or code or workflows,
-                    "code-quality": event == "workflow_dispatch" or code or workflows,
+                    "code-quality": True,
                     "docs": event in ("schedule", "workflow_dispatch") or code or docs,
                 }
                 needs = needs_for(*(str(flag).lower() for flag in (code, docs, workflows)))
@@ -138,7 +138,7 @@ class RequiredJobsTests(unittest.TestCase):
         lines = workflow.read_text(encoding="utf-8").splitlines()
         expected = {
             "build-test": "needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
-            "code-quality": "needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'workflow_dispatch'",
+            "code-quality": None,
             "docs": "needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
         }
         for job, expression in expected.items():

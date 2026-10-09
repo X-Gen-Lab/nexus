@@ -129,6 +129,10 @@ class ChangePathsTests(unittest.TestCase):
             "requirements.txt", "runtime/contracts/requirements-build.txt",
             "runtime/contracts/pyproject.toml", "runtime/contracts/poetry.lock",
             "runtime/contracts/uv.lock", ".clang-tidy", ".clang-format",
+            ".clang-format-dirs", ".editorconfig", ".pre-commit-config.yaml",
+            ".kiro/steering/comment-standards.md",
+            "docs/sphinx/development/coding_standards.rst",
+            "CONTRIBUTING.md", "CONTRIBUTING_CN.md",
         )
         for path in paths:
             with self.subTest(path=path):
@@ -158,13 +162,13 @@ class ChangePathsTests(unittest.TestCase):
     def test_docs_only_changes_allow_build_skips_but_require_documentation(self):
         for changes in ([("modified", "README.md")],
                         [("deleted", "docs/guide/old.rst")],
-                        [("modified", "docs/guide/new.rst"), ("modified", "CONTRIBUTING.md")]):
+                        [("modified", "docs/guide/new.rst"), ("modified", "CHANGELOG.md")]):
             with self.subTest(changes=changes):
                 outputs = classify(self.filters, changes)
                 self.assertEqual(required_jobs(outputs, "pull_request"),
-                                 {"build-test": False, "code-quality": False, "docs": True})
+                                 {"build-test": False, "code-quality": True, "docs": True})
                 needs = {"changes": {"result": "success", "outputs": outputs},
-                         "build-test": {"result": "skipped"}, "code-quality": {"result": "skipped"},
+                         "build-test": {"result": "skipped"}, "code-quality": {"result": "success"},
                          "docs": {"result": "success"}}
                 self.assertTrue(check_required_jobs(needs, "pull_request").passed)
                 needs["docs"]["result"] = "skipped"

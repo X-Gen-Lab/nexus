@@ -40,7 +40,7 @@ def required_jobs(outputs: Dict[str, str], event_name: str) -> Dict[str, bool]:
     )
     return {
         "build-test": code_or_workflows or scheduled or manual,
-        "code-quality": code_or_workflows or manual,
+        "code-quality": True,
         "docs": (
             outputs["docs"] == "true"
             or outputs["code"] == "true"

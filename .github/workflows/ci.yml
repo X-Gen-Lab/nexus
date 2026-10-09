@@ -68,6 +68,12 @@ jobs:
               - '.clang-format*'
               - '.clang-tidy*'
               - '.clangd'
+              - '.editorconfig'
+              - '.pre-commit-config.yaml'
+              - '.kiro/steering/comment-standards.md'
+              - 'docs/sphinx/development/coding_standards.rst'
+              - 'CONTRIBUTING.md'
+              - 'CONTRIBUTING_CN.md'
             docs:
               - 'docs/**'
               - '**.md'
@@ -89,8 +95,9 @@ jobs:
   code-quality:
     name: Code Quality
     needs: changes
-    if: needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/quality-checks.yml
+    with:
+      run_static_analysis: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'workflow_dispatch' }}
 
   docs:
     name: Documentation
