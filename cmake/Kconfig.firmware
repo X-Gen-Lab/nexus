@@ -1,0 +1,30 @@
+# Generic firmware resources; application composition belongs to consumers.
+menu "Firmware resources and artifacts"
+config FIRMWARE_MAIN_STACK_SIZE
+    hex "CPU main/exception stack reservation (bytes)"
+    default 0x1000
+    range 0x400 0x10000
+    help
+      Linker-reserved MSP/exception stack, independent of OSAL task stacks.
+config FIRMWARE_LIBC_HEAP_SIZE
+    hex "C runtime heap reservation (bytes)"
+    default 0x2000
+    range 0x0 0x100000
+    help
+      Linker-reserved libc heap. OSAL pools and FreeRTOS kernel budgets are separate.
+config FIRMWARE_GENERATE_BIN
+    bool "Generate raw binary"
+    default y
+config FIRMWARE_GENERATE_HEX
+    bool "Generate Intel HEX"
+    default y
+config FIRMWARE_GENERATE_MAP
+    bool
+    default y
+config FIRMWARE_PRINT_SIZE
+    bool "Print firmware size"
+    default y
+config FIRMWARE_PRINT_MEMORY_USAGE
+    bool "Print linker memory usage"
+    default y
+endmenu

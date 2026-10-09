@@ -49,7 +49,7 @@ macro(nexus_configure)
         endif()
     endif()
     set(_nexus_settings --set "BUILD_TYPE_${_nexus_mode}=y" --set "${_nexus_toolchain}=y")
-    foreach(_nexus_pair "BUILD_TESTS;NEXUS_BUILD_TESTS" "BUILD_EXAMPLES;NEXUS_BUILD_EXAMPLES" "ENABLE_COVERAGE;NEXUS_ENABLE_COVERAGE" "ENABLE_SANITIZERS;NEXUS_ENABLE_SANITIZERS")
+    foreach(_nexus_pair "BUILD_TESTS;NEXUS_BUILD_TESTS" "BUILD_CONTRACTS;NEXUS_BUILD_CONTRACTS" "ENABLE_COVERAGE;NEXUS_ENABLE_COVERAGE" "ENABLE_SANITIZERS;NEXUS_ENABLE_SANITIZERS")
         list(GET _nexus_pair 0 _nexus_symbol)
         list(GET _nexus_pair 1 _nexus_option)
         if(${_nexus_option})
@@ -58,6 +58,9 @@ macro(nexus_configure)
             list(APPEND _nexus_settings --set "${_nexus_symbol}=n")
         endif()
     endforeach()
+    if(NEXUS_BOARD_DIR)
+        list(APPEND _nexus_settings --set "BOARD_EXTERNAL=y")
+    endif()
     execute_process(COMMAND "${Python3_EXECUTABLE}" "${NEXUS_SOURCE_DIR}/scripts/kconfig/generate_config.py"
         --kconfig "${NEXUS_SOURCE_DIR}/Kconfig" --config "${NEXUS_CONFIG_FILE}"
         --output "${NEXUS_CONFIG_HEADER}" --effective-config "${NEXUS_CONFIG_DIR}/effective.config"

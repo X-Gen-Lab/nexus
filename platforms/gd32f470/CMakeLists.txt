@@ -1,4 +1,4 @@
-if(NOT CONFIG_GD32F470ZG OR NOT CONFIG_BOARD_GD32F470_LIANGSHAN)
+if(NOT CONFIG_GD32F470ZG OR NOT (CONFIG_BOARD_GD32F470_LIANGSHAN OR CONFIG_BOARD_EXTERNAL))
     message(FATAL_ERROR "GD32F470 requires the maintained GD32F470ZGT6 Liangshan board binding")
 endif()
 if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU" OR NOT CONFIG_CPU_ARCH STREQUAL "cortex-m4")
@@ -20,7 +20,7 @@ set(cmsis "${firmware}/CMSIS")
 set(device "${cmsis}/GD/GD32F4xx")
 set(peripheral "${firmware}/GD32F4xx_standard_peripheral")
 set(startup_source "${device}/Source/GCC/startup_gd32f450_470.S")
-set(linker_script "${CMAKE_CURRENT_SOURCE_DIR}/linker/gd32f470zg.ld")
+set(linker_script "${NEXUS_GENERATED_LINKER_SCRIPT}")
 foreach(required "${cmsis}/core_cm4.h" "${device}/Include/gd32f4xx.h"
         "${startup_source}" "${linker_script}" "${peripheral}/Source/gd32f4xx_rcu.c")
     if(NOT EXISTS "${required}")
@@ -46,9 +46,8 @@ add_library(Nexus::GD32SDK ALIAS sdk_gd32f4xx)
 target_link_libraries(sdk_gd32f4xx PUBLIC sdk_gd32f4xx_headers)
 
 add_subdirectory("${NEXUS_SOURCE_DIR}/soc/gd32f470zg" "${NEXUS_BINARY_DIR}/soc/gd32f470zg")
-add_subdirectory("${NEXUS_SOURCE_DIR}/boards/gd32f470_liangshan"
-    "${NEXUS_BINARY_DIR}/boards/gd32f470_liangshan")
-set(component_objects soc_gd32f470 board_gd32f470_wiring)
+set(component_objects soc_gd32f470)
+nexus_add_selected_board()
 foreach(controller gpio uart spi)
     string(TOUPPER "${controller}" symbol)
     if(CONFIG_GD32_${symbol}_ENABLE)
@@ -56,7 +55,7 @@ foreach(controller gpio uart spi)
         add_library(${controller_target} OBJECT "src/${controller}.c")
         target_include_directories(${controller_target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
         target_link_libraries(${controller_target} PRIVATE
-            sdk_gd32f4xx hal osal nexus_arch board_gd32f470_liangshan)
+            sdk_gd32f4xx Nexus::HALProviders hal_support osal nexus_arch ${NEXUS_BOARD_TARGET})
         list(APPEND component_objects ${controller_target})
     endif()
 endforeach()
@@ -68,16 +67,14 @@ foreach(component IN LISTS component_objects)
 endforeach()
 target_include_directories(platform_gd32f470 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(platform_gd32f470 PRIVATE
-    sdk_gd32f4xx hal osal nexus_arch board_gd32f470_liangshan)
+    sdk_gd32f4xx Nexus::HALProviders hal_support osal nexus_arch ${NEXUS_BOARD_TARGET})
 target_link_libraries(platform_gd32f470 INTERFACE hal osal nexus_arch
-    soc_gd32f470_interface board_gd32f470_liangshan "$<LINK_ONLY:sdk_gd32f4xx>")
-if(CONFIG_SERVICE_STORAGE)
-    target_link_libraries(platform_gd32f470 INTERFACE "$<LINK_ONLY:nexus_storage>")
-endif()
+    soc_gd32f470_interface ${NEXUS_BOARD_TARGET} "$<LINK_ONLY:sdk_gd32f4xx>")
 set_target_properties(platform_gd32f470 PROPERTIES
     NEXUS_STARTUP_SOURCE "${startup_source}"
     NEXUS_LINKER_SCRIPT "${linker_script}"
     NEXUS_SDK_TARGET sdk_gd32f4xx
     NEXUS_COMPONENT_OBJECT_TARGETS "${component_objects}")
 target_link_options(platform_gd32f470 INTERFACE "-T${linker_script}")
-set_property(TARGET platform_gd32f470 APPEND PROPERTY INTERFACE_LINK_DEPENDS "${linker_script}")
+set_property(TARGET platform_gd32f470 APPEND PROPERTY INTERFACE_LINK_DEPENDS "${linker_script}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/linker/gd32f470_sections.ld")

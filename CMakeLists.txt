@@ -17,7 +17,7 @@ if(PROJECT_IS_TOP_LEVEL AND NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYP
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build mode" FORCE)
 endif()
 option(NEXUS_BUILD_TESTS "Build host tests" ${PROJECT_IS_TOP_LEVEL})
-option(NEXUS_BUILD_EXAMPLES "Build applications" ${PROJECT_IS_TOP_LEVEL})
+option(NEXUS_BUILD_CONTRACTS "Build platform link/startup contract fixtures" ${PROJECT_IS_TOP_LEVEL})
 if(NEXUS_BUILD_TESTS)
     enable_language(CXX)
 endif()
@@ -26,10 +26,15 @@ option(NEXUS_ENABLE_COVERAGE "Instrument host code for coverage" OFF)
 set(NEXUS_PLATFORM native CACHE STRING "Target platform")
 set(NEXUS_OSAL_BACKEND "" CACHE STRING "Optional backend constraint")
 set(NEXUS_CONFIG_FILE "" CACHE FILEPATH "Explicit Kconfig input fragment")
+set(NEXUS_BOARD_DIR "" CACHE PATH "External Board package directory")
+set(NEXUS_FLASH_LAYOUT_FILE "" CACHE FILEPATH "External Flash layout JSON input")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+include(NexusBoard)
+nexus_prepare_board()
 include(NexusConfig)
 nexus_configure()
+nexus_configure_board()
 
 # Usage requirements belong to targets, never directory-global compiler flags.
 add_library(nexus_build_options INTERFACE)
@@ -37,22 +42,55 @@ string(TOUPPER "${NEXUS_PLATFORM}" nexus_platform_symbol)
 target_compile_definitions(nexus_build_options INTERFACE "NEXUS_PLATFORM_${nexus_platform_symbol}" NEXUS_EFFECTIVE_CONFIG=1)
 file(SHA256 "${NEXUS_CONFIG_DIR}/effective.config" nexus_config_sha256)
 set(nexus_source_revision "unknown-source")
-find_package(Git QUIET)
-if(Git_FOUND)
-    execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --verify HEAD
-        WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE revision_result
-        OUTPUT_VARIABLE revision OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-    if(revision_result EQUAL 0)
-        set(nexus_source_revision "${revision}")
-        execute_process(COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=normal -- .
-            WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE status_result
-            OUTPUT_VARIABLE source_changes ERROR_QUIET)
-        if(NOT status_result EQUAL 0 OR source_changes)
-            string(APPEND nexus_source_revision "-dirty")
+if(EXISTS "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json")
+    execute_process(COMMAND "${Python3_EXECUTABLE}"
+        "${NEXUS_SOURCE_DIR}/cmake/package/package_source_sdk.py" --verify "${NEXUS_SOURCE_DIR}"
+        RESULT_VARIABLE _nexus_sdk_verification ERROR_VARIABLE _nexus_sdk_diagnostic)
+    if(NOT _nexus_sdk_verification EQUAL 0)
+        message(FATAL_ERROR "Source SDK identity verification failed: ${_nexus_sdk_diagnostic}")
+    endif()
+    file(READ "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json" _nexus_sdk_manifest)
+    string(JSON nexus_source_revision GET "${_nexus_sdk_manifest}" source_revision)
+    string(JSON _nexus_sdk_publishable GET "${_nexus_sdk_manifest}" publishable)
+    if(NOT _nexus_sdk_publishable)
+        if(NOT NEXUS_ALLOW_SOURCE_SDK_FIXTURE)
+            message(FATAL_ERROR "Development source SDK fixture requires NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON")
+        endif()
+        string(JSON _nexus_snapshot_identity GET "${_nexus_sdk_manifest}" snapshot_sha256)
+        string(SUBSTRING "${_nexus_snapshot_identity}" 0 12 _nexus_snapshot_short)
+        string(APPEND nexus_source_revision "-snapshot-${_nexus_snapshot_short}")
+    endif()
+else()
+    find_package(Git QUIET)
+    if(Git_FOUND)
+        # An archived source folder inside a consumer Git checkout is not the
+        # consumer commit. Only this checkout's own root can establish Git identity.
+        execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
+            WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE _nexus_git_root_result
+            OUTPUT_VARIABLE _nexus_git_root OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+        file(REAL_PATH "${NEXUS_SOURCE_DIR}" _nexus_own_root)
+        if(_nexus_git_root_result EQUAL 0)
+            file(REAL_PATH "${_nexus_git_root}" _nexus_actual_git_root)
+        endif()
+        if(_nexus_git_root_result EQUAL 0 AND _nexus_actual_git_root STREQUAL _nexus_own_root)
+            execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --verify HEAD
+                WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE revision_result
+                OUTPUT_VARIABLE revision OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+            if(revision_result EQUAL 0)
+                set(nexus_source_revision "${revision}")
+                execute_process(COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=normal -- .
+                    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" RESULT_VARIABLE status_result
+                    OUTPUT_VARIABLE source_changes ERROR_QUIET)
+                if(NOT status_result EQUAL 0 OR source_changes)
+                    string(APPEND nexus_source_revision "-dirty")
+                endif()
+            endif()
         endif()
     endif()
 endif()
 target_compile_definitions(nexus_build_options INTERFACE
+    "NEXUS_BOARD_SHA256=\"${NEXUS_BOARD_SHA256}\""
+    "NEXUS_LAYOUT_SHA256=\"${NEXUS_LAYOUT_SHA256}\""
     "NEXUS_CONFIG_SHA256=\"${nexus_config_sha256}\""
     "NEXUS_SOURCE_REVISION=\"${nexus_source_revision}\"")
 target_compile_definitions(nexus_build_options INTERFACE
@@ -122,11 +160,14 @@ add_library(Nexus::HALInterface ALIAS hal_interface)
 add_library(Nexus::OSAL ALIAS osal)
 add_library(Nexus::OSALInterface ALIAS osal_interface)
 add_library(Nexus::Platform ALIAS "platform_${NEXUS_PLATFORM}")
-add_subdirectory(products)
+add_subdirectory(runtime)
 foreach(pair "Storage;nexus_storage" "Security;nexus_security" "Update;nexus_update"
              "ModbusRTU;nexus_modbus_rtu" "Industrial;nexus_industrial"
              "ConfigManager;config_framework" "Log;log_framework"
-             "Shell;shell_framework" "Init;init_framework")
+             "Shell;shell_framework" "Init;init_framework"
+             "LogUART;log_uart_adapter" "ShellUART;shell_uart_adapter"
+             "LogCore;log_core" "LogRuntime;log_framework"
+             "SecurityCore;nexus_security" "CryptoOpenSSL;nexus_security_openssl")
     list(GET pair 0 public_name)
     list(GET pair 1 implementation)
     if(TARGET "${implementation}")
@@ -134,11 +175,9 @@ foreach(pair "Storage;nexus_storage" "Security;nexus_security" "Update;nexus_upd
     endif()
 endforeach()
 include(NexusApplications)
-if(NEXUS_BUILD_EXAMPLES)
-    add_subdirectory(applications)
-    if(NEXUS_PLATFORM STREQUAL "native" AND TARGET nexus_modbus_rtu AND TARGET nexus_industrial)
-        add_subdirectory(examples/industrial_controller)
-    endif()
+include(NexusSDK OPTIONAL)
+if(NEXUS_BUILD_CONTRACTS AND NEXUS_PLATFORM MATCHES "^(stm32|gd32f470)$")
+    add_subdirectory(tests/firmware)
 endif()
 if(NEXUS_BUILD_TESTS)
     if(NOT NEXUS_PLATFORM STREQUAL "native" OR NOT NEXUS_OSAL_BACKEND STREQUAL "native")

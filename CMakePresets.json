@@ -14,9 +14,9 @@
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "NEXUS_BUILD_TESTS": "ON",
-                "NEXUS_BUILD_EXAMPLES": "ON",
                 "NEXUS_PLATFORM": "native",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/platforms/native/defconfig"
+                "NEXUS_CONFIG_FILE": "${sourceDir}/platforms/native/defconfig",
+                "NEXUS_BUILD_CONTRACTS": "ON"
             }
         },
         {
@@ -199,7 +199,6 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "NEXUS_PLATFORM": "stm32",
                 "NEXUS_BUILD_TESTS": "OFF",
-                "NEXUS_BUILD_EXAMPLES": "ON",
                 "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407_baremetal_defconfig"
             }
         },
@@ -293,7 +292,7 @@
         },
         {
             "name": "native-services-debug",
-            "displayName": "Native OSAL finite resource example",
+            "displayName": "Native optional common components (compile only)",
             "inherits": "linux-gcc-debug",
             "cacheVariables": {
                 "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_services_demo_defconfig",
@@ -342,7 +341,7 @@
         },
         {
             "name": "native-minimal-debug",
-            "displayName": "Native minimal product without optional services",
+            "displayName": "Native minimal source SDK (compile only)",
             "inherits": "linux-gcc-debug",
             "cacheVariables": {
                 "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_minimal_defconfig",

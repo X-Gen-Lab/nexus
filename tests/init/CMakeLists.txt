@@ -7,13 +7,10 @@ set(INIT_TEST_SOURCES
     # Unit tests
     test_nx_firmware_info.cpp
     test_nx_init.cpp
-    test_nx_startup.cpp
     # Property-based tests
     test_nx_init_properties.cpp
     # Integration tests
     test_init_integration.cpp
-    # Performance tests
-    test_init_performance.cpp
     # Test helpers
     test_init_helpers.cpp
 )
@@ -28,7 +25,7 @@ add_executable(init_tests
 target_compile_features(init_tests PRIVATE cxx_std_20)
 
 # Test mode definition
-target_compile_definitions(init_tests PRIVATE NX_STARTUP_TEST_MODE)
+target_compile_definitions(init_tests PRIVATE NX_INIT_TEST_MODE)
 
 # Compile options
 target_compile_options(init_tests PRIVATE ${NEXUS_TEST_COMPILE_OPTIONS})

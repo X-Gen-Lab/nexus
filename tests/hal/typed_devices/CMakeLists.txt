@@ -38,14 +38,48 @@ endif()
 add_test(NAME typed_stm32_gpio_registration COMMAND typed_stm32_gpio_registration)
 set_tests_properties(typed_stm32_gpio_registration PROPERTIES TIMEOUT 10 LABELS "hal;typed;driver;host-fake;contract")
 
-# Actual selected Native provider and Product assembly, without ISR overrides.
+# Actual selected Native provider and Runtime assembly, without ISR overrides.
 add_executable(typed_native_spi_tests test_native_spi.cpp
     "${NEXUS_SOURCE_DIR}/tests/hal/native/devices/native_spi_helpers.c")
 target_compile_features(typed_native_spi_tests PRIVATE cxx_std_17)
 target_include_directories(typed_native_spi_tests PRIVATE
     "${NEXUS_SOURCE_DIR}/tests/hal/native")
-target_link_libraries(typed_native_spi_tests PRIVATE Nexus::Product GTest::gtest_main ${THREAD_LIBS})
+target_link_libraries(typed_native_spi_tests PRIVATE Nexus::Firmware Nexus::HALProviders GTest::gtest_main ${THREAD_LIBS})
 if(NOT MSVC)
     target_compile_options(typed_native_spi_tests PRIVATE -Wall -Wextra -Werror)
 endif()
-nexus_discover_tests(typed_native_spi_tests PROPERTIES TIMEOUT 10 LABELS "hal;typed;native;product;contract")
+nexus_discover_tests(typed_native_spi_tests PROPERTIES TIMEOUT 10 LABELS "hal;typed;native;runtime;contract")
+
+# Actual Native I2C provider; injection ports are explicit test-only sources.
+add_executable(typed_native_i2c_tests test_native_i2c.cpp native_i2c_fixture.c)
+target_compile_features(typed_native_i2c_tests PRIVATE cxx_std_17)
+target_link_libraries(typed_native_i2c_tests PRIVATE Nexus::Firmware Nexus::HALProviders Nexus::HALRuntimeOSAL GTest::gtest_main ${THREAD_LIBS})
+if(NOT MSVC)
+    target_compile_options(typed_native_i2c_tests PRIVATE -Wall -Wextra -Werror)
+endif()
+nexus_discover_tests(typed_native_i2c_tests PROPERTIES TIMEOUT 10 LABELS "hal;typed;i2c;native;runtime;contract")
+
+add_executable(typed_hal_minimal_link test_minimal_hal.c)
+target_link_libraries(typed_hal_minimal_link PRIVATE Nexus::HALGPIO)
+add_test(NAME typed_hal_minimal_link COMMAND typed_hal_minimal_link)
+set_tests_properties(typed_hal_minimal_link PROPERTIES TIMEOUT 10 LABELS "hal;typed;minimal;contract")
+
+# Compile the ordinary consumer umbrella: mutable provider state must stay opaque.
+# CMake's real compiler checks are portable across GCC/Clang/MSVC generators.
+include(CheckCSourceCompiles)
+set(_hal_saved_required_includes "${CMAKE_REQUIRED_INCLUDES}")
+set(_hal_saved_try_type "${CMAKE_TRY_COMPILE_TARGET_TYPE}")
+set(CMAKE_REQUIRED_INCLUDES "${NEXUS_SOURCE_DIR}/hal/include;${NEXUS_CONFIG_DIR}")
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+unset(NEXUS_HAL_MUTABLE_DESCRIPTOR_VISIBLE CACHE)
+check_c_source_compiles("#include <hal/nx_hal.h>\nvoid probe(nx_device_ref_t r) { (void)r.descriptor->state; }"
+    NEXUS_HAL_MUTABLE_DESCRIPTOR_VISIBLE)
+if(NEXUS_HAL_MUTABLE_DESCRIPTOR_VISIBLE)
+    message(FATAL_ERROR "Consumer HAL header exposed mutable provider descriptor state")
+endif()
+set(CMAKE_REQUIRED_INCLUDES "${_hal_saved_required_includes}")
+if(_hal_saved_try_type)
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE "${_hal_saved_try_type}")
+else()
+    unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
+endif()

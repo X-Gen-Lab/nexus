@@ -1,71 +1,124 @@
-#include "hal/provider/nx_device_provider.h"
+/** Real full F470 Flash provider with fault probes; no physical HIL. */
 #define _GNU_SOURCE
 #include "flash.h"
+#include "hal/provider/nx_device_provider.h"
 #include "identity.h"
+#include "hal/base/nx_device.h"
 #include "gd32f4xx.h"
 #include "arch/nx_arch.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
-__asm__(".global __nexus_storage_start\n.set __nexus_storage_start,0x080FC000\n"
-        ".global __nexus_storage_end\n.set __nexus_storage_end,0x08100000\n");
-static bool locked=true,fail_program,fail_erase,skip_erase;
-static uint32_t programs,erases,ipsr;
-static uint32_t pages[4];
-bool nx_arch_in_isr(void){return ipsr!=0;}
-void nx_arch_dsb(void){}
-void fmc_unlock(void){locked=false;}
-void fmc_lock(void){locked=true;}
-void fmc_flag_clear(uint32_t x){assert(x);}
-fmc_state_enum fmc_state_get(void){return FMC_READY;}
-fmc_state_enum fmc_halfword_program(uint32_t address,uint16_t value){
-    assert(!locked&&address>=0x080FC000&&address+2u<=0x08100000);
-    programs++;if(fail_program)return FMC_OPERR;
-    *(uint16_t*)(uintptr_t)address&=value;return FMC_READY;
-}
-fmc_state_enum fmc_page_erase(uint32_t address){
-    /* Independent page model: a 128KiB sector erase would touch the canary. */
-    assert(!locked&&address>=0x080FC000&&address+4096u<=0x08100000&&address%4096u==0);
-    if(erases<4) { pages[erases]=address; }
-    erases++;
-    if(fail_erase)return FMC_OPERR;
-    if(!skip_erase)memset((void*)(uintptr_t)address,0xFF,4096);
+uint32_t fake_fmc_ctl=FMC_CTL_LK;
+static bool fail_unlock,fail_lock,fail_program,fail_erase,skip_erase,hardware_timeout;
+static uint32_t programs,erases,ipsr,mask,milliseconds,busy_probes;
+static nx_flash_operations_t* operations;
+uint32_t nx_gd32f470_millis(void) { return milliseconds; }
+nx_arch_irq_state_t nx_arch_irq_save(void) { nx_arch_irq_state_t old={mask}; mask=1; return old; }
+void nx_arch_irq_restore(nx_arch_irq_state_t old) { mask=old.value; }
+bool nx_arch_in_isr(void) { return ipsr!=0; }
+bool nx_arch_irq_is_masked(void) { return mask!=0; }
+void nx_arch_dmb(void) { }
+void nx_arch_dsb(void) { }
+void nx_arch_isb(void) { }
+void fmc_unlock(void) { if (!fail_unlock) fake_fmc_ctl&=~FMC_CTL_LK; }
+void fmc_lock(void) { if (!fail_lock) fake_fmc_ctl|=FMC_CTL_LK; }
+void fmc_flag_clear(uint32_t flags) { assert(flags); }
+fmc_state_enum fmc_state_get(void) { if (busy_probes) { --busy_probes; return FMC_BUSY; } return FMC_READY; }
+fmc_state_enum fmc_halfword_program(uint32_t address,uint16_t value) {
+    assert(!(fake_fmc_ctl&FMC_CTL_LK) && address>=0x08000000U && address+2U<=0x08100000U);
+    ++programs; milliseconds+=5;
+    uint16_t scratch;
+    assert(operations->read(operations,0,(uint8_t*)&scratch,2)==NX_ERR_BUSY);
+    if (hardware_timeout) { busy_probes=4; return FMC_TOERR; }
+    if (fail_program) return FMC_OPERR;
+    *(uint16_t*)(uintptr_t)address&=value;
     return FMC_READY;
 }
-static void map(uintptr_t address,size_t size){
-    assert(mmap((void*)address,size,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED_NOREPLACE,-1,0)==(void*)address);
+fmc_state_enum fmc_page_erase(uint32_t address) {
+    assert(!(fake_fmc_ctl&FMC_CTL_LK) && address>=0x08000000U && address+4096U<=0x08100000U && address%4096U==0);
+    ++erases; milliseconds+=5;
+    if (fail_erase) return FMC_OPERR;
+    if (!skip_erase) memset((void*)(uintptr_t)address,0xFF,4096);
+    return FMC_READY;
 }
-int main(void){
-    map(0x08000000,1048576);map(0x1FFF7000,4096);
-    memset((void*)0x08000000,0xA5,1048576);
-    *(uint32_t*)0x1FFF7A20=(1024u<<16)|512u;
+static void map_memory(uintptr_t address,size_t size) {
+    assert(mmap((void*)address,size,PROT_READ|PROT_WRITE,
+        MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED_NOREPLACE,-1,0)==(void*)address);
+}
+int main(void) {
+    map_memory(0x08000000U,1048576); map_memory(0x1FFF7000U,4096);
+    memset((void*)0x08000000U,0xA5,1048576);
+    *(uint32_t*)0x1FFF7A20=(1024U<<16)|512U;
     uint32_t* uid=(uint32_t*)0x1FFF7A10;
-    uid[0]=0x11111111;uid[1]=0x22222222;uid[2]=0x33333333;
+    uid[0]=0x11111111; uid[1]=0x22222222; uid[2]=0x33333333;
     nx_gd32f470_identity_t identity;
     nx_gd32f470_identity(&identity);
-    assert(identity.uid[0]==uid[0]&&identity.uid[1]==uid[1]&&identity.uid[2]==uid[2]);
-    assert(identity.flash_kib==1024&&identity.sram_kib==512&&identity.silicon_id==DBG_ID);
-    const nx_flash_port_t* port=nx_gd32f470_flash_port();
-    assert(port&&port->size==16384&&port->erase_size==4096&&port->program_size==2);
-    assert(port->erase(port->ctx,0,16384)==NX_STORAGE_OK&&locked&&erases==4);
-    for(unsigned i=0;i<4;i++)assert(pages[i]==0x080FC000+i*4096);
-    for(uintptr_t p=0x08000000;p<0x080FC000;p++)assert(*(uint8_t*)p==0xA5); /* firmware canary */
+    assert(identity.uid[0]==uid[0] && identity.flash_kib==1024 && identity.sram_kib==512);
+    extern const nx_device_t GD32_INTERNAL_FLASH0;
+    assert(GD32_INTERNAL_FLASH0.device_class==NX_DEVICE_CLASS_FLASH);
+    void* api=NULL;
+    assert(GD32_INTERNAL_FLASH0.construct(&GD32_INTERNAL_FLASH0,&api)==NX_OK && api);
+    nx_internal_flash_t* flash=api;
+    nx_lifecycle_t* lifecycle=flash->get_lifecycle(flash);
+    operations=flash->get_operations(flash);
+    nx_flash_geometry_t geometry;
+    assert(operations->get_geometry(operations,&geometry)==NX_ERR_NOT_INIT);
+    assert(lifecycle->init(lifecycle)==NX_OK && (fake_fmc_ctl&FMC_CTL_LK));
+    assert(operations->get_geometry(operations,&geometry)==NX_OK);
+    assert(geometry.size_bytes==1048576 && geometry.block_count==256 && geometry.program_alignment==2);
+    nx_flash_block_t block;
+    assert(operations->get_block(operations,geometry.size_bytes-1,&block)==NX_OK);
+    assert(block.offset==1044480 && block.size==4096 && block.index==255);
     uint16_t value=0x1234,actual=0;
-    assert(port->program(port->ctx,16382,&value,2)==NX_STORAGE_OK&&locked);
-    assert(port->read(port->ctx,16382,&actual,2)==NX_STORAGE_OK&&actual==value);
+    assert(operations->erase(operations,0,4096,100)==NX_ERR_INVALID_STATE && !erases);
+    fail_unlock=true; assert(flash->unlock(flash)==NX_ERR_IO); fail_unlock=false;
+    assert(flash->unlock(flash)==NX_OK && !(fake_fmc_ctl&FMC_CTL_LK));
+    /* Explicitly select four pages in this test, with untouched adjacent data. */
+    assert(operations->erase(operations,0xFC000,16384,100)==NX_OK && erases==4);
+    for (uintptr_t address=0x08000000;address<0x080FC000;++address)
+        assert(*(uint8_t*)address==0xA5);
+    assert(operations->program(operations,1048574,(uint8_t*)&value,2,100)==NX_OK);
+    assert(operations->read(operations,1048574,(uint8_t*)&actual,2)==NX_OK && actual==value);
     uint32_t count=programs;
-    value=0xFFFF;assert(port->program(port->ctx,16382,&value,2)==NX_STORAGE_IO&&programs==count&&locked);
-    assert(port->erase(port->ctx,1,4096)==NX_STORAGE_INVALID);
-    assert(port->erase(port->ctx,0,2048)==NX_STORAGE_INVALID);
-    assert(port->erase(port->ctx,16384,4096)==NX_STORAGE_INVALID);
-    assert(port->read(port->ctx,SIZE_MAX,&actual,2)==NX_STORAGE_INVALID);
-    assert(port->program(port->ctx,16383,&actual,2)==NX_STORAGE_INVALID);
-    fail_erase=true;assert(port->erase(port->ctx,0,4096)==NX_STORAGE_IO&&locked);fail_erase=false;
-    *(uint8_t*)0x080FC000=0;skip_erase=true;assert(port->erase(port->ctx,0,4096)==NX_STORAGE_IO&&locked);skip_erase=false;
-    fail_program=true;assert(port->program(port->ctx,2,&actual,2)==NX_STORAGE_IO&&locked);fail_program=false;
-    ipsr=1;assert(port->erase(port->ctx,0,4096)==NX_STORAGE_INVALID&&port->sync(port->ctx)==NX_STORAGE_INVALID);ipsr=0;
-    *(uint32_t*)0x1FFF7A20=(512u<<16)|256u;assert(nx_gd32f470_flash_port()==NULL);
-    puts("GD32 4KiB independent page erase, firmware canary, physical density, bounds and I/O faults passed");
+    value=UINT16_MAX;
+    assert(operations->program(operations,1048574,(uint8_t*)&value,2,100)==NX_ERR_INVALID_STATE && programs==count);
+    assert(operations->erase(operations,1,4096,100)==NX_ERR_INVALID_PARAM);
+    assert(operations->erase(operations,0,2048,100)==NX_ERR_INVALID_PARAM);
+    assert(operations->erase(operations,1048576,4096,100)==NX_ERR_INVALID_PARAM);
+    assert(operations->read(operations,UINT32_MAX,(uint8_t*)&actual,2)==NX_ERR_INVALID_PARAM);
+    assert(operations->read(operations,0,(uint8_t*)&actual,SIZE_MAX)==NX_ERR_INVALID_PARAM);
+    assert(operations->program(operations,1048575,(uint8_t*)&actual,2,100)==NX_ERR_INVALID_PARAM);
+    fail_erase=true; assert(operations->erase(operations,0,4096,100)==NX_ERR_IO); fail_erase=false;
+    skip_erase=true; assert(operations->erase(operations,0,4096,100)==NX_ERR_IO); skip_erase=false;
+    assert(operations->erase(operations,0,4096,100)==NX_OK);
+    fail_program=true; assert(operations->program(operations,0,(uint8_t*)&actual,2,100)==NX_ERR_IO); fail_program=false;
+    count=programs;
+    assert(operations->program(operations,0,(uint8_t*)&actual,2,0)==NX_ERR_TIMEOUT && programs==count);
+    uint16_t pair[]={actual,actual};
+    assert(operations->program(operations,0,(uint8_t*)pair,4,1)==NX_ERR_TIMEOUT && programs==count+1);
+    assert(*(uint16_t*)0x08000000==actual && *(uint16_t*)0x08000002==UINT16_MAX);
+    milliseconds=UINT32_MAX-1;
+    assert(operations->program(operations,2,(uint8_t*)&actual,2,100)==NX_OK);
+    hardware_timeout=true;
+    assert(operations->program(operations,4,(uint8_t*)&actual,2,100)==NX_ERR_TIMEOUT && busy_probes==0); hardware_timeout=false;
+    mask=1;
+    assert(operations->erase(operations,0,4096,100)==NX_ERR_INVALID_STATE && mask==1);
+    assert(operations->read(operations,0,(uint8_t*)&actual,2)==NX_OK && mask==1); mask=0;
+    ipsr=1;
+    assert(operations->read(operations,0,(uint8_t*)&actual,2)==NX_ERR_INVALID_STATE);
+    assert(operations->sync(operations,100)==NX_ERR_INVALID_STATE); ipsr=0;
+    count=erases;
+    assert(operations->erase(operations,0,geometry.size_bytes,10000)==NX_OK && erases-count==256);
+    *(uint32_t*)0x1FFF7A20=(512U<<16)|256U;
+    assert(operations->get_geometry(operations,&geometry)==NX_ERR_INVALID_STATE);
+    *(uint32_t*)0x1FFF7A20=(1024U<<16)|512U;
+    fail_lock=true; assert(lifecycle->deinit(lifecycle)==NX_ERR_IO); fail_lock=false;
+    assert(lifecycle->get_state(lifecycle)==NX_DEV_STATE_RUNNING);
+    assert(lifecycle->deinit(lifecycle)==NX_OK && (fake_fmc_ctl&FMC_CTL_LK));
+    assert(operations->read(operations,0,(uint8_t*)&actual,2)==NX_ERR_NOT_INIT);
+    assert(lifecycle->init(lifecycle)==NX_OK && lifecycle->deinit(lifecycle)==NX_OK);
+    puts("GD32 full physical pages, density, explicit protection, budgets and settlement passed");
     return 0;
 }

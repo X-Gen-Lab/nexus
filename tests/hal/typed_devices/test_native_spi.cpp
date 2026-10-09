@@ -1,5 +1,5 @@
-/** Product -> typed HAL -> real Native SPI. Host timing is a model, not HIL. */
-#include "product/product.h"
+/** Runtime -> typed HAL -> real Native SPI. Host timing is a model, not HIL. */
+#include "runtime/nx_runtime.h"
 #include "hal/base/nx_device.h"
 #include "hal/system/nx_mem.h"
 #include "devices/native_spi_helpers.h"
@@ -19,7 +19,7 @@ protected:
     nx_spi_transaction_t transaction{tx, rx, sizeof(tx), 500, nullptr, nullptr};
     virtual uint32_t delay() const { return 0; }
     void SetUp() override {
-        ASSERT_EQ(nx_product_boot(nullptr), NX_OK);
+        ASSERT_EQ(nx_runtime_bootstrap(nullptr), NX_OK);
         nx_mem_stats_t before{}, after{};
         ASSERT_EQ(nx_mem_get_stats(&before), NX_OK);
         // First binding allocates neither the bus, slave pool nor capture bytes.
@@ -38,7 +38,7 @@ protected:
             }
             EXPECT_EQ(nx_device_close(controller), NX_OK);
         }
-        EXPECT_EQ(nx_product_shutdown(nullptr), NX_OK);
+        EXPECT_EQ(nx_runtime_shutdown(nullptr), NX_OK);
     }
     nx_device_spi_ref_t child() {
         nx_device_spi_ref_t ref{};
@@ -51,14 +51,14 @@ protected:
         opened.clear(); EXPECT_EQ(nx_device_close(controller), NX_OK); controller = {};
     }
 };
-TEST_F(TypedNativeSPI, ProductShutdownRejectsControllerAndChildrenUntilClosed) {
+TEST_F(TypedNativeSPI, RuntimeShutdownRejectsControllerAndChildrenUntilClosed) {
     auto ref = child();
-    EXPECT_EQ(nx_product_shutdown(nullptr), NX_ERR_BUSY);
-    EXPECT_TRUE(nx_product_is_ready());
+    EXPECT_EQ(nx_runtime_shutdown(nullptr), NX_ERR_BUSY);
+    EXPECT_TRUE((nx_runtime_get_state() == NX_RUNTIME_READY));
     EXPECT_EQ(nx_device_close(controller), NX_ERR_BUSY);
     ASSERT_EQ(nx_device_spi_transfer(ref, &transaction), NX_OK);
     EXPECT_EQ(std::memcmp(rx, tx, sizeof(tx)), 0);
-    close_all(); EXPECT_EQ(nx_product_shutdown(nullptr), NX_OK);
+    close_all(); EXPECT_EQ(nx_runtime_shutdown(nullptr), NX_OK);
 }
 TEST_F(TypedNativeSPI, DistinctChildrenKeepTheirOwnPhysicalConfiguration) {
     auto first = child(); config.cs_pin = 5; config.speed = 500000; config.mode = NX_SPI_MODE_3;

@@ -3,7 +3,6 @@ CONFIG_PLATFORM_NATIVE=y
 CONFIG_OSAL_NATIVE=y
 # Existing simulator contract tests inspect counters.
 CONFIG_NATIVE_ENABLE_STATISTICS=y
-CONFIG_BUILD_APP_FREERTOS_DEMO=y
 
-# Explicit provider for the full Native contract profile.
+# Native full contract profile explicitly selects its maintained crypto provider.
 CONFIG_CRYPTO_PROVIDER_OPENSSL=y

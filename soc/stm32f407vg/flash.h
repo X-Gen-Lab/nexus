@@ -1,14 +1,12 @@
 #ifndef NEXUS_STM32F407_FLASH_H
 #define NEXUS_STM32F407_FLASH_H
-#include "nexus/storage.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* Sector 10/11 only. Requires linker __nexus_storage_start/end reservations.
- * Returns NULL if the image does not reserve exactly this partition.
- * Task context; serialized maintenance window; VDD must be 2.7..3.6 V. */
-const nx_flash_port_t* nx_stm32f407_flash_port(void);
-#ifdef __cplusplus
-}
-#endif
+#include "hal/interface/nx_flash.h"
+/* The SoC registers typed FLASH0 for the whole xE/xG device. Applications
+ * borrow HAL regions from their own layout; no storage/linker partition is
+ * required. Explicit unlock, task context, unmasked maintenance window,
+ * stable SYSCLK and VDD 2.7..3.6V. A started pulse cannot be aborted; deadlines
+ * return after settlement. DWT must run and each pulse must be shorter than
+ * its 32-bit wrap. This is not control-loop or physical power-fail acceptance.
+ * The caller must exclude the executing image and vectors from erase/program;
+ * full-chip geometry is a physical fact, not permission to alter live code. */
 #endif

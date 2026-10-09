@@ -32,9 +32,10 @@ endforeach()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     add_executable(test_driver_gd32_flash test_flash.c "${nexus_root}/soc/gd32f470zg/flash.c"
         "${nexus_root}/soc/gd32f470zg/identity.c")
-    target_include_directories(test_driver_gd32_flash PRIVATE fake
+    target_include_directories(test_driver_gd32_flash PRIVATE fake/flash fake
         "${nexus_root}/soc/gd32f470zg" "${nexus_root}/arch/include"
-        "${nexus_root}/services/storage/include" "${nexus_root}/hal/include")
+        "${nexus_root}/hal/include" "${nexus_root}/platforms/gd32f470/include")
+    target_compile_definitions(test_driver_gd32_flash PRIVATE NEXUS_PLATFORM_NATIVE)
     target_compile_features(test_driver_gd32_flash PRIVATE c_std_11)
     if(TARGET nexus_build_options)
         target_link_libraries(test_driver_gd32_flash PRIVATE nexus_build_options)

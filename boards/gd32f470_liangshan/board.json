@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "gd32f470zg-liangshan",
+  "soc": "gd32f470zg",
+  "hse_hz": 25000000,
+  "interface_target": "board_gd32f470_liangshan",
+  "object_targets": [
+    "board_gd32f470_wiring"
+  ],
+  "inputs": [
+    "CMakeLists.txt",
+    "nexus_board.h",
+    "board.h",
+    "board.c"
+  ],
+  "resources": [
+    {
+      "id": "status-led",
+      "kind": "gpio",
+      "when": "CONFIG_GD32_GPIO_ENABLE",
+      "pins": [
+        {
+          "port": "D",
+          "pin": 7,
+          "af": 0,
+          "signal": "led",
+          "initial": 0
+        }
+      ]
+    },
+    {
+      "id": "console",
+      "kind": "uart",
+      "instance": 0,
+      "when": "CONFIG_GD32_UART_ENABLE",
+      "clock": "USART0",
+      "irq": 37,
+      "priority": 5,
+      "pins": [
+        {
+          "port": "A",
+          "pin": 9,
+          "af": 7,
+          "signal": "tx"
+        },
+        {
+          "port": "A",
+          "pin": 10,
+          "af": 7,
+          "signal": "rx"
+        }
+      ]
+    },
+    {
+      "id": "spi-flash",
+      "kind": "spi",
+      "instance": 4,
+      "when": "CONFIG_GD32_SPI_ENABLE",
+      "clock": "SPI4",
+      "irq": 85,
+      "priority": 5,
+      "pins": [
+        {
+          "port": "F",
+          "pin": 7,
+          "af": 5,
+          "signal": "sck"
+        },
+        {
+          "port": "F",
+          "pin": 8,
+          "af": 5,
+          "signal": "miso"
+        },
+        {
+          "port": "F",
+          "pin": 9,
+          "af": 5,
+          "signal": "mosi"
+        },
+        {
+          "port": "F",
+          "pin": 6,
+          "af": 0,
+          "signal": "cs0",
+          "initial": 1
+        }
+      ]
+    },
+    {
+      "id": "rs485-de",
+      "kind": "gpio",
+      "when": "CONFIG_GD32_RS485_ENABLE",
+      "pins": [
+        {
+          "port": "B",
+          "pin": 1,
+          "af": 0,
+          "signal": "de",
+          "initial": 0
+        }
+      ]
+    }
+  ]
+}

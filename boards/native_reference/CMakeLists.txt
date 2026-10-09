@@ -1,0 +1,3 @@
+add_library(board_native_reference INTERFACE)
+target_include_directories(board_native_reference INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(board_native_reference INTERFACE nexus_build_options)

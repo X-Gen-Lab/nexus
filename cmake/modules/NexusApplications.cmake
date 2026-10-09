@@ -44,10 +44,10 @@ function(nexus_add_application)
     if(APP_VERSION)
         target_compile_definitions(${APP_TARGET} PRIVATE "NEXUS_APP_VERSION=\"${APP_VERSION}\"")
     endif()
-    if(TARGET Nexus::Product)
-        target_link_libraries(${APP_TARGET} PRIVATE Nexus::Product)
+    if(TARGET Nexus::Firmware)
+        target_link_libraries(${APP_TARGET} PRIVATE Nexus::Firmware)
     else()
-        # Minimal independent linker fixtures provide the platform directly.
+        # Independent linker fixtures provide their platform directly.
         target_link_libraries(${APP_TARGET} PRIVATE "${platform_target}" Nexus::HAL Nexus::OSAL)
     endif()
     target_link_libraries(${APP_TARGET} PRIVATE ${APP_EXTRA_DEPS} ${APP_PLATFORM_DEPS})
@@ -58,20 +58,20 @@ function(nexus_add_application)
         set_target_properties(${APP_TARGET} PROPERTIES SUFFIX ".elf")
         target_link_options(${APP_TARGET} PRIVATE
             "-Wl,-Map,$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map"
-            "-Wl,--defsym,_Min_Stack_Size=${CONFIG_APP_STACK_SIZE}"
-            "-Wl,--defsym,_Min_Heap_Size=${CONFIG_APP_HEAP_SIZE}")
-        if(CONFIG_APP_PRINT_MEMORY_USAGE)
+            "-Wl,--defsym,_Min_Stack_Size=${CONFIG_FIRMWARE_MAIN_STACK_SIZE}"
+            "-Wl,--defsym,_Min_Heap_Size=${CONFIG_FIRMWARE_LIBC_HEAP_SIZE}")
+        if(CONFIG_FIRMWARE_PRINT_MEMORY_USAGE)
             target_link_options(${APP_TARGET} PRIVATE -Wl,--print-memory-usage)
         endif()
-        if(CONFIG_APP_GENERATE_BIN)
+        if(CONFIG_FIRMWARE_GENERATE_BIN)
             add_custom_command(TARGET ${APP_TARGET} POST_BUILD
                 COMMAND "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:${APP_TARGET}>" "$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin" VERBATIM)
         endif()
-        if(CONFIG_APP_GENERATE_HEX)
+        if(CONFIG_FIRMWARE_GENERATE_HEX)
             add_custom_command(TARGET ${APP_TARGET} POST_BUILD
                 COMMAND "${CMAKE_OBJCOPY}" -O ihex "$<TARGET_FILE:${APP_TARGET}>" "$<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.hex" VERBATIM)
         endif()
-        if(CONFIG_APP_PRINT_SIZE)
+        if(CONFIG_FIRMWARE_PRINT_SIZE)
             add_custom_command(TARGET ${APP_TARGET} POST_BUILD
                 COMMAND "${CMAKE_SIZE}" "$<TARGET_FILE:${APP_TARGET}>" VERBATIM)
         endif()

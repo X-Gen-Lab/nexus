@@ -45,7 +45,7 @@ add_executable(config_tests
 target_compile_features(config_tests PRIVATE cxx_std_20)
 
 # Test mode definition
-target_compile_definitions(config_tests PRIVATE NX_STARTUP_TEST_MODE)
+target_compile_definitions(config_tests PRIVATE NX_INIT_TEST_MODE)
 
 # Compile options
 target_compile_options(config_tests PRIVATE ${NEXUS_TEST_COMPILE_OPTIONS})

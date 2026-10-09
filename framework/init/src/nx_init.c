@@ -131,7 +131,7 @@ static nx_status_t validate_init_span(uintptr_t start, uintptr_t end,
     return NX_OK;
 }
 
-#ifdef NX_STARTUP_TEST_MODE
+#ifdef NX_INIT_TEST_MODE
 nx_status_t nx_init_validate_span_for_test(uintptr_t start, uintptr_t end,
                                           size_t* count) {
     return validate_init_span(start, end, count);

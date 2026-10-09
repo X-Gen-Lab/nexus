@@ -40,15 +40,15 @@ class EffectiveConfigTests(unittest.TestCase):
         self.assertEqual(first, (self.work / 'nexus_config.h').read_bytes())
 
     def test_disabled_build_controls_remain_explicit_in_the_real_generated_bundle(self):
-        result = self.generate('--set', 'BUILD_TESTS=n', '--set', 'BUILD_EXAMPLES=n',
+        result = self.generate('--set', 'BUILD_TESTS=n',
                                '--set', 'ENABLE_COVERAGE=n', '--set', 'ENABLE_SANITIZERS=n')
         self.assertEqual(result.returncode, 0, result.stderr)
         contents = {name: (self.work / name).read_text() for name in
                     ('effective.config', 'nexus_config.h', 'config.cmake')}
         config = validate_configuration_bundle(contents)
-        for name in ('BUILD_TESTS', 'BUILD_EXAMPLES', 'ENABLE_COVERAGE', 'ENABLE_SANITIZERS'):
+        for name in ('BUILD_TESTS', 'ENABLE_COVERAGE', 'ENABLE_SANITIZERS'):
             self.assertIs(config['CONFIG_' + name], False)
-        result = self.generate('--set', 'BUILD_TESTS=n', '--set', 'BUILD_EXAMPLES=n',
+        result = self.generate('--set', 'BUILD_TESTS=n',
                                '--set', 'ENABLE_COVERAGE=n', '--set', 'ENABLE_SANITIZERS=n')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(contents, {name: (self.work / name).read_text() for name in contents})
@@ -79,13 +79,14 @@ class EffectiveConfigTests(unittest.TestCase):
         self.fragment.unlink()
         self.assertNotEqual(self.generate().returncode, 0)
 
-    def test_disabled_service_rejects_an_explicit_dependent_service(self):
+    def test_update_policy_can_use_external_ports_without_storage_or_crypto(self):
         self.fragment.write_text('CONFIG_PLATFORM_NATIVE=y\nCONFIG_SERVICE_STORAGE=n\n'
+                                 'CONFIG_SERVICE_SECURITY=n\nCONFIG_FRAMEWORK_CONFIG=n\n'
                                  'CONFIG_SERVICE_UPDATE=y\n')
         result = self.generate()
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn('CONFIG_SERVICE_UPDATE=y cannot be honored', result.stderr)
-        self.assertFalse((self.work / 'nexus_config.h').exists())
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('#define NX_CONFIG_SERVICE_UPDATE 1',
+                      (self.work / 'nexus_config.h').read_text())
 
     def test_obsolete_inactive_firmware_budget_fails_with_named_diagnostic(self):
         self.fragment.write_text('CONFIG_PLATFORM_STM32=y\nCONFIG_STM32_STACK_SIZE=0x2000\n')
@@ -122,7 +123,7 @@ class EffectiveConfigTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         config = (self.work / 'effective.config').read_text()
         for setting in ('CONFIG_PLATFORM_NAME="gd32f470"',
-                        'CONFIG_PRODUCT_NAME="gd32f470-liangshan"'):
+                        'CONFIG_BOARD_NAME="gd32f470zg-liangshan"'):
             self.assertIn(setting, config)
         for name, expected in (('LINKER_RAM_SIZE', 0x30000),
                                ('LINKER_FLASH_SIZE', 0x100000)):
@@ -237,7 +238,7 @@ class CMakeConfigurationTests(unittest.TestCase):
 
     def configure(self, directory, *settings):
         return subprocess.run(['cmake', '-S', str(ROOT), '-B', str(directory),
-                               '-DNEXUS_BUILD_TESTS=OFF', '-DNEXUS_BUILD_EXAMPLES=OFF', *settings],
+                               '-DNEXUS_BUILD_TESTS=OFF', *settings],
                               text=True, capture_output=True)
 
     @unittest.skipUnless(sys.platform.startswith('linux') and shutil.which('gcc') and
@@ -254,7 +255,6 @@ class CMakeConfigurationTests(unittest.TestCase):
         cache = cmake_cache(directory / 'CMakeCache.txt')
         validate_effective_build(cache, RELEASE_PROFILES['linux-gcc-release'], 'Release', config)
         self.assertIs(config['CONFIG_BUILD_TESTS'], True)
-        self.assertIs(config['CONFIG_BUILD_EXAMPLES'], True)
         self.assertIs(config['CONFIG_ENABLE_COVERAGE'], False)
         self.assertIs(config['CONFIG_ENABLE_SANITIZERS'], False)
         # A valid header and target graph cannot substitute for absent release metadata.
@@ -342,13 +342,13 @@ class ApplicationTargetTests(unittest.TestCase):
             'project(platform_scope_probe C ASM)\n'
             'set(NEXUS_PLATFORM stm32)\n'
             'set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")\n'
-            'set(CONFIG_APP_STACK_SIZE 0x1000)\nset(CONFIG_APP_HEAP_SIZE 0x2000)\n'
+            'set(CONFIG_FIRMWARE_MAIN_STACK_SIZE 0x1000)\nset(CONFIG_FIRMWARE_LIBC_HEAP_SIZE 0x2000)\n'
             'add_library(hal INTERFACE)\nadd_library(osal INTERFACE)\n'
             'add_library(Nexus::HAL ALIAS hal)\nadd_library(Nexus::OSAL ALIAS osal)\n'
             'add_library(nexus_build_options INTERFACE)\n'
             'add_library(Nexus::Config ALIAS nexus_build_options)\n'
             'file(WRITE "${CMAKE_BINARY_DIR}/config.cmake" '
-            '"set(CONFIG_APP_STACK_SIZE 0x1000)\\nset(CONFIG_APP_HEAP_SIZE 0x2000)\\n")\n'
+            '"set(CONFIG_FIRMWARE_MAIN_STACK_SIZE 0x1000)\\nset(CONFIG_FIRMWARE_LIBC_HEAP_SIZE 0x2000)\\n")\n'
             'set_target_properties(nexus_build_options PROPERTIES '
             'NEXUS_PLATFORM stm32 NEXUS_PLATFORM_TARGET platform_stm32 '
             'NEXUS_BINARY_DIR "${CMAKE_BINARY_DIR}" '

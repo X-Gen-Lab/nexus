@@ -94,7 +94,7 @@ if(TARGET nexus_build_options)
     target_link_libraries(test_driver_stm32_flash_geometry PRIVATE nexus_build_options)
 endif()
 target_include_directories(test_driver_stm32_flash_geometry PRIVATE
-    "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg" "${NEXUS_DRIVER_ROOT}/hal/include")
 target_compile_features(test_driver_stm32_flash_geometry PRIVATE c_std_11)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(test_driver_stm32_flash_geometry PRIVATE -Wall -Wextra -Werror -UNDEBUG)
@@ -111,8 +111,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
             target_link_libraries(${target} PRIVATE nexus_build_options)
         endif()
         target_include_directories(${target} PRIVATE
-            "${CMAKE_CURRENT_SOURCE_DIR}/fake" "${NEXUS_DRIVER_ROOT}/hal/include"
-            "${NEXUS_DRIVER_ROOT}/arch/include" "${NEXUS_DRIVER_ROOT}/services/storage/include"
+            "${CMAKE_CURRENT_SOURCE_DIR}/fake/flash" "${CMAKE_CURRENT_SOURCE_DIR}/fake" "${NEXUS_DRIVER_ROOT}/hal/include"
+            "${NEXUS_DRIVER_ROOT}/arch/include" "${NEXUS_DRIVER_ROOT}/osal/include"
             "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg")
         if(variant STREQUAL "1m")
             target_compile_definitions(${target} PRIVATE NX_CONFIG_STM32_FLASH_SIZE=0x100000)
@@ -120,8 +120,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
             target_compile_definitions(${target} PRIVATE NX_CONFIG_STM32_FLASH_SIZE=0x80000)
         endif()
         if(variant STREQUAL "mismatched")
-            target_compile_definitions(${target} PRIVATE NEXUS_TEST_MISMATCH_LAYOUT=1)
+            target_compile_definitions(${target} PRIVATE NEXUS_TEST_MISMATCH_DENSITY=1)
         endif()
+        target_compile_definitions(${target} PRIVATE NEXUS_PLATFORM_NATIVE)
         target_compile_features(${target} PRIVATE c_std_11)
         target_compile_options(${target} PRIVATE -Wall -Wextra -Werror -UNDEBUG)
         target_link_options(${target} PRIVATE -no-pie)
@@ -161,3 +162,10 @@ foreach(target test_driver_stm32_isr_manager test_driver_stm32_gpio_config)
     add_test(NAME ${target} COMMAND ${target})
     set_tests_properties(${target} PROPERTIES LABELS "driver;host-fake;contract")
 endforeach()
+
+if(NOT Python3_EXECUTABLE)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+endif()
+add_test(NAME driver_stm32_chip_config
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_stm32_chip_config.py")
+set_tests_properties(driver_stm32_chip_config PROPERTIES LABELS "driver;configuration;contract" TIMEOUT 30)

@@ -20,9 +20,9 @@ config BUILD_TESTS
     bool "Build host tests"
     default y
     depends on PLATFORM_NATIVE
-config BUILD_EXAMPLES
-    bool "Build applications"
-    default y
+config BUILD_CONTRACTS
+    bool "Build common platform contract fixtures"
+    default n
 config ENABLE_COVERAGE
     bool "GCC host coverage"
     default n

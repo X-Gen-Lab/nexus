@@ -15,4 +15,4 @@ add_library(board_stm32f407_qiming_v31_wiring OBJECT ${board_sources})
 target_include_directories(board_stm32f407_qiming_v31_wiring PRIVATE
     "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/uart")
 target_link_libraries(board_stm32f407_qiming_v31_wiring PRIVATE
-    board_stm32f407_qiming_v31 sdk_stm32f4 hal)
+    board_stm32f407_qiming_v31 sdk_stm32f4 Nexus::HALProviders)

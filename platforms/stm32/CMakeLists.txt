@@ -14,11 +14,7 @@ set(cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
 set(device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4")
 set(vendor "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4xx_hal_driver")
 set(startup_source "${device}/Source/Templates/gcc/startup_stm32f407xx.s")
-if(CONFIG_STM32F407VE)
-    set(linker_script "${CMAKE_CURRENT_SOURCE_DIR}/linker/stm32f4/gcc/stm32f407ve.ld")
-else()
-    set(linker_script "${CMAKE_CURRENT_SOURCE_DIR}/linker/stm32f4/gcc/stm32f407.ld")
-endif()
+set(linker_script "${NEXUS_GENERATED_LINKER_SCRIPT}")
 foreach(required "${cmsis}/core_cm4.h" "${device}/Include/stm32f407xx.h" "${vendor}/Src/stm32f4xx_hal.c" "${startup_source}" "${linker_script}")
     if(NOT EXISTS "${required}")
         message(FATAL_ERROR "Missing pinned submodule file ${required}; initialize dependencies")
@@ -52,25 +48,12 @@ foreach(peripheral gpio uart spi)
         target_include_directories(${driver_target} PRIVATE
             "${CMAKE_CURRENT_SOURCE_DIR}/include"
             "${CMAKE_CURRENT_SOURCE_DIR}/private")
-        target_link_libraries(${driver_target} PRIVATE sdk_stm32f4 hal osal nexus_arch)
+        target_link_libraries(${driver_target} PRIVATE sdk_stm32f4 Nexus::HALProviders hal_support osal nexus_arch)
         list(APPEND component_objects ${driver_target})
     endif()
 endforeach()
-if(CONFIG_BOARD_STM32F4DISCOVERY)
-    set(board_directory stm32f4discovery)
-elseif(CONFIG_BOARD_STM32F407_QIMING_V31)
-    set(board_directory stm32f407_qiming_v31)
-elseif(CONFIG_BOARD_STM32F407VE_SKY_QINGCHUN)
-    set(board_directory stm32f407ve_sky_qingchun)
-else()
-    message(FATAL_ERROR "STM32F407 requires an explicitly maintained board binding")
-endif()
-set(board_target "board_${board_directory}")
-add_subdirectory("${NEXUS_SOURCE_DIR}/boards/${board_directory}"
-    "${NEXUS_BINARY_DIR}/boards/${board_directory}")
-if(TARGET "${board_target}_wiring")
-    list(APPEND component_objects "${board_target}_wiring")
-endif()
+nexus_add_selected_board()
+set(board_target "${NEXUS_BOARD_TARGET}")
 
 # Sole firmware assembly: startup is a direct source for application validation.
 # Explicit object injection retains registration and strong HAL callbacks.
@@ -83,13 +66,10 @@ add_library(platform_stm32 OBJECT
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/NexusComponentObjects.cmake")
 nexus_stm32_forward_components(platform_stm32 ${component_objects})
 target_include_directories(platform_stm32 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(platform_stm32 PRIVATE sdk_stm32f4 hal osal nexus_arch)
+target_link_libraries(platform_stm32 PRIVATE sdk_stm32f4 Nexus::HALProviders hal_support osal nexus_arch)
 target_link_libraries(platform_stm32 INTERFACE
     hal osal soc_stm32f407_interface "${board_target}"
     "$<LINK_ONLY:sdk_stm32f4>")
-if(CONFIG_SERVICE_STORAGE)
-    target_link_libraries(platform_stm32 INTERFACE "$<LINK_ONLY:nexus_storage>")
-endif()
 set_target_properties(platform_stm32 PROPERTIES
     NEXUS_STARTUP_SOURCE "${startup_source}"
     NEXUS_LINKER_SCRIPT "${linker_script}"

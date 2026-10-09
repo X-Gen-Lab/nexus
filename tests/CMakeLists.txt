@@ -163,7 +163,6 @@ add_subdirectory(drivers)
 if(CONFIG_SERVICE_PROTOCOLS AND CONFIG_SERVICE_INDUSTRIAL)
     add_subdirectory(industrial)
 endif()
-add_subdirectory(products)
 
 # Build system tests
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/build_system)
@@ -223,27 +222,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
     set_tests_properties(platform_component_objects PROPERTIES LABELS "build;platform;host-link" TIMEOUT 120)
 endif()
 
-if(TARGET blinky)
-    # Execute the real application and production factory, without fixture setup.
-    add_test(NAME native_blinky_smoke COMMAND blinky --cycles 3)
-    set_tests_properties(native_blinky_smoke PROPERTIES LABELS "application;native;contract" TIMEOUT 10)
-endif()
 
-if(TARGET nexus_industrial_controller)
-    add_test(NAME native_industrial_controller_smoke COMMAND nexus_industrial_controller)
-    set_tests_properties(native_industrial_controller_smoke PROPERTIES LABELS "application;industrial;native;contract" TIMEOUT 10)
-endif()
-
-if(TARGET config_demo)
-    add_test(NAME native_config_demo_smoke COMMAND config_demo)
-    set_tests_properties(native_config_demo_smoke PROPERTIES LABELS "application;configuration;native;contract" TIMEOUT 10)
-endif()
-if(TARGET shell_demo)
-    add_test(NAME native_shell_demo_smoke COMMAND shell_demo --smoke)
-    set_tests_properties(native_shell_demo_smoke PROPERTIES LABELS "application;shell;native;contract" TIMEOUT 10)
-endif()
-
-if(TARGET freertos_demo)
-    add_test(NAME native_freertos_demo_smoke COMMAND freertos_demo --run-ms 500)
-    set_tests_properties(native_freertos_demo_smoke PROPERTIES LABELS "application;osal;native;contract" TIMEOUT 10)
-endif()
+add_test(NAME board_package_resources_and_layout
+    COMMAND "${Python3_EXECUTABLE}" -m unittest discover -s "${NEXUS_SOURCE_DIR}/scripts/configure" -p "test_*.py")
+set_tests_properties(board_package_resources_and_layout PROPERTIES LABELS "build;board;layout;contract" TIMEOUT 30)

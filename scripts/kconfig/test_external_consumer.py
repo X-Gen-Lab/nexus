@@ -61,10 +61,10 @@ class ExternalConsumerTests(unittest.TestCase):
             '  message(FATAL_ERROR "SDK changed parent build defaults")\nendif()\n'
             # These caller variables must not redirect the SDK context.
             'set(NEXUS_PLATFORM foreign-parent-value)\n'
-            'set(CONFIG_APP_HEAP_SIZE invalid-parent-value)\n'
+            'set(CONFIG_FIRMWARE_LIBC_HEAP_SIZE invalid-parent-value)\n'
             'nexus_add_application(TARGET product_firmware SOURCES application.c)\n'
             'add_executable(parent_sentinel parent.c)\n'
-            'foreach(public_target Config HAL HALInterface OSAL OSALInterface Platform '
+            'foreach(public_target Config HAL HALInterface OSAL OSALInterface Platform Runtime Firmware '
             'Storage Security Update ModbusRTU Industrial)\n'
             '  if(NOT TARGET Nexus::${public_target})\n'
             '    message(FATAL_ERROR "Missing SDK target ${public_target}")\n'
@@ -101,12 +101,13 @@ class ExternalConsumerTests(unittest.TestCase):
 
     def test_minimal_product_links_and_runs_without_optional_services_or_openssl(self):
         (self.source / 'application.c').write_text(
-            '#include "product/product.h"\n'
+            '#include "runtime/nx_runtime.h"\n'
+            '#include "runtime/nx_platform_info.h"\n'
             '#include <string.h>\n'
             'int main(void) {\n'
-            '  if (strcmp(nx_product_descriptor()->name, "native-reference")) return 1;\n'
-            '  if (nx_product_boot(0) != NX_OK) return 2;\n'
-            '  return nx_product_shutdown(0) != NX_OK;\n}\n')
+            '  if (strcmp(nx_platform_get_info()->board, "native-reference")) return 1;\n'
+            '  if (nx_runtime_bootstrap(0) != NX_OK) return 2;\n'
+            '  return nx_runtime_shutdown(0) != NX_OK;\n}\n')
         body = (
             f'set(NEXUS_CONFIG_FILE "{(ROOT / "configs/native_minimal_defconfig").as_posix()}")\n'
             'set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL TRUE)\n'
@@ -170,12 +171,57 @@ class ExternalConsumerTests(unittest.TestCase):
             '    message(FATAL_ERROR "Tests forced a disabled component: ${excluded}")\n'
             '  endif()\nendforeach()\n'
             'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/smoke-path.txt" CONTENT '
-            '"$<TARGET_FILE:product_native_smoke>\\n")\n')
+            '"$<TARGET_FILE:runtime_native_smoke>\\n")\n')
         result = self.configure(body)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.run_checked(['cmake', '--build', str(self.build), '--parallel', '2',
-                          '--target', 'product_native_smoke'])
+                          '--target', 'runtime_native_smoke'])
         self.run_checked([(self.build / 'smoke-path.txt').read_text().strip()])
+
+    def test_external_board_package_builds_cpp_consumer_with_isolated_identity(self):
+        board = self.source / 'outside SDK board'
+        shutil.copytree(ROOT / 'tests/fixtures/external_board', board)
+        (self.source / 'application.cpp').write_text(
+            '#include "runtime/nx_runtime.h"\n'
+            '#include "runtime/nx_platform_info.h"\n'
+            '#include <cstring>\n'
+            'int main() {\n'
+            '  if (std::strcmp(nx_platform_get_info()->board, "external-native-fixture")) return 1;\n'
+            '  if (nx_runtime_bootstrap(nullptr) != NX_OK) return 2;\n'
+            '  return nx_runtime_shutdown(nullptr) != NX_OK;\n}\n')
+        body = (
+            'enable_language(CXX)\n'
+            'set(NEXUS_BOARD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/outside SDK board")\n'
+            f'set(NEXUS_CONFIG_FILE "{(ROOT / "configs/native_minimal_defconfig").as_posix()}")\n'
+            + self.add_nexus() +
+            'nexus_add_application(TARGET cpp_board SOURCES application.cpp VERSION fixture-1)\n'
+            'file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/external-path.txt" CONTENT '
+            '"$<TARGET_FILE:cpp_board>\\n")\n')
+        result = self.configure(body)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.run_checked(['cmake', '--build', str(self.build), '--parallel', '2', '--target', 'cpp_board'])
+        self.run_checked([(self.build / 'external-path.txt').read_text().strip()])
+        import json
+        identity = json.loads((self.build / 'nexus-owned/generated/board-identity.json').read_text())
+        self.assertEqual(identity['id'], 'external-native-fixture')
+        self.assertIn('nexus_board.h', identity['inputs_sha256'])
+        effective = (self.build / 'nexus-owned/generated/effective.config').read_text()
+        self.assertIn('CONFIG_BOARD_NAME="external-native-fixture"', effective)
+        self.assertIn('CONFIG_BOARD_EXTERNAL=y', effective)
+
+    def test_external_board_missing_or_wrong_manifest_fails_without_builtin_fallback(self):
+        for directory in ('missing-board', 'wrong-board'):
+            board = self.source / directory
+            if directory == 'wrong-board':
+                shutil.copytree(ROOT / 'tests/fixtures/external_board', board)
+                import json
+                data = json.loads((board / 'board.json').read_text())
+                data['soc'] = 'gd32f303'
+                (board / 'board.json').write_text(json.dumps(data))
+            result = self.configure(
+                f'set(NEXUS_BOARD_DIR "{board.as_posix()}")\n' + self.add_nexus())
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse((self.build / 'nexus-owned/generated/board-identity.json').exists())
 
     def test_parent_multi_configuration_is_not_silently_rewritten(self):
         self.assertIsNotNone(shutil.which('ninja'), 'Ninja is required for this contract')
