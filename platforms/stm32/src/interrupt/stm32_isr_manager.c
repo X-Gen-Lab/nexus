@@ -52,9 +52,12 @@
 /* Configuration                                                             */
 /*---------------------------------------------------------------------------*/
 
-/* Maximum number of IRQs supported (STM32 specific) */
+/* Number of external NVIC IRQs, excluding the 16 core exception vectors.
+ * F407's last IRQ comes from the selected CMSIS device header. */
 #ifndef NX_ISR_MAX_IRQS
-#if defined(STM32F0)
+#if defined(STM32F407xx)
+#define NX_ISR_MAX_IRQS (FPU_IRQn + 1)
+#elif defined(STM32F0)
 #define NX_ISR_MAX_IRQS 32
 #elif defined(STM32F1)
 #define NX_ISR_MAX_IRQS 60
@@ -119,10 +122,12 @@ static nx_isr_manager_impl_t g_isr_manager = {
 /*---------------------------------------------------------------------------*/
 
 /**
- * \brief           Convert IRQn_Type to array index
+ * \brief           Convert an external IRQ number to its NVIC slot
+ * \note            A vector-table slot is IRQn + 16; this table contains only
+ *                  external IRQs. Negative core exceptions become out of range.
  */
 static inline uint32_t irqn_to_index(IRQn_Type irqn) {
-    return (uint32_t)((int32_t)irqn + 16);
+    return (uint32_t)irqn;
 }
 
 /**

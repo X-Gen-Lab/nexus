@@ -130,3 +130,21 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
             LABELS "driver;host-fake;storage;contract" TIMEOUT 10)
     endforeach()
 endif()
+
+# Production STM32 IRQ regression with real CMSIS device enums.
+
+add_executable(test_driver_stm32_isr_manager test_stm32_isr_manager.c
+    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/interrupt/stm32_isr_manager.c")
+target_include_directories(test_driver_stm32_isr_manager PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/fake/interrupt" "${CMAKE_CURRENT_SOURCE_DIR}/fake"
+    "${NEXUS_DRIVER_ROOT}/hal/include" "${NEXUS_DRIVER_ROOT}/platforms/stm32/private")
+target_include_directories(test_driver_stm32_isr_manager SYSTEM PRIVATE
+    "${NEXUS_DRIVER_ROOT}/vendors/st/cmsis_device_f4/Include"
+    "${NEXUS_DRIVER_ROOT}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+target_compile_definitions(test_driver_stm32_isr_manager PRIVATE STM32F407xx STM32F4)
+target_compile_features(test_driver_stm32_isr_manager PRIVATE c_std_11)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(test_driver_stm32_isr_manager PRIVATE -Wall -Wextra -Werror -UNDEBUG)
+endif()
+add_test(NAME test_driver_stm32_isr_manager COMMAND test_driver_stm32_isr_manager)
+set_tests_properties(test_driver_stm32_isr_manager PROPERTIES LABELS "driver;host-fake;contract")
