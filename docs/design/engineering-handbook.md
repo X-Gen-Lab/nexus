@@ -297,17 +297,27 @@ HIL或签名后的晋升使用同hashartifact，不重新构建一个名称相�
 
 ## 12. 代码风格、注释与静态检查
 
-### 12.1 一个formatter口径
+### 12.1 沿用现有formatter与命名规范
 
-采用一份锁定版本对应的clang-format配置，统一4空格、braces、include排列、pointer与行宽。首版可选100列以避免长typed接口过度折行；最终固定一个值，不允许模块各自选择或在review中手工对齐绕过formatter。
+代码格式沿用仓库根目录 [.clang-format](../../.clang-format) 与 [.editorconfig](../../.editorconfig)，不另起格式口径。工具版本进入正式环境锁；现有配置声明兼容clang-format 14及以上，实际采用的版本须通过同配置验证，不把版本升级作为改变风格的机会。
 
-函数/变量使用snake_case，公共symbol使用项目前缀，private函数和只在文件内使用的数据为static。公共type保持命名一致，宏只用于必须的编译期/架构功能。优先普通函数、const table和typed结构，避免宏生成隐藏控制流与清理动作。
+保持80列、4空格、禁止tab、K&R attached braces、类型侧pointer alignment（`char* ptr`）、switch case缩进、现有include排序和最多一个连续空行。控制语句不压成单行，普通函数体保持多行。长typed接口按现有formatter折行，不能为减少折行改成100列。UTF-8、LF、文件末尾换行及各文件类型缩进由EditorConfig约束。
+
+命名沿用 [贡献指南](../../CONTRIBUTING.md) 和 [coding standards](../sphinx/development/coding_standards.rst)：文件、函数和普通变量使用snake_case；函数与公共symbol使用现有模块前缀，如`nx_`、`osal_`；类型以`_t`结尾；宏、枚举值和常量使用UPPER_CASE。文件内静态变量使用`s_`前缀，全局变量使用`g_`并尽量避免；private函数和只在文件内使用的数据为static。优先普通函数、const table和typed结构，避免宏生成隐藏控制流与清理动作。
 
 文件按真实状态、生命周期和职责拆分。不能为追求文件短把同一个状态机切成大量`.inc`，也不能把所有接口塞进巨型umbrella头。
 
-### 12.2 注释说明合同和原因
+### 12.2 沿用Doxygen形式，完善合同内容
 
-public API注释提供调用者需要的合同：
+注释形式沿用 [现有注释规范](../../.kiro/steering/comment-standards.md)。C/C++使用反斜杠Doxygen标签：`\brief`、`\param[in]`、`\param[out]`、`\param[in,out]`、`\return`、`\retval`、`\details`和`\note`；按现有模板对齐说明文本，不引入`@brief`风格。
+
+public header写完整参数方向、返回值、必要错误和共同合同。source不重复header中的`\param`和`\return`，使用`\brief`、`\details`、`\note`说明实现；static helper使用简化`\brief`。结构体和枚举成员沿用`/**< ... */`；普通和行尾注释使用`/* ... */`，行尾前两个空格；section采用现有`/*---...---*/`模板。C/C++源码与文档内C/C++示例同样遵守这些形式。
+
+头文件保持含`\file/\brief/\author`的文件头；C源文件保持含`\version/\date/\copyright`的完整文件头，必要时增加`\details`。既有更完整文件头与许可证声明保留，字段内容准确，不编造作者、版本、日期。Git和发布记录补充历史追踪，不替代文件头，也不要求给每个函数新增手写修改日志。
+
+CMake和Shell沿用`#`注释；Python沿用`#`与三引号docstring。C/C++注释形式不套用到这些语言。第三方源码保持上游规范和许可声明。
+
+public API在以上现有形式中提供调用者需要的合同：
 
 | 项目 | 必须说明的含义 |
 | --- | --- |
@@ -318,7 +328,7 @@ public API注释提供调用者需要的合同：
 | failure | 返回码、output有效性、remaining ownership、retry/recovery行为 |
 | resources | 固定容量、可能allocation、copy、worker与预算要求 |
 
-共用规则集中在type或模块contract，函数写必要差异。内部注释解释硬件勘误、barrier、竞态和不变量，避免复述代码。保留已审许可证/SPDX与第三方声明；不新增样板author、version、date、重复版权墙或无可追溯来源的requirements编号。Git与发布记录管理历史。
+共用规则集中在type或模块contract，函数写必要差异，通过`\details/\note`等现有标签表达。内部注释解释硬件勘误、barrier、竞态和不变量，避免复述代码。保留已有可追溯需求和许可声明，不新增无来源的requirements编号；契约内容完善不改变现有注释展示风格。
 
 TODO必须对应一个有owner和退出条件的工作项。注释中的能力、时序与“线程安全”声明需要具体范围，不能靠措辞替代证明。
 
@@ -329,6 +339,14 @@ owned production使用`Wall/Wextra`和经评审的prototype、shadow、conversio
 clang-tidy消费实际compile commands与生成配置，只检查owned边界。vendor代码按其target独立处理；不能通过全局静音隐藏自身错误。每条suppression要有具体原因和局部范围，不提交无解释的全目录排除。
 
 本规则集是工程检查基线，不构成MISRA、功能安全或其他认证。若产品要求标准符合性，另立准确standard/version、覆盖范围、deviation、工具资格与独立review项目，不能仅凭`cert-*`或analyzer配置宣称合规。
+
+### 12.4 当前落实缺口与迁移方式
+
+本提案编写时，规范与实际落实尚不完全一致：原有HAL/OSAL等模块有完整Doxygen文件头和标签，部分近期Arch、Runtime、typed facade使用简略文件头、无标签API说明或单行控制语句。它们属于待修正差异，不作为新风格依据。
+
+[格式目录清单](../../.clang-format-dirs)仍只包含hal、osal、platforms、applications、framework和tests，遗漏arch、soc、boards、runtime和services。[Python格式工具](../../scripts/tools/format.py)读取该清单，[Shell入口](../../scripts/tools/format.sh)另有硬编码目录；现有quality workflow运行静态分析，尚未建立同范围的必需格式门禁。声明规范、选择文件和实际执行检查需要分别验证。
+
+NG-003从首个owned切片建立现有风格的实际检查，NG-024补齐目录迁移覆盖、入口一致性和PR门禁。formatter负责可自动处理的排版，文件头/Doxygen合同另行核对；格式通过不能代替注释内容正确。仅格式或注释机械整理单独提交，行为重构原子更新caller/测试/文档，避免把全仓排版与架构变更混成难以review的diff。本轮未改格式配置或批量格式化生产源码。
 
 ## 13. 错误、所有权与并发API规范
 

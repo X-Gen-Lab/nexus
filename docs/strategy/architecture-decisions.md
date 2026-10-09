@@ -124,6 +124,8 @@ Runtime 先释放 OSAL 后 HAL，仅在 HAL 仍 READY 时尝试 OSALrestore，�
 
 状态：PROPOSED，待实施和资格验证；不覆盖 ADR 001–014 的当前实现状态。
 
+用户新增约束：代码格式、命名与注释风格保持当前仓库规范；沿用.clang-format/.editorconfig、贡献指南和反斜杠Doxygen模板，包括现有文件头。架构破坏性重构不授权另起格式口径。
+
 用户要求从性能、空间、工程管理、自动化、代码规范、设备接入与扩展重新设计，并明确现有设计不构成约束。[下一代架构蓝图](../design/next-generation-platform.md) 定义默认编译期静态资源规划、固定 typed 端口、普通 C 静态绑定、caller-owned 请求和真实执行状态。默认不设置通用运行时设备注册中心、逐 GPIO owner/ref/generation、强制统一 OSAL、隐藏 worker 或多处重复事务状态；动态撤销/复用等能力需要独立明确合同。
 
 首版配置采用 SoC、Board、外部 assembly 三类输入到单一 resolved 结果，CMake 保持源码与依赖权威；Kconfig 不作为必须保留的前提。编译期资源检查不能证明任意 C 调用遵守 owner，也不能替代实板资格。异步 buffer 借用、取消/timeout 与 settlement 分离、IRQ/DMA drain 和失败保留责任属于必需合同。

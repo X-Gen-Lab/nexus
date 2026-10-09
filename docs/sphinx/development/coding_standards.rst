@@ -87,11 +87,12 @@ Doxygen tags (not ``@`` style).
 Tag Alignment
 ~~~~~~~~~~~~~
 
-All Doxygen tags must be aligned to column 20 (17 spaces after ``*``).
-This ensures consistent formatting across the codebase::
+Align the description after each Doxygen tag as shown below. Excluding any
+surrounding code indentation, the description starts at column 21: the tag and
+its padding occupy 17 characters after `` * ``::
 
     /**
-     * \brief           Brief description starts at column 20
+     * \brief           Brief description starts at column 21
      * \param[in]       param: Parameter description
      * \param[out]      result: Output parameter description
      * \return          Return value description
@@ -157,7 +158,8 @@ Section Comments
 ~~~~~~~~~~~~~~~~
 
 Use section comments to organize code into logical blocks. The separator line
-must be exactly 77 characters (``/*`` + 75 characters + ``*/``)::
+must be exactly 79 characters (``/*`` + 75 characters + ``*/``), preserving the
+existing template::
 
     /*---------------------------------------------------------------------------*/
     /* Section Name                                                              */

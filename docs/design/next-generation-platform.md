@@ -4,6 +4,8 @@
 
 本次交付是设计、工程规范、接入契约与执行计划；没有修改生产代码、构建实现或硬件支持声明。新方案实施后，需要建立新的源码与产物基线，历史通过结果不能继承。
 
+用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。
+
 配套资料：[工程手册](engineering-handbook.md)、[接入契约](integration-contracts.md)、[执行清单](next-generation-execution.csv)。实施阶段的决策可据实验结果修订，不能用架构提案代替实验。
 
 ## 1. 平台要解决的问题
@@ -309,9 +311,9 @@ RTOS tick、HAL时间、UART时序、ADC/PWM触发分别占用实际timebase资�
 
 正式环境锁定版本与 OCI digest，源依赖另外锁定内容和许可。一个薄 dev入口编排原生命令；本地与CI复用，不建立第二build/test/workflow engine。
 
-风格采用一种 formatter输出；public函数/类型使用统一前缀，private实现static，header自足，整数/长度/序列化规则明确。vendor代码独立target，不通过全局关闭warnings掩盖own代码。
+风格沿用根目录.clang-format/.editorconfig：80列、4空格、K&R attached braces和类型侧pointer alignment。公共symbol延续模块前缀、type的_t后缀和既有命名；private实现static，header自足，整数/长度/序列化规则明确。vendor代码独立target，不通过全局关闭warnings掩盖own代码。
 
-注释描述调用context、阻塞和deadline起点、所有权、输出有效性、取消/结清、失败剩余状态；共享规则放类型/模块contract，函数仅写差异。内部注释解释竞态、屏障、勘误和取舍。Git记录作者/日期/版本，删除逐函数手写历史和重复样板。
+注释沿用反斜杠Doxygen、现有文件头与section/inline形式。public header写完整参数和返回合同，source避免重复；调用context、阻塞和deadline起点、所有权、输出有效性、取消/结清及失败剩余状态用现有标签说明。共享规则放类型/模块contract，函数仅写差异。内部注释解释竞态、屏障、勘误和取舍。文件头保留作者/版本/日期等现有约定，Git补充历史追踪。具体规则和现有落实缺口见[工程手册第12节](engineering-handbook.md#12-代码风格注释与静态检查)。
 
 状态码服务于caller可以执行的恢复动作；raw vendor诊断为可选detail。API不隐式格式化日志、不写全局last error、不在IRQ调用全局用户handler。普通错误与invariant违约分别处理。
 

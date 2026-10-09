@@ -2,6 +2,8 @@
 
 状态：**PROPOSED，待实现**。本目录从第一性原理定义下一代平台，不将现有API、目录、Kconfig、factory、OSAL或工作流视为必须保留的约束。用户已授权破坏性重构。
 
+代码格式、命名和注释风格遵循现有仓库规范：根目录.clang-format/.editorconfig、贡献指南及Doxygen注释模板。后续架构重构保持这些形式一致。
+
 这里交付的是设计与执行计划。生产实现、现有支持矩阵和历史证据未因新增文档而改变。现状参见 [当前架构](../strategy/target-architecture.md) 和 [当前支持范围](../strategy/support-matrix.yaml)。
 
 | 文档 | 作用 |
