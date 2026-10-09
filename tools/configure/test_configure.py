@@ -1,5 +1,4 @@
 """Behavioral rejection, identity and atomic-generation tests for the resolver."""
-import copy
 import json
 from pathlib import Path
 import shutil

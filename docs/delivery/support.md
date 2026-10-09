@@ -42,6 +42,10 @@ Flash pulse 不能被 deadline 撤销；BUSY 未清不能释放责任。产品�
 停顿、电压、watchdog 窗口、掉电、认证、布局与持久化格式迁移。公共通用 storage
 的 CRC/commit 机制不等于安全升级协议。
 
+GD32 Flash 的重新上锁读回失败会保留静态 provider 并拒绝继续操作，需要受控
+复位；普通 stop 不能恢复此状态。该 relock-fault 当前没有专项模型或实板资格。
+生命周期与扫描诊断的解释见[安全审查](security-review.md)。
+
 硬件未接入，三板 clock、reset、GPIO safe output、UART TC/abort/RX、SPI/I2C
 电气、Flash 掉电、watchdog reset、EXTI 波形、PWM 与 ADC 精度均未执行。当前
 支持声明不能替代物理 HIL 或产品 release promotion。

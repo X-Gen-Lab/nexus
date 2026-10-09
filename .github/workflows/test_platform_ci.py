@@ -46,10 +46,10 @@ class WorkflowContracts(unittest.TestCase):
             'gd32-liangshan-baremetal', 'gd32-liangshan-freertos'})
         presets = json.loads((ROOT / 'CMakePresets.json').read_text())
         configured = {p['name'] for p in presets['configurePresets']}
-        self.assertTrue(selected <= configured)
+        self.assertLessEqual(selected, configured)
         native = set(jobs['native']['strategy']['matrix']['preset'])
         self.assertEqual(native, {'native-debug', 'native-release', 'native-asan'})
-        self.assertTrue(native <= configured)
+        self.assertLessEqual(native, configured)
         for name in ('arm', 'native'):
             commands = '\n'.join(s.get('run', '') for s in jobs[name]['steps'])
             self.assertIn('tools/dev/dev.py configure', commands)

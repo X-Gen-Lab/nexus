@@ -9,11 +9,12 @@
  */
 #define _POSIX_C_SOURCE 200809L
 #include "nexus/components/file_flash.h"
-#include <assert.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -25,7 +26,7 @@
             abort();                                                           \
         }                                                                      \
     } while (0)
-static char s_path[128];
+static const char s_path[] = "flash.bin";
 static nx_file_flash_t s_flash;
 static nx_storage_t s_store;
 static uint8_t s_workspace[32];
@@ -35,9 +36,11 @@ static void open_store(void) {
     CHECK(nx_storage_open(&s_store, &s_flash.port, 0, 256, s_workspace,
                           sizeof(s_workspace)) == NX_STORAGE_OK);
 }
-/** \brief Fresh. */
+/** \brief Replace only the fixed model file in the test's private directory. */
 static void fresh(void) {
-    unlink(s_path);
+    if (unlink(s_path) != 0) {
+        CHECK(errno == ENOENT);
+    }
     open_store();
 }
 /** \brief Expect value. */
@@ -149,37 +152,51 @@ static void corruption_recovery(void) {
                           sizeof(s_workspace)) == NX_STORAGE_CORRUPT);
     nx_file_flash_close(&s_flash);
 }
-/** \brief Process persistence. */
-static void process_persistence(const char* self) {
+/** \brief Re-exec this exact Linux binary in the inherited private directory.
+ */
+static void process_persistence(void) {
     fresh();
     CHECK(nx_storage_save(&s_store, "process durable", 16) == NX_STORAGE_OK);
     nx_file_flash_close(&s_flash);
     pid_t pid = fork();
     CHECK(pid >= 0);
     if (!pid) {
-        execl(self, self, "--read", s_path, (char*)NULL);
+        execl("/proc/self/exe", "contract_storage", "--read", (char*)NULL);
         _exit(127);
     }
     int status;
     CHECK(waitpid(pid, &status, 0) == pid);
     CHECK(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
+/** \brief Keep file paths and executable selection independent of argv data. */
 int main(int argc, char** argv) {
-    if (argc == 3 && !strcmp(argv[1], "--read")) {
-        snprintf(s_path, sizeof(s_path), "%s", argv[2]);
+    if (argc == 2 && !strcmp(argv[1], "--read")) {
         open_store();
         expect_value("process durable", NULL);
         nx_file_flash_close(&s_flash);
         return 0;
     }
-    snprintf(s_path, sizeof(s_path), "/tmp/nexus-storage-%ld.s_flash",
-             (long)getpid());
+    if (argc != 1) {
+        fputs("unexpected storage-test arguments\n", stderr);
+        return EXIT_FAILURE;
+    }
+    int original_cwd = open(".", O_RDONLY | O_CLOEXEC | O_DIRECTORY);
+    CHECK(original_cwd >= 0);
+    char directory[] = "/tmp/nexus-storage-XXXXXX";
+    CHECK(mkdtemp(directory) != NULL);
+    struct stat info;
+    CHECK(stat(directory, &info) == 0 && S_ISDIR(info.st_mode));
+    CHECK((info.st_mode & 0777) == 0700 && info.st_uid == geteuid());
+    CHECK(chdir(directory) == 0);
     power_loss_matrix();
     geometry_errors();
     aliased_port_reopen();
     corruption_recovery();
-    process_persistence(argv[0]);
-    unlink(s_path);
+    process_persistence();
+    CHECK(unlink(s_path) == 0);
+    CHECK(fchdir(original_cwd) == 0);
+    CHECK(close(original_cwd) == 0);
+    CHECK(rmdir(directory) == 0);
     puts("storage geometry, corruption, exhausted capacity, erase/program "
          "failures and cross-process persistence passed");
     return 0;

@@ -378,7 +378,8 @@ static void flash_cases(void) {
 /** \brief           Preserve irreversible state and distinguish pre-enable
  * failure. */
 static void watchdog_cases(bool late_failure) {
-    nx_watchdog_port_t port;
+    /* The enabled watchdog retains its owner until process/platform reset. */
+    static nx_watchdog_port_t port;
     FMC_OBCTL0 = FMC_OBCTL0_NWDG_HW;
     CHECK(nx_gd32_watchdog_initialize(&port) == NX_SUCCESS);
     CHECK(nx_watchdog_port_feed(&port) == NX_ERROR_STATE);

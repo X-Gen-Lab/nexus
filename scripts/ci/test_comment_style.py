@@ -316,6 +316,16 @@ class CommandLineTests(unittest.TestCase):
                         gate.main(["--root", str(self.root), "--files", name])
                 self.assertEqual(raised.exception.code, 2)
 
+    def test_invalid_root_cannot_emit_a_success_report(self):
+        output, errors = StringIO(), StringIO()
+        with redirect_stdout(output), redirect_stderr(errors):
+            with self.assertRaises(SystemExit) as raised:
+                gate.main(["--root", str(self.root / "missing"), "--all",
+                           "--json"])
+        self.assertEqual(raised.exception.code, 2)
+        self.assertEqual(output.getvalue(), "")
+        self.assertIn("error:", errors.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

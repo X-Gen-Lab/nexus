@@ -170,6 +170,7 @@ def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = N
                 try:
                     os.killpg(process.pid, signal.SIGTERM)
                 except ProcessLookupError:
+                    # The process group exited before this signal was delivered.
                     pass
             else:
                 process.terminate()
@@ -180,6 +181,7 @@ def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = N
                     try:
                         os.killpg(process.pid, signal.SIGKILL)
                     except ProcessLookupError:
+                        # Termination completed before escalation; reap below.
                         pass
                 else:
                     process.kill()
@@ -190,6 +192,7 @@ def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = N
                 try:
                     os.killpg(process.pid, signal.SIGKILL)
                 except ProcessLookupError:
+                    # Cleanup left no surviving process-group members.
                     pass
 
         deadline = time.monotonic() + timeout_s
@@ -204,14 +207,17 @@ def run_adapter(argv: list[str], timeout_s: float, *, cwd: str | Path | None = N
                 try:
                     process.wait(timeout=min(remaining, 0.05))
                 except subprocess.TimeoutExpired:
+                    # A polling interval elapsed; recheck deadline and output bounds.
                     pass
         except BaseException:
+            # Reap on cancellation too, then propagate the original exception.
             stop_process_group()
             raise
         if os.name == "posix":
             try:
                 os.killpg(process.pid, 0)
             except ProcessLookupError:
+                # An absent group establishes that no background process survived.
                 pass
             else:
                 # A successful parent must not leave a flasher or a serial

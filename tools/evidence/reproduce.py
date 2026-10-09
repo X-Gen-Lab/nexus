@@ -12,12 +12,11 @@ import shutil
 import signal
 import subprocess
 import sys
-import tempfile
 import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.evidence.common import (EvidenceError, atomic_json, command, digest,
+from tools.evidence.common import (EvidenceError, atomic_json, command,
     fields, file_identity, load_json, regular_file, stream_digest, verify_file_identity)
 from tools.evidence.container import docker_prefix, verify as verify_environment
 from tools.evidence.identity import git_source, verify_source, verify_sdk_package
@@ -114,6 +113,7 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
             try:
                 os.killpg(process.pid, signal.SIGKILL)
             except ProcessLookupError:
+                # The group already exited; the wait below still reaps the child.
                 pass
         elif process.poll() is None:
             process.kill()
@@ -130,6 +130,7 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
                 try:
                     process.wait(timeout=0.05)
                 except subprocess.TimeoutExpired:
+                    # Polling continues to enforce the deadline and log-size bound.
                     pass
         exit_code = process.returncode
         failure = None
@@ -137,6 +138,7 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
             try:
                 os.killpg(process.pid, 0)
             except ProcessLookupError:
+                # No group remains after parent exit, so there is no orphan to kill.
                 pass
             else:
                 stop()
@@ -195,7 +197,6 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
         if not hasattr(os, "getuid") or not hasattr(os, "getgid"):
             raise EvidenceError("formal bind-mount execution requires POSIX UID/GID")
         container_user = f"{os.getuid()}:{os.getgid()}"
-        source = Path(spec["source"]["root"])
         report["source"] = spec["source"]
         report["environment"] = file_identity(spec["environment"])
         report["toolchain"] = spec["toolchain"]

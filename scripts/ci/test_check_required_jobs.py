@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest import mock
+from unittest.mock import patch
 
 from check_required_jobs import check_required_jobs, main, required_jobs
 
@@ -114,7 +114,7 @@ class RequiredJobsTests(unittest.TestCase):
         for event in ("", "unknown", "pull_request_target"):
             self.assertFalse(check_required_jobs(needs_for(), event).passed)
 
-    @mock.patch.dict("os.environ", {}, clear=True)
+    @patch.dict("os.environ", {}, clear=True)
     def test_cli_fails_on_invalid_json(self):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             self.assertEqual(main(["--needs-json", "{", "--event-name", "push"]), 1)

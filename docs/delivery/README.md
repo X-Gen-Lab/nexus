@@ -10,6 +10,7 @@
 | [支持范围](support.md) | 首发模式、三块 Board 与精确未知项 |
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
 | [迁移手册](migration.md) | 旧 API、配置、对象与外部应用迁移 |
+| [安全与生命周期审查](security-review.md) | 扫描范围、测试工装修复与借用／恢复限制 |
 | [后续迭代](next-iterations.md) | 实板验收、测量驱动的扩展与团队流程 |
 | [33 项实施台账](../design/next-generation-execution.csv) | 每项实现路径、证据入口、软件和物理退出状态 |
 

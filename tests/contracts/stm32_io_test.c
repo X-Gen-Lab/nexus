@@ -149,6 +149,7 @@ void nx_stm32_model_io_poll(unsigned kind, void* raw) {
 /** \brief Verify authorization, atomic batch encoding and masked snapshots. */
 static void gpio_test(void) {
     RCC_TypeDef rcc = {0};
+    RCC_TypeDef* previous_rcc = g_nx_stm32_system.rcc;
     g_nx_stm32_system.rcc = &rcc;
     assert(nx_stm32_gpio_clock_enable(4U) == NX_SUCCESS);
     assert((rcc.AHB1ENR & (1U << 4U)) != 0U);
@@ -194,6 +195,9 @@ static void gpio_test(void) {
     assert(registers.MODER == mode && registers.OSPEEDR == speed &&
            registers.PUPDR == pull && registers.OTYPER == type &&
            registers.AFR[0] == af && registers.BSRR == (1U << 3U));
+    /* The global model borrows this local RCC only inside this fixture scope.
+     */
+    g_nx_stm32_system.rcc = previous_rcc;
 }
 
 /** \brief Drive one RX observation under simulated interrupt context. */
@@ -629,6 +633,9 @@ static void timer_adc_test(void) {
  * implementation. */
 int main(void) {
     gpio_test();
+    /* A later constructor must reject unbound RCC, not use an expired fixture.
+     */
+    assert(nx_stm32_gpio_clock_enable(4U) == NX_ERROR_INVALID);
     uart_test();
     spi_test();
     i2c_test();

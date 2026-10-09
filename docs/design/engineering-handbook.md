@@ -340,15 +340,15 @@ clang-tidy消费实际compile commands与生成配置，只检查owned边界。v
 
 本规则集是工程检查基线，不构成MISRA、功能安全或其他认证。若产品要求标准符合性，另立准确standard/version、覆盖范围、deviation、工具资格与独立review项目，不能仅凭`cert-*`或analyzer配置宣称合规。
 
-### 12.4 当前落实缺口与迁移方式
+### 12.4 当前落实与历史迁移
 
-本提案编写时，规范与实际落实尚不完全一致：原有HAL/OSAL等模块有完整Doxygen文件头和标签，部分近期Arch、Runtime、typed facade使用简略文件头、无标签API说明或单行控制语句。它们属于待修正差异，不作为新风格依据。
+原架构曾存在文件头、注释标签和格式不一致。本轮已经移除旧HAL/OSAL、Runtime及业务服务，将当前Core、I/O、OS、Arch、SoC、组件和测试按原有格式与反斜杠Doxygen规则统一。根`.clang-format`和`.editorconfig`保持不变。
 
-[格式目录清单](../../.clang-format-dirs)已补齐Arch、SoC、Board、Runtime和Services及实际使用的`.inc`，Shell、Windows和PowerShell入口均委托[Python格式工具](../../scripts/tools/format.py)。[安装入口](../../scripts/setup/install_dev_tools.py)固定安装pre-commit 4.3.0和clang-format 14.0.6，并安装真实`pre-commit`、`commit-msg` hooks。默认提交检查暂存快照；手工`--files`、`--all-files`检查工作区。CI每次运行相同的全量源码门禁，重型分析保留路径条件。
+[格式目录清单](../../.clang-format-dirs)覆盖所有维护中的C/C++与`.inc`，包括测量workload。[安装入口](../../scripts/setup/install_dev_tools.py)固定安装pre-commit 4.3.0和clang-format 14.0.6，并安装真实`pre-commit`、`commit-msg` hooks。默认提交检查暂存快照；手工`--files`、`--all-files`检查工作区。CI运行相同的整文件门禁，静态分析消费实际编译数据库。
 
-首次审计596个自有源码文件，记录337个文件的格式欠账与291个文件的机械注释欠账，两者重叠。[冻结基线](../../dependencies/style-baseline.json)只允许固定历史源码的未改字节；修改后须整文件合规，不能增加或重封豁免、通过排除路径隐藏自有源码。门禁通过表示满足这一迁移政策，不能称全仓已格式合规。实际使用、报告和检查边界见[质量门禁说明](../archive/implementation/quality-gates.md)。
+首次历史审计的596文件及337/291格式／注释欠账仅用于追溯。当前[冻结基线](../../dependencies/style-baseline.json)的两类欠账集合均为空；新源码全部按整文件规则检查，禁止增加或重封豁免。最终通过状态由当前提交的实际门禁报告决定，不能继承历史计数。归档原始记录与第三方源码分别保留自身身份，不冒充当前自有代码验收。
 
-上述工具交付是NG-003/NG-024的一部分；完整工具链环境锁、单一dev构建入口、全部warning和风险矩阵仍待实施。formatter负责排版，注释检查器只验证可机械判断的规则；API合同语义仍需review和行为测试。仅格式或注释机械整理单独提交，行为重构原子更新caller/测试/文档，避免把全仓排版与架构变更混成难以review的diff。本轮未改根格式配置或批量格式化生产源码。
+环境锁、统一dev入口、源码SDK、ELF预算、离线复现和HIL工装已实现；准确范围见[交付说明](../delivery/README.md)。formatter负责排版，注释检查器只验证机械规则；API合同语义仍需review和行为测试。安全扫描诊断按维护范围逐项核对，不通过全局静音消除自身问题。软件检查不能替代实板时序、产品安全或标准符合性资格。
 
 ## 13. 错误、所有权与并发API规范
 

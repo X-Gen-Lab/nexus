@@ -395,7 +395,9 @@ def main(argv: list[str] | None = None) -> int:
         baseline = load_baseline(baseline_path) if baseline_path else None
         result = check_files(root, _select(root, args.files), baseline)
     except (StyleError, OSError) as error:
-        parser.error(str(error))
+        parser.print_usage(sys.stderr)
+        print(f"{parser.prog}: error: {error}", file=sys.stderr)
+        raise SystemExit(2) from error
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:

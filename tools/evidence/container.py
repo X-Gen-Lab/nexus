@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -17,7 +16,7 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
-    file_identity, load_json, parse_json, run_adapter, sha256_value)
+    file_identity, load_json, run_adapter, sha256_value)
 
 
 def docker_prefix(executable: str = "docker") -> list[str]:

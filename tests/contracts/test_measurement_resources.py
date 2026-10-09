@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-import struct
 import subprocess
 import sys
 import tempfile
@@ -10,7 +9,7 @@ import unittest
 
 from tools.evidence.common import EvidenceError, atomic_json
 from tools.measurement.elf import Elf32, interval_bytes
-from tools.measurement.resources import allocation, measure, validate_budget
+from tools.measurement.resources import measure, validate_budget
 from tests.contracts.test_evidence_support import link_fixture
 
 

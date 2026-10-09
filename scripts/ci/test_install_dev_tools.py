@@ -77,7 +77,7 @@ class InstallDevToolsTests(unittest.TestCase):
             return subprocess.CompletedProcess(command, 0, f"clang-format version {self.formatter_version}\n", "")
         if "pre_commit" in command and "install" in command:
             return subprocess.CompletedProcess(command, 0, "", "")
-        self.fail(f"Unexpected command: {command}")
+        raise AssertionError(f"Unexpected command: {command}")
 
     def invoke(self, arguments=()):
         output, errors = io.StringIO(), io.StringIO()

@@ -12,7 +12,7 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
-    file_identity, identifier, load_json, regular_file, stream_digest, verify_file_identity)
+    file_identity, identifier, load_json, stream_digest, verify_file_identity)
 from tools.evidence.identity import resolved_identity, verify_source
 from tools.evidence.container import verify as verify_environment
 from tools.measurement.elf import Elf32, binary_from_elf
