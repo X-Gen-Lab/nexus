@@ -20,10 +20,23 @@ levels:
 - enterprise_supported
 - lts
 validation_rule: exact_profile_acceptance_actual_execution_and_bound_source_config_artifact_evidence
-current_evidence_snapshot:
+current_delivery:
+  software_status: external_bound_execution_record_authoritative
+  identity_authority: external_exact_source_pair_and_frozen_execution_reports
+  validation_record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+  examples_dependency_lock: https://github.com/X-Gen-Lab/nexus-examples/blob/main/dependencies/nexus.lock.json
+  execution_record: docs/implementation/refactor-execution.csv
+  directory_layout:
+    stm32_family: soc/stm32f407
+    gd32_family: soc/gd32f470
+    host_virtual_model: soc/native
+    platform_responsibility: startup_lifecycle_object_assembly_only
+  current_source_rule: A later source change requires fresh exact-pair reports; historical counts are not inherited.
+  physical_status: deferred_by_user_not_executed
+  hardware_verified: false
+historical_targeted_snapshot_f2d2cf8:
   platform_observed_head: f2d2cf89f437ad69bf73a8d9eb068d600d53081f
   source_worktree_clean: false
-  final_clean_sha_pair: pending
   record: docs/implementation/refactor-execution.csv
   note: Scoped working-tree checks are real; later commits require their own final integration records.
   exact_committed_component_scope:
@@ -39,6 +52,19 @@ current_evidence_snapshot:
     snapshot: build/refactor-commit-checks/runtime-board/snapshot.json
     junit: build/refactor-commit-checks/runtime-board/junit.xml
 historical_evidence:
+- scope: complete_software_delivery_before_directory_lifecycle_unification_not_inherited
+  platform_source_commit: 5498b2b6988cc1cf28cf4255c5c281d56394d614
+  platform_source_tree: ea178ba746a991c7feb21242215aa1a18e6afb05
+  examples_tested_commit: 272200f40eca5b414e4aa97f5c5be67a0659bc78
+  examples_tested_tree: 38d8bd2920af45d806ef97ba5e9c6648ed1ba3ee
+  native_ctest_passed: 1810
+  platform_arm_release_configurations: 8
+  platform_contract_elf_images: 8
+  examples_native_checks: 6
+  examples_arm_elf_images: 38
+  strict_clean_source_sdk: publishable_verified_and_actual_relocated_consumers_passed
+  record: https://github.com/X-Gen-Lab/nexus-examples/tree/main/evidence/reports/5498b2b
+  hardware_verified: false
 - scope: before_current_RF_refactor_not_inherited
   source_commit: 3129550d12fcf67a7da52dcb2713ee634bae5415
   native_ctest_passed: 1781
@@ -112,10 +138,11 @@ capability_limits:
   board_validation: reviewed_GPIO_UART_SPI_routes_not_complete_topology_solver
   memory_info: main_SRAM_and_internal_Flash_only_not_all_domains_or_DMA_map
   mcu_crypto: no_provider_entropy_vault_binding_explicit_unsupported
-  kernel_restart: not_supported_running_MCU_FreeRTOS_shutdown_is_BUSY
+  platform_lifecycle: bounded_idle_baremetal_or_pre_scheduler_cleanup_reinit_partial_failures_retain_ownership_and_admission_fence
+  kernel_restart: not_supported_running_or_suspended_MCU_FreeRTOS_shutdown_is_BUSY
   cache_mpu: not_implemented_or_qualified
-  hal_completion: implemented_18_native_checks_real_cortex_archive_no_auto_device_callback_or_worker
-  relocatable_source_sdk: fixture_relocated_consumers_passed_strict_clean_prepare_consume_pending
+  hal_completion: implemented_caller_owned_bounded_terminal_dispatch_no_auto_device_callback_or_worker
+  relocatable_source_sdk: strict_clean_5498b2b_delivery_passed_current_source_requires_fresh_prepare_verify_consume
   physical_workloads: IRQ_DMA_power_loss_long_load_full_runners_and_measured_budgets_pending
 profiles:
 - id: native-contracts
@@ -133,20 +160,11 @@ profiles:
   - linux-gcc-sanitizers
   status: experimental
   evidence:
-    runtime_ctest: 53
-    hal_scoped_ctest: 84
-    osal_scoped_ctest: 278
-    log_shell_scoped_ctest: 444
-    security_selected_ctest: 77
-    selected_integration_ctest: 52
-    record: docs/implementation/refactor-execution.md
-    final_clean_integrated_matrix: pending
+    production: maintained_host_typed_contracts_OSAL_and_explicit_components
+    current_unified_source_matrix: see_current_delivery_validation_record
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+    historical_targeted_scopes: docs/implementation/refactor-execution.csv
     hardware: not_applicable
-    python_gate_cases: 281
-    ci_helper_cases: 170
-    exact_component_tree_ctest: 735
-    completion_ctest: 18
-    exact_runtime_board_tree_ctest: 187
   limits:
   - Counts refer to distinct scoped snapshots and can overlap; do not sum them as a new full-suite total.
   - OpenSSL requires explicit Native configuration, link and provider binding.
@@ -199,10 +217,10 @@ profiles:
   physical_erase_geometry: 12_nonuniform_sectors
   evidence:
     production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
-    software: production_contracts_and_selected_actual_ARM_links_passed
-    final_clean_eight_profile_matrix: pending_current_source_binding
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
     contract_image: nexus_contract_firmware_not_business_application
-    record: docs/implementation/refactor-execution.md
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
     hardware: not_executed
   limits:
   - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
@@ -241,10 +259,10 @@ profiles:
   physical_erase_geometry: 12_nonuniform_sectors
   evidence:
     production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
-    software: production_contracts_and_selected_actual_ARM_links_passed
-    final_clean_eight_profile_matrix: pending_current_source_binding
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
     contract_image: nexus_contract_firmware_not_business_application
-    record: docs/implementation/refactor-execution.md
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
     hardware: not_executed
   limits:
   - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
@@ -283,10 +301,10 @@ profiles:
   physical_erase_geometry: 8_nonuniform_sectors
   evidence:
     production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
-    software: production_contracts_and_selected_actual_ARM_links_passed
-    final_clean_eight_profile_matrix: pending_current_source_binding
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
     contract_image: nexus_contract_firmware_not_business_application
-    record: docs/implementation/refactor-execution.md
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
     hardware: not_executed
   limits:
   - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
@@ -325,10 +343,10 @@ profiles:
   physical_erase_geometry: 256_four_KiB_independent_erase_pages
   evidence:
     production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
-    software: production_contracts_and_selected_actual_ARM_links_passed
-    final_clean_eight_profile_matrix: pending_current_source_binding
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
     contract_image: nexus_contract_firmware_not_business_application
-    record: docs/implementation/refactor-execution.md
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
     hardware: not_executed
   limits:
   - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
@@ -348,12 +366,12 @@ hil_tooling:
   board_fixture_templates: 4
   station_observed_identity: not_bound
   board_probe_tty_leases: implemented
-  elf_bin_board_layout_admission: actual_current_contract_image_passed
-  artifact_tampering_cases_rejected: 6
+  elf_bin_board_layout_admission: implemented_current_artifacts_require_fresh_readonly_admission
+  historical_artifact_tampering_cases_rejected: 6
   new_board_model_tests: 23
   legacy_adapter_model_tests: 20
   hardware_verified: false
-  record: build/rf-hil-artifact-admission.json
+  record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
   workload_budgets: null_unmeasured
   uart_challenge_runner: implemented_not_physically_executed
 promotion_requires:

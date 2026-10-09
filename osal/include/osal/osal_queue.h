@@ -83,6 +83,10 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle);
 osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
                               uint32_t timeout_ms);
 
+/** Atomically append an item, removing the oldest if full. Task context,
+ * nonblocking, supports arbitrary capacity, and does not change queue mode. */
+osal_status_t osal_queue_send_overwrite(osal_queue_handle_t handle, const void* item);
+
 /**
  * \brief           Send item to front of queue
  * \param[in]       handle: Queue handle
@@ -96,10 +100,6 @@ osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
  * \retval          OSAL_ERROR_TIMEOUT Send operation timed out
  * \retval          OSAL_ERROR_FULL Queue is full (with OSAL_NO_WAIT)
  */
-/** Atomically append an item, removing the oldest if full. Task context,
- * nonblocking, supports arbitrary capacity, and does not change queue mode. */
-osal_status_t osal_queue_send_overwrite(osal_queue_handle_t handle, const void* item);
-
 osal_status_t osal_queue_send_front(osal_queue_handle_t handle,
                                     const void* item, uint32_t timeout_ms);
 

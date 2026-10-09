@@ -156,7 +156,7 @@ depends on
 
     config ADVANCED_FEATURE
         bool "Advanced feature"
-        depends on PLATFORM_STM32 && (STM32F4 || STM32H7)
+        depends on PLATFORM_STM32
         depends on !MINIMAL_BUILD
 
 select

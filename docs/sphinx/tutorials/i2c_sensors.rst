@@ -1,34 +1,13 @@
-I2C Sensor Integration
-======================
+I2C Support Boundary
+====================
 
-.. note::
+Native typed I2C models parent/child ownership, unshifted 7-bit addresses,
+transaction queues, original deadlines, cancellation and terminal callbacks.
+Its tests validate behavior and stale-owner rejection.
 
-   This tutorial is under development and will be available soon.
-
-Overview
---------
-
-Coming soon...
-
-Prerequisites
--------------
-
-* Completed previous tutorials
-* Understanding of i2c sensor integration
-
-What You'll Learn
------------------
-
-* Coming soon...
-
-See Also
---------
-
-* :doc:`gpio_control` - GPIO basics
-* :doc:`uart_communication` - UART communication
-* :doc:`spi_communication` - SPI communication
-
----
-
-**Status**: Under Development
-**Last Updated**: 2026-01-25
+STM32F407 and GD32F470 modern typed hardware I2C providers are not implemented.
+No sensor wiring or repeated-start timing is qualified. Vendor SDK I2C symbols,
+legacy getters, draft configuration or Native success cannot enable production
+MCU I2C. A future hardware port needs correct controller/state handling, reviewed
+Board pins/electrical constraints, meaningful fault tests, real firmware links
+and separate physical evidence before a sensor application is advertised.

@@ -72,4 +72,4 @@ Binary v2采用固定字节偏移和little-endian标量，拒绝旧v1/native-C-l
 
 上述持久化和密码 C 文件通过 C11 `-Wall -Wextra -Werror` 编译，服务测试实际执行；部分服务另通过 ASan/UBSan。测试 keys 仅为测试夹具或进程临时生成，不能用于制造。
 
-`nx_file_flash` 是真实文件持久化的 POSIX 故障模型，具有独占文件锁、几何检查和部分写入注入。跨进程测试不等于实际硬件断电。当前F407端口位于 `soc/stm32f407vg/flash.c`：1MiB xG（Discovery/启明）保留sector10/11，512KiB xE（天空星青春版）保留sector6/7，两者均为两个128KiB sector，并检查实际密度和linker fence。GD32F470ZG已在 `soc/gd32f470zg/flash.c` 提供真实官方FMC端口，保留末16KiB的四个独立4KiB page，使用F470专属 `fmc_page_erase()` 而非STM32 sector或F303几何。产品串行调用这些同步端口并安排维护窗口。仍未完成实板Flash断电、擦写暂停、供电/磨损预算、熵源、安全vault、可信启动、metadata防重放或制造密钥注入验证；MCU stock profiles的Config/security/update默认禁用，不表示这些上层能力已经接入产品。
+`nx_file_flash` 是真实文件持久化的 POSIX 故障模型，具有独占文件锁、几何检查和部分写入注入。跨进程测试不等于实际硬件断电。当前F407端口位于 `soc/stm32f407/flash.c`：按1MiB xG/ZG（Discovery/启明）或512KiB xE（天空星青春版）暴露全部12/8个非均匀sector，并检查实际密度。GD32F470ZG在 `soc/gd32f470/flash.c` 提供真实官方FMC端口，暴露完整1MiB/256个独立4KiB page，使用F470专属 `fmc_page_erase()` 而非STM32 sector或F303几何。平台默认不预留storage；外部layout与typedregion约束产品分区，`Nexus::StorageHAL`借用已打开region。产品串行调用这些同步端口并安排维护窗口。仍未完成实板Flash断电、擦写暂停、供电/磨损预算、熵源、安全vault、可信启动、metadata防重放或制造密钥注入验证；MCU stock profiles的Config/security/update默认禁用，不表示这些上层能力已经接入产品。

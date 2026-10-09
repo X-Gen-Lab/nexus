@@ -1,89 +1,54 @@
-GD32 Platform Guide
-===================
+GD32F470 Platform Guide
+=======================
 
-.. note::
+The maintained GD32 platform is **GD32F470ZGT6 Liangshan Pi**. The user replaced
+the original F303 request with this board. GD32F303/F407/VF103 are not supported
+by this implementation. STM32 startup/register/erase assumptions are not reused.
 
-   GD32 platform support is currently under development. This guide will be updated as features become available.
+``soc/gd32f470`` owns independent controllers, clock/IRQ/TIMER1 timebase,
+physical Flash/identity, private official SDK context and linker sections.
+``boards/gd32f470_liangshan`` owns reviewed wiring/HSE/safe levels.
+``platforms/gd32f470`` owns startup/lifecycle/object assembly. Official GD32F4xx
+Firmware Library 3.3.3 is imported with source/archive/file/license identities.
+Normal consumers receive no vendor includes/macros; raw bring-up explicitly
+selects ``Nexus::GD32SDK`` and owns raw-resource quiescence.
 
-Overview
---------
-
-GD32 is a series of 32-bit general-purpose microcontrollers based on the ARM Cortex-M core, developed by GigaDevice Semiconductor.
-
-Nexus provides support for GD32 microcontrollers, offering similar features to STM32 platforms.
-
-Supported Devices
------------------
-
-**GD32F4 Series**
-
-* GD32F450
-* GD32F470
-* More devices coming soon...
-
-**GD32F3 Series**
-
-* GD32F303
-* GD32F307
-* More devices coming soon...
-
-Getting Started
----------------
-
-.. note::
-
-   Detailed setup instructions will be added soon.
-
-Basic setup steps:
-
-1. Install ARM toolchain
-2. Configure CMake for GD32 platform
-3. Build and flash your application
-
-See :doc:`stm32f4` for similar setup process.
-
-Hardware Setup
---------------
-
-Coming soon...
-
-Building for GD32
------------------
+Build
+-----
 
 .. code-block:: bash
 
-   # Configure for GD32
-   cmake -B build-gd32 \
-       -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
-       -DNEXUS_PLATFORM=gd32 \
-       -DCMAKE_BUILD_TYPE=Release
+   cmake --preset gd32f470-armgcc-baremetal-release
+   cmake --build --preset gd32f470-armgcc-baremetal-release --parallel 4
+   python3 scripts/ci/validate_firmware_elf.py \
+     --build-dir build/gd32f470-armgcc-baremetal-release \
+     --report build/gd32f470-armgcc-baremetal-release/firmware-static.json
 
-   # Build
-   cmake --build build-gd32
+Use the pinned ARM GNU 14.3.rel1 toolchain. The equivalent FreeRTOS preset is
+``gd32f470-armgcc-freertos-release``. The real startup vector/SP/reset and strong
+IRQ/registration entries must be checked in actual ELF, not inferred from a
+successful archive build.
 
-Flashing
---------
+Resources and Capability
+------------------------
 
-Coming soon...
+The reference profile uses 25 MHz HXTAL, 200 MHz CPU, USART0 PA9/PA10, SPI4
+PF7/PF8/PF9 with CS PF6, PD7 LED and reserved TIMER1 timestamp timebase.
+Actual PCB revision/electrical behavior remains unqualified. Optional RS485 DE
+is disabled by default; the stock board does not establish a transceiver.
 
-Platform-Specific Features
----------------------------
+Physical Flash is 1 MiB, exposed as 256 independent 4 KiB erase pages with
+2-byte program alignment. Default firmware owns the full Flash and reserves no
+storage area. External layout selects regions; image offset must be zero.
+Default main SRAM is 192 KiB; extra 256 KiB SRAM and 64 KiB TCM are not an
+exhaustive initialized memory-domain/DMA-capability guarantee.
 
-Coming soon...
+IRQ UART uses finite tickets and real TC settlement; polling SPI has bounded
+child/queue lifetimes. UART/SPI DMA and typed MCU I2C are unsupported. No
+CAN/Ethernet/USB provider, MCU crypto/entropy/vault, bootchain, MPU/cache or full
+kernel restart is claimed. Flash may stall same-bank instruction/IRQ fetch;
+external products must specify maintenance and measured timing/power-loss budgets.
 
-Troubleshooting
----------------
-
-Coming soon...
-
-See Also
---------
-
-* :doc:`stm32f4` - Similar platform guide
-* :doc:`stm32h7` - Another ARM Cortex-M platform
-* :doc:`../user_guide/porting` - Porting guide
-
----
-
-**Status**: Under Development
-**Last Updated**: 2026-01-25
+No physical board has been connected. Host fault models and ARM linkage establish
+software contracts only. HIL startup, electrical, IRQ/TC, waveform, Flash power
+interruption and long-load execution remain pending.

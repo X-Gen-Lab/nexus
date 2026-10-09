@@ -48,7 +48,9 @@ the manager and its resources so the owner can recover and retry.
 For Flash, open a board-owned nx_storage_t, call config_backend_flash_bind(),
 select config_backend_flash_get() with config_set_backend(), then load the
 snapshot. Keep the storage and flash port alive until deinitialization. The
-F407 candidate reserves sectors 10/11 and limits application Flash to 768 KiB.
+F407/GD32 providers expose full physical Flash; the default image reserves no
+storage. An external layout selects complete erase-aligned regions and image
+bounds, which are checked by typed region/StorageHAL ownership.
 Flash stalls and hardware power-loss recovery require board measurements.
 
 Authenticated values
@@ -68,7 +70,7 @@ retain both key generations until reopening determines the committed generation.
 Production keys must not appear in source, examples, artifacts or logs.
 
 Import, export and migration
----------------------------
+----------------------------
 
 Binary version 2 uses explicit little-endian encoding and preserves namespaces.
 It preserves namespace IDs; the receiving manager needs the corresponding map.

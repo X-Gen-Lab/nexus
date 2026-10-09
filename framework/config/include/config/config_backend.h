@@ -113,10 +113,6 @@ struct config_backend {
     config_backend_snapshot_load_fn load_snapshot;
 };
 
-/**
- * \}
- */
-
 #ifndef CONFIG_PERSISTENCE_BUFFER_SIZE
 #if defined(NX_CONFIG_MANAGER_PERSISTENCE_BUFFER)
 #define CONFIG_PERSISTENCE_BUFFER_SIZE NX_CONFIG_MANAGER_PERSISTENCE_BUFFER

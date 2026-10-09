@@ -1,34 +1,11 @@
-ADC Sampling and Signal Processing
-==================================
+ADC Support Boundary
+====================
 
-.. note::
+Nexus does not maintain an STM32F407/GD32F470 production ADC provider. Native ADC
+is an explicit private host model, not an analog precision, calibration, sampling
+rate or DMA qualification. A chip ADC peripheral or copied configuration cannot
+make a typed MCU application usable.
 
-   This tutorial is under development and will be available soon.
-
-Overview
---------
-
-Coming soon...
-
-Prerequisites
--------------
-
-* Completed previous tutorials
-* Understanding of adc sampling and signal processing
-
-What You'll Learn
------------------
-
-* Coming soon...
-
-See Also
---------
-
-* :doc:`gpio_control` - GPIO basics
-* :doc:`uart_communication` - UART communication
-* :doc:`spi_communication` - SPI communication
-
----
-
-**Status**: Under Development
-**Last Updated**: 2026-01-25
+A future port needs reviewed reference voltage/input wiring, controller ownership,
+trigger/DMA settlement, calibrated conversion and source-bound software/physical
+checks. Product signal processing and calibration policy remain external.

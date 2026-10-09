@@ -226,7 +226,7 @@ config NATIVE_OPTION_BYTES_DEFAULT_PROTECTION
 ### File Structure
 
 ```
-platforms/native/src/option_bytes/
+soc/native/controllers/option_bytes/
 ├── nx_option_bytes_device.c      # Device registration and factory functions
 ├── nx_option_bytes_interface.c   # Option Bytes interface implementation
 ├── nx_option_bytes_lifecycle.c   # Lifecycle management

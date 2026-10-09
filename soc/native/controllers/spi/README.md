@@ -160,7 +160,7 @@ The SPI implementation provides test support functions in `nx_spi_test.h`:
 ### Test Example
 
 ```c
-#include "platforms/native/src/spi/nx_spi_test.h"
+#include "soc/native/controllers/spi/nx_spi_test.h"
 
 /* Inject test data */
 uint8_t test_data[] = {0xAA, 0xBB, 0xCC};

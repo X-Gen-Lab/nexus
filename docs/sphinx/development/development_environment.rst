@@ -78,6 +78,6 @@ failure. Correct unknown/conflicting values before compiling. Use a separate
 preset directory when compiler or mode changes. Initialize a missing pinned
 submodule instead of fetching an arbitrary current release.
 
-GD32 awaits selected silicon, board, SDK and a complete port; unimplemented
+GD32F470ZG Liangshan has an independent official SDK/startup/controller port; unmaintained
 backends fail explicitly. STM32F407/MB997 remains experimental, with ARM linking
 and physical HIL separate from host validation.

@@ -38,9 +38,9 @@ DMA 需要真实板级 prepare 完成时钟、引脚、stream 初始化、HAL li
 
 F407 的最高 SYSCLK 限制修正为 168 MHz，不能从其他 F4 型号推导出 180 MHz/Over-Drive。GPIO 初始化现在开启对应 RCC port clock，先写输出 latch 再切输出模式，填满 lifecycle 与 power 方法，逻辑 suspend 保留电气状态并抑制读写。共享 port clock 不会因一个 pin deinit 被关掉。没有实现的 EXTI routing 返回 NOT_SUPPORTED。
 
-`soc/stm32f407vg/flash.c` 当前提供F407 xG与xE真实ST HAL Flash port：xG的sector10/11保留0x080C0000..0x08100000，应用前768KiB；xE的sector6/7保留0x08040000..0x08080000，应用前256KiB。均为128KiB erase、4字节program，核对实际Flash密度与 `__nexus_storage_start/end`，验证1→0、HAL错误、读回与cache flush。VDD须满足2.7..3.6V条件。GD32F470端口使用末16KiB四个独立4KiB page和2字节program，独立检查1MiB密度及linker fence；它不复用ST sector擦除假设。读取、program、erase是同步任务操作，产品串行管理，不能保留caller buffers；同bank擦写可暂停取指/IRQ，仅允许产品维护窗口，实板供电与断电恢复仍待验收。
+`soc/stm32f407/flash.c` 当前按F407 xG/xE真实密度暴露完整物理Flash：xG/ZG为1MiB/12sector，xE为512KiB/8sector，包含16/64/128KiB非均匀擦除几何与4字节program。它核对实际密度，验证1→0、HAL错误、读回与cache flush。VDD须满足2.7..3.6V条件。`soc/gd32f470/flash.c`暴露完整1MiB/256个独立4KiB page和2字节program；它不复用ST sector擦除假设。外部layout选择region，默认没有保留storage。读取、program、erase是同步任务操作，产品串行管理，不能保留caller buffers；同bank擦写可暂停取指/IRQ，仅允许产品维护窗口，实板供电与断电恢复仍待验收。
 
-`soc/stm32f407vg/identity.c` 读取实际 96 位 UID、硅片 device/revision 和 Flash 容量；PCB revision 必须来自板卡资产/工装记录，不能用硅片 revision 代替。
+`soc/stm32f407/identity.c` 读取实际 96 位 UID、硅片 device/revision 和 Flash 容量；PCB revision 必须来自板卡资产/工装记录，不能用硅片 revision 代替。
 
 ## 执行证据与限制
 
@@ -64,4 +64,4 @@ SPI、board、identity、Flash 及 GPIO 代码还使用 checkout 中固定 commi
 
 STM32 仍需实际执行启动/时钟/UART、GPIO、双 slave 并发、DMA IRQ 故障与取消、Flash 任意 program/erase 断电恢复，以及通信/日志/Flash 压力下的控制时序。记录板卡和 PCB revision、UID、source/config/dependency/toolchain identities、实际执行次数、超时清理上界、波形与故障 seed。FreeRTOS 还需检查实际中断优先级与并发锁等待预算。
 
-GD32F470梁山派的官方SDK3.3.3、独立startup/clock/vector/IRQ/GPIO/UART/SPI4/TIMER1/Flash已实现，并有生产端口host fault模型和真实ARM构建。BSP-003/004的软件移植阶段不再标为缺SDK阻塞；GD32 DMA仍明确不支持，实板供电/时钟/IRQ/总线/Flash/控制budget须独立HIL。启明和天空星stock profiles的SPI禁用，启用需另行审核板级资源绑定；Typed I2C未迁移，Native模型不表示这些板有生产I2C。禁止把host模型或cross-build当作对应物理资格。
+GD32F470梁山派的官方SDK3.3.3、独立startup/clock/vector/IRQ/GPIO/UART/SPI4/TIMER1/Flash已实现，并有生产端口host fault模型和真实ARM构建。BSP-003/004的软件移植阶段不再标为缺SDK阻塞；GD32 DMA仍明确不支持，实板供电/时钟/IRQ/总线/Flash/控制budget须独立HIL。启明和天空星stock profiles的SPI禁用，启用需另行审核板级资源绑定；Native typed I2C已实施；两 MCU typed I2C provider仍明确不支持，Native模型不表示这些板有生产I2C。禁止把host模型或cross-build当作对应物理资格。

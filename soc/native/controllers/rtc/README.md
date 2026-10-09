@@ -233,7 +233,7 @@ config RTC0_ALARM_COUNT
 ### File Structure
 
 ```
-platforms/native/src/rtc/
+soc/native/controllers/rtc/
 ├── nx_rtc_device.c       # Device registration and factory functions
 ├── nx_rtc_interface.c    # RTC interface implementation
 ├── nx_rtc_lifecycle.c    # Lifecycle management

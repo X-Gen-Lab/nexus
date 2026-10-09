@@ -1,6 +1,8 @@
-# 工业平台重构交付记录
+# 历史工业平台交付记录（3129550）
 
-本轮在 `codex/industrial-platform-modernization` 上实施 Arch / SoC / Board / HAL / OSAL / Product 分层。首发硬件输入为 STM32F407ZGT6 启明欣欣高配 V3.1、STM32F407VET6 天空星青春版、GD32F470ZGT6 梁山派；保留已验证构建的 F407VG Discovery 参考组合。用户明确将原 GD32F303 目标改为 F470，当前没有 F303 支持声明。
+本文保存早期 `3129550` / 旧 Product 与固定分区阶段的历史实现和实际验证，不是当前支持声明。当前平台已采用外部产品、Runtime/Firmware、SoC controller、全物理 Flash 与 consumer-owned layout；当前架构见 [目标架构](../strategy/target-architecture.md)，身份与软件/HIL 交付状态见 [支持矩阵](../strategy/support-matrix.yaml) 和外部 [验证记录](https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json)。下文源码、计数、路径和占用均保留原历史范围，不继承到后续源码。
+
+历史轮次在 `codex/industrial-platform-modernization` 上实施 Arch / SoC / Board / HAL / OSAL / Product 分层。首发硬件输入为 STM32F407ZGT6 启明欣欣高配 V3.1、STM32F407VET6 天空星青春版、GD32F470ZGT6 梁山派；保留已验证构建的 F407VG Discovery 参考组合。用户明确将原 GD32F303 目标改为 F470，当前没有 F303 支持声明。
 
 ## 代码边界与消费
 

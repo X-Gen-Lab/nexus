@@ -118,21 +118,19 @@ Generated API
 -------------
 
 .. doxygengroup:: CONFIG
-   :project: Nexus
+   :project: nexus
    :members:
 
 .. doxygengroup:: CONFIG_DEF
-   :project: Nexus
+   :project: nexus
    :members:
 
 .. doxygengroup:: CONFIG_BACKEND
-   :project: Nexus
+   :project: nexus
    :members:
 
-.. doxygengroup:: CONFIG_BACKEND_RAM
-   :project: Nexus
-   :members:
+.. doxygenfile:: config_ram_backend.h
+   :project: nexus
 
-.. doxygengroup:: CONFIG_BACKEND_FLASH
-   :project: Nexus
-   :members:
+.. doxygenfile:: config_flash_backend.h
+   :project: nexus

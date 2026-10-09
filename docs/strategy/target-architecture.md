@@ -43,9 +43,16 @@ flowchart TB
 
 ## 可维护的工程结构
 
-`arch/`是 CPU 端口；`hal/`是 typed 契约/core/facade/runtime；`osal/`是后端；`soc/`保留物理芯片信息/Flash 实现；`platforms/`拥有真实 startup、controller 以及装配；`boards/`是参考 Board package；`runtime/`是中性的基础设施生命周期。`framework/`与`services/`只保留通用组件及窄适配，`tests/`拥有模型/fake/ARM 链接契约。
+`arch/`拥有 CPU 端口；`hal/`拥有 typed 契约/core/facade/runtime；`osal/`拥有操作系统后端；`soc/`拥有 controller、时钟、IRQ/时间源、芯片身份、全物理 Flash、私有实现头和 SDK 装配；`platforms/`仅拥有启动、平台生命周期与对象装配；`boards/`拥有参考 Board package；`runtime/`拥有中性的基础设施生命周期。`framework/`与`services/`只保留通用组件及窄适配，`tests/`拥有模型/fake/ARM 链接契约。
 
-目录并不要求所有控制器立即搬到 soc。当前 STM32 控制器主要在`platforms/stm32/src/hal`，GD32 有独立实现；是否正确分层以 target 源码、include、链接方向、所有权和实际消费验证判断，搬目录或重命名不能代替这些条件。
+| 目录 | 维护范围与装配目标 |
+|---|---|
+| `soc/stm32f407/` | F407VE/VG/ZG 共用实现；`soc_stm32f407`，controllers、clock、interrupt、system、chips、sdk、linker、Flash/identity |
+| `soc/gd32f470/` | F470ZG 实现；`soc_gd32f470`，controllers、clock、interrupt、sdk、linker、Flash/identity |
+| `soc/native/` | 主机虚拟资源模型；`soc_native`，controllers、resources、private；不声明物理芯片或 MCU 实时能力 |
+| `platforms/native/`、`platforms/stm32/`、`platforms/gd32f470/` | 对应生命周期 hook、启动与所选 SoC/Board 的最终对象装配 |
+
+家族实现路径与精确芯片身份分开：F407VE/VG/ZG 仍在 effective configuration、Board manifest、布局和 ELF 身份中分别校验。统一目录不允许把 VG 的密度应用到 VE。三平台通过 `nexus_forward_component_objects()` 保留 SoC/Board OBJECTS、startup、注册对象与强 IRQ，SDK 仍留在 PRIVATE 编译面。未维护的 ESP32、nRF52、GD32F407 壳和其他 STM32 系列配置不作为可选平台。
 
 外部仓库拥有 main、product.conf/layout.json、私有 Board、领域与业务流程。公开 examples 固定 SDK revision，产品可选择自己的 release 策略；任何平台缺陷应先修平台，再更新 external pin 并做应用回归。
 
@@ -53,7 +60,7 @@ flowchart TB
 
 设备目录包含 constant descriptor。普通 consumer 通过`nx_device_discover()/nx_device_describe()`读取 opaque 身份和只读类别/能力，不初始化设备。`nx_device_open()`以 explicit owner 获取`nx_device_ref_t`；generation 防止成功 close/reopen 后旧副本作用于新设备。provider 使用独立`hal/provider/nx_device_provider.h`声明可变 state 与 registration。
 
-controller、child device 与一次 operation 分开。SPI/I2C child 通过有界 slot/generation 持有 parent；Flash region 通过权限与 generation 限制范围，StorageHAL 进一步借用 region 而不夺取 parent。设备 close 遇到未关闭 child/region、活跃操作或借用返回 BUSY，保留所有权。
+controller、child device 与一次 operation 分开。SPI/I2C child 通过有界 slot/generation 持有 parent；Flash region 通过权限与 generation 限制范围，StorageHAL 进一步借用 region 而不夺取 parent。设备 close 遇到未关闭 child/region、活跃操作或借用返回 BUSY，保留所有权。SPI底层Board资源release失败保留ERROR/残余资源并可retry；task/已有mask拒绝在provider调用前发生，不改变incomingmask。
 
 | 动作 | 成功/失败后的资源规则 |
 |---|---|
@@ -81,7 +88,7 @@ completion 模块不 poll/cancel/drain 或证明 provider settlement，不自动
 
 `nx_runtime_bootstrap()`从 OFFLINE 按 HAL→OSAL 获取 ownership，成功进入 READY，重复成功调用幂等。其他 owner 已初始化、ISR 或未结清 PARTIAL 拒绝；OSAL 失败尝试 rollback HAL，同时保存原始/回滚错误。
 
-`nx_runtime_shutdown()`要求应用先结清 devices、组件、workers 与 OSAL objects。失败保留 ownership 可重试；HAL release 失败可尝试恢复 OSAL，恢复失败继续 PARTIAL。Running MCU FreeRTOS scheduler 返回 BUSY，不支持全 kernel shutdown/restart。Runtime 不决定 watchdog、安全输出、健康、业务降级或产品 reset。
+`nx_runtime_shutdown()`要求应用先结清 devices、组件、workers 与 OSAL objects，再按 OSAL→HAL 释放。HAL只读preflight失败保持READY，可恢复OSAL；实际cleanup失败后HAL进入PARTIAL并保留独占admission fence，此时不恢复依赖可能已停止时间源的OSAL。原owner仍可settle/close/recover，禁止newopen/construct/register/IRQ-DMA准入，真实cleanup重试成功才OFFLINE。baremetal与调度前idle MCU支持有界真实cleanup/reinit，运行或suspended MCU FreeRTOS kernel返回BUSY，不支持全kernel热重启。Runtime不决定watchdog、产品安全输出、健康、业务降级或reset；ST peripheral bank reset与窄Board安全初值重建不保证执行器电平连续性。直接SDK使用者须先停稳其资源。
 
 `nx_platform_get_info()`无 alloc/lock/open/clock/scheduler 副作用，给出 Arch/platform/SoC/Board/backend、Board/layout 摘要、main SRAM/physicalFlash 与 MSP/libcheap。Native memory table 为空；MCU 表目前只枚举 main SRAM/internalFlash，并不是 CCM/全部 memory domains、DMA 地址或产品 partition 声明。后端具体能力/预算用`osal_get_backend_info()`查询。
 

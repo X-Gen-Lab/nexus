@@ -14,6 +14,15 @@ Reference examples live in [X-Gen-Lab/nexus-examples](https://github.com/X-Gen-L
 
 STM32/GD32 modern typed **I2C hardware providers are currently unsupported**. Native typed I2C is implemented and tested. Unsupported capabilities fail explicitly. No physical board, enterprise support, LTS, installed binary SDK or MPU protection qualification is claimed by this iteration. See the [support matrix](docs/strategy/support-matrix.yaml).
 
+## Source ownership
+
+`arch/` owns CPU primitives. `soc/stm32f407/`, `soc/gd32f470/` and `soc/native/`
+own controllers, clock/IRQ/time, physical or virtual resources, private headers
+and SDK assembly. Native is a host model. `boards/` owns reviewed wiring;
+`platforms/` owns startup/lifecycle and final object assembly through one common
+helper. F407 family directories retain precise VE/VG/ZG configuration, density
+and artifact identities. Unmaintained platform/configuration shells are removed.
+
 ## Build the platform
 
 Use CMake 3.21+, Ninja, a C11/C++17 compiler and Python (3.11 recommended). Kconfiglib is pinned; configuration does not download dependencies. The full Native profile explicitly selects OpenSSL 3 and needs its development package. `native-minimal-debug` builds without optional services or OpenSSL.
@@ -84,7 +93,7 @@ int main(void) {
 }
 ```
 
-`Nexus::Firmware` explicitly links the selected platform objects/startup plus Runtime and typed HAL. `nx_runtime_bootstrap()` initializes HAL then OSAL, reports ownership and rollback failures, and starts no worker or scheduler. `nx_runtime_shutdown()` requires callers to settle their objects; a running MCU FreeRTOS kernel cannot be shut down/restarted through this API. `nx_platform_get_info()` reads Board/backend, identity digests and main SRAM/Flash/resource information without starting hardware.
+`Nexus::Firmware` explicitly links the selected platform objects/startup plus Runtime and typed HAL. `nx_runtime_bootstrap()` initializes HAL then OSAL, reports ownership and rollback failures, and starts no worker or scheduler. `nx_runtime_shutdown()` requires callers to settle their objects. Idle baremetal/pre-scheduler MCU cleanup is bounded; a running or suspended FreeRTOS kernel remains BUSY. Read-only close rejection retains READY; hardware cleanup failure retains PARTIAL and admission fencing for retry. Direct SDK users and products first quiesce their own resources and safe outputs. `nx_platform_get_info()` reads Board/backend, identity digests and main SRAM/Flash/resource information without starting hardware.
 
 A clean complete checkout can also prepare a relocatable **source SDK** outside its source tree:
 
@@ -95,7 +104,7 @@ python3 -B '/absolute/path/to/nexus sdk prefix/share/nexus/src/cmake/package/pac
   --verify '/absolute/path/to/nexus sdk prefix/share/nexus/src'
 ```
 
-Use `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)` instead of `add_subdirectory`, passing `Nexus_DIR=<prefix>/lib/cmake/Nexus`, your `NEXUS_CONFIG_FILE` and `NEXUS_EXPECTED_SOURCE_REVISION`. The package rebuilds actual source, dependencies, startup and linker. See [package preparation and consumer commands](cmake/package/README.md). The relocated development fixture has been tested; the strict publishable clean snapshot must bind the final source commit. Development fixtures require explicit opt-in and remain ineligible for release promotion.
+Use `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)` instead of `add_subdirectory`, passing `Nexus_DIR=<prefix>/lib/cmake/Nexus`, your `NEXUS_CONFIG_FILE` and `NEXUS_EXPECTED_SOURCE_REVISION`. The package rebuilds actual source, dependencies, startup and linker. See [package preparation and consumer commands](cmake/package/README.md). The historical clean `5498b2b` snapshot completed strict publishable preparation and actual relocated consumers. A later source revision must prepare, verify and consume a new source-bound package. Development fixtures require explicit opt-in and remain ineligible for release promotion.
 
 ## Configuration and ownership
 
@@ -105,6 +114,6 @@ Use `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)` instead of `add_subdirecto
 - Device discovery is side-effect free. Explicit typed open/close and owner/generation references protect lifetime. Timeout or cancellation does not release an unsettled hardware buffer.
 - Log/Shell core and typed UART adapters, Config RAM/Flash, StorageHAL and OpenSSL are explicit choices. Test fakes do not enter production libraries. Crypto core has no default provider; a missing MCU crypto provider returns unsupported.
 
-Read [architecture decisions](docs/strategy/architecture-decisions.md), [HAL/OSAL contracts](docs/strategy/hal-osal-design.md) and [enterprise workflow](docs/strategy/enterprise-workflow.md). Historical `3129550` Native 1781 tests and eight ARM/15 ELF results remain recorded in [platform-validation.json](docs/implementation/platform-validation.json); they do not qualify the new refactor. Current scoped execution and remaining gates are in [refactor-execution.csv](docs/implementation/refactor-execution.csv).
+Read [architecture decisions](docs/strategy/architecture-decisions.md), [HAL/OSAL contracts](docs/strategy/hal-osal-design.md) and [enterprise workflow](docs/strategy/enterprise-workflow.md). Historical `3129550` Native 1781 tests and eight ARM/15 ELF results remain recorded in [platform-validation.json](docs/implementation/platform-validation.json); they do not qualify the new refactor. The historical clean `5498b2b` delivery passed 1810 Native tests, 8 platform contract ELF links and 38 external example ELF links; current source changes require fresh verification. Current software status is in [support-matrix.yaml](docs/strategy/support-matrix.yaml), with exact source-pair identity in the [external validation record](https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json). The [RF execution table](docs/implementation/refactor-execution.csv) preserves targeted historical scopes and separates current revalidation from physical/operational acceptance.
 
 A release binds the same source/dependencies, effective configuration, Board/layout, toolchain, ELF/BIN and nonzero executed tests. Product promotion additionally needs actual HIL, trust/signing, measured budgets and manufacturing evidence. Read [AGENTS.md](AGENTS.md) before changing contracts. Nexus uses the [MIT license](LICENSE); dependencies keep their own licenses.

@@ -8,14 +8,16 @@ register map, startup vector, UID address or Flash geometry is reused.
 ## Boundaries and build
 
 - `arch/cortex_m4` owns CPU interrupt state and barriers.
-- `soc/gd32f470zg` owns the clock transition, interrupt vectors, dedicated
+- `soc/gd32f470` owns the clock transition, interrupt vectors, dedicated
   timestamp timer, silicon identity and physical internal Flash port.
 - `boards/gd32f470_liangshan` owns alternate functions, CS/DE, external-device
   wiring and initial idle levels. `nexus_board.h` describes the heartbeat LED.
-- `platforms/gd32f470/src` implements Nexus GPIO, UART and SPI contracts. It
-  assembles the board/SoC/controller objects without exporting SDK headers.
-- `products` owns startup, selection, resource policy and recovery. The
-  default heartbeat uses the typed GPIO API.
+- `soc/gd32f470/controllers` implements Nexus GPIO, UART and SPI contracts;
+  `soc/gd32f470/sdk` owns the selected private SDK compilation context.
+- `platforms/gd32f470/src` owns startup/lifecycle and assembles SoC/Board objects
+  through the common `nexus_forward_component_objects()` helper.
+- External applications own main, workers, scheduler, partitions and recovery.
+  They consume `Nexus::Firmware` and bootstrap common `Nexus::Runtime`.
 
 The implementation uses the original **official GD32F4xx Firmware Library
 3.3.3**, with source/archive hashes and licenses in
@@ -57,17 +59,19 @@ allocation region. Additional SRAM at `0x20030000` (256 KiB) and TCM at
 startup initialization for arbitrary extra sections is promised. PCB revision
 is a fixture/manufacturing input, not a fabricated silicon observation.
 
-The firmware region is `0x08000000..0x080FC000` (1008 KiB). Storage owns
-`0x080FC000..0x08100000` (16 KiB), four independently erasable **4 KiB pages**.
-This is GD32F470's additional page-erase facility, not 128 KiB sector erase.
+The physical Flash is `0x08000000..0x08100000` (1 MiB), exposed as 256
+independently erasable **4 KiB pages**. Default firmware uses all of it and
+creates no storage reservation. External `NEXUS_FLASH_LAYOUT_FILE` selects
+consumer-owned regions and image bounds; image offset must remain zero.
+The independent page erase is GD32F470's additional facility, not 128 KiB
+sector erase.
 Official UM Rev3.3 section 2.3.4 specifies `FMC_PEKEY`, `FMC_PECFG.PE_EN` and a
 4 KiB-aligned address with `FMC_CTL.SN=0`; the locked SDK's
 `fmc_page_erase()` implements it under the GD32F470 conditional. The port never
 calls sector erase. It validates the physical Flash density and linker fence,
 requires aligned 2-byte program units, rejects forbidden 0-to-1 changes and
-verifies erased/programmed contents. The linker asserts firmware/storage
-separation. Products serialize the synchronous Flash port and use a maintenance
-window: same-bank Flash operations may stall instruction/IRQ fetch and are not
+verifies erased/programmed contents. The generated linker validates declared image/region separation. External
+products serialize the synchronous Flash port and use a maintenance window: same-bank Flash operations may stall instruction/IRQ fetch and are not
 safe during active control deadlines.
 
 ## Runtime contracts
@@ -107,8 +111,9 @@ All four real ARM presets compile and link with the official startup/SDK.
 against test-only faulting vendor models; it is also in the general driver
 CTest suite. The fixtures test UART TC/cancel/loss/deadline/overflow, SPI
 ownership/queue/deadline/drain, TIMER1 pending-wrap handling, silicon density
-and independent Flash page boundaries. The Flash fixture verifies a canary
-across every firmware byte before the storage partition. Selected sanitizer
+and independent Flash page boundaries. Flash fixtures verify independent page geometry, rejected bounds and retained
+canaries outside the explicit test region; they do not establish a default
+product partition. Selected sanitizer
 options instrument these tests through the shared build options target.
 
 **No physical board or hardware fixture was available for this implementation.**

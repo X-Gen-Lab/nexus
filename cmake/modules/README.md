@@ -1,6 +1,6 @@
 # Maintained CMake modules
 
-The root uses four small modules with one effective configuration and one Board/backend per build root:
+The root uses focused modules with one effective configuration and one Board/backend per build root:
 
 | Module | Responsibility |
 |---|---|
@@ -8,6 +8,7 @@ The root uses four small modules with one effective configuration and one Board/
 | `NexusBoard.cmake` | Select a maintained Board or one `NEXUS_BOARD_DIR`, validate declared inputs/reviewed resources and derive Board identity plus consumer-owned Flash layout/linker/region outputs. |
 | `NexusApplications.cmake` | Create a consumer executable from `Nexus::Config` target context; explicitly link `Nexus::Firmware` objects/startup/runtime and selected dependencies, with isolated map/bin/hex/resource settings. |
 | `NexusSDK.cmake` | Expose `nexus_package_source_sdk(OUTPUT_DIRECTORY ... [DEVELOPMENT_FIXTURE])` for a verified relocatable source package. It delegates preparation and identity verification to the package tooling. |
+| `NexusComponentObjects.cmake` | Forward explicitly declared component OBJECT targets through `nexus_forward_component_objects()`. The same helper assembles Native, STM32F407 and GD32F470 SoC/Board objects without copying platform-specific target-property loops. |
 
 Libraries use ordinary CMake `add_library`, `target_sources`, include/options and link usage requirements. Presets own compiler/build mode, effective Kconfig owns software/resource selection, and fixed dependencies own SDK versions. Configuration performs no downloads. No extra module DSL, implicit Product assembly or automatic business entry point is maintained.
 

@@ -105,21 +105,21 @@ Generated API
 -------------
 
 .. doxygengroup:: OSAL_DEF
-   :project: Nexus
+   :project: nexus
    :members:
 
 .. doxygengroup:: OSAL_TASK
-   :project: Nexus
+   :project: nexus
    :members:
 
 .. doxygengroup:: OSAL_MUTEX
-   :project: Nexus
+   :project: nexus
    :members:
 
 .. doxygengroup:: OSAL_SEM
-   :project: Nexus
+   :project: nexus
    :members:
 
 .. doxygengroup:: OSAL_QUEUE
-   :project: Nexus
+   :project: nexus
    :members:

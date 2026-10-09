@@ -3,8 +3,9 @@ Build System
 
 Nexus uses CMake targets, explicit presets and one resolved configuration per
 build directory. Run the commands below from the repository root. Linux Native
-is the current software-validation environment; STM32F407 baremetal and FreeRTOS
-profiles are embedded build candidates whose hardware evidence remains separate.
+is the host software-validation environment; STM32F407VE/VG/ZG and GD32F470ZG
+baremetal/FreeRTOS profiles have independent ARM software checks with separate
+physical qualification.
 
 Tools and dependencies
 ----------------------
@@ -16,7 +17,8 @@ your preset. Install the Python requirements, including ``kconfiglib``:
 
    python -m pip install -r requirements.txt
 
-Native builds require OpenSSL 3 development headers and libraries. Host tests
+Full Native builds explicitly select OpenSSL 3 and require its development
+headers/libraries; minimal builds disable optional services/OpenSSL. Host tests
 use the pinned Google Test and FreeRTOS submodules:
 
 .. code-block:: bash
@@ -59,13 +61,13 @@ Frequently used profiles are:
    * - Preset
      - Purpose
    * - ``linux-gcc-debug`` / ``linux-gcc-release``
-     - Native GCC applications and host tests.
+     - Native GCC platform contracts and host tests.
    * - ``linux-clang-release``
      - Native Clang build and test variant; consult its execution evidence.
    * - ``linux-gcc-sanitizers``
      - Native ASan/UBSan contract validation; CI selects supported test targets.
    * - ``native-services-debug``
-     - Native device-service example; host test suites are disabled in this profile.
+     - Native optional-component compile profile; applications are external.
    * - ``stm32-armgcc-release``
      - STM32F407, STM32F4DISCOVERY MB997, baremetal cross-compilation.
    * - ``stm32-armgcc-freertos-release``
@@ -73,7 +75,8 @@ Frequently used profiles are:
 
 Windows/macOS presets are available for separate validation. Their existence
 does not establish the same service coverage or release support as Linux.
-GD32 and other platforms without an implemented BSP reject configuration.
+GD32F470ZG Liangshan also has baremetal/FreeRTOS presets; unmaintained platforms
+and unsupported configuration reject the build.
 
 Shared script entry point
 -------------------------
@@ -158,7 +161,7 @@ two explicitly named files. CMake regenerates the authoritative bundle during
 configuration; inspection output is not a substitute for a configured build.
 
 Product fragments and dedicated directories
-------------------------------------------
+-------------------------------------------
 
 Keep a product fragment under ``configs/`` and use a separate output directory
 for each product/board/compiler/mode combination. A Native fragment can start

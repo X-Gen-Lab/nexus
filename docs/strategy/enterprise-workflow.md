@@ -36,7 +36,9 @@ Scope 判断先问是否跨产品共用、是否有窄端口/确定预算、是�
 | 软件候选 | 同工件 ELF/BIN/hash/config/Board/layout/deps/toolchain、非零测试/许可与 knownlimits；明确 HIL 状态 |
 | 产品资格 | actualPCB/wiring、实测 budget、时序/DMA/Flashpowercut/longload、trust/signing/manufacturing |
 
-C01–C19 原批次是验收/提交范围，不要求每个名字恰好一个 commit；较大任务可拆，但 eachcommit 的依赖/API/test 一致。当前已提交 P0+HAL 和其他 pendingintegration 见 executionCSV；不能把 38 份文档/target 当 38 项完成。
+C01–C19 原批次是验收/提交范围，不要求每个名字恰好一个 commit；较大任务可拆，但 eachcommit 的依赖/API/test 一致。历史完整软件基线与本轮新源码重验分别见 executionCSV/current delivery；不能把 38 份文档/target 当 38 项完成。
+
+examples 的 `workflow_dispatch`可显式输入完整 40 位小写 `candidate_nexus_ref`，在保持正式 gitlink/lock 不变的条件下检验指定 Nexus 提交；空输入消费正式 pin。candidate checkout 必须 clean，origin/依赖/实际 commit/tree 被记录，运行相同 Native 与八 ARM matrix。该结果证明指定 pair 的应用回归，不表示每个 core PR 已自动触发跨私有仓库 CI，也不代替更新正式 pin 后的交付验收。最终身份以外部验证报告为准。
 
 ## 一套构建模型
 

@@ -28,13 +28,15 @@ HAL core、各 GPIO/UART/SPI/I2C/Flash facade、provider/support/runtime 分成�
 
 每个构建只有一份 effective configuration。一个 `NEXUS_BOARD_DIR` 接入外部 Board，manifest 验证 source containment、密度/HSE、已维护 GPIO/UART/SPI 的 pin/AF/clock/IRQ/DMA 绑定。一个外部 layout 同时驱动 linker、region header 和 ELF identity；默认 image 使用整块物理 Flash 且没有 storage 区，非零 image offset 拒绝。
 
-可重定位源码 SDK 已有真实移动包、C/C++ Native 运行与 STM32 ELF 消费回归。它不是 binary SDK；开发 fixture 明确 `publishable=false`，最终严格 clean 包与 final SHA pair 仍须单独验证。[源码包说明](../../cmake/package/README.md) 给出真实准备、verify 与 find_package 命令。
+可重定位源码 SDK 已在历史 `5498b2b` 干净版本完成严格 publishable 包、移动后 C/C++ Native 运行与 STM32 ELF 消费。新源码须重新 prepare/verify/consume，不继承旧包身份。它不是 binary SDK；开发 fixture 明确 `publishable=false`。[源码包说明](../../cmake/package/README.md) 给出真实准备、verify 与 find_package 命令。
 
 ## 证据与当前边界
 
-本轮定向软件记录包含 HAL、OSAL、Runtime、组件、StorageHAL、配置/Board、CI helper 和 relocated source SDK。各 scope/源码/日志见执行清单，不能累加成一个“新平台完整测试数”。新的 clean Native GCC/Clang、相关 sanitizer/分析、8 ARM、双仓 pin/在线 CI 与正式候选继续由最终记录绑定。
+维护目录已统一为 `arch/`、`soc/{native,stm32f407,gd32f470}/`、`boards/`、`platforms/`。controller、clock/IRQ/system、Flash/identity、私有头与 SDK 属于 SoC，platforms 仅拥有 startup/lifecycle/对象装配；Native 是虚拟主机资源模型。家族目录与精确料号分开，F407VE/VG/ZG 密度不会合并。三平台使用共同 OBJECT 转发 helper，厂商 SDK 编译面保持私有。
 
-历史 `3129550` 的 Native 1781 项、8 ARM 配置/15 ELF、56 checker 与 60 损坏拒绝，记录在 [platform-validation.json](../implementation/platform-validation.json)。更早 `4a283eb`/`affaa86f` 的 1711、覆盖率与线上 sanitizer 都属于各自历史源码，不被后续重构继承。
+当前交付状态由 [支持矩阵](support-matrix.yaml) 的 `current_delivery` 与外部 [双仓验证记录](https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json) 绑定；外部 Gitlink/lock 与被测 source/tree 一致后才有当前源码的软件通过结论。平台文档不回写自身最终 SHA，避免身份自递归。当前执行结果不能用过去计数代替，也不在本库回写自身最终SHA或PASS。
+
+历史 `5498b2b` / examples tested `272200f` 完成 Native 1810/1810、8 个平台 contract ELF、Native 6 应用检查与 38 个外部 ARM ELF、严格源码 SDK 和在线门禁。历史 `3129550` 的 Native 1781、8 ARM/15 ELF 留在 [platform-validation.json](../implementation/platform-validation.json)，更早 `4a283eb`/`affaa86f` 的检查也保留各自源码边界。各历史 scope 不能累加或继承到新重构。
 
 Native typed I2C 已实现；STM32/GD32 modern hardware I2C provider 当前明确不支持。HALCompletion caller-owned 队列已有 18 项真实 Native 软件检查与 Cortex 编译；它不自动接线设备 callback 或启动 worker。MCU crypto/熵源/vault、全 MCU kernel teardown/restart、完整内存域/cache/MPU、bootloader/非零 VTOR relocation、完整自动拓扑求解和 installed binary SDK 未完成。
 

@@ -7,9 +7,10 @@ Nexus Embedded Platform
 
    **New to Nexus?** Start with :doc:`getting_started/quick_start` or see :doc:`DOCUMENTATION_GUIDE` for navigation help.
 
-Welcome to the Nexus Embedded Platform documentation. Nexus is a world-class
-embedded software development platform designed for building reliable,
-secure, and portable embedded applications.
+Nexus provides reusable embedded platform contracts, SoC/Board integration,
+explicit HAL/OSAL lifecycle, common components and traceable builds. Applications
+and product policy live in external repositories. Source-bound software checks
+and physical hardware qualification are separate gates.
 
 .. toctree::
    :maxdepth: 1
@@ -75,7 +76,6 @@ secure, and portable embedded applications.
    platform_guides/index
    platform_guides/native
    platform_guides/stm32f4
-   platform_guides/stm32h7
    platform_guides/gd32
 
 .. toctree::
@@ -121,14 +121,17 @@ Key Features
 🔧 Hardware Abstraction Layer (HAL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unified API for GPIO, UART, SPI, I2C, Timer, ADC with factory pattern and lifecycle management.
+Opaque device ownership and independent typed GPIO/UART/SPI/I2C/Flash facades.
+Native typed I2C is implemented; STM32F407/GD32F470 typed I2C and UART DMA are
+unsupported. Legacy virtual peripherals do not establish MCU support.
 
 :doc:`Learn more → <user_guide/hal>`
 
 ⚙️ OS Abstraction Layer (OSAL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Portable RTOS interface supporting FreeRTOS, RT-Thread, Zephyr, and bare-metal.
+Explicit Native, baremetal and pinned FreeRTOS backends with capability/resource
+queries. RT-Thread and Zephyr are not maintained backends.
 
 :doc:`Learn more → <user_guide/osal>`
 
@@ -149,7 +152,8 @@ Interactive command-line interface with command registration, history, and auto-
 ⚙️ Configuration System
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Powerful Kconfig-based configuration with validation, migration, and runtime access.
+One per-build Kconfig effective configuration with strict validation. Runtime
+Config storage is a separate explicitly selected component.
 
 :doc:`Learn more → <user_guide/kconfig>`
 
@@ -163,20 +167,9 @@ CMake-based build system with cross-platform support, toolchain management, and 
 🔒 Security & Safety
 ~~~~~~~~~~~~~~~~~~~~
 
-* Secure boot and firmware updates
-* TLS 1.3 and crypto engine
-* MISRA C compliance
-* MPU protection and runtime checks
-
-☁️ Cloud Integration
-~~~~~~~~~~~~~~~~~~~~~
-
-Ready-to-use integrations for AWS IoT, Azure IoT, and Alibaba Cloud IoT.
-
-🤖 AI/ML Support
-~~~~~~~~~~~~~~~~
-
-TensorFlow Lite Micro and CMSIS-NN for edge AI applications.
+Security core has no automatic provider; OpenSSL is an explicit Native choice.
+MCU bootloader/trust chain, crypto/entropy/vault, MPU and industrial safety
+qualification are not implemented or qualified by this software delivery.
 
 Quick Start
 -----------
@@ -186,25 +179,28 @@ Get started in 5 minutes:
 .. code-block:: bash
 
    # Clone repository
-   git clone https://github.com/X-Gen-Lab/nexus.git
+   git clone --recurse-submodules https://github.com/X-Gen-Lab/nexus.git
    cd nexus
 
    # Build for native platform
-   python scripts/building/build.py
-
-   # Run example
-   ./build/applications/blinky/blinky
+   python3 -m pip install kconfiglib==14.1.0
+   cmake --preset linux-gcc-debug
+   cmake --build --preset linux-gcc-debug --parallel 4
+   ctest --preset linux-gcc-debug --output-on-failure --no-tests=error --parallel 4
 
 :doc:`Full quick start guide → <getting_started/quick_start>`
 
 Supported Platforms
 -------------------
 
-* **Native** - Windows, Linux, macOS (simulation)
-* **STM32** - F4, H7 series
-* **GD32** - GD32F4, GD32F3 series
-* **ESP32** - ESP32, ESP32-S3 (coming soon)
-* **nRF52** - nRF52832, nRF52840 (coming soon)
+* **Native** - Linux executed host models; Windows/macOS presets retained.
+* **STM32F407VE/VG/ZG** - Sky Youth, Discovery and Qiming V3.1.
+* **GD32F470ZG** - Liangshan Pi using independent official SDK integration.
+
+MCU baremetal/FreeRTOS software integration is maintained. The user has deferred
+boards; no physical probe, flashing, serial, waveform, power-loss or long-load
+qualification has been executed. Exact current evidence and known limits are in
+``docs/strategy/support-matrix.yaml`` and external examples validation records.
 
 :doc:`Platform guides → <platform_guides/index>`
 

@@ -14,7 +14,15 @@
 
 Runtime 不代表应用健康，不负责设备业务恢复或组件停止。MCU FreeRTOS scheduler 运行期间 shutdown 明确 BUSY，不承诺 kernel 全局 shutdown/restart。
 
-## 本次定向执行
+## 统一后的 HAL/MCU 生命周期
+
+当前 HAL 具有 OFFLINE/PARTIAL/READY 与独立 cleanup status。失败 init 保留原错误并真实 cleanup，失败 cleanup 继续被 Runtime 持有为 PARTIAL。common HAL 独占 token admission fence；只读 typed/provider/IRQ/DMA preflight 失败保持 READY，进入实际 mutating cleanup 后的任一错误保持 PARTIAL/fence。新 open/construct/register/IRQ-DMA 准入拒绝，原 owner 可 close/recover/settle，重试真实cleanup成功才恢复OFFLINE。
+
+Runtime 先 OSAL 后 HAL，仅 HAL 仍 READY 时尝试恢复 OSAL。idle baremetal/FreeRTOS调度前 MCU cleanup 实际结清 IRQ/DMA、vendor/timebase 与 clock binding，可再次 bootstrap；running/suspended MCU kernel 保持 BUSY。直接 SDK 用户先 quiesce 自己的资源；产品拥有 safe-output。ST peripheral bank reset 后重建窄 Board 初值不保证执行器电平连续。
+
+当前新源码的生产/faultmodel/ARM检查由 external source-pair delivery reports 绑定，不以本文历史 53 个检查作为新 lifecycle 通过证明。
+
+## 历史定向执行（统一前）
 
 2026-10-09 在工作树、Native Debug 配置下使用 CMake 4.4.4 / GNU 14.2.0 构建并执行以下范围，尚未绑定最终干净提交：
 

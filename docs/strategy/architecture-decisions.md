@@ -94,13 +94,31 @@ Arch saved PRIMASK 与 FreeRTOS BASEPRI/syscall 临界区不互换。调度前�
 
 ## ADR 012 固定官方依赖与可重定位源码包
 
-状态：采用；relocated fixture 已真实消费，strict clean 包待最终提交验证。
+状态：采用；历史5498b2b已完成严格clean包与真实relocated消费；后续源码必须重新绑定包与消费报告。
 
 CMSIS/ST HAL/FreeRTOS 等锁定真实 Gitlink，GD32 3.3.3 使用 reviewed official import 的下载/archive/逐文件摘要和许可证，不伪造 Gitcommit。ARM GNU14.3.rel1 archive hash 固定；配置和打包拒绝漂移/缺失/额外/symlink。
 
 `nexus_package_source_sdk()`/prepare script 导出源码、必要依赖、许可、relative CMakeConfig/Version。manifest binds source commit/tree、files/deps/import/toolchain、snapshot 和两个 export 摘要；验证不误取 consumer ancestor Git。find_package 要求精确版本，并可固定完整 source revision。
 
-发布默认拒 dirty/未知 source；development fixture 只有显式 opt-in 可消费，`publishable=false`。package prepare 与 consumer 重新编译真实 startup/linker；工具链外部提供。没有 installed binarySDK、签名分发或跨配置 ABI 承诺。真正 clean package、verify 与消费者矩阵在最终 commit 后完成。
+发布默认拒 dirty/未知 source；development fixture 只有显式 opt-in 可消费，`publishable=false`。package prepare 与 consumer 重新编译真实 startup/linker；工具链外部提供。没有 installed binarySDK、签名分发或跨配置 ABI 承诺。每个交付的 clean package、verify 与消费者矩阵在对应源码提交后完成并记录，不能继承旧包摘要。
+
+## ADR 013 目录、构建责任与 maintained 能力统一
+
+状态：采用；新源码的软件执行以 external pair 记录为准。
+
+SoC family owns controllers、clock/IRQ/system、Flash/identity、private 头、SDK source selection 和 linker sections，platforms 只 owns startup/lifecycle/object assembly。目录为 `soc/stm32f407`、`soc/gd32f470`、`soc/native`；Native 是虚拟主机模型。精确 VE/VG/ZG/F470ZG 料号、密度和 Board/layout 身份保持独立。统一 `nexus_forward_component_objects()` 转发显式 OBJECT targets，避免每个平台复制 target-property 装配逻辑，并保留 startup/registration/强 IRQ。
+
+Kconfig 可选平台只有 Native、F407VE/VG/ZG、F470ZG。不提供仅有壳/SDK的其他 STM32、GD32F407、ESP32、nRF52 选项；未实现 MCU ADC/DAC/timer/I2C/EXTI、虚假 VTOR/CCM/LL 开关不进入维护配置。UART DMA 显式 y 拒绝。STM SDK 编译7个必要基础 source与选中 UART/SPI，vendor DMA source 可能为 HAL 链接依赖，不表示 UART DMA 已可用；GD SDK 同样选择必要基础与 USART/SPI。完整固定 vendor import 的身份校验不因少编译几个 source 而省略。
+
+公开支持与被测源码的身份权威位于 external examples 的固定 gitlink/lock 和 source-pair validation reports。本库文档记录 contract/known limits 与 delivery status，历史快照明确保留原 source，避免自身 SHA 自递归。source/config 改变需要 fresh actual suite/consumer，candidate CI 不修改正式 dependency pin，不冒充产品 promotion。
+
+## ADR 014 分开只读拒绝与实际 cleanup 失败
+
+状态：采用；当前源码的软件故障回归单独验收。
+
+HAL 与 Runtime 显式 OFFLINE/PARTIAL/READY，失败 init 真实 cleanup 后保留 original 与 cleanup status。HAL 关闭取得独占 token fence，provider/IRQ/DMA 的只读 preflight 失败不改变 READY。实际 mutating cleanup 失败保留 fence 和 HALownership，禁止新open/construct/register/IRQ-DMA admission，原owner仍可settle/close/recover；cleanupretry成功才 OFFLINE。
+
+Runtime 先释放 OSAL 后 HAL，仅在 HAL 仍 READY 时尝试 OSALrestore，防止恢复到已停止 clock 的 PARTIAL平台。idle baremetal或FreeRTOS调度前MCU有真实时钟/IRQ/timebase/vendorcleanup与reinit；运行或suspendedkernel仍BUSY。直接SDK资源及产品safe-output由外部caller先停稳。ST peripheralbankreset会改变外设状态，重建窄Board初值不等于执行器电平连续性保证。Nexus不提供全kernel/产品热重启。
 
 ## 继续演进的前置条件
 

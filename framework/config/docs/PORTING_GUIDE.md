@@ -10,6 +10,6 @@ Config使用C11公共接口，不直接依赖MCU SDK。产品负责串行管理o
 6. 所有Config调用交给一个管理owner；ISR和控制任务通过队列传递请求。Flash擦写是否暂停取指或违约控制周期必须实测，任务隔离不消除芯片stall。
 7. 验证正常重启、所有erase/program/sync断电边界、坏CRC/密文、熵失败、空间耗尽、键删除、namespace同名隔离、轮换恢复以及真实Flash寿命。
 
-F407候选端口是`soc/stm32f407vg/flash.c`，保留sector10/11并把应用FLASH限制为768KiB。GD32尚未有真实Flashprovider；Native文件模型不能当作GD32或STM32硬件验证。
+F407真实端口是`soc/stm32f407/flash.c`，按VE/VG/ZG密度暴露完整物理Flash与8/12个非均匀sector。GD32F470真实端口是`soc/gd32f470/flash.c`，暴露1MiB与256个4KiB独立page。平台默认不预留storage；外部`NEXUS_FLASH_LAYOUT_FILE`明确选择region，产品打开typedregion并通过`Nexus::StorageHAL`绑定，须满足uniform完整eraseblock和权限/borrow契约。Native文件模型不能当作GD32或STM32硬件验证。
 
 [完整格式、移植合同及软件证据](../../../docs/implementation/storage-security.md)与[受维护密码provider](../../../services/security/README.md)是本轮实现依据。不能照搬旧OSAL mutex假实现或自制AES/随机数。
