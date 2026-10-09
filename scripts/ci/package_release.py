@@ -464,6 +464,157 @@ def validate_target_outputs(outputs, profile):
         raise ReleaseError("No target ELF platform contract found under build bin")
 
 
+# These six explicit targets compile real MCU code against source-owned fault
+# ports. They are Native test models, not the selected platform's production
+# configuration or ABI proof. Output directories alone cannot establish this.
+MCU_FIXTURE_ROOT = "tests/platform/mcu_lifecycle"
+MCU_SHARED_PRODUCTION_OUTPUTS = {
+    "hal/src/nx_hal.c": "hal/CMakeFiles/hal_support.dir/src/nx_hal.c.o",
+    "hal/src/nx_device.c": "hal/CMakeFiles/hal_core.dir/src/nx_device.c.o",
+    "runtime/src/nx_runtime.c": "runtime/CMakeFiles/nexus_runtime.dir/src/nx_runtime.c.o",
+}
+
+
+def mcu_fixture_specifications():
+    specifications = {}
+    for chip in ("stm32", "gd32"):
+        for backend in ("baremetal", "freertos"):
+            hook = ("platforms/stm32/src/boot/stm32_platform_init.c" if chip == "stm32"
+                    else "platforms/gd32f470/src/platform.c")
+            defines = {"NEXUS_PLATFORM_NATIVE=1", "NX_CONFIG_OSAL_" + backend.upper() + "=1"}
+            if chip == "stm32":
+                defines.update({"STM32F407xx=1", "NX_MODEL_STM32=1"})
+            specifications[f"mcu_lifecycle_{chip}_{backend}_tests"] = {
+                "sources": {MCU_FIXTURE_ROOT + "/test_platform.c", hook, *MCU_SHARED_PRODUCTION_OUTPUTS},
+                "defines": defines, "model_includes": [MCU_FIXTURE_ROOT + "/platform_model"],
+            }
+    specifications["mcu_register_stm32_tests"] = {
+        "sources": {MCU_FIXTURE_ROOT + "/test_registers_stm32.c", MCU_FIXTURE_ROOT + "/register_model/stm32/model.c",
+                    "soc/stm32f407/clock/stm32_clock_lifecycle.c",
+                    "soc/stm32f407/interrupt/stm32_resources_lifecycle.c", "soc/stm32f407/interrupt/stm32_isr_manager.c"},
+        "defines": {"STM32F407xx=1"},
+        "model_includes": [MCU_FIXTURE_ROOT + "/register_model/stm32", MCU_FIXTURE_ROOT + "/register_model/common"],
+    }
+    specifications["mcu_register_gd32_tests"] = {
+        "sources": {MCU_FIXTURE_ROOT + "/test_registers_gd32.c", MCU_FIXTURE_ROOT + "/register_model/gd32/model.c",
+                    "soc/gd32f470/clock.c", "soc/gd32f470/interrupt.c"},
+        "defines": set(),
+        "model_includes": [MCU_FIXTURE_ROOT + "/register_model/gd32", MCU_FIXTURE_ROOT + "/register_model/common"],
+    }
+    return specifications
+
+
+def compile_arguments(entry):
+    arguments = entry.get("arguments")
+    if arguments is None and isinstance(entry.get("command"), str):
+        arguments = shlex.split(entry["command"])
+    if not isinstance(arguments, list) or not arguments or not all(isinstance(arg, str) and arg for arg in arguments):
+        raise ReleaseError("Compile command database contains an invalid command")
+    return arguments
+
+
+def compile_output(entry):
+    """Read the actual -o action; JSON output is optional across CMake versions."""
+    arguments = compile_arguments(entry)
+    actions = [i for i, arg in enumerate(arguments) if arg == "-o"]
+    recorded = entry.get("output")
+    if recorded is not None and not isinstance(recorded, str):
+        raise ReleaseError("Compile command output identity is invalid")
+    if not actions and recorded is None:
+        return None
+    directory = Path(entry.get("directory", ""))
+    if len(actions) != 1 or actions[0] + 1 >= len(arguments) or not directory.is_absolute():
+        raise ReleaseError("Compile command lacks an unambiguous actual object output")
+    actual = Path(arguments[actions[0] + 1])
+    if ".." in actual.parts or ".." in directory.parts:
+        raise ReleaseError("Compile command object output path traversal is not allowed")
+    actual = actual if actual.is_absolute() else directory / actual
+    if recorded is not None:
+        recorded_path = Path(recorded)
+        if ".." in recorded_path.parts:
+            raise ReleaseError("Compile command recorded object path traversal is not allowed")
+        recorded_path = recorded_path if recorded_path.is_absolute() else directory / recorded_path
+        if actual != recorded_path:
+            raise ReleaseError("Compile command output differs from actual compiler action")
+    return actual
+
+
+def mcu_host_fixture_indices(commands, profile, generated_directory, source, *, require_local_sources):
+    """Admit only complete known fault targets with consistent actual -o/CU."""
+    if generated_directory is None:
+        return set()
+    build = Path(generated_directory).parent
+    specifications = mcu_fixture_specifications()
+    groups = {}
+    indices = set()
+    prefix = str(build / MCU_FIXTURE_ROOT / "CMakeFiles") + "/"
+    for index, entry in enumerate(commands):
+        actual_output_identity = compile_output(entry)
+        output = str(actual_output_identity) if actual_output_identity is not None else ""
+        if not output.startswith(prefix):
+            continue
+        suffix = output[len(prefix):]
+        target = suffix.split("/", 1)[0].removesuffix(".dir")
+        if target not in specifications:
+            continue
+        if profile["platform"] != "native":
+            raise ReleaseError("Native MCU host fixture cannot qualify an ARM release")
+        spec = specifications[target]
+        filename = Path(entry["file"])
+        directory = Path(entry.get("directory", ""))
+        if not filename.is_absolute():
+            filename = directory / filename
+        try:
+            relative = filename.relative_to(source).as_posix()
+        except ValueError as exc:
+            raise ReleaseError("MCU host fixture source is outside the recorded source tree") from exc
+        arguments = compile_arguments(entry)
+        object_tail = (relative[len(MCU_FIXTURE_ROOT) + 1:] if relative.startswith(MCU_FIXTURE_ROOT + "/")
+                       else "__/__/__/" + relative) + ".o"
+        expected_output = build / MCU_FIXTURE_ROOT / "CMakeFiles" / (target + ".dir") / object_tail
+        output_indices = [i for i, arg in enumerate(arguments) if arg == "-o"]
+        source_indices = [i for i, arg in enumerate(arguments) if arg == "-c"]
+        valid_actions = (len(output_indices) == len(source_indices) == 1 and
+                         output_indices[0] + 1 < len(arguments) and source_indices[0] + 1 < len(arguments))
+        if valid_actions:
+            actual_output = Path(arguments[output_indices[0] + 1])
+            actual_source = Path(arguments[source_indices[0] + 1])
+            actual_output = actual_output if actual_output.is_absolute() else directory / actual_output
+            actual_source = actual_source if actual_source.is_absolute() else directory / actual_source
+            valid_actions = actual_output == expected_output and actual_source == filename
+        includes = [arg[2:] for arg in arguments if arg.startswith("-I")]
+        expected_includes = [str(source / path) for path in spec["model_includes"]]
+        defines = {arg[2:] for arg in arguments if arg.startswith("-D")} - {"NDEBUG"}
+        compiler_index = 1 if Path(arguments[0]).name in ("ccache", "sccache", "distcc") else 0
+        host_compiler = (len(arguments) > compiler_index and
+                         re.fullmatch(r"(?:gcc|cc|clang)(?:-[0-9.]+)?", Path(arguments[compiler_index]).name))
+        forbidden = any(arg.startswith(("@", "-m", "--target", "-target")) or
+                        (arg.startswith("-o") and arg != "-o") or
+                        (arg.startswith("-U") and arg != "-UNDEBUG") for arg in arguments)
+        optimizations = [arg for arg in arguments if re.fullmatch(r"-O(?:[0-3sgz]|fast)?", arg)]
+        assertions = [arg for arg in arguments if arg in ("-DNDEBUG", "-UNDEBUG")]
+        if (directory != build or relative not in spec["sources"] or Path(output) != expected_output or
+                not valid_actions or not host_compiler or not optimizations or optimizations[-1] != "-O3" or
+                not assertions or assertions[-1] != "-UNDEBUG" or includes[:len(expected_includes)] != expected_includes or
+                str(generated_directory) in includes or defines != spec["defines"] or forbidden or
+                not {"-O3", "-DNDEBUG", "-UNDEBUG", "-Werror"}.issubset(arguments)):
+            raise ReleaseError("MCU host fixture target/source/fault-port compile context is inconsistent")
+        if require_local_sources:
+            checked_path(filename, source)
+        groups.setdefault(target, []).append(relative)
+        indices.add(index)
+    for target, sources in groups.items():
+        if len(sources) != len(set(sources)) or set(sources) != specifications[target]["sources"]:
+            raise ReleaseError("MCU host fixture lacks its complete declared harness/model/source inventory")
+    if groups:
+        for filename, object_tail in MCU_SHARED_PRODUCTION_OUTPUTS.items():
+            counterparts = [entry for i, entry in enumerate(commands) if i not in indices and
+                            entry["file"] == str(source / filename) and compile_output(entry) == build / object_tail]
+            if len(counterparts) != 1:
+                raise ReleaseError("MCU host fixture cannot replace its real shared production compile command")
+    return indices
+
+
 def validate_compile_commands(contents, profile, generated_directory=None, source=None,
                               *, require_local_sources=True):
     commands = json.loads(contents)
@@ -476,8 +627,13 @@ def validate_compile_commands(contents, profile, generated_directory=None, sourc
         raise ReleaseError("Compile commands contain an invalid recorded source root")
     owned_directories = {"hal", "osal", "framework", "services", "platforms", "boards",
                          "soc", "arch", "runtime"}
-    production = []
     for entry in commands:
+        if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
+            raise ReleaseError("Compile command database contains an invalid entry")
+    fixture_indices = mcu_host_fixture_indices(commands, profile, generated_directory, recorded_root,
+                                              require_local_sources=require_local_sources)
+    production = []
+    for index, entry in enumerate(commands):
         if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
             raise ReleaseError("Compile command database contains an invalid entry")
         filename = Path(entry["file"].replace("\\", "/"))
@@ -498,13 +654,25 @@ def validate_compile_commands(contents, profile, generated_directory=None, sourc
             continue
         if require_local_sources:
             checked_path(filename, recorded_root)
-        arguments = entry.get("arguments")
-        if arguments is None and isinstance(entry.get("command"), str):
-            arguments = shlex.split(entry["command"])
-        if not isinstance(arguments, list) or not all(isinstance(arg, str) for arg in arguments):
-            raise ReleaseError("Compile command database contains an invalid command")
+        if index in fixture_indices:
+            continue
+        arguments = compile_arguments(entry)
         if generated_directory is not None and f"-I{generated_directory}" not in arguments:
             raise ReleaseError("Production compile command does not consume its generated configuration")
+        actual_output_identity = compile_output(entry)
+        optimizations = [arg for arg in arguments if re.fullmatch(r"-O(?:[0-3sgz]|fast)?", arg)]
+        if not optimizations or optimizations[-1] != "-O3" or "-DNDEBUG" not in arguments:
+            raise ReleaseError("Production compile command does not retain Release optimization/NDEBUG flags")
+        output = str(actual_output_identity) if actual_output_identity is not None else ""
+        is_test_context = generated_directory is not None and output.startswith(str(Path(generated_directory).parent / "tests") + "/")
+        ndebug = []
+        for i, arg in enumerate(arguments):
+            if arg in ("-DNDEBUG", "-UNDEBUG"):
+                ndebug.append(arg)
+            elif arg in ("-U", "-D") and i + 1 < len(arguments) and arguments[i + 1] == "NDEBUG":
+                ndebug.append("-UNDEBUG" if arg == "-U" else "-DNDEBUG")
+        if not is_test_context and ndebug[-1] != "-DNDEBUG":
+            raise ReleaseError("Real production compile command undefines NDEBUG")
         if profile["platform"] != "native":
             required = {f"-mcpu={profile['cpu']}", "-mthumb", f"-mfpu={profile['fpu']}",
                         f"-mfloat-abi={profile['float_abi']}"}

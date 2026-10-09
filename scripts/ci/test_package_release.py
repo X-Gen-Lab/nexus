@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -160,7 +161,7 @@ class ReleaseTests(unittest.TestCase):
 
     def write_compile_commands(self, flags=()):
         value = [{"directory": str(self.build), "file": str(self.source / "runtime/main.c"),
-                  "arguments": ["gcc", f"-I{self.build / 'generated'}", *flags, "-c",
+                  "arguments": ["gcc", f"-I{self.build / 'generated'}", "-O3", "-DNDEBUG", *flags, "-c",
                                 str(self.source / "runtime/main.c")]}]
         (self.build / "compile_commands.json").write_text(json.dumps(value))
 
@@ -618,7 +619,7 @@ class ReleaseTests(unittest.TestCase):
         asset_pairs = re.findall(r"--expected (\S+)=([^\s\\]+)", workflow)
         self.assertEqual({preset: artifact for artifact, preset in asset_pairs}, expected)
         self.assertIn("if: ${{ !matrix.host_tests }}", workflow)
-        self.assertIn("python scripts/ci/validate_firmware_elf.py", workflow)
+        self.assertIn("python3 scripts/ci/validate_firmware_elf.py", workflow)
         self.assertIn("build/${{ matrix.preset }}/firmware-static-contract.json", workflow)
 
     def test_arm_config_toolchain_or_cpu_override_fails_closed(self):
@@ -670,7 +671,7 @@ class ReleaseTests(unittest.TestCase):
     def test_production_namespace_uses_only_first_component_below_recorded_root(self):
         root = Path("/not-present/osal/nexus")
         generated = root / "build/generated"
-        commands = [{"file": str(root / "hal/device.c"), "arguments": ["gcc", f"-I{generated}", "-c"]}]
+        commands = [{"file": str(root / "hal/device.c"), "arguments": ["gcc", f"-I{generated}", "-O3", "-DNDEBUG", "-c"]}]
         # The ancestor root itself also contains 'osal'. No substring can
         # establish component ownership relative to that root.
         commands.extend({"file": str(root / path), "arguments": ["gcc", "-c"]} for path in
@@ -684,7 +685,7 @@ class ReleaseTests(unittest.TestCase):
         generated = root / "build/generated"
         for path in ("tests/osal/freertos_runtime/wait_for_event.c", "tests/arch/model.c",
                      "ext/vendor/hal/driver.c", "build/runtime/fake.c", "fake.c"):
-            command = {"file": str(root / path), "arguments": ["gcc", f"-I{generated}", "-c"]}
+            command = {"file": str(root / path), "arguments": ["gcc", f"-I{generated}", "-O3", "-DNDEBUG", "-c"]}
             with self.subTest(path=path), self.assertRaisesRegex(release.ReleaseError, "no Nexus production"):
                 release.validate_compile_commands(json.dumps([command]), release.RELEASE_PROFILES[self.preset],
                                                   generated, root, require_local_sources=False)
@@ -694,7 +695,7 @@ class ReleaseTests(unittest.TestCase):
         directory.mkdir(); (directory / "device.c").write_text("int fixture;\n")
         generated = self.build / "generated"
         command = {"file": "device.c", "directory": str(directory),
-                   "arguments": ["gcc", f"-I{generated}", "-c"]}
+                   "arguments": ["gcc", f"-I{generated}", "-O3", "-DNDEBUG", "-c"]}
         release.validate_compile_commands(json.dumps([command]), release.RELEASE_PROFILES[self.preset], generated, self.source)
         for bad_directory in ("hal", str(self.source.parent / "other")):
             command["directory"] = bad_directory
@@ -709,7 +710,7 @@ class ReleaseTests(unittest.TestCase):
             with self.subTest(directory=directory), self.assertRaisesRegex(release.ReleaseError, "generated configuration"):
                 release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], generated, root,
                                                   require_local_sources=False)
-        commands = [{"file": str(root / "hal/source.c"), "arguments": ["gcc", f"-I{generated}", "-c"]}]
+        commands = [{"file": str(root / "hal/source.c"), "arguments": ["gcc", f"-I{generated}", "-O3", "-DNDEBUG", "-c"]}]
         for invalid_root in (None, Path("relative/root"), root / "../nexus"):
             with self.subTest(root=invalid_root), self.assertRaises(release.ReleaseError):
                 release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], generated, invalid_root,
@@ -1200,7 +1201,7 @@ class ReleaseTests(unittest.TestCase):
             file = self.source / directory / "source.c"; file.parent.mkdir(exist_ok=True); file.write_text("int fixture;\n")
             # Identity is already committed before packaging; only command verification is needed.
             for override in ("-mcpu=cortex-m7", "-mfpu=fpv5-d16", "-mfloat-abi=soft", "-marm", "@hidden.rsp"):
-                commands = [{"file": str(file), "arguments": ["arm-none-eabi-gcc", f"-I{self.build / 'generated'}",
+                commands = [{"file": str(file), "arguments": ["arm-none-eabi-gcc", f"-I{self.build / 'generated'}", "-O3", "-DNDEBUG",
                     "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard", override]}]
                 with self.subTest(directory=directory, override=override), self.assertRaisesRegex(release.ReleaseError, "ARM"):
                     release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], self.build / "generated", self.source)
@@ -1238,6 +1239,97 @@ class ReleaseTests(unittest.TestCase):
                      "actual compile database requires NEXUS_RELEASE_TEST_BUILD")
 class ActualReleaseCompileDatabaseTests(unittest.TestCase):
     """Read a real maintained build; no toy report substitutes for its commands."""
+
+    def test_actual_mcu_fault_context_and_production_tamper_boundaries(self):
+        build = Path(os.environ["NEXUS_RELEASE_TEST_BUILD"]).resolve()
+        preset = os.environ.get("NEXUS_RELEASE_TEST_PRESET", "linux-gcc-release")
+        profile = release.RELEASE_PROFILES[preset]
+        cache = release.cmake_cache(build / "CMakeCache.txt")
+        root = Path(cache["CMAKE_HOME_DIRECTORY"])
+        generated = build / "generated"
+        database = json.loads((build / "compile_commands.json").read_text())
+        if profile["platform"] != "native":
+            self.assertEqual(release.mcu_host_fixture_indices(database, profile, generated, root,
+                                                             require_local_sources=True), set())
+            return
+        indices = release.mcu_host_fixture_indices(database, profile, generated, root,
+                                                   require_local_sources=True)
+        self.assertEqual(len(indices), 29) # 21 real owned CUs plus 8 harness/model CUs.
+        self.assertEqual(len({e["output"].split("/CMakeFiles/")[1].split("/", 1)[0]
+                              for i, e in enumerate(database) if i in indices}), 6)
+        # CMake versions may omit the optional JSON output property. Actual
+        # -o actions still prove every target, including production counterparts.
+        without_output = [{key: value for key, value in entry.items() if key != "output"} for entry in database]
+        self.assertEqual(release.mcu_host_fixture_indices(without_output, profile, generated, root,
+                                                         require_local_sources=True), indices)
+        release.validate_compile_commands(json.dumps(without_output), profile, generated, root)
+        relative_output = json.loads(json.dumps(database))
+        for entry in relative_output:
+            if "output" in entry:
+                entry["output"] = str(Path(entry["output"]).relative_to(Path(entry["directory"])))
+        self.assertEqual(release.mcu_host_fixture_indices(relative_output, profile, generated, root,
+                                                         require_local_sources=True), indices)
+        release.validate_compile_commands(json.dumps(relative_output), profile, generated, root)
+        release.validate_compile_commands(json.dumps(database), profile, generated, root,
+                                          require_local_sources=False)
+        fixture = next(i for i in indices if database[i]["file"] == str(root / "hal/src/nx_hal.c"))
+        production = next(i for i, e in enumerate(database) if e.get("output") ==
+                          str(build / release.MCU_SHARED_PRODUCTION_OUTPUTS["hal/src/nx_hal.c"]))
+
+        def altered(index, operation):
+            result = json.loads(json.dumps(database))
+            entry = result[index]
+            entry["arguments"] = entry.get("arguments") or shlex.split(entry.pop("command"))
+            operation(entry)
+            return result
+
+        def reject(name, database_value, selected=profile):
+            with self.subTest(case=name), self.assertRaises(release.ReleaseError):
+                release.validate_compile_commands(json.dumps(database_value), selected, generated, root)
+
+        changes = {
+            "wrong target source": lambda e: e.update(file=str(root / "hal/src/nx_device_gpio.c")),
+            "output-only relocation": lambda e: e.update(output=e["output"].replace("mcu_lifecycle_", "unreviewed_")),
+            "missing fault port": lambda e: e["arguments"].remove("-I" + str(root / release.MCU_FIXTURE_ROOT / "platform_model")),
+            "fake plus real generated": lambda e: e["arguments"].append("-I" + str(generated)),
+            "missing explicit Native model": lambda e: e["arguments"].remove("-DNEXUS_PLATFORM_NATIVE=1"),
+            "conflicting backend": lambda e: e["arguments"].append("-DNX_CONFIG_OSAL_FREERTOS=1"),
+            "undefines model marker": lambda e: e["arguments"].append("-UNEXUS_PLATFORM_NATIVE"),
+            "foreign effective config": lambda e: e["arguments"].append("-DNEXUS_EFFECTIVE_CONFIG=1"),
+            "response flag indirection": lambda e: e["arguments"].append("@unchecked.rsp"),
+            "ARM flags in Native model": lambda e: e["arguments"].append("-mcpu=cortex-m4"),
+            "cross compiler in Native model": lambda e: e["arguments"].__setitem__(0, "arm-none-eabi-gcc"),
+            "ambiguous object action": lambda e: e["arguments"].extend(["-o", e["output"]]),
+            "model optimization overridden": lambda e: e["arguments"].append("-O0"),
+            "model assertions disabled": lambda e: e["arguments"].append("-DNDEBUG"),
+            "model cross-target compiler override": lambda e: (e["arguments"].__setitem__(0, "clang"),
+                                                                e["arguments"].append("--target=arm-none-eabi")),
+            "model split target override": lambda e: e["arguments"].extend(["-target", "arm-none-eabi"]),
+            "model host ABI width override": lambda e: e["arguments"].append("-m32"),
+        }
+        for name, operation in changes.items():
+            reject(name, altered(fixture, operation))
+        harness = next(i for i in indices if database[i]["file"] == str(root / release.MCU_FIXTURE_ROOT / "test_platform.c"))
+        reject("incomplete target harness", [e for i, e in enumerate(database) if i != harness])
+        reject("duplicate fixture source", database + [database[fixture]])
+        reject("missing true shared production counterpart", [e for i, e in enumerate(database) if i != production])
+        reject("models cannot provide production proof", [e for i, e in enumerate(database) if i in indices])
+        reject("Native fixture never supplies ARM ABI proof", database, release.RELEASE_PROFILES["stm32-armgcc-release"])
+        real_changes = {
+            "real production generated removed": lambda e: e["arguments"].remove("-I" + str(generated)),
+            "real production optimization removed": lambda e: e["arguments"].remove("-O3"),
+            "real production optimization overridden": lambda e: e["arguments"].append("-O0"),
+            "real production default optimization overridden": lambda e: e["arguments"].append("-O"),
+            "real production NDEBUG removed": lambda e: e["arguments"].remove("-DNDEBUG"),
+            "real production NDEBUG undefined": lambda e: e["arguments"].append("-UNDEBUG"),
+            "real production NDEBUG split undefined": lambda e: e["arguments"].extend(["-U", "NDEBUG"]),
+            "real production merely moved into tests": lambda e: e.update(output=database[fixture]["output"]),
+        }
+        for name, operation in real_changes.items():
+            reject(name, altered(production, operation))
+        forged = json.loads(json.dumps(database))
+        forged[production] = json.loads(json.dumps(database[fixture]))
+        reject("real production replaced by complete fixture command", forged)
 
     def test_actual_effective_build_and_compile_database(self):
         build = Path(os.environ["NEXUS_RELEASE_TEST_BUILD"]).resolve()
