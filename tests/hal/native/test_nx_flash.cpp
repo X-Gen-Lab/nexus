@@ -21,7 +21,7 @@ extern "C" {
 #include "hal/interface/nx_flash.h"
 #include "hal/nx_factory.h"
 #include "devices/native_flash_helpers.h"
-#include "../../../platforms/native/src/flash/nx_flash_helpers.h"
+#include "../../../soc/native/controllers/flash/nx_flash_helpers.h"
 void flash_init_lifecycle(nx_lifecycle_t*);
 }
 

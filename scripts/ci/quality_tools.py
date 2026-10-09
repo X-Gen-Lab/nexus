@@ -19,9 +19,9 @@ OWNED = {"arch", "runtime", "hal", "osal", "framework", "services", "platforms",
 # Native database. Their translation units include the actual production .c;
 # selecting the explicit model preserves its real defines and include order.
 HOST_MODELS = {
-    "tests/drivers/gd32f470/test_uart.c": "platforms/gd32f470/src/uart.c",
-    "tests/drivers/gd32f470/test_spi.c": "platforms/gd32f470/src/spi.c",
-    "tests/drivers/gd32f470/test_timebase.c": "soc/gd32f470zg/interrupt.c",
+    "tests/drivers/gd32f470/test_uart.c": "soc/gd32f470/controllers/uart.c",
+    "tests/drivers/gd32f470/test_spi.c": "soc/gd32f470/controllers/spi.c",
+    "tests/drivers/gd32f470/test_timebase.c": "soc/gd32f470/interrupt.c",
 }
 
 # Required portable-C correctness profile. Advisory exclusions and their

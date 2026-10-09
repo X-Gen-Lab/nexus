@@ -10,7 +10,7 @@ foreach(driver uart spi timebase typed_spi)
     target_include_directories(${target} PRIVATE fake
         "${nexus_root}/hal/include" "${nexus_root}/arch/include"
         "${nexus_root}/boards/gd32f470_liangshan"
-        "${nexus_root}/platforms/gd32f470/include")
+        "${nexus_root}/soc/gd32f470/include")
     target_compile_features(${target} PRIVATE c_std_11)
     if(driver STREQUAL "typed_spi")
         target_sources(${target} PRIVATE "${nexus_root}/hal/src/nx_device.c"
@@ -30,11 +30,11 @@ foreach(driver uart spi timebase typed_spi)
         LABELS "driver;host-fake;gd32;contract" TIMEOUT 10)
 endforeach()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    add_executable(test_driver_gd32_flash test_flash.c "${nexus_root}/soc/gd32f470zg/flash.c"
-        "${nexus_root}/soc/gd32f470zg/identity.c")
+    add_executable(test_driver_gd32_flash test_flash.c "${nexus_root}/soc/gd32f470/flash.c"
+        "${nexus_root}/soc/gd32f470/identity.c")
     target_include_directories(test_driver_gd32_flash PRIVATE fake/flash fake
-        "${nexus_root}/soc/gd32f470zg" "${nexus_root}/arch/include"
-        "${nexus_root}/hal/include" "${nexus_root}/platforms/gd32f470/include")
+        "${nexus_root}/soc/gd32f470" "${nexus_root}/arch/include"
+        "${nexus_root}/hal/include" "${nexus_root}/soc/gd32f470/include")
     target_compile_definitions(test_driver_gd32_flash PRIVATE NEXUS_PLATFORM_NATIVE)
     target_compile_features(test_driver_gd32_flash PRIVATE c_std_11)
     if(TARGET nexus_build_options)

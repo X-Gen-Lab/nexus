@@ -9,8 +9,8 @@
  */
 
 #include "native_usb_helpers.h"
-#include "../../../../platforms/native/src/usb/nx_usb_helpers.h"
-#include "../../../../platforms/native/src/usb/nx_usb_types.h"
+#include "../../../../soc/native/controllers/usb/nx_usb_helpers.h"
+#include "../../../../soc/native/controllers/usb/nx_usb_types.h"
 #include "hal/nx_factory.h"
 #include <string.h>
 

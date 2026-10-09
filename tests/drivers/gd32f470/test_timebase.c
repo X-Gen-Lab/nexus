@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 // NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production fault fixture; retain private factory/state checks.
-#include "../../../soc/gd32f470zg/interrupt.c"
+#include "../../../soc/gd32f470/interrupt.c"
 int main(void){
     int initialized=nx_gd32f470_timebase_init();
     assert(initialized==0&&fake_timer_config.prescaler==99&&fake_timer_config.period==UINT32_MAX);

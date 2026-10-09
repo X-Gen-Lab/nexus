@@ -1,7 +1,7 @@
 /** Explicit Native I2C fixtures. Observation never completes async work. */
 #include "native_i2c_helpers.h"
 #include "hal/nx_factory.h"
-#include "../../../../platforms/native/src/i2c/nx_i2c_helpers.h"
+#include "../../../../soc/native/controllers/i2c/nx_i2c_helpers.h"
 #include <limits.h>
 #include <string.h>
 #define NX_I2C_MAX_INSTANCES 8

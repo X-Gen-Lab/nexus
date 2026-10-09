@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 // NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production fault fixture; retain private factory/state checks.
-#include "../../../platforms/gd32f470/src/uart.c"
+#include "../../../soc/gd32f470/controllers/uart.c"
 uint32_t nx_gd32f470_millis(void){return fake_millis;}
 uint64_t nx_gd32f470_timestamp_us(void){return (uint64_t)fake_millis*1000u+123u;}
 static void irq(uint32_t flags){fake_uart_flags=flags;if(flags&USART_STAT0_TC)fake_uart_shift=false;fake_isr=1;USART0_IRQHandler();fake_isr=0;}

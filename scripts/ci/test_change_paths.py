@@ -105,9 +105,9 @@ class ChangePathsTests(unittest.TestCase):
         paths = (
             "hal/src/nx_hal.c", "osal/adapters/baremetal/osal_baremetal.c",
             "framework/config/src/config.c", "services/storage/src/storage.c",
-            "platforms/stm32/src/hal/spi/stm32_spi_sync.c",
+            "soc/stm32f407/controllers/spi/stm32_spi_sync.c",
             "runtime/src/nx_runtime.c", "runtime/src/nx_platform_info.c",
-            "arch/cortex_m/interrupt.c", "soc/stm32f407vg/flash.c",
+            "arch/cortex_m/interrupt.c", "soc/stm32f407/flash.c",
             "boards/stm32f4discovery/spi.c", "runtime/support-matrix.json",
             "runtime/contracts/manifest.json", "runtime/contracts/src/main.c",
         )
@@ -120,7 +120,7 @@ class ChangePathsTests(unittest.TestCase):
         paths = (
             "CMakeLists.txt", "CMakePresets.json", "CMakeUserPresets.json",
             "runtime/contracts/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
-            "platforms/stm32/linker/stm32f4/gcc/stm32f407.ld",
+            "soc/stm32f407/linker/stm32f407.ld",
             "Kconfig", "runtime/Kconfig", "platforms/native/Kconfig.platform",
             "configs/stm32f407_freertos_defconfig", ".config", ".config.product",
             "runtime/contracts/.config.board", "runtime/contracts/minimal_defconfig",

@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/watchdog/nx_watchdog_types.h"
+#include "../../../../soc/native/controllers/watchdog/nx_watchdog_types.h"
 
 #include <string.h>
 

@@ -60,6 +60,17 @@ class EffectiveConfigTests(unittest.TestCase):
         self.assertIn('Unknown configuration symbol', result.stderr)
         self.assertFalse((self.work / 'nexus_config.h').exists())
 
+    def test_unmaintained_platforms_and_silicon_cannot_select_a_fallback(self):
+        for symbol in ('PLATFORM_ESP32', 'PLATFORM_NRF52', 'PLATFORM_GD32',
+                       'STM32H7', 'STM32L4', 'STM32F429', 'STM32_I2C_ENABLE',
+                       'STM32_ADC_ENABLE', 'STM32_TIMER_ENABLE'):
+            with self.subTest(symbol=symbol):
+                self.fragment.write_text('CONFIG_PLATFORM_STM32=y\nCONFIG_' + symbol + '=y\n')
+                result = self.generate('--set', 'TOOLCHAIN_ARM_GCC=y')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('Unknown configuration symbol CONFIG_' + symbol, result.stderr)
+                self.assertFalse((self.work / 'nexus_config.h').exists())
+
     def test_choice_conflict_is_not_silently_coerced(self):
         self.fragment.write_text('CONFIG_PLATFORM_NATIVE=y\nCONFIG_PLATFORM_STM32=y\n')
         self.assertIn('cannot be honored', self.generate().stderr)

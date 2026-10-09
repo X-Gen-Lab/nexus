@@ -24,9 +24,9 @@ class ChipConfiguration(unittest.TestCase):
             (root/'nexus_config.h').write_text('\n'.join(f'#define {name} {value}' for name,value in values.items())+'\n')
             executable=root/'chip-validator'
             command=[compiler,'-std=c11','-Wall','-Wextra','-Werror','-UNDEBUG',
-                '-DSTM32F4','-DSTM32F407xx','-I'+str(root),'-I'+str(ROOT/'platforms/stm32/include'),
+                '-DSTM32F4','-DSTM32F407xx','-I'+str(root),'-I'+str(ROOT/'soc/stm32f407/private'),
                 str(ROOT/'tests/drivers/test_stm32_chip_config.c'),
-                str(ROOT/'platforms/stm32/src/system/stm32_chip_validation.c'),'-o',str(executable)]
+                str(ROOT/'soc/stm32f407/system/stm32_chip_validation.c'),'-o',str(executable)]
             result=subprocess.run(command,text=True,capture_output=True)
             if valid:
                 self.assertEqual(result.returncode,0,result.stderr)

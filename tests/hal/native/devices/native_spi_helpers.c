@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/spi/nx_spi_helpers.h"
+#include "../../../../soc/native/controllers/spi/nx_spi_helpers.h"
 
 #include <string.h>
 

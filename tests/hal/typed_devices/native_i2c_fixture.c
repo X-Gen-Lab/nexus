@@ -1,7 +1,7 @@
 /** Test-only addressed response and latency injection. Never linked in Firmware. */
 #include "hal/base/nx_device.h"
 #include "hal/provider/nx_device_provider.h"
-#include "../../../platforms/native/src/i2c/nx_i2c_helpers.h"
+#include "../../../soc/native/controllers/i2c/nx_i2c_helpers.h"
 #include <string.h>
 nx_status_t typed_i2c_response(nx_device_ref_t ref, uint8_t address, const uint8_t* data, size_t len) {
     if (!data || !len || len > NATIVE_I2C_PAYLOAD_CAPACITY || address > 127) return NX_ERR_INVALID_PARAM;

@@ -51,7 +51,7 @@ endif()
 set(NEXUS_TEST_INCLUDES
     ${NEXUS_SOURCE_DIR}/hal/include
     ${NEXUS_SOURCE_DIR}/osal/include
-    ${NEXUS_SOURCE_DIR}/platforms/native/include
+    ${NEXUS_SOURCE_DIR}/soc/native/private
     ${NEXUS_SOURCE_DIR}/framework/log/include
     ${NEXUS_SOURCE_DIR}/framework/shell/include
     ${NEXUS_SOURCE_DIR}/framework/config/include

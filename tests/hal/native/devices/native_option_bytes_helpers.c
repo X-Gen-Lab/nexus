@@ -9,7 +9,7 @@
  */
 
 #include "native_option_bytes_helpers.h"
-#include "../../../../platforms/native/src/option_bytes/nx_option_bytes_types.h"
+#include "../../../../soc/native/controllers/option_bytes/nx_option_bytes_types.h"
 #include "hal/nx_factory.h"
 #include <string.h>
 

@@ -25,10 +25,10 @@
 
 /* Shutdown must use production lifecycle methods, never test fixtures. */
 #include "hal/base/nx_device.h"
-#include "../gpio/nx_gpio_types.h"
-#include "../uart/nx_uart_types.h"
-#include "../spi/nx_spi_types.h"
-#include "../i2c/nx_i2c_types.h"
+#include "gpio/nx_gpio_types.h"
+#include "uart/nx_uart_types.h"
+#include "spi/nx_spi_types.h"
+#include "i2c/nx_i2c_types.h"
 #include <stdio.h>
 #include <string.h>
 static void* cached_api(const char* name) {

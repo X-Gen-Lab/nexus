@@ -1,0 +1,4 @@
+# Per-pin declarations feed the generated registration traversal.
+menu "STM32F407 GPIO Pins"
+rsource "Kconfig_gpio_stm32f4"
+endmenu

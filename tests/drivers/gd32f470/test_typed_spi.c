@@ -7,9 +7,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../../soc/gd32f470zg/interrupt.c"
+#include "../../../soc/gd32f470/interrupt.c"
 #include "../../../platforms/gd32f470/src/platform.c"
-#include "../../../platforms/gd32f470/src/spi.c"
+#include "../../../soc/gd32f470/controllers/spi.c"
 
 uint32_t SystemCoreClock = 200000000u;
 static int clock_result;

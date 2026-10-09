@@ -1,0 +1,27 @@
+# GD32F470 silicon owns clocks, interrupt/timebase, memory and controllers.
+add_library(soc_gd32f470_interface INTERFACE)
+target_include_directories(soc_gd32f470_interface INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(soc_gd32f470_interface INTERFACE hal_interface)
+add_subdirectory(sdk)
+add_library(soc_gd32f470 OBJECT clock.c interrupt.c identity.c flash.c)
+target_include_directories(soc_gd32f470 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(soc_gd32f470 PRIVATE
+    soc_gd32f470_interface sdk_gd32f4xx Nexus::HALProviders hal_support osal nexus_arch)
+if(NEXUS_OSAL_BACKEND STREQUAL "freertos")
+    target_link_libraries(soc_gd32f470 PRIVATE freertos_kernel freertos_config)
+endif()
+
+set(component_objects soc_gd32f470)
+foreach(controller gpio uart spi)
+    string(TOUPPER "${controller}" symbol)
+    if(CONFIG_GD32_${symbol}_ENABLE)
+        set(controller_target "controller_gd32f470_${controller}")
+        add_library(${controller_target} OBJECT "controllers/${controller}.c")
+        target_include_directories(${controller_target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        target_link_libraries(${controller_target} PRIVATE
+            sdk_gd32f4xx Nexus::HALProviders hal_support osal nexus_arch "${NEXUS_BOARD_TARGET}")
+        list(APPEND component_objects ${controller_target})
+    endif()
+endforeach()
+set(NEXUS_SOC_COMPONENT_OBJECTS "${component_objects}" PARENT_SCOPE)
+set(NEXUS_SOC_STARTUP_SOURCE "${NEXUS_SOC_STARTUP_SOURCE}" PARENT_SCOPE)

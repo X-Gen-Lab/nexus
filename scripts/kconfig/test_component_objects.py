@@ -47,7 +47,7 @@ class PlatformObjectAssemblyTests(unittest.TestCase):
                 '    mask |= *(const unsigned *)(begin + i * sizeof(unsigned));\n'
                 '  return mask == 7 && Reset_Handler() == 42 ? 0 : 1;\n'
                 '}\n')
-            helper = ROOT / 'platforms/stm32/cmake/NexusComponentObjects.cmake'
+            helper = ROOT / 'cmake/modules/NexusComponentObjects.cmake'
             (source / 'CMakeLists.txt').write_text(
                 'cmake_minimum_required(VERSION 3.21)\n'
                 'project(assembly_contract C)\n'
@@ -59,7 +59,7 @@ class PlatformObjectAssemblyTests(unittest.TestCase):
                 'add_library(platform OBJECT startup.c)\n'
                 'target_link_libraries(platform PRIVATE sdk)\n'
                 f'include("{helper.as_posix()}")\n'
-                'nexus_stm32_forward_components(platform soc controller board)\n'
+                'nexus_forward_component_objects(platform soc controller board)\n'
                 'add_executable(firmware main.c)\n'
                 'target_link_libraries(firmware PRIVATE platform)\n'
                 # The former nested SOURCES design must demonstrably lose the

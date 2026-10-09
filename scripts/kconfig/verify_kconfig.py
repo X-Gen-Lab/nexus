@@ -100,7 +100,7 @@ def check_native_kconfig():
     missing_peripherals = []
 
     for peripheral in peripherals:
-        source_line = f'source "platforms/native/src/{peripheral}/Kconfig"'
+        source_line = f'source "soc/native/controllers/{peripheral}/Kconfig"'
         if source_line not in content:
             missing_peripherals.append(peripheral)
 
@@ -114,7 +114,7 @@ def check_native_kconfig():
 
 def check_peripheral_kconfig(peripheral):
     """Check individual peripheral Kconfig file."""
-    filepath = f"platforms/native/src/{peripheral}/Kconfig"
+    filepath = f"soc/native/controllers/{peripheral}/Kconfig"
 
     if not check_file_exists(filepath):
         print_warning(f"{filepath} does not exist (may not be implemented yet)")

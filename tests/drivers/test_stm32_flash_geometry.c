@@ -1,6 +1,6 @@
 /** Physical geometry regression independent of driver/vendor registers. */
 #include "flash_geometry.h"
-#include "../../soc/gd32f470zg/flash_geometry.h"
+#include "../../soc/gd32f470/flash_geometry.h"
 #include <assert.h>
 #include <stdio.h>
 static const uint32_t sizes[]={16384,16384,16384,16384,65536,

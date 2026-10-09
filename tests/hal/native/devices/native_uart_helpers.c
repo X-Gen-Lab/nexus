@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/uart/nx_uart_types.h"
+#include "../../../../soc/native/controllers/uart/nx_uart_types.h"
 
 #include <string.h>
 

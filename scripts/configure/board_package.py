@@ -270,7 +270,7 @@ def emit(directory, manifest, soc, identity, active, layout, sdk_root):
             script += f'__nexus_region_{region["name"]}_start = 0x{0x08000000 + region["offset"]:08x};\n__nexus_region_{region["name"]}_end = 0x{0x08000000 + region["offset"] + region["size"]:08x};\n'
         if not stm32:
             script += '_sp = _estack;\nEXTERN(nx_device_descriptor_bytes)\n'
-        sections = 'platforms/stm32/linker/stm32f4/gcc/stm32f407_sections.ld' if stm32 else 'platforms/gd32f470/linker/gd32f470_sections.ld'
+        sections = 'soc/stm32f407/linker/stm32f407_sections.ld' if stm32 else 'soc/gd32f470/linker/gd32f470_sections.ld'
         script += f'INCLUDE "{(Path(sdk_root) / sections).as_posix()}"\n'
         write_if_changed(out / 'firmware.ld', script)
         cmake.extend([f'set(NEXUS_GENERATED_LINKER_SCRIPT "{(out / "firmware.ld").as_posix()}")', f'set(NEXUS_LAYOUT_SHA256 {layout["sha256"]})'])

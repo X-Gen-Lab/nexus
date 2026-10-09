@@ -13,6 +13,6 @@ if(CONFIG_STM32_UART_ENABLE)
 endif()
 add_library(board_stm32f407ve_sky_qingchun_wiring OBJECT ${board_sources})
 target_include_directories(board_stm32f407ve_sky_qingchun_wiring PRIVATE
-    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/uart")
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/uart")
 target_link_libraries(board_stm32f407ve_sky_qingchun_wiring PRIVATE
     board_stm32f407ve_sky_qingchun sdk_stm32f4 Nexus::HALProviders)

@@ -604,9 +604,9 @@ def board_package_module():
 
 
 def linker_sections(profile):
-    return ("platforms/stm32/linker/stm32f4/gcc/stm32f407_sections.ld"
+    return ("soc/stm32f407/linker/stm32f407_sections.ld"
             if profile["platform"] == "stm32" else
-            "platforms/gd32f470/linker/gd32f470_sections.ld")
+            "soc/gd32f470/linker/gd32f470_sections.ld")
 
 
 def validate_board_bundle(config, profile, read, sdk_root, generated_directory):

@@ -21,13 +21,13 @@ nexus_discover_tests(typed_device_contract_tests PROPERTIES TIMEOUT 10 LABELS "h
 add_executable(typed_stm32_gpio_registration
     test_stm32_gpio_registration.c "${NEXUS_SOURCE_DIR}/hal/src/nx_device.c"
     "${NEXUS_SOURCE_DIR}/hal/src/nx_device_gpio.c"
-    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_device.c"
-    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_lifecycle.c"
-    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_power.c"
-    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio/stm32_gpio_ops.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/gpio/stm32_gpio_device.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/gpio/stm32_gpio_lifecycle.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/gpio/stm32_gpio_power.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/gpio/stm32_gpio_ops.c")
 target_include_directories(typed_stm32_gpio_registration PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake"
-    "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/gpio")
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/gpio")
 target_compile_definitions(typed_stm32_gpio_registration PRIVATE STM32F4 NEXUS_PLATFORM_NATIVE)
 target_link_libraries(typed_stm32_gpio_registration PRIVATE hal_provider_interface nexus_arch)
 if(MSVC)

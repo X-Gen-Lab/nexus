@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/timer/nx_timer_types.h"
+#include "../../../../soc/native/controllers/timer/nx_timer_types.h"
 
 #include <string.h>
 

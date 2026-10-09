@@ -12,7 +12,7 @@ endif()
 set(STM32_SPI_SOURCES
     stm32_spi_device.c stm32_spi_sync.c stm32_spi_async.c
     stm32_spi_dma.c stm32_spi_lifecycle.c stm32_spi_power.c)
-list(TRANSFORM STM32_SPI_SOURCES PREPEND "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/spi/")
+list(TRANSFORM STM32_SPI_SOURCES PREPEND "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/spi/")
 foreach(mode bare osal)
     add_executable(test_driver_stm32_spi_${mode} test_stm32_spi.c ${STM32_SPI_SOURCES})
     target_include_directories(test_driver_stm32_spi_${mode} PRIVATE
@@ -20,7 +20,7 @@ foreach(mode bare osal)
         "${NEXUS_DRIVER_ROOT}/hal/include"
         "${NEXUS_DRIVER_ROOT}/arch/include"
         "${NEXUS_DRIVER_ROOT}/osal/include"
-        "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/spi")
+        "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/spi")
     target_compile_definitions(test_driver_stm32_spi_${mode} PRIVATE STM32F4xx)
     if(mode STREQUAL "osal")
         target_compile_definitions(test_driver_stm32_spi_${mode} PRIVATE NX_CONFIG_STM32_SPI_USE_OSAL=1)
@@ -36,12 +36,12 @@ foreach(mode bare osal)
     set_tests_properties(driver_stm32_spi_${mode} PROPERTIES LABELS "driver;host-fake;contract")
 endforeach()
 add_executable(test_driver_stm32_gpio test_stm32_gpio.c
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_lifecycle.c"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_power.c"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_ops.c")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_lifecycle.c"
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_power.c"
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_ops.c")
 target_include_directories(test_driver_stm32_gpio PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake" "${NEXUS_DRIVER_ROOT}/hal/include"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio")
 target_compile_definitions(test_driver_stm32_gpio PRIVATE STM32F4)
 if(TARGET nexus_build_options)
     target_link_libraries(test_driver_stm32_gpio PRIVATE nexus_build_options)
@@ -53,13 +53,13 @@ add_test(NAME driver_stm32_gpio COMMAND test_driver_stm32_gpio)
 set_tests_properties(driver_stm32_gpio PROPERTIES LABELS "driver;host-fake;contract")
 
 file(GLOB STM32_UART_SOURCES CONFIGURE_DEPENDS
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/uart/*.c")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/uart/*.c")
 add_executable(test_driver_stm32_uart test_stm32_uart.c ${STM32_UART_SOURCES})
 target_include_directories(test_driver_stm32_uart PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake/uart" "${CMAKE_CURRENT_SOURCE_DIR}/fake"
     "${NEXUS_DRIVER_ROOT}/hal/include" "${NEXUS_DRIVER_ROOT}/osal/include"
     "${NEXUS_DRIVER_ROOT}/arch/include"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/uart")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/uart")
 target_compile_definitions(test_driver_stm32_uart PRIVATE STM32F4xx NEXUS_PLATFORM_NATIVE)
 if(TARGET nexus_build_options)
     target_link_libraries(test_driver_stm32_uart PRIVATE nexus_build_options)
@@ -72,11 +72,11 @@ add_test(NAME driver_stm32_uart COMMAND test_driver_stm32_uart)
 set_tests_properties(driver_stm32_uart PROPERTIES LABELS "driver;host-fake;contract")
 
 add_executable(test_driver_stm32_uart_clock test_stm32_uart_clock.c
-    "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg/stm32_uart_clock.c")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/stm32_uart_clock.c")
 target_include_directories(test_driver_stm32_uart_clock PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake" "${NEXUS_DRIVER_ROOT}/hal/include"
     "${NEXUS_DRIVER_ROOT}/arch/include"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/uart")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/uart")
 target_compile_definitions(test_driver_stm32_uart_clock PRIVATE
     NEXUS_PLATFORM_NATIVE NEXUS_TEST_UART_CLOCK)
 if(TARGET nexus_build_options)
@@ -94,7 +94,7 @@ if(TARGET nexus_build_options)
     target_link_libraries(test_driver_stm32_flash_geometry PRIVATE nexus_build_options)
 endif()
 target_include_directories(test_driver_stm32_flash_geometry PRIVATE
-    "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg" "${NEXUS_DRIVER_ROOT}/hal/include")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407" "${NEXUS_DRIVER_ROOT}/hal/include")
 target_compile_features(test_driver_stm32_flash_geometry PRIVATE c_std_11)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(test_driver_stm32_flash_geometry PRIVATE -Wall -Wextra -Werror -UNDEBUG)
@@ -106,14 +106,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
     foreach(variant 512k 1m mismatched)
         set(target "test_driver_stm32_flash_${variant}")
         add_executable(${target} test_stm32_flash_port.c
-            "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg/flash.c")
+            "${NEXUS_DRIVER_ROOT}/soc/stm32f407/flash.c")
         if(TARGET nexus_build_options)
             target_link_libraries(${target} PRIVATE nexus_build_options)
         endif()
         target_include_directories(${target} PRIVATE
             "${CMAKE_CURRENT_SOURCE_DIR}/fake/flash" "${CMAKE_CURRENT_SOURCE_DIR}/fake" "${NEXUS_DRIVER_ROOT}/hal/include"
             "${NEXUS_DRIVER_ROOT}/arch/include" "${NEXUS_DRIVER_ROOT}/osal/include"
-            "${NEXUS_DRIVER_ROOT}/soc/stm32f407vg")
+            "${NEXUS_DRIVER_ROOT}/soc/stm32f407")
         if(variant STREQUAL "1m")
             target_compile_definitions(${target} PRIVATE NX_CONFIG_STM32_FLASH_SIZE=0x100000)
         else()
@@ -134,22 +134,22 @@ endif()
 
 # Production regressions with real SDK IRQ enums and host-only NVIC substitutes.
 add_executable(test_driver_stm32_isr_manager test_stm32_isr_manager.c
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/interrupt/stm32_isr_manager.c")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/interrupt/stm32_isr_manager.c")
 target_include_directories(test_driver_stm32_isr_manager PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake/interrupt" "${CMAKE_CURRENT_SOURCE_DIR}/fake"
-    "${NEXUS_DRIVER_ROOT}/hal/include" "${NEXUS_DRIVER_ROOT}/platforms/stm32/private")
+    "${NEXUS_DRIVER_ROOT}/hal/include" "${NEXUS_DRIVER_ROOT}/soc/stm32f407/private")
 target_include_directories(test_driver_stm32_isr_manager SYSTEM PRIVATE
     "${NEXUS_DRIVER_ROOT}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_DRIVER_ROOT}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
 target_compile_definitions(test_driver_stm32_isr_manager PRIVATE STM32F407xx STM32F4)
 add_executable(test_driver_stm32_gpio_config test_stm32_gpio_config.c
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_device.c"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_lifecycle.c"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_power.c"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_ops.c")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_device.c"
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_lifecycle.c"
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_power.c"
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio/stm32_gpio_ops.c")
 target_include_directories(test_driver_stm32_gpio_config PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/fake/gpio_config" "${NEXUS_DRIVER_ROOT}/hal/include"
-    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio")
+    "${NEXUS_DRIVER_ROOT}/soc/stm32f407/controllers/gpio")
 target_compile_definitions(test_driver_stm32_gpio_config PRIVATE STM32F4 NEXUS_PLATFORM_NATIVE)
 foreach(target test_driver_stm32_isr_manager test_driver_stm32_gpio_config)
     if(TARGET nexus_build_options)

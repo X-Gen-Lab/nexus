@@ -79,9 +79,9 @@ class RequiredAnalysisTests(unittest.TestCase):
     def test_explicit_production_host_models_retain_actual_compilation_scope(self):
         modeled = []
         for fixture, production in (
-            ('tests/drivers/gd32f470/test_uart.c', 'platforms/gd32f470/src/uart.c'),
-            ('tests/drivers/gd32f470/test_spi.c', 'platforms/gd32f470/src/spi.c'),
-            ('tests/drivers/gd32f470/test_timebase.c', 'soc/gd32f470zg/interrupt.c'),
+            ('tests/drivers/gd32f470/test_uart.c', 'soc/gd32f470/controllers/uart.c'),
+            ('tests/drivers/gd32f470/test_spi.c', 'soc/gd32f470/controllers/spi.c'),
+            ('tests/drivers/gd32f470/test_timebase.c', 'soc/gd32f470/interrupt.c'),
         ):
             source = self.root / production
             source.parent.mkdir(parents=True, exist_ok=True)
@@ -97,7 +97,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(len(selected), 4)
         self.assertEqual([entry['file'] for entry in selected[1:]], list(map(str, modeled)))
         self.assertTrue(all(entry['nexus_analysis_scope'] == 'host-model' for entry in selected[1:]))
-        self.assertEqual(selected[1]['nexus_production_source'], 'platforms/gd32f470/src/uart.c')
+        self.assertEqual(selected[1]['nexus_production_source'], 'soc/gd32f470/controllers/uart.c')
         self.assertEqual(run('tidy', self.root, self.build, self.tool(0), self.report), 0)
         self.assertIn('"kind": "host-model"', self.report.read_text())
         self.assertIn('do not establish ARM execution', self.report.read_text())

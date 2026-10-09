@@ -12,8 +12,8 @@ endif()
 if(board_wiring_sources)
     add_library(board_stm32f4discovery_wiring OBJECT ${board_wiring_sources})
     target_include_directories(board_stm32f4discovery_wiring PRIVATE
-        "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/spi"
-        "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/uart")
+        "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/spi"
+        "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/uart")
     target_link_libraries(board_stm32f4discovery_wiring PRIVATE
         board_stm32f4discovery sdk_stm32f4 Nexus::HALProviders osal)
 else()

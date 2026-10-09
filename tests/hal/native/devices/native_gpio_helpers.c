@@ -12,8 +12,8 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/gpio/nx_gpio_types.h"
-#include "../../../../platforms/native/src/gpio/nx_gpio_helpers.h"
+#include "../../../../soc/native/controllers/gpio/nx_gpio_types.h"
+#include "../../../../soc/native/controllers/gpio/nx_gpio_helpers.h"
 
 #include <string.h>
 

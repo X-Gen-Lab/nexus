@@ -6,7 +6,7 @@ foreach(board stm32f407_qiming_v31 stm32f407ve_sky_qingchun)
         "${CMAKE_CURRENT_SOURCE_DIR}/fake"
         "${NEXUS_SOURCE_DIR}/boards/${board}"
         "${NEXUS_SOURCE_DIR}/hal/include"
-        "${NEXUS_SOURCE_DIR}/platforms/stm32/src/hal/uart")
+        "${NEXUS_SOURCE_DIR}/soc/stm32f407/controllers/uart")
     if(board STREQUAL "stm32f407_qiming_v31")
         target_compile_definitions(test_board_${board} PRIVATE TEST_QIMING_BOARD=1)
     endif()
