@@ -3,6 +3,9 @@
 if(NOT CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     return() # Cortex vendor weak/register models are GNU/Clang-only fixtures.
 endif()
+
+# Keep instrumentation separate from Nexus::Config's generated header directory,
+# configuration macros and CPU ABI; each model uses its isolated fake config.
 foreach(chip stm32 gd32)
     foreach(backend baremetal freertos)
         set(target "mcu_lifecycle_${chip}_${backend}_tests")
@@ -15,6 +18,9 @@ foreach(chip stm32 gd32)
             "${NEXUS_SOURCE_DIR}/hal/src/nx_hal.c"
             "${NEXUS_SOURCE_DIR}/hal/src/nx_device.c"
             "${NEXUS_SOURCE_DIR}/runtime/src/nx_runtime.c")
+        if(TARGET nexus_instrumentation_options)
+            target_link_libraries(${target} PRIVATE nexus_instrumentation_options)
+        endif()
         target_include_directories(${target} PRIVATE platform_model
             "${NEXUS_SOURCE_DIR}/hal/include" "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/osal/include" "${NEXUS_SOURCE_DIR}/runtime/include"
@@ -67,6 +73,9 @@ target_include_directories(mcu_register_gd32_tests PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/gd32f470/include"
     "${NEXUS_SOURCE_DIR}/hal/include" "${NEXUS_SOURCE_DIR}/arch/include")
 foreach(chip stm32 gd32)
+    if(TARGET nexus_instrumentation_options)
+        target_link_libraries(mcu_register_${chip}_tests PRIVATE nexus_instrumentation_options)
+    endif()
     target_compile_features(mcu_register_${chip}_tests PRIVATE c_std_11)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(mcu_register_${chip}_tests PRIVATE -Wall -Wextra -Werror -UNDEBUG)
