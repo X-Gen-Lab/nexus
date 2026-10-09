@@ -42,6 +42,7 @@
  */
 
 #include "system/stm32_chip_validation.h"
+#include "nexus_config.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -76,13 +77,34 @@
 
 /* Verify memory configuration is defined */
 #ifndef NX_CONFIG_STM32_FLASH_SIZE
-#define NX_CONFIG_STM32_FLASH_SIZE 0x80000 /* Default 512KB */
-#warning "Flash size not configured. Using default 512KB."
+#error "STM32 physical Flash size must come from the effective configuration"
 #endif
 
 #ifndef NX_CONFIG_STM32_SRAM_SIZE
-#define NX_CONFIG_STM32_SRAM_SIZE 0x20000 /* Default 128KB */
-#warning "SRAM size not configured. Using default 128KB."
+#error "STM32 total physical SRAM size must come from the effective configuration"
+#endif
+
+#if defined(STM32F407xx)
+/* F407 has 128KiB main SRAM plus 64KiB CCM. The linker may allocate less
+ * main SRAM; it must not redefine the physical chip total as its own budget. */
+#if NX_CONFIG_STM32_SRAM_SIZE != (192U * 1024U)
+#error "STM32F407 physical SRAM is 128KiB main plus 64KiB CCM"
+#endif
+#if !defined(NX_CONFIG_LINKER_RAM_SIZE) || NX_CONFIG_LINKER_RAM_SIZE == 0 || \
+    NX_CONFIG_LINKER_RAM_SIZE > (128U * 1024U)
+#error "STM32F407 main RAM linker allocation must be within the physical 128KiB"
+#endif
+#if defined(NX_CONFIG_STM32F407VE)
+#if NX_CONFIG_STM32_FLASH_SIZE != (512U * 1024U)
+#error "STM32F407VE requires its physical 512KiB Flash density"
+#endif
+#elif defined(NX_CONFIG_STM32F407VG) || defined(NX_CONFIG_STM32F407ZG)
+#if NX_CONFIG_STM32_FLASH_SIZE != (1024U * 1024U)
+#error "STM32F407VG/ZG requires its physical 1MiB Flash density"
+#endif
+#else
+#error "The effective configuration must select the exact STM32F407VE/VG/ZG part"
+#endif
 #endif
 
 /*---------------------------------------------------------------------------*/
