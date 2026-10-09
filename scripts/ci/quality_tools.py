@@ -110,7 +110,7 @@ def compiler_query(entry: dict) -> tuple[list[str], list[str]]:
 def imported_macro(name: str) -> bool:
     # Import compiler identity, target and ABI object macros only. Project
     # definitions stay in their actual database entry, not in a global union.
-    return bool(re.fullmatch(r"__(?:GNUC(?:_MINOR|_PATCHLEVEL)?|GNUG|GXX_ABI_VERSION|clang(?:_major|_minor|_patchlevel)?|llvm|VERSION|STDC(?:_VERSION|_HOSTED|_NO_ATOMICS|_NO_THREADS|_NO_VLA|_NO_COMPLEX)?|cplusplus|STRICT_ANSI|CHAR_BIT|CHAR_UNSIGNED|SIZE_TYPE|SIZE_MAX|PTRDIFF_TYPE|PTRDIFF_MAX|INTPTR_TYPE|UINTPTR_TYPE|BYTE_ORDER)__", name) or
+    return bool(re.fullmatch(r"__(?:GNUC(?:_MINOR|_PATCHLEVEL)?|GNUG|GXX_ABI_VERSION|clang(?:_major|_minor|_patchlevel)?|llvm|VERSION|STDC(?:_VERSION|_HOSTED|_NO_ATOMICS|_NO_THREADS|_NO_VLA|_NO_COMPLEX)?|cplusplus|STRICT_ANSI|CHAR_BIT|CHAR_UNSIGNED|SIZE_TYPE|SIZE_MAX|PTRDIFF_TYPE|PTRDIFF_MAX|INTPTR_TYPE|INTPTR_MAX|UINTPTR_TYPE|UINTPTR_MAX|BYTE_ORDER)__", name) or
                 re.match(r"__(?:SIZEOF_|ALIGNOF_|ORDER_|WCHAR_|WINT_|SCHAR_|SHRT_|INT(?:_|\d|_FAST|_LEAST)|UINT(?:_|\d|_FAST|_LEAST)|LONG_|LONG_LONG_|GCC_ATOMIC_|SSE|AVX|MMX|FMA|AES|PCLMUL|SHA|ARM_|arm|thumb|aarch64|x86|i[3-6]86|amd64|riscv|mips|sparc|powerpc|ppc|PPC|s390|wasm|AVR|MSP430|VFP_|SOFTFP|APCS_|linux|unix|APPLE|MACH|CYGWIN|MINGW|FreeBSD|NetBSD)", name) or
                 name in {"_WIN32", "_WIN64", "__cplusplus", "__GXX_ABI_VERSION", "__LP64__", "_LP64", "__ILP32__", "_ILP32", "__LLP64__", "__OPTIMIZE__", "__OPTIMIZE_SIZE__", "__NO_INLINE__", "__FINITE_MATH_ONLY__"})
 
@@ -150,6 +150,40 @@ def predefines(entry: dict, output) -> list[str]:
             definitions[name] = "" if value is None else value
     if not definitions or not any(name in definitions for name in ("__GNUC__", "__clang__")):
         raise ValueError("compiler identity/ABI predefined scope is empty")
+    # Cppcheck does not necessarily load the compiler's system stdint.h. Query
+    # the same real target/language context for its public pointer limit macros;
+    # never infer their values from a host width or disable the source checks.
+    output.write("Compiler stdint invocation: " + json.dumps(query_argv) + "\n")
+    output.write("Compiler stdint input: " + json.dumps("#include <stdint.h>\n") + "\n")
+    output.flush()
+    standard = subprocess.run(query_argv, cwd=entry["directory"],
+                              input=b"#include <stdint.h>\n",
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              timeout=30)
+    output.write("Compiler stdint query exit code: " + str(standard.returncode) + "\n")
+    if standard.stderr:
+        output.write("Compiler stdint query diagnostic: " + standard.stderr.decode("utf-8", errors="replace") + "\n")
+    if standard.returncode != 0 or not standard.stdout.strip():
+        raise ValueError("compiler stdint ABI query failed or empty")
+    output.write("Compiler stdint output SHA256: " + hashlib.sha256(standard.stdout).hexdigest() + "\n")
+    standard_limits = {}
+    for line in standard.stdout.decode("utf-8", errors="strict").splitlines():
+        match = re.fullmatch(r"#define\s+(INTPTR_MAX|UINTPTR_MAX)\s+(.*)", line)
+        if match:
+            name, value = match.groups()
+            if name in standard_limits or not value.strip():
+                raise ValueError("invalid compiler stdint pointer limit")
+            standard_limits[name] = value
+    if set(standard_limits) != {"INTPTR_MAX", "UINTPTR_MAX"}:
+        raise ValueError("compiler stdint pointer limit scope is incomplete")
+    for value in standard_limits.values():
+        # An alias such as __UINTPTR_MAX__ must resolve to another observed ABI
+        # object macro. Undefined identifiers must not become zero in analysis.
+        identifiers = re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", value)
+        if any(name not in definitions and name not in standard_limits
+               for name in identifiers):
+            raise ValueError("compiler stdint pointer limit has an unobserved dependency")
+    definitions.update(standard_limits)
     output.write("Imported object predefines: " + json.dumps(definitions, sort_keys=True) + "\n")
     output.write(f"Function-like predefines not injected: {function_macros}\n")
     output.flush()

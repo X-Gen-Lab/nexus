@@ -121,7 +121,7 @@ class RequiredAnalysisTests(unittest.TestCase):
     def compiler(self, name="fixture-gcc", identity="17", failure=0, empty=False):
         path = self.root / name
         log = self.root / (name + ".queries.jsonl")
-        lines = "" if empty else f"#define __GNUC__ {identity}\n#define __SIZEOF_POINTER__ {{size}}\n#define {{target_macro}} 1\n#define __INT32_C(x) x\n#define PROJECT_ONLY 123\n"
+        lines = "" if empty else f"#define __GNUC__ {identity}\n#define __SIZEOF_POINTER__ {{size}}\n#define {{target_macro}} 1\n#define __INTPTR_MAX__ {{signed_max}}\n#define __UINTPTR_MAX__ {{unsigned_max}}\n#define __INT32_C(x) x\n#define PROJECT_ONLY 123\n"
         path.write_text(
             f"#!{sys.executable}\nimport json, sys\n"
             f"with open({str(log)!r}, 'a') as log: log.write(json.dumps(sys.argv[1:]) + '\\n')\n"
@@ -129,10 +129,15 @@ class RequiredAnalysisTests(unittest.TestCase):
             f"if {failure}: sys.exit({failure})\n"
             "assert '-E' in sys.argv and '-dM' in sys.argv and sys.argv[-1] == '-'\n"
             "assert '-c' not in sys.argv and '-o' not in sys.argv\n"
+            "query_input = sys.stdin.read()\n"
             "arm = '--target=arm-fixture' in sys.argv\n"
             "size = '4' if arm else '8'\n"
+            "signed_max = '2147483647' if arm else '9223372036854775807L'\n"
+            "unsigned_max = '4294967295U' if arm else '18446744073709551615UL'\n"
             "target_macro = '__arm__' if arm else '__x86_64__'\n"
-            f"print({lines!r}.format(size=size, target_macro=target_macro), end='')\n")
+            f"print({lines!r}.format(size=size, target_macro=target_macro, signed_max=signed_max, unsigned_max=unsigned_max), end='')\n"
+            "if '#include <stdint.h>' in query_input:\n"
+            " print('#define INTPTR_MAX __INTPTR_MAX__\\n#define UINTPTR_MAX __UINTPTR_MAX__')\n")
         path.chmod(0o700)
         return str(path), log
 
@@ -163,14 +168,43 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertIn("-D__GNUC__=17", analyzed[0])
         self.assertIn("-D__arm__=1", analyzed[0])
         self.assertIn("-D__SIZEOF_POINTER__=4", analyzed[0])
+        self.assertIn("-D__UINTPTR_MAX__=4294967295U", analyzed[0])
+        self.assertIn("-D__INTPTR_MAX__=2147483647", analyzed[0])
+        self.assertIn("-DUINTPTR_MAX=__UINTPTR_MAX__", analyzed[0])
+        self.assertIn("-DINTPTR_MAX=__INTPTR_MAX__", analyzed[0])
         self.assertNotIn("-D__x86_64__=1", analyzed[0])
         self.assertIn("-D__GNUC__=23", analyzed[1])
         self.assertIn("-D__SIZEOF_POINTER__=8", analyzed[1])
+        self.assertIn("-D__UINTPTR_MAX__=18446744073709551615UL", analyzed[1])
+        self.assertIn("-D__INTPTR_MAX__=9223372036854775807L", analyzed[1])
         self.assertNotIn("-D__arm__=1", analyzed[1])
         query = json.loads(first_log.read_text().splitlines()[-1])
         self.assertIn("-mabi=ilp32", query)
         self.assertIn("--target=arm-fixture", query)
         self.assertIn("Compiler predefined output SHA256:", self.report.read_text())
+        self.assertIn("Compiler stdint output SHA256:", self.report.read_text())
+
+    def test_missing_standard_pointer_limits_fail_before_analysis(self):
+        driver, _ = self.compiler()
+        path = Path(driver)
+        path.write_text(path.read_text().replace("if '#include <stdint.h>' in query_input:", "if False:"))
+        entries = [{"directory": str(self.root), "file": str(self.source),
+                    "arguments": [driver, "-c", str(self.source)]}]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertFalse(self.analyzer_log.exists())
+        self.assertIn("compiler stdint pointer limit scope is incomplete", self.report.read_text())
+
+    def test_unobserved_pointer_limit_dependency_fails_before_analysis(self):
+        driver, _ = self.compiler()
+        path = Path(driver)
+        path.write_text(path.read_text().replace("UINTPTR_MAX __UINTPTR_MAX__", "UINTPTR_MAX UNKNOWN_ABI_LIMIT"))
+        entries = [{"directory": str(self.root), "file": str(self.source),
+                    "arguments": [driver, "-c", str(self.source)]}]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 1)
+        self.assertFalse(self.analyzer_log.exists())
+        self.assertIn("unobserved dependency", self.report.read_text())
 
     def test_command_string_with_spaces_uses_argv_without_shell(self):
         driver, log = self.compiler()
