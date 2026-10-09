@@ -24,3 +24,9 @@ Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算�
 实板接入后优先复核安全输出、clock/reset、UART TC/cancel/RX loss、SPI/I2C、Flash
 掉电、watchdog、EXTI/PWM/ADC，再测 cycles/latency/high-water 与长期负载。私有
 产品策略、现场部署、密钥与制造许可由外部工程承接。
+
+实施台账的 `implemented` 记录代码与工具已经落入源码；
+`qualification_record_authority` 表示实际验收由该源码 HEAD 的外部交付证据决定。
+它不在源码中自报 passed。正式执行写入 `nexus-delivery/<HEAD>/`，候选的
+`candidate.json`、六类 qualification 和原始报告一起给出最终状态。
+这样提交后的验收能绑定准确 HEAD，后续文档提交也不能继承旧资格。

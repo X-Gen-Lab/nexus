@@ -1,26 +1,26 @@
-name: Industrial product requirement
-description: Define an acceptance condition linked to a product, board and verification evidence.
+name: Reusable platform requirement
+description: Define a common mechanism and its observable software or hardware acceptance.
 title: '[Requirement] '
 body:
   - type: input
     id: identity
     attributes:
-      label: Requirement and backlog IDs
-      description: Use a NEX-REQ-nnn and the applicable BAS/HAL/OS/BSP/HIL/CFG/APP/SEC/REL/PROD backlog IDs.
+      label: Requirement or NG task
+      description: Link the current 33-task ledger or an exact new mechanism requirement.
     validations:
       required: true
   - type: textarea
     id: behavior
     attributes:
-      label: Trigger and observable result
-      description: Describe the device behavior, failure state and how the product acceptance will be measured.
+      label: Trigger and resulting behavior
+      description: Include failure state and explain why the mechanism belongs in the common platform. Product policy stays external.
     validations:
       required: true
   - type: textarea
     id: target
     attributes:
-      label: Exact product and target identity
-      description: Product, board revision, SoC/capacity, RTOS/toolchain, interfaces, memory/timing budgets. Mark unresolved inputs explicitly.
+      label: Exact target and bounded mode
+      description: Full SoC part, Board and observed PCB revision, backend, compiler, assembly, ownership, storage, deadlines and resource budgets. Mark unknown facts.
     validations:
       required: true
   - type: dropdown
@@ -33,12 +33,12 @@ body:
   - type: textarea
     id: evidence
     attributes:
-      label: Verification plan and evidence identity
-      description: Separate host/model tests, actual HIL, fault recovery and manufacturing. Link source/config/image digests and reports when executed.
+      label: Applicable verification and identity
+      description: Separate actual host/model tests, ARM linkage/resources, sealed software and physical HIL. Link source/config/artifact and raw reports when executed.
     validations:
       required: true
   - type: textarea
     id: risk
     attributes:
-      label: Persistent data, safety state, security and release impact
-      description: Identify contract/format changes, rollback and recoverability, ADR and product review needs.
+      label: Contract and external consumer impact
+      description: Identify borrowed storage, cancellation/drain, persistence or startup changes and required external migration or recovery.

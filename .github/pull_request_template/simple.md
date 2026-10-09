@@ -1,45 +1,10 @@
-<!-- 
-简化版 PR 模板
-适用于小型更改、文档更新、样式修复等
--->
+## Result
 
-## 📝 Description
-<!-- 简要描述此 PR 的变更 -->
+Describe the small concrete change and its reason.
 
+## Validation
 
+State the relevant check actually executed and any practical limit. Formatting or
+documentation edits do not need tests that merely repeat their implementation.
 
-## 🔗 Related Issues
-- Fixes #
-- Related to #
-
-## 🎯 Type of Change
-- [ ] 🐛 Bug fix
-- [ ] ✨ New feature
-- [ ] 📚 Documentation
-- [ ] 🎨 Style/Format
-- [ ] ♻️ Refactoring
-
-## 📋 Changes
-<!-- 列出主要更改 -->
-
-- 
-- 
-
-## 🧪 Testing
-- [ ] Tests pass
-- [ ] Manually tested
-
-## ✅ Checklist
-- [ ] Code formatted
-- [ ] Self-reviewed
-- [ ] Documentation updated
-- [ ] CHANGELOG updated
-
-## 💬 Notes
-<!-- 任何额外说明 -->
-
-
-
----
-
-**感谢您的贡献！** 🎉
+Link an issue or requirement when applicable.

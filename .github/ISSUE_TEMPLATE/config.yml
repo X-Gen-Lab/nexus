@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Platform architecture and maintenance plan
-    url: https://github.com/X-Gen-Lab/nexus/tree/main/docs/strategy
-    about: Read scope, architectural decisions and acceptance criteria before opening a requirement.
+  - name: Current platform contracts and delivery
+    url: https://github.com/X-Gen-Lab/nexus/tree/main/docs/delivery
+    about: Review current implementation scope and software versus physical qualification.
   - name: Security advisory
     url: https://github.com/X-Gen-Lab/nexus/security/advisories/new
-    about: Use the private advisory channel for sensitive vulnerability details; do not include credentials in public issues.
+    about: Use private advisories for sensitive vulnerability details.
