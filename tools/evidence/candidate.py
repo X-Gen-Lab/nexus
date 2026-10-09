@@ -22,19 +22,26 @@ REQUIRED_SCOPES = frozenset({"host_contracts", "arm_link", "resource_budget",
                            "source_sdk", "reproducibility", "hil_tooling"})
 
 
-def collect_identities(value, *, identity_verifier=verify_file_identity) -> list[dict]:
+def collect_identities(value, *, identity_verifier=verify_file_identity,
+                       allow_unbound=False) -> list[dict]:
     """Preserve every referenced raw/artifact byte, not only summary JSON."""
     found = []
     if isinstance(value, dict):
         if {"path", "sha256", "size"}.issubset(value):
+            # An unbound fixture slot declares no file; its containing bytes are sealed.
+            if allow_unbound and set(value) == {"path", "sha256", "size"} and all(
+                    value[key] is None for key in ("path", "sha256", "size")):
+                return []
             identity_verifier(value)
             found.append(value)
         else:
             for child in value.values():
-                found.extend(collect_identities(child, identity_verifier=identity_verifier))
+                found.extend(collect_identities(child, identity_verifier=identity_verifier,
+                                                allow_unbound=allow_unbound))
     elif isinstance(value, list):
         for child in value:
-            found.extend(collect_identities(child, identity_verifier=identity_verifier))
+            found.extend(collect_identities(child, identity_verifier=identity_verifier,
+                                            allow_unbound=allow_unbound))
     return found
 
 
@@ -63,7 +70,10 @@ def collect_evidence_closure(identities: list[dict], *, resolver=None) -> list[d
             if path.suffix == ".json":
                 raise
             continue
-        pending.extend(collect_identities(value, identity_verifier=resolver or verify_file_identity))
+        unbound_station = (isinstance(value, dict) and value.get("kind") == "hil_station"
+                           and "station_id" in value and value["station_id"] is None)
+        pending.extend(collect_identities(value, identity_verifier=resolver or verify_file_identity,
+                                          allow_unbound=unbound_station))
     return result
 
 

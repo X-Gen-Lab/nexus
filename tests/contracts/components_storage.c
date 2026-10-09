@@ -184,10 +184,14 @@ int main(int argc, char** argv) {
     CHECK(original_cwd >= 0);
     char directory[] = "/tmp/nexus-storage-XXXXXX";
     CHECK(mkdtemp(directory) != NULL);
+    int private_directory =
+        open(directory, O_RDONLY | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW);
+    CHECK(private_directory >= 0);
     struct stat info;
-    CHECK(stat(directory, &info) == 0 && S_ISDIR(info.st_mode));
+    CHECK(fstat(private_directory, &info) == 0 && S_ISDIR(info.st_mode));
     CHECK((info.st_mode & 0777) == 0700 && info.st_uid == geteuid());
-    CHECK(chdir(directory) == 0);
+    /* Validate and enter the same pinned inode; no pathname re-resolution. */
+    CHECK(fchdir(private_directory) == 0);
     power_loss_matrix();
     geometry_errors();
     aliased_port_reopen();
@@ -197,6 +201,7 @@ int main(int argc, char** argv) {
     CHECK(fchdir(original_cwd) == 0);
     CHECK(close(original_cwd) == 0);
     CHECK(rmdir(directory) == 0);
+    CHECK(close(private_directory) == 0);
     puts("storage geometry, corruption, exhausted capacity, erase/program "
          "failures and cross-process persistence passed");
     return 0;

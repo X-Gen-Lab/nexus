@@ -9,9 +9,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.evidence.candidate import (REQUIRED_SCOPES, seal, validate_manifest,
-    validate_qualification, verify)
-from tools.evidence.common import EvidenceError, atomic_json, file_identity
+from tools.evidence.candidate import (REQUIRED_SCOPES, collect_evidence_closure,
+    collect_identities, seal, validate_manifest, validate_qualification, verify)
+from tools.evidence.common import EvidenceError, atomic_json, file_identity, load_json
 from tools.evidence.identity import git_source
 from tools.evidence.qualification import create_qualification
 from tools.evidence.reproduce import run_logged
@@ -76,6 +76,57 @@ class CandidateGateTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             create_qualification("host_contracts", self.source, resolved, elf,
                                  [{"name": "failed_actual_command", **execution}])
+
+    def test_unbound_fixture_slots_preserve_bytes_and_actual_references(self):
+        artifact = self.root / "probe.cfg"
+        artifact.write_text("actual fixture configuration\n")
+        fixture = self.root / "station.template.json"
+        atomic_json(fixture, {"kind": "hil_station", "station_id": None, "tool": {
+            "path": None, "sha256": None, "size": None},
+            "bound_configuration": file_identity(artifact)})
+        closure = collect_evidence_closure([file_identity(fixture)])
+        self.assertEqual({item["sha256"] for item in closure},
+                         {file_identity(fixture)["sha256"], file_identity(artifact)["sha256"]})
+        with self.assertRaises(EvidenceError):
+            collect_identities({"path": None, "sha256": None, "size": None})
+        with self.assertRaises(EvidenceError):
+            collect_identities({"path": str(artifact), "sha256": None, "size": None})
+        original = load_json(fixture)
+        for changed in [{**original, "kind": "execution_context"},
+                        {**original, "station_id": "declared-station"},
+                        {**original, "tool": {"path": str(artifact), "sha256": None,
+                                               "size": None}}]:
+            atomic_json(fixture, changed)
+            with self.assertRaises(EvidenceError):
+                collect_evidence_closure([file_identity(fixture)])
+        atomic_json(fixture, original)
+        manifest, elf, resolved = self.prepared()
+        with self.assertRaises(EvidenceError):
+            create_qualification("hil_tooling", self.source, resolved, elf, [{
+                "name": "unbound_raw", "exit_code": 0,
+                "raw": {"path": None, "sha256": None, "size": None}}])
+        with self.assertRaises(EvidenceError):
+            create_qualification("hil_tooling", self.source, resolved, elf, [{
+                **self.checks[0], "artifacts": [{"path": None, "sha256": None, "size": None}]}])
+        identity = next(item for item in manifest["qualifications"]
+                        if "hil_tooling" in item["path"])
+        report_path = Path(identity["path"])
+        report = load_json(report_path)
+        report["evidence"] = [file_identity(fixture)]
+        atomic_json(report_path, report)
+        manifest["qualifications"] = [file_identity(report_path) if item == identity else item
+                                      for item in manifest["qualifications"]]
+        path = self.root / "manifest.json"
+        atomic_json(path, manifest)
+        # Scope trust is tested separately; this model tests fixture byte preservation.
+        with patch("tools.evidence.candidate.verify_environment", return_value={}), \
+                patch("tools.evidence.candidate.validate_scope_proof", return_value=([], None)):
+            sealed = seal(path, self.root / "sealed")
+        self.assertEqual(sealed["physical_status"], "not_executed")
+        self.assertIn(file_identity(fixture)["sha256"],
+                      {item["sha256"] for item in sealed["payloads"]})
+        with patch("tools.evidence.candidate.validate_scope_proof", return_value=([], None)):
+            verify(self.root / "sealed/candidate.json")
 
     def test_missing_qualification_blocks_seal(self):
         manifest, _, _ = self.prepared()
