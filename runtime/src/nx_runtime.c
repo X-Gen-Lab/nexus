@@ -2,6 +2,7 @@
 #include "hal/nx_hal.h"
 #include "hal/base/nx_device.h"
 #include "osal/osal.h"
+#include "arch/nx_arch.h"
 
 static bool ready;
 static bool hal_owned;
@@ -56,7 +57,10 @@ static void complete_report(nx_boot_report_t* output, nx_boot_report_t report) {
 nx_status_t nx_runtime_bootstrap(nx_boot_report_t* output) {
     nx_boot_report_t report = initial_report();
     nx_status_t status = NX_OK;
-    if (osal_is_isr()) { status = NX_ERR_INVALID_STATE; goto done; }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        status = NX_ERR_INVALID_STATE;
+        goto done;
+    }
     if (ready) { report.stage = NX_BOOT_STAGE_READY; goto done; }
     if (hal_owned || osal_owned) { status = NX_ERR_INVALID_STATE; goto done; }
     if (nx_hal_is_initialized() || osal_is_initialized()) {
@@ -87,7 +91,10 @@ done:
 nx_status_t nx_runtime_shutdown(nx_boot_report_t* output) {
     nx_boot_report_t report = initial_report();
     nx_status_t status = NX_OK;
-    if (osal_is_isr()) { status = NX_ERR_INVALID_STATE; goto done; }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        status = NX_ERR_INVALID_STATE;
+        goto done;
+    }
     if (!hal_owned && !osal_owned) { goto done; }
     status = nx_device_shutdown_check();
     if (status != NX_OK) {

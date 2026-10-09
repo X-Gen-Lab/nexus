@@ -13,6 +13,7 @@
  */
 
 #include "hal/nx_hal.h"
+#include "arch/nx_arch.h"
 #include <stdbool.h>
 
 /*---------------------------------------------------------------------------*/
@@ -118,6 +119,14 @@ nx_status_t nx_platform_deinit(void) {
 nx_status_t nx_hal_init(void) {
     nx_status_t status;
 
+    /* Platform clock/failure deadlines require interrupt progress. */
+    if (nx_arch_in_isr()) {
+        return NX_ERR_CONTEXT;
+    }
+    if (nx_arch_irq_is_masked()) {
+        return NX_ERR_INVALID_STATE;
+    }
+
     /* Check if already initialized */
     if (hal_initialized) {
         return NX_OK;
@@ -148,6 +157,13 @@ nx_status_t nx_hal_init(void) {
  */
 nx_status_t nx_hal_deinit(void) {
     nx_status_t status;
+
+    if (nx_arch_in_isr()) {
+        return NX_ERR_CONTEXT;
+    }
+    if (nx_arch_irq_is_masked()) {
+        return NX_ERR_INVALID_STATE;
+    }
 
     /* Check if not initialized */
     if (!hal_initialized) {

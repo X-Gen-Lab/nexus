@@ -93,15 +93,16 @@ extern "C" {
  * This function initializes the HAL subsystem. It should be called once
  * at system startup before using any HAL functionality.
  *
- * The function performs the following:
- * - Initializes platform-specific hardware
- * - Sets up resource managers (DMA, ISR)
- * - Prepares device registry
+ * The selected platform initializes its hardware and effective-config resources.
  *
  * \note            This function is idempotent - calling it multiple times
  *                  has no additional effect after the first successful call.
- * \note            Task context. The application serializes global HAL lifetime
- *                  against device users. An unbound platform is unsupported.
+ * \note            Externally serialized task/startup context with interrupts
+ *                  unmasked. ISR calls return NX_ERR_CONTEXT; an existing Arch
+ *                  interrupt mask returns NX_ERR_INVALID_STATE before any
+ *                  platform hook, including repeated calls. The caller retains
+ *                  and restores its own mask. The application serializes HAL
+ *                  lifetime against device users. An unbound platform is unsupported.
  */
 nx_status_t nx_hal_init(void);
 
@@ -109,19 +110,19 @@ nx_status_t nx_hal_init(void);
  * \brief           Deinitialize the Nexus HAL
  * \return          NX_OK on success, error code otherwise
  *
- * This function deinitializes the HAL subsystem and releases all resources.
- * It should be called at system shutdown.
- *
- * The function performs the following:
- * - Deinitializes all active devices
- * - Releases resource managers
- * - Cleans up platform-specific hardware
+ * This function requests selected-platform hardware cleanup at system shutdown.
+ * The caller must first quiesce device users and settle all outstanding leases;
+ * this entry does not automatically release device handles or application objects.
  *
  * \warning         After calling this function, no HAL functions should be
  *                  called until nx_hal_init() is called again.
- * \note            Task context. An unsupported or busy platform retains global
- *                  initialized state. STM32 reference shutdown requires a
- *                  product-owned quiescence implementation and controlled reset.
+ * \note            Externally serialized task/startup context with interrupts
+ *                  unmasked. ISR calls return NX_ERR_CONTEXT; an existing Arch
+ *                  interrupt mask returns NX_ERR_INVALID_STATE before any
+ *                  platform hook, including offline calls. The caller retains
+ *                  and restores its own mask. An unsupported or busy platform
+ *                  retains initialized state. STM32 reference shutdown requires
+ *                  a product-owned quiescence implementation and controlled reset.
  */
 nx_status_t nx_hal_deinit(void);
 

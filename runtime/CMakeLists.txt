@@ -1,6 +1,7 @@
 add_library(nexus_runtime STATIC src/nx_runtime.c src/nx_platform_info.c)
 target_include_directories(nexus_runtime PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_runtime PUBLIC hal_core hal_support osal)
+target_link_libraries(nexus_runtime PRIVATE nexus_arch)
 add_library(Nexus::Runtime ALIAS nexus_runtime)
 
 # Explicit object injection preserves registration, strong IRQ/callback symbols

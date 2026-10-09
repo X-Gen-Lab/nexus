@@ -1,9 +1,30 @@
 #include "runtime/nx_runtime.h"
 #include "hal/nx_hal.h"
 #include "osal/osal.h"
+#include "arch/nx_arch.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+
+static void reject_real_arch_mask(nx_runtime_state_t state) {
+    bool hal_before = nx_hal_is_initialized(), osal_before = osal_is_initialized();
+    nx_arch_irq_state_t outer = nx_arch_irq_save();
+    nx_arch_irq_state_t inner = nx_arch_irq_save();
+    assert(nx_arch_irq_is_masked());
+    nx_boot_report_t report;
+    assert(nx_runtime_bootstrap(&report) == NX_ERR_INVALID_STATE);
+    assert(report.state == state && report.stage == NX_BOOT_STAGE_IDLE);
+    assert(nx_runtime_shutdown(&report) == NX_ERR_INVALID_STATE);
+    assert(report.state == state && report.stage == NX_BOOT_STAGE_IDLE);
+    assert(nx_runtime_get_state() == state);
+    assert(nx_hal_is_initialized() == hal_before && osal_is_initialized() == osal_before);
+    nx_arch_irq_restore(inner);
+    assert(nx_arch_irq_is_masked());
+    assert(nx_runtime_bootstrap(NULL) == NX_ERR_INVALID_STATE);
+    assert(nx_runtime_shutdown(NULL) == NX_ERR_INVALID_STATE);
+    nx_arch_irq_restore(outer);
+    assert(!nx_arch_irq_is_masked());
+}
 
 int main(void) {
     const nx_platform_info_t* profile = nx_platform_get_info();
@@ -18,10 +39,12 @@ int main(void) {
     assert(strlen(profile->board_sha256) == 64 && strlen(profile->layout_sha256) == 0);
     assert(!nx_hal_is_initialized() && !osal_is_initialized());
     assert(nx_runtime_get_state() == NX_RUNTIME_OFFLINE);
+    reject_real_arch_mask(NX_RUNTIME_OFFLINE);
     nx_boot_report_t report;
     assert(nx_runtime_bootstrap(&report) == NX_OK);
     assert(report.stage == NX_BOOT_STAGE_READY);
     assert(nx_hal_is_initialized() && osal_is_initialized());
+    reject_real_arch_mask(NX_RUNTIME_READY);
     osal_mutex_handle_t held = NULL;
     assert(osal_mutex_create(&held) == OSAL_OK);
     assert(nx_runtime_shutdown(&report) == NX_ERR_BUSY);

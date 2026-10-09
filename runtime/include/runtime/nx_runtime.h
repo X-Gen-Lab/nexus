@@ -40,7 +40,9 @@ typedef struct {
  * Successful repeated calls are idempotent. HAL/OSAL already initialized by
  * another owner are rejected. If OSAL fails, owned HAL is rolled back; the
  * original error and any rollback error are both reported. PARTIAL ownership
- * rejects restart until shutdown settles it. ISR calls are rejected.
+ * rejects restart until shutdown settles it. ISR calls and task/startup calls
+ * with an existing Arch interrupt mask are rejected before any HAL/OSAL query
+ * or side effect. The caller retains and restores its own mask state.
  * Once acquired, callers must not directly deinitialize HAL/OSAL behind this
  * owner. READY describes infrastructure, not application health. */
 nx_status_t nx_runtime_bootstrap(nx_boot_report_t* report);
@@ -51,7 +53,8 @@ nx_status_t nx_runtime_bootstrap(nx_boot_report_t* report);
  * OSAL restoration is attempted and both errors are retained. Ownership is
  * preserved on failure so shutdown can be retried. A stopped/restarted MCU
  * kernel and global product teardown are not supported capabilities.
- * ISR calls are rejected; never call concurrently with bootstrap/shutdown. */
+ * ISR calls and existing Arch interrupt masks are rejected before any HAL/OSAL
+ * query or side effect; never call concurrently with bootstrap/shutdown. */
 nx_status_t nx_runtime_shutdown(nx_boot_report_t* report);
 
 /** Nonblocking ownership state; use the same serialized lifecycle context. */

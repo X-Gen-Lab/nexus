@@ -20,7 +20,7 @@ int main(void) {
 
 `nx_runtime_bootstrap()` 按 HAL→OSAL 获取所有权，不启动 scheduler。重复成功调用幂等，已有其他 owner 的初始化明确拒绝。OSAL 失败时尝试回滚 HAL，报告同时保留原始错误、rollback 错误与最终所有权。
 
-状态为 `OFFLINE`、`PARTIAL` 或 `READY`。`READY` 只表示该 owner 已初始化基础设施；未结清的部分成功保留为 `PARTIAL`，不能重启 bootstrap，必须先重试 shutdown。所有生命周期调用由外部串行，ISR 拒绝，不提供隐式并发锁。
+状态为 `OFFLINE`、`PARTIAL` 或 `READY`。`READY` 只表示该 owner 已初始化基础设施；未结清的部分成功保留为 `PARTIAL`，不能重启 bootstrap，必须先重试 shutdown。所有生命周期调用由外部串行，ISR 或已有 Arch 中断屏蔽均在 HAL/OSAL 查询和副作用之前拒绝，不提供隐式并发锁。Cortex-M 的 PRIMASK、BASEPRI 和 FAULTMASK 都受此限制，调用者自行保存恢复原状态；初始化不能在依赖 SysTick 的时钟超时被屏蔽的上下文内进行。
 
 Shutdown 首先检查设备引用/操作，再释放 OSAL 和 HAL。BUSY 时保留状态；HAL 释放失败时尝试恢复 OSAL，恢复失败保留部分所有权，后续 shutdown 可重试。它不释放应用组件，也不终止其任务。MCU FreeRTOS scheduler 运行期间明确 BUSY，不支持全局 kernel shutdown/restart。
 
