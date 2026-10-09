@@ -1,7 +1,9 @@
 # 企业质量与交付工具实施记录
 
-本次把 HIL-001、REL-002/003、PROD-001、GOV-001 的软件设施落到仓库，可由 CI 或受控实验室调用。
-没有连接实际板卡、探针、签名服务或产线；工具模型通过不能作为物理 HIL、企业支持或量产完成证据。
+本文保留 [Nexus `069dcf14` 的企业交付历史快照](https://github.com/X-Gen-Lab/nexus/blob/069dcf14f9cb1cd6fc4a869d87bf9827b91ce306/docs/implementation/enterprise-delivery.md)。其中 HIL-001、REL-002/003、PROD-001、GOV-001、68 项工具测试和 Native 工业应用报告属于当时的实施记录，不能作为当前重构平台资格。
+旧[工业产品需求文件](https://github.com/X-Gen-Lab/nexus/blob/069dcf14f9cb1cd6fc4a869d87bf9827b91ce306/docs/requirements/industrial-reference.json)已原样迁至独立 examples 仓库；控制循环、制造身份和产品预算由应用仓库负责。
+
+当前平台需求见 [platform.json](../requirements/platform.json)，8 项通用验收以 schema 2 的 `subject_id`/`subject_status` 表达，映射 [38 项重构执行记录](refactor-execution.csv)。全部资格状态为 `planned`、证据为空；源码实现和局部软件检查分别记录，不能替代需求验收。当前没有连接实际板卡、探针、签名服务或产线；工具模型通过不能作为物理 HIL、企业支持或量产完成证据。
 
 ## 实施范围与职责
 
@@ -10,9 +12,8 @@ BSP 2、工业应用 2、QA/HIL 2、构建发布 1，另将安全、制造、现
 它定义主责、备份和职责范围，不虚构成员账号。实际成员指派、GitHub reviewer/CODEOWNERS 与
 分支保护尚未配置；本次没有修改远程设置。
 
-`docs/requirements/industrial-reference.json` 建立 8 项工业产品验收需求，映射 backlog 和责任角色。
-需求状态保持 `planned`，因为验收还包含具体产品定义与硬件证据。`check_traceability.py` 校验
-需求 ID、责任人角色、10 人配置、备份角色和验收证据；其成功表示结构一致，不表示产品验收通过。
+当前 [platform.json](../requirements/platform.json) 建立有效配置、typed ownership、OSAL、Flash/Storage、外部 SDK/Board、显式密码端口、工件/HIL 与维护兼容性 8 项平台需求。
+`check_traceability.py` 默认读取该文件及 `refactor-execution.csv` 的 `task_id`，校验需求 ID、责任角色、10 人配置、备份角色和验收证据；仅明确兼容旧 CSV 的 `id` 列，不解析另一套任务格式。主体状态沿用需求的四阶段，只能落后于已满足的需求，不能在未验收的需求之上宣称资格。成功表示结构一致，不表示平台验收通过。外部产品 release policy、制造和 HIL 端口仍接受调用者明确提供的输入。
 PR 模板要求源/config/image/依赖身份、实际测试计数与跳过、硬件预算、风险和 ADR；需求 Issue 模板
 要求可观测结果和精确板卡组合。删除了旧模板对全部平台、MISRA 与虚构站点的笼统假设。
 

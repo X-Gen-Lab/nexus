@@ -1,83 +1,156 @@
-# Software evidence and physical qualification are distinct. Final source/config/artifact identity belongs in the validation package.
+# Current common-platform software evidence and physical qualification are separate.
 schema_version: 1
-baseline_commit: 7a203266082ad1f655b6686713b2b7950ba31ec6
-review_date: '2026-10-08'
-focus: industrial_control_and_connectivity
+review_date: '2026-10-09'
+focus: common_industrial_embedded_platform
 team_size: approximately_10
 horizon_months:
 - 3
 - 6
+scope:
+  platform_repository: X-Gen-Lab/nexus
+  external_examples_repository: X-Gen-Lab/nexus-examples
+  product_composition: external_only
+  physical_execution: deferred_by_user_not_executed
+  binary_sdk: not_implemented
+  lts: not_promised
 levels:
 - planned
 - experimental
 - validated
 - enterprise_supported
 - lts
-validation_rule: validated_requires_complete_profile_acceptance_and_bound_evidence
+validation_rule: exact_profile_acceptance_actual_execution_and_bound_source_config_artifact_evidence
+current_evidence_snapshot:
+  platform_observed_head: f2d2cf89f437ad69bf73a8d9eb068d600d53081f
+  source_worktree_clean: false
+  final_clean_sha_pair: pending
+  record: docs/implementation/refactor-execution.csv
+  note: Scoped working-tree checks are real; later commits require their own final integration records.
+  exact_committed_component_scope:
+    source_commit: c5aa06d92787540bcf4d521fa5d6fa7fa7c5e5a7
+    ctest_passed: 735
+    skipped: 0
+    snapshot: build/refactor-commit-checks/components/snapshot.json
+    junit: build/refactor-commit-checks/components/junit.xml
+  exact_committed_runtime_board_scope:
+    source_commit: 61530942f1618ad20140f46004350ef36b454393
+    ctest_passed: 187
+    skipped: 0
+    snapshot: build/refactor-commit-checks/runtime-board/snapshot.json
+    junit: build/refactor-commit-checks/runtime-board/junit.xml
+historical_evidence:
+- scope: before_current_RF_refactor_not_inherited
+  source_commit: 3129550d12fcf67a7da52dcb2713ee634bae5415
+  native_ctest_passed: 1781
+  arm_release_configurations: 8
+  arm_elf_images: 15
+  checker_checks: 56
+  actual_corruption_rejections: 60
+  record: docs/implementation/platform-validation.json
+  hardware_verified: false
+- scope: older_software_checkpoint_not_current_support
+  source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+  native_ctest_passed: 1711
+  online_sanitizer_with_leak_detection: 23
+  local_sanitizer_subset: 37
+  local_leak_detection: disabled_due_to_ptrace_not_passed
+  archived_checkpoint:
+    source_implementation: maintained
+    configure_build_link: executed
+    effective_config_regressions: 18_passed
+    spi_contracts: 43_passed
+    i2c_contracts: 36_passed
+    config_independent_subset: 119_passed
+    industrial_contracts: 19_passed_with_fuzz_and_sanitizers
+    enterprise_tools: 68_passed_models_and_real_openssl_signature_verification
+    persistence_fault_boundaries: 630_storage_763_rotation_3659_update
+    source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+    full_suite: 1711_passed_zero_failures_errors_or_skips
+    full_suite_seconds: 48.82
+    full_suite_report: build/linux-gcc-debug/ctest-final-source.xml
+    online_native_profiles: three_profiles_each_1711_passed_at_4a283eb
+    production_entry_smokes: blinky_industrial_controller_config_demo_shell_demo_freertos_demo_passed
+    release_application_checks: 5_passed_zero_failures_errors_or_skips
+    release_application_report: build/linux-gcc-release/ctest-final-applications.xml
+    release_application_seconds: 1.01
+    expanded_sanitizer_subset: 37_passed_zero_failures_errors_or_skips
+    sanitizer_report: build/linux-gcc-sanitizers/ctest-final-contracts.xml
+    sanitizer_seconds: 12.33
+    sanitizer_scope: selected_local_contracts_regressions_and_5_finite_apps
+    local_leak_detection: disabled_due_to_ptrace_no_passing_leak_claim
+    online_sanitizer_subset: 23_passed_with_leak_detection_enabled_at_4a283eb
+    source_config_artifact_binding: build/evidence/final-source-4a283ebf6c2f-identity.json
+    required_static_analysis: clang_tidy_and_cppcheck_136_owned_translation_units_passed_at_4a283eb
+    ci_helpers: 107_passed_at_e15df5c
+    tracked_python_syntax: 130_sources_zero_errors_at_e15df5c
+    coverage_export_and_final_documentation_head: see_live_PR_3_checks
+    hardware: not_applicable
+    records:
+    - docs/implementation/build-config.md
+    - docs/implementation/native-i2c.md
+    - docs/implementation/native-hal-validation.md
+    - docs/implementation/industrial-reference.md
+    - docs/implementation/independent-review.md
+    - docs/implementation/enterprise-delivery.md
+- scope: external_old_API_baseline_new_pin_requires_validation
+  platform_source_commit: 069dcf14f9cb1cd6fc4a869d87bf9827b91ce306
+  examples_source_commit: 24ef09c36ca32362749691e7524c2d7b48177690
+  native_application_checks: 3
+  arm_release_configurations: 8
+  arm_elf_images: 20
+  record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/docs/validation.md
+  hardware_verified: false
+capability_limits:
+  typed_i2c:
+    native: implemented_and_executed
+    stm32: modern_hardware_provider_not_implemented_explicit_unsupported
+    gd32f470: modern_hardware_provider_not_implemented_explicit_unsupported
+  flash_layout:
+    default: whole_physical_flash_image_no_reserved_storage_regions
+    image_offset: zero_only_no_bootloader_or_VTOR_relocation
+    regions: consumer_owned_validated_permissions_and_full_erase_blocks
+  board_validation: reviewed_GPIO_UART_SPI_routes_not_complete_topology_solver
+  memory_info: main_SRAM_and_internal_Flash_only_not_all_domains_or_DMA_map
+  mcu_crypto: no_provider_entropy_vault_binding_explicit_unsupported
+  kernel_restart: not_supported_running_MCU_FreeRTOS_shutdown_is_BUSY
+  cache_mpu: not_implemented_or_qualified
+  hal_completion: implemented_18_native_checks_real_cortex_archive_no_auto_device_callback_or_worker
+  relocatable_source_sdk: fixture_relocated_consumers_passed_strict_clean_prepare_consume_pending
+  physical_workloads: IRQ_DMA_power_loss_long_load_full_runners_and_measured_budgets_pending
 profiles:
 - id: native-contracts
-  architecture: x86_64
+  architecture: native
   host: linux
-  board: native-reference-model
+  board: native-reference
   osal: native
-  toolchain: GCC_14.2
+  toolchain: GCC_14.2_or_Clang_per_preset
   config: platforms/native/defconfig
+  presets:
+  - linux-gcc-debug
+  - linux-gcc-release
+  - linux-clang-debug
+  - linux-clang-release
+  - linux-gcc-sanitizers
   status: experimental
   evidence:
-    current_implementation: Arch typed-device Product runtime and opt-in services implemented
-    current_final_integration: clean_3129550_Native_1781_passed_and_online_CI_success
-    record: docs/implementation/platform-validation.json
-    historical_checkpoint:
-      source_implementation: maintained
-      configure_build_link: executed
-      effective_config_regressions: 18_passed
-      spi_contracts: 43_passed
-      i2c_contracts: 36_passed
-      config_independent_subset: 119_passed
-      industrial_contracts: 19_passed_with_fuzz_and_sanitizers
-      enterprise_tools: 68_passed_models_and_real_openssl_signature_verification
-      persistence_fault_boundaries: 630_storage_763_rotation_3659_update
-      source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
-      full_suite: 1711_passed_zero_failures_errors_or_skips
-      full_suite_seconds: 48.82
-      full_suite_report: build/linux-gcc-debug/ctest-final-source.xml
-      online_native_profiles: three_profiles_each_1711_passed_at_4a283eb
-      production_entry_smokes: blinky_industrial_controller_config_demo_shell_demo_freertos_demo_passed
-      release_application_checks: 5_passed_zero_failures_errors_or_skips
-      release_application_report: build/linux-gcc-release/ctest-final-applications.xml
-      release_application_seconds: 1.01
-      expanded_sanitizer_subset: 37_passed_zero_failures_errors_or_skips
-      sanitizer_report: build/linux-gcc-sanitizers/ctest-final-contracts.xml
-      sanitizer_seconds: 12.33
-      sanitizer_scope: selected_local_contracts_regressions_and_5_finite_apps
-      local_leak_detection: disabled_due_to_ptrace_no_passing_leak_claim
-      online_sanitizer_subset: 23_passed_with_leak_detection_enabled_at_4a283eb
-      source_config_artifact_binding: build/evidence/final-source-4a283ebf6c2f-identity.json
-      required_static_analysis: clang_tidy_and_cppcheck_136_owned_translation_units_passed_at_4a283eb
-      ci_helpers: 107_passed_at_e15df5c
-      tracked_python_syntax: 130_sources_zero_errors_at_e15df5c
-      coverage_export_and_final_documentation_head: see_live_PR_3_checks
-      hardware: not_applicable
-      records:
-      - docs/implementation/build-config.md
-      - docs/implementation/native-i2c.md
-      - docs/implementation/native-hal-validation.md
-      - docs/implementation/industrial-reference.md
-      - docs/implementation/independent-review.md
-      - docs/implementation/enterprise-delivery.md
+    runtime_ctest: 53
+    hal_scoped_ctest: 84
+    osal_scoped_ctest: 278
+    log_shell_scoped_ctest: 444
+    security_selected_ctest: 77
+    selected_integration_ctest: 52
+    record: docs/implementation/refactor-execution.md
+    final_clean_integrated_matrix: pending
     hardware: not_applicable
+    python_gate_cases: 281
+    ci_helper_cases: 170
+    exact_component_tree_ctest: 735
+    completion_ctest: 18
+    exact_runtime_board_tree_ctest: 187
   limits:
-  - Host models do not establish MCU timing, electrical behavior, ISR or DMA.
-  - OpenSSL and POSIX file flash are host-only integrations.
-  - Windows/macOS presets are not validated by this checkpoint.
-  - Evidence is bound to the stated source revisions; later commits require their own actual CI records.
-  - Local 37-entry ASan/UBSan and online 23-entry leak-checked runs have different scopes; neither is complete-suite
-    sanitizer evidence.
-  blockers:
-  - DOC-001
-  - HAL-001
-  - OS-001
-  - OS-002
+  - Counts refer to distinct scoped snapshots and can overlap; do not sum them as a new full-suite total.
+  - OpenSSL requires explicit Native configuration, link and provider binding.
+  - Host models do not establish MCU IRQ/DMA/electrical or real-time behavior.
 - id: freertos-posix-contracts
   architecture: host
   board: not_applicable
@@ -85,28 +158,29 @@ profiles:
   config: tests/osal/freertos_runtime/FreeRTOSConfig.h
   status: experimental
   evidence:
-    actual_kernel: initialized_at_repository_gitlink
-    runtime_contracts: 10_groups_passed_natural_exit_zero
-    timer_delete_reclamation_review: atomic_reclamation_and_30_concurrent_reuse_rounds_passed
-    local_event_helper: 5_groups_passed_200_cancel_reuse_cycles
-    integrated_source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
-    integration_report: build/linux-gcc-debug/ctest-final-source.xml
-    record: docs/implementation/freertos-posix-host-port.md
-    arm_interrupt_port: not_executed
+    kernel: actual_pinned_source_initialized_and_executed
+    record: docs/implementation/osal-refactor-validation.json
+    finite_token_budget: production_limit_six_exhaustion_and_slot_diagnostics_executed
     hardware: not_applicable
-    static_resources: six_static_object_types_idle_and_timer_daemon
-    boot_mask: real_pinned_kernel_ARM_mask_model_passed_not_ARM_instructions
-    task_mutex_lifetime: TCB_reuse_and_orphaned_mutex_quarantine_regressions_passed
-    current_directed_suite: 275_OSAL_entries_passed_no_failures_or_skips
-  blockers:
-  - OS-001
-  - OS-002
-- id: stm32-industrial-reference
+    arm_interrupt_port: not_executed
+  limits:
+  - Real POSIX kernel execution is not ARM scheduler or interrupt qualification.
+- id: windows-macos-native
+  host:
+  - windows
+  - macos
+  status: experimental
+  evidence:
+    presets_and_wrappers: retained_updated
+    current_execution: not_executed
+  limits:
+  - Linux execution does not qualify retained cross-host presets.
+- id: stm32-discovery-reference
   soc: STM32F407VGT6
   architecture: cortex_m4f
   board: stm32f4discovery-mb997
   board_revision: null
-  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  user_board_selection: confirmed_model_actual_PCB_pending
   osal:
   - baremetal
   - freertos
@@ -114,39 +188,41 @@ profiles:
   configs:
   - configs/stm32f407_baremetal_defconfig
   - configs/stm32f407_freertos_defconfig
+  presets:
+  - stm32-armgcc-release
+  - stm32-armgcc-freertos-release
+  board_manifest: boards/stm32f4discovery/board.json
   status: experimental
   physical_flash_bytes: 1048576
-  firmware_flash_bytes: 786432
-  storage_geometry: sectors10_11
+  default_image_bytes: 1048576
+  default_storage_regions: []
+  physical_erase_geometry: 12_nonuniform_sectors
   evidence:
-    source_implementation: maintained
-    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
-    software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: production_contracts_and_selected_actual_ARM_links_passed
+    final_clean_eight_profile_matrix: pending_current_source_binding
+    contract_image: nexus_contract_firmware_not_business_application
+    record: docs/implementation/refactor-execution.md
     hardware: not_executed
-    record: docs/implementation/stm32-runtime.md
   limits:
-  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
-  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
-  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
-    policy.
-  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
-  - RS485 requires product transceiver/wiring and measured frame/DE timing.
-  blockers:
-  - BSP-001
-  - BSP-002
-  - HAL-005
-  - HIL-001
-  - HIL-002
-  - HIL-003
-  - SEC-001
-  - SEC-002
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
 - id: stm32-qiming-v31
   soc: STM32F407ZGT6
   architecture: cortex_m4f
   board: stm32f407zg-qiming-v31
   board_revision: null
-  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  user_board_selection: confirmed_model_actual_PCB_pending
   osal:
   - baremetal
   - freertos
@@ -154,40 +230,41 @@ profiles:
   configs:
   - configs/stm32f407zg_qiming_v31_baremetal_defconfig
   - configs/stm32f407zg_qiming_v31_freertos_defconfig
+  presets:
+  - stm32-qiming-armgcc-baremetal-release
+  - stm32-qiming-armgcc-freertos-release
+  board_manifest: boards/stm32f407_qiming_v31/board.json
   status: experimental
   physical_flash_bytes: 1048576
-  firmware_flash_bytes: 786432
-  storage_geometry: sectors10_11
+  default_image_bytes: 1048576
+  default_storage_regions: []
+  physical_erase_geometry: 12_nonuniform_sectors
   evidence:
-    source_implementation: maintained
-    production_ports: boot_clock_gpio_uart_flash_uid_monotonic_time
-    software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: production_contracts_and_selected_actual_ARM_links_passed
+    final_clean_eight_profile_matrix: pending_current_source_binding
+    contract_image: nexus_contract_firmware_not_business_application
+    record: docs/implementation/refactor-execution.md
     hardware: not_executed
-    record: docs/implementation/stm32-runtime.md
   limits:
-  - SPI is disabled in both stock profiles; enabling a controller requires an explicit reviewed board resource binding.
-  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
-  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
-  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
-    policy.
-  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
-  - RS485 requires product transceiver/wiring and measured frame/DE timing.
-  blockers:
-  - BSP-001
-  - BSP-002
-  - HAL-005
-  - HIL-001
-  - HIL-002
-  - HIL-003
-  - SEC-001
-  - SEC-002
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
 - id: stm32-sky-youth
   soc: STM32F407VET6
   architecture: cortex_m4f
   board: stm32f407ve-sky-qingchun
   board_revision: null
-  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  user_board_selection: confirmed_model_actual_PCB_pending
   osal:
   - baremetal
   - freertos
@@ -195,40 +272,41 @@ profiles:
   configs:
   - configs/stm32f407ve_sky_qingchun_baremetal_defconfig
   - configs/stm32f407ve_sky_qingchun_freertos_defconfig
+  presets:
+  - stm32-sky-armgcc-baremetal-release
+  - stm32-sky-armgcc-freertos-release
+  board_manifest: boards/stm32f407ve_sky_qingchun/board.json
   status: experimental
   physical_flash_bytes: 524288
-  firmware_flash_bytes: 262144
-  storage_geometry: sectors6_7
+  default_image_bytes: 524288
+  default_storage_regions: []
+  physical_erase_geometry: 8_nonuniform_sectors
   evidence:
-    source_implementation: maintained
-    production_ports: boot_clock_gpio_uart_flash_uid_monotonic_time
-    software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: production_contracts_and_selected_actual_ARM_links_passed
+    final_clean_eight_profile_matrix: pending_current_source_binding
+    contract_image: nexus_contract_firmware_not_business_application
+    record: docs/implementation/refactor-execution.md
     hardware: not_executed
-    record: docs/implementation/stm32-runtime.md
   limits:
-  - SPI is disabled in both stock profiles; enabling a controller requires an explicit reviewed board resource binding.
-  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
-  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
-  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
-    policy.
-  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
-  - RS485 requires product transceiver/wiring and measured frame/DE timing.
-  blockers:
-  - BSP-001
-  - BSP-002
-  - HAL-005
-  - HIL-001
-  - HIL-002
-  - HIL-003
-  - SEC-001
-  - SEC-002
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
 - id: gd32-liangshan
   soc: GD32F470ZGT6
   architecture: cortex_m4f
   board: gd32f470zg-liangshan
   board_revision: null
-  product_confirmation: user_confirmed_hardware_family_physical_revision_pending
+  user_board_selection: confirmed_model_actual_PCB_pending
   osal:
   - baremetal
   - freertos
@@ -236,42 +314,57 @@ profiles:
   configs:
   - configs/gd32f470_baremetal_defconfig
   - configs/gd32f470_freertos_defconfig
+  presets:
+  - gd32f470-armgcc-baremetal-release
+  - gd32f470-armgcc-freertos-release
+  board_manifest: boards/gd32f470_liangshan/board.json
   status: experimental
   physical_flash_bytes: 1048576
-  firmware_flash_bytes: 1032192
-  storage_geometry: last_four_4KiB_F470_independent_erase_pages
+  default_image_bytes: 1048576
+  default_storage_regions: []
+  physical_erase_geometry: 256_four_KiB_independent_erase_pages
   evidence:
-    source_implementation: maintained
-    production_ports: boot_clock_gpio_uart_spi_flash_uid_monotonic_time
-    software_fault_models: actual_production_ports_against_vendor_fakes_passed
-    current_final_arm_matrix: clean_3129550_8_profiles_15_ELF_56_checker_60_corruption_rejections_passed
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: production_contracts_and_selected_actual_ARM_links_passed
+    final_clean_eight_profile_matrix: pending_current_source_binding
+    contract_image: nexus_contract_firmware_not_business_application
+    record: docs/implementation/refactor-execution.md
     hardware: not_executed
-    record: platforms/gd32f470/README.md
   limits:
-  - PCB revision, clock, supply, initial safe levels, real IRQ/TC and Flash power cut require physical evidence.
-  - Cross compilation and vendor fakes do not establish control jitter or industrial qualification.
-  - Default memory allocations exclude CCM/ADDRAM/TCM; their initialization and DMA access need explicit product
-    policy.
-  - Whole MCU shutdown, crypto/entropy, protected bootloader/vault and safety qualification are not integrated.
-  - RS485 requires product transceiver/wiring and measured frame/DE timing.
-  blockers:
-  - BSP-001
-  - BSP-004
-  - HAL-005
-  - HIL-001
-  - HIL-002
-  - HIL-003
-  - SEC-001
-  - SEC-002
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
+hil_tooling:
+  status: tooling_ready_not_physical_qualification
+  board_fixture_templates: 4
+  station_observed_identity: not_bound
+  board_probe_tty_leases: implemented
+  elf_bin_board_layout_admission: actual_current_contract_image_passed
+  artifact_tampering_cases_rejected: 6
+  new_board_model_tests: 23
+  legacy_adapter_model_tests: 20
+  hardware_verified: false
+  record: build/rf-hil-artifact-admission.json
+  workload_budgets: null_unmeasured
+  uart_challenge_runner: implemented_not_physically_executed
 promotion_requires:
-- exact_product_soc_board_revision_osal_toolchain_and_effective_configuration
-- clean_source_and_dependency_identity_bound_to_actual_elf_map_and_nonzero_tests
-- linked_capabilities_with_executed_contract_and_physical_hardware_reports
-- measured_resource_and_deadline_budgets
-- persistence_and_fault_recovery_evidence
-- reviewed_whole_artifact_security_license_and_component_inventory
-- product_trust_signing_and_same_artifact_release_evidence
-- named_primary_backup_owner_support_window_and_known_limits
+- clean_source_dependency_and_exact_external_source_pair
+- fresh_nonzero_executed_required_suites_and_final_profile_matrix
+- effective_config_Board_layout_toolchain_ELF_BIN_map_identity
+- whole_artifact_license_security_and_inventory_review
+- exact_PCB_probe_readback_physical_HIL_for_product_qualification
+- measured_workload_resource_and_deadline_budgets
+- external_product_trust_signing_health_manufacturing_policy
+- named_primary_backup_reviewers_support_window_and_regression_resources
 enterprise_supported_profiles: []
 lts_profiles: []
-target_change: User replaced GD32F303 with GD32F470ZGT6 Liangshan; no F303 support claim.
+target_change: User replaced GD32F303 with GD32F470ZGT6 Liangshan. No F303 support claim.

@@ -1,103 +1,107 @@
-# Nexus 架构决策记录
+# Nexus 架构决策
 
-以下决策指导工业控制与设备联网首期建设。状态为“采用”的方向用于维护实现；状态为“待收敛”的事项依赖参考板、测量或产品要求。各项区分已实施的软件边界与产品验收，实际执行证据见 [实施记录](../implementation/) 和 [任务清单](backlog.csv)。
+这些决策用于当前通用平台实现；实际运行范围与未完成任务见 [RF 执行清单](../implementation/refactor-execution.csv)。历史 `affaa86f` 的 Product 和保留 Flash 分区已不代表当前架构。公共 API 以源码头和 target 为准，不以历史提案代码冒充实现。
 
-## ADR 001 维护 C11 接口并允许明确的破坏性重构
-
-状态：采用。
-
-保留 C11 语言、能力接口、工厂入口和有价值的 Native 行为测试。用户明确允许删除不良旧设计，不要求为错误实现保留兼容层。统一错误、生命周期、资源所有权和执行上下文，公共结构变更必须与生产调用者、测试和文档原子更新，并明确源码及 ABI 边界；静态链接也受配置和编译器布局影响。
-
-SPI/I2C 的现代设备 API 采用调用者持有的 owner/generation 值句柄，关闭或总线反初始化使全部旧副本失效。已保留的 pointer getter 仅提供文档化、有界、不可重定向的旧模型入口，不是扩大兼容承诺的理由。Config namespace/callback 使用不解引用的 lifetime token，计数跨 manager 反初始化保留，耗尽明确失败。
-
-持久化格式与现场数据独立管理：新实现拒绝旧未认证 CBC/NXCFG 与 binary v1，不把格式变化伪装为自动迁移。已有部署需要明确的离线迁移、备份、回滚与恢复验证。Rust 可用于独立边界清晰的实验，不作为本轮可靠性修复的前提。
-
-## ADR 002 分离架构 SoC 板卡与产品
+## ADR 001 C11 契约与明确的破坏性重构
 
 状态：采用。
 
-通用能力契约位于 HAL/OSAL；Arch 负责 CPU 中断状态保存恢复、异常上下文和屏障；SoC 负责时钟树、控制器、IRQ、时间源、内存域和内部 Flash 几何；Board 负责晶振、引脚、外部器件和初始安全电平；Product 选择板卡、后端、服务、存储分区、预算和启动恢复策略。通用层不得包含厂商头文件，产品不得绕过接口依赖寄存器。cache/MPU 原语在实际产品需要并验证时扩展，不能把 Cortex-M4 空函数称为已完成的保护。
+保留 C11、CMake/Kconfig/CTest、维护中的 FreeRTOS 和已有有效软件回归。用户授权移除不良设计，不为错误实现保留伪成功兼容层。公共接口变更原子更新该仓生产调用者、测试和文档；外部仓库在独立提交中更新 SDK pin 与调用者。
 
-独立 `arch/` 已承担 Native/Cortex-M4 保存恢复语义，HAL 元数据和裸机 OSAL 使用该端口；FreeRTOS 运行中的 syscall 临界区继续由内核 BASEPRI 管理，不用 PRIMASK token 替代。平台装配显式连接 SoC、controller、Board、startup/linker；Board 与 SPI/UART 通过窄资源结构连接，不公开完整可变 driver instance。`products/` 实现配置身份和串行启动/回滚，普通应用通过 `Nexus::Product` 消费。目录与运行时变更均须由实际构建、调用者与契约测试验证。
+源码兼容、配置兼容和持久化兼容分别管理。旧未认证 CBC/NXCFG 和 binary v1 不静默迁移；部署产品需要独立备份、回滚与可验证的数据转换。源码 SDK 没有跨 compiler/configuration 的二进制 ABI 承诺。
 
-## ADR 003 配置作为每个构建的输入
+## ADR 002 通用平台与外部产品分仓
 
-状态：采用，唯一有效配置生成链路已实施并通过 15 项定向回归，最终整合矩阵单独验收。
+状态：采用，Runtime/Firmware 已实施。
 
-产品 profile 与明确配置片段经 Kconfig 解析为一份有效配置，输出到独立构建目录。`generated/effective.config`、`nexus_config.h` 和 `config.cmake` 来自同一次解析，头文件、CMake 变量和链接布局使用这一输入。preset 选择工具链和显式片段；源码根 `.config` 与旧生成头文件已移除，不会静默覆盖目标。未知/重复符号、非法值、choice/range/dependency 冲突与生成失败阻断 CMake，不回退默认值继续编译。
+Arch 拥有 CPU 异常上下文、saved mask 和屏障；SoC/controller 拥有时钟、IRQ/DMA、控制器、芯片内存与全物理 Flash 几何；Board 拥有 PCB 接线、晶振、电气资源与安全初值；HAL/OSAL 提供可验证能力契约。Runtime 仅初始化/释放 HAL 与 OSAL 所有权，Firmware 装配启动对象。
 
-每个构建保存有效配置 hash，重配时清理旧 `CONFIG_*` 缓存。宿主与目标使用不同 build 目录；生成无时间戳，未变更输出保持内容和时间，失败重配不会允许旧配置编译。Multi-config 目录只暴露选定构建类型。`NEXUS_CONFIG_FILE` 是受校验的显式配置片段入口，不是旧根配置的兼容别名；调用者必须使用有效片段和专用输出目录。
+产品 main、workers、组件顺序、领域控制、客户协议、分区/更新/健康/恢复/制造政策在外部仓库。`Nexus::Product`、产品身份和平台内 application choice 已删除，外部固件使用 `Nexus::Firmware` 与通用 runtime API。READY 只表示基础设施，不表示产品健康。
 
-## ADR 004 先定义实时接口契约
-
-状态：采用。
-
-每个 API 明确任务或 ISR 上下文、是否阻塞、timeout 起点、缓冲区所有权、取消行为、回调上下文以及失败后的状态。有限超时应覆盖锁等待和设备操作；DMA 超时返回前必须停止 DMA，或者通过显式异步所有权继续持有缓冲区。完成、错误、取消竞态只交付一次终态。
-
-Native 验证同一语义，真实板验证中断优先级、DMA/cache、总线和调度。临界区不应由编译器名字猜测 CPU；OSAL 端口必须定义嵌套、SMP 与 ISR 行为。控制路径需要静态分配或有界池，其他服务可按 profile 选择堆。
-
-## ADR 005 模块化工业设备服务
+## ADR 003 每个 build root 一份有效配置
 
 状态：采用。
 
-以参考产品需要的采集控制、参数、诊断和工业通信建立最小闭环；协议、网络、TLS、OTA、文件系统和 TinyML 均按需启用。驱动与服务以稳定端口相连，避免 HAL 直接依赖网络或云 SDK。控制域与管理域分离优先级、队列、内存预算和故障处理，是否需要 MPU 或双核隔离由风险和硬件能力决定。
+`NEXUS_CONFIG_FILE` 明确软件片段，preset 选择 compiler/build mode。Kconfig 一次解析生成 `effective.config`、`nexus_config.h`、`config.cmake`；未知/重复/非法值、choice/range/dependency 冲突与失败生成阻断配置。根 `.config` 和根生成头不参与回退。
 
-Modbus、CANopen、MQTT、TLS、bootloader 等优先评估维护良好、许可证适用的组件，经过适配和验证后纳入依赖清单；不自行实现密码原语。选型需记录资源成本、版本维护、可移植性与安全更新路径。
+Board/backend、CMake tests/contracts 开关和 linker 预算与同一有效输入一致。不同平台或后端使用不同 build root，不允许同次配置叠加多个 Nexus。重配清理旧 CONFIG cache；失败不允许旧 generated bundle 继续编译。
 
-## ADR 006 发布来自同一组已验证产物
+## ADR 004 所有权和 settlement 优先于表面超时
 
-状态：采用，候选发布保护与企业证据工具已实施；真正在线候选与产品 promotion 单独验收。
+状态：采用。
 
-构建、测试和打包成功后才能创建候选 Release；正式发布复用该工件，不再次构建产生不同镜像。工件身份包含 source、board/product、有效配置、toolchain 和第三方依赖，摘要与报告随工件存储。签名服务与普通构建隔离。
+所有 API 声明 task/ISR、等待、时间起点、caller storage、callback、取消/故障状态。有限 deadline 在 admission 前开始，排队、锁、操作和等待消费原预算。时钟端口真实且显式；查询次数不是时间。
 
-候选包区分 Native 已执行测试与 ARM cross-compile-only。独立 inventory 工具可从真实 map-linked static archives 生成有限范围 CycloneDX 1.5 SBOM，企业 promotion 工具校验物理 HIL、review 和外部公钥签名绑定的同工件摘要；这些实现和模型回归不表示实际 HIL/企业签名服务/完整固件许可证审核或 LTS 已完成。空测试、空包、错误构建类型、source/config/依赖/ELF 身份不符及 dirty candidate 均拒绝。正式企业发布必须满足审核的产品门禁，不重建另一组产物。
+异步取消请求不是所有设备统一的 buffer return proof。必须依据类型化 result 的 settled、callback/硬件停止契约，失败保持 lease 与可重试状态。零 ticket provider 违约进入 recovery-required，证明 deinit/UNINITIALIZED 才使旧 ref 失效并释放借用。有限 completion queue 不负责认证设备 settlement，也不启动默认 worker。
 
-## ADR 007 持久化与升级先保证可恢复
+## ADR 005 通用组件 core 与 adapter 分开
 
-状态：采用；双银行快照、新认证记录与更新策略已实施，MCU provider/bootloader/保护端口与实板验收待收敛。
+状态：采用。
 
-`nx_flash_port_t` 定义同步 read/program/erase/sync 与几何边界，`services/storage` 使用两个 bank 的完整快照、CRC、generation 和最后提交标记实现原子替换。它不是高频 journal 或通用 wear leveling；产品必须核算擦写寿命和维护窗口。Native 文件 Flash 630 个故障边界、整代 key rotation 763 个边界和更新联合 3659 个边界已执行，物理掉电与真实暂停时序仍须验证。STM32F407VG/ZG 使用 sector10/11、前768KiB应用；512KiB VE 使用 sector6/7、前256KiB应用，必须读取实际密度并核对 linker。GD32F470ZG 使用该系列特有的独立4KiB page erase，末16KiB保留、前1008KiB应用；不套用 STM32 sector 几何或 F303 page 几何。真实 production ports 的故障模型不构成物理掉电证据。
+Log formatter core 无 HAL/OSAL；Log runtime 明确依赖 OSAL，UART sink 由应用选入。Shell core 与 UART adapter 分开，mock backend 属 tests。Config core/RAM/Flash、Storage core/typed HAL adapter 和协议核心均独立装配；组件不默认创建任务、命令表或产品分区。
 
-Config 完整 namespace 映射以 NXCS 快照保存，binary v2 使用明确 little-endian 格式并要求既有 namespace map。NXCF schema1 使用维护中的 AES-GCM，AAD 绑定记录、namespace数值ID、key和type；它不能独自保护整个快照政策或阻止回放。Native 的 OpenSSL3 provider 提供系统 CSPRNG/SHA-256/Ed25519，MCU 未绑定维护中的 provider 显式失败。nonce 为96-bit CSPRNG随机值，产品需制定碰撞/写次数/轮换预算并验证真实熵，不宣称无限写入无重用。keyring/vault 持久化和退役由产品负责，明文key不写入参数分区。
+工业产品、virtual plant、客户设备管理和测试应用在 examples/产品仓库。Nexus 可保留平台无关协议和适配契约，不内置领域控制业务。CAN/CANopen、Ethernet/MQTT、额外 MCU 或 RTOS 的投入需具体需求、维护库许可和回归预算，不能挤掉 P0 生命周期与 BSP 修复。
 
-更新核心实现 NXUF 签名清单、NXUS 状态、错板/摘要拒绝、先持久化试运行次数及健康意图、计数推进后确认的可恢复流程。下载、槽安装、受保护状态/信任库、安全计数器、启动切换和独立恢复由产品端口承担，尚未建立真实启动链。MCUboot 仍是待选候选；分区容量、硬件保护和维护窗口必须由首发产品决定。旧实验格式一律按明确版本边界处理，不静默迁移未认证数据。
+## ADR 006 发布使用同一批验证产物
 
-## ADR 008 源码 SDK 使用目标上下文而非宿主工程根
+状态：采用；工具与模型已实现，正式候选/promotion 未自动完成。
 
-状态：采用，实施与执行范围见 [架构基础记录](../implementation/architecture-foundation.md)。
+source commit/dependencies、effective config、Board/layout SHA、工具链与 ELF/map/bin/hex 必须一致。必需 suite 有真实非零执行；零测试、全部 skip、旧/空报告、dirty source、错 SHA/缺依赖/错误 linker/篡改工件都拒绝。候选完成后正式发布复用同工件摘要，不重建另一组镜像。
 
-Nexus source/build 根取自身目录；作为子工程默认不创建测试和示例，不污染父工程其他目标的输出。有效配置、选定平台、生成目录与工件设置存入 target context，应用 helper 在父工程读取该上下文。公开 `Nexus::` targets 是源码消费入口，不等于已完成的 installed binary SDK。
+平台软件候选标注 physical qualification 未执行；产品 promotion 还需精确 PCB、真实 HIL、测量预算、trust/signing、许可/安全与制造审查。模型与临时公钥验签不代表企业签名服务或真实产线资格。
 
-一次配置只拥有一组 board/backend/effective config。不同组合使用独立 build root，不增加第二个构建引擎、模块注册 DSL 或全局多产品配置生成器。外部消费以真实 configure/build/link/run 和父工程隔离验证退出；install/export 作为单独工作包。
+## ADR 007 全物理 Flash 与外部分区政策
 
-## ADR 009 平台装配显式保留对象并隔离 SDK 编译接口
+状态：采用，typed Flash/region/StorageHAL 已实施并做软件故障回归。
 
-状态：采用，编译边界与 SPI/UART 的窄板级资源绑定已实施，完整自动资源拓扑校验尚未完成。
+SoC `FLASH0` 暴露整个物理芯片与真实密度：F407VE 8 sector、VG/ZG 12 sector，F470ZG 256 个 4 KiB page。HAL region 检查 owner/generation、权限、溢出、物理 block 和可写重叠。SoC 不链接 Storage，也不默认预留 product storage。
 
-SoC、controller、Board 各自声明源码及私有 SDK/内部头，platform assembly 显式注入对象并直接拥有真实 startup 和 linker。注册段和强 callback 不能只依靠 archive 按需抽取与 linker KEEP。平台对普通产品公开 Nexus 接口；direct SDK bring-up 必须显式声明 SDK 依赖。验证包含真实 ARM 链接与普通应用编译接口隔离，不以 target 名称代替证明。
+外部 `NEXUS_FLASH_LAYOUT_FILE` 生成 linker/region declarations。默认 whole-Flash image 且 regions 为空。相同解析拒绝重叠、越界、非完整 erase block、image 侵占；layout 和 Board 摘要各由八个绝对 ELF symbol 绑定。首次仅支持 image 起于物理 Flash 基址；没有 bootloader/VTOR relocation，非零 offset 拒绝。
 
-## ADR 010 常量设备描述与运行操作所有权分离
+StorageHAL 借用已开的外部 region，验证 uniform 完整 block、0xff/编程几何并共享整次 storage 操作的有限 budget，不选择分区或 auto unlock。Storage 是 dual-bank 完整快照；不是高频 journal/wear leveling。软件故障模型的原/新完整状态保证不等于物理掉电、电压、暂停时序与寿命资格。
 
-状态：采用；类型化设备核心、GPIO/UART 操作、SPI父子引用和生产调用者已迁移，I2C及其余类别按实际能力逐项迁移，不能视作完整接口覆盖。
+## ADR 008 目标拥有源码消费上下文
 
-设备描述、driver instance、owner/generation handle 和 operation 是不同对象。发现不启动硬件，打开/关闭显式报告错误；取消和超时经过 hardware settlement，停止失败继续持有 buffer lease 并进入故障恢复。UART memory complete 与 wire TC 分开，RS485 DE 以后者为准。任务锁、CPU saved mask 与 RTOS syscall mask 不互换。迁移需同时更新真实调用者与测试，不能保留弱伪时钟和无法停止传输的通用同步转换作为可靠性承诺。
+状态：采用。
 
-详细契约及验收见 [HAL/OSAL 设计](hal-osal-design.md)，底座选择见 [平台比较](platform-comparison.md)。
+源码根和 build root 使用 Nexus 自身路径；`Nexus::Config` 保存选定 target、有效配置和输出上下文。`nexus_add_application()` 在父作用域读取该上下文，仅改变本目标输出/链接，不污染父工程 sentinel 或全局路径。`Nexus::Firmware` 显式注入 startup、controller/Board objects、runtime 与 typed HAL。
 
-## ADR 011 FreeRTOS 实时资源静态配置及启动上下文
+CMake/CTest/preset 是权威构建模型。Python CLI 和 shell/PowerShell wrappers 只编排同一命令及退出码；setup 检查本机依赖或明确初始化 pinned dependencies，不维护另一套配置 DSL。Windows/macOS wrappers 未在本 Linux session 执行。
 
-状态：采用；实际 pinned kernel、Native 与裸机分别验证，实板时序待 HIL。
+## ADR 009 板卡通过单一路径和窄资源接入
 
-FreeRTOS 的 task、queue、mutex、semaphore、event group、timer 使用固定容量和静态内核对象；栈、队列 payload、idle/daemon 栈均有明确预算，耗尽返回错误。OSAL heap seal 只约束 OSAL 分配入口，不宣称禁止 SDK/libc 或全程序 malloc。任务自然返回停留在 finished 状态，由其他任务完成同步删除；持有 mutex 的已结束任务隔离，不回收 TCB 给新任务继承其锁身份。
+状态：采用；校验范围为明确维护路由。
 
-启动期可以创建对象，但调度前不能调用阻塞操作或 FromISR 内核入口。官方 ARM port 在调度启动前的 critical nesting sentinel 会令部分对象构造保留 BASEPRI；适配器保存恢复 incoming port mask，不能让构造意外阻断 HAL tick/UART。应用先 Product boot，再创建 worker 并启动 scheduler，业务在受调度任务中执行。启动期删除与只读查询按对象能力明示，不伪造可重启内核或完整 MCU teardown。
+`NEXUS_BOARD_DIR` 选择一个外部 package；manifest binds schema、SoC/HSE、CMake/interface/object targets、全部声明 inputs 和资源。源码必须在 package 内并被摘要覆盖；enabled controller 的 pin/AF/clock/IRQ/DMA 与 reviewed route 一致，冲突拒绝。Board 传只读 Nexus 资源，不能持有/修改 mutable driver instance。
 
-## ADR 012 官方源码导入和工具链身份
+这是已维护 GPIO/UART/SPI 路由的 consistency validation，不能称全芯片自动拓扑求解。增加新 peripheral/alternate route 需要真实 provider、SDK 复核、负配置与 cross-build；物理 PCB/电气仍由 HIL 单独资格确认。SDK header/macros 留在实现目标私有编译面。
 
-状态：采用；候选和企业 inventory 同时识别 Git 依赖与 reviewed import。
+## ADR 010 普通 typed consumer 与 provider 内部契约分离
 
-STM32/CMSIS/FreeRTOS 继续锁定真实 gitlink。GD32F4xx 官方 SDK 3.3.3 以逐文件字节导入，锁定下载来源、双层 archive SHA-256、路径、长度、每文件摘要和实际许可证；配置和打包均拒绝缺失、额外、篡改与 symlink 文件。导入不伪造厂商 Git commit，也不把旧 Arm 特殊许可改写为 BSD。ARM GNU 14.3.rel1 的 Linux x86_64 工具链以官方 archive SHA-256 固定，CI 与本地使用同一版本入口。SBOM 的有限静态链接范围和完整固件许可审核继续分别报告。
+状态：采用。
 
-## 需要产品信息收敛的决策
+`hal/base/nx_device.h` 对普通应用暴露 opaque descriptor、只读 metadata 和 owner/generation 值引用；发现不 init，open/close/recover 明确错误。mutable descriptor/state/registration 使用显式 `hal/provider/nx_device_provider.h`，provider target PRIVATE link `Nexus::HALProviders`。
 
-团队输入已确定为约 10 人、3–6 个月，首发板为 STM32F407ZGT6 启明欣欣高配 V3.1、STM32F407VET6 天空星青春版和 GD32F470ZGT6 梁山派；用户已将原 F303 目标替换为 F470。PCB revision 的实物确认、控制周期和允许抖动、RS485/CAN/Ethernet 优先级、断电保持策略、OTA 空间、量产身份、外部 Flash/Secure Element、支持年限及 HIL 资源仍需实际产品定义。软件配置记录文档来源，不能代替收到实板后的确认。
+HALCore、每类 facade、HALSupport、deadline runtime/OSAL binding 独立链接。UART ticket、SPI/I2C parent-child、Flash region/borrow 各自定义真实 settlement，无无能力同步/异步转换占位。Native typed I2C 已实现；MCU modern hardware I2C 当前 unsupported，不从 legacy getter 推导支持。
+
+## ADR 011 后端能力、静态资源和启动上下文明示
+
+状态：采用；真实软件后端检查已执行，ARM port 时序未上板。
+
+OSAL 查询声明 backend capability、资源限制与累计不可重定向 token 预算。FreeRTOS 六类对象使用静态 kernel/control/payload/stack 预算；固定 slot 可复用，lifetime identity 不复用，耗尽明确失败。OSAL heap seal 不代表 SDK/libc 或全固件无 malloc。
+
+Arch saved PRIMASK 与 FreeRTOS BASEPRI/syscall 临界区不互换。调度前拒绝 blocking/FromISR；适配器保留 incoming mask，避免构造静态对象意外阻断启动期 HAL tick。外部应用显式检查 worker create/`osal_start()`，需要调度的业务在 worker 中运行；裸机拥有自己的 loop/pump，未实现能力明确拒绝。
+
+## ADR 012 固定官方依赖与可重定位源码包
+
+状态：采用；relocated fixture 已真实消费，strict clean 包待最终提交验证。
+
+CMSIS/ST HAL/FreeRTOS 等锁定真实 Gitlink，GD32 3.3.3 使用 reviewed official import 的下载/archive/逐文件摘要和许可证，不伪造 Gitcommit。ARM GNU14.3.rel1 archive hash 固定；配置和打包拒绝漂移/缺失/额外/symlink。
+
+`nexus_package_source_sdk()`/prepare script 导出源码、必要依赖、许可、relative CMakeConfig/Version。manifest binds source commit/tree、files/deps/import/toolchain、snapshot 和两个 export 摘要；验证不误取 consumer ancestor Git。find_package 要求精确版本，并可固定完整 source revision。
+
+发布默认拒 dirty/未知 source；development fixture 只有显式 opt-in 可消费，`publishable=false`。package prepare 与 consumer 重新编译真实 startup/linker；工具链外部提供。没有 installed binarySDK、签名分发或跨配置 ABI 承诺。真正 clean package、verify 与消费者矩阵在最终 commit 后完成。
+
+## 继续演进的前置条件
+
+用户当前选择先软件和 HIL 工装。新增 MCU/复杂拓扑、cache/MPU、完整热重启、非零 imageoffset/bootloader、安全 vault/entropy、控制 worst-load 和企业 LTS 都需要独立实现与证据。实板预算、PCBrevision、RS485 收发器、掉电工装、产品信任/制造和成员主备由外部产品与团队定义，不以计划、接口或 null 预算冒充能力。

@@ -1,120 +1,110 @@
 # Nexus Embedded Platform
 
-English | [中文](README_CN.md)
+Nexus provides the common firmware platform for industrial control and connected devices: CPU primitives, typed HAL, OSAL, SoC/Board integration, explicit infrastructure lifecycle, reusable components, and traceable builds. Application entry points, workers, product policy, private protocols, partitions and manufacturing identities belong to external repositories.
 
-Nexus targets industrial control and connected devices through a common HAL/OSAL,
-separate SoC/board/product profiles, and traceable engineering and delivery.
-Maintained implementations include Linux Native, STM32F407VG Discovery,
-STM32F407ZGT6 Qiming high-spec V3.1, STM32F407VET6 Sky Youth, and GD32F470ZGT6
-Liangshan Pi. Each MCU board has baremetal and FreeRTOS configurations.
+Reference examples live in [X-Gen-Lab/nexus-examples](https://github.com/X-Gen-Lab/nexus-examples). They pin a Nexus source revision and use public targets and headers; platform contract tests build independently of those applications. The [38-task execution record](docs/implementation/refactor-execution.md) separates production implementation, actual software checks, final integration and physical qualification.
 
-| Profile | Implementation/evidence | Qualification boundary |
+| Platform | Maintained software | Qualification boundary |
 |---|---|---|
-| Linux Native / GCC | Full targets build; software contracts and application checks | Host peripheral models |
-| FreeRTOS POSIX port | Pinned real kernel and OSAL contract execution | Does not validate Cortex-M interrupts/timing |
-| STM32F407VG / MB997 | Existing implementation and real ARM build baseline | New changes require separate evidence; physical HIL pending |
-| STM32F407ZG Qiming V3.1 / F407VE Sky Youth | Separate wiring, actual density and Flash partitions | Physical HIL and actual PCB revision confirmation pending |
-| GD32F470ZG Liangshan | Official SDK 3.3.3; independent startup/clock/IRQ/GPIO/UART/SPI/time/Flash | Software/ARM evidence is separate from board qualification |
-| Windows / macOS | Native presets retained | Not executed in this maintenance run |
+| Linux Native | HAL/OSAL contracts and peripheral models; explicit OpenSSL provider | Host behavior does not establish MCU electrical or real-time behavior |
+| Pinned FreeRTOS POSIX port | Real kernel execution for OSAL contract tests | ARM port interrupts and timing remain separate |
+| STM32F407VG Discovery / F407ZG Qiming V3.1 / F407VE Sky Youth | Real startup, private vendor SDK, GPIO/UART/SPI providers and full physical Flash geometry | Exact PCB, wiring, IRQ/DMA/wire timing and power loss require HIL |
+| GD32F470ZG Liangshan Pi | Independent official SDK 3.3.3, startup, clock, GPIO/UART/SPI/time and Flash implementation | MCU qualification has not been executed |
+| Windows / macOS Native | Retained presets and common wrappers | Not executed in this Linux maintenance session |
 
-The [support matrix](docs/strategy/support-matrix.yaml) defines promotion evidence.
-Enterprise support and LTS are not currently promised.
+STM32/GD32 modern typed **I2C hardware providers are currently unsupported**. Native typed I2C is implemented and tested. Unsupported capabilities fail explicitly. No physical board, enterprise support, LTS, installed binary SDK or MPU protection qualification is claimed by this iteration. See the [support matrix](docs/strategy/support-matrix.yaml).
 
-## Build and verify
+## Build the platform
 
-Use CMake 3.21+, Python 3.11+, and a C11/C++17 compiler. The default Native
-security services require OpenSSL 3 development headers/libraries; the minimal
-product does not. ARM uses the pinned complete ARM GNU 14.3.rel1/newlib toolchain.
-Configuration does not download dependencies: initialize the pinned submodules.
+Use CMake 3.21+, Ninja, a C11/C++17 compiler and Python (3.11 recommended). Kconfiglib is pinned; configuration does not download dependencies. The full Native profile explicitly selects OpenSSL 3 and needs its development package. `native-minimal-debug` builds without optional services or OpenSSL.
 
 ```sh
-git clone https://github.com/X-Gen-Lab/nexus.git
+git clone --recurse-submodules https://github.com/X-Gen-Lab/nexus.git
 cd nexus
-python -m pip install kconfiglib==14.1.0
-git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+python3 -m pip install kconfiglib==14.1.0
 cmake --preset linux-gcc-debug
 cmake --build --preset linux-gcc-debug --parallel 4
 ctest --preset linux-gcc-debug --output-on-failure --no-tests=error --parallel 4
-python -m unittest discover -s scripts/ci -p 'test_*.py'
+python3 -m unittest discover -s scripts/ci -p 'test_*.py'
 ```
 
-Linux packages include GCC, CMake, Ninja and libssl-dev. List other presets with
-cmake --list-presets. Their presence is not cross-platform execution evidence.
-
-Each build owns one generated bundle: effective.config, nexus_config.h and
-config.cmake. Presets own compiler/build mode; Kconfig fragments own device and
-resource selections. Source-root .config and generated headers are retired.
-Unknown/conflicting/out-of-range settings and generation failures stop the build.
+The same build/test sequence is available through the maintained wrapper:
 
 ```sh
-python scripts/ci/install_arm_toolchain.py --install-dir build/toolchains/arm-gnu-14.3.rel1
+python3 scripts/ci/ci_build.py --preset linux-gcc-debug --stage all --jobs 4
+cmake --preset native-minimal-debug
+cmake --build --preset native-minimal-debug --parallel 4
+```
+
+The minimal and optional-component presets compile platform libraries; application demos are in the external repository. `cmake --list-presets` lists the available profiles. A preset's existence is not execution evidence.
+
+ARM builds use the complete fixed ARM GNU 14.3.rel1/newlib toolchain. The installer verifies the archive hash in [toolchains.lock.json](dependencies/toolchains.lock.json).
+
+```sh
+python3 scripts/ci/install_arm_toolchain.py --install-dir build/toolchains/arm-gnu-14.3.rel1
 export PATH="$PWD/build/toolchains/arm-gnu-14.3.rel1/bin:$PATH"
-cmake --preset stm32-armgcc-release
-cmake --build --preset stm32-armgcc-release --parallel 4
-cmake --preset stm32-armgcc-freertos-release
-cmake --build --preset stm32-armgcc-freertos-release --parallel 4
+cmake --preset stm32-qiming-armgcc-freertos-release
+cmake --build --preset stm32-qiming-armgcc-freertos-release --parallel 4
+python3 scripts/ci/validate_firmware_elf.py \
+  --build-dir build/stm32-qiming-armgcc-freertos-release \
+  --report build/stm32-qiming-armgcc-freertos-release/firmware-static.json
 ```
 
 | Board | Baremetal Release preset | FreeRTOS Release preset |
 |---|---|---|
-| Qiming high-spec V3.1 | `stm32-qiming-armgcc-baremetal-release` | `stm32-qiming-armgcc-freertos-release` |
-| Sky Youth | `stm32-sky-armgcc-baremetal-release` | `stm32-sky-armgcc-freertos-release` |
-| Liangshan Pi | `gd32f470-armgcc-baremetal-release` | `gd32f470-armgcc-freertos-release` |
+| Discovery F407VG | `stm32-armgcc-release` | `stm32-armgcc-freertos-release` |
+| Qiming F407ZG V3.1 | `stm32-qiming-armgcc-baremetal-release` | `stm32-qiming-armgcc-freertos-release` |
+| Sky F407VE Youth | `stm32-sky-armgcc-baremetal-release` | `stm32-sky-armgcc-freertos-release` |
+| Liangshan F470ZG | `gd32f470-armgcc-baremetal-release` | `gd32f470-armgcc-freertos-release` |
 
-Replace `release` with `debug` for each development profile. ELF/map/bin/hex use
-the selected build's bin directory. Match silicon, actual PCB revision, supply,
-partition layout and effective configuration before flashing. Consult the
-[platform delivery record](docs/implementation/platform-delivery.md) for execution
-scope and source/artifact identity. Physical HIL has not been executed.
+Top-level MCU profiles build `nexus_contract_firmware.elf` plus configured map/bin/hex in `build/<preset>/bin`. This fixture checks startup and platform linking; it is not a business application or physical UART echo qualification. Source consumers default to no platform development tests or fixtures.
 
-## Runtime contracts
+## Consume Nexus
 
-- Independent Arch saved interrupt state and barriers; typed HAL references,
-  explicit open/close/recover, UART tickets and buffer leases.
-- Product-owned board/backend/services/budgets and boot/rollback. FreeRTOS uses
-  scheduled application workers and six static object pools. Source SDK products
-  consume `Nexus::Product`.
-- STM32 SPI bus/device/transaction separation, bounded asynchronous queues,
-  cancellation and DMA drain before buffer release.
-- Baremetal exposes an honest main-loop backend; unsupported scheduling,
-  event and software timer operations fail explicitly.
-- Dual-bank atomic snapshots on a real Flash port; persistent Native file-flash
-  simulation. RAM remains volatile.
-- A serialized Config management owner and authenticated AES-GCM records using
-  maintained crypto providers. The MCU crypto provider and entropy source are
-  not integrated; required crypto operations return unsupported.
-- Authenticated update policy and recoverable trial/confirm/rollback metadata.
-  Product bootloader, protected vault and hardware evidence still need binding.
+A parent project can add a fixed complete checkout as a subdirectory:
 
-```sh
-build/linux-gcc-debug/bin/blinky --cycles 3
-cmake --preset native-services-debug
-cmake --build --preset native-services-debug --parallel 4
-build/native-services-debug/bin/freertos_demo --run-ms 500
+```cmake
+cmake_minimum_required(VERSION 3.21)
+project(my_firmware LANGUAGES C CXX ASM)
+set(NEXUS_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/platform.conf" CACHE FILEPATH "")
+add_subdirectory(external/nexus nexus)
+nexus_add_application(TARGET firmware SOURCES main.c)
 ```
 
-Read the implementation records for [build/config](docs/implementation/build-config.md),
-[drivers](docs/implementation/platform-drivers.md),
-[storage/security](docs/implementation/storage-security.md),
-[update](docs/implementation/update.md) and
-[reference applications](docs/implementation/reference-applications.md), plus
-[integrated validation and live CI](docs/implementation/integration-validation.md).
-Software fault injection is separate from physical power-loss, electrical and
-control-deadline measurements.
+Select the toolchain before `project()` using `-DCMAKE_TOOLCHAIN_FILE=.../cmake/toolchains/arm-gcc.cmake`; ARM also selects `NEXUS_PLATFORM=stm32` or `gd32f470`. Start from a maintained configuration fragment and keep one platform/Board/backend per build directory. The consumer owns `main()`, component initialization, tasks, scheduling and recovery.
 
-## Enterprise workflow
+```c
+#include "runtime/nx_runtime.h"
 
-The [architecture and workflow plan](docs/strategy/README.md) covers the
-approximately ten-person allocation, 3–6 month roadmap, requirement/test
-traceability, risk review, dependencies and release gates.
-The [backlog](docs/strategy/backlog.csv) distinguishes implementation evidence,
-pending qualification and external blockers.
+int main(void) {
+    nx_boot_report_t report;
+    if (nx_runtime_bootstrap(&report) != NX_OK) return 1;
+    /* Initialize selected components/devices, then run your loop or scheduler. */
+    return 0;
+}
+```
 
-A release candidate binds the same source commit, effective configuration,
-dependency identities, artifact digests and nonzero tests. Production also
-requires matching board HIL, signing identity, measured budgets and manufacturing
-evidence. Missing evidence cannot become a successful production gate.
+`Nexus::Firmware` explicitly links the selected platform objects/startup plus Runtime and typed HAL. `nx_runtime_bootstrap()` initializes HAL then OSAL, reports ownership and rollback failures, and starts no worker or scheduler. `nx_runtime_shutdown()` requires callers to settle their objects; a running MCU FreeRTOS kernel cannot be shut down/restarted through this API. `nx_platform_get_info()` reads Board/backend, identity digests and main SRAM/Flash/resource information without starting hardware.
 
-Read [AGENTS.md](AGENTS.md) before changing public contracts, persisted formats or
-the build graph. Nexus uses the [MIT license](LICENSE); dependencies retain
-their individual licenses.
+A clean complete checkout can also prepare a relocatable **source SDK** outside its source tree:
+
+```sh
+python3 -B cmake/package/package_source_sdk.py \
+  --source /absolute/path/to/nexus --output '/absolute/path/to/nexus sdk prefix'
+python3 -B '/absolute/path/to/nexus sdk prefix/share/nexus/src/cmake/package/package_source_sdk.py' \
+  --verify '/absolute/path/to/nexus sdk prefix/share/nexus/src'
+```
+
+Use `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)` instead of `add_subdirectory`, passing `Nexus_DIR=<prefix>/lib/cmake/Nexus`, your `NEXUS_CONFIG_FILE` and `NEXUS_EXPECTED_SOURCE_REVISION`. The package rebuilds actual source, dependencies, startup and linker. See [package preparation and consumer commands](cmake/package/README.md). The relocated development fixture has been tested; the strict publishable clean snapshot must bind the final source commit. Development fixtures require explicit opt-in and remain ineligible for release promotion.
+
+## Configuration and ownership
+
+- `generated/effective.config`, `nexus_config.h` and `config.cmake` come from one Kconfig parse. Contradictory, unknown or out-of-range settings stop configuration. No source-root `.config` or stale header fallback exists.
+- `NEXUS_BOARD_DIR` supplies one external Board package. Its manifest binds source inputs and reviewed GPIO/UART/SPI routes. This validation is scoped to maintained routes, not a complete automatic resource solver.
+- `NEXUS_FLASH_LAYOUT_FILE` supplies consumer-owned image/regions. One parse generates linker and region declarations; Board/layout digests are bound to ELF symbols. The default image covers full physical Flash with no automatic storage reservation. Nonzero image offsets are rejected.
+- Device discovery is side-effect free. Explicit typed open/close and owner/generation references protect lifetime. Timeout or cancellation does not release an unsettled hardware buffer.
+- Log/Shell core and typed UART adapters, Config RAM/Flash, StorageHAL and OpenSSL are explicit choices. Test fakes do not enter production libraries. Crypto core has no default provider; a missing MCU crypto provider returns unsupported.
+
+Read [architecture decisions](docs/strategy/architecture-decisions.md), [HAL/OSAL contracts](docs/strategy/hal-osal-design.md) and [enterprise workflow](docs/strategy/enterprise-workflow.md). Historical `3129550` Native 1781 tests and eight ARM/15 ELF results remain recorded in [platform-validation.json](docs/implementation/platform-validation.json); they do not qualify the new refactor. Current scoped execution and remaining gates are in [refactor-execution.csv](docs/implementation/refactor-execution.csv).
+
+A release binds the same source/dependencies, effective configuration, Board/layout, toolchain, ELF/BIN and nonzero executed tests. Product promotion additionally needs actual HIL, trust/signing, measured budgets and manufacturing evidence. Read [AGENTS.md](AGENTS.md) before changing contracts. Nexus uses the [MIT license](LICENSE); dependencies keep their own licenses.

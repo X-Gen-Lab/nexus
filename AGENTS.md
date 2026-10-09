@@ -1,34 +1,41 @@
 # Nexus maintenance instructions
 
-Nexus is being maintained toward an industrial control and connected device platform. Read `docs/strategy/README.md`, the relevant architecture decisions, and the matching backlog item before architecture changes. These strategy documents describe a target; do not claim planned capabilities already work.
+Nexus owns the common industrial embedded platform. Read `docs/strategy/README.md`, the relevant architecture decisions and the matching RF item in `docs/implementation/refactor-execution.csv` before architecture changes. The external `nexus-examples/docs/platform-refactor-plan.md` defines the original 38 tasks/19 batches. Historical `docs/strategy/backlog.csv` uses earlier IDs and evidence. Plans and role metadata do not prove implemented capabilities.
 
 ## Engineering boundaries
 
-- The user authorizes architectural refactoring and removal of poor legacy designs. Prefer explicit, testable contracts over compatibility shims. Update callers, tests and documentation atomically when changing public interfaces; persisted product data still needs an explicit format and recovery policy.
-- Keep common HAL and OSAL independent of vendor SDK headers, board wiring, product policy, and network services. Keep architecture primitives, SoC drivers, boards, and product profiles distinct.
-- Document task versus ISR context, blocking and timeout rules, memory ownership, cancellation, lifecycle, and error state. Never return success for a required but unimplemented operation.
-- Use per-build effective configuration. Reject contradictions and generation failures. Do not silently consume a developer's root `.config` or a stale generated header for a different target.
-- DMA timeout and cancellation must settle hardware and callback ownership before the caller can release buffers. Do not implement cryptographic primitives or label RAM storage as persistent flash.
-- Target deterministic control behavior and bounded resources. Measure hardware timing, memory, fault recovery, and persistence on the supported board profile.
+- The user authorizes breaking architectural refactors and removal of poor designs. Update public interfaces, production callers, tests and documents atomically. Persisted product data needs a separate explicit format, migration and recovery policy.
+- Keep HAL/OSAL independent of vendor headers, Board wiring and product policy. Arch, SoC/controllers and Board resources own separate contracts. Product main/workers, domain control, private protocols and partition/update/health/manufacturing policies belong to external repositories such as nexus-examples.
+- Runtime owns only serial HAL/OSAL infrastructure. Firmware explicitly assembles platform objects/startup. Applications own scheduler, components and workers. Do not restore Product identity, automatic main wrappers or mandatory application choice.
+- Document task/ISR context, timeout origin, blocking bound, ownership, cancellation, callback, lifecycle and failure state. Never return success for required unimplemented operations. An unsettled DMA/transfer buffer remains borrowed; timeout is not settlement.
+- Use one per-build effective configuration and reject contradictions/generation failures. No source-root `.config` or stale generated-header fallback. Different Board/backend combinations use independent build roots.
+- Board packages use one `NEXUS_BOARD_DIR`, declared hashed inputs and reviewed narrow resources. External `NEXUS_FLASH_LAYOUT_FILE` drives linker/regions from one parse. SoC exposes full physical Flash; no default product storage reservation. Nonzero image offsets, MPU/cache, MCU typed I2C and unsupported routes stay explicit until implemented and verified.
+- Prefer bounded resources and honest capabilities. Do not write cryptographic primitives or call RAM persistent Flash. External product teams own physical timing, memory, power-loss, maintenance-window and worst-load budgets.
 
 ## Validation and review
 
-Run checks appropriate to the changed behavior. The CI helper tests are available without third-party test frameworks:
+The CI helper tests require no third-party test framework:
 
 ```sh
-python -m unittest discover -s scripts/ci -p 'test_*.py'
+python3 -m unittest discover -s scripts/ci -p 'test_*.py'
 ```
 
-Use a complete checkout, its pinned submodules and required toolchain for CMake/CTest. Host tests must reject zero tests. Retain logs, executed test counts, effective configuration, board identity and artifact hashes. State when full build, HIL or a backend was not executed; a workflow definition or coverage claim is not execution evidence.
+Use a complete checkout, fixed submodules/imports and required toolchain for CMake/CTest. Top-level ARM `NEXUS_BUILD_CONTRACTS` builds an independent platform link fixture; source consumers default development tests/contracts off. Host suites reject zero tests; required evidence rejects empty/stale/all-skipped reports and propagates nonzero command exits.
 
-For critical contracts, test user-visible outcomes, failures and cross-backend invariants. Keep native simulation and real ISR/DMA/electrical validation distinct. Introduce a regression test when fixing a meaningful defect; avoid tests that merely compare implementation text.
+Keep actual command, exit, test enumeration, source/dep/config/toolchain, Board/layout and artifact hashes. Separate host models, real FreeRTOS POSIX execution, ARM compilation, real firmware linkage and physical qualification. A target, workflow definition, file or coverage claim is not execution evidence. Historical source counts cannot qualify later refactors.
 
-Use requirement and backlog IDs in PR context. ADRs are for dependency direction, public contracts, persistence, security and release architecture decisions. Update support claims and examples with their implementation and execution evidence. Do not add new MCU platforms before the current supported combination has a repeatable validation baseline.
+Critical regression tests verify user-observable success/failure and cross-backend invariants. Relevant faults include stale owners, finite pool exhaustion, busy/error retry, timeout/cancel races, zero ticket recovery and final buffer return. Reversible prose/format changes need suitable checks, not new tests that mirror text.
+
+The user currently defers physical boards: finish authorized software and HIL tooling without executing equipment. Record physical IRQ/DMA/electrical/power-cut/long-load qualification as unexecuted. Do not invent station IDs, measured budgets, passing HIL or hardware support from models.
+
+Use RF/backlog IDs in review context. ADRs cover dependency direction, public contracts, persistence, security and release identity. Update exact support claims and external caller contracts with implementation/evidence. Do not add platforms before maintained combinations have repeatable software baselines.
 
 ## Delivery
 
-Publishable artifacts must be built and verified before release, with a matching source, configuration and dependency identity. Candidate releases are drafts until the required product evidence exists. Signing and manufacturing credentials must never appear in source, test fixtures, logs or artifacts. Planned SBOM, signing, HIL and LTS capabilities must remain labeled as planned until completed.
+Publishable artifacts need verified source, dependencies, effective configuration, Board/layout and ELF/BIN identity. Candidate and product promotion remain separate gates; same-artifact promotion does not rebuild a different image. Signing/manufacturing credentials never enter source, tests, logs or artifacts.
 
-Do not contact third parties or change remote repository settings simply because a document names a role or workflow. Continue reversible local analysis, implementation and validation within the user's established task scope. Make remaining remote changes concrete and reviewable.
+Relocatable source SDK preparation needs a clean complete checkout and actual consumer verification. Development fixtures remain `publishable=false` and require explicit opt-in; they are ineligible for promotion. Source packages do not establish installed binary SDK, ABI compatibility, signing or physical qualification.
 
-The `.nexus-source-snapshot.json` file, if present, identifies an analysis snapshot rather than a full Git checkout. Check missing files, submodules and tool availability before attempting full builds or reporting Git history.
+Real HIL, trust/signing, manufacturing, named reviewers, branch rules, support window and LTS require actual external evidence and responsibility. Role files do not authorize contacting third parties or altering repository settings. Continue reversible authorized work and make remote changes concrete/reviewable.
+
+`.nexus-source-snapshot.json`, if present, identifies an analysis snapshot, not a complete Git checkout. Verify missing files/submodules/tooling before reporting builds or history.

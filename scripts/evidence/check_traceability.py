@@ -37,21 +37,37 @@ def validate(requirements_path: Path, backlog_path: Path, roles_path: Path) -> d
             raise EvidenceError("distinct valid backup role required")
     if any(role not in role_ids for role in roles["interfaces"].values()):
         raise EvidenceError("interface owner must be an allocated role")
-    with backlog_path.open(newline="", encoding="utf-8") as stream:
-        backlog = list(csv.DictReader(stream))
-    backlog_ids = {item["id"] for item in backlog}
+    try:
+        with backlog_path.open(newline="", encoding="utf-8") as stream:
+            reader = csv.DictReader(stream, strict=True)
+            columns = reader.fieldnames or []
+            # Current execution records use task_id. The former backlog.csv uses
+            # id; this explicit legacy column is the only alternative CSV format.
+            identity_columns = {"task_id", "id"}.intersection(columns)
+            if len(identity_columns) != 1 or len(columns) != len(set(columns)):
+                raise EvidenceError("CSV requires one task_id or legacy id column")
+            identity_column = identity_columns.pop()
+            backlog = list(reader)
+    except csv.Error as error:
+        raise EvidenceError("invalid backlog CSV quoting") from error
+    if any(None in item or any(value is None for value in item.values()) for item in backlog):
+        raise EvidenceError("malformed backlog CSV row")
+    backlog_ids = {identifier(item[identity_column], "backlog identity") for item in backlog}
     if not backlog or len(backlog_ids) != len(backlog):
         raise EvidenceError("backlog identities must be nonempty and unique")
     document = load_json(requirements_path)
-    fields(document, {"schema_version", "product_id", "product_status", "requirements"})
-    if document["schema_version"] != 1:
+    fields(document, {"schema_version", "subject_id", "subject_status", "requirements"})
+    if type(document["schema_version"]) is not int or document["schema_version"] != 2:
         raise EvidenceError("unsupported requirement schema")
-    identifier(document["product_id"], "product id")
+    identifier(document["subject_id"], "subject id")
+    identifier(document["subject_status"], "subject status")
     requirements = document["requirements"]
     if not isinstance(requirements, list) or not requirements:
         raise EvidenceError("zero requirements rejected")
     seen = set()
     statuses = {"planned": 0, "implemented": 0, "host_validated": 0, "hardware_validated": 0}
+    if document["subject_status"] not in statuses:
+        raise EvidenceError("unsupported subject status")
     for requirement in requirements:
         fields(requirement, {"id", "backlog_ids", "owner_role", "statement", "verification_kind",
                              "status", "acceptance", "evidence"})
@@ -96,16 +112,23 @@ def validate(requirements_path: Path, backlog_path: Path, roles_path: Path) -> d
             if not any(item["kind"] == "manufacturing_audit" and
                        load_json(item["identity"]["path"]).get("status") == "pass" for item in evidence):
                 raise EvidenceError("manufacturing validation needs executed station audit")
+    # Subject status is a qualification stage, not free-form promotional text.
+    # It may lag individual requirements but cannot advance past any of them.
+    stages = list(statuses)
+    subject_stage = stages.index(document["subject_status"])
+    if any(stages.index(requirement["status"]) < subject_stage for requirement in requirements):
+        raise EvidenceError("subject status exceeds an unmet requirement")
     return {"schema_version": 1, "kind": "requirement_traceability", "status": "pass",
             "requirements": len(requirements), "status_counts": statuses, "allocated_people": seats,
             "named_team_assignment": roles["assignment_status"],
-            "limitation": "schema consistency is not product acceptance or hardware execution"}
+            "subject_id": document["subject_id"], "subject_status": document["subject_status"],
+            "limitation": "schema consistency is not subject acceptance or hardware execution"}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--requirements", type=Path, default=Path("docs/requirements/industrial-reference.json"))
-    parser.add_argument("--backlog", type=Path, default=Path("docs/strategy/backlog.csv"))
+    parser.add_argument("--requirements", type=Path, default=Path("docs/requirements/platform.json"))
+    parser.add_argument("--backlog", type=Path, default=Path("docs/implementation/refactor-execution.csv"))
     parser.add_argument("--roles", type=Path, default=Path(".github/maintainer-roles.json"))
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()

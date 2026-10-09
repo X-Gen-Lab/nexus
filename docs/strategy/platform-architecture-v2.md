@@ -1,180 +1,149 @@
-# Nexus 平台架构重构设计
+# 平台架构与构建实现设计
 
-日期：2026-10-08。审查基线：`affaa86f485886d4bf72fb40e511030de5407ba0`，位于 `codex/industrial-platform-modernization`，尚未合入 `main`。适用范围：约 10 人的工业控制与设备联网团队，STM32/GD32，FreeRTOS/裸机，3–6 个月交付窗口。
+日期：2026-10-09。范围：Nexus 通用平台及外部消费者；当前源码实现与定向检查详见 [38 项执行表](../implementation/refactor-execution.csv)。原 `affaa86f` 审查中 HAL/OSAL 混合、Product 身份、固定保留 Flash 和隐式 main 均为历史背景，当前不再作为消费接口。
 
-本文保留审查基线的问题与目标设计；后续实现已落地独立 Arch、类型化 GPIO/UART、静态 OSAL、Product 和三首发板。当前代码与实际执行范围见[平台交付记录](../implementation/platform-delivery.md)，不要把下方基线问题当作现 HEAD 的未修复结论。本文区分审查基线、目标设计和实施退出条件。原有 [目标架构](target-architecture.md) 提供产品背景；本文收敛到 HAL/OSAL、Arch/SoC/Board/Product 与构建目标的具体边界。配套阅读：[主流平台比较](platform-comparison.md)、[HAL/OSAL 详细设计](hal-osal-design.md)、[架构决策](architecture-decisions.md)。这些设计没有自动赋予硬件支持、产品资格或企业发布资格。
-
-## 1. 决策与成功标准
-
-保留 C11、CMake、Kconfig、CTest、维护中的 FreeRTOS，以及平台无关的存储/协议/工业服务核心。Nexus 定位为可组合的 MCU 产品平台，不建设新 RTOS，不重写密码库，不要求业务依赖厂商 SDK。首批重构优先形成能验证的编译边界，再调整有缺陷的运行时模型。
-
-“优秀”用结果衡量：一个板级变更不修改领域服务；一个产品变更不复制整套 BSP；一个外设实例有明确所有者；超时不会提前归还硬件仍在使用的内存；最小产品不安装无关工具；构建与现场诊断能定位同一组源码、配置和工件。性能指标由产品预算与实测决定，不预设优于其他平台。
-
-首期选择一份有效配置对应一个平台、板卡、OSAL 后端及资源配置。多个产品/后端使用独立构建目录。单次 CMake 配置内同时建立多个不同 Nexus 配置、SMP、通用热插拔和动态插件框架均不属于首期范围。
-
-## 2. 审查基线结构及问题归属
-
-以下箭头表示审查基线 CMake 依赖，省略无关的单个源码文件：
+## 1. 一份配置与显式目标图
 
 ```text
-hal_interface / osal_interface -> nexus_build_options
-hal -> hal_interface + osal
-osal -> Native Threads | baremetal | FreeRTOS kernel/config
-platform_native OBJECT -> hal + osal
-platform_stm32 OBJECT -> hal + osal + vendor SDK + storage
-  + startup/system/clock/IRQ
-  + GPIO/UART/SPI controller implementations
-  + F407 Flash + MB997 identity/SPI wiring
-application helper -> selected platform + hal + osal + explicit services
-industrial_controller -> protocols + industrial (Native model)
+external application target
+  -> Nexus::Firmware
+       -> platform_<selected> + explicit platform OBJECTS/startup
+       -> Nexus::Runtime
+            -> HALCore + HALSupport + OSAL
+       -> HALDevice facades
+  -> explicitly selected component cores/adapters
+
+HALCore -> configuration/standard types + private Arch/provider contract
+HALGPIO / HALUART / HALSPI / HALI2C / HALFlash -> HALCore
+HALSupport -> HALCore + OSAL + Arch
+HALRuntime -> HALUART + Arch
+HALRuntimeOSAL -> HALRuntime + OSAL
+HALCompletion -> configuration + Arch; caller-owned queue, no OSAL worker
+controller / SoC / Board objects -> narrow Nexus contracts + private SDK
 ```
 
-可核对的源码入口：
+Firmware 的 typedfacade 集合是便利装配；只需要一个 GPIO core 的消费者可直接选 HALGPIO，实际最小 link 检查证明不拉 OSAL。HAL aggregate 仅提供显式兼容性装配，不应成为新 provider 公开 SDK 的捷径。一个 buildroot 内只有一个 Nexus 配置，多个平台/后端需要独立 configure。
 
-| 现状 | 源码 | 架构后果 |
-| --- | --- | --- |
-| HAL 实现公开依赖 OSAL | `hal/CMakeLists.txt` | 设备核心、互斥封装、等待适配与运行时实现混在一个库中 |
-| CPU 中断屏蔽在 HAL 内实现 | `hal/src/nx_mutex.c` | Arch 责任未形成独立模块；不能直接与 RTOS 临界区合并 |
-| 查找后自动初始化并缓存指针 | `hal/src/nx_device.c`, `hal/include/hal/nx_factory.h` | 发现、资源取得和初始化失败被压缩为同一个返回值 |
-| 通用同步转换自带弱计时器 | `hal/src/nx_adapter.c` | 轮询次数被当作时间；超时不能证明异步 TX 已停止 |
-| SDK 的头与宏公开传播 | `platforms/stm32/CMakeLists.txt` | 普通应用可以隐式使用 SDK，平台可移植性难以检查 |
-| Board SPI 使用 controller 内部结构 | `boards/stm32f4discovery/spi.c` | 拓扑、DMA 运行状态和 IRQ 生命周期没有分开 |
-| 多个 UART 描述符统一指向 USART1 | `platforms/stm32/src/hal/uart/stm32_uart_device.c` | 逻辑实例没有真实资源绑定，多实例无法成立 |
-| 框架启动与应用手工启动并存 | `framework/init/src/nx_startup.c`, `applications/blinky/main.c` | 初始化错误与调度器启动责任不统一 |
-| 根目录与输出目录使用宿主工程根变量 | `cmake/modules`, `osal/CMakeLists.txt`, `framework/init/CMakeLists.txt` | 作为外部产品子工程消费时路径和作用域错误 |
-| 部分有效选项不改变目标图 | `hal/Kconfig`, `services/CMakeLists.txt` | 配置关闭、目标创建和依赖安装不是同一个语义 |
+| 输入 | 拥有者 | 生效规则 |
+|---|---|---|
+| CMake preset | 平台维护者/外部工程 | generator、compiler/buildtype、明确 config 路径 |
+| `NEXUS_CONFIG_FILE` | 消费方 | Kconfig 软件选择与 generic 资源；非法依赖/choice/range 拒绝 |
+| `NEXUS_BOARD_DIR` | 消费方 | 一个 externalBoardpackage；与 BOARD_EXTERNAL 一致 |
+| `NEXUS_FLASH_LAYOUT_FILE` | 消费方 | 一个 image/region 输入；默认 wholeFlashimage/no regions |
+| `NEXUS_BUILD_TESTS` | 开发工程 | top-levelNative 默认 ON，源码子工程 OFF；与有效 BUILD_TESTS 一致 |
+| `NEXUS_BUILD_CONTRACTS` | 开发工程 | top-level 默认 ON，ARM 建独立 linkfixture，源码消费者 OFF |
+| expected source revision | 外部仓库/交付方 | 固定真实 SDKsourceSHA，拒绝混入另一个版本 |
 
-表中描述审查基线。首批已移除没有生产/测试调用者的 `nx_adapter.c/.h`，同时移除弱伪时钟、无停止契约的同步转换和内联阻塞的伪异步入口；未增加成功占位替代。其历史源码引用见 HAL/OSAL 设计的固定提交链接，类型化设备核心和 GPIO/UART 操作已在后续实施；其他类别与完整运行时等待封装逐项验证。
+根 CMake 只解析并装配选择模块，不列 businesssource。optionalcomponent 在有效 Kconfig 关闭时没有 target，不隐式 findOpenSSL 或拉 Storage。ConfigCore 会使用 Securitycorefacade，但 core 没有 OpenSSL 默认 provider。
 
-已有良好边界也必须保留：公共 HAL/OSAL 头没有直接导入厂商 SDK；服务核心通过调用者提供的端口访问设备；有效配置的三个输出来自同一次解析；未维护的 STM32 外设明确拒绝；GD32F470 后续以独立官方 SDK 与实际驱动接入；SPI 已有设备/事务隔离与取消故障模型。
+## 2. generated bundle
 
-## 3. 目标依赖图
+`generated/effective.config`、`nexus_config.h`与`config.cmake`来自同 Kconfig 解析，generated 目录属于 Nexus 自己的 binarycontext，不借父`PROJECT_SOURCE_DIR`或源根.config。Boardmodule 随后根据 resolvedconfig 验证 package，emit`board-identity.json`和`board.cmake`。
 
-```mermaid
-flowchart TB
-    Product[产品装配与启动] --> Domain[领域逻辑与服务]
-    Product --> Board[板卡拓扑与安全输出]
-    Product --> Runtime[运行时与等待适配]
-    Product --> Controller[控制器驱动实例]
-    Domain --> Ports[服务端口与公共类型]
-    Runtime --> Hal[HAL 能力接口]
-    Runtime --> Osal[OSAL 接口]
-    Controller --> Hal
-    Controller --> Soc[SoC 资源与实现]
-    Board --> Soc
-    Soc --> Arch[CPU 架构原语]
-    Soc --> Vendor[固定版本厂商 SDK]
-    OsalBackend[OSAL 后端] --> Osal
-    OsalBackend --> Arch
-    OsalBackend --> Kernel[Native 或 FreeRTOS 或裸机端口]
-    Product --> OsalBackend
-    Directory[静态设备目录] --> Hal
-    Directory --> Arch
+Flash layout 同 parse 产生`layout.json`、`nx_flash_layout.h`、`firmware.ld`；linker 包含真实所选 SoCsections，与 MSP/libcheap 预算一起生效。hash、config、inputs 更新导致重新 configure，生成失败阻止旧 bundle 继续编译。Native 没有物理 Flashimage；metadata 查询不伪造 MCUmemory。
+
+重配清理旧 CONFIGcache，默认不写父工程输出设置。Applicationhelper 从`Nexus::Config`读取 platform/source/build/configcontext，EXTRA_DEPS 由外部应用选择。每个 application 输出到 SDKcontext 的 bin，父 sentinel 保持其原输出。C/C++consumer 和含空格外部 Board 都已有真实检查。
+
+## 3. Runtime 与业务入口
+
+公开头为`runtime/nx_runtime.h`、`runtime/nx_platform_info.h`。Runtime 不创建业务 worker、scheduler 或 component，不保留 productname、applicationchoice 或自动 mainwrapper。
+
+```c
+nx_boot_report_t report;
+if (nx_runtime_bootstrap(&report) != NX_OK) {
+    /* Caller examines original status, rollback status and owned state. */
+}
+const nx_platform_info_t *info = nx_platform_get_info();
 ```
 
-箭头不表示服务必须经过所有层才能调用硬件。产品装配将服务端口绑定到驱动或适配器；纯算法只依赖自己的端口。运行时回调允许依赖倒置，但必须使用已声明的端口，不能让 SoC 包含某个板卡的实现头。
+启动 HAL→OSAL；失败 rollback 保留原错误和 cleanuperror，state 为 OFFLINE/PARTIAL/READY，PARTIAL 必须先 shutdown 结清。所有生命周期由 caller 串行，ISR 明确拒绝。READY 只说 ownedinfra 成功；应用健康、taskcreation/启动失败和安全输出是消费方责任。
 
-| 层 | 拥有的内容 | 禁止承担的内容 |
-| --- | --- | --- |
-| 公共类型/接口 | 固定宽度类型、错误、能力、句柄与协议端口 | SDK、全局设备初始化、日志、内存分配策略 |
-| Arch | 异常上下文、saved IRQ mask、屏障；有硬件时的 cache/MPU 原语 | 晶振、LED 引脚、Flash 产品分区、RTOS 任务策略 |
-| SoC | 控制器、时钟树约束、DMA 路由、IRQ 向量、内存区域、芯片 Flash 几何 | PCB 接线、控制算法、产品安全状态 |
-| Board | PCB revision、晶振/电源、引脚与外部器件、资源映射、初始安全电平 | 持有 controller 私有运行结构、复制协议核心、决定升级政策 |
-| HAL 核心 | 设备目录、类型/能力检查、资源取得与状态 | 强制选择内核、伪装不存在的能力 |
-| OSAL | 任务、同步、时间及后端能力语义 | 引脚、DMA 完成条件、协议策略 |
-| 运行时适配 | 有界队列、等待、deadline、延后完成派发 | 用返回 timeout 假装已经停止 DMA |
-| Product | 选择 Board、后端、器件、服务、任务、资源预算和恢复政策 | 将 SDK 类型传播到可复用业务模块 |
+FreeRTOS 外部 main 先 bootstrap、创建启动 worker 并检查返回，再调用`osal_start()`；需要 blocking 组件在 scheduler 运行的 worker 中初始化。baremetal 外部 main 拥有 poll/pump。Shutdown 先要求 leases/objects 结清；runningMCUkernel 返回 BUSY，完整热重启未实现。metadata 只含 mainSRAM/Flash 等当前已实现字段，不宣称所有 memorydomain/DMA 属性。
 
-公共接口和实现 target 分开。`PUBLIC` 只用于调用者编译所必需的接口；SDK、驱动内部头和内核实现优先 `PRIVATE`。静态库需要的下游链接依赖可以传播，不能因此公开其编译头与宏。调试/bring-up 应用可以显式依赖 SDK，须标明用途。
+## 4. Board 单路径及 private 实现
 
-## 4. 设备、资源和生命周期
+Boardmanifest schema1 至少提供 id、soc、hse_hz、interface_target、object_targets、inputs 与 resources。`NEXUS_BOARD_DIR`只输入一个包含 manifest/CMake/source 的 package；sourcepath 不得越界/symlink，编译 Boardobject 的声明文件必须纳入 inputs 并 hashbind。
 
-设备模型采用四种不同对象：
+active 资源 kind 是 GPIO/UART/SPI；`when`对应有效 Kconfig。reviewedcontroller 绑定验证 clock、IRQ、priority、pin/AF 和 selectedDMA，重复 pin/controller/IRQ/DMA 拒绝。UART 例如 STMUSART1/2、GD USART0，SPI 例如 STMSPI1 与 GDSPI4；其余 route 未经实现复核不会自动接受。
 
-1. **Descriptor**：编译期只读信息，包含类型、能力、控制器标识及资源描述；发现不会初始化硬件。
-2. **Instance**：驱动持有的可变状态，包括 IRQ/DMA handle、忙状态、故障和资源租约；应用不能访问其结构。
-3. **Handle**：调用者持有的类型化引用，包含 owner/generation；关闭或重新初始化后旧引用失效。
-4. **Operation**：一次传输或请求的状态，包含身份、deadline、缓冲区租约和终态；重复、晚到完成不能作用于后续请求。
+FreeRTOS 目前 syscall-safe logicalpriority 下限为 5，调用内核的 controllerIRQ 不能填 0–4。Board 不直接操纵 controller mutableinstance，使用只读 Nexus 资源与 boundedCS/安全初值接口；控制器承担时钟/IRQ/DMA 打开停止与真实 error/settlement。完整自动 pinctrl/topology 求解、所有 AF 组合、外部器件上电 policy 与实物 qualification 不在 manifestschema 能力中。
 
-用显式 `discover/open/close` 替代通用 factory 隐式初始化。`discover` 返回描述和状态；`open` 返回明确错误与类型化句柄。必须区分不存在、不支持、资源忙、初始化失败和故障隔离。SPI 当前 generation 模型作为迁移基础，不创建另一套互不兼容的寿命规则。
+## 5. Flash 是芯片能力，partition 是外部政策
 
-控制路径采用调用者存储或固定容量池。池耗尽直接返回资源错误，不能降级为无界堆。资源容量从有效配置生成；产品测试必须验证耗尽、重复释放、旧句柄、并发首次打开以及失败重试。
+STM32`FLASH0`按 actualdensity 暴露 8/12sector，GD32`FLASH0`暴露 256×4KiBpage；provider 不依赖 Storage。typedregion 创建权限/owner/generationlease，physicalblock 查询返回完整 block，不把跨 sectoroperation 当 uniformpage。越界/溢出、可写重叠、erase 非整 block 拒绝。
 
-设备生命周期和 operation 生命周期分开：
+外部 layout schema1 选择 soc、image 的 offset/size 与 namedregions。offset 为相对 physicalFlashbase；当前 imageoffset 必须 0，size 不得侵占 region。默认 image 整 Flash、regions 为空。root 生成`NX_LAYOUT_REGION_LIST(X)`供外部 caller 按 name/offset/size/permissions 明确选 region，平台不自动打开 storage。
 
-```text
-device:  UNINITIALIZED -> READY -> STOPPING -> UNINITIALIZED
-                               -> FAULTED -> recovery policy
-operation: IDLE -> ACCEPTED -> ACTIVE -> SETTLING -> TERMINAL
+ELF 强绑定`__nexus_image_start/end`、regionbounds 及 layout/Board SHA 各 8word；checker 从真实 segment/vector/entry/sections 和物理几何验证，不仅比较 JSON。package/HIL 也重建 Board/layoutbundle 并核对 BIN 与 ELFbytes。非零 imageoffset 需要真实 VTOR/startup/bootloader 和产品安装恢复链，当前拒绝。
+
+`Nexus::StorageHAL`caller-ownedcontext 通过 generation-safeborrow 锁住已经开的 region；oldporttoken 不重导新 bindcontext，inflight/unbind 冲突 BUSY。adapter 只接受 uniformcompleteeraseblocks、0xff 和合适 programgeometry，共享整次 open/load/savebudget；unlock/lock、partition 与 maintenancewindow 由外部 caller 拥有。
+
+## 6. Component targets
+
+| 公开 target | 实际实现边界 |
+|---|---|
+| `Nexus::LogCore` | formatter，无 HAL/OSAL/clock/heap；拥有必要 buildoptions 以匹配 ARMABI |
+| `Nexus::LogRuntime` / `Nexus::Log` | selected OSAL logger；callback 不持 globalmetadata 锁等 UART |
+| `Nexus::LogUART` | typedUART、caller-ownedcontext 与有界 TXstorage；flush 等待 wirecompletion，超时保留 lease |
+| `Nexus::Shell` / `Nexus::ShellUART` | core 与 typedUARTadapter 分离；mock 只 tests；失败 teardown 保留 owner 可 retry |
+| `Nexus::ConfigCore` / RAM / Flash | neutralbackend 与 cryptocontract；RAMvolatile，Flash 显式链接 Storage |
+| `Nexus::Storage` / `Nexus::StorageHAL` | dual-bank 快照 core / typedregionadapter，不默认 partition |
+| `Nexus::SecurityCore` / `Nexus::CryptoOpenSSL` | providerNULLcore / explicitNativeOpenSSLprovider |
+| `Nexus::ModbusRTU` / `Nexus::Update` | protocol/statecore，通过 callerports 连接 wire/trust/install/healthpolicy |
+
+选 OpenSSLtarget 还需要 effective`CRYPTO_PROVIDER_OPENSSL=y`且 Native，然后应用`nx_crypto_set_provider(nx_crypto_openssl_provider())`显式绑定。仅 linkcore 不运行 provider，也不隐式 findOpenSSL。MCU 没有 provider 时 unsupported；不写自制 crypto。
+
+## 7. 官方入口与外部消费
+
+平台权威入口是 CMakePresets/CMake/CTest；Python 只编排。
+
+```sh
+python3 scripts/ci/ci_build.py --preset linux-gcc-debug --stage all --jobs 4
+python3 scripts/ci/ci_build.py --preset stm32-qiming-armgcc-freertos-release --stage build --jobs 4
+python3 scripts/ci/validate_firmware_elf.py \
+  --build-dir build/stm32-qiming-armgcc-freertos-release \
+  --report build/stm32-qiming-armgcc-freertos-release/firmware-static.json
 ```
 
-`close/suspend` 不能在硬件仍访问缓冲区时释放资源。停止失败保持 `FAULTED/SETTLING` 和内存租约；由产品决定受控恢复或复位，不能返回成功后继续操作。生命周期细则与拟议 API 见 [HAL/OSAL 设计](hal-osal-design.md)。
+ARMtop-level 建`nexus_contract_firmware`检查 startup/objects/metadata；独立测试不用 examples 源码。已有 fixedARMGNU14.3.rel1 和 SDK 依赖入口不自动任意下载/升级。Native-minimal/native-services 只是 compileprofiles，应用运行命令在 externalrepo。
 
-## 5. CPU、IRQ、DMA 和时间
+外部 CMake 先选择工具链，再`project(C CXX ASM)`，设置明确 NEXUS_CONFIG_FILE 并 add_subdirectory 固定 SDK；最后`nexus_add_application(TARGET ... SOURCES ... EXTRA_DEPS ...)`。生产 caller 使用 publicNexusheaders/targets，SDKprivateheader 不得由平台 interface 传播。不同 Board/backend 各自 buildroot。
 
-必须区分三种同步机制：保存恢复 CPU IRQ mask、RTOS syscall-safe critical region、任务互斥锁。Cortex-M PRIMASK 屏蔽语义与 FreeRTOS BASEPRI/syscall mask 不同；把它们统一到一个 `enter_critical` 会改变高优先级中断行为。Native 的锁模拟只能验证互斥与嵌套，不能证明 MCU 中断延迟。
+## 8. Relocatable installed source SDK
 
-ISR 资源描述同时登记向量、优先级、所有者及是否调用内核。调用 FreeRTOS ISR API 的中断必须满足所选端口的 syscall-safe 范围；高优先级快速 ISR 只写有界事件，不调用任务态 API。共享向量由一个分发器管理，不允许两个驱动各自覆盖全局 callback。
+完整、干净、固定依赖 checkout 使用：
 
-DMA 状态由 controller 驱动拥有，Board 只声明路由。描述资源至少包括 DMA 控制器/stream/channel、IRQ、可访问内存和 cache 要求。完成、取消和错误共同经过 settlement；内存交还、callback 终态、物理完成可能是不同时间点。
+```sh
+python3 -B cmake/package/package_source_sdk.py \
+  --source /absolute/path/to/nexus --output '/absolute/path/to/nexus sdk prefix'
+python3 -B '/absolute/path/to/nexus sdk prefix/share/nexus/src/cmake/package/package_source_sdk.py' \
+  --verify '/absolute/path/to/nexus sdk prefix/share/nexus/src'
+```
 
-UART 必须区分“发送内存不再被 DMA 使用”与“最后 stop bit 离开线路”。RS485 释放 DE 需要后者。RX 首期用驱动持有的有界 staging/ring，在采集完成后发布；记录时间、错误与溢出，不能用消费时间替代所有字节的实际到达时间。时间戳精度和采集方案必须满足选定 baudrate 的帧间隔预算并实测。
+OUTPUT 必须在 source 之外且尚不存在；失败不留下半包。整个 prefix 移动后 relative`lib/cmake/Nexus`配置访问`share/nexus/src`，所有源码/依赖/许可和 exportSHA 都验证。sourceGitSHA 来自 manifest，不查 consumerancestorGit。
 
-有限等待在入口建立一次 deadline，抢锁、排队、启动、等待共享预算。时间源提供者显式选择，禁止 weak increment-on-query 的伪时钟。裸机返回它实际支持的行为；不通过自旋假装有调度、优先级继承或任务等待。
+```cmake
+cmake_minimum_required(VERSION 3.21)
+project(my_firmware LANGUAGES C CXX ASM)
+find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)
+nexus_add_application(TARGET firmware SOURCES main.c)
+```
 
-CCM、SRAM、Flash 是不同 bank。当前 F407 linker 接受 CCM，但所选 startup 未完成其初始化，现有镜像 CCM 为空。启用非空 CCM 前要实现初始化或明确拒绝；DMA 可访问性仍须独立检查。
+```sh
+cmake -S /absolute/path/to/application -B /absolute/path/to/application-build -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  '-DNexus_DIR=/absolute/path/to/nexus sdk prefix/lib/cmake/Nexus' \
+  '-DNEXUS_CONFIG_FILE=/absolute/path/to/application/platform.conf' \
+  '-DNEXUS_EXPECTED_SOURCE_REVISION=REPLACE_WITH_40_HEX_SOURCE_COMMIT'
+cmake --build /absolute/path/to/application-build --parallel 4
+```
 
-## 6. 板卡与产品装配
+ARM 首次 configure 再传`CMAKE_TOOLCHAIN_FILE=<prefix>/share/nexus/src/cmake/toolchains/arm-gcc.cmake`和 NEXUS_PLATFORM；toolchain 由消费方按 lock 提供。包不带 developmenttests/GoogleTest，拒绝 NEXUS_BUILD_TESTS/CONTRACTS 开启。developmentfixture 需要`NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`，身份有 snapshotSHA 且 publishable=false，不能 promotion。
 
-首期采用类型化静态 C 资源表及现有板卡元数据，不先建设新的通用描述语言或强制代码生成器。Kconfig 选择软件能力，Board 描述物理拓扑，Product 定义策略；同一引脚和 DMA 路由只保留一个权威描述。
+真实 relocatedfixture 已有 NativeC/C++运行、STM32C/C++真实 ELF 检查；strictcleanpack/consume 等待 finalsourcecommit。这是 sourceSDK，不是 binarySDK，也没有 crosscompiler/configABI 承诺。详细 license/provenance 参见[packageREADME](../../cmake/package/README.md)。
 
-板卡对产品导出语义引用，例如 console、status LED、sensor bus、RS485、safe output。公共描述使用 Nexus 类型；厂商 HAL handle 留在内部。板级代码不能取得 `stm32_spi_impl_t` 这样的可变实现对象。驱动接收经验证的资源配置；与板级电源/片选交互通过窄端口完成。
+## 9. 验证和剩余能力
 
-静态资源检查按参考组合逐项落实，不一次承诺所有 MCU 的 pinmux 验证数据库：重复 pin、DMA stream 独占冲突、IRQ 优先级/所有权、内存区间与分区、能力未绑定。板卡 revision 改变必须形成独立身份。规模增长后评估复用 Devicetree 工具与 bindings，不能同时维护两份物理拓扑。
+原完整基线`3129550`的 1781Native/8ARM15ELF 留在历史记录。本轮各模块真实 targeted 软件通过不会自动覆盖最终 cleanGCC/Clang/sanitizer/analysis、8ARM 和双仓 pin/在线结果。所有 candidate 绑定 source/config/Board/layout/toolchain/artifacts 与非零 actualtests，不能以 target/定义 workflow 计完成。
 
-产品装配是唯一运行启动入口：安全输出 -> 时钟/Board -> OSAL -> 设备 -> 服务 -> 任务 -> 调度器。任何失败均有记录及可测试的安全状态；调度器有唯一启动者。控制任务与通信/存储/诊断分离预算，通过有界消息与一致快照通信。Flash 擦写暂停和日志压力是实测输入，不能用软件分层承诺“绝不中断控制”。
-
-现有 Native `industrial_controller` 是模型，不是 MCU 产品。STM32 参考产品需补 UART/RS485、采集/定时端口、安全输出和物理 watchdog；GD32 在精确型号、板卡与 SDK 明确后复用同一产品契约，独立验证硬件差异。
-
-## 7. 简洁的构建模型
-
-保留三个用户入口：preset 选择主机/工具链与输出目录；显式配置片段选择能力和资源；应用 target 声明源文件与依赖。唯一 Kconfig 解析生成有效配置，CMake 消费它，不另建 Python 构建调度器。
-
-构建组织原则：
-
-- Nexus 的 source/build 根取自身目录，不能以外部产品的 `CMAKE_SOURCE_DIR/CMAKE_BINARY_DIR` 定位内部文件。
-- 作为子工程时默认不创建 Nexus 测试和示例，不改父工程其他 target 的输出路径。
-- 应用 helper 在父工程也能调用：配置与平台信息保存到 target properties，从 target 读取，不依赖子目录普通变量的作用域。
-- 提供命名空间接口，区分契约与实现。公开 aliases 支持源码子工程消费；不把它们宣称为已完成的 installed binary SDK。
-- 一个 platform assembly 显式连接 controller、SoC、Board 对象和真实 startup/linker。注册段或强 callback 不能因 static archive 的按需抽取而丢失；`KEEP` 不能保证未抽取的 archive member 入镜像。
-- 单个组件 CMake 仅声明源、公开接口、私有依赖和所属能力。避免每个组件重写配置解析、全局 flag、SDK 寻路和工件生成。
-- Kconfig 中每个可编辑符号必须改变有效行为，或仅作为只读派生信息。删除无效 `STM32_STACK_SIZE/HEAP_SIZE`，统一到真正使用的 APP 预算；HAL 关闭语义另行明确。
-- 按实际选择查找提供者依赖；Native 安全提供者使用 OpenSSL，最小产品不应仅因仓库存在安全模块就被迫安装它。
-
-目标树应可检查 `PUBLIC/PRIVATE/INTERFACE` 三类依赖。compile database 用于验证公共产品 TU 没有 SDK include/define，显式 bring-up TU 则允许。外部消费测试必须配置、编译、链接并运行真实小产品，还要验证父工程输出与编译选项没有受污染。
-
-后续独立增加 install/export、组件 capability 裁剪和资源门禁。不要把 add_subdirectory、全功能包安装和多配置 SDK 混为一个验收项。
-
-## 8. 大型团队协作
-
-模块有明确维护责任与主备 reviewer；真实成员账号尚未登记，岗位元数据不能冒充已生效的 CODEOWNERS。公共接口/生命周期/分区变更走 ADR 和跨模块 review；板级接线变更走 Board revision 和对应 HIL；纯产品算法变更不要求改 HAL。
-
-CI 首期优先保证输入完整：SDK gitlink、示例、Arch、SoC、Board、配置、产品和构建工具变化都能触发相关必需验证。当前是整体矩阵，不宣称已经支持自动 affected-product 推导。产品增多后再增加可审查的 product dependency map，并以未知输入跑完整矩阵作为规则；不要先建设复杂调度服务。
-
-每个 PR 给出影响的契约/组合、实际执行、未执行的硬件条件以及对应 backlog ID。验收包引用同一 BuildIdentity，记录 HEAD、实际测试提交、source tree、配置、工具链、依赖、linker/分区与 ELF/map 摘要。PR merge 构建身份与分支 HEAD 可以不同；同 source tree 不等于可以改写工件中的提交身份。
-
-候选固件一次构建，主机测试、实验室、审核、签名逐步增加证据。真实实验站和执行适配器须有受控身份。绝对路径适合工作区复验，可搬运交付包使用内容身份与相对路径；两种验证职责分开。
-
-## 9. 迁移顺序与退出条件
-
-| 工作包 | 对应 backlog | 退出条件 |
-| --- | --- | --- |
-| A：源码 SDK 与目标编译边界 | BAS-001/002/004、CI-001 | root 与子工程均可消费；平台真实 startup/linker 保留；SDK 私有，显式 bring-up 例外；输入触发回归通过 |
-| B：设备/操作/Arch 契约 | HAL-001/002/004/005、OS-001/002 | typed discovery/open/close；过期句柄与晚 callback 拒绝；架构原语独立，RTOS 语义不变；旧转换接口退出 |
-| C：STM32 UART 和统一启动 | BSP-002、COM-001、APP-001 | 多实例实际绑定；RX/error/TC/取消；错误启动进入安全状态；主机故障与板卡回归各自执行 |
-| D：可裁剪产品和预算 | BAS-002、MEM-001、HIL-002 | 最小配置不引入无关依赖；有效符号和 target 对应；各内存 bank/分区门禁；最坏资源与时序实测 |
-| E：工业参考产品与 GD32 | BSP-003/004、APP-001、HIL-001/003 | 两平台独立硬件验收，共用领域代码；受信 HIL；存储/控制/通信联合故障验证 |
-
-每个工作包拆成可以独立 review、验证和提交的改动；公共接口变化连同调用者一起提交。按依赖顺序同步 GitHub，不在主分支直接覆盖全部平台。物理硬件输入、MCU crypto、bootloader 与制造资格继续使用既有受阻/待验收状态。
-
-首批实现记录与实际验证见 [架构与构建基础重构](../implementation/architecture-foundation.md)。该记录是完成范围的依据；本文的目标图不能作为已实现能力证明。
+NativetypedI2C 支持双 device 和 deadline/cancel；MCUmodernI2C 未实现。Completionadapter 只派发 producer 明确 settledterminal，provider 是 bufferlease 权威。HIL 工装可做静态准入/租约/challenge，但 physicalexecutions、IRQ/DMA/powerloss/longload 完整 workload 和实测 budgets 仍未完成。本阶段用户暂不接实板；SDKpack、软件 matrix 和 HILready 继续推进，企业/LTS/安全/制造资格单独验收。

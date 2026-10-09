@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import csv
 import json
 from pathlib import Path
 import shutil
@@ -61,14 +62,14 @@ class TraceabilityTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         repository = Path(__file__).resolve().parents[2]
         self.roles = json.loads((repository / ".github/maintainer-roles.json").read_text())
-        self.requirements = json.loads((repository / "docs/requirements/industrial-reference.json").read_text())
+        self.requirements = json.loads((repository / "docs/requirements/platform.json").read_text())
         # Start each policy model without acceptance evidence. Repository
         # requirements may advance independently after real validation.
         for requirement in self.requirements["requirements"]:
             requirement["status"] = "planned"
             requirement["evidence"] = []
         self.backlog = self.root / "backlog.csv"
-        shutil.copyfile(repository / "docs/strategy/backlog.csv", self.backlog)
+        shutil.copyfile(repository / "docs/implementation/refactor-execution.csv", self.backlog)
         self.roles_file = self.root / "roles.json"
         self.requirements_file = self.root / "requirements.json"
 
@@ -80,11 +81,73 @@ class TraceabilityTests(unittest.TestCase):
         atomic_json(self.requirements_file, self.requirements)
         return validate_traceability(self.requirements_file, self.backlog, self.roles_file)
 
-    def test_approved_roles_map_eight_unaccepted_product_requirements(self):
+    def test_approved_roles_map_eight_unaccepted_platform_requirements(self):
         report = self.validate()
         self.assertEqual(report["allocated_people"], 10)
         self.assertEqual(report["requirements"], 8)
         self.assertEqual(report["status_counts"]["planned"], 8)
+        self.assertEqual(report["subject_id"], "nexus-platform")
+        self.assertEqual(report["subject_status"], "planned")
+
+    def test_platform_requirements_cover_current_refactor_tasks_without_claiming_qualification(self):
+        with self.backlog.open(newline="", encoding="utf-8") as stream:
+            task_ids = {row["task_id"] for row in csv.DictReader(stream)}
+        linked = [identity for requirement in self.requirements["requirements"]
+                  for identity in requirement["backlog_ids"]]
+        self.assertEqual(len(task_ids), 38)
+        self.assertEqual(set(linked), task_ids)
+        self.assertEqual(len(linked), len(task_ids))
+        self.assertTrue(all(requirement["status"] == "planned" and not requirement["evidence"]
+                            for requirement in self.requirements["requirements"]))
+
+    def test_generic_external_subject_remains_supported(self):
+        self.requirements["subject_id"] = "external-platform-contract"
+        report = self.validate()
+        self.assertEqual(report["subject_id"], "external-platform-contract")
+
+    def test_schema_one_product_fields_are_not_current_platform_requirements(self):
+        self.requirements["schema_version"] = 1
+        self.requirements["product_id"] = self.requirements.pop("subject_id")
+        self.requirements["product_status"] = self.requirements.pop("subject_status")
+        with self.assertRaises(EvidenceError):
+            self.validate()
+
+    def test_legacy_id_csv_is_explicitly_supported(self):
+        text = self.backlog.read_text()
+        self.backlog.write_text(text.replace("task_id,", "id,", 1))
+        self.assertEqual(self.validate()["status"], "pass")
+
+    def test_csv_cannot_invent_another_identity_format(self):
+        for header in ("name,title\n", "task_id,id\n", "task_id,task_id\n"):
+            with self.subTest(header=header):
+                self.backlog.write_text(header)
+                with self.assertRaises(EvidenceError):
+                    self.validate()
+
+    def test_empty_duplicate_or_malformed_task_rows_are_rejected(self):
+        first = self.requirements["requirements"][0]["backlog_ids"][0]
+        for rows in ("", ",empty identity\n", f"{first},first\n{first},duplicate\n",
+                     f"{first},too,many\n", f"{first}\n"):
+            with self.subTest(rows=rows):
+                self.backlog.write_text("task_id,title\n" + rows)
+                with self.assertRaises(EvidenceError):
+                    self.validate()
+
+    def test_unterminated_quoted_csv_field_is_rejected_even_with_all_mapped_tasks(self):
+        with self.backlog.open(newline="", encoding="utf-8") as stream:
+            tasks = [row["task_id"] for row in csv.DictReader(stream)]
+        self.backlog.write_text("task_id,title\n" +
+                               "".join(f"{task},valid\n" for task in tasks[:-1]) +
+                               f'{tasks[-1]},"unterminated\n')
+        with self.assertRaises(EvidenceError):
+            self.validate()
+
+    def test_subject_cannot_claim_a_stage_ahead_of_unaccepted_requirements(self):
+        for status in ("implemented", "host_validated", "hardware_validated", "claimed-pass"):
+            with self.subTest(status=status):
+                self.requirements["subject_status"] = status
+                with self.assertRaises(EvidenceError):
+                    self.validate()
 
     def test_unknown_owner_role_is_rejected(self):
         self.requirements["requirements"][0]["owner_role"] = "imaginary-person"
