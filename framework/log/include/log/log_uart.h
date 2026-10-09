@@ -10,7 +10,7 @@ extern "C" {
 #define LOG_UART_QUEUE_DEPTH 4u
 #endif
 #ifndef LOG_UART_MESSAGE_SIZE
-#define LOG_UART_MESSAGE_SIZE (LOG_MAX_MSG_LEN * 2u)
+#define LOG_UART_MESSAGE_SIZE ((size_t)LOG_MAX_MSG_LEN * 2u)
 #endif
 typedef struct {
     size_t accepted, completed, dropped, failed, pending;

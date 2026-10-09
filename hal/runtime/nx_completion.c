@@ -93,9 +93,10 @@ nx_status_t nx_hal_completion_post(nx_hal_completion_queue_t* q,
     else if (ticket.slot > q->slot_capacity) s = NX_ERR_INVALID_STATE;
     else {
         nx_hal_completion_slot_t* slot = &q->slots[ticket.slot - 1];
-        if (slot->sequence != ticket.sequence) s = NX_ERR_INVALID_STATE;
+        if (slot->sequence != ticket.sequence ||
+            (slot->state != SLOT_ARMED && slot->state != SLOT_DISPATCHING))
+            s = NX_ERR_INVALID_STATE;
         else if (slot->state == SLOT_DISPATCHING) s = NX_ERR_BUSY;
-        else if (slot->state != SLOT_ARMED) s = NX_ERR_INVALID_STATE;
         else if (q->queued == q->queue_capacity) s = NX_ERR_FULL;
         else {
             slot->result = result;
