@@ -226,3 +226,7 @@ endif()
 add_test(NAME board_package_resources_and_layout
     COMMAND "${Python3_EXECUTABLE}" -m unittest discover -s "${NEXUS_SOURCE_DIR}/scripts/configure" -p "test_*.py")
 set_tests_properties(board_package_resources_and_layout PROPERTIES LABELS "build;board;layout;contract" TIMEOUT 30)
+
+add_test(NAME installed_source_sdk
+    COMMAND "${Python3_EXECUTABLE}" "${NEXUS_SOURCE_DIR}/cmake/package/test_source_sdk.py")
+set_tests_properties(installed_source_sdk PROPERTIES LABELS "build;sdk;installed-source" TIMEOUT 240)
