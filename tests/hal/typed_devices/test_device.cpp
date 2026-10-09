@@ -348,6 +348,39 @@ TEST_F(TypedDevice, InterruptContextNeverStartsOrClosesHardware) {
     EXPECT_EQ(nx_device_close(ref), NX_ERR_CONTEXT);
     EXPECT_EQ(port.opens, 0u);
 }
+TEST_F(TypedDevice, MaskedLifecycleAndProviderDispatchRejectBeforeCallingDriver) {
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 1, &ref), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_device_get_checked(descriptor.name, descriptor.device_class), nullptr);
+    EXPECT_EQ(port.constructions, 0u);
+    EXPECT_EQ(port.opens, 0u);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    nx_arch_irq_restore(saved);
+    open();
+    saved = nx_arch_irq_save();
+    EXPECT_EQ(nx_device_close(ref), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(nx_device_gpio_write(ref, 1), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(port.closes, 0u);
+    EXPECT_EQ(port.level, 0u);
+    EXPECT_EQ(storage.phase, NX_DEVICE_OPEN);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    nx_arch_irq_restore(saved);
+}
+TEST_F(TypedDevice, MaskedRecoveryCannotEnterPotentiallyBlockingProviderCleanup) {
+    port.open_status = NX_ERR_HARDWARE;
+    port.close_status = NX_ERR_BUSY;
+    EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 1, &ref), NX_ERR_BUSY);
+    unsigned closes = port.closes;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    EXPECT_EQ(nx_device_recover(descriptor.name, 1), NX_ERR_INVALID_STATE);
+    EXPECT_EQ(port.closes, closes);
+    EXPECT_EQ(storage.phase, NX_DEVICE_RECOVERY_REQUIRED);
+    EXPECT_EQ(storage.owner, 1u);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    nx_arch_irq_restore(saved);
+    port.close_status = NX_OK;
+    EXPECT_EQ(nx_device_recover(descriptor.name, 1), NX_OK);
+}
 TEST_F(TypedDevice, ShutdownFenceRejectsNewOwnerUntilReleased) {
     ASSERT_EQ(nx_device_shutdown_begin(), NX_OK);
     EXPECT_EQ(nx_device_open(descriptor.name, descriptor.device_class, 1, &ref), NX_ERR_BUSY);

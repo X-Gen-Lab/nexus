@@ -106,7 +106,8 @@ typedef struct {
     nx_uart_state_t state;
     uint8_t* tx;
     uint8_t* rx;
-    size_t tx_size, rx_size;
+    nx_uart_rx_event_t* events;
+    size_t tx_size, rx_size, event_capacity;
 } native_uart_storage_t;
 
 static nx_status_t nx_uart_construct(const nx_device_t* dev, void** out) {
@@ -118,8 +119,9 @@ static nx_status_t nx_uart_construct(const nx_device_t* dev, void** out) {
     if (!cfg->baudrate || cfg->word_length < 5 || cfg->word_length > 9 ||
         (cfg->stop_bits != 1 && cfg->stop_bits != 2) || cfg->parity > 2 ||
         cfg->flow_control || !cfg->tx_buf_size || !cfg->rx_buf_size ||
-        !storage->tx || !storage->rx || storage->tx_size != cfg->tx_buf_size ||
-        storage->rx_size != cfg->rx_buf_size) return NX_ERR_INVALID_PARAM;
+        !storage->tx || !storage->rx || !storage->events ||
+        storage->tx_size != cfg->tx_buf_size || storage->rx_size != cfg->rx_buf_size ||
+        storage->event_capacity != cfg->rx_buf_size) return NX_ERR_INVALID_PARAM;
     nx_uart_impl_t* impl = &storage->impl;
     memset(impl, 0, sizeof(*impl));
     impl->state = &storage->state;
@@ -131,6 +133,8 @@ static nx_status_t nx_uart_construct(const nx_device_t* dev, void** out) {
     buffer_init(&impl->state->tx_buf, storage->tx, cfg->tx_buf_size);
     buffer_init(&impl->state->rx_buf, storage->rx, cfg->rx_buf_size);
     impl->device = (nx_device_t*)dev;
+    impl->rx_events = storage->events;
+    impl->rx_event_capacity = storage->event_capacity;
     NX_INIT_UART(&impl->base, uart_get_tx_async, uart_get_rx_async,
         uart_get_tx_sync, uart_get_rx_sync, uart_get_lifecycle, uart_get_power);
     uart_init_tx_async(&impl->tx_async);
@@ -139,6 +143,7 @@ static nx_status_t nx_uart_construct(const nx_device_t* dev, void** out) {
     uart_init_rx_sync(&impl->rx_sync);
     uart_init_lifecycle(&impl->lifecycle);
     uart_init_power(&impl->power);
+    native_uart_init_operations(impl);
     *out = &impl->base;
     return NX_OK;
 }
@@ -165,13 +170,18 @@ static nx_status_t nx_uart_construct(const nx_device_t* dev, void** out) {
     NX_UART_CONFIG(index);                                                     \
     static uint8_t uart_tx_##index[NX_CONFIG_UART##index##_TX_BUFFER_SIZE];     \
     static uint8_t uart_rx_##index[NX_CONFIG_UART##index##_RX_BUFFER_SIZE];     \
+    static nx_uart_rx_event_t uart_events_##index[NX_CONFIG_UART##index##_RX_BUFFER_SIZE]; \
     static native_uart_storage_t uart_storage_##index = {                      \
         .tx = uart_tx_##index, .rx = uart_rx_##index,                           \
         .tx_size = sizeof(uart_tx_##index), .rx_size = sizeof(uart_rx_##index), \
+        .events = uart_events_##index,                                        \
+        .event_capacity = sizeof(uart_events_##index)/sizeof(uart_events_##index[0]), \
     };                                                                        \
     NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index, "UART" #index,               \
         &uart_config_##index, &uart_storage_##index.core,                      \
-        NX_DEVICE_CLASS_UART, 0, nx_uart_construct, NULL);
+        NX_DEVICE_CLASS_UART,                                                \
+        NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_CANCEL |           \
+            NX_DEVICE_CAP_UART_RX_EVENTS, nx_uart_construct, NULL);
 
 /**
  * \brief           Register all enabled UART instances

@@ -159,7 +159,7 @@ static nx_status_t construct_api(const nx_device_t* dev, bool typed, void** out)
     return status;
 }
 void* nx_device_init(const nx_device_t* dev) {
-    if (nx_arch_in_isr()) return NULL;
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) return NULL;
     void* api = NULL;
     return construct_api(dev, false, &api) == NX_OK ? api : NULL;
 }
@@ -209,6 +209,7 @@ nx_status_t nx_device_open(const char* name, nx_device_class_t expected,
     if (!out) return NX_ERR_NULL_PTR;
     memset(out, 0, sizeof(*out));
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     if (!owner) return NX_ERR_INVALID_PARAM;
     const nx_device_t* dev = NULL;
     nx_status_t status = nx_device_discover(name, expected, &dev);
@@ -358,6 +359,7 @@ static nx_status_t lifecycle_deinit_settled(nx_lifecycle_t* life, bool unknown_l
 }
 nx_status_t nx_device_close(nx_device_ref_t ref) {
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     uint32_t saved = metadata_enter();
     nx_device_config_state_t* state = NULL;
     nx_status_t status = validate_ref(ref, &state);
@@ -385,6 +387,7 @@ nx_status_t nx_device_close(nx_device_ref_t ref) {
 }
 nx_status_t nx_device_recover(const char* name, uintptr_t owner) {
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     if (!name || !owner) return NX_ERR_INVALID_PARAM;
     uint32_t saved = metadata_enter();
     const nx_device_t* dev = NULL;
@@ -418,6 +421,7 @@ nx_status_t nx_device_recover(const char* name, uintptr_t owner) {
 
 nx_status_t nx_device_dispatch_recover_unknown_uart(nx_device_ref_t ref) {
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     uint32_t saved = metadata_enter();
     if (!registered(ref.descriptor)) { metadata_exit(saved); return NX_ERR_NOT_FOUND; }
     const nx_device_t* dev = ref.descriptor;
@@ -437,6 +441,7 @@ nx_status_t nx_device_dispatch_recover_unknown_uart(nx_device_ref_t ref) {
 nx_status_t nx_device_dispatch_pin(nx_device_ref_t ref, nx_device_class_t expected,
                                    bool serialize, void** api) {
     if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     uint32_t saved = metadata_enter();
     nx_device_config_state_t* state = NULL;
     nx_status_t status = validate_ref(ref, &state);
@@ -525,7 +530,8 @@ nx_status_t nx_device_shutdown_end_owned(uintptr_t owner) {
 }
 
 static nx_status_t provider_lifecycle_pass(bool stop) {
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) return NX_ERR_CONTEXT;
+    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
     uint32_t saved = metadata_enter();
     if (!shutdown_admission_closed) {
         metadata_exit(saved);

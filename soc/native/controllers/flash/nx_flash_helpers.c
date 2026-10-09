@@ -11,11 +11,19 @@
  *                  write with erase check, read operations, and persistence.
  */
 
+#if !defined(_WIN32) && !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L
+#endif
 #include "nx_flash_helpers.h"
 #include "hal/nx_types.h"
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#if defined(_WIN32)
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 /*---------------------------------------------------------------------------*/
 /* Flash Storage Operations                                                  */
@@ -239,9 +247,15 @@ nx_status_t flash_save_to_file(nx_flash_state_t* state) {
             break;
         }
     }
-    if (fclose(file) != 0) {
-        status = NX_ERR_IO;
+    if (status == NX_OK && fflush(file) != 0) status = NX_ERR_IO;
+    if (status == NX_OK) {
+#if defined(_WIN32)
+        if (_commit(_fileno(file)) != 0) status = NX_ERR_IO;
+#else
+        if (fsync(fileno(file)) != 0) status = NX_ERR_IO;
+#endif
     }
+    if (fclose(file) != 0) status = NX_ERR_IO;
     return status;
 }
 
@@ -282,6 +296,9 @@ nx_status_t flash_load_from_file(nx_flash_state_t* state) {
             }
         }
     }
+    /* An existing file is exactly one raw image, not a prefix of another
+     * revision. Reject trailing bytes and read errors as malformed input. */
+    if (status == NX_OK && (fgetc(file) != EOF || ferror(file))) status = NX_ERR_IO;
     if (fclose(file) != 0) {
         status = NX_ERR_IO;
     }

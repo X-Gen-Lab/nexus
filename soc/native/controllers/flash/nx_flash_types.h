@@ -66,6 +66,7 @@ typedef struct {
  */
 typedef struct {
     nx_internal_flash_t base; /**< Base flash interface */
+    nx_flash_operations_t operations; /**< Typed model geometry/offset IO */
     nx_lifecycle_t lifecycle; /**< Lifecycle interface */
     nx_flash_state_t* state;  /**< Flash state */
     nx_device_t* device;      /**< Device handle */

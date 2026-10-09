@@ -31,7 +31,8 @@ typedef struct {
 } nx_uart_result_t;
 
 /** RX events are ordered, single-byte records. timestamp_us is sampled in the
- * RX IRQ, not when the application drains the ring. resolution_us describes
+ * RX IRQ (MCU) or explicit event producer (Native), not when the application
+ * drains the ring. resolution_us describes
  * the clock precision. Error/overflow records have has_data=false; raw_error
  * contains backend diagnostic flags. Data never implies an error-free frame. */
 typedef struct {

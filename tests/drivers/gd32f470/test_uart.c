@@ -28,6 +28,8 @@ int main(void){
     assert(life->init(life)==NX_OK);
     nx_uart_operations_t* ops=api->get_operations(api);
     uint8_t bytes[]={1,2};nx_uart_ticket_t ticket;nx_uart_result_t result;
+    ticket.sequence = 12;
+    assert(ops->submit(ops,bytes,2,0,&ticket)==NX_ERR_TIMEOUT&&ticket.sequence==0&&!fake_de);
     assert(ops->submit(ops,bytes,2,5,&ticket)==NX_OK&&fake_de);
     assert(life->deinit(life)==NX_ERR_BUSY);
     irq(USART_STAT0_TBE|USART_STAT0_TC); /* sampled TC predates DATA write */
@@ -66,7 +68,7 @@ int main(void){
     assert(ops->submit(ops,bytes,2,5,&ticket)==NX_OK&&ticket.sequence>previous.sequence);
     assert(ops->cancel(ops,ticket)==NX_OK);
     uart.sequence=UINT64_MAX;
-    assert(ops->submit(ops,bytes,2,5,&ticket)==NX_ERR_FULL);
+    assert(ops->submit(ops,bytes,2,5,&ticket)==NX_ERR_NO_RESOURCE);
     fake_isr=1;assert(life->deinit(life)==NX_ERR_INVALID_STATE);fake_isr=0;
     release_error = NX_ERR_IO;
     assert(life->deinit(life) == NX_ERR_IO);

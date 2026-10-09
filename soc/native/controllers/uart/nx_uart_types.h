@@ -134,6 +134,13 @@ typedef struct nx_uart_impl_s {
     nx_tx_sync_t tx_sync;     /**< TX sync interface */
     nx_rx_sync_t rx_sync;     /**< RX sync interface */
     nx_lifecycle_t lifecycle; /**< Lifecycle interface */
+    nx_uart_operations_t operations; /**< Typed, immediate-copy host model */
+    uint64_t sequence; /**< Never reset by lifecycle close/reopen */
+    nx_uart_result_t result;
+    nx_uart_rx_event_t* rx_events;
+    size_t rx_event_capacity, rx_event_head, rx_event_count;
+    uint32_t rx_event_dropped;
+    uint64_t rx_drop_timestamp;
     nx_power_t power;         /**< Power interface */
     nx_uart_state_t* state;   /**< State pointer */
     nx_device_t* device;      /**< Device descriptor */

@@ -138,13 +138,16 @@ static nx_device_state_t uart_state(nx_lifecycle_t* self) { (void)self; return u
 static nx_status_t uart_submit(nx_uart_operations_t* self, const uint8_t* data,
                                size_t length, uint32_t timeout_ms, nx_uart_ticket_t* ticket) {
     (void)self;
-    if (!data || !length || !ticket || !timeout_ms || timeout_ms > INT32_MAX) {
+    if (!ticket) { return NX_ERR_NULL_PTR; }
+    ticket->sequence = 0;
+    if (!data || !length || timeout_ms > INT32_MAX) {
         return NX_ERR_INVALID_PARAM;
     }
     if (nx_arch_in_isr() || uart.state != NX_DEV_STATE_RUNNING) { return NX_ERR_INVALID_STATE; }
+    if (!timeout_ms) { return NX_ERR_TIMEOUT; }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     if (uart.active) { nx_arch_irq_restore(saved); return NX_ERR_BUSY; }
-    if (uart.sequence == UINT64_MAX) { nx_arch_irq_restore(saved); return NX_ERR_FULL; }
+    if (uart.sequence == UINT64_MAX) { nx_arch_irq_restore(saved); return NX_ERR_NO_RESOURCE; }
     uart.tx = data;
     uart.tx_length = length;
     uart.tx_position = 0;

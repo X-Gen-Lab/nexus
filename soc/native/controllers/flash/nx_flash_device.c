@@ -72,5 +72,6 @@ static nx_status_t nx_flash_construct(const nx_device_t* dev, void** out) {
     static native_flash_storage_t flash_storage_##index_ = {.index = index_}; \
     NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index_, "FLASH" #index_, NULL,      \
         &flash_storage_##index_.core, NX_DEVICE_CLASS_FLASH,                  \
-        0, nx_flash_construct, NULL);
+        NX_DEVICE_CAP_FLASH_GEOMETRY | NX_DEVICE_CAP_FLASH_PROGRAM |          \
+            NX_DEVICE_CAP_FLASH_ERASE, nx_flash_construct, NULL);
 NX_TRAVERSE_EACH_INSTANCE(NX_FLASH_DEVICE_REGISTER, DEVICE_TYPE)
