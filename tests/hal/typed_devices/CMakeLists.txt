@@ -93,3 +93,14 @@ if(NOT MSVC)
     target_compile_options(typed_native_provider_tests PRIVATE -Wall -Wextra -Werror)
 endif()
 nexus_discover_tests(typed_native_provider_tests PROPERTIES TIMEOUT 10 LABELS "hal;typed;native;provider;contract")
+
+# Production logger/adapter and selected Native provider; no UART fault port.
+add_executable(typed_native_log_uart_tests test_native_log_uart.cpp)
+target_compile_features(typed_native_log_uart_tests PRIVATE cxx_std_17)
+target_link_libraries(typed_native_log_uart_tests PRIVATE
+    Nexus::Firmware Nexus::HALProviders Nexus::Arch log_uart_adapter log_framework
+    GTest::gtest_main ${THREAD_LIBS})
+if(NOT MSVC)
+    target_compile_options(typed_native_log_uart_tests PRIVATE -Wall -Wextra -Werror)
+endif()
+nexus_discover_tests(typed_native_log_uart_tests PROPERTIES TIMEOUT 10 LABELS "hal;typed;native;log;integration;contract")
