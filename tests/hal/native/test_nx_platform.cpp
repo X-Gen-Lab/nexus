@@ -19,12 +19,11 @@ extern "C" {
 #include "hal/base/nx_device.h"
 #include "hal/nx_factory.h"
 #include "hal/nx_status.h"
+#include "hal/nx_hal.h"
 #include "hal/resource/nx_dma_manager.h"
 #include "hal/resource/nx_isr_manager.h"
 
 /* Platform initialization functions */
-nx_status_t nx_platform_init(void);
-nx_status_t nx_platform_deinit(void);
 bool nx_platform_is_initialized(void);
 
 /* ISR simulation function */
@@ -48,12 +47,12 @@ class PlatformInitTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Ensure platform is deinitialized before each test */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     void TearDown() override {
         /* Clean up after each test */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 };
 
@@ -62,7 +61,7 @@ TEST_F(PlatformInitTest, InitializeSuccess) {
     EXPECT_FALSE(nx_platform_is_initialized());
 
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
 
     /* Platform should be initialized */
     EXPECT_TRUE(nx_platform_is_initialized());
@@ -70,21 +69,21 @@ TEST_F(PlatformInitTest, InitializeSuccess) {
 
 TEST_F(PlatformInitTest, InitializeIdempotent) {
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
     EXPECT_TRUE(nx_platform_is_initialized());
 
     /* Initialize again - should succeed (idempotent) */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
     EXPECT_TRUE(nx_platform_is_initialized());
 }
 
 TEST_F(PlatformInitTest, DeinitializeSuccess) {
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
     EXPECT_TRUE(nx_platform_is_initialized());
 
     /* Deinitialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_deinit());
+    EXPECT_EQ(NX_OK, nx_hal_deinit());
 
     /* Platform should not be initialized */
     EXPECT_FALSE(nx_platform_is_initialized());
@@ -92,24 +91,24 @@ TEST_F(PlatformInitTest, DeinitializeSuccess) {
 
 TEST_F(PlatformInitTest, DeinitializeIdempotent) {
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
 
     /* Deinitialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_deinit());
+    EXPECT_EQ(NX_OK, nx_hal_deinit());
     EXPECT_FALSE(nx_platform_is_initialized());
 
     /* Deinitialize again - should succeed (idempotent) */
-    EXPECT_EQ(NX_OK, nx_platform_deinit());
+    EXPECT_EQ(NX_OK, nx_hal_deinit());
     EXPECT_FALSE(nx_platform_is_initialized());
 }
 
 TEST_F(PlatformInitTest, InitDeinitCycle) {
     /* Test multiple init/deinit cycles */
     for (int i = 0; i < 3; i++) {
-        EXPECT_EQ(NX_OK, nx_platform_init());
+        EXPECT_EQ(NX_OK, nx_hal_init());
         EXPECT_TRUE(nx_platform_is_initialized());
 
-        EXPECT_EQ(NX_OK, nx_platform_deinit());
+        EXPECT_EQ(NX_OK, nx_hal_deinit());
         EXPECT_FALSE(nx_platform_is_initialized());
     }
 }
@@ -125,12 +124,12 @@ class DeviceRegistrationTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize platform */
-        nx_platform_init();
+        nx_hal_init();
     }
 
     void TearDown() override {
         /* Deinitialize platform */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 };
 
@@ -233,12 +232,12 @@ class DMAManagementTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize platform */
-        nx_platform_init();
+        nx_hal_init();
     }
 
     void TearDown() override {
         /* Deinitialize platform */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 };
 
@@ -432,7 +431,7 @@ class ISRManagementTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize platform */
-        nx_platform_init();
+        nx_hal_init();
 
         /* Get ISR manager */
         isr_mgr = nx_isr_manager_get();
@@ -441,7 +440,7 @@ class ISRManagementTest : public ::testing::Test {
 
     void TearDown() override {
         for (uint32_t irq=0; irq<64; ++irq) (void)isr_mgr->disconnect(isr_mgr,irq);
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     nx_isr_manager_t* isr_mgr = nullptr;

@@ -72,6 +72,11 @@ int stm32_perf_init(void) {
     return 0;
 }
 
+void stm32_perf_deinit(void) {
+    DWT_CTRL &= ~DWT_CTRL_CYCCNTENA;
+    g_boot_time_measured = false;
+}
+
 /**
  * \brief           Start performance counter
  */

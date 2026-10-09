@@ -1,3 +1,4 @@
+#include "gd32f470_platform.h"
 #include "gd32f4xx.h"
 #include "nexus_config.h"
 #include <stdbool.h>
@@ -62,4 +63,40 @@ int nx_gd32f470_clock_validate(void) {
     return SystemCoreClock == NX_CONFIG_GD32_SYSCLK_FREQ &&
         rcu_clock_freq_get(CK_APB1) == 50000000u &&
         rcu_clock_freq_get(CK_APB2) == 100000000u ? 0 : -1;
+}
+
+int nx_gd32f470_clock_release(void) {
+    RCU_CTL |= RCU_CTL_IRC16MEN;
+    if (!wait_bits(&RCU_CTL, RCU_CTL_IRC16MSTB, RCU_CTL_IRC16MSTB)) {
+        SystemCoreClockUpdate();
+        return -1;
+    }
+    /* Preserve dividers until the CPU has really switched. Never disable a
+     * PLL that might still be the system clock after a failed request. */
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_SCS) | RCU_CKSYSSRC_IRC16M;
+    if (!wait_bits(&RCU_CFG0, RCU_CFG0_SCSS, RCU_SCSS_IRC16M)) {
+        SystemCoreClockUpdate();
+        return -1;
+    }
+    RCU_CFG0 &= ~(RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC);
+    SystemCoreClockUpdate();
+    if ((RCU_CFG0 & (RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC)) != 0u ||
+        SystemCoreClock != 16000000u) {
+        return -1;
+    }
+
+    RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_PLLI2SEN | RCU_CTL_PLLSAIEN);
+    if (!wait_bits(&RCU_CTL,
+                   RCU_CTL_PLLEN | RCU_CTL_PLLSTB |
+                   RCU_CTL_PLLI2SEN | RCU_CTL_PLLI2SSTB |
+                   RCU_CTL_PLLSAIEN | RCU_CTL_PLLSAISTB, 0u)) {
+        return -1;
+    }
+    RCU_CTL &= ~(RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
+    if (!wait_bits(&RCU_CTL, RCU_CTL_HXTALEN | RCU_CTL_HXTALSTB, 0u)) {
+        return -1;
+    }
+    /* Leave the conservative Flash latency and regulator/high-drive setting
+     * intact. clock_validate() restores the published bus frequencies. */
+    return 0;
 }

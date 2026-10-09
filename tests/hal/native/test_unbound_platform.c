@@ -7,8 +7,11 @@ int main(void) {
     assert(!nx_hal_is_initialized());
     assert(nx_hal_init() == NX_ERR_NOT_SUPPORTED);
     assert(!nx_hal_is_initialized());
-    assert(nx_hal_init() == NX_ERR_NOT_SUPPORTED);
-    assert(!nx_hal_is_initialized());
+    assert(nx_hal_get_state() == NX_HAL_PARTIAL);
+    assert(nx_hal_get_last_cleanup_status() == NX_ERR_NOT_SUPPORTED);
+    assert(nx_hal_init() == NX_ERR_INVALID_STATE);
+    assert(nx_hal_deinit() == NX_ERR_NOT_SUPPORTED);
+    assert(nx_hal_get_state() == NX_HAL_PARTIAL);
     puts("Unbound platform startup rejected");
     return 0;
 }

@@ -23,7 +23,7 @@ foreach(variant model native)
     add_executable(hal_lifecycle_${variant}_context_tests
         test_hal_context.c "${NEXUS_SOURCE_DIR}/hal/src/nx_hal.c")
     target_link_libraries(hal_lifecycle_${variant}_context_tests PRIVATE
-        hal_interface nexus_arch_interface)
+        hal_interface osal_interface nexus_arch_interface)
     if(variant STREQUAL "native")
         target_compile_definitions(hal_lifecycle_${variant}_context_tests PRIVATE
             NX_HAL_CONTEXT_REAL_ARCH=1)

@@ -13,6 +13,11 @@ spi_parameter_struct fake_spi_config;
 uint32_t fake_timer_count;
 bool fake_timer_pending;
 timer_parameter_struct fake_timer_config;
+fake_nvic_t fake_nvic;
+fake_systick_t fake_systick;
+fake_scb_t fake_scb;
+uint32_t fake_dma_ctl[2][8], fake_rcu_apb1en, fake_rcu_apb1spen;
+uint32_t fake_timer_ctl0, fake_timer_dmainten, fake_timer_psc, fake_timer_car;
 nx_arch_irq_state_t nx_arch_irq_save(void) { nx_arch_irq_state_t old={fake_mask};fake_mask=1;return old; }
 void nx_arch_irq_restore(nx_arch_irq_state_t old) {fake_mask=old.value;}
 bool nx_arch_irq_is_masked(void) {return fake_mask!=0;}
@@ -20,17 +25,19 @@ bool nx_arch_in_isr(void) {return fake_isr!=0;}
 void nx_arch_dmb(void) {}
 void nx_arch_dsb(void) {}
 void nx_arch_isb(void) {}
-void rcu_periph_clock_enable(uint32_t x) {(void)x;}
-void rcu_periph_clock_sleep_enable(uint32_t x) {(void)x;}
+void rcu_periph_clock_enable(uint32_t x) {if(x==RCU_TIMER1)fake_rcu_apb1en|=RCU_APB1EN_TIMER1EN;}
+void rcu_periph_clock_sleep_enable(uint32_t x) {if(x==RCU_TIMER1_SLP)fake_rcu_apb1spen|=RCU_APB1SPEN_TIMER1SPEN;}
+void rcu_periph_clock_disable(uint32_t x) {if(x==RCU_TIMER1)fake_rcu_apb1en&=~RCU_APB1EN_TIMER1EN;}
+void rcu_periph_clock_sleep_disable(uint32_t x) {if(x==RCU_TIMER1_SLP)fake_rcu_apb1spen&=~RCU_APB1SPEN_TIMER1SPEN;}
 void rcu_periph_reset_enable(uint32_t x) {
     fake_reset_count++;
     if(x==RCU_USART0RST){fake_uart_shift=false;fake_uart_flags=0;fake_usart_interrupts=0;}
     if(x==RCU_SPI4RST){fake_spi_shift=false;fake_spi_flags=SPI_STAT_TBE;}
 }
 void rcu_periph_reset_disable(uint32_t x) {(void)x;}
-void NVIC_DisableIRQ(int x) {(void)x;}
-void NVIC_EnableIRQ(int x) {(void)x;}
-void NVIC_ClearPendingIRQ(int x) {(void)x;}
+void NVIC_DisableIRQ(int x) {assert(x>=0&&x<=IPA_IRQn);fake_nvic.ISER[(unsigned)x/32u]&=~(1u<<((unsigned)x%32u));}
+void NVIC_EnableIRQ(int x) {assert(x>=0&&x<=IPA_IRQn);fake_nvic.ISER[(unsigned)x/32u]|=1u<<((unsigned)x%32u);}
+void NVIC_ClearPendingIRQ(int x) {assert(x>=0&&x<=IPA_IRQn);fake_nvic.ISPR[(unsigned)x/32u]&=~(1u<<((unsigned)x%32u));}
 void NVIC_SetPriority(int x,uint32_t p) {(void)x;(void)p;}
 #define NOOP2(f) void f(uint32_t x,uint32_t y){(void)x;(void)y;}
 NOOP2(usart_baudrate_set)
@@ -68,12 +75,13 @@ uint32_t fake_spi_stat(void){
 static uint8_t last_spi_byte;
 void spi_i2s_data_transmit(uint32_t x,uint16_t y){(void)x;assert(fake_cs);fake_spi_writes++;last_spi_byte=(uint8_t)y;fake_spi_shift=true;fake_spi_flags=SPI_STAT_TBE|SPI_STAT_RBNE|SPI_STAT_TRANS;}
 uint16_t spi_i2s_data_receive(uint32_t x){(void)x;fake_spi_flags=SPI_STAT_TBE|(fake_spi_hold_busy?SPI_STAT_TRANS:0);fake_spi_shift=fake_spi_hold_busy;return (uint8_t)(last_spi_byte^0xFFu);}
-void timer_deinit(uint32_t x){(void)x;fake_timer_count=0;fake_timer_pending=false;}
+void timer_deinit(uint32_t x){(void)x;fake_timer_count=0;fake_timer_pending=false;fake_timer_ctl0=0;fake_timer_dmainten=0;fake_timer_psc=0;fake_timer_car=0;}
 void timer_struct_para_init(timer_parameter_struct* p){memset(p,0,sizeof(*p));}
-void timer_init(uint32_t x,timer_parameter_struct* p){(void)x;fake_timer_config=*p;}
+void timer_init(uint32_t x,timer_parameter_struct* p){(void)x;fake_timer_config=*p;fake_timer_psc=p->prescaler;fake_timer_car=p->period;}
 void timer_counter_value_config(uint32_t x,uint32_t y){(void)x;fake_timer_count=y;}
 void timer_interrupt_flag_clear(uint32_t x,uint32_t y){(void)x;(void)y;fake_timer_pending=false;}
-void timer_interrupt_enable(uint32_t x,uint32_t y){(void)x;(void)y;}
-void timer_enable(uint32_t x){(void)x;}
+void timer_interrupt_enable(uint32_t x,uint32_t y){(void)x;fake_timer_dmainten|=y;}
+void timer_enable(uint32_t x){(void)x;fake_timer_ctl0|=TIMER_CTL0_CEN;}
+void timer_disable(uint32_t x){(void)x;fake_timer_ctl0&=~TIMER_CTL0_CEN;}
 uint32_t timer_counter_read(uint32_t x){(void)x;return fake_timer_count;}
 FlagStatus timer_interrupt_flag_get(uint32_t x,uint32_t y){(void)x;(void)y;return fake_timer_pending?SET:RESET;}

@@ -153,6 +153,23 @@ int main(void) {
     assert(osal_deinit() == OSAL_ERROR_BUSY && osal_is_initialized());
     assert(osal_sem_delete(lifecycle) == OSAL_OK);
     assert(osal_deinit() == OSAL_OK && !osal_is_initialized());
-    puts("9 baremetal board-model contract groups passed");
+    assert(osal_baremetal_clear_clock(NULL) == OSAL_ERROR_NULL_POINTER);
+    assert(osal_baremetal_clear_clock(other_clock) == OSAL_ERROR_BUSY);
+    irq_masked = true;
+    assert(osal_baremetal_clear_clock(board_clock) == OSAL_ERROR_BUSY && irq_masked);
+    irq_masked = false; in_isr = true;
+    assert(osal_baremetal_clear_clock(board_clock) == OSAL_ERROR_ISR);
+    in_isr = false;
+    assert(osal_baremetal_clear_clock(board_clock) == OSAL_OK);
+    assert(osal_get_backend_info(&info) == OSAL_OK && !(info.capabilities & OSAL_CAP_MONOTONIC_CLOCK));
+    uint32_t time;
+    assert(osal_get_time_ms(&time) == OSAL_ERROR_NOT_SUPPORTED);
+    assert(osal_baremetal_clear_clock(board_clock) == OSAL_OK);
+    assert(osal_baremetal_set_clock(board_clock) == OSAL_OK);
+    assert(osal_init() == OSAL_OK);
+    assert(osal_baremetal_clear_clock(board_clock) == OSAL_ERROR_BUSY);
+    assert(osal_get_backend_info(&info) == OSAL_OK && (info.capabilities & OSAL_CAP_MONOTONIC_CLOCK));
+    assert(osal_deinit() == OSAL_OK && osal_baremetal_clear_clock(board_clock) == OSAL_OK);
+    puts("10 baremetal board-model contract groups passed, including clock owner detach/rebind");
     return 0;
 }

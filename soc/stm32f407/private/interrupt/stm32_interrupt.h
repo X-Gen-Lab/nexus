@@ -36,6 +36,8 @@
 #define NEXUS_STM32_INTERRUPT_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include "hal/nx_status.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,6 +109,20 @@ void stm32_irq_disable_all(void);
  *                  to dispatch registered callbacks through nx_isr_manager.
  */
 void stm32_isr_dispatch(IRQn_Type irqn);
+
+/**
+ * \brief           Read-only IRQ/DMA quiescence gate for F407 teardown.
+ * \return          NX_ERR_BUSY while an ISR registration, external enabled /
+ *                  pending / active IRQ, or enabled DMA stream exists.
+ * \note            Caller must prevent concurrent resource acquisition.
+ *                  Direct-SDK peripherals without these resources must be
+ *                  quiesced by their external owner before platform teardown.
+ */
+nx_status_t nx_stm32f407_resources_idle(void);
+/* Read-only manager registration/active-callback query under an Arch section.
+ * Disconnect is task-context and reports BUSY while a callback/hardware IRQ
+ * retains the registration. Dispatch callbacks run outside the short lock. */
+bool stm32_isr_manager_is_idle(void);
 
 /*---------------------------------------------------------------------------*/
 /* ISR Handler Generation Macros                                             */

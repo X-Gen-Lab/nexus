@@ -14,7 +14,6 @@ static void* conflicting_init(const nx_device_t* device) {
 }
 
 int main(void) {
-    assert(osal_init() == OSAL_OK);
     assert(!nx_hal_is_initialized());
     nx_device_config_state_t conflict_state = {0};
     const nx_device_t conflict = {
@@ -27,6 +26,7 @@ int main(void) {
 
     assert(nx_hal_init() == NX_OK);
     assert(nx_hal_init() == NX_OK);
+    assert(osal_init() == OSAL_OK);
     const nx_device_t* uart = nx_device_find("UART0");
     assert(uart && uart != &conflict);
     assert(nx_factory_uart(0));
@@ -41,6 +41,8 @@ int main(void) {
     assert(lifecycle && lifecycle->init(lifecycle) == NX_OK);
     gpio->write(gpio, 1);
     assert(input->read(input) == 1);
+    assert(nx_hal_deinit() == NX_ERR_BUSY);
+    assert(osal_deinit() == OSAL_OK);
     assert(nx_hal_deinit() == NX_OK);
     assert(!nx_hal_is_initialized());
 

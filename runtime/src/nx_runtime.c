@@ -63,13 +63,19 @@ nx_status_t nx_runtime_bootstrap(nx_boot_report_t* output) {
     }
     if (ready) { report.stage = NX_BOOT_STAGE_READY; goto done; }
     if (hal_owned || osal_owned) { status = NX_ERR_INVALID_STATE; goto done; }
-    if (nx_hal_is_initialized() || osal_is_initialized()) {
+    if (nx_hal_get_state() != NX_HAL_OFFLINE || osal_is_initialized()) {
         status = NX_ERR_ALREADY_INIT;
         goto done;
     }
     report.stage = NX_BOOT_STAGE_HAL;
     report.hal_status = nx_hal_init();
-    if (report.hal_status != NX_OK) { status = report.hal_status; goto done; }
+    if (report.hal_status != NX_OK) {
+        status = report.hal_status;
+        hal_owned = nx_hal_get_state() != NX_HAL_OFFLINE;
+        report.rollback_status = nx_hal_get_last_cleanup_status();
+        if (hal_owned) { report.stage = NX_BOOT_STAGE_ROLLBACK; }
+        goto done;
+    }
     hal_owned = true;
     report.stage = NX_BOOT_STAGE_OSAL;
     report.osal_status = osal_init();
@@ -114,12 +120,14 @@ nx_status_t nx_runtime_shutdown(nx_boot_report_t* output) {
     report.hal_status = hal_owned ? nx_hal_deinit() : NX_OK;
     status = report.hal_status;
     if (status != NX_OK) {
-        if (restore_osal) {
+        /* Restore only an untouched READY platform. A failed hardware cleanup
+         * may have changed clocks/time sources and must remain quarantined. */
+        if (restore_osal && nx_hal_get_state() == NX_HAL_READY) {
             report.rollback_status = translate_osal_status(osal_init());
             osal_owned = report.rollback_status == NX_OK;
             if (!osal_owned) { report.stage = NX_BOOT_STAGE_ROLLBACK; }
         }
-        ready = hal_owned && osal_owned;
+        ready = hal_owned && osal_owned && nx_hal_get_state() == NX_HAL_READY;
         goto done;
     }
     hal_owned = false;

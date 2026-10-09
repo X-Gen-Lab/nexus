@@ -106,6 +106,22 @@ extern "C" {
  */
 nx_status_t nx_hal_init(void);
 
+typedef enum {
+    NX_HAL_OFFLINE, /**< No selected-platform resources are owned. */
+    NX_HAL_PARTIAL, /**< Cleanup failed; new acquisition/restart is quarantined. */
+    NX_HAL_READY    /**< The selected platform completed initialization. */
+} nx_hal_state_t;
+
+/** Nonblocking lifetime snapshot; use the serialized HAL lifecycle context.
+ * Failed init attempts actual cleanup and returns its original error. PARTIAL
+ * retains ownership and the exclusive admission fence until nx_hal_deinit()
+ * settles it. Existing owners may close/recover to return borrowed resources. */
+nx_hal_state_t nx_hal_get_state(void);
+
+/** Cleanup result from the latest failed-init rollback or deinit attempt.
+ * This is separate from the original initialization error. */
+nx_status_t nx_hal_get_last_cleanup_status(void);
+
 /**
  * \brief           Deinitialize the Nexus HAL
  * \return          NX_OK on success, error code otherwise
@@ -114,21 +130,26 @@ nx_status_t nx_hal_init(void);
  * The caller must first quiesce device users and settle all outstanding leases;
  * this entry does not automatically release device handles or application objects.
  *
- * \warning         After calling this function, no HAL functions should be
- *                  called until nx_hal_init() is called again.
+ * \warning         After successful cleanup, initialize HAL before device use.
+ *                  PARTIAL permits settlement/cleanup retry, not ordinary use.
  * \note            Externally serialized task/startup context with interrupts
  *                  unmasked. ISR calls return NX_ERR_CONTEXT; an existing Arch
  *                  interrupt mask returns NX_ERR_INVALID_STATE before any
  *                  platform hook, including offline calls. The caller retains
  *                  and restores its own mask. An unsupported or busy platform
- *                  retains initialized state. STM32 reference shutdown requires
- *                  a product-owned quiescence implementation and controlled reset.
+ *                  retains ownership. Read-only admission failure keeps READY;
+ *                  any failure after entering cleanup quarantines PARTIAL.
+ *                  MCU teardown is limited to baremetal or
+ *                  before scheduler start, after all Nexus devices, IRQ/DMA
+ *                  resources and OSAL objects are released. Direct vendor SDK
+ *                  users must quiesce their resources separately. The caller
+ *                  also releases OSAL before stopping the platform time source.
  */
 nx_status_t nx_hal_deinit(void);
 
 /**
  * \brief           Check if HAL is initialized
- * \return          true if initialized, false otherwise
+ * \return          true only when initialization completed (READY)
  */
 bool nx_hal_is_initialized(void);
 

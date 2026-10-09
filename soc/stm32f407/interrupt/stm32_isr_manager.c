@@ -44,6 +44,8 @@
 /*---------------------------------------------------------------------------*/
 
 #include "hal/resource/nx_isr_manager.h"
+#include "hal/provider/nx_device_provider.h"
+#include "arch/nx_arch.h"
 #include "interrupt/stm32_interrupt.h"
 #include <stdbool.h>
 #include <string.h>
@@ -84,6 +86,7 @@ typedef struct {
     void* data;          /**< User data */
     uint8_t hw_priority; /**< Hardware priority (0-15) */
     bool registered;     /**< Registration flag */
+    uint32_t active;     /**< Dispatch pins retaining callback/user context */
 } nx_isr_item_t;
 
 /**
@@ -170,8 +173,15 @@ static nx_status_t isr_connect(nx_isr_manager_t* self, uint32_t irq,
         return NX_ERR_INVALID_PARAM;
     }
 
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERR_CONTEXT;
+    }
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+
     /* Check if already registered */
-    if (impl->items[index].registered) {
+    if (nx_device_shutdown_is_active() || impl->items[index].registered ||
+        impl->items[index].active != 0U) {
+        nx_arch_irq_restore(previous);
         return NX_ERR_BUSY;
     }
 
@@ -184,6 +194,8 @@ static nx_status_t isr_connect(nx_isr_manager_t* self, uint32_t irq,
     /* One-step setup: clear pending + set priority + enable */
     stm32_irq_prepare(irqn, priority); /* Includes RTOS protection */
     stm32_irq_enable(irqn);
+    nx_arch_dmb();
+    nx_arch_irq_restore(previous);
 
     return NX_OK;
 }
@@ -208,18 +220,42 @@ static nx_status_t isr_disconnect(nx_isr_manager_t* self, uint32_t irq) {
         return NX_ERR_INVALID_PARAM;
     }
 
+    bool forbidden_context = nx_arch_in_isr() || nx_arch_irq_is_masked();
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    uint32_t bank = index / 32U;
+    uint32_t bit = UINT32_C(1) << (index % 32U);
+    /* A callback may ask to disconnect itself. Refuse settlement while its
+     * function / user pointer is pinned, including same-IRQ hardware activity. */
+    if (impl->items[index].active != 0U || (NVIC->IABR[bank] & bit) != 0U) {
+        nx_arch_irq_restore(previous);
+        return NX_ERR_BUSY;
+    }
+    if (forbidden_context) {
+        nx_arch_irq_restore(previous);
+        return NX_ERR_CONTEXT;
+    }
+
     /* Check if registered */
     if (!impl->items[index].registered) {
+        nx_arch_irq_restore(previous);
         return NX_ERR_NOT_FOUND;
     }
 
     /* Disable interrupt */
     stm32_irq_disable(irqn);
+    HAL_NVIC_ClearPendingIRQ(irqn);
+    if (((NVIC->ISER[bank] | NVIC->ISPR[bank] | NVIC->IABR[bank]) & bit) != 0U) {
+        /* A still-active source must be quiesced by its owner before retry. */
+        nx_arch_irq_restore(previous);
+        return NX_ERR_BUSY;
+    }
 
     /* Clear callback information */
     impl->items[index].func = NULL;
     impl->items[index].data = NULL;
     impl->items[index].registered = false;
+    nx_arch_dmb();
+    nx_arch_irq_restore(previous);
 
     return NX_OK;
 }
@@ -235,6 +271,18 @@ nx_isr_manager_t* nx_isr_manager_get(void) {
     return &g_isr_manager.base;
 }
 
+bool stm32_isr_manager_is_idle(void) {
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    for (uint32_t irq = 0; irq < NX_ISR_MAX_IRQS; ++irq) {
+        if (g_isr_manager.items[irq].registered || g_isr_manager.items[irq].active != 0U) {
+            nx_arch_irq_restore(previous);
+            return false;
+        }
+    }
+    nx_arch_irq_restore(previous);
+    return true;
+}
+
 /**
  * \brief           Dispatch ISR callback for an interrupt
  * \param[in]       irqn: Interrupt number (IRQn_Type)
@@ -248,10 +296,24 @@ void stm32_isr_dispatch(IRQn_Type irqn) {
         return;
     }
 
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
     nx_isr_item_t* item = &g_isr_manager.items[index];
-
-    /* O(1) lookup and call */
-    if (item->registered && item->func) {
-        item->func(item->data);
+    if (!item->registered || !item->func || item->active == UINT32_MAX) {
+        nx_arch_irq_restore(previous);
+        return;
     }
+    nx_isr_func_t callback = item->func;
+    void* data = item->data;
+    ++item->active;
+    nx_arch_dmb();
+    nx_arch_irq_restore(previous);
+
+    /* The dispatch pin, rather than an interrupt mask, retains user storage
+     * throughout the callback. This is CPU-local; not an NMI or SMP contract. */
+    callback(data);
+
+    previous = nx_arch_irq_save();
+    --item->active;
+    nx_arch_dmb();
+    nx_arch_irq_restore(previous);
 }

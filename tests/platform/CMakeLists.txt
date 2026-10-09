@@ -9,3 +9,4 @@ endif()
 
 add_subdirectory(runtime)
 
+add_subdirectory(mcu_lifecycle)

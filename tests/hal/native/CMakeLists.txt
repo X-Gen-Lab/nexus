@@ -104,7 +104,7 @@ set_tests_properties(native_registry_contract_tests PROPERTIES TIMEOUT 10 LABELS
 
 add_executable(unbound_platform_contract_tests
     test_unbound_platform.c "${NEXUS_SOURCE_DIR}/hal/src/nx_hal.c")
-target_link_libraries(unbound_platform_contract_tests PRIVATE hal_interface nexus_build_options Nexus::Arch)
+target_link_libraries(unbound_platform_contract_tests PRIVATE hal_interface Nexus::HALCore osal Nexus::Arch)
 if(MSVC)
     target_compile_options(unbound_platform_contract_tests PRIVATE /UNDEBUG)
 else()

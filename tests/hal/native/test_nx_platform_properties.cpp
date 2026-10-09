@@ -22,12 +22,11 @@
 extern "C" {
 #include "hal/base/nx_device.h"
 #include "hal/nx_status.h"
+#include "hal/nx_hal.h"
 #include "hal/resource/nx_dma_manager.h"
 #include "hal/resource/nx_isr_manager.h"
 
 /* Platform initialization functions */
-nx_status_t nx_platform_init(void);
-nx_status_t nx_platform_deinit(void);
 bool nx_platform_is_initialized(void);
 
 /* ISR simulation function */
@@ -48,12 +47,12 @@ class PlatformPropertyTest : public ::testing::Test {
         native_property_seed(rng);
 
         /* Ensure platform is deinitialized */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     void TearDown() override {
         /* Clean up platform */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     /* Random number generator */
@@ -99,7 +98,7 @@ class PlatformPropertyTest : public ::testing::Test {
  */
 TEST_F(PlatformPropertyTest, Property38_DMAChannelAllocationUniqueness) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     for (int iteration = 0; iteration < 100; ++iteration) {
         /* Generate random number of channels to allocate (1-8) */
@@ -170,7 +169,7 @@ TEST_F(PlatformPropertyTest, Property38_DMAChannelAllocationUniqueness) {
  */
 TEST_F(PlatformPropertyTest, Property39_DMAChannelReleaseAvailability) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     for (int iteration = 0; iteration < 100; ++iteration) {
         /* Generate random DMA and channel */
@@ -227,7 +226,7 @@ TEST_F(PlatformPropertyTest, Property39_DMAChannelReleaseAvailability) {
  */
 TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     /* Get ISR manager */
     nx_isr_manager_t* isr_mgr = nx_isr_manager_get();
@@ -301,7 +300,7 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
  */
 TEST_F(PlatformPropertyTest, PropertyExtra_DMAConfigurationPersistence) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     for (int iteration = 0; iteration < 100; ++iteration) {
         /* Generate random DMA and channel */

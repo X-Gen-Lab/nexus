@@ -8,8 +8,9 @@ add_subdirectory(sdk)
 set(stm32_device_dir "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4")
 add_library(soc_stm32f407 OBJECT
     flash.c identity.c stm32_uart_clock.c
-    clock/stm32_clock_common.c clock/stm32f4_clock.c
+    clock/stm32_clock_common.c clock/stm32f4_clock.c clock/stm32_clock_lifecycle.c
     interrupt/stm32_interrupt.c interrupt/stm32_isr_manager.c interrupt/stm32f4_it.c
+    interrupt/stm32_resources_lifecycle.c
     system/stm32_error.c system/stm32_error_handler.c system/stm32_chip_validation.c
     system/stm32_performance.c system/stm32_profiler.c
     "${stm32_device_dir}/Source/Templates/system_stm32f4xx.c")

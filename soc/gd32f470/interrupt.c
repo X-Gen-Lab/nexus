@@ -1,6 +1,7 @@
 #include "gd32f470_platform.h"
 #include "arch/nx_arch.h"
 #include "gd32f4xx.h"
+#include "gd32f4xx_dma.h"
 #include "nexus_config.h"
 #ifdef NX_CONFIG_OSAL_FREERTOS
 #include "FreeRTOS.h"
@@ -12,7 +13,12 @@ extern void xPortSysTickHandler(void);
  * resource, never exported as an application timer. The overflow ISR extends
  * it to 64 bits; interrupt masking must remain below its 71-minute wrap. */
 static volatile uint32_t timer_epoch;
+static bool gd32_timebase_owned;
 int nx_gd32f470_timebase_init(void) {
+    if (gd32_timebase_owned) { return -1; }
+    /* Acquire before the first write. A failed initialization still owns
+     * every partial timer/IRQ/clock effect until successful cleanup. */
+    gd32_timebase_owned = true;
     rcu_periph_clock_enable(RCU_TIMER1);
     rcu_periph_clock_sleep_enable(RCU_TIMER1_SLP);
     timer_deinit(TIMER1);
@@ -32,6 +38,62 @@ int nx_gd32f470_timebase_init(void) {
     NVIC_SetPriority(TIMER1_IRQn, 5u);
     NVIC_EnableIRQ(TIMER1_IRQn);
     timer_enable(TIMER1);
+    uint32_t bank = (uint32_t)TIMER1_IRQn / 32u;
+    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32u);
+    return (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0u &&
+           (RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN) != 0u &&
+           (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u &&
+           (TIMER_DMAINTEN(TIMER1) & TIMER_DMAINTEN_UPIE) != 0u &&
+           TIMER_PSC(TIMER1) == 99u && TIMER_CAR(TIMER1) == UINT32_MAX &&
+           (NVIC->ISER[bank] & bit) != 0u ? 0 : -1;
+}
+
+nx_status_t nx_gd32f470_resources_idle(void) {
+    /* F470's last external vector is IPA (90), beyond the FPU vector. The
+     * dedicated TIMER1 belongs to the platform; active IRQs are never waived. */
+    for (uint32_t irq = 0; irq <= (uint32_t)IPA_IRQn; ++irq) {
+        uint32_t bank = irq / 32u;
+        uint32_t bit = UINT32_C(1) << (irq % 32u);
+        if ((NVIC->IABR[bank] & bit) != 0u ||
+            ((irq != (uint32_t)TIMER1_IRQn || !gd32_timebase_owned) &&
+             ((NVIC->ISER[bank] | NVIC->ISPR[bank]) & bit) != 0u)) {
+            return NX_ERR_BUSY;
+        }
+    }
+    for (uint32_t channel = 0; channel < 8u; ++channel) {
+        if ((DMA_CHCTL(DMA0, channel) & DMA_CHXCTL_CHEN) != 0u ||
+            (DMA_CHCTL(DMA1, channel) & DMA_CHXCTL_CHEN) != 0u) {
+            return NX_ERR_BUSY;
+        }
+    }
+    return NX_OK;
+}
+
+int nx_gd32f470_timebase_deinit(void) {
+    if (!gd32_timebase_owned) { return 0; }
+    uint32_t bank = (uint32_t)TIMER1_IRQn / 32u;
+    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32u);
+    if ((NVIC->IABR[bank] & bit) != 0u) {
+        return -1;
+    }
+    NVIC_DisableIRQ(TIMER1_IRQn);
+    timer_disable(TIMER1);
+    TIMER_DMAINTEN(TIMER1) = 0u;
+    timer_interrupt_flag_clear(TIMER1, TIMER_INT_FLAG_UP);
+    NVIC_ClearPendingIRQ(TIMER1_IRQn);
+    if ((TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u ||
+        TIMER_DMAINTEN(TIMER1) != 0u ||
+        (NVIC->ISER[bank] & bit) != 0u || (NVIC->ISPR[bank] & bit) != 0u) {
+        return -1;
+    }
+    rcu_periph_clock_sleep_disable(RCU_TIMER1_SLP);
+    rcu_periph_clock_disable(RCU_TIMER1);
+    if ((RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN) != 0u ||
+        (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0u) {
+        return -1;
+    }
+    timer_epoch = 0u;
+    gd32_timebase_owned = false;
     return 0;
 }
 uint64_t nx_gd32f470_timestamp_us(void) {

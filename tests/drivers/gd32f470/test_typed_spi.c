@@ -4,6 +4,7 @@
 #include "hal/provider/nx_device_provider.h"
 #include "model.h"
 #include "hal/base/nx_device.h"
+#include "hal/nx_hal.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,9 +18,11 @@ static unsigned clock_checks, grouping_calls, systick_calls;
 int nx_gd32f470_clock_validate(void) {
     ++clock_checks;
     /* Production boot must establish safe outputs before the clock change. */
-    assert(fake_board_safe_inits == clock_checks && !fake_cs && !fake_de);
+    assert(fake_board_safe_inits >= clock_checks && !fake_cs && !fake_de);
     return clock_result;
 }
+bool osal_is_initialized(void) { return false; }
+int nx_gd32f470_clock_release(void) { return 0; }
 void NVIC_SetPriorityGrouping(uint32_t group) {
     assert(group == 3u && clock_result == 0);
     ++grouping_calls;
@@ -73,18 +76,20 @@ static void cancel_blocking(void) {
 
 int main(void) {
     fake_isr = 1u;
-    assert(nx_platform_init() == NX_ERR_INVALID_STATE && !fake_board_safe_inits);
+    assert(nx_hal_init() == NX_ERR_CONTEXT && !fake_board_safe_inits);
     fake_isr = 0u;
     fake_cs = fake_de = true;
     clock_result = -1;
-    assert(nx_platform_init() == NX_ERR_IO);
+    assert(nx_hal_init() == NX_ERR_IO);
     assert(!fake_cs && !fake_de && !grouping_calls && !systick_calls);
-    assert(nx_platform_deinit() == NX_OK);
+    assert(nx_hal_deinit() == NX_OK);
     clock_result = 0;
-    assert(nx_platform_init() == NX_OK && nx_platform_init() == NX_OK);
+    assert(nx_hal_init() == NX_OK && nx_hal_init() == NX_OK);
     assert(clock_checks == 2u && grouping_calls == 1u && systick_calls == 1u);
     assert(fake_timer_config.prescaler == 99u && fake_timer_config.period == UINT32_MAX);
-    assert(nx_platform_deinit() == NX_ERR_NOT_SUPPORTED);
+    assert(nx_hal_deinit() == NX_OK);
+    assert(!fake_timer_ctl0 && !fake_timer_dmainten && !fake_rcu_apb1en && !fake_rcu_apb1spen);
+    assert(nx_hal_init() == NX_OK);
 
     assert(nx_device_register(&NX_SPI4) == NX_OK);
     const nx_device_t* descriptor = NULL;
@@ -189,6 +194,7 @@ int main(void) {
     assert(active_controller.generation != controller.generation);
     assert(nx_device_spi_query(child, &caps) == NX_ERR_INVALID_STATE);
     assert(nx_device_close(active_controller) == NX_OK);
+    assert(nx_hal_deinit() == NX_OK);
     assert(nx_device_registry_reset() == NX_OK);
     assert(nx_device_discover("SPI4", NX_DEVICE_CLASS_SPI, &descriptor) == NX_ERR_NOT_FOUND);
     puts("GD32 production boot, typed SPI4 leases, queue settlement, cancellation and stale generations passed");

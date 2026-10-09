@@ -36,6 +36,7 @@
 #define NEXUS_STM32_CLOCK_H
 
 #include <stdint.h>
+#include "hal/nx_status.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +81,18 @@ typedef struct {
  * \return          0 on success, -1 on failure
  */
 int SystemClock_Config(void);
+
+/**
+ * \brief           Return an idle F407 clock tree to the internal HSI.
+ * \return          NX_OK after hardware-confirmed switch and oscillator stop;
+ *                  NX_ERR_TIMEOUT when a bounded register wait fails.
+ * \note            Caller must serialize resource acquisition and establish
+ *                  SoC quiescence first. No HAL tick or scheduler is used.
+ *                  Failure may leave the tree partly changed; retain ownership
+ *                  and retry cleanup. Flash latency and regulator voltage are
+ *                  deliberately not reduced at the lower clock frequency.
+ */
+nx_status_t nx_stm32f407_clock_release(void);
 
 #ifdef __cplusplus
 }

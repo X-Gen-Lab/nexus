@@ -162,6 +162,21 @@ osal_status_t osal_baremetal_set_clock(osal_baremetal_clock_t clock) {
     osal_exit_critical();
     return OSAL_OK;
 }
+osal_status_t osal_baremetal_clear_clock(osal_baremetal_clock_t expected) {
+    BARE_TASK_ONLY();
+    if (nx_arch_irq_is_masked()) return OSAL_ERROR_BUSY;
+    if (!expected) return OSAL_ERROR_NULL_POINTER;
+    osal_enter_critical();
+    if (s_initialized || s_stats.mutex_count || s_stats.sem_count ||
+        s_stats.queue_count || s_stats.event_count ||
+        (s_clock && s_clock != expected)) {
+        osal_exit_critical();
+        return OSAL_ERROR_BUSY;
+    }
+    s_clock = NULL;
+    osal_exit_critical();
+    return OSAL_OK;
+}
 static osal_status_t bare_wait_setup(uint32_t ms, uint32_t* begin) {
     if (ms != OSAL_NO_WAIT && ms != OSAL_WAIT_FOREVER && !s_clock)
         return OSAL_ERROR_NOT_SUPPORTED;

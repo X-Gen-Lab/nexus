@@ -7,6 +7,18 @@
 #include <stdio.h>
 
 static unsigned init_calls, deinit_calls;
+static uintptr_t fence_owner;
+bool osal_is_initialized(void) { return false; }
+nx_status_t nx_device_shutdown_check(void) { return NX_OK; }
+nx_status_t nx_device_shutdown_begin_owned(uintptr_t owner) {
+    assert(fence_owner == 0); fence_owner = owner; return NX_OK;
+}
+nx_status_t nx_device_shutdown_quarantine_begin(uintptr_t owner) {
+    return nx_device_shutdown_begin_owned(owner);
+}
+nx_status_t nx_device_shutdown_end_owned(uintptr_t owner) {
+    assert(fence_owner == owner); fence_owner = 0; return NX_OK;
+}
 static nx_status_t init_status = NX_OK, deinit_status = NX_OK;
 
 nx_status_t nx_platform_init(void) {
@@ -79,7 +91,7 @@ int main(void) {
 
     init_status = NX_ERR_TIMEOUT;
     assert(nx_hal_init() == NX_ERR_TIMEOUT);
-    assert(!nx_hal_is_initialized() && init_calls == 1);
+    assert(!nx_hal_is_initialized() && init_calls == 1 && deinit_calls == 1);
     init_status = NX_OK;
     assert(nx_hal_init() == NX_OK);
     assert(nx_hal_is_initialized() && init_calls == 2);
@@ -88,13 +100,15 @@ int main(void) {
 
     deinit_status = NX_ERR_BUSY;
     assert(nx_hal_deinit() == NX_ERR_BUSY);
-    assert(nx_hal_is_initialized() && deinit_calls == 1);
-    reject_all_masks(true);
+    assert(nx_hal_get_state() == NX_HAL_PARTIAL && deinit_calls == 2);
+    assert(fence_owner != 0);
+    assert(nx_hal_init() == NX_ERR_INVALID_STATE);
+    reject_all_masks(false);
     deinit_status = NX_OK;
     assert(nx_hal_deinit() == NX_OK);
-    assert(!nx_hal_is_initialized() && deinit_calls == 2);
+    assert(!nx_hal_is_initialized() && deinit_calls == 3 && fence_owner == 0);
     reject_all_masks(false);
-    assert(nx_hal_deinit() == NX_OK && deinit_calls == 2);
+    assert(nx_hal_deinit() == NX_OK && deinit_calls == 3);
     puts("Production HAL context rejection preserves masks, state and platform hooks");
     return 0;
 }

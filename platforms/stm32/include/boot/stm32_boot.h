@@ -57,15 +57,18 @@ typedef struct {
 /**
  * \brief           Initialize STM32 platform
  * \return          0 on success, -1 on failure
+ * \note            Private implementation wrapper. Ordinary consumers call
+ *                  nx_hal_init() so failed initialization cleanup is owned.
  */
 int stm32_platform_init(void);
 
 /**
- * \brief           Check global platform shutdown availability
- * \return          0 if never initialized, -1 while initialized
- * \note            The reference is startup-only. It retains initialized IRQ,
- *                  DMA and scheduler ownership until a controlled reset; a
- *                  product quiescence implementation is required for shutdown.
+ * \brief           Private platform cleanup wrapper
+ * \return          0 on cleanup, -1 on error or missing common HAL fence
+ * \note            Ordinary consumers call nx_hal_deinit()/runtime shutdown.
+ *                  This wrapper is only valid under the exclusive HAL admission
+ *                  fence after read-only provider, IRQ and DMA quiescence checks.
+ *                  Running or suspended MCU kernels cannot be restarted.
  */
 int stm32_platform_deinit(void);
 

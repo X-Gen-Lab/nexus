@@ -61,6 +61,9 @@ typedef struct {
  * \return          0 on success, -1 on failure
  */
 int stm32_perf_init(void);
+/** Stop the platform-owned cycle counter after all diagnostic users settle.
+ * Keeps shared debug trace enable intact; does not revoke debugger resources. */
+void stm32_perf_deinit(void);
 
 /**
  * \brief           Start performance counter

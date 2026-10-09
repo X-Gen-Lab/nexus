@@ -1,4 +1,5 @@
 #include "runtime/nx_runtime.h"
+#include "hal/nx_hal.h"
 #include "osal/osal.h"
 #include "arch/nx_arch.h"
 #include <assert.h>
@@ -24,6 +25,10 @@ bool nx_arch_irq_is_masked(void) {
     return (primask & 1u) != 0 || basepri != 0 || (faultmask & 1u) != 0;
 }
 bool nx_hal_is_initialized(void) { ++dependency_queries; return hal_initialized; }
+nx_hal_state_t nx_hal_get_state(void) {
+    ++dependency_queries; return hal_initialized ? NX_HAL_READY : NX_HAL_OFFLINE;
+}
+nx_status_t nx_hal_get_last_cleanup_status(void) { return NX_OK; }
 bool osal_is_initialized(void) { ++dependency_queries; return osal_initialized; }
 bool osal_is_isr(void) { ++dependency_queries; return is_isr; }
 nx_status_t nx_device_shutdown_check(void) { ++dependency_queries; return device_shutdown_result; }
@@ -133,9 +138,9 @@ int main(void) {
     assert(hal_initialized && osal_initialized && (nx_runtime_get_state() == NX_RUNTIME_READY));
     assert(report.osal_status == OSAL_ERROR_BUSY && report.state == NX_RUNTIME_READY);
     osal_deinit_result = OSAL_OK;
-    hal_deinit_result = NX_ERR_IO;
+    hal_deinit_result = NX_ERR_BUSY;
     unsigned before_restore = calls;
-    assert(nx_runtime_shutdown(&report) == NX_ERR_IO);
+    assert(nx_runtime_shutdown(&report) == NX_ERR_BUSY);
     assert(strcmp(trace + before_restore, "ohO") == 0);
     assert(hal_initialized && osal_initialized && (nx_runtime_get_state() == NX_RUNTIME_READY));
     hal_deinit_result = NX_OK;
@@ -144,14 +149,14 @@ int main(void) {
     unsigned shutdown_calls = calls;
     assert(nx_runtime_shutdown(NULL) == NX_OK && calls == shutdown_calls);
     assert(nx_runtime_bootstrap(&report) == NX_OK);
-    hal_deinit_result = NX_ERR_IO;
+    hal_deinit_result = NX_ERR_BUSY;
     osal_init_result = OSAL_ERROR_NO_MEMORY;
-    assert(nx_runtime_shutdown(&report) == NX_ERR_IO);
+    assert(nx_runtime_shutdown(&report) == NX_ERR_BUSY);
     assert(report.stage == NX_BOOT_STAGE_ROLLBACK);
     assert(report.rollback_status == NX_ERR_NO_MEMORY && !(nx_runtime_get_state() == NX_RUNTIME_READY));
     assert(report.state == NX_RUNTIME_PARTIAL && report.hal_owned && !report.osal_owned);
     assert(hal_initialized && !osal_initialized);
-    assert(nx_runtime_shutdown(&report) == NX_ERR_IO);
+    assert(nx_runtime_shutdown(&report) == NX_ERR_BUSY);
     hal_deinit_result = NX_OK;
     assert(nx_runtime_shutdown(&report) == NX_OK);
     assert(!hal_initialized && !osal_initialized);

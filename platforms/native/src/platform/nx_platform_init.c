@@ -18,71 +18,15 @@
 #include "hal/resource/nx_dma_manager.h"
 #include "hal/resource/nx_isr_manager.h"
 #include <stdbool.h>
+#include "native_platform.h"
 
 /*---------------------------------------------------------------------------*/
 /* External Functions                                                        */
 /*---------------------------------------------------------------------------*/
 
-/* Shutdown must use production lifecycle methods, never test fixtures. */
-#include "hal/base/nx_device.h"
-#include "gpio/nx_gpio_types.h"
-#include "uart/nx_uart_types.h"
-#include "spi/nx_spi_types.h"
-#include "i2c/nx_i2c_types.h"
-#include <stdio.h>
-#include <string.h>
-static void* cached_api(const char* name) {
-    const nx_device_t* device=nx_device_find(name);
-    return device && device->state && device->state->initialized ? device->state->api : NULL;
-}
-static nx_status_t stop(nx_lifecycle_t* lifecycle) {
-    if (!lifecycle || !lifecycle->deinit) return NX_ERR_NOT_SUPPORTED;
-    nx_status_t r=lifecycle->deinit(lifecycle);
-    return r==NX_ERR_NOT_INIT ? NX_OK : r;
-}
-static nx_status_t shutdown_cached_io(void) {
-    nx_status_t ownership = nx_device_shutdown_check();
-    if (ownership != NX_OK) return ownership;
-    char name[16];
-    for (unsigned port=0;port<8;++port) for(unsigned pin=0;pin<16;++pin) {
-        (void)snprintf(name,sizeof(name),"GPIO%c%u",(char)('A'+port),pin);
-        nx_gpio_read_write_impl_t* impl=cached_api(name);
-        if (!impl || !impl->state) continue;
-        nx_status_t r=stop(&impl->lifecycle);
-        if (r!=NX_OK) return r;
-        impl->state->pin_state=0; impl->state->suspended=false;
-        memset(&impl->state->stats,0,sizeof(impl->state->stats));
-        memset(&impl->state->exti,0,sizeof(impl->state->exti));
-    }
-    /* Public configuration currently contains instances 0..3; leave room for
-     * a bounded extension without creating devices as part of shutdown. */
-    for(unsigned instance=0;instance<8;++instance) {
-        (void)snprintf(name,sizeof(name),"UART%u",instance);
-        nx_uart_impl_t* uart=cached_api(name);
-        if (uart && uart->state) {
-            nx_status_t r=stop(&uart->lifecycle); if(r!=NX_OK) return r;
-            uart->state->tx_busy=uart->state->rx_busy=false;
-            memset(&uart->state->stats,0,sizeof(uart->state->stats));
-        }
-        (void)snprintf(name,sizeof(name),"SPI%u",instance);
-        nx_spi_impl_t* spi=cached_api(name);
-        if (spi && spi->state) {
-            nx_status_t r=stop(&spi->lifecycle); if(r!=NX_OK) return r;
-            spi->state->locked=false;
-            memset(&spi->state->current_device,0,sizeof(spi->state->current_device));
-            memset(&spi->state->stats,0,sizeof(spi->state->stats));
-        }
-        (void)snprintf(name,sizeof(name),"I2C%u",instance);
-        nx_i2c_impl_t* i2c=cached_api(name);
-        if (i2c && i2c->state) {
-            nx_status_t r=stop(&i2c->lifecycle); if(r!=NX_OK) return r;
-            memset(&i2c->state->current_device,0,sizeof(i2c->state->current_device));
-            memset(&i2c->state->stats,0,sizeof(i2c->state->stats));
-        }
-    }
-    return NX_OK;
-}
-
+/* The common HAL owns admission and serializes this private hook. All cached
+ * providers are stopped through production lifecycle methods, including legacy
+ * peripherals; shutdown never constructs a device or calls test fixtures. */
 /*---------------------------------------------------------------------------*/
 /* Static Variables                                                          */
 /*---------------------------------------------------------------------------*/
@@ -206,16 +150,26 @@ nx_status_t nx_platform_deinit(void) {
 
     /* The caller serializes platform lifetime against applications. Cached
      * factory objects remain valid across re-init and are not allocated here. */
-    nx_status_t result=nx_device_shutdown_begin();
+    nx_status_t result=nx_native_resources_idle();
     if (result!=NX_OK) return result;
-    result=shutdown_cached_io();
-    nx_device_shutdown_end();
+    result=nx_device_provider_stop_all();
+    if (result!=NX_OK) return result;
+    result=nx_device_provider_quiescence_check();
     if (result!=NX_OK) return result;
 
     /* Mark as not initialized */
     platform_initialized = false;
 
     return NX_OK;
+}
+
+/* Private HAL hook: called with the common registry admission fence held. */
+nx_status_t nx_platform_shutdown_check(void) {
+    return nx_native_resources_idle();
+}
+
+nx_status_t nx_platform_init_check(void) {
+    return nx_native_resources_idle();
 }
 
 /**
