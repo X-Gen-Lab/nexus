@@ -441,6 +441,13 @@ def compiled_file(path):
 
 
 def validate_target_outputs(outputs, profile):
+    contract_name = {
+        "native": "runtime_native_smoke",
+        "stm32": "nexus_contract_firmware.elf",
+        "gd32f470": "nexus_contract_firmware.elf",
+    }.get(profile["platform"])
+    if contract_name is None:
+        raise ReleaseError("Unsupported platform contract target")
     machine = 62 if profile["platform"] == "native" else 40
     elf_class = 2 if profile["platform"] == "native" else 1
     executable = False
@@ -450,8 +457,7 @@ def validate_target_outputs(outputs, profile):
         if (len(header) < 20 or header[4] != elf_class or header[5] != 1
                 or int.from_bytes(header[18:20], "little") != machine):
             raise ReleaseError("Compiled ELF architecture does not match the release target")
-        if (name.startswith("bin/") and Path(name).name in
-                ("nexus_contract_firmware", "nexus_contract_firmware.elf")
+        if (name.startswith("bin/") and Path(name).name == contract_name
                 and int.from_bytes(header[16:18], "little") in (2, 3)):
             executable = True
     if not executable:

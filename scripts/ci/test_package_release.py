@@ -183,7 +183,10 @@ class ReleaseTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def add_output(self, name="bin/nexus_contract_firmware.elf", content=None):
+    def add_output(self, name=None, content=None):
+        if name is None:
+            name = ("bin/runtime_native_smoke" if self.values["CONFIG_PLATFORM_NAME"] == "native"
+                    else "bin/nexus_contract_firmware.elf")
         path = self.build / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(self.elf if content is None else content)
@@ -241,9 +244,29 @@ class ReleaseTests(unittest.TestCase):
             path.write_bytes(content)
 
     def test_platform_contract_cannot_be_substituted_by_unrelated_application(self):
-        self.add_output("bin/unrelated-app")
-        with self.assertRaisesRegex(release.ReleaseError, "platform contract"):
-            self.package()
+        for name in ("bin/unrelated-app", "bin/nexus_contract_firmware.elf"):
+            with self.subTest(name=name):
+                output = self.add_output(name)
+                with self.assertRaisesRegex(release.ReleaseError, "platform contract"):
+                    self.package()
+                output.unlink()
+
+    def test_contract_name_directory_and_type_are_specific_to_each_platform(self):
+        for preset, profile in release.RELEASE_PROFILES.items():
+            native = profile["platform"] == "native"
+            valid_name = "runtime_native_smoke" if native else "nexus_contract_firmware.elf"
+            wrong_name = "nexus_contract_firmware.elf" if native else "runtime_native_smoke"
+            header = elf() if native else elf(40, 1)
+            relocatable = bytearray(header)
+            relocatable[16:18] = (1).to_bytes(2, "little")
+            for name, content in ((f"bin/{wrong_name}", header),
+                                  ("bin/runtime_native_smoke.elf" if native else "bin/nexus_contract_firmware", header),
+                                  (f"bin/{valid_name}.other", header),
+                                  (f"lib/{valid_name}", header),
+                                  (f"bin/{valid_name}", bytes(relocatable))):
+                with self.subTest(preset=preset, name=name, elf_type=int.from_bytes(content[16:18], "little")):
+                    with self.assertRaisesRegex(release.ReleaseError, "platform contract"):
+                        release.validate_target_outputs([(name, content)], profile)
 
     def test_native_candidate_has_source_bound_board_identity_without_flash_layout(self):
         self.add_output()
@@ -398,7 +421,7 @@ class ReleaseTests(unittest.TestCase):
                               "vendors/st/cmsis_device_f4", "vendors/st/stm32f4xx_hal_driver"})
             self.assertEqual(provenance["target"]["board"], "native-reference")
             self.assertEqual(provenance["validation"]["executed"], 1)
-            self.assertEqual(set(provenance["compiled_outputs"]), {"bin/nexus_contract_firmware.elf", "lib/libnexus.a"})
+            self.assertEqual(set(provenance["compiled_outputs"]), {"bin/runtime_native_smoke", "lib/libnexus.a"})
             self.assertIn("unsigned provenance", provenance["limitations"])
             for name in release.CONFIGURATION_FILES:
                 self.assertIn(f"{self.artifact}/configuration/{name}", bundle.namelist())
@@ -410,7 +433,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn(archive.name, (archive.parent / "SHA256SUMS").read_text())
 
     def test_multi_configuration_nested_outputs_include_only_requested_configuration(self):
-        self.add_output("bin/Release/nexus_contract_firmware.elf", ELF)
+        self.add_output("bin/Release/runtime_native_smoke", ELF)
         self.add_output("bin/Release/plugins/device.so", ELF)
         self.add_output("lib/Release/hal.lib", LIBRARY)
         self.add_output("bin/Debug/blinky", ELF)
@@ -820,7 +843,7 @@ class ReleaseTests(unittest.TestCase):
     def test_internal_member_checksum_is_verified(self):
         self.add_output()
         archive = self.package()
-        self.rewrite_archive(archive, changes={f"{self.artifact}/bin/nexus_contract_firmware.elf": ELF + b"changed"})
+        self.rewrite_archive(archive, changes={f"{self.artifact}/bin/runtime_native_smoke": ELF + b"changed"})
         with self.assertRaisesRegex(release.ReleaseError, "member checksum mismatch"):
             self.verify()
 
@@ -975,11 +998,12 @@ class ReleaseTests(unittest.TestCase):
             self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
 
     def test_compile_database_must_consume_generated_configuration_and_arm_flags(self):
-        self.add_output()
+        native_output = self.add_output()
         commands = self.build / "compile_commands.json"
         commands.write_text(commands.read_text().replace(str(self.build / "generated"), str(self.source)))
         with self.assertRaisesRegex(release.ReleaseError, "generated configuration"):
             self.package()
+        native_output.unlink()
         self.arm_fixture()
         self.add_output()
         commands.write_text(commands.read_text().replace('"-mfloat-abi=hard", ', ""))
