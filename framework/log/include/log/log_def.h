@@ -37,6 +37,9 @@ typedef enum {
     LOG_ERROR_FULL = 5,          /**< Buffer full */
     LOG_ERROR_BACKEND = 6,       /**< Backend error */
     LOG_ERROR_ALREADY_INIT = 7,  /**< Already initialized */
+    LOG_ERROR_BUSY = 8,          /**< Closing, in use, or reentrant callback */
+    LOG_ERROR_TIMEOUT = 9,       /**< Bounded operation did not complete */
+    LOG_ERROR_ISR = 10,          /**< Task-only service called from ISR */
 } log_status_t;
 
 /**

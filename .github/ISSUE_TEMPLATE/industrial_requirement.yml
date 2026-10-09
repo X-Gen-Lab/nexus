@@ -1,0 +1,44 @@
+name: Industrial product requirement
+description: Define an acceptance condition linked to a product, board and verification evidence.
+title: '[Requirement] '
+body:
+  - type: input
+    id: identity
+    attributes:
+      label: Requirement and backlog IDs
+      description: Use a NEX-REQ-nnn and the applicable BAS/HAL/OS/BSP/HIL/CFG/APP/SEC/REL/PROD backlog IDs.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Trigger and observable result
+      description: Describe the device behavior, failure state and how the product acceptance will be measured.
+    validations:
+      required: true
+  - type: textarea
+    id: target
+    attributes:
+      label: Exact product and target identity
+      description: Product, board revision, SoC/capacity, RTOS/toolchain, interfaces, memory/timing budgets. Mark unresolved inputs explicitly.
+    validations:
+      required: true
+  - type: dropdown
+    id: owner
+    attributes:
+      label: Accountable role
+      options: [technical-lead, core-interfaces, bsp-ports, industrial-apps, quality-hil, build-release]
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Verification plan and evidence identity
+      description: Separate host/model tests, actual HIL, fault recovery and manufacturing. Link source/config/image digests and reports when executed.
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Persistent data, safety state, security and release impact
+      description: Identify contract/format changes, rollback and recoverability, ADR and product review needs.

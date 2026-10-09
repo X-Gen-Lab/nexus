@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407ve-sky-qingchun",
+  "soc": "stm32f407ve",
+  "chip_part": "STM32F407VET6",
+  "board_family": "LCKFB Sky STM32 youth core",
+  "physical_pcb_revision": null,
+  "revision_policy": "Record physical PCB silkscreen and fitted options before HIL; do not substitute VG high-spec or soldered-header editions",
+  "status": "implementation-candidate",
+  "clock": {"hse_hz": 8000000, "target_sysclk_hz": 168000000, "lse_populated": false, "lse_enabled": false},
+  "memory": {"internal_flash_bytes": 524288, "main_sram_bytes": 131072, "ccm_bytes": 65536},
+  "debug": {"transport": "SWD", "probe": "external", "header": "2x5 debug header is unpopulated on the youth edition"},
+  "wiring": {
+    "led": {"port": "B", "pin": 2, "active_level": 1},
+    "console": {"enabled": true, "logical_instance": 0, "controller": "USART1", "tx": "PA9", "rx": "PA10", "alternate_function": 7, "electrical": "3.3 V UART; external bridge and soldered debug header required"},
+    "spi": {"enabled": false, "reason": "SPI Flash is unpopulated; external device resource allocation is not bound"},
+    "rs485": {"enabled": false, "reason": "No onboard transceiver or DE/RE allocation in this core-board profile"}
+  },
+  "external_flash": {"populated": false, "baseline_driver_enabled": false, "capacity_bytes": null},
+  "safe_outputs": {"leds": "Preload PB2 low before output mode", "industrial_actuators": "No industrial actuator pins are configured or claimed safe"},
+  "provenance": [
+    {"url": "https://wiki.lckfb.com/zh-hans/fdb/skystar.html", "scope": "Exact youth edition: VE512KiB, HSE8MHz, LSE/Flash/debug header fitting options"},
+    {"url": "https://wiki.lckfb.com/zh-hans/fdb/micropython/introduction.html", "scope": "PB2 active-high LED and UART1 PA9/PA10 resource table"},
+    {"url": "https://wiki.lckfb.com/zh-hans/tkx/hardware/schematic.html", "scope": "First-party schematic reference for physical fixture comparison"}
+  ],
+  "hardware_verification": "not-executed"
+}

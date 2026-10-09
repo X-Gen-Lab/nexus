@@ -33,6 +33,10 @@ typedef void* osal_event_handle_t;
  */
 typedef uint32_t osal_event_bits_t;
 
+/** Bits 0..23 are portable across every maintained backend. Bits 24..31
+ * are reserved and every update, wait and barrier rejects them. */
+#define OSAL_EVENT_BITS_MASK UINT32_C(0x00ffffff)
+
 /**
  * \brief           Event wait mode enumeration
  */
@@ -162,6 +166,9 @@ osal_status_t osal_event_clear_from_isr(osal_event_handle_t handle,
  *                                           wait_bits is zero
  * \retval          OSAL_ERROR_TIMEOUT Wait timed out
  * \retval          OSAL_ERROR_ISR Called from ISR context
+ * \note            Barrier contract: mode must be WAIT_ALL and auto_clear true.
+ *                  All waiters matched by one set receive the same snapshot.
+ *                  Portable event bits occupy bits 0..23.
  * \note            Requirements: 7.3
  */
 osal_status_t osal_event_sync(osal_event_handle_t handle,

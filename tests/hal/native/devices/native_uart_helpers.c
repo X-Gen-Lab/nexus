@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/uart/nx_uart_types.h"
+#include "../../../../soc/native/controllers/uart/nx_uart_types.h"
 
 #include <string.h>
 
@@ -133,7 +133,7 @@ nx_status_t native_uart_get_state(uint8_t instance,
     state->parity = impl->state->config.parity;
     state->flow_control = impl->state->config.flow_control;
     state->tx_busy = impl->state->tx_busy;
-    state->rx_busy = impl->state->stats.rx_busy;
+    state->rx_busy = impl->state->rx_busy;
     state->tx_count = impl->state->stats.tx_count;
     state->rx_count = impl->state->stats.rx_count;
     state->tx_errors = impl->state->stats.tx_errors;

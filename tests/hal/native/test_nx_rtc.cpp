@@ -19,7 +19,7 @@
 extern "C" {
 #include "hal/interface/nx_rtc.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_rtc_helpers.h"
+#include "devices/native_rtc_helpers.h"
 }
 
 /**
@@ -443,7 +443,7 @@ TEST_F(RTCTest, PowerDisable) {
 static bool g_power_callback_called = false;
 static bool g_power_callback_enabled = false;
 
-static void power_callback(void* user_data, bool enabled) {
+static void power_callback(void*, bool enabled) {
     g_power_callback_called = true;
     g_power_callback_enabled = enabled;
 }

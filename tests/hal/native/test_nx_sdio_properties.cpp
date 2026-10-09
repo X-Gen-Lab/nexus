@@ -18,12 +18,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_sdio.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_sdio_helpers.h"
+#include "devices/native_sdio_helpers.h"
 }
 
 /**
@@ -40,7 +41,7 @@ class SDIOPropertyTest : public ::testing::Test {
     nx_sdio_t* sdio = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all SDIO instances */
         native_sdio_reset_all();

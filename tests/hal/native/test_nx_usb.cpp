@@ -17,7 +17,8 @@
 extern "C" {
 #include "hal/interface/nx_usb.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_usb_helpers.h"
+#include "devices/native_usb_helpers.h"
+#include "../../../soc/native/controllers/usb/nx_usb_helpers.h"
 }
 
 /*---------------------------------------------------------------------------*/
@@ -373,6 +374,94 @@ TEST_F(USBTest, NullPointerChecks) {
     nx_rx_async_t* rx = usb->get_rx_async(usb);
     ASSERT_NE(nullptr, rx);
     EXPECT_EQ(NX_ERR_NULL_PTR, rx->receive(nullptr, nullptr, nullptr));
+}
+
+TEST(USBInterfaceInitializationTest, NullInitializersReturnSafely) {
+    usb_init_tx_async(nullptr);
+    usb_init_rx_async(nullptr);
+    usb_init_tx_sync(nullptr);
+    usb_init_rx_sync(nullptr);
+    usb_init_base(nullptr);
+}
+
+TEST(USBInterfaceInitializationTest, BufferInitializerRejectsInvalidStorage) {
+    uint8_t storage[4] = {};
+    nx_usb_buffer_t buffer = {};
+
+    buffer_init(nullptr, storage, sizeof(storage));
+    buffer_init(&buffer, storage, sizeof(storage));
+
+    const uint8_t input[] = {0xA5, 0x5A};
+    ASSERT_EQ(sizeof(input), usb_buffer_write(&buffer, input, sizeof(input)));
+
+    /* Invalid reinitialization must preserve buffered data and valid storage. */
+    buffer_init(&buffer, nullptr, sizeof(storage));
+    buffer_init(&buffer, storage, 0);
+
+    uint8_t output[sizeof(input)] = {};
+    EXPECT_EQ(sizeof(output), usb_buffer_read(&buffer, output, sizeof(output)));
+    EXPECT_EQ(0, memcmp(input, output, sizeof(input)));
+}
+
+TEST_F(USBTest, InitializedInterfacesRejectNullReceiversAndKeepWorking) {
+    nx_usb_impl_t* impl = usb_get_impl(usb);
+    ASSERT_NE(nullptr, impl);
+    usb_init_tx_async(&impl->tx_async);
+    usb_init_rx_async(&impl->rx_async);
+    usb_init_tx_sync(&impl->tx_sync);
+    usb_init_rx_sync(&impl->rx_sync);
+    usb_init_base(&impl->base);
+
+    nx_tx_async_t* tx_async = usb->get_tx_async(usb);
+    nx_rx_async_t* rx_async = usb->get_rx_async(usb);
+    nx_tx_sync_t* tx_sync = usb->get_tx_sync(usb);
+    nx_rx_sync_t* rx_sync = usb->get_rx_sync(usb);
+    ASSERT_NE(nullptr, tx_async);
+    ASSERT_NE(nullptr, rx_async);
+    ASSERT_NE(nullptr, tx_sync);
+    ASSERT_NE(nullptr, rx_sync);
+    ASSERT_NE(nullptr, tx_async->send);
+    ASSERT_NE(nullptr, tx_async->get_state);
+    ASSERT_NE(nullptr, rx_async->receive);
+    ASSERT_NE(nullptr, tx_sync->send);
+    ASSERT_NE(nullptr, rx_sync->receive);
+    ASSERT_NE(nullptr, rx_sync->receive_all);
+    ASSERT_NE(nullptr, usb->is_connected);
+
+    const uint8_t input[] = {0x12, 0x34, 0x56};
+    uint8_t output[sizeof(input)] = {};
+    size_t len = sizeof(output);
+
+    EXPECT_EQ(NX_ERR_NULL_PTR, tx_async->send(nullptr, input, sizeof(input)));
+    EXPECT_EQ(NX_ERR_NULL_PTR, tx_async->get_state(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR,
+              tx_sync->send(nullptr, input, sizeof(input), 1000));
+    EXPECT_FALSE(usb->is_connected(nullptr));
+    EXPECT_TRUE(usb->is_connected(usb));
+    EXPECT_EQ(NX_OK, tx_async->send(tx_async, input, sizeof(input)));
+    EXPECT_EQ(NX_OK, tx_async->get_state(tx_async));
+    EXPECT_EQ(NX_OK, tx_sync->send(tx_sync, input, sizeof(input), 1000));
+
+    ASSERT_EQ(NX_OK, native_usb_inject_rx(0, input, sizeof(input)));
+    EXPECT_EQ(NX_ERR_NULL_PTR, rx_async->receive(nullptr, output, &len));
+    EXPECT_EQ(NX_ERR_NULL_PTR, rx_sync->receive(nullptr, output, &len, 1000));
+    EXPECT_EQ(NX_ERR_NULL_PTR,
+              rx_sync->receive_all(nullptr, output, &len, 1000));
+    ASSERT_EQ(NX_OK, rx_async->receive(rx_async, output, &len));
+    ASSERT_EQ(sizeof(input), len);
+    EXPECT_EQ(0, memcmp(input, output, sizeof(input)));
+
+    ASSERT_EQ(NX_OK, native_usb_inject_rx(0, input, sizeof(input)));
+    len = sizeof(output);
+    ASSERT_EQ(NX_OK, rx_sync->receive(rx_sync, output, &len, 1000));
+    ASSERT_EQ(sizeof(input), len);
+    EXPECT_EQ(0, memcmp(input, output, sizeof(input)));
+
+    ASSERT_EQ(NX_OK, native_usb_inject_rx(0, input, sizeof(input)));
+    len = sizeof(output);
+    ASSERT_EQ(NX_OK, rx_sync->receive_all(rx_sync, output, &len, 1000));
+    ASSERT_EQ(sizeof(input), len);
+    EXPECT_EQ(0, memcmp(input, output, sizeof(input)));
 }
 
 TEST_F(USBTest, UninitializedAccess) {

@@ -1,0 +1,7 @@
+if(UNIX)
+    add_executable(arch_contract_tests test_arch_contracts.c)
+    target_link_libraries(arch_contract_tests PRIVATE Nexus::Arch hal Threads::Threads)
+    target_compile_options(arch_contract_tests PRIVATE -UNDEBUG -Werror)
+    add_test(NAME arch_contract_tests COMMAND arch_contract_tests)
+    set_tests_properties(arch_contract_tests PROPERTIES TIMEOUT 30 LABELS "arch;contract;host-model")
+endif()

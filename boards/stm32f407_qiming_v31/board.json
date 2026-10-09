@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "id": "stm32f407zg-qiming-v31",
+  "soc": "stm32f407zg",
+  "hse_hz": 8000000,
+  "interface_target": "board_stm32f407_qiming_v31",
+  "object_targets": [
+    "board_stm32f407_qiming_v31_wiring"
+  ],
+  "inputs": [
+    "CMakeLists.txt",
+    "nexus_board.h",
+    "board.c",
+    "uart.c"
+  ],
+  "resources": [
+    {
+      "id": "status-led",
+      "kind": "gpio",
+      "when": "CONFIG_STM32_GPIO_ENABLE",
+      "pins": [
+        {
+          "port": "E",
+          "pin": 3,
+          "af": 0,
+          "signal": "led0",
+          "initial": 1
+        },
+        {
+          "port": "E",
+          "pin": 4,
+          "af": 0,
+          "signal": "led1",
+          "initial": 1
+        },
+        {
+          "port": "G",
+          "pin": 9,
+          "af": 0,
+          "signal": "led2",
+          "initial": 1
+        }
+      ]
+    },
+    {
+      "id": "console",
+      "kind": "uart",
+      "instance": 0,
+      "when": "CONFIG_STM32_UART_ENABLE",
+      "clock": "USART1",
+      "irq": 37,
+      "priority": 5,
+      "pins": [
+        {
+          "port": "A",
+          "pin": 9,
+          "af": 7,
+          "signal": "tx"
+        },
+        {
+          "port": "A",
+          "pin": 10,
+          "af": 7,
+          "signal": "rx"
+        }
+      ]
+    }
+  ]
+}

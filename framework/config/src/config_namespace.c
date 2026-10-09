@@ -17,6 +17,7 @@
 #include "config_namespace.h"
 #include "config/config.h"
 #include "config_store.h"
+#include "config_crypto.h"
 #include <string.h>
 
 /*---------------------------------------------------------------------------*/
@@ -38,6 +39,7 @@ typedef struct {
 struct config_namespace {
     uint8_t ns_id; /**< Namespace ID */
     bool valid;    /**< Handle is valid */
+    config_ns_handle_t token; /**< Opaque lifetime identity; never dereferenced */
 };
 
 /**
@@ -61,6 +63,18 @@ typedef struct {
  * \brief           Global namespace manager context
  */
 static config_namespace_ctx_t g_ns_ctx;
+/* Lifetime identity survives manager teardown and snapshot reload. Exhaustion
+ * is explicit; a closed handle can never name a subsequent slot lifetime. */
+static uintptr_t g_next_handle = 1;
+
+static struct config_namespace* namespace_lookup(const struct config_namespace* token) {
+    if (!g_ns_ctx.initialized || !token) return NULL;
+    for (size_t i = 0; i < (size_t)g_ns_ctx.max_namespaces * 2u; ++i) {
+        struct config_namespace* slot = &g_ns_ctx.handles[i];
+        if (slot->valid && slot->token == token) return slot;
+    }
+    return NULL;
+}
 
 /*---------------------------------------------------------------------------*/
 /* Internal Functions                                                        */
@@ -148,6 +162,40 @@ config_status_t config_namespace_deinit(void) {
 
 bool config_namespace_is_initialized(void) {
     return g_ns_ctx.initialized;
+}
+
+config_status_t config_namespace_replace_all(
+    const config_namespace_snapshot_t* entries, size_t count, bool apply) {
+    if (!g_ns_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if (!entries || !count || count > g_ns_ctx.max_namespaces)
+        return CONFIG_ERROR_INVALID_FORMAT;
+    for (size_t i = 0; i < (size_t)g_ns_ctx.max_namespaces * 2u; ++i)
+        if (g_ns_ctx.handles[i].valid) return CONFIG_ERROR;
+    bool has_default = false;
+    for (size_t i = 0; i < count; ++i) {
+        size_t len = strlen(entries[i].name);
+        if (entries[i].id >= g_ns_ctx.max_namespaces || !len ||
+            len >= CONFIG_MAX_NS_NAME_LEN) return CONFIG_ERROR_INVALID_FORMAT;
+        if (!entries[i].id) {
+            if (strcmp(entries[i].name, "default") != 0)
+                return CONFIG_ERROR_INVALID_FORMAT;
+            has_default = true;
+        }
+        for (size_t j = 0; j < i; ++j)
+            if (entries[j].id == entries[i].id ||
+                strcmp(entries[j].name, entries[i].name) == 0)
+                return CONFIG_ERROR_INVALID_FORMAT;
+    }
+    if (!has_default) return CONFIG_ERROR_INVALID_FORMAT;
+    if (!apply) return CONFIG_OK;
+    memset(g_ns_ctx.namespaces, 0, sizeof(g_ns_ctx.namespaces));
+    for (size_t i = 0; i < count; ++i) {
+        config_namespace_entry_t* entry = &g_ns_ctx.namespaces[entries[i].id];
+        memcpy(entry->name, entries[i].name, strlen(entries[i].name) + 1);
+        entry->active = true;
+    }
+    g_ns_ctx.active_count = count;
+    return CONFIG_OK;
 }
 
 config_status_t config_namespace_get_id(const char* name, uint8_t* ns_id) {
@@ -271,6 +319,12 @@ config_status_t config_open_namespace(const char* name,
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
+    *handle = NULL;
+    struct config_namespace* ns_handle = config_namespace_find_free_handle();
+    if (!ns_handle || g_next_handle > (UINTPTR_MAX >> 4)) {
+        return CONFIG_ERROR_NO_SPACE;
+    }
+
     /* Create or get namespace */
     uint8_t ns_id;
     config_status_t status = config_namespace_create(name, &ns_id);
@@ -278,18 +332,13 @@ config_status_t config_open_namespace(const char* name,
         return status;
     }
 
-    /* Find free handle */
-    struct config_namespace* ns_handle = config_namespace_find_free_handle();
-    if (ns_handle == NULL) {
-        return CONFIG_ERROR_NO_SPACE;
-    }
-
     /* Initialize handle */
     ns_handle->ns_id = ns_id;
+    ns_handle->token = (config_ns_handle_t)((g_next_handle++ << 4) | 0xau);
     ns_handle->valid = true;
     g_ns_ctx.namespaces[ns_id].ref_count++;
 
-    *handle = ns_handle;
+    *handle = ns_handle->token;
     return CONFIG_OK;
 }
 
@@ -298,11 +347,12 @@ config_status_t config_close_namespace(config_ns_handle_t handle) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (handle == NULL || !handle->valid) {
+    struct config_namespace* slot = namespace_lookup(handle);
+    if (slot == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    uint8_t ns_id = handle->ns_id;
+    uint8_t ns_id = slot->ns_id;
     if (ns_id >= g_ns_ctx.max_namespaces ||
         !g_ns_ctx.namespaces[ns_id].active) {
         return CONFIG_ERROR_NOT_FOUND;
@@ -314,7 +364,7 @@ config_status_t config_close_namespace(config_ns_handle_t handle) {
     }
 
     /* Invalidate handle */
-    handle->valid = false;
+    slot->valid = false;
 
     return CONFIG_OK;
 }
@@ -361,22 +411,30 @@ config_status_t config_erase_namespace(const char* name) {
 /* Namespace-scoped Operations                                               */
 /*---------------------------------------------------------------------------*/
 
+static config_status_t reject_encrypted_scalar(const char* key, uint8_t ns) {
+    uint8_t flags = 0;
+    config_status_t status = config_store_get_flags(key, ns, &flags);
+    if (status != CONFIG_OK) { return status; }
+    return flags & CONFIG_FLAG_ENCRYPTED ? CONFIG_ERROR_UNSUPPORTED : CONFIG_OK;
+}
+
 config_status_t config_ns_set_i32(config_ns_handle_t ns, const char* key,
                                   int32_t value) {
     if (!g_ns_ctx.initialized) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     return config_store_set(key, CONFIG_TYPE_I32, &value, sizeof(int32_t),
-                            CONFIG_FLAG_NONE, ns->ns_id);
+                            CONFIG_FLAG_NONE, slot->ns_id);
 }
 
 config_status_t config_ns_get_i32(config_ns_handle_t ns, const char* key,
@@ -385,17 +443,18 @@ config_status_t config_ns_get_i32(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || value == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL || value == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     /* Check if key exists and get its type */
     config_type_t type;
-    config_status_t status = config_store_get_type(key, ns->ns_id, &type);
+    config_status_t status = config_store_get_type(key, slot->ns_id, &type);
 
     if (status == CONFIG_ERROR_NOT_FOUND) {
         *value = default_val;
@@ -412,7 +471,9 @@ config_status_t config_ns_get_i32(config_ns_handle_t ns, const char* key,
     }
 
     size_t size = sizeof(int32_t);
-    return config_store_get(key, NULL, value, &size, NULL, ns->ns_id);
+    status = reject_encrypted_scalar(key, slot->ns_id);
+    if (status != CONFIG_OK) { return status; }
+    return config_store_get(key, NULL, value, &size, NULL, slot->ns_id);
 }
 
 config_status_t config_ns_set_u32(config_ns_handle_t ns, const char* key,
@@ -421,16 +482,17 @@ config_status_t config_ns_set_u32(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     return config_store_set(key, CONFIG_TYPE_U32, &value, sizeof(uint32_t),
-                            CONFIG_FLAG_NONE, ns->ns_id);
+                            CONFIG_FLAG_NONE, slot->ns_id);
 }
 
 config_status_t config_ns_get_u32(config_ns_handle_t ns, const char* key,
@@ -439,16 +501,17 @@ config_status_t config_ns_get_u32(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || value == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL || value == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     config_type_t type;
-    config_status_t status = config_store_get_type(key, ns->ns_id, &type);
+    config_status_t status = config_store_get_type(key, slot->ns_id, &type);
 
     if (status == CONFIG_ERROR_NOT_FOUND) {
         *value = default_val;
@@ -464,7 +527,9 @@ config_status_t config_ns_get_u32(config_ns_handle_t ns, const char* key,
     }
 
     size_t size = sizeof(uint32_t);
-    return config_store_get(key, NULL, value, &size, NULL, ns->ns_id);
+    status = reject_encrypted_scalar(key, slot->ns_id);
+    if (status != CONFIG_OK) { return status; }
+    return config_store_get(key, NULL, value, &size, NULL, slot->ns_id);
 }
 
 config_status_t config_ns_set_str(config_ns_handle_t ns, const char* key,
@@ -473,17 +538,18 @@ config_status_t config_ns_set_str(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || value == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL || value == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     size_t len = strlen(value) + 1;
     return config_store_set(key, CONFIG_TYPE_STRING, value, len,
-                            CONFIG_FLAG_NONE, ns->ns_id);
+                            CONFIG_FLAG_NONE, slot->ns_id);
 }
 
 config_status_t config_ns_get_str(config_ns_handle_t ns, const char* key,
@@ -492,17 +558,18 @@ config_status_t config_ns_get_str(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || buffer == NULL ||
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL || buffer == NULL ||
         buf_size == 0) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     config_type_t type;
-    config_status_t status = config_store_get_type(key, ns->ns_id, &type);
+    config_status_t status = config_store_get_type(key, slot->ns_id, &type);
 
     if (status != CONFIG_OK) {
         return status;
@@ -512,14 +579,29 @@ config_status_t config_ns_get_str(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_TYPE_MISMATCH;
     }
 
+    uint8_t flags = 0;
+    status = config_store_get_flags(key, slot->ns_id, &flags);
+    if (status != CONFIG_OK) { return status; }
     size_t size = buf_size;
-    status = config_store_get(key, NULL, buffer, &size, NULL, ns->ns_id);
+    if (flags & CONFIG_FLAG_ENCRYPTED) {
+        uint8_t record[CONFIG_MAX_MAX_VALUE_SIZE];
+        size_t record_size = sizeof(record);
+        status = config_store_get(key, NULL, record, &record_size, NULL, slot->ns_id);
+        if (status != CONFIG_OK) { return status; }
+        status = config_crypto_decrypt_record(record, record_size, (uint8_t*)buffer,
+            &size, key, slot->ns_id, CONFIG_TYPE_STRING);
+    } else {
+        status = config_store_get(key, NULL, buffer, &size, NULL, slot->ns_id);
+    }
 
     if (status != CONFIG_OK) {
         return status;
     }
 
-    buffer[buf_size - 1] = '\0';
+    if (size == 0 || buffer[size - 1] != '\0') {
+        memset(buffer, 0, buf_size);
+        return CONFIG_ERROR_INVALID_FORMAT;
+    }
     return CONFIG_OK;
 }
 
@@ -529,16 +611,17 @@ config_status_t config_ns_set_bool(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     return config_store_set(key, CONFIG_TYPE_BOOL, &value, sizeof(bool),
-                            CONFIG_FLAG_NONE, ns->ns_id);
+                            CONFIG_FLAG_NONE, slot->ns_id);
 }
 
 config_status_t config_ns_get_bool(config_ns_handle_t ns, const char* key,
@@ -547,16 +630,17 @@ config_status_t config_ns_get_bool(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || value == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL || value == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
     config_type_t type;
-    config_status_t status = config_store_get_type(key, ns->ns_id, &type);
+    config_status_t status = config_store_get_type(key, slot->ns_id, &type);
 
     if (status == CONFIG_ERROR_NOT_FOUND) {
         *value = default_val;
@@ -572,7 +656,9 @@ config_status_t config_ns_get_bool(config_ns_handle_t ns, const char* key,
     }
 
     size_t size = sizeof(bool);
-    return config_store_get(key, NULL, value, &size, NULL, ns->ns_id);
+    status = reject_encrypted_scalar(key, slot->ns_id);
+    if (status != CONFIG_OK) { return status; }
+    return config_store_get(key, NULL, value, &size, NULL, slot->ns_id);
 }
 
 config_status_t config_ns_exists(config_ns_handle_t ns, const char* key,
@@ -581,15 +667,16 @@ config_status_t config_ns_exists(config_ns_handle_t ns, const char* key,
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL || exists == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL || exists == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
-    return config_store_exists(key, ns->ns_id, exists);
+    return config_store_exists(key, slot->ns_id, exists);
 }
 
 config_status_t config_ns_delete(config_ns_handle_t ns, const char* key) {
@@ -597,15 +684,16 @@ config_status_t config_ns_delete(config_ns_handle_t ns, const char* key) {
         return CONFIG_ERROR_NOT_INIT;
     }
 
-    if (ns == NULL || !ns->valid || key == NULL) {
+    struct config_namespace* slot = namespace_lookup(ns);
+    if (slot == NULL || key == NULL) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!config_namespace_is_valid_id(ns->ns_id)) {
+    if (!config_namespace_is_valid_id(slot->ns_id)) {
         return CONFIG_ERROR_NOT_FOUND;
     }
 
-    return config_store_delete(key, ns->ns_id);
+    return config_store_delete(key, slot->ns_id);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -623,11 +711,12 @@ config_namespace_get_handle_id(const struct config_namespace* handle,
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    if (!handle->valid) {
+    struct config_namespace* slot = namespace_lookup(handle);
+    if (!slot) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
-    *ns_id = handle->ns_id;
+    *ns_id = slot->ns_id;
     return CONFIG_OK;
 }
 
@@ -640,5 +729,6 @@ bool config_namespace_is_valid_handle(const struct config_namespace* handle) {
         return false;
     }
 
-    return handle->valid && config_namespace_is_valid_id(handle->ns_id);
+    struct config_namespace* slot = namespace_lookup(handle);
+    return slot && config_namespace_is_valid_id(slot->ns_id);
 }

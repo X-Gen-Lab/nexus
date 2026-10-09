@@ -11,13 +11,39 @@
  *                  Requirements: 4.1-4.9, 10.1-10.6
  */
 
+#include <chrono>
 #include <cstring>
+#include <filesystem>
 #include <gtest/gtest.h>
+#include <string>
+#include <vector>
 
 extern "C" {
+#include "../../../soc/native/controllers/flash/nx_flash_helpers.h"
+#include "devices/native_flash_helpers.h"
 #include "hal/interface/nx_flash.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_flash_helpers.h"
+void flash_init_lifecycle(nx_lifecycle_t*);
+}
+
+/* Atomic directory creation isolates repeated subprocesses as well as test
+ * names. The timestamp is only a candidate name; mkdir decides ownership. */
+static std::filesystem::path flash_test_directory() {
+    std::error_code error;
+    auto parent = std::filesystem::temp_directory_path(error);
+    if (error)
+        return {};
+    const auto stamp =
+        std::chrono::steady_clock::now().time_since_epoch().count();
+    for (unsigned attempt = 0; attempt < 128; ++attempt) {
+        auto directory = parent / ("nexus-flash-" + std::to_string(stamp) +
+                                   "-" + std::to_string(attempt));
+        if (std::filesystem::create_directory(directory, error))
+            return directory;
+        if (error)
+            return {};
+    }
+    return {};
 }
 
 /**
@@ -26,12 +52,18 @@ extern "C" {
 class FlashTest : public ::testing::Test {
   protected:
     void SetUp() override {
+        directory = flash_test_directory();
+        ASSERT_FALSE(directory.empty());
+        backing_file = (directory / "flash.bin").string();
+        ASSERT_LT(backing_file.size(), 256u);
         /* Reset all Flash instances before each test */
         native_flash_reset_all();
 
         /* Get Flash0 instance */
         flash = nx_factory_flash(0);
         ASSERT_NE(nullptr, flash);
+        ASSERT_EQ(NX_OK,
+                  native_flash_set_backing_file(0, backing_file.c_str()));
 
         /* Initialize Flash */
         nx_lifecycle_t* lifecycle = flash->get_lifecycle(flash);
@@ -46,15 +78,23 @@ class FlashTest : public ::testing::Test {
         /* Deinitialize Flash */
         if (flash != nullptr) {
             nx_lifecycle_t* lifecycle = flash->get_lifecycle(flash);
-            if (lifecycle != nullptr) {
-                lifecycle->deinit(lifecycle);
+            if (lifecycle != nullptr &&
+                lifecycle->get_state(lifecycle) != NX_DEV_STATE_UNINITIALIZED) {
+                EXPECT_EQ(NX_OK, lifecycle->deinit(lifecycle));
             }
         }
 
         /* Reset all instances */
         native_flash_reset_all();
+        if (!directory.empty()) {
+            std::error_code error;
+            std::filesystem::remove_all(directory, error);
+            EXPECT_FALSE(error) << error.message();
+        }
     }
 
+    std::filesystem::path directory;
+    std::string backing_file;
     nx_internal_flash_t* flash = nullptr;
 };
 
@@ -85,15 +125,25 @@ TEST_F(FlashTest, Erase_MultipleSectors) {
 }
 
 TEST_F(FlashTest, Erase_PartialSector) {
-    /* Erase partial sector (should round up) */
-    uint32_t addr = 0;
-    size_t size = flash->get_page_size(flash) / 2;
+    const size_t page_size = flash->get_page_size(flash);
+    ASSERT_GT(page_size, 0u);
+    ASSERT_EQ(NX_OK, flash->erase(flash, 0, page_size));
+    std::vector<uint8_t> written(page_size);
+    for (size_t i = 0; i < written.size(); ++i) {
+        written[i] = static_cast<uint8_t>(i);
+    }
+    ASSERT_EQ(NX_OK, flash->write(flash, 0, written.data(), written.size()));
 
-    EXPECT_EQ(NX_OK, flash->erase(flash, addr, static_cast<uint32_t>(size)));
-
-    /* Verify entire sector is erased */
-    EXPECT_TRUE(native_flash_is_erased(
-        0, 0, static_cast<uint32_t>(flash->get_page_size(flash))));
+    /* Partial lengths and unaligned starts must never erase adjacent bytes. */
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, flash->erase(flash, 0, page_size / 2));
+    EXPECT_EQ(
+        NX_ERR_INVALID_PARAM,
+        flash->erase(flash, static_cast<uint32_t>(page_size / 2), page_size));
+    std::vector<uint8_t> observed(page_size);
+    ASSERT_EQ(NX_OK, flash->read(flash, 0, observed.data(), observed.size()));
+    EXPECT_EQ(written, observed);
+    EXPECT_FALSE(
+        native_flash_is_erased(0, 0, static_cast<uint32_t>(page_size)));
 }
 
 TEST_F(FlashTest, Erase_WhenLocked) {
@@ -365,3 +415,84 @@ TEST_F(FlashTest, Error_Suspended) {
     EXPECT_EQ(NX_ERR_INVALID_STATE, flash->write(flash, 0, data, sizeof(data)));
     EXPECT_EQ(NX_ERR_INVALID_STATE, flash->erase(flash, 0, sizeof(data)));
 }
+
+/* Exercise the production helpers directly: these can also be called during
+ * lifecycle persistence, before a fully initialized public Flash exists. */
+TEST(FlashHelperValidation, NullStateAndDataReturnWithoutDereference) {
+    uint8_t data[4] = {1, 2, 3, 4};
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_save_to_file(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_load_from_file(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_erase_sector(nullptr, 0));
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_read(nullptr, 0, data, sizeof(data)));
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_write(nullptr, 0, data, sizeof(data)));
+    EXPECT_FALSE(flash_is_erased(nullptr, 0, sizeof(data)));
+    auto* state = new nx_flash_state_t{};
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_read(state, 0, nullptr, sizeof(data)));
+    EXPECT_EQ(NX_ERR_NULL_PTR, flash_write(state, 0, nullptr, sizeof(data)));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, flash_save_to_file(state));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, flash_load_from_file(state));
+    delete state;
+}
+
+TEST(FlashHelperValidation, AddressLengthOverflowIsRejected) {
+    EXPECT_FALSE(flash_is_valid_address(4, SIZE_MAX));
+    EXPECT_FALSE(flash_is_valid_address(NX_FLASH_TOTAL_SIZE, 0));
+    EXPECT_FALSE(flash_is_valid_address(NX_FLASH_TOTAL_SIZE - 4, 8));
+    EXPECT_TRUE(flash_is_valid_address(NX_FLASH_TOTAL_SIZE - 4, 4));
+}
+
+#ifndef _WIN32
+#include <cstdio>
+#include <cstdlib>
+#include <memory>
+#include <unistd.h>
+
+TEST(FlashPersistenceValidation, IOFailuresPropagateAndDeinitCanBeRetried) {
+    auto state = std::make_unique<nx_flash_state_t>();
+    std::strcpy(state->backing_file, "/dev/full");
+    EXPECT_EQ(NX_ERR_IO, flash_save_to_file(state.get()));
+    nx_flash_impl_t impl{};
+    impl.state = state.get();
+    flash_init_lifecycle(&impl.lifecycle);
+    state->initialized = true;
+    EXPECT_EQ(NX_ERR_IO, impl.lifecycle.deinit(&impl.lifecycle));
+    EXPECT_TRUE(state->initialized);
+    char path[] = "/tmp/nexus-flash-model-XXXXXX";
+    int descriptor = mkstemp(path);
+    ASSERT_GE(descriptor, 0);
+    ASSERT_EQ(0, close(descriptor));
+    std::strcpy(state->backing_file, path);
+    EXPECT_EQ(NX_OK, impl.lifecycle.deinit(&impl.lifecycle));
+    EXPECT_FALSE(state->initialized);
+    EXPECT_EQ(0, std::remove(path));
+}
+
+TEST(FlashPersistenceValidation,
+     MissingFileIsFirstBootButShortOrUnreadableImageIsError) {
+    auto state = std::make_unique<nx_flash_state_t>();
+    char path[] = "/tmp/nexus-flash-load-XXXXXX";
+    int descriptor = mkstemp(path);
+    ASSERT_GE(descriptor, 0);
+    const uint8_t partial[] = {0x12, 0x34};
+    ASSERT_EQ(static_cast<ssize_t>(sizeof(partial)),
+              write(descriptor, partial, sizeof(partial)));
+    ASSERT_EQ(0, close(descriptor));
+    std::strcpy(state->backing_file, path);
+    EXPECT_EQ(NX_ERR_IO, flash_load_from_file(state.get()));
+    nx_flash_impl_t impl{};
+    impl.state = state.get();
+    flash_init_lifecycle(&impl.lifecycle);
+    EXPECT_EQ(NX_ERR_IO, impl.lifecycle.init(&impl.lifecycle));
+    EXPECT_FALSE(state->initialized);
+    EXPECT_EQ(0, std::remove(path));
+    ASSERT_EQ(NX_OK, impl.lifecycle.init(&impl.lifecycle));
+    EXPECT_TRUE(state->initialized);
+    EXPECT_TRUE(flash_is_erased(state.get(), 0, NX_FLASH_TOTAL_SIZE));
+    ASSERT_EQ(NX_OK, impl.lifecycle.deinit(&impl.lifecycle));
+    EXPECT_EQ(0, std::remove(path));
+    std::strcpy(state->backing_file, "/tmp");
+    EXPECT_EQ(NX_ERR_IO, flash_load_from_file(state.get()));
+    EXPECT_EQ(NX_ERR_IO, impl.lifecycle.init(&impl.lifecycle));
+    EXPECT_FALSE(state->initialized);
+}
+#endif

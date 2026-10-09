@@ -211,6 +211,12 @@ extern const nx_init_fn_t Image$$nx_init_fn$$Limit[];
  */
 nx_status_t nx_init_run(void);
 
+#ifdef NX_INIT_TEST_MODE
+/* Test the same span validation used before any production callback executes. */
+nx_status_t nx_init_validate_span_for_test(uintptr_t start, uintptr_t end,
+                                          size_t* count);
+#endif
+
 /**
  * \brief           Get initialization statistics
  * \param[out]      stats: Pointer to statistics structure

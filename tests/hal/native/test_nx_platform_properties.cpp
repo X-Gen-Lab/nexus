@@ -15,18 +15,18 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <set>
 #include <vector>
 
 extern "C" {
 #include "hal/base/nx_device.h"
 #include "hal/nx_status.h"
+#include "hal/nx_hal.h"
 #include "hal/resource/nx_dma_manager.h"
 #include "hal/resource/nx_isr_manager.h"
 
 /* Platform initialization functions */
-nx_status_t nx_platform_init(void);
-nx_status_t nx_platform_deinit(void);
 bool nx_platform_is_initialized(void);
 
 /* ISR simulation function */
@@ -44,15 +44,15 @@ class PlatformPropertyTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Seed random number generator */
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Ensure platform is deinitialized */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     void TearDown() override {
         /* Clean up platform */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     /* Random number generator */
@@ -77,9 +77,9 @@ class PlatformPropertyTest : public ::testing::Test {
     }
 
     /* Helper: Generate random ISR priority */
-    nx_isr_priority_t randomPriority() {
-        std::uniform_int_distribution<int> dist(0, 3);
-        return static_cast<nx_isr_priority_t>(dist(rng));
+    uint8_t randomPriority() {
+        std::uniform_int_distribution<int> dist(0, 15);
+        return static_cast<uint8_t>(dist(rng));
     }
 };
 
@@ -98,7 +98,7 @@ class PlatformPropertyTest : public ::testing::Test {
  */
 TEST_F(PlatformPropertyTest, Property38_DMAChannelAllocationUniqueness) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     for (int iteration = 0; iteration < 100; ++iteration) {
         /* Generate random number of channels to allocate (1-8) */
@@ -169,7 +169,7 @@ TEST_F(PlatformPropertyTest, Property38_DMAChannelAllocationUniqueness) {
  */
 TEST_F(PlatformPropertyTest, Property39_DMAChannelReleaseAvailability) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     for (int iteration = 0; iteration < 100; ++iteration) {
         /* Generate random DMA and channel */
@@ -226,7 +226,7 @@ TEST_F(PlatformPropertyTest, Property39_DMAChannelReleaseAvailability) {
  */
 TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     /* Get ISR manager */
     nx_isr_manager_t* isr_mgr = nx_isr_manager_get();
@@ -237,7 +237,7 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
         uint32_t irq = randomIRQ();
 
         /* Generate random priority */
-        nx_isr_priority_t priority = randomPriority();
+        uint8_t priority = randomPriority();
 
         /* Create handler with call counter */
         int call_count = 0;
@@ -247,15 +247,11 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
         };
 
         /* Register handler */
-        nx_isr_handle_t* handle =
+        nx_status_t status =
             isr_mgr->connect(isr_mgr, irq, handler, &call_count, priority);
 
-        ASSERT_NE(nullptr, handle) << "Failed to register ISR for IRQ " << irq
+        ASSERT_EQ(NX_OK, status) << "Failed to register ISR for IRQ " << irq
                                    << " in iteration " << iteration;
-
-        /* Enable interrupt */
-        EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, irq))
-            << "Failed to enable IRQ " << irq << " in iteration " << iteration;
 
         /* Simulate interrupt */
         nx_isr_simulate(irq);
@@ -275,7 +271,7 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
             << iteration;
 
         /* Disconnect handler */
-        EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, handle))
+        EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, irq))
             << "Failed to disconnect ISR for IRQ " << irq << " in iteration "
             << iteration;
 
@@ -304,7 +300,7 @@ TEST_F(PlatformPropertyTest, Property40_ISRRegistrationTriggerConsistency) {
  */
 TEST_F(PlatformPropertyTest, PropertyExtra_DMAConfigurationPersistence) {
     /* Initialize platform */
-    ASSERT_EQ(NX_OK, nx_platform_init());
+    ASSERT_EQ(NX_OK, nx_hal_init());
 
     for (int iteration = 0; iteration < 100; ++iteration) {
         /* Generate random DMA and channel */

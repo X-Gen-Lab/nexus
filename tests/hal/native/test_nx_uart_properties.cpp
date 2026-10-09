@@ -15,12 +15,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
-#include "hal/include/hal/interface/nx_uart.h"
+#include "hal/interface/nx_uart.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_uart_helpers.h"
+#include "devices/native_uart_helpers.h"
 }
 
 /**
@@ -37,7 +38,7 @@ class UARTPropertyTest : public ::testing::Test {
     nx_uart_t* uart = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all UART instances */
         native_uart_reset_all();
@@ -437,14 +438,14 @@ TEST_F(UARTPropertyTest, Property8_MultipleReceptionsPreserveOrder) {
  */
 
 /*---------------------------------------------------------------------------*/
-/* Property 10: Diagnostic Count Accuracy                                    */
+/* Property 10: Simulator Count Accuracy                                    */
 /* *For any* UART, executing N operations SHALL result in diagnostic count   */
 /* equal to N.                                                               */
 /* **Validates: Requirements 2.7**                                           */
 /*---------------------------------------------------------------------------*/
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* number of transmit operations, the TX count should equal the
  * total bytes transmitted.
@@ -484,10 +485,9 @@ TEST_F(UARTPropertyTest, Property10_TxCountAccuracy) {
         }
 
         /* Query diagnostic statistics */
-        nx_diagnostic_t* diag = uart->get_diagnostic(uart);
-        ASSERT_NE(nullptr, diag);
-        nx_uart_stats_t stats;
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+
+        native_uart_state_t stats;
+        EXPECT_EQ(NX_OK, native_uart_get_state(0, &stats));
 
         /* Verify TX count matches */
         EXPECT_EQ(total_bytes, stats.tx_count)
@@ -496,7 +496,7 @@ TEST_F(UARTPropertyTest, Property10_TxCountAccuracy) {
 }
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* number of receive operations, the RX count should equal the
  * total bytes received.
@@ -531,10 +531,9 @@ TEST_F(UARTPropertyTest, Property10_RxCountAccuracy) {
         }
 
         /* Query diagnostic statistics */
-        nx_diagnostic_t* diag = uart->get_diagnostic(uart);
-        ASSERT_NE(nullptr, diag);
-        nx_uart_stats_t stats;
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+
+        native_uart_state_t stats;
+        EXPECT_EQ(NX_OK, native_uart_get_state(0, &stats));
 
         /* Verify RX count matches */
         EXPECT_EQ(total_bytes, stats.rx_count)
@@ -543,27 +542,29 @@ TEST_F(UARTPropertyTest, Property10_RxCountAccuracy) {
 }
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* UART, resetting diagnostics should clear all counts to zero.
  *
  * **Validates: Requirements 2.7**
  */
-TEST_F(UARTPropertyTest, Property10_DiagnosticResetClearsCount) {
+TEST_F(UARTPropertyTest, Property10_SimulatorResetClearsCount) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Send some data to generate counts */
         std::vector<uint8_t> data = randomData(10, 50);
         nx_tx_async_t* tx_async = uart->get_tx_async(uart);
         tx_async->send(tx_async, data.data(), data.size());
 
-        /* Reset diagnostics */
-        nx_diagnostic_t* diag = uart->get_diagnostic(uart);
-        ASSERT_NE(nullptr, diag);
-        EXPECT_EQ(NX_OK, diag->clear_statistics(diag));
+        /* Reset simulator state */
+
+        ASSERT_EQ(NX_OK, native_uart_reset(0));
+        nx_lifecycle_t* reset_lifecycle = uart->get_lifecycle(uart);
+        ASSERT_NE(nullptr, reset_lifecycle);
+        ASSERT_EQ(NX_OK, reset_lifecycle->init(reset_lifecycle));
 
         /* Query statistics - should be zero */
-        nx_uart_stats_t stats;
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+        native_uart_state_t stats;
+        EXPECT_EQ(NX_OK, native_uart_get_state(0, &stats));
 
         EXPECT_EQ(0U, stats.tx_count)
             << "Iteration " << test_iter << ": TX count not cleared";

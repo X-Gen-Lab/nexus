@@ -32,6 +32,14 @@ typedef struct {
     size_t min_free_size; /**< Minimum ever free heap size (watermark) */
 } osal_mem_stats_t;
 
+/** Irreversibly reject new OSAL heap allocations and realloc growth.
+ * Task-only, FreeRTOS backend. Existing allocations can still be freed.
+ * Call after boot allocation and before admitting concurrent allocators.
+ * This does not intercept libc, SDK or direct kernel allocation calls.
+ * Other backends return NOT_SUPPORTED. */
+osal_status_t osal_mem_seal(void);
+bool osal_mem_is_sealed(void);
+
 /**
  * \brief           Allocate memory
  * \param[in]       size: Size in bytes to allocate

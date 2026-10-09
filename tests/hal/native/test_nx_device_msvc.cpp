@@ -12,13 +12,14 @@
  *                  Requirements: 1.2, 1.3, 1.4, 8.1, 8.2, 8.3, 8.4
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include <cstring>
 #include <gtest/gtest.h>
 
 extern "C" {
 #include "hal/base/nx_device.h"
 #include "hal/nx_status.h"
-#include "tests/hal/native/native_test_helpers.h"
+#include "native_test_helpers.h"
 }
 
 /*---------------------------------------------------------------------------*/

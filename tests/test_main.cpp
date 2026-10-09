@@ -8,8 +8,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "hal/base/nx_device.h"
 #include <gtest/gtest.h>
+#include "nexus_config.h"
+#if defined(NX_CONFIG_CRYPTO_PROVIDER_OPENSSL) && NX_CONFIG_CRYPTO_PROVIDER_OPENSSL
+#include "security/crypto_openssl.h"
+#endif
+
 
 /* Include native test helpers for manual device registration */
 #if NX_DEVICE_MANUAL_REGISTRATION
@@ -24,6 +30,10 @@
  */
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
+#if defined(NX_CONFIG_CRYPTO_PROVIDER_OPENSSL) && NX_CONFIG_CRYPTO_PROVIDER_OPENSSL
+    /* Explicit fixture startup, not implicit selection inside the SDK core. */
+    if (nx_crypto_set_provider(nx_crypto_openssl_provider()) != NX_CRYPTO_OK) return 1;
+#endif
 
 #if NX_DEVICE_MANUAL_REGISTRATION
     /* Setup devices before running tests (manual registration) */

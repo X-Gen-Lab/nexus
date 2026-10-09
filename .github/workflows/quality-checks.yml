@@ -1,144 +1,82 @@
 name: Quality Checks
-
 on:
   workflow_call:
-
+    inputs:
+      run_static_analysis:
+        type: boolean
+        default: true
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
-  format-check:
-    name: Format Check
-    runs-on: ubuntu-latest
+  commit-style:
+    name: Required commit style checks
+    runs-on: ubuntu-24.04
+    env:
+      NEXUS_STYLE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD^' }}
+      NEXUS_STYLE_FULL: '1'
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Check clang-format
-        run: |
-          # Install clang-format-19 to match local development environment
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 19
-          sudo apt-get install -y clang-format-19
-
-          # Read directories from .clang-format-dirs (excluding comments and exclusions)
-          DIRS=$(grep -v '^#' .clang-format-dirs | grep -v '^\[' | grep -v '^!' | grep -v '^$' | tr '\n' ' ')
-
-          # Check format for configured directories
-          for dir in $DIRS; do
-            if [ -d "$dir" ]; then
-              echo "Checking format in $dir..."
-              find "$dir" \( -name '*.c' -o -name '*.h' -o -name '*.cpp' -o -name '*.hpp' \) \
-                -exec clang-format-19 --dry-run --Werror {} +
-            fi
-          done
-
-  static-analysis:
-    name: Static Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          submodules: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install locked commit tools
+        run: python scripts/setup/install_dev_tools.py --skip-hooks
+      - name: Test commit automation boundaries
+        run: .venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message
+      - name: Obtain the trusted comparison commit
+        shell: bash
+        run: |
+          if [[ "$NEXUS_STYLE_BASE_REF" =~ ^[0-9a-f]{40}$ && "$NEXUS_STYLE_BASE_REF" != "0000000000000000000000000000000000000000" ]]; then
+            if ! git cat-file -e "$NEXUS_STYLE_BASE_REF^{commit}"; then
+              git fetch --no-tags origin "$NEXUS_STYLE_BASE_REF"
+            fi
+          fi
+      - name: Check the clean checkout with the same hook
+        run: .venv/bin/python -m pre_commit run nexus-style --all-files --show-diff-on-failure
+      - name: Retain the executed style report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: required-commit-style
+          path: build/quality/style-gate.json
+          if-no-files-found: error
+  static-analysis:
+    name: Required static analysis
+    if: inputs.run_static_analysis || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+      - name: Initialize pinned maintained dependencies
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
           preset: linux-clang-debug
-
-      - name: Configure
+      - name: Install analyzers
+        run: sudo apt-get install -y clang-tidy-14 cppcheck
+      - name: Configure actual compilation database
         run: cmake --preset linux-clang-debug
-
-      - name: Run clang-tidy
-        continue-on-error: true
-        run: |
-          run-clang-tidy-14 -p build/linux-clang-debug \
-            -header-filter='hal/.*|osal/.*|framework/.*' \
-            'hal/.*|osal/.*|framework/.*' > clang-tidy.txt 2>&1
-
-      - name: Run cppcheck
-        continue-on-error: true
-        run: |
-          sudo apt-get install -y cppcheck
-          cppcheck --enable=all --inconclusive --xml --xml-version=2 \
-            --suppress=missingIncludeSystem \
-            -I hal/include -I osal/include -I framework/include \
-            hal/ osal/ framework/ 2> cppcheck.xml
-
-      - name: Upload Reports
-        uses: actions/upload-artifact@v4
+      - name: Test analyzer execution policy
+        run: python3 -m unittest discover -s scripts/ci -p 'test_quality_tools.py' -v
+      - name: Run required clang analyzer
+        run: python3 scripts/ci/quality_tools.py tidy --build-dir build/linux-clang-debug --tool clang-tidy-14 --report build/quality/clang-tidy.txt
+      - name: Run required cppcheck
+        if: '!cancelled()'
+        run: python3 scripts/ci/quality_tools.py cppcheck --build-dir build/linux-clang-debug --tool cppcheck --report build/quality/cppcheck.txt
+      - name: Retain reports on success and failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: static-analysis
-          path: |
-            clang-tidy.txt
-            cppcheck.xml
-
-  complexity:
-    name: Complexity Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run lizard
-        continue-on-error: true
-        run: |
-          pip install lizard
-          lizard hal/ osal/ framework/ -l c -C 15 -L 100 -w > complexity.txt
-
-      - name: Upload Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: complexity-report
-          path: complexity.txt
-
-  comment-style:
-    name: Comment Style Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check Doxygen style
-        run: |
-          if grep -r "@brief\|@param\|@return" hal/ osal/ framework/ --include="*.h" --include="*.c"; then
-            echo "::error::Found @ style Doxygen tags. Use \\ style instead."
-            exit 1
-          fi
-
-      - name: Check comment style
-        run: |
-          if grep -r "//" hal/ osal/ framework/ --include="*.c" --include="*.h" | grep -v "http://\|https://"; then
-            echo "::warning::Found // style comments. Use /* */ style instead."
-          fi
-
-  misra:
-    name: MISRA Compliance
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
-
-      - name: Run MISRA Check
-        continue-on-error: true
-        run: |
-          cppcheck --addon=misra \
-            --suppress=missingIncludeSystem \
-            --suppress=unmatchedSuppression \
-            -I hal/include -I osal/include -I framework/include \
-            hal/ osal/ framework/ 2> misra-report.txt || true
-
-      - name: Upload MISRA Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: misra-report
-          path: misra-report.txt
-          retention-days: 30
-
-      - name: Check MISRA Results
-        run: |
-          if [ -s misra-report.txt ]; then
-            echo "## MISRA Compliance Issues" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "See artifact for details" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## No MISRA Issues Found ✓" >> $GITHUB_STEP_SUMMARY
-          fi
+          name: required-static-analysis
+          path: build/quality/
+          if-no-files-found: error
+# MISRA qualification needs an agreed rule set and approved deviations.
+# An empty stderr file does not establish compliance. Style checks retain
+# unchanged sealed debt explicitly; required analysis rejects findings/tool failures.

@@ -15,12 +15,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
-#include "hal/include/hal/interface/nx_i2c.h"
+#include "hal/interface/nx_i2c.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_i2c_helpers.h"
+#include "devices/native_i2c_helpers.h"
 }
 
 /**
@@ -35,12 +36,19 @@ class I2CPropertyTest : public ::testing::Test {
   protected:
     std::mt19937 rng;
     nx_i2c_bus_t* i2c = nullptr;
+    std::vector<uint8_t> enabled_instances;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all I2C instances */
         native_i2c_reset_all();
+
+        enabled_instances.clear();
+        for (uint8_t index = 0; index < 8; ++index) {
+            if (nx_factory_i2c(index) != nullptr) enabled_instances.push_back(index);
+        }
+        ASSERT_FALSE(enabled_instances.empty());
 
         /* Get I2C instance 0 */
         i2c = nx_factory_i2c(0);
@@ -81,11 +89,11 @@ class I2CPropertyTest : public ::testing::Test {
     }
 
     /**
-     * \brief       Generate random I2C instance (0-7)
+     * \brief       Generate one actually configured I2C instance
      */
     uint8_t randomInstance() {
-        std::uniform_int_distribution<int> dist(0, 7);
-        return static_cast<uint8_t>(dist(rng));
+        std::uniform_int_distribution<size_t> dist(0, enabled_instances.size()-1);
+        return enabled_instances[dist(rng)];
     }
 
     /**
@@ -122,9 +130,7 @@ TEST_F(I2CPropertyTest, Property1_InitializationIdempotent) {
 
         /* Get I2C instance */
         nx_i2c_bus_t* test_i2c = nx_factory_i2c(instance);
-        if (test_i2c == nullptr) {
-            continue; /* Skip if I2C not available */
-        }
+        ASSERT_NE(nullptr, test_i2c);
 
         /* Initialize */
         nx_lifecycle_t* lifecycle = test_i2c->get_lifecycle(test_i2c);
@@ -181,9 +187,7 @@ TEST_F(I2CPropertyTest, Property2_LifecycleRoundTrip) {
 
         /* Get I2C instance */
         nx_i2c_bus_t* test_i2c = nx_factory_i2c(instance);
-        if (test_i2c == nullptr) {
-            continue; /* Skip if I2C not available */
-        }
+        ASSERT_NE(nullptr, test_i2c);
 
         /* Check initial state */
         native_i2c_state_t state_before;
@@ -236,9 +240,7 @@ TEST_F(I2CPropertyTest, Property3_PowerManagementRoundTrip) {
         /* Reset and initialize this I2C */
         native_i2c_reset(instance);
         nx_i2c_bus_t* test_i2c = nx_factory_i2c(instance);
-        if (test_i2c == nullptr) {
-            continue;
-        }
+        ASSERT_NE(nullptr, test_i2c);
 
         nx_lifecycle_t* lifecycle = test_i2c->get_lifecycle(test_i2c);
         ASSERT_NE(nullptr, lifecycle);
@@ -417,21 +419,23 @@ TEST_F(I2CPropertyTest, Property9_AsyncCallbackTriggering) {
         EXPECT_EQ(NX_OK, result)
             << "Iteration " << test_iter << ": Async tx_rx failed";
 
-        /* Verify callback was triggered */
-        EXPECT_GT(callback_counter, 0)
+        EXPECT_EQ(0, callback_counter);
+        ASSERT_EQ(NX_OK, i2c->service(i2c));
+        /* A completed transaction invokes its callback exactly once. */
+        EXPECT_EQ(callback_counter, 1)
             << "Iteration " << test_iter << ": Callback not triggered";
     }
 }
 
 /*---------------------------------------------------------------------------*/
-/* Property 10: Diagnostic Count Accuracy                                    */
+/* Property 10: Simulator Count Accuracy                                    */
 /* *For any* I2C instance, executing N operations SHALL result in diagnostic */
 /* counts equal to N.                                                        */
 /* **Validates: Requirements 4.7**                                           */
 /*---------------------------------------------------------------------------*/
 
 /**
- * Feature: native-hal-validation, Property 10: Diagnostic Count Accuracy
+ * Feature: native-hal-validation, Property 10: Simulator Count Accuracy
  *
  * *For any* I2C instance and number of operations, diagnostic counts should
  * accurately reflect the number of operations performed.
@@ -464,12 +468,10 @@ TEST_F(I2CPropertyTest, Property10_DiagnosticCountAccuracy) {
         }
 
         /* Query diagnostic statistics */
-        nx_diagnostic_t* diag = i2c->get_diagnostic(i2c);
-        ASSERT_NE(nullptr, diag);
 
-        nx_i2c_stats_t stats;
-        size_t stats_size = sizeof(stats);
-        EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, stats_size));
+        native_i2c_state_t stats;
+
+        EXPECT_EQ(NX_OK, native_i2c_get_state(0, &stats));
 
         /* Verify TX count matches */
         EXPECT_EQ(total_tx_bytes, stats.tx_count)

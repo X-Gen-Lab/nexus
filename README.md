@@ -1,613 +1,119 @@
 # Nexus Embedded Platform
 
-[![CI Status](https://github.com/nexus-platform/nexus/workflows/CI/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![Build Matrix](https://github.com/nexus-platform/nexus/workflows/Build%20Matrix/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![Documentation](https://github.com/nexus-platform/nexus/workflows/Documentation%20Build/badge.svg)](https://github.com/nexus-platform/nexus/actions)
-[![codecov](https://codecov.io/gh/nexus-platform/nexus/branch/main/graph/badge.svg)](https://codecov.io/gh/nexus-platform/nexus)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+Nexus provides the common firmware platform for industrial control and connected devices: CPU primitives, typed HAL, OSAL, SoC/Board integration, explicit infrastructure lifecycle, reusable components, and traceable builds. Application entry points, workers, product policy, private protocols, partitions and manufacturing identities belong to external repositories.
 
-[English](#english) | [中文](README_CN.md)
+Reference examples live in [X-Gen-Lab/nexus-examples](https://github.com/X-Gen-Lab/nexus-examples). They pin a Nexus source revision and use public targets and headers; platform contract tests build independently of those applications. The [38-task execution record](docs/implementation/refactor-execution.md) separates production implementation, actual software checks, final integration and physical qualification.
 
----
+| Platform | Maintained software | Qualification boundary |
+|---|---|---|
+| Linux Native | HAL/OSAL contracts and peripheral models; explicit OpenSSL provider | Host behavior does not establish MCU electrical or real-time behavior |
+| Pinned FreeRTOS POSIX port | Real kernel execution for OSAL contract tests | ARM port interrupts and timing remain separate |
+| STM32F407VG Discovery / F407ZG Qiming V3.1 / F407VE Sky Youth | Real startup, private vendor SDK, GPIO/UART/SPI providers and full physical Flash geometry | Exact PCB, wiring, IRQ/DMA/wire timing and power loss require HIL |
+| GD32F470ZG Liangshan Pi | Independent official SDK 3.3.3, startup, clock, GPIO/UART/SPI/time and Flash implementation | MCU qualification has not been executed |
+| Windows / macOS Native | Retained presets and common wrappers | Not executed in this Linux maintenance session |
 
-<a name="english"></a>
+STM32/GD32 modern typed **I2C hardware providers are currently unsupported**. Native typed I2C is implemented and tested. Unsupported capabilities fail explicitly. No physical board, enterprise support, LTS, installed binary SDK or MPU protection qualification is claimed by this iteration. See the [support matrix](docs/strategy/support-matrix.yaml).
 
-**Nexus** is a professional embedded software development platform designed for building reliable, secure, and portable embedded applications across multiple MCU platforms with comprehensive testing and documentation.
+## Source ownership
 
-## ✨ Key Features
+`arch/` owns CPU primitives. `soc/stm32f407/`, `soc/gd32f470/` and `soc/native/`
+own controllers, clock/IRQ/time, physical or virtual resources, private headers
+and SDK assembly. Native is a host model. `boards/` owns reviewed wiring;
+`platforms/` owns startup/lifecycle and final object assembly through one common
+helper. F407 family directories retain precise VE/VG/ZG configuration, density
+and artifact identities. Unmaintained platform/configuration shells are removed.
 
-### Core Layers
-- **🔧 Hardware Abstraction Layer (HAL)** - Unified hardware interface with Kconfig-based compile-time configuration
-- **⚙️ OS Abstraction Layer (OSAL)** - Support for FreeRTOS, RT-Thread, Zephyr, and bare-metal
-- **� Framework Layer** - Config management, logging, shell, and initialization systems
+## Build the platform
 
-### Development Experience
-- **🌐 Cross-platform Development** - Windows, Linux, macOS with native simulation
-- **🧪 Comprehensive Testing** - 1539+ tests with 100% code coverage for native platform
-- **📚 Bilingual Documentation** - Complete English and Chinese documentation
-- **🛠️ Python Build Tools** - Cross-platform scripts for build, test, and format
-- **⚡ Kconfig Configuration** - Compile-time configuration system for all peripherals
+Use CMake 3.21+, Ninja, a C11/C++17 compiler and Python (3.11 recommended). Kconfiglib is pinned; configuration does not download dependencies. The full Native profile explicitly selects OpenSSL 3 and needs its development package. `native-minimal-debug` builds without optional services or OpenSSL.
 
-### Advanced Features
-- **🔒 Security** - Secure boot, TLS 1.3, hardware crypto acceleration (planned)
-- **☁️ Cloud Integration** - AWS IoT, Azure IoT, Alibaba Cloud (planned)
-- **🤖 TinyML** - TensorFlow Lite Micro support for edge AI (planned)
-
-## 🎯 Supported Platforms
-
-| Platform | Status | Peripherals | RTOS Support |
-|----------|--------|-------------|--------------|
-| **Native** | ✅ Production | Full simulation for testing | Bare-metal, FreeRTOS |
-| **STM32F4** | ✅ Production | GPIO, UART, SPI, I2C, ADC, PWM, Timer, DMA, CAN | Bare-metal, FreeRTOS |
-| **STM32H7** | 🚧 In Progress | + TrustZone, Crypto, Ethernet | Bare-metal, FreeRTOS |
-| **GD32** | 🚧 In Progress | GPIO, UART, SPI, I2C | Bare-metal |
-| **ESP32** | 📋 Planned | + WiFi, BLE, Touch | FreeRTOS |
-| **nRF52** | 📋 Planned | + BLE, NFC, Crypto | FreeRTOS, Zephyr |
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-**All Platforms:**
-- CMake 3.21+
-- Git
-- Python 3.8+ (for build scripts and Kconfig)
-
-**For Native Build (Testing):**
-- Windows: Visual Studio 2019+ or MSVC Build Tools
-- Linux: GCC 9+ or Clang 10+
-- macOS: Xcode Command Line Tools (Clang 12+)
-
-**For ARM Cross-Compilation:**
-- ARM GCC Toolchain 10.3+ (`arm-none-eabi-gcc`)
-- Download: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain
-
-**For Documentation:**
-- Doxygen 1.9+
-- Python packages: `pip install sphinx breathe sphinx_rtd_theme`
-
-### Dependency Management
-
-Nexus uses Git submodules for vendor libraries (CMSIS, HAL drivers, FreeRTOS, GoogleTest). The build system automatically initializes required dependencies, but you can also manage them manually:
-
-**Automatic (Recommended):**
-
-```bash
-# One-command setup - automatically detects platform from .config
-./scripts/setup_deps.sh                          # Linux/macOS
-scripts\setup_deps.bat                           # Windows
-
-# Or specify platform explicitly
-./scripts/setup_deps.sh --platform=stm32 --series=f4
-./scripts/setup_deps.sh --platform=native
-```
-
-**Manual:**
-
-```bash
-# Initialize all submodules (not recommended, ~2GB)
-git submodule update --init --recursive
-
-# Initialize only what you need (recommended)
-# For STM32F4 development:
-git submodule update --init vendors/arm/CMSIS_5
-git submodule update --init vendors/st/cmsis_device_f4
-git submodule update --init vendors/st/stm32f4xx_hal_driver
-
-# For native testing:
-git submodule update --init ext/googletest
-
-# For FreeRTOS:
-git submodule update --init ext/freertos
-```
-
-**CMake Auto-initialization:**
-
-The build system automatically initializes missing submodules during configuration. If you encounter dependency errors, run:
-
-```bash
-./scripts/setup_deps.sh --platform=stm32 --series=f4
-```
-
-See [Dependency Management Guide](docs/dependency-management-solution.md) for advanced usage.
-
-### Automatic Build (Recommended)
-
-The easiest way to build is using the automatic build scripts with Kconfig:
-
-```bash
-# Clone repository
-git clone https://github.com/nexus-platform/nexus.git
+```sh
+git clone --recurse-submodules https://github.com/X-Gen-Lab/nexus.git
 cd nexus
-
-# Install Kconfig tool
-pip install kconfiglib
-
-# Configure and build in one command
-# Windows
-scripts\build.bat --config
-
-# Linux/macOS
-./scripts/build.sh --config
-
-# In menuconfig:
-# 1. Select Platform Configuration → STM32 Platform (or Native Platform)
-# 2. Select Toolchain Configuration → ARM GCC (or GCC/Clang/MSVC for native)
-# 3. Select Build Configuration → Debug/Release
-# 4. Save with 'S' and exit
-
-# The script automatically:
-# - Detects the correct CMake preset from your configuration
-# - Configures CMake with the right toolchain
-# - Builds the project
+python3 -m pip install kconfiglib==14.1.0
+cmake --preset linux-gcc-debug
+cmake --build --preset linux-gcc-debug --parallel 4
+ctest --preset linux-gcc-debug --output-on-failure --no-tests=error --parallel 4
+python3 -m unittest discover -s scripts/ci -p 'test_*.py'
 ```
 
-See [Toolchain Auto-Selection Guide](docs/TOOLCHAIN_AUTO_SELECTION.md) for details.
+The same build/test sequence is available through the maintained wrapper:
 
-### Build for Native (Host Testing)
-
-```bash
-# Clone repository
-git clone https://github.com/nexus-platform/nexus.git
-cd nexus
-
-# Method 1: Using Python script (recommended, cross-platform)
-python scripts/building/build.py
-
-# Method 2: Using CMake Presets (CMake 3.21+)
-cmake --preset native-debug      # Debug build
-cmake --build --preset native-debug
-
-cmake --preset native-release    # Release build
-cmake --build --preset native-release
-
-# Method 3: Using CMake directly
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DNEXUS_PLATFORM=native
-cmake --build build --config Release
-
-# Run tests
-python scripts/test/test.py
-# Or: ctest --test-dir build -C Release --output-on-failure
+```sh
+python3 scripts/ci/ci_build.py --preset linux-gcc-debug --stage all --jobs 4
+cmake --preset native-minimal-debug
+cmake --build --preset native-minimal-debug --parallel 4
 ```
 
-### Build for STM32F4
+The minimal and optional-component presets compile platform libraries; application demos are in the external repository. `cmake --list-presets` lists the available profiles. A preset's existence is not execution evidence.
 
-```bash
-# Method 1: Using Python script
-python scripts/building/build.py --platform stm32f4 --toolchain arm-none-eabi
+ARM builds use the complete fixed ARM GNU 14.3.rel1/newlib toolchain. The installer verifies the archive hash in [toolchains.lock.json](dependencies/toolchains.lock.json).
 
-# Method 2: Using CMake Presets (CMake 3.21+)
-cmake --preset stm32f4-debug     # Debug build
-cmake --build --preset stm32f4-debug
-
-cmake --preset stm32f4-release   # Release build
-cmake --build --preset stm32f4-release
-
-# Method 3: Using CMake directly
-cmake -B build-stm32f4 \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi.cmake \
-    -DNEXUS_PLATFORM=stm32f4
-
-cmake --build build-stm32f4 --config Release
-
-# Output: build-stm32f4/applications/blinky/blinky.elf
+```sh
+python3 scripts/ci/install_arm_toolchain.py --install-dir build/toolchains/arm-gnu-14.3.rel1
+export PATH="$PWD/build/toolchains/arm-gnu-14.3.rel1/bin:$PATH"
+cmake --preset stm32-qiming-armgcc-freertos-release
+cmake --build --preset stm32-qiming-armgcc-freertos-release --parallel 4
+python3 scripts/ci/validate_firmware_elf.py \
+  --build-dir build/stm32-qiming-armgcc-freertos-release \
+  --report build/stm32-qiming-armgcc-freertos-release/firmware-static.json
 ```
 
-### Build Options
+| Board | Baremetal Release preset | FreeRTOS Release preset |
+|---|---|---|
+| Discovery F407VG | `stm32-armgcc-release` | `stm32-armgcc-freertos-release` |
+| Qiming F407ZG V3.1 | `stm32-qiming-armgcc-baremetal-release` | `stm32-qiming-armgcc-freertos-release` |
+| Sky F407VE Youth | `stm32-sky-armgcc-baremetal-release` | `stm32-sky-armgcc-freertos-release` |
+| Liangshan F470ZG | `gd32f470-armgcc-baremetal-release` | `gd32f470-armgcc-freertos-release` |
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `NEXUS_PLATFORM` | `native` | Target platform: `native`, `stm32f4`, `stm32h7`, `gd32`, `esp32`, `nrf52` |
-| `NEXUS_OSAL_BACKEND` | `baremetal` | OSAL backend: `baremetal`, `freertos`, `rtthread`, `zephyr` |
-| `NEXUS_BUILD_TESTS` | `ON` | Build unit tests (native only) |
-| `NEXUS_BUILD_EXAMPLES` | `ON` | Build example applications |
-| `NEXUS_ENABLE_COVERAGE` | `OFF` | Enable code coverage analysis |
-| `CMAKE_BUILD_TYPE` | `Debug` | Build type: `Debug`, `Release`, `MinSizeRel`, `RelWithDebInfo` |
+Top-level MCU profiles build `nexus_contract_firmware.elf` plus configured map/bin/hex in `build/<preset>/bin`. This fixture checks startup and platform linking; it is not a business application or physical UART echo qualification. Source consumers default to no platform development tests or fixtures.
 
-### CMake Presets
+## Consume Nexus
 
-The project includes CMakePresets.json for standardized configurations:
+A parent project can add a fixed complete checkout as a subdirectory:
 
-```bash
-# List available presets
-cmake --list-presets
-
-# Use a preset
-cmake --preset native-debug
-cmake --build --preset native-debug
-
-# Common presets:
-# - native-debug: Native platform debug build
-# - native-release: Native platform release build
-# - stm32f4-debug: STM32F4 debug build
-# - stm32f4-release: STM32F4 release build
+```cmake
+cmake_minimum_required(VERSION 3.21)
+project(my_firmware LANGUAGES C CXX ASM)
+set(NEXUS_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/platform.conf" CACHE FILEPATH "")
+add_subdirectory(external/nexus nexus)
+nexus_add_application(TARGET firmware SOURCES main.c)
 ```
 
-## 📖 First Project
-
-Create a simple LED blink application:
+Select the toolchain before `project()` using `-DCMAKE_TOOLCHAIN_FILE=.../cmake/toolchains/arm-gcc.cmake`; ARM also selects `NEXUS_PLATFORM=stm32` or `gd32f470`. Start from a maintained configuration fragment and keep one platform/Board/backend per build directory. The consumer owns `main()`, component initialization, tasks, scheduling and recovery.
 
 ```c
-#include "hal/nx_factory.h"
-#include "osal/osal.h"
+#include "runtime/nx_runtime.h"
 
-int main(void)
-{
-    /* Initialize OSAL and HAL */
-    osal_init();
-    nx_hal_init();
-
-    /* Get GPIO device (Port A, Pin 5) */
-    nx_gpio_write_t* led = nx_factory_gpio_write('A', 5);
-    if (!led) {
-        return -1;
-    }
-
-    /* Configure as output (done via Kconfig at compile-time) */
-    led->set_mode(led, NX_GPIO_MODE_OUTPUT_PP);
-
-    /* Blink loop */
-    while (1) {
-        led->toggle(led);
-        osal_task_delay(500);  /* 500ms delay */
-    }
-
-    /* Cleanup (never reached) */
-    nx_factory_gpio_release((nx_gpio_t*)led);
-    nx_hal_deinit();
+int main(void) {
+    nx_boot_report_t report;
+    if (nx_runtime_bootstrap(&report) != NX_OK) return 1;
+    /* Initialize selected components/devices, then run your loop or scheduler. */
     return 0;
 }
 ```
 
-### Configure via Kconfig
+`Nexus::Firmware` explicitly links the selected platform objects/startup plus Runtime and typed HAL. `nx_runtime_bootstrap()` initializes HAL then OSAL, reports ownership and rollback failures, and starts no worker or scheduler. `nx_runtime_shutdown()` requires callers to settle their objects. Idle baremetal/pre-scheduler MCU cleanup is bounded; a running or suspended FreeRTOS kernel remains BUSY. Read-only close rejection retains READY; hardware cleanup failure retains PARTIAL and admission fencing for retry. Direct SDK users and products first quiesce their own resources and safe outputs. `nx_platform_get_info()` reads Board/backend, identity digests and main SRAM/Flash/resource information without starting hardware.
 
-```kconfig
-# In your project's Kconfig or defconfig
+A clean complete checkout can also prepare a relocatable **source SDK** outside its source tree:
 
-# Enable GPIO Port A Pin 5
-CONFIG_HAL_GPIO_A_5=y
-CONFIG_HAL_GPIO_A_5_MODE=OUTPUT_PP
-CONFIG_HAL_GPIO_A_5_PULL=NONE
-CONFIG_HAL_GPIO_A_5_SPEED=LOW
-CONFIG_HAL_GPIO_A_5_LEVEL=LOW
+```sh
+python3 -B cmake/package/package_source_sdk.py \
+  --source /absolute/path/to/nexus --output '/absolute/path/to/nexus sdk prefix'
+python3 -B '/absolute/path/to/nexus sdk prefix/share/nexus/src/cmake/package/package_source_sdk.py' \
+  --verify '/absolute/path/to/nexus sdk prefix/share/nexus/src'
 ```
 
-## 📁 Project Structure
+Use `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)` instead of `add_subdirectory`, passing `Nexus_DIR=<prefix>/lib/cmake/Nexus`, your `NEXUS_CONFIG_FILE` and `NEXUS_EXPECTED_SOURCE_REVISION`. The package rebuilds actual source, dependencies, startup and linker. See [package preparation and consumer commands](cmake/package/README.md). The historical clean `5498b2b` snapshot completed strict publishable preparation and actual relocated consumers. A later source revision must prepare, verify and consume a new source-bound package. Development fixtures require explicit opt-in and remain ineligible for release promotion.
 
-```
-nexus/
-├── hal/                    # Hardware Abstraction Layer
-│   ├── include/hal/        #   Public API headers
-│   ├── src/                #   Common implementations
-│   ├── docs/               #   Complete documentation (EN/CN)
-│   └── Kconfig             #   HAL configuration options
-├── osal/                   # OS Abstraction Layer
-│   ├── include/osal/       #   Public API headers
-│   ├── adapters/           #   RTOS adapters (baremetal, freertos, rtthread)
-│   ├── docs/               #   Complete documentation (EN/CN)
-│   └── Kconfig             #   OSAL configuration options
-├── framework/              # High-level frameworks
-│   ├── config/             #   Configuration management system
-│   ├── log/                #   Logging system
-│   ├── shell/              #   Command shell
-│   └── init/               #   Initialization framework
-├── platforms/              # Platform-specific implementations
-│   ├── native/             #   Host simulation (Windows/Linux/macOS)
-│   ├── stm32/              #   STM32 family (F4, H7)
-│   ├── gd32/               #   GigaDevice GD32
-│   ├── esp32/              #   Espressif ESP32
-│   ├── nrf52/              #   Nordic nRF52
-│   └── Kconfig             #   Platform configuration
-├── applications/           # Example applications
-│   ├── blinky/             #   LED blink example
-│   ├── shell_demo/         #   Command shell demo
-│   ├── config_demo/        #   Configuration system demo
-│   └── freertos_demo/      #   FreeRTOS integration demo
-├── tests/                  # Comprehensive test suite (1539+ tests)
-│   ├── hal/                #   HAL unit and property tests
-│   ├── osal/               #   OSAL tests
-│   ├── config/             #   Config framework tests
-│   ├── log/                #   Log framework tests
-│   ├── shell/              #   Shell framework tests
-│   ├── init/               #   Init framework tests
-│   └── integration/        #   Integration tests
-├── docs/                   # Documentation
-│   ├── api/                #   Doxygen API documentation
-│   ├── sphinx/             #   User guides (EN/CN)
-│   └── requirements/       #   Requirements and design docs
-├── scripts/                # Build and utility scripts
-│   ├── building/           #   Build scripts (Python/Bash/Batch)
-│   ├── test/               #   Test scripts
-│   ├── tools/              #   Format, clean, docs scripts
-│   └── coverage/           #   Coverage analysis scripts
-├── cmake/                  # CMake modules
-│   ├── modules/            #   Helper functions
-│   └── toolchains/         #   Cross-compilation toolchains
-├── vendors/                # Vendor SDKs and libraries
-│   ├── st/                 #   STMicroelectronics
-│   ├── espressif/          #   Espressif
-│   ├── nordic/             #   Nordic Semiconductor
-│   └── arm/                #   ARM CMSIS
-├── ext/                    # External dependencies
-│   ├── freertos/           #   FreeRTOS kernel
-│   └── googletest/         #   Google Test framework
-└── .github/workflows/      # CI/CD pipelines
-    ├── build.yml           #   Multi-platform build
-    ├── test.yml            #   Unit tests with coverage
-    └── docs.yml            #   Documentation deployment
-```
+## Configuration and ownership
 
-## 📚 Documentation
+- `generated/effective.config`, `nexus_config.h` and `config.cmake` come from one Kconfig parse. Contradictory, unknown or out-of-range settings stop configuration. No source-root `.config` or stale header fallback exists.
+- `NEXUS_BOARD_DIR` supplies one external Board package. Its manifest binds source inputs and reviewed GPIO/UART/SPI routes. This validation is scoped to maintained routes, not a complete automatic resource solver.
+- `NEXUS_FLASH_LAYOUT_FILE` supplies consumer-owned image/regions. One parse generates linker and region declarations; Board/layout digests are bound to ELF symbols. The default image covers full physical Flash with no automatic storage reservation. Nonzero image offsets are rejected.
+- Device discovery is side-effect free. Explicit typed open/close and owner/generation references protect lifetime. Timeout or cancellation does not release an unsettled hardware buffer.
+- Log/Shell core and typed UART adapters, Config RAM/Flash, StorageHAL and OpenSSL are explicit choices. Test fakes do not enter production libraries. Crypto core has no default provider; a missing MCU crypto provider returns unsupported.
 
-### Online Documentation
+Read [architecture decisions](docs/strategy/architecture-decisions.md), [HAL/OSAL contracts](docs/strategy/hal-osal-design.md) and [enterprise workflow](docs/strategy/enterprise-workflow.md). Historical `3129550` Native 1781 tests and eight ARM/15 ELF results remain recorded in [platform-validation.json](docs/implementation/platform-validation.json); they do not qualify the new refactor. The historical clean `5498b2b` delivery passed 1810 Native tests, 8 platform contract ELF links and 38 external example ELF links; current source changes require fresh verification. Current software status is in [support-matrix.yaml](docs/strategy/support-matrix.yaml), with exact source-pair identity in the [external validation record](https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json). The [RF execution table](docs/implementation/refactor-execution.csv) preserves targeted historical scopes and separates current revalidation from physical/operational acceptance.
 
-Visit our comprehensive documentation site: **[nexus-platform.github.io/nexus](https://nexus-platform.github.io/nexus/)**
-
-- **English**: https://nexus-platform.github.io/nexus/en/
-- **中文**: https://nexus-platform.github.io/nexus/zh_CN/
-- **API Reference**: https://nexus-platform.github.io/nexus/api/
-
-### Build Documentation Locally
-
-```bash
-# Install dependencies
-pip install sphinx breathe sphinx_rtd_theme
-
-# Build all documentation (API + User Guides)
-python scripts/tools/docs.py
-
-# Or build separately:
-
-# API documentation (Doxygen)
-doxygen Doxyfile
-
-# User guides (Sphinx)
-cd docs/sphinx
-sphinx-build -b html . _build/html/en                    # English
-sphinx-build -b html -D language=zh_CN . _build/html/cn  # Chinese
-```
-
-### Module Documentation
-
-Each module has comprehensive documentation:
-
-#### HAL (Hardware Abstraction Layer)
-- [📖 Overview](hal/docs/README.md)
-- [👤 User Guide](hal/docs/USER_GUIDE.md) - Complete API usage and examples
-- [🏗️ Design Document](hal/docs/DESIGN.md) - Architecture and implementation
-- [🧪 Testing Guide](hal/docs/TEST_GUIDE.md) - Test strategy and cases
-- [🔧 Porting Guide](hal/docs/PORTING_GUIDE.md) - How to port to new platforms
-- [🔍 Troubleshooting](hal/docs/TROUBLESHOOTING.md) - Common issues and solutions
-
-#### OSAL (OS Abstraction Layer)
-- [📖 Overview](osal/docs/README.md)
-- [👤 User Guide](osal/docs/USER_GUIDE.md) - Tasks, synchronization, memory
-- [🏗️ Design Document](osal/docs/DESIGN.md) - RTOS adapter architecture
-- [🧪 Testing Guide](osal/docs/TEST_GUIDE.md) - Unit and integration tests
-- [🔧 Porting Guide](osal/docs/PORTING_GUIDE.md) - Adapt to new RTOS
-- [🔍 Troubleshooting](osal/docs/TROUBLESHOOTING.md) - Debugging tips
-
-#### Framework Modules
-- [⚙️ Config System](framework/config/docs/README.md) - Configuration management
-- [📝 Log System](framework/log/docs/README.md) - Logging framework
-- [💻 Shell System](framework/shell/docs/README.md) - Command shell
-- [🚀 Init System](framework/init/docs/README.md) - Initialization framework
-
-## 🛠️ Development
-
-### Using Python Scripts (Recommended)
-
-```bash
-# Build
-python scripts/building/build.py                 # Debug build
-python scripts/building/build.py -t release      # Release build
-python scripts/building/build.py -c              # Clean build
-python scripts/building/build.py -j 8            # Parallel build (8 jobs)
-
-# Test
-python scripts/test/test.py                      # Run all tests
-python scripts/test/test.py -f "GPIO*"           # Filter tests
-python scripts/test/test.py -v                   # Verbose output
-python scripts/test/test.py --xml report.xml     # Generate XML report
-
-# Format code
-python scripts/tools/format.py                   # Format all code
-python scripts/tools/format.py --check           # Check formatting only
-
-# Clean
-python scripts/tools/clean.py                    # Clean build artifacts
-
-# Generate documentation
-python scripts/tools/docs.py                     # Build all docs
-```
-
-### Code Style
-
-This project follows strict coding standards:
-
-- **C Standard**: C11
-- **C++ Standard**: C++17 (tests use C++20)
-- **Line Length**: 80 characters maximum
-- **Indentation**: 4 spaces (no tabs)
-- **Naming**: snake_case for functions and variables
-- **Comments**: Doxygen with backslash style (`\brief`, `\param`)
-
-Format code before committing:
-
-```bash
-python scripts/tools/format.py
-```
-
-### Doxygen Comment Style
-
-Use backslash style for Doxygen comments:
-
-```c
-/**
- * \file            nx_gpio.h
- * \brief           GPIO device interface definition
- * \author          Nexus Team
- */
-
-/**
- * \brief           Get GPIO device with write capability
- * \param[in]       port: GPIO port ('A'-'K')
- * \param[in]       pin: GPIO pin number (0-15)
- * \return          GPIO write interface pointer, NULL on failure
- */
-nx_gpio_write_t* nx_factory_gpio_write(char port, uint8_t pin);
-```
-
-### Running Tests
-
-```bash
-# Using Python script (recommended)
-python scripts/test/test.py                      # All tests
-python scripts/test/test.py -f "GPIO*"           # Specific suite
-python scripts/test/test.py -l unit              # By label
-python scripts/test/test.py -v                   # Verbose
-
-# Using CTest directly
-cd build
-ctest -C Release --output-on-failure             # All tests
-ctest -C Release -R "GPIO*"                      # Specific suite
-ctest -C Release -L unit                         # By label
-ctest -C Release -j8                             # Parallel (8 jobs)
-```
-
-### Test Statistics
-
-Current test suite contains:
-
-- **Total Tests**: 1539+ tests
-- **HAL Tests**: ~400 tests (unit + property-based)
-- **OSAL Tests**: ~200 tests
-- **Config Tests**: ~300 tests
-- **Log Tests**: ~130 tests
-- **Shell Tests**: ~400 tests
-- **Init Tests**: ~15 tests
-- **Integration Tests**: ~40 tests
-
-### Code Coverage
-
-Generate code coverage reports:
-
-```bash
-# Linux/WSL
-cd scripts/coverage
-./run_coverage_linux.sh
-
-# Windows (PowerShell)
-cd scripts\coverage
-.\run_coverage_windows.ps1
-
-# View report
-# Linux: xdg-open ../../coverage_html/index.html
-# Windows: start ..\..\coverage_report\html\index.html
-```
-
-**Target**: 100% code coverage for native platform HAL implementations.
-
-## 🔄 CI/CD
-
-GitHub Actions workflows automatically run on every push and pull request:
-
-| Workflow | Description | Triggers |
-|----------|-------------|----------|
-| **ci.yml** | Unified continuous integration pipeline | Push, PR |
-| **build-matrix.yml** | Multi-platform build testing (Windows, Linux, macOS, ARM) | Push, PR |
-| **docs-build.yml** | Build and deploy documentation to GitHub Pages | Push to main |
-| **quality-checks.yml** | Code quality validation and static analysis | Push, PR |
-| **performance.yml** | Performance benchmarking and regression testing | Push to main, Manual |
-| **release.yml** | Automated release process and artifact publishing | Tag push |
-
-### Modular Architecture
-
-The CI/CD system uses a modular architecture with reusable actions:
-
-- **Reusable Actions** in `.github/actions/`:
-  - `setup-build/` - Common build environment setup
-  - Shared across multiple workflows for consistency
-
-### CI Status
-
-- ✅ All platforms build successfully
-- ✅ 1539+ tests passing
-- ✅ Code coverage > 95%
-- ✅ Documentation builds successfully
-- ✅ Quality checks passing
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
-
-- Development environment setup
-- Code style guidelines
-- Testing requirements (all contributions must include tests)
-- Pull request process
-- Documentation guidelines
-
-Quick checklist before submitting a PR:
-
-- [ ] Code follows style guidelines (`python scripts/tools/format.py`)
-- [ ] All tests pass (`python scripts/test/test.py`)
-- [ ] New code has corresponding tests
-- [ ] Documentation is updated
-- [ ] Commit messages follow conventional commits
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🌟 Community
-
-- **Issues**: [GitHub Issues](https://github.com/nexus-platform/nexus/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/nexus-platform/nexus/discussions)
-- **Documentation**: [Online Docs](https://nexus-platform.github.io/nexus/)
-- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
-## 🗺️ Roadmap
-
-### v0.1.0 (Current)
-
-- ✅ HAL core functionality (GPIO, UART, SPI, I2C, ADC, PWM, CAN)
-- ✅ OSAL core functionality (tasks, synchronization, memory)
-- ✅ Framework modules (Config, Log, Shell, Init)
-- ✅ STM32F4 platform support
-- ✅ Native platform for testing
-- ✅ Kconfig configuration system
-- ✅ Comprehensive testing (1539+ tests)
-- ✅ Complete bilingual documentation
-
-### v0.2.0 (Planned)
-
-- 🚧 STM32H7 platform support
-- 🚧 GD32 platform support
-- 🚧 DMA advanced features
-- 🚧 Low-power management
-- 🚧 Enhanced security features
-
-### v1.0.0 (Future)
-
-- 📋 ESP32 platform support
-- 📋 nRF52 platform support
-- 📋 Cloud integration (AWS IoT, Azure IoT)
-- 📋 TinyML support
-- 📋 Secure boot implementation
-
-## 🙏 Acknowledgments
-
-Thanks to all contributors who have helped make Nexus better!
-
-Special thanks to:
-- FreeRTOS team for the excellent RTOS
-- Google Test team for the testing framework
-- Doxygen and Sphinx teams for documentation tools
-
----
-
-**Made with ❤️ by the Nexus Team**
-
-*Building the future of embedded systems, one commit at a time.*
+A release binds the same source/dependencies, effective configuration, Board/layout, toolchain, ELF/BIN and nonzero executed tests. Product promotion additionally needs actual HIL, trust/signing, measured budgets and manufacturing evidence. Read [AGENTS.md](AGENTS.md) before changing contracts. Nexus uses the [MIT license](LICENSE); dependencies keep their own licenses.

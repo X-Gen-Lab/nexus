@@ -1,0 +1,23 @@
+menu "STM32F407 System"
+
+config STM32_PREFETCH_ENABLE
+    bool "Enable Flash instruction prefetch"
+    default y
+
+config STM32_INSTRUCTION_CACHE_ENABLE
+    bool "Enable Flash instruction acceleration cache"
+    default y
+    help
+      F407 Flash accelerator feature; this is not a CPU cache/MPU contract.
+
+config STM32_DATA_CACHE_ENABLE
+    bool "Enable Flash data acceleration cache"
+    default y
+    help
+      F407 Flash accelerator feature; this is not a CPU cache/MPU contract.
+
+config STM32_ENABLE_PROFILING
+    bool "Enable DWT profiling zones"
+    default n
+
+endmenu

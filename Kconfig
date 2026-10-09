@@ -16,6 +16,8 @@ source "cmake/Kconfig"
 #-----------------------------------------------------------------------------
 
 source "platforms/Kconfig"
+source "boards/Kconfig"
+source "cmake/Kconfig.firmware"
 
 #-----------------------------------------------------------------------------
 # HAL Layer Configuration
@@ -28,6 +30,7 @@ source "hal/Kconfig"
 #-----------------------------------------------------------------------------
 
 source "osal/Kconfig"
+source "services/Kconfig"
 
 #-----------------------------------------------------------------------------
 # Framework Layer Configuration (Future Expansion)
@@ -44,5 +47,3 @@ source "framework/Kconfig"
 #-----------------------------------------------------------------------------
 # Applications Configuration
 #-----------------------------------------------------------------------------
-
-source "applications/Kconfig"

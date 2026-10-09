@@ -11,7 +11,7 @@ set(INTEGRATION_TEST_SOURCES
 
 # Create test executable
 add_executable(integration_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main_common.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
     ${INTEGRATION_TEST_SOURCES}
 )
 
@@ -28,7 +28,7 @@ target_compile_options(integration_tests PRIVATE ${NEXUS_TEST_COMPILE_OPTIONS})
 target_include_directories(integration_tests PRIVATE ${NEXUS_TEST_INCLUDES})
 
 # Link libraries
-target_link_libraries(integration_tests PRIVATE ${NEXUS_TEST_LIBS})
+target_link_libraries(integration_tests PRIVATE ${NEXUS_TEST_LIBS} shell_test_support config_test_support)
 
 # Discover tests
 nexus_discover_tests(integration_tests

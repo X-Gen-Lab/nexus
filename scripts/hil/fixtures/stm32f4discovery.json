@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "board_fixture_template",
+  "hardware_verified": false,
+  "board_id": "stm32f4discovery-mb997",
+  "soc": "stm32f407vg",
+  "board_manifest": "boards/stm32f4discovery/board.json",
+  "chip_part": "STM32F407VGT6",
+  "flash_base": 134217728,
+  "flash_size": 1048576,
+  "debug": {
+    "transport": "swd",
+    "reference_probe": "stlink",
+    "allowed_interfaces": [
+      "stlink",
+      "cmsis-dap",
+      "external-reviewed"
+    ],
+    "openocd_target_hint": "target/stm32f4x.cfg",
+    "adapter_clock_khz": 1000
+  },
+  "console": {
+    "controller": "USART2",
+    "tx": "PA2",
+    "rx": "PA3",
+    "baudrate": 115200,
+    "frame": "8N1",
+    "mcu_voltage_mv": 3300,
+    "host_rx_to": "PA2",
+    "host_tx_to": "PA3",
+    "common_ground": true
+  },
+  "led": {
+    "pin": "PD12",
+    "active_level": 1
+  },
+  "electrical_notes": "Discovery CN3/SWD; ST-LINK does not imply a UART bridge. Use an external3.3V bridge.",
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "pending_qualification": [
+    {
+      "id": "irq_preemption",
+      "fixture": "logic analyzer/timing firmware; priority and load recorded",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "uart_wire_tc_cancel",
+      "fixture": "TX/RX logic analyzer; cancel-vs-TC assertions",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "spi_dma_cs",
+      "fixture": "reviewed slave/loopback and CS/SCK/DMA signal capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "flash_power_loss",
+      "fixture": "controlled supply interrupter, legal external layout and voltage capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "control_jitter",
+      "fixture": "external application worst-load workload and hardware timer capture",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

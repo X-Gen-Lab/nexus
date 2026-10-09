@@ -117,7 +117,8 @@ void history_deinit(history_manager_t* hist) {
 
 bool history_add(history_manager_t* hist, const char* cmd) {
     /* Validate parameters */
-    if (hist == NULL || hist->entries == NULL || hist->capacity == 0) {
+    if (hist == NULL || hist->entries == NULL || hist->capacity == 0 ||
+        hist->entry_size == 0) {
         return false;
     }
 
@@ -172,20 +173,20 @@ const char* history_get_prev(history_manager_t* hist) {
     }
 
     /* Calculate next browse index (going backward in time = older) */
-    int8_t next_index;
+    int16_t next_index;
     if (hist->browse_index < 0) {
         /* Currently at current input, go to most recent history */
         next_index = 0;
     } else {
         /* Go to older entry */
-        next_index = hist->browse_index + 1;
+        next_index = (int16_t)(hist->browse_index + 1);
     }
 
     /* Check if we've reached the oldest entry */
-    if (next_index >= (int8_t)hist->count) {
+    if (next_index >= (int16_t)hist->count) {
         /* Already at oldest, return current oldest */
         if (hist->browse_index >= 0 &&
-            hist->browse_index < (int8_t)hist->count) {
+            hist->browse_index < (int16_t)hist->count) {
             uint8_t buf_idx =
                 get_buffer_index(hist, (uint8_t)hist->browse_index);
             return hist->entries[buf_idx];
@@ -210,7 +211,7 @@ const char* history_get_next(history_manager_t* hist) {
     }
 
     /* Calculate next browse index (going forward in time = newer) */
-    int8_t next_index = hist->browse_index - 1;
+    int16_t next_index = (int16_t)(hist->browse_index - 1);
 
     /* Check if we've returned to current input */
     if (next_index < 0) {

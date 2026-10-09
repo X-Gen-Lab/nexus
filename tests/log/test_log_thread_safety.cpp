@@ -131,6 +131,7 @@ TEST_F(LogThreadSafetyTest, ConcurrentLevelChanges) {
     ClearBackendCache();
 
     /* System should still be functional */
+    ASSERT_LOG_OK(log_set_level(LOG_LEVEL_INFO));
     LOG_INFO("Final message");
 
     /* Give time for message to be written */
@@ -447,7 +448,12 @@ TEST_F(LogThreadSafetyTest, ConcurrentReadWrite) {
  * \brief           Test no data corruption under concurrent access
  */
 TEST_F(LogThreadSafetyTest, NoDataCorruption) {
-    InitLog();
+    /* Lossless parallel delivery selects the explicit bounded worker queue.
+     * Synchronous sinks use no-wait callback admission and can return BUSY. */
+    log_config_t config = LOG_CONFIG_DEFAULT;
+    config.async_mode = true;
+    config.async_policy = LOG_ASYNC_POLICY_BLOCK;
+    InitLog(&config);
     log_set_level(LOG_LEVEL_TRACE);
     log_set_format("[T%d] %m");
 
@@ -464,7 +470,8 @@ TEST_F(LogThreadSafetyTest, NoDataCorruption) {
                 /* Unique message per thread */
                 std::string msg =
                     "T" + std::to_string(t) + "_M" + std::to_string(i);
-                LOG_INFO("%s", msg.c_str());
+                EXPECT_EQ(LOG_OK, log_write(LOG_LEVEL_INFO, "parallel", __FILE__,
+                                            __LINE__, __func__, "%s", msg.c_str()));
             }
         });
     }
@@ -474,7 +481,8 @@ TEST_F(LogThreadSafetyTest, NoDataCorruption) {
         thread.join();
     }
 
-    /* Read all messages */
+    ASSERT_LOG_OK(log_async_flush());
+    /* Read all accepted messages after the FIFO barrier. */
     std::string content = ReadMemoryBackend(backend);
 
     /* Verify no obvious corruption (messages should be readable) */
@@ -489,8 +497,8 @@ TEST_F(LogThreadSafetyTest, NoDataCorruption) {
             count++;
             pos += marker.length();
         }
-        /* Should have some messages from each thread */
-        EXPECT_GT(count, 0u) << "No messages from thread " << t;
+        EXPECT_EQ(static_cast<size_t>(MESSAGES_PER_THREAD), count)
+            << "Missing or duplicated messages from thread " << t;
     }
 
     CleanupMemoryBackend(backend);

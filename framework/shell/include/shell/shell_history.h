@@ -35,7 +35,7 @@ typedef struct {
     uint8_t capacity;    /**< Maximum number of entries */
     uint8_t count;       /**< Current number of entries */
     uint8_t head;        /**< Index of newest entry (circular buffer) */
-    int8_t browse_index; /**< Current browse position (-1 = current input) */
+    int16_t browse_index; /**< Position -1 or 0..254 for uint8_t capacity */
 } history_manager_t;
 
 /**

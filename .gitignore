@@ -6,6 +6,7 @@ _build/
 out/
 cmake-build-*/
 nonexistent_build_dir/
+/.ccache/
 
 # IDE
 .idea/
@@ -54,6 +55,8 @@ Testing/
 *.gcda
 *.gcov
 lcov.info
+/coverage.info
+/coverage_html/
 
 # Test results
 test_results.xml
@@ -65,6 +68,7 @@ __pycache__/
 *.pyc
 .env
 venv/
+.venv/
 *.egg-info/
 
 # OS files
@@ -95,3 +99,7 @@ docs/api/latex/
 # Test result files
 osal_test_results.xml
 osal_property_test_results.xml
+
+# Developer configuration and generated headers never belong to the source tree.
+/.config
+/nexus_config.h

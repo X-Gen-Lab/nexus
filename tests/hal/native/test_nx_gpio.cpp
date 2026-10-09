@@ -14,9 +14,11 @@
 #include <gtest/gtest.h>
 
 extern "C" {
+#include "../../../soc/native/controllers/gpio/nx_gpio_types.h"
+#include "devices/native_gpio_helpers.h"
+#include "hal/base/nx_device.h"
 #include "hal/interface/nx_gpio.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_gpio_helpers.h"
 }
 
 /**
@@ -101,6 +103,34 @@ TEST_F(GPIOTest, ReadGPIO) {
     EXPECT_EQ(1U, state.read_count);
 }
 
+TEST_F(GPIOTest, ReadAndWriteShareLifecycleAndPower) {
+    nx_lifecycle_t* read_lifecycle = gpio->read.get_lifecycle(&gpio->read);
+    nx_lifecycle_t* write_lifecycle = gpio->write.get_lifecycle(&gpio->write);
+    ASSERT_NE(nullptr, read_lifecycle);
+    ASSERT_EQ(read_lifecycle, write_lifecycle);
+    EXPECT_EQ(gpio->read.get_power(&gpio->read),
+              gpio->write.get_power(&gpio->write));
+
+    ASSERT_EQ(NX_OK, read_lifecycle->suspend(read_lifecycle));
+    EXPECT_EQ(NX_DEV_STATE_SUSPENDED,
+              write_lifecycle->get_state(write_lifecycle));
+    ASSERT_EQ(NX_OK, write_lifecycle->resume(write_lifecycle));
+    EXPECT_EQ(NX_DEV_STATE_RUNNING, read_lifecycle->get_state(read_lifecycle));
+}
+
+TEST_F(GPIOTest, FactoryReturnsRegisteredCapabilities) {
+    nx_gpio_read_t* read = nx_factory_gpio_read('A', 0);
+    nx_gpio_write_t* write = nx_factory_gpio_write('A', 0);
+    ASSERT_EQ(&gpio->read, read);
+    ASSERT_EQ(&gpio->write, write);
+    write->write(write, 1);
+    EXPECT_EQ(1, read->read(read));
+    EXPECT_EQ(nullptr, nx_factory_gpio_read('Z', 0));
+    EXPECT_EQ(nullptr, nx_factory_gpio_write('Z', 0));
+    EXPECT_EQ(nullptr, nx_factory_gpio_read('A', 255));
+    EXPECT_EQ(nullptr, nx_factory_gpio_write('A', 255));
+}
+
 TEST_F(GPIOTest, ToggleGPIO) {
     /* Initial state is 0 */
     gpio->write.write(&gpio->write, 0);
@@ -145,6 +175,20 @@ TEST_F(GPIOTest, RegisterInterrupt) {
     /* Verify interrupt is registered */
     native_gpio_state_t state;
     EXPECT_EQ(NX_OK, native_gpio_get_state(0, 0, &state));
+    EXPECT_TRUE(state.interrupt_enabled);
+    EXPECT_EQ(NX_GPIO_TRIGGER_RISING, state.trigger);
+}
+
+TEST_F(GPIOTest, InvalidInterruptTriggerPreservesRegistration) {
+    int user_data = 42;
+    ASSERT_EQ(NX_OK,
+              gpio->read.register_exti(&gpio->read, gpio_interrupt_callback,
+                                       &user_data, NX_GPIO_TRIGGER_RISING));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,
+              gpio->read.register_exti(&gpio->read, nullptr, nullptr,
+                                       static_cast<nx_gpio_trigger_t>(255)));
+    native_gpio_state_t state{};
+    ASSERT_EQ(NX_OK, native_gpio_get_state(0, 0, &state));
     EXPECT_TRUE(state.interrupt_enabled);
     EXPECT_EQ(NX_GPIO_TRIGGER_RISING, state.trigger);
 }
@@ -211,6 +255,26 @@ TEST_F(GPIOTest, InterruptTriggerBoth) {
     EXPECT_TRUE(interrupt_triggered);
 }
 
+TEST_F(GPIOTest, SuspendedAndDeinitializedInterruptsDoNotCallUser) {
+    int user_data = 42;
+    interrupt_triggered = false;
+    ASSERT_EQ(NX_OK,
+              gpio->read.register_exti(&gpio->read, gpio_interrupt_callback,
+                                       &user_data, NX_GPIO_TRIGGER_BOTH));
+    nx_lifecycle_t* lifecycle = gpio->read.get_lifecycle(&gpio->read);
+    ASSERT_NE(nullptr, lifecycle);
+    ASSERT_EQ(NX_OK, lifecycle->suspend(lifecycle));
+    ASSERT_EQ(NX_OK, native_gpio_simulate_pin_change(0, 0, 1));
+    EXPECT_FALSE(interrupt_triggered);
+    ASSERT_EQ(NX_OK, lifecycle->resume(lifecycle));
+    ASSERT_EQ(NX_OK, native_gpio_simulate_pin_change(0, 0, 0));
+    EXPECT_TRUE(interrupt_triggered);
+    ASSERT_EQ(NX_OK, lifecycle->deinit(lifecycle));
+    interrupt_triggered = false;
+    ASSERT_EQ(NX_OK, native_gpio_simulate_pin_change(0, 0, 1));
+    EXPECT_FALSE(interrupt_triggered);
+}
+
 /*---------------------------------------------------------------------------*/
 /* Power Management Tests - Requirements 1.5, 1.6                            */
 /*---------------------------------------------------------------------------*/
@@ -248,6 +312,65 @@ TEST_F(GPIOTest, ResumeGPIO) {
     EXPECT_EQ(NX_OK, native_gpio_get_state(0, 0, &state));
     EXPECT_FALSE(state.suspended);
     EXPECT_EQ(1, state.pin_state); /* State should be restored */
+}
+
+TEST_F(GPIOTest, SuspendedOperationsPreserveOutputAndCounters) {
+    gpio->write.write(&gpio->write, 1);
+    nx_lifecycle_t* lifecycle = gpio->read.get_lifecycle(&gpio->read);
+    ASSERT_NE(nullptr, lifecycle);
+    ASSERT_EQ(NX_OK, lifecycle->suspend(lifecycle));
+    native_gpio_state_t before{};
+    ASSERT_EQ(NX_OK, native_gpio_get_state(0, 0, &before));
+    gpio->write.write(&gpio->write, 0);
+    gpio->write.toggle(&gpio->write);
+    EXPECT_EQ(0, gpio->read.read(&gpio->read));
+    EXPECT_EQ(NX_ERR_NOT_INIT,
+              gpio->read.register_exti(&gpio->read, nullptr, nullptr,
+                                       NX_GPIO_TRIGGER_RISING));
+    native_gpio_state_t after{};
+    ASSERT_EQ(NX_OK, native_gpio_get_state(0, 0, &after));
+    EXPECT_EQ(before.pin_state, after.pin_state);
+    EXPECT_EQ(before.write_count, after.write_count);
+    EXPECT_EQ(before.read_count, after.read_count);
+    EXPECT_EQ(before.toggle_count, after.toggle_count);
+    ASSERT_EQ(NX_OK, lifecycle->resume(lifecycle));
+    EXPECT_EQ(1, gpio->read.read(&gpio->read));
+}
+
+TEST_F(GPIOTest, PowerDisableEnablePreservesOutput) {
+    nx_power_t* power = gpio->write.get_power(&gpio->write);
+    ASSERT_NE(nullptr, power);
+    EXPECT_TRUE(power->is_enabled(power));
+    gpio->write.write(&gpio->write, 1);
+    ASSERT_EQ(NX_OK, power->disable(power));
+    EXPECT_FALSE(power->is_enabled(power));
+    ASSERT_EQ(NX_OK, power->disable(power));
+    gpio->write.write(&gpio->write, 0);
+    EXPECT_EQ(0, gpio->read.read(&gpio->read));
+    ASSERT_EQ(NX_OK, power->enable(power));
+    EXPECT_TRUE(power->is_enabled(power));
+    EXPECT_EQ(1, gpio->read.read(&gpio->read));
+    EXPECT_EQ(NX_OK, power->enable(power));
+}
+
+TEST_F(GPIOTest, PowerRejectsUninitializedDevice) {
+    nx_lifecycle_t* lifecycle = gpio->write.get_lifecycle(&gpio->write);
+    nx_power_t* power = gpio->write.get_power(&gpio->write);
+    ASSERT_NE(nullptr, lifecycle);
+    ASSERT_NE(nullptr, power);
+    ASSERT_EQ(NX_OK, lifecycle->deinit(lifecycle));
+    EXPECT_FALSE(power->is_enabled(power));
+    EXPECT_EQ(NX_ERR_NOT_INIT, power->enable(power));
+    EXPECT_EQ(NX_ERR_NOT_INIT, power->disable(power));
+}
+
+TEST_F(GPIOTest, PowerCallbackUnsupported) {
+    nx_power_t* power = gpio->write.get_power(&gpio->write);
+    ASSERT_NE(nullptr, power);
+    auto callback = [](void*, bool) {};
+    EXPECT_EQ(NX_ERR_NOT_SUPPORTED,
+              power->set_callback(power, callback, nullptr));
+    EXPECT_EQ(NX_OK, power->set_callback(power, nullptr, nullptr));
 }
 
 TEST_F(GPIOTest, SuspendResumePreservesState) {
@@ -313,19 +436,36 @@ TEST_F(GPIOTest, GetLifecycleState) {
 /*---------------------------------------------------------------------------*/
 
 TEST_F(GPIOTest, NullPointerHandling) {
-    /* Test NULL pointer handling - should not crash */
-    nx_gpio_write_t* null_gpio = nullptr;
-    if (null_gpio != nullptr) {
-        null_gpio->write(null_gpio, 1);
-        null_gpio->toggle(null_gpio);
-    }
+    /* Invoke real entry points with a missing receiver. */
+    gpio->write.write(nullptr, 1);
+    gpio->write.toggle(nullptr);
+    EXPECT_EQ(0, gpio->read.read(nullptr));
+    EXPECT_EQ(nullptr, gpio->read.get_lifecycle(nullptr));
+    EXPECT_EQ(nullptr, gpio->write.get_lifecycle(nullptr));
+    EXPECT_EQ(nullptr, gpio->read.get_power(nullptr));
+    EXPECT_EQ(nullptr, gpio->write.get_power(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR,
+              gpio->read.register_exti(nullptr, gpio_interrupt_callback,
+                                       nullptr, NX_GPIO_TRIGGER_RISING));
+    native_gpio_state_t state{};
+    ASSERT_EQ(NX_OK, native_gpio_get_state(0, 0, &state));
+    EXPECT_EQ(0U, state.write_count);
+    EXPECT_EQ(0U, state.toggle_count);
 
-    /* Read with NULL should return 0 */
-    nx_gpio_read_t* null_read = nullptr;
-    if (null_read != nullptr) {
-        uint8_t value = null_read->read(null_read);
-        EXPECT_EQ(0, value);
-    }
+    nx_lifecycle_t* lifecycle = gpio->read.get_lifecycle(&gpio->read);
+    ASSERT_NE(nullptr, lifecycle);
+    EXPECT_EQ(NX_ERR_NULL_PTR, lifecycle->init(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, lifecycle->deinit(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, lifecycle->suspend(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, lifecycle->resume(nullptr));
+    EXPECT_EQ(NX_DEV_STATE_ERROR, lifecycle->get_state(nullptr));
+
+    nx_power_t* power = gpio->read.get_power(&gpio->read);
+    ASSERT_NE(nullptr, power);
+    EXPECT_EQ(NX_ERR_NULL_PTR, power->enable(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, power->disable(nullptr));
+    EXPECT_FALSE(power->is_enabled(nullptr));
+    EXPECT_EQ(NX_ERR_NULL_PTR, power->set_callback(nullptr, nullptr, nullptr));
 }
 
 TEST_F(GPIOTest, InvalidPortHandling) {
@@ -402,43 +542,28 @@ TEST_F(GPIOTest, DoubleSuspend) {
 /*---------------------------------------------------------------------------*/
 
 TEST_F(GPIOTest, MultipleGPIOInstances) {
-    /* Get multiple GPIO instances */
-    nx_gpio_t* gpio1 = nx_factory_gpio('A', 1);
-    nx_gpio_t* gpio2 = nx_factory_gpio('A', 2);
-    nx_gpio_t* gpio3 = nx_factory_gpio('B', 0);
+    /* The Native baseline enables A0 and A2. Disabled pins are not devices.
+     * A0 was initialized by SetUp; initialize the other supported pin. */
+    nx_gpio_t* other = nx_factory_gpio('A', 2);
+    ASSERT_NE(nullptr, other);
+    ASSERT_NE(gpio, other);
+    nx_lifecycle_t* other_lifecycle = other->write.get_lifecycle(&other->write);
+    ASSERT_NE(nullptr, other_lifecycle);
+    ASSERT_EQ(NX_OK, other_lifecycle->init(other_lifecycle));
 
-    ASSERT_NE(nullptr, gpio1);
-    ASSERT_NE(nullptr, gpio2);
-    ASSERT_NE(nullptr, gpio3);
+    gpio->write.write(&gpio->write, 0);
+    other->write.write(&other->write, 1);
+    EXPECT_EQ(0, gpio->read.read(&gpio->read));
+    EXPECT_EQ(1, other->read.read(&other->read));
 
-    /* Initialize all */
-    nx_lifecycle_t* lc1 = gpio1->write.get_lifecycle(&gpio1->write);
-    nx_lifecycle_t* lc2 = gpio2->write.get_lifecycle(&gpio2->write);
-    nx_lifecycle_t* lc3 = gpio3->write.get_lifecycle(&gpio3->write);
-
-    ASSERT_EQ(NX_OK, lc1->init(lc1));
-    ASSERT_EQ(NX_OK, lc2->init(lc2));
-    ASSERT_EQ(NX_OK, lc3->init(lc3));
-
-    /* Write different values */
-    gpio1->write.write(&gpio1->write, 0);
-    gpio2->write.write(&gpio2->write, 1);
-    gpio3->write.write(&gpio3->write, 1);
-
-    /* Verify each has correct state */
-    native_gpio_state_t state1, state2, state3;
-    EXPECT_EQ(NX_OK, native_gpio_get_state(0, 1, &state1));
-    EXPECT_EQ(NX_OK, native_gpio_get_state(0, 2, &state2));
-    EXPECT_EQ(NX_OK, native_gpio_get_state(1, 0, &state3));
-
-    EXPECT_EQ(0, state1.pin_state);
-    EXPECT_EQ(1, state2.pin_state);
-    EXPECT_EQ(1, state3.pin_state);
-
-    /* Cleanup */
-    lc1->deinit(lc1);
-    lc2->deinit(lc2);
-    lc3->deinit(lc3);
+    /* Changing or deinitializing one instance must not affect the other. */
+    gpio->write.toggle(&gpio->write);
+    EXPECT_EQ(1, gpio->read.read(&gpio->read));
+    EXPECT_EQ(1, other->read.read(&other->read));
+    ASSERT_EQ(NX_OK, other_lifecycle->deinit(other_lifecycle));
+    nx_lifecycle_t* lifecycle = gpio->write.get_lifecycle(&gpio->write);
+    ASSERT_NE(nullptr, lifecycle);
+    EXPECT_EQ(NX_DEV_STATE_RUNNING, lifecycle->get_state(lifecycle));
 }
 
 TEST_F(GPIOTest, RapidToggle) {
@@ -473,4 +598,47 @@ TEST_F(GPIOTest, MultipleInterruptRegistrations) {
     native_gpio_state_t state;
     EXPECT_EQ(NX_OK, native_gpio_get_state(0, 0, &state));
     EXPECT_EQ(NX_GPIO_TRIGGER_FALLING, state.trigger);
+}
+
+TEST_F(GPIOTest, DeviceRegistrationRejectsNullDescriptorAndConfiguration) {
+    const nx_device_t* registered = nx_device_find("GPIOA0");
+    ASSERT_NE(nullptr, registered);
+    ASSERT_NE(nullptr, registered->construct);
+    EXPECT_EQ(nullptr, registered->device_init);
+    gpio->write.write(&gpio->write, 1);
+    void* output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(nullptr, &output));
+    EXPECT_EQ(nullptr, output);
+    EXPECT_EQ(NX_ERR_NULL_PTR, registered->construct(registered, nullptr));
+
+    nx_device_t malformed = *registered;
+    malformed.config = nullptr;
+    output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(&malformed, &output));
+    EXPECT_EQ(nullptr, output);
+
+    malformed = *registered;
+    malformed.state = nullptr;
+    output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(&malformed, &output));
+    EXPECT_EQ(nullptr, output);
+
+    ASSERT_NE(nullptr, registered->config);
+    auto invalid_config =
+        *static_cast<const nx_gpio_platform_config_t*>(registered->config);
+    invalid_config.pin = 16;
+    malformed = *registered;
+    malformed.config = &invalid_config;
+    output = gpio;
+    EXPECT_EQ(NX_ERR_INVALID_PARAM, registered->construct(&malformed, &output));
+    EXPECT_EQ(nullptr, output);
+
+    /* Rejected binding leaves the existing initialized pin and value intact. */
+    nx_gpio_read_write_t* pin = nx_factory_gpio_read_write('A', 0);
+    ASSERT_EQ(gpio, pin);
+    nx_lifecycle_t* lifecycle = pin->write.get_lifecycle(&pin->write);
+    EXPECT_EQ(NX_DEV_STATE_RUNNING, lifecycle->get_state(lifecycle));
+    EXPECT_EQ(1, pin->read.read(&pin->read));
+    pin->write.write(&pin->write, 0);
+    EXPECT_EQ(0, pin->read.read(&pin->read));
 }

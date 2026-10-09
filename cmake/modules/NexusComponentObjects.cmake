@@ -1,0 +1,21 @@
+# Private firmware assembly rule shared by every platform. Explicit interface
+# object injection retains startup-independent registry and strong IRQ symbols.
+function(nexus_forward_component_objects assembly)
+    get_target_property(assembly_type "${assembly}" TYPE)
+    if(NOT assembly_type STREQUAL "OBJECT_LIBRARY")
+        message(FATAL_ERROR "Firmware assembly ${assembly} must be an OBJECT library")
+    endif()
+    foreach(component IN LISTS ARGN)
+        get_target_property(component_type "${component}" TYPE)
+        if(NOT component_type STREQUAL "OBJECT_LIBRARY")
+            message(FATAL_ERROR "Firmware component ${component} must be an OBJECT library")
+        endif()
+        # Forward the named target as well as its objects. The target supplies
+        # the build dependency when a consumer builds only its executable
+        # (not ALL), including with Unix Makefiles; transitive OBJECT targets
+        # carry usage requirements while the expression injects objects once.
+        target_link_libraries("${assembly}" INTERFACE
+            "${component}" "$<TARGET_OBJECTS:${component}>")
+    endforeach()
+    set_property(TARGET "${assembly}" PROPERTY NEXUS_COMPONENT_OBJECT_TARGETS "${ARGN}")
+endfunction()

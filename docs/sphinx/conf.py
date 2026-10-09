@@ -15,8 +15,8 @@ from pathlib import Path
 project = 'Nexus Embedded Platform'
 copyright = '2026, Nexus Team'
 author = 'Nexus Team'
-version = '1.0.0'
-release = '1.0.0'
+version = '0.1.0'
+release = '0.1.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -94,7 +94,7 @@ html_css_files = [
 html_theme_options = {
     'logo_name': True,
     'description': 'World-class Embedded Software Development Platform',
-    'github_user': 'nexus-team',
+    'github_user': 'X-Gen-Lab',
     'github_repo': 'nexus',
     'github_button': True,
     'github_type': 'star',
@@ -148,7 +148,7 @@ html_show_sphinx = True
 # Add "Edit on GitHub" links
 html_context.update({
     'display_github': True,
-    'github_user': 'nexus-team',
+    'github_user': 'X-Gen-Lab',
     'github_repo': 'nexus',
     'github_version': 'main',
     'conf_py_path': '/docs/sphinx/',
@@ -164,13 +164,8 @@ breathe_projects = {
 breathe_default_project = 'nexus'
 breathe_default_members = ('members', 'undoc-members')
 
-# Suppress breathe warnings if Doxygen XML not found
-# Also suppress duplicate C++ declaration warnings from forward declarations
-suppress_warnings = [
-    'breathe.doxygen',
-    'cpp.duplicate_declaration',
-    'ref.cpp'
-]
+# Missing API XML, invalid references and duplicate declarations fail strict builds.
+suppress_warnings = []
 
 # -- Mermaid configuration ---------------------------------------------------
 # Mermaid is used for creating diagrams from text descriptions

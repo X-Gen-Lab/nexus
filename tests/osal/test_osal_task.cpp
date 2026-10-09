@@ -55,7 +55,7 @@ static void simple_task_func(void* arg) {
 static void running_task_func(void* arg) {
     (void)arg;
     s_task_running = true;
-    while (s_task_running) {
+    while (s_task_running && !osal_task_should_stop()) {
         osal_task_delay(10);
     }
     s_task_completed = true;
@@ -78,6 +78,14 @@ static void handle_task_func(void* arg) {
     (void)arg;
     s_stored_handle = osal_task_get_current();
     s_task_completed = true;
+}
+
+static osal_status_t stop_join_delete(osal_task_handle_t handle) {
+    osal_status_t stop = osal_task_request_stop(handle);
+    if (stop != OSAL_OK) return stop;
+    osal_status_t joined = osal_task_join(handle, 2000);
+    if (joined != OSAL_OK) return joined;
+    return osal_task_delete(handle);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -115,7 +123,7 @@ TEST_F(OsalTaskTest, CreateWithValidConfig) {
     EXPECT_EQ(1, s_task_counter.load());
 
     /* Clean up */
-    osal_task_delete(handle);
+    stop_join_delete(handle);
 }
 
 /**
@@ -187,7 +195,7 @@ TEST_F(OsalTaskTest, CreateWithDifferentPriorities) {
 
     /* Wait and clean up */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    osal_task_delete(handle_low);
+    stop_join_delete(handle_low);
 
     s_task_completed = false;
 
@@ -203,7 +211,7 @@ TEST_F(OsalTaskTest, CreateWithDifferentPriorities) {
 
     /* Wait and clean up */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    osal_task_delete(handle_high);
+    stop_join_delete(handle_high);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -234,7 +242,7 @@ TEST_F(OsalTaskTest, DeleteTask) {
     s_task_running = false;
 
     /* Delete task */
-    EXPECT_EQ(OSAL_OK, osal_task_delete(handle));
+    EXPECT_EQ(OSAL_OK, stop_join_delete(handle));
 }
 
 /**
@@ -243,7 +251,7 @@ TEST_F(OsalTaskTest, DeleteTask) {
 TEST_F(OsalTaskTest, DeleteWithNullHandle) {
     /* Deleting with NULL handle should try to delete current task,
      * which may fail if not called from a task context */
-    EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, osal_task_delete(nullptr));
+    EXPECT_EQ(OSAL_ERROR_INVALID_PARAM, stop_join_delete(nullptr));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -277,7 +285,7 @@ TEST_F(OsalTaskTest, SuspendTask) {
     s_task_running = false;
     osal_task_resume(handle);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    osal_task_delete(handle);
+    stop_join_delete(handle);
 }
 
 /**
@@ -310,7 +318,7 @@ TEST_F(OsalTaskTest, ResumeTask) {
     /* Clean up */
     s_task_running = false;
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    osal_task_delete(handle);
+    stop_join_delete(handle);
 }
 
 /**
@@ -366,7 +374,7 @@ TEST_F(OsalTaskTest, TaskDelay) {
     /* Delay should be at least the specified time (with some tolerance) */
     EXPECT_GE(elapsed_ms, delay_ms - 20);
 
-    osal_task_delete(handle);
+    stop_join_delete(handle);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -404,7 +412,7 @@ TEST_F(OsalTaskTest, GetCurrentTask) {
     /* The stored handle should match the created handle */
     EXPECT_EQ(handle, s_stored_handle);
 
-    osal_task_delete(handle);
+    stop_join_delete(handle);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -432,7 +440,7 @@ TEST_F(OsalTaskTest, GetTaskName) {
 
     /* Wait for task to complete */
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    osal_task_delete(handle);
+    stop_join_delete(handle);
 }
 
 /**
@@ -499,6 +507,6 @@ TEST_F(OsalTaskTest, CreateMultipleTasks) {
 
     /* Clean up */
     for (int i = 0; i < num_tasks; i++) {
-        osal_task_delete(handles[i]);
+        stop_join_delete(handles[i]);
     }
 }

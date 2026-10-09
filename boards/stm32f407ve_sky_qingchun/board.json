@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "stm32f407ve-sky-qingchun",
+  "soc": "stm32f407ve",
+  "hse_hz": 8000000,
+  "interface_target": "board_stm32f407ve_sky_qingchun",
+  "object_targets": [
+    "board_stm32f407ve_sky_qingchun_wiring"
+  ],
+  "inputs": [
+    "CMakeLists.txt",
+    "nexus_board.h",
+    "board.c",
+    "uart.c"
+  ],
+  "resources": [
+    {
+      "id": "status-led",
+      "kind": "gpio",
+      "when": "CONFIG_STM32_GPIO_ENABLE",
+      "pins": [
+        {
+          "port": "B",
+          "pin": 2,
+          "af": 0,
+          "signal": "led",
+          "initial": 0
+        }
+      ]
+    },
+    {
+      "id": "console",
+      "kind": "uart",
+      "instance": 0,
+      "when": "CONFIG_STM32_UART_ENABLE",
+      "clock": "USART1",
+      "irq": 37,
+      "priority": 5,
+      "pins": [
+        {
+          "port": "A",
+          "pin": 9,
+          "af": 7,
+          "signal": "tx"
+        },
+        {
+          "port": "A",
+          "pin": 10,
+          "af": 7,
+          "signal": "rx"
+        }
+      ]
+    }
+  ]
+}

@@ -88,7 +88,10 @@ log_status_t log_init(const log_config_t* config);
 /**
  * \brief           Deinitialize the log system
  * \return          LOG_OK on success, error code otherwise
- * \note            Flushes pending messages and releases resources
+ * \note            Task context; rejects new producers, drains accepted entries,
+ *                  cooperatively joins the worker and releases resources.
+ *                  BUSY/TIMEOUT retain ownership; retry from a management task.
+ *                  Callback reentry returns BUSY. No fixed sleep is a join.
  */
 log_status_t log_deinit(void);
 
@@ -239,6 +242,8 @@ log_status_t log_write_raw(const char* msg, size_t len);
 
 /**
  * \brief           Flush all pending async messages
+ * \note            Task context. A FIFO acknowledgement includes backend writes
+ *                  and flush callbacks. Queue empty alone is not completion.
  * \return          LOG_OK on success, error code otherwise
  * \note            Blocks until all messages are processed
  */

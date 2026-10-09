@@ -1,6 +1,13 @@
 Kconfig Tools Reference
 =======================
 
+.. note::
+
+   These helpers generate draft Kconfig text, not implemented peripheral support
+   or the authoritative build configuration. Only maintained SoC/controller
+   Kconfig and reviewed Board routes are selectable. Templates mentioning other
+   chips/platforms or legacy peripherals do not add Nexus providers.
+
 This guide provides detailed documentation for all Kconfig configuration tools in the Nexus Embedded Platform.
 
 .. contents:: Table of Contents

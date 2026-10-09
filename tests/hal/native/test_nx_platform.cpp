@@ -19,12 +19,11 @@ extern "C" {
 #include "hal/base/nx_device.h"
 #include "hal/nx_factory.h"
 #include "hal/nx_status.h"
+#include "hal/nx_hal.h"
 #include "hal/resource/nx_dma_manager.h"
 #include "hal/resource/nx_isr_manager.h"
 
 /* Platform initialization functions */
-nx_status_t nx_platform_init(void);
-nx_status_t nx_platform_deinit(void);
 bool nx_platform_is_initialized(void);
 
 /* ISR simulation function */
@@ -48,12 +47,12 @@ class PlatformInitTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Ensure platform is deinitialized before each test */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 
     void TearDown() override {
         /* Clean up after each test */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 };
 
@@ -62,7 +61,7 @@ TEST_F(PlatformInitTest, InitializeSuccess) {
     EXPECT_FALSE(nx_platform_is_initialized());
 
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
 
     /* Platform should be initialized */
     EXPECT_TRUE(nx_platform_is_initialized());
@@ -70,21 +69,21 @@ TEST_F(PlatformInitTest, InitializeSuccess) {
 
 TEST_F(PlatformInitTest, InitializeIdempotent) {
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
     EXPECT_TRUE(nx_platform_is_initialized());
 
     /* Initialize again - should succeed (idempotent) */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
     EXPECT_TRUE(nx_platform_is_initialized());
 }
 
 TEST_F(PlatformInitTest, DeinitializeSuccess) {
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
     EXPECT_TRUE(nx_platform_is_initialized());
 
     /* Deinitialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_deinit());
+    EXPECT_EQ(NX_OK, nx_hal_deinit());
 
     /* Platform should not be initialized */
     EXPECT_FALSE(nx_platform_is_initialized());
@@ -92,24 +91,24 @@ TEST_F(PlatformInitTest, DeinitializeSuccess) {
 
 TEST_F(PlatformInitTest, DeinitializeIdempotent) {
     /* Initialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_init());
+    EXPECT_EQ(NX_OK, nx_hal_init());
 
     /* Deinitialize platform */
-    EXPECT_EQ(NX_OK, nx_platform_deinit());
+    EXPECT_EQ(NX_OK, nx_hal_deinit());
     EXPECT_FALSE(nx_platform_is_initialized());
 
     /* Deinitialize again - should succeed (idempotent) */
-    EXPECT_EQ(NX_OK, nx_platform_deinit());
+    EXPECT_EQ(NX_OK, nx_hal_deinit());
     EXPECT_FALSE(nx_platform_is_initialized());
 }
 
 TEST_F(PlatformInitTest, InitDeinitCycle) {
     /* Test multiple init/deinit cycles */
     for (int i = 0; i < 3; i++) {
-        EXPECT_EQ(NX_OK, nx_platform_init());
+        EXPECT_EQ(NX_OK, nx_hal_init());
         EXPECT_TRUE(nx_platform_is_initialized());
 
-        EXPECT_EQ(NX_OK, nx_platform_deinit());
+        EXPECT_EQ(NX_OK, nx_hal_deinit());
         EXPECT_FALSE(nx_platform_is_initialized());
     }
 }
@@ -125,12 +124,12 @@ class DeviceRegistrationTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize platform */
-        nx_platform_init();
+        nx_hal_init();
     }
 
     void TearDown() override {
         /* Deinitialize platform */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 };
 
@@ -194,6 +193,34 @@ TEST_F(DeviceRegistrationTest, FactoryFunctionsWork) {
     EXPECT_NE(nullptr, i2c);
 }
 
+TEST_F(DeviceRegistrationTest, FactoryUnknownMaximumIndicesDoNotAliasDevices) {
+    /* The widest uint8_t index must resolve its full name, never device zero. */
+    const uint8_t unknown = UINT8_MAX;
+    EXPECT_EQ(nullptr, nx_factory_gpio_read_write('A', unknown));
+    EXPECT_EQ(nullptr, nx_factory_gpio_read('A', unknown));
+    EXPECT_EQ(nullptr, nx_factory_gpio_write('A', unknown));
+    EXPECT_EQ(nullptr, nx_factory_uart(unknown));
+    EXPECT_EQ(nullptr, nx_factory_spi(unknown));
+    EXPECT_EQ(nullptr, nx_factory_i2c(unknown));
+    EXPECT_EQ(nullptr, nx_factory_timer(unknown));
+    EXPECT_EQ(nullptr, nx_factory_timer_pwm(unknown));
+    EXPECT_EQ(nullptr, nx_factory_timer_encoder(unknown));
+    EXPECT_EQ(nullptr, nx_factory_adc(unknown));
+    EXPECT_EQ(nullptr, nx_factory_flash(unknown));
+    EXPECT_EQ(nullptr, nx_factory_can(unknown));
+    EXPECT_EQ(nullptr, nx_factory_usb(unknown));
+    EXPECT_EQ(nullptr, nx_factory_rtc(unknown));
+    EXPECT_EQ(nullptr, nx_factory_watchdog(unknown));
+    EXPECT_EQ(nullptr, nx_factory_dac(unknown));
+    EXPECT_EQ(nullptr, nx_factory_sdio(unknown));
+    EXPECT_EQ(nullptr, nx_factory_crc(unknown));
+    EXPECT_EQ(nullptr, nx_factory_option_bytes(unknown));
+
+    EXPECT_EQ(nx_device_get("UART0"), nx_factory_uart(0));
+    EXPECT_EQ(nx_device_get("SPI0"), nx_factory_spi(0));
+    EXPECT_EQ(nx_device_get("I2C0"), nx_factory_i2c(0));
+}
+
 /*---------------------------------------------------------------------------*/
 /* DMA Channel Management Tests - Requirements 16.1-16.5                     */
 /*---------------------------------------------------------------------------*/
@@ -205,12 +232,12 @@ class DMAManagementTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize platform */
-        nx_platform_init();
+        nx_hal_init();
     }
 
     void TearDown() override {
         /* Deinitialize platform */
-        nx_platform_deinit();
+        nx_hal_deinit();
     }
 };
 
@@ -404,7 +431,7 @@ class ISRManagementTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize platform */
-        nx_platform_init();
+        nx_hal_init();
 
         /* Get ISR manager */
         isr_mgr = nx_isr_manager_get();
@@ -412,191 +439,73 @@ class ISRManagementTest : public ::testing::Test {
     }
 
     void TearDown() override {
-        /* Deinitialize platform */
-        nx_platform_deinit();
+        for (uint32_t irq=0; irq<64; ++irq) (void)isr_mgr->disconnect(isr_mgr,irq);
+        nx_hal_deinit();
     }
 
     nx_isr_manager_t* isr_mgr = nullptr;
 };
 
-TEST_F(ISRManagementTest, ConnectISR) {
-    /* Connect ISR handler */
-    bool handler_called = false;
-    auto handler = [](void* user_data) {
-        bool* flag = static_cast<bool*>(user_data);
-        *flag = true;
-    };
-
-    nx_isr_handle_t* handle = isr_mgr->connect(
-        isr_mgr, 10, handler, &handler_called, NX_ISR_PRIORITY_NORMAL);
-
-    EXPECT_NE(nullptr, handle);
-
-    /* Disconnect ISR */
-    if (handle != nullptr) {
-        EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, handle));
-    }
-}
-
-TEST_F(ISRManagementTest, TriggerISR) {
-    /* Connect ISR handler */
-    bool handler_called = false;
-    auto handler = [](void* user_data) {
-        bool* flag = static_cast<bool*>(user_data);
-        *flag = true;
-    };
-
-    nx_isr_handle_t* handle = isr_mgr->connect(
-        isr_mgr, 10, handler, &handler_called, NX_ISR_PRIORITY_NORMAL);
-
-    ASSERT_NE(nullptr, handle);
-
-    /* Enable interrupt */
-    EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, 10));
-
-    /* Simulate interrupt */
+TEST_F(ISRManagementTest, ConnectEnablesAndPreservesContext) {
+    unsigned calls=0;
+    auto handler=[](void* context) { ++*static_cast<unsigned*>(context); };
+    ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,10,handler,&calls,5));
     nx_isr_simulate(10);
-
-    /* Handler should have been called */
-    EXPECT_TRUE(handler_called);
-
-    /* Disconnect ISR */
-    EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, handle));
-}
-
-TEST_F(ISRManagementTest, MultipleHandlersSameIRQ) {
-    /* Connect multiple handlers to same IRQ */
-    struct CallData {
-        int* call_order_ptr;
-        int* handler_order_ptr;
-    };
-
-    int call_order = 0;
-    int handler1_order = 0;
-    int handler2_order = 0;
-
-    CallData data1 = {&call_order, &handler1_order};
-    CallData data2 = {&call_order, &handler2_order};
-
-    auto handler = [](void* user_data) {
-        CallData* data = static_cast<CallData*>(user_data);
-        *(data->handler_order_ptr) = ++(*(data->call_order_ptr));
-    };
-
-    nx_isr_handle_t* h1 =
-        isr_mgr->connect(isr_mgr, 10, handler, &data1, NX_ISR_PRIORITY_HIGH);
-    nx_isr_handle_t* h2 =
-        isr_mgr->connect(isr_mgr, 10, handler, &data2, NX_ISR_PRIORITY_NORMAL);
-
-    ASSERT_NE(nullptr, h1);
-    ASSERT_NE(nullptr, h2);
-
-    /* Enable interrupt */
-    EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, 10));
-
-    /* Simulate interrupt */
+    EXPECT_EQ(1U,calls);
+    ASSERT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,10));
     nx_isr_simulate(10);
-
-    /* Both handlers should have been called */
-    EXPECT_GT(handler1_order, 0);
-    EXPECT_GT(handler2_order, 0);
-
-    /* Higher priority handler should be called first */
-    EXPECT_LT(handler1_order, handler2_order);
-
-    /* Disconnect ISRs */
-    EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, h1));
-    EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, h2));
+    EXPECT_EQ(1U,calls);
 }
-
-TEST_F(ISRManagementTest, DisableInterrupt) {
-    /* Connect ISR handler */
-    bool handler_called = false;
-    auto handler = [](void* user_data) {
-        bool* flag = static_cast<bool*>(user_data);
-        *flag = true;
-    };
-
-    nx_isr_handle_t* handle = isr_mgr->connect(
-        isr_mgr, 10, handler, &handler_called, NX_ISR_PRIORITY_NORMAL);
-
-    ASSERT_NE(nullptr, handle);
-
-    /* Enable then disable interrupt */
-    EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, 10));
-    EXPECT_EQ(NX_OK, isr_mgr->disable(isr_mgr, 10));
-
-    /* Simulate interrupt */
+TEST_F(ISRManagementTest, DuplicateOwnerRejected) {
+    unsigned first=0,second=0;
+    auto handler=[](void* context) { ++*static_cast<unsigned*>(context); };
+    ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,10,handler,&first,5));
+    EXPECT_EQ(NX_ERR_BUSY,isr_mgr->connect(isr_mgr,10,handler,&second,0));
     nx_isr_simulate(10);
-
-    /* Handler should NOT have been called (interrupt disabled) */
-    EXPECT_FALSE(handler_called);
-
-    /* Disconnect ISR */
-    EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, handle));
+    EXPECT_EQ(1U,first); EXPECT_EQ(0U,second);
+    EXPECT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,10));
 }
-
-TEST_F(ISRManagementTest, DisconnectHandler) {
-    /* Connect ISR handler */
-    struct CallData {
-        bool* flag_ptr;
+TEST_F(ISRManagementTest, IndependentIRQs) {
+    unsigned first=0,second=0;
+    auto handler=[](void* context) { ++*static_cast<unsigned*>(context); };
+    ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,10,handler,&first,0));
+    ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,11,handler,&second,15));
+    nx_isr_simulate(10); nx_isr_simulate(11); nx_isr_simulate(11);
+    EXPECT_EQ(1U,first); EXPECT_EQ(2U,second);
+    EXPECT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,10));
+    EXPECT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,11));
+}
+TEST_F(ISRManagementTest, DisconnectCannotReclaimRunningCallback) {
+    nx_status_t observed=NX_OK;
+    auto handler=[](void* context) {
+        auto result=static_cast<nx_status_t*>(context);
+        nx_isr_manager_t* manager=nx_isr_manager_get();
+        *result=manager->disconnect(manager,10);
+        nx_isr_simulate(10); // Recursion must not invoke the handler again.
     };
-
-    bool handler_called = false;
-    CallData data = {&handler_called};
-
-    auto handler = [](void* user_data) {
-        CallData* d = static_cast<CallData*>(user_data);
-        *(d->flag_ptr) = true;
-    };
-
-    nx_isr_handle_t* handle =
-        isr_mgr->connect(isr_mgr, 10, handler, &data, NX_ISR_PRIORITY_NORMAL);
-
-    ASSERT_NE(nullptr, handle);
-
-    /* Enable interrupt */
-    EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, 10));
-
-    /* Disconnect handler */
-    EXPECT_EQ(NX_OK, isr_mgr->disconnect(isr_mgr, handle));
-
-    /* Simulate interrupt */
+    ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,10,handler,&observed,5));
     nx_isr_simulate(10);
-
-    /* Handler should NOT have been called (disconnected) */
-    EXPECT_FALSE(handler_called);
+    EXPECT_EQ(NX_ERR_BUSY,observed);
+    EXPECT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,10));
 }
-
-TEST_F(ISRManagementTest, SetPriority) {
-    /* Set interrupt priority */
-    EXPECT_EQ(NX_OK, isr_mgr->set_priority(isr_mgr, 10, 5));
-    EXPECT_EQ(NX_OK, isr_mgr->set_priority(isr_mgr, 11, 10));
-}
-
 TEST_F(ISRManagementTest, InvalidParameters) {
-    /* Try to connect with NULL function */
-    nx_isr_handle_t* h1 =
-        isr_mgr->connect(isr_mgr, 10, nullptr, nullptr, NX_ISR_PRIORITY_NORMAL);
-    EXPECT_EQ(nullptr, h1);
-
-    /* Try to connect with invalid IRQ */
-    auto handler = [](void* user_data) { (void)user_data; };
-    nx_isr_handle_t* h2 = isr_mgr->connect(isr_mgr, 999, handler, nullptr,
-                                           NX_ISR_PRIORITY_NORMAL);
-    EXPECT_EQ(nullptr, h2);
-
-    /* Try to disconnect NULL handle */
-    EXPECT_NE(NX_OK, isr_mgr->disconnect(isr_mgr, nullptr));
-
-    /* Try to set invalid priority */
-    EXPECT_NE(NX_OK, isr_mgr->set_priority(isr_mgr, 10, 255));
+    auto handler=[](void*) {};
+    EXPECT_EQ(NX_ERR_NULL_PTR,isr_mgr->connect(isr_mgr,10,nullptr,nullptr,5));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,isr_mgr->connect(isr_mgr,64,handler,nullptr,5));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,isr_mgr->connect(isr_mgr,10,handler,nullptr,16));
+    EXPECT_EQ(NX_ERR_INVALID_PARAM,isr_mgr->disconnect(isr_mgr,64));
+    EXPECT_EQ(NX_ERR_NOT_FOUND,isr_mgr->disconnect(isr_mgr,10));
 }
-
-TEST_F(ISRManagementTest, EnableDisableCycle) {
-    /* Test multiple enable/disable cycles */
-    for (int i = 0; i < 3; i++) {
-        EXPECT_EQ(NX_OK, isr_mgr->enable(isr_mgr, 10));
-        EXPECT_EQ(NX_OK, isr_mgr->disable(isr_mgr, 10));
+TEST_F(ISRManagementTest, ReconnectChangesContextOnlyAfterDisconnect) {
+    unsigned first=0,second=0;
+    auto handler=[](void* context) { ++*static_cast<unsigned*>(context); };
+    for(unsigned i=0;i<100;++i) {
+        ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,10,handler,&first,5));
+        nx_isr_simulate(10);
+        ASSERT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,10));
+        ASSERT_EQ(NX_OK,isr_mgr->connect(isr_mgr,10,handler,&second,15));
+        nx_isr_simulate(10);
+        ASSERT_EQ(NX_OK,isr_mgr->disconnect(isr_mgr,10));
     }
+    EXPECT_EQ(100U,first); EXPECT_EQ(100U,second);
 }

@@ -1,274 +1,119 @@
 #!/usr/bin/env python3
-"""
-\file            quick_start.py
-\brief           快速开始示例脚本
-\author          Nexus Team
-\version         1.0.0
-\date            2026-01-20
-
-\copyright       Copyright (c) 2026 Nexus Team
-
-\details         此脚本提供交互式菜单，帮助用户快速上手 Kconfig 工具系统。
-"""
-
-import os
-import sys
+"""Interactive entry point for scaffold examples and strict product validation."""
+import argparse
 from pathlib import Path
+import re
+import subprocess
+import sys
 
-/* 添加父目录到 Python 路径 */
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-
-def print_menu():
-    """
-    \brief           打印主菜单
-    """
-    print("\n" + "=" * 60)
-    print("Kconfig 命名规范系统 - 快速开始")
-    print("=" * 60)
-    print("\n请选择操作:")
-    print("  1. 生成单个外设 Kconfig 文件")
-    print("  2. 批量生成所有外设 Kconfig 文件")
-    print("  3. 验证单个 Kconfig 文件")
-    print("  4. 验证项目所有 Kconfig 文件")
-    print("  5. 查看命名规范说明")
-    print("  6. 查看示例配置文件")
-    print("  0. 退出")
-    print("=" * 60)
+ROOT = Path(__file__).resolve().parents[3]
+EXAMPLES = Path(__file__).resolve().parent
+PERIPHERALS = ("UART", "GPIO", "SPI", "I2C", "ADC", "DAC", "CRC", "WATCHDOG")
+CONFIG_FILES = ("batch_config.yaml", "stm32_config.yaml", "minimal_config.yaml", "custom_peripheral.json")
 
 
-def generate_single_peripheral():
-    """
-    \brief           生成单个外设配置
-    """
-    print("\n生成单个外设 Kconfig 文件")
-    print("-" * 60)
-
-    /* 外设类型选择 */
-    print("\n支持的外设类型:")
-    peripherals = ["UART", "GPIO", "SPI", "I2C", "ADC", "DAC", "CRC", "WATCHDOG"]
-    for i, p in enumerate(peripherals, 1):
-        print(f"  {i}. {p}")
-
-    choice = input("\n请选择外设类型 (1-8): ").strip()
+def select(items, prompt):
+    for index, item in enumerate(items, 1):
+        print(f"  {index}. {item}")
     try:
-        peripheral = peripherals[int(choice) - 1]
-    except (ValueError, IndexError):
-        print("无效的选择！")
-        return
-
-    /* 平台选择 */
-    platform = input("请输入平台名称 (如 NATIVE, STM32): ").strip().upper()
-    if not platform:
-        print("平台名称不能为空！")
-        return
-
-    /* 实例数量 */
-    instances = input(f"请输入实例数量 (默认 2): ").strip()
-    instances = int(instances) if instances else 2
-
-    /* 输出路径 */
-    output = input(f"请输入输出文件路径 (默认 output/{peripheral.lower()}_kconfig): ").strip()
-    if not output:
-        output = f"output/{peripheral.lower()}_kconfig"
-
-    /* 生成命令 */
-    cmd = f"python scripts/kconfig_tools/cli.py generate -p {peripheral} -P {platform} -n {instances} -o {output}"
-    print(f"\n执行命令: {cmd}")
-    os.system(cmd)
+        value = int(input(prompt).strip())
+    except ValueError:
+        print("请输入菜单范围内的整数。")
+        return None
+    if value == 0:
+        return None
+    if not 1 <= value <= len(items):
+        print("选择超出范围。")
+        return None
+    return items[value - 1]
 
 
-def batch_generate_all():
-    """
-    \brief           批量生成所有外设
-    """
-    print("\n批量生成所有外设 Kconfig 文件")
-    print("-" * 60)
-
-    platform = input("请输入平台名称 (如 NATIVE, STM32): ").strip().upper()
-    if not platform:
-        print("平台名称不能为空！")
-        return
-
-    output_dir = input(f"请输入输出目录 (默认 output_{platform.lower()}): ").strip()
-    if not output_dir:
-        output_dir = f"output_{platform.lower()}"
-
-    /* 使用示例脚本 */
-    cmd = f"python scripts/kconfig_tools/examples/generate_all_peripherals.py {platform} {output_dir}"
-    print(f"\n执行命令: {cmd}")
-    os.system(cmd)
-
-
-def validate_single_file():
-    """
-    \brief           验证单个文件
-    """
-    print("\n验证单个 Kconfig 文件")
-    print("-" * 60)
-
-    file_path = input("请输入 Kconfig 文件路径: ").strip()
-    if not file_path:
-        print("文件路径不能为空！")
-        return
-
-    if not os.path.isfile(file_path):
-        print(f"文件不存在: {file_path}")
-        return
-
-    cmd = f"python scripts/kconfig_tools/cli.py validate -f {file_path}"
-    print(f"\n执行命令: {cmd}")
-    os.system(cmd)
-
-
-def validate_project():
-    """
-    \brief           验证项目所有文件
-    """
-    print("\n验证项目所有 Kconfig 文件")
-    print("-" * 60)
-
-    directory = input("请输入项目目录路径 (如 platforms/): ").strip()
-    if not directory:
-        print("目录路径不能为空！")
-        return
-
-    if not os.path.isdir(directory):
-        print(f"目录不存在: {directory}")
-        return
-
-    save_report = input("是否保存详细报告? (y/n, 默认 n): ").strip().lower()
-    report_file = ""
-    if save_report == 'y':
-        report_file = input("请输入报告文件路径 (默认 validation_report.txt): ").strip()
-        if not report_file:
-            report_file = "validation_report.txt"
-
-    /* 使用示例脚本 */
-    if report_file:
-        cmd = f"python scripts/kconfig_tools/examples/validate_project.py {directory} --report {report_file}"
-    else:
-        cmd = f"python scripts/kconfig_tools/examples/validate_project.py {directory}"
-
-    print(f"\n执行命令: {cmd}")
-    os.system(cmd)
-
-
-def show_naming_rules():
-    """
-    \brief           显示命名规范说明
-    """
-    print("\n" + "=" * 60)
-    print("Kconfig 命名规范说明")
-    print("=" * 60)
-
-    print("\n1. 平台级配置符号:")
-    print("   - 平台使能: {PLATFORM}_ENABLE")
-    print("     示例: NATIVE_ENABLE")
-    print("   - 平台特性: {PLATFORM}_{FEATURE}_ENABLE")
-    print("     示例: NATIVE_UART_ENABLE")
-
-    print("\n2. 外设级配置符号:")
-    print("   - 外设使能: {PLATFORM}_{PERIPHERAL}_ENABLE")
-    print("     示例: NATIVE_UART_ENABLE")
-    print("   - 最大实例数: {PLATFORM}_{PERIPHERAL}_MAX_INSTANCES")
-    print("     示例: NATIVE_UART_MAX_INSTANCES")
-
-    print("\n3. 实例级配置符号:")
-    print("   - 实例使能: INSTANCE_NX_{PERIPHERAL}_{N}")
-    print("     示例: INSTANCE_NX_UART_0")
-    print("   - 实例参数: {PERIPHERAL}{N}_{PARAMETER}")
-    print("     示例: UART0_BAUDRATE")
-
-    print("\n4. 选择项命名:")
-    print("   - 选择项选项: NX_{PERIPHERAL}{N}_{CATEGORY}_{OPTION}")
-    print("     示例: NX_UART0_PARITY_NONE")
-    print("   - 选择项值: {PERIPHERAL}{N}_{CATEGORY}_VALUE")
-    print("     示例: UART0_PARITY_VALUE")
-
-    print("\n5. 特殊规则:")
-    print("   - GPIO 端口使用字母标识: GPIOA, GPIOB, GPIOC")
-    print("   - GPIO 引脚使用 PIN 前缀: GPIOA_PIN0_MODE")
-
-    input("\n按回车键返回主菜单...")
-
-
-def show_example_configs():
-    """
-    \brief           显示示例配置文件
-    """
-    print("\n" + "=" * 60)
-    print("示例配置文件")
-    print("=" * 60)
-
-    examples_dir = Path(__file__).parent
-    config_files = [
-        "batch_config.yaml",
-        "stm32_config.yaml",
-        "minimal_config.yaml",
-        "custom_peripheral.json"
-    ]
-
-    print("\n可用的示例配置文件:")
-    for i, config_file in enumerate(config_files, 1):
-        file_path = examples_dir / config_file
-        if file_path.exists():
-            print(f"  {i}. {config_file}")
-        else:
-            print(f"  {i}. {config_file} (未找到)")
-
-    choice = input("\n请选择要查看的配置文件 (1-4, 0 返回): ").strip()
-    if choice == '0':
-        return
-
+def run_script(script, *arguments):
+    command = [sys.executable, str(script), *map(str, arguments)]
+    print("执行:", command)
     try:
-        config_file = config_files[int(choice) - 1]
-        file_path = examples_dir / config_file
-
-        if not file_path.exists():
-            print(f"文件不存在: {file_path}")
-            input("\n按回车键返回主菜单...")
-            return
-
-        print(f"\n文件内容: {config_file}")
-        print("-" * 60)
-        with open(file_path, 'r', encoding='utf-8') as f:
-            print(f.read())
-
-    except (ValueError, IndexError):
-        print("无效的选择！")
-
-    input("\n按回车键返回主菜单...")
+        return subprocess.run(command, cwd=ROOT, check=False).returncode
+    except OSError as error:
+        print(f"执行失败: {error}", file=sys.stderr)
+        return 1
 
 
-def main():
-    """
-    \brief           主函数
-    """
+def platform_name():
+    value = input("平台符号 (NATIVE/STM32): ").strip().upper()
+    if not re.fullmatch(r"[A-Z][A-Z0-9_]*", value):
+        raise ValueError("平台必须是有效的 Kconfig 标识符")
+    return value
+
+
+def generate_single():
+    peripheral = select(PERIPHERALS, "外设序号 (0 返回): ")
+    if peripheral is None:
+        return 0
+    platform = platform_name()
+    value = input("实例数 (默认 1): ").strip()
+    try:
+        instances = int(value) if value else 1
+    except ValueError as error:
+        raise ValueError("实例数必须是正整数") from error
+    if instances < 1:
+        raise ValueError("实例数必须是正整数")
+    output = input("输出目录 (默认 build/kconfig-examples/single): ").strip() or "build/kconfig-examples/single"
+    return run_script(EXAMPLES / "generate_all_peripherals.py", platform, output,
+                      "--peripheral", peripheral, "--instances", instances)
+
+
+def generate_all():
+    platform = platform_name()
+    output = input("输出目录 (默认 build/kconfig-examples/all): ").strip() or "build/kconfig-examples/all"
+    return run_script(EXAMPLES / "generate_all_peripherals.py", platform, output)
+
+
+def validate_names():
+    path = input("待检查的 scaffold 文件或目录: ").strip()
+    if not path:
+        raise ValueError("路径不能为空")
+    return run_script(EXAMPLES / "validate_project.py", Path(path).resolve())
+
+
+def validate_product():
+    path = input("产品配置 fragment 路径: ").strip()
+    if not path:
+        raise ValueError("fragment 路径不能为空")
+    return run_script(ROOT / "scripts/nexus_config.py", "validate", "--config", Path(path).resolve())
+
+
+def show_examples():
+    name = select(CONFIG_FILES, "文件序号 (0 返回): ")
+    if name is not None:
+        print((EXAMPLES / name).read_text(encoding="utf-8"))
+    return 0
+
+
+def main(argv=None):
+    argparse.ArgumentParser(description=__doc__).parse_args(argv)
+    actions = (generate_single, generate_all, validate_names, validate_product, show_examples)
+    result = 0
     while True:
-        print_menu()
-        choice = input("\n请选择 (0-6): ").strip()
-
-        if choice == '0':
-            print("\n感谢使用！再见！")
-            break
-        elif choice == '1':
-            generate_single_peripheral()
-        elif choice == '2':
-            batch_generate_all()
-        elif choice == '3':
-            validate_single_file()
-        elif choice == '4':
-            validate_project()
-        elif choice == '5':
-            show_naming_rules()
-        elif choice == '6':
-            show_example_configs()
-        else:
-            print("\n无效的选择，请重试！")
-
-        input("\n按回车键继续...")
+        print("\n1. 单个外设草稿  2. 所有模板草稿  3. 命名 lint  4. 产品 fragment 严格验证  5. 查看模板  0. 退出")
+        try:
+            choice = input("请选择: ").strip()
+            if choice == "0":
+                return result
+            if not choice.isdecimal() or not 1 <= int(choice) <= len(actions):
+                print("请输入 0–5 范围内的整数。")
+                continue
+            status = actions[int(choice) - 1]()
+            if status:
+                result = 1
+                print(f"操作失败，退出码 {status}")
+        except (ValueError, OSError) as error:
+            result = 1
+            print(f"操作失败: {error}", file=sys.stderr)
+        except EOFError:
+            return result
+        except KeyboardInterrupt:
+            return 130
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

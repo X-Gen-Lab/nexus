@@ -2,7 +2,7 @@
 #
 # 此文件演示如何配置批量生成多个外设的 Kconfig 文件
 # 使用方法:
-#   python scripts/kconfig_tools/cli.py batch-generate -c examples/batch_config.yaml -o platforms/native/src/
+#   python scripts/kconfig_tools/cli.py batch-generate -c examples/batch_config.yaml -o soc/native/controllers/
 
 # 外设配置列表
 peripherals:

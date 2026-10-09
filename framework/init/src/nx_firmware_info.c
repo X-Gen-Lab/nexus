@@ -99,57 +99,57 @@ size_t nx_get_version_string(char* buf, size_t size) {
 
     /* Major version */
     if (major >= 100) {
-        temp[temp_len++] = '0' + (major / 100);
+        temp[temp_len++] = (char)('0' + (major / 100));
         major %= 100;
-        temp[temp_len++] = '0' + (major / 10);
-        temp[temp_len++] = '0' + (major % 10);
+        temp[temp_len++] = (char)('0' + (major / 10));
+        temp[temp_len++] = (char)('0' + (major % 10));
     } else if (major >= 10) {
-        temp[temp_len++] = '0' + (major / 10);
-        temp[temp_len++] = '0' + (major % 10);
+        temp[temp_len++] = (char)('0' + (major / 10));
+        temp[temp_len++] = (char)('0' + (major % 10));
     } else {
-        temp[temp_len++] = '0' + major;
+        temp[temp_len++] = (char)('0' + major);
     }
     temp[temp_len++] = '.';
 
     /* Minor version */
     if (minor >= 100) {
-        temp[temp_len++] = '0' + (minor / 100);
+        temp[temp_len++] = (char)('0' + (minor / 100));
         minor %= 100;
-        temp[temp_len++] = '0' + (minor / 10);
-        temp[temp_len++] = '0' + (minor % 10);
+        temp[temp_len++] = (char)('0' + (minor / 10));
+        temp[temp_len++] = (char)('0' + (minor % 10));
     } else if (minor >= 10) {
-        temp[temp_len++] = '0' + (minor / 10);
-        temp[temp_len++] = '0' + (minor % 10);
+        temp[temp_len++] = (char)('0' + (minor / 10));
+        temp[temp_len++] = (char)('0' + (minor % 10));
     } else {
-        temp[temp_len++] = '0' + minor;
+        temp[temp_len++] = (char)('0' + minor);
     }
     temp[temp_len++] = '.';
 
     /* Patch version */
     if (patch >= 100) {
-        temp[temp_len++] = '0' + (patch / 100);
+        temp[temp_len++] = (char)('0' + (patch / 100));
         patch %= 100;
-        temp[temp_len++] = '0' + (patch / 10);
-        temp[temp_len++] = '0' + (patch % 10);
+        temp[temp_len++] = (char)('0' + (patch / 10));
+        temp[temp_len++] = (char)('0' + (patch % 10));
     } else if (patch >= 10) {
-        temp[temp_len++] = '0' + (patch / 10);
-        temp[temp_len++] = '0' + (patch % 10);
+        temp[temp_len++] = (char)('0' + (patch / 10));
+        temp[temp_len++] = (char)('0' + (patch % 10));
     } else {
-        temp[temp_len++] = '0' + patch;
+        temp[temp_len++] = (char)('0' + patch);
     }
     temp[temp_len++] = '.';
 
     /* Build number */
     if (build >= 100) {
-        temp[temp_len++] = '0' + (build / 100);
+        temp[temp_len++] = (char)('0' + (build / 100));
         build %= 100;
-        temp[temp_len++] = '0' + (build / 10);
-        temp[temp_len++] = '0' + (build % 10);
+        temp[temp_len++] = (char)('0' + (build / 10));
+        temp[temp_len++] = (char)('0' + (build % 10));
     } else if (build >= 10) {
-        temp[temp_len++] = '0' + (build / 10);
-        temp[temp_len++] = '0' + (build % 10);
+        temp[temp_len++] = (char)('0' + (build / 10));
+        temp[temp_len++] = (char)('0' + (build % 10));
     } else {
-        temp[temp_len++] = '0' + build;
+        temp[temp_len++] = (char)('0' + build);
     }
 
     /* Copy to output buffer */

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470zg-liangshan",
+  "soc": "gd32f470zg",
+  "chip_part": "GD32F470ZGT6",
+  "board_family": "LCKFB Liangshan Pi",
+  "physical_pcb_revision": null,
+  "revision_policy": "Record the physical PCB silkscreen, fitted MCU, oscillator, external Flash and connector routing before HIL; a reference-board document is not an observed board identity",
+  "status": "implementation-candidate",
+  "clock": {
+    "hse_hz": 25000000,
+    "target_sysclk_hz": 200000000,
+    "apb1_hz": 50000000,
+    "apb2_hz": 100000000,
+    "lse_enabled": false,
+    "usb_48mhz_clock_provided": false,
+    "verification": "Configured board profile; oscillator, voltage and PLL behavior have not been measured on hardware"
+  },
+  "memory": {
+    "internal_flash_bytes": 1048576,
+    "total_sram_bytes": 524288,
+    "main_sram_bytes": 196608,
+    "additional_sram_bytes": 262144,
+    "tcm_bytes": 65536,
+    "regions": [
+      {"id": "SRAM0", "start": "0x20000000", "size_bytes": 114688, "default_allocation": true},
+      {"id": "SRAM1", "start": "0x2001C000", "size_bytes": 16384, "default_allocation": true},
+      {"id": "SRAM2", "start": "0x20020000", "size_bytes": 65536, "default_allocation": true},
+      {"id": "ADDSRAM", "linker_region": "ADDRAM", "start": "0x20030000", "size_bytes": 262144, "default_allocation": false},
+      {"id": "TCM", "start": "0x10000000", "size_bytes": 65536, "default_allocation": false}
+    ],
+    "allocation_policy": "Linker data, BSS, heap and stack use only the contiguous 192 KiB main SRAM. ADDRAM and TCM are declared regions without default allocation, startup initialization or DMA-reachability claims"
+  },
+  "storage": {
+    "application_flash_start": "0x08000000",
+    "application_flash_bytes": 1032192,
+    "partition_start": "0x080FC000",
+    "partition_end": "0x08100000",
+    "partition_size": 16384,
+    "erase_size": 4096,
+    "erase_units": 4,
+    "program_size": 2,
+    "erase_operation": "GD32F470 independent 4 KiB page erase through official fmc_page_erase(), not 128 KiB sector erase",
+    "geometry_source": "GD32F4xx User Manual Rev3.3 section 2.3.4; FMC_PEKEY, FMC_PECFG.PE_EN and 4 KiB-aligned page address, FMC_CTL.SN=0",
+    "policy": "Validate physical density and linker partition fences. Product serializes the port and reserves a maintenance window; same-bank Flash instruction/IRQ stalls and power-fail recovery require hardware evidence"
+  },
+  "timebase": {
+    "controller": "TIMER1",
+    "reserved": true,
+    "counter_bits": 32,
+    "frequency_hz": 1000000,
+    "prescaler": 99,
+    "clock_source_hz": 100000000,
+    "timestamp_bits": 64,
+    "overflow_handler": "TIMER1_IRQHandler",
+    "irq_priority": 5,
+    "policy": "Reserved for platform timestamps and deadlines, not an application timer. IRQ observation is not start-bit capture. Keep the timer running and service its overflow before a full 32-bit wrap"
+  },
+  "scheduler": {"tick_source": "SysTick", "tick_hz": 1000, "irq_priority": 15, "pendsv_irq_priority": 15},
+  "interrupts": {"priority_group": 3, "preemption_bits": 4, "subpriority_bits": 0},
+  "debug": {"transport": "SWD", "probe": "Record the actual probe and fixture; no populated probe is assumed"},
+  "wiring": {
+    "led": {"label": "LED2", "port": "D", "pin": 7, "active_level": 1, "device": "GPIOD7"},
+    "console": {"enabled": true, "logical_instance": 0, "controller": "USART0", "tx": "PA9", "rx": "PA10", "alternate_function": 7, "baudrate": 115200, "frame": "8N1", "irq_priority": 6, "dma_enabled": false, "electrical": "3.3 V MCU UART; record the actual host adapter and connector routing in the hardware fixture"},
+    "spi": {"enabled": true, "controller": "SPI4", "device": "SPI4", "sck": "PF7", "miso": "PF8", "mosi": "PF9", "alternate_function": 5, "logical_cs_0": "PF6", "cs_active_level": 0, "dma_enabled": false, "implementation": "Polling controller with bounded task-serviced transaction queue"},
+    "rs485": {"enabled": false, "onboard_transceiver": false, "reason": "The stock profile has no onboard RS485 transceiver or active DE allocation", "optional_external_profile": {"de": "PB1", "active_level": 1, "requires": "Explicit configuration and a recorded external transceiver/DE wiring fixture"}}
+  },
+  "external_flash": {
+    "reference_board_part_family": "W25Q64",
+    "reference_board_capacity_bytes": 8388608,
+    "physical_fitted_part": null,
+    "baseline_driver_enabled": false,
+    "policy": "SPI4 wiring is implemented; no external NOR storage partition, JEDEC identity, protocol driver or physical fitted part is claimed without verification"
+  },
+  "safe_outputs": {
+    "leds": "Preload PD7 low before output mode",
+    "spi": "Preload PF6 CS high before output mode and before the external clock transition",
+    "rs485": "Optional PB1 DE is preloaded low only when the external RS485 profile is explicitly enabled; the stock profile leaves it unallocated",
+    "industrial_actuators": "No industrial actuator pins are configured or claimed safe"
+  },
+  "provenance": [
+    {"url": "https://www.gigadevice.com/product/mcu/mcus-product-selector/gd32f470zgt6", "scope": "Exact GD32F470ZGT6 identity, Cortex-M4F, 1 MiB Flash, 512 KiB SRAM and LQFP144"},
+    {"url": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf", "scope": "Official part memory domains and peripheral alternate functions"},
+    {"url": "https://www.gd32mcu.com/data/documents/userManual/GD32F4xx_User_Manual_Rev3.3.pdf", "scope": "Memory/identity, independent page erase section 2.3.4 and TIMER1 width in timer chapter 18"},
+    {"url": "https://www.gd32mcu.com/en/download?kw=GD32F4xx", "version": "3.3.3", "source_lock": "vendors/gigadevice/gd32f4xx/source.lock.json", "scope": "Official GD32F4xx firmware SDK and startup; locked original archive/source hashes and licenses"},
+    {"url": "https://wiki.lckfb.com/zh-hans/lspi/", "scope": "First-party Liangshan Pi reference-board documentation; compare the physical oscillator and PCB with this profile before HIL"},
+    {"url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/led-lib.html", "scope": "LED2 PD7 active-high wiring"},
+    {"url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/uart.html", "scope": "USART0 PA9/PA10 AF7 reference-board wiring"},
+    {"url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/spi-flash.html", "scope": "W25Q64 SPI4 PF6 CS/PF7 clock/PF8 MISO/PF9 MOSI AF5 reference-board wiring"}
+  ],
+  "hardware_verification": "not-executed"
+}

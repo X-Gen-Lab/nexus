@@ -501,18 +501,19 @@ config_status_t config_get_str(const char* key, char* buffer, size_t buf_size) {
 
         /* Decrypt */
         size_t decrypted_size = buf_size;
-        status = config_crypto_decrypt(encrypted_buf, encrypted_size,
-                                       (uint8_t*)buffer, &decrypted_size);
+        status = config_crypto_decrypt_record(encrypted_buf, encrypted_size,
+            (uint8_t*)buffer, &decrypted_size, key, CONFIG_DEFAULT_NAMESPACE_ID,
+            CONFIG_TYPE_STRING);
         if (status != CONFIG_OK) {
             config_set_last_error(status);
             return status;
         }
 
-        /* Ensure null termination */
-        if (decrypted_size < buf_size) {
-            buffer[decrypted_size] = '\0';
-        } else {
-            buffer[buf_size - 1] = '\0';
+        /* Authenticated string records must retain their actual terminator. */
+        if (decrypted_size == 0 || buffer[decrypted_size - 1] != '\0') {
+            memset(buffer, 0, buf_size);
+            config_set_last_error(CONFIG_ERROR_INVALID_FORMAT);
+            return CONFIG_ERROR_INVALID_FORMAT;
         }
     } else {
         /* Read unencrypted data */
@@ -559,6 +560,14 @@ config_status_t config_get_str_len(const char* key, size_t* len) {
         config_set_last_error(CONFIG_ERROR_TYPE_MISMATCH);
         return CONFIG_ERROR_TYPE_MISMATCH;
     }
+
+    uint8_t flags = 0;
+    status = config_store_get_flags(key, CONFIG_DEFAULT_NAMESPACE_ID, &flags);
+    if (status == CONFIG_OK && (flags & CONFIG_FLAG_ENCRYPTED)) {
+        status = config_crypto_get_plaintext_size(key, CONFIG_DEFAULT_NAMESPACE_ID,
+            CONFIG_TYPE_STRING, &size);
+    }
+    if (status != CONFIG_OK) { config_set_last_error(status); return status; }
 
     /* Return length excluding null terminator */
     *len = (size > 0) ? (size - 1) : 0;
@@ -655,8 +664,9 @@ config_status_t config_get_blob(const char* key, void* buffer, size_t buf_size,
 
         /* Decrypt */
         size_t decrypted_size = buf_size;
-        status = config_crypto_decrypt(encrypted_buf, encrypted_size,
-                                       (uint8_t*)buffer, &decrypted_size);
+        status = config_crypto_decrypt_record(encrypted_buf, encrypted_size,
+            (uint8_t*)buffer, &decrypted_size, key, CONFIG_DEFAULT_NAMESPACE_ID,
+            CONFIG_TYPE_BLOB);
         if (status != CONFIG_OK) {
             config_set_last_error(status);
             return status;
@@ -691,8 +701,9 @@ config_status_t config_get_blob_len(const char* key, size_t* len) {
         return CONFIG_ERROR_INVALID_PARAM;
     }
 
+    size_t size = 0;
     config_status_t status =
-        config_store_get_size(key, CONFIG_DEFAULT_NAMESPACE_ID, len);
+        config_store_get_size(key, CONFIG_DEFAULT_NAMESPACE_ID, &size);
     if (status != CONFIG_OK) {
         config_set_last_error(status);
         return status;
@@ -710,6 +721,15 @@ config_status_t config_get_blob_len(const char* key, size_t* len) {
         config_set_last_error(CONFIG_ERROR_TYPE_MISMATCH);
         return CONFIG_ERROR_TYPE_MISMATCH;
     }
+
+    uint8_t flags = 0;
+    status = config_store_get_flags(key, CONFIG_DEFAULT_NAMESPACE_ID, &flags);
+    if (status == CONFIG_OK && (flags & CONFIG_FLAG_ENCRYPTED)) {
+        status = config_crypto_get_plaintext_size(key, CONFIG_DEFAULT_NAMESPACE_ID,
+            CONFIG_TYPE_BLOB, &size);
+    }
+    if (status != CONFIG_OK) { config_set_last_error(status); return status; }
+    *len = size;
 
     config_set_last_error(CONFIG_OK);
     return CONFIG_OK;

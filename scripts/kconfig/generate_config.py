@@ -39,7 +39,10 @@ Usage:
 import argparse
 import os
 import sys
-from datetime import datetime
+import json
+import re
+import tempfile
+from pathlib import Path
 
 try:
     import kconfiglib
@@ -49,115 +52,95 @@ except ImportError:
     sys.exit(1)
 
 
-def parse_config_with_kconfig(kconfig_file='Kconfig', config_file='.config'):
-    """
-    Parse Kconfig and .config files using kconfiglib.
-
-    Args:
-        kconfig_file: Path to root Kconfig file
-        config_file: Path to .config file (optional)
-
-    Returns:
-        Dictionary of config name -> value pairs
-    """
-    config = {}
-
-    try:
-        # Suppress kconfiglib warnings by redirecting stderr temporarily
-        import io
-        import contextlib
-
-        # Create a custom stderr that filters out known harmless warnings
-        class FilteredStderr:
-            def __init__(self, original_stderr):
-                self.original_stderr = original_stderr
-                self.buffer = []
-
-            def write(self, text):
-                # Filter out known harmless warnings about choice symbols
-                if 'choice symbol' in text and 'is defined with a prompt outside the choice' in text:
-                    return
-                if 'default selection' in text and 'is not contained in the choice' in text:
-                    return
-                # Pass through other messages
-                self.original_stderr.write(text)
-
-            def flush(self):
-                self.original_stderr.flush()
-
-        # Temporarily replace stderr
-        original_stderr = sys.stderr
-        sys.stderr = FilteredStderr(original_stderr)
-
-        try:
-            # Parse Kconfig file
-            kconf = kconfiglib.Kconfig(kconfig_file)
-
-            # Load .config if it exists
-            if os.path.exists(config_file):
-                kconf.load_config(config_file)
-        finally:
-            # Restore original stderr
-            sys.stderr = original_stderr
-
-        # Extract all configuration symbols
-        for sym in kconf.unique_defined_syms:
-            # Get symbol name with CONFIG_ prefix
-            name = f'CONFIG_{sym.name}'
-
-            # Get symbol value based on type
-            if sym.type == kconfiglib.BOOL:
-                if sym.tri_value == 2:  # y
-                    config[name] = True
-                elif sym.tri_value == 0:  # n
-                    config[name] = False
-                else:
-                    config[name] = None
-            elif sym.type == kconfiglib.TRISTATE:
-                if sym.tri_value == 2:  # y
-                    config[name] = True
-                elif sym.tri_value == 1:  # m
-                    config[name] = 'm'
-                elif sym.tri_value == 0:  # n
-                    config[name] = False
-                else:
-                    config[name] = None
-            elif sym.type == kconfiglib.STRING:
-                value = sym.str_value
-                if value:
-                    config[name] = value
-                else:
-                    config[name] = None
-            elif sym.type == kconfiglib.INT:
-                value = sym.str_value
-                if value:
-                    try:
-                        config[name] = int(value)
-                    except ValueError:
-                        config[name] = value
-                else:
-                    config[name] = None
-            elif sym.type == kconfiglib.HEX:
-                value = sym.str_value
-                if value:
-                    # Keep hex format
-                    if value.startswith('0x') or value.startswith('0X'):
-                        config[name] = value
-                    else:
-                        config[name] = f'0x{value}'
-                else:
-                    config[name] = None
+def resolve_config(kconfig_file, config_file=None, overrides=()):
+    """Resolve once; unknown, malformed, contradictory or ignored input is fatal."""
+    kconf = kconfiglib.Kconfig(kconfig_file, warn_to_stderr=False)
+    if kconf.warnings:
+        raise ValueError("Invalid Kconfig schema:\n" + "\n".join(kconf.warnings))
+    requested = {}
+    if config_file:
+        for number, line in enumerate(Path(config_file).read_text().splitlines(), 1):
+            line = line.strip()
+            match = re.fullmatch(r"CONFIG_([A-Za-z0-9_]+)=(.+)", line)
+            unset = re.fullmatch(r"# CONFIG_([A-Za-z0-9_]+) is not set", line)
+            if unset:
+                name, value = unset[1], "n"
+            elif match:
+                name, value = match[1], match[2]
+            elif not line or line.startswith("#"):
+                continue
             else:
-                # Unknown type, store as string
-                config[name] = sym.str_value if sym.str_value else None
+                raise ValueError(f"{config_file}:{number}: malformed configuration")
+            if name in requested:
+                raise ValueError(f"{config_file}:{number}: duplicate CONFIG_{name}")
+            requested[name] = value
+    for setting in overrides:
+        name, sep, value = setting.partition("=")
+        if not sep:
+            raise ValueError(f"Invalid setting: {setting}")
+        if name in requested and requested[name] != value:
+            raise ValueError(f"CONFIG_{name} conflicts with the selected build: {requested[name]} != {value}")
+        requested[name] = value
+    normalized = {}
+    for name, value in requested.items():
+        sym = kconf.syms.get(name)
+        if sym is None or not sym.nodes:
+            raise ValueError(f"Unknown configuration symbol CONFIG_{name}")
+        if sym.type == kconfiglib.STRING:
+            try:
+                value = json.loads(value)
+            except (ValueError, TypeError) as exc:
+                raise ValueError(f"CONFIG_{name} requires a quoted string") from exc
+            if not isinstance(value, str):
+                raise ValueError(f"CONFIG_{name} requires a string")
+        elif sym.type in (kconfiglib.BOOL, kconfiglib.TRISTATE):
+            if value not in (("n", "y") if sym.type == kconfiglib.BOOL else ("n", "m", "y")):
+                raise ValueError(f"Invalid boolean CONFIG_{name}={value}")
+        elif sym.type in (kconfiglib.INT, kconfiglib.HEX):
+            try:
+                int(value, 16 if sym.type == kconfiglib.HEX else 10)
+            except ValueError as exc:
+                raise ValueError(f"Invalid numeric CONFIG_{name}={value}") from exc
+        if not sym.set_value(value):
+            raise ValueError(f"Invalid value CONFIG_{name}={value}")
+        normalized[name] = value
+    for name, expected in normalized.items():
+        sym = kconf.syms[name]
+        actual = sym.str_value
+        if sym.type in (kconfiglib.INT, kconfiglib.HEX) and actual:
+            equal = int(actual, 16 if sym.type == kconfiglib.HEX else 10) == int(expected, 16 if sym.type == kconfiglib.HEX else 10)
+        else:
+            equal = actual == expected
+        if not equal:
+            raise ValueError(f"CONFIG_{name}={expected} cannot be honored (effective {actual!r}); check dependencies, choices and ranges")
+    if kconf.warnings:
+        raise ValueError("Invalid configuration:\n" + "\n".join(kconf.warnings))
+    # The daemon priority is an index, whereas MAX_PRIORITIES is a count.
+    # Kconfig ranges cannot express the exclusive upper bound.
+    freertos = kconf.syms.get("OSAL_FREERTOS")
+    if freertos is not None and freertos.tri_value == 2:
+        maximum = int(kconf.syms["OSAL_MAX_PRIORITIES"].str_value)
+        priority = int(kconf.syms["FREERTOS_TIMER_TASK_PRIORITY"].str_value)
+        if priority >= maximum:
+            raise ValueError("CONFIG_FREERTOS_TIMER_TASK_PRIORITY must be smaller than CONFIG_OSAL_MAX_PRIORITIES")
+    return kconf
 
-        return config
 
-    except Exception as e:
-        print(f"Error parsing Kconfig: {e}")
-        import traceback
-        traceback.print_exc()
-        return {}
+def config_values(kconf):
+    values = {}
+    for sym in kconf.unique_defined_syms:
+        name = f"CONFIG_{sym.name}"
+        if sym.type in (kconfiglib.BOOL, kconfiglib.TRISTATE):
+            values[name] = {0: False, 1: "m", 2: True}[sym.tri_value]
+        elif sym.type in (kconfiglib.INT, kconfiglib.HEX):
+            values[name] = int(sym.str_value, 16 if sym.type == kconfiglib.HEX else 10) if sym.str_value else None
+        else:
+            values[name] = sym.str_value or None
+    return values
+
+
+def parse_config_with_kconfig(kconfig_file='Kconfig', config_file=None):
+    return config_values(resolve_config(kconfig_file, config_file))
 
 
 def categorize_config(key):
@@ -337,7 +320,7 @@ def generate_header(config, output_path):
     header.append(' * \\author          Nexus Team')
     header.append(' *')
     header.append(' * This file is auto-generated from Kconfig. Do not edit manually.')
-    header.append(f' * Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    header.append(' * Generated from the effective build configuration; do not edit.')
     header.append(' */')
     header.append('')
     header.append('#ifndef NEXUS_CONFIG_H')
@@ -433,10 +416,10 @@ def generate_header(config, output_path):
                         header.append(f'#define {nx_key} {value}')
                     except ValueError:
                         # Not a valid hex, treat as string
-                        header.append(f'#define {nx_key} "{value}"')
+                        header.append(f'#define {nx_key} {json.dumps(value)}')
                 else:
                     # String value - add quotes
-                    header.append(f'#define {nx_key} "{value}"')
+                    header.append(f'#define {nx_key} {json.dumps(value)}')
             else:
                 # Fallback for other types
                 header.append(f'#define {nx_key} {value}')
@@ -608,110 +591,71 @@ def generate_header(config, output_path):
 
 
 def generate_default_config(kconfig_file, output_path):
-    """
-    Generate a default configuration header using Kconfig defaults.
+    generate_header(config_values(resolve_config(kconfig_file)), output_path)
 
-    Args:
-        kconfig_file: Path to root Kconfig file
-        output_path: Path to output header file
-    """
-    try:
-        # Suppress kconfiglib warnings
-        class FilteredStderr:
-            def __init__(self, original_stderr):
-                self.original_stderr = original_stderr
 
-            def write(self, text):
-                if 'choice symbol' in text and 'is defined with a prompt outside the choice' in text:
-                    return
-                if 'default selection' in text and 'is not contained in the choice' in text:
-                    return
-                self.original_stderr.write(text)
+def cmake_values(kconf):
+    lines = ["# Generated from the same resolved Kconfig as nexus_config.h."]
+    for sym in kconf.unique_defined_syms:
+        value = sym.str_value
+        if sym.type in (kconfiglib.BOOL, kconfiglib.TRISTATE):
+            value = "ON" if sym.tri_value == 2 else "OFF"
+        # Bracket arguments preserve strings without interpreting CMake syntax.
+        delimiter = "="
+        while f"]{delimiter}]" in value:
+            delimiter += "="
+        lines.append(f"set(CONFIG_{sym.name} [{delimiter}[{value}]{delimiter}])")
+    return "\n".join(lines) + "\n"
 
-            def flush(self):
-                self.original_stderr.flush()
 
-        original_stderr = sys.stderr
-        sys.stderr = FilteredStderr(original_stderr)
-
-        try:
-            # Parse Kconfig with defaults
-            kconf = kconfiglib.Kconfig(kconfig_file)
-
-            # Write default .config to temporary file
-            temp_config = '.config_temp_default'
-            kconf.write_config(temp_config)
-        finally:
-            sys.stderr = original_stderr
-
-        # Parse the default config
-        config = parse_config_with_kconfig(kconfig_file, temp_config)
-
-        # Clean up temp file
-        if os.path.exists(temp_config):
-            os.remove(temp_config)
-
-        # Generate header
-        generate_header(config, output_path)
-
-    except Exception as e:
-        print(f"Error generating default configuration: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+def write_effective_config(kconf, path):
+    kconf.write_config(str(path), save_old=False)
+    # Kconfiglib omits hidden false booleans. These build controls also appear
+    # in CMake's cache and must retain an explicit value for release provenance.
+    contents = path.read_text(encoding='utf-8')
+    recorded = set(contents.splitlines())
+    for name in ('BUILD_TESTS', 'BUILD_EXAMPLES', 'ENABLE_COVERAGE', 'ENABLE_SANITIZERS'):
+        sym = kconf.syms.get(name)
+        if sym is None or not sym.nodes:
+            continue
+        line = f'CONFIG_{name}=y' if sym.tri_value == 2 else f'# CONFIG_{name} is not set'
+        if line not in recorded:
+            contents += line + '\n'
+    path.write_text(contents, encoding='utf-8')
 
 
 def main():
-    """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description='Generate nexus_config.h from Kconfig .config file'
-    )
-    parser.add_argument(
-        '--kconfig', '-k',
-        default='Kconfig',
-        help='Path to root Kconfig file (default: Kconfig)'
-    )
-    parser.add_argument(
-        '--config', '-c',
-        default='.config',
-        help='Path to .config file (default: .config)'
-    )
-    parser.add_argument(
-        '--output', '-o',
-        default='nexus_config.h',
-        help='Output header file path (default: nexus_config.h)'
-    )
-    parser.add_argument(
-        '--default', '-d',
-        action='store_true',
-        help='Generate default configuration (ignore .config)'
-    )
-
+    parser = argparse.ArgumentParser(description='Resolve and validate Nexus build configuration')
+    parser.add_argument('--kconfig', '-k', default='Kconfig')
+    parser.add_argument('--config', '-c')
+    parser.add_argument('--output', '-o', default='build/generated/nexus_config.h')
+    parser.add_argument('--default', '-d', action='store_true')
+    parser.add_argument('--set', action='append', default=[])
+    parser.add_argument('--effective-config')
+    parser.add_argument('--cmake-output')
     args = parser.parse_args()
-
-    # Check if Kconfig file exists
-    if not os.path.exists(args.kconfig):
-        print(f'Error: Kconfig file not found: {args.kconfig}')
+    try:
+        kconf = resolve_config(args.kconfig, None if args.default else args.config, args.set)
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='.nexus-config-', dir=output.parent) as directory:
+            stage = Path(directory)
+            generate_header(config_values(kconf), str(stage / 'nexus_config.h'))
+            artifacts = [(stage / 'nexus_config.h', output)]
+            if args.effective_config:
+                write_effective_config(kconf, stage / 'effective.config')
+                artifacts.append((stage / 'effective.config', Path(args.effective_config)))
+            if args.cmake_output:
+                (stage / 'config.cmake').write_text(cmake_values(kconf))
+                artifacts.append((stage / 'config.cmake', Path(args.cmake_output)))
+            for source, target in artifacts:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if not target.exists() or source.read_bytes() != target.read_bytes():
+                    os.replace(source, target)
+        return 0
+    except (OSError, ValueError, kconfiglib.KconfigError) as exc:
+        print(f"Configuration failed: {exc}", file=sys.stderr)
         return 1
-
-    if args.default:
-        print('Generating default configuration from Kconfig...')
-        generate_default_config(args.kconfig, args.output)
-    elif not os.path.exists(args.config):
-        print(f'Warning: Config file not found: {args.config}')
-        print('Generating default configuration from Kconfig...')
-        generate_default_config(args.kconfig, args.output)
-    else:
-        print(f'Parsing configuration from {args.config}...')
-        config = parse_config_with_kconfig(args.kconfig, args.config)
-        if not config:
-            print('Warning: No configuration found')
-            print('Generating default configuration from Kconfig...')
-            generate_default_config(args.kconfig, args.output)
-        else:
-            generate_header(config, args.output)
-
-    return 0
 
 
 if __name__ == '__main__':

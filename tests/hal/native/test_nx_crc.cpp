@@ -17,7 +17,7 @@
 extern "C" {
 #include "hal/interface/nx_crc.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_crc_helpers.h"
+#include "devices/native_crc_helpers.h"
 }
 
 /**

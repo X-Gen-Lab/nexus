@@ -11,6 +11,7 @@
  *                  features: namespace + callbacks + defaults + persistence.
  */
 
+#include "config/config_ram_backend.h"
 #include <cstring>
 #include <gtest/gtest.h>
 

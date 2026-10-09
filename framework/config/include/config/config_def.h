@@ -15,6 +15,20 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* CMake builds must consume the generated effective profile, never silently
+ * fall back to oversized Host limits if its bundle is absent or stale. */
+#if defined(NEXUS_EFFECTIVE_CONFIG)
+#include "nexus_config.h"
+#if !defined(NX_CONFIG_MANAGER_KEY_LIMIT) || \
+    !defined(NX_CONFIG_MANAGER_DEFAULT_KEYS) || \
+    !defined(NX_CONFIG_MANAGER_KEY_LENGTH) || \
+    !defined(NX_CONFIG_MANAGER_VALUE_SIZE) || \
+    !defined(NX_CONFIG_MANAGER_DEFAULT_VALUE_SIZE) || \
+    !defined(NX_CONFIG_MANAGER_PERSISTENCE_BUFFER)
+#error "Effective configuration is missing Config management budgets"
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,6 +62,9 @@ typedef enum {
     CONFIG_ERROR_NO_ENCRYPTION_KEY = 16, /**< Encryption key not set */
     CONFIG_ERROR_CRYPTO_FAILED = 17,     /**< Encryption/decryption failed */
     CONFIG_ERROR_NO_BACKEND = 18,        /**< Backend not set */
+    CONFIG_ERROR_UNSUPPORTED = 19,       /**< Required provider is unavailable */
+    CONFIG_ERROR_BUSY = 20,              /**< Management transaction in progress */
+    CONFIG_ERROR_READ_ONLY = 21,         /**< Immutable entry requires migration */
 } config_status_t;
 
 /**
@@ -103,8 +120,8 @@ typedef enum {
  * \brief           Encryption algorithms
  */
 typedef enum {
-    CONFIG_CRYPTO_AES128 = 0, /**< AES-128-CBC */
-    CONFIG_CRYPTO_AES256 = 1, /**< AES-256-CBC */
+    CONFIG_CRYPTO_AES128_GCM = 1, /**< Authenticated AES-128-GCM */
+    CONFIG_CRYPTO_AES256_GCM = 2, /**< Authenticated AES-256-GCM */
 } config_crypto_algo_t;
 
 /**
@@ -112,15 +129,27 @@ typedef enum {
  * \{
  */
 #ifndef CONFIG_DEFAULT_MAX_KEYS
+#if defined(NX_CONFIG_MANAGER_DEFAULT_KEYS)
+#define CONFIG_DEFAULT_MAX_KEYS NX_CONFIG_MANAGER_DEFAULT_KEYS
+#else
 #define CONFIG_DEFAULT_MAX_KEYS 64
+#endif
 #endif
 
 #ifndef CONFIG_DEFAULT_MAX_KEY_LEN
+#if defined(NX_CONFIG_MANAGER_KEY_LENGTH) && NX_CONFIG_MANAGER_KEY_LENGTH < 32
+#define CONFIG_DEFAULT_MAX_KEY_LEN NX_CONFIG_MANAGER_KEY_LENGTH
+#else
 #define CONFIG_DEFAULT_MAX_KEY_LEN 32
+#endif
 #endif
 
 #ifndef CONFIG_DEFAULT_MAX_VALUE_SIZE
+#if defined(NX_CONFIG_MANAGER_DEFAULT_VALUE_SIZE)
+#define CONFIG_DEFAULT_MAX_VALUE_SIZE NX_CONFIG_MANAGER_DEFAULT_VALUE_SIZE
+#else
 #define CONFIG_DEFAULT_MAX_VALUE_SIZE 256
+#endif
 #endif
 
 #ifndef CONFIG_DEFAULT_MAX_NAMESPACES
@@ -145,11 +174,37 @@ typedef enum {
  * \{
  */
 #define CONFIG_MIN_MAX_KEYS       32
+#ifndef CONFIG_MAX_MAX_KEYS
+#if defined(NX_CONFIG_MANAGER_KEY_LIMIT)
+#define CONFIG_MAX_MAX_KEYS NX_CONFIG_MANAGER_KEY_LIMIT
+#else
 #define CONFIG_MAX_MAX_KEYS       256
+#endif
+#endif
 #define CONFIG_MIN_MAX_KEY_LEN    16
+#ifndef CONFIG_MAX_MAX_KEY_LEN
+#if defined(NX_CONFIG_MANAGER_KEY_LENGTH)
+#define CONFIG_MAX_MAX_KEY_LEN NX_CONFIG_MANAGER_KEY_LENGTH
+#else
 #define CONFIG_MAX_MAX_KEY_LEN    64
+#endif
+#endif
 #define CONFIG_MIN_MAX_VALUE_SIZE 64
+#ifndef CONFIG_MAX_MAX_VALUE_SIZE
+#if defined(NX_CONFIG_MANAGER_VALUE_SIZE)
+#define CONFIG_MAX_MAX_VALUE_SIZE NX_CONFIG_MANAGER_VALUE_SIZE
+#else
 #define CONFIG_MAX_MAX_VALUE_SIZE 1024
+#endif
+#endif
+#if CONFIG_DEFAULT_MAX_KEYS < CONFIG_MIN_MAX_KEYS || \
+    CONFIG_DEFAULT_MAX_KEYS > CONFIG_MAX_MAX_KEYS || \
+    CONFIG_DEFAULT_MAX_KEY_LEN < CONFIG_MIN_MAX_KEY_LEN || \
+    CONFIG_DEFAULT_MAX_KEY_LEN > CONFIG_MAX_MAX_KEY_LEN || \
+    CONFIG_DEFAULT_MAX_VALUE_SIZE < CONFIG_MIN_MAX_VALUE_SIZE || \
+    CONFIG_DEFAULT_MAX_VALUE_SIZE > CONFIG_MAX_MAX_VALUE_SIZE
+#error "Config defaults exceed the effective static resource budget"
+#endif
 /** \} */
 
 /**

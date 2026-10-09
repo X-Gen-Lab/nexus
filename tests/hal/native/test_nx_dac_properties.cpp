@@ -13,12 +13,13 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_dac.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_dac_helpers.h"
+#include "devices/native_dac_helpers.h"
 }
 
 /**
@@ -28,7 +29,7 @@ class DacPropertyTest : public ::testing::Test {
   protected:
     void SetUp() override {
         /* Initialize random number generator */
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all DAC instances */
         native_dac_reset_all();

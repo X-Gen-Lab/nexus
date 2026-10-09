@@ -8,6 +8,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 
+#include "hal/provider/nx_device_provider.h"
 #include "native_test_helpers.h"
 #include "hal/base/nx_device.h"
 #include <stdio.h>

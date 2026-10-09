@@ -1,3 +1,5 @@
+> Persistence/crypto refactor: Flash requires an explicit `config_backend_flash_bind` partition; keys are externally persisted and reloaded before encrypted load; AES-GCM records replace CBC. Follow [the current implementation contract](../../../docs/implementation/storage-security.md) for atomic snapshots, error recovery and support evidence.
+
 # Config Manager 使用指南
 
 ## 目录
@@ -407,87 +409,22 @@ void main_loop(void) {
 
 ## 6. 存储后端
 
-### 6.1 RAM 后端（测试用）
+初始化前由板级代码打开明确预留的 Flash 分区：
 
 ```c
-#include "config/config_backend.h"
-
-void test_config(void) {
-    /* 初始化配置管理器 */
-    config_init(NULL);
-    
-    /* 使用 RAM 后端 */
-    const config_backend_t* ram_backend = config_backend_ram_get();
-    config_set_backend(ram_backend);
-    
-    /* 配置操作 */
-    config_set_i32("test.value", 42);
-    
-    /* 注意: RAM 后端数据在重启后丢失 */
-}
-```
-
-### 6.2 Flash 后端（生产环境）
-
-```c
-void production_config(void) {
-    config_init(NULL);
-    
-    /* 使用 Flash 后端 */
-    const config_backend_t* flash_backend = config_backend_flash_get();
-    config_set_backend(flash_backend);
-    
-    /* 从 Flash 加载配置 */
-    config_status_t status = config_load();
-    if (status != CONFIG_OK) {
-        printf("Failed to load config, using defaults\n");
-    }
-    
-    /* 修改配置 */
-    config_set_i32("app.version", 2);
-    
-    /* 保存到 Flash */
-    config_commit();
-}
-```
-
-### 6.3 自动提交模式
-
-```c
-config_manager_config_t config = {
-    .max_keys = 64,
-    .max_key_len = 32,
-    .max_value_size = 256,
-    .max_namespaces = 8,
-    .max_callbacks = 16,
-    .auto_commit = true  /* 启用自动提交 */
-};
-
-config_init(&config);
+nx_storage_open(&partition, board_flash_port, 0, bank_size);
+config_backend_flash_bind(&partition);
+config_init(NULL);
+/* 加密数据在这里先注册全部 externally persisted keyring generations。 */
 config_set_backend(config_backend_flash_get());
-
-/* 每次设置都会自动提交到 Flash */
-config_set_i32("value", 100);  /* 自动保存 */
+config_load();
+config_set_i32("control.limit", 100);
+config_commit();
 ```
 
-### 6.4 手动提交模式（推荐）
+产品必须检查每一步状态。Flash 不会自动选择路径或模拟 RAM；未绑定返回 UNSUPPORTED。load 保持 namespace 数值身份并全量验证后替换 store，先关闭 namespace handles。删除在全量快照中被保留。配置为 `auto_commit=true` 时，普通、namespace 和加密 setter/delete 都执行真实快照保存，并报告持久化失败；失败时 RAM可能已有待恢复的新值，必须重新 load 确认持久化结果。
 
-```c
-config_manager_config_t config = CONFIG_MANAGER_CONFIG_DEFAULT;
-config.auto_commit = false;  /* 禁用自动提交 */
-
-config_init(&config);
-config_set_backend(config_backend_flash_get());
-
-/* 批量修改 */
-config_set_i32("param1", 100);
-config_set_i32("param2", 200);
-config_set_str("param3", "value");
-
-/* 一次性提交所有变更 */
-config_commit();  /* 减少 Flash 写入次数 */
-```
-
+[分区、容量、掉电和生命周期规则](../../../docs/implementation/storage-security.md)是移植依据。
 
 ## 7. 导入导出
 
@@ -629,115 +566,20 @@ void restore_config(void) {
 
 ## 8. 加密功能
 
-### 8.1 设置加密密钥
-
 ```c
-/* AES-128 加密 */
-uint8_t aes128_key[16] = {
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
-};
-
-config_set_encryption_key(aes128_key, sizeof(aes128_key), CONFIG_CRYPTO_AES128);
-
-/* AES-256 加密 */
-uint8_t aes256_key[32] = { /* ... */ };
-config_set_encryption_key(aes256_key, sizeof(aes256_key), CONFIG_CRYPTO_AES256);
+/* 所有 key 必须安全持久化，不应是源码常量。 */
+config_register_encryption_key(old_key, 32, CONFIG_CRYPTO_AES256_GCM, true);
+config_register_encryption_key(new_key, 32, CONFIG_CRYPTO_AES256_GCM, false);
+config_set_str_encrypted("network.token", token);
+config_commit();
+config_rotate_encryption_key(new_key, 32, CONFIG_CRYPTO_AES256_GCM);
 ```
 
-### 8.2 加密存储
+每一步检查返回值。错误熵、未配置 provider、篡改和错误 key 都失败，不会假成功。明文长度查询与 DECRYPT export 也必须先通过认证。
 
-```c
-/* 加密存储字符串 */
-config_set_str_encrypted("auth.password", "MySecretPassword123");
+keyring最多四代；旧新密钥由产品vault持久化，再开始轮换。提交失败保留两代并重新打开/load分区；成功不意味着inactive bank/备份已不引用旧key，退役须覆盖这些生命周期。96位CSPRNG nonce具有概率上界，产品限制单key写次数并在限额前轮换；未提供无限次nonce数学保证。
 
-/* 加密存储二进制数据 */
-uint8_t token[32] = { /* ... */ };
-config_set_blob_encrypted("auth.token", token, sizeof(token));
-
-/* 读取时自动解密 */
-char password[64];
-config_get_str("auth.password", password, sizeof(password));
-
-uint8_t token_out[32];
-size_t token_size;
-config_get_blob("auth.token", token_out, sizeof(token_out), &token_size);
-```
-
-### 8.3 检查加密状态
-
-```c
-bool encrypted;
-config_is_encrypted("auth.password", &encrypted);
-if (encrypted) {
-    printf("This key is encrypted\n");
-}
-```
-
-### 8.4 密钥轮换
-
-```c
-/* 生成新密钥 */
-uint8_t new_key[16];
-generate_random_key(new_key, sizeof(new_key));
-
-/* 轮换密钥（重新加密所有加密项）*/
-config_status_t status = config_rotate_encryption_key(new_key, sizeof(new_key),
-                                                      CONFIG_CRYPTO_AES128);
-if (status == CONFIG_OK) {
-    printf("Key rotation successful\n");
-    /* 保存新密钥到安全存储 */
-    save_key_to_secure_storage(new_key, sizeof(new_key));
-}
-```
-
-### 8.5 加密最佳实践
-
-```c
-/* 1. 在应用启动时设置密钥 */
-void app_init(void) {
-    uint8_t key[16];
-    
-    /* 从安全存储加载密钥 */
-    if (load_key_from_secure_storage(key, sizeof(key)) == 0) {
-        config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);
-    } else {
-        /* 首次运行，生成新密钥 */
-        generate_random_key(key, sizeof(key));
-        config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);
-        save_key_to_secure_storage(key, sizeof(key));
-    }
-    
-    /* 清除内存中的密钥副本 */
-    memset(key, 0, sizeof(key));
-}
-
-/* 2. 只加密敏感数据 */
-void store_credentials(const char* username, const char* password) {
-    config_set_str("auth.username", username);  /* 不加密 */
-    config_set_str_encrypted("auth.password", password);  /* 加密 */
-}
-
-/* 3. 定期轮换密钥 */
-void periodic_key_rotation(void) {
-    static uint32_t last_rotation = 0;
-    uint32_t now = get_timestamp();
-    
-    /* 每 30 天轮换一次 */
-    if (now - last_rotation > 30 * 24 * 3600) {
-        uint8_t new_key[16];
-        generate_random_key(new_key, sizeof(new_key));
-        
-        if (config_rotate_encryption_key(new_key, sizeof(new_key),
-                                        CONFIG_CRYPTO_AES128) == CONFIG_OK) {
-            save_key_to_secure_storage(new_key, sizeof(new_key));
-            last_rotation = now;
-        }
-        
-        memset(new_key, 0, sizeof(new_key));
-    }
-}
-```
+56字节认证记录开销计入value容量，旧CBC不接受。完整规则见[实现契约](../../../docs/implementation/storage-security.md)。
 
 ## 9. 高级用法
 
@@ -967,26 +809,9 @@ void on_timeout_changed(const char* key, config_type_t type,
 }
 ```
 
-### 10.4 线程安全
+### 10.4 管理 owner
 
-```c
-/* Config Manager 的公共 API 是线程安全的 */
-void thread1(void* arg) {
-    config_set_i32("thread1.value", 100);
-}
-
-void thread2(void* arg) {
-    config_set_i32("thread2.value", 200);
-}
-
-/* 注意: 回调函数中不要调用 Config API */
-void callback(const char* key, config_type_t type,
-              const void* old_value, const void* new_value,
-              void* user_data) {
-    /* 不要在这里调用 config_set_*() 或 config_get_*() */
-    /* 使用标志或队列延迟处理 */
-}
-```
+公共 API 需要外部串行化；没有全局mutex自动保护。产品把配置请求交给一个管理任务，或全部调用共用一个外部锁。回调用队列延迟提交请求，避免重入修改。Flash/crypto不用于控制路径或ISR。
 
 ## 11. 常见问题
 
@@ -1067,7 +892,7 @@ if (type == CONFIG_TYPE_I32) {
 /* 确保设置了正确的密钥 */
 uint8_t key[16];  /* AES-128 需要 16 字节 */
 generate_random_key(key, sizeof(key));
-config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128);
+config_set_encryption_key(key, sizeof(key), CONFIG_CRYPTO_AES128_GCM);
 
 /* 然后才能使用加密功能 */
 config_set_str_encrypted("password", "secret");

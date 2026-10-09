@@ -74,36 +74,6 @@ config TOOLCHAIN_ARM_GCC
       Supported cores: Cortex-M0/M0+/M3/M4/M7/M33
       Recommended for: General embedded development
 
-config TOOLCHAIN_ARM_CLANG
-    bool "ARM Clang (armclang)"
-    depends on !PLATFORM_NATIVE
-    help
-      ARM Compiler 6 (armclang) for embedded ARM development.
-
-      Features:
-      - Official ARM toolchain
-      - Excellent optimization
-      - Best code density
-      - Advanced features
-
-      Note: Requires commercial license from ARM
-      Recommended for: Production with size constraints
-
-config TOOLCHAIN_IAR
-    bool "IAR EWARM (iccarm)"
-    depends on !PLATFORM_NATIVE
-    help
-      IAR Embedded Workbench for ARM compiler.
-
-      Features:
-      - Excellent code size optimization
-      - Comprehensive IDE
-      - Strong debugging support
-      - Industry standard
-
-      Note: Requires commercial license from IAR Systems
-      Recommended for: Safety-critical applications
-
 endchoice
 
 config TOOLCHAIN_NAME
@@ -112,15 +82,11 @@ config TOOLCHAIN_NAME
     default "clang" if TOOLCHAIN_CLANG
     default "msvc" if TOOLCHAIN_MSVC
     default "arm-none-eabi-gcc" if TOOLCHAIN_ARM_GCC
-    default "armclang" if TOOLCHAIN_ARM_CLANG
-    default "iar-arm" if TOOLCHAIN_IAR
 
 config TOOLCHAIN_FILE
     string
     default "" if PLATFORM_NATIVE
     default "cmake/toolchains/arm-gcc.cmake" if TOOLCHAIN_ARM_GCC
-    default "cmake/toolchains/armclang.cmake" if TOOLCHAIN_ARM_CLANG
-    default "cmake/toolchains/iar-arm.cmake" if TOOLCHAIN_IAR
     help
       Path to CMake toolchain file (relative to project root).
 

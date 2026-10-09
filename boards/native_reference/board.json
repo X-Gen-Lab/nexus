@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "native-reference",
+  "soc": "native",
+  "hse_hz": 0,
+  "interface_target": "board_native_reference",
+  "object_targets": [],
+  "inputs": [
+    "CMakeLists.txt",
+    "nexus_board.h"
+  ],
+  "resources": []
+}

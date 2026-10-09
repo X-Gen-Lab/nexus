@@ -1,386 +1,108 @@
-Release Process
-===============
-
-Guide to the Nexus release management process.
-
-.. contents:: Table of Contents
-   :local:
-   :depth: 3
-
-Overview
---------
-
-The Nexus release process ensures:
-
-* **Quality**: All releases are thoroughly tested
-* **Stability**: Breaking changes are managed carefully
-* **Documentation**: Changes are well documented
-* **Traceability**: All changes are tracked
-
-Release Types
--------------
-
-Semantic Versioning
-~~~~~~~~~~~~~~~~~~~
-
-Nexus follows semantic versioning (MAJOR.MINOR.PATCH):
-
-* **MAJOR**: Breaking changes
-* **MINOR**: New features (backward compatible)
-* **PATCH**: Bug fixes (backward compatible)
-
-**Examples**:
-
-* ``1.0.0`` → ``1.0.1``: Bug fix release
-* ``1.0.0`` → ``1.1.0``: Feature release
-* ``1.0.0`` → ``2.0.0``: Major release with breaking changes
-
-Release Schedule
-~~~~~~~~~~~~~~~~
-
-**Regular Releases**
-
-* **Patch releases**: As needed for critical bugs
-* **Minor releases**: Every 2-3 months
-* **Major releases**: Once or twice per year
-
-**Release Candidates**
-
-* RC1, RC2, etc. before major/minor releases
-* At least 1 week of testing before final release
-
-Release Process
----------------
-
-Step 1: Planning
-~~~~~~~~~~~~~~~~
-
-**Create Release Branch**
-
-.. code-block:: bash
-
-   # Create release branch from develop
-   git checkout develop
-   git pull origin develop
-   git checkout -b release/v1.2.0
-
-**Update Version Numbers**
-
-Update version in:
-
-* ``CMakeLists.txt``
-* ``version.h``
-* ``package.json`` (if applicable)
-* Documentation
-
-.. code-block:: cmake
-
-   # CMakeLists.txt
-   project(Nexus
-       VERSION 1.2.0
-       LANGUAGES C CXX
-   )
-
-Step 2: Testing
-~~~~~~~~~~~~~~~
-
-**Run Full Test Suite**
-
-.. code-block:: bash
-
-   # Run all tests
-   python scripts/test/test.py --all
-
-   # Run on all platforms
-   python scripts/test/test.py --platform native
-   python scripts/test/test.py --platform stm32f4
-
-   # Check coverage
-   python scripts/test/test.py --coverage
-
-**Hardware Testing**
-
-* Test on all supported hardware platforms
-* Verify all examples work
-* Test upgrade from previous version
-
-**Performance Testing**
-
-.. code-block:: bash
-
-   # Run performance benchmarks
-   python scripts/test/benchmark.py
-
-   # Compare with previous release
-   python scripts/test/benchmark.py --compare v1.1.0
-
-Step 3: Documentation
-~~~~~~~~~~~~~~~~~~~~~~
-
-**Update CHANGELOG**
-
-.. code-block:: markdown
-
-   # Changelog
-
-   ## [1.2.0] - 2026-01-25
-
-   ### Added
-   - New SPI DMA support
-   - Configuration system improvements
-   - Additional examples
-
-   ### Changed
-   - Improved error handling in HAL
-   - Updated documentation
-
-   ### Fixed
-   - GPIO initialization bug
-   - UART timeout handling
-
-   ### Deprecated
-   - Old configuration API (use new API)
-
-**Update Documentation**
-
-* API documentation (Doxygen)
-* User guides
-* Migration guides (for breaking changes)
-* Release notes
-
-**Generate Documentation**
-
-.. code-block:: bash
-
-   # Generate API docs
-   python scripts/docs/generate.py
-
-   # Build Sphinx docs
-   cd docs/sphinx
-   make html
-
-Step 4: Code Review
-~~~~~~~~~~~~~~~~~~~
-
-**Create Pull Request**
-
-.. code-block:: bash
-
-   # Push release branch
-   git push origin release/v1.2.0
-
-   # Create PR: release/v1.2.0 → main
-
-**Review Checklist**
-
-☐ All tests pass
-☐ Documentation updated
-☐ CHANGELOG updated
-☐ Version numbers updated
-☐ No debug code
-☐ Code formatted
-☐ Static analysis clean
-
-Step 5: Release Candidate
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Tag Release Candidate**
-
-.. code-block:: bash
-
-   # Tag RC
-   git tag -a v1.2.0-rc1 -m "Release candidate 1 for v1.2.0"
-   git push origin v1.2.0-rc1
-
-**Announce RC**
-
-* Post in GitHub Discussions
-* Notify testers
-* Request feedback
-
-**Testing Period**
-
-* Minimum 1 week for RC testing
-* Fix critical bugs found
-* Create new RC if needed
-
-Step 6: Final Release
-~~~~~~~~~~~~~~~~~~~~~~
-
-**Merge to Main**
-
-.. code-block:: bash
-
-   # Merge release branch to main
-   git checkout main
-   git merge --no-ff release/v1.2.0
-   git push origin main
-
-**Tag Release**
-
-.. code-block:: bash
-
-   # Create release tag
-   git tag -a v1.2.0 -m "Release v1.2.0"
-   git push origin v1.2.0
-
-**Merge Back to Develop**
-
-.. code-block:: bash
-
-   # Merge to develop
-   git checkout develop
-   git merge --no-ff release/v1.2.0
-   git push origin develop
-
-   # Delete release branch
-   git branch -d release/v1.2.0
-   git push origin --delete release/v1.2.0
-
-Step 7: Publish Release
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Create GitHub Release**
-
-1. Go to GitHub Releases
-2. Click "Draft a new release"
-3. Select tag ``v1.2.0``
-4. Add release notes
-5. Attach release artifacts
-6. Publish release
-
-**Release Artifacts**
-
-* Source code (automatic)
-* Binary releases (if applicable)
-* Documentation (PDF/HTML)
-* Examples
-
-**Announce Release**
-
-* GitHub Discussions
-* Project website
-* Social media
-* Mailing list
-
-Hotfix Process
---------------
-
-Critical Bug Fixes
-~~~~~~~~~~~~~~~~~~
-
-**Create Hotfix Branch**
-
-.. code-block:: bash
-
-   # Create hotfix from main
-   git checkout main
-   git checkout -b hotfix/v1.2.1
-
-**Fix Bug**
-
-.. code-block:: bash
-
-   # Make fix
-   # Add tests
-   # Update CHANGELOG
-
-**Release Hotfix**
-
-.. code-block:: bash
-
-   # Merge to main
-   git checkout main
-   git merge --no-ff hotfix/v1.2.1
-   git tag -a v1.2.1 -m "Hotfix v1.2.1"
-   git push origin main v1.2.1
-
-   # Merge to develop
-   git checkout develop
-   git merge --no-ff hotfix/v1.2.1
-   git push origin develop
-
-   # Delete hotfix branch
-   git branch -d hotfix/v1.2.1
-
-Release Checklist
+Release Candidates
+==================
+
+Nexus stages a draft candidate after its maintained build matrix succeeds.
+A candidate is an engineering artifact; hardware qualification, signing and
+product approval require separate evidence. No support window or LTS term is
+currently promised by this workflow.
+
+Maintained matrix
 -----------------
 
-Pre-Release
-~~~~~~~~~~~
+* ``linux-gcc-release``: Linux x86_64, Native OSAL, host contract tests.
+* ``stm32-armgcc-release``: STM32F407, STM32F4DISCOVERY MB997, baremetal.
+* ``stm32-armgcc-freertos-release``: the same reference board with FreeRTOS.
 
-☐ All tests pass
-☐ Code coverage meets target (>90%)
-☐ Documentation updated
-☐ CHANGELOG updated
-☐ Version numbers updated
-☐ Migration guide (if breaking changes)
-☐ Release notes prepared
-☐ Hardware testing complete
-☐ Performance benchmarks run
+The two MCU profiles are cross-compile candidates. Board revision, electrical
+behavior, interrupt priorities, DMA cancellation, power-cut recovery and control
+latency still need HIL reports. Windows/macOS presets and GD32 are outside the
+current release matrix. MCU builds have no default cryptographic provider;
+products requiring encrypted configuration or firmware authentication need an
+integrated, validated provider before product release.
 
-Release
-~~~~~~~
+Build and evidence
+------------------
 
-☐ Release branch created
-☐ Release candidate tested
-☐ Final review complete
-☐ Merged to main
-☐ Tagged
-☐ GitHub release created
-☐ Artifacts uploaded
-☐ Announcement posted
+Use a clean checkout of the intended source commit and its pinned dependencies.
+The tag must be an existing ``vMAJOR.MINOR.PATCH`` tag, optionally followed by a
+prerelease identifier such as ``-rc.1``, and must identify that exact commit.
 
-Post-Release
-~~~~~~~~~~~~
+For example, the Native candidate build commands are:
 
-☐ Merged back to develop
-☐ Release branch deleted
-☐ Documentation published
-☐ Monitor for issues
-☐ Respond to feedback
+.. code-block:: bash
 
-Version Support
----------------
+   git submodule update --init ext/googletest ext/freertos
+   cmake --preset linux-gcc-release
+   cmake --build --preset linux-gcc-release --parallel 4
+   ctest --preset linux-gcc-release --parallel 4 --output-on-failure --no-tests=error --output-junit "$PWD/build/linux-gcc-release/ctest-results.xml"
 
-Support Policy
-~~~~~~~~~~~~~~
+Use the ARM preset names above after initializing ``vendors/arm/CMSIS_5``,
+``vendors/st/cmsis_device_f4`` and ``vendors/st/stm32f4xx_hal_driver``; FreeRTOS also
+requires ``ext/freertos``. ARM execution and HIL are separate from cross-compiling.
 
-* **Current version**: Full support
-* **Previous minor version**: Security fixes only
-* **Older versions**: No support
+Each build owns ``build/<preset>/generated/`` with ``effective.config``,
+``nexus_config.h`` and ``config.cmake``. The input fragment is provenance only.
+The package tool rejects disagreement among the resolved files, cache options,
+Release mode, target identity and production compile commands. It checks ARM
+CPU/FPU/float ABI flags and requires an ELF reference application with the
+expected architecture. Libraries or raw firmware blobs alone are insufficient.
 
-**Example**:
+Native packaging requires ``ctest-results.xml`` with at least one successful
+execution and no failure or error. Skipped tests are counted separately. The
+archive includes available CTest logs, resolved configuration, input fragment,
+CMake cache, compile commands, source and dependency commits, board/SoC/OSAL
+identity, file sizes and SHA-256 hashes. ARM validation is recorded as
+``cross-compile-only`` with ``hardware_verified: false``.
 
-* Current: v1.2.0 (full support)
-* Previous: v1.1.x (security fixes)
-* Older: v1.0.x (no support)
+Candidate workflow
+------------------
 
-Long-Term Support (LTS)
-~~~~~~~~~~~~~~~~~~~~~~~
+``.github/workflows/release.yml`` runs on version tags or an explicitly selected
+existing tag. It performs the following sequence:
 
-* LTS releases supported for 2 years
-* Security and critical bug fixes only
-* Marked as LTS in release notes
+1. Validate the tag format and its commit.
+2. Checkout the same commit for all three builds, initialize maintained
+   dependencies, configure and build; run Native tests with zero tests rejected.
+3. Package verified outputs and retain build/test evidence even if a job fails.
+4. Require the complete candidate asset set. Verify archive and member hashes,
+   resolved configuration, target identity, test counts and dependencies against
+   the source Git gitlinks.
+5. Generate candidate notes and a combined ``SHA256SUMS``, then create a draft
+   with ``gh release create --draft --verify-tag``. Prerelease tags also use
+   ``--prerelease --latest=false``.
 
-See Also
+The workflow uses read permissions except for the final draft-creation job.
+It does not overwrite an existing candidate. Tag creation and workflow dispatch
+are explicit repository actions; this guide does not perform them.
+
+Package contract tests run without network access:
+
+.. code-block:: bash
+
+   python -m unittest discover -s scripts/ci -p test_package_release.py -v
+
+These tests use local Git repositories/submodules and binary-format fixtures.
+They test package behavior rather than claiming the firmware built or ran.
+Executed build results belong in ``docs/implementation/`` and the retained CI
+reports.
+
+Product promotion
+-----------------
+
+Promote the reviewed candidate assets without rebuilding a different image.
+The product owner must supply the exact board revision, resource and deadline
+budgets, HIL/fault-recovery evidence, deployment/recovery policy and any required
+signing identity. Security and manufacturing credentials must remain outside
+source and artifacts.
+
+SHA-256 and provenance are unsigned integrity and traceability records. They are
+not authenticity signatures, reproducible-build attestations or firmware
+signatures. SBOM, supply-chain locking, signing and LTS commitments remain
+separate work until their implementation and execution evidence exist.
+
+See also
 --------
 
-* :doc:`contributing` - Contribution guidelines
-* :doc:`testing` - Testing guidelines
-* :doc:`code_review_guidelines` - Code review process
-
-Summary
--------
-
-The release process ensures quality through:
-
-1. **Planning**: Version numbers, release branch
-2. **Testing**: Full test suite, hardware testing
-3. **Documentation**: CHANGELOG, docs, release notes
-4. **Review**: Code review, final checks
-5. **RC**: Release candidate testing
-6. **Release**: Tag, merge, publish
-7. **Announce**: GitHub, website, social media
-
-Following this process ensures stable, well-documented releases.
+* :doc:`testing` - Test execution and evidence.
+* :doc:`code_review_guidelines` - Review process.
+* ``docs/strategy/first-iteration-release.md`` - Candidate implementation details.

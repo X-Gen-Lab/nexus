@@ -258,8 +258,8 @@ cd scripts/coverage
 cppcheck --enable=all hal/ osal/ framework/
 
 # 5. 构建所有平台
-python scripts/building/build.py --platform native
-python scripts/building/build.py --platform stm32f4
+python scripts/building/build.py --preset linux-gcc-debug --stage all
+python scripts/building/build.py --preset stm32-armgcc-release --stage build
 ```
 
 #### 自我审查清单
@@ -416,7 +416,7 @@ python scripts/tools/format.py
 python scripts/test/test.py
 
 # 构建
-python scripts/building/build.py
+python scripts/building/build.py --preset linux-gcc-debug --stage all
 
 # 清理
 python scripts/tools/clean.py

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "execution_kind": "not-run",
+  "profile": "stm32f407-discovery-baremetal",
+  "board": {"id": "stm32f4discovery-mb997", "pcb_revision": null, "silicon_uid": null},
+  "fixture_lease_id": null,
+  "build": {"source_commit": null, "firmware_sha256": null, "effective_config_sha256": null, "toolchain_version": null, "dependency_commits": null},
+  "started_at": null,
+  "finished_at": null,
+  "cases": [
+    {"id": "boot-clock-uart", "status": "not-run", "observations": null},
+    {"id": "gpio", "status": "not-run", "observations": null},
+    {"id": "spi-two-slaves", "status": "not-run", "observations": null},
+    {"id": "dma-timeout-cancel-error", "status": "not-run", "observations": null},
+    {"id": "flash-power-cut", "status": "not-run", "observations": null},
+    {"id": "control-latency-under-management-load", "status": "not-run", "observations": null}
+  ]
+}

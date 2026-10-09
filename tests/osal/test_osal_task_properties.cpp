@@ -29,6 +29,14 @@ extern "C" {
 #include "osal/osal.h"
 }
 
+static osal_status_t stop_join_delete(osal_task_handle_t handle) {
+    osal_status_t stop = osal_task_request_stop(handle);
+    if (stop != OSAL_OK) return stop;
+    osal_status_t joined = osal_task_join(handle, 2000);
+    if (joined != OSAL_OK) return joined;
+    return osal_task_delete(handle);
+}
+
 /**
  * \brief           Number of iterations for property tests
  */
@@ -61,7 +69,7 @@ static std::atomic<bool> s_task_should_run{true};
 static void lifecycle_task_func(void* arg) {
     (void)arg;
     s_task_completed = true;
-    while (s_task_should_run) {
+    while (s_task_should_run && !osal_task_should_stop()) {
         osal_task_delay(5);
     }
 }
@@ -198,7 +206,7 @@ TEST_F(OsalTaskPropertyTest, Property2_TaskLifecycleConsistency) {
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
         /* Delete task - should succeed */
-        osal_status_t delete_status = osal_task_delete(handle);
+        osal_status_t delete_status = stop_join_delete(handle);
         EXPECT_EQ(OSAL_OK, delete_status)
             << "Iteration " << test_iter << ": Task delete should succeed";
     }
@@ -245,7 +253,7 @@ TEST_F(OsalTaskPropertyTest, Property3_PriorityMappingCorrectness) {
                 << (int)priority << " should run";
 
             /* Clean up */
-            osal_task_delete(handle);
+            stop_join_delete(handle);
         }
     }
 }
@@ -286,7 +294,7 @@ TEST_F(OsalTaskPropertyTest, Property3_PriorityBoundaryValues) {
                     << ": Task with boundary priority " << (int)priority
                     << " should run";
 
-                osal_task_delete(handle);
+                stop_join_delete(handle);
             }
         }
     }
@@ -370,7 +378,7 @@ TEST_F(OsalTaskPropertyTest, Property4_TaskNamePreservation) {
             /* Clean up */
             s_task_should_run = false;
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            osal_task_delete(handle);
+            stop_join_delete(handle);
         }
     }
 }
@@ -413,7 +421,7 @@ TEST_F(OsalTaskPropertyTest, Property4_NullNameHandling) {
             /* Clean up */
             s_task_should_run = false;
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            osal_task_delete(handle);
+            stop_join_delete(handle);
         }
     }
 }
@@ -472,7 +480,7 @@ TEST_F(OsalTaskPropertyTest, Property2_MultipleSuspendResumeCycles) {
         /* Clean up */
         s_task_should_run = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        osal_task_delete(handle);
+        stop_join_delete(handle);
     }
 }
 
@@ -534,7 +542,7 @@ TEST_F(OsalTaskPropertyTest, Property16_TaskPriorityRoundTrip) {
         /* Clean up */
         s_task_should_run = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        osal_task_delete(handle);
+        stop_join_delete(handle);
     }
 }
 
@@ -583,7 +591,7 @@ TEST_F(OsalTaskPropertyTest, Property16_SetPriorityInvalidRejection) {
         /* Clean up */
         s_task_should_run = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        osal_task_delete(handle);
+        stop_join_delete(handle);
     }
 }
 
@@ -688,7 +696,7 @@ TEST_F(OsalTaskPropertyTest, Property17_TaskStateConsistency) {
         /* Clean up */
         s_task_should_run = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        osal_task_delete(handle);
+        stop_join_delete(handle);
     }
 }
 
@@ -762,7 +770,7 @@ TEST_F(OsalTaskPropertyTest, Property18_TaskStackWatermarkValidity) {
         /* Clean up */
         s_task_should_run = false;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        osal_task_delete(handle);
+        stop_join_delete(handle);
     }
 }
 

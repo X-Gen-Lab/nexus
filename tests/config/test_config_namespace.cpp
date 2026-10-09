@@ -16,6 +16,7 @@
 
 extern "C" {
 #include "config/config.h"
+#include "../../framework/config/src/config_namespace.h"
 }
 
 /**
@@ -91,6 +92,73 @@ TEST_F(ConfigNamespaceTest, CloseNamespaceTwice) {
 
     /* Second close should fail - handle is invalid */
     EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_close_namespace(handle));
+}
+
+TEST_F(ConfigNamespaceTest, ClosedHandleCannotOperateOnReusedSlotOrCloseNewLifetime) {
+    config_ns_handle_t stale = nullptr, current = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_open_namespace("sensor", &stale));
+    ASSERT_EQ(CONFIG_OK, config_close_namespace(stale));
+    ASSERT_EQ(CONFIG_OK, config_open_namespace("motor", &current));
+    EXPECT_NE(stale, current);
+    ASSERT_EQ(CONFIG_OK, config_ns_set_i32(current, "limit", 17));
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_set_i32(stale, "limit", 99));
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_close_namespace(stale));
+    int32_t value = 0;
+    ASSERT_EQ(CONFIG_OK, config_ns_get_i32(current, "limit", &value, 0));
+    EXPECT_EQ(17, value);
+    ASSERT_EQ(CONFIG_OK, config_close_namespace(current));
+    for (size_t i = 0; i < 1000; ++i) {
+        ASSERT_EQ(CONFIG_OK, config_open_namespace("motor", &current));
+        EXPECT_NE(stale, current);
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_close_namespace(stale));
+        ASSERT_EQ(CONFIG_OK, config_close_namespace(current));
+    }
+}
+
+TEST_F(ConfigNamespaceTest, HandlesRemainInvalidAfterManagerReinitialization) {
+    config_ns_handle_t stale = nullptr, current = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_open_namespace("sensor", &stale));
+    ASSERT_EQ(CONFIG_OK, config_deinit());
+    ASSERT_EQ(CONFIG_OK, config_init(nullptr));
+    ASSERT_EQ(CONFIG_OK, config_open_namespace("motor", &current));
+    EXPECT_NE(stale, current);
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_set_str(stale, "secret", "wrong-owner"));
+    EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_close_namespace(stale));
+    bool exists = true;
+    ASSERT_EQ(CONFIG_OK, config_ns_exists(current, "secret", &exists)); EXPECT_FALSE(exists);
+    ASSERT_EQ(CONFIG_OK, config_close_namespace(current));
+}
+
+TEST_F(ConfigNamespaceTest, ForgedHandlesAreRejectedWithoutDereferenceForEveryOperation) {
+    config_ns_handle_t current = nullptr;
+    ASSERT_EQ(CONFIG_OK, config_open_namespace("motor", &current));
+    ASSERT_EQ(CONFIG_OK, config_ns_set_i32(current, "limit", 17));
+    int32_t signedValue = 0; uint32_t unsignedValue = 0; bool boolean = false;
+    char text[16] = "untouched"; uint8_t nsId = 99;
+    const config_ns_handle_t invalid[] = {
+        reinterpret_cast<config_ns_handle_t>(uintptr_t(1)),
+        reinterpret_cast<config_ns_handle_t>(UINTPTR_MAX),
+        reinterpret_cast<config_ns_handle_t>(&signedValue),
+        reinterpret_cast<config_ns_handle_t>(uintptr_t(0xa))};
+    for (config_ns_handle_t handle : invalid) {
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_close_namespace(handle));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_set_i32(handle, "limit", 99));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_get_i32(handle, "limit", &signedValue, 0));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_set_u32(handle, "limit", 99));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_get_u32(handle, "limit", &unsignedValue, 0));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_set_str(handle, "limit", "bad"));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_get_str(handle, "limit", text, sizeof(text)));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_set_bool(handle, "limit", true));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_get_bool(handle, "limit", &boolean, false));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_exists(handle, "limit", &boolean));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_ns_delete(handle, "limit"));
+        EXPECT_FALSE(config_namespace_is_valid_handle(handle));
+        EXPECT_EQ(CONFIG_ERROR_INVALID_PARAM, config_namespace_get_handle_id(handle, &nsId));
+    }
+    EXPECT_EQ(99u, nsId); EXPECT_STREQ("untouched", text);
+    ASSERT_EQ(CONFIG_OK, config_ns_get_i32(current, "limit", &signedValue, 0));
+    EXPECT_EQ(17, signedValue);
+    ASSERT_EQ(CONFIG_OK, config_close_namespace(current));
 }
 
 /*---------------------------------------------------------------------------*/

@@ -44,8 +44,11 @@ typedef enum {
  * \return          OSAL_OK on success, error code otherwise
  * \retval          OSAL_OK Queue created successfully
  * \retval          OSAL_ERROR_NULL_POINTER handle is NULL
- * \retval          OSAL_ERROR_INVALID_PARAM item_size or item_count is zero
- * \retval          OSAL_ERROR_NO_MEMORY Memory allocation failed
+ * \retval          OSAL_ERROR_INVALID_PARAM Zero, overflow, or storage budget exceeded
+ * \retval          OSAL_ERROR_NO_MEMORY Backend object slots exhausted
+ * \note            FreeRTOS payload and overwrite scratch use fixed static
+ *                  storage; Native allocates payload on the host heap.
+ *                  Query effective limits through osal_get_backend_info.
  */
 osal_status_t osal_queue_create(size_t item_size, size_t item_count,
                                 osal_queue_handle_t* handle);
@@ -57,6 +60,10 @@ osal_status_t osal_queue_create(size_t item_size, size_t item_count,
  * \retval          OSAL_OK Queue deleted successfully
  * \retval          OSAL_ERROR_NULL_POINTER handle is NULL
  * \retval          OSAL_ERROR_INVALID_PARAM Invalid queue handle
+ * \retval          OSAL_ERROR_BUSY FreeRTOS operation still pins the queue
+ * \note            Native/baremetal delete cancels old waiting callers.
+ *                  FreeRTOS requires callers to settle waits first; BUSY
+ *                  preserves the handle and kernel storage for retry.
  */
 osal_status_t osal_queue_delete(osal_queue_handle_t handle);
 
@@ -75,6 +82,10 @@ osal_status_t osal_queue_delete(osal_queue_handle_t handle);
  */
 osal_status_t osal_queue_send(osal_queue_handle_t handle, const void* item,
                               uint32_t timeout_ms);
+
+/** Atomically append an item, removing the oldest if full. Task context,
+ * nonblocking, supports arbitrary capacity, and does not change queue mode. */
+osal_status_t osal_queue_send_overwrite(osal_queue_handle_t handle, const void* item);
 
 /**
  * \brief           Send item to front of queue

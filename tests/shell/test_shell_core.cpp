@@ -679,3 +679,14 @@ TEST_F(ShellCoreTest, ErrorMessageContainsCode) {
 /**
  * \}
  */
+
+static int failing_transport_read(uint8_t*, int) { return -1; }
+TEST_F(ShellCoreTest, TransportErrorIsObservableAndDoesNotMeanEmptyInput) {
+    shell_config_t config = get_default_config();
+    ASSERT_EQ(SHELL_OK, shell_init(&config));
+    const shell_backend_t failed = {.read = failing_transport_read, .write = nullptr};
+    ASSERT_EQ(SHELL_OK, shell_set_backend(&failed));
+    EXPECT_EQ(SHELL_ERROR_BACKEND, shell_process());
+    EXPECT_EQ(SHELL_ERROR_BACKEND, shell_get_last_error());
+    shell_set_backend(nullptr);
+}

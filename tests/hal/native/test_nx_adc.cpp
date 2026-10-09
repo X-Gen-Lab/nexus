@@ -12,11 +12,12 @@
  */
 
 #include <gtest/gtest.h>
+#include <vector>
 
 extern "C" {
 #include "hal/interface/nx_adc.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_adc_helpers.h"
+#include "devices/native_adc_helpers.h"
 }
 
 /**
@@ -65,6 +66,56 @@ TEST_F(AdcTest, InitializeAdc) {
     EXPECT_TRUE(state.initialized);
 }
 
+TEST_F(AdcTest, InitializedSamplesStayInRangeAndReplayAfterReinit) {
+    native_adc_state_t state;
+    ASSERT_EQ(NX_OK, native_adc_get_state(0, &state));
+    std::vector<uint32_t> first;
+    for (uint8_t i = 0; i < state.channel_count; ++i) {
+        nx_adc_channel_t* channel = adc->get_channel(adc, i);
+        ASSERT_NE(nullptr, channel);
+        first.push_back(channel->get_value(channel));
+        EXPECT_LE(first.back(), 4095u);
+    }
+    ASSERT_FALSE(first.empty());
+    ASSERT_EQ(NX_OK, lifecycle->deinit(lifecycle));
+    ASSERT_EQ(NX_OK, lifecycle->init(lifecycle));
+    for (uint8_t i = 0; i < state.channel_count; ++i) {
+        nx_adc_channel_t* channel = adc->get_channel(adc, i);
+        ASSERT_NE(nullptr, channel);
+        EXPECT_EQ(first[i], channel->get_value(channel));
+    }
+}
+
+TEST(AdcBufferSimulationTest, BufferedSamplesStayInRangeAndReplayAfterReinit) {
+    auto* buffer_adc = static_cast<nx_adc_buffer_t*>(nx_device_get("ADC_BUFFER0"));
+    ASSERT_NE(nullptr, buffer_adc);
+    nx_lifecycle_t* lifecycle = buffer_adc->get_lifecycle(buffer_adc);
+    ASSERT_NE(nullptr, lifecycle);
+    ASSERT_EQ(NX_OK, lifecycle->init(lifecycle));
+    uint32_t* buffer = buffer_adc->get_buffer(buffer_adc);
+    const size_t size = buffer_adc->get_buffer_size(buffer_adc);
+    ASSERT_NE(nullptr, buffer);
+    ASSERT_GT(size, 0u);
+
+    buffer_adc->trigger(buffer_adc);
+    const std::vector<uint32_t> first(buffer, buffer + size);
+    buffer_adc->trigger(buffer_adc);
+    const std::vector<uint32_t> second(buffer, buffer + size);
+    EXPECT_NE(first, second);
+    for (unsigned batch = 0; batch < 64; ++batch) {
+        buffer_adc->trigger(buffer_adc);
+        for (size_t i = 0; i < size; ++i) EXPECT_LE(buffer[i], 4095u);
+    }
+
+    ASSERT_EQ(NX_OK, lifecycle->deinit(lifecycle));
+    ASSERT_EQ(NX_OK, lifecycle->init(lifecycle));
+    buffer_adc->trigger(buffer_adc);
+    EXPECT_EQ(first, std::vector<uint32_t>(buffer, buffer + size));
+    buffer_adc->trigger(buffer_adc);
+    EXPECT_EQ(second, std::vector<uint32_t>(buffer, buffer + size));
+    EXPECT_EQ(NX_OK, lifecycle->deinit(lifecycle));
+}
+
 TEST_F(AdcTest, TriggerConversion) {
     /* Set analog value for channel 0 */
     EXPECT_EQ(NX_OK, native_adc_set_analog_value(0, 0, 2048));
@@ -111,13 +162,10 @@ TEST_F(AdcTest, GetInvalidChannel) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Diagnostic Tests - Requirement 6.6                                        */
+/* Simulator Counter Tests - Requirement 6.6                                        */
 /*---------------------------------------------------------------------------*/
 
-TEST_F(AdcTest, DiagnosticInterface) {
-    /* Get diagnostic interface */
-    nx_diagnostic_t* diag = adc->get_diagnostic(adc);
-    ASSERT_NE(nullptr, diag);
+TEST_F(AdcTest, ConversionCounters) {
 
     /* Trigger some conversions */
     adc->trigger(adc);

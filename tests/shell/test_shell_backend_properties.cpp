@@ -24,6 +24,7 @@
 
 extern "C" {
 #include "shell/shell_backend.h"
+#include "shell/shell_mock_backend.h"
 }
 
 /**

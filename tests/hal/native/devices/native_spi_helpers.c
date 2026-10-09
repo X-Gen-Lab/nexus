@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/spi/nx_spi_types.h"
+#include "../../../../soc/native/controllers/spi/nx_spi_helpers.h"
 
 #include <string.h>
 
@@ -122,10 +122,12 @@ nx_status_t native_spi_get_state(uint8_t instance, native_spi_state_t* state) {
         return NX_ERR_INVALID_PARAM;
     }
 
+    native_spi_lock();
     /* Copy state information */
     state->initialized = impl->state->initialized;
     state->suspended = impl->state->suspended;
     state->busy = impl->state->busy;
+    state->users = impl->users;
     state->max_speed = impl->state->config.max_speed;
     state->mosi_pin = impl->state->config.mosi_pin;
     state->miso_pin = impl->state->config.miso_pin;
@@ -139,6 +141,7 @@ nx_status_t native_spi_get_state(uint8_t instance, native_spi_state_t* state) {
     state->error_count = impl->state->stats.error_count;
     state->tx_buf_count = impl->state->tx_buf.count;
     state->rx_buf_count = impl->state->rx_buf.count;
+    native_spi_unlock();
 
     return NX_OK;
 }
@@ -173,16 +176,24 @@ nx_status_t native_spi_inject_rx_data(uint8_t instance, const uint8_t* data,
         return NX_ERR_INVALID_STATE;
     }
 
+    native_spi_lock();
+    if (len > impl->state->rx_buf.size - impl->state->rx_buf.count) {
+        impl->state->stats.error_count++;
+        native_spi_unlock();
+        return NX_ERR_NO_MEMORY;
+    }
     /* Write data to RX buffer */
     size_t written = buffer_write(&impl->state->rx_buf, data, len);
     if (written < len) {
         /* Buffer overflow - some data was lost */
         impl->state->stats.error_count++;
+        native_spi_unlock();
         return NX_ERR_NO_MEMORY;
     }
 
     /* Update statistics after successful write */
     impl->state->stats.rx_count += (uint32_t)written;
+    native_spi_unlock();
 
     return NX_OK;
 }
@@ -207,7 +218,9 @@ nx_status_t native_spi_get_tx_data(uint8_t instance, uint8_t* data,
     }
 
     /* Read data from TX buffer */
+    native_spi_lock();
     size_t read = buffer_read(&impl->state->tx_buf, data, *len);
+    native_spi_unlock();
     *len = read;
 
     return NX_OK;
@@ -225,33 +238,7 @@ nx_status_t native_spi_reset(uint8_t instance) {
         return NX_ERR_INVALID_PARAM;
     }
 
-    /* Reset state */
-    impl->state->initialized = false;
-    impl->state->suspended = false;
-    impl->state->busy = false;
-
-    /* Reset device handle */
-    memset(&impl->state->current_device, 0, sizeof(nx_spi_device_handle_t));
-
-    /* Reset statistics */
-    memset(&impl->state->stats, 0, sizeof(nx_spi_stats_t));
-
-    /* Reset buffers */
-    if (impl->state->tx_buf.data != NULL) {
-        impl->state->tx_buf.head = 0;
-        impl->state->tx_buf.tail = 0;
-        impl->state->tx_buf.count = 0;
-        memset(impl->state->tx_buf.data, 0, impl->state->tx_buf.size);
-    }
-
-    if (impl->state->rx_buf.data != NULL) {
-        impl->state->rx_buf.head = 0;
-        impl->state->rx_buf.tail = 0;
-        impl->state->rx_buf.count = 0;
-        memset(impl->state->rx_buf.data, 0, impl->state->rx_buf.size);
-    }
-
-    return NX_OK;
+    return native_spi_reset_impl(impl);
 }
 
 /**
@@ -263,4 +250,21 @@ void native_spi_reset_all(void) {
     for (uint8_t instance = 0; instance < NX_SPI_MAX_INSTANCES; instance++) {
         native_spi_reset(instance);
     }
+}
+
+nx_status_t native_spi_set_transfer_delay(uint8_t instance, uint32_t delay_ms) {
+    nx_spi_impl_t* b=get_spi_impl(instance);
+    if(!b || delay_ms>1000) return NX_ERR_INVALID_PARAM;
+    native_spi_lock(); b->transfer_delay_ms=delay_ms; native_spi_unlock(); return NX_OK;
+}
+
+nx_status_t native_spi_get_trace(uint8_t instance, native_spi_operation_t* output, size_t* count) {
+    nx_spi_impl_t* b=get_spi_impl(instance);
+    if(!b || !output || !count) return NX_ERR_INVALID_PARAM;
+    native_spi_lock();
+    size_t n=*count<b->trace_count ? *count : b->trace_count;
+    for(size_t i=0;i<n;++i) {
+        output[i].config=b->trace[i].config; output[i].token=b->trace[i].token; output[i].first_tx=b->trace[i].first_tx;
+    }
+    *count=n; native_spi_unlock(); return NX_OK;
 }

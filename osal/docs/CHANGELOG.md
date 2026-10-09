@@ -2,6 +2,13 @@
 
 本文档记录 Nexus OSAL 模块的版本变更历史。
 
+当前维护基线采用显式 board/profile 与新的生命周期、合作停止和句柄世代契约。
+本文件中的旧版本支持、性能和路线描述保留为历史记录，未经当前矩阵重新验证，
+不能作为平台支持或实时性能承诺。当前执行证据以 `docs/implementation/` 和
+`docs/strategy/support-matrix.yaml` 为准；Native、FreeRTOS 主机合同与裸机模型分别验收，
+MCU 中断、调度和实板时序仍需对应板卡报告。RT-Thread、Zephyr、ThreadX、embOS
+不在本轮受维护构建矩阵中。
+
 ## 版本规范
 
 本项目遵循[语义化版本](https://semver.org/lang/zh-CN/)规范：

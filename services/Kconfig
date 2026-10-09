@@ -1,0 +1,35 @@
+menu "Optional common components"
+
+config SERVICE_STORAGE
+    bool "Atomic storage service"
+    default y
+    help
+      Build the storage port and recoverable two-bank snapshot implementation.
+      Physical SoC Flash providers remain independent of storage policy.
+
+config SERVICE_SECURITY
+    bool "Cryptographic provider service"
+    default y
+    help
+      The core does not bind a default provider. Select the explicit Native
+      OpenSSL adapter or supply a maintained provider; unsupported operations
+      fail explicitly.
+
+config SERVICE_UPDATE
+    bool "Authenticated update policy"
+    default y
+    help
+      Policy and recovery state only; the product supplies its image installer,
+      boot selection, protected counters and trust boundary.
+
+config SERVICE_PROTOCOLS
+    bool "Modbus RTU protocol"
+    default y
+
+config SERVICE_INDUSTRIAL
+    bool "Industrial health supervision"
+    default y
+
+endmenu
+
+source "services/security/Kconfig"

@@ -9,7 +9,7 @@
  */
 
 #include "native_sdio_helpers.h"
-#include "../../../../platforms/native/src/sdio/nx_sdio_types.h"
+#include "../../../../soc/native/controllers/sdio/nx_sdio_types.h"
 #include "hal/nx_factory.h"
 #include <string.h>
 

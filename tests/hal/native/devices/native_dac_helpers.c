@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/dac/nx_dac_types.h"
+#include "../../../../soc/native/controllers/dac/nx_dac_types.h"
 
 #include <string.h>
 

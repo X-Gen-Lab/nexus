@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Validate requirement/backlog/role mappings without inventing completion evidence."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+from pathlib import Path
+import re
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from scripts.evidence.common import (EvidenceError, atomic_json, fields, identifier,
+                                     load_json, verify_file_identity)
+
+
+def validate(requirements_path: Path, backlog_path: Path, roles_path: Path) -> dict:
+    roles = load_json(roles_path)
+    fields(roles, {"schema_version", "assignment_status", "roles", "interfaces", "note"})
+    if roles["schema_version"] != 1 or not isinstance(roles["roles"], list) or not roles["roles"]:
+        raise EvidenceError("maintainer role schema required")
+    role_ids = set()
+    seats = 0
+    for role in roles["roles"]:
+        fields(role, {"id", "seats", "scope", "backup_role"})
+        identifier(role["id"], "owner role")
+        if role["id"] in role_ids or type(role["seats"]) is not int or role["seats"] <= 0:
+            raise EvidenceError("duplicate role or invalid allocation")
+        if not isinstance(role["scope"], list) or not role["scope"] or any(not isinstance(scope, str) or not scope for scope in role["scope"]):
+            raise EvidenceError("role responsibility scopes required")
+        seats += role["seats"]
+        role_ids.add(role["id"])
+    if seats != 10:
+        raise EvidenceError("approved maintainer allocation totals 10 people")
+    for role in roles["roles"]:
+        if role["backup_role"] not in role_ids or role["backup_role"] == role["id"]:
+            raise EvidenceError("distinct valid backup role required")
+    if any(role not in role_ids for role in roles["interfaces"].values()):
+        raise EvidenceError("interface owner must be an allocated role")
+    try:
+        with backlog_path.open(newline="", encoding="utf-8") as stream:
+            reader = csv.DictReader(stream, strict=True)
+            columns = reader.fieldnames or []
+            # Current execution records use task_id. The former backlog.csv uses
+            # id; this explicit legacy column is the only alternative CSV format.
+            identity_columns = {"task_id", "id"}.intersection(columns)
+            if len(identity_columns) != 1 or len(columns) != len(set(columns)):
+                raise EvidenceError("CSV requires one task_id or legacy id column")
+            identity_column = identity_columns.pop()
+            backlog = list(reader)
+    except csv.Error as error:
+        raise EvidenceError("invalid backlog CSV quoting") from error
+    if any(None in item or any(value is None for value in item.values()) for item in backlog):
+        raise EvidenceError("malformed backlog CSV row")
+    backlog_ids = {identifier(item[identity_column], "backlog identity") for item in backlog}
+    if not backlog or len(backlog_ids) != len(backlog):
+        raise EvidenceError("backlog identities must be nonempty and unique")
+    document = load_json(requirements_path)
+    fields(document, {"schema_version", "subject_id", "subject_status", "requirements"})
+    if type(document["schema_version"]) is not int or document["schema_version"] != 2:
+        raise EvidenceError("unsupported requirement schema")
+    identifier(document["subject_id"], "subject id")
+    identifier(document["subject_status"], "subject status")
+    requirements = document["requirements"]
+    if not isinstance(requirements, list) or not requirements:
+        raise EvidenceError("zero requirements rejected")
+    seen = set()
+    statuses = {"planned": 0, "implemented": 0, "host_validated": 0, "hardware_validated": 0}
+    if document["subject_status"] not in statuses:
+        raise EvidenceError("unsupported subject status")
+    for requirement in requirements:
+        fields(requirement, {"id", "backlog_ids", "owner_role", "statement", "verification_kind",
+                             "status", "acceptance", "evidence"})
+        identity = requirement["id"]
+        if not isinstance(identity, str) or not re.fullmatch(r"NEX-REQ-\d{3}", identity) or identity in seen:
+            raise EvidenceError("unique NEX-REQ-nnn identity required")
+        seen.add(identity)
+        if requirement["owner_role"] not in role_ids:
+            raise EvidenceError("requirement owner is not an allocated role")
+        linked = requirement["backlog_ids"]
+        if not isinstance(linked, list) or not linked or len(linked) != len(set(linked)) or not set(linked).issubset(backlog_ids):
+            raise EvidenceError("requirement links missing or unknown backlog identities")
+        for name in ("statement", "acceptance"):
+            if not isinstance(requirement[name], str) or not requirement[name].strip():
+                raise EvidenceError("requirement statement and acceptance must be concrete")
+        if requirement["verification_kind"] not in {"host_contract", "host_and_hardware", "hardware_measurement", "manufacturing_station"}:
+            raise EvidenceError("invalid verification kind")
+        status = requirement["status"]
+        if status not in statuses:
+            raise EvidenceError("unsupported requirement status")
+        statuses[status] += 1
+        evidence = requirement["evidence"]
+        if not isinstance(evidence, list):
+            raise EvidenceError("requirement evidence list required")
+        if status in {"host_validated", "hardware_validated"} and not evidence:
+            raise EvidenceError("validated requirement needs executed evidence")
+        physical = False
+        for item in evidence:
+            fields(item, {"kind", "identity"})
+            verify_file_identity(item["identity"])
+            if item["kind"] == "physical_hil":
+                report = load_json(item["identity"]["path"])
+                if (report.get("kind") != "physical_hil" or report.get("status") != "pass" or
+                        report.get("eligible_physical_hil") is not True):
+                    raise EvidenceError("physical requirement cannot use synthetic HIL")
+                physical = True
+            elif item["kind"] not in {"host_contract", "manufacturing_audit", "measurement"}:
+                raise EvidenceError("unknown requirement evidence kind")
+        if status == "hardware_validated" and not physical and requirement["verification_kind"] != "manufacturing_station":
+            raise EvidenceError("hardware validated status needs passing physical HIL")
+        if status == "hardware_validated" and requirement["verification_kind"] == "manufacturing_station":
+            if not any(item["kind"] == "manufacturing_audit" and
+                       load_json(item["identity"]["path"]).get("status") == "pass" for item in evidence):
+                raise EvidenceError("manufacturing validation needs executed station audit")
+    # Subject status is a qualification stage, not free-form promotional text.
+    # It may lag individual requirements but cannot advance past any of them.
+    stages = list(statuses)
+    subject_stage = stages.index(document["subject_status"])
+    if any(stages.index(requirement["status"]) < subject_stage for requirement in requirements):
+        raise EvidenceError("subject status exceeds an unmet requirement")
+    return {"schema_version": 1, "kind": "requirement_traceability", "status": "pass",
+            "requirements": len(requirements), "status_counts": statuses, "allocated_people": seats,
+            "named_team_assignment": roles["assignment_status"],
+            "subject_id": document["subject_id"], "subject_status": document["subject_status"],
+            "limitation": "schema consistency is not subject acceptance or hardware execution"}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--requirements", type=Path, default=Path("docs/requirements/platform.json"))
+    parser.add_argument("--backlog", type=Path, default=Path("docs/implementation/refactor-execution.csv"))
+    parser.add_argument("--roles", type=Path, default=Path(".github/maintainer-roles.json"))
+    parser.add_argument("--report", type=Path, required=True)
+    args = parser.parse_args()
+    try:
+        report = validate(args.requirements, args.backlog, args.roles)
+    except (EvidenceError, OSError, KeyError, TypeError) as error:
+        report = {"schema_version": 1, "kind": "requirement_traceability", "status": "fail", "failure": str(error)}
+    atomic_json(args.report, report)
+    print(f"traceability: {report['status']}; report={args.report}")
+    return 0 if report["status"] == "pass" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

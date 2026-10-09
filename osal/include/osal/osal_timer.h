@@ -67,7 +67,11 @@ osal_status_t osal_timer_create(const osal_timer_config_t* config,
                                 osal_timer_handle_t* handle);
 
 /**
- * \brief           Delete a timer
+ * \brief           Delete a timer and return callback argument ownership
+ * \note            Task context. BUSY means a callback/control operation still
+ *                  owns the timer; retry after it completes. FreeRTOS deletion
+ *                  is confirmed by its timer daemon before the slot is reused.
+ *                  TIMEOUT retains ownership and permits a management retry.
  * \param[in]       handle: Timer handle
  * \return          OSAL_OK on success, error code otherwise
  * \retval          OSAL_OK: Timer deleted successfully
@@ -85,7 +89,9 @@ osal_status_t osal_timer_delete(osal_timer_handle_t handle);
 osal_status_t osal_timer_start(osal_timer_handle_t handle);
 
 /**
- * \brief           Stop a timer
+ * \brief           Stop a timer and settle callback ownership
+ * \note            Successful return means no earlier callback retains arg.
+ *                  BUSY/TIMEOUT requires settlement before releasing arg.
  * \param[in]       handle: Timer handle
  * \return          OSAL_OK on success, error code otherwise
  * \retval          OSAL_OK: Timer stopped successfully

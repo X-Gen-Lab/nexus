@@ -67,6 +67,9 @@ static const char* const g_error_strings[] = {
     "No encryption key",   /* CONFIG_ERROR_NO_ENCRYPTION_KEY */
     "Crypto failed",       /* CONFIG_ERROR_CRYPTO_FAILED */
     "No backend",          /* CONFIG_ERROR_NO_BACKEND */
+    "Unsupported provider", /* CONFIG_ERROR_UNSUPPORTED */
+    "Busy",                 /* CONFIG_ERROR_BUSY */
+    "Read only",            /* CONFIG_ERROR_READ_ONLY */
 };
 
 /*---------------------------------------------------------------------------*/
@@ -143,9 +146,19 @@ config_status_t config_deinit(void) {
         g_last_error = CONFIG_ERROR_NOT_INIT;
         return CONFIG_ERROR_NOT_INIT;
     }
+    if (config_callback_is_busy()) {
+        g_last_error = CONFIG_ERROR_BUSY;
+        return CONFIG_ERROR_BUSY;
+    }
 
     /* Deinitialize backend */
-    config_backend_deinit();
+    config_status_t backend_status = config_backend_deinit();
+    if (backend_status != CONFIG_OK) {
+        /* Retain store/keyring and initialized state while the backend still
+         * owns its context. Caller must resolve/ retry before freeing it. */
+        g_last_error = backend_status;
+        return backend_status;
+    }
 
     /* Clear crypto state */
     config_crypto_clear();

@@ -37,7 +37,7 @@ struct nx_mutex_s {
  * \brief           Atomic type
  */
 typedef struct nx_atomic_s {
-    volatile uint32_t value;
+    uint32_t value; /**< Access only through nx_atomic_*; serialized by port lock */
 } nx_atomic_t;
 
 /*---------------------------------------------------------------------------*/
@@ -70,13 +70,17 @@ typedef struct nx_atomic_s {
 
 /**
  * \brief           Enter critical section (disable interrupts)
- * \return          Previous interrupt state (primask value)
+ * \return          Opaque previous architecture state; restore in reverse order
+ * \note            Cortex-M masks local interrupts and saves PRIMASK. Native
+ *                  uses a recursive thread lock, not an interrupt mask. Never
+ *                  sleep, allocate, or call blocking OSAL APIs in this region.
+ *                  Atomic functions synchronize in every configuration.
  */
 uint32_t nx_critical_enter(void);
 
 /**
  * \brief           Exit critical section (restore interrupts)
- * \param[in]       primask: Previous interrupt state to restore
+ * \param[in]       primask: Token returned by the matching enter on this CPU/thread
  */
 void nx_critical_exit(uint32_t primask);
 
@@ -87,10 +91,11 @@ void nx_critical_exit(uint32_t primask);
 nx_mutex_t* nx_mutex_create(void);
 
 /**
- * \brief           Destroy a mutex
+ * \brief           Destroy an unowned mutex (task context, caller quiesces users)
+ * \return          NX_ERR_BUSY if held; NX_OK after reclamation
  * \param[in]       mutex: Mutex to destroy
  */
-void nx_mutex_destroy(nx_mutex_t* mutex);
+nx_status_t nx_mutex_destroy(nx_mutex_t* mutex);
 
 /**
  * \brief           Load atomic value

@@ -32,7 +32,7 @@ def run_command(cmd, check=True):
 def check_docker():
     """检查 Docker 是否可用"""
     try:
-        result = subprocess.run(["docker", "--version"], 
+        result = subprocess.run(["docker", "--version"],
                               capture_output=True, text=True, check=True)
         print(f"✓ Docker 可用: {result.stdout.strip()}")
         return True
@@ -45,29 +45,29 @@ def check_docker():
 def build_image():
     """构建 Docker 镜像"""
     print("🔨 构建 Nexus 开发环境镜像...")
-    
+
     dockerfile_path = Path(__file__).parent / "Dockerfile"
     if not dockerfile_path.exists():
         print("❌ Dockerfile 不存在")
         return False
-    
+
     cmd = [
         "docker", "build",
         "-t", "nexus-dev:latest",
         "-f", str(dockerfile_path),
         str(dockerfile_path.parent)
     ]
-    
+
     return run_command(cmd, check=False)
 
 
 def run_container():
     """运行开发容器"""
     print("🚀 启动 Nexus 开发容器...")
-    
+
     # 获取项目根目录
     project_root = Path(__file__).parent.parent.parent.resolve()
-    
+
     cmd = [
         "docker", "run",
         "-d",  # 后台运行
@@ -79,32 +79,32 @@ def run_container():
         "nexus-dev:latest",
         "sleep", "infinity"  # 保持容器运行
     ]
-    
+
     # 先停止已存在的容器
-    subprocess.run(["docker", "stop", "nexus-dev"], 
+    subprocess.run(["docker", "stop", "nexus-dev"],
                   capture_output=True, check=False)
-    
+
     return run_command(cmd, check=False)
 
 
 def enter_shell():
     """进入容器 shell"""
     print("🐚 进入 Nexus 开发容器...")
-    
+
     cmd = [
         "docker", "exec",
         "-it",
         "nexus-dev",
         "/bin/bash"
     ]
-    
+
     return run_command(cmd, check=False)
 
 
 def stop_container():
     """停止容器"""
     print("🛑 停止 Nexus 开发容器...")
-    
+
     cmd = ["docker", "stop", "nexus-dev"]
     return run_command(cmd, check=False)
 
@@ -112,11 +112,11 @@ def stop_container():
 def clean_docker():
     """清理 Docker 资源"""
     print("🧹 清理 Docker 资源...")
-    
+
     # 停止容器
-    subprocess.run(["docker", "stop", "nexus-dev"], 
+    subprocess.run(["docker", "stop", "nexus-dev"],
                   capture_output=True, check=False)
-    
+
     # 删除镜像
     cmd = ["docker", "rmi", "nexus-dev:latest"]
     return run_command(cmd, check=False)
@@ -125,13 +125,13 @@ def clean_docker():
 def show_status():
     """显示容器状态"""
     print("📊 Docker 容器状态:")
-    
+
     # 显示容器状态
     result = subprocess.run(
         ["docker", "ps", "-a", "--filter", "name=nexus-dev"],
         capture_output=True, text=True, check=False
     )
-    
+
     if result.returncode == 0:
         print(result.stdout)
     else:
@@ -154,7 +154,7 @@ def show_usage():
 
 4. 在容器中开发:
    cd nexus
-   python scripts/building/build.py
+   python scripts/building/build.py --preset linux-gcc-debug --stage all
    python scripts/test/test.py
 
 5. 停止容器:
@@ -178,46 +178,46 @@ def main():
     parser.add_argument("--stop", action="store_true", help="停止容器")
     parser.add_argument("--clean", action="store_true", help="清理容器和镜像")
     parser.add_argument("--status", action="store_true", help="显示容器状态")
-    
+
     args = parser.parse_args()
-    
+
     # 如果没有参数，显示使用说明
     if not any(vars(args).values()):
         show_usage()
         return 0
-    
+
     # 检查 Docker
     if not check_docker():
         return 1
-    
+
     success = True
-    
+
     try:
         if args.build:
             success &= build_image()
-        
+
         if args.run:
             success &= run_container()
-        
+
         if args.shell:
             success &= enter_shell()
-        
+
         if args.stop:
             success &= stop_container()
-        
+
         if args.clean:
             success &= clean_docker()
-        
+
         if args.status:
             show_status()
-        
+
         if success:
             print("✅ 操作完成")
             return 0
         else:
             print("❌ 部分操作失败")
             return 1
-            
+
     except KeyboardInterrupt:
         print("\n❌ 用户中断操作")
         return 1

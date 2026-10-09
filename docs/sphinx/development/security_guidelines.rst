@@ -1,6 +1,14 @@
 Security Guidelines
 ===================
 
+.. note::
+
+   This page describes product security design considerations, not implemented
+   Nexus capabilities. Security core has no automatic provider; OpenSSL is an
+   explicit Native choice. MCU bootloader/trust chain, entropy/vault/signing,
+   TLS/cloud and MPU/safety qualification are not supplied by this delivery.
+   Product security, keys and installation policy remain external.
+
 Security best practices for the Nexus Embedded Platform.
 
 .. contents:: Table of Contents

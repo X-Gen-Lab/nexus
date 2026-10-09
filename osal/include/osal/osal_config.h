@@ -15,6 +15,8 @@
 #ifndef OSAL_CONFIG_H
 #define OSAL_CONFIG_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,6 +85,16 @@ extern "C" {
 /* Resource Limits                                                           */
 /*---------------------------------------------------------------------------*/
 
+/** Cumulative handle identities per process/boot. Deleted storage slots are
+ * reusable, identities are not. A smaller product budget may be supplied to
+ * all adapter translation units; exhaustion fails rather than wrapping. */
+#ifndef OSAL_LIFETIME_TOKEN_LIMIT
+#define OSAL_LIFETIME_TOKEN_LIMIT (UINTPTR_MAX >> 4)
+#endif
+#if OSAL_LIFETIME_TOKEN_LIMIT == 0 || OSAL_LIFETIME_TOKEN_LIMIT > (UINTPTR_MAX >> 4)
+#error "OSAL lifetime token budget must fit the nonzero opaque handle identity"
+#endif
+
 /**
  * \brief           Maximum number of tasks
  */
@@ -109,6 +121,35 @@ extern "C" {
  */
 #ifndef OSAL_MAX_QUEUES
 #define OSAL_MAX_QUEUES 8
+#endif
+
+/** Maximum copied item size; bounds critical-section copy work. */
+#ifndef OSAL_MAX_QUEUE_ITEM_SIZE
+#define OSAL_MAX_QUEUE_ITEM_SIZE 1024u
+#endif
+/** Per-queue storage ceiling, independent of allocation overflow checks. */
+#ifndef OSAL_MAX_QUEUE_BYTES
+#define OSAL_MAX_QUEUE_BYTES (64u * 1024u)
+#endif
+
+/* Real FreeRTOS object storage. Values are bytes, never kernel stack words.
+ * A product can lower object counts and these capacities independently. */
+#if defined(NEXUS_EFFECTIVE_CONFIG)
+#include "nexus_config.h"
+#endif
+#ifndef OSAL_FREERTOS_TASK_STACK_BYTES
+#if defined(NX_CONFIG_OSAL_FREERTOS_TASK_STACK_BYTES)
+#define OSAL_FREERTOS_TASK_STACK_BYTES NX_CONFIG_OSAL_FREERTOS_TASK_STACK_BYTES
+#else
+#define OSAL_FREERTOS_TASK_STACK_BYTES 2048u
+#endif
+#endif
+#ifndef OSAL_FREERTOS_QUEUE_STORAGE_BYTES
+#if defined(NX_CONFIG_OSAL_FREERTOS_QUEUE_STORAGE_BYTES)
+#define OSAL_FREERTOS_QUEUE_STORAGE_BYTES NX_CONFIG_OSAL_FREERTOS_QUEUE_STORAGE_BYTES
+#else
+#define OSAL_FREERTOS_QUEUE_STORAGE_BYTES 1024u
+#endif
 #endif
 
 /**

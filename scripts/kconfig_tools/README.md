@@ -82,7 +82,7 @@ python scripts/kconfig_tools/cli.py generate \
     --peripheral UART \
     --platform NATIVE \
     --instances 4 \
-    --output platforms/native/src/uart/Kconfig
+    --output soc/native/controllers/uart/Kconfig
 
 # 使用简短参数
 python scripts/kconfig_tools/cli.py generate -p SPI -P NATIVE -n 2 -o output.kconfig
@@ -100,7 +100,7 @@ python scripts/kconfig_tools/cli.py generate -p SPI -P NATIVE -n 2 -o output.kco
 # 从配置文件批量生成
 python scripts/kconfig_tools/cli.py batch-generate \
     --config examples/batch_config.yaml \
-    --output-dir platforms/native/src/
+    --output-dir soc/native/controllers/
 
 # 使用简短参数
 python scripts/kconfig_tools/cli.py batch-generate -c config.yaml -o output/
@@ -124,11 +124,11 @@ peripherals:
 ```bash
 # 验证单个文件
 python scripts/kconfig_tools/cli.py validate \
-    --file platforms/native/src/uart/Kconfig
+    --file soc/native/controllers/uart/Kconfig
 
 # 验证目录下所有文件
 python scripts/kconfig_tools/cli.py validate \
-    --directory platforms/native/src/
+    --directory soc/native/controllers/
 
 # 使用简短参数
 python scripts/kconfig_tools/cli.py validate -f file.kconfig
@@ -140,11 +140,11 @@ python scripts/kconfig_tools/cli.py validate -d platforms/
 Validation Report
 =================
 
-File: platforms/native/src/uart/Kconfig
+File: soc/native/controllers/uart/Kconfig
 ----------------------------------------
 ✓ No issues found
 
-File: platforms/native/src/gpio/Kconfig
+File: soc/native/controllers/gpio/Kconfig
 ----------------------------------------
 ✗ 2 issues found:
 
@@ -208,14 +208,14 @@ from kconfig_tools import KconfigValidator, NamingRules
 validator = KconfigValidator(NamingRules())
 
 # 验证单个文件
-issues = validator.validate_file("platforms/native/src/uart/Kconfig")
+issues = validator.validate_file("soc/native/controllers/uart/Kconfig")
 for issue in issues:
     print(f"[{issue.severity.upper()}] Line {issue.line}: {issue.message}")
     if issue.suggestion:
         print(f"  Suggestion: {issue.suggestion}")
 
 # 验证目录
-all_issues = validator.validate_directory("platforms/native/src/")
+all_issues = validator.validate_directory("soc/native/controllers/")
 report = validator.generate_report(all_issues)
 print(report)
 ```

@@ -129,7 +129,7 @@ TEST_F(ConfigCryptoPropertyTest, Property7_EncryptionTransparencyStringAES128) {
 
         /* Set up encryption with AES-128 */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes128_key, 16,
-                                                       CONFIG_CRYPTO_AES128))
+                                                       CONFIG_CRYPTO_AES128_GCM))
             << "Iteration " << test_iter << ": set_encryption_key failed";
 
         /* Generate random string */
@@ -176,7 +176,7 @@ TEST_F(ConfigCryptoPropertyTest, Property7_EncryptionTransparencyStringAES256) {
 
         /* Set up encryption with AES-256 */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes256_key, 32,
-                                                       CONFIG_CRYPTO_AES256))
+                                                       CONFIG_CRYPTO_AES256_GCM))
             << "Iteration " << test_iter << ": set_encryption_key failed";
 
         /* Generate random string */
@@ -215,7 +215,7 @@ TEST_F(ConfigCryptoPropertyTest, Property7_EncryptionTransparencyBlobAES128) {
 
         /* Set up encryption with AES-128 */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes128_key, 16,
-                                                       CONFIG_CRYPTO_AES128))
+                                                       CONFIG_CRYPTO_AES128_GCM))
             << "Iteration " << test_iter << ": set_encryption_key failed";
 
         /* Generate random blob */
@@ -266,7 +266,7 @@ TEST_F(ConfigCryptoPropertyTest, Property7_EncryptionTransparencyBlobAES256) {
 
         /* Set up encryption with AES-256 */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes256_key, 32,
-                                                       CONFIG_CRYPTO_AES256))
+                                                       CONFIG_CRYPTO_AES256_GCM))
             << "Iteration " << test_iter << ": set_encryption_key failed";
 
         /* Generate random blob */
@@ -315,7 +315,7 @@ TEST_F(ConfigCryptoPropertyTest, Property7_EncryptionTransparencyRandomKey) {
         /* Generate random key */
         std::vector<uint8_t> key_data = randomAESKey(use_aes256);
         config_crypto_algo_t algo =
-            use_aes256 ? CONFIG_CRYPTO_AES256 : CONFIG_CRYPTO_AES128;
+            use_aes256 ? CONFIG_CRYPTO_AES256_GCM : CONFIG_CRYPTO_AES128_GCM;
 
         /* Set up encryption */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(key_data.data(),
@@ -359,7 +359,7 @@ TEST_F(ConfigCryptoPropertyTest, Property_EncryptedPlainIsolation) {
 
         /* Set up encryption */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes128_key, 16,
-                                                       CONFIG_CRYPTO_AES128));
+                                                       CONFIG_CRYPTO_AES128_GCM));
 
         /* Generate random values */
         std::string plain_value = randomString();
@@ -415,7 +415,7 @@ TEST_F(ConfigCryptoPropertyTest, Property_MultipleEncryptedValues) {
 
         /* Set up encryption */
         ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes128_key, 16,
-                                                       CONFIG_CRYPTO_AES128));
+                                                       CONFIG_CRYPTO_AES128_GCM));
 
         /* Generate random number of entries (2-5) */
         std::uniform_int_distribution<int> count_dist(2, 5);
@@ -442,5 +442,32 @@ TEST_F(ConfigCryptoPropertyTest, Property_MultipleEncryptedValues) {
             EXPECT_STREQ(expected_value.c_str(), buffer)
                 << "Iteration " << test_iter << ": value mismatch for " << key;
         }
+    }
+}
+
+TEST_F(ConfigCryptoPropertyTest, AuthenticatedEncryptedJsonRoundTrip) {
+    for (int iteration = 0; iteration < PROPERTY_TEST_ITERATIONS; ++iteration) {
+        ASSERT_EQ(CONFIG_OK, config_deinit());
+        ASSERT_EQ(CONFIG_OK, config_init(nullptr));
+        ASSERT_EQ(CONFIG_OK, config_set_encryption_key(aes256_key, sizeof(aes256_key),
+            CONFIG_CRYPTO_AES256_GCM));
+        const std::string text = randomString();
+        const std::vector<uint8_t> blob = randomBlob();
+        ASSERT_EQ(CONFIG_OK, config_set_str_encrypted("secret.string", text.c_str()));
+        ASSERT_EQ(CONFIG_OK, config_set_blob_encrypted("secret.blob", blob.data(), blob.size()));
+        size_t required;
+        ASSERT_EQ(CONFIG_OK, config_get_export_size(CONFIG_FORMAT_JSON, CONFIG_EXPORT_FLAG_NONE, &required));
+        std::vector<char> json(required); size_t actual;
+        ASSERT_EQ(CONFIG_OK, config_export(CONFIG_FORMAT_JSON, CONFIG_EXPORT_FLAG_NONE,
+            json.data(), json.size(), &actual));
+        ASSERT_EQ(CONFIG_OK, config_import(CONFIG_FORMAT_JSON, CONFIG_IMPORT_FLAG_CLEAR,
+            json.data(), actual)) << iteration;
+        char output[256];
+        ASSERT_EQ(CONFIG_OK, config_get_str("secret.string", output, sizeof(output)));
+        EXPECT_EQ(text, std::string(output));
+        std::vector<uint8_t> blobOutput(blob.size()); size_t size;
+        ASSERT_EQ(CONFIG_OK, config_get_blob("secret.blob", blobOutput.data(), blobOutput.size(), &size));
+        EXPECT_EQ(blob.size(), size);
+        EXPECT_EQ(blob, blobOutput);
     }
 }

@@ -1,0 +1,17 @@
+# STM32F407 implements physical SPI1..SPI3. Board bindings must exist for a bus.
+config STM32_SPI_USE_OSAL
+    bool "Serialize SPI transactions with OSAL"
+    default y if OSAL_FREERTOS
+    depends on OSAL_FREERTOS
+config STM32_SPI_USE_DMA
+    bool "Enable SPI DMA (requires board channels and interrupt wiring)"
+    default n
+config STM32_SPI1_ENABLE
+    bool "Enable physical SPI1"
+    default n
+config STM32_SPI2_ENABLE
+    bool "Enable physical SPI2"
+    default n
+config STM32_SPI3_ENABLE
+    bool "Enable physical SPI3"
+    default n

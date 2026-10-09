@@ -16,7 +16,7 @@
 extern "C" {
 #include "hal/interface/nx_timer.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_timer_helpers.h"
+#include "devices/native_timer_helpers.h"
 }
 
 /**

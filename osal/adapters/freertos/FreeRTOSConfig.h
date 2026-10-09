@@ -2,16 +2,19 @@
  * \file            FreeRTOSConfig.h
  * \brief           FreeRTOS configuration for Nexus Platform
  *
- * \details         This is the default FreeRTOS configuration template for
- * STM32F4 platform. Platform-specific configurations can override this by
- * placing a FreeRTOSConfig.h in the platforms/[platform]/ directory.
- *
- * \note            This configuration is optimized for STM32F4 running at
- * 168MHz
+ * \details         Maintained single-core Cortex-M4F kernel configuration.
+ * The selected product's effective configuration supplies CPU frequency,
+ * tick rate, priorities, management heap and bounded OSAL storage capacities.
  */
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
+
+#include <stddef.h>
+
+#if defined(NEXUS_EFFECTIVE_CONFIG)
+#include "nexus_config.h"
+#endif
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -28,6 +31,11 @@
  *----------------------------------------------------------*/
 
 /* Set to 1 to use preemptive scheduling, 0 for cooperative */
+#if defined(NEXUS_EFFECTIVE_CONFIG)
+#if !NX_CONFIG_FREERTOS_USE_PREEMPTION
+#error "The supported OSAL FreeRTOS profile requires preemption"
+#endif
+#endif
 #define configUSE_PREEMPTION 1
 
 /* Use port optimized task selection for Cortex-M */
@@ -37,13 +45,27 @@
 #define configUSE_TICKLESS_IDLE 0
 
 /* CPU clock frequency in Hz (STM32F4 @ 168MHz) */
+#if defined(NX_CONFIG_STM32_SYSCLK_FREQ)
+#define configCPU_CLOCK_HZ NX_CONFIG_STM32_SYSCLK_FREQ
+#elif defined(NX_CONFIG_GD32_SYSCLK_FREQ)
+#define configCPU_CLOCK_HZ NX_CONFIG_GD32_SYSCLK_FREQ
+#else
 #define configCPU_CLOCK_HZ 168000000UL
+#endif
 
 /* Tick rate in Hz (1000 = 1ms tick) */
+#if defined(NX_CONFIG_OSAL_TICK_RATE_HZ)
+#define configTICK_RATE_HZ NX_CONFIG_OSAL_TICK_RATE_HZ
+#else
 #define configTICK_RATE_HZ 1000
+#endif
 
 /* Maximum number of priorities (OSAL uses 0-31, so 32 priorities) */
+#if defined(NX_CONFIG_OSAL_MAX_PRIORITIES)
+#define configMAX_PRIORITIES NX_CONFIG_OSAL_MAX_PRIORITIES
+#else
 #define configMAX_PRIORITIES 32
+#endif
 
 /* Minimum stack size in words (128 words = 512 bytes for Cortex-M) */
 #define configMINIMAL_STACK_SIZE 128
@@ -65,14 +87,19 @@
  * Memory Allocation Configuration
  *----------------------------------------------------------*/
 
-/* Static allocation support (0 = disabled, 1 = enabled) */
-#define configSUPPORT_STATIC_ALLOCATION 0
+/* OSAL objects and scheduler idle/timer objects use bounded static storage. */
+#define configSUPPORT_STATIC_ALLOCATION 1
+#define configKERNEL_PROVIDED_STATIC_MEMORY 1
 
-/* Dynamic allocation support (required for OSAL) */
+/* Optional management-domain heap. OSAL object creation does not use it. */
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 
 /* Total heap size (32KB for STM32F4 with 128KB RAM) */
-#define configTOTAL_HEAP_SIZE (32 * 1024)
+#if defined(NX_CONFIG_OSAL_HEAP_SIZE)
+#define configTOTAL_HEAP_SIZE ((size_t)NX_CONFIG_OSAL_HEAP_SIZE)
+#else
+#define configTOTAL_HEAP_SIZE ((size_t)32768u)
+#endif
 
 /* Use application-provided heap (0 = use FreeRTOS heap) */
 #define configAPPLICATION_ALLOCATED_HEAP 0
@@ -120,13 +147,29 @@
  *----------------------------------------------------------*/
 
 /* Software timer support */
+#if defined(NEXUS_EFFECTIVE_CONFIG)
+#if !NX_CONFIG_FREERTOS_USE_TIMERS
+#error "The OSAL FreeRTOS lifetime barriers require the timer daemon"
+#endif
+#endif
 #define configUSE_TIMERS 1
 
 /* Timer task priority (highest priority) */
+#if defined(NX_CONFIG_FREERTOS_TIMER_TASK_PRIORITY)
+#define configTIMER_TASK_PRIORITY NX_CONFIG_FREERTOS_TIMER_TASK_PRIORITY
+#else
 #define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1)
+#endif
+#if configTIMER_TASK_PRIORITY >= configMAX_PRIORITIES
+#error "FreeRTOS timer priority exceeds the configured priority range"
+#endif
 
 /* Timer command queue length */
+#if defined(NX_CONFIG_FREERTOS_TIMER_QUEUE_LENGTH)
+#define configTIMER_QUEUE_LENGTH NX_CONFIG_FREERTOS_TIMER_QUEUE_LENGTH
+#else
 #define configTIMER_QUEUE_LENGTH 10
+#endif
 
 /* Timer task stack depth */
 #define configTIMER_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE
@@ -191,6 +234,7 @@
 #define INCLUDE_eTaskGetState               1
 #define INCLUDE_xEventGroupSetBitFromISR    1
 #define INCLUDE_xTimerPendFunctionCall      1
+#define INCLUDE_xSemaphoreGetMutexHolder    1
 #define INCLUDE_xTaskAbortDelay             0
 #define INCLUDE_xTaskGetHandle              0
 #define INCLUDE_xTaskResumeFromISR          1
@@ -203,26 +247,21 @@
 /* Definitions for Cortex-M interrupt handlers */
 #define vPortSVCHandler     SVC_Handler
 #define xPortPendSVHandler  PendSV_Handler
-#define xPortSysTickHandler SysTick_Handler
+/* The platform SysTick wrapper also maintains the HAL millisecond timebase.
+ * It calls the real xPortSysTickHandler after the scheduler has started. */
 
 /*-----------------------------------------------------------
  * Assert Configuration
  *----------------------------------------------------------*/
 
-/* Assert macro for debugging */
-#ifdef DEBUG
+/* Assertions protect ISR priority and kernel invariants in every build. */
 extern void vAssertCalled(const char* file, int line);
 #define configASSERT(x)                                                        \
-    if ((x) == 0)                                                              \
-    vAssertCalled(__FILE__, __LINE__)
-#else
-#define configASSERT(x)                                                        \
-    if ((x) == 0) {                                                            \
-        taskDISABLE_INTERRUPTS();                                              \
-        for (;;)                                                               \
-            ;                                                                  \
-    }
-#endif
+    do {                                                                      \
+        if ((x) == 0) {                                                       \
+            vAssertCalled(__FILE__, __LINE__);                                \
+        }                                                                     \
+    } while (0)
 
 /*-----------------------------------------------------------
  * FPU Configuration (Cortex-M4F)

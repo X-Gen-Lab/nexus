@@ -14,12 +14,15 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include <utility>
+#include <vector>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_gpio.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_gpio_helpers.h"
+#include "devices/native_gpio_helpers.h"
 }
 
 /**
@@ -34,10 +37,21 @@ class GPIOPropertyTest : public ::testing::Test {
   protected:
     std::mt19937 rng;
     nx_gpio_t* gpio = nullptr;
+    std::vector<std::pair<char, uint8_t>> configured_pins;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
+        /* Enumerate enabled devices; each property iteration must exercise a
+         * device rather than silently skipping a disabled random pin. */
+        for (char port = 'A'; port <= 'H'; ++port) {
+            for (uint8_t pin = 0; pin < 16; ++pin) {
+                if (nx_factory_gpio(port, pin) != nullptr) {
+                    configured_pins.emplace_back(port, pin);
+                }
+            }
+        }
+        ASSERT_FALSE(configured_pins.empty());
         /* Reset all GPIO instances */
         native_gpio_reset_all();
 
@@ -72,20 +86,10 @@ class GPIOPropertyTest : public ::testing::Test {
         return static_cast<uint8_t>(dist(rng));
     }
 
-    /**
-     * \brief       Generate random GPIO port ('A'-'H')
-     */
-    char randomPort() {
-        std::uniform_int_distribution<int> dist(0, 7);
-        return static_cast<char>('A' + dist(rng));
-    }
-
-    /**
-     * \brief       Generate random GPIO pin (0-15)
-     */
-    uint8_t randomPin() {
-        std::uniform_int_distribution<int> dist(0, 15);
-        return static_cast<uint8_t>(dist(rng));
+    std::pair<char, uint8_t> randomConfiguredPin() {
+        std::uniform_int_distribution<size_t> dist(0,
+                                                   configured_pins.size() - 1);
+        return configured_pins[dist(rng)];
     }
 
     /**
@@ -115,17 +119,14 @@ class GPIOPropertyTest : public ::testing::Test {
 TEST_F(GPIOPropertyTest, Property1_InitializationIdempotent) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Generate random port and pin */
-        char port = randomPort();
-        uint8_t pin = randomPin();
+        const auto [port, pin] = randomConfiguredPin();
 
         /* Reset this GPIO */
         native_gpio_reset(port - 'A', pin);
 
         /* Get GPIO instance */
         nx_gpio_t* test_gpio = nx_factory_gpio(port, pin);
-        if (test_gpio == nullptr) {
-            continue; /* Skip if GPIO not available */
-        }
+        ASSERT_NE(nullptr, test_gpio);
 
         /* Initialize */
         nx_lifecycle_t* lifecycle =
@@ -176,17 +177,14 @@ TEST_F(GPIOPropertyTest, Property1_InitializationIdempotent) {
 TEST_F(GPIOPropertyTest, Property2_LifecycleRoundTrip) {
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Generate random port and pin */
-        char port = randomPort();
-        uint8_t pin = randomPin();
+        const auto [port, pin] = randomConfiguredPin();
 
         /* Reset this GPIO */
         native_gpio_reset(port - 'A', pin);
 
         /* Get GPIO instance */
         nx_gpio_t* test_gpio = nx_factory_gpio(port, pin);
-        if (test_gpio == nullptr) {
-            continue; /* Skip if GPIO not available */
-        }
+        ASSERT_NE(nullptr, test_gpio);
 
         /* Check initial state */
         native_gpio_state_t state_before;

@@ -1,4 +1,4 @@
-name: Release
+name: Release Candidate
 
 on:
   push:
@@ -7,114 +7,224 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., v1.0.0)'
+        description: 'Existing tag matching the selected source commit (e.g., v1.0.0)'
         required: true
         type: string
 
+permissions:
+  contents: read
+
+concurrency:
+  group: release-candidate-${{ github.event.inputs.version || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
-  create-release:
-    name: Create Release
+  metadata:
+    name: Validate Release Source
     runs-on: ubuntu-latest
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.version }}
-
+      version: ${{ steps.validate.outputs.version }}
+      commit: ${{ steps.validate.outputs.commit }}
+      prerelease: ${{ steps.validate.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate changelog
-        run: |
-          if [ -f CHANGELOG.md ]; then
-            sed -n "/## \[${{ steps.get_version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | head -n -1 > release_notes.md
-          else
-            echo "Release ${{ steps.get_version.outputs.version }}" > release_notes.md
-          fi
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
-          body_path: release_notes.md
-          draft: false
-          prerelease: false
+          python-version: '3.11'
+      - name: Validate version and tag commit
+        id: validate
+        env:
+          RELEASE_VERSION: ${{ github.event.inputs.version || github.ref_name }}
+        run: python3 scripts/ci/package_release.py metadata --version "$RELEASE_VERSION"
 
   build-release:
     name: Build ${{ matrix.name }}
-    needs: create-release
+    needs: metadata
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: Windows MSVC
-            os: windows-latest
-            preset: windows-msvc-release
-            artifact: nexus-windows-msvc
           - name: Linux GCC
             os: ubuntu-latest
             preset: linux-gcc-release
             artifact: nexus-linux-gcc
-          - name: macOS Clang
-            os: macos-latest
-            preset: macos-clang-release
-            artifact: nexus-macos-clang
-          - name: ARM Cortex-M4
+            host_tests: true
+          - name: STM32F407 Baremetal
             os: ubuntu-latest
-            preset: cross-arm-release
-            artifact: nexus-arm-cortex-m4
-
+            preset: stm32-armgcc-release
+            artifact: nexus-stm32f407-baremetal
+            host_tests: false
+          - name: STM32F407 FreeRTOS
+            os: ubuntu-latest
+            preset: stm32-armgcc-freertos-release
+            artifact: nexus-stm32f407-freertos
+            host_tests: false
+          - name: Qiming STM32F407ZG Baremetal
+            os: ubuntu-latest
+            preset: stm32-qiming-armgcc-baremetal-release
+            artifact: nexus-stm32f407-qiming-baremetal
+            host_tests: false
+          - name: Qiming STM32F407ZG FreeRTOS
+            os: ubuntu-latest
+            preset: stm32-qiming-armgcc-freertos-release
+            artifact: nexus-stm32f407-qiming-freertos
+            host_tests: false
+          - name: Sky STM32F407VE Baremetal
+            os: ubuntu-latest
+            preset: stm32-sky-armgcc-baremetal-release
+            artifact: nexus-stm32f407-sky-baremetal
+            host_tests: false
+          - name: Sky STM32F407VE FreeRTOS
+            os: ubuntu-latest
+            preset: stm32-sky-armgcc-freertos-release
+            artifact: nexus-stm32f407-sky-freertos
+            host_tests: false
+          - name: Liangshan GD32F470ZG Baremetal
+            os: ubuntu-latest
+            preset: gd32f470-armgcc-baremetal-release
+            artifact: nexus-gd32f470-liangshan-baremetal
+            host_tests: false
+          - name: Liangshan GD32F470ZG FreeRTOS
+            os: ubuntu-latest
+            preset: gd32f470-armgcc-freertos-release
+            artifact: nexus-gd32f470-liangshan-freertos
+            host_tests: false
+    env:
+      BUILD_PRESET: ${{ matrix.preset }}
+      RELEASE_ARTIFACT: ${{ matrix.artifact }}
+      RELEASE_VERSION: ${{ needs.metadata.outputs.version }}
+      SOURCE_COMMIT: ${{ needs.metadata.outputs.commit }}
+    defaults:
+      run:
+        shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
-
+          ref: ${{ needs.metadata.outputs.commit }}
+          fetch-depth: 0
+          submodules: false
+          persist-credentials: false
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
-
-      - name: Configure
-        run: cmake --preset ${{ matrix.preset }}
-
-      - name: Build
-        run: cmake --build --preset ${{ matrix.preset }} --parallel
-
-      - name: Package
-        shell: bash
+      - name: Install locked ARM compiler for source SDK relocation contracts
+        if: matrix.host_tests
         run: |
-          mkdir -p release/${{ matrix.artifact }}
-          cp -r build/${{ matrix.preset }}/bin/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp -r build/${{ matrix.preset }}/lib/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp README.md LICENSE release/${{ matrix.artifact }}/
-
-      - name: Create Archive
-        shell: bash
+          python3 scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+          echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
+      - name: Initialize Maintained Dependencies
         run: |
-          cd release
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            7z a ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip" >> $GITHUB_ENV
-          else
-            tar czf ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz" >> $GITHUB_ENV
+          case "$BUILD_PRESET" in
+            linux-gcc-release)
+              git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+              ;;
+            gd32f470-*)
+              python3 scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
+              ;;
+            stm32-*)
+              git submodule update --init vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+              ;;
+            *) exit 1 ;;
+          esac
+          if [[ "$BUILD_PRESET" == *freertos-release ]]; then
+            git submodule update --init --recursive ext/freertos
           fi
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
+      - name: Configure
+        run: cmake --preset "$BUILD_PRESET"
+      - name: Build
+        run: cmake --build --preset "$BUILD_PRESET" --parallel 4
+      - name: Validate actual ARM vectors, registration ABI and physical memory
+        if: ${{ !matrix.host_tests }}
+        run: >-
+          python3 scripts/ci/validate_firmware_elf.py
+          --build-dir "build/$BUILD_PRESET"
+          --report "build/$BUILD_PRESET/firmware-static-contract.json"
+      - name: Test Native platform contracts and verify fresh JUnit
+        if: matrix.host_tests
+        run: python3 scripts/ci/ci_build.py --preset "$BUILD_PRESET" --stage test --jobs 4
+      - name: Package compiled outputs and provenance
+        run: |
+          python3 scripts/ci/package_release.py package \
+            --version "$RELEASE_VERSION" --source-commit "$SOURCE_COMMIT" \
+            --preset "$BUILD_PRESET" --artifact "$RELEASE_ARTIFACT" \
+            --build-dir "build/$BUILD_PRESET" --output-dir release
+      - name: Stage candidate assets
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          tag_name: ${{ needs.create-release.outputs.version }}
-          files: ${{ env.ASSET_PATH }}
+          name: release-${{ matrix.artifact }}
+          path: |
+            release/*.zip
+            release/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Retain Build and Test Evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: evidence-${{ matrix.artifact }}
+          path: |
+            build/${{ matrix.preset }}/CMakeCache.txt
+            build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/generated/*
+            build/${{ matrix.preset }}/ctest-results.xml
+            build/${{ matrix.preset }}/firmware-static-contract.json
+            build/${{ matrix.preset }}/Testing/Temporary/*.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  candidate-release:
+    name: Create Draft Release Candidate
+    needs: [metadata, build-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ needs.metadata.outputs.version }}
+      SOURCE_COMMIT: ${{ needs.metadata.outputs.commit }}
+      RELEASE_PRERELEASE: ${{ needs.metadata.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.metadata.outputs.commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Download complete candidate asset set
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: release-nexus-*
+          path: release
+          merge-multiple: true
+      - name: Verify assets and generate candidate notes
+        run: |
+          python3 scripts/ci/package_release.py verify-assets \
+            --version "$RELEASE_VERSION" --source-commit "$SOURCE_COMMIT" \
+            --expected nexus-linux-gcc=linux-gcc-release \
+            --expected nexus-stm32f407-baremetal=stm32-armgcc-release \
+            --expected nexus-stm32f407-freertos=stm32-armgcc-freertos-release \
+            --expected nexus-stm32f407-qiming-baremetal=stm32-qiming-armgcc-baremetal-release \
+            --expected nexus-stm32f407-qiming-freertos=stm32-qiming-armgcc-freertos-release \
+            --expected nexus-stm32f407-sky-baremetal=stm32-sky-armgcc-baremetal-release \
+            --expected nexus-stm32f407-sky-freertos=stm32-sky-armgcc-freertos-release \
+            --expected nexus-gd32f470-liangshan-baremetal=gd32f470-armgcc-baremetal-release \
+            --expected nexus-gd32f470-liangshan-freertos=gd32f470-armgcc-freertos-release
+      - name: Create draft candidate after every build succeeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          release_options=(--draft --verify-tag)
+          if [[ "$RELEASE_PRERELEASE" == "true" ]]; then
+            release_options+=(--prerelease --latest=false)
+          fi
+          gh release create "$RELEASE_VERSION" "${release_options[@]}" \
+            --target "$SOURCE_COMMIT" --title "Nexus $RELEASE_VERSION candidate" \
+            --notes-file release_notes.md release/*.zip release/SHA256SUMS

@@ -15,9 +15,11 @@
  * **Validates: Requirements 9.4**
  */
 
+#include "hal/nx_factory.h"
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
@@ -40,7 +42,7 @@ class OptionBytesPropertyTest : public ::testing::Test {
     nx_option_bytes_t* opt_bytes = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all Option Bytes instances */
         native_option_bytes_reset_all();

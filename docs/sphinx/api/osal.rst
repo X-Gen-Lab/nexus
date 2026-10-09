@@ -1,194 +1,125 @@
 OSAL API Reference
 ==================
 
-This section documents the OS Abstraction Layer (OSAL) API.
+Public headers under ``osal/include/osal`` define resource, context, timeout and
+lifecycle contracts. Maintained backends are Native, FreeRTOS and baremetal.
+RT-Thread is not an implemented build backend and fails configuration.
 
-Overview
---------
+Context and timeouts
+--------------------
 
-The Nexus OSAL provides a portable RTOS interface that works across multiple
-backends including FreeRTOS, RT-Thread, and bare-metal. It provides a unified
-API for tasks, synchronization primitives, and memory management.
+Creation/deletion, task control, mutex ownership, blocking waits and allocation
+belong to task context. Only APIs explicitly declared for ISR use may run in
+interrupts. Use ``*_from_isr`` where provided, respecting backend capability and
+MCU interrupt priority rules. An API's presence does not make every operation or
+timeout ISR-safe.
 
-Usage Examples
---------------
+Timeouts are milliseconds. ``OSAL_NO_WAIT`` attempts once;
+``OSAL_WAIT_FOREVER`` permits indefinite waiting. Positive finite waits use the
+backend clock and cannot become zero through tick conversion. Workers needing
+cooperative shutdown must use bounded waits. Full/empty, timeout, exhaustion and
+unsupported operations remain distinct outcomes.
 
-Task Creation
-~~~~~~~~~~~~~
+Tasks and shutdown
+------------------
 
-.. code-block:: c
-
-    #include "osal/osal.h"
-
-    /* Task function */
-    void my_task(void* arg) {
-        while (1) {
-            /* Task work */
-            osal_task_delay(1000);  /* Delay 1000ms */
-        }
-    }
-
-    /* Create task */
-    osal_task_t task;
-    osal_task_config_t config = {
-        .name = "MyTask",
-        .stack_size = 2048,
-        .priority = 5
-    };
-
-    osal_task_create(&task, my_task, NULL, &config);
-
-Mutex Usage
-~~~~~~~~~~~
+``osal_task_config_t`` contains function and argument. Create with
+``osal_task_create(&config, &handle)``; stack size is in bytes. Native starts a
+worker on creation; FreeRTOS execution depends on kernel lifecycle. Shared
+resources must exist before workers can access them.
 
 .. code-block:: c
 
-    #include "osal/osal.h"
+   #include "osal/osal.h"
 
-    /* Create mutex */
-    osal_mutex_t mutex;
-    osal_mutex_create(&mutex);
+   static void worker(void* arg) {
+       (void)arg;
+       while (!osal_task_should_stop()) {
+           if (osal_task_delay(10) != OSAL_OK) {
+               return;
+           }
+       }
+   }
 
-    /* Lock mutex */
-    if (osal_mutex_lock(&mutex, 1000) == OSAL_OK) {
-        /* Critical section */
+   osal_status_t start_worker(osal_task_handle_t* handle) {
+       const osal_task_config_t config = {
+           .name = "worker",
+           .func = worker,
+           .arg = NULL,
+           .priority = OSAL_TASK_PRIORITY_NORMAL,
+           .stack_size = 2048
+       };
+       return osal_task_create(&config, handle);
+   }
 
-        /* Unlock mutex */
-        osal_mutex_unlock(&mutex);
-    }
+Initialize OSAL and check creation. Request cooperative stop with
+``osal_task_request_stop``; the worker observes ``osal_task_should_stop`` and
+returns. Join with bounded ``osal_task_join`` before deleting the handle or
+releasing shared data. Delete of a running task can return BUSY, not forcefully
+terminate arbitrary code. Retain dependencies when join fails.
 
-    /* Delete mutex when done */
-    osal_mutex_delete(&mutex);
+Synchronization and lifetime
+----------------------------
 
-Semaphore Usage
-~~~~~~~~~~~~~~~
+Create into an ``osal_mutex_handle_t``; lock/unlock/delete receive the handle,
+not its address. Mutexes have task ownership and cannot serve as ISR locks.
+Locked mutex deletion returns BUSY; its owner must unlock before reclamation.
+Counting semaphores use ``osal_sem_create(initial_count, max_count, &handle)``
+and ``osal_sem_take``/``osal_sem_give``.
 
-.. code-block:: c
+Queues use ``osal_queue_create(item_size, item_count, &handle)`` and copy fixed
+size items. Callers supply complete item buffers. Item size, storage and object
+counts are bounded by generated resource profiles. Handles are opaque; successful
+deletion invalidates copies, and stale tokens cannot acquire a reused slot.
+Backend lifetime protection does not synchronize arbitrary application data.
+Respect BUSY/errors and quiesce users before freeing contexts or buffers.
 
-    #include "osal/osal.h"
+Events, timers and critical sections
+------------------------------------
 
-    /* Create binary semaphore */
-    osal_sem_t sem;
-    osal_sem_create(&sem, 0, 1);
+Event waits are task operations; ISR changes use explicitly declared variants
+and can report unsupported capabilities. Event barriers require a scheduler.
+Software timer callbacks run in service/task context, not as hardware-ISR timing.
+Keep callbacks bounded and avoid blocking the FreeRTOS timer service. Timer
+deletion can return BUSY while callbacks/control still own it; retain context
+and retry after quiescence. Self-deletion does not imply automatic reclamation.
 
-    /* Wait for semaphore */
-    if (osal_sem_wait(&sem, OSAL_WAIT_FOREVER) == OSAL_OK) {
-        /* Semaphore acquired */
-    }
+Balance critical-section enter/exit on the same task. Do not hold a critical
+section across blocking work, Flash, logging or arbitrary callbacks. Mixed
+ISR/task use needs the documented saved-mask HAL primitive and board priority
+policy.
 
-    /* Signal semaphore */
-    osal_sem_post(&sem);
+Backend boundaries
+------------------
 
-    /* Delete semaphore */
-    osal_sem_delete(&sem);
+Native uses host synchronization. Its tests cannot validate Cortex-M masking,
+DMA or deadlines. The pinned real FreeRTOS POSIX contract runner also does not
+validate the Cortex-M interrupt port.
 
-Queue Usage
-~~~~~~~~~~~
+Baremetal is a main loop: tasks, event barriers and software timers return
+``OSAL_ERROR_NOT_SUPPORTED`` rather than fictitious scheduler success. Its timed
+waits need a real board monotonic clock and declared capabilities. Delay/yield
+do not switch tasks. Scheduler-dependent applications must reject baremetal.
 
-.. code-block:: c
-
-    #include "osal/osal.h"
-
-    /* Create queue */
-    osal_queue_t queue;
-    osal_queue_create(&queue, 10, sizeof(int));
-
-    /* Send to queue */
-    int data = 42;
-    osal_queue_send(&queue, &data, 1000);
-
-    /* Receive from queue */
-    int received;
-    if (osal_queue_receive(&queue, &received, 1000) == OSAL_OK) {
-        /* Process received data */
-    }
-
-    /* Delete queue */
-    osal_queue_delete(&queue);
-
-Timer Usage
-~~~~~~~~~~~
-
-.. code-block:: c
-
-    #include "osal/osal.h"
-
-    /* Timer callback */
-    void timer_callback(void* arg) {
-        /* Timer expired */
-    }
-
-    /* Create timer */
-    osal_timer_t timer;
-    osal_timer_config_t config = {
-        .name = "MyTimer",
-        .period_ms = 1000,
-        .auto_reload = true
-    };
-
-    osal_timer_create(&timer, timer_callback, NULL, &config);
-
-    /* Start timer */
-    osal_timer_start(&timer);
-
-    /* Stop timer */
-    osal_timer_stop(&timer);
-
-    /* Delete timer */
-    osal_timer_delete(&timer);
-
-Thread Safety
+Generated API
 -------------
-
-All OSAL functions are **thread-safe** and can be called from multiple tasks
-simultaneously. The OSAL handles all necessary synchronization internally.
-
-OSAL Definitions
-----------------
 
 .. doxygengroup:: OSAL_DEF
    :project: nexus
-   :content-only:
-
-Task API
---------
+   :members:
 
 .. doxygengroup:: OSAL_TASK
    :project: nexus
-   :content-only:
-
-Mutex API
----------
+   :members:
 
 .. doxygengroup:: OSAL_MUTEX
    :project: nexus
-   :content-only:
-
-Semaphore API
--------------
+   :members:
 
 .. doxygengroup:: OSAL_SEM
    :project: nexus
-   :content-only:
-
-Queue API
----------
+   :members:
 
 .. doxygengroup:: OSAL_QUEUE
    :project: nexus
-   :content-only:
-
-Related APIs
-------------
-
-- :doc:`hal` - Hardware abstraction layer
-- :doc:`init` - Automatic initialization system
-- :doc:`log` - Logging framework (uses OSAL for thread safety)
-- :doc:`shell` - Shell framework (uses OSAL for task management)
-
-See Also
---------
-
-- :doc:`../user_guide/osal` - OSAL User Guide
-- :doc:`../reference/error_codes` - Error Code Reference
-- :doc:`../platform_guides/index` - Platform-Specific Guides
+   :members:

@@ -1,6 +1,12 @@
 Kconfig Tools API
 =================
 
+.. note::
+
+   Template generation is a development helper. Actual supported symbols and
+   capabilities come from maintained Kconfig/providers/Board routes; generated
+   draft names do not implement hardware or bypass strict configuration.
+
 Overview
 --------
 

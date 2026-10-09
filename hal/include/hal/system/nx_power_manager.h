@@ -20,10 +20,13 @@ typedef enum nx_power_mode_e {
     NX_POWER_RUN = 0, /**< Normal run mode */
     NX_POWER_SLEEP,   /**< Sleep mode (CPU stopped, peripherals running) */
     NX_POWER_STOP,    /**< Stop mode (most clocks stopped) */
+    NX_POWER_UNKNOWN, /**< Invalid instance or unavailable mode query */
 } nx_power_mode_t;
 
 /**
- * \brief           Power manager interface (simplified)
+ * \brief           System power manager interface
+ * \note            The common manager reports RUN. Hardware SLEEP/STOP
+ *                  transitions are unsupported until a platform provides them.
  */
 typedef struct nx_power_manager_s nx_power_manager_t;
 struct nx_power_manager_s {
@@ -32,13 +35,15 @@ struct nx_power_manager_s {
      * \param[in]       self: Power manager instance
      * \param[in]       mode: Target power mode
      * \return          NX_OK on success, error code otherwise
+     * \note            Task context. NULL returns NX_ERR_NULL_PTR. Unsupported
+     *                  transitions do not change the reported mode.
      */
     nx_status_t (*enter_mode)(nx_power_manager_t* self, nx_power_mode_t mode);
 
     /**
      * \brief           Get current power mode
      * \param[in]       self: Power manager instance
-     * \return          Current power mode
+     * \return          Current mode, or NX_POWER_UNKNOWN for an invalid instance
      */
     nx_power_mode_t (*get_mode)(nx_power_manager_t* self);
 };

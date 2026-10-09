@@ -1,148 +1,86 @@
-# Nexus Performance Workflow
-# Performance benchmarking and regression testing
-
-name: Performance
+name: Resource Evidence
 
 on:
   schedule:
-    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+    - cron: '0 2 * * 1'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  benchmark:
-    name: Performance Benchmarks
+  memory-check:
+    name: Native Valgrind contracts
     runs-on: ubuntu-latest
-
+    timeout-minutes: 60
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          os: ubuntu-latest
-          preset: linux-gcc-release
-
-      - name: Configure
-        run: cmake --preset linux-gcc-release
-
-      - name: Build
-        run: cmake --build --preset linux-gcc-release --parallel
-
-      - name: Run Benchmarks
-        run: ctest --preset linux-gcc-release -L performance --output-on-failure || true
-
-      - name: Generate Performance Report
-        run: |
-          echo "## Performance Benchmark Results" > performance-report.md
-          echo "" >> performance-report.md
-          echo "**Build Type:** Release" >> performance-report.md
-          echo "**Platform:** Native (Ubuntu)" >> performance-report.md
-          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> performance-report.md
-          echo "" >> performance-report.md
-
-          if [ -f build/linux-gcc-release/performance-*.txt ]; then
-            echo "### Results" >> performance-report.md
-            echo "\`\`\`" >> performance-report.md
-            cat build/linux-gcc-release/performance-*.txt >> performance-report.md || true
-            echo "\`\`\`" >> performance-report.md
-          fi
-
-      - name: Upload Performance Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-report
-          path: performance-report.md
-          retention-days: 90
-
-  memory-profile:
-    name: Memory Profiling
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
           preset: linux-gcc-debug
-
-      - name: Install Valgrind
+      - name: Install maintained memory checker
         run: sudo apt-get update && sudo apt-get install -y valgrind
-
-      - name: Configure
-        run: cmake --preset linux-gcc-debug
-
-      - name: Build
-        run: cmake --build --preset linux-gcc-debug --parallel
-
-      - name: Run Valgrind
+      - name: Build native contracts
         run: |
-          ctest --preset linux-gcc-debug -L unit \
-            --overwrite MemoryCheckCommandOptions="--leak-check=full --show-leak-kinds=all" \
-            -T memcheck || true
-
-      - name: Generate Memory Report
+          cmake --preset linux-gcc-debug
+          cmake --build --preset linux-gcc-debug --parallel 2
+      - name: Check every executed contract and reject tool errors
         run: |
-          echo "## Memory Profiling Results" > memory-report.md
-          echo "" >> memory-report.md
-          find build/linux-gcc-debug/Testing/Temporary -name "MemoryChecker.*.log" \
-            -exec cat {} \; >> memory-report.md || true
-
-      - name: Upload Memory Report
-        uses: actions/upload-artifact@v4
+          python scripts/evidence/resource_checks.py memory \
+            --build build/linux-gcc-debug --report build/linux-gcc-debug/memory-report.json
+      - name: Retain memory execution evidence
         if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: memory-report
+          name: native-memory-check
           path: |
-            memory-report.md
-            build/linux-gcc-debug/Testing/Temporary/MemoryChecker.*.log
+            build/linux-gcc-debug/memory-report.json
+            build/linux-gcc-debug/memory-logs/
+            build/linux-gcc-debug/generated/
+          if-no-files-found: error
           retention-days: 90
 
-  size-analysis:
-    name: Code Size Analysis
+  arm-size:
+    name: STM32F407 linked image size (hardware timing pending)
     runs-on: ubuntu-latest
-
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [stm32-armgcc-release, stm32-armgcc-freertos-release]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
-          preset: cross-arm-release
-
-      - name: Configure
-        run: cmake --preset cross-arm-release
-
-      - name: Build
-        run: cmake --build --preset cross-arm-release --parallel
-
-      - name: Analyze Code Size
+          preset: ${{ matrix.preset }}
+      - name: Build the target image
         run: |
-          echo "## Code Size Analysis (ARM Cortex-M4)" > size-report.md
-          echo "" >> size-report.md
-          echo "**Build Type:** MinSizeRel" >> size-report.md
-          echo "**Platform:** STM32F4" >> size-report.md
-          echo "" >> size-report.md
-          echo "### Application Sizes" >> size-report.md
-          echo "" >> size-report.md
-          echo "\`\`\`" >> size-report.md
-          find build/cross-arm-release -name "*.elf" -exec arm-none-eabi-size -A {} \; >> size-report.md || true
-          echo "\`\`\`" >> size-report.md
-
-      - name: Upload Size Report
-        uses: actions/upload-artifact@v4
+          cmake --preset "${{ matrix.preset }}"
+          cmake --build --preset "${{ matrix.preset }}" --parallel 2
+      - name: Measure actual linked sections, reject missing images/tools
+        run: |
+          python scripts/ci/validate_firmware_elf.py \
+            --build-dir "build/${{ matrix.preset }}" \
+            --report "build/${{ matrix.preset }}/firmware-static-contract.json"
+          python scripts/evidence/resource_checks.py size \
+            --build "build/${{ matrix.preset }}" \
+            --report "build/${{ matrix.preset }}/size-report.json"
+      - name: Retain section measurements and map evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: size-report
-          path: size-report.md
+          name: arm-size-${{ matrix.preset }}
+          path: |
+            build/${{ matrix.preset }}/size-report.json
+            build/${{ matrix.preset }}/firmware-static-contract.json
+            build/${{ matrix.preset }}/bin/*.elf
+            build/${{ matrix.preset }}/bin/*.map
+            build/${{ matrix.preset }}/generated/
+          if-no-files-found: error
           retention-days: 90

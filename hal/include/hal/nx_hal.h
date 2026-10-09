@@ -14,11 +14,11 @@
  *     // Initialize HAL
  *     nx_hal_init();
  *
- *     // Get UART device
- *     nx_uart_t *uart = nx_factory_uart(0);
- *     if (uart) {
- *         // Use UART...
- *         nx_factory_uart_release(uart);
+ *     // Device actions use an explicit owner and a typed reference.
+ *     nx_device_ref_t led = {0};
+ *     if (nx_device_open("GPIOA0", NX_DEVICE_CLASS_GPIO, 1, &led) == NX_OK) {
+ *         nx_device_gpio_write(led, 1);
+ *         nx_device_close(led);
  *     }
  *
  *     // Cleanup
@@ -80,7 +80,7 @@ extern "C" {
 /* Factory Interface                                                         */
 /*---------------------------------------------------------------------------*/
 
-#include "hal/nx_factory.h"
+/* Explicit provider/migration factories are not part of this consumer umbrella. */
 
 /*---------------------------------------------------------------------------*/
 /* HAL Initialization and Deinitialization                                   */
@@ -93,36 +93,65 @@ extern "C" {
  * This function initializes the HAL subsystem. It should be called once
  * at system startup before using any HAL functionality.
  *
- * The function performs the following:
- * - Initializes platform-specific hardware
- * - Sets up resource managers (DMA, ISR)
- * - Prepares device registry
+ * The selected platform initializes its hardware and effective-config resources.
  *
  * \note            This function is idempotent - calling it multiple times
  *                  has no additional effect after the first successful call.
+ * \note            Externally serialized task/startup context with interrupts
+ *                  unmasked. ISR calls return NX_ERR_CONTEXT; an existing Arch
+ *                  interrupt mask returns NX_ERR_INVALID_STATE before any
+ *                  platform hook, including repeated calls. The caller retains
+ *                  and restores its own mask. The application serializes HAL
+ *                  lifetime against device users. An unbound platform is unsupported.
  */
 nx_status_t nx_hal_init(void);
+
+typedef enum {
+    NX_HAL_OFFLINE, /**< No selected-platform resources are owned. */
+    NX_HAL_PARTIAL, /**< Cleanup failed; new acquisition/restart is quarantined.
+                     */
+    NX_HAL_READY    /**< The selected platform completed initialization. */
+} nx_hal_state_t;
+
+/** Nonblocking lifetime snapshot; use the serialized HAL lifecycle context.
+ * Failed init attempts actual cleanup and returns its original error. PARTIAL
+ * retains ownership and the exclusive admission fence until nx_hal_deinit()
+ * settles it. Existing owners may close/recover to return borrowed resources.
+ */
+nx_hal_state_t nx_hal_get_state(void);
+
+/** Cleanup result from the latest failed-init rollback or deinit attempt.
+ * This is separate from the original initialization error. */
+nx_status_t nx_hal_get_last_cleanup_status(void);
 
 /**
  * \brief           Deinitialize the Nexus HAL
  * \return          NX_OK on success, error code otherwise
  *
- * This function deinitializes the HAL subsystem and releases all resources.
- * It should be called at system shutdown.
+ * This function requests selected-platform hardware cleanup at system shutdown.
+ * The caller must first quiesce device users and settle all outstanding leases;
+ * this entry does not automatically release device handles or application objects.
  *
- * The function performs the following:
- * - Deinitializes all active devices
- * - Releases resource managers
- * - Cleans up platform-specific hardware
- *
- * \warning         After calling this function, no HAL functions should be
- *                  called until nx_hal_init() is called again.
+ * \warning         After successful cleanup, initialize HAL before device use.
+ *                  PARTIAL permits settlement/cleanup retry, not ordinary use.
+ * \note            Externally serialized task/startup context with interrupts
+ *                  unmasked. ISR calls return NX_ERR_CONTEXT; an existing Arch
+ *                  interrupt mask returns NX_ERR_INVALID_STATE before any
+ *                  platform hook, including offline calls. The caller retains
+ *                  and restores its own mask. An unsupported or busy platform
+ *                  retains ownership. Read-only admission failure keeps READY;
+ *                  any failure after entering cleanup quarantines PARTIAL.
+ *                  MCU teardown is limited to baremetal or
+ *                  before scheduler start, after all Nexus devices, IRQ/DMA
+ *                  resources and OSAL objects are released. Direct vendor SDK
+ *                  users must quiesce their resources separately. The caller
+ *                  also releases OSAL before stopping the platform time source.
  */
 nx_status_t nx_hal_deinit(void);
 
 /**
  * \brief           Check if HAL is initialized
- * \return          true if initialized, false otherwise
+ * \return          true only when initialization completed (READY)
  */
 bool nx_hal_is_initialized(void);
 

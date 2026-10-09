@@ -60,6 +60,27 @@ typedef struct {
     size_t mem_alloc_count; /**< Number of active allocations */
 } osal_stats_t;
 
+/** Actual storage reservations; includes constructing, closing and quarantined
+ * lifetimes. This is independent of optional statistics/watermark collection. */
+typedef struct {
+    uint16_t capacity;
+    uint16_t reserved;
+} osal_object_usage_t;
+
+typedef struct {
+    osal_object_usage_t tasks, mutexes, semaphores, queues, events, timers;
+    uint64_t lifetime_tokens_capacity;
+    uint64_t lifetime_tokens_issued;
+    uint64_t lifetime_tokens_remaining;
+} osal_resource_usage_t;
+
+/** Nonallocating, serialized snapshot; supported in task/ISR contexts. The
+ * token budget is shared by all classes and survives deinit and stats reset.
+ * A reservation whose kernel/host construction fails may consume an identity.
+ * Token exhaustion and slot exhaustion both make create return NO_MEMORY with
+ * NULL output; this snapshot distinguishes the reason. */
+osal_status_t osal_get_resource_usage(osal_resource_usage_t* usage);
+
 /*---------------------------------------------------------------------------*/
 /* Error Callback                                                            */
 /*---------------------------------------------------------------------------*/

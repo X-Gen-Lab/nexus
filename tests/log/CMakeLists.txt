@@ -4,6 +4,7 @@
 
 # Collect all test sources
 set(LOG_TEST_SOURCES
+    fixtures/level_abi.c
     # Unit tests
     test_log.cpp
     # Property-based tests
@@ -18,7 +19,7 @@ set(LOG_TEST_SOURCES
 
 # Create test executable
 add_executable(log_tests
-    ${CMAKE_SOURCE_DIR}/tests/test_main_common.cpp
+    ${NEXUS_SOURCE_DIR}/tests/test_main_common.cpp
     ${LOG_TEST_SOURCES}
 )
 
@@ -43,3 +44,45 @@ nexus_discover_tests(log_tests
         TIMEOUT 300
         LABELS "log;framework;unit;property"
 )
+
+if(UNIX)
+    add_executable(log_contract_tests test_log_contracts.c)
+    target_link_libraries(log_contract_tests PRIVATE log_framework osal Threads::Threads)
+    target_compile_options(log_contract_tests PRIVATE -UNDEBUG -Werror)
+    add_test(NAME log_contract_tests COMMAND log_contract_tests)
+    set_tests_properties(log_contract_tests PROPERTIES TIMEOUT 30 LABELS "log;concurrency;contract")
+endif()
+
+# The formatter links as a core-only component with no runtime or HAL.
+add_executable(log_format_core_contract_tests test_format_core_contracts.c)
+target_link_libraries(log_format_core_contract_tests PRIVATE log_core)
+if(MSVC)
+    target_compile_options(log_format_core_contract_tests PRIVATE /UNDEBUG)
+else()
+    target_compile_options(log_format_core_contract_tests PRIVATE -UNDEBUG -Wall -Wextra -Werror)
+endif()
+add_test(NAME log_format_core_contract_tests COMMAND log_format_core_contract_tests)
+set_tests_properties(log_format_core_contract_tests PROPERTIES TIMEOUT 10 LABELS "log;core;contract")
+
+# Compile both allocation modes against the production facade and a hardware
+# ownership fault fixture; this does not imply a Native UART provider or HIL.
+foreach(mode 0 1)
+    add_executable(log_uart_contract_${mode}
+        test_uart_adapter_contracts.c fixtures/typed_uart_port.c
+        "${NEXUS_SOURCE_DIR}/framework/log/src/log.c"
+        "${NEXUS_SOURCE_DIR}/framework/log/src/log_format.c"
+        "${NEXUS_SOURCE_DIR}/framework/log/src/log_backend_uart.c")
+    target_compile_definitions(log_uart_contract_${mode} PRIVATE LOG_USE_STATIC_ALLOC=${mode})
+    target_link_libraries(log_uart_contract_${mode} PRIVATE log_interface Nexus::HALDevice osal nexus_arch)
+    if(MSVC)
+        target_compile_options(log_uart_contract_${mode} PRIVATE /UNDEBUG)
+    else()
+        target_compile_options(log_uart_contract_${mode} PRIVATE -UNDEBUG -Wall -Wextra -Werror)
+    endif()
+    if(UNIX AND NOT APPLE)
+        target_compile_definitions(log_uart_contract_${mode} PRIVATE LOG_TEST_WRAP_ALLOC)
+        target_link_options(log_uart_contract_${mode} PRIVATE -Wl,--wrap=malloc)
+    endif()
+    add_test(NAME log_uart_contract_${mode} COMMAND log_uart_contract_${mode})
+    set_tests_properties(log_uart_contract_${mode} PROPERTIES TIMEOUT 10 LABELS "log;uart;typed;contract")
+endforeach()

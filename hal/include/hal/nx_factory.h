@@ -11,7 +11,7 @@
 #ifndef NX_FACTORY_H
 #define NX_FACTORY_H
 
-#include "hal/base/nx_device.h"
+#include "hal/provider/nx_device_provider.h"
 #include "hal/interface/nx_adc.h"
 #include "hal/interface/nx_can.h"
 #include "hal/interface/nx_crc.h"
@@ -49,8 +49,11 @@ extern "C" {
 static inline nx_gpio_read_write_t* nx_factory_gpio_read_write(char port,
                                                                uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
-    return (nx_gpio_read_write_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "GPIO%c%d", port, pin);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_gpio_read_write_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_GPIO);
 }
 
 /**
@@ -69,12 +72,22 @@ static inline nx_gpio_t* nx_factory_gpio(char port, uint8_t pin) {
  * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO read interface pointer, NULL on failure
- * \note            Device name format: "GPIO<port><pin>_R"
+ * \note            Uses the dedicated _R registration if present, otherwise
+ *                  projects the read capability from the registered RW device.
  */
 static inline nx_gpio_read_t* nx_factory_gpio_read(char port, uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d_R", port, pin);
-    return (nx_gpio_read_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "GPIO%c%d_R", port, pin);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    const nx_device_t* dedicated = nx_device_find(name);
+    if (dedicated) {
+        return dedicated->device_class == NX_DEVICE_CLASS_GPIO_READ ?
+            (nx_gpio_read_t*)nx_device_init(dedicated) : NULL;
+    }
+    nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(port, pin);
+    return gpio ? &gpio->read : NULL;
 }
 
 /**
@@ -82,12 +95,22 @@ static inline nx_gpio_read_t* nx_factory_gpio_read(char port, uint8_t pin) {
  * \param[in]       port: GPIO port character ('A', 'B', etc.)
  * \param[in]       pin: GPIO pin number
  * \return          GPIO write interface pointer, NULL on failure
- * \note            Device name format: "GPIO<port><pin>_W"
+ * \note            Uses the dedicated _W registration if present, otherwise
+ *                  projects the write capability from the registered RW device.
  */
 static inline nx_gpio_write_t* nx_factory_gpio_write(char port, uint8_t pin) {
     char name[16];
-    snprintf(name, sizeof(name), "GPIO%c%d_W", port, pin);
-    return (nx_gpio_write_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "GPIO%c%d_W", port, pin);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    const nx_device_t* dedicated = nx_device_find(name);
+    if (dedicated) {
+        return dedicated->device_class == NX_DEVICE_CLASS_GPIO_WRITE ?
+            (nx_gpio_write_t*)nx_device_init(dedicated) : NULL;
+    }
+    nx_gpio_read_write_t* gpio = nx_factory_gpio_read_write(port, pin);
+    return gpio ? &gpio->write : NULL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -101,8 +124,11 @@ static inline nx_gpio_write_t* nx_factory_gpio_write(char port, uint8_t pin) {
  */
 static inline nx_uart_t* nx_factory_uart(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "UART%d", index);
-    return (nx_uart_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "UART%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_uart_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_UART);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -116,8 +142,11 @@ static inline nx_uart_t* nx_factory_uart(uint8_t index) {
  */
 static inline nx_spi_t* nx_factory_spi(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "SPI%d", index);
-    return (nx_spi_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "SPI%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_spi_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_SPI);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -131,8 +160,11 @@ static inline nx_spi_t* nx_factory_spi(uint8_t index) {
  */
 static inline nx_i2c_t* nx_factory_i2c(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "I2C%d", index);
-    return (nx_i2c_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "I2C%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_i2c_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_I2C);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -146,8 +178,11 @@ static inline nx_i2c_t* nx_factory_i2c(uint8_t index) {
  */
 static inline nx_timer_base_t* nx_factory_timer(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "TIMER%d", index);
-    return (nx_timer_base_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "TIMER%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_timer_base_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_TIMER);
 }
 
 /**
@@ -157,8 +192,11 @@ static inline nx_timer_base_t* nx_factory_timer(uint8_t index) {
  */
 static inline nx_timer_pwm_t* nx_factory_timer_pwm(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "TIMER%d", index);
-    return (nx_timer_pwm_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "TIMER%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_timer_pwm_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_TIMER_PWM);
 }
 
 /**
@@ -168,8 +206,11 @@ static inline nx_timer_pwm_t* nx_factory_timer_pwm(uint8_t index) {
  */
 static inline nx_timer_encoder_t* nx_factory_timer_encoder(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "TIMER%d", index);
-    return (nx_timer_encoder_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "TIMER%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_timer_encoder_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_TIMER_ENCODER);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -183,8 +224,11 @@ static inline nx_timer_encoder_t* nx_factory_timer_encoder(uint8_t index) {
  */
 static inline nx_adc_t* nx_factory_adc(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "ADC%d", index);
-    return (nx_adc_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "ADC%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_adc_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_ADC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -198,8 +242,11 @@ static inline nx_adc_t* nx_factory_adc(uint8_t index) {
  */
 static inline nx_internal_flash_t* nx_factory_flash(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "FLASH%d", index);
-    return (nx_internal_flash_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "FLASH%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_internal_flash_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_FLASH);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -213,8 +260,11 @@ static inline nx_internal_flash_t* nx_factory_flash(uint8_t index) {
  */
 static inline nx_can_bus_t* nx_factory_can(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "CAN%d", index);
-    return (nx_can_bus_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "CAN%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_can_bus_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_CAN);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -227,8 +277,11 @@ static inline nx_can_bus_t* nx_factory_can(uint8_t index) {
  */
 static inline nx_usb_t* nx_factory_usb(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "USB%d", index);
-    return (nx_usb_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "USB%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_usb_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_USB);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -242,8 +295,11 @@ static inline nx_usb_t* nx_factory_usb(uint8_t index) {
  */
 static inline nx_rtc_t* nx_factory_rtc(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "RTC%d", index);
-    return (nx_rtc_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "RTC%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_rtc_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_RTC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -257,8 +313,11 @@ static inline nx_rtc_t* nx_factory_rtc(uint8_t index) {
  */
 static inline nx_watchdog_t* nx_factory_watchdog(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "WATCHDOG%d", index);
-    return (nx_watchdog_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "WATCHDOG%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_watchdog_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_WATCHDOG);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -272,8 +331,11 @@ static inline nx_watchdog_t* nx_factory_watchdog(uint8_t index) {
  */
 static inline nx_dac_t* nx_factory_dac(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "DAC%d", index);
-    return (nx_dac_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "DAC%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_dac_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_DAC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -287,8 +349,11 @@ static inline nx_dac_t* nx_factory_dac(uint8_t index) {
  */
 static inline nx_sdio_t* nx_factory_sdio(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "SDIO%d", index);
-    return (nx_sdio_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "SDIO%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_sdio_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_SDIO);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -302,8 +367,11 @@ static inline nx_sdio_t* nx_factory_sdio(uint8_t index) {
  */
 static inline nx_crc_t* nx_factory_crc(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "CRC%d", index);
-    return (nx_crc_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "CRC%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_crc_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_CRC);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -317,8 +385,11 @@ static inline nx_crc_t* nx_factory_crc(uint8_t index) {
  */
 static inline nx_option_bytes_t* nx_factory_option_bytes(uint8_t index) {
     char name[16];
-    snprintf(name, sizeof(name), "OPTBYTES%d", index);
-    return (nx_option_bytes_t*)nx_device_get(name);
+    int written = snprintf(name, sizeof(name), "OPTBYTES%d", index);
+    if (written < 0 || (size_t)written >= sizeof(name)) {
+        return NULL;
+    }
+    return (nx_option_bytes_t*)nx_device_get_checked(name, NX_DEVICE_CLASS_OPTION_BYTES);
 }
 
 #ifdef __cplusplus

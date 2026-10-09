@@ -26,14 +26,14 @@ extern "C" {
 #include "hal/interface/nx_uart.h"
 #include "hal/interface/nx_usb.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_flash_helpers.h"
-#include "tests/hal/native/devices/native_gpio_helpers.h"
-#include "tests/hal/native/devices/native_i2c_helpers.h"
-#include "tests/hal/native/devices/native_rtc_helpers.h"
-#include "tests/hal/native/devices/native_spi_helpers.h"
-#include "tests/hal/native/devices/native_timer_helpers.h"
-#include "tests/hal/native/devices/native_uart_helpers.h"
-#include "tests/hal/native/devices/native_usb_helpers.h"
+#include "devices/native_flash_helpers.h"
+#include "devices/native_gpio_helpers.h"
+#include "devices/native_i2c_helpers.h"
+#include "devices/native_rtc_helpers.h"
+#include "devices/native_spi_helpers.h"
+#include "devices/native_timer_helpers.h"
+#include "devices/native_uart_helpers.h"
+#include "devices/native_usb_helpers.h"
 }
 
 /*---------------------------------------------------------------------------*/

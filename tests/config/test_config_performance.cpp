@@ -10,6 +10,7 @@
  * \details         Performance and benchmark tests for Config Manager.
  */
 
+#include "config/config_ram_backend.h"
 #include <chrono>
 #include <cstring>
 #include <gtest/gtest.h>

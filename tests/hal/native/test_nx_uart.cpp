@@ -15,9 +15,9 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "hal/include/hal/interface/nx_uart.h"
+#include "hal/interface/nx_uart.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_uart_helpers.h"
+#include "devices/native_uart_helpers.h"
 }
 
 /**
@@ -169,13 +169,10 @@ TEST_F(UARTTest, SyncReceiveAll) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Diagnostic Tests - Requirement 2.7                                        */
+/* Simulator Counter Tests - Requirement 2.7                                */
 /*---------------------------------------------------------------------------*/
 
-TEST_F(UARTTest, DiagnosticStatistics) {
-    /* Get diagnostic interface */
-    nx_diagnostic_t* diag = uart->get_diagnostic(uart);
-    ASSERT_NE(nullptr, diag);
+TEST_F(UARTTest, SimulatorStatistics) {
 
     /* Send some data */
     nx_tx_async_t* tx_async = uart->get_tx_async(uart);
@@ -191,30 +188,31 @@ TEST_F(UARTTest, DiagnosticStatistics) {
     rx_async->receive(rx_async, received, &received_len);
 
     /* Query statistics */
-    nx_uart_stats_t stats;
-    EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+    native_uart_state_t stats;
+    EXPECT_EQ(NX_OK, native_uart_get_state(0, &stats));
 
     /* Verify counts */
     EXPECT_EQ(sizeof(tx_data), stats.tx_count);
     EXPECT_EQ(sizeof(rx_data), stats.rx_count);
 }
 
-TEST_F(UARTTest, DiagnosticReset) {
-    /* Get diagnostic interface */
-    nx_diagnostic_t* diag = uart->get_diagnostic(uart);
-    ASSERT_NE(nullptr, diag);
+TEST_F(UARTTest, SimulatorReset) {
 
     /* Send some data to generate statistics */
     nx_tx_async_t* tx_async = uart->get_tx_async(uart);
     const uint8_t tx_data[] = {0x01, 0x02, 0x03};
     tx_async->send(tx_async, tx_data, sizeof(tx_data));
 
-    /* Reset statistics */
-    EXPECT_EQ(NX_OK, diag->clear_statistics(diag));
+    /* Reset simulator state and reinitialize; this is not a public
+     * diagnostic clear operation. */
+    ASSERT_EQ(NX_OK, native_uart_reset(0));
+    nx_lifecycle_t* reset_lifecycle = uart->get_lifecycle(uart);
+    ASSERT_NE(nullptr, reset_lifecycle);
+    ASSERT_EQ(NX_OK, reset_lifecycle->init(reset_lifecycle));
 
     /* Query statistics - should be zero */
-    nx_uart_stats_t stats;
-    EXPECT_EQ(NX_OK, diag->get_statistics(diag, &stats, sizeof(stats)));
+    native_uart_state_t stats;
+    EXPECT_EQ(NX_OK, native_uart_get_state(0, &stats));
     EXPECT_EQ(0U, stats.tx_count);
     EXPECT_EQ(0U, stats.rx_count);
 }
@@ -318,12 +316,10 @@ TEST_F(UARTTest, GetLifecycleState) {
 /*---------------------------------------------------------------------------*/
 
 TEST_F(UARTTest, NullPointerHandling) {
-    /* Test NULL UART pointer - should not crash */
-    nx_uart_t* null_uart = nullptr;
-    if (null_uart != nullptr) {
-        null_uart->get_tx_async(null_uart);
-        null_uart->get_rx_async(null_uart);
-    }
+    EXPECT_EQ(nullptr, uart->get_tx_async(nullptr));
+    EXPECT_EQ(nullptr, uart->get_rx_async(nullptr));
+    EXPECT_EQ(nullptr, uart->get_lifecycle(nullptr));
+    EXPECT_EQ(nullptr, uart->get_power(nullptr));
 
     /* Test NULL data pointer */
     nx_tx_async_t* tx_async = uart->get_tx_async(uart);

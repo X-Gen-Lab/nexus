@@ -64,6 +64,44 @@ TEST_F(HistoryTest, InitWithNullEntries) {
     EXPECT_EQ(0, history_get_count(&hist));
 }
 
+TEST_F(HistoryTest, ZeroEntrySizeRejectsWrite) {
+    char sentinel = 'x';
+    char* slot = &sentinel;
+    history_manager_t hist;
+    history_init(&hist, &slot, 1, 0);
+    EXPECT_FALSE(history_add(&hist, "command"));
+    EXPECT_EQ(sentinel, 'x');
+    EXPECT_EQ(history_get_count(&hist), 0);
+}
+
+TEST_F(HistoryTest, FullUint8CapacityNavigatesOldestAndNewest) {
+    constexpr unsigned capacity = UINT8_MAX;
+    char buffers[capacity][8];
+    char* slots[capacity];
+    for (unsigned i = 0; i < capacity; ++i) slots[i] = buffers[i];
+    history_manager_t hist;
+    history_init(&hist, slots, capacity, sizeof(buffers[0]));
+    for (unsigned i = 0; i < capacity; ++i) {
+        char command[8];
+        ASSERT_GT(snprintf(command, sizeof(command), "cmd%u", i), 0);
+        ASSERT_TRUE(history_add(&hist, command));
+    }
+    ASSERT_EQ(history_get_count(&hist), capacity);
+    for (unsigned i = capacity; i > 0; --i) {
+        char expected[8];
+        ASSERT_GT(snprintf(expected, sizeof(expected), "cmd%u", i - 1), 0);
+        ASSERT_STREQ(history_get_prev(&hist), expected);
+    }
+    EXPECT_STREQ(history_get_prev(&hist), "cmd0");
+    for (unsigned i = 1; i < capacity; ++i) {
+        char expected[8];
+        ASSERT_GT(snprintf(expected, sizeof(expected), "cmd%u", i), 0);
+        ASSERT_STREQ(history_get_next(&hist), expected);
+    }
+    EXPECT_EQ(history_get_next(&hist), nullptr);
+    EXPECT_FALSE(history_is_browsing(&hist));
+}
+
 TEST_F(HistoryTest, DeinitResetsState) {
     history_add(&history, "test");
     history_deinit(&history);

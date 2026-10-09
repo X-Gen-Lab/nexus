@@ -65,7 +65,7 @@ typedef struct {
     osal_task_func_t func; /**< Task function */
     void* arg;             /**< Task argument */
     uint8_t priority;      /**< Task priority (0-31) */
-    size_t stack_size;     /**< Stack size in bytes */
+    size_t stack_size;     /**< Bytes; FreeRTOS rejects beyond its static slot. */
 } osal_task_config_t;
 
 /**
@@ -86,9 +86,26 @@ osal_status_t osal_task_create(const osal_task_config_t* config,
  * \param[in]       handle: Task handle (NULL for current task)
  * \return          OSAL_OK on success, error code otherwise
  * \retval          OSAL_OK Task deleted successfully
+ * \note            A running task is stopped cooperatively: delete requests
+ *                  stop and returns BUSY until its function returns and all
+ *                  joiners release references. FreeRTOS parks that completed
+ *                  task, then manager deletion finishes kernel/port cleanup
+ *                  before making its static TCB and stack reusable. A worker
+ *                  that returns while owning an OSAL mutex remains BUSY and
+ *                  quarantined: it requires product fault recovery/reset.
  * \retval          OSAL_ERROR_INVALID_PARAM Invalid task handle
  */
 osal_status_t osal_task_delete(osal_task_handle_t handle);
+
+/** Request cooperative stop; callers must use bounded waits and return.
+ * Native/FreeRTOS deletion of a running task requests stop and returns BUSY. */
+osal_status_t osal_task_request_stop(osal_task_handle_t handle);
+/** True when the current task has a pending cooperative stop request. */
+bool osal_task_should_stop(void);
+/** Wait for task function completion, without destroying its handle.
+ * Task context only. timeout follows the ordinary OSAL millisecond contract. */
+osal_status_t osal_task_join(osal_task_handle_t handle, uint32_t timeout_ms);
+
 
 /**
  * \brief           Suspend a task

@@ -19,12 +19,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_rtc.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_rtc_helpers.h"
+#include "devices/native_rtc_helpers.h"
 }
 
 /**
@@ -41,7 +42,7 @@ class RTCPropertyTest : public ::testing::Test {
     nx_rtc_t* rtc = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all RTC instances */
         native_rtc_reset_all();
@@ -304,7 +305,7 @@ TEST_F(RTCPropertyTest, Property8_DatetimeTimestampConversionRoundTrip) {
 
 static int g_alarm_trigger_count = 0;
 
-static void property_alarm_callback(void* user_data) {
+static void property_alarm_callback(void*) {
     g_alarm_trigger_count++;
 }
 

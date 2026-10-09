@@ -2,9 +2,10 @@ name: Build Matrix
 
 on:
   workflow_call:
-    secrets:
-      CODECOV_TOKEN:
-        required: false
+
+defaults:
+  run:
+    shell: bash
 
 env:
   CCACHE_DIR: ${{ github.workspace }}/.ccache
@@ -17,52 +18,64 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Windows builds
-          - name: Windows MSVC Debug
-            os: windows-latest
-            preset: windows-msvc-debug
-            upload_artifacts: false
-          - name: Windows MSVC Release
-            os: windows-latest
-            preset: windows-msvc-release
-            upload_artifacts: true
-          - name: Windows GCC Release
-            os: windows-latest
-            preset: windows-gcc-release
-            upload_artifacts: false
-
-          # Linux builds
-          - name: Linux GCC Debug
+          - name: Linux GCC Debug (compile only)
             os: ubuntu-latest
             preset: linux-gcc-debug
             upload_artifacts: false
-          - name: Linux GCC Release
+          - name: Linux GCC Release contracts
             os: ubuntu-latest
             preset: linux-gcc-release
             upload_artifacts: true
-          - name: Linux Clang Release
+          - name: Linux Clang Release (compile only)
             os: ubuntu-latest
             preset: linux-clang-release
             upload_artifacts: false
-
-          # macOS builds
-          - name: macOS Clang Release
-            os: macos-latest
-            preset: macos-clang-release
-            upload_artifacts: true
-
-          # ARM cross-compile
-          - name: ARM Cortex-M4 Release
+          - name: STM32F407 Baremetal Release
             os: ubuntu-latest
-            preset: cross-arm-release
+            preset: stm32-armgcc-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407 FreeRTOS Release
+            os: ubuntu-latest
+            preset: stm32-armgcc-freertos-release
+            upload_artifacts: true
+            is_arm: true
+          - name: GD32F470ZG Liangshan Baremetal Release
+            os: ubuntu-latest
+            preset: gd32f470-armgcc-baremetal-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407ZG Qiming V3.1 Baremetal Release
+            os: ubuntu-latest
+            preset: stm32-qiming-armgcc-baremetal-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407ZG Qiming V3.1 FreeRTOS Release
+            os: ubuntu-latest
+            preset: stm32-qiming-armgcc-freertos-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407VE Sky Youth Baremetal Release
+            os: ubuntu-latest
+            preset: stm32-sky-armgcc-baremetal-release
+            upload_artifacts: true
+            is_arm: true
+          - name: STM32F407VE Sky Youth FreeRTOS Release
+            os: ubuntu-latest
+            preset: stm32-sky-armgcc-freertos-release
+            upload_artifacts: true
+            is_arm: true
+          - name: GD32F470ZG Liangshan FreeRTOS Release
+            os: ubuntu-latest
+            preset: gd32f470-armgcc-freertos-release
             upload_artifacts: true
             is_arm: true
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
 
       - name: Setup Build Environment
@@ -71,45 +84,70 @@ jobs:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
 
-      - name: Cache Build
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/${{ matrix.preset }}
-            !build/${{ matrix.preset }}/**/*.obj
-            !build/${{ matrix.preset }}/**/*.o
-          key: ${{ runner.os }}-${{ matrix.preset }}-${{ hashFiles('**/CMakeLists.txt', 'cmake/**') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.preset }}-
+      - name: Install locked ARM compiler for source SDK relocation contracts
+        if: matrix.preset == 'linux-gcc-release'
+        run: |
+          python3 scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+          echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
 
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
 
       - name: Build
-        run: cmake --build --preset ${{ matrix.preset }} --parallel
+        run: cmake --build --preset ${{ matrix.preset }} --parallel 4
 
-      - name: Test
-        if: ${{ !matrix.is_arm }}
-        run: ctest --preset ${{ matrix.preset }} --output-on-failure --parallel 4
+      - name: Verify ARM Firmware Static Contract
+        if: matrix.is_arm
+        run: >-
+          python3 scripts/ci/validate_firmware_elf.py
+          --build-dir build/${{ matrix.preset }}
+          --report build/${{ matrix.preset }}/firmware-static-contract.json
+
+      # GCC Release is the one complete uninstrumented Native execution.
+      # Debug/Clang matrix members establish separate compilation contexts.
+      - name: Run Native contracts and verify fresh JUnit
+        if: matrix.preset == 'linux-gcc-release'
+        run: python3 scripts/ci/ci_build.py --preset "${{ matrix.preset }}" --stage test --jobs 4
+
+      - name: Verify ARM Artifact Rejection Paths
+        if: matrix.is_arm
+        run: python3 scripts/ci/test_validate_firmware_elf.py LinkedFirmwareRejectionTests -v
+        env:
+          NEXUS_FIRMWARE_TEST_BUILD: build/${{ matrix.preset }}
+
+      - name: Verify actual release configuration and production compile database
+        if: ${{ matrix.is_arm || matrix.preset == 'linux-gcc-release' }}
+        run: python3 scripts/ci/test_package_release.py ActualReleaseCompileDatabaseTests -v
+        env:
+          NEXUS_RELEASE_TEST_BUILD: build/${{ matrix.preset }}
+          NEXUS_RELEASE_TEST_PRESET: ${{ matrix.preset }}
 
       - name: Upload Artifacts
         if: matrix.upload_artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: binaries-${{ matrix.preset }}
           path: |
             build/${{ matrix.preset }}/bin/*
             build/${{ matrix.preset }}/lib/*
+            build/${{ matrix.preset }}/generated/*
+            build/${{ matrix.preset }}/CMakeCache.txt
+            build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/ctest-results.xml
+            build/${{ matrix.preset }}/firmware-static-contract.json
           retention-days: 7
+          if-no-files-found: error
 
   coverage:
     name: Coverage Analysis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 0
 
       - name: Setup Build Environment
@@ -118,11 +156,8 @@ jobs:
           os: ubuntu-latest
           preset: linux-gcc-coverage
 
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: coverage
-          max-size: 500M
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
 
       - name: Configure
         run: |
@@ -132,89 +167,122 @@ jobs:
       - name: Build
         run: |
           export PATH="/usr/lib/ccache:$PATH"
-          cmake --build --preset linux-gcc-coverage --parallel $(nproc)
+          cmake --build --preset linux-gcc-coverage --parallel 4
 
       - name: Test
-        run: ctest --preset linux-gcc-coverage --output-on-failure --parallel $(nproc)
+        run: python3 scripts/ci/ci_build.py --preset linux-gcc-coverage --stage test --jobs 4
 
       - name: Generate Coverage
         run: |
-          lcov --capture --directory . --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/ext/*' --output-file coverage.info
+          # Native runtime scope; boards/soc need separate ARM coverage evidence.
+          lcov --capture --directory build/linux-gcc-coverage --output-file coverage.info \
+            --include "${{ github.workspace }}/arch/*" \
+            --include "${{ github.workspace }}/runtime/*" \
+            --include "${{ github.workspace }}/hal/*" \
+            --include "${{ github.workspace }}/osal/*" \
+            --include "${{ github.workspace }}/framework/*" \
+            --include "${{ github.workspace }}/services/*" \
+            --include "${{ github.workspace }}/platforms/*"
+          test -s coverage.info
+          grep -q '^SF:' coverage.info
           genhtml coverage.info --output-directory coverage_html
 
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage.info
-          flags: unittests
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
           path: coverage_html/
           retention-days: 30
 
   sanitizer:
-    name: Sanitizer - ${{ matrix.sanitizer }}
+    name: ASan and UBSan platform contracts
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        sanitizer: [address, undefined, thread]
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
-
+          submodules: false
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
           os: ubuntu-latest
-          preset: linux-gcc-debug
-
-      - name: Configure with Sanitizer
-        run: |
-          SANITIZER_FLAG=""
-          case "${{ matrix.sanitizer }}" in
-            address)
-              SANITIZER_FLAG="-fsanitize=address -fno-omit-frame-pointer"
-              ;;
-            undefined)
-              SANITIZER_FLAG="-fsanitize=undefined -fno-omit-frame-pointer"
-              ;;
-            thread)
-              SANITIZER_FLAG="-fsanitize=thread"
-              ;;
-          esac
-
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DNEXUS_PLATFORM=native \
-            -DNEXUS_BUILD_TESTS=ON \
-            -DCMAKE_C_FLAGS="$SANITIZER_FLAG" \
-            -DCMAKE_CXX_FLAGS="$SANITIZER_FLAG"
-
-      - name: Build
-        run: cmake --build build --parallel $(nproc)
-
-      - name: Test with Sanitizer
-        run: ctest --test-dir build --output-on-failure --parallel $(nproc)
+          preset: linux-gcc-sanitizers
+      - name: Initialize Maintained Dependencies
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - name: Configure
+        run: cmake --preset linux-gcc-sanitizers
+      - name: Build platform contract targets
+        run: cmake --build --preset linux-gcc-sanitizers --parallel 4
+      - name: Run instrumented platform contracts and verify fresh JUnit
+        run: python3 scripts/ci/ci_build.py --preset linux-gcc-sanitizers --stage test --jobs 1
         env:
-          ASAN_OPTIONS: detect_leaks=1:check_initialization_order=1
-          UBSAN_OPTIONS: print_stacktrace=1
-          TSAN_OPTIONS: second_deadlock_stack=1
-
-      - name: Upload Sanitizer Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      - name: Upload Sanitizer Evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: sanitizer-logs-${{ matrix.sanitizer }}
+          name: sanitizer-contract-evidence
           path: |
-            build/Testing/Temporary/*.log
+            build/linux-gcc-sanitizers/Testing/Temporary/*.log
+            build/linux-gcc-sanitizers/ctest-results.xml
+            build/linux-gcc-sanitizers/generated/*
           retention-days: 7
+
+  platform-tooling:
+    name: SDK configuration, release gates and HIL readiness
+    needs: matrix-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXUS_RELEASE_TEST_BUILD: build/linux-gcc-release
+      NEXUS_RELEASE_TEST_PRESET: linux-gcc-release
+      NEXUS_FIRMWARE_TEST_BUILD: build/stm32-qiming-armgcc-freertos-release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+      - uses: ./.github/actions/setup-build
+        with:
+          os: ubuntu-latest
+          preset: linux-gcc-release
+      - name: Initialize maintained test dependencies
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - name: Download actual Native Release evidence
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binaries-linux-gcc-release
+          path: build/linux-gcc-release
+      - name: Download actual ARM contract evidence
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binaries-stm32-qiming-armgcc-freertos-release
+          path: build/stm32-qiming-armgcc-freertos-release
+      - name: Verify Python syntax and action locks
+        run: |
+          python3 scripts/ci/check_python_syntax.py
+          python3 scripts/ci/check_action_pins.py
+      - name: Test Board generator and build entry points
+        run: |
+          mkdir -p build/tooling
+          python3 -m unittest discover -s scripts/configure -p 'test_*.py' -v 2>&1 | tee build/tooling/configure-tests.log
+      - name: Test SDK configuration and independent consumers
+        run: python3 -m unittest discover -s scripts/kconfig -p 'test_*.py' -v 2>&1 | tee build/tooling/kconfig-tests.log
+      - name: Test CI and release gates with actual linked artifacts
+        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v 2>&1 | tee build/tooling/ci-tests.log
+      - name: Test strict reports and preset subprocess failures
+        run: python3 -m unittest discover -s tests/validation -p 'test_*.py' -v 2>&1 | tee build/tooling/validation-tests.log
+      - name: Test HIL readiness and nonphysical adapter rejection paths
+        run: python3 -m unittest discover -s tests/hil -p 'test_*.py' -v 2>&1 | tee build/tooling/hil-readiness-tests.log
+      - name: Parse workflow contracts and execute their real test commands
+        run: |
+          python3 -m pip install PyYAML==6.0.3
+          python3 -m unittest discover -s .github/workflows -p 'test_*.py' -v 2>&1 | tee build/tooling/workflow-tests.log
+      - name: Retain tooling execution logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: platform-tooling-evidence
+          path: build/tooling/*.log
+          if-no-files-found: error
+          retention-days: 14

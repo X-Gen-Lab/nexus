@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/flash/nx_flash_types.h"
+#include "../../../../soc/native/controllers/flash/nx_flash_types.h"
 
 #include <string.h>
 

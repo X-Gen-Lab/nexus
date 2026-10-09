@@ -99,6 +99,15 @@ config_namespace_get_handle_id(const struct config_namespace* handle,
  */
 bool config_namespace_is_valid_handle(const struct config_namespace* handle);
 
+typedef struct {
+    uint8_t id;
+    char name[CONFIG_MAX_NS_NAME_LEN];
+} config_namespace_snapshot_t;
+/* Validates all ids/names and rejects replacement while any handle is open.
+ * apply=false permits joint store+namespace validation before either mutates. */
+config_status_t config_namespace_replace_all(
+    const config_namespace_snapshot_t* entries, size_t count, bool apply);
+
 #ifdef __cplusplus
 }
 #endif

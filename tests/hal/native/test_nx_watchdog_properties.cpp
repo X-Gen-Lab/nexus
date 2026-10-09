@@ -19,12 +19,13 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <random>
+#include "native_property_seed.h"
 #include <vector>
 
 extern "C" {
 #include "hal/interface/nx_watchdog.h"
 #include "hal/nx_factory.h"
-#include "tests/hal/native/devices/native_watchdog_helpers.h"
+#include "devices/native_watchdog_helpers.h"
 }
 
 /**
@@ -41,7 +42,7 @@ class WatchdogPropertyTest : public ::testing::Test {
     nx_watchdog_t* wdt = nullptr;
 
     void SetUp() override {
-        rng.seed(std::random_device{}());
+        native_property_seed(rng);
 
         /* Reset all Watchdog instances */
         native_watchdog_reset_all();
@@ -428,7 +429,7 @@ TEST_F(WatchdogPropertyTest, Property12_CallbackInvokedOnlyOnce) {
  */
 TEST_F(WatchdogPropertyTest, Property12_CallbackCanBeChanged) {
     static int g_second_callback_count = 0;
-    auto second_callback = [](void* user_data) { g_second_callback_count++; };
+    auto second_callback = [](void*) { g_second_callback_count++; };
 
     for (int test_iter = 0; test_iter < PROPERTY_TEST_ITERATIONS; ++test_iter) {
         /* Set initial callback */

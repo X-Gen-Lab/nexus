@@ -12,6 +12,7 @@
  * reset. Useful for testing and temporary configuration storage.
  */
 
+#include "config/config_ram_backend.h"
 #include "config/config_backend.h"
 #include <string.h>
 
@@ -23,21 +24,21 @@
  * \brief           Maximum number of entries in RAM backend
  */
 #ifndef CONFIG_RAM_BACKEND_MAX_ENTRIES
-#define CONFIG_RAM_BACKEND_MAX_ENTRIES 128
+#define CONFIG_RAM_BACKEND_MAX_ENTRIES CONFIG_MAX_MAX_KEYS
 #endif
 
 /**
  * \brief           Maximum key length in RAM backend
  */
 #ifndef CONFIG_RAM_BACKEND_MAX_KEY_LEN
-#define CONFIG_RAM_BACKEND_MAX_KEY_LEN 64
+#define CONFIG_RAM_BACKEND_MAX_KEY_LEN CONFIG_MAX_MAX_KEY_LEN
 #endif
 
 /**
  * \brief           Maximum value size in RAM backend
  */
 #ifndef CONFIG_RAM_BACKEND_MAX_VALUE_SIZE
-#define CONFIG_RAM_BACKEND_MAX_VALUE_SIZE 512
+#define CONFIG_RAM_BACKEND_MAX_VALUE_SIZE CONFIG_MAX_MAX_VALUE_SIZE
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -71,6 +72,9 @@ typedef struct {
  * \brief           Global RAM backend context
  */
 static ram_backend_ctx_t g_ram_ctx;
+static uint8_t g_snapshot[CONFIG_PERSISTENCE_BUFFER_SIZE];
+static size_t g_snapshot_size;
+static bool g_snapshot_exists;
 
 /*---------------------------------------------------------------------------*/
 /* Internal Functions                                                        */
@@ -122,6 +126,8 @@ static config_status_t ram_backend_init(void* ctx) {
     (void)ctx;
 
     memset(&g_ram_ctx, 0, sizeof(g_ram_ctx));
+    memset(g_snapshot, 0, sizeof(g_snapshot));
+    g_snapshot_size = 0; g_snapshot_exists = false;
     g_ram_ctx.initialized = true;
     g_ram_ctx.entry_count = 0;
 
@@ -137,6 +143,8 @@ static config_status_t ram_backend_deinit(void* ctx) {
     (void)ctx;
 
     memset(&g_ram_ctx, 0, sizeof(g_ram_ctx));
+    memset(g_snapshot, 0, sizeof(g_snapshot));
+    g_snapshot_size = 0; g_snapshot_exists = false;
     return CONFIG_OK;
 }
 
@@ -297,6 +305,25 @@ static config_status_t ram_backend_commit(void* ctx) {
     return CONFIG_OK;
 }
 
+static config_status_t ram_save_snapshot(void* ctx, const void* data, size_t size) {
+    (void)ctx;
+    if (!g_ram_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if (size > sizeof(g_snapshot)) return CONFIG_ERROR_NO_SPACE;
+    memcpy(g_snapshot, data, size); g_snapshot_size = size;
+    g_snapshot_exists = true; return CONFIG_OK;
+}
+static config_status_t ram_load_snapshot(void* ctx, void* data, size_t* size) {
+    (void)ctx;
+    if (!g_ram_ctx.initialized) return CONFIG_ERROR_NOT_INIT;
+    if (!size) return CONFIG_ERROR_INVALID_PARAM;
+    if (!g_snapshot_exists) return CONFIG_ERROR_NOT_FOUND;
+    if (data && *size < g_snapshot_size) {
+        *size = g_snapshot_size; return CONFIG_ERROR_NO_SPACE;
+    }
+    if (data) memcpy(data, g_snapshot, g_snapshot_size);
+    *size = g_snapshot_size; return CONFIG_OK;
+}
+
 /*---------------------------------------------------------------------------*/
 /* Backend Instance                                                          */
 /*---------------------------------------------------------------------------*/
@@ -313,7 +340,9 @@ static const config_backend_t g_ram_backend = {.name = "ram",
                                                .erase_all =
                                                    ram_backend_erase_all,
                                                .commit = ram_backend_commit,
-                                               .ctx = NULL};
+                                               .ctx = NULL,
+                                               .save_snapshot = ram_save_snapshot,
+                                               .load_snapshot = ram_load_snapshot};
 
 /*---------------------------------------------------------------------------*/
 /* Public API                                                                */

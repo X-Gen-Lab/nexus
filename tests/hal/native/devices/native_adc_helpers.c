@@ -12,7 +12,7 @@
 #include "hal/nx_factory.h"
 
 /* Include platform-specific types */
-#include "../../../../platforms/native/src/adc/nx_adc_types.h"
+#include "../../../../soc/native/controllers/adc/nx_adc_types.h"
 
 #include <string.h>
 

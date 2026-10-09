@@ -113,6 +113,7 @@ TEST_F(LogPerformanceTest, LevelFilteringPerformance) {
         LOG_INFO("Test message");
     }
     double elapsed_pass = timer1.ElapsedMs();
+    EXPECT_GT(log_backend_memory_size(backend), 0u);
 
     /* Test 2: All messages filtered */
     log_set_level(LOG_LEVEL_FATAL);
@@ -127,8 +128,9 @@ TEST_F(LogPerformanceTest, LevelFilteringPerformance) {
     PrintResults("Level Filtering (Pass)", PERF_ITERATIONS, elapsed_pass);
     PrintResults("Level Filtering (Filtered)", PERF_ITERATIONS, elapsed_filter);
 
-    /* Filtered should be faster */
-    EXPECT_LT(elapsed_filter, elapsed_pass);
+    /* The host may preempt either interval. Latency is benchmark evidence;
+     * the deterministic contract is that filtering avoids all backend work. */
+    EXPECT_EQ(log_backend_memory_size(backend), 0u);
 
     std::cout << "Filtering overhead: "
               << (elapsed_filter / elapsed_pass * 100.0) << "%" << std::endl;
