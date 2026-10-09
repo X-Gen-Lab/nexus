@@ -2,6 +2,8 @@
  * validates kernel behavior, not Cortex-M IRQ priority or board timing. */
 #include "FreeRTOS.h"
 #include "osal/osal.h"
+#include "../event_mask_contract.h"
+#include "../resource_usage_contract.h"
 #include "arch/nx_arch.h"
 #include "task.h"
 #include <assert.h>
@@ -187,6 +189,21 @@ static void test_entry(void* arg) {
     (void)arg;
     assert(osal_init() == OSAL_OK);
     assert(osal_is_initialized());
+    test_event_advertised_bits();
+    test_resource_usage_pool();
+    osal_execution_info_t execution;
+    assert(osal_get_execution_info(&execution) == OSAL_OK && execution.initialized);
+    assert(execution.backend == OSAL_BACKEND_FREERTOS && !execution.in_isr &&
+        execution.scheduler_state == OSAL_SCHEDULER_RUNNING);
+    osal_sem_handle_t suspended_sem;
+    assert(osal_sem_create(0, 1, &suspended_sem) == OSAL_OK);
+    vTaskSuspendAll();
+    assert(osal_get_execution_info(&execution) == OSAL_OK &&
+        execution.scheduler_state == OSAL_SCHEDULER_SUSPENDED);
+    assert(osal_sem_take(suspended_sem, 1) == OSAL_ERROR_BUSY);
+    assert(osal_task_delay(1) == OSAL_ERROR_BUSY);
+    xTaskResumeAll();
+    assert(osal_sem_delete(suspended_sem) == OSAL_OK);
     test_static_storage_lifetimes();
     osal_sem_handle_t old, fresh;
     for (unsigned i = 0; i < 1000; ++i) {
@@ -306,7 +323,7 @@ static void test_entry(void* arg) {
     assert(osal_get_stats(&stats) == OSAL_OK);
     assert(!stats.task_count && !stats.mutex_count && !stats.sem_count &&
            !stats.queue_count && !stats.event_count && !stats.timer_count);
-    puts("12 real FreeRTOS kernel contract groups passed");
+    puts("15 real FreeRTOS kernel contract groups passed");
     atomic_store(&completed, true);
     vTaskEndScheduler();
 }

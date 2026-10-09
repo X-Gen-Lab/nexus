@@ -15,6 +15,8 @@
 #ifndef OSAL_CONFIG_H
 #define OSAL_CONFIG_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -82,6 +84,16 @@ extern "C" {
 /*---------------------------------------------------------------------------*/
 /* Resource Limits                                                           */
 /*---------------------------------------------------------------------------*/
+
+/** Cumulative handle identities per process/boot. Deleted storage slots are
+ * reusable, identities are not. A smaller product budget may be supplied to
+ * all adapter translation units; exhaustion fails rather than wrapping. */
+#ifndef OSAL_LIFETIME_TOKEN_LIMIT
+#define OSAL_LIFETIME_TOKEN_LIMIT (UINTPTR_MAX >> 4)
+#endif
+#if OSAL_LIFETIME_TOKEN_LIMIT == 0 || OSAL_LIFETIME_TOKEN_LIMIT > (UINTPTR_MAX >> 4)
+#error "OSAL lifetime token budget must fit the nonzero opaque handle identity"
+#endif
 
 /**
  * \brief           Maximum number of tasks

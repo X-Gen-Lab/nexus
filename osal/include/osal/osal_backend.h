@@ -43,10 +43,32 @@ typedef struct {
     uint32_t event_bits_mask;
 } osal_backend_info_t;
 
+typedef enum {
+    OSAL_SCHEDULER_NONE, /**< Backend does not require scheduler startup. */
+    OSAL_SCHEDULER_NOT_STARTED,
+    OSAL_SCHEDULER_RUNNING,
+    OSAL_SCHEDULER_SUSPENDED
+} osal_scheduler_state_t;
+
+typedef struct {
+    osal_backend_t backend;
+    bool initialized;
+    bool in_isr;
+    osal_scheduler_state_t scheduler_state;
+} osal_execution_info_t;
+
 /** Nonblocking snapshot; accepts task or supported ISR context. Baremetal's
  * MONOTONIC_CLOCK bit appears only after the board installs its clock.
  * STATIC_OBJECTS excludes a POSIX port's internal host allocations. */
 osal_status_t osal_get_backend_info(osal_backend_info_t* info);
+
+/** Context snapshot, no allocation or scheduler start. FreeRTOS boot permits
+ * construction/query and idle sync-object deletion; operations return NOT_INIT
+ * until scheduler startup. Task operational calls return BUSY while scheduling
+ * is suspended. FromISR is rejected before startup; running ISR APIs must obey
+ * the configured kernel interrupt priority. Native has no hardware ISR and
+ * reports NONE even though osal_start can keep its main thread alive. */
+osal_status_t osal_get_execution_info(osal_execution_info_t* info);
 
 #ifdef __cplusplus
 }

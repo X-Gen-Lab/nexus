@@ -19,7 +19,7 @@
 #endif
 #define RTOS_RESOURCE_MAX (OSAL_MAX_TASKS + OSAL_MAX_MUTEXES + OSAL_MAX_SEMS + \
                            OSAL_MAX_QUEUES + OSAL_MAX_TIMERS + OSAL_MAX_EVENTS)
-#define RTOS_EVENT_MASK 0x00ffffffu
+#define RTOS_EVENT_MASK OSAL_EVENT_BITS_MASK
 
 #if configSUPPORT_STATIC_ALLOCATION != 1
 #error "The OSAL FreeRTOS backend requires static kernel object creation"
@@ -236,7 +236,7 @@ static rtos_resource_t* rtos_reserve(osal_resource_type_t type) {
             ++count;
             occupied |= UINT64_C(1) << s_resources[i].storage_index;
         }
-    if (count >= rtos_limit(type) || s_next_token > (UINTPTR_MAX >> 4)) {
+    if (count >= rtos_limit(type) || s_next_token > OSAL_LIFETIME_TOKEN_LIMIT) {
         rtos_unlock(mask); return NULL;
     }
     for (unsigned i = 0; i < RTOS_RESOURCE_MAX; ++i) {
@@ -312,6 +312,36 @@ osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
 #endif
     return OSAL_OK;
 }
+
+osal_status_t osal_get_execution_info(osal_execution_info_t* info) {
+    if (!info) return OSAL_ERROR_NULL_POINTER;
+    UBaseType_t mask = rtos_lock();
+    BaseType_t state = xTaskGetSchedulerState();
+    *info = (osal_execution_info_t){.backend = OSAL_BACKEND_FREERTOS,
+        .initialized = s_initialized, .in_isr = osal_is_isr(),
+        .scheduler_state = state == taskSCHEDULER_NOT_STARTED ? OSAL_SCHEDULER_NOT_STARTED :
+            state == taskSCHEDULER_SUSPENDED ? OSAL_SCHEDULER_SUSPENDED : OSAL_SCHEDULER_RUNNING};
+    rtos_unlock(mask);
+    return OSAL_OK;
+}
+
+osal_status_t osal_get_resource_usage(osal_resource_usage_t* usage) {
+    if (!usage) return OSAL_ERROR_NULL_POINTER;
+    UBaseType_t mask = rtos_lock();
+    *usage = (osal_resource_usage_t){
+        .tasks.capacity = OSAL_MAX_TASKS, .mutexes.capacity = OSAL_MAX_MUTEXES,
+        .semaphores.capacity = OSAL_MAX_SEMS, .queues.capacity = OSAL_MAX_QUEUES,
+        .events.capacity = OSAL_MAX_EVENTS, .timers.capacity = OSAL_MAX_TIMERS,
+        .lifetime_tokens_capacity = OSAL_LIFETIME_TOKEN_LIMIT,
+        .lifetime_tokens_issued = s_next_token - 1u,
+        .lifetime_tokens_remaining = OSAL_LIFETIME_TOKEN_LIMIT - (s_next_token - 1u)};
+    osal_object_usage_t* classes[7] = {NULL, &usage->tasks, &usage->mutexes,
+        &usage->semaphores, &usage->queues, &usage->events, &usage->timers};
+    for (unsigned i = 0; i < RTOS_RESOURCE_MAX; ++i)
+        if (s_resources[i].used) ++classes[s_resources[i].type]->reserved;
+    rtos_unlock(mask);
+    return OSAL_OK;
+}
 static rtos_resource_t* rtos_pin(void* handle, osal_resource_type_t type) {
     /* Boot task queries may borrow metadata. ISR/runtime actions are gated
      * independently; kernel reads use a boot mask guard. */
@@ -349,6 +379,8 @@ static osal_status_t rtos_close(void* handle, osal_resource_type_t type,
     RTOS_BOOT_CONTEXT();                                                       \
     if (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED)                  \
         return OSAL_ERROR_NOT_INIT;                                            \
+    if (xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED)                    \
+        return OSAL_ERROR_BUSY;                                                \
 } while (0)
 #define RTOS_PIN(handle, type, resource)                                      \
     do {                                                                     \

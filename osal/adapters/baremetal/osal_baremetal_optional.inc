@@ -12,7 +12,7 @@ osal_status_t osal_event_create(osal_event_handle_t* handle) {
     osal_exit_critical();return OSAL_ERROR_NO_MEMORY;
 }
 osal_status_t osal_event_delete(osal_event_handle_t h){BARE_TASK_ONLY();if(!h)return OSAL_ERROR_NULL_POINTER;osal_enter_critical();bare_event_t*e=bare_event(h);if(!e){osal_exit_critical();return OSAL_ERROR_INVALID_PARAM;}e->used=false;--s_stats.event_count;osal_exit_critical();return OSAL_OK;}
-static osal_status_t bare_event_update(osal_event_handle_t h,uint32_t bits,bool set){if(!h)return OSAL_ERROR_NULL_POINTER;if(!bits||(bits&0xff000000u))return OSAL_ERROR_INVALID_PARAM;osal_enter_critical();bare_event_t*e=bare_event(h);if(!e){osal_exit_critical();return OSAL_ERROR_INVALID_PARAM;}e->bits=set?e->bits|bits:e->bits&~bits;osal_exit_critical();return OSAL_OK;}
+static osal_status_t bare_event_update(osal_event_handle_t h,uint32_t bits,bool set){if(!h)return OSAL_ERROR_NULL_POINTER;if(!bits||(bits&~OSAL_EVENT_BITS_MASK))return OSAL_ERROR_INVALID_PARAM;osal_enter_critical();bare_event_t*e=bare_event(h);if(!e){osal_exit_critical();return OSAL_ERROR_INVALID_PARAM;}e->bits=set?e->bits|bits:e->bits&~bits;osal_exit_critical();return OSAL_OK;}
 osal_status_t osal_event_set(osal_event_handle_t h,uint32_t bits){BARE_TASK_ONLY();return bare_event_update(h,bits,true);}
 osal_status_t osal_event_clear(osal_event_handle_t h,uint32_t bits){BARE_TASK_ONLY();return bare_event_update(h,bits,false);}
 osal_status_t osal_event_set_from_isr(osal_event_handle_t h,uint32_t bits){return bare_event_update(h,bits,true);}
@@ -20,7 +20,7 @@ osal_status_t osal_event_clear_from_isr(osal_event_handle_t h,uint32_t bits){ret
 osal_event_bits_t osal_event_get(osal_event_handle_t h){osal_enter_critical();bare_event_t*e=bare_event(h);uint32_t bits=e?e->bits:0;osal_exit_critical();return bits;}
 static osal_status_t bare_event_wait(osal_event_handle_t h,uint32_t set,uint32_t bits,const osal_event_wait_options_t*opts,uint32_t*out){
     BARE_TASK_ONLY();if(out)*out=0;if(!h||!opts)return OSAL_ERROR_NULL_POINTER;
-    if(!bits||((bits|set)&0xff000000u)||(opts->mode!=OSAL_EVENT_WAIT_ALL&&opts->mode!=OSAL_EVENT_WAIT_ANY))return OSAL_ERROR_INVALID_PARAM;
+    if(!bits||((bits|set)&~OSAL_EVENT_BITS_MASK)||(opts->mode!=OSAL_EVENT_WAIT_ALL&&opts->mode!=OSAL_EVENT_WAIT_ANY))return OSAL_ERROR_INVALID_PARAM;
     uint32_t begin;osal_status_t setup=bare_wait_setup(opts->timeout_ms,&begin);if(setup!=OSAL_OK)return setup;
     bool seen=false;
     for(;;){

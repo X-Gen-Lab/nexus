@@ -12,12 +12,19 @@ static UBaseType_t model_mask;
 static unsigned sentinel_depth = 0xaaaa;
 static bool model_isr;
 static unsigned isr_tick_reads;
+static bool override_task_tick;
+static TickType_t model_task_tick;
 void __real_vPortEnterCritical(void);
 void __real_vPortExitCritical(void);
 UBaseType_t __real_xPortSetInterruptMask(void);
 void __real_vPortClearInterruptMask(UBaseType_t mask);
 bool __real_nx_arch_in_isr(void);
 TickType_t __real_xTaskGetTickCountFromISR(void);
+TickType_t __real_xTaskGetTickCount(void);
+
+TickType_t __wrap_xTaskGetTickCount(void) {
+    return override_task_tick ? model_task_tick : __real_xTaskGetTickCount();
+}
 
 bool __wrap_nx_arch_in_isr(void) {
     return model_isr || __real_nx_arch_in_isr();
@@ -52,10 +59,31 @@ void __wrap_vPortClearInterruptMask(UBaseType_t mask) {
 static void unused(void* arg) { (void)arg; }
 int main(void) {
     assert(osal_init() == OSAL_OK && model_mask == 0);
+    osal_execution_info_t execution;
+    osal_resource_usage_t usage;
+    assert(osal_get_execution_info(NULL) == OSAL_ERROR_NULL_POINTER);
+    assert(osal_get_execution_info(&execution) == OSAL_OK &&
+        execution.backend == OSAL_BACKEND_FREERTOS && execution.initialized &&
+        execution.scheduler_state == OSAL_SCHEDULER_NOT_STARTED && !execution.in_isr);
+    assert(osal_get_resource_usage(&usage) == OSAL_OK && !usage.tasks.reserved);
+    assert(model_mask == 0 && !nx_arch_irq_is_masked());
     uint32_t milliseconds = UINT32_MAX;
     assert(osal_get_time_ms(&milliseconds) == OSAL_OK && milliseconds == 0);
     assert(model_mask == 0 && !nx_arch_irq_is_masked());
+    override_task_tick = true;
+    model_task_tick = UINT32_MAX;
+    assert(osal_get_time_ms(&milliseconds) == OSAL_OK &&
+        milliseconds == (uint32_t)((uint64_t)UINT32_MAX * 1000u / configTICK_RATE_HZ));
+    const uint32_t before_wrap = milliseconds;
+    model_task_tick = 0;
+    assert(osal_get_time_ms(&milliseconds) == OSAL_OK && milliseconds == 0);
+    assert((uint32_t)(milliseconds - before_wrap) == 1000u / configTICK_RATE_HZ);
+    override_task_tick = false;
+    assert(model_mask == 0 && !nx_arch_irq_is_masked());
     model_isr = true;
+    assert(osal_get_execution_info(&execution) == OSAL_OK && execution.in_isr &&
+        execution.scheduler_state == OSAL_SCHEDULER_NOT_STARTED);
+    assert(osal_get_resource_usage(&usage) == OSAL_OK);
     milliseconds = UINT32_MAX;
     assert(osal_get_time_ms(&milliseconds) == OSAL_ERROR_NOT_INIT && milliseconds == 0);
     assert(isr_tick_reads == 0 && model_mask == 0 && !nx_arch_irq_is_masked());
@@ -79,6 +107,7 @@ int main(void) {
     assert(osal_queue_send(queue, &item, 0) == OSAL_ERROR_NOT_INIT);
     assert(osal_queue_receive_from_isr(queue, &item) == OSAL_ERROR_NOT_INIT);
     assert(osal_event_set_from_isr(event, 1) == OSAL_ERROR_NOT_INIT);
+    assert(osal_event_clear_from_isr(event, 1) == OSAL_ERROR_NOT_INIT);
     assert(osal_task_delay(0) == OSAL_ERROR_NOT_INIT && model_mask == 0);
     assert(osal_mutex_delete(mutex) == OSAL_OK && model_mask == 0);
     assert(osal_sem_delete(sem) == OSAL_OK && model_mask == 0);
@@ -121,6 +150,8 @@ int main(void) {
     assert(osal_task_get_stack_watermark(task) <= task_config.stack_size && model_mask == 0);
     assert(osal_task_get_current() == NULL);
     assert(osal_task_join(task, 0) == OSAL_ERROR_NOT_INIT);
+    assert(osal_get_resource_usage(&usage) == OSAL_OK && usage.tasks.reserved == 1 &&
+        usage.timers.reserved == 1);
     assert(osal_deinit() == OSAL_ERROR_BUSY);
     puts("Boot constructors preserve model BASEPRI/Arch state; operations require scheduler");
     return 0;

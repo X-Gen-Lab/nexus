@@ -23,6 +23,19 @@ target_compile_options(freertos_contract_tests PRIVATE -Werror -UNDEBUG)
 add_test(NAME freertos_contract_tests COMMAND freertos_contract_tests)
 set_tests_properties(freertos_contract_tests PROPERTIES TIMEOUT 60 LABELS "osal;freertos;kernel;contract")
 
+add_library(freertos_small_budget_adapter STATIC "${NEXUS_SOURCE_DIR}/osal/adapters/freertos/osal_freertos.c")
+target_include_directories(freertos_small_budget_adapter PUBLIC "${NEXUS_SOURCE_DIR}/osal/include")
+target_link_libraries(freertos_small_budget_adapter PUBLIC freertos_contract_kernel nexus_build_options)
+target_link_libraries(freertos_small_budget_adapter PRIVATE nexus_arch)
+target_compile_definitions(freertos_small_budget_adapter PUBLIC OSAL_LIFETIME_TOKEN_LIMIT=6)
+target_compile_options(freertos_small_budget_adapter PRIVATE -Werror -UNDEBUG)
+add_executable(freertos_token_budget_tests ../test_token_budget_contract.c)
+target_link_libraries(freertos_token_budget_tests PRIVATE freertos_small_budget_adapter)
+target_compile_options(freertos_token_budget_tests PRIVATE -Werror -UNDEBUG)
+add_test(NAME freertos_token_budget_tests COMMAND freertos_token_budget_tests)
+set_tests_properties(freertos_token_budget_tests PROPERTIES
+    TIMEOUT 15 LABELS "osal;freertos;kernel;contract;resource-budget")
+
 add_executable(freertos_task_mutex_quarantine_tests ../test_task_mutex_quarantine.c)
 target_link_libraries(freertos_task_mutex_quarantine_tests PRIVATE freertos_contract_adapter)
 target_compile_definitions(freertos_task_mutex_quarantine_tests PRIVATE OSAL_TEST_FREERTOS=1)
@@ -36,7 +49,8 @@ target_compile_options(freertos_boot_kernel_mask_tests PRIVATE -UNDEBUG -Werror)
 target_link_options(freertos_boot_kernel_mask_tests PRIVATE
     -Wl,--wrap=vPortEnterCritical -Wl,--wrap=vPortExitCritical
     -Wl,--wrap=xPortSetInterruptMask -Wl,--wrap=vPortClearInterruptMask
-    -Wl,--wrap=nx_arch_in_isr -Wl,--wrap=xTaskGetTickCountFromISR)
+    -Wl,--wrap=nx_arch_in_isr -Wl,--wrap=xTaskGetTickCountFromISR
+    -Wl,--wrap=xTaskGetTickCount)
 add_test(NAME freertos_boot_kernel_mask_tests COMMAND freertos_boot_kernel_mask_tests)
 set_tests_properties(freertos_boot_kernel_mask_tests PROPERTIES TIMEOUT 15 LABELS "osal;freertos;kernel;contract;mask-model")
 

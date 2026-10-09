@@ -77,7 +77,7 @@ osal_status_t osal_event_delete(osal_event_handle_t handle) {
 static osal_status_t native_event_update(osal_event_handle_t handle,
                                        osal_event_bits_t bits, bool set) {
     if (!handle) return OSAL_ERROR_NULL_POINTER;
-    if (!bits || (bits & 0xff000000u)) return OSAL_ERROR_INVALID_PARAM;
+    if (!bits || (bits & ~OSAL_EVENT_BITS_MASK)) return OSAL_ERROR_INVALID_PARAM;
     global_lock();
     osal_event_internal_t* e = native_event(handle);
     if (!e) { global_unlock(); return OSAL_ERROR_INVALID_PARAM; }
@@ -99,7 +99,7 @@ static osal_status_t native_event_wait(osal_event_handle_t handle,
                                       osal_event_bits_t* bits_out) {
     if (bits_out) *bits_out = 0;
     if (!handle || !options) return OSAL_ERROR_NULL_POINTER;
-    if (!wait_bits || ((wait_bits | set_bits) & 0xff000000u) || (options->mode != OSAL_EVENT_WAIT_ANY &&
+    if (!wait_bits || ((wait_bits | set_bits) & ~OSAL_EVENT_BITS_MASK) || (options->mode != OSAL_EVENT_WAIT_ANY &&
                       options->mode != OSAL_EVENT_WAIT_ALL))
         return OSAL_ERROR_INVALID_PARAM;
     native_deadline_t d = native_deadline(options->timeout_ms);

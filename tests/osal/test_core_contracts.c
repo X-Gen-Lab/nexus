@@ -1,6 +1,8 @@
 /* Executable contract regressions: observable outcomes, not source matching. */
 #define _POSIX_C_SOURCE 200809L
 #include "osal/osal.h"
+#include "event_mask_contract.h"
+#include "resource_usage_contract.h"
 #ifndef OSAL_CONTRACT_NO_HAL
 #include "hal/system/nx_mutex.h"
 #include "hal/system/nx_mem.h"
@@ -405,6 +407,11 @@ int main(void) {
     assert(!(info.capabilities & (OSAL_CAP_STATIC_OBJECTS | OSAL_CAP_HARDWARE_ISR |
         OSAL_CAP_PRIORITY_SCHEDULER | OSAL_CAP_MEMORY_SEAL)));
     assert(info.delete_policy == OSAL_DELETE_CANCELS_WAITERS);
+    osal_execution_info_t execution;
+    assert(osal_get_execution_info(NULL) == OSAL_ERROR_NULL_POINTER);
+    assert(osal_get_execution_info(&execution) == OSAL_OK);
+    assert(execution.backend == OSAL_BACKEND_NATIVE && execution.initialized &&
+        !execution.in_isr && execution.scheduler_state == OSAL_SCHEDULER_NONE);
     assert(osal_mem_seal() == OSAL_ERROR_NOT_SUPPORTED && !osal_mem_is_sealed());
     osal_sem_handle_t lifecycle;
     assert(osal_sem_create(0, 1, &lifecycle) == OSAL_OK);
@@ -414,6 +421,8 @@ int main(void) {
     assert(osal_init() == OSAL_OK && osal_is_initialized());
 unsigned groups = 0;
 #define RUN(test) do { test(); ++groups; puts(#test " passed"); } while (0)
+    RUN(test_event_advertised_bits);
+    RUN(test_resource_usage_pool);
     RUN(test_nested_critical);
 #ifndef OSAL_CONTRACT_NO_HAL
     RUN(test_hal_atomic);

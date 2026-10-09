@@ -100,7 +100,7 @@ osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
         .max_queue_storage_bytes = OSAL_QUEUE_MAX_SIZE < OSAL_MAX_QUEUE_BYTES ?
             OSAL_QUEUE_MAX_SIZE : OSAL_MAX_QUEUE_BYTES,
         .reserved_object_bytes = sizeof(s_mutexes) + sizeof(s_sems) +
-            sizeof(s_queues) + sizeof(s_events), .event_bits_mask = UINT32_MAX};
+            sizeof(s_queues) + sizeof(s_events), .event_bits_mask = OSAL_EVENT_BITS_MASK};
     if (s_clock) info->capabilities |= OSAL_CAP_MONOTONIC_CLOCK;
 #if defined(__ARM_ARCH_7EM__)
     info->capabilities |= OSAL_CAP_HARDWARE_ISR;
@@ -109,8 +109,35 @@ osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
     return OSAL_OK;
 }
 static void* bare_token(unsigned type) {
-    if (s_next_token > (UINTPTR_MAX >> 4)) return NULL;
+    if (s_next_token > OSAL_LIFETIME_TOKEN_LIMIT) return NULL;
     return (void*)((s_next_token++ << 4) | type);
+}
+
+osal_status_t osal_get_execution_info(osal_execution_info_t* info) {
+    if (!info) return OSAL_ERROR_NULL_POINTER;
+    osal_enter_critical();
+    *info = (osal_execution_info_t){.backend = OSAL_BACKEND_BAREMETAL,
+        .initialized = s_initialized, .in_isr = osal_is_isr(),
+        .scheduler_state = OSAL_SCHEDULER_NONE};
+    osal_exit_critical();
+    return OSAL_OK;
+}
+
+osal_status_t osal_get_resource_usage(osal_resource_usage_t* usage) {
+    if (!usage) return OSAL_ERROR_NULL_POINTER;
+    osal_enter_critical();
+    *usage = (osal_resource_usage_t){
+        .mutexes.capacity = OSAL_MAX_MUTEXES, .semaphores.capacity = OSAL_MAX_SEMS,
+        .queues.capacity = OSAL_MAX_QUEUES, .events.capacity = OSAL_MAX_EVENTS,
+        .lifetime_tokens_capacity = OSAL_LIFETIME_TOKEN_LIMIT,
+        .lifetime_tokens_issued = s_next_token - 1u,
+        .lifetime_tokens_remaining = OSAL_LIFETIME_TOKEN_LIMIT - (s_next_token - 1u)};
+    for (unsigned i = 0; i < OSAL_MAX_MUTEXES; ++i) usage->mutexes.reserved += s_mutexes[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_SEMS; ++i) usage->semaphores.reserved += s_sems[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_QUEUES; ++i) usage->queues.reserved += s_queues[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_EVENTS; ++i) usage->events.reserved += s_events[i].used;
+    osal_exit_critical();
+    return OSAL_OK;
 }
 #define BARE_LOOKUP(name, pool, max, type)                                    \
     static type* name(void* token) {                                         \

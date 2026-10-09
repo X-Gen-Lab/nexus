@@ -33,6 +33,10 @@ typedef void* osal_event_handle_t;
  */
 typedef uint32_t osal_event_bits_t;
 
+/** Bits 0..23 are portable across every maintained backend. Bits 24..31
+ * are reserved and every update, wait and barrier rejects them. */
+#define OSAL_EVENT_BITS_MASK UINT32_C(0x00ffffff)
+
 /**
  * \brief           Event wait mode enumeration
  */

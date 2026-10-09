@@ -51,6 +51,24 @@ idle and timer daemon TCB/stacks; its timer command queue is also static. Produc
 profiles must budget these kernel allocations, the exception/main stack and all
 other linked components separately.
 
+`osal_get_execution_info()` exposes the current initialization/ISR context and
+kernel scheduler state without starting or allocating resources. Native and
+baremetal report `NONE`; FreeRTOS reports prestart/running/suspended. Task
+operational calls during FreeRTOS scheduler suspension return BUSY, so a finite
+wait cannot enter an illegal kernel wait. Prestart operations remain NOT_INIT.
+
+`osal_get_resource_usage()` counts actual per-class reserved slots, including
+constructing/closing/quarantined lifetimes, independently of optional statistics.
+It also reports cumulative token capacity/issued/remaining. The default
+`OSAL_LIFETIME_TOKEN_LIMIT` is `UINTPTR_MAX >> 4` (268435455 on 32-bit MCUs).
+Deletion reuses storage, never identities; failed construction may consume one.
+Exhaustion returns NO_MEMORY with NULL output. Neither statistics reset nor
+rollback/reinit resets the token budget. See the executable small-budget
+production variants and [refactor evidence](../../docs/implementation/osal-refactor.md).
+
+Every maintained backend advertises `OSAL_EVENT_BITS_MASK` (bits 0..23) and
+rejects bits 24..31 consistently in update/wait/barrier and FromISR entry.
+
 ## Completion and reclamation
 
 Before the scheduler starts, OSAL metadata locks and its public balanced boot

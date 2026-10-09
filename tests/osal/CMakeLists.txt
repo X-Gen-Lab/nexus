@@ -55,6 +55,32 @@ nexus_discover_tests(osal_tests
 )
 
 if(UNIX)
+    add_executable(osal_event_mask_tests test_event_mask_contract.c)
+    target_link_libraries(osal_event_mask_tests PRIVATE osal)
+    target_compile_options(osal_event_mask_tests PRIVATE -UNDEBUG -Werror)
+    add_test(NAME osal_event_mask_tests COMMAND osal_event_mask_tests)
+    set_tests_properties(osal_event_mask_tests PROPERTIES TIMEOUT 15 LABELS "osal;contract;capability")
+
+    foreach(backend native baremetal)
+        add_library(osal_${backend}_small_budget STATIC
+            "${NEXUS_SOURCE_DIR}/osal/adapters/${backend}/osal_${backend}.c")
+        target_link_libraries(osal_${backend}_small_budget PUBLIC osal_interface)
+        target_compile_definitions(osal_${backend}_small_budget PUBLIC OSAL_LIFETIME_TOKEN_LIMIT=6)
+        target_compile_options(osal_${backend}_small_budget PRIVATE -Werror)
+        if(backend STREQUAL "native")
+            target_link_libraries(osal_${backend}_small_budget PRIVATE Threads::Threads)
+            target_compile_definitions(osal_${backend}_small_budget PUBLIC OSAL_STATS_ENABLE=0)
+        else()
+            target_link_libraries(osal_${backend}_small_budget PRIVATE nexus_arch)
+        endif()
+        add_executable(osal_${backend}_token_budget_tests test_token_budget_contract.c)
+        target_link_libraries(osal_${backend}_token_budget_tests PRIVATE osal_${backend}_small_budget)
+        target_compile_options(osal_${backend}_token_budget_tests PRIVATE -UNDEBUG -Werror)
+        add_test(NAME osal_${backend}_token_budget_tests COMMAND osal_${backend}_token_budget_tests)
+        set_tests_properties(osal_${backend}_token_budget_tests PROPERTIES
+            TIMEOUT 15 LABELS "osal;contract;resource-budget")
+    endforeach()
+
     add_executable(osal_contract_tests test_core_contracts.c)
     target_link_libraries(osal_contract_tests PRIVATE osal hal Threads::Threads)
     target_compile_options(osal_contract_tests PRIVATE -UNDEBUG)

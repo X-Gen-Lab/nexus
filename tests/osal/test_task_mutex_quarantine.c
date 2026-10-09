@@ -46,6 +46,9 @@ static void run_contract(void* arg) {
     assert(osal_deinit() == OSAL_ERROR_BUSY);
     osal_stats_t stats;
     assert(osal_get_stats(&stats) == OSAL_OK && stats.task_count == 1 && stats.mutex_count == 1);
+    osal_resource_usage_t usage;
+    assert(osal_get_resource_usage(&usage) == OSAL_OK &&
+        usage.tasks.reserved == 1 && usage.mutexes.reserved == 1);
     puts("Faulted mutex owner quarantined; fresh task has no ownership; reset required");
     atomic_store(&completed, true);
 #ifdef OSAL_TEST_FREERTOS

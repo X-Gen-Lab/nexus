@@ -1,4 +1,6 @@
 #include "osal/osal.h"
+#include "event_mask_contract.h"
+#include "resource_usage_contract.h"
 #include "osal/osal_baremetal.h"
 #include "arch/nx_arch.h"
 #include <assert.h>
@@ -49,6 +51,17 @@ int main(void) {
         OSAL_CAP_DYNAMIC_MEMORY | OSAL_CAP_MONOTONIC_CLOCK)));
     assert(info.max_tasks == 0 && info.max_timers == 0 && info.max_queue_storage_bytes == 256);
     assert(osal_mem_seal() == OSAL_ERROR_NOT_SUPPORTED && !osal_mem_is_sealed());
+    test_event_advertised_bits();
+    test_resource_usage_pool();
+    osal_execution_info_t execution;
+    assert(osal_get_execution_info(&execution) == OSAL_OK);
+    assert(execution.backend == OSAL_BACKEND_BAREMETAL && execution.initialized &&
+        !execution.in_isr && execution.scheduler_state == OSAL_SCHEDULER_NONE);
+    in_isr = true;
+    assert(osal_get_execution_info(&execution) == OSAL_OK && execution.in_isr);
+    osal_resource_usage_t usage;
+    assert(osal_get_resource_usage(&usage) == OSAL_OK && !usage.events.reserved);
+    in_isr = false;
     irq_masked = true;
     enters = exits = 0;
     osal_enter_critical(); osal_enter_critical();
@@ -140,6 +153,6 @@ int main(void) {
     assert(osal_deinit() == OSAL_ERROR_BUSY && osal_is_initialized());
     assert(osal_sem_delete(lifecycle) == OSAL_OK);
     assert(osal_deinit() == OSAL_OK && !osal_is_initialized());
-    puts("7 baremetal board-model contract groups passed");
+    puts("9 baremetal board-model contract groups passed");
     return 0;
 }

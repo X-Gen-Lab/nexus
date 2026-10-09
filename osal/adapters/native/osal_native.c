@@ -346,7 +346,15 @@ osal_status_t osal_get_backend_info(osal_backend_info_t* info) {
         .max_queue_storage_bytes = OSAL_MAX_QUEUE_BYTES,
         .reserved_object_bytes = sizeof(s_tasks) + sizeof(s_mutexes) +
             sizeof(s_sems) + sizeof(s_queues) + sizeof(s_events) + sizeof(s_timers),
-        .event_bits_mask = UINT32_MAX};
+        .event_bits_mask = OSAL_EVENT_BITS_MASK};
+    return OSAL_OK;
+}
+
+osal_status_t osal_get_execution_info(osal_execution_info_t* info) {
+    if (!info) return OSAL_ERROR_NULL_POINTER;
+    *info = (osal_execution_info_t){.backend = OSAL_BACKEND_NATIVE,
+        .initialized = atomic_load(&s_osal_initialized), .in_isr = false,
+        .scheduler_state = OSAL_SCHEDULER_NONE};
     return OSAL_OK;
 }
 
@@ -416,6 +424,26 @@ bool osal_is_isr(void) {
 #include "osal_native_task.inc"
 #include "osal_native_timer.inc"
 #include "osal_native_event.inc"
+
+osal_status_t osal_get_resource_usage(osal_resource_usage_t* usage) {
+    if (!usage) return OSAL_ERROR_NULL_POINTER;
+    global_lock();
+    *usage = (osal_resource_usage_t){
+        .tasks.capacity = OSAL_MAX_TASKS, .mutexes.capacity = OSAL_MAX_MUTEXES,
+        .semaphores.capacity = OSAL_MAX_SEMS, .queues.capacity = OSAL_MAX_QUEUES,
+        .events.capacity = OSAL_MAX_EVENTS, .timers.capacity = OSAL_MAX_TIMERS,
+        .lifetime_tokens_capacity = OSAL_LIFETIME_TOKEN_LIMIT,
+        .lifetime_tokens_issued = s_sync_next_token - 1u,
+        .lifetime_tokens_remaining = OSAL_LIFETIME_TOKEN_LIMIT - (s_sync_next_token - 1u)};
+    for (unsigned i = 0; i < OSAL_MAX_TASKS; ++i) usage->tasks.reserved += s_tasks[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_MUTEXES; ++i) usage->mutexes.reserved += s_mutexes[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_SEMS; ++i) usage->semaphores.reserved += s_sems[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_QUEUES; ++i) usage->queues.reserved += s_queues[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_EVENTS; ++i) usage->events.reserved += s_events[i].used;
+    for (unsigned i = 0; i < OSAL_MAX_TIMERS; ++i) usage->timers.reserved += s_timers[i].used;
+    global_unlock();
+    return OSAL_OK;
+}
 
 osal_status_t osal_get_time_ms(uint32_t* milliseconds) {
     if (!milliseconds) return OSAL_ERROR_NULL_POINTER;

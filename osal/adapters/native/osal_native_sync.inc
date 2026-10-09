@@ -81,7 +81,7 @@ static void native_notify(native_cond_t* cv) {
  * Exhaustion fails rather than wrapping and accepting a stale handle. */
 static uintptr_t s_sync_next_token = 1;
 static void* native_token(osal_resource_type_t type) {
-    if (s_sync_next_token > (UINTPTR_MAX >> 4))
+    if (s_sync_next_token > OSAL_LIFETIME_TOKEN_LIMIT)
         return NULL;
     return (void*)((s_sync_next_token++ << 4) | (uintptr_t)type);
 }
