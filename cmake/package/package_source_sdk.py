@@ -347,7 +347,8 @@ def main(argv=None):
     except (SDKError, OSError, ValueError, TypeError, KeyError) as exc:
         print(f"Source SDK rejected: {exc}", file=sys.stderr)
         return 1
-    print(json.dumps({"kind": result["kind"], "source_revision": result["source_revision"],
+    print(json.dumps({"kind": "nexus_source_sdk_summary", "sdk_kind": result["kind"],
+                      "source_revision": result["source_revision"],
                       "publishable": result["publishable"], "files": len(result["files_sha256"]),
                       "snapshot_sha256": result["snapshot_sha256"]}, sort_keys=True))
     return 0

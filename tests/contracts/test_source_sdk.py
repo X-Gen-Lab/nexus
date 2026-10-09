@@ -52,6 +52,18 @@ class SourceSDKTests(unittest.TestCase):
         return self.run_process([sys.executable, "-B", str(self.sdk / "cmake/package/package_source_sdk.py"),
                          "--verify", str(self.sdk)])
 
+    def test_cli_summary_cannot_be_confused_with_complete_manifest(self):
+        result = self.verify()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        summary = json.loads(result.stdout)
+        self.assertEqual(summary["kind"], "nexus_source_sdk_summary")
+        self.assertEqual(summary["sdk_kind"], self.identity["kind"])
+        self.assertNotEqual(summary["kind"], self.identity["kind"])
+        self.assertEqual(summary["snapshot_sha256"],
+                         self.identity["snapshot_sha256"])
+        self.assertEqual(summary["files"], len(self.identity["files_sha256"]))
+        self.assertNotIn("files_sha256", summary)
+
     def consumer(self, name, **options):
         source, build, command = consumer_gate.prepare_consumer(
             self.prefix, self.directory, name, self.run_ok, **options)
