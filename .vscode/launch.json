@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Native config_tests",
+            "name": "Native request contracts",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/config_tests",
+            "program": "${workspaceFolder}/build/native-debug/bin/contract_core_contract",
             "args": [],
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
@@ -13,92 +13,15 @@
             "preLaunchTask": "Build Native"
         },
         {
-            "name": "Native osal_tests",
+            "name": "Native I/O contracts",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/osal_tests",
+            "program": "${workspaceFolder}/build/native-debug/bin/contract_native_io",
             "args": [],
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "stopAtEntry": false,
             "preLaunchTask": "Build Native"
-        },
-        {
-            "name": "Native hal_native_tests",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/hal_native_tests",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "stopAtEntry": false,
-            "preLaunchTask": "Build Native"
-        },
-        {
-            "name": "Native blinky",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/blinky",
-            "args": [
-                "--cycles",
-                "3"
-            ],
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "stopAtEntry": false,
-            "preLaunchTask": "Build Native"
-        },
-        {
-            "name": "Native shell_demo",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/shell_demo",
-            "args": [
-                "--smoke"
-            ],
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "stopAtEntry": false,
-            "preLaunchTask": "Build Native"
-        },
-        {
-            "name": "Native nexus_industrial_controller",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/linux-gcc-debug/bin/nexus_industrial_controller",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "stopAtEntry": false,
-            "preLaunchTask": "Build Native"
-        },
-        {
-            "name": "STM32 baremetal MB997 / ST-Link",
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "openocd",
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/stm32-armgcc-debug/bin/blinky.elf",
-            "device": "STM32F407VG",
-            "configFiles": [
-                "board/stm32f4discovery.cfg"
-            ],
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Build STM32 baremetal"
-        },
-        {
-            "name": "STM32 FreeRTOS MB997 / ST-Link",
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "openocd",
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/stm32-armgcc-freertos-debug/bin/blinky.elf",
-            "device": "STM32F407VG",
-            "configFiles": [
-                "board/stm32f4discovery.cfg"
-            ],
-            "runToEntryPoint": "main",
-            "preLaunchTask": "Build STM32 FreeRTOS"
         }
     ]
 }

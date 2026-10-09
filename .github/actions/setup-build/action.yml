@@ -1,88 +1,38 @@
-name: Setup Build Environment
-description: Setup build tools and dependencies for Nexus
+name: Setup Nexus Tools
+description: Install pinned CLI tools and the explicitly selected compiler
 
 inputs:
-  os:
-    description: 'Operating system (windows-latest, ubuntu-latest, macos-latest)'
-    required: true
   preset:
-    description: 'CMake preset name'
+    description: CMake preset used by this job
     required: true
+  arm:
+    description: Install the hash-verified ARM GNU distribution
+    default: 'false'
+  os:
+    description: Caller metadata; execution uses the runner OS
+    default: ubuntu-24.04
 
 runs:
   using: composite
   steps:
-    - name: Setup Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: '3.11'
-        cache: 'pip'
-
-    - name: Install Python Dependencies
+    - name: Install the locked local build and commit tools
       shell: bash
       run: |
-        python -m pip install kconfiglib==14.1.0
-
-    - name: Setup MSVC (Windows)
-      if: runner.os == 'Windows' && contains(inputs.preset, 'msvc')
-      uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
-      with:
-        arch: x64
-
-    - name: Setup MinGW (Windows)
-      if: runner.os == 'Windows' && contains(inputs.preset, 'gcc')
-      uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2.33.0
-      with:
-        msystem: MINGW64
-        update: true
-        install: >-
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-cmake
-          mingw-w64-x86_64-ninja
-
-    - name: Install Build Tools (Linux)
-      if: runner.os == 'Linux'
+        python scripts/setup/install_dev_tools.py --skip-hooks
+        .venv/bin/python -m pip install -r requirements.txt
+        echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+    - name: Initialize selected vendor and scheduler sources
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake ninja-build ccache libssl-dev
-
-        if [[ "${{ inputs.preset }}" == *"clang"* ]]; then
-          sudo apt-get install -y clang-14 clang-tidy-14
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-14 100
-        fi
-
-        if [[ "${{ inputs.preset }}" == *"gcc"* ]]; then
-          sudo apt-get install -y gcc g++
-        fi
-
-        if [[ "${{ inputs.preset }}" == *"coverage"* ]]; then
-          sudo apt-get install -y lcov
-        fi
-
-    - name: Install Locked ARM GNU Toolchain
-      if: runner.os == 'Linux' && contains(inputs.preset, 'arm')
+        git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4
+    - name: Install the locked ARM compiler
+      if: inputs.arm == 'true'
       shell: bash
       run: |
-        python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+        .venv/bin/python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
         echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
-
-    - name: Setup ccache (Linux)
-      if: runner.os == 'Linux'
-      uses: hendrikmuhs/ccache-action@f09c25b45002a07be2955cbe52e8cee55643f89d # v1.2.24
-      with:
-        key: ${{ inputs.preset }}
-        max-size: 500M
-
-    - name: Install Build Tools (macOS)
-      if: runner.os == 'macOS'
-      shell: bash
-      run: brew install cmake ninja ccache
-
-    - name: Setup ccache (macOS)
-      if: runner.os == 'macOS'
-      uses: hendrikmuhs/ccache-action@f09c25b45002a07be2955cbe52e8cee55643f89d # v1.2.24
-      with:
-        key: ${{ inputs.preset }}
-        max-size: 500M
+    # Runner compiler checks provide fast feedback. Formal reproducibility
+    # uses the measured OCI environment, not the runner's mutable host packages.

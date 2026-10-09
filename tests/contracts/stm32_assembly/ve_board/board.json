@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407ve-controller-link-fixture",
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f407",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "cs0",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "mask": 8,
+      "initial": 8
+    },
+    {
+      "id": "spi0",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "i2c0",
+      "controller": "I2C1",
+      "route": "i2c1-pb6-pb7"
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal"
+    },
+    {
+      "id": "watchdog0",
+      "controller": "IWDG",
+      "route": "iwdg"
+    },
+    {
+      "id": "edge5",
+      "controller": "EXTI5",
+      "route": "exti5-pa5"
+    },
+    {
+      "id": "edge6",
+      "controller": "EXTI6",
+      "route": "exti6-pa6"
+    },
+    {
+      "id": "pwm0",
+      "controller": "TIM3",
+      "route": "tim3-ch1-pa6",
+      "mask": 64,
+      "initial": 0
+    },
+    {
+      "id": "adc0",
+      "controller": "ADC1",
+      "route": "adc1-ch0-pa0"
+    },
+    {
+      "id": "adc_scan",
+      "controller": "ADC1",
+      "route": "adc1-scan-pa0-pa1"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Development compile/link fixture, not a physical PCB package",
+    "External devices, I2C pull-ups, electrical wiring and 3.3 V supply are not measured",
+    "Ineligible for physical HIL or product promotion"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "Reviewed STM32F407 silicon controller and AF resources; no physical wiring qualification"
+    }
+  ]
+}

@@ -1,4 +1,0 @@
-# The platform assembles its selected SoC; silicon options live with the SoC.
-if PLATFORM_STM32
-source "soc/stm32f407/Kconfig"
-endif

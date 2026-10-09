@@ -21,6 +21,7 @@ def needs_for(code="false", docs="false", workflows="false"):
         },
         "build-test": {"result": "skipped"},
         "code-quality": {"result": "success"},
+        "tool-contracts": {"result": "skipped"},
         "docs": {"result": "skipped"},
     }
 
@@ -34,13 +35,14 @@ class RequiredJobsTests(unittest.TestCase):
                 expected = {
                     "build-test": event in ("schedule", "workflow_dispatch") or code or workflows,
                     "code-quality": True,
-                    "docs": event in ("schedule", "workflow_dispatch") or code or docs,
+                    "tool-contracts": event in ("schedule", "workflow_dispatch") or code or workflows,
+                    "docs": event in ("schedule", "workflow_dispatch") or code or docs or workflows,
                 }
                 needs = needs_for(*(str(flag).lower() for flag in (code, docs, workflows)))
                 with self.subTest(event=event, code=code, docs=docs, workflows=workflows):
                     self.assertEqual(required_jobs(needs["changes"]["outputs"], event), expected)
                 for statuses in itertools.product(
-                    ("success", "skipped", "failure", "cancelled"), repeat=3
+                    ("success", "skipped", "failure", "cancelled"), repeat=4
                 ):
                     for job, status in zip(expected, statuses):
                         needs[job]["result"] = status
@@ -59,21 +61,21 @@ class RequiredJobsTests(unittest.TestCase):
     def test_manual_run_requires_all_gates(self):
         needs = needs_for()
         self.assertFalse(check_required_jobs(needs, "workflow_dispatch").passed)
-        for job in ("build-test", "code-quality", "docs"):
+        for job in ("build-test", "code-quality", "tool-contracts", "docs"):
             needs[job]["result"] = "success"
         self.assertTrue(check_required_jobs(needs, "workflow_dispatch").passed)
 
     def test_changes_must_succeed_even_on_manual_run(self):
         for status in ("failure", "cancelled", "skipped", "unknown", None):
             needs = needs_for()
-            for job in ("build-test", "code-quality", "docs"):
+            for job in ("build-test", "code-quality", "tool-contracts", "docs"):
                 needs[job]["result"] = "success"
             needs["changes"]["result"] = status
             with self.subTest(status=status):
                 self.assertFalse(check_required_jobs(needs, "workflow_dispatch").passed)
 
     def test_missing_or_malformed_job_entries_fail(self):
-        for job in ("changes", "build-test", "code-quality", "docs"):
+        for job in ("changes", "build-test", "code-quality", "tool-contracts", "docs"):
             for replacement in (None, "success", {}, {"result": None}, {"result": "unknown"}):
                 needs = needs_for()
                 needs[job] = replacement
@@ -139,7 +141,8 @@ class RequiredJobsTests(unittest.TestCase):
         expected = {
             "build-test": "needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
             "code-quality": None,
-            "docs": "needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
+            "tool-contracts": "needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
+            "docs": "needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'",
         }
         for job, expression in expected.items():
             start = lines.index("  {}:".format(job)) + 1

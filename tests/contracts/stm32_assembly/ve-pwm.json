@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "board_package": "ve_board",
+  "backend": "baremetal",
+  "clock_profile": "hse8-pll168",
+  "controllers": [
+    {
+      "id": "pwm0",
+      "binding": "pwm0",
+      "mode": "fixed-pwm",
+      "period_ticks": 1000,
+      "duty_ticks": 0,
+      "tick_hz": 1000000
+    }
+  ],
+  "devices": [],
+  "memory_budgets": {
+    "main_stack_bytes": 2048,
+    "flash_load_bytes": 65536,
+    "static_ram_bytes": 16384,
+    "libc_heap_bytes": 0
+  },
+  "layout": null,
+  "optimization": "Os"
+}

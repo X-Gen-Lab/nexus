@@ -17,25 +17,27 @@ import tempfile
 
 sys.dont_write_bytecode = True
 
-ROOT_FILES = {"CMakeLists.txt", "Kconfig", "LICENSE", "README.md", "AGENTS.md"}
-ROOT_DIRS = {"arch", "boards", "cmake", "configs", "dependencies", "drivers",
-             "framework", "hal", "osal", "platforms", "runtime", "scripts",
-             "services", "soc"}
+ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md",
+              ".clang-format", ".editorconfig", ".clang-format-dirs"}
+ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
+             "components", "tools", "scripts", "soc"}
 REQUIRED_DEPENDENCIES = ("ext/freertos", "vendors/arm/CMSIS_5",
-                         "vendors/st/cmsis_device_f4", "vendors/st/stm32f4xx_hal_driver")
+                         "vendors/st/cmsis_device_f4")
 REQUIRED_FILES = (
-    "CMakeLists.txt", "Kconfig", "LICENSE", "dependencies/toolchains.lock.json",
-    "runtime/include/runtime/nx_runtime.h", "runtime/src/nx_runtime.c",
-    "arch/cortex_m4/nx_arch_cortex_m4.c", "osal/adapters/freertos/osal_freertos.c",
-    "boards/stm32f407_qiming_v31/manifest.json",
-    "boards/stm32f407ve_sky_qingchun/manifest.json",
-    "boards/gd32f470_liangshan/manifest.json",
+    "CMakeLists.txt", "LICENSE", "dependencies/toolchains.lock.json",
+    "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
+    "core/src/request.c", "io/include/nexus/io/gpio.h",
+    "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
+    "boards/stm32f407_qiming_v31/board.json",
+    "boards/stm32f407ve_sky_qingchun/board.json",
+    "boards/gd32f470_liangshan/board.json",
+    "soc/stm32f407/soc.json", "soc/gd32f470/soc.json",
+    "tools/configure/configure.py", "cmake/platform/Firmware.cmake",
+    "tools/measurement/workload.c",
     "ext/freertos/tasks.c", "ext/freertos/LICENSE.md",
     "vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_5/LICENSE.txt",
     "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s",
     "vendors/st/cmsis_device_f4/LICENSE.md",
-    "vendors/st/stm32f4xx_hal_driver/Src/stm32f4xx_hal.c",
-    "vendors/st/stm32f4xx_hal_driver/LICENSE.md",
     "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
     "vendors/gigadevice/gd32f4xx/source.lock.json",
     "cmake/package/NexusConfig.cmake.in", "cmake/package/NexusConfigVersion.cmake.in",

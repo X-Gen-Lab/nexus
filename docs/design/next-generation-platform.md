@@ -1,8 +1,8 @@
 # Nexus 下一代平台：从第一性原理设计
 
-状态：**PROPOSED，待实现与资格验证**。本文件定义下一代架构，不描述当前软件已实现的能力。当前架构与支持状态继续由 [现有架构](../strategy/target-architecture.md) 和 [支持矩阵](../strategy/support-matrix.yaml) 描述。用户授权破坏性重构；旧 API、目录、Kconfig、factory、OSAL 和工作流均不构成本设计约束。
+状态：**下一代架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 新代码采用本设计的静态装配、窄端口和显式所有权边界，旧运行架构已删除。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](../archive/strategy/target-architecture.md)仅用于迁移对照。
 
-本次交付是设计、工程规范、接入契约与执行计划；没有修改生产代码、构建实现或硬件支持声明。新方案实施后，需要建立新的源码与产物基线，历史通过结果不能继承。
+本次迭代将设计、工程规范、接入契约与33项实施清单落实为新的生产代码和构建链。新源码与产物建立独立资格；历史通过结果不能继承。
 
 用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。
 
@@ -167,7 +167,7 @@ CPU metadata PRIMASK、FreeRTOS BASEPRI、总线 owner 和 DMA 生命周期是�
 
 ## 7. 请求、deadline、取消与完成
 
-异步默认使用 caller-owned request 和 payload；排队仅借用指针或小 descriptor。以下示意 API 尚未实现：
+异步默认使用 caller-owned request 和 payload；排队仅借用指针或小 descriptor。以下 API 为合同示意，当前可编译接口见 `core/include/nexus/core/request.h`：
 
 ~~~c
 nx_spi_request_prepare(&request, tx, rx, length, transfer_deadline);

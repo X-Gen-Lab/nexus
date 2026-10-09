@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "board_package": "../../../boards/gd32f470_liangshan",
+  "backend": "freertos",
+  "clock_profile": "hxtal25-pll200",
+  "controllers": [
+    {
+      "id": "spi0",
+      "binding": "spi_flash",
+      "mode": "short-poll",
+      "max_hz": 1000000
+    }
+  ],
+  "devices": [],
+  "memory_budgets": {
+    "main_stack_bytes": 2048,
+    "flash_load_bytes": 65536,
+    "static_ram_bytes": 32768,
+    "libc_heap_bytes": 0
+  },
+  "layout": null,
+  "optimization": "Os"
+}

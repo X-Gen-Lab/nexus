@@ -1,27 +1,48 @@
-# GD32F470 silicon owns clocks, interrupt/timebase, memory and controllers.
-add_library(soc_gd32f470_interface INTERFACE)
-target_include_directories(soc_gd32f470_interface INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(soc_gd32f470_interface INTERFACE hal_interface)
-add_subdirectory(sdk)
-add_library(soc_gd32f470 OBJECT clock.c interrupt.c identity.c flash.c)
-target_include_directories(soc_gd32f470 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(soc_gd32f470 PRIVATE
-    soc_gd32f470_interface sdk_gd32f4xx Nexus::HALProviders hal_support osal nexus_arch)
-if(NEXUS_OSAL_BACKEND STREQUAL "freertos")
-    target_link_libraries(soc_gd32f470 PRIVATE freertos_kernel freertos_config)
+# Exact GD32F470ZGT6 implementation; SDK headers stay private to this target.
+set(gd_vendor "${PROJECT_SOURCE_DIR}/vendors/gigadevice/gd32f4xx")
+if(DEFINED NEXUS_SOURCE_DIR)
+    set(gd_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx")
 endif()
-
-set(component_objects soc_gd32f470)
-foreach(controller gpio uart spi)
-    string(TOUPPER "${controller}" symbol)
-    if(CONFIG_GD32_${symbol}_ENABLE)
-        set(controller_target "controller_gd32f470_${controller}")
-        add_library(${controller_target} OBJECT "controllers/${controller}.c")
-        target_include_directories(${controller_target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-        target_link_libraries(${controller_target} PRIVATE
-            sdk_gd32f4xx Nexus::HALProviders hal_support osal nexus_arch "${NEXUS_BOARD_TARGET}")
-        list(APPEND component_objects ${controller_target})
-    endif()
+execute_process(COMMAND "${Python3_EXECUTABLE}"
+    "${gd_vendor}/../../../scripts/ci/verify_vendor_source.py"
+    --root "${gd_vendor}"
+    RESULT_VARIABLE gd_sdk_verified
+    OUTPUT_VARIABLE gd_sdk_output ERROR_VARIABLE gd_sdk_error)
+if(NOT gd_sdk_verified EQUAL 0)
+    message(FATAL_ERROR "GD32 SDK lock failed: ${gd_sdk_output}${gd_sdk_error}")
+endif()
+set(gd_firmware "${gd_vendor}/Firmware")
+set(gd_device "${gd_firmware}/CMSIS/GD/GD32F4xx")
+set(gd_peripheral "${gd_firmware}/GD32F4xx_standard_peripheral")
+add_library(nexus_gd32_sdk STATIC)
+foreach(unit rcu gpio timer usart spi i2c fmc adc exti syscfg fwdgt)
+    target_sources(nexus_gd32_sdk PRIVATE
+        "${gd_peripheral}/Source/gd32f4xx_${unit}.c")
 endforeach()
-set(NEXUS_SOC_COMPONENT_OBJECTS "${component_objects}" PARENT_SCOPE)
-set(NEXUS_SOC_STARTUP_SOURCE "${NEXUS_SOC_STARTUP_SOURCE}" PARENT_SCOPE)
+target_include_directories(nexus_gd32_sdk PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/private")
+target_include_directories(nexus_gd32_sdk SYSTEM PRIVATE "${gd_firmware}/CMSIS"
+    "${gd_device}/Include" "${gd_peripheral}/Include")
+target_link_libraries(nexus_gd32_sdk PRIVATE nexus_build_options)
+target_compile_definitions(nexus_gd32_sdk PRIVATE GD32F470 HXTAL_VALUE=25000000)
+add_library(nexus_soc_gd32f470 STATIC timebase.c drivers/gpio.c
+    drivers/uart.c drivers/spi.c drivers/i2c.c drivers/flash.c
+    drivers/watchdog.c drivers/exti.c drivers/timer.c drivers/adc.c)
+target_link_libraries(nexus_soc_gd32f470 PUBLIC nexus_io PRIVATE nexus_gd32_sdk
+    nexus_build_options nexus_owned_warnings)
+target_include_directories(nexus_soc_gd32f470 PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/private")
+target_include_directories(nexus_soc_gd32f470 SYSTEM PRIVATE
+    "${gd_firmware}/CMSIS" "${gd_device}/Include"
+    "${gd_peripheral}/Include")
+target_compile_definitions(nexus_soc_gd32f470 PRIVATE GD32F470
+    HXTAL_VALUE=25000000)
+set(NEXUS_STARTUP_SOURCE "${gd_device}/Source/GCC/startup_gd32f450_470.S"
+    PARENT_SCOPE)
+set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c" PARENT_SCOPE)
+# system.c is a firmware source, not an archive: startup must resolve SystemInit.
+set(NEXUS_SYSTEM_PRIVATE_INCLUDES
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/private" PARENT_SCOPE)
+set(NEXUS_SYSTEM_VENDOR_INCLUDES "${gd_firmware}/CMSIS"
+    "${gd_device}/Include" "${gd_peripheral}/Include" PARENT_SCOPE)
+set(NEXUS_SYSTEM_COMPILE_DEFINITIONS GD32F470 HXTAL_VALUE=25000000 PARENT_SCOPE)

@@ -1,6 +1,0 @@
-foreach(component storage security update protocols industrial)
-    string(TOUPPER "${component}" symbol)
-    if(CONFIG_SERVICE_${symbol})
-        add_subdirectory(${component})
-    endif()
-endforeach()

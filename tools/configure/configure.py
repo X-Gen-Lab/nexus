@@ -1,0 +1,835 @@
+#!/usr/bin/env python3
+"""Resolve reviewed hardware facts and emit one atomic configuration bundle.
+
+CMake remains the authority for source targets. This tool never discovers source
+code, creates workers, selects application policy, or invents a hardware route.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[2]
+UINT32_MAX = (1 << 32) - 1
+IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
+PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
+KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
+         "timer", "pwm", "adc"}
+C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
+
+
+def c_identity(value):
+    identifier = c_id(value)
+    if identifier in C_KEYWORDS:
+        fail(f"Reserved C identifier: {value}")
+    return identifier
+
+
+def dependency_identity(root, relative, expected=None):
+    """Validate checkout commits, or the verified installed SDK identities."""
+    manifest = root / ".nexus-source-sdk.json"
+    if manifest.is_file():
+        records = load(manifest)["dependencies"]
+        record = next((item for item in records if item["path"] == relative), None)
+        if record is None:
+            fail(f"Installed SDK has no source identity: {relative}")
+        commit = record["commit"]
+    else:
+        checkout = root / relative
+        if not (checkout / ".git").exists():
+            fail(f"Initialize the locked SDK dependency: {relative}")
+        def git(directory, *arguments):
+            command = subprocess.run(["git", "-C", str(directory), *arguments],
+                                     capture_output=True, text=True)
+            if command.returncode:
+                fail(f"Cannot verify SDK dependency: {relative}")
+            return command.stdout.strip()
+        commit = git(checkout, "rev-parse", "HEAD")
+        entry = git(root, "ls-tree", "HEAD", "--", relative).split()
+        if len(entry) != 4 or entry[:2] != ["160000", "commit"] or entry[2] != commit:
+            fail(f"SDK dependency differs from the locked Gitlink: {relative}")
+        if git(checkout, "status", "--porcelain", "--untracked-files=normal"):
+            fail(f"SDK dependency has unrecorded changes: {relative}")
+    if expected is not None and commit != expected:
+        fail(f"SDK source lock contradicts actual dependency: {relative}")
+    return {"path": relative, "commit": commit}
+
+
+def validate_selection(selection, route, family, ram_size):
+    """One maintained mode has one bounded, explicit configuration contract."""
+    kind = route["kind"]
+    fields = {
+        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
+        "spi": {"max_hz"}, "i2c": {"max_hz"}, "flash": set(), "watchdog": set(),
+        "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
+        "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
+        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms"},
+    }
+    unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
+    if kind not in fields or unknown:
+        fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
+    if kind == "uart":
+        if not {"baud", "rx_capacity", "rx_profile", "irq_priority"}.issubset(selection):
+            fail("UART requires baud, RX capacity/profile and IRQ priority")
+        minimum_baud = {"stm32f407": 1282, "gd32f470": 1526}.get(family, 1200)
+        integer(selection["baud"], minimum_baud, 1000000, "UART baud")
+        integer(selection["rx_capacity"], 1, min(4096, ram_size // 16), "UART RX capacity")
+        if selection["rx_profile"] not in {"bytes", "events"}:
+            fail("Unsupported UART receive profile")
+    elif kind == "exti":
+        if not {"edge", "event_capacity", "irq_priority"}.issubset(selection):
+            fail("EXTI requires edge, event capacity and IRQ priority")
+        if selection["edge"] not in {"rising", "falling", "both"}:
+            fail("Unsupported EXTI edge")
+        integer(selection["event_capacity"], 1, min(4096, ram_size // 24), "EXTI event capacity")
+    elif kind == "pwm":
+        if not {"period_ticks", "duty_ticks", "tick_hz"}.issubset(selection):
+            fail("PWM requires explicit period, duty and tick_hz")
+        integer(selection["period_ticks"], 1, 65535, "PWM period")
+        integer(selection["duty_ticks"], 0, selection["period_ticks"], "PWM duty")
+        tick = integer(selection["tick_hz"], 1, context="PWM tick_hz")
+        clock = 84000000 if family == "stm32f407" else 100000000
+        if clock % tick or not 1 <= clock // tick <= 65536:
+            fail("PWM tick_hz is not an exact maintained timer divider")
+    elif kind == "adc":
+        if not {"channels", "sample_times", "reference_mv"}.issubset(selection):
+            fail("ADC requires channels, sample_times and reference_mv")
+        channels = sequence(selection["channels"], "ADC channels")
+        expected = [int(pin["pin"][2:]) for pin in route["pins"]]
+        if channels != expected or not channels or len(channels) > 16:
+            fail("ADC channel sequence differs from reviewed analog pins")
+        for channel in channels:
+            integer(channel, 0, 15, "ADC channel")
+        samples = sequence(selection["sample_times"], "ADC sample_times")
+        if len(samples) != len(channels):
+            fail("ADC sample_times must match the channel sequence")
+        for sample in samples:
+            integer(sample, 7 if family == "gd32f470" else 0, 7, "ADC sample encoding")
+        integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
+        if family == "gd32f470":
+            integer(selection.get("timeout_ms"), 1, 1000, "ADC calibration timeout_ms")
+        if (selection["mode"] == "single-shot") != (len(channels) == 1):
+            fail("ADC mode contradicts its reviewed channel count")
+    elif kind == "i2c" and selection.get("max_hz", 100000) != 100000:
+        fail("Only reviewed 100 kHz I2C mode is maintained")
+    elif kind == "spi":
+        minimum, maximum = (328125, 42000000) if family == "stm32f407" else (390625, 50000000)
+        integer(selection.get("max_hz", 1000000), minimum, maximum, "SPI max_hz")
+
+
+class ConfigurationError(ValueError):
+    """A rejected input has no usable generated configuration."""
+
+
+def pairs(items):
+    result = {}
+    for key, value in items:
+        if key in result:
+            raise ConfigurationError(f"Duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def load(path, snapshots=None):
+    if path.is_symlink() or not path.is_file():
+        raise ConfigurationError(f"Input must be a regular file: {path}")
+    contents = path.read_bytes()
+    if snapshots is not None:
+        snapshots[path] = contents
+    return json.loads(contents.decode("utf-8"), object_pairs_hook=pairs,
+                      parse_constant=lambda value: fail(f"Invalid number {value}"))
+
+
+def fail(message):
+    raise ConfigurationError(message)
+
+
+def obj(value, required, optional=(), context="object"):
+    if not isinstance(value, dict):
+        fail(f"{context}: expected object")
+    missing = set(required) - value.keys()
+    unknown = value.keys() - set(required) - set(optional)
+    if missing or unknown:
+        fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+    return value
+
+
+def integer(value, minimum=0, maximum=UINT32_MAX, context="integer"):
+    if type(value) is not int or not minimum <= value <= maximum:
+        fail(f"{context}: integer required in [{minimum}, {maximum}]")
+    return value
+
+
+def sequence(value, context):
+    if not isinstance(value, list):
+        fail(f"{context}: expected array")
+    return value
+
+
+def text(value, context, empty=False):
+    if not isinstance(value, str) or (not empty and not value):
+        fail(f"{context}: expected nonempty string")
+    if "\0" in value:
+        fail(f"{context}: NUL is forbidden")
+    return value
+
+
+def identity(value, context):
+    text(value, context)
+    if not IDENTIFIER.fullmatch(value):
+        fail(f"{context}: invalid identifier {value!r}")
+    return value
+
+
+def unique(items, context):
+    if len(set(items)) != len(items):
+        fail(f"{context}: duplicate values")
+
+
+def address_range(origin, size, context):
+    integer(origin, context=f"{context}.origin")
+    integer(size, 1, context=f"{context}.size")
+    if origin + size > UINT32_MAX + 1:
+        fail(f"{context}: address overflow")
+    return origin, origin + size
+
+
+def file_digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def contained_file(package, name):
+    text(name, "declared input")
+    rel = Path(name)
+    if rel.is_absolute() or ".." in rel.parts or rel.as_posix() != name:
+        fail(f"Package input escapes containment: {name}")
+    path = package / rel
+    if any((package / Path(*rel.parts[:n])).is_symlink()
+           for n in range(1, len(rel.parts) + 1)):
+        fail(f"Package input follows symlink: {name}")
+    if not path.is_file() or not path.resolve().is_relative_to(package):
+        fail(f"Missing package input: {name}")
+    return path
+
+
+def validate_soc(soc, part):
+    obj(soc, {"schema_version", "id", "variants", "cpu", "clock_profiles",
+              "controllers"}, {"provenance", "source_lock", "reserved_resources"},
+        "SoC")
+    integer(soc["schema_version"], 1, 1, "SoC schema")
+    identity(soc["id"], "SoC id")
+    if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
+        fail(f"Unmaintained exact part: {part}")
+    variant = obj(soc["variants"][part], {"package", "flash", "memory"},
+                  {"pins"}, "variant")
+    text(variant["package"], "package")
+    flash = obj(variant["flash"], {"origin", "size", "erase_blocks"}, (),
+                "physical Flash")
+    address_range(flash["origin"], flash["size"], "Flash")
+    blocks = sequence(flash["erase_blocks"], "Flash erase blocks")
+    if not blocks or sum(integer(size, 1, context="erase block")
+                         for size in blocks) != flash["size"]:
+        fail("Flash erase geometry does not cover exact physical Flash")
+    memory = sequence(variant["memory"], "memory domains")
+    if not memory:
+        fail("At least one memory domain is required")
+    unique([region.get("id") for region in memory], "memory IDs")
+    ranges = [(flash["origin"], flash["origin"] + flash["size"], "Flash")]
+    for region in memory:
+        obj(region, {"id", "origin", "size", "dma", "linker"}, (), "memory")
+        identity(region["id"], "memory id")
+        if type(region["dma"]) is not bool or type(region["linker"]) is not bool:
+            fail("Memory DMA/linker facts must be boolean")
+        start, end = address_range(region["origin"], region["size"], region["id"])
+        if any(start < old_end and old_start < end for old_start, old_end, _ in ranges):
+            fail(f"Overlapping physical memory domain: {region['id']}")
+        ranges.append((start, end, region["id"]))
+    if sum(region["linker"] for region in memory) != 1:
+        fail("Exactly one maintained default RAM linker domain is required")
+    cpu = obj(soc["cpu"], {"arch", "fpu", "float_abi"}, (), "CPU ABI")
+    expected = ({"arch": "native", "fpu": "none", "float_abi": "native"}
+                if soc["id"] == "native" else
+                {"arch": "cortex-m4", "fpu": "fpv4-sp-d16", "float_abi": "hard"})
+    if cpu != expected:
+        fail(f"Unsupported CPU/FPU ABI: {cpu}")
+    if not isinstance(soc["controllers"], dict):
+        fail("SoC controllers must be an object")
+    for name, controller in soc["controllers"].items():
+        identity(name, "controller")
+        obj(controller, {"kind", "modes", "irq", "pins"},
+            {"resources", "max_hz", "irq_numbers", "channel_count"}, name)
+        if controller["kind"] not in KINDS:
+            fail(f"Unmaintained controller kind: {controller['kind']}")
+        for field in ("modes", "irq", "pins"):
+            values = sequence(controller[field], f"{name}.{field}")
+            unique(values, f"{name}.{field}")
+            for value in values:
+                text(value, f"{name}.{field}")
+        if not controller["modes"]:
+            fail(f"Controller {name} has no maintained mode")
+    if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
+        fail("Clock profiles are required")
+    for name, profile in soc["clock_profiles"].items():
+        identity(name, "clock profile")
+        obj(profile, {"hse_hz", "core_hz"},
+            {"apb1_hz", "apb2_hz", "timebase", "flash_wait_states"}, name)
+        integer(profile["hse_hz"], 1, context="HSE Hz")
+        integer(profile["core_hz"], 1, context="core Hz")
+    return variant
+
+
+def resolve(assembly_path, root=ROOT, *, input_paths=None):
+    """Validate all input facts before producing the sole resolved decision."""
+    root = root.resolve()
+    if assembly_path.is_symlink():
+        fail("Assembly must not be a symlink")
+    snapshots = {}
+    read = lambda path: load(path, snapshots)
+    assembly_path = assembly_path.resolve()
+    assembly = obj(read(assembly_path),
+                   {"schema_version", "board_package", "backend", "clock_profile",
+                    "controllers", "devices", "memory_budgets", "layout"},
+                   {"abi", "optimization", "components"}, "assembly")
+    integer(assembly["schema_version"], 1, 1, "assembly schema")
+    board_name = text(assembly["board_package"], "Board package")
+    board_dir = (assembly_path.parent / board_name).resolve()
+    if Path(assembly_path.parent / board_name).is_symlink():
+        fail("Board package must not be a symlink")
+    board_path = board_dir / "board.json"
+    board = obj(read(board_path),
+                {"schema_version", "id", "soc", "soc_family", "source_revision",
+                 "physical_pcb_revision", "clocks", "bindings",
+                 "reserved_resources", "unknowns", "provenance"},
+                {"inputs"}, "Board")
+    integer(board["schema_version"], 1, 1, "Board schema")
+    identity(board["id"], "Board id")
+    family = identity(board["soc_family"], "SoC family")
+    part = identity(board["soc"], "exact part")
+    soc_dir = root / "soc" / family
+    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
+        fail("SoC package escapes owned source")
+    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
+    soc, routes_doc = read(soc_path), read(routes_path)
+    variant = validate_soc(soc, part)
+    if soc["id"] != family:
+        fail("Board SoC family differs from the package identity")
+    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
+    integer(routes_doc["schema_version"], 1, 1, "routes schema")
+    routes = {}
+    for route in sequence(routes_doc["routes"], "routes"):
+        obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
+                    "source"}, {"resources", "dma"}, "route")
+        identity(route["id"], "route id")
+        if route["id"] in routes:
+            fail(f"Duplicate route id: {route['id']}")
+        for field in ("variants", "modes"):
+            values = sequence(route[field], f"route {field}")
+            unique(values, f"route {field}")
+            for value in values:
+                text(value, f"route {field}")
+        if not route["variants"] or not route["modes"]:
+            fail("Route must have exact variants and maintained modes")
+        if any(value not in soc["variants"] for value in route["variants"]):
+            fail(f"Route {route['id']} has unknown exact variant")
+        controller = soc["controllers"].get(route["controller"])
+        if not controller or controller["kind"] != route["kind"]:
+            fail(f"Route {route['id']} does not match a maintained controller")
+        if not set(route["modes"]).issubset(controller["modes"]):
+            fail(f"Route {route['id']} advertises unsupported modes")
+        pins = sequence(route["pins"], "route pins")
+        unique([pin.get("pin") for pin in pins], "route pins")
+        for pin in pins:
+            obj(pin, {"pin", "function", "af"}, (), "route pin")
+            if not isinstance(pin["pin"], str) or not PIN.fullmatch(pin["pin"]):
+                fail(f"Invalid pin: {pin['pin']}")
+            if pin["pin"] not in controller["pins"]:
+                fail(f"Route pin not permitted by controller: {pin['pin']}")
+            for exact in route["variants"]:
+                available = soc["variants"][exact].get("pins")
+                if available is not None and pin["pin"] not in available:
+                    fail(f"Pin {pin['pin']} does not exist on {exact}")
+            integer(pin["af"], 0, 15, "pin AF")
+            text(pin["function"], "pin function")
+        text(route["source"], "route source")
+        routes[route["id"]] = route
+    text(board["source_revision"], "Board source revision")
+    if board["physical_pcb_revision"] is not None:
+        text(board["physical_pcb_revision"], "physical PCB revision")
+    obj(board["clocks"], {"hse_hz"}, {"lse_hz"}, "Board clocks")
+    integer(board["clocks"]["hse_hz"], 1, context="Board HSE")
+    for value in sequence(board["unknowns"], "unknowns"):
+        text(value, "unknown condition")
+    for value in sequence(board["provenance"], "provenance"):
+        if isinstance(value, str):
+            text(value, "provenance")
+        else:
+            obj(value, {"scope"}, {"url", "repository", "tree", "led_header_blob",
+                "led_source_blob", "clock_source_blob", "uart_source_blob"}, "provenance")
+            if not ("url" in value or "repository" in value):
+                fail("Provenance requires URL or repository")
+            for key, field in value.items():
+                text(field, "provenance " + key)
+                if key == "tree" or key.endswith("_blob"):
+                    if not re.fullmatch(r"[0-9a-f]{40}", field):
+                        fail("Provenance Git identity must be exact SHA-1")
+    backend = assembly["backend"]
+    if backend not in {"baremetal", "freertos", "native"}:
+        fail(f"Unsupported OS backend: {backend}")
+    if (family == "native") != (backend == "native"):
+        fail("Native is a host model; its backend cannot qualify MCU execution")
+    clock = soc["clock_profiles"].get(assembly["clock_profile"])
+    if clock is None:
+        fail(f"Unknown clock profile: {assembly['clock_profile']}")
+    if clock["hse_hz"] != board["clocks"]["hse_hz"]:
+        fail("Clock profile does not match the Board oscillator")
+    if "abi" in assembly and assembly["abi"] != soc["cpu"]:
+        fail("Assembly ABI contradicts the selected SoC")
+    optimization = assembly.get("optimization", "Os")
+    if optimization not in {"O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
+        fail(f"Unsupported optimization profile: {optimization}")
+    budgets = obj(assembly["memory_budgets"], {"main_stack_bytes"},
+                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes"},
+                  "memory budgets")
+    for name, value in budgets.items():
+        integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
+    if budgets["main_stack_bytes"] % 8:
+        fail("Main stack must have 8-byte alignment")
+    ram = next(region for region in variant["memory"] if region["linker"])
+    if budgets["main_stack_bytes"] + budgets.get("libc_heap_bytes", 0) >= ram["size"]:
+        fail("Reserved stack/heap exhaust default RAM")
+    if budgets.get("static_ram_bytes", ram["size"]) > ram["size"]:
+        fail("Static RAM budget exceeds physical linker domain")
+    if budgets.get("flash_load_bytes", variant["flash"]["size"]) > variant["flash"]["size"]:
+        fail("Flash budget exceeds exact physical density")
+    bindings = {}
+    for binding in sequence(board["bindings"], "Board bindings"):
+        obj(binding, {"id", "controller", "route"}, {"initial", "mask"}, "binding")
+        identity(binding["id"], "binding id")
+        if binding["id"] in bindings:
+            fail(f"Duplicate Board binding: {binding['id']}")
+        route = routes.get(binding["route"])
+        if not route or part not in route["variants"] or route["controller"] != binding["controller"]:
+            fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+        if "initial" in binding:
+            integer(binding["initial"], 0, UINT32_MAX, "GPIO initial")
+        if "mask" in binding:
+            integer(binding["mask"], 1, 65535, "GPIO mask")
+            actual_mask = sum(1 << int(PIN.fullmatch(pin["pin"])[2]) for pin in route["pins"])
+            if binding["mask"] != actual_mask:
+                fail(f"GPIO binding {binding['id']} mask differs from its reviewed pins")
+            if binding.get("initial", 0) & ~binding["mask"]:
+                fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
+        bindings[binding["id"]] = binding
+    claims = {}
+    claim_list = []
+
+    def claim(key, owner, mode, source):
+        text(key, "resource key")
+        key = normalize_resource(key)
+        if key in claims:
+            fail(f"Resource conflict {key}: {claims[key]} versus {owner}")
+        claims[key] = owner
+        claim_list.append({"key": key, "owner": owner, "mode": mode, "source": source})
+
+    for reserved in sequence(board["reserved_resources"], "reserved resources"):
+        if isinstance(reserved, str):
+            claim("pin:" + reserved if PIN.fullmatch(reserved) else reserved,
+                  "board-reserved", "reserved", board["id"])
+        else:
+            obj(reserved, {"key", "owner"}, (), "reserved resource")
+            claim(reserved["key"], reserved["owner"], "reserved", board["id"])
+    for resource in soc.get("reserved_resources", []):
+        claim(normalize_resource(resource), "soc-timebase", "reserved", family)
+    if backend == "freertos":
+        for irq in ("SysTick", "PendSV", "SVC"):
+            claim("irq:" + irq, "freertos", "kernel", "FreeRTOS Cortex-M4F")
+    selected = []
+    instance_ids = []
+    irq_owners = {}
+    for selection in sequence(assembly["controllers"], "selected controllers"):
+        obj(selection, {"id", "binding", "mode"},
+            {"irq_priority", "rx_capacity", "baud", "max_hz", "event_capacity",
+             "period_ticks", "duty_ticks", "channels", "sample_cycles",
+             "timeout_ms", "calls_os", "rx_profile", "sample_times",
+             "reference_mv", "tick_hz", "edge"}, "controller selection")
+        name = identity(selection["id"], "instance id")
+        c_identity(name)
+        instance_ids.append(name)
+        binding = bindings.get(selection["binding"])
+        if binding is None:
+            fail(f"Unknown Board binding: {selection['binding']}")
+        route = routes[binding["route"]]
+        hardware = soc["controllers"][route["controller"]]
+        validate_selection(selection, route, family, ram["size"])
+        if route["kind"] == "uart":
+            required_uart = {"baud", "rx_capacity", "irq_priority", "rx_profile"}
+            if not required_uart.issubset(selection):
+                fail("UART selection requires baud, RX capacity/profile and IRQ priority")
+            if selection["rx_profile"] not in {"bytes", "events"}:
+                fail("Unsupported UART receive profile")
+        mode = text(selection["mode"], "controller mode")
+        if mode not in route["modes"]:
+            fail(f"Unsupported mode {mode} for {selection['binding']}")
+        for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
+                        "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
+            integer(selection[numeric], 1, context=numeric)
+        if "duty_ticks" in selection:
+            integer(selection["duty_ticks"], 0, context="duty ticks")
+            if selection["duty_ticks"] > selection.get("period_ticks", 0):
+                fail("PWM duty exceeds period")
+        if "irq_priority" in selection:
+            integer(selection["irq_priority"], 0, 15, "IRQ priority")
+        if "calls_os" in selection and type(selection["calls_os"]) is not bool:
+            fail("calls_os must be boolean")
+        if selection.get("calls_os", False) and (backend != "freertos" or
+                                                 selection.get("irq_priority", 0) < 5):
+            fail("OS-calling ISR violates the FreeRTOS syscall ceiling")
+        if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
+            fail("Controller speed exceeds maintained limit")
+        if mode == "dma" and not route.get("dma"):
+            fail("DMA mode has no reviewed DMA route")
+        if route["kind"] != "gpio":
+            claim("controller:" + route["controller"], name, mode, route["id"])
+        for pin in route["pins"]:
+            claim("pin:" + pin["pin"], name, mode, route["id"])
+        if mode in {"irq-byte-event", "irq", "edge-event", "edge", "dma"}:
+            for irq in hardware["irq"]:
+                key = normalize_resource("irq:" + irq)
+                priority = selection.get("irq_priority")
+                previous = irq_owners.get(key)
+                shared = route["kind"] == "exti" and family == "stm32f407" and key in {
+                    "irq:EXTI9_5", "irq:EXTI15_10"}
+                if previous and shared and previous[0] == "exti":
+                    if previous[1] != priority:
+                        fail(f"Shared EXTI vector {key} requires identical priorities")
+                    record = next(record for record in claim_list if record["key"] == key)
+                    record["owner"] += ";" + name
+                    record["mode"] = "static-exti-dispatch"
+                else:
+                    claim(key, name, mode, route["id"])
+                    irq_owners[key] = (route["kind"], priority)
+
+        for resource in hardware.get("resources", []) + route.get("resources", []):
+            claim(normalize_resource(resource), name, mode, route["id"])
+        if mode == "dma":
+            for dma in route["dma"]:
+                claim("dma:" + dma, name, mode, route["id"])
+        selected.append({**selection, "controller": route["controller"],
+                         "kind": route["kind"], "route": route["id"],
+                         "pins": route["pins"], "initial": binding.get("initial", 0),
+                         "mask": binding.get("mask", 0)})
+    unique(instance_ids, "controller instance IDs")
+    unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
+    device_ids = []
+    addresses = set()
+    for device in sequence(assembly["devices"], "devices"):
+        obj(device, {"id", "controller", "driver"}, {"cs_binding", "address",
+            "mode", "max_hz", "capacity"}, "device")
+        device_ids.append(identity(device["id"], "device ID"))
+        c_identity(device["id"])
+        controller = next((item for item in selected if item["id"] == device["controller"]), None)
+        if controller is None or controller["kind"] not in {"spi", "i2c"}:
+            fail("Device references no selected SPI/I2C controller")
+        if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280"}:
+            fail(f"Unknown maintained device driver: {device['driver']}")
+        if device["driver"] == "bmp280" and controller["kind"] != "spi":
+            fail("BMP280 currently requires its maintained SPI transport")
+        if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
+            fail("SPI endpoint driver is not an I2C transport")
+        if device["driver"] == "i2c-endpoint" and controller["kind"] != "i2c":
+            fail("I2C endpoint driver is not a SPI transport")
+        if "mode" in device:
+            integer(device["mode"], 0, 3, "SPI endpoint mode")
+        if "max_hz" in device:
+            integer(device["max_hz"], 1, context="device speed")
+            if device["max_hz"] > controller.get("max_hz", 1000000):
+                fail("Device speed exceeds its selected controller budget")
+        if "capacity" in device:
+            integer(device["capacity"], 1, context="device capacity")
+        if controller["kind"] == "spi":
+            builtin_cs = family == "gd32f470" and any(
+                pin["function"] == "cs" for pin in controller["pins"])
+            if ("cs_binding" not in device and not builtin_cs) or "address" in device:
+                fail("SPI child requires a CS binding and no I2C address")
+            if "cs_binding" in device:
+                binding = bindings.get(device["cs_binding"])
+                if not binding or routes[binding["route"]]["kind"] != "gpio":
+                    fail("SPI child CS lacks reviewed GPIO wiring")
+                cs_pins = routes[binding["route"]]["pins"]
+                if len(cs_pins) != 1 or binding.get("initial") != 1 << int(cs_pins[0]["pin"][2:]):
+                    fail("Active-low SPI CS must be one reviewed pin initially high")
+                for pin in cs_pins:
+                    claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
+        else:
+            if "address" not in device or "cs_binding" in device:
+                fail("I2C child requires address and no CS binding")
+            integer(device["address"], 8, 119, "7-bit I2C address")
+            key = (controller["id"], device["address"])
+            if key in addresses:
+                fail("Duplicate I2C address on one bus")
+            addresses.add(key)
+    unique(device_ids + instance_ids, "assembly instance IDs")
+    unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
+    for controller in selected:
+        children = [item for item in assembly["devices"] if item["controller"] == controller["id"]]
+        if controller["kind"] == "i2c" and not children:
+            fail("I2C requires at least one explicit address endpoint")
+        if controller["kind"] == "spi" and family == "stm32f407" and not children:
+            fail("STM32 SPI requires at least one reviewed CS endpoint")
+        if controller["kind"] == "spi" and family == "gd32f470" and len(children) > 1:
+            fail("GD32 SPI4 currently maintains one reviewed fixed CS endpoint")
+    layout = variant["flash"].copy()
+    inputs = [assembly_path, board_path, soc_path, routes_path]
+    for name in sequence(board.get("inputs", []), "declared Board inputs"):
+        inputs.append(contained_file(board_dir, name))
+    if assembly["layout"] is not None:
+        layout_path = (assembly_path.parent / text(assembly["layout"], "layout path")).resolve()
+        layout_doc = obj(read(layout_path), {"schema_version", "regions"}, (), "layout")
+        integer(layout_doc["schema_version"], 1, 1, "layout schema")
+        boundaries = {variant["flash"]["origin"]}
+        cursor = variant["flash"]["origin"]
+        for size in variant["flash"]["erase_blocks"]:
+            cursor += size
+            boundaries.add(cursor)
+        spans = []
+        region_ids = []
+        images = []
+        for region in sequence(layout_doc["regions"], "layout regions"):
+            obj(region, {"id", "origin", "size", "kind"}, (), "layout region")
+            identity(region["id"], "region ID")
+            region_ids.append(region["id"])
+            start, end = address_range(region["origin"], region["size"], "region")
+            if start not in boundaries or end not in boundaries:
+                fail("Flash region is not on exact erase boundaries")
+            if any(start < b and a < end for a, b in spans):
+                fail("Flash layout overlap")
+            spans.append((start, end))
+            if region["kind"] not in {"image", "data"}:
+                fail("Unknown Flash region kind")
+            if region["kind"] == "image":
+                images.append(region)
+        if len(images) != 1 or images[0]["origin"] != variant["flash"]["origin"]:
+            fail("Only one reset-address image is maintained; offsets/bootloaders are unsupported")
+        unique(region_ids, "Flash region IDs")
+        layout = {**variant["flash"], **images[0]}
+        inputs.append(layout_path)
+    source_dependencies = []
+    if "source_lock" in soc:
+        lock = soc["source_lock"]
+        if isinstance(lock, str):
+            inputs.append(contained_file(root, lock))
+        else:
+            obj(lock, {"cmsis_core", "cmsis_device_f4"}, (), "SoC source lock")
+            if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value)
+                   for value in lock.values()):
+                fail("SDK Git dependencies require exact commit identities")
+            for key, path in {"cmsis_core": "vendors/arm/CMSIS_5",
+                              "cmsis_device_f4": "vendors/st/cmsis_device_f4"}.items():
+                source_dependencies.append(dependency_identity(root, path, lock[key]))
+    if backend == "freertos":
+        source_dependencies.append(dependency_identity(root, "ext/freertos"))
+    manifest = root / ".nexus-source-sdk.json"
+    if manifest.is_file():
+        inputs.append(manifest)
+    records = []
+    for path in sorted(set(inputs), key=lambda value: value.as_posix()):
+        label = (path.relative_to(root).as_posix() if path.is_relative_to(root)
+                 else "external/" + path.name)
+        contents = snapshots.get(path, path.read_bytes())
+        expected = hashlib.sha256(contents).hexdigest()
+        if file_digest(path) != expected:
+            fail(f"Input changed during resolution: {label}")
+        records.append({"path": label, "sha256": expected})
+        if input_paths is not None:
+            input_paths[label] = str(path)
+    if len({record["path"] for record in records}) != len(records):
+        fail("Declared input identity labels collide")
+    components = sequence(assembly.get("components", []), "components")
+    for component in components:
+        text(component, "component")
+    unique(components, "components")
+    maintained_components = {"bus-owner", "spi-owner", "uart-owner", "bmp280", "bmp280-spi",
+                             "log", "storage", "flash-storage", "modbus-rtu"}
+    for component in components:
+        if component not in maintained_components:
+            fail(f"Unknown maintained component: {component}")
+    if any(device["driver"] == "bmp280" for device in assembly["devices"]):
+        if "bmp280-spi" not in components:
+            fail("BMP280 SPI device requires the maintained bmp280-spi component")
+    result = {"schema_version": 1, "board": board["id"], "soc_family": family,
+              "part": part, "package": variant["package"], "backend": backend,
+              "cpu": soc["cpu"], "clock_profile": assembly["clock_profile"],
+              "clock": clock, "memory": variant["memory"], "flash": variant["flash"],
+              "layout": layout, "controllers": selected, "devices": assembly["devices"],
+              "components": components, "claims": claim_list, "memory_budgets": budgets,
+              "board_bindings": bindings, "routes": routes,
+              "optimization": optimization, "inputs": records,
+              "source_dependencies": source_dependencies,
+              "physical_pcb_revision": board["physical_pcb_revision"],
+              "limitations": board["unknowns"] + ["Physical qualification not executed"],
+              "physical_qualified": False,
+              "enum_abi": "native-int" if family == "native" else "short-enums"}
+    result["configuration_sha256"] = hashlib.sha256(
+        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return result
+
+
+def c_id(value):
+    return value.replace("-", "_")
+
+
+def normalize_resource(value):
+    if value.startswith("irq:"):
+        irq = value[4:]
+        for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
+            if irq.endswith(suffix):
+                return "irq:" + irq[:-len(suffix)]
+    return value
+
+
+def generate(result, output):
+    """Emit narrow compile/link inputs; this never emits a code dependency graph."""
+    write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
+    write("resolved.json", json.dumps(result, indent=2, sort_keys=True) + "\n")
+    header = ["/* Generated from the sole resolved configuration. */",
+              "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
+              f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
+              f'#define NEXUS_EXACT_PART "{result["part"]}"',
+              f'#define NEXUS_CORE_HZ {result["clock"]["core_hz"]}u',
+              f'#define NEXUS_HSE_HZ {result["clock"]["hse_hz"]}u',
+              f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
+              f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
+              '#define NEXUS_IRQ_SYSCALL_PRIORITY 5u',
+              '#define NEXUS_IRQ_PRIORITY_BITS 4u']
+    cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
+             f'set(NEXUS_EXACT_PART "{result["part"]}")',
+             f'set(NEXUS_BACKEND "{result["backend"]}")',
+             f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
+             f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
+             'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
+             'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
+    for selection in result["controllers"]:
+        prefix = "NEXUS_" + c_id(selection["id"]).upper()
+        header.append(f"#define {prefix}_SELECTED 1")
+        if selection["kind"] == "gpio":
+            mask = selection["mask"] or sum(1 << int(pin["pin"][2:]) for pin in selection["pins"])
+            header.append(f"#define {prefix}_MASK {mask}u")
+        for field in ("rx_capacity", "baud", "irq_priority", "event_capacity"):
+            if field in selection:
+                header.append(f"#define {prefix}_{field.upper()} {selection[field]}u")
+    header.extend(["#endif", ""])
+    write("nexus_config.h", "\n".join(header))
+    write("selection.cmake", "\n".join(cmake) + "\n")
+    try:
+        from .bindings import emit
+    except ImportError:
+        from bindings import emit
+    bindings_header, bindings_source = emit(result)
+    write("nexus_bindings.h", bindings_header)
+    write("bindings.c", bindings_source)
+    ram = next(region for region in result["memory"] if region["linker"])
+    flash = result["layout"]
+    stack = result["memory_budgets"]["main_stack_bytes"]
+    heap = result["memory_budgets"].get("libc_heap_bytes", 0)
+    write("memory.ld", f'''/* Exact resolved physical layout; no product reservation. */
+ENTRY(Reset_Handler)
+PHDRS {{
+    flash PT_LOAD FLAGS(5);
+    data PT_LOAD FLAGS(6);
+    ram PT_LOAD FLAGS(6);
+    stack PT_LOAD FLAGS(6);
+}}
+MEMORY {{
+    FLASH (rx) : ORIGIN = 0x{flash["origin"]:08x}, LENGTH = {flash["size"]}
+    RAM (rwx) : ORIGIN = 0x{ram["origin"]:08x}, LENGTH = {ram["size"]}
+}}
+_estack = ORIGIN(RAM) + LENGTH(RAM);
+_sp = _estack;
+_Min_Stack_Size = {stack};
+_Min_Heap_Size = {heap};
+__nx_msp_start = _estack - _Min_Stack_Size;
+__nx_msp_end = _estack;
+__nx_resolved_sha256_0 = 0x{result["configuration_sha256"][0:8]};
+__nx_resolved_sha256_1 = 0x{result["configuration_sha256"][8:16]};
+__nx_resolved_sha256_2 = 0x{result["configuration_sha256"][16:24]};
+__nx_resolved_sha256_3 = 0x{result["configuration_sha256"][24:32]};
+__nx_resolved_sha256_4 = 0x{result["configuration_sha256"][32:40]};
+__nx_resolved_sha256_5 = 0x{result["configuration_sha256"][40:48]};
+__nx_resolved_sha256_6 = 0x{result["configuration_sha256"][48:56]};
+__nx_resolved_sha256_7 = 0x{result["configuration_sha256"][56:64]};
+SECTIONS {{
+    .isr_vector : {{ KEEP(*(.isr_vector)) KEEP(*(.vectors)) }} > FLASH :flash
+    .text : {{ *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) }} > FLASH :flash
+    .ARM.extab : {{ *(.ARM.extab*) }} > FLASH :flash
+    .ARM.exidx : {{ __exidx_start = .; *(.ARM.exidx*) __exidx_end = .; }} > FLASH :flash
+    .preinit_array : {{ PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); }} > FLASH :flash
+    .init_array : {{ PROVIDE_HIDDEN(__init_array_start = .); KEEP(*(SORT(.init_array.*))) KEEP(*(.init_array*)) PROVIDE_HIDDEN(__init_array_end = .); }} > FLASH :flash
+    .fini_array : {{ PROVIDE_HIDDEN(__fini_array_start = .); KEEP(*(SORT(.fini_array.*))) KEEP(*(.fini_array*)) PROVIDE_HIDDEN(__fini_array_end = .); }} > FLASH :flash
+    _sidata = LOADADDR(.data);
+    .data : {{ . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; }} > RAM AT> FLASH :data
+    .bss (NOLOAD) : AT(ADDR(.bss)) {{ . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; }} > RAM :ram
+    .reserved (NOLOAD) : AT(ADDR(.reserved)) {{ . = ALIGN(8); __heap_start = .; __nx_heap_start = .; . += _Min_Heap_Size; __heap_end = .; __nx_heap_end = .; }} > RAM :ram
+    .msp __nx_msp_start (NOLOAD) : AT(__nx_msp_start) {{ . += _Min_Stack_Size; }} > RAM :stack
+    PROVIDE(end = _ebss);
+    PROVIDE(_end = _ebss);
+    ASSERT(_ebss + _Min_Heap_Size <= _estack - _Min_Stack_Size, "RAM stack/heap overlap")
+}}
+''')
+    write("resource-budget.json", json.dumps({"schema_version": 1,
+          "flash_loaded_max": result["memory_budgets"].get("flash_load_bytes", flash["size"]),
+          "flash_footprint_max": result["memory_budgets"].get("flash_load_bytes", flash["size"]),
+          "ram_reserved_max": {region["id"]: result["memory_budgets"].get("static_ram_bytes", region["size"])
+                               if region["linker"] else 0 for region in result["memory"]},
+          "msp_max": stack, "heap_max": heap}, indent=2, sort_keys=True) + "\n")
+    write(".nexus-config-bundle", result["configuration_sha256"] + "\n")
+
+
+def configure(assembly, output, root=ROOT):
+    output = output.absolute()
+    if output.is_symlink() or output == root.resolve() or output == output.parent:
+        fail("Unsafe configuration output directory")
+    if output.exists():
+        if not output.is_dir() or not (output / ".nexus-config-bundle").is_file():
+            fail("Existing output is not an owned configuration bundle")
+        # Invalidate before parsing; a rejected reconfiguration cannot reuse old
+        # successful headers or selection files, including after process failure.
+        shutil.rmtree(output)
+    input_paths = {}
+    result = resolve(assembly, root, input_paths=input_paths)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = Path(tempfile.mkdtemp(prefix=".nexus-config-", dir=output.parent))
+    try:
+        generate(result, temporary)
+        (temporary / "input_paths.json").write_text(
+            json.dumps(input_paths, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        os.replace(temporary, output)
+    except BaseException:
+        shutil.rmtree(temporary, ignore_errors=True)
+        raise
+    return result
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--assembly", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--source-root", type=Path, default=ROOT)
+    args = parser.parse_args(argv)
+    try:
+        result = configure(args.assembly, args.output, args.source_root)
+    except (ConfigurationError, OSError, ValueError, TypeError, KeyError) as error:
+        print(f"Nexus configuration rejected: {error}", file=sys.stderr)
+        return 1
+    print(f"Resolved {result['part']}/{result['board']}/{result['backend']}: "
+          f"{result['configuration_sha256']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

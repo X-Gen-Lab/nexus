@@ -7,7 +7,7 @@ C Standard
 ----------
 
 - C11 for source code
-- C++17 for tests
+- C11 for maintained contract tests; C++17 for external ABI consumer checks
 
 Code Formatting
 ---------------
@@ -71,17 +71,17 @@ Empty Lines
 Naming Conventions
 ------------------
 
-- Functions: ``module_action_object()`` (e.g., ``hal_gpio_init()``)
-- Types: ``module_type_t`` (e.g., ``hal_status_t``)
-- Macros: ``MODULE_MACRO_NAME`` (e.g., ``HAL_OK``)
-- Constants: ``MODULE_CONSTANT`` (e.g., ``HAL_GPIO_PORT_MAX``)
+- Functions: ``module_action_object()`` (e.g., ``nx_gpio_port_write()``)
+- Types: ``module_type_t`` (e.g., ``nx_result_t``)
+- Macros: ``MODULE_MACRO_NAME`` (e.g., ``NX_SUCCESS``)
+- Constants: ``MODULE_CONSTANT`` (e.g., ``NEXUS_UART0_SELECTED``)
 - Static variables: ``s_variable_name`` prefix
 - Global variables: ``g_variable_name`` prefix (avoid when possible)
 
 Documentation
 -------------
 
-All public APIs must have Doxygen comments. This project uses ``\`` style
+All public APIs must have Doxygen comments. This project uses ``\\`` style
 Doxygen tags (not ``@`` style).
 
 Tag Alignment
@@ -89,7 +89,7 @@ Tag Alignment
 
 Align the description after each Doxygen tag as shown below. Excluding any
 surrounding code indentation, the description starts at column 21: the tag and
-its padding occupy 17 characters after `` * ``::
+its padding occupy 17 characters after the opening comment star::
 
     /**
      * \brief           Brief description starts at column 21
@@ -132,25 +132,22 @@ Header Files (.h)
 Header files contain full API documentation including parameters and return values::
 
     /**
-     * \brief           Create a mutex
-     * \param[out]      handle: Pointer to store mutex handle
-     * \return          OSAL_OK on success, error code otherwise
+     * \brief           Prepare an exclusively owned reusable request.
+     * \param[in,out]   request: Quiescent caller storage.
+     * \param[in]       deadline: Absolute monotonic deadline.
+     * \return          Success or STATE while an earlier borrow remains.
      */
-    osal_status_t osal_mutex_create(osal_mutex_handle_t* handle);
+    nx_result_t nx_request_prepare(nx_request_t* request, nx_time_us_t deadline);
 
 Source Files (.c)
 ~~~~~~~~~~~~~~~~~
 
-Source files should NOT duplicate ``\param`` and ``\return`` documentation
-from headers. Use only ``\brief``, ``\details``, and ``\note``::
+Source definitions explain hardware ordering and invariants without duplicating
+``\param`` or ``\return`` from the header. Use ``\brief``, ``\details`` and
+``\note`` as needed::
 
-    /**
-     * \brief           Create a mutex
-     * \details         Allocates and initializes a new mutex object.
-     *                  The mutex is created in unlocked state.
-     * \note            Thread-safe function.
-     */
-    osal_status_t osal_mutex_create(osal_mutex_handle_t* handle) {
+    /** \brief           Restore the saved incoming interrupt mask. */
+    void nx_arch_irq_restore(nx_arch_irq_state_t state) {
         /* Implementation */
     }
 
@@ -205,12 +202,23 @@ Prohibited Practices
 
 The following practices are NOT allowed:
 
-- Using ``@`` style Doxygen tags (use ``\`` instead)
+- Using ``@`` style Doxygen tags (use ``\\`` instead)
 - Using ``//`` single-line comments (use ``/* */`` instead)
 - Using ``/*===...===*/`` section separators (use ``/*---...---*/`` instead)
 - Duplicating ``\param`` and ``\return`` in source files (only in headers)
 
-MISRA C
--------
+Ownership and evidence
+----------------------
 
-Code should comply with MISRA C:2012 guidelines.
+Public declarations specify context, deadlines, retained storage and failure
+state. Describe why a volatile read, ordering barrier or drain is necessary.
+``SETTLED`` is the provider's final request access. Cancellation never permits
+reclaiming a borrowed buffer before settlement or proved controlled recovery.
+
+Changed files pass whole-file formatting and mechanical comment checks. Install
+local Git hooks with ``python scripts/setup/install_dev_tools.py``. The commit
+and CI gates share ``scripts/ci/style_gate.py``; no hook bypass is a validation
+result. Actual warning/analyzer and behavioral evidence is separate from style.
+
+Selected analyzer checks do not establish MISRA certification or industrial
+functional-safety qualification.

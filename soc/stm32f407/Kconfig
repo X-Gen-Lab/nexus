@@ -1,6 +1,0 @@
-# Maintained F407 silicon, clocks, interrupts and controller declarations.
-rsource "chips/Kconfig"
-rsource "clock/Kconfig"
-rsource "interrupt/Kconfig"
-rsource "controllers/Kconfig"
-rsource "system/Kconfig"

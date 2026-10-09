@@ -50,7 +50,7 @@ class FormatToolTests(unittest.TestCase):
 
     def test_repo_policy_covers_owned_layers_and_excludes_third_party(self):
         includes, exclusions, _ = FORMAT.parse_format_config(REPO / ".clang-format-dirs")
-        self.assertTrue({"arch", "soc", "boards", "runtime", "services"}.issubset(includes))
+        self.assertTrue({"core", "io", "os", "components", "arch", "soc", "boards", "tests", "tools/measurement"}.issubset(includes))
         for path in ("vendors/sdk/a.c", "ext/library/a.h", "soc/chip/vendor/a.c"):
             self.assertTrue(FORMAT.should_exclude(REPO / path, REPO, exclusions))
 

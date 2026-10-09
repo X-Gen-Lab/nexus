@@ -1,661 +1,177 @@
 {
-    "version": 3,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 21,
-        "patch": 0
+        "minor": 31,
+        "patch": 6
     },
     "configurePresets": [
         {
-            "name": "base",
-            "hidden": true,
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/install/${presetName}",
+            "name": "native-debug",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/native-debug",
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.json",
+                "NEXUS_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "native-release",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/native-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.json",
+                "NEXUS_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "native-asan",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/native-asan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.json",
                 "NEXUS_BUILD_TESTS": "ON",
-                "NEXUS_PLATFORM": "native",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/platforms/native/defconfig",
-                "NEXUS_BUILD_CONTRACTS": "ON"
-            }
-        },
-        {
-            "name": "windows-base",
-            "hidden": true,
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            }
-        },
-        {
-            "name": "linux-base",
-            "hidden": true,
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            }
-        },
-        {
-            "name": "macos-base",
-            "hidden": true,
-            "inherits": "base",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
-            }
-        },
-        {
-            "name": "windows-msvc-debug",
-            "displayName": "Windows MSVC Debug",
-            "description": "Windows build with MSVC compiler (Debug)",
-            "inherits": "windows-base",
-            "generator": "Visual Studio 17 2022",
-            "architecture": {
-                "value": "x64",
-                "strategy": "set"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "cl",
-                "CMAKE_CXX_COMPILER": "cl"
-            }
-        },
-        {
-            "name": "windows-msvc-release",
-            "displayName": "Windows MSVC Release",
-            "description": "Windows build with MSVC compiler (Release)",
-            "inherits": "windows-msvc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "windows-gcc-debug",
-            "displayName": "Windows GCC Debug (MinGW)",
-            "description": "Windows build with GCC compiler (Debug)",
-            "inherits": "windows-base",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++"
-            }
-        },
-        {
-            "name": "windows-gcc-release",
-            "displayName": "Windows GCC Release (MinGW)",
-            "description": "Windows build with GCC compiler (Release)",
-            "inherits": "windows-gcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "windows-clang-debug",
-            "displayName": "Windows Clang Debug",
-            "description": "Windows build with Clang compiler (Debug)",
-            "inherits": "windows-base",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++"
-            }
-        },
-        {
-            "name": "windows-clang-release",
-            "displayName": "Windows Clang Release",
-            "description": "Windows build with Clang compiler (Release)",
-            "inherits": "windows-clang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "linux-gcc-debug",
-            "displayName": "Linux GCC Debug",
-            "description": "Linux build with GCC compiler (Debug)",
-            "inherits": "linux-base",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++"
-            }
-        },
-        {
-            "name": "linux-gcc-release",
-            "displayName": "Linux GCC Release",
-            "description": "Linux build with GCC compiler (Release)",
-            "inherits": "linux-gcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "linux-gcc-coverage",
-            "displayName": "Linux GCC Coverage",
-            "description": "Linux build with GCC and coverage enabled",
-            "inherits": "linux-gcc-debug",
-            "cacheVariables": {
-                "NEXUS_ENABLE_COVERAGE": "ON"
-            }
-        },
-        {
-            "name": "linux-clang-debug",
-            "displayName": "Linux Clang Debug",
-            "description": "Linux build with Clang compiler (Debug)",
-            "inherits": "linux-base",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++"
-            }
-        },
-        {
-            "name": "linux-clang-release",
-            "displayName": "Linux Clang Release",
-            "description": "Linux build with Clang compiler (Release)",
-            "inherits": "linux-clang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "macos-clang-debug",
-            "displayName": "macOS Clang Debug",
-            "description": "macOS build with Clang compiler (Debug)",
-            "inherits": "macos-base",
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++"
-            }
-        },
-        {
-            "name": "macos-clang-release",
-            "displayName": "macOS Clang Release",
-            "description": "macOS build with Clang compiler (Release)",
-            "inherits": "macos-clang-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "stm32-armgcc-debug",
-            "displayName": "STM32 ARM GCC Debug",
-            "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Debug",
-            "inherits": "base",
-            "generator": "Ninja",
-            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_PLATFORM": "stm32",
-                "NEXUS_BUILD_TESTS": "OFF",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407_baremetal_defconfig"
-            }
-        },
-        {
-            "name": "stm32-armgcc-release",
-            "displayName": "STM32 ARM GCC Release",
-            "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Release",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "stm32-armgcc-minsizerel",
-            "displayName": "STM32 ARM GCC MinSizeRel",
-            "description": "STM32 build with ARM GCC (arm-none-eabi-gcc) - Minimum Size Release",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "MinSizeRel"
-            }
-        },
-        {
-            "name": "windows-stm32-armgcc-debug",
-            "displayName": "Windows \u2192 STM32 ARM GCC Debug",
-            "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
-            "inherits": [
-                "stm32-armgcc-debug",
-                "windows-base"
-            ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            }
-        },
-        {
-            "name": "windows-stm32-armgcc-release",
-            "displayName": "Windows \u2192 STM32 ARM GCC Release",
-            "description": "Windows host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Release",
-            "inherits": "windows-stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "linux-stm32-armgcc-debug",
-            "displayName": "Linux \u2192 STM32 ARM GCC Debug",
-            "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Debug",
-            "inherits": [
-                "stm32-armgcc-debug",
-                "linux-base"
-            ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            }
-        },
-        {
-            "name": "linux-stm32-armgcc-release",
-            "displayName": "Linux \u2192 STM32 ARM GCC Release",
-            "description": "Linux host, STM32 target with ARM GCC (arm-none-eabi-gcc) - Release",
-            "inherits": "linux-stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "linux-gcc-sanitizers",
-            "displayName": "Linux GCC ASan/UBSan",
-            "inherits": "linux-gcc-debug",
-            "cacheVariables": {
                 "NEXUS_ENABLE_SANITIZERS": "ON"
             }
         },
         {
-            "name": "stm32-armgcc-freertos-debug",
-            "displayName": "STM32F407 FreeRTOS ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
+            "name": "stm32-qiming-baremetal",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-qiming-baremetal",
             "cacheVariables": {
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407_freertos_defconfig"
-            }
-        },
-        {
-            "name": "stm32-armgcc-freertos-release",
-            "displayName": "STM32F407 FreeRTOS ARM GCC Release",
-            "inherits": "stm32-armgcc-freertos-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "native-services-debug",
-            "displayName": "Native optional common components (compile only)",
-            "inherits": "linux-gcc-debug",
-            "cacheVariables": {
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_services_demo_defconfig",
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/qiming-baremetal.json",
                 "NEXUS_BUILD_TESTS": "OFF"
-            }
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         },
         {
-            "name": "gd32f470-armgcc-baremetal-debug",
-            "displayName": "GD32F470ZG baremetal ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_PLATFORM": "gd32f470",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_baremetal_defconfig"
-            }
-        },
-        {
-            "name": "gd32f470-armgcc-baremetal-release",
-            "displayName": "GD32F470ZG baremetal ARM GCC Release",
-            "inherits": "stm32-armgcc-debug",
+            "name": "stm32-qiming-freertos",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-qiming-freertos",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_PLATFORM": "gd32f470",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_baremetal_defconfig"
-            }
-        },
-        {
-            "name": "gd32f470-armgcc-freertos-debug",
-            "displayName": "GD32F470ZG freertos ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_PLATFORM": "gd32f470",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_freertos_defconfig"
-            }
-        },
-        {
-            "name": "gd32f470-armgcc-freertos-release",
-            "displayName": "GD32F470ZG freertos ARM GCC Release",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_PLATFORM": "gd32f470",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/gd32f470_freertos_defconfig"
-            }
-        },
-        {
-            "name": "native-minimal-debug",
-            "displayName": "Native minimal source SDK (compile only)",
-            "inherits": "linux-gcc-debug",
-            "cacheVariables": {
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/native_minimal_defconfig",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/qiming-freertos.json",
                 "NEXUS_BUILD_TESTS": "OFF"
-            }
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         },
         {
-            "name": "stm32-qiming-armgcc-baremetal-debug",
-            "displayName": "STM32F407 qiming baremetal ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_baremetal_defconfig"
-            }
-        },
-        {
-            "name": "stm32-qiming-armgcc-baremetal-release",
-            "displayName": "STM32F407 qiming baremetal ARM GCC Release",
-            "inherits": "stm32-armgcc-debug",
+            "name": "stm32-sky-baremetal",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-sky-baremetal",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_baremetal_defconfig"
-            }
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/sky-baremetal.json",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         },
         {
-            "name": "stm32-qiming-armgcc-freertos-debug",
-            "displayName": "STM32F407 qiming freertos ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_freertos_defconfig"
-            }
-        },
-        {
-            "name": "stm32-qiming-armgcc-freertos-release",
-            "displayName": "STM32F407 qiming freertos ARM GCC Release",
-            "inherits": "stm32-armgcc-debug",
+            "name": "stm32-sky-freertos",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-sky-freertos",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407zg_qiming_v31_freertos_defconfig"
-            }
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/sky-freertos.json",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         },
         {
-            "name": "stm32-sky-armgcc-baremetal-debug",
-            "displayName": "STM32F407 sky baremetal ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_baremetal_defconfig"
-            }
-        },
-        {
-            "name": "stm32-sky-armgcc-baremetal-release",
-            "displayName": "STM32F407 sky baremetal ARM GCC Release",
-            "inherits": "stm32-armgcc-debug",
+            "name": "gd32-liangshan-baremetal",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-liangshan-baremetal",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_baremetal_defconfig"
-            }
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-baremetal.json",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         },
         {
-            "name": "stm32-sky-armgcc-freertos-debug",
-            "displayName": "STM32F407 sky freertos ARM GCC Debug",
-            "inherits": "stm32-armgcc-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_freertos_defconfig"
-            }
-        },
-        {
-            "name": "stm32-sky-armgcc-freertos-release",
-            "displayName": "STM32F407 sky freertos ARM GCC Release",
-            "inherits": "stm32-armgcc-debug",
+            "name": "gd32-liangshan-freertos",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-liangshan-freertos",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_CONFIG_FILE": "${sourceDir}/configs/stm32f407ve_sky_qingchun_freertos_defconfig"
-            }
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-freertos.json",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         }
     ],
     "buildPresets": [
         {
-            "name": "windows-msvc-debug",
-            "configurePreset": "windows-msvc-debug",
-            "configuration": "Debug"
+            "name": "native-debug",
+            "configurePreset": "native-debug"
         },
         {
-            "name": "windows-msvc-release",
-            "configurePreset": "windows-msvc-release",
-            "configuration": "Release"
+            "name": "native-release",
+            "configurePreset": "native-release"
         },
         {
-            "name": "windows-gcc-debug",
-            "configurePreset": "windows-gcc-debug"
+            "name": "native-asan",
+            "configurePreset": "native-asan"
         },
         {
-            "name": "windows-gcc-release",
-            "configurePreset": "windows-gcc-release"
+            "name": "stm32-qiming-baremetal",
+            "configurePreset": "stm32-qiming-baremetal"
         },
         {
-            "name": "windows-clang-debug",
-            "configurePreset": "windows-clang-debug"
+            "name": "stm32-qiming-freertos",
+            "configurePreset": "stm32-qiming-freertos"
         },
         {
-            "name": "windows-clang-release",
-            "configurePreset": "windows-clang-release"
+            "name": "stm32-sky-baremetal",
+            "configurePreset": "stm32-sky-baremetal"
         },
         {
-            "name": "linux-gcc-debug",
-            "configurePreset": "linux-gcc-debug"
+            "name": "stm32-sky-freertos",
+            "configurePreset": "stm32-sky-freertos"
         },
         {
-            "name": "linux-gcc-release",
-            "configurePreset": "linux-gcc-release"
+            "name": "gd32-liangshan-baremetal",
+            "configurePreset": "gd32-liangshan-baremetal"
         },
         {
-            "name": "linux-clang-debug",
-            "configurePreset": "linux-clang-debug"
-        },
-        {
-            "name": "linux-clang-release",
-            "configurePreset": "linux-clang-release"
-        },
-        {
-            "name": "macos-clang-debug",
-            "configurePreset": "macos-clang-debug"
-        },
-        {
-            "name": "macos-clang-release",
-            "configurePreset": "macos-clang-release"
-        },
-        {
-            "name": "linux-gcc-coverage",
-            "configurePreset": "linux-gcc-coverage"
-        },
-        {
-            "name": "stm32-armgcc-debug",
-            "configurePreset": "stm32-armgcc-debug"
-        },
-        {
-            "name": "stm32-armgcc-release",
-            "configurePreset": "stm32-armgcc-release"
-        },
-        {
-            "name": "stm32-armgcc-minsizerel",
-            "configurePreset": "stm32-armgcc-minsizerel"
-        },
-        {
-            "name": "windows-stm32-armgcc-debug",
-            "configurePreset": "windows-stm32-armgcc-debug"
-        },
-        {
-            "name": "windows-stm32-armgcc-release",
-            "configurePreset": "windows-stm32-armgcc-release"
-        },
-        {
-            "name": "linux-stm32-armgcc-debug",
-            "configurePreset": "linux-stm32-armgcc-debug"
-        },
-        {
-            "name": "linux-stm32-armgcc-release",
-            "configurePreset": "linux-stm32-armgcc-release"
-        },
-        {
-            "name": "linux-gcc-sanitizers",
-            "configurePreset": "linux-gcc-sanitizers"
-        },
-        {
-            "name": "stm32-armgcc-freertos-debug",
-            "configurePreset": "stm32-armgcc-freertos-debug"
-        },
-        {
-            "name": "stm32-armgcc-freertos-release",
-            "configurePreset": "stm32-armgcc-freertos-release"
-        },
-        {
-            "name": "native-services-debug",
-            "configurePreset": "native-services-debug"
-        },
-        {
-            "name": "gd32f470-armgcc-baremetal-debug",
-            "configurePreset": "gd32f470-armgcc-baremetal-debug"
-        },
-        {
-            "name": "gd32f470-armgcc-baremetal-release",
-            "configurePreset": "gd32f470-armgcc-baremetal-release"
-        },
-        {
-            "name": "gd32f470-armgcc-freertos-debug",
-            "configurePreset": "gd32f470-armgcc-freertos-debug"
-        },
-        {
-            "name": "gd32f470-armgcc-freertos-release",
-            "configurePreset": "gd32f470-armgcc-freertos-release"
-        },
-        {
-            "name": "native-minimal-debug",
-            "configurePreset": "native-minimal-debug"
-        },
-        {
-            "name": "stm32-qiming-armgcc-baremetal-debug",
-            "configurePreset": "stm32-qiming-armgcc-baremetal-debug"
-        },
-        {
-            "name": "stm32-qiming-armgcc-baremetal-release",
-            "configurePreset": "stm32-qiming-armgcc-baremetal-release"
-        },
-        {
-            "name": "stm32-qiming-armgcc-freertos-debug",
-            "configurePreset": "stm32-qiming-armgcc-freertos-debug"
-        },
-        {
-            "name": "stm32-qiming-armgcc-freertos-release",
-            "configurePreset": "stm32-qiming-armgcc-freertos-release"
-        },
-        {
-            "name": "stm32-sky-armgcc-baremetal-debug",
-            "configurePreset": "stm32-sky-armgcc-baremetal-debug"
-        },
-        {
-            "name": "stm32-sky-armgcc-baremetal-release",
-            "configurePreset": "stm32-sky-armgcc-baremetal-release"
-        },
-        {
-            "name": "stm32-sky-armgcc-freertos-debug",
-            "configurePreset": "stm32-sky-armgcc-freertos-debug"
-        },
-        {
-            "name": "stm32-sky-armgcc-freertos-release",
-            "configurePreset": "stm32-sky-armgcc-freertos-release"
+            "name": "gd32-liangshan-freertos",
+            "configurePreset": "gd32-liangshan-freertos"
         }
     ],
     "testPresets": [
         {
-            "name": "base-test",
-            "hidden": true,
+            "name": "native-debug",
+            "configurePreset": "native-debug",
             "output": {
                 "outputOnFailure": true
             },
             "execution": {
-                "noTestsAction": "error",
-                "stopOnFailure": false
+                "noTestsAction": "error"
             }
         },
         {
-            "name": "windows-msvc-debug",
-            "configurePreset": "windows-msvc-debug",
-            "inherits": "base-test",
-            "configuration": "Debug"
+            "name": "native-release",
+            "configurePreset": "native-release",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error"
+            }
         },
         {
-            "name": "windows-msvc-release",
-            "configurePreset": "windows-msvc-release",
-            "inherits": "base-test",
-            "configuration": "Release"
-        },
-        {
-            "name": "windows-gcc-debug",
-            "configurePreset": "windows-gcc-debug",
-            "inherits": "base-test"
-        },
-        {
-            "name": "windows-gcc-release",
-            "configurePreset": "windows-gcc-release",
-            "inherits": "base-test"
-        },
-        {
-            "name": "windows-clang-debug",
-            "configurePreset": "windows-clang-debug",
-            "inherits": "base-test"
-        },
-        {
-            "name": "windows-clang-release",
-            "configurePreset": "windows-clang-release",
-            "inherits": "base-test"
-        },
-        {
-            "name": "linux-gcc-debug",
-            "configurePreset": "linux-gcc-debug",
-            "inherits": "base-test"
-        },
-        {
-            "name": "linux-gcc-release",
-            "configurePreset": "linux-gcc-release",
-            "inherits": "base-test"
-        },
-        {
-            "name": "linux-clang-debug",
-            "configurePreset": "linux-clang-debug",
-            "inherits": "base-test"
-        },
-        {
-            "name": "linux-clang-release",
-            "configurePreset": "linux-clang-release",
-            "inherits": "base-test"
-        },
-        {
-            "name": "linux-gcc-coverage",
-            "configurePreset": "linux-gcc-coverage",
-            "inherits": "base-test"
-        },
-        {
-            "name": "macos-clang-debug",
-            "configurePreset": "macos-clang-debug",
-            "inherits": "base-test"
-        },
-        {
-            "name": "macos-clang-release",
-            "configurePreset": "macos-clang-release",
-            "inherits": "base-test"
-        },
-        {
-            "name": "linux-gcc-sanitizers",
-            "configurePreset": "linux-gcc-sanitizers",
-            "inherits": "base-test"
+            "name": "native-asan",
+            "configurePreset": "native-asan",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error"
+            }
         }
     ]
 }

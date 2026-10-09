@@ -1,3 +1,0 @@
-# Finite OSAL resource example; Native backend is not a FreeRTOS kernel port.
-CONFIG_PLATFORM_NATIVE=y
-CONFIG_OSAL_NATIVE=y

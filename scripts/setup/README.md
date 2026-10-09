@@ -1,43 +1,27 @@
-# Development prerequisites and quick start
+# Development setup
 
-Nexus owns the common platform and contract tests. Reference applications live
-in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples).
-
-Initialize the repository's pinned dependencies and install Python 3.10+, CMake
-3.21+, Ninja and the selected compiler. Install `kconfiglib==14.1.0` for the single
-configuration generator. ARM GNU identity is in `dependencies/toolchains.lock.json`;
-use `scripts/ci/install_arm_toolchain.py` rather than an unpinned download.
-`setup.py --preset <preset>` checks prerequisites without installing unpinned
-packages. `--init-deps` explicitly initializes pinned submodules;
-`--install-arm-toolchain <directory>` explicitly invokes the locked installer.
-These flags preserve failure codes and do not infer support for an untested OS.
+Use Python 3.10+, CMake 3.31.6, Ninja 1.13.2 and a C11 compiler. Install the
+repository tools and both local Git hooks for each clone:
 
 ```sh
-python scripts/setup/setup.py --preset linux-gcc-debug --init-deps
-python scripts/setup/quick-start.py --preset linux-gcc-debug --stage all
+python scripts/setup/install_dev_tools.py
+.venv/bin/python -m pip install -r requirements.txt
+git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4
+python tools/dev/dev.py doctor
 ```
 
-`quick-start.py`, the build shell/batch/PowerShell wrappers, and
-`scripts/nexus.py build` forward to `scripts/ci/ci_build.py`. They use the same
-`--preset`, `--stage`, and `--jobs` arguments and preserve failure exit codes.
-They never infer a chip from a `--platform` alias or write another build tree.
-`--stage all` executes CTest only when the selected preset enables host tests;
-ARM compilation is reported as compilation and needs separate physical HIL.
-No packages are installed by quick start.
+The installer preserves existing hooks using pre-commit's migration and rejects
+an explicit `core.hooksPath`. CI uses `--skip-hooks` and executes the same checks.
+The root `.clang-format` and `.editorconfig` remain authoritative. Versions are
+locked in `dependencies/development-tools.txt` and `environment-tools.txt`.
+
+ARM uses GNU 14.3.rel1 with a hash-verified archive:
 
 ```sh
-python scripts/nexus.py build --preset linux-gcc-release --stage all --jobs 4
-python scripts/nexus.py test --preset linux-gcc-debug
-python scripts/setup/quick-start.py --help
+python scripts/ci/install_arm_toolchain.py --install-dir /your/toolchains/arm
 ```
 
-Windows PowerShell uses the same arguments:
-
-```powershell
-./scripts/building/build.ps1 --preset windows-msvc-debug --stage all --jobs 4
-./scripts/nexus.ps1 build --preset windows-msvc-debug --stage configure
-```
-
-These command surfaces are shared. Windows/macOS compiler execution must be
-reported from an actual run; the current Linux evidence does not prove them.
-See [source SDK and Board integration](../../cmake/README.md) for external builds.
+Add that directory's `bin` to PATH. Use one maintained preset through
+`python tools/dev/dev.py configure|build|test`. No dependency download occurs
+during firmware configuration. Formal offline builds use the observed sealed
+OCI environment; mutable host checks have a separate scope.

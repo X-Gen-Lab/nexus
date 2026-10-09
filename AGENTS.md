@@ -1,56 +1,77 @@
-# Nexus maintenance instructions
+# Nexus platform maintenance
 
-Nexus owns the common industrial embedded platform. Read `docs/strategy/README.md`, the relevant architecture decisions and the matching RF item in `docs/implementation/refactor-execution.csv` before architecture changes. The external `nexus-examples/docs/platform-refactor-plan.md` defines the original 38 tasks/19 batches. Historical `docs/strategy/backlog.csv` uses earlier IDs and evidence. Plans and role metadata do not prove implemented capabilities.
+Nexus owns reusable embedded mechanisms. Applications, product roles, protocol
+register policy, workers, private PCB data, Flash reservations and recovery policy
+belong in external repositories. Public examples live in X-Gen-Lab/nexus-examples.
 
-## Engineering boundaries
+Read [the design contracts](docs/design/README.md),
+[delivery evidence](docs/delivery/README.md) and the relevant layer README before
+changing behavior. `docs/archive/` contains historical contracts and results.
+They do not establish current support or qualification.
 
-- The user authorizes breaking architectural refactors and removal of poor designs. Update public interfaces, production callers, tests and documents atomically. Persisted product data needs a separate explicit format, migration and recovery policy.
-- Preserve the repository's code formatting and comment style during refactors: root `.clang-format`/`.editorconfig`, contribution guides and `.kiro/steering/comment-standards.md` remain authoritative. Keep 80 columns, 4 spaces, attached braces, type-side pointer alignment, established names/file headers and backslash Doxygen tags. Public headers own full API contracts; source comments avoid duplicating parameter/return documentation. Existing compact code is a style gap, not a new convention.
-- Keep HAL/OSAL independent of vendor headers, Board wiring and product policy. Arch, SoC/controllers and Board resources own separate contracts. Maintained controllers/clock/IRQ/system/private SDK live in `soc/{stm32f407,gd32f470,native}`; `platforms/` owns only startup/lifecycle/object assembly. `soc/native` is a host virtual model, not physical silicon. Family paths do not replace exact variant/density identities. Product main/workers, domain control, private protocols and partition/update/health/manufacturing policies belong to external repositories such as nexus-examples.
-- Runtime owns only serial HAL/OSAL infrastructure. Firmware explicitly assembles platform objects/startup. Applications own scheduler, components and workers. Do not restore Product identity, automatic main wrappers or mandatory application choice.
-- Document task/ISR context, timeout origin, blocking bound, ownership, cancellation, callback, lifecycle and failure state. Never return success for required unimplemented operations. An unsettled DMA/transfer buffer remains borrowed; timeout is not settlement.
-- Use one per-build effective configuration and reject contradictions/generation failures. No source-root `.config` or stale generated-header fallback. Different Board/backend combinations use independent build roots.
-- Board packages use one `NEXUS_BOARD_DIR`, declared hashed inputs and reviewed narrow resources. External `NEXUS_FLASH_LAYOUT_FILE` drives linker/regions from one parse. SoC exposes full physical Flash; no default product storage reservation. Nonzero image offsets, MPU/cache, MCU typed I2C and unsupported routes stay explicit until implemented and verified.
-- Prefer bounded resources and honest capabilities. Do not write cryptographic primitives or call RAM persistent Flash. External product teams own physical timing, memory, power-loss, maintenance-window and worst-load budgets.
+## Architecture and configuration
 
-## Validation and review
+- Keep the default C11 path statically assembled and allocation-free: Core,
+  Arch, SoC, typed I/O, optional OS/owner adapters, optional common components.
+- Public device APIs use Nexus types. Vendor SDKs and provider storage remain
+  implementation inputs. A product uses generated fixed typed bindings.
+- Do not reintroduce registries, name lookup, factory discovery, maximum object
+  pools, hidden workers, mandatory OS locks or forwarding-only runtime layers.
+- SoC facts, Board `board.json` and one assembly JSON resolve to one atomic
+  bundle. JSON is the sole configuration authority. CMake targets own software
+  dependencies. Do not introduce Kconfig/cache fallback or a second build graph.
+- Reject unknown fields, unsupported modes, resource conflicts and stale inputs.
+  Never repair configuration by silently selecting a different mode or Board.
+- Distinguish a chip capability from a reviewed PCB route and physical HIL.
+  Unknown PCB revisions and electrical facts stay explicit. Do not invent wiring.
+- Startup does not start a scheduler. Applications own tasks, wait adapters,
+  queue depths, stack/TCB storage and their shutdown sequence.
 
-Install the pinned local commit tools and hooks for every fresh clone:
+## Ownership and correctness
 
-```sh
-python scripts/setup/install_dev_tools.py
-```
+- REJECTED admission has no retained references or residual hardware effects.
+  ACCEPTED transfers borrow request and buffers until acquire-observed SETTLED.
+- SETTLED is the provider's final access. Detach hardware/IRQ/queue references
+  before release-publication. Cancel, timeout or a failure to drain never revoke
+  a borrow; retain QUARANTINED storage and expose recovery responsibility.
+- Cross-task controls address stable slots and monotonically increasing epochs.
+  Drain controls and join observers before reclaiming a slot or request.
+- Use absolute monotonic deadlines in one domain. Save and restore incoming
+  interrupt masks. Keep peripheral drain, wire completion and request completion
+  distinct. Do not remove barriers or volatile reads needed by the contract.
+- Physical Flash drivers expose geometry. Products explicitly supply erase-aligned
+  regions. Persistence policy, authentication and migration remain external.
+- IRQ notification is a hint. The latched request predicate remains authoritative.
+  Validate the FreeRTOS syscall ceiling before any kernel ISR API.
 
-Git commits run staged style/text checks and Conventional Commit validation.
-Hooks report failures without formatting or staging files. The frozen historical
-baseline only permits unchanged reviewed bytes; modified source is strict. Do
-not add/rebase debt or move owned source into exclusions. Manual pre-commit
-`--files`/`--all-files` checks read working-tree contents, not a different staged
-snapshot. CI runs the same full source check for every invocation and retains
-the actual report. See `docs/implementation/quality-gates.md` for scope and limits.
+## Tools, style and validation
 
-The CI helper tests require no third-party test framework:
+Install commit tools with `python scripts/setup/install_dev_tools.py`, then
+`.venv/bin/python -m pip install -r dependencies/environment-tools.txt` (Windows:
+use `.venv/Scripts/python.exe`). This installs pre-commit and commit-msg hooks;
+no hook bypass or automatic staging is allowed. CI uses the same checks.
 
-```sh
-python3 -m unittest discover -s scripts/ci -p 'test_*.py'
-```
+Use `python tools/dev/dev.py configure|build|test --preset <name>`; native CMake
+arguments pass through. `doctor` checks tools and `check` runs repository gates.
+Fresh JUnit, nonzero tests and actual return codes are required. Missing tools,
+empty reports and skipped-only executions fail qualification.
 
-Use a complete checkout, fixed submodules/imports and required toolchain for CMake/CTest. Top-level ARM `NEXUS_BUILD_CONTRACTS` builds an independent platform link fixture; source consumers default development tests/contracts off. Host suites reject zero tests; required evidence rejects empty/stale/all-skipped reports and propagates nonzero command exits.
+Keep the existing `.clang-format`, `.editorconfig` and backslash Doxygen style:
+80 columns, four spaces, attached braces and type-attached pointer stars. Sources
+have file/brief/author/version/date/copyright; headers have file/brief/author and
+public context, deadline, ownership and failure contracts. Implementation comments
+explain invariants and hardware ordering. Do not duplicate declaration parameter
+lists in source definitions. New or changed files pass whole-file checks. Frozen
+historical debt may only shrink; never rebaseline new defects.
 
-Keep actual command, exit, test enumeration, source/dep/config/toolchain, Board/layout and artifact hashes. Separate host models, real FreeRTOS POSIX execution, ARM compilation, real firmware linkage and physical qualification. A target, workflow definition, file or coverage claim is not execution evidence. Historical source counts cannot qualify later refactors.
+Run the maintained host/model and tool boundary suites. Changes to interrupt,
+lifecycle, persistence or concurrency need meaningful failure-path regressions.
+Compile common components for both MCU families. Native models establish software
+behavior, ARM ELF checks establish linking/resources, and physical station results
+establish hardware behavior. Never inherit old test counts or hardware status.
 
-Critical regression tests verify user-observable success/failure and cross-backend invariants. Relevant faults include stale owners, finite pool exhaustion, busy/error retry, timeout/cancel races, zero ticket recovery and final buffer return. Reversible prose/format changes need suitable checks, not new tests that mirror text.
-
-The user currently defers physical boards: finish authorized software and HIL tooling without executing equipment. Record physical IRQ/DMA/electrical/power-cut/long-load qualification as unexecuted. Do not invent station IDs, measured budgets, passing HIL or hardware support from models.
-
-Use RF/backlog IDs in review context. ADRs cover dependency direction, public contracts, persistence, security and release identity. Update exact support claims and external caller contracts with implementation/evidence. Do not add platforms before maintained combinations have repeatable software baselines.
-
-## Delivery
-
-Publishable artifacts need verified source, dependencies, effective configuration, Board/layout and ELF/BIN identity. Candidate and product promotion remain separate gates; same-artifact promotion does not rebuild a different image. Signing/manufacturing credentials never enter source, tests, logs or artifacts.
-
-Relocatable source SDK preparation needs a clean complete checkout and actual consumer verification. Development fixtures remain `publishable=false` and require explicit opt-in; they are ineligible for promotion. Source packages do not establish installed binary SDK, ABI compatibility, signing or physical qualification.
-
-Real HIL, trust/signing, manufacturing, named reviewers, branch rules, support window and LTS require actual external evidence and responsibility. Role files do not authorize contacting third parties or altering repository settings. Continue reversible authorized work and make remote changes concrete/reviewable.
-
-`.nexus-source-snapshot.json`, if present, identifies an analysis snapshot, not a complete Git checkout. Verify missing files/submodules/tooling before reporting builds or history.
+A software candidate binds clean Git source, exact configuration, dependency and
+OCI/toolchain identities, executed raw logs and the same ELF/BIN/map bytes. Two
+fresh network-disabled builds establish reproducibility. A digest alone does not.
+No unsigned software candidate is a product release, safety certification or LTS
+promise. Record physical tests as not executed until real equipment runs them.

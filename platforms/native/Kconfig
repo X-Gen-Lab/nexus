@@ -1,3 +1,0 @@
-if PLATFORM_NATIVE
-source "soc/native/Kconfig"
-endif

@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'codex/**' ]
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
@@ -32,6 +32,11 @@ jobs:
         with:
           filters: |
             code:
+              - 'core/**'
+              - 'io/**'
+              - 'os/**'
+              - 'components/**'
+              - 'tools/**'
               - 'hal/**'
               - 'osal/**'
               - 'framework/**'
@@ -97,12 +102,18 @@ jobs:
     needs: changes
     uses: ./.github/workflows/quality-checks.yml
     with:
-      run_static_analysis: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'workflow_dispatch' }}
+      run_static_analysis: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+
+  tool-contracts:
+    name: Tool Contracts
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/enterprise-tools.yml
 
   docs:
     name: Documentation
     needs: changes
-    if: needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/docs-build.yml
     secrets: inherit
     permissions:
@@ -113,7 +124,7 @@ jobs:
   status-check:
     name: CI Status
     runs-on: ubuntu-latest
-    needs: [changes, build-test, code-quality, docs]
+    needs: [changes, build-test, code-quality, tool-contracts, docs]
     if: always()
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "board_package": "../../../boards/native_reference",
+  "backend": "native",
+  "clock_profile": "model",
+  "controllers": [
+    {
+      "id": "uart0",
+      "binding": "uart0",
+      "mode": "irq-byte-event",
+      "irq_priority": 5,
+      "rx_capacity": 32,
+      "rx_profile": "bytes",
+      "baud": 115200
+    }
+  ],
+  "devices": [],
+  "memory_budgets": {
+    "main_stack_bytes": 2048,
+    "flash_load_bytes": 65536,
+    "static_ram_bytes": 32768,
+    "libc_heap_bytes": 0
+  },
+  "layout": null,
+  "optimization": "Os"
+}

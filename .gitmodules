@@ -1,7 +1,3 @@
-[submodule "ext/googletest"]
-	path = ext/googletest
-	url = https://github.com/google/googletest.git
-
 [submodule "ext/freertos"]
 	path = ext/freertos
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
@@ -13,7 +9,3 @@
 [submodule "vendors/st/cmsis_device_f4"]
 	path = vendors/st/cmsis_device_f4
 	url = https://github.com/STMicroelectronics/cmsis_device_f4.git
-
-[submodule "vendors/st/stm32f4xx_hal_driver"]
-	path = vendors/st/stm32f4xx_hal_driver
-	url = https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git

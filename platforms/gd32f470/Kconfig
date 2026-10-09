@@ -1,3 +1,0 @@
-if PLATFORM_GD32F470
-source "soc/gd32f470/Kconfig"
-endif

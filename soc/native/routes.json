@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {"id": "gpio-pa0", "variants": ["NATIVE_MODEL"], "controller": "GPIOA", "kind": "gpio", "pins": [{"pin": "PA0", "function": "output", "af": 0}], "modes": ["output"], "source": "Host virtual model; no physical wiring"},
+    {"id": "uart0", "variants": ["NATIVE_MODEL"], "controller": "UART0", "kind": "uart", "pins": [{"pin": "PA1", "function": "tx", "af": 0}, {"pin": "PA2", "function": "rx", "af": 0}], "modes": ["irq-byte-event"], "source": "Host virtual model; no physical timing"},
+    {"id": "spi0", "variants": ["NATIVE_MODEL"], "controller": "SPI0", "kind": "spi", "pins": [], "modes": ["short-poll"], "source": "Host virtual model; no physical timing"}
+  ]
+}

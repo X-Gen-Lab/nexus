@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "native",
+  "variants": {
+    "NATIVE_MODEL": {
+      "package": "host-model",
+      "flash": {"origin": 134217728, "size": 1048576, "erase_blocks": [1048576]},
+      "memory": [{"id": "model-ram", "origin": 536870912, "size": 1048576, "dma": false, "linker": true}]
+    }
+  },
+  "cpu": {"arch": "native", "fpu": "none", "float_abi": "native"},
+  "clock_profiles": {"model": {"hse_hz": 1000000, "core_hz": 1000000}},
+  "controllers": {
+    "GPIOA": {"kind": "gpio", "modes": ["output", "input"], "irq": [], "pins": ["PA0", "PA1", "PA2"]},
+    "UART0": {"kind": "uart", "modes": ["irq-byte-event"], "irq": [], "pins": ["PA1", "PA2"]},
+    "SPI0": {"kind": "spi", "modes": ["short-poll"], "irq": [], "pins": []}
+  }
+}

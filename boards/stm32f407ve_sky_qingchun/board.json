@@ -1,55 +1,57 @@
 {
-  "schema": 1,
+  "schema_version": 1,
   "id": "stm32f407ve-sky-qingchun",
-  "soc": "stm32f407ve",
-  "hse_hz": 8000000,
-  "interface_target": "board_stm32f407ve_sky_qingchun",
-  "object_targets": [
-    "board_stm32f407ve_sky_qingchun_wiring"
-  ],
-  "inputs": [
-    "CMakeLists.txt",
-    "nexus_board.h",
-    "board.c",
-    "uart.c"
-  ],
-  "resources": [
+  "soc": "STM32F407VET6",
+  "soc_family": "stm32f407",
+  "source_revision": "first-party-youth-documentation",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
     {
-      "id": "status-led",
-      "kind": "gpio",
-      "when": "CONFIG_STM32_GPIO_ENABLE",
-      "pins": [
-        {
-          "port": "B",
-          "pin": 2,
-          "af": 0,
-          "signal": "led",
-          "initial": 0
-        }
-      ]
+      "id": "led0",
+      "controller": "GPIOB",
+      "route": "gpio-pb2",
+      "initial": 0,
+      "mask": 4
     },
     {
-      "id": "console",
-      "kind": "uart",
-      "instance": 0,
-      "when": "CONFIG_STM32_UART_ENABLE",
-      "clock": "USART1",
-      "irq": 37,
-      "priority": 5,
-      "pins": [
-        {
-          "port": "A",
-          "pin": 9,
-          "af": 7,
-          "signal": "tx"
-        },
-        {
-          "port": "A",
-          "pin": 10,
-          "af": 7,
-          "signal": "rx"
-        }
-      ]
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal"
+    },
+    {
+      "id": "iwdg0",
+      "controller": "IWDG",
+      "route": "iwdg"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Physical PCB revision and fitted options not inspected",
+    "SPI/I2C/PWM/ADC/EXTI external wiring not bound or physically qualified"
+  ],
+  "provenance": [
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/fdb/skystar.html",
+      "scope": "Exact youth edition: VE512KiB, HSE8MHz, LSE/Flash/debug header fitting options"
+    },
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/fdb/micropython/introduction.html",
+      "scope": "PB2 active-high LED and UART1 PA9/PA10 resource table"
+    },
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/tkx/hardware/schematic.html",
+      "scope": "First-party schematic reference for physical fixture comparison"
     }
   ]
 }

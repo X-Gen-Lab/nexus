@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pe3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "gpio-pe4",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "gpio-pg9",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "gpio-pb2",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "usart1-pa9-pa10",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "USART1",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA10",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "spi1-pa5-pa6-pa7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "SPI1",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PA6",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PA7",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "i2c1-pb6-pb7",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB7",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "tim3-ch1-pa6",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "adc1-ch0-pa0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "exti0-pa0",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI0",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "flash-internal",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-word"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "iwdg",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "adc1-scan-pa0-pa1",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "exti5-pa5",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI5",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "exti6-pa6",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "EXTI6",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    }
+  ]
+}

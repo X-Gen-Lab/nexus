@@ -1,6 +1,6 @@
-# PROPOSED：下一代平台工程运行手册
+# 下一代平台工程运行手册
 
-> **状态：整体工程模型为 PROPOSED。** 本文规定未来的工程模型、工具职责和批次退出条件，不是当前仓库能力清单。12.4 单独记录已实现的提交检查工具；其他入口、文件名、profile 和命令仍为设计示意，尚不能据此认定已有可复现构建、硬件资格或发布授权。
+> 工程合同与风险门禁。当前可运行入口、逐项实现和实际证据见[交付状态](../delivery/README.md)。本手册规定团队责任和验收边界；示意 schema/API 不替代源码。OCI 准备、正式离线构建、软件候选及实板资格分别验收。
 
 平台总体设计见 [next-generation-platform.md](next-generation-platform.md)，外部产品、Board 和组件接入契约见 [integration-contracts.md](integration-contracts.md)。本文负责把这些边界转换为约十人团队可以执行、审查和持续维护的工程规则；接口与目录的最终定义以上述设计文档为准。
 
@@ -346,7 +346,7 @@ clang-tidy消费实际compile commands与生成配置，只检查owned边界。v
 
 [格式目录清单](../../.clang-format-dirs)已补齐Arch、SoC、Board、Runtime和Services及实际使用的`.inc`，Shell、Windows和PowerShell入口均委托[Python格式工具](../../scripts/tools/format.py)。[安装入口](../../scripts/setup/install_dev_tools.py)固定安装pre-commit 4.3.0和clang-format 14.0.6，并安装真实`pre-commit`、`commit-msg` hooks。默认提交检查暂存快照；手工`--files`、`--all-files`检查工作区。CI每次运行相同的全量源码门禁，重型分析保留路径条件。
 
-首次审计596个自有源码文件，记录337个文件的格式欠账与291个文件的机械注释欠账，两者重叠。[冻结基线](../../dependencies/style-baseline.json)只允许固定历史源码的未改字节；修改后须整文件合规，不能增加或重封豁免、通过排除路径隐藏自有源码。门禁通过表示满足这一迁移政策，不能称全仓已格式合规。实际使用、报告和检查边界见[质量门禁说明](../implementation/quality-gates.md)。
+首次审计596个自有源码文件，记录337个文件的格式欠账与291个文件的机械注释欠账，两者重叠。[冻结基线](../../dependencies/style-baseline.json)只允许固定历史源码的未改字节；修改后须整文件合规，不能增加或重封豁免、通过排除路径隐藏自有源码。门禁通过表示满足这一迁移政策，不能称全仓已格式合规。实际使用、报告和检查边界见[质量门禁说明](../archive/implementation/quality-gates.md)。
 
 上述工具交付是NG-003/NG-024的一部分；完整工具链环境锁、单一dev构建入口、全部warning和风险矩阵仍待实施。formatter负责排版，注释检查器只验证可机械判断的规则；API合同语义仍需review和行为测试。仅格式或注释机械整理单独提交，行为重构原子更新caller/测试/文档，避免把全仓排版与架构变更混成难以review的diff。本轮未改根格式配置或批量格式化生产源码。
 

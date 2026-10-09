@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "board_package": "ve_board",
+  "backend": "baremetal",
+  "clock_profile": "hse8-pll168",
+  "controllers": [
+    {
+      "id": "i2c0",
+      "binding": "i2c0",
+      "mode": "poll-messages",
+      "max_hz": 100000
+    }
+  ],
+  "devices": [
+    {
+      "id": "device0",
+      "controller": "i2c0",
+      "driver": "i2c-endpoint",
+      "address": 80
+    }
+  ],
+  "memory_budgets": {
+    "main_stack_bytes": 2048,
+    "flash_load_bytes": 65536,
+    "static_ram_bytes": 16384,
+    "libc_heap_bytes": 0
+  },
+  "layout": null,
+  "optimization": "Os"
+}

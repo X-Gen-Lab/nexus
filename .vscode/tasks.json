@@ -4,10 +4,12 @@
         {
             "label": "Configure Native",
             "type": "process",
-            "command": "cmake",
+            "command": "python",
             "args": [
+                "tools/dev/dev.py",
+                "configure",
                 "--preset",
-                "linux-gcc-debug"
+                "native-debug"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -17,36 +19,39 @@
         {
             "label": "Build Native",
             "type": "process",
-            "command": "cmake",
+            "command": "python",
             "args": [
-                "--build",
+                "tools/dev/dev.py",
+                "build",
                 "--preset",
-                "linux-gcc-debug",
+                "native-debug",
                 "--parallel",
                 "4"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
+            "problemMatcher": [
+                "$gcc"
+            ],
             "dependsOn": [
                 "Configure Native"
             ],
             "dependsOrder": "sequence",
-            "problemMatcher": [
-                "$gcc"
-            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
         },
         {
-            "label": "Configure STM32 baremetal",
+            "label": "Configure Qiming baremetal",
             "type": "process",
-            "command": "cmake",
+            "command": "python",
             "args": [
+                "tools/dev/dev.py",
+                "configure",
                 "--preset",
-                "stm32-armgcc-debug"
+                "stm32-qiming-baremetal"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -54,35 +59,41 @@
             "problemMatcher": []
         },
         {
-            "label": "Build STM32 baremetal",
+            "label": "Build Qiming baremetal",
             "type": "process",
-            "command": "cmake",
+            "command": "python",
             "args": [
-                "--build",
+                "tools/dev/dev.py",
+                "build",
                 "--preset",
-                "stm32-armgcc-debug",
+                "stm32-qiming-baremetal",
                 "--parallel",
                 "4"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "dependsOn": [
-                "Configure STM32 baremetal"
-            ],
-            "dependsOrder": "sequence",
             "problemMatcher": [
                 "$gcc"
             ],
-            "group": "build"
+            "dependsOn": [
+                "Configure Qiming baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         },
         {
-            "label": "Configure STM32 FreeRTOS",
+            "label": "Configure Qiming FreeRTOS",
             "type": "process",
-            "command": "cmake",
+            "command": "python",
             "args": [
+                "tools/dev/dev.py",
+                "configure",
                 "--preset",
-                "stm32-armgcc-freertos-debug"
+                "stm32-qiming-freertos"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -90,39 +101,209 @@
             "problemMatcher": []
         },
         {
-            "label": "Build STM32 FreeRTOS",
+            "label": "Build Qiming FreeRTOS",
             "type": "process",
-            "command": "cmake",
+            "command": "python",
             "args": [
-                "--build",
+                "tools/dev/dev.py",
+                "build",
                 "--preset",
-                "stm32-armgcc-freertos-debug",
+                "stm32-qiming-freertos",
                 "--parallel",
                 "4"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "dependsOn": [
-                "Configure STM32 FreeRTOS"
-            ],
-            "dependsOrder": "sequence",
             "problemMatcher": [
                 "$gcc"
             ],
-            "group": "build"
+            "dependsOn": [
+                "Configure Qiming FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Sky baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "stm32-sky-baremetal"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Sky baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "stm32-sky-baremetal",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Sky baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Sky FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "stm32-sky-freertos"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Sky FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "stm32-sky-freertos",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Sky FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Liangshan baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "gd32-liangshan-baremetal"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Liangshan baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "gd32-liangshan-baremetal",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Liangshan baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Liangshan FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "gd32-liangshan-freertos"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Liangshan FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "gd32-liangshan-freertos",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Liangshan FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         },
         {
             "label": "Test Native",
             "type": "process",
-            "command": "ctest",
+            "command": "python",
             "args": [
+                "tools/dev/dev.py",
+                "test",
                 "--preset",
-                "linux-gcc-debug",
-                "--output-on-failure",
-                "--no-tests=error",
-                "--parallel",
-                "4"
+                "native-debug"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -130,9 +311,8 @@
             "dependsOn": [
                 "Build Native"
             ],
-            "dependsOrder": "sequence",
-            "group": "test",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "group": "test"
         }
     ]
 }

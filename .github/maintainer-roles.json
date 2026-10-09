@@ -16,10 +16,11 @@
       "id": "core-interfaces",
       "seats": 2,
       "scope": [
-        "hal",
-        "osal",
-        "storage",
-        "security-contracts"
+        "core",
+        "io",
+        "os",
+        "components/storage",
+        "ownership-and-lifecycle-contracts"
       ],
       "backup_role": "bsp-ports"
     },
@@ -30,8 +31,7 @@
         "arch",
         "soc",
         "boards",
-        "platforms/stm32",
-        "platforms/gd32f470"
+        "tools/configure/routes-and-bindings"
       ],
       "backup_role": "core-interfaces"
     },
@@ -39,9 +39,7 @@
       "id": "industrial-apps",
       "seats": 2,
       "scope": [
-        "framework",
-        "services/protocols",
-        "services/industrial",
+        "components",
         "device-adapter-contracts",
         "X-Gen-Lab/nexus-examples: reference applications and external composition"
       ],
@@ -51,8 +49,8 @@
       "id": "quality-hil",
       "seats": 2,
       "scope": [
-        "tests",
-        "scripts/hil",
+        "tests/contracts",
+        "tools/hil",
         "fault-injection",
         "field-regressions"
       ],
@@ -63,8 +61,11 @@
       "seats": 1,
       "scope": [
         "cmake",
+        "tools/configure",
+        "tools/dev",
+        "tools/evidence",
+        "tools/measurement",
         ".github/workflows",
-        "scripts/evidence",
         "artifact-provenance"
       ],
       "backup_role": "quality-hil"

@@ -15,7 +15,7 @@ import sys
 from typing import Any, Dict, List, Optional
 
 
-GATE_JOBS = ("build-test", "code-quality", "docs")
+GATE_JOBS = ("build-test", "code-quality", "tool-contracts", "docs")
 OUTPUT_NAMES = ("code", "docs", "workflows")
 EVENT_NAMES = ("push", "pull_request", "schedule", "workflow_dispatch")
 
@@ -41,9 +41,10 @@ def required_jobs(outputs: Dict[str, str], event_name: str) -> Dict[str, bool]:
     return {
         "build-test": code_or_workflows or scheduled or manual,
         "code-quality": True,
+        "tool-contracts": code_or_workflows or scheduled or manual,
         "docs": (
             outputs["docs"] == "true"
-            or outputs["code"] == "true"
+            or code_or_workflows
             or scheduled
             or manual
         ),

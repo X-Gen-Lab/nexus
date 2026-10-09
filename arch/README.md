@@ -1,33 +1,21 @@
-# Architecture primitives
+# CPU-local primitives
 
-`Nexus::Arch` owns short CPU-local exclusion, exception-context queries and
-barriers. It depends only on the effective build configuration and host threading
-library. HAL and baremetal OSAL use it; it never calls HAL, OSAL or a vendor SDK.
+`Nexus::Arch` exposes saved interrupt masks, exception context, ordering barriers
+and an optional already-enabled DWT cycle snapshot. It does not call I/O, OS or
+vendor SDK code. Ports are Cortex-M4 and a POSIX-threaded Native behavior model.
 
-The maintained ports are Native (POSIX/Windows) and Cortex-M4 (GCC/Clang,
-ARMv7E-M). Configuration rejects other CPU/platform combinations. Cortex-M4
-contains real PRIMASK/IPSR/barrier instructions, not weak success fallbacks.
-FPU policy remains a SoC/toolchain decision and is not required by these primitives.
+Save/restore tokens on the same CPU/thread in strict reverse order. Cortex-M4
+preserves incoming PRIMASK and does not overwrite BASEPRI/FAULTMASK. NMI and
+HardFault remain unmasked. Keep metadata sections short: no blocking, allocation,
+large copies, kernel calls or user callbacks. A saved Arch token is not a kernel
+critical-section token or an SMP lock.
 
-`nx_arch_irq_save` returns an opaque token. Restore tokens on the same CPU/thread
-in reverse order, including a region entered with interrupts already masked.
-Do not sleep, allocate, invoke user callbacks or call kernel APIs while holding
-this region. PRIMASK does not mask NMI/HardFault or protect another CPU.
-FreeRTOS retains its own task/BASEPRI syscall boundary; an architecture token
-cannot be substituted for a kernel token.
-The mask query conservatively checks PRIMASK, BASEPRI and FAULTMASK on
-Cortex-M4. Blocking drivers use it to reject contexts that can mask their
-completion IRQ or tick. Save/restore changes only PRIMASK and does not replace
-the kernel's BASEPRI state.
+Mask/context queries let blocking I/O reject contexts that prevent its progress.
+DMB/DSB/ISB encode different ordering guarantees; they do not prove peripheral
+or DMA quiescence. DWT snapshots are not monotonic deadlines and do not enable
+or reset the counter. Their wrap/frequency limits are documented in the header.
 
-Native uses an independent recursive lock, thread-local nesting and C11 fences.
-It models thread exclusion, not NVIC priority, DMA ordering, ISR timing or
-POSIX signal-safe interrupts. Invalid restore nesting terminates the process in
-Release as well as Debug. Windows and Cortex-M4 require their own target execution
-evidence; Native contract execution alone cannot qualify them.
-
-`tests/arch` checks recursive exclusion, contention, critical-section visibility
-and unchanged HAL atomic behavior. The baremetal contract fixture links an
-explicit CPU model to exercise saved-mask and ISR decisions independently of
-production ports. Real interrupt latency and PRIMASK/BASEPRI preemption remain
-physical target validation.
+Native models recursive exclusion and C11 fences; it does not model real NVIC,
+DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in
+both Debug and Release. Tests in `tests/contracts` cover saved-mask decisions and
+request publication. Actual IRQ latency and CPU timing require HIL.

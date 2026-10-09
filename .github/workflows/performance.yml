@@ -1,4 +1,4 @@
-name: Resource Evidence
+name: Resource Profiles
 
 on:
   schedule:
@@ -9,78 +9,44 @@ permissions:
   contents: read
 
 jobs:
-  memory-check:
-    name: Native Valgrind contracts
-    runs-on: ubuntu-latest
+  profiles:
+    name: Linked costs (${{ matrix.board }})
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          submodules: recursive
-      - uses: ./.github/actions/setup-build
-        with:
-          os: ubuntu-latest
-          preset: linux-gcc-debug
-      - name: Install maintained memory checker
-        run: sudo apt-get update && sudo apt-get install -y valgrind
-      - name: Build native contracts
-        run: |
-          cmake --preset linux-gcc-debug
-          cmake --build --preset linux-gcc-debug --parallel 2
-      - name: Check every executed contract and reject tool errors
-        run: |
-          python scripts/evidence/resource_checks.py memory \
-            --build build/linux-gcc-debug --report build/linux-gcc-debug/memory-report.json
-      - name: Retain memory execution evidence
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: native-memory-check
-          path: |
-            build/linux-gcc-debug/memory-report.json
-            build/linux-gcc-debug/memory-logs/
-            build/linux-gcc-debug/generated/
-          if-no-files-found: error
-          retention-days: 90
-
-  arm-size:
-    name: STM32F407 linked image size (hardware timing pending)
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        preset: [stm32-armgcc-release, stm32-armgcc-freertos-release]
+        include:
+          - board: qiming
+            workloads: empty gpio uart
+          - board: sky
+            workloads: empty gpio uart
+          - board: liangshan
+            workloads: empty gpio uart spi
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
+          submodules: false
+          fetch-depth: 0
       - uses: ./.github/actions/setup-build
         with:
-          os: ubuntu-latest
-          preset: ${{ matrix.preset }}
-      - name: Build the target image
-        run: |
-          cmake --preset "${{ matrix.preset }}"
-          cmake --build --preset "${{ matrix.preset }}" --parallel 2
-      - name: Measure actual linked sections, reject missing images/tools
-        run: |
-          python scripts/ci/validate_firmware_elf.py \
-            --build-dir "build/${{ matrix.preset }}" \
-            --report "build/${{ matrix.preset }}/firmware-static-contract.json"
-          python scripts/evidence/resource_checks.py size \
-            --build "build/${{ matrix.preset }}" \
-            --report "build/${{ matrix.preset }}/size-report.json"
-      - name: Retain section measurements and map evidence
+          preset: resource-profiles
+          arm: 'true'
+      - name: Measure real minimum workloads and fail budget violations
+        run: >-
+          .venv/bin/python tools/measurement/compare.py
+          --assembly tools/configure/assemblies/${{ matrix.board }}-baremetal.json
+          --build-root build/profiles-${{ matrix.board }}
+          --compiler "$(command -v arm-none-eabi-gcc)"
+          --cmake .venv/bin/cmake --ninja .venv/bin/ninja
+          --workloads ${{ matrix.workloads }}
+      - name: Preserve profile identity, maps and actual costs
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: arm-size-${{ matrix.preset }}
-          path: |
-            build/${{ matrix.preset }}/size-report.json
-            build/${{ matrix.preset }}/firmware-static-contract.json
-            build/${{ matrix.preset }}/bin/*.elf
-            build/${{ matrix.preset }}/bin/*.map
-            build/${{ matrix.preset }}/generated/
+          name: resource-profiles-${{ matrix.board }}
+          path: build/profiles-${{ matrix.board }}/
           if-no-files-found: error
-          retention-days: 90
+          retention-days: 30
+      # SPI board profiles are limited to maintained wiring. No measured
+      # MCU cycles, IRQ latency, dynamic high-water or power-loss claim is made.

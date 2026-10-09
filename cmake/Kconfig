@@ -1,6 +1,0 @@
-# CMake owns compilers, flags and build mode. Kconfig records selected identity
-# and configures embedded behavior; it never changes a selected toolchain.
-menu "Build Identity"
-source "cmake/Kconfig.build"
-source "cmake/Kconfig.toolchain"
-endmenu

@@ -26,6 +26,7 @@ CONTROL_FILES = {
     ".pre-commit-config.yaml", BASELINE_PATH,
     "dependencies/development-tools.txt", "scripts/tools/format.py",
     "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
+    "dependencies/environment.lock.json",
     ".kiro/steering/comment-standards.md",
     "docs/sphinx/development/coding_standards.rst",
 }

@@ -35,11 +35,11 @@ jobs:
 
       - name: Build Sphinx (English)
         working-directory: docs/sphinx
-        run: sphinx-build -b html . _build/html/en
+        run: sphinx-build -n -W --keep-going -b html . _build/html/en
 
       - name: Build Sphinx (Chinese)
         working-directory: docs/sphinx
-        run: sphinx-build -b html -D language=zh_CN . _build/html/zh_CN
+        run: sphinx-build -n -W --keep-going -b html -D language=zh_CN . _build/html/zh_CN
 
       - name: Prepare Pages
         run: |

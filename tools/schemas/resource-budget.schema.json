@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus resource-budget",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "flash_loaded_max": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "flash_footprint_max": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "ram_reserved_max": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 4294967295
+      }
+    },
+    "msp_max": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "heap_max": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    }
+  },
+  "required": [
+    "schema_version",
+    "flash_loaded_max",
+    "flash_footprint_max",
+    "ram_reserved_max",
+    "msp_max",
+    "heap_max"
+  ]
+}

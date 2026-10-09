@@ -1,6 +1,6 @@
 # 接入、资源装配与源码 SDK 合同
 
-> **PROPOSED — 未实现的设计提案。** 本文中的 schema、命令、生成物和 API 是拟议合同，不代表当前源码已实现，也不构成三块开发板的硬件支持或产品发布承诺。
+> 下一代接入合同。已实现模式及实际验收见[当前交付](../delivery/README.md)；精确 schema 和公共 API 以 `tools/configure/` 与当前头文件为准。示意命令不构成三块开发板的物理资格或产品发布承诺。
 
 本文说明通用平台如何接入 CPU、SoC、Board、外部器件、协议和组件，以及外部工程如何形成可审核的固件。总体边界见 [下一代平台设计](next-generation-platform.md)，开发、验证和维护流程见 [工程手册](engineering-handbook.md)。
 

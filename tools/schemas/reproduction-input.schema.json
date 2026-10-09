@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus reproduction-input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "source": {
+      "type": "object"
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "toolchain": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "files",
+        "bytes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "assembly": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "elf",
+        "bin"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "elf": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bin": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "source_date_epoch": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "source_sdk": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "size"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "source",
+    "environment",
+    "toolchain",
+    "assembly",
+    "commands",
+    "artifacts",
+    "source_date_epoch",
+    "source_sdk"
+  ]
+}

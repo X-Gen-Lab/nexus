@@ -1,1 +1,0 @@
-# Validation and its regression tests use only Python standard library.

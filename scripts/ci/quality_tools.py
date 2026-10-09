@@ -13,19 +13,17 @@ import shlex
 import subprocess
 import tempfile
 
-OWNED = {"arch", "runtime", "hal", "osal", "framework", "services", "platforms", "boards", "soc"}
+OWNED = {"core", "io", "os", "components", "arch", "boards", "soc", "tools"}
 
-# These production drivers need a host register model to be compiled in the
-# Native database. Their translation units include the actual production .c;
-# selecting the explicit model preserves its real defines and include order.
+# Register models compile the production translation units separately with
+# their actual model defines. The compilation database is the scope authority.
 HOST_MODELS = {
-    "tests/drivers/gd32f470/test_uart.c": "soc/gd32f470/controllers/uart.c",
-    "tests/drivers/gd32f470/test_spi.c": "soc/gd32f470/controllers/spi.c",
-    "tests/drivers/gd32f470/test_timebase.c": "soc/gd32f470/interrupt.c",
+    "tests/contracts/os_freertos_runtime/posix_event.c":
+        "tests/contracts/os_freertos_runtime/posix_event.c",
 }
 
 # Required portable-C correctness profile. Advisory exclusions and their
-# reviewed rationale live in docs/implementation/quality-gates.md.
+# reviewed rationale live in docs/design/engineering-handbook.md.
 TIDY_CHECKS = ",".join((
     "-*", "clang-analyzer-*", "bugprone-*", "cert-*",
     "-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling",
@@ -248,7 +246,7 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                     invocations.append([tool, entry["file"], "-p", str(directory),
                      "--checks=" + TIDY_CHECKS,
                      "--warnings-as-errors=*",
-                     "--header-filter=" + str(root.resolve()) + "/(arch|runtime|hal|osal|framework|services|platforms|boards|soc)/.*"])
+                     "--header-filter=" + str(root.resolve()) + "/(core|io|os|components|arch|boards|soc|tools)/.*"])
             else:
                 invocations = []
             failed = False
@@ -280,6 +278,7 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                         observed = predefines(entry, output)
                         invocations.append([tool, "--project=" + str(directory / "compile_commands.json"),
                                             *observed, "--enable=warning,performance,portability",
+                                            "--check-level=exhaustive",
                                             "--error-exitcode=2", "--xml", "--xml-version=2",
                                             "--suppress=missingIncludeSystem"])
                 for argv in invocations:

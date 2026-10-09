@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "board_package": "../../../boards/native_reference",
+  "backend": "native",
+  "clock_profile": "model",
+  "controllers": [],
+  "devices": [],
+  "memory_budgets": {
+    "main_stack_bytes": 2048,
+    "flash_load_bytes": 65536,
+    "static_ram_bytes": 32768,
+    "libc_heap_bytes": 0
+  },
+  "layout": null,
+  "optimization": "Os"
+}

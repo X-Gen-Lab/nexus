@@ -114,7 +114,7 @@ class ChangePathsTests(unittest.TestCase):
         for path in paths:
             with self.subTest(path=path):
                 self.assertEqual(self.decisions([("modified", path)]),
-                                 {"build-test": True, "code-quality": True, "docs": True})
+                                 {"build-test": True, "code-quality": True, "tool-contracts": True, "docs": True})
 
     def test_build_configuration_and_dependency_identity_require_builds(self):
         paths = (
@@ -166,9 +166,10 @@ class ChangePathsTests(unittest.TestCase):
             with self.subTest(changes=changes):
                 outputs = classify(self.filters, changes)
                 self.assertEqual(required_jobs(outputs, "pull_request"),
-                                 {"build-test": False, "code-quality": True, "docs": True})
+                                 {"build-test": False, "code-quality": True, "tool-contracts": False, "docs": True})
                 needs = {"changes": {"result": "success", "outputs": outputs},
                          "build-test": {"result": "skipped"}, "code-quality": {"result": "success"},
+                         "tool-contracts": {"result": "skipped"},
                          "docs": {"result": "success"}}
                 self.assertTrue(check_required_jobs(needs, "pull_request").passed)
                 needs["docs"]["result"] = "skipped"

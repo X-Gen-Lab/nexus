@@ -1,61 +1,56 @@
-name: Enterprise Delivery Tools
+name: Tool Contracts
 
 on:
+  workflow_call:
   push:
     branches: [main, develop, 'codex/**']
-    paths:
-      - 'scripts/evidence/**'
-      - 'scripts/hil/**'
-      - 'scripts/manufacturing/**'
-      - 'docs/requirements/**'
-      - 'docs/strategy/backlog.csv'
-      - '.github/maintainer-roles.json'
-      - '.github/workflows/enterprise-tools.yml'
+    paths: ['tools/**', 'tests/contracts/**', 'scripts/ci/**', 'cmake/package/**', '.github/workflows/**']
   pull_request:
-    paths:
-      - 'scripts/evidence/**'
-      - 'scripts/hil/**'
-      - 'scripts/manufacturing/**'
-      - 'docs/requirements/**'
-      - 'docs/strategy/backlog.csv'
-      - '.github/maintainer-roles.json'
-      - '.github/workflows/enterprise-tools.yml'
+    paths: ['tools/**', 'tests/contracts/**', 'scripts/ci/**', 'cmake/package/**', '.github/workflows/**']
   workflow_dispatch:
 
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  delivery-contracts:
-    name: Delivery contracts and requirement consistency
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        python: ['3.11', '3.13']
+  tooling:
+    name: Configuration, evidence and SDK failure boundaries
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: ${{ matrix.python }}
-      - name: Exercise adapter and tamper failure boundaries
-        shell: bash
+          submodules: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-build
+        with:
+          preset: native-debug
+          arm: 'true'
+      - name: Use the installed CLI tools for real consumer builds
+        run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+      - name: Execute configuration rejection and atomic generation
+        run: .venv/bin/python -m unittest discover -s tools/configure -p 'test_*.py' -v
+      - name: Execute tamper, budget, HIL and relocated SDK boundaries
         run: |
-          mkdir -p build/evidence
-          openssl version
-          python -m unittest discover -s scripts/evidence -p 'test_*.py' -v \
-            2>&1 | tee build/evidence/enterprise-tools-tests.log
-      - name: Validate approved roles and requirement mapping
-        run: python scripts/evidence/check_traceability.py --report build/evidence/traceability.json
-      - name: Preserve consistency result
+          mkdir -p build/quality
+          .venv/bin/python -m unittest discover -s tests/contracts -p 'test_*.py' -v             2>&1 | tee build/quality/tool-contracts.log
+        env:
+          NEXUS_ARM_GCC: arm-none-eabi-gcc
+      - name: Execute commit and analyzer orchestration boundaries
+        run: |
+          .venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message
+          .venv/bin/python -m unittest discover -s scripts/ci -p 'test_quality_tools.py'
+          .venv/bin/python .github/workflows/test_platform_ci.py
+      - name: Preserve executed tool evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: enterprise-tool-contracts-python-${{ matrix.python }}
-          path: |
-            build/evidence/traceability.json
-            build/evidence/enterprise-tools-tests.log
+          name: tool-contracts
+          path: build/quality/tool-contracts.log
           if-no-files-found: error
-      # Adapter fixtures do not use hardware. Physical HIL must be run on a
-      # reviewed lab station manifest, not on an untrusted pull-request runner.
+      # A station template with no probe/serial binding is rejected. These
+      # software tests do not open a production station or establish board HIL.

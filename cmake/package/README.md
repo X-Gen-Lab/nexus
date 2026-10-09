@@ -1,54 +1,82 @@
-# 可重定位 Source SDK
+# Relocatable Nexus source SDK
 
-本包分发源码，消费工程重新生成有效配置并编译实际平台、startup 和 linker；它不是 binary SDK，也没有跨编译器/配置的预编译 ABI 承诺。当前维护范围是 Native、STM32F407 与 GD32F470，包准备不下载依赖。
+Nexus 1.0 exports reusable platform sources. The consumer owns its assembly,
+application sources, compiler, ABI, workers and resource budgets. Vendor headers
+and concrete provider storage stay private. No precompiled MCU binary ABI or
+application generator is exported.
 
-## 准备与校验
-
-必须使用干净、真实 Git checkout，并初始化 `ext/freertos`、`vendors/arm/CMSIS_5`、STM32F4 device/HAL 及其必要递归依赖。GD32 reviewed import、许可证与固定工具链 lock 同时绑定。
+Prepare from an initialized, clean, committed checkout:
 
 ```sh
-python3 -B cmake/package/package_source_sdk.py \
-  --source /path/to/nexus --output '/path/to/nexus sdk prefix'
-python3 -B '/path/to/nexus sdk prefix/share/nexus/src/cmake/package/package_source_sdk.py' \
-  --verify '/path/to/nexus sdk prefix/share/nexus/src'
+python cmake/package/package_source_sdk.py --source . --output /tmp/nexus-sdk
 ```
 
-已配置 Nexus 的完整 checkout 也可调用：
+The package records the source commit/tree, every packaged file hash, required
+recursive dependency commits/trees, the reviewed GD32 import and license notices.
+The installed CMake package verifies those bytes before configuring a consumer.
+Modified, missing, extra or symlinked files fail verification. Preparation and
+verification do not fetch missing dependencies.
+
+A dirty checkout can produce an explicitly nonpublishable development fixture
+with `--development-fixture`. Its consumers must deliberately set
+`NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`. This does not qualify a release.
+
+Move the complete prefix, then consume it from an independent project:
 
 ```cmake
-nexus_package_source_sdk(OUTPUT_DIRECTORY "/path/to/nexus sdk prefix")
-```
-
-输出必须在输入 checkout 外且尚不存在；失败不会留下半个包。移动整个 prefix 即可重定位：`lib/cmake/Nexus` 保存 package config/version，`share/nexus/src` 保存真实源码、依赖、许可和 `.nexus-source-sdk.json`。固定 Git 依赖使用原始 committed blobs 导出，避免 checkout 的 EOL filter 改变 commit 字节身份。
-
-Manifest 记录真实 source commit/tree、完整逐文件摘要、所有必要依赖 commit/tree、GD32 source import 与工具链 lock；两个导出 CMake 文件另外绑定摘要。哈希用于内容与 provenance 一致性，包是未签名源码快照，`publishable=true` 不代表产品发布 promotion 或实板资格。
-
-## 外部消费
-
-父工程须选择自己的配置、Board/layout 和工具链；一组 build root 只允许一份 Nexus。普通应用通过公开目标和头文件消费，两个版本的包不能在同一次构建内混用。
-
-```cmake
-cmake_minimum_required(VERSION 3.21)
-project(external_firmware LANGUAGES C CXX ASM)
-find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)
-nexus_add_application(TARGET firmware SOURCES main.c)
+cmake_minimum_required(VERSION 3.31)
+project(my_device LANGUAGES C ASM)
+set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.json")
+find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)
+nexus_add_firmware(my_device SOURCES main.c)
 ```
 
 ```sh
-cmake -S /path/to/application -B /path/to/application-build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  '-DNexus_DIR=/path/to/nexus sdk prefix/lib/cmake/Nexus' \
-  '-DNEXUS_CONFIG_FILE=/path/to/application/platform.conf' \
-  -DNEXUS_EXPECTED_SOURCE_REVISION=<expected-full-source-commit>
-cmake --build /path/to/application-build
+cmake -S . -B build -G Ninja \
+  -DNexus_DIR=/relocated/nexus-sdk/lib/cmake/Nexus \
+  -DCMAKE_TOOLCHAIN_FILE=/relocated/nexus-sdk/share/nexus/src/cmake/toolchains/arm-gcc.cmake
+cmake --build build
 ```
 
-ARM 工程在首次 configure、`project()` 之前通过 `CMAKE_TOOLCHAIN_FILE=<prefix>/share/nexus/src/cmake/toolchains/arm-gcc.cmake` 选择工具链，并设定 `NEXUS_PLATFORM`。工具链程序由调用者提供并按包内 lock/交付流程验证，不随 SDK 捆绑；有效配置、工具链、Board、layout 与工件身份属于该消费构建。
+An assembly chooses a reviewed Board package, exact part, clock, OS backend,
+explicit controller modes, device endpoints and memory budgets. Relative Board
+paths are relative to the assembly, including when it is outside the SDK.
+`NEXUS_EXPECTED_SOURCE_REVISION` can enforce a consumer-approved exact revision.
+Native models use a host compiler and omit the ARM toolchain argument.
 
-本包不包含平台开发测试目录与 Googletest，不接受 `NEXUS_BUILD_TESTS=ON` 或 `NEXUS_BUILD_CONTRACTS=ON`。完整 checkout 的契约/质量门禁独立执行，外部应用的业务与实板测试由其仓库拥有。
+`Nexus::Core`, `Nexus::Arch`, `Nexus::IO`, `Nexus::Platform` and optional component
+or OS targets expose their own includes and dependencies. `nexus_add_firmware`
+links explicit sources, selected components, startup, generated bindings and the
+resolved linker input. It does not create `main`, tasks or a scheduler. Consumers
+start hardware with `nx_platform_start`; generated `nx_binding_<id>` and
+`nx_device_<id>` symbols are fixed typed aliases. Backend and application startup
+order remains explicit in consumer code.
 
-## 开发 fixture
+Every MCU firmware produces ELF, BIN, map and a checked resource report. The ELF
+contains the configuration digest and the real startup vector. Default MCU ABI
+is Cortex-M4F, FPv4-SP-D16, hard float and short enums; consumers inherit those
+flags through Nexus targets. C++ consumers should use their declared embedded
+runtime policy, such as `-fno-exceptions -fno-rtti` for the tested source SDK path.
 
-架构重构工作树可以显式使用 `--development-fixture`，或 CMake `DEVELOPMENT_FIXTURE` 参数，生成 `publishable=false` 的独立 snapshot。它仍校验全部必要依赖和真实文件，不伪造“当前 commit 已含所有修改”。消费必须显式开启 `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`；基础构建 source identity 会增加 snapshot 摘要，不得用于发布 promotion。
+The maintained boundary test is `tests/contracts/test_source_sdk.py`. It packages
+the real checkout, relocates into a path with spaces, verifies byte tamper and
+identity rejection, executes independent Native C/C++ consumers and links both
+STM32F407 and GD32F470 C/C++ consumers with actual startup/linker/resource gates.
+Those software checks do not establish physical Board qualification.
 
-开发回归运行 `python3 -B cmake/package/test_source_sdk.py -v`：移动包到含空格路径，在不同父 Git 身份下构建/运行 C 与 C++ Native consumer，并在 ARM GNU 可用时真实编译两个 MCU ELF、验证真实向量/startup/linker。缺少 ARM 时明确 skip，不能据此宣称 ARM 验证。干净提交交付前应另外以默认严格模式准备 source package，并重新执行其消费矩阵。
+Release automation verifies an existing publishable installed prefix with the
+same consumer template, without the development opt-in:
+
+```sh
+python cmake/package/verify_consumers.py \
+  --prefix /relocated/nexus-sdk --output build/installed-sdk-check
+```
+
+`verification.json` and per-command logs retain actual arguments and exit codes.
+This command fails for development fixtures, missing tools, any compile/run/link
+failure, leaked private includes or failed ELF resource/configuration binding.
+An old owned verification directory is invalidated before a new attempt.
+
+The package includes the repository formatter and comment-policy files. Git
+commit hooks and whole-checkout lint workflows remain repository maintenance
+tools; they are not installed into the consumer's Git repository by `find_package`.

@@ -1,24 +1,25 @@
-# Nexus 下一代设计
+# 当前设计与实施台账
 
-状态：**PROPOSED，待实现**。本目录从第一性原理定义下一代平台，不将现有API、目录、Kconfig、factory、OSAL或工作流视为必须保留的约束。用户已授权破坏性重构。
+当前代码已按第一性原理蓝图重构到统一物理目录。公共C11路径是静态装配、固定
+typed I/O、caller-owned request；SDK和provider storage私有；应用产品工程独立。
+这里的设计合同与 [当前交付](../delivery/README.md) 一起使用，历史文档不建立当前资格。
 
-代码格式、命名和注释风格遵循现有仓库规范：根目录.clang-format/.editorconfig、贡献指南及Doxygen注释模板。后续架构重构保持这些形式一致。
-
-这里交付的是设计与执行计划。生产实现、现有支持矩阵和历史证据未因新增文档而改变。现状参见 [当前架构](../strategy/target-architecture.md) 和 [当前支持范围](../strategy/support-matrix.yaml)。
-
-| 文档 | 作用 |
+| 文档 | 用途 |
 |---|---|
-| [架构蓝图](next-generation-platform.md) | 原理、静态运行模型、设备/请求、并发、内存、性能与交付边界 |
-| [工程手册](engineering-handbook.md) | 工具、风格、注释、代码评审、自动化、证据和发布流程 |
-| [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程接入、资源校验与资格范围 |
-| [执行清单](next-generation-execution.csv) | 分批任务、依赖、角色、软件/物理退出条件；全部初始为planned |
+| [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
+| [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
+| [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程的严格资源合同 |
+| [33项实施台账](next-generation-execution.csv) | 实现文件、证据入口、软件与物理状态分列 |
+| [实际架构](../delivery/architecture.md) | 最终目录和依赖方向，旧factory/Kconfig迁移 |
+| [当前资格边界](../delivery/qualification.md) | 开发执行、clean软件候选、实板pending的区别 |
 
-默认方向是编译期静态装配、固定typed端口、caller-owned请求、真实执行状态、按实例资源预算。配置采用SoC/Board/外部assembly三类输入，一份resolved结果；CMake仍是代码依赖权威。
+台账保留B0–B6和原始退出条件，新增implementation_paths/evidence_paths、software_status、
+hardware_status。implemented表示机制已经存在，不表示所有退出条件已passed；开发验证
+不能替代clean-source SDK、正式离线双构建和候选封存。NG028/030的正式执行以新生成
+证据更新，硬件未接入，全部适用物理项not_executed。Glob表示同一机制的明确目录族，
+不代表递归发现或缺省构建；X-Gen-Lab/nexus-examples路径是独立外部仓库。
 
-首阶段针对STM32F407ZG启明欣欣V3.1、STM32F407VE天空星青春版和GD32F470ZG梁山派，裸机/FreeRTOS及Native模型。业务任务、产品策略与私有Board继续位于外部工程。硬件未接入，物理验证状态保持未执行。
-
-阅读文档不等于接受所有设计决策。实施以垂直切片验证成本和契约，再逐批替换旧实现；新源码必须获得新的软件和产物证据。
-
-执行清单的角色沿用十人配置：TL为技术负责人；K1/K2为core、IO和OS；B1/B2分别负责STM32/GD32与Board；I1/I2负责器件和通信；Q1/Q2负责软件QA与HIL；R1负责构建发布。尚未指派实际人员。
-
-清单采用B0–B6批次，33项初始状态均为planned。多值字段以分号分隔；`primary_role`的首项承担任务关闭责任，其余项共同实现，`review_roles`列出独立审查所需领域。`legacy_rf_refs`仅用于定位已有需求和风险，不继承旧实现状态或验收结果。
+首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/
+FreeRTOS及Native模型。三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
+Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、
+构建发布1；实际人员与branch protection另行配置。

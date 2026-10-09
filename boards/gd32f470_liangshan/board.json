@@ -1,105 +1,64 @@
 {
-  "schema": 1,
+  "schema_version": 1,
   "id": "gd32f470zg-liangshan",
-  "soc": "gd32f470zg",
-  "hse_hz": 25000000,
-  "interface_target": "board_gd32f470_liangshan",
-  "object_targets": [
-    "board_gd32f470_wiring"
-  ],
-  "inputs": [
-    "CMakeLists.txt",
-    "nexus_board.h",
-    "board.h",
-    "board.c"
-  ],
-  "resources": [
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470",
+  "source_revision": "first-party-reference-pages-retrieved-2026-10-09",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000
+  },
+  "bindings": [
     {
-      "id": "status-led",
-      "kind": "gpio",
-      "when": "CONFIG_GD32_GPIO_ENABLE",
-      "pins": [
-        {
-          "port": "D",
-          "pin": 7,
-          "af": 0,
-          "signal": "led",
-          "initial": 0
-        }
-      ]
+      "id": "status_led",
+      "controller": "GPIOD",
+      "route": "gpiod7",
+      "initial": 0,
+      "mask": 128
     },
     {
       "id": "console",
-      "kind": "uart",
-      "instance": 0,
-      "when": "CONFIG_GD32_UART_ENABLE",
-      "clock": "USART0",
-      "irq": 37,
-      "priority": 5,
-      "pins": [
-        {
-          "port": "A",
-          "pin": 9,
-          "af": 7,
-          "signal": "tx"
-        },
-        {
-          "port": "A",
-          "pin": 10,
-          "af": 7,
-          "signal": "rx"
-        }
-      ]
+      "controller": "USART0",
+      "route": "usart0-pa9-pa10"
     },
     {
-      "id": "spi-flash",
-      "kind": "spi",
-      "instance": 4,
-      "when": "CONFIG_GD32_SPI_ENABLE",
-      "clock": "SPI4",
-      "irq": 85,
-      "priority": 5,
-      "pins": [
-        {
-          "port": "F",
-          "pin": 7,
-          "af": 5,
-          "signal": "sck"
-        },
-        {
-          "port": "F",
-          "pin": 8,
-          "af": 5,
-          "signal": "miso"
-        },
-        {
-          "port": "F",
-          "pin": 9,
-          "af": 5,
-          "signal": "mosi"
-        },
-        {
-          "port": "F",
-          "pin": 6,
-          "af": 0,
-          "signal": "cs0",
-          "initial": 1
-        }
-      ]
+      "id": "spi_flash",
+      "controller": "SPI4",
+      "route": "spi4-pf6-pf9",
+      "initial": 1
     },
     {
-      "id": "rs485-de",
-      "kind": "gpio",
-      "when": "CONFIG_GD32_RS485_ENABLE",
-      "pins": [
-        {
-          "port": "B",
-          "pin": 1,
-          "af": 0,
-          "signal": "de",
-          "initial": 0
-        }
-      ]
+      "id": "internal_flash",
+      "controller": "FMC",
+      "route": "physical-flash"
+    },
+    {
+      "id": "watchdog",
+      "controller": "FWDGT",
+      "route": "independent-watchdog"
+    }
+  ],
+  "reserved_resources": [
+    "TIMER1"
+  ],
+  "unknowns": [
+    "Physical PCB revision, oscillator and connector continuity are unobserved.",
+    "SPI external NOR fitted part is unknown; no product partition is reserved.",
+    "I2C, PWM, ADC and EXTI external connector/electrical routes are not Board bindings.",
+    "All physical IRQ, timing, reset, power-cut and electrical qualification is unexecuted."
+  ],
+  "provenance": [
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/led-lib.html",
+      "scope": "LED2 PD7 active high"
+    },
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/uart.html",
+      "scope": "USART0 PA9/PA10 AF7"
+    },
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/spi-flash.html",
+      "scope": "SPI4 PF6 CS, PF7/PF8/PF9 AF5"
     }
   ]
 }

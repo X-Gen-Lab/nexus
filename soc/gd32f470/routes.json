@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpiod7",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "usart0-pa9-pa10",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "USART0",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA10",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "spi4-pf6-pf9",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "SPI4",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PF6",
+          "function": "cs",
+          "af": 0
+        },
+        {
+          "pin": "PF7",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PF8",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PF9",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "i2c0-pb6-pb7",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "I2C0",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB7",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "exti3-pe3",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "EXTI3",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PE3",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "timer2-pa6",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "TIMER2",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch0",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "adc0-pa0",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "ADC0",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "channel0",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "physical-flash",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "FMC",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-word"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/userManual/GD32F4xx_User_Manual_Rev3.3.pdf"
+    },
+    {
+      "id": "independent-watchdog",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "FWDGT",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/userManual/GD32F4xx_User_Manual_Rev3.3.pdf"
+    },
+    {
+      "id": "adc0-pa0-pa1",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "ADC0",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "channel0",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "channel1",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    }
+  ]
+}

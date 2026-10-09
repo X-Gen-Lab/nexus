@@ -18,7 +18,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.root = Path(self.workspace.name)
         self.build = self.root / "build"
         self.build.mkdir()
-        self.source = self.root / "services" / "sample.c"
+        self.source = self.root / "components" / "sample.c"
         self.source.parent.mkdir()
         self.source.write_text("int sample(void) { return 1; }\n")
         self.report = self.root / "reports" / "analysis.txt"
@@ -65,8 +65,8 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.database([self.source, Path("/tmp/foreign.c"), self.root / "vendors" / "sdk.c"])
         self.assertEqual(len(commands(self.root, self.build)), 1)
 
-    def test_runtime_is_owned_and_external_product_is_not(self):
-        runtime = self.root / "runtime" / "bootstrap.c"
+    def test_core_is_owned_and_external_product_is_not(self):
+        runtime = self.root / "core" / "bootstrap.c"
         runtime.parent.mkdir()
         runtime.write_text("int bootstrap(void) { return 0; }\n")
         product = self.root / "products" / "private.c"
@@ -76,39 +76,38 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual([entry['file'] for entry in commands(self.root, self.build)],
                          [str(self.source), str(runtime)])
 
-    def test_explicit_production_host_models_retain_actual_compilation_scope(self):
-        modeled = []
-        for fixture, production in (
-            ('tests/drivers/gd32f470/test_uart.c', 'soc/gd32f470/controllers/uart.c'),
-            ('tests/drivers/gd32f470/test_spi.c', 'soc/gd32f470/controllers/spi.c'),
-            ('tests/drivers/gd32f470/test_timebase.c', 'soc/gd32f470/interrupt.c'),
-        ):
-            source = self.root / production
-            source.parent.mkdir(parents=True, exist_ok=True)
-            source.write_text('int production_driver;\n')
-            model = self.root / fixture
-            model.parent.mkdir(parents=True, exist_ok=True)
-            model.write_text('#include "' + str(source) + '"\n')
-            modeled.append(model)
-        ordinary_test = self.root / 'tests/ordinary.c'
-        ordinary_test.write_text('int test_fixture;\n')
-        self.database([self.source, *modeled, ordinary_test, self.root / 'vendors/sdk.c'])
+    def test_owned_posix_event_support_is_analyzed(self):
+        support = self.root / "tests/contracts/os_freertos_runtime/posix_event.c"
+        support.parent.mkdir(parents=True)
+        support.write_text("int event_support;\n")
+        self.database([support])
         selected = commands(self.root, self.build)
-        self.assertEqual(len(selected), 4)
-        self.assertEqual([entry['file'] for entry in selected[1:]], list(map(str, modeled)))
-        self.assertTrue(all(entry['nexus_analysis_scope'] == 'host-model' for entry in selected[1:]))
-        self.assertEqual(selected[1]['nexus_production_source'], 'soc/gd32f470/controllers/uart.c')
-        self.assertEqual(run('tidy', self.root, self.build, self.tool(0), self.report), 0)
-        self.assertIn('"kind": "host-model"', self.report.read_text())
-        self.assertIn('do not establish ARM execution', self.report.read_text())
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
+        self.assertEqual(selected[0]["nexus_production_source"],
+                         "tests/contracts/os_freertos_runtime/posix_event.c")
 
-    def test_a_host_model_without_its_production_source_fails(self):
-        model = self.root / 'tests/drivers/gd32f470/test_spi.c'
+    def test_register_models_use_actual_production_compilation_entries(self):
+        source = self.root / "soc/gd32f470/drivers/uart.c"
+        source.parent.mkdir(parents=True)
+        source.write_text("int production_driver;\n")
+        model = self.root / "tests/contracts/gd32_io_test.c"
         model.parent.mkdir(parents=True)
-        model.write_text('#include "missing-driver.c"\n')
-        self.database([model])
-        with self.assertRaisesRegex(ValueError, 'missing modeled production source'):
-            commands(self.root, self.build)
+        model.write_text("int model_test;\n")
+        entries = [
+            {"file": str(source), "directory": str(self.root),
+             "arguments": ["cc", "-DNX_REGISTER_MODEL=1", "-c", str(source)]},
+            {"file": str(source), "directory": str(self.root),
+             "arguments": ["cc", "-DGD32F470=1", "-c", str(source)]},
+            {"file": str(model), "directory": str(self.root),
+             "arguments": ["cc", "-c", str(model)]},
+        ]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        selected = commands(self.root, self.build)
+        self.assertEqual(len(selected), 2)
+        self.assertEqual(selected[0]["arguments"][1], "-DNX_REGISTER_MODEL=1")
+        self.assertEqual(selected[1]["arguments"][1], "-DGD32F470=1")
+        self.assertTrue(all(e["nexus_analysis_scope"] == "production" for e in selected))
 
     def test_malformed_database_fails(self):
         (self.build / "compile_commands.json").write_text("{}")
@@ -165,6 +164,7 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(run("cppcheck", self.root, self.build, self.recording_analyzer(), self.report), 0)
         analyzed = [json.loads(line) for line in self.analyzer_log.read_text().splitlines()]
         self.assertEqual(len(analyzed), 2)
+        self.assertIn("--check-level=exhaustive", analyzed[0])
         self.assertIn("-D__GNUC__=17", analyzed[0])
         self.assertIn("-D__arm__=1", analyzed[0])
         self.assertIn("-D__SIZEOF_POINTER__=4", analyzed[0])
@@ -232,10 +232,10 @@ class RequiredAnalysisTests(unittest.TestCase):
         (self.root / 'CMakeLists.txt').write_text(
             'cmake_minimum_required(VERSION 3.21)\nproject(quality_database_contract C)\n'
             'set(CMAKE_C_STANDARD 11)\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-            'add_library(first OBJECT services/sample.c)\n'
+            'add_library(first OBJECT components/sample.c)\n'
             'target_include_directories(first PRIVATE "${CMAKE_SOURCE_DIR}/headers first")\n'
             'target_compile_definitions(first PRIVATE PROFILE_VALUE=17)\n'
-            'add_library(second OBJECT services/sample.c)\n'
+            'add_library(second OBJECT components/sample.c)\n'
             'target_include_directories(second PRIVATE "${CMAKE_SOURCE_DIR}/headers second")\n'
             'target_compile_definitions(second PRIVATE PROFILE_VALUE=23)\n')
         for argv in (['cmake', '-S', str(self.root), '-B', str(self.build)],

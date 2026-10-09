@@ -1,23 +1,5 @@
-# 脚本交付验证系统依赖
-
-# 核心依赖
-pathlib2>=2.3.0; python_version < '3.4'
-kconfiglib==14.1.0  # Kconfig 解析库
-windows-curses>=2.3.0; sys_platform == 'win32'  # Windows 上的 menuconfig 支持
-
-# 测试依赖
-pytest>=7.0.0
-pytest-cov>=4.0.0
-hypothesis>=6.0.0
-
-# 报告生成依赖
-jinja2>=3.0.0
-markdown>=3.0.0
-
-# 开发依赖
-black>=22.0.0
-flake8>=5.0.0
-mypy>=1.0.0
-
-# 平台特定依赖
-psutil>=5.8.0  # 用于性能监控
+# Optional repository development and workflow validation dependencies.
+# The runtime build/configuration tools themselves use the Python standard library.
+-r dependencies/development-tools.txt
+-r dependencies/environment-tools.txt
+PyYAML==6.0.3

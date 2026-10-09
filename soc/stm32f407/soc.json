@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407",
+  "variants": {
+    "STM32F407VET6": {
+      "package": "LQFP100",
+      "flash": {
+        "origin": 134217728,
+        "size": 524288,
+        "erase_blocks": [
+          16384,
+          16384,
+          16384,
+          16384,
+          65536,
+          131072,
+          131072,
+          131072
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ]
+    },
+    "STM32F407ZGT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_blocks": [
+          16384,
+          16384,
+          16384,
+          16384,
+          65536,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 131072,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ]
+    }
+  },
+  "cpu": {
+    "arch": "cortex-m4",
+    "fpu": "fpv4-sp-d16",
+    "float_abi": "hard"
+  },
+  "clock_profiles": {
+    "hse8-pll168": {
+      "hse_hz": 8000000,
+      "core_hz": 168000000
+    }
+  },
+  "controllers": {
+    "GPIOA": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15"
+      ]
+    },
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15"
+      ]
+    },
+    "GPIOE": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15"
+      ]
+    },
+    "GPIOG": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15"
+      ]
+    },
+    "USART1": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "irq": [
+        "USART1_IRQn"
+      ],
+      "pins": [
+        "PA9",
+        "PA10"
+      ]
+    },
+    "SPI1": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "pins": [
+        "PA5",
+        "PA6",
+        "PA7"
+      ],
+      "max_hz": 42000000
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "irq": [],
+      "pins": [
+        "PB6",
+        "PB7"
+      ],
+      "max_hz": 100000
+    },
+    "FLASH": {
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "IWDG": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "EXTI0": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI0_IRQn"
+      ],
+      "pins": [
+        "PA0"
+      ],
+      "resources": [
+        "exti:line:0"
+      ]
+    },
+    "TIM3": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "pins": [
+        "PA6"
+      ],
+      "resources": [
+        "timer:TIM3"
+      ]
+    },
+    "ADC1": {
+      "kind": "adc",
+      "modes": [
+        "single-shot",
+        "low-rate-scan"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1"
+      ]
+    },
+    "EXTI5": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI9_5_IRQn"
+      ],
+      "pins": [
+        "PA5"
+      ],
+      "resources": [
+        "exti:line:5"
+      ]
+    },
+    "EXTI6": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI9_5_IRQn"
+      ],
+      "pins": [
+        "PA6"
+      ],
+      "resources": [
+        "exti:line:6"
+      ]
+    }
+  },
+  "reserved_resources": [
+    "timer:TIM2",
+    "irq:TIM2_IRQn"
+  ],
+  "source_lock": {
+    "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+    "cmsis_device_f4": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+  },
+  "provenance": [
+    "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+    "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf"
+  ]
+}

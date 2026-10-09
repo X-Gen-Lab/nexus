@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "board": "stm32f407zg-qiming-v31",
+  "part": "STM32F407ZGT6",
+  "transport": "swd",
+  "probe_interfaces": [
+    "stlink",
+    "cmsis-dap",
+    "external-reviewed"
+  ],
+  "serial": {
+    "controller": "USART1",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "physical_status": "not_executed",
+  "pending_qualification": [
+    {
+      "id": "irq_preemption",
+      "fixture": "logic analyzer/timing firmware; priority and load recorded",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "uart_wire_tc_cancel",
+      "fixture": "TX/RX logic analyzer; cancel-vs-TC assertions",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "spi_dma_cs",
+      "fixture": "reviewed slave/loopback and CS/SCK/DMA signal capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "flash_power_loss",
+      "fixture": "controlled supply interrupter, legal external layout and voltage capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "control_jitter",
+      "fixture": "external application worst-load workload and hardware timer capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "i2c_stop_recovery",
+      "fixture": "reviewed slave/fault injection; ACK/NACK/STOP/repeated START and recovery",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "iwdg_reset_cause",
+      "fixture": "isolated outputs and stable supply; irreversible enable/feed/reset cause",
+      "budget": null,
+      "unit": "ms"
+    },
+    {
+      "id": "exti_edge_overflow",
+      "fixture": "signal generator/logic analyzer; edge/priority/loss/stop drain",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "pwm_period_duty",
+      "fixture": "logic analyzer; 0/100pct/shadow update and safe stop output",
+      "budget": null,
+      "unit": "ns"
+    },
+    {
+      "id": "adc_single_scan",
+      "fixture": "calibrated reference/input source; count/accuracy/sample rate/timeout",
+      "budget": null,
+      "unit": "counts"
+    }
+  ]
+}
