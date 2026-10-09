@@ -193,7 +193,11 @@ NX_WEAK uint32_t stm32_spi_board_clock_hz(uint8_t instance) {
     (void)instance;
     return 0;
 }
-NX_WEAK void stm32_spi_board_release(const stm32_spi_board_port_t* request) { (void)request; }
+NX_WEAK nx_status_t stm32_spi_board_release(const stm32_spi_board_port_t* request) {
+    (void)request;
+    /* The matching default prepare rejects wiring before any side effect. */
+    return NX_OK;
+}
 NX_WEAK bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length,
                                               bool write) {
 #if defined(STM32F407xx)

@@ -16,6 +16,13 @@ static SPI_HandleTypeDef* live;
 static stm32_spi_impl_t* live_bus;
 static bool dma_error, duplicate, start_fail, abort_fail, cancel_on_pump, missing_dma;
 static bool board_missing;
+static HAL_StatusTypeDef init_result, deinit_result;
+static nx_status_t board_result, release_result;
+static unsigned inits, deinits, releases, sem_deletes, mutex_deletes;
+static bool sem_create_fails;
+static osal_status_t sem_delete_result, mutex_delete_result;
+static osal_mutex_handle_t live_mutex;
+static osal_sem_handle_t live_sem;
 static unsigned starts, aborts, callbacks, callback_result, give_isr, give_task;
 static unsigned lock_delay, lock_timeout, transfer_timeout, cs_active;
 static uint8_t trace_tx[16];
@@ -59,6 +66,7 @@ nx_status_t stm32_spi_board_prepare(const stm32_spi_board_port_t* port) {
     assert(port->instance==1 && port->dma_tx_enabled==b->dma_tx_enabled);
 
     if (board_missing) return NX_ERR_NOT_SUPPORTED;
+    if (board_result != NX_OK) return board_result;
     live_bus = b;
     tx_dma = (DMA_HandleTypeDef){.Instance=&tx_stream, .Parent=&b->hspi};
     rx_dma = (DMA_HandleTypeDef){.Instance=&rx_stream, .Parent=&b->hspi};
@@ -71,14 +79,18 @@ nx_status_t stm32_spi_board_select(uint8_t instance, uint8_t cs, bool active) {
     return NX_OK;
 }
 uint32_t stm32_spi_board_clock_hz(uint8_t instance) { assert(instance==1); return 16000000; }
-void stm32_spi_board_release(const stm32_spi_board_port_t* port) { assert(port && port->instance==1); }
+nx_status_t stm32_spi_board_release(const stm32_spi_board_port_t* port) {
+    assert(port && port->instance==1); ++releases; return release_result;
+}
 bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length, bool write) {
     (void)write;
     return data && length;
 }
 NX_NORETURN void stm32_spi_dma_failstop(stm32_spi_impl_t* b) { (void)b; abort(); }
-HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef* h) { h->Instance->enabled = true; return HAL_OK; }
-HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef* h) { h->Instance->enabled = false; return HAL_OK; }
+HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef* h) { ++inits; h->Instance->enabled = true; return init_result; }
+HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef* h) {
+    ++deinits; if (deinit_result == HAL_OK) h->Instance->enabled = false; return deinit_result;
+}
 static void trace(SPI_HandleTypeDef* h, uint8_t* data) {
     assert(traces < 16);
     trace_tx[traces] = *data;
@@ -129,8 +141,14 @@ HAL_StatusTypeDef HAL_SPI_Abort(SPI_HandleTypeDef* h) {
 }
 
 typedef struct { unsigned count; } sem_t;
-osal_status_t osal_mutex_create(osal_mutex_handle_t* out) { *out = malloc(1); return *out ? OSAL_OK : OSAL_ERROR_NO_MEMORY; }
-osal_status_t osal_mutex_delete(osal_mutex_handle_t h) { free(h); return OSAL_OK; }
+osal_status_t osal_mutex_create(osal_mutex_handle_t* out) {
+    assert(!live_mutex); *out = malloc(1); live_mutex = *out; return *out ? OSAL_OK : OSAL_ERROR_NO_MEMORY;
+}
+osal_status_t osal_mutex_delete(osal_mutex_handle_t h) {
+    assert(h && h == live_mutex); ++mutex_deletes;
+    if (mutex_delete_result != OSAL_OK) return mutex_delete_result;
+    free(h); live_mutex = NULL; return OSAL_OK;
+}
 osal_status_t osal_mutex_lock(osal_mutex_handle_t h, uint32_t timeout) {
     assert(h); lock_timeout=timeout;
     if (lock_delay > timeout) { now+=timeout; return OSAL_ERROR_TIMEOUT; }
@@ -138,9 +156,15 @@ osal_status_t osal_mutex_lock(osal_mutex_handle_t h, uint32_t timeout) {
 }
 osal_status_t osal_mutex_unlock(osal_mutex_handle_t h) { assert(h); return OSAL_OK; }
 osal_status_t osal_sem_create(uint32_t initial, uint32_t max, osal_sem_handle_t* out) {
-    assert(max == 1); sem_t* s=malloc(sizeof(*s)); s->count=initial; *out=s; return OSAL_OK;
+    assert(max == 1 && !live_sem); *out = NULL;
+    if (sem_create_fails) return OSAL_ERROR_NO_MEMORY;
+    sem_t* s=malloc(sizeof(*s)); assert(s); s->count=initial; *out=s; live_sem=s; return OSAL_OK;
 }
-osal_status_t osal_sem_delete(osal_sem_handle_t h) { free(h); return OSAL_OK; }
+osal_status_t osal_sem_delete(osal_sem_handle_t h) {
+    assert(h && h == live_sem); ++sem_deletes;
+    if (sem_delete_result != OSAL_OK) return sem_delete_result;
+    free(h); live_sem = NULL; return OSAL_OK;
+}
 osal_status_t osal_sem_take(osal_sem_handle_t h, uint32_t timeout) {
     sem_t* s=h;
     while (!s->count && timeout) { pump(); --timeout; }
@@ -160,6 +184,10 @@ static void terminal(void* context, nx_status_t result) {
     ++callbacks; callback_result=result;
 }
 static void setup(stm32_spi_impl_t* b, bool dma) {
+    assert(!live_mutex && !live_sem);
+    init_result = deinit_result = HAL_OK; board_result = release_result = NX_OK;
+    inits=deinits=releases=sem_deletes=mutex_deletes=0;
+    sem_create_fails=false; sem_delete_result=mutex_delete_result=OSAL_OK;
     now=primask=basepri=faultmask=ipsr=0; complete_after=1; live=NULL; traces=0; starts=aborts=callbacks=0;
     dma_error=duplicate=start_fail=abort_fail=cancel_on_pump=missing_dma=board_missing=false;
     lock_delay=lock_timeout=transfer_timeout=give_isr=give_task=cs_active=0;
@@ -402,12 +430,91 @@ static void test_sync_callback_lifecycle_pin(void) {
     assert(d->transfer(d,&t)==NX_OK && c.calls==1);
     finish(&b);
 }
+static void test_partial_cleanup_and_retry(void) {
+    stm32_spi_impl_t b;
+    setup(&b, false);
+    init_result = HAL_ERROR; deinit_result = HAL_ERROR;
+    assert(b.lifecycle.init(&b.lifecycle) == NX_ERR_IO);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_ERROR);
+    assert(b.state->hal_owned && b.state->board_owned && fake_spi.enabled);
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_ERR_IO);
+    assert(!releases && !live_mutex && !live_sem);
+    deinit_result = HAL_OK;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_OK);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_UNINITIALIZED);
+    assert(!fake_spi.enabled && releases == 1);
+    init_result = HAL_OK;
+    assert(b.lifecycle.init(&b.lifecycle) == NX_OK);
+    finish(&b);
+
+    setup(&b, false);
+    board_result = NX_ERR_IO; release_result = NX_ERR_BUSY;
+    assert(b.lifecycle.init(&b.lifecycle) == NX_ERR_IO);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_ERROR);
+    assert(b.state->board_owned && !inits && !deinits);
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_ERR_BUSY);
+    release_result = NX_OK;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_OK && releases == 3);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_UNINITIALIZED);
+
+#ifdef NX_CONFIG_STM32_SPI_USE_OSAL
+    setup(&b, false);
+    assert(b.lifecycle.init(&b.lifecycle) == NX_OK);
+    osal_mutex_handle_t original = b.mutex;
+    mutex_delete_result = OSAL_ERROR_BUSY;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_ERR_BUSY);
+    assert(!b.dma_sem && b.mutex == original && live_mutex == original);
+    assert(sem_deletes == 1 && mutex_deletes == 1 && deinits == 1 && !releases);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_ERROR);
+    mutex_delete_result = OSAL_OK;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_OK);
+    assert(sem_deletes == 1 && mutex_deletes == 2 && deinits == 1 && releases == 1);
+    assert(!live_mutex && !live_sem);
+    assert(b.lifecycle.init(&b.lifecycle) == NX_OK);
+    finish(&b);
+
+    setup(&b, false);
+    assert(b.lifecycle.init(&b.lifecycle) == NX_OK);
+    sem_delete_result = OSAL_ERROR_BUSY;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_ERR_BUSY);
+    assert(b.dma_sem && b.mutex && sem_deletes == 1 && !mutex_deletes && !releases);
+    sem_delete_result = OSAL_OK;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_OK);
+    assert(sem_deletes == 2 && mutex_deletes == 1 && deinits == 1);
+
+    setup(&b, false);
+    sem_create_fails = true; mutex_delete_result = OSAL_ERROR_BUSY;
+    assert(b.lifecycle.init(&b.lifecycle) == NX_ERR_NO_RESOURCE);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_ERROR);
+    assert(b.mutex && !b.dma_sem && !b.state->initialized && !b.state->hal_owned);
+    assert(b.lifecycle.init(&b.lifecycle) == NX_ERR_INVALID_STATE);
+    mutex_delete_result = OSAL_OK;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_OK && !live_mutex);
+    assert(deinits == 1 && releases == 1);
+#endif
+    setup(&b, false);
+    for (unsigned which = 0; which < 3; ++which) {
+        primask = which == 0; basepri = which == 1; faultmask = which == 2;
+        assert(b.lifecycle.init(&b.lifecycle) == NX_ERR_INVALID_STATE);
+        assert(b.lifecycle.deinit(&b.lifecycle) == NX_ERR_INVALID_STATE);
+        assert(!inits && !deinits && !releases && !b.state->transitioning);
+        assert(primask == (which == 0) && basepri == (which == 1) && faultmask == (which == 2));
+    }
+    primask=basepri=faultmask=0;
+    assert(b.lifecycle.init(&b.lifecycle) == NX_OK);
+    primask=1;
+    assert(b.lifecycle.deinit(&b.lifecycle) == NX_ERR_INVALID_STATE && primask == 1);
+    assert(b.lifecycle.get_state(&b.lifecycle) == NX_DEV_STATE_RUNNING && !deinits);
+    primask=0;
+    finish(&b);
+}
 int main(void) {
     test_configuration_and_lifecycle(); test_dma_outcomes();
     test_masked_task_does_not_start_or_dequeue_hardware();
     test_queue_cancel_deadline_and_pool(); test_legacy_copy_and_context();
     test_budget_and_wrap(); test_missing_board_and_dma(); test_seeded_storm(); test_callback_chaining(); test_stale_value_generation_and_exhaustion(); test_sync_callback_lifecycle_pin();
-    printf("STM32 SPI driver contracts: 11 suites, DMA 6 fault/race outcomes + 1000 seeded operations passed (%s)\n",
+    test_partial_cleanup_and_retry();
+    printf("STM32 SPI driver contracts: 12 suites, DMA 6 fault/race outcomes + 1000 seeded operations passed (%s)\n",
 #ifdef NX_CONFIG_STM32_SPI_USE_OSAL
         "OSAL"
 #else

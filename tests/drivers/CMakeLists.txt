@@ -9,6 +9,7 @@ get_filename_component(NEXUS_DRIVER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABS
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_subdirectory(gd32f470)
 endif()
+add_subdirectory(stm32_spi_board_lifecycle)
 set(STM32_SPI_SOURCES
     stm32_spi_device.c stm32_spi_sync.c stm32_spi_async.c
     stm32_spi_dma.c stm32_spi_lifecycle.c stm32_spi_power.c)

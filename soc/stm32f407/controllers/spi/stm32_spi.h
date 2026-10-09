@@ -17,9 +17,9 @@ static inline nx_status_t spi_board_prepare(stm32_spi_impl_t* bus) {
     stm32_spi_board_port_t port=spi_board_port(bus);
     return stm32_spi_board_prepare(&port);
 }
-static inline void spi_board_release(stm32_spi_impl_t* bus) {
+static inline nx_status_t spi_board_release(stm32_spi_impl_t* bus) {
     stm32_spi_board_port_t port=spi_board_port(bus);
-    stm32_spi_board_release(&port);
+    return stm32_spi_board_release(&port);
 }
 bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length, bool write);
 /* Fatal hardware inability to stop DMA cannot return caller-owned buffers. */
