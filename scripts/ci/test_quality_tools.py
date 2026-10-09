@@ -65,6 +65,17 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.database([self.source, Path("/tmp/foreign.c"), self.root / "vendors" / "sdk.c"])
         self.assertEqual(len(commands(self.root, self.build)), 1)
 
+    def test_runtime_is_owned_and_external_product_is_not(self):
+        runtime = self.root / "runtime" / "bootstrap.c"
+        runtime.parent.mkdir()
+        runtime.write_text("int bootstrap(void) { return 0; }\n")
+        product = self.root / "products" / "private.c"
+        product.parent.mkdir()
+        product.write_text("int product_private;\n")
+        self.database([self.source, runtime, product])
+        self.assertEqual([entry['file'] for entry in commands(self.root, self.build)],
+                         [str(self.source), str(runtime)])
+
     def test_explicit_production_host_models_retain_actual_compilation_scope(self):
         modeled = []
         for fixture, production in (

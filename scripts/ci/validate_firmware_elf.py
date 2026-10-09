@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 import struct
+import re
 
 from package_release import effective_config, ReleaseError
 
@@ -94,14 +95,77 @@ class Elf32:
                    for segment in self.segments)
 
 
-def target_contract(config):
+def checked_layout(config, layout=None):
+    """Validate the canonical external layout against physical SoC geometry."""
+    if config.get('CONFIG_PLATFORM_NAME') == 'gd32f470':
+        soc, size = 'gd32f470zg', 0x100000
+        boundaries = set(range(0, size + 1, 0x1000))
+    elif config.get('CONFIG_PLATFORM_NAME') == 'stm32':
+        size = config.get('CONFIG_STM32_FLASH_SIZE')
+        if size not in (0x80000, 0x100000):
+            raise FirmwareError('Unsupported physical Flash identity')
+        part = config.get('CONFIG_STM32_PART_NAME', '')
+        soc = ('stm32f407ve' if size == 0x80000 else
+               'stm32f407zg' if part == 'STM32F407ZGT6' else 'stm32f407vg')
+        boundaries = {0, 0x4000, 0x8000, 0xc000, 0x10000, 0x20000}
+        boundaries.update(range(0x40000, size + 1, 0x20000))
+    else:
+        raise FirmwareError('Layout has no maintained physical SoC')
+    if layout is None:
+        layout = {'schema': 1, 'soc': soc, 'flash_base': 0x08000000,
+                  'flash_size': size, 'image': {'offset': 0, 'size': size}, 'regions': []}
+        layout['sha256'] = hashlib.sha256(json.dumps(
+            layout, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        layout['input_sha256'] = None
+    if not isinstance(layout, dict) or set(layout) != {
+            'schema', 'soc', 'flash_base', 'flash_size', 'image', 'regions',
+            'sha256', 'input_sha256'}:
+        raise FirmwareError('Missing or unrecognized resolved layout fields')
+    if (layout['schema'] != 1 or layout['soc'] != soc or
+            layout['flash_base'] != 0x08000000 or layout['flash_size'] != size):
+        raise FirmwareError('Layout contradicts the physical SoC identity')
+    canonical = {k: v for k, v in layout.items() if k not in ('sha256', 'input_sha256')}
+    if layout['sha256'] != hashlib.sha256(json.dumps(
+            canonical, sort_keys=True, separators=(',', ':')).encode()).hexdigest():
+        raise FirmwareError('Resolved layout digest mismatch')
+    source_digest = layout['input_sha256']
+    if source_digest is not None and (not isinstance(source_digest, str) or
+            not re.fullmatch(r'[0-9a-f]{64}', source_digest)):
+        raise FirmwareError('Invalid layout input digest')
+    if not isinstance(layout['regions'], list) or not isinstance(layout['image'], dict):
+        raise FirmwareError('Invalid layout regions')
+    spans, names = [], set()
+    for index, region in enumerate([layout['image'], *layout['regions']]):
+        if not isinstance(region, dict) or set(region) != (
+                {'offset', 'size'} if index == 0 else {'offset', 'size', 'name'}):
+            raise FirmwareError('Invalid resolved region fields')
+        offset, length = region['offset'], region['size']
+        if (type(offset) is not int or type(length) is not int or length <= 0 or
+                offset not in boundaries or offset + length not in boundaries or
+                offset < 0 or offset + length > size):
+            raise FirmwareError('Region crosses physical erase blocks or Flash bounds')
+        if any(offset < end and start < offset + length for start, end in spans):
+            raise FirmwareError('Resolved regions overlap')
+        spans.append((offset, offset + length))
+        if index:
+            name = region['name']
+            if (not isinstance(name, str) or not re.fullmatch(r'[a-z][a-z0-9_]{0,47}', name)
+                    or name in names):
+                raise FirmwareError('Invalid or duplicate region name')
+            names.add(name)
+    if layout['image']['offset'] != 0:
+        raise FirmwareError('Nonzero image relocation has not been qualified')
+    return layout
+
+
+def target_contract(config, layout=None):
     platform = config.get('CONFIG_PLATFORM_NAME')
     if platform == 'stm32':
         flash = config.get('CONFIG_STM32_FLASH_SIZE')
         if flash not in (0x80000, 0x100000):
             raise FirmwareError('Unsupported STM32F407 physical Flash identity')
         flash_end = 0x08000000 + flash
-        storage_start = flash_end - 0x40000
+        storage_start = flash_end
         ram_end = 0x20020000
         vector_bytes, vector_name = 0x188, 'g_pfnVectors'
         irq = {}
@@ -114,7 +178,7 @@ def target_contract(config):
                 irq[72] = 'DMA2_Stream0_IRQHandler'
                 irq[75] = 'DMA2_Stream3_IRQHandler'
     elif platform == 'gd32f470' and config.get('CONFIG_GD32F470ZG'):
-        flash_end, storage_start, ram_end = 0x08100000, 0x080FC000, 0x20030000
+        flash_end, storage_start, ram_end = 0x08100000, 0x08100000, 0x20030000
         vector_bytes, vector_name = 0x1AC, '__gVectors'
         irq = {44: 'TIMER1_IRQHandler'}
         if config.get('CONFIG_GD32_UART_ENABLE'):
@@ -129,12 +193,15 @@ def target_contract(config):
             config.get('CONFIG_LINKER_FLASH_START') != 0x08000000 or
             config.get('CONFIG_LINKER_FLASH_SIZE') != flash_end - 0x08000000):
         raise FirmwareError('Effective configuration contradicts the physical memory contract')
-    return storage_start, flash_end, ram_end, vector_bytes, vector_name, irq
+    resolved = checked_layout(config, layout)
+    image_end = resolved['flash_base'] + resolved['image']['size']
+    return image_end, flash_end, ram_end, vector_bytes, vector_name, irq
 
 
-def validate_image(contents, config):
+def validate_image(contents, config, layout=None, board_identity=None):
     elf = Elf32(contents)
-    storage, flash_end, ram_end, vector_bytes, vector_name, irq = target_contract(config)
+    layout = checked_layout(config, layout)
+    storage, flash_end, ram_end, vector_bytes, vector_name, irq = target_contract(config, layout)
 
     def retained_constant(section):
         if (not section or section[1] != 1 or section[2] & 1 or
@@ -183,9 +250,29 @@ def validate_image(contents, config):
                 not firmware_function(address)):
             raise FirmwareError(f'Interrupt vector does not bind its strong handler: {name}')
         strong_irqs.append(name)
-    if (elf.symbol('__nexus_storage_start') != storage or
-            elf.symbol('__nexus_storage_end') != flash_end):
-        raise FirmwareError('Storage partition symbols do not match the physical part')
+    if (elf.symbol('__nexus_image_start') != layout['flash_base'] or
+            elf.symbol('__nexus_image_end') != storage):
+        raise FirmwareError('Image linker symbols do not match the resolved layout')
+    for index in range(8):
+        if elf.symbol(f'__nexus_layout_sha256_{index}') != int(
+                layout['sha256'][index * 8:(index + 1) * 8], 16):
+            raise FirmwareError('ELF does not bind the resolved layout digest')
+    if board_identity is not None:
+        if (board_identity.get('schema') != 1 or
+                board_identity.get('id') != config.get('CONFIG_BOARD_NAME') or
+                board_identity.get('soc') != layout['soc'] or
+                not isinstance(board_identity.get('sha256'), str) or
+                not re.fullmatch(r'[0-9a-f]{64}', board_identity['sha256'])):
+            raise FirmwareError('Board identity contradicts the effective build')
+        for index in range(8):
+            if elf.symbol(f'__nexus_board_sha256_{index}') != int(
+                    board_identity['sha256'][index * 8:(index + 1) * 8], 16):
+                raise FirmwareError('ELF does not bind the resolved Board digest')
+    for region in layout['regions']:
+        start = layout['flash_base'] + region['offset']
+        if (elf.symbol('__nexus_region_' + region['name'] + '_start') != start or
+                elf.symbol('__nexus_region_' + region['name'] + '_end') != start + region['size']):
+            raise FirmwareError('Region linker symbols do not match the resolved layout')
     abi = elf.sections.get('.nx_abi')
     abi_symbol = elf.symbols.get('nx_device_descriptor_bytes')
     if (not retained_constant(abi) or not abi_symbol or
@@ -228,25 +315,34 @@ def validate_image(contents, config):
             'device_records': registry[5] // descriptor_bytes,
             'application_flash_bytes': storage - 0x08000000,
             'flash_loaded_bytes': flash_used, 'main_ram_bytes': ram_end - 0x20000000,
-            'main_ram_reserved_bytes': ram_used, 'storage_start': storage,
-            'storage_end': flash_end, 'writable_executable_segments': 0}
+            'main_ram_reserved_bytes': ram_used, 'image_start': layout['flash_base'],
+            'image_end': storage, 'physical_flash_end': flash_end,
+            'layout_sha256': layout['sha256'], 'regions': layout['regions'],
+            'writable_executable_segments': 0}
 
 
 def inspect_build(build):
     fragment = build / 'generated/effective.config'
     config = effective_config(fragment.read_text())
+    layout = checked_layout(config, json.loads((build / 'generated/layout.json').read_text()))
+    board = json.loads((build / 'generated/board-identity.json').read_text())
+    if (board.get('schema') != 1 or board.get('id') != config.get('CONFIG_BOARD_NAME') or
+            board.get('soc') != layout['soc'] or not isinstance(board.get('sha256'), str)
+            or not re.fullmatch(r'[0-9a-f]{64}', board['sha256'])):
+        raise FirmwareError('Board identity contradicts the effective build')
     images = sorted((build / 'bin').glob('*.elf'))
     if not images:
         raise FirmwareError('No linked ARM firmware images')
     report = {'schema_version': 1, 'kind': 'arm-static-link-contract',
               'hardware_verified': False, 'platform': config['CONFIG_PLATFORM_NAME'],
-              'product': config['CONFIG_PRODUCT_NAME'],
+              'board_id': board['id'], 'board_sha256': board['sha256'],
+              'layout_sha256': layout['sha256'],
               'config_sha256': hashlib.sha256(fragment.read_bytes()).hexdigest(), 'images': []}
     for path in images:
         contents = path.read_bytes()
         report['images'].append({'file': path.name,
                                 'sha256': hashlib.sha256(contents).hexdigest(),
-                                **validate_image(contents, config)})
+                                **validate_image(contents, config, layout=layout, board_identity=board)})
     return report
 
 

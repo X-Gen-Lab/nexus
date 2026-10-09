@@ -50,14 +50,15 @@ class ReleaseTests(unittest.TestCase):
         (self.dependency / "library.c").write_text("/* Local dependency fixture. */\n")
         self.dep_git("add", ".")
         self.dep_git("commit", "--quiet", "-m", "Dependency fixture")
-        self.add_dependency("ext/googletest")
-        self.add_dependency("ext/freertos")
+        for dependency in release.RELEASE_PROFILES["linux-gcc-release"]["dependencies"]:
+            self.add_dependency(dependency)
         self.fragment = self.source / "platforms/native/defconfig"
         self.fragment.parent.mkdir(parents=True)
         self.fragment.write_text("CONFIG_PLATFORM_NATIVE=y\n")
-        application = self.source / "applications/blinky/main.c"
-        application.parent.mkdir(parents=True)
-        application.write_text("int main(void) { return 0; }\n")
+        runtime_source = self.source / "runtime/main.c"
+        runtime_source.parent.mkdir(parents=True)
+        runtime_source.write_text("int main(void) { return 0; }\n")
+        self.create_board_sources()
         self.git("add", ".")
         self.git("commit", "--quiet", "-m", "Fixture")
         self.git("tag", "v1.2.3")
@@ -70,17 +71,17 @@ class ReleaseTests(unittest.TestCase):
         self.values = {
             "CONFIG_BUILD_TYPE": "Release", "CONFIG_BUILD_TYPE_RELEASE": True,
             "CONFIG_BUILD_TYPE_DEBUG": False, "CONFIG_BUILD_TESTS": True,
-            "CONFIG_BUILD_EXAMPLES": True, "CONFIG_ENABLE_COVERAGE": False,
+            "CONFIG_BUILD_CONTRACTS": True, "CONFIG_ENABLE_COVERAGE": False,
             "CONFIG_ENABLE_SANITIZERS": False, "CONFIG_PLATFORM_NAME": "native",
             "CONFIG_PLATFORM_NATIVE": True, "CONFIG_PLATFORM_STM32": False,
             "CONFIG_BOARD_NAME": "native-reference", "CONFIG_OSAL_BACKEND_NAME": "native",
-            "CONFIG_PRODUCT_NAME": "native-reference",
             "CONFIG_TOOLCHAIN_NAME": "gcc", "CONFIG_TEST_BUDGET": 4096,
         }
         self.write_bundle()
         self.write_cache()
         self.write_compile_commands()
         self.write_test_report()
+        self.write_board_bundle()
 
     def git(self, *args):
         return subprocess.check_output(
@@ -116,10 +117,51 @@ class ReleaseTests(unittest.TestCase):
         for name, lines in (("effective.config", effective), ("nexus_config.h", header), ("config.cmake", cmake)):
             (generated / name).write_text("\n".join(lines) + "\n")
 
+    @staticmethod
+    def board_soc(profile):
+        return {"native-reference": "native", "stm32f4discovery-mb997": "stm32f407vg",
+                "stm32f407zg-qiming-v31": "stm32f407zg", "stm32f407ve-sky-qingchun": "stm32f407ve",
+                "gd32f470zg-liangshan": "gd32f470zg"}[profile["board"]]
+
+    def create_board_sources(self):
+        for profile in release.RELEASE_PROFILES.values():
+            directory = self.source / release.BOARD_DIRECTORIES[profile["board"]]
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / "CMakeLists.txt").write_text("# Board fixture\n")
+            (directory / "nexus_board.h").write_text("/* Board input fixture. */\n")
+            platform = profile["platform"]
+            resources = []
+            if platform != "native":
+                pins = {"tx": ("A", 2, 7), "rx": ("A", 3, 7)} if platform == "stm32" else {"tx": ("A", 9, 7), "rx": ("A", 10, 7)}
+                resources.append({"id": "console", "kind": "uart", "instance": 1 if platform == "stm32" else 0,
+                    "when": "CONFIG_PLATFORM_STM32" if platform == "stm32" else "CONFIG_GD32F470ZG",
+                    "clock": "USART2" if platform == "stm32" else "USART0", "irq": 38 if platform == "stm32" else 37,
+                    "priority": 6, "pins": [{"signal": signal, "port": port, "pin": pin, "af": af}
+                                               for signal, (port, pin, af) in pins.items()]})
+            manifest = {"schema": 1, "id": profile["board"], "soc": self.board_soc(profile),
+                        "hse_hz": 0 if platform == "native" else (8000000 if platform == "stm32" else 25000000),
+                        "interface_target": "board_fixture", "object_targets": [],
+                        "inputs": ["CMakeLists.txt", "nexus_board.h"], "resources": resources}
+            (directory / "board.json").write_text(json.dumps(manifest))
+        for profile in (release.RELEASE_PROFILES["stm32-armgcc-release"],
+                        release.RELEASE_PROFILES["gd32f470-armgcc-baremetal-release"]):
+            path = self.source / release.linker_sections(profile)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("/* Linker section fixture. */\n")
+
+    def write_board_bundle(self, profile=None, layout_input=None):
+        profile = profile or release.RELEASE_PROFILES["linux-gcc-release"]
+        generator = release.board_package_module()
+        manifest, soc, identity, active = generator.validate_manifest(
+            self.source / release.BOARD_DIRECTORIES[profile["board"]], self.values)
+        self.layout = generator.validate_layout(layout_input, manifest["soc"])
+        generator.emit(self.build / "generated", manifest, soc, identity, active, self.layout, self.source)
+        self.board_identity = json.loads((self.build / "generated/board-identity.json").read_text())
+
     def write_compile_commands(self, flags=()):
-        value = [{"directory": str(self.build), "file": str(self.source / "applications/blinky/main.c"),
+        value = [{"directory": str(self.build), "file": str(self.source / "runtime/main.c"),
                   "arguments": ["gcc", f"-I{self.build / 'generated'}", *flags, "-c",
-                                str(self.source / "applications/blinky/main.c")]}]
+                                str(self.source / "runtime/main.c")]}]
         (self.build / "compile_commands.json").write_text(json.dumps(value))
 
     def write_test_report(self, contents='<testsuite tests="1" failures="0"><testcase name="fixture" status="run"/></testsuite>'):
@@ -134,14 +176,14 @@ class ReleaseTests(unittest.TestCase):
             "NEXUS_PLATFORM:STRING=native\n"
             "NEXUS_OSAL_BACKEND:STRING=\n"
             "NEXUS_BUILD_TESTS:BOOL=ON\n"
-            "NEXUS_BUILD_EXAMPLES:BOOL=ON\n"
+            "NEXUS_BUILD_CONTRACTS:BOOL=ON\n"
             "NEXUS_ENABLE_COVERAGE:BOOL=OFF\n"
             "NEXUS_ENABLE_SANITIZERS:BOOL=OFF\n"
             f"NEXUS_CONFIG_FILE:FILEPATH={config or self.fragment}\n",
             encoding="utf-8",
         )
 
-    def add_output(self, name="bin/blinky", content=None):
+    def add_output(self, name="bin/nexus_contract_firmware.elf", content=None):
         path = self.build / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(self.elf if content is None else content)
@@ -169,6 +211,126 @@ class ReleaseTests(unittest.TestCase):
              "--source", str(self.source), "--version", "v1.2.3"],
             text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env,
         )
+
+    def test_missing_generated_board_identity_rejects_candidate(self):
+        self.add_output()
+        (self.build / "generated/board-identity.json").unlink()
+        with self.assertRaisesRegex(release.ReleaseError, "board-identity"):
+            self.package()
+
+    def test_arm_generated_board_layout_header_and_linker_are_required(self):
+        self.arm_fixture()
+        self.add_output()
+        for name in release.BOARD_FILES + release.LAYOUT_FILES:
+            path = self.build / "generated" / name
+            content = path.read_bytes()
+            path.unlink()
+            with self.subTest(name=name), self.assertRaises(release.ReleaseError):
+                self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+            path.write_bytes(content)
+
+    def test_generated_header_linker_and_board_identity_must_match_inputs(self):
+        self.arm_fixture()
+        self.add_output()
+        for name in ("board-identity.json", "board.cmake", "nx_flash_layout.h", "firmware.ld"):
+            path = self.build / "generated" / name
+            content = path.read_bytes()
+            path.write_bytes(content + b"\n/* injected */\n")
+            with self.subTest(name=name), self.assertRaises(release.ReleaseError):
+                self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+            path.write_bytes(content)
+
+    def test_platform_contract_cannot_be_substituted_by_unrelated_application(self):
+        self.add_output("bin/unrelated-app")
+        with self.assertRaisesRegex(release.ReleaseError, "platform contract"):
+            self.package()
+
+    def test_native_candidate_has_source_bound_board_identity_without_flash_layout(self):
+        self.add_output()
+        archive = self.package()
+        with zipfile.ZipFile(archive) as bundle:
+            names = bundle.namelist()
+            provenance = json.loads(bundle.read(f"{self.artifact}/provenance.json"))
+            self.assertEqual(provenance["target"]["board_sha256"], self.board_identity["sha256"])
+            self.assertIsNone(provenance["target"]["layout_sha256"])
+            for name in ("board.json", "CMakeLists.txt", "nexus_board.h"):
+                self.assertIn(f"{self.artifact}/configuration/board/{name}", names)
+            self.assertNotIn(f"{self.artifact}/configuration/layout.json", names)
+        self.verify()
+
+    def test_missing_archived_board_input_rejected_after_manifest_refresh(self):
+        self.add_output()
+        archive = self.package()
+        self.rewrite_archive(archive, removals=[f"{self.artifact}/configuration/board/nexus_board.h"],
+                             refresh_manifests=True)
+        with self.assertRaisesRegex(release.ReleaseError, "Board/layout"):
+            self.verify()
+
+    def test_coherently_rewritten_board_is_still_bound_to_source_git_objects(self):
+        self.add_output()
+        archive = self.package()
+        prefix = self.artifact + "/"
+        (self.source / "boards/native_reference/nexus_board.h").write_text("/* Rewritten board. */\n")
+        self.write_board_bundle()
+        with zipfile.ZipFile(archive) as bundle:
+            provenance = json.loads(bundle.read(prefix + "provenance.json"))
+        provenance["target"]["board_sha256"] = self.board_identity["sha256"]
+        provenance["validation"]["board_sha256"] = self.board_identity["sha256"]
+        changes = {prefix + "configuration/board/nexus_board.h":
+                   (self.source / "boards/native_reference/nexus_board.h").read_bytes()}
+        for name in release.BOARD_FILES:
+            changes[prefix + "configuration/" + name] = (self.build / "generated" / name).read_bytes()
+        changes[prefix + "provenance.json"] = json.dumps(provenance).encode()
+        self.rewrite_archive(archive, changes=changes, refresh_manifests=True)
+        # Local worktree matches the forged bytes; committed Git objects do not.
+        release.verify_bundle(archive, self.artifact, self.preset, "v1.2.3", self.commit)
+        with self.assertRaisesRegex(release.ReleaseError, "source commit"):
+            self.verify()
+
+    def test_archived_arm_layout_header_linker_and_source_section_mutations_fail(self):
+        self.arm_fixture(); self.add_output()
+        archive = self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+        prefix = "nexus-stm32f407-baremetal/"
+        names = [prefix + "configuration/" + name for name in
+                 (*release.LAYOUT_FILES, "linker-sections.ld")]
+        with zipfile.ZipFile(archive) as bundle:
+            original = {name: bundle.read(name) for name in names}
+        for name in names:
+            self.rewrite_archive(archive, changes=original | {name: original[name] + b"\n/* rewritten */\n"},
+                                 refresh_manifests=True)
+            with self.subTest(name=name), self.assertRaises(release.ReleaseError):
+                self.verify(expected=["nexus-stm32f407-baremetal=stm32-armgcc-release"])
+
+    def test_native_archive_cannot_add_a_physical_layout(self):
+        self.add_output(); archive = self.package()
+        self.rewrite_archive(archive, additions={f"{self.artifact}/configuration/layout.json": b"{}"},
+                             refresh_manifests=True)
+        with self.assertRaisesRegex(release.ReleaseError, "physical Flash layout"):
+            self.verify()
+
+    def test_explicit_layout_is_archived_and_controls_the_real_arm_gate(self):
+        self.arm_fixture()
+        profile = release.RELEASE_PROFILES["stm32-armgcc-release"]
+        layout_input = self.source / "layouts/reference.json"
+        layout_input.parent.mkdir()
+        layout_input.write_text(json.dumps({"schema": 1, "soc": "stm32f407vg",
+            "image": {"offset": 0, "size": 0xe0000},
+            "regions": [{"name": "config", "offset": 0xe0000, "size": 0x20000}]}))
+        self.git("add", "."); self.git("commit", "--quiet", "-m", "Explicit layout input")
+        self.git("tag", "-f", "v1.2.3"); self.commit = self.git("rev-parse", "HEAD")
+        with (self.build / "CMakeCache.txt").open("a") as cache:
+            cache.write(f"NEXUS_FLASH_LAYOUT_FILE:FILEPATH={layout_input}\n")
+        self.write_board_bundle(profile, layout_input)
+        self.elf = firmware_fixture(config=self.values, layout=self.layout, board_identity=self.board_identity)
+        self.add_output()
+        archive = self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
+        with zipfile.ZipFile(archive) as bundle:
+            prefix = "nexus-stm32f407-baremetal/"
+            provenance = json.loads(bundle.read(prefix + "provenance.json"))
+            self.assertEqual(provenance["target"]["layout_sha256"], self.layout["sha256"])
+            self.assertEqual(provenance["validation"]["images"][0]["image_end"], 0x080e0000)
+            self.assertEqual(bundle.read(prefix + "configuration/layout.input.json"), layout_input.read_bytes())
+        self.verify(expected=["nexus-stm32f407-baremetal=stm32-armgcc-release"])
 
     def test_metadata_validates_existing_matching_tag(self):
         self.assertEqual(release.metadata(self.source, "v1.2.3"),
@@ -232,10 +394,11 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(provenance["commit"], self.commit)
             self.assertEqual(provenance["preset"], self.preset)
             self.assertEqual(provenance["configuration"], "Release")
-            self.assertEqual({m["path"] for m in provenance["submodules"]}, {"ext/googletest", "ext/freertos"})
+            self.assertEqual({m["path"] for m in provenance["submodules"]}, {"ext/googletest", "ext/freertos", "vendors/arm/CMSIS_5",
+                              "vendors/st/cmsis_device_f4", "vendors/st/stm32f4xx_hal_driver"})
             self.assertEqual(provenance["target"]["board"], "native-reference")
             self.assertEqual(provenance["validation"]["executed"], 1)
-            self.assertEqual(set(provenance["compiled_outputs"]), {"bin/blinky", "lib/libnexus.a"})
+            self.assertEqual(set(provenance["compiled_outputs"]), {"bin/nexus_contract_firmware.elf", "lib/libnexus.a"})
             self.assertIn("unsigned provenance", provenance["limitations"])
             for name in release.CONFIGURATION_FILES:
                 self.assertIn(f"{self.artifact}/configuration/{name}", bundle.namelist())
@@ -247,6 +410,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn(archive.name, (archive.parent / "SHA256SUMS").read_text())
 
     def test_multi_configuration_nested_outputs_include_only_requested_configuration(self):
+        self.add_output("bin/Release/nexus_contract_firmware.elf", ELF)
         self.add_output("bin/Release/plugins/device.so", ELF)
         self.add_output("lib/Release/hal.lib", LIBRARY)
         self.add_output("bin/Debug/blinky", ELF)
@@ -319,7 +483,8 @@ class ReleaseTests(unittest.TestCase):
         toolchain.parent.mkdir(parents=True)
         toolchain.write_text("# fixture ARM GCC toolchain\n")
         for path in ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4", "vendors/st/stm32f4xx_hal_driver"):
-            self.add_dependency(path)
+            if not (self.source / path).exists():
+                self.add_dependency(path)
         self.fragment = self.source / ("configs/stm32f407_freertos_defconfig" if osal == "freertos"
                                        else "configs/stm32f407_baremetal_defconfig")
         self.fragment.parent.mkdir(exist_ok=True)
@@ -352,10 +517,14 @@ class ReleaseTests(unittest.TestCase):
                             "CONFIG_LINKER_FLASH_START": 0x08000000,
                             "CONFIG_LINKER_FLASH_SIZE": self.values.get("CONFIG_STM32_FLASH_SIZE", 0x100000),
                             "CONFIG_INSTANCE_STM32_UART_1": profile["platform"] == "stm32",
-                            "CONFIG_GD32_UART_ENABLE": profile["platform"] == "gd32f470"})
+                            "CONFIG_GD32_UART_ENABLE": profile["platform"] == "gd32f470",
+                            "CONFIG_STM32_HSE_VALUE": 8000000, "CONFIG_GD32_HXTAL_VALUE": 25000000,
+                            "CONFIG_OSAL_FREERTOS": osal == "freertos"})
+        self.values["CONFIG_" + self.board_soc(profile).upper()] = True
         self.write_bundle()
         self.write_compile_commands(("-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"))
-        self.elf = firmware_fixture(config=self.values)
+        self.write_board_bundle(profile)
+        self.elf = firmware_fixture(config=self.values, layout=self.layout, board_identity=self.board_identity)
 
     def test_arm_effective_target_profile_can_be_packaged_and_verified(self):
         self.arm_fixture()
@@ -381,7 +550,7 @@ class ReleaseTests(unittest.TestCase):
         for defect in ("missing_vectors", "weak_irq", "rwx", "storage_overlap", "partial_descriptor"):
             with self.subTest(defect=defect):
                 (self.build / "firmware-static-contract.json").write_text('{"status":"forged-pass"}')
-                self.add_output(content=firmware_fixture(defect, config=self.values))
+                self.add_output(content=firmware_fixture(defect, config=self.values, layout=self.layout, board_identity=self.board_identity))
                 with self.assertRaisesRegex(release.ReleaseError, "static contract"):
                     self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
                 self.assertFalse((self.build / "firmware-static-contract.json").exists())
@@ -411,8 +580,8 @@ class ReleaseTests(unittest.TestCase):
         self.arm_fixture()
         self.add_output()
         archive = self.package(preset="stm32-armgcc-release", artifact="nexus-stm32f407-baremetal")
-        self.rewrite_archive(archive, changes={"nexus-stm32f407-baremetal/bin/blinky":
-                                             firmware_fixture("missing_vectors", config=self.values)},
+        self.rewrite_archive(archive, changes={"nexus-stm32f407-baremetal/bin/nexus_contract_firmware.elf":
+                                             firmware_fixture("missing_vectors", config=self.values, layout=self.layout, board_identity=self.board_identity)},
                              refresh_manifests=True)
         with self.assertRaisesRegex(release.ReleaseError, "static contract"):
             self.verify(expected=["nexus-stm32f407-baremetal=stm32-armgcc-release"])
@@ -453,7 +622,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_untracked_production_source_cannot_claim_source_commit_identity(self):
         self.add_output()
-        source = self.source / "applications/blinky/untracked.c"
+        source = self.source / "runtime/untracked.c"
         source.write_text("int untracked_feature(void) { return 1; }\n")
         with self.assertRaisesRegex(release.ReleaseError, "Untracked source"):
             self.package()
@@ -470,7 +639,7 @@ class ReleaseTests(unittest.TestCase):
         self.add_output()
         commands = self.build / "compile_commands.json"
         contents = json.loads(commands.read_text())
-        contents[0]["file"] = str(self.source.parent / "applications/unrelated.c")
+        contents[0]["file"] = str(self.source.parent / "runtime/unrelated.c")
         commands.write_text(json.dumps(contents))
         with self.assertRaisesRegex(release.ReleaseError, "outside"):
             self.package()
@@ -483,7 +652,7 @@ class ReleaseTests(unittest.TestCase):
         # establish component ownership relative to that root.
         commands.extend({"file": str(root / path), "arguments": ["gcc", "-c"]} for path in
                         ("tests/osal/freertos_runtime/wait_for_event.c", "tests/hal/model.c",
-                         "ext/vendor/services/library.c", "build/generated/products/model.c"))
+                         "ext/vendor/services/library.c", "build/generated/runtime/model.c"))
         release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset],
                                           generated, root, require_local_sources=False)
 
@@ -491,7 +660,7 @@ class ReleaseTests(unittest.TestCase):
         root = Path("/not-present/hal/nexus")
         generated = root / "build/generated"
         for path in ("tests/osal/freertos_runtime/wait_for_event.c", "tests/arch/model.c",
-                     "ext/vendor/hal/driver.c", "build/products/fake.c", "fake.c"):
+                     "ext/vendor/hal/driver.c", "build/runtime/fake.c", "fake.c"):
             command = {"file": str(root / path), "arguments": ["gcc", f"-I{generated}", "-c"]}
             with self.subTest(path=path), self.assertRaisesRegex(release.ReleaseError, "no Nexus production"):
                 release.validate_compile_commands(json.dumps([command]), release.RELEASE_PROFILES[self.preset],
@@ -512,7 +681,7 @@ class ReleaseTests(unittest.TestCase):
     def test_recorded_source_identity_and_owned_configuration_remain_required_offline(self):
         root = Path("/not-present/nexus")
         generated = root / "build/generated"
-        for directory in ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "arch", "products", "applications"):
+        for directory in ("hal", "osal", "framework", "services", "platforms", "boards", "soc", "arch", "runtime"):
             commands = [{"file": str(root / directory / "source.c"), "arguments": ["gcc", "-c"]}]
             with self.subTest(directory=directory), self.assertRaisesRegex(release.ReleaseError, "generated configuration"):
                 release.validate_compile_commands(json.dumps(commands), release.RELEASE_PROFILES[self.preset], generated, root,
@@ -556,7 +725,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_archive_paths_reject_cross_platform_traversal_and_checksum_injection(self):
         for value in ("bin/../../escape", "bin/..\\escape", "bin/C:escape",
-                      "bin/file\nchecksum", "bin/./blinky", "bin//blinky", "bin/blinky."):
+                      "bin/file\nchecksum", "bin/./blinky", "bin//blinky", "bin/nexus_contract_firmware.elf."):
             with self.subTest(value=value), self.assertRaises(release.ReleaseError):
                 release.validate_archive_path(value)
         self.assertEqual(release.validate_archive_path("bin/Release/plugins/device.dll").as_posix(),
@@ -616,11 +785,13 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(release.ReleaseError, "checksum mismatch"):
             self.verify()
 
-    def rewrite_archive(self, archive, additions=None, changes=None, refresh_manifests=False):
+    def rewrite_archive(self, archive, additions=None, changes=None, refresh_manifests=False, removals=()):
         with zipfile.ZipFile(archive) as bundle:
             content = {name: bundle.read(name) for name in bundle.namelist()}
         content.update(additions or {})
         content.update(changes or {})
+        for name in removals:
+            content.pop(name)
         if refresh_manifests:
             prefix = archive.name.split("-v", 1)[0] + "/"
             provenance_name = prefix + "provenance.json"
@@ -649,7 +820,7 @@ class ReleaseTests(unittest.TestCase):
     def test_internal_member_checksum_is_verified(self):
         self.add_output()
         archive = self.package()
-        self.rewrite_archive(archive, changes={f"{self.artifact}/bin/blinky": ELF + b"changed"})
+        self.rewrite_archive(archive, changes={f"{self.artifact}/bin/nexus_contract_firmware.elf": ELF + b"changed"})
         with self.assertRaisesRegex(release.ReleaseError, "member checksum mismatch"):
             self.verify()
 
@@ -739,7 +910,7 @@ class ReleaseTests(unittest.TestCase):
             self.package()
 
     def test_escaped_configuration_strings_are_data_not_executed_cmake(self):
-        self.values["CONFIG_PRODUCT_LABEL"] = 'line ]=] "quoted"; ${ENV_VAR} \\ label'
+        self.values["CONFIG_MANIFEST_LABEL"] = 'line ]=] "quoted"; ${ENV_VAR} \\ label'
         self.write_bundle()
         self.add_output()
         self.package()
@@ -821,9 +992,9 @@ class ReleaseTests(unittest.TestCase):
             '<testsuite tests="0"/>',
             '<testsuite tests="1" failures="1"><testcase status="fail"><failure/></testcase></testsuite>',
             '<testsuite tests="1"><testcase status="run"><error/></testcase></testsuite>',
-            '<testsuite tests="1"><testcase status="notrun"><skipped/></testcase></testsuite>',
-            '<testsuite tests="9"><testcase status="run"/></testsuite>',
-            '<testsuite tests="invalid"><testcase status="run"/></testsuite>',
+            '<testsuite tests="1"><testcase name="skip" status="notrun"><skipped/></testcase></testsuite>',
+            '<testsuite tests="9"><testcase name="pass" status="run"/></testsuite>',
+            '<testsuite tests="invalid"><testcase name="pass" status="run"/></testsuite>',
             'invalid XML',
         ):
             self.write_test_report(contents)
@@ -834,8 +1005,8 @@ class ReleaseTests(unittest.TestCase):
             self.package()
 
     def test_test_skips_are_reported_without_inventing_execution(self):
-        self.write_test_report('<testsuite tests="2" failures="0" skipped="1"><testcase status="run"/>'
-                               '<testcase status="notrun"><skipped/></testcase></testsuite>')
+        self.write_test_report('<testsuite tests="2" failures="0" skipped="1"><testcase name="pass" status="run"/>'
+                               '<testcase name="skip" status="notrun"><skipped/></testcase></testsuite>')
         self.add_output()
         archive = self.package()
         with zipfile.ZipFile(archive) as bundle:
@@ -843,6 +1014,16 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual((validation["executed"], validation["skipped"]), (1, 1))
         self.verify()
         self.assertIn("1 host tests passed, 1 skipped", (self.source / "release_notes.md").read_text())
+
+    def test_native_candidate_requires_each_sdk_dependency_used_by_its_contracts(self):
+        self.add_output()
+        for dependency in ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4", "vendors/st/stm32f4xx_hal_driver"):
+            self.git("submodule", "deinit", "--force", dependency)
+            with self.subTest(dependency=dependency), self.assertRaisesRegex(release.ReleaseError, "initialized"):
+                self.package()
+            self.git("-c", "protocol.file.allow=always", "submodule", "update", "--init", dependency)
+        self.package()
+        self.verify()
 
     def test_missing_required_dependency_fails_but_unused_sdk_does_not_block(self):
         self.add_dependency("vendors/unused-sdk")
@@ -919,7 +1100,7 @@ class ReleaseTests(unittest.TestCase):
             fragment = self.source / profile["fragment"]
             fragment.parent.mkdir(parents=True, exist_ok=True)
             if not fragment.exists():
-                fragment.write_text("# Product profile fixture\n")
+                fragment.write_text("# Platform profile fixture\n")
         self.git("add", ".")
         self.git("commit", "--quiet", "-m", "Reviewed profile and imported SDK fixture")
         self.git("tag", "-f", "v1.2.3")
@@ -933,14 +1114,14 @@ class ReleaseTests(unittest.TestCase):
         self.build = self.source / "build" / preset
         self.build.mkdir(exist_ok=True)
         self.values = {"CONFIG_BUILD_TYPE": "Release", "CONFIG_BUILD_TYPE_RELEASE": True,
-                       "CONFIG_BUILD_TESTS": True, "CONFIG_BUILD_EXAMPLES": True,
+                       "CONFIG_BUILD_TESTS": True, "CONFIG_BUILD_CONTRACTS": True,
                        "CONFIG_ENABLE_COVERAGE": False, "CONFIG_ENABLE_SANITIZERS": False,
                        "CONFIG_PLATFORM_NAME": "native", "CONFIG_PLATFORM_NATIVE": True,
                        "CONFIG_BOARD_NAME": "native-reference", "CONFIG_OSAL_BACKEND_NAME": "native",
-                       "CONFIG_PRODUCT_NAME": "native-reference",
                        "CONFIG_TOOLCHAIN_NAME": "gcc", "CONFIG_TEST_BUDGET": 4096}
         self.elf = ELF
         self.write_bundle(); self.write_cache(); self.write_compile_commands(); self.write_test_report()
+        self.write_board_bundle()
         if profile["platform"] != "native":
             self.configure_arm_bundle(self.source / "cmake/toolchains/arm-gcc.cmake", profile["osal"], profile)
         return profile
@@ -988,11 +1169,11 @@ class ReleaseTests(unittest.TestCase):
                 with self.subTest(preset=preset, key=key), self.assertRaisesRegex(release.ReleaseError, "Effective"):
                     self.package()
 
-    def test_all_arm_platforms_reject_flag_override_including_arch_and_product_units(self):
+    def test_all_arm_platforms_reject_flag_override_including_arch_and_runtime_units(self):
         self.all_profiles_fixture()
         self.select_profile("gd32f470-armgcc-baremetal-release"); self.add_output()
-        for directory in ("arch", "products"):
-            file = self.source / directory / "source.c"; file.parent.mkdir(); file.write_text("int fixture;\n")
+        for directory in ("arch", "runtime"):
+            file = self.source / directory / "source.c"; file.parent.mkdir(exist_ok=True); file.write_text("int fixture;\n")
             # Identity is already committed before packaging; only command verification is needed.
             for override in ("-mcpu=cortex-m7", "-mfpu=fpv5-d16", "-mfloat-abi=soft", "-marm", "@hidden.rsp"):
                 commands = [{"file": str(file), "arguments": ["arm-none-eabi-gcc", f"-I{self.build / 'generated'}",
@@ -1045,7 +1226,16 @@ class ActualReleaseCompileDatabaseTests(unittest.TestCase):
         commands = (build / "compile_commands.json").read_text()
         generated = build / "generated"
         release.validate_compile_commands(commands, profile, generated, Path(cache["CMAKE_HOME_DIRECTORY"]))
+        paths, board_identity, layout = release.board_configuration(
+            Path(cache["CMAKE_HOME_DIRECTORY"]), build, config, profile, cache)
+        self.assertGreater(len(paths), 0)
+        outputs = release.build_outputs(build, Path(cache["CMAKE_HOME_DIRECTORY"]), "Release")
+        release.validate_target_outputs(((name, file.read_bytes()[:64]) for name, file in outputs), profile)
         if profile["platform"] == "native":
+            self.assertIsNone(layout)
+            self.assertEqual(board_identity["id"], "native-reference")
+            result = release.test_report((build / "ctest-results.xml").read_bytes())
+            self.assertGreater(result["executed"], 0)
             nested_kernel = [entry for entry in json.loads(commands)
                              if entry["file"].endswith("/tests/osal/freertos_runtime/wait_for_event.c")]
             self.assertGreater(len(nested_kernel), 0)
@@ -1059,7 +1249,8 @@ class ActualReleaseCompileDatabaseTests(unittest.TestCase):
             self.assertGreater(without_generated, 0)
         else:
             images = [(file.name, file.read_bytes()) for file in sorted((build / "bin").glob("*.elf"))]
-            result = release.validate_arm_artifacts(config, contents["effective.config"].encode(), images)
+            result = release.validate_arm_artifacts(config, contents["effective.config"].encode(), images,
+                                                   layout=layout, board_identity=board_identity)
             self.assertGreater(len(result["images"]), 0)
             self.assertFalse(result["hardware_verified"])
 

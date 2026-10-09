@@ -15,7 +15,7 @@ import shlex
 import stat
 import subprocess
 import sys
-import xml.etree.ElementTree as ET
+import tempfile
 import zipfile
 
 from vendor_import_identity import (ImportIdentityError, reviewed_import, validate_import_record)
@@ -30,8 +30,9 @@ CACHE_KEYS = (
     "CMAKE_BUILD_TYPE", "CMAKE_GENERATOR", "CMAKE_HOME_DIRECTORY", "CMAKE_C_COMPILER",
     "CMAKE_CXX_COMPILER", "CMAKE_TOOLCHAIN_FILE", "CMAKE_C_FLAGS",
     "CMAKE_C_FLAGS_RELEASE", "CMAKE_CXX_FLAGS_RELEASE", "NEXUS_PLATFORM",
-    "NEXUS_OSAL_BACKEND", "NEXUS_BUILD_TESTS", "NEXUS_BUILD_EXAMPLES",
+    "NEXUS_OSAL_BACKEND", "NEXUS_BUILD_TESTS", "NEXUS_BUILD_CONTRACTS",
     "NEXUS_ENABLE_COVERAGE", "NEXUS_ENABLE_SANITIZERS",
+    "NEXUS_BOARD_DIR", "NEXUS_FLASH_LAYOUT_FILE",
 )
 # Deliberately explicit: extending the release matrix requires a reviewed target
 # profile rather than treating a filename/preset label as evidence of its target.
@@ -41,8 +42,9 @@ RELEASE_PROFILES = {
         "board": "native-reference", "chip": None, "osal": "native",
         "support_profile": "native-contracts", "architecture": "x86_64",
         "toolchain": "gcc", "fragment": "platforms/native/defconfig",
-        "expected_config": {"CONFIG_PRODUCT_NAME": "native-reference"},
-        "dependencies": ("ext/googletest", "ext/freertos"),
+        "expected_config": {"CONFIG_BOARD_NAME": "native-reference"},
+        "dependencies": ("ext/googletest", "ext/freertos", "vendors/arm/CMSIS_5",
+                         "vendors/st/cmsis_device_f4", "vendors/st/stm32f4xx_hal_driver"),
     },
     "stm32-armgcc-release": {
         "artifact": "nexus-stm32f407-baremetal", "platform": "stm32",
@@ -50,7 +52,7 @@ RELEASE_PROFILES = {
         "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
         "toolchain_file": "cmake/toolchains/arm-gcc.cmake",
         "board": "stm32f4discovery-mb997", "chip": "STM32F407VGT6", "osal": "baremetal",
-        "expected_config": {"CONFIG_PRODUCT_NAME": "stm32f407-discovery", "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
+        "expected_config": {"CONFIG_BOARD_NAME": "stm32f4discovery-mb997", "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
                             "CONFIG_STM32_PART_NAME": "STM32F407VGT6", "CONFIG_STM32_FLASH_SIZE": 0x100000},
         "support_profile": "stm32f407-discovery-baremetal", "architecture": "armv7e-m",
         "fragment": "configs/stm32f407_baremetal_defconfig",
@@ -63,7 +65,7 @@ RELEASE_PROFILES = {
         "fpu": "fpv4-sp-d16", "float_abi": "hard", "toolchain": "arm-none-eabi-gcc",
         "toolchain_file": "cmake/toolchains/arm-gcc.cmake",
         "board": "stm32f4discovery-mb997", "chip": "STM32F407VGT6", "osal": "freertos",
-        "expected_config": {"CONFIG_PRODUCT_NAME": "stm32f407-discovery", "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
+        "expected_config": {"CONFIG_BOARD_NAME": "stm32f4discovery-mb997", "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
                             "CONFIG_STM32_PART_NAME": "STM32F407VGT6", "CONFIG_STM32_FLASH_SIZE": 0x100000},
         "support_profile": "stm32f407-discovery-freertos", "architecture": "armv7e-m",
         "fragment": "configs/stm32f407_freertos_defconfig",
@@ -71,7 +73,7 @@ RELEASE_PROFILES = {
                          "vendors/st/stm32f4xx_hal_driver"),
     },
 }
-# New profiles are explicit reviewed products, not filename-derived platforms.
+# New profiles are explicit reviewed boards, not filename-derived platforms.
 for board_id, board_name, part, flash, fragment in (
     ("qiming", "stm32f407zg-qiming-v31", "STM32F407ZGT6", 0x100000, "stm32f407zg_qiming_v31"),
     ("sky", "stm32f407ve-sky-qingchun", "STM32F407VET6", 0x80000, "stm32f407ve_sky_qingchun"),
@@ -83,7 +85,7 @@ for board_id, board_name, part, flash, fragment in (
             "chip": part, "osal": backend,
             "support_profile": f"stm32f407-{board_id}-{backend}",
             "fragment": f"configs/{fragment}_{backend}_defconfig",
-            "expected_config": {"CONFIG_PRODUCT_NAME": board_name, "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
+            "expected_config": {"CONFIG_BOARD_NAME": board_name, "CONFIG_STM32_CHIP_NAME": "STM32F407xx",
                                 "CONFIG_STM32_PART_NAME": part, "CONFIG_STM32_FLASH_SIZE": flash},
             "dependencies": (("ext/freertos",) if backend == "freertos" else ()) +
                             RELEASE_PROFILES["stm32-armgcc-release"]["dependencies"],
@@ -97,10 +99,19 @@ for backend in ("baremetal", "freertos"):
         "chip": "GD32F470ZGT6", "osal": backend, "architecture": "armv7e-m",
         "support_profile": f"gd32f470-liangshan-{backend}",
         "fragment": f"configs/gd32f470_{backend}_defconfig",
-        "expected_config": {"CONFIG_PRODUCT_NAME": "gd32f470-liangshan", "CONFIG_GD32F470ZG": True},
+        "expected_config": {"CONFIG_BOARD_NAME": "gd32f470zg-liangshan", "CONFIG_GD32F470ZG": True},
         "dependencies": ("ext/freertos",) if backend == "freertos" else (),
         "imports": ("vendors/gigadevice/gd32f4xx",),
     }
+BOARD_DIRECTORIES = {
+    "native-reference": "boards/native_reference",
+    "stm32f4discovery-mb997": "boards/stm32f4discovery",
+    "stm32f407zg-qiming-v31": "boards/stm32f407_qiming_v31",
+    "stm32f407ve-sky-qingchun": "boards/stm32f407ve_sky_qingchun",
+    "gd32f470zg-liangshan": "boards/gd32f470_liangshan",
+}
+BOARD_FILES = ("board-identity.json", "board.cmake")
+LAYOUT_FILES = ("layout.json", "nx_flash_layout.h", "firmware.ld")
 CONFIGURATION_FILES = ("effective.config", "nexus_config.h", "config.cmake")
 
 
@@ -347,7 +358,7 @@ def validate_effective_build(cache, profile, configuration, config):
     if cache.get("NEXUS_OSAL_BACKEND") and cache["NEXUS_OSAL_BACKEND"] != profile["osal"]:
         raise ReleaseError("Effective OSAL cache constraint disagrees with the release target")
     for option, symbol in (("NEXUS_BUILD_TESTS", "CONFIG_BUILD_TESTS"),
-                           ("NEXUS_BUILD_EXAMPLES", "CONFIG_BUILD_EXAMPLES"),
+                           ("NEXUS_BUILD_CONTRACTS", "CONFIG_BUILD_CONTRACTS"),
                            ("NEXUS_ENABLE_COVERAGE", "CONFIG_ENABLE_COVERAGE"),
                            ("NEXUS_ENABLE_SANITIZERS", "CONFIG_ENABLE_SANITIZERS")):
         expected = config.get(symbol)
@@ -357,8 +368,8 @@ def validate_effective_build(cache, profile, configuration, config):
             raise ReleaseError(f"Effective configuration disagrees with {option}")
     if config["CONFIG_ENABLE_COVERAGE"] or config["CONFIG_ENABLE_SANITIZERS"]:
         raise ReleaseError("Instrumented output cannot form a release candidate")
-    if not config["CONFIG_BUILD_EXAMPLES"]:
-        raise ReleaseError("Release candidates require built reference applications")
+    if not config["CONFIG_BUILD_CONTRACTS"]:
+        raise ReleaseError("Platform candidates require the contract build configuration")
     if profile["platform"] == "native":
         if cache.get("CMAKE_TOOLCHAIN_FILE"):
             raise ReleaseError("Native release target unexpectedly uses a cross-toolchain file")
@@ -380,39 +391,28 @@ def validate_effective_build(cache, profile, configuration, config):
         raise ReleaseError("Effective toolchain file does not match the release target")
 
 
-def target_identity(profile):
+def target_identity(profile, board_identity, layout=None):
     return {key: profile[key] for key in ("platform", "board", "chip", "osal", "architecture",
                                          "toolchain", "support_profile")} | {
         "board_revision": None, "hardware_verified": False,
+        "board_id": board_identity["id"], "board_sha256": board_identity["sha256"],
+        "layout_sha256": layout["sha256"] if layout else None,
     }
 
 
 def test_report(contents):
+    # One strict parser gates CTest execution, packages and downloaded archives.
+    # Stage bytes locally so verification uses the producer's parser contract.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "validation"))
+    from junit import validate_junit
     try:
-        root = ET.fromstring(contents)
-    except ET.ParseError as exc:
-        raise ReleaseError("Invalid host test report") from exc
-    if root.tag not in ("testsuite", "testsuites"):
-        raise ReleaseError("Invalid host test report root")
-    cases = list(root.iter("testcase"))
-    if not cases:
-        raise ReleaseError("Host test report contains zero tests")
-    if any(node.tag in ("failure", "error") for node in root.iter()):
-        raise ReleaseError("Host test report contains failing tests")
-    for suite in (node for node in root.iter() if node.tag in ("testsuite", "testsuites")):
-        for key in ("failures", "errors"):
-            if suite.get(key, "0") != "0":
-                raise ReleaseError("Host test report contains failing tests")
-        try:
-            if suite.get("tests") is not None and int(suite.get("tests")) != len(list(suite.iter("testcase"))):
-                raise ReleaseError("Host test report count disagrees with executed entries")
-        except ValueError as exc:
-            raise ReleaseError("Host test report contains an invalid test count") from exc
-    skipped = sum(case.find("skipped") is not None for case in cases)
-    executed = len(cases) - skipped
-    if executed <= 0 or any(case.get("status", "run") != "run" and case.find("skipped") is None for case in cases):
-        raise ReleaseError("Host test report has no complete successful execution")
-    return {"kind": "native-host-tests", "executed": executed, "skipped": skipped,
+        with tempfile.TemporaryDirectory(prefix="nexus-release-junit-") as directory:
+            path = Path(directory) / "ctest-results.xml"
+            path.write_bytes(contents)
+            report = validate_junit(path)
+    except ValueError as exc:
+        raise ReleaseError(f"Invalid host test report: {exc}") from exc
+    return {"kind": "native-host-tests", "executed": report["passed"], "skipped": report["skipped"],
             "failed": 0, "hardware_verified": False}
 
 
@@ -450,10 +450,12 @@ def validate_target_outputs(outputs, profile):
         if (len(header) < 20 or header[4] != elf_class or header[5] != 1
                 or int.from_bytes(header[18:20], "little") != machine):
             raise ReleaseError("Compiled ELF architecture does not match the release target")
-        if name.startswith("bin/") and int.from_bytes(header[16:18], "little") in (2, 3):
+        if (name.startswith("bin/") and Path(name).name in
+                ("nexus_contract_firmware", "nexus_contract_firmware.elf")
+                and int.from_bytes(header[16:18], "little") in (2, 3)):
             executable = True
     if not executable:
-        raise ReleaseError("No target ELF reference application found under build bin")
+        raise ReleaseError("No target ELF platform contract found under build bin")
 
 
 def validate_compile_commands(contents, profile, generated_directory=None, source=None,
@@ -467,7 +469,7 @@ def validate_compile_commands(contents, profile, generated_directory=None, sourc
     if not recorded_root.is_absolute() or ".." in recorded_root.parts:
         raise ReleaseError("Compile commands contain an invalid recorded source root")
     owned_directories = {"hal", "osal", "framework", "services", "platforms", "boards",
-                         "soc", "arch", "products", "applications"}
+                         "soc", "arch", "runtime"}
     production = []
     for entry in commands:
         if not isinstance(entry, dict) or not isinstance(entry.get("file"), str):
@@ -587,20 +589,123 @@ def validate_imported_sources(records, profile, commit, read):
             raise ReleaseError("Archive source import identity differs from its lock/notices") from exc
 
 
-def validate_arm_artifacts(config, effective_contents, artifacts):
+def board_package_module():
+    # Use the production generator's schema/route/geometry checks for packaging
+    # and verification. There is one Board/layout grammar, not a release copy.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "configure"))
+    import board_package
+    return board_package
+
+
+def linker_sections(profile):
+    return ("platforms/stm32/linker/stm32f4/gcc/stm32f407_sections.ld"
+            if profile["platform"] == "stm32" else
+            "platforms/gd32f470/linker/gd32f470_sections.ld")
+
+
+def validate_board_bundle(config, profile, read, sdk_root, generated_directory):
+    """Revalidate archived Board inputs and regenerate layout/header/linker.
+
+    The generated layout is always required for ARM, including a full-image
+    layout. It is never inferred from a storage service's default addresses.
+    """
+    generator = board_package_module()
+    try:
+        board_identity = json.loads(read("configuration/board-identity.json"))
+        manifest_bytes = read("configuration/board/board.json")
+        manifest = json.loads(manifest_bytes)
+        if manifest.get("id") != profile["board"]:
+            raise ReleaseError("Board identity differs from reviewed support profile")
+        with tempfile.TemporaryDirectory(prefix="nexus-release-board-") as temporary:
+            directory = Path(temporary)
+            board = directory / "board"
+            board.mkdir()
+            (board / "board.json").write_bytes(manifest_bytes)
+            for name in manifest["inputs"]:
+                validate_archive_path(name)
+                if name == "board.json":
+                    raise ReleaseError("Board manifest cannot be its own input")
+                path = board / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(read(f"configuration/board/{name}"))
+            raw, soc, identity, active = generator.validate_manifest(board, config)
+            layout = None
+            if profile["platform"] != "native":
+                layout = json.loads(read("configuration/layout.json"))
+                raw_layout = {key: layout[key] for key in ("schema", "soc", "image", "regions")}
+                input_file = directory / "layout.input.json"
+                if layout.get("input_sha256") is not None:
+                    input_file.write_bytes(read("configuration/layout.input.json"))
+                else:
+                    input_file.write_text(json.dumps(raw_layout))
+                resolved = generator.validate_layout(input_file, manifest["soc"])
+                if layout.get("input_sha256") is None:
+                    resolved["input_sha256"] = None
+                if layout != resolved:
+                    raise ReleaseError("Resolved Flash layout differs from its validated input/geometry")
+                # The actual section script is part of the source-bound bundle.
+                read("configuration/linker-sections.ld")
+            expected = directory / "generated"
+            generator.emit(expected, raw, soc, identity, active, layout, sdk_root)
+            for name in BOARD_FILES + (LAYOUT_FILES if layout else ()):
+                contents = (expected / name).read_bytes()
+                if name == "board.cmake":
+                    contents = contents.replace(str(expected).encode(), str(generated_directory).encode())
+                if read(f"configuration/{name}") != contents:
+                    raise ReleaseError(f"Generated {name} differs from its Board/layout inputs")
+        return board_identity, layout
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        if isinstance(exc, ReleaseError):
+            raise
+        raise ReleaseError("Board/layout configuration bundle missing or invalid") from exc
+
+
+def board_configuration(source, build, config, profile, cache):
+    """Collect regular, source-contained inputs and their generated outputs."""
+    generator = board_package_module()
+    directory = checked_path(source / BOARD_DIRECTORIES[profile["board"]], source, directory=True)
+    try:
+        manifest, _, _, _ = generator.validate_manifest(directory, config)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise ReleaseError("Source Board manifest is invalid") from exc
+    if cache.get("NEXUS_BOARD_DIR") and checked_path(cache["NEXUS_BOARD_DIR"], source, directory=True) != directory:
+        raise ReleaseError("Release Board directory differs from reviewed support profile")
+    paths = {"configuration/board/board.json": checked_path(directory / "board.json", source)}
+    for name in manifest["inputs"]:
+        validate_archive_path(name)
+        if name == "board.json":
+            raise ReleaseError("Board manifest cannot be its own input")
+        paths[f"configuration/board/{name}"] = checked_path(directory / name, source)
+    for name in BOARD_FILES + (LAYOUT_FILES if profile["platform"] != "native" else ()):
+        paths[f"configuration/{name}"] = checked_path(build / "generated" / name, source)
+    if profile["platform"] != "native":
+        paths["configuration/linker-sections.ld"] = checked_path(source / linker_sections(profile), source)
+        if cache.get("NEXUS_FLASH_LAYOUT_FILE"):
+            paths["configuration/layout.input.json"] = checked_path(cache["NEXUS_FLASH_LAYOUT_FILE"], source)
+    elif cache.get("NEXUS_FLASH_LAYOUT_FILE"):
+        raise ReleaseError("Native release cannot select a physical Flash layout")
+    identity, layout = validate_board_bundle(config, profile, lambda name: paths[name].read_bytes(),
+                                            source, build / "generated")
+    if bool(cache.get("NEXUS_FLASH_LAYOUT_FILE")) != bool(layout and layout["input_sha256"]):
+        raise ReleaseError("Flash layout input identity differs from the build cache")
+    return paths, identity, layout
+
+
+def validate_arm_artifacts(config, effective_contents, artifacts, *, layout, board_identity):
     # Import lazily: the maintained checker uses the configuration parser in
     # this module. Validate bytes again; a supplied passing report is not proof.
     from validate_firmware_elf import validate_image, FirmwareError
     report = {"schema_version": 1, "kind": "arm-static-link-contract",
               "hardware_verified": False, "platform": config["CONFIG_PLATFORM_NAME"],
-              "product": config["CONFIG_PRODUCT_NAME"],
+              "board_id": board_identity["id"], "board_sha256": board_identity["sha256"],
+              "layout_sha256": layout["sha256"],
               "config_sha256": hashlib.sha256(effective_contents).hexdigest(), "images": []}
     try:
         for name, content in sorted(artifacts):
             if content[:4] == b"\x7fELF":
                 report["images"].append({"file": Path(name).name,
                                          "sha256": hashlib.sha256(content).hexdigest(),
-                                         **validate_image(content, config)})
+                                         **validate_image(content, config, layout=layout, board_identity=board_identity)})
     except (FirmwareError, ValueError, KeyError, TypeError) as error:
         raise ReleaseError("ARM firmware static contract rejected") from error
     if not report["images"] or len({image["file"] for image in report["images"]}) != len(report["images"]):
@@ -645,6 +750,9 @@ def package(source, version, commit, preset, artifact, build, output, configurat
         configuration_entries.append((target, path))
     config = validate_configuration_bundle(contents)
     validate_effective_build(cache, profile, configuration, config)
+    board_paths, board_identity, layout = board_configuration(source, build, config, profile, cache)
+    configuration_entries.extend(board_paths.items())
+    config_paths.update({name: path.relative_to(source).as_posix() for name, path in board_paths.items()})
     entries = build_outputs(build, source, configuration)
     validate_target_outputs(((name, path.read_bytes()[:64]) for name, path in entries), profile)
     compiled = [name for name, path in entries if compiled_file(path)]
@@ -659,7 +767,8 @@ def package(source, version, commit, preset, artifact, build, output, configurat
                               profile, build / "generated", source)
     if profile["platform"] == "native":
         report = checked_path(build / "ctest-results.xml", source)
-        validation = test_report(report.read_bytes())
+        validation = test_report(report.read_bytes()) | {"platform": "native",
+                     "board_id": board_identity["id"], "board_sha256": board_identity["sha256"]}
         entries.append(("validation/ctest-results.xml", report))
         log = checked_path(build / "Testing/Temporary/LastTest.log", source, required=False)
         if log.exists():
@@ -669,7 +778,7 @@ def package(source, version, commit, preset, artifact, build, output, configurat
         report.unlink(missing_ok=True)
         validation = validate_arm_artifacts(config, contents["effective.config"].encode("utf-8"),
                                             ((name, path.read_bytes()) for name, path in entries
-                                             if name in compiled))
+                                             if name in compiled), layout=layout, board_identity=board_identity)
         report.write_text(json.dumps(validation, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         entries.append(("validation/firmware-static-contract.json", report))
     for filename in ("CMakePresets.json", "README.md", "LICENSE"):
@@ -697,7 +806,7 @@ def package(source, version, commit, preset, artifact, build, output, configurat
     provenance = {
         "schema_version": 2, **info, "artifact": artifact, "preset": preset,
         "configuration": configuration, "source_worktree_dirty": False,
-        "configuration_paths": config_paths, "target": target_identity(profile),
+        "configuration_paths": config_paths, "target": target_identity(profile, board_identity, layout),
         "validation": validation,
         "cmake": {key: cache[key] for key in CACHE_KEYS if key in cache},
         "submodules": submodules(source, profile["dependencies"]) if profile["dependencies"] else [],
@@ -762,8 +871,8 @@ def verify_bundle(archive, artifact, preset, version, commit):
                 raise ReleaseError(f"Archive provenance does not match {key}")
         if not provenance.get("compiled_outputs") or provenance.get("source_worktree_dirty") is not False:
             raise ReleaseError("Archive lacks clean compiled-output provenance")
-        if provenance.get("schema_version") != 2 or provenance.get("target") != target_identity(profile):
-            raise ReleaseError("Archive target identity does not match its reviewed support profile")
+        if provenance.get("schema_version") != 2:
+            raise ReleaseError("Archive target identity uses an unsupported schema")
         contents = {name: bundle.read(f"{artifact}/configuration/{name}").decode("utf-8")
                     for name in CONFIGURATION_FILES}
         config = validate_configuration_bundle(contents)
@@ -791,15 +900,45 @@ def verify_bundle(archive, artifact, preset, version, commit):
             raise ReleaseError("Archive lacks the effective configuration location")
         validate_archive_path(effective_path)
         generated_directory = Path(packaged_cache["CMAKE_HOME_DIRECTORY"]) / Path(effective_path).parent
+        board_identity, layout = validate_board_bundle(
+            config, profile, lambda name: bundle.read(f"{artifact}/{name}"),
+            Path(packaged_cache["CMAKE_HOME_DIRECTORY"]), generated_directory)
+        if provenance.get("target") != target_identity(profile, board_identity, layout):
+            raise ReleaseError("Archive target identity does not match its reviewed support profile")
+        source_paths = provenance.get("configuration_paths", {})
+        expected_board_paths = {"configuration/board/board.json": f"{BOARD_DIRECTORIES[profile['board']]}/board.json"}
+        expected_board_paths.update({f"configuration/board/{name}": f"{BOARD_DIRECTORIES[profile['board']]}/{name}"
+                                     for name in board_identity["inputs_sha256"]})
+        if layout:
+            expected_board_paths["configuration/linker-sections.ld"] = linker_sections(profile)
+        for name, relative in expected_board_paths.items():
+            if source_paths.get(name) != relative:
+                raise ReleaseError("Archive Board source path differs from its reviewed support profile")
+        for name in BOARD_FILES + (LAYOUT_FILES if layout else ()):
+            if source_paths.get(f"configuration/{name}") != (Path(effective_path).parent / name).as_posix():
+                raise ReleaseError("Archive generated Board/layout paths disagree with its configuration")
+        layout_input = packaged_cache.get("NEXUS_FLASH_LAYOUT_FILE")
+        if bool(layout_input) != bool(layout and layout["input_sha256"]):
+            raise ReleaseError("Archive Flash layout input identity differs from its build cache")
+        if layout_input:
+            relative = source_paths.get("configuration/layout.input.json", "")
+            validate_archive_path(relative)
+            if Path(layout_input) != Path(packaged_cache["CMAKE_HOME_DIRECTORY"]) / relative:
+                raise ReleaseError("Archive Flash layout input path differs from its build cache")
         validate_compile_commands(bundle.read(f"{artifact}/build/compile_commands.json").decode("utf-8"),
                                   profile, generated_directory, Path(packaged_cache["CMAKE_HOME_DIRECTORY"]),
                                   require_local_sources=False)
         if profile["platform"] == "native":
-            validation = test_report(bundle.read(f"{artifact}/validation/ctest-results.xml"))
+            if any(f"{artifact}/configuration/{name}" in names for name in LAYOUT_FILES
+                   + ("layout.input.json", "linker-sections.ld")):
+                raise ReleaseError("Native archive cannot contain a physical Flash layout")
+            validation = test_report(bundle.read(f"{artifact}/validation/ctest-results.xml")) | {
+                "platform": "native", "board_id": board_identity["id"], "board_sha256": board_identity["sha256"]}
         else:
             validation = validate_arm_artifacts(config, contents["effective.config"].encode("utf-8"),
                                                 ((name, bundle.read(f"{artifact}/{name}"))
-                                                 for name in provenance["compiled_outputs"]))
+                                                 for name in provenance["compiled_outputs"]),
+                                                layout=layout, board_identity=board_identity)
             if json.loads(bundle.read(f"{artifact}/validation/firmware-static-contract.json")) != validation:
                 raise ReleaseError("Archive ARM static report differs from its real firmware bytes")
         if provenance.get("validation") != validation:
@@ -814,6 +953,26 @@ def verify_bundle(archive, artifact, preset, version, commit):
         validate_target_outputs(((name, bundle.read(f"{artifact}/{name}")[:64])
                                  for name in provenance["compiled_outputs"]), profile)
         return provenance
+
+
+def validate_board_source_commit(source, archive, artifact, provenance, commit):
+    """Bind Board, section script and optional layout input to committed bytes.
+
+    Checksums alone accept a coherently rewritten archive. Verification uses
+    Git objects, so an uncommitted local edit cannot become release evidence.
+    """
+    with zipfile.ZipFile(archive) as bundle:
+        for name, relative in provenance["configuration_paths"].items():
+            if (name.startswith("configuration/board/") or name in
+                    ("configuration/linker-sections.ld", "configuration/layout.input.json")):
+                validate_archive_path(relative)
+                try:
+                    committed = subprocess.check_output(
+                        ["git", "-C", str(source), "show", f"{commit}:{relative}"], stderr=subprocess.PIPE)
+                except subprocess.CalledProcessError as exc:
+                    raise ReleaseError("Archive Board/layout source is absent from the source commit") from exc
+                if committed != bundle.read(f"{artifact}/{name}"):
+                    raise ReleaseError("Archive Board/layout source differs from the source commit")
 
 
 def verify_assets(source, version, commit, assets, expected, notes):
@@ -845,6 +1004,7 @@ def verify_assets(source, version, commit, assets, expected, notes):
             raise ReleaseError("Downloaded archive checksum mismatch")
         provenance = verify_bundle(archive, artifact, preset, version, commit)
         profile = release_profile(preset, artifact)
+        validate_board_source_commit(source, archive, artifact, provenance, commit)
         validate_dependency_identity(source, provenance.get("submodules", []), profile)
         for record in provenance.get("imported_sources", []):
             try:

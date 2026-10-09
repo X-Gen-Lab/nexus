@@ -1,6 +1,9 @@
 """Fault models for the ELF checker; these do not execute ARM instructions."""
 
 import os
+import copy
+import hashlib
+import json
 from pathlib import Path
 import struct
 import subprocess
@@ -8,12 +11,12 @@ import sys
 import tempfile
 import unittest
 
-from validate_firmware_elf import Elf32, FirmwareError, target_contract, validate_image
+from validate_firmware_elf import Elf32, FirmwareError, target_contract, validate_image, checked_layout
 from package_release import effective_config
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = {
-    'CONFIG_PLATFORM_NAME': 'gd32f470', 'CONFIG_PRODUCT_NAME': 'gd32f470-liangshan',
+    'CONFIG_PLATFORM_NAME': 'gd32f470', 'CONFIG_BOARD_NAME': 'gd32f470-liangshan',
     'CONFIG_GD32F470ZG': True, 'CONFIG_GD32_UART_ENABLE': True,
     'CONFIG_OSAL_BACKEND_NAME': 'baremetal',
     'CONFIG_LINKER_RAM_START': 0x20000000, 'CONFIG_LINKER_RAM_SIZE': 0x30000,
@@ -21,19 +24,28 @@ CONFIG = {
 }
 
 
-def fixture(defect='', config=None, descriptor_bytes=32):
+def fixture(defect='', config=None, descriptor_bytes=32, layout=None, board_identity=None):
     """Build structural data for any maintained profile; no ARM is executed."""
     config = CONFIG if config is None else config
-    storage, flash_end, stack, vector_bytes, vector_name, irq = target_contract(config)
-    data = bytearray(0x3500)
+    storage, flash_end, stack, vector_bytes, vector_name, irq = target_contract(config, layout)
+    data = bytearray(0x5500)
     addresses = {
         'Reset_Handler': 0x08000301, 'SystemInit': 0x08000311,
         vector_name: 0x08000000, '_estack': stack,
-        '__nexus_storage_start': storage, '__nexus_storage_end': flash_end,
+        '__nexus_image_start': 0x08000000, '__nexus_image_end': storage,
         '__nx_device_start': 0x08000500,
         '__nx_device_end': 0x08000500 + descriptor_bytes,
         'nx_device_descriptor_bytes': 0x080004F0,
     }
+    layout = checked_layout(config, layout)
+    for index in range(8):
+        addresses[f'__nexus_layout_sha256_{index}'] = int(layout['sha256'][index * 8:(index + 1) * 8], 16)
+        if board_identity is not None:
+            addresses[f'__nexus_board_sha256_{index}'] = int(board_identity['sha256'][index * 8:(index + 1) * 8], 16)
+    for region in layout['regions']:
+        start = layout['flash_base'] + region['offset']
+        addresses['__nexus_region_' + region['name'] + '_start'] = start
+        addresses['__nexus_region_' + region['name'] + '_end'] = start + region['size']
     for index, name in enumerate(irq.values()):
         addresses[name] = 0x08000321 + index * 16
     if config.get('CONFIG_BOARD_NAME') in ('stm32f407zg-qiming-v31',
@@ -48,7 +60,7 @@ def fixture(defect='', config=None, descriptor_bytes=32):
     if defect == 'outside_flash_reset':
         addresses['Reset_Handler'] = 0x20000001
     if defect == 'storage_boundary':
-        addresses['__nexus_storage_start'] += 4
+        addresses['__nexus_image_end'] += 4
     if defect == 'registry_boundary':
         addresses['__nx_device_end'] += 4
     words = [0] * (vector_bytes // 4)
@@ -69,7 +81,7 @@ def fixture(defect='', config=None, descriptor_bytes=32):
                 ('.nx_abi', 1, 2, 0x080004F0, 0x14F0, 4, 0, 0, 4, 0),
                 ('.shstrtab', 3, 0, 0, 0x2800, 0, 0, 0, 1, 0),
                 ('.strtab', 3, 0, 0, 0x2900, 0, 0, 0, 1, 0),
-                ('.symtab', 2, 0, 0, 0x2C00, 0, 6, 1, 4, 16)]
+                ('.symtab', 2, 0, 0, 0x4C00, 0, 6, 1, 4, 16)]
     strings = bytearray(b'\0')
     symbols = bytearray(b'\0' * 16)
     for name, address in addresses.items():
@@ -82,7 +94,7 @@ def fixture(defect='', config=None, descriptor_bytes=32):
         symbols.extend(struct.pack('<IIIBBH', name_offset, address, 4 if is_abi else 0,
                                    binding << 4 | (1 if is_abi else 2), 0, 4 if is_abi else 2))
     data[0x2900:0x2900 + len(strings)] = strings
-    data[0x2C00:0x2C00 + len(symbols)] = symbols
+    data[0x4C00:0x4C00 + len(symbols)] = symbols
     for index, section in enumerate(sections):
         name, *fields = section
         name_offset = len(names) if name else 0
@@ -104,13 +116,13 @@ def fixture(defect='', config=None, descriptor_bytes=32):
             fields[4] = len(strings)
         if name == '.symtab':
             fields[4] = len(symbols)
-        struct.pack_into('<IIIIIIIIII', data, 0x3000 + index * 40, name_offset, *fields)
+        struct.pack_into('<IIIIIIIIII', data, 0x5000 + index * 40, name_offset, *fields)
     data[0x2800:0x2800 + len(names)] = names
-    struct.pack_into('<I', data, 0x3000 + 5 * 40 + 20, len(names))
+    struct.pack_into('<I', data, 0x5000 + 5 * 40 + 20, len(names))
     ident = b'\x7fELF\x01\x01\x01' + b'\0' * 9
     flags = 0x05000200 if defect == 'float_abi' else 0x05000400
     struct.pack_into('<16sHHIIIIIHHHHHH', data, 0, ident, 2, 40, 1,
-                     addresses['Reset_Handler'], 52, 0x3000, flags,
+                     addresses['Reset_Handler'], 52, 0x5000, flags,
                      52, 32, 2, 40, len(sections), 5)
     permissions = 7 if defect == 'rwx' else 5
     physical = storage if defect == 'storage_overlap' else 0x08000000
@@ -123,6 +135,42 @@ def fixture(defect='', config=None, descriptor_bytes=32):
 
 
 class FirmwareElfTests(unittest.TestCase):
+    def test_external_layout_is_bound_to_linked_symbols(self):
+        layout = checked_layout(CONFIG)
+        layout['image']['size'] = 0xfc000
+        layout['regions'] = [{'name': 'params_a', 'offset': 0xfc000, 'size': 0x2000},
+                             {'name': 'params_b', 'offset': 0xfe000, 'size': 0x2000}]
+        canonical = {k: v for k, v in layout.items() if k not in ('sha256', 'input_sha256')}
+        layout['sha256'] = hashlib.sha256(json.dumps(
+            canonical, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        contents = fixture(layout=layout)
+        report = validate_image(contents, CONFIG, layout=layout)
+        self.assertEqual(report['image_end'], 0x080fc000)
+        self.assertEqual(report['regions'], layout['regions'])
+        with self.assertRaises(FirmwareError):
+            validate_image(contents, CONFIG)  # Another valid layout still rejects this ELF.
+        corrupted = copy.deepcopy(layout)
+        corrupted['regions'][0]['size'] += 4
+        with self.assertRaisesRegex(FirmwareError, 'digest'):
+            validate_image(contents, CONFIG, layout=corrupted)
+
+    def test_layout_rejects_rehashed_overlap_and_nonuniform_sector_boundaries(self):
+        def rehash(layout):
+            canonical = {k: v for k, v in layout.items() if k not in ('sha256', 'input_sha256')}
+            layout['sha256'] = hashlib.sha256(json.dumps(
+                canonical, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+            return layout
+        layout = checked_layout(CONFIG)
+        layout['regions'] = [{'name': 'overlap', 'offset': 0xfc000, 'size': 0x4000}]
+        with self.assertRaisesRegex(FirmwareError, 'overlap'):
+            checked_layout(CONFIG, rehash(layout))
+        stm = {**CONFIG, 'CONFIG_PLATFORM_NAME': 'stm32', 'CONFIG_STM32_FLASH_SIZE': 0x100000,
+               'CONFIG_LINKER_RAM_SIZE': 0x20000}
+        layout = checked_layout(stm)
+        layout['image']['size'] = 0x1000
+        with self.assertRaisesRegex(FirmwareError, 'erase blocks'):
+            checked_layout(stm, rehash(layout))
+
     def test_complete_vendor_vectors_and_readonly_registry_are_accepted(self):
         report = validate_image(fixture(), CONFIG)
         self.assertEqual(report['vector_bytes'], 0x1AC)
@@ -151,7 +199,7 @@ class FirmwareElfTests(unittest.TestCase):
             validate_image(fixture(), {**CONFIG, 'CONFIG_LINKER_RAM_SIZE': 0x80000})
 
     def test_truncated_artifact_is_rejected_without_an_unbounded_read(self):
-        for length in (0, 16, 51, 90, 0x3001):
+        for length in (0, 16, 51, 90, 0x5001):
             with self.subTest(length=length), self.assertRaises(FirmwareError):
                 validate_image(fixture()[:length], CONFIG)
 
@@ -183,11 +231,12 @@ class LinkedFirmwareRejectionTests(unittest.TestCase):
     def test_actual_linked_firmware_detects_vector_irq_segment_and_layout_corruption(self):
         build = Path(os.environ['NEXUS_FIRMWARE_TEST_BUILD'])
         config = effective_config((build / 'generated/effective.config').read_text())
+        layout = json.loads((build / 'generated/layout.json').read_text())
         images = sorted((build / 'bin').glob('*.elf'))
         self.assertTrue(images, 'real ARM build must contain firmware')
         for image in images:
             contents = image.read_bytes()
-            validate_image(contents, config)
+            validate_image(contents, config, layout=layout)
             elf = Elf32(contents)
             header = elf.unpack('<16sHHIIIIIHHHHHH', 0)
             symbol_section = elf.sections['.symtab']
@@ -213,7 +262,7 @@ class LinkedFirmwareRejectionTests(unittest.TestCase):
                 self.fail('real artifact executable load absent')
             mutations['rwx'] = rwx
             for symbol_name, defect in (('SysTick_Handler', 'weak_irq'),
-                                       ('__nexus_storage_start', 'storage_boundary')):
+                                       ('__nexus_image_end', 'storage_boundary')):
                 corrupted = bytearray(contents)
                 for offset in range(symbol_section[4], symbol_section[4] + symbol_section[5], 16):
                     symbol = elf.unpack('<IIIBBH', offset)
@@ -228,7 +277,7 @@ class LinkedFirmwareRejectionTests(unittest.TestCase):
                 mutations[defect] = corrupted
             for defect, corrupted in mutations.items():
                 with self.subTest(image=image.name, defect=defect), self.assertRaises(FirmwareError):
-                    validate_image(bytes(corrupted), config)
+                    validate_image(bytes(corrupted), config, layout=layout)
 
 
 if __name__ == '__main__':

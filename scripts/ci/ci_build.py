@@ -5,8 +5,11 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from scripts.validation.junit import validate_junit
 
 
 def run(command):
@@ -48,18 +51,23 @@ def main():
             run(["cmake", "--build", "--preset", args.preset, "--parallel", args.jobs])
         if args.stage == "test" or (args.stage == "all" and host_tests):
             report = ROOT / "build" / args.preset / "ctest-results.xml"
+            report.unlink(missing_ok=True)
+            started_ns = time.time_ns()
             run(["ctest", "--preset", args.preset, "--parallel", args.jobs,
                  "--output-on-failure", "--no-tests=error", "--output-junit", report])
+            results = validate_junit(report, not_before_ns=started_ns)
+            print(f"Verified {results['passed']} passed, {results['skipped']} skipped; "
+                  f"JUnit SHA-256 {results['report_sha256']}")
         if args.stage == "all" and not host_tests:
             if settings.get("NEXUS_PLATFORM") == "native":
-                print("Application build completed; this preset runs its finite Native example separately.")
+                print("Platform build completed; this preset does not execute host contracts.")
             else:
                 print("Embedded compilation completed. Hardware execution requires HIL evidence.")
         if args.stage == "lint":
             run([sys.executable, ROOT / "scripts/tools/format.py", "--check"])
         if args.stage == "docs":
             run([sys.executable, ROOT / "scripts/tools/docs.py", "-t", "doxygen"])
-    except (subprocess.CalledProcessError, OSError) as error:
+    except (subprocess.CalledProcessError, OSError, ValueError) as error:
         print(f"CI command failed: {error}", file=sys.stderr)
         return 1
     return 0

@@ -101,15 +101,15 @@ class ChangePathsTests(unittest.TestCase):
     def decisions(self, changes):
         return required_jobs(classify(self.filters, changes), "pull_request")
 
-    def test_production_sources_and_future_product_boundaries_require_builds(self):
+    def test_production_sources_and_runtime_boundaries_require_builds(self):
         paths = (
             "hal/src/nx_hal.c", "osal/adapters/baremetal/osal_baremetal.c",
             "framework/config/src/config.c", "services/storage/src/storage.c",
             "platforms/stm32/src/hal/spi/stm32_spi_sync.c",
-            "applications/blinky/main.c", "examples/industrial_controller/main.c",
+            "runtime/src/nx_runtime.c", "runtime/src/nx_platform_info.c",
             "arch/cortex_m/interrupt.c", "soc/stm32f407vg/flash.c",
-            "boards/stm32f4discovery/spi.c", "profiles/support-matrix.json",
-            "products/controller/manifest.json", "products/controller/src/main.c",
+            "boards/stm32f4discovery/spi.c", "runtime/support-matrix.json",
+            "runtime/contracts/manifest.json", "runtime/contracts/src/main.c",
         )
         for path in paths:
             with self.subTest(path=path):
@@ -119,16 +119,16 @@ class ChangePathsTests(unittest.TestCase):
     def test_build_configuration_and_dependency_identity_require_builds(self):
         paths = (
             "CMakeLists.txt", "CMakePresets.json", "CMakeUserPresets.json",
-            "products/controller/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+            "runtime/contracts/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
             "platforms/stm32/linker/stm32f4/gcc/stm32f407.ld",
-            "Kconfig", "applications/Kconfig", "platforms/native/Kconfig.platform",
+            "Kconfig", "runtime/Kconfig", "platforms/native/Kconfig.platform",
             "configs/stm32f407_freertos_defconfig", ".config", ".config.product",
-            "products/controller/.config.board", "products/controller/minimal_defconfig",
+            "runtime/contracts/.config.board", "runtime/contracts/minimal_defconfig",
             "scripts/kconfig/generate_config.py", ".gitmodules", "nexus.lock",
             "dependencies/actions.lock.json", "deps/sdk.lock", "third_party/sdk/source.c",
-            "requirements.txt", "products/controller/requirements-build.txt",
-            "products/controller/pyproject.toml", "products/controller/poetry.lock",
-            "products/controller/uv.lock", ".clang-tidy", ".clang-format",
+            "requirements.txt", "runtime/contracts/requirements-build.txt",
+            "runtime/contracts/pyproject.toml", "runtime/contracts/poetry.lock",
+            "runtime/contracts/uv.lock", ".clang-tidy", ".clang-format",
         )
         for path in paths:
             with self.subTest(path=path):
@@ -141,8 +141,8 @@ class ChangePathsTests(unittest.TestCase):
                 self.assertTrue(self.decisions([("modified", path)])["build-test"])
 
     def test_deletions_and_mixed_changes_cannot_justify_build_skips(self):
-        for path in ("examples/industrial_controller/main.c", "vendors/st/cmsis_device_f4",
-                     "products/controller/profile.json", "cmake/toolchains/arm-gcc.cmake"):
+        for path in ("runtime/src/nx_platform_info.c", "vendors/st/cmsis_device_f4",
+                     "runtime/contracts/profile.json", "cmake/toolchains/arm-gcc.cmake"):
             for changes in ([("deleted", path)],
                             [("modified", "README.md"), ("deleted", path)]):
                 with self.subTest(changes=changes):

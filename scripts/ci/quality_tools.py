@@ -13,7 +13,7 @@ import shlex
 import subprocess
 import tempfile
 
-OWNED = {"arch", "products", "hal", "osal", "framework", "services", "platforms", "boards", "soc"}
+OWNED = {"arch", "runtime", "hal", "osal", "framework", "services", "platforms", "boards", "soc"}
 
 # These production drivers need a host register model to be compiled in the
 # Native database. Their translation units include the actual production .c;
@@ -214,7 +214,7 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                     invocations.append([tool, entry["file"], "-p", str(directory),
                      "--checks=" + TIDY_CHECKS,
                      "--warnings-as-errors=*",
-                     "--header-filter=" + str(root.resolve()) + "/(arch|products|hal|osal|framework|services|platforms|boards|soc)/.*"])
+                     "--header-filter=" + str(root.resolve()) + "/(arch|runtime|hal|osal|framework|services|platforms|boards|soc)/.*"])
             else:
                 invocations = []
             failed = False

@@ -9,39 +9,6 @@ permissions:
   contents: read
 
 jobs:
-  host-contract-runtime:
-    name: Host contract execution timings (not MCU real-time evidence)
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          submodules: recursive
-      - uses: ./.github/actions/setup-build
-        with:
-          os: ubuntu-latest
-          preset: linux-gcc-release
-      - name: Build Release contracts
-        run: |
-          cmake --preset linux-gcc-release
-          cmake --build --preset linux-gcc-release --parallel 2
-      - name: Execute all host contracts, reject zero tests
-        run: |
-          ctest --preset linux-gcc-release --no-tests=error \
-            --output-junit "${{ github.workspace }}/build/linux-gcc-release/runtime-results.xml"
-          python -c "from pathlib import Path; from scripts.evidence.build_inventory import test_summary; print(test_summary(Path('build/linux-gcc-release/runtime-results.xml')))"
-      - name: Retain measured host runtimes and configuration
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: host-contract-runtime
-          path: |
-            build/linux-gcc-release/runtime-results.xml
-            build/linux-gcc-release/generated/
-            build/linux-gcc-release/Testing/Temporary/LastTest.log
-          if-no-files-found: error
-          retention-days: 90
-
   memory-check:
     name: Native Valgrind contracts
     runs-on: ubuntu-latest
@@ -83,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        preset: [linux-stm32-armgcc-release, stm32-armgcc-freertos-release]
+        preset: [stm32-armgcc-release, stm32-armgcc-freertos-release]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

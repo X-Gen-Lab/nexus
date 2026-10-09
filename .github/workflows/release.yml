@@ -113,11 +113,16 @@ jobs:
         with:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
+      - name: Install locked ARM compiler for source SDK relocation contracts
+        if: matrix.host_tests
+        run: |
+          python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+          echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
       - name: Initialize Maintained Dependencies
         run: |
           case "$BUILD_PRESET" in
             linux-gcc-release)
-              git submodule update --init --recursive ext/googletest ext/freertos
+              git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
               ;;
             gd32f470-*)
               python scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
@@ -140,11 +145,9 @@ jobs:
           python scripts/ci/validate_firmware_elf.py
           --build-dir "build/$BUILD_PRESET"
           --report "build/$BUILD_PRESET/firmware-static-contract.json"
-      - name: Test native host build
+      - name: Test Native platform contracts and verify fresh JUnit
         if: matrix.host_tests
-        run: >-
-          ctest --preset "$BUILD_PRESET" --output-on-failure --no-tests=error --parallel 4
-          --output-junit "$GITHUB_WORKSPACE/build/$BUILD_PRESET/ctest-results.xml"
+        run: python scripts/ci/ci_build.py --preset "$BUILD_PRESET" --stage test --jobs 4
       - name: Package compiled outputs and provenance
         run: |
           python scripts/ci/package_release.py package \

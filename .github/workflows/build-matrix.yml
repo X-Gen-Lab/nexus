@@ -3,6 +3,10 @@ name: Build Matrix
 on:
   workflow_call:
 
+defaults:
+  run:
+    shell: bash
+
 env:
   CCACHE_DIR: ${{ github.workspace }}/.ccache
 
@@ -14,15 +18,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Linux GCC Debug
+          - name: Linux GCC Debug (compile only)
             os: ubuntu-latest
             preset: linux-gcc-debug
             upload_artifacts: false
-          - name: Linux GCC Release
+          - name: Linux GCC Release contracts
             os: ubuntu-latest
             preset: linux-gcc-release
             upload_artifacts: true
-          - name: Linux Clang Release
+          - name: Linux Clang Release (compile only)
             os: ubuntu-latest
             preset: linux-clang-release
             upload_artifacts: false
@@ -80,8 +84,13 @@ jobs:
           os: ${{ matrix.os }}
           preset: ${{ matrix.preset }}
 
+      - name: Install locked ARM compiler for source SDK relocation contracts
+        if: matrix.preset == 'linux-gcc-release'
+        run: |
+          python3 scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+          echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
       - name: Initialize Maintained Dependencies
-        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
 
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
@@ -96,13 +105,15 @@ jobs:
           --build-dir build/${{ matrix.preset }}
           --report build/${{ matrix.preset }}/firmware-static-contract.json
 
-      - name: Test
-        if: ${{ !matrix.is_arm }}
-        run: ctest --preset ${{ matrix.preset }} --output-on-failure --no-tests=error --parallel 4 --output-junit "${{ github.workspace }}/build/${{ matrix.preset }}/ctest-results.xml"
+      # GCC Release is the one complete uninstrumented Native execution.
+      # Debug/Clang matrix members establish separate compilation contexts.
+      - name: Run Native contracts and verify fresh JUnit
+        if: matrix.preset == 'linux-gcc-release'
+        run: python3 scripts/ci/ci_build.py --preset "${{ matrix.preset }}" --stage test --jobs 4
 
       - name: Verify ARM Artifact Rejection Paths
         if: matrix.is_arm
-        run: python3 -m unittest discover -s scripts/ci -p test_validate_firmware_elf.py
+        run: python3 scripts/ci/test_validate_firmware_elf.py LinkedFirmwareRejectionTests -v
         env:
           NEXUS_FIRMWARE_TEST_BUILD: build/${{ matrix.preset }}
 
@@ -146,7 +157,7 @@ jobs:
           preset: linux-gcc-coverage
 
       - name: Initialize Maintained Dependencies
-        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
 
       - name: Configure
         run: |
@@ -159,14 +170,14 @@ jobs:
           cmake --build --preset linux-gcc-coverage --parallel 4
 
       - name: Test
-        run: ctest --preset linux-gcc-coverage --output-on-failure --no-tests=error --parallel 4
+        run: python3 scripts/ci/ci_build.py --preset linux-gcc-coverage --stage test --jobs 4
 
       - name: Generate Coverage
         run: |
           # Native runtime scope; boards/soc need separate ARM coverage evidence.
           lcov --capture --directory build/linux-gcc-coverage --output-file coverage.info \
             --include "${{ github.workspace }}/arch/*" \
-            --include "${{ github.workspace }}/products/*" \
+            --include "${{ github.workspace }}/runtime/*" \
             --include "${{ github.workspace }}/hal/*" \
             --include "${{ github.workspace }}/osal/*" \
             --include "${{ github.workspace }}/framework/*" \
@@ -184,7 +195,7 @@ jobs:
           retention-days: 30
 
   sanitizer:
-    name: ASan and UBSan service contracts
+    name: ASan and UBSan platform contracts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -197,31 +208,13 @@ jobs:
           os: ubuntu-latest
           preset: linux-gcc-sanitizers
       - name: Initialize Maintained Dependencies
-        run: git submodule update --init ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
       - name: Configure
         run: cmake --preset linux-gcc-sanitizers
-      - name: Build Contract Targets
-        run: >-
-          cmake --build --preset linux-gcc-sanitizers --parallel 4 --target
-          osal_contract_tests baremetal_contract_tests init_registry_tests nexus_industrial_tests
-          native_registry_contract_tests posix_event_contract_tests unbound_platform_contract_tests log_contract_tests
-          blinky config_demo shell_demo freertos_demo nexus_industrial_controller
-          crypto_tests crypto_partial_tests crypto_unconfigured_tests
-          storage_tests config_persistence_tests update_tests update_storage_tests
-          test_driver_stm32_spi_bare test_driver_stm32_spi_osal test_driver_stm32_gpio
-          test_driver_stm32_uart test_driver_stm32_uart_clock
-          test_driver_stm32_flash_geometry test_driver_stm32_flash_512k
-          test_driver_stm32_flash_1m test_driver_stm32_flash_mismatched
-          test_driver_gd32_uart test_driver_gd32_spi test_driver_gd32_timebase test_driver_gd32_flash
-          test_driver_gd32_typed_spi
-          arch_contract_tests typed_device_contract_tests typed_native_spi_tests typed_stm32_gpio_registration
-          product_boot_contract_tests product_native_smoke
-          test_board_stm32f407_qiming_v31 test_board_stm32f407ve_sky_qingchun
-      - name: Run Contract Targets
-        run: >-
-          ctest --preset linux-gcc-sanitizers --parallel 1 --output-on-failure --no-tests=error
-          -R '^(osal_contract_tests|baremetal_contract_tests|init_registry_tests|crypto_tests|crypto_partial_tests|crypto_unconfigured_tests|storage_tests|config_persistence_tests|update_tests|update_storage_tests|driver_stm32_spi_bare|driver_stm32_spi_osal|driver_stm32_gpio|driver_stm32_uart|driver_stm32_uart_clock|driver_stm32_flash_.*|driver_gd32_.*|arch_contract_tests|TypedDevice\..*|TypedSPI\..*|TypedNativeSPI\..*|TypedNativeDelayedSPI\..*|typed_stm32_gpio_registration|product_boot_contract_tests|product_native_smoke|board_stm32f407_qiming_v31|board_stm32f407ve_sky_qingchun|nexus_industrial_tests|native_registry_contract_tests|posix_event_contract_tests|unbound_platform_contract_tests|log_contract_tests|native_blinky_smoke|native_config_demo_smoke|native_shell_demo_smoke|native_freertos_demo_smoke|native_industrial_controller_smoke)$'
-          --output-junit "${{ github.workspace }}/build/linux-gcc-sanitizers/ctest-results.xml"
+      - name: Build platform contract targets
+        run: cmake --build --preset linux-gcc-sanitizers --parallel 4
+      - name: Run instrumented platform contracts and verify fresh JUnit
+        run: python3 scripts/ci/ci_build.py --preset linux-gcc-sanitizers --stage test --jobs 1
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
           UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
@@ -235,3 +228,61 @@ jobs:
             build/linux-gcc-sanitizers/ctest-results.xml
             build/linux-gcc-sanitizers/generated/*
           retention-days: 7
+
+  platform-tooling:
+    name: SDK configuration, release gates and HIL readiness
+    needs: matrix-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXUS_RELEASE_TEST_BUILD: build/linux-gcc-release
+      NEXUS_RELEASE_TEST_PRESET: linux-gcc-release
+      NEXUS_FIRMWARE_TEST_BUILD: build/stm32-qiming-armgcc-freertos-release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+      - uses: ./.github/actions/setup-build
+        with:
+          os: ubuntu-latest
+          preset: linux-gcc-release
+      - name: Initialize maintained test dependencies
+        run: git submodule update --init --recursive ext/googletest ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/stm32f4xx_hal_driver
+      - name: Download actual Native Release evidence
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binaries-linux-gcc-release
+          path: build/linux-gcc-release
+      - name: Download actual ARM contract evidence
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binaries-stm32-qiming-armgcc-freertos-release
+          path: build/stm32-qiming-armgcc-freertos-release
+      - name: Verify Python syntax and action locks
+        run: |
+          python3 scripts/ci/check_python_syntax.py
+          python3 scripts/ci/check_action_pins.py
+      - name: Test Board generator and build entry points
+        run: |
+          mkdir -p build/tooling
+          python3 -m unittest discover -s scripts/configure -p 'test_*.py' -v 2>&1 | tee build/tooling/configure-tests.log
+      - name: Test SDK configuration and independent consumers
+        run: python3 -m unittest discover -s scripts/kconfig -p 'test_*.py' -v 2>&1 | tee build/tooling/kconfig-tests.log
+      - name: Test CI and release gates with actual linked artifacts
+        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v 2>&1 | tee build/tooling/ci-tests.log
+      - name: Test strict reports and preset subprocess failures
+        run: python3 -m unittest discover -s tests/validation -p 'test_*.py' -v 2>&1 | tee build/tooling/validation-tests.log
+      - name: Test HIL readiness and nonphysical adapter rejection paths
+        run: python3 -m unittest discover -s tests/hil -p 'test_*.py' -v 2>&1 | tee build/tooling/hil-readiness-tests.log
+      - name: Parse workflow contracts and execute their real test commands
+        run: |
+          python3 -m pip install PyYAML==6.0.3
+          python3 -m unittest discover -s .github/workflows -p 'test_*.py' -v 2>&1 | tee build/tooling/workflow-tests.log
+      - name: Retain tooling execution logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: platform-tooling-evidence
+          path: build/tooling/*.log
+          if-no-files-found: error
+          retention-days: 14

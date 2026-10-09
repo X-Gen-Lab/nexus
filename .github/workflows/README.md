@@ -1,95 +1,112 @@
-# Maintained GitHub workflows
+# Maintained platform workflows
 
-The workflow files define gates; they are not execution evidence. Retain actual
-logs, effective configuration, compiler commands, test reports and artifact
-identities. The current local outcomes and unavailable tools/hardware are recorded
-under `docs/implementation/`.
+Nexus owns the common SDK, Board packages and platform contracts. Product
+applications and demonstration repositories are independent consumers. Platform
+CI neither checks out those repositories nor requires their application targets.
+A workflow definition is a gate specification, not execution evidence.
 
-| Workflow | Contract |
+| Workflow | Gate |
 |---|---|
-| `ci.yml` | Detect code/docs/workflow changes, call the required jobs and reject missing or failed required results. |
-| `build-matrix.yml` | Linux GCC Debug/Release and Clang Release host tests; STM32F407 baremetal/FreeRTOS ARM GCC compilation; host coverage and sanitizer contracts. |
-| `quality-checks.yml` | Run real clang-tidy and cppcheck against the actual compilation database; findings, missing tools, empty source selection and process failures fail the job. |
-| `docs-build.yml` | Build documentation using its declared tools; build results remain distinct from firmware/HIL evidence. |
-| `release.yml` | Validate a matching source tag, build three candidate members, verify their identities and hashes, then create a draft. |
-| `security.yml` | Audit resolved Python dependencies, run CodeQL and scan secrets; tool execution is distinct from cryptographic or product qualification. |
-| `performance.yml` | Retain measured host execution and memory evidence and ARM image sizes; host timings do not establish control-loop deadlines. |
+| `ci.yml` | Detect platform/docs/workflow changes and require the appropriate build, quality and documentation results. |
+| `build-matrix.yml` | Compile GCC Debug, GCC Release and Clang Release; execute one full uninstrumented Native Release suite; compile and inspect eight ARM Board/OSAL contracts; run separate coverage and sanitizer configurations. |
+| `quality-checks.yml` | Run clang-tidy and cppcheck on an actual compilation database, rejecting missing tools, empty selection, process errors and findings. |
+| `release.yml` | Build nine source-bound platform candidates, revalidate their archived inputs and ELF/test evidence, and create a draft after the full matrix passes. |
+| `enterprise-tools.yml` | Exercise delivery adapters and validate approved requirement/role mappings. |
+| `security.yml` | Audit resolved Python dependencies, extract actual CodeQL build contexts and scan secrets. |
+| `performance.yml` | Measure Valgrind execution and ARM linked sections separately. Native CTest timing records are already retained by the normal matrix. |
+| `docs-build.yml` | Build documentation with its declared tools. |
 
-## Build and test inputs
+## Platform build and execution
 
-Presets select compiler, build mode and input fragment. Each build directory owns
-`generated/effective.config`, `nexus_config.h` and `config.cmake`. Source-root
-`.config` and headers are not build inputs. Unknown or conflicting configuration,
-missing implementations and missing pinned dependencies stop configuration.
+Each preset owns its generated configuration and build directory. Unknown or
+contradictory configuration, missing dependencies or unimplemented requirements
+stop configuration. The generated Board identity binds the manifest and each
+Board input; ARM builds additionally bind the resolved Flash layout, generated
+header and linker script. CPU/SDK/Board sources remain explicit build targets.
 
-The maintained matrix initializes GoogleTest, FreeRTOS, CMSIS and the STM32F4
-SDK submodules at the repository gitlinks. Native builds use OpenSSL 3. The setup
-composite installs `kconfiglib==14.1.0`; configure does not download dependencies.
-ccache caches compilation, while each job resolves a fresh build configuration.
-Whole build directories are not shared across products or compilers.
+The maintained ARM matrix covers STM32F407VG Discovery, STM32F407ZG Qiming V3.1,
+STM32F407VE Sky Youth and GD32F470ZG Liangshan with baremetal and FreeRTOS.
+Each member runs the actual vector, strong IRQ, registry ABI, memory and
+Board/layout hash checks. GCC ARM comes from the reviewed official download
+and checksum lock through `setup-build`; distribution ARM packages do not
+replace that compiler identity. Native Release also installs this compiler so
+its relocated source SDK test executes the ARM consumer, as well as C/C++
+Native consumers. The release Native checkout initializes all five maintained
+dependencies required by the full contract suite and source SDK package.
+Initialization is recursive, including the recorded FreeRTOS nested gitlinks.
 
-Host CTest invocations reject zero tests and save actual JUnit reports. Windows
-and macOS presets remain available for separate validation; they are not part of
-the maintained Linux execution matrix. ARM jobs compile the concrete F407/MB997
-profile and do not claim electrical, IRQ/DMA, timing or power-loss qualification.
+GCC Debug and Clang Release are compilation checks. GCC Release executes the
+complete normal Native CTest suite once. Coverage and ASan/UBSan execute their
+own configurations because instrumentation changes the contract being checked.
+The sanitizer build uses the actual CMake target graph, with no application
+list or hand-maintained regular expression. Leak checks remain enabled.
 
-Coverage retains lcov/HTML artifacts in GitHub. No Codecov service or token is
-required. The sanitizer job builds 18 standalone contracts plus five finite
-Native applications, and runs ASan/UBSan with leak checking on its normal Linux
-runner. A local environment limitation must be recorded separately and cannot
-be silently copied into the CI settings.
+Every Native CTest execution uses `scripts/ci/ci_build.py`: delete the previous
+report, require the subprocess to succeed, reject zero tests and validate fresh
+JUnit with the shared strict parser. Failed, malformed, contradictory or all-skip
+reports cannot pass. Partial skips are recorded as skips. Matrix artifacts retain
+configuration, compile commands, linked files, JUnit/static reports and logs.
 
-## Required quality and supply-chain checks
+Coverage captures only the instrumented Native ownership scope: Arch, Runtime,
+HAL, OSAL, Framework, Services and Native platform code. Board/SoC hardware
+coverage needs separate execution. Capture errors and empty source records fail;
+coverage percentages are evidence, without an invented qualification threshold.
 
-External Actions are pinned to full commit identities; local composite/reusable
-workflow paths remain local. Before changing them, run:
+## Tooling and HIL readiness
+
+The tooling job consumes Native Release and Qiming FreeRTOS artifacts from the
+same successful build matrix. It executes the production configuration, Board,
+CI/release and report helpers and independent SDK consumer tests. The suites are:
 
 ```sh
-python scripts/ci/check_action_pins.py
-python -m unittest discover -s scripts/ci -p 'test_*.py'
+python3 -m unittest discover -s scripts/configure -p 'test_*.py' -v
+python3 -m unittest discover -s scripts/kconfig -p 'test_*.py' -v
+python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
+python3 -m unittest discover -s tests/validation -p 'test_*.py' -v
+python3 -m unittest discover -s tests/hil -p 'test_*.py' -v
 ```
 
-The static-analysis runner reads the compilation database and executes analyzers
-without a shell. Reports are retained on success and failure. Missing analyzers
-are not successful checks. Formatting and complexity guidance do not establish
-MISRA compliance or functional-safety certification.
+Actual artifact environment variables enable the CI helpers' real-build cases.
+Logs are retained per suite, with shell pipe failure propagation. Workflow tests
+parse YAML, validate shell syntax and execute the declared Native commands on
+finite, zero-test, all-skip and stale-report CMake projects. They also execute the
+ARM checker against the retained linked artifact. PyYAML is pinned for this
+workflow parser; platform production helpers remain stdlib based.
 
-`ci.yml` evaluates required job results according to the detected change/event
-policy. A prerequisite failure cannot turn a required skipped job into a green
-status. Repository branch protection must select these statuses explicitly;
-this maintenance run does not change remote repository settings.
+HIL readiness uses explicit nonphysical adapters to check admission, identity,
+readback, cleanup and failure boundaries. It never flashes an untrusted runner
+or claims physical qualification. Real boards require a reviewed lab station,
+probe identity and separately retained measurements.
 
 ## Candidate release boundary
 
-The release matrix is Linux GCC Native, STM32F407 baremetal and STM32F407
-FreeRTOS. Package validation checks the effective bundle, actual compilation
-arguments, ELF architecture, board/chip/OSAL identities, clean matching source
-tag and pinned dependency commits. Native requires a nonzero successful JUnit
-report; recorded skipped counts do not establish support for the skipped cases.
-ARM members are explicitly `cross-compile-only` and `hardware_verified=false`.
+A platform candidate contains Native plus all eight ARM members. Packaging
+requires a clean matching source tag, reviewed toolchain/configuration,
+production compile commands, pinned submodules or verified vendor import,
+actual platform contract ELF and Native nonzero successful JUnit.
 
-Candidate archives retain the input fragment, resolved bundle, CMake cache,
-compile commands, ELF/images/maps, dependency identity, execution reports and
-SHA-256 checksums. Aggregation rechecks member hashes and source gitlinks before
-the final job creates a draft. Product promotion requires separately reviewed
-HIL, resource, manufacturing and security evidence. It reuses the validated
-artifacts rather than rebuilding an undocumented image.
+Archives retain the effective three-file configuration bundle, input fragment,
+Board manifest and each input, generated Board/layout files, source linker
+sections, optional explicit layout input, compiler commands, files and hashes.
+Verification regenerates configuration-derived outputs, repeats actual ELF
+checks and compares Board/layout sources with committed Git objects. A coherent
+rewrite of archive checksums does not replace source identity.
 
-No production signing key belongs in the repository, fixtures, logs or artifacts.
-A workflow definition or draft is not a qualified release. See
-`docs/implementation/release-workflow.md` and
-`docs/sphinx/development/release_process.rst` for the implemented candidate gates.
+Candidates are drafts. Checksums and provenance are unsigned; this pipeline
+neither establishes reproducible builds nor signs or qualifies firmware.
+Electrical, timing, DMA/ISR, persistence, manufacturing and product promotion
+require their own evidence. No signing credentials belong in source or logs.
+Branch protection selects the aggregate statuses explicitly; these workflows
+never change repository settings.
 
 ## Local entry points
 
 ```sh
-python scripts/ci/ci_build.py --preset linux-gcc-debug --stage all --jobs 4
-python scripts/building/build.py --preset linux-gcc-release --stage build --jobs 4
-python scripts/test/test.py --preset linux-gcc-debug --jobs 4
-python scripts/ci/ci_build.py --preset stm32-armgcc-release --stage build --jobs 4
+python3 scripts/ci/ci_build.py --preset linux-gcc-release --stage all --jobs 4
+python3 scripts/ci/ci_build.py --preset stm32-armgcc-release --stage build --jobs 4
+python3 scripts/ci/validate_firmware_elf.py --build-dir build/stm32-armgcc-release --report build/stm32-armgcc-release/firmware-static-contract.json
+python3 scripts/ci/check_action_pins.py
 ```
 
-All wrappers delegate to the same preset workflow and propagate failures. They
-do not infer a toolchain from root `.config`, delete build directories or look
-for the retired `nexus_tests` executable. `--stage test` runs an already built
-host-test preset; embedded execution requires a real HIL station and report.
+Legacy wrappers forward to the same explicit preset runner and preserve failures.
+Embedded compilation and static inspection remain separate from physical HIL.

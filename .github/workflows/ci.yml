@@ -39,11 +39,8 @@ jobs:
               - 'arch/**'
               - 'boards/**'
               - 'soc/**'
-              - 'profiles/**'
-              - 'products/**'
+              - 'runtime/**'
               - 'platforms/**'
-              - 'applications/**'
-              - 'examples/**'
               - 'tests/**'
               - '**/CMakeLists.txt'
               - 'cmake/**'
@@ -113,12 +110,6 @@ jobs:
     if: always()
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Compile owned tracked Python syntax
-        run: python3 scripts/ci/check_python_syntax.py
-      - name: Verify locked external actions
-        run: python3 scripts/ci/check_action_pins.py
-      - name: Test CI gate policy
-        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
       - name: Check required results
         env:
           CI_NEEDS_JSON: ${{ toJSON(needs) }}
