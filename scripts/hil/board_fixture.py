@@ -175,13 +175,19 @@ def validate_station(station,fixture,*,model=False):
     require(isinstance(serial['path'],str) and serial['path'],'observed serial device required')
     if model:
         serial_key=hashlib.sha256(serial['path'].encode()).hexdigest()
+        serial_device={'kind':'model','supplied_path':serial['path']}
     else:
         serial_path=Path(serial['path']).resolve(strict=True)
         observed=serial_path.stat()
         require(stat.S_ISCHR(observed.st_mode),'serial path must be an actual character device')
         require(re.fullmatch(r'tty[A-Za-z0-9_.-]+',serial_path.name) is not None,
                 'serial path is not an identified tty device')
-        serial_key=hashlib.sha256(f'{serial_path}:{observed.st_rdev}'.encode()).hexdigest()
+        # This lease directory belongs to one host/kernel. Paths are audit
+        # data: different nodes/hardlinks can name the same character device.
+        serial_key=hashlib.sha256(f'local-character-device:{observed.st_rdev}'.encode()).hexdigest()
+        serial_device={'kind':'character-device','lease_scope':'local-host',
+            'supplied_path':serial['path'],'canonical_path':str(serial_path),
+            'st_rdev':observed.st_rdev}
     require(isinstance(station['adapter_files'],list) and station['adapter_files'],'reviewed adapter file identities required')
     for identity in station['adapter_files']:
         verify_file_identity(identity)
@@ -192,7 +198,7 @@ def validate_station(station,fixture,*,model=False):
         expanded=command(argv,{'firmware':'firmware.bin',**station['board']})
         executable=regular_file(expanded[0]).resolve()
         require(str(executable) in pinned,'command executable is not an identified reviewed tool')
-    return identities,'serial-'+serial_key
+    return identities,'serial-'+serial_key,serial_device
 
 def run(fixture_path,station_path,build_dir,image,static_report,report_path,leases,
         *,execute_hardware=False,model=False,artifact_validator=None,adapter_runner=None):
@@ -209,7 +215,7 @@ def run(fixture_path,station_path,build_dir,image,static_report,report_path,leas
         station=load_json(station_path)
         reject_secret_fields(station)
         build=(artifact_validator or validate_build)(fixture,build_dir,image,static_report)
-        inputs,serial_lease=validate_station(station,fixture,model=model)
+        inputs,serial_lease,serial_device=validate_station(station,fixture,model=model)
         artifacts=build['artifacts']+[file_identity(fixture_path),file_identity(station_path)]
         protected.extend(Path(item['path']) for item in artifacts+inputs)
         safe=all(report_path.resolve()!=path.resolve() for path in protected)
@@ -224,7 +230,7 @@ def run(fixture_path,station_path,build_dir,image,static_report,report_path,leas
         report.update({'status':'ready','dry_run':not execute_hardware and not model,
             'fixture_sha256':digest(fixture_path),'station_sha256':digest(station_path),
             'build_identity':build,'board':station['board'],'planned_operations':list(station['commands']),
-            'pending_qualification':fixture['pending_qualification']})
+            'serial_device':serial_device,'pending_qualification':fixture['pending_qualification']})
         if execute_hardware or model:
             import tempfile
             with tempfile.TemporaryDirectory() as temporary:

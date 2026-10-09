@@ -70,7 +70,7 @@ UART 观察不能独立证明板卡或固件身份；旧 UART echo banner 没有
 3. 准入重新校验 Board 实际文件与 inputs、layout canonical hash 和 erase boundary/重叠；检查 ELF 的 image/region/layout symbols；从 ELF file-backed allocated sections 重建 BIN，逐字节比对，防止拿别的 BIN 刷写。
 4. 签收实物 station：实际 inventory ID、PCB revision、芯片丝印、96-bit UID、probe serial、串口设备和电气接线。锁定 reviewed tools/adapter/config 文件 hash。缺失项直接失败。
 5. 先 dry-run，查看具体核准镜像、Board/layout/config 身份与计划动作。它不获取探针，也不写板。
-6. 受控 lab 人员显式执行。Board inventory、物理 probe 和 canonical tty 三类资源在同一共享 lease root 独占；identify 错误在编程前停止；readback 错误在 reset/UART 前停止。
+6. 受控 lab 人员显式执行。Board inventory、物理 probe 和 tty 三类资源在同一主机的共享 lease root 独占；串口按内核字符设备号 `st_rdev` 归一，符号链接、硬链接及同设备的不同节点不能取得第二把锁。输入与 canonical 路径只进入 audit，跨主机设备池需要另行定义 host/device registry。identify 错误在编程前停止；readback 错误在 reset/UART 前停止。
 7. 本轮 smoke 只认 `probe_identity`、`flash_readback`、`reset`、`uart_echo` 全部 pass。零、缺失、重复、fail/skipped 和预算错误都失败；清理失败隔离，不能依 TTL 自动抢占。
 
 ```sh
@@ -109,6 +109,8 @@ python3 -m unittest discover -s tests/hil -p 'test_*.py' -v
 python3 -m unittest scripts.evidence.test_enterprise_tools.AdapterFixture -v
 ```
 
-新增 Board/串口模型 23/23、既有 HIL 编排回归 20/20 通过，均没有跳过。对当前 `stm32-qiming-armgcc-freertos-release` 的 `nexus_contract_firmware` 执行真实静态 checker 和 `validate_build`，确认 Board/layout SHA 符号、有效配置、ELF/BIN 字节及 11 个工件身份一致。复制这些工件后，BIN、ELF、有效配置、Board identity、layout identity 和静态报告 Board SHA 六种篡改全部被拒绝。软件记录为 `build/rf-hil-artifact-admission.json`；它明确 `hardware_verified:false`、`eligible_physical_hil:false`。该镜像是平台链接合同测试镜像，未作为 `uart_echo` 或实板运行资格使用。
+新增 Board/串口模型 26/26、既有 HIL 编排回归 20/20 通过，均没有跳过。追加的字符设备 stat 模型先复现“同设备、不同节点取得两把锁”，修复后验证节点别名冲突、符号链接冲突和不同设备并行；日志为 `build/rf-hil-node-alias-before.log`、`build/rf-hil-node-alias-after.log`。没有创建、打开或发送真实串口数据。
+
+对开发阶段的 `stm32-qiming-armgcc-freertos-release` 的 `nexus_contract_firmware` 执行真实静态 checker 和 `validate_build`，确认 Board/layout SHA 符号、有效配置、ELF/BIN 字节及 11 个工件身份一致。复制这些工件后，BIN、ELF、有效配置、Board identity、layout identity 和静态报告 Board SHA 六种篡改全部被拒绝。软件记录为 `build/rf-hil-artifact-admission.json`；它明确 `hardware_verified:false`、`eligible_physical_hil:false`。该镜像是平台链接合同测试镜像，未作为 `uart_echo` 或实板运行资格使用。
 
 历史 ELF/BIN 文件只用于检查纯重建算法的字节对应，不计入新平台镜像或硬件资格。正式资格应在最终提交及 Nexus/examples SHA pair 上重新绑定构建、静态报告和实验室记录；本段计数不能代替那个最终记录。

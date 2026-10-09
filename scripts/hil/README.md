@@ -37,7 +37,11 @@ The runner leases both board ID and physical `probe_serial`; a second manifest c
 race the same probe merely by using a different logical board name. The lease root must
 be shared by all station jobs that can reach those resources.
 The Board readiness wrapper additionally provides `serial_lease_id`, based on
-the actual canonical tty, so different logical stations cannot race one UART.
+the actual tty's kernel character-device number (`st_rdev`). Its lease directory
+belongs to one host and is shared by all jobs on that host. Symlinks, hardlinks,
+and separate nodes naming the same device must acquire the same serial lease;
+supplied/canonical paths remain audit data. A cross-host equipment pool requires
+an explicit host/device registry and is outside this serial lease contract.
 
 Commands use no shell. Substitutions are `{firmware}`, `{id}`, `{profile}`, `{revision}`
 and `{probe_serial}`. Paths can contain spaces because each argument remains one element.

@@ -3,6 +3,7 @@ from pathlib import Path
 import copy
 import hashlib
 import json
+import stat
 import sys
 import tempfile
 import types
@@ -117,10 +118,61 @@ class BoardFixtureModels(unittest.TestCase):
         with EquipmentLease(self.leases,first):
             self.assertEqual(self.run_model()['status'],'fail'); self.assertEqual(self.seen,[])
     def test_serial_alias_lease_blocks_different_probe(self):
-        _,serial_key=validate_station(self.station,self.fixture,model=True)
+        _,serial_key,_=validate_station(self.station,self.fixture,model=True)
         first={**self.station['board'],'id':'other-inventory-board','probe_serial':'other-model-probe'}
         with EquipmentLease(self.leases,first,serial_key):
             self.assertEqual(self.run_model()['status'],'fail'); self.assertEqual(self.seen,[])
+    def serial_node_station(self,path):
+        station=copy.deepcopy(self.station)
+        station['kind']='lab_station'
+        station['serial']['path']=str(path)
+        return station
+    def observe_simulated_character_nodes(self,node_numbers,stations):
+        """Use real paths/symlinks and model only the character-device stat."""
+        actual_stat=Path.stat
+        def observed_stat(path,*args,**kwargs):
+            if path in node_numbers:
+                return types.SimpleNamespace(st_mode=stat.S_IFCHR|0o600,
+                    st_rdev=node_numbers[path])
+            return actual_stat(path,*args,**kwargs)
+        with patch.object(Path,'stat',observed_stat):
+            return [validate_station(station,self.fixture) for station in stations]
+    def test_same_character_device_alias_cannot_lease_twice(self):
+        first=self.root/'ttyNodeA'; second=self.root/'ttyNodeB'
+        first.write_text('nonphysical node-stat fixture')
+        second.write_text('nonphysical node-stat fixture')
+        admitted=self.observe_simulated_character_nodes({first:188*256+3,second:188*256+3},
+            [self.serial_node_station(first),self.serial_node_station(second)])
+        self.assertNotEqual(admitted[0][2]['canonical_path'],admitted[1][2]['canonical_path'])
+        self.assertEqual(admitted[0][2]['st_rdev'],admitted[1][2]['st_rdev'])
+        other={**self.station['board'],'id':'other-inventory','probe_serial':'other-probe'}
+        with EquipmentLease(self.leases,self.station['board'],admitted[0][1]):
+            with self.assertRaises(EvidenceError):
+                with EquipmentLease(self.leases,other,admitted[1][1]):
+                    self.fail('the same character device acquired a second serial lease')
+        self.assertEqual(self.seen,[])
+    def test_serial_symlink_alias_still_conflicts(self):
+        node=self.root/'ttyNode'; node.write_text('nonphysical node-stat fixture')
+        alias=self.root/'ttyAlias'; alias.symlink_to(node)
+        admitted=self.observe_simulated_character_nodes({node:188*256+3},
+            [self.serial_node_station(node),self.serial_node_station(alias)])
+        self.assertNotEqual(admitted[0][2]['supplied_path'],admitted[1][2]['supplied_path'])
+        self.assertEqual(admitted[0][2]['canonical_path'],admitted[1][2]['canonical_path'])
+        other={**self.station['board'],'id':'other-inventory','probe_serial':'other-probe'}
+        with EquipmentLease(self.leases,self.station['board'],admitted[0][1]):
+            with self.assertRaises(EvidenceError):
+                with EquipmentLease(self.leases,other,admitted[1][1]):
+                    self.fail('symlink alias bypassed the serial lease')
+    def test_distinct_character_devices_can_lease_in_parallel(self):
+        first=self.root/'ttyNodeA'; second=self.root/'ttyNodeB'
+        first.write_text('nonphysical node-stat fixture')
+        second.write_text('nonphysical node-stat fixture')
+        admitted=self.observe_simulated_character_nodes({first:188*256+3,second:188*256+4},
+            [self.serial_node_station(first),self.serial_node_station(second)])
+        other={**self.station['board'],'id':'other-inventory','probe_serial':'other-probe'}
+        with EquipmentLease(self.leases,self.station['board'],admitted[0][1]):
+            with EquipmentLease(self.leases,other,admitted[1][1]):
+                self.assertEqual(len(list(self.leases.glob('*/owner.json'))),6)
     def test_failed_cleanup_quarantines_board_probe_and_serial(self):
         self.mode='cleanup_failure'; result=self.run_model()
         self.assertEqual(result['status'],'fail'); self.assertEqual(result['lease_status'],'quarantined')
