@@ -17,6 +17,7 @@
 
 extern "C" {
 #include "log/log.h"
+log_status_t log_test_set_level_integer(int value);
 }
 
 /**
@@ -256,10 +257,10 @@ TEST_F(LogPropertyTest, Property_InvalidLevelRejection) {
         /* Generate an invalid level (> LOG_LEVEL_NONE) */
         std::uniform_int_distribution<int> dist(LOG_LEVEL_NONE + 1,
                                                 LOG_LEVEL_NONE + 100);
-        log_level_t invalid_level = static_cast<log_level_t>(dist(rng));
+        int invalid_level = dist(rng);
 
         /* Try to set invalid level */
-        log_status_t status = log_set_level(invalid_level);
+        log_status_t status = log_test_set_level_integer(invalid_level);
 
         /* Should return error */
         EXPECT_EQ(LOG_ERROR_INVALID_PARAM, status)

@@ -46,16 +46,10 @@ TEST_F(LogIntegrationTest, MultipleBackendsDifferentLevels) {
     ASSERT_NE(nullptr, backend2);
     ASSERT_NE(nullptr, backend3);
 
-    /* Assign unique names (must use strdup for dynamic allocation) */
-#ifdef _MSC_VER
-    backend1->name = _strdup("memory1");
-    backend2->name = _strdup("memory2");
-    backend3->name = _strdup("memory3");
-#else
-    backend1->name = strdup("memory1");
-    backend2->name = strdup("memory2");
-    backend3->name = strdup("memory3");
-#endif
+    /* Backend names are borrowed; these literals outlive every registration. */
+    backend1->name = "memory1";
+    backend2->name = "memory2";
+    backend3->name = "memory3";
 
     /* Set different min levels */
     backend1->min_level = LOG_LEVEL_TRACE; /* All messages */

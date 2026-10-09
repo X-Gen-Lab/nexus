@@ -4,6 +4,7 @@
 
 # Collect all test sources
 set(LOG_TEST_SOURCES
+    fixtures/level_abi.c
     # Unit tests
     test_log.cpp
     # Property-based tests
