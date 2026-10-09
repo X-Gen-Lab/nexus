@@ -10,7 +10,12 @@ function(nexus_forward_component_objects assembly)
         if(NOT component_type STREQUAL "OBJECT_LIBRARY")
             message(FATAL_ERROR "Firmware component ${component} must be an OBJECT library")
         endif()
-        target_link_libraries("${assembly}" INTERFACE "$<TARGET_OBJECTS:${component}>")
+        # Forward the named target as well as its objects. The target supplies
+        # the build dependency when a consumer builds only its executable
+        # (not ALL), including with Unix Makefiles; transitive OBJECT targets
+        # carry usage requirements while the expression injects objects once.
+        target_link_libraries("${assembly}" INTERFACE
+            "${component}" "$<TARGET_OBJECTS:${component}>")
     endforeach()
     set_property(TARGET "${assembly}" PROPERTY NEXUS_COMPONENT_OBJECT_TARGETS "${ARGN}")
 endfunction()

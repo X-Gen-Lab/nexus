@@ -39,13 +39,12 @@ class ExternalConsumerTests(unittest.TestCase):
         (self.source / 'parent.c').write_text('int main(void) { return 0; }\n')
         (self.source / 'application.c').write_text(
             '#include "nexus_config.h"\n'
-            '#include "hal/nx_hal.h"\n'
-            '#include "osal/osal.h"\n'
+            '#include "runtime/nx_runtime.h"\n'
             '#ifndef NX_CONFIG_PLATFORM_NATIVE\n#error Wrong effective configuration\n#endif\n'
             '#ifndef NX_CONFIG_BUILD_TYPE_RELEASE\n#error Wrong build mode\n#endif\n'
             'int main(void) {\n'
-            '  if (osal_init() != OSAL_OK || nx_hal_init() != NX_OK) return 1;\n'
-            '  return nx_hal_deinit() != NX_OK;\n}\n')
+            '  if (nx_runtime_bootstrap(0) != NX_OK) return 1;\n'
+            '  return nx_runtime_shutdown(0) != NX_OK;\n}\n')
         body = (
             'set(CMAKE_C_STANDARD 99)\n'
             'set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/parent-bin")\n'

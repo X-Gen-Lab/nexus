@@ -1,4 +1,4 @@
-"""Execute the STM32 assembly rule using host ELF objects, without MCU claims."""
+"""Execute the common firmware assembly rule using host ELF objects, without MCU claims."""
 
 from pathlib import Path
 import shutil
@@ -12,7 +12,14 @@ ROOT = Path(__file__).resolve().parents[2]
 
 @unittest.skipUnless(sys.platform.startswith('linux'), 'Fixture uses GNU ELF KEEP semantics')
 class PlatformObjectAssemblyTests(unittest.TestCase):
-    def test_unreferenced_records_and_strong_callbacks_reach_final_image(self):
+    def test_makefiles_unreferenced_records_and_strong_callbacks_reach_final_image(self):
+        self.check_image('Unix Makefiles')
+
+    def test_ninja_unreferenced_records_and_strong_callbacks_reach_final_image(self):
+        self.assertIsNotNone(shutil.which('ninja'), 'Ninja is required')
+        self.check_image('Ninja')
+
+    def check_image(self, generator):
         self.assertIsNotNone(shutil.which('cmake'), 'CMake is required')
         with tempfile.TemporaryDirectory(prefix='nexus object assembly ') as directory:
             source = Path(directory) / 'source'
@@ -75,9 +82,10 @@ class PlatformObjectAssemblyTests(unittest.TestCase):
                 '"-Wl,-T,${CMAKE_CURRENT_SOURCE_DIR}/registry.ld")\n'
                 'endforeach()\n')
             for arguments in (
-                ['cmake', '-S', str(source), '-B', str(build)],
-                ['cmake', '--build', str(build), '--parallel', '2'],
+                ['cmake', '-S', str(source), '-B', str(build), '-G', generator],
+                ['cmake', '--build', str(build), '--parallel', '2', '--target', 'firmware'],
                 [str(build / 'firmware')],
+                ['cmake', '--build', str(build), '--parallel', '2', '--target', 'broken_firmware'],
             ):
                 result = subprocess.run(arguments, capture_output=True, text=True, timeout=60)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
