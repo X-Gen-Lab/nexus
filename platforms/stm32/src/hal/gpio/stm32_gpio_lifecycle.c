@@ -53,6 +53,7 @@ static nx_status_t enable_clock(GPIO_TypeDef* port) {
 
 nx_status_t stm32_gpio_hw_init(stm32_gpio_state_t* state) {
     if (!state || !state->config) return NX_ERR_INVALID_PARAM;
+    if (state->config->alternate > 15U) return NX_ERR_INVALID_PARAM;
     if (__get_IPSR()) return NX_ERR_INVALID_STATE;
     if (state->initialized) return NX_ERR_ALREADY_INIT;
     nx_status_t result = enable_clock(state->config->port);

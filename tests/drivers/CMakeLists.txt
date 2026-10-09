@@ -131,8 +131,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang
     endforeach()
 endif()
 
-# Production STM32 IRQ regression with real CMSIS device enums.
-
+# Production regressions with real SDK IRQ enums and host-only NVIC substitutes.
 add_executable(test_driver_stm32_isr_manager test_stm32_isr_manager.c
     "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/interrupt/stm32_isr_manager.c")
 target_include_directories(test_driver_stm32_isr_manager PRIVATE
@@ -142,9 +141,23 @@ target_include_directories(test_driver_stm32_isr_manager SYSTEM PRIVATE
     "${NEXUS_DRIVER_ROOT}/vendors/st/cmsis_device_f4/Include"
     "${NEXUS_DRIVER_ROOT}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
 target_compile_definitions(test_driver_stm32_isr_manager PRIVATE STM32F407xx STM32F4)
-target_compile_features(test_driver_stm32_isr_manager PRIVATE c_std_11)
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(test_driver_stm32_isr_manager PRIVATE -Wall -Wextra -Werror -UNDEBUG)
-endif()
-add_test(NAME test_driver_stm32_isr_manager COMMAND test_driver_stm32_isr_manager)
-set_tests_properties(test_driver_stm32_isr_manager PROPERTIES LABELS "driver;host-fake;contract")
+add_executable(test_driver_stm32_gpio_config test_stm32_gpio_config.c
+    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_device.c"
+    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_lifecycle.c"
+    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_power.c"
+    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio/stm32_gpio_ops.c")
+target_include_directories(test_driver_stm32_gpio_config PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/fake/gpio_config" "${NEXUS_DRIVER_ROOT}/hal/include"
+    "${NEXUS_DRIVER_ROOT}/platforms/stm32/src/hal/gpio")
+target_compile_definitions(test_driver_stm32_gpio_config PRIVATE STM32F4 NEXUS_PLATFORM_NATIVE)
+foreach(target test_driver_stm32_isr_manager test_driver_stm32_gpio_config)
+    if(TARGET nexus_build_options)
+        target_link_libraries(${target} PRIVATE nexus_build_options)
+    endif()
+    target_compile_features(${target} PRIVATE c_std_11)
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(${target} PRIVATE -Wall -Wextra -Werror -UNDEBUG)
+    endif()
+    add_test(NAME ${target} COMMAND ${target})
+    set_tests_properties(${target} PROPERTIES LABELS "driver;host-fake;contract")
+endforeach()

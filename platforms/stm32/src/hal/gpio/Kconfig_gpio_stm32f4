@@ -170,9 +170,8 @@ config GPIO_A0_ALTERNATE
     hex "PA0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A0_MODE_AF_PP || GPIO_A0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A0_INIT_VALUE
     int "PA0 Initial Value"
@@ -337,9 +336,8 @@ config GPIO_A1_ALTERNATE
     hex "PA1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A1_MODE_AF_PP || GPIO_A1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A1_INIT_VALUE
     int "PA1 Initial Value"
@@ -504,9 +502,8 @@ config GPIO_A2_ALTERNATE
     hex "PA2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A2_MODE_AF_PP || GPIO_A2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A2_INIT_VALUE
     int "PA2 Initial Value"
@@ -671,9 +668,8 @@ config GPIO_A3_ALTERNATE
     hex "PA3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A3_MODE_AF_PP || GPIO_A3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A3_INIT_VALUE
     int "PA3 Initial Value"
@@ -838,9 +834,8 @@ config GPIO_A4_ALTERNATE
     hex "PA4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A4_MODE_AF_PP || GPIO_A4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A4_INIT_VALUE
     int "PA4 Initial Value"
@@ -1005,9 +1000,8 @@ config GPIO_A5_ALTERNATE
     hex "PA5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A5_MODE_AF_PP || GPIO_A5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A5_INIT_VALUE
     int "PA5 Initial Value"
@@ -1172,9 +1166,8 @@ config GPIO_A6_ALTERNATE
     hex "PA6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A6_MODE_AF_PP || GPIO_A6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A6_INIT_VALUE
     int "PA6 Initial Value"
@@ -1339,9 +1332,8 @@ config GPIO_A7_ALTERNATE
     hex "PA7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A7_MODE_AF_PP || GPIO_A7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A7_INIT_VALUE
     int "PA7 Initial Value"
@@ -1506,9 +1498,8 @@ config GPIO_A8_ALTERNATE
     hex "PA8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A8_MODE_AF_PP || GPIO_A8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A8_INIT_VALUE
     int "PA8 Initial Value"
@@ -1673,9 +1664,8 @@ config GPIO_A9_ALTERNATE
     hex "PA9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A9_MODE_AF_PP || GPIO_A9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A9_INIT_VALUE
     int "PA9 Initial Value"
@@ -1840,9 +1830,8 @@ config GPIO_A10_ALTERNATE
     hex "PA10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A10_MODE_AF_PP || GPIO_A10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A10_INIT_VALUE
     int "PA10 Initial Value"
@@ -2007,9 +1996,8 @@ config GPIO_A11_ALTERNATE
     hex "PA11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A11_MODE_AF_PP || GPIO_A11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A11_INIT_VALUE
     int "PA11 Initial Value"
@@ -2174,9 +2162,8 @@ config GPIO_A12_ALTERNATE
     hex "PA12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A12_MODE_AF_PP || GPIO_A12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A12_INIT_VALUE
     int "PA12 Initial Value"
@@ -2341,9 +2328,8 @@ config GPIO_A13_ALTERNATE
     hex "PA13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A13_MODE_AF_PP || GPIO_A13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A13_INIT_VALUE
     int "PA13 Initial Value"
@@ -2508,9 +2494,8 @@ config GPIO_A14_ALTERNATE
     hex "PA14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A14_MODE_AF_PP || GPIO_A14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A14_INIT_VALUE
     int "PA14 Initial Value"
@@ -2675,9 +2660,8 @@ config GPIO_A15_ALTERNATE
     hex "PA15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_A15_MODE_AF_PP || GPIO_A15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_A15_INIT_VALUE
     int "PA15 Initial Value"
@@ -2850,9 +2834,8 @@ config GPIO_B0_ALTERNATE
     hex "PB0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B0_MODE_AF_PP || GPIO_B0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B0_INIT_VALUE
     int "PB0 Initial Value"
@@ -3017,9 +3000,8 @@ config GPIO_B1_ALTERNATE
     hex "PB1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B1_MODE_AF_PP || GPIO_B1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B1_INIT_VALUE
     int "PB1 Initial Value"
@@ -3184,9 +3166,8 @@ config GPIO_B2_ALTERNATE
     hex "PB2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B2_MODE_AF_PP || GPIO_B2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B2_INIT_VALUE
     int "PB2 Initial Value"
@@ -3351,9 +3332,8 @@ config GPIO_B3_ALTERNATE
     hex "PB3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B3_MODE_AF_PP || GPIO_B3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B3_INIT_VALUE
     int "PB3 Initial Value"
@@ -3518,9 +3498,8 @@ config GPIO_B4_ALTERNATE
     hex "PB4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B4_MODE_AF_PP || GPIO_B4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B4_INIT_VALUE
     int "PB4 Initial Value"
@@ -3685,9 +3664,8 @@ config GPIO_B5_ALTERNATE
     hex "PB5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B5_MODE_AF_PP || GPIO_B5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B5_INIT_VALUE
     int "PB5 Initial Value"
@@ -3852,9 +3830,8 @@ config GPIO_B6_ALTERNATE
     hex "PB6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B6_MODE_AF_PP || GPIO_B6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B6_INIT_VALUE
     int "PB6 Initial Value"
@@ -4019,9 +3996,8 @@ config GPIO_B7_ALTERNATE
     hex "PB7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B7_MODE_AF_PP || GPIO_B7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B7_INIT_VALUE
     int "PB7 Initial Value"
@@ -4186,9 +4162,8 @@ config GPIO_B8_ALTERNATE
     hex "PB8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B8_MODE_AF_PP || GPIO_B8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B8_INIT_VALUE
     int "PB8 Initial Value"
@@ -4353,9 +4328,8 @@ config GPIO_B9_ALTERNATE
     hex "PB9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B9_MODE_AF_PP || GPIO_B9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B9_INIT_VALUE
     int "PB9 Initial Value"
@@ -4520,9 +4494,8 @@ config GPIO_B10_ALTERNATE
     hex "PB10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B10_MODE_AF_PP || GPIO_B10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B10_INIT_VALUE
     int "PB10 Initial Value"
@@ -4687,9 +4660,8 @@ config GPIO_B11_ALTERNATE
     hex "PB11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B11_MODE_AF_PP || GPIO_B11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B11_INIT_VALUE
     int "PB11 Initial Value"
@@ -4854,9 +4826,8 @@ config GPIO_B12_ALTERNATE
     hex "PB12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B12_MODE_AF_PP || GPIO_B12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B12_INIT_VALUE
     int "PB12 Initial Value"
@@ -5021,9 +4992,8 @@ config GPIO_B13_ALTERNATE
     hex "PB13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B13_MODE_AF_PP || GPIO_B13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B13_INIT_VALUE
     int "PB13 Initial Value"
@@ -5188,9 +5158,8 @@ config GPIO_B14_ALTERNATE
     hex "PB14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B14_MODE_AF_PP || GPIO_B14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B14_INIT_VALUE
     int "PB14 Initial Value"
@@ -5355,9 +5324,8 @@ config GPIO_B15_ALTERNATE
     hex "PB15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_B15_MODE_AF_PP || GPIO_B15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_B15_INIT_VALUE
     int "PB15 Initial Value"
@@ -5530,9 +5498,8 @@ config GPIO_C0_ALTERNATE
     hex "PC0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C0_MODE_AF_PP || GPIO_C0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C0_INIT_VALUE
     int "PC0 Initial Value"
@@ -5697,9 +5664,8 @@ config GPIO_C1_ALTERNATE
     hex "PC1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C1_MODE_AF_PP || GPIO_C1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C1_INIT_VALUE
     int "PC1 Initial Value"
@@ -5864,9 +5830,8 @@ config GPIO_C2_ALTERNATE
     hex "PC2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C2_MODE_AF_PP || GPIO_C2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C2_INIT_VALUE
     int "PC2 Initial Value"
@@ -6031,9 +5996,8 @@ config GPIO_C3_ALTERNATE
     hex "PC3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C3_MODE_AF_PP || GPIO_C3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C3_INIT_VALUE
     int "PC3 Initial Value"
@@ -6198,9 +6162,8 @@ config GPIO_C4_ALTERNATE
     hex "PC4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C4_MODE_AF_PP || GPIO_C4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C4_INIT_VALUE
     int "PC4 Initial Value"
@@ -6365,9 +6328,8 @@ config GPIO_C5_ALTERNATE
     hex "PC5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C5_MODE_AF_PP || GPIO_C5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C5_INIT_VALUE
     int "PC5 Initial Value"
@@ -6532,9 +6494,8 @@ config GPIO_C6_ALTERNATE
     hex "PC6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C6_MODE_AF_PP || GPIO_C6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C6_INIT_VALUE
     int "PC6 Initial Value"
@@ -6699,9 +6660,8 @@ config GPIO_C7_ALTERNATE
     hex "PC7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C7_MODE_AF_PP || GPIO_C7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C7_INIT_VALUE
     int "PC7 Initial Value"
@@ -6866,9 +6826,8 @@ config GPIO_C8_ALTERNATE
     hex "PC8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C8_MODE_AF_PP || GPIO_C8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C8_INIT_VALUE
     int "PC8 Initial Value"
@@ -7033,9 +6992,8 @@ config GPIO_C9_ALTERNATE
     hex "PC9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C9_MODE_AF_PP || GPIO_C9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C9_INIT_VALUE
     int "PC9 Initial Value"
@@ -7200,9 +7158,8 @@ config GPIO_C10_ALTERNATE
     hex "PC10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C10_MODE_AF_PP || GPIO_C10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C10_INIT_VALUE
     int "PC10 Initial Value"
@@ -7367,9 +7324,8 @@ config GPIO_C11_ALTERNATE
     hex "PC11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C11_MODE_AF_PP || GPIO_C11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C11_INIT_VALUE
     int "PC11 Initial Value"
@@ -7534,9 +7490,8 @@ config GPIO_C12_ALTERNATE
     hex "PC12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C12_MODE_AF_PP || GPIO_C12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C12_INIT_VALUE
     int "PC12 Initial Value"
@@ -7701,9 +7656,8 @@ config GPIO_C13_ALTERNATE
     hex "PC13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C13_MODE_AF_PP || GPIO_C13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C13_INIT_VALUE
     int "PC13 Initial Value"
@@ -7868,9 +7822,8 @@ config GPIO_C14_ALTERNATE
     hex "PC14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C14_MODE_AF_PP || GPIO_C14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C14_INIT_VALUE
     int "PC14 Initial Value"
@@ -8035,9 +7988,8 @@ config GPIO_C15_ALTERNATE
     hex "PC15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_C15_MODE_AF_PP || GPIO_C15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_C15_INIT_VALUE
     int "PC15 Initial Value"
@@ -8210,9 +8162,8 @@ config GPIO_D0_ALTERNATE
     hex "PD0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D0_MODE_AF_PP || GPIO_D0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D0_INIT_VALUE
     int "PD0 Initial Value"
@@ -8377,9 +8328,8 @@ config GPIO_D1_ALTERNATE
     hex "PD1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D1_MODE_AF_PP || GPIO_D1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D1_INIT_VALUE
     int "PD1 Initial Value"
@@ -8544,9 +8494,8 @@ config GPIO_D2_ALTERNATE
     hex "PD2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D2_MODE_AF_PP || GPIO_D2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D2_INIT_VALUE
     int "PD2 Initial Value"
@@ -8711,9 +8660,8 @@ config GPIO_D3_ALTERNATE
     hex "PD3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D3_MODE_AF_PP || GPIO_D3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D3_INIT_VALUE
     int "PD3 Initial Value"
@@ -8878,9 +8826,8 @@ config GPIO_D4_ALTERNATE
     hex "PD4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D4_MODE_AF_PP || GPIO_D4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D4_INIT_VALUE
     int "PD4 Initial Value"
@@ -9045,9 +8992,8 @@ config GPIO_D5_ALTERNATE
     hex "PD5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D5_MODE_AF_PP || GPIO_D5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D5_INIT_VALUE
     int "PD5 Initial Value"
@@ -9212,9 +9158,8 @@ config GPIO_D6_ALTERNATE
     hex "PD6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D6_MODE_AF_PP || GPIO_D6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D6_INIT_VALUE
     int "PD6 Initial Value"
@@ -9379,9 +9324,8 @@ config GPIO_D7_ALTERNATE
     hex "PD7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D7_MODE_AF_PP || GPIO_D7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D7_INIT_VALUE
     int "PD7 Initial Value"
@@ -9546,9 +9490,8 @@ config GPIO_D8_ALTERNATE
     hex "PD8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D8_MODE_AF_PP || GPIO_D8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D8_INIT_VALUE
     int "PD8 Initial Value"
@@ -9713,9 +9656,8 @@ config GPIO_D9_ALTERNATE
     hex "PD9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D9_MODE_AF_PP || GPIO_D9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D9_INIT_VALUE
     int "PD9 Initial Value"
@@ -9880,9 +9822,8 @@ config GPIO_D10_ALTERNATE
     hex "PD10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D10_MODE_AF_PP || GPIO_D10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D10_INIT_VALUE
     int "PD10 Initial Value"
@@ -10047,9 +9988,8 @@ config GPIO_D11_ALTERNATE
     hex "PD11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D11_MODE_AF_PP || GPIO_D11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D11_INIT_VALUE
     int "PD11 Initial Value"
@@ -10214,9 +10154,8 @@ config GPIO_D12_ALTERNATE
     hex "PD12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D12_MODE_AF_PP || GPIO_D12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D12_INIT_VALUE
     int "PD12 Initial Value"
@@ -10381,9 +10320,8 @@ config GPIO_D13_ALTERNATE
     hex "PD13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D13_MODE_AF_PP || GPIO_D13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D13_INIT_VALUE
     int "PD13 Initial Value"
@@ -10548,9 +10486,8 @@ config GPIO_D14_ALTERNATE
     hex "PD14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D14_MODE_AF_PP || GPIO_D14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D14_INIT_VALUE
     int "PD14 Initial Value"
@@ -10715,9 +10652,8 @@ config GPIO_D15_ALTERNATE
     hex "PD15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_D15_MODE_AF_PP || GPIO_D15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_D15_INIT_VALUE
     int "PD15 Initial Value"
@@ -10890,9 +10826,8 @@ config GPIO_E0_ALTERNATE
     hex "PE0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E0_MODE_AF_PP || GPIO_E0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E0_INIT_VALUE
     int "PE0 Initial Value"
@@ -11057,9 +10992,8 @@ config GPIO_E1_ALTERNATE
     hex "PE1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E1_MODE_AF_PP || GPIO_E1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E1_INIT_VALUE
     int "PE1 Initial Value"
@@ -11224,9 +11158,8 @@ config GPIO_E2_ALTERNATE
     hex "PE2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E2_MODE_AF_PP || GPIO_E2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E2_INIT_VALUE
     int "PE2 Initial Value"
@@ -11391,9 +11324,8 @@ config GPIO_E3_ALTERNATE
     hex "PE3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E3_MODE_AF_PP || GPIO_E3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E3_INIT_VALUE
     int "PE3 Initial Value"
@@ -11558,9 +11490,8 @@ config GPIO_E4_ALTERNATE
     hex "PE4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E4_MODE_AF_PP || GPIO_E4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E4_INIT_VALUE
     int "PE4 Initial Value"
@@ -11725,9 +11656,8 @@ config GPIO_E5_ALTERNATE
     hex "PE5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E5_MODE_AF_PP || GPIO_E5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E5_INIT_VALUE
     int "PE5 Initial Value"
@@ -11892,9 +11822,8 @@ config GPIO_E6_ALTERNATE
     hex "PE6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E6_MODE_AF_PP || GPIO_E6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E6_INIT_VALUE
     int "PE6 Initial Value"
@@ -12059,9 +11988,8 @@ config GPIO_E7_ALTERNATE
     hex "PE7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E7_MODE_AF_PP || GPIO_E7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E7_INIT_VALUE
     int "PE7 Initial Value"
@@ -12226,9 +12154,8 @@ config GPIO_E8_ALTERNATE
     hex "PE8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E8_MODE_AF_PP || GPIO_E8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E8_INIT_VALUE
     int "PE8 Initial Value"
@@ -12393,9 +12320,8 @@ config GPIO_E9_ALTERNATE
     hex "PE9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E9_MODE_AF_PP || GPIO_E9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E9_INIT_VALUE
     int "PE9 Initial Value"
@@ -12560,9 +12486,8 @@ config GPIO_E10_ALTERNATE
     hex "PE10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E10_MODE_AF_PP || GPIO_E10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E10_INIT_VALUE
     int "PE10 Initial Value"
@@ -12727,9 +12652,8 @@ config GPIO_E11_ALTERNATE
     hex "PE11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E11_MODE_AF_PP || GPIO_E11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E11_INIT_VALUE
     int "PE11 Initial Value"
@@ -12894,9 +12818,8 @@ config GPIO_E12_ALTERNATE
     hex "PE12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E12_MODE_AF_PP || GPIO_E12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E12_INIT_VALUE
     int "PE12 Initial Value"
@@ -13061,9 +12984,8 @@ config GPIO_E13_ALTERNATE
     hex "PE13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E13_MODE_AF_PP || GPIO_E13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E13_INIT_VALUE
     int "PE13 Initial Value"
@@ -13228,9 +13150,8 @@ config GPIO_E14_ALTERNATE
     hex "PE14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E14_MODE_AF_PP || GPIO_E14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E14_INIT_VALUE
     int "PE14 Initial Value"
@@ -13395,9 +13316,8 @@ config GPIO_E15_ALTERNATE
     hex "PE15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_E15_MODE_AF_PP || GPIO_E15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_E15_INIT_VALUE
     int "PE15 Initial Value"
@@ -13570,9 +13490,8 @@ config GPIO_F0_ALTERNATE
     hex "PF0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F0_MODE_AF_PP || GPIO_F0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F0_INIT_VALUE
     int "PF0 Initial Value"
@@ -13737,9 +13656,8 @@ config GPIO_F1_ALTERNATE
     hex "PF1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F1_MODE_AF_PP || GPIO_F1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F1_INIT_VALUE
     int "PF1 Initial Value"
@@ -13904,9 +13822,8 @@ config GPIO_F2_ALTERNATE
     hex "PF2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F2_MODE_AF_PP || GPIO_F2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F2_INIT_VALUE
     int "PF2 Initial Value"
@@ -14071,9 +13988,8 @@ config GPIO_F3_ALTERNATE
     hex "PF3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F3_MODE_AF_PP || GPIO_F3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F3_INIT_VALUE
     int "PF3 Initial Value"
@@ -14238,9 +14154,8 @@ config GPIO_F4_ALTERNATE
     hex "PF4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F4_MODE_AF_PP || GPIO_F4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F4_INIT_VALUE
     int "PF4 Initial Value"
@@ -14405,9 +14320,8 @@ config GPIO_F5_ALTERNATE
     hex "PF5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F5_MODE_AF_PP || GPIO_F5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F5_INIT_VALUE
     int "PF5 Initial Value"
@@ -14572,9 +14486,8 @@ config GPIO_F6_ALTERNATE
     hex "PF6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F6_MODE_AF_PP || GPIO_F6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F6_INIT_VALUE
     int "PF6 Initial Value"
@@ -14739,9 +14652,8 @@ config GPIO_F7_ALTERNATE
     hex "PF7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F7_MODE_AF_PP || GPIO_F7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F7_INIT_VALUE
     int "PF7 Initial Value"
@@ -14906,9 +14818,8 @@ config GPIO_F8_ALTERNATE
     hex "PF8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F8_MODE_AF_PP || GPIO_F8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F8_INIT_VALUE
     int "PF8 Initial Value"
@@ -15073,9 +14984,8 @@ config GPIO_F9_ALTERNATE
     hex "PF9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F9_MODE_AF_PP || GPIO_F9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F9_INIT_VALUE
     int "PF9 Initial Value"
@@ -15240,9 +15150,8 @@ config GPIO_F10_ALTERNATE
     hex "PF10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F10_MODE_AF_PP || GPIO_F10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F10_INIT_VALUE
     int "PF10 Initial Value"
@@ -15407,9 +15316,8 @@ config GPIO_F11_ALTERNATE
     hex "PF11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F11_MODE_AF_PP || GPIO_F11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F11_INIT_VALUE
     int "PF11 Initial Value"
@@ -15574,9 +15482,8 @@ config GPIO_F12_ALTERNATE
     hex "PF12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F12_MODE_AF_PP || GPIO_F12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F12_INIT_VALUE
     int "PF12 Initial Value"
@@ -15741,9 +15648,8 @@ config GPIO_F13_ALTERNATE
     hex "PF13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F13_MODE_AF_PP || GPIO_F13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F13_INIT_VALUE
     int "PF13 Initial Value"
@@ -15908,9 +15814,8 @@ config GPIO_F14_ALTERNATE
     hex "PF14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F14_MODE_AF_PP || GPIO_F14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F14_INIT_VALUE
     int "PF14 Initial Value"
@@ -16075,9 +15980,8 @@ config GPIO_F15_ALTERNATE
     hex "PF15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_F15_MODE_AF_PP || GPIO_F15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_F15_INIT_VALUE
     int "PF15 Initial Value"
@@ -16250,9 +16154,8 @@ config GPIO_G0_ALTERNATE
     hex "PG0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G0_MODE_AF_PP || GPIO_G0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G0_INIT_VALUE
     int "PG0 Initial Value"
@@ -16417,9 +16320,8 @@ config GPIO_G1_ALTERNATE
     hex "PG1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G1_MODE_AF_PP || GPIO_G1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G1_INIT_VALUE
     int "PG1 Initial Value"
@@ -16584,9 +16486,8 @@ config GPIO_G2_ALTERNATE
     hex "PG2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G2_MODE_AF_PP || GPIO_G2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G2_INIT_VALUE
     int "PG2 Initial Value"
@@ -16751,9 +16652,8 @@ config GPIO_G3_ALTERNATE
     hex "PG3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G3_MODE_AF_PP || GPIO_G3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G3_INIT_VALUE
     int "PG3 Initial Value"
@@ -16918,9 +16818,8 @@ config GPIO_G4_ALTERNATE
     hex "PG4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G4_MODE_AF_PP || GPIO_G4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G4_INIT_VALUE
     int "PG4 Initial Value"
@@ -17085,9 +16984,8 @@ config GPIO_G5_ALTERNATE
     hex "PG5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G5_MODE_AF_PP || GPIO_G5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G5_INIT_VALUE
     int "PG5 Initial Value"
@@ -17252,9 +17150,8 @@ config GPIO_G6_ALTERNATE
     hex "PG6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G6_MODE_AF_PP || GPIO_G6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G6_INIT_VALUE
     int "PG6 Initial Value"
@@ -17419,9 +17316,8 @@ config GPIO_G7_ALTERNATE
     hex "PG7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G7_MODE_AF_PP || GPIO_G7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G7_INIT_VALUE
     int "PG7 Initial Value"
@@ -17586,9 +17482,8 @@ config GPIO_G8_ALTERNATE
     hex "PG8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G8_MODE_AF_PP || GPIO_G8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G8_INIT_VALUE
     int "PG8 Initial Value"
@@ -17753,9 +17648,8 @@ config GPIO_G9_ALTERNATE
     hex "PG9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G9_MODE_AF_PP || GPIO_G9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G9_INIT_VALUE
     int "PG9 Initial Value"
@@ -17920,9 +17814,8 @@ config GPIO_G10_ALTERNATE
     hex "PG10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G10_MODE_AF_PP || GPIO_G10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G10_INIT_VALUE
     int "PG10 Initial Value"
@@ -18087,9 +17980,8 @@ config GPIO_G11_ALTERNATE
     hex "PG11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G11_MODE_AF_PP || GPIO_G11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G11_INIT_VALUE
     int "PG11 Initial Value"
@@ -18254,9 +18146,8 @@ config GPIO_G12_ALTERNATE
     hex "PG12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G12_MODE_AF_PP || GPIO_G12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G12_INIT_VALUE
     int "PG12 Initial Value"
@@ -18421,9 +18312,8 @@ config GPIO_G13_ALTERNATE
     hex "PG13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G13_MODE_AF_PP || GPIO_G13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G13_INIT_VALUE
     int "PG13 Initial Value"
@@ -18588,9 +18478,8 @@ config GPIO_G14_ALTERNATE
     hex "PG14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G14_MODE_AF_PP || GPIO_G14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G14_INIT_VALUE
     int "PG14 Initial Value"
@@ -18755,9 +18644,8 @@ config GPIO_G15_ALTERNATE
     hex "PG15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_G15_MODE_AF_PP || GPIO_G15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_G15_INIT_VALUE
     int "PG15 Initial Value"
@@ -18930,9 +18818,8 @@ config GPIO_H0_ALTERNATE
     hex "PH0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H0_MODE_AF_PP || GPIO_H0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H0_INIT_VALUE
     int "PH0 Initial Value"
@@ -19097,9 +18984,8 @@ config GPIO_H1_ALTERNATE
     hex "PH1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H1_MODE_AF_PP || GPIO_H1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H1_INIT_VALUE
     int "PH1 Initial Value"
@@ -19264,9 +19150,8 @@ config GPIO_H2_ALTERNATE
     hex "PH2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H2_MODE_AF_PP || GPIO_H2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H2_INIT_VALUE
     int "PH2 Initial Value"
@@ -19431,9 +19316,8 @@ config GPIO_H3_ALTERNATE
     hex "PH3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H3_MODE_AF_PP || GPIO_H3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H3_INIT_VALUE
     int "PH3 Initial Value"
@@ -19598,9 +19482,8 @@ config GPIO_H4_ALTERNATE
     hex "PH4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H4_MODE_AF_PP || GPIO_H4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H4_INIT_VALUE
     int "PH4 Initial Value"
@@ -19765,9 +19648,8 @@ config GPIO_H5_ALTERNATE
     hex "PH5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H5_MODE_AF_PP || GPIO_H5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H5_INIT_VALUE
     int "PH5 Initial Value"
@@ -19932,9 +19814,8 @@ config GPIO_H6_ALTERNATE
     hex "PH6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H6_MODE_AF_PP || GPIO_H6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H6_INIT_VALUE
     int "PH6 Initial Value"
@@ -20099,9 +19980,8 @@ config GPIO_H7_ALTERNATE
     hex "PH7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H7_MODE_AF_PP || GPIO_H7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H7_INIT_VALUE
     int "PH7 Initial Value"
@@ -20266,9 +20146,8 @@ config GPIO_H8_ALTERNATE
     hex "PH8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H8_MODE_AF_PP || GPIO_H8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H8_INIT_VALUE
     int "PH8 Initial Value"
@@ -20433,9 +20312,8 @@ config GPIO_H9_ALTERNATE
     hex "PH9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H9_MODE_AF_PP || GPIO_H9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H9_INIT_VALUE
     int "PH9 Initial Value"
@@ -20600,9 +20478,8 @@ config GPIO_H10_ALTERNATE
     hex "PH10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H10_MODE_AF_PP || GPIO_H10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H10_INIT_VALUE
     int "PH10 Initial Value"
@@ -20767,9 +20644,8 @@ config GPIO_H11_ALTERNATE
     hex "PH11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H11_MODE_AF_PP || GPIO_H11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H11_INIT_VALUE
     int "PH11 Initial Value"
@@ -20934,9 +20810,8 @@ config GPIO_H12_ALTERNATE
     hex "PH12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H12_MODE_AF_PP || GPIO_H12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H12_INIT_VALUE
     int "PH12 Initial Value"
@@ -21101,9 +20976,8 @@ config GPIO_H13_ALTERNATE
     hex "PH13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H13_MODE_AF_PP || GPIO_H13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H13_INIT_VALUE
     int "PH13 Initial Value"
@@ -21268,9 +21142,8 @@ config GPIO_H14_ALTERNATE
     hex "PH14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H14_MODE_AF_PP || GPIO_H14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H14_INIT_VALUE
     int "PH14 Initial Value"
@@ -21435,9 +21308,8 @@ config GPIO_H15_ALTERNATE
     hex "PH15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_H15_MODE_AF_PP || GPIO_H15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_H15_INIT_VALUE
     int "PH15 Initial Value"
@@ -21610,9 +21482,8 @@ config GPIO_I0_ALTERNATE
     hex "PI0 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I0_MODE_AF_PP || GPIO_I0_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I0_INIT_VALUE
     int "PI0 Initial Value"
@@ -21777,9 +21648,8 @@ config GPIO_I1_ALTERNATE
     hex "PI1 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I1_MODE_AF_PP || GPIO_I1_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I1_INIT_VALUE
     int "PI1 Initial Value"
@@ -21944,9 +21814,8 @@ config GPIO_I2_ALTERNATE
     hex "PI2 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I2_MODE_AF_PP || GPIO_I2_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I2_INIT_VALUE
     int "PI2 Initial Value"
@@ -22111,9 +21980,8 @@ config GPIO_I3_ALTERNATE
     hex "PI3 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I3_MODE_AF_PP || GPIO_I3_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I3_INIT_VALUE
     int "PI3 Initial Value"
@@ -22278,9 +22146,8 @@ config GPIO_I4_ALTERNATE
     hex "PI4 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I4_MODE_AF_PP || GPIO_I4_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I4_INIT_VALUE
     int "PI4 Initial Value"
@@ -22445,9 +22312,8 @@ config GPIO_I5_ALTERNATE
     hex "PI5 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I5_MODE_AF_PP || GPIO_I5_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I5_INIT_VALUE
     int "PI5 Initial Value"
@@ -22612,9 +22478,8 @@ config GPIO_I6_ALTERNATE
     hex "PI6 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I6_MODE_AF_PP || GPIO_I6_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I6_INIT_VALUE
     int "PI6 Initial Value"
@@ -22779,9 +22644,8 @@ config GPIO_I7_ALTERNATE
     hex "PI7 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I7_MODE_AF_PP || GPIO_I7_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I7_INIT_VALUE
     int "PI7 Initial Value"
@@ -22946,9 +22810,8 @@ config GPIO_I8_ALTERNATE
     hex "PI8 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I8_MODE_AF_PP || GPIO_I8_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I8_INIT_VALUE
     int "PI8 Initial Value"
@@ -23113,9 +22976,8 @@ config GPIO_I9_ALTERNATE
     hex "PI9 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I9_MODE_AF_PP || GPIO_I9_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I9_INIT_VALUE
     int "PI9 Initial Value"
@@ -23280,9 +23142,8 @@ config GPIO_I10_ALTERNATE
     hex "PI10 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I10_MODE_AF_PP || GPIO_I10_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I10_INIT_VALUE
     int "PI10 Initial Value"
@@ -23447,9 +23308,8 @@ config GPIO_I11_ALTERNATE
     hex "PI11 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I11_MODE_AF_PP || GPIO_I11_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I11_INIT_VALUE
     int "PI11 Initial Value"
@@ -23614,9 +23474,8 @@ config GPIO_I12_ALTERNATE
     hex "PI12 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I12_MODE_AF_PP || GPIO_I12_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I12_INIT_VALUE
     int "PI12 Initial Value"
@@ -23781,9 +23640,8 @@ config GPIO_I13_ALTERNATE
     hex "PI13 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I13_MODE_AF_PP || GPIO_I13_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I13_INIT_VALUE
     int "PI13 Initial Value"
@@ -23948,9 +23806,8 @@ config GPIO_I14_ALTERNATE
     hex "PI14 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I14_MODE_AF_PP || GPIO_I14_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I14_INIT_VALUE
     int "PI14 Initial Value"
@@ -24115,9 +23972,8 @@ config GPIO_I15_ALTERNATE
     hex "PI15 Alternate Function"
     default 0x00
     range 0x00 0x0F
-    depends on GPIO_I15_MODE_AF_PP || GPIO_I15_MODE_AF_OD
     help
-      Alternate function number (0-15)
+      Alternate function number (0-15); ignored outside AF modes.
 
 config GPIO_I15_INIT_VALUE
     int "PI15 Initial Value"

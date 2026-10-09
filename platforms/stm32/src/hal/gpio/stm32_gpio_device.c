@@ -113,13 +113,15 @@ static nx_status_t stm32_gpio_construct(const nx_device_t* dev, void** api) {
  * \param[in]       n: Pin number (0-15)
  */
 #define STM32_GPIO_CONFIG(p, n)                                                \
+    _Static_assert(NX_CONFIG_GPIO_##p##n##_ALTERNATE <= 15U,                    \
+                   "STM32 GPIO alternate function must be in 0..15");        \
     static const stm32_gpio_config_t gpio_config_##p##n = {                    \
         .port = GPIO_PORT(p),                                                  \
         .pin = GPIO_PIN(n),                                                    \
         .mode = NX_CONFIG_GPIO_##p##n##_MODE,                                  \
         .pull = NX_CONFIG_GPIO_##p##n##_PULL,                                  \
         .speed = NX_CONFIG_GPIO_##p##n##_SPEED,                                \
-        .alternate = 0,                                                        \
+        .alternate = NX_CONFIG_GPIO_##p##n##_ALTERNATE,                         \
         .init_value = NX_CONFIG_GPIO_##p##n##_INIT_VALUE,                      \
         .rw_mode = NX_CONFIG_GPIO_##p##n##_RW_MODE,                            \
     }
