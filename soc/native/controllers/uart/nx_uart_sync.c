@@ -36,7 +36,8 @@ static nx_status_t tx_sync_send(nx_tx_sync_t* self, const uint8_t* data,
         return NX_ERR_INVALID_PARAM;
     }
 
-    if (impl->state->tx_busy) return NX_ERR_BUSY;
+    if (impl->state->tx_busy)
+        return NX_ERR_BUSY;
 
     /* Ignore timeout in simulation */
     (void)timeout_ms;

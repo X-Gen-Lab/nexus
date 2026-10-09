@@ -21,8 +21,12 @@ int nx_gd32f470_clock_validate(void) {
     assert(fake_board_safe_inits >= clock_checks && !fake_cs && !fake_de);
     return clock_result;
 }
-bool osal_is_initialized(void) { return false; }
-int nx_gd32f470_clock_release(void) { return 0; }
+bool osal_is_initialized(void) {
+    return false;
+}
+int nx_gd32f470_clock_release(void) {
+    return 0;
+}
 void NVIC_SetPriorityGrouping(uint32_t group) {
     assert(group == 3u && clock_result == 0);
     ++grouping_calls;
@@ -88,7 +92,8 @@ int main(void) {
     assert(clock_checks == 2u && grouping_calls == 1u && systick_calls == 1u);
     assert(fake_timer_config.prescaler == 99u && fake_timer_config.period == UINT32_MAX);
     assert(nx_hal_deinit() == NX_OK);
-    assert(!fake_timer_ctl0 && !fake_timer_dmainten && !fake_rcu_apb1en && !fake_rcu_apb1spen);
+    assert(!fake_timer_ctl0 && !fake_timer_dmainten && !fake_rcu_apb1en &&
+           !fake_rcu_apb1spen);
     assert(nx_hal_init() == NX_OK);
 
     assert(nx_device_register(&NX_SPI4) == NX_OK);

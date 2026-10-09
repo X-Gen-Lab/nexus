@@ -26,9 +26,12 @@ bool nx_arch_irq_is_masked(void) {
 }
 bool nx_hal_is_initialized(void) { ++dependency_queries; return hal_initialized; }
 nx_hal_state_t nx_hal_get_state(void) {
-    ++dependency_queries; return hal_initialized ? NX_HAL_READY : NX_HAL_OFFLINE;
+    ++dependency_queries;
+    return hal_initialized ? NX_HAL_READY : NX_HAL_OFFLINE;
 }
-nx_status_t nx_hal_get_last_cleanup_status(void) { return NX_OK; }
+nx_status_t nx_hal_get_last_cleanup_status(void) {
+    return NX_OK;
+}
 bool osal_is_initialized(void) { ++dependency_queries; return osal_initialized; }
 bool osal_is_isr(void) { ++dependency_queries; return is_isr; }
 nx_status_t nx_device_shutdown_check(void) { ++dependency_queries; return device_shutdown_result; }

@@ -285,9 +285,11 @@ typedef struct {
     size_t tx_size, rx_size;
 } native_spi_storage_t;
 static nx_status_t nx_spi_construct(const nx_device_t* dev, void** api) {
-    if(!api) return NX_ERR_NULL_PTR;
+    if (!api)
+        return NX_ERR_NULL_PTR;
     *api=NULL;
-    if(!dev || !dev->state) return NX_ERR_INVALID_PARAM;
+    if (!dev || !dev->state)
+        return NX_ERR_INVALID_PARAM;
     const nx_spi_platform_config_t* cfg=dev->config;
     native_spi_storage_t* storage=NX_CONTAINER_OF(dev->state,native_spi_storage_t,core);
     if(!cfg || !cfg->tx_buf_size || !cfg->rx_buf_size || !storage->tx || !storage->rx ||
@@ -329,8 +331,9 @@ static nx_status_t nx_spi_construct(const nx_device_t* dev, void** api) {
     };                                                                        \
     NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index, "SPI" #index,                \
         &spi_config_##index, &spi_storage_##index.core, NX_DEVICE_CLASS_SPI,    \
-        NX_DEVICE_CAP_SPI_DEVICES | NX_DEVICE_CAP_SPI_QUEUE |                 \
-            NX_DEVICE_CAP_SPI_CANCEL, nx_spi_construct, NULL);
+        NX_DEVICE_CAP_SPI_DEVICES | NX_DEVICE_CAP_SPI_QUEUE |                  \
+            NX_DEVICE_CAP_SPI_CANCEL,                                          \
+        nx_spi_construct, NULL);
 
 /**
  * \brief           Register all enabled SPI instances

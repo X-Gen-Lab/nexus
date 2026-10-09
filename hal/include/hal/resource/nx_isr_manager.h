@@ -44,7 +44,8 @@ struct nx_isr_manager_s {
      *                  New registration is rejected during HAL shutdown.
      *                  STM32 mutation requires unmasked task/startup context;
      *                  ISR or masked calls return NX_ERR_CONTEXT. Callback
-     *                  invocation occurs outside short metadata critical regions.
+     *                  invocation occurs outside short metadata critical
+     * regions.
      */
     nx_status_t (*connect)(nx_isr_manager_t* self, uint32_t irq,
                            nx_isr_func_t func, void* data, uint8_t priority);
@@ -60,7 +61,8 @@ struct nx_isr_manager_s {
      *                  IRQs; remaining ISR/masked mutation returns CONTEXT.
      *                  Callers must quiesce producers before disconnect. Native
      *                  dispatch is a host model; neither backend promises an
-     *                  NMI/HardFault drain protocol or an SMP synchronization lock.
+     *                  NMI/HardFault drain protocol or an SMP synchronization
+     * lock.
      */
     nx_status_t (*disconnect)(nx_isr_manager_t* self, uint32_t irq);
 };

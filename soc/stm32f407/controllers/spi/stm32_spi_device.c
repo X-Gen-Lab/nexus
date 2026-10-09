@@ -193,7 +193,8 @@ NX_WEAK uint32_t stm32_spi_board_clock_hz(uint8_t instance) {
     (void)instance;
     return 0;
 }
-NX_WEAK nx_status_t stm32_spi_board_release(const stm32_spi_board_port_t* request) {
+NX_WEAK nx_status_t
+stm32_spi_board_release(const stm32_spi_board_port_t* request) {
     (void)request;
     /* The matching default prepare rejects wiring before any side effect. */
     return NX_OK;
@@ -226,20 +227,24 @@ NX_WEAK bool stm32_spi_board_dma_buffer_valid(const void* data, size_t length,
         .crc_calculation = SPI_CRCCALCULATION_DISABLE, .crc_polynomial = 7,    \
         .use_dma = SPI_DMA_ENABLED,                                           \
     };                                                                        \
-    static nx_status_t spi_create_##index(const nx_device_t* dev, void** out) { \
-        if (!out) return NX_ERR_NULL_PTR;                                     \
-        *out = NULL;                                                         \
-        if (!dev || dev->config != &spi_cfg_##index)                          \
+    static nx_status_t spi_create_##index(const nx_device_t* dev,              \
+                                          void** out) {                        \
+        if (!out)                                                              \
+            return NX_ERR_NULL_PTR;                                            \
+        *out = NULL;                                                           \
+        if (!dev || dev->config != &spi_cfg_##index)                           \
             return NX_ERR_INVALID_PARAM;                                     \
         stm32_spi_construct(&spi_bus_##index, dev->config);                    \
-        *out = &spi_bus_##index.base;                                         \
+        *out = &spi_bus_##index.base;                                          \
         return NX_OK;                                                        \
     }                                                                         \
     static nx_device_config_state_t spi_reg_##index;                           \
-    NX_DEVICE_REGISTER_TYPED(NX_SPI, index, "SPI" #index, &spi_cfg_##index,   \
-        &spi_reg_##index, NX_DEVICE_CLASS_SPI,                                \
-        NX_DEVICE_CAP_SPI_DEVICES | NX_DEVICE_CAP_SPI_QUEUE |                 \
-            NX_DEVICE_CAP_SPI_CANCEL, spi_create_##index, NULL)
+    NX_DEVICE_REGISTER_TYPED(NX_SPI, index, "SPI" #index, &spi_cfg_##index,    \
+                             &spi_reg_##index, NX_DEVICE_CLASS_SPI,            \
+                             NX_DEVICE_CAP_SPI_DEVICES |                       \
+                                 NX_DEVICE_CAP_SPI_QUEUE |                     \
+                                 NX_DEVICE_CAP_SPI_CANCEL,                     \
+                             spi_create_##index, NULL)
 #ifdef NX_CONFIG_STM32_SPI_USE_DMA
 #define SPI_DMA_ENABLED true
 #else

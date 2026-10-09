@@ -39,7 +39,8 @@ static nx_status_t uart_lifecycle_init(nx_lifecycle_t* self) {
         return NX_ERR_ALREADY_INIT;
     }
 
-    if (impl->state->tx_busy || impl->state->rx_busy) return NX_ERR_BUSY;
+    if (impl->state->tx_busy || impl->state->rx_busy)
+        return NX_ERR_BUSY;
 
     /* Clear buffer contents and reset pointers */
     if (impl->state->tx_buf.data != NULL) {
@@ -59,7 +60,7 @@ static nx_status_t uart_lifecycle_init(nx_lifecycle_t* self) {
 
     impl->rx_event_head = impl->rx_event_count = 0;
     impl->rx_event_dropped = 0;
-    impl->result = (nx_uart_result_t){.status=NX_ERR_INVALID_STATE};
+    impl->result = (nx_uart_result_t){.status = NX_ERR_INVALID_STATE};
 
     /* Set state flags */
     impl->state->initialized = true;
@@ -79,7 +80,8 @@ static nx_status_t uart_lifecycle_deinit(nx_lifecycle_t* self) {
         return NX_ERR_NOT_INIT;
     }
 
-    if (impl->state->tx_busy || impl->state->rx_busy) return NX_ERR_BUSY;
+    if (impl->state->tx_busy || impl->state->rx_busy)
+        return NX_ERR_BUSY;
 
     /* Clear buffer contents and reset pointers */
     if (impl->state->tx_buf.data != NULL) {
@@ -124,7 +126,8 @@ static nx_status_t uart_lifecycle_suspend(nx_lifecycle_t* self) {
         return NX_ERR_INVALID_STATE;
     }
 
-    if (impl->state->tx_busy || impl->state->rx_busy) return NX_ERR_BUSY;
+    if (impl->state->tx_busy || impl->state->rx_busy)
+        return NX_ERR_BUSY;
 
     /* Set suspend flag */
     impl->state->suspended = true;

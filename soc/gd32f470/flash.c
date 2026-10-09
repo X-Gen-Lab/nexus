@@ -184,9 +184,11 @@ static nx_status_t legacy_erase(nx_internal_flash_t* self,uint32_t address,size_
 static size_t page_size(nx_internal_flash_t* self) { return self==&device.api ? 4096 : 0; }
 static size_t write_size(nx_internal_flash_t* self) { return self==&device.api ? 2 : 0; }
 static nx_status_t construct(const nx_device_t* descriptor,void** api) {
-    if (!api) return NX_ERR_NULL_PTR;
-    *api=NULL;
-    if (!descriptor || descriptor->state!=&device.core) return NX_ERR_INVALID_PARAM;
+    if (!api)
+        return NX_ERR_NULL_PTR;
+    *api = NULL;
+    if (!descriptor || descriptor->state != &device.core)
+        return NX_ERR_INVALID_PARAM;
     device.operations=(nx_flash_operations_t){.get_geometry=geometry_query,.get_block=block_query,
         .read=read_data,.program=program_data,.erase=erase_data,.sync=sync_data};
     device.lifecycle=(nx_lifecycle_t){.init=initialize,.deinit=deinitialize,

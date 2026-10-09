@@ -43,22 +43,26 @@ typedef struct {
 } native_gpio_storage_t;
 
 static nx_status_t nx_gpio_construct(const nx_device_t* dev, void** out) {
-    if (!out) return NX_ERR_NULL_PTR;
+    if (!out)
+        return NX_ERR_NULL_PTR;
     *out = NULL;
-    if (!dev || !dev->state || !dev->config) return NX_ERR_INVALID_PARAM;
+    if (!dev || !dev->state || !dev->config)
+        return NX_ERR_INVALID_PARAM;
     const nx_gpio_platform_config_t* cfg = dev->config;
     if (cfg->port > 7 || cfg->pin > 15 || cfg->mode > NX_GPIO_MODE_ANALOG ||
         cfg->pull > NX_GPIO_PULL_DOWN || cfg->speed > NX_GPIO_SPEED_VERY_HIGH ||
-        cfg->af > 15) return NX_ERR_INVALID_PARAM;
-    native_gpio_storage_t* storage = NX_CONTAINER_OF(dev->state, native_gpio_storage_t, core);
+        cfg->af > 15)
+        return NX_ERR_INVALID_PARAM;
+    native_gpio_storage_t* storage =
+        NX_CONTAINER_OF(dev->state, native_gpio_storage_t, core);
     nx_gpio_read_write_impl_t* impl = &storage->impl;
     memset(impl, 0, sizeof(*impl));
     impl->state = &storage->state;
     memset(impl->state, 0, sizeof(*impl->state));
     impl->state->port = cfg->port;
     impl->state->pin = cfg->pin;
-    impl->state->config = (nx_gpio_config_t){cfg->port, cfg->pin, cfg->mode,
-        cfg->pull, cfg->speed, cfg->af};
+    impl->state->config = (nx_gpio_config_t){cfg->port, cfg->pin,   cfg->mode,
+                                             cfg->pull, cfg->speed, cfg->af};
     impl->state->exti.trigger = NX_GPIO_TRIGGER_RISING;
     impl->device = (nx_device_t*)dev;
     gpio_init_read_write(&impl->base);
@@ -117,10 +121,11 @@ static nx_status_t nx_gpio_construct(const nx_device_t* dev, void** out) {
  */
 #define NX_GPIO_DEVICE_REGISTER(_P, _N)                                        \
     NX_GPIO_CONFIG(_P, _N);                                                    \
-    static native_gpio_storage_t gpio_storage_##_P##_N;                       \
-    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, _P##_N, "GPIO" #_P #_N,              \
-        &gpio_config_##_P##_N, &gpio_storage_##_P##_N.core,                     \
-        NX_DEVICE_CLASS_GPIO, 0, nx_gpio_construct, NULL);
+    static native_gpio_storage_t gpio_storage_##_P##_N;                        \
+    NX_DEVICE_REGISTER_TYPED(                                                  \
+        DEVICE_TYPE, _P##_N, "GPIO" #_P #_N, &gpio_config_##_P##_N,            \
+        &gpio_storage_##_P##_N.core, NX_DEVICE_CLASS_GPIO, 0,                  \
+        nx_gpio_construct, NULL);
 
 /**
  * \brief           Register all enabled GPIO instances

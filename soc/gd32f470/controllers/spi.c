@@ -73,7 +73,9 @@ static nx_status_t spi_init_device(nx_lifecycle_t* self) {
     if (bus.state == NX_DEV_STATE_RUNNING) { nx_arch_irq_restore(saved); return NX_OK; }
     rcu_periph_clock_enable(RCU_SPI4);
     nx_status_t status = reset_controller();
-    if (status == NX_OK) { status = nx_gd32_board_spi_pins(true); }
+    if (status == NX_OK) {
+        status = nx_gd32_board_spi_pins(true);
+    }
     if (status == NX_OK) { bus.state = NX_DEV_STATE_RUNNING; }
     nx_arch_irq_restore(saved);
     return status;
@@ -84,8 +86,13 @@ static nx_status_t spi_deinit_device(nx_lifecycle_t* self) {
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     if (lifecycle_busy()) { nx_arch_irq_restore(saved); return NX_ERR_BUSY; }
     nx_status_t status = reset_controller();
-    if (status == NX_OK) { status = nx_gd32_board_spi_pins(false); }
-    if (status != NX_OK) { nx_arch_irq_restore(saved); return status; }
+    if (status == NX_OK) {
+        status = nx_gd32_board_spi_pins(false);
+    }
+    if (status != NX_OK) {
+        nx_arch_irq_restore(saved);
+        return status;
+    }
     for (size_t i = 0; i < NX_CONFIG_GD32_SPI_DEVICE_CAPACITY; ++i) {
         bus.slots[i].allocated = false;
     }
@@ -100,8 +107,13 @@ static nx_status_t spi_suspend(nx_lifecycle_t* self) {
     if (bus.state != NX_DEV_STATE_RUNNING) { nx_arch_irq_restore(saved); return NX_ERR_INVALID_STATE; }
     if (lifecycle_busy()) { nx_arch_irq_restore(saved); return NX_ERR_BUSY; }
     nx_status_t status = reset_controller();
-    if (status == NX_OK) { status = nx_gd32_board_spi_pins(false); }
-    if (status != NX_OK) { nx_arch_irq_restore(saved); return status; }
+    if (status == NX_OK) {
+        status = nx_gd32_board_spi_pins(false);
+    }
+    if (status != NX_OK) {
+        nx_arch_irq_restore(saved);
+        return status;
+    }
     bus.state = NX_DEV_STATE_SUSPENDED;
     nx_arch_irq_restore(saved);
     return NX_OK;
@@ -127,7 +139,9 @@ static nx_status_t execute(const nx_spi_device_config_t* config,
                             const nx_spi_transaction_t* transaction, uint32_t started) {
     if (expired(started, transaction->timeout_ms)) { return NX_ERR_TIMEOUT; }
     nx_status_t status = reset_controller();
-    if (status != NX_OK) { return status; }
+    if (status != NX_OK) {
+        return status;
+    }
     spi_parameter_struct parameters;
     spi_struct_para_init(&parameters);
     parameters.device_mode = SPI_MASTER;
@@ -293,9 +307,13 @@ static nx_tx_rx_sync_t* no_tx_rx_sync(nx_spi_bus_t* self, nx_spi_device_config_t
 static nx_lifecycle_t* get_lifecycle(nx_spi_bus_t* self) { (void)self; return &bus.lifecycle; }
 static nx_power_t* get_power(nx_spi_bus_t* self) { (void)self; return NULL; }
 static nx_status_t construct_spi(const nx_device_t* descriptor, void** out) {
-    if (!out) { return NX_ERR_NULL_PTR; }
+    if (!out) {
+        return NX_ERR_NULL_PTR;
+    }
     *out = NULL;
-    if (!descriptor || descriptor->state != &device_state) { return NX_ERR_INVALID_PARAM; }
+    if (!descriptor || descriptor->state != &device_state) {
+        return NX_ERR_INVALID_PARAM;
+    }
     bus.api = (nx_spi_bus_t){ .open_device = open_device, .close_device = close_device, .service = service,
         .get_tx_async_handle = no_tx_async, .get_tx_rx_async_handle = no_tx_rx_async,
         .get_tx_sync_handle = no_tx_sync, .get_tx_rx_sync_handle = no_tx_rx_sync,
@@ -305,5 +323,8 @@ static nx_status_t construct_spi(const nx_device_t* descriptor, void** out) {
     *out = &bus.api;
     return NX_OK;
 }
-NX_DEVICE_REGISTER_TYPED(NX_SPI, 4, "SPI4", NULL, &device_state, NX_DEVICE_CLASS_SPI,
-    NX_DEVICE_CAP_SPI_DEVICES | NX_DEVICE_CAP_SPI_QUEUE | NX_DEVICE_CAP_SPI_CANCEL, construct_spi, NULL);
+NX_DEVICE_REGISTER_TYPED(NX_SPI, 4, "SPI4", NULL, &device_state,
+                         NX_DEVICE_CLASS_SPI,
+                         NX_DEVICE_CAP_SPI_DEVICES | NX_DEVICE_CAP_SPI_QUEUE |
+                             NX_DEVICE_CAP_SPI_CANCEL,
+                         construct_spi, NULL);

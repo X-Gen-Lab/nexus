@@ -43,19 +43,23 @@ nx_status_t nx_platform_init_check(void);
 /* Only this entry owns the registry admission fence. Platform hooks are
  * private, externally serialized implementation calls, never application APIs.
  * The fence spans every platform side effect. PARTIAL retains it until a
- * successful cleanup; existing owners may still close/recover for settlement. */
+ * successful cleanup; existing owners may still close/recover for settlement.
+ */
 static nx_status_t cleanup_platform(bool* attempted) {
     *attempted = false;
     nx_status_t status;
     if (!shutdown_fence_owned) {
         uintptr_t owner = (uintptr_t)&shutdown_owner;
-        status = hal_state == NX_HAL_PARTIAL ?
-            nx_device_shutdown_quarantine_begin(owner) : nx_device_shutdown_begin_owned(owner);
-        if (status != NX_OK) return status;
+        status = hal_state == NX_HAL_PARTIAL
+                     ? nx_device_shutdown_quarantine_begin(owner)
+                     : nx_device_shutdown_begin_owned(owner);
+        if (status != NX_OK)
+            return status;
         shutdown_fence_owned = true;
     }
     status = nx_device_shutdown_check();
-    if (status == NX_OK) status = nx_platform_shutdown_check();
+    if (status == NX_OK)
+        status = nx_platform_shutdown_check();
     if (status == NX_OK) {
         *attempted = true;
         status = nx_platform_deinit();
@@ -65,8 +69,10 @@ static nx_status_t cleanup_platform(bool* attempted) {
 
 static nx_status_t release_shutdown_fence(void) {
     if (shutdown_fence_owned) {
-        nx_status_t status = nx_device_shutdown_end_owned((uintptr_t)&shutdown_owner);
-        if (status != NX_OK) return status;
+        nx_status_t status =
+            nx_device_shutdown_end_owned((uintptr_t)&shutdown_owner);
+        if (status != NX_OK)
+            return status;
         shutdown_fence_owned = false;
     }
     return NX_OK;
@@ -111,24 +117,41 @@ nx_status_t nx_platform_init(void) {
 
 /* Read-only startup admission before acquiring any platform hardware. */
 #if defined(_MSC_VER)
-#pragma comment(linker, "/alternatename:nx_platform_init_check=nx_platform_init_check_default")
-nx_status_t nx_platform_init_check_default(void) { return NX_OK; }
+#pragma comment(                                                               \
+    linker,                                                                    \
+    "/alternatename:nx_platform_init_check=nx_platform_init_check_default")
+nx_status_t nx_platform_init_check_default(void) {
+    return NX_OK;
+}
 #elif defined(__GNUC__) || defined(__clang__)
-__attribute__((weak)) nx_status_t nx_platform_init_check(void) { return NX_OK; }
+__attribute__((weak)) nx_status_t nx_platform_init_check(void) {
+    return NX_OK;
+}
 #else
-nx_status_t nx_platform_init_check(void) { return NX_OK; }
+nx_status_t nx_platform_init_check(void) {
+    return NX_OK;
+}
 #endif
 
 /* Optional read-only selected-platform admission check. An implementation
  * rejects hardware/manager ownership before any cleanup side effect. Missing
- * checks do not certify resources: the mutating hook still has to settle them. */
+ * checks do not certify resources: the mutating hook still has to settle them.
+ */
 #if defined(_MSC_VER)
-#pragma comment(linker, "/alternatename:nx_platform_shutdown_check=nx_platform_shutdown_check_default")
-nx_status_t nx_platform_shutdown_check_default(void) { return NX_OK; }
+#pragma comment(                                                               \
+    linker,                                                                    \
+    "/alternatename:nx_platform_shutdown_check=nx_platform_shutdown_check_default")
+nx_status_t nx_platform_shutdown_check_default(void) {
+    return NX_OK;
+}
 #elif defined(__GNUC__) || defined(__clang__)
-__attribute__((weak)) nx_status_t nx_platform_shutdown_check(void) { return NX_OK; }
+__attribute__((weak)) nx_status_t nx_platform_shutdown_check(void) {
+    return NX_OK;
+}
 #else
-nx_status_t nx_platform_shutdown_check(void) { return NX_OK; }
+nx_status_t nx_platform_shutdown_check(void) {
+    return NX_OK;
+}
 #endif
 
 /**
@@ -201,8 +224,10 @@ nx_status_t nx_hal_init(void) {
         return NX_ERR_BUSY;
     }
     status = nx_device_shutdown_check();
-    if (status == NX_OK) status = nx_platform_init_check();
-    if (status != NX_OK) return status;
+    if (status == NX_OK)
+        status = nx_platform_init_check();
+    if (status != NX_OK)
+        return status;
 
     /* Initialize platform-specific hardware */
     status = nx_platform_init();
@@ -210,8 +235,10 @@ nx_status_t nx_hal_init(void) {
         bool attempted;
         hal_state = NX_HAL_PARTIAL;
         last_cleanup_status = cleanup_platform(&attempted);
-        if (last_cleanup_status == NX_OK) last_cleanup_status = release_shutdown_fence();
-        hal_state = last_cleanup_status == NX_OK ? NX_HAL_OFFLINE : NX_HAL_PARTIAL;
+        if (last_cleanup_status == NX_OK)
+            last_cleanup_status = release_shutdown_fence();
+        hal_state =
+            last_cleanup_status == NX_OK ? NX_HAL_OFFLINE : NX_HAL_PARTIAL;
         return status;
     }
 
@@ -248,7 +275,8 @@ nx_status_t nx_hal_deinit(void) {
         return NX_OK;
     }
     /* Runtime releases OSAL first. Direct HAL callers may not stop a clock
-     * underneath an initialized backend, even when its object pools are idle. */
+     * underneath an initialized backend, even when its object pools are idle.
+     */
     if (osal_is_initialized()) {
         return NX_ERR_BUSY;
     }

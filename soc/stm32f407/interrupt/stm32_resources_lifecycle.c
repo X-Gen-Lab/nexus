@@ -9,7 +9,8 @@ nx_status_t nx_stm32f407_resources_idle(void) {
     for (uint32_t irq = 0; irq <= (uint32_t)FPU_IRQn; ++irq) {
         uint32_t bank = irq / 32U;
         uint32_t bit = UINT32_C(1) << (irq % 32U);
-        if (((NVIC->ISER[bank] | NVIC->ISPR[bank] | NVIC->IABR[bank]) & bit) != 0U) {
+        if (((NVIC->ISER[bank] | NVIC->ISPR[bank] | NVIC->IABR[bank]) & bit) !=
+            0U) {
             return NX_ERR_BUSY;
         }
     }

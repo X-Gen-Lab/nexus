@@ -39,14 +39,15 @@ extern "C" {
 /* Bounded pools: no allocation occurs on the transfer path. */
 #define STM32_SPI_MAX_DEVICES 8U
 #define STM32_SPI_ASYNC_BYTES 256U
-#define STM32_SPI_MAX_BUSES 6U
+#define STM32_SPI_MAX_BUSES   6U
 
 typedef struct stm32_spi_impl_s stm32_spi_impl_t;
 typedef struct stm32_spi_platform_config_s {
     SPI_TypeDef* spi_base;
     uint8_t spi_index;
     uint32_t mode, direction, data_size, clk_polarity, clk_phase, nss;
-    uint32_t baud_prescaler, first_bit, ti_mode, crc_calculation, crc_polynomial;
+    uint32_t baud_prescaler, first_bit, ti_mode, crc_calculation,
+        crc_polynomial;
     bool use_osal, use_dma;
 } stm32_spi_platform_config_t;
 
@@ -59,7 +60,9 @@ typedef struct stm32_spi_state_s {
 } stm32_spi_state_t;
 
 typedef enum stm32_spi_phase_e {
-    STM32_SPI_IDLE, STM32_SPI_WAITING, STM32_SPI_TERMINAL
+    STM32_SPI_IDLE,
+    STM32_SPI_WAITING,
+    STM32_SPI_TERMINAL
 } stm32_spi_phase_t;
 
 typedef struct stm32_spi_device_s {

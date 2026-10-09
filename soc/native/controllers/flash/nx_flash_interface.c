@@ -112,7 +112,8 @@ static nx_status_t flash_erase_impl(nx_internal_flash_t* self, uint32_t addr,
     uint32_t count = (uint32_t)(size / NX_FLASH_SECTOR_SIZE);
     for (uint32_t sector = first; sector < first + count; ++sector) {
         nx_status_t status = flash_erase_sector(state, sector);
-        if (status != NX_OK) return status;
+        if (status != NX_OK)
+            return status;
     }
 
     return NX_OK;
@@ -186,73 +187,111 @@ static nx_flash_impl_t* from_operations(nx_flash_operations_t* self) {
     return self ? NX_CONTAINER_OF(self, nx_flash_impl_t, operations) : NULL;
 }
 static nx_status_t typed_ready(nx_flash_impl_t* impl) {
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
-    return !impl || !impl->state || !impl->state->initialized ? NX_ERR_NOT_INIT :
-        impl->state->suspended ? NX_ERR_INVALID_STATE : NX_OK;
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERR_INVALID_STATE;
+    return !impl || !impl->state || !impl->state->initialized ? NX_ERR_NOT_INIT
+           : impl->state->suspended ? NX_ERR_INVALID_STATE
+                                    : NX_OK;
 }
-static nx_status_t geometry(nx_flash_operations_t* self, nx_flash_geometry_t* out) {
-    if (!out) return NX_ERR_NULL_PTR;
+static nx_status_t geometry(nx_flash_operations_t* self,
+                            nx_flash_geometry_t* out) {
+    if (!out)
+        return NX_ERR_NULL_PTR;
     *out = (nx_flash_geometry_t){0};
     nx_status_t r = typed_ready(from_operations(self));
-    if (r == NX_OK) *out = (nx_flash_geometry_t){.base_address=0,
-        .size_bytes=NX_FLASH_TOTAL_SIZE,.program_alignment=NX_FLASH_WRITE_UNIT,
-        .block_count=NX_FLASH_NUM_SECTORS,.flags=0,.erased_value=NX_FLASH_ERASED_BYTE};
+    if (r == NX_OK)
+        *out = (nx_flash_geometry_t){.base_address = 0,
+                                     .size_bytes = NX_FLASH_TOTAL_SIZE,
+                                     .program_alignment = NX_FLASH_WRITE_UNIT,
+                                     .block_count = NX_FLASH_NUM_SECTORS,
+                                     .flags = 0,
+                                     .erased_value = NX_FLASH_ERASED_BYTE};
     return r;
 }
-static nx_status_t block(nx_flash_operations_t* self,uint32_t offset,nx_flash_block_t* out) {
-    if (!out) return NX_ERR_NULL_PTR;
+static nx_status_t block(nx_flash_operations_t* self, uint32_t offset,
+                         nx_flash_block_t* out) {
+    if (!out)
+        return NX_ERR_NULL_PTR;
     *out = (nx_flash_block_t){0};
     nx_status_t r = typed_ready(from_operations(self));
-    if (r != NX_OK) return r;
-    if (offset >= NX_FLASH_TOTAL_SIZE) return NX_ERR_INVALID_PARAM;
-    *out=(nx_flash_block_t){.offset=offset/NX_FLASH_SECTOR_SIZE*NX_FLASH_SECTOR_SIZE,
-        .size=NX_FLASH_SECTOR_SIZE,.index=offset/NX_FLASH_SECTOR_SIZE};
+    if (r != NX_OK)
+        return r;
+    if (offset >= NX_FLASH_TOTAL_SIZE)
+        return NX_ERR_INVALID_PARAM;
+    *out = (nx_flash_block_t){.offset = offset / NX_FLASH_SECTOR_SIZE *
+                                        NX_FLASH_SECTOR_SIZE,
+                              .size = NX_FLASH_SECTOR_SIZE,
+                              .index = offset / NX_FLASH_SECTOR_SIZE};
     return NX_OK;
 }
-static nx_status_t typed_read(nx_flash_operations_t* self,uint32_t offset,uint8_t* data,size_t length) {
-    nx_flash_impl_t* impl=from_operations(self);
-    nx_status_t r=typed_ready(impl);
-    if (r!=NX_OK) return r;
-    if (!length) return NX_ERR_INVALID_PARAM;
-    return flash_read_impl(&impl->base,offset,data,length);
+static nx_status_t typed_read(nx_flash_operations_t* self, uint32_t offset,
+                              uint8_t* data, size_t length) {
+    nx_flash_impl_t* impl = from_operations(self);
+    nx_status_t r = typed_ready(impl);
+    if (r != NX_OK)
+        return r;
+    if (!length)
+        return NX_ERR_INVALID_PARAM;
+    return flash_read_impl(&impl->base, offset, data, length);
 }
-static nx_status_t budget_start(nx_flash_impl_t* impl,uint32_t budget,uint32_t* started) {
-    nx_status_t r=typed_ready(impl);
-    if (r!=NX_OK) return r;
-    if (!budget) return NX_ERR_TIMEOUT;
-    if (budget>INT32_MAX && budget!=UINT32_MAX) return NX_ERR_INVALID_PARAM;
-    return osal_get_time_ms(started)==OSAL_OK ? NX_OK : NX_ERR_NOT_INIT;
+static nx_status_t budget_start(nx_flash_impl_t* impl, uint32_t budget,
+                                uint32_t* started) {
+    nx_status_t r = typed_ready(impl);
+    if (r != NX_OK)
+        return r;
+    if (!budget)
+        return NX_ERR_TIMEOUT;
+    if (budget > INT32_MAX && budget != UINT32_MAX)
+        return NX_ERR_INVALID_PARAM;
+    return osal_get_time_ms(started) == OSAL_OK ? NX_OK : NX_ERR_NOT_INIT;
 }
-static nx_status_t budget_finish(nx_status_t status,uint32_t started,uint32_t budget) {
-    if (status!=NX_OK) return status;
-    uint32_t ended=started;
-    if (osal_get_time_ms(&ended)!=OSAL_OK) return NX_ERR_IO;
-    return budget!=UINT32_MAX && (uint32_t)(ended-started)>=budget ? NX_ERR_TIMEOUT : NX_OK;
+static nx_status_t budget_finish(nx_status_t status, uint32_t started,
+                                 uint32_t budget) {
+    if (status != NX_OK)
+        return status;
+    uint32_t ended = started;
+    if (osal_get_time_ms(&ended) != OSAL_OK)
+        return NX_ERR_IO;
+    return budget != UINT32_MAX && (uint32_t)(ended - started) >= budget
+               ? NX_ERR_TIMEOUT
+               : NX_OK;
 }
-static nx_status_t typed_program(nx_flash_operations_t* self,uint32_t offset,
-                                const uint8_t* data,size_t length,uint32_t budget) {
-    nx_flash_impl_t* impl=from_operations(self); uint32_t started=0;
-    nx_status_t r=budget_start(impl,budget,&started);
-    if (r!=NX_OK) return r;
-    if (!length) return NX_ERR_INVALID_PARAM;
-    return budget_finish(flash_write_impl(&impl->base,offset,data,length),started,budget);
+static nx_status_t typed_program(nx_flash_operations_t* self, uint32_t offset,
+                                 const uint8_t* data, size_t length,
+                                 uint32_t budget) {
+    nx_flash_impl_t* impl = from_operations(self);
+    uint32_t started = 0;
+    nx_status_t r = budget_start(impl, budget, &started);
+    if (r != NX_OK)
+        return r;
+    if (!length)
+        return NX_ERR_INVALID_PARAM;
+    return budget_finish(flash_write_impl(&impl->base, offset, data, length),
+                         started, budget);
 }
-static nx_status_t typed_erase(nx_flash_operations_t* self,uint32_t offset,size_t length,uint32_t budget) {
-    nx_flash_impl_t* impl=from_operations(self); uint32_t started=0;
-    nx_status_t r=budget_start(impl,budget,&started);
-    if (r!=NX_OK) return r;
-    return budget_finish(flash_erase_impl(&impl->base,offset,length),started,budget);
+static nx_status_t typed_erase(nx_flash_operations_t* self, uint32_t offset,
+                               size_t length, uint32_t budget) {
+    nx_flash_impl_t* impl = from_operations(self);
+    uint32_t started = 0;
+    nx_status_t r = budget_start(impl, budget, &started);
+    if (r != NX_OK)
+        return r;
+    return budget_finish(flash_erase_impl(&impl->base, offset, length), started,
+                         budget);
 }
-static nx_status_t typed_sync(nx_flash_operations_t* self,uint32_t budget) {
-    nx_flash_impl_t* impl=from_operations(self); uint32_t started=0;
-    nx_status_t r=budget_start(impl,budget,&started);
-    if (r!=NX_OK) return r;
+static nx_status_t typed_sync(nx_flash_operations_t* self, uint32_t budget) {
+    nx_flash_impl_t* impl = from_operations(self);
+    uint32_t started = 0;
+    nx_status_t r = budget_start(impl, budget, &started);
+    if (r != NX_OK)
+        return r;
     /* File IO can exceed a requested deadline; it still completes/settles
      * before return, then reports TIMEOUT. This is not an MCU timing model. */
-    return budget_finish(flash_save_to_file(impl->state),started,budget);
+    return budget_finish(flash_save_to_file(impl->state), started, budget);
 }
 static nx_flash_operations_t* get_operations(nx_internal_flash_t* self) {
-    return self ? &NX_CONTAINER_OF(self,nx_flash_impl_t,base)->operations : NULL;
+    return self ? &NX_CONTAINER_OF(self, nx_flash_impl_t, base)->operations
+                : NULL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -271,8 +310,12 @@ void flash_init_interface(nx_internal_flash_t* flash) {
                            flash_erase_impl, flash_get_page_size_impl,
                            flash_get_write_unit_impl, flash_lock_impl,
                            flash_unlock_impl, flash_get_lifecycle_impl);
-    nx_flash_impl_t* impl=NX_CONTAINER_OF(flash,nx_flash_impl_t,base);
-    impl->operations=(nx_flash_operations_t){.get_geometry=geometry,.get_block=block,
-        .read=typed_read,.program=typed_program,.erase=typed_erase,.sync=typed_sync};
-    flash->get_operations=get_operations;
+    nx_flash_impl_t* impl = NX_CONTAINER_OF(flash, nx_flash_impl_t, base);
+    impl->operations = (nx_flash_operations_t){.get_geometry = geometry,
+                                               .get_block = block,
+                                               .read = typed_read,
+                                               .program = typed_program,
+                                               .erase = typed_erase,
+                                               .sync = typed_sync};
+    flash->get_operations = get_operations;
 }

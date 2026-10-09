@@ -117,7 +117,10 @@ static nx_status_t uart_deinit(nx_lifecycle_t* self) {
     usart_deinit(USART0);
     NVIC_ClearPendingIRQ(USART0_IRQn);
     nx_status_t status = nx_gd32_board_uart_pins(false);
-    if (status != NX_OK) { nx_arch_irq_restore(saved); return status; }
+    if (status != NX_OK) {
+        nx_arch_irq_restore(saved);
+        return status;
+    }
     uart.head = uart.count = 0;
     uart.dropped = 0;
     uart.state = NX_DEV_STATE_UNINITIALIZED;
@@ -138,16 +141,23 @@ static nx_device_state_t uart_state(nx_lifecycle_t* self) { (void)self; return u
 static nx_status_t uart_submit(nx_uart_operations_t* self, const uint8_t* data,
                                size_t length, uint32_t timeout_ms, nx_uart_ticket_t* ticket) {
     (void)self;
-    if (!ticket) { return NX_ERR_NULL_PTR; }
+    if (!ticket) {
+        return NX_ERR_NULL_PTR;
+    }
     ticket->sequence = 0;
     if (!data || !length || timeout_ms > INT32_MAX) {
         return NX_ERR_INVALID_PARAM;
     }
     if (nx_arch_in_isr() || uart.state != NX_DEV_STATE_RUNNING) { return NX_ERR_INVALID_STATE; }
-    if (!timeout_ms) { return NX_ERR_TIMEOUT; }
+    if (!timeout_ms) {
+        return NX_ERR_TIMEOUT;
+    }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     if (uart.active) { nx_arch_irq_restore(saved); return NX_ERR_BUSY; }
-    if (uart.sequence == UINT64_MAX) { nx_arch_irq_restore(saved); return NX_ERR_NO_RESOURCE; }
+    if (uart.sequence == UINT64_MAX) {
+        nx_arch_irq_restore(saved);
+        return NX_ERR_NO_RESOURCE;
+    }
     uart.tx = data;
     uart.tx_length = length;
     uart.tx_position = 0;
@@ -271,9 +281,13 @@ static nx_rx_sync_t* get_rx_sync(nx_uart_t* self) { (void)self; return NULL; }
 static nx_lifecycle_t* get_lifecycle(nx_uart_t* self) { (void)self; return &uart.lifecycle; }
 static nx_power_t* get_power(nx_uart_t* self) { (void)self; return NULL; }
 static nx_status_t construct_uart(const nx_device_t* descriptor, void** out) {
-    if (!out) { return NX_ERR_NULL_PTR; }
+    if (!out) {
+        return NX_ERR_NULL_PTR;
+    }
     *out = NULL;
-    if (!descriptor || descriptor->state != &device_state) { return NX_ERR_INVALID_PARAM; }
+    if (!descriptor || descriptor->state != &device_state) {
+        return NX_ERR_INVALID_PARAM;
+    }
     uart.api = (nx_uart_t){ .get_operations = get_operations, .get_tx_async = get_tx_async,
         .get_rx_async = get_rx_async, .get_tx_sync = get_tx_sync,
         .get_rx_sync = get_rx_sync, .get_lifecycle = get_lifecycle, .get_power = get_power };
@@ -286,5 +300,9 @@ static nx_status_t construct_uart(const nx_device_t* descriptor, void** out) {
     *out = &uart.api;
     return NX_OK;
 }
-NX_DEVICE_REGISTER_TYPED(NX_UART, 0, "UART0", NULL, &device_state, NX_DEVICE_CLASS_UART,
-    NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_CANCEL | NX_DEVICE_CAP_UART_RX_EVENTS, construct_uart, NULL);
+NX_DEVICE_REGISTER_TYPED(NX_UART, 0, "UART0", NULL, &device_state,
+                         NX_DEVICE_CLASS_UART,
+                         NX_DEVICE_CAP_UART_OPERATIONS |
+                             NX_DEVICE_CAP_UART_CANCEL |
+                             NX_DEVICE_CAP_UART_RX_EVENTS,
+                         construct_uart, NULL);

@@ -26,8 +26,7 @@ static void progress(void) {
         (cfg & RCC_CFGR_SW) == 0u && (cr & RCC_CR_HSIRDY) != 0u) {
         cfg &= ~RCC_CFGR_SWS;
     }
-    if ((cfg & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL &&
-        (cr & RCC_CR_PLLON) == 0u) {
+    if ((cfg & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL && (cr & RCC_CR_PLLON) == 0u) {
         model_stm32_unsafe_stop = true;
     }
     if ((cr & RCC_CR_PLLON) == 0u &&
@@ -51,10 +50,13 @@ RCC_TypeDef* model_stm32_rcc(void) {
 }
 void SystemCoreClockUpdate(void) {
     progress();
-    uint32_t source = (model_stm32_clock_regs.CFGR & RCC_CFGR_SWS) ==
-                       RCC_CFGR_SWS_PLL ? 168000000u : 16000000u;
+    uint32_t source =
+        (model_stm32_clock_regs.CFGR & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL
+            ? 168000000u
+            : 16000000u;
     uint32_t div = (model_stm32_clock_regs.CFGR & RCC_CFGR_HPRE) >> 4;
-    static const uint8_t shift[16] = {0,0,0,0,0,0,0,0,1,2,3,4,6,7,8,9};
+    static const uint8_t shift[16] = {0, 0, 0, 0, 0, 0, 0, 0,
+                                      1, 2, 3, 4, 6, 7, 8, 9};
     SystemCoreClock = source >> shift[div];
     if ((model_stm32_faults & MODEL_STM_CLOCK_REPORT) != 0u) {
         ++SystemCoreClock;
@@ -70,8 +72,10 @@ void model_stm32_reset(void) {
     model_stm32_isr = 0u;
     model_stm32_shutdown = false;
     model_stm32_clock_regs.CR = RCC_CR_HSEON | RCC_CR_HSERDY | RCC_CR_CSSON |
-        RCC_CR_PLLON | RCC_CR_PLLRDY | RCC_CR_PLLI2SON | RCC_CR_PLLI2SRDY;
-    model_stm32_clock_regs.CFGR = 2u | RCC_CFGR_SWS_PLL | (5u << 10) | (4u << 13);
+                                RCC_CR_PLLON | RCC_CR_PLLRDY | RCC_CR_PLLI2SON |
+                                RCC_CR_PLLI2SRDY;
+    model_stm32_clock_regs.CFGR =
+        2u | RCC_CFGR_SWS_PLL | (5u << 10) | (4u << 13);
     flash_acr = 5u;
     regulator = 3u;
     SystemCoreClock = 168000000u;
@@ -85,7 +89,8 @@ void model_stm32_snapshot(model_stm_snapshot_t* out) {
     out->regulator = regulator;
 }
 void HAL_NVIC_ClearPendingIRQ(IRQn_Type irq) {
-    model_stm32_nvic.ISPR[(uint32_t)irq / 32u] &= ~(1u << ((uint32_t)irq % 32u));
+    model_stm32_nvic.ISPR[(uint32_t)irq / 32u] &=
+        ~(1u << ((uint32_t)irq % 32u));
 }
 void stm32_irq_prepare(IRQn_Type irq, uint8_t priority) {
     (void)priority;
@@ -95,7 +100,8 @@ void stm32_irq_enable(IRQn_Type irq) {
     model_stm32_nvic.ISER[(uint32_t)irq / 32u] |= 1u << ((uint32_t)irq % 32u);
 }
 void stm32_irq_disable(IRQn_Type irq) {
-    model_stm32_nvic.ISER[(uint32_t)irq / 32u] &= ~(1u << ((uint32_t)irq % 32u));
+    model_stm32_nvic.ISER[(uint32_t)irq / 32u] &=
+        ~(1u << ((uint32_t)irq % 32u));
 }
 nx_arch_irq_state_t nx_arch_irq_save(void) {
     nx_arch_irq_state_t previous = {model_stm32_mask};
@@ -105,7 +111,14 @@ nx_arch_irq_state_t nx_arch_irq_save(void) {
 void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
     model_stm32_mask = previous.value;
 }
-bool nx_arch_irq_is_masked(void) { return model_stm32_mask != 0u; }
-bool nx_arch_in_isr(void) { return model_stm32_isr != 0u; }
-void nx_arch_dmb(void) { }
-bool nx_device_shutdown_is_active(void) { return model_stm32_shutdown; }
+bool nx_arch_irq_is_masked(void) {
+    return model_stm32_mask != 0u;
+}
+bool nx_arch_in_isr(void) {
+    return model_stm32_isr != 0u;
+}
+void nx_arch_dmb(void) {
+}
+bool nx_device_shutdown_is_active(void) {
+    return model_stm32_shutdown;
+}

@@ -67,8 +67,8 @@ int stm32_platform_init(void);
  * \return          0 on cleanup, -1 on error or missing common HAL fence
  * \note            Ordinary consumers call nx_hal_deinit()/runtime shutdown.
  *                  This wrapper is only valid under the exclusive HAL admission
- *                  fence after read-only provider, IRQ and DMA quiescence checks.
- *                  Running or suspended MCU kernels cannot be restarted.
+ *                  fence after read-only provider, IRQ and DMA quiescence
+ * checks. Running or suspended MCU kernels cannot be restarted.
  */
 int stm32_platform_deinit(void);
 

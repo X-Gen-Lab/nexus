@@ -8,16 +8,24 @@
 
 static unsigned init_calls, deinit_calls;
 static uintptr_t fence_owner;
-bool osal_is_initialized(void) { return false; }
-nx_status_t nx_device_shutdown_check(void) { return NX_OK; }
+bool osal_is_initialized(void) {
+    return false;
+}
+nx_status_t nx_device_shutdown_check(void) {
+    return NX_OK;
+}
 nx_status_t nx_device_shutdown_begin_owned(uintptr_t owner) {
-    assert(fence_owner == 0); fence_owner = owner; return NX_OK;
+    assert(fence_owner == 0);
+    fence_owner = owner;
+    return NX_OK;
 }
 nx_status_t nx_device_shutdown_quarantine_begin(uintptr_t owner) {
     return nx_device_shutdown_begin_owned(owner);
 }
 nx_status_t nx_device_shutdown_end_owned(uintptr_t owner) {
-    assert(fence_owner == owner); fence_owner = 0; return NX_OK;
+    assert(fence_owner == owner);
+    fence_owner = 0;
+    return NX_OK;
 }
 static nx_status_t init_status = NX_OK, deinit_status = NX_OK;
 

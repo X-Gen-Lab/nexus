@@ -42,8 +42,9 @@ nx_status_t nx_stm32f407_clock_release(void) {
      * settings is unnecessary for a safe idle state and restart. */
     RCC->CR &= ~(RCC_CR_PLLON | RCC_CR_PLLI2SON);
     if (!clock_wait_bits(&RCC->CR,
-                         RCC_CR_PLLON | RCC_CR_PLLRDY |
-                         RCC_CR_PLLI2SON | RCC_CR_PLLI2SRDY, 0U)) {
+                         RCC_CR_PLLON | RCC_CR_PLLRDY | RCC_CR_PLLI2SON |
+                             RCC_CR_PLLI2SRDY,
+                         0U)) {
         return NX_ERR_TIMEOUT;
     }
     RCC->CR &= ~(RCC_CR_CSSON | RCC_CR_HSEON);

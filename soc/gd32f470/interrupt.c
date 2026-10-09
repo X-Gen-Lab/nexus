@@ -15,7 +15,9 @@ extern void xPortSysTickHandler(void);
 static volatile uint32_t timer_epoch;
 static bool gd32_timebase_owned;
 int nx_gd32f470_timebase_init(void) {
-    if (gd32_timebase_owned) { return -1; }
+    if (gd32_timebase_owned) {
+        return -1;
+    }
     /* Acquire before the first write. A failed initialization still owns
      * every partial timer/IRQ/clock effect until successful cleanup. */
     gd32_timebase_owned = true;
@@ -41,16 +43,20 @@ int nx_gd32f470_timebase_init(void) {
     uint32_t bank = (uint32_t)TIMER1_IRQn / 32u;
     uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32u);
     return (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0u &&
-           (RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN) != 0u &&
-           (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u &&
-           (TIMER_DMAINTEN(TIMER1) & TIMER_DMAINTEN_UPIE) != 0u &&
-           TIMER_PSC(TIMER1) == 99u && TIMER_CAR(TIMER1) == UINT32_MAX &&
-           (NVIC->ISER[bank] & bit) != 0u ? 0 : -1;
+                   (RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN) != 0u &&
+                   (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u &&
+                   (TIMER_DMAINTEN(TIMER1) & TIMER_DMAINTEN_UPIE) != 0u &&
+                   TIMER_PSC(TIMER1) == 99u &&
+                   TIMER_CAR(TIMER1) == UINT32_MAX &&
+                   (NVIC->ISER[bank] & bit) != 0u
+               ? 0
+               : -1;
 }
 
 nx_status_t nx_gd32f470_resources_idle(void) {
     /* F470's last external vector is IPA (90), beyond the FPU vector. The
-     * dedicated TIMER1 belongs to the platform; active IRQs are never waived. */
+     * dedicated TIMER1 belongs to the platform; active IRQs are never waived.
+     */
     for (uint32_t irq = 0; irq <= (uint32_t)IPA_IRQn; ++irq) {
         uint32_t bank = irq / 32u;
         uint32_t bit = UINT32_C(1) << (irq % 32u);
@@ -70,7 +76,9 @@ nx_status_t nx_gd32f470_resources_idle(void) {
 }
 
 int nx_gd32f470_timebase_deinit(void) {
-    if (!gd32_timebase_owned) { return 0; }
+    if (!gd32_timebase_owned) {
+        return 0;
+    }
     uint32_t bank = (uint32_t)TIMER1_IRQn / 32u;
     uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32u);
     if ((NVIC->IABR[bank] & bit) != 0u) {
@@ -82,8 +90,8 @@ int nx_gd32f470_timebase_deinit(void) {
     timer_interrupt_flag_clear(TIMER1, TIMER_INT_FLAG_UP);
     NVIC_ClearPendingIRQ(TIMER1_IRQn);
     if ((TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u ||
-        TIMER_DMAINTEN(TIMER1) != 0u ||
-        (NVIC->ISER[bank] & bit) != 0u || (NVIC->ISPR[bank] & bit) != 0u) {
+        TIMER_DMAINTEN(TIMER1) != 0u || (NVIC->ISER[bank] & bit) != 0u ||
+        (NVIC->ISPR[bank] & bit) != 0u) {
         return -1;
     }
     rcu_periph_clock_sleep_disable(RCU_TIMER1_SLP);

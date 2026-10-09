@@ -37,9 +37,11 @@ typedef struct {
     nx_uart_rx_event_t* rx_storage;
 } uart_resource_t;
 static nx_status_t construct(const nx_device_t* descriptor, void** out) {
-    if (!out) return NX_ERR_NULL_PTR;
+    if (!out)
+        return NX_ERR_NULL_PTR;
     *out = NULL;
-    if (!descriptor) return NX_ERR_INVALID_PARAM;
+    if (!descriptor)
+        return NX_ERR_INVALID_PARAM;
     const uart_resource_t* resource = descriptor->config;
     if (!resource || !resource->hardware.usart_base) return NX_ERR_INVALID_PARAM;
     stm32_uart_impl_t* impl = resource->impl;
@@ -108,7 +110,8 @@ static nx_lifecycle_t* descriptor_lifecycle(void* api) {
         .tx_storage = uart_tx_##index, .rx_storage = uart_rx_##index};          \
     static nx_device_config_state_t uart_registry_##index;                    \
     NX_DEVICE_REGISTER_TYPED(STM32_UART, index, "UART" #index, &uart_config_##index, \
-        &uart_registry_##index, NX_DEVICE_CLASS_UART,                         \
-        NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_CANCEL |           \
-            NX_DEVICE_CAP_UART_RX_EVENTS, construct, descriptor_lifecycle)
+        &uart_registry_##index, NX_DEVICE_CLASS_UART,                          \
+        NX_DEVICE_CAP_UART_OPERATIONS | NX_DEVICE_CAP_UART_CANCEL |            \
+            NX_DEVICE_CAP_UART_RX_EVENTS,                                      \
+        construct, descriptor_lifecycle)
 NX_TRAVERSE_EACH_INSTANCE(UART_REGISTER, STM32_UART);

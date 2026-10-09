@@ -108,14 +108,16 @@ nx_status_t nx_hal_init(void);
 
 typedef enum {
     NX_HAL_OFFLINE, /**< No selected-platform resources are owned. */
-    NX_HAL_PARTIAL, /**< Cleanup failed; new acquisition/restart is quarantined. */
+    NX_HAL_PARTIAL, /**< Cleanup failed; new acquisition/restart is quarantined.
+                     */
     NX_HAL_READY    /**< The selected platform completed initialization. */
 } nx_hal_state_t;
 
 /** Nonblocking lifetime snapshot; use the serialized HAL lifecycle context.
  * Failed init attempts actual cleanup and returns its original error. PARTIAL
  * retains ownership and the exclusive admission fence until nx_hal_deinit()
- * settles it. Existing owners may close/recover to return borrowed resources. */
+ * settles it. Existing owners may close/recover to return borrowed resources.
+ */
 nx_hal_state_t nx_hal_get_state(void);
 
 /** Cleanup result from the latest failed-init rollback or deinit attempt.

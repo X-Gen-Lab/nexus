@@ -17,12 +17,15 @@ nx_status_t stm32_spi_board_prepare(const stm32_spi_board_port_t* port) {
     if (!port || !port->handle || port->handle->Instance != SPI1 || port->instance != 1) return NX_ERR_NOT_SUPPORTED;
     /* A partial attempt is still owned: only release may settle it. Do not
      * overwrite the static handles or an unrelated SoC DMA binding. */
-    if (bound_handle) return NX_ERR_BUSY;
-    if (port->handle->hdmatx || port->handle->hdmarx) return NX_ERR_RESOURCE_BUSY;
+    if (bound_handle)
+        return NX_ERR_BUSY;
+    if (port->handle->hdmatx || port->handle->hdmarx)
+        return NX_ERR_RESOURCE_BUSY;
     nx_isr_manager_t* selected_manager = NULL;
     if (port->dma_tx_enabled || port->dma_rx_enabled) {
         selected_manager = nx_isr_manager_get();
-        if (!selected_manager) return NX_ERR_NO_RESOURCE;
+        if (!selected_manager)
+            return NX_ERR_NO_RESOURCE;
         if (!selected_manager->connect || !selected_manager->disconnect)
             return NX_ERR_NOT_SUPPORTED;
     }
@@ -64,10 +67,12 @@ nx_status_t stm32_spi_board_prepare(const stm32_spi_board_port_t* port) {
      * before entering the vendor function, not only its successful result. */
     tx_dma_owned = true;
     __HAL_LINKDMA(port->handle, hdmatx, dma_tx);
-    if (HAL_DMA_Init(&dma_tx) != HAL_OK) return NX_ERR_DMA_CONFIG;
+    if (HAL_DMA_Init(&dma_tx) != HAL_OK)
+        return NX_ERR_DMA_CONFIG;
     rx_dma_owned = true;
     __HAL_LINKDMA(port->handle, hdmarx, dma_rx);
-    if (HAL_DMA_Init(&dma_rx) != HAL_OK) return NX_ERR_DMA_CONFIG;
+    if (HAL_DMA_Init(&dma_rx) != HAL_OK)
+        return NX_ERR_DMA_CONFIG;
     /* Priority 5 is inside the default FreeRTOS syscall-safe range 5..15.
      * A product changing configMAX_SYSCALL_INTERRUPT_PRIORITY must review this. */
     nx_status_t r = manager->connect(manager, DMA2_Stream3_IRQn, tx_irq, &dma_tx, 5);
@@ -90,8 +95,10 @@ uint32_t stm32_spi_board_clock_hz(uint8_t instance) {
     return instance == 1 ? HAL_RCC_GetPCLK2Freq() : 0;
 }
 static nx_status_t disconnect_owned(uint32_t irq, bool* connected) {
-    if (!*connected) return NX_OK;
-    if (!manager || !manager->disconnect) return NX_ERR_INVALID_STATE;
+    if (!*connected)
+        return NX_OK;
+    if (!manager || !manager->disconnect)
+        return NX_ERR_INVALID_STATE;
     nx_status_t status = manager->disconnect(manager, irq);
     if (status == NX_OK) {
         *connected = false;
@@ -100,34 +107,46 @@ static nx_status_t disconnect_owned(uint32_t irq, bool* connected) {
     return status;
 }
 static nx_status_t release_dma(DMA_HandleTypeDef* dma, bool* owned,
-                                DMA_HandleTypeDef** binding) {
-    if (!*owned) return NX_OK;
+                               DMA_HandleTypeDef** binding) {
+    if (!*owned)
+        return NX_OK;
     HAL_StatusTypeDef status = HAL_DMA_DeInit(dma);
-    if (status != HAL_OK) return status == HAL_BUSY ? NX_ERR_BUSY :
-        status == HAL_TIMEOUT ? NX_ERR_TIMEOUT : NX_ERR_IO;
+    if (status != HAL_OK)
+        return status == HAL_BUSY      ? NX_ERR_BUSY
+               : status == HAL_TIMEOUT ? NX_ERR_TIMEOUT
+                                       : NX_ERR_IO;
     *owned = false;
-    if (*binding == dma) *binding = NULL;
+    if (*binding == dma)
+        *binding = NULL;
     dma->Instance = NULL;
     dma->Parent = NULL;
     return NX_OK;
 }
 nx_status_t stm32_spi_board_release(const stm32_spi_board_port_t* port) {
-    if (!port || !port->handle || port->handle->Instance != SPI1 || port->instance != 1)
+    if (!port || !port->handle || port->handle->Instance != SPI1 ||
+        port->instance != 1)
         return NX_ERR_NOT_SUPPORTED;
-    if (!bound_handle) return NX_OK;
-    if (port->handle != bound_handle) return NX_ERR_RESOURCE_BUSY;
+    if (!bound_handle)
+        return NX_OK;
+    if (port->handle != bound_handle)
+        return NX_ERR_RESOURCE_BUSY;
     nx_status_t result = disconnect_owned(DMA2_Stream3_IRQn, &tx_connected);
     nx_status_t status = disconnect_owned(DMA2_Stream0_IRQn, &rx_connected);
-    if (result == NX_OK) result = status;
+    if (result == NX_OK)
+        result = status;
     status = disconnect_owned(SPI1_IRQn, &spi_connected);
-    if (result == NX_OK) result = status;
+    if (result == NX_OK)
+        result = status;
     /* Any connected callback can still borrow the SPI/DMA context. Successful
      * independent disconnects stay released; do not destroy a retained one. */
-    if (result != NX_OK) return result;
+    if (result != NX_OK)
+        return result;
     result = release_dma(&dma_tx, &tx_dma_owned, &port->handle->hdmatx);
     status = release_dma(&dma_rx, &rx_dma_owned, &port->handle->hdmarx);
-    if (result == NX_OK) result = status;
-    if (result != NX_OK) return result;
+    if (result == NX_OK)
+        result = status;
+    if (result != NX_OK)
+        return result;
     if (pins_owned) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
         HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);

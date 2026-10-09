@@ -73,7 +73,9 @@ nx_status_t nx_runtime_bootstrap(nx_boot_report_t* output) {
         status = report.hal_status;
         hal_owned = nx_hal_get_state() != NX_HAL_OFFLINE;
         report.rollback_status = nx_hal_get_last_cleanup_status();
-        if (hal_owned) { report.stage = NX_BOOT_STAGE_ROLLBACK; }
+        if (hal_owned) {
+            report.stage = NX_BOOT_STAGE_ROLLBACK;
+        }
         goto done;
     }
     hal_owned = true;

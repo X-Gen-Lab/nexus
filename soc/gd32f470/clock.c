@@ -80,16 +80,17 @@ int nx_gd32f470_clock_release(void) {
     }
     RCU_CFG0 &= ~(RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC);
     SystemCoreClockUpdate();
-    if ((RCU_CFG0 & (RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC)) != 0u ||
+    if ((RCU_CFG0 & (RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC)) !=
+            0u ||
         SystemCoreClock != 16000000u) {
         return -1;
     }
 
     RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_PLLI2SEN | RCU_CTL_PLLSAIEN);
     if (!wait_bits(&RCU_CTL,
-                   RCU_CTL_PLLEN | RCU_CTL_PLLSTB |
-                   RCU_CTL_PLLI2SEN | RCU_CTL_PLLI2SSTB |
-                   RCU_CTL_PLLSAIEN | RCU_CTL_PLLSAISTB, 0u)) {
+                   RCU_CTL_PLLEN | RCU_CTL_PLLSTB | RCU_CTL_PLLI2SEN |
+                       RCU_CTL_PLLI2SSTB | RCU_CTL_PLLSAIEN | RCU_CTL_PLLSAISTB,
+                   0u)) {
         return -1;
     }
     RCU_CTL &= ~(RCU_CTL_CKMEN | RCU_CTL_HXTALEN);

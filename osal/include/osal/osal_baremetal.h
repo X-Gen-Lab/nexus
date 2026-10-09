@@ -13,7 +13,8 @@ osal_status_t osal_baremetal_set_clock(osal_baremetal_clock_t clock);
  * Task/startup context with no existing interrupt mask. BUSY while OSAL is
  * initialized, any object is owned, or another source is installed. The caller
  * serializes lifetime against clock readers and waits. Idempotent if detached.
- * Successful detach removes MONOTONIC_CLOCK capability until set_clock again. */
+ * Successful detach removes MONOTONIC_CLOCK capability until set_clock again.
+ */
 osal_status_t osal_baremetal_clear_clock(osal_baremetal_clock_t expected);
 #ifdef __cplusplus
 }

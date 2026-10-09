@@ -106,7 +106,9 @@ static bool clock_bound;
 /* Discovery has no external safety policy; reviewed boards override the narrow
  * safe-initial-level hook. GPIO banks may become high impedance during vendor
  * reset. Continuous actuator safety is a product/electrical responsibility. */
-__weak nx_status_t nx_board_prepare_safe_outputs(void) { return NX_OK; }
+__weak nx_status_t nx_board_prepare_safe_outputs(void) {
+    return NX_OK;
+}
 extern nx_status_t nx_stm32f407_resources_idle(void);
 
 /*---------------------------------------------------------------------------*/
@@ -128,27 +130,39 @@ extern nx_status_t nx_stm32f407_resources_idle(void);
  *                  NX_CONFIG_STM32_SYSTICK_PRIORITY.
  */
 /* Platform hooks are private: only serialized nx_hal_init/deinit may invoke
- * them. The common HAL owns shutdown admission and records partial ownership. */
+ * them. The common HAL owns shutdown admission and records partial ownership.
+ */
 nx_status_t nx_platform_init(void) {
-    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
-    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
-    if (platform_ready) return NX_OK;
-    if (platform_owned) return NX_ERR_INVALID_STATE;
-    /* Mark ownership before the first vendor call, including failed HAL_Init. */
+    if (nx_arch_in_isr())
+        return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked())
+        return NX_ERR_INVALID_STATE;
+    if (platform_ready)
+        return NX_OK;
+    if (platform_owned)
+        return NX_ERR_INVALID_STATE;
+    /* Mark ownership before the first vendor call, including failed HAL_Init.
+     */
     platform_owned = true;
-    if (HAL_Init() != HAL_OK) return NX_ERR_IO;
+    if (HAL_Init() != HAL_OK)
+        return NX_ERR_IO;
 #ifdef NX_CONFIG_OSAL_BAREMETAL
-    if (osal_baremetal_set_clock(HAL_GetTick) != OSAL_OK) return NX_ERR_BUSY;
+    if (osal_baremetal_set_clock(HAL_GetTick) != OSAL_OK)
+        return NX_ERR_BUSY;
     clock_bound = true;
 #endif
     if ((uint32_t)*(volatile const uint16_t*)FLASHSIZE_BASE * 1024U !=
-        NX_CONFIG_STM32_FLASH_SIZE) return NX_ERR_HARDWARE;
-    if (SystemClock_Config() != 0) return NX_ERR_IO;
-    if (nx_board_prepare_safe_outputs() != NX_OK) return NX_ERR_IO;
+        NX_CONFIG_STM32_FLASH_SIZE)
+        return NX_ERR_HARDWARE;
+    if (SystemClock_Config() != 0)
+        return NX_ERR_IO;
+    if (nx_board_prepare_safe_outputs() != NX_OK)
+        return NX_ERR_IO;
     HAL_NVIC_SetPriorityGrouping(7U - NX_CONFIG_STM32_NVIC_PRIORITY_GROUP);
     HAL_NVIC_SetPriority(SysTick_IRQn, NX_CONFIG_STM32_SYSTICK_PRIORITY, 0);
     HAL_NVIC_SetPriority(PendSV_IRQn, NX_CONFIG_STM32_PENDSV_PRIORITY, 0);
-    /* DWT is optional diagnostics; its absence is not infrastructure failure. */
+    /* DWT is optional diagnostics; its absence is not infrastructure failure.
+     */
     (void)stm32_perf_init();
     stm32_boot_time_mark(3);
     platform_ready = true;
@@ -156,47 +170,64 @@ nx_status_t nx_platform_init(void) {
 }
 
 nx_status_t nx_platform_init_check(void) {
-    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
-    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
-    if (osal_is_initialized()) return NX_ERR_BUSY;
+    if (nx_arch_in_isr())
+        return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked())
+        return NX_ERR_INVALID_STATE;
+    if (osal_is_initialized())
+        return NX_ERR_BUSY;
 #ifdef NX_CONFIG_OSAL_FREERTOS
     osal_execution_info_t execution;
-    if (osal_get_execution_info(&execution) != OSAL_OK) return NX_ERR_IO;
-    if (execution.scheduler_state != OSAL_SCHEDULER_NOT_STARTED) return NX_ERR_BUSY;
+    if (osal_get_execution_info(&execution) != OSAL_OK)
+        return NX_ERR_IO;
+    if (execution.scheduler_state != OSAL_SCHEDULER_NOT_STARTED)
+        return NX_ERR_BUSY;
 #endif
     return nx_stm32f407_resources_idle();
 }
 
 nx_status_t nx_platform_shutdown_check(void) {
-    if (nx_arch_in_isr()) return NX_ERR_CONTEXT;
-    if (nx_arch_irq_is_masked()) return NX_ERR_INVALID_STATE;
-    if (!nx_device_shutdown_is_active()) return NX_ERR_INVALID_STATE;
-    if (osal_is_initialized()) return NX_ERR_BUSY;
+    if (nx_arch_in_isr())
+        return NX_ERR_CONTEXT;
+    if (nx_arch_irq_is_masked())
+        return NX_ERR_INVALID_STATE;
+    if (!nx_device_shutdown_is_active())
+        return NX_ERR_INVALID_STATE;
+    if (osal_is_initialized())
+        return NX_ERR_BUSY;
 #ifdef NX_CONFIG_OSAL_FREERTOS
     osal_execution_info_t execution;
-    if (osal_get_execution_info(&execution) != OSAL_OK) return NX_ERR_IO;
-    if (execution.scheduler_state != OSAL_SCHEDULER_NOT_STARTED) return NX_ERR_BUSY;
+    if (osal_get_execution_info(&execution) != OSAL_OK)
+        return NX_ERR_IO;
+    if (execution.scheduler_state != OSAL_SCHEDULER_NOT_STARTED)
+        return NX_ERR_BUSY;
 #endif
     nx_status_t status = nx_device_provider_quiescence_check();
-    if (status != NX_OK) return status;
+    if (status != NX_OK)
+        return status;
     return nx_stm32f407_resources_idle();
 }
 
 nx_status_t nx_platform_deinit(void) {
-    if (!platform_owned) return NX_OK;
+    if (!platform_owned)
+        return NX_OK;
     /* Read-only admission has already completed under the common HAL fence. */
-    if (!nx_device_shutdown_is_active()) return NX_ERR_INVALID_STATE;
+    if (!nx_device_shutdown_is_active())
+        return NX_ERR_INVALID_STATE;
     platform_ready = false;
 #ifdef NX_CONFIG_OSAL_BAREMETAL
     if (clock_bound) {
-        if (osal_baremetal_clear_clock(HAL_GetTick) != OSAL_OK) return NX_ERR_BUSY;
+        if (osal_baremetal_clear_clock(HAL_GetTick) != OSAL_OK)
+            return NX_ERR_BUSY;
         clock_bound = false;
     }
 #endif
     nx_status_t status = nx_stm32f407_clock_release();
-    if (status != NX_OK) return status;
+    if (status != NX_OK)
+        return status;
     /* Neither fixed ST HAL_DeInit nor its weak RCC_DeInit stops SysTick. All
-     * clock waits above are bounded register polls, independent of this tick. */
+     * clock waits above are bounded register polls, independent of this tick.
+     */
     SysTick->CTRL = 0u;
     SysTick->LOAD = 0u;
     SysTick->VAL = 0u;
@@ -206,8 +237,10 @@ nx_status_t nx_platform_deinit(void) {
     stm32_perf_deinit();
     HAL_StatusTypeDef vendor_status = HAL_DeInit();
     nx_status_t board_status = nx_board_prepare_safe_outputs();
-    if (vendor_status != HAL_OK) return NX_ERR_IO;
-    if (board_status != NX_OK) return board_status;
+    if (vendor_status != HAL_OK)
+        return NX_ERR_IO;
+    if (board_status != NX_OK)
+        return board_status;
     platform_owned = false;
     return NX_OK;
 }

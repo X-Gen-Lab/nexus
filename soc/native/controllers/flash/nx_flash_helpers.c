@@ -247,15 +247,19 @@ nx_status_t flash_save_to_file(nx_flash_state_t* state) {
             break;
         }
     }
-    if (status == NX_OK && fflush(file) != 0) status = NX_ERR_IO;
+    if (status == NX_OK && fflush(file) != 0)
+        status = NX_ERR_IO;
     if (status == NX_OK) {
 #if defined(_WIN32)
-        if (_commit(_fileno(file)) != 0) status = NX_ERR_IO;
+        if (_commit(_fileno(file)) != 0)
+            status = NX_ERR_IO;
 #else
-        if (fsync(fileno(file)) != 0) status = NX_ERR_IO;
+        if (fsync(fileno(file)) != 0)
+            status = NX_ERR_IO;
 #endif
     }
-    if (fclose(file) != 0) status = NX_ERR_IO;
+    if (fclose(file) != 0)
+        status = NX_ERR_IO;
     return status;
 }
 
@@ -298,7 +302,8 @@ nx_status_t flash_load_from_file(nx_flash_state_t* state) {
     }
     /* An existing file is exactly one raw image, not a prefix of another
      * revision. Reject trailing bytes and read errors as malformed input. */
-    if (status == NX_OK && (fgetc(file) != EOF || ferror(file))) status = NX_ERR_IO;
+    if (status == NX_OK && (fgetc(file) != EOF || ferror(file)))
+        status = NX_ERR_IO;
     if (fclose(file) != 0) {
         status = NX_ERR_IO;
     }

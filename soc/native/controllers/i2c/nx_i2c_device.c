@@ -153,25 +153,32 @@ typedef struct {
     size_t tx_size, rx_size;
 } native_i2c_storage_t;
 static nx_status_t nx_i2c_construct(const nx_device_t* dev, void** out) {
-    if(!out) return NX_ERR_NULL_PTR;
-    *out=NULL;
-    if(!dev || !dev->state || !dev->config) return NX_ERR_INVALID_PARAM;
+    if (!out)
+        return NX_ERR_NULL_PTR;
+    *out = NULL;
+    if (!dev || !dev->state || !dev->config)
+        return NX_ERR_INVALID_PARAM;
     const nx_i2c_platform_config_t* cfg=dev->config;
-    native_i2c_storage_t* storage=NX_CONTAINER_OF(dev->state,native_i2c_storage_t,core);
-    if(!cfg->speed || !cfg->tx_buf_size || !cfg->rx_buf_size || !storage->tx ||
-       !storage->rx || storage->tx_size!=cfg->tx_buf_size ||
-       storage->rx_size!=cfg->rx_buf_size) return NX_ERR_INVALID_PARAM;
-    nx_i2c_impl_t* b=&storage->bus;
-    memset(b,0,sizeof(*b)); b->state=&storage->state;
+    native_i2c_storage_t* storage =
+        NX_CONTAINER_OF(dev->state, native_i2c_storage_t, core);
+    if (!cfg->speed || !cfg->tx_buf_size || !cfg->rx_buf_size || !storage->tx ||
+        !storage->rx || storage->tx_size != cfg->tx_buf_size ||
+        storage->rx_size != cfg->rx_buf_size)
+        return NX_ERR_INVALID_PARAM;
+    nx_i2c_impl_t* b = &storage->bus;
+    memset(b, 0, sizeof(*b));
+    b->state = &storage->state;
     memset(b->state,0,sizeof(*b->state)); b->state->index=cfg->i2c_index;
     b->state->config=(nx_i2c_config_t){cfg->speed,cfg->scl_pin,cfg->sda_pin,false,false,cfg->tx_buf_size,cfg->rx_buf_size};
-    b->state->tx_buf.data=storage->tx; b->state->tx_buf.size=cfg->tx_buf_size;
-    b->state->rx_buf.data=storage->rx; b->state->rx_buf.size=cfg->rx_buf_size;
-    b->device=(nx_device_t*)dev;
+    b->state->tx_buf.data = storage->tx;
+    b->state->tx_buf.size = cfg->tx_buf_size;
+    b->state->rx_buf.data = storage->rx;
+    b->state->rx_buf.size = cfg->rx_buf_size;
+    b->device = (nx_device_t*)dev;
     NX_INIT_I2C_BUS(&b->base,get_tx_sync,get_tx_rx_sync,get_tx_async,get_tx_rx_async,get_lifecycle,get_power);
     b->base.open_device=open_device; b->base.close_device=close_device; b->base.service=service;
     i2c_init_lifecycle(&b->lifecycle); i2c_init_power(&b->power);
-    *out=&b->base;
+    *out = &b->base;
     return NX_OK;
 }
 #define NX_I2C_CONFIG(index) \
@@ -180,13 +187,17 @@ static nx_status_t nx_i2c_construct(const nx_device_t* dev, void** out) {
         NX_CONFIG_I2C##index##_TX_BUFFER_SIZE,NX_CONFIG_I2C##index##_RX_BUFFER_SIZE}
 #define NX_I2C_DEVICE_REGISTER(index) \
     NX_I2C_CONFIG(index); \
-    static uint8_t i2c_tx_##index[NX_CONFIG_I2C##index##_TX_BUFFER_SIZE]; \
-    static uint8_t i2c_rx_##index[NX_CONFIG_I2C##index##_RX_BUFFER_SIZE]; \
-    static native_i2c_storage_t i2c_storage_##index={ \
-        .tx=i2c_tx_##index,.rx=i2c_rx_##index, \
-        .tx_size=sizeof(i2c_tx_##index),.rx_size=sizeof(i2c_rx_##index)}; \
-    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE,index,"I2C" #index,&i2c_config_##index, \
-        &i2c_storage_##index.core,NX_DEVICE_CLASS_I2C, \
-        NX_DEVICE_CAP_I2C_DEVICES|NX_DEVICE_CAP_I2C_QUEUE|NX_DEVICE_CAP_I2C_CANCEL, \
-        nx_i2c_construct,NULL);
+    static uint8_t i2c_tx_##index[NX_CONFIG_I2C##index##_TX_BUFFER_SIZE];      \
+    static uint8_t i2c_rx_##index[NX_CONFIG_I2C##index##_RX_BUFFER_SIZE];      \
+    static native_i2c_storage_t i2c_storage_##index = {                        \
+        .tx = i2c_tx_##index,                                                  \
+        .rx = i2c_rx_##index,                                                  \
+        .tx_size = sizeof(i2c_tx_##index),                                     \
+        .rx_size = sizeof(i2c_rx_##index)};                                    \
+    NX_DEVICE_REGISTER_TYPED(                                                  \
+        DEVICE_TYPE, index, "I2C" #index, &i2c_config_##index,                 \
+        &i2c_storage_##index.core, NX_DEVICE_CLASS_I2C,                        \
+        NX_DEVICE_CAP_I2C_DEVICES | NX_DEVICE_CAP_I2C_QUEUE |                  \
+            NX_DEVICE_CAP_I2C_CANCEL,                                          \
+        nx_i2c_construct, NULL);
 NX_TRAVERSE_EACH_INSTANCE(NX_I2C_DEVICE_REGISTER,DEVICE_TYPE)

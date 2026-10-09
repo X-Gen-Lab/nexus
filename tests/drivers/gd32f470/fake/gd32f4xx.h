@@ -8,29 +8,35 @@ typedef enum { RESET = 0, SET = 1 } FlagStatus;
 #define TIMER1 1u
 #define USART0_IRQn 37
 #define TIMER1_IRQn 28
-#define IPA_IRQn 90
-typedef struct { uint32_t ISER[3], ISPR[3], IABR[3]; } fake_nvic_t;
+#define IPA_IRQn    90
+typedef struct {
+    uint32_t ISER[3], ISPR[3], IABR[3];
+} fake_nvic_t;
 extern fake_nvic_t fake_nvic;
 #define NVIC (&fake_nvic)
-typedef struct { uint32_t CTRL, LOAD, VAL; } fake_systick_t;
-typedef struct { uint32_t ICSR; } fake_scb_t;
+typedef struct {
+    uint32_t CTRL, LOAD, VAL;
+} fake_systick_t;
+typedef struct {
+    uint32_t ICSR;
+} fake_scb_t;
 extern fake_systick_t fake_systick;
 extern fake_scb_t fake_scb;
-#define SysTick (&fake_systick)
-#define SCB (&fake_scb)
+#define SysTick                (&fake_systick)
+#define SCB                    (&fake_scb)
 #define SCB_ICSR_PENDSTCLR_Msk (1u << 25)
 #define SCB_ICSR_PENDSVCLR_Msk (1u << 27)
-#define __DSB() ((void)0)
-#define __ISB() ((void)0)
+#define __DSB()                ((void)0)
+#define __ISB()                ((void)0)
 extern uint32_t fake_dma_ctl[2][8];
-#define DMA0 0u
-#define DMA1 1u
+#define DMA0                    0u
+#define DMA1                    1u
 #define DMA_CHCTL(dma, channel) (fake_dma_ctl[(dma)][(channel)])
-#define DMA_CHXCTL_CHEN (1u << 0)
+#define DMA_CHXCTL_CHEN         (1u << 0)
 extern uint32_t fake_rcu_apb1en, fake_rcu_apb1spen;
-#define RCU_APB1EN (fake_rcu_apb1en)
-#define RCU_APB1SPEN (fake_rcu_apb1spen)
-#define RCU_APB1EN_TIMER1EN (1u << 0)
+#define RCU_APB1EN              (fake_rcu_apb1en)
+#define RCU_APB1SPEN            (fake_rcu_apb1spen)
+#define RCU_APB1EN_TIMER1EN     (1u << 0)
 #define RCU_APB1SPEN_TIMER1SPEN (1u << 0)
 #define RCU_USART0 1u
 #define RCU_USART0RST 2u
@@ -123,11 +129,11 @@ uint16_t spi_i2s_data_receive(uint32_t);
 #define TIMER_INT_UP 1u
 extern uint32_t fake_timer_ctl0, fake_timer_dmainten;
 extern uint32_t fake_timer_psc, fake_timer_car;
-#define TIMER_CTL0(x) (fake_timer_ctl0)
-#define TIMER_DMAINTEN(x) (fake_timer_dmainten)
-#define TIMER_PSC(x) (fake_timer_psc)
-#define TIMER_CAR(x) (fake_timer_car)
-#define TIMER_CTL0_CEN (1u << 0)
+#define TIMER_CTL0(x)       (fake_timer_ctl0)
+#define TIMER_DMAINTEN(x)   (fake_timer_dmainten)
+#define TIMER_PSC(x)        (fake_timer_psc)
+#define TIMER_CAR(x)        (fake_timer_car)
+#define TIMER_CTL0_CEN      (1u << 0)
 #define TIMER_DMAINTEN_UPIE (1u << 0)
 typedef struct { uint16_t prescaler,alignedmode,counterdirection;uint32_t period;uint16_t clockdivision,repetitioncounter; } timer_parameter_struct;
 void timer_deinit(uint32_t);

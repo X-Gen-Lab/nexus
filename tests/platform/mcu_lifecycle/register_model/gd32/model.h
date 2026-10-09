@@ -4,12 +4,18 @@
 #include "gd32f4xx_dma.h"
 #include <stdbool.h>
 enum {
-    MODEL_GD_IRC_START = 1u << 0, MODEL_GD_SWITCH = 1u << 1,
-    MODEL_GD_PLL_STOP = 1u << 2, MODEL_GD_HXTAL_STOP = 1u << 3,
-    MODEL_GD_HXTAL_START = 1u << 4, MODEL_GD_PLL_START = 1u << 5,
-    MODEL_GD_HIGH_DRIVE = 1u << 6, MODEL_GD_TIMER_STOP = 1u << 7,
-    MODEL_GD_IRQ_DISABLE = 1u << 8, MODEL_GD_PENDING_CLEAR = 1u << 9,
-    MODEL_GD_GATE_DISABLE = 1u << 10, MODEL_GD_TIMER_INIT = 1u << 11,
+    MODEL_GD_IRC_START = 1u << 0,
+    MODEL_GD_SWITCH = 1u << 1,
+    MODEL_GD_PLL_STOP = 1u << 2,
+    MODEL_GD_HXTAL_STOP = 1u << 3,
+    MODEL_GD_HXTAL_START = 1u << 4,
+    MODEL_GD_PLL_START = 1u << 5,
+    MODEL_GD_HIGH_DRIVE = 1u << 6,
+    MODEL_GD_TIMER_STOP = 1u << 7,
+    MODEL_GD_IRQ_DISABLE = 1u << 8,
+    MODEL_GD_PENDING_CLEAR = 1u << 9,
+    MODEL_GD_GATE_DISABLE = 1u << 10,
+    MODEL_GD_TIMER_INIT = 1u << 11,
 };
 typedef struct {
     uint32_t registers[MODEL_GD_REG_COUNT];

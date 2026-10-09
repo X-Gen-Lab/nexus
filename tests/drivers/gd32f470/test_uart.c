@@ -6,8 +6,9 @@
 #include "board.h"
 static nx_status_t release_error;
 static nx_status_t provider_test_uart_pins(bool enabled) {
-    return !enabled && release_error != NX_OK ? release_error :
-        nx_gd32_board_uart_pins(enabled);
+    return !enabled && release_error != NX_OK
+               ? release_error
+               : nx_gd32_board_uart_pins(enabled);
 }
 #define nx_gd32_board_uart_pins provider_test_uart_pins
 // NOLINTNEXTLINE(bugprone-suspicious-include): deliberate same-TU production fault fixture; retain private factory/state checks.
@@ -17,19 +18,23 @@ uint32_t nx_gd32f470_millis(void){return fake_millis;}
 uint64_t nx_gd32f470_timestamp_us(void){return (uint64_t)fake_millis*1000u+123u;}
 static void irq(uint32_t flags){fake_uart_flags=flags;if(flags&USART_STAT0_TC)fake_uart_shift=false;fake_isr=1;USART0_IRQHandler();fake_isr=0;}
 int main(void){
-    assert(NX_UART0.device_init == NULL && NX_UART0.construct == construct_uart);
+    assert(NX_UART0.device_init == NULL &&
+           NX_UART0.construct == construct_uart);
     void* rejected = (void*)1;
-    assert(construct_uart(NULL, &rejected) == NX_ERR_INVALID_PARAM && rejected == NULL);
+    assert(construct_uart(NULL, &rejected) == NX_ERR_INVALID_PARAM &&
+           rejected == NULL);
     assert(construct_uart(&NX_UART0, NULL) == NX_ERR_NULL_PTR);
     void* constructed = NULL;
     assert(construct_uart(&NX_UART0, &constructed) == NX_OK);
-    nx_uart_t* api = constructed;nx_lifecycle_t* life=api->get_lifecycle(api);
+    nx_uart_t* api = constructed;
+    nx_lifecycle_t* life = api->get_lifecycle(api);
     assert(!fake_usart_interrupts); /* discovery cannot start a controller */
     assert(life->init(life)==NX_OK);
     nx_uart_operations_t* ops=api->get_operations(api);
     uint8_t bytes[]={1,2};nx_uart_ticket_t ticket;nx_uart_result_t result;
     ticket.sequence = 12;
-    assert(ops->submit(ops,bytes,2,0,&ticket)==NX_ERR_TIMEOUT&&ticket.sequence==0&&!fake_de);
+    assert(ops->submit(ops, bytes, 2, 0, &ticket) == NX_ERR_TIMEOUT &&
+           ticket.sequence == 0 && !fake_de);
     assert(ops->submit(ops,bytes,2,5,&ticket)==NX_OK&&fake_de);
     assert(life->deinit(life)==NX_ERR_BUSY);
     irq(USART_STAT0_TBE|USART_STAT0_TC); /* sampled TC predates DATA write */
@@ -68,7 +73,7 @@ int main(void){
     assert(ops->submit(ops,bytes,2,5,&ticket)==NX_OK&&ticket.sequence>previous.sequence);
     assert(ops->cancel(ops,ticket)==NX_OK);
     uart.sequence=UINT64_MAX;
-    assert(ops->submit(ops,bytes,2,5,&ticket)==NX_ERR_NO_RESOURCE);
+    assert(ops->submit(ops, bytes, 2, 5, &ticket) == NX_ERR_NO_RESOURCE);
     fake_isr=1;assert(life->deinit(life)==NX_ERR_INVALID_STATE);fake_isr=0;
     release_error = NX_ERR_IO;
     assert(life->deinit(life) == NX_ERR_IO);

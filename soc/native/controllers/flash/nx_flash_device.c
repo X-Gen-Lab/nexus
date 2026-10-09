@@ -44,22 +44,27 @@ typedef struct {
 } native_flash_storage_t;
 
 static nx_status_t nx_flash_construct(const nx_device_t* dev, void** out) {
-    if (!out) return NX_ERR_NULL_PTR;
+    if (!out)
+        return NX_ERR_NULL_PTR;
     *out = NULL;
-    if (!dev || !dev->state) return NX_ERR_INVALID_PARAM;
-    native_flash_storage_t* storage = NX_CONTAINER_OF(dev->state, native_flash_storage_t, core);
+    if (!dev || !dev->state)
+        return NX_ERR_INVALID_PARAM;
+    native_flash_storage_t* storage =
+        NX_CONTAINER_OF(dev->state, native_flash_storage_t, core);
     nx_flash_impl_t* impl = &storage->impl;
     memset(impl, 0, sizeof(*impl));
     impl->state = &storage->state;
     memset(impl->state, 0, sizeof(*impl->state));
     impl->state->index = storage->index;
     impl->state->locked = true;
-    int n = snprintf(impl->state->backing_file, sizeof(impl->state->backing_file),
-        "native_flash%u.bin", (unsigned)storage->index);
+    int n =
+        snprintf(impl->state->backing_file, sizeof(impl->state->backing_file),
+                 "native_flash%u.bin", (unsigned)storage->index);
     if (n < 0 || (size_t)n >= sizeof(impl->state->backing_file))
         return NX_ERR_INVALID_PARAM;
     for (uint32_t i = 0; i < NX_FLASH_NUM_SECTORS; ++i) {
-        memset(impl->state->sectors[i].data, NX_FLASH_ERASED_BYTE, NX_FLASH_SECTOR_SIZE);
+        memset(impl->state->sectors[i].data, NX_FLASH_ERASED_BYTE,
+               NX_FLASH_SECTOR_SIZE);
         impl->state->sectors[i].erased = true;
     }
     impl->device = (nx_device_t*)dev;
@@ -68,10 +73,10 @@ static nx_status_t nx_flash_construct(const nx_device_t* dev, void** out) {
     *out = &impl->base;
     return NX_OK;
 }
-#define NX_FLASH_DEVICE_REGISTER(index_)                                      \
-    static native_flash_storage_t flash_storage_##index_ = {.index = index_}; \
-    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index_, "FLASH" #index_, NULL,      \
-        &flash_storage_##index_.core, NX_DEVICE_CLASS_FLASH,                  \
-        NX_DEVICE_CAP_FLASH_GEOMETRY | NX_DEVICE_CAP_FLASH_PROGRAM |          \
+#define NX_FLASH_DEVICE_REGISTER(index_)                                       \
+    static native_flash_storage_t flash_storage_##index_ = {.index = index_};  \
+    NX_DEVICE_REGISTER_TYPED(DEVICE_TYPE, index_, "FLASH" #index_, NULL,                            \
+        &flash_storage_##index_.core, NX_DEVICE_CLASS_FLASH,                   \
+        NX_DEVICE_CAP_FLASH_GEOMETRY | NX_DEVICE_CAP_FLASH_PROGRAM |           \
             NX_DEVICE_CAP_FLASH_ERASE, nx_flash_construct, NULL);
 NX_TRAVERSE_EACH_INSTANCE(NX_FLASH_DEVICE_REGISTER, DEVICE_TYPE)

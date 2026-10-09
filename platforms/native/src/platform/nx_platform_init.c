@@ -150,11 +150,12 @@ nx_status_t nx_platform_deinit(void) {
 
     /* The caller serializes platform lifetime against applications. Cached
      * factory objects remain valid across re-init and are not allocated here. */
-    nx_status_t result=nx_native_resources_idle();
+    nx_status_t result = nx_native_resources_idle();
+    if (result != NX_OK)
+        return result;
+    result = nx_device_provider_stop_all();
     if (result!=NX_OK) return result;
-    result=nx_device_provider_stop_all();
-    if (result!=NX_OK) return result;
-    result=nx_device_provider_quiescence_check();
+    result = nx_device_provider_quiescence_check();
     if (result!=NX_OK) return result;
 
     /* Mark as not initialized */
