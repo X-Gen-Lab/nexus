@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "board_fixture_template",
+  "hardware_verified": false,
+  "board_id": "stm32f407zg-qiming-v31",
+  "soc": "stm32f407zg",
+  "board_manifest": "boards/stm32f407_qiming_v31/board.json",
+  "chip_part": "STM32F407ZGT6",
+  "flash_base": 134217728,
+  "flash_size": 1048576,
+  "debug": {
+    "transport": "swd",
+    "reference_probe": "external",
+    "allowed_interfaces": [
+      "stlink",
+      "cmsis-dap",
+      "external-reviewed"
+    ],
+    "openocd_target_hint": "target/stm32f4x.cfg",
+    "adapter_clock_khz": 1000
+  },
+  "console": {
+    "controller": "USART1",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "frame": "8N1",
+    "mcu_voltage_mv": 3300,
+    "host_rx_to": "PA9",
+    "host_tx_to": "PA10",
+    "common_ground": true
+  },
+  "led": {
+    "pin": "PE3",
+    "active_level": 0
+  },
+  "electrical_notes": "MCU pins are3.3V. MAX232/P14/RS232 connector requires an RS232 adapter; never attach TTL there. Record P14/jumper state.",
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "pending_qualification": [
+    {
+      "id": "irq_preemption",
+      "fixture": "logic analyzer/timing firmware; priority and load recorded",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "uart_wire_tc_cancel",
+      "fixture": "TX/RX logic analyzer; cancel-vs-TC assertions",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "spi_dma_cs",
+      "fixture": "reviewed slave/loopback and CS/SCK/DMA signal capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "flash_power_loss",
+      "fixture": "controlled supply interrupter, legal external layout and voltage capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "control_jitter",
+      "fixture": "external application worst-load workload and hardware timer capture",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

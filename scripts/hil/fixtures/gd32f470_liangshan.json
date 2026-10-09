@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "board_fixture_template",
+  "hardware_verified": false,
+  "board_id": "gd32f470zg-liangshan",
+  "soc": "gd32f470zg",
+  "board_manifest": "boards/gd32f470_liangshan/board.json",
+  "chip_part": "GD32F470ZGT6",
+  "flash_base": 134217728,
+  "flash_size": 1048576,
+  "debug": {
+    "transport": "swd",
+    "reference_probe": "external",
+    "allowed_interfaces": [
+      "stlink",
+      "cmsis-dap",
+      "external-reviewed"
+    ],
+    "openocd_target_hint": null,
+    "adapter_clock_khz": 1000
+  },
+  "console": {
+    "controller": "USART0",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "frame": "8N1",
+    "mcu_voltage_mv": 3300,
+    "host_rx_to": "PA9",
+    "host_tx_to": "PA10",
+    "common_ground": true
+  },
+  "led": {
+    "pin": "PD7",
+    "active_level": 1
+  },
+  "electrical_notes": "Record25MHz HXTAL and SWD/console connector routing. No USB48MHz or RS485 transceiver is assumed.",
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "pending_qualification": [
+    {
+      "id": "irq_preemption",
+      "fixture": "logic analyzer/timing firmware; priority and load recorded",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "uart_wire_tc_cancel",
+      "fixture": "TX/RX logic analyzer; cancel-vs-TC assertions",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "spi_dma_cs",
+      "fixture": "reviewed slave/loopback and CS/SCK/DMA signal capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "flash_power_loss",
+      "fixture": "controlled supply interrupter, legal external layout and voltage capture",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "control_jitter",
+      "fixture": "external application worst-load workload and hardware timer capture",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import math
 import os
 from pathlib import Path
 import socket
+import shutil
 import sys
 import time
 import uuid
@@ -74,16 +75,19 @@ class BoardLease:
 class EquipmentLease:
     """Lease logical board and physical probe so manifest aliases cannot race."""
 
-    def __init__(self, directory: Path, board: dict):
+    def __init__(self, directory: Path, board: dict, serial_lease_id: str | None = None):
         self.stack = ExitStack()
         self.board = BoardLease(directory, board["id"])
         probe_key = "probe-" + hashlib.sha256(identifier(board["probe_serial"]).encode()).hexdigest()
         self.probe = BoardLease(directory, probe_key)
+        self.serial = BoardLease(directory, serial_lease_id) if serial_lease_id else None
 
     def __enter__(self):
         try:
             self.stack.enter_context(self.board)
             self.stack.enter_context(self.probe)
+            if self.serial:
+                self.stack.enter_context(self.serial)
         except BaseException:
             self.stack.close()
             raise
@@ -92,6 +96,8 @@ class EquipmentLease:
     def quarantine(self, reason: str) -> None:
         # Preserve the physical probe first, even if a later audit write fails.
         self.probe.quarantine(reason)
+        if self.serial:
+            self.serial.quarantine(reason)
         self.board.quarantine(reason)
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -105,14 +111,17 @@ def utc_now() -> str:
 def validate_manifest(manifest: dict, *, model: bool = False) -> dict:
     fields(manifest, {"schema_version", "kind", "lab_id", "board", "firmware",
                       "config_sha256", "adapter_files", "commands", "operation_timeout_s",
-                      "total_timeout_s", "required_tests", "budgets"})
+                      "total_timeout_s", "required_tests", "budgets"}, {"serial_lease_id"})
     if manifest["schema_version"] != 1:
         raise EvidenceError("unsupported HIL manifest schema")
     expected_kind = "orchestrator_model" if model else "physical_hil"
     if manifest["kind"] != expected_kind:
         raise EvidenceError(f"manifest kind must be {expected_kind}")
     identifier(manifest["lab_id"], "lab id")
-    fields(manifest["board"], {"id", "profile", "revision", "probe_serial"})
+    if "serial_lease_id" in manifest:
+        identifier(manifest["serial_lease_id"], "serial lease id")
+    fields(manifest["board"], {"id", "profile", "revision", "probe_serial"},
+           {"chip_part", "chip_uid"})
     for key, value in manifest["board"].items():
         identifier(value, "board " + key)
     fields(manifest["firmware"], {"path", "sha256"})
@@ -128,7 +137,9 @@ def validate_manifest(manifest: dict, *, model: bool = False) -> dict:
     substitutions = {"firmware": str(regular_file(manifest["firmware"]["path"])),
                      **manifest["board"]}
     for argv in manifest["commands"].values():
-        command(argv, substitutions)
+        expanded = command(argv, substitutions)
+        if shutil.which(expanded[0]) is None:
+            raise EvidenceError("required adapter executable unavailable")
     timeout = manifest["operation_timeout_s"]
     total = manifest["total_timeout_s"]
     if type(timeout) not in (int, float) or not 0 < timeout <= 300:
@@ -152,7 +163,8 @@ def validate_manifest(manifest: dict, *, model: bool = False) -> dict:
 
 
 def same_board(observed: dict, expected: dict) -> None:
-    fields(observed, {"id", "profile", "revision", "probe_serial"})
+    fields(observed, {"id", "profile", "revision", "probe_serial"},
+           {"chip_part", "chip_uid"})
     if observed != expected:
         raise EvidenceError("observed hardware identity differs from board manifest")
 
@@ -196,18 +208,24 @@ def validate_serial(result: dict, manifest: dict) -> None:
 
 
 def execute(manifest_path: Path, report_path: Path, lease_directory: Path,
-            *, model: bool = False) -> dict:
-    report_safe = report_path.absolute() != manifest_path.absolute()
-    report = {"schema_version": 1, "kind": "orchestrator_model" if model else "physical_hil",
-              "eligible_physical_hil": not model, "status": "fail", "started_utc": utc_now(),
+            *, model: bool = False, execute_hardware: bool = False,
+            adapter_runner=None) -> dict:
+    report_safe = report_path.resolve() != manifest_path.resolve()
+    report = {"schema_version": 1, "kind": "orchestrator_model" if model else
+              "physical_hil" if execute_hardware else "physical_hil_preflight",
+              "hardware_verified": False, "eligible_physical_hil": False,
+              "status": "fail", "started_utc": utc_now(),
               "operations": []}
     try:
+        if adapter_runner is not None and not model:
+            raise EvidenceError("injected adapter runners require model mode")
+        runner = adapter_runner or run_adapter
         manifest = load_json(manifest_path)
         substitutions = validate_manifest(manifest, model=model)
         protected = [manifest_path, Path(manifest["firmware"]["path"]),
                      *(Path(identity["path"]) for identity in manifest["adapter_files"])]
-        if any(report_path.absolute() == path.absolute() or
-               report_path.with_suffix(".transcript.json").absolute() == path.absolute() for path in protected):
+        if any(report_path.resolve() == path.resolve() or
+               report_path.with_suffix(".transcript.json").resolve() == path.resolve() for path in protected):
             report_safe = False
             raise EvidenceError("report/transcript must not overwrite input, firmware or adapter files")
         report.update({"manifest_sha256": digest(manifest_path), "lab_id": manifest["lab_id"],
@@ -215,6 +233,13 @@ def execute(manifest_path: Path, report_path: Path, lease_directory: Path,
                        "config_sha256": manifest["config_sha256"],
                        "adapter_files": manifest["adapter_files"],
                        "required_tests": manifest["required_tests"], "budgets": manifest["budgets"]})
+        if not model and not execute_hardware:
+            report.update({"status": "ready", "dry_run": True,
+                           "planned_operations": list(manifest["commands"]),
+                           "finished_utc": utc_now()})
+            if report_safe:
+                atomic_json(report_path, report)
+            return report
         deadline = time.monotonic() + manifest["total_timeout_s"]
 
         def operation(name: str, *, cleanup: bool = False) -> bytes:
@@ -222,11 +247,11 @@ def execute(manifest_path: Path, report_path: Path, lease_directory: Path,
             if remaining <= 0 and not cleanup:
                 raise EvidenceError("HIL total execution deadline expired")
             timeout = min(manifest["operation_timeout_s"], 5 if cleanup else remaining)
-            output = run_adapter(command(manifest["commands"][name], substitutions), timeout)
+            output = runner(command(manifest["commands"][name], substitutions), timeout)
             report["operations"].append({"name": name, "status": "pass"})
             return output
 
-        with EquipmentLease(lease_directory, manifest["board"]) as lease:
+        with EquipmentLease(lease_directory, manifest["board"], manifest.get("serial_lease_id")) as lease:
             try:
                 identified = parse_json(operation("identify"))
                 fields(identified, {"schema_version", "board"})
@@ -259,6 +284,8 @@ def execute(manifest_path: Path, report_path: Path, lease_directory: Path,
                     report["lease_status"] = "quarantined"
                     raise
         report["status"] = "pass"
+        report["hardware_verified"] = not model
+        report["eligible_physical_hil"] = not model
     except (EvidenceError, OSError, TypeError, KeyError) as error:
         report["failure"] = str(error)
     report["finished_utc"] = utc_now()
@@ -273,10 +300,14 @@ def main() -> int:
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--leases", type=Path, required=True)
     parser.add_argument("--model", action="store_true", help="label fake-adapter tests; ineligible for physical HIL")
+    parser.add_argument("--execute", action="store_true", help="explicitly execute the reviewed physical manifest; otherwise validate only")
     args = parser.parse_args()
-    report = execute(args.manifest, args.report, args.leases, model=args.model)
+    if args.model and args.execute:
+        parser.error("--model cannot be combined with physical --execute")
+    report = execute(args.manifest, args.report, args.leases, model=args.model,
+                     execute_hardware=args.execute)
     print(f"{report['kind']}: {report['status']}; report={args.report}")
-    return 0 if report["status"] == "pass" else 1
+    return 0 if report["status"] in ("pass", "ready") else 1
 
 
 if __name__ == "__main__":
