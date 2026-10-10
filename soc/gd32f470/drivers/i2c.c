@@ -10,6 +10,17 @@
 #include "gd32f4xx.h"
 #include "private/system.h"
 
+#ifndef NX_GD32_I2C_POLL
+#define NX_GD32_I2C_POLL(port) ((void)(port))
+#endif
+#ifndef NX_GD32_I2C_READ_DATA
+#define NX_GD32_I2C_READ_DATA(port)                                            \
+    ((uint8_t)I2C_DATA((port)->controller->registers))
+#endif
+#ifndef NX_GD32_I2C_ADDRESS_CLEARED
+#define NX_GD32_I2C_ADDRESS_CLEARED(port) ((void)(port))
+#endif
+
 const nx_gd32_i2c_controller_t nx_gd32_i2c0_controller = {I2C0, 50000000U,
                                                           RCU_I2C0};
 const nx_gd32_i2c_controller_t nx_gd32_i2c1_controller = {I2C1, 50000000U,
@@ -19,6 +30,7 @@ const nx_gd32_i2c_controller_t nx_gd32_i2c1_controller = {I2C1, 50000000U,
 static nx_result_t wait_status(nx_gd32_i2c_state_t* port, uint32_t mask,
                                nx_time_us_t deadline) {
     for (uint32_t polls = 0u; polls < 1000000u; ++polls) {
+        NX_GD32_I2C_POLL(port);
         uint32_t flags = I2C_STAT0(port->controller->registers);
         if ((flags & I2C_STAT0_LOSTARB) != 0u) {
             return NX_ERROR_ARBITRATION;
@@ -111,38 +123,85 @@ nx_result_t nx_gd32_i2c_initialize(nx_gd32_i2c_state_t* port,
 static void clear_address(nx_gd32_i2c_state_t* port) {
     (void)I2C_STAT0(port->controller->registers);
     (void)I2C_STAT1(port->controller->registers);
+    NX_GD32_I2C_ADDRESS_CLEARED(port);
 }
 
-/** \brief           Receive final 1/2-byte message with prearranged final NACK.
- */
+/** \brief Request STOP or repeated START before consuming the final pair. */
+static void end_receive(nx_gd32_i2c_state_t* port, bool last) {
+    I2C_CTL0(port->controller->registers) |=
+        last ? I2C_CTL0_STOP : I2C_CTL0_START;
+}
+
+/** \brief Consume a bounded receive with exact 1/2/final-three-byte timing. */
 static nx_result_t receive(nx_gd32_i2c_state_t* port, nx_i2c_message_t* message,
-                           nx_time_us_t deadline, size_t* transferred) {
-    uint32_t saved = nx_gd32_critical_enter();
-    I2C_CTL0(port->controller->registers) &= ~I2C_CTL0_ACKEN;
-    if (message->length == 2u) {
-        I2C_CTL0(port->controller->registers) |= I2C_CTL0_POAP;
-    } else {
-        I2C_CTL0(port->controller->registers) &= ~I2C_CTL0_POAP;
+                           bool last, nx_time_us_t deadline,
+                           size_t* transferred) {
+    const uint32_t registers = port->controller->registers;
+    size_t remaining = message->length;
+    size_t index = 0u;
+    nx_result_t status;
+    if (remaining == 1u) {
+        uint32_t saved = nx_gd32_critical_enter();
+        I2C_CTL0(registers) &= ~I2C_CTL0_ACKEN;
+        clear_address(port);
+        end_receive(port, last);
+        nx_gd32_critical_leave(saved);
+        status = wait_status(port, I2C_STAT0_RBNE, deadline);
+        if (status != NX_SUCCESS) {
+            return status;
+        }
+        message->data[0] = NX_GD32_I2C_READ_DATA(port);
+        ++*transferred;
+        return NX_SUCCESS;
+    }
+    if (remaining == 2u) {
+        I2C_CTL0(registers) |= I2C_CTL0_POAP;
+        uint32_t saved = nx_gd32_critical_enter();
+        clear_address(port);
+        I2C_CTL0(registers) &= ~I2C_CTL0_ACKEN;
+        nx_gd32_critical_leave(saved);
+        status = wait_status(port, I2C_STAT0_BTC, deadline);
+        if (status != NX_SUCCESS) {
+            return status;
+        }
+        saved = nx_gd32_critical_enter();
+        end_receive(port, last);
+        message->data[0] = NX_GD32_I2C_READ_DATA(port);
+        message->data[1] = NX_GD32_I2C_READ_DATA(port);
+        nx_gd32_critical_leave(saved);
+        *transferred += 2u;
+        return NX_SUCCESS;
     }
     clear_address(port);
-    if (message->length == 1u) {
-        I2C_CTL0(port->controller->registers) |= I2C_CTL0_STOP;
+    while (remaining > 3u) {
+        status = wait_status(port, I2C_STAT0_RBNE, deadline);
+        if (status != NX_SUCCESS) {
+            return status;
+        }
+        message->data[index++] = NX_GD32_I2C_READ_DATA(port);
+        --remaining;
+        ++*transferred;
     }
+    status = wait_status(port, I2C_STAT0_BTC, deadline);
+    if (status != NX_SUCCESS) {
+        return status;
+    }
+    /* ACK withdrawal and N-2 consumption must share one protected window. */
+    uint32_t saved = nx_gd32_critical_enter();
+    I2C_CTL0(registers) &= ~I2C_CTL0_ACKEN;
+    message->data[index++] = NX_GD32_I2C_READ_DATA(port);
     nx_gd32_critical_leave(saved);
-    nx_result_t status = wait_status(
-        port, message->length == 1u ? I2C_STAT0_RBNE : I2C_STAT0_BTC, deadline);
+    ++*transferred;
+    status = wait_status(port, I2C_STAT0_BTC, deadline);
     if (status != NX_SUCCESS) {
         return status;
     }
     saved = nx_gd32_critical_enter();
-    if (message->length == 2u) {
-        I2C_CTL0(port->controller->registers) |= I2C_CTL0_STOP;
-    }
-    for (size_t i = 0u; i < message->length; ++i) {
-        message->data[i] = (uint8_t)I2C_DATA(port->controller->registers);
-        ++*transferred;
-    }
+    end_receive(port, last);
+    message->data[index++] = NX_GD32_I2C_READ_DATA(port);
+    message->data[index] = NX_GD32_I2C_READ_DATA(port);
     nx_gd32_critical_leave(saved);
+    *transferred += 2u;
     return NX_SUCCESS;
 }
 
@@ -155,17 +214,19 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
                                              size_t* transferred) {
     const nx_gd32_i2c_endpoint_state_t* endpoint = context;
     if (!endpoint || !endpoint->port || endpoint->port->controller == NULL ||
-        !messages || !count || count > 4u || !transferred ||
-        endpoint->address < 8u || endpoint->address > 119u) {
+        !messages || !count || !transferred || endpoint->address < 8u ||
+        endpoint->address > 119u) {
         return NX_ERROR_INVALID;
     }
     *transferred = 0u;
+    if (count > NX_I2C_MAX_MESSAGES || deadline == NX_DEADLINE_NEVER) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     for (size_t i = 0u; i < count; ++i) {
-        if (!messages[i].data || !messages[i].length ||
-            messages[i].length > 256u) {
+        if (!messages[i].data || !messages[i].length) {
             return NX_ERROR_INVALID;
         }
-        if (messages[i].read && (i + 1u != count || messages[i].length > 2u)) {
+        if (messages[i].length > NX_I2C_MAX_MESSAGE_BYTES) {
             return NX_ERROR_UNSUPPORTED;
         }
     }
@@ -200,7 +261,8 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
             break;
         }
         if (messages[i].read) {
-            status = receive(port, &messages[i], deadline, transferred);
+            status = receive(port, &messages[i], i + 1u == count, deadline,
+                             transferred);
             continue;
         }
         clear_address(port);
@@ -223,12 +285,14 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
             I2C_CTL0(port->controller->registers) |= I2C_CTL0_STOP;
         }
     }
-    if (status != NX_ERROR_ARBITRATION &&
+    if (status != NX_SUCCESS && status != NX_ERROR_ARBITRATION &&
         (I2C_STAT1(port->controller->registers) & I2C_STAT1_MASTER) != 0u) {
         I2C_CTL0(port->controller->registers) |= I2C_CTL0_STOP;
     }
     for (uint32_t polls = 0u; polls < 1000000u; ++polls) {
-        if ((I2C_CTL0(port->controller->registers) & I2C_CTL0_STOP) == 0u) {
+        NX_GD32_I2C_POLL(port);
+        if ((I2C_CTL0(port->controller->registers) & I2C_CTL0_STOP) == 0u &&
+            (I2C_STAT1(port->controller->registers) & I2C_STAT1_MASTER) == 0u) {
             break;
         }
         if (nx_deadline_expired(deadline, nx_time_now_us()) ||
@@ -248,8 +312,8 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
         i2c_deinit(port->controller->registers);
         port->faulted = true;
     } else {
-        I2C_CTL0(port->controller->registers) &= ~I2C_CTL0_POAP;
-        I2C_CTL0(port->controller->registers) |= I2C_CTL0_ACKEN;
+        I2C_CTL0(port->controller->registers) &=
+            ~(I2C_CTL0_POAP | I2C_CTL0_ACKEN);
     }
     nx_gd32_peripheral_barrier();
     port->active = false;

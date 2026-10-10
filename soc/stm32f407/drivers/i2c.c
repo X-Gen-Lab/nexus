@@ -12,6 +12,13 @@
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
 #endif
 
+#ifndef NX_STM32_I2C_READ_DATA
+#define NX_STM32_I2C_READ_DATA(port) ((uint8_t)(port)->registers->DR)
+#endif
+#ifndef NX_STM32_I2C_ADDRESS_CLEARED
+#define NX_STM32_I2C_ADDRESS_CLEARED(port) ((void)(port))
+#endif
+
 /** \brief Apply only the reviewed 42 MHz / 100 kHz standard-mode profile. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     if (port == NULL || port->registers == NULL) {
@@ -65,6 +72,7 @@ static nx_result_t wait_flag(nx_stm32_i2c_state_t* port, uint32_t mask,
 static void clear_address(nx_stm32_i2c_state_t* port) {
     (void)port->registers->SR1;
     (void)port->registers->SR2;
+    NX_STM32_I2C_ADDRESS_CLEARED(port);
 }
 
 /** \brief Request STOP or the next repeated START at the final receive window.
@@ -91,7 +99,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         if (result != NX_SUCCESS) {
             return result;
         }
-        message->data[0] = (uint8_t)regs->DR;
+        message->data[0] = NX_STM32_I2C_READ_DATA(port);
         ++*transferred;
         return NX_SUCCESS;
     }
@@ -107,8 +115,8 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         }
         mask = nx_arch_irq_save();
         end_receive(port, last);
-        message->data[0] = (uint8_t)regs->DR;
-        message->data[1] = (uint8_t)regs->DR;
+        message->data[0] = NX_STM32_I2C_READ_DATA(port);
+        message->data[1] = NX_STM32_I2C_READ_DATA(port);
         nx_arch_irq_restore(mask);
         *transferred += 2U;
         return NX_SUCCESS;
@@ -119,7 +127,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         if (result != NX_SUCCESS) {
             return result;
         }
-        message->data[index++] = (uint8_t)regs->DR;
+        message->data[index++] = NX_STM32_I2C_READ_DATA(port);
         --remaining;
         ++*transferred;
     }
@@ -127,17 +135,21 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
     if (result != NX_SUCCESS) {
         return result;
     }
+    /* Keep final-three ACK withdrawal and N-2 consumption in one bounded
+     * protected window. Hardware waits remain outside the interrupt mask. */
+    nx_arch_irq_state_t mask = nx_arch_irq_save();
     regs->CR1 &= ~(uint32_t)I2C_CR1_ACK;
-    message->data[index++] = (uint8_t)regs->DR;
+    message->data[index++] = NX_STM32_I2C_READ_DATA(port);
+    nx_arch_irq_restore(mask);
     ++*transferred;
     result = wait_flag(port, I2C_SR1_BTF, deadline);
     if (result != NX_SUCCESS) {
         return result;
     }
-    nx_arch_irq_state_t mask = nx_arch_irq_save();
+    mask = nx_arch_irq_save();
     end_receive(port, last);
-    message->data[index++] = (uint8_t)regs->DR;
-    message->data[index] = (uint8_t)regs->DR;
+    message->data[index++] = NX_STM32_I2C_READ_DATA(port);
+    message->data[index] = NX_STM32_I2C_READ_DATA(port);
     nx_arch_irq_restore(mask);
     *transferred += 2U;
     return NX_SUCCESS;
@@ -175,14 +187,14 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         return NX_ERROR_INVALID;
     }
     *transferred = 0U;
-    if (count > 8U || deadline == NX_DEADLINE_NEVER) {
+    if (count > NX_I2C_MAX_MESSAGES || deadline == NX_DEADLINE_NEVER) {
         return NX_ERROR_UNSUPPORTED;
     }
     for (size_t i = 0U; i < count; ++i) {
         if (messages[i].data == NULL || messages[i].length == 0U) {
             return NX_ERROR_INVALID;
         }
-        if (messages[i].length > 256U) {
+        if (messages[i].length > NX_I2C_MAX_MESSAGE_BYTES) {
             return NX_ERROR_UNSUPPORTED;
         }
     }
@@ -241,7 +253,11 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         }
     }
     if (result != NX_ERROR_ARBITRATION) {
-        port->registers->CR1 |= I2C_CR1_STOP;
+        /* A successful final receive already requested STOP in its final
+         * byte window; do not issue a second STOP after master release. */
+        if (result != NX_SUCCESS || !messages[count - 1U].read) {
+            port->registers->CR1 |= I2C_CR1_STOP;
+        }
         if (!drain_stop(port) && result == NX_SUCCESS) {
             result = NX_ERROR_IO;
         }

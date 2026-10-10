@@ -25,7 +25,7 @@ not linked into these direct-register typed providers.
 | GPIO | One-port 16-bit authorization mask; atomic BSRR set/reset; serialized toggle; initial level precedes mode |
 | UART | USART1 PA9/PA10 AF7, 8N1 IRQ TX or finite DMA2 stream7 channel4 TX; true TC, cancellation drain and quarantine; byte/event RX or independent IRQ/IDLE blocks |
 | SPI | SPI1 PA5/PA6/PA7 AF5, 8-bit master, modes 0–3; short polling at most 256 bytes or finite full-duplex DMA2 RXstream0/TXstream3 channel3 at most 65535 bytes; complete CS interval |
-| I2C | I2C1 PB6/PB7 AF4, 42 MHz / 100 kHz, 7-bit address, at most 8 messages of 256 bytes, finite deadline; repeated START and one/two/final-three-byte ACK handling; explicit NACK/arbitration/STOP failure |
+| I2C | I2C1 PB6/PB7 AF4, 42 MHz / 100 kHz, 7-bit address, at most 8 read/write messages of 1–256 bytes, finite deadline; mixed reads/repeated START and protected one/two/final-three-byte ACK handling; explicit NACK/arbitration/STOP failure |
 | Flash | Exact VE 8-sector / ZG 12-sector geometry, x32 program at caller-declared 2.7–3.6 V; range/alignment checks, complete pulses, cache invalidation; erase is never preempted by a C deadline |
 | IWDG | 4–256 prescaler, 12-bit reload, nominal 32 kHz with 17–47 kHz declared LSI bounds; hardware-option activation and irreversible software enable reported; debug freeze explicit |
 | EXTI | Static lines, bounded shared-vector dispatch, per-line event storage and observable overflow; pending hardware bits can coalesce edges; no debounce policy |

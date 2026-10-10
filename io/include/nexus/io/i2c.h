@@ -15,6 +15,10 @@ extern "C" {
 #endif
 typedef struct nx_i2c_port nx_i2c_port_t;
 typedef struct nx_i2c_endpoint nx_i2c_endpoint_t;
+/** \brief Maintained polling admission bounds, checked before hardware access.
+ */
+#define NX_I2C_MAX_MESSAGES      8U
+#define NX_I2C_MAX_MESSAGE_BYTES 256U
 /**
  * \brief           One message; a new message starts with repeated START,
  *                  final with STOP.
@@ -74,14 +78,18 @@ struct nx_i2c_endpoint {
  *
  * \param[in,out]   messages: Message buffers; write data are not modified.
  *
- * \param[in]       count: Positive finite message count.
+ * \param[in]       count: One through NX_I2C_MAX_MESSAGES.
  *
- * \param[in]       deadline: Absolute provider-clock deadline including queue.
+ * \param[in]       deadline: Finite absolute provider-clock deadline.
  *
- * \param[out]      transferred: Successfully transferred byte count.
+ * \param[out]      transferred: Completed byte prefix across messages,
+ *                  including error returns.
  *
- * \return          Success, INVALID/BUSY/TIMEOUT/NACK/ARBITRATION/IO. Return
- *                  releases buffers after STOP/abort drain, not bus recovery.
+ * \return          Success or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY/TIMEOUT/
+ *                  NACK/ARBITRATION/IO. Each message has
+ *                  1..NX_I2C_MAX_MESSAGE_BYTES bytes; any message may read or
+ *                  write. Return releases buffers after STOP/abort drain.
+ *                  Controller settlement does not establish bus recovery.
  *
  * \note            Task-only, one executor. No hidden scan or GPIO recovery.
  *                  Failed bus recovery is never reported as transfer success.

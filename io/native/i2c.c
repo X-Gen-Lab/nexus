@@ -89,15 +89,17 @@ static nx_result_t native_i2c_transaction(void* context,
         return NX_ERROR_INVALID;
     }
     *transferred = 0;
-    size_t total = 0;
+    if (count > NX_I2C_MAX_MESSAGES || deadline == NX_DEADLINE_NEVER) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     for (size_t i = 0; i < count; i++) {
-        if (messages[i].data == NULL || messages[i].length == 0 ||
-            messages[i].length > SIZE_MAX - total) {
+        if (messages[i].data == NULL || messages[i].length == 0) {
             return NX_ERROR_INVALID;
         }
-        total += messages[i].length;
+        if (messages[i].length > NX_I2C_MAX_MESSAGE_BYTES) {
+            return NX_ERROR_UNSUPPORTED;
+        }
     }
-    *transferred = 0;
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
@@ -134,6 +136,10 @@ static nx_result_t native_i2c_transaction(void* context,
         }
     }
     port->active = false;
+    if (result == NX_SUCCESS &&
+        nx_deadline_expired(deadline, nx_time_now_us())) {
+        return NX_ERROR_TIMEOUT;
+    }
     return result;
 }
 
@@ -143,6 +149,12 @@ static nx_result_t native_i2c_recover(void* context) {
     nx_native_i2c_state_t* port = context;
     if (port == NULL) {
         return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!port->opened) {
+        return NX_ERROR_STATE;
     }
     if (port->active) {
         return NX_ERROR_BUSY;

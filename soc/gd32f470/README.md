@@ -19,7 +19,7 @@ Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立�
 | GPIO | 授权 mask，单次 BOP set/reset；初值先写 latch，再改变 mode；toggle 要求单一串行 writer |
 | UART | USART0/1 IRQ、8N1；USART0 可选 DMA1 CH7 selector4 有限 TX；真正 TC；byte/event RX 或可选 IRQ block RX，独立容量，无复制池 |
 | SPI | SPI0/4 的 8-bit MSB first、最多 256-byte polling；SPI4 可选 DMA1 CH3 RX/CH4 TX selector2 有限全双工；端点独立 CS/mode/rate |
-| I2C | I2C0/1 100 kHz polling；最多 4 条消息，每条写最多 256 byte；最后消息可读 1/2 byte；repeated START、NACK、仲裁、STOP；每实例独立线路，无 DMA/十位地址/任意 scan |
+| I2C | I2C0/1 100 kHz polling；最多 8 条消息，每条 read/write 1–256 byte；任意消息可读，1/2/末三字节 ACK 时序；repeated START、NACK、仲裁、STOP；每实例独立线路，无 DMA/十位地址/任意 scan |
 | Flash | 全物理 1 MiB、256 个 4 KiB 独立 page、2-byte program；范围、erase alignment、1→0 与 pulse 验证；不预留产品分区 |
 | Watchdog | 真正 FWDGT enable/feed/reset cause；硬件 option 已启用可识别；enable 不可撤销，无产品健康策略 |
 | EXTI | 唯一 line、有界 queue、共享 vector 的静态 16-line 分派；同 vector priority 必须一致；overflow 可见，无 debounce/callback |

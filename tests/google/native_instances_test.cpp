@@ -11,9 +11,11 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/arch/arch.h"
 #include "provider.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <vector>
 
 namespace {
 
@@ -392,6 +394,97 @@ TEST_F(NativeInstances, WatchdogAssemblyRestartPreservesIrreversibleEffect) {
               NX_ERROR_STATE);
     EXPECT_TRUE(effect.enabled);
     EXPECT_EQ(nx_watchdog_port_feed(&api), NX_SUCCESS);
+}
+
+TEST_F(NativeInstances, I2CLongReadUsesTheSameBoundedMessageContract) {
+    nx_native_i2c_state_t state = {};
+    nx_native_i2c_endpoint_state_t device = {};
+    const nx_i2c_endpoint_t endpoint = {&nx_native_i2c_endpoint_ops, &device};
+    uint8_t memory[256] = {};
+    uint8_t output[257] = {};
+    for (size_t i = 0; i < sizeof(memory); ++i) {
+        memory[i] = static_cast<uint8_t>(i);
+    }
+    ASSERT_EQ(nx_native_i2c_port_configure_instance(&state), NX_SUCCESS);
+    ASSERT_EQ(nx_native_i2c_configure_instance(&device, &state, memory,
+                                               sizeof(memory), 0x50),
+              NX_SUCCESS);
+    size_t transferred = 0;
+    nx_i2c_message_t read = {output, 256, true};
+    ASSERT_EQ(
+        nx_i2c_endpoint_transaction(&endpoint, &read, 1, 1000, &transferred),
+        NX_SUCCESS);
+    EXPECT_EQ(transferred, 256U);
+    EXPECT_THAT(std::vector<uint8_t>(output, output + 256),
+                testing::ElementsAreArray(memory, 256));
+    device.cursor = 0;
+    read.length = 257;
+    EXPECT_EQ(
+        nx_i2c_endpoint_transaction(&endpoint, &read, 1, 1000, &transferred),
+        NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(transferred, 0U);
+    EXPECT_EQ(device.cursor, 0U);
+    read.length = 3;
+    EXPECT_EQ(nx_i2c_endpoint_transaction(&endpoint, &read, 1,
+                                          NX_DEADLINE_NEVER, &transferred),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(device.cursor, 0U);
+    nx_i2c_message_t messages[9] = {};
+    for (auto& message : messages) {
+        message = {output, 1, true};
+    }
+    EXPECT_EQ(
+        nx_i2c_endpoint_transaction(&endpoint, messages, 9, 1000, &transferred),
+        NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(device.cursor, 0U);
+}
+
+TEST_F(NativeInstances, I2CDeadlineAndRecoveryPreserveExecutionContracts) {
+    nx_native_i2c_state_t state = {};
+    nx_native_i2c_endpoint_state_t device = {};
+    const nx_i2c_endpoint_t endpoint = {&nx_native_i2c_endpoint_ops, &device};
+    const nx_i2c_port_t port = {&nx_native_i2c_ops, &state};
+    uint8_t memory[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    uint8_t output[8] = {};
+    ASSERT_EQ(nx_native_i2c_port_configure_instance(&state), NX_SUCCESS);
+    ASSERT_EQ(nx_native_i2c_configure_instance(&device, &state, memory,
+                                               sizeof(memory), 0x50),
+              NX_SUCCESS);
+    nx_i2c_message_t read = {output, sizeof(output), true};
+    size_t transferred = 0;
+    EXPECT_EQ(nx_i2c_endpoint_transaction(&endpoint, &read, 1, 3, &transferred),
+              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(transferred, 3U);
+    EXPECT_THAT(output, testing::ElementsAre(1, 2, 3, 0, 0, 0, 0, 0));
+    EXPECT_FALSE(state.active);
+    nx_native_i2c_fault_instance(&state, NX_ERROR_NACK, false);
+    const nx_arch_irq_state_t incoming = nx_arch_irq_save();
+    const nx_result_t recovery = nx_i2c_port_recover(&port);
+    nx_arch_irq_restore(incoming);
+    EXPECT_EQ(recovery, NX_ERROR_CONTEXT);
+    EXPECT_EQ(state.fault, NX_ERROR_NACK);
+    ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
+    ASSERT_EQ(nx_native_i2c_stop_instance(&state), NX_SUCCESS);
+    EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_STATE);
+}
+
+TEST_F(NativeInstances, I2CDeadlineIncludesTheLastByteInterval) {
+    nx_native_i2c_state_t state = {};
+    nx_native_i2c_endpoint_state_t device = {};
+    const nx_i2c_endpoint_t endpoint = {&nx_native_i2c_endpoint_ops, &device};
+    uint8_t memory[3] = {1, 2, 3};
+    uint8_t output[3] = {};
+    ASSERT_EQ(nx_native_i2c_port_configure_instance(&state), NX_SUCCESS);
+    ASSERT_EQ(nx_native_i2c_configure_instance(&device, &state, memory,
+                                               sizeof(memory), 0x50),
+              NX_SUCCESS);
+    nx_i2c_message_t read = {output, sizeof(output), true};
+    size_t transferred = 0;
+    EXPECT_EQ(nx_i2c_endpoint_transaction(&endpoint, &read, 1, 3, &transferred),
+              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(transferred, 3U);
+    EXPECT_THAT(output, testing::ElementsAre(1, 2, 3));
+    EXPECT_FALSE(state.active);
 }
 
 } /* namespace */

@@ -334,10 +334,15 @@ static void i2c_cases(void) {
                                       g_gd32_model_now + 100u,
                                       &count) == NX_SUCCESS);
     CHECK(count == 4u && rx[2] == 0xEEu && !port.active);
-    messages[1].length = 3u;
+    messages[1].length = 257u;
     CHECK(nx_i2c_endpoint_transaction(&endpoint_api, messages, 2u,
                                       g_gd32_model_now + 100u,
                                       &count) == NX_ERROR_UNSUPPORTED);
+    messages[1].length = 3u;
+    CHECK(nx_i2c_endpoint_transaction(&endpoint_api, messages, 2u,
+                                      g_gd32_model_now + 100u,
+                                      &count) == NX_SUCCESS);
+    CHECK(count == 5u && !port.active);
     messages[1].length = 2u;
     I2C_STAT0(I2C0) = I2C_STAT0_AERR;
     CHECK(nx_i2c_endpoint_transaction(&endpoint_api, messages, 2u,
