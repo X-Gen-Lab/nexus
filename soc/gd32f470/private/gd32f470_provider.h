@@ -250,10 +250,16 @@ nx_result_t nx_gd32_pwm_release(nx_gd32_pwm_state_t* port);
  *
  * \param[in]       deadline: Absolute startup calibration deadline.
  *
- * \return          Success or INVALID/BUSY/TIMEOUT/CONTEXT.
+ * \return          Success or INVALID/BUSY/TIMEOUT/IO/CONTEXT.
  *
  * \note            Channels and storage remain alive while used. Pin mode and
  *                  external wiring require reviewed routes; no DMA/trigger.
+ *                  Startup exclusively owns the shared ADC0/1/2 reset domain;
+ *                  all three clocks and external clock-gated owners must be
+ *                  idle. An enabled ADC clock returns BUSY before mutation.
+ *                  Failed cold startup leaves storage unpublished, powers ADC0
+ *                  off and restores selected pin mode/pull, newly enabled GPIO
+ *                  clocks and the incoming shared ADC configuration.
  */
 nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
                                    const uint8_t* channels, size_t count,

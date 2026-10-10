@@ -12,6 +12,38 @@
 
 static nx_gd32_adc_state_t* s_adc;
 
+/** \brief Only the mode and pull fields touched by analog pin selection. */
+typedef struct {
+    uint32_t fields;
+    uint32_t mode;
+    uint32_t pull;
+} adc_pin_snapshot_t;
+
+/** \brief A failed cold constructor cannot delegate cleanup to its caller. */
+static void rollback(const adc_pin_snapshot_t pins[3], uint32_t added_clocks,
+                     uint32_t common) {
+    ADC_CTL1(ADC0) = 0u;
+    nx_gd32_peripheral_barrier();
+    (void)ADC_CTL1(ADC0);
+    ADC_SYNCCTL = common;
+    nx_gd32_peripheral_barrier();
+    (void)ADC_SYNCCTL;
+    rcu_periph_clock_disable(RCU_ADC0);
+    for (unsigned index = 0u; index < 3u; ++index) {
+        uint32_t fields = pins[index].fields;
+        if (fields != 0u) {
+            uint32_t gpio = GPIOA + index * 0x400u;
+            GPIO_PUD(gpio) = (GPIO_PUD(gpio) & ~fields) | pins[index].pull;
+            GPIO_CTL(gpio) = (GPIO_CTL(gpio) & ~fields) | pins[index].mode;
+            (void)GPIO_CTL(gpio);
+        }
+    }
+    nx_gd32_peripheral_barrier();
+    RCU_AHB1EN &= ~added_clocks;
+    (void)RCU_AHB1EN;
+    nx_gd32_peripheral_barrier();
+}
+
 /** \brief           Bound calibration waits without the SDK's infinite loop. */
 static nx_result_t wait_clear(uint32_t mask, nx_time_us_t deadline) {
     for (uint32_t polls = 0u; polls < 1000000u; ++polls) {
@@ -41,11 +73,40 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    if (s_adc) {
+    /* The SDK reset and prescaler affect all ADCs. Clock-gated external
+     * owners must also remain quiescent under the exclusive startup contract.
+     */
+    if (s_adc || (RCU_APB2EN & (RCU_APB2EN_ADC0EN | RCU_APB2EN_ADC1EN |
+                                RCU_APB2EN_ADC2EN)) != 0u) {
         return NX_ERROR_BUSY;
     }
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
+    }
+    adc_pin_snapshot_t pins[3] = {0};
+    uint32_t clock_mask = 0u;
+    for (size_t i = 0u; i < count; ++i) {
+        unsigned channel = channels[i];
+        unsigned index = channel < 8u ? 0u : channel < 10u ? 1u : 2u;
+        unsigned pin = channel < 8u    ? channel
+                       : channel < 10u ? channel - 8u
+                                       : channel - 10u;
+        pins[index].fields |= 3u << (pin * 2u);
+        clock_mask |= UINT32_C(1) << index;
+    }
+    uint32_t added_clocks = clock_mask & ~RCU_AHB1EN;
+    RCU_AHB1EN |= clock_mask;
+    (void)RCU_AHB1EN;
+    nx_gd32_peripheral_barrier();
+    /* GPIO register values cannot be captured while their clock is gated.
+     * Capture every selected field once, including duplicate scan channels.
+     */
+    for (unsigned index = 0u; index < 3u; ++index) {
+        if (pins[index].fields != 0u) {
+            uint32_t gpio = GPIOA + index * 0x400u;
+            pins[index].mode = GPIO_CTL(gpio) & pins[index].fields;
+            pins[index].pull = GPIO_PUD(gpio) & pins[index].fields;
+        }
     }
     for (size_t i = 0u; i < count; ++i) {
         unsigned channel = channels[i];
@@ -53,11 +114,13 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
         unsigned pin = channel < 8u    ? channel
                        : channel < 10u ? channel - 8u
                                        : channel - 10u;
-        RCU_AHB1EN |= UINT32_C(1) << index;
         gpio_mode_set(GPIOA + index * 0x400u, GPIO_MODE_ANALOG, GPIO_PUPD_NONE,
                       UINT32_C(1) << pin);
     }
     rcu_periph_clock_enable(RCU_ADC0);
+    (void)RCU_APB2EN;
+    nx_gd32_peripheral_barrier();
+    uint32_t common = ADC_SYNCCTL;
     adc_deinit();
     adc_clock_config(ADC_ADCCK_PCLK2_DIV8);
     ADC_CTL0(ADC0) = 0u;
@@ -66,13 +129,11 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
     uint32_t polls = 0u;
     while (!nx_deadline_expired(stable, nx_time_now_us())) {
         if (++polls == 1000000u) {
-            ADC_CTL1(ADC0) = 0u;
-            rcu_periph_clock_disable(RCU_ADC0);
+            rollback(pins, added_clocks, common);
             return NX_ERROR_IO;
         }
         if (nx_deadline_expired(deadline, nx_time_now_us())) {
-            ADC_CTL1(ADC0) = 0u;
-            rcu_periph_clock_disable(RCU_ADC0);
+            rollback(pins, added_clocks, common);
             return NX_ERROR_TIMEOUT;
         }
     }
@@ -83,8 +144,7 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
         status = wait_clear(ADC_CTL1_CLB, deadline);
     }
     if (status != NX_SUCCESS) {
-        ADC_CTL1(ADC0) = 0u;
-        rcu_periph_clock_disable(RCU_ADC0);
+        rollback(pins, added_clocks, common);
         return status;
     }
     *port = (nx_gd32_adc_state_t){.channels = channels,

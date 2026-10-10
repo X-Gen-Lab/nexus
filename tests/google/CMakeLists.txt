@@ -243,6 +243,19 @@ target_compile_options(nexus_gd32_adc_stream_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
     "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/gd32_adc_stream_model.h>")
 
+nexus_google_test(nexus_gd32_adc_initialize_test
+    SOURCES gd32_adc_initialize_test.cpp "${gd_multi_root}/drivers/adc.c"
+    LIBRARIES Nexus::IO
+    INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+target_include_directories(nexus_gd32_adc_initialize_test SYSTEM PRIVATE
+    "${gd_multi_vendor}/CMSIS/GD/GD32F4xx/Include"
+    "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Include")
+target_compile_definitions(nexus_gd32_adc_initialize_test PRIVATE GD32F470
+    HXTAL_VALUE=25000000)
+target_compile_options(nexus_gd32_adc_initialize_test PRIVATE
+    "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
+
 nexus_google_test(nexus_gd32_uart_stream_test SOURCES gd32_uart_stream_test.cpp
     "${gd_multi_root}/drivers/uart.c" "${gd_multi_root}/drivers/uart_stream.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"

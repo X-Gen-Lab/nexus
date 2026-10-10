@@ -54,6 +54,15 @@ TBE 置位后，才释放 CS 并发布 SETTLED。取消／超时不提前释放 
 均不分配 copy pool、DMA stream allocator 或后台任务。DMA1 时钟由装配统一
 持有，单设备 stop 只关闭自身通道与 IRQ，不关闭共享时钟。
 
+ADC 冷启动独占 ADC0/1/2 的共享 reset 与时钟分频域；任一 ADC clock 已启用
+会在引脚变更前返回 BUSY。外部 clock-gated owner 也必须由调用方保持静止，
+该检查不建立 ADC1/2 支持。初始化先启用并观察 GPIO clock，再保存实际选择
+引脚的 mode/pull。稳定等待、reset 校准或校准失败时，关闭 ADC0、恢复共享
+配置和所选引脚字段，仅释放本次新增的 GPIO clock，保留相邻引脚及其他
+时钟变化；失败不发布实例，也不要求调用方 stop。快照只占冷启动栈，不
+增加运行时实例存储或依赖 Nexus GPIO provider。block rearm 使用已有所有权，
+不再次执行冷启动或恢复仍持有的引脚。
+
 ADC block 模式使用正常 DMA 而非覆盖消费者的循环缓冲。固定 ADC 时钟为
 12.5 MHz，每个通道需要 15 个采样周期和 12 个转换周期；请求频率同时受
 完整 scan 时间和 100 MHz TIMER2 的精确 PSC/ARR 整数分频约束。块容量必须
