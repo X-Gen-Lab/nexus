@@ -47,6 +47,8 @@ endfunction()
 
 nexus_google_test(nexus_owner_mock_test SOURCES owner_mock_test.cpp
     LIBRARIES Nexus::BusOwner)
+nexus_google_test(nexus_realtime_metadata_test SOURCES realtime_metadata_test.cpp
+    LIBRARIES Nexus::BusOwner Nexus::IO Nexus::Arch)
 nexus_google_test(nexus_polymorphic_io_test SOURCES polymorphic_mock_test.cpp
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_uart_owner_mock_test SOURCES uart_owner_test.cpp

@@ -3,7 +3,7 @@
  * \brief           Bounded admission and explicit owner progress
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-10-09
+ * \date            2026-10-10
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
@@ -25,6 +25,16 @@ static void pop_head(nx_bus_owner_t* owner) {
     }
 }
 
+/** \brief Recycle an unbound slot without ever reusing its final epoch. */
+static void recycle_slot(nx_bus_owner_t* owner, size_t index) {
+    nx_owner_slot_t* slot = &owner->slots[index];
+    slot->next = owner->capacity;
+    if (slot->identity.epoch != UINT64_MAX) {
+        slot->next = owner->free_head;
+        owner->free_head = index;
+    }
+}
+
 /** \brief Detach every adapter reference before final request publication. */
 static nx_wait_port_t settle_slot(nx_bus_owner_t* owner, size_t index,
                                   nx_result_t result, size_t transferred) {
@@ -36,7 +46,7 @@ static nx_wait_port_t settle_slot(nx_bus_owner_t* owner, size_t index,
     memset(&slot->completion, 0, sizeof(slot->completion));
     slot->cancel_requested = false;
     slot->cancel_sent = false;
-    slot->next = owner->capacity;
+    recycle_slot(owner, index);
     nx_request_settle(request, result, transferred);
     return completion;
 }
@@ -60,6 +70,10 @@ nx_result_t nx_bus_owner_init(nx_bus_owner_t* owner, nx_owner_slot_t* slots,
     owner->head = capacity;
     owner->tail = capacity;
     owner->active = capacity;
+    owner->free_head = 0;
+    for (size_t i = 0; i < capacity; ++i) {
+        slots[i].next = i + 1;
+    }
     owner->guard = guard;
     owner->executor = executor;
     owner->clock = clock;
@@ -87,17 +101,13 @@ nx_result_t nx_bus_owner_submit(nx_bus_owner_t* owner, nx_request_t* request,
         owner->guard.leave(owner->guard.context, state);
         return NX_ERROR_STATE;
     }
-    size_t index = 0;
-    while (index < owner->capacity &&
-           (owner->slots[index].identity.request != NULL ||
-            owner->slots[index].identity.epoch == UINT64_MAX)) {
-        ++index;
-    }
+    size_t index = owner->free_head;
     if (index == owner->capacity) {
         owner->guard.leave(owner->guard.context, state);
         return NX_ERROR_EXHAUSTED;
     }
     nx_owner_slot_t* slot = &owner->slots[index];
+    owner->free_head = slot->next;
     uint64_t epoch;
     nx_result_t result = nx_request_slot_bind(&slot->identity, request, &epoch);
     if (result == NX_SUCCESS) {
@@ -106,6 +116,7 @@ nx_result_t nx_bus_owner_submit(nx_bus_owner_t* owner, nx_request_t* request,
     if (result != NX_SUCCESS) {
         /* This is a rejection; binding never itself established a borrow. */
         slot->identity.request = NULL;
+        recycle_slot(owner, index);
         owner->guard.leave(owner->guard.context, state);
         return result;
     }

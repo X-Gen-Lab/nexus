@@ -63,7 +63,10 @@ typedef struct {
     uint64_t epoch;
 } nx_owner_ticket_t;
 
-/** \brief Exact caller-owned queue slot; initialize only with owner init. */
+/**
+ * \brief           Exact caller-owned slot, linked in either the free or FIFO
+ *                  chain; initialize only with owner init.
+ */
 typedef struct {
     nx_request_slot_t identity;
     void* operation;
@@ -80,6 +83,7 @@ typedef struct {
     size_t head;
     size_t tail;
     size_t active;
+    size_t free_head;
     nx_owner_guard_port_t guard;
     nx_owner_executor_port_t executor;
     nx_clock_t clock;
@@ -113,8 +117,10 @@ nx_result_t nx_bus_owner_init(nx_bus_owner_t* owner, nx_owner_slot_t* slots,
  * \param[in]       completion: Optional static caller wake port, or NULL
  * \param[out]      ticket: Stable cancellation identity, valid on SUCCESS
  * \return          SUCCESS means ACCEPTED; rejection retains zero references
- * \note            Task multi-producer context. Fixed slot scan is bounded by
- *                  capacity. Deadline includes queue residence. Caller must not
+ * \note            Task multi-producer context. Free-slot admission and FIFO
+ *                  insertion use constant metadata work under the guard. An
+ *                  exhausted epoch permanently retires its slot. Deadline
+ *                  includes queue residence. Caller must not
  *                  modify request, operation or buffers after admission. A
  *                  notification error after admission cannot change SUCCESS to
  *                  rejection; executor must recheck/pump periodically.

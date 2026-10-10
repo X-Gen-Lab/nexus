@@ -21,6 +21,14 @@ no hardware initialization, allocation, name search or locking. Faces remain
 valid while provider storage exists, so stopping requires caller and IRQ
 quiescence rather than promising that a pointer has been revoked.
 
+Stream reserve, publish, acquire, release, abort and stop access constant
+metadata independent of block count. Stop checks an outstanding-block count;
+filling, ready and borrowed blocks remain counted until proved abort or matching
+release. It never scans the block array or revokes a loan under the interrupt
+mask. Storage overlap validation remains a cold assembly operation whose work
+grows with block count. This complexity contract is not physical IRQ latency or
+cycle qualification.
+
 Default paths need no OS locks or hidden tasks. Requests and exact-capacity
 buffers are caller or assembly owned. UART tracks physical TC separately from
 loaded bytes and request release; error-only RX events never invent data. SPI

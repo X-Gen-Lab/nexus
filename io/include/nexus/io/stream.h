@@ -44,12 +44,18 @@ typedef struct {
     nx_stream_slot_state_t state;
 } nx_stream_slot_t;
 
-/** \brief Caller-owned stream control, initialized before publication. */
+/**
+ * \brief           Caller-owned stream control, initialized before publication.
+ *
+ * \note            outstanding counts nonfree blocks, including filling,
+ *                  ready and borrowed states. Only stream operations mutate it.
+ */
 typedef struct {
     nx_stream_slot_t* slots;
     size_t count;
     size_t producer;
     size_t consumer;
+    size_t outstanding;
     uint64_t epoch;
     uint32_t losses;
     bool stopping;
@@ -214,8 +220,8 @@ nx_result_t nx_stream_abort(nx_stream_t* stream, const nx_stream_fill_t* fill,
  * \return          Success only when all blocks are free, BUSY until producers
  *                  detach and consumers drain/release, INVALID for bad control.
  *
- * \note            This metadata operation does not stop hardware or revoke
- *                  loans.
+ * \note            Task/IRQ constant metadata work independent of block count.
+ *                  This operation does not stop hardware or revoke loans.
  */
 nx_result_t nx_stream_stop(nx_stream_t* stream);
 

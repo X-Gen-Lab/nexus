@@ -112,6 +112,7 @@ nx_result_t nx_stream_reserve(nx_stream_t* stream, nx_stream_fill_t* fill) {
     } else {
         slot->epoch = ++stream->epoch;
         slot->state = NX_STREAM_SLOT_FILLING;
+        ++stream->outstanding;
         *fill = (nx_stream_fill_t){.data = slot->data,
                                    .capacity = slot->capacity,
                                    .slot = stream->producer,
@@ -212,6 +213,7 @@ nx_result_t nx_stream_release(nx_stream_t* stream,
         return NX_ERROR_STATE;
     }
     slot->state = NX_STREAM_SLOT_FREE;
+    --stream->outstanding;
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
@@ -229,6 +231,7 @@ nx_result_t nx_stream_abort(nx_stream_t* stream, const nx_stream_fill_t* fill,
                                            : NX_ERROR_BUSY;
     if (result == NX_SUCCESS) {
         slot->state = NX_STREAM_SLOT_FREE;
+        --stream->outstanding;
     }
     nx_arch_irq_restore(saved);
     return result;
@@ -242,13 +245,7 @@ nx_result_t nx_stream_stop(nx_stream_t* stream) {
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     stream->stopping = true;
-    nx_result_t result = NX_SUCCESS;
-    for (size_t i = 0U; i < stream->count; ++i) {
-        if (stream->slots[i].state != NX_STREAM_SLOT_FREE) {
-            result = NX_ERROR_BUSY;
-            break;
-        }
-    }
+    nx_result_t result = stream->outstanding == 0U ? NX_SUCCESS : NX_ERROR_BUSY;
     nx_arch_irq_restore(saved);
     return result;
 }
