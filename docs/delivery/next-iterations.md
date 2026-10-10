@@ -14,8 +14,11 @@ target tuple 上资格化。试验输出保持脱离产品负载，具体现场�
 ## 第二阶段：按测量增加能力
 
 UART/SPI 有限 DMA、IRQ RX blocks 和离散 ADC trigger blocks 已实现，先根据实板
-吞吐／IRQ latency／块间间隙测量收敛其预算。循环 DMA RX、无间隙 ADC、I2C 长读取、
-timer capture、CAN/network、低功耗再按实际产品需求逐项立项。每次扩展先明确
+吞吐／IRQ latency／块间间隙测量收敛其预算。I2C 的 read/write 均已扩展到每条
+1–256 bytes、最多 8 条消息，任意位置 read 可通过 repeated START 接后续消息；
+控制器、100 kHz、7-bit address 路线保持明确。循环 DMA RX、无间隙 ADC、I2C
+DMA／10-bit／超过 256-byte 事务、timer capture、CAN/network、低功耗再按实际
+产品需求逐项立项。每次扩展先明确
 owner、buffer、cancel/drain、ISR、
 deadline、对齐/cache 与停止合同，再做一个真实 provider 垂直切片。未选择模式不
 驻留资源，不用不断扩大的通用 object 或 feature flags 把成本摊到全部产品。
@@ -38,6 +41,13 @@ deadline、对齐/cache 与停止合同，再做一个真实 provider 垂直切�
 实际人员和 backup 通过 `.github/maintainer-roles.json` 与 PR 指派维护；角色模板
 不冒充已经完成实名安排或 GitHub branch protection。安全、制造和现场接口由对应
 角色承接，产品权限／流程留在外部应用仓库。
+
+使用 `python tools/maintenance/ownership.py` 得到可解析的真实 pending 报告；
+团队交接使用 `--require-assigned`，任何未指派角色、非法账号、重复账号或缺失
+backup 均拒绝。实名齐备后生成 `CODEOWNERS.proposed`，复核账号仓库权限与路径
+覆盖，再通过 PR 安装；branch rules 与 required checks 必须在 GitHub 单独确认。
+具体命令见[维护工具](../../tools/maintenance/README.md)。当前实名与强制评审仍待
+负责人提供并配置，工具不会用假账号填满席位。
 
 Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次
 commit 自动检查 staged 内容和 Conventional Commit，CI 用同一整文件规范。

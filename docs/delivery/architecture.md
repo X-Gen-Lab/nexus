@@ -19,6 +19,11 @@ SoC 每个 controller 是独立 translation unit。选入一个 UART 不会默�
 静态 archive 中未被引用的弱符号来拉入正确 reset/vector。强 provider IRQ 只随所选
 实现进入镜像，未使用实现由 section GC 清除。
 
+CMake 从同一 resolved 结果读取选中的 controller kind/mode，仅查询选择事实；
+源码集合仍由各家族 CMake 维护。未选择的驱动不参与编译，端点所需 base driver
+按组合补齐。STM 空配置不编译外设驱动；GD 保留 system/timebase 所需的基础
+SDK 源码。最终 section GC 继续消除未引用函数，编译裁剪与镜像裁剪分别验证。
+
 Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级控制器 route
 可以在明确标为软件测试夹具的外部 Board 包中编译／链接；这不意味着三块参考 PCB
 已核对相同 connector 和电气。默认 Board 仅绑定已有来源的路线。
@@ -48,6 +53,16 @@ SoC/Board 事实采用 JSON，使用者编写 schema-2 TOML。严格 resolver �
 typed IR；各生成器消费同一结果。`resolved.json` 是该结果的序列化，不能作为手工
 配置回填。迁移期 schema-1 JSON 夹具有显式入口，不与 TOML 混合叠加。
 
+IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record，
+ADC channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping，
+不能声称所有字段均有名义强类型。`tools/configure/providers/<family>/` 明确
+拥有 ABI、mode→implementation、DMA 路线、trigger、共享 IRQ 与 CS 合同，以及
+constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema、事实、
+资源、输入身份与输出，公共 binding 编排 Nexus face 与统一生命周期进度。
+新增 SoC 需显式登记真实 provider 模块并维护 CMake/SDK 必需文件；未知 family
+和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现，
+不复制驱动；文档矩阵不能反向决定配置。
+
 CMake 中 `Nexus::Platform` 导出配置、typed factory 和不可变接口；SDK headers 和
 provider storage 只对实现与生成 binding TU 可见。公共消费路径没有厂商 SDK ABI。
 外部 firmware 通过 `nexus_add_firmware()` 显式装入 startup/system/linker 和资源校验。
@@ -62,6 +77,12 @@ buffer 独立静态存储。方法接收自己的 context，不通过操作表�
 只返回已存在对象：不申请堆、不启硬件、不查字符串、不加锁。非法 ID 返回 NULL；
 取得对象与 `nx_platform_start()`、请求借用和停止分别执行。静态句柄不是可撤销
 session，停机前仍必须结清调用者、IRQ、owner 与通知发布者。
+
+factory ID 当前按类命名并以 `uint16_t` 表达；C typedef 不阻止把另一个类的数值
+传入。ID 只属于当前 assembly，不作为跨版本持久化编号。start/stop 由外部单一
+执行者串行调用，没有隐藏平台锁；公共 I/O 不统一检查全局 started 状态，启动
+失败后的业务退出与清理推进由调用合同约束。stop 可先撤回部分实例再返回 BUSY，
+不得把 BUSY 解释成恢复完整运行状态。
 
 SPI/I2C controller factory 返回真实控制器，device factory 返回 CS/address
 端点。一个 controller 仲裁所有子端点；恢复属于 controller，不借用第一个端点
@@ -109,6 +130,17 @@ STM32 取消保留到实际 TC drain；GD32 可用受控 USART reset 终止 wire
 未使用 provider 的 GC。O2/Os/O3 与 LTO 的选择依据相同 workload 的实测，不凭
 源码行数推断效率。原生测试耗时、汇编数量和真实 MCU cycles/latency 分开；当前
 无实板，不能承诺“最低 cycles”或已完成物理时序预算。
+
+固定容量也要测量最坏临界区。Owner admission 使用 free-head 链，提交与可复用
+slot 归还为 O(1)，epoch 耗尽的 slot 永久退休。stream 用 outstanding 记录
+FILLING/READY/BORROWED 总借用，stop 判断为 O(1)；失败或重复操作不改变计数。
+每个 Owner 和 stream 逻辑上增加一个 `size_t`，不增加 per-slot 存储。实际
+Cortex-M4 ARM 编译中 Owner 控制对象为 80→84 B，stream 为 32→40 B，后者包含
+64-bit epoch 对齐带来的 padding；slot 大小仍为 48/40 B。冷初始化仍需
+构建链、清零和校验 block 重叠，重叠校验为 O(n²)，发生在启动前无 IRQ guard。
+这些复杂度不证明实际 cycles 或 IRQ latency，须以同一 ELF 测量。
+默认 Owner FIFO 不提供优先级抢占或 deadline 排序；应用必须预算事务长度、
+service 间隔及 quarantine 对后续请求的影响。
 
 `tools/measurement/interfaces.py` 从实际 ELF 审计保留的 face 与操作表。非 LTO
 ARM face 为 8 bytes Flash／0 bytes RAM，表按 provider 共享；独立状态另外核算。

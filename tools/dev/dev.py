@@ -25,6 +25,15 @@ def execute(command, environment):
     return subprocess.call(command, cwd=ROOT, env=environment)
 
 
+def maintenance_checks(environment):
+    for script in ("capabilities.py", "ownership.py"):
+        result = execute([sys.executable, "tools/maintenance/" + script],
+                         environment)
+        if result:
+            return result
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("configure", "build", "test", "check", "doctor"))
@@ -63,12 +72,15 @@ def main(argv=None):
                     print(f"{name}: {result.stdout.strip()} ({compiler})")
                 else:
                     print(f"{name}: unavailable; its target cannot be configured")
-            return 0
+            return maintenance_checks(environment)
         if args.action == "check":
             if native:
                 raise ValueError("check accepts no native CMake arguments")
             result = execute([sys.executable, "scripts/ci/style_gate.py", "--all",
                               "--report", "build/quality/style-gate.json"], environment)
+            if result:
+                return result
+            result = maintenance_checks(environment)
             if result:
                 return result
             return execute([sys.executable, "scripts/ci/tdd_gate.py", "--all",

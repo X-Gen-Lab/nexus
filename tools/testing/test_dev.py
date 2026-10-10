@@ -11,12 +11,22 @@ from tools.dev import dev
 
 class DeveloperCommandTests(unittest.TestCase):
     def test_check_runs_tdd_for_requested_preset_and_propagates_failure(self):
-        with patch.object(dev, "execute", side_effect=[0, 7]) as execute:
+        with patch.object(dev, "execute", side_effect=[0, 0, 0, 7]) as execute:
             result = dev.main(["check", "--preset", "native-release"])
         self.assertEqual(result, 7)
-        self.assertEqual(execute.call_args_list[1].args[0],
+        self.assertEqual(execute.call_args_list[3].args[0],
                          [dev.sys.executable, "scripts/ci/tdd_gate.py", "--all",
                           "--preset", "native-release"])
+
+    def test_maintenance_failure_stops_before_contract_execution(self):
+        with patch.object(dev, "execute", side_effect=[0, 6]) as execute:
+            result = dev.main(["check"])
+        self.assertEqual(result, 6)
+        self.assertEqual(execute.call_count, 2)
+        self.assertEqual(execute.call_args_list[0].args[0][1],
+                         "scripts/ci/style_gate.py")
+        self.assertEqual(execute.call_args_list[1].args[0][1],
+                         "tools/maintenance/capabilities.py")
 
     def test_style_failure_stops_before_contract_execution(self):
         with patch.object(dev, "execute", return_value=8) as execute:

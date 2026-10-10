@@ -31,6 +31,10 @@ jobs:
         run: >-
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite configure
           --report build/quality/tools-configure.json
+      - name: Check derived capability text and report review assignment gaps
+        run: |
+          .venv/bin/python tools/maintenance/capabilities.py --check
+          .venv/bin/python tools/maintenance/ownership.py
       - name: Execute tamper, budget, HIL and relocated SDK boundaries
         run: |
           mkdir -p build/quality

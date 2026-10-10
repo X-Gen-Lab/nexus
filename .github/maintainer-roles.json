@@ -10,7 +10,13 @@
         "common-platform-requirements",
         "support-policy"
       ],
-      "backup_role": "core-interfaces"
+      "backup_role": "core-interfaces",
+      "review_paths": [
+        "/**",
+        "/docs/design/",
+        "/docs/delivery/"
+      ],
+      "members": []
     },
     {
       "id": "core-interfaces",
@@ -22,7 +28,14 @@
         "components/storage",
         "ownership-and-lifecycle-contracts"
       ],
-      "backup_role": "bsp-ports"
+      "backup_role": "bsp-ports",
+      "review_paths": [
+        "/core/",
+        "/io/",
+        "/os/",
+        "/components/storage/"
+      ],
+      "members": []
     },
     {
       "id": "bsp-ports",
@@ -33,7 +46,13 @@
         "boards",
         "tools/configure/routes-and-bindings"
       ],
-      "backup_role": "core-interfaces"
+      "backup_role": "core-interfaces",
+      "review_paths": [
+        "/arch/",
+        "/soc/",
+        "/boards/"
+      ],
+      "members": []
     },
     {
       "id": "industrial-apps",
@@ -43,7 +62,11 @@
         "device-adapter-contracts",
         "X-Gen-Lab/nexus-examples: reference applications and external composition"
       ],
-      "backup_role": "bsp-ports"
+      "backup_role": "bsp-ports",
+      "review_paths": [
+        "/components/"
+      ],
+      "members": []
     },
     {
       "id": "quality-hil",
@@ -54,7 +77,12 @@
         "fault-injection",
         "field-regressions"
       ],
-      "backup_role": "build-release"
+      "backup_role": "build-release",
+      "review_paths": [
+        "/tests/",
+        "/tools/hil/"
+      ],
+      "members": []
     },
     {
       "id": "build-release",
@@ -68,7 +96,21 @@
         ".github/workflows",
         "artifact-provenance"
       ],
-      "backup_role": "quality-hil"
+      "backup_role": "quality-hil",
+      "review_paths": [
+        "/cmake/",
+        "/CMakeLists.txt",
+        "/CMakePresets.json",
+        "/tools/configure/",
+        "/tools/dev/",
+        "/tools/evidence/",
+        "/tools/measurement/",
+        "/tools/maintenance/",
+        "/.github/",
+        "/scripts/",
+        "/dependencies/"
+      ],
+      "members": []
     }
   ],
   "interfaces": {

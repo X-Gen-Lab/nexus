@@ -6,6 +6,9 @@ ELF physical regions, selected configuration and budgets, and compares minimum
 images across compiler profiles. `hil/` validates station admission and raw
 physical evidence without operating unavailable equipment. `evidence/` binds
 clean source, exact files, executed logs, SDK, environment and candidate bytes.
+`maintenance/` verifies the derived capability matrix and reports real team
+assignment gaps. It prepares review ownership only after named accounts exist;
+it neither configures branch protection nor claims hardware qualification.
 
 ```sh
 python tools/dev/dev.py configure --preset native-debug
@@ -22,7 +25,7 @@ Formal reproduction uses that complete source SDK as its read-only source input:
 python cmake/package/package_source_sdk.py --source . --output /your/source-sdk
 python cmake/package/verify_consumers.py --prefix /your/source-sdk --output /your/sdk-checks
 python tools/evidence/reproduce.py --prepare-spec --spec /your/repro-spec.json \
-  --source . --assembly tools/configure/assemblies/liangshan-baremetal-empty.json \
+  --source . --assembly tools/configure/assemblies/liangshan-baremetal-empty.toml \
   --source-sdk /your/source-sdk/share/nexus/src/.nexus-source-sdk.json \
   --environment /your/observed-environment.json --toolchain /your/arm-toolchain
 python tools/evidence/reproduce.py --spec /your/repro-spec.json --report /your/repro-report.json

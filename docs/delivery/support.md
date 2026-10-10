@@ -1,5 +1,9 @@
 # 精确支持范围
 
+[派生能力矩阵](capabilities.md) 自动核对 SoC/route 的 mode、参考 Board binding
+与实际 resolver/emitter 选择的生产源码。叙述表说明运行合同，派生表说明精确
+身份与有限源码一致性；两者均不继承旧 HEAD 的资格或替代实板执行。
+
 ## 芯片、板卡与系统
 
 | 目标 | 软件实现 | 未完成的物理事实 |
@@ -21,7 +25,7 @@ scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生
 | UART | 8N1 IRQ TX 或有限 TX DMA；caller-owned request、真实 TC、byte/event RX；独立 IRQ RX blocks／IDLE 模式；STM baud 最低 1282、GD 最低 1526，最高 1 Mbaud |
 | SPI | 8-bit MSB-first；短轮询每笔最多 256 bytes；全双工有限 DMA 最多 65535 bytes；单 wire-active、完整 CS interval；明确的独立 CS endpoint |
 | I2C | 100 kHz；最多 4 条消息、每条写最多 256 bytes；末条 read 长度 1/2；repeated START/NACK/仲裁/STOP；恢复检查实际 bus/line 状态 |
-| Flash | STM 精确 16/64/128 KiB sector 几何与字节 program；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region |
+| Flash | STM 精确 16/64/128 KiB sector 几何与 x32 program（4-byte alignment/length，声明供电 2.7–3.6 V）；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region |
 | Watchdog | 独立 enable/feed/reset cause；启用不可逆，late failure 不擦除责任；GD IRC32K 物理 timeout bounds 未保证 |
 | EXTI | selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策 |
 | PWM | 固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner |

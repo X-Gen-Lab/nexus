@@ -9,6 +9,7 @@
 |---|---|
 | [当前架构](architecture.md) | 物理目录、依赖方向、执行与资源责任 |
 | [支持范围](support.md) | 首发模式、三块 Board 与精确未知项 |
+| [派生能力矩阵](capabilities.md) | facts/routes、参考 Board、软件夹具和生产定义的一致性 |
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
 | [迁移手册](migration.md) | 旧 API、配置、对象与外部应用迁移 |
 | [安全与生命周期审查](security-review.md) | 扫描范围、测试工装修复与借用／恢复限制 |

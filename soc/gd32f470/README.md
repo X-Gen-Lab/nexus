@@ -8,6 +8,10 @@ SoC 实现使用，不导出到 `Nexus::Platform` 的公共 include 路径。
 保持原样，构建实际验证 `vendors/gigadevice/gd32f4xx/source.lock.json`；厂商
 目标的 headers 与 CPU/FPU ABI 私有使用，不带旧 HAL、OSAL 或设备 registry。
 
+[派生能力矩阵](../../docs/delivery/capabilities.md) 直接核对 facts/routes、参考
+Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立新的配置权威，
+也不把芯片路线或软件夹具提升为 PCB 接线与物理资格。
+
 | Provider | 首发实现与边界 |
 |---|---|
 | Clock/startup | 25 MHz HXTAL、200 MHz SYSCLK、APB1 50 MHz/APB2 100 MHz；有界稳定等待与保留责任的回滚；无 USB 48 MHz/动态切换 |

@@ -5,8 +5,10 @@ assembled hardware access, explicit caller-owned resources and reusable componen
 Applications and product policy live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
 or private product repositories.
 
-The current implementation replaces the earlier HAL/OSAL factory, registry and
-Kconfig runtime with one static configuration and a direct typed I/O path.
+The current implementation retains a typed factory and C polymorphic interfaces.
+One authored TOML assembly creates fixed instances before execution; the factory
+returns their stable identity, while public I/O calls dispatch to the selected
+provider. Kconfig and runtime registries are no longer configuration authorities.
 
 | Layer | Responsibility |
 | --- | --- |
@@ -17,14 +19,17 @@ Kconfig runtime with one static configuration and a direct typed I/O path.
 | `io/` | GPIO, UART, SPI, I²C, physical Flash, watchdog, EXTI, PWM and ADC contracts |
 | `os/` | Optional per-object baremetal, Native and static FreeRTOS adapters |
 | `components/` | Bounded owner adapters, BMP280, log sinks, Modbus RTU and journals |
-| `tools/` | Atomic JSON configuration, CLI, resources, HIL preparation and evidence |
+| `tools/` | TOML resolution, atomic output, CLI, resources, HIL and evidence |
 | `tests/contracts/` | Executed behavior, fault, concurrency and tool boundary suites |
 
 No default heap, registry, driver worker or maximum instance pool is introduced.
 Products explicitly choose controller modes, queues, stack/TCB storage, component
-ports and shutdown behavior. Polling SPI/I²C/Flash/ADC remains synchronous;
-UART uses IRQ completion with a caller-owned request. Advanced DMA and product
-bootloader/update policy have separate future contracts.
+ports and shutdown behavior. Polling SPI/I²C/Flash/ADC remains synchronous.
+UART IRQ TX, finite UART/SPI DMA, UART IRQ/IDLE RX blocks and timer-triggered
+ADC DMA blocks are implemented as explicit modes. DMA and wire completion remain
+separate; cancellation preserves borrowed storage until proven settlement.
+Continuous DMA RX, gap-free ADC sampling and product boot/update policy remain
+outside the current support scope.
 
 ## First platforms
 
@@ -56,10 +61,17 @@ MCU builds. Install the SHA-256-locked ARM GNU distribution with
 `scripts/ci/install_arm_toolchain.py` and put its `bin` directory on `PATH`.
 `native-release` and `native-asan` provide additional host contexts.
 
-`NEXUS_ASSEMBLY_FILE` selects one JSON input. The generated bundle contains
-`resolved.json`, `nexus_config.h`, `nexus_bindings.h`, binding C, linker memory and
-resource budgets. Unknown options and resource conflicts fail configuration.
-External applications consume `Nexus::Platform` and `nexus_add_firmware()`.
+`NEXUS_ASSEMBLY_FILE` selects one schema-2 TOML input. SoC/Board facts remain
+maintained JSON. The generated bundle contains `resolved.json`, `nexus_config.h`,
+`nexus_bindings.h`, `nexus_factory.h`, binding C, linker memory and resource
+budgets. Unknown options and resource conflicts fail configuration. The resolved
+JSON is output, never an authored input. External applications consume
+`Nexus::Platform` and `nexus_add_firmware()`.
+
+The [derived capability matrix](docs/delivery/capabilities.md) separates SoC modes,
+reference Board declarations, resolver fixtures and selected implementation
+source. `doctor`, `check` and CI reject a stale generated matrix; source evidence
+does not establish real hardware timing or qualification.
 
 The unchanged root style and Doxygen conventions are enforced at commit time
 and in CI. Hooks validate staged content, preserve unstaged work and never stage
@@ -69,6 +81,7 @@ or auto-fix files. Commit messages use Conventional Commits.
 
 - [Architecture, engineering handbook and integration contracts](docs/design/README.md)
 - [Software delivery status and reproducible acceptance](docs/delivery/README.md)
+- [Team assignment and review preparation](tools/maintenance/README.md)
 - [Source SDK packaging](cmake/package/README.md)
 - [Contribution workflow](CONTRIBUTING.md)
 - [Historical evidence](docs/archive/README.md)
