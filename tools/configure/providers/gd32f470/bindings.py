@@ -1,8 +1,9 @@
 """Reviewed GD32 fixed construction with no dynamic controller discovery."""
 try:
-    from .emission import dma_regions
+    from ...emission import dma_regions
 except ImportError:
     from emission import dma_regions
+from ..common import controller_ir
 
 
 def _symbol(value):
@@ -76,13 +77,14 @@ def released(name, pins, stop, cs_pins=()):
     return lines + ["    return NX_SUCCESS;", "}"]
 
 
-def constructor(item, result, board_bindings, routes, devices):
+def _controller_constructor(item, result, board_bindings, routes, devices):
     """Emit only maintained controllers and explicit package-reviewed routes.
 
     The Liangshan SPI provider owns one built-in PF6 chip select. I2C children
     are fixed address facts sharing one controller. These silicon routes do not
     qualify any unmeasured PCB, external pull-up or peripheral device.
     """
+    item = controller_ir(item, 'gd32f470')
     name = _symbol(item["id"])
     kind = item["kind"]
     declarations = []
@@ -94,9 +96,9 @@ def constructor(item, result, board_bindings, routes, devices):
             raise ValueError("GD32 maintains USART0/USART1 IRQ UART")
         name = _symbol(item["id"])
         blocks = item["mode"] == "irq-blocks"
-        profile = 'NX_UART_RX_EVENTS' if item["rx_profile"] == "events" else 'NX_UART_RX_BYTES'
-        storage = 'nx_uart_rx_event_t' if item["rx_profile"] == "events" else 'uint8_t'
-        capacity = item.get("rx_capacity", 0)
+        profile = 'NX_UART_RX_EVENTS' if item.options.rx_profile == "events" else 'NX_UART_RX_BYTES'
+        storage = 'nx_uart_rx_event_t' if item.options.rx_profile == "events" else 'uint8_t'
+        capacity = (item.options.rx_capacity or 0)
         if not blocks:
             declarations.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
         descriptor = item["controller"].lower()
@@ -104,17 +106,17 @@ def constructor(item, result, board_bindings, routes, devices):
         prefix = []
         if blocks:
             call = (f"nx_gd32_uart_stream_initialize_at(&s_nx_port_{name}, &nx_gd32_{descriptor}_controller, "
-                    f"{item['baud']}u, {item['irq_priority']}u)")
+                    f"{item.options.baud}u, {item.options.irq.priority}u)")
         elif dma:
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
             prefix = [f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
                       f"    s_nx_port_{name}.region_count = {region_count}u;"]
             call = (f"nx_gd32_uart_dma_initialize(&s_nx_port_{name}, "
-                    f"{item['baud']}u, {profile}, s_nx_rx_{name}, {capacity}u, {item['irq_priority']}u)")
+                    f"{item.options.baud}u, {profile}, s_nx_rx_{name}, {capacity}u, {item.options.irq.priority}u)")
         else:
             call = (f"nx_gd32_uart_initialize_at(&s_nx_port_{name}, &nx_gd32_{descriptor}_controller, "
-                    f"{item['baud']}u, {profile}, s_nx_rx_{name}, {capacity}u, {item['irq_priority']}u)")
+                    f"{item.options.baud}u, {profile}, s_nx_rx_{name}, {capacity}u, {item.options.irq.priority}u)")
         prepare = prepared(name, [(pin, 2, 1, False, None) for pin in item["pins"]], call)
         position = prepare.index(f"    status = {call};")
         prepare[position:position] = prefix
@@ -160,7 +162,7 @@ def constructor(item, result, board_bindings, routes, devices):
             wire = cs_pin["pin"]
             cs_gpio = f"GPIO{wire[1]}"
             cs_mask = 1 << int(wire[2:])
-            maximum = child.get("max_hz", item.get("max_hz", 1000000))
+            maximum = child.get("max_hz", item.options.max_hz)
             mode = child.get("mode", 0)
             endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
             if index:
@@ -174,7 +176,7 @@ def constructor(item, result, board_bindings, routes, devices):
             if index == 0:
                 if dma:
                     first_call = (f"nx_gd32_spi_dma_initialize(&s_nx_port_{name}, &{endpoint}, "
-                                  f"{cs_gpio}, {cs_mask}u, {maximum}u, {mode}u, {item['irq_priority']}u)")
+                                  f"{cs_gpio}, {cs_mask}u, {maximum}u, {mode}u, {item.options.irq.priority}u)")
                 else:
                     first_call = (f"nx_gd32_spi_initialize_at(&s_nx_port_{name}, &{endpoint}, "
                                   f"&nx_gd32_{descriptor}_controller, {cs_gpio}, {cs_mask}u, {maximum}u, {mode}u)")
@@ -232,12 +234,12 @@ def constructor(item, result, board_bindings, routes, devices):
             raise ValueError("GD32 first-release route is EXTI3 PE3 only")
         _pins(item, [("PE3", "input", 0)])
         edge = {"rising": "NX_EXTI_RISING", "falling": "NX_EXTI_FALLING",
-                "both": "NX_EXTI_BOTH"}.get(item.get("edge"))
+                "both": "NX_EXTI_BOTH"}.get(item.options.edge)
         if edge is None:
             raise ValueError("EXTI requires explicit rising/falling/both edge")
-        capacity = _integer(item.get("event_capacity"), 1, 4096,
+        capacity = _integer(item.options.event_capacity, 1, 4096,
                             "EXTI requires bounded event_capacity")
-        priority = _integer(item.get("irq_priority"), 0, 15,
+        priority = _integer(item.options.irq.priority, 0, 15,
                             "EXTI requires explicit IRQ priority")
         declarations.append(f"static nx_exti_event_t s_nx_events_{name}[{capacity}];")
         initialize = (f"nx_gd32_exti_initialize(&s_nx_port_{name}, 3u, 4u, {edge}, "
@@ -247,11 +249,11 @@ def constructor(item, result, board_bindings, routes, devices):
         if item["controller"] != "TIMER2":
             raise ValueError("GD32 maintains TIMER2 channel 0 only")
         _pins(item, [("PA6", "ch0", 2)])
-        period = _integer(item.get("period_ticks"), 1, 65535,
+        period = _integer(item.options.period_ticks, 1, 65535,
                           "PWM requires a positive 16-bit period")
-        duty = _integer(item.get("duty_ticks"), 0, period,
+        duty = _integer(item.options.duty_ticks, 0, period,
                         "PWM duty must be within the fixed period")
-        tick = _integer(item.get("tick_hz"), 1, 100000000,
+        tick = _integer(item.options.tick_hz, 1, 100000000,
                         "PWM requires an explicit tick_hz")
         if 100000000 % tick != 0 or not 1 <= 100000000 // tick <= 65536:
             raise ValueError("PWM tick_hz must exactly divide the 100 MHz timer")
@@ -267,17 +269,17 @@ def constructor(item, result, board_bindings, routes, devices):
         stream = item["mode"] == "trigger-dma"
         if item["controller"] != "ADC0":
             raise ValueError("GD32 maintains ADC0 polling only")
-        channels = list(item.get("channels", ()))
+        channels = list(item.options.channels)
         if channels not in ([0], [0, 1]):
             raise ValueError("GD32 maintained ADC routes use PA0 or PA0/PA1")
         _pins(item, [(f"PA{channel}", f"channel{channel}", 0)
                      for channel in channels])
         expected_sample = 1 if stream else 7
-        if tuple(item.get("sample_times", ())) != (expected_sample,) * len(channels):
+        if tuple(item.options.sample_times) != (expected_sample,) * len(channels):
             raise ValueError("GD32 ADC sampling differs from the selected provider contract")
-        reference = _integer(item.get("reference_mv"), 1, 3600,
+        reference = _integer(item.options.reference_mv, 1, 3600,
                              "ADC requires explicit nominal reference_mv")
-        timeout = _integer(item.get("timeout_ms"), 1, 60000,
+        timeout = _integer(item.options.timeout_ms, 1, 60000,
                            "ADC requires bounded startup timeout_ms")
         values = ", ".join(f"{channel}u" for channel in channels)
         declarations.append(f"static const uint8_t s_nx_adc_channels_{name}[] = {{ {values} }};")
@@ -286,7 +288,7 @@ def constructor(item, result, board_bindings, routes, devices):
         if stream:
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
-            call = f"nx_gd32_adc_stream_initialize({arguments}, {item['irq_priority']}u)"
+            call = f"nx_gd32_adc_stream_initialize({arguments}, {item.options.irq.priority}u)"
             declarations += [f"static nx_result_t prepare_{name}(void) {{",
                              f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
                              f"    s_nx_port_{name}.region_count = {region_count}u;",
@@ -303,3 +305,21 @@ def constructor(item, result, board_bindings, routes, devices):
         raise ValueError(f"No maintained GD32 constructor for {kind}")
     return {"definitions": declarations, "initialize": initialize,
             "stop": stop, "extra_headers": extra_headers}
+
+
+def constructor(item, result, board_bindings, routes, devices):
+    """Emit one reviewed GD32 instance, including explicit GPIO construction."""
+    item = controller_ir(item, "gd32f470")
+    if item.kind != "gpio":
+        return _controller_constructor(item, result, board_bindings, routes,
+                                       devices)
+    name = _symbol(item.id)
+    index = ord(item["pins"][0]["pin"][1]) - ord("A")
+    mask = item.options.mask or sum(1 << int(pin["pin"][2:])
+                                   for pin in item["pins"])
+    initial = item.options.initial
+    output = "true" if item.mode == "output" else "false"
+    return {"definitions": [],
+            "initialize": (f"nx_gd32_gpio_initialize(&s_nx_port_{name}, "
+                           f"{index}u, {mask}u, {initial}u, {output})"),
+            "stop": [f"nx_gd32_gpio_stop(&s_nx_port_{name}, {initial}u)"]}

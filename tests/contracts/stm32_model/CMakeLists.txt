@@ -15,7 +15,7 @@ execute_process(COMMAND "${Python3_EXECUTABLE}"
     "${NEXUS_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/stm32_constructors.h"
     COMMAND_ERROR_IS_FATAL ANY)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/stm32_bindings.py"
+    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/bindings.py"
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py")
 add_executable(contract_stm32_constructor_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"

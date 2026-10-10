@@ -147,12 +147,32 @@ checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
 `ir.py` defines frozen `ControllerIR`, `EndpointIR`, `MemoryBudgetIR` and
-`ConfigurationIR`. Constructor emitters consume these decisions directly;
+`ConfigurationIR`. Controller options use explicit frozen GPIO, UART, SPI, I2C,
+EXTI, PWM and ADC records. IRQ priority and kernel-call intent are a nested record;
+ADC channel and sample sequences are tuples. Constructor emitters consume these
+named decisions directly; reviewed hardware facts retain an immutable Mapping
+projection. This does not make C factory ID aliases nominal strong types.
 `resolved.json` is their JSON projection, with the same configuration identity.
 There is no mutable configuration cache or generated software dependency graph.
 The schema-1 JSON reader remains for explicit legacy contract fixtures and
 migration measurements. Maintained assemblies and source-SDK examples use TOML;
 JSON is never consulted as a fallback for a failed TOML assembly.
+
+`providers/` has an explicit maintained map for Native, STM32F407 and GD32F470.
+Each family package owns its implemented mode map, CPU/enum ABI, numerical limits,
+fixed DMA/trigger routes, IRQ sharing and built-in CS rules. Its `bindings.py`
+owns constructors, rollback and fixed IRQ wiring; `emission.py` owns system and
+shared-clock lifecycle emission. The public resolver owns schema, reviewed facts,
+input snapshots and resource conflicts. The public binding emitter owns Nexus
+faces and common lifecycle progress. There is no package discovery or runtime
+provider registration, and unknown families or unimplemented modes fail closed.
+
+Adding a family requires a real capability and constructor contract in that map,
+explicit CMake reconfiguration dependencies, source-SDK required files and tests.
+CPU architecture, FPU, float ABI and enum ABI reach CMake from the validated
+resolution. Arch and build options accept only maintained combinations; a new
+non-Native family does not implicitly receive Cortex-M4 flags. These configuration
+modules do not select software source files: CMake targets retain that authority.
 
 Generated private storage has separate role namespaces: `s_nx_port_*`,
 `s_nx_endpoint_*`, `s_nx_cs_*`, receive/model buffers and platform lifecycle state.

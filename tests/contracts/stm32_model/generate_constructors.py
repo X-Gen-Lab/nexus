@@ -6,7 +6,7 @@ root = Path(sys.argv[1]).resolve()
 output = Path(sys.argv[2])
 sys.path.insert(0, str(root / "tools/configure"))
 from configure import resolve  # noqa: E402
-from stm32_bindings import constructor, shared_irq_definitions  # noqa: E402
+from providers.stm32f407.bindings import constructor, shared_irq_definitions  # noqa: E402
 
 lines = []
 for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml"):

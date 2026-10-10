@@ -15,22 +15,21 @@ import subprocess
 import sys
 import tempfile
 
+try:
+    from .providers import maintained
+    from .providers.common import (ConfigurationError, fail, integer, sequence,
+                                   validate_selection)
+except ImportError:
+    from providers import maintained
+    from providers.common import (ConfigurationError, fail, integer, sequence,
+                                  validate_selection)
+
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "timer", "pwm", "adc"}
-# Fixed providers cannot honor arbitrary well-formed SDK request mappings.
-# Tuple order preserves TX/RX roles for full-duplex providers.
-FIXED_DMA_ROUTES = {
-    ("stm32f407", "USART1", "dma-tx"): ("DMA2:stream7:channel4",),
-    ("stm32f407", "SPI1", "dma"): ("DMA2:stream3:channel3", "DMA2:stream0:channel3"),
-    ("stm32f407", "ADC1", "trigger-dma"): ("DMA2:stream4:channel0",),
-    ("gd32f470", "USART0", "dma-tx"): ("DMA1:stream7:channel4",),
-    ("gd32f470", "SPI4", "dma-full-duplex"): ("DMA1:stream4:channel2", "DMA1:stream3:channel2"),
-    ("gd32f470", "ADC0", "trigger-dma"): ("DMA1:stream0:channel0",),
-}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -73,89 +72,6 @@ def dependency_identity(root, relative, expected=None):
     return {"path": relative, "commit": commit}
 
 
-def validate_selection(selection, route, family, ram_size):
-    """One maintained mode has one bounded, explicit configuration contract."""
-    kind = route["kind"]
-    fields = {
-        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
-        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz"}, "flash": set(), "watchdog": set(),
-        "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
-        "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
-        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os"},
-    }
-    unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
-    if kind not in fields or unknown:
-        fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    if kind == "uart":
-        if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
-            fail("UART requires baud, RX profile and IRQ priority")
-        minimum_baud = {"stm32f407": 1282, "gd32f470": 1526}.get(family, 1200)
-        integer(selection["baud"], minimum_baud, 1000000, "UART baud")
-        if selection["rx_profile"] == "blocks":
-            if selection["mode"] != "irq-blocks":
-                fail("UART RX blocks requires the implemented irq-blocks provider")
-            if "rx_capacity" in selection:
-                fail("UART RX blocks has no generated ring capacity; storage is caller-owned")
-        elif selection["mode"] == "irq-blocks":
-            fail("UART irq-blocks requires RX blocks format")
-        elif selection["rx_profile"] in {"bytes", "events"}:
-            integer(selection.get("rx_capacity"), 1, min(4096, ram_size // 16), "UART RX capacity")
-        else:
-            fail("Unsupported UART receive profile")
-    elif kind == "exti":
-        if not {"edge", "event_capacity", "irq_priority"}.issubset(selection):
-            fail("EXTI requires edge, event capacity and IRQ priority")
-        if selection["edge"] not in {"rising", "falling", "both"}:
-            fail("Unsupported EXTI edge")
-        integer(selection["event_capacity"], 1, min(4096, ram_size // 24), "EXTI event capacity")
-    elif kind == "pwm":
-        if not {"period_ticks", "duty_ticks", "tick_hz"}.issubset(selection):
-            fail("PWM requires explicit period, duty and tick_hz")
-        integer(selection["period_ticks"], 1, 65535, "PWM period")
-        integer(selection["duty_ticks"], 0, selection["period_ticks"], "PWM duty")
-        tick = integer(selection["tick_hz"], 1, context="PWM tick_hz")
-        clock = 84000000 if family == "stm32f407" else 100000000
-        if clock % tick or not 1 <= clock // tick <= 65536:
-            fail("PWM tick_hz is not an exact maintained timer divider")
-    elif kind == "adc":
-        if not {"channels", "sample_times", "reference_mv"}.issubset(selection):
-            fail("ADC requires channels, sample_times and reference_mv")
-        channels = sequence(selection["channels"], "ADC channels")
-        expected = [int(pin["pin"][2:]) for pin in route["pins"]]
-        if channels != expected or not channels or len(channels) > 16:
-            fail("ADC channel sequence differs from reviewed analog pins")
-        for channel in channels:
-            integer(channel, 0, 15, "ADC channel")
-        samples = sequence(selection["sample_times"], "ADC sample_times")
-        if len(samples) != len(channels):
-            fail("ADC sample_times must match the channel sequence")
-        for sample in samples:
-            integer(sample, 0, 7, "ADC sample encoding")
-        if family == "gd32f470":
-            expected_sample = 1 if selection["mode"] == "trigger-dma" else 7
-            if samples != [expected_sample] * len(channels):
-                fail("GD32 trigger-dma sampling is fifteen cycles (encoding 1)" if expected_sample == 1
-                     else "GD32 polling sampling is 480 cycles (encoding 7)")
-        integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
-        if family == "gd32f470":
-            integer(selection.get("timeout_ms"), 1, 1000, "ADC calibration timeout_ms")
-        if selection["mode"] in {"single-shot", "scan"} and (selection["mode"] == "single-shot") != (len(channels) == 1):
-            fail("ADC mode contradicts its reviewed channel count")
-        if selection["mode"] == "trigger-dma" and "irq_priority" not in selection:
-            fail("ADC trigger-dma requires an explicit IRQ priority")
-        if selection["mode"] != "trigger-dma" and ({"irq_priority", "calls_os"} & selection.keys()):
-            fail("Polling ADC has no IRQ options")
-    elif kind == "i2c" and selection.get("max_hz", 100000) != 100000:
-        fail("Only reviewed 100 kHz I2C mode is maintained")
-    elif kind == "spi":
-        minimum, maximum = (328125, 42000000) if family == "stm32f407" else (390625, 50000000)
-        integer(selection.get("max_hz", 1000000), minimum, maximum, "SPI max_hz")
-
-
-class ConfigurationError(ValueError):
-    """A rejected input has no usable generated configuration."""
-
-
 def uses_dma(mode):
     return mode.startswith("dma") or mode == "trigger-dma"
 
@@ -179,10 +95,6 @@ def load(path, snapshots=None):
                       parse_constant=lambda value: fail(f"Invalid number {value}"))
 
 
-def fail(message):
-    raise ConfigurationError(message)
-
-
 def obj(value, required, optional=(), context="object"):
     if not isinstance(value, dict):
         fail(f"{context}: expected object")
@@ -190,18 +102,6 @@ def obj(value, required, optional=(), context="object"):
     unknown = value.keys() - set(required) - set(optional)
     if missing or unknown:
         fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
-    return value
-
-
-def integer(value, minimum=0, maximum=UINT32_MAX, context="integer"):
-    if type(value) is not int or not minimum <= value <= maximum:
-        fail(f"{context}: integer required in [{minimum}, {maximum}]")
-    return value
-
-
-def sequence(value, context):
-    if not isinstance(value, list):
-        fail(f"{context}: expected array")
     return value
 
 
@@ -286,9 +186,7 @@ def validate_soc(soc, part):
     if sum(region["linker"] for region in memory) != 1:
         fail("Exactly one maintained default RAM linker domain is required")
     cpu = obj(soc["cpu"], {"arch", "fpu", "float_abi"}, (), "CPU ABI")
-    expected = ({"arch": "native", "fpu": "none", "float_abi": "native"}
-                if soc["id"] == "native" else
-                {"arch": "cortex-m4", "fpu": "fpv4-sp-d16", "float_abi": "hard"})
+    expected = maintained(soc["id"]).CPU_ABI
     if cpu != expected:
         fail(f"Unsupported CPU/FPU ABI: {cpu}")
     if not isinstance(soc["controllers"], dict):
@@ -359,6 +257,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     integer(board["schema_version"], 1, 1, "Board schema")
     identity(board["id"], "Board id")
     family = identity(board["soc_family"], "SoC family")
+    provider = maintained(family)
     part = identity(board["soc"], "exact part")
     soc_dir = root / "soc" / family
     if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
@@ -437,7 +336,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     backend = assembly["backend"]
     if backend not in {"baremetal", "freertos", "native"}:
         fail(f"Unsupported OS backend: {backend}")
-    if (family == "native") != (backend == "native"):
+    if (provider.MODEL) != (backend == "native"):
         fail("Native is a host model; its backend cannot qualify MCU execution")
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
     if clock is None:
@@ -534,10 +433,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         authored_kind = selection.pop("authored_kind", route["kind"])
         if authored_kind != route["kind"]:
             fail("Authored kind differs from Board binding kind")
-        validate_selection(selection, route, family, ram["size"])
         mode = text(selection["mode"], "controller mode")
         if mode not in route["modes"]:
             fail(f"Unsupported mode {mode} for {selection['binding']}")
+        validate_selection(selection, route, provider, ram["size"])
         for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
                         "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
             integer(selection[numeric], 1, context=numeric)
@@ -561,16 +460,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if uses_dma(mode) and not route.get("dma"):
             fail("DMA mode has no reviewed DMA route")
         if uses_dma(mode):
-            expected = FIXED_DMA_ROUTES.get((family, route["controller"], mode))
-            actual = tuple(sequence(route["dma"], "DMA route"))
-            if expected is None or actual != expected:
-                fail(f"DMA route differs from fixed provider: {family}/{route['controller']}/{mode}")
-            if mode == "trigger-dma":
-                timer = "TIM3" if family == "stm32f407" else "TIMER2"
-                resources = tuple(normalize_resource(resource) for resource in
-                                  route.get("mode_resources", {}).get(mode, []))
-                if resources != ("controller:" + timer,):
-                    fail(f"Trigger resource differs from fixed provider: {family}/{route['controller']}")
+            provider.validate_dma(route, mode, normalize_resource)
         if route["kind"] != "gpio":
             claim("controller:" + route["controller"], name, mode, route["id"])
         for pin in route["pins"]:
@@ -580,8 +470,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 key = normalize_resource("irq:" + irq)
                 priority = selection.get("irq_priority")
                 previous = irq_owners.get(key)
-                shared = route["kind"] == "exti" and family == "stm32f407" and key in {
-                    "irq:EXTI9_5", "irq:EXTI15_10"}
+                shared = provider.shares_irq(route["kind"], key)
                 if previous and shared and previous[0] == "exti":
                     if previous[1] != priority:
                         fail(f"Shared EXTI vector {key} requires identical priorities")
@@ -597,11 +486,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if uses_dma(mode):
             for dma in route["dma"]:
                 claim("dma:" + dma, name, mode, route["id"])
-                match = re.fullmatch(r"DMA([12]):stream([0-7]):channel([0-7])", dma)
-                if match is None:
-                    fail(f"DMA route requires an explicit request selector: {dma}")
-                vector = "Channel" if family == "gd32f470" else "Stream"
-                claim(f"irq:DMA{match[1]}_{vector}{match[2]}", name, mode, route["id"])
+                claim(provider.dma_irq(dma), name, mode, route["id"])
         selected.append({**selection, "controller": route["controller"],
                          "kind": route["kind"], "route": route["id"],
                          "pins": route["pins"], "initial": binding.get("initial", 0),
@@ -623,9 +508,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         authored_kind = device.pop("authored_kind", controller["kind"])
         if authored_kind != controller["kind"]:
             fail("Authored device kind differs from controller binding kind")
-        model_fields = {"model_bytes"} if family == "native" else set()
+        model_fields = {"model_bytes"} if provider.MODEL else set()
         if "model_bytes" in device:
-            if family != "native":
+            if not provider.MODEL:
                 fail("model_bytes is only valid for an explicit Native device model")
             integer(device["model_bytes"], 1, 256, "Native device model_bytes")
         if controller["kind"] == "spi":
@@ -634,7 +519,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         else:
             obj(device, {"id", "controller", "driver", "address"}, model_fields,
                 "I2C device")
-            if family == "native" and "model_bytes" not in device:
+            if provider.MODEL and "model_bytes" not in device:
                 fail("Native I2C device requires explicit model_bytes")
         if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280"}:
             fail(f"Unknown maintained device driver: {device['driver']}")
@@ -653,10 +538,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if controller["kind"] == "spi":
             speed = device.get("max_hz", controller.get("max_hz", 1000000))
             limit = soc["controllers"][controller["controller"]].get("max_hz")
-            if family != "native" and (limit is None or speed < (limit + 127) // 128):
+            if not provider.MODEL and (limit is None or speed < (limit + 127) // 128):
                 fail("SPI endpoint speed cannot be realized by the reviewed clock divider")
-            builtin_cs = family == "native" or (family == "gd32f470" and any(
-                pin["function"] == "cs" for pin in controller["pins"]))
+            builtin_cs = provider.builtin_cs(controller)
             if "cs_binding" not in device and not builtin_cs:
                 fail("SPI child requires a CS binding")
             if "cs_binding" in device:
@@ -671,7 +555,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                         fail("Duplicate SPI chip select")
                     chip_selects.add(pin["pin"])
                     claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
-            elif family != "native":
+            elif not provider.MODEL:
                 for pin in controller["pins"]:
                     if pin["function"] == "cs":
                         if pin["pin"] in chip_selects:
@@ -689,10 +573,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         children = [item for item in assembly["devices"] if item["controller"] == controller["id"]]
         if controller["kind"] == "i2c" and not children:
             fail("I2C requires at least one explicit address endpoint")
-        if controller["kind"] == "spi" and family == "stm32f407" and not children:
-            fail("STM32 SPI requires at least one reviewed CS endpoint")
-        if controller["kind"] == "spi" and family == "gd32f470" and not children:
-            fail("GD32 SPI requires at least one reviewed CS endpoint")
+        if controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and not children:
+            fail("SPI requires at least one reviewed CS endpoint")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path]
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -783,7 +665,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "physical_pcb_revision": board["physical_pcb_revision"],
               "limitations": board["unknowns"] + ["Physical qualification not executed"],
               "physical_qualified": False,
-              "enum_abi": "native-int" if family == "native" else "short-enums"}
+              "enum_abi": provider.ENUM_ABI}
     result["configuration_sha256"] = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return result
@@ -837,6 +719,10 @@ def generate(result, output):
               '#define NEXUS_IRQ_PRIORITY_BITS 4u']
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
+             f'set(NEXUS_CPU_ARCH "{result["cpu"]["arch"]}")',
+             f'set(NEXUS_CPU_FPU "{result["cpu"]["fpu"]}")',
+             f'set(NEXUS_FLOAT_ABI "{result["cpu"]["float_abi"]}")',
+             f'set(NEXUS_ENUM_ABI "{result["enum_abi"]}")',
              f'set(NEXUS_BACKEND "{result["backend"]}")',
              f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',

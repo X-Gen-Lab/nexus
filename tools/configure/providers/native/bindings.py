@@ -1,5 +1,7 @@
 """Emit exact host model storage and wiring, without runtime hardware policy."""
 
+from ..common import controller_ir
+
 
 def symbol(name):
     return name.replace("-", "_")
@@ -8,6 +10,7 @@ def symbol(name):
 def constructor(item, result, board_bindings, routes, devices):
     """Construct one validated static instance using narrow provider calls."""
     del board_bindings, routes
+    item = controller_ir(item, 'native')
     name = symbol(item["id"])
     kind = item["kind"]
     state = f"&s_nx_port_{name}"
@@ -23,8 +26,8 @@ def constructor(item, result, board_bindings, routes, devices):
                       f"{initial}u, {output})")
         stop = [f"nx_native_gpio_stop_instance({state}, {initial}u)"]
     elif kind == "uart":
-        capacity = item["rx_capacity"]
-        events = item["rx_profile"] == "events"
+        capacity = item.options.rx_capacity
+        events = item.options.rx_profile == "events"
         data_type = "nx_uart_rx_event_t" if events else "uint8_t"
         profile = "NX_UART_RX_EVENTS" if events else "NX_UART_RX_BYTES"
         definitions = [f"static {data_type} s_nx_rx_{name}[{capacity}];",
@@ -73,9 +76,9 @@ def constructor(item, result, board_bindings, routes, devices):
         initialize = f"nx_native_watchdog_initialize_instance({state})"
         # Independent watchdog effects intentionally survive platform stop.
     elif kind == "exti":
-        capacity = item["event_capacity"]
+        capacity = item.options.event_capacity
         edge = {"rising": "NX_EXTI_RISING", "falling": "NX_EXTI_FALLING",
-                "both": "NX_EXTI_BOTH"}[item["edge"]]
+                "both": "NX_EXTI_BOTH"}[item.options.edge]
         line = int(item["pins"][0]["pin"][2:])
         definitions = [f"static nx_exti_event_t s_nx_events_{name}[{capacity}];"]
         initialize = (f"nx_native_exti_configure_instance({state}, {line}u, "
@@ -84,18 +87,18 @@ def constructor(item, result, board_bindings, routes, devices):
     elif kind == "pwm":
         definitions = [f"static nx_result_t prepare_{name}(void) {{",
                        f"    nx_result_t status = nx_native_pwm_configure_instance({state},",
-                       f"        {item['tick_hz']}u, {item['period_ticks']}u);",
+                       f"        {item.options.tick_hz}u, {item.options.period_ticks}u);",
                        "    if (status != NX_SUCCESS) { return status; }",
-                       f"    return nx_pwm_port_set({face}, {item['period_ticks']}u, {item['duty_ticks']}u);",
+                       f"    return nx_pwm_port_set({face}, {item.options.period_ticks}u, {item.options.duty_ticks}u);",
                        "}"]
         initialize = f"prepare_{name}()"
         stop = [f"nx_native_pwm_stop_instance({state})"]
     elif kind == "adc":
-        channels = item["channels"]
+        channels = item.options.channels
         definitions = [f"static const uint16_t s_nx_adc_model_{name}[{len(channels)}] = {{0}};"]
         initialize = (f"nx_native_adc_configure_instance({state}, "
                       f"s_nx_adc_model_{name}, {len(channels)}u, 12u, "
-                      f"{item['reference_mv']}u)")
+                      f"{item.options.reference_mv}u)")
         stop = [f"nx_native_adc_stop_instance({state})"]
     else:
         raise ValueError(f"Native construction is not maintained for {kind}")

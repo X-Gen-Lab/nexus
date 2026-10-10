@@ -1,8 +1,9 @@
 """Reviewed STM32 fixed construction, never a runtime resource allocator."""
 try:
-    from .emission import dma_regions
+    from ...emission import dma_regions
 except ImportError:
     from emission import dma_regions
+from ..common import controller_ir
 
 
 def _symbol(value):
@@ -43,13 +44,14 @@ def _endpoint_face(kind, name, state, implementation=None):
             f"const nx_{kind}_endpoint_t* const nx_device_{name} = &s_nx_device_face_{name};"]
 
 
-def constructor(item, result, board_bindings, routes, devices):
+def _controller_constructor(item, result, board_bindings, routes, devices):
     """Emit static contexts after resolver resource and mode validation.
 
     No pin is inferred from a Board name. SPI/I2C child identities and CS/address
     facts must already be reviewed and claimed by the resolver. Any unsupported
     controller, channel or incomplete electrical/resource description fails.
     """
+    item = controller_ir(item, 'stm32f407')
     name = _symbol(item["id"])
     kind = item["kind"]
     declarations = []
@@ -108,7 +110,7 @@ def constructor(item, result, board_bindings, routes, devices):
                      f"    s_nx_cs_{child_name}.output = true;"]
             _check(body, f"nx_stm32_gpio_initialize(&s_nx_cs_{child_name}, {bit}u)")
             mode = child.get("mode", 0)
-            maximum = child.get("max_hz", item.get("max_hz", 1000000))
+            maximum = child.get("max_hz", item.options.max_hz)
             if not isinstance(mode, int) or isinstance(mode, bool) or not 0 <= mode <= 3:
                 raise ValueError("SPI mode must be 0 through 3")
             if not isinstance(maximum, int) or maximum < 328125 or maximum > 42000000:
@@ -130,8 +132,8 @@ def constructor(item, result, board_bindings, routes, devices):
                      f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
                      f"    s_nx_port_{name}.region_count = {region_count}u;"]
             _check(body, f"nx_stm32_spi_dma_initialize(&s_nx_port_{name})")
-            body += [f"    NVIC_SetPriority(DMA2_Stream3_IRQn, {item['irq_priority']}u);",
-                     f"    NVIC_SetPriority(DMA2_Stream0_IRQn, {item['irq_priority']}u);"]
+            body += [f"    NVIC_SetPriority(DMA2_Stream3_IRQn, {item.options.irq.priority}u);",
+                     f"    NVIC_SetPriority(DMA2_Stream0_IRQn, {item.options.irq.priority}u);"]
             for stream, receive in ((3, "false"), (0, "true")):
                 declarations += [f"void DMA2_Stream{stream}_IRQHandler(void);",
                                  "/** \\brief Exact selected SPI DMA terminal observation. */",
@@ -225,9 +227,9 @@ def constructor(item, result, board_bindings, routes, devices):
             raise ValueError("EXTI pin and mux line mismatch")
         irq = "EXTI0_IRQn" if line == 0 else "EXTI9_5_IRQn"
         edge = {"rising": "NX_EXTI_RISING", "falling": "NX_EXTI_FALLING",
-                "both": "NX_EXTI_BOTH"}.get(item.get("edge"))
-        capacity = item.get("event_capacity")
-        priority = item.get("irq_priority")
+                "both": "NX_EXTI_BOTH"}.get(item.options.edge)
+        capacity = item.options.event_capacity
+        priority = item.options.irq.priority
         if edge is None or not isinstance(capacity, int) or not 1 <= capacity <= 4096:
             raise ValueError("EXTI requires an edge and bounded event_capacity")
         if not isinstance(priority, int) or not 0 <= priority <= 15:
@@ -254,8 +256,8 @@ def constructor(item, result, board_bindings, routes, devices):
     elif kind == "pwm":
         if item["controller"] != "TIM3" or [pin["pin"] for pin in item["pins"]] != ["PA6"]:
             raise ValueError("Only reviewed TIM3 CH1 PA6 PWM route is maintained")
-        period, duty, tick = (item.get(field) for field in
-                              ("period_ticks", "duty_ticks", "tick_hz"))
+        period, duty, tick = (item.options.period_ticks, item.options.duty_ticks,
+                              item.options.tick_hz)
         if not all(isinstance(value, int) for value in (period, duty, tick)):
             raise ValueError("PWM requires explicit period/duty/tick_hz")
         if not 1 <= period <= 65535 or not 0 <= duty <= period or tick <= 0:
@@ -298,12 +300,12 @@ def constructor(item, result, board_bindings, routes, devices):
     elif kind == "adc":
         stream = item["mode"] == "trigger-dma"
         adc = f"s_nx_port_{name}" + (".adc" if stream else "")
-        channels = list(item.get("channels", ()))
+        channels = list(item.options.channels)
         reviewed = [int(pin["pin"][2:]) for pin in item["pins"]]
         if item["controller"] != "ADC1" or channels != reviewed or channels not in ([0], [0, 1]):
             raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
-        sampling = list(item.get("sample_times", ()))
-        reference = item.get("reference_mv")
+        sampling = list(item.options.sample_times)
+        reference = item.options.reference_mv
         if not isinstance(sampling, list) or len(sampling) != len(channels) or not all(
                 isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 7
                 for value in sampling):
@@ -338,7 +340,7 @@ def constructor(item, result, board_bindings, routes, devices):
                      f"    s_nx_port_{name}.timer_clock_hz = 84000000u;",
                      f"    s_nx_port_{name}.adc_clock_hz = 21000000u;"]
             _check(body, f"nx_stm32_adc_stream_initialize(&s_nx_port_{name})")
-            body.append(f"    NVIC_SetPriority(DMA2_Stream4_IRQn, {item['irq_priority']}u);")
+            body.append(f"    NVIC_SetPriority(DMA2_Stream4_IRQn, {item.options.irq.priority}u);")
             declarations += ["void DMA2_Stream4_IRQHandler(void);",
                              "/** \\brief Exact ADC DMA block terminal observation. */",
                              f"void DMA2_Stream4_IRQHandler(void) {{ nx_stm32_adc_stream_irq(&s_nx_port_{name}); }}"]
@@ -394,6 +396,7 @@ def constructor(item, result, board_bindings, routes, devices):
 
 def shared_irq_definitions(selections):
     """Emit one bounded static dispatcher per selected hardware vector."""
+    selections = [controller_ir(item, "stm32f407") for item in selections]
     groups = {}
     for item in selections:
         if item["kind"] != "exti":
@@ -403,7 +406,7 @@ def shared_irq_definitions(selections):
         groups.setdefault(vector, []).append(item)
     lines = []
     for vector, items in groups.items():
-        if len({item["irq_priority"] for item in items}) != 1:
+        if len({item.options.irq.priority for item in items}) != 1:
             raise ValueError("Shared EXTI vector priorities must agree")
         pointers = ", ".join("&s_nx_port_" + _symbol(item["id"]) for item in items)
         array = "s_nx_irq_" + vector.lower() + "_ports"
@@ -415,3 +418,130 @@ def shared_irq_definitions(selections):
                       f"    nx_stm32_exti_dispatch({array}, {len(items)}u, {mask}u);",
                       "}"])
     return lines
+
+
+def _gpio_constructor(item):
+    name = _symbol(item.id)
+    port = item["pins"][0]["pin"][1]
+    index = ord(port) - ord("A")
+    mask = item.options.mask or sum(1 << int(pin["pin"][2:])
+                                   for pin in item["pins"])
+    initial = item.options.initial
+    definitions = []
+    definitions += [f'/* Fixed {item["controller"]} authorization. */',
+               f'static nx_result_t prepare_{name}(void) {{',
+               f'    s_nx_port_{name}.registers = GPIO{port};',
+               f'    s_nx_port_{name}.mask = {mask}u;',
+               f'    s_nx_port_{name}.output = {"true" if item["mode"] == "output" else "false"};',
+               f'    uint32_t saved_clock = RCC->AHB1ENR & {1 << index}u;',
+               f'    nx_result_t clock = nx_stm32_gpio_clock_enable({index}u);',
+               f'    if (clock != NX_SUCCESS) {{ RCC->AHB1ENR = (RCC->AHB1ENR & ~{1 << index}u) | saved_clock; return clock; }}']
+    for pin in item["pins"]:
+        number = pin["pin"][2:]
+        definitions.append(f'    uint16_t saved_{number} = nx_stm32_pin_capture(GPIO{port}, {number}u);')
+    definitions += [f'    nx_result_t status = nx_stm32_gpio_initialize(&s_nx_port_{name}, {initial}u);',
+               '    if (status != NX_SUCCESS) {']
+    for pin in item["pins"]:
+        number = pin["pin"][2:]
+        definitions.append(f'        nx_stm32_pin_restore(GPIO{port}, {number}u, saved_{number});')
+    definitions += [f'        RCC->AHB1ENR = (RCC->AHB1ENR & ~{1 << index}u) | saved_clock;',
+               '        nx_arch_dsb();', '    }', '    return status;', '}']
+    init = f'prepare_{name}()'
+    return {"definitions": definitions, "initialize": init,
+            "stop": [f"nx_stm32_gpio_stop(&s_nx_port_{name}, {initial}u)"]}
+
+
+def _uart_constructor(item, result):
+    name = _symbol(item.id)
+    dma_uart = item.mode == "dma-tx"
+    block_uart = item.mode == "irq-blocks"
+    implementation = ("uart_dma" if dma_uart else
+                      "uart_stream" if block_uart else "uart")
+    options = item.options
+    profile = ("NX_UART_RX_BLOCKS" if block_uart else
+               "NX_UART_RX_EVENTS" if options.rx_profile == "events" else
+               "NX_UART_RX_BYTES")
+    storage = ("nx_uart_rx_event_t" if options.rx_profile == "events" else
+               "uint8_t")
+    capacity = options.rx_capacity or 0
+    definitions = []
+    if not block_uart:
+        definitions.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
+    uart_state = f's_nx_port_{name}' + ('.uart' if dma_uart or block_uart else '')
+    rx_storage = 'NULL' if block_uart else f's_nx_rx_{name}'
+    definitions += [f'static nx_result_t prepare_{name}(void) {{',
+               f'    {uart_state}.registers = {item["controller"]};',
+               f'    {uart_state}.rx_storage = {rx_storage};',
+               f'    {uart_state}.rx_capacity = {capacity}u;',
+               f'    {uart_state}.baud = {item.options.baud}u;',
+               f'    {uart_state}.profile = {profile};',
+               f'    {uart_state}.irq = {item["controller"]}_IRQn;',
+               '    uint32_t saved_clock = RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN;',
+               '    uint32_t saved_uart_clock = RCC->APB2ENR & RCC_APB2ENR_USART1EN;',
+               '    nx_result_t clock = nx_stm32_gpio_clock_enable(0u);',
+               '    if (clock != NX_SUCCESS) {',
+               '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock;',
+               '        return clock;', '    }',
+               '    uint16_t saved_tx = nx_stm32_pin_capture(GPIOA, 9u);',
+               '    uint16_t saved_rx = nx_stm32_pin_capture(GPIOA, 10u);',
+               '    nx_result_t pins = nx_stm32_uart1_pins_prepare();',
+               f'    nx_result_t uart = pins == NX_SUCCESS ? nx_stm32_{implementation}_initialize(&s_nx_port_{name}, 84000000u) : pins;',
+               '    if (uart != NX_SUCCESS) {',
+               '        nx_stm32_pin_restore(GPIOA, 9u, saved_tx);',
+               '        nx_stm32_pin_restore(GPIOA, 10u, saved_rx);',
+               '        RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)RCC_APB2ENR_USART1EN) | saved_uart_clock;',
+               '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock;',
+               '        nx_arch_dsb();', '        return uart;', '    }',
+               f'    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);',
+               '    return NX_SUCCESS;', '}',
+               f'static nx_result_t stop_{name}(void) {{',
+               f'    nx_result_t status = nx_uart_port_stop(&s_nx_face_{name});',
+               '    if (status != NX_SUCCESS) { return status; }',
+               '    (void)nx_stm32_pin_configure(GPIOA, 9u, 0u, 0u, 0u, false);',
+               '    (void)nx_stm32_pin_configure(GPIOA, 10u, 0u, 0u, 0u, false);',
+               '    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_USART1EN;',
+               '    nx_arch_dsb();', '    return NX_SUCCESS;', '}']
+    init = f'prepare_{name}()'
+    irq = item["controller"] + '_IRQHandler'
+    irq_implementation = "uart_dma_uart" if dma_uart else "uart_stream" if block_uart else "uart"
+    definitions += [f'void {irq}(void);', '/** \\brief Fixed single-controller IRQ dispatch. */',
+               f'void {irq}(void) {{ nx_stm32_{irq_implementation}_irq(&s_nx_port_{name}); }}']
+    if dma_uart:
+        if item["controller"] != "USART1" or item.get("dma") != ("DMA2:stream7:channel4",) and item.get("dma") != ["DMA2:stream7:channel4"]:
+            raise ValueError("UART DMA requires reviewed USART1 DMA2 stream7 channel4")
+        regions = [region for region in result["memory"] if region["dma"]]
+        region_lines = [f'static const nx_dma_memory_region_t s_nx_dma_regions_{name}[] = {{']
+        for region in regions:
+            region_lines.append(f'    {{ 0x{region["origin"]:08x}u, {region["size"]}u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE }},')
+        region_lines += [f'    {{ 0x{result["flash"]["origin"]:08x}u, {result["flash"]["size"]}u, NX_DMA_MEMORY_READ }}', '};']
+        # Fixed DMA pointers and domains precede the ordinary UART
+        # register preparation. The provider owns admission/drain.
+        position = next(index for index, line in enumerate(definitions)
+                        if line == f'static nx_result_t prepare_{name}(void) {{')
+        definitions[position:position] = region_lines
+        definitions[position + len(region_lines) + 1:position + len(region_lines) + 1] = [
+            f'    s_nx_port_{name}.dma = DMA2;',
+            f'    s_nx_port_{name}.tx = DMA2_Stream7;',
+            f'    s_nx_port_{name}.regions = s_nx_dma_regions_{name};',
+            f'    s_nx_port_{name}.region_count = {len(regions) + 1}u;',
+            f'    s_nx_port_{name}.dma_irq = DMA2_Stream7_IRQn;',
+            f'    s_nx_port_{name}.stream = 7u;',
+            f'    s_nx_port_{name}.channel = 4u;']
+        priority_line = next(index for index, line in enumerate(definitions)
+                             if line == f'    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);')
+        definitions.insert(priority_line + 1, f'    NVIC_SetPriority(s_nx_port_{name}.dma_irq, {item.options.irq.priority}u);')
+        definitions += ['void DMA2_Stream7_IRQHandler(void);',
+                   '/** \\brief Fixed DMA stream terminal observation. */',
+                   f'void DMA2_Stream7_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&s_nx_port_{name}); }}']
+    return {"definitions": definitions, "initialize": init,
+            "stop": [f"stop_{name}()"]}
+
+
+def constructor(item, result, board_bindings, routes, devices):
+    """Emit one reviewed STM32 instance, including its rollback and stop."""
+    item = controller_ir(item, "stm32f407")
+    if item.kind == "gpio":
+        return _gpio_constructor(item)
+    if item.kind == "uart":
+        return _uart_constructor(item, result)
+    return _controller_constructor(item, result, board_bindings, routes, devices)

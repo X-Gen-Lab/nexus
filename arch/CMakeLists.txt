@@ -1,8 +1,10 @@
 # The selected CPU implementation has no vendor or kernel include surface.
-if(NEXUS_SOC_FAMILY STREQUAL "native")
+if(NEXUS_CPU_ARCH STREQUAL "native")
     set(nexus_arch_port native)
-else()
+elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m4")
     set(nexus_arch_port cortex_m4)
+else()
+    message(FATAL_ERROR "Unsupported CPU architecture: ${NEXUS_CPU_ARCH}")
 endif()
 add_library(nexus_arch STATIC "${nexus_arch_port}/nx_arch_${nexus_arch_port}.c")
 target_include_directories(nexus_arch PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

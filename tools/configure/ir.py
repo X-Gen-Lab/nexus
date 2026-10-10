@@ -37,6 +37,97 @@ class Record(Mapping):
 
 
 @dataclass(frozen=True)
+class IrqOptions:
+    priority: int
+    calls_os: bool
+
+
+@dataclass(frozen=True)
+class GpioOptions:
+    mask: int
+    initial: int
+
+
+@dataclass(frozen=True)
+class UartOptions:
+    baud: int
+    rx_profile: str
+    rx_capacity: int | None
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class SpiOptions:
+    max_hz: int
+    irq: IrqOptions | None
+
+
+@dataclass(frozen=True)
+class I2cOptions:
+    max_hz: int
+
+
+@dataclass(frozen=True)
+class ExtiOptions:
+    edge: str
+    event_capacity: int
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class PwmOptions:
+    period_ticks: int
+    duty_ticks: int
+    tick_hz: int
+
+
+@dataclass(frozen=True)
+class AdcOptions:
+    channels: tuple[int, ...]
+    sample_times: tuple[int, ...]
+    reference_mv: int
+    timeout_ms: int | None
+    irq: IrqOptions | None
+
+
+@dataclass(frozen=True)
+class NoOptions:
+    """Flash and watchdog have no authored construction options."""
+
+
+ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
+                     ExtiOptions | PwmOptions | AdcOptions | NoOptions)
+
+
+def mode_options(values):
+    """Project one validated mode into immutable named constructor arguments."""
+    kind = values["kind"]
+    irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False))
+           if "irq_priority" in values else None)
+    if kind == "gpio":
+        return GpioOptions(values["mask"], values["initial"])
+    if kind == "uart":
+        return UartOptions(values["baud"], values["rx_profile"],
+                           values.get("rx_capacity"), irq)
+    if kind == "spi":
+        return SpiOptions(values.get("max_hz", 1000000), irq)
+    if kind == "i2c":
+        return I2cOptions(values.get("max_hz", 100000))
+    if kind == "exti":
+        return ExtiOptions(values["edge"], values["event_capacity"], irq)
+    if kind == "pwm":
+        return PwmOptions(values["period_ticks"], values["duty_ticks"],
+                          values["tick_hz"])
+    if kind == "adc":
+        return AdcOptions(tuple(values["channels"]),
+                          tuple(values["sample_times"]), values["reference_mv"],
+                          values.get("timeout_ms"), irq)
+    if kind in {"flash", "watchdog"}:
+        return NoOptions()
+    raise ValueError(f"Unmaintained controller decision: {kind}")
+
+
+@dataclass(frozen=True)
 class ControllerIR(Record):
     id: str
     kind: str
@@ -44,13 +135,14 @@ class ControllerIR(Record):
     binding: str
     mode: str
     provider: str
+    options: ControllerOptions
     values: Mapping
 
     @classmethod
     def create(cls, values, provider):
         return cls(*(values[key] for key in
                      ("id", "kind", "controller", "binding", "mode")),
-                   provider, freeze(values))
+                   provider, mode_options(values), freeze(values))
 
 
 @dataclass(frozen=True)

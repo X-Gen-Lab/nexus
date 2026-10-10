@@ -9,9 +9,17 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/factory.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/stm32_bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/gd32_bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/native_bindings.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/__init__.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/common.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/native/__init__.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/native/bindings.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/native/emission.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/__init__.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/bindings.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/emission.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/__init__.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/bindings.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/emission.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/emission.py")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
@@ -23,6 +31,7 @@ function(nexus_resolve_assembly)
     endif()
     include("${bundle}/selection.cmake")
     foreach(value NEXUS_SOC_FAMILY NEXUS_EXACT_PART NEXUS_BACKEND
+                  NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI
                   NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
                   NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256)
         set(${value} "${${value}}" PARENT_SCOPE)
