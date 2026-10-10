@@ -9,15 +9,20 @@ shared EXTI5/6, PWM and ADC single/scan are independent to avoid pin conflicts.
 The contexts are generated from external Board-package inputs. The fixtures
 claim no fitted external device, I2C pull-ups, measured VDD, actual PCB, physical
 waveform or product qualification. They are ineligible for hardware admission
-and product promotion. Volatile typed function references retain real operation
-implementations without automatically erasing/programming Flash or enabling
-IWDG. Host register models separately execute operation success/fault behavior.
+and product promotion. Volatile reads of every selected typed factory face
+retain concrete operations tables and their initialized methods without calling
+Flash programming or watchdog enable methods. A post-link audit checks the
+actual selected faces, public table layout, provider initializer methods, local
+function source identity and LOAD bytes in `bin/provider-retention.json`. Host
+register models separately execute operation success/fault behavior.
 The generated-constructor host model additionally checks partial acquisition
 rollback, shared EXTI vector release and PWM idle restoration using these same
 schema inputs and generator functions.
 
 Configure this directory as an independent consumer, with explicit
 `NEXUS_SOURCE_ROOT`, one `NEXUS_ASSEMBLY_FILE` from this directory and the
-platform ARM toolchain. A successful link is evidence of API/ABI/construction
-and exact geometry only. No fixture result is inherited by the three real
+platform ARM toolchain. The link and retention report establish software
+API/ABI/construction, exact geometry and retained method bytes. They do not
+establish operation execution, timing or electrical behavior. No result is
+inherited by the three real
 reference Boards' electrical support matrix.

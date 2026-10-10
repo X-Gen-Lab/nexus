@@ -9,12 +9,16 @@ one controller; SPI uses the provider's reviewed built-in active-low PF6 CS.
 The `software_board` is not a physical PCB package. It does not qualify external
 pull-ups, fitted devices, oscillators, analog input, VDD, or actual electrical
 wiring. These firmware images are ineligible for physical HIL and product
-promotion. Volatile function references retain real operation implementations
-without automatically erasing/programming Flash or enabling the watchdog.
-Production-source host fault models exercise operation behavior separately.
+promotion. Volatile reads of every selected typed factory face retain concrete
+operations tables and initialized methods without invoking Flash programming
+or watchdog enable. The post-link `bin/provider-retention.json` audit verifies
+actual face/table LOAD bytes, public ABI layout, provider initializer methods
+and local function source identity. Production-source host fault models execute
+operation behavior separately.
 
 Configure this directory as an independent consumer with `NEXUS_SOURCE_ROOT`,
-one explicit JSON `NEXUS_ASSEMBLY_FILE`, and the platform ARM toolchain. Actual
-ELF links demonstrate API/ABI/construction and selected resource allocation.
+one explicit TOML `NEXUS_ASSEMBLY_FILE`, and the platform ARM toolchain. Actual
+ELF links and retention reports demonstrate API/ABI/construction, selected
+resource allocation and retained method bytes.
 They do not establish cycle counts or inherit physical reference-Board
 qualification.

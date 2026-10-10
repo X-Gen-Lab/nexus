@@ -3,65 +3,52 @@
  * \brief           Development-only actual typed GD32 controller link fixture
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-10-09
+ * \date            2026-10-10
  * \copyright       Copyright (c) 2026 Nexus Team
- * \details         Volatile typed function references retain actual providers.
- *                  They do not execute Flash pulses, enable FWDGT, or assert
- *                  external electrical wiring. This is not a HIL image.
+ * \details         Volatile face reads retain every selected operations table.
+ *                  Methods are linked but never called by this fixture. This
+ *                  is software evidence, not a HIL image or Board wiring proof.
  */
 #include "nexus_bindings.h"
-#include "nexus_config.h"
+#include "nexus_factory.h"
 
-/** \brief Initialize selected construction and retain the real typed functions.
+/* Volatile-qualified face fields force real ROM reads. Their relocations keep
+ * concrete ops and all non-NULL methods alive through section GC, independently
+ * of controller/device names. Empty generated classes add no runtime work.
+ */
+#define NX_FIXTURE_RETAIN_FACES(name, type, count)                             \
+    do {                                                                       \
+        size_t instance_count = (count);                                       \
+        for (size_t index = 0; index < instance_count; ++index) {              \
+            const volatile type* face =                                        \
+                nx_factory_##name((nx_##name##_id_t)index);                    \
+            if (face != NULL) {                                                \
+                (void)face->ops;                                               \
+                (void)face->context;                                           \
+            }                                                                  \
+        }                                                                      \
+    } while (0)
+
+/** \brief Initialize assembly and retain every typed controller and endpoint.
  */
 int main(void) {
     nx_platform_start_result_t result = nx_platform_start();
     if (result.primary != NX_SUCCESS) {
         return 1;
     }
-#if defined(NEXUS_SPI0_SELECTED)
-    nx_result_t (*volatile transfer)(const nx_spi_endpoint_t*, const uint8_t*,
-                                     uint8_t*, size_t, nx_time_us_t, size_t*) =
-        nx_spi_endpoint_transfer;
-    (void)transfer;
-#elif defined(NEXUS_I2C0_SELECTED)
-    nx_result_t (*volatile transaction)(const nx_i2c_endpoint_t*,
-                                        nx_i2c_message_t*, size_t, nx_time_us_t,
-                                        size_t*) = nx_i2c_endpoint_transaction;
-    nx_result_t (*volatile recover)(const nx_i2c_port_t*) = nx_i2c_port_recover;
-    (void)transaction;
-    (void)recover;
-#elif defined(NEXUS_FLASH0_SELECTED)
-    nx_result_t (*volatile program)(const nx_flash_port_t*, uint32_t,
-                                    const void*, size_t, nx_time_us_t) =
-        nx_flash_port_program;
-    nx_result_t (*volatile erase)(const nx_flash_port_t*, uint32_t, size_t,
-                                  nx_time_us_t) = nx_flash_port_erase;
-    (void)program;
-    (void)erase;
-#elif defined(NEXUS_WATCHDOG0_SELECTED)
-    nx_result_t (*volatile enable)(const nx_watchdog_port_t*, uint32_t, bool,
-                                   nx_watchdog_state_t*) =
-        nx_watchdog_port_enable;
-    nx_result_t (*volatile feed)(const nx_watchdog_port_t*) =
-        nx_watchdog_port_feed;
-    (void)enable;
-    (void)feed;
-#elif defined(NEXUS_EDGE3_SELECTED)
-    nx_result_t (*volatile read)(const nx_exti_port_t*, nx_exti_event_t*,
-                                 size_t, size_t*) = nx_exti_port_read;
-    (void)read;
-#elif defined(NEXUS_PWM0_SELECTED)
-    nx_result_t (*volatile set)(const nx_pwm_port_t*, uint32_t, uint32_t) =
-        nx_pwm_port_set;
-    nx_result_t (*volatile start)(const nx_pwm_port_t*) = nx_pwm_port_start;
-    (void)set;
-    (void)start;
-#elif defined(NEXUS_ADC0_SELECTED)
-    nx_result_t (*volatile sample)(const nx_adc_port_t*, uint16_t*, size_t,
-                                   nx_time_us_t, size_t*) = nx_adc_port_sample;
-    (void)sample;
-#endif
+    NX_FIXTURE_RETAIN_FACES(gpio, nx_gpio_port_t, NX_GPIO_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(uart, nx_uart_port_t, NX_UART_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(spi, nx_spi_port_t, NX_SPI_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(i2c, nx_i2c_port_t, NX_I2C_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(flash, nx_flash_port_t, NX_FLASH_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(watchdog, nx_watchdog_port_t, NX_WATCHDOG_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(exti, nx_exti_port_t, NX_EXTI_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(pwm, nx_pwm_port_t, NX_PWM_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(adc, nx_adc_port_t, NX_ADC_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(spi_device, nx_spi_endpoint_t,
+                            NX_SPI_DEVICE_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(i2c_device, nx_i2c_endpoint_t,
+                            NX_I2C_DEVICE_ID_COUNT);
     for (;;) {
     }
 }

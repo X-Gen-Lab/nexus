@@ -65,13 +65,17 @@ class Elf32:
                     section[5] % 16):
                 raise EvidenceError("invalid ELF symbol table")
             strings = self.section_data(sections[section[6]])
+            local_file = None
             for offset in range(section[4], section[4] + section[5], 16):
                 symbol = self.unpack("<IIIBBH", offset)
                 name = self.string(strings, symbol[0])
+                if symbol[3] & 15 == 4:
+                    local_file = name or None
                 if name and symbol[5]:
                     self.defined_symbols.append({"name": name, "value": symbol[1],
                         "size": symbol[2], "section": symbol[5],
-                        "binding": symbol[3] >> 4, "type": symbol[3] & 15})
+                        "binding": symbol[3] >> 4, "type": symbol[3] & 15,
+                        "file": local_file if symbol[3] >> 4 == 0 else None})
                 if name and symbol[5] and symbol[3] >> 4 in (1, 2):
                     if name in self.symbols:
                         raise EvidenceError("duplicate defined global ELF symbol")
