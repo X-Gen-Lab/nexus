@@ -65,7 +65,7 @@ def validate_fixture(fixture: dict) -> None:
         names.add(case["id"])
         maximum = case["budget"]
         require(maximum is None or (type(maximum) in (int, float) and
-                math.isfinite(maximum) and maximum >= 0),
+                0 <= maximum <= 2 ** 64 - 1 and math.isfinite(maximum)),
                 "invalid pending physical measurement budget")
 
 
@@ -112,11 +112,16 @@ def validate_station(station: dict, fixture: dict) -> None:
             "reviewed physical measurement budgets required")
     for name, budget in station["budgets"].items():
         identifier(name, "physical metric")
-        fields(budget, {"maximum", "unit"})
+        fields(budget, {"maximum", "unit"}, {"minimum"})
         identifier(budget["unit"], "measurement unit")
         require(type(budget["maximum"]) in (int, float) and
-                math.isfinite(budget["maximum"]) and budget["maximum"] >= 0,
+                0 <= budget["maximum"] <= 2 ** 64 - 1 and
+                math.isfinite(budget["maximum"]),
                 "invalid physical measurement budget")
+        minimum = budget.get("minimum", 0)
+        require(type(minimum) in (int, float) and
+                0 <= minimum <= budget["maximum"] and math.isfinite(minimum),
+                "invalid physical measurement lower bound")
 
 
 def validate_console(fixture: dict, resolved: dict) -> None:
@@ -224,7 +229,8 @@ def validate_raw(raw: dict, admission: dict, *, maximum_age_s: int = 86400,
         fields(metric, {"value", "unit", "raw"})
         budget = admission["budgets"][name]
         require(type(metric["value"]) in (int, float) and
-                math.isfinite(metric["value"]) and 0 <= metric["value"] <=
+                math.isfinite(metric["value"]) and
+                budget.get("minimum", 0) <= metric["value"] <=
                 budget["maximum"] and metric["unit"] == budget["unit"],
                 "physical measurement budget failed: " + name)
         verify_file_identity(metric["raw"])
