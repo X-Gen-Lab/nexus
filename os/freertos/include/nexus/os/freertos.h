@@ -3,17 +3,18 @@
  * \brief           Per-object static FreeRTOS storage and optional thin
  *                  services
  * \author          Nexus Team
- * \note            Kernel operations require privileged task context unless
- *                  IRQ wake is explicitly documented. PRIMASK and FAULTMASK
- *                  must be zero. BASEPRI must be zero, or exactly the
- *                  maintained syscall mask before the scheduler starts. This
- *                  permits CM4F bootstrap critical sections; a matching value
- *                  does not prove its origin. Unsafe contexts return CONTEXT
- *                  before mutating kernel APIs or object storage; a read-only
- *                  scheduler query may be needed. Startup permits init, task
- *                  creation, wake and zero-wait queues. Wait, join and nonzero
- *                  waits require a running scheduler. Port binding and
- *                  sequence snapshots remain reads.
+ * \note            Running task operations require privileged unmasked Thread
+ *                  mode; IRQ wake has its own contract. Before scheduler start,
+ *                  the selected Baseline port may retain PRIMASK=1 or the
+ *                  Mainline port its exact syscall BASEPRI; all other masks
+ *                  must be zero. Matching a value cannot prove mask provenance.
+ *                  Unsafe contexts return CONTEXT before mutating kernel APIs
+ *                  or object storage; a scheduler-state read may be needed.
+ *                  Startup permits init, task creation, wake and zero-wait
+ *                  queues. Wait, join and nonzero waits require a running
+ *                  scheduler. Port binding and sequence snapshots remain reads.
+ *                  MPU user-task gateways and cross-world secure task calls
+ *                  are outside these privileged, current-security-domain APIs.
  */
 #ifndef NEXUS_OS_FREERTOS_H
 #define NEXUS_OS_FREERTOS_H
@@ -61,12 +62,14 @@ typedef struct {
 
 /**
  * \brief           Test whether the current context may call kernel ISR APIs
- * \return          True for a privileged unmasked external Cortex-M IRQ below
- *                  the syscall ceiling
+ * \return          True for a privileged unmasked external Cortex-M IRQ within
+ *                  the selected CPU/SoC bounds and kernel mask contract
  * \note            Native POSIX has no physical IRQ and returns false. NMI,
  *                  faults and kernel-owned exceptions are rejected before
- *                  entering FreeRTOS. Runtime grouping must remain the
- *                  maintained all-preemption configuration.
+ *                  entering FreeRTOS. Mainline priority/grouping must respect
+ *                  the syscall ceiling. Baseline PRIMASK ports accept every
+ *                  configurable IRQ and do not read Mainline priority grouping.
+ *                  Nonsecure permission does not exclude Secure-side accesses.
  */
 bool nx_freertos_isr_allowed(void);
 /**

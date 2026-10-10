@@ -13,14 +13,29 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/request.h"
+#include <limits.h>
 #include <stdatomic.h>
+#include <stddef.h>
 
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "Nexus request publication requires GCC/Clang atomic builtins"
 #endif
-_Static_assert(ATOMIC_INT_LOCK_FREE == 2 &&
-                   sizeof(uint32_t) == sizeof(unsigned),
-               "request state must use lock-free atomic publication");
+_Static_assert(sizeof(uint32_t) == 4 && sizeof(unsigned) == 4 && CHAR_BIT == 8,
+               "request publication requires aligned 32-bit unsigned words");
+_Static_assert(_Alignof(nx_request_t) >= _Alignof(uint32_t) &&
+                   offsetof(nx_request_t, state) % _Alignof(uint32_t) == 0,
+               "request state must retain natural word alignment");
+#if defined(__ARM_ARCH_6M__)
+/* ARMv6-M has atomic aligned word load/store with compiler acquire/release
+ * barriers. Its generic INT lock-free macro also covers unsupported RMW;
+ * request publication never performs RMW or needs an IRQ guard. The real
+ * compiler gate verifies that these operations have no library helpers. */
+_Static_assert(ATOMIC_INT_LOCK_FREE == 1 || ATOMIC_INT_LOCK_FREE == 2,
+               "ARMv6-M request publication requires reviewed compiler words");
+#else
+_Static_assert(ATOMIC_INT_LOCK_FREE == 2,
+               "request publication requires the maintained word port");
+#endif
 
 /** \brief Initialize never-borrowed storage; this is not a revocation API. */
 void nx_request_initialize(nx_request_t* request) {

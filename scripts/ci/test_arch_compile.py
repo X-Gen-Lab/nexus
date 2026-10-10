@@ -18,6 +18,8 @@ class CortexCompilerPolicyTests(unittest.TestCase):
             "#define __SIZEOF_INT__ 4\n"
             "#define __SOFTFP__ 1\n"
             f"#define __GCC_ATOMIC_INT_LOCK_FREE {profile.atomic_lock_free}\n"
+            + ('#define __ARM_FEATURE_DSP 1\n' if
+               gate.reference_facts(cpu)['cpu']['dsp'] else '')
         )
 
     def assembly(self, cpu):
@@ -30,8 +32,8 @@ class CortexCompilerPolicyTests(unittest.TestCase):
     def test_scope_is_exact_and_unknown_cpu_fails_closed(self):
         self.assertEqual(tuple(gate.PROFILES), (
             'cortex-m0', 'cortex-m0plus', 'cortex-m3', 'cortex-m4',
-            'cortex-m7', 'cortex-m23', 'cortex-m33'))
-        for cpu in ('cortex-m55', 'cortex-a7', '', 'cortex-m4 -O0'):
+            'cortex-m7', 'cortex-m23', 'cortex-m33', 'cortex-m55', 'cortex-m85'))
+        for cpu in ('cortex-m52', 'cortex-a7', '', 'cortex-m4 -O0'):
             with self.assertRaisesRegex(ValueError, 'unsupported CPU'):
                 gate.profile(cpu)
 
@@ -57,6 +59,52 @@ class CortexCompilerPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'atomic helper'):
             gate.check_atomic_symbols(
                 'cortex-m23', '         U __atomic_fetch_add_4\n')
+
+    def test_declared_abi_and_optional_instruction_macros_must_match(self):
+        hard = self.macros('cortex-m55').replace(
+            '#define __SOFTFP__ 1\n', '') + (
+                '#define __ARM_PCS_VFP 1\n#define __ARM_FP 14\n'
+                '#define __ARM_FEATURE_MVE 3\n')
+        gate.check_macros('cortex-m55', hard, fpu='auto', float_abi='hard',
+                          mve='float')
+        for argument in ({'float_abi': 'softfp'}, {'mve': 'integer'},
+                         {'fpu': 'none'}):
+            values = {'fpu': 'auto', 'float_abi': 'hard', 'mve': 'float'}
+            values.update(argument)
+            with self.assertRaisesRegex(ValueError, 'ABI|FPU|MVE'):
+                gate.check_macros('cortex-m55', hard, **values)
+
+    def test_optional_dsp_instruction_macros_must_match_declared_facts(self):
+        nodsp = self.macros('cortex-m33').replace(
+            '#define __ARM_FEATURE_DSP 1\n', '')
+        enabled = nodsp + '#define __ARM_FEATURE_DSP 1\n'
+        gate.check_macros('cortex-m33', nodsp, dsp=False)
+        gate.check_macros('cortex-m33', enabled, dsp=True)
+        for facts, actual in ((False, enabled), (True, nodsp)):
+            with self.assertRaisesRegex(ValueError, 'DSP instruction'):
+                gate.check_macros('cortex-m33', actual, dsp=facts)
+
+    def test_software_matrix_covers_declared_fpus_and_security_without_boards(self):
+        variants = gate.software_profiles()
+        self.assertEqual(len({item['name'] for item in variants}), len(variants))
+        self.assertEqual({item['facts']['cpu']['arch'] for item in variants},
+                         set(gate.PROFILES))
+        for cpu in ('cortex-m55', 'cortex-m85'):
+            scoped = [item['facts']['cpu'] for item in variants
+                      if item['facts']['cpu']['arch'] == cpu]
+            self.assertEqual({facts['mve'] for facts in scoped},
+                             {'none', 'integer', 'float'})
+            self.assertEqual({facts['security'] for facts in scoped},
+                             {'single', 'secure', 'nonsecure'})
+        optional = [item['facts']['cpu'] for item in variants
+                    if item['facts']['cpu']['arch'] == 'cortex-m33']
+        self.assertEqual(len(optional), 10)
+        self.assertEqual({item['dsp'] for item in optional}, {False, True})
+        for enabled in (False, True):
+            self.assertEqual({item['float_abi'] for item in optional
+                              if item['dsp'] is enabled},
+                             {'soft', 'hard', 'softfp'})
+        self.assertTrue(all('board' not in item['facts'] for item in variants))
 
     def test_wrong_atomic_fact_or_unexpected_helpers_fail(self):
         with self.assertRaisesRegex(ValueError, 'atomic lock-free'):

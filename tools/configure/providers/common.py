@@ -1,16 +1,7 @@
 """Shared input checks; provider packages own silicon-specific limits."""
 import re
-from types import MappingProxyType
 
 UINT32_MAX = (1 << 32) - 1
-# Unshifted logical ceiling belongs to the maintained kernel-port policy.
-_FREERTOS_PORTS = MappingProxyType({
-    "GCC/ARM_CM4F": MappingProxyType({
-        "cpu": MappingProxyType({"arch": "cortex-m4", "fpu": "fpv4-sp-d16",
-                                 "float_abi": "hard"}),
-        "syscall_priority": 5,
-    }),
-})
 
 
 class ConfigurationError(ValueError):
@@ -40,21 +31,22 @@ def cpu_abi(cpu):
 
 def resolve_interrupts(cpu, irq, backend, provider):
     """Bind logical IRQ range and syscall policy to a maintained kernel port."""
-    bits = integer(irq["priority_bits"], 1, 8, "IRQ priority bits")
-    maximum = (1 << bits) - 1
-    port = None
-    ceiling = None
-    if backend == "freertos":
-        port = provider.FREERTOS_PORT
-        profile = _FREERTOS_PORTS.get(port)
-        if profile is None:
-            fail(f"Unmaintained FreeRTOS port: {port}")
-        if cpu_abi(cpu) != profile["cpu"]:
-            fail("FreeRTOS kernel CPU ABI differs from the selected SoC")
-        ceiling = integer(profile["syscall_priority"], 1, maximum,
-                          "FreeRTOS syscall priority")
-    return {"priority_bits": bits, "maximum_priority": maximum,
-            "syscall_priority": ceiling, "kernel_port": port}
+    try:
+        from .. import cpu as profiles
+    except ImportError:
+        import cpu as profiles
+    if cpu_abi(cpu) != provider.CPU_ABI:
+        fail("FreeRTOS kernel CPU ABI differs from the selected SoC")
+    # Direct provider-contract tests may supply ABI assertions alone. Their
+    # missing capabilities come from the exact maintained provider, never an
+    # architecture-name guess; public CPU resolution requires every fact.
+    facts = {**provider.CPU_FEATURES, **cpu}
+    irq = {"external_count": provider.EXTERNAL_IRQ_COUNT, **irq}
+    profile = profiles.resolve(facts, irq, backend, enum_abi=provider.ENUM_ABI)
+    result = profile.to_dict()["irq"]
+    if backend == "freertos" and result["kernel_port"] != provider.FREERTOS_PORT:
+        fail(f"Unmaintained FreeRTOS port: {provider.FREERTOS_PORT}")
+    return result
 
 
 def dma_irq(dma, vector):

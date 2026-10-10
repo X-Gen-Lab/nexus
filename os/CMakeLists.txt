@@ -6,7 +6,8 @@ target_include_directories(nexus_os_wait PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/inc
 target_link_libraries(nexus_os_wait PUBLIC nexus_core PRIVATE nexus_owned_warnings nexus_build_options)
 
 add_library(nexus_os_baremetal STATIC baremetal/notify.c)
-target_link_libraries(nexus_os_baremetal PUBLIC nexus_os_wait PRIVATE nexus_owned_warnings nexus_build_options)
+target_link_libraries(nexus_os_baremetal PUBLIC nexus_os_wait
+    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
 
 if(NEXUS_SOC_FAMILY STREQUAL "native")
     find_package(Threads REQUIRED)

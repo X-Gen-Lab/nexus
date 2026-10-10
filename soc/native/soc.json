@@ -26,7 +26,14 @@
     "arch": "native",
     "fpu": "none",
     "float_abi": "native",
-    "dwt_cyccnt": false
+    "dsp": false,
+    "dwt_cyccnt": false,
+    "mpu_version": 0,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
   },
   "clock_profiles": {
     "model": {
@@ -152,6 +159,7 @@
     }
   },
   "irq": {
-    "priority_bits": 4
+    "priority_bits": 4,
+    "external_count": 0
   }
 }

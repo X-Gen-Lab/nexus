@@ -28,6 +28,11 @@ REQUIRED_FILES = (
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
     "arch/include/nexus/arch/arch.h", "arch/cortex_m/nx_arch_cortex_m.c",
     "arch/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
+    "arch/include/nexus/arch/atomic.h", "arch/include/nexus/arch/features.h",
+    "arch/include/nexus/arch/cache.h", "arch/include/nexus/arch/mpu.h",
+    "arch/include/nexus/arch/security.h", "arch/cortex_m/private/mechanisms.h",
+    "arch/cortex_m/nx_arch_cache.c", "arch/cortex_m/nx_arch_mpu.c",
+    "arch/cortex_m/nx_arch_security.c",
     "core/src/request.c", "io/include/nexus/io/gpio.h",
     "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
     "boards/stm32f407_qiming_v31/board.json",
@@ -36,6 +41,8 @@ REQUIRED_FILES = (
     "soc/stm32f407/soc.json", "soc/gd32f470/soc.json",
     "tools/configure/configure.py", "cmake/platform/Firmware.cmake",
     "tools/configure/authored.py", "tools/configure/ir.py",
+    "tools/configure/cpu.py", "tools/configure/runtime.py",
+    "cmake/platform/Runtime.cmake", "os/freertos/prepare_m7_integer.py",
     "tools/configure/providers/__init__.py",
     "tools/configure/providers/common.py",
     "tools/configure/providers/native/__init__.py",
@@ -60,6 +67,17 @@ REQUIRED_FILES = (
     "cmake/package/NexusConfig.cmake.in", "cmake/package/NexusConfigVersion.cmake.in",
     "cmake/package/package_source_sdk.py")
 MANIFEST = ".nexus-source-sdk.json"
+# Required payload identity is separate from CMake's production source graph.
+# Every exposed kernel profile must survive a rehashed omission attempt.
+for _port in ("ARM_CM0", "ARM_CM3", "ARM_CM4F", "ARM_CM7/r0p1",
+              "ARM_CM23_NTZ/non_secure", "ARM_CM33_NTZ/non_secure",
+              "ARM_CM55_NTZ/non_secure", "ARM_CM85_NTZ/non_secure"):
+    REQUIRED_FILES += tuple(f"ext/freertos/portable/GCC/{_port}/{name}"
+                            for name in ("port.c", "portmacro.h"))
+    if _port in {"ARM_CM0", "ARM_CM23_NTZ/non_secure",
+                  "ARM_CM33_NTZ/non_secure", "ARM_CM55_NTZ/non_secure",
+                  "ARM_CM85_NTZ/non_secure"}:
+        REQUIRED_FILES += (f"ext/freertos/portable/GCC/{_port}/portasm.c",)
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
 

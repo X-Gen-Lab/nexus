@@ -9,12 +9,26 @@
  */
 #include "nexus/os/freertos.h"
 #include "nexus/arch/arch.h"
+#include "nexus/arch/atomic.h"
 #include <limits.h>
 #include <string.h>
 
-_Static_assert(__GCC_ATOMIC_INT_LOCK_FREE == 2 &&
-                   sizeof(uint32_t) == sizeof(unsigned),
-               "FreeRTOS notifications require lock-free sequence publication");
+/* Native kernel fixtures have no hardware CPU facts; their context model is
+ * explicit in the test target. MCU consumers must supply validated facts. */
+#ifndef NEXUS_CPU_HAS_BASEPRI
+#if defined(__arm__) || defined(__thumb__)
+#error "FreeRTOS requires validated CPU interrupt-mask facts"
+#else
+#define NEXUS_CPU_HAS_BASEPRI 1
+#endif
+#endif
+#ifndef NEXUS_CPU_EXTERNAL_IRQ_COUNT
+#if defined(__arm__) || defined(__thumb__)
+#error "FreeRTOS requires validated external IRQ bounds"
+#else
+#define NEXUS_CPU_EXTERNAL_IRQ_COUNT 240
+#endif
+#endif
 
 #if defined(__arm__) || defined(__thumb__) || defined(NEXUS_FREERTOS_MODEL)
 #ifndef NX_FREERTOS_PRIORITY_GROUP
@@ -33,17 +47,31 @@ static bool task_context_allowed(void) {
         return false;
     }
     nx_arch_irq_masks_t masks = nx_arch_irq_masks();
-    if (masks.primask != 0 || masks.faultmask != 0) {
+    if (masks.faultmask != 0) {
+        return false;
+    }
+#if NEXUS_CPU_HAS_BASEPRI
+    if (masks.primask != 0) {
         return false;
     }
     if (masks.basepri == 0) {
         return true;
     }
-    /* The pinned CM4F port keeps its syscall mask while its pre-scheduler
+    /* Mainline ports keep their syscall mask while their pre-scheduler
      * critical nesting is nonzero. Accept that exact value only before start;
      * running or suspended tasks must restore every incoming manual mask. */
     return masks.basepri == configMAX_SYSCALL_INTERRUPT_PRIORITY &&
            xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED;
+#else
+    if (masks.basepri != 0 || masks.primask > 1) {
+        return false;
+    }
+    /* Baseline ports retain PRIMASK, not BASEPRI, until scheduler start. The
+     * value grants bootstrap permission; it cannot establish mask provenance.
+     */
+    return masks.primask == 0 ||
+           xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED;
+#endif
 }
 
 /** \brief Reject kernel API calls above the maintained syscall ceiling. */
@@ -53,13 +81,21 @@ bool nx_freertos_isr_allowed(void) {
     }
 #if defined(__arm__) || defined(__thumb__) || defined(NEXUS_FREERTOS_MODEL)
     uint32_t exception = nx_arch_exception_number();
-    if (exception < 16 || exception > 255) {
+    if (exception < 16 || exception - 16 >= NEXUS_CPU_EXTERNAL_IRQ_COUNT) {
         return false;
     }
+#if NEXUS_CPU_HAS_BASEPRI
     uint32_t grouping = NX_FREERTOS_PRIORITY_GROUP();
-    return grouping <= 7u - configPRIO_BITS &&
+    uint32_t maximum_grouping =
+        configPRIO_BITS >= 7 ? 0u : 7u - configPRIO_BITS;
+    return grouping <= maximum_grouping &&
            NX_FREERTOS_IRQ_PRIORITY(exception) >=
                configMAX_SYSCALL_INTERRUPT_PRIORITY;
+#else
+    /* PRIMASK excludes every configurable exception; Baseline kernels do not
+     * own a BASEPRI syscall ceiling or a Mainline priority-group contract. */
+    return true;
+#endif
 #else
     return false;
 #endif
@@ -86,7 +122,7 @@ static TickType_t deadline_ticks(nx_time_us_t deadline) {
 /** \brief Snapshot the lock-free wake sequence. */
 static uint32_t notify_arm(void* context) {
     nx_freertos_notify_t* notification = context;
-    return __atomic_load_n(&notification->sequence, __ATOMIC_ACQUIRE);
+    return nx_atomic_u32_load_acquire(&notification->sequence);
 }
 
 /** \brief Consume a binary latch while retaining sequence as the predicate. */
@@ -98,9 +134,8 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
         return NX_ERROR_CONTEXT;
     }
     uint32_t expected = 0;
-    if (!__atomic_compare_exchange_n(&notification->waiting, &expected, 1,
-                                     false, __ATOMIC_ACQ_REL,
-                                     __ATOMIC_ACQUIRE)) {
+    if (!nx_atomic_u32_compare_exchange_acq_rel(&notification->waiting,
+                                                &expected, 1)) {
         return NX_ERROR_BUSY;
     }
     nx_result_t result = NX_SUCCESS;
@@ -115,7 +150,7 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
     if (notify_arm(context) != sequence) {
         result = NX_SUCCESS;
     }
-    __atomic_store_n(&notification->waiting, 0, __ATOMIC_RELEASE);
+    nx_atomic_u32_store_release(&notification->waiting, 0);
     return result;
 }
 
@@ -127,7 +162,7 @@ static nx_result_t notify_wake(void* context) {
         (!isr && !task_context_allowed())) {
         return NX_ERROR_CONTEXT;
     }
-    __atomic_fetch_add(&notification->sequence, 1, __ATOMIC_RELEASE);
+    (void)nx_atomic_u32_fetch_add_release(&notification->sequence, 1);
     if (isr) {
         BaseType_t switch_required = pdFALSE;
         (void)xSemaphoreGiveFromISR(notification->handle, &switch_required);
@@ -170,7 +205,7 @@ nx_result_t nx_freertos_notify_destroy(nx_freertos_notify_t* notification) {
     if (notification == NULL || notification->handle == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (__atomic_load_n(&notification->waiting, __ATOMIC_ACQUIRE) != 0) {
+    if (nx_atomic_u32_load_acquire(&notification->waiting) != 0) {
         return NX_ERROR_BUSY;
     }
     vSemaphoreDelete(notification->handle);
@@ -284,9 +319,9 @@ nx_result_t nx_freertos_queue_send(nx_freertos_queue_t* queue, const void* item,
     if (wait_ticks != 0 && xTaskGetSchedulerState() != taskSCHEDULER_RUNNING) {
         return NX_ERROR_CONTEXT;
     }
-    __atomic_fetch_add(&queue->users, 1, __ATOMIC_ACQ_REL);
+    (void)nx_atomic_u32_fetch_add_acq_rel(&queue->users, 1);
     BaseType_t result = xQueueSend(queue->handle, item, wait_ticks);
-    __atomic_fetch_sub(&queue->users, 1, __ATOMIC_RELEASE);
+    (void)nx_atomic_u32_fetch_sub_release(&queue->users, 1);
     return result == pdTRUE ? NX_SUCCESS : NX_ERROR_TIMEOUT;
 }
 
@@ -303,9 +338,9 @@ nx_result_t nx_freertos_queue_receive(nx_freertos_queue_t* queue, void* item,
     if (wait_ticks != 0 && xTaskGetSchedulerState() != taskSCHEDULER_RUNNING) {
         return NX_ERROR_CONTEXT;
     }
-    __atomic_fetch_add(&queue->users, 1, __ATOMIC_ACQ_REL);
+    (void)nx_atomic_u32_fetch_add_acq_rel(&queue->users, 1);
     BaseType_t result = xQueueReceive(queue->handle, item, wait_ticks);
-    __atomic_fetch_sub(&queue->users, 1, __ATOMIC_RELEASE);
+    (void)nx_atomic_u32_fetch_sub_release(&queue->users, 1);
     return result == pdTRUE ? NX_SUCCESS : NX_ERROR_TIMEOUT;
 }
 
@@ -317,7 +352,7 @@ nx_result_t nx_freertos_queue_destroy(nx_freertos_queue_t* queue) {
     if (queue == NULL || queue->handle == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (__atomic_load_n(&queue->users, __ATOMIC_ACQUIRE) != 0 ||
+    if (nx_atomic_u32_load_acquire(&queue->users) != 0 ||
         uxQueueMessagesWaiting(queue->handle) != 0) {
         return NX_ERROR_BUSY;
     }

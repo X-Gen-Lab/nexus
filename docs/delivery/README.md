@@ -8,7 +8,8 @@
 | 阅读入口 | 说明 |
 |---|---|
 | [当前架构](architecture.md) | 物理目录、依赖方向、执行与资源责任 |
-| [Cortex-M 架构接入](cortex-m.md) | CPU 原语、掩码／特权、内核启动与跨内核编译边界 |
+| [Cortex-M 软件支持](cortex-m.md) | 九核 ABI/feature、Core/Arch/OS runtime 与配置示例 |
+| [Arch 契约](../design/arch-contracts.md) | 原子操作、掩码、cache/MPU/SAU 的上下文和所有权 |
 | [支持范围](support.md) | 首发模式、三块 Board 与精确未知项 |
 | [派生能力矩阵](capabilities.md) | facts/routes、参考 Board、软件夹具和生产定义的一致性 |
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
@@ -17,6 +18,12 @@
 | [后续迭代](next-iterations.md) | 实板验收、测量驱动的扩展与团队流程 |
 | [33 项实施台账](../design/next-generation-execution.csv) | 每项实现路径、证据入口、软件和物理退出状态 |
 | [Factory 与 TDD 迭代台账](../design/factory-platform-execution.csv) | 本次 P0–P5 的具体实现与条件验收 |
+
+CPU 软件层覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85。外部工程可通过一份
+严格 CPU runtime TOML/事实包使用 `nexus_add_runtime` 或安装包的 Runtime
+component，复用 Core/Arch/I/O face 与选定裸机/FreeRTOS adapter。运行时装配
+不生成 SoC、Board、启动或 factory，具体硬件、产品任务和安全策略仍由外部工程
+负责；当前完整平台保持 F407/F470 三板，物理 HIL 全部未执行。
 
 截至本轮开发验证，已有生产 `.c` 的 Native/寄存器故障模型、真实 ARM 编译与链接、
 三板资源矩阵、外部应用开发构建、工具负路径与 HIL 准入工装。开发执行结果不自动

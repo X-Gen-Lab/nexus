@@ -4,6 +4,16 @@ add_test(NAME contract_configuration_rejection
         -s "${NEXUS_SOURCE_DIR}/tools/configure" -p "test_*.py")
 set_tests_properties(contract_configuration_rejection PROPERTIES
     WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}")
+add_test(NAME contract_m7_integer_overlay
+    COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/os/freertos/test_m7_integer_overlay.py")
+set_tests_properties(contract_m7_integer_overlay PROPERTIES
+    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}")
+add_test(NAME contract_runtime_sdk
+    COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tests/contracts/test_runtime_sdk.py")
+set_tests_properties(contract_runtime_sdk PROPERTIES
+    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" TIMEOUT 180)
 
 function(nexus_behavior_test name)
     cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES;INCLUDES;DEFINITIONS" ${ARGN})

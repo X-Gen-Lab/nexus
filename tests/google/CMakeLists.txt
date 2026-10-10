@@ -300,6 +300,11 @@ target_compile_options(nexus_gd32_i2c_register_test PRIVATE
 
 include(arch_cortex.cmake)
 include(arch_native.cmake)
+include(atomic_tests.cmake)
+include(arch_cache.cmake)
+include(arch_mpu.cmake)
+include(arch_security.cmake)
+include(arch_native_mechanism.cmake)
 include(freertos_context.cmake)
 include(gd32_arch.cmake)
 

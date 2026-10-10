@@ -13,7 +13,7 @@
 #error "Nexus Cortex-M primitives require GCC or Clang"
 #endif
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) ||                   \
-    defined(__ARM_ARCH_8M_MAIN__)
+    defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8_1M_MAIN__)
 #define NX_ARCH_CORTEX_M_PRIORITY_MASK 1
 #elif defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
 #define NX_ARCH_CORTEX_M_PRIORITY_MASK 0

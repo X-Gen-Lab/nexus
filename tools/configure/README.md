@@ -147,8 +147,8 @@ checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
 `ir.py` defines frozen `ControllerIR`, `EndpointIR`, `MemoryBudgetIR`,
-`InterruptProfileIR` and `ConfigurationIR`. Controller options use frozen GPIO,
-UART, SPI, I2C,
+`CpuProfileIR`, `InterruptProfileIR` and `ConfigurationIR`. Controller options use
+frozen GPIO, UART, SPI, I2C,
 EXTI, PWM and ADC records. IRQ priority and kernel-call intent are a nested record;
 ADC channel and sample sequences are tuples. Constructor emitters consume these
 named decisions directly; reviewed hardware facts retain an immutable Mapping
@@ -175,21 +175,70 @@ resolution. Arch and build options accept only maintained combinations; a new
 non-Native family does not implicitly receive Cortex-M4 flags. These configuration
 modules do not select software source files: CMake targets retain that authority.
 
-CPU facts also declare the boolean `dwt_cyccnt` capability. Interrupt facts
-declare `irq.priority_bits`; each maintained provider verifies the exact chip
-values before resolving the logical priority range. Native retains a four-bit
-model priority range without claiming a physical NVIC or DWT. Authored `[abi]`
-continues to assert only architecture, FPU and float ABI, so an assembly cannot
-override chip capabilities.
+`cpu.py` is the shared strict CPU profile resolver. Reviewed CPU facts declare
+architecture, DSP, FPU, float ABI, DWT cycle counter, MPU format, instruction
+and data cache line sizes, execution security state, accessible SAU and MVE
+variant. Every optional capability must be present as a fact; a CPU name does
+not enable optional hardware. IRQ facts declare priority width and actual
+external-vector count. The maintained SoC providers verify the exact chip values
+before resolution. Native retains a four-bit model range and zero external
+vectors without claiming a physical NVIC or DWT. Authored `[abi]` asserts only
+architecture, FPU and float ABI; an assembly cannot override chip capabilities.
 
-The selected FreeRTOS provider names its maintained `GCC/ARM_CM4F` port. That
-port's immutable profile binds its CPU ABI and logical syscall ceiling; the
-resolver verifies that the ceiling fits the chip's priority width before any
-instance is emitted. The frozen IRQ decision supplies generated priority and
-syscall macros, the kernel port selection and the Arch DWT compile fact. Baremetal
-and Native have no kernel syscall ceiling. Unknown ports, contradictory CPU
-facts and invalid OS-calling IRQ priorities fail closed. Adding a primitive
-Arch implementation does not add a selectable SoC, ABI or kernel port.
+The resolver accepts CPU software profiles for Cortex-M0, M0+, M3, M4, M7,
+M23, M33, M55 and M85. It produces one immutable ABI, compiler flag list,
+Arch capability set and IRQ/kernel-port decision. Hardware capability, software
+component support and physical qualification remain separate: the full assembly
+providers still support Native, STM32F407 and GD32F470 only.
+
+The required `cpu.dsp` fact is a strict boolean. M33 can include or omit DSP;
+`false` emits `-mcpu=cortex-m33+nodsp`, while `true` enables its reviewed DSP
+instruction set. Native, M0/M0+/M3/M23 require `false`; M4/M7/M55/M85 require
+`true` because their DSP extension is always present. The generated
+`NEXUS_CPU_HAS_DSP` macro has the same value. Missing or contradictory facts are
+rejected. An assembly cannot infer DSP from compiler defaults or override it.
+
+| CPU execution profile | FreeRTOS context port | Mask contract |
+| --- | --- | --- |
+| M0 / M0+ | `GCC/ARM_CM0` | PRIMASK |
+| M3 / M4 without FPU | `GCC/ARM_CM3` | BASEPRI |
+| M4 with FPU | `GCC/ARM_CM4F` | BASEPRI |
+| M7 without FPU | owned `nexus/ARM_CM7_integer` erratum overlay | BASEPRI |
+| M7 with FPU | `GCC/ARM_CM7/r0p1` | BASEPRI |
+| M23 | `GCC/ARM_CM23_NTZ/non_secure` | PRIMASK |
+| M33 / M55 / M85 | corresponding `GCC/ARM_CM*_NTZ/non_secure` | BASEPRI |
+
+The v8 NTZ ports execute one declared security state and do not introduce Secure
+gateway calls. Secure execution emits `-mcmse`; NonSecure and single-state
+builds do not. FPU/MVE save contracts follow exact feature facts. Integer MVE
+without an FPU uses softfp ABI because GNU soft ABI disables MVE. An absent
+MVE/FPU on M55/M85 emits explicit instruction exclusions. CPU flags reach compile
+and link from this resolver, with no second CMake CPU/FPU table.
+
+Mainline FreeRTOS uses a maintained logical syscall ceiling of 5, or 10 for
+eight implemented priority bits to meet the port's even-priority requirement.
+Baseline FreeRTOS uses PRIMASK and a logical ceiling of zero. Priority width,
+actual external-vector count, mask kind and syscall range are independent facts.
+M0/M0+/M23 have exactly two implemented priority bits and four priority levels;
+Mainline profiles permit three to eight bits, narrowed by the actual SoC fact.
+The processor limits are 32 external IRQs for M0/M0+, 240 for M3/M4/M7/M23,
+and 480 for M33/M55/M85. System exceptions are excluded: 496 total exceptions
+on M33/M55/M85 is not 496 external interrupts. CMSIS register-array capacity
+does not establish the processor limit. The actual count remains a required
+SoC fact and cannot exceed that processor limit; the limit is never a default
+claim that a chip implements every vector.
+Baremetal and Native have no kernel syscall ceiling. Invalid widths, counts,
+optional-feature combinations and unsupported backends fail closed.
+
+External SoC packages consume `cpu.resolve` and its immutable `CpuProfileIR`.
+The public CPU/Core/Arch/OS runtime entry consumes a separate authored runtime
+TOML through `runtime.py`, using the same resolver and `emit_profile`. It emits
+no device factory, pin route, startup, SoC driver or memory layout. The machine
+CLI `cpu.py --facts cpu.json --backend baremetal --output build/cpu-config`
+accepts a strict fact package containing `schema_version = 1`, CPU/IRQ records
+and a positive uint32 `clock_hz`. Its owned output is published atomically;
+source parents, symlink paths and unowned output are protected. The CLI does not
+replace the single authored TOML entry used by CMake.
 
 Generated private storage has separate role namespaces: `s_nx_port_*`,
 `s_nx_endpoint_*`, `s_nx_cs_*`, receive/model buffers and platform lifecycle state.

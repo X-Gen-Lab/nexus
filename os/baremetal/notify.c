@@ -1,19 +1,20 @@
 /**
  * \file            notify.c
- * \brief           Lock-free bare-metal sequence notification
+ * \brief           Bounded bare-metal sequence publication
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-09
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/arch/atomic.h"
 #include "nexus/os/baremetal.h"
 #include <stddef.h>
 
 /** \brief Snapshot published wake sequence. */
 static uint32_t notify_arm(void* context) {
     nx_baremetal_notify_t* notification = context;
-    return __atomic_load_n(&notification->sequence, __ATOMIC_ACQUIRE);
+    return nx_atomic_u32_load_acquire(&notification->sequence);
 }
 
 /** \brief Observe a wake or leave progress to the explicit owner loop. */
@@ -31,7 +32,7 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
 /** \brief Publish a wake without allocation or a completion queue. */
 static nx_result_t notify_wake(void* context) {
     nx_baremetal_notify_t* notification = context;
-    __atomic_fetch_add(&notification->sequence, 1, __ATOMIC_RELEASE);
+    (void)nx_atomic_u32_fetch_add_release(&notification->sequence, 1);
     return NX_SUCCESS;
 }
 
@@ -42,10 +43,7 @@ nx_result_t nx_baremetal_notify_init(nx_baremetal_notify_t* notification,
     if (notification == NULL || now_us == NULL) {
         return NX_ERROR_INVALID;
     }
-    notification->sequence = 0;
-    if (!__atomic_always_lock_free(sizeof(notification->sequence), 0)) {
-        return NX_ERROR_UNSUPPORTED;
-    }
+    nx_atomic_u32_store_relaxed(&notification->sequence, 0);
     notification->now_us = now_us;
     notification->clock_context = clock_context;
     return NX_SUCCESS;

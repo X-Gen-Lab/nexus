@@ -26,7 +26,7 @@ class InterruptProfileTests(unittest.TestCase):
         for value in (True, 0, 9, 3):
             with self.subTest(value=value):
                 soc = gate.load(gate.ROOT / "soc/stm32f407/soc.json")
-                soc["irq"] = {"priority_bits": value}
+                soc["irq"]["priority_bits"] = value
                 with self.assertRaisesRegex(gate.ConfigurationError,
                                             "IRQ priority bits"):
                     gate.validate_soc(soc, "STM32F407ZGT6")
@@ -45,10 +45,10 @@ class InterruptProfileTests(unittest.TestCase):
                                                  {"priority_bits": bits},
                                                  "freertos", provider)
                 self.assertEqual(irq["maximum_priority"], (1 << bits) - 1)
-                self.assertEqual(irq["syscall_priority"], 5)
+                self.assertEqual(irq["syscall_priority"], 10 if bits == 8 else 5)
                 self.assertEqual(irq["kernel_port"], "GCC/ARM_CM4F")
         with self.assertRaisesRegex(gate.ConfigurationError,
-                                    "syscall priority"):
+                                    "IRQ priority bits"):
             common.resolve_interrupts(provider.CPU_ABI,
                                       {"priority_bits": 2}, "freertos", provider)
 

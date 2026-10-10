@@ -295,7 +295,14 @@
     "arch": "cortex-m4",
     "fpu": "fpv4-sp-d16",
     "float_abi": "hard",
-    "dwt_cyccnt": true
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "mpu_version": 7,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
   },
   "clock_profiles": {
     "hxtal25-pll200": {
@@ -470,6 +477,7 @@
     "irq:TIMER1_IRQn"
   ],
   "irq": {
-    "priority_bits": 4
+    "priority_bits": 4,
+    "external_count": 91
   }
 }

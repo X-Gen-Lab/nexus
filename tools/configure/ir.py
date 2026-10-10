@@ -48,6 +48,36 @@ class InterruptProfileIR:
     maximum_priority: int
     syscall_priority: int | None
     kernel_port: str | None
+    external_count: int
+    mask_kind: str
+
+
+@dataclass(frozen=True)
+class CpuProfileIR(Record):
+    arch: str
+    fpu: str
+    float_abi: str
+    enum_abi: str
+    backend: str
+    arch_macro: str
+    has_basepri: bool
+    atomic_backend: str
+    irq: InterruptProfileIR
+    compile_options: tuple[str, ...]
+    definitions: Mapping
+    values: Mapping
+
+    @classmethod
+    def from_validated(cls, record):
+        return cls(*(record[name] for name in (
+            "arch", "fpu", "float_abi", "enum_abi", "backend", "arch_macro",
+            "has_basepri", "atomic_backend")),
+                   InterruptProfileIR(**record["irq"]),
+                   tuple(record["compile_options"]),
+                   freeze(record["definitions"]), freeze(record))
+
+    def to_dict(self):
+        return thaw(self)
 
 
 @dataclass(frozen=True)
@@ -183,6 +213,7 @@ class ConfigurationIR(Record):
     soc_family: str
     backend: str
     irq: InterruptProfileIR
+    cpu_profile: CpuProfileIR
     controllers: tuple[ControllerIR, ...]
     devices: tuple[EndpointIR, ...]
     memory_budget: MemoryBudgetIR
@@ -203,7 +234,8 @@ class ConfigurationIR(Record):
                                 budgets.get("static_ram_bytes"),
                                 budgets.get("flash_load_bytes"))
         irq = InterruptProfileIR(**result["irq"])
-        return cls(result["board"], result["soc_family"], result["backend"], irq,
+        cpu = CpuProfileIR.from_validated(result["cpu_profile"])
+        return cls(result["board"], result["soc_family"], result["backend"], irq, cpu,
                    controllers, devices, memory, MappingProxyType(values))
 
     def to_dict(self):

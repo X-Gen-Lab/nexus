@@ -1,6 +1,6 @@
 /**
  * \file            FreeRTOSConfig.h
- * \brief           Maintained static-only Cortex-M4F kernel profile
+ * \brief           Maintained static-only Cortex-M kernel profiles
  * \author          Nexus Team
  */
 #ifndef FREERTOS_CONFIG_H
@@ -12,8 +12,16 @@
 extern "C" {
 #endif
 
-#define configUSE_PREEMPTION                         1
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION      1
+#define configUSE_PREEMPTION                    1
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION NEXUS_CPU_HAS_BASEPRI
+/* MVE and scalar FP share the coprocessor register bank and extended exception
+ * frame. This kernel switch enables its context/lazy-frame initialization; CPU
+ * facts and +nofp compiler flags still distinguish integer-only MVE from FP. */
+#define configENABLE_FPU                             (NEXUS_CPU_HAS_FPU || NEXUS_CPU_HAS_MVE)
+#define configENABLE_MVE                             NEXUS_CPU_HAS_MVE
+#define configENABLE_MPU                             0
+#define configENABLE_TRUSTZONE                       0
+#define configRUN_FREERTOS_SECURE_ONLY               NEXUS_CPU_SECURE_ONLY
 #define configCPU_CLOCK_HZ                           NEXUS_CORE_HZ
 #define configTICK_RATE_HZ                           1000u
 #define configMAX_PRIORITIES                         8

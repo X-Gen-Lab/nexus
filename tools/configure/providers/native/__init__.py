@@ -8,6 +8,12 @@ ENUM_ABI = 'native-int'
 IRQ_PRIORITY_BITS = 4
 DWT_CYCCNT = False
 FREERTOS_PORT = None
+EXTERNAL_IRQ_COUNT = 0
+CPU_FEATURES = MappingProxyType({
+    'dwt_cyccnt': False, 'mpu_version': 0, 'icache_line_bytes': 0,
+    'dcache_line_bytes': 0, 'security': 'single', 'sau': False, 'mve': 'none',
+    'dsp': False,
+})
 PREFIX = 'native'
 MODEL = True
 DMA_VECTOR = None

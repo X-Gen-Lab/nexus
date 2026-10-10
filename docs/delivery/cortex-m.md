@@ -1,115 +1,211 @@
-# Cortex-M 架构接入与验证边界
+# Cortex-M 软件支持与平台接入边界
 
-Arch 只拥有 CPU 局部机制：中断保存恢复、当前掩码、异常号、特权、屏障和可选
-周期快照。实现按编译期目标选择，不建立运行时 CPU 对象、注册表、锁池或 worker。
-设备实例仍由 TOML → 不可变 IR → 静态 typed factory 装配，使用共享多态方法表。
+Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。
+同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机/FreeRTOS
+运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。
+选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。
+当前完整 SoC 仍为 STM32F407/GD32F470，参考 Board 仍为三板，实板 HIL 未执行。
 
-## 分层与依赖
+详细所有权、上下文与拒绝语义见 [Arch 契约](../design/arch-contracts.md)，
+OS 生命周期见 [OS 适配](../../os/README.md)，精确整平台范围见
+[支持矩阵](support.md)。旧 HEAD 的软件候选和 qualification 不继承到本轮。
 
-```mermaid
-flowchart BT
-    A[Arch CPU 原语] --> S[SoC 控制器和单调时钟]
-    A --> O[可选 OS 上下文和内核适配]
-    S --> I[公共 typed I/O]
-    I --> C[可选通用组件]
-    O --> C
-    B[Board 只读接线事实] --> G[严格配置生成器]
-    F[SoC CPU / IRQ / 内存事实] --> G
-    T[外部 TOML assembly] --> G
-    G --> P[静态 Platform / factory]
-    S --> P
-    C --> E[外部应用 / 产品]
-    P --> E
+## 九核与可选能力
+
+下表列出解析器接受的能力格式；可选能力必须由具体芯片事实证明，不能从 CPU
+名称推断存在或已启用。`none`/零明确表示未声明该能力，不做运行时发现。
+
+| CPU | 原子 RMW / IRQ mask | 可选硬件格式 | 维护的 FreeRTOS port |
+|---|---|---|---|
+| M0 | saved-PRIMASK / PRIMASK | 无 FPU/MVE/cache/MPU/SAU | GCC/ARM_CM0 |
+| M0+ | saved-PRIMASK / PRIMASK | 可选 v7-format MPU | GCC/ARM_CM0 |
+| M3 | compiler exclusive / BASEPRI | v7 MPU、DWT | GCC/ARM_CM3 |
+| M4 | compiler exclusive / BASEPRI | fpv4-sp-d16、v7 MPU、DWT | 无 FP 用 CM3；有 FP 用 CM4F |
+| M7 | compiler exclusive / BASEPRI | fpv5-sp-d16/fpv5-d16、32-byte cache、v7 MPU、DWT | 无 FP 用受审 integer overlay；有 FP 用 CM7/r0p1 |
+| M23 | compiler exclusive / PRIMASK | v8 MPU、显式安全状态、Secure SAU | ARM_CM23_NTZ/non_secure |
+| M33 | compiler exclusive / BASEPRI | 可选 DSP、fpv5-sp-d16、v8 MPU、DWT、显式安全状态、Secure SAU | ARM_CM33_NTZ/non_secure |
+| M55 | compiler exclusive / BASEPRI | 显式 FPU/MVE、32-byte cache、v8 MPU、DWT、安全状态、Secure SAU | ARM_CM55_NTZ/non_secure |
+| M85 | compiler exclusive / BASEPRI | 显式 FPU/MVE、32-byte cache、v8 MPU、DWT、安全状态、Secure SAU | ARM_CM85_NTZ/non_secure |
+
+Cortex-M 使用 short-enums ABI。无 FPU、无 MVE 时使用 soft；有 FPU 时明确选择
+hard 或 softfp。M55/M85 的 MVE 为 `none`、`integer` 或 `float`：无 MVE 添加
+`+nomve`，无 scalar FP 添加 `+nofp`；integer-only MVE 使用 softfp，FPU 事实
+仍为 `none`。FP-MVE 必须同时声明可用 FPU。M55/M85 的 FPU 选择为 `auto`、
+`fpv5-sp-d16` 或 `fpv5-d16`，`auto` 是显式编译器选项，不是硬件自动探测。
+
+安全状态为 `single`、`secure` 或 `nonsecure`。只有支持安全扩展的 M23/M33/
+M55/M85 可声明后两者；Secure 编译添加 `-mcmse`。SAU 仅允许 Secure 事实为真。
+Cache line 仅允许零或 32 bytes，MPU 为零或该内核维护的 v7/v8 格式。M0/M0+/
+M23 禁止 DWT capability；其他内核也必须显式声明才能读已启用的周期计数器。
+
+IRQ priority width、external IRQ count 和 clock 是芯片事实。PRIMASK profile
+固定为 2 个优先级 bits，BASEPRI profile 支持 3–8 bits。M0/M0+ 最多支持
+32 个 external IRQ，M3/M4/M7/M23 为 240，M33/M55/M85 为 480；SoC 必须
+声明实际有效范围。这些边界不代替厂商芯片事实或电气验证。
+
+## CPU 机制与所有权
+
+Arch 无 SoC、I/O、内核或厂商 SDK 依赖。生产算法通过内联指令/MMIO 边界执行；
+GoogleTest/GoogleMock 只替换该硬件边界。Native 提供真实递归线程排他、C11
+fence 与 publication 行为，不模拟 NVIC、物理 IRQ、特权切换或真实周期。
+
+PRIMASK token 只在同 CPU/线程逆序恢复一次，保留输入 BASEPRI/FAULTMASK。
+被保护元数据只允许特权 Thread/可配置 IRQ 参与，NMI/HardFault、其他核、安全
+世界和 DMA 不在排他域内。上下文查询不授权 kernel ISR 调用；屏障不证明外设
+idle 或 DMA drain。DWT 不启用/复位计数器，也不作为单调 deadline 时钟。
+
+对齐 word acquire/release load/store 不屏蔽 IRQ。M0/M0+ RMW 使用 bounded
+saved-PRIMASK exclusion，不静默链接 libatomic；其他核使用 compiler lock-free
+RMW，exclusive retry 不等于固定 cycles。request/buffer/notify 生命周期仍由
+owner 保证，atomic publication 不自动回收对象。
+
+Cache 操作只维护独占的完整 32-byte lines，不 rounding、不 enable；所有相关
+cache 在写入前完成 capability/enabled 检查。DMA receive 前置/排空后的维护、
+可达地址和 buffer loan 由 provider/产品负责。MPU v7/v8 与 SAU 使用不同精确
+encoder；实际单 region 编程要求本域内 privileged Thread、输入 PRIMASK=1，
+相应单元已经 disabled，保留 CTRL、其他 region 与输入 RNR，不隐式启用。
+
+产品拥有 MPU/MAIR policy、SAU/IDAU、NSC veneers、安全启动、共享资源协议和
+恢复。CPU 机制不提供用户任务 MPU 隔离，也不把 range encode 当作安全验收。
+
+## FreeRTOS 软件合同
+
+全部 CPU profile 选择锁定内核的精确 port 源码；M0 及 v8-M port 同时编译所需
+独立 assembly 文件。M7 无 FP 使用从锁定 CM3 派生的受审构建 overlay，添加
+errata 837070 的 PRIMASK-preserving BASEPRI helpers 与 PendSV 处理，厂商
+源文件保持锁定内容。禁止为了省事将所有内核映射到 CM4F。
+
+Armv8-M 的 NTZ、Secure-only 和 standalone NonSecure 由显式事实选择，使用
+`configENABLE_TRUSTZONE=0` 的维护路径。没有 Secure task heap、双世界 task
+调用或 gateway；Secure 启动、IDAU/SAU 与 NonSecure coprocessor access 仍由
+外部工程负责。用户 MPU task gateway 未实现，API 和 task 均为特权合同。
+
+M55/M85 使用实际 MVE-aware context port。`configENABLE_FPU` 在 FP 或 MVE
+存在时打开共享寄存器 bank 和 extended/lazy frame；integer-only MVE 不因此
+获得 scalar FP capability。Upper bank 的保存路径在 port 源码/对象中单独检查；
+VPR/lower bank 依赖硬件 extended exception framing，是该 port 的验收假设，
+必须结合架构资料与实板核对。编译/ELF 不能证明完整 payload 保留或真实 FP/MVE
+切换，不替代物理验收。
+
+任务、TCB、stack、queue 和 notification storage 由调用者静态提供，内核不链接
+heap allocator。应用拥有 scheduler start、workers、队列深度、公平性、shutdown
+进度与 join 后的 reclaim；平台启动不启动 scheduler、不生成隐藏任务或 daemon。
+
+运行中 API 要求 privileged、unmasked Thread。仅在 NOT_STARTED 阶段接受锁定
+port 的 canonical bootstrap mask：Baseline 为 PRIMASK=1，Mainline 为精确
+syscall BASEPRI；它们不能证明 mask 的来源，不能在运行/暂停时继承许可。Fault
+mask 与其他 mask 在对象变更前拒绝。IRQ wake 另验证外部异常范围、优先级宽度
+与实际 port 的 syscall 合同，notification 只提示重查 request/sequence 谓词。
+
+## 外部 CPU runtime 配置
+
+完整 SoC 工程继续使用原有严格平台 assembly。仅复用 CPU/Core/OS 时，外部工程
+提供 `runtime.toml` 与芯片包维护的 `cpu.json`。以下是 **M33 NonSecure 软件配置
+示例**，不是新增芯片或 Board 声明；clock、IRQ 数量和可选能力应替换为真实芯片
+的受审事实。无需 Board 文件，也不输出 SoC/设备 factory。
+
+`runtime.toml` 仅接受以下四项，路径相对此 TOML：
+
+```toml
+schema_version = 1
+cpu_facts = "cpu.json"
+backend = "freertos"
+optimization = "Os"
 ```
 
-Arch 不依赖 CMSIS、厂商 SDK、I/O 或内核。SoC 保留实际 IRQ 编号、NVIC 资源、
-DMA 可达区域、外设排空和时钟；Board 保留电气路线。OS 拥有 kernel port、syscall
-ceiling、静态任务／通知／队列及合法调用上下文。产品拥有 MPU／安全策略、任务、
-缓冲布局和恢复责任。GD32 私有 CPU 辅助调用复用 Arch，不再另写 PRIMASK、IPSR
-和屏障指令；外设 readback 和 drain 仍由 SoC 证明。
+`backend` 为 `baremetal` 或 `freertos`，`optimization` 为 `O2`、`Os` 或 `O3`。
+CPU package 和 CPU/IRQ 对象的字段完整且唯一，未知字段、重复 JSON keys、矛盾
+feature/ABI、非法 schema/clock 和 symlink path 被拒绝，不能用 authored override
+伪造芯片能力。
 
-`arch/cortex_m/private/compiler.h` 是私有指令／寄存器边界，生产路径内联为 CPU
-指令。测试只替换该硬件边界，执行真实 `nx_arch_cortex_m.c`；模型不执行 ARM CPU。
-ABI、FPU 和目标选择仍由精确 SoC 事实及 CMake 统一设置。
+```json
+{
+  "schema_version": 1,
+  "cpu": {
+    "arch": "cortex-m33",
+    "dsp": false,
+    "fpu": "none",
+    "float_abi": "soft",
+    "dwt_cyccnt": false,
+    "mpu_version": 8,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "nonsecure",
+    "sau": false,
+    "mve": "none"
+  },
+  "irq": {"priority_bits": 3, "external_count": 64},
+  "clock_hz": 64000000
+}
+```
 
-## 精确支持层级
-
-| 内核 | 原语实现和编译门禁 | 整平台的剩余条件 |
-|---|---|---|
-| M0／M0+ | ARMv6-M；PRIMASK、IPSR、CONTROL、屏障；不读 BASEPRI／FAULTMASK／DWT | 当前 Core／OS 要求无隐藏 helper 的原子操作；尚无受审 RMW 后端、SoC 和内核 port |
-| M3 | ARMv7-M；增加 BASEPRI／FAULTMASK；DWT 由显式事实允许 | 未接入具体芯片、启动、驱动和内核 port |
-| M4 | ARMv7E-M；同一原语实现；当前 F407／F470 声明 DWT | 当前完整软件平台仍固定 M4F、hard-float、short-enums 和 GCC/ARM_CM4F；三板 HIL 未执行 |
-| M7 | ARMv7E-M 原语可编译 | cache line 所有权、DMA 可达区域、启动、驱动和 kernel port 须独立接入 |
-| M23 | ARMv8-M Baseline；不读 BASEPRI／FAULTMASK；DWT 禁用 | 安全状态、SoC 和内核 port 须独立接入；其独占 RMW 能力不能按 M0 推断 |
-| M33 | ARMv8-M Mainline；当前安全状态的掩码／特权查询 | Secure／NonSecure 链接、异常、共享资源和 kernel port 未接入 |
-| M55／M85 | 未维护，拒绝选择 | 不复用 CM4F port 来声称 FPU／MVE／安全上下文支持 |
-
-标准平台配置仍只接受已维护的 Native 和 Cortex-M4F ABI。新增芯片必须明确登记
-provider、SoC facts、startup／linker、驱动、OS port、SDK 和验证范围；CPU 原语
-源码可以编译，不代表这些条件已经完成。
-
-锁定 GCC 的原子 probe 区分 acquire load、release store 和 fetch-add。M0／M0+
-的 RMW 会引用 `__atomic_fetch_add_4`；当前平台不静默链接 libatomic，也不把
-`volatile` 当作同步替代。M23 的 probe 为内联独占操作，不能与 M0 合并分类。
-无 helper、lock-free 或 O(1) 均不证明无重试、固定 cycles 或最坏中断延迟。
-
-## CPU 与调用合同
-
-- `nx_arch_irq_save/restore` 只改变 PRIMASK，保留输入状态；token 同 CPU／线程、
-  严格逆序、恰好恢复一次。当前实现保留 DSB／ISB，不为减少指令而删除必要排序。
-- `nx_arch_irq_masks` 返回 PRIMASK／BASEPRI／FAULTMASK 的查询快照；不存在的
-  寄存器为零。它不是 restore token，不授权解除别人的屏蔽或跨安全域互斥。
-- `nx_arch_exception_number` 返回 IPSR 身份，零为 Thread mode；不是 SoC IRQ ID，
-  也不证明可以调用内核。Handler mode 的特权不能由被中断线程的 nPRIV 推断。
-- PRIMASK 不能保护 NMI／HardFault、其他 CPU 或另一个安全世界。共享元数据访问
-  仅限受合同允许的特权 Thread／可配置 IRQ；非特权线程需要明确的 OS gateway。
-- DMB／DSB／ISB 语义分别保留；它们不代替 cache clean／invalidate、DMA idle、
-  外设状态 readback 或取消后的排空证明。
-- DWT 只在显式允许且当前有特权时读取，未启用／不存在时返回 false、输出不变。
-  不启用、不复位其他使用者的计数器；频率和回绕限制使它不能作为 deadline 时钟。
-
-Native 使用真实递归线程互斥与 C11 fence；掩码是线程局部模型，异常号为零、
-特权为 true。错序、重复和未配对 restore 在 Debug／Release 都终止进程。
-Native 不模型化 NVIC、硬件异常、信号安全、特权切换或物理时间。
-
-## FreeRTOS 启动与通知
-
-正常 task API 要求特权 Thread，PRIMASK／FAULTMASK 为零；调度器运行或暂停时，
-BASEPRI 也必须为零。拒绝在变更对象和进入有副作用的内核 API 前发生。
-
-锁定 CM4F port 在调度器启动前保留 critical nesting；首次静态对象创建可能留下
-与 syscall ceiling 相等的 BASEPRI。因此仅在 `taskSCHEDULER_NOT_STARTED` 时允许
-这个精确值，继续创建静态对象、发布通知及执行零等待队列操作。该数值判断不能
-证明屏蔽来自谁，调用者仍须遵守启动合同；其他掩码值拒绝，适配层不自行清除
-BASEPRI。等待和 join 另要求调度器运行。
-
-IRQ wake 在发布 sequence 前验证特权、输入掩码、外部异常范围、实际 NVIC priority
-和 PRIGROUP。当前 IRQ 范围及 syscall 规则属于已维护 CM4F port，不向其他 CPU
-默认继承。GD32 SPI DMA 在短临界区锁存完成事实与 wake 指针，恢复输入状态后
-再通知；通知对象由应用保持有效，直到全部 IRQ 发布者已排空。
-
-应用 task entry 必须恢复手动屏蔽和调度器状态，并在特权 Thread mode 返回。
-通知仅为提示，request／sequence 谓词仍是完成依据；超时不能撤回 buffer 借用。
-
-## 配置和自动门禁
-
-SoC `cpu.dwt_cyccnt`、`irq.priority_bits` 是受审事实，provider 校验其与真实实现
-一致性。冻结的 `InterruptProfileIR` 派生逻辑优先级范围、维护的 kernel port 和
-syscall ceiling。TOML 不增加芯片能力覆盖项；`[abi]` 仍只检查三项 ABI 声明。
-同一 bundle 生成 C header 和 CMake selection，没有第二套 Kconfig 或 cache 真源。
-
-commit hooks 执行格式／注释、配置测试和全部 GoogleTest／GoogleMock；测试不能
-过滤、跳过或以旧 XML 代替执行。CI 增加七个 CPU 的真实编译门禁，保留命令、返回码、
-对象、汇编、反汇编、宏和哈希，并拒绝隐藏运行时依赖、错误寄存器或不完整接口。
+单独检查并原子生成 bundle：
 
 ```sh
+python -B tools/configure/runtime.py \
+    --assembly /path/to/product/runtime.toml \
+    --output /path/to/build/generated-runtime
+```
+
+输出 `resolved-cpu.json`、`nexus_config.h`、`selection.cmake`、`input_paths.json`
+与 ownership marker，绑定输入和配置 SHA-256，不输出 linker script、bindings
+或 factory。配置失败使已有 owned bundle 失效，不继续使用 stale selection；
+非 owned 目录不会被清空，输出不能覆盖输入或其父目录。`clock_hz` 不设时钟。
+
+Source checkout 的公共 CMake 入口：
+
+```cmake
+cmake_minimum_required(VERSION 3.24)
+project(product_runtime LANGUAGES C ASM)
+include("/path/to/nexus/cmake/platform/Runtime.cmake")
+nexus_add_runtime(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/runtime.toml")
+add_library(application STATIC application.c)
+target_link_libraries(application PRIVATE Nexus::Runtime)
+```
+
+安装后的 source SDK 使用下列入口，其余两条 target 操作相同：
+
+```cmake
+find_package(Nexus REQUIRED COMPONENTS Runtime)
+nexus_add_runtime(ASSEMBLY "${CMAKE_CURRENT_SOURCE_DIR}/runtime.toml")
+```
+
+`Nexus::Runtime` 传递 Config/ABI、Core、Arch、typed I/O face 和选定 OS adapter，
+没有 SoC/Board/factory。一个 CMake build 只允许一个解析后的 Nexus assembly，
+不能在同一 build 混用相互冲突的 ABI；额外组件由外部工程显式链接。MCU 工程在
+首次 CMake configure 时选择 `cmake/toolchains/arm-gcc.cmake`。应用自己的启动、
+向量表、链接布局、时钟、具体硬件和最终 executable 仍需由外部工程实现。示例
+只展示可复用静态 library 的源图，不声称生成了可上板运行的 firmware。
+
+Installed SDK 在生成/编译前核验完整 source identity。开发 fixture SDK 需要明确
+opt-in，不能当作 publishable candidate；该 opt-in 也不会绕过 checksum/closure
+校验。SDK/外部 consumer 必须针对本轮新 HEAD 重新执行。
+
+## 执行证据与剩余验收
+
+CPU profile/Runtime resolver 测试覆盖 immutable IR、严格 schema、ABI/feature
+冲突、原子发布 bundle、输入变化和 stale output；Google 模型执行实际 CPU
+算法，ARM 编译门禁保留宏、对象、汇编/反汇编、命令、返回码和 raw hash。
+Runtime 门禁复用 `nexus_add_runtime` 的生产源图构建 Core/Arch/OS 组合，分别
+检查真实 kernel 的 FP/MVE context 与 ELF，而不维护第二份手写 source graph。
+
+```sh
+python -B -m unittest discover -s tools/configure -p 'test_*.py'
 python scripts/ci/tdd_gate.py --all --preset native-debug
 python -B -m unittest discover -s scripts/ci -p 'test_*.py'
 python scripts/ci/arch_compile.py --compiler arm-none-eabi-gcc \
     --output build/arch-compiler
+python scripts/ci/cortex_runtime.py --compiler arm-none-eabi-gcc \
+    --output build/cortex-runtime
 ```
 
-原语模型、编译门禁、三板两后端的 ARM 链接和真实 HIL 分别建立证据。原有 clean
-软件候选不继承到此次修改；源码 SDK 和外部示例必须针对新 HEAD 重新验证。当前
-没有实板接入，cycles、IRQ latency、FPU context、cache／MPU、TrustZone 和物理
-波形保持未验收状态。最坏临界区和非 LTO 调用成本须由实际镜像及后续实板测量收敛。
+这些门禁分别建立 CPU primitive、CPU runtime、完整 F407/F470 平台和实板证据。
+可选 feature 组合按实际执行范围记录，单个组合通过不继承给所有可能组合。
+当前开发执行目录为 `/workspace/nexus-all-cortex-evidence`；最终通过数与源码身份
+由实际报告核对，不引用之前版本的 counts。
+
+本轮没有新增真实 Board，没有执行物理 HIL。IRQ latency、FPU/MVE context
+切换、cache/DMA coherence、MPU/SAU 行为、安全世界协作、stack high-water、时钟
+和物理波形均保持未验收。正式 clean-source SDK、离线双构建、镜像 hash 和
+candidate 封存须依据 [qualification](qualification.md) 重新执行；软件支持不
+自动提升为 production release、硬件资格、安全认证或 LTS。

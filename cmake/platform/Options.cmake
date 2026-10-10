@@ -6,25 +6,22 @@ set_target_properties(nexus_build_options PROPERTIES
     NEXUS_SOURCE_DIR "${NEXUS_SOURCE_DIR}" NEXUS_CONFIG_DIR "${NEXUS_CONFIG_DIR}")
 add_library(nexus_abi_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
-# CPU facts are validated by the maintained provider and consumed explicitly.
-# A new family cannot silently inherit the current Cortex-M4 ABI.
+# The sole CPU resolver owns ABI combinations and optional instruction flags.
+# CMake consumes the validated canonical list, never guesses an FPU or port.
+if(NOT NEXUS_CPU_ARCH STREQUAL "native" AND
+   NOT NEXUS_CPU_ARCH MATCHES "^cortex-m(0|0plus|3|4|7|23|33|55|85)$")
+    message(FATAL_ERROR "Unsupported CPU architecture: ${NEXUS_CPU_ARCH}")
+endif()
+if(NOT DEFINED NEXUS_CPU_COMPILE_OPTIONS)
+    message(FATAL_ERROR "Missing validated CPU compile options")
+endif()
+set(cpu ${NEXUS_CPU_COMPILE_OPTIONS})
 if(NEXUS_CPU_ARCH STREQUAL "native")
-    if(NOT NEXUS_CPU_FPU STREQUAL "none" OR
-       NOT NEXUS_FLOAT_ABI STREQUAL "native" OR
-       NOT NEXUS_ENUM_ABI STREQUAL "native-int")
+    if(cpu OR NOT NEXUS_ENUM_ABI STREQUAL "native-int")
         message(FATAL_ERROR "Unsupported Native ABI contract")
     endif()
-    set(cpu)
-elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m4")
-    if(NOT NEXUS_CPU_FPU STREQUAL "fpv4-sp-d16" OR
-       NOT NEXUS_FLOAT_ABI STREQUAL "hard" OR
-       NOT NEXUS_ENUM_ABI STREQUAL "short-enums")
-        message(FATAL_ERROR "Unsupported Cortex-M4 ABI contract")
-    endif()
-    set(cpu "-mcpu=${NEXUS_CPU_ARCH}" -mthumb
-        "-mfpu=${NEXUS_CPU_FPU}" "-mfloat-abi=${NEXUS_FLOAT_ABI}" -fshort-enums)
-else()
-    message(FATAL_ERROR "Unsupported CPU architecture: ${NEXUS_CPU_ARCH}")
+elseif(NOT cpu OR NOT NEXUS_ENUM_ABI STREQUAL "short-enums")
+    message(FATAL_ERROR "Missing validated Cortex-M ABI contract")
 endif()
 if(MSVC)
     target_compile_options(nexus_owned_warnings INTERFACE /W4 /WX)

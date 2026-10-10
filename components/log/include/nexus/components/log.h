@@ -65,6 +65,10 @@ nx_result_t nx_log_init(nx_log_t* logger, nx_log_sink_port_t sink,
  *                  concurrent/recursive writes, STATE after stop, otherwise
  *                  sink error
  * \note            Task multi-producer entry with nonblocking serialization.
+ *                  M0/M0+ use CPU-local saved-PRIMASK metadata exclusion and
+ *                  require privileged callers on one CPU. Sink calls run
+ *                  after restoring the incoming mask. This does not make
+ *                  NMI/HardFault or cross-security-domain writers valid.
  *                  IRQ use is prohibited. Drop/retry policy remains with the
  *                  external caller.
  */
@@ -76,6 +80,7 @@ nx_result_t nx_log_write(nx_log_t* logger, nx_log_level_t level,
  * \param[in,out]   logger: Live instance
  * \param[in]       deadline: Absolute sink deadline
  * \return          SUCCESS, BUSY, STATE, UNSUPPORTED or sink error
+ * \note            Same task/privilege/CPU domain as write.
  */
 nx_result_t nx_log_flush(nx_log_t* logger, nx_time_us_t deadline);
 /**

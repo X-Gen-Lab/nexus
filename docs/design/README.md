@@ -10,6 +10,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程的严格资源合同 |
+| [Arch 与 CPU runtime 契约](arch-contracts.md) | 九核软件、原子操作、cache/MPU/SAU 和安全边界 |
 | [33项实施台账](next-generation-execution.csv) | 实现文件、证据入口、软件与物理状态分列 |
 | [本次 P0–P5 台账](factory-platform-execution.csv) | factory、TOML、TDD、多实例与 IRQ/DMA/block 实现 |
 | [实际架构](../delivery/architecture.md) | 当前目录、公共 factory 和多态接口、依赖方向 |
@@ -20,6 +21,11 @@ hardware_status。implemented表示机制已经存在，不表示所有退出条
 不能替代clean-source SDK、正式离线双构建和候选封存。NG028/030的正式执行以新生成
 证据更新，硬件未接入，全部适用物理项not_executed。Glob表示同一机制的明确目录族，
 不代表递归发现或缺省构建；X-Gen-Lab/nexus-examples路径是独立外部仓库。
+
+CPU 软件层覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85，通过显式 CPU/IRQ facts
+选择原子后端、ABI、可选 FPU/MVE/cache/MPU/SAU 与裸机/FreeRTOS port。外部
+CPU runtime 不生成 SoC/Board/factory；配置示例与剩余条件见
+[九核支持说明](../delivery/cortex-m.md)。这不扩大完整平台的芯片/板卡范围。
 
 首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/
 FreeRTOS及Native模型。三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实

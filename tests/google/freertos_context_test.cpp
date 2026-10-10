@@ -53,10 +53,14 @@ class Cpu {
     MOCK_METHOD(nx_arch_irq_masks_t, masks, ());
     MOCK_METHOD(uint32_t, priority_group, ());
     MOCK_METHOD(uint8_t, irq_priority, (uint32_t));
+    MOCK_METHOD(nx_arch_irq_state_t, irq_save, ());
+    MOCK_METHOD(void, irq_restore, (nx_arch_irq_state_t));
 };
 
 Kernel* kernel;
 Cpu* cpu;
+uint32_t model_primask;
+unsigned guard_depth;
 
 enum class Context { Masked, Unprivileged, Isr };
 enum class Operation {
@@ -93,12 +97,14 @@ class FreeRTOSContextTest : public ::testing::Test {
     void SetUp() override {
         kernel = &calls;
         cpu = &context;
+        guard_depth = 0;
         set_context(false, false, true);
     }
 
     /** \brief Avoid retaining fixture pointers after each complete execution.
      */
     void TearDown() override {
+        EXPECT_EQ(guard_depth, 0U);
         kernel = nullptr;
         cpu = nullptr;
     }
@@ -119,9 +125,37 @@ class FreeRTOSContextTest : public ::testing::Test {
             .Times(AnyNumber())
             .WillRepeatedly(Return(isr ? 3U : 0U));
         const nx_arch_irq_masks_t masks = {masked ? 1U : 0U, 0, 0};
+        model_primask = masks.primask;
         EXPECT_CALL(context, masks())
             .Times(AnyNumber())
             .WillRepeatedly(Return(masks));
+        EXPECT_CALL(context, irq_save()).Times(AnyNumber()).WillRepeatedly([] {
+            const nx_arch_irq_state_t saved = {model_primask};
+            model_primask = 1;
+            ++guard_depth;
+            return saved;
+        });
+        EXPECT_CALL(context, irq_restore(_))
+            .Times(AnyNumber())
+            .WillRepeatedly([](nx_arch_irq_state_t saved) {
+                EXPECT_GT(guard_depth, 0U);
+                --guard_depth;
+                model_primask = saved.value;
+            });
+    }
+
+    /** \brief Select the retained bootstrap mask of the real kernel port. */
+    static nx_arch_irq_masks_t bootstrap_masks() {
+#if NEXUS_CPU_HAS_BASEPRI
+        return {0, configMAX_SYSCALL_INTERRUPT_PRIORITY, 0};
+#else
+        return {1, 0, 0};
+#endif
+    }
+
+    /** \brief Derive the largest safe group from real kernel priority bits. */
+    static uint32_t allowed_group() {
+        return configPRIO_BITS >= 7 ? 0U : 7U - configPRIO_BITS;
     }
 
     /** \brief Entry remains caller-owned; mocked creation never executes it. */
@@ -138,6 +172,11 @@ TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
     const auto [condition, operation] = GetParam();
     set_context(condition == Context::Isr, condition == Context::Masked,
                 condition != Context::Unprivileged);
+#if !NEXUS_CPU_HAS_BASEPRI
+    if (condition == Context::Masked) {
+        EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_RUNNING));
+    }
+#endif
     notification.handle = latch;
     notification.sequence = 42;
     task.handle = task_handle;
@@ -298,17 +337,15 @@ TEST_F(FreeRTOSContextTest, SuccessfulJoinDeletesBeforeReclaimPermission) {
     EXPECT_EQ(task.finished, nullptr);
 }
 
-TEST_F(FreeRTOSContextTest,
-       KernelBootstrapCeilingAllowsFollowingStaticObjects) {
+TEST_F(FreeRTOSContextTest, KernelBootstrapMaskAllowsFollowingStaticObjects) {
     EXPECT_CALL(calls, create_queue(1, 0, nullptr, &notification.storage,
                                     queueQUEUE_TYPE_BINARY_SEMAPHORE))
         .WillOnce(
             [&](UBaseType_t, UBaseType_t, uint8_t*, StaticQueue_t*, uint8_t) {
-                /* The pinned CM4F port keeps its syscall BASEPRI before start.
-                 */
+                /* Both maintained port classes retain a mask before start. */
                 set_context(false, true, true);
-                const nx_arch_irq_masks_t masks = {
-                    0, configMAX_SYSCALL_INTERRUPT_PRIORITY, 0};
+                const nx_arch_irq_masks_t masks = bootstrap_masks();
+                model_primask = masks.primask;
                 EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
                 return latch;
             });
@@ -345,8 +382,8 @@ TEST_F(FreeRTOSContextTest,
 
 TEST_F(FreeRTOSContextTest, RunningAndSuspendedCanonicalMasksRejectMutation) {
     set_context(false, true, true);
-    const nx_arch_irq_masks_t masks = {0, configMAX_SYSCALL_INTERRUPT_PRIORITY,
-                                       0};
+    const nx_arch_irq_masks_t masks = bootstrap_masks();
+    model_primask = masks.primask;
     EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
     EXPECT_CALL(calls, scheduler())
         .WillOnce(Return(taskSCHEDULER_RUNNING))
@@ -377,8 +414,11 @@ TEST_F(FreeRTOSContextTest, NoncanonicalBasepriRejectsWithoutKernelQueries) {
 TEST_F(FreeRTOSContextTest, AllowedIrqPublishesBeforeGivingAndYielding) {
     set_context(true, false, true);
     EXPECT_CALL(context, exception()).WillRepeatedly(Return(16U));
-    EXPECT_CALL(context, priority_group()).WillOnce(Return(3));
-    EXPECT_CALL(context, irq_priority(16)).WillOnce(Return(0x50));
+#if NEXUS_CPU_HAS_BASEPRI
+    EXPECT_CALL(context, priority_group()).WillOnce(Return(allowed_group()));
+    EXPECT_CALL(context, irq_priority(16))
+        .WillOnce(Return(configMAX_SYSCALL_INTERRUPT_PRIORITY));
+#endif
     notification.handle = latch;
     const auto port = nx_freertos_notify_port(&notification);
     EXPECT_CALL(calls, give_isr(latch, _))
@@ -391,10 +431,12 @@ TEST_F(FreeRTOSContextTest, AllowedIrqPublishesBeforeGivingAndYielding) {
     EXPECT_EQ(port.wake(port.context), NX_SUCCESS);
 }
 
+#if NEXUS_CPU_HAS_BASEPRI
 TEST_F(FreeRTOSContextTest, UnsafeGroupingRejectsBeforePriorityOrKernelReads) {
     set_context(true, false, true);
     EXPECT_CALL(context, exception()).WillRepeatedly(Return(16U));
-    EXPECT_CALL(context, priority_group()).WillOnce(Return(4));
+    EXPECT_CALL(context, priority_group())
+        .WillOnce(Return(allowed_group() + 1U));
     notification.handle = latch;
     const auto port = nx_freertos_notify_port(&notification);
     EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
@@ -404,13 +446,17 @@ TEST_F(FreeRTOSContextTest, UnsafeGroupingRejectsBeforePriorityOrKernelReads) {
 TEST_F(FreeRTOSContextTest, AboveCeilingIrqRejectsBeforeSequencePublication) {
     set_context(true, false, true);
     EXPECT_CALL(context, exception()).WillRepeatedly(Return(16U));
-    EXPECT_CALL(context, priority_group()).WillOnce(Return(3));
-    EXPECT_CALL(context, irq_priority(16)).WillOnce(Return(0x40));
+    EXPECT_CALL(context, priority_group()).WillOnce(Return(allowed_group()));
+    EXPECT_CALL(context, irq_priority(16))
+        .WillOnce(Return(configMAX_SYSCALL_INTERRUPT_PRIORITY -
+                         (1U << (8U - configPRIO_BITS))));
     notification.handle = latch;
     const auto port = nx_freertos_notify_port(&notification);
     EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
     EXPECT_EQ(notification.sequence, 0U);
 }
+
+#endif
 
 TEST_F(FreeRTOSContextTest, SystemAndOutOfRangeExceptionsNeverReadNvic) {
     set_context(true, false, true);
@@ -421,7 +467,7 @@ TEST_F(FreeRTOSContextTest, SystemAndOutOfRangeExceptionsNeverReadNvic) {
         .WillOnce(Return(11U))
         .WillOnce(Return(14U))
         .WillOnce(Return(15U))
-        .WillOnce(Return(256U));
+        .WillOnce(Return(16U + NEXUS_CPU_EXTERNAL_IRQ_COUNT));
     notification.handle = latch;
     const auto port = nx_freertos_notify_port(&notification);
     for (unsigned i = 0; i < 7; ++i) {
@@ -436,6 +482,31 @@ TEST_F(FreeRTOSContextTest, MaskedIrqNeverReadsNvicOrPublishesSequence) {
     const auto port = nx_freertos_notify_port(&notification);
     EXPECT_EQ(port.wake(port.context), NX_ERROR_CONTEXT);
     EXPECT_EQ(notification.sequence, 0U);
+}
+
+TEST_F(FreeRTOSContextTest, LastExternalVectorAcceptedWithinSelectedProfile) {
+    set_context(true, false, true);
+    const uint32_t exception = NEXUS_CPU_EXTERNAL_IRQ_COUNT + 15U;
+    EXPECT_CALL(context, exception()).WillRepeatedly(Return(exception));
+#if NEXUS_CPU_HAS_BASEPRI
+    EXPECT_CALL(context, priority_group()).WillOnce(Return(allowed_group()));
+    EXPECT_CALL(context, irq_priority(exception)).WillOnce(Return(0xf0));
+#endif
+    notification.handle = latch;
+    const auto port = nx_freertos_notify_port(&notification);
+    EXPECT_CALL(calls, give_isr(latch, _)).WillOnce(Return(pdTRUE));
+    EXPECT_EQ(port.wake(port.context), NX_SUCCESS);
+    EXPECT_EQ(notification.sequence, 1U);
+}
+
+TEST_F(FreeRTOSContextTest, FaultmaskAlwaysRejectsBeforeKernelQueries) {
+    set_context(false, true, true);
+    auto masks = bootstrap_masks();
+    masks.faultmask = 1;
+    EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
+    queue.handle = queue_handle;
+    EXPECT_EQ(nx_freertos_queue_send(&queue, &item, 0), NX_ERROR_CONTEXT);
+    EXPECT_EQ(queue.users, 0U);
 }
 } /* namespace */
 
@@ -465,6 +536,16 @@ nx_arch_irq_masks_t nx_arch_irq_masks(void) {
     return cpu->masks();
 }
 
+/** \brief M0 atomic RMW borrows one bounded CPU mask guard. */
+nx_arch_irq_state_t nx_arch_irq_save(void) {
+    return cpu->irq_save();
+}
+
+/** \brief Restore exactly the incoming mask before entering the kernel. */
+void nx_arch_irq_restore(nx_arch_irq_state_t saved) {
+    cpu->irq_restore(saved);
+}
+
 /** \brief Supply the priority-grouping field at the external MMIO boundary. */
 uint32_t nx_freertos_test_priority_group(void) {
     return cpu->priority_group();
@@ -479,6 +560,7 @@ uint8_t nx_freertos_test_irq_priority(uint32_t exception) {
 QueueHandle_t xQueueGenericCreateStatic(UBaseType_t depth, UBaseType_t size,
                                         uint8_t* storage,
                                         StaticQueue_t* control, uint8_t type) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->create_queue(depth, size, storage, control, type);
 }
 
@@ -487,63 +569,75 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t entry, const char* name,
                                configSTACK_DEPTH_TYPE depth, void* argument,
                                UBaseType_t priority, StackType_t* stack,
                                StaticTask_t* control) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->create_task(entry, name, depth, argument, priority, stack,
                                control);
 }
 
 /** \brief Supply scheduler state without running a fake scheduler. */
 BaseType_t xTaskGetSchedulerState(void) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->scheduler();
 }
 
 /** \brief Supply external task identity for self-join rejection. */
 TaskHandle_t xTaskGetCurrentTaskHandle(void) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->current_task();
 }
 
 /** \brief Observe kernel queue and semaphore sends. */
 BaseType_t xQueueGenericSend(QueueHandle_t handle, const void* item,
                              TickType_t ticks, BaseType_t position) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->send(handle, item, ticks, position);
 }
 
 /** \brief Observe the kernel receive boundary. */
 BaseType_t xQueueReceive(QueueHandle_t handle, void* item, TickType_t ticks) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->receive(handle, item, ticks);
 }
 
 /** \brief Observe binary-latch waits at the real kernel boundary. */
 BaseType_t xQueueSemaphoreTake(QueueHandle_t handle, TickType_t ticks) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->take(handle, ticks);
 }
 
 /** \brief Observe IRQ wake operations without simulating physical NVIC. */
 BaseType_t xQueueGiveFromISR(QueueHandle_t handle, BaseType_t* required) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->give_isr(handle, required);
 }
 
 /** \brief Observe queue drain checks. */
 UBaseType_t uxQueueMessagesWaiting(QueueHandle_t handle) {
+    EXPECT_EQ(guard_depth, 0U);
     return kernel->messages(handle);
 }
 
 /** \brief Observe caller-owned kernel object deletion. */
 void vQueueDelete(QueueHandle_t handle) {
+    EXPECT_EQ(guard_depth, 0U);
     kernel->delete_queue(handle);
 }
 
 /** \brief Observe task deletion before storage is reclaimed. */
 void vTaskDelete(TaskHandle_t handle) {
+    EXPECT_EQ(guard_depth, 0U);
     kernel->delete_task(handle);
 }
 
 /** \brief Task wrappers are not scheduled by this mocked kernel boundary. */
 void vTaskSuspend(TaskHandle_t handle) {
+    EXPECT_EQ(guard_depth, 0U);
     kernel->suspend(handle);
 }
 
 /** \brief Observe an explicit ISR scheduler request. */
 void vPortYield(void) {
+    EXPECT_EQ(guard_depth, 0U);
     kernel->yield();
 }
 

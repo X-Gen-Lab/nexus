@@ -1,7 +1,7 @@
 """Execute and retain Cortex-M primitive compiler evidence, never HIL claims.
 
-All seven maintained primitive profiles run with the same explicit soft ABI.
-This probes Arch code generation, not SoC startup, RTOS ports or full platforms.
+Nine maintained primitive profiles cover exact FPU/MVE/security ABI choices.
+This probes Arch code generation, not SoC startup or physical platforms.
 Missing tools, changed target facts and hidden runtime dependencies fail closed.
 """
 from __future__ import annotations
@@ -14,7 +14,11 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 from types import MappingProxyType
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.configure import cpu as cpu_contract
 
 
 @dataclass(frozen=True)
@@ -25,14 +29,8 @@ class Profile:
 
 
 PROFILES = MappingProxyType({
-    'cortex-m0': Profile('__ARM_ARCH_6M__', False, 1),
-    'cortex-m0plus': Profile('__ARM_ARCH_6M__', False, 1),
-    'cortex-m3': Profile('__ARM_ARCH_7M__', True, 2),
-    'cortex-m4': Profile('__ARM_ARCH_7EM__', True, 2),
-    'cortex-m7': Profile('__ARM_ARCH_7EM__', True, 2),
-    'cortex-m23': Profile('__ARM_ARCH_8M_BASE__', False, 2),
-    'cortex-m33': Profile('__ARM_ARCH_8M_MAIN__', True, 2),
-})
+    name: Profile(item.macro, item.basepri, 1 if item.atomic == 'irq' else 2)
+    for name, item in cpu_contract.PROFILES.items() if name != 'native'})
 
 PUBLIC_SYMBOLS = frozenset({
     'nx_arch_irq_save', 'nx_arch_irq_restore', 'nx_arch_irq_is_masked',
@@ -62,7 +60,65 @@ def profile(cpu: str) -> Profile:
         raise ValueError(f'unsupported CPU: {cpu!r}') from error
 
 
-def check_macros(cpu: str, text: str) -> None:
+def reference_facts(cpu: str, **choices) -> dict:
+    """Declare software reference facts; never infer an actual chip or board."""
+    profile(cpu)
+    supported = cpu_contract.PROFILES[cpu]
+    facts = {'arch': cpu, 'fpu': 'none', 'float_abi': 'soft',
+             'dwt_cyccnt': supported.basepri, 'mpu_version': supported.mpu,
+             'icache_line_bytes': 32 if supported.cache else 0,
+             'dcache_line_bytes': 32 if supported.cache else 0,
+             'security': 'single', 'sau': False, 'mve': 'none',
+             'dsp': supported.dsp[-1]}
+    facts.update(choices)
+    return {'schema_version': 1, 'cpu': facts,
+            'irq': {'priority_bits': 4 if supported.basepri else 2,
+                    'external_count': supported.irq_count},
+            'clock_hz': 48000000}
+
+
+def software_profiles() -> tuple[dict, ...]:
+    """Fixed review matrix, resolved by the sole production CPU authority."""
+    variants = []
+
+    def add(cpu, **choices):
+        facts = reference_facts(cpu, **choices)
+        value = facts['cpu']
+        name = '-'.join(value[field] for field in
+                        ('arch', 'fpu', 'float_abi', 'mve', 'security')) + (
+                            '-dsp' if value['dsp'] else '-nodsp')
+        # Validation owns ISA, optional features and the actual ABI flag list.
+        resolved = cpu_contract.resolve(value, facts['irq'], 'baremetal')
+        variants.append({'name': name, 'facts': facts,
+                         'profile': resolved.to_dict()})
+
+    for cpu, supported in cpu_contract.PROFILES.items():
+        if cpu == 'native':
+            continue
+        add(cpu)
+        for fpu in supported.fpus:
+            for abi in ('hard', 'softfp'):
+                add(cpu, fpu=fpu, float_abi=abi)
+        if supported.mve:
+            add(cpu, mve='integer', float_abi='softfp')
+            for abi in ('hard', 'softfp'):
+                add(cpu, fpu='auto', mve='integer', float_abi=abi)
+                add(cpu, fpu='auto', mve='float', float_abi=abi)
+        if supported.security:
+            add(cpu, security='secure', sau=True)
+            add(cpu, security='nonsecure')
+        for dsp in supported.dsp[:-1]:
+            for variant in tuple(variants):
+                if variant['facts']['cpu']['arch'] == cpu:
+                    choices = dict(variant['facts']['cpu'])
+                    del choices['arch']
+                    choices['dsp'] = dsp
+                    add(cpu, **choices)
+    return tuple(variants)
+
+
+def check_macros(cpu: str, text: str, *, fpu='none', float_abi='soft',
+                 mve='none', security='single', dsp=None) -> None:
     selected = profile(cpu)
     macros = {}
     for line in text.splitlines():
@@ -77,9 +133,27 @@ def check_macros(cpu: str, text: str) -> None:
             (arch_macros & macros.keys()) != {selected.arch_macro} or
             macros.get('__ARM_ARCH_PROFILE') != '77'):
         raise ValueError(f'{cpu}: wrong architecture macro')
-    if (macros.get('__SOFTFP__') != '1' or '__ARM_PCS_VFP' in macros or
-            macros.get('__SIZEOF_INT__') != '4'):
-        raise ValueError(f'{cpu}: wrong soft-float ABI or integer width')
+    hard = macros.get('__ARM_PCS_VFP') == '1'
+    if (hard != (float_abi == 'hard') or
+            macros.get('__SIZEOF_INT__') != '4' or
+            (float_abi == 'soft' and macros.get('__SOFTFP__') != '1')):
+        raise ValueError(f'{cpu}: wrong {float_abi}-float ABI or integer width')
+    floating = int(macros.get('__ARM_FP', '0'), 0)
+    if (bool(floating) != (fpu != 'none') or
+            (fpu != 'none' and not floating & 4) or
+            (fpu == 'fpv5-d16' and not floating & 8)):
+        raise ValueError(f'{cpu}: wrong FPU instruction capability')
+    vector = int(macros.get('__ARM_FEATURE_MVE', '0'), 0)
+    if vector != {'none': 0, 'integer': 1, 'float': 3}[mve]:
+        raise ValueError(f'{cpu}: wrong MVE instruction capability')
+    if dsp is None:
+        dsp = cpu_contract.PROFILES[cpu].dsp[-1]
+    if (type(dsp) is not bool or
+            int(macros.get('__ARM_FEATURE_DSP', '0'), 0) != int(dsp)):
+        raise ValueError(f'{cpu}: wrong DSP instruction capability')
+    secure = bool(int(macros.get('__ARM_FEATURE_CMSE', '0'), 0) & 2)
+    if secure != (security == 'secure'):
+        raise ValueError(f'{cpu}: wrong Secure compiler state')
     if (macros.get('__GCC_ATOMIC_INT_LOCK_FREE') !=
             str(selected.atomic_lock_free)):
         raise ValueError(f'{cpu}: unexpected atomic lock-free capability')
@@ -252,58 +326,68 @@ def run(root: Path, compiler: str, output: Path) -> int:
         probe = recorder.output / 'atomic-probe.c'
         probe.write_text(ATOMIC_SOURCE, encoding='utf-8')
         report['atomic_probe'] = digest(probe)
-        for cpu, facts in PROFILES.items():
-            flags = [f'-mcpu={cpu}', '-mthumb', '-mfloat-abi=soft',
+        for variant in software_profiles():
+            cpu_facts = variant['facts']['cpu']
+            cpu = cpu_facts['arch']
+            facts = profile(cpu)
+            name = variant['name']
+            resolved = variant['profile']
+            flags = [*resolved['compile_options'],
                      '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror']
             macros = recorder.execute(
                 [selected_tools['gcc'], *flags, '-E', '-dM', '-x', 'c', '-'],
-                cpu + '-macros', input_text='', nonempty=True)
-            check_macros(cpu, macros)
-            result = {'cpu': cpu, 'status': 'running',
+                name + '-macros', input_text='', nonempty=True)
+            check_macros(cpu, macros, **{
+                key: cpu_facts[key] for key in
+                ('fpu', 'float_abi', 'mve', 'security', 'dsp')})
+            result = {'cpu': cpu, 'name': name, 'status': 'running',
+                      'resolved_profile': resolved,
                       'full_platform_status': 'not_qualified',
                       'atomic_int_lock_free': facts.atomic_lock_free,
-                      'atomic_rmw_scope': ('inline' if
+                      'atomic_rmw_scope': ('compiler_builtin_inline' if
                                            facts.atomic_lock_free == 2 else
-                                           'external_helper_not_platform_qualified'),
+                                           'compiler_builtin_external_helper_requires_nexus_irq_port'),
                       'dwt_profiles': []}
             report['profiles'].append(result)
             arch_flags = [*flags, '-I' + str(root / 'arch/include'),
                           '-I' + str(source.parent)]
             for dwt in (0, 1):
-                filename = recorder.output / f'{cpu}-dwt{dwt}'
+                filename = recorder.output / f'{name}-dwt{dwt}'
                 current = [selected_tools['gcc'], *arch_flags,
                            f'-DNEXUS_ARCH_HAS_DWT_CYCCNT={dwt}']
                 obj = filename.with_suffix('.o')
                 if dwt and not facts.mainline:
                     recorder.execute([*current, '-c', str(source), '-o',
-                                      str(obj)], cpu + '-dwt1-rejection',
+                                      str(obj)], name + '-dwt1-rejection',
                                      reject=True)
                     result['dwt_profiles'].append(
                         {'dwt': dwt, 'status': 'rejected_as_required'})
                     continue
                 asm = filename.with_suffix('.s')
                 recorder.execute([*current, '-c', str(source), '-o', str(obj)],
-                                 cpu + f'-dwt{dwt}-compile')
+                                 name + f'-dwt{dwt}-compile')
                 recorder.execute([*current, '-S', str(source), '-o', str(asm)],
-                                 cpu + f'-dwt{dwt}-assembly')
+                                 name + f'-dwt{dwt}-assembly')
                 check_arch_symbols(recorder.execute(
                     [selected_tools['nm'], '-u', str(obj)],
-                    cpu + f'-dwt{dwt}-undefined'))
+                    name + f'-dwt{dwt}-undefined'))
                 check_exports(recorder.execute(
                     [selected_tools['nm'], '--defined-only', '--extern-only',
-                     str(obj)], cpu + f'-dwt{dwt}-exports', nonempty=True))
+                     str(obj)], name + f'-dwt{dwt}-exports', nonempty=True))
                 disassembly = recorder.execute(
                     [selected_tools['objdump'], '-d', str(obj)],
-                    cpu + f'-dwt{dwt}-disassembly', nonempty=True)
+                    name + f'-dwt{dwt}-disassembly', nonempty=True)
                 check_instructions(cpu, disassembly)
                 check_instructions(cpu, asm.read_text())
                 if not dwt:
                     check_disabled_counter(disassembly)
                 attributes = recorder.execute(
                     [selected_tools['readelf'], '-A', str(obj)],
-                    cpu + f'-dwt{dwt}-attributes', nonempty=True)
-                if re.search(r'Tag_ABI_VFP_args:\s*VFP registers', attributes):
-                    raise ValueError(f'{cpu}: object has unexpected hard-float ABI')
+                    name + f'-dwt{dwt}-attributes', nonempty=True)
+                hard = bool(re.search(
+                    r'Tag_ABI_VFP_args:\s*VFP registers', attributes))
+                if hard != (cpu_facts['float_abi'] == 'hard'):
+                    raise ValueError(f'{cpu}: object has unexpected float ABI')
                 result['dwt_profiles'].append(
                     {'dwt': dwt, 'status': 'compiled',
                      'object': digest(obj), 'assembly': digest(asm)})
@@ -314,16 +398,16 @@ def run(root: Path, compiler: str, output: Path) -> int:
                 recorder.execute(
                     [selected_tools['gcc'], *arch_flags, *arguments, '-c',
                      str(source), '-o', str(recorder.output /
-                                           f'{cpu}-dwt-{suffix}.o')],
-                    cpu + '-dwt-' + suffix + '-rejection', reject=True)
-            atom = recorder.output / (cpu + '-atomics.o')
+                                           f'{name}-dwt-{suffix}.o')],
+                    name + '-dwt-' + suffix + '-rejection', reject=True)
+            atom = recorder.output / (name + '-atomics.o')
             recorder.execute([selected_tools['gcc'], *flags, '-c', str(probe),
-                              '-o', str(atom)], cpu + '-atomic-compile')
+                              '-o', str(atom)], name + '-atomic-compile')
             check_atomic_symbols(cpu, recorder.execute(
                 [selected_tools['nm'], '-u', str(atom)],
-                cpu + '-atomic-undefined'))
+                name + '-atomic-undefined'))
             recorder.execute([selected_tools['objdump'], '-d', str(atom)],
-                             cpu + '-atomic-disassembly', nonempty=True)
+                             name + '-atomic-disassembly', nonempty=True)
             result['atomic_object'] = digest(atom)
             result['status'] = 'primitive_compile_passed'
         report['status'] = 'passed'

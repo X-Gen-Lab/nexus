@@ -77,7 +77,14 @@
     "arch": "cortex-m4",
     "fpu": "fpv4-sp-d16",
     "float_abi": "hard",
-    "dwt_cyccnt": true
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "mpu_version": 7,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
   },
   "clock_profiles": {
     "hse8-pll168": {
@@ -332,6 +339,7 @@
     "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf"
   ],
   "irq": {
-    "priority_bits": 4
+    "priority_bits": 4,
+    "external_count": 82
   }
 }

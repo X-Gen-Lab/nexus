@@ -107,6 +107,15 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('"$fixture"/*.toml', commands)
         self.assertNotIn('"$fixture"/*.json', commands)
 
+    def test_cpu_runtime_matrix_executes_real_kernel_links_and_keeps_evidence(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/cortex_runtime.py'), 1)
+        self.assertIn('--output build/cortex-runtime', commands)
+        evidence = [step for step in job['steps']
+                    if step.get('name') == 'Preserve compiler evidence'][0]
+        self.assertIn('build/cortex-runtime/', evidence['with']['path'])
+
 
 class CTestAdmission(unittest.TestCase):
     def execute_fixture(self, kind):

@@ -73,7 +73,17 @@ provider storage 只对实现与生成 binding TU 可见。公共消费路径没
 CPU 原语、特权、中断屏蔽和 FreeRTOS 启动合同见
 [Cortex-M 架构接入](cortex-m.md)。Arch 按编译期目标选择实现，不使用运行时
 CPU factory；设备 typed factory 与共享多态方法表保持。完整 MCU 平台目前仍为
-F407／F470，其他内核的原语编译结果不替代其 SoC、内核 port、缓存或安全验证。
+F407／F470，九核 CPU 软件层的模型/编译不替代具体 SoC 集成或物理验证。
+
+独立 CPU runtime 读取外部 `runtime.toml` 与显式 `cpu.json`，复用同一冻结
+`CpuProfileIR` 和生产 CMake targets。`nexus_add_runtime(ASSEMBLY ...)` 导出
+`Nexus::Runtime`，传递 Config/ABI、Core、Arch、typed I/O face 与选定裸机/
+FreeRTOS adapter；安装包用 `find_package(Nexus REQUIRED COMPONENTS Runtime)`
+开放相同入口。该模式没有 SoC、Board、启动、链接脚本或 typed factory。具体
+memory/clock/IRQ 资源、设备 provider、安全策略及最终固件仍由外部工程实现。
+九核的 FPU/MVE/cache/MPU/DWT/security/SAU 都是显式事实，合法组合和精确 kernel
+port 经解析器选择，不能靠 CMake cache 推断或覆盖。硬件与产品 qualification
+仍独立；单区域 MPU/SAU 机制不提供用户 task 隔离或双世界 gateway。
 
 当前恢复 factory＋多态接口骨架，生成阶段完成实例构造。每类接口 face 只有
 `const ops*` 和 `context*`；face 与操作表只读，provider 可变状态及按实例选择的

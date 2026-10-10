@@ -16,11 +16,13 @@ import sys
 import tempfile
 
 try:
+    from . import cpu as cpu_profiles
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                    resolve_interrupts, sequence,
                                    validate_selection)
 except ImportError:
+    import cpu as cpu_profiles
     from providers import maintained
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                   resolve_interrupts, sequence,
@@ -187,7 +189,7 @@ def validate_soc(soc, part):
         ranges.append((start, end, region["id"]))
     if sum(region["linker"] for region in memory) != 1:
         fail("Exactly one maintained default RAM linker domain is required")
-    cpu = obj(soc["cpu"], {"arch", "fpu", "float_abi", "dwt_cyccnt"}, (),
+    cpu = obj(soc["cpu"], cpu_profiles.CPU_FIELDS, (),
               "CPU facts")
     provider = maintained(soc["id"])
     if cpu_abi(cpu) != provider.CPU_ABI:
@@ -195,10 +197,17 @@ def validate_soc(soc, part):
     if (type(cpu["dwt_cyccnt"]) is not bool or
             cpu["dwt_cyccnt"] != provider.DWT_CYCCNT):
         fail("DWT cycle counter differs from maintained CPU facts")
-    irq = obj(soc["irq"], {"priority_bits"}, (), "IRQ facts")
+    if {key: cpu[key] for key in provider.CPU_FEATURES} != provider.CPU_FEATURES:
+        fail("Optional CPU capabilities differ from maintained SoC facts")
+    irq = obj(soc["irq"], {"priority_bits", "external_count"}, (), "IRQ facts")
     bits = integer(irq["priority_bits"], 1, 8, "IRQ priority bits")
     if bits != provider.IRQ_PRIORITY_BITS:
         fail("IRQ priority bits differ from maintained SoC facts")
+    count = integer(irq["external_count"], 0, 496, "External IRQ count")
+    if count != provider.EXTERNAL_IRQ_COUNT:
+        fail("External IRQ count differs from maintained SoC facts")
+    cpu_profiles.resolve(cpu, irq, "native" if provider.MODEL else "baremetal",
+                         enum_abi=provider.ENUM_ABI)
     if not isinstance(soc["controllers"], dict):
         fail("SoC controllers must be an object")
     for name, controller in soc["controllers"].items():
@@ -349,6 +358,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if (provider.MODEL) != (backend == "native"):
         fail("Native is a host model; its backend cannot qualify MCU execution")
     irq_profile = resolve_interrupts(soc["cpu"], soc["irq"], backend, provider)
+    cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
+                                       enum_abi=provider.ENUM_ABI)
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
     if clock is None:
         fail(f"Unknown clock profile: {assembly['clock_profile']}")
@@ -669,6 +680,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     result = {"schema_version": 1, "board": board["id"], "soc_family": family,
               "part": part, "package": variant["package"], "backend": backend,
               "cpu": soc["cpu"], "irq": irq_profile,
+              "cpu_profile": cpu_profile.to_dict(),
               "clock_profile": assembly["clock_profile"],
               "clock": clock, "memory": variant["memory"], "flash": variant["flash"],
               "layout": layout, "controllers": selected, "devices": assembly["devices"],
@@ -721,6 +733,7 @@ def generate(result, output):
     write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
     write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
                                       else result, indent=2, sort_keys=True) + "\n")
+    profile = cpu_profiles.CpuProfileIR.from_validated(result["cpu_profile"])
     header = ["/* Generated from the sole resolved configuration. */",
               "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
               f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
@@ -729,20 +742,10 @@ def generate(result, output):
               f'#define NEXUS_HSE_HZ {result["clock"]["hse_hz"]}u',
               f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
               f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
-              f'#define NEXUS_IRQ_PRIORITY_BITS {result["irq"]["priority_bits"]}u']
-    if result["irq"]["syscall_priority"] is not None:
-        header.append('#define NEXUS_IRQ_SYSCALL_PRIORITY '
-                      f'{result["irq"]["syscall_priority"]}u')
+              *cpu_profiles.header_lines(profile)]
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
-             f'set(NEXUS_CPU_ARCH "{result["cpu"]["arch"]}")',
-             f'set(NEXUS_CPU_FPU "{result["cpu"]["fpu"]}")',
-             f'set(NEXUS_FLOAT_ABI "{result["cpu"]["float_abi"]}")',
-             f'set(NEXUS_ENUM_ABI "{result["enum_abi"]}")',
-             f'set(NEXUS_ARCH_HAS_DWT_CYCCNT "{int(result["cpu"]["dwt_cyccnt"])}")',
-             f'set(NEXUS_IRQ_PRIORITY_BITS "{result["irq"]["priority_bits"]}")',
-             f'set(NEXUS_FREERTOS_PORT "{result["irq"]["kernel_port"] or ""}")',
-             f'set(NEXUS_BACKEND "{result["backend"]}")',
+             *cpu_profiles.selection_lines(profile),
              f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',

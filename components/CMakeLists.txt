@@ -20,7 +20,8 @@ target_link_libraries(nexus_bmp280_spi PUBLIC nexus_bmp280 nexus_io PRIVATE nexu
 
 add_library(nexus_log STATIC log/src/log.c)
 target_include_directories(nexus_log PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/log/include")
-target_link_libraries(nexus_log PUBLIC nexus_core PRIVATE nexus_owned_warnings nexus_build_options)
+target_link_libraries(nexus_log PUBLIC nexus_core
+    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
 add_library(nexus_storage STATIC storage/src/storage.c)
 target_include_directories(nexus_storage PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/storage/include")
 target_link_libraries(nexus_storage PUBLIC nexus_abi_options PRIVATE nexus_owned_warnings nexus_build_options)

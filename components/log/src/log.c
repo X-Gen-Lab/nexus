@@ -8,19 +8,19 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/components/log.h"
+#include "nexus/arch/atomic.h"
 
 /** \brief Acquire only nonblocking logger metadata, never wait under a lock. */
 static nx_result_t begin_write(nx_log_t* logger) {
-    if (__atomic_load_n(&logger->stopped, __ATOMIC_ACQUIRE) != 0) {
+    if (nx_atomic_u32_load_acquire(&logger->stopped) != 0) {
         return NX_ERROR_STATE;
     }
     uint32_t expected = 0;
-    if (!__atomic_compare_exchange_n(&logger->busy, &expected, 1, false,
-                                     __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {
+    if (!nx_atomic_u32_compare_exchange_acq_rel(&logger->busy, &expected, 1)) {
         return NX_ERROR_BUSY;
     }
-    if (__atomic_load_n(&logger->stopped, __ATOMIC_ACQUIRE) != 0) {
-        __atomic_store_n(&logger->busy, 0, __ATOMIC_RELEASE);
+    if (nx_atomic_u32_load_acquire(&logger->stopped) != 0) {
+        nx_atomic_u32_store_release(&logger->busy, 0);
         return NX_ERROR_STATE;
     }
     return NX_SUCCESS;
@@ -48,7 +48,7 @@ nx_result_t nx_log_write(nx_log_t* logger, nx_log_level_t level,
         (unsigned)level > (unsigned)NX_LOG_ERROR) {
         return NX_ERROR_INVALID;
     }
-    if (__atomic_load_n(&logger->stopped, __ATOMIC_ACQUIRE) != 0) {
+    if (nx_atomic_u32_load_acquire(&logger->stopped) != 0) {
         return NX_ERROR_STATE;
     }
     if (level < logger->minimum) {
@@ -60,7 +60,7 @@ nx_result_t nx_log_write(nx_log_t* logger, nx_log_level_t level,
     }
     result = logger->sink.write(logger->sink.context, level, bytes, length,
                                 deadline);
-    __atomic_store_n(&logger->busy, 0, __ATOMIC_RELEASE);
+    nx_atomic_u32_store_release(&logger->busy, 0);
     return result;
 }
 
@@ -76,7 +76,7 @@ nx_result_t nx_log_flush(nx_log_t* logger, nx_time_us_t deadline) {
     result = logger->sink.flush != NULL
                  ? logger->sink.flush(logger->sink.context, deadline)
                  : NX_ERROR_UNSUPPORTED;
-    __atomic_store_n(&logger->busy, 0, __ATOMIC_RELEASE);
+    nx_atomic_u32_store_release(&logger->busy, 0);
     return result;
 }
 
@@ -85,8 +85,7 @@ nx_result_t nx_log_stop(nx_log_t* logger) {
     if (logger == NULL) {
         return NX_ERROR_INVALID;
     }
-    __atomic_store_n(&logger->stopped, 1, __ATOMIC_RELEASE);
-    return __atomic_load_n(&logger->busy, __ATOMIC_ACQUIRE) == 0
-               ? NX_SUCCESS
-               : NX_ERROR_BUSY;
+    nx_atomic_u32_store_release(&logger->stopped, 1);
+    return nx_atomic_u32_load_acquire(&logger->busy) == 0 ? NX_SUCCESS
+                                                          : NX_ERROR_BUSY;
 }

@@ -17,10 +17,13 @@
 scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生命周期，不能
 替代 Cortex-M4F IRQ ceiling、FPU context 与 stack high-water 的实板验证。
 
-Arch 原语另有 M0／M0+／M3／M4／M7／M23／M33 的实际编译和软件模型门禁。
-这不会扩大上述整平台列表。M0／M0+ 的原子 RMW 仍需额外机制，M7 的 cache/DMA、
-M23／M33 的安全状态、各芯片启动和其他 RTOS port 均未因此取得平台资格；详细
-范围见 [Cortex-M 架构接入](cortex-m.md)。
+CPU 软件层另支持 M0／M0+／M3／M4／M7／M23／M33／M55／M85，统一严格事实
+解析器选择 Core/Arch、原子操作和裸机/FreeRTOS runtime。M0/M0+ RMW 使用
+bounded saved-PRIMASK；可选 cache/MPU/SAU 有真实 CPU 算法，FPU/MVE 与安全
+状态决定精确 kernel port 和 ABI。没有新增 SoC/Board/factory，以上完整平台列表
+保持独立。编译、寄存器模型与真实 FP/MVE/cache/MPU/安全世界验收分别记录；
+没有双世界 gateway、用户 MPU task 集成或新增实板 HIL。范围和配置例子见
+[Cortex-M 软件支持](cortex-m.md) 与 [Arch 契约](../design/arch-contracts.md)。
 
 ## 首发模式
 
