@@ -45,3 +45,10 @@ until confirmed by GitHub, never infer it from this local template.
 `doctor`, `check` and Tool Contracts CI validate the generated capability text
 and report the assignment status. Pending real members do not block software
 development; use the strict check as the exit condition for team handover.
+
+The installed source SDK intentionally omits repository docs, named assignments
+and the main firmware host contract suite. `doctor` first verifies its file map,
+package exports,
+dependency and source-import identities, then reports tools and this narrower
+scope. A manifest's presence alone never skips verification. `check` requires a
+development checkout and explicitly rejects the SDK-only scope.

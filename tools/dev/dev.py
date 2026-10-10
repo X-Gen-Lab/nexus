@@ -10,13 +10,16 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "cmake/package"))
+import package_source_sdk as source_sdk
 
 
 def executable(name):
     local = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin") / name
     found = str(local) if local.is_file() else shutil.which(name)
     if not found:
-        raise ValueError(f"Missing {name}: install dependencies/environment-tools.txt")
+        raise ValueError(f"Missing {name}: install "
+                         "dependencies/environment-tools.txt")
     return found
 
 
@@ -34,32 +37,54 @@ def maintenance_checks(environment):
     return 0
 
 
+def workspace_identity():
+    """A manifest triggers complete verification, never a check bypass."""
+    manifest = ROOT / source_sdk.MANIFEST
+    if manifest.exists() or manifest.is_symlink():
+        try:
+            return source_sdk.verify(ROOT)
+        except (OSError, ValueError, TypeError, KeyError) as error:
+            message = "Invalid source SDK identity: " + str(error)
+            raise ValueError(message) from error
+    if not (ROOT / ".git").exists():
+        raise ValueError("Use a development checkout or verified source SDK")
+    return None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("configure", "build", "test", "check", "doctor"))
+    parser.add_argument("action", choices=("configure", "build", "test",
+                                          "check", "doctor"))
     parser.add_argument("--preset", default="native-debug")
     args, native = parser.parse_known_args(argv)
     try:
         environment = os.environ.copy()
         # Prefer the pinned local tools without requiring shell activation.
         local_bin = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin")
-        environment["PATH"] = str(local_bin) + os.pathsep + environment.get("PATH", "")
+        environment["PATH"] = (str(local_bin) + os.pathsep
+                               + environment.get("PATH", ""))
         if args.action == "doctor":
-            lock = json.loads((ROOT / "dependencies/environment.lock.json").read_text())
-            minimum = tuple(int(part) for part in lock["python"]["minimum"].split("."))
+            identity = workspace_identity()
+            lock_path = ROOT / "dependencies/environment.lock.json"
+            lock = json.loads(lock_path.read_text())
+            minimum = tuple(int(part)
+                            for part in lock["python"]["minimum"].split("."))
             if sys.version_info[:len(minimum)] < minimum:
                 raise ValueError("Python differs from the locked minimum "
                                  + lock["python"]["minimum"])
             try:
                 import tomllib
             except ImportError as error:
-                raise ValueError("Python must provide stdlib tomllib") from error
+                message = "Python must provide stdlib tomllib"
+                raise ValueError(message) from error
             tomllib.loads("schema = 2")
             version = ".".join(map(str, sys.version_info[:3]))
-            print(f"Python: {version} ({sys.executable}); stdlib tomllib available")
+            print(f"Python: {version} ({sys.executable}); "
+                  "stdlib tomllib available")
             for name in ("cmake", "ninja"):
                 result = subprocess.run([executable(name), "--version"],
-                                        capture_output=True, text=True, check=True)
+                                        capture_output=True, text=True,
+                                        check=True)
                 expected = lock["tools"][name]
                 if expected not in result.stdout.splitlines()[0]:
                     raise ValueError(f"{name} differs from locked {expected}")
@@ -68,16 +93,27 @@ def main(argv=None):
                 compiler = shutil.which(name, path=environment["PATH"])
                 if compiler:
                     result = subprocess.run([compiler, "-dumpfullversion"],
-                                            capture_output=True, text=True, check=True)
+                                            capture_output=True, text=True,
+                                            check=True)
                     print(f"{name}: {result.stdout.strip()} ({compiler})")
                 else:
-                    print(f"{name}: unavailable; its target cannot be configured")
+                    print(f"{name}: unavailable; "
+                          "its target cannot be configured")
+            if identity is not None:
+                print("Verified source SDK: " + identity["source_revision"])
+                print("Tool diagnosis only: repository review/documentation "
+                      "governance materials are not packaged")
+                return 0
             return maintenance_checks(environment)
         if args.action == "check":
             if native:
                 raise ValueError("check accepts no native CMake arguments")
-            result = execute([sys.executable, "scripts/ci/style_gate.py", "--all",
-                              "--report", "build/quality/style-gate.json"], environment)
+            if workspace_identity() is not None:
+                raise ValueError("check requires a development checkout with "
+                                 "repository tests and governance materials")
+            result = execute([sys.executable, "scripts/ci/style_gate.py",
+                              "--all", "--report",
+                              "build/quality/style-gate.json"], environment)
             if result:
                 return result
             result = maintenance_checks(environment)
@@ -98,7 +134,8 @@ def main(argv=None):
                              if item["name"] == args.preset), None)
             if selected is None:
                 raise ValueError("Unknown configured test preset")
-            build = Path(selected["binaryDir"].replace("${sourceDir}", str(ROOT)))
+            directory = selected["binaryDir"].replace("${sourceDir}", str(ROOT))
+            build = Path(directory)
             report = build / "ctest-results.xml"
             report.unlink(missing_ok=True)
             started = time.time_ns()

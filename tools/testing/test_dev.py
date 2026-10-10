@@ -2,11 +2,17 @@
 
 from contextlib import redirect_stderr, redirect_stdout
 import io
+from pathlib import Path
+import shutil
 import subprocess
+import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
 from tools.dev import dev
+sys.path.insert(0, str(dev.ROOT / "cmake/package"))
+import package_source_sdk as source_sdk
 
 
 class DeveloperCommandTests(unittest.TestCase):
@@ -59,6 +65,63 @@ class DeveloperCommandTests(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertIn("Python:", output.getvalue())
         self.assertIn("tomllib", output.getvalue())
+
+    def sdk_fixture(self, directory):
+        root = Path(directory) / "share/nexus/src"
+        (root / "dependencies").mkdir(parents=True)
+        shutil.copyfile(dev.ROOT / "dependencies/environment.lock.json",
+                        root / "dependencies/environment.lock.json")
+        (root / ".nexus-source-sdk.json").write_text("{}")
+        return root
+
+    def test_doctor_verifies_sdk_before_reporting_tool_only_scope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.sdk_fixture(directory)
+            output = io.StringIO()
+            with patch.object(dev, "ROOT", root), \
+                    patch.object(source_sdk, "verify", return_value={
+                        "source_revision": "a" * 40}) as verify, \
+                    patch.object(dev, "executable",
+                                 side_effect=lambda name: name), \
+                    patch.object(dev.subprocess, "run",
+                                 side_effect=self.probe), \
+                    patch.object(dev, "execute", return_value=0) as execute, \
+                    redirect_stdout(output), redirect_stderr(io.StringIO()):
+                result = dev.main(["doctor"])
+            self.assertEqual(result, 0)
+            verify.assert_called_once_with(root)
+            execute.assert_not_called()
+            self.assertIn("Verified source SDK", output.getvalue())
+            self.assertIn("governance materials are not packaged",
+                          output.getvalue())
+
+    def test_manifest_presence_cannot_bypass_full_sdk_verification(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.sdk_fixture(directory)
+            output = io.StringIO()
+            with patch.object(dev, "ROOT", root), \
+                    patch.object(dev.subprocess, "run",
+                                 side_effect=self.probe), \
+                    patch.object(dev, "execute", return_value=0) as execute, \
+                    redirect_stdout(io.StringIO()), redirect_stderr(output):
+                result = dev.main(["doctor"])
+            self.assertEqual(result, 2)
+            execute.assert_not_called()
+            self.assertIn("source SDK identity", output.getvalue())
+
+    def test_check_explicitly_requires_development_checkout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.sdk_fixture(directory)
+            output = io.StringIO()
+            with patch.object(dev, "ROOT", root), \
+                    patch.object(source_sdk, "verify", return_value={
+                        "source_revision": "a" * 40}), \
+                    patch.object(dev, "execute", return_value=0) as execute, \
+                    redirect_stdout(io.StringIO()), redirect_stderr(output):
+                result = dev.main(["check"])
+            self.assertEqual(result, 2)
+            execute.assert_not_called()
+            self.assertIn("development checkout", output.getvalue())
 
 
 if __name__ == "__main__":
