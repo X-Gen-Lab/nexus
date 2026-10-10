@@ -84,8 +84,12 @@ static inline uint32_t nx_atomic_u32_add_guarded(uint32_t* value,
 
 /**
  * \brief           Strong acq_rel compare/exchange, acquire on failure.
+ * \param[in,out]   value: Live naturally aligned word in the caller-owned
+ *                  atomic domain; all concurrent accesses use this contract.
  * \param[in,out]   expected: Separate, private caller storage; failure replaces
  *                  it with the observed value. Success leaves it unchanged.
+ * \param[in]       desired: Replacement word stored only when comparison
+ *                  succeeds.
  * \return          True only when the original word equals expected and the
  *                  desired word was stored. No spurious failure is allowed.
  */
