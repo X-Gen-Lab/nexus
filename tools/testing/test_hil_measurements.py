@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.evidence.identity import canonical_digest
-from tools.hil.admit import validate_station
+from tools.hil.admit import validate_raw, validate_station
 from tools.hil.measure import measurement_plan, validate_measurements
 from tests.contracts import test_hil_admission
 
@@ -323,6 +323,21 @@ class HilMeasurementTests(unittest.TestCase):
             raw = {**original, "context": file_identity(path)}
             with self.subTest(metric=name), self.assertRaises(EvidenceError):
                 validate_measurements(raw, admission)
+
+    def test_extreme_smoke_metrics_raise_evidence_errors(self):
+        admission, _ = self.record()
+        admission["required_tests"] = self.fixture.fixture["required_tests"]
+        raw = self.fixture.raw_record(admission)
+        raw["metrics"] = {
+            name: {"value": 2000 if name == "throughput" else 1,
+                   "unit": budget["unit"], "raw": self.fixture.identity}
+            for name, budget in admission["budgets"].items()}
+        self.assertEqual(validate_raw(raw, admission)["status"], "passed")
+        for value in (10 ** 400, -(10 ** 400), True):
+            changed = copy.deepcopy(raw)
+            changed["metrics"]["irq_latency"]["value"] = value
+            with self.subTest(value=value), self.assertRaises(EvidenceError):
+                validate_raw(changed, admission)
 
     def test_extreme_station_bounds_raise_evidence_errors(self):
         for key in ("minimum", "maximum"):

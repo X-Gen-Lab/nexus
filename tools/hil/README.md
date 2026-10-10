@@ -29,7 +29,7 @@ physical measurements before those capabilities can be qualified.
 The platform supplies tooling and generic measurement cases. Products own
 electrical limits, fixture wiring, erase regions, real workloads and release
 decisions. Unknown PCB routes remain unknown until reviewed. These commands do not
-operate probes, powers boards, flashes firmware or opens serial devices.
+operate probes, power boards, flash firmware or open serial devices.
 
 
 `measure.py plan` generates seven generic acquisition cases bound to an exact

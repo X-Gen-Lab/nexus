@@ -229,6 +229,7 @@ def validate_raw(raw: dict, admission: dict, *, maximum_age_s: int = 86400,
         fields(metric, {"value", "unit", "raw"})
         budget = admission["budgets"][name]
         require(type(metric["value"]) in (int, float) and
+                0 <= metric["value"] <= 2 ** 64 - 1 and
                 math.isfinite(metric["value"]) and
                 budget.get("minimum", 0) <= metric["value"] <=
                 budget["maximum"] and metric["unit"] == budget["unit"],
