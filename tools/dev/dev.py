@@ -10,8 +10,6 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "cmake/package"))
-import package_source_sdk as source_sdk
 
 
 def executable(name):
@@ -39,11 +37,15 @@ def maintenance_checks(environment):
 
 def workspace_identity():
     """A manifest triggers complete verification, never a check bypass."""
-    manifest = ROOT / source_sdk.MANIFEST
+    manifest = ROOT / ".nexus-source-sdk.json"
     if manifest.exists() or manifest.is_symlink():
+        # Normal CMake/CTest commands do not depend on SDK packaging. Load the
+        # owned verifier only when this scope claims an installed SDK identity.
         try:
+            sys.path.insert(0, str(ROOT / "cmake/package"))
+            import package_source_sdk as source_sdk
             return source_sdk.verify(ROOT)
-        except (OSError, ValueError, TypeError, KeyError) as error:
+        except (ImportError, OSError, ValueError, TypeError, KeyError) as error:
             message = "Invalid source SDK identity: " + str(error)
             raise ValueError(message) from error
     if not (ROOT / ".git").exists():
