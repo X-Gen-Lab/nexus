@@ -24,7 +24,7 @@ scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生
 | GPIO | authorized mask、原子 set/reset、快照 read、single-writer toggle |
 | UART | 8N1 IRQ TX 或有限 TX DMA；caller-owned request、真实 TC、byte/event RX；独立 IRQ RX blocks／IDLE 模式；STM baud 最低 1282、GD 最低 1526，最高 1 Mbaud |
 | SPI | 8-bit MSB-first；短轮询每笔最多 256 bytes；全双工有限 DMA 最多 65535 bytes；单 wire-active、完整 CS interval；明确的独立 CS endpoint |
-| I2C | 100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；任意消息可读；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；STM 恢复检查 BUSY，GD 同时检查 BUSY 与所选线路电平 |
+| I2C | 100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；任意消息可读；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；两家恢复均检查 BUSY 与所选 SCL/SDA 电平 |
 | Flash | STM 精确 16/64/128 KiB sector 几何与 x32 program（4-byte alignment/length，声明供电 2.7–3.6 V）；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region |
 | Watchdog | 独立 enable/feed/reset cause；启用不可逆，late failure 不擦除责任；GD IRC32K 物理 timeout bounds 未保证 |
 | EXTI | selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策 |

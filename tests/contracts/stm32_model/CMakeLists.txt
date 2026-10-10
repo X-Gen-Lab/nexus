@@ -20,6 +20,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 add_executable(contract_stm32_constructor_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"
     "${stm32_root}/drivers/timer.c" "${stm32_root}/drivers/spi.c"
+    "${stm32_root}/drivers/i2c.c"
     "../stm32_constructor_test.c")
 target_include_directories(contract_stm32_constructor_model PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")

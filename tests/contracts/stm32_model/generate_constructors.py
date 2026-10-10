@@ -9,13 +9,13 @@ from configure import resolve  # noqa: E402
 from providers.stm32f407.bindings import constructor, shared_irq_definitions  # noqa: E402
 
 lines = []
-for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml"):
+for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml", "ve-i2c.toml"):
     result = resolve(root / "tests/contracts/stm32_assembly" / fixture, root)
     for item in result["controllers"]:
         name = item["id"].replace("-", "_")
         lines.append(f"static nx_stm32_{item['kind']}_state_t s_nx_port_{name};")
-        if item["kind"] == "spi":
-            lines.append(f"static nx_stm32_spi_endpoint_state_t s_nx_endpoint_{name};")
+        if item["kind"] in {"spi", "i2c"}:
+            lines.append(f"static nx_stm32_{item['kind']}_endpoint_state_t s_nx_endpoint_{name};")
         if item["kind"] in {"pwm", "exti"}:
             kind = item["kind"]
             lines.append(f"static const nx_{kind}_port_t s_nx_face_{name} = {{&nx_stm32_{kind}_ops, &s_nx_port_{name}}};")

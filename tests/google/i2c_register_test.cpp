@@ -35,6 +35,9 @@ size_t model_remaining;
 size_t model_received;
 size_t model_starts;
 bool model_address;
+bool model_sb_pending;
+bool model_restart_on_last_read;
+size_t model_duplicate_starts;
 bool model_hold_stop;
 bool model_hold_master;
 bool model_complete_on_last_read;
@@ -94,6 +97,7 @@ class I2CRegisters : public testing::Test {
     size_t transferred = 0;
 #ifdef NEXUS_I2C_STM32_TEST
     I2C_TypeDef registers = {};
+    GPIO_TypeDef lines = {};
 #else
     void* mapping = MAP_FAILED;
 #endif
@@ -107,6 +111,9 @@ class I2CRegisters : public testing::Test {
         model_received = 0;
         model_starts = 0;
         model_address = false;
+        model_sb_pending = false;
+        model_restart_on_last_read = false;
+        model_duplicate_starts = 0;
         model_hold_stop = false;
         model_hold_master = false;
         model_complete_on_last_read = false;
@@ -119,6 +126,9 @@ class I2CRegisters : public testing::Test {
         std::memset(data, 0xCC, sizeof(data));
 #ifdef NEXUS_I2C_STM32_TEST
         state.registers = &registers;
+        state.line_gpio = &lines;
+        state.line_mask = (1U << 6U) | (1U << 7U);
+        lines.IDR = state.line_mask;
         state.peripheral_mhz = 42;
         state.rate_hz = 100000;
         ASSERT_EQ(nx_stm32_i2c_initialize(&state), NX_SUCCESS);
@@ -154,6 +164,7 @@ class I2CRegisters : public testing::Test {
                          uint64_t deadline = 1000) {
         model_remaining = 0;
         model_address = false;
+        model_sb_pending = false;
         model_messages = std::move(messages);
         return nx_i2c_endpoint_transaction(&endpoint, model_messages.data(),
                                            model_messages.size(), deadline,
@@ -276,13 +287,26 @@ extern "C" void nx_i2c_model_poll(void* raw) {
         status(state) = 0;
         return;
     }
+    if (model_sb_pending) {
+        if ((control(state) & start) != 0) {
+            ++model_duplicate_starts;
+            ADD_FAILURE() << "START was requested again after hardware set SB";
+            control(state) &= ~start;
+        }
+#ifdef NEXUS_I2C_STM32_TEST
+        status(state) = I2C_SR1_SB;
+#else
+        status(state) = I2C_STAT0_SBSEND;
+#endif
+        return;
+    }
     if ((control(state) & start) != 0 && model_remaining == 0) {
         if (model_starts != 0) {
             ++model_message;
         }
         ++model_starts;
         control(state) &= ~start;
-        model_address = true;
+        model_sb_pending = true;
 #ifdef NEXUS_I2C_STM32_TEST
         status(state) = I2C_SR1_SB;
 #else
@@ -306,6 +330,25 @@ extern "C" void nx_i2c_model_poll(void* raw) {
     status(state) |= I2C_SR1_TXE;
 #else
     status(state) |= I2C_STAT0_TBE;
+#endif
+}
+
+/** \brief Hardware clears SB only after address DATA is actually written. */
+extern "C" void nx_i2c_model_write(void* raw, uint32_t value) {
+    auto* state = static_cast<State*>(raw);
+    if (model_sb_pending) {
+        ASSERT_LT(model_message, model_messages.size());
+        EXPECT_EQ(value, (UINT32_C(0x50) << 1U) |
+                             (model_messages[model_message].read ? 1U : 0U));
+        EXPECT_EQ(control(state) & pos, 0U);
+        EXPECT_NE(control(state) & ack, 0U);
+        model_sb_pending = false;
+        model_address = true;
+    }
+#ifdef NEXUS_I2C_STM32_TEST
+    state->registers->DR = value;
+#else
+    I2C_DATA(state->controller->registers) = value;
 #endif
 }
 
@@ -360,6 +403,20 @@ extern "C" uint8_t nx_i2c_model_read(void* raw) {
         I2C_STAT1(state->controller->registers) = 0;
 #endif
         model_stop_completed = true;
+    }
+    if (model_remaining == 0 && model_restart_on_last_read &&
+        model_message + 1 < model_messages.size()) {
+        /* A receive-window restart can reach SB before the task resumes. */
+        EXPECT_NE(control(state) & start, 0U);
+        control(state) &= ~start;
+        ++model_message;
+        ++model_starts;
+        model_sb_pending = true;
+#ifdef NEXUS_I2C_STM32_TEST
+        status(state) = I2C_SR1_SB;
+#else
+        status(state) = I2C_STAT0_SBSEND;
+#endif
     }
     return static_cast<uint8_t>(++model_received);
 }
@@ -541,3 +598,68 @@ TEST_F(I2CRegisters, StopBitClearWithoutMasterReleaseCannotReportSuccess) {
     EXPECT_EQ(transferred, 4U);
     EXPECT_FALSE(state.active);
 }
+
+TEST_F(I2CRegisters,
+       ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt) {
+    for (bool immediate : {false, true}) {
+        for (size_t length : {1U, 2U, 3U, 256U}) {
+            for (bool next_read : {false, true}) {
+                SCOPED_TRACE(immediate);
+                SCOPED_TRACE(length);
+                SCOPED_TRACE(next_read);
+                model_time = 0;
+                model_message = 0;
+                model_received = 0;
+                model_starts = 0;
+                model_duplicate_starts = 0;
+                model_restart_on_last_read = immediate;
+                uint8_t next[1] = {0x10};
+                EXPECT_CALL(boundary, Call(0, true));
+                EXPECT_CALL(boundary, Call(1, next_read));
+                ASSERT_EQ(transact({{data, length, true},
+                                    {next, sizeof(next), next_read}}),
+                          NX_SUCCESS);
+                EXPECT_EQ(transferred, length + 1);
+                EXPECT_EQ(model_starts, 2U);
+                EXPECT_EQ(model_duplicate_starts, 0U);
+                EXPECT_EQ(model_mask, 0U);
+            }
+        }
+    }
+}
+
+TEST_F(I2CRegisters, RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear) {
+    for (unsigned line = 0; line < 2; ++line) {
+#ifdef NEXUS_I2C_STM32_TEST
+        state.registers->SR2 = 0;
+        lines.IDR = state.line_mask & ~(1U << (6U + line));
+#else
+        I2C_STAT1(state.controller->registers) = 0;
+        GPIO_ISTAT(GPIOB) = state.line_mask & ~(1U << (10U + line));
+#endif
+        EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_IO);
+#ifdef NEXUS_I2C_STM32_TEST
+        EXPECT_TRUE(state.fault);
+        lines.IDR = state.line_mask;
+#else
+        EXPECT_TRUE(state.faulted);
+        GPIO_ISTAT(GPIOB) = state.line_mask;
+#endif
+        ASSERT_EQ(nx_i2c_port_recover(&port), NX_SUCCESS);
+    }
+}
+
+#ifdef NEXUS_I2C_STM32_TEST
+TEST_F(I2CRegisters, MissingLineFactsRejectInitializationAndRecovery) {
+    state.line_gpio = nullptr;
+    const uint32_t before = control(&state);
+    EXPECT_EQ(nx_stm32_i2c_initialize(&state), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_INVALID);
+    EXPECT_EQ(control(&state), before);
+    state.line_gpio = &lines;
+    state.line_mask = 0;
+    EXPECT_EQ(nx_stm32_i2c_initialize(&state), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_i2c_port_recover(&port), NX_ERROR_INVALID);
+    EXPECT_EQ(control(&state), before);
+}
+#endif

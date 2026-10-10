@@ -172,7 +172,16 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             # External pull-ups are a reviewed Board requirement; enabling an
             # internal pull-up does not stand in for that electrical contract.
             _pin(body, pin, 2, open_drain=True)
+        # The maintained route has two lines on one GPIO port. Retain the
+        # resolved facts for physical line-level observation during recover.
+        line_ports = {pin["pin"][1] for pin in item["pins"]}
+        if len(item["pins"]) != 2 or len(line_ports) != 1:
+            raise ValueError("I2C requires two reviewed lines on one GPIO port")
+        line_port = next(iter(line_ports))
+        line_mask = sum(1 << int(pin["pin"][2:]) for pin in item["pins"])
         body += [f"    s_nx_port_{name}.registers = I2C1;",
+                 f"    s_nx_port_{name}.line_gpio = GPIO{line_port};",
+                 f"    s_nx_port_{name}.line_mask = {line_mask}u;",
                  f"    s_nx_port_{name}.peripheral_mhz = 42u;",
                  f"    s_nx_port_{name}.rate_hz = 100000u;"]
         for index, child in enumerate(children):

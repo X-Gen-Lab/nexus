@@ -433,8 +433,12 @@ static void spi_test(void) {
  * recovery. */
 static void i2c_test(void) {
     I2C_TypeDef registers = {0};
-    nx_stm32_i2c_state_t port = {
-        .registers = &registers, .peripheral_mhz = 42U, .rate_hz = 100000U};
+    GPIO_TypeDef lines = {.IDR = (1U << 6U) | (1U << 7U)};
+    nx_stm32_i2c_state_t port = {.registers = &registers,
+                                 .line_gpio = &lines,
+                                 .line_mask = (1U << 6U) | (1U << 7U),
+                                 .peripheral_mhz = 42U,
+                                 .rate_hz = 100000U};
     const nx_i2c_port_t port_api = {&nx_stm32_i2c_ops, &port};
     (void)port_api;
     nx_stm32_i2c_endpoint_state_t endpoint = {.port = &port, .address = 0x50U};

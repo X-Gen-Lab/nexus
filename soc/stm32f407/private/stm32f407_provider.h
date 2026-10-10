@@ -62,6 +62,8 @@ typedef struct {
 } nx_stm32_spi_endpoint_state_t;
 typedef struct {
     I2C_TypeDef* registers;
+    const GPIO_TypeDef* line_gpio;
+    uint32_t line_mask;
     uint32_t peripheral_mhz;
     uint32_t rate_hz;
     bool active;

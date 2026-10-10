@@ -63,6 +63,11 @@ quarantined transfer; until then its request remains borrowed. After SETTLED,
 no IRQ or provider reference remains. Request owners must preserve storage
 until settlement and separate observer/adapter drain.
 
+I2C recovery checks the controller BUSY flag and both retained SCL/SDA GPIO
+input levels from the reviewed route. A low line returns IO even if BUSY is
+clear. Local reset does not emit GPIO pulses, replay a transaction or establish
+future bus availability; missing line facts reject before register writes.
+
 Construction is a cold task operation with no other writers of the selected
 controllers. GPIO levels and reviewed AF fields are installed explicitly.
 Advanced constructors capture only affected pin fields and clock bits on the
@@ -77,7 +82,7 @@ platform shutdown. These are ownership guarantees, not physical timing proof.
 `tests/contracts/stm32_model` compiles the real production providers against
 controlled official register structs and explicit model event hooks. It tests
 clock failure/rollback, timer wrap, GPIO masks, UART TC/cancel/late IRQ/RX loss,
-SPI reset/CS, I2C receive profiles/NACK/arbitration/STOP/recovery, Flash bounds
+SPI reset/CS, I2C receive profiles/repeated-START auto-clear/NACK/arbitration/STOP/recovery, Flash bounds
 and pulses, irreversible IWDG failure, shared EXTI isolation, PWM and ADC faults.
 Host models and ARM ELF linkage remain separate evidence. Physical clock,
 IRQ timing, electrical waveform, Flash power loss and long-load qualification

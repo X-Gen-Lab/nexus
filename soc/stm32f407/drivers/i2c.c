@@ -15,13 +15,17 @@
 #ifndef NX_STM32_I2C_READ_DATA
 #define NX_STM32_I2C_READ_DATA(port) ((uint8_t)(port)->registers->DR)
 #endif
+#ifndef NX_STM32_I2C_WRITE_DATA
+#define NX_STM32_I2C_WRITE_DATA(port, value) ((port)->registers->DR = (value))
+#endif
 #ifndef NX_STM32_I2C_ADDRESS_CLEARED
 #define NX_STM32_I2C_ADDRESS_CLEARED(port) ((void)(port))
 #endif
 
 /** \brief Apply only the reviewed 42 MHz / 100 kHz standard-mode profile. */
 nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
-    if (port == NULL || port->registers == NULL) {
+    if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
+        port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
         return NX_ERROR_INVALID;
     }
     if (port->peripheral_mhz != 42U || port->rate_hz != 100000U) {
@@ -217,15 +221,24 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
     }
     port->active = true;
     nx_result_t result = NX_SUCCESS;
+    bool start_requested = false;
     for (size_t message = 0U; message < count; ++message) {
-        port->registers->CR1 = (port->registers->CR1 & ~(uint32_t)I2C_CR1_POS) |
-                               I2C_CR1_ACK | I2C_CR1_START;
+        if (!start_requested) {
+            port->registers->CR1 |= I2C_CR1_START;
+        }
         result = wait_flag(port, I2C_SR1_SB, deadline);
         if (result != NX_SUCCESS) {
             break;
         }
-        port->registers->DR = ((uint32_t)endpoint->address << 1U) |
-                              (messages[message].read ? 1U : 0U);
+        /* SB proves the requested START completed. Prepare the next ACK/POS
+         * only now: a CR1 RMW before SB could copy a concurrently clearing
+         * START bit and request another start. */
+        port->registers->CR1 =
+            (port->registers->CR1 & ~(uint32_t)(I2C_CR1_POS | I2C_CR1_START)) |
+            I2C_CR1_ACK;
+        start_requested = false;
+        NX_STM32_I2C_WRITE_DATA(port, ((uint32_t)endpoint->address << 1U) |
+                                          (messages[message].read ? 1U : 0U));
         result = wait_flag(port, I2C_SR1_ADDR, deadline);
         if (result != NX_SUCCESS) {
             break;
@@ -233,6 +246,7 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         if (messages[message].read) {
             result = receive(port, &messages[message], message + 1U == count,
                              deadline, transferred);
+            start_requested = result == NX_SUCCESS && message + 1U < count;
         } else {
             clear_address(port);
             for (size_t byte = 0U; byte < messages[message].length; ++byte) {
@@ -240,7 +254,7 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
                 if (result != NX_SUCCESS) {
                     break;
                 }
-                port->registers->DR = messages[message].data[byte];
+                NX_STM32_I2C_WRITE_DATA(port, messages[message].data[byte]);
                 result = wait_flag(port, I2C_SR1_BTF, deadline);
                 if (result != NX_SUCCESS) {
                     break;
@@ -275,7 +289,8 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
  */
 nx_result_t nx_stm32_i2c_recover(void* context) {
     nx_stm32_i2c_state_t* port = context;
-    if (port == NULL || port->registers == NULL) {
+    if (port == NULL || port->registers == NULL || port->line_gpio == NULL ||
+        port->line_mask == 0U || (port->line_mask & ~UINT32_C(0xFFFF)) != 0U) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
@@ -292,7 +307,9 @@ nx_result_t nx_stm32_i2c_recover(void* context) {
     port->registers->CR1 = 0U;
     nx_result_t result = nx_stm32_i2c_initialize(port);
     NX_STM32_IO_POLL(2U, port);
-    if (result == NX_SUCCESS && (port->registers->SR2 & I2C_SR2_BUSY) != 0U) {
+    if (result == NX_SUCCESS &&
+        ((port->registers->SR2 & I2C_SR2_BUSY) != 0U ||
+         (port->line_gpio->IDR & port->line_mask) != port->line_mask)) {
         port->fault = true;
         return NX_ERROR_IO;
     }

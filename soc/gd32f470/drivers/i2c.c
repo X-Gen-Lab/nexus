@@ -17,6 +17,10 @@
 #define NX_GD32_I2C_READ_DATA(port)                                            \
     ((uint8_t)I2C_DATA((port)->controller->registers))
 #endif
+#ifndef NX_GD32_I2C_WRITE_DATA
+#define NX_GD32_I2C_WRITE_DATA(port, value)                                    \
+    (I2C_DATA((port)->controller->registers) = (value))
+#endif
 #ifndef NX_GD32_I2C_ADDRESS_CLEARED
 #define NX_GD32_I2C_ADDRESS_CLEARED(port) ((void)(port))
 #endif
@@ -246,16 +250,25 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
     }
     port->active = true;
     nx_result_t status = NX_SUCCESS;
+    bool start_requested = false;
     for (size_t i = 0u; i < count && status == NX_SUCCESS; ++i) {
-        I2C_CTL0(port->controller->registers) =
-            (I2C_CTL0(port->controller->registers) & ~I2C_CTL0_POAP) |
-            I2C_CTL0_ACKEN | I2C_CTL0_START;
+        if (!start_requested) {
+            I2C_CTL0(port->controller->registers) |= I2C_CTL0_START;
+        }
         status = wait_status(port, I2C_STAT0_SBSEND, deadline);
         if (status != NX_SUCCESS) {
             break;
         }
-        I2C_DATA(port->controller->registers) =
-            ((uint32_t)endpoint->address << 1) | (messages[i].read ? 1u : 0u);
+        /* SBSEND proves START has cleared before the ACK/POS RMW. A receive
+         * window can already have issued this START before task code resumes.
+         */
+        I2C_CTL0(port->controller->registers) =
+            (I2C_CTL0(port->controller->registers) &
+             ~(I2C_CTL0_POAP | I2C_CTL0_START)) |
+            I2C_CTL0_ACKEN;
+        start_requested = false;
+        NX_GD32_I2C_WRITE_DATA(port, ((uint32_t)endpoint->address << 1) |
+                                         (messages[i].read ? 1u : 0u));
         status = wait_status(port, I2C_STAT0_ADDSEND, deadline);
         if (status != NX_SUCCESS) {
             break;
@@ -263,6 +276,7 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
         if (messages[i].read) {
             status = receive(port, &messages[i], i + 1u == count, deadline,
                              transferred);
+            start_requested = status == NX_SUCCESS && i + 1u < count;
             continue;
         }
         clear_address(port);
@@ -271,7 +285,7 @@ nx_result_t nx_gd32_i2c_endpoint_transaction(void* context,
             if (status != NX_SUCCESS) {
                 break;
             }
-            I2C_DATA(port->controller->registers) = messages[i].data[j];
+            NX_GD32_I2C_WRITE_DATA(port, messages[i].data[j]);
             status = wait_status(port, I2C_STAT0_BTC, deadline);
             if (status != NX_SUCCESS) {
                 break;

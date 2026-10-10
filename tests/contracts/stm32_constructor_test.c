@@ -18,6 +18,8 @@ static SYSCFG_TypeDef s_mux;
 static TIM_TypeDef s_timer;
 static GPIO_TypeDef s_gpioe;
 static SPI_TypeDef s_spi;
+static I2C_TypeDef s_i2c;
+static GPIO_TypeDef s_gpiob;
 static unsigned s_disable;
 static unsigned s_clear;
 static unsigned s_clock_failure;
@@ -34,6 +36,10 @@ static unsigned s_clock_failure;
 #define GPIOE (&s_gpioe)
 #undef SPI1
 #define SPI1 (&s_spi)
+#undef I2C1
+#define I2C1 (&s_i2c)
+#undef GPIOB
+#define GPIOB (&s_gpiob)
 #undef NVIC_SetPriority
 #define NVIC_SetPriority(irq, priority) ((void)(irq), (void)(priority))
 #undef NVIC_EnableIRQ
@@ -164,12 +170,26 @@ static void spi_rollback_test(void) {
     assert((s_rcc.APB2ENR & RCC_APB2ENR_SPI1EN) == 0U);
 }
 
+/** \brief The generated I2C owner retains exactly its reviewed line facts. */
+static void i2c_route_test(void) {
+    s_rcc.APB1ENR = RCC_APB1ENR_TIM2EN;
+    s_rcc.AHB1ENR = 1U << 2U;
+    assert(prepare_i2c0() == NX_SUCCESS);
+    assert(s_nx_port_i2c0.line_gpio == GPIOB);
+    assert(s_nx_port_i2c0.line_mask == ((1U << 6U) | (1U << 7U)));
+    assert(s_nx_port_i2c0.registers == I2C1);
+    assert(stop_i2c0() == NX_SUCCESS);
+    assert(!s_nx_port_i2c0.initialized);
+    assert(s_rcc.APB1ENR == RCC_APB1ENR_TIM2EN);
+}
+
 /** \brief Execute actual generated construction, failure and release paths. */
 int main(void) {
     g_nx_stm32_system.rcc = &s_rcc;
     exti_rollback_test();
     pwm_rollback_test();
     spi_rollback_test();
+    i2c_route_test();
     puts("STM32 generated constructor rollback and release model passed");
     return 0;
 }
