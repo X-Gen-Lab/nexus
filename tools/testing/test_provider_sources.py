@@ -132,6 +132,37 @@ add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" soc)
                     expected.add("timebase.c")
                 self.assertEqual(provider, expected)
 
+    def test_gd32_adc_uses_vendor_gpio_without_an_unreferenced_provider(self):
+        for mode in ("single-shot", "low-rate-scan", "trigger-dma"):
+            with self.subTest(mode=mode):
+                provider, sdk = self.configure_sources(
+                    "gd32f470", [("adc", mode)])
+                expected = {"timebase.c", "adc.c"}
+                if mode == "trigger-dma":
+                    expected.add("adc_stream.c")
+                self.assertEqual(provider, expected)
+                self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
+                                       "gd32f4xx_timer", "gd32f4xx_gpio",
+                                       "gd32f4xx_adc"})
+
+    def test_gd32_exti_and_pwm_use_sdk_pins_without_gpio_provider(self):
+        for kind, mode, source in (("exti", "edge-event", "exti.c"),
+                                   ("pwm", "fixed-pwm", "timer.c")):
+            with self.subTest(kind=kind):
+                provider, sdk = self.configure_sources(
+                    "gd32f470", [(kind, mode)])
+                self.assertEqual(provider, {"timebase.c", source})
+                self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
+                                       "gd32f4xx_timer", "gd32f4xx_gpio"})
+
+    def test_stm32_adc_exti_pwm_retain_generated_pin_helpers(self):
+        for kind, mode, source in (("adc", "low-rate-scan", "adc.c"),
+                                   ("exti", "edge-event", "exti.c"),
+                                   ("pwm", "fixed-pwm", "timer.c")):
+            with self.subTest(kind=kind):
+                self.assertEqual(self.configure_sources(
+                    "stm32f407", [(kind, mode)]), ({"gpio.c", source}, set()))
+
     def test_pinless_devices_do_not_compile_gpio(self):
         for family in ("stm32f407", "gd32f470"):
             with self.subTest(family=family):

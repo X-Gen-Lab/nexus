@@ -28,8 +28,12 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
     else()
         list(APPEND gd_sources "drivers/${kind}.c")
     endif()
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc)$")
+    # Generated UART/SPI/I2C acquisition and rollback use Nexus pin helpers.
+    if(kind MATCHES "^(gpio|uart|spi|i2c)$")
         list(APPEND gd_sources drivers/gpio.c)
+    endif()
+    # EXTI/PWM/ADC configure pins through the SDK without Nexus GPIO helpers.
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc)$")
         list(APPEND gd_sdk_units gpio)
     endif()
     if(kind STREQUAL "uart")
