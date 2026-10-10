@@ -178,7 +178,6 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
     return ++model_time;
 }
 
-#ifdef NEXUS_I2C_STM32_TEST
 /** \brief Save the incoming mask used by protected hardware receive windows. */
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
     nx_arch_irq_state_t incoming = {model_mask};
@@ -200,28 +199,31 @@ extern "C" bool nx_arch_irq_is_masked(void) {
 /** \brief Host ordering does not qualify physical peripheral timing. */
 extern "C" void nx_arch_dsb(void) {
 }
-#else
-/** \brief Preserve the incoming GD interrupt mask. */
-extern "C" uint32_t nx_gd32_critical_enter(void) {
-    uint32_t incoming = model_mask;
-    model_mask = 1;
-    return incoming;
+/** \brief Both MCU models share one explicit CPU interrupt-mask domain. */
+extern "C" nx_arch_irq_masks_t nx_arch_irq_masks(void) {
+    return {model_mask, 0U, 0U};
 }
-/** \brief Restore the incoming GD interrupt mask. */
-extern "C" void nx_gd32_critical_leave(uint32_t incoming) {
-    model_mask = incoming;
+/** \brief The register fixture injects one external exception identity. */
+extern "C" uint32_t nx_arch_exception_number(void) {
+    return model_isr ? 16U : 0U;
 }
-/** \brief Report an injected exception context. */
-extern "C" bool nx_gd32_in_isr(void) {
-    return model_isr;
+/** \brief Unprivileged CPU faults are exercised by the dedicated Arch model. */
+extern "C" bool nx_arch_is_privileged(void) {
+    return true;
 }
-/** \brief Report an injected interrupt mask. */
-extern "C" bool nx_gd32_irq_masked(void) {
-    return model_mask != 0;
+/** \brief Preserve host ordering without claiming hardware timing. */
+extern "C" void nx_arch_dmb(void) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
-/** \brief A host barrier does not prove physical hardware ordering. */
-extern "C" void nx_gd32_peripheral_barrier(void) {
+/** \brief The host register fixture has no physical instruction pipeline. */
+extern "C" void nx_arch_isb(void) {
 }
+/** \brief No physical DWT counter exists in this transaction fixture. */
+extern "C" bool nx_arch_cycle_snapshot(uint32_t* cycles) {
+    (void)cycles;
+    return false;
+}
+#ifndef NEXUS_I2C_STM32_TEST
 /** \brief Model selected clock acquisition with the official register layout.
  */
 extern "C" void rcu_periph_clock_enable(rcu_periph_enum clock) {

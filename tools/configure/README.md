@@ -146,8 +146,9 @@ for normalization. It assists editor completion. The resolver additionally
 checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
-`ir.py` defines frozen `ControllerIR`, `EndpointIR`, `MemoryBudgetIR` and
-`ConfigurationIR`. Controller options use explicit frozen GPIO, UART, SPI, I2C,
+`ir.py` defines frozen `ControllerIR`, `EndpointIR`, `MemoryBudgetIR`,
+`InterruptProfileIR` and `ConfigurationIR`. Controller options use frozen GPIO,
+UART, SPI, I2C,
 EXTI, PWM and ADC records. IRQ priority and kernel-call intent are a nested record;
 ADC channel and sample sequences are tuples. Constructor emitters consume these
 named decisions directly; reviewed hardware facts retain an immutable Mapping
@@ -173,6 +174,22 @@ CPU architecture, FPU, float ABI and enum ABI reach CMake from the validated
 resolution. Arch and build options accept only maintained combinations; a new
 non-Native family does not implicitly receive Cortex-M4 flags. These configuration
 modules do not select software source files: CMake targets retain that authority.
+
+CPU facts also declare the boolean `dwt_cyccnt` capability. Interrupt facts
+declare `irq.priority_bits`; each maintained provider verifies the exact chip
+values before resolving the logical priority range. Native retains a four-bit
+model priority range without claiming a physical NVIC or DWT. Authored `[abi]`
+continues to assert only architecture, FPU and float ABI, so an assembly cannot
+override chip capabilities.
+
+The selected FreeRTOS provider names its maintained `GCC/ARM_CM4F` port. That
+port's immutable profile binds its CPU ABI and logical syscall ceiling; the
+resolver verifies that the ceiling fits the chip's priority width before any
+instance is emitted. The frozen IRQ decision supplies generated priority and
+syscall macros, the kernel port selection and the Arch DWT compile fact. Baremetal
+and Native have no kernel syscall ceiling. Unknown ports, contradictory CPU
+facts and invalid OS-calling IRQ priorities fail closed. Adding a primitive
+Arch implementation does not add a selectable SoC, ABI or kernel port.
 
 Generated private storage has separate role namespaces: `s_nx_port_*`,
 `s_nx_endpoint_*`, `s_nx_cs_*`, receive/model buffers and platform lifecycle state.

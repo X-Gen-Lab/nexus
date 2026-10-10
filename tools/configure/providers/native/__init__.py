@@ -4,6 +4,10 @@ from .. import common
 
 CPU_ABI = MappingProxyType({'arch': 'native', 'fpu': 'none', 'float_abi': 'native'})
 ENUM_ABI = 'native-int'
+# Preserve the authored model priority range; Native has no physical NVIC.
+IRQ_PRIORITY_BITS = 4
+DWT_CYCCNT = False
+FREERTOS_PORT = None
 PREFIX = 'native'
 MODEL = True
 DMA_VECTOR = None

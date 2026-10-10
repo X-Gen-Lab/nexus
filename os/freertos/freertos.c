@@ -8,6 +8,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/os/freertos.h"
+#include "nexus/arch/arch.h"
 #include <limits.h>
 #include <string.h>
 
@@ -15,29 +16,50 @@ _Static_assert(__GCC_ATOMIC_INT_LOCK_FREE == 2 &&
                    sizeof(uint32_t) == sizeof(unsigned),
                "FreeRTOS notifications require lock-free sequence publication");
 
-/** \brief Read the architectural exception identity without vendor headers. */
-static uint32_t exception_number(void) {
-#if defined(__arm__) || defined(__thumb__)
-    uint32_t exception;
-    __asm volatile("mrs %0, ipsr" : "=r"(exception));
-    return exception;
-#else
-    return 0;
+#if defined(__arm__) || defined(__thumb__) || defined(NEXUS_FREERTOS_MODEL)
+#ifndef NX_FREERTOS_PRIORITY_GROUP
+#define NX_FREERTOS_PRIORITY_GROUP()                                           \
+    ((*(const volatile uint32_t*)0xe000ed0cu >> 8) & 7u)
 #endif
+#ifndef NX_FREERTOS_IRQ_PRIORITY
+#define NX_FREERTOS_IRQ_PRIORITY(exception)                                    \
+    (((const volatile uint8_t*)0xe000e400u)[(exception)-16])
+#endif
+#endif
+
+/** \brief Reject unsafe CPU contexts before kernel entry or object mutation. */
+static bool task_context_allowed(void) {
+    if (nx_arch_in_isr() || !nx_arch_is_privileged()) {
+        return false;
+    }
+    nx_arch_irq_masks_t masks = nx_arch_irq_masks();
+    if (masks.primask != 0 || masks.faultmask != 0) {
+        return false;
+    }
+    if (masks.basepri == 0) {
+        return true;
+    }
+    /* The pinned CM4F port keeps its syscall mask while its pre-scheduler
+     * critical nesting is nonzero. Accept that exact value only before start;
+     * running or suspended tasks must restore every incoming manual mask. */
+    return masks.basepri == configMAX_SYSCALL_INTERRUPT_PRIORITY &&
+           xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED;
 }
 
 /** \brief Reject kernel API calls above the maintained syscall ceiling. */
 bool nx_freertos_isr_allowed(void) {
-#if defined(__arm__) || defined(__thumb__)
-    uint32_t exception = exception_number();
+    if (!nx_arch_is_privileged() || nx_arch_irq_is_masked()) {
+        return false;
+    }
+#if defined(__arm__) || defined(__thumb__) || defined(NEXUS_FREERTOS_MODEL)
+    uint32_t exception = nx_arch_exception_number();
     if (exception < 16 || exception > 255) {
         return false;
     }
-    const volatile uint8_t* priorities = (const volatile uint8_t*)0xe000e400u;
-    const volatile uint32_t* aircr = (const volatile uint32_t*)0xe000ed0cu;
-    uint32_t grouping = (*aircr >> 8) & 7u;
+    uint32_t grouping = NX_FREERTOS_PRIORITY_GROUP();
     return grouping <= 7u - configPRIO_BITS &&
-           priorities[exception - 16] >= configMAX_SYSCALL_INTERRUPT_PRIORITY;
+           NX_FREERTOS_IRQ_PRIORITY(exception) >=
+               configMAX_SYSCALL_INTERRUPT_PRIORITY;
 #else
     return false;
 #endif
@@ -71,7 +93,7 @@ static uint32_t notify_arm(void* context) {
 static nx_result_t notify_wait(void* context, uint32_t sequence,
                                uint64_t deadline_us) {
     nx_freertos_notify_t* notification = context;
-    if (exception_number() != 0 ||
+    if (!task_context_allowed() ||
         xTaskGetSchedulerState() != taskSCHEDULER_RUNNING) {
         return NX_ERROR_CONTEXT;
     }
@@ -100,8 +122,9 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
 /** \brief Publish sequence then latch wake; a full binary latch is valid. */
 static nx_result_t notify_wake(void* context) {
     nx_freertos_notify_t* notification = context;
-    bool isr = exception_number() != 0;
-    if (isr && !nx_freertos_isr_allowed()) {
+    bool isr = nx_arch_in_isr();
+    if ((isr && !nx_freertos_isr_allowed()) ||
+        (!isr && !task_context_allowed())) {
         return NX_ERROR_CONTEXT;
     }
     __atomic_fetch_add(&notification->sequence, 1, __ATOMIC_RELEASE);
@@ -117,7 +140,7 @@ static nx_result_t notify_wake(void* context) {
 
 /** \brief Create exactly one static notification latch. */
 nx_result_t nx_freertos_notify_init(nx_freertos_notify_t* notification) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (notification == NULL || notification->handle != NULL) {
@@ -141,7 +164,7 @@ nx_wait_port_t nx_freertos_notify_port(nx_freertos_notify_t* notification) {
 
 /** \brief Require publisher quiescence before deleting the static latch. */
 nx_result_t nx_freertos_notify_destroy(nx_freertos_notify_t* notification) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (notification == NULL || notification->handle == NULL) {
@@ -175,7 +198,7 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
                                    StackType_t* stack, size_t stack_words,
                                    UBaseType_t priority, void (*entry)(void*),
                                    void* context) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (task == NULL || name == NULL || stack == NULL || entry == NULL ||
@@ -203,7 +226,7 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
 /** \brief Delete a returned other task before returning reclaim permission. */
 nx_result_t nx_freertos_task_join(nx_freertos_task_t* task,
                                   nx_time_us_t deadline) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (task == NULL || task->handle == NULL) {
@@ -234,7 +257,7 @@ nx_result_t nx_freertos_task_join(nx_freertos_task_t* task,
 nx_result_t nx_freertos_queue_init(nx_freertos_queue_t* queue, uint8_t* storage,
                                    size_t storage_bytes, size_t depth,
                                    size_t item_size) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (queue == NULL || storage == NULL || depth == 0 || item_size == 0 ||
@@ -251,7 +274,7 @@ nx_result_t nx_freertos_queue_init(nx_freertos_queue_t* queue, uint8_t* storage,
 /** \brief Send bounded queue data; explicit owner controls stop admission. */
 nx_result_t nx_freertos_queue_send(nx_freertos_queue_t* queue, const void* item,
                                    TickType_t wait_ticks) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (queue == NULL || queue->handle == NULL || item == NULL ||
@@ -270,7 +293,7 @@ nx_result_t nx_freertos_queue_send(nx_freertos_queue_t* queue, const void* item,
 /** \brief Receive bounded queue data. */
 nx_result_t nx_freertos_queue_receive(nx_freertos_queue_t* queue, void* item,
                                       TickType_t wait_ticks) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (queue == NULL || queue->handle == NULL || item == NULL ||
@@ -288,7 +311,7 @@ nx_result_t nx_freertos_queue_receive(nx_freertos_queue_t* queue, void* item,
 
 /** \brief Delete only after external users quiesce and queued items drain. */
 nx_result_t nx_freertos_queue_destroy(nx_freertos_queue_t* queue) {
-    if (exception_number() != 0) {
+    if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
     if (queue == NULL || queue->handle == NULL) {

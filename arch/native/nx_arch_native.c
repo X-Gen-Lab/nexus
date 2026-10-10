@@ -95,6 +95,16 @@ void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
 bool nx_arch_irq_is_masked(void) {
     return s_depth != 0;
 }
+nx_arch_irq_masks_t nx_arch_irq_masks(void) {
+    nx_arch_irq_masks_t masks = {s_depth != 0 ? 1u : 0u, 0, 0};
+    return masks;
+}
+uint32_t nx_arch_exception_number(void) {
+    return 0;
+}
+bool nx_arch_is_privileged(void) {
+    return true;
+}
 bool nx_arch_in_isr(void) {
     return false;
 }

@@ -17,11 +17,13 @@ import tempfile
 
 try:
     from .providers import maintained
-    from .providers.common import (ConfigurationError, fail, integer, sequence,
+    from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
+                                   resolve_interrupts, sequence,
                                    validate_selection)
 except ImportError:
     from providers import maintained
-    from providers.common import (ConfigurationError, fail, integer, sequence,
+    from providers.common import (ConfigurationError, cpu_abi, fail, integer,
+                                  resolve_interrupts, sequence,
                                   validate_selection)
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -152,7 +154,7 @@ def contained_file(package, name):
 
 
 def validate_soc(soc, part):
-    obj(soc, {"schema_version", "id", "variants", "cpu", "clock_profiles",
+    obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
               "controllers"}, {"provenance", "source_lock", "reserved_resources"},
         "SoC")
     integer(soc["schema_version"], 1, 1, "SoC schema")
@@ -185,10 +187,18 @@ def validate_soc(soc, part):
         ranges.append((start, end, region["id"]))
     if sum(region["linker"] for region in memory) != 1:
         fail("Exactly one maintained default RAM linker domain is required")
-    cpu = obj(soc["cpu"], {"arch", "fpu", "float_abi"}, (), "CPU ABI")
-    expected = maintained(soc["id"]).CPU_ABI
-    if cpu != expected:
+    cpu = obj(soc["cpu"], {"arch", "fpu", "float_abi", "dwt_cyccnt"}, (),
+              "CPU facts")
+    provider = maintained(soc["id"])
+    if cpu_abi(cpu) != provider.CPU_ABI:
         fail(f"Unsupported CPU/FPU ABI: {cpu}")
+    if (type(cpu["dwt_cyccnt"]) is not bool or
+            cpu["dwt_cyccnt"] != provider.DWT_CYCCNT):
+        fail("DWT cycle counter differs from maintained CPU facts")
+    irq = obj(soc["irq"], {"priority_bits"}, (), "IRQ facts")
+    bits = integer(irq["priority_bits"], 1, 8, "IRQ priority bits")
+    if bits != provider.IRQ_PRIORITY_BITS:
+        fail("IRQ priority bits differ from maintained SoC facts")
     if not isinstance(soc["controllers"], dict):
         fail("SoC controllers must be an object")
     for name, controller in soc["controllers"].items():
@@ -338,12 +348,13 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail(f"Unsupported OS backend: {backend}")
     if (provider.MODEL) != (backend == "native"):
         fail("Native is a host model; its backend cannot qualify MCU execution")
+    irq_profile = resolve_interrupts(soc["cpu"], soc["irq"], backend, provider)
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
     if clock is None:
         fail(f"Unknown clock profile: {assembly['clock_profile']}")
     if clock["hse_hz"] != board["clocks"]["hse_hz"]:
         fail("Clock profile does not match the Board oscillator")
-    if "abi" in assembly and assembly["abi"] != soc["cpu"]:
+    if "abi" in assembly and assembly["abi"] != cpu_abi(soc["cpu"]):
         fail("Assembly ABI contradicts the selected SoC")
     optimization = assembly.get("optimization", "Os")
     if optimization not in {"O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
@@ -412,7 +423,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         claim(key, owner, "reserved", board["id"])
     if backend == "freertos":
         for irq in ("SysTick", "PendSV", "SVC"):
-            claim("irq:" + irq, "freertos", "kernel", "FreeRTOS Cortex-M4F")
+            claim("irq:" + irq, "freertos", "kernel",
+                  "FreeRTOS " + irq_profile["kernel_port"])
     selected = []
     instance_ids = []
     irq_owners = {}
@@ -445,7 +457,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             if selection["duty_ticks"] > selection.get("period_ticks", 0):
                 fail("PWM duty exceeds period")
         if "irq_priority" in selection:
-            integer(selection["irq_priority"], 0, 15, "IRQ priority")
+            integer(selection["irq_priority"], 0,
+                    irq_profile["maximum_priority"], "IRQ priority")
         if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
             fail("Polling SPI has no IRQ options")
         if route["kind"] == "spi" and mode.startswith("dma") and "irq_priority" not in selection:
@@ -453,7 +466,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if "calls_os" in selection and type(selection["calls_os"]) is not bool:
             fail("calls_os must be boolean")
         if selection.get("calls_os", False) and (backend != "freertos" or
-                                                 selection.get("irq_priority", 0) < 5):
+                selection.get("irq_priority", 0) < irq_profile["syscall_priority"]):
             fail("OS-calling ISR violates the FreeRTOS syscall ceiling")
         if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
             fail("Controller speed exceeds maintained limit")
@@ -655,7 +668,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("BMP280 SPI device requires the maintained bmp280-spi component")
     result = {"schema_version": 1, "board": board["id"], "soc_family": family,
               "part": part, "package": variant["package"], "backend": backend,
-              "cpu": soc["cpu"], "clock_profile": assembly["clock_profile"],
+              "cpu": soc["cpu"], "irq": irq_profile,
+              "clock_profile": assembly["clock_profile"],
               "clock": clock, "memory": variant["memory"], "flash": variant["flash"],
               "layout": layout, "controllers": selected, "devices": assembly["devices"],
               "components": components, "claims": claim_list, "memory_budgets": budgets,
@@ -715,14 +729,19 @@ def generate(result, output):
               f'#define NEXUS_HSE_HZ {result["clock"]["hse_hz"]}u',
               f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
               f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
-              '#define NEXUS_IRQ_SYSCALL_PRIORITY 5u',
-              '#define NEXUS_IRQ_PRIORITY_BITS 4u']
+              f'#define NEXUS_IRQ_PRIORITY_BITS {result["irq"]["priority_bits"]}u']
+    if result["irq"]["syscall_priority"] is not None:
+        header.append('#define NEXUS_IRQ_SYSCALL_PRIORITY '
+                      f'{result["irq"]["syscall_priority"]}u')
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
              f'set(NEXUS_CPU_ARCH "{result["cpu"]["arch"]}")',
              f'set(NEXUS_CPU_FPU "{result["cpu"]["fpu"]}")',
              f'set(NEXUS_FLOAT_ABI "{result["cpu"]["float_abi"]}")',
              f'set(NEXUS_ENUM_ABI "{result["enum_abi"]}")',
+             f'set(NEXUS_ARCH_HAS_DWT_CYCCNT "{int(result["cpu"]["dwt_cyccnt"])}")',
+             f'set(NEXUS_IRQ_PRIORITY_BITS "{result["irq"]["priority_bits"]}")',
+             f'set(NEXUS_FREERTOS_PORT "{result["irq"]["kernel_port"] or ""}")',
              f'set(NEXUS_BACKEND "{result["backend"]}")',
              f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',

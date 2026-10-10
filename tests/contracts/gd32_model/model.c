@@ -45,35 +45,61 @@ uint64_t nx_time_now_us(void) {
     return g_gd32_model_now;
 }
 /** \brief           Save the model's incoming mask. */
-uint32_t nx_gd32_critical_enter(void) {
+nx_arch_irq_state_t nx_arch_irq_save(void) {
     if (g_gd32_model_tc_before_critical && !g_gd32_model_mask) {
         g_gd32_model_tc_before_critical = false;
         USART_STAT0(USART0) = USART_STAT0_TC;
         USART0_IRQHandler();
     }
-    uint32_t saved = g_gd32_model_mask;
+    nx_arch_irq_state_t saved = {g_gd32_model_mask};
     g_gd32_model_mask = 1u;
     return saved;
 }
 /** \brief           Restore the model's incoming mask. */
-void nx_gd32_critical_leave(uint32_t saved) {
-    g_gd32_model_mask = saved;
+void nx_arch_irq_restore(nx_arch_irq_state_t saved) {
+    g_gd32_model_mask = saved.value;
 }
 /** \brief           Report injected exception context. */
-bool nx_gd32_in_isr(void) {
+bool nx_arch_in_isr(void) {
     return g_gd32_model_isr;
 }
 /** \brief           Inspect the modeled incoming mask. */
-bool nx_gd32_irq_masked(void) {
+bool nx_arch_irq_is_masked(void) {
     return g_gd32_model_mask != 0u;
 }
 /** \brief           Host MMIO stores already complete in this synchronous
  * model. */
-void nx_gd32_peripheral_barrier(void) {
+void nx_arch_dsb(void) {
     g_gd32_model_now += g_gd32_model_barrier_advance;
     if (g_gd32_model_debug_freeze_fails) {
         DBG_CTL1 &= ~DBG_CTL1_FWDGT_HOLD;
     }
+}
+/** \brief           Report the model's implemented interrupt-mask domain. */
+nx_arch_irq_masks_t nx_arch_irq_masks(void) {
+    nx_arch_irq_masks_t masks = {g_gd32_model_mask, 0u, 0u};
+    return masks;
+}
+/** \brief           The GD register fixture injects one external exception. */
+uint32_t nx_arch_exception_number(void) {
+    return g_gd32_model_isr ? 16u : 0u;
+}
+/** \brief           This register fixture models privileged execution only. */
+bool nx_arch_is_privileged(void) {
+    return true;
+}
+/** \brief           Order synchronous host accesses without hardware claims. */
+void nx_arch_dmb(void) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+/** \brief           The host register fixture has no instruction pipeline. */
+void nx_arch_isb(void) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+/** \brief           No physical DWT counter exists in the host fixture. */
+bool nx_arch_cycle_snapshot(uint32_t* cycles) {
+    (void)cycles;
+    return false;
 }
 /** \brief           Clock enable is observed separately from register
  * algorithms. */

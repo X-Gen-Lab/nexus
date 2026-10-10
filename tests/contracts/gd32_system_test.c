@@ -8,6 +8,7 @@
  */
 #define _GNU_SOURCE
 #include "gd32f4xx.h"
+#include "nexus/arch/arch.h"
 #include "private/system.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +25,36 @@ extern uint32_t SystemCoreClock;
 void TIMER1_IRQHandler(void);
 static unsigned s_fault;
 static unsigned s_checks;
+
+/** \brief           Model the CPU boundary used by the real SoC timebase. */
+nx_arch_irq_state_t nx_arch_irq_save(void) {
+    nx_arch_irq_state_t previous = {g_gd32_model_mask};
+    g_gd32_model_mask = 1u;
+    return previous;
+}
+
+/** \brief           Restore the exact incoming modeled PRIMASK. */
+void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
+    g_gd32_model_mask = previous.value;
+}
+
+/** \brief           Report injected CPU exception context. */
+bool nx_arch_in_isr(void) {
+    return g_gd32_model_isr;
+}
+
+/** \brief           Query the injected incoming CPU mask. */
+bool nx_arch_irq_is_masked(void) {
+    return g_gd32_model_mask != 0u;
+}
+
+/** \brief           Synchronous modeled peripheral writes are complete. */
+void nx_arch_dsb(void) {
+}
+
+/** \brief           Model instruction synchronization without CPU timing. */
+void nx_arch_isb(void) {
+}
 
 /** \brief           Keep failure checks live independently of NDEBUG. */
 static void check(bool value, const char* expression, unsigned line) {

@@ -125,17 +125,55 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
 }
 
 /** \brief Context is external to the initializer's register transaction. */
-extern "C" bool nx_gd32_in_isr(void) {
+extern "C" bool nx_arch_in_isr(void) {
     return s_isr;
 }
 
 /** \brief Admission must preserve an incoming mask. */
-extern "C" bool nx_gd32_irq_masked(void) {
+extern "C" bool nx_arch_irq_is_masked(void) {
     return s_mask != 0U;
 }
 
+/** \brief All CPU metadata uses the fixture's single incoming mask domain. */
+extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
+    nx_arch_irq_state_t previous = {s_mask};
+    s_mask = 1U;
+    return previous;
+}
+
+/** \brief Restore exactly the fixture's incoming interrupt state. */
+extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
+    s_mask = previous.value;
+}
+
+/** \brief No priority or fault-mask injection is claimed by this fixture. */
+extern "C" nx_arch_irq_masks_t nx_arch_irq_masks(void) {
+    return {s_mask, 0U, 0U};
+}
+
+/** \brief The fixture models privileged Thread or an external exception. */
+extern "C" uint32_t nx_arch_exception_number(void) {
+    return s_isr ? 16U : 0U;
+}
+
+/** \brief CPU privilege faults have a separate Arch contract fixture. */
+extern "C" bool nx_arch_is_privileged(void) {
+    return true;
+}
+
+/** \brief Host ordering does not establish physical peripheral completion. */
+extern "C" void nx_arch_dmb(void) {
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+
+/** \brief Host register fixtures expose no physical DWT counter. */
+extern "C" bool nx_arch_cycle_snapshot(uint32_t* cycles) {
+    (void)cycles;
+    return false;
+}
+
 /** \brief Host stores complete synchronously; firmware supplies its barrier. */
-extern "C" void nx_gd32_peripheral_barrier(void) {
+extern "C" void nx_arch_dsb(void) {
     if (s_gated_pins && (RCU_AHB1EN & (RCU_AHB1EN_PAEN | RCU_AHB1EN_PCEN)) ==
                             (RCU_AHB1EN_PAEN | RCU_AHB1EN_PCEN)) {
         /* Clock-gated GPIO reads do not expose the retained register shadow.
@@ -147,6 +185,10 @@ extern "C" void nx_gd32_peripheral_barrier(void) {
         GPIO_PUD(GPIOC) = UINT32_C(0xAAAAAAAA);
         s_gated_pins = false;
     }
+}
+
+/** \brief The register fixture has no physical instruction pipeline. */
+extern "C" void nx_arch_isb(void) {
 }
 
 class GD32ADCInitialize : public ::testing::Test {

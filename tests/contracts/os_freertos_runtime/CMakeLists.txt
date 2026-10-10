@@ -27,7 +27,7 @@ target_include_directories(contract_os_freertos_posix PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}" "${NEXUS_SOURCE_DIR}/os/freertos/include")
 target_link_libraries(contract_os_freertos_posix PUBLIC
     contract_freertos_posix nexus_os_wait nexus_io_native
-    PRIVATE nexus_owned_warnings nexus_build_options)
+    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
 add_library(contract_os_freertos_hooks OBJECT "${NEXUS_SOURCE_DIR}/os/freertos/hooks.c")
 target_include_directories(contract_os_freertos_hooks PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}" "${NEXUS_SOURCE_DIR}/os/freertos/include")

@@ -32,6 +32,8 @@ function(nexus_resolve_assembly)
     include("${bundle}/selection.cmake")
     foreach(value NEXUS_SOC_FAMILY NEXUS_EXACT_PART NEXUS_BACKEND
                   NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI
+                  NEXUS_ARCH_HAS_DWT_CYCCNT NEXUS_IRQ_PRIORITY_BITS
+                  NEXUS_FREERTOS_PORT
                   NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
                   NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256)
         set(${value} "${${value}}" PARENT_SCOPE)

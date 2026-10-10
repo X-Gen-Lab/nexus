@@ -76,7 +76,8 @@
   "cpu": {
     "arch": "cortex-m4",
     "fpu": "fpv4-sp-d16",
-    "float_abi": "hard"
+    "float_abi": "hard",
+    "dwt_cyccnt": true
   },
   "clock_profiles": {
     "hse8-pll168": {
@@ -329,5 +330,8 @@
   "provenance": [
     "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
     "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf"
-  ]
+  ],
+  "irq": {
+    "priority_bits": 4
+  }
 }

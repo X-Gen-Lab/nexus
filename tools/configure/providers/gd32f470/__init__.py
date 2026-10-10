@@ -4,6 +4,9 @@ from .. import common
 
 CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
 ENUM_ABI = 'short-enums'
+IRQ_PRIORITY_BITS = 4
+DWT_CYCCNT = True
+FREERTOS_PORT = 'GCC/ARM_CM4F'
 PREFIX = 'gd32'
 MODEL = False
 DMA_VECTOR = 'Channel'

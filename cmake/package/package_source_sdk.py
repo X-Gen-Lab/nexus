@@ -26,6 +26,8 @@ REQUIRED_DEPENDENCIES = ("ext/freertos", "vendors/arm/CMSIS_5",
 REQUIRED_FILES = (
     "CMakeLists.txt", "LICENSE", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
+    "arch/include/nexus/arch/arch.h", "arch/cortex_m/nx_arch_cortex_m.c",
+    "arch/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
     "core/src/request.c", "io/include/nexus/io/gpio.h",
     "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
     "boards/stm32f407_qiming_v31/board.json",
@@ -127,6 +129,22 @@ def selected(name):
             or name.startswith("vendors/gigadevice/gd32f4xx/"))
 
 
+def snapshot_files(source, entries, development_fixture=False):
+    """Select committed sources, or an explicit nonpublishable worktree view.
+
+    Staged additions are tracked by the index but absent from HEAD and from
+    Git's untracked list. Include both index and untracked paths only in the
+    development overlay; publishable payloads retain committed-blob identity.
+    """
+    names = {name for name, (_, kind, _) in entries.items()
+             if kind == "blob" and selected(name)}
+    if development_fixture:
+        names.update(name.decode() for name in git(
+            source, "ls-files", "--cached", "--others", "--exclude-standard",
+            "-z").split(b"\0") if name and selected(name.decode()))
+    return names
+
+
 def dependency_records(root, entries):
     records = []
     for dep in REQUIRED_DEPENDENCIES:
@@ -218,10 +236,7 @@ def prepare(source, output, development_fixture=False):
     sdk.mkdir(parents=True)
     files = {}
     try:
-        names = {name for name, (_, kind, _) in entries.items() if kind == "blob" and selected(name)}
-        if development_fixture:
-            names.update(name.decode() for name in git(source, "ls-files", "--others", "--exclude-standard", "-z").split(b"\0")
-                         if name and selected(name.decode()))
+        names = snapshot_files(source, entries, development_fixture)
         source_blobs = {} if development_fixture else committed_blobs(source, {name: entries[name] for name in names})
         for name in sorted(names):
             entry = entries.get(name)

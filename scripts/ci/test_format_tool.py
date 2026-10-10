@@ -208,7 +208,7 @@ class FormatToolTests(unittest.TestCase):
     def test_shell_wrapper_preserves_foreign_working_directory_and_failure(self):
         command = ["bash", str(REPO / "scripts/tools/format.sh"), "check", "--tool",
                    "nexus-missing-clang-format", "--files",
-                   str(REPO / "arch/cortex_m4/nx_arch_cortex_m4.c")]
+                   str(REPO / "arch/cortex_m/nx_arch_cortex_m.c")]
         result = subprocess.run(command, cwd=self.root, capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 2)
         self.assertIn("nexus-missing-clang-format", result.stderr)

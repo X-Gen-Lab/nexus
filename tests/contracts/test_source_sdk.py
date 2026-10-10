@@ -39,6 +39,63 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertTrue(assembly.endswith(".toml"), assembly)
 
 
+class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="SDK staged source ")
+        self.addCleanup(self.temporary.cleanup)
+        self.repository = Path(self.temporary.name)
+        self.environment = {
+            key: value for key, value in os.environ.items()
+            if not key.startswith("GIT_")}
+        self.git("init", "--quiet")
+        self.write("core/committed.c", "int committed_source;\n")
+        self.write("docs/committed.txt", "external documentation\n")
+        self.git("add", ".")
+        self.git("-c", "user.name=SDK test", "-c",
+                 "user.email=sdk-test@local.invalid", "commit", "--quiet",
+                 "-m", "committed snapshot baseline")
+        self.entries = source_sdk.tree_entries(self.repository)
+        self.write("core/committed.c", "int working_source;\n")
+        self.write("arch/cortex_m/staged.c", "int staged_source;\n")
+        self.write("docs/staged.txt", "nonselected staged source\n")
+        self.git("add", "arch/cortex_m/staged.c", "docs/staged.txt")
+        self.write("tools/untracked.py", "untracked_source = True\n")
+        self.write("docs/untracked.txt", "nonselected untracked source\n")
+        self.write("dependencies/source/host-framework.tar.gz", "host only\n")
+
+    def git(self, *arguments):
+        result = subprocess.run(
+            ["git", "-C", str(self.repository), *arguments],
+            env=self.environment, capture_output=True, timeout=30)
+        self.assertEqual(result.returncode, 0,
+                         result.stdout.decode() + result.stderr.decode())
+        return result.stdout
+
+    def write(self, name, data):
+        file = self.repository / name
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(data)
+
+    def test_development_snapshot_includes_staged_and_untracked_sources(self):
+        before = self.git("write-tree")
+        names = source_sdk.snapshot_files(
+            self.repository, self.entries, development_fixture=True)
+        self.assertEqual(names, {
+            "core/committed.c", "arch/cortex_m/staged.c",
+            "tools/untracked.py"})
+        self.assertEqual(self.git("write-tree"), before)
+
+    def test_publishable_snapshot_uses_only_original_committed_blobs(self):
+        names = source_sdk.snapshot_files(
+            self.repository, self.entries, development_fixture=False)
+        self.assertEqual(names, {"core/committed.c"})
+        blobs = source_sdk.committed_blobs(
+            self.repository, {name: self.entries[name] for name in names})
+        self.assertEqual(blobs["core/committed.c"], b"int committed_source;\n")
+        self.assertNotEqual(blobs["core/committed.c"],
+                            (self.repository / "core/committed.c").read_bytes())
+
+
 class SourceSDKTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -207,6 +264,32 @@ class SourceSDKTests(unittest.TestCase):
             self.assertIn("Missing source SDK file", result.stderr)
         finally:
             target.write_bytes(original)
+
+    def test_rehashed_missing_arch_source_is_rejected(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        original_identity = identity.read_bytes()
+        for name in ("arch/include/nexus/arch/arch.h",
+                     "arch/cortex_m/nx_arch_cortex_m.c",
+                     "arch/cortex_m/private/compiler.h",
+                     "arch/native/nx_arch_native.c"):
+            with self.subTest(name=name):
+                target = self.sdk / name
+                original_source = target.read_bytes()
+                try:
+                    target.unlink()
+                    manifest = json.loads(original_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("missing required sources/licenses",
+                                  result.stderr)
+                finally:
+                    target.write_bytes(original_source)
+                    identity.write_bytes(original_identity)
 
     def test_additional_file_and_symlink_are_rejected(self):
         extra = self.sdk / "unexpected.c"

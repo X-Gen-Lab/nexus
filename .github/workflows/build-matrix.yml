@@ -52,6 +52,34 @@ jobs:
             build/${{ matrix.preset }}/google-contracts.json
           if-no-files-found: error
 
+  arch:
+    name: Cortex-M primitive compiler contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-build
+        with:
+          preset: native-debug
+          arm: 'true'
+      - name: Audit real objects and atomics for seven Cortex-M profiles
+        run: >-
+          .venv/bin/python scripts/ci/arch_compile.py
+          --root "$GITHUB_WORKSPACE"
+          --compiler arm-none-eabi-gcc
+          --output build/arch-compiler
+      - name: Preserve compiler evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cortex-m-primitive-compiler
+          path: build/arch-compiler/
+          if-no-files-found: error
+      # Primitive compilation does not qualify a SoC, kernel port or hardware.
+
   arm:
     name: ARM link and budgets (${{ matrix.preset }})
     runs-on: ubuntu-24.04

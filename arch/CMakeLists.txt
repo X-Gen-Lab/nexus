@@ -1,8 +1,8 @@
 # The selected CPU implementation has no vendor or kernel include surface.
 if(NEXUS_CPU_ARCH STREQUAL "native")
     set(nexus_arch_port native)
-elseif(NEXUS_CPU_ARCH STREQUAL "cortex-m4")
-    set(nexus_arch_port cortex_m4)
+elseif(NEXUS_CPU_ARCH MATCHES "^cortex-m(0|0plus|3|4|7|23|33)$")
+    set(nexus_arch_port cortex_m)
 else()
     message(FATAL_ERROR "Unsupported CPU architecture: ${NEXUS_CPU_ARCH}")
 endif()
@@ -10,6 +10,14 @@ add_library(nexus_arch STATIC "${nexus_arch_port}/nx_arch_${nexus_arch_port}.c")
 target_include_directories(nexus_arch PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_arch PUBLIC nexus_abi_options
     PRIVATE nexus_build_options nexus_owned_warnings)
+if(nexus_arch_port STREQUAL "cortex_m")
+    if(NOT DEFINED NEXUS_ARCH_HAS_DWT_CYCCNT OR
+            NOT NEXUS_ARCH_HAS_DWT_CYCCNT MATCHES "^[01]$")
+        message(FATAL_ERROR "Missing or invalid reviewed CPU DWT capability")
+    endif()
+    target_compile_definitions(nexus_arch PRIVATE
+        NEXUS_ARCH_HAS_DWT_CYCCNT=${NEXUS_ARCH_HAS_DWT_CYCCNT})
+endif()
 if(nexus_arch_port STREQUAL "native" AND NOT WIN32)
     find_package(Threads REQUIRED)
     target_link_libraries(nexus_arch PRIVATE Threads::Threads)

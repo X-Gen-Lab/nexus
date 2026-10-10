@@ -308,8 +308,12 @@ void nx_gd32_spi_dma_irq(nx_gd32_spi_dma_state_t* state, bool receive) {
             state->drain_deadline = nx_deadline_after(nx_time_now_us(), 200U);
         }
     }
-    (void)nx_irq_wake_signal(state->wake);
+    /* Task-only attachment cannot reclaim this snapshot before IRQ return.
+     * Publish facts first, then permit the wake's kernel call outside PRIMASK.
+     */
+    const nx_irq_wake_t* wake = state->wake;
     nx_gd32_critical_leave(saved);
+    (void)nx_irq_wake_signal(wake);
 }
 
 /** \brief Two disabled engines, detached IRQs and idle wire precede

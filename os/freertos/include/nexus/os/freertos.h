@@ -3,6 +3,17 @@
  * \brief           Per-object static FreeRTOS storage and optional thin
  *                  services
  * \author          Nexus Team
+ * \note            Kernel operations require privileged task context unless
+ *                  IRQ wake is explicitly documented. PRIMASK and FAULTMASK
+ *                  must be zero. BASEPRI must be zero, or exactly the
+ *                  maintained syscall mask before the scheduler starts. This
+ *                  permits CM4F bootstrap critical sections; a matching value
+ *                  does not prove its origin. Unsafe contexts return CONTEXT
+ *                  before mutating kernel APIs or object storage; a read-only
+ *                  scheduler query may be needed. Startup permits init, task
+ *                  creation, wake and zero-wait queues. Wait, join and nonzero
+ *                  waits require a running scheduler. Port binding and
+ *                  sequence snapshots remain reads.
  */
 #ifndef NEXUS_OS_FREERTOS_H
 #define NEXUS_OS_FREERTOS_H
@@ -50,7 +61,8 @@ typedef struct {
 
 /**
  * \brief           Test whether the current context may call kernel ISR APIs
- * \return          True for an external Cortex-M IRQ below the syscall ceiling
+ * \return          True for a privileged unmasked external Cortex-M IRQ below
+ *                  the syscall ceiling
  * \note            Native POSIX has no physical IRQ and returns false. NMI,
  *                  faults and kernel-owned exceptions are rejected before
  *                  entering FreeRTOS. Runtime grouping must remain the
@@ -92,6 +104,9 @@ nx_result_t nx_freertos_notify_destroy(nx_freertos_notify_t* notification);
  * \param[in]       context: Entry context kept until join
  * \return          SUCCESS or invalid/context/start error
  * \note            Task/startup context. No hidden worker or maximum pool.
+ *                  Entry must return in privileged Thread mode, with manual
+ *                  interrupt masks restored and the scheduler resumed after
+ *                  any temporary suspension.
  */
 nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
                                    StackType_t* stack, size_t stack_words,
@@ -103,7 +118,7 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
  * \param[in]       deadline: Absolute wait deadline in nx_time_now_us domain
  * \return          SUCCESS only after external vTaskDelete removes the task;
  *                  TIMEOUT retains handle, TCB, stack and context; CONTEXT
- *                  rejects ISR/self-join
+ *                  rejects unsafe CPU context, self-join or stopped scheduler
  * \note            Single joiner, task context. The entry return parks its
  *                  wrapper; no self-delete/idle cleanup race releases caller
  *                  storage early. Stop producers, keep bus owner draining, join

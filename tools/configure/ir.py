@@ -43,6 +43,14 @@ class IrqOptions:
 
 
 @dataclass(frozen=True)
+class InterruptProfileIR:
+    priority_bits: int
+    maximum_priority: int
+    syscall_priority: int | None
+    kernel_port: str | None
+
+
+@dataclass(frozen=True)
 class GpioOptions:
     mask: int
     initial: int
@@ -174,6 +182,7 @@ class ConfigurationIR(Record):
     board: str
     soc_family: str
     backend: str
+    irq: InterruptProfileIR
     controllers: tuple[ControllerIR, ...]
     devices: tuple[EndpointIR, ...]
     memory_budget: MemoryBudgetIR
@@ -193,7 +202,8 @@ class ConfigurationIR(Record):
                                 budgets.get("libc_heap_bytes", 0),
                                 budgets.get("static_ram_bytes"),
                                 budgets.get("flash_load_bytes"))
-        return cls(result["board"], result["soc_family"], result["backend"],
+        irq = InterruptProfileIR(**result["irq"])
+        return cls(result["board"], result["soc_family"], result["backend"], irq,
                    controllers, devices, memory, MappingProxyType(values))
 
     def to_dict(self):

@@ -59,6 +59,7 @@ nexus_behavior_test(contract_gd32_io SOURCES gd32_io_test.c
     gd32_model/model.c ${gd32_driver_sources}
     LIBRARIES Nexus::IO
     INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/gd32_model"
+        "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/soc/gd32f470"
         "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
     DEFINITIONS GD32F470 HXTAL_VALUE=25000000)
@@ -76,6 +77,8 @@ nexus_behavior_test(contract_gd32_system SOURCES gd32_system_test.c
         "${NEXUS_SOURCE_DIR}/soc/gd32f470"
         "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
     DEFINITIONS GD32F470 HXTAL_VALUE=25000000 NX_GD32_CLOCK_MODEL)
+target_include_directories(contract_gd32_system PRIVATE
+    "${NEXUS_SOURCE_DIR}/arch/include")
 target_compile_options(contract_gd32_system PRIVATE -Wno-int-to-pointer-cast)
 target_include_directories(contract_gd32_system SYSTEM PRIVATE
     "${gd32_vendor_root}/CMSIS/GD/GD32F4xx/Include"

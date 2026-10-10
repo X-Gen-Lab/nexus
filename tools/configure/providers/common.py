@@ -1,7 +1,16 @@
 """Shared input checks; provider packages own silicon-specific limits."""
 import re
+from types import MappingProxyType
 
 UINT32_MAX = (1 << 32) - 1
+# Unshifted logical ceiling belongs to the maintained kernel-port policy.
+_FREERTOS_PORTS = MappingProxyType({
+    "GCC/ARM_CM4F": MappingProxyType({
+        "cpu": MappingProxyType({"arch": "cortex-m4", "fpu": "fpv4-sp-d16",
+                                 "float_abi": "hard"}),
+        "syscall_priority": 5,
+    }),
+})
 
 
 class ConfigurationError(ValueError):
@@ -22,6 +31,30 @@ def sequence(value, context):
     if not isinstance(value, list):
         fail(f"{context}: expected array")
     return value
+
+
+def cpu_abi(cpu):
+    """Capabilities are chip facts, never additional authored ABI choices."""
+    return {key: cpu[key] for key in ("arch", "fpu", "float_abi")}
+
+
+def resolve_interrupts(cpu, irq, backend, provider):
+    """Bind logical IRQ range and syscall policy to a maintained kernel port."""
+    bits = integer(irq["priority_bits"], 1, 8, "IRQ priority bits")
+    maximum = (1 << bits) - 1
+    port = None
+    ceiling = None
+    if backend == "freertos":
+        port = provider.FREERTOS_PORT
+        profile = _FREERTOS_PORTS.get(port)
+        if profile is None:
+            fail(f"Unmaintained FreeRTOS port: {port}")
+        if cpu_abi(cpu) != profile["cpu"]:
+            fail("FreeRTOS kernel CPU ABI differs from the selected SoC")
+        ceiling = integer(profile["syscall_priority"], 1, maximum,
+                          "FreeRTOS syscall priority")
+    return {"priority_bits": bits, "maximum_priority": maximum,
+            "syscall_priority": ceiling, "kernel_port": port}
 
 
 def dma_irq(dma, vector):

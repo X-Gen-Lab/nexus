@@ -258,11 +258,17 @@ TEST_F(GD32SPIDMA, WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion) {
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
     testing::InSequence ordered;
     EXPECT_CALL(observer, notify()).WillOnce(testing::Invoke([this]() {
+        EXPECT_EQ(g_gd32_model_mask, 0U);
         EXPECT_TRUE(state.rx_complete);
+        EXPECT_EQ(state.active, &request);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
         return NX_SUCCESS;
     }));
     EXPECT_CALL(observer, notify()).WillOnce(testing::Invoke([this]() {
+        EXPECT_EQ(g_gd32_model_mask, 0U);
         EXPECT_TRUE(state.tx_complete);
+        EXPECT_EQ(state.active, &request);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
         return NX_SUCCESS;
     }));
     CompleteMemory();
@@ -278,6 +284,29 @@ TEST_F(GD32SPIDMA, WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion) {
     EXPECT_EQ(DMA_INTF0(DMA1), DMA_INTF_FTFIF);
     EXPECT_EQ(DMA_INTF1(DMA1), DMA_INTF_FTFIF << 22U);
     EXPECT_EQ(state.active, nullptr);
+}
+
+TEST_F(GD32SPIDMA, ErrorWakeObservesLatchedDrainAfterRestoringIncomingMask) {
+    testing::StrictMock<SpiWakeObserver> observer;
+    const nx_irq_wake_t wake = {&observer, SpiWakeObserver::Callback, true};
+    ASSERT_EQ(nx_spi_port_attach_wake(&bus, &wake, 5U), NX_SUCCESS);
+    ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
+    EXPECT_CALL(observer, notify()).WillOnce(testing::Invoke([this]() {
+        EXPECT_EQ(g_gd32_model_mask, 0U);
+        EXPECT_TRUE(g_gd32_model_isr);
+        EXPECT_TRUE(state.draining);
+        EXPECT_EQ(state.active, &request);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_DRAINING);
+        return NX_SUCCESS;
+    }));
+    DMA_INTF0(DMA1) = DMA_INTF_TAEIF << 22U;
+    g_gd32_model_isr = true;
+    nx_gd32_spi_dma_irq(&state, true);
+    g_gd32_model_isr = false;
+    EXPECT_EQ(g_gd32_model_mask, 0U);
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
 }
 
 TEST_F(GD32SPIDMA, BothActualIrqPrioritiesMustPermitKernelCallingWake) {

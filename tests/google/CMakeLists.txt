@@ -298,6 +298,20 @@ target_compile_options(nexus_gd32_i2c_register_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
     "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_register_model.h>")
 
+include(arch_cortex.cmake)
+include(arch_native.cmake)
+include(freertos_context.cmake)
+include(gd32_arch.cmake)
+
+# GD32 tests replace the CPU boundary coherently; no partial Native Arch model.
+foreach(gd_target nexus_gd32_multi_test nexus_gd32_uart_dma_test
+        nexus_gd32_spi_dma_test nexus_gd32_flash_fault_test
+        nexus_gd32_adc_stream_test nexus_gd32_adc_initialize_test
+        nexus_gd32_uart_stream_test nexus_gd32_i2c_register_test)
+    target_include_directories(${gd_target} PRIVATE
+        "${NEXUS_SOURCE_DIR}/arch/include")
+endforeach()
+
 get_property(google_executables GLOBAL PROPERTY NEXUS_GOOGLE_EXECUTABLES)
 list(JOIN google_executables "\",\n    \"" google_executables)
 file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/google-contracts.json"

@@ -75,7 +75,7 @@ target_link_libraries(nexus_gd32_sdk PRIVATE nexus_build_options)
 target_compile_definitions(nexus_gd32_sdk PRIVATE GD32F470 HXTAL_VALUE=25000000)
 add_library(nexus_soc_gd32f470 STATIC ${gd_sources})
 target_link_libraries(nexus_soc_gd32f470 PUBLIC nexus_io
-    PRIVATE nexus_gd32_sdk nexus_build_options nexus_owned_warnings)
+    PRIVATE nexus_arch nexus_gd32_sdk nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_soc_gd32f470 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/private")

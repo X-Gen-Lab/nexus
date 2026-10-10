@@ -16,38 +16,6 @@ static bool s_timer_owned;
 int nx_gd32_clock_start(void);
 int nx_gd32_clock_stop(void);
 
-/** \brief           Preserve incoming interrupt masking for short metadata. */
-uint32_t nx_gd32_critical_enter(void) {
-    uint32_t saved = __get_PRIMASK();
-    __disable_irq();
-    __DMB();
-    return saved;
-}
-
-/** \brief           Publish metadata before restoring the incoming mask. */
-void nx_gd32_critical_leave(uint32_t saved) {
-    __DMB();
-    __set_PRIMASK(saved);
-}
-
-/** \brief           Inspect exception context without depending on an OS. */
-bool nx_gd32_in_isr(void) {
-    return __get_IPSR() != 0u;
-}
-
-/** \brief           Reject task polling when the incoming IRQ domain is masked.
- */
-bool nx_gd32_irq_masked(void) {
-    return __get_PRIMASK() != 0u || __get_BASEPRI() != 0u ||
-           __get_FAULTMASK() != 0u;
-}
-
-/** \brief           Complete hardware writes before releasing a borrow. */
-void nx_gd32_peripheral_barrier(void) {
-    __DSB();
-    __ISB();
-}
-
 /** \brief           Check all external interrupt and DMA resources at stop. */
 static bool external_resources_idle(void) {
     if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) != 0u ||

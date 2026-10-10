@@ -25,7 +25,8 @@
   "cpu": {
     "arch": "native",
     "fpu": "none",
-    "float_abi": "native"
+    "float_abi": "native",
+    "dwt_cyccnt": false
   },
   "clock_profiles": {
     "model": {
@@ -149,5 +150,8 @@
         "PA9"
       ]
     }
+  },
+  "irq": {
+    "priority_bits": 4
   }
 }
