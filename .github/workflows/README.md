@@ -6,7 +6,7 @@ Workflow edits require build, tool, analyzer and documentation validation.
 
 | Workflow | Actual responsibility |
 |---|---|
-| `build-matrix.yml` | Three Native contract configurations, unfiltered GoogleTest/GoogleMock execution; six exact Board/backend ARM assemblies; common components; software-only peripheral fixtures. |
+| `build-matrix.yml` | Three Native configurations each execute the complete CTest plan once and validate every GoogleTest/GoogleMock case; six exact Board/backend ARM assemblies; common components; software-only peripheral fixtures. |
 | `quality-checks.yml` | Same staged style policy as local hooks; actual compile-database clang-tidy/cppcheck; missing tools or empty scope fail. |
 | `enterprise-tools.yml` | Configuration, artifact tamper, budget, HIL admission, real source SDK relocation and command-failure boundaries. |
 | `performance.yml` | Three-board O2/Os/O3 ±LTO minimum-image resource comparisons; GC and budget checks; no inferred cycles. |
@@ -26,9 +26,20 @@ CTest report. ARM compilation and software-register fixtures have distinct scope
 from real hardware. Advanced route fixtures explicitly declare unknown PCB
 revisions and cannot be used to claim three-board electrical qualification.
 
-The GoogleTest gate independently enumerates and executes every registered
-contract binary with fresh case-level XML. Filters, shards, empty reports and
-skipped-only runs cannot substitute for the contract set. GoogleTest/GoogleMock
+`scripts/ci/native_contracts.py` enumerates the complete CTest plan and every
+registered GoogleTest case, then executes CTest once. Its clean environment
+requests separate case-level XML from each Google binary, including disabled
+cases. Both the CTest identities and Google case identities must exactly match
+discovery; missing, extra, stale, skipped or failed reports reject execution.
+The commit hook keeps its independent full `tdd_gate.py` execution unchanged.
+Tool reporting/configuration suites no longer run a second time after every
+Native CTest execution. The independently callable tool workflow retains its
+complete suites, including on manual invocation. It has one automatic caller
+in `ci.yml`, rather than a duplicate push/PR trigger. Maintained branch pushes
+and PR checks remain enabled in `ci.yml`.
+
+Filters, shards, empty reports and skipped runs cannot substitute for the
+contract set. GoogleTest/GoogleMock
 are checksum-pinned host test dependencies; firmware and the source SDK contain
 no framework runtime or test archive. TDD records describe executed failing and
 passing boundaries; hooks alone cannot prove the order of every local edit.

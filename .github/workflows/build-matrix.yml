@@ -31,14 +31,9 @@ jobs:
         run: .venv/bin/python tools/dev/dev.py configure --preset "${{ matrix.preset }}"
       - name: Build platform and register models
         run: .venv/bin/python tools/dev/dev.py build --preset "${{ matrix.preset }}" --parallel 4
-      - name: Execute contracts and validate fresh JUnit
-        run: .venv/bin/python tools/dev/dev.py test --preset "${{ matrix.preset }}" --parallel 1
-        env:
-          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
-          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
-      - name: Execute every GoogleTest and GoogleMock contract
+      - name: Execute the complete CTest and GoogleTest contracts once
         run: >-
-          .venv/bin/python scripts/ci/tdd_gate.py --all
+          .venv/bin/python scripts/ci/native_contracts.py
           --preset "${{ matrix.preset }}"
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1

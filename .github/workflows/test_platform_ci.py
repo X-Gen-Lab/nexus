@@ -64,10 +64,13 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('scripts/ci/install_arm_toolchain.py', commands)
         self.assertNotIn('apt-get', commands)
 
-    def test_each_native_build_executes_unfiltered_google_contract_gate(self):
+    def test_native_executes_complete_ctest_and_google_plan_once(self):
         native = workflow('build-matrix.yml')['jobs']['native']
         commands = '\n'.join(step.get('run', '') for step in native['steps'])
-        self.assertIn('scripts/ci/tdd_gate.py --all --preset', commands)
+        self.assertEqual(commands.count('scripts/ci/native_contracts.py'), 1)
+        self.assertNotIn('scripts/ci/tdd_gate.py', commands)
+        self.assertNotIn('tools/dev/dev.py test', commands)
+        self.assertIn('--preset "${{ matrix.preset }}"', commands)
         evidence = [step for step in native['steps']
                     if step.get('name') == 'Preserve execution evidence'][0]
         self.assertIn('/tdd/', evidence['with']['path'])
@@ -76,8 +79,19 @@ class WorkflowContracts(unittest.TestCase):
     def test_tooling_runs_google_report_and_hil_preparation_boundaries(self):
         tools = workflow('enterprise-tools.yml')['jobs']['tooling']
         commands = '\n'.join(step.get('run', '') for step in tools['steps'])
-        self.assertIn('discover -s tools/testing', commands)
+        self.assertIn('tools/testing/run_tool_tests.py --suite testing', commands)
+        self.assertIn('tools-testing.json', commands)
+        self.assertEqual(commands.count('--suite configure'), 1)
         self.assertIn('tools.hil.prepare', commands)
+
+    def test_tool_contracts_have_one_automatic_workflow_caller(self):
+        events = workflow('enterprise-tools.yml')['on']
+        self.assertEqual(set(events), {'workflow_call', 'workflow_dispatch'})
+        # Maintained work branches must retain pre-PR checks.
+        ci_events = workflow('ci.yml')['on']
+        self.assertEqual(set(ci_events['push']['branches']),
+                         {'main', 'develop', 'codex/**'})
+        self.assertIn('pull_request', ci_events)
 
     def test_each_arm_link_retains_an_unbound_hil_work_plan(self):
         arm = workflow('build-matrix.yml')['jobs']['arm']
