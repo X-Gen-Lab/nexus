@@ -37,6 +37,17 @@ def main(argv=None):
         environment["PATH"] = str(local_bin) + os.pathsep + environment.get("PATH", "")
         if args.action == "doctor":
             lock = json.loads((ROOT / "dependencies/environment.lock.json").read_text())
+            minimum = tuple(int(part) for part in lock["python"]["minimum"].split("."))
+            if sys.version_info[:len(minimum)] < minimum:
+                raise ValueError("Python differs from the locked minimum "
+                                 + lock["python"]["minimum"])
+            try:
+                import tomllib
+            except ImportError as error:
+                raise ValueError("Python must provide stdlib tomllib") from error
+            tomllib.loads("schema = 2")
+            version = ".".join(map(str, sys.version_info[:3]))
+            print(f"Python: {version} ({sys.executable}); stdlib tomllib available")
             for name in ("cmake", "ninja"):
                 result = subprocess.run([executable(name), "--version"],
                                         capture_output=True, text=True, check=True)
@@ -44,7 +55,7 @@ def main(argv=None):
                 if expected not in result.stdout.splitlines()[0]:
                     raise ValueError(f"{name} differs from locked {expected}")
                 print(result.stdout.splitlines()[0])
-            for name in ("gcc", "arm-none-eabi-gcc"):
+            for name in ("gcc", "g++", "arm-none-eabi-gcc"):
                 compiler = shutil.which(name, path=environment["PATH"])
                 if compiler:
                     result = subprocess.run([compiler, "-dumpfullversion"],
@@ -60,8 +71,8 @@ def main(argv=None):
                               "--report", "build/quality/style-gate.json"], environment)
             if result:
                 return result
-            return execute([sys.executable, "-m", "unittest", "discover", "-s",
-                            "tools/configure", "-p", "test_*.py"], environment)
+            return execute([sys.executable, "scripts/ci/tdd_gate.py", "--all",
+                            "--preset", args.preset], environment)
         tool = "ctest" if args.action == "test" else "cmake"
         command = [executable(tool)]
         if args.action == "build":

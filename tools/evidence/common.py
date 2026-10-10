@@ -84,7 +84,7 @@ def digest(path: str | Path) -> str:
 
 
 def stream_digest(stream) -> str:
-    """Bounded hashing compatible with the declared Python 3.10 minimum."""
+    """Bounded hashing compatible with the declared Python 3.11 minimum."""
     result = hashlib.sha256()
     for block in iter(lambda: stream.read(1024 * 1024), b""):
         result.update(block)

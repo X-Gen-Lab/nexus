@@ -21,7 +21,7 @@ static void timeout_bounds(nx_watchdog_state_t* state, uint32_t divisor,
 }
 
 /** \brief Identify hardware-option automatic activation before any failure. */
-static void observe_option(nx_watchdog_port_t* port) {
+static void observe_option(nx_stm32_watchdog_state_t* port) {
     if (port->flash != NULL &&
         (port->flash->OPTCR & FLASH_OPTCR_WDG_SW) == 0U) {
         port->state.enabled = true;
@@ -34,9 +34,10 @@ static void observe_option(nx_watchdog_port_t* port) {
 
 /** \brief Enable and retain responsibility even if post-activation setup fails.
  */
-nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
-                                    uint32_t timeout_us, bool debug_freeze,
-                                    nx_watchdog_state_t* state) {
+nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
+                                     bool debug_freeze,
+                                     nx_watchdog_state_t* state) {
+    nx_stm32_watchdog_state_t* port = context;
     if (port == NULL || port->registers == NULL || port->rcc == NULL ||
         port->debug == NULL || state == NULL || port->poll_limit == 0U) {
         return NX_ERROR_INVALID;
@@ -111,7 +112,8 @@ nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
 }
 
 /** \brief Reload only a known active watchdog owned by this platform image. */
-nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port) {
+nx_result_t nx_stm32_watchdog_feed(void* context) {
+    nx_stm32_watchdog_state_t* port = context;
     if (port == NULL || port->registers == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -124,8 +126,9 @@ nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port) {
 }
 
 /** \brief Report remaining hardware effect without implying reversibility. */
-nx_result_t nx_watchdog_port_state(const nx_watchdog_port_t* port,
-                                   nx_watchdog_state_t* state) {
+nx_result_t nx_stm32_watchdog_state(const void* context,
+                                    nx_watchdog_state_t* state) {
+    const nx_stm32_watchdog_state_t* port = context;
     if (port == NULL || state == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -171,3 +174,10 @@ uint32_t nx_reset_cause(void) {
     }
     return result;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_watchdog_ops_t nx_stm32_watchdog_ops = {
+    .enable = nx_stm32_watchdog_enable,
+    .feed = nx_stm32_watchdog_feed,
+    .state = nx_stm32_watchdog_state,
+};

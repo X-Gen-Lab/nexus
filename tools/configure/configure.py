@@ -21,11 +21,23 @@ IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "timer", "pwm", "adc"}
+# Fixed providers cannot honor arbitrary well-formed SDK request mappings.
+# Tuple order preserves TX/RX roles for full-duplex providers.
+FIXED_DMA_ROUTES = {
+    ("stm32f407", "USART1", "dma-tx"): ("DMA2:stream7:channel4",),
+    ("stm32f407", "SPI1", "dma"): ("DMA2:stream3:channel3", "DMA2:stream0:channel3"),
+    ("stm32f407", "ADC1", "trigger-dma"): ("DMA2:stream4:channel0",),
+    ("gd32f470", "USART0", "dma-tx"): ("DMA1:stream7:channel4",),
+    ("gd32f470", "SPI4", "dma-full-duplex"): ("DMA1:stream4:channel2", "DMA1:stream3:channel2"),
+    ("gd32f470", "ADC0", "trigger-dma"): ("DMA1:stream0:channel0",),
+}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
 def c_identity(value):
     identifier = c_id(value)
+    if identifier.upper() == "COUNT":
+        fail(f"Reserved factory identifier: {value}")
     if identifier in C_KEYWORDS:
         fail(f"Reserved C identifier: {value}")
     return identifier
@@ -66,21 +78,29 @@ def validate_selection(selection, route, family, ram_size):
     kind = route["kind"]
     fields = {
         "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
-        "spi": {"max_hz"}, "i2c": {"max_hz"}, "flash": set(), "watchdog": set(),
+        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
-        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms"},
+        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os"},
     }
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
     if kind == "uart":
-        if not {"baud", "rx_capacity", "rx_profile", "irq_priority"}.issubset(selection):
-            fail("UART requires baud, RX capacity/profile and IRQ priority")
+        if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
+            fail("UART requires baud, RX profile and IRQ priority")
         minimum_baud = {"stm32f407": 1282, "gd32f470": 1526}.get(family, 1200)
         integer(selection["baud"], minimum_baud, 1000000, "UART baud")
-        integer(selection["rx_capacity"], 1, min(4096, ram_size // 16), "UART RX capacity")
-        if selection["rx_profile"] not in {"bytes", "events"}:
+        if selection["rx_profile"] == "blocks":
+            if selection["mode"] != "irq-blocks":
+                fail("UART RX blocks requires the implemented irq-blocks provider")
+            if "rx_capacity" in selection:
+                fail("UART RX blocks has no generated ring capacity; storage is caller-owned")
+        elif selection["mode"] == "irq-blocks":
+            fail("UART irq-blocks requires RX blocks format")
+        elif selection["rx_profile"] in {"bytes", "events"}:
+            integer(selection.get("rx_capacity"), 1, min(4096, ram_size // 16), "UART RX capacity")
+        else:
             fail("Unsupported UART receive profile")
     elif kind == "exti":
         if not {"edge", "event_capacity", "irq_priority"}.issubset(selection):
@@ -110,12 +130,21 @@ def validate_selection(selection, route, family, ram_size):
         if len(samples) != len(channels):
             fail("ADC sample_times must match the channel sequence")
         for sample in samples:
-            integer(sample, 7 if family == "gd32f470" else 0, 7, "ADC sample encoding")
+            integer(sample, 0, 7, "ADC sample encoding")
+        if family == "gd32f470":
+            expected_sample = 1 if selection["mode"] == "trigger-dma" else 7
+            if samples != [expected_sample] * len(channels):
+                fail("GD32 trigger-dma sampling is fifteen cycles (encoding 1)" if expected_sample == 1
+                     else "GD32 polling sampling is 480 cycles (encoding 7)")
         integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
         if family == "gd32f470":
             integer(selection.get("timeout_ms"), 1, 1000, "ADC calibration timeout_ms")
-        if (selection["mode"] == "single-shot") != (len(channels) == 1):
+        if selection["mode"] in {"single-shot", "scan"} and (selection["mode"] == "single-shot") != (len(channels) == 1):
             fail("ADC mode contradicts its reviewed channel count")
+        if selection["mode"] == "trigger-dma" and "irq_priority" not in selection:
+            fail("ADC trigger-dma requires an explicit IRQ priority")
+        if selection["mode"] != "trigger-dma" and ({"irq_priority", "calls_os"} & selection.keys()):
+            fail("Polling ADC has no IRQ options")
     elif kind == "i2c" and selection.get("max_hz", 100000) != 100000:
         fail("Only reviewed 100 kHz I2C mode is maintained")
     elif kind == "spi":
@@ -125,6 +154,10 @@ def validate_selection(selection, route, family, ram_size):
 
 class ConfigurationError(ValueError):
     """A rejected input has no usable generated configuration."""
+
+
+def uses_dma(mode):
+    return mode.startswith("dma") or mode == "trigger-dma"
 
 
 def pairs(items):
@@ -284,6 +317,21 @@ def validate_soc(soc, part):
     return variant
 
 
+def load_assembly(path, root=ROOT, snapshots=None):
+    """Normalize one explicit authored input; no validation or format fallback."""
+    path = path.resolve()
+    snapshots = {} if snapshots is None else snapshots
+    if path.suffix == ".toml":
+        try:
+            from . import authored
+        except ImportError:
+            import authored
+        return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+    if path.suffix == ".json":
+        return load(path, snapshots)
+    fail("Assembly must use authored TOML (.toml)")
+
+
 def resolve(assembly_path, root=ROOT, *, input_paths=None):
     """Validate all input facts before producing the sole resolved decision."""
     root = root.resolve()
@@ -292,7 +340,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     snapshots = {}
     read = lambda path: load(path, snapshots)
     assembly_path = assembly_path.resolve()
-    assembly = obj(read(assembly_path),
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+    assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
                    {"abi", "optimization", "components"}, "assembly")
@@ -324,7 +373,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     routes = {}
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
-                    "source"}, {"resources", "dma"}, "route")
+                    "source"}, {"resources", "dma", "mode_resources"}, "route")
         identity(route["id"], "route id")
         if route["id"] in routes:
             fail(f"Duplicate route id: {route['id']}")
@@ -342,6 +391,13 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail(f"Route {route['id']} does not match a maintained controller")
         if not set(route["modes"]).issubset(controller["modes"]):
             fail(f"Route {route['id']} advertises unsupported modes")
+        mode_resources = obj(route.get("mode_resources", {}), set(), set(route["modes"]),
+                             "mode-specific resources")
+        for mode, resources in mode_resources.items():
+            if mode not in route["modes"]:
+                fail("Mode-specific resource has no maintained route mode")
+            for resource in sequence(resources, "mode-specific resources"):
+                normalize_resource(text(resource, "mode-specific resource"))
         pins = sequence(route["pins"], "route pins")
         unique([pin.get("pin") for pin in pins], "route pins")
         for pin in pins:
@@ -432,20 +488,29 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     def claim(key, owner, mode, source):
         text(key, "resource key")
         key = normalize_resource(key)
-        if key in claims:
-            fail(f"Resource conflict {key}: {claims[key]} versus {owner}")
-        claims[key] = owner
-        claim_list.append({"key": key, "owner": owner, "mode": mode, "source": source})
+        previous = claims.get(key)
+        record = {"key": key, "owner": owner, "mode": mode, "source": source}
+        if previous is not None:
+            if previous == record:
+                return
+            fail(f"Resource conflict {key}: {previous['owner']} versus {owner}")
+        claims[key] = record
+        claim_list.append(record)
 
+    for resource in soc.get("reserved_resources", []):
+        claim(resource, "soc-timebase", "reserved", family)
     for reserved in sequence(board["reserved_resources"], "reserved resources"):
         if isinstance(reserved, str):
-            claim("pin:" + reserved if PIN.fullmatch(reserved) else reserved,
-                  "board-reserved", "reserved", board["id"])
+            key = "pin:" + reserved if PIN.fullmatch(reserved) else reserved
+            owner = "board-reserved"
         else:
             obj(reserved, {"key", "owner"}, (), "reserved resource")
-            claim(reserved["key"], reserved["owner"], "reserved", board["id"])
-    for resource in soc.get("reserved_resources", []):
-        claim(normalize_resource(resource), "soc-timebase", "reserved", family)
+            key, owner = reserved["key"], reserved["owner"]
+        # A Board may restate a silicon reservation; it cannot release it.
+        previous = claims.get(normalize_resource(text(key, "resource key")))
+        if previous is not None and previous["owner"] == "soc-timebase":
+            continue
+        claim(key, owner, "reserved", board["id"])
     if backend == "freertos":
         for irq in ("SysTick", "PendSV", "SVC"):
             claim("irq:" + irq, "freertos", "kernel", "FreeRTOS Cortex-M4F")
@@ -457,7 +522,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             {"irq_priority", "rx_capacity", "baud", "max_hz", "event_capacity",
              "period_ticks", "duty_ticks", "channels", "sample_cycles",
              "timeout_ms", "calls_os", "rx_profile", "sample_times",
-             "reference_mv", "tick_hz", "edge"}, "controller selection")
+             "reference_mv", "tick_hz", "edge", "authored_kind"}, "controller selection")
         name = identity(selection["id"], "instance id")
         c_identity(name)
         instance_ids.append(name)
@@ -466,13 +531,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail(f"Unknown Board binding: {selection['binding']}")
         route = routes[binding["route"]]
         hardware = soc["controllers"][route["controller"]]
+        authored_kind = selection.pop("authored_kind", route["kind"])
+        if authored_kind != route["kind"]:
+            fail("Authored kind differs from Board binding kind")
         validate_selection(selection, route, family, ram["size"])
-        if route["kind"] == "uart":
-            required_uart = {"baud", "rx_capacity", "irq_priority", "rx_profile"}
-            if not required_uart.issubset(selection):
-                fail("UART selection requires baud, RX capacity/profile and IRQ priority")
-            if selection["rx_profile"] not in {"bytes", "events"}:
-                fail("Unsupported UART receive profile")
         mode = text(selection["mode"], "controller mode")
         if mode not in route["modes"]:
             fail(f"Unsupported mode {mode} for {selection['binding']}")
@@ -485,6 +547,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 fail("PWM duty exceeds period")
         if "irq_priority" in selection:
             integer(selection["irq_priority"], 0, 15, "IRQ priority")
+        if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
+            fail("Polling SPI has no IRQ options")
+        if route["kind"] == "spi" and mode.startswith("dma") and "irq_priority" not in selection:
+            fail("DMA SPI requires an explicit IRQ priority")
         if "calls_os" in selection and type(selection["calls_os"]) is not bool:
             fail("calls_os must be boolean")
         if selection.get("calls_os", False) and (backend != "freertos" or
@@ -492,13 +558,24 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("OS-calling ISR violates the FreeRTOS syscall ceiling")
         if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
             fail("Controller speed exceeds maintained limit")
-        if mode == "dma" and not route.get("dma"):
+        if uses_dma(mode) and not route.get("dma"):
             fail("DMA mode has no reviewed DMA route")
+        if uses_dma(mode):
+            expected = FIXED_DMA_ROUTES.get((family, route["controller"], mode))
+            actual = tuple(sequence(route["dma"], "DMA route"))
+            if expected is None or actual != expected:
+                fail(f"DMA route differs from fixed provider: {family}/{route['controller']}/{mode}")
+            if mode == "trigger-dma":
+                timer = "TIM3" if family == "stm32f407" else "TIMER2"
+                resources = tuple(normalize_resource(resource) for resource in
+                                  route.get("mode_resources", {}).get(mode, []))
+                if resources != ("controller:" + timer,):
+                    fail(f"Trigger resource differs from fixed provider: {family}/{route['controller']}")
         if route["kind"] != "gpio":
             claim("controller:" + route["controller"], name, mode, route["id"])
         for pin in route["pins"]:
             claim("pin:" + pin["pin"], name, mode, route["id"])
-        if mode in {"irq-byte-event", "irq", "edge-event", "edge", "dma"}:
+        if mode in {"irq-byte-event", "irq", "irq-blocks", "edge-event", "edge"} or uses_dma(mode):
             for irq in hardware["irq"]:
                 key = normalize_resource("irq:" + irq)
                 priority = selection.get("irq_priority")
@@ -515,27 +592,50 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     claim(key, name, mode, route["id"])
                     irq_owners[key] = (route["kind"], priority)
 
-        for resource in hardware.get("resources", []) + route.get("resources", []):
+        for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
             claim(normalize_resource(resource), name, mode, route["id"])
-        if mode == "dma":
+        if uses_dma(mode):
             for dma in route["dma"]:
                 claim("dma:" + dma, name, mode, route["id"])
+                match = re.fullmatch(r"DMA([12]):stream([0-7]):channel([0-7])", dma)
+                if match is None:
+                    fail(f"DMA route requires an explicit request selector: {dma}")
+                vector = "Channel" if family == "gd32f470" else "Stream"
+                claim(f"irq:DMA{match[1]}_{vector}{match[2]}", name, mode, route["id"])
         selected.append({**selection, "controller": route["controller"],
                          "kind": route["kind"], "route": route["id"],
                          "pins": route["pins"], "initial": binding.get("initial", 0),
-                         "mask": binding.get("mask", 0)})
+                         "mask": binding.get("mask", 0),
+                         **({"dma": route["dma"]} if uses_dma(mode) else {})})
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
     device_ids = []
     addresses = set()
+    chip_selects = set()
     for device in sequence(assembly["devices"], "devices"):
         obj(device, {"id", "controller", "driver"}, {"cs_binding", "address",
-            "mode", "max_hz", "capacity"}, "device")
+            "mode", "max_hz", "authored_kind", "model_bytes"}, "device")
         device_ids.append(identity(device["id"], "device ID"))
         c_identity(device["id"])
         controller = next((item for item in selected if item["id"] == device["controller"]), None)
         if controller is None or controller["kind"] not in {"spi", "i2c"}:
             fail("Device references no selected SPI/I2C controller")
+        authored_kind = device.pop("authored_kind", controller["kind"])
+        if authored_kind != controller["kind"]:
+            fail("Authored device kind differs from controller binding kind")
+        model_fields = {"model_bytes"} if family == "native" else set()
+        if "model_bytes" in device:
+            if family != "native":
+                fail("model_bytes is only valid for an explicit Native device model")
+            integer(device["model_bytes"], 1, 256, "Native device model_bytes")
+        if controller["kind"] == "spi":
+            obj(device, {"id", "controller", "driver"},
+                {"cs_binding", "mode", "max_hz"} | model_fields, "SPI device")
+        else:
+            obj(device, {"id", "controller", "driver", "address"}, model_fields,
+                "I2C device")
+            if family == "native" and "model_bytes" not in device:
+                fail("Native I2C device requires explicit model_bytes")
         if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280"}:
             fail(f"Unknown maintained device driver: {device['driver']}")
         if device["driver"] == "bmp280" and controller["kind"] != "spi":
@@ -550,13 +650,15 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             integer(device["max_hz"], 1, context="device speed")
             if device["max_hz"] > controller.get("max_hz", 1000000):
                 fail("Device speed exceeds its selected controller budget")
-        if "capacity" in device:
-            integer(device["capacity"], 1, context="device capacity")
         if controller["kind"] == "spi":
-            builtin_cs = family == "gd32f470" and any(
-                pin["function"] == "cs" for pin in controller["pins"])
-            if ("cs_binding" not in device and not builtin_cs) or "address" in device:
-                fail("SPI child requires a CS binding and no I2C address")
+            speed = device.get("max_hz", controller.get("max_hz", 1000000))
+            limit = soc["controllers"][controller["controller"]].get("max_hz")
+            if family != "native" and (limit is None or speed < (limit + 127) // 128):
+                fail("SPI endpoint speed cannot be realized by the reviewed clock divider")
+            builtin_cs = family == "native" or (family == "gd32f470" and any(
+                pin["function"] == "cs" for pin in controller["pins"]))
+            if "cs_binding" not in device and not builtin_cs:
+                fail("SPI child requires a CS binding")
             if "cs_binding" in device:
                 binding = bindings.get(device["cs_binding"])
                 if not binding or routes[binding["route"]]["kind"] != "gpio":
@@ -565,10 +667,17 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 if len(cs_pins) != 1 or binding.get("initial") != 1 << int(cs_pins[0]["pin"][2:]):
                     fail("Active-low SPI CS must be one reviewed pin initially high")
                 for pin in cs_pins:
+                    if pin["pin"] in chip_selects:
+                        fail("Duplicate SPI chip select")
+                    chip_selects.add(pin["pin"])
                     claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
+            elif family != "native":
+                for pin in controller["pins"]:
+                    if pin["function"] == "cs":
+                        if pin["pin"] in chip_selects:
+                            fail("Duplicate SPI chip select")
+                        chip_selects.add(pin["pin"])
         else:
-            if "address" not in device or "cs_binding" in device:
-                fail("I2C child requires address and no CS binding")
             integer(device["address"], 8, 119, "7-bit I2C address")
             key = (controller["id"], device["address"])
             if key in addresses:
@@ -582,8 +691,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("I2C requires at least one explicit address endpoint")
         if controller["kind"] == "spi" and family == "stm32f407" and not children:
             fail("STM32 SPI requires at least one reviewed CS endpoint")
-        if controller["kind"] == "spi" and family == "gd32f470" and len(children) > 1:
-            fail("GD32 SPI4 currently maintains one reviewed fixed CS endpoint")
+        if controller["kind"] == "spi" and family == "gd32f470" and not children:
+            fail("GD32 SPI requires at least one reviewed CS endpoint")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path]
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -654,7 +763,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     for component in components:
         text(component, "component")
     unique(components, "components")
-    maintained_components = {"bus-owner", "spi-owner", "uart-owner", "bmp280", "bmp280-spi",
+    maintained_components = {"bus-owner", "spi-owner", "spi-async-owner", "uart-owner", "bmp280", "bmp280-spi",
                              "log", "storage", "flash-storage", "modbus-rtu"}
     for component in components:
         if component not in maintained_components:
@@ -685,6 +794,14 @@ def c_id(value):
 
 
 def normalize_resource(value):
+    timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
+    if timer is not None:
+        return "controller:" + timer[1]
+    if value.startswith("dma:"):
+        match = re.fullmatch(r"dma:DMA([12]):stream([0-7])(?::channel([0-7]))?", value)
+        if match is None:
+            fail(f"Invalid physical DMA resource: {value}")
+        return f"dma:DMA{match[1]}:stream{match[2]}"
     if value.startswith("irq:"):
         irq = value[4:]
         for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
@@ -693,10 +810,21 @@ def normalize_resource(value):
     return value
 
 
+def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
+    """Return the immutable typed resolution consumed by every emitter."""
+    try:
+        from .ir import ConfigurationIR
+    except ImportError:
+        from ir import ConfigurationIR
+    return ConfigurationIR.from_validated(
+        resolve(assembly_path, root, input_paths=input_paths))
+
+
 def generate(result, output):
     """Emit narrow compile/link inputs; this never emits a code dependency graph."""
     write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
-    write("resolved.json", json.dumps(result, indent=2, sort_keys=True) + "\n")
+    write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
+                                      else result, indent=2, sort_keys=True) + "\n")
     header = ["/* Generated from the sole resolved configuration. */",
               "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
               f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
@@ -730,7 +858,14 @@ def generate(result, output):
         from .bindings import emit
     except ImportError:
         from bindings import emit
+    try:
+        from .factory import emit as emit_factory
+    except ImportError:
+        from factory import emit as emit_factory
+    factory_header, factory_source = emit_factory(result)
+    write("nexus_factory.h", factory_header)
     bindings_header, bindings_source = emit(result)
+    bindings_source += "\n" + factory_source
     write("nexus_bindings.h", bindings_header)
     write("bindings.c", bindings_source)
     ram = next(region for region in result["memory"] if region["linker"])
@@ -801,7 +936,7 @@ def configure(assembly, output, root=ROOT):
         # successful headers or selection files, including after process failure.
         shutil.rmtree(output)
     input_paths = {}
-    result = resolve(assembly, root, input_paths=input_paths)
+    result = resolve_ir(assembly, root, input_paths=input_paths)
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=".nexus-config-", dir=output.parent))
     try:
@@ -812,23 +947,60 @@ def configure(assembly, output, root=ROOT):
     except BaseException:
         shutil.rmtree(temporary, ignore_errors=True)
         raise
-    return result
+    return result.to_dict()
 
 
 def main(argv=None):
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    commands = {"generate", "check", "explain", "list-bindings", "init"}
+    command = arguments.pop(0) if arguments and arguments[0] in commands else "generate"
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--assembly", required=True, type=Path)
-    parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--source-root", type=Path, default=ROOT)
-    args = parser.parse_args(argv)
+    parser.add_argument("--assembly", required=command != "init", type=Path)
+    parser.add_argument("--output", required=command in {"generate", "init"}, type=Path)
+    if command == "init":
+        parser.add_argument("--board", required=True)
+        parser.add_argument("--backend", required=True,
+                            choices=("native", "baremetal", "freertos"))
+        parser.add_argument("--clock", required=True)
+    args = parser.parse_args(arguments)
     try:
-        result = configure(args.assembly, args.output, args.source_root)
+        if command == "init":
+            if args.output.exists() or args.output.is_symlink():
+                fail("init refuses to overwrite an existing authored configuration")
+            if args.output.suffix != ".toml":
+                fail("init output must be authored TOML (.toml)")
+            contents = ("schema = 2\nboard = " + json.dumps(args.board) +
+                        "\nbackend = " + json.dumps(args.backend) +
+                        "\nclock = " + json.dumps(args.clock) +
+                        "\n\n[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n")
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                with args.output.open("x", encoding="utf-8") as stream:
+                    stream.write(contents)
+                result = resolve_ir(args.output, args.source_root)
+            except BaseException:
+                args.output.unlink(missing_ok=True)
+                raise
+        elif command == "generate":
+            result = configure(args.assembly, args.output, args.source_root)
+        else:
+            result = resolve_ir(args.assembly, args.source_root)
+        if command == "explain":
+            print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+        elif command == "list-bindings":
+            print(f"Board: {result['board']}")
+            for name, binding in result["board_bindings"].items():
+                route = result["routes"][binding["route"]]
+                print(f"{name}: {route['kind']} {route['controller']} "
+                      f"modes={','.join(route['modes'])}")
+        else:
+            print(f"Resolved {result['part']}/{result['board']}/{result['backend']}: "
+                  f"{result['configuration_sha256']}")
+        return 0
     except (ConfigurationError, OSError, ValueError, TypeError, KeyError) as error:
         print(f"Nexus configuration rejected: {error}", file=sys.stderr)
         return 1
-    print(f"Resolved {result['part']}/{result['board']}/{result['backend']}: "
-          f"{result['configuration_sha256']}")
-    return 0
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@
 #include "private/system.h"
 #include <string.h>
 
-static nx_flash_port_t* s_flash;
+static nx_gd32_flash_state_t* s_flash;
 
 static const nx_flash_sector_t s_sectors[256] = {
     {0u, 4096u},       {4096u, 4096u},    {8192u, 4096u},    {12288u, 4096u},
@@ -98,7 +98,7 @@ static void drain(void) {
 
 /** \brief           Validate context, then unlock under the single-owner rule.
  */
-static nx_result_t begin(nx_flash_port_t* port) {
+static nx_result_t begin(nx_gd32_flash_state_t* port) {
     if (!port || port != s_flash || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -123,7 +123,7 @@ static nx_result_t begin(nx_flash_port_t* port) {
 
 /** \brief           Expose physical geometry only after observed density
  * matches. */
-nx_result_t nx_gd32_flash_initialize(nx_flash_port_t* port) {
+nx_result_t nx_gd32_flash_initialize(nx_gd32_flash_state_t* port) {
     if (!port) {
         return NX_ERROR_INVALID;
     }
@@ -140,20 +140,22 @@ nx_result_t nx_gd32_flash_initialize(nx_flash_port_t* port) {
     if ((FMC_CTL & FMC_CTL_LK) == 0u) {
         return NX_ERROR_IO;
     }
-    *port = (nx_flash_port_t){.initialized = true};
+    *port = (nx_gd32_flash_state_t){.initialized = true};
     s_flash = port;
     return NX_SUCCESS;
 }
 
 /** \brief           Return immutable full-density page geometry. */
-const nx_flash_geometry_t* nx_flash_port_geometry(const nx_flash_port_t* port) {
+const nx_flash_geometry_t* nx_gd32_flash_geometry(const void* context) {
+    const nx_gd32_flash_state_t* port = context;
     return port && port == s_flash && port->initialized ? &s_geometry : NULL;
 }
 
 /** \brief           Copy only validated physical bytes while no pulse is live.
  */
-nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
-                               void* data, size_t length) {
+nx_result_t nx_gd32_flash_read(const void* context, uint32_t offset, void* data,
+                               size_t length) {
+    const nx_gd32_flash_state_t* port = context;
     if (!port || port != s_flash || !port->initialized ||
         !valid_range(offset, length) || (!data && length)) {
         return NX_ERROR_INVALID;
@@ -169,9 +171,10 @@ nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
 }
 
 /** \brief           Issue aligned halfword pulses and verify each result. */
-nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
+nx_result_t nx_gd32_flash_program(void* context, uint32_t offset,
                                   const void* data, size_t length,
                                   nx_time_us_t deadline) {
+    nx_gd32_flash_state_t* port = context;
     if (!data || !length || !valid_range(offset, length) || offset % 2u ||
         length % 2u) {
         return NX_ERROR_INVALID;
@@ -220,8 +223,9 @@ nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
 
 /** \brief           Use F470 independent 4 KiB page erase, never fake sectors.
  */
-nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
-                                size_t length, nx_time_us_t deadline) {
+nx_result_t nx_gd32_flash_erase(void* context, uint32_t offset, size_t length,
+                                nx_time_us_t deadline) {
+    nx_gd32_flash_state_t* port = context;
     if (!length || !valid_range(offset, length) || offset % 4096u ||
         length % 4096u) {
         return NX_ERROR_INVALID;
@@ -271,7 +275,7 @@ nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
 }
 
 /** \brief           Retain ownership if a pulse or lock effect is unsettled. */
-nx_result_t nx_gd32_flash_stop(nx_flash_port_t* port) {
+nx_result_t nx_gd32_flash_stop(nx_gd32_flash_state_t* port) {
     if (!port || port != s_flash || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -289,3 +293,11 @@ nx_result_t nx_gd32_flash_stop(nx_flash_port_t* port) {
     s_flash = NULL;
     return NX_SUCCESS;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_flash_ops_t nx_gd32_flash_ops = {
+    .geometry = nx_gd32_flash_geometry,
+    .read = nx_gd32_flash_read,
+    .program = nx_gd32_flash_program,
+    .erase = nx_gd32_flash_erase,
+};

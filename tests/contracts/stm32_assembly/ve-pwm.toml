@@ -1,0 +1,18 @@
+schema = 2
+board_package = "ve_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[pwm.pwm0]
+binding = "pwm0"
+mode = "fixed-pwm"
+period_ticks = 1000
+duty_ticks = 0
+tick_hz = 1000000

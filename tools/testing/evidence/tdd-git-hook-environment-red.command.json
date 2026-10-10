@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "command": [
+    ".venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_git_environment",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

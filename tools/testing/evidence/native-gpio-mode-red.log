@@ -1,0 +1,37 @@
+[1/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/gpio.c.o
+[2/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/uart.c.o
+[3/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/exti.c.o
+[4/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/i2c.c.o
+[5/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/watchdog.c.o
+[6/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/spi.c.o
+[7/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/timer.c.o
+[8/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/flash.c.o
+[9/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/time.c.o
+[10/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/src/adc.c.o
+[11/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/flash.c.o
+[12/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/gpio.c.o
+[13/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/watchdog.c.o
+[14/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/exti.c.o
+[15/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/spi.c.o
+[16/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/i2c.c.o
+[17/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/uart.c.o
+[18/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/timer.c.o
+[19/22] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/adc.c.o
+[20/22] Linking C static library libnative.a
+[21/22] Building CXX object CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o
+FAILED: [code=1] CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o 
+/usr/bin/g++  -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus/io/include -I/workspace/nexus/io/native -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest  -MD -MT CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o -MF CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o.d -o CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o -c /workspace/nexus/tests/google/native_instances_test.cpp
+In file included from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from /workspace/nexus/tests/google/native_instances_test.cpp:15:
+/workspace/nexus/tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_GPIOInputViewRejectsWritesWithoutChangingSnapshot_Test::TestBody()’:
+/workspace/nexus/tests/google/native_instances_test.cpp:62:48: error: too many arguments to function ‘nx_result_t nx_native_gpio_configure_instance(nx_native_gpio_state_t*, uint32_t, uint32_t)’
+   62 |     ASSERT_EQ(nx_native_gpio_configure_instance(&state, 3, 0, false),
+      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+In file included from /workspace/nexus/tests/google/native_instances_test.cpp:14:
+/workspace/nexus/io/native/provider.h:152:13: note: declared here
+  152 | nx_result_t nx_native_gpio_configure_instance(nx_native_gpio_state_t* state,
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

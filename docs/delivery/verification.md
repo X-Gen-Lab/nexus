@@ -1,34 +1,37 @@
 # 当前证据与验收边界
 
-此文记录本轮开发执行入口。开发工作区、手工执行或历史日志不能自动成为当前
-clean-source 候选证据；最终资格文件必须由工具以准确 source/config/tool/ELF 身份
-和 fresh raw execution 生成。构建日志路径是本轮环境中的证据定位，不承诺所有
-临时开发产物都会随源码包发布。
+本次静态 factory／多态接口／TOML／DMA block 迭代必须重新执行验证。旧版本候选、
+历史测试数量和开发目录不能继承为新 HEAD 的资格。实施台账的 implemented
+表示源码和工具已落地；验收状态必须读取对应 HEAD 的执行报告。最终执行保存在外部
+`nexus-delivery/<HEAD>/`；每份报告绑定源码、配置、依赖、工具、命令返回码和产物。
 
-| 范围 | 实际执行／证据入口 | 资格边界 |
+| 范围 | 当前执行入口 | 资格边界 |
 |---|---|---|
-| Core、Native I/O | `tests/contracts/core_contract_test.c`、`native_io_test.c`；GCC14.2 strict 与 ASan/UBSan 开发执行 | request 发布、deadline/wrap、RX/EXTI loss ordering 等软件行为 |
-| STM32 | `tests/contracts/stm32_model/`、`stm32_io_test.c`；真实生产 TU；独立 VE/ZG controller ARM fixtures | 模型与编译／链接，不是 PCB 电气 |
-| GD32 | `tests/contracts/gd32_io_test.c`、`gd32_system_test.c`；四个 CTest；`build/native-asan` 实际通过 | TC/late IRQ、quarantine、mask/clock rollback、watchdog 不可逆失败；DBG 模型地址为 ASan 重定位，生产 SDK 不变 |
-| GD32 ARM controllers | `build/gd32-controller-{spi,i2c,flash,watchdog,exti,pwm,adc,adc-scan}` 真实链接 | 8 个独立软件 Board fixture，非 HIL 镜像 |
-| OS／通用组件 | `build/ng-agent-cmake/os-components-junit.xml` 10/10、`build/ng-agent-sanitized/os-components-junit.xml` 9/9 | 实际 POSIX/FreeRTOS POSIX、3 producer/3,000 帧 UART owner、并发／掉电模型；FreeRTOS POSIX cancellation 修后 100 fresh process 通过 |
-| 三板资源矩阵 | `build/measurement-qiming-v3/matrix.json` 18、`measurement-sky-v1/matrix.json` 18、`measurement-liangshan-v5/matrix.json` 24 | 60 个 O2/Os/O3±LTO 开发镜像；不是 cycles 或最终封存 candidate |
-| GC 负路径 | `build/measurement-qiming-gc-v2`、`measurement-sky-gc-v2`、`measurement-liangshan-gc` | weak IRQ alias 不冒充真实 provider，未选 provider 不驻留 |
-| 外部示例 | `nexus-examples/build/nextgen-development/` 的 Native JUnit、ARM development JSON、script log | 实际开发消费；最终 pin/clean SDK 需要独立验证 |
-| 工具边界 | `tests/contracts/test_{measurement,evidence,hil,repro,source_sdk}*.py` 与配置测试 | 缺失／失效／错 scope／伪造／空报告真实拒绝；模型不代替正式操作 |
-| OCI | 本轮实际 seal/verify/load 的 manifest digest `e936b188b9e30cf37ce109a5407019c91fe2dbc62fb10afceb3f2abbfc823ac8` | 本地观测 OCI；非发布 registry，Dockerfile recipe 不声称可复现 |
-| 离线双构建／候选 | `tools/evidence/reproduce.py`、`candidate.py`、`proof.py` | 工具已实现；以 clean HEAD 后正式输出为准，不能用开发 hash 代替 |
-| HIL | `tools/hil/admit.py`、三 Board fixture、station template、准入负测 | 工装准备；未连接 station，物理 `not_executed` |
+| Native／Core／OS／组件 | `tools/dev/dev.py test --preset native-debug`，另执行 release 和 ASan／UBSan | 实际软件所有权、线程、故障行为；不构成 MCU 电气资格 |
+| GoogleTest／GoogleMock | `scripts/ci/tdd_gate.py --all`；`tests/google/` | 全量发现与实际非过滤执行、fresh XML、零跳过；不是历史编辑顺序的自动证明 |
+| 生成器 | `tools/testing/run_tool_tests.py --suite configure` | TOML、冻结 IR、九类 Native factory、物理资源冲突和错误输入 |
+| 工具门禁 | `tools/testing/run_tool_tests.py --suite testing`；`tests/contracts/test_*.py`；`scripts/ci/` | 实际负路径、暂存区稳定、报告身份和执行退出码 |
+| STM／GD 寄存器模型 | `tests/google/*dma*`、`*uart_stream*`、`*adc_stream*`、`gd32_multi_test.cpp` 与已有 C contracts | 真实生产 TU；内存／线上排空、EN 拒绝关闭、迟到 IRQ、借用／隔离、校准／稳定 |
+| 三板基础配置 | 六个 ARM presets | 实际 startup／vector／provider 链接、ELF／BIN／map 和预算 |
+| 高级 controller 夹具 | `tests/contracts/{stm32,gd32}_assembly/*.toml` | 九类、DMA、块接收／触发、多控制器实际 ARM 链接；明确是软件 Board |
+| 最小资源矩阵 | `tools/measurement/compare.py` | 三板 60 个 O2／Os／O3 ± LTO 镜像；18 empty GC 检查；实际 face／ops 存储成本 |
+| 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 精确 pin 后 Native 运行与六个 ARM 配置；产品实现留在外部 |
+| 源码 SDK | `cmake/package/package_source_sdk.py`、`verify_consumers.py` | 干净版本、移动路径 C／C++ Native 运行与 STM／GD 固件链接 |
+| 离线复现／候选 | `tools/evidence/reproduce.py`、`candidate.py`、`proof.py` | 两次独立 network-none 构建，相同源码／配置／工具／ELF 身份及必需 scope |
+| HIL | `tools/hil/prepare.py`、`admit.py`、三板 fixture 与 station template | 工装已准备；未连接设备，所有物理结果 `not_executed` |
 
-开发资源比较中的 Os 数值仅用于观察当前机制成本，MSP 都显式保留 2048 bytes、
-heap=0，未启用的 CCM/TCM/ADDSRAM 占用为 0。后续源码改变会使 image hash 和
-资源数值变化，不能把这一组开发数字复制成正式预算通过记录。
+开发执行目录 `build/controller-routes-factory/` 与
+`build/minimal-factory-resources/` 保留独立 attempt 和原始命令，不覆盖旧运行。资源
+数字只描述对应 ELF；源码变化后重新执行。MSP 显式预留，heap=0；未使用的内存域
+不因芯片具有该区域就自动驻留。汇编和 ELF 字节不能替代实际 cycles／IRQ latency。
 
-正式软件验收要求：clean source/dependency、准确工具环境与配置、非零 fresh tests、
-实际 ELF/BIN/map bytes、当前预算、可移动源码 SDK 消费、两次独立 network-none
-构建比较。candidate 验证同时检查 qualification 的 scope 和相同 artifact 身份。
-报告字段、schema、文件摘要和 workflow 定义本身均不是执行证据。
+RED 日志保存在 `tools/testing/evidence/`，GREEN 为真实框架执行。既有正确合同的
+迁移明确标识，不为了制造 RED 而修改生产行为。commit hook 开始和结束检查暂存
+快照及 index tree，拒绝执行期间发生的行为变更；失败不发布新的成功摘要。
 
-所有物理时序／精度／波形／reset／掉电／负载项目尚未执行。实板资格必须绑定
-PCB、chip UID、probe/serial/power、station identity、预算和同一候选 image，不能
-继承另一 Board、软件 fixture 或旧版本的结果。
+正式软件资格要求 clean source/dependency、准确工具环境与配置、非零 fresh tests、
+同一 ELF／BIN／map、当前预算、源码 SDK 独立消费与离线双构建。支持范围以
+[精确支持矩阵](support.md) 为准，不把软件夹具的 connector 继承到参考 Board。
+
+所有物理时序、精度、波形、reset、掉电和长期负载项目尚未执行。实际 HIL 必须
+记录 PCB、chip UID、probe／serial／power、station、预算和同一候选 image。

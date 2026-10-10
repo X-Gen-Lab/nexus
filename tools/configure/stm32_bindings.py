@@ -1,4 +1,8 @@
 """Reviewed STM32 fixed construction, never a runtime resource allocator."""
+try:
+    from .emission import dma_regions
+except ImportError:
+    from emission import dma_regions
 
 
 def _symbol(value):
@@ -32,6 +36,13 @@ def _release(pins):
             f"{pin['pin'][2:]}u, 0u, 0u, 0u, false);" for pin in pins]
 
 
+def _endpoint_face(kind, name, state, implementation=None):
+    implementation = implementation or kind
+    return [f"static const nx_{kind}_endpoint_t s_nx_device_face_{name} = {{",
+            f"    &nx_stm32_{implementation}_endpoint_ops, &{state}", "};",
+            f"const nx_{kind}_endpoint_t* const nx_device_{name} = &s_nx_device_face_{name};"]
+
+
 def constructor(item, result, board_bindings, routes, devices):
     """Emit static contexts after resolver resource and mode validation.
 
@@ -49,6 +60,8 @@ def constructor(item, result, board_bindings, routes, devices):
     rollback_extra = []
     clock_bits = {"APB1ENR": "0u", "APB2ENR": "0u"}
     if kind == "spi":
+        dma = item["mode"] == "dma"
+        bus = f"s_nx_port_{name}" + (".spi" if dma else "")
         if item["controller"] != "SPI1":
             raise ValueError("Only reviewed SPI1 is maintained")
         children = [child for child in devices
@@ -58,9 +71,9 @@ def constructor(item, result, board_bindings, routes, devices):
         clock_bits["APB2ENR"] = "RCC_APB2ENR_SPI1EN"
         body += ["    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;",
                  "    nx_arch_dsb();",
-                 f"    s_{name}.registers = SPI1;",
-                 f"    s_{name}.rcc = RCC;",
-                 f"    s_{name}.clock_hz = 84000000u;",
+                 f"    {bus}.registers = SPI1;",
+                 f"    {bus}.rcc = RCC;",
+                 f"    {bus}.clock_hz = 84000000u;",
                  "    saved_spi_cr1 = SPI1->CR1;",
                  "    saved_spi_cr2 = SPI1->CR2;",
                  "    captured_spi = true;",
@@ -81,38 +94,61 @@ def constructor(item, result, board_bindings, routes, devices):
             bit = 1 << int(cs_pin[2:])
             if binding.get("initial") != bit:
                 raise ValueError("SPI active-low CS must declare initial high")
-            endpoint = f"s_{name}_endpoint" if index == 0 else f"s_{child_name}_endpoint"
+            endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
+            implementation = "spi_dma" if dma else "spi"
             if index != 0:
-                declarations.append(f"static nx_spi_endpoint_t {endpoint};")
-            declarations += [f"static nx_gpio_port_t s_{child_name}_cs;",
-                             f"const nx_spi_endpoint_t* const nx_device_{child_name} = &{endpoint};"]
+                declarations.append(f"static nx_stm32_{implementation}_endpoint_state_t {endpoint};")
+            declarations += [f"static nx_stm32_gpio_state_t s_nx_cs_{child_name};",
+                             *_endpoint_face("spi", child_name, endpoint, implementation)]
             _check(body, f"nx_stm32_gpio_clock_enable({ord(cs_pin[1]) - ord('A')}u)")
             _capture(body, cs_pin)
-            rollback_extra.append(f"    s_{child_name}_cs.initialized = false;")
-            body += [f"    s_{child_name}_cs.registers = GPIO{cs_pin[1]};",
-                     f"    s_{child_name}_cs.mask = {bit}u;",
-                     f"    s_{child_name}_cs.output = true;"]
-            _check(body, f"nx_stm32_gpio_initialize(&s_{child_name}_cs, {bit}u)")
+            rollback_extra.append(f"    s_nx_cs_{child_name}.initialized = false;")
+            body += [f"    s_nx_cs_{child_name}.registers = GPIO{cs_pin[1]};",
+                     f"    s_nx_cs_{child_name}.mask = {bit}u;",
+                     f"    s_nx_cs_{child_name}.output = true;"]
+            _check(body, f"nx_stm32_gpio_initialize(&s_nx_cs_{child_name}, {bit}u)")
             mode = child.get("mode", 0)
             maximum = child.get("max_hz", item.get("max_hz", 1000000))
             if not isinstance(mode, int) or isinstance(mode, bool) or not 0 <= mode <= 3:
                 raise ValueError("SPI mode must be 0 through 3")
             if not isinstance(maximum, int) or maximum < 328125 or maximum > 42000000:
                 raise ValueError("SPI1 maintained frequency is 328125 through 42000000 Hz")
-            body += [f"    {endpoint}.port = &s_{name};",
-                     f"    {endpoint}.cs = &s_{child_name}_cs;",
-                     f"    {endpoint}.cs_mask = {bit}u;",
-                     f"    {endpoint}.mode = {mode}u;",
-                     f"    {endpoint}.frequency_hz = {maximum}u;"]
+            base = endpoint + (".endpoint" if dma else "")
+            body += [f"    {base}.port = &{bus};",
+                     f"    {base}.cs = &s_nx_cs_{child_name};",
+                     f"    {base}.cs_mask = {bit}u;",
+                     f"    {base}.mode = {mode}u;",
+                     f"    {base}.frequency_hz = {maximum}u;"]
+            if dma:
+                body.append(f"    {endpoint}.dma = &s_nx_port_{name};")
+        if dma:
+            region_lines, region_count = dma_regions(name, result, include_flash=True)
+            declarations += region_lines
+            body += [f"    s_nx_port_{name}.dma = DMA2;",
+                     f"    s_nx_port_{name}.tx = DMA2_Stream3;",
+                     f"    s_nx_port_{name}.rx = DMA2_Stream0;",
+                     f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
+                     f"    s_nx_port_{name}.region_count = {region_count}u;"]
+            _check(body, f"nx_stm32_spi_dma_initialize(&s_nx_port_{name})")
+            body += [f"    NVIC_SetPriority(DMA2_Stream3_IRQn, {item['irq_priority']}u);",
+                     f"    NVIC_SetPriority(DMA2_Stream0_IRQn, {item['irq_priority']}u);"]
+            for stream, receive in ((3, "false"), (0, "true")):
+                declarations += [f"void DMA2_Stream{stream}_IRQHandler(void);",
+                                 "/** \\brief Exact selected SPI DMA terminal observation. */",
+                                 f"void DMA2_Stream{stream}_IRQHandler(void) {{ nx_stm32_spi_dma_irq(&s_nx_port_{name}, {receive}); }}"]
         stop_name = f"stop_{name}"
-        stop_body = [f"static nx_result_t {stop_name}(void) {{",
-                     f"    if (s_{name}.active) {{ return NX_ERROR_BUSY; }}",
-                     "    SPI1->CR1 = 0u;"]
+        stop_body = [f"static nx_result_t {stop_name}(void) {{"]
+        if dma:
+            stop_body += [f"    nx_result_t stopped = nx_spi_port_stop(nx_binding_{name});",
+                          "    if (stopped != NX_SUCCESS) { return stopped; }"]
+        else:
+            stop_body.append(f"    if ({bus}.active) {{ return NX_ERROR_BUSY; }}")
+        stop_body.append("    SPI1->CR1 = 0u;")
         for child in children:
             child_name = _symbol(child["id"])
             binding = board_bindings[child["cs_binding"]]
             stop_body += [f"    nx_result_t result_{child_name} = nx_stm32_gpio_stop(",
-                          f"        &s_{child_name}_cs, {binding['initial']}u);",
+                          f"        &s_nx_cs_{child_name}, {binding['initial']}u);",
                           f"    if (result_{child_name} != NX_SUCCESS) {{ return result_{child_name}; }}"]
         stop_body += _release(item["pins"])
         stop_body += ["    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_SPI1EN;",
@@ -134,25 +170,25 @@ def constructor(item, result, board_bindings, routes, devices):
             # External pull-ups are a reviewed Board requirement; enabling an
             # internal pull-up does not stand in for that electrical contract.
             _pin(body, pin, 2, open_drain=True)
-        body += [f"    s_{name}.registers = I2C1;",
-                 f"    s_{name}.peripheral_mhz = 42u;",
-                 f"    s_{name}.rate_hz = 100000u;"]
+        body += [f"    s_nx_port_{name}.registers = I2C1;",
+                 f"    s_nx_port_{name}.peripheral_mhz = 42u;",
+                 f"    s_nx_port_{name}.rate_hz = 100000u;"]
         for index, child in enumerate(children):
             child_name = _symbol(child["id"])
             address = child["address"]
             if not 8 <= address <= 119:
                 raise ValueError("Reserved I2C addresses are not maintained")
-            endpoint = f"s_{name}_endpoint" if index == 0 else f"s_{child_name}_endpoint"
+            endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
             if index != 0:
-                declarations.append(f"static nx_i2c_endpoint_t {endpoint};")
-            declarations += [f"const nx_i2c_endpoint_t* const nx_device_{child_name} = &{endpoint};"]
-            body += [f"    {endpoint}.port = &s_{name};",
+                declarations.append(f"static nx_stm32_i2c_endpoint_state_t {endpoint};")
+            declarations += [*_endpoint_face("i2c", child_name, endpoint)]
+            body += [f"    {endpoint}.port = &s_nx_port_{name};",
                      f"    {endpoint}.address = {address}u;"]
-        _check(body, f"nx_stm32_i2c_initialize(&s_{name})")
+        _check(body, f"nx_stm32_i2c_initialize(&s_nx_port_{name})")
         declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    if (s_{name}.active) {{ return NX_ERROR_BUSY; }}",
+                         f"    if (s_nx_port_{name}.active) {{ return NX_ERROR_BUSY; }}",
                          "    I2C1->CR1 = 0u;",
-                         f"    s_{name}.initialized = false;"] + _release(item["pins"]) + [
+                         f"    s_nx_port_{name}.initialized = false;"] + _release(item["pins"]) + [
                          "    RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_I2C1EN;",
                          "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
@@ -160,23 +196,23 @@ def constructor(item, result, board_bindings, routes, devices):
         if item["controller"] != "FLASH":
             raise ValueError("Only the full internal Flash provider is maintained")
         geometry = "ve" if result["part"] == "STM32F407VET6" else "zg"
-        body += [f"    s_{name}.registers = FLASH;",
-                 f"    s_{name}.geometry = &g_nx_stm32_flash_{geometry};",
-                 f"    s_{name}.memory = (volatile uint8_t*)FLASH_BASE;",
-                 f"    s_{name}.supply_mv = 3300u;"]
+        body += [f"    s_nx_port_{name}.registers = FLASH;",
+                 f"    s_nx_port_{name}.geometry = &g_nx_stm32_flash_{geometry};",
+                 f"    s_nx_port_{name}.memory = (volatile uint8_t*)FLASH_BASE;",
+                 f"    s_nx_port_{name}.supply_mv = 3300u;"]
         declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    return s_{name}.active || (FLASH->SR & FLASH_SR_BSY) != 0u",
+                         f"    return s_nx_port_{name}.active || (FLASH->SR & FLASH_SR_BSY) != 0u",
                          "        ? NX_ERROR_BUSY : NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
     elif kind == "watchdog":
         if item["controller"] != "IWDG":
             raise ValueError("Only independent IWDG is maintained")
-        body += [f"    s_{name}.registers = IWDG;",
-                 f"    s_{name}.flash = FLASH;", f"    s_{name}.debug = DBGMCU;",
-                 f"    s_{name}.rcc = RCC;", f"    s_{name}.poll_limit = 1000000u;"]
+        body += [f"    s_nx_port_{name}.registers = IWDG;",
+                 f"    s_nx_port_{name}.flash = FLASH;", f"    s_nx_port_{name}.debug = DBGMCU;",
+                 f"    s_nx_port_{name}.rcc = RCC;", f"    s_nx_port_{name}.poll_limit = 1000000u;"]
         declarations += [f"static nx_result_t stop_{name}(void) {{",
                          "    nx_watchdog_state_t state;",
-                         f"    nx_result_t result = nx_watchdog_port_state(&s_{name}, &state);",
+                         f"    nx_result_t result = nx_watchdog_port_state(&s_nx_face_{name}, &state);",
                          "    if (result != NX_SUCCESS) { return result; }",
                          "    return state.enabled ? NX_ERROR_STATE : NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
@@ -197,21 +233,21 @@ def constructor(item, result, board_bindings, routes, devices):
         if not isinstance(priority, int) or not 0 <= priority <= 15:
             raise ValueError("EXTI requires a reviewed IRQ priority")
         clock_bits["APB2ENR"] = "RCC_APB2ENR_SYSCFGEN"
-        declarations.append(f"static nx_exti_event_t s_{name}_events[{capacity}];")
+        declarations.append(f"static nx_exti_event_t s_nx_events_{name}[{capacity}];")
         body += [f"    if ((EXTI->IMR & {1 << line}u) != 0u) {{",
                  "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
         _pin(body, pin, 0)
         body += ["    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;", "    nx_arch_dsb();",
-                 f"    s_{name}.registers = EXTI;",
-                 f"    s_{name}.gpio = GPIO{pin['pin'][1]};",
-                 f"    s_{name}.storage = s_{name}_events;",
-                 f"    s_{name}.capacity = {capacity}u;", f"    s_{name}.line = {line}u;",
-                 f"    s_{name}.edge = {edge};"]
-        _check(body, f"nx_stm32_exti_initialize(&s_{name}, SYSCFG, {ord(pin['pin'][1]) - ord('A')}u)")
+                 f"    s_nx_port_{name}.registers = EXTI;",
+                 f"    s_nx_port_{name}.gpio = GPIO{pin['pin'][1]};",
+                 f"    s_nx_port_{name}.storage = s_nx_events_{name};",
+                 f"    s_nx_port_{name}.capacity = {capacity}u;", f"    s_nx_port_{name}.line = {line}u;",
+                 f"    s_nx_port_{name}.edge = {edge};"]
+        _check(body, f"nx_stm32_exti_initialize(&s_nx_port_{name}, SYSCFG, {ord(pin['pin'][1]) - ord('A')}u)")
         body += [f"    NVIC_SetPriority({irq}, {priority}u);",
                  f"    NVIC_ClearPendingIRQ({irq});", f"    NVIC_EnableIRQ({irq});"]
         declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    nx_result_t status = nx_exti_port_stop(&s_{name});",
+                         f"    nx_result_t status = nx_exti_port_stop(&s_nx_face_{name});",
                          "    if (status != NX_SUCCESS) { return status; }"] + _release(item["pins"]) + [
                          "    return NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
@@ -230,7 +266,7 @@ def constructor(item, result, board_bindings, routes, devices):
         if inactive not in (0, 64):
             raise ValueError("PWM idle must be explicit PA6 masked output level")
         clock_bits["APB1ENR"] = "RCC_APB1ENR_TIM3EN"
-        declarations.append(f"static nx_gpio_port_t s_{name}_idle;")
+        declarations.append(f"static nx_stm32_gpio_state_t s_nx_idle_{name};")
         body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;",
                  "    nx_arch_dsb();",
                  f"    if ((TIM3->CCER & 1u) != 0u || ((TIM3->CR1 & TIM_CR1_CEN) != 0u &&",
@@ -238,33 +274,35 @@ def constructor(item, result, board_bindings, routes, devices):
                  "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
         _check(body, "nx_stm32_gpio_clock_enable(0u)")
         _capture(body, "PA6")
-        rollback_extra.append(f"    s_{name}_idle.initialized = false;")
-        body += [f"    s_{name}_idle.registers = GPIOA;",
-                 f"    s_{name}_idle.mask = 64u;", f"    s_{name}_idle.output = true;"]
-        _check(body, f"nx_stm32_gpio_initialize(&s_{name}_idle, {inactive}u)")
-        body += [f"    s_{name}.registers = TIM3;",
-                 f"    s_{name}.inactive_gpio = &s_{name}_idle;",
-                 f"    s_{name}.inactive_mask = 64u;",
-                 f"    s_{name}.inactive_high = {'true' if inactive else 'false'};",
-                 f"    s_{name}.channel = 1u;", f"    s_{name}.period_ticks = {period}u;",
-                 f"    s_{name}.duty_ticks = {duty}u;", f"    s_{name}.tick_hz = {tick}u;",
-                 f"    s_{name}.prescaler = {84000000 // tick - 1}u;"]
-        _check(body, f"nx_stm32_pwm_initialize(&s_{name})")
+        rollback_extra.append(f"    s_nx_idle_{name}.initialized = false;")
+        body += [f"    s_nx_idle_{name}.registers = GPIOA;",
+                 f"    s_nx_idle_{name}.mask = 64u;", f"    s_nx_idle_{name}.output = true;"]
+        _check(body, f"nx_stm32_gpio_initialize(&s_nx_idle_{name}, {inactive}u)")
+        body += [f"    s_nx_port_{name}.registers = TIM3;",
+                 f"    s_nx_port_{name}.inactive_gpio = &s_nx_idle_{name};",
+                 f"    s_nx_port_{name}.inactive_mask = 64u;",
+                 f"    s_nx_port_{name}.inactive_high = {'true' if inactive else 'false'};",
+                 f"    s_nx_port_{name}.channel = 1u;", f"    s_nx_port_{name}.period_ticks = {period}u;",
+                 f"    s_nx_port_{name}.duty_ticks = {duty}u;", f"    s_nx_port_{name}.tick_hz = {tick}u;",
+                 f"    s_nx_port_{name}.prescaler = {84000000 // tick - 1}u;"]
+        _check(body, f"nx_stm32_pwm_initialize(&s_nx_port_{name})")
         declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    nx_result_t status = nx_pwm_port_stop(&s_{name});",
+                         f"    nx_result_t status = nx_pwm_port_stop(&s_nx_face_{name});",
                          "    if (status != NX_SUCCESS) { return status; }",
-                         f"    s_{name}.initialized = false;",
-                         f"    s_{name}_idle.initialized = false;",
+                         f"    s_nx_port_{name}.initialized = false;",
+                         f"    s_nx_idle_{name}.initialized = false;",
                          "    if ((TIM3->CCER & 0x1111u) == 0u) {",
                          "        RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_TIM3EN;",
                          "    }", "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
     elif kind == "adc":
-        channels = item.get("channels")
+        stream = item["mode"] == "trigger-dma"
+        adc = f"s_nx_port_{name}" + (".adc" if stream else "")
+        channels = list(item.get("channels", ()))
         reviewed = [int(pin["pin"][2:]) for pin in item["pins"]]
         if item["controller"] != "ADC1" or channels != reviewed or channels not in ([0], [0, 1]):
             raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
-        sampling = item.get("sample_times")
+        sampling = list(item.get("sample_times", ()))
         reference = item.get("reference_mv")
         if not isinstance(sampling, list) or len(sampling) != len(channels) or not all(
                 isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 7
@@ -275,23 +313,48 @@ def constructor(item, result, board_bindings, routes, devices):
         clock_bits["APB2ENR"] = "RCC_APB2ENR_ADC1EN"
         channel_values = ", ".join(f"{value}u" for value in channels)
         sampling_values = ", ".join(f"{value}u" for value in sampling)
-        declarations += [f"static const uint8_t s_{name}_channels[] = {{ {channel_values} }};",
-                         f"static const uint8_t s_{name}_sampling[] = {{ {sampling_values} }};"]
+        declarations += [f"static const uint8_t s_nx_adc_channels_{name}[] = {{ {channel_values} }};",
+                         f"static const uint8_t s_nx_adc_samples_{name}[] = {{ {sampling_values} }};"]
         body += ["    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;", "    nx_arch_dsb();",
                  "    if ((ADC1->CR2 & ADC_CR2_ADON) != 0u) {",
                  "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
         for pin in item["pins"]:
             _pin(body, pin, 3)
         body += [
-                 f"    s_{name}.registers = ADC1;", f"    s_{name}.common = ADC;",
-                 f"    s_{name}.channels = s_{name}_channels;",
-                 f"    s_{name}.sample_times = s_{name}_sampling;",
-                 f"    s_{name}.channel_count = {len(channels)}u;", f"    s_{name}.reference_mv = {reference}u;"]
-        _check(body, f"nx_stm32_adc_initialize(&s_{name})")
-        declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         f"    if (s_{name}.active) {{ return NX_ERROR_BUSY; }}",
-                         "    ADC1->CR2 = 0u;",
-                         f"    s_{name}.initialized = false;"] + _release(item["pins"]) + [
+                 f"    {adc}.registers = ADC1;", f"    {adc}.common = ADC;",
+                 f"    {adc}.channels = s_nx_adc_channels_{name};",
+                 f"    {adc}.sample_times = s_nx_adc_samples_{name};",
+                 f"    {adc}.channel_count = {len(channels)}u;", f"    {adc}.reference_mv = {reference}u;"]
+        if stream:
+            clock_bits["APB1ENR"] = "RCC_APB1ENR_TIM3EN"
+            region_lines, region_count = dma_regions(name, result)
+            declarations += region_lines
+            body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;", "    nx_arch_dsb();",
+                     f"    s_nx_port_{name}.timer = TIM3;",
+                     f"    s_nx_port_{name}.dma = DMA2;",
+                     f"    s_nx_port_{name}.memory = DMA2_Stream4;",
+                     f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
+                     f"    s_nx_port_{name}.region_count = {region_count}u;",
+                     f"    s_nx_port_{name}.timer_clock_hz = 84000000u;",
+                     f"    s_nx_port_{name}.adc_clock_hz = 21000000u;"]
+            _check(body, f"nx_stm32_adc_stream_initialize(&s_nx_port_{name})")
+            body.append(f"    NVIC_SetPriority(DMA2_Stream4_IRQn, {item['irq_priority']}u);")
+            declarations += ["void DMA2_Stream4_IRQHandler(void);",
+                             "/** \\brief Exact ADC DMA block terminal observation. */",
+                             f"void DMA2_Stream4_IRQHandler(void) {{ nx_stm32_adc_stream_irq(&s_nx_port_{name}); }}"]
+        else:
+            _check(body, f"nx_stm32_adc_initialize(&s_nx_port_{name})")
+        stop_body = [f"static nx_result_t stop_{name}(void) {{"]
+        if stream:
+            stop_body += [f"    nx_result_t stopped = nx_adc_port_stream_stop(&s_nx_face_{name});",
+                          "    if (stopped != NX_SUCCESS) { return stopped; }",
+                          "    NVIC_DisableIRQ(DMA2_Stream4_IRQn);",
+                          "    NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);"]
+        stop_body += [f"    if ({adc}.active) {{ return NX_ERROR_BUSY; }}",
+                      "    ADC1->CR2 = 0u;", f"    {adc}.initialized = false;"]
+        if stream:
+            stop_body.append("    RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_TIM3EN;")
+        declarations += stop_body + _release(item["pins"]) + [
                          "    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_ADC1EN;",
                          "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
@@ -342,10 +405,10 @@ def shared_irq_definitions(selections):
     for vector, items in groups.items():
         if len({item["irq_priority"] for item in items}) != 1:
             raise ValueError("Shared EXTI vector priorities must agree")
-        pointers = ", ".join("&s_" + _symbol(item["id"]) for item in items)
-        array = "s_" + vector.lower() + "_lines"
+        pointers = ", ".join("&s_nx_port_" + _symbol(item["id"]) for item in items)
+        array = "s_nx_irq_" + vector.lower() + "_ports"
         mask = sum(1 << int(item["controller"][4:]) for item in items)
-        lines.extend([f"static nx_exti_port_t* const {array}[] = {{ {pointers} }};",
+        lines.extend([f"static nx_stm32_exti_state_t* const {array}[] = {{ {pointers} }};",
                       f"void {vector}_IRQHandler(void);",
                       "/** \\brief Static bounded EXTI shared-vector dispatch. */",
                       f"void {vector}_IRQHandler(void) {{",

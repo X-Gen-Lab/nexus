@@ -1,0 +1,35 @@
+Running main() from gmock_main.cc
+Note: Google Test filter = Stm32UartStreamFacts.*
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from Stm32UartStreamFacts
+[ RUN      ] Stm32UartStreamFacts.FullIdleHasOnePublicationWithBothObservedFacts
+/workspace/nexus/tests/google/stm32_uart_stream_test.cpp:129: Failure
+Expected equality of these values:
+  block.flags
+    Which is: 0
+  1U
+    Which is: 1
+
+[  FAILED  ] Stm32UartStreamFacts.FullIdleHasOnePublicationWithBothObservedFacts (0 ms)
+[ RUN      ] Stm32UartStreamFacts.ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte
+/workspace/nexus/tests/google/stm32_uart_stream_test.cpp:144: Failure
+Expected: (block.flags & 8U) != (0U), actual: 0 vs 0
+
+[  FAILED  ] Stm32UartStreamFacts.ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte (0 ms)
+[ RUN      ] Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan
+/workspace/nexus/tests/google/stm32_uart_stream_test.cpp:158: Failure
+Expected: (block.flags & 8U) != (0U), actual: 0 vs 0
+
+[  FAILED  ] Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan (0 ms)
+[----------] 3 tests from Stm32UartStreamFacts (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] Stm32UartStreamFacts.FullIdleHasOnePublicationWithBothObservedFacts
+[  FAILED  ] Stm32UartStreamFacts.ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte
+[  FAILED  ] Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan
+
+ 3 FAILED TESTS

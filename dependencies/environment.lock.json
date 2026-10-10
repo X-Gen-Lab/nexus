@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "tools": {"cmake": "3.31.6", "ninja": "1.13.2", "clang-format": "14.0.6", "pre-commit": "4.3.0"},
-  "python": {"minimum": "3.10", "qualified_local": "3.12.14"},
+  "python": {"minimum": "3.11", "qualified_local": "3.12.14"},
   "native_compiler": {"id": "GNU", "version": "14.2.0"},
   "arm_compiler": {"id": "GNU", "version": "14.3.1", "distribution": "14.3.rel1", "archive_lock": "dependencies/toolchains.lock.json"},
   "qualified_oci": {

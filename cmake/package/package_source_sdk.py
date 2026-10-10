@@ -33,6 +33,10 @@ REQUIRED_FILES = (
     "boards/gd32f470_liangshan/board.json",
     "soc/stm32f407/soc.json", "soc/gd32f470/soc.json",
     "tools/configure/configure.py", "cmake/platform/Firmware.cmake",
+    "tools/configure/authored.py", "tools/configure/ir.py",
+    "tools/configure/factory.py", "tools/configure/assemblies/native.toml",
+    "tools/configure/assemblies/sky-baremetal.toml",
+    "tools/configure/assemblies/liangshan-baremetal.toml",
     "tools/measurement/workload.c",
     "ext/freertos/tasks.c", "ext/freertos/LICENSE.md",
     "vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_5/LICENSE.txt",
@@ -104,6 +108,10 @@ def tree_entries(root):
 
 
 def selected(name):
+    # Host test frameworks never become firmware source dependencies. Their
+    # reviewed lock stays in the SDK provenance, without host-only payloads.
+    if name.startswith("dependencies/source/"):
+        return False
     return (name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
             or name.startswith("vendors/gigadevice/gd32f4xx/"))
 

@@ -12,7 +12,7 @@
             "binaryDir": "${sourceDir}/build/native-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.toml",
                 "NEXUS_BUILD_TESTS": "ON"
             }
         },
@@ -22,7 +22,7 @@
             "binaryDir": "${sourceDir}/build/native-release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.toml",
                 "NEXUS_BUILD_TESTS": "ON"
             }
         },
@@ -32,7 +32,7 @@
             "binaryDir": "${sourceDir}/build/native-asan",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.toml",
                 "NEXUS_BUILD_TESTS": "ON",
                 "NEXUS_ENABLE_SANITIZERS": "ON"
             }
@@ -43,7 +43,7 @@
             "binaryDir": "${sourceDir}/build/stm32-qiming-baremetal",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/qiming-baremetal.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/qiming-baremetal.toml",
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
@@ -54,7 +54,7 @@
             "binaryDir": "${sourceDir}/build/stm32-qiming-freertos",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/qiming-freertos.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/qiming-freertos.toml",
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
@@ -65,7 +65,7 @@
             "binaryDir": "${sourceDir}/build/stm32-sky-baremetal",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/sky-baremetal.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/sky-baremetal.toml",
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
@@ -76,7 +76,7 @@
             "binaryDir": "${sourceDir}/build/stm32-sky-freertos",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/sky-freertos.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/sky-freertos.toml",
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
@@ -87,7 +87,7 @@
             "binaryDir": "${sourceDir}/build/gd32-liangshan-baremetal",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-baremetal.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-baremetal.toml",
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
@@ -98,7 +98,7 @@
             "binaryDir": "${sourceDir}/build/gd32-liangshan-freertos",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-freertos.json",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-freertos.toml",
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"

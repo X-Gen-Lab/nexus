@@ -64,6 +64,35 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('scripts/ci/install_arm_toolchain.py', commands)
         self.assertNotIn('apt-get', commands)
 
+    def test_each_native_build_executes_unfiltered_google_contract_gate(self):
+        native = workflow('build-matrix.yml')['jobs']['native']
+        commands = '\n'.join(step.get('run', '') for step in native['steps'])
+        self.assertIn('scripts/ci/tdd_gate.py --all --preset', commands)
+        evidence = [step for step in native['steps']
+                    if step.get('name') == 'Preserve execution evidence'][0]
+        self.assertIn('/tdd/', evidence['with']['path'])
+        self.assertIn('/google-contracts.json', evidence['with']['path'])
+
+    def test_tooling_runs_google_report_and_hil_preparation_boundaries(self):
+        tools = workflow('enterprise-tools.yml')['jobs']['tooling']
+        commands = '\n'.join(step.get('run', '') for step in tools['steps'])
+        self.assertIn('discover -s tools/testing', commands)
+        self.assertIn('tools.hil.prepare', commands)
+
+    def test_each_arm_link_retains_an_unbound_hil_work_plan(self):
+        arm = workflow('build-matrix.yml')['jobs']['arm']
+        commands = '\n'.join(step.get('run', '') for step in arm['steps'])
+        self.assertIn('tools/hil/prepare.py', commands)
+        evidence = [step for step in arm['steps']
+                    if step.get('name') == 'Preserve linked software evidence'][0]
+        self.assertIn('/hil-preparation.json', evidence['with']['path'])
+
+    def test_advanced_fixture_loop_uses_the_authored_toml_set(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertIn('"$fixture"/*.toml', commands)
+        self.assertNotIn('"$fixture"/*.json', commands)
+
 
 class CTestAdmission(unittest.TestCase):
     def execute_fixture(self, kind):

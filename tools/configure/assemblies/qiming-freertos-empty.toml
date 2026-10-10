@@ -1,0 +1,11 @@
+schema = 2
+board = "stm32f407_qiming_v31"
+backend = "freertos"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0

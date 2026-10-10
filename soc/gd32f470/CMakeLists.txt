@@ -26,8 +26,11 @@ target_include_directories(nexus_gd32_sdk SYSTEM PRIVATE "${gd_firmware}/CMSIS"
 target_link_libraries(nexus_gd32_sdk PRIVATE nexus_build_options)
 target_compile_definitions(nexus_gd32_sdk PRIVATE GD32F470 HXTAL_VALUE=25000000)
 add_library(nexus_soc_gd32f470 STATIC timebase.c drivers/gpio.c
-    drivers/uart.c drivers/spi.c drivers/i2c.c drivers/flash.c
-    drivers/watchdog.c drivers/exti.c drivers/timer.c drivers/adc.c)
+    drivers/uart.c drivers/uart_dma.c drivers/uart_stream.c
+    drivers/spi.c drivers/spi_dma.c
+    drivers/i2c.c drivers/flash.c
+    drivers/watchdog.c drivers/exti.c drivers/timer.c drivers/adc.c
+    drivers/adc_stream.c)
 target_link_libraries(nexus_soc_gd32f470 PUBLIC nexus_io PRIVATE nexus_gd32_sdk
     nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_soc_gd32f470 PRIVATE

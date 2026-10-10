@@ -27,7 +27,9 @@ class HilAdmissionTests(unittest.TestCase):
             "serial": {"controller": "USART1", "tx": "PA9", "rx": "PA10", "baudrate": 115200,
                        "electrical_mode": "ttl_3v3"},
             "required_tests": ["probe_identity", "flash_readback", "reset", "uart_echo"],
-            "physical_status": "not_executed", "pending_qualification": ["physical pending"]}
+            "physical_status": "not_executed", "pending_qualification": [
+                {"id": "irq_preemption", "fixture": "synthetic timing plan only",
+                 "budget": None, "unit": "us"}]}
         self.station = {"schema_version": 1, "kind": "hil_station", "station_id": "test-station",
             "board": "test-board", "part": "STM32F407ZGT6", "pcb_revision": "test-revision",
             "chip_uid": "test-uid", "probe": {"serial": "test-serial", "interface": "cmsis-dap",
@@ -78,6 +80,33 @@ class HilAdmissionTests(unittest.TestCase):
         station = json.loads(Path("tools/hil/fixtures/station.template.json").read_text())
         with self.assertRaises(EvidenceError):
             validate_station(station, self.fixture)
+
+    def test_pending_physical_scope_is_strict_and_unique(self):
+        invalid = ([], ["physical pending"],
+                   [{"id": "latency", "fixture": "logic analyzer",
+                     "budget": -1, "unit": "us"}],
+                   [{"id": "latency", "fixture": "logic analyzer",
+                     "budget": float("nan"), "unit": "us"}],
+                   [{"id": "latency", "fixture": "", "budget": None,
+                     "unit": "us"}],
+                   self.fixture["pending_qualification"] * 2)
+        for pending in invalid:
+            fixture = copy.deepcopy(self.fixture)
+            fixture["pending_qualification"] = pending
+            with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                validate_fixture(fixture)
+
+    def test_fixture_console_identity_and_probe_choices_are_strict(self):
+        for key, value in (("baudrate", True), ("tx", ""),
+                           ("rx", None), ("controller", "")):
+            fixture = copy.deepcopy(self.fixture)
+            fixture["serial"][key] = value
+            with self.subTest(key=key), self.assertRaises(EvidenceError):
+                validate_fixture(fixture)
+        fixture = copy.deepcopy(self.fixture)
+        fixture["probe_interfaces"] *= 2
+        with self.assertRaises(EvidenceError):
+            validate_fixture(fixture)
 
     def test_wrong_board_and_part_are_rejected(self):
         for key in ("board", "part"):

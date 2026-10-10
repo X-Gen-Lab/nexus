@@ -1,12 +1,12 @@
 # Nexus 下一代平台：从第一性原理设计
 
-状态：**下一代架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 新代码采用本设计的静态装配、窄端口和显式所有权边界，旧运行架构已删除。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](../archive/strategy/target-architecture.md)仅用于迁移对照。
+状态：**当前 factory + 多态平台架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 代码采用 TOML 静态装配、纯 typed factory、共享只读方法表、独立私有实例和显式所有权边界。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](../archive/strategy/target-architecture.md)仅用于迁移对照。
 
 本次迭代将设计、工程规范、接入契约与33项实施清单落实为新的生产代码和构建链。新源码与产物建立独立资格；历史通过结果不能继承。
 
 用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。
 
-配套资料：[工程手册](engineering-handbook.md)、[接入契约](integration-contracts.md)、[执行清单](next-generation-execution.csv)。实施阶段的决策可据实验结果修订，不能用架构提案代替实验。
+配套资料：[工程手册](engineering-handbook.md)、[接入契约](integration-contracts.md)、[基础执行清单](next-generation-execution.csv)、[factory/TOML/TDD P0–P5 清单](factory-platform-execution.csv)。实施阶段的决策可据实验结果修订，不能用架构提案代替实验。
 
 ## 1. 平台要解决的问题
 
@@ -59,9 +59,9 @@ MCU 平台的本质是把固定硬件、并发执行和有限资源连接起来�
 | 控制路径 | 初始化、校准、start/stop/recovery、配置变更 | 有界、明确失败与剩余资源；可使用诊断信息 |
 | 数据路径 | GPIO 操作、请求启动、IRQ 数据搬运、完成状态发布 | 无名称查找、无分配、无无界扫描、无默认应用回调 |
 
-默认固定端口使用 typed opaque context 和普通 C 函数；每个镜像选择一种对应的 SoC 实现。多实例共享实现。生产代码与 Native 模型实现同一合同，分别链接，不要求 runtime vtable。
+默认固定端口采用只读 typed face：共享 `const ops` 加私有 context。factory 按生成的 `uint16_t` typed ID 返回静态身份，无构造或启动副作用。生产 SoC 和 Native 实现同一公共合同，多实例共享表但各自拥有状态。
 
-同一镜像确有异构 provider，或组件需要注入 transport/time/storage 端口时，使用一个共享 const 方法表和 context。方法表用于真实变化点，不能按每个实例在 RAM 复制。不能把“希望未来可能支持”作为强制多态的依据。
+硬件接口使用一致的 typed 多态布局；算法组件通过窄 transport/time/storage 端口接入。每个 provider/mode 共享只读表，不按实例复制方法字段。IRQ 调用具体 provider，OS 和有界 owner 保持可选，不叠加不必要的转发对象。
 
 不承诺所有调用都内联或 LTO 都能去虚化。普通函数、共享方法表、生成的直接绑定分别使用 ELF/反汇编及实板测量判断。默认先选择简单的可维护表达。
 
@@ -102,17 +102,17 @@ startup/linker/clock 属于所选芯片实现，最终 image target 装配一次
 
 ## 4. 配置体系：三类输入，一份解析结果
 
-首版采用 schema 校验的 JSON 和一个窄 Python 配置器。Kconfig 不进入首版新链路；未来需要交互式配置时，作为受控前端输出同一解析模型，不引入第二份有效配置。
+装配使用 TOML schema 2，SoC/Board 事实保持 JSON；Python 标准 `tomllib` 解析后产生冻结的 typed IR。严格字段模型同时生成 editor schema。`init/list-bindings/check/explain` 降低接入成本；Kconfig 和 cache 不形成另一份有效配置。
 
 | 输入 | 事实拥有者 |
 |---|---|
 | SoC package | 精确 part/package/density、内存域、reviewed route、实现模式、clock profile、SDK 来源 |
 | Board package | 实际 HSE、PCB/source revision、连接、装配器件、跳线、电气、安全初值 |
-| 外部 assembly.json | 所选 Board/backend、组件和实例、路由、执行模式、容量、外部 layout |
+| 外部 assembly.toml | 所选 Board/backend、组件和实例、路由、执行模式、容量、外部 layout |
 
 拒绝未知字段、未实现模式、矛盾和资源冲突。首版不支持 overlay/inherit 合并语言、自动拓扑求解或从 SDK 宏推导所有路由。使用者显式选择已复核资源，配置器给出字段路径、冲突资源及声明来源。
 
-同一解析模型生成 resolved.json、配置头、只读 binding C、linker 输入和资源报告。生成器只做确定性校验和静态装配，不生成业务 main、worker、调度算法、器件状态机或驱动算法。
+冻结 typed IR 直接生成 resolved.json、配置头、只读 face、共享 ops 接线、typed factory、linker 输入和资源报告。生成器只做确定性校验和静态装配，不生成业务 main、worker、调度算法、器件状态机或驱动算法。
 
 CMake Presets 选择 assembly、正式工具环境、优化 profile 和独立 build root。CMake 是源与依赖权威；它读取解析结果并检查组件所需能力，不重写选择结果。不允许 cache、手工 CONFIG 宏和生成头共同决定同一事实。
 
@@ -137,7 +137,7 @@ controller 拥有线上独占和执行；endpoint 不再复制 controller 锁和
 
 GPIO/PWM/ADC stream 不强行转换成字节事务。SPI 的 CS/全双工、I2C 的 repeated START/ACK/仲裁、Flash 的 program/erase 几何各自保持具体合同。共用 request 辅助规则，不建设万能事务执行器。
 
-factory 可表现为生成的 typed 符号/访问器或低频诊断入口。固定实例的便利获取不承担动态构造、隐式启动和生命周期。名称与 strings 可在关闭诊断后从产物删除。
+factory 是生成的纯 typed getter：固定 `uint16_t` ID、具名常量和静态 switch；越界返回 NULL。它不承担动态构造、隐式启动或生命周期。诊断名称不进入默认数据路径；SPI/I2C 的 controller 和 endpoint 身份分别取得。
 
 默认不为每 GPIO 保存 owner/generation。构建期证明资源规划不冲突；外部应用明确单一 writer/协调者。普通 C 代码遵守该组织约束，配置器不能证明所有用户源码没有越权调用。
 
@@ -277,7 +277,7 @@ CAN/CANopen、Ethernet、USB、低功耗、cache/MPU、安全启动和远程更�
 
 RTOS tick、HAL时间、UART时序、ADC/PWM触发分别占用实际timebase资源。选型和配置不能让多个用途无意占用同一timer/channel。未确认三板的外设接线不从芯片具有该外设自动推导。
 
-首发模式目标在B0冻结为：EXTI指定边沿的有界事件；timer固定时基与PWM输出；ADC单次/低速scan；IWDG feed/reset-cause。capture、advanced timer break/dead-time及高频ADC DMA stream是独立扩展模式，未实现前配置拒绝。高频工业控制必须选择并验证相应DMA/trigger模式，不能用single-shot基础支持覆盖它。
+当前维护 EXTI 有界事件、固定 PWM、ADC polling/scan、IWDG feed/reset-cause；并提供 STM/GD UART 有限 TX DMA、SPI 有限 full-duplex DMA、STM/GD UART IRQ RX blocks、STM/GD ADC timer-triggered DMA blocks。ADC 每块停机、consumer release 后显式 service 重启，存在间隔；UART `dma-tx` 与 `irq-blocks` 为不同 provider，不声明组合模式。DMA domain、硬件 route、IRQ、停止与 consumer loan 排空均有独立合同和模型验证；capture、advanced timer break/dead-time及持续无间隔采集仍需独立实现与实板资格。
 
 - timer说明频率、tick单位、wrap扩展、最长维护间隔和clock/stop行为；PWM同时检查共享PSC/ARR/base mode，明确0%/100%、shadow更新、误差及启动/停止电平。
 - ADC说明分辨率、sample time、参考电压/原始计数含义、sequence/trigger、overrun、时间信息和超时输出有效性；DMA stream另定义窗口覆盖和借用。

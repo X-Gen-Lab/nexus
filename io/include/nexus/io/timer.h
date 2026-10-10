@@ -23,6 +23,31 @@ typedef struct {
     uint32_t tick_hz;
     bool running;
 } nx_pwm_state_t;
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    nx_result_t (*set)(void* context, uint32_t period_ticks,
+                       uint32_t duty_ticks);
+    nx_result_t (*start)(void* context);
+    nx_result_t (*stop)(void* context);
+    nx_result_t (*state)(const void* context, nx_pwm_state_t* state);
+} nx_pwm_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_pwm_port {
+    const nx_pwm_ops_t* ops;
+    void* context;
+};
+
 /**
  * \brief           Atomically stage a reviewed fixed-base PWM duty.
  *
@@ -41,7 +66,7 @@ typedef struct {
  *                  not infer immediate electrical change from successful
  *                  staging.
  */
-nx_result_t nx_pwm_port_set(nx_pwm_port_t* port, uint32_t period_ticks,
+nx_result_t nx_pwm_port_set(const nx_pwm_port_t* port, uint32_t period_ticks,
                             uint32_t duty_ticks);
 /**
  * \brief           Enable a previously configured fixed PWM output.
@@ -50,7 +75,7 @@ nx_result_t nx_pwm_port_set(nx_pwm_port_t* port, uint32_t period_ticks,
  *
  * \return          Success or INVALID/STATE.
  */
-nx_result_t nx_pwm_port_start(nx_pwm_port_t* port);
+nx_result_t nx_pwm_port_start(const nx_pwm_port_t* port);
 /**
  * \brief           Stop PWM at its declared Board inactive electrical level.
  *
@@ -58,7 +83,7 @@ nx_result_t nx_pwm_port_start(nx_pwm_port_t* port);
  *
  * \return          Success or INVALID; no advanced break/capture promise.
  */
-nx_result_t nx_pwm_port_stop(nx_pwm_port_t* port);
+nx_result_t nx_pwm_port_stop(const nx_pwm_port_t* port);
 /**
  * \brief           Query staged PWM counts and selected timer clock.
  *

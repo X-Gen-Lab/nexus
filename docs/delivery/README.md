@@ -1,8 +1,9 @@
 # 当前平台交付
 
-本轮已将默认实现统一为 **Core / Arch / SoC / Board / typed I/O / 可选 OS / 可选组件**。
-旧 HAL、OSAL、factory、registry、运行时配置图和默认业务服务已移除。应用、产品任务、
-私有 PCB、Flash 分区、恢复与安全策略由外部工程维护。
+默认实现统一为 **Core / Arch / SoC / Board / 静态 factory / 多态 I/O / 可选 OS /
+可选组件**。一份 TOML 经严格校验和不可变 IR 生成精确实例；factory 返回稳定的
+只读接口对象，共享只读操作表，独立状态留在 provider 内部。获取接口不启动硬件。
+应用、产品任务、私有 PCB、Flash 分区、恢复与安全策略由外部工程维护。
 
 | 阅读入口 | 说明 |
 |---|---|
@@ -13,6 +14,7 @@
 | [安全与生命周期审查](security-review.md) | 扫描范围、测试工装修复与借用／恢复限制 |
 | [后续迭代](next-iterations.md) | 实板验收、测量驱动的扩展与团队流程 |
 | [33 项实施台账](../design/next-generation-execution.csv) | 每项实现路径、证据入口、软件和物理退出状态 |
+| [Factory 与 TDD 迭代台账](../design/factory-platform-execution.csv) | 本次 P0–P5 的具体实现与条件验收 |
 
 截至本轮开发验证，已有生产 `.c` 的 Native/寄存器故障模型、真实 ARM 编译与链接、
 三板资源矩阵、外部应用开发构建、工具负路径与 HIL 准入工装。开发执行结果不自动
@@ -22,3 +24,7 @@
 `docs/archive/` 保留历史设计、结果和旧 Sphinx 教程，不能继承为当前支持或验收。
 当前公共 API 文档只从现有公开 include 树生成；代码格式和反斜杠 Doxygen 风格保持
 根 `.clang-format`、`.editorconfig` 与现有规范。
+
+行为变更遵循 TDD。GoogleTest／GoogleMock 只进入 host 测试目标，生产固件保持
+C11。commit hooks 实际执行配置工具和全部 GoogleTest 契约，拒绝未完成、过滤或
+跳过的报告。执行结果证明当前合同；真实 RED→GREEN 过程由 PR 和原始日志记录。

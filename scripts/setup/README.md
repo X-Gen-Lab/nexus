@@ -1,6 +1,6 @@
 # Development setup
 
-Use Python 3.10+, CMake 3.31.6, Ninja 1.13.2 and a C11 compiler. Install the
+Use Python 3.11+, CMake 3.31.6, Ninja 1.13.2 and a C11 compiler. Install the
 repository tools and both local Git hooks for each clone:
 
 ```sh

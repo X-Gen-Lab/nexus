@@ -37,11 +37,38 @@ typedef struct {
  *                  partition.
  */
 typedef struct {
-    nx_flash_port_t* port;
+    const nx_flash_port_t* port;
     uint32_t offset;
     uint32_t size;
     bool writable;
 } nx_flash_region_t;
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    const nx_flash_geometry_t* (*geometry)(const void* context);
+    nx_result_t (*read)(const void* context, uint32_t offset, void* data,
+                        size_t length);
+    nx_result_t (*program)(void* context, uint32_t offset, const void* data,
+                           size_t length, nx_time_us_t deadline);
+    nx_result_t (*erase)(void* context, uint32_t offset, size_t length,
+                         nx_time_us_t deadline);
+} nx_flash_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_flash_port {
+    const nx_flash_ops_t* ops;
+    void* context;
+};
+
 /**
  * \brief           Query exact physical Flash geometry without side effects.
  *
@@ -89,7 +116,7 @@ nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
  *                  execution-from- Flash stall, watchdog and power-loss
  *                  policy. No RAM fake on MCU.
  */
-nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
+nx_result_t nx_flash_port_program(const nx_flash_port_t* port, uint32_t offset,
                                   const void* data, size_t length,
                                   nx_time_us_t deadline);
 /**
@@ -107,7 +134,7 @@ nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
  *                  timeout/error. Return waits for current pulse to become
  *                  idle.
  */
-nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
+nx_result_t nx_flash_port_erase(const nx_flash_port_t* port, uint32_t offset,
                                 size_t length, nx_time_us_t deadline);
 /**
  * \brief           Validate region bounds against physical geometry.

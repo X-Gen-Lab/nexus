@@ -9,6 +9,7 @@
 #define NEXUS_EXTI_H
 
 #include "nexus/core/time.h"
+#include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,12 +25,12 @@ typedef enum {
  * \brief           Edge facts; timestamp precision and coalescing are
  *                  provider-specific.
  *
- * \note            LOSS is an independent boundary after older buffered
- *                  facts and before later facts. Its edge is invalid; its
- *                  timestamp is detection/report time, never a reconstructed
- *                  missing edge. For COALESCED facts, edge may derive from
- *                  sampled pin level after an IRQ and does not represent
- *                  complete edge history.
+ * \note            LOSS is an independent boundary after older buffered facts
+ *                  and before later facts. Its edge is invalid; its timestamp
+ *                  is detection/report time, never a reconstructed missing
+ *                  edge. For COALESCED facts, edge may derive from sampled pin
+ *                  level after an IRQ and does not represent complete edge
+ *                  history.
  */
 typedef struct {
     nx_time_us_t timestamp_us;
@@ -37,11 +38,35 @@ typedef struct {
     uint8_t line;
     nx_exti_edge_t edge;
 } nx_exti_event_t;
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    nx_result_t (*read)(void* context, nx_exti_event_t* events, size_t capacity,
+                        size_t* count);
+    nx_result_t (*stop)(void* context);
+    nx_result_t (*attach_wake)(void* context, const nx_irq_wake_t* wake,
+                               uint8_t syscall_ceiling);
+} nx_exti_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_exti_port {
+    const nx_exti_ops_t* ops;
+    void* context;
+};
+
 /**
  * \brief           Read queued EXTI events from an exact static line binding.
  *
- * \param[in,out]   port: One consumer; bounded configured IRQ-producer
- *                  storage.
+ * \param[in,out]   port: One consumer; bounded configured IRQ-producer storage.
  *
  * \param[out]      events: Caller destination, never retained.
  *
@@ -51,8 +76,9 @@ typedef struct {
  *
  * \return          Success, EMPTY or INVALID. No debounce policy or callbacks.
  */
-nx_result_t nx_exti_port_read(nx_exti_port_t* port, nx_exti_event_t* events,
-                              size_t capacity, size_t* count);
+nx_result_t nx_exti_port_read(const nx_exti_port_t* port,
+                              nx_exti_event_t* events, size_t capacity,
+                              size_t* count);
 /**
  * \brief           Disable the line source, clear pending and drain its
  *                  handler.
@@ -62,7 +88,25 @@ nx_result_t nx_exti_port_read(nx_exti_port_t* port, nx_exti_event_t* events,
  * \return          Success proves no remaining accesses to event storage; BUSY
  *                  retains it. Shared vectors preserve other maintained lines.
  */
-nx_result_t nx_exti_port_stop(nx_exti_port_t* port);
+nx_result_t nx_exti_port_stop(const nx_exti_port_t* port);
+/**
+ * \brief           Attach or detach an explicit event/loss IRQ wake target.
+ *
+ * \param[in]       port: Initialized line, controlled by one task executor.
+ *
+ * \param[in]       wake: Immutable live target, or NULL to detach.
+ *
+ * \param[in]       syscall_ceiling: Unshifted minimum kernel-safe IRQ priority.
+ *
+ * \return          Success or CONTEXT/STATE/PERMISSION/UNSUPPORTED.
+ *
+ * \note            Actual shared-vector priority must satisfy the target. Stop
+ *                  and join publishers before freeing old target storage. Wake
+ *                  callbacks observe already-latched event or loss facts.
+ */
+nx_result_t nx_exti_port_attach_wake(const nx_exti_port_t* port,
+                                     const nx_irq_wake_t* wake,
+                                     uint8_t syscall_ceiling);
 #ifdef __cplusplus
 }
 #endif

@@ -20,14 +20,15 @@
 #include "nexus/io/watchdog.h"
 #include "stm32f407_system.h"
 
-struct nx_gpio_port {
+typedef struct {
     GPIO_TypeDef* registers;
     uint32_t mask;
     bool output;
     bool initialized;
-};
-struct nx_uart_port {
+} nx_stm32_gpio_state_t;
+typedef struct {
     USART_TypeDef* registers;
+    const nx_irq_wake_t* wake;
     nx_uart_tx_request_t* active;
     size_t tx_position;
     void* rx_storage;
@@ -44,50 +45,51 @@ struct nx_uart_port {
     bool initialized;
     bool closing;
     bool tx_complete;
-};
-struct nx_spi_port {
+} nx_stm32_uart_state_t;
+typedef struct {
     SPI_TypeDef* registers;
     RCC_TypeDef* rcc;
     uint32_t clock_hz;
     bool active;
     bool fault;
-};
-struct nx_spi_endpoint {
-    nx_spi_port_t* port;
-    nx_gpio_port_t* cs;
+} nx_stm32_spi_state_t;
+typedef struct {
+    nx_stm32_spi_state_t* port;
+    nx_stm32_gpio_state_t* cs;
     uint32_t cs_mask;
     uint32_t frequency_hz;
     uint8_t mode;
-};
-struct nx_i2c_port {
+} nx_stm32_spi_endpoint_state_t;
+typedef struct {
     I2C_TypeDef* registers;
     uint32_t peripheral_mhz;
     uint32_t rate_hz;
     bool active;
     bool fault;
     bool initialized;
-};
-struct nx_i2c_endpoint {
-    nx_i2c_port_t* port;
+} nx_stm32_i2c_state_t;
+typedef struct {
+    nx_stm32_i2c_state_t* port;
     uint8_t address;
-};
-struct nx_flash_port {
+} nx_stm32_i2c_endpoint_state_t;
+typedef struct {
     FLASH_TypeDef* registers;
     const nx_flash_geometry_t* geometry;
     volatile uint8_t* memory;
     uint32_t supply_mv;
     bool active;
-};
-struct nx_watchdog_port {
+} nx_stm32_flash_state_t;
+typedef struct {
     IWDG_TypeDef* registers;
     FLASH_TypeDef* flash;
     DBGMCU_TypeDef* debug;
     RCC_TypeDef* rcc;
     nx_watchdog_state_t state;
     uint32_t poll_limit;
-};
-struct nx_exti_port {
+} nx_stm32_watchdog_state_t;
+typedef struct {
     EXTI_TypeDef* registers;
+    const nx_irq_wake_t* wake;
     GPIO_TypeDef* gpio;
     nx_exti_event_t* storage;
     size_t capacity;
@@ -98,10 +100,10 @@ struct nx_exti_port {
     uint8_t line;
     nx_exti_edge_t edge;
     bool initialized;
-};
-struct nx_pwm_port {
+} nx_stm32_exti_state_t;
+typedef struct {
     TIM_TypeDef* registers;
-    nx_gpio_port_t* inactive_gpio;
+    nx_stm32_gpio_state_t* inactive_gpio;
     uint32_t inactive_mask;
     uint32_t period_ticks;
     uint32_t duty_ticks;
@@ -111,8 +113,8 @@ struct nx_pwm_port {
     bool inactive_high;
     bool initialized;
     bool running;
-};
-struct nx_adc_port {
+} nx_stm32_pwm_state_t;
+typedef struct {
     ADC_TypeDef* registers;
     ADC_Common_TypeDef* common;
     const uint8_t* channels;
@@ -121,7 +123,7 @@ struct nx_adc_port {
     uint32_t reference_mv;
     bool active;
     bool initialized;
-};
+} nx_stm32_adc_state_t;
 
 #ifdef NEXUS_STM32_MODEL
 extern GPIO_TypeDef g_nx_stm32_gpioa_model;
@@ -147,25 +149,94 @@ nx_result_t nx_stm32_gpio_clock_enable(unsigned port_index);
 nx_result_t nx_stm32_uart1_pins_prepare(void);
 /** \brief Invalidate a quiescent GPIO binding at its inactive electrical level.
  */
-nx_result_t nx_stm32_gpio_stop(nx_gpio_port_t* port, uint32_t inactive);
+nx_result_t nx_stm32_gpio_stop(nx_stm32_gpio_state_t* port, uint32_t inactive);
 /** \brief Initialize authorized pins, preloading BSRR before output mode. */
-nx_result_t nx_stm32_gpio_initialize(nx_gpio_port_t* port, uint32_t initial);
+nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
+                                     uint32_t initial);
 /** \brief Initialize one fixed 8N1 UART; storage must outlive IRQ and stop. */
-nx_result_t nx_stm32_uart_initialize(nx_uart_port_t* port, uint32_t clock_hz);
+nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
+                                     uint32_t clock_hz);
 /** \brief Bounded USART IRQ dispatch for the statically bound instance. */
-void nx_stm32_uart_irq(nx_uart_port_t* port);
+void nx_stm32_uart_irq(nx_stm32_uart_state_t* port);
+/** \brief Advance only TX facts when an independent provider owns RX storage.
+ */
+bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status);
 /** \brief Initialize standard-mode I2C at a fixed 42 MHz peripheral clock. */
-nx_result_t nx_stm32_i2c_initialize(nx_i2c_port_t* port);
+nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port);
 /** \brief Initialize one statically allocated EXTI line and event ring. */
-nx_result_t nx_stm32_exti_initialize(nx_exti_port_t* port, SYSCFG_TypeDef* mux,
-                                     uint8_t gpio_index);
+nx_result_t nx_stm32_exti_initialize(nx_stm32_exti_state_t* port,
+                                     SYSCFG_TypeDef* mux, uint8_t gpio_index);
 /** \brief Bounded IRQ delivery for a statically assembled line array. */
-void nx_stm32_exti_dispatch(nx_exti_port_t* const* ports, size_t count,
+void nx_stm32_exti_dispatch(nx_stm32_exti_state_t* const* ports, size_t count,
                             uint32_t vector_mask);
 /** \brief Initialize one TIM3 general-purpose PWM channel. */
-nx_result_t nx_stm32_pwm_initialize(nx_pwm_port_t* port);
+nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port);
 /** \brief Initialize fixed ADC1 channels, independent 12-bit software trigger.
  */
-nx_result_t nx_stm32_adc_initialize(nx_adc_port_t* port);
+nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port);
+
+/** \brief Shared provider methods for statically assembled interfaces. */
+extern const nx_gpio_ops_t nx_stm32_gpio_ops;
+nx_result_t nx_stm32_gpio_write(void* context, uint32_t set_mask,
+                                uint32_t reset_mask);
+nx_result_t nx_stm32_gpio_read(const void* context, uint32_t* value);
+nx_result_t nx_stm32_gpio_toggle(void* context, uint32_t mask);
+extern const nx_uart_ops_t nx_stm32_uart_ops;
+nx_result_t nx_stm32_uart_submit(void* context, nx_uart_tx_request_t* request);
+nx_result_t nx_stm32_uart_start_admitted(void* context,
+                                         nx_uart_tx_request_t* request);
+nx_result_t nx_stm32_uart_cancel(void* context, nx_uart_tx_request_t* request);
+void nx_stm32_uart_service(void* context);
+nx_result_t nx_stm32_uart_read_events(void* context, nx_uart_rx_event_t* events,
+                                      size_t capacity, size_t* count);
+nx_result_t nx_stm32_uart_read_bytes(void* context, uint8_t* bytes,
+                                     size_t capacity, size_t* count);
+nx_result_t nx_stm32_uart_stop(void* context);
+extern const nx_spi_ops_t nx_stm32_spi_ops;
+nx_result_t nx_stm32_spi_recover(void* context);
+extern const nx_spi_endpoint_ops_t nx_stm32_spi_endpoint_ops;
+nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
+                                           uint8_t* rx, size_t length,
+                                           nx_time_us_t deadline,
+                                           size_t* transferred);
+extern const nx_i2c_ops_t nx_stm32_i2c_ops;
+nx_result_t nx_stm32_i2c_recover(void* context);
+extern const nx_i2c_endpoint_ops_t nx_stm32_i2c_endpoint_ops;
+nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
+                                              nx_i2c_message_t* messages,
+                                              size_t count,
+                                              nx_time_us_t deadline,
+                                              size_t* transferred);
+extern const nx_flash_ops_t nx_stm32_flash_ops;
+const nx_flash_geometry_t* nx_stm32_flash_geometry(const void* context);
+nx_result_t nx_stm32_flash_read(const void* context, uint32_t offset,
+                                void* data, size_t length);
+nx_result_t nx_stm32_flash_program(void* context, uint32_t offset,
+                                   const void* data, size_t length,
+                                   nx_time_us_t deadline);
+nx_result_t nx_stm32_flash_erase(void* context, uint32_t offset, size_t length,
+                                 nx_time_us_t deadline);
+extern const nx_watchdog_ops_t nx_stm32_watchdog_ops;
+nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
+                                     bool debug_freeze,
+                                     nx_watchdog_state_t* state);
+nx_result_t nx_stm32_watchdog_feed(void* context);
+nx_result_t nx_stm32_watchdog_state(const void* context,
+                                    nx_watchdog_state_t* state);
+extern const nx_exti_ops_t nx_stm32_exti_ops;
+nx_result_t nx_stm32_exti_read(void* context, nx_exti_event_t* events,
+                               size_t capacity, size_t* count);
+nx_result_t nx_stm32_exti_stop(void* context);
+extern const nx_pwm_ops_t nx_stm32_pwm_ops;
+nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
+                             uint32_t duty_ticks);
+nx_result_t nx_stm32_pwm_start(void* context);
+nx_result_t nx_stm32_pwm_stop(void* context);
+nx_result_t nx_stm32_pwm_state(const void* context, nx_pwm_state_t* state);
+extern const nx_adc_ops_t nx_stm32_adc_ops;
+nx_result_t nx_stm32_adc_info(const void* context, nx_adc_info_t* info);
+nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
+                                size_t capacity, nx_time_us_t deadline,
+                                size_t* count);
 
 #endif

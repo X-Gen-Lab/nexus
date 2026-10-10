@@ -51,6 +51,13 @@ uint32_t nx_stm32_model_gpio_clock_read(const volatile uint32_t* reg) {
     return *reg;
 }
 
+/** \brief Constructors never execute an SPI transaction. */
+void nx_stm32_model_io_poll(unsigned kind, void* port) {
+    (void)kind;
+    (void)port;
+    assert(false);
+}
+
 /** \brief Model incoming interrupt state without ARM instructions. */
 nx_arch_irq_state_t nx_arch_irq_save(void) {
     return (nx_arch_irq_state_t){0U};
@@ -97,7 +104,7 @@ static void exti_rollback_test(void) {
     uint16_t before = nx_stm32_pin_capture(GPIOA, 6U);
     s_exti.IMR = 1U << 6U;
     assert(prepare_edge6() == NX_ERROR_BUSY);
-    assert(!s_edge6.initialized);
+    assert(!s_nx_port_edge6.initialized);
     assert(nx_stm32_pin_capture(GPIOA, 6U) == before);
     assert(s_rcc.AHB1ENR == (1U << 2U));
     assert(s_rcc.APB2ENR == RCC_APB2ENR_USART1EN);
@@ -107,7 +114,7 @@ static void exti_rollback_test(void) {
     assert(prepare_edge6() == NX_SUCCESS);
     s_exti.PR = (1U << 5U) | (1U << 6U);
     EXTI9_5_IRQHandler();
-    assert(s_edge5.count == 1U && s_edge6.count == 1U);
+    assert(s_nx_port_edge5.count == 1U && s_nx_port_edge6.count == 1U);
     s_disable = 0U;
     s_clear = 0U;
     assert(stop_edge6() == NX_SUCCESS && s_disable == 0U);
@@ -123,7 +130,7 @@ static void pwm_rollback_test(void) {
     s_timer.PSC = 12U;
     s_timer.ARR = 10U;
     assert(prepare_pwm0() == NX_ERROR_BUSY);
-    assert(!s_pwm0.initialized && !s_pwm0_idle.initialized);
+    assert(!s_nx_port_pwm0.initialized && !s_nx_idle_pwm0.initialized);
     assert(nx_stm32_pin_capture(GPIOA, 6U) == before);
     assert(s_timer.CR1 == TIM_CR1_CEN && s_timer.PSC == 12U &&
            s_timer.ARR == 10U);
@@ -131,9 +138,9 @@ static void pwm_rollback_test(void) {
     assert(s_rcc.AHB1ENR == (1U << 2U));
     s_timer.CR1 = 0U;
     assert(prepare_pwm0() == NX_SUCCESS);
-    assert(nx_pwm_port_start(&s_pwm0) == NX_SUCCESS);
+    assert(nx_pwm_port_start(&s_nx_face_pwm0) == NX_SUCCESS);
     assert(stop_pwm0() == NX_SUCCESS);
-    assert(!s_pwm0.initialized && !s_pwm0_idle.initialized);
+    assert(!s_nx_port_pwm0.initialized && !s_nx_idle_pwm0.initialized);
     assert((GPIOA->MODER & (3U << 12U)) == (1U << 12U));
     assert(GPIOA->BSRR == (1U << 22U));
     assert((s_rcc.APB1ENR & RCC_APB1ENR_TIM3EN) == 0U);
@@ -149,11 +156,11 @@ static void spi_rollback_test(void) {
     assert(nx_stm32_pin_capture(GPIOA, 5U) == before);
     assert(s_rcc.AHB1ENR == (1U << 2U));
     assert(s_rcc.APB2ENR == RCC_APB2ENR_USART1EN);
-    assert(!s_sensor0_cs.initialized);
+    assert(!s_nx_cs_sensor0.initialized);
     assert(prepare_spi0() == NX_SUCCESS);
-    assert(s_sensor0_cs.initialized && s_spi.CR1 == 0U);
+    assert(s_nx_cs_sensor0.initialized && s_spi.CR1 == 0U);
     assert(stop_spi0() == NX_SUCCESS);
-    assert(!s_sensor0_cs.initialized && s_gpioe.BSRR == 8U);
+    assert(!s_nx_cs_sensor0.initialized && s_gpioe.BSRR == 8U);
     assert((s_rcc.APB2ENR & RCC_APB2ENR_SPI1EN) == 0U);
 }
 

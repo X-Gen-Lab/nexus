@@ -317,7 +317,9 @@
     "USART0": {
       "kind": "uart",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx",
+        "irq-blocks"
       ],
       "irq": [
         "USART0_IRQHandler"
@@ -330,7 +332,8 @@
     "SPI4": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma-full-duplex"
       ],
       "irq": [],
       "pins": [
@@ -338,7 +341,8 @@
         "PF7",
         "PF8",
         "PF9"
-      ]
+      ],
+      "max_hz": 50000000
     },
     "I2C0": {
       "kind": "i2c",
@@ -393,13 +397,75 @@
       "kind": "adc",
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma"
       ],
       "irq": [],
       "pins": [
         "PA0",
         "PA1"
       ]
+    },
+    "USART1": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event",
+        "irq-blocks"
+      ],
+      "irq": [
+        "USART1_IRQn"
+      ],
+      "pins": [
+        "PA2",
+        "PA3"
+      ],
+      "max_hz": 1000000
+    },
+    "SPI0": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [
+        "SPI0_IRQn"
+      ],
+      "pins": [
+        "PA5",
+        "PA6",
+        "PA7"
+      ],
+      "max_hz": 50000000
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "irq": [
+        "I2C1_EV_IRQn",
+        "I2C1_ER_IRQn"
+      ],
+      "pins": [
+        "PB10",
+        "PB11"
+      ],
+      "max_hz": 100000
+    },
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0",
+        "PB1"
+      ]
     }
-  }
+  },
+  "reserved_resources": [
+    "timer:TIMER1",
+    "irq:TIMER1_IRQn"
+  ]
 }

@@ -192,7 +192,9 @@
     "USART1": {
       "kind": "uart",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx",
+        "irq-blocks"
       ],
       "irq": [
         "USART1_IRQn"
@@ -205,7 +207,8 @@
     "SPI1": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma"
       ],
       "irq": [],
       "pins": [
@@ -275,7 +278,8 @@
       "kind": "adc",
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma"
       ],
       "irq": [],
       "pins": [

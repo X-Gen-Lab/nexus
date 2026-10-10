@@ -25,16 +25,16 @@ extern "C" {
  * \brief           Fixed model bindings; no allocation, lookup, probe or
  *                  construction.
  */
-extern nx_gpio_port_t* const nx_native_gpio;
-extern nx_uart_port_t* const nx_native_uart;
+extern const nx_gpio_port_t* const nx_native_gpio;
+extern const nx_uart_port_t* const nx_native_uart;
 extern const nx_spi_endpoint_t* const nx_native_spi;
-extern nx_i2c_port_t* const nx_native_i2c_port;
+extern const nx_i2c_port_t* const nx_native_i2c_port;
 extern const nx_i2c_endpoint_t* const nx_native_i2c;
-extern nx_flash_port_t* const nx_native_flash;
-extern nx_watchdog_port_t* const nx_native_watchdog;
-extern nx_exti_port_t* const nx_native_exti;
-extern nx_pwm_port_t* const nx_native_pwm;
-extern nx_adc_port_t* const nx_native_adc;
+extern const nx_flash_port_t* const nx_native_flash;
+extern const nx_watchdog_port_t* const nx_native_watchdog;
+extern const nx_exti_port_t* const nx_native_exti;
+extern const nx_pwm_port_t* const nx_native_pwm;
+extern const nx_adc_port_t* const nx_native_adc;
 /**
  * \brief           Switch host model to a deterministic clock domain.
  *
@@ -277,6 +277,282 @@ nx_result_t nx_native_adc_configure(const uint16_t* samples, size_t count,
  * \param[in]       sample_count: Complete samples allowed; SIZE_MAX disables.
  */
 void nx_native_adc_fault(size_t sample_count);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_gpio_model_input(const nx_gpio_port_t* binding, uint32_t value);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+uint32_t nx_native_gpio_model_output(const nx_gpio_port_t* binding);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t
+nx_native_uart_model_configure(const nx_uart_port_t* binding,
+                               const nx_native_uart_config_t* config);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_uart_model_irq_step(const nx_uart_port_t* binding);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_uart_model_receive(const nx_uart_port_t* binding,
+                                         uint8_t byte, uint32_t flags);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_uart_model_fault(const nx_uart_port_t* binding,
+                                bool start_failure, bool hold_drain);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+size_t nx_native_uart_model_transmitted(const nx_uart_port_t* binding);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_spi_model_configure(const nx_spi_endpoint_t* binding,
+                                          uint8_t* registers, size_t length);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_spi_model_fault(const nx_spi_port_t* binding, size_t fail_after,
+                               bool busy);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+bool nx_native_spi_model_cs_active(const nx_spi_endpoint_t* binding);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_i2c_model_configure(const nx_i2c_endpoint_t* binding,
+                                          uint8_t* memory, size_t length,
+                                          uint8_t address);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_i2c_model_fault(const nx_i2c_port_t* binding, nx_result_t result,
+                               bool stuck);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t
+nx_native_flash_model_configure(const nx_flash_port_t* binding, uint8_t* memory,
+                                const nx_flash_geometry_t* geometry);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_flash_model_fault(const nx_flash_port_t* binding,
+                                 size_t pulse_count);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_watchdog_model_boot(const nx_watchdog_port_t* binding,
+                                   uint32_t causes);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+bool nx_native_watchdog_model_expired(const nx_watchdog_port_t* binding);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_exti_model_configure(const nx_exti_port_t* binding,
+                                           uint8_t line, nx_exti_edge_t edge,
+                                           nx_exti_event_t* events,
+                                           size_t capacity);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_exti_model_emit(const nx_exti_port_t* binding,
+                                      uint8_t line, nx_exti_edge_t edge);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_pwm_model_configure(const nx_pwm_port_t* binding,
+                                          uint32_t tick_hz,
+                                          uint32_t period_ticks);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+nx_result_t nx_native_adc_model_configure(const nx_adc_port_t* binding,
+                                          const uint16_t* samples, size_t count,
+                                          uint8_t resolution_bits,
+                                          uint32_t reference_mv);
+/**
+ * \brief           Operate on the selected Native model face only.
+ *
+ * \note            Null or foreign-provider faces return INVALID for status
+ *                  operations, zero/false for observations, and have no effect
+ *                  for injections. Referenced fixture storage remains owned
+ *                  by the caller; reconfiguration requires writer and IRQ
+ *                  quiescence and never revokes a live UART borrow.
+ */
+void nx_native_adc_model_fault(const nx_adc_port_t* binding,
+                               size_t sample_count);
+
+/**
+ * \brief           Choose explicit or automatic modeled SPI IRQ stepping.
+ *
+ * \note            Quiesce the controller first. Automatic service advances
+ *                  at most one byte or a separate final idle fact per call;
+ *                  this does not model physical DMA or wire timing.
+ */
+void nx_native_spi_model_async_configure(const nx_spi_port_t* binding,
+                                         bool automatic_irq);
+
+/** \brief Inject one bounded SPI byte/idle event on the exact Native bus. */
+void nx_native_spi_model_irq_step(const nx_spi_port_t* binding);
+
+/**
+ * \brief           Inject inability to prove SPI hardware drain.
+ *
+ * \note            Retained requests become QUARANTINED until hold is released
+ *                  and the executor services the bus again. No loan is revoked.
+ */
+void nx_native_spi_model_drain_hold(const nx_spi_port_t* binding, bool hold);
+
+/**
+ * \brief           Inject UART IDLE and publish its current valid byte prefix.
+ *
+ * \return          Success, EMPTY without a prefix, STATE outside a running
+ *                  block stream, BUSY while its modeled writer is active, or
+ *                  INVALID for a foreign provider. No producer loan is revoked.
+ */
+nx_result_t nx_native_uart_model_idle(const nx_uart_port_t* binding);
+
+/**
+ * \brief           Inject one ADC timer-trigger scan into a free selected
+ * block.
+ *
+ * \return          Success, OVERFLOW while a required block remains held, IO
+ *                  for a failed scan, STATE after stop, or INVALID for a
+ * foreign provider. No hardware cadence or analog accuracy is claimed.
+ *
+ * \note            Each success publishes one interleaved raw-count scan;
+ *                  partial failed scans are detached and never published.
+ */
+nx_result_t nx_native_adc_model_trigger(const nx_adc_port_t* binding);
 #ifdef __cplusplus
 }
 #endif

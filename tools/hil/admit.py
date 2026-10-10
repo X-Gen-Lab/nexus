@@ -38,10 +38,35 @@ def validate_fixture(fixture: dict) -> None:
             "reset", "uart_echo"], "required physical checks cannot be weakened")
     require(isinstance(fixture["probe_interfaces"], list) and
             bool(fixture["probe_interfaces"]), "probe interface list empty")
+    for interface in fixture["probe_interfaces"]:
+        identifier(interface, "probe interface")
+    require(len(fixture["probe_interfaces"]) == len(set(fixture["probe_interfaces"])),
+            "duplicate probe interface")
     fields(fixture["serial"], {"controller", "tx", "rx", "baudrate",
                               "electrical_mode"})
     require(fixture["serial"]["electrical_mode"] == "ttl_3v3",
             "fixture serial electrical mode unsupported")
+    for key in ("controller", "tx", "rx"):
+        identifier(fixture["serial"][key], "fixture serial " + key)
+    require(type(fixture["serial"]["baudrate"]) is int and
+            fixture["serial"]["baudrate"] == 115200,
+            "fixture console baud must be reviewed 115200")
+    pending = fixture["pending_qualification"]
+    require(isinstance(pending, list) and bool(pending),
+            "pending physical scope must be explicit")
+    names = set()
+    for case in pending:
+        fields(case, {"id", "fixture", "budget", "unit"})
+        identifier(case["id"], "pending physical case")
+        identifier(case["unit"], "pending physical unit")
+        require(isinstance(case["fixture"], str) and bool(case["fixture"].strip()),
+                "pending physical fixture description required")
+        require(case["id"] not in names, "duplicate pending physical case")
+        names.add(case["id"])
+        maximum = case["budget"]
+        require(maximum is None or (type(maximum) in (int, float) and
+                math.isfinite(maximum) and maximum >= 0),
+                "invalid pending physical measurement budget")
 
 
 def validate_station(station: dict, fixture: dict) -> None:
@@ -94,12 +119,8 @@ def validate_station(station: dict, fixture: dict) -> None:
                 "invalid physical measurement budget")
 
 
-def admit(station_path: Path, fixture_path: Path, elf_path: Path,
-          resolved_path: Path, resources_path: Path) -> dict:
-    fixture, station = load_json(fixture_path), load_json(station_path)
-    validate_fixture(fixture)
-    validate_station(station, fixture)
-    resolved, config = resolved_identity(resolved_path)
+def validate_console(fixture: dict, resolved: dict) -> None:
+    """The smoke console must name one exact resolved physical controller."""
     require(resolved["board"] == fixture["board"] and
             resolved["part"] == fixture["part"], "fixture/build Board mismatch")
     consoles = [controller for controller in resolved.get("controllers", []) if
@@ -112,6 +133,15 @@ def admit(station_path: Path, fixture_path: Path, elf_path: Path,
             pins.get("rx") == fixture["serial"]["rx"] and
             console["baud"] == fixture["serial"]["baudrate"],
             "fixture console pins/baud differ from resolved route")
+
+
+def admit(station_path: Path, fixture_path: Path, elf_path: Path,
+          resolved_path: Path, resources_path: Path) -> dict:
+    fixture, station = load_json(fixture_path), load_json(station_path)
+    validate_fixture(fixture)
+    validate_station(station, fixture)
+    resolved, config = resolved_identity(resolved_path)
+    validate_console(fixture, resolved)
     resources = load_json(resources_path)
     require(resources.get("kind") == "elf_resource_budget" and
             resources.get("status") == "passed", "passing ELF budget required")

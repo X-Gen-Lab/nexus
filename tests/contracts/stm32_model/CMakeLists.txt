@@ -19,7 +19,8 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_constructors.py")
 add_executable(contract_stm32_constructor_model
     "${stm32_root}/drivers/gpio.c" "${stm32_root}/drivers/exti.c"
-    "${stm32_root}/drivers/timer.c" "../stm32_constructor_test.c")
+    "${stm32_root}/drivers/timer.c" "${stm32_root}/drivers/spi.c"
+    "../stm32_constructor_test.c")
 target_include_directories(contract_stm32_constructor_model PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")
 foreach(target contract_stm32_system_model contract_stm32_io_model

@@ -70,6 +70,7 @@ class Elf32:
                 name = self.string(strings, symbol[0])
                 if name and symbol[5]:
                     self.defined_symbols.append({"name": name, "value": symbol[1],
+                        "size": symbol[2], "section": symbol[5],
                         "binding": symbol[3] >> 4, "type": symbol[3] & 15})
                 if name and symbol[5] and symbol[3] >> 4 in (1, 2):
                     if name in self.symbols:

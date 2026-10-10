@@ -101,9 +101,14 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx",
+        "irq-blocks"
       ],
-      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "dma": [
+        "DMA2:stream7:channel4"
+      ]
     },
     {
       "id": "spi1-pa5-pa6-pa7",
@@ -131,9 +136,14 @@
         }
       ],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma"
       ],
-      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "dma": [
+        "DMA2:stream3:channel3",
+        "DMA2:stream0:channel3"
+      ]
     },
     {
       "id": "i2c1-pb6-pb7",
@@ -197,9 +207,18 @@
       ],
       "modes": [
         "single-shot",
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma"
       ],
-      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "exti0-pa0",
@@ -270,9 +289,18 @@
         }
       ],
       "modes": [
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma"
       ],
-      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ]
+      }
     },
     {
       "id": "exti5-pa5",

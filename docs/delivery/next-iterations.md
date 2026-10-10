@@ -13,8 +13,10 @@ target tuple 上资格化。试验输出保持脱离产品负载，具体现场�
 
 ## 第二阶段：按测量增加能力
 
-DMA/stream、I2C 长读取、ADC trigger、timer capture、CAN/network、低功耗应按
-实际产品需求和资源测量逐项立项。每次扩展先明确 owner、buffer、cancel/drain、ISR、
+UART/SPI 有限 DMA、IRQ RX blocks 和离散 ADC trigger blocks 已实现，先根据实板
+吞吐／IRQ latency／块间间隙测量收敛其预算。循环 DMA RX、无间隙 ADC、I2C 长读取、
+timer capture、CAN/network、低功耗再按实际产品需求逐项立项。每次扩展先明确
+owner、buffer、cancel/drain、ISR、
 deadline、对齐/cache 与停止合同，再做一个真实 provider 垂直切片。未选择模式不
 驻留资源，不用不断扩大的通用 object 或 feature flags 把成本摊到全部产品。
 
@@ -39,6 +41,8 @@ deadline、对齐/cache 与停止合同，再做一个真实 provider 垂直切�
 
 Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次
 commit 自动检查 staged 内容和 Conventional Commit，CI 用同一整文件规范。
-中断、生命周期、持久化和并发变更要有真实 failure-path 回归；普通可逆小修改不
-新增只重复实现的测试。nightly/正式候选的测量、离线构建和 station 结果独立封存，
+新行为和缺陷修复必须 TDD，主机合同采用 GoogleTest／GoogleMock；Python 工具
+保留 unittest。新增用例先实际 RED，再最小修复 GREEN；机械门禁不证明历史编辑
+顺序，PR 记录命令、失败原因和原始日志。中断、生命周期、持久化和并发变更要有
+真实 failure-path 回归。nightly/正式候选的测量、离线构建和 station 结果独立封存，
 生产发布不由普通平台 CI 自动提升。

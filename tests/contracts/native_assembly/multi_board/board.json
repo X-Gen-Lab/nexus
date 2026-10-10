@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "native-multi-contract",
+  "soc": "NATIVE_MODEL",
+  "soc_family": "native",
+  "source_revision": "native-model-multi-v2",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 1000000
+  },
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOA",
+      "route": "gpio-pa0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "uart0",
+      "controller": "UART0",
+      "route": "uart0"
+    },
+    {
+      "id": "spi0",
+      "controller": "SPI0",
+      "route": "spi0"
+    },
+    {
+      "id": "led1",
+      "controller": "GPIOA",
+      "route": "gpio-pa3",
+      "initial": 0,
+      "mask": 8
+    },
+    {
+      "id": "uart1",
+      "controller": "UART1",
+      "route": "uart1"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1"
+    },
+    {
+      "id": "i2c0",
+      "controller": "I2C0",
+      "route": "i2c0"
+    },
+    {
+      "id": "i2c1",
+      "controller": "I2C1",
+      "route": "i2c1"
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH0",
+      "route": "flash0"
+    },
+    {
+      "id": "watchdog0",
+      "controller": "IWDG",
+      "route": "watchdog0"
+    },
+    {
+      "id": "exti0",
+      "controller": "EXTI6",
+      "route": "exti0"
+    },
+    {
+      "id": "pwm0",
+      "controller": "PWM0",
+      "route": "pwm0"
+    },
+    {
+      "id": "adc0",
+      "controller": "ADC0",
+      "route": "adc0"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Host model does not qualify physical clock, memory or electrical behavior"
+  ],
+  "provenance": [
+    "Maintained host model"
+  ]
+}

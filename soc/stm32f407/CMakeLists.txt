@@ -10,8 +10,10 @@ foreach(required "${stm32_device}/Include/stm32f407xx.h"
     endif()
 endforeach()
 add_library(nexus_soc_stm32f407 STATIC
-    drivers/gpio.c drivers/uart.c drivers/spi.c drivers/i2c.c drivers/flash.c
-    drivers/watchdog.c drivers/exti.c drivers/timer.c drivers/adc.c)
+    drivers/gpio.c drivers/uart.c drivers/uart_dma.c drivers/uart_stream.c
+    drivers/spi.c drivers/spi_dma.c drivers/i2c.c drivers/flash.c
+    drivers/watchdog.c drivers/exti.c drivers/timer.c drivers/adc.c
+    drivers/adc_stream.c)
 target_link_libraries(nexus_soc_stm32f407 PUBLIC nexus_io PRIVATE Nexus::Arch
     nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_soc_stm32f407 PRIVATE

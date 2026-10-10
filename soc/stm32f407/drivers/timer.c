@@ -9,7 +9,7 @@
 #include "stm32f407_provider.h"
 
 /** \brief Locate the selected fixed channel compare register. */
-static volatile uint32_t* compare(nx_pwm_port_t* port) {
+static volatile uint32_t* compare(nx_stm32_pwm_state_t* port) {
     switch (port->channel) {
         case 1U:
             return &port->registers->CCR1;
@@ -24,7 +24,7 @@ static volatile uint32_t* compare(nx_pwm_port_t* port) {
 
 /** \brief Initialize one base only; another channel cannot silently reconfigure
  * it. */
-nx_result_t nx_stm32_pwm_initialize(nx_pwm_port_t* port) {
+nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port) {
     if (port == NULL || port->registers == NULL ||
         port->inactive_gpio == NULL || port->channel == 0U ||
         port->channel > 4U || port->period_ticks == 0U ||
@@ -61,8 +61,9 @@ nx_result_t nx_stm32_pwm_initialize(nx_pwm_port_t* port) {
 
 /** \brief Stage only duty against the immutable shared period/PSC
  * configuration. */
-nx_result_t nx_pwm_port_set(nx_pwm_port_t* port, uint32_t period_ticks,
-                            uint32_t duty_ticks) {
+nx_result_t nx_stm32_pwm_set(void* context, uint32_t period_ticks,
+                             uint32_t duty_ticks) {
+    nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized || period_ticks == 0U ||
         period_ticks > 65535U || duty_ticks > period_ticks) {
         return NX_ERROR_INVALID;
@@ -78,7 +79,8 @@ nx_result_t nx_pwm_port_set(nx_pwm_port_t* port, uint32_t period_ticks,
 }
 
 /** \brief Connect the initialized pin to AF2 before enabling its channel. */
-nx_result_t nx_pwm_port_start(nx_pwm_port_t* port) {
+nx_result_t nx_stm32_pwm_start(void* context) {
+    nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized ||
         !port->inactive_gpio->initialized) {
         return NX_ERROR_STATE;
@@ -104,12 +106,13 @@ nx_result_t nx_pwm_port_start(nx_pwm_port_t* port) {
 
 /** \brief Disable only this channel and restore its declared GPIO idle level.
  */
-nx_result_t nx_pwm_port_stop(nx_pwm_port_t* port) {
+nx_result_t nx_stm32_pwm_stop(void* context) {
+    nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized) {
         return NX_ERROR_INVALID;
     }
     port->registers->CCER &= ~(1U << (((uint32_t)port->channel - 1U) * 4U));
-    nx_result_t result = nx_gpio_port_write(
+    nx_result_t result = nx_stm32_gpio_write(
         port->inactive_gpio, port->inactive_high ? port->inactive_mask : 0U,
         port->inactive_high ? 0U : port->inactive_mask);
     for (unsigned pin = 0U; pin < 16U; ++pin) {
@@ -128,8 +131,8 @@ nx_result_t nx_pwm_port_stop(nx_pwm_port_t* port) {
 
 /** \brief Report the staged values, without claiming measured waveform timing.
  */
-nx_result_t nx_pwm_port_state(const nx_pwm_port_t* port,
-                              nx_pwm_state_t* state) {
+nx_result_t nx_stm32_pwm_state(const void* context, nx_pwm_state_t* state) {
+    const nx_stm32_pwm_state_t* port = context;
     if (port == NULL || !port->initialized || state == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -139,3 +142,11 @@ nx_result_t nx_pwm_port_state(const nx_pwm_port_t* port,
                               .running = port->running};
     return NX_SUCCESS;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_pwm_ops_t nx_stm32_pwm_ops = {
+    .set = nx_stm32_pwm_set,
+    .start = nx_stm32_pwm_start,
+    .stop = nx_stm32_pwm_stop,
+    .state = nx_stm32_pwm_state,
+};

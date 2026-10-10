@@ -10,11 +10,11 @@
 #include "gd32f4xx.h"
 #include "private/system.h"
 
-static nx_watchdog_port_t* s_watchdog;
+static nx_gd32_watchdog_state_t* s_watchdog;
 extern uint32_t g_gd32_reset_flags;
 
 /** \brief           Preserve honest uncharacterized IRC32K physical bounds. */
-nx_result_t nx_gd32_watchdog_initialize(nx_watchdog_port_t* port) {
+nx_result_t nx_gd32_watchdog_initialize(nx_gd32_watchdog_state_t* port) {
     if (!port) {
         return NX_ERROR_INVALID;
     }
@@ -22,7 +22,7 @@ nx_result_t nx_gd32_watchdog_initialize(nx_watchdog_port_t* port) {
         return NX_ERROR_BUSY;
     }
     bool hardware_enabled = (FMC_OBCTL0 & FMC_OBCTL0_NWDG_HW) == 0u;
-    *port = (nx_watchdog_port_t){
+    *port = (nx_gd32_watchdog_state_t){
         .state = {.minimum_timeout_us = 0u,
                   .maximum_timeout_us = UINT32_MAX,
                   .enabled = hardware_enabled,
@@ -35,9 +35,10 @@ nx_result_t nx_gd32_watchdog_initialize(nx_watchdog_port_t* port) {
 
 /** \brief           Configure before enabling; retain every irreversible
  * effect. */
-nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
-                                    uint32_t timeout_us, bool debug_freeze,
+nx_result_t nx_gd32_watchdog_enable(void* context, uint32_t timeout_us,
+                                    bool debug_freeze,
                                     nx_watchdog_state_t* state) {
+    nx_gd32_watchdog_state_t* port = context;
     if (!port || port != s_watchdog || !state || !port->initialized ||
         timeout_us < 1000u || timeout_us > 32760000u) {
         return NX_ERROR_INVALID;
@@ -92,7 +93,8 @@ nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
 }
 
 /** \brief           Feed only the known unique enabled watchdog owner. */
-nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port) {
+nx_result_t nx_gd32_watchdog_feed(void* context) {
+    nx_gd32_watchdog_state_t* port = context;
     if (!port || port != s_watchdog || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -105,8 +107,9 @@ nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port) {
 
 /** \brief           Report enabled effects without claiming oscillator
  * accuracy. */
-nx_result_t nx_watchdog_port_state(const nx_watchdog_port_t* port,
+nx_result_t nx_gd32_watchdog_state(const void* context,
                                    nx_watchdog_state_t* state) {
+    const nx_gd32_watchdog_state_t* port = context;
     if (!port || port != s_watchdog || !state) {
         return NX_ERROR_INVALID;
     }
@@ -127,7 +130,7 @@ uint32_t nx_reset_cause(void) {
 }
 
 /** \brief           Refuse to erase irreversible watchdog responsibility. */
-nx_result_t nx_gd32_watchdog_stop(nx_watchdog_port_t* port) {
+nx_result_t nx_gd32_watchdog_stop(nx_gd32_watchdog_state_t* port) {
     if (!port || port != s_watchdog || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -141,3 +144,10 @@ nx_result_t nx_gd32_watchdog_stop(nx_watchdog_port_t* port) {
     s_watchdog = NULL;
     return NX_SUCCESS;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_watchdog_ops_t nx_gd32_watchdog_ops = {
+    .enable = nx_gd32_watchdog_enable,
+    .feed = nx_gd32_watchdog_feed,
+    .state = nx_gd32_watchdog_state,
+};

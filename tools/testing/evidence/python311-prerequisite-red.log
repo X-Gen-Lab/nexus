@@ -1,0 +1,21 @@
+FF
+======================================================================
+FAIL: test_python_without_stdlib_toml_is_rejected_before_install (scripts.ci.test_install_dev_tools.InstallDevToolsTests.test_python_without_stdlib_toml_is_rejected_before_install)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_install_dev_tools.py", line 189, in test_python_without_stdlib_toml_is_rejected_before_install
+    self.assertEqual(result, 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_host_python_without_stdlib_toml_is_rejected_before_commands (scripts.ci.test_install_dev_tools.InstallDevToolsTests.test_host_python_without_stdlib_toml_is_rejected_before_commands)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_install_dev_tools.py", line 195, in test_host_python_without_stdlib_toml_is_rejected_before_commands
+    self.assertEqual(result, 1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.003s
+
+FAILED (failures=2)

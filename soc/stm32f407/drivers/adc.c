@@ -14,7 +14,7 @@
 
 /** \brief Initialize only independent ADC, no trigger, DMA or hidden scan task.
  */
-nx_result_t nx_stm32_adc_initialize(nx_adc_port_t* port) {
+nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
     if (port == NULL || port->registers == NULL || port->common == NULL ||
         port->channels == NULL || port->sample_times == NULL ||
         port->channel_count == 0U || port->channel_count > 16U ||
@@ -40,7 +40,8 @@ nx_result_t nx_stm32_adc_initialize(nx_adc_port_t* port) {
 
 /** \brief Publish raw-count metadata and the nominal, uncalibrated reference.
  */
-nx_result_t nx_adc_port_info(const nx_adc_port_t* port, nx_adc_info_t* info) {
+nx_result_t nx_stm32_adc_info(const void* context, nx_adc_info_t* info) {
+    const nx_stm32_adc_state_t* port = context;
     if (port == NULL || !port->initialized || info == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -51,9 +52,10 @@ nx_result_t nx_adc_port_info(const nx_adc_port_t* port, nx_adc_info_t* info) {
 }
 
 /** \brief Convert sequential software shots in the declared low-rate order. */
-nx_result_t nx_adc_port_sample(nx_adc_port_t* port, uint16_t* samples,
-                               size_t capacity, nx_time_us_t deadline,
-                               size_t* count) {
+nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
+                                size_t capacity, nx_time_us_t deadline,
+                                size_t* count) {
+    nx_stm32_adc_state_t* port = context;
     if (port == NULL || !port->initialized || samples == NULL ||
         count == NULL || capacity < port->channel_count) {
         return NX_ERROR_INVALID;
@@ -121,3 +123,9 @@ nx_result_t nx_adc_port_sample(nx_adc_port_t* port, uint16_t* samples,
     }
     return result;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_adc_ops_t nx_stm32_adc_ops = {
+    .info = nx_stm32_adc_info,
+    .sample = nx_stm32_adc_sample,
+};

@@ -13,29 +13,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
-#include "nexus/io/native/model.h"
+#include "provider.h"
 
-struct nx_uart_port {
-    nx_uart_tx_request_t* active;
-    nx_native_uart_config_t config;
-    size_t tx_index;
-    size_t logged;
-    size_t rx_head;
-    size_t rx_count;
-    bool loss;
-    nx_time_us_t loss_timestamp;
-    bool terminal;
-    bool start_failure;
-    bool hold_drain;
-    bool opened;
-    bool stopping;
-    nx_result_t terminal_result;
-};
-nx_uart_port_t g_nx_native_uart;
-nx_uart_port_t* const nx_native_uart = &g_nx_native_uart;
+static nx_native_uart_state_t s_uart;
+const nx_uart_port_t g_nx_native_uart = {&nx_native_uart_ops, &s_uart};
+const nx_uart_port_t* const nx_native_uart = &g_nx_native_uart;
 
 /** \brief Validate fixed-port preparation before establishing any borrow. */
-static nx_result_t validate_start(nx_uart_port_t* port,
+static nx_result_t validate_start(nx_native_uart_state_t* port,
                                   nx_uart_tx_request_t* request,
                                   nx_request_state_t required) {
     if (port == NULL || request == NULL || request->data == NULL ||
@@ -61,7 +46,7 @@ static nx_result_t validate_start(nx_uart_port_t* port,
 }
 
 /** \brief Attach already-admitted storage; later start error stays ACCEPTED. */
-static void attach_request(nx_uart_port_t* port,
+static void attach_request(nx_native_uart_state_t* port,
                            nx_uart_tx_request_t* request) {
     port->active = request;
     port->tx_index = 0;
@@ -70,7 +55,12 @@ static void attach_request(nx_uart_port_t* port,
 }
 
 /** \brief Configure only after the previous provider borrow is gone. */
-nx_result_t nx_native_uart_configure(const nx_native_uart_config_t* config) {
+nx_result_t
+nx_native_uart_configure_instance(nx_native_uart_state_t* port,
+                                  const nx_native_uart_config_t* config) {
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
     if (config == NULL || config->rx_storage == NULL ||
         config->rx_capacity == 0 || config->rx_capacity > SIZE_MAX / 2 ||
         (config->profile != NX_UART_RX_BYTES &&
@@ -82,20 +72,26 @@ nx_result_t nx_native_uart_configure(const nx_native_uart_config_t* config) {
         return NX_ERROR_INVALID;
     }
     nx_arch_irq_state_t token = nx_arch_irq_save();
-    if (g_nx_native_uart.active != NULL) {
+    if (port->active != NULL || port->rx_stream != NULL) {
         nx_arch_irq_restore(token);
         return NX_ERROR_BUSY;
     }
-    g_nx_native_uart = (nx_uart_port_t){0};
-    g_nx_native_uart.config = *config;
-    g_nx_native_uart.opened = true;
+    *port = (nx_native_uart_state_t){0};
+    port->config = *config;
+    port->opened = true;
     nx_arch_irq_restore(token);
     return NX_SUCCESS;
 }
 
+/** \brief Operate on the explicit default fixture only. */
+nx_result_t nx_native_uart_configure(const nx_native_uart_config_t* config) {
+    return nx_native_uart_configure_instance(&s_uart, config);
+}
+
 /** \brief Direct admission occurs once, after every rejectable validation. */
-nx_result_t nx_uart_port_submit(nx_uart_port_t* port,
-                                nx_uart_tx_request_t* request) {
+static nx_result_t native_uart_submit(void* context,
+                                      nx_uart_tx_request_t* request) {
+    nx_native_uart_state_t* port = context;
     nx_result_t result = validate_start(port, request, NX_REQUEST_READY);
     if (result != NX_SUCCESS) {
         return result;
@@ -110,8 +106,9 @@ nx_result_t nx_uart_port_submit(nx_uart_port_t* port,
 }
 
 /** \brief Hand execution from a QUEUED adapter borrow to the controller. */
-nx_result_t nx_uart_port_start_admitted(nx_uart_port_t* port,
-                                        nx_uart_tx_request_t* request) {
+static nx_result_t native_uart_start_admitted(void* context,
+                                              nx_uart_tx_request_t* request) {
+    nx_native_uart_state_t* port = context;
     nx_result_t result = validate_start(port, request, NX_REQUEST_QUEUED);
     if (result != NX_SUCCESS) {
         return result;
@@ -126,8 +123,9 @@ nx_result_t nx_uart_port_start_admitted(nx_uart_port_t* port,
 }
 
 /** \brief Cancellation retains the descriptor until service proves drain. */
-nx_result_t nx_uart_port_cancel(nx_uart_port_t* port,
-                                nx_uart_tx_request_t* request) {
+static nx_result_t native_uart_cancel(void* context,
+                                      nx_uart_tx_request_t* request) {
+    nx_native_uart_state_t* port = context;
     if (port == NULL || request == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -153,9 +151,12 @@ nx_result_t nx_uart_port_cancel(nx_uart_port_t* port,
 
 /** \brief Move at most one byte or one distinct TC fact, never settle in IRQ.
  */
-void nx_native_uart_irq_step(void) {
+void nx_native_uart_irq_step_instance(nx_native_uart_state_t* port) {
+    if (port == NULL) {
+        return;
+    }
     nx_arch_irq_state_t token = nx_arch_irq_save();
-    nx_uart_port_t* port = &g_nx_native_uart;
+
     if (port->active != NULL && !port->terminal) {
         if (port->tx_index < port->active->length) {
             uint8_t byte = port->active->data[port->tx_index++];
@@ -176,12 +177,20 @@ void nx_native_uart_irq_step(void) {
                     : NX_SUCCESS;
         }
     }
+    const nx_irq_wake_t* wake = port->terminal ? port->wake : NULL;
     nx_arch_irq_restore(token);
+    (void)nx_irq_wake_signal(wake);
+}
+
+/** \brief Operate on the explicit default fixture only. */
+void nx_native_uart_irq_step(void) {
+    nx_native_uart_irq_step_instance(&s_uart);
 }
 
 /** \brief Detach before terminal publication and retain failed drain ownership.
  */
-void nx_uart_port_service(nx_uart_port_t* port) {
+static void native_uart_service(void* context) {
+    nx_native_uart_state_t* port = context;
     if (port == NULL || nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return;
     }
@@ -194,7 +203,7 @@ void nx_uart_port_service(nx_uart_port_t* port) {
     bool automatic_irq = port->config.automatic_irq;
     nx_arch_irq_restore(snapshot_token);
     if (automatic_irq) {
-        nx_native_uart_irq_step();
+        nx_native_uart_irq_step_instance(port);
     }
     nx_arch_irq_state_t token = nx_arch_irq_save();
     nx_uart_tx_request_t* request = port->active;
@@ -230,9 +239,16 @@ void nx_uart_port_service(nx_uart_port_t* port) {
 }
 
 /** \brief Inject one bounded RX event without callbacks or silent overwrite. */
-nx_result_t nx_native_uart_receive(uint8_t byte, uint32_t flags) {
+nx_result_t nx_native_uart_receive_instance(nx_native_uart_state_t* port,
+                                            uint8_t byte, uint32_t flags) {
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (port->rx_stream != NULL) {
+        return nx_native_uart_block_receive(port, byte, flags);
+    }
     nx_arch_irq_state_t token = nx_arch_irq_save();
-    nx_uart_port_t* port = &g_nx_native_uart;
+
     if (!port->opened || port->stopping) {
         nx_arch_irq_restore(token);
         return NX_ERROR_STATE;
@@ -240,7 +256,9 @@ nx_result_t nx_native_uart_receive(uint8_t byte, uint32_t flags) {
     if ((flags & NX_UART_EVENT_NO_BYTE) != 0 &&
         port->config.profile == NX_UART_RX_BYTES) {
         port->loss = true;
+        const nx_irq_wake_t* wake = port->wake;
         nx_arch_irq_restore(token);
+        (void)nx_irq_wake_signal(wake);
         return NX_SUCCESS;
     }
     if (port->rx_count == port->config.rx_capacity ||
@@ -249,7 +267,9 @@ nx_result_t nx_native_uart_receive(uint8_t byte, uint32_t flags) {
             port->loss_timestamp = nx_time_now_us();
         }
         port->loss = true;
+        const nx_irq_wake_t* wake = port->wake;
         nx_arch_irq_restore(token);
+        (void)nx_irq_wake_signal(wake);
         return NX_ERROR_OVERFLOW;
     }
     size_t tail = port->rx_head + port->rx_count;
@@ -269,19 +289,27 @@ nx_result_t nx_native_uart_receive(uint8_t byte, uint32_t flags) {
         }
     }
     port->rx_count++;
+    const nx_irq_wake_t* wake = port->wake;
     nx_arch_irq_restore(token);
+    (void)nx_irq_wake_signal(wake);
     return NX_SUCCESS;
 }
 
+/** \brief Operate on the explicit default fixture only. */
+nx_result_t nx_native_uart_receive(uint8_t byte, uint32_t flags) {
+    return nx_native_uart_receive_instance(&s_uart, byte, flags);
+}
+
 /** \brief Pop at most one event per short metadata critical section. */
-nx_result_t nx_uart_port_read_events(nx_uart_port_t* port,
-                                     nx_uart_rx_event_t* events,
-                                     size_t capacity, size_t* count) {
+static nx_result_t native_uart_read_events(void* context,
+                                           nx_uart_rx_event_t* events,
+                                           size_t capacity, size_t* count) {
+    nx_native_uart_state_t* port = context;
     if (port == NULL || events == NULL || capacity == 0 || count == NULL) {
         return NX_ERROR_INVALID;
     }
     *count = 0;
-    if (port->config.profile != NX_UART_RX_EVENTS) {
+    if (port->rx_stream != NULL || port->config.profile != NX_UART_RX_EVENTS) {
         return NX_ERROR_UNSUPPORTED;
     }
     while (*count < capacity) {
@@ -314,13 +342,14 @@ nx_result_t nx_uart_port_read_events(nx_uart_port_t* port,
 
 /** \brief Preserve explicit aggregate loss while copying the selected byte
  * ring. */
-nx_result_t nx_uart_port_read_bytes(nx_uart_port_t* port, uint8_t* bytes,
-                                    size_t capacity, size_t* count) {
+static nx_result_t native_uart_read_bytes(void* context, uint8_t* bytes,
+                                          size_t capacity, size_t* count) {
+    nx_native_uart_state_t* port = context;
     if (port == NULL || bytes == NULL || capacity == 0 || count == NULL) {
         return NX_ERROR_INVALID;
     }
     *count = 0;
-    if (port->config.profile != NX_UART_RX_BYTES) {
+    if (port->rx_stream != NULL || port->config.profile != NX_UART_RX_BYTES) {
         return NX_ERROR_UNSUPPORTED;
     }
     bool loss = false;
@@ -348,7 +377,8 @@ nx_result_t nx_uart_port_read_bytes(nx_uart_port_t* port, uint8_t* bytes,
 }
 
 /** \brief Reject new work while the execution owner continues cancel/drain. */
-nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
+static nx_result_t native_uart_stop(void* context) {
+    nx_native_uart_state_t* port = context;
     if (port == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -364,12 +394,17 @@ nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
     }
     nx_arch_irq_restore(stop_token);
     if (active) {
-        nx_uart_port_service(port);
+        native_uart_service(port);
         if (port->active != NULL) {
             return NX_ERROR_BUSY;
         }
     }
+    nx_result_t rx_result = nx_native_uart_rx_stop(port);
+    if (rx_result != NX_SUCCESS) {
+        return rx_result;
+    }
     nx_arch_irq_state_t token = nx_arch_irq_save();
+    port->wake = NULL;
     port->opened = false;
     port->rx_count = 0;
     nx_arch_irq_restore(token);
@@ -377,17 +412,121 @@ nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
 }
 
 /** \brief Inject only controlled fixture faults; do not revoke live storage. */
-void nx_native_uart_fault(bool start_failure, bool hold_drain) {
+void nx_native_uart_fault_instance(nx_native_uart_state_t* port,
+                                   bool start_failure, bool hold_drain) {
+    if (port == NULL) {
+        return;
+    }
     nx_arch_irq_state_t token = nx_arch_irq_save();
-    g_nx_native_uart.start_failure = start_failure;
-    g_nx_native_uart.hold_drain = hold_drain;
+    port->start_failure = start_failure;
+    port->hold_drain = hold_drain;
     nx_arch_irq_restore(token);
 }
 
+/** \brief Operate on the explicit default fixture only. */
+void nx_native_uart_fault(bool start_failure, bool hold_drain) {
+    nx_native_uart_fault_instance(&s_uart, start_failure, hold_drain);
+}
+
 /** \brief Read capture length under the same model IRQ exclusion discipline. */
-size_t nx_native_uart_transmitted(void) {
+size_t nx_native_uart_transmitted_instance(const nx_native_uart_state_t* port) {
+    if (port == NULL) {
+        return 0;
+    }
     nx_arch_irq_state_t token = nx_arch_irq_save();
-    size_t logged = g_nx_native_uart.logged;
+    size_t logged = port->logged;
     nx_arch_irq_restore(token);
     return logged;
+}
+
+/** \brief Operate on the explicit default fixture only. */
+size_t nx_native_uart_transmitted(void) {
+    return nx_native_uart_transmitted_instance(&s_uart);
+}
+
+/** \brief Bind an explicit sink using the maintained model IRQ priority. */
+static nx_result_t native_uart_attach_wake(void* context,
+                                           const nx_irq_wake_t* wake,
+                                           uint8_t syscall_ceiling) {
+    nx_native_uart_state_t* port = context;
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (!port->opened) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_STATE;
+    }
+    nx_result_t result = nx_irq_wake_validate(wake, 5U, 4U, syscall_ceiling);
+    if (result == NX_SUCCESS) {
+        port->wake = wake;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+
+/** \brief One readonly operation table is shared by every Native instance. */
+const nx_uart_ops_t nx_native_uart_ops = {
+    .submit = native_uart_submit,
+    .start_admitted = native_uart_start_admitted,
+    .cancel = native_uart_cancel,
+    .service = native_uart_service,
+    .read_events = native_uart_read_events,
+    .read_bytes = native_uart_read_bytes,
+    .stop = native_uart_stop,
+    .attach_wake = native_uart_attach_wake,
+    .rx_start = nx_native_uart_rx_start,
+    .rx_stop = nx_native_uart_rx_stop,
+};
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+nx_result_t
+nx_native_uart_model_configure(const nx_uart_port_t* binding,
+                               const nx_native_uart_config_t* config) {
+    if (binding == NULL || binding->ops != &nx_native_uart_ops ||
+        binding->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_native_uart_configure_instance(binding->context, config);
+}
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+void nx_native_uart_model_irq_step(const nx_uart_port_t* binding) {
+    if (binding == NULL || binding->ops != &nx_native_uart_ops ||
+        binding->context == NULL) {
+        return;
+    }
+    nx_native_uart_irq_step_instance(binding->context);
+}
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+nx_result_t nx_native_uart_model_receive(const nx_uart_port_t* binding,
+                                         uint8_t byte, uint32_t flags) {
+    if (binding == NULL || binding->ops != &nx_native_uart_ops ||
+        binding->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_native_uart_receive_instance(binding->context, byte, flags);
+}
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+void nx_native_uart_model_fault(const nx_uart_port_t* binding,
+                                bool start_failure, bool hold_drain) {
+    if (binding == NULL || binding->ops != &nx_native_uart_ops ||
+        binding->context == NULL) {
+        return;
+    }
+    nx_native_uart_fault_instance(binding->context, start_failure, hold_drain);
+}
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+size_t nx_native_uart_model_transmitted(const nx_uart_port_t* binding) {
+    if (binding == NULL || binding->ops != &nx_native_uart_ops ||
+        binding->context == NULL) {
+        return 0;
+    }
+    return nx_native_uart_transmitted_instance(binding->context);
 }

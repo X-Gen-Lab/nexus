@@ -12,22 +12,20 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
-#include "nexus/io/native/model.h"
+#include "provider.h"
 #include <string.h>
 
-struct nx_flash_port {
-    uint8_t* memory;
-    const nx_flash_geometry_t* geometry;
-    size_t pulses_left;
-    bool active;
-};
-nx_flash_port_t g_nx_native_flash;
-nx_flash_port_t* const nx_native_flash = &g_nx_native_flash;
+static nx_native_flash_state_t s_flash;
+const nx_flash_port_t g_nx_native_flash = {&nx_native_flash_ops, &s_flash};
+const nx_flash_port_t* const nx_native_flash = &g_nx_native_flash;
 
 /** \brief Validate geometry before exposing RAM as a deliberately named model.
  */
-nx_result_t nx_native_flash_configure(uint8_t* memory,
-                                      const nx_flash_geometry_t* geometry) {
+static nx_result_t configure(nx_native_flash_state_t* port, uint8_t* memory,
+                             const nx_flash_geometry_t* geometry, bool reset) {
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
     if (memory == NULL || geometry == NULL || geometry->size == 0 ||
         geometry->program_unit == 0 || geometry->sectors == NULL ||
         geometry->sector_count == 0 ||
@@ -47,19 +45,64 @@ nx_result_t nx_native_flash_configure(uint8_t* memory,
     if (end != geometry->size) {
         return NX_ERROR_INVALID;
     }
-    g_nx_native_flash = (nx_flash_port_t){
-        .memory = memory, .geometry = geometry, .pulses_left = SIZE_MAX};
-    memset(memory, 0xff, geometry->size);
+    if (port->active) {
+        return NX_ERROR_BUSY;
+    }
+    bool erase = reset || !port->formatted;
+    *port = (nx_native_flash_state_t){.memory = memory,
+                                      .geometry = geometry,
+                                      .pulses_left = SIZE_MAX,
+                                      .formatted = true};
+    if (erase) {
+        memset(memory, 0xff, geometry->size);
+    }
     return NX_SUCCESS;
 }
 
+/** \brief An explicit fixture reset erases its nonpersistent model memory. */
+nx_result_t
+nx_native_flash_configure_instance(nx_native_flash_state_t* port,
+                                   uint8_t* memory,
+                                   const nx_flash_geometry_t* geometry) {
+    return configure(port, memory, geometry, true);
+}
+
+/** \brief Static assembly restart restores admission without erasing bytes. */
+nx_result_t
+nx_native_flash_initialize_instance(nx_native_flash_state_t* port,
+                                    uint8_t* memory,
+                                    const nx_flash_geometry_t* geometry) {
+    return configure(port, memory, geometry, false);
+}
+
+/** \brief Keep live pulses retained, otherwise withdraw the platform binding.
+ */
+nx_result_t nx_native_flash_stop_instance(nx_native_flash_state_t* port) {
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (port->active) {
+        return NX_ERROR_BUSY;
+    }
+    port->geometry = NULL;
+    port->memory = NULL;
+    return NX_SUCCESS;
+}
+
+/** \brief Operate on the explicit default fixture only. */
+nx_result_t nx_native_flash_configure(uint8_t* memory,
+                                      const nx_flash_geometry_t* geometry) {
+    return nx_native_flash_configure_instance(&s_flash, memory, geometry);
+}
+
 /** \brief Return maintained full geometry only for configured model storage. */
-const nx_flash_geometry_t* nx_flash_port_geometry(const nx_flash_port_t* port) {
+static const nx_flash_geometry_t* native_flash_geometry(const void* context) {
+    const nx_native_flash_state_t* port = context;
     return port == NULL ? NULL : port->geometry;
 }
 
 /** \brief Reject every physical overflow before accessing model memory. */
-static bool valid_range(const nx_flash_port_t* port, uint32_t offset,
+static bool valid_range(const nx_native_flash_state_t* port, uint32_t offset,
                         size_t length) {
     return port != NULL && port->geometry != NULL &&
            offset <= port->geometry->size &&
@@ -67,8 +110,9 @@ static bool valid_range(const nx_flash_port_t* port, uint32_t offset,
 }
 
 /** \brief Read bounded bytes without any persistent-memory support claim. */
-nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
-                               void* data, size_t length) {
+static nx_result_t native_flash_read(const void* context, uint32_t offset,
+                                     void* data, size_t length) {
+    const nx_native_flash_state_t* port = context;
     if (!valid_range(port, offset, length) || (length != 0 && data == NULL)) {
         return NX_ERROR_INVALID;
     }
@@ -83,7 +127,8 @@ nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
 
 /** \brief Consume a complete modeled pulse or reject before its first access.
  */
-static nx_result_t begin_pulse(nx_flash_port_t* port, nx_time_us_t deadline) {
+static nx_result_t begin_pulse(nx_native_flash_state_t* port,
+                               nx_time_us_t deadline) {
     if (nx_deadline_expired(deadline, nx_time_now_us())) {
         return NX_ERROR_TIMEOUT;
     }
@@ -98,9 +143,10 @@ static nx_result_t begin_pulse(nx_flash_port_t* port, nx_time_us_t deadline) {
 
 /** \brief Model whole program pulses, preserving NOR zero-to-one constraints.
  */
-nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
-                                  const void* data, size_t length,
-                                  nx_time_us_t deadline) {
+static nx_result_t native_flash_program(void* context, uint32_t offset,
+                                        const void* data, size_t length,
+                                        nx_time_us_t deadline) {
+    nx_native_flash_state_t* port = context;
     if (!valid_range(port, offset, length) || data == NULL || length == 0 ||
         offset % port->geometry->program_unit != 0 ||
         length % port->geometry->program_unit != 0) {
@@ -135,8 +181,9 @@ nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
 
 /** \brief Validate full-sector boundaries before beginning any irreversible
  * pulse. */
-nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
-                                size_t length, nx_time_us_t deadline) {
+static nx_result_t native_flash_erase(void* context, uint32_t offset,
+                                      size_t length, nx_time_us_t deadline) {
+    nx_native_flash_state_t* port = context;
     if (!valid_range(port, offset, length) || length == 0) {
         return NX_ERROR_INVALID;
     }
@@ -178,6 +225,45 @@ nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
 
 /** \brief Inject partial physical-operation model failure at pulse boundaries.
  */
+void nx_native_flash_fault_instance(nx_native_flash_state_t* port,
+                                    size_t pulse_count) {
+    if (port == NULL) {
+        return;
+    }
+    port->pulses_left = pulse_count;
+}
+
+/** \brief Operate on the explicit default fixture only. */
 void nx_native_flash_fault(size_t pulse_count) {
-    g_nx_native_flash.pulses_left = pulse_count;
+    nx_native_flash_fault_instance(&s_flash, pulse_count);
+}
+
+/** \brief One readonly operation table is shared by every Native instance. */
+const nx_flash_ops_t nx_native_flash_ops = {
+    .geometry = native_flash_geometry,
+    .read = native_flash_read,
+    .program = native_flash_program,
+    .erase = native_flash_erase,
+};
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+nx_result_t
+nx_native_flash_model_configure(const nx_flash_port_t* binding, uint8_t* memory,
+                                const nx_flash_geometry_t* geometry) {
+    if (binding == NULL || binding->ops != &nx_native_flash_ops ||
+        binding->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_native_flash_configure_instance(binding->context, memory,
+                                              geometry);
+}
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+void nx_native_flash_model_fault(const nx_flash_port_t* binding,
+                                 size_t pulse_count) {
+    if (binding == NULL || binding->ops != &nx_native_flash_ops ||
+        binding->context == NULL) {
+        return;
+    }
+    nx_native_flash_fault_instance(binding->context, pulse_count);
 }

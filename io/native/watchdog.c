@@ -11,33 +11,51 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "nexus/io/native/model.h"
+#include "provider.h"
 
-struct nx_watchdog_port {
-    nx_watchdog_state_t state;
-    uint32_t nominal_timeout_us;
-    nx_time_us_t expiration;
-    uint32_t causes;
-    bool expired;
-};
-nx_watchdog_port_t g_nx_native_watchdog;
-nx_watchdog_port_t* const nx_native_watchdog = &g_nx_native_watchdog;
+static nx_native_watchdog_state_t s_watchdog;
+const nx_watchdog_port_t g_nx_native_watchdog = {&nx_native_watchdog_ops,
+                                                 &s_watchdog};
+const nx_watchdog_port_t* const nx_native_watchdog = &g_nx_native_watchdog;
 
 /** \brief Model a new boot explicitly, never a reversible production disable.
  */
+void nx_native_watchdog_boot_instance(nx_native_watchdog_state_t* port,
+                                      uint32_t causes) {
+    if (port == NULL) {
+        return;
+    }
+    *port = (nx_native_watchdog_state_t){.causes = causes, .initialized = true};
+}
+
+/** \brief Platform restart retains an enabled effect and its expiration. */
+nx_result_t
+nx_native_watchdog_initialize_instance(nx_native_watchdog_state_t* port) {
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    port->initialized = true;
+    return NX_SUCCESS;
+}
+
+/** \brief Operate on the explicit default fixture only. */
 void nx_native_watchdog_boot(uint32_t causes) {
-    g_nx_native_watchdog = (nx_watchdog_port_t){.causes = causes};
+    nx_native_watchdog_boot_instance(&s_watchdog, causes);
 }
 
 /** \brief Preserve an already enabled effect instead of claiming reactivation.
  */
-nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
-                                    uint32_t timeout_us, bool debug_freeze,
-                                    nx_watchdog_state_t* state) {
+static nx_result_t native_watchdog_enable(void* context, uint32_t timeout_us,
+                                          bool debug_freeze,
+                                          nx_watchdog_state_t* state) {
+    nx_native_watchdog_state_t* port = context;
     if (port == NULL || state == NULL) {
         return NX_ERROR_INVALID;
     }
     *state = port->state;
+    if (!port->initialized) {
+        return NX_ERROR_STATE;
+    }
     if (port->state.enabled) {
         return NX_ERROR_STATE;
     }
@@ -56,7 +74,8 @@ nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
 
 /** \brief Refresh only an enabled, not already expired, hardware-effect model.
  */
-nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port) {
+static nx_result_t native_watchdog_feed(void* context) {
+    nx_native_watchdog_state_t* port = context;
     if (port == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -75,8 +94,9 @@ nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port) {
 
 /** \brief Query the retained irreversible effect without mutating feed policy.
  */
-nx_result_t nx_watchdog_port_state(const nx_watchdog_port_t* port,
-                                   nx_watchdog_state_t* state) {
+static nx_result_t native_watchdog_state(const void* context,
+                                         nx_watchdog_state_t* state) {
+    const nx_native_watchdog_state_t* port = context;
     if (port == NULL || state == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -85,8 +105,11 @@ nx_result_t nx_watchdog_port_state(const nx_watchdog_port_t* port,
 }
 
 /** \brief Record a deterministic model timeout without pretending to reboot. */
-bool nx_native_watchdog_expired(void) {
-    nx_watchdog_port_t* port = &g_nx_native_watchdog;
+bool nx_native_watchdog_expired_instance(nx_native_watchdog_state_t* port) {
+    if (port == NULL) {
+        return 0;
+    }
+
     if (port->state.enabled &&
         nx_deadline_expired(port->expiration, nx_time_now_us())) {
         port->expired = true;
@@ -95,7 +118,38 @@ bool nx_native_watchdog_expired(void) {
     return port->expired;
 }
 
+/** \brief Operate on the explicit default fixture only. */
+bool nx_native_watchdog_expired(void) {
+    return nx_native_watchdog_expired_instance(&s_watchdog);
+}
+
 /** \brief Return accumulated boot/effect facts; no implicit flag clearing. */
 uint32_t nx_reset_cause(void) {
-    return g_nx_native_watchdog.causes;
+    return s_watchdog.causes;
+}
+
+/** \brief One readonly operation table is shared by every Native instance. */
+const nx_watchdog_ops_t nx_native_watchdog_ops = {
+    .enable = native_watchdog_enable,
+    .feed = native_watchdog_feed,
+    .state = native_watchdog_state,
+};
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+void nx_native_watchdog_model_boot(const nx_watchdog_port_t* binding,
+                                   uint32_t causes) {
+    if (binding == NULL || binding->ops != &nx_native_watchdog_ops ||
+        binding->context == NULL) {
+        return;
+    }
+    nx_native_watchdog_boot_instance(binding->context, causes);
+}
+
+/** \brief Select exactly one Native face without affecting default fixtures. */
+bool nx_native_watchdog_model_expired(const nx_watchdog_port_t* binding) {
+    if (binding == NULL || binding->ops != &nx_native_watchdog_ops ||
+        binding->context == NULL) {
+        return false;
+    }
+    return nx_native_watchdog_expired_instance(binding->context);
 }

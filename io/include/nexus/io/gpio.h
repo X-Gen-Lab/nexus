@@ -13,6 +13,28 @@
 extern "C" {
 #endif
 typedef struct nx_gpio_port nx_gpio_port_t;
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    nx_result_t (*write)(void* context, uint32_t set_mask, uint32_t reset_mask);
+    nx_result_t (*read)(const void* context, uint32_t* value);
+    nx_result_t (*toggle)(void* context, uint32_t mask);
+} nx_gpio_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_gpio_port {
+    const nx_gpio_ops_t* ops;
+    void* context;
+};
 /**
  * \brief           Atomically set/reset one port's authorized output mask.
  *
@@ -29,7 +51,7 @@ typedef struct nx_gpio_port nx_gpio_port_t;
  *                  binding. Stop/mode changes require writers and IRQ
  *                  quiescence.
  */
-nx_result_t nx_gpio_port_write(nx_gpio_port_t* port, uint32_t set_mask,
+nx_result_t nx_gpio_port_write(const nx_gpio_port_t* port, uint32_t set_mask,
                                uint32_t reset_mask);
 /**
  * \brief           Read one input snapshot restricted to the binding mask.
@@ -52,7 +74,7 @@ nx_result_t nx_gpio_port_read(const nx_gpio_port_t* port, uint32_t* value);
  *
  * \note            Read-modify-write is not atomic against unrelated writes.
  */
-nx_result_t nx_gpio_port_toggle(nx_gpio_port_t* port, uint32_t mask);
+nx_result_t nx_gpio_port_toggle(const nx_gpio_port_t* port, uint32_t mask);
 #ifdef __cplusplus
 }
 #endif

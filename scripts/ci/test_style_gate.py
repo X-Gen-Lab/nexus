@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
+import yaml
 
 from scripts.ci import style_gate as gate
 
@@ -42,6 +43,14 @@ class StyleGateTests(unittest.TestCase):
             destination = self.root / name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, destination)
+        # This disposable project tests style and message hooks, not firmware.
+        # Actual TDD configuration and execution are checked in the real tree.
+        hook_path = self.root / ".pre-commit-config.yaml"
+        hooks = yaml.safe_load(hook_path.read_text())
+        for repository in hooks["repos"]:
+            repository["hooks"] = [hook for hook in repository["hooks"]
+                                   if hook["id"] != "nexus-tdd-gate"]
+        hook_path.write_text(yaml.safe_dump(hooks, sort_keys=False))
         (self.root / ".clang-format-dirs").write_text(
             "src\n!vendors\n!ext\n!build\n[extensions]\n.c\n.h\n.inc\n"
         )
@@ -90,6 +99,24 @@ class StyleGateTests(unittest.TestCase):
         result = self.check("src/main.c", full=True)
         self.assertFalse(result["errors"])
         self.assertEqual(result["source_files_checked"], 1)
+
+    def test_real_repository_configures_tdd_hook_without_bypass(self):
+        configuration = yaml.safe_load((ROOT / ".pre-commit-config.yaml").read_text())
+        matches = [hook for repo in configuration["repos"] for hook in repo["hooks"]
+                   if hook["id"] == "nexus-tdd-gate"]
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["entry"], "python scripts/ci/tdd_gate.py --staged")
+        self.assertEqual(matches[0]["stages"], ["pre-commit"])
+        self.assertTrue(matches[0]["always_run"])
+        self.assertTrue(matches[0]["pass_filenames"])
+        self.assertTrue((ROOT / "scripts/ci/tdd_gate.py").is_file())
+
+    def test_authored_toml_is_checked_by_staged_text_gate(self):
+        (self.root / "assembly.toml").write_bytes(b"schema = 2\r\n")
+        self.git("add", "assembly.toml")
+        result = self.check("assembly.toml")
+        self.assertTrue(any("LF line endings" in error
+                            for error in result["errors"]))
 
     def test_new_source_with_comment_violation_is_rejected(self):
         (self.root / "src/new.c").write_bytes(GOOD + b"// forbidden\n")

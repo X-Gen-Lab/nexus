@@ -36,6 +36,13 @@ jobs:
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
           UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      - name: Execute every GoogleTest and GoogleMock contract
+        run: >-
+          .venv/bin/python scripts/ci/tdd_gate.py --all
+          --preset "${{ matrix.preset }}"
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
       - name: Preserve execution evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -46,6 +53,8 @@ jobs:
             build/${{ matrix.preset }}/Testing/Temporary/
             build/${{ matrix.preset }}/generated/
             build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/tdd/
+            build/${{ matrix.preset }}/google-contracts.json
           if-no-files-found: error
 
   arm:
@@ -86,6 +95,20 @@ jobs:
           --resolved build/${{ matrix.preset }}/generated/resolved.json
           --budget build/${{ matrix.preset }}/generated/resource-budget.json
           --report build/${{ matrix.preset }}/resource-report.json
+      - name: Prepare the unbound physical station work plan
+        env:
+          PRESET: ${{ matrix.preset }}
+        run: |
+          case "$PRESET" in
+            stm32-qiming-*) fixture=stm32f407_qiming_v31 ;;
+            stm32-sky-*) fixture=stm32f407ve_sky_qingchun ;;
+            gd32-liangshan-*) fixture=gd32f470_liangshan ;;
+            *) exit 1 ;;
+          esac
+          .venv/bin/python -B tools/hil/prepare.py \
+            --fixture "tools/hil/fixtures/$fixture.json" \
+            --resolved "build/$PRESET/generated/resolved.json" \
+            --report "build/$PRESET/hil-preparation.json"
       - name: Preserve linked software evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -96,6 +119,7 @@ jobs:
             build/${{ matrix.preset }}/generated/
             build/${{ matrix.preset }}/compile_commands.json
             build/${{ matrix.preset }}/resource-report.json
+            build/${{ matrix.preset }}/hil-preparation.json
           if-no-files-found: error
       # ARM linking and modeled peripheral tests establish software contracts.
       # Probe/serial execution and physical timing remain separate HIL evidence.
@@ -123,8 +147,8 @@ jobs:
         run: |
           fixture="tests/contracts/${FAMILY}_assembly"
           count=0
-          for assembly in "$fixture"/*.json; do
-            name="$(basename "$assembly" .json)"
+          for assembly in "$fixture"/*.toml; do
+            name="$(basename "$assembly" .toml)"
             output="build/controller-routes/$FAMILY/$name"
             .venv/bin/cmake -S "$fixture" -B "$output" -G Ninja \
               -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/cmake/toolchains/arm-gcc.cmake" \

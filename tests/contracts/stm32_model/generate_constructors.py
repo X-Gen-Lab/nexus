@@ -9,13 +9,16 @@ from configure import resolve  # noqa: E402
 from stm32_bindings import constructor, shared_irq_definitions  # noqa: E402
 
 lines = []
-for fixture in ("ve-exti.json", "ve-pwm.json", "ve-spi.json"):
+for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml"):
     result = resolve(root / "tests/contracts/stm32_assembly" / fixture, root)
     for item in result["controllers"]:
         name = item["id"].replace("-", "_")
-        lines.append(f"static nx_{item['kind']}_port_t s_{name};")
+        lines.append(f"static nx_stm32_{item['kind']}_state_t s_nx_port_{name};")
         if item["kind"] == "spi":
-            lines.append(f"static nx_spi_endpoint_t s_{name}_endpoint;")
+            lines.append(f"static nx_stm32_spi_endpoint_state_t s_nx_endpoint_{name};")
+        if item["kind"] in {"pwm", "exti"}:
+            kind = item["kind"]
+            lines.append(f"static const nx_{kind}_port_t s_nx_face_{name} = {{&nx_stm32_{kind}_ops, &s_nx_port_{name}}};")
         generated = constructor(item, result, result["board_bindings"],
                                 result["routes"], result["devices"])
         lines += generated["definitions"]

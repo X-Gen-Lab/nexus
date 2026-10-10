@@ -10,11 +10,11 @@
 #include "gd32f4xx.h"
 #include "private/system.h"
 
-static nx_pwm_port_t* s_pwm;
+static nx_gd32_pwm_state_t* s_pwm;
 
 /** \brief           Reserve one timer base before configuring its safe output.
  */
-nx_result_t nx_gd32_pwm_initialize(nx_pwm_port_t* port, uint32_t period,
+nx_result_t nx_gd32_pwm_initialize(nx_gd32_pwm_state_t* port, uint32_t period,
                                    uint32_t tick_hz) {
     if (!port || !period || period > UINT16_MAX || !tick_hz ||
         100000000u % tick_hz != 0u || 100000000u / tick_hz > 65536u) {
@@ -40,15 +40,15 @@ nx_result_t nx_gd32_pwm_initialize(nx_pwm_port_t* port, uint32_t period,
     TIMER_CTL0(TIMER2) = TIMER_CTL0_ARSE;
     TIMER_SWEVG(TIMER2) = TIMER_SWEVG_UPG;
     TIMER_INTF(TIMER2) = 0u;
-    *port = (nx_pwm_port_t){.state = {period, 0u, tick_hz, false},
-                            .initialized = true};
+    *port = (nx_gd32_pwm_state_t){.state = {period, 0u, tick_hz, false},
+                                  .initialized = true};
     s_pwm = port;
     return NX_SUCCESS;
 }
 
 /** \brief           Stage CCR, including exact zero and full-period duty. */
-nx_result_t nx_pwm_port_set(nx_pwm_port_t* port, uint32_t period,
-                            uint32_t duty) {
+nx_result_t nx_gd32_pwm_set(void* context, uint32_t period, uint32_t duty) {
+    nx_gd32_pwm_state_t* port = context;
     if (!port || port != s_pwm || !port->initialized || !period ||
         duty > period || period > UINT16_MAX) {
         return NX_ERROR_INVALID;
@@ -62,7 +62,8 @@ nx_result_t nx_pwm_port_set(nx_pwm_port_t* port, uint32_t period,
 }
 
 /** \brief           Load staged shadows before enabling the pin and counter. */
-nx_result_t nx_pwm_port_start(nx_pwm_port_t* port) {
+nx_result_t nx_gd32_pwm_start(void* context) {
+    nx_gd32_pwm_state_t* port = context;
     if (!port || port != s_pwm || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -78,7 +79,8 @@ nx_result_t nx_pwm_port_start(nx_pwm_port_t* port) {
 }
 
 /** \brief           Drive the selected inactive low before disabling timer. */
-nx_result_t nx_pwm_port_stop(nx_pwm_port_t* port) {
+nx_result_t nx_gd32_pwm_stop(void* context) {
+    nx_gd32_pwm_state_t* port = context;
     if (!port || port != s_pwm || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -92,8 +94,8 @@ nx_result_t nx_pwm_port_stop(nx_pwm_port_t* port) {
 }
 
 /** \brief           Return selected fixed-base and staged duty facts. */
-nx_result_t nx_pwm_port_state(const nx_pwm_port_t* port,
-                              nx_pwm_state_t* state) {
+nx_result_t nx_gd32_pwm_state(const void* context, nx_pwm_state_t* state) {
+    const nx_gd32_pwm_state_t* port = context;
     if (!port || port != s_pwm || !state || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -102,11 +104,11 @@ nx_result_t nx_pwm_port_state(const nx_pwm_port_t* port,
 }
 
 /** \brief           Release timer ownership while retaining safe pin output. */
-nx_result_t nx_gd32_pwm_release(nx_pwm_port_t* port) {
+nx_result_t nx_gd32_pwm_release(nx_gd32_pwm_state_t* port) {
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    nx_result_t status = nx_pwm_port_stop(port);
+    nx_result_t status = nx_gd32_pwm_stop(port);
     if (status != NX_SUCCESS) {
         return status;
     }
@@ -116,3 +118,11 @@ nx_result_t nx_gd32_pwm_release(nx_pwm_port_t* port) {
     s_pwm = NULL;
     return NX_SUCCESS;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_pwm_ops_t nx_gd32_pwm_ops = {
+    .set = nx_gd32_pwm_set,
+    .start = nx_gd32_pwm_start,
+    .stop = nx_gd32_pwm_stop,
+    .state = nx_gd32_pwm_state,
+};

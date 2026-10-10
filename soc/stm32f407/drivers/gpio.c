@@ -13,7 +13,8 @@
 #endif
 
 /** \brief Preload output levels before exposing the configured output mode. */
-nx_result_t nx_stm32_gpio_initialize(nx_gpio_port_t* port, uint32_t initial) {
+nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
+                                     uint32_t initial) {
     if (port == NULL || port->registers == NULL || port->mask == 0U ||
         (port->mask & ~0xFFFFU) != 0U || (initial & ~port->mask) != 0U) {
         return NX_ERROR_INVALID;
@@ -33,8 +34,9 @@ nx_result_t nx_stm32_gpio_initialize(nx_gpio_port_t* port, uint32_t initial) {
 }
 
 /** \brief Validate dynamic masks before the one atomic BSRR write. */
-nx_result_t nx_gpio_port_write(nx_gpio_port_t* port, uint32_t set_mask,
-                               uint32_t reset_mask) {
+nx_result_t nx_stm32_gpio_write(void* context, uint32_t set_mask,
+                                uint32_t reset_mask) {
+    nx_stm32_gpio_state_t* port = context;
     if (port == NULL || !port->initialized || !port->output ||
         (set_mask & reset_mask) != 0U) {
         return NX_ERROR_INVALID;
@@ -47,7 +49,8 @@ nx_result_t nx_gpio_port_write(nx_gpio_port_t* port, uint32_t set_mask,
 }
 
 /** \brief Return a masked single-port input snapshot. */
-nx_result_t nx_gpio_port_read(const nx_gpio_port_t* port, uint32_t* value) {
+nx_result_t nx_stm32_gpio_read(const void* context, uint32_t* value) {
+    const nx_stm32_gpio_state_t* port = context;
     if (port == NULL || !port->initialized || value == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -57,7 +60,8 @@ nx_result_t nx_gpio_port_read(const nx_gpio_port_t* port, uint32_t* value) {
 
 /** \brief Toggle using one ODR snapshot under the serialized writer contract.
  */
-nx_result_t nx_gpio_port_toggle(nx_gpio_port_t* port, uint32_t mask) {
+nx_result_t nx_stm32_gpio_toggle(void* context, uint32_t mask) {
+    nx_stm32_gpio_state_t* port = context;
     if (port == NULL || !port->initialized || !port->output) {
         return NX_ERROR_INVALID;
     }
@@ -65,7 +69,7 @@ nx_result_t nx_gpio_port_toggle(nx_gpio_port_t* port, uint32_t mask) {
         return NX_ERROR_PERMISSION;
     }
     uint32_t high = port->registers->ODR & mask;
-    return nx_gpio_port_write(port, mask & ~high, high);
+    return nx_stm32_gpio_write(port, mask & ~high, high);
 }
 
 /** \brief Establish GPIO clock access before the first mode/BSRR operation. */
@@ -104,7 +108,7 @@ nx_result_t nx_stm32_uart1_pins_prepare(void) {
 }
 
 /** \brief Preserve declared idle output while withdrawing software access. */
-nx_result_t nx_stm32_gpio_stop(nx_gpio_port_t* port, uint32_t inactive) {
+nx_result_t nx_stm32_gpio_stop(nx_stm32_gpio_state_t* port, uint32_t inactive) {
     if (port == NULL || (inactive & ~port->mask) != 0U) {
         return NX_ERROR_INVALID;
     }
@@ -116,7 +120,7 @@ nx_result_t nx_stm32_gpio_stop(nx_gpio_port_t* port, uint32_t inactive) {
         return NX_SUCCESS;
     }
     nx_result_t result =
-        nx_gpio_port_write(port, inactive, port->mask & ~inactive);
+        nx_stm32_gpio_write(port, inactive, port->mask & ~inactive);
     if (result == NX_SUCCESS) {
         port->initialized = false;
     }
@@ -182,3 +186,10 @@ void nx_stm32_pin_restore(GPIO_TypeDef* gpio, uint8_t pin, uint16_t state) {
         (gpio->MODER & ~(3U << shift)) | (((uint32_t)state & 3U) << shift);
     nx_arch_dsb();
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_gpio_ops_t nx_stm32_gpio_ops = {
+    .write = nx_stm32_gpio_write,
+    .read = nx_stm32_gpio_read,
+    .toggle = nx_stm32_gpio_toggle,
+};

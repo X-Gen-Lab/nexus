@@ -83,8 +83,10 @@ static nx_result_t cancel(void* context) {
 /** \brief Initialize exactly one private request, without opening hardware. */
 nx_owner_executor_port_t
 nx_uart_owner_executor_port(nx_uart_owner_executor_t* executor,
-                            nx_uart_port_t* uart) {
-    if (executor == NULL || uart == NULL) {
+                            const nx_uart_port_t* uart) {
+    if (executor == NULL || uart == NULL || uart->ops == NULL ||
+        uart->context == NULL || uart->ops->submit == NULL ||
+        uart->ops->cancel == NULL || uart->ops->service == NULL) {
         return (nx_owner_executor_port_t){0};
     }
     *executor = (nx_uart_owner_executor_t){0};

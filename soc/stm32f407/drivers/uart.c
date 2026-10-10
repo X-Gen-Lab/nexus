@@ -9,12 +9,16 @@
 #include "stm32f407_provider.h"
 
 /** \brief Initialize 8N1 and only the selected per-instance RX storage. */
-nx_result_t nx_stm32_uart_initialize(nx_uart_port_t* port, uint32_t clock_hz) {
+nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
+                                     uint32_t clock_hz) {
     if (port == NULL || port->registers == NULL || port->baud == 0U ||
-        port->baud > clock_hz / 16U || port->rx_storage == NULL ||
-        port->rx_capacity == 0U || port->initialized ||
+        port->baud > clock_hz / 16U || port->initialized ||
         (port->profile != NX_UART_RX_BYTES &&
-         port->profile != NX_UART_RX_EVENTS)) {
+         port->profile != NX_UART_RX_EVENTS &&
+         port->profile != NX_UART_RX_BLOCKS) ||
+        (port->profile == NX_UART_RX_BLOCKS
+             ? (port->rx_storage != NULL || port->rx_capacity != 0U)
+             : (port->rx_storage == NULL || port->rx_capacity == 0U))) {
         return NX_ERROR_INVALID;
     }
     uint32_t divisor = (clock_hz + port->baud / 2U) / port->baud;
@@ -23,7 +27,8 @@ nx_result_t nx_stm32_uart_initialize(nx_uart_port_t* port, uint32_t clock_hz) {
     }
     port->registers->CR1 = 0U;
     port->registers->CR2 = 0U;
-    port->registers->CR3 = USART_CR3_EIE;
+    port->registers->CR3 =
+        port->profile == NX_UART_RX_BLOCKS ? 0U : (uint32_t)USART_CR3_EIE;
     port->registers->BRR = divisor;
     (void)port->registers->SR;
     (void)port->registers->DR;
@@ -35,7 +40,9 @@ nx_result_t nx_stm32_uart_initialize(nx_uart_port_t* port, uint32_t clock_hz) {
     port->closing = false;
     port->initialized = true;
     port->registers->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE |
-                           USART_CR1_RXNEIE | USART_CR1_PEIE;
+                           (port->profile == NX_UART_RX_BLOCKS
+                                ? 0U
+                                : USART_CR1_RXNEIE | USART_CR1_PEIE);
 #ifndef NEXUS_STM32_MODEL
     NVIC_SetPriority(port->irq, 5U);
     NVIC_ClearPendingIRQ(port->irq);
@@ -45,8 +52,8 @@ nx_result_t nx_stm32_uart_initialize(nx_uart_port_t* port, uint32_t clock_hz) {
 }
 
 /** \brief Start after all rejection conditions, with the unique admission. */
-static nx_result_t start(nx_uart_port_t* port, nx_uart_tx_request_t* request,
-                         bool admitted) {
+static nx_result_t start(nx_stm32_uart_state_t* port,
+                         nx_uart_tx_request_t* request, bool admitted) {
     if (port == NULL || request == NULL || request->data == NULL ||
         request->length == 0U) {
         return NX_ERROR_INVALID;
@@ -86,14 +93,15 @@ static nx_result_t start(nx_uart_port_t* port, nx_uart_tx_request_t* request,
 }
 
 /** \brief Admit one direct caller-owned descriptor. */
-nx_result_t nx_uart_port_submit(nx_uart_port_t* port,
-                                nx_uart_tx_request_t* request) {
+nx_result_t nx_stm32_uart_submit(void* context, nx_uart_tx_request_t* request) {
+    nx_stm32_uart_state_t* port = context;
     return start(port, request, false);
 }
 
 /** \brief Transfer execution of one already-admitted descriptor. */
-nx_result_t nx_uart_port_start_admitted(nx_uart_port_t* port,
-                                        nx_uart_tx_request_t* request) {
+nx_result_t nx_stm32_uart_start_admitted(void* context,
+                                         nx_uart_tx_request_t* request) {
+    nx_stm32_uart_state_t* port = context;
     if (request == NULL ||
         nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
         return NX_ERROR_STATE;
@@ -102,7 +110,7 @@ nx_result_t nx_uart_port_start_admitted(nx_uart_port_t* port,
 }
 
 /** \brief Stop loading bytes while preserving the final in-flight TC drain. */
-static void begin_drain(nx_uart_port_t* port, nx_result_t terminal) {
+static void begin_drain(nx_stm32_uart_state_t* port, nx_result_t terminal) {
     port->registers->CR1 &= ~(uint32_t)USART_CR1_TXEIE;
     port->terminal = terminal;
     (void)nx_request_transition(&port->active->base, NX_REQUEST_DRAINING);
@@ -116,8 +124,8 @@ static void begin_drain(nx_uart_port_t* port, nx_result_t terminal) {
 }
 
 /** \brief Mark cancellation under the same task executor and metadata mask. */
-nx_result_t nx_uart_port_cancel(nx_uart_port_t* port,
-                                nx_uart_tx_request_t* request) {
+nx_result_t nx_stm32_uart_cancel(void* context, nx_uart_tx_request_t* request) {
+    nx_stm32_uart_state_t* port = context;
     if (port == NULL || request == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -159,14 +167,47 @@ static uint32_t rx_flags(uint32_t status) {
     return result;
 }
 
+/** \brief Separate TX ownership from byte/event or block RX producers. */
+bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
+    if (port == NULL || !port->initialized) {
+        return false;
+    }
+    bool notify = false;
+    nx_uart_tx_request_t* request = port->active;
+    bool wrote_byte = false;
+    if (request != NULL && (status & USART_SR_TXE) != 0U &&
+        (port->registers->CR1 & USART_CR1_TXEIE) != 0U) {
+        port->registers->DR = request->data[port->tx_position++];
+        wrote_byte = true;
+        if (port->tx_position == request->length) {
+            port->registers->CR1 &= ~(uint32_t)USART_CR1_TXEIE;
+            port->registers->CR1 |= USART_CR1_TCIE;
+        }
+    }
+    if (request != NULL && !wrote_byte && (status & USART_SR_TC) != 0U &&
+        (port->registers->CR1 & USART_CR1_TCIE) != 0U &&
+        (port->registers->CR1 & USART_CR1_TXEIE) == 0U) {
+        port->registers->CR1 &= ~(uint32_t)USART_CR1_TCIE;
+        if (port->terminal == NX_SUCCESS &&
+            nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
+            port->terminal = NX_ERROR_TIMEOUT;
+        }
+        port->tx_complete = true;
+        notify = true;
+    }
+    return notify;
+}
+
 /** \brief Perform one bounded RX observation and at most one TX byte write. */
-void nx_stm32_uart_irq(nx_uart_port_t* port) {
+void nx_stm32_uart_irq(nx_stm32_uart_state_t* port) {
     if (port == NULL || !port->initialized) {
         return;
     }
     uint32_t status = port->registers->SR;
+    bool notify = false;
     if ((status & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_ORE |
                    USART_SR_NE)) != 0U) {
+        notify = true;
         uint8_t byte = (uint8_t)port->registers->DR;
         uint32_t flags = rx_flags(status);
         bool has_byte = (status & USART_SR_RXNE) != 0U;
@@ -198,32 +239,16 @@ void nx_stm32_uart_irq(nx_uart_port_t* port) {
             ++port->rx_count;
         }
     }
-    nx_uart_tx_request_t* request = port->active;
-    bool wrote_byte = false;
-    if (request != NULL && (status & USART_SR_TXE) != 0U &&
-        (port->registers->CR1 & USART_CR1_TXEIE) != 0U) {
-        port->registers->DR = request->data[port->tx_position++];
-        wrote_byte = true;
-        if (port->tx_position == request->length) {
-            port->registers->CR1 &= ~(uint32_t)USART_CR1_TXEIE;
-            port->registers->CR1 |= USART_CR1_TCIE;
-        }
-    }
-    if (request != NULL && !wrote_byte && (status & USART_SR_TC) != 0U &&
-        (port->registers->CR1 & USART_CR1_TCIE) != 0U &&
-        (port->registers->CR1 & USART_CR1_TXEIE) == 0U) {
-        port->registers->CR1 &= ~(uint32_t)USART_CR1_TCIE;
-        if (port->terminal == NX_SUCCESS &&
-            nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-            port->terminal = NX_ERROR_TIMEOUT;
-        }
-        port->tx_complete = true;
+    notify = nx_stm32_uart_tx_irq(port, status) || notify;
+    if (notify) {
+        (void)nx_irq_wake_signal(port->wake);
     }
 }
 
 /** \brief Drain source references before release-publishing the unique result.
  */
-void nx_uart_port_service(nx_uart_port_t* port) {
+void nx_stm32_uart_service(void* context) {
+    nx_stm32_uart_state_t* port = context;
     if (port == NULL || !port->initialized || nx_arch_in_isr() ||
         nx_arch_irq_is_masked()) {
         return;
@@ -256,9 +281,9 @@ void nx_uart_port_service(nx_uart_port_t* port) {
 }
 
 /** \brief Copy the configured event ring under a short producer exclusion. */
-nx_result_t nx_uart_port_read_events(nx_uart_port_t* port,
-                                     nx_uart_rx_event_t* events,
-                                     size_t capacity, size_t* count) {
+nx_result_t nx_stm32_uart_read_events(void* context, nx_uart_rx_event_t* events,
+                                      size_t capacity, size_t* count) {
+    nx_stm32_uart_state_t* port = context;
     if (port == NULL || events == NULL || count == NULL || capacity == 0U ||
         !port->initialized) {
         return NX_ERROR_INVALID;
@@ -298,8 +323,9 @@ nx_result_t nx_uart_port_read_events(nx_uart_port_t* port,
 }
 
 /** \brief Copy bytes and report aggregate RX loss without fake timestamps. */
-nx_result_t nx_uart_port_read_bytes(nx_uart_port_t* port, uint8_t* bytes,
-                                    size_t capacity, size_t* count) {
+nx_result_t nx_stm32_uart_read_bytes(void* context, uint8_t* bytes,
+                                     size_t capacity, size_t* count) {
+    nx_stm32_uart_state_t* port = context;
     if (port == NULL || bytes == NULL || count == NULL || capacity == 0U ||
         !port->initialized) {
         return NX_ERROR_INVALID;
@@ -332,7 +358,8 @@ nx_result_t nx_uart_port_read_bytes(nx_uart_port_t* port, uint8_t* bytes,
 }
 
 /** \brief Close admission while the owner continues active request drain. */
-nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
+nx_result_t nx_stm32_uart_stop(void* context) {
+    nx_stm32_uart_state_t* port = context;
     if (port == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -355,7 +382,50 @@ nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
     NVIC_DisableIRQ(port->irq);
     NVIC_ClearPendingIRQ(port->irq);
 #endif
+    port->wake = NULL;
     port->initialized = false;
     nx_arch_irq_restore(mask);
     return NX_SUCCESS;
 }
+
+/** \brief Attach only after checking the actual publisher priority. */
+static nx_result_t stm32_uart_attach_wake(void* context,
+                                          const nx_irq_wake_t* wake,
+                                          uint8_t syscall_ceiling) {
+    nx_stm32_uart_state_t* port = context;
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (!port->initialized) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_STATE;
+    }
+#ifdef NEXUS_STM32_MODEL
+    uint8_t priority = 5U;
+#else
+    uint8_t priority = (uint8_t)NVIC_GetPriority(port->irq);
+#endif
+    nx_result_t result =
+        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+    if (result == NX_SUCCESS) {
+        port->wake = wake;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_uart_ops_t nx_stm32_uart_ops = {
+    .submit = nx_stm32_uart_submit,
+    .start_admitted = nx_stm32_uart_start_admitted,
+    .cancel = nx_stm32_uart_cancel,
+    .service = nx_stm32_uart_service,
+    .read_events = nx_stm32_uart_read_events,
+    .read_bytes = nx_stm32_uart_read_bytes,
+    .stop = nx_stm32_uart_stop,
+    .attach_wake = stm32_uart_attach_wake,
+};

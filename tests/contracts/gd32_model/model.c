@@ -20,6 +20,7 @@ bool g_gd32_model_adc_works;
 bool g_gd32_model_i2c_stop_works;
 bool g_gd32_model_fwdgt_config_fails;
 bool g_gd32_model_debug_freeze_fails;
+bool g_gd32_model_flash_lock_works = true;
 bool g_gd32_model_tc_before_critical;
 uint32_t g_gd32_model_pulses;
 uint32_t g_gd32_model_mask;
@@ -39,6 +40,7 @@ uint64_t nx_time_now_us(void) {
     }
     if (g_gd32_model_i2c_stop_works) {
         I2C_CTL0(I2C0) &= ~I2C_CTL0_STOP;
+        I2C_CTL0(I2C1) &= ~I2C_CTL0_STOP;
     }
     return g_gd32_model_now;
 }
@@ -76,19 +78,20 @@ void nx_gd32_peripheral_barrier(void) {
 /** \brief           Clock enable is observed separately from register
  * algorithms. */
 void rcu_periph_clock_enable(rcu_periph_enum periph) {
-    (void)periph;
+    REG32(RCU + ((uint32_t)periph >> 6U)) |= 1U << ((uint32_t)periph & 31U);
 }
 /** \brief           Clock release never fabricates a controller reset. */
 void rcu_periph_clock_disable(rcu_periph_enum periph) {
-    (void)periph;
+    REG32(RCU + ((uint32_t)periph >> 6U)) &= ~(1U << ((uint32_t)periph & 31U));
 }
 /** \brief           Inject a UART reset success or a stuck enabled controller.
  */
 void rcu_periph_reset_enable(rcu_periph_reset_enum periph) {
-    if (periph == RCU_USART0RST) {
-        USART_CTL0(USART0) = g_gd32_model_reset_fails ? USART_CTL0_UEN : 0u;
-        USART_CTL1(USART0) = 0u;
-        USART_CTL2(USART0) = 0u;
+    if (periph == RCU_USART0RST || periph == RCU_USART1RST) {
+        uint32_t uart = periph == RCU_USART0RST ? USART0 : USART1;
+        USART_CTL0(uart) = g_gd32_model_reset_fails ? USART_CTL0_UEN : 0u;
+        USART_CTL1(uart) = 0u;
+        USART_CTL2(uart) = 0u;
     }
 }
 /** \brief           Release the modeled peripheral reset pulse. */
@@ -164,9 +167,11 @@ void adc_clock_config(uint32_t divider) {
 void fmc_unlock(void) {
     FMC_CTL &= ~FMC_CTL_LK;
 }
-/** \brief           Lock the modeled physical Flash controller. */
+/** \brief           Model lock readback failure without releasing ownership. */
 void fmc_lock(void) {
-    FMC_CTL |= FMC_CTL_LK;
+    if (g_gd32_model_flash_lock_works) {
+        FMC_CTL |= FMC_CTL_LK;
+    }
 }
 /** \brief           Clear modeled latched Flash errors. */
 void fmc_flag_clear(uint32_t flags) {

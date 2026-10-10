@@ -10,10 +10,10 @@
 
 接入不是把所有硬件描述转换为一个运行时设备树。它是提交有限事实、选择已维护能力、检查资源，再显式装配静态对象。
 
-- 使用 C11、CMake、Ninja、版本化 JSON 和一个窄 Python 校验/生成工具。核心默认不需要 heap、运行时字符串查找、自动探测或后台 worker。
-- 默认入口是外部工程的 `assembly.json`。硬件输入分为 SoC、Board、assembly 三类，解析后只有一份权威 `resolved.json`。
+- 使用 C11、CMake、Ninja、TOML 装配输入、JSON 硬件事实和一个窄 Python 校验/生成工具。核心默认不需要 heap、运行时字符串查找、自动探测或后台 worker。
+- 默认入口是外部工程的 `assembly.toml`。硬件输入分为 SoC、Board、assembly 三类，一次验证建立冻结 typed IR；`resolved.json` 是其权威 JSON 投影。
 - CMake 仍是代码目标和代码依赖的权威。生成器不生成组件依赖图、业务线程、产品 main 或调度策略。
-- Kconfig 可以以后提供软件选项界面，导出到同一输入合同。它不能与 JSON、CMake cache 各自控制同一个选项，也不能覆盖 SoC/Board 的事实。
+- 实例选择使用 TOML schema 2，SoC/Board 事实保持 JSON。工具只解析这一个装配输入；Kconfig、CMake cache 和旧生成头不形成平行配置权威。
 - 目录可采用 `core/ arch/ soc/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。
 - 未维护的能力不因 SDK 有宏、路由表有 AF 值、同系列有示例而自动可用。新路由、新 DMA 模式、新控制器分别接入。
 
@@ -86,22 +86,20 @@ Board 不复制 SDK、HAL、RTOS port 或链接器脚本。普通 GPIO 初始电
 
 ### 外部 assembly
 
-外部 `nexus-examples` 或私有产品工程提供 `assembly.json`，选择一个 Board package、OS 后端、时钟 profile、需要的资源和器件实例。以下最小示意没有声明任何已可用的外设路线：
+外部 `nexus-examples` 或私有产品工程提供 `assembly.toml`，选择一个 Board package、OS 后端、时钟 profile、需要的资源和器件实例。以下最小示意没有声明任何外设实例：
 
-```json
-{
-  "schema_version": 1,
-  "board_package": "./boards/example-board",
-  "backend": "baremetal",
-  "clock_profile": "selected-profile-id",
-  "controllers": [],
-  "devices": [],
-  "memory_budgets": {"main_stack_bytes": 4096},
-  "layout": null
-}
+```toml
+schema = 2
+board_package = "./boards/example-board"
+backend = "baremetal"
+clock = "selected-profile-id"
+
+[memory]
+main_stack_bytes = 4096
+libc_heap_bytes = 0
 ```
 
-`selected-profile-id` 是需替换的示意值；未知 profile 必须拒绝。`controllers` 只选择 Board 已声明且 SoC 已维护的 binding，明确 polling/IRQ/DMA 模式、必要 buffer 容量和 IRQ priority。`devices` 绑定总线 child、CS/address、器件型号与固定容量，不生成任何 worker。
+`selected-profile-id` 是需替换的示意值；未知 profile 必须拒绝。`[uart.link0]` 等类别实例表只选择 Board 已声明且 SoC 已维护的 binding，明确 polling/IRQ/DMA 模式、必要 ring 容量和 IRQ priority。`[spi_device.sensor0]`、`[i2c_device.sensor0]` 显式绑定 controller 与 CS/address，不生成 worker。factory 分别返回 controller 和 child 的 immutable face。
 
 没有外部产品 layout 时，镜像只能采用已维护的全物理 Flash 默认布局，平台不预留“通用产品存储”。产品 layout 若被选择，其完整内容成为 assembly 的 declared input，由同一解析路径进入 resolved IR。
 
@@ -174,14 +172,63 @@ role 映射和约束属于外部 consumer。它可在自己的构建步骤中读
 
 普通数据路径不需要运行时字符串查找。只读 wiring 放 Flash；必要 context、pool、queue 和 buffer 静态分配。role alias 可编译为直接符号，通用 driver 只在需要窄端口时保留一层函数指针。不要为每个层名建立一层对象或虚调用。
 
-未选中的 controller、SDK source、driver 和 adapter 不编译或不链接进入镜像。适当使用 function/data sections 与链接器 GC；startup/vector/显式 handler 等必要对象的保留规则由 CMake/linker 明确维护，不能依赖 accidental whole-archive。
+### 已实现的静态实例与 typed factory
+
+factory 保留取得 typed 多态接口对象的架构骨架。生成器建立静态对象，
+factory 只返回已存在的身份，不创建、初始化、锁定或重配设备。公开
+`nx_factory_uart(nx_uart_id_t)` 等类型化 getter；ID 是 `uint16_t` 和对应的
+具名常量，越界、COUNT 和未选中类别返回 NULL。ID 只在当前 assembly 内有效，
+不作为持久化格式或跨版本二进制 ABI。
+
+每个公开 face 是只读的 `{ const ops*, void* context }`；32 位目标包含两个
+指针，具体 Flash/RAM 成本由实际链接产物审核。每个 provider/mode 共享一张
+`const ops`，可变状态和容量精确的数组独立拥有。方法接收实际 context，
+不会把共享 ops 对象当作实例。IRQ 静态进入具体 provider，不要求逐字节经过
+虚调用。Native 多实例同样生成独立状态，单例只保留为明确的测试 fixture。
+
+| 对象 | 已实现的静态生成责任 |
+|---|---|
+| controller port | 独占控制器的一份必要状态和一个只读公共 face |
+| GPIO view | 独立授权 mask 和方向；共享 GPIO 基座的不同 pin 分别校验 |
+| bus endpoint | SPI CS 或 I2C 地址各自拥有 face 和私有配置，不借第一项设备身份 |
+| mode storage | 只分配所选 UART/EXTI profile、容量和显式 Native register model |
+| typed factory | 纯静态 switch；无注册、字符串查找、heap、hidden worker |
+| ops | 同 provider/mode 共享只读表；不同实现保持相同公共接口布局 |
+| IRQ wiring | 固定实例直接分发；真实共享 EXTI 使用有界静态 dispatcher |
+| startup | 显式串行调用与逆序清理，BUSY 保留进度和所有被借用的存储 |
+| component | 外部 composition 提供存储、窄端口和调度，不自动生成业务实例 |
+
+`nx_binding_<bus>` 和 `nx_factory_spi/i2c` 都返回真实 controller port；
+`nx_device_<child>` 和 `nx_factory_spi_device/i2c_device` 返回具体 endpoint。
+公共 I2C recovery 因此始终可取得 bus 身份。应用不能再把 bus alias 当作
+第一项 endpoint。poll 与 async mode 的资源和能力分别实现，不由 getter
+隐式改变。
+
+装配写 TOML schema 2；`authored.py` 的同一字段模型提供严格解析和 editor
+schema。冻结的 `ControllerIR/EndpointIR/MemoryBudgetIR/ConfigurationIR`
+直接供 emitter 使用，`resolved.json` 是这个决策的序列化。
+`configure.py init/list-bindings/check/explain/generate` 均使用同一解析器。
+CMake 从 resolver 的 input paths 加入精确重配置依赖，不重解析 TOML。
+
+STM32 USART1 `dma-tx` 使用固定 DMA2 stream7 channel4，RX 保持独立 IRQ ring。
+DMA 可达域与动态指针校验、memory-engine detach、UART TC wire drain 分别验证；
+不能把 NDTR=0 当作串口完成。不同 selector 对同一个 physical stream 仍冲突。
+其它硬件 DMA/stream 模式只按各自代码、模型、链接和物理证据声明支持。
+
+得到静态 face 不改变启动状态，也不授予并发执行权。取消、timeout、stop 和
+restart 都不能提前撤销请求 borrow；仅 acquire-observed SETTLED 允许回收。
+共享路径由显式 owner 执行者推进，产品拥有任务与 recovery policy。
+
+源码 SDK 包含公共接口、严格配置工具和精确依赖身份。代码/注释保持当前格式；
+行为改动使用先失败后实现的 TDD，主机 GoogleTest/GoogleMock 与生产 C11 驱动
+分开链接。源码 SDK 的普通固件不包含测试框架。
 
 ## 7. 新 Board 接入流程
 
 1. 收集精确 MCU、PCB/document revision、原理图/BOM来源、晶振、电源、SWD、连接器、跳线和默认电平。未知的实际 PCB revision 保持 null。
 2. 确认 SoC 已有维护实现，选择最小资源，例如 LED 加一条 UART。逐条核对 route，不默认覆盖全部连接器。
 3. 编写 `board.json`、README；特殊电源/复位动作才增加中性 Board hook。标明已复核来源与未执行的物理项。
-4. 在外部仓库创建 `assembly.json` 和显式 main，先选择裸机，再构建实际 ARM ELF/map/BIN。检查资源计划、时钟、内存、ABI、vector 和 handler。
+4. 在外部仓库创建 `assembly.toml` 和显式 main，先选择裸机，再构建实际 ARM ELF/map/BIN。检查资源计划、时钟、内存、ABI、vector 和 handler。
 5. 为同一资源创建 FreeRTOS assembly，检查 port、timebase、IRQ priority 和静态预算；两个 backend 使用独立 build root。
 6. 在支持矩阵记录精确 tuple 和实际软件证据。没有接实板时，物理初始化、电气、IRQ/DMA 与长期运行全部保持未执行。
 
@@ -229,7 +276,7 @@ RS485 特别需要 Board/外部 wiring 说明收发器、电平、DE/RE、隔离
 nexus-examples/<application>/
   CMakeLists.txt
   CMakePresets.json
-  assembly.json
+  assembly.toml
   dependencies.lock.json
   main.c
   ...                      # 产品自己的 role、worker、layout 和策略

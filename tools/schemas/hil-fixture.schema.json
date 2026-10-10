@@ -32,7 +32,8 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 128
-      }
+      },
+      "uniqueItems": true
     },
     "serial": {
       "type": "object",
@@ -83,7 +84,35 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "type": "object"
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "fixture",
+          "budget",
+          "unit"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          },
+          "fixture": {
+            "type": "string",
+            "minLength": 1
+          },
+          "budget": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "unit": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          }
+        }
       }
     }
   },

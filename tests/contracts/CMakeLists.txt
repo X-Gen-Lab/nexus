@@ -84,3 +84,6 @@ foreach(scenario watchdog-late-failure watchdog-hardware-enabled)
     add_test(NAME contract_gd32_${scenario} COMMAND contract_gd32_io ${scenario})
     set_tests_properties(contract_gd32_${scenario} PROPERTIES TIMEOUT 30)
 endforeach()
+
+# New behavioral contracts use one pinned host-only GoogleTest/GoogleMock layer.
+add_subdirectory("${NEXUS_SOURCE_DIR}/tests/google" google)

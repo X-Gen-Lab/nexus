@@ -11,6 +11,32 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "cmake/package"))
 import verify_consumers as consumer_gate
+import package_source_sdk as source_sdk
+
+
+class SourceSDKSelectionTests(unittest.TestCase):
+    def test_test_framework_payload_is_not_a_firmware_sdk_dependency(self):
+        for name in ("dependencies/source/googletest-1.16.0.tar.gz",
+                     "dependencies/source/googletest-LICENSE.txt",
+                     "tests/contracts/factory_test.cpp"):
+            with self.subTest(name=name):
+                self.assertFalse(source_sdk.selected(name))
+        self.assertTrue(source_sdk.selected("dependencies/googletest.lock.json"))
+        self.assertTrue(source_sdk.selected("io/include/nexus/io/factory.h"))
+        self.assertTrue(source_sdk.selected("tools/configure/assemblies/native.toml"))
+
+    def test_consumer_uses_authored_toml_for_each_maintained_family(self):
+        with tempfile.TemporaryDirectory(prefix="SDK consumer inputs ") as value:
+            directory = Path(value)
+            for name, arm, chip in (("native", False, "native"),
+                                    ("stm32", True, "stm32"),
+                                    ("gd32", True, "gd32")):
+                _, _, command = consumer_gate.prepare_consumer(
+                    directory / "prefix", directory, name,
+                    lambda arguments: None, arm=arm, chip=chip)
+                assembly = next(argument for argument in command
+                                if argument.startswith("-DNEXUS_ASSEMBLY_FILE="))
+                self.assertTrue(assembly.endswith(".toml"), assembly)
 
 
 class SourceSDKTests(unittest.TestCase):

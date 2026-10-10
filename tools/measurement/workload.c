@@ -33,9 +33,9 @@ int main(void) {
         return 4;
     }
 #if defined(NEXUS_UART1_SELECTED)
-    nx_uart_port_t* uart = nx_binding_uart1;
+    const nx_uart_port_t* uart = nx_binding_uart1;
 #else
-    nx_uart_port_t* uart = nx_binding_uart0;
+    const nx_uart_port_t* uart = nx_binding_uart0;
 #endif
     if (nx_uart_port_submit(uart, &request) != NX_SUCCESS) {
         return 5;
@@ -48,7 +48,7 @@ int main(void) {
     uint8_t rx = 0u;
     nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 100000u);
     size_t transferred = 0u;
-    if (nx_spi_endpoint_transfer(nx_binding_spi0, &tx, &rx, 1u, deadline,
+    if (nx_spi_endpoint_transfer(nx_device_nor0, &tx, &rx, 1u, deadline,
                                  &transferred) != NX_SUCCESS) {
         return 7;
     }

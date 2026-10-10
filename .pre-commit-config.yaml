@@ -16,3 +16,11 @@ repos:
         entry: python scripts/ci/check_commit_message.py
         language: python
         stages: [commit-msg]
+      - id: nexus-tdd-gate
+        name: Nexus GoogleTest and GoogleMock contract execution
+        entry: python scripts/ci/tdd_gate.py --staged
+        language: python
+        stages: [pre-commit]
+        pass_filenames: true
+        always_run: true
+        require_serial: true

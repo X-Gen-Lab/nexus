@@ -27,7 +27,7 @@ typedef struct {
  *                  worker or pool. Never pass inner to application observers.
  */
 typedef struct {
-    nx_uart_port_t* port;
+    const nx_uart_port_t* port;
     nx_uart_tx_request_t inner;
     bool pending;
 } nx_uart_owner_executor_t;
@@ -51,7 +51,7 @@ typedef struct {
  */
 nx_owner_executor_port_t
 nx_uart_owner_executor_port(nx_uart_owner_executor_t* executor,
-                            nx_uart_port_t* uart);
+                            const nx_uart_port_t* uart);
 
 #ifdef __cplusplus
 }

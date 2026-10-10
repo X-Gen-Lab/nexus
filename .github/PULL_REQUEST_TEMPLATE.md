@@ -24,6 +24,22 @@ Include the commands actually run and report paths. Distinguish development buil
 clean software qualification and physical HIL. Workflow definitions and hashes
 alone are not execution evidence.
 
+## TDD record
+
+New or changed behavior and defect fixes define the contract with a failing test
+before implementation. Record actual commands and raw logs:
+
+| Step | Test identity, command, expected failure reason and raw result |
+|---|---|
+| RED before implementation | |
+| GREEN after the smallest correct implementation | |
+| Regression after refactoring | |
+
+Explain why RED failed for the required missing behavior. Migrating historical
+tests or preserving existing behavior does not justify manufacturing a failure
+or claiming a historical RED run. The gate verifies current execution; it cannot
+automatically prove the order of earlier development work.
+
 ## Review and delivery
 
 - [ ] Changed files pass existing format and backslash Doxygen rules.

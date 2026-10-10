@@ -33,7 +33,7 @@ CONTROL_FILES = {
 SOURCE_SUFFIXES = {".c", ".h", ".cpp", ".hpp", ".cc", ".hh", ".inc"}
 TEXT_SUFFIXES = SOURCE_SUFFIXES | {
     ".py", ".cmake", ".txt", ".rst", ".json", ".yml", ".yaml",
-    ".sh", ".ps1", ".bat", ".md", ".cfg", ".ini",
+    ".sh", ".ps1", ".bat", ".md", ".cfg", ".ini", ".toml",
 }
 
 

@@ -26,7 +26,7 @@ Move the complete prefix, then consume it from an independent project:
 ```cmake
 cmake_minimum_required(VERSION 3.31)
 project(my_device LANGUAGES C ASM)
-set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.json")
+set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)
 nexus_add_firmware(my_device SOURCES main.c)
 ```
@@ -48,8 +48,13 @@ Native models use a host compiler and omit the ARM toolchain argument.
 or OS targets expose their own includes and dependencies. `nexus_add_firmware`
 links explicit sources, selected components, startup, generated bindings and the
 resolved linker input. It does not create `main`, tasks or a scheduler. Consumers
-start hardware with `nx_platform_start`; generated `nx_binding_<id>` and
-`nx_device_<id>` symbols are fixed typed aliases. Backend and application startup
+start hardware with `nx_platform_start`. Generated `nexus_factory.h` supplies
+compact typed IDs and pure static getters such as
+`nx_factory_gpio(NX_GPIO_ID_LED0)`. A getter neither initializes hardware nor
+allocates memory. The returned readonly face dispatches through one shared
+provider operations table to its own mutable context. Generated
+`nx_binding_<id>` and `nx_device_<id>` symbols remain fixed typed aliases.
+Backend and application startup
 order remains explicit in consumer code.
 
 Every MCU firmware produces ELF, BIN, map and a checked resource report. The ELF
@@ -80,3 +85,11 @@ An old owned verification directory is invalidated before a new attempt.
 The package includes the repository formatter and comment-policy files. Git
 commit hooks and whole-checkout lint workflows remain repository maintenance
 tools; they are not installed into the consumer's Git repository by `find_package`.
+
+The source SDK includes authored TOML readers, typed resolution and factory
+generation, maintained default assemblies and dependency provenance locks.
+GoogleTest/GoogleMock source archives, licenses and contract binaries belong to
+host repository development and are excluded from the firmware SDK payload.
+Configuring a firmware consumer never downloads a test dependency. A consumer
+that needs platform development tests uses the complete repository checkout;
+the installed source SDK explicitly excludes those contract targets.

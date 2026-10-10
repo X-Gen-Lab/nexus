@@ -41,9 +41,14 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "dma-tx",
+        "irq-blocks"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "dma": [
+        "DMA1:stream7:channel4"
+      ]
     },
     {
       "id": "spi4-pf6-pf9",
@@ -75,9 +80,14 @@
         }
       ],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma-full-duplex"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "dma": [
+        "DMA1:stream4:channel2",
+        "DMA1:stream3:channel2"
+      ]
     },
     {
       "id": "i2c0-pb6-pb7",
@@ -156,9 +166,18 @@
         }
       ],
       "modes": [
-        "single-shot"
+        "single-shot",
+        "trigger-dma"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "dma": [
+        "DMA1:stream0:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIMER2"
+        ]
+      }
     },
     {
       "id": "physical-flash",
@@ -206,7 +225,132 @@
         }
       ],
       "modes": [
-        "low-rate-scan"
+        "low-rate-scan",
+        "trigger-dma"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "dma": [
+        "DMA1:stream0:channel0"
+      ],
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIMER2"
+        ]
+      }
+    },
+    {
+      "id": "usart1-pa2-pa3",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "USART1",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA3",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-byte-event",
+        "irq-blocks"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "spi0-pa5-pa7",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "SPI0",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PA6",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PA7",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "i2c1-pb10-pb11",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB10",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB11",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "gpiob0",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "gpiob1",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
     }

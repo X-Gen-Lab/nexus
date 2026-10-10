@@ -25,3 +25,17 @@ responsibility. Reject unsupported modes and unknown routes.
 Silicon fixtures demonstrate software construction; they do not establish PCB
 connector or electrical qualification. State remaining unknowns and the precise
 supported tuple.
+
+## Actual TDD sequence
+
+For new controller, provider or configuration behavior, record the test first:
+
+| Step | Actual command, test identity, failure reason and raw log |
+|---|---|
+| RED before implementation | |
+| GREEN after implementation | |
+| Regression after refactoring | |
+
+A missing API may initially fail to compile; the finished provider must execute
+the behavior and meaningful failure paths. Historical test migration has no
+invented RED record. Current passing reports do not prove historical test order.

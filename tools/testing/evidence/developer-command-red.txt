@@ -1,0 +1,50 @@
+FFF.
+======================================================================
+FAIL: test_check_runs_tdd_for_requested_preset_and_propagates_failure (tools.testing.test_dev.DeveloperCommandTests.test_check_runs_tdd_for_requested_preset_and_propagates_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dev.py", line 17, in test_check_runs_tdd_for_requested_preset_and_propagates_failure
+    self.assertEqual(execute.call_args_list[1].args[0],
+AssertionError: Lists differ: ['/wo[29 chars]n', '-m', 'unittest', 'discover', '-s', 'tools[26 chars].py'] != ['/wo[29 chars]n', 'scripts/ci/tdd_gate.py', '--all', '--pres[17 chars]ase']
+
+First differing element 1:
+'-m'
+'scripts/ci/tdd_gate.py'
+
+First list contains 3 additional elements.
+First extra element 5:
+'tools/configure'
+
+  ['/workspace/nexus/.venv/bin/python',
++  'scripts/ci/tdd_gate.py',
++  '--all',
++  '--preset',
++  'native-release']
+-  '-m',
+-  'unittest',
+-  'discover',
+-  '-s',
+-  'tools/configure',
+-  '-p',
+-  'test_*.py']
+
+======================================================================
+FAIL: test_doctor_rejects_python_without_stdlib_toml (tools.testing.test_dev.DeveloperCommandTests.test_doctor_rejects_python_without_stdlib_toml)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dev.py", line 42, in test_doctor_rejects_python_without_stdlib_toml
+    self.assertEqual(result, 2)
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_doctor_reports_python_and_locked_tool_versions (tools.testing.test_dev.DeveloperCommandTests.test_doctor_reports_python_and_locked_tool_versions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dev.py", line 50, in test_doctor_reports_python_and_locked_tool_versions
+    self.assertIn("Python:", output.getvalue())
+AssertionError: 'Python:' not found in 'cmake version 3.31.6\n1.13.2\ngcc: 14.2.0 (/usr/bin/gcc)\narm-none-eabi-gcc: unavailable; its target cannot be configured\n'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.012s
+
+FAILED (failures=3)

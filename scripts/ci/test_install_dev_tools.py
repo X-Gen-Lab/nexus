@@ -29,7 +29,7 @@ class InstallDevToolsTests(unittest.TestCase):
         self.lock.write_text("# Tool pins\npre-commit==5.2.1\nclang-format==19.3.2\n", encoding="utf-8")
         self.installed = dict(self.pins)
         self.hooks_path = None
-        self.python_version = [3, 10, 1]
+        self.python_version = [3, 11, 1]
         self.prefix = self.root / ".venv"
         self.formatter_version = self.pins["clang-format"]
         self.pre_commit_version = self.pins["pre-commit"]
@@ -180,8 +180,20 @@ class InstallDevToolsTests(unittest.TestCase):
         self.python_version = [3, 9, 20]
         result, created, _, error = self.invoke(["--skip-hooks"])
         self.assertEqual((result, created), (1, 0))
-        self.assertIn("Python >=3.10", error)
+        self.assertIn("Python >=3.11", error)
         self.assertFalse(any("pip" in call for call in self.calls))
+
+    def test_python_without_stdlib_toml_is_rejected_before_install(self):
+        self.python_version = [3, 10, 14]
+        result, _, _, _ = self.invoke(["--skip-hooks"])
+        self.assertEqual(result, 1)
+        self.assertFalse(any("pip" in call for call in self.calls))
+
+    def test_host_python_without_stdlib_toml_is_rejected_before_commands(self):
+        with patch.object(INSTALLER.sys, "version_info", (3, 10, 14)):
+            result, _, _, _ = self.invoke(["--skip-hooks"])
+        self.assertEqual(result, 1)
+        self.assertEqual(self.calls, [])
 
     def test_wrong_python_prefix_is_rejected(self):
         self.prefix = self.root / "some-other-venv"
@@ -223,7 +235,7 @@ class InstallDevToolsTests(unittest.TestCase):
         with patch.object(INSTALLER.sys, "version_info", (3, 9, 20)):
             result, created, _, error = self.invoke(["--skip-hooks"])
         self.assertEqual((result, created), (1, 0))
-        self.assertIn("Python >=3.10", error)
+        self.assertIn("Python >=3.11", error)
         self.assertEqual(self.calls, [])
 
 

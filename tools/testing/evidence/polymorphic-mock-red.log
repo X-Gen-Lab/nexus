@@ -1,0 +1,52 @@
+tests/google/polymorphic_mock_test.cpp:41:7: error: ‘nx_gpio_ops_t’ does not name a type; did you mean ‘nx_gpio_port_t’?
+   41 | const nx_gpio_ops_t operations = {write, read, toggle};
+      |       ^~~~~~~~~~~~~
+      |       nx_gpio_port_t
+tests/google/polymorphic_mock_test.cpp: In member function ‘virtual void {anonymous}::PolymorphicGPIO_SharedOperationsKeepIndependentInstanceContext_Test::TestBody()’:
+tests/google/polymorphic_mock_test.cpp:46:26: error: variable ‘const nx_gpio_port_t first_port’ has initializer but incomplete type
+   46 |     const nx_gpio_port_t first_port = {&operations, &first};
+      |                          ^~~~~~~~~~
+tests/google/polymorphic_mock_test.cpp:46:41: error: ‘operations’ was not declared in this scope; did you mean ‘operator=’?
+   46 |     const nx_gpio_port_t first_port = {&operations, &first};
+      |                                         ^~~~~~~~~~
+      |                                         operator=
+tests/google/polymorphic_mock_test.cpp:47:26: error: variable ‘const nx_gpio_port_t second_port’ has initializer but incomplete type
+   47 |     const nx_gpio_port_t second_port = {&operations, &second};
+      |                          ^~~~~~~~~~~
+tests/google/polymorphic_mock_test.cpp: In member function ‘virtual void {anonymous}::PolymorphicGPIO_ConstFaceDispatchesReadAndToggle_Test::TestBody()’:
+tests/google/polymorphic_mock_test.cpp:57:26: error: variable ‘const nx_gpio_port_t port’ has initializer but incomplete type
+   57 |     const nx_gpio_port_t port = {&operations, &provider};
+      |                          ^~~~
+tests/google/polymorphic_mock_test.cpp:57:35: error: ‘operations’ was not declared in this scope; did you mean ‘operator=’?
+   57 |     const nx_gpio_port_t port = {&operations, &provider};
+      |                                   ^~~~~~~~~~
+      |                                   operator=
+tests/google/polymorphic_mock_test.cpp: In member function ‘virtual void {anonymous}::PolymorphicGPIO_DifferentProviderTablesCoexistInOneImage_Test::TestBody()’:
+tests/google/polymorphic_mock_test.cpp:71:11: error: ‘nx_gpio_ops_t’ does not name a type; did you mean ‘nx_gpio_port_t’?
+   71 |     const nx_gpio_ops_t write_only = {write, nullptr, nullptr};
+      |           ^~~~~~~~~~~~~
+      |           nx_gpio_port_t
+tests/google/polymorphic_mock_test.cpp:72:26: error: variable ‘const nx_gpio_port_t first_port’ has initializer but incomplete type
+   72 |     const nx_gpio_port_t first_port = {&operations, &first};
+      |                          ^~~~~~~~~~
+tests/google/polymorphic_mock_test.cpp:72:41: error: ‘operations’ was not declared in this scope; did you mean ‘operator=’?
+   72 |     const nx_gpio_port_t first_port = {&operations, &first};
+      |                                         ^~~~~~~~~~
+      |                                         operator=
+tests/google/polymorphic_mock_test.cpp:73:26: error: variable ‘const nx_gpio_port_t second_port’ has initializer but incomplete type
+   73 |     const nx_gpio_port_t second_port = {&write_only, &second};
+      |                          ^~~~~~~~~~~
+tests/google/polymorphic_mock_test.cpp:73:42: error: ‘write_only’ was not declared in this scope
+   73 |     const nx_gpio_port_t second_port = {&write_only, &second};
+      |                                          ^~~~~~~~~~
+tests/google/polymorphic_mock_test.cpp: In member function ‘virtual void {anonymous}::PolymorphicGPIO_InvalidFacesRejectBeforeProviderAccess_Test::TestBody()’:
+tests/google/polymorphic_mock_test.cpp:83:26: error: variable ‘const nx_gpio_port_t no_ops’ has initializer but incomplete type
+   83 |     const nx_gpio_port_t no_ops = {nullptr, &provider};
+      |                          ^~~~~~
+tests/google/polymorphic_mock_test.cpp:84:26: error: variable ‘const nx_gpio_port_t no_context’ has initializer but incomplete type
+   84 |     const nx_gpio_port_t no_context = {&operations, nullptr};
+      |                          ^~~~~~~~~~
+tests/google/polymorphic_mock_test.cpp:84:41: error: ‘operations’ was not declared in this scope; did you mean ‘operator=’?
+   84 |     const nx_gpio_port_t no_context = {&operations, nullptr};
+      |                                         ^~~~~~~~~~
+      |                                         operator=

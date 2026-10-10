@@ -1,0 +1,14 @@
+Hardware asynchronous contracts, RED stage, 2026-10-10 UTC
+
+Tests were authored before the DMA, block-stream and IRQ-wake API headers or
+implementations existed. Command:
+
+g++ -std=c++17 -Iio/include -Icore/include -c tests/google/dma_test.cpp
+
+Observed failure (actual exit status 1):
+tests/google/dma_test.cpp:9:10: fatal error: nexus/io/dma.h: No such file or directory
+
+The tests specify domain crossing/overflow rejection, selector/resource conflicts,
+independent wire-drain facts, borrowed-block retention, stale token rejection,
+observable overflow and kernel-safe IRQ notification. This RED compilation is
+development evidence, not physical qualification or proof of all future changes.

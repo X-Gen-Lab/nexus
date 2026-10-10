@@ -13,7 +13,7 @@
 #endif
 
 /** \brief Apply only the reviewed 42 MHz / 100 kHz standard-mode profile. */
-nx_result_t nx_stm32_i2c_initialize(nx_i2c_port_t* port) {
+nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     if (port == NULL || port->registers == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -33,7 +33,7 @@ nx_result_t nx_stm32_i2c_initialize(nx_i2c_port_t* port) {
 }
 
 /** \brief Observe real status flags and retain the original hardware error. */
-static nx_result_t wait_flag(nx_i2c_port_t* port, uint32_t mask,
+static nx_result_t wait_flag(nx_stm32_i2c_state_t* port, uint32_t mask,
                              nx_time_us_t deadline) {
     for (;;) {
         NX_STM32_IO_POLL(2U, port);
@@ -62,21 +62,21 @@ static nx_result_t wait_flag(nx_i2c_port_t* port, uint32_t mask,
 }
 
 /** \brief Clear ADDR with the RM0090 prescribed SR1/SR2 read sequence. */
-static void clear_address(nx_i2c_port_t* port) {
+static void clear_address(nx_stm32_i2c_state_t* port) {
     (void)port->registers->SR1;
     (void)port->registers->SR2;
 }
 
 /** \brief Request STOP or the next repeated START at the final receive window.
  */
-static void end_receive(nx_i2c_port_t* port, bool last) {
+static void end_receive(nx_stm32_i2c_state_t* port, bool last) {
     port->registers->CR1 |= last ? I2C_CR1_STOP : I2C_CR1_START;
 }
 
 /** \brief Read with explicit one/two/final-three byte ACK timing. */
-static nx_result_t receive(nx_i2c_port_t* port, nx_i2c_message_t* message,
-                           bool last, nx_time_us_t deadline,
-                           size_t* transferred) {
+static nx_result_t receive(nx_stm32_i2c_state_t* port,
+                           nx_i2c_message_t* message, bool last,
+                           nx_time_us_t deadline, size_t* transferred) {
     I2C_TypeDef* regs = port->registers;
     size_t remaining = message->length;
     size_t index = 0U;
@@ -145,7 +145,7 @@ static nx_result_t receive(nx_i2c_port_t* port, nx_i2c_message_t* message,
 
 /** \brief Bound STOP observation; reset local controller if the bus stays hung.
  */
-static bool drain_stop(nx_i2c_port_t* port) {
+static bool drain_stop(nx_stm32_i2c_state_t* port) {
     nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 1000U);
     while ((port->registers->CR1 & I2C_CR1_STOP) != 0U ||
            (port->registers->SR2 & I2C_SR2_MSL) != 0U) {
@@ -163,10 +163,12 @@ static bool drain_stop(nx_i2c_port_t* port) {
 
 /** \brief Execute a fixed-address, explicitly bounded repeated-START sequence.
  */
-nx_result_t nx_i2c_endpoint_transaction(const nx_i2c_endpoint_t* endpoint,
-                                        nx_i2c_message_t* messages,
-                                        size_t count, nx_time_us_t deadline,
-                                        size_t* transferred) {
+nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
+                                              nx_i2c_message_t* messages,
+                                              size_t count,
+                                              nx_time_us_t deadline,
+                                              size_t* transferred) {
+    const nx_stm32_i2c_endpoint_state_t* endpoint = context;
     if (endpoint == NULL || endpoint->port == NULL ||
         endpoint->address > 0x7FU || messages == NULL || count == 0U ||
         transferred == NULL) {
@@ -184,7 +186,7 @@ nx_result_t nx_i2c_endpoint_transaction(const nx_i2c_endpoint_t* endpoint,
             return NX_ERROR_UNSUPPORTED;
         }
     }
-    nx_i2c_port_t* port = endpoint->port;
+    nx_stm32_i2c_state_t* port = endpoint->port;
     if (port->registers == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -255,7 +257,8 @@ nx_result_t nx_i2c_endpoint_transaction(const nx_i2c_endpoint_t* endpoint,
 
 /** \brief Reset only local controller; externally stuck SDA remains an error.
  */
-nx_result_t nx_i2c_port_recover(nx_i2c_port_t* port) {
+nx_result_t nx_stm32_i2c_recover(void* context) {
+    nx_stm32_i2c_state_t* port = context;
     if (port == NULL || port->registers == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -279,3 +282,13 @@ nx_result_t nx_i2c_port_recover(nx_i2c_port_t* port) {
     }
     return result;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_i2c_ops_t nx_stm32_i2c_ops = {
+    .recover = nx_stm32_i2c_recover,
+};
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_i2c_endpoint_ops_t nx_stm32_i2c_endpoint_ops = {
+    .transaction = nx_stm32_i2c_endpoint_transaction,
+};

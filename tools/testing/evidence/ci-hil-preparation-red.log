@@ -1,0 +1,14 @@
+test_each_arm_link_retains_an_unbound_hil_work_plan (__main__.WorkflowContracts.test_each_arm_link_retains_an_unbound_hil_work_plan) ... FAIL
+
+======================================================================
+FAIL: test_each_arm_link_retains_an_unbound_hil_work_plan (__main__.WorkflowContracts.test_each_arm_link_retains_an_unbound_hil_work_plan)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 85, in test_each_arm_link_retains_an_unbound_hil_work_plan
+    self.assertIn('tools/hil/prepare.py', commands)
+AssertionError: 'tools/hil/prepare.py' not found in '\n\n.venv/bin/python tools/dev/dev.py configure --preset "${{ matrix.preset }}"\n.venv/bin/python tools/dev/dev.py build --preset "${{ matrix.preset }}" --parallel 4 --target nexus_firmware nexus_bus_owner nexus_spi_owner nexus_uart_owner nexus_bmp280 nexus_bmp280_spi nexus_log nexus_storage nexus_flash_storage nexus_modbus\n.venv/bin/python tools/measurement/resources.py --elf build/${{ matrix.preset }}/bin/nexus_firmware.elf --resolved build/${{ matrix.preset }}/generated/resolved.json --budget build/${{ matrix.preset }}/generated/resource-budget.json --report build/${{ matrix.preset }}/resource-report.json\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+FAILED (failures=1)

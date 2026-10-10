@@ -1,0 +1,37 @@
+Running main() from gmock_main.cc
+Note: Google Test filter = Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from Stm32UartDma
+[ RUN      ] Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:133: Failure
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 4
+  NX_REQUEST_DRAINING
+    Which is: 3
+
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:136: Failure
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 4
+  NX_REQUEST_QUARANTINED
+    Which is: 5
+
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:137: Failure
+Expected equality of these values:
+  state.uart.active
+    Which is: NULL
+  &request
+    Which is: 0x55dbe2527c78
+
+[  FAILED  ] Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable (0 ms)
+[----------] 1 test from Stm32UartDma (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable
+
+ 1 FAILED TEST

@@ -45,6 +45,10 @@ jobs:
           .venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message
           .venv/bin/python -m unittest discover -s scripts/ci -p 'test_quality_tools.py'
           .venv/bin/python .github/workflows/test_platform_ci.py
+      - name: Execute Google report admission and station preparation boundaries
+        run: |
+          .venv/bin/python -B -m unittest discover -s tools/testing -p 'test_*.py' -v
+          .venv/bin/python -B -m tools.hil.prepare --help
       - name: Preserve executed tool evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

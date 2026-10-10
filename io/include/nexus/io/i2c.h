@@ -24,6 +24,49 @@ typedef struct {
     size_t length;
     bool read;
 } nx_i2c_message_t;
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    nx_result_t (*recover)(void* context);
+} nx_i2c_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_i2c_port {
+    const nx_i2c_ops_t* ops;
+    void* context;
+};
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    nx_result_t (*transaction)(void* context, nx_i2c_message_t* messages,
+                               size_t count, nx_time_us_t deadline,
+                               size_t* transferred);
+} nx_i2c_endpoint_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_i2c_endpoint {
+    const nx_i2c_endpoint_ops_t* ops;
+    void* context;
+};
+
 /**
  * \brief           Execute a polling 7-bit-address message transaction.
  *
@@ -55,7 +98,7 @@ nx_result_t nx_i2c_endpoint_transaction(const nx_i2c_endpoint_t* endpoint,
  * \return          Success only when hardware bus idle is observed; otherwise
  *                  BUSY/IO/UNSUPPORTED. Does not replay a failed transaction.
  */
-nx_result_t nx_i2c_port_recover(nx_i2c_port_t* port);
+nx_result_t nx_i2c_port_recover(const nx_i2c_port_t* port);
 #ifdef __cplusplus
 }
 #endif

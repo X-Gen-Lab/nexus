@@ -1,0 +1,50 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/native-debug/generated/resolved.json
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus/build/native-debug
+[1/25] Building C object io/CMakeFiles/nexus_io.dir/src/exti.c.o
+[2/25] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[3/25] Building C object io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[4/25] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[5/25] Building C object io/CMakeFiles/nexus_io.dir/src/wake.c.o
+[6/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[7/25] Building C object io/CMakeFiles/nexus_io.dir/src/dma.c.o
+[8/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[9/25] Building C object io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[10/25] Linking C static library lib/libnexus_io.a
+[11/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[12/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[13/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[14/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[15/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[16/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[17/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[18/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[19/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[20/25] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[21/25] Linking C static library lib/libnexus_io_native.a
+[22/25] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[23/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o
+[24/25] Linking CXX executable bin/nexus_stm32_uart_stream_test
+FAILED: [code=1] bin/nexus_stm32_uart_stream_test 
+: && /usr/bin/c++ -g -Wl,--dependency-file=tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/link.d tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/__/__/soc/stm32f407/drivers/uart.c.o -o bin/nexus_stm32_uart_stream_test  lib/libgmock_main.a  lib/libnexus_io_native.a  lib/libnexus_arch.a  lib/libgmock.a  lib/libgtest.a  lib/libnexus_io.a  lib/libnexus_arch.a  lib/libnexus_core.a && :
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o: warning: relocation against `nx_stm32_uart_stream_ops' in read-only section `.text._ZN73Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test8TestBodyEv'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o: in function `Stm32UartStream_DroppedReceptionProducesLossAtTheNextUsefulBlock_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_uart_stream_test.cpp:64:(.text._ZN69Stm32UartStream_DroppedReceptionProducesLossAtTheNextUsefulBlock_Test8TestBodyEv+0x93): undefined reference to `nx_stm32_uart_stream_ops'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:71:(.text._ZN69Stm32UartStream_DroppedReceptionProducesLossAtTheNextUsefulBlock_Test8TestBodyEv+0x1a5): undefined reference to `nx_stm32_uart_stream_initialize'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:75:(.text._ZN69Stm32UartStream_DroppedReceptionProducesLossAtTheNextUsefulBlock_Test8TestBodyEv+0x2e2): undefined reference to `nx_stm32_uart_stream_irq'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:80:(.text._ZN69Stm32UartStream_DroppedReceptionProducesLossAtTheNextUsefulBlock_Test8TestBodyEv+0x3a7): undefined reference to `nx_stm32_uart_stream_irq'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:84:(.text._ZN69Stm32UartStream_DroppedReceptionProducesLossAtTheNextUsefulBlock_Test8TestBodyEv+0x475): undefined reference to `nx_stm32_uart_stream_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o: in function `Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_uart_stream_test.cpp:27:(.text._ZN73Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test8TestBodyEv+0x93): undefined reference to `nx_stm32_uart_stream_ops'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:34:(.text._ZN73Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test8TestBodyEv+0x1c1): undefined reference to `nx_stm32_uart_stream_initialize'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:38:(.text._ZN73Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test8TestBodyEv+0x322): undefined reference to `nx_stm32_uart_stream_irq'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:40:(.text._ZN73Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test8TestBodyEv+0x332): undefined reference to `nx_stm32_uart_stream_irq'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_stream_test.cpp:48:(.text._ZN73Stm32UartStream_IdlePublishesPartialAndBackpressureKeepsConsumerLoan_Test8TestBodyEv+0x600): undefined reference to `nx_stm32_uart_stream_irq'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

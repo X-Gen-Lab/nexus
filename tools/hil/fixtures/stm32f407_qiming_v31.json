@@ -83,6 +83,36 @@
       "fixture": "calibrated reference/input source; count/accuracy/sample rate/timeout",
       "budget": null,
       "unit": "counts"
+    },
+    {
+      "id": "irq_executor_wake",
+      "fixture": "reviewed IRQ priority and OS ceiling; IRQ-to-executor capture, arm/recheck and worst-load latency",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "uart_rx_block",
+      "fixture": "reviewed UART RX/IDLE route; wrap, partial block, overflow and stop/drain capture for selected stream mode",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "adc_trigger_block",
+      "fixture": "reviewed ADC input/trigger/DMA route and calibrated source; block ownership, overrun and trigger-stop capture",
+      "budget": null,
+      "unit": "counts"
+    },
+    {
+      "id": "dma_memory_domain",
+      "fixture": "selected DMA routes; SRAM transfer, forbidden CCM/TCM rejection, alignment and drain under cancellation",
+      "budget": null,
+      "unit": "us"
+    },
+    {
+      "id": "multi_controller_isolation",
+      "fixture": "reviewed independent routes; simultaneous load, clock/IRQ/DMA resource isolation and stop/restart",
+      "budget": null,
+      "unit": "us"
     }
   ]
 }

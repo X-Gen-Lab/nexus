@@ -44,12 +44,14 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         '#ifdef NEXUS_EFFECTIVE_CONFIG\n#error SDK leaked into unrelated parent target\n#endif\n'
         'int main(void) { return 0; }\n')
     code = ('#include "nexus_bindings.h"\n'
+            '#include "nexus_factory.h"\n'
             '#include "nexus_config.h"\n'
             '#if __has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
             '#error Vendor SDK leaked into product source\n#endif\n'
             '#if __has_include("stm32f407_provider.h") || __has_include("gd32f470_provider.h")\n'
             '#error Concrete provider leaked into product source\n#endif\n'
             'int main(void) {\n'
+            ' if (nx_factory_gpio(NX_GPIO_ID_COUNT) != 0) return 7;\n'
             ' nx_platform_start_result_t result = nx_platform_start();\n'
             ' if (result.primary != NX_SUCCESS) return 1;\n'
             ' return nx_platform_stop() == NX_SUCCESS ? 0 : 2;\n}\n')
@@ -73,8 +75,8 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         arguments.append("-DNEXUS_BUILD_WORKLOAD=ON")
     if expected_revision:
         arguments.append("-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision)
-    arm_assembly = "liangshan-baremetal.json" if chip == "gd32" else "sky-baremetal.json"
-    assembly = sdk / "tools/configure/assemblies" / (arm_assembly if arm else "native.json")
+    arm_assembly = "liangshan-baremetal.toml" if chip == "gd32" else "sky-baremetal.toml"
+    assembly = sdk / "tools/configure/assemblies" / (arm_assembly if arm else "native.toml")
     arguments.append(f"-DNEXUS_ASSEMBLY_FILE={assembly}")
     if arm:
         arguments.append(f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}")

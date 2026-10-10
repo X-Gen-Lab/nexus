@@ -62,6 +62,11 @@
       "id": "adc_scan",
       "controller": "ADC1",
       "route": "adc1-scan-pa0-pa1"
+    },
+    {
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
     }
   ],
   "reserved_resources": [

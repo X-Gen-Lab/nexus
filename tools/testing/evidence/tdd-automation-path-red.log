@@ -1,0 +1,37 @@
+FFFF
+======================================================================
+FAIL: test_all_automation_paths_require_behavioral_execution (tools.testing.test_google_report.GateBoundaryTests.test_all_automation_paths_require_behavioral_execution) (name='tools/hil/runner.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 88, in test_all_automation_paths_require_behavioral_execution
+    self.assertTrue(relevant(name))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_all_automation_paths_require_behavioral_execution (tools.testing.test_google_report.GateBoundaryTests.test_all_automation_paths_require_behavioral_execution) (name='tools/measurement/resources.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 88, in test_all_automation_paths_require_behavioral_execution
+    self.assertTrue(relevant(name))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_all_automation_paths_require_behavioral_execution (tools.testing.test_google_report.GateBoundaryTests.test_all_automation_paths_require_behavioral_execution) (name='scripts/ci/new_gate.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 88, in test_all_automation_paths_require_behavioral_execution
+    self.assertTrue(relevant(name))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_all_automation_paths_require_behavioral_execution (tools.testing.test_google_report.GateBoundaryTests.test_all_automation_paths_require_behavioral_execution) (name='scripts/setup/new_installer.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 88, in test_all_automation_paths_require_behavioral_execution
+    self.assertTrue(relevant(name))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=4)

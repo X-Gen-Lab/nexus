@@ -28,36 +28,37 @@ int main(void) {
     nx_result_t (*volatile transaction)(const nx_i2c_endpoint_t*,
                                         nx_i2c_message_t*, size_t, nx_time_us_t,
                                         size_t*) = nx_i2c_endpoint_transaction;
-    nx_result_t (*volatile recover)(nx_i2c_port_t*) = nx_i2c_port_recover;
+    nx_result_t (*volatile recover)(const nx_i2c_port_t*) = nx_i2c_port_recover;
     (void)transaction;
     (void)recover;
 #elif defined(NEXUS_FLASH0_SELECTED)
-    nx_result_t (*volatile program)(nx_flash_port_t*, uint32_t, const void*,
-                                    size_t, nx_time_us_t) =
+    nx_result_t (*volatile program)(const nx_flash_port_t*, uint32_t,
+                                    const void*, size_t, nx_time_us_t) =
         nx_flash_port_program;
-    nx_result_t (*volatile erase)(nx_flash_port_t*, uint32_t, size_t,
+    nx_result_t (*volatile erase)(const nx_flash_port_t*, uint32_t, size_t,
                                   nx_time_us_t) = nx_flash_port_erase;
     (void)program;
     (void)erase;
 #elif defined(NEXUS_WATCHDOG0_SELECTED)
-    nx_result_t (*volatile enable)(nx_watchdog_port_t*, uint32_t, bool,
+    nx_result_t (*volatile enable)(const nx_watchdog_port_t*, uint32_t, bool,
                                    nx_watchdog_state_t*) =
         nx_watchdog_port_enable;
-    nx_result_t (*volatile feed)(nx_watchdog_port_t*) = nx_watchdog_port_feed;
+    nx_result_t (*volatile feed)(const nx_watchdog_port_t*) =
+        nx_watchdog_port_feed;
     (void)enable;
     (void)feed;
 #elif defined(NEXUS_EDGE5_SELECTED)
-    nx_result_t (*volatile read)(nx_exti_port_t*, nx_exti_event_t*, size_t,
-                                 size_t*) = nx_exti_port_read;
+    nx_result_t (*volatile read)(const nx_exti_port_t*, nx_exti_event_t*,
+                                 size_t, size_t*) = nx_exti_port_read;
     (void)read;
 #elif defined(NEXUS_PWM0_SELECTED)
-    nx_result_t (*volatile set)(nx_pwm_port_t*, uint32_t, uint32_t) =
+    nx_result_t (*volatile set)(const nx_pwm_port_t*, uint32_t, uint32_t) =
         nx_pwm_port_set;
-    nx_result_t (*volatile start)(nx_pwm_port_t*) = nx_pwm_port_start;
+    nx_result_t (*volatile start)(const nx_pwm_port_t*) = nx_pwm_port_start;
     (void)set;
     (void)start;
 #elif defined(NEXUS_ADC0_SELECTED)
-    nx_result_t (*volatile sample)(nx_adc_port_t*, uint16_t*, size_t,
+    nx_result_t (*volatile sample)(const nx_adc_port_t*, uint16_t*, size_t,
                                    nx_time_us_t, size_t*) = nx_adc_port_sample;
     (void)sample;
 #endif

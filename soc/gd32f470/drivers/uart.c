@@ -11,20 +11,32 @@
 #include "private/system.h"
 #include <string.h>
 
-static nx_uart_port_t* s_uart;
+const nx_gd32_uart_controller_t nx_gd32_usart0_controller = {
+    USART0, 100000000U, RCU_USART0, RCU_USART0RST, USART0_IRQn};
+const nx_gd32_uart_controller_t nx_gd32_usart1_controller = {
+    USART1, 50000000U, RCU_USART1, RCU_USART1RST, USART1_IRQn};
 
 /** \brief           Configure fixed 8N1 without starting a TX request. */
-static void configure(uint32_t baud) {
-    usart_baudrate_set(USART0, baud);
-    USART_CTL0(USART0) = USART_CTL0_UEN | USART_CTL0_TEN | USART_CTL0_REN |
-                         USART_CTL0_RBNEIE | USART_CTL0_PERRIE;
-    USART_CTL1(USART0) = 0u;
-    USART_CTL2(USART0) = USART_CTL2_ERRIE;
+static void configure(nx_gd32_uart_state_t* port, uint32_t baud) {
+    USART_BAUD(port->controller->registers) =
+        (port->controller->clock_hz + baud / 2U) / baud;
+    USART_CTL0(port->controller->registers) =
+        USART_CTL0_UEN | USART_CTL0_TEN | USART_CTL0_REN;
+    USART_CTL1(port->controller->registers) = 0u;
+    USART_CTL2(port->controller->registers) = 0u;
+    if (port->profile != NX_UART_RX_BLOCKS) {
+        USART_CTL0(port->controller->registers) |=
+            USART_CTL0_RBNEIE | USART_CTL0_PERRIE;
+        USART_CTL2(port->controller->registers) = USART_CTL2_ERRIE;
+    }
 }
 
 /** \brief           Record bounded loss without replacing already queued data.
  */
-static void enqueue(nx_uart_port_t* port, nx_uart_rx_event_t event) {
+static void enqueue(nx_gd32_uart_state_t* port, nx_uart_rx_event_t event) {
+    if (port->profile == NX_UART_RX_BLOCKS) {
+        return;
+    }
     if (port->rx_count == port->rx_capacity || port->losses != 0u) {
         if (!port->losses) {
             port->loss_timestamp = event.timestamp_us;
@@ -49,51 +61,78 @@ static void enqueue(nx_uart_port_t* port, nx_uart_rx_event_t event) {
     ++port->rx_count;
 }
 
-/** \brief           Assemble exactly one static USART0 handler binding. */
-nx_result_t nx_gd32_uart_initialize(nx_uart_port_t* port, uint32_t baud,
-                                    nx_uart_rx_profile_t profile, void* storage,
-                                    size_t capacity, unsigned priority) {
-    if (!port || !storage || !capacity || baud < 1526u || baud > 1000000u ||
-        capacity > SIZE_MAX / 2u ||
+/** \brief Initialize one statically selected controller after Board
+ * preparation. */
+nx_result_t
+nx_gd32_uart_initialize_at(nx_gd32_uart_state_t* port,
+                           const nx_gd32_uart_controller_t* controller,
+                           uint32_t baud, nx_uart_rx_profile_t profile,
+                           void* storage, size_t capacity, unsigned priority) {
+    if (port == NULL ||
+        (controller != &nx_gd32_usart0_controller &&
+         controller != &nx_gd32_usart1_controller) ||
+        baud == 0U || baud > 1000000U || capacity > SIZE_MAX / 2U ||
+        priority > 15U ||
+        (profile != NX_UART_RX_BYTES && profile != NX_UART_RX_EVENTS &&
+         profile != NX_UART_RX_BLOCKS) ||
+        (profile == NX_UART_RX_BLOCKS ? (storage != NULL || capacity != 0U)
+                                      : (storage == NULL || capacity == 0U)) ||
         (profile == NX_UART_RX_EVENTS &&
          (capacity > SIZE_MAX / sizeof(nx_uart_rx_event_t) ||
-          (uintptr_t)storage % _Alignof(nx_uart_rx_event_t) != 0u)) ||
-        priority > 15u ||
-        (profile != NX_UART_RX_BYTES && profile != NX_UART_RX_EVENTS)) {
+          (uintptr_t)storage % _Alignof(nx_uart_rx_event_t) != 0U))) {
+        return NX_ERROR_INVALID;
+    }
+    uint32_t divisor = (controller->clock_hz + baud / 2U) / baud;
+    if (divisor == 0U || divisor > UINT16_MAX) {
         return NX_ERROR_INVALID;
     }
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    if (s_uart) {
+    if ((RCU_REG_VAL(controller->clock) &
+         BIT(RCU_BIT_POS(controller->clock))) != 0U) {
         return NX_ERROR_BUSY;
     }
-    *port = (nx_uart_port_t){.rx_storage = storage,
-                             .rx_capacity = capacity,
-                             .baud = baud,
-                             .profile = profile};
+    *port = (nx_gd32_uart_state_t){.controller = controller,
+                                   .rx_storage = storage,
+                                   .rx_capacity = capacity,
+                                   .baud = baud,
+                                   .profile = profile};
+    rcu_periph_clock_enable((rcu_periph_enum)controller->clock);
+    usart_deinit(controller->registers);
+    configure(port, baud);
+    NVIC_ClearPendingIRQ((IRQn_Type)controller->irq);
+    NVIC_SetPriority((IRQn_Type)controller->irq, priority);
+    port->initialized = true;
+    NVIC_EnableIRQ((IRQn_Type)controller->irq);
+    return NX_SUCCESS;
+}
+
+/** \brief Preserve the explicit USART0 fixture while generated boards use _at.
+ */
+nx_result_t nx_gd32_uart_initialize(nx_gd32_uart_state_t* port, uint32_t baud,
+                                    nx_uart_rx_profile_t profile, void* storage,
+                                    size_t capacity, unsigned priority) {
+    nx_result_t result =
+        nx_gd32_uart_initialize_at(port, &nx_gd32_usart0_controller, baud,
+                                   profile, storage, capacity, priority);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
     rcu_periph_clock_enable(RCU_GPIOA);
-    rcu_periph_clock_enable(RCU_USART0);
     gpio_af_set(GPIOA, GPIO_AF_7, GPIO_PIN_9 | GPIO_PIN_10);
     gpio_mode_set(GPIOA, GPIO_MODE_AF, GPIO_PUPD_PULLUP,
                   GPIO_PIN_9 | GPIO_PIN_10);
     gpio_output_options_set(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,
                             GPIO_PIN_9 | GPIO_PIN_10);
-    usart_deinit(USART0);
-    configure(baud);
-    NVIC_ClearPendingIRQ(USART0_IRQn);
-    NVIC_SetPriority(USART0_IRQn, priority);
-    s_uart = port;
-    port->initialized = true;
-    NVIC_EnableIRQ(USART0_IRQn);
     return NX_SUCCESS;
 }
 
 /** \brief           Validate both direct and adapter start without admission.
  */
-static nx_result_t validate(nx_uart_port_t* port,
+static nx_result_t validate(nx_gd32_uart_state_t* port,
                             nx_uart_tx_request_t* request) {
-    if (!port || port != s_uart || !request || !request->data ||
+    if (!port || port->controller == NULL || !request || !request->data ||
         !request->length) {
         return NX_ERROR_INVALID;
     }
@@ -113,18 +152,18 @@ static nx_result_t validate(nx_uart_port_t* port,
 }
 
 /** \brief           Start hardware only after the unique admission succeeds. */
-static void start(nx_uart_port_t* port, nx_uart_tx_request_t* request) {
+static void start(nx_gd32_uart_state_t* port, nx_uart_tx_request_t* request) {
     port->tx_position = 0u;
     port->terminal = NX_SUCCESS;
     port->tc = false;
     port->active = request;
-    USART_STAT0(USART0) &= ~USART_STAT0_TC;
-    USART_CTL0(USART0) |= USART_CTL0_TBEIE;
+    USART_STAT0(port->controller->registers) &= ~USART_STAT0_TC;
+    USART_CTL0(port->controller->registers) |= USART_CTL0_TBEIE;
 }
 
 /** \brief           Admit and start one direct caller-owned request. */
-nx_result_t nx_uart_port_submit(nx_uart_port_t* port,
-                                nx_uart_tx_request_t* request) {
+nx_result_t nx_gd32_uart_submit(void* context, nx_uart_tx_request_t* request) {
+    nx_gd32_uart_state_t* port = context;
     nx_result_t status = validate(port, request);
     if (status != NX_SUCCESS) {
         return status;
@@ -139,8 +178,9 @@ nx_result_t nx_uart_port_submit(nx_uart_port_t* port,
 }
 
 /** \brief           Transfer an existing adapter admission to the hardware. */
-nx_result_t nx_uart_port_start_admitted(nx_uart_port_t* port,
+nx_result_t nx_gd32_uart_start_admitted(void* context,
                                         nx_uart_tx_request_t* request) {
+    nx_gd32_uart_state_t* port = context;
     nx_result_t status = validate(port, request);
     if (status != NX_SUCCESS) {
         return status;
@@ -159,9 +199,9 @@ nx_result_t nx_uart_port_start_admitted(nx_uart_port_t* port,
 }
 
 /** \brief           Retain the borrow until task service proves drain. */
-nx_result_t nx_uart_port_cancel(nx_uart_port_t* port,
-                                nx_uart_tx_request_t* request) {
-    if (!port || !request || port != s_uart) {
+nx_result_t nx_gd32_uart_cancel(void* context, nx_uart_tx_request_t* request) {
+    nx_gd32_uart_state_t* port = context;
+    if (!port || !request || port->controller == NULL) {
         return NX_ERROR_INVALID;
     }
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
@@ -182,8 +222,10 @@ nx_result_t nx_uart_port_cancel(nx_uart_port_t* port,
 
 /** \brief           Publish settlement only after detaching all hardware refs.
  */
-void nx_uart_port_service(nx_uart_port_t* port) {
-    if (!port || port != s_uart || nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+void nx_gd32_uart_service(void* context) {
+    nx_gd32_uart_state_t* port = context;
+    if (!port || port->controller == NULL || nx_gd32_in_isr() ||
+        nx_gd32_irq_masked()) {
         return;
     }
     uint32_t saved = nx_gd32_critical_enter();
@@ -202,20 +244,22 @@ void nx_uart_port_service(nx_uart_port_t* port) {
         nx_gd32_critical_leave(saved);
         return;
     }
-    USART_CTL0(USART0) &= ~(USART_CTL0_TBEIE | USART_CTL0_TCIE);
+    USART_CTL0(port->controller->registers) &=
+        ~(USART_CTL0_TBEIE | USART_CTL0_TCIE);
     if (aborting && !port->tc) {
         (void)nx_request_transition(&request->base, NX_REQUEST_DRAINING);
-        USART_CTL0(USART0) = 0u;
-        rcu_periph_reset_enable(RCU_USART0RST);
-        rcu_periph_reset_disable(RCU_USART0RST);
+        USART_CTL0(port->controller->registers) = 0u;
+        rcu_periph_reset_enable((rcu_periph_reset_enum)port->controller->reset);
+        rcu_periph_reset_disable(
+            (rcu_periph_reset_enum)port->controller->reset);
         nx_gd32_peripheral_barrier();
-        if (USART_CTL0(USART0) != 0u) {
+        if (USART_CTL0(port->controller->registers) != 0u) {
             (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
             nx_gd32_critical_leave(saved);
             return;
         }
-        NVIC_ClearPendingIRQ(USART0_IRQn);
-        configure(port->baud);
+        NVIC_ClearPendingIRQ((IRQn_Type)port->controller->irq);
+        configure(port, port->baud);
         enqueue(port, (nx_uart_rx_event_t){.timestamp_us = nx_time_now_us(),
                                            .flags = NX_UART_EVENT_LOSS |
                                                     NX_UART_EVENT_NO_BYTE});
@@ -229,10 +273,10 @@ void nx_uart_port_service(nx_uart_port_t* port) {
 
 /** \brief           Copy queued event facts and preserve observable overflow.
  */
-nx_result_t nx_uart_port_read_events(nx_uart_port_t* port,
-                                     nx_uart_rx_event_t* events,
+nx_result_t nx_gd32_uart_read_events(void* context, nx_uart_rx_event_t* events,
                                      size_t capacity, size_t* count) {
-    if (!port || port != s_uart || !events || !capacity || !count) {
+    nx_gd32_uart_state_t* port = context;
+    if (!port || port->controller == NULL || !events || !capacity || !count) {
         return NX_ERROR_INVALID;
     }
     if (port->profile != NX_UART_RX_EVENTS) {
@@ -263,9 +307,10 @@ nx_result_t nx_uart_port_read_events(nx_uart_port_t* port,
 }
 
 /** \brief           Consume byte-profile data with aggregate loss status. */
-nx_result_t nx_uart_port_read_bytes(nx_uart_port_t* port, uint8_t* bytes,
+nx_result_t nx_gd32_uart_read_bytes(void* context, uint8_t* bytes,
                                     size_t capacity, size_t* count) {
-    if (!port || port != s_uart || !bytes || !capacity || !count) {
+    nx_gd32_uart_state_t* port = context;
+    if (!port || port->controller == NULL || !bytes || !capacity || !count) {
         return NX_ERROR_INVALID;
     }
     if (port->profile != NX_UART_RX_BYTES) {
@@ -295,8 +340,9 @@ nx_result_t nx_uart_port_read_bytes(nx_uart_port_t* port, uint8_t* bytes,
 }
 
 /** \brief           Close admissions, retaining storage until TX drain ends. */
-nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
-    if (!port || port != s_uart) {
+nx_result_t nx_gd32_uart_stop(void* context) {
+    nx_gd32_uart_state_t* port = context;
+    if (!port || port->controller == NULL) {
         return NX_ERROR_INVALID;
     }
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
@@ -311,58 +357,115 @@ nx_result_t nx_uart_port_stop(nx_uart_port_t* port) {
         nx_gd32_critical_leave(saved);
         return NX_ERROR_BUSY;
     }
-    NVIC_DisableIRQ(USART0_IRQn);
-    USART_CTL0(USART0) = 0u;
-    USART_CTL2(USART0) = 0u;
-    usart_deinit(USART0);
-    NVIC_ClearPendingIRQ(USART0_IRQn);
+    NVIC_DisableIRQ((IRQn_Type)port->controller->irq);
+    USART_CTL0(port->controller->registers) = 0u;
+    USART_CTL2(port->controller->registers) = 0u;
+    usart_deinit(port->controller->registers);
+    NVIC_ClearPendingIRQ((IRQn_Type)port->controller->irq);
     nx_gd32_peripheral_barrier();
-    s_uart = NULL;
+    port->wake = NULL;
     port->initialized = false;
-    rcu_periph_clock_disable(RCU_USART0);
+    rcu_periph_clock_disable((rcu_periph_enum)port->controller->clock);
+    port->controller = NULL;
     nx_gd32_critical_leave(saved);
     return NX_SUCCESS;
 }
 
-/** \brief           Move bounded bytes and publish TC facts without callbacks.
- */
-void USART0_IRQHandler(void) {
-    nx_uart_port_t* port = s_uart;
+/** \brief Share true wire-completion handling without touching RX DATA. */
+bool nx_gd32_uart_tx_irq(nx_gd32_uart_state_t* port, uint32_t flags) {
     if (!port || !port->initialized) {
-        return;
+        return false;
     }
     bool sent_byte = false;
-    uint32_t flags = USART_STAT0(USART0);
-    uint32_t errors = flags & (USART_STAT0_PERR | USART_STAT0_FERR |
-                               USART_STAT0_NERR | USART_STAT0_ORERR);
-    if ((flags & USART_STAT0_RBNE) != 0u || errors) {
-        uint8_t byte = (uint8_t)USART_DATA(USART0);
-        uint32_t neutral =
-            (errors & USART_STAT0_PERR ? NX_UART_EVENT_PARITY : 0u) |
-            (errors & USART_STAT0_FERR ? NX_UART_EVENT_FRAMING : 0u) |
-            (errors & USART_STAT0_NERR ? NX_UART_EVENT_NOISE : 0u) |
-            (errors & USART_STAT0_ORERR ? NX_UART_EVENT_OVERRUN : 0u) |
-            ((flags & USART_STAT0_RBNE) == 0u ? NX_UART_EVENT_NO_BYTE : 0u);
-        enqueue(port, (nx_uart_rx_event_t){nx_time_now_us(), neutral, byte});
-    }
+    bool notify = false;
     if (port->active && (flags & USART_STAT0_TBE) != 0u &&
-        (USART_CTL0(USART0) & USART_CTL0_TBEIE) != 0u) {
-        USART_DATA(USART0) = port->active->data[port->tx_position++];
+        (USART_CTL0(port->controller->registers) & USART_CTL0_TBEIE) != 0u) {
+        USART_DATA(port->controller->registers) =
+            port->active->data[port->tx_position++];
         sent_byte = true;
         if (port->tx_position == port->active->length) {
-            USART_CTL0(USART0) =
-                (USART_CTL0(USART0) & ~USART_CTL0_TBEIE) | USART_CTL0_TCIE;
+            USART_CTL0(port->controller->registers) =
+                (USART_CTL0(port->controller->registers) & ~USART_CTL0_TBEIE) |
+                USART_CTL0_TCIE;
         }
     }
     if (port->active && (flags & USART_STAT0_TC) != 0u &&
-        (USART_CTL0(USART0) & USART_CTL0_TCIE) != 0u &&
+        (USART_CTL0(port->controller->registers) & USART_CTL0_TCIE) != 0u &&
         port->tx_position == port->active->length && !sent_byte) {
-        USART_CTL0(USART0) &= ~USART_CTL0_TCIE;
+        USART_CTL0(port->controller->registers) &= ~USART_CTL0_TCIE;
         if (port->terminal == NX_SUCCESS &&
             nx_deadline_expired(port->active->base.deadline,
                                 nx_time_now_us())) {
             port->terminal = NX_ERROR_TIMEOUT;
         }
         port->tc = true;
+        notify = true;
+    }
+    return notify;
+}
+
+/** \brief Move bounded bytes and publish TC facts without consumer callbacks.
+ */
+void nx_gd32_uart_irq(nx_gd32_uart_state_t* port) {
+    if (port == NULL || !port->initialized) {
+        return;
+    }
+    bool notify = false;
+    uint32_t flags = USART_STAT0(port->controller->registers);
+    uint32_t errors = flags & (USART_STAT0_PERR | USART_STAT0_FERR |
+                               USART_STAT0_NERR | USART_STAT0_ORERR);
+    if ((flags & USART_STAT0_RBNE) != 0U || errors != 0U) {
+        notify = true;
+        uint8_t byte = (uint8_t)USART_DATA(port->controller->registers);
+        uint32_t neutral =
+            (errors & USART_STAT0_PERR ? NX_UART_EVENT_PARITY : 0U) |
+            (errors & USART_STAT0_FERR ? NX_UART_EVENT_FRAMING : 0U) |
+            (errors & USART_STAT0_NERR ? NX_UART_EVENT_NOISE : 0U) |
+            (errors & USART_STAT0_ORERR ? NX_UART_EVENT_OVERRUN : 0U) |
+            ((flags & USART_STAT0_RBNE) == 0U ? NX_UART_EVENT_NO_BYTE : 0U);
+        enqueue(port, (nx_uart_rx_event_t){nx_time_now_us(), neutral, byte});
+    }
+    notify = nx_gd32_uart_tx_irq(port, flags) || notify;
+    if (notify) {
+        (void)nx_irq_wake_signal(port->wake);
     }
 }
+
+/** \brief Attach only after checking the actual publisher priority. */
+static nx_result_t gd32_uart_attach_wake(void* context,
+                                         const nx_irq_wake_t* wake,
+                                         uint8_t syscall_ceiling) {
+    nx_gd32_uart_state_t* port = context;
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    uint32_t saved = nx_gd32_critical_enter();
+    if (!port->initialized) {
+        nx_gd32_critical_leave(saved);
+        return NX_ERROR_STATE;
+    }
+    uint8_t priority =
+        (uint8_t)NVIC_GetPriority((IRQn_Type)port->controller->irq);
+    nx_result_t result =
+        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+    if (result == NX_SUCCESS) {
+        port->wake = wake;
+    }
+    nx_gd32_critical_leave(saved);
+    return result;
+}
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_uart_ops_t nx_gd32_uart_ops = {
+    .submit = nx_gd32_uart_submit,
+    .start_admitted = nx_gd32_uart_start_admitted,
+    .cancel = nx_gd32_uart_cancel,
+    .service = nx_gd32_uart_service,
+    .read_events = nx_gd32_uart_read_events,
+    .read_bytes = nx_gd32_uart_read_bytes,
+    .stop = nx_gd32_uart_stop,
+    .attach_wake = gd32_uart_attach_wake,
+};

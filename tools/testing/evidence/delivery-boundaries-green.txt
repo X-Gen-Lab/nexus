@@ -1,0 +1,23 @@
+test_missing_or_duplicate_smoke_console_is_rejected (tests.contracts.test_hil_prepare.HilPreparationTests.test_missing_or_duplicate_smoke_console_is_rejected) ... ok
+test_plan_has_selected_modes_and_unexecuted_physical_scope (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_has_selected_modes_and_unexecuted_physical_scope) ... ok
+test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) ... ok
+test_preparation_is_repeatable_without_mutating_authored_inputs (tests.contracts.test_hil_prepare.HilPreparationTests.test_preparation_is_repeatable_without_mutating_authored_inputs) ... ok
+test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) ... ok
+test_changed_elf_and_resources_are_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_changed_elf_and_resources_are_rejected) ... ok
+test_empty_station_is_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_empty_station_is_rejected) ... ok
+test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) ... ok
+test_missing_probe_identity_and_unsafe_wiring_are_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_missing_probe_identity_and_unsafe_wiring_are_rejected) ... ok
+test_missing_raw_and_zero_cases_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_missing_raw_and_zero_cases_rejected) ... ok
+test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) ... ok
+test_physical_budget_failure_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_physical_budget_failure_rejected) ... ok
+test_readiness_does_not_claim_hardware_execution (tests.contracts.test_hil_admission.HilAdmissionTests.test_readiness_does_not_claim_hardware_execution) ... ok
+test_stale_empty_all_skipped_and_wrong_board_raw_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_stale_empty_all_skipped_and_wrong_board_raw_rejected) ... ok
+test_three_actual_templates_are_unqualified (tests.contracts.test_hil_admission.HilAdmissionTests.test_three_actual_templates_are_unqualified) ... ok
+test_wrong_board_and_part_are_rejected (tests.contracts.test_hil_admission.HilAdmissionTests.test_wrong_board_and_part_are_rejected) ... ok
+test_consumer_uses_authored_toml_for_each_maintained_family (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... ok
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.113s
+
+OK

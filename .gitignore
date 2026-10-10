@@ -84,6 +84,7 @@ desktop.ini
 # Archives
 *.zip
 *.tar.gz
+!dependencies/source/googletest-1.16.0.tar.gz
 *.rar
 
 # Sphinx
@@ -103,3 +104,6 @@ osal_property_test_results.xml
 # Developer configuration and generated headers never belong to the source tree.
 /.config
 /nexus_config.h
+
+# Preserve executed TDD machine output byte-for-byte.
+!tools/testing/evidence/*.log

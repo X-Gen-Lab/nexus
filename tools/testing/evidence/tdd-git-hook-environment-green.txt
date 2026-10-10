@@ -1,0 +1,6 @@
+test_real_commit_hook_checks_submodule_and_preserves_index (tools.testing.test_git_environment.GitEnvironmentTests.test_real_commit_hook_checks_submodule_and_preserves_index) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.144s
+
+OK

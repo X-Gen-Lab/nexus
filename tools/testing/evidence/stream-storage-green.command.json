@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "command": [
+    "build/native-debug/bin/nexus_stream_storage_test",
+    "--gtest_filter=*",
+    "--gtest_output=xml:build/native-debug/stream-storage-reviewed-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

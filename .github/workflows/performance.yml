@@ -35,7 +35,7 @@ jobs:
       - name: Measure real minimum workloads and fail budget violations
         run: >-
           .venv/bin/python tools/measurement/compare.py
-          --assembly tools/configure/assemblies/${{ matrix.board }}-baremetal.json
+          --assembly tools/configure/assemblies/${{ matrix.board }}-baremetal.toml
           --build-root build/profiles-${{ matrix.board }}
           --compiler "$(command -v arm-none-eabi-gcc)"
           --cmake .venv/bin/cmake --ninja .venv/bin/ninja

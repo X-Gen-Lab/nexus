@@ -282,7 +282,7 @@ class AdvancedResolverTests(unittest.TestCase):
 
     def fixture(self, name):
         directory = gate.ROOT / "tests/contracts/stm32_assembly"
-        result = json.loads((directory / ("ve-" + name + ".json")).read_text())
+        result = gate.load_assembly(directory / ("ve-" + name + ".toml"))
         result["board_package"] = str(directory / result["board_package"])
         return result
 
@@ -330,6 +330,58 @@ class AdvancedResolverTests(unittest.TestCase):
         data = self.fixture("spi")
         data["devices"][0]["driver"] = "bmp280"
         self.reject(data, "requires the maintained bmp280-spi")
+
+    def test_unused_device_capacity_rejected_for_each_transport(self):
+        for transport in ("spi", "i2c"):
+            with self.subTest(transport=transport):
+                data = self.fixture(transport)
+                data["devices"][0]["capacity"] = 32
+                self.reject(data, "device:.*unknown.*capacity")
+
+    def test_i2c_spi_options_rejected(self):
+        for field, value in (("mode", 3), ("max_hz", 50000),
+                             ("cs_binding", "cs0")):
+            with self.subTest(field=field):
+                data = self.fixture("i2c")
+                data["devices"][0][field] = value
+                self.reject(data, "I2C device:.*unknown.*" + field)
+
+    def test_i2c_endpoint_requires_address(self):
+        data = self.fixture("i2c")
+        del data["devices"][0]["address"]
+        self.reject(data, "I2C device:.*missing.*address")
+
+    def test_spi_i2c_address_rejected(self):
+        data = self.fixture("spi")
+        data["devices"][0]["address"] = 80
+        self.reject(data, "SPI device:.*unknown.*address")
+
+    def test_gd32_builtin_spi_cs_remains_supported(self):
+        directory = gate.ROOT / "tests/contracts/gd32_assembly"
+        data = gate.load_assembly(directory / "spi.toml")
+        data["board_package"] = str(directory / data["board_package"])
+        data["devices"] = [{"id": "sensor", "controller": "spi0",
+                            "driver": "spi-endpoint", "mode": 3,
+                            "max_hz": 1000000}]
+        self.assembly.write_text(json.dumps(data))
+        result = gate.resolve(self.assembly)
+        self.assertNotIn("cs_binding", result["devices"][0])
+        self.assertIn("pin:PF6", {item["key"] for item in result["claims"]})
+
+    def test_invalid_device_reconfiguration_invalidates_old_bundle(self):
+        for transport, field, value in (("spi", "capacity", 32),
+                                        ("i2c", "mode", 3)):
+            with self.subTest(transport=transport, field=field):
+                data = self.fixture(transport)
+                self.assembly.write_text(json.dumps(data))
+                output = Path(self.temporary.name) / (transport + "-bundle")
+                gate.configure(self.assembly, output)
+                self.assertTrue((output / "bindings.c").is_file())
+                data["devices"][0][field] = value
+                self.assembly.write_text(json.dumps(data))
+                with self.assertRaisesRegex(gate.ConfigurationError, field):
+                    gate.configure(self.assembly, output)
+                self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

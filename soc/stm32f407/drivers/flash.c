@@ -37,20 +37,23 @@ const nx_flash_geometry_t g_nx_stm32_flash_zg = {.base_address = 0x08000000U,
                 FLASH_SR_PGPERR | FLASH_SR_PGSERR))
 
 /** \brief Validate physical subtraction bounds before any read or write. */
-static bool range(const nx_flash_port_t* port, uint32_t offset, size_t length) {
+static bool range(const nx_stm32_flash_state_t* port, uint32_t offset,
+                  size_t length) {
     return port != NULL && port->registers != NULL && port->geometry != NULL &&
            port->memory != NULL && offset <= port->geometry->size &&
            length <= port->geometry->size - offset;
 }
 
 /** \brief Expose immutable density geometry with no product reservation. */
-const nx_flash_geometry_t* nx_flash_port_geometry(const nx_flash_port_t* port) {
+const nx_flash_geometry_t* nx_stm32_flash_geometry(const void* context) {
+    const nx_stm32_flash_state_t* port = context;
     return port != NULL ? port->geometry : NULL;
 }
 
 /** \brief Read physical nonvolatile bytes without a retained destination. */
-nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
-                               void* data, size_t length) {
+nx_result_t nx_stm32_flash_read(const void* context, uint32_t offset,
+                                void* data, size_t length) {
+    const nx_stm32_flash_state_t* port = context;
     if (!range(port, offset, length) || (data == NULL && length != 0U)) {
         return NX_ERROR_INVALID;
     }
@@ -65,7 +68,7 @@ nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
 }
 
 /** \brief Unlock only when an operation passed all structural validation. */
-static nx_result_t begin(nx_flash_port_t* port) {
+static nx_result_t begin(nx_stm32_flash_state_t* port) {
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
@@ -89,7 +92,8 @@ static nx_result_t begin(nx_flash_port_t* port) {
 }
 
 /** \brief Wait for the uninterruptible physical pulse; timeout is not abort. */
-static nx_result_t pulse_result(nx_flash_port_t* port, nx_time_us_t deadline) {
+static nx_result_t pulse_result(nx_stm32_flash_state_t* port,
+                                nx_time_us_t deadline) {
     do {
         NX_STM32_IO_POLL(3U, port);
     } while ((port->registers->SR & FLASH_SR_BSY) != 0U);
@@ -102,7 +106,7 @@ static nx_result_t pulse_result(nx_flash_port_t* port, nx_time_us_t deadline) {
 
 /** \brief Clear programming modes and relock only after hardware has settled.
  */
-static void end(nx_flash_port_t* port) {
+static void end(nx_stm32_flash_state_t* port) {
     port->registers->CR &=
         ~(uint32_t)(FLASH_CR_PG | FLASH_CR_SER | FLASH_CR_SNB);
     port->registers->CR |= FLASH_CR_LOCK;
@@ -116,9 +120,10 @@ static void end(nx_flash_port_t* port) {
 }
 
 /** \brief Program x32 words with caller-declared valid programming voltage. */
-nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
-                                  const void* data, size_t length,
-                                  nx_time_us_t deadline) {
+nx_result_t nx_stm32_flash_program(void* context, uint32_t offset,
+                                   const void* data, size_t length,
+                                   nx_time_us_t deadline) {
+    nx_stm32_flash_state_t* port = context;
     if (!range(port, offset, length) || data == NULL || length == 0U ||
         (offset & 3U) != 0U || (length & 3U) != 0U || port->registers == NULL) {
         return NX_ERROR_INVALID;
@@ -164,8 +169,9 @@ nx_result_t nx_flash_port_program(nx_flash_port_t* port, uint32_t offset,
 
 /** \brief Erase exact sectors without rounding into an adjacent consumer
  * region. */
-nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
-                                size_t length, nx_time_us_t deadline) {
+nx_result_t nx_stm32_flash_erase(void* context, uint32_t offset, size_t length,
+                                 nx_time_us_t deadline) {
+    nx_stm32_flash_state_t* port = context;
     if (!range(port, offset, length) || length == 0U ||
         port->registers == NULL) {
         return NX_ERROR_INVALID;
@@ -215,3 +221,11 @@ nx_result_t nx_flash_port_erase(nx_flash_port_t* port, uint32_t offset,
     }
     return result;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_flash_ops_t nx_stm32_flash_ops = {
+    .geometry = nx_stm32_flash_geometry,
+    .read = nx_stm32_flash_read,
+    .program = nx_stm32_flash_program,
+    .erase = nx_stm32_flash_erase,
+};

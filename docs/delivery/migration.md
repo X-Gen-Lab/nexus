@@ -1,12 +1,15 @@
 # 外部工程迁移
 
-本轮是破坏性迁移，不长期保留旧 HAL/factory/OSAL 与新路径并存。先 pin 新平台
+本轮保留 factory 与多态接口的总体模型，重新实现配置和静态实例生成。相比原始
+工厂，实例具有精确的独立状态、共享只读操作表和明确生命周期；相比上一版直接
+typed binding，调用者现在也可按类型 ID 获取接口并替换 provider。先 pin 新平台
 源码版本，完整更新调用者和测试；旧部署产品的持久化格式与恢复另立合同。
 
 | 旧路径／做法 | 当前替代 |
 |---|---|
-| `hal/`、`nx_factory`、device name lookup、generic reference | `io/include/nexus/io/` 和生成的固定 typed `nx_binding_*` |
-| Kconfig/defconfig/多处 CMake cache 选择 | 一份外部 assembly，SoC facts/routes 与 Board `board.json`，一个 resolved bundle |
+| 原始 `hal/`、字符串 lookup、通用设备指针 | 公共 typed 多态接口；生成 `nexus_factory.h` 的类型 ID 与 `nx_factory_*()` |
+| 上一版 provider 类型直接作为公共 port | 两指针只读 face：共享 `ops` 与独立 `context`；SDK／状态私有 |
+| Kconfig/defconfig/多处 CMake cache 选择 | 一份外部 TOML assembly、不可变 IR、SoC／Board facts，一个 resolved bundle |
 | SoC/Board/platform startup 混合 | Arch 原语、SoC system/drivers、只读 Board facts、外部启动 composition |
 | `osal/` 全局最大对象池／默认 worker | `os/` 按对象 TCB/stack/queue 与薄 wait/wake；外部显式任务 |
 | UART hidden TX queue/copy buffer | caller-owned request/payload；精确 RX profile；可选 bounded owner |
@@ -17,7 +20,14 @@
 
 外部工程通过 `NEXUS_ASSEMBLY_FILE` 明确输入，链接 `Nexus::Platform`，由
 `nexus_add_firmware()` 装入 startup/system/linker/resource gate。应用只包含公共
-Nexus 头和生成 binding，不读取 private provider storage 或 SDK register 类型。
+Nexus 头和生成 `nexus_factory.h`／`nexus_bindings.h`，不读取 private provider storage 或 SDK
+register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，controller factory
+不得返回第一个子设备的别名。无效 ID 返回 NULL；factory 不初始化、不分配内存。
+
+维护的 assembly 已统一为 TOML schema 2。schema 1 JSON 读取仅供明确迁移与工具
+派生输入，不与 TOML 维护同一份配置。冷启动仍显式执行 `nx_platform_start()`，
+停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。
+在 start 前可以保存 face；在成功 stop 后 face 的身份不变，provider 拒绝操作。
 
 请求迁移必须同时更新所有权：prepare 不意味着 accepted，cancel 不意味着 settled。
 接受后保持 request 与 payload，到 acquire-observed SETTLED 才能复用。共享 owner

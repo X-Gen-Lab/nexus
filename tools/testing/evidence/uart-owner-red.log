@@ -1,0 +1,40 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from UARTOwnerContract
+[ RUN      ] UARTOwnerContract.RejectsIncompleteProviderBeforeAdvertisingExecutor
+/workspace/nexus/tests/google/uart_owner_test.cpp:45: Failure
+Expected equality of these values:
+  invalid.context
+    Which is: 0x7ffe895344e8
+  nullptr
+    Which is: (nullptr)
+
+/workspace/nexus/tests/google/uart_owner_test.cpp:46: Failure
+Expected equality of these values:
+  invalid.start
+    Which is: 0x556556defa99
+  nullptr
+    Which is: (nullptr)
+
+/workspace/nexus/tests/google/uart_owner_test.cpp:50: Failure
+Expected equality of these values:
+  nx_uart_owner_executor_port(&executor, &no_cancel).start
+    Which is: 0x556556defa99
+  nullptr
+    Which is: (nullptr)
+
+[  FAILED  ] UARTOwnerContract.RejectsIncompleteProviderBeforeAdvertisingExecutor (0 ms)
+[ RUN      ] UARTOwnerContract.RejectedSubmissionRetainsNeitherBorrowNorPayload
+[       OK ] UARTOwnerContract.RejectedSubmissionRetainsNeitherBorrowNorPayload (0 ms)
+[ RUN      ] UARTOwnerContract.QuarantineRetainsPayloadUntilProviderDrainProof
+[       OK ] UARTOwnerContract.QuarantineRetainsPayloadUntilProviderDrainProof (0 ms)
+[----------] 3 tests from UARTOwnerContract (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 2 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] UARTOwnerContract.RejectsIncompleteProviderBeforeAdvertisingExecutor
+
+ 1 FAILED TEST

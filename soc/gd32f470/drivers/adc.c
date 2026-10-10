@@ -10,7 +10,7 @@
 #include "gd32f4xx.h"
 #include "private/system.h"
 
-static nx_adc_port_t* s_adc;
+static nx_gd32_adc_state_t* s_adc;
 
 /** \brief           Bound calibration waits without the SDK's infinite loop. */
 static nx_result_t wait_clear(uint32_t mask, nx_time_us_t deadline) {
@@ -26,8 +26,9 @@ static nx_result_t wait_clear(uint32_t mask, nx_time_us_t deadline) {
 }
 
 /** \brief           Bind reviewed channels after bounded ADC stabilization. */
-nx_result_t nx_gd32_adc_initialize(nx_adc_port_t* port, const uint8_t* channels,
-                                   size_t count, uint32_t reference_mv,
+nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
+                                   const uint8_t* channels, size_t count,
+                                   uint32_t reference_mv,
                                    nx_time_us_t deadline) {
     if (!port || !channels || !count || count > 16u || !reference_mv) {
         return NX_ERROR_INVALID;
@@ -86,17 +87,18 @@ nx_result_t nx_gd32_adc_initialize(nx_adc_port_t* port, const uint8_t* channels,
         rcu_periph_clock_disable(RCU_ADC0);
         return status;
     }
-    *port = (nx_adc_port_t){.channels = channels,
-                            .channel_count = count,
-                            .reference_mv = reference_mv,
-                            .initialized = true};
+    *port = (nx_gd32_adc_state_t){.channels = channels,
+                                  .channel_count = count,
+                                  .reference_mv = reference_mv,
+                                  .initialized = true};
     s_adc = port;
     return NX_SUCCESS;
 }
 
 /** \brief           Return raw count format without inventing calibrated volts.
  */
-nx_result_t nx_adc_port_info(const nx_adc_port_t* port, nx_adc_info_t* info) {
+nx_result_t nx_gd32_adc_info(const void* context, nx_adc_info_t* info) {
+    const nx_gd32_adc_state_t* port = context;
     if (!port || port != s_adc || !port->initialized || !info) {
         return NX_ERROR_INVALID;
     }
@@ -106,9 +108,10 @@ nx_result_t nx_adc_port_info(const nx_adc_port_t* port, nx_adc_info_t* info) {
 
 /** \brief           Run one conversion per sequence element with valid prefix.
  */
-nx_result_t nx_adc_port_sample(nx_adc_port_t* port, uint16_t* samples,
+nx_result_t nx_gd32_adc_sample(void* context, uint16_t* samples,
                                size_t capacity, nx_time_us_t deadline,
                                size_t* count) {
+    nx_gd32_adc_state_t* port = context;
     if (!port || port != s_adc || !port->initialized || !samples || !count ||
         capacity < port->channel_count) {
         return NX_ERROR_INVALID;
@@ -188,7 +191,7 @@ nx_result_t nx_adc_port_sample(nx_adc_port_t* port, uint16_t* samples,
 
 /** \brief           Disable conversions before releasing configuration storage.
  */
-nx_result_t nx_gd32_adc_stop(nx_adc_port_t* port) {
+nx_result_t nx_gd32_adc_stop(nx_gd32_adc_state_t* port) {
     if (!port || port != s_adc || !port->initialized) {
         return NX_ERROR_INVALID;
     }
@@ -206,3 +209,9 @@ nx_result_t nx_gd32_adc_stop(nx_adc_port_t* port) {
     s_adc = NULL;
     return NX_SUCCESS;
 }
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_adc_ops_t nx_gd32_adc_ops = {
+    .info = nx_gd32_adc_info,
+    .sample = nx_gd32_adc_sample,
+};

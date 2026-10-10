@@ -13,13 +13,19 @@ They do not establish current support or qualification.
 
 - Keep the default C11 path statically assembled and allocation-free: Core,
   Arch, SoC, typed I/O, optional OS/owner adapters, optional common components.
-- Public device APIs use Nexus types. Vendor SDKs and provider storage remain
-  implementation inputs. A product uses generated fixed typed bindings.
-- Do not reintroduce registries, name lookup, factory discovery, maximum object
-  pools, hidden workers, mandatory OS locks or forwarding-only runtime layers.
-- SoC facts, Board `board.json` and one assembly JSON resolve to one atomic
-  bundle. JSON is the sole configuration authority. CMake targets own software
-  dependencies. Do not introduce Kconfig/cache fallback or a second build graph.
+- Public device APIs use Nexus types and immutable interface faces. Vendor SDKs
+  and mutable provider state remain private. Instances share read-only typed
+  operations tables; callbacks receive the instance context, never the table.
+- A generated typed factory returns existing static objects by compact ID. It
+  never allocates, initializes hardware, acquires locks or discovers devices.
+  Do not introduce runtime name registries, maximum object pools, hidden workers,
+  mandatory OS locks or forwarding-only runtime layers. Controller and endpoint
+  identities remain separate; no endpoint substitutes for its controller.
+- SoC facts and Board `board.json` are machine-maintained JSON. One authored TOML
+  assembly resolves through a validated typed IR into one atomic bundle. CMake
+  targets own software dependencies. Do not introduce Kconfig/cache fallback,
+  competing configuration authorities or a second source build graph. Legacy
+  schema-1 JSON fixtures may be read during migration, never silently mixed.
 - Reject unknown fields, unsupported modes, resource conflicts and stale inputs.
   Never repair configuration by silently selecting a different mode or Board.
 - Distinguish a chip capability from a reviewed PCB route and physical HIL.
@@ -55,6 +61,25 @@ Use `python tools/dev/dev.py configure|build|test --preset <name>`; native CMake
 arguments pass through. `doctor` checks tools and `check` runs repository gates.
 Fresh JUnit, nonzero tests and actual return codes are required. Missing tools,
 empty reports and skipped-only executions fail qualification.
+
+TDD is mandatory for new production behavior and defect fixes: write the
+regression/contract first, execute it and record the expected RED failure, then
+implement the smallest correct change, execute GREEN and refactor while keeping
+tests passing. New C API and provider tests use GoogleTest and GoogleMock on the
+host; Python tools retain stdlib unittest. Mock external dependencies and hardware
+ports, not the implementation under test. Verify rejection, cancellation, drain,
+overflow and instance isolation where the changed contract requires them.
+
+`python scripts/ci/tdd_gate.py --all --preset native-debug` builds the pinned,
+offline GoogleTest/GoogleMock targets and executes every discovered case with fresh
+reports. The commit hook runs this gate for behavioral changes, rejects differing
+unstaged/untracked behavior before and after execution, and requires an unchanged
+Git index tree. CI executes the gate independently of
+local hooks. Do not disable cases, filters, shards or hooks to create acceptance
+evidence. Record RED/GREEN commands and the failure reason in the change review;
+automation verifies real execution, not the historical order of developer work.
+The framework enables C++17 only for Native tests. Firmware remains C11 and never
+links GoogleTest, GoogleMock, C++ test fixtures or their runtime.
 
 Keep the existing `.clang-format`, `.editorconfig` and backslash Doxygen style:
 80 columns, four spaces, attached braces and type-attached pointer stars. Sources

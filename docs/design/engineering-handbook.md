@@ -40,7 +40,7 @@
 
 首版生产模块使用 C11；必要的 startup/CPU 原语使用受控汇编。生产目标不因为构建测试而获得 C++ runtime、异常、RTTI 或额外 STL 依赖。平台 public C header 必须自足，并提供需要的 C++ linkage 声明，使外部 C++ 产品可以正常消费 C API。
 
-主机测试可使用 C++17 和一个测试框架，例如 GoogleTest。测试 helper、fault injection、host fixture 与 mock SDK 仅进入测试 target，不能通过目录全局 include/define 混入生产编译。Python 工具使用独立的工具测试，不要求嵌入式工程采用 Python runtime。
+主机 C API、组件和 provider 的新增行为测试统一使用 C++17、GoogleTest 和 GoogleMock。测试 helper、fault injection、host fixture 与 mock SDK 仅进入测试 target，不能通过目录全局 include/define 混入生产编译。Python 工具使用 stdlib unittest，不要求嵌入式工程采用 Python runtime。历史 C 模型测试作为已有回归继续执行，新行为按下述 TDD 约束扩展。
 
 至少验证三个消费边界：纯 C public header consumer、C++ public header consumer、真实外部 product consumer。测试打开与关闭时，生产 target 的接口和资源合同保持一致；instrumentation profile 的编译产物另行标识。
 
@@ -67,13 +67,13 @@ Vendor 源码和规则独立管理。公共结构不得含 vendor 类型，也�
 
 生成器输出应当小且可检查：有效配置、配置头、选中目标标识、静态资源绑定和必要 linker layout。普通 typed C 初始化与数据路径仍由人维护。避免为了减少几行初始化代码生成业务 worker、调度算法、驱动状态机或通用执行 DSL。
 
-## 4. 首版配置：assembly.json 到 resolved.json
+## 4. 首版配置：assembly.toml 到 resolved.json
 
 ### 4.1 唯一默认输入模型
 
-首版采用一个 product-owned `assembly.json`，引用明确的 SoC/Board 输入并选择 OS/backend、组件、实例资源和预算。项目发布 schema 与语义规则；实现使用一个受控解析器。
+装配采用 product-owned TOML schema 2 的 `assembly.toml`，引用明确的 Board，按其精确料号选择 SoC，再选择 OS/backend、组件、实例资源和预算。Python 标准 `tomllib` 解析，严格字段模型同时提供 editor schema；CLI 提供 `init/list-bindings/check/explain/generate`。
 
-`assembly.json` 不包含任意软件依赖声明、shell 命令或代码表达式。它不能通过字符串重新定义 CPU 指令集、ABI、controller 功能或任意编译 flags。模式和优化选项从受支持的命名 profile 选择，实际 flags 由工具链规则生成并记录。
+`assembly.toml` 不包含任意软件依赖声明、shell 命令或代码表达式。它不能通过字符串重新定义 CPU 指令集、ABI、controller 功能或任意编译 flags。模式和优化选项从受支持的命名 profile 选择，实际 flags 由工具链规则生成并记录。
 
 首版不引入 `overlay`、`inherit`、递归 merge 或其他配置语言。外部产品通过完整、显式的 assembly 选择表达需求。相同字段不能在 assembly、Board 输入、CMake cache 和环境变量中各有一套覆盖规则。
 
@@ -81,9 +81,9 @@ SoC 输入声明准确变体、物理内存、controller 与实现能力；Board
 
 ### 4.2 一次解析，派生物只有一个来源
 
-配置阶段输出 `resolved.json`，记录所有最终事实、相关输入身份与解析器 schema 版本。以下内容由同一次解析派生：
+配置阶段构造冻结 `ConfigurationIR`、`ControllerIR`、`EndpointIR` 和 `MemoryBudgetIR`。构造器直接消费 IR，`resolved.json` 保存相同决定、输入身份与解析器版本。以下内容由同一次解析派生：
 
-- 编译所需的常量与实例绑定。
+- 编译所需常量、独立私有实例、只读 face 与 `nexus_factory.h` 的 typed ID/getter。
 - 供 CMake 使用的明确选择值。
 - Board 路由和资源冲突检查结果。
 - product layout 的 linker/region 定义。
@@ -91,7 +91,7 @@ SoC 输入声明准确变体、物理内存、controller 与实现能力；Board
 
 这些派生文件不得手工编辑。`resolved.json` 也不是用户输入；缺失或与输入身份不符时必须重新生成，不能从旧生成目录回退。配置失败不留下可被当作成功结果消费的部分 bundle。
 
-解析器必须拒绝重复 JSON key、未知字段、错误类型、越界值、矛盾选择、不存在的输入、未实现能力、非法 IRQ/DMA/pin route 与 layout overlap。输入声明的 capability 不能覆盖实现 capability。字符串到 C/header/CMake 的转换必须有明确编码与转义，不把用户数据当脚本执行。
+解析器拒绝重复 TOML table/key、重复 JSON 事实 key、未知字段、错误类型、越界值、矛盾选择、不存在的输入、未实现能力、非法 IRQ/DMA/pin route 与 layout overlap。输入声明的 capability 不能覆盖实现 capability。字符串到 C/header/CMake 的转换必须有明确编码与转义，不把用户数据当脚本执行。
 
 ### 4.3 独立构建根与 cache
 
@@ -103,7 +103,7 @@ SoC 输入声明准确变体、物理内存、controller 与实现能力；Board
 
 首版没有 Kconfig frontend。Kconfig 不是资源安全、静态组装或 CMake 构建的必需条件。
 
-若未来配置规模证明交互式 choice/dependency UI 有价值，可以另行实现 Kconfig frontend，把选择转换为同一 `resolved.json` 合同。届时必须确定唯一权威前端，并维持相同语义校验；不能让 Kconfig、JSON 和 CMake cache 同时成为真源，也不能让隐式 `select/default` 绕过未实现能力检查。
+若未来配置规模证明交互式 choice/dependency UI 有价值，可以另行实现 Kconfig frontend，把选择转换为同一 typed IR 合同。届时必须确定唯一权威前端，并维持相同语义校验；不能让 Kconfig、TOML 和 CMake cache 同时成为真源，也不能让隐式 `select/default` 绕过未实现能力检查。
 
 ## 5. 外部 package 接入
 
@@ -135,7 +135,7 @@ Board package 包含准确 board/silicon 身份、声明输入、资源 manifest
 | --- | --- |
 | 构建和测试编排 | CMake、Ninja、CTest |
 | production 编译 | 锁定的 ARM GCC；Native GCC 提供对应软件验证环境 |
-| 主机 C/C++ 测试 | 一个框架，例如 GoogleTest；不传播至 production target |
+| 主机 C/C++ 测试 | 锁定的 GoogleTest／GoogleMock；不传播至 production target |
 | C/C++ 格式与精选分析 | 同一锁定版本系列的 clang-format、clang-tidy |
 | 配置、证据与打包工具 | Python；工具测试使用 stdlib unittest；Ruff 统一 Python 格式/lint |
 | 正式构建环境 | 按 digest 固定的 Linux OCI image |
@@ -152,16 +152,14 @@ Board package 包含准确 board/silicon 身份、声明输入、资源 manifest
 
 ### 6.3 一个薄入口，直接调用原生工具
 
-可以提供一个薄 Python `dev` 入口，职责为选择有效配置、调用原生工具、传播 exit code、收集结果。它不替代 CMake、CTest、编译器或 package manager，也不实现通用工作流引擎。
+`tools/dev/dev.py` 调用真实 CMake、CTest、style 与 TDD gate，传播 exit code 并验证新鲜测试报告。preset 决定构建目录；额外原生命令参数直接传递，assembly 仍由唯一解析器解释。
 
-以下只是未来命令形状示意，当前没有因此获得可执行性：
-
-```text
-dev configure --assembly product/assembly.json --profile development
-dev build --build <resolved-build-root>
-dev check --build <resolved-build-root> --scope local
-dev check --build <resolved-build-root> --scope pull-request
-dev package --candidate <sealed-candidate>
+```sh
+python tools/dev/dev.py doctor
+python tools/dev/dev.py configure --preset native-debug
+python tools/dev/dev.py build --preset native-debug
+python tools/dev/dev.py test --preset native-debug
+python tools/dev/dev.py check --preset native-debug
 ```
 
 local 与 CI 调用同一入口和同一底层命令。CI yaml 负责触发、权限、矩阵和 artifact transport，不重复另一套配置解析或检查算法。命令、工作目录、非敏感环境摘要与 exit code进入执行记录；凭据不能进入日志和产物。
@@ -387,3 +385,24 @@ E1–E6描述工程验收领域，不是另一套排期或任务真源。唯一�
 先用一个精确Board、一个OS/backend和一个外部产品完成fresh checkout到真实consumer build，再扩展第二backend和第二SoC。第一切片需同时包含一个小typed I/O、错误/cleanup路径、资源预算、public/private include边界和原始产物证据。
 
 工具、schema、CMake模块和review规则应由这个切片证明需要。每扩展一种组合，都增加实际验证及维护责任；不先构造庞大通用框架，再用空fixture宣布工程模型完成。
+
+## 14. TDD 与 GoogleTest／GoogleMock 强制开发合同
+
+新增生产行为和缺陷修复遵循 RED → GREEN → REFACTOR。先从公开合同编写可失败的测试，执行并确认失败原因是所需行为尚未实现，再以最小正确实现让测试通过，最后整理实现并重复相关测试。新 API 尚不存在时，首次编译失败可以记录接口 RED；接口建立后还要实际执行行为测试。已经存在的行为补回归不能宣称历史上采用了 TDD。
+
+GoogleTest 承担断言、fixture 和边界场景；GoogleMock 只替代硬件、时间、通知和执行器等依赖端口。测试实际调用 Nexus 的公共 API，不能把被测 provider、factory 或 owner 整体 mock 掉，再用期望调用证明自身正确。优先检查不同实例的隔离、零副作用拒绝、资源冲突、deadline、取消后的排空和最终发布顺序。正常路径和失败路径共同确定合同，不要求为了数字重复实现细节。
+
+框架源以 `dependencies/googletest.lock.json` 固定准确版本、commit、archive SHA256 和许可；主机测试只从仓库内归档解压，没有 configure-time 下载或网络回退。`tests/google/CMakeLists.txt` 启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime 或测试框架依赖。
+
+统一执行入口为：
+
+```sh
+python scripts/ci/tdd_gate.py --all --preset native-debug
+python tools/dev/dev.py test --preset native-debug
+```
+
+第一条命令运行测试报告检查器的工具测试，配置并构建 `nexus_google_contracts`，从各二进制发现完整用例，随后执行不带筛选的实际测试。它移除环境中的 GoogleTest filter/shard 设置，删除旧 XML，拒绝零用例、未执行、跳过、失败、过期报告和发现数不符，并在 `build/<preset>/tdd/` 保存原始输出、GoogleTest XML 和汇总。第二条命令执行完整的现有 CTest 模型与工具回归；两者的证据职责不同。
+
+已安装的 pre-commit hook 对生产、测试、配置和构建行为变更执行同一 GoogleTest gate；只改说明文档无需重建。hook 在执行前后检查未暂存／未跟踪的行为改动，并比较起止 `git write-tree`，要求暂存区内容完全一致。执行过程中修改或重新暂存源码会拒绝验收，不生成新的汇总，避免工作区修复或并发编辑误认证即将提交的源码。CI 独立执行 gate，不依赖贡献者本地是否安装或运行 hook。`--no-verify`、`SKIP`、禁用测试或手写 XML 不构成有效验收。
+
+每项行为变更的评审说明包含失败测试名称、RED 命令及实际失败原因、GREEN 命令和相关场景覆盖。代码评审检查测试是否先定义了可观察合同。自动化能够证明真实执行、报告完整性和当前源码验证，无法机械证明所有开发者历史上遵守了测试先行顺序；因此不能把一个绿灯当作 TDD 流程全部合规。

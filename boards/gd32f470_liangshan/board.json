@@ -39,7 +39,7 @@
     }
   ],
   "reserved_resources": [
-    "TIMER1"
+    "timer:TIMER1"
   ],
   "unknowns": [
     "Physical PCB revision, oscillator and connector continuity are unobserved.",

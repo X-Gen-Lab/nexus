@@ -32,6 +32,30 @@ typedef struct {
     bool irreversible;
     bool debug_freeze;
 } nx_watchdog_state_t;
+
+/**
+ * \brief           Shared read-only methods using one provider state.
+ *
+ * \note            Methods follow each public operation's ownership contract.
+ *                  Missing optional methods report UNSUPPORTED.
+ */
+typedef struct {
+    nx_result_t (*enable)(void* context, uint32_t timeout_us, bool debug_freeze,
+                          nx_watchdog_state_t* state);
+    nx_result_t (*feed)(void* context);
+    nx_result_t (*state)(const void* context, nx_watchdog_state_t* state);
+} nx_watchdog_ops_t;
+/**
+ * \brief           Immutable interface pointing to caller-owned state.
+ *
+ * \note            Face and state outlive callers, IRQs and retained borrows.
+ *                  Factory lookup neither initializes nor acquires hardware.
+ */
+struct nx_watchdog_port {
+    const nx_watchdog_ops_t* ops;
+    void* context;
+};
+
 /**
  * \brief           Enable IWDG with reviewed bounds; activation is
  *                  irreversible.
@@ -50,7 +74,7 @@ typedef struct {
  *                  was disabled during rollback. Existing enable is
  *                  identified.
  */
-nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
+nx_result_t nx_watchdog_port_enable(const nx_watchdog_port_t* port,
                                     uint32_t timeout_us, bool debug_freeze,
                                     nx_watchdog_state_t* state);
 /**
@@ -62,7 +86,7 @@ nx_result_t nx_watchdog_port_enable(nx_watchdog_port_t* port,
  *
  * \return          Success or INVALID/STATE; bounded task/IRQ, no allocation.
  */
-nx_result_t nx_watchdog_port_feed(nx_watchdog_port_t* port);
+nx_result_t nx_watchdog_port_feed(const nx_watchdog_port_t* port);
 /**
  * \brief           Query current watchdog effect and timeout uncertainty.
  *

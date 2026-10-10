@@ -1,0 +1,42 @@
+test_late_staged_source_change_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_staged_source_change_rejects_new_summary) ... FAIL
+test_late_unstaged_source_change_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_unstaged_source_change_rejects_new_summary) ... FAIL
+test_late_untracked_source_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_untracked_source_rejects_new_summary) ... FAIL
+test_unchanged_real_index_can_accept_completed_tests (tools.testing.test_staged_execution.StagedExecutionTests.test_unchanged_real_index_can_accept_completed_tests) ... ok
+
+======================================================================
+FAIL: test_late_staged_source_change_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_staged_source_change_rejects_new_summary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 110, in test_late_staged_source_change_rejects_new_summary
+    self.assert_rejected(mutation)
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 81, in assert_rejected
+    self.assertEqual(result, 1, output)
+AssertionError: 0 != 1 : Executed 1 GoogleTest cases; evidence: /tmp/tmpuhwe7_dz/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_late_unstaged_source_change_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_unstaged_source_change_rejects_new_summary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 91, in test_late_unstaged_source_change_rejects_new_summary
+    self.assert_rejected(lambda: (self.root / "core" / "state.c")
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 81, in assert_rejected
+    self.assertEqual(result, 1, output)
+AssertionError: 0 != 1 : Executed 1 GoogleTest cases; evidence: /tmp/tmplbjc6qf6/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_late_untracked_source_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_untracked_source_rejects_new_summary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 99, in test_late_untracked_source_rejects_new_summary
+    self.assert_rejected(mutation)
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 81, in assert_rejected
+    self.assertEqual(result, 1, output)
+AssertionError: 0 != 1 : Executed 1 GoogleTest cases; evidence: /tmp/tmpbxxzl2fi/build/native-debug/tdd/execution.json
+
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.037s
+
+FAILED (failures=3)

@@ -143,8 +143,8 @@ def inspect_venv(directory, python, root):
             raise ValueError("invalid installed package version")
     except (KeyError, TypeError, ValueError) as error:
         raise InstallError(f"Cannot inspect virtual environment {directory}: {error}") from error
-    if version < (3, 10, 0):
-        raise InstallError(f"{python} requires Python >=3.10; repair the existing .venv")
+    if version < (3, 11, 0):
+        raise InstallError(f"{python} requires Python >=3.11; repair the existing .venv")
     if prefix != directory.resolve() or prefix == base_prefix:
         raise InstallError(f"{python} is not running inside the repository .venv")
     return versions
@@ -169,8 +169,8 @@ def main(arguments=None):
     parser.add_argument("--skip-hooks", action="store_true", help="install/verify tools without Git hooks (CI)")
     args = parser.parse_args(arguments)
     try:
-        if sys.version_info < (3, 10):
-            raise InstallError("Development tool installation requires Python >=3.10")
+        if sys.version_info < (3, 11):
+            raise InstallError("Development tool installation requires Python >=3.11")
         root = ROOT.resolve()
         lock = root / LOCK_NAME
         pins = read_lock(lock)

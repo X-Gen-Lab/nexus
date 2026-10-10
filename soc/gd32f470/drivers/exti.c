@@ -10,7 +10,7 @@
 #include "gd32f4xx.h"
 #include "private/system.h"
 
-static nx_exti_port_t* s_lines[16];
+static nx_gd32_exti_state_t* s_lines[16];
 
 /** \brief           Map GPIO lines to their exact silicon vector. */
 static IRQn_Type vector(unsigned line) {
@@ -21,7 +21,7 @@ static IRQn_Type vector(unsigned line) {
 }
 
 /** \brief           Bind after duplicate line and shared priority checks. */
-nx_result_t nx_gd32_exti_initialize(nx_exti_port_t* port, unsigned line,
+nx_result_t nx_gd32_exti_initialize(nx_gd32_exti_state_t* port, unsigned line,
                                     unsigned gpio_index, nx_exti_edge_t edges,
                                     nx_exti_event_t* events, size_t capacity,
                                     unsigned priority) {
@@ -62,12 +62,12 @@ nx_result_t nx_gd32_exti_initialize(nx_exti_port_t* port, unsigned line,
     EXTI_FTEN =
         (EXTI_FTEN & ~mask) | ((edges & NX_EXTI_FALLING) != 0u ? mask : 0u);
     EXTI_PD = mask;
-    *port = (nx_exti_port_t){.events = events,
-                             .capacity = capacity,
-                             .line = (uint8_t)line,
-                             .gpio_index = (uint8_t)gpio_index,
-                             .edges = edges,
-                             .initialized = true};
+    *port = (nx_gd32_exti_state_t){.events = events,
+                                   .capacity = capacity,
+                                   .line = (uint8_t)line,
+                                   .gpio_index = (uint8_t)gpio_index,
+                                   .edges = edges,
+                                   .initialized = true};
     s_lines[line] = port;
     NVIC_SetPriority(irq, priority);
     NVIC_EnableIRQ(irq);
@@ -82,7 +82,7 @@ static void dispatch(uint32_t vector_mask) {
     nx_time_us_t now = nx_time_now_us();
     for (unsigned line = 0u; line < 16u; ++line) {
         uint32_t mask = UINT32_C(1) << line;
-        nx_exti_port_t* port = s_lines[line];
+        nx_gd32_exti_state_t* port = s_lines[line];
         if ((pending & mask) == 0u || !port || !port->initialized) {
             continue;
         }
@@ -91,6 +91,7 @@ static void dispatch(uint32_t vector_mask) {
             if (port->lost != UINT32_MAX) {
                 ++port->lost;
             }
+            (void)nx_irq_wake_signal(port->wake);
             continue;
         }
         nx_exti_edge_t edge = port->edges;
@@ -105,12 +106,14 @@ static void dispatch(uint32_t vector_mask) {
         port->events[tail] = (nx_exti_event_t){now, NX_EXTI_EVENT_COALESCED,
                                                (uint8_t)line, edge};
         ++port->count;
+        (void)nx_irq_wake_signal(port->wake);
     }
 }
 
 /** \brief           Return queue order then a loss marker before new events. */
-nx_result_t nx_exti_port_read(nx_exti_port_t* port, nx_exti_event_t* events,
+nx_result_t nx_gd32_exti_read(void* context, nx_exti_event_t* events,
                               size_t capacity, size_t* count) {
+    nx_gd32_exti_state_t* port = context;
     if (!port || !port->initialized || !events || !capacity || !count) {
         return NX_ERROR_INVALID;
     }
@@ -137,7 +140,8 @@ nx_result_t nx_exti_port_read(nx_exti_port_t* port, nx_exti_event_t* events,
 }
 
 /** \brief           Preserve shared line sources and retain storage on BUSY. */
-nx_result_t nx_exti_port_stop(nx_exti_port_t* port) {
+nx_result_t nx_gd32_exti_stop(void* context) {
+    nx_gd32_exti_state_t* port = context;
     if (!port || !port->initialized || port->line > 15u ||
         s_lines[port->line] != port) {
         return NX_ERROR_INVALID;
@@ -165,6 +169,7 @@ nx_result_t nx_exti_port_stop(nx_exti_port_t* port) {
         NVIC_DisableIRQ(irq);
         NVIC_ClearPendingIRQ(irq);
     }
+    port->wake = NULL;
     port->initialized = false;
     port->count = 0u;
     port->lost = 0u;
@@ -200,3 +205,36 @@ void EXTI5_9_IRQHandler(void) {
 void EXTI10_15_IRQHandler(void) {
     dispatch(0xFC00u);
 }
+
+/** \brief Validate shared-vector priority before attaching a borrowed sink. */
+static nx_result_t gd32_exti_attach_wake(void* context,
+                                         const nx_irq_wake_t* wake,
+                                         uint8_t syscall_ceiling) {
+    nx_gd32_exti_state_t* port = context;
+    if (port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    uint32_t saved = nx_gd32_critical_enter();
+    if (!port->initialized) {
+        nx_gd32_critical_leave(saved);
+        return NX_ERROR_STATE;
+    }
+    uint8_t priority = (uint8_t)NVIC_GetPriority(vector(port->line));
+    nx_result_t result =
+        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+    if (result == NX_SUCCESS) {
+        port->wake = wake;
+    }
+    nx_gd32_critical_leave(saved);
+    return result;
+}
+
+/** \brief One shared immutable method table for this execution mode. */
+const nx_exti_ops_t nx_gd32_exti_ops = {
+    .read = nx_gd32_exti_read,
+    .stop = nx_gd32_exti_stop,
+    .attach_wake = gd32_exti_attach_wake,
+};

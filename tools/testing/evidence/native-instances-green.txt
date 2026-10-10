@@ -1,0 +1,33 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from NativeInstances
+[ RUN      ] NativeInstances.GPIOBindingsAndAlternateProviderRemainIndependent
+[       OK ] NativeInstances.GPIOBindingsAndAlternateProviderRemainIndependent (0 ms)
+[ RUN      ] NativeInstances.GPIOInputViewRejectsWritesWithoutChangingSnapshot
+[       OK ] NativeInstances.GPIOInputViewRejectsWritesWithoutChangingSnapshot (0 ms)
+[ RUN      ] NativeInstances.PublicModelHelpersSelectOnlyTheirNativeFace
+[       OK ] NativeInstances.PublicModelHelpersSelectOnlyTheirNativeFace (0 ms)
+[ RUN      ] NativeInstances.UARTInterruptsAndBorrowSettlementStayOnTheirInstance
+[       OK ] NativeInstances.UARTInterruptsAndBorrowSettlementStayOnTheirInstance (0 ms)
+[ RUN      ] NativeInstances.SPIEndpointsShareArbitrationAndKeepDeviceMemory
+[       OK ] NativeInstances.SPIEndpointsShareArbitrationAndKeepDeviceMemory (0 ms)
+[ RUN      ] NativeInstances.I2CEndpointCursorAndFaultsHaveExplicitControllerScope
+[       OK ] NativeInstances.I2CEndpointCursorAndFaultsHaveExplicitControllerScope (0 ms)
+[ RUN      ] NativeInstances.FlashProgramAndFaultsDoNotCrossInstanceMemory
+[       OK ] NativeInstances.FlashProgramAndFaultsDoNotCrossInstanceMemory (0 ms)
+[ RUN      ] NativeInstances.EXTIQueuesAndStopAreIndependent
+[       OK ] NativeInstances.EXTIQueuesAndStopAreIndependent (0 ms)
+[ RUN      ] NativeInstances.PWMBasesAndADCSequencesAreIndependent
+[       OK ] NativeInstances.PWMBasesAndADCSequencesAreIndependent (0 ms)
+[ RUN      ] NativeInstances.WatchdogEffectsRemainInstanceLocal
+[       OK ] NativeInstances.WatchdogEffectsRemainInstanceLocal (0 ms)
+[ RUN      ] NativeInstances.PlatformStopWithdrawsFlashADCAndPWMAdmission
+[       OK ] NativeInstances.PlatformStopWithdrawsFlashADCAndPWMAdmission (0 ms)
+[ RUN      ] NativeInstances.WatchdogAssemblyRestartPreservesIrreversibleEffect
+[       OK ] NativeInstances.WatchdogAssemblyRestartPreservesIrreversibleEffect (0 ms)
+[----------] 12 tests from NativeInstances (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 12 tests.
