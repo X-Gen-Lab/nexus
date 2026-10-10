@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "command": [
+    ".venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tests.contracts.test_junit.JunitEvidenceContracts.test_fixture_freshness_is_independent_of_filesystem_clock_lag",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

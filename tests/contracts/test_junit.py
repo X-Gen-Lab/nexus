@@ -7,6 +7,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 CHECKER = ROOT / "scripts/validation/junit.py"
@@ -20,8 +21,11 @@ class JunitEvidenceContracts(unittest.TestCase):
             start_ns = time.time_ns()
             if contents is not None:
                 report.write_text(contents)
-            if stale:
-                os.utime(report, ns=(start_ns - 10_000_000_000,) * 2)
+                # Synthetic checker inputs need controlled timestamps; filesystem
+                # clock ticks must not determine fixture validity. Real execution
+                # reports keep their actual timestamps in production callers.
+                stamp_ns = start_ns - 10_000_000_000 if stale else start_ns
+                os.utime(report, ns=(stamp_ns,) * 2)
             return subprocess.run([sys.executable, str(CHECKER), "--report", str(report),
                                    "--not-before-ns", str(start_ns), *suffix],
                                   capture_output=True, text=True, timeout=10)
@@ -33,6 +37,15 @@ class JunitEvidenceContracts(unittest.TestCase):
         self.assertEqual((data["tests"], data["passed"], data["skipped"]), (1, 1, 0))
         self.assertEqual(data["cases"][0]["name"], "real.case")
         self.assertEqual(len(data["report_sha256"]), 64)
+
+    def test_fixture_freshness_is_independent_of_filesystem_clock_lag(self):
+        future_ns = time.time_ns() + 10_000_000_000
+        with patch.object(time, "time_ns", return_value=future_ns):
+            fresh = self.run_checker(GOOD)
+            stale = self.run_checker(GOOD, stale=True)
+        self.assertEqual(fresh.returncode, 0, fresh.stderr)
+        self.assertNotEqual(stale.returncode, 0)
+        self.assertIn("predates this test execution", stale.stderr)
 
     def test_missing_report_rejected(self):
         self.assertNotEqual(self.run_checker(None).returncode, 0)
