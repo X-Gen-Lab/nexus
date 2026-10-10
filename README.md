@@ -13,7 +13,7 @@ provider. Kconfig and runtime registries are no longer configuration authorities
 | Layer | Responsibility |
 | --- | --- |
 | `core/` | Status, monotonic deadlines, caller-owned requests and stable epochs |
-| `arch/` | Cortex-M4/Native interrupt masks, barriers and cycle snapshots |
+| `arch/` | Compile-time Cortex-M/Native masks, privilege, exceptions, barriers and cycle snapshots |
 | `soc/` | Exact chip memory, clocks, reset/startup, IRQs and controller drivers |
 | `boards/` | Reviewed pin routes, oscillator facts, initial outputs and provenance |
 | `io/` | GPIO, UART, SPI, I²C, physical Flash, watchdog, EXTI, PWM and ADC contracts |

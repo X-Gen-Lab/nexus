@@ -5,7 +5,7 @@
 | 层与目录 | 拥有的责任 | 依赖边界 |
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
-| `arch/` | Cortex-M4/Native 异常上下文、中断状态保存恢复、屏障、cycle snapshot | 公共 Nexus 类型；不管理外设 |
+| `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot | 无 SDK／OS；原语编译与整平台资格分别记录 |
 | `soc/stm32f407/`、`soc/gd32f470/` | 精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
 | `io/` | 九类 I/O 的 typed 多态合同、共享操作表、DMA/stream/wake 机制 | 公共头不含厂商类型；Native 是行为模型 |
@@ -14,7 +14,8 @@
 | `tools/`、`cmake/` | 严格输入解析、单份生成结果、源码 SDK、ELF/资格/HIL 工具 | CMake 是代码依赖唯一权威 |
 | 外部应用工程 | 产品 composition、任务、策略、布局、预算、恢复与业务 | pin 一个明确平台版本，拥有实际执行进展 |
 
-SoC 每个 controller 是独立 translation unit。选入一个 UART 不会默认驻留所有
+SoC 按 controller kind/mode 组织 translation unit，同一实现可服务多个独立实例。
+选入一个 UART 不会默认驻留所有
 外设、RTOS 队列或最大对象池。启动与 system source 是显式 firmware 输入，不依靠
 静态 archive 中未被引用的弱符号来拉入正确 reset/vector。强 provider IRQ 只随所选
 实现进入镜像，未使用实现由 section GC 清除。
@@ -68,6 +69,11 @@ provider storage 只对实现与生成 binding TU 可见。公共消费路径没
 外部 firmware 通过 `nexus_add_firmware()` 显式装入 startup/system/linker 和资源校验。
 
 ## 固定对象与执行
+
+CPU 原语、特权、中断屏蔽和 FreeRTOS 启动合同见
+[Cortex-M 架构接入](cortex-m.md)。Arch 按编译期目标选择实现，不使用运行时
+CPU factory；设备 typed factory 与共享多态方法表保持。完整 MCU 平台目前仍为
+F407／F470，其他内核的原语编译结果不替代其 SoC、内核 port、缓存或安全验证。
 
 当前恢复 factory＋多态接口骨架，生成阶段完成实例构造。每类接口 face 只有
 `const ops*` 和 `context*`；face 与操作表只读，provider 可变状态及按实例选择的

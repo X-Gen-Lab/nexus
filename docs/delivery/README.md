@@ -8,6 +8,7 @@
 | 阅读入口 | 说明 |
 |---|---|
 | [当前架构](architecture.md) | 物理目录、依赖方向、执行与资源责任 |
+| [Cortex-M 架构接入](cortex-m.md) | CPU 原语、掩码／特权、内核启动与跨内核编译边界 |
 | [支持范围](support.md) | 首发模式、三块 Board 与精确未知项 |
 | [派生能力矩阵](capabilities.md) | facts/routes、参考 Board、软件夹具和生产定义的一致性 |
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
