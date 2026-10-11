@@ -1,0 +1,22 @@
+test_owner_observer_is_an_explicit_optional_component (tools.configure.test_metadata_binding.MetadataBindingTests.test_owner_observer_is_an_explicit_optional_component) ... ERROR
+
+======================================================================
+ERROR: test_owner_observer_is_an_explicit_optional_component (tools.configure.test_metadata_binding.MetadataBindingTests.test_owner_observer_is_an_explicit_optional_component)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_metadata_binding.py", line 44, in test_owner_observer_is_an_explicit_optional_component
+    result = gate.resolve_ir(self.assembly, self.root)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 785, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 729, in resolve
+    fail(f"Unknown maintained component: {component}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unknown maintained component: owner-observer
+
+----------------------------------------------------------------------
+Ran 1 test in 0.003s
+
+FAILED (errors=1)

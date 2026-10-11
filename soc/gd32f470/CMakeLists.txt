@@ -101,7 +101,11 @@ target_compile_definitions(nexus_soc_gd32f470 PRIVATE GD32F470
     HXTAL_VALUE=25000000)
 set(NEXUS_STARTUP_SOURCE "${gd_device}/Source/GCC/startup_gd32f450_470.S"
     PARENT_SCOPE)
-set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c" PARENT_SCOPE)
+set(gd_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c")
+if(NEXUS_MEMORY_ADDSRAM OR NEXUS_MEMORY_TCM)
+    list(APPEND gd_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")
+endif()
+set(NEXUS_SYSTEM_SOURCE ${gd_system_sources} PARENT_SCOPE)
 # system.c is a firmware source, not an archive: startup must resolve SystemInit.
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/private"

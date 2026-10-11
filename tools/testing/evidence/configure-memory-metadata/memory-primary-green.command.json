@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_selection_cannot_replace_the_authoritative_primary_ram",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

@@ -3,7 +3,7 @@ add_library(nexus_io STATIC
     src/gpio.c src/uart.c src/spi.c src/i2c.c src/flash.c
     src/watchdog.c src/exti.c src/timer.c src/adc.c src/flash_region.c
     src/dma.c src/stream.c src/wake.c src/i2c_bus_clear.c src/adc_observer.c
-    src/uart_rs485.c)
+    src/uart_rs485.c src/stream_budget.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_io PUBLIC nexus_core PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
 add_library(Nexus::IO ALIAS nexus_io)

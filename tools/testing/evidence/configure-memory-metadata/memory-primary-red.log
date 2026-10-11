@@ -1,0 +1,17 @@
+test_extra_selection_cannot_replace_the_authoritative_primary_ram (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_selection_cannot_replace_the_authoritative_primary_ram) ... FAIL
+
+======================================================================
+FAIL: test_extra_selection_cannot_replace_the_authoritative_primary_ram (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_selection_cannot_replace_the_authoritative_primary_ram)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_memory_regions.py", line 76, in test_extra_selection_cannot_replace_the_authoritative_primary_ram
+    self.assertEqual(next(item["id"] for item in selected if item["linker"]),
+AssertionError: 'tcm' != 'sram'
+- tcm
++ sram
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

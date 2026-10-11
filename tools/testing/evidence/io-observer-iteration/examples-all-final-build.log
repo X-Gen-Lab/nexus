@@ -1,0 +1,10 @@
+[1/10] Building C object CMakeFiles/platform_reference.dir/apps/platform_reference/main.c.o
+[2/10] Building C object CMakeFiles/sensor_spi.dir/apps/sensor_spi/main.c.o
+[3/10] Building C object nexus/components/CMakeFiles/nexus_file_flash.dir/storage/src/file_flash.c.o
+[4/10] Building C object CMakeFiles/journal.dir/apps/journal/main.c.o
+[5/10] Linking C static library nexus/lib/libnexus_file_flash.a
+[6/10] Linking C executable bin/platform_reference
+[7/10] Linking C executable bin/sensor_spi
+[8/10] Building C object CMakeFiles/modbus_registers.dir/apps/modbus_registers/main.c.o
+[9/10] Linking C executable bin/journal
+[10/10] Linking C executable bin/modbus_registers

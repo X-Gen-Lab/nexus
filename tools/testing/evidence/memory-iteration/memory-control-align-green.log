@@ -1,0 +1,31 @@
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from MemoryFixture
+[ RUN      ] MemoryFixture.CopiesDataZerosBssAndPreservesNoInitAndPadding
+[       OK ] MemoryFixture.CopiesDataZerosBssAndPreservesNoInitAndPadding (0 ms)
+[ RUN      ] MemoryFixture.EmptyCopyAndZeroRangesDoNotTouchNoInit
+[       OK ] MemoryFixture.EmptyCopyAndZeroRangesDoNotTouchNoInit (0 ms)
+[ RUN      ] MemoryFixture.InvalidSecondRegionRejectsBeforeFirstMutation
+[       OK ] MemoryFixture.InvalidSecondRegionRejectsBeforeFirstMutation (0 ms)
+[ RUN      ] MemoryFixture.EverySectionBoundRequiresWordAlignment
+[       OK ] MemoryFixture.EverySectionBoundRequiresWordAlignment (0 ms)
+[ RUN      ] MemoryFixture.ReversedAndOutOfRegionBoundsRejectWithoutWrites
+[       OK ] MemoryFixture.ReversedAndOutOfRegionBoundsRejectWithoutWrites (0 ms)
+[ RUN      ] MemoryFixture.FlashLoadOverflowAndOutOfFlashRejectWithoutWrites
+[       OK ] MemoryFixture.FlashLoadOverflowAndOutOfFlashRejectWithoutWrites (0 ms)
+[ RUN      ] MemoryFixture.OverlappingPhysicalRegionsRejectWithoutWrites
+[       OK ] MemoryFixture.OverlappingPhysicalRegionsRejectWithoutWrites (0 ms)
+[ RUN      ] MemoryFixture.DescriptorInsideTargetRejectsBeforeSelfOverwrite
+[       OK ] MemoryFixture.DescriptorInsideTargetRejectsBeforeSelfOverwrite (0 ms)
+[ RUN      ] MemoryFixture.FlashAndTargetOverlapRejectsBeforeWrites
+[       OK ] MemoryFixture.FlashAndTargetOverlapRejectsBeforeWrites (0 ms)
+[ RUN      ] MemoryFixture.InvalidCountAndFlashBoundsRejectBeforeWrites
+[       OK ] MemoryFixture.InvalidCountAndFlashBoundsRejectBeforeWrites (0 ms)
+[ RUN      ] MemoryFixture.UnalignedDescriptorsRejectBeforeReadingControl
+[       OK ] MemoryFixture.UnalignedDescriptorsRejectBeforeReadingControl (0 ms)
+[----------] 11 tests from MemoryFixture (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 11 tests.

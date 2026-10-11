@@ -246,11 +246,18 @@ class EndpointIR(Record):
 
 
 @dataclass(frozen=True)
+class MemoryRegionBudgetIR:
+    id: str
+    limit_bytes: int
+
+
+@dataclass(frozen=True)
 class MemoryBudgetIR:
     main_stack_bytes: int
     libc_heap_bytes: int
     static_ram_limit_bytes: int | None
     flash_load_limit_bytes: int | None
+    regions: tuple[MemoryRegionBudgetIR, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -285,7 +292,10 @@ class ConfigurationIR(Record):
         memory = MemoryBudgetIR(budgets["main_stack_bytes"],
                                 budgets.get("libc_heap_bytes", 0),
                                 budgets.get("static_ram_bytes"),
-                                budgets.get("flash_load_bytes"))
+                                budgets.get("flash_load_bytes"),
+                                tuple(MemoryRegionBudgetIR(name, choice["limit_bytes"])
+                                      for name, choice in sorted(
+                                          budgets.get("regions", {}).items())))
         irq = InterruptProfileIR(**result["irq"])
         cpu = CpuProfileIR.from_validated(result["cpu_profile"])
         kernel = (KernelProfileIR.from_validated(result["kernel_profile"])

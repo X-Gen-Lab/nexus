@@ -17,7 +17,8 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel
+    from . import kernel, memory as memory_regions, metadata, factory
+    from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                    mode_traits, route_dma,
@@ -26,6 +27,10 @@ try:
 except ImportError:
     import cpu as cpu_profiles
     import kernel
+    import metadata
+    import factory
+    import memory as memory_regions
+    from ir import thaw
     from providers import maintained
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                    mode_traits, route_dma,
@@ -269,6 +274,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     snapshots = {}
     read = lambda path: load(path, snapshots)
     assembly_path = assembly_path.resolve()
+    policy_path = contained_file(root, metadata.POLICY)
+    platform_metadata = metadata.policy_contract(
+        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
     assembly_input = load_assembly(assembly_path, root, snapshots)
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
@@ -410,9 +418,11 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if optimization not in {"O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
     budgets = obj(assembly["memory_budgets"], {"main_stack_bytes"},
-                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes"},
+                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions"},
                   "memory budgets")
     for name, value in budgets.items():
+        if name == "regions":
+            continue
         integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
     if budgets["main_stack_bytes"] % 8:
         fail("Main stack must have 8-byte alignment")
@@ -423,6 +433,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail("Static RAM budget exceeds physical linker domain")
     if budgets.get("flash_load_bytes", variant["flash"]["size"]) > variant["flash"]["size"]:
         fail("Flash budget exceeds exact physical density")
+    selected_memory = memory_regions.select(
+        variant["memory"], budgets, family, part, obj=obj, integer=integer, fail=fail)
     bindings = {}
     for binding in sequence(board["bindings"], "Board bindings"):
         obj(binding, {"id", "controller", "route"}, {"initial", "mask"}, "binding")
@@ -648,7 +660,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and not children:
             fail("SPI requires at least one reviewed CS endpoint")
     layout = variant["flash"].copy()
-    inputs = [assembly_path, board_path, soc_path, routes_path]
+    inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
         inputs.append(contained_file(board_dir, name))
     if assembly["layout"] is not None:
@@ -717,7 +729,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     for component in components:
         text(component, "component")
     unique(components, "components")
-    maintained_components = {"bus-owner", "spi-owner", "spi-async-owner", "uart-owner", "bmp280", "bmp280-spi",
+    maintained_components = {"owner-observer", "bus-owner", "spi-owner", "spi-async-owner", "uart-owner", "bmp280", "bmp280-spi",
                              "log", "storage", "flash-storage", "modbus-rtu"}
     for component in components:
         if component not in maintained_components:
@@ -725,14 +737,15 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if any(device["driver"] == "bmp280" for device in assembly["devices"]):
         if "bmp280-spi" not in components:
             fail("BMP280 SPI device requires the maintained bmp280-spi component")
-    result = {"schema_version": 1, "board": board["id"], "soc_family": family,
+    result = {"schema_version": 1, "platform_metadata": platform_metadata,
+              "board": board["id"], "soc_family": family,
               "part": part, "package": variant["package"], "backend": backend,
               "cpu": soc["cpu"], "irq": irq_profile,
               "cpu_profile": cpu_profile.to_dict(),
               "kernel_profile": (kernel_profile.to_dict()
                                  if kernel_profile is not None else None),
               "clock_profile": assembly["clock_profile"],
-              "clock": clock, "memory": variant["memory"], "flash": variant["flash"],
+              "clock": clock, "memory": selected_memory, "flash": variant["flash"],
               "layout": layout, "controllers": selected, "devices": assembly["devices"],
               "components": components, "claims": claim_list, "memory_budgets": budgets,
               "board_bindings": bindings, "routes": routes,
@@ -796,11 +809,14 @@ def generate(result, output):
               f'#define NEXUS_HSE_HZ {result["clock"]["hse_hz"]}u',
               f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
               f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
-              *cpu_profiles.header_lines(profile), *kernel.header_lines(policy)]
+              *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
+              *memory_regions.header_lines(result),
+              *metadata.header_lines(thaw(result["platform_metadata"]))]
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
              *cpu_profiles.selection_lines(profile),
              *kernel.selection_lines(policy),
+             *memory_regions.selection_lines(result),
              f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
@@ -836,55 +852,11 @@ def generate(result, output):
     flash = result["layout"]
     stack = result["memory_budgets"]["main_stack_bytes"]
     heap = result["memory_budgets"].get("libc_heap_bytes", 0)
-    write("memory.ld", f'''/* Exact resolved physical layout; no product reservation. */
-ENTRY(Reset_Handler)
-PHDRS {{
-    flash PT_LOAD FLAGS(5);
-    data PT_LOAD FLAGS(6);
-    ram PT_LOAD FLAGS(6);
-    stack PT_LOAD FLAGS(6);
-}}
-MEMORY {{
-    FLASH (rx) : ORIGIN = 0x{flash["origin"]:08x}, LENGTH = {flash["size"]}
-    RAM (rwx) : ORIGIN = 0x{ram["origin"]:08x}, LENGTH = {ram["size"]}
-}}
-_estack = ORIGIN(RAM) + LENGTH(RAM);
-_sp = _estack;
-_Min_Stack_Size = {stack};
-_Min_Heap_Size = {heap};
-__nx_msp_start = _estack - _Min_Stack_Size;
-__nx_msp_end = _estack;
-__nx_resolved_sha256_0 = 0x{result["configuration_sha256"][0:8]};
-__nx_resolved_sha256_1 = 0x{result["configuration_sha256"][8:16]};
-__nx_resolved_sha256_2 = 0x{result["configuration_sha256"][16:24]};
-__nx_resolved_sha256_3 = 0x{result["configuration_sha256"][24:32]};
-__nx_resolved_sha256_4 = 0x{result["configuration_sha256"][32:40]};
-__nx_resolved_sha256_5 = 0x{result["configuration_sha256"][40:48]};
-__nx_resolved_sha256_6 = 0x{result["configuration_sha256"][48:56]};
-__nx_resolved_sha256_7 = 0x{result["configuration_sha256"][56:64]};
-SECTIONS {{
-    .isr_vector : {{ KEEP(*(.isr_vector)) KEEP(*(.vectors)) }} > FLASH :flash
-    .text : {{ *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) }} > FLASH :flash
-    .ARM.extab : {{ *(.ARM.extab*) }} > FLASH :flash
-    .ARM.exidx : {{ __exidx_start = .; *(.ARM.exidx*) __exidx_end = .; }} > FLASH :flash
-    .preinit_array : {{ PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); }} > FLASH :flash
-    .init_array : {{ PROVIDE_HIDDEN(__init_array_start = .); KEEP(*(SORT(.init_array.*))) KEEP(*(.init_array*)) PROVIDE_HIDDEN(__init_array_end = .); }} > FLASH :flash
-    .fini_array : {{ PROVIDE_HIDDEN(__fini_array_start = .); KEEP(*(SORT(.fini_array.*))) KEEP(*(.fini_array*)) PROVIDE_HIDDEN(__fini_array_end = .); }} > FLASH :flash
-    _sidata = LOADADDR(.data);
-    .data : {{ . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; }} > RAM AT> FLASH :data
-    .bss (NOLOAD) : AT(ADDR(.bss)) {{ . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; }} > RAM :ram
-    .reserved (NOLOAD) : AT(ADDR(.reserved)) {{ . = ALIGN(8); __heap_start = .; __nx_heap_start = .; . += _Min_Heap_Size; __heap_end = .; __nx_heap_end = .; }} > RAM :ram
-    .msp __nx_msp_start (NOLOAD) : AT(__nx_msp_start) {{ . += _Min_Stack_Size; }} > RAM :stack
-    PROVIDE(end = _ebss);
-    PROVIDE(_end = _ebss);
-    ASSERT(_ebss + _Min_Heap_Size <= _estack - _Min_Stack_Size, "RAM stack/heap overlap")
-}}
-''')
+    write("memory.ld", memory_regions.linker(result))
     write("resource-budget.json", json.dumps({"schema_version": 1,
           "flash_loaded_max": result["memory_budgets"].get("flash_load_bytes", flash["size"]),
           "flash_footprint_max": result["memory_budgets"].get("flash_load_bytes", flash["size"]),
-          "ram_reserved_max": {region["id"]: result["memory_budgets"].get("static_ram_bytes", region["size"])
-                               if region["linker"] else 0 for region in result["memory"]},
+          "ram_reserved_max": memory_regions.budget_limits(result),
           "msp_max": stack, "heap_max": heap}, indent=2, sort_keys=True) + "\n")
     write(".nexus-config-bundle", result["configuration_sha256"] + "\n")
 
@@ -893,6 +865,9 @@ def configure(assembly, output, root=ROOT):
     output = output.absolute()
     if output.is_symlink() or output == root.resolve() or output == output.parent:
         fail("Unsafe configuration output directory")
+    policy_source = (root / metadata.POLICY).resolve()
+    if output.resolve() == policy_source or output.resolve() in policy_source.parents:
+        fail("Configuration output must not replace platform metadata")
     if output.exists():
         if not output.is_dir() or not (output / ".nexus-config-bundle").is_file():
             fail("Existing output is not an owned configuration bundle")
@@ -907,6 +882,11 @@ def configure(assembly, output, root=ROOT):
         generate(result, temporary)
         (temporary / "input_paths.json").write_text(
             json.dumps(input_paths, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        # Publish only if every snapshotted authored or package input still
+        # matches the resolved identity, including compatibility metadata.
+        for record in result["inputs"]:
+            if file_digest(Path(input_paths[record["path"]])) != record["sha256"]:
+                fail(f"Input changed during generation: {record['path']}")
         os.replace(temporary, output)
     except BaseException:
         shutil.rmtree(temporary, ignore_errors=True)

@@ -1,0 +1,14 @@
+schema = 2
+board = "gd32f470_liangshan"
+backend = "baremetal"
+clock = "hxtal25-pll200"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 16384
+static_ram_limit_bytes = 4096
+libc_heap_bytes = 0
+
+[memory.regions.tcm]
+limit_bytes = 128

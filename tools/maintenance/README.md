@@ -79,3 +79,21 @@ package exports,
 dependency and source-import identities, then reports tools and this narrower
 scope. A manifest's presence alone never skips verification. `check` requires a
 development checkout and explicitly rejects the SDK-only scope.
+
+`compatibility.py` checks the single
+`dependencies/platform-compatibility.json` policy against actual CMake,
+validator/emitter schemas, fact files and executed exact-version package tests.
+The production stdlib loader is `tools/configure/metadata.py`. Unknown requested
+source factory generations fail closed; current epoch 1 does not promise a
+binary ABI. Optional generated-header and installed-source-SDK checks verify
+actual bytes. This metadata consistency check is not software qualification.
+
+`dependency_proposals.py` observes actual current pins offline by default.
+Explicit `--observe-upstream --upstream-output <fresh-directory>` captures
+bounded public GitHub heads/tags and raw request/response identities. Failures
+remain `not_observed`. Codex owns weekly proposals and independent review.
+Candidate source/archive/license identities and nine mandatory software/legal
+gates are retained as pending or referenced/unreviewed; a passed marker never
+authorizes an upgrade. The tool never writes locks or merges source changes.
+See [source compatibility and maintenance](../../docs/design/source-compatibility.md)
+for scope, commands and the complete upgrade process.

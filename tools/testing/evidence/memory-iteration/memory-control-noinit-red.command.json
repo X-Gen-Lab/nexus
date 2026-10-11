@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-memory-iteration/memory_test_red",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/memory-iteration/memory-control-noinit-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T17:00:00.260072+00:00",
+  "ended_at": "2026-10-11T17:00:00.267176+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/memory-iteration/memory-control-noinit-red.log"
+}

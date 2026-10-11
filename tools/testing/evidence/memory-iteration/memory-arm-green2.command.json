@@ -1,0 +1,16 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-B",
+    "scripts/ci/gd32_memory.py",
+    "--compiler",
+    "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+    "--output",
+    "tools/testing/evidence/memory-iteration/arm-green2"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T17:34:02.231427+00:00",
+  "ended_at": "2026-10-11T17:34:05.413440+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/memory-iteration/memory-arm-green2.log"
+}

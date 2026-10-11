@@ -14,6 +14,9 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/cpu.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/memory.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/authored.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/factory.py"
@@ -51,6 +54,7 @@ function(nexus_resolve_assembly)
                   NEXUS_CPU_COMPILE_OPTIONS NEXUS_IRQ_KERNEL_POLICY
                   NEXUS_FREERTOS_PORT
                   NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
+                  NEXUS_MEMORY_ADDSRAM NEXUS_MEMORY_TCM
                   NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256
                   NEXUS_OS_SELECTION_VARIABLES ${NEXUS_OS_SELECTION_VARIABLES})
         set(${value} "${${value}}" PARENT_SCOPE)

@@ -41,8 +41,6 @@ function(nexus_google_test name)
     add_dependencies(nexus_google_contracts ${name})
     add_test(NAME ${name} COMMAND ${name})
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
-    set_property(GLOBAL APPEND PROPERTY NEXUS_GOOGLE_EXECUTABLES
-        "$<TARGET_FILE:${name}>")
 endfunction()
 
 nexus_google_test(nexus_owner_mock_test SOURCES owner_mock_test.cpp
@@ -425,7 +423,13 @@ foreach(gd_target nexus_gd32_multi_test nexus_gd32_uart_dma_test
         "${NEXUS_SOURCE_DIR}/arch/include")
 endforeach()
 
-get_property(google_executables GLOBAL PROPERTY NEXUS_GOOGLE_EXECUTABLES)
-list(JOIN google_executables "\",\n    \"" google_executables)
-file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/google-contracts.json"
-    CONTENT "{\n  \"schema\": 1,\n  \"executables\": [\n    \"${google_executables}\"\n  ]\n}\n")
+include(plan.cmake)
+
+include(gd32_memory.cmake)
+nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
+    LIBRARIES Nexus::OwnerObserver Nexus::IO)
+nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
+    LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
+        Nexus::SPIAsyncOwner Nexus::NativeModel)
+target_include_directories(nexus_io_state_machine_test PRIVATE
+    "${NEXUS_SOURCE_DIR}/io/native")

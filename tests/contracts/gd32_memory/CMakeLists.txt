@@ -1,0 +1,27 @@
+# Consume the real platform graph and one authored optional-memory assembly.
+cmake_minimum_required(VERSION 3.31)
+project(nexus_gd32_memory_contract LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT NEXUS_ASSEMBLY_FILE)
+    message(FATAL_ERROR "Select exactly one GD32 memory fixture TOML")
+endif()
+get_filename_component(nexus_source "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host framework in firmware" FORCE)
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Consumer owns its fixture" FORCE)
+add_subdirectory("${nexus_source}" nexus EXCLUDE_FROM_ALL)
+get_target_property(memory_soc Nexus::Platform NEXUS_SOC_FAMILY)
+if(NOT memory_soc STREQUAL "gd32f470")
+    message(FATAL_ERROR "Memory fixture requires the exact GD32F470ZGT6 SoC")
+endif()
+nexus_add_firmware(nexus_gd32_memory SOURCES main.c)
+
+# Deliberately bypass the public placement macro to probe linker rejection.
+set(GD32_MEMORY_INJECT "" CACHE STRING "Test-only unselected section injection")
+if(GD32_MEMORY_INJECT)
+    if(NOT GD32_MEMORY_INJECT MATCHES "^(ADDSRAM|TCM)$")
+        message(FATAL_ERROR "Unknown optional-memory rejection fixture")
+    endif()
+    target_sources(nexus_gd32_memory PRIVATE unselected.c)
+    target_compile_definitions(nexus_gd32_memory PRIVATE
+        "NX_MEMORY_REJECT_${GD32_MEMORY_INJECT}=1")
+endif()

@@ -1,0 +1,70 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from MemoryFixture
+[ RUN      ] MemoryFixture.CopiesDataZerosBssAndPreservesNoInitAndPadding
+[       OK ] MemoryFixture.CopiesDataZerosBssAndPreservesNoInitAndPadding (0 ms)
+[ RUN      ] MemoryFixture.EmptyCopyAndZeroRangesDoNotTouchNoInit
+[       OK ] MemoryFixture.EmptyCopyAndZeroRangesDoNotTouchNoInit (0 ms)
+[ RUN      ] MemoryFixture.InvalidSecondRegionRejectsBeforeFirstMutation
+[       OK ] MemoryFixture.InvalidSecondRegionRejectsBeforeFirstMutation (0 ms)
+[ RUN      ] MemoryFixture.EverySectionBoundRequiresWordAlignment
+[       OK ] MemoryFixture.EverySectionBoundRequiresWordAlignment (0 ms)
+[ RUN      ] MemoryFixture.ReversedAndOutOfRegionBoundsRejectWithoutWrites
+[       OK ] MemoryFixture.ReversedAndOutOfRegionBoundsRejectWithoutWrites (0 ms)
+[ RUN      ] MemoryFixture.FlashLoadOverflowAndOutOfFlashRejectWithoutWrites
+[       OK ] MemoryFixture.FlashLoadOverflowAndOutOfFlashRejectWithoutWrites (0 ms)
+[ RUN      ] MemoryFixture.OverlappingPhysicalRegionsRejectWithoutWrites
+[       OK ] MemoryFixture.OverlappingPhysicalRegionsRejectWithoutWrites (0 ms)
+[ RUN      ] MemoryFixture.DescriptorInsideTargetRejectsBeforeSelfOverwrite
+[       OK ] MemoryFixture.DescriptorInsideTargetRejectsBeforeSelfOverwrite (0 ms)
+[ RUN      ] MemoryFixture.FlashAndTargetOverlapRejectsBeforeWrites
+[       OK ] MemoryFixture.FlashAndTargetOverlapRejectsBeforeWrites (0 ms)
+[ RUN      ] MemoryFixture.InvalidCountAndFlashBoundsRejectBeforeWrites
+[       OK ] MemoryFixture.InvalidCountAndFlashBoundsRejectBeforeWrites (0 ms)
+[ RUN      ] MemoryFixture.UnalignedDescriptorsRejectBeforeReadingControl
+[       OK ] MemoryFixture.UnalignedDescriptorsRejectBeforeReadingControl (0 ms)
+[ RUN      ] MemoryFixture.DescriptorInsideNoInitIsNotValidResetControl
+tests/google/gd32_memory_test.cpp:214: Failure
+Value of: initialize()
+  Actual: true
+Expected: false
+
+tests/google/gd32_memory_test.cpp:58: Failure
+Expected equality of these values:
+  item
+    Which is: 13
+  0x5A5A5A5AU
+    Which is: 1515870810
+
+tests/google/gd32_memory_test.cpp:58: Failure
+Expected equality of these values:
+  item
+    Which is: 14
+  0x5A5A5A5AU
+    Which is: 1515870810
+
+tests/google/gd32_memory_test.cpp:58: Failure
+Expected equality of these values:
+  item
+    Which is: 0
+  0x5A5A5A5AU
+    Which is: 1515870810
+
+tests/google/gd32_memory_test.cpp:58: Failure
+Expected equality of these values:
+  item
+    Which is: 0
+  0x5A5A5A5AU
+    Which is: 1515870810
+
+[  FAILED  ] MemoryFixture.DescriptorInsideNoInitIsNotValidResetControl (0 ms)
+[----------] 12 tests from MemoryFixture (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 11 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] MemoryFixture.DescriptorInsideNoInitIsNotValidResetControl
+
+ 1 FAILED TEST

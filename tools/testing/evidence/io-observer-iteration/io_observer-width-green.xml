@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="15" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:33:36.038" name="AllTests">
+  <testsuite name="RequestObservation" tests="5" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:33:36.038">
+    <testcase name="InvalidAndStaleBindingRejectWithoutReference" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="30" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="RequestObservation" />
+    <testcase name="BorrowedFactsDoNotExposePrivateResults" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="37" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="RequestObservation" />
+    <testcase name="OldEpochCannotReadAReusedRequest" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="58" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="RequestObservation" />
+    <testcase name="ReversedClockPreservesOutputAndSaturatesCounters" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="RequestObservation" />
+    <testcase name="OutputOverlapCannotRewriteBorrowedControl" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="84" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="RequestObservation" />
+  </testsuite>
+  <testsuite name="StreamObservation" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:33:36.038">
+    <testcase name="TotalFreeDoesNotClaimTheFifoCursorIsAvailable" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="93" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="StreamObservation" />
+    <testcase name="InvalidMetadataAndAliasedOutputRemainUnchanged" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="121" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="StreamObservation" />
+  </testsuite>
+  <testsuite name="StreamBudget" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:33:36.038">
+    <testcase name="CalculatesDeclaredPipelineCapacityAndStrictLatency" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="129" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="StreamBudget" />
+    <testcase name="RoundsFractionalRetentionUpWithoutAdditionOverflow" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="145" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="StreamBudget" />
+    <testcase name="ArithmeticOverflowNeverCreatesAClampedPassingBudget" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="155" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="StreamBudget" />
+    <testcase name="LargestBlockCannotOverflowDenominatorOrPayloadSilently" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="167" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="StreamBudget" />
+  </testsuite>
+  <testsuite name="OwnerObservation" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:33:36.038">
+    <testcase name="BindingDoesNotServiceAndRejectsIncompleteOwner" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="233" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="OwnerObservation" />
+    <testcase name="RealErrorAndClockDiagnosticRemainIndependentDuringDrain" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="241" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="OwnerObservation" />
+    <testcase name="BusyAndSaturatingCountersNeverInventQuarantine" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="268" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="OwnerObservation" />
+    <testcase name="OutputAliasRejectsBeforeHardwareService" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="281" status="run" result="completed" time="0." timestamp="2026-10-11T17:33:36.038" classname="OwnerObservation" />
+  </testsuite>
+</testsuites>

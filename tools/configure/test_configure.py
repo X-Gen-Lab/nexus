@@ -13,7 +13,8 @@ class ResolverTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        for name in ("soc/native/soc.json", "soc/native/routes.json",
+        for name in ("dependencies/platform-compatibility.json",
+                     "soc/native/soc.json", "soc/native/routes.json",
                      "boards/native_reference/board.json"):
             destination = self.root / name
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -52,7 +53,7 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(result["part"], "NATIVE_MODEL")
         self.assertFalse(result["physical_qualified"])
         self.assertEqual(result["controllers"], [])
-        self.assertEqual(len(result["inputs"]), 4)
+        self.assertEqual(len(result["inputs"]), 5)
         self.assertNotIn("tasks", result)
 
     def test_duplicate_json_keys_rejected(self):

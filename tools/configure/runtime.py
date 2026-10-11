@@ -15,10 +15,17 @@ import tomllib
 from types import MappingProxyType
 
 try:
-    from . import cpu, kernel
+    from . import cpu, kernel, metadata, factory
+    from .ir import freeze
 except ImportError:
     import cpu
     import kernel
+    import metadata
+    import factory
+    from ir import freeze
+
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class RuntimeError(ValueError):
@@ -28,6 +35,7 @@ class RuntimeError(ValueError):
 @dataclass(frozen=True)
 class RuntimeIR:
     profile: object
+    platform_metadata: object
     kernel: object
     backend: str
     optimization: str
@@ -58,6 +66,11 @@ def resolve(assembly):
     """Return immutable validated input identities and CPU contracts."""
     try:
         assembly = _path(assembly)
+        policy_path = _path(ROOT / metadata.POLICY)
+        policy_bytes, _ = metadata.snapshot(policy_path)
+        platform_metadata = metadata.policy_contract(
+            metadata.parse_json(policy_bytes),
+            expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
         authored = assembly.read_bytes()
         choices = tomllib.loads(authored.decode("utf-8"))
         _fields(choices, {"schema_version", "cpu_facts", "backend", "optimization"},
@@ -84,21 +97,26 @@ def resolve(assembly):
         policy = kernel.resolve(choices.get("os"), profile, hz)
         profile = kernel.bind(profile, policy)
         digest = hashlib.sha256()
-        for label, data in ((b"assembly", authored), (b"cpu-facts", content)):
+        for label, data in ((b"assembly", authored), (b"cpu-facts", content),
+                            (b"platform-metadata", policy_bytes)):
             digest.update(label + b"\0" + len(data).to_bytes(8, "big") + data)
         inputhash = digest.hexdigest()
-        record = {"schema_version": 1, "cpu_profile": profile.to_dict(),
+        record = {"schema_version": 1, "platform_metadata": platform_metadata,
+                  "cpu_profile": profile.to_dict(),
                   "kernel_profile": policy.to_dict() if policy is not None else None,
                   "clock_hz": hz, "optimization": choices["optimization"],
                   "input_sha256": inputhash}
         configuration = hashlib.sha256(json.dumps(
             record, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-        return RuntimeIR(profile, policy, choices["backend"], choices["optimization"], hz,
+        return RuntimeIR(profile, freeze(platform_metadata), policy,
+                         choices["backend"], choices["optimization"], hz,
                          inputhash, configuration,
                          MappingProxyType({"assembly": str(assembly),
-                                           "cpu_facts": str(facts_path)}),
+                                           "cpu_facts": str(facts_path),
+                                           "platform_metadata": str(policy_path)}),
                          MappingProxyType({str(assembly): authored,
-                                           str(facts_path): content}))
+                                           str(facts_path): content,
+                                           str(policy_path): policy_bytes}))
     except (OSError, ValueError, TypeError, KeyError) as error:
         if isinstance(error, RuntimeError):
             raise
@@ -123,6 +141,9 @@ def configure(assembly, output):
             source = Path(os.path.abspath(assembly.parent / relative)).resolve()
             if output == source or output in source.parents:
                 raise RuntimeError("Runtime output must not replace input facts or their parent")
+        policy_source = _path(ROOT / metadata.POLICY)
+        if output == policy_source or output in policy_source.parents:
+            raise RuntimeError("Runtime output must not replace platform metadata")
         if output.exists():
             marker = output / ".nexus-runtime-bundle"
             if not output.is_dir() or not marker.is_file() or marker.is_symlink():
@@ -138,7 +159,8 @@ def configure(assembly, output):
                                    clock_hz=result.clock_hz,
                                    optimization=result.optimization,
                                    inputhash=result.input_sha256,
-                                   kernel_profile=result.kernel)
+                                   kernel_profile=result.kernel,
+                                   platform_metadata=result.platform_metadata)
         if emitted["configuration_sha256"] != result.configuration_sha256:
             raise RuntimeError("Resolved runtime identity changed during emission")
         with (temporary / "selection.cmake").open("a", encoding="utf-8") as stream:

@@ -14,7 +14,7 @@ INSTANCE_FIELDS = {
 }
 KINDS = set(INSTANCE_FIELDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
-                 "flash_load_limit_bytes"}
+                 "flash_load_limit_bytes", "regions"}
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
@@ -150,6 +150,12 @@ def editor_schema():
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})
+    properties["memory"]["properties"]["regions"] = {
+        "type": "object", "additionalProperties": record(
+            {"limit_bytes"}, {"limit_bytes"})}
+    properties["memory"]["properties"]["regions"]["additionalProperties"][
+        "properties"]["limit_bytes"] = {"type": "integer", "minimum": 4,
+                                        "multipleOf": 4}
     properties["os"] = kernel.editor_schema()
     properties["factory"] = {
         "type": "object", "properties": {"capabilities": {"type": "boolean"}},

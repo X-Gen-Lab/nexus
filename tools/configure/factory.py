@@ -5,6 +5,8 @@ try:
 except ImportError:
     from providers.common import mode_traits
 
+FACTORY_ABI_EPOCH = 1
+
 KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc")
 
 

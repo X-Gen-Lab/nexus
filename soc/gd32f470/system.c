@@ -8,8 +8,58 @@
  */
 #include "private/system.h"
 #include "gd32f4xx.h"
+#include "nexus_config.h"
 
 #include <stdbool.h>
+
+#if (defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM == 1) ||            \
+    (defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1)
+#include "private/memory_init.h"
+extern uint32_t __nx_flash_start;
+extern uint32_t __nx_flash_end;
+#if defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM == 1
+extern uint32_t __nx_addsram_data_load;
+extern uint32_t __nx_addsram_data_start;
+extern uint32_t __nx_addsram_data_end;
+extern uint32_t __nx_addsram_bss_start;
+extern uint32_t __nx_addsram_bss_end;
+extern uint32_t __nx_addsram_noinit_start;
+extern uint32_t __nx_addsram_noinit_end;
+#endif
+#if defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1
+extern uint32_t __nx_tcm_data_load;
+extern uint32_t __nx_tcm_data_start;
+extern uint32_t __nx_tcm_data_end;
+extern uint32_t __nx_tcm_bss_start;
+extern uint32_t __nx_tcm_bss_end;
+extern uint32_t __nx_tcm_noinit_start;
+extern uint32_t __nx_tcm_noinit_end;
+#endif
+
+/** \brief Reset stack and Flash control must not depend on extra memory. */
+static bool initialize_extra_memory(void) {
+    const nx_gd32_memory_region_t regions[] = {
+#if defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM == 1
+        {UINT32_C(0x20030000), UINT32_C(0x20070000),
+         (uintptr_t)&__nx_addsram_data_load,
+         (uintptr_t)&__nx_addsram_data_start, (uintptr_t)&__nx_addsram_data_end,
+         (uintptr_t)&__nx_addsram_bss_start, (uintptr_t)&__nx_addsram_bss_end,
+         (uintptr_t)&__nx_addsram_noinit_start,
+         (uintptr_t)&__nx_addsram_noinit_end},
+#endif
+#if defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1
+        {UINT32_C(0x10000000), UINT32_C(0x10010000),
+         (uintptr_t)&__nx_tcm_data_load, (uintptr_t)&__nx_tcm_data_start,
+         (uintptr_t)&__nx_tcm_data_end, (uintptr_t)&__nx_tcm_bss_start,
+         (uintptr_t)&__nx_tcm_bss_end, (uintptr_t)&__nx_tcm_noinit_start,
+         (uintptr_t)&__nx_tcm_noinit_end},
+#endif
+    };
+    return nx_gd32_memory_initialize(
+        regions, sizeof(regions) / sizeof(regions[0]),
+        (uintptr_t)&__nx_flash_start, (uintptr_t)&__nx_flash_end);
+}
+#endif
 
 uint32_t SystemCoreClock = 16000000u;
 uint32_t g_gd32_reset_flags;
@@ -55,6 +105,28 @@ void SystemInit(void) {
     extern const uint32_t __gVectors[];
     SCB->VTOR = (uint32_t)(uintptr_t)__gVectors;
     SystemCoreClock = 16000000u;
+#if defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1
+    /* TCM is only on DBUS. Keep unrelated AHB1 enables and establish access
+     * before any initialized TCM object or constructor can be observed. */
+    RCU_AHB1EN |= RCU_AHB1EN_TCMSRAMEN;
+    __DSB();
+    if ((RCU_AHB1EN & RCU_AHB1EN_TCMSRAMEN) == 0u) {
+        g_gd32_boot_error = 3u;
+        for (;;) {
+            __NOP();
+        }
+    }
+#endif
+#if (defined(NEXUS_MEMORY_ADDSRAM) && NEXUS_MEMORY_ADDSRAM == 1) ||            \
+    (defined(NEXUS_MEMORY_TCM) && NEXUS_MEMORY_TCM == 1)
+    if (!initialize_extra_memory()) {
+        g_gd32_boot_error = 4u;
+        for (;;) {
+            __NOP();
+        }
+    }
+    __DSB();
+#endif
 }
 /** \brief           Publish the current AHB frequency after clock changes. */
 void SystemCoreClockUpdate(void) {

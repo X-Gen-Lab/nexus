@@ -1,0 +1,40 @@
+test_actual_inventory_observes_pins_not_latest_claims (tools.testing.test_dependency_proposals.DependencyProposalTests.test_actual_inventory_observes_pins_not_latest_claims) ... ok
+test_archive_and_license_identity_produce_only_pending_proposal (tools.testing.test_dependency_proposals.DependencyProposalTests.test_archive_and_license_identity_produce_only_pending_proposal) ... ok
+test_bare_passed_marker_never_approves_upgrade (tools.testing.test_dependency_proposals.DependencyProposalTests.test_bare_passed_marker_never_approves_upgrade) ... ok
+test_boolean_schema_is_rejected (tools.testing.test_dependency_proposals.DependencyProposalTests.test_boolean_schema_is_rejected) ... ok
+test_candidate_archive_changed_or_empty_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_candidate_archive_changed_or_empty_rejects) ... ok
+test_candidate_archive_symlink_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_candidate_archive_symlink_rejects) ... ok
+test_existing_or_symlink_output_cannot_replace_evidence (tools.testing.test_dependency_proposals.DependencyProposalTests.test_existing_or_symlink_output_cannot_replace_evidence) ... ok
+test_explicit_upstream_records_raw_refs_without_upgrading (tools.testing.test_dependency_proposals.DependencyProposalTests.test_explicit_upstream_records_raw_refs_without_upgrading) ... ok
+test_failed_network_stays_not_observed_with_actual_exit (tools.testing.test_dependency_proposals.DependencyProposalTests.test_failed_network_stays_not_observed_with_actual_exit) ... ok
+test_license_is_reviewed_not_guessed (tools.testing.test_dependency_proposals.DependencyProposalTests.test_license_is_reviewed_not_guessed) ... ok
+test_malformed_remote_refs_do_not_become_observed (tools.testing.test_dependency_proposals.DependencyProposalTests.test_malformed_remote_refs_do_not_become_observed) ... ok
+test_missing_or_changed_license_notice_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_missing_or_changed_license_notice_rejects) ... ok
+test_missing_or_unknown_plan_field_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_missing_or_unknown_plan_field_rejects) ... ok
+test_proposal_does_not_modify_inputs_or_locks (tools.testing.test_dependency_proposals.DependencyProposalTests.test_proposal_does_not_modify_inputs_or_locks) ... ok
+test_sources_with_credentials_or_non_https_reject (tools.testing.test_dependency_proposals.DependencyProposalTests.test_sources_with_credentials_or_non_https_reject) ... ok
+test_stale_evidence_reference_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_stale_evidence_reference_rejects) ... ok
+test_unknown_dependency_and_same_revision_reject (tools.testing.test_dependency_proposals.DependencyProposalTests.test_unknown_dependency_and_same_revision_reject) ... ok
+test_unknown_evidence_gate_and_empty_reference_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_unknown_evidence_gate_and_empty_reference_rejects) ... ok
+test_unpinned_git_revision_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_unpinned_git_revision_rejects) ... ok
+test_upstream_git_does_not_inherit_capture_repository_local_configuration (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_git_does_not_inherit_capture_repository_local_configuration) ... FAIL
+test_upstream_invocation_is_no_shell_noninteractive_and_bounded (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_invocation_is_no_shell_noninteractive_and_bounded) ... ok
+test_upstream_origin_without_public_allowed_host_rejects_before_request (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_origin_without_public_allowed_host_rejects_before_request) ... ok
+
+======================================================================
+FAIL: test_upstream_git_does_not_inherit_capture_repository_local_configuration (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_git_does_not_inherit_capture_repository_local_configuration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dependency_proposals.py", line 198, in test_upstream_git_does_not_inherit_capture_repository_local_configuration
+    proposals.observe_upstream(self.upstream_current(), self.folder / "isolated", runner=checked)
+  File "/workspace/nexus/tools/maintenance/dependency_proposals.py", line 186, in observe_upstream
+    request = runner(step, {}, output)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/testing/test_dependency_proposals.py", line 193, in checked
+    self.assertIn("-C", arguments)
+AssertionError: '-C' not found in ['GIT_CONFIG_NOSYSTEM=1', 'GIT_CONFIG_GLOBAL=/dev/null', 'GIT_TERMINAL_PROMPT=0', 'GIT_ASKPASS=/bin/false', '/usr/local/bin/git', '-c', 'credential.helper=', '-c', 'http.extraHeader=', 'ls-remote', '--refs', '--tags', '--heads', 'https://github.com/FreeRTOS/FreeRTOS-Kernel.git']
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.212s
+
+FAILED (failures=1)

@@ -15,6 +15,11 @@ import package_source_sdk as source_sdk
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_metadata_and_memory_generation_are_required_sdk_payload(self):
+        required = {"dependencies/platform-compatibility.json",
+                    "tools/configure/metadata.py", "tools/configure/memory.py"}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
+
     def test_test_framework_payload_is_not_a_firmware_sdk_dependency(self):
         for name in ("dependencies/source/googletest-1.16.0.tar.gz",
                      "dependencies/source/googletest-LICENSE.txt",

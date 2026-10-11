@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "development-regression",
+  "previous_execution_scope": "Actual1739cases; omitted16memory and22observer cases; superseded by corrected full gate",
+  "regression": "Actual CMake aggregate with target added after manifest registration, and non-executable dependency rejection",
+  "red": "2failed assertions against prior early global collection; first unavailable-tool attempt separately retained",
+  "green": "2actual CMake regressions passed; no Google framework was simulated",
+  "artifacts": [
+    {
+      "path": "tools/testing/evidence/google-plan/google-plan-green.cmake.raw",
+      "sha256": "97716224e253d290db205dd0b58fd429d1d9474921a8e5795ef086f478636fc2"
+    },
+    {
+      "path": "tools/testing/evidence/google-plan/google-plan-real-green.log",
+      "sha256": "17e85e0c8f64f4c606570af4fc3fcdb64bce8ecfe719070e57372413aac41f73"
+    },
+    {
+      "path": "tools/testing/evidence/google-plan/google-plan-real-red.log",
+      "sha256": "40dcfebc70a2862613d3d2d686ac7c2996251ccd747f1791a6cee216401ec43f"
+    },
+    {
+      "path": "tools/testing/evidence/google-plan/google-plan-red.cmake.raw",
+      "sha256": "f2a56245b0df4b76beae3e7c44fc50dd2c20f774797ff8674b94baade901ce4d"
+    },
+    {
+      "path": "tools/testing/evidence/google-plan/google-plan-red.log",
+      "sha256": "9d9e11b7b5edeec94ce2399392820c997138c7935ec5a9430be7bf692e617fcb"
+    },
+    {
+      "path": "tools/testing/evidence/google-plan/prior-incomplete-execution.json",
+      "sha256": "47069dbd326b32194d6b634641f4b902de18bfc06ab88673427247b9dbd9ba75"
+    }
+  ]
+}

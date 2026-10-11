@@ -1,0 +1,22 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_io_observer_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_observer-red.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 1,
+    "started_at": "2026-10-11T17:21:53.795096+00:00",
+    "ended_at": "2026-10-11T17:21:53.800653+00:00"
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_io_state_machine_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_state_machine-red.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 1,
+    "started_at": "2026-10-11T17:21:53.800699+00:00",
+    "ended_at": "2026-10-11T17:21:53.803845+00:00"
+  }
+]

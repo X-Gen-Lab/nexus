@@ -19,13 +19,18 @@ import tempfile
 from types import MappingProxyType
 
 try:
-    from . import kernel
-    from .ir import CpuProfileIR
+    from . import kernel, metadata, factory
+    from .ir import CpuProfileIR, freeze, thaw
     from .providers.common import fail, integer
 except ImportError:
     import kernel
-    from ir import CpuProfileIR
+    import metadata
+    import factory
+    from ir import CpuProfileIR, freeze, thaw
     from providers.common import fail, integer
+
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 @dataclass(frozen=True)
@@ -254,8 +259,13 @@ def header_lines(profile):
 
 
 def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
-                 kernel_profile=None):
+                 kernel_profile=None, platform_metadata=None):
     """Write a complete bundle into the caller's fresh temporary directory."""
+    if platform_metadata is None:
+        platform_metadata = metadata.load_policy(
+            ROOT, expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
+    platform_metadata = metadata.policy_contract(
+        thaw(platform_metadata), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
     integer(clock_hz, 1, context="CPU clock Hz")
     if (not isinstance(optimization, str) or
             optimization not in {"O2", "Os", "O3"}):
@@ -269,7 +279,8 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
     if kernel_profile is None:
         kernel_profile = kernel.resolve(None, profile, clock_hz)
     profile = kernel.bind(profile, kernel_profile)
-    resolved = {"schema_version": 1, "cpu_profile": profile.to_dict(),
+    resolved = {"schema_version": 1, "platform_metadata": platform_metadata,
+                "cpu_profile": profile.to_dict(),
                 "kernel_profile": (kernel_profile.to_dict()
                                    if kernel_profile is not None else None),
                 "clock_hz": clock_hz, "optimization": optimization,
@@ -290,6 +301,7 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
               f"#define NEXUS_CORE_HZ {clock_hz}u",
               f"#define NEXUS_BACKEND_{profile.backend.upper()} 1",
               *header_lines(profile), *kernel.header_lines(kernel_profile),
+              *metadata.header_lines(platform_metadata),
               "#endif", ""]
     (output / "nexus_config.h").write_text("\n".join(header), encoding="utf-8")
     (output / _BUNDLE).write_text("Nexus CPU runtime bundle\n",
@@ -336,7 +348,14 @@ def main(argv=None):
         source, output = checked_path(args.facts), checked_path(args.output)
         if output == source or output in source.parents:
             fail("CPU output must not replace facts or their source parent")
+        policy_path = checked_path(ROOT / metadata.POLICY)
+        if output == policy_path or output in policy_path.parents:
+            fail("CPU output must not replace platform metadata")
         invalidate(output)
+        policy_bytes, _ = metadata.snapshot(policy_path)
+        platform_metadata = metadata.policy_contract(
+            metadata.parse_json(policy_bytes),
+            expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
         content = source.read_bytes()
         facts = json.loads(content, object_pairs_hook=unique_keys)
         fields(facts, {"schema_version", "cpu", "irq", "clock_hz"},
@@ -346,11 +365,22 @@ def main(argv=None):
         output.parent.mkdir(parents=True, exist_ok=True)
         temporary = Path(tempfile.mkdtemp(prefix=".nexus-cpu-",
                                           dir=output.parent))
+        digest = hashlib.sha256()
+        for label, data in ((b"cpu-facts", content),
+                            (b"platform-metadata", policy_bytes)):
+            digest.update(label + b"\0" + len(data).to_bytes(8, "big") + data)
         emit_profile(profile, temporary, clock_hz=facts["clock_hz"],
                      optimization=args.optimization,
-                     inputhash=hashlib.sha256(content).hexdigest())
+                     inputhash=digest.hexdigest(),
+                     platform_metadata=platform_metadata)
+        (temporary / "input_paths.json").write_text(
+            json.dumps({"cpu_facts": str(source),
+                        "platform_metadata": str(policy_path)},
+                       indent=2, sort_keys=True) + "\n", encoding="utf-8")
         if checked_path(source).read_bytes() != content:
             fail("CPU facts changed during generation")
+        if metadata.snapshot(policy_path)[0] != policy_bytes:
+            fail("CPU platform metadata changed during generation")
         os.replace(temporary, output)
         return 0
     except (OSError, ValueError, KeyError, TypeError) as error:

@@ -1,0 +1,105 @@
+{
+  "binary_abi_supported": false,
+  "factory_abi_epoch": 1,
+  "inputs": [
+    {
+      "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+      "sha256": "b3551672d2fae2619674aaa5444c53cec6238fdd53d378bb8d095edbd204c54d",
+      "size": 492
+    },
+    {
+      "path": "/workspace/nexus/CMakeLists.txt",
+      "sha256": "8d7a7469a45135ddbb8ec0ec4f628a62904544dfbc18b5953cb62bf7368493ae",
+      "size": 5677
+    },
+    {
+      "path": "/workspace/nexus/tools/configure/authored.py",
+      "sha256": "8192855ce0e00f595159756e92d6dd436d108bb3ca834678821b2956caf5b483",
+      "size": 8936
+    },
+    {
+      "path": "/workspace/nexus/tools/configure/configure.py",
+      "sha256": "4ff9fb02d0d29c203e20eafc106377c0fd949acbe6c45502dc0bcbff811f7a53",
+      "size": 49506
+    },
+    {
+      "path": "/workspace/nexus/tools/configure/runtime.py",
+      "sha256": "40628fce4db24b7a79100379e5bd0270e005010e75139ad73916d40ce2010d67",
+      "size": 9052
+    },
+    {
+      "path": "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "sha256": "5f7aca2453fe44de7b25b171e337e412ebd199255db8a50835c894b9e4b3a16e",
+      "size": 23909
+    },
+    {
+      "path": "/workspace/nexus/tools/configure/factory.py",
+      "sha256": "bf7766a9f26fe6cd1698109846d65189f17c77ada84a38c658dc01cc816d9b76",
+      "size": 9948
+    },
+    {
+      "path": "/workspace/nexus/tools/configure/assembly.schema.json",
+      "sha256": "fe77c76fbb58d341828ed7dbe066d6570f8a5779e68db438f78b9b7d3587b4e2",
+      "size": 13165
+    },
+    {
+      "path": "/workspace/nexus/boards/gd32f470_liangshan/board.json",
+      "sha256": "6aa6f232593de796cf311d74a753c402c3e960ff7ecc0dd8c753ea9379914b7c",
+      "size": 1653
+    },
+    {
+      "path": "/workspace/nexus/boards/native_reference/board.json",
+      "sha256": "06fb3eea191d0d993c00040e9295e9ecc5c3183aa63146c4c67d859c6f857c6c",
+      "size": 605
+    },
+    {
+      "path": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
+      "sha256": "b9afd240f0d50996139c4e2147a3760babd18a5780629bc5cb3e4af4939598c9",
+      "size": 1870
+    },
+    {
+      "path": "/workspace/nexus/boards/stm32f407ve_sky_qingchun/board.json",
+      "sha256": "1ac4d6d1d771803b8e7ff3fa5e79bb39e4e078b568845969213b30142b485f80",
+      "size": 1412
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/soc.json",
+      "sha256": "ce094ab9956334116e884e55a4adb8980d7ffa31b5fa7400817c77aaf5e21a1b",
+      "size": 8165
+    },
+    {
+      "path": "/workspace/nexus/soc/native/soc.json",
+      "sha256": "bd42c1a4dc49d9d8c5acff8fe5fb8f509a874a6319c20133fb0e55f9fa326a6e",
+      "size": 2630
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/soc.json",
+      "sha256": "cc68db4f860f7f9f28e8aec585ccdfade70a8a31dfdf72473d87c604ae2832a2",
+      "size": 6123
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/routes.json",
+      "sha256": "4e6c35cb9be028a96b780a5f67dceb677e50272a1ba0ea36a2a25e3b93fd9ba1",
+      "size": 8389
+    },
+    {
+      "path": "/workspace/nexus/soc/native/routes.json",
+      "sha256": "65758edf6d8b40f811c353ae58e89f7ea639782681db81e15bda2be822427060",
+      "size": 4733
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/routes.json",
+      "sha256": "20fd4f86aa0b3b9ede38ebac1869dc10c439a15cde34e85ba3ee7e79214c644d",
+      "size": 8495
+    },
+    {
+      "path": "/workspace/nexus/cmake/package/NexusConfigVersion.cmake.in",
+      "sha256": "bdf2cb342d8e71bcfa3ffdbc4e7caf34bd8ff32ed6558c3a89e6bacb35afe394",
+      "size": 363
+    }
+  ],
+  "physical_qualification": false,
+  "semantic_version": "1.0.0",
+  "software_candidate_qualification": false,
+  "status": "consistent"
+}

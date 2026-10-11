@@ -1,0 +1,27 @@
+test_budget_rejects_zero_bool_unaligned_and_physical_overflow (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_budget_rejects_zero_bool_unaligned_and_physical_overflow) ... ok
+test_default_has_no_selected_extra_budget_and_rejects_live_sections (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_default_has_no_selected_extra_budget_and_rejects_live_sections) ... FAIL
+test_extra_domains_have_separate_immutable_limits_and_physical_facts (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_domains_have_separate_immutable_limits_and_physical_facts) ... FAIL
+test_extra_selection_cannot_replace_the_authoritative_primary_ram (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_selection_cannot_replace_the_authoritative_primary_ram) ... ok
+test_region_contract_rejects_unknown_fields_and_non_table_values (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_region_contract_rejects_unknown_fields_and_non_table_values) ... ok
+test_unknown_main_or_unsupported_chip_region_is_not_silently_selected (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_unknown_main_or_unsupported_chip_region_is_not_silently_selected) ... ok
+
+======================================================================
+FAIL: test_default_has_no_selected_extra_budget_and_rejects_live_sections (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_default_has_no_selected_extra_budget_and_rejects_live_sections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_memory_regions.py", line 67, in test_default_has_no_selected_extra_budget_and_rejects_live_sections
+    self.assertIn("set(NEXUS_MEMORY_ADDSRAM 0)", cmake)
+AssertionError: 'set(NEXUS_MEMORY_ADDSRAM 0)' not found in 'set(NEXUS_SOC_FAMILY "gd32f470")\nset(NEXUS_EXACT_PART "GD32F470ZGT6")\nset(NEXUS_CPU_ARCH "cortex-m4")\nset(NEXUS_CPU_FPU "fpv4-sp-d16")\nset(NEXUS_FLOAT_ABI "hard")\nset(NEXUS_ENUM_ABI "short-enums")\nset(NEXUS_BACKEND "baremetal")\nset(NEXUS_FREERTOS_PORT "")\nset(NEXUS_IRQ_PRIORITY_BITS "4")\nset(NEXUS_CPU_COMPILE_OPTIONS "-mcpu=cortex-m4;-mthumb;-mfpu=fpv4-sp-d16;-mfloat-abi=hard;-fshort-enums")\nset(NEXUS_IRQ_KERNEL_POLICY "0")\nset(NEXUS_ARCH_HAS_DWT_CYCCNT "1")\nset(NEXUS_ARCH_MPU_VERSION "7")\nset(NEXUS_ARCH_ICACHE_LINE_BYTES "0")\nset(NEXUS_ARCH_DCACHE_LINE_BYTES "0")\nset(NEXUS_ARCH_SECURITY_STATE "0")\nset(NEXUS_ARCH_HAS_SAU "0")\nset(NEXUS_CPU_HAS_BASEPRI "1")\nset(NEXUS_CPU_HAS_FPU "1")\nset(NEXUS_CPU_HAS_MVE "0")\nset(NEXUS_CPU_HAS_DSP "1")\nset(NEXUS_CPU_MPU_REGIONS "8")\nset(NEXUS_CPU_SECURE_ONLY "0")\nset(NEXUS_CPU_EXTERNAL_IRQ_COUNT "91")\nset(NEXUS_CPU_ATOMIC_BACKEND_IRQ "0")\nset(NEXUS_CONFIG_SHA256 "afccfc648e1bfd699fcd9acbfb507a1ff6ea1f5a1aa6d712052fd92f8c84037b")\nset(NEXUS_OPTIMIZATION "Os")\nset(NEXUS_SELECTED_KINDS "")\nset(NEXUS_SELECTED_COMPONENTS "")\n'
+
+======================================================================
+FAIL: test_extra_domains_have_separate_immutable_limits_and_physical_facts (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_domains_have_separate_immutable_limits_and_physical_facts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_memory_regions.py", line 53, in test_extra_domains_have_separate_immutable_limits_and_physical_facts
+    self.assertIn("set(NEXUS_MEMORY_ADDSRAM 1)", cmake)
+AssertionError: 'set(NEXUS_MEMORY_ADDSRAM 1)' not found in 'set(NEXUS_SOC_FAMILY "gd32f470")\nset(NEXUS_EXACT_PART "GD32F470ZGT6")\nset(NEXUS_CPU_ARCH "cortex-m4")\nset(NEXUS_CPU_FPU "fpv4-sp-d16")\nset(NEXUS_FLOAT_ABI "hard")\nset(NEXUS_ENUM_ABI "short-enums")\nset(NEXUS_BACKEND "baremetal")\nset(NEXUS_FREERTOS_PORT "")\nset(NEXUS_IRQ_PRIORITY_BITS "4")\nset(NEXUS_CPU_COMPILE_OPTIONS "-mcpu=cortex-m4;-mthumb;-mfpu=fpv4-sp-d16;-mfloat-abi=hard;-fshort-enums")\nset(NEXUS_IRQ_KERNEL_POLICY "0")\nset(NEXUS_ARCH_HAS_DWT_CYCCNT "1")\nset(NEXUS_ARCH_MPU_VERSION "7")\nset(NEXUS_ARCH_ICACHE_LINE_BYTES "0")\nset(NEXUS_ARCH_DCACHE_LINE_BYTES "0")\nset(NEXUS_ARCH_SECURITY_STATE "0")\nset(NEXUS_ARCH_HAS_SAU "0")\nset(NEXUS_CPU_HAS_BASEPRI "1")\nset(NEXUS_CPU_HAS_FPU "1")\nset(NEXUS_CPU_HAS_MVE "0")\nset(NEXUS_CPU_HAS_DSP "1")\nset(NEXUS_CPU_MPU_REGIONS "8")\nset(NEXUS_CPU_SECURE_ONLY "0")\nset(NEXUS_CPU_EXTERNAL_IRQ_COUNT "91")\nset(NEXUS_CPU_ATOMIC_BACKEND_IRQ "0")\nset(NEXUS_CONFIG_SHA256 "d102086c943be075a972475e6810f4c4d4be8ecede0a6c5b5416e12d6da43a2f")\nset(NEXUS_OPTIMIZATION "Os")\nset(NEXUS_SELECTED_KINDS "")\nset(NEXUS_SELECTED_COMPONENTS "")\n'
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.028s
+
+FAILED (failures=2)

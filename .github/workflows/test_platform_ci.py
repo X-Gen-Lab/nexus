@@ -20,6 +20,22 @@ def workflow(name):
 
 
 class WorkflowContracts(unittest.TestCase):
+    def test_dependency_review_is_weekly_read_only_and_source_bound(self):
+        document = workflow('dependency-maintenance.yml')
+        self.assertEqual(document['on']['schedule'][0]['cron'], '0 3 * * 1')
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        steps = document['jobs']['observe']['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertIn('dependency_proposals.py --observe-upstream', commands)
+        self.assertNotIn('git push', commands)
+        self.assertIn('compatibility.py', commands)
+        upload = next(i for i, step in enumerate(steps) if step.get(
+            'uses', '').startswith('actions/upload-artifact@'))
+        seal = steps[upload - 1]
+        self.assertEqual(seal['uses'], './.github/actions/record-identity')
+        self.assertEqual(seal['with']['require-dependencies'], 'true')
+        self.assertEqual(steps[upload]['with']['retention-days'], '30')
+
     def test_pages_publish_observed_documentation_identity(self):
         steps = workflow('docs-build.yml')['jobs']['build']['steps']
         index = next(index for index, step in enumerate(steps) if step.get(

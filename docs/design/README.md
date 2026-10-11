@@ -43,3 +43,5 @@ Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应�
 provider、factory 与 owner，配置工具用 Python unittest。commit hook 和 CI 执行同一
 门禁，生产 MCU target 不链接测试框架。构建期资源验证、实际寄存器模型、ARM ELF
 预算与物理 HIL 分别建立证据，方法表开销由实际 linked image 测量。
+
+- [Source compatibility and SDK versions](source-compatibility.md)

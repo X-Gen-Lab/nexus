@@ -1,0 +1,14 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+CMake Error at cmake/platform/Configure.cmake:39 (message):
+  Configuration rejected: Nexus configuration rejected: policy: exact fields
+  required
+
+Call Stack (most recent call first):
+  CMakeLists.txt:32 (nexus_resolve_assembly)
+
+
+-- Configuring incomplete, errors occurred!
+FAILED: [code=1] build.ninja 
+/workspace/nexus/.venv/lib/python3.12/site-packages/cmake/data/bin/cmake --regenerate-during-build -S/workspace/nexus -B/workspace/nexus/build/uart-iteration
+ninja: error: rebuilding 'build.ninja': subcommand failed

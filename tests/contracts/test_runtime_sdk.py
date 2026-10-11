@@ -22,6 +22,13 @@ APPLICATION = """#include "nexus/arch/arch.h"
 #include "nexus_config.h"
 #include <stdio.h>
 
+#ifndef NEXUS_PLATFORM_VERSION
+#error "Missing generated source interface version"
+#endif
+#if NEXUS_FACTORY_ABI_EPOCH != 1U
+#error "Unsupported generated factory interface epoch"
+#endif
+
 nx_time_us_t nx_time_now_us(void) {
     return 42;
 }

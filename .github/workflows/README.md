@@ -76,3 +76,12 @@ The source SDK workflow requests provenance for this digest-bearing manifest,
 then preserves the actual returned attestation bundle in a separate upload.
 Signing is pending until GitHub executes that workflow; this configuration does
 not establish a signature, a production release or physical qualification.
+
+
+`dependency-maintenance.yml` defines a Monday 03:00 UTC read-only observation
+job and manual dispatch. It retains actual locked revisions, compatibility
+checks and bounded public upstream refs under an observed source identity.
+It never changes a dependency lock or opens an unverified upgrade. A candidate
+upgrade needs license, model, ARM, SDK and reproducibility evidence for that
+exact source. Scheduled execution begins only when this workflow is present
+on the default branch; the definition does not claim an executed weekly run.

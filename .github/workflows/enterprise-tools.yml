@@ -34,6 +34,7 @@ jobs:
       - name: Check derived capability text and report review assignment gaps
         run: |
           .venv/bin/python tools/maintenance/capabilities.py --check
+          .venv/bin/python tools/maintenance/compatibility.py
           .venv/bin/python tools/maintenance/ownership.py --require-assigned
       - name: Execute tamper, budget, HIL and relocated SDK boundaries
         run: |

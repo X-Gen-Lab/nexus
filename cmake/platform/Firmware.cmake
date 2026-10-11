@@ -22,7 +22,7 @@ function(nexus_add_firmware target)
         # Product source files see only typed public Nexus interfaces.
         set(startup_target "${target}_nexus_startup")
         add_library(${startup_target} OBJECT "${NEXUS_STARTUP_SOURCE}"
-            "${NEXUS_SYSTEM_SOURCE}")
+            ${NEXUS_SYSTEM_SOURCE})
         target_link_libraries(${startup_target} PRIVATE Nexus::IO Nexus::Arch
             nexus_build_options nexus_owned_warnings)
         target_include_directories(${startup_target} PRIVATE ${NEXUS_SYSTEM_PRIVATE_INCLUDES})

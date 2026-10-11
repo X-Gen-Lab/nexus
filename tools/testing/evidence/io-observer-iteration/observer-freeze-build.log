@@ -1,0 +1,10 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (0.8s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/3] Building CXX object tests/contracts/google/CMakeFiles/nexus_io_state_machine_test.dir/io_state_machine_test.cpp.o
+[2/3] Linking CXX executable bin/nexus_io_state_machine_test

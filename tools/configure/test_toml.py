@@ -17,7 +17,8 @@ class TomlConfigurationTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
-        for relative in ("soc/native/soc.json", "soc/native/routes.json",
+        for relative in ("dependencies/platform-compatibility.json",
+                     "soc/native/soc.json", "soc/native/routes.json",
                          "boards/native_reference/board.json"):
             destination = self.root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)

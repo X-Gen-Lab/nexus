@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="28" failures="0" disabled="0" errors="0" time="0.007" timestamp="2026-10-11T17:22:19.146" name="AllTests">
+  <testsuite name="Lifecycle" tests="10" failures="0" disabled="0" skipped="0" errors="0" time="0.002" timestamp="2026-10-11T17:22:19.146">
+    <testcase name="ClosesAdmissionBeforeProducerJoinThenReclaimsAfterAllJoins" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="84" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.146" classname="Lifecycle" />
+    <testcase name="ProducerTimeoutRetainsNotificationsAndOwnerProgress" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="106" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.147" classname="Lifecycle" />
+    <testcase name="OwnerJoinFailureDoesNotDetachHardwareOrReclaimStorage" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="119" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.147" classname="Lifecycle" />
+    <testcase name="IdleCheckRejectsPrematureOwnerJoinBeforePublicationExits" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="131" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+    <testcase name="QuiescenceFailureRetainsStorageAndRetriesOnlyThatMilestone" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="148" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+    <testcase name="InvalidInputHasNoSchedulingOrHardwareEffects" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="160" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+    <testcase name="RunningSchedulerRetainsPlatformClocksAndTickAfterIOReclaim" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="170" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+    <testcase name="StoppedSchedulerMayStopPlatformOnlyOnceAfterReclaim" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="177" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+    <testcase name="PlatformStopFailureRetainsReclaimMilestoneAndCanRetry" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+    <testcase name="PlatformStopRejectsCallsBeforeQuiescenceOrInvalidInputs" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="198" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.148" classname="Lifecycle" />
+  </testsuite>
+  <testsuite name="BackendPolicy" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:22:19.149">
+    <testcase name="OnlyFreeRTOSPreservesPlatformForItsLiveScheduler" file="/workspace/nexus-examples/tests/owner_lifecycle_test.cpp" line="206" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.149" classname="BackendPolicy" />
+  </testsuite>
+  <testsuite name="Bootstrap" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-11T17:22:19.149">
+    <testcase name="NotificationFailureDestroysOnlyCreatedObjectsInReverseOrder" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="79" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.149" classname="Bootstrap" />
+    <testcase name="NativePartialTaskFailureClosesAdmissionBeforeJoiningLiveThreads" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="94" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.149" classname="Bootstrap" />
+    <testcase name="FreeRTOSUnstartedTasksUseDiscardActionAndNeverJoin" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="119" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="Bootstrap" />
+    <testcase name="RunningSchedulerRejectsPrestartRollbackWithoutSideEffects" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="130" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="Bootstrap" />
+    <testcase name="FailedJoinRetainsPublishersNotificationsAndWorkerRecord" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="140" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="Bootstrap" />
+    <testcase name="DestroyFailureRetriesOnlyUnreclaimedEffects" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="152" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="Bootstrap" />
+    <testcase name="UndrainedOwnerNeverDetachesPublishersOrReclaimsLoans" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="Bootstrap" />
+    <testcase name="InvalidOrInconsistentRecordCannotInvokeExternalActions" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="186" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="Bootstrap" />
+  </testsuite>
+  <testsuite name="BootstrapNative" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:22:19.150">
+    <testcase name="FailedNextCreationDrainsAndJoinsActualRunningThreads" file="/workspace/nexus-examples/tests/owner_bootstrap_test.cpp" line="285" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.150" classname="BootstrapNative" />
+  </testsuite>
+  <testsuite name="SchedulerReturn" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:22:19.151">
+    <testcase name="PublishesStageAndFailureBeforeCallingItsTerminalSink" file="/workspace/nexus-examples/tests/scheduler_return_test.cpp" line="34" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.151" classname="SchedulerReturn" />
+    <testcase name="DoesNotTreatAnUncertainSchedulerFlagAsNeverExecutedTasks" file="/workspace/nexus-examples/tests/scheduler_return_test.cpp" line="57" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.151" classname="SchedulerReturn" />
+  </testsuite>
+  <testsuite name="QuarantinePolicy" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-11T17:22:19.151">
+    <testcase name="RejectsInvalidBudgetAndBindingBeforeHardware" file="/workspace/nexus-examples/tests/quarantine_policy_test.cpp" line="82" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.151" classname="QuarantinePolicy" />
+    <testcase name="BusyDoesNotCloseAdmissionOrPublishFault" file="/workspace/nexus-examples/tests/quarantine_policy_test.cpp" line="89" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.152" classname="QuarantinePolicy" />
+    <testcase name="StepLimitEscalatesRetainedAndRealDrainStillExecutes" file="/workspace/nexus-examples/tests/quarantine_policy_test.cpp" line="98" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.152" classname="QuarantinePolicy" />
+    <testcase name="ReversedTimeEscalatesWithoutReplacingTheServiceResult" file="/workspace/nexus-examples/tests/quarantine_policy_test.cpp" line="117" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.152" classname="QuarantinePolicy" />
+    <testcase name="DeadlineLimitDoesNotSettleOrReclaimRetainedStorage" file="/workspace/nexus-examples/tests/quarantine_policy_test.cpp" line="126" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.153" classname="QuarantinePolicy" />
+    <testcase name="DeadlineAdditionOverflowEscalatesAndKeepsBorrow" file="/workspace/nexus-examples/tests/quarantine_policy_test.cpp" line="135" status="run" result="completed" time="0." timestamp="2026-10-11T17:22:19.153" classname="QuarantinePolicy" />
+  </testsuite>
+</testsuites>
