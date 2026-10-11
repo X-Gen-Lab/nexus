@@ -1,0 +1,10 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tools.testing.test_dependency_proposals",
+    "-v"
+  ],
+  "returncode": 1
+}

@@ -7,7 +7,6 @@ this tool cannot turn a JSON passed marker into qualification or merge authority
 """
 from __future__ import annotations
 import argparse
-import configparser
 import hashlib
 import json
 import os
@@ -24,6 +23,10 @@ sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import (  # noqa: E402
     fields, identity, parse_json, read_json, regular, snapshot,
 )
+from tools.maintenance.source_catalogue import (  # noqa: E402
+    SOURCE_DEPENDENCIES, declared_modules,
+)
+from tools.maintenance import threadx_lock  # noqa: E402
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
          "board_arm", "resource_budgets", "installed_sdk",
@@ -73,27 +76,32 @@ def inventory(root=ROOT):
         raise ValueError("Dependency proposals require a development Git checkout")
     commit = git(root, "rev-parse", "HEAD")
     module_bytes, module_identity = snapshot(root / ".gitmodules")
-    origins = configparser.ConfigParser(interpolation=None)
-    origins.read_string(module_bytes.decode("utf-8"))
-    urls = {origins[section]["path"]: origins[section]["url"]
-            for section in origins.sections()}
-    expected_modules = {"ext/freertos", "vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4"}
-    if len(urls) != len(origins.sections()) or set(urls) != expected_modules:
-        raise ValueError("Unregistered or duplicate source dependency requires catalogue review")
+    urls = declared_modules(module_bytes)
     records = []
-    for name, path, notice in (
-            ("freertos", "ext/freertos", "LICENSE.md"),
-            ("cmsis5", "vendors/arm/CMSIS_5", "LICENSE.txt"),
-            ("stm32f4_cmsis", "vendors/st/cmsis_device_f4", "LICENSE.md")):
+    for dependency in SOURCE_DEPENDENCIES:
+        name, path, notice = dependency.identifier, dependency.path, dependency.notice
         entry = git(root, "ls-tree", "HEAD", "--", path).split()
         if len(entry) != 4 or entry[:2] != ["160000", "commit"]:
             raise ValueError("Missing committed source Gitlink: " + path)
         checkout = root / path
         if git(checkout, "rev-parse", "HEAD") != entry[2] or git(checkout, "status", "--porcelain", "--untracked-files=normal"):
             raise ValueError("Source checkout differs from locked clean Gitlink: " + path)
+        references = [module_identity, identity(checkout / notice)]
+        if dependency.source_lock is not None:
+            if name != "threadx":
+                raise ValueError("Source lock validator requires catalogue review")
+            lock_path = root / dependency.source_lock
+            lock_bytes, lock_identity = snapshot(lock_path)
+            locked = parse_json(lock_bytes)
+            threadx_lock.verify(checkout, lock_path, "linux")
+            if locked["commit"] != entry[2]:
+                raise ValueError("ThreadX lock differs from committed source Gitlink")
+            references.extend([lock_identity,
+                               *[identity(checkout / filename)
+                                 for filename in sorted(locked["files"])]])
         records.append({"id": name, "revision": entry[2], "kind": "git_source",
                         "path": path, "upstream_url": urls[path],
-                        "identities": [module_identity, identity(checkout / notice)],
+                        "identities": references,
                         "license_review": "current_notices_observed"})
     google_path = root / "dependencies/googletest.lock.json"
     google_bytes, google_identity = snapshot(google_path)

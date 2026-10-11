@@ -8,6 +8,9 @@ import unittest
 import subprocess
 import sys
 from tools.maintenance import dependency_proposals as proposals
+from tools.maintenance import source_catalogue
+import shutil
+import os
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,6 +31,15 @@ class DependencyProposalTests(unittest.TestCase):
         return {"path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
 
     def test_actual_inventory_observes_pins_not_latest_claims(self):
+        expected = {item.path for item in source_catalogue.SOURCE_DEPENDENCIES}
+        missing = [path for path in expected
+                   if not proposals.git(ROOT, "ls-tree", "HEAD", "--", path)]
+        if missing:
+            # A working .gitmodules addition is not a committed dependency pin.
+            # Exercise the actual rejection until root commits its Gitlink.
+            with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
+                proposals.inventory(ROOT)
+            return
         result = proposals.inventory(ROOT)
         self.assertEqual(result["owner"], "codex")
         self.assertEqual(result["mode"], "weekly_read_only")
@@ -205,4 +217,104 @@ class DependencyProposalTests(unittest.TestCase):
             proposals.observe_upstream(self.upstream_current(), path, runner=lambda *_: self.fail("unexpected request"))
         self.assertFalse((ROOT / "dependencies/proposal-output-must-not-exist").exists())
 
-if __name__ == "__main__": unittest.main()
+class DependencyInventoryGitTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="dependency gitlinks ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        self.git(self.root, "init", "--quiet")
+        self.write(self.root / ".gitmodules", (ROOT / ".gitmodules").read_bytes())
+        self.threadx_lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
+        for item in source_catalogue.SOURCE_DEPENDENCIES:
+            checkout = self.root / item.path
+            checkout.mkdir(parents=True)
+            self.git(checkout, "init", "--quiet")
+            self.git(checkout, "remote", "add", "origin", item.origin)
+            paths = [item.notice]
+            if item.identifier == "threadx":
+                paths.extend(self.threadx_lock["files"])
+            for name in paths:
+                self.write(checkout / name, (ROOT / item.path / name).read_bytes())
+            self.git(checkout, "add", ".")
+            self.commit(checkout, "actual fixture dependency")
+            if item.identifier == "threadx":
+                self.threadx_lock["commit"] = self.git(checkout, "rev-parse", "HEAD")
+                self.git(checkout, "tag", self.threadx_lock["tag"])
+        self.write(self.root / "dependencies/threadx.lock.json",
+                   (json.dumps(self.threadx_lock) + "\n").encode())
+        for name in ("dependencies/googletest.lock.json", "dependencies/source/googletest-LICENSE.txt",
+                     "dependencies/toolchains.lock.json", "dependencies/environment.lock.json",
+                     "dependencies/development-tools.txt", "dependencies/environment-tools.txt",
+                     "dependencies/actions.lock.json", "vendors/gigadevice/gd32f4xx/source.lock.json"):
+            self.write(self.root / name, (ROOT / name).read_bytes())
+        google = json.loads((ROOT / "dependencies/googletest.lock.json").read_text())
+        self.write(self.root / google["archive"], (ROOT / google["archive"]).read_bytes())
+        for notice in (ROOT / "vendors/gigadevice/gd32f4xx/LICENSES").iterdir():
+            self.write(self.root / "vendors/gigadevice/gd32f4xx/LICENSES" / notice.name,
+                       notice.read_bytes())
+        self.git(self.root, "add", ".")
+        self.commit(self.root, "actual parent committed gitlinks")
+
+    def write(self, path, data):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    def git(self, path, *arguments):
+        result = subprocess.run(["git", "-C", str(path), *arguments], capture_output=True,
+                                text=True, env=self.environment, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout.strip()
+
+    def commit(self, path, message):
+        self.git(path, "-c", "user.name=Dependency test", "-c",
+                 "user.email=dependency-test@local.invalid", "commit", "--quiet", "-m", message)
+
+    def test_committed_gitlinks_observe_real_threadx_identity_and_all_sources(self):
+        result = proposals.inventory(self.root)
+        record = next(x for x in result["dependencies"] if x["id"] == "threadx")
+        self.assertEqual(record["revision"], self.threadx_lock["commit"])
+        self.assertEqual(record["upstream_url"], "https://github.com/eclipse-threadx/threadx.git")
+        self.assertGreaterEqual(len(record["identities"]), 217)
+        self.assertFalse(result["source_dirty"])
+        self.assertFalse(result["software_qualified"])
+
+    def test_checkout_change_and_foreign_origin_reject_without_repair(self):
+        file = self.root / "ext/threadx" / self.threadx_lock["common"][0]
+        old = file.read_bytes()
+        file.write_bytes(b"corrupt source")
+        with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+        file.write_bytes(old)
+        self.git(self.root / "ext/threadx", "remote", "set-url", "origin",
+                 "https://example.com/threadx.git")
+        with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+
+    def test_uncommitted_gitlink_and_unreviewed_module_declaration_reject(self):
+        self.git(self.root, "rm", "--cached", "ext/threadx")
+        self.commit(self.root, "parent does not own threadx gitlink")
+        with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
+            proposals.inventory(self.root)
+        with (self.root / ".gitmodules").open("a") as stream:
+            stream.write('\n[submodule "ext/unknown"]\npath=ext/unknown\nurl=https://example.com/unknown.git\n')
+        with self.assertRaisesRegex(ValueError, "catalogue review"):
+            proposals.inventory(self.root)
+
+    def test_rehashed_lock_omission_and_wrong_locked_commit_reject(self):
+        path = self.root / "dependencies/threadx.lock.json"
+        altered = copy.deepcopy(self.threadx_lock)
+        name = altered["common"].pop()
+        del altered["files"][name]
+        path.write_text(json.dumps(altered))
+        with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+        altered = copy.deepcopy(self.threadx_lock)
+        altered["commit"] = "a" * 40
+        path.write_text(json.dumps(altered))
+        with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+
+
+if __name__ == "__main__":
+    unittest.main()
