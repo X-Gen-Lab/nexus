@@ -1,0 +1,518 @@
+/**
+ * \file            bindings.c
+ * \brief           Generated fixed typed hardware construction.
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-09
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+#include "nexus_bindings.h"
+#include "nexus_factory.h"
+#include "nexus_config.h"
+#include "nexus/arch/arch.h"
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+#include "gd32f470_provider.h"
+#include "gd32f4xx.h"
+#include "gd32f470_eth.h"
+#include "gd32f4xx_syscfg.h"
+void _init(void);
+void _fini(void);
+/** \brief C runtime hooks; constructors use .init_array. */
+void _init(void) {}
+void _fini(void) {}
+static bool s_nx_platform_started;
+static size_t s_nx_platform_initialized;
+static uint32_t s_nx_eth_clocks_added;
+static uint32_t s_nx_eth_syscfg_clock_added;
+static uint32_t s_nx_eth_gpio_clocks_added;
+static nx_eth_mac_t s_nx_port_mac;
+static const nx_eth_port_t s_nx_face_mac = {
+    &nx_eth_mac_ops, &s_nx_port_mac
+};
+const nx_eth_port_t* const nx_binding_mac = &s_nx_face_mac;
+static nx_eth_descriptor_t s_nx_eth_tx_mac[2];
+static nx_eth_descriptor_t s_nx_eth_rx_mac[2];
+static nx_eth_tx_slot_t s_nx_eth_tx_slots_mac[2];
+static nx_eth_rx_slot_t s_nx_eth_rx_slots_mac[2];
+_Alignas(4) static uint8_t s_nx_eth_storage_mac[2][1536];
+static uint16_t s_nx_eth_pin_snapshots_mac[9];
+static uint16_t s_nx_eth_pin_leases_mac;
+static uint32_t s_nx_eth_mux_saved_mac;
+static bool s_nx_eth_mux_leased_mac;
+static const nx_dma_memory_region_t s_nx_eth_regions_mac[] = {
+    { 0x20000000u, 196608u,
+      NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE }
+};
+static const nx_mdio_port_t s_nx_face_mdio_mac = {
+    &nx_eth_mdio_ops, &s_nx_port_mac
+};
+const nx_mdio_port_t* const nx_binding_mac_mdio = &s_nx_face_mdio_mac;
+static nx_result_t stop_mac(void) {
+    nx_result_t status = nx_eth_port_stop(&s_nx_face_mac);
+    if (status != NX_SUCCESS) { return status; }
+    if ((s_nx_eth_pin_leases_mac & 256u) != 0u) {
+        nx_gd32_pin_restore(GPIOG, 14u, s_nx_eth_pin_snapshots_mac[8]);
+        if (nx_gd32_pin_capture(GPIOG, 14u) != s_nx_eth_pin_snapshots_mac[8]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~256u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 128u) != 0u) {
+        nx_gd32_pin_restore(GPIOG, 13u, s_nx_eth_pin_snapshots_mac[7]);
+        if (nx_gd32_pin_capture(GPIOG, 13u) != s_nx_eth_pin_snapshots_mac[7]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~128u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 64u) != 0u) {
+        nx_gd32_pin_restore(GPIOG, 11u, s_nx_eth_pin_snapshots_mac[6]);
+        if (nx_gd32_pin_capture(GPIOG, 11u) != s_nx_eth_pin_snapshots_mac[6]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~64u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 32u) != 0u) {
+        nx_gd32_pin_restore(GPIOC, 5u, s_nx_eth_pin_snapshots_mac[5]);
+        if (nx_gd32_pin_capture(GPIOC, 5u) != s_nx_eth_pin_snapshots_mac[5]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~32u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 16u) != 0u) {
+        nx_gd32_pin_restore(GPIOC, 4u, s_nx_eth_pin_snapshots_mac[4]);
+        if (nx_gd32_pin_capture(GPIOC, 4u) != s_nx_eth_pin_snapshots_mac[4]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~16u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 8u) != 0u) {
+        nx_gd32_pin_restore(GPIOC, 1u, s_nx_eth_pin_snapshots_mac[3]);
+        if (nx_gd32_pin_capture(GPIOC, 1u) != s_nx_eth_pin_snapshots_mac[3]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~8u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 4u) != 0u) {
+        nx_gd32_pin_restore(GPIOA, 7u, s_nx_eth_pin_snapshots_mac[2]);
+        if (nx_gd32_pin_capture(GPIOA, 7u) != s_nx_eth_pin_snapshots_mac[2]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~4u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 2u) != 0u) {
+        nx_gd32_pin_restore(GPIOA, 2u, s_nx_eth_pin_snapshots_mac[1]);
+        if (nx_gd32_pin_capture(GPIOA, 2u) != s_nx_eth_pin_snapshots_mac[1]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~2u;
+    }
+    if ((s_nx_eth_pin_leases_mac & 1u) != 0u) {
+        nx_gd32_pin_restore(GPIOA, 1u, s_nx_eth_pin_snapshots_mac[0]);
+        if (nx_gd32_pin_capture(GPIOA, 1u) != s_nx_eth_pin_snapshots_mac[0]) {
+            return NX_ERROR_IO;
+        }
+        s_nx_eth_pin_leases_mac &= (uint16_t)~1u;
+    }
+    if (s_nx_eth_mux_leased_mac) {
+        SYSCFG_CFG1 = (SYSCFG_CFG1 & ~SYSCFG_CFG1_ENET_PHY_SEL) | s_nx_eth_mux_saved_mac;
+        nx_arch_dsb();
+        if ((SYSCFG_CFG1 & SYSCFG_CFG1_ENET_PHY_SEL) != s_nx_eth_mux_saved_mac) { return NX_ERROR_IO; }
+        s_nx_eth_mux_leased_mac = false;
+    }
+    return NX_SUCCESS;
+}
+static nx_result_t prepare_mac(void) {
+    nx_result_t status;
+    for (size_t i = 0u; i < 2u; ++i) {
+        s_nx_eth_rx_slots_mac[i].data = s_nx_eth_storage_mac[i];
+        s_nx_eth_rx_slots_mac[i].capacity = 1536u;
+    }
+    s_nx_port_mac = (nx_eth_mac_t){
+        .registers = ENET_BASE, .hclk_hz = 200000000u,
+        .regions = s_nx_eth_regions_mac, .region_count = 1u,
+        .tx_descriptors = s_nx_eth_tx_mac, .rx_descriptors = s_nx_eth_rx_mac,
+        .tx_slots = s_nx_eth_tx_slots_mac, .rx_slots = s_nx_eth_rx_slots_mac,
+        .tx_count = 2u, .rx_count = 2u,
+        .epoch = s_nx_port_mac.epoch, .drain_timeout_us = 1000u,
+        .address = { 2u, 0u, 0u, 0u, 0u, 1u },
+        .irq_policy = { NX_IRQ_KERNEL_NONE, 91u, 4u, 0u },
+        .source = { 61, 5u, 3u }
+    };
+    status = nx_gd32_gpio_clock_enable(0u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[0] = nx_gd32_pin_capture(GPIOA, 1u);
+    s_nx_eth_pin_leases_mac |= 1u;
+    status = nx_gd32_pin_configure(GPIOA, 1u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(0u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[1] = nx_gd32_pin_capture(GPIOA, 2u);
+    s_nx_eth_pin_leases_mac |= 2u;
+    status = nx_gd32_pin_configure(GPIOA, 2u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(0u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[2] = nx_gd32_pin_capture(GPIOA, 7u);
+    s_nx_eth_pin_leases_mac |= 4u;
+    status = nx_gd32_pin_configure(GPIOA, 7u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(2u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[3] = nx_gd32_pin_capture(GPIOC, 1u);
+    s_nx_eth_pin_leases_mac |= 8u;
+    status = nx_gd32_pin_configure(GPIOC, 1u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(2u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[4] = nx_gd32_pin_capture(GPIOC, 4u);
+    s_nx_eth_pin_leases_mac |= 16u;
+    status = nx_gd32_pin_configure(GPIOC, 4u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(2u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[5] = nx_gd32_pin_capture(GPIOC, 5u);
+    s_nx_eth_pin_leases_mac |= 32u;
+    status = nx_gd32_pin_configure(GPIOC, 5u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(6u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[6] = nx_gd32_pin_capture(GPIOG, 11u);
+    s_nx_eth_pin_leases_mac |= 64u;
+    status = nx_gd32_pin_configure(GPIOG, 11u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(6u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[7] = nx_gd32_pin_capture(GPIOG, 13u);
+    s_nx_eth_pin_leases_mac |= 128u;
+    status = nx_gd32_pin_configure(GPIOG, 13u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_gd32_gpio_clock_enable(6u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_eth_pin_snapshots_mac[8] = nx_gd32_pin_capture(GPIOG, 14u);
+    s_nx_eth_pin_leases_mac |= 256u;
+    status = nx_gd32_pin_configure(GPIOG, 14u, 2u, 11u, 0u, false);
+    if (status != NX_SUCCESS) { return status; }
+    RCU_APB2EN |= RCU_APB2EN_SYSCFGEN;
+    RCU_AHB1EN |= 0x0e000000u;
+    nx_arch_dsb();
+    if ((RCU_APB2EN & RCU_APB2EN_SYSCFGEN) == 0u || (RCU_AHB1EN & 0x0e000000u) != 0x0e000000u) { return NX_ERROR_IO; }
+    s_nx_eth_mux_saved_mac = SYSCFG_CFG1 & SYSCFG_CFG1_ENET_PHY_SEL;
+    s_nx_eth_mux_leased_mac = true;
+    SYSCFG_CFG1 |= SYSCFG_CFG1_ENET_PHY_SEL;
+    nx_arch_dsb();
+    if ((SYSCFG_CFG1 & SYSCFG_CFG1_ENET_PHY_SEL) == 0u) { return NX_ERROR_IO; }
+    return nx_gd32_eth_initialize(&s_nx_port_mac,
+        nx_deadline_after(nx_time_now_us(), 5000u));
+}
+void ENET_IRQHandler(void);
+/** \brief Bounded progress through the selected RMII MAC. */
+void ENET_IRQHandler(void) { nx_eth_mac_irq(&s_nx_port_mac); }
+/** \brief Stop only the initialized selected interfaces. */
+nx_result_t nx_platform_stop(void) {
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) { return NX_ERROR_CONTEXT; }
+    if (s_nx_platform_initialized >= 1u) {
+        nx_result_t status_0 = stop_mac();
+        if (status_0 != NX_SUCCESS) { return status_0; }
+        s_nx_platform_initialized = 0u;
+    }
+    RCU_AHB1EN &= ~s_nx_eth_clocks_added;
+    nx_arch_dsb();
+    if ((RCU_AHB1EN & s_nx_eth_clocks_added) != 0u) { return NX_ERROR_IO; }
+    s_nx_eth_clocks_added = 0u;
+    RCU_APB2EN &= ~s_nx_eth_syscfg_clock_added;
+    nx_arch_dsb();
+    if ((RCU_APB2EN & s_nx_eth_syscfg_clock_added) != 0u) { return NX_ERROR_IO; }
+    s_nx_eth_syscfg_clock_added = 0u;
+    RCU_AHB1EN &= ~s_nx_eth_gpio_clocks_added;
+    nx_arch_dsb();
+    if ((RCU_AHB1EN & s_nx_eth_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }
+    s_nx_eth_gpio_clocks_added = 0u;
+    if (s_nx_platform_started && nx_gd32_soc_stop() != 0) { return NX_ERROR_IO; }
+    s_nx_platform_started = false;
+    s_nx_platform_initialized = 0u;
+    return NX_SUCCESS;
+}
+/** \brief Start explicit hardware only; rollback retains error facts. */
+nx_platform_start_result_t nx_platform_start(void) {
+    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        result.primary = NX_ERROR_CONTEXT; return result; }
+    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }
+    if (nx_gd32_soc_start() != 0) {
+        result.primary = NX_ERROR_IO;
+        result.cleanup = nx_gd32_soc_stop() == 0 ? NX_SUCCESS : NX_ERROR_IO;
+        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;
+        s_nx_platform_started = result.remaining_effects != 0u;
+        return result;
+    }
+    s_nx_platform_started = true;
+    s_nx_eth_clocks_added = ~RCU_AHB1EN & 0x0e000000u;
+    s_nx_eth_syscfg_clock_added = ~RCU_APB2EN & RCU_APB2EN_SYSCFGEN;
+    s_nx_eth_gpio_clocks_added = ~RCU_AHB1EN & 69u;
+    s_nx_platform_initialized = 1u;
+    result.primary = prepare_mac();
+    if (result.primary != NX_SUCCESS) {
+        result.cleanup = nx_platform_stop();
+        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;
+        return result;
+    }
+    s_nx_platform_initialized = 1u;
+    return result;
+}
+
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_gpio_port_t* nx_factory_gpio(nx_gpio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_uart_port_t* nx_factory_uart(nx_uart_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_spi_port_t* nx_factory_spi(nx_spi_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_i2c_port_t* nx_factory_i2c(nx_i2c_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_flash_port_t* nx_factory_flash(nx_flash_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_watchdog_port_t* nx_factory_watchdog(nx_watchdog_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_exti_port_t* nx_factory_exti(nx_exti_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_pwm_port_t* nx_factory_pwm(nx_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_adc_port_t* nx_factory_adc(nx_adc_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_can_port_t* nx_factory_can(nx_can_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_usb_device_port_t* nx_factory_usb_device(nx_usb_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_eth_port_t* nx_factory_eth(nx_eth_id_t id) {
+    switch (id) {
+        case NX_ETH_ID_MAC:
+            return nx_binding_mac;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_spi_endpoint_t* nx_factory_spi_device(nx_spi_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_i2c_endpoint_t* nx_factory_i2c_device(nx_i2c_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_usb_endpoint_port_t* nx_factory_usb_endpoint(nx_usb_endpoint_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_mdio_port_t* nx_factory_mdio(nx_mdio_id_t id) {
+    switch (id) {
+        case NX_MDIO_ID_MAC:
+            return nx_binding_mac_mdio;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_gpio_capability(
+    nx_gpio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_uart_capability(
+    nx_uart_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_spi_capability(
+    nx_spi_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_i2c_capability(
+    nx_i2c_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_flash_capability(
+    nx_flash_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_watchdog_capability(
+    nx_watchdog_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_exti_capability(
+    nx_exti_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_pwm_capability(
+    nx_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_adc_capability(
+    nx_adc_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_can_capability(
+    nx_can_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_usb_device_capability(
+    nx_usb_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+static const nx_factory_io_capability_t s_nx_capability_eth_mac = {
+    NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_BUS_MASTER_DMA, NX_ETH_FRAME_MAX, 1U, 4U, 1U
+};
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_eth_capability(
+    nx_eth_id_t id) {
+    switch (id) {
+        case NX_ETH_ID_MAC:
+            return &s_nx_capability_eth_mac;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_spi_device_capability(
+    nx_spi_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_i2c_device_capability(
+    nx_i2c_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_usb_endpoint_capability(
+    nx_usb_endpoint_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+static const nx_factory_io_capability_t s_nx_capability_mdio_mac = {
+    NX_FACTORY_CAP_POLLING, 1U, 2U, 1U, 1U
+};
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_mdio_capability(
+    nx_mdio_id_t id) {
+    switch (id) {
+        case NX_MDIO_ID_MAC:
+            return &s_nx_capability_mdio_mac;
+        default:
+            return NULL;
+    }
+}

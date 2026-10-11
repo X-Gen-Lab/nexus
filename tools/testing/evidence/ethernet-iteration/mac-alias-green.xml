@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="11" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:08:17.430" name="AllTests">
+  <testsuite name="EthernetMac" tests="11" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:08:17.431">
+    <testcase name="OwnHandoffRetainsBorrowUntilRealTransmitStatus" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="105" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="HeldReceiveLoanIsNeverOverwrittenAtRingWrap" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="121" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="CancellationWaitsForActualEngineAndFifoDrain" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="137" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="InvalidDomainRejectsBeforeResetOrOwnPublication" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="158" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="MdioTimeoutDoesNotInventReadValueOrClearBusy" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="164" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="ReceiveOutputCannotAliasDmaBufferOrOtherLoans" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="174" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="StateAndMdioOutputCannotOverwriteProviderStorage" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="183" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="LateFatalIrqClosesAdmissionBeforeNewOwnPublication" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="192" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="InitializationCannotResetForeignDescriptorEngine" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="200" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="StopDoesNotReclaimStuckOwnOrHeldLoan" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="206" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+    <testcase name="CapturedWakeRemainsBorrowedDuringItsCallback" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="224" status="run" result="completed" time="0." timestamp="2026-10-11T17:08:17.431" classname="EthernetMac" />
+  </testsuite>
+</testsuites>

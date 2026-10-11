@@ -1,0 +1,101 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Semaphore                                                           */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_trace.h"
+#include "tx_semaphore.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_semaphore_put_notify                            PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function registers an application callback function that is    */
+/*    called whenever the this semaphore is put.                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    semaphore_ptr                         Pointer to semaphore          */
+/*    semaphore_put_notify                  Application callback function */
+/*                                            (TX_NULL disables notify)   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Service return status         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_semaphore_put_notify(TX_SEMAPHORE *semaphore_ptr, VOID (*semaphore_put_notify)(TX_SEMAPHORE *notify_semaphore_ptr))
+{
+
+#ifdef TX_DISABLE_NOTIFY_CALLBACKS
+
+    TX_SEMAPHORE_NOT_USED(semaphore_ptr);
+    TX_SEMAPHORE_PUT_NOTIFY_NOT_USED(semaphore_put_notify);
+
+    /* Feature is not enabled, return error.  */
+    return(TX_FEATURE_NOT_ENABLED);
+#else
+
+TX_INTERRUPT_SAVE_AREA
+
+
+    /* Disable interrupts.  */
+    TX_DISABLE
+
+    /* Make entry in event log.  */
+    TX_TRACE_IN_LINE_INSERT(TX_TRACE_SEMAPHORE_PUT_NOTIFY, semaphore_ptr, 0, 0, 0, TX_TRACE_SEMAPHORE_EVENTS)
+
+    /* Make entry in event log.  */
+    TX_EL_SEMAPHORE_PUT_NOTIFY_INSERT
+
+    /* Setup semaphore put notification callback function.  */
+    semaphore_ptr -> tx_semaphore_put_notify =  semaphore_put_notify;
+
+    /* Restore interrupts.  */
+    TX_RESTORE
+
+    /* Return success to caller.  */
+    return(TX_SUCCESS);
+#endif
+}
+

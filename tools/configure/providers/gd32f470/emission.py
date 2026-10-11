@@ -2,10 +2,11 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device
+    from ... import can, usb_device, ethernet
 except ImportError:
     import can
     import usb_device
+    import ethernet
 
 
 def implementation(item):
@@ -16,6 +17,8 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.kind == "eth":
+        return "nx_eth_mac_ops"
     if item.kind == "can":
         return "nx_classic_can_ops"
     if item.kind == "usb_device":
@@ -44,6 +47,9 @@ def includes(result):
     if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
            for item in selections):
         source.append('#include "gd32f470_i2c_async.h"')
+    if any(item.kind == "eth" for item in selections):
+        source.append('#include "gd32f470_eth.h"')
+        source.append('#include "gd32f4xx_syscfg.h"')
     if any(item.kind == "can" for item in selections):
         source.append('#include "gd32f470_can.h"')
     if any(item.kind == "usb_device" for item in selections):
@@ -81,6 +87,7 @@ def state_declarations(result):
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
     source.extend(can.state_declarations(result, "gd32"))
+    source.extend(ethernet.state_declarations(result, "gd32"))
     source.extend(usb_device.state_declarations(result, "gd32"))
     return source
 
@@ -93,6 +100,7 @@ def shared_irqs(result):
 def stop_system(result):
     dma_clock = has_dma(result)
     source = can.stop_domain(result, "gd32")
+    source.extend(ethernet.stop_system(result, "gd32"))
     source.extend(usb_device.stop_system(result, "gd32"))
     if dma_clock:
         source += ['    if (s_nx_platform_started) { RCU_AHB1EN &= ~s_nx_platform_dma_clocks_added; }',
@@ -119,6 +127,7 @@ def start_system(result):
 
 def start_resources(result):
     source = usb_device.start_resources(result, "gd32")
+    source.extend(ethernet.start_resources(result, "gd32"))
     mask = _dma_clock_mask(result)
     if mask:
         source += [f'    s_nx_platform_dma_clocks_added = ~RCU_AHB1EN & ({mask});',

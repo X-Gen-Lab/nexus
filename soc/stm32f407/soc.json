@@ -409,6 +409,36 @@
       "clock_hz": 48000000,
       "fifo_words": 320,
       "endpoint_numbers": 4
+    },
+    "ETH": {
+      "kind": "eth",
+      "modes": [
+        "raw-rmii"
+      ],
+      "irq": [
+        "ETH"
+      ],
+      "irq_numbers": [
+        61
+      ],
+      "clock_hz": 168000000,
+      "pins": [
+        "PA1",
+        "PA2",
+        "PA7",
+        "PC1",
+        "PC4",
+        "PC5",
+        "PG11",
+        "PG13",
+        "PG14"
+      ],
+      "resources": [
+        "clock:ETHMAC",
+        "clock:ETHMACTX",
+        "clock:ETHMACRX",
+        "controller:SYSCFG_RMII"
+      ]
     }
   },
   "reserved_resources": [

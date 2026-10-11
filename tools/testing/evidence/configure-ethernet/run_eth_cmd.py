@@ -1,0 +1,3 @@
+from pathlib import Path
+import subprocess,sys,json,hashlib,os
+label=sys.argv[1]; argv=sys.argv[2:];root=Path('/workspace/nexus');out=Path('/workspace/nexus-config-iteration-evidence');env=os.environ.copy();env['PATH']=str(root/'.venv/bin')+':'+env['PATH'];r=subprocess.run(argv,cwd=root,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);p=out/(label+'.log');p.write_bytes(r.stdout);(out/(label+'.command.json')).write_text(json.dumps({'command':argv,'cwd':str(root),'PATH':env['PATH'],'exit_code':r.returncode,'log':str(p),'sha256':hashlib.sha256(r.stdout).hexdigest()},indent=2)+'\n');print(r.stdout.decode()[-2500:]);raise SystemExit(r.returncode)

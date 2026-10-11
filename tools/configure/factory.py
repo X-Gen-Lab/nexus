@@ -7,7 +7,7 @@ except ImportError:
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth")
 
 
 def symbol(name):
@@ -16,11 +16,17 @@ def symbol(name):
 
 def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
+    if class_name in {"eth", "mdio"}:
+        return f"nx_{class_name}_port_t"
     if class_name == "usb_device":
         return "nx_usb_device_port_t"
     if class_name == "usb_endpoint":
         return "nx_usb_endpoint_port_t"
     return f"nx_{class_name.removesuffix('_device')}_{shape}_t"
+
+
+def public_header(kind):
+    return {"pwm": "timer", "eth": "ethernet"}.get(kind, kind)
 
 
 def classes(result):
@@ -34,6 +40,8 @@ def classes(result):
     records.append(("usb_endpoint", "endpoint", [item for item in result["devices"]
                     if next(port["kind"] for port in result["controllers"]
                             if port["id"] == item["controller"]) == "usb_device"]))
+    records.append(("mdio", "port", [item for item in result["controllers"]
+                                      if item["kind"] == "eth"]))
     return records
 
 
@@ -43,7 +51,8 @@ def emit(result):
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_FACTORY_H', '#define NEXUS_FACTORY_H']
     for kind in KINDS:
-        header.append(f'#include "nexus/io/{"timer" if kind == "pwm" else kind}.h"')
+        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+    header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif']
     source = []
     for class_name, shape, instances in classes(result):
@@ -71,6 +80,7 @@ def emit(result):
         for instance in instances:
             name = symbol(instance["id"])
             pointer = (f"nx_device_{name}" if shape == "endpoint"
+                       else f"nx_binding_{name}_mdio" if class_name == "mdio"
                        else f"nx_binding_{name}")
             source += [f"        case {prefix}{name.upper()}:", f"            return {pointer};"]
         source += ["        default:", "            return NULL;", "    }", "}"]
@@ -139,6 +149,8 @@ def _capability(item, model):
             flags.append("NX_FACTORY_CAP_TX_DMA")
         if traits.rx_dma:
             flags.append("NX_FACTORY_CAP_RX_DMA")
+        if traits.bus_master:
+            flags.append("NX_FACTORY_CAP_BUS_MASTER_DMA")
     if traits.block_stream:
         flags.append("NX_FACTORY_CAP_BLOCK_STREAM")
         if traits.dma and not traits.continuous:
@@ -166,6 +178,8 @@ def _capability(item, model):
     elif kind == "can":
         # Each submitted request borrows one frame, not all TX mailboxes.
         units, unit_bytes, messages = 8, 1, 1
+    elif kind == "eth":
+        units, unit_bytes, alignment, messages = "NX_ETH_FRAME_MAX", 1, 4, 1
     elif kind == "usb_device":
         units, unit_bytes, messages = item.get("max_packet", 64), 1, 1
     elif kind == "flash":
@@ -183,7 +197,8 @@ def emit_capabilities(result):
         '    NX_FACTORY_CAP_TX_DMA = 1U << 3,',
         '    NX_FACTORY_CAP_RX_DMA = 1U << 4,',
         '    NX_FACTORY_CAP_BLOCK_STREAM = 1U << 5,',
-        '    NX_FACTORY_CAP_STREAM_GAPS = 1U << 6', '};',
+        '    NX_FACTORY_CAP_STREAM_GAPS = 1U << 6,',
+        '    NX_FACTORY_CAP_BUS_MASTER_DMA = 1U << 7', '};',
         '/**',
         ' * \\brief Readonly bounds of the selected provider/mode.',
         ' * \\note Zero units/messages means no bound described, not unlimited.',
@@ -203,6 +218,8 @@ def emit_capabilities(result):
                 item = {**item, "max_packet": instance["max_packet"]}
             flags, units, size, alignment, messages = _capability(
                 item, result["soc_family"] == "native")
+            if class_name == "mdio":
+                flags, units, size, alignment, messages = "NX_FACTORY_CAP_POLLING", 1, 2, 1, 1
             # Public C constants are the bounds authority; never recopy values.
             units = f"{units}U" if type(units) is int else units
             messages = f"{messages}U" if type(messages) is int else messages

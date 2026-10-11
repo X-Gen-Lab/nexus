@@ -457,3 +457,7 @@ include(usb_factory.cmake)
 include(timebase_lowpower.cmake)
 
 include(threadx.cmake)
+
+include(ethernet.cmake)
+
+include(ethernet_factory.cmake)

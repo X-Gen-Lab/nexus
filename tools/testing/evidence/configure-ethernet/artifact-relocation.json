@@ -1,0 +1,165 @@
+{
+  "files": [
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-baremetal/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-baremetal/compile_commands.json.raw",
+      "bytes": 61217,
+      "sha256": "9a13244680eded7b813d257df8419f10ffc66cacf67618b4f651d34bb3e2ed9f",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-baremetal/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-baremetal/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 1151,
+      "sha256": "f888207c5906e076fc13edb35128e7866fb37ed02fdbd39826de5fd913aa3c4a",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-freertos/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-freertos/compile_commands.json.raw",
+      "bytes": 69378,
+      "sha256": "7f64ac5096e20d459f11ad7570108e21e70292cedce528f1838f1454ac44d786",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-freertos/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-freertos/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 2466,
+      "sha256": "f855a78df3788810bf4c29236aa4eb58b2f2159a6104e780efe89c623aca4101",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-baremetal/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-baremetal/compile_commands.json.raw",
+      "bytes": 53343,
+      "sha256": "2d594acba12fe5d56c7cdcf121aaf4b0cf8c5b0cb810e848eaf8104ecdc53392",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 1153,
+      "sha256": "7769a5951ceaa9b0d3df6c96d6ff64278700f007c25f741e2117c878b09d37a7",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-freertos/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-freertos/compile_commands.json.raw",
+      "bytes": 61578,
+      "sha256": "42bd964c169b7d05a4872808bafde2c82b125c841c007499f76184c8de1db731",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-freertos/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-freertos/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 2468,
+      "sha256": "5f389488916cd5834c576f65a5c69ae52f4f02d13c65eb511e78adbd17af77fe",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-baremetal/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-baremetal/compile_commands.json.raw",
+      "bytes": 62008,
+      "sha256": "894ebb53dbeb470c489a6f87534dc06bcd3e7db7a49c2c39d1640ff98f718f3f",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-baremetal/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-baremetal/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 1151,
+      "sha256": "f888207c5906e076fc13edb35128e7866fb37ed02fdbd39826de5fd913aa3c4a",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-freertos/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-freertos/compile_commands.json.raw",
+      "bytes": 70167,
+      "sha256": "03f4fe0e749265bb35198dbe8bfa6c4f06c6edff22c05e748493a3856446e3ec",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-freertos/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-freertos/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 2466,
+      "sha256": "f855a78df3788810bf4c29236aa4eb58b2f2159a6104e780efe89c623aca4101",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-baremetal/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-baremetal/compile_commands.json.raw",
+      "bytes": 54142,
+      "sha256": "d2b3c2899660719650fb3f29740e7254f7cd0957d3af0bf1738414c9fcd7bfe8",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-baremetal/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-baremetal/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 1153,
+      "sha256": "7769a5951ceaa9b0d3df6c96d6ff64278700f007c25f741e2117c878b09d37a7",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-freertos/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-freertos/compile_commands.json.raw",
+      "bytes": 62375,
+      "sha256": "578199c5fc10319dd5552951e0b3886850c3b10daea669a3eb11d7e931c1474a",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-freertos/nexus-sdk/generated/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-freertos/nexus-sdk/generated/selection.cmake.raw",
+      "bytes": 2468,
+      "sha256": "5f389488916cd5834c576f65a5c69ae52f4f02d13c65eb511e78adbd17af77fe",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/frozen-owned-sources/tests/google/ethernet_factory.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/frozen-owned-sources/tests/google/ethernet_factory.cmake.raw",
+      "bytes": 3071,
+      "sha256": "62e2ad13fbdf7a87a5abc500f4901b1659a5915376cc61b3c2df77b172148c1a",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/host/ethernet-config-model/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/host/ethernet-config-model/compile_commands.json.raw",
+      "bytes": 785060,
+      "sha256": "99e8da80030058c18628ee4e73a715c1a37bc07a4dc9d9babc173a70f2ea3206",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/host/ethernet-config-model/gd32/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/host/ethernet-config-model/gd32/selection.cmake.raw",
+      "bytes": 1151,
+      "sha256": "f0e318ef01e503b51ee6134c2f2fe0d3925fc15e4c3149d8e41765dd63c26140",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/host/ethernet-config-model/stm32/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/host/ethernet-config-model/stm32/selection.cmake.raw",
+      "bytes": 1153,
+      "sha256": "7b760d91c609c499a4fb007e9885f219138be045fe04a98326c2030e3e6e0acf",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/host/ethernet-config-san/compile_commands.json",
+      "archived": "tools/testing/evidence/configure-ethernet/host/ethernet-config-san/compile_commands.json.raw",
+      "bytes": 814229,
+      "sha256": "3c594cf2f428b742cdd1449a2e796115a1b1b7a2150ce02ae54099d7a8d6d38c",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/host/ethernet-config-san/gd32/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/host/ethernet-config-san/gd32/selection.cmake.raw",
+      "bytes": 1151,
+      "sha256": "f0e318ef01e503b51ee6134c2f2fe0d3925fc15e4c3149d8e41765dd63c26140",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/configure-ethernet/host/ethernet-config-san/stm32/selection.cmake",
+      "archived": "tools/testing/evidence/configure-ethernet/host/ethernet-config-san/stm32/selection.cmake.raw",
+      "bytes": 1153,
+      "sha256": "7b760d91c609c499a4fb007e9885f219138be045fe04a98326c2030e3e6e0acf",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    }
+  ]
+}

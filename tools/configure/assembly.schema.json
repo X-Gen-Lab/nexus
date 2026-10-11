@@ -432,6 +432,71 @@
       "type": "array",
       "uniqueItems": true
     },
+    "eth": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "items": {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "maxItems": 6,
+            "minItems": 6,
+            "type": "array"
+          },
+          "binding": {
+            "type": "string"
+          },
+          "drain_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "init_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "rx_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rx_storage_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tx_count": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
     "exti": {
       "additionalProperties": {
         "additionalProperties": false,

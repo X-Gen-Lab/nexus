@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:56:39.201" name="AllTests">
+  <testsuite name="EthernetNative" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:56:39.201">
+    <testcase name="ExplicitEgressReturnsOwnBeforeActualProviderSettlement" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="53" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+    <testcase name="ExplicitIngressCannotOverwriteAnAcquiredLoan" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="72" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+    <testcase name="MdioReadsOnlyExplicitRegisterFileAndAddress" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="89" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+    <testcase name="StopRetainsFailedIrqDetachAndLaterRecoversWithoutReplay" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="105" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+    <testcase name="PendingStatusCannotBeReleasedWhileW1cIsStuck" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="120" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+    <testcase name="ActualPriorityIsRevalidatedBeforeKernelWakeBinding" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="131" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+    <testcase name="EpochSurvivesStopAndPreventsReleaseOfReusedStorage" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_native_test.cpp" line="139" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.201" classname="EthernetNative" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,26 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/eth-build",
+      "-j",
+      "2"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/eth-build/ethernet_api_test",
+      "--gtest_output=xml:/workspace/nexus-iteration-bus-design/eth-src/evidence/link-quiet-green-ethernet_api_test.xml"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/eth-build/ethernet_mac_test",
+      "--gtest_output=xml:/workspace/nexus-iteration-bus-design/eth-src/evidence/link-quiet-green-ethernet_mac_test.xml"
+    ],
+    "returncode": 1
+  }
+]

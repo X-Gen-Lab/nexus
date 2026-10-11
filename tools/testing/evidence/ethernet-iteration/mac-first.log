@@ -1,0 +1,19 @@
+Running main() from gmock_main.cc
+[==========] Running 5 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 5 tests from EthernetMac
+[ RUN      ] EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus
+[       OK ] EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus (0 ms)
+[ RUN      ] EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap
+[       OK ] EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap (0 ms)
+[ RUN      ] EthernetMac.CancellationWaitsForActualEngineAndFifoDrain
+[       OK ] EthernetMac.CancellationWaitsForActualEngineAndFifoDrain (0 ms)
+[ RUN      ] EthernetMac.InvalidDomainRejectsBeforeResetOrOwnPublication
+[       OK ] EthernetMac.InvalidDomainRejectsBeforeResetOrOwnPublication (0 ms)
+[ RUN      ] EthernetMac.MdioTimeoutDoesNotInventReadValueOrClearBusy
+[       OK ] EthernetMac.MdioTimeoutDoesNotInventReadValueOrClearBusy (0 ms)
+[----------] 5 tests from EthernetMac (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 5 tests.

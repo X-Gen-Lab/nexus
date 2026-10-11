@@ -2,10 +2,11 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device
+    from ... import can, usb_device, ethernet
 except ImportError:
     import can
     import usb_device
+    import ethernet
 
 
 def implementation(item):
@@ -16,6 +17,8 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.kind == "eth":
+        return "nx_eth_mac_ops"
     if item.kind == "can":
         return "nx_classic_can_ops"
     if item.kind == "usb_device":
@@ -41,6 +44,8 @@ def includes(result):
     if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
            for item in selections):
         source.append('#include "stm32f407_i2c_async.h"')
+    if any(item.kind == "eth" for item in selections):
+        source.append('#include "stm32f407_eth.h"')
     if any(item.kind == "can" for item in selections):
         source.append('#include "stm32f407_can.h"')
     if any(item.kind == "usb_device" for item in selections):
@@ -94,6 +99,7 @@ def state_declarations(result):
     if any(item["kind"] == "exti" for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     source.extend(can.state_declarations(result, "stm32"))
+    source.extend(ethernet.state_declarations(result, "stm32"))
     return source
 
 
@@ -105,6 +111,7 @@ def stop_system(result):
     selections = result.controllers
     dma_clock = has_dma(result)
     source = can.stop_domain(result, "stm32")
+    source.extend(ethernet.stop_system(result, "stm32"))
     gpio_clock_mask = _gpio_clock_mask(result)
     if gpio_clock_mask:
         source += ['    if (s_nx_platform_started) {',
@@ -150,7 +157,7 @@ def start_system(result):
 
 def start_resources(result):
     selections = result.controllers
-    source = []
+    source = ethernet.start_resources(result, "stm32")
     mask = _dma_clock_mask(result)
     if mask:
         source += [f'    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & ({mask});',

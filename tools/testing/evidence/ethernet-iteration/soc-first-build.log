@@ -1,0 +1,8 @@
+[0/1] Re-running CMake...
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-iteration-bus-design/eth-build
+[1/5] Building C object CMakeFiles/ethernet_gd32_test.dir/soc/gd32f470/drivers/ethernet.c.o
+[2/5] Building C object CMakeFiles/ethernet_stm32_test.dir/soc/stm32f407/drivers/ethernet.c.o
+[3/5] Linking CXX executable ethernet_stm32_test
+[4/5] Linking CXX executable ethernet_gd32_test

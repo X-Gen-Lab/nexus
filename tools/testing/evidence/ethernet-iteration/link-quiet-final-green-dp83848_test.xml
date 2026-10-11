@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:56:39.204" name="AllTests">
+  <testsuite name="Dp83848" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:56:39.204">
+    <testcase name="IdentityMismatchDoesNotConfigureUnknownPhy" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="36" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="AutoNegotiationConfigurationDoesNotInventLink" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="47" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="LatchLowIsReadTwiceBeforeConfirmedLink" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="66" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="InvalidModeIsRejectedWithoutMdioEffects" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="84" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="PartialConfigurationFailureNeverRemainsConfigured" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="93" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="ResetRequiresActualSelfClearingAcknowledgement" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="FixedModeMismatchAndRemoteFaultPreserveOutput" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="115" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.204" classname="Dp83848" />
+    <testcase name="NsVariantMustBeExplicitlySelected" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/dp83848_test.cpp" line="133" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:39.205" classname="Dp83848" />
+  </testsuite>
+</testsuites>

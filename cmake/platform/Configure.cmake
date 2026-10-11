@@ -17,6 +17,7 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/memory.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/usb_device.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/ethernet.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/threadx.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/lowpower.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"

@@ -1,0 +1,187 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Thread                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_trace.h"
+#include "tx_thread.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_delete                                   PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function handles application delete thread requests.  The      */
+/*    thread to delete must be in a terminated or completed state,        */
+/*    otherwise this function just returns an error code.                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to suspend  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Return completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_thread_delete(TX_THREAD *thread_ptr)
+{
+
+TX_INTERRUPT_SAVE_AREA
+
+TX_THREAD       *next_thread;
+TX_THREAD       *previous_thread;
+UINT            status;
+
+
+    /* Default status to success.  */
+    status =  TX_SUCCESS;
+
+    /* Lockout interrupts while the thread is being deleted.  */
+    TX_DISABLE
+
+    /* Check for proper status of this thread to delete.  */
+    if (thread_ptr -> tx_thread_state != TX_COMPLETED)
+    {
+
+        /* Now check for terminated state.  */
+        if (thread_ptr -> tx_thread_state != TX_TERMINATED)
+        {
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+
+            /* Thread not completed or terminated - return an error!  */
+            status =  TX_DELETE_ERROR;
+        }
+    }
+
+    /* The state is terminal, but a terminal state on its own is not authorization to
+       release the control block.  Both paths that produce one -- thread completion in
+       _tx_thread_shell_entry and thread termination in _tx_thread_terminate -- publish
+       TX_COMPLETED or TX_TERMINATED, and then run this thread's exit notification
+       callback, before the thread has been detached from the ready list and before
+       those services have finished with the pointer they hold to it.  The suspending
+       flag is set for exactly that interval, so a thread whose flag is still set is
+       part-way through the transition.  */
+    if (status == TX_SUCCESS)
+    {
+
+        /* Is the completion or termination transition still in progress?  */
+        if (thread_ptr -> tx_thread_suspending == TX_TRUE)
+        {
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+
+            /* Yes, refuse the delete rather than unlink a thread the scheduler is
+               still holding.  The condition is transient: the caller may retry once
+               the transition has finished.  */
+            status =  TX_DELETE_ERROR;
+        }
+    }
+
+    /* Determine if the delete operation is okay.  */
+    if (status == TX_SUCCESS)
+    {
+
+        /* Yes, continue with deleting the thread.  */
+
+        /* Perform any additional activities for tool or user purpose.  */
+        TX_THREAD_DELETE_EXTENSION(thread_ptr)
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_DELETE, thread_ptr, TX_POINTER_TO_ULONG_CONVERT(&next_thread), 0, 0, TX_TRACE_THREAD_EVENTS)
+
+        /* If trace is enabled, unregister this object.  */
+        TX_TRACE_OBJECT_UNREGISTER(thread_ptr)
+
+        /* Log this kernel call.  */
+        TX_EL_THREAD_DELETE_INSERT
+
+        /* Unregister thread in the thread array structure.  */
+        TX_EL_THREAD_UNREGISTER(thread_ptr)
+
+        /* Clear the thread ID to make it invalid.  */
+        thread_ptr -> tx_thread_id =  TX_CLEAR_ID;
+
+        /* Decrement the number of created threads.  */
+        _tx_thread_created_count--;
+
+        /* See if the thread is the only one on the list.  */
+        if (_tx_thread_created_count == TX_EMPTY)
+        {
+
+            /* Only created thread, just set the created list to NULL.  */
+            _tx_thread_created_ptr =  TX_NULL;
+        }
+        else
+        {
+
+            /* Otherwise, not the only created thread, link-up the neighbors.  */
+            next_thread =                                thread_ptr -> tx_thread_created_next;
+            previous_thread =                            thread_ptr -> tx_thread_created_previous;
+            next_thread -> tx_thread_created_previous =  previous_thread;
+            previous_thread -> tx_thread_created_next =  next_thread;
+
+            /* See if we have to update the created list head pointer.  */
+            if (_tx_thread_created_ptr == thread_ptr)
+            {
+
+                /* Yes, move the head pointer to the next link. */
+                _tx_thread_created_ptr =  next_thread;
+            }
+        }
+
+        /* Execute Port-Specific completion processing. If needed, it is typically defined in tx_port.h.  */
+        TX_THREAD_DELETE_PORT_COMPLETION(thread_ptr)
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+    }
+
+    /* Return completion status.  */
+    return(status);
+}
+

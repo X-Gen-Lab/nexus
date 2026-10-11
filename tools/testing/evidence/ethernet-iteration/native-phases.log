@@ -1,0 +1,23 @@
+Running main() from gmock_main.cc
+[==========] Running 7 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 7 tests from EthernetNative
+[ RUN      ] EthernetNative.ExplicitEgressReturnsOwnBeforeActualProviderSettlement
+[       OK ] EthernetNative.ExplicitEgressReturnsOwnBeforeActualProviderSettlement (0 ms)
+[ RUN      ] EthernetNative.ExplicitIngressCannotOverwriteAnAcquiredLoan
+[       OK ] EthernetNative.ExplicitIngressCannotOverwriteAnAcquiredLoan (0 ms)
+[ RUN      ] EthernetNative.MdioReadsOnlyExplicitRegisterFileAndAddress
+[       OK ] EthernetNative.MdioReadsOnlyExplicitRegisterFileAndAddress (0 ms)
+[ RUN      ] EthernetNative.StopRetainsFailedIrqDetachAndLaterRecoversWithoutReplay
+[       OK ] EthernetNative.StopRetainsFailedIrqDetachAndLaterRecoversWithoutReplay (0 ms)
+[ RUN      ] EthernetNative.PendingStatusCannotBeReleasedWhileW1cIsStuck
+[       OK ] EthernetNative.PendingStatusCannotBeReleasedWhileW1cIsStuck (0 ms)
+[ RUN      ] EthernetNative.ActualPriorityIsRevalidatedBeforeKernelWakeBinding
+[       OK ] EthernetNative.ActualPriorityIsRevalidatedBeforeKernelWakeBinding (0 ms)
+[ RUN      ] EthernetNative.EpochSurvivesStopAndPreventsReleaseOfReusedStorage
+[       OK ] EthernetNative.EpochSurvivesStopAndPreventsReleaseOfReusedStorage (0 ms)
+[----------] 7 tests from EthernetNative (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 7 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 7 tests.

@@ -1,0 +1,109 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Byte Memory                                                         */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_byte_pool.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_byte_pool_info_get                             PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the byte pool information get    */
+/*    service.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pool_ptr                          Pointer to byte pool control block*/
+/*    name                              Destination for the pool name     */
+/*    available_bytes                   Number of free bytes in byte pool */
+/*    fragments                         Number of fragments in byte pool  */
+/*    first_suspended                   Destination for pointer of first  */
+/*                                        thread suspended on byte pool   */
+/*    suspended_count                   Destination for suspended count   */
+/*    next_pool                         Destination for pointer to next   */
+/*                                        byte pool on the created list   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_POOL_ERROR                     Invalid byte pool pointer         */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_byte_pool_info_get            Actual byte pool info get service */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txe_byte_pool_info_get(TX_BYTE_POOL *pool_ptr, TX_NAME_CONST CHAR **name, ULONG *available_bytes,
+                    ULONG *fragments, TX_THREAD **first_suspended,
+                    ULONG *suspended_count, TX_BYTE_POOL **next_pool)
+{
+
+UINT    status;
+
+
+    /* Check for an invalid byte pool pointer.  */
+    if (pool_ptr == TX_NULL)
+    {
+
+        /* Block pool pointer is invalid, return appropriate error code.  */
+        status =  TX_POOL_ERROR;
+    }
+
+    /* Now check for invalid pool ID.  */
+    else if (pool_ptr -> tx_byte_pool_id != TX_BYTE_POOL_ID)
+    {
+
+        /* Block pool pointer is invalid, return appropriate error code.  */
+        status =  TX_POOL_ERROR;
+    }
+    else
+    {
+
+        /* Otherwise, call the actual byte pool information get service.  */
+        status =  _tx_byte_pool_info_get(pool_ptr, name, available_bytes,
+                            fragments, first_suspended, suspended_count, next_pool);
+    }
+
+    /* Return completion status.  */
+    return(status);
+}
+

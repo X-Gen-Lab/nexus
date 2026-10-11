@@ -1,0 +1,4 @@
+[1/4] Building CXX object CMakeFiles/ethernet_native_test.dir/tests/google/ethernet_native_test.cpp.o
+[2/4] Linking CXX executable ethernet_native_test
+[3/4] Building CXX object CMakeFiles/dp83848_test.dir/tests/google/dp83848_test.cpp.o
+[4/4] Linking CXX executable dp83848_test

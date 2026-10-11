@@ -49,7 +49,7 @@ if(TARGET nexus_file_flash)
     add_library(Nexus::FileFlash ALIAS nexus_file_flash)
 endif()
 add_subdirectory(owner_observer)
+add_subdirectory(dp83848)
 
 add_subdirectory(clock_domain)
-
 add_subdirectory(user_io_broker)

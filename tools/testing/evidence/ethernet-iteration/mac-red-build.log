@@ -1,0 +1,64 @@
+[0/1] Re-running CMake...
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-iteration-bus-design/eth-build
+[1/5] Building C object CMakeFiles/ethernet_mac_test.dir/io/src/mdio.c.o
+[2/5] Building C object CMakeFiles/ethernet_mac_test.dir/io/src/ethernet.c.o
+[3/5] Building CXX object CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o
+FAILED: [code=1] CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o 
+/usr/bin/c++  -I/workspace/nexus-iteration-bus-design/eth-src/io/include -I/workspace/nexus-iteration-bus-design/eth-src/io/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -I/workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -std=gnu++17 -Wall -Wextra -Werror -MD -MT CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o -MF CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o.d -o CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o -c /workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp: In function ‘void nx_eth_model_write(uintptr_t, unsigned int, uint32_t)’:
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:80:19: error: reference to ‘stat’ is ambiguous
+   80 |     if (offset == stat) { regs[offset / 4] &= ~value; return; }
+      |                   ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:15:34: note: candidates are: ‘constexpr const unsigned int {anonymous}::stat’
+   15 | constexpr unsigned ctl = 0x1018, stat = 0x1014;
+      |                                  ^~~~
+In file included from /workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/internal/gtest-port.h:319,
+                 from /workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-message.h:57,
+                 from /workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-assertion-result.h:46,
+                 from /workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:63,
+                 from /workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:10:
+/usr/include/x86_64-linux-gnu/sys/stat.h:205:12: note:                 ‘int stat(const char*, stat*)’
+  205 | extern int stat (const char *__restrict __file,
+      |            ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp: In function ‘void nx_eth_model_poll(void*)’:
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:96:28: error: reference to ‘stat’ is ambiguous
+   96 |     if (!hold_engine) regs[stat / 4] &= ~UINT32_C(0x7e0000);
+      |                            ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:15:34: note: candidates are: ‘constexpr const unsigned int {anonymous}::stat’
+   15 | constexpr unsigned ctl = 0x1018, stat = 0x1014;
+      |                                  ^~~~
+/usr/include/x86_64-linux-gnu/sys/stat.h:205:12: note:                 ‘int stat(const char*, stat*)’
+  205 | extern int stat (const char *__restrict __file,
+      |            ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp: In member function ‘virtual void EthernetMac_OwnHandoffRetainsBorrowUntilRealTransmitStatus_Test::TestBody()’:
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:111:10: error: reference to ‘stat’ is ambiguous
+  111 |     regs[stat / 4] |= 1;
+      |          ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:15:34: note: candidates are: ‘constexpr const unsigned int {anonymous}::stat’
+   15 | constexpr unsigned ctl = 0x1018, stat = 0x1014;
+      |                                  ^~~~
+/usr/include/x86_64-linux-gnu/sys/stat.h:205:12: note:                 ‘int stat(const char*, stat*)’
+  205 | extern int stat (const char *__restrict __file,
+      |            ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp: In member function ‘virtual void EthernetMac_CancellationWaitsForActualEngineAndFifoDrain_Test::TestBody()’:
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:141:10: error: reference to ‘stat’ is ambiguous
+  141 |     regs[stat / 4] |= 1U << 20U;
+      |          ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:15:34: note: candidates are: ‘constexpr const unsigned int {anonymous}::stat’
+   15 | constexpr unsigned ctl = 0x1018, stat = 0x1014;
+      |                                  ^~~~
+/usr/include/x86_64-linux-gnu/sys/stat.h:205:12: note:                 ‘int stat(const char*, stat*)’
+  205 | extern int stat (const char *__restrict __file,
+      |            ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:150:10: error: reference to ‘stat’ is ambiguous
+  150 |     regs[stat / 4] &= ~(7U << 20U);
+      |          ^~~~
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:15:34: note: candidates are: ‘constexpr const unsigned int {anonymous}::stat’
+   15 | constexpr unsigned ctl = 0x1018, stat = 0x1014;
+      |                                  ^~~~
+/usr/include/x86_64-linux-gnu/sys/stat.h:205:12: note:                 ‘int stat(const char*, stat*)’
+  205 | extern int stat (const char *__restrict __file,
+      |            ^~~~
+ninja: build stopped: subcommand failed.

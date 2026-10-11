@@ -1,0 +1,21 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/eth-build",
+      "--target",
+      "ethernet_mac_test",
+      "-j",
+      "2"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/eth-build/ethernet_mac_test",
+      "--gtest_output=xml:/workspace/nexus-iteration-bus-design/eth-src/evidence/wake-review-red.xml"
+    ],
+    "returncode": 1
+  }
+]

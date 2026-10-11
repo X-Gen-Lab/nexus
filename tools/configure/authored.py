@@ -2,6 +2,8 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "eth": {"binding", "mode", "tx_count", "rx_count", "rx_storage_bytes",
+            "address", "init_timeout_us", "drain_timeout_us", "irq"},
     "usb_device": {"binding", "mode", "event_capacity", "rx_fifo_words",
                    "vbus_sensing", "poll_limit", "drain_timeout_us",
                    "clock_timeout_us", "irq"},
@@ -76,7 +78,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["calls_os"] = irq["calls_os"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -143,7 +145,8 @@ def editor_schema():
                    "reference_mv", "timeout_ms", "address", "model_bytes",
                    "bitrate", "drain_timeout_us", "poll_limit", "prescaler",
                    "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo",
-                   "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words"}
+                   "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words",
+                   "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
@@ -198,6 +201,10 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "eth":
+            properties[kind]["additionalProperties"]["properties"]["address"] = {
+                "type": "array", "minItems": 6, "maxItems": 6,
+                "items": {"type": "integer", "minimum": 0, "maximum": 255}}
     for kind, fields in ENDPOINT_FIELDS.items():
         properties[kind + "_device"] = {"type": "object", "additionalProperties": record(fields, {"controller"})}
     endpoint_schema = record(USB_ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS - {"fifo_words"})

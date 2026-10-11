@@ -1,0 +1,51 @@
+{
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/ethernet-arm-green/gd32-baremetal/bin/ethernet_controller_fixture.elf",
+    "sha256": "ef2b0ff62a42f4045456bcfbdbd4978a480e59dfece1933209f2b0409233a9e2",
+    "size": 29220
+  },
+  "instances": [
+    {
+      "descriptor_bytes": 64,
+      "domain": {
+        "origin": 536870912,
+        "size": 196608
+      },
+      "id": "mac",
+      "objects": [
+        {
+          "address": 536874344,
+          "role": "tx",
+          "size": 32
+        },
+        {
+          "address": 536874312,
+          "role": "rx",
+          "size": 32
+        },
+        {
+          "address": 536874296,
+          "role": "tx_slots",
+          "size": 16
+        },
+        {
+          "address": 536874216,
+          "role": "rx_slots",
+          "size": 80
+        },
+        {
+          "address": 536871140,
+          "role": "storage",
+          "size": 3072
+        }
+      ],
+      "rx_storage_bytes": 3072
+    }
+  ],
+  "resolved": {
+    "path": "/workspace/nexus-config-iteration-evidence/ethernet-arm-green/gd32-baremetal/nexus-sdk/generated/resolved.json",
+    "sha256": "447dce544ad9b1047f9fc9fead495a19876ba67cd1fd74f6c1f7231c41cba739",
+    "size": 26323
+  },
+  "scope": "Actual ARM ELF storage; no physical PHY/HIL proof"
+}

@@ -17,7 +17,7 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device
+    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet
     from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
@@ -30,6 +30,7 @@ except ImportError:
     import can
     import threadx
     import usb_device
+    import ethernet
     import metadata
     import factory
     import memory as memory_regions
@@ -45,7 +46,7 @@ UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "timer", "pwm", "adc", "can", "usb_device"}
+         "timer", "pwm", "adc", "can", "usb_device", "eth"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -246,6 +247,7 @@ def validate_soc(soc, part):
             validate_resource_fact(resource, provider, "SoC resource")
     can.validate_soc(soc, provider)
     usb_device.validate_soc(soc, provider)
+    ethernet.validate_soc(soc, provider)
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
@@ -524,7 +526,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
              "timeout_ms", "calls_os", "rx_profile", "sample_times",
              "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
              "bitrate", "timing", "drain_timeout_us", "poll_limit",
-             "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us"}, "controller selection")
+             "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
+             "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us"}, "controller selection")
         name = identity(selection["id"], "instance id")
         c_identity(name)
         instance_ids.append(name)

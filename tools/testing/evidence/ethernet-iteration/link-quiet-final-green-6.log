@@ -1,0 +1,25 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from Dp83848
+[ RUN      ] Dp83848.IdentityMismatchDoesNotConfigureUnknownPhy
+[       OK ] Dp83848.IdentityMismatchDoesNotConfigureUnknownPhy (0 ms)
+[ RUN      ] Dp83848.AutoNegotiationConfigurationDoesNotInventLink
+[       OK ] Dp83848.AutoNegotiationConfigurationDoesNotInventLink (0 ms)
+[ RUN      ] Dp83848.LatchLowIsReadTwiceBeforeConfirmedLink
+[       OK ] Dp83848.LatchLowIsReadTwiceBeforeConfirmedLink (0 ms)
+[ RUN      ] Dp83848.InvalidModeIsRejectedWithoutMdioEffects
+[       OK ] Dp83848.InvalidModeIsRejectedWithoutMdioEffects (0 ms)
+[ RUN      ] Dp83848.PartialConfigurationFailureNeverRemainsConfigured
+[       OK ] Dp83848.PartialConfigurationFailureNeverRemainsConfigured (0 ms)
+[ RUN      ] Dp83848.ResetRequiresActualSelfClearingAcknowledgement
+[       OK ] Dp83848.ResetRequiresActualSelfClearingAcknowledgement (0 ms)
+[ RUN      ] Dp83848.FixedModeMismatchAndRemoteFaultPreserveOutput
+[       OK ] Dp83848.FixedModeMismatchAndRemoteFaultPreserveOutput (0 ms)
+[ RUN      ] Dp83848.NsVariantMustBeExplicitlySelected
+[       OK ] Dp83848.NsVariantMustBeExplicitlySelected (0 ms)
+[----------] 8 tests from Dp83848 (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 8 tests.

@@ -208,6 +208,17 @@ class AdcOptions:
 
 
 @dataclass(frozen=True)
+class EthernetOptions:
+    tx_count: int
+    rx_count: int
+    rx_storage_bytes: int
+    address: tuple[int, ...]
+    init_timeout_us: int
+    drain_timeout_us: int
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
 class UsbDeviceOptions:
     event_capacity: int
     rx_fifo_words: int
@@ -275,7 +286,7 @@ class NoOptions:
 
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | AdcOptions | CanOptions |
-                     UsbDeviceOptions | NoOptions)
+                     UsbDeviceOptions | EthernetOptions | NoOptions)
 
 
 def mode_options(values):
@@ -292,6 +303,10 @@ def mode_options(values):
         return UsbDeviceOptions(*(values[key] for key in (
             "event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
             "drain_timeout_us", "clock_timeout_us")), irq)
+    if kind == "eth":
+        return EthernetOptions(values["tx_count"], values["rx_count"],
+                               values["rx_storage_bytes"], tuple(values["address"]),
+                               values["init_timeout_us"], values["drain_timeout_us"], irq)
     if kind == "gpio":
         return GpioOptions(values["mask"], values["initial"])
     if kind == "uart":

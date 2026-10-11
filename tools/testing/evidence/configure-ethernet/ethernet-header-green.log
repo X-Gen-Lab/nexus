@@ -1,0 +1,12 @@
+test_count_buffer_alignment_and_finite_budgets_reject_before_emission (tools.configure.test_ethernet.EthernetConfigurationTests.test_count_buffer_alignment_and_finite_budgets_reject_before_emission) ... ok
+test_default_platform_has_no_mac_ring_phy_or_mdio_context (tools.configure.test_ethernet.EthernetConfigurationTests.test_default_platform_has_no_mac_ring_phy_or_mdio_context) ... ok
+test_exact_chosen_storage_and_paired_readonly_faces_share_one_context (tools.configure.test_ethernet.EthernetConfigurationTests.test_exact_chosen_storage_and_paired_readonly_faces_share_one_context) ... ok
+test_failed_mac_cold_is_counted_before_prepare_and_pins_restore_after_stop (tools.configure.test_ethernet.EthernetConfigurationTests.test_failed_mac_cold_is_counted_before_prepare_and_pins_restore_after_stop) ... ok
+test_mac_address_requires_explicit_nonzero_unicast_six_bytes (tools.configure.test_ethernet.EthernetConfigurationTests.test_mac_address_requires_explicit_nonzero_unicast_six_bytes) ... ok
+test_two_exact_zg_parts_have_one_mac_and_no_stream_dma_claim (tools.configure.test_ethernet.EthernetConfigurationTests.test_two_exact_zg_parts_have_one_mac_and_no_stream_dma_claim) ... ok
+test_unreviewed_ve_package_cannot_use_zg_port_g_route (tools.configure.test_ethernet.EthernetConfigurationTests.test_unreviewed_ve_package_cannot_use_zg_port_g_route) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.126s
+
+OK

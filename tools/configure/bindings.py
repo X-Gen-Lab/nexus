@@ -2,11 +2,11 @@
 try:
     from .providers import maintained
     from .ir import ConfigurationIR
-    from .factory import interface_type
+    from .factory import interface_type, public_header
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
-    from factory import interface_type
+    from factory import interface_type, public_header
 
 
 def symbol(name):
@@ -24,7 +24,9 @@ def emit(result):
               '#ifndef NEXUS_BINDINGS_H', '#define NEXUS_BINDINGS_H',
               '#include "nexus/core/status.h"']
     for kind in sorted({item["kind"] for item in selections}):
-        header.append(f'#include "nexus/io/{"timer" if kind == "pwm" else kind}.h"')
+        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+    if any(item.kind == "eth" for item in selections):
+        header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif', 'typedef struct {', '    nx_result_t primary;',
                '    nx_result_t cleanup;', '    uint32_t remaining_effects;',
                '} nx_platform_start_result_t;',
@@ -59,7 +61,8 @@ def emit(result):
                    f'extern const {exported_type}* const nx_binding_{name};']
         implementation = provider.implementation(item)
         prefix = provider.PREFIX
-        state_type = ("nx_usb_controller_t" if item.kind == "usb_device" else
+        state_type = ("nx_eth_mac_t" if item.kind == "eth" else
+                      "nx_usb_controller_t" if item.kind == "usb_device" else
                       "nx_can_controller_t" if item.kind == "can" else
                       f"nx_{prefix}_{implementation}_state_t")
         source += [f'static {state_type} s_nx_port_{name};',
@@ -70,6 +73,7 @@ def emit(result):
         construction = provider.constructor(item, result, result["board_bindings"],
                                             result["routes"], result.devices)
         source.extend(construction["definitions"])
+        header.extend(construction.get("exports", ()))
         initialize.append(construction["initialize"])
         stop.extend((len(initialize), expression)
                     for expression in construction["stop"])
@@ -100,7 +104,7 @@ def emit(result):
     source.append("    s_nx_platform_started = true;")
     source.extend(provider.start_resources(result))
     for index, expression in enumerate(initialize):
-        if selections[index].kind in {"can", "usb_device"}:
+        if selections[index].kind in {"can", "usb_device", "eth"}:
             # Cold failure may retain live hardware; include that instance
             # in reverse cleanup before attempting initialization.
             source.append(f"    s_nx_platform_initialized = {index + 1}u;")

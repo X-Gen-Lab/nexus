@@ -31,6 +31,7 @@ python tools/maintenance/capabilities.py --write
 | gd32f470 | ADC0 | adc | trigger-dma-continuous | `adc0-pa0`, `adc0-pa0-pa1` | — | `tests/contracts/gd32_assembly/adc-continuous.toml` | `soc/gd32f470/drivers/adc_continuous.c` |
 | gd32f470 | CAN0 | can | classic-irq | `can0-pa11-pa12` | — | `tests/contracts/can_assembly/gd32-both.toml`, `tests/contracts/can_assembly/gd32-first.toml` | `io/src/can_controller.c` |
 | gd32f470 | CAN1 | can | classic-irq | `can1-pb12-pb13` | — | `tests/contracts/can_assembly/gd32-both.toml` | `io/src/can_controller.c` |
+| gd32f470 | ENET | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/gd32.toml` | `io/src/eth_mac.c` |
 | gd32f470 | EXTI3 | exti | edge-event | `exti3-pe3` | — | `tests/contracts/gd32_assembly/exti.toml` | `soc/gd32f470/drivers/exti.c` |
 | gd32f470 | FMC | flash | poll-word | `physical-flash` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/flash.toml` | `soc/gd32f470/drivers/flash.c` |
 | gd32f470 | FWDGT | watchdog | independent | `independent-watchdog` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/watchdog.toml` | `soc/gd32f470/drivers/watchdog.c` |
@@ -62,6 +63,7 @@ python tools/maintenance/capabilities.py --write
 | stm32f407 | ADC1 | adc | trigger-dma-continuous | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/zg-adc-continuous.toml` | `soc/stm32f407/drivers/adc_continuous.c` |
 | stm32f407 | CAN1 | can | classic-irq | `can1-pa11-pa12` | `stm32f407zg-qiming-v31` | `tests/contracts/can_assembly/stm32-both.toml`, `tests/contracts/can_assembly/stm32-first.toml` | `io/src/can_controller.c` |
 | stm32f407 | CAN2 | can | classic-irq | `can2-pb12-pb13` | `stm32f407zg-qiming-v31` | `tests/contracts/can_assembly/stm32-both.toml` | `io/src/can_controller.c` |
+| stm32f407 | ETH | eth | raw-rmii | `rmii-a-c-g` | — | `tests/contracts/ethernet_assembly/stm32-zg.toml` | `io/src/eth_mac.c` |
 | stm32f407 | EXTI0 | exti | edge-event | `exti0-pa0` | — | — | — |
 | stm32f407 | EXTI5 | exti | edge-event | `exti5-pa5` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32f407/drivers/exti.c` |
 | stm32f407 | EXTI6 | exti | edge-event | `exti6-pa6` | — | `tests/contracts/stm32_assembly/ve-exti.toml`, `tests/contracts/stm32_assembly/zg-exti.toml` | `soc/stm32f407/drivers/exti.c` |

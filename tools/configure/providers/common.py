@@ -23,6 +23,7 @@ class ModeTraits:
     tx_dma: bool = False
     rx_dma: bool = False
     continuous: bool = False
+    bus_master: bool = False
 
     @property
     def dma(self):
@@ -30,6 +31,7 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
     ("usb_device", "device-fs"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
@@ -176,6 +178,8 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "eth": {"tx_count", "rx_count", "rx_storage_bytes", "address",
+                "init_timeout_us", "drain_timeout_us", "irq_priority", "calls_os"},
         "usb_device": {"event_capacity", "rx_fifo_words", "vbus_sensing",
                        "poll_limit", "drain_timeout_us", "clock_timeout_us",
                        "irq_priority", "calls_os"},
@@ -190,7 +194,13 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    if kind == "usb_device":
+    if kind == "eth":
+        try:
+            from .. import ethernet
+        except ImportError:
+            import ethernet
+        ethernet.validate_selection(selection, route, provider, ram_size)
+    elif kind == "usb_device":
         try:
             from .. import usb_device
         except ImportError:

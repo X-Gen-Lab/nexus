@@ -1,0 +1,43 @@
+{
+  "copied_owned_paths": [
+    "io/native/ethernet.h",
+    "io/native/ethernet.c",
+    "io/native/ethernet_access.h",
+    "io/private/eth_mac.h",
+    "io/src/eth_mac.c",
+    "io/src/ethernet.c",
+    "io/src/mdio.c",
+    "io/include/nexus/io/mdio.h",
+    "io/include/nexus/io/ethernet.h",
+    "soc/gd32f470/drivers/ethernet.c",
+    "soc/gd32f470/private/gd32f470_eth.h",
+    "soc/stm32f407/drivers/ethernet.c",
+    "soc/stm32f407/private/stm32f407_eth.h",
+    "components/dp83848/README.md",
+    "components/dp83848/src/dp83848.c",
+    "components/dp83848/include/nexus/dp83848/dp83848.h",
+    "tests/google/dp83848_test.cpp",
+    "tests/google/ethernet_native_test.cpp",
+    "tests/google/ethernet_model.h",
+    "tests/google/ethernet_api_test.cpp",
+    "tests/google/ethernet_mac_test.cpp",
+    "docs/design/ethernet.md"
+  ],
+  "scope": "isolated developer evidence; physical not executed; factory/Board/FreeRTOS integration by parent",
+  "reviewed_source_sha256": {
+    "dp83848c.pdf": "fbefe8146a513ade52a0c94d94d379c254ece69638c9ade9744fa48e92ba5b68",
+    "linux-dp83848-v6.12.c": "8f9ec840c9ebee6e7ab4cb985e3c15f714bd667661c7fe2d61895b70990bd0dd",
+    "stm32-rm0090.pdf": "f3ff2322eec21f4e49081f68481b764506eee81dba6031bc767e2f8955b27cca",
+    "GD32F4xx_User_Manual_Rev3.3.pdf": "c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13"
+  },
+  "reviewed_sources": [
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/dp83848c.pdf",
+      "document": "SNLS266E March2015"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/phy/dp83848.c",
+      "usage": "TI/NS model-ID review only; not imported or linked"
+    }
+  ]
+}
