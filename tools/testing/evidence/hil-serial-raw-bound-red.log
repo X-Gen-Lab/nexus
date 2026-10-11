@@ -1,0 +1,14 @@
+test_raw_bound_retains_the_actual_overflow_byte_before_failure (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_raw_bound_retains_the_actual_overflow_byte_before_failure) ... FAIL
+
+======================================================================
+FAIL: test_raw_bound_retains_the_actual_overflow_byte_before_failure (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_raw_bound_retains_the_actual_overflow_byte_before_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 215, in test_raw_bound_retains_the_actual_overflow_byte_before_failure
+    self.assertEqual(len((self.retained() / "drain.bin").read_bytes()), 9)
+AssertionError: 5 != 9
+
+----------------------------------------------------------------------
+Ran 1 test in 0.007s
+
+FAILED (failures=1)

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "resolved_date": "2026-10-08",
+  "resolved_date": "2026-10-11",
   "validation": "GitHub API commit resolution; runtime workflow execution pending",
   "actions": [
     {
@@ -105,6 +105,14 @@
       "sha": "005b692bdfd0764e5da402887d9ab9196f8023dc",
       "url": "https://github.com/trufflesecurity/trufflehog/commit/005b692bdfd0764e5da402887d9ab9196f8023dc",
       "release_url": "https://github.com/trufflesecurity/trufflehog/releases/tag/v3.99.1"
+    },
+    {
+      "repository": "actions/attest-build-provenance",
+      "ref": "v4.2.2",
+      "sha": "4d101475d8b20a2381f78447822ac1eab6504dd8",
+      "url": "https://github.com/actions/attest-build-provenance/commit/4d101475d8b20a2381f78447822ac1eab6504dd8",
+      "release_url": "https://github.com/actions/attest-build-provenance/releases/tag/v4.2.2",
+      "previous_ref": "not installed"
     }
   ]
 }

@@ -17,7 +17,8 @@ def canonical_digest(value: dict) -> str:
         separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
-def git_source(root: Path) -> dict:
+def observe_git_source(root: Path) -> dict:
+    """Observe checkout bytes even when a CI job has no initialized SDK."""
     root = root.resolve()
     def git(*args):
         result = subprocess.run(["git", "-C", str(root), *args],
@@ -29,10 +30,17 @@ def git_source(root: Path) -> dict:
     tree = git("rev-parse", "HEAD^{tree}")
     status = git("status", "--porcelain", "--untracked-files=all")
     submodules = git("submodule", "status", "--recursive")
-    if any(line.startswith(("-", "+", "U")) for line in submodules.splitlines()):
-        raise EvidenceError("source submodules are missing or differ from locked commit")
     return {"root": str(root), "commit": commit, "tree": tree,
             "dirty": bool(status), "submodules": submodules.splitlines()}
+
+
+def git_source(root: Path) -> dict:
+    source = observe_git_source(root)
+    if any(line.startswith(("-", "+", "U"))
+           for line in source['submodules']):
+        raise EvidenceError(
+            "source submodules are missing or differ from locked commit")
+    return source
 
 
 def verify_source(source: dict, *, clean: bool = False) -> None:

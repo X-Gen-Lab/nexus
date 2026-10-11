@@ -7,13 +7,12 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import time
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from scripts.ci.tdd_gate import environment, validate_google_report
-from scripts.validation.junit import validate_junit
+from scripts.validation.junit import prepare_report, validate_junit
 
 
 def execute(command, env, log):
@@ -134,7 +133,7 @@ def main(arguments=None):
         # GoogleTest's directory output names each report after its executable.
         env.update({"GTEST_OUTPUT": "xml:" + str(google) + "/",
                     "GTEST_REPEAT": "1", "GTEST_ALSO_RUN_DISABLED_TESTS": "1"})
-        started = time.time_ns()
+        started = prepare_report(report)
         execute([ctest, "--preset", args.preset, "--output-on-failure",
                  "--no-tests=error", "--parallel", "1", "--output-junit",
                  str(report)], env, output / "ctest-execution.txt")

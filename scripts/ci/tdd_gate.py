@@ -7,13 +7,12 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-import time
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from scripts.validation.junit import validate_junit
+from scripts.validation.junit import prepare_report, validate_junit
 
 RELEVANT_PREFIXES = (
     "core/", "arch/", "soc/", "boards/", "io/", "os/", "components/",
@@ -173,8 +172,7 @@ def main(arguments=None):
                               output / f"discovery-{index}.txt")
             count = discovered_count(listing)
             report = output / f"google-{index}.xml"
-            report.unlink(missing_ok=True)
-            started = time.time_ns()
+            started = prepare_report(report)
             execute([str(binary), "--gtest_filter=*", "--gtest_repeat=1",
                      "--gtest_also_run_disabled_tests",
                      "--gtest_output=xml:" + str(report)], env,

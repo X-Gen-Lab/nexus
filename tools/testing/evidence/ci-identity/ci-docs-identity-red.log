@@ -1,0 +1,14 @@
+test_pages_publish_observed_documentation_identity (__main__.WorkflowContracts.test_pages_publish_observed_documentation_identity) ... FAIL
+
+======================================================================
+FAIL: test_pages_publish_observed_documentation_identity (__main__.WorkflowContracts.test_pages_publish_observed_documentation_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 28, in test_pages_publish_observed_documentation_identity
+    self.assertEqual(seal.get('uses'), './.github/actions/record-identity')
+AssertionError: None != './.github/actions/record-identity'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (failures=1)

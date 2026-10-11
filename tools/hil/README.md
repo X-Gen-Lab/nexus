@@ -192,9 +192,35 @@ missing or stale observation, identity change and output exhaustion stop later
 operations; cleanup is still attempted. Cleanup failure keeps the station lock
 as quarantine. Resolve it by inspecting equipment and the retained record, not
 by automatically deleting the lock or starting a retry over old evidence.
+Ownership is checked before and after every adapter. A lost/replaced station
+lock or an operator interrupt stops all further equipment actions and retains
+quarantine. Capture errors and cancellation kill and reap the adapter process
+group before returning; raw partial streams remain available.
 
 A complete successful acquisition is `captured` / `executed_unqualified`:
 commands completed, but no physical test or measurement is automatically passed.
 Feed actual smoke, measurement and OS records to `admit.py`, `measure.py` and
 `os_acceptance.py` respectively. Host subprocess fixtures exercise failure and
 audit paths; they do not operate the three boards or establish physical support.
+
+The first-party `serial_echo.py` adapter opens only the admitted stable
+`/dev/serial/by-id/...` identity. It verifies the character device across open,
+uses `TIOCEXCL`, restores original terminal settings, and configures 115200 8N1.
+After a bounded quiet drain it sends a random public 32-byte challenge and
+retains exact TX/RX/drain bytes plus host monotonic event timestamps. Partial
+writes/reads share one finite capture deadline. Wrong/incomplete echo, excessive
+output, device replacement and failed admission retain failure evidence and do
+not write a successful observation.
+
+To use it as the recipe's `serial` step, pin the Python executable and
+`serial_echo.py` as adapter inputs and pass `--admission {admission}`,
+`--session {session}`, `--record {record}`. Tool arguments containing placeholders
+must be separate whole arguments. Review `--timeout-s` and `--quiet-s`; defaults
+are host I/O bounds, not product performance budgets. The current
+`platform_reference` firmware provides byte echo; the UART owner workload is a
+different application and must not be selected as an echo fixture.
+
+Host arrival/close timestamps never establish MCU cycles, IRQ latency or UART TC
+timing. Waveform, clock, Flash power-loss and OS context collectors need their
+actual station instruments and reviewed workload protocol. The real PTY tests
+exercise POSIX software mechanics only; no first-party board has been operated.

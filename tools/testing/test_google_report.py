@@ -3,6 +3,7 @@
 from pathlib import Path
 import json
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -12,6 +13,29 @@ from scripts.ci.tdd_gate import (check_staged_snapshot, discovered_count,
 
 
 class GoogleReportTests(unittest.TestCase):
+    def test_new_execution_uses_filesystem_time_despite_wall_clock_offset(self):
+        from scripts.validation import junit
+        self.write('<testcase name="Old" classname="Request"'
+                   ' status="run" result="completed"/>')
+        with patch.object(time, 'time_ns', return_value=10 ** 30):
+            started = junit.prepare_report(self.report)
+            self.assertFalse(self.report.exists())
+            with self.assertRaises(ValueError):
+                validate_google_report(self.report, not_before_ns=started)
+            self.write('<testcase name="Fresh" classname="Request"'
+                       ' status="run" result="completed"/>')
+            evidence = validate_google_report(self.report, not_before_ns=started)
+        self.assertEqual(evidence['cases'][0]['name'], 'Fresh')
+
+    def test_execution_path_cannot_alias_another_report(self):
+        from scripts.validation import junit
+        original = Path(self.directory.name) / 'unrelated.xml'
+        original.write_text('unrelated existing bytes')
+        self.report.symlink_to(original)
+        with self.assertRaises(ValueError):
+            junit.prepare_report(self.report)
+        self.assertEqual(original.read_text(), 'unrelated existing bytes')
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)

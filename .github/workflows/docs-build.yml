@@ -160,7 +160,22 @@ jobs:
           </html>
           EOF
 
+      - name: Bind the documentation upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: documentation
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: public/nexus-job-identity
+          require-dependencies: 'false'
+          artifacts: public/
+          tools: |
+            python=python3
+            doxygen=doxygen
+            sphinx=sphinx-build
       - name: Upload Pages Artifact
+        if: always()
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: public

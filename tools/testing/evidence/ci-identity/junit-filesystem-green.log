@@ -1,0 +1,36 @@
+test_all_automation_paths_require_behavioral_execution (tools.testing.test_google_report.GateBoundaryTests.test_all_automation_paths_require_behavioral_execution) ... ok
+test_bypass_environment_cannot_create_evidence (tools.testing.test_google_report.GateBoundaryTests.test_bypass_environment_cannot_create_evidence) ... ok
+test_command_and_actual_exit_are_recorded_alongside_raw_log (tools.testing.test_google_report.GateBoundaryTests.test_command_and_actual_exit_are_recorded_alongside_raw_log) ... + binary --gtest_filter=*
+ok
+test_discovery_uses_framework_cases_not_banner (tools.testing.test_google_report.GateBoundaryTests.test_discovery_uses_framework_cases_not_banner) ... ok
+test_discovery_without_cases_fails (tools.testing.test_google_report.GateBoundaryTests.test_discovery_without_cases_fails) ... ok
+test_environment_strips_filters_and_shards (tools.testing.test_google_report.GateBoundaryTests.test_environment_strips_filters_and_shards) ... ok
+test_untracked_behavior_cannot_certify_staged_snapshot (tools.testing.test_google_report.GateBoundaryTests.test_untracked_behavior_cannot_certify_staged_snapshot) ... ok
+test_empty_report_fails (tools.testing.test_google_report.GoogleReportTests.test_empty_report_fails) ... ok
+test_executed_google_case_passes (tools.testing.test_google_report.GoogleReportTests.test_executed_google_case_passes) ... ok
+test_execution_path_cannot_alias_another_report (tools.testing.test_google_report.GoogleReportTests.test_execution_path_cannot_alias_another_report) ... ok
+test_expected_discovery_count_is_required (tools.testing.test_google_report.GoogleReportTests.test_expected_discovery_count_is_required) ... ok
+test_failure_is_not_a_pass (tools.testing.test_google_report.GoogleReportTests.test_failure_is_not_a_pass) ... ok
+test_generic_junit_is_not_google_execution (tools.testing.test_google_report.GoogleReportTests.test_generic_junit_is_not_google_execution) ... ok
+test_new_execution_uses_filesystem_time_despite_wall_clock_offset (tools.testing.test_google_report.GoogleReportTests.test_new_execution_uses_filesystem_time_despite_wall_clock_offset) ... ok
+test_skipped_case_fails_even_with_one_pass (tools.testing.test_google_report.GoogleReportTests.test_skipped_case_fails_even_with_one_pass) ... ok
+test_stale_execution_fails (tools.testing.test_google_report.GoogleReportTests.test_stale_execution_fails) ... ok
+test_suppressed_or_disabled_case_fails (tools.testing.test_google_report.GoogleReportTests.test_suppressed_or_disabled_case_fails) ... ok
+test_actual_case_identity_and_hash_retained (tests.contracts.test_junit.JunitEvidenceContracts.test_actual_case_identity_and_hash_retained) ... ok
+test_all_skipped_report_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_all_skipped_report_rejected) ... ok
+test_duplicate_and_missing_names_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_duplicate_and_missing_names_rejected) ... ok
+test_failures_and_errors_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_failures_and_errors_rejected) ... ok
+test_false_counts_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_false_counts_rejected) ... ok
+test_fixture_freshness_is_independent_of_filesystem_clock_lag (tests.contracts.test_junit.JunitEvidenceContracts.test_fixture_freshness_is_independent_of_filesystem_clock_lag) ... ok
+test_malformed_xml_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_malformed_xml_rejected) ... ok
+test_missing_report_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_missing_report_rejected) ... ok
+test_nested_suite_totals_are_validated (tests.contracts.test_junit.JunitEvidenceContracts.test_nested_suite_totals_are_validated) ... ok
+test_orphan_error_and_nonexecuted_status_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_orphan_error_and_nonexecuted_status_rejected) ... ok
+test_partial_skip_is_reported_without_becoming_passed (tests.contracts.test_junit.JunitEvidenceContracts.test_partial_skip_is_reported_without_becoming_passed) ... ok
+test_stale_previous_success_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_stale_previous_success_rejected) ... ok
+test_zero_test_report_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_zero_test_report_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 0.567s
+
+OK

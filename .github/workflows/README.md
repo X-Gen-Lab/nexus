@@ -65,3 +65,14 @@ the checked agent-managed policy; named people are not required. GitHub
 protection, product deployments, signing and release promotion retain their
 separate actual states; workflow files do not establish remote permissions or
 physical qualifications.
+
+Every ordinary artifact upload now retains an observed job identity and its
+tool-version command logs for 30 days. Documentation uploads include the same
+record in the published tree. Actual checkout SHA/tree, recursive gitlinks,
+locks, resolved configuration and input closure, executable bytes and uploaded
+file digests are checked together. A metadata success cannot replace successful
+test execution. Failed or cancelled jobs retain their actual partial outputs.
+The source SDK workflow requests provenance for this digest-bearing manifest,
+then preserves the actual returned attestation bundle in a separate upload.
+Signing is pending until GitHub executes that workflow; this configuration does
+not establish a signature, a production release or physical qualification.

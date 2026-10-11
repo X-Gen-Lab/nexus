@@ -39,6 +39,26 @@ jobs:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
           UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
           TSAN_OPTIONS: halt_on_error=1
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: native-${{ matrix.preset }}
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/native-${{ matrix.preset }}
+          require-dependencies: 'true'
+          artifacts: |
+            build/${{ matrix.preset }}/ctest-results.xml
+            build/${{ matrix.preset }}/Testing/Temporary/
+            build/${{ matrix.preset }}/generated/
+            build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/tdd/
+            build/${{ matrix.preset }}/google-contracts.json
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=cc
       - name: Preserve execution evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -51,6 +71,9 @@ jobs:
             build/${{ matrix.preset }}/compile_commands.json
             build/${{ matrix.preset }}/tdd/
             build/${{ matrix.preset }}/google-contracts.json
+            build/job-identities/native-${{ matrix.preset }}/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
 
   arch:
@@ -90,6 +113,24 @@ jobs:
         run: >-
           .venv/bin/python scripts/ci/os_resources.py
           --output build/os-resources
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: arch
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/arch
+          require-dependencies: 'true'
+          artifacts: |
+            build/arch-compiler/
+            build/cortex-runtime/
+            build/os-profiles/
+            build/os-wait-cost/
+            build/os-resources/
+          tools: |
+            python=python3
+            compiler=arm-none-eabi-gcc
       - name: Preserve compiler evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -101,6 +142,9 @@ jobs:
             build/os-profiles/
             build/os-wait-cost/
             build/os-resources/
+            build/job-identities/arch/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
       # CPU reference links do not qualify a physical SoC, Board or hardware.
 
@@ -127,6 +171,21 @@ jobs:
           .venv/bin/python scripts/ci/os_secure_runtime.py
           --compiler arm-none-eabi-gcc
           --output build/os-secure-runtime
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: os-security
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/os-security
+          require-dependencies: 'true'
+          artifacts: |
+            build/os-mpu/
+            build/os-secure-runtime/
+          tools: |
+            python=python3
+            compiler=arm-none-eabi-gcc
       - name: Preserve security link evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -135,6 +194,9 @@ jobs:
           path: |
             build/os-mpu/
             build/os-secure-runtime/
+            build/job-identities/os-security/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
       # CPU software fixtures establish linkage and ownership. Physical fault
       # injection, SAU/IDAU wiring and isolation remain station qualification.
@@ -191,6 +253,25 @@ jobs:
             --fixture "tools/hil/fixtures/$fixture.json" \
             --resolved "build/$PRESET/generated/resolved.json" \
             --report "build/$PRESET/hil-preparation.json"
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: arm-${{ matrix.preset }}
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/arm-${{ matrix.preset }}
+          require-dependencies: 'true'
+          artifacts: |
+            build/${{ matrix.preset }}/bin/
+            build/${{ matrix.preset }}/generated/
+            build/${{ matrix.preset }}/compile_commands.json
+            build/${{ matrix.preset }}/resource-report.json
+            build/${{ matrix.preset }}/hil-preparation.json
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=arm-none-eabi-gcc
       - name: Preserve linked software evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -202,6 +283,9 @@ jobs:
             build/${{ matrix.preset }}/compile_commands.json
             build/${{ matrix.preset }}/resource-report.json
             build/${{ matrix.preset }}/hil-preparation.json
+            build/job-identities/arm-${{ matrix.preset }}/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
       # ARM linking and modeled peripheral tests establish software contracts.
       # Probe/serial execution and physical timing remain separate HIL evidence.
@@ -240,12 +324,31 @@ jobs:
             count=$((count + 1))
           done
           test "$count" -gt 0
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: routes-${{ matrix.family }}
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/routes-${{ matrix.family }}
+          require-dependencies: 'true'
+          artifacts: |
+            build/controller-routes/
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=arm-none-eabi-gcc
       - name: Retain the actual peripheral link and budget evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: controller-software-${{ matrix.family }}
-          path: build/controller-routes/
+          path: |
+            build/controller-routes/
+            build/job-identities/routes-${{ matrix.family }}/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
       # These fixtures exercise real providers and static constructors. They
       # declare unknown PCB revisions; they do not assert three-board wiring.

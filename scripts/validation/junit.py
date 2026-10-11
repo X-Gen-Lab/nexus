@@ -5,14 +5,35 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
+
+
+def prepare_report(report):
+    """Remove old evidence and observe a fresh timestamp in its filesystem.
+
+    Filesystem timestamp resolution and clock offsets need not match Python's
+    realtime clock. The anchor and the produced report use the same clock;
+    stale and missing reports remain invalid without a timing tolerance.
+    """
+    path = Path(report).absolute()
+    if any(part.is_symlink() for part in (path, *path.parents)):
+        raise ValueError("JUnit execution path must not traverse a symlink")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.unlink(missing_ok=True)
+    with tempfile.NamedTemporaryFile(dir=path.parent,
+                                     prefix=".nexus-execution-", mode="wb") as anchor:
+        anchor.write(b"fresh execution timestamp\n")
+        anchor.flush()
+        return Path(anchor.name).stat().st_mtime_ns
 
 
 def validate_junit(report, *, not_before_ns=None):
     """Return actual case identities/counts, or raise ValueError on bad evidence.
 
     Callers delete the old report before launching CTest, require its subprocess
-    return code to be zero, then supply their start time as not_before_ns. This
+    return code to be zero, then supply prepare_report's filesystem anchor as
+    not_before_ns. This
     parser cannot establish which source/configuration executed the cases; the
     enclosing candidate manifest must bind those identities separately.
     """

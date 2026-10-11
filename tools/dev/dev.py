@@ -7,7 +7,6 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import time
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -139,14 +138,13 @@ def main(argv=None):
             directory = selected["binaryDir"].replace("${sourceDir}", str(ROOT))
             build = Path(directory)
             report = build / "ctest-results.xml"
-            report.unlink(missing_ok=True)
-            started = time.time_ns()
+            sys.path.insert(0, str(ROOT))
+            from scripts.validation.junit import prepare_report, validate_junit
+            started = prepare_report(report)
             result = execute(command + ["--output-junit", str(report)] + native,
                              environment)
             if result:
                 return result
-            sys.path.insert(0, str(ROOT))
-            from scripts.validation.junit import validate_junit
             evidence = validate_junit(report, not_before_ns=started)
             print(f"Validated fresh execution: {evidence['passed']} test cases")
             return 0

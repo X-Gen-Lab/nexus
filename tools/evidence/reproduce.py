@@ -98,7 +98,8 @@ def copy_source_sdk(identity: dict, source: dict, destination: Path) -> dict:
     return tree_identity(destination)
 
 
-def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
+def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900,
+               cwd: Path | None = None) -> dict:
     """Retain actual stdout/stderr and nonzero status, including tool failure."""
     command(argv)
     if type(timeout_s) is not int or not 0 < timeout_s <= 1800:
@@ -121,7 +122,8 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
     try:
         with log.open("wb") as output:
             process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=output,
-                stderr=subprocess.STDOUT, start_new_session=os.name == "posix")
+                stderr=subprocess.STDOUT, start_new_session=os.name == "posix",
+                cwd=cwd)
             while process.poll() is None:
                 if time.monotonic() - started >= timeout_s:
                     raise subprocess.TimeoutExpired(argv, timeout_s)
@@ -132,6 +134,8 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
                 except subprocess.TimeoutExpired:
                     # Polling continues to enforce the deadline and log-size bound.
                     pass
+            if os.fstat(output.fileno()).st_size > 32 * 1024 * 1024:
+                raise EvidenceError("command raw log exceeded 32 MiB bound")
         exit_code = process.returncode
         failure = None
         if os.name == "posix":
@@ -150,13 +154,47 @@ def run_logged(argv: list[str], log: Path, *, timeout_s: int = 900) -> dict:
         stop()
         exit_code, failure = 125, str(error)
     except OSError as error:
+        stop()
         log.write_text("adapter executable unavailable\n")
         exit_code, failure = 127, str(error)
+    except BaseException:
+        # Cancellation must not leave a compiler or hardware adapter running.
+        stop()
+        raise
     # A success with no output still has a nonempty command execution record.
     if not log.stat().st_size:
         log.write_text("command produced no stdout/stderr\n")
     return {"argv": argv, "exit_code": exit_code, "failure": failure,
             "elapsed_s": time.monotonic() - started, "raw": file_identity(log)}
+
+
+def run_container_logged(argv: list[str], log: Path, *, container_name: str,
+                         docker: str = "docker", timeout_s: int = 900) -> dict:
+    """Stop the named daemon-owned container after CLI failure or cancellation."""
+    if (not isinstance(container_name, str) or not container_name.startswith("nexus-")
+            or len(container_name) > 128 or any(
+                character not in "abcdefghijklmnopqrstuvwxyz0123456789-_"
+                for character in container_name)):
+        raise EvidenceError("bounded Nexus container name required")
+
+    def cleanup() -> dict:
+        return run_logged([*docker_prefix(docker), "rm", "--force", container_name],
+                          log.with_name(log.name + ".cleanup.log"), timeout_s=30)
+
+    try:
+        execution = run_logged(argv, log, timeout_s=timeout_s)
+    except BaseException as error:
+        # Killing the CLI process group cannot stop a Docker daemon workload.
+        try:
+            removal = cleanup()
+            if removal["exit_code"]:
+                error.add_note("container cleanup failed; retained raw cleanup log")
+        except BaseException as cleanup_error:
+            error.add_note("container cleanup did not complete: " + str(cleanup_error))
+        raise
+    if execution["exit_code"]:
+        execution["container_cleanup"] = cleanup()
+    return execution
 
 
 def validate_spec(spec: dict) -> None:
@@ -252,12 +290,11 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
                     "--mount", f"type=bind,src={build},dst={mount_build}",
                     "--mount", f"type=bind,src={spec['toolchain']['path']},dst={mount_toolchain},readonly",
                     "--workdir", mount_build, environment["image_config_id"], *expanded]
-                execution = run_logged(docker_argv, run_root / f"command-{number}.log")
+                execution = run_container_logged(
+                    docker_argv, run_root / f"command-{number}.log",
+                    docker=docker, container_name=container_name)
                 run["commands"].append(execution)
                 if execution["exit_code"]:
-                    # docker CLI timeout does not establish container termination.
-                    subprocess.run([*docker_prefix(docker), "rm", "--force", container_name],
-                                   capture_output=True, timeout=30, check=False)
                     raise EvidenceError("offline build command failed; retained actual log")
             if tree_identity(package_snapshot) != package_identity:
                 raise EvidenceError("read-only source SDK prefix snapshot changed")
@@ -360,9 +397,12 @@ def main() -> int:
         parser.error("execution requires --report")
     if args.spec.resolve() == args.report.resolve():
         parser.exit(1, "report cannot overwrite reproduction spec\n")
+    if args.qualification:
+        if args.qualification.resolve() in (args.spec.resolve(), args.report.resolve()):
+            parser.exit(1, "qualification cannot overwrite reproduction inputs/report\n")
+        args.qualification.unlink(missing_ok=True)
     report = reproduce(args.spec, args.report, docker=args.docker)
     if args.qualification:
-        args.qualification.unlink(missing_ok=True)
         if report["status"] == "passed":
             from tools.evidence.qualification import create_qualification
             elf = Path(report["runs"][0]["artifacts"]["elf"]["path"])

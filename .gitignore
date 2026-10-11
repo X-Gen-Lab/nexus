@@ -42,6 +42,7 @@ nonexistent_build_dir/
 
 # Documentation build
 docs/build/
+/public/
 docs/api/
 docs/sphinx/_build/
 *.log

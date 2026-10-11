@@ -20,6 +20,54 @@ def workflow(name):
 
 
 class WorkflowContracts(unittest.TestCase):
+    def test_pages_publish_observed_documentation_identity(self):
+        steps = workflow('docs-build.yml')['jobs']['build']['steps']
+        index = next(index for index, step in enumerate(steps) if step.get(
+            'uses', '').startswith('actions/upload-pages-artifact@'))
+        seal = steps[index - 1]
+        self.assertEqual(seal.get('uses'), './.github/actions/record-identity')
+        self.assertEqual(seal['with']['artifacts'], 'public/')
+        self.assertTrue(seal['with']['output'].startswith('public/'))
+        self.assertEqual(seal['with']['require-dependencies'], 'false')
+
+    def test_source_sdk_attests_only_a_successful_observed_manifest(self):
+        job = workflow('release.yml')['jobs']['source-sdk']
+        self.assertEqual(job.get('permissions', {}).get('id-token'), 'write')
+        self.assertEqual(job.get('permissions', {}).get('attestations'), 'write')
+        attestations = [step for step in job['steps'] if step.get(
+            'uses', '').startswith('actions/attest-build-provenance@')]
+        self.assertEqual(len(attestations), 1)
+        self.assertEqual(attestations[0]['if'], 'success()')
+        self.assertEqual(attestations[0]['with']['subject-path'],
+                         'build/job-identities/source-sdk/identity.json')
+
+    def test_every_software_upload_is_bound_to_observed_job_identity(self):
+        count = 0
+        for name in ('build-matrix.yml', 'enterprise-tools.yml',
+                     'quality-checks.yml', 'performance.yml', 'release.yml'):
+            for job in workflow(name)['jobs'].values():
+                steps = job.get('steps', [])
+                for index, upload in enumerate(steps):
+                    if not upload.get('uses', '').startswith(
+                            'actions/upload-artifact@'):
+                        continue
+                    with self.subTest(workflow=name, upload=upload['name']):
+                        self.assertGreater(index, 0)
+                        seal = steps[index - 1]
+                        self.assertEqual(seal.get('uses'),
+                                         './.github/actions/record-identity')
+                        self.assertEqual(seal['if'], 'always()')
+                        self.assertEqual(seal['with']['result'],
+                                         '${{ job.status }}')
+                        self.assertIn(seal['with']['output'],
+                                      upload['with']['path'])
+                        self.assertEqual(upload['with']['include-hidden-files'],
+                                         'true')
+                        self.assertGreaterEqual(
+                            int(upload['with']['retention-days']), 30)
+                        count += 1
+        self.assertGreaterEqual(count, 10)
+
     def test_actual_workflows_and_shell_blocks_parse(self):
         count = 0
         for path in (ROOT / '.github/workflows').glob('*.yml'):

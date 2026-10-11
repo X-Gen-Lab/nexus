@@ -34,7 +34,7 @@ jobs:
       - name: Check derived capability text and report review assignment gaps
         run: |
           .venv/bin/python tools/maintenance/capabilities.py --check
-          .venv/bin/python tools/maintenance/ownership.py
+          .venv/bin/python tools/maintenance/ownership.py --require-assigned
       - name: Execute tamper, budget, HIL and relocated SDK boundaries
         run: |
           mkdir -p build/quality
@@ -49,6 +49,23 @@ jobs:
         run: |
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
           .venv/bin/python -B -m tools.hil.prepare --help
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: tooling
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/tooling
+          require-dependencies: 'true'
+          artifacts: |
+            build/quality/tool-contracts.log
+            build/quality/tools-configure.json
+            build/quality/tools-testing.json
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=arm-none-eabi-gcc
       - name: Preserve executed tool evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -58,6 +75,9 @@ jobs:
             build/quality/tool-contracts.log
             build/quality/tools-configure.json
             build/quality/tools-testing.json
+            build/job-identities/tooling/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
       # A station template with no probe/serial binding is rejected. These
       # software tests do not open a production station or establish board HIL.

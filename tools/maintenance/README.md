@@ -48,6 +48,31 @@ checks through GitHub before reporting them as configured.
 and report the assignment status. `--require-assigned` passes for a complete
 agent-managed policy without requesting human accounts.
 
+`job_identity.py` records each published CI artifact's actual checkout, tree,
+recursive dependency state, locks, configuration input closure, executable
+bytes, version-command output and artifact digests. A successful job rejects
+dirty source, missing required dependencies, incomplete outputs, stale inputs
+and files or tools that change during observation. Failed or cancelled jobs
+retain missing outputs and invalid configuration bytes with their actual state.
+Documentation and style jobs explicitly observe uninitialized SDK dependencies;
+they cannot report those dependencies as complete. CPU runtime inputs use the
+same length-framed assembly/facts hash as the production resolver.
+
+The composite `record-identity` action supplies inputs through environment
+variables and constructs an argument list. It never executes input text as a
+shell command. Ordinary artifacts retain the identity and raw version logs for
+30 days. The manual source SDK workflow also requests GitHub provenance for the
+observed manifest and retains the returned bundle. Workflow configuration is
+not evidence that signing ran; GitHub must actually execute it successfully.
+The job identity explicitly remains `not_a_software_candidate`. Formal offline
+rebuild, source SDK consumption and physical qualification keep their separate
+admission rules.
+
+```sh
+python tools/maintenance/job_identity.py --help
+python -B -m unittest tools.testing.test_job_identity -v
+```
+
 The installed source SDK intentionally omits repository docs, named assignments
 and the main firmware host contract suite. `doctor` first verifies its file map,
 package exports,

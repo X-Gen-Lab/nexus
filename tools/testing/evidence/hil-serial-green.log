@@ -1,0 +1,28 @@
+test_actual_fragmented_echo_retains_bytes_and_host_times (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_actual_fragmented_echo_retains_bytes_and_host_times) ... ok
+test_admission_change_during_io_keeps_raw_and_rejects_success (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_admission_change_during_io_keeps_raw_and_rejects_success) ... ok
+test_alias_swap_during_open_does_not_send_or_reconfigure (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_alias_swap_during_open_does_not_send_or_reconfigure) ... ok
+test_changed_admission_input_rejects_before_device_open (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_changed_admission_input_rejects_before_device_open) ... ok
+test_cli_runs_capture_and_returns_failure_without_qualification (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_cli_runs_capture_and_returns_failure_without_qualification) ... Serial capture rejected: fresh serial capture must not overwrite inputs or old output
+ok
+test_continuous_prechallenge_noise_never_sends_challenge (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_continuous_prechallenge_noise_never_sends_challenge) ... ok
+test_each_capture_uses_fresh_random_challenge (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_each_capture_uses_fresh_random_challenge) ... ok
+test_existing_exclusive_owner_prevents_io (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_existing_exclusive_owner_prevents_io) ... ok
+test_existing_sidecar_and_symlink_input_are_rejected (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_existing_sidecar_and_symlink_input_are_rejected) ... ok
+test_full_admission_rebuild_rejects_inconsistent_record (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_full_admission_rebuild_rejects_inconsistent_record) ... ok
+test_invalid_session_and_capture_limits_reject_before_open (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_invalid_session_and_capture_limits_reject_before_open) ... ok
+test_no_echo_obeys_finite_host_capture_limit (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_no_echo_obeys_finite_host_capture_limit) ... ok
+test_nonstable_and_traversal_device_names_are_rejected (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_nonstable_and_traversal_device_names_are_rejected) ... ok
+test_partial_echo_retains_failure_without_success_observation (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_partial_echo_retains_failure_without_success_observation) ... ok
+test_raw_bound_retains_the_actual_overflow_byte_before_failure (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_raw_bound_retains_the_actual_overflow_byte_before_failure) ... ok
+test_real_partial_writes_are_retried_and_logged (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_real_partial_writes_are_retried_and_logged) ... ok
+test_record_cannot_overwrite_input_or_old_capture (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_record_cannot_overwrite_input_or_old_capture) ... ok
+test_regular_file_cannot_be_used_as_serial_device (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_regular_file_cannot_be_used_as_serial_device) ... ok
+test_repeated_write_interruptions_still_obey_deadline (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_repeated_write_interruptions_still_obey_deadline) ... ok
+test_retryable_syscall_failures_do_not_replace_real_io (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_retryable_syscall_failures_do_not_replace_real_io) ... ok
+test_symlink_output_and_parent_are_rejected (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_symlink_output_and_parent_are_rejected) ... ok
+test_wrong_echo_is_recorded_and_rejected (tools.testing.test_hil_serial_echo.HilSerialEchoTests.test_wrong_echo_is_recorded_and_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.460s
+
+OK

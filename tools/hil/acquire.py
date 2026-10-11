@@ -27,6 +27,7 @@ from tools.hil.admit import admit, require
 
 OPERATIONS = ("identify", "flash", "verify_flash", "reset", "serial", "cleanup")
 PLACEHOLDERS = {"{record}", "{session}", "{admission}", "{elf}", "{output}"}
+LOCK_FAILURE = "station lock ownership changed; stop equipment actions"
 
 
 def _path(path: Path) -> Path:
@@ -125,6 +126,38 @@ def _kill_group(process: subprocess.Popen) -> None:
     process.wait(timeout=5)
 
 
+def _capture_output(process, step, stdout, stderr, started, result):
+    """Read bounded streams; the caller always reaps the process on exit."""
+    with selectors.DefaultSelector() as selector:
+        for pipe, destination in ((process.stdout, stdout),
+                                  (process.stderr, stderr)):
+            os.set_blocking(pipe.fileno(), False)
+            selector.register(pipe, selectors.EVENT_READ, destination)
+        captured = 0
+        while selector.get_map():
+            remaining = step["timeout_s"] - (time.monotonic() - started)
+            if remaining <= 0:
+                result["timed_out"] = True
+                return
+            for key, _events in selector.select(min(remaining, 0.05)):
+                data = os.read(key.fileobj.fileno(), 65536)
+                if not data:
+                    selector.unregister(key.fileobj)
+                    continue
+                capacity = step["maximum_output_bytes"] - captured
+                key.data.write(data[:capacity])
+                captured += len(data[:capacity])
+                if len(data) > capacity:
+                    result["output_exceeded"] = True
+                    return
+        if process.poll() is None:
+            remaining = step["timeout_s"] - (time.monotonic() - started)
+            try:
+                process.wait(timeout=max(0, remaining))
+            except subprocess.TimeoutExpired:
+                result["timed_out"] = True
+
+
 def _command(step: dict, substitutions: dict, output: Path) -> dict:
     name = step["name"]
     arguments = [str(verify_file_identity(step["tool"]))]
@@ -134,6 +167,7 @@ def _command(step: dict, substitutions: dict, output: Path) -> dict:
     result = {"name": name, "argv": arguments,
               "started_utc": datetime.now(timezone.utc).isoformat(),
               "exit_code": None, "process_started": False, "timed_out": False,
+              "cancelled": False,
               "output_exceeded": False, "residual_processes": False}
     started = time.monotonic()
     environment = {key: value for key, value in os.environ.items()
@@ -147,43 +181,18 @@ def _command(step: dict, substitutions: dict, output: Path) -> dict:
                                   cwd=output, env=environment,
                                   start_new_session=True) as process:
                 result["process_started"] = True
-                with selectors.DefaultSelector() as selector:
-                    for pipe, destination in ((process.stdout, stdout),
-                                              (process.stderr, stderr)):
-                        os.set_blocking(pipe.fileno(), False)
-                        selector.register(pipe, selectors.EVENT_READ,
-                                          destination)
-                    captured = 0
-                    while selector.get_map():
-                        remaining = step["timeout_s"] - (
-                            time.monotonic() - started)
-                        if remaining <= 0:
-                            result["timed_out"] = True
-                            _kill_group(process)
-                            break
-                        events = selector.select(min(remaining, 0.05))
-                        for key, _events in events:
-                            data = os.read(key.fileobj.fileno(), 65536)
-                            if not data:
-                                selector.unregister(key.fileobj)
-                                continue
-                            capacity = step["maximum_output_bytes"] - captured
-                            key.data.write(data[:capacity])
-                            captured += len(data[:capacity])
-                            if len(data) > capacity:
-                                result["output_exceeded"] = True
-                                _kill_group(process)
-                                break
-                        if result["output_exceeded"]:
-                            break
+                try:
+                    _capture_output(process, step, stdout, stderr,
+                                    started, result)
+                except BaseException as error:
+                    # Cancellation must not escape Popen's unbounded context
+                    # wait while an instrument process still holds equipment.
+                    result["failure"] = type(error).__name__ + ": " + str(error)
+                    result["cancelled"] = isinstance(
+                        error, (KeyboardInterrupt, SystemExit))
+                finally:
                     if process.poll() is None:
-                        remaining = step["timeout_s"] - (
-                            time.monotonic() - started)
-                        try:
-                            process.wait(timeout=max(0, remaining))
-                        except subprocess.TimeoutExpired:
-                            result["timed_out"] = True
-                            _kill_group(process)
+                        _kill_group(process)
                     result["exit_code"] = process.wait()
                     try:
                         os.killpg(process.pid, 0)
@@ -198,9 +207,11 @@ def _command(step: dict, substitutions: dict, output: Path) -> dict:
                    for stream, path in paths.items()})
     result["finished_utc"] = datetime.now(timezone.utc).isoformat()
     result["elapsed_s"] = time.monotonic() - started
-    failures = ("timed_out", "output_exceeded", "residual_processes")
+    failures = ("timed_out", "output_exceeded", "residual_processes",
+                "cancelled")
     result["status"] = (
         "captured" if result["exit_code"] == 0 and
+        "failure" not in result and
         not any(result[key] for key in failures) else "failed")
     return result
 
@@ -225,6 +236,13 @@ def _observation(path: Path, step: dict, token: str, admission: dict) -> dict:
         require(facts.get("probe_serial") == station["probe"]["serial"],
                 "observed probe serial mismatch")
     return file_identity(path)
+
+
+def _owns_station(lock: Path, token: str) -> bool:
+    try:
+        return lock.read_text().splitlines()[0] == token
+    except (OSError, IndexError):
+        return False
 
 
 def execute_acquisition(recipe_path: Path, admission_path: Path,
@@ -271,6 +289,7 @@ def execute_acquisition(recipe_path: Path, admission_path: Path,
                 continue
             record = output / (step["name"] + ".observation.json")
             try:
+                require(_owns_station(lock, token), LOCK_FAILURE)
                 verify_file_identity(plan["recipe"])
                 verify_file_identity(plan["admission"])
                 _reviewed(recipe_path, admission_path)
@@ -282,8 +301,12 @@ def execute_acquisition(recipe_path: Path, admission_path: Path,
                 report["operations"].append(result)
                 if result["process_started"]:
                     report["physical_status"] = "executed_unqualified"
+                if result["cancelled"]:
+                    report["cancelled"] = True
                 require(result["status"] == "captured",
-                        "adapter command failed: " + step["name"])
+                        result.get("failure", "adapter command failed: " +
+                                   step["name"]))
+                require(_owns_station(lock, token), LOCK_FAILURE)
                 result["observation"] = _observation(
                     record, step, token, admission)
                 verify_file_identity(plan["recipe"])
@@ -299,6 +322,9 @@ def execute_acquisition(recipe_path: Path, admission_path: Path,
                     report["operations"][-1]["failure"] = str(error)
                 if step["name"] == "cleanup":
                     report["cleanup_failure"] = str(error)
+                if not _owns_station(lock, token) or report.get("cancelled"):
+                    report["station_quarantined"] = True
+                    break
         if "failure" not in report:
             report["status"] = "captured"
     finally:

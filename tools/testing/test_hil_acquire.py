@@ -2,9 +2,12 @@
 
 import copy
 import json
+import os
 from pathlib import Path
+import selectors
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -190,6 +193,76 @@ class HilAcquireTests(unittest.TestCase):
         self.assertIn("ownership", result["failure"])
         self.assertEqual(Path(self.recipe["station_lock"]).read_text(),
                          "changed-owner\n")
+
+    def test_identify_losing_lock_ownership_prevents_all_later_device_actions(
+            self):
+        lock_path = repr(self.recipe["station_lock"])
+        self.change_script(
+            "import pathlib, sys\n"
+            "if sys.argv[1] == 'identify':\n"
+            f" pathlib.Path({lock_path}).write_text('different-owner\\n')\n")
+        result = execute_acquisition(self.recipe_path, self.admission_path,
+                                     self.output)
+        self.assertEqual([step["name"] for step in result["operations"]],
+                         ["identify"])
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(result["station_quarantined"])
+
+    def sleeping_adapter(self):
+        pid = self.root / "adapter-pid.txt"
+        self.change_script(
+            "import os, pathlib, sys, time\n"
+            "if sys.argv[1] == 'identify':\n"
+            f" pathlib.Path({str(pid)!r}).write_text(str(os.getpid()))\n"
+            " print('started', flush=True)\n"
+            " time.sleep(5)\n")
+        return pid
+
+    def test_capture_reader_failure_reaps_process_before_timeout(self):
+        pid = self.sleeping_adapter()
+        original = os.read
+
+        def fail_capture(descriptor, count):
+            if count == 65536:
+                raise OSError("capture reader failed")
+            return original(descriptor, count)
+
+        started = time.monotonic()
+        with patch("tools.hil.acquire.os.read", side_effect=fail_capture):
+            result = execute_acquisition(self.recipe_path, self.admission_path,
+                                         self.output)
+        self.assertLess(time.monotonic() - started, 3)
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("capture reader failed", result["failure"])
+        with self.assertRaises(ProcessLookupError):
+            os.kill(int(pid.read_text()), 0)
+
+    def test_interrupt_reaps_process_and_keeps_station_quarantine(self):
+        pid = self.sleeping_adapter()
+        original = selectors.EpollSelector.select
+        interrupted = False
+
+        def interrupt_capture(selector, timeout):
+            nonlocal interrupted
+            events = original(selector, timeout)
+            if events and not interrupted:
+                interrupted = True
+                raise KeyboardInterrupt()
+            return events
+
+        with patch.object(selectors.EpollSelector, "select", interrupt_capture):
+            try:
+                result = execute_acquisition(
+                    self.recipe_path, self.admission_path, self.output)
+            except KeyboardInterrupt:
+                self.fail("capture interrupt escaped bounded process cleanup")
+        self.assertTrue(result["cancelled"])
+        self.assertTrue(result["station_quarantined"])
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual([step["name"] for step in result["operations"]],
+                         ["identify"])
+        with self.assertRaises(ProcessLookupError):
+            os.kill(int(pid.read_text()), 0)
 
     def test_changed_input_and_wrong_admission_reject_before_process(self):
         for mutation in ("tool", "admission"):

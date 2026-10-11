@@ -38,12 +38,29 @@ jobs:
           fi
       - name: Check the clean checkout with the same hook
         run: .venv/bin/python -m pre_commit run nexus-style --all-files --show-diff-on-failure
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: commit-style
+          result: ${{ job.status }}
+          expected-commit: ${{ github.event.pull_request.head.sha || github.sha }}
+          output: build/job-identities/commit-style
+          require-dependencies: 'false'
+          artifacts: |
+            build/quality/style-gate.json
+          tools: |
+            python=python3
       - name: Retain the executed style report
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: required-commit-style
-          path: build/quality/style-gate.json
+          path: |
+            build/quality/style-gate.json
+            build/job-identities/commit-style/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
   static-analysis:
     name: Required static analysis
@@ -70,12 +87,32 @@ jobs:
       - name: Run required cppcheck
         if: '!cancelled()'
         run: .venv/bin/python scripts/ci/quality_tools.py cppcheck --build-dir build/native-debug --tool cppcheck --report build/quality/cppcheck.txt
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: static-analysis
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/static-analysis
+          require-dependencies: 'true'
+          artifacts: |
+            build/quality/
+          tools: |
+            python=python3
+            tidy=clang-tidy-14
+            cppcheck=cppcheck
+            compiler=cc
       - name: Retain reports on success and failure
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: required-static-analysis
-          path: build/quality/
+          path: |
+            build/quality/
+            build/job-identities/static-analysis/
+          retention-days: 30
+          include-hidden-files: true
           if-no-files-found: error
 # MISRA qualification needs an agreed rule set and approved deviations.
 # An empty stderr file does not establish compliance. Style checks retain

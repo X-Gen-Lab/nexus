@@ -17,6 +17,16 @@
       "path": "tools/testing/evidence/hil-acquire-final-green.log",
       "sha256": "3b0d25c28152f3f98ffafcc04f9aae703a9ea7da08644600e02709898526376b",
       "size": 2172
+    },
+    {
+      "path": "tools/testing/evidence/hil-acquire-ownership-cancel-red.log",
+      "sha256": "15e325ddf6c31cfcee0f361b94dbfb6d0d7c07f80f860a1ea2d43973b119d02b",
+      "size": 3472
+    },
+    {
+      "path": "tools/testing/evidence/hil-acquire-ownership-cancel-green.log",
+      "sha256": "9c4bba4b3dcbed71577eeb0bbc404d231ed63de7eb21b3b6c054f4d666cc189b",
+      "size": 2710
     }
   ],
   "commands": [
@@ -60,5 +70,27 @@
     }
   ],
   "physical_status": "not_executed",
-  "qualifies_source_candidate": false
+  "qualifies_source_candidate": false,
+  "followup": {
+    "scope": "Source after first platform iteration commit; same synthetic tool boundary scope, no equipment operated",
+    "red": {
+      "exit_code": 1,
+      "tests": 3,
+      "failed": 3,
+      "record": "hil-acquire-ownership-cancel-red.log",
+      "reason": "Lost station lock still allowed flash; read failure waited for child; interrupt escaped without bounded process cleanup"
+    },
+    "green": {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "unittest",
+        "tools.testing.test_hil_acquire",
+        "-v"
+      ],
+      "exit_code": 0,
+      "tests": 15,
+      "record": "hil-acquire-ownership-cancel-green.log"
+    }
+  }
 }

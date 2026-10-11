@@ -1,0 +1,20 @@
+test_actual_subprocess_pipeline_retains_raw_and_never_qualifies (tools.testing.test_hil_acquire.HilAcquireTests.test_actual_subprocess_pipeline_retains_raw_and_never_qualifies) ... ok
+test_capture_reader_failure_reaps_process_before_timeout (tools.testing.test_hil_acquire.HilAcquireTests.test_capture_reader_failure_reaps_process_before_timeout) ... ok
+test_changed_input_and_wrong_admission_reject_before_process (tools.testing.test_hil_acquire.HilAcquireTests.test_changed_input_and_wrong_admission_reject_before_process) ... ok
+test_changed_lock_ownership_is_retained_as_failed_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_changed_lock_ownership_is_retained_as_failed_quarantine) ... ok
+test_cleanup_failure_retains_exclusive_station_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_cleanup_failure_retains_exclusive_station_quarantine) ... ok
+test_existing_output_and_symlink_cannot_be_overwritten (tools.testing.test_hil_acquire.HilAcquireTests.test_existing_output_and_symlink_cannot_be_overwritten) ... ok
+test_failed_command_retains_stderr_and_stops_later_operations (tools.testing.test_hil_acquire.HilAcquireTests.test_failed_command_retains_stderr_and_stops_later_operations) ... ok
+test_failed_process_creation_cannot_claim_equipment_execution (tools.testing.test_hil_acquire.HilAcquireTests.test_failed_process_creation_cannot_claim_equipment_execution) ... ok
+test_identify_losing_lock_ownership_prevents_all_later_device_actions (tools.testing.test_hil_acquire.HilAcquireTests.test_identify_losing_lock_ownership_prevents_all_later_device_actions) ... ok
+test_interrupt_reaps_process_and_keeps_station_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_interrupt_reaps_process_and_keeps_station_quarantine) ... ok
+test_json_schema_supports_runtime_reviewed_lower_bound (tools.testing.test_hil_acquire.HilAcquireTests.test_json_schema_supports_runtime_reviewed_lower_bound) ... ok
+test_plan_never_executes_process_or_creates_station_lock (tools.testing.test_hil_acquire.HilAcquireTests.test_plan_never_executes_process_or_creates_station_lock) ... ok
+test_timeout_retains_raw_and_cleanup_still_executes (tools.testing.test_hil_acquire.HilAcquireTests.test_timeout_retains_raw_and_cleanup_still_executes) ... ok
+test_wrong_observed_uid_prevents_flash_but_runs_cleanup (tools.testing.test_hil_acquire.HilAcquireTests.test_wrong_observed_uid_prevents_flash_but_runs_cleanup) ... ok
+test_wrong_order_or_unknown_fields_fail_before_execution (tools.testing.test_hil_acquire.HilAcquireTests.test_wrong_order_or_unknown_fields_fail_before_execution) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 12.788s
+
+OK

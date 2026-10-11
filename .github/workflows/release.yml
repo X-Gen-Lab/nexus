@@ -19,6 +19,10 @@ jobs:
     needs: [platform, contracts]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -31,23 +35,79 @@ jobs:
       - name: Package only the clean checked-out source and locked dependencies
         run: >-
           .venv/bin/python cmake/package/package_source_sdk.py
-          --source "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/nexus-source-sdk"
+          --source "$GITHUB_WORKSPACE" --output "$GITHUB_WORKSPACE/build/delivery/source-sdk"
       - name: Verify the installed source and exported CMake package byte identities
         run: >-
           .venv/bin/python cmake/package/package_source_sdk.py
-          --verify "$RUNNER_TEMP/nexus-source-sdk/share/nexus/src"
+          --verify "$GITHUB_WORKSPACE/build/delivery/source-sdk/share/nexus/src"
       - name: Execute strict consumers against this exact installed prefix
         run: >-
           .venv/bin/python cmake/package/verify_consumers.py
-          --prefix "$RUNNER_TEMP/nexus-source-sdk"
-          --output "$RUNNER_TEMP/nexus-sdk-consumers"
+          --prefix "$GITHUB_WORKSPACE/build/delivery/source-sdk"
+          --output "$GITHUB_WORKSPACE/build/delivery/sdk-consumers"
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: source-sdk
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/source-sdk
+          require-dependencies: 'true'
+          artifacts: |
+            build/delivery/source-sdk/
+            build/delivery/sdk-consumers/
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=arm-none-eabi-gcc
       - name: Retain the verified source SDK
+        if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: nexus-source-sdk-${{ github.sha }}
-          path: ${{ runner.temp }}/nexus-source-sdk/
+          path: |
+            build/delivery/source-sdk/
+            build/delivery/sdk-consumers/
+            build/job-identities/source-sdk/
+          include-hidden-files: true
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
+      - name: Attest the observed source SDK manifest
+        id: provenance
+        if: success()
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: build/job-identities/source-sdk/identity.json
+      - name: Retain the actual attestation bundle
+        if: success()
+        env:
+          NEXUS_ATTESTATION_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+        run: |
+          test -s "$NEXUS_ATTESTATION_BUNDLE"
+          mkdir -p build/delivery/attestation
+          cp -- "$NEXUS_ATTESTATION_BUNDLE" build/delivery/attestation/bundle.json
+      - name: Bind the attestation upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: source-sdk-attestation
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/source-sdk-attestation
+          artifacts: build/delivery/attestation/
+          tools: python=python3
+      - name: Preserve the actual attestation and its job identity
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nexus-source-sdk-attestation-${{ github.sha }}
+          path: |
+            build/delivery/attestation/
+            build/job-identities/source-sdk-attestation/
+          retention-days: 30
+          include-hidden-files: true
+          if-no-files-found: error
       # This workflow verifies source consumption and the nine software builds.
       # tools/evidence/candidate.py separately requires actual offline rebuild,
       # matching qualification artifacts and explicit unexecuted hardware status.
