@@ -17,6 +17,13 @@ PREFIX = 'stm32'
 MODEL = False
 CAN_CONTROLLERS = ('CAN1', 'CAN2')
 CAN_CLOCK_HZ = 42000000
+# Capability assertion for the actual fixed system.c cold implementation.
+CLOCK_PROFILES = MappingProxyType({
+    'hse8-pll168': MappingProxyType({
+        'hse_hz': 8000000, 'core_hz': 168000000,
+        'apb1_hz': 42000000, 'apb2_hz': 84000000,
+    }),
+})
 DMA_VECTOR = 'Stream'
 DMA_TOPOLOGY = (frozenset((1, 2)), range(8), range(8))
 LIMITS = MappingProxyType({

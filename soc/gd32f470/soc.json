@@ -308,7 +308,9 @@
   "clock_profiles": {
     "hxtal25-pll200": {
       "hse_hz": 25000000,
-      "core_hz": 200000000
+      "core_hz": 200000000,
+      "apb1_hz": 50000000,
+      "apb2_hz": 100000000
     }
   },
   "controllers": {

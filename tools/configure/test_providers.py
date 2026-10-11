@@ -11,6 +11,24 @@ import configure as gate
 
 
 class ProviderContractTests(unittest.TestCase):
+    def test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile(self):
+        for family, part, profile in (
+                ('stm32f407', 'STM32F407ZGT6', 'hse8-pll168'),
+                ('gd32f470', 'GD32F470ZGT6', 'hxtal25-pll200')):
+            for field, value in (('core_hz', 1), ('apb1_hz', 1),
+                                 ('apb2_hz', 1), ('apb1_hz', False),
+                                 ('apb2_hz', 100000000.0),
+                                 ('profile_alias', 'unimplemented-clock')):
+                with self.subTest(family=family, field=field, value=value):
+                    soc = gate.load(gate.ROOT / f'soc/{family}/soc.json')
+                    if field == 'profile_alias':
+                        soc['clock_profiles'][value] = dict(
+                            soc['clock_profiles'][profile])
+                    else:
+                        soc['clock_profiles'][profile][field] = value
+                    with self.assertRaisesRegex(ValueError, 'Clock'):
+                        gate.validate_soc(soc, part)
+
     def test_physical_key_normalization_has_no_silicon_topology(self):
         self.assertEqual(
             gate.normalize_resource("dma:GPDMA3:stream31:channel255"),

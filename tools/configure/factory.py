@@ -147,7 +147,8 @@ def _capability(item, model):
     elif kind == "i2c":
         unit_bytes = 1
         if not model:
-            units, messages = 256, 8
+            units = "NX_I2C_MAX_MESSAGE_BYTES"
+            messages = "NX_I2C_MAX_MESSAGES"
     elif kind == "adc":
         unit_bytes, alignment = 2, 2
         count = len(item["channels"])
@@ -189,10 +190,13 @@ def emit_capabilities(result):
                     if class_name.endswith("_device") else instance)
             flags, units, size, alignment, messages = _capability(
                 item, result["soc_family"] == "native")
+            # Public C constants are the bounds authority; never recopy values.
+            units = f"{units}U" if type(units) is int else units
+            messages = f"{messages}U" if type(messages) is int else messages
             name = symbol(instance["id"])
             source += [f"static const nx_factory_io_capability_t "
                        f"s_nx_capability_{class_name}_{name} = {{",
-                       f"    {flags}, {units}U, {size}U, {alignment}U, {messages}U",
+                       f"    {flags}, {units}, {size}U, {alignment}U, {messages}",
                        "};"]
         function = f"nx_factory_{class_name}_capability"
         header += ['/** \\brief Pure lookup; NULL for an invalid assembly ID. */',

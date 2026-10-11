@@ -17,6 +17,13 @@ PREFIX = 'gd32'
 MODEL = False
 CAN_CONTROLLERS = ('CAN0', 'CAN1')
 CAN_CLOCK_HZ = 50000000
+# Capability assertion for the actual fixed system.c cold implementation.
+CLOCK_PROFILES = MappingProxyType({
+    'hxtal25-pll200': MappingProxyType({
+        'hse_hz': 25000000, 'core_hz': 200000000,
+        'apb1_hz': 50000000, 'apb2_hz': 100000000,
+    }),
+})
 DMA_VECTOR = 'Channel'
 DMA_TOPOLOGY = (frozenset((0, 1)), range(8), range(8))
 LIMITS = MappingProxyType({

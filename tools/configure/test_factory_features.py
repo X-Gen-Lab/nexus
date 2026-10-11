@@ -142,6 +142,48 @@ class OptionalFactoryTests(unittest.TestCase):
                 execution = subprocess.run([str(executable)], check=False)
                 self.assertEqual(execution.returncode, 0)
 
+    def test_i2c_capabilities_follow_the_actual_public_header_bounds(self):
+        fixture = gate.ROOT / 'tests/contracts/gd32_assembly/i2c-irq.toml'
+        result = gate.resolve_ir(fixture)
+        header, getters = factory.emit(result)
+        (self.root / 'nexus_factory.h').write_text(header)
+        include = self.root / 'include/nexus/io'
+        include.mkdir(parents=True)
+        public = (gate.ROOT / 'io/include/nexus/io/i2c.h').read_text()
+        public = public.replace('NX_I2C_MAX_MESSAGES      8U',
+                                'NX_I2C_MAX_MESSAGES      32U')
+        public = public.replace('NX_I2C_MAX_MESSAGE_BYTES 256U',
+                                'NX_I2C_MAX_MESSAGE_BYTES 64U')
+        (include / 'i2c.h').write_text(public)
+        source = self.root / 'bounds.c'
+        source.write_text(
+            '#include "nexus_factory.h"\n#include <stdio.h>\n'
+            'const nx_i2c_port_t* const nx_binding_bus = NULL;\n'
+            'const nx_i2c_endpoint_t* const nx_device_sensor = NULL;\n'
+            + getters + '\nint main(void) {\n'
+            'const nx_factory_io_capability_t* port = '
+            'nx_factory_i2c_capability(NX_I2C_ID_BUS);\n'
+            'const nx_factory_io_capability_t* endpoint = '
+            'nx_factory_i2c_device_capability(NX_I2C_DEVICE_ID_SENSOR);\n'
+            'printf("actual units=%u messages=%u; public units=%u messages=%u\\n",'
+            '(unsigned)port->max_transfer_units, (unsigned)port->max_messages,'
+            '(unsigned)NX_I2C_MAX_MESSAGE_BYTES, (unsigned)NX_I2C_MAX_MESSAGES);\n'
+            'return port->max_transfer_units != NX_I2C_MAX_MESSAGE_BYTES || '
+            'port->max_messages != NX_I2C_MAX_MESSAGES || '
+            'endpoint->max_transfer_units != NX_I2C_MAX_MESSAGE_BYTES || '
+            'endpoint->max_messages != NX_I2C_MAX_MESSAGES;\n}\n')
+        executable = self.root / 'bounds'
+        command = ['cc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-pedantic',
+                   '-I' + str(self.root / 'include'), '-I' + str(self.root),
+                   '-I' + str(gate.ROOT / 'io/include'),
+                   '-I' + str(gate.ROOT / 'core/include'), str(source),
+                   '-o', str(executable)]
+        compiled = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(compiled.returncode, 0, compiled.stderr)
+        execution = subprocess.run([str(executable)], capture_output=True,
+                                   text=True)
+        self.assertEqual(execution.returncode, 0, execution.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

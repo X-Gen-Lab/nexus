@@ -90,6 +90,22 @@ def cpu_abi(cpu):
     return {key: cpu[key] for key in ("arch", "fpu", "float_abi")}
 
 
+def validate_clock_profiles(soc, provider):
+    """Fixed cold implementations accept only their exact reviewed clock tuple."""
+    if provider.MODEL:
+        return
+    supported = provider.CLOCK_PROFILES
+    actual = soc["clock_profiles"]
+    if set(actual) != set(supported):
+        fail("Clock profile identity differs from the fixed cold implementation")
+    for name, expected in supported.items():
+        facts = actual[name]
+        if (set(facts) != set(expected) or
+                any(type(value) is not int for value in facts.values()) or
+                facts != expected):
+            fail(f"Clock profile differs from the fixed cold implementation: {name}")
+
+
 def resolve_interrupts(cpu, irq, backend, provider):
     """Bind logical IRQ range and syscall policy to a maintained kernel port."""
     try:

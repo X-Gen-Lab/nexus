@@ -22,7 +22,7 @@ IO-20,I2C physical bus clear,implemented,targeted_passed,not_executed,io/src/i2c
 IO-21,Additional reviewed controller routes,planned,pending,not_executed,soc/*/routes.json,pending,datasheet references; no invented Board wiring,codex
 IO-22,GD additional SRAM and TCM linker,implemented,targeted_passed,not_executed,core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform,tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-memory-metadata,explicit sections and budgets; DMA TCM rejection,codex
 IO-23,Three Board electrical fact review,blocked,pending,blocked,boards,pending,actual PCB revision connector crystal and NOR identity,codex
-IO-24,Resolver emitter common limits,partial,development_passed,not_applicable,tools/configure/providers/common.py;tools/configure/providers/*/bindings.py,tools/testing/evidence/configure-iteration,single immutable provider limits authority,codex
+IO-24,Resolver emitter common limits,implemented,targeted_passed,not_applicable,tools/configure/providers/common.py;tools/configure/providers/*/bindings.py,tools/testing/evidence/configure-limits-clock,factory limits derive from public contract; reviewed clock tuple; four selected ARM graphs with resource/retention evidence,codex
 IO-25,Physical FP MVE task context,blocked,pending,blocked,tools/hil,pending,real target observations; current three boards are M4F,codex
 IO-26,Physical clock tick deadline accuracy,blocked,pending,blocked,tools/hil,pending,bound timer drift tick and monotonic evidence,codex
 IO-27,Runtime MSP task stack peaks,planned,pending,blocked,tools/hil;os,pending,task and MSP high-water measured on real station,codex

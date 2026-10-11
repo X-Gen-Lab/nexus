@@ -1,0 +1,15 @@
+test_i2c_capabilities_follow_the_actual_public_header_bounds (tools.configure.test_factory_features.OptionalFactoryTests.test_i2c_capabilities_follow_the_actual_public_header_bounds) ... FAIL
+
+======================================================================
+FAIL: test_i2c_capabilities_follow_the_actual_public_header_bounds (tools.configure.test_factory_features.OptionalFactoryTests.test_i2c_capabilities_follow_the_actual_public_header_bounds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 185, in test_i2c_capabilities_follow_the_actual_public_header_bounds
+    self.assertEqual(execution.returncode, 0, execution.stdout)
+AssertionError: 1 != 0 : actual units=256 messages=8; public units=64 messages=32
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.053s
+
+FAILED (failures=1)

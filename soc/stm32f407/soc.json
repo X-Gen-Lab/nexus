@@ -90,7 +90,9 @@
   "clock_profiles": {
     "hse8-pll168": {
       "hse_hz": 8000000,
-      "core_hz": 168000000
+      "core_hz": 168000000,
+      "apb1_hz": 42000000,
+      "apb2_hz": 84000000
     }
   },
   "controllers": {

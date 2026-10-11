@@ -21,7 +21,7 @@ try:
     from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
-                                   mode_traits, route_dma,
+                                   mode_traits, route_dma, validate_clock_profiles,
                                    resolve_interrupts, sequence,
                                    validate_selection)
 except ImportError:
@@ -34,7 +34,7 @@ except ImportError:
     from ir import thaw
     from providers import maintained
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
-                                   mode_traits, route_dma,
+                                   mode_traits, route_dma, validate_clock_profiles,
                                   resolve_interrupts, sequence,
                                   validate_selection)
 
@@ -250,6 +250,7 @@ def validate_soc(soc, part):
             {"apb1_hz", "apb2_hz", "timebase", "flash_wait_states"}, name)
         integer(profile["hse_hz"], 1, context="HSE Hz")
         integer(profile["core_hz"], 1, context="core Hz")
+    validate_clock_profiles(soc, provider)
     return variant
 
 

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1,
+  "PYTHONPATH": "/workspace/nexus/tools/configure"
+}
