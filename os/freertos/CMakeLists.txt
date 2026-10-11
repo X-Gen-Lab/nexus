@@ -163,3 +163,7 @@ target_sources(nexus_os_freertos INTERFACE $<TARGET_OBJECTS:nx_freertos_hooks>)
 target_include_directories(nexus_os_freertos PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_os_freertos PUBLIC nexus_os_wait nx_freertos_kernel
     PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
+
+if(NEXUS_OS_TRACE)
+    target_sources(nexus_os_freertos PRIVATE stack_snapshot.c)
+endif()

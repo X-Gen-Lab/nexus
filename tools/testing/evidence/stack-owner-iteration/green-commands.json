@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus/build/uart-iteration",
+      "--target",
+      "nexus_stack_observation_test",
+      "nexus_freertos_stack_test",
+      "--parallel",
+      "2"
+    ],
+    "returncode": 0,
+    "start": 1791741227.676001,
+    "end": 1791741232.318642
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_stack_observation_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/stack-tdd/stack_observation-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791741232.3186705,
+    "end": 1791741232.3212948
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_freertos_stack_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/stack-tdd/freertos_stack-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791741232.3213007,
+    "end": 1791741232.3233182
+  }
+]

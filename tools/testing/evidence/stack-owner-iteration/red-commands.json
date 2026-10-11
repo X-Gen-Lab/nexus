@@ -1,0 +1,30 @@
+{
+  "commands": [
+    {
+      "command": [
+        "/workspace/nexus/build/native-debug/bin/nexus_stack_observation_test",
+        "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/stack-tdd/stack_observation-red.xml"
+      ],
+      "returncode": 1,
+      "start": 1791741173.8418705,
+      "end": 1791741173.8449275
+    },
+    {
+      "command": [
+        "/workspace/nexus/build/native-debug/bin/nexus_freertos_stack_test",
+        "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/stack-tdd/freertos_stack-red.xml"
+      ],
+      "returncode": 1,
+      "start": 1791741173.8449342,
+      "end": 1791741173.848532
+    }
+  ],
+  "sources": {
+    "core/include/nexus/core/stack_observation.h": "e3e02e7a65e0ef82076039457866793836215ad17937a8e4edbaf6a4c75fa2e7",
+    "core/src/stack_observation.c": "9b67f2c06ff2de253e4bec6663d7cd2be50bbad58ba090aa623b7631bc6df3f8",
+    "os/freertos/include/nexus/os/freertos_stack.h": "0f2530e0f7d0d9cf5574448fa136d0c88fa2b77f30599c1b178f715fb120dee2",
+    "os/freertos/stack_snapshot.c": "d36197e9c3fbec5ebc74c8a0b8755fec94c9af45093bfb6aeb799f342ef3c772",
+    "tests/google/stack_observation_test.cpp": "26a08e063060bced4ebc1e030e602494ffedd5a94a0884ab2107ecae6ea59769",
+    "tests/google/freertos_stack_test.cpp": "6c9742aca5764f8b3da840531c14200724d32977bf098cbc23ea6119559f8819"
+  }
+}

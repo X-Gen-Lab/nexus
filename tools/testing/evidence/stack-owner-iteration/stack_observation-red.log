@@ -1,0 +1,70 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from StackObservation
+[ RUN      ] StackObservation.UntouchedFullCapacityTerminatesAtTheDeclaredBoundary
+/workspace/nexus/tests/google/stack_observation_test.cpp:18: Failure
+Expected equality of these values:
+  nx_stack_observe(bytes, sizeof bytes, 0xA5, &out)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] StackObservation.UntouchedFullCapacityTerminatesAtTheDeclaredBoundary (0 ms)
+[ RUN      ] StackObservation.PrefixStopsAtTheLowestWrittenByte
+/workspace/nexus/tests/google/stack_observation_test.cpp:31: Failure
+Expected equality of these values:
+  nx_stack_observe(bytes, sizeof bytes, 0x5C, &out)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] StackObservation.PrefixStopsAtTheLowestWrittenByte (0 ms)
+[ RUN      ] StackObservation.InvalidSpanAndAliasPreserveOutputAndStorage
+/workspace/nexus/tests/google/stack_observation_test.cpp:41: Failure
+Expected equality of these values:
+  nx_stack_observe(nullptr, sizeof bytes, 0U, &out)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stack_observation_test.cpp:42: Failure
+Expected equality of these values:
+  nx_stack_observe(bytes, 0U, 0U, &out)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stack_observation_test.cpp:43: Failure
+Expected equality of these values:
+  nx_stack_observe(bytes, sizeof bytes, 0U, nullptr)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stack_observation_test.cpp:44: Failure
+Expected equality of these values:
+  nx_stack_observe(reinterpret_cast<void*>((18446744073709551615UL) - 1U), 3U, 0U, &out)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stack_observation_test.cpp:47: Failure
+Expected equality of these values:
+  nx_stack_observe(bytes, sizeof bytes, 0U, reinterpret_cast<nx_stack_observation_t*>(bytes))
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+[  FAILED  ] StackObservation.InvalidSpanAndAliasPreserveOutputAndStorage (0 ms)
+[----------] 3 tests from StackObservation (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] StackObservation.UntouchedFullCapacityTerminatesAtTheDeclaredBoundary
+[  FAILED  ] StackObservation.PrefixStopsAtTheLowestWrittenByte
+[  FAILED  ] StackObservation.InvalidSpanAndAliasPreserveOutputAndStorage
+
+ 3 FAILED TESTS

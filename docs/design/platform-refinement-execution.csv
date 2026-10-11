@@ -25,8 +25,8 @@ IO-23,Three Board electrical fact review,blocked,pending,blocked,boards,pending,
 IO-24,Resolver emitter common limits,implemented,targeted_passed,not_applicable,tools/configure/providers/common.py;tools/configure/providers/*/bindings.py,tools/testing/evidence/configure-limits-clock,factory limits derive from public contract; reviewed clock tuple; four selected ARM graphs with resource/retention evidence,codex
 IO-25,Physical FP MVE task context,blocked,pending,blocked,tools/hil,pending,real target observations; current three boards are M4F,codex
 IO-26,Physical clock tick deadline accuracy,blocked,pending,blocked,tools/hil,pending,bound timer drift tick and monotonic evidence,codex
-IO-27,Runtime MSP task stack peaks,planned,pending,blocked,tools/hil;os,pending,task and MSP high-water measured on real station,codex
-IO-28,OS owner lifecycle endurance,planned,pending,blocked,os;components;tools/hil,pending,actual kernel repeated lifecycle and physical soak,codex
+IO-27,Runtime MSP task stack peaks,implemented,targeted_passed,blocked,tools/hil;os,tools/testing/evidence/stack-owner-iteration,bounded quiescent stack scan and actual pinned kernel ownership rounds; physical MCU stack/soak not executed,codex
+IO-28,OS owner lifecycle endurance,implemented,targeted_passed,blocked,os;components;tools/hil,tools/testing/evidence/stack-owner-iteration,bounded quiescent stack scan and actual pinned kernel ownership rounds; physical MCU stack/soak not executed,codex
 IO-29,Board tickless continuous timer port,planned,pending,blocked,soc;os,pending,timer remains valid across sleep; no generic tickless claim,codex
 IO-30,Fail-stop and product safety output hooks,planned,pending,blocked,os;X-Gen-Lab/nexus-examples,pending,observable platform fault; product explicit safe-output policy,codex
 IO-31,Physical restricted MPU isolation,blocked,pending,blocked,tools/hil,pending,software fixtures cannot prove actual memory fault isolation,codex

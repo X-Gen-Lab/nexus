@@ -1,0 +1,12 @@
+/workspace/nexus-io-implementation-evidence/stack-tdd/arm-profile-selection/diagnostic/build/nexus-runtime/os/freertos/CMakeFiles/nexus_os_freertos.dir/stack_snapshot.c.obj  :
+section                           size   addr
+.text                                0      0
+.data                                0      0
+.bss                                 0      0
+.text.overlaps.constprop.0          36      0
+.text.nx_freertos_stack_observe    206      0
+.comment                            71      0
+.ARM.attributes                     52      0
+Total                              365
+
+

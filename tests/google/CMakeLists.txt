@@ -74,8 +74,13 @@ nexus_google_test(nexus_irq_wake_provider_test SOURCES irq_wake_test.cpp
     INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 
 nexus_google_test(nexus_freertos_services_kernel_test
-    SOURCES freertos_services_kernel_test.cpp
-    LIBRARIES contract_os_freertos_posix)
+    SOURCES freertos_services_kernel_test.cpp freertos_stack_kernel_test.cpp
+        freertos_owner_endurance_test.cpp
+        "${NEXUS_SOURCE_DIR}/os/freertos/stack_snapshot.c"
+    LIBRARIES contract_os_freertos_posix Nexus::UARTOwner
+    INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/os_freertos_runtime"
+        "${NEXUS_SOURCE_DIR}/io/native"
+        "${NEXUS_SOURCE_DIR}/os/freertos/include")
 
 # A second assembly is a separate image, never linked to the default platform.
 set(native_factory_input
@@ -436,3 +441,5 @@ target_include_directories(nexus_io_state_machine_test PRIVATE
 
 include(can_runtime.cmake)
 include(can_factory.cmake)
+
+include(stack_observation.cmake)
