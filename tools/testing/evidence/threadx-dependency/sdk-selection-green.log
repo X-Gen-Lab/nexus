@@ -1,0 +1,11 @@
+test_consumer_uses_authored_toml_for_each_maintained_family (sdk_contracts.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... ok
+test_metadata_and_memory_generation_are_required_sdk_payload (sdk_contracts.SourceSDKSelectionTests.test_metadata_and_memory_generation_are_required_sdk_payload) ... ok
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (sdk_contracts.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... ok
+test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (sdk_contracts.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required) ... ok
+test_development_snapshot_includes_staged_and_untracked_sources (sdk_contracts.SourceSDKDevelopmentSnapshotTests.test_development_snapshot_includes_staged_and_untracked_sources) ... ok
+test_publishable_snapshot_uses_only_original_committed_blobs (sdk_contracts.SourceSDKDevelopmentSnapshotTests.test_publishable_snapshot_uses_only_original_committed_blobs) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.033s
+
+OK

@@ -167,3 +167,7 @@ target_link_libraries(nexus_os_freertos PUBLIC nexus_os_wait nx_freertos_kernel
 if(NEXUS_OS_TRACE)
     target_sources(nexus_os_freertos PRIVATE stack_snapshot.c)
 endif()
+
+if(NEXUS_OS_TIMEBASE_LOWPOWER)
+    target_sources(nexus_os_freertos PRIVATE timebase_lowpower.c)
+endif()

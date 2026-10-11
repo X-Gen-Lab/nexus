@@ -1,0 +1,124 @@
+{
+  "board": "stm32f407zg-qiming-v31",
+  "budget": {
+    "path": "/workspace/nexus-threadx-probe/evidence/maintained-matrix-run1/qiming-basepri/build/nexus/generated/resource-budget.json",
+    "sha256": "a62f7fad79c1b379afcc7f8cefa0fc059ec01d238ca1f9b82f20c2bfc084970f",
+    "size": 184
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-threadx-probe/evidence/maintained-matrix-run1/qiming-basepri/inputs/assembly.toml",
+        "sha256": "f9775bf7549ae2adfa9ebe496f2d246166b09961cf94a8c9ce00c7bafab86239",
+        "size": 253
+      },
+      "label": "external/assembly.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
+        "sha256": "9899b6036e9bc7d11eada7bc6a62a9601124099e440bbf9d862b760adbf75cf8",
+        "size": 2580
+      },
+      "label": "boards/stm32f407_qiming_v31/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "5d3f57aca4a937e155ddc8c077d6d60cdba3ae7e6d3861cd3f61183fb25cbcf1",
+        "size": 11441
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "4581bc0b75ede90883ba2b43781c642ba2eda955f0eb99cf266f2e1412966811",
+        "size": 7877
+      },
+      "label": "soc/stm32f407/soc.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-threadx-probe/evidence/maintained-matrix-run1/qiming-basepri/build/bin/nexus_threadx_runtime.elf",
+    "sha256": "ec19533235b17c68f5ec128a5d57f48d1e299aff14bf16ba866a8e4eb24cb370",
+    "size": 34300
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 10740,
+      "loaded_bytes": 10740,
+      "ranges": [
+        [
+          134217728,
+          134228468
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870956
+          ],
+          [
+            536870960,
+            536875192
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 6324
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536875192,
+        "start": 536875192
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-threadx-probe/evidence/maintained-matrix-run1/qiming-basepri/build/nexus/generated/resolved.json",
+    "sha256": "c6c2d2749a3452951f6c11f1118e8d264f3e27a3d48c7f382e9b85f668d63824",
+    "size": 19936
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

@@ -1,0 +1,80 @@
+test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts (test_lowpower_integration.LowpowerIntegrationTests.test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts) ... ERROR
+test_cpu_only_runtime_rejects_missing_soc_hardware_contract (test_lowpower_integration.LowpowerIntegrationTests.test_cpu_only_runtime_rejects_missing_soc_hardware_contract) ... FAIL
+test_default_custom_port_preserves_existing_weak_null_contract (test_lowpower_integration.LowpowerIntegrationTests.test_default_custom_port_preserves_existing_weak_null_contract) ... ERROR
+test_editor_selector_uses_same_explicit_fields (test_lowpower_integration.LowpowerIntegrationTests.test_editor_selector_uses_same_explicit_fields) ... ERROR
+test_selector_type_unknown_value_and_incompatible_policy_are_rejected (test_lowpower_integration.LowpowerIntegrationTests.test_selector_type_unknown_value_and_incompatible_policy_are_rejected) ... ok
+test_timebase_port_is_explicit_and_emits_one_selector (test_lowpower_integration.LowpowerIntegrationTests.test_timebase_port_is_explicit_and_emits_one_selector) ... ERROR
+
+======================================================================
+ERROR: test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts (test_lowpower_integration.LowpowerIntegrationTests.test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 60, in test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts
+    policy = kernel.resolve({"profile": "lowpower", "lowpower_port": "timebase"},
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/kernel.py", line 73, in resolve
+    fail(f"OS policy: unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+providers.common.ConfigurationError: OS policy: unknown ['lowpower_port']
+
+======================================================================
+ERROR: test_default_custom_port_preserves_existing_weak_null_contract (test_lowpower_integration.LowpowerIntegrationTests.test_default_custom_port_preserves_existing_weak_null_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 19, in test_default_custom_port_preserves_existing_weak_null_contract
+    self.assertEqual(policy.lowpower_port, "custom")
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'KernelProfileIR' object has no attribute 'lowpower_port'
+
+======================================================================
+ERROR: test_editor_selector_uses_same_explicit_fields (test_lowpower_integration.LowpowerIntegrationTests.test_editor_selector_uses_same_explicit_fields)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 40, in test_editor_selector_uses_same_explicit_fields
+    self.assertEqual(kernel.editor_schema()["properties"]["lowpower_port"],
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'lowpower_port'
+
+======================================================================
+ERROR: test_timebase_port_is_explicit_and_emits_one_selector (test_lowpower_integration.LowpowerIntegrationTests.test_timebase_port_is_explicit_and_emits_one_selector)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 26, in test_timebase_port_is_explicit_and_emits_one_selector
+    policy = kernel.resolve({"profile": "lowpower", "lowpower_port": "timebase"},
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/kernel.py", line 73, in resolve
+    fail(f"OS policy: unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+providers.common.ConfigurationError: OS policy: unknown ['lowpower_port']
+
+======================================================================
+FAIL: test_cpu_only_runtime_rejects_missing_soc_hardware_contract (test_lowpower_integration.LowpowerIntegrationTests.test_cpu_only_runtime_rejects_missing_soc_hardware_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/runtime.py", line 97, in resolve
+    policy = kernel.resolve(choices.get("os"), profile, hz)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/kernel.py", line 73, in resolve
+    fail(f"OS policy: unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+providers.common.ConfigurationError: OS policy: unknown ['lowpower_port']
+
+The above exception was the direct cause of the following exception:
+
+runtime.RuntimeError: OS policy: unknown ['lowpower_port']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 54, in test_cpu_only_runtime_rejects_missing_soc_hardware_contract
+    with self.assertRaisesRegex(runtime.RuntimeError, "CPU-only.*SoC"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "CPU-only.*SoC" does not match "OS policy: unknown ['lowpower_port']"
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.003s
+
+FAILED (failures=1, errors=4)

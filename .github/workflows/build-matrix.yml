@@ -148,6 +148,52 @@ jobs:
           if-no-files-found: error
       # CPU reference links do not qualify a physical SoC, Board or hardware.
 
+  threadx:
+    name: ThreadX kernel and lifecycle software contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-build
+        with:
+          preset: native-debug
+          arm: 'true'
+      - name: Link all reviewed Boards and both kernel interrupt policies
+        run: >-
+          .venv/bin/python scripts/ci/os_threadx.py
+          --compiler arm-none-eabi-gcc
+          --output build/os-threadx
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: threadx
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/threadx
+          require-dependencies: 'true'
+          artifacts: |
+            build/os-threadx/
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=arm-none-eabi-gcc
+      - name: Preserve ThreadX execution
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: threadx-kernel-contracts
+          path: |
+            build/os-threadx/
+            build/job-identities/threadx/
+          retention-days: 30
+          include-hidden-files: true
+          if-no-files-found: error
+      # Kernel links establish software contracts; physical execution is separate.
+
   os-security:
     name: Optional MPU and TrustZone software contracts
     runs-on: ubuntu-24.04

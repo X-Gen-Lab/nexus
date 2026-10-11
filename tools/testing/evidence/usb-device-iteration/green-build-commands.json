@@ -1,0 +1,24 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus-industrial-design/usb-tests",
+      "-B",
+      "/workspace/nexus-industrial-design/usb-tests/build"
+    ],
+    "exit_code": 0,
+    "log": "green-configure.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/usb-tests/build",
+      "-j",
+      "4"
+    ],
+    "exit_code": 2,
+    "log": "green-build.log"
+  }
+]

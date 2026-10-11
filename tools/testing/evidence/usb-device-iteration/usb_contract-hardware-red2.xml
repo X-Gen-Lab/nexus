@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="36" failures="36" disabled="0" errors="0" time="0.001" timestamp="2026-10-11T17:51:52.085" name="AllTests">
+  <testsuite name="UsbDevice" tests="36" failures="36" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:51:52.085">
+    <testcase name="FifoWriteDoesNotCompleteHostAcknowledgement" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ShortOutCompletesOnlyAfterDataAndTransferFacts" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="85" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutOverflowCannotWriteBeyondCallerCapacity" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="99" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FailedDisableKeepsRequestBorrowedThroughDrainDeadline" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="111" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FifoFlushFailureCannotSettleDisabledEndpoint" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="124" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="StopCannotReleaseWakeOrClockWithAnEnabledIrq" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="135" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="NewSetupInvalidatesOldControlBeforeReusingStorage" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="142" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="AddressChangesOnlyAfterMatchingStatusInAcknowledgement" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="155" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ResetDoesNotRevokeAnUnprovedEndpointLoan" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="StaleCompletionCannotFinishANewRequestEpoch" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="179" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="IllegalPacketAndIncomingMaskRejectWithNoBorrow" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="StallRequiresIdleAndClearResetsBulkDataPid" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="197" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FullEventsPreserveAuthoritativeLatestSetup" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="207" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.085" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="SubsequentControlDataPacketsPreserveTheHardwarePidToggle" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="222" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="235" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="248" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="257" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="263" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="PacketBuffersCannotAliasTheClockConsumerControl" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="280" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="RestartDoesNotReuseAnEarlierControlEpoch" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="287" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="CancellingOutRestoresPeerAdmissionAfterActualDrain" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="297" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="305" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="PendingResetAtGlobalEnableRemainsObservableAfterColdStart" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="312" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="StopAndDetachJoinTheInFlightWakePublisher" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="329" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="StateOutputsCannotOverwriteControllerOrClockStorage" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="364" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="EventCountCannotAliasControllerQueueMetadata" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="374" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="EventOutputsCannotOverwriteClockOrAcceptedOutRequest" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="384" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="AttachedWakeObjectCannotBecomeAnOutBuffer" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="404" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="WakeCannotAttachInsideAnAlreadyBorrowedOutBuffer" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="411" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="EventPlanCannotOverwriteAnImmutableClockTable" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="418" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ReadOnlyTxEmptyFlagCannotPreventColdStartOrSettlement" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="438" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="EmptyInTokenIsRetryInformationRatherThanATransferFailure" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="448" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutSetupDoneIsNotAnErrorOfTheFollowingControlData" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="459" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ResetDiscardsAnUnorderedPendingSetupFromThePriorBusEpoch" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="469" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="InDisableWaitsForAnObservedNakEffectiveState" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="481" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutZeroFixedDisableBitUsesProvedPioFifoWithdrawal" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="493" status="run" result="completed" time="0." timestamp="2026-10-11T17:51:52.086" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:56&#x0A;Expected equality of these values:&#x0A;  nx_native_usb_initialize(&amp;model)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:56
+Expected equality of these values:
+  nx_native_usb_initialize(&model)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_stop(&amp;device)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:64
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

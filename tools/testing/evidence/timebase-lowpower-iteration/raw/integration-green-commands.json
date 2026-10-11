@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      ".venv/bin/cmake",
+      "--build",
+      "build/uart-iteration",
+      "--target",
+      "nexus_stm32f407_lowpower_integration_test",
+      "nexus_gd32f470_lowpower_integration_test",
+      "--parallel",
+      "2"
+    ],
+    "returncode": 0,
+    "start": 1791744575.2808092,
+    "end": 1791744575.6035879
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_stm32f407_lowpower_integration_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/stm-integration-run-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744575.6036015,
+    "end": 1791744575.606684
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_gd32f470_lowpower_integration_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/gd-integration-run-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744575.606689,
+    "end": 1791744575.6098163
+  }
+]

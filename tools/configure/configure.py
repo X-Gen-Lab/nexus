@@ -17,7 +17,7 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel, memory as memory_regions, metadata, factory, can
+    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device
     from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
@@ -28,6 +28,8 @@ except ImportError:
     import cpu as cpu_profiles
     import kernel
     import can
+    import threadx
+    import usb_device
     import metadata
     import factory
     import memory as memory_regions
@@ -43,7 +45,7 @@ UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "timer", "pwm", "adc", "can"}
+         "timer", "pwm", "adc", "can", "usb_device"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -228,7 +230,8 @@ def validate_soc(soc, part):
     for name, controller in soc["controllers"].items():
         identity(name, "controller")
         obj(controller, {"kind", "modes", "irq", "pins"},
-            {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz"}, name)
+            {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
+             "fifo_words", "endpoint_numbers"}, name)
         if controller["kind"] not in KINDS:
             fail(f"Unmaintained controller kind: {controller['kind']}")
         for field in ("modes", "irq", "pins"):
@@ -242,6 +245,7 @@ def validate_soc(soc, part):
                                  f"{name}.resources"):
             validate_resource_fact(resource, provider, "SoC resource")
     can.validate_soc(soc, provider)
+    usb_device.validate_soc(soc, provider)
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
@@ -397,10 +401,14 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     if not re.fullmatch(r"[0-9a-f]{40}", field):
                         fail("Provenance Git identity must be exact SHA-1")
     backend = assembly["backend"]
-    if backend not in {"baremetal", "freertos", "native"}:
+    if backend not in {"baremetal", "freertos", "native", "threadx"}:
         fail(f"Unsupported OS backend: {backend}")
-    if (provider.MODEL) != (backend == "native"):
+    host = soc["cpu"]["arch"] == "native"
+    if (host and backend not in {"native", "threadx"}) or (
+            not host and backend == "native"):
         fail("Native is a host model; its backend cannot qualify MCU execution")
+    if backend == "threadx":
+        threadx.validate_platform(board["id"], family)
     irq_profile = resolve_interrupts(soc["cpu"], soc["irq"], backend, provider)
     cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
                                        enum_abi=provider.ENUM_ABI)
@@ -413,6 +421,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail("OS policy: expected object")
     kernel_profile = kernel.resolve(assembly.get("os"), cpu_profile,
                                     clock["core_hz"])
+    if (backend == "freertos" and kernel_profile.lowpower_port == "timebase" and
+            family not in {"stm32f407", "gd32f470"}):
+        fail("Timebase lowpower requires the maintained STM32F407/GD32F470 SoC alarm")
     cpu_profile = kernel.bind(cpu_profile, kernel_profile)
     irq_profile = cpu_profile.to_dict()["irq"]
     if "abi" in assembly and assembly["abi"] != cpu_abi(soc["cpu"]):
@@ -498,6 +509,11 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         for irq in ("SysTick", "PendSV", "SVC"):
             claim("irq:" + irq, "freertos", "kernel",
                   "FreeRTOS " + irq_profile["kernel_port"])
+    elif backend == "threadx" and not host:
+        for irq in ("PendSV", *(["SysTick"] if
+                                kernel_profile.tick_source == "systick" else [])):
+            claim("irq:" + irq, "threadx", "kernel",
+                  "ThreadX " + irq_profile["kernel_port"])
     selected = []
     instance_ids = []
     irq_owners = {}
@@ -508,7 +524,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
              "timeout_ms", "calls_os", "rx_profile", "sample_times",
              "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
              "bitrate", "timing", "drain_timeout_us", "poll_limit",
-             "fifo_order"}, "controller selection")
+             "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us"}, "controller selection")
         name = identity(selection["id"], "instance id")
         c_identity(name)
         instance_ids.append(name)
@@ -540,9 +556,11 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("DMA SPI requires an explicit IRQ priority")
         if "calls_os" in selection and type(selection["calls_os"]) is not bool:
             fail("calls_os must be boolean")
-        if selection.get("calls_os", False) and (backend != "freertos" or
+        if selection.get("calls_os", False) and (
+                kernel_profile is None or host or
+                kernel_profile.kernel_policy == "none" or
                 selection.get("irq_priority", 0) < irq_profile["syscall_priority"]):
-            fail("OS-calling ISR violates the FreeRTOS syscall ceiling")
+            fail("OS-calling ISR violates the selected kernel syscall ceiling")
         if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
             fail("Controller speed exceeds maintained limit")
         traits = mode_traits(route["kind"], mode)
@@ -591,15 +609,21 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     chip_selects = set()
     for device in sequence(assembly["devices"], "devices"):
         obj(device, {"id", "controller", "driver"}, {"cs_binding", "address",
-            "mode", "max_hz", "authored_kind", "model_bytes"}, "device")
+            "mode", "max_hz", "authored_kind", "model_bytes", "number",
+            "direction", "transfer", "max_packet", "fifo_words"}, "device")
         device_ids.append(identity(device["id"], "device ID"))
         c_identity(device["id"])
         controller = next((item for item in selected if item["id"] == device["controller"]), None)
-        if controller is None or controller["kind"] not in {"spi", "i2c"}:
-            fail("Device references no selected SPI/I2C controller")
+        if controller is None or controller["kind"] not in {"spi", "i2c", "usb_device"}:
+            fail("Device references no selected SPI/I2C/USB controller")
         authored_kind = device.pop("authored_kind", controller["kind"])
         if authored_kind != controller["kind"]:
             fail("Authored device kind differs from controller binding kind")
+        if controller["kind"] == "usb_device":
+            validated = usb_device.endpoint(device)
+            device.clear()
+            device.update(validated)
+            continue
         model_fields = {"model_bytes"} if provider.MODEL else set()
         if "model_bytes" in device:
             if not provider.MODEL:
@@ -661,6 +685,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             addresses.add(key)
     unique(device_ids + instance_ids, "assembly instance IDs")
     unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
+    usb_device.complete_plan(selected, assembly["devices"], claim)
     for controller in selected:
         children = [item for item in assembly["devices"] if item["controller"] == controller["id"]]
         if controller["kind"] == "i2c" and not children:
@@ -717,6 +742,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 source_dependencies.append(dependency_identity(root, path, lock[key]))
     if backend == "freertos":
         source_dependencies.append(dependency_identity(root, "ext/freertos"))
+    elif backend == "threadx":
+        source_dependencies.append(dependency_identity(root, "ext/threadx"))
     manifest = root / ".nexus-source-sdk.json"
     if manifest.is_file():
         inputs.append(manifest)
@@ -809,7 +836,7 @@ def generate(result, output):
     write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
                                       else result, indent=2, sort_keys=True) + "\n")
     profile = cpu_profiles.CpuProfileIR.from_validated(result["cpu_profile"])
-    policy = (kernel.KernelProfileIR.from_validated(result["kernel_profile"])
+    policy = (kernel.from_validated(result["kernel_profile"])
               if result.get("kernel_profile") is not None else None)
     header = ["/* Generated from the sole resolved configuration. */",
               "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
@@ -915,7 +942,7 @@ def main(argv=None):
     if command == "init":
         parser.add_argument("--board", required=True)
         parser.add_argument("--backend", required=True,
-                            choices=("native", "baremetal", "freertos"))
+                            choices=("native", "baremetal", "freertos", "threadx"))
         parser.add_argument("--clock", required=True)
     args = parser.parse_args(arguments)
     try:

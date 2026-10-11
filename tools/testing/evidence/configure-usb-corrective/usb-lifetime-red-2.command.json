@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/workspace/nexus/build/usb-config-model/bin/nexus_gd32_usb_factory_test",
+    "--gtest_output=xml:/workspace/nexus-config-iteration-evidence/usb-lifetime-gd32-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 1,
+  "log": "/workspace/nexus-config-iteration-evidence/usb-lifetime-red-2.log",
+  "sha256": "ea3b1c35a56a2e7ff545f6424d8c8a4ec405cc04dd7002880345bcdc55b40f09"
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-10-11T17:53:06.064" name="AllTests">
+  <testsuite name="UsbSoc" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-11T17:53:06.064">
+    <testcase name="RealRegisterFactsAndClockConsumerSurviveUntilDetach" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="96" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.064" classname="UsbSoc" />
+    <testcase name="ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="106" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.064" classname="UsbSoc" />
+    <testcase name="FalseCpuFactsRejectBeforeBorrowingTheClock" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="123" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.064" classname="UsbSoc" />
+    <testcase name="ForeignCoreIsNotReboundOrReset" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="129" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.064" classname="UsbSoc" />
+    <testcase name="FailedCoreResetKeepsClockAndOwnerStorage" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="136" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.064" classname="UsbSoc" />
+    <testcase name="FreshResetFailureCanBeStoppedWithoutDereferencingNullEndpoint" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="146" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.064" classname="UsbSoc" />
+    <testcase name="FreshFlushFailureRetainsClockUntilBoundedStopRetry" file="/workspace/nexus/tests/google/usb_device_soc_test.cpp" line="161" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.065" classname="UsbSoc" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,9 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import importlib.util,unittest; s=importlib.util.spec_from_file_location('sdk_contracts','/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); r=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(m)); raise SystemExit(not r.wasSuccessful())"
+  ],
+  "returncode": 1,
+  "scope": "Complete real development-fixture SDK, old frozen ThreadX CLI lacks installed-manifest path"
+}

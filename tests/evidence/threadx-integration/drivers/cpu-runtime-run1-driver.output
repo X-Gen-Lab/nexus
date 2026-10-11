@@ -1,0 +1,8 @@
++ cmake -S /workspace/nexus-threadx-probe/cpu-fixture -B /workspace/nexus-threadx-probe/cpu-integer-basepri -G Ninja -DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake -DNEXUS_RUNTIME_ASSEMBLY=/workspace/nexus-threadx-probe/cpu-assemblies/integer-basepri/runtime.toml
++ cmake --build /workspace/nexus-threadx-probe/cpu-integer-basepri --target threadx_cpu --parallel 1
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm --defined-only /workspace/nexus-threadx-probe/cpu-integer-basepri/threadx_cpu.elf
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-probe/cpu_execution.py", line 19, in <module>
+    if not any(line.split()[-1]==required for line in symbols.splitlines()):raise ValueError(required+' discarded')
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: SysTick_Handler discarded

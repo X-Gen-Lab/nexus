@@ -44,6 +44,32 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertTrue(assembly.endswith(".toml"), assembly)
 
 
+class SourceSDKThreadXSelectionTests(unittest.TestCase):
+    def test_threadx_dependency_snapshot_is_exact_reviewed_source_closure(self):
+        lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
+        selected = source_sdk.dependency_entries(ROOT, "ext/threadx")
+        self.assertEqual(set(selected), set(lock["files"]) | {lock["license"]["path"]})
+        self.assertEqual(len(selected), 215)
+        self.assertNotIn("ports/cortex_m7/gnu/src/tx_thread_schedule.S", selected)
+
+    def test_approved_origin_declaration_is_required_and_packaged(self):
+        self.assertTrue(source_sdk.selected(".gitmodules"))
+        self.assertIn(".gitmodules", source_sdk.REQUIRED_FILES)
+
+    def test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required(self):
+        lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
+        official = {"ext/threadx/" + name for name in lock["files"]}
+        official.add("ext/threadx/" + lock["license"]["path"])
+        owned = {"dependencies/threadx.lock.json", "tools/maintenance/threadx_lock.py",
+                 "tools/maintenance/source_catalogue.py", "tools/configure/threadx.py",
+                 "tools/configure/lowpower.py", "os/threadx/CMakeLists.txt",
+                 "os/threadx/Kernel.cmake", "os/threadx/threadx.c", "os/threadx/m4.c",
+                 "os/threadx/m4_vectors.S", "os/threadx/prepare_linux.py",
+                 "os/threadx/config/tx_user.h", "os/threadx/include/nexus/os/threadx.h"}
+        self.assertTrue((official | owned).issubset(set(source_sdk.REQUIRED_FILES)))
+        self.assertIn("ext/threadx", source_sdk.REQUIRED_DEPENDENCIES)
+
+
 class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK staged source ")
@@ -204,6 +230,66 @@ class SourceSDKTests(unittest.TestCase):
             self.assertNotIn("-DSTM32F407", command)
             self.assertNotIn("-DGD32F470", command)
 
+    def threadx_consumer(self, name, board, clock, *, arm):
+        source, build, arguments = consumer_gate.prepare_consumer(
+            self.prefix, self.directory, name, self.run_ok,
+            fixture=True, arm=arm)
+        (source / "CMakeLists.txt").write_text(
+            'cmake_minimum_required(VERSION 3.31)\n'
+            'project(installed_threadx_consumer LANGUAGES C ASM)\n'
+            'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+            'find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)\n'
+            'nexus_add_firmware(installed_threadx SOURCES main.c '
+            'LIBRARIES Nexus::OSThreadX)\n'
+            'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
+            'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n')
+        # The fixture deliberately retains a permanent owner task: link only.
+        shutil.copyfile(ROOT / "tests/contracts/os_threadx_runtime/main.c",
+                        source / "main.c")
+        assembly = source / "threadx.toml"
+        assembly.write_text(
+            f'schema = 2\nboard = "{board}"\nbackend = "threadx"\n'
+            f'clock = "{clock}"\noptimization = "Os"\n\n'
+            '[memory]\nmain_stack_bytes = 2048\n'
+            'flash_load_limit_bytes = 65536\n'
+            'static_ram_limit_bytes = 32768\nlibc_heap_bytes = 0\n')
+        arguments = [argument for argument in arguments
+                     if not argument.startswith("-DNEXUS_ASSEMBLY_FILE=")]
+        arguments.append(f"-DNEXUS_ASSEMBLY_FILE={assembly}")
+        self.run_ok(arguments)
+        self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
+        self.run_ok(["cmake", "--build", str(build), "--parallel", "4",
+                     "--target", "installed_threadx"])
+        commands = json.loads((build / "compile_commands.json").read_text())
+        product = [entry for entry in commands
+                   if Path(entry["file"]).resolve() == source / "main.c"]
+        self.assertEqual(len(product), 1)
+        for entry in commands:
+            self.assertNotIn(str(ROOT) + "/", entry["command"])
+        for private in ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470"):
+            self.assertNotIn(private, product[0]["command"])
+        if arm:
+            image = build / "bin/installed_threadx.elf"
+            resources = json.loads(
+                (build / "bin/installed_threadx.resources.json").read_text())
+            self.assertEqual(resources["status"], "passed")
+        else:
+            image = build / "bin/installed_threadx"
+        self.assertGreater(image.stat().st_size, 0)
+
+    def test_relocated_threadx_native_consumer_links_actual_official_kernel(self):
+        self.threadx_consumer("threadx native", "native_reference", "model",
+                              arm=False)
+
+    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
+    def test_relocated_threadx_three_board_consumers_link_actual_official_kernel(self):
+        for name, board, clock in (
+                ("qiming", "stm32f407_qiming_v31", "hse8-pll168"),
+                ("sky", "stm32f407ve_sky_qingchun", "hse8-pll168"),
+                ("liangshan", "gd32f470_liangshan", "hxtal25-pll200")):
+            with self.subTest(board=board):
+                self.threadx_consumer("threadx " + name, board, clock, arm=True)
+
     def test_fixture_requires_explicit_consumer_opt_in(self):
         self.assertFalse(self.identity["publishable"])
         _, _, result = self.consumer("fixture rejection", fixture=False)
@@ -296,6 +382,85 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(original_source)
                     identity.write_bytes(original_identity)
 
+    def test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        for name in ("ext/threadx/common/src/tx_thread_create.c",
+                     "ext/threadx/ports/linux/gnu/src/tx_timer_interrupt.c",
+                     "ext/threadx/ports/cortex_m4/gnu/src/tx_thread_schedule.S",
+                     "ext/threadx/common/inc/tx_api.h", "ext/threadx/LICENSE.txt",
+                     "os/threadx/Kernel.cmake", "tools/configure/threadx.py",
+                     "tools/maintenance/threadx_lock.py"):
+            with self.subTest(name=name):
+                target = self.sdk / name
+                old_source = target.read_bytes()
+                try:
+                    target.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("missing required sources/licenses", result.stderr)
+                finally:
+                    target.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+
+    def test_rehashed_threadx_wrong_commit_or_source_identity_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        try:
+            manifest = json.loads(old_identity)
+            next(x for x in manifest["dependencies"] if x["path"] == "ext/threadx")["commit"] = "a" * 40
+            identity.write_text(json.dumps(manifest) + "\n")
+            self.assertNotEqual(self.verify().returncode, 0)
+        finally:
+            identity.write_bytes(old_identity)
+        source = self.sdk / "ext/threadx/common/src/tx_thread_create.c"
+        old_source = source.read_bytes()
+        try:
+            source.write_bytes(old_source + b"\n/* unreviewed source */\n")
+            manifest = json.loads(old_identity)
+            manifest["files_sha256"][source.relative_to(self.sdk).as_posix()] = source_sdk.digest(source.read_bytes())
+            manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                manifest["files_sha256"], sort_keys=True, separators=(",", ":")).encode())
+            identity.write_text(json.dumps(manifest) + "\n")
+            self.assertNotEqual(self.verify().returncode, 0)
+        finally:
+            source.write_bytes(old_source)
+            identity.write_bytes(old_identity)
+
+    def test_installed_threadx_cli_does_not_write_into_readonly_sdk(self):
+        before = {p.relative_to(self.sdk).as_posix() for p in self.sdk.rglob("*") if p.is_file()}
+        command = [sys.executable, str(self.sdk / "tools/maintenance/threadx_lock.py"),
+                   "--source", str(self.sdk / "ext/threadx"),
+                   "--lock", str(self.sdk / "dependencies/threadx.lock.json"),
+                   "--port", "linux"]
+        result = self.run_process(command)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        after = {p.relative_to(self.sdk).as_posix() for p in self.sdk.rglob("*") if p.is_file()}
+        self.assertEqual(after, before)
+
+    def test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback(self):
+        command = [sys.executable, str(self.sdk / "tools/maintenance/threadx_lock.py"),
+                   "--source", str(self.sdk / "ext/threadx"),
+                   "--lock", str(self.sdk / "dependencies/threadx.lock.json"),
+                   "--port", "linux"]
+        result = self.run_process(command)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["source_kind"], "installed_source_sdk")
+        source = self.sdk / "ext/threadx/common/src/tx_thread_create.c"
+        old_source = source.read_bytes()
+        try:
+            source.write_bytes(b"corrupted")
+            result = self.run_process(command)
+            self.assertNotEqual(result.returncode, 0)
+        finally:
+            source.write_bytes(old_source)
+
     def test_additional_file_and_symlink_are_rejected(self):
         extra = self.sdk / "unexpected.c"
         try:
@@ -335,7 +500,8 @@ class SourceSDKTests(unittest.TestCase):
         repo.mkdir()
         self.run_ok(["git", "init", "--quiet", str(repo)])
         (repo / "README.md").write_text("source\n")
-        self.run_ok(["git", "-C", str(repo), "add", "README.md"])
+        (repo / ".gitmodules").write_bytes((ROOT / ".gitmodules").read_bytes())
+        self.run_ok(["git", "-C", str(repo), "add", "README.md", ".gitmodules"])
         self.run_ok(["git", "-C", str(repo), "-c", "user.name=SDK test", "-c", "user.email=sdk-test@local.invalid",
                      "commit", "--quiet", "-m", "fixture baseline"])
         result = self.run_process([sys.executable, "-B", str(ROOT / "cmake/package/package_source_sdk.py"),

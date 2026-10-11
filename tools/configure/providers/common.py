@@ -30,6 +30,7 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("usb_device", "device-fs"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
@@ -71,6 +72,13 @@ def mode_traits(kind, mode):
     if traits is None:
         fail(f"Unmaintained execution mode: {kind}/{mode}")
     return traits
+
+
+def kernel_policy_constant(result):
+    """Emit the configured kernel policy, not a physical CPU mask primitive."""
+    profile = result.get("kernel_profile")
+    return ("NX_IRQ_KERNEL_" + profile["kernel_policy"].upper()
+            if profile is not None else "NX_IRQ_KERNEL_NONE")
 
 
 def integer(value, minimum=0, maximum=UINT32_MAX, context="integer"):
@@ -168,6 +176,9 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "usb_device": {"event_capacity", "rx_fifo_words", "vbus_sensing",
+                       "poll_limit", "drain_timeout_us", "clock_timeout_us",
+                       "irq_priority", "calls_os"},
         "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
                 "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
         "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
@@ -179,7 +190,13 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    if kind == "can":
+    if kind == "usb_device":
+        try:
+            from .. import usb_device
+        except ImportError:
+            import usb_device
+        usb_device.validate_selection(selection, route, provider, ram_size)
+    elif kind == "can":
         try:
             from .. import can
         except ImportError:

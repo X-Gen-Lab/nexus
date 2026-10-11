@@ -2,9 +2,11 @@
 try:
     from .providers import maintained
     from .ir import ConfigurationIR
+    from .factory import interface_type
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
+    from factory import interface_type
 
 
 def symbol(name):
@@ -42,6 +44,9 @@ def emit(result):
               '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus_config.h"',
               '#include "nexus/arch/arch.h"']
+    source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
+               "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
+               "#endif"]
     source.extend(provider.includes(result))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
@@ -49,12 +54,13 @@ def emit(result):
     stop = []
     for item in selections:
         name = symbol(item.id)
-        exported_type = f"nx_{item.kind}_port_t"
+        exported_type = interface_type(item.kind, "port")
         header += ['/** \\brief Fixed static identity; lifecycle stays explicit. */',
                    f'extern const {exported_type}* const nx_binding_{name};']
         implementation = provider.implementation(item)
         prefix = provider.PREFIX
-        state_type = ("nx_can_controller_t" if item.kind == "can" else
+        state_type = ("nx_usb_controller_t" if item.kind == "usb_device" else
+                      "nx_can_controller_t" if item.kind == "can" else
                       f"nx_{prefix}_{implementation}_state_t")
         source += [f'static {state_type} s_nx_port_{name};',
                    f'static const {exported_type} s_nx_face_{name} = {{',
@@ -70,7 +76,8 @@ def emit(result):
     for device in result["devices"]:
         controller = next(item for item in selections if item["id"] == device["controller"])
         kind = controller["kind"]
-        header.append(f'extern const nx_{kind}_endpoint_t* const nx_device_{symbol(device["id"])};')
+        class_name = "usb_endpoint" if kind == "usb_device" else kind + "_device"
+        header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device["id"])};')
     source.extend(provider.shared_irqs(result))
     source += ['/** \\brief Stop only the initialized selected interfaces. */',
                'nx_result_t nx_platform_stop(void) {',
@@ -93,8 +100,8 @@ def emit(result):
     source.append("    s_nx_platform_started = true;")
     source.extend(provider.start_resources(result))
     for index, expression in enumerate(initialize):
-        if selections[index].kind == "can":
-            # Cold CAN failure may retain live hardware; include that instance
+        if selections[index].kind in {"can", "usb_device"}:
+            # Cold failure may retain live hardware; include that instance
             # in reverse cleanup before attempting initialization.
             source.append(f"    s_nx_platform_initialized = {index + 1}u;")
         source += [f'    result.primary = {expression};',

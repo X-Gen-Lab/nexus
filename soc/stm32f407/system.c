@@ -8,6 +8,9 @@
  */
 #include "nexus/core/time.h"
 #include "stm32f407_system.h"
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+#include "stm32f407_lowpower.h"
+#endif
 
 #ifndef NEXUS_STM32_MODEL
 nx_stm32_system_t g_nx_stm32_system = {
@@ -15,6 +18,10 @@ nx_stm32_system_t g_nx_stm32_system = {
 #endif
 
 extern nx_stm32_system_t g_nx_stm32_system;
+
+#ifndef NX_STM32_TIMEBASE_ACK
+#define NX_STM32_TIMEBASE_ACK(system, value) ((system)->timer->SR = (value))
+#endif
 
 /** \brief Read the unique fixed provider clock without an OS dependency. */
 nx_time_us_t nx_time_now_us(void) {
@@ -24,7 +31,14 @@ nx_time_us_t nx_time_now_us(void) {
 /** \brief Forward the explicitly reserved timer vector to the static context.
  */
 void TIM2_IRQHandler(void) {
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+#endif
     nx_stm32_system_timer_irq(&g_nx_stm32_system);
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+    nx_stm32_lowpower_alarm_irq();
+    nx_arch_irq_restore(saved);
+#endif
 }
 
 #ifndef NX_STM32_POLL
@@ -155,6 +169,11 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
         system->flash == NULL || poll_limit == 0U) {
         return -2;
     }
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+    if (nx_stm32_lowpower_busy()) {
+        return -1;
+    }
+#endif
 #ifndef NEXUS_STM32_MODEL
     NVIC_DisableIRQ(TIM2_IRQn);
     NVIC_ClearPendingIRQ(TIM2_IRQn);
@@ -171,7 +190,7 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
 void nx_stm32_system_timer_irq(nx_stm32_system_t* system) {
     if (system != NULL && system->started &&
         (system->timer->SR & TIM_SR_UIF) != 0U) {
-        system->timer->SR = ~(uint32_t)TIM_SR_UIF;
+        NX_STM32_TIMEBASE_ACK(system, ~(uint32_t)TIM_SR_UIF);
         system->overflow_us += (UINT64_C(1) << 32U);
     }
 }

@@ -427,6 +427,31 @@
         }
       ],
       "source": "STM32F407 datasheet alternate functions AF9; Qiming V3.1 CAN sample blobs ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa"
+    },
+    {
+      "id": "usbfs-pa11-pa12",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "OTG_FS",
+      "kind": "usb_device",
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "dm",
+          "af": 10
+        },
+        {
+          "pin": "PA12",
+          "function": "dp",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "device-fs"
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 AF10; RM0090 Rev21 OTG FS internal PHY. Pad route only, no PCB connector/electrical claim."
     }
   ]
 }

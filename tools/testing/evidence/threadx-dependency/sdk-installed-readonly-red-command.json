@@ -1,0 +1,10 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import importlib.util,unittest; s=importlib.util.spec_from_file_location('sdk_contracts','/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); r=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(m)); raise SystemExit(not r.wasSuccessful())"
+  ],
+  "returncode": 1,
+  "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+  "scope": "Complete SDK suite, oldCLI writes bytecode and lacks SDKmanifest proof; no test skips expected with actual toolchain PATH"
+}

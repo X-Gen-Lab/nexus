@@ -1,0 +1,4 @@
+#include "stm32f407_usb_clock.h"
+#include "gd32f470_usb_clock.h"
+const unsigned char nx_stm32_usb_clock_state_bytes[sizeof(nx_stm32_usb_clock_state_t)] = {0};
+const unsigned char nx_gd32_usb_clock_state_bytes[sizeof(nx_gd32_usb_clock_state_t)] = {0};

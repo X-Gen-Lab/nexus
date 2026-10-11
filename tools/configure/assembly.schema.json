@@ -1,6 +1,166 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "backend": {
+            "const": "freertos"
+          }
+        },
+        "required": [
+          "backend"
+        ]
+      },
+      "then": {
+        "properties": {
+          "os": {
+            "additionalProperties": false,
+            "properties": {
+              "counting_semaphores": {
+                "type": "boolean"
+              },
+              "idle_stack_words": {
+                "maximum": 65536,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "lowpower_port": {
+                "enum": [
+                  "custom",
+                  "timebase"
+                ]
+              },
+              "max_priorities": {
+                "maximum": 32,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_task_name_len": {
+                "maximum": 64,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "memory_protection": {
+                "type": "boolean"
+              },
+              "mutexes": {
+                "type": "boolean"
+              },
+              "notification_slots": {
+                "maximum": 8,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "profile": {
+                "enum": [
+                  "diagnostic",
+                  "lowpower",
+                  "minimal",
+                  "standard"
+                ]
+              },
+              "runtime_stats": {
+                "type": "boolean"
+              },
+              "secure_idle_stack_bytes": {
+                "maximum": 65536,
+                "minimum": 64,
+                "type": "integer"
+              },
+              "security_model": {
+                "enum": [
+                  "single",
+                  "split"
+                ]
+              },
+              "syscall_priority": {
+                "maximum": 255,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "system_call_stack_words": {
+                "maximum": 65536,
+                "minimum": 64,
+                "type": "integer"
+              },
+              "task_notifications": {
+                "type": "boolean"
+              },
+              "tick_hz": {
+                "maximum": 1000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "tick_source": {
+                "enum": [
+                  "external",
+                  "systick"
+                ]
+              },
+              "tickless": {
+                "type": "boolean"
+              },
+              "trace": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "backend": {
+            "const": "threadx"
+          }
+        },
+        "required": [
+          "backend"
+        ]
+      },
+      "then": {
+        "properties": {
+          "os": {
+            "additionalProperties": false,
+            "properties": {
+              "interrupt_mask": {
+                "enum": [
+                  "none",
+                  "basepri",
+                  "primask"
+                ]
+              },
+              "max_priorities": {
+                "const": 32
+              },
+              "syscall_priority": {
+                "maximum": 255,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "tick_hz": {
+                "maximum": 1000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "tick_source": {
+                "enum": [
+                  "host",
+                  "systick",
+                  "external"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
   "oneOf": [
     {
       "not": {
@@ -105,7 +265,8 @@
       "enum": [
         "native",
         "baremetal",
-        "freertos"
+        "freertos",
+        "threadx"
       ],
       "type": "string"
     },
@@ -482,91 +643,134 @@
       "type": "string"
     },
     "os": {
-      "additionalProperties": false,
-      "properties": {
-        "counting_semaphores": {
-          "type": "boolean"
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "counting_semaphores": {
+              "type": "boolean"
+            },
+            "idle_stack_words": {
+              "maximum": 65536,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "lowpower_port": {
+              "enum": [
+                "custom",
+                "timebase"
+              ]
+            },
+            "max_priorities": {
+              "maximum": 32,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "max_task_name_len": {
+              "maximum": 64,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "memory_protection": {
+              "type": "boolean"
+            },
+            "mutexes": {
+              "type": "boolean"
+            },
+            "notification_slots": {
+              "maximum": 8,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "profile": {
+              "enum": [
+                "diagnostic",
+                "lowpower",
+                "minimal",
+                "standard"
+              ]
+            },
+            "runtime_stats": {
+              "type": "boolean"
+            },
+            "secure_idle_stack_bytes": {
+              "maximum": 65536,
+              "minimum": 64,
+              "type": "integer"
+            },
+            "security_model": {
+              "enum": [
+                "single",
+                "split"
+              ]
+            },
+            "syscall_priority": {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "system_call_stack_words": {
+              "maximum": 65536,
+              "minimum": 64,
+              "type": "integer"
+            },
+            "task_notifications": {
+              "type": "boolean"
+            },
+            "tick_hz": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "tick_source": {
+              "enum": [
+                "external",
+                "systick"
+              ]
+            },
+            "tickless": {
+              "type": "boolean"
+            },
+            "trace": {
+              "type": "boolean"
+            }
+          },
+          "type": "object"
         },
-        "idle_stack_words": {
-          "maximum": 65536,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "max_priorities": {
-          "maximum": 32,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "max_task_name_len": {
-          "maximum": 64,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "memory_protection": {
-          "type": "boolean"
-        },
-        "mutexes": {
-          "type": "boolean"
-        },
-        "notification_slots": {
-          "maximum": 8,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "profile": {
-          "enum": [
-            "diagnostic",
-            "lowpower",
-            "minimal",
-            "standard"
-          ]
-        },
-        "runtime_stats": {
-          "type": "boolean"
-        },
-        "secure_idle_stack_bytes": {
-          "maximum": 65536,
-          "minimum": 64,
-          "type": "integer"
-        },
-        "security_model": {
-          "enum": [
-            "single",
-            "split"
-          ]
-        },
-        "syscall_priority": {
-          "maximum": 255,
-          "minimum": 0,
-          "type": "integer"
-        },
-        "system_call_stack_words": {
-          "maximum": 65536,
-          "minimum": 64,
-          "type": "integer"
-        },
-        "task_notifications": {
-          "type": "boolean"
-        },
-        "tick_hz": {
-          "maximum": 1000000,
-          "minimum": 1,
-          "type": "integer"
-        },
-        "tick_source": {
-          "enum": [
-            "external",
-            "systick"
-          ]
-        },
-        "tickless": {
-          "type": "boolean"
-        },
-        "trace": {
-          "type": "boolean"
+        {
+          "additionalProperties": false,
+          "properties": {
+            "interrupt_mask": {
+              "enum": [
+                "none",
+                "basepri",
+                "primask"
+              ]
+            },
+            "max_priorities": {
+              "const": 32
+            },
+            "syscall_priority": {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "tick_hz": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "tick_source": {
+              "enum": [
+                "host",
+                "systick",
+                "external"
+              ]
+            }
+          },
+          "type": "object"
         }
-      },
-      "type": "object"
+      ]
     },
     "pwm": {
       "additionalProperties": {
@@ -730,6 +934,107 @@
         "required": [
           "binding",
           "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "usb_device": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "clock_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "drain_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "event_capacity": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "poll_limit": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rx_fifo_words": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "vbus_sensing": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "usb_endpoint": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "controller": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "in",
+              "out"
+            ]
+          },
+          "fifo_words": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "max_packet": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "number": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "transfer": {
+            "enum": [
+              "control",
+              "bulk"
+            ]
+          }
+        },
+        "required": [
+          "controller",
+          "direction",
+          "max_packet",
+          "number",
+          "transfer"
         ],
         "type": "object"
       },

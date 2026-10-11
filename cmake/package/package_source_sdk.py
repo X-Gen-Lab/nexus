@@ -15,16 +15,33 @@ import subprocess
 import sys
 import tempfile
 
-sys.dont_write_bytecode = True
+class SDKError(ValueError):
+    pass
 
-ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md",
+
+sys.dont_write_bytecode = True
+SOURCE_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(SOURCE_ROOT))
+try:
+    from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
+    from tools.maintenance import threadx_lock
+    from tools.configure.metadata import parse_json, snapshot
+except ImportError as error:
+    # Missing verifier modules are an incomplete SDK, including after an
+    # attacker rehashes the payload map. Never accept a reduced checker graph.
+    message = "missing required sources/licenses (source verifier dependencies)"
+    if __name__ == "__main__":
+        print("Source SDK rejected: " + message, file=sys.stderr)
+        raise SystemExit(1) from error
+    raise SDKError(message) from error
+
+ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodules",
               ".clang-format", ".editorconfig", ".clang-format-dirs"}
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
              "components", "tools", "scripts", "soc"}
-REQUIRED_DEPENDENCIES = ("ext/freertos", "vendors/arm/CMSIS_5",
-                         "vendors/st/cmsis_device_f4")
+REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
 REQUIRED_FILES = (
-    "CMakeLists.txt", "LICENSE", "dependencies/toolchains.lock.json",
+    "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
     "arch/include/nexus/arch/arch.h", "arch/cortex_m/nx_arch_cortex_m.c",
     "arch/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
@@ -133,12 +150,21 @@ REQUIRED_FILES += tuple(f"ext/freertos/include/{name}" for name in (
     "projdefs.h", "stack_macros.h", "mpu_prototypes.h", "mpu_wrappers.h",
     "mpu_syscall_numbers.h", "deprecated_definitions.h", "timers.h",
     "event_groups.h", "stream_buffer.h"))
+REQUIRED_FILES += (
+    "dependencies/threadx.lock.json", "tools/maintenance/threadx_lock.py",
+    "tools/maintenance/source_catalogue.py", "tools/configure/threadx.py",
+    "tools/configure/lowpower.py", "os/threadx/CMakeLists.txt",
+    "os/threadx/Kernel.cmake", "os/threadx/threadx.c", "os/threadx/m4.c",
+    "os/threadx/m4_vectors.S", "os/threadx/prepare_linux.py",
+    "os/threadx/config/tx_user.h", "os/threadx/include/nexus/os/threadx.h")
+# The reviewed lock remains the one ThreadX graph authority. Rehashed SDK
+# omissions cannot remove required kernel payloads from a different file map.
+_threadx_lock = parse_json((SOURCE_ROOT / "dependencies/threadx.lock.json").read_bytes())
+threadx_lock.contract(_threadx_lock)
+REQUIRED_FILES += tuple("ext/threadx/" + name for name in _threadx_lock["files"])
+REQUIRED_FILES += ("ext/threadx/" + _threadx_lock["license"]["path"],)
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
-
-
-class SDKError(ValueError):
-    pass
 
 
 def digest(data):
@@ -193,6 +219,19 @@ def tree_entries(root):
     return entries
 
 
+def dependency_entries(root, dependency):
+    """Keep ThreadX redistribution inside its reviewed source/notice closure."""
+    entries = tree_entries(root / dependency)
+    if dependency == "ext/threadx":
+        raw, _ = snapshot(root / "dependencies/threadx.lock.json")
+        lock = parse_json(raw)
+        names = threadx_lock.contract(lock) | {lock["license"]["path"]}
+        if not names.issubset(entries):
+            raise SDKError("ThreadX committed source graph is incomplete")
+        entries = {name: entries[name] for name in names}
+    return entries
+
+
 def selected(name):
     # Host test frameworks never become firmware source dependencies. Their
     # reviewed lock stays in the SDK provenance, without host-only payloads.
@@ -219,6 +258,7 @@ def snapshot_files(source, entries, development_fixture=False):
 
 
 def dependency_records(root, entries):
+    declared_modules(regular(root, ".gitmodules").read_bytes())
     records = []
     for dep in REQUIRED_DEPENDENCIES:
         row = entries.get(dep)
@@ -300,6 +340,7 @@ def prepare(source, output, development_fixture=False):
         raise SDKError("Publishable source SDK preparation rejects a dirty source checkout")
     entries = tree_entries(source)
     dependencies = dependency_records(source, entries)
+    threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
     sys.path.insert(0, str(source / "scripts/ci"))
     from vendor_import_identity import reviewed_import
     imports = [reviewed_import(source / "vendors/gigadevice/gd32f4xx", source)]
@@ -321,7 +362,7 @@ def prepare(source, output, development_fixture=False):
                                     entry[0] == "100755" if entry else None)
         for record in dependencies:
             dep = record["path"]
-            dep_entries = tree_entries(source / dep)
+            dep_entries = dependency_entries(source, dep)
             blobs = committed_blobs(source / dep, {name: row for name, row in dep_entries.items() if row[1] == "blob"})
             for name, (mode, kind, blob) in dep_entries.items():
                 if kind == "commit":
@@ -421,6 +462,10 @@ def verify(root):
         paths.add(path)
     if not set(REQUIRED_DEPENDENCIES).issubset(paths):
         raise SDKError("Source SDK dependency set is incomplete")
+    declared_modules(regular(root, ".gitmodules").read_bytes())
+    threadx = next(record for record in records if record["path"] == "ext/threadx")
+    threadx_lock.verify(root / "ext/threadx", root / "dependencies/threadx.lock.json",
+                        "linux", packaged_commit=threadx["commit"])
     sys.path.insert(0, str(root / "scripts/ci"))
     from vendor_import_identity import validate_import_record
     imports = identity["reviewed_imports"]

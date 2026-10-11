@@ -1,0 +1,369 @@
+{
+  "bindings": {
+    "path": "/workspace/nexus-config-iteration-evidence/usb-arm-corrective-green/stm32-ve-freertos/nexus-sdk/generated/bindings.c",
+    "sha256": "d686600540b00e1d90889a82e6cb70054a47b61424f53095be895e9cdb7ec3bf",
+    "size": 15440
+  },
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/usb-arm-corrective-green/stm32-ve-freertos/bin/usb_controller_fixture.elf",
+    "sha256": "7852543f75c60b113e23344c9d43523ef2bac810645c485f722e48ec2efc217a",
+    "size": 27448
+  },
+  "face_count": 5,
+  "faces": [
+    {
+      "address": 134227812,
+      "context": "s_nx_port_fs",
+      "name": "s_nx_face_fs",
+      "operations": "nx_usb_fs_device_ops",
+      "type": "nx_usb_device_port_t"
+    },
+    {
+      "address": 134227804,
+      "context": "s_nx_usb_endpoints_fs[0]",
+      "context_array_count": 4,
+      "context_element_bytes": 40,
+      "context_index": 0,
+      "context_offset": 0,
+      "context_symbol": "s_nx_usb_endpoints_fs",
+      "name": "s_nx_device_face_control_in",
+      "operations": "nx_usb_fs_endpoint_ops",
+      "type": "nx_usb_endpoint_port_t"
+    },
+    {
+      "address": 134227796,
+      "context": "s_nx_usb_endpoints_fs[1]",
+      "context_array_count": 4,
+      "context_element_bytes": 40,
+      "context_index": 1,
+      "context_offset": 40,
+      "context_symbol": "s_nx_usb_endpoints_fs",
+      "name": "s_nx_device_face_control_out",
+      "operations": "nx_usb_fs_endpoint_ops",
+      "type": "nx_usb_endpoint_port_t"
+    },
+    {
+      "address": 134227788,
+      "context": "s_nx_usb_endpoints_fs[2]",
+      "context_array_count": 4,
+      "context_element_bytes": 40,
+      "context_index": 2,
+      "context_offset": 80,
+      "context_symbol": "s_nx_usb_endpoints_fs",
+      "name": "s_nx_device_face_bulk_in",
+      "operations": "nx_usb_fs_endpoint_ops",
+      "type": "nx_usb_endpoint_port_t"
+    },
+    {
+      "address": 134227780,
+      "context": "s_nx_usb_endpoints_fs[3]",
+      "context_array_count": 4,
+      "context_element_bytes": 40,
+      "context_index": 3,
+      "context_offset": 120,
+      "context_symbol": "s_nx_usb_endpoints_fs",
+      "name": "s_nx_device_face_bulk_out",
+      "operations": "nx_usb_fs_endpoint_ops",
+      "type": "nx_usb_endpoint_port_t"
+    }
+  ],
+  "kind": "linked_provider_retention",
+  "limitations": [
+    "Actual linked face/table/function bytes only; not execution, electrical or timing evidence."
+  ],
+  "method_count": 9,
+  "operations_table_count": 2,
+  "physical_status": "not_executed",
+  "public_contracts": [
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc.h",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1",
+      "size": 9218
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc_observer.h",
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788",
+      "size": 4193
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/advanced_pwm.h",
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410",
+      "size": 3514
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/can.h",
+      "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084",
+      "size": 7325
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b",
+      "size": 4114
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/ethernet.h",
+      "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6",
+      "size": 7906
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/exti.h",
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6",
+      "size": 4106
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/flash.h",
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c",
+      "size": 6868
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/gpio.h",
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778",
+      "size": 2676
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3",
+      "size": 9481
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f",
+      "size": 8046
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/mdio.h",
+      "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636",
+      "size": 2150
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+      "size": 11660
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/stream.h",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a",
+      "size": 11194
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/stream_budget.h",
+      "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a",
+      "size": 3252
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/timer.h",
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a",
+      "size": 3191
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/timer_capture.h",
+      "sha256": "68af76fbd4961d6fd9fd2a158cbdb4f2e0e04562e1996e5c02c8035a25269816",
+      "size": 3958
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/uart.h",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc",
+      "size": 10872
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/uart_rs485.h",
+      "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e",
+      "size": 3247
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/usb_device.h",
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e",
+      "size": 8447
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/wake.h",
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9",
+      "size": 3440
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/watchdog.h",
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c",
+      "size": 3724
+    }
+  ],
+  "schema_version": 1,
+  "status": "passed",
+  "tables": [
+    {
+      "address": 134227832,
+      "bytes": 24,
+      "methods": [
+        {
+          "address": 134226997,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "service"
+            }
+          ],
+          "name": "service",
+          "slot": 0,
+          "symbols": [
+            "service"
+          ]
+        },
+        {
+          "address": 134221609,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "read_events"
+            }
+          ],
+          "name": "read_events",
+          "slot": 1,
+          "symbols": [
+            "read_events"
+          ]
+        },
+        {
+          "address": 134221529,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "state"
+            }
+          ],
+          "name": "state",
+          "slot": 2,
+          "symbols": [
+            "state"
+          ]
+        },
+        {
+          "address": 134222389,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "address"
+            }
+          ],
+          "name": "address",
+          "slot": 3,
+          "symbols": [
+            "address"
+          ]
+        },
+        {
+          "address": 134222209,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "attach_wake"
+            }
+          ],
+          "name": "attach_wake",
+          "slot": 4,
+          "symbols": [
+            "attach_wake"
+          ]
+        },
+        {
+          "address": 134226433,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "stop"
+            }
+          ],
+          "name": "stop",
+          "slot": 5,
+          "symbols": [
+            "stop"
+          ]
+        }
+      ],
+      "name": "nx_usb_fs_device_ops",
+      "null_methods": 0,
+      "slots": [
+        "service",
+        "read_events",
+        "state",
+        "address",
+        "attach_wake",
+        "stop"
+      ],
+      "source": {
+        "path": "/workspace/nexus/io/src/usb_device_controller.c",
+        "sha256": "94ce3e0fed2adaa1e66483fd880378838740b434989b2e82683161cbdd8298b4",
+        "size": 45743
+      },
+      "type": "nx_usb_device_ops_t"
+    },
+    {
+      "address": 134227856,
+      "bytes": 12,
+      "methods": [
+        {
+          "address": 134222589,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "submit"
+            }
+          ],
+          "name": "submit",
+          "slot": 0,
+          "symbols": [
+            "submit"
+          ]
+        },
+        {
+          "address": 134226361,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "cancel"
+            }
+          ],
+          "name": "cancel",
+          "slot": 1,
+          "symbols": [
+            "cancel"
+          ]
+        },
+        {
+          "address": 134223169,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "usb_device_controller.c",
+              "name": "stall"
+            }
+          ],
+          "name": "stall",
+          "slot": 2,
+          "symbols": [
+            "stall"
+          ]
+        }
+      ],
+      "name": "nx_usb_fs_endpoint_ops",
+      "null_methods": 0,
+      "slots": [
+        "submit",
+        "cancel",
+        "stall"
+      ],
+      "source": {
+        "path": "/workspace/nexus/io/src/usb_device_controller.c",
+        "sha256": "94ce3e0fed2adaa1e66483fd880378838740b434989b2e82683161cbdd8298b4",
+        "size": 45743
+      },
+      "type": "nx_usb_endpoint_ops_t"
+    }
+  ]
+}

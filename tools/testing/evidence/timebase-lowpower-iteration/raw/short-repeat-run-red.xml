@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="19" failures="3" disabled="0" errors="0" time="0." timestamp="2026-10-11T18:50:56.929" name="AllTests">
+  <testsuite name="TimebaseLowpower" tests="19" failures="3" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T18:50:56.929">
+    <testcase name="PendingTickRejectsWithoutChangingSource" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="60" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="CapturePreservesFractionAndHasADeclaredSampleBound" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="68" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="PendingArrivalDuringDisableRollsBackControl" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="77" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="ExcessiveOrReversedSampleWindowRejects" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="86" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="ReversedSampleIsRejectedWithPeriodicSourceRestored" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="95" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="FailedRejectedPauseRollbackCannotForgetStoppedSource" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower">
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:108&#x0A;Expected: nx_timebase_pause_tick(&amp;context, &amp;out) throws an exception of type std::runtime_error.&#x0A;  Actual: it throws nothing.&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:108
+Expected: nx_timebase_pause_tick(&context, &out) throws an exception of type std::runtime_error.
+  Actual: it throws nothing.
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:109&#x0A;Value of: context.paused&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:109
+Value of: context.paused
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="AlarmUsesAbsoluteLowWordAcrossCounterWrap" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="113" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="ExpiredAndOverHorizonAlarmsHaveNoEffects" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="122" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="LateArmRejectsAndPreservesOverflow" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="131" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="DisarmNeverStealsSharedOverflowFlag" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="139" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="FailedInterruptDisableCannotResumeAndForgetOwnership" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="148" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="FirstCounterConsumesShortLoadBeforeFutureFullReload" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="156" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.929" classname="TimebaseLowpower" />
+    <testcase name="ASecondPauseCannotTreatTheShortCounterAsAFullPeriod" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="170" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower">
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:176&#x0A;Expected equality of these values:&#x0A;  nx_timebase_pause_tick(&amp;context, &amp;out)&#x0A;    Which is: 0&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:176
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &out)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:177&#x0A;Expected equality of these values:&#x0A;  writes&#x0A;    Which is: 6&#x0A;  prior&#x0A;    Which is: 5&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:177
+Expected equality of these values:
+  writes
+    Which is: 6
+  prior
+    Which is: 5
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:178&#x0A;Expected equality of these values:&#x0A;  out.time_us&#x0A;    Which is: 1000&#x0A;  77U&#x0A;    Which is: 77&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:178
+Expected equality of these values:
+  out.time_us
+    Which is: 1000
+  77U
+    Which is: 77
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:179&#x0A;Expected equality of these values:&#x0A;  control&#x0A;    Which is: 6&#x0A;  7U&#x0A;    Which is: 7&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:179
+Expected equality of these values:
+  control
+    Which is: 6
+  7U
+    Which is: 7
+]]></failure>
+    </testcase>
+    <testcase name="NearZeroRemainderQuantizationAddsAtMostOneMicrosecond" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="181" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower" />
+    <testcase name="UnprovenReloadIsAnExplicitRetainedFault" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="189" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower" />
+    <testcase name="FailedPeriodicIRQRestoreRemainsARetainedFault" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="196" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower">
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:199&#x0A;Expected: nx_timebase_resume_tick(&amp;context, now + 10U) throws an exception of type std::runtime_error.&#x0A;  Actual: it throws nothing.&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:199
+Expected: nx_timebase_resume_tick(&context, now + 10U) throws an exception of type std::runtime_error.
+  Actual: it throws nothing.
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/timebase_lowpower_test.cpp:200&#x0A;Value of: context.paused&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timebase_lowpower_test.cpp:200
+Value of: context.paused
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="ShortUnderflowDuringFullLoadRestoreCannotBeAccepted" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="203" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower" />
+    <testcase name="AlarmDispatchClearsOnlyTheReservedCompareSource" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="210" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower" />
+    <testcase name="TickHandlerRestoresFullPeriodBeforeKernelDispatch" file="/workspace/nexus/tests/google/timebase_lowpower_test.cpp" line="220" status="run" result="completed" time="0." timestamp="2026-10-11T18:50:56.930" classname="TimebaseLowpower" />
+  </testsuite>
+</testsuites>

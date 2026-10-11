@@ -1,0 +1,15 @@
+test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (sdk_contracts.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required) ... ok
+test_approved_origin_declaration_is_required_and_packaged (sdk_contracts.SourceSDKThreadXSelectionTests.test_approved_origin_declaration_is_required_and_packaged) ... FAIL
+
+======================================================================
+FAIL: test_approved_origin_declaration_is_required_and_packaged (sdk_contracts.SourceSDKThreadXSelectionTests.test_approved_origin_declaration_is_required_and_packaged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 53, in test_approved_origin_declaration_is_required_and_packaged
+    self.assertTrue(source_sdk.selected(".gitmodules"))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.001s
+
+FAILED (failures=1)

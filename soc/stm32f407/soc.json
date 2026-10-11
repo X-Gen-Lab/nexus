@@ -387,6 +387,28 @@
         "PB12",
         "PB13"
       ]
+    },
+    "OTG_FS": {
+      "kind": "usb_device",
+      "modes": [
+        "device-fs"
+      ],
+      "irq": [
+        "OTG_FS"
+      ],
+      "pins": [
+        "PA11",
+        "PA12"
+      ],
+      "resources": [
+        "clock:USBFS48"
+      ],
+      "irq_numbers": [
+        67
+      ],
+      "clock_hz": 48000000,
+      "fifo_words": 320,
+      "endpoint_numbers": 4
     }
   },
   "reserved_resources": [

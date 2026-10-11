@@ -12,7 +12,7 @@ foreach(required "${stm32_device}/Include/stm32f407xx.h"
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 set(stm32_sources)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
         continue()
@@ -23,7 +23,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
         list(APPEND stm32_sources "drivers/${kind}.c")
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device)$")
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
@@ -46,6 +46,9 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
             list(APPEND stm32_sources drivers/i2c_async.c
                 "${CMAKE_CURRENT_SOURCE_DIR}/../common/i2c_v1_async.c")
         endif()
+    elseif(kind STREQUAL "usb_device")
+        list(APPEND stm32_sources usb_clock.c
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/usb_device_controller.c")
     elseif(kind STREQUAL "can")
         list(APPEND stm32_sources "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/can_controller.c")
     elseif(kind STREQUAL "adc")
@@ -66,7 +69,7 @@ if(stm32_sources)
     target_include_directories(nexus_soc_stm32f407 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
         "${CMAKE_CURRENT_SOURCE_DIR}/../common"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../io/private")
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../io/private")
     target_include_directories(nexus_soc_stm32f407 SYSTEM PRIVATE
         "${stm32_device}/Include" "${stm32_cmsis}")
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)
@@ -88,15 +91,35 @@ function(nexus_add_stm32f407_sleep target)
     if(NOT ARGC EQUAL 1 OR TARGET "${target}")
         message(FATAL_ERROR "Sleep target requires one unused target name")
     endif()
+    get_filename_component(sleep_source
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
     add_library(${target} STATIC EXCLUDE_FROM_ALL
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c")
     target_link_libraries(${target} PRIVATE Nexus::ClockDomain Nexus::Arch
         nexus_build_options nexus_owned_warnings)
     target_include_directories(${target} PRIVATE
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/private"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+        "${sleep_source}/components/clock_domain/private")
     target_include_directories(${target} SYSTEM PRIVATE
-        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
-        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+        "${sleep_source}/vendors/st/cmsis_device_f4/Include"
+        "${sleep_source}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
     target_compile_definitions(${target} PRIVATE STM32F407xx)
 endfunction()
+
+# The explicitly selected getter and SysTick entry must precede weak archives.
+if(NEXUS_OS_TIMEBASE_LOWPOWER)
+    add_library(nx_stm32f407_lowpower_binding OBJECT timebase_lowpower.c)
+    target_link_libraries(nx_stm32f407_lowpower_binding PRIVATE
+        Nexus::OSFreeRTOS Nexus::Arch nexus_build_options nexus_owned_warnings)
+    target_include_directories(nx_stm32f407_lowpower_binding PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/private"
+        "${NEXUS_SOURCE_DIR}/os/freertos/private")
+    target_include_directories(nx_stm32f407_lowpower_binding SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    target_compile_definitions(nx_stm32f407_lowpower_binding PRIVATE STM32F407xx)
+    target_sources(nexus_soc_stm32f407 INTERFACE
+        $<TARGET_OBJECTS:nx_stm32f407_lowpower_binding>)
+    set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32F407xx
+        NEXUS_TIMEBASE_LOWPOWER=1 PARENT_SCOPE)
+endif()

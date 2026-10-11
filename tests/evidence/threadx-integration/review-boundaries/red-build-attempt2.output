@@ -1,0 +1,13 @@
+[1/8] Building CXX object CMakeFiles/threadx_probe.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o
+FAILED: [code=1] CMakeFiles/threadx_probe.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o 
+/usr/bin/c++ -DTX_INCLUDE_USER_DEFINE_FILE -D_GNU_SOURCE -DTX_LINUX_DEBUG_ENABLE -I/workspace/nexus/os/threadx/include -I/workspace/nexus/core/include -I/workspace/nexus/os/include -I/workspace/nexus/arch/include -isystem /workspace/nexus-threadx-probe/threadx/ports/linux/gnu/inc -isystem /workspace/nexus-threadx-probe/threadx/common/inc -isystem /workspace/nexus-threadx-probe/build/threadx/custom_inc -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -g -Wall -Wextra -Werror -MD -MT CMakeFiles/threadx_probe.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o -MF CMakeFiles/threadx_probe.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o.d -o CMakeFiles/threadx_probe.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o -c /workspace/nexus/tests/google/threadx_admission_test.cpp
+/workspace/nexus/tests/google/threadx_admission_test.cpp: In member function ‘virtual void {anonymous}::ThreadXAdmission_QueuePayloadCannotOverlapControl_Test::TestBody()’:
+/workspace/nexus/tests/google/threadx_admission_test.cpp:18:8: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+   18 |     if (result == NX_SUCCESS)
+      |        ^
+/workspace/nexus/tests/google/threadx_admission_test.cpp: In member function ‘virtual void {anonymous}::ThreadXAdmission_WrappedPayloadRangeHasNoKernelEffects_Test::TestBody()’:
+/workspace/nexus/tests/google/threadx_admission_test.cpp:38:8: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+   38 |     if (result == NX_SUCCESS)
+      |        ^
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.

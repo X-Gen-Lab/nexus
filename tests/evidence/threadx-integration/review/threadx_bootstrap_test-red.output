@@ -1,0 +1,56 @@
+Running main() from /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from ThreadXBootstrap
+[ RUN      ] ThreadXBootstrap.RejectsISRCallbackBeforeProduct
+/workspace/nexus/tests/google/threadx_bootstrap_test.cpp:26: Failure
+Death test: enter(1)
+    Result: died but not with expected exit code:
+            Exited with exit status 65
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] ThreadXBootstrap.RejectsISRCallbackBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.RejectsUnprivilegedCallbackBeforeProduct
+/workspace/nexus/tests/google/threadx_bootstrap_test.cpp:29: Failure
+Death test: enter(2)
+    Result: died but not with expected exit code:
+            Exited with exit status 65
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] ThreadXBootstrap.RejectsUnprivilegedCallbackBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.RejectsFaultMaskBeforeProduct
+/workspace/nexus/tests/google/threadx_bootstrap_test.cpp:32: Failure
+Death test: enter(3)
+    Result: died but not with expected exit code:
+            Exited with exit status 65
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] ThreadXBootstrap.RejectsFaultMaskBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.RejectsUnselectedBasepriBeforeProduct
+/workspace/nexus/tests/google/threadx_bootstrap_test.cpp:35: Failure
+Death test: enter(4)
+    Result: died but not with expected exit code:
+            Exited with exit status 65
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] ThreadXBootstrap.RejectsUnselectedBasepriBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.CanonicalUnmaskedCallbackInvokesProduct
+[       OK ] ThreadXBootstrap.CanonicalUnmaskedCallbackInvokesProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.CanonicalPrimaskCallbackInvokesProduct
+[       OK ] ThreadXBootstrap.CanonicalPrimaskCallbackInvokesProduct (0 ms)
+[----------] 6 tests from ThreadXBootstrap (2 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (2 ms total)
+[  PASSED  ] 2 tests.
+[  FAILED  ] 4 tests, listed below:
+[  FAILED  ] ThreadXBootstrap.RejectsISRCallbackBeforeProduct
+[  FAILED  ] ThreadXBootstrap.RejectsUnprivilegedCallbackBeforeProduct
+[  FAILED  ] ThreadXBootstrap.RejectsFaultMaskBeforeProduct
+[  FAILED  ] ThreadXBootstrap.RejectsUnselectedBasepriBeforeProduct
+
+ 4 FAILED TESTS

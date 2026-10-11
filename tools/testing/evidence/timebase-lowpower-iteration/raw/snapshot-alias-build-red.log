@@ -1,0 +1,2 @@
+[1/2] Building CXX object tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/timebase_lowpower_test.cpp.o
+[2/2] Linking CXX executable bin/nexus_timebase_lowpower_test

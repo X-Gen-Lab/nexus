@@ -27,7 +27,7 @@ runs:
     - name: Initialize selected vendor and scheduler sources
       shell: bash
       run: |
-        git submodule update --init --recursive ext/freertos vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4
+        git submodule update --init --recursive ext/freertos ext/threadx vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4
     - name: Install the locked ARM compiler
       if: inputs.arm == 'true'
       shell: bash

@@ -55,6 +55,7 @@ python tools/maintenance/capabilities.py --write
 | gd32f470 | USART0 | uart | rx-dma-idle | `usart0-pa9-pa10` | `gd32f470zg-liangshan` | `tests/contracts/gd32_assembly/rx-dma-idle.toml` | `soc/gd32f470/drivers/uart_receive.c` |
 | gd32f470 | USART1 | uart | irq-blocks | `usart1-pa2-pa3` | — | `tests/contracts/gd32_assembly/blocks.toml` | `soc/gd32f470/drivers/uart_stream.c` |
 | gd32f470 | USART1 | uart | irq-byte-event | `usart1-pa2-pa3` | — | `tests/contracts/gd32_assembly/dma.toml`, `tests/contracts/gd32_assembly/multi.toml` | `soc/gd32f470/drivers/uart.c` |
+| gd32f470 | USBFS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/gd32.toml` | `io/src/usb_device_controller.c` |
 | stm32f407 | ADC1 | adc | low-rate-scan | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-adc-scan.toml`, `tests/contracts/stm32_assembly/zg-adc-scan.toml` | `soc/stm32f407/drivers/adc.c` |
 | stm32f407 | ADC1 | adc | single-shot | `adc1-ch0-pa0` | — | `tests/contracts/stm32_assembly/ve-adc.toml`, `tests/contracts/stm32_assembly/zg-adc.toml` | `soc/stm32f407/drivers/adc.c` |
 | stm32f407 | ADC1 | adc | trigger-dma | `adc1-ch0-pa0`, `adc1-scan-pa0-pa1` | — | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml` | `soc/stm32f407/drivers/adc_stream.c` |
@@ -77,6 +78,7 @@ python tools/maintenance/capabilities.py --write
 | stm32f407 | I2C1 | i2c | irq-messages | `i2c1-pb6-pb7` | — | `tests/contracts/stm32_assembly/zg-i2c-irq.toml` | `soc/common/i2c_v1_async.c` |
 | stm32f407 | I2C1 | i2c | poll-messages | `i2c1-pb6-pb7` | — | `tests/contracts/stm32_assembly/ve-i2c.toml`, `tests/contracts/stm32_assembly/zg-i2c.toml` | `soc/stm32f407/drivers/i2c.c` |
 | stm32f407 | IWDG | watchdog | independent | `iwdg` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31` | `tests/contracts/stm32_assembly/ve-watchdog.toml`, `tests/contracts/stm32_assembly/zg-watchdog.toml` | `soc/stm32f407/drivers/watchdog.c` |
+| stm32f407 | OTG_FS | usb_device | device-fs | `usbfs-pa11-pa12` | — | `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg.toml` | `io/src/usb_device_controller.c` |
 | stm32f407 | SPI1 | spi | dma | `spi1-pa5-pa6-pa7` | — | `tests/contracts/stm32_assembly/ve-blocks.toml`, `tests/contracts/stm32_assembly/ve-dma.toml`, `tests/contracts/stm32_assembly/zg-blocks.toml`, `tests/contracts/stm32_assembly/zg-dma.toml` | `soc/stm32f407/drivers/spi_dma.c` |
 | stm32f407 | SPI1 | spi | short-poll | `spi1-pa5-pa6-pa7` | — | `tests/contracts/stm32_assembly/ve-spi.toml`, `tests/contracts/stm32_assembly/zg-spi.toml` | `soc/stm32f407/drivers/spi.c` |
 | stm32f407 | TIM3 | pwm | fixed-pwm | `tim3-ch1-pa6` | — | `tests/contracts/stm32_assembly/ve-pwm.toml`, `tests/contracts/stm32_assembly/zg-pwm.toml` | `soc/stm32f407/drivers/timer.c` |

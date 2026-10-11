@@ -2,9 +2,10 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can
+    from ... import can, usb_device
 except ImportError:
     import can
+    import usb_device
 
 
 def implementation(item):
@@ -17,6 +18,8 @@ def operations(item):
     selected = implementation(item)
     if item.kind == "can":
         return "nx_classic_can_ops"
+    if item.kind == "usb_device":
+        return "nx_usb_fs_device_ops"
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
     return f"nx_gd32_{selected}_ops"
@@ -43,6 +46,8 @@ def includes(result):
         source.append('#include "gd32f470_i2c_async.h"')
     if any(item.kind == "can" for item in selections):
         source.append('#include "gd32f470_can.h"')
+    if any(item.kind == "usb_device" for item in selections):
+        source.append('#include "gd32f470_usb_device.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -76,6 +81,7 @@ def state_declarations(result):
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
     source.extend(can.state_declarations(result, "gd32"))
+    source.extend(usb_device.state_declarations(result, "gd32"))
     return source
 
 
@@ -87,6 +93,7 @@ def shared_irqs(result):
 def stop_system(result):
     dma_clock = has_dma(result)
     source = can.stop_domain(result, "gd32")
+    source.extend(usb_device.stop_system(result, "gd32"))
     if dma_clock:
         source += ['    if (s_nx_platform_started) { RCU_AHB1EN &= ~s_nx_platform_dma_clocks_added; }',
                    '    nx_arch_dsb();']
@@ -111,7 +118,7 @@ def start_system(result):
 
 
 def start_resources(result):
-    source = []
+    source = usb_device.start_resources(result, "gd32")
     mask = _dma_clock_mask(result)
     if mask:
         source += [f'    s_nx_platform_dma_clocks_added = ~RCU_AHB1EN & ({mask});',

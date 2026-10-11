@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-usb-clock-iteration/gd-test",
+    "--gtest_output=xml:tools/testing/evidence/usb-clock-iteration/gd-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T17:23:36.871987+00:00",
+  "ended_at": "2026-10-11T17:23:36.875264+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/usb-clock-iteration/usb-gd-execution-green.log"
+}

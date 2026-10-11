@@ -1,0 +1,7 @@
+{
+  "argv": [
+    "/workspace/nexus-threadx-probe/build/threadx_probe",
+    "--gtest_output=xml:/workspace/nexus-threadx-probe/evidence/review-boundaries/threadx_probe-green.xml"
+  ],
+  "returncode": 0
+}

@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 
+sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.configure.metadata import fields, parse_json, snapshot  # noqa: E402
@@ -192,7 +193,24 @@ def main(argv=None):
     parser.add_argument("--port", required=True)
     args = parser.parse_args(argv)
     try:
-        result = verify(args.source, args.lock, args.port)
+        source = args.source.absolute()
+        sdk = source.parent.parent
+        packaged_commit = None
+        if not (source / ".git").exists() and (sdk / ".nexus-source-sdk.json").exists():
+            if source != sdk / "ext/threadx" or args.lock.absolute() != sdk / "dependencies/threadx.lock.json":
+                raise ValueError("Installed ThreadX requires its exact SDK source and lock paths")
+            # Verify the whole package before consuming its recorded commit.
+            # A missing .git directory or a bare JSON passed marker is never
+            # accepted as provenance. verify() calls the byte checker with the
+            # manifest commit, so this CLI path does not recurse.
+            sys.path.insert(0, str(sdk / "cmake/package"))
+            import package_source_sdk
+            manifest = package_source_sdk.verify(sdk)
+            entries = [r for r in manifest["dependencies"] if r["path"] == "ext/threadx"]
+            if len(entries) != 1:
+                raise ValueError("Installed SDK lacks an exact ThreadX dependency")
+            packaged_commit = entries[0]["commit"]
+        result = verify(source, args.lock, args.port, packaged_commit=packaged_commit)
     except (OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError) as error:
         print("ThreadX source rejected: " + str(error), file=sys.stderr)
         return 1

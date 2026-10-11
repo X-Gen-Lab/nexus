@@ -447,3 +447,13 @@ include(stack_observation.cmake)
 include(clock_domain.cmake)
 
 include(user_io_broker.cmake)
+
+include(usb_clock.cmake)
+
+include(usb_device.cmake)
+
+include(usb_factory.cmake)
+
+include(timebase_lowpower.cmake)
+
+include(threadx.cmake)

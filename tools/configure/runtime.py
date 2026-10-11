@@ -89,12 +89,14 @@ def resolve(assembly):
         hz = facts["clock_hz"]
         if type(hz) is not int or not 1 <= hz <= 0xFFFFFFFF:
             raise RuntimeError("CPU clock_hz must be a positive uint32 fact")
-        if choices["backend"] not in {"baremetal", "freertos"}:
+        if choices["backend"] not in {"baremetal", "freertos", "threadx"}:
             raise RuntimeError("Unsupported runtime backend")
         if choices["optimization"] not in {"O2", "Os", "O3"}:
             raise RuntimeError("Unsupported runtime optimization")
         profile = cpu.resolve(facts["cpu"], facts["irq"], choices["backend"])
         policy = kernel.resolve(choices.get("os"), profile, hz)
+        if policy is not None and policy.get("lowpower_port") == "timebase":
+            raise RuntimeError("CPU-only lowpower runtime requires reviewed SoC timer facts")
         profile = kernel.bind(profile, policy)
         digest = hashlib.sha256()
         for label, data in ((b"assembly", authored), (b"cpu-facts", content),

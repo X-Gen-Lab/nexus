@@ -1,0 +1,12 @@
+[0/1] Re-running CMake...
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/usb-config-model/generated/resolved.json
+-- Configuring done (1.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus/build/usb-config-model
+[1/7] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/usb-factory-stm32/bindings.c.o
+[2/7] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/usb-factory-gd32/bindings.c.o
+[3/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/usb_factory_test.cpp.o
+[4/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/usb_factory_test.cpp.o
+[5/7] Linking CXX executable bin/nexus_stm32_usb_factory_test
+[6/7] Linking CXX executable bin/nexus_gd32_usb_factory_test

@@ -15,6 +15,7 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'gd32'
 MODEL = False
+USB_CONTROLLER = 'USBFS'
 CAN_CONTROLLERS = ('CAN0', 'CAN1')
 CAN_CLOCK_HZ = 50000000
 # Capability assertion for the actual fixed system.c cold implementation.
@@ -45,6 +46,7 @@ _FIXED_DMA = MappingProxyType({('USART0', 'dma-tx'): ('DMA1:stream7:channel4',),
  ('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1')})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('usb_device', 'device-fs'): 'usb_device',
     ('can', 'classic-irq'): 'can',
     ('gpio', 'input'): 'gpio',
     ('gpio', 'output'): 'gpio',

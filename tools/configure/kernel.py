@@ -1,16 +1,18 @@
-"""One bounded kernel policy authority; CPU/IRQ capabilities remain chip facts.
+"""Backend-specific kernel policy; CPU/IRQ capabilities remain chip facts.
 
-The profiles configure the locked static-only FreeRTOS ports. They create no
-tasks, queues, Tick hardware, trace buffers or product recovery policy.
+FreeRTOS profiles and the strict ThreadX static-port policy remain independent.
+They create no tasks, queues, Tick hardware, buffers or product recovery policy.
 """
 from types import MappingProxyType
 
 try:
     from .ir import CpuProfileIR, KernelProfileIR
     from .providers.common import fail, integer
+    from . import lowpower
 except ImportError:
     from ir import CpuProfileIR, KernelProfileIR
     from providers.common import fail, integer
+    import lowpower
 
 
 _STANDARD = {"tick_source": "systick", "tick_hz": 1000,
@@ -20,7 +22,8 @@ _STANDARD = {"tick_source": "systick", "tick_hz": 1000,
              "notification_slots": 1, "trace": False,
              "runtime_stats": False, "tickless": False,
              "memory_protection": False, "system_call_stack_words": 128,
-             "security_model": "single", "secure_idle_stack_bytes": 128}
+             "security_model": "single", "secure_idle_stack_bytes": 128,
+             "lowpower_port": "custom"}
 PROFILES = MappingProxyType({
     "standard": MappingProxyType(_STANDARD),
     "minimal": MappingProxyType({**_STANDARD, "max_priorities": 4,
@@ -53,7 +56,13 @@ def default_syscall(has_basepri, priority_bits):
 
 
 def resolve(choices, cpu, clock_hz):
-    """Validate kernel policy against the exact CPU Port and clock contract."""
+    """Select a typed backend policy against exact CPU Port and clock facts."""
+    if cpu.backend == "threadx":
+        try:
+            from . import threadx
+        except ImportError:
+            import threadx
+        return threadx.resolve(choices, cpu, clock_hz)
     if cpu.backend != "freertos":
         if choices is not None:
             fail("OS policy requires the FreeRTOS backend")
@@ -135,6 +144,7 @@ def resolve(choices, cpu, clock_hz):
     integer(ceiling, 1 if cpu.has_basepri else 0,
             cpu.irq.maximum_priority if cpu.has_basepri else 0,
             "OS syscall priority")
+    lowpower_port = lowpower.resolve_port(options)
     policy = "basepri" if cpu.has_basepri else "primask"
     definitions = {
         "NEXUS_OS_TICK_HZ": tick_hz,
@@ -150,6 +160,7 @@ def resolve(choices, cpu, clock_hz):
         "NEXUS_OS_TRACE": int(options["trace"]),
         "NEXUS_OS_RUNTIME_STATS": int(options["runtime_stats"]),
         "NEXUS_OS_TICKLESS": int(options["tickless"]),
+        "NEXUS_OS_TIMEBASE_LOWPOWER": int(lowpower_port == "timebase"),
         "NEXUS_OS_MEMORY_PROTECTION": int(protected),
         "NEXUS_OS_SYSTEM_CALL_STACK_WORDS": options["system_call_stack_words"],
         "NEXUS_OS_TRUSTZONE": int(security == "split"),
@@ -173,7 +184,21 @@ def bind(cpu, kernel):
     record = cpu.to_dict()
     record["irq"]["syscall_priority"] = kernel.syscall_priority
     record["irq"]["kernel_port"] = kernel.kernel_port
+    record["irq"]["mask_kind"] = kernel.kernel_policy
+    record["definitions"]["NEXUS_IRQ_KERNEL_POLICY"] = kernel.definitions[
+        "NEXUS_IRQ_KERNEL_POLICY"]
     return CpuProfileIR.from_validated(record)
+
+
+def from_validated(record):
+    """Recover the backend-specific typed decision without inventing features."""
+    if record.get("backend") == "threadx":
+        try:
+            from . import threadx
+        except ImportError:
+            import threadx
+        return threadx.ThreadXKernelProfileIR.from_validated(record)
+    return KernelProfileIR.from_validated(record)
 
 
 def header_lines(kernel):
@@ -209,5 +234,6 @@ def editor_schema():
     properties["profile"] = {"enum": sorted(PROFILES)}
     properties["tick_source"] = {"enum": ["external", "systick"]}
     properties["security_model"] = {"enum": ["single", "split"]}
+    properties["lowpower_port"] = {"enum": list(lowpower.PORTS)}
     return {"type": "object", "properties": properties,
             "additionalProperties": False}

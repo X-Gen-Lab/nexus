@@ -63,8 +63,18 @@ def fields(value, names, context):
 
 
 def policy_contract(policy, expected_factory_epoch=None):
-    fields(policy, {"schema_version", "kind", "semantic_version",
-                    "factory_abi_epoch", "source_sdk", "schemas"}, "policy")
+    names = {"schema_version", "kind", "semantic_version",
+             "factory_abi_epoch", "source_sdk", "schemas"}
+    if isinstance(policy, dict) and "configured_backends" in policy:
+        names.add("configured_backends")
+    fields(policy, names, "policy")
+    if "configured_backends" in policy:
+        backends = policy["configured_backends"]
+        if (not isinstance(backends, list) or not backends or
+                any(not isinstance(name, str) or name not in
+                    {"baremetal", "native", "freertos", "threadx"} for name in backends) or
+                len(set(backends)) != len(backends)):
+            raise ValueError("Unknown or duplicate configured backend names")
     if type(policy["schema_version"]) is not int or policy["schema_version"] != 1:
         raise ValueError("Unsupported compatibility policy schema")
     if policy["kind"] != "nexus-platform-compatibility":

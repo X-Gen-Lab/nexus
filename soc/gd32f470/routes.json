@@ -437,6 +437,30 @@
         }
       ],
       "source": "GD32F470xx Datasheet Rev2.2 Table 2-7 / 2-8 AF9; exact ZG LQFP144 pin tables"
+    },
+    {
+      "id": "usbfs-pa11-pa12",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "controller": "USBFS",
+      "kind": "usb_device",
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "dm",
+          "af": 10
+        },
+        {
+          "pin": "PA12",
+          "function": "dp",
+          "af": 10
+        }
+      ],
+      "modes": [
+        "device-fs"
+      ],
+      "source": "GD32F470xx Datasheet Rev2.2 PortA AF10; GD32F4xx User Manual USBFS internal PHY"
     }
   ]
 }

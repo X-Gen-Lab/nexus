@@ -1,0 +1,2 @@
+00000010 00000008 R nx_stm32_usb_clock_state_bytes
+00000000 00000010 R nx_gd32_usb_clock_state_bytes

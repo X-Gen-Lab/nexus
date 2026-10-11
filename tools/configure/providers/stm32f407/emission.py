@@ -2,9 +2,10 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can
+    from ... import can, usb_device
 except ImportError:
     import can
+    import usb_device
 
 
 def implementation(item):
@@ -17,6 +18,8 @@ def operations(item):
     selected = implementation(item)
     if item.kind == "can":
         return "nx_classic_can_ops"
+    if item.kind == "usb_device":
+        return "nx_usb_fs_device_ops"
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
     return f"nx_stm32_{selected}_ops"
@@ -40,6 +43,8 @@ def includes(result):
         source.append('#include "stm32f407_i2c_async.h"')
     if any(item.kind == "can" for item in selections):
         source.append('#include "stm32f407_can.h"')
+    if any(item.kind == "usb_device" for item in selections):
+        source.append('#include "stm32f407_usb_device.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -102,7 +107,14 @@ def stop_system(result):
     source = can.stop_domain(result, "stm32")
     gpio_clock_mask = _gpio_clock_mask(result)
     if gpio_clock_mask:
-        source += ['    if (s_nx_platform_started) { RCC->AHB1ENR &= ~s_nx_platform_gpio_clocks_added; }']
+        source += ['    if (s_nx_platform_started) {',
+                   '        NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,',
+                   '            RCC->AHB1ENR & ~s_nx_platform_gpio_clocks_added);',
+                   '        nx_arch_dsb();',
+                   '        if ((RCC->AHB1ENR & s_nx_platform_gpio_clocks_added) != 0u) {',
+                   '            return NX_ERROR_IO;', '        }',
+                   '        s_nx_platform_gpio_clocks_added = 0u;',
+                   '    }']
     if any(item["kind"] == "exti" for item in selections):
         source += ['    if (s_nx_platform_started) { RCC->APB2ENR &= ~s_nx_platform_syscfg_clock_added; }']
     if dma_clock:

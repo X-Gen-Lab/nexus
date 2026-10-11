@@ -1,0 +1,18 @@
+[1/2] Building C object tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o 
+/usr/bin/cc  -I/workspace/nexus/tests/google/../../os/freertos/private -I/workspace/nexus/tests/google/../../os/freertos/include -I/workspace/nexus/tests/google/../../arch/include -I/workspace/nexus/tests/google/lowpower_profile -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/core/include -isystem /workspace/nexus/ext/freertos/include -isystem /workspace/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -include/workspace/nexus/tests/google/timebase_lowpower_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o -MF tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o.d -o tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o -c /workspace/nexus/os/freertos/timebase_lowpower.c
+In file included from /workspace/nexus/os/freertos/timebase_lowpower.c:10:
+/workspace/nexus/ext/freertos/include/FreeRTOS.h:170:6: error: #error configMAX_PRIORITIES must be defined to be greater than or equal to 1.
+  170 |     #error configMAX_PRIORITIES must be defined to be greater than or equal to 1.
+      |      ^~~~~
+/workspace/nexus/ext/freertos/include/FreeRTOS.h:364:6: error: #error configMAX_TASK_NAME_LEN must be set to a minimum of 1 in FreeRTOSConfig.h
+  364 |     #error configMAX_TASK_NAME_LEN must be set to a minimum of 1 in FreeRTOSConfig.h
+      |      ^~~~~
+/workspace/nexus/ext/freertos/include/FreeRTOS.h:2787:6: error: #error configTASK_NOTIFICATION_ARRAY_ENTRIES must be at least 1
+ 2787 |     #error configTASK_NOTIFICATION_ARRAY_ENTRIES must be at least 1
+      |      ^~~~~
+In file included from /workspace/nexus/ext/freertos/include/FreeRTOS.h:64:
+/workspace/nexus/ext/freertos/include/FreeRTOS.h:3155:23: error: ‘NEXUS_OS_MAX_TASK_NAME_LEN’ undeclared here (not in a function); did you mean ‘configMAX_TASK_NAME_LEN’?
+ 3155 |     uint8_t ucDummy7[ configMAX_TASK_NAME_LEN ];
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

@@ -5,9 +5,9 @@ The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
 try:
-    from .providers.common import fail, integer, sequence
+    from .providers.common import fail, integer, sequence, kernel_policy_constant
 except ImportError:
-    from providers.common import fail, integer, sequence
+    from providers.common import fail, integer, sequence, kernel_policy_constant
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
                  "remote", "match_remote"}
@@ -158,7 +158,7 @@ def constructor(item, result, prefix):
     lines += ["    return NX_SUCCESS;", "}", f"static nx_result_t prepare_{name}(void) {{",
               "    nx_result_t status;"]
     policy = result['irq']
-    kernel = 'NX_IRQ_KERNEL_BASEPRI' if result['backend'] == 'freertos' else 'NX_IRQ_KERNEL_NONE'
+    kernel = kernel_policy_constant(result)
     ceiling = policy['syscall_priority'] or 0
     controller_index = result['can_controllers'].index(item['controller'])
     t = options.timing

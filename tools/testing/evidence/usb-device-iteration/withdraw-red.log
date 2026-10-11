@@ -1,0 +1,105 @@
+Running main() from gmock_main.cc
+[==========] Running 24 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 24 tests from UsbDevice
+[ RUN      ] UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement
+[       OK ] UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement (0 ms)
+[ RUN      ] UsbDevice.ShortOutCompletesOnlyAfterDataAndTransferFacts
+[       OK ] UsbDevice.ShortOutCompletesOnlyAfterDataAndTransferFacts (0 ms)
+[ RUN      ] UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity
+[       OK ] UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity (0 ms)
+[ RUN      ] UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline
+[       OK ] UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline (0 ms)
+[ RUN      ] UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint
+[       OK ] UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint (0 ms)
+[ RUN      ] UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq
+[       OK ] UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq (0 ms)
+[ RUN      ] UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage
+[       OK ] UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage (0 ms)
+[ RUN      ] UsbDevice.AddressChangesOnlyAfterMatchingStatusInAcknowledgement
+[       OK ] UsbDevice.AddressChangesOnlyAfterMatchingStatusInAcknowledgement (0 ms)
+[ RUN      ] UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan
+[       OK ] UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan (0 ms)
+[ RUN      ] UsbDevice.StaleCompletionCannotFinishANewRequestEpoch
+[       OK ] UsbDevice.StaleCompletionCannotFinishANewRequestEpoch (0 ms)
+[ RUN      ] UsbDevice.IllegalPacketAndIncomingMaskRejectWithNoBorrow
+[       OK ] UsbDevice.IllegalPacketAndIncomingMaskRejectWithNoBorrow (0 ms)
+[ RUN      ] UsbDevice.StallRequiresIdleAndClearResetsBulkDataPid
+[       OK ] UsbDevice.StallRequiresIdleAndClearResetsBulkDataPid (0 ms)
+[ RUN      ] UsbDevice.FullEventsPreserveAuthoritativeLatestSetup
+[       OK ] UsbDevice.FullEventsPreserveAuthoritativeLatestSetup (0 ms)
+[ RUN      ] UsbDevice.SubsequentControlDataPacketsPreserveTheHardwarePidToggle
+[       OK ] UsbDevice.SubsequentControlDataPacketsPreserveTheHardwarePidToggle (0 ms)
+[ RUN      ] UsbDevice.SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut
+[       OK ] UsbDevice.SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut (0 ms)
+[ RUN      ] UsbDevice.ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop
+[       OK ] UsbDevice.ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop (0 ms)
+[ RUN      ] UsbDevice.EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact
+[       OK ] UsbDevice.EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact (0 ms)
+[ RUN      ] UsbDevice.OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed
+[       OK ] UsbDevice.OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed (0 ms)
+[ RUN      ] UsbDevice.PacketBuffersCannotAliasTheClockConsumerControl
+[       OK ] UsbDevice.PacketBuffersCannotAliasTheClockConsumerControl (0 ms)
+[ RUN      ] UsbDevice.RestartDoesNotReuseAnEarlierControlEpoch
+[       OK ] UsbDevice.RestartDoesNotReuseAnEarlierControlEpoch (0 ms)
+[ RUN      ] UsbDevice.CancellingOutRestoresPeerAdmissionAfterActualDrain
+/workspace/nexus/tests/google/usb_device_test.cpp:303: Failure
+Expected equality of these values:
+  model.hardware.registers[0x804U / 4U] & 8U
+    Which is: 8
+  0U
+    Which is: 0
+
+[  FAILED  ] UsbDevice.CancellingOutRestoresPeerAdmissionAfterActualDrain (0 ms)
+[ RUN      ] UsbDevice.UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission
+/workspace/nexus/tests/google/usb_device_test.cpp:309: Failure
+Expected equality of these values:
+  nx_usb_endpoint_submit(&port, &request)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+/workspace/nexus/tests/google/usb_device_test.cpp:310: Failure
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 2
+  NX_REQUEST_READY
+    Which is: 0
+
+[  FAILED  ] UsbDevice.UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission (0 ms)
+[ RUN      ] UsbDevice.PendingResetAtGlobalEnableRemainsObservableAfterColdStart
+/workspace/nexus/tests/google/usb_device_test.cpp:325: Failure
+Expected equality of these values:
+  nx_usb_device_read_events(&device, &output, 1, &count)
+    Which is: 9
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/usb_device_test.cpp:326: Failure
+Expected equality of these values:
+  count
+    Which is: 0
+  1U
+    Which is: 1
+
+/workspace/nexus/tests/google/usb_device_test.cpp:327: Failure
+Expected equality of these values:
+  output.kind
+    Which is: 0
+  NX_USB_EVENT_RESET
+    Which is: 1
+
+[  FAILED  ] UsbDevice.PendingResetAtGlobalEnableRemainsObservableAfterColdStart (0 ms)
+[ RUN      ] UsbDevice.StopAndDetachJoinTheInFlightWakePublisher
+[       OK ] UsbDevice.StopAndDetachJoinTheInFlightWakePublisher (0 ms)
+[----------] 24 tests from UsbDevice (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 24 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 21 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] UsbDevice.CancellingOutRestoresPeerAdmissionAfterActualDrain
+[  FAILED  ] UsbDevice.UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission
+[  FAILED  ] UsbDevice.PendingResetAtGlobalEnableRemainsObservableAfterColdStart
+
+ 3 FAILED TESTS

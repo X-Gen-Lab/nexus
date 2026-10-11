@@ -1,0 +1,38 @@
+{
+  "qualification": false,
+  "scope": "fresh dirty-development actual firmware CMake graph; no physical execution",
+  "commands": [
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "--version"
+      ],
+      "returncode": 0,
+      "start": 1791745164.4109097,
+      "end": 1791745164.4125504,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm/tool-gcc.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "-S",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm/stm32f407-custom/fixture",
+        "-B",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm/stm32f407-custom/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm/stm32f407-custom/assembly.toml"
+      ],
+      "returncode": 1,
+      "start": 1791745164.4129725,
+      "end": 1791745164.5120847,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm/stm32f407-custom-configure.log"
+    }
+  ],
+  "variants": [],
+  "status": "failed",
+  "error": "stm32f407-custom-configure failed: CMake Error: CMake was unable to find a build program corresponding to \"Ninja\".  CMAKE_MAKE_PROGRAM is not set.  You probably need to select a different build tool.\n-- Configuring incomplete, errors occurred!\n"
+}

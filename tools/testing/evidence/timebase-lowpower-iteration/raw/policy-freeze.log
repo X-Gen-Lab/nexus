@@ -1,0 +1,18 @@
+E
+======================================================================
+ERROR: test_lowpower (unittest.loader._FailedTest.test_lowpower)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_lowpower
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/test_lowpower.py", line 4, in <module>
+    import lowpower
+ModuleNotFoundError: No module named 'lowpower'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

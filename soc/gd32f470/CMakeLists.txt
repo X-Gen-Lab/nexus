@@ -18,7 +18,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 # SystemInit needs RCU/FMC; the always-present monotonic timebase needs TIMER.
 set(gd_sdk_units rcu fmc timer)
 set(gd_sources timebase.c)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
         continue()
@@ -29,11 +29,11 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
         list(APPEND gd_sources "drivers/${kind}.c")
     endif()
     # Generated UART/SPI/I2C acquisition and rollback use Nexus pin helpers.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|can)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|can|usb_device)$")
         list(APPEND gd_sources drivers/gpio.c)
     endif()
     # EXTI/PWM/ADC configure pins through the SDK without Nexus GPIO helpers.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device)$")
         list(APPEND gd_sdk_units gpio)
     endif()
     if(kind STREQUAL "uart")
@@ -63,6 +63,9 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
         endif()
     elseif(kind STREQUAL "watchdog")
         list(APPEND gd_sdk_units fwdgt)
+    elseif(kind STREQUAL "usb_device")
+        list(APPEND gd_sources usb_clock.c
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/usb_device_controller.c")
     elseif(kind STREQUAL "can")
         list(APPEND gd_sources "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/can_controller.c")
     elseif(kind STREQUAL "adc")
@@ -99,7 +102,8 @@ target_include_directories(nexus_soc_gd32f470 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../../io/private")
 target_include_directories(nexus_soc_gd32f470 SYSTEM PRIVATE
     "${gd_firmware}/CMSIS" "${gd_device}/Include"
-    "${gd_peripheral}/Include")
+    "${gd_peripheral}/Include"
+    "${gd_firmware}/GD32F4xx_usb_library/driver/Include")
 target_compile_definitions(nexus_soc_gd32f470 PRIVATE GD32F470
     HXTAL_VALUE=25000000)
 set(NEXUS_STARTUP_SOURCE "${gd_device}/Source/GCC/startup_gd32f450_470.S"
@@ -122,16 +126,39 @@ function(nexus_add_gd32f470_sleep target)
     if(NOT ARGC EQUAL 1 OR TARGET "${target}")
         message(FATAL_ERROR "Sleep target requires one unused target name")
     endif()
+    get_filename_component(sleep_source
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
     add_library(${target} STATIC EXCLUDE_FROM_ALL
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c")
     target_link_libraries(${target} PRIVATE Nexus::ClockDomain Nexus::Arch
         nexus_build_options nexus_owned_warnings)
     target_include_directories(${target} PRIVATE
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/private"
-        "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
-    set(sleep_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
+        "${sleep_source}/components/clock_domain/private")
+    set(sleep_vendor "${sleep_source}/vendors/gigadevice/gd32f4xx/Firmware")
     target_include_directories(${target} SYSTEM PRIVATE
         "${sleep_vendor}/CMSIS" "${sleep_vendor}/CMSIS/GD/GD32F4xx/Include"
         "${sleep_vendor}/GD32F4xx_standard_peripheral/Include")
     target_compile_definitions(${target} PRIVATE GD32F470 HXTAL_VALUE=25000000)
 endfunction()
+
+# The explicitly selected getter and SysTick entry must precede weak archives.
+if(NEXUS_OS_TIMEBASE_LOWPOWER)
+    add_library(nx_gd32f470_lowpower_binding OBJECT timebase_lowpower.c)
+    target_link_libraries(nx_gd32f470_lowpower_binding PRIVATE
+        Nexus::OSFreeRTOS Nexus::Arch nexus_build_options nexus_owned_warnings)
+    target_include_directories(nx_gd32f470_lowpower_binding PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/private"
+        "${NEXUS_SOURCE_DIR}/os/freertos/private")
+    target_include_directories(nx_gd32f470_lowpower_binding SYSTEM PRIVATE
+        "${gd_firmware}/CMSIS" "${gd_device}/Include"
+        "${gd_peripheral}/Include")
+    target_compile_definitions(nx_gd32f470_lowpower_binding PRIVATE GD32F470
+        HXTAL_VALUE=25000000)
+    target_compile_definitions(nexus_soc_gd32f470 PRIVATE
+        NEXUS_TIMEBASE_LOWPOWER=1)
+    target_sources(nexus_soc_gd32f470 INTERFACE
+        $<TARGET_OBJECTS:nx_gd32f470_lowpower_binding>)
+    set(NEXUS_SYSTEM_COMPILE_DEFINITIONS GD32F470 HXTAL_VALUE=25000000
+        NEXUS_TIMEBASE_LOWPOWER=1 PARENT_SCOPE)
+endif()

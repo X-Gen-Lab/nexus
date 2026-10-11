@@ -16,7 +16,9 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/memory.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/usb_device.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/threadx.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/lowpower.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/authored.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
@@ -53,7 +55,7 @@ function(nexus_resolve_assembly)
                   NEXUS_CPU_SECURE_ONLY
                   NEXUS_CPU_EXTERNAL_IRQ_COUNT NEXUS_CPU_ATOMIC_BACKEND_IRQ
                   NEXUS_CPU_COMPILE_OPTIONS NEXUS_IRQ_KERNEL_POLICY
-                  NEXUS_FREERTOS_PORT
+                  NEXUS_FREERTOS_PORT NEXUS_THREADX_PORT
                   NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
                   NEXUS_MEMORY_ADDSRAM NEXUS_MEMORY_TCM
                   NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256

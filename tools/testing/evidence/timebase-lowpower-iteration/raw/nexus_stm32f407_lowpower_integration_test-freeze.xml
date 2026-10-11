@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="3" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T18:56:07.223" name="AllTests">
+  <testsuite name="TimebaseIntegration" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T18:56:07.223">
+    <testcase name="VectorDispatchesCompareAfterMonotonicOverflow" file="/workspace/nexus/tests/google/timebase_soc_integration_test.cpp" line="127" status="run" result="completed" time="0." timestamp="2026-10-11T18:56:07.223" classname="TimebaseIntegration" />
+    <testcase name="FreshCompareBetweenFlagReadAndAckStillWakes" file="/workspace/nexus/tests/google/timebase_soc_integration_test.cpp" line="138" status="run" result="completed" time="0." timestamp="2026-10-11T18:56:07.223" classname="TimebaseIntegration" />
+    <testcase name="ClockStopRejectsOutstandingPauseBeforeAnyRelease" file="/workspace/nexus/tests/google/timebase_soc_integration_test.cpp" line="148" status="run" result="completed" time="0." timestamp="2026-10-11T18:56:07.223" classname="TimebaseIntegration" />
+  </testsuite>
+</testsuites>

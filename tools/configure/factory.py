@@ -7,11 +7,20 @@ except ImportError:
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device")
 
 
 def symbol(name):
     return name.replace("-", "_")
+
+
+def interface_type(class_name, shape):
+    """Use actual public types where controller/direction names differ."""
+    if class_name == "usb_device":
+        return "nx_usb_device_port_t"
+    if class_name == "usb_endpoint":
+        return "nx_usb_endpoint_port_t"
+    return f"nx_{class_name.removesuffix('_device')}_{shape}_t"
 
 
 def classes(result):
@@ -22,6 +31,9 @@ def classes(result):
                   if next(port["kind"] for port in result["controllers"]
                           if port["id"] == item["controller"]) == kind])
                 for kind in ("spi", "i2c")]
+    records.append(("usb_endpoint", "endpoint", [item for item in result["devices"]
+                    if next(port["kind"] for port in result["controllers"]
+                            if port["id"] == item["controller"]) == "usb_device"]))
     return records
 
 
@@ -36,8 +48,7 @@ def emit(result):
     source = []
     for class_name, shape, instances in classes(result):
         prefix = "NX_" + class_name.upper() + "_ID_"
-        kind = class_name.removesuffix("_device")
-        return_type = f"const nx_{kind}_{shape}_t*"
+        return_type = "const " + interface_type(class_name, shape) + "*"
         argument = f"nx_{class_name}_id_t id"
         header += [f"typedef uint16_t nx_{class_name}_id_t;", "enum {"]
         for index, instance in enumerate(instances):
@@ -86,7 +97,6 @@ def emit_strong(result):
               "#define NX_FACTORY_REF_VALUE(type, value) ((type){value})",
               "#endif"]
     for class_name, shape, instances in classes(result):
-        kind = class_name.removesuffix("_device")
         upper = class_name.upper()
         ref = f"nx_{class_name}_ref_t"
         header += ["/** \\brief Explicit assembly-local ID; not a wire ABI. */",
@@ -103,7 +113,7 @@ def emit_strong(result):
                 header.append(key.ljust(width) + " " + value)
             else:
                 header += [key.ljust(79) + "\\", "    " + value]
-        return_type = f"static inline const nx_{kind}_{shape}_t*"
+        return_type = "static inline const " + interface_type(class_name, shape) + "*"
         declaration = f"nx_factory_{class_name}_ref({ref} id) {{"
         signature = ([return_type, declaration]
                      if len(return_type + " " + declaration) > 80 else
@@ -156,6 +166,8 @@ def _capability(item, model):
     elif kind == "can":
         # Each submitted request borrows one frame, not all TX mailboxes.
         units, unit_bytes, messages = 8, 1, 1
+    elif kind == "usb_device":
+        units, unit_bytes, messages = item.get("max_packet", 64), 1, 1
     elif kind == "flash":
         unit_bytes = alignment = 1 if model else 4
     return " | ".join(flags) or "0U", units, unit_bytes, alignment, messages
@@ -183,11 +195,12 @@ def emit_capabilities(result):
         '} nx_factory_io_capability_t;']
     source = []
     for class_name, shape, instances in classes(result):
-        del shape
         for instance in instances:
             item = (next(port for port in result["controllers"]
                          if port["id"] == instance["controller"])
-                    if class_name.endswith("_device") else instance)
+                    if shape == "endpoint" else instance)
+            if class_name == "usb_endpoint":
+                item = {**item, "max_packet": instance["max_packet"]}
             flags, units, size, alignment, messages = _capability(
                 item, result["soc_family"] == "native")
             # Public C constants are the bounds authority; never recopy values.

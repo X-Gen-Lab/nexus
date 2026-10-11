@@ -2,6 +2,9 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "usb_device": {"binding", "mode", "event_capacity", "rx_fifo_words",
+                   "vbus_sensing", "poll_limit", "drain_timeout_us",
+                   "clock_timeout_us", "irq"},
     "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
             "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
     "gpio": {"binding", "mode"},
@@ -19,13 +22,15 @@ MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes"
                  "flash_load_limit_bytes", "regions"}
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
+USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
+                       "max_packet", "fifo_words"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
 TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain"}
 
 
 
 def normalize(data, path, root, fail, obj, integer, text):
-    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device"},
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
         "assembly TOML")
     integer(data["schema"], 2, 2, "assembly schema")
     if ("board" in data) == ("board_package" in data):
@@ -71,7 +76,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["calls_os"] = irq["calls_os"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -92,6 +97,14 @@ def normalize(data, path, root, fail, obj, integer, text):
             device.setdefault("driver", kind + "-endpoint")
             device["authored_kind"] = kind
             devices.append(device)
+    endpoints = data.get("usb_endpoint", {})
+    if not isinstance(endpoints, dict):
+        fail("USB endpoints: expected endpoint tables")
+    for name, definition in endpoints.items():
+        obj(definition, USB_ENDPOINT_FIELDS - {"fifo_words"}, {"fifo_words"},
+            "USB endpoint " + name)
+        devices.append({**definition, "id": name, "driver": "usb-fs-endpoint",
+                        "authored_kind": "usb_device"})
     result = {"schema_version": 1, "board_package": package,
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
@@ -117,9 +130,10 @@ def read(path, snapshots, root, fail, obj, integer, text):
 def editor_schema():
     """Expose the same authoring fields for editor completion, not resolution."""
     try:
-        from . import kernel
+        from . import kernel, threadx
     except ImportError:
         import kernel
+        import threadx
 
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}
@@ -128,12 +142,13 @@ def editor_schema():
                    "event_capacity", "period_ticks", "duty_ticks", "tick_hz",
                    "reference_mv", "timeout_ms", "address", "model_bytes",
                    "bitrate", "drain_timeout_us", "poll_limit", "prescaler",
-                   "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo"}
+                   "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo",
+                   "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
-        for name in fields & {"fifo_order", "remote", "match_remote"}:
+        for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing"}:
             properties[name] = {"type": "boolean"}
         if "timing" in fields:
             properties["timing"] = record(
@@ -149,13 +164,13 @@ def editor_schema():
             properties["rx"]["properties"]["format"]["enum"] = ["bytes", "events", "blocks"]
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
-    schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device"},
+    schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
                     TOP_REQUIRED)
     schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
     schema["title"] = "Nexus authored assembly schema 2"
     properties = schema["properties"]
     properties["schema"] = {"const": 2}
-    properties["backend"]["enum"] = ["native", "baremetal", "freertos"]
+    properties["backend"]["enum"] = ["native", "baremetal", "freertos", "threadx"]
     properties["optimization"]["enum"] = ["O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"]
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
@@ -171,7 +186,13 @@ def editor_schema():
                      "remote", "match_remote"}
     properties["can_domain"]["properties"]["filters"] = {
         "type": "array", "items": record(filter_fields, filter_fields)}
-    properties["os"] = kernel.editor_schema()
+    properties["os"] = {"anyOf": [kernel.editor_schema(), threadx.editor_schema()]}
+    schema["allOf"] = [
+        {"if": {"properties": {"backend": {"const": backend}},
+                "required": ["backend"]},
+         "then": {"properties": {"os": policy}}}
+        for backend, policy in (("freertos", kernel.editor_schema()),
+                                ("threadx", threadx.editor_schema()))]
     properties["factory"] = {
         "type": "object", "properties": {"capabilities": {"type": "boolean"}},
         "additionalProperties": False}
@@ -179,6 +200,10 @@ def editor_schema():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
     for kind, fields in ENDPOINT_FIELDS.items():
         properties[kind + "_device"] = {"type": "object", "additionalProperties": record(fields, {"controller"})}
+    endpoint_schema = record(USB_ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS - {"fifo_words"})
+    endpoint_schema["properties"]["direction"] = {"enum": ["in", "out"]}
+    endpoint_schema["properties"]["transfer"] = {"enum": ["control", "bulk"]}
+    properties["usb_endpoint"] = {"type": "object", "additionalProperties": endpoint_schema}
     schema["oneOf"] = [{"required": ["board"], "not": {"required": ["board_package"]}},
                        {"required": ["board_package"], "not": {"required": ["board"]}}]
     return schema

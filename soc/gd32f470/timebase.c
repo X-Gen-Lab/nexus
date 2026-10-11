@@ -8,6 +8,13 @@
  */
 #include "gd32f4xx.h"
 #include "private/system.h"
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+#include "private/gd32f470_lowpower.h"
+#endif
+
+#ifndef NX_GD32_TIMEBASE_ACK
+#define NX_GD32_TIMEBASE_ACK(value) (TIMER_INTF(TIMER1) = (value))
+#endif
 
 static volatile uint32_t s_epoch;
 static bool s_clock_owned;
@@ -119,6 +126,11 @@ int nx_gd32_soc_start(void) {
 
 /** \brief           Stop only after all external execution owners are quiet. */
 int nx_gd32_soc_stop(void) {
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+    if (nx_gd32_lowpower_busy()) {
+        return -1;
+    }
+#endif
     if (nx_gd32_in_isr() || nx_gd32_irq_masked() ||
         !external_resources_idle() || stop_timer() != 0) {
         return -1;
@@ -151,8 +163,12 @@ void TIMER1_IRQHandler(void) {
     uint32_t saved = nx_gd32_critical_enter();
     if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0u) {
         ++s_epoch;
-        TIMER_INTF(TIMER1) &= ~TIMER_INTF_UPIF;
+        /* W0C ones preserve compare flags arriving after this UPIF read. */
+        NX_GD32_TIMEBASE_ACK(~(uint32_t)TIMER_INTF_UPIF);
     }
+#if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
+    nx_gd32_lowpower_alarm_irq();
+#endif
     nx_gd32_critical_leave(saved);
 }
 

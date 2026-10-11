@@ -211,6 +211,26 @@ class WorkflowContracts(unittest.TestCase):
                            step.get('run', ''))
             self.assertIn('--compiler arm-none-eabi-gcc', execute['run'])
 
+    def test_threadx_matrix_uses_locked_kernel_and_retains_execution(self):
+        job = workflow('build-matrix.yml')['jobs']['threadx']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/os_threadx.py'), 1)
+        self.assertIn('--compiler arm-none-eabi-gcc', commands)
+        self.assertIn('--output build/os-threadx', commands)
+        evidence = next(step for step in job['steps']
+                        if step.get('name') == 'Preserve ThreadX execution')
+        self.assertIn('build/os-threadx/', evidence['with']['path'])
+        identity = next(step for step in job['steps']
+                        if step.get('uses') ==
+                        './.github/actions/record-identity')
+        self.assertEqual(identity['with']['require-dependencies'], 'true')
+        self.assertIn('build/os-threadx/', identity['with']['artifacts'])
+        setup = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
+                          .read_text(), Loader=yaml.BaseLoader)
+        initialization = '\n'.join(step.get('run', '')
+                                   for step in setup['runs']['steps'])
+        self.assertIn(' ext/threadx', initialization)
+
 
 class CTestAdmission(unittest.TestCase):
     def execute_fixture(self, kind):

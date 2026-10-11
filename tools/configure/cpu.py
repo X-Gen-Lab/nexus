@@ -108,8 +108,11 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
     profile = PROFILES[arch]
     native = arch == "native"
     if not isinstance(backend, str) or backend not in (
-            {"native", "baremetal"} if native else {"baremetal", "freertos"}):
+            {"native", "baremetal", "threadx"} if native else
+            {"baremetal", "freertos", "threadx"}):
         fail("CPU and OS backend contradict each other")
+    if backend == "threadx" and arch not in {"native", "cortex-m4"}:
+        fail("Unsupported maintained ThreadX CPU port")
     if enum_abi is None:
         enum_abi = "native-int" if native else "short-enums"
     if enum_abi != ("native-int" if native else "short-enums"):
@@ -180,6 +183,9 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
                     "GCC/ARM_CM7/r0p1")
         else:
             port = f"GCC/ARM_CM{arch[8:]}_NTZ/non_secure"
+    if backend == "threadx":
+        ceiling = 0 if native else kernel.default_syscall(profile.basepri, bits)
+        port = "linux/gnu" if native else "cortex_m4/gnu"
     irq_result = {"priority_bits": bits, "maximum_priority": maximum,
                   "syscall_priority": ceiling, "kernel_port": port,
                   "external_count": count,
@@ -204,7 +210,7 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
         flags.extend((f"-mfloat-abi={abi}", "-fshort-enums"))
     definitions = {
         "NEXUS_IRQ_KERNEL_POLICY": (2 if profile.basepri else 1)
-        if backend == "freertos" else 0,
+        if backend in {"freertos", "threadx"} and not native else 0,
         "NEXUS_ARCH_HAS_DWT_CYCCNT": int(dwt),
         "NEXUS_ARCH_MPU_VERSION": mpu,
         "NEXUS_ARCH_ICACHE_LINE_BYTES": cpu["icache_line_bytes"],
@@ -240,10 +246,15 @@ def selection_lines(profile):
               "NEXUS_FLOAT_ABI": profile.float_abi,
               "NEXUS_ENUM_ABI": profile.enum_abi,
               "NEXUS_BACKEND": profile.backend,
-              "NEXUS_FREERTOS_PORT": profile.irq.kernel_port or "",
+              "NEXUS_FREERTOS_PORT": (profile.irq.kernel_port or "")
+              if profile.backend == "freertos" else "",
+              "NEXUS_THREADX_PORT": (profile.irq.kernel_port or "")
+              if profile.backend == "threadx" else "",
               "NEXUS_IRQ_PRIORITY_BITS": profile.irq.priority_bits,
               "NEXUS_CPU_COMPILE_OPTIONS": ";".join(profile.compile_options),
               **profile.definitions}
+    if profile.irq.syscall_priority is not None:
+        values["NEXUS_IRQ_SYSCALL_PRIORITY"] = profile.irq.syscall_priority
     return [f'set({key} "{value}")' for key, value in values.items()]
 
 
@@ -278,6 +289,8 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
         fail("CPU emission requires an empty temporary directory")
     if kernel_profile is None:
         kernel_profile = kernel.resolve(None, profile, clock_hz)
+    if kernel_profile is not None and kernel_profile.get("lowpower_port") == "timebase":
+        fail("CPU-only lowpower runtime requires reviewed SoC timer facts")
     profile = kernel.bind(profile, kernel_profile)
     resolved = {"schema_version": 1, "platform_metadata": platform_metadata,
                 "cpu_profile": profile.to_dict(),
@@ -337,7 +350,7 @@ def unique_keys(pairs):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--facts", type=Path, required=True)
-    parser.add_argument("--backend", choices=("baremetal", "freertos"),
+    parser.add_argument("--backend", choices=("baremetal", "freertos", "threadx"),
                         required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--optimization", choices=("O2", "Os", "O3"),

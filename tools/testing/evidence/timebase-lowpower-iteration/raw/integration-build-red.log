@@ -1,0 +1,75 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/11] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o 
+/usr/bin/cc -DNEXUS_STM32_MODEL -DNEXUS_TIMEBASE_LOWPOWER=1 -DNX_TIMEBASE_INTEGRATION -DSTM32F407xx -I/workspace/nexus/tests/google/timebase_soc_profile -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/os/freertos/private -I/workspace/nexus/os/freertos/include -I/workspace/nexus/arch/include -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/core/include -isystem /workspace/nexus/ext/freertos/include -isystem /workspace/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -isystem /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -include/workspace/nexus/tests/google/timebase_soc_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o -MF tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o.d -o tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o -c /workspace/nexus/soc/stm32f407/system.c
+In file included from <command-line>:
+/workspace/nexus/tests/google/timebase_soc_model.h:51:9: error: "NVIC_EnableIRQ" redefined [-Werror]
+   51 | #define NVIC_EnableIRQ(irq) nx_timebase_model_enable_irq(irq)
+      |         ^~~~~~~~~~~~~~
+In file included from /workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f407xx.h:166,
+                 from /workspace/nexus/tests/google/timebase_soc_model.h:11:
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1651:11: note: this is the location of the previous definition
+ 1651 |   #define NVIC_EnableIRQ              __NVIC_EnableIRQ
+      |           ^~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_model.h:52:9: error: "NVIC_DisableIRQ" redefined [-Werror]
+   52 | #define NVIC_DisableIRQ(irq) nx_timebase_model_disable_irq(irq)
+      |         ^~~~~~~~~~~~~~~
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1653:11: note: this is the location of the previous definition
+ 1653 |   #define NVIC_DisableIRQ             __NVIC_DisableIRQ
+      |           ^~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_model.h:53:9: error: "NVIC_ClearPendingIRQ" redefined [-Werror]
+   53 | #define NVIC_ClearPendingIRQ(irq) nx_timebase_model_clear_irq(irq)
+      |         ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1656:11: note: this is the location of the previous definition
+ 1656 |   #define NVIC_ClearPendingIRQ        __NVIC_ClearPendingIRQ
+      |           ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_model.h:54:9: error: "NVIC_SetPriority" redefined [-Werror]
+   54 | #define NVIC_SetPriority(irq, priority) nx_timebase_model_priority(irq, priority)
+      |         ^~~~~~~~~~~~~~~~
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1658:11: note: this is the location of the previous definition
+ 1658 |   #define NVIC_SetPriority            __NVIC_SetPriority
+      |           ^~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+[2/11] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o 
+/usr/bin/c++ -DNEXUS_STM32_MODEL -DNEXUS_TIMEBASE_LOWPOWER=1 -DNX_TIMEBASE_INTEGRATION -DSTM32F407xx -I/workspace/nexus/tests/google/timebase_soc_profile -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/os/freertos/private -I/workspace/nexus/os/freertos/include -I/workspace/nexus/arch/include -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/core/include -isystem /workspace/nexus/ext/freertos/include -isystem /workspace/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -isystem /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -include/workspace/nexus/tests/google/timebase_soc_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o -c /workspace/nexus/tests/google/timebase_soc_integration_test.cpp
+In file included from <command-line>:
+/workspace/nexus/tests/google/timebase_soc_model.h:51:9: error: "NVIC_EnableIRQ" redefined [-Werror]
+   51 | #define NVIC_EnableIRQ(irq) nx_timebase_model_enable_irq(irq)
+      |         ^~~~~~~~~~~~~~
+In file included from /workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f407xx.h:166,
+                 from /workspace/nexus/tests/google/timebase_soc_model.h:11:
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1651:11: note: this is the location of the previous definition
+ 1651 |   #define NVIC_EnableIRQ              __NVIC_EnableIRQ
+      |           ^~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_model.h:52:9: error: "NVIC_DisableIRQ" redefined [-Werror]
+   52 | #define NVIC_DisableIRQ(irq) nx_timebase_model_disable_irq(irq)
+      |         ^~~~~~~~~~~~~~~
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1653:11: note: this is the location of the previous definition
+ 1653 |   #define NVIC_DisableIRQ             __NVIC_DisableIRQ
+      |           ^~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_model.h:53:9: error: "NVIC_ClearPendingIRQ" redefined [-Werror]
+   53 | #define NVIC_ClearPendingIRQ(irq) nx_timebase_model_clear_irq(irq)
+      |         ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1656:11: note: this is the location of the previous definition
+ 1656 |   #define NVIC_ClearPendingIRQ        __NVIC_ClearPendingIRQ
+      |           ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_model.h:54:9: error: "NVIC_SetPriority" redefined [-Werror]
+   54 | #define NVIC_SetPriority(irq, priority) nx_timebase_model_priority(irq, priority)
+      |         ^~~~~~~~~~~~~~~~
+/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h:1658:11: note: this is the location of the previous definition
+ 1658 |   #define NVIC_SetPriority            __NVIC_SetPriority
+      |           ^~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp: In member function ‘virtual void {anonymous}::TimebaseIntegration::TearDown()’:
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:107:12: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+  107 |         if (mapping != MAP_FAILED) EXPECT_EQ(munmap(mapping, 0x80000U), 0);
+      |            ^
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.

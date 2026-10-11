@@ -1,0 +1,276 @@
+test_development_snapshot_includes_staged_and_untracked_sources (sdk_contracts.SourceSDKDevelopmentSnapshotTests.test_development_snapshot_includes_staged_and_untracked_sources) ... ok
+test_publishable_snapshot_uses_only_original_committed_blobs (sdk_contracts.SourceSDKDevelopmentSnapshotTests.test_publishable_snapshot_uses_only_original_committed_blobs) ... ok
+test_consumer_uses_authored_toml_for_each_maintained_family (sdk_contracts.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... ok
+test_metadata_and_memory_generation_are_required_sdk_payload (sdk_contracts.SourceSDKSelectionTests.test_metadata_and_memory_generation_are_required_sdk_payload) ... ok
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (sdk_contracts.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... ok
+test_additional_file_and_symlink_are_rejected (sdk_contracts.SourceSDKTests.test_additional_file_and_symlink_are_rejected) ... ok
+test_clean_checkout_with_missing_dependency_gitlinks_is_rejected (sdk_contracts.SourceSDKTests.test_clean_checkout_with_missing_dependency_gitlinks_is_rejected) ... FAIL
+test_cli_summary_cannot_be_confused_with_complete_manifest (sdk_contracts.SourceSDKTests.test_cli_summary_cannot_be_confused_with_complete_manifest) ... ok
+test_default_preparation_rejects_dirty_checkout (sdk_contracts.SourceSDKTests.test_default_preparation_rejects_dirty_checkout) ... ok
+test_development_contracts_are_explicitly_rejected (sdk_contracts.SourceSDKTests.test_development_contracts_are_explicitly_rejected) ... ERROR
+test_different_source_package_version_is_rejected (sdk_contracts.SourceSDKTests.test_different_source_package_version_is_rejected) ... ERROR
+test_expected_revision_conflict_is_rejected (sdk_contracts.SourceSDKTests.test_expected_revision_conflict_is_rejected) ... ERROR
+test_fixture_requires_explicit_consumer_opt_in (sdk_contracts.SourceSDKTests.test_fixture_requires_explicit_consumer_opt_in) ... ERROR
+test_formal_consumer_cli_rejects_nonpublishable_fixture (sdk_contracts.SourceSDKTests.test_formal_consumer_cli_rejects_nonpublishable_fixture) ... ok
+test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback (sdk_contracts.SourceSDKTests.test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback) ... FAIL
+test_missing_license_is_rejected (sdk_contracts.SourceSDKTests.test_missing_license_is_rejected) ... ok
+test_modified_exported_config_is_rejected (sdk_contracts.SourceSDKTests.test_modified_exported_config_is_rejected) ... FAIL
+test_modified_required_file_is_rejected (sdk_contracts.SourceSDKTests.test_modified_required_file_is_rejected) ... ok
+test_output_parent_alias_cannot_bypass_source_boundary (sdk_contracts.SourceSDKTests.test_output_parent_alias_cannot_bypass_source_boundary) ... ok
+test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) ... 
+  test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/include/nexus/arch/arch.h') ... FAIL
+  test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/cortex_m/nx_arch_cortex_m.c') ... FAIL
+  test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/cortex_m/private/compiler.h') ... FAIL
+  test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/native/nx_arch_native.c') ... FAIL
+test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) ... 
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/common/src/tx_thread_create.c') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/ports/linux/gnu/src/tx_timer_interrupt.c') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/ports/cortex_m4/gnu/src/tx_thread_schedule.S') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/common/inc/tx_api.h') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/LICENSE.txt') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='os/threadx/Kernel.cmake') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='tools/configure/threadx.py') ... FAIL
+  test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='tools/maintenance/threadx_lock.py') ... FAIL
+test_rehashed_threadx_wrong_commit_or_source_identity_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_wrong_commit_or_source_identity_reject) ... ok
+test_relocated_arm_consumer_compiles_real_startup_and_linker (sdk_contracts.SourceSDKTests.test_relocated_arm_consumer_compiles_real_startup_and_linker) ... skipped 'ARM GNU toolchain unavailable: no ARM execution claim'
+test_relocated_c_and_cpp_consumer_build_and_run_without_original_source (sdk_contracts.SourceSDKTests.test_relocated_c_and_cpp_consumer_build_and_run_without_original_source) ... ERROR
+test_relocated_gd32_consumer_compiles_real_startup_and_linker (sdk_contracts.SourceSDKTests.test_relocated_gd32_consumer_compiles_real_startup_and_linker) ... skipped 'ARM GNU toolchain unavailable: no ARM execution claim'
+test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (sdk_contracts.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required) ... ok
+test_approved_origin_declaration_is_required_and_packaged (sdk_contracts.SourceSDKThreadXSelectionTests.test_approved_origin_declaration_is_required_and_packaged) ... ok
+test_threadx_dependency_snapshot_is_exact_reviewed_source_closure (sdk_contracts.SourceSDKThreadXSelectionTests.test_threadx_dependency_snapshot_is_exact_reviewed_source_closure) ... ok
+
+======================================================================
+ERROR: test_development_contracts_are_explicitly_rejected (sdk_contracts.SourceSDKTests.test_development_contracts_are_explicitly_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 266, in test_development_contracts_are_explicitly_rejected
+    _, _, result = self.consumer("contract rejection", contracts=True, fixture=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 188, in consumer
+    return source, build, self.run_process(command)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 160, in run_process
+    return subprocess.run(arguments, text=True, capture_output=True, timeout=180, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'cmake'
+
+======================================================================
+ERROR: test_different_source_package_version_is_rejected (sdk_contracts.SourceSDKTests.test_different_source_package_version_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 261, in test_different_source_package_version_is_rejected
+    _, _, result = self.consumer("version rejection", fixture=True, version="99.0.0")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 188, in consumer
+    return source, build, self.run_process(command)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 160, in run_process
+    return subprocess.run(arguments, text=True, capture_output=True, timeout=180, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'cmake'
+
+======================================================================
+ERROR: test_expected_revision_conflict_is_rejected (sdk_contracts.SourceSDKTests.test_expected_revision_conflict_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 256, in test_expected_revision_conflict_is_rejected
+    _, _, result = self.consumer("revision rejection", fixture=True, expected_revision="0" * 40)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 188, in consumer
+    return source, build, self.run_process(command)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 160, in run_process
+    return subprocess.run(arguments, text=True, capture_output=True, timeout=180, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'cmake'
+
+======================================================================
+ERROR: test_fixture_requires_explicit_consumer_opt_in (sdk_contracts.SourceSDKTests.test_fixture_requires_explicit_consumer_opt_in)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 239, in test_fixture_requires_explicit_consumer_opt_in
+    _, _, result = self.consumer("fixture rejection", fixture=False)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 188, in consumer
+    return source, build, self.run_process(command)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 160, in run_process
+    return subprocess.run(arguments, text=True, capture_output=True, timeout=180, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'cmake'
+
+======================================================================
+ERROR: test_relocated_c_and_cpp_consumer_build_and_run_without_original_source (sdk_contracts.SourceSDKTests.test_relocated_c_and_cpp_consumer_build_and_run_without_original_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 191, in test_relocated_c_and_cpp_consumer_build_and_run_without_original_source
+    source, build, result = self.consumer("native", fixture=True)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 188, in consumer
+    return source, build, self.run_process(command)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 160, in run_process
+    return subprocess.run(arguments, text=True, capture_output=True, timeout=180, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'cmake'
+
+======================================================================
+FAIL: test_clean_checkout_with_missing_dependency_gitlinks_is_rejected (sdk_contracts.SourceSDKTests.test_clean_checkout_with_missing_dependency_gitlinks_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 442, in test_clean_checkout_with_missing_dependency_gitlinks_is_rejected
+    self.assertIn("required dependency Gitlink", result.stderr)
+AssertionError: 'required dependency Gitlink' not found in 'Source SDK rejected: Missing source SDK file: .gitmodules\n'
+
+======================================================================
+FAIL: test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback (sdk_contracts.SourceSDKTests.test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 386, in test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : ThreadX source rejected: ThreadX checkout differs from exact official locked revision
+
+
+======================================================================
+FAIL: test_modified_exported_config_is_rejected (sdk_contracts.SourceSDKTests.test_modified_exported_config_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 288, in test_modified_exported_config_is_rejected
+    self.assertIn("Exported CMake package identity changed", result.stderr)
+AssertionError: 'Exported CMake package identity changed' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/include/nexus/arch/arch.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 323, in test_rehashed_missing_arch_source_is_rejected
+    self.assertIn("missing required sources/licenses",
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/cortex_m/nx_arch_cortex_m.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 323, in test_rehashed_missing_arch_source_is_rejected
+    self.assertIn("missing required sources/licenses",
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/cortex_m/private/compiler.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 323, in test_rehashed_missing_arch_source_is_rejected
+    self.assertIn("missing required sources/licenses",
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_missing_arch_source_is_rejected (sdk_contracts.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) (name='arch/native/nx_arch_native.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 323, in test_rehashed_missing_arch_source_is_rejected
+    self.assertIn("missing required sources/licenses",
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/common/src/tx_thread_create.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/ports/linux/gnu/src/tx_timer_interrupt.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/ports/cortex_m4/gnu/src/tx_thread_schedule.S')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/common/inc/tx_api.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='ext/threadx/LICENSE.txt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='os/threadx/Kernel.cmake')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='tools/configure/threadx.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+======================================================================
+FAIL: test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (sdk_contracts.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) (name='tools/maintenance/threadx_lock.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 351, in test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject
+    self.assertIn("missing required sources/licenses", result.stderr)
+AssertionError: 'missing required sources/licenses' not found in 'Source SDK rejected: Installed source SDK has missing or additional files\n'
+
+----------------------------------------------------------------------
+Ran 28 tests in 29.652s
+
+FAILED (failures=15, errors=5, skipped=2)

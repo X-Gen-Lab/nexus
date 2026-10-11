@@ -5,9 +5,10 @@ except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
 try:
-    from ... import can
+    from ... import can, usb_device
 except ImportError:
     import can
+    import usb_device
 from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
@@ -629,6 +630,8 @@ def constructor(item, result, board_bindings, routes, devices):
     item = controller_ir(item, "stm32f407")
     if item.kind == "can":
         return can.constructor(item, result, "stm32")
+    if item.kind == "usb_device":
+        return usb_device.constructor(item, result, "stm32")
     if item.kind == "gpio":
         return _gpio_constructor(item)
     if item.kind == "uart":

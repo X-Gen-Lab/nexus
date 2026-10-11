@@ -1,0 +1,28 @@
+Running main() from gmock_main.cc
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from TimebaseSoC
+[ RUN      ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort
+/workspace/nexus/tests/google/timebase_soc_test.cpp:116: Failure
+Expected: (face) != (nullptr), actual: NULL vs (nullptr)
+
+[  FAILED  ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort (0 ms)
+[ RUN      ] TimebaseSoC.MissingSleepClockAndDisabledWakeIRQRejectThePort
+[       OK ] TimebaseSoC.MissingSleepClockAndDisabledWakeIRQRejectThePort (0 ms)
+[ RUN      ] TimebaseSoC.WrongPrescalerAndStoppedTimebaseRejectWithoutRepair
+[       OK ] TimebaseSoC.WrongPrescalerAndStoppedTimebaseRejectWithoutRepair (0 ms)
+[ RUN      ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState
+/workspace/nexus/tests/google/timebase_soc_test.cpp:140: Failure
+Expected: (face) != (nullptr), actual: NULL vs (nullptr)
+
+[  FAILED  ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState (0 ms)
+[----------] 4 tests from TimebaseSoC (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 2 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort
+[  FAILED  ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState
+
+ 2 FAILED TESTS

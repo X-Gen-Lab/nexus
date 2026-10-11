@@ -1,0 +1,66 @@
+[1/64] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj
+[2/64] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[3/64] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[4/64] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj
+[5/64] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[6/64] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[7/64] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[8/64] Linking C static library nexus-sdk/lib/libnexus_core.a
+[9/64] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[10/64] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[11/64] Linking C static library nexus-sdk/lib/libnexus_arch.a
+[12/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[13/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[14/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[15/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[16/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[17/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[18/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[19/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[20/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[21/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[22/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[23/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[24/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[25/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[26/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[27/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[28/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj
+[29/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj
+[30/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj
+[31/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.obj
+[32/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj
+[33/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj
+[34/64] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj
+[35/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.obj
+[36/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.obj
+[37/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c.obj
+[38/64] Linking C static library nexus-sdk/lib/libnexus_io.a
+[39/64] Building C object nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[40/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/list.c.obj
+[41/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/portable/GCC/ARM_CM4F/port.c.obj
+[42/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c.obj
+[43/64] Linking C static library nexus-sdk/lib/libnexus_gd32_sdk.a
+[44/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/timebase.c.obj
+[45/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/usb_device.c.obj
+[46/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/queue.c.obj
+[47/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/gpio.c.obj
+[48/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/usb_clock.c.obj
+[49/64] Linking C static library nexus-sdk/lib/libnexus_os_wait.a
+[50/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/tasks.c.obj
+[51/64] Linking C static library nexus-sdk/lib/libnx_freertos_kernel.a
+[52/64] Building C object CMakeFiles/usb_controller_fixture.dir/controller_main.c.obj
+[53/64] Building ASM object CMakeFiles/usb_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S.obj
+[54/64] Building C object nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj
+[55/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+[56/64] Building C object CMakeFiles/usb_controller_fixture_nexus_startup.dir/workspace/nexus/soc/gd32f470/system.c.obj
+[57/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+[58/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+[59/64] Building C object nexus-sdk/os/freertos/CMakeFiles/nexus_os_freertos.dir/freertos.c.obj
+[60/64] Linking C static library nexus-sdk/lib/libnexus_os_freertos.a
+[61/64] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/workspace/nexus/io/src/usb_device_controller.c.obj
+[62/64] Linking C static library nexus-sdk/lib/libnexus_soc_gd32f470.a
+[63/64] Linking C static library nexus-sdk/lib/libnexus_platform.a
+[64/64] Linking C executable bin/usb_controller_fixture.elf
+ELF budget: passed
+Retained 5 selected faces, 2 concrete tables and 9 method slots

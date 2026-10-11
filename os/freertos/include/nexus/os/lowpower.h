@@ -15,7 +15,7 @@ extern "C" {
 #endif
 /** \brief Bounded late alarm catch-up; larger delays violate the timer port. */
 #define NX_FREERTOS_LATE_TICK_BUDGET 8u
-/** \brief Exact stopped-periodic-tick epoch in the continuous clock domain. */
+/** \brief Stopped-tick epoch with the concrete port's declared precision. */
 typedef struct {
     uint64_t time_us;
     uint32_t phase_us;
@@ -33,7 +33,8 @@ typedef struct {
  *                  rejection retains no alarm. disarm removes only that alarm.
  *                  resume_tick restores the periodic source with its next
  *                  expiry at the supplied absolute clock instant, preserving
- *                  phase rather than adding callback latency to every tick.
+ *                  phase within its declared quantization and sampling bound
+ *                  rather than adding callback latency to every tick.
  *                  It must not publish an already accounted tick. The alarm
  *                  wakes by deadline; at most eight extra ticks of latency may
  *                  be caught up. Reversed clocks or larger latency fail stop.
@@ -49,10 +50,11 @@ typedef struct {
     void (*resume_tick)(void* context, uint64_t next_tick_us);
 } nx_freertos_lowpower_port_t;
 /**
- * \brief           Return the explicit application-owned timer port.
+ * \brief           Return the explicitly selected continuous timer port.
  * \return          Stable port or NULL to leave normal periodic ticking.
- * \note            Application overrides the weak NULL default when selecting
- *                  lowpower. Port and context live throughout the scheduler;
+ * \note            A maintained SoC binding or application implementation
+ *                  overrides the weak NULL default. The port and context
+ *                  remain live throughout the scheduler;
  *                  no runtime rebinding, hidden pool or worker is provided.
  *                  Absence of a port never stops ticks or sleeps.
  */

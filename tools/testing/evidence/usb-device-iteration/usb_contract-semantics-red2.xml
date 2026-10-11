@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="36" failures="3" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:53:06.060" name="AllTests">
+  <testsuite name="UsbDevice" tests="36" failures="3" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:53:06.060">
+    <testcase name="FifoWriteDoesNotCompleteHostAcknowledgement" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="ShortOutCompletesOnlyAfterDataAndTransferFacts" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="85" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="OutOverflowCannotWriteBeyondCallerCapacity" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="99" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="FailedDisableKeepsRequestBorrowedThroughDrainDeadline" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="111" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="FifoFlushFailureCannotSettleDisabledEndpoint" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="124" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="StopCannotReleaseWakeOrClockWithAnEnabledIrq" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="135" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="NewSetupInvalidatesOldControlBeforeReusingStorage" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="142" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="AddressChangesOnlyAfterMatchingStatusInAcknowledgement" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="155" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="ResetDoesNotRevokeAnUnprovedEndpointLoan" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="StaleCompletionCannotFinishANewRequestEpoch" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="179" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="IllegalPacketAndIncomingMaskRejectWithNoBorrow" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="StallRequiresIdleAndClearResetsBulkDataPid" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="197" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="FullEventsPreserveAuthoritativeLatestSetup" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="207" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="SubsequentControlDataPacketsPreserveTheHardwarePidToggle" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="222" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="235" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="248" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="257" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="263" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="PacketBuffersCannotAliasTheClockConsumerControl" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="280" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="RestartDoesNotReuseAnEarlierControlEpoch" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="287" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="CancellingOutRestoresPeerAdmissionAfterActualDrain" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="297" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="305" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="PendingResetAtGlobalEnableRemainsObservableAfterColdStart" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="312" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="StopAndDetachJoinTheInFlightWakePublisher" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="329" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.060" classname="UsbDevice" />
+    <testcase name="StateOutputsCannotOverwriteControllerOrClockStorage" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="364" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="EventCountCannotAliasControllerQueueMetadata" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="374" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="EventOutputsCannotOverwriteClockOrAcceptedOutRequest" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="384" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="AttachedWakeObjectCannotBecomeAnOutBuffer" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="404" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="WakeCannotAttachInsideAnAlreadyBorrowedOutBuffer" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="411" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="EventPlanCannotOverwriteAnImmutableClockTable" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="418" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="ReadOnlyTxEmptyFlagCannotPreventColdStartOrSettlement" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="438" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="EmptyInTokenIsRetryInformationRatherThanATransferFailure" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="448" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:454&#x0A;Expected equality of these values:&#x0A;  nx_request_state(&amp;request.base)&#x0A;    Which is: 4&#x0A;  NX_REQUEST_ACTIVE&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:454
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 4
+  NX_REQUEST_ACTIVE
+    Which is: 2
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:457&#x0A;Expected equality of these values:&#x0A;  request.base.result&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:457
+Expected equality of these values:
+  request.base.result
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutSetupDoneIsNotAnErrorOfTheFollowingControlData" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="459" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:467&#x0A;Expected equality of these values:&#x0A;  nx_request_state(&amp;request.base)&#x0A;    Which is: 3&#x0A;  NX_REQUEST_ACTIVE&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:467
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 3
+  NX_REQUEST_ACTIVE
+    Which is: 2
+]]></failure>
+    </testcase>
+    <testcase name="ResetDiscardsAnUnorderedPendingSetupFromThePriorBusEpoch" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="469" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice">
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:474&#x0A;Value of: model.controller.snapshot.control_pending&#x0A;  Actual: true&#x0A;Expected: false&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:474
+Value of: model.controller.snapshot.control_pending
+  Actual: true
+Expected: false
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:475&#x0A;Expected equality of these values:&#x0A;  nx_usb_device_address(&amp;device, model.controller.snapshot.epoch, 7)&#x0A;    Which is: 0&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:475
+Expected equality of these values:
+  nx_usb_device_address(&device, model.controller.snapshot.epoch, 7)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/usb_device_test.cpp:478&#x0A;Expected equality of these values:&#x0A;  count&#x0A;    Which is: 2&#x0A;  1U&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/usb_device_test.cpp:478
+Expected equality of these values:
+  count
+    Which is: 2
+  1U
+    Which is: 1
+]]></failure>
+    </testcase>
+    <testcase name="InDisableWaitsForAnObservedNakEffectiveState" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="481" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+    <testcase name="OutZeroFixedDisableBitUsesProvedPioFifoWithdrawal" file="/workspace/nexus/tests/google/usb_device_test.cpp" line="493" status="run" result="completed" time="0." timestamp="2026-10-11T17:53:06.061" classname="UsbDevice" />
+  </testsuite>
+</testsuites>

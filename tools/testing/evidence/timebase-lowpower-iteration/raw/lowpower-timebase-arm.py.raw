@@ -1,0 +1,86 @@
+import hashlib,json,os,subprocess,time
+from pathlib import Path
+root=Path('/workspace/nexus');base=Path('/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-clock-review');base.mkdir(exist_ok=True)
+arm=Path('/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin');env=os.environ.copy();env['PATH']=str(arm)+os.pathsep+str(root/'.venv/bin')+os.pathsep+env['PATH']
+report={'qualification':False,'scope':'fresh dirty-development actual firmware CMake graph; no physical execution','commands':[],'variants':[]}
+def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def run(cmd,name):
+ t=time.time();p=subprocess.run([str(x) for x in cmd],cwd=root,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True);log=base/(name+'.log');log.write_text(p.stdout);report['commands'].append({'command':[str(x) for x in cmd],'returncode':p.returncode,'start':t,'end':time.time(),'log':str(log)});print(name,p.returncode,flush=True)
+ if p.returncode: raise RuntimeError(name+' failed: '+p.stdout[-2500:])
+ return p.stdout
+try:
+ run([arm/'arm-none-eabi-gcc','--version'],'tool-gcc')
+ for family,board,clock in [('stm32f407','stm32_assembly/zg_board','hse8-pll168'),('gd32f470','gd32_assembly/software_board','hxtal25-pll200')]:
+  for port in ['custom','timebase']:
+   name=family+'-'+port;d=base/name;d.mkdir();build=d/'build';fixture=d/'fixture';fixture.mkdir()
+   (fixture/'CMakeLists.txt').write_text('''cmake_minimum_required(VERSION 3.31)
+project(lowpower_binding_fixture LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "ARM software-only fixture")
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Caller main owns scheduler start")
+add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+nexus_add_firmware(lowpower_fixture SOURCES main.c)
+''')
+   (fixture/'main.c').write_text('''#include "nexus_bindings.h"
+#include "nexus/os/lowpower.h"
+#include "FreeRTOS.h"
+#include "task.h"
+int main(void) {
+    nx_platform_start_result_t start = nx_platform_start();
+    if (start.primary != NX_SUCCESS) return 1;
+    const volatile nx_freertos_lowpower_port_t* port = nx_freertos_lowpower_port();
+    if (port != NULL) {
+        (void)port->context; (void)port->now_us; (void)port->pause_tick;
+        (void)port->arm_deadline; (void)port->disarm; (void)port->resume_tick;
+    }
+    vTaskStartScheduler();
+    return 2;
+}
+''')
+   assembly=d/'assembly.toml';assembly.write_text(f'''schema = 2
+board_package = "{root/'tests/contracts'/board}"
+backend = "freertos"
+clock = "{clock}"
+optimization = "Os"
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+[os]
+profile = "standard"
+tick_source = "systick"
+tickless = true
+lowpower_port = "{port}"
+''')
+   source_before={x:sha(root/x) for x in ['os/freertos/timebase_lowpower.c','os/freertos/private/timebase_lowpower.h','os/freertos/CMakeLists.txt','os/freertos/include/FreeRTOSConfig.h',f'soc/{family}/timebase_lowpower.c',f'soc/{family}/CMakeLists.txt',f'soc/{family}/'+('system.c' if family=='stm32f407' else 'timebase.c')]}
+   run([root/'.venv/bin/cmake','-S',fixture,'-B',build,'-G','Ninja','-DCMAKE_BUILD_TYPE=Release','-DCMAKE_TOOLCHAIN_FILE='+str(root/'cmake/toolchains/arm-gcc.cmake'),'-DNEXUS_SOURCE_ROOT='+str(root),'-DNEXUS_ASSEMBLY_FILE='+str(assembly)],name+'-configure')
+   run([root/'.venv/bin/cmake','--build',build,'--parallel','2'],name+'-build')
+   elves=list((build/'bin').glob('*.elf'));assert len(elves)==1;elf=elves[0]
+   symbols=run([arm/'arm-none-eabi-nm','-S','--defined-only',elf],name+'-nm'); undefined=run([arm/'arm-none-eabi-nm','-u',elf],name+'-undefined');assert not undefined.strip()
+   size=run([arm/'arm-none-eabi-size',elf],name+'-size');disasm=run([arm/'arm-none-eabi-objdump','-d',elf],name+'-disassembly')
+   entries=json.loads((build/'compile_commands.json').read_text());selected=[e for e in entries if Path(e['file']).name=='timebase_lowpower.c'];assert len(selected)==(2 if port=='timebase' else 0)
+   if port=='timebase':
+    assert 'nx_freertos_kernel_tick_handler' in symbols and 'nx_timebase_resume_tick' in symbols and 'nx_timebase_pause_tick' in symbols
+    getter=[s for s in symbols.splitlines() if s.endswith(' nx_freertos_lowpower_port')];assert len(getter)==1 and ' T ' in getter[0]
+    layouts={}
+    for sym,expect in [('s_context',16),('s_registers',52),('s_port',24)]:
+     lines=[s.split() for s in symbols.splitlines() if s.endswith(' '+sym)];assert len(lines)==1;layouts[sym]=int(lines[0][1],16);assert layouts[sym]==expect,(sym,layouts[sym],expect)
+    assert '<SysTick_Handler>:' in disasm and '<nx_freertos_kernel_tick_handler>:' in disasm
+   else:
+    assert 'nx_freertos_kernel_tick_handler' not in symbols and 'nx_timebase_' not in symbols and 'nx_'+('stm32' if family=='stm32f407' else 'gd32')+'_lowpower_' not in symbols
+    getter=[s for s in symbols.splitlines() if s.endswith(' nx_freertos_lowpower_port')];assert len(getter)==1 and ' W ' in getter[0]
+    layouts={}
+   rows=size.strip().splitlines()[-1].split();cost={'text':int(rows[0]),'data':int(rows[1]),'bss':int(rows[2]),'flash_text_data':int(rows[0])+int(rows[1]),'ram_data_bss':int(rows[1])+int(rows[2])}
+   source_after={x:sha(root/x) for x in source_before};assert source_before==source_after,'source changed during variant'
+   artifact=[{'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p)} for p in sorted((build/'bin').iterdir()) if p.is_file()]
+   report['variants'].append({'name':name,'family':family,'port':port,'status':'passed','source_hashes':source_after,'selected_mechanism_TUs':len(selected),'layouts':layouts,'size':cost,'artifacts':artifact,'assembly_sha256':sha(assembly),'fixture_sha256':{p.name:sha(p) for p in fixture.iterdir() if p.is_file()}})
+   (base/'report.json').write_text(json.dumps(report,indent=2)+'\n')
+ report['deltas']={}
+ for family in ['stm32f407','gd32f470']:
+  default=next(v for v in report['variants'] if v['name']==family+'-custom'); selected=next(v for v in report['variants'] if v['name']==family+'-timebase');report['deltas'][family]={k:selected['size'][k]-default['size'][k] for k in selected['size']}
+ report['status']='passed'
+except Exception as error:
+ report['status']='failed';report['error']=str(error);print(str(error),flush=True)
+finally:
+ (base/'report.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({'status':report['status'],'variants':len(report['variants']),'deltas':report.get('deltas')},indent=2),flush=True)
+raise SystemExit(0 if report['status']=='passed' else 1)

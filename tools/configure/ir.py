@@ -103,6 +103,7 @@ class KernelProfileIR(Record):
     trace: bool
     runtime_stats: bool
     tickless: bool
+    lowpower_port: str
     min_stack_words: int
     stack_alignment_bytes: int
     definitions: Mapping
@@ -118,7 +119,39 @@ class KernelProfileIR(Record):
             "idle_stack_words",
             "max_task_name_len", "mutexes", "counting_semaphores",
             "task_notifications", "notification_slots", "trace", "runtime_stats",
-            "tickless", "min_stack_words", "stack_alignment_bytes")),
+            "tickless", "lowpower_port", "min_stack_words", "stack_alignment_bytes")),
+                   freeze(record["definitions"]), freeze(record))
+
+    def to_dict(self):
+        return thaw(self)
+
+
+@dataclass(frozen=True)
+class ThreadXKernelProfileIR(Record):
+    """Immutable ThreadX decisions, independent of FreeRTOS policy fields."""
+    backend: str
+    profile: str
+    tick_source: str
+    tick_hz: int
+    tick_reload: int | None
+    max_priorities: int
+    syscall_priority: int
+    interrupt_mask: str
+    kernel_policy: str
+    kernel_port: str
+    timer_process_in_isr: bool
+    min_stack_bytes: int
+    stack_alignment_bytes: int
+    definitions: Mapping
+    values: Mapping
+
+    @classmethod
+    def from_validated(cls, record):
+        return cls(*(record[name] for name in (
+            "backend", "profile", "tick_source", "tick_hz", "tick_reload",
+            "max_priorities", "syscall_priority", "interrupt_mask",
+            "kernel_policy", "kernel_port", "timer_process_in_isr",
+            "min_stack_bytes", "stack_alignment_bytes")),
                    freeze(record["definitions"]), freeze(record))
 
     def to_dict(self):
@@ -175,6 +208,28 @@ class AdcOptions:
 
 
 @dataclass(frozen=True)
+class UsbDeviceOptions:
+    event_capacity: int
+    rx_fifo_words: int
+    vbus_sensing: bool
+    poll_limit: int
+    drain_timeout_us: int
+    clock_timeout_us: int
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class UsbEndpointOptions:
+    index: int
+    number: int
+    direction: str
+    transfer: str
+    max_packet: int
+    fifo_start: int
+    fifo_words: int
+
+
+@dataclass(frozen=True)
 class CanTimingOptions:
     prescaler: int
     segment1: int
@@ -219,7 +274,8 @@ class NoOptions:
 
 
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
-                     ExtiOptions | PwmOptions | AdcOptions | CanOptions | NoOptions)
+                     ExtiOptions | PwmOptions | AdcOptions | CanOptions |
+                     UsbDeviceOptions | NoOptions)
 
 
 def mode_options(values):
@@ -232,6 +288,10 @@ def mode_options(values):
                           values["bitrate"], CanTimingOptions(**values["timing"]),
                           irq, values["drain_timeout_us"], values["poll_limit"],
                           values["fifo_order"])
+    if kind == "usb_device":
+        return UsbDeviceOptions(*(values[key] for key in (
+            "event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
+            "drain_timeout_us", "clock_timeout_us")), irq)
     if kind == "gpio":
         return GpioOptions(values["mask"], values["initial"])
     if kind == "uart":
@@ -279,14 +339,19 @@ class EndpointIR(Record):
     controller: str
     driver: str
     kind: str
+    options: UsbEndpointOptions | None
     values: Mapping
 
     @classmethod
     def create(cls, values, controllers):
         kind = next(item.kind for item in controllers
                     if item.id == values["controller"])
+        options = (UsbEndpointOptions(values["endpoint_index"], *(values[key]
+                   for key in ("number", "direction", "transfer", "max_packet",
+                               "fifo_start", "fifo_words")))
+                   if kind == "usb_device" else None)
         return cls(values["id"], values["controller"], values["driver"],
-                   kind, freeze(values))
+                   kind, options, freeze(values))
 
 
 @dataclass(frozen=True)
@@ -316,7 +381,7 @@ class ConfigurationIR(Record):
     backend: str
     irq: InterruptProfileIR
     cpu_profile: CpuProfileIR
-    kernel: KernelProfileIR | None
+    kernel: KernelProfileIR | ThreadXKernelProfileIR | None
     controllers: tuple[ControllerIR, ...]
     devices: tuple[EndpointIR, ...]
     memory_budget: MemoryBudgetIR
@@ -343,7 +408,9 @@ class ConfigurationIR(Record):
                                           budgets.get("regions", {}).items())))
         irq = InterruptProfileIR(**result["irq"])
         cpu = CpuProfileIR.from_validated(result["cpu_profile"])
-        kernel = (KernelProfileIR.from_validated(result["kernel_profile"])
+        kernel_type = (ThreadXKernelProfileIR if result["backend"] == "threadx"
+                       else KernelProfileIR)
+        kernel = (kernel_type.from_validated(result["kernel_profile"])
                   if result.get("kernel_profile") is not None else None)
         return cls(result["board"], result["soc_family"], result["backend"], irq, cpu, kernel,
                    controllers, devices, memory,

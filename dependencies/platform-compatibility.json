@@ -19,5 +19,11 @@
     "cpu_facts": 1,
     "runtime_resolved": 1,
     "source_sdk_manifest": 1
-  }
+  },
+  "configured_backends": [
+    "baremetal",
+    "native",
+    "freertos",
+    "threadx"
+  ]
 }

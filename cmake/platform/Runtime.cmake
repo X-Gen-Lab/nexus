@@ -21,7 +21,7 @@ function(nexus_add_runtime)
     endif()
     foreach(override NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI
             NEXUS_ENUM_ABI NEXUS_CPU_COMPILE_OPTIONS NEXUS_BACKEND
-            NEXUS_FREERTOS_PORT NEXUS_IRQ_PRIORITY_BITS NEXUS_OPTIMIZATION)
+            NEXUS_FREERTOS_PORT NEXUS_THREADX_PORT NEXUS_IRQ_PRIORITY_BITS NEXUS_OPTIMIZATION)
         if(DEFINED CACHE{${override}})
             message(FATAL_ERROR "${override} is not a runtime override; use ASSEMBLY")
         endif()
@@ -65,6 +65,10 @@ function(nexus_add_runtime)
         "${NEXUS_SOURCE_DIR}/tools/configure/cpu.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/threadx.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/lowpower.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
+        "${NEXUS_SOURCE_DIR}/dependencies/platform-compatibility.json"
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/common.py")
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
     foreach(layer core arch io os components)
@@ -76,6 +80,8 @@ function(nexus_add_runtime)
         Nexus::Arch Nexus::IO)
     if(NEXUS_BACKEND STREQUAL "freertos")
         target_link_libraries(nexus_runtime INTERFACE Nexus::OSFreeRTOS)
+    elseif(NEXUS_BACKEND STREQUAL "threadx")
+        target_link_libraries(nexus_runtime INTERFACE Nexus::OSThreadX)
     else()
         target_link_libraries(nexus_runtime INTERFACE Nexus::OSBaremetal)
     endif()

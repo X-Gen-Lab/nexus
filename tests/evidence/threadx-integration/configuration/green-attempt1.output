@@ -1,0 +1,45 @@
+test_cpu_runtime_binds_host_policy_into_atomic_bundle (test_threadx.ThreadXPolicyTests.test_cpu_runtime_binds_host_policy_into_atomic_bundle) ... ok
+test_default_m4_policy_uses_real_static_port_facts (test_threadx.ThreadXPolicyTests.test_default_m4_policy_uses_real_static_port_facts) ... ok
+test_editor_schema_is_backend_specific (test_threadx.ThreadXPolicyTests.test_editor_schema_is_backend_specific) ... ok
+test_external_tick_has_no_implicit_hardware_or_truncation (test_threadx.ThreadXPolicyTests.test_external_tick_has_no_implicit_hardware_or_truncation) ... ok
+test_generated_policy_has_exact_threadx_contracts (test_threadx.ThreadXPolicyTests.test_generated_policy_has_exact_threadx_contracts) ... ok
+test_native_and_actual_m4_gnu_tuples_are_distinct (test_threadx.ThreadXPolicyTests.test_native_and_actual_m4_gnu_tuples_are_distinct) ... ok
+test_native_cannot_claim_interrupt_mask_or_syscall_ceiling (test_threadx.ThreadXPolicyTests.test_native_cannot_claim_interrupt_mask_or_syscall_ceiling) ... ok
+test_native_clock_is_explicit_host_monotonic_not_fake_systick (test_threadx.ThreadXPolicyTests.test_native_clock_is_explicit_host_monotonic_not_fake_systick) ... ok
+test_other_cores_remain_arch_contracts_not_threadx_ports (test_threadx.ThreadXPolicyTests.test_other_cores_remain_arch_contracts_not_threadx_ports) ... ok
+test_platform_scope_does_not_turn_arbitrary_board_into_support (test_threadx.ThreadXPolicyTests.test_platform_scope_does_not_turn_arbitrary_board_into_support) ... ok
+test_policy_and_macros_are_immutable (test_threadx.ThreadXPolicyTests.test_policy_and_macros_are_immutable) ... ok
+test_primask_policy_does_not_remove_physical_basepri_capability (test_threadx.ThreadXPolicyTests.test_primask_policy_does_not_remove_physical_basepri_capability) ... ok
+test_priority_count_and_numeric_types_fail_closed (test_threadx.ThreadXPolicyTests.test_priority_count_and_numeric_types_fail_closed) ... ok
+test_profile_and_freertos_feature_fields_are_rejected (test_threadx.ThreadXPolicyTests.test_profile_and_freertos_feature_fields_are_rejected) ... ok
+test_roundtrip_dispatch_retains_threadx_type_and_identity (test_threadx.ThreadXPolicyTests.test_roundtrip_dispatch_retains_threadx_type_and_identity) ... ok
+test_systick_requires_exact_reviewed_clock_and_reload (test_threadx.ThreadXPolicyTests.test_systick_requires_exact_reviewed_clock_and_reload) ... ok
+test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts (test_lowpower_integration.LowpowerIntegrationTests.test_cpu_emitter_cannot_publish_a_soc_port_without_soc_facts) ... ok
+test_cpu_only_runtime_rejects_missing_soc_hardware_contract (test_lowpower_integration.LowpowerIntegrationTests.test_cpu_only_runtime_rejects_missing_soc_hardware_contract) ... ok
+test_default_custom_port_preserves_existing_weak_null_contract (test_lowpower_integration.LowpowerIntegrationTests.test_default_custom_port_preserves_existing_weak_null_contract) ... ERROR
+test_editor_selector_uses_same_explicit_fields (test_lowpower_integration.LowpowerIntegrationTests.test_editor_selector_uses_same_explicit_fields) ... ok
+test_selector_type_unknown_value_and_incompatible_policy_are_rejected (test_lowpower_integration.LowpowerIntegrationTests.test_selector_type_unknown_value_and_incompatible_policy_are_rejected) ... ok
+test_timebase_port_is_explicit_and_emits_one_selector (test_lowpower_integration.LowpowerIntegrationTests.test_timebase_port_is_explicit_and_emits_one_selector) ... ERROR
+
+======================================================================
+ERROR: test_default_custom_port_preserves_existing_weak_null_contract (test_lowpower_integration.LowpowerIntegrationTests.test_default_custom_port_preserves_existing_weak_null_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 19, in test_default_custom_port_preserves_existing_weak_null_contract
+    self.assertEqual(policy.lowpower_port, "custom")
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'KernelProfileIR' object has no attribute 'lowpower_port'
+
+======================================================================
+ERROR: test_timebase_port_is_explicit_and_emits_one_selector (test_lowpower_integration.LowpowerIntegrationTests.test_timebase_port_is_explicit_and_emits_one_selector)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_lowpower_integration.py", line 28, in test_timebase_port_is_explicit_and_emits_one_selector
+    self.assertEqual(policy.lowpower_port, "timebase")
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'KernelProfileIR' object has no attribute 'lowpower_port'
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.008s
+
+FAILED (errors=2)

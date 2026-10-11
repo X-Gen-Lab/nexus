@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+   7476	     60	   2980	  10516	   2914	/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-clock-review/stm32f407-timebase/build/bin/lowpower_fixture.elf
