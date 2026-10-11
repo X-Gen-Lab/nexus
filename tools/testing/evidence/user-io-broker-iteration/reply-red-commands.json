@@ -1,0 +1,19 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/user-io-tests/build"
+    ],
+    "exit_code": 0,
+    "log": "reply-build-red.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/user-io-tests/build/user_io_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/user-io-broker-iteration/reply-red.xml"
+    ],
+    "exit_code": 1,
+    "log": "reply-red.log"
+  }
+]

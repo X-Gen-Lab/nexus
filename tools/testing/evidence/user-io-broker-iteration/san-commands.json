@@ -1,0 +1,34 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus-industrial-design/user-io-tests",
+      "-B",
+      "/workspace/nexus-industrial-design/user-io-tests/build-san",
+      "-DCMAKE_BUILD_TYPE=Debug",
+      "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+    ],
+    "exit_code": 0,
+    "log": "san-configure.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/user-io-tests/build-san"
+    ],
+    "exit_code": 0,
+    "log": "san-build.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/user-io-tests/build-san/user_io_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/user-io-broker-iteration/san-green.xml"
+    ],
+    "exit_code": 0,
+    "log": "san-green.log"
+  }
+]

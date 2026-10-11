@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="28" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T18:59:35.818" name="AllTests">
+  <testsuite name="UserIoBroker" tests="28" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T18:59:35.818">
+    <testcase name="AuthorizedScalarWriteUsesRealTypedProvider" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="126" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="ReadReturnsOnlyRequestedAuthorizedInputBits" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="138" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="AuthenticPrincipalCannotBeSuppliedByUser" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="148" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="UnauthorizedMasksRejectBeforeAnyDeviceEffect" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="159" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="BadAbiReservedOperationAndOverlappingMasksReject" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="168" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="ContextRejectsBeforeIdentityOrPins" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="182" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="WholeSpanBoundsPermissionsAndOverflowAreChecked" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="191" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="InputReplyAndKernelCallAliasesRejectBeforePins" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="215" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="FailedUnpinRetainsCallAndFinishNeverReplaysWrite" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="227" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="SecondPinFailureRetainsFirstIfRollbackCannotUnpin" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="249" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="RevokeDuringPinPreventsAnyDeviceEffectAndKeepsCleanup" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="268" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="SnapshotDoesNotReReadAChangedUserMessage" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="284" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="GenericLoanRequiresActualSettlementAndObserverJoin" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="298" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="CloseCannotRevokePinnedOutstandingLoan" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="310" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="CopiedAndStaleLoanTicketsCannotUnpinOriginal" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="325" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="FailedUnpinKeepsPinnedLoanAndExactIdentity" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="340" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="PinFailureRejectsWithoutBorrowAndEpochCannotWrap" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="350" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="WritablePeerOverlapRejectsButReadOnlySharingIsLegal" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="362" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="UserLoanAndDrainControlsCannotResideInUserWindow" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="377" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="ExactCapacityDoesNotCreateHiddenLoans" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="391" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="ConstructionRejectsUserWindowsCoveringKnownKernelControls" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="407" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="KernelCallAndLoanCannotAliasKnownProviderContext" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="420" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="LoanCannotOverwriteItsOwnTrustedDrainControl" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="431" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="NewCallCannotOverwriteAnotherRetainedDrainContext" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="441" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="ConstructCannotOverlayKnownMutableProviderStorage" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="456" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="OpenAdmissionIsNotAStableQuiescenceBarrier" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="468" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.818" classname="UserIoBroker" />
+    <testcase name="IncomingMaskedThreadCannotCallMemoryGateway" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="473" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.819" classname="UserIoBroker" />
+    <testcase name="ProviderCancellationStillCopiesInitializedErrorReply" file="/workspace/nexus/tests/google/user_io_broker_test.cpp" line="482" status="run" result="completed" time="0." timestamp="2026-10-11T18:59:35.819" classname="UserIoBroker">
+      <failure message="/workspace/nexus/tests/google/user_io_broker_test.cpp:505&#x0A;Expected equality of these values:&#x0A;  reply()-&gt;result&#x0A;    Which is: 6&#x0A;  NX_ERROR_CANCELLED&#x0A;    Which is: 5&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/user_io_broker_test.cpp:505
+Expected equality of these values:
+  reply()->result
+    Which is: 6
+  NX_ERROR_CANCELLED
+    Which is: 5
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/user_io_broker_test.cpp:506&#x0A;Expected equality of these values:&#x0A;  reply()-&gt;value&#x0A;    Which is: 4294967295&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/user_io_broker_test.cpp:506
+Expected equality of these values:
+  reply()->value
+    Which is: 4294967295
+  0U
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

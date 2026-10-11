@@ -1,0 +1,61 @@
+[ 16%] Building CXX object CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o
+[ 33%] Building C object CMakeFiles/user_io_contract.dir/workspace/nexus/io/src/gpio.c.o
+[ 50%] Building C object CMakeFiles/user_io_contract.dir/workspace/nexus/io/native/gpio.c.o
+[ 66%] Building C object CMakeFiles/user_io_contract.dir/workspace/nexus/core/src/request.c.o
+[ 83%] Building C object CMakeFiles/user_io_contract.dir/workspace/nexus/arch/native/nx_arch_native.c.o
+[100%] Linking CXX executable user_io_contract
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker::SetUp()':
+user_io_broker_test.cpp:(.text+0x11aa): undefined reference to `nx_user_io_broker_construct'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker::Call()':
+user_io_broker_test.cpp:(.text+0x1515): undefined reference to `nx_user_io_broker_gpio'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker::Loan(unsigned int)':
+user_io_broker_test.cpp:(.text+0x15a2): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_WholeSpanBoundsPermissionsAndOverflowAreChecked_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x3c2a): undefined reference to `nx_user_io_broker_gpio'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x3e54): undefined reference to `nx_user_io_broker_gpio'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_InputReplyAndKernelCallAliasesRejectBeforePins_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x4747): undefined reference to `nx_user_io_broker_gpio'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x496a): undefined reference to `nx_user_io_broker_gpio'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_FailedUnpinRetainsCallAndFinishNeverReplaysWrite_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x524c): undefined reference to `nx_user_io_broker_quiescent'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x5634): undefined reference to `nx_user_io_broker_gpio_finish'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_RevokeDuringPinPreventsAnyDeviceEffectAndKeepsCleanup_Test::TestBody()::{lambda(unsigned int, void*, unsigned long, unsigned int, unsigned long*)#1}::operator()(unsigned int, void*, unsigned long, unsigned int, unsigned long*) const':
+user_io_broker_test.cpp:(.text+0x6ac4): undefined reference to `nx_user_io_broker_close'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_GenericLoanRequiresActualSettlementAndObserverJoin_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x7e2f): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x7f56): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x811e): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_CloseCannotRevokePinnedOutstandingLoan_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x86d8): undefined reference to `nx_user_io_broker_close'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x87e5): undefined reference to `nx_user_io_broker_quiescent'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x8958): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x8c39): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x8d0e): undefined reference to `nx_user_io_broker_quiescent'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_CopiedAndStaleLoanTicketsCannotUnpinOriginal_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x925e): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x9375): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x968c): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0x9847): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_FailedUnpinKeepsPinnedLoanAndExactIdentity_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0x9df3): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_WritablePeerOverlapRejectsButReadOnlySharingIsLegal_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0xaef6): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xb163): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xb28c): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xb376): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_UserLoanAndDrainControlsCannotResideInUserWindow_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0xb6c9): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xb94a): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_ExactCapacityDoesNotCreateHiddenLoans_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0xbe7d): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xc01f): undefined reference to `nx_user_io_loan_acquire'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xc2f0): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xc3da): undefined reference to `nx_user_io_loan_release'
+/usr/bin/ld: CMakeFiles/user_io_contract.dir/workspace/nexus/tests/google/user_io_broker_test.cpp.o: in function `(anonymous namespace)::UserIoBroker_ConstructionRejectsUserWindowsCoveringKnownKernelControls_Test::TestBody()':
+user_io_broker_test.cpp:(.text+0xc772): undefined reference to `nx_user_io_broker_construct'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xc87d): undefined reference to `nx_user_io_broker_construct'
+/usr/bin/ld: user_io_broker_test.cpp:(.text+0xc994): undefined reference to `nx_user_io_broker_construct'
+collect2: error: ld returned 1 exit status
+gmake[2]: *** [CMakeFiles/user_io_contract.dir/build.make:168: user_io_contract] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/user_io_contract.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

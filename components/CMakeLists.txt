@@ -51,3 +51,5 @@ endif()
 add_subdirectory(owner_observer)
 
 add_subdirectory(clock_domain)
+
+add_subdirectory(user_io_broker)

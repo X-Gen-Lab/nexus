@@ -1,0 +1,192 @@
+Running main() from gmock_main.cc
+[==========] Running 27 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 27 tests from UserIoBroker
+[ RUN      ] UserIoBroker.AuthorizedScalarWriteUsesRealTypedProvider
+[       OK ] UserIoBroker.AuthorizedScalarWriteUsesRealTypedProvider (0 ms)
+[ RUN      ] UserIoBroker.ReadReturnsOnlyRequestedAuthorizedInputBits
+[       OK ] UserIoBroker.ReadReturnsOnlyRequestedAuthorizedInputBits (0 ms)
+[ RUN      ] UserIoBroker.AuthenticPrincipalCannotBeSuppliedByUser
+[       OK ] UserIoBroker.AuthenticPrincipalCannotBeSuppliedByUser (0 ms)
+[ RUN      ] UserIoBroker.UnauthorizedMasksRejectBeforeAnyDeviceEffect
+[       OK ] UserIoBroker.UnauthorizedMasksRejectBeforeAnyDeviceEffect (0 ms)
+[ RUN      ] UserIoBroker.BadAbiReservedOperationAndOverlappingMasksReject
+[       OK ] UserIoBroker.BadAbiReservedOperationAndOverlappingMasksReject (0 ms)
+[ RUN      ] UserIoBroker.ContextRejectsBeforeIdentityOrPins
+[       OK ] UserIoBroker.ContextRejectsBeforeIdentityOrPins (0 ms)
+[ RUN      ] UserIoBroker.WholeSpanBoundsPermissionsAndOverflowAreChecked
+[       OK ] UserIoBroker.WholeSpanBoundsPermissionsAndOverflowAreChecked (0 ms)
+[ RUN      ] UserIoBroker.InputReplyAndKernelCallAliasesRejectBeforePins
+[       OK ] UserIoBroker.InputReplyAndKernelCallAliasesRejectBeforePins (0 ms)
+[ RUN      ] UserIoBroker.FailedUnpinRetainsCallAndFinishNeverReplaysWrite
+[       OK ] UserIoBroker.FailedUnpinRetainsCallAndFinishNeverReplaysWrite (0 ms)
+[ RUN      ] UserIoBroker.SecondPinFailureRetainsFirstIfRollbackCannotUnpin
+[       OK ] UserIoBroker.SecondPinFailureRetainsFirstIfRollbackCannotUnpin (0 ms)
+[ RUN      ] UserIoBroker.RevokeDuringPinPreventsAnyDeviceEffectAndKeepsCleanup
+[       OK ] UserIoBroker.RevokeDuringPinPreventsAnyDeviceEffectAndKeepsCleanup (0 ms)
+[ RUN      ] UserIoBroker.SnapshotDoesNotReReadAChangedUserMessage
+[       OK ] UserIoBroker.SnapshotDoesNotReReadAChangedUserMessage (0 ms)
+[ RUN      ] UserIoBroker.GenericLoanRequiresActualSettlementAndObserverJoin
+[       OK ] UserIoBroker.GenericLoanRequiresActualSettlementAndObserverJoin (0 ms)
+[ RUN      ] UserIoBroker.CloseCannotRevokePinnedOutstandingLoan
+[       OK ] UserIoBroker.CloseCannotRevokePinnedOutstandingLoan (0 ms)
+[ RUN      ] UserIoBroker.CopiedAndStaleLoanTicketsCannotUnpinOriginal
+[       OK ] UserIoBroker.CopiedAndStaleLoanTicketsCannotUnpinOriginal (0 ms)
+[ RUN      ] UserIoBroker.FailedUnpinKeepsPinnedLoanAndExactIdentity
+[       OK ] UserIoBroker.FailedUnpinKeepsPinnedLoanAndExactIdentity (0 ms)
+[ RUN      ] UserIoBroker.PinFailureRejectsWithoutBorrowAndEpochCannotWrap
+[       OK ] UserIoBroker.PinFailureRejectsWithoutBorrowAndEpochCannotWrap (0 ms)
+[ RUN      ] UserIoBroker.WritablePeerOverlapRejectsButReadOnlySharingIsLegal
+[       OK ] UserIoBroker.WritablePeerOverlapRejectsButReadOnlySharingIsLegal (0 ms)
+[ RUN      ] UserIoBroker.UserLoanAndDrainControlsCannotResideInUserWindow
+[       OK ] UserIoBroker.UserLoanAndDrainControlsCannotResideInUserWindow (0 ms)
+[ RUN      ] UserIoBroker.ExactCapacityDoesNotCreateHiddenLoans
+[       OK ] UserIoBroker.ExactCapacityDoesNotCreateHiddenLoans (0 ms)
+[ RUN      ] UserIoBroker.ConstructionRejectsUserWindowsCoveringKnownKernelControls
+[       OK ] UserIoBroker.ConstructionRejectsUserWindowsCoveringKnownKernelControls (0 ms)
+[ RUN      ] UserIoBroker.KernelCallAndLoanCannotAliasKnownProviderContext
+[       OK ] UserIoBroker.KernelCallAndLoanCannotAliasKnownProviderContext (0 ms)
+[ RUN      ] UserIoBroker.LoanCannotOverwriteItsOwnTrustedDrainControl
+/workspace/nexus/tests/google/user_io_broker_test.cpp:427: Failure
+Expected equality of these values:
+  result.result
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:428: Failure
+Value of: result.accepted
+  Actual: true
+Expected: false
+
+[  FAILED  ] UserIoBroker.LoanCannotOverwriteItsOwnTrustedDrainControl (0 ms)
+[ RUN      ] UserIoBroker.NewCallCannotOverwriteAnotherRetainedDrainContext
+/workspace/nexus/tests/google/user_io_broker_test.cpp:439: Failure
+Expected equality of these values:
+  result.result
+    Which is: 13
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:440: Failure
+Value of: result.accepted
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:441: Failure
+Expected equality of these values:
+  reinterpret_cast<nx_user_io_call_t*>(control)->result
+    Which is: 13
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UserIoBroker.NewCallCannotOverwriteAnotherRetainedDrainContext (0 ms)
+[ RUN      ] UserIoBroker.ConstructCannotOverlayKnownMutableProviderStorage
+/workspace/nexus/tests/google/user_io_broker_test.cpp:453: Failure
+Expected equality of these values:
+  nx_user_io_broker_construct( reinterpret_cast<nx_user_io_broker_t*>(control), &other_config)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+[  FAILED  ] UserIoBroker.ConstructCannotOverlayKnownMutableProviderStorage (0 ms)
+[ RUN      ] UserIoBroker.OpenAdmissionIsNotAStableQuiescenceBarrier
+/workspace/nexus/tests/google/user_io_broker_test.cpp:458: Failure
+Expected equality of these values:
+  nx_user_io_broker_quiescent(&broker)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+[  FAILED  ] UserIoBroker.OpenAdmissionIsNotAStableQuiescenceBarrier (0 ms)
+[ RUN      ] UserIoBroker.IncomingMaskedThreadCannotCallMemoryGateway
+/workspace/nexus/tests/google/user_io_broker_test.cpp:46: Failure
+Value of: nx_arch_irq_is_masked()
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:463: Failure
+Mock function called more times than expected - taking default action specified at:
+/workspace/nexus/tests/google/user_io_broker_test.cpp:93:
+    Function call: Identity(0x7ffd09e7f940)
+          Returns: 0
+         Expected: to be never called
+           Actual: called once - over-saturated and active
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:52: Failure
+Value of: nx_arch_irq_is_masked()
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:464: Failure
+Mock function called more times than expected - taking default action specified at:
+/workspace/nexus/tests/google/user_io_broker_test.cpp:97:
+    Function call: Pin(7, 0x5585c9082528, 32, 1, 0x5585c9082720)
+          Returns: 0
+         Expected: to be never called
+           Actual: called once - over-saturated and active
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:52: Failure
+Value of: nx_arch_irq_is_masked()
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:464: Failure
+Mock function called more times than expected - taking default action specified at:
+/workspace/nexus/tests/google/user_io_broker_test.cpp:97:
+    Function call: Pin(7, 0x5585c9082568, 8, 2, 0x5585c9082778)
+          Returns: 0
+         Expected: to be never called
+           Actual: called twice - over-saturated and active
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:57: Failure
+Value of: nx_arch_irq_is_masked()
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:57: Failure
+Value of: nx_arch_irq_is_masked()
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:466: Failure
+Expected equality of these values:
+  Call().result
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:52: Failure
+Value of: nx_arch_irq_is_masked()
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:464: Failure
+Mock function called more times than expected - taking default action specified at:
+/workspace/nexus/tests/google/user_io_broker_test.cpp:97:
+    Function call: Pin(7, 0x5585c90825a8, 32, 1, 0x5585c9082800)
+          Returns: 0
+         Expected: to be never called
+           Actual: called 3 times - over-saturated and active
+
+/workspace/nexus/tests/google/user_io_broker_test.cpp:467: Failure
+Expected equality of these values:
+  Loan().result
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+[  FAILED  ] UserIoBroker.IncomingMaskedThreadCannotCallMemoryGateway (0 ms)
+[----------] 27 tests from UserIoBroker (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 27 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 22 tests.
+[  FAILED  ] 5 tests, listed below:
+[  FAILED  ] UserIoBroker.LoanCannotOverwriteItsOwnTrustedDrainControl
+[  FAILED  ] UserIoBroker.NewCallCannotOverwriteAnotherRetainedDrainContext
+[  FAILED  ] UserIoBroker.ConstructCannotOverlayKnownMutableProviderStorage
+[  FAILED  ] UserIoBroker.OpenAdmissionIsNotAStableQuiescenceBarrier
+[  FAILED  ] UserIoBroker.IncomingMaskedThreadCannotCallMemoryGateway
+
+ 5 FAILED TESTS

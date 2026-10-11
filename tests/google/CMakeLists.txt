@@ -445,3 +445,5 @@ include(can_factory.cmake)
 include(stack_observation.cmake)
 
 include(clock_domain.cmake)
+
+include(user_io_broker.cmake)
