@@ -1,0 +1,70 @@
+[1/27] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[2/27] Building C object io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+[3/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[4/27] Linking C static library lib/libnexus_io.a
+[5/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[6/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[7/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[8/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[9/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[10/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[11/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[12/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[13/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[14/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[15/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[16/27] Linking C static library lib/libnexus_io_native.a
+[17/27] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[18/27] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+[19/27] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o
+[20/27] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o 
+/usr/bin/c++ -DNEXUS_STM32_MODEL -DSTM32F407xx -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -isystem /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -include/workspace/nexus/tests/google/stm32_uart_receive_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o -c /workspace/nexus/tests/google/stm32_uart_receive_test.cpp
+In file included from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from /workspace/nexus/tests/google/stm32_uart_receive_test.cpp:13:
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp: In member function ‘virtual void Stm32UartReceive_HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam_Test::TestBody()’:
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:425:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_stm32_uart_flow_configure’?
+  425 |     ASSERT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, true, false),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:429:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_stm32_uart_flow_configure’?
+  429 |     ASSERT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, false, true),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:433:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_stm32_uart_flow_configure’?
+  433 |     ASSERT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, false, false),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp: In member function ‘virtual void Stm32UartReceive_HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters_Test::TestBody()’:
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:441:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_stm32_uart_flow_configure’?
+  441 |     EXPECT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, true, true),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:451:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_stm32_uart_flow_configure’?
+  451 |     EXPECT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, true, true),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[21/27] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o 
+/usr/bin/c++ -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/arch/include -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o -c /workspace/nexus/tests/google/gd32_uart_receive_test.cpp
+In file included from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from /workspace/nexus/tests/google/gd32_uart_receive_test.cpp:18:
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp: In member function ‘virtual void Gd32UartReceive_HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam_Test::TestBody()’:
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:459:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_gd32_uart_flow_configure’?
+  459 |     ASSERT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, true, false),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:463:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_gd32_uart_flow_configure’?
+  463 |     ASSERT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, false, true),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:467:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_gd32_uart_flow_configure’?
+  467 |     ASSERT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, false, false),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp: In member function ‘virtual void Gd32UartReceive_HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters_Test::TestBody()’:
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:475:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_gd32_uart_flow_configure’?
+  475 |     EXPECT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, true, true),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:485:15: error: ‘PREFIX_uart_flow_configure’ was not declared in this scope; did you mean ‘nx_gd32_uart_flow_configure’?
+  485 |     EXPECT_EQ(PREFIX_uart_flow_configure(&state.transmit.uart, true, true),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

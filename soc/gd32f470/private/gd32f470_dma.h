@@ -56,6 +56,31 @@ void nx_gd32_uart_dma_irq(nx_gd32_uart_dma_state_t* state);
  * \param[in,out]   state: Same static instance as the DMA vector.
  */
 void nx_gd32_uart_dma_uart_irq(nx_gd32_uart_dma_state_t* state);
+/**
+ * \brief           Side-effect-free checks shared with this exact TX start.
+ * \param[in]       context: Exact immutable face's selected provider state.
+ * \param[in]       request: Live descriptor, not admitted or retained here.
+ * \return          Same payload/domain/context/state/deadline rejection.
+ * \note            Task-only; reads facts but performs no MMIO store or borrow.
+ *                  RS485 binding must use this provider's matching validator.
+ */
+nx_result_t nx_gd32_uart_dma_tx_validate(void* context,
+                                         const nx_uart_tx_request_t* request);
+
+/** \brief Direct selected TX-DMA method; same request borrow contract. */
+nx_result_t nx_gd32_uart_dma_submit(void* context,
+                                    nx_uart_tx_request_t* request);
+/** \brief Direct selected TX-DMA method; same request borrow contract. */
+nx_result_t nx_gd32_uart_dma_start_admitted(void* context,
+                                            nx_uart_tx_request_t* request);
+/** \brief Direct selected TX-DMA method; same request borrow contract. */
+nx_result_t nx_gd32_uart_dma_cancel(void* context,
+                                    nx_uart_tx_request_t* request);
+/** \brief Owner-only bounded service; failed drain retains quarantine. */
+void nx_gd32_uart_dma_service(void* context);
+/** \brief Close TX admission and prove both memory and wire drain. */
+nx_result_t nx_gd32_uart_dma_stop(void* context);
+
 #ifdef __cplusplus
 }
 #endif

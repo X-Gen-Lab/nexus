@@ -152,6 +152,49 @@ TEST_F(GD32SPIDMA, PollingEndpointsProveSharedControllerWithoutDmaAlias) {
     EXPECT_FALSE(nx_spi_endpoint_on_port(&first, &incompatible));
 }
 
+TEST_F(GD32SPIDMA, ExplicitSingleCellSpansProgramFixedDmaWithoutScratch) {
+    const nx_dma_memory_region_t domains[] = {
+        {reinterpret_cast<uintptr_t>(source), 1U, NX_DMA_MEMORY_READ},
+        {reinterpret_cast<uintptr_t>(destination), 4U, NX_DMA_MEMORY_WRITE}};
+    state.regions = domains;
+    state.region_count = 2U;
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_TX_FIXED),
+              NX_SUCCESS);
+    EXPECT_EQ(DMA_CH4CTL(DMA1) & DMA_CHXCTL_MNAGA, 0U);
+    EXPECT_NE(DMA_CH3CTL(DMA1) & DMA_CHXCTL_MNAGA, 0U);
+    EXPECT_EQ(DMA_CH4M0ADDR(DMA1), reinterpret_cast<uintptr_t>(source));
+    EXPECT_EQ(DMA_CH4CNT(DMA1), 4U);
+    ASSERT_EQ(nx_spi_port_cancel(&bus, &request), NX_SUCCESS);
+    SPI_STAT(SPI4) = SPI_STAT_TRANS;
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(state.active, &request);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    SPI_STAT(SPI4) = SPI_STAT_TBE;
+    nx_spi_port_service(&bus);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+}
+
+TEST_F(GD32SPIDMA, ExplicitDiscardRejectsInvalidSpansBeforeAnyEffects) {
+    const nx_dma_memory_region_t domains[] = {
+        {reinterpret_cast<uintptr_t>(source), 4U, NX_DMA_MEMORY_READ},
+        {reinterpret_cast<uintptr_t>(destination), 1U, NX_DMA_MEMORY_WRITE}};
+    state.regions = domains;
+    state.region_count = 2U;
+    EXPECT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request, 4U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request, 0U),
+              NX_ERROR_PERMISSION);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(GPIO_BOP(GPIOF), 0U);
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_RX_FIXED),
+              NX_SUCCESS);
+    EXPECT_EQ(DMA_CH3CTL(DMA1) & DMA_CHXCTL_MNAGA, 0U);
+    EXPECT_NE(DMA_CH4CTL(DMA1) & DMA_CHXCTL_MNAGA, 0U);
+}
+
 TEST_F(GD32SPIDMA, BothDmaCompletionsRetainCsUntilIndependentWireIdle) {
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
     SPI_STAT(SPI4) = SPI_STAT_TRANS;

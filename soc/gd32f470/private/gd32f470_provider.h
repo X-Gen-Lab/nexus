@@ -203,6 +203,20 @@ nx_result_t nx_gd32_uart_initialize(nx_gd32_uart_state_t* port, uint32_t baud,
                                     nx_uart_rx_profile_t profile, void* storage,
                                     size_t capacity, unsigned priority);
 /**
+ * \brief           Select independent RTS/CTS only on an idle live controller.
+ * \param[in,out]   state: Startup-controlled UART, no active TX or RX DMA.
+ * \param[in]       rts: Actual hardware RTS output enable.
+ * \param[in]       cts: Actual hardware CTS transmit gate enable.
+ * \return          Success or INVALID/STATE/CONTEXT/BUSY before any write.
+ * \note            Board owns AF pins/wiring. RTS covers hardware receive
+ *                  register capacity, not application stream/ring backpressure.
+ *                  Default state has no extra RAM; other CR3 bits are
+ * preserved.
+ */
+nx_result_t nx_gd32_uart_flow_configure(nx_gd32_uart_state_t* state, bool rts,
+                                        bool cts);
+
+/**
  * \brief           Bind SPI4 PF7/PF8/PF9 AF5 and active-low PF6 CS endpoint.
  * \param[out]      port: Fresh single-executor storage.
  * \param[out]      endpoint: Stable CS configuration storage.
@@ -471,5 +485,16 @@ nx_result_t nx_gd32_gpio_clock_enable(unsigned index);
 nx_result_t nx_gd32_spi_endpoint_initialize(
     nx_gd32_spi_state_t* port, nx_gd32_spi_endpoint_state_t* endpoint,
     uint32_t cs_gpio, uint32_t cs_mask, uint32_t clock_hz, unsigned mode);
+
+/**
+ * \brief           Side-effect-free checks shared with this exact TX start.
+ * \param[in]       context: Exact immutable face's selected provider state.
+ * \param[in]       request: Live descriptor, not admitted or retained here.
+ * \return          Same payload/domain/context/state/deadline rejection.
+ * \note            Task-only; reads facts but performs no MMIO store or borrow.
+ *                  RS485 binding must use this provider's matching validator.
+ */
+nx_result_t nx_gd32_uart_tx_validate(void* context,
+                                     const nx_uart_tx_request_t* request);
 
 #endif

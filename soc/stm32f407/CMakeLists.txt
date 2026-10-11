@@ -27,16 +27,33 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
-        if("dma-tx" IN_LIST modes)
+        if("dma-tx" IN_LIST modes OR "dma-duplex" IN_LIST modes
+            OR "dma-duplex-continuous" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_dma.c)
+        endif()
+        if("rx-dma-idle" IN_LIST modes OR "rx-dma-continuous" IN_LIST modes
+            OR "dma-duplex" IN_LIST modes
+            OR "dma-duplex-continuous" IN_LIST modes)
+            list(APPEND stm32_sources drivers/uart_receive.c drivers/uart_dma.c)
         endif()
         if("irq-blocks" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_stream.c)
         endif()
     elseif(kind STREQUAL "spi" AND "dma" IN_LIST modes)
         list(APPEND stm32_sources drivers/spi_dma.c)
-    elseif(kind STREQUAL "adc" AND "trigger-dma" IN_LIST modes)
-        list(APPEND stm32_sources drivers/adc_stream.c)
+    elseif(kind STREQUAL "i2c")
+        if("irq-messages" IN_LIST modes OR "dma-messages" IN_LIST modes)
+            list(APPEND stm32_sources drivers/i2c_async.c
+                "${CMAKE_CURRENT_SOURCE_DIR}/../common/i2c_v1_async.c")
+        endif()
+    elseif(kind STREQUAL "adc")
+        if("trigger-dma" IN_LIST modes
+            OR "trigger-dma-continuous" IN_LIST modes)
+            list(APPEND stm32_sources drivers/adc_stream.c)
+        endif()
+        if("trigger-dma-continuous" IN_LIST modes)
+            list(APPEND stm32_sources drivers/adc_continuous.c)
+        endif()
     endif()
 endforeach()
 list(REMOVE_DUPLICATES stm32_sources)
@@ -45,7 +62,8 @@ if(stm32_sources)
     target_link_libraries(nexus_soc_stm32f407 PUBLIC nexus_io
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32f407 PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/private")
+        "${CMAKE_CURRENT_SOURCE_DIR}/private"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../common")
     target_include_directories(nexus_soc_stm32f407 SYSTEM PRIVATE
         "${stm32_device}/Include" "${stm32_cmsis}")
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)

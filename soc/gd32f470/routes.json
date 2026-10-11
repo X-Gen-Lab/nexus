@@ -43,12 +43,32 @@
       "modes": [
         "irq-byte-event",
         "dma-tx",
-        "irq-blocks"
+        "irq-blocks",
+        "rx-dma-idle",
+        "dma-duplex",
+        "rx-dma-continuous",
+        "dma-duplex-continuous"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
       "dma": [
         "DMA1:stream7:channel4"
-      ]
+      ],
+      "mode_dma": {
+        "rx-dma-idle": [
+          "DMA1:stream2:channel4"
+        ],
+        "dma-duplex": [
+          "DMA1:stream7:channel4",
+          "DMA1:stream2:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA1:stream2:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA1:stream7:channel4",
+          "DMA1:stream2:channel4"
+        ]
+      }
     },
     {
       "id": "spi4-pf6-pf9",
@@ -109,9 +129,17 @@
         }
       ],
       "modes": [
-        "poll-messages"
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA0:stream0:channel1",
+          "DMA0:stream6:channel1"
+        ]
+      }
     },
     {
       "id": "exti3-pe3",
@@ -167,7 +195,8 @@
       ],
       "modes": [
         "single-shot",
-        "trigger-dma"
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
       "dma": [
@@ -175,6 +204,9 @@
       ],
       "mode_resources": {
         "trigger-dma": [
+          "controller:TIMER2"
+        ],
+        "trigger-dma-continuous": [
           "controller:TIMER2"
         ]
       }
@@ -226,7 +258,8 @@
       ],
       "modes": [
         "low-rate-scan",
-        "trigger-dma"
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
       "dma": [
@@ -234,6 +267,9 @@
       ],
       "mode_resources": {
         "trigger-dma": [
+          "controller:TIMER2"
+        ],
+        "trigger-dma-continuous": [
           "controller:TIMER2"
         ]
       }

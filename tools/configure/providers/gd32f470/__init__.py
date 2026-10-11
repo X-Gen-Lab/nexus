@@ -23,7 +23,17 @@ LIMITS = MappingProxyType({
 })
 ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
-_FIXED_DMA = MappingProxyType({('USART0', 'dma-tx'): ('DMA1:stream7:channel4',), ('SPI4', 'dma-full-duplex'): ('DMA1:stream4:channel2', 'DMA1:stream3:channel2'), ('ADC0', 'trigger-dma'): ('DMA1:stream0:channel0',)})
+_FIXED_DMA = MappingProxyType({('USART0', 'dma-tx'): ('DMA1:stream7:channel4',),
+ ('USART0', 'rx-dma-idle'): ('DMA1:stream2:channel4',),
+ ('USART0', 'dma-duplex'): ('DMA1:stream7:channel4', 'DMA1:stream2:channel4'),
+ ('USART0', 'rx-dma-continuous'): ('DMA1:stream2:channel4',),
+ ('USART0', 'dma-duplex-continuous'): ('DMA1:stream7:channel4',
+                                       'DMA1:stream2:channel4'),
+ ('SPI4', 'dma-full-duplex'): ('DMA1:stream4:channel2',
+                               'DMA1:stream3:channel2'),
+ ('ADC0', 'trigger-dma'): ('DMA1:stream0:channel0',),
+ ('ADC0', 'trigger-dma-continuous'): ('DMA1:stream0:channel0',),
+ ('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1')})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('gpio', 'input'): 'gpio',
@@ -31,6 +41,8 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('uart', 'irq-byte-event'): 'uart',
     ('spi', 'short-poll'): 'spi',
     ('i2c', 'poll-messages'): 'i2c',
+    ('i2c', 'irq-messages'): 'i2c_async',
+    ('i2c', 'dma-messages'): 'i2c_async',
     ('flash', 'poll-word'): 'flash',
     ('watchdog', 'independent'): 'watchdog',
     ('exti', 'edge-event'): 'exti',
@@ -38,9 +50,14 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('adc', 'low-rate-scan'): 'adc',
     ('uart', 'dma-tx'): 'uart_dma',
     ('uart', 'irq-blocks'): 'uart_stream',
+    ('uart', 'rx-dma-idle'): 'uart_receive',
+    ('uart', 'dma-duplex'): 'uart_duplex',
+    ('uart', 'rx-dma-continuous'): 'uart_receive',
+    ('uart', 'dma-duplex-continuous'): 'uart_duplex',
     ('spi', 'dma-full-duplex'): 'spi_dma',
     ('adc', 'single-shot'): 'adc',
     ('adc', 'trigger-dma'): 'adc_stream',
+    ('adc', 'trigger-dma-continuous'): 'adc_continuous',
 })
 
 
@@ -61,11 +78,13 @@ def validate_selection(selection, route):
     elif kind == "adc":
         if tuple(selection["channels"]) not in ADC_CHANNEL_SEQUENCES:
             common.fail("ADC channel sequence is not implemented by the provider")
-        expected = 1 if selection["mode"] == "trigger-dma" else 7
-        if selection["sample_times"] != [expected] * len(selection["channels"]):
-            common.fail("GD32 trigger-dma sampling is fifteen cycles (encoding 1)"
-                        if expected == 1 else
-                        "GD32 polling sampling is 480 cycles (encoding 7)")
+        traits = common.mode_traits(kind, selection["mode"])
+        if not traits.continuous:
+            expected = 1 if traits.dma else 7
+            if selection["sample_times"] != [expected] * len(selection["channels"]):
+                common.fail("GD32 trigger-dma sampling is fifteen cycles (encoding 1)"
+                            if expected == 1 else
+                            "GD32 polling sampling is 480 cycles (encoding 7)")
         common.integer(selection.get("timeout_ms"), 1, 1000,
                        "ADC calibration timeout_ms")
 
@@ -101,6 +120,6 @@ def builtin_cs(controller):
 
 # Import maintained emitters explicitly; importing a package performs no I/O.
 from .bindings import constructor
-from .emission import (includes, instance_declarations, implementation,
+from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)

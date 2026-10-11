@@ -1,0 +1,49 @@
+..........................................................FFFF...
+======================================================================
+FAIL: test_unselected_dma_facts_are_checked_by_the_selected_provider (test_configure.ResolverTests.test_unselected_dma_facts_are_checked_by_the_selected_provider)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_configure.py", line 131, in test_unselected_dma_facts_are_checked_by_the_selected_provider
+    self.rejected("topology")
+  File "/workspace/nexus/tools/configure/test_configure.py", line 47, in rejected
+    with self.assertRaisesRegex(gate.ConfigurationError, match):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_unselected_dma_route_requires_an_array (test_configure.ResolverTests.test_unselected_dma_route_requires_an_array)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_configure.py", line 136, in test_unselected_dma_route_requires_an_array
+    self.rejected("array")
+  File "/workspace/nexus/tools/configure/test_configure.py", line 47, in rejected
+    with self.assertRaisesRegex(gate.ConfigurationError, match):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_unselected_route_resources_cannot_hide_invalid_dma_facts (test_configure.ResolverTests.test_unselected_route_resources_cannot_hide_invalid_dma_facts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_configure.py", line 141, in test_unselected_route_resources_cannot_hide_invalid_dma_facts
+    self.rejected("topology")
+  File "/workspace/nexus/tools/configure/test_configure.py", line 47, in rejected
+    with self.assertRaisesRegex(gate.ConfigurationError, match):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_unselected_soc_resources_cannot_hide_invalid_dma_facts (test_configure.ResolverTests.test_unselected_soc_resources_cannot_hide_invalid_dma_facts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_configure.py", line 147, in test_unselected_soc_resources_cannot_hide_invalid_dma_facts
+    self.rejected("topology")
+  File "/workspace/nexus/tools/configure/test_configure.py", line 47, in rejected
+    with self.assertRaisesRegex(gate.ConfigurationError, match):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+----------------------------------------------------------------------
+Ran 65 tests in 0.203s
+
+FAILED (failures=4)

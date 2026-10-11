@@ -87,6 +87,6 @@ def builtin_cs(controller):
 
 # Import maintained emitters explicitly; importing a package performs no I/O.
 from .bindings import constructor
-from .emission import (includes, instance_declarations, implementation,
+from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)

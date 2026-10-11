@@ -148,6 +148,7 @@ class SpiOptions:
 @dataclass(frozen=True)
 class I2cOptions:
     max_hz: int
+    irq: IrqOptions | None
 
 
 @dataclass(frozen=True)
@@ -195,7 +196,7 @@ def mode_options(values):
     if kind == "spi":
         return SpiOptions(values.get("max_hz", 1000000), irq)
     if kind == "i2c":
-        return I2cOptions(values.get("max_hz", 100000))
+        return I2cOptions(values.get("max_hz", 100000), irq)
     if kind == "exti":
         return ExtiOptions(values["edge"], values["event_capacity"], irq)
     if kind == "pwm":

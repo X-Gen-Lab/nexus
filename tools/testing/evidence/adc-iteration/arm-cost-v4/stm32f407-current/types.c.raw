@@ -1,0 +1,14 @@
+#include "stm32f407_stream.h"
+unsigned char cost_adc_poll[sizeof(nx_stm32_adc_state_t)];
+unsigned char cost_adc_finite[sizeof(nx_stm32_adc_stream_state_t)];
+unsigned char cost_stream[sizeof(nx_stream_t)];
+unsigned char cost_stream_slot[sizeof(nx_stream_slot_t)];
+unsigned char cost_adc_face[sizeof(nx_adc_port_t)];
+const unsigned char cost_adc_ops[sizeof(nx_adc_ops_t)] = {0};
+
+unsigned char cost_adc_continuous[sizeof(nx_stm32_adc_continuous_state_t)];
+unsigned char cost_posted_producer[sizeof(nx_stream_producer_t)];
+unsigned char cost_observer[sizeof(nx_adc_observer_t)];
+unsigned char cost_observation[sizeof(nx_adc_observation_t)];
+
+int main(void) { return 0; }

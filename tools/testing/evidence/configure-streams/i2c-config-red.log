@@ -1,0 +1,204 @@
+test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) ... 
+  test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='stm32f407', mode='irq-messages') ... ERROR
+  test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='stm32f407', mode='dma-messages') ... ERROR
+  test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='gd32f470', mode='irq-messages') ... ERROR
+  test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='gd32f470', mode='dma-messages') ... ERROR
+test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) ... 
+  test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) (family='stm32f407', mode='irq-messages') ... FAIL
+  test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) (family='stm32f407', mode='dma-messages') ... FAIL
+test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) ... FAIL
+test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) ... 
+  test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) (priority='true') ... FAIL
+  test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) (priority=-1) ... FAIL
+  test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) (priority=16) ... FAIL
+
+======================================================================
+ERROR: test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='stm32f407', mode='irq-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 40, in test_async_modes_have_immutable_irq_policy_and_exact_directional_claims
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 780, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 258, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 112, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 55, in normalize
+    obj(definition, {"binding", "mode"}, INSTANCE_FIELDS[kind] - {"binding", "mode"},
+  File "/workspace/nexus/tools/configure/configure.py", line 116, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+======================================================================
+ERROR: test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='stm32f407', mode='dma-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 40, in test_async_modes_have_immutable_irq_policy_and_exact_directional_claims
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 780, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 258, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 112, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 55, in normalize
+    obj(definition, {"binding", "mode"}, INSTANCE_FIELDS[kind] - {"binding", "mode"},
+  File "/workspace/nexus/tools/configure/configure.py", line 116, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+======================================================================
+ERROR: test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='gd32f470', mode='irq-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 40, in test_async_modes_have_immutable_irq_policy_and_exact_directional_claims
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 780, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 258, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 112, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 55, in normalize
+    obj(definition, {"binding", "mode"}, INSTANCE_FIELDS[kind] - {"binding", "mode"},
+  File "/workspace/nexus/tools/configure/configure.py", line 116, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+======================================================================
+ERROR: test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) (family='gd32f470', mode='dma-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 40, in test_async_modes_have_immutable_irq_policy_and_exact_directional_claims
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 780, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 258, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 112, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 55, in normalize
+    obj(definition, {"binding", "mode"}, INSTANCE_FIELDS[kind] - {"binding", "mode"},
+  File "/workspace/nexus/tools/configure/configure.py", line 116, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+======================================================================
+FAIL: test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) (family='stm32f407', mode='irq-messages')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode irq-messages for i2c0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 75, in test_async_requires_explicit_irq_and_polling_rejects_irq_options
+    with self.assertRaisesRegex(ValueError, "IRQ priority"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "IRQ priority" does not match "Unsupported mode irq-messages for i2c0"
+
+======================================================================
+FAIL: test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) (family='stm32f407', mode='dma-messages')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-messages for i2c0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 75, in test_async_requires_explicit_irq_and_polling_rejects_irq_options
+    with self.assertRaisesRegex(ValueError, "IRQ priority"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "IRQ priority" does not match "Unsupported mode dma-messages for i2c0"
+
+======================================================================
+FAIL: test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 77, in test_async_requires_explicit_irq_and_polling_rejects_irq_options
+    with self.assertRaisesRegex(ValueError, "Polling I2C"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Polling I2C" does not match "i2c.bus: missing [], unknown ['irq']"
+
+======================================================================
+FAIL: test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) (priority='true')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 83, in test_priority_integer_range_is_validated_before_emission
+    with self.assertRaisesRegex(ValueError, "IRQ priority"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "IRQ priority" does not match "i2c.bus: missing [], unknown ['irq']"
+
+======================================================================
+FAIL: test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) (priority=-1)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 83, in test_priority_integer_range_is_validated_before_emission
+    with self.assertRaisesRegex(ValueError, "IRQ priority"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "IRQ priority" does not match "i2c.bus: missing [], unknown ['irq']"
+
+======================================================================
+FAIL: test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) (priority=16)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: i2c.bus: missing [], unknown ['irq']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_i2c_modes.py", line 83, in test_priority_integer_range_is_validated_before_emission
+    with self.assertRaisesRegex(ValueError, "IRQ priority"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "IRQ priority" does not match "i2c.bus: missing [], unknown ['irq']"
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.011s
+
+FAILED (failures=6, errors=4)

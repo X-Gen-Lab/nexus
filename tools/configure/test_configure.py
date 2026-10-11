@@ -125,6 +125,27 @@ class ResolverTests(unittest.TestCase):
         self.data["controllers"] = [self.selected()]
         self.rejected("Resource conflict pin:PA0")
 
+    def test_unselected_dma_facts_are_checked_by_the_selected_provider(self):
+        self.mutate(self.routes_path, lambda doc: doc["routes"][0].update(
+            dma=["DMA9:stream99:channel99"]))
+        self.rejected("topology")
+
+    def test_unselected_dma_route_requires_an_array(self):
+        self.mutate(self.routes_path, lambda doc: doc["routes"][0].update(
+            dma="DMA1:stream0:channel0"))
+        self.rejected("array")
+
+    def test_unselected_route_resources_cannot_hide_invalid_dma_facts(self):
+        self.mutate(self.routes_path, lambda doc: doc["routes"][0].update(
+            resources=["dma:DMA9:stream99:channel99"]))
+        self.rejected("topology")
+
+    def test_unselected_soc_resources_cannot_hide_invalid_dma_facts(self):
+        self.mutate(self.soc_path, lambda doc: next(iter(
+            doc["controllers"].values())).update(
+                resources=["dma:DMA9:stream99:channel99"]))
+        self.rejected("topology")
+
     def test_gpio_mask_mismatch_rejected(self):
         self.mutate(self.board_path, lambda item: item["bindings"][0].update(mask=2))
         self.rejected("mask differs")

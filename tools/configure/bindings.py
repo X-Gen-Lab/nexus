@@ -56,7 +56,7 @@ def emit(result):
         prefix = provider.PREFIX
         source += [f'static nx_{prefix}_{implementation}_state_t s_nx_port_{name};',
                    f'static const {exported_type} s_nx_face_{name} = {{',
-                   f'    &nx_{prefix}_{implementation}_ops, &s_nx_port_{name}', '};',
+                   f'    &{provider.operations(item)}, &s_nx_port_{name}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
         source.extend(provider.instance_declarations(item, result))
         construction = provider.constructor(item, result, result["board_bindings"],

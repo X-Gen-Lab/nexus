@@ -1,0 +1,36 @@
+/**
+ * \file            nexus_bindings.h
+ * \brief           Fixed typed aliases selected by one assembly.
+ * \author          Nexus Team
+ */
+#ifndef NEXUS_BINDINGS_H
+#define NEXUS_BINDINGS_H
+#include "nexus/core/status.h"
+#include "nexus/io/gpio.h"
+#include "nexus/io/uart.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+typedef struct {
+    nx_result_t primary;
+    nx_result_t cleanup;
+    uint32_t remaining_effects;
+} nx_platform_start_result_t;
+/** \brief Startup-only; no scheduler or product worker is created.
+ * \return Primary/cleanup errors and retained effects. On error
+ * all ports remain unusable; preserve contexts until cleanup.
+ */
+nx_platform_start_result_t nx_platform_start(void);
+/** \brief Stop after direct writers/IRQ consumers quiesce.
+ * \return SUCCESS after drain; BUSY retains all storage and clock.
+ * The owner must continue service before retrying BUSY.
+ */
+nx_result_t nx_platform_stop(void);
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_gpio_port_t* const nx_binding_led0;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_uart_port_t* const nx_binding_uart0;
+#ifdef __cplusplus
+}
+#endif
+#endif

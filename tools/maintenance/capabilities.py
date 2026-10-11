@@ -67,6 +67,13 @@ def collect(root=ROOT):
                 if symbol in exports:
                     raise ValueError(f"Duplicate ops definition: {symbol}")
                 exports[symbol] = source.relative_to(root).as_posix()
+    # Shared algorithms keep one real readonly table across SoC wrappers.
+    # Read actual production definitions, never expand provider-name guesses.
+    for source in sorted((root / "soc/common").glob("*.c")):
+        for symbol in ops_definitions(source.read_text(encoding="utf-8")):
+            if symbol in exports:
+                raise ValueError(f"Duplicate ops definition: {symbol}")
+            exports[symbol] = source.relative_to(root).as_posix()
     if not facts:
         raise ValueError("No maintained MCU SoC facts found")
     for board_path in sorted((root / "boards").glob("*/board.json")):

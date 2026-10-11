@@ -85,12 +85,22 @@ static nx_result_t finish(nx_gd32_adc_stream_state_t* state) {
 }
 
 /** \brief Bind an exact rate within 16-bit timer factors and full-scan cost. */
-static nx_result_t timing(size_t channels, uint32_t hz, uint16_t* prescaler,
-                          uint16_t* reload) {
-    if (hz == 0U) {
+nx_result_t nx_gd32_adc_stream_timing(size_t channels,
+                                      const uint8_t* sample_times, uint32_t hz,
+                                      uint16_t* prescaler, uint16_t* reload) {
+    if (hz == 0U || channels == 0U || channels > 16U) {
         return NX_ERROR_INVALID;
     }
-    if (hz > UINT32_C(12500000) / (27U * channels) ||
+    static const uint16_t cycles[] = {3U, 15U, 28U, 56U, 84U, 112U, 144U, 480U};
+    uint32_t scan_cycles = 0U;
+    for (size_t i = 0U; i < channels; ++i) {
+        unsigned code = sample_times == NULL ? 1U : sample_times[i];
+        if (code > 7U) {
+            return NX_ERROR_INVALID;
+        }
+        scan_cycles += cycles[code] + 12U;
+    }
+    if (hz > UINT32_C(12500000) / scan_cycles ||
         UINT32_C(100000000) % hz != 0U) {
         return NX_ERROR_UNSUPPORTED;
     }
@@ -115,8 +125,8 @@ static nx_result_t validate(nx_gd32_adc_stream_state_t* state,
         stream->stopping) {
         return NX_ERROR_INVALID;
     }
-    nx_result_t result =
-        timing(state->adc.channel_count, hz, prescaler, reload);
+    nx_result_t result = nx_gd32_adc_stream_timing(state->adc.channel_count,
+                                                   NULL, hz, prescaler, reload);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -141,7 +151,8 @@ static nx_result_t validate(nx_gd32_adc_stream_state_t* state,
 }
 
 /** \brief Program the fixed scan and selected fifteen-cycle sample time. */
-static void sequence(const nx_gd32_adc_state_t* adc) {
+void nx_gd32_adc_stream_sequence(const nx_gd32_adc_state_t* adc,
+                                 const uint8_t* sample_times) {
     ADC_CTL0(ADC0) = adc->channel_count > 1U ? ADC_CTL0_SM : 0U;
     ADC_SAMPT0(ADC0) = 0U;
     ADC_SAMPT1(ADC0) = 0U;
@@ -150,10 +161,11 @@ static void sequence(const nx_gd32_adc_state_t* adc) {
     ADC_RSQ2(ADC0) = 0U;
     for (size_t i = 0U; i < adc->channel_count; ++i) {
         uint32_t channel = adc->channels[i];
+        uint32_t sample = sample_times == NULL ? 1U : sample_times[i];
         if (channel < 10U) {
-            ADC_SAMPT1(ADC0) |= 1U << (channel * 3U);
+            ADC_SAMPT1(ADC0) |= sample << (channel * 3U);
         } else {
-            ADC_SAMPT0(ADC0) |= 1U << ((channel - 10U) * 3U);
+            ADC_SAMPT0(ADC0) |= sample << ((channel - 10U) * 3U);
         }
         if (i < 6U) {
             ADC_RSQ2(ADC0) |= channel << (i * 5U);
@@ -178,7 +190,7 @@ static nx_result_t arm(nx_gd32_adc_stream_state_t* state) {
     state->filling = true;
     state->completed = false;
     acknowledge();
-    sequence(&state->adc);
+    nx_gd32_adc_stream_sequence(&state->adc, NULL);
     TIMER_CTL0(TIMER2) = TIMER_CTL0_ARSE;
     TIMER_CTL1(TIMER2) = TIMER_TRI_OUT_SRC_UPDATE;
     TIMER_DMAINTEN(TIMER2) = 0U;

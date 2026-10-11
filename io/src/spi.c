@@ -90,6 +90,23 @@ nx_result_t nx_spi_endpoint_submit(const nx_spi_endpoint_t* port,
     return port->ops->submit(port->context, request);
 }
 
+/** \brief Fixed DMA spans are explicit and never inferred from NULL pointers.
+ */
+nx_result_t nx_spi_endpoint_submit_memory(const nx_spi_endpoint_t* port,
+                                          nx_spi_request_t* request,
+                                          uint8_t memory_flags) {
+    if (port == NULL || port->ops == NULL || port->context == NULL ||
+        request == NULL || request->tx == NULL || request->rx == NULL ||
+        request->length == 0U ||
+        (memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
+            0U) {
+        return NX_ERROR_INVALID;
+    }
+    return port->ops->submit_memory != NULL
+               ? port->ops->submit_memory(port->context, request, memory_flags)
+               : NX_ERROR_UNSUPPORTED;
+}
+
 /** \brief Optional finite-mode method dispatch preserves the exact bus context.
  */
 nx_result_t nx_spi_endpoint_start_admitted(const nx_spi_endpoint_t* port,

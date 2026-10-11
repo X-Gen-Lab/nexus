@@ -23,7 +23,16 @@ LIMITS = MappingProxyType({
 })
 ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
-_FIXED_DMA = MappingProxyType({('USART1', 'dma-tx'): ('DMA2:stream7:channel4',), ('SPI1', 'dma'): ('DMA2:stream3:channel3', 'DMA2:stream0:channel3'), ('ADC1', 'trigger-dma'): ('DMA2:stream4:channel0',)})
+_FIXED_DMA = MappingProxyType({('USART1', 'dma-tx'): ('DMA2:stream7:channel4',),
+ ('USART1', 'rx-dma-idle'): ('DMA2:stream2:channel4',),
+ ('USART1', 'dma-duplex'): ('DMA2:stream7:channel4', 'DMA2:stream2:channel4'),
+ ('USART1', 'rx-dma-continuous'): ('DMA2:stream2:channel4',),
+ ('USART1', 'dma-duplex-continuous'): ('DMA2:stream7:channel4',
+                                       'DMA2:stream2:channel4'),
+ ('SPI1', 'dma'): ('DMA2:stream3:channel3', 'DMA2:stream0:channel3'),
+ ('ADC1', 'trigger-dma'): ('DMA2:stream4:channel0',),
+ ('ADC1', 'trigger-dma-continuous'): ('DMA2:stream4:channel0',),
+ ('I2C1', 'dma-messages'): ('DMA1:stream0:channel1', 'DMA1:stream6:channel1')})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('gpio', 'input'): 'gpio',
@@ -31,6 +40,8 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('uart', 'irq-byte-event'): 'uart',
     ('spi', 'short-poll'): 'spi',
     ('i2c', 'poll-messages'): 'i2c',
+    ('i2c', 'irq-messages'): 'i2c_async',
+    ('i2c', 'dma-messages'): 'i2c_async',
     ('flash', 'poll-word'): 'flash',
     ('watchdog', 'independent'): 'watchdog',
     ('exti', 'edge-event'): 'exti',
@@ -38,9 +49,14 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('adc', 'low-rate-scan'): 'adc',
     ('uart', 'dma-tx'): 'uart_dma',
     ('uart', 'irq-blocks'): 'uart_stream',
+    ('uart', 'rx-dma-idle'): 'uart_receive',
+    ('uart', 'dma-duplex'): 'uart_duplex',
+    ('uart', 'rx-dma-continuous'): 'uart_receive',
+    ('uart', 'dma-duplex-continuous'): 'uart_duplex',
     ('spi', 'dma'): 'spi_dma',
     ('adc', 'single-shot'): 'adc',
     ('adc', 'trigger-dma'): 'adc_stream',
+    ('adc', 'trigger-dma-continuous'): 'adc_continuous',
 })
 
 
@@ -93,6 +109,6 @@ def builtin_cs(controller):
 
 # Import maintained emitters explicitly; importing a package performs no I/O.
 from .bindings import constructor
-from .emission import (includes, instance_declarations, implementation,
+from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
                        start_system, start_resources)

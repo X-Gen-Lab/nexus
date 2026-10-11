@@ -130,6 +130,7 @@ typedef struct nx_native_spi_state {
     bool hold_drain;
     bool register_read;
     uint8_t register_address;
+    uint8_t memory_flags;
     nx_result_t terminal_result;
     size_t transferred;
     nx_spi_request_t* active_request;
@@ -275,6 +276,9 @@ nx_result_t nx_native_adc_stop_instance(nx_native_adc_state_t* state);
 
 /** \brief Native finite async callbacks share the same explicit bus state. */
 nx_result_t nx_native_spi_submit(void* context, nx_spi_request_t* request);
+nx_result_t nx_native_spi_submit_memory(void* context,
+                                        nx_spi_request_t* request,
+                                        uint8_t memory_flags);
 nx_result_t nx_native_spi_start_admitted(void* context,
                                          nx_spi_request_t* request);
 nx_result_t nx_native_spi_cancel(void* context, nx_spi_request_t* request);

@@ -48,12 +48,50 @@ typedef struct {
     bool fault;
 } nx_stm32_adc_stream_state_t;
 
+/**
+ * \brief           Optional continuous ADC double-buffer storage.
+ * \note            Default finite state and stream slots do not grow. The
+ *                  spare loan in base.fill stays retained if a target write or
+ *                  drain cannot be proved. Only this provider owns posted.
+ */
+typedef struct {
+    nx_stm32_adc_stream_state_t base;
+    nx_stream_producer_t posted;
+    nx_stream_fill_t targets[2];
+    nx_adc_observer_t* observer;
+    nx_result_t fault_result;
+    uint8_t expected_bank;
+    bool halted;
+} nx_stm32_adc_continuous_state_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern const nx_uart_ops_t nx_stm32_uart_stream_ops;
 extern const nx_adc_ops_t nx_stm32_adc_stream_ops;
+extern const nx_adc_ops_t nx_stm32_adc_continuous_ops;
+/** \brief Initialize the same reviewed route, with independent optional state.
+ *  \param[in,out] state: Fresh exact route and immutable channel/clock facts.
+ *  \return Success or the finite cold initializer's checked failure.
+ */
+nx_result_t
+nx_stm32_adc_continuous_initialize(nx_stm32_adc_continuous_state_t* state);
+/** \brief Replace only a completed inactive bank, then publish proved memory.
+ *  \param[in,out] state: Exact static instance alive through successful stop.
+ *  \note Short DMA IRQ work; starvation stops instead of overwriting loans.
+ */
+void nx_stm32_adc_continuous_irq(nx_stm32_adc_continuous_state_t* state);
+/** \brief Shared private complete-scan timing validation; no block admission.
+ */
+nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
+                                     uint32_t hz, uint16_t* prescaler,
+                                     uint16_t* period);
+/** \brief Shared private all-slot DMA and complete-scan validation. */
+nx_result_t nx_stm32_adc_stream_blocks(nx_stm32_adc_stream_state_t* state,
+                                       const nx_stream_t* stream);
+/** \brief Shared private rank/sample register programming, engines stopped. */
+void nx_stm32_adc_stream_sequence(nx_stm32_adc_stream_state_t* state);
 
 /**
  * \brief           Initialize only the selected static ADC1/TIM3/DMA2 route.

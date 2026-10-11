@@ -69,6 +69,19 @@ typedef struct {
     uint64_t epoch;
 } nx_stream_fill_t;
 
+/**
+ * \brief           Optional caller-owned preposted producer; no default cost.
+ * \note            One serialized producer owns this control and the stream.
+ *                  Do not mix ordinary reserve/publish/abort with a live posted
+ *                  producer. Two hardware targets remain FILLING until
+ * detached. Publication is FIFO; rollback is LIFO to avoid consumer holes.
+ */
+typedef struct {
+    nx_stream_t* stream;
+    size_t cursor;
+    size_t pending;
+} nx_stream_producer_t;
+
 /** \brief Immutable consumer loan, valid until matching release succeeds. */
 typedef struct {
     const uint8_t* data;
@@ -224,6 +237,60 @@ nx_result_t nx_stream_abort(nx_stream_t* stream, const nx_stream_fill_t* fill,
  *                  This operation does not stop hardware or revoke loans.
  */
 nx_result_t nx_stream_stop(nx_stream_t* stream);
+
+/**
+ * \brief           Bind a posted producer to a quiescent initialized stream
+ * \param[out]      producer: Separate caller control, not aliased with buffers
+ * \param[in,out]   stream: Admission open, no outstanding producer/consumer
+ * loans \return          SUCCESS, INVALID, BUSY or STATE; rejected output is
+ * untouched \note            Task-only cold binding. Caller owns exclusive
+ * producer rights and retains control until all pending fills and IRQs drain.
+ */
+nx_result_t nx_stream_post_initialize(nx_stream_producer_t* producer,
+                                      nx_stream_t* stream);
+/**
+ * \brief           Query the next preposted slot without a loan or guessed loss
+ * \param[in]       producer: Same exclusive serialized producer
+ * \return          True when the next reservation can succeed
+ * \note            Bounded task/IRQ hint; still reserve before writing payload.
+ */
+bool nx_stream_post_can_reserve(const nx_stream_producer_t* producer);
+/**
+ * \brief           Reserve a future fill without making earlier blocks ready
+ * \param[in,out]   producer: Live posted producer
+ * \param[out]      fill: Exact pending loan until FIFO publish or LIFO abort
+ * \return          SUCCESS, OVERFLOW, STATE, EXHAUSTED or INVALID
+ * \note            O(1) task/IRQ. Failure leaves output and loss counters
+ * intact; only explicitly observed boundaries justify note_loss.
+ */
+nx_result_t nx_stream_post_reserve(nx_stream_producer_t* producer,
+                                   nx_stream_fill_t* fill);
+/**
+ * \brief           Publish only the oldest pending detached producer loan
+ * \param[in,out]   producer: Same exclusive producer as reserve
+ * \param[in]       fill: Exact oldest token, absent from every hardware target
+ * \param[in]       length: Positive valid bytes at most the block capacity
+ * \param[in]       flags: Observed IDLE/TRIGGER/ERROR boundary facts
+ * \return          SUCCESS, INVALID or STATE; rejection retains the loan
+ * \note            O(1) task/IRQ. Consumer acquire/release use the original
+ * stream.
+ */
+nx_result_t nx_stream_post_publish(nx_stream_producer_t* producer,
+                                   const nx_stream_fill_t* fill, size_t length,
+                                   uint32_t flags);
+/**
+ * \brief           Cancel the newest pending fill after proof of memory drain
+ * \param[in,out]   producer: Same producer; rollback is strictly LIFO
+ * \param[in]       fill: Exact newest pending token
+ * \param[in]       memory_quiesced: Source detached, no remaining writes
+ * \return          SUCCESS, BUSY, STATE or INVALID; failure retains the loan
+ * \note            O(1) task/IRQ. Does not advance consumer or published
+ * cursor; no FREE hole appears ahead of future publication. Stopping closes
+ * admission but still permits proved tail rollback.
+ */
+nx_result_t nx_stream_post_abort(nx_stream_producer_t* producer,
+                                 const nx_stream_fill_t* fill,
+                                 bool memory_quiesced);
 
 #ifdef __cplusplus
 }

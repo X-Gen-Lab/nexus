@@ -95,6 +95,51 @@ TEST_F(NativeAsync, SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects) {
     EXPECT_EQ(facts.calls, 1u);
 }
 
+TEST_F(NativeAsync, FixedDummyAndDiscardOnlyTouchTheirExplicitCells) {
+    nx_native_spi_state_t controller = {};
+    nx_native_spi_endpoint_state_t device = {};
+    const nx_spi_port_t bus = {&nx_native_spi_ops, &controller};
+    const nx_spi_endpoint_t endpoint = {&nx_native_spi_endpoint_ops, &device};
+    ASSERT_EQ(nx_native_spi_port_configure_instance(&controller), NX_SUCCESS);
+    ASSERT_EQ(
+        nx_native_spi_configure_instance(&device, &controller, nullptr, 0),
+        NX_SUCCESS);
+    nx_native_spi_model_async_configure(&bus, false);
+    uint8_t source[] = {17, 91, 92, 93};
+    uint8_t destination[] = {0, 51, 52, 53};
+    nx_spi_request_t request = {};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(nx_spi_request_prepare(&request, source, destination, 4, 100),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_TX_FIXED),
+              NX_SUCCESS);
+    for (unsigned i = 0; i < 5; ++i) {
+        nx_native_spi_model_irq_step(&bus);
+    }
+    nx_spi_port_service(&bus);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    for (auto value : destination) {
+        EXPECT_EQ(value, 17U);
+    }
+    ASSERT_EQ(nx_spi_request_prepare(&request, source, destination, 4, 100),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_RX_FIXED),
+              NX_SUCCESS);
+    for (unsigned i = 0; i < 5; ++i) {
+        nx_native_spi_model_irq_step(&bus);
+    }
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(destination[0], 93U);
+    EXPECT_EQ(destination[1], 17U);
+    EXPECT_EQ(destination[2], 17U);
+    EXPECT_EQ(destination[3], 17U);
+    EXPECT_EQ(source[1], 91U);
+    EXPECT_EQ(source[2], 92U);
+    EXPECT_EQ(source[3], 93U);
+}
+
 TEST_F(NativeAsync, SPIQuarantineRetainsBorrowAndStopUntilDrain) {
     nx_native_spi_state_t controller = {};
     nx_native_spi_endpoint_state_t endpoint = {};

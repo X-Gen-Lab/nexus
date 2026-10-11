@@ -38,8 +38,14 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
     endif()
     if(kind STREQUAL "uart")
         list(APPEND gd_sdk_units usart)
-        if("dma-tx" IN_LIST modes)
+        if("dma-tx" IN_LIST modes OR "dma-duplex" IN_LIST modes
+            OR "dma-duplex-continuous" IN_LIST modes)
             list(APPEND gd_sources drivers/uart_dma.c)
+        endif()
+        if("rx-dma-idle" IN_LIST modes OR "rx-dma-continuous" IN_LIST modes
+            OR "dma-duplex" IN_LIST modes
+            OR "dma-duplex-continuous" IN_LIST modes)
+            list(APPEND gd_sources drivers/uart_receive.c drivers/uart_dma.c)
         endif()
         if("irq-blocks" IN_LIST modes)
             list(APPEND gd_sources drivers/uart_stream.c)
@@ -51,12 +57,20 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
         endif()
     elseif(kind STREQUAL "i2c")
         list(APPEND gd_sdk_units i2c)
+        if("irq-messages" IN_LIST modes OR "dma-messages" IN_LIST modes)
+            list(APPEND gd_sources drivers/i2c_async.c
+                "${CMAKE_CURRENT_SOURCE_DIR}/../common/i2c_v1_async.c")
+        endif()
     elseif(kind STREQUAL "watchdog")
         list(APPEND gd_sdk_units fwdgt)
     elseif(kind STREQUAL "adc")
         list(APPEND gd_sdk_units adc)
-        if("trigger-dma" IN_LIST modes)
+        if("trigger-dma" IN_LIST modes
+            OR "trigger-dma-continuous" IN_LIST modes)
             list(APPEND gd_sources drivers/adc_stream.c)
+        endif()
+        if("trigger-dma-continuous" IN_LIST modes)
+            list(APPEND gd_sources drivers/adc_continuous.c)
         endif()
     endif()
 endforeach()
@@ -78,7 +92,8 @@ target_link_libraries(nexus_soc_gd32f470 PUBLIC nexus_io
     PRIVATE nexus_arch nexus_gd32_sdk nexus_build_options nexus_owned_warnings)
 target_include_directories(nexus_soc_gd32f470 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_SOURCE_DIR}/private")
+    "${CMAKE_CURRENT_SOURCE_DIR}/private"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../common")
 target_include_directories(nexus_soc_gd32f470 SYSTEM PRIVATE
     "${gd_firmware}/CMSIS" "${gd_device}/Include"
     "${gd_peripheral}/Include")

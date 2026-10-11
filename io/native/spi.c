@@ -196,6 +196,7 @@ const nx_spi_ops_t nx_native_spi_ops = {
 const nx_spi_endpoint_ops_t nx_native_spi_endpoint_ops = {
     .transfer = native_spi_transfer,
     .submit = nx_native_spi_submit,
+    .submit_memory = nx_native_spi_submit_memory,
     .start_admitted = nx_native_spi_start_admitted,
     .on_port = nx_native_spi_on_port,
 };

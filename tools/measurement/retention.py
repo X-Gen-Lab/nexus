@@ -57,7 +57,9 @@ def source_contracts(root=ROOT):
             if name + "_t" in faces:
                 raise EvidenceError("duplicate public face type")
             faces[name + "_t"] = operations
-    for path in sorted((root / "soc").glob("*/drivers/*.c")):
+    provider_sources = set((root / "soc").glob("*/drivers/*.c"))
+    provider_sources.update((root / "soc/common").glob("*.c"))
+    for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
         for kind, name, body in re.findall(

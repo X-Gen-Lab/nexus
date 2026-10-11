@@ -1,0 +1,27 @@
+[1/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[2/27] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[3/27] Linking C static library lib/libnexus_io.a
+[4/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[5/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[6/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[7/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[8/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[9/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[10/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[11/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[12/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[13/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[14/27] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[15/27] Linking C static library lib/libnexus_io_native.a
+[16/27] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc.c.o
+[17/27] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_stream.c.o
+[18/27] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o
+[19/27] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o
+[20/27] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc.c.o
+[21/27] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_stream.c.o
+[22/27] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/contracts/gd32_model/model.c.o
+[23/27] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_initialize_test.dir/__/__/soc/gd32f470/drivers/adc.c.o
+[24/27] Linking CXX executable bin/nexus_stm32_adc_stream_test
+[25/27] Linking CXX executable bin/nexus_gd32_adc_stream_test
+[26/27] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_initialize_test.dir/gd32_adc_initialize_test.cpp.o
+[27/27] Linking CXX executable bin/nexus_gd32_adc_initialize_test

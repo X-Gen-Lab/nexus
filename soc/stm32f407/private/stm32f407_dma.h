@@ -53,6 +53,7 @@ typedef struct {
     bool draining;
     bool stopping;
     bool initialized;
+    uint8_t memory_flags;
 } nx_stm32_spi_dma_state_t;
 
 /** \brief Per-device CS/mode/rate identity is independent of controller DMA. */
@@ -77,8 +78,8 @@ extern const nx_spi_endpoint_ops_t nx_stm32_spi_dma_endpoint_ops;
  * \return          Success or INVALID/BUSY/UNSUPPORTED before buffer admission.
  *
  * \note            Assembly owns DMA2/SPI1 clocks and reviewed pin/CS
- *                  resources. Only nonoverlapping complete TX/RX buffers are
- *                  supported.
+ *                  resources. Nonoverlapping TX/RX spans are complete buffers,
+ *                  or explicit caller-owned single cells through submit_memory.
  */
 nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state);
 
@@ -111,6 +112,15 @@ void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive);
  */
 nx_result_t nx_stm32_uart_dma_initialize(nx_stm32_uart_dma_state_t* state,
                                          uint32_t clock_hz);
+/**
+ * \brief           Initialize TX DMA for an explicit separate RX producer.
+ * \param[in,out]   state: Same exact USART1/stream7 facts, BLOCKS profile.
+ * \param[in]       clock_hz: Exact USART peripheral clock.
+ * \return          Same cold rejection contract as ordinary DMA init.
+ * \note            This initializer provides no RX method or block loan itself.
+ */
+nx_result_t nx_stm32_uart_dma_block_initialize(nx_stm32_uart_dma_state_t* state,
+                                               uint32_t clock_hz);
 
 /**
  * \brief           Observe bounded DMA terminal flags and detach memory source.
@@ -130,6 +140,31 @@ void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state);
  * \note            Generated USART1 vector uses this mode-specific thunk.
  */
 void nx_stm32_uart_dma_uart_irq(nx_stm32_uart_dma_state_t* state);
+
+/**
+ * \brief           Side-effect-free checks shared with this exact TX start.
+ * \param[in]       context: Exact immutable face's selected provider state.
+ * \param[in]       request: Live descriptor, not admitted or retained here.
+ * \return          Same payload/domain/context/state/deadline rejection.
+ * \note            Task-only; reads facts but performs no MMIO store or borrow.
+ *                  RS485 binding must use this provider's matching validator.
+ */
+nx_result_t nx_stm32_uart_dma_tx_validate(void* context,
+                                          const nx_uart_tx_request_t* request);
+
+/** \brief Direct selected TX-DMA method; same request borrow contract. */
+nx_result_t nx_stm32_uart_dma_submit(void* context,
+                                     nx_uart_tx_request_t* request);
+/** \brief Direct selected TX-DMA method; same request borrow contract. */
+nx_result_t nx_stm32_uart_dma_start_admitted(void* context,
+                                             nx_uart_tx_request_t* request);
+/** \brief Direct selected TX-DMA method; same request borrow contract. */
+nx_result_t nx_stm32_uart_dma_cancel(void* context,
+                                     nx_uart_tx_request_t* request);
+/** \brief Owner-only bounded service; failed drain retains quarantine. */
+void nx_stm32_uart_dma_service(void* context);
+/** \brief Close TX admission and prove both memory and wire drain. */
+nx_result_t nx_stm32_uart_dma_stop(void* context);
 
 #ifdef __cplusplus
 }

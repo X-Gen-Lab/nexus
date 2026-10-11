@@ -1,0 +1,16 @@
+{
+  "argv": [
+    ".venv/bin/cmake",
+    "--build",
+    "build/adc-iteration",
+    "--target",
+    "nexus_hardware_contract_test",
+    "--parallel",
+    "2"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T15:55:24.073051+00:00",
+  "ended_at": "2026-10-11T15:55:27.814403+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-api-red-build.log"
+}

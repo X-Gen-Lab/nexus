@@ -2,27 +2,27 @@ task_id,task,implementation_status,software_status,hardware_status,implementatio
 IO-01,ADC mode reset,implemented,development_passed,not_executed,soc/stm32f407/drivers/adc.c,tools/testing/evidence/adc-iteration,stream to polling clears scan sequence before sample,codex
 IO-02,ADC retry calibration,implemented,development_passed,not_executed,soc/gd32f470/drivers/adc.c,tools/testing/evidence/adc-iteration,retry repeats bounded stable reset calibration,codex
 IO-03,GPIO inferred mask validation,implemented,development_passed,not_applicable,tools/configure/configure.py,tools/configure/test_configure.py,omitted mask cannot authorize extra initial bits,codex
-IO-04,Current support documentation,in_progress,pending,not_applicable,docs/delivery/support.md;docs/delivery/cortex-m.md,docs/delivery/verification.md,mode MPU split and reviewed route statements match production,codex
+IO-04,Current support documentation,implemented,development_passed,not_applicable,tools/configure/documentation.py;docs/delivery/support.md,tools/testing/evidence/configure-iteration,mode MPU split and reviewed route statements match production,codex
 IO-05,SPI polling owner identity,implemented,development_passed,not_executed,components/bus_owner/src/spi_owner.c,tools/testing/evidence/spi-polling-identity-green.log,foreign controller rejected before borrowing or hardware,codex
-IO-06,Example startup rollback,in_progress,development_passed,not_executed,os/freertos/freertos.c;X-Gen-Lab/nexus-examples,tools/testing/evidence/adc-iteration,close drain join or prestart discard; preserve cleanup responsibility,codex
+IO-06,Example startup rollback,implemented,development_passed,not_executed,os/freertos/freertos.c;X-Gen-Lab/nexus-examples,X-Gen-Lab/nexus-examples/tests/evidence/startup-rollback;X-Gen-Lab/nexus-examples/tests/evidence/scheduler-return,close drain join or prestart discard; preserve cleanup responsibility,codex
 IO-07,I/O service diagnostics,planned,pending,not_executed,io;components,pending,progress and failures observable without hidden worker,codex
 IO-08,Mode ownership cancellation matrix,planned,pending,not_executed,soc;tests/google,pending,count loss deadline and drain contracts cover selected modes,codex
 IO-09,Quarantine integration and recovery,planned,pending,not_executed,components;X-Gen-Lab/nexus-examples,pending,retain borrowed storage; explicit recovery owner,codex
 IO-10,Stream capacity backpressure budget,planned,pending,not_executed,io/src/stream.c;tools/hil,pending,bounded capacity and caller policy; no overwritten loans,codex
-IO-11,Optional read-only capabilities,designed,pending,not_applicable,tools/configure;io,pending,selected descriptors; simulated Native flags; no hot path cost,codex
-IO-12,UART RX DMA and IDLE,designed,pending,not_executed,soc/stm32f407;soc/gd32f470;io,pending,reviewed DMA routes; finite and continuous ownership,codex
-IO-13,UART duplex DMA blocks,designed,pending,not_executed,soc/stm32f407;soc/gd32f470,pending,TX DMA plus RX blocks without default state growth,codex
-IO-14,UART RTS CTS and RS485,designed,pending,not_executed,soc;components;tools/configure,pending,reviewed pins; actual TC; DE delay borrowing contract,codex
-IO-15,Continuous ADC DMA,designed,pending,not_executed,io/src/stream.c;soc,pending,preposted targets; hardware address replacement proof,codex
-IO-16,ADC channel timing expansion,designed,pending,not_executed,soc;tools/configure,pending,sample-time and scan rate hardware bounds,codex
-IO-17,DMA topology facts,partial,development_passed,not_executed,io/src/dma.c;tools/configure,tests/google/dma_test.cpp,common opaque IDs; provider validates reviewed physical topology,codex
-IO-18,SPI one-way DMA,designed,pending,not_executed,io; soc,pending,caller dummy discard; actual spans; per-direction MINC,codex
-IO-19,I2C interrupt DMA async,designed,pending,not_executed,io; soc,pending,ACK final byte sequence; BTF STOP; request final access,codex
-IO-20,I2C physical bus clear,designed,pending,not_executed,components; soc,pending,bounded pulses STOP; open-drain and cleanup ownership,codex
+IO-11,Optional read-only capabilities,implemented,development_passed,not_applicable,tools/configure/factory.py;tools/configure/providers/common.py,tools/testing/evidence/configure-iteration,selected descriptors; simulated Native flags; no hot path cost,codex
+IO-12,UART RX DMA and IDLE,implemented,targeted_passed,not_executed,soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c,tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-streams,reviewed DMA routes; finite and continuous ownership,codex
+IO-13,UART duplex DMA blocks,implemented,targeted_passed,not_executed,soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c,tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-streams,TX DMA plus RX blocks without default state growth,codex
+IO-14,UART RTS CTS and RS485,implemented,targeted_passed,not_executed,io/src/uart_rs485.c;soc;tools/configure,tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md,reviewed pins; actual TC; DE delay borrowing contract,codex
+IO-15,Continuous ADC DMA,implemented,targeted_passed,not_executed,io/src/stream.c;soc/*/drivers/adc_continuous.c,tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-streams,preposted targets; hardware address replacement proof,codex
+IO-16,ADC channel timing expansion,implemented,targeted_passed,not_executed,io/src/adc_observer.c;soc;tools/configure,tools/testing/evidence/adc-iteration,sample-time and scan rate hardware bounds,codex
+IO-17,DMA topology facts,implemented,targeted_passed,not_executed,io/src/dma.c;tools/configure,tools/testing/evidence/configure-iteration,common opaque IDs; provider validates reviewed physical topology,codex
+IO-18,SPI one-way DMA,implemented,targeted_passed,not_executed,io/src/spi.c;soc/*/drivers/spi_dma.c,tools/testing/evidence/spi-memory-arm-commands.json,caller dummy discard; actual spans; per-direction MINC,codex
+IO-19,I2C interrupt DMA async,implemented,targeted_passed,not_executed,io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c,tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-streams,ACK final byte sequence; BTF STOP; request final access,codex
+IO-20,I2C physical bus clear,implemented,targeted_passed,not_executed,io/src/i2c_bus_clear.c,tests/evidence/i2c-bus-clear,bounded pulses STOP; open-drain and cleanup ownership,codex
 IO-21,Additional reviewed controller routes,planned,pending,not_executed,soc/*/routes.json,pending,datasheet references; no invented Board wiring,codex
 IO-22,GD additional SRAM and TCM linker,planned,pending,not_executed,soc/gd32f470;tools/configure,pending,explicit sections and budgets; DMA TCM rejection,codex
 IO-23,Three Board electrical fact review,blocked,pending,blocked,boards,pending,actual PCB revision connector crystal and NOR identity,codex
-IO-24,Resolver emitter common limits,designed,pending,not_applicable,tools/configure/providers,pending,single immutable provider limits authority,codex
+IO-24,Resolver emitter common limits,partial,development_passed,not_applicable,tools/configure/providers/common.py;tools/configure/providers/*/bindings.py,tools/testing/evidence/configure-iteration,single immutable provider limits authority,codex
 IO-25,Physical FP MVE task context,blocked,pending,blocked,tools/hil,pending,real target observations; current three boards are M4F,codex
 IO-26,Physical clock tick deadline accuracy,blocked,pending,blocked,tools/hil,pending,bound timer drift tick and monotonic evidence,codex
 IO-27,Runtime MSP task stack peaks,planned,pending,blocked,tools/hil;os,pending,task and MSP high-water measured on real station,codex
@@ -33,17 +33,17 @@ IO-31,Physical restricted MPU isolation,blocked,pending,blocked,tools/hil,pendin
 IO-32,Physical split security isolation,blocked,pending,blocked,tools/hil,pending,requires matching secure target and real SAU attribution,codex
 IO-33,Selectable OS object cost,planned,pending,not_executed,os;components,pending,caller selects raw permanent or closeable object with measured cost,codex
 IO-34,Additional real RTOS backend,planned,pending,not_executed,os;tools/configure,pending,selected pinned real kernel and full context lifecycle tests,codex
-IO-35,Optional nominal factory IDs,designed,pending,not_applicable,tools/configure/emission.py,pending,C and C++ compile reject cross-kind IDs; no default RAM cost,codex
-IO-36,Executable TOML documentation,designed,pending,not_applicable,tools/maintenance;tools/configure,pending,resolve every complete snippet; explicit fragment rationale,codex
+IO-35,Optional nominal factory IDs,implemented,development_passed,not_applicable,tools/configure/factory.py;tools/configure/test_factory_features.py,tools/testing/evidence/configure-iteration,C and C++ compile reject cross-kind IDs; no default RAM cost,codex
+IO-36,Executable TOML documentation,implemented,development_passed,not_applicable,tools/configure/documentation.py;tools/configure/test_documentation.py,tools/testing/evidence/configure-iteration,resolve every complete snippet; explicit fragment rationale,codex
 IO-37,Provider property failure matrix,planned,pending,not_executed,tests/google;tools/configure,pending,legal modes plus generated conflict fault sequences,codex
-IO-38,New mode resources and GC,planned,pending,not_executed,scripts/ci;tests/workloads,pending,real ARM link maps no unused mode state or tables,codex
+IO-38,New mode resources and GC,partial,targeted_passed,not_executed,tools/measurement/retention.py;soc/*/CMakeLists.txt;tests/contracts/*_assembly,tools/testing/evidence/configure-streams,actual selected mode ARM link/retention; RX-only unused TX-DMA GC; broader minimal workloads pending,codex
 IO-39,Physical poll IRQ DMA benchmark,blocked,pending,blocked,tools/hil,pending,same artifact clock load optimization and raw timing,codex
-IO-40,CI artifact source identity,planned,pending,not_applicable,.github/workflows;tools/evidence,pending,every job actual checkout tree deps config tool identity,codex
-IO-41,Evidence retention and attestation,planned,pending,not_applicable,.github/workflows;tools/evidence,pending,immutable archive and provenance; no fabricated signature,codex
+IO-40,CI artifact source identity,implemented,targeted_passed,not_applicable,.github/actions/record-identity;tools/maintenance/job_identity.py,tools/testing/evidence/ci-identity,every job actual checkout tree deps config tool identity,codex
+IO-41,Evidence retention and attestation,implemented,runtime_pending,not_applicable,.github/workflows/release.yml;dependencies/actions.lock.json,tools/testing/evidence/ci-identity,immutable archive and provenance; no fabricated signature,codex
 IO-42,API schema SDK compatibility version,planned,pending,not_applicable,docs;tools/sdk;cmake,pending,explicit version policy and package consistency checks,codex
 IO-43,Agent maintenance responsibility,implemented,development_passed,not_applicable,.github/maintainer-roles.json;tools/maintenance/ownership.py,tools/testing/evidence/agent-maintenance,Codex owns all domains; no named people required,codex
 IO-44,Remote rules and required checks,blocked,pending,not_applicable,.github/workflows,pending,current connector cannot inspect branch protection; no fake CODEOWNERS,codex
-IO-45,Defect review release execution ownership,in_progress,pending,not_applicable,AGENTS.md;docs/design/engineering-handbook.md,pending,Codex execution; independent agent review; release distinct from CI,codex
+IO-45,Defect review release execution ownership,in_progress,targeted_passed,not_applicable,AGENTS.md;tools/evidence/reproduce.py;.github/workflows,tools/testing/evidence/ci-identity,Codex execution; independent agent review; release distinct from CI,codex
 IO-46,Locked dependency upgrade maintenance,planned,pending,not_applicable,dependencies;.github,pending,Codex owner; source hash license model ARM SDK reproducibility,codex
 IO-47,Real HIL station binding,blocked,pending,blocked,tools/hil,pending,three physical probes serial and chip identity unavailable,codex
 IO-48,Physical clock reset GPIO watchdog,blocked,pending,blocked,tools/hil,pending,actual station capture and reset reason,codex
@@ -52,7 +52,7 @@ IO-50,Physical I2C electrical protocol,blocked,pending,blocked,tools/hil,pending
 IO-51,Physical ADC PWM EXTI,blocked,pending,blocked,tools/hil,pending,real stimulus and independent instrument observations,codex
 IO-52,Physical Flash power interruption,blocked,pending,blocked,tools/hil;X-Gen-Lab/nexus-examples,pending,destructive test region explicitly owned externally,codex
 IO-53,Physical concurrent endurance and latency,blocked,pending,blocked,tools/hil,pending,same firmware soak interrupt latency stack load evidence,codex
-IO-54,CAN platform interface and controllers,planned,pending,not_executed,io;soc,pending,static bounded frames; classic CAN on current silicon; no fake CAN FD,codex
+IO-54,CAN platform interface and controllers,in_progress,pending,not_executed,io;soc,pending,static bounded frames; classic CAN on current silicon; no fake CAN FD,codex
 IO-55,Ethernet MAC PHY raw frames,planned,pending,not_executed,io;soc,pending,caller descriptors buffers; cache/domain; external network policy,codex
 IO-56,USB clock endpoints lifecycle,planned,pending,not_executed,io;soc,pending,legal 48 MHz profile; reset cancel drain; no GD default clock promise,codex
 IO-57,Timer capture advanced PWM,planned,pending,not_executed,io;soc,pending,input capture timestamps; break deadtime safe ownership,codex

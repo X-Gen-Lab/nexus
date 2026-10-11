@@ -1,0 +1,35 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/workspace/nexus-io20-build",
+      "--target",
+      "nexus_i2c_bus_clear_test",
+      "--parallel",
+      "1"
+    ],
+    "started_ns": 1791736195455586825,
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/workspace/nexus-io20-build/bin/nexus_i2c_bus_clear_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "started_ns": 1791736202243441200,
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/workspace/nexus-io20-build/bin/nexus_i2c_bus_clear_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-os-iteration-evidence/io20-bus-clear/final.xml"
+    ],
+    "started_ns": 1791736202247164612,
+    "exit_code": 0
+  }
+]

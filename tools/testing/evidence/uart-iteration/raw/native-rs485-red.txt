@@ -1,0 +1,51 @@
+Running main() from gmock_main.cc
+[==========] Running 10 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 8 tests from UartRs485
+[ RUN      ] UartRs485.RejectsInvalidTransportBeforeDirectionOrBorrow
+[       OK ] UartRs485.RejectsInvalidTransportBeforeDirectionOrBorrow (0 ms)
+[ RUN      ] UartRs485.SetupThenTrueTransportSettlementThenMinimumHold
+[       OK ] UartRs485.SetupThenTrueTransportSettlementThenMinimumHold (0 ms)
+[ RUN      ] UartRs485.CancelDuringSetupNeverStartsUartAndWithdrawsDirection
+[       OK ] UartRs485.CancelDuringSetupNeverStartsUartAndWithdrawsDirection (0 ms)
+[ RUN      ] UartRs485.SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer
+[       OK ] UartRs485.SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer (0 ms)
+[ RUN      ] UartRs485.ActiveCancelAndFailedDrainRetainOuterBorrowAndDirection
+[       OK ] UartRs485.ActiveCancelAndFailedDrainRetainOuterBorrowAndDirection (0 ms)
+[ RUN      ] UartRs485.FailedDirectionWithdrawalQuarantinesUntilActualRetry
+[       OK ] UartRs485.FailedDirectionWithdrawalQuarantinesUntilActualRetry (0 ms)
+[ RUN      ] UartRs485.StopClosesAdmissionAndDrainsDirectionBeforeTransportStop
+[       OK ] UartRs485.StopClosesAdmissionAndDrainsDirectionBeforeTransportStop (0 ms)
+[ RUN      ] UartRs485.SuccessAlreadySettledInTransportWinsLaterCancel
+[       OK ] UartRs485.SuccessAlreadySettledInTransportWinsLaterCancel (0 ms)
+[----------] 8 tests from UartRs485 (0 ms total)
+
+[----------] 2 tests from NativeUartRs485
+[ RUN      ] NativeUartRs485.NativeWireTcAndSelectedDirectionHaveIndependentLifetimes
+/workspace/nexus/tests/google/uart_rs485_test.cpp:259: Failure
+Expected equality of these values:
+  nx_uart_port_submit(&port, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] NativeUartRs485.NativeWireTcAndSelectedDirectionHaveIndependentLifetimes (0 ms)
+[ RUN      ] NativeUartRs485.NativeHeldDrainRetainsOuterDirectionUntilRealRetry
+/workspace/nexus/tests/google/uart_rs485_test.cpp:279: Failure
+Expected equality of these values:
+  nx_uart_port_submit(&port, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] NativeUartRs485.NativeHeldDrainRetainsOuterDirectionUntilRealRetry (0 ms)
+[----------] 2 tests from NativeUartRs485 (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 10 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 8 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] NativeUartRs485.NativeWireTcAndSelectedDirectionHaveIndependentLifetimes
+[  FAILED  ] NativeUartRs485.NativeHeldDrainRetainsOuterDirectionUntilRealRetry
+
+ 2 FAILED TESTS

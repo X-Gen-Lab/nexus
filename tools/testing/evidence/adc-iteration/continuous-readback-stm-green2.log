@@ -1,0 +1,58 @@
+Running main() from gmock_main.cc
+[==========] Running 23 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 10 tests from Stm32AdcStream
+[ RUN      ] Stm32AdcStream.StabilizationRequiresExplicitServiceBeforeFirstTrigger
+[       OK ] Stm32AdcStream.StabilizationRequiresExplicitServiceBeforeFirstTrigger (0 ms)
+[ RUN      ] Stm32AdcStream.ValidatesCompleteScanConversionBudgetBeforeAdmission
+[       OK ] Stm32AdcStream.ValidatesCompleteScanConversionBudgetBeforeAdmission (0 ms)
+[ RUN      ] Stm32AdcStream.PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume
+[       OK ] Stm32AdcStream.PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume (0 ms)
+[ RUN      ] Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory
+[       OK ] Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory (0 ms)
+[ RUN      ] Stm32AdcStream.MisalignedOrPartialScanBlocksRejectWithoutTimerEffects
+[       OK ] Stm32AdcStream.MisalignedOrPartialScanBlocksRejectWithoutTimerEffects (0 ms)
+[ RUN      ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes
+[       OK ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes (0 ms)
+[ RUN      ] Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete
+[       OK ] Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete (0 ms)
+[ RUN      ] Stm32AdcStream.BasicAdcInitializationCannotBypassStreamClockValidation
+[       OK ] Stm32AdcStream.BasicAdcInitializationCannotBypassStreamClockValidation (0 ms)
+[ RUN      ] Stm32AdcStream.InvalidStreamClockBoundsRejectBeforeAdmission
+[       OK ] Stm32AdcStream.InvalidStreamClockBoundsRejectBeforeAdmission (0 ms)
+[ RUN      ] Stm32AdcStream.StoppedMultiChannelStreamRestoresIndependentPollShots
+[       OK ] Stm32AdcStream.StoppedMultiChannelStreamRestoresIndependentPollShots (0 ms)
+[----------] 10 tests from Stm32AdcStream (0 ms total)
+
+[----------] 13 tests from Stm32AdcContinuous
+[ RUN      ] Stm32AdcContinuous.TwoPrepostedTargetsStayInvisibleUntilSwapped
+[       OK ] Stm32AdcContinuous.TwoPrepostedTargetsStayInvisibleUntilSwapped (0 ms)
+[ RUN      ] Stm32AdcContinuous.HeldConsumerForcesStopAndExplicitWarmResume
+[       OK ] Stm32AdcContinuous.HeldConsumerForcesStopAndExplicitWarmResume (0 ms)
+[ RUN      ] Stm32AdcContinuous.FailedDrainRetainsBothPrepostedLoans
+[       OK ] Stm32AdcContinuous.FailedDrainRetainsBothPrepostedLoans (0 ms)
+[ RUN      ] Stm32AdcContinuous.WholeScanEqualCapacityAndDomainsValidateBeforeLoan
+[       OK ] Stm32AdcContinuous.WholeScanEqualCapacityAndDomainsValidateBeforeLoan (0 ms)
+[ RUN      ] Stm32AdcContinuous.WrongCompletionPhaseNeverPublishesUnprovenMemory
+[       OK ] Stm32AdcContinuous.WrongCompletionPhaseNeverPublishesUnprovenMemory (0 ms)
+[ RUN      ] Stm32AdcContinuous.RefusedTargetWriteRetainsSpareUntilProvedDrain
+[       OK ] Stm32AdcContinuous.RefusedTargetWriteRetainsSpareUntilProvedDrain (0 ms)
+[ RUN      ] Stm32AdcContinuous.BankFlipDuringAddressWriteNeverPublishesOldTarget
+[       OK ] Stm32AdcContinuous.BankFlipDuringAddressWriteNeverPublishesOldTarget (0 ms)
+[ RUN      ] Stm32AdcContinuous.SequenceFactsAreColdAndDescribeCompleteScanCost
+[       OK ] Stm32AdcContinuous.SequenceFactsAreColdAndDescribeCompleteScanCost (0 ms)
+[ RUN      ] Stm32AdcContinuous.ObserverUsesLoanEpochAndSoftwareObservationClock
+[       OK ] Stm32AdcContinuous.ObserverUsesLoanEpochAndSoftwareObservationClock (0 ms)
+[ RUN      ] Stm32AdcContinuous.ObserverCountAndPayloadAliasRejectBeforeDmaLoan
+[       OK ] Stm32AdcContinuous.ObserverCountAndPayloadAliasRejectBeforeDmaLoan (0 ms)
+[ RUN      ] Stm32AdcContinuous.ObserverSequenceNeverWrapsOrPublishesMissingRecord
+[       OK ] Stm32AdcContinuous.ObserverSequenceNeverWrapsOrPublishesMissingRecord (0 ms)
+[ RUN      ] Stm32AdcContinuous.WrongAddressReadbackMustNotReleasePreviousTarget
+[       OK ] Stm32AdcContinuous.WrongAddressReadbackMustNotReleasePreviousTarget (0 ms)
+[ RUN      ] Stm32AdcContinuous.ErrorArrivingDuringTargetWriteRejectsPublication
+[       OK ] Stm32AdcContinuous.ErrorArrivingDuringTargetWriteRejectsPublication (0 ms)
+[----------] 13 tests from Stm32AdcContinuous (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 23 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 23 tests.

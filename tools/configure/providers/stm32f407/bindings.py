@@ -3,7 +3,7 @@ try:
     from ...emission import dma_regions
 except ImportError:
     from emission import dma_regions
-from ..common import controller_ir
+from ..common import controller_ir, mode_traits
 from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
@@ -40,8 +40,11 @@ def _release(pins):
 
 def _endpoint_face(kind, name, state, implementation=None):
     implementation = implementation or kind
+    operations = ("nx_i2c_v1_async_endpoint_ops"
+                  if implementation == "i2c_async" else
+                  f"nx_stm32_{implementation}_endpoint_ops")
     return [f"static const nx_{kind}_endpoint_t s_nx_device_face_{name} = {{",
-            f"    &nx_stm32_{implementation}_endpoint_ops, &{state}", "};",
+            f"    &{operations}, &{state}", "};",
             f"const nx_{kind}_endpoint_t* const nx_device_{name} = &s_nx_device_face_{name};"]
 
 
@@ -159,6 +162,55 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                       "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
         declarations += stop_body
         stop = [f"{stop_name}()"]
+    elif kind == "i2c" and mode_traits(kind, item.mode).irq:
+        if item["controller"] != "I2C1":
+            raise ValueError("Only reviewed I2C1 asynchronous mode is maintained")
+        children = [child for child in devices
+                    if child["controller"] == item.id]
+        clock_bits["APB1ENR"] = "RCC_APB1ENR_I2C1EN"
+        body += ["    RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;", "    nx_arch_dsb();"]
+        for pin in item["pins"]:
+            _pin(body, pin, 2, open_drain=True)
+        port = item["pins"][0]["pin"][1]
+        mask = sum(1 << int(pin["pin"][2:]) for pin in item["pins"])
+        body += [f"    s_nx_port_{name}.registers = (volatile uint32_t*)I2C1;",
+                 f"    s_nx_port_{name}.line_inputs = &GPIO{port}->IDR;",
+                 f"    s_nx_port_{name}.line_mask = {mask}u;",
+                 f"    s_nx_port_{name}.peripheral_mhz = 42u;"]
+        dma = mode_traits(kind, item.mode).dma
+        if dma:
+            region_lines, region_count = dma_regions(name, result, include_flash=True)
+            declarations += region_lines
+            declarations += [f"static const nx_i2c_v1_dma_t s_nx_i2c_dma_{name} =",
+                             f"    NX_STM32_I2C1_DMA(s_nx_dma_regions_{name}, {region_count}u);"]
+            body.append(f"    s_nx_port_{name}.dma = &s_nx_i2c_dma_{name};")
+        else:
+            body.append(f"    s_nx_port_{name}.dma = NULL;")
+        for index, child in enumerate(children):
+            child_name = _symbol(child["id"])
+            endpoint = f"s_nx_endpoint_{name}" if not index else f"s_nx_endpoint_{child_name}"
+            if index:
+                declarations.append(f"static nx_stm32_i2c_async_endpoint_state_t {endpoint};")
+            declarations += _endpoint_face("i2c", child_name, endpoint, "i2c_async")
+            body += [f"    {endpoint}.port = &s_nx_port_{name};",
+                     f"    {endpoint}.address = {child['address']}u;"]
+        _check(body, f"nx_stm32_i2c_async_initialize(&s_nx_port_{name}, {item.options.irq.priority}u)")
+        declarations += [f"static nx_result_t stop_{name}(void) {{",
+                         f"    nx_result_t status = nx_i2c_port_stop(&s_nx_face_{name});",
+                         "    if (status != NX_SUCCESS) { return status; }"]
+        declarations += _release(item["pins"])
+        declarations += ["    RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_I2C1EN;",
+                         "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
+        for vector in ("I2C1_EV", "I2C1_ER"):
+            declarations += [f"void {vector}_IRQHandler(void);",
+                             r"/** \brief Selected finite I2C message publisher. */",
+                             f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_irq(&s_nx_port_{name}); }}"]
+        if dma:
+            for channel, receive in ((0, "true"), (6, "false")):
+                declarations += [f"void DMA1_Stream{channel}_IRQHandler(void);",
+                                 r"/** \brief Selected I2C DMA boundary publisher. */",
+                                 f"void DMA1_Stream{channel}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
+        stop = [f"stop_{name}()"]
     elif kind == "i2c":
         if item["controller"] != "I2C1" or item.get("max_hz", 100000) != 100000:
             raise ValueError("Only I2C1 100 kHz standard mode is maintained")
@@ -310,8 +362,10 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                          "    }", "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
         stop = [f"stop_{name}()"]
     elif kind == "adc":
-        stream = item["mode"] == "trigger-dma"
-        adc = f"s_nx_port_{name}" + (".adc" if stream else "")
+        traits = mode_traits(kind, item.mode)
+        stream, continuous = traits.dma, traits.continuous
+        stream_state = f"s_nx_port_{name}" + (".base" if continuous else "")
+        adc = stream_state + (".adc" if stream else "")
         channels = list(item.options.channels)
         reviewed = [int(pin["pin"][2:]) for pin in item["pins"]]
         if item["controller"] != "ADC1" or channels != reviewed or tuple(channels) not in ADC_CHANNEL_SEQUENCES:
@@ -344,18 +398,18 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
             body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;", "    nx_arch_dsb();",
-                     f"    s_nx_port_{name}.timer = TIM3;",
-                     f"    s_nx_port_{name}.dma = DMA2;",
-                     f"    s_nx_port_{name}.memory = DMA2_Stream4;",
-                     f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
-                     f"    s_nx_port_{name}.region_count = {region_count}u;",
-                     f"    s_nx_port_{name}.timer_clock_hz = 84000000u;",
-                     f"    s_nx_port_{name}.adc_clock_hz = 21000000u;"]
-            _check(body, f"nx_stm32_adc_stream_initialize(&s_nx_port_{name})")
+                     f"    {stream_state}.timer = TIM3;",
+                     f"    {stream_state}.dma = DMA2;",
+                     f"    {stream_state}.memory = DMA2_Stream4;",
+                     f"    {stream_state}.regions = s_nx_dma_regions_{name};",
+                     f"    {stream_state}.region_count = {region_count}u;",
+                     f"    {stream_state}.timer_clock_hz = 84000000u;",
+                     f"    {stream_state}.adc_clock_hz = 21000000u;"]
+            _check(body, f"nx_stm32_adc_{'continuous' if continuous else 'stream'}_initialize(&s_nx_port_{name})")
             body.append(f"    NVIC_SetPriority(DMA2_Stream4_IRQn, {item.options.irq.priority}u);")
             declarations += ["void DMA2_Stream4_IRQHandler(void);",
                              "/** \\brief Exact ADC DMA block terminal observation. */",
-                             f"void DMA2_Stream4_IRQHandler(void) {{ nx_stm32_adc_stream_irq(&s_nx_port_{name}); }}"]
+                             f"void DMA2_Stream4_IRQHandler(void) {{ nx_stm32_adc_{'continuous' if continuous else 'stream'}_irq(&s_nx_port_{name}); }}"]
         else:
             _check(body, f"nx_stm32_adc_initialize(&s_nx_port_{name})")
         stop_body = [f"static nx_result_t stop_{name}(void) {{"]
@@ -465,9 +519,12 @@ def _gpio_constructor(item):
 
 def _uart_constructor(item, result):
     name = _symbol(item.id)
-    dma_uart = item.mode == "dma-tx"
-    block_uart = item.mode == "irq-blocks"
-    implementation = ("uart_dma" if dma_uart else
+    traits = mode_traits("uart", item.mode)
+    dma_uart, receive_uart = traits.tx_dma, traits.rx_dma
+    block_uart = traits.block_stream
+    implementation = ("uart_duplex" if receive_uart and dma_uart else
+                      "uart_receive" if receive_uart else
+                      "uart_dma" if dma_uart else
                       "uart_stream" if block_uart else "uart")
     options = item.options
     profile = ("NX_UART_RX_BLOCKS" if block_uart else
@@ -479,7 +536,9 @@ def _uart_constructor(item, result):
     definitions = []
     if not block_uart:
         definitions.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
-    uart_state = f's_nx_port_{name}' + ('.uart' if dma_uart or block_uart else '')
+    dma_state = f"s_nx_port_{name}" + (".transmit" if receive_uart else "")
+    uart_state = (dma_state + ".uart" if receive_uart or dma_uart or block_uart
+                  else dma_state)
     rx_storage = 'NULL' if block_uart else f's_nx_rx_{name}'
     definitions += [f'static nx_result_t prepare_{name}(void) {{',
                f'    {uart_state}.registers = {item["controller"]};',
@@ -515,36 +574,48 @@ def _uart_constructor(item, result):
                '    nx_arch_dsb();', '    return NX_SUCCESS;', '}']
     init = f'prepare_{name}()'
     irq = item["controller"] + '_IRQHandler'
-    irq_implementation = "uart_dma_uart" if dma_uart else "uart_stream" if block_uart else "uart"
+    irq_implementation = ("uart_duplex" if receive_uart and dma_uart else
+                      "uart_receive" if receive_uart else
+                          "uart_dma_uart" if dma_uart else
+                          "uart_stream" if block_uart else "uart")
     definitions += [f'void {irq}(void);', '/** \\brief Fixed single-controller IRQ dispatch. */',
                f'void {irq}(void) {{ nx_stm32_{irq_implementation}_irq(&s_nx_port_{name}); }}']
-    if dma_uart:
-        if item["controller"] != "USART1" or item.get("dma") != ("DMA2:stream7:channel4",) and item.get("dma") != ["DMA2:stream7:channel4"]:
-            raise ValueError("UART DMA requires reviewed USART1 DMA2 stream7 channel4")
-        regions = [region for region in result["memory"] if region["dma"]]
-        region_lines = [f'static const nx_dma_memory_region_t s_nx_dma_regions_{name}[] = {{']
-        for region in regions:
-            region_lines.append(f'    {{ 0x{region["origin"]:08x}u, {region["size"]}u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE }},')
-        region_lines += [f'    {{ 0x{result["flash"]["origin"]:08x}u, {result["flash"]["size"]}u, NX_DMA_MEMORY_READ }}', '};']
-        # Fixed DMA pointers and domains precede the ordinary UART
-        # register preparation. The provider owns admission/drain.
-        position = next(index for index, line in enumerate(definitions)
-                        if line == f'static nx_result_t prepare_{name}(void) {{')
+    if traits.dma:
+        from . import _FIXED_DMA
+        expected = _FIXED_DMA.get((item["controller"], item.mode))
+        if tuple(item.get("dma", ())) != expected:
+            raise ValueError("UART DMA differs from its reviewed fixed route")
+        region_lines, region_count = dma_regions(
+            name, result, include_flash=traits.tx_dma)
+        position = definitions.index(f"static nx_result_t prepare_{name}(void) {{")
         definitions[position:position] = region_lines
-        definitions[position + len(region_lines) + 1:position + len(region_lines) + 1] = [
-            f'    s_nx_port_{name}.dma = DMA2;',
-            f'    s_nx_port_{name}.tx = DMA2_Stream7;',
-            f'    s_nx_port_{name}.regions = s_nx_dma_regions_{name};',
-            f'    s_nx_port_{name}.region_count = {len(regions) + 1}u;',
-            f'    s_nx_port_{name}.dma_irq = DMA2_Stream7_IRQn;',
-            f'    s_nx_port_{name}.stream = 7u;',
-            f'    s_nx_port_{name}.channel = 4u;']
-        priority_line = next(index for index, line in enumerate(definitions)
-                             if line == f'    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);')
-        definitions.insert(priority_line + 1, f'    NVIC_SetPriority(s_nx_port_{name}.dma_irq, {item.options.irq.priority}u);')
-        definitions += ['void DMA2_Stream7_IRQHandler(void);',
-                   '/** \\brief Fixed DMA stream terminal observation. */',
-                   f'void DMA2_Stream7_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&s_nx_port_{name}); }}']
+        prefix = [f"    {dma_state}.dma = DMA2;",
+                  f"    {dma_state}.regions = s_nx_dma_regions_{name};",
+                  f"    {dma_state}.region_count = {region_count}u;"]
+        if receive_uart:
+            prefix += [f"    s_nx_port_{name}.receive = DMA2_Stream2;",
+                       f"    s_nx_port_{name}.continuous = {'true' if traits.continuous else 'false'};"]
+        if dma_uart:
+            prefix += [f"    {dma_state}.tx = DMA2_Stream7;",
+                       f"    {dma_state}.dma_irq = DMA2_Stream7_IRQn;",
+                       f"    {dma_state}.stream = 7u;",
+                       f"    {dma_state}.channel = 4u;"]
+        position += len(region_lines) + 1
+        definitions[position:position] = prefix
+        priority_line = definitions.index(
+            f"    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);")
+        priorities = []
+        if receive_uart:
+            priorities.append(f"    NVIC_SetPriority(DMA2_Stream2_IRQn, {item.options.irq.priority}u);")
+            definitions += ["void DMA2_Stream2_IRQHandler(void);",
+                            "/** \\brief Exact selected DMA receive publisher. */",
+                            f"void DMA2_Stream2_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
+        if dma_uart:
+            priorities.append(f"    NVIC_SetPriority({dma_state}.dma_irq, {item.options.irq.priority}u);")
+            definitions += ["void DMA2_Stream7_IRQHandler(void);",
+                            "/** \\brief Exact selected DMA TX observation. */",
+                            f"void DMA2_Stream7_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&{dma_state}); }}"]
+        definitions[priority_line + 1:priority_line + 1] = priorities
     return {"definitions": definitions, "initialize": init,
             "stop": [f"stop_{name}()"]}
 

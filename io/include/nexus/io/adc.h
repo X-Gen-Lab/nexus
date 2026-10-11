@@ -9,6 +9,7 @@
 #define NEXUS_ADC_H
 
 #include "nexus/core/time.h"
+#include "nexus/io/adc_observer.h"
 #include "nexus/io/stream.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
@@ -26,6 +27,26 @@ typedef struct {
 } nx_adc_info_t;
 
 /**
+ * \brief           Immutable complete-scan timing facts for the selected mode.
+ * \note            sample_times are codes into sample_cycles, in channel order.
+ *                  scan_cycles includes each channel's sample and conversion.
+ *                  Clock declarations and cycle counts describe scheduling;
+ *                  they do not establish electrical accuracy or sample aperture
+ *                  timestamps. Arrays remain valid through provider lifetime.
+ */
+typedef struct {
+    const uint8_t* channels;
+    const uint8_t* sample_times;
+    const uint16_t* sample_cycles;
+    size_t channel_count;
+    size_t sample_code_count;
+    uint32_t adc_clock_hz;
+    uint32_t timer_clock_hz;
+    uint32_t scan_cycles;
+    uint16_t conversion_cycles;
+} nx_adc_sequence_info_t;
+
+/**
  * \brief           Shared read-only methods using one provider state.
  *
  * \note            Methods follow each public operation's ownership contract.
@@ -41,6 +62,12 @@ typedef struct {
     nx_result_t (*stream_service)(void* context);
     nx_result_t (*attach_wake)(void* context, const nx_irq_wake_t* wake,
                                uint8_t syscall_ceiling);
+    nx_result_t (*sequence_info)(const void* context,
+                                 nx_adc_sequence_info_t* info);
+    nx_result_t (*attach_observer)(void* context, nx_adc_observer_t* observer);
+    nx_result_t (*block_observation)(const void* context,
+                                     const nx_stream_block_t* block,
+                                     nx_adc_observation_t* observation);
 } nx_adc_ops_t;
 /**
  * \brief           Immutable interface pointing to caller-owned state.
@@ -63,6 +90,38 @@ struct nx_adc_port {
  * \return          Success or INVALID.
  */
 nx_result_t nx_adc_port_info(const nx_adc_port_t* port, nx_adc_info_t* info);
+/**
+ * \brief           Read fixed channel order and complete-scan timing facts.
+ * \param[in]       port: Initialized timing-capable provider.
+ * \param[out]      info: Cold read-only facts; no acquisition starts.
+ * \return          Success or INVALID/STATE/UNSUPPORTED.
+ */
+nx_result_t nx_adc_port_sequence_info(const nx_adc_port_t* port,
+                                      nx_adc_sequence_info_t* info);
+/**
+ * \brief           Attach optional observer storage before acquisition starts.
+ * \param[in]       port: Initialized continuous provider, one task owner.
+ * \param[in,out]   observer: Initialized stable caller storage, or NULL to
+ *                  detach. Provider validates exact stream count at start.
+ * \return          Success or BUSY/CONTEXT/UNSUPPORTED.
+ * \note            Stop and join before detach/reclaim. No hidden allocation;
+ *                  polling and finite modes need no observation storage.
+ */
+nx_result_t nx_adc_port_attach_observer(const nx_adc_port_t* port,
+                                        nx_adc_observer_t* observer);
+/**
+ * \brief           Query one live consumer loan's software completion record.
+ * \param[in]       port: Same stable observer-capable provider.
+ * \param[in]       block: Same stream's currently acquired immutable block.
+ * \param[out]      observation: Copied epoch, ordinal, observed time and gap
+ *                  flag. This is never a hardware sample aperture timestamp.
+ * \return          Success or INVALID/STATE/UNSUPPORTED, output unchanged on
+ *                  rejection.
+ */
+nx_result_t nx_adc_port_block_observation(const nx_adc_port_t* port,
+                                          const nx_stream_block_t* block,
+                                          nx_adc_observation_t* observation);
+
 /**
  * \brief           Sample the fixed single/scan sequence by bounded polling.
  *

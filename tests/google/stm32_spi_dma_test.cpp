@@ -110,6 +110,65 @@ TEST_F(Stm32SpiDma, BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle) {
     EXPECT_FALSE(state.spi.active);
 }
 
+TEST_F(Stm32SpiDma, ExplicitDiscardBorrowsOneCellAndDisablesRxIncrement) {
+    regions[1].size = 1U;
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_RX_FIXED),
+              NX_SUCCESS);
+    EXPECT_EQ(rx.CR & DMA_SxCR_MINC, 0U);
+    EXPECT_NE(tx.CR & DMA_SxCR_MINC, 0U);
+    spi.SR = SPI_SR_BSY;
+    CompleteMemory();
+    nx_spi_port_service(&bus);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(state.active, &request);
+    spi.SR = SPI_SR_TXE;
+    nx_spi_port_service(&bus);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+}
+
+TEST_F(Stm32SpiDma, ExplicitDummyBorrowsOneCellAndDisablesTxIncrement) {
+    regions[0].size = 1U;
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_TX_FIXED),
+              NX_SUCCESS);
+    EXPECT_EQ(tx.CR & DMA_SxCR_MINC, 0U);
+    EXPECT_NE(rx.CR & DMA_SxCR_MINC, 0U);
+}
+
+TEST_F(Stm32SpiDma, FixedMemoryRejectsUnknownOverlapAndMissingDomains) {
+    EXPECT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request, 4U),
+              NX_ERROR_INVALID);
+    regions[1].size = 1U;
+    EXPECT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request, 0U),
+              NX_ERROR_PERMISSION);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    request.rx = source;
+    regions[0].permissions |= NX_DMA_MEMORY_WRITE;
+    EXPECT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_RX_FIXED),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(state.active, nullptr);
+    EXPECT_EQ(gpio.BSRR, 0U);
+    EXPECT_EQ(tx.CR & DMA_SxCR_EN, 0U);
+    EXPECT_EQ(rx.CR & DMA_SxCR_EN, 0U);
+}
+
+TEST_F(Stm32SpiDma, FollowingOrdinaryAdmissionRestoresBothMemoryIncrements) {
+    ASSERT_EQ(nx_spi_endpoint_submit_memory(&endpoint, &request,
+                                            NX_SPI_MEMORY_RX_FIXED),
+              NX_SUCCESS);
+    CompleteMemory();
+    nx_spi_port_service(&bus);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(nx_spi_request_prepare(&request, source, destination, 4U, 1000U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
+    EXPECT_NE(tx.CR & DMA_SxCR_MINC, 0U);
+    EXPECT_NE(rx.CR & DMA_SxCR_MINC, 0U);
+    EXPECT_EQ(state.memory_flags, 0U);
+}
+
 TEST_F(Stm32SpiDma, CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount) {
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
     tx.NDTR = 1U;

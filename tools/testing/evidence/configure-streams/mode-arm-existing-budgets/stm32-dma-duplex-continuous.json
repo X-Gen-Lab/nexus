@@ -1,0 +1,112 @@
+{
+  "board": "stm32f407zg-controller-link-fixture",
+  "budget": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/nexus-sdk/generated/resource-budget.json",
+    "sha256": "93aa9ca0082cd8774bf63793072672a7647ba81398cebb1abbd0abf8e79439f4",
+    "size": 189
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "20fd4f86aa0b3b9ede38ebac1869dc10c439a15cde34e85ba3ee7e79214c644d",
+        "size": 8495
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "cc68db4f860f7f9f28e8aec585ccdfade70a8a31dfdf72473d87c604ae2832a2",
+        "size": 6123
+      },
+      "label": "soc/stm32f407/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml",
+        "sha256": "fda21aecda9b5025992106bf1ed7945739ace78405d7fa222c26ade9791e0ae5",
+        "size": 344
+      },
+      "label": "tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/stm32_assembly/zg_board/board.json",
+        "sha256": "937936cecd900c6dfff2545c3df9e6bcedf37756cc01d265de0f2c9fe3aeca9a",
+        "size": 1866
+      },
+      "label": "tests/contracts/stm32_assembly/zg_board/board.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.elf",
+    "sha256": "0a0d7878983c700cc38cb89d30a336725526094671404dcb3b75ee03ca652e38",
+    "size": 27628
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 8966,
+      "loaded_bytes": 8966,
+      "ranges": [
+        [
+          134217728,
+          134226694
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536871168
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 2304
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871168,
+        "start": 536871168
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/nexus-sdk/generated/resolved.json",
+    "sha256": "278425c5a67ab3e4ba40fb6f49e2ef234dca514388c5c10d7ba9332d524ffbd3",
+    "size": 16811
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

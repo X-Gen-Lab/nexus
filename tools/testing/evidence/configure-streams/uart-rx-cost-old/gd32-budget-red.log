@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/workspace/nexus-config-iteration-evidence/uart-rx-cost-old/gd32-absence-budget.py", line 3, in <module>
+    assert "nx_gd32_uart_dma_ops" not in names, "RX-only face retains TX-DMA operations table"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: RX-only face retains TX-DMA operations table

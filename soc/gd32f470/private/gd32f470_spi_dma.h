@@ -32,6 +32,7 @@ typedef struct {
     bool stopping;
     bool initialized;
     bool faulted;
+    uint8_t memory_flags;
 } nx_gd32_spi_dma_state_t;
 
 /** \brief Independent immutable CS/mode/rate binding on one DMA controller. */

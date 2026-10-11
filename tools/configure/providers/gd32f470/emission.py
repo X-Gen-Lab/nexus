@@ -1,10 +1,19 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings
+from ..common import mode_traits
 
 
 def implementation(item):
     from . import mode_implementation
     return mode_implementation(item.kind, item.mode)
+
+
+def operations(item):
+    """Name the actual readonly table; shared algorithms keep one identity."""
+    selected = implementation(item)
+    if selected == "i2c_async":
+        return "nx_i2c_v1_async_ops"
+    return f"nx_gd32_{selected}_ops"
 
 
 def includes(result):
@@ -15,10 +24,17 @@ def includes(result):
         source.append('#include "gd32f470_dma.h"')
     if any(item["kind"] == "spi" and item["mode"] == "dma-full-duplex" for item in selections):
         source.append('#include "gd32f470_spi_dma.h"')
-    if any(item["kind"] == "adc" and item["mode"] == "trigger-dma" for item in selections):
+    if any(item.kind == "adc" and mode_traits(item.kind, item.mode).dma
+           for item in selections):
         source.append('#include "gd32f470_adc_stream.h"')
     if any(item["kind"] == "uart" and item["mode"] == "irq-blocks" for item in selections):
         source.append('#include "gd32f470_uart_stream.h"')
+    if any(item.kind == "uart" and mode_traits(item.kind, item.mode).rx_dma
+           for item in selections):
+        source.append('#include "gd32f470_uart_receive.h"')
+    if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
+           for item in selections):
+        source.append('#include "gd32f470_i2c_async.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -37,8 +53,14 @@ def instance_declarations(item, result):
 
 
 def has_dma(result):
-    return any(item.mode.startswith("dma") or item.mode == "trigger-dma"
+    return any(mode_traits(item.kind, item.mode).dma
                for item in result.controllers)
+
+
+def _dma_clock_mask(result):
+    controllers = {dma.split(":", 1)[0]
+                   for item in result.controllers for dma in item.get("dma", ())}
+    return " | ".join(f"RCU_AHB1EN_{name}EN" for name in sorted(controllers))
 
 
 def state_declarations(result):
@@ -79,8 +101,9 @@ def start_system(result):
 
 def start_resources(result):
     source = []
-    if has_dma(result):
-        source += ['    s_nx_platform_dma_clocks_added = ~RCU_AHB1EN & RCU_AHB1EN_DMA1EN;',
-                   '    RCU_AHB1EN |= RCU_AHB1EN_DMA1EN;',
+    mask = _dma_clock_mask(result)
+    if mask:
+        source += [f'    s_nx_platform_dma_clocks_added = ~RCU_AHB1EN & ({mask});',
+                   f'    RCU_AHB1EN |= ({mask});',
                    '    (void)RCU_AHB1EN;', '    nx_arch_dsb();']
     return source

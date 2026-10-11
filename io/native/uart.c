@@ -20,8 +20,8 @@ const nx_uart_port_t g_nx_native_uart = {&nx_native_uart_ops, &s_uart};
 const nx_uart_port_t* const nx_native_uart = &g_nx_native_uart;
 
 /** \brief Validate fixed-port preparation before establishing any borrow. */
-static nx_result_t validate_start(nx_native_uart_state_t* port,
-                                  nx_uart_tx_request_t* request,
+static nx_result_t validate_start(const nx_native_uart_state_t* port,
+                                  const nx_uart_tx_request_t* request,
                                   nx_request_state_t required) {
     if (port == NULL || request == NULL || request->data == NULL ||
         request->length == 0) {
@@ -560,4 +560,17 @@ size_t nx_native_uart_model_transmitted(const nx_uart_port_t* binding) {
         return 0;
     }
     return nx_native_uart_transmitted_instance(binding->context);
+}
+
+/** \brief Native selected adapter shares the real submit rejection checks. */
+nx_result_t nx_native_uart_tx_validate(void* context,
+                                       const nx_uart_tx_request_t* request) {
+    if (request == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    nx_request_state_t required = nx_request_state(&request->base);
+    if (required != NX_REQUEST_READY && required != NX_REQUEST_QUEUED) {
+        return NX_ERROR_STATE;
+    }
+    return validate_start(context, request, required);
 }

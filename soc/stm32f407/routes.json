@@ -103,12 +103,32 @@
       "modes": [
         "irq-byte-event",
         "dma-tx",
-        "irq-blocks"
+        "irq-blocks",
+        "rx-dma-idle",
+        "dma-duplex",
+        "rx-dma-continuous",
+        "dma-duplex-continuous"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
       "dma": [
         "DMA2:stream7:channel4"
-      ]
+      ],
+      "mode_dma": {
+        "rx-dma-idle": [
+          "DMA2:stream2:channel4"
+        ],
+        "dma-duplex": [
+          "DMA2:stream7:channel4",
+          "DMA2:stream2:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA2:stream2:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA2:stream7:channel4",
+          "DMA2:stream2:channel4"
+        ]
+      }
     },
     {
       "id": "spi1-pa5-pa6-pa7",
@@ -166,9 +186,17 @@
         }
       ],
       "modes": [
-        "poll-messages"
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
       ],
-      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA1:stream0:channel1",
+          "DMA1:stream6:channel1"
+        ]
+      }
     },
     {
       "id": "tim3-ch1-pa6",
@@ -208,7 +236,8 @@
       "modes": [
         "single-shot",
         "low-rate-scan",
-        "trigger-dma"
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
       "dma": [
@@ -216,6 +245,9 @@
       ],
       "mode_resources": {
         "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
           "controller:TIM3"
         ]
       }
@@ -290,7 +322,8 @@
       ],
       "modes": [
         "low-rate-scan",
-        "trigger-dma"
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
       "dma": [
@@ -298,6 +331,9 @@
       ],
       "mode_resources": {
         "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
           "controller:TIM3"
         ]
       }

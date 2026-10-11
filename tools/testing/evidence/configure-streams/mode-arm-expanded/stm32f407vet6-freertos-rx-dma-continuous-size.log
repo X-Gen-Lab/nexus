@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+   7886	     40	   2264	  10190	   27ce	/workspace/nexus-config-iteration-evidence/mode-arm-expanded/stm32f407vet6-freertos-rx-dma-continuous/bin/stm32_controller_fixture.elf

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/workspace/nexus-adc-iteration/cost_v2.py", line 14, in <module>
+    OUT.mkdir(exist_ok=False)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+FileExistsError: [Errno 17] File exists: '/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost'

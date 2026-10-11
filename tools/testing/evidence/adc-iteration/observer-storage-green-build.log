@@ -1,0 +1,2 @@
+[1/2] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o
+[2/2] Linking CXX executable bin/nexus_hardware_contract_test

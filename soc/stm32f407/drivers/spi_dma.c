@@ -111,30 +111,38 @@ static nx_result_t configuration(nx_stm32_spi_dma_endpoint_state_t* device,
 /** \brief The full-duplex mode never allocates scratch buffers or copies
  * payload. */
 static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
-                                    const nx_spi_request_t* request) {
+                                    const nx_spi_request_t* request,
+                                    uint8_t memory_flags) {
+    if ((memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
+        0U) {
+        return NX_ERROR_INVALID;
+    }
     if (request == NULL || request->length == 0U || request->length > 65535U) {
         return NX_ERROR_INVALID;
     }
     if (request->tx == NULL || request->rx == NULL) {
         return NX_ERROR_UNSUPPORTED;
     }
+    size_t tx_span =
+        (memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U ? 1U : request->length;
+    size_t rx_span =
+        (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U ? 1U : request->length;
     nx_result_t result =
         nx_dma_buffer_validate(state->regions, state->region_count, request->tx,
-                               request->length, 1U, NX_DMA_TO_DEVICE);
+                               tx_span, 1U, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
     result =
         nx_dma_buffer_validate(state->regions, state->region_count, request->rx,
-                               request->length, 1U, NX_DMA_FROM_DEVICE);
+                               rx_span, 1U, NX_DMA_FROM_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
     uintptr_t tx = (uintptr_t)request->tx;
     uintptr_t rx = (uintptr_t)request->rx;
-    return tx < rx + request->length && rx < tx + request->length
-               ? NX_ERROR_INVALID
-               : NX_SUCCESS;
+    return tx < rx + rx_span && rx < tx + tx_span ? NX_ERROR_INVALID
+                                                  : NX_SUCCESS;
 }
 
 /** \brief Program exactly one disabled DMA memory engine. */
@@ -146,7 +154,10 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
     stream->M0AR = (uint32_t)(uintptr_t)(receive ? request->rx : request->tx);
     stream->NDTR = (uint32_t)request->length;
     stream->FCR = 0U;
-    stream->CR = (3U << DMA_SxCR_CHSEL_Pos) | DMA_SxCR_MINC | DMA_SxCR_PL_1 |
+    uint8_t fixed = receive ? NX_SPI_MEMORY_RX_FIXED : NX_SPI_MEMORY_TX_FIXED;
+    uint32_t increment =
+        (state->memory_flags & fixed) != 0U ? 0U : DMA_SxCR_MINC;
+    stream->CR = (3U << DMA_SxCR_CHSEL_Pos) | increment | DMA_SxCR_PL_1 |
                  DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE |
                  (receive ? 0U : DMA_SxCR_DIR_0);
 }
@@ -154,7 +165,8 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
 /** \brief One admission gates both DMA engines and the entire selected CS
  * interval. */
 static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
-                         nx_spi_request_t* request, bool admitted) {
+                         nx_spi_request_t* request, bool admitted,
+                         uint8_t memory_flags) {
     uint32_t control;
     nx_result_t result = configuration(device, &control);
     if (result != NX_SUCCESS) {
@@ -164,7 +176,7 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
         return NX_ERROR_CONTEXT;
     }
     nx_stm32_spi_dma_state_t* state = device->dma;
-    result = validate_buffers(state, request);
+    result = validate_buffers(state, request, memory_flags);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -186,6 +198,7 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
         nx_arch_irq_restore(saved);
         return result;
     }
+    state->memory_flags = memory_flags;
     state->active = request;
     state->endpoint = device;
     state->spi.active = true;
@@ -212,7 +225,13 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
 /** \brief Start direct finite DMA after every rejection condition is resolved.
  */
 static nx_result_t submit(void* context, nx_spi_request_t* request) {
-    return start(context, request, false);
+    return start(context, request, false, 0U);
+}
+
+/** \brief Copy explicit memory modes only after valid request admission. */
+static nx_result_t submit_memory(void* context, nx_spi_request_t* request,
+                                 uint8_t memory_flags) {
+    return start(context, request, false, memory_flags);
 }
 
 /** \brief Transfer an existing adapter loan to the exact selected endpoint. */
@@ -221,7 +240,7 @@ static nx_result_t start_admitted(void* context, nx_spi_request_t* request) {
         nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
         return NX_ERROR_STATE;
     }
-    return start(context, request, true);
+    return start(context, request, true, 0U);
 }
 
 /** \brief Stopping DMA does not withdraw CS before an actual SPI idle
@@ -465,6 +484,7 @@ const nx_spi_ops_t nx_stm32_spi_dma_ops = {
 const nx_spi_endpoint_ops_t nx_stm32_spi_dma_endpoint_ops = {
     .transfer = transfer,
     .submit = submit,
+    .submit_memory = submit_memory,
     .start_admitted = start_admitted,
     .on_port = on_port,
 };

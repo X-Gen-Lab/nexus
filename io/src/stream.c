@@ -249,3 +249,144 @@ nx_result_t nx_stream_stop(nx_stream_t* stream) {
     nx_arch_irq_restore(saved);
     return result;
 }
+
+/** \brief Cold binding rejects control overlap with every retained byte span.
+ */
+nx_result_t nx_stream_post_initialize(nx_stream_producer_t* producer,
+                                      nx_stream_t* stream) {
+    if (producer == NULL || stream == NULL || stream->slots == NULL ||
+        stream->count == 0U ||
+        stream->count > SIZE_MAX / sizeof(*stream->slots)) {
+        return NX_ERROR_INVALID;
+    }
+    uintptr_t control = (uintptr_t)producer;
+    if (control % _Alignof(nx_stream_producer_t) != 0U ||
+        sizeof(*producer) > UINTPTR_MAX - control ||
+        overlaps(control, sizeof(*producer), (uintptr_t)stream,
+                 sizeof(*stream)) ||
+        overlaps(control, sizeof(*producer), (uintptr_t)stream->slots,
+                 stream->count * sizeof(*stream->slots))) {
+        return NX_ERROR_INVALID;
+    }
+    for (size_t index = 0U; index < stream->count; ++index) {
+        const nx_stream_slot_t* slot = &stream->slots[index];
+        if (overlaps(control, sizeof(*producer), (uintptr_t)slot->data,
+                     slot->capacity)) {
+            return NX_ERROR_INVALID;
+        }
+    }
+    if (stream->stopping) {
+        return NX_ERROR_STATE;
+    }
+    if (stream->outstanding != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    *producer =
+        (nx_stream_producer_t){.stream = stream, .cursor = stream->producer};
+    return NX_SUCCESS;
+}
+
+/** \brief Only the exclusive producer changes cursor and pending metadata. */
+static bool posted_valid(const nx_stream_producer_t* producer) {
+    return producer != NULL && producer->stream != NULL &&
+           producer->stream->slots != NULL && producer->stream->count != 0U &&
+           producer->cursor < producer->stream->count &&
+           producer->pending <= producer->stream->count;
+}
+
+/** \brief An unavailable target is backpressure, not evidence of a lost sample.
+ */
+bool nx_stream_post_can_reserve(const nx_stream_producer_t* producer) {
+    if (!posted_valid(producer)) {
+        return false;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    const nx_stream_t* stream = producer->stream;
+    bool ready = !stream->stopping && producer->pending < stream->count &&
+                 stream->epoch != UINT64_MAX &&
+                 stream->slots[producer->cursor].state == NX_STREAM_SLOT_FREE;
+    nx_arch_irq_restore(saved);
+    return ready;
+}
+
+/** \brief Advance only the private reservation cursor until FIFO publication.
+ */
+nx_result_t nx_stream_post_reserve(nx_stream_producer_t* producer,
+                                   nx_stream_fill_t* fill) {
+    if (!posted_valid(producer) || fill == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_stream_t* stream = producer->stream;
+    nx_stream_slot_t* slot = &stream->slots[producer->cursor];
+    nx_result_t result = NX_SUCCESS;
+    if (stream->stopping) {
+        result = NX_ERROR_STATE;
+    } else if (producer->pending == stream->count ||
+               slot->state != NX_STREAM_SLOT_FREE) {
+        result = NX_ERROR_OVERFLOW;
+    } else if (stream->epoch == UINT64_MAX) {
+        result = NX_ERROR_EXHAUSTED;
+    } else {
+        slot->epoch = ++stream->epoch;
+        slot->state = NX_STREAM_SLOT_FILLING;
+        ++stream->outstanding;
+        ++producer->pending;
+        *fill = (nx_stream_fill_t){.data = slot->data,
+                                   .capacity = slot->capacity,
+                                   .slot = producer->cursor,
+                                   .epoch = slot->epoch};
+        if (++producer->cursor == stream->count) {
+            producer->cursor = 0U;
+        }
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+
+/** \brief Shared FIFO publication preserves the original consumer contract. */
+nx_result_t nx_stream_post_publish(nx_stream_producer_t* producer,
+                                   const nx_stream_fill_t* fill, size_t length,
+                                   uint32_t flags) {
+    if (!posted_valid(producer)) {
+        return NX_ERROR_INVALID;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_result_t result =
+        producer->pending == 0U
+            ? NX_ERROR_STATE
+            : nx_stream_publish(producer->stream, fill, length, flags);
+    if (result == NX_SUCCESS) {
+        --producer->pending;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+
+/** \brief Reverse rollback keeps the next consumer slot available for reuse. */
+nx_result_t nx_stream_post_abort(nx_stream_producer_t* producer,
+                                 const nx_stream_fill_t* fill,
+                                 bool memory_quiesced) {
+    if (!posted_valid(producer) || fill == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_stream_t* stream = producer->stream;
+    size_t tail =
+        producer->cursor == 0U ? stream->count - 1U : producer->cursor - 1U;
+    nx_stream_slot_t* slot = &stream->slots[tail];
+    nx_result_t result = NX_ERROR_STATE;
+    if (producer->pending != 0U && fill->slot == tail &&
+        slot->state == NX_STREAM_SLOT_FILLING && slot->epoch == fill->epoch &&
+        slot->data == fill->data && slot->capacity == fill->capacity) {
+        result = memory_quiesced ? NX_SUCCESS : NX_ERROR_BUSY;
+        if (result == NX_SUCCESS) {
+            slot->state = NX_STREAM_SLOT_FREE;
+            --stream->outstanding;
+            --producer->pending;
+            producer->cursor = tail;
+        }
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}

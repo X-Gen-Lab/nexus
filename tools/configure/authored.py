@@ -5,7 +5,7 @@ INSTANCE_FIELDS = {
     "gpio": {"binding", "mode"},
     "uart": {"binding", "mode", "baud", "rx", "irq"},
     "spi": {"binding", "mode", "max_hz", "irq"},
-    "i2c": {"binding", "mode", "max_hz"},
+    "i2c": {"binding", "mode", "max_hz", "irq"},
     "flash": {"binding", "mode"},
     "watchdog": {"binding", "mode"},
     "exti": {"binding", "mode", "edge", "event_capacity", "irq"},
@@ -69,7 +69,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["calls_os"] = irq["calls_os"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:

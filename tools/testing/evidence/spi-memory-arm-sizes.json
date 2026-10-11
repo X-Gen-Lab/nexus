@@ -1,0 +1,42 @@
+{
+  "stm32-baseline": {
+    "nx_dma_size": 64,
+    "nx_face_size": 8,
+    "nx_ops_size": 16,
+    "nx_polling_size": 16,
+    "nx_request_size": 40
+  },
+  "stm32-current": {
+    "nx_dma_size": 64,
+    "nx_face_size": 8,
+    "nx_ops_size": 20,
+    "nx_polling_size": 16,
+    "nx_request_size": 40
+  },
+  "gd32-baseline": {
+    "nx_dma_size": 48,
+    "nx_face_size": 8,
+    "nx_ops_size": 16,
+    "nx_polling_size": 8,
+    "nx_request_size": 40
+  },
+  "gd32-current": {
+    "nx_dma_size": 48,
+    "nx_face_size": 8,
+    "nx_ops_size": 20,
+    "nx_polling_size": 8,
+    "nx_request_size": 40
+  },
+  "native-baseline": {
+    "nx_face_size": 8,
+    "nx_model_size": 32,
+    "nx_ops_size": 16,
+    "nx_request_size": 40
+  },
+  "native-current": {
+    "nx_face_size": 8,
+    "nx_model_size": 32,
+    "nx_ops_size": 20,
+    "nx_request_size": 40
+  }
+}

@@ -102,6 +102,16 @@ typedef struct {
  */
 nx_result_t nx_native_uart_configure(const nx_native_uart_config_t* config);
 /**
+ * \brief           Validate exact Native TX context for selected RS485 binding.
+ * \param[in]       context: Configured Native UART face's exact context.
+ * \param[in]       request: Live READY/QUEUED descriptor, never retained.
+ * \return          Same pure rejectable checks as Native submit/start.
+ * \note            Task-only; no model IRQ, admission, GPIO or state mutation.
+ */
+nx_result_t nx_native_uart_tx_validate(void* context,
+                                       const nx_uart_tx_request_t* request);
+
+/**
  * \brief           Copy explicit IRQ facts into a quiescent host UART model.
  *
  * \param[in]       binding: Configured Native UART face with no IRQ users.

@@ -1,0 +1,31 @@
+/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v4/stm32f407-adc_stream.o: \
+ /workspace/nexus/soc/stm32f407/drivers/adc_stream.c \
+ /workspace/nexus/soc/stm32f407/private/stm32f407_stream.h \
+ /workspace/nexus/soc/stm32f407/private/stm32f407_dma.h \
+ /workspace/nexus/io/include/nexus/io/dma.h \
+ /workspace/nexus/core/include/nexus/core/status.h \
+ /workspace/nexus/soc/stm32f407/private/stm32f407_provider.h \
+ /workspace/nexus/io/include/nexus/io/adc.h \
+ /workspace/nexus/core/include/nexus/core/time.h \
+ /workspace/nexus/io/include/nexus/io/adc_observer.h \
+ /workspace/nexus/io/include/nexus/io/stream.h \
+ /workspace/nexus/io/include/nexus/io/wake.h \
+ /workspace/nexus/io/include/nexus/io/exti.h \
+ /workspace/nexus/io/include/nexus/io/flash.h \
+ /workspace/nexus/io/include/nexus/io/gpio.h \
+ /workspace/nexus/io/include/nexus/io/i2c.h \
+ /workspace/nexus/io/include/nexus/io/spi.h \
+ /workspace/nexus/core/include/nexus/core/request.h \
+ /workspace/nexus/io/include/nexus/io/timer.h \
+ /workspace/nexus/io/include/nexus/io/uart.h \
+ /workspace/nexus/io/include/nexus/io/watchdog.h \
+ /workspace/nexus/soc/stm32f407/private/stm32f407_system.h \
+ /workspace/nexus/arch/include/nexus/arch/arch.h \
+ /workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f407xx.h \
+ /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h \
+ /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_version.h \
+ /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_compiler.h \
+ /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_gcc.h \
+ /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/mpu_armv7.h \
+ /workspace/nexus/vendors/st/cmsis_device_f4/Include/system_stm32f4xx.h \
+ /workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v4/generated/stm32f407/nexus_config.h

@@ -1,0 +1,255 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/adc-iteration/generated/resolved.json
+-- Configuring done (0.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/adc-iteration
+[1/5] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/dma_test.cpp.o
+[2/5] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o 
+/usr/bin/c++  -I/workspace/nexus/build/adc-iteration/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o -c /workspace/nexus/tests/google/stream_test.cpp
+/workspace/nexus/tests/google/stream_test.cpp:92:5: error: ‘nx_stream_producer_t’ does not name a type; did you mean ‘nx_stream_block_t’?
+   92 |     nx_stream_producer_t producer = {};
+      |     ^~~~~~~~~~~~~~~~~~~~
+      |     nx_stream_block_t
+In file included from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/tests/google/stream_test.cpp:16:
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream::SetUp()’:
+/workspace/nexus/tests/google/stream_test.cpp:100:46: error: ‘producer’ was not declared in this scope
+  100 |         ASSERT_EQ(nx_stream_post_initialize(&producer, &stream), NX_SUCCESS);
+      |                                              ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:100:19: error: ‘nx_stream_post_initialize’ was not declared in this scope; did you mean ‘nx_stream_initialize’?
+  100 |         ASSERT_EQ(nx_stream_post_initialize(&producer, &stream), NX_SUCCESS);
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream_PrepostedFillsRemainInvisibleAndPublicationIsFIFO_Test::TestBody()’:
+/workspace/nexus/tests/google/stream_test.cpp:106:39: error: ‘producer’ was not declared in this scope
+  106 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:106:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  106 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:107:39: error: ‘producer’ was not declared in this scope
+  107 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:107:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  107 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:108:39: error: ‘producer’ was not declared in this scope
+  108 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &third), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:108:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  108 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &third), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:109:15: error: ‘producer’ was not declared in this scope
+  109 |     EXPECT_EQ(producer.pending, 3U);
+      |               ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:114:39: error: ‘producer’ was not declared in this scope
+  114 |     EXPECT_EQ(nx_stream_post_publish(&producer, &second, 8U, 0U),
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:114:15: error: ‘nx_stream_post_publish’ was not declared in this scope; did you mean ‘nx_stream_publish’?
+  114 |     EXPECT_EQ(nx_stream_post_publish(&producer, &second, 8U, 0U),
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+In file included from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-printers.h:122,
+                 from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-matchers.h:49,
+                 from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/internal/gtest-death-test-internal.h:47,
+                 from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-death-test.h:43,
+                 from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:64:
+/workspace/nexus/tests/google/stream_test.cpp:117:46: error: ‘producer’ was not declared in this scope
+  117 |     EXPECT_FALSE(nx_stream_post_can_reserve(&producer));
+      |                                              ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:117:18: error: ‘nx_stream_post_can_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  117 |     EXPECT_FALSE(nx_stream_post_can_reserve(&producer));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:119:39: error: ‘producer’ was not declared in this scope
+  119 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &denied), NX_ERROR_OVERFLOW);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:119:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  119 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &denied), NX_ERROR_OVERFLOW);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:122:39: error: ‘producer’ was not declared in this scope
+  122 |     ASSERT_EQ(nx_stream_post_publish(&producer, &first, 8U, 0U), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:122:15: error: ‘nx_stream_post_publish’ was not declared in this scope; did you mean ‘nx_stream_publish’?
+  122 |     ASSERT_EQ(nx_stream_post_publish(&producer, &first, 8U, 0U), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:125:15: error: ‘producer’ was not declared in this scope
+  125 |     EXPECT_EQ(producer.pending, 2U);
+      |               ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream_LIFOAbortNeedsQuiescenceAndNeverLeavesConsumerHoles_Test::TestBody()’:
+/workspace/nexus/tests/google/stream_test.cpp:130:39: error: ‘producer’ was not declared in this scope
+  130 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:130:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  130 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:131:39: error: ‘producer’ was not declared in this scope
+  131 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:131:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  131 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:132:39: error: ‘producer’ was not declared in this scope
+  132 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &third), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:132:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  132 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &third), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:133:37: error: ‘producer’ was not declared in this scope
+  133 |     EXPECT_EQ(nx_stream_post_abort(&producer, &first, true), NX_ERROR_STATE);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:133:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  133 |     EXPECT_EQ(nx_stream_post_abort(&producer, &first, true), NX_ERROR_STATE);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:134:37: error: ‘producer’ was not declared in this scope
+  134 |     EXPECT_EQ(nx_stream_post_abort(&producer, &third, false), NX_ERROR_BUSY);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:134:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  134 |     EXPECT_EQ(nx_stream_post_abort(&producer, &third, false), NX_ERROR_BUSY);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:135:15: error: ‘producer’ was not declared in this scope
+  135 |     EXPECT_EQ(producer.pending, 3U);
+      |               ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:137:37: error: ‘producer’ was not declared in this scope
+  137 |     ASSERT_EQ(nx_stream_post_abort(&producer, &third, true), NX_SUCCESS);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:137:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  137 |     ASSERT_EQ(nx_stream_post_abort(&producer, &third, true), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:138:39: error: ‘producer’ was not declared in this scope
+  138 |     ASSERT_EQ(nx_stream_post_publish(&producer, &first, 1U, 0U), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:138:15: error: ‘nx_stream_post_publish’ was not declared in this scope; did you mean ‘nx_stream_publish’?
+  138 |     ASSERT_EQ(nx_stream_post_publish(&producer, &first, 1U, 0U), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:139:37: error: ‘producer’ was not declared in this scope
+  139 |     ASSERT_EQ(nx_stream_post_abort(&producer, &second, true), NX_SUCCESS);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:139:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  139 |     ASSERT_EQ(nx_stream_post_abort(&producer, &second, true), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:140:15: error: ‘producer’ was not declared in this scope
+  140 |     EXPECT_EQ(producer.pending, 0U);
+      |               ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:141:15: error: ‘producer’ was not declared in this scope
+  141 |     EXPECT_EQ(producer.cursor, stream.producer);
+      |               ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:145:39: error: ‘producer’ was not declared in this scope
+  145 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:145:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  145 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:146:39: error: ‘producer’ was not declared in this scope
+  146 |     ASSERT_EQ(nx_stream_post_publish(&producer, &second, 1U, 0U), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:146:15: error: ‘nx_stream_post_publish’ was not declared in this scope; did you mean ‘nx_stream_publish’?
+  146 |     ASSERT_EQ(nx_stream_post_publish(&producer, &second, 1U, 0U), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream_StopRetainsAllPostedLoansUntilReverseDrain_Test::TestBody()’:
+/workspace/nexus/tests/google/stream_test.cpp:153:39: error: ‘producer’ was not declared in this scope
+  153 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:153:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  153 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:154:39: error: ‘producer’ was not declared in this scope
+  154 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:154:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  154 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &second), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:156:46: error: ‘producer’ was not declared in this scope
+  156 |     EXPECT_FALSE(nx_stream_post_can_reserve(&producer));
+      |                                              ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:156:18: error: ‘nx_stream_post_can_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  156 |     EXPECT_FALSE(nx_stream_post_can_reserve(&producer));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:157:39: error: ‘producer’ was not declared in this scope
+  157 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &first), NX_ERROR_STATE);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:157:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  157 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &first), NX_ERROR_STATE);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:158:37: error: ‘producer’ was not declared in this scope
+  158 |     EXPECT_EQ(nx_stream_post_abort(&producer, &second, false), NX_ERROR_BUSY);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:158:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  158 |     EXPECT_EQ(nx_stream_post_abort(&producer, &second, false), NX_ERROR_BUSY);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:159:37: error: ‘producer’ was not declared in this scope
+  159 |     ASSERT_EQ(nx_stream_post_abort(&producer, &second, true), NX_SUCCESS);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:159:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  159 |     ASSERT_EQ(nx_stream_post_abort(&producer, &second, true), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:160:37: error: ‘producer’ was not declared in this scope
+  160 |     ASSERT_EQ(nx_stream_post_abort(&producer, &first, true), NX_SUCCESS);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:160:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  160 |     ASSERT_EQ(nx_stream_post_abort(&producer, &first, true), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream_WrapNeverOverwritesHeldConsumerAndOldEpochCannotAbort_Test::TestBody()’:
+/workspace/nexus/tests/google/stream_test.cpp:168:43: error: ‘producer’ was not declared in this scope
+  168 |         ASSERT_EQ(nx_stream_post_reserve(&producer, &fills[index]), NX_SUCCESS);
+      |                                           ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:168:19: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  168 |         ASSERT_EQ(nx_stream_post_reserve(&producer, &fills[index]), NX_SUCCESS);
+      |                   ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:170:43: error: ‘producer’ was not declared in this scope
+  170 |         ASSERT_EQ(nx_stream_post_publish(&producer, &fills[index], 1U, 0U),
+      |                                           ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:170:19: error: ‘nx_stream_post_publish’ was not declared in this scope; did you mean ‘nx_stream_publish’?
+  170 |         ASSERT_EQ(nx_stream_post_publish(&producer, &fills[index], 1U, 0U),
+      |                   ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:174:39: error: ‘producer’ was not declared in this scope
+  174 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &fills[0]), NX_ERROR_OVERFLOW);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:174:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  174 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &fills[0]), NX_ERROR_OVERFLOW);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:178:39: error: ‘producer’ was not declared in this scope
+  178 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &fills[0]), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:178:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  178 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &fills[0]), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:180:37: error: ‘producer’ was not declared in this scope
+  180 |     EXPECT_EQ(nx_stream_post_abort(&producer, &stale, true), NX_ERROR_STATE);
+      |                                     ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:180:15: error: ‘nx_stream_post_abort’ was not declared in this scope; did you mean ‘nx_stream_abort’?
+  180 |     EXPECT_EQ(nx_stream_post_abort(&producer, &stale, true), NX_ERROR_STATE);
+      |               ^~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream_ExhaustedIdentityRetainsCursorAndOutputWithoutWrap_Test::TestBody()’:
+/workspace/nexus/tests/google/stream_test.cpp:188:39: error: ‘producer’ was not declared in this scope
+  188 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:188:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  188 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:190:25: error: ‘producer’ was not declared in this scope
+  190 |     const auto before = producer;
+      |                         ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:191:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  191 |     EXPECT_EQ(nx_stream_post_reserve(&producer, &denied), NX_ERROR_EXHAUSTED);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp: In member function ‘virtual void PostedStream_InitializationRejectsLiveLoansAndPreservesOutput_Test::TestBody()’:
+/workspace/nexus/tests/google/stream_test.cpp:199:39: error: ‘producer’ was not declared in this scope
+  199 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |                                       ^~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:199:15: error: ‘nx_stream_post_reserve’ was not declared in this scope; did you mean ‘nx_stream_can_reserve’?
+  199 |     ASSERT_EQ(nx_stream_post_reserve(&producer, &first), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/stream_test.cpp:200:5: error: ‘nx_stream_producer_t’ was not declared in this scope; did you mean ‘nx_stream_block_t’?
+  200 |     nx_stream_producer_t other = {};
+      |     ^~~~~~~~~~~~~~~~~~~~
+      |     nx_stream_block_t
+/workspace/nexus/tests/google/stream_test.cpp:201:25: error: ‘other’ was not declared in this scope
+  201 |     const auto before = other;
+      |                         ^~~~~
+/workspace/nexus/tests/google/stream_test.cpp:202:15: error: ‘nx_stream_post_initialize’ was not declared in this scope; did you mean ‘nx_stream_initialize’?
+  202 |     EXPECT_EQ(nx_stream_post_initialize(&other, &stream), NX_ERROR_BUSY);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+[3/5] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/wake_test.cpp.o
+ninja: build stopped: subcommand failed.

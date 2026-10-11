@@ -1,0 +1,16 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_stm32_uart_receive_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/stm32-continuous-green-attempt1.xml"
+    ],
+    "returncode": 1
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_gd32_uart_receive_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/gd32-continuous-green-attempt1.xml"
+    ],
+    "returncode": 0
+  }
+]

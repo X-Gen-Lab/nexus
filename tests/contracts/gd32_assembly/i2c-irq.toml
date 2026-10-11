@@ -1,0 +1,26 @@
+schema = 2
+board_package = "software_board"
+backend = "baremetal"
+clock = "hxtal25-pll200"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[i2c.bus]
+binding = "i2c0"
+mode = "irq-messages"
+max_hz = 100000
+
+[i2c.bus.irq]
+priority = 5
+calls_os = false
+
+[i2c_device.sensor]
+controller = "bus"
+driver = "i2c-endpoint"
+address = 80

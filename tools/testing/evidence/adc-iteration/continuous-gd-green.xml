@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="17" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:16:22.650" name="AllTests">
+  <testsuite name="GD32ADCStream" tests="9" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:16:22.651">
+    <testcase name="FullScanPublicationRequiresEngineDetach" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="134" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="BackpressureNeverOverwritesAndResumeIsExplicit" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="162" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="InvalidDomainAndRateRejectBeforeLoanOrEffects" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="206" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="WakeUsesActualDmaPriorityAndLatchedPublication" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="229" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="241" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="CalibrationTimeoutReleasesOnlyQuiescentProducer" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="260" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="278" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+    <testcase name="StabilityClockStartsAfterPowerStoreHasCompleted" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="298" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCStream" />
+  </testsuite>
+  <testsuite name="GD32ADCContinuous" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:16:22.651">
+    <testcase name="SwappedBankPublishesWhileOtherBankKeepsAcquiring" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="378" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="StarvationStopsAndNeverOverwritesBorrowedBlock" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="398" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="FailedDisableRetainsBothTargetsUntilReadback" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="417" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="InvalidLateDomainAndUnequalScanCapacityNeverLoan" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="427" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="WrongBankPhaseStopsInsteadOfPublishingUnknownScan" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="440" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="RefusedAddressWriteAndDrainRetainThreeLoans" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="448" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="BankSwitchDuringTargetWriteRejectsPublication" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="463" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+    <testcase name="ExplicitSampleTimeCostsLimitTheCompleteScanRate" file="/workspace/nexus/tests/google/gd32_adc_stream_test.cpp" line="473" status="run" result="completed" time="0." timestamp="2026-10-11T16:16:22.651" classname="GD32ADCContinuous" />
+  </testsuite>
+</testsuites>

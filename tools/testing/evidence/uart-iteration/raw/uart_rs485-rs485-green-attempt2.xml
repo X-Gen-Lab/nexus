@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:30:37.233" name="AllTests">
+  <testsuite name="UartRs485" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:30:37.233">
+    <testcase name="RejectsInvalidTransportBeforeDirectionOrBorrow" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.233" classname="UartRs485" />
+    <testcase name="SetupThenTrueTransportSettlementThenMinimumHold" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="115" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.233" classname="UartRs485" />
+    <testcase name="CancelDuringSetupNeverStartsUartAndWithdrawsDirection" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="138" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.233" classname="UartRs485" />
+    <testcase name="SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="149" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.234" classname="UartRs485" />
+    <testcase name="ActiveCancelAndFailedDrainRetainOuterBorrowAndDirection" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="160" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.234" classname="UartRs485" />
+    <testcase name="FailedDirectionWithdrawalQuarantinesUntilActualRetry" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="183" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.234" classname="UartRs485" />
+    <testcase name="StopClosesAdmissionAndDrainsDirectionBeforeTransportStop" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="204" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.234" classname="UartRs485" />
+    <testcase name="SuccessAlreadySettledInTransportWinsLaterCancel" file="/workspace/nexus/tests/google/uart_rs485_test.cpp" line="222" status="run" result="completed" time="0." timestamp="2026-10-11T16:30:37.234" classname="UartRs485" />
+  </testsuite>
+</testsuites>

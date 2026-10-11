@@ -84,3 +84,39 @@ nx_result_t nx_adc_port_attach_wake(const nx_adc_port_t* port,
                ? NX_ERROR_UNSUPPORTED
                : port->ops->attach_wake(port->context, wake, syscall_ceiling);
 }
+
+/** \brief Optional immutable facts do not start or configure the peripheral. */
+nx_result_t nx_adc_port_sequence_info(const nx_adc_port_t* port,
+                                      nx_adc_sequence_info_t* info) {
+    if (port == NULL || port->ops == NULL || port->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return port->ops->sequence_info == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->sequence_info(port->context, info);
+}
+
+/** \brief Storage is lent only through the selected provider's cold contract.
+ */
+nx_result_t nx_adc_port_attach_observer(const nx_adc_port_t* port,
+                                        nx_adc_observer_t* observer) {
+    if (port == NULL || port->ops == NULL || port->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return port->ops->attach_observer == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->attach_observer(port->context, observer);
+}
+
+/** \brief A live loan's epoch remains authoritative over optional metadata. */
+nx_result_t nx_adc_port_block_observation(const nx_adc_port_t* port,
+                                          const nx_stream_block_t* block,
+                                          nx_adc_observation_t* observation) {
+    if (port == NULL || port->ops == NULL || port->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return port->ops->block_observation == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->block_observation(port->context, block,
+                                              observation);
+}

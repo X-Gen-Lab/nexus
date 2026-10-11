@@ -91,8 +91,9 @@ nx_result_t nx_stm32_adc_stream_initialize(nx_stm32_adc_stream_state_t* state) {
 }
 
 /** \brief Validate the whole ADC scan, not merely the timer divider. */
-static nx_result_t rate(nx_stm32_adc_stream_state_t* state, uint32_t trigger_hz,
-                        uint16_t* prescaler, uint16_t* period) {
+nx_result_t nx_stm32_adc_stream_rate(nx_stm32_adc_stream_state_t* state,
+                                     uint32_t trigger_hz, uint16_t* prescaler,
+                                     uint16_t* period) {
     static const uint16_t sample_cycles[] = {3U,  15U,  28U,  56U,
                                              84U, 112U, 144U, 480U};
     if (trigger_hz == 0U || state->timer_clock_hz == 0U ||
@@ -125,8 +126,8 @@ static nx_result_t rate(nx_stm32_adc_stream_state_t* state, uint32_t trigger_hz,
 
 /** \brief Validate every future block before the first successful producer
  * loan. */
-static nx_result_t blocks(nx_stm32_adc_stream_state_t* state,
-                          const nx_stream_t* stream) {
+nx_result_t nx_stm32_adc_stream_blocks(nx_stm32_adc_stream_state_t* state,
+                                       const nx_stream_t* stream) {
     size_t scan_bytes = state->adc.channel_count * sizeof(uint16_t);
     for (size_t i = 0U; i < stream->count; ++i) {
         const nx_stream_slot_t* slot = &stream->slots[i];
@@ -146,7 +147,7 @@ static nx_result_t blocks(nx_stm32_adc_stream_state_t* state,
 
 /** \brief Preserve channel order and selected sample time for complete scans.
  */
-static void sequence(nx_stm32_adc_stream_state_t* state) {
+void nx_stm32_adc_stream_sequence(nx_stm32_adc_stream_state_t* state) {
     ADC_TypeDef* adc = state->adc.registers;
     adc->SQR1 = ((uint32_t)state->adc.channel_count - 1U) << 20U;
     adc->SQR2 = 0U;
@@ -179,7 +180,7 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
     state->block_flags = NX_STREAM_BOUNDARY_TRIGGER;
     adc->CR2 = 0U;
     adc->CR1 = state->adc.channel_count > 1U ? (uint32_t)ADC_CR1_SCAN : 0U;
-    sequence(state);
+    nx_stm32_adc_stream_sequence(state);
     adc->SR = 0U;
     state->timer->CR1 = 0U;
     state->timer->CR2 = TIM_CR2_MMS_1;
@@ -223,9 +224,10 @@ static nx_result_t stream_start(void* context, nx_stream_t* stream,
     }
     uint16_t prescaler;
     uint16_t period;
-    nx_result_t result = rate(state, trigger_hz, &prescaler, &period);
+    nx_result_t result =
+        nx_stm32_adc_stream_rate(state, trigger_hz, &prescaler, &period);
     if (result == NX_SUCCESS) {
-        result = blocks(state, stream);
+        result = nx_stm32_adc_stream_blocks(state, stream);
     }
     if (result != NX_SUCCESS) {
         return result;

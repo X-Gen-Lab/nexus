@@ -1,5 +1,7 @@
 """Shared input checks; provider packages own silicon-specific limits."""
+from dataclasses import dataclass
 import re
+from types import MappingProxyType
 
 UINT32_MAX = (1 << 32) - 1
 
@@ -10,6 +12,64 @@ class ConfigurationError(ValueError):
 
 def fail(message):
     raise ConfigurationError(message)
+
+
+@dataclass(frozen=True)
+class ModeTraits:
+    """Execution shape only; provider mode tables still establish support."""
+    irq: bool = False
+    polling: bool = False
+    block_stream: bool = False
+    tx_dma: bool = False
+    rx_dma: bool = False
+    continuous: bool = False
+
+    @property
+    def dma(self):
+        return self.tx_dma or self.rx_dma
+
+
+_MODE_TRAITS = MappingProxyType({
+    ("gpio", "input"): ModeTraits(),
+    ("gpio", "output"): ModeTraits(),
+    ("uart", "irq-byte-event"): ModeTraits(irq=True),
+    ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
+    ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
+    ("uart", "rx-dma-idle"): ModeTraits(
+        irq=True, block_stream=True, rx_dma=True),
+    ("uart", "dma-duplex"): ModeTraits(
+        irq=True, block_stream=True, tx_dma=True, rx_dma=True),
+    ("uart", "rx-dma-continuous"): ModeTraits(
+        irq=True, block_stream=True, rx_dma=True, continuous=True),
+    ("uart", "dma-duplex-continuous"): ModeTraits(
+        irq=True, block_stream=True, tx_dma=True, rx_dma=True, continuous=True),
+    ("spi", "short-poll"): ModeTraits(polling=True),
+    ("spi", "dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
+    ("spi", "dma-full-duplex"): ModeTraits(
+        irq=True, tx_dma=True, rx_dma=True),
+    ("i2c", "poll-messages"): ModeTraits(polling=True),
+    ("i2c", "irq-messages"): ModeTraits(irq=True),
+    ("i2c", "dma-messages"): ModeTraits(
+        irq=True, tx_dma=True, rx_dma=True),
+    ("flash", "poll-byte"): ModeTraits(polling=True),
+    ("flash", "poll-word"): ModeTraits(polling=True),
+    ("watchdog", "independent"): ModeTraits(),
+    ("exti", "edge-event"): ModeTraits(irq=True),
+    ("pwm", "fixed-pwm"): ModeTraits(),
+    ("adc", "single-shot"): ModeTraits(polling=True),
+    ("adc", "low-rate-scan"): ModeTraits(polling=True),
+    ("adc", "trigger-dma"): ModeTraits(
+        irq=True, block_stream=True, rx_dma=True),
+    ("adc", "trigger-dma-continuous"): ModeTraits(
+        irq=True, block_stream=True, rx_dma=True, continuous=True),
+})
+
+
+def mode_traits(kind, mode):
+    traits = _MODE_TRAITS.get((kind, mode))
+    if traits is None:
+        fail(f"Unmaintained execution mode: {kind}/{mode}")
+    return traits
 
 
 def integer(value, minimum=0, maximum=UINT32_MAX, context="integer"):
@@ -71,11 +131,16 @@ def dma_irq(dma, vector, topology):
     return f"irq:DMA{controller}_{vector}{stream}"
 
 
+def route_dma(route, mode):
+    """The exact selected mode chooses a reviewed physical tuple."""
+    return route.get("mode_dma", {}).get(mode, route.get("dma", []))
+
+
 def validate_dma(route, mode, expected, family, normalize, trigger=None):
-    actual = tuple(sequence(route["dma"], "DMA route"))
+    actual = tuple(sequence(route_dma(route, mode), "DMA route"))
     if expected is None or actual != expected:
         fail(f"DMA route differs from fixed provider: {family}/{route['controller']}/{mode}")
-    if mode == "trigger-dma":
+    if route["kind"] == "adc" and mode_traits("adc", mode).dma:
         resources = tuple(normalize(resource) for resource in
                           route.get("mode_resources", {}).get(mode, []))
         if trigger is None or resources != ("controller:" + trigger,):
@@ -87,7 +152,7 @@ def validate_selection(selection, route, provider, ram_size):
     kind = route["kind"]
     fields = {
         "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
-        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz"}, "flash": set(), "watchdog": set(),
+        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
         "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os"},
@@ -100,12 +165,12 @@ def validate_selection(selection, route, provider, ram_size):
             fail("UART requires baud, RX profile and IRQ priority")
         integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
         if selection["rx_profile"] == "blocks":
-            if selection["mode"] != "irq-blocks":
-                fail("UART RX blocks requires the implemented irq-blocks provider")
+            if not mode_traits(kind, selection["mode"]).block_stream:
+                fail("UART RX blocks requires irq-blocks or a reviewed RX-DMA provider")
             if "rx_capacity" in selection:
                 fail("UART RX blocks has no generated ring capacity; storage is caller-owned")
-        elif selection["mode"] == "irq-blocks":
-            fail("UART irq-blocks requires RX blocks format")
+        elif mode_traits(kind, selection["mode"]).block_stream:
+            fail("UART block provider requires RX blocks format")
         elif selection["rx_profile"] in {"bytes", "events"}:
             integer(selection.get("rx_capacity"), 1, min(4096, ram_size // 16), "UART RX capacity")
         else:
@@ -139,12 +204,18 @@ def validate_selection(selection, route, provider, ram_size):
         integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
         if selection["mode"] in {"single-shot", "low-rate-scan"} and (selection["mode"] == "single-shot") != (len(channels) == 1):
             fail("ADC mode contradicts its reviewed channel count")
-        if selection["mode"] == "trigger-dma" and "irq_priority" not in selection:
+        if mode_traits(kind, selection["mode"]).dma and "irq_priority" not in selection:
             fail("ADC trigger-dma requires an explicit IRQ priority")
-        if selection["mode"] != "trigger-dma" and ({"irq_priority", "calls_os"} & selection.keys()):
+        if not mode_traits(kind, selection["mode"]).dma and ({"irq_priority", "calls_os"} & selection.keys()):
             fail("Polling ADC has no IRQ options")
-    elif kind == "i2c" and selection.get("max_hz", 100000) != 100000:
-        fail("Only reviewed 100 kHz I2C mode is maintained")
+    elif kind == "i2c":
+        if selection.get("max_hz", 100000) != 100000:
+            fail("Only reviewed 100 kHz I2C mode is maintained")
+        if mode_traits(kind, selection["mode"]).irq:
+            if "irq_priority" not in selection:
+                fail("Asynchronous I2C requires an explicit IRQ priority")
+        elif {"irq_priority", "calls_os"} & selection.keys():
+            fail("Polling I2C has no IRQ options")
     provider.validate_selection(selection, route)
 
 

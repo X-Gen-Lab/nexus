@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "command": [
+    "build/iteration-bus/bin/nexus_native_async_test",
+    "--gtest_output=xml:build/iteration-bus/spi-memory-native-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

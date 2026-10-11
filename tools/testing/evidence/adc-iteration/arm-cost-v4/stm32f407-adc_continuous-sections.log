@@ -1,0 +1,24 @@
+/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v4/stm32f407-adc_continuous.o  :
+section                                    size   addr
+.text                                         0      0
+.data                                         0      0
+.bss                                          0      0
+.text.attach_wake                            24      0
+.text.block_observation                      20      0
+.text.arm                                   284      0
+.text.start                                 278      0
+.text.sequence_info                          80      0
+.text.rollback                              224      0
+.text.halt                                   50      0
+.text.attach_observer                        82      0
+.text.service                               198      0
+.text.stop                                   98      0
+.text.nx_stm32_adc_continuous_initialize     10      0
+.text.nx_stm32_adc_continuous_irq           424      0
+.rodata.cycles.0                             16      0
+.rodata.nx_stm32_adc_continuous_ops          36      0
+.comment                                     71      0
+.ARM.attributes                              52      0
+Total                                      1947
+
+

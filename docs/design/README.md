@@ -12,6 +12,8 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程的严格资源合同 |
 | [OS 执行与生命周期合同](os-contracts.md) | deadline、IRQ policy、任务/队列、低功耗与扩展边界 |
 | [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |
+| [I2C 总线恢复](i2c-bus-clear.md) | 调用者独占 GPIO、有限时序与失败后继续清理的合同 |
+| [UART DMA 与 RS485](uart-dma-rs485.md) | 有限/连续接收、双向 DMA、流控和真实 TC/DE 时序 |
 | [OS01–OS55 台账](os-execution.csv) | 每项实际机制、证据及软件/物理状态 |
 | [Arch 与 CPU runtime 契约](arch-contracts.md) | 九核软件、原子操作、cache/MPU/SAU 和安全边界 |
 | [33项实施台账](next-generation-execution.csv) | 实现文件、证据入口、软件与物理状态分列 |

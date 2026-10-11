@@ -1,0 +1,35 @@
+{
+  "checked_files": 3,
+  "failing_diagnostics": 0,
+  "files": {
+    "io/include/nexus/io/i2c_bus_clear.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "4dd769a438c5e34bae8077aedf35272316bb3d0c7c20be94c4de0ee61d171e06"
+    },
+    "io/src/i2c_bus_clear.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df"
+    },
+    "tests/google/i2c_bus_clear_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "d55df85b1a139bd9dad7f905d0fb8ab7c9afaca0d275bf6e79ff6f161b0818ae"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

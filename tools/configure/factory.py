@@ -1,5 +1,10 @@
 """Generate pure, typed static lookup without registration or construction."""
 
+try:
+    from .providers.common import mode_traits
+except ImportError:
+    from providers.common import mode_traits
+
 KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc")
 
 
@@ -71,7 +76,10 @@ def emit_strong(result):
               " * \\author          Nexus Team", " */",
               "#ifndef NEXUS_FACTORY_STRONG_H", "#define NEXUS_FACTORY_STRONG_H",
               '#include "nexus_factory.h"', "#ifdef __cplusplus",
-              "#define NX_FACTORY_REF_VALUE(type, value) type{value}",
+              "#define NX_FACTORY_REF_VALUE(type, value)".ljust(79) + "\\",
+              "    type {".ljust(79) + "\\",
+              "        value".ljust(79) + "\\",
+              "    }",
               'extern "C" {', "#else",
               "#define NX_FACTORY_REF_VALUE(type, value) ((type){value})",
               "#endif"]
@@ -80,14 +88,26 @@ def emit_strong(result):
         upper = class_name.upper()
         ref = f"nx_{class_name}_ref_t"
         header += ["/** \\brief Explicit assembly-local ID; not a wire ABI. */",
-                   f"typedef struct {{ uint16_t value; }} {ref};"]
+                   "typedef struct {", "    uint16_t value;", f"}} {ref};"]
+        macros = []
         for instance in [*instances, {"id": "COUNT"}]:
             name = symbol(instance["id"]).upper()
-            header += [f"#define NX_{upper}_REF_{name} " + "\\",
-                       f"    NX_FACTORY_REF_VALUE({ref}, NX_{upper}_ID_{name})"]
+            key = f"#define NX_{upper}_REF_{name}"
+            value = f"NX_FACTORY_REF_VALUE({ref}, NX_{upper}_ID_{name})"
+            macros.append((key, value))
+        width = max(len(key) for key, _ in macros)
+        for key, value in macros:
+            if width + 1 + len(value) <= 80:
+                header.append(key.ljust(width) + " " + value)
+            else:
+                header += [key.ljust(79) + "\\", "    " + value]
+        return_type = f"static inline const nx_{kind}_{shape}_t*"
+        declaration = f"nx_factory_{class_name}_ref({ref} id) {{"
+        signature = ([return_type, declaration]
+                     if len(return_type + " " + declaration) > 80 else
+                     [return_type + " " + declaration])
         header += ["/** \\brief Pure getter; lifecycle remains explicit. */",
-                   f"static inline const nx_{kind}_{shape}_t* "
-                   f"nx_factory_{class_name}_ref({ref} id) {{",
+                   *signature,
                    f"    return nx_factory_{class_name}(id.value);", "}"]
     header += ["#ifdef __cplusplus", "}", "#endif", "#endif", ""]
     return "\n".join(header)
@@ -96,35 +116,29 @@ def emit_strong(result):
 def _capability(item, model):
     """Describe maintained execution traits, never infer silicon capacity."""
     kind, mode = item["kind"], item["mode"]
-    modes = {
-        "gpio": {"input", "output"},
-        "uart": {"irq-byte-event", "dma-tx", "irq-blocks"},
-        "spi": {"short-poll", "dma", "dma-full-duplex"},
-        "i2c": {"poll-messages"}, "flash": {"poll-byte", "poll-word"},
-        "watchdog": {"independent"}, "exti": {"edge-event"},
-        "pwm": {"fixed-pwm"},
-        "adc": {"single-shot", "low-rate-scan", "trigger-dma"},
-    }
-    if mode not in modes.get(kind, set()):
-        raise ValueError(f"Unmaintained capability descriptor: {kind}/{mode}")
+    traits = mode_traits(kind, mode)
     flags = ["NX_FACTORY_CAP_MODEL"] if model else []
-    units, unit_bytes, alignment, messages = 0, 0, 1, 0
-    if kind in {"spi", "i2c", "flash", "adc"}:
+    if traits.polling:
         flags.append("NX_FACTORY_CAP_POLLING")
-    if kind == "uart":
-        if not model:
+    if not model:
+        if traits.irq:
             flags.append("NX_FACTORY_CAP_IRQ")
-        unit_bytes = 1
-        if mode == "dma-tx":
+        if traits.tx_dma:
             flags.append("NX_FACTORY_CAP_TX_DMA")
+        if traits.rx_dma:
+            flags.append("NX_FACTORY_CAP_RX_DMA")
+    if traits.block_stream:
+        flags.append("NX_FACTORY_CAP_BLOCK_STREAM")
+        if traits.dma and not traits.continuous:
+            flags.append("NX_FACTORY_CAP_STREAM_GAPS")
+    units, unit_bytes, alignment, messages = 0, 0, 1, 0
+    if kind == "uart":
+        unit_bytes = 1
+        if traits.dma:
             units = 65535
-        if mode == "irq-blocks":
-            flags.append("NX_FACTORY_CAP_BLOCK_STREAM")
     elif kind == "spi":
         unit_bytes = 1
-        if mode in {"dma", "dma-full-duplex"}:
-            flags = ["NX_FACTORY_CAP_TX_DMA", "NX_FACTORY_CAP_RX_DMA",
-                     "NX_FACTORY_CAP_IRQ"]
+        if traits.dma:
             units = 65535
         elif not model:
             units = 256
@@ -135,15 +149,9 @@ def _capability(item, model):
     elif kind == "adc":
         unit_bytes, alignment = 2, 2
         count = len(item["channels"])
-        units = count
-        if mode == "trigger-dma":
-            flags = ["NX_FACTORY_CAP_RX_DMA", "NX_FACTORY_CAP_IRQ",
-                     "NX_FACTORY_CAP_BLOCK_STREAM", "NX_FACTORY_CAP_STREAM_GAPS"]
-            units = 65535 - 65535 % count
+        units = 65535 - 65535 % count if traits.dma else count
     elif kind == "flash":
         unit_bytes = alignment = 1 if model else 4
-    elif kind == "exti" and not model:
-        flags.append("NX_FACTORY_CAP_IRQ")
     return " | ".join(flags) or "0U", units, unit_bytes, alignment, messages
 
 

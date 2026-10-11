@@ -130,8 +130,8 @@ nx_result_t nx_gd32_uart_initialize(nx_gd32_uart_state_t* port, uint32_t baud,
 
 /** \brief           Validate both direct and adapter start without admission.
  */
-static nx_result_t validate(nx_gd32_uart_state_t* port,
-                            nx_uart_tx_request_t* request) {
+static inline nx_result_t validate(const nx_gd32_uart_state_t* port,
+                                   const nx_uart_tx_request_t* request) {
     if (!port || port->controller == NULL || !request || !request->data ||
         !request->length) {
         return NX_ERROR_INVALID;
@@ -248,6 +248,8 @@ void nx_gd32_uart_service(void* context) {
         ~(USART_CTL0_TBEIE | USART_CTL0_TCIE);
     if (aborting && !port->tc) {
         (void)nx_request_transition(&request->base, NX_REQUEST_DRAINING);
+        uint32_t flow = USART_CTL2(port->controller->registers) &
+                        (USART_CTL2_RTSEN | USART_CTL2_CTSEN);
         USART_CTL0(port->controller->registers) = 0u;
         rcu_periph_reset_enable((rcu_periph_reset_enum)port->controller->reset);
         rcu_periph_reset_disable(
@@ -260,6 +262,7 @@ void nx_gd32_uart_service(void* context) {
         }
         NVIC_ClearPendingIRQ((IRQn_Type)port->controller->irq);
         configure(port, port->baud);
+        USART_CTL2(port->controller->registers) |= flow;
         enqueue(port, (nx_uart_rx_event_t){.timestamp_us = nx_time_now_us(),
                                            .flags = NX_UART_EVENT_LOSS |
                                                     NX_UART_EVENT_NO_BYTE});
@@ -467,3 +470,44 @@ const nx_uart_ops_t nx_gd32_uart_ops = {
     .stop = nx_gd32_uart_stop,
     .attach_wake = gd32_uart_attach_wake,
 };
+
+/** \brief Selected cold hardware flow control preserves unrelated bits. */
+nx_result_t nx_gd32_uart_flow_configure(nx_gd32_uart_state_t* state, bool rts,
+                                        bool cts) {
+    if (state == NULL || state->controller == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!state->initialized || state->stopping) {
+        return NX_ERROR_STATE;
+    }
+    uint32_t saved = nx_gd32_critical_enter();
+    if (state->active != NULL ||
+        (USART_CTL2(state->controller->registers) & USART_CTL2_DENR) != 0U) {
+        nx_gd32_critical_leave(saved);
+        return NX_ERROR_BUSY;
+    }
+    uint32_t original = USART_CTL2(state->controller->registers);
+    uint32_t selected =
+        (original & ~(uint32_t)(USART_CTL2_RTSEN | USART_CTL2_CTSEN)) |
+        (rts ? USART_CTL2_RTSEN : 0U) | (cts ? USART_CTL2_CTSEN : 0U);
+    USART_CTL2(state->controller->registers) = selected;
+    nx_gd32_peripheral_barrier();
+    nx_result_t result = USART_CTL2(state->controller->registers) == selected
+                             ? NX_SUCCESS
+                             : NX_ERROR_IO;
+    if (result != NX_SUCCESS) {
+        USART_CTL2(state->controller->registers) = original;
+        nx_gd32_peripheral_barrier();
+    }
+    nx_gd32_critical_leave(saved);
+    return result;
+}
+
+/** \brief Expose exact pure checks only for an explicitly selected adapter. */
+nx_result_t nx_gd32_uart_tx_validate(void* context,
+                                     const nx_uart_tx_request_t* request) {
+    return validate(context, request);
+}

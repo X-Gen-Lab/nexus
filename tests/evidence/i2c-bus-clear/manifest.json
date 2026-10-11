@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "i2c_bus_clear_development_tdd",
+  "status": "development_passed",
+  "physical_status": "not_executed",
+  "red": {
+    "cases": 28,
+    "failed": 28,
+    "exit_code": 1,
+    "reason": "New API prototype returned UNSUPPORTED; most contracts fail at required initialization, not a claim of 28 pre-existing production defects."
+  },
+  "green": {
+    "cases": 28,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "sources": [
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "4dd769a438c5e34bae8077aedf35272316bb3d0c7c20be94c4de0ee61d171e06",
+      "size": 7850
+    },
+    {
+      "path": "/workspace/nexus/io/src/i2c_bus_clear.c",
+      "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df",
+      "size": 10355
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_bus_clear_test.cpp",
+      "sha256": "d55df85b1a139bd9dad7f905d0fb8ab7c9afaca0d275bf6e79ff6f161b0818ae",
+      "size": 20635
+    },
+    {
+      "path": "/workspace/nexus/docs/design/i2c-bus-clear.md",
+      "sha256": "c6fae605c7441e9da233d2c1ebf2f59ef6f89d7e3dd93481b4a5a7c5b2299355",
+      "size": 5688
+    }
+  ],
+  "raw": [
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/comment-style2.json",
+      "sha256": "81b01444c08175fcb8f43f517cf10be023837d35dd5ef6d2c1f2eba1761e21aa",
+      "size": 1182
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/final-build.log",
+      "sha256": "f0595617acb0b323ab6cfd3488c5f7b5802851e1cdf5ee990cdb580491b8c620",
+      "size": 887
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/final-commands.json",
+      "sha256": "f186f172f974d50c4e42bf428006151acfffd6b4be0a2dbba7aabe0aaccab53e",
+      "size": 787
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/final-discovery.log",
+      "sha256": "2e239a9a56e18f8e3645a5e2253470da0404a5d47ce6127f84c754871f6a423c",
+      "size": 1577
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/final-execution.json",
+      "sha256": "547641e71f755d778b99e93c40c847dd05a495d5d259db443fabc48ff7bbcf47",
+      "size": 4071
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/final-execution.log",
+      "sha256": "6968dd26c02bfffaaf816c8f311eab262cc06ac723431eb9422f5104042d43d9",
+      "size": 4724
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/final.xml",
+      "sha256": "5e578c6946e734324688879329a9c0885915258ef5988898a99e55f5cdb1e086",
+      "size": 7242
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/red-physical-command.json",
+      "sha256": "fc707b79163125baf795a50a24fed2f37f9f69fb689cbce0393b88c47ca55e3b",
+      "size": 424
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/red-physical.log",
+      "sha256": "aa406b1e9362a25b006bcf24d3a8833b7c4e5996897728ff7b55a549150e4f3e",
+      "size": 11931
+    },
+    {
+      "path": "/workspace/nexus/tests/evidence/i2c-bus-clear/red-physical.xml",
+      "sha256": "812a2e58049f43b27f98d9f3f55b237bbab805609ce3b677052d55f794b6f5b0",
+      "size": 19786
+    }
+  ],
+  "limits": [
+    "Actual pinned GoogleTest/GoogleMock host execution through production C11 algorithm and mocked external electrical/clock/resource ports.",
+    "No automatic SoC/Board GPIO adapter, no guessed open-drain/pull-up/voltage facts and no real equipment operation.",
+    "No cycle, waveform, rise-time, wire completion, electrical safety or physical bus recovery qualification.",
+    "Independent development build against a working tree; root normal commit hooks and clean-source qualification remain separate."
+  ]
+}

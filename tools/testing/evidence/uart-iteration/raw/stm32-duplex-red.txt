@@ -1,0 +1,142 @@
+Running main() from gmock_main.cc
+[==========] Running 20 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 20 tests from Stm32UartReceive
+[ RUN      ] Stm32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy
+[       OK ] Stm32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy (0 ms)
+[ RUN      ] Stm32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect
+[       OK ] Stm32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect (0 ms)
+[ RUN      ] Stm32UartReceive.IdlePublishesOnlyTheStablePartialPrefix
+[       OK ] Stm32UartReceive.IdlePublishesOnlyTheStablePartialPrefix (0 ms)
+[ RUN      ] Stm32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains
+[       OK ] Stm32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains (0 ms)
+[ RUN      ] Stm32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm
+[       OK ] Stm32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm (0 ms)
+[ RUN      ] Stm32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss
+[       OK ] Stm32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss (0 ms)
+[ RUN      ] Stm32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists
+[       OK ] Stm32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists (0 ms)
+[ RUN      ] Stm32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice
+[       OK ] Stm32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer
+[       OK ] Stm32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:240: Failure
+Expected equality of these values:
+  nx_stream_acquire(&stream, &block)
+    Which is: 9
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:229: Failure
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:234: Failure
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(1U, address(payload[0])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+[  FAILED  ] Stm32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:258: Failure
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+[  FAILED  ] Stm32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:281: Failure
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+[  FAILED  ] Stm32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:305: Failure
+Expected equality of these values:
+  nx_stream_acquire(&stream, &borrowed)
+    Which is: 9
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Stm32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture
+[       OK ] Stm32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss
+[       OK ] Stm32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss (0 ms)
+[ RUN      ] Stm32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan
+[       OK ] Stm32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan (0 ms)
+[ RUN      ] Stm32UartReceive.TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:390: Failure
+Expected equality of these values:
+  nx_uart_port_submit(&port, &request)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:391: Failure
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 2
+  NX_REQUEST_READY
+    Which is: 0
+
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:392: Failure
+Expected equality of these values:
+  state.transmit.uart.active
+    Which is: 0x7ffc44a610d0
+  nullptr
+    Which is: (nullptr)
+
+[  FAILED  ] Stm32UartReceive.TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart (0 ms)
+[ RUN      ] Stm32UartReceive.ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:401: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:402: Failure
+Expected equality of these values:
+  stream.outstanding
+    Which is: 1
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:403: Failure
+Expected equality of these values:
+  receive.CR & (0x1UL << (0U))
+    Which is: 1
+  0U
+    Which is: 0
+
+[  FAILED  ] Stm32UartReceive.ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan (0 ms)
+[ RUN      ] Stm32UartReceive.ReceiveStopOnFreshStateFailsWithoutDereferencingHardware
+/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:409: Failure
+Expected equality of these values:
+  nx_uart_port_attach_wake(&face, nullptr, 0U)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+[  FAILED  ] Stm32UartReceive.ReceiveStopOnFreshStateFailsWithoutDereferencingHardware (0 ms)
+[ RUN      ] Stm32UartReceive.ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission
+[       OK ] Stm32UartReceive.ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission (0 ms)
+[----------] 20 tests from Stm32UartReceive (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 20 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 13 tests.
+[  FAILED  ] 7 tests, listed below:
+[  FAILED  ] Stm32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps
+[  FAILED  ] Stm32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory
+[  FAILED  ] Stm32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget
+[  FAILED  ] Stm32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock
+[  FAILED  ] Stm32UartReceive.TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart
+[  FAILED  ] Stm32UartReceive.ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan
+[  FAILED  ] Stm32UartReceive.ReceiveStopOnFreshStateFailsWithoutDereferencingHardware
+
+ 7 FAILED TESTS

@@ -1,5 +1,6 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings
+from ..common import mode_traits
 
 
 def implementation(item):
@@ -7,14 +8,30 @@ def implementation(item):
     return mode_implementation(item.kind, item.mode)
 
 
+def operations(item):
+    """Name the actual readonly table; shared algorithms keep one identity."""
+    selected = implementation(item)
+    if selected == "i2c_async":
+        return "nx_i2c_v1_async_ops"
+    return f"nx_stm32_{selected}_ops"
+
+
 def includes(result):
     selections = result.controllers
     source = []
     source.append('#include "stm32f407_provider.h"')
-    if any(item["mode"].startswith("dma") for item in selections):
+    if any(implementation(item) in {"uart_dma", "spi_dma"}
+           for item in selections):
         source.append('#include "stm32f407_dma.h"')
-    if any(item["mode"] in {"irq-blocks", "trigger-dma"} for item in selections):
+    if any(mode_traits(item.kind, item.mode).block_stream
+           for item in selections):
         source.append('#include "stm32f407_stream.h"')
+    if any(item.kind == "uart" and mode_traits(item.kind, item.mode).rx_dma
+           for item in selections):
+        source.append('#include "stm32f407_uart_receive.h"')
+    if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
+           for item in selections):
+        source.append('#include "stm32f407_i2c_async.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -43,8 +60,14 @@ def _gpio_clock_mask(result):
 
 
 def has_dma(result):
-    return any(item.mode.startswith("dma") or item.mode == "trigger-dma"
+    return any(mode_traits(item.kind, item.mode).dma
                for item in result.controllers)
+
+
+def _dma_clock_mask(result):
+    controllers = {dma.split(":", 1)[0]
+                   for item in result.controllers for dma in item.get("dma", ())}
+    return " | ".join(f"RCC_AHB1ENR_{name}EN" for name in sorted(controllers))
 
 
 def state_declarations(result):
@@ -107,9 +130,10 @@ def start_system(result):
 def start_resources(result):
     selections = result.controllers
     source = []
-    if has_dma(result):
-        source += ['    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & RCC_AHB1ENR_DMA2EN;',
-                   '    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;',
+    mask = _dma_clock_mask(result)
+    if mask:
+        source += [f'    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & ({mask});',
+                   f'    RCC->AHB1ENR |= ({mask});',
                    '    (void)RCC->AHB1ENR;', '    nx_arch_dsb();']
     gpio_clock_mask = _gpio_clock_mask(result)
     if gpio_clock_mask:

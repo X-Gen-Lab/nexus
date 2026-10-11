@@ -51,29 +51,35 @@ nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
     return NX_SUCCESS;
 }
 
-/** \brief Start after all rejection conditions, with the unique admission. */
-static nx_result_t start(nx_stm32_uart_state_t* port,
-                         nx_uart_tx_request_t* request, bool admitted) {
-    if (port == NULL || request == NULL || request->data == NULL ||
-        request->length == 0U) {
+/** \brief Same side-effect-free rejection checks serve TX and RS485. */
+static inline nx_result_t validate_tx(const nx_stm32_uart_state_t* port,
+                                      const nx_uart_tx_request_t* request) {
+    if (port == NULL || port->registers == NULL || request == NULL ||
+        request->data == NULL || request->length == 0U) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    nx_arch_irq_state_t mask = nx_arch_irq_save();
     if (!port->initialized || port->closing) {
-        nx_arch_irq_restore(mask);
         return NX_ERROR_STATE;
     }
     if (port->active != NULL) {
-        nx_arch_irq_restore(mask);
         return NX_ERROR_BUSY;
     }
-    if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        nx_arch_irq_restore(mask);
-        return NX_ERROR_TIMEOUT;
+    return nx_deadline_expired(request->base.deadline, nx_time_now_us())
+               ? NX_ERROR_TIMEOUT
+               : NX_SUCCESS;
+}
+
+/** \brief Start after all rejection conditions, with the unique admission. */
+static nx_result_t start(nx_stm32_uart_state_t* port,
+                         nx_uart_tx_request_t* request, bool admitted) {
+    nx_result_t checked = validate_tx(port, request);
+    if (checked != NX_SUCCESS) {
+        return checked;
     }
+    nx_arch_irq_state_t mask = nx_arch_irq_save();
     nx_result_t result =
         admitted ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
                  : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
@@ -424,3 +430,43 @@ const nx_uart_ops_t nx_stm32_uart_ops = {
     .stop = nx_stm32_uart_stop,
     .attach_wake = stm32_uart_attach_wake,
 };
+
+/** \brief Selected cold hardware flow control preserves unrelated bits. */
+nx_result_t nx_stm32_uart_flow_configure(nx_stm32_uart_state_t* state, bool rts,
+                                         bool cts) {
+    if (state == NULL || state->registers == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!state->initialized || state->closing) {
+        return NX_ERROR_STATE;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (state->active != NULL ||
+        (state->registers->CR3 & USART_CR3_DMAR) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
+    uint32_t original = state->registers->CR3;
+    uint32_t selected =
+        (original & ~(uint32_t)(USART_CR3_RTSE | USART_CR3_CTSE)) |
+        (rts ? USART_CR3_RTSE : 0U) | (cts ? USART_CR3_CTSE : 0U);
+    state->registers->CR3 = selected;
+    nx_arch_dsb();
+    nx_result_t result =
+        state->registers->CR3 == selected ? NX_SUCCESS : NX_ERROR_IO;
+    if (result != NX_SUCCESS) {
+        state->registers->CR3 = original;
+        nx_arch_dsb();
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
+
+/** \brief Expose exact pure checks only for an explicitly selected adapter. */
+nx_result_t nx_stm32_uart_tx_validate(void* context,
+                                      const nx_uart_tx_request_t* request) {
+    return validate_tx(context, request);
+}

@@ -1,0 +1,77 @@
+.......EEEEEEEE.......
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='uart', mode='dma-tx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='uart', mode='rx-dma-idle')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='uart', mode='dma-duplex')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='uart', mode='rx-dma-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='uart', mode='dma-duplex-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='adc', mode='trigger-dma')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) (kind='adc', mode='trigger-dma-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 88, in test_mode_traits_are_explicit_immutable_and_directional
+    traits = common.mode_traits(kind, mode)
+             ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+======================================================================
+ERROR: test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 96, in test_mode_traits_are_explicit_immutable_and_directional
+    self.assertFalse(common.mode_traits("spi", "short-poll").irq)
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'providers.common' has no attribute 'mode_traits'
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.348s
+
+FAILED (errors=8)

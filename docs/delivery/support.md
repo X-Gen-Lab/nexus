@@ -32,38 +32,56 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 | 接口 | 已实现模式与限制 |
 |---|---|
 | GPIO | authorized mask、原子 set/reset、快照 read、single-writer toggle |
-| UART | 8N1 IRQ TX 或有限 TX DMA；caller-owned request、真实 TC、byte/event RX；独立 IRQ RX blocks／IDLE 模式；STM baud 最低 1282、GD 最低 1526，最高 1 Mbaud |
-| SPI | 8-bit MSB-first；短轮询每笔最多 256 bytes；全双工有限 DMA 最多 65535 bytes；单 wire-active、完整 CS interval；明确的独立 CS endpoint |
-| I2C | 100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；任意消息可读；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；两家恢复均检查 BUSY 与所选 SCL/SDA 电平 |
+| UART | 8N1 IRQ TX 或有限 TX DMA；caller-owned request、真实 TC；IRQ RX blocks／IDLE、有限及连续 RX DMA、双向 DMA；显式 RTS/CTS 与外部静态 RS485 适配；STM baud 最低 1282、GD 最低 1526，最高 1 Mbaud |
+| SPI | 8-bit MSB-first；短轮询每笔最多 256 bytes；有限 DMA 最多 65535 bytes；双向递增或调用者单字节固定 dummy/discard；单 wire-active、完整 CS interval；独立 CS endpoint |
+| I2C | 100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；轮询、中断及 DMA 消息；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；恢复检查 BUSY 与所选 SCL/SDA 电平；独立有界 GPIO bus-clear 工具 |
 | Flash | STM 精确 16/64/128 KiB sector 几何与 x32 program（4-byte alignment/length，声明供电 2.7–3.6 V）；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region |
 | Watchdog | 独立 enable/feed/reset cause；启用不可逆，late failure 不擦除责任；GD IRC32K 物理 timeout bounds 未保证 |
 | EXTI | selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策 |
 | PWM | 固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner |
-| ADC | reviewed channel、single-shot/低速 scan、定时触发 DMA blocks；显式 sample time/reference；轮询超时有效 prefix；块模式只发布完整扫描 |
+| ADC | reviewed channel、single-shot/低速 scan、有限及连续双缓冲定时触发 DMA blocks；显式 sample time/reference；只发布完整扫描；可选外部序列与软件观测时间记录 |
 
 有限 DMA 的精确首发路线如下，其他 controller／通道组合由 resolver 拒绝。
 
 | 模式 | STM32F407 | GD32F470 |
 |---|---|---|
 | UART TX DMA | USART1；DMA2 stream7 channel4 | USART0；DMA1 channel7 selector4 |
+| UART RX DMA／双向 DMA | USART1；RX DMA2 stream2 channel4；TX 同上 | USART0；RX DMA1 channel2 selector4；TX 同上 |
 | SPI 全双工 DMA | SPI1；DMA2 RXstream0／TXstream3 channel3 | SPI4；DMA1 RXchannel3／TXchannel4 selector2 |
-| ADC trigger blocks | ADC1；TIM3 TRGO；DMA2 stream4 channel0 | ADC0；TIMER2 TRGO；DMA1 channel0 selector0 |
+| I2C 消息 DMA | I2C1；DMA1 RXstream0／TXstream6 channel1 | I2C0；DMA0 RXchannel0／TXchannel6 selector1 |
+| ADC 有限／连续 trigger blocks | ADC1；TIM3 TRGO；DMA2 stream4 channel0 | ADC0；TIMER2 TRGO；DMA1 channel0 selector0 |
 
-SPI DMA 要求非空、不重叠的 TX／RX 缓冲，不分配 scratch 或隐式复制池。实际
+SPI DMA 要求非空、不重叠的 TX／RX 实际访问跨度；固定地址方向只访问调用者的一字节。
+不分配 scratch 或隐式复制池。实际
 memory domain 与读写权限由 provider 再次校验；STM CCM、GD TCM 均不能作为 DMA
 缓冲。DMA TC 表示内存传输事实，UART TC／SPI idle 表示线上事实；两者排空证明
 都满足后才发布 SETTLED。取消、超时或 EN 拒绝关闭保留借用，进入 QUARANTINED。
 
-UART block 模式使用 IRQ 接收与 IDLE／满块边界，不是循环 DMA RX。块由调用者
-提供，消费者 acquire 后保持不可变，直到匹配 epoch 的 release。无空闲块时可见
-丢失，stop 保留最后 prefix 和消费者借用。TX DMA＋RX blocks 的组合当前未实现，
-配置明确拒绝，不为一个模式隐式驻留另一个模式的接收环。
+UART 的 `irq-blocks` 保留独立 IRQ 接收实现；`rx-dma-idle` 使用有限 DMA 与 IDLE，
+`rx-dma-continuous` 使用硬件双缓冲，另有显式 `dma-duplex` 和
+`dma-duplex-continuous`。块由调用者提供，消费者 acquire 后保持不可变，直到匹配
+epoch 的 release。连续模式必须预留两个硬件目标及替换块；替换地址读回、目标银行
+和新错误检查成立后才能发布旧块。没有替换块就停止，不覆写消费者借用。
+仅接收模式使用独立只读方法表，不驻留 TX DMA 状态和方法。RTS/CTS 并不代替
+容量和排空合同；RS485 的 DE 引脚、极性及 setup/hold 时间由外部工程明确提供，
+到达真实 UART TC 后才开始 hold 并撤销 DE。详见
+[UART DMA 与 RS485](../design/uart-dma-rs485.md)。
 
-ADC block 模式使用普通有限 DMA；每块停止触发、转换与内存写入，再发布完整块。
+ADC 的 `trigger-dma` 使用普通有限 DMA；每块停止触发、转换与内存写入，再发布完整块。
 调用者必须显式 service，完成上电稳定／GD 校准后重新触发下一块。无空闲 loan 时
 保持暂停，不覆写、不伪造暂停期间的精确丢样数。该模式有块间间隙，不承诺连续
-无间隙采样。频率需满足精确 timer divider 和整段 scan 转换时间；GD block 使用
-15-cycle sample，GD 低速轮询使用 480-cycle sample。stop 在持有 loan 时返回 BUSY。
+无间隙采样。`trigger-dma-continuous` 则显式选择硬件双缓冲及预投递块，地址替换
+成功后发布完整块；至少需要三个调用者 slot。频率需满足精确 timer divider 和
+整段 scan 转换时间；GD 连续模式显式选择 SDK 对应的 sample-time code，有限模式
+保持原有 15-cycle sample。可选 observer 的时间戳是软件发布观测时间，不是采样
+孔径时间。单个锁存 TC/CT 事实无法计算未观测的多轮丢样。stop 在持有 loan 时返回 BUSY。
+
+I2C 中断及 DMA 共享经过两家 SDK 布局与位定义检查的 V1 寄存器算法，MCU 热路径
+直接访问寄存器。DMA TC 不代表线上完成；最后字节、BTF、STOP/MSL、DMA EN 和
+IRQ 发布者必须排空后才 SETTLED。bus-clear 独立要求静止外设、独占开漏 GPIO 和
+有界等待，最多九个完成的恢复脉冲；STOP 或释放失败保留 lease，可继续清理。
+平台没有为未经审查的 Board 自动切换引脚。详见
+[I2C 总线恢复](../design/i2c-bus-clear.md)。
 
 这些是 **SoC 实现能力**。参考 Board 默认 binding、软件测试夹具路线、现场测量结果
 各自独立。STM32 默认参考 Board 未声明可资格化的 SPI CS，资源矩阵只测
@@ -72,8 +90,9 @@ Board 的 SPI4 PF6/7/8/9 有公开来源，外接 NOR 具体料号仍未知。
 
 ## 明确边界
 
-UART 循环 DMA RX、无间隙 ADC 环形采样、I2C DMA／超出 256-byte 的 read、capture／advanced
-PWM、动态 clock／低功耗、CAN、USB、Ethernet 与安全启动／升级未作为首发实现。
+连续模式不能承诺任意 IRQ 延迟与消费者速度下无丢失。I2C 超出 256-byte 的 read、
+capture／advanced PWM、动态 clock／低功耗、CAN、USB、Ethernet 与安全启动／升级
+未作为本批实现。
 Unsupported 配置明确拒绝，不通过成功 stub 声称支持。
 
 Flash pulse 不能被 deadline 撤销；BUSY 未清不能释放责任。产品负责 Flash 执行

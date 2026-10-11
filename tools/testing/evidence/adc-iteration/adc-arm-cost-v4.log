@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/workspace/nexus-adc-iteration/cost_v4.py", line 111, in <module>
+    run(flags + ['-MF', folder / 'types.d', '-nostdlib', '-Wl,-e,main',
+  File "/workspace/nexus-adc-iteration/cost_v4.py", line 42, in run
+    raise RuntimeError(log.read_text())
+RuntimeError: In file included from /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h:187,
+                 from /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h:287,
+                 from /workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v4/baseline/soc/gd32f470/private/gd32f470_provider.h:18,
+                 from /workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v4/baseline/soc/gd32f470/private/gd32f470_adc_stream.h:9,
+                 from /workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v4/gd32f470-baseline/types.c:1:
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cmInstr.h: In function '__REVSH':
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cmInstr.h:402:9: error: conversion to 'int32_t' {aka 'long int'} from 'uint32_t' {aka 'long unsigned int'} may change the sign of the result [-Werror=sign-conversion]
+  402 |   return(result);
+      |         ^
+In file included from /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h:189:
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4_simd.h: In function '__SMMLA':
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4_simd.h:665:8: error: conversion to 'uint32_t' {aka 'long unsigned int'} from 'int32_t' {aka 'long int'} may change the sign of the result [-Werror=sign-conversion]
+  665 |  return(result);
+      |        ^
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h: In function 'NVIC_EncodePriority':
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h:1620:30: error: conversion to 'long unsigned int' from 'int' may change the sign of the result [-Werror=sign-conversion]
+ 1620 |            ((PreemptPriority & ((1 << (PreemptPriorityBits)) - 1)) << SubPriorityBits) |
+      |                              ^
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h:1621:30: error: conversion to 'long unsigned int' from 'int' may change the sign of the result [-Werror=sign-conversion]
+ 1621 |            ((SubPriority     & ((1 << (SubPriorityBits    )) - 1)))
+      |                              ^
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h: In function 'NVIC_DecodePriority':
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h:1647:53: error: conversion to 'long unsigned int' from 'int' may change the sign of the result [-Werror=sign-conversion]
+ 1647 |   *pPreemptPriority = (Priority >> SubPriorityBits) & ((1 << (PreemptPriorityBits)) - 1);
+      |                                                     ^
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h:1648:53: error: conversion to 'long unsigned int' from 'int' may change the sign of the result [-Werror=sign-conversion]
+ 1648 |   *pSubPriority     = (Priority                   ) & ((1 << (SubPriorityBits    )) - 1);
+      |                                                     ^
+cc1: all warnings being treated as errors
+

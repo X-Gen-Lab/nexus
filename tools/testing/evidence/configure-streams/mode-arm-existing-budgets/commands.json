@@ -1,0 +1,268 @@
+[
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-rx-dma-idle.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-rx-dma-idle.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-rx-dma-idle.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-rx-dma-continuous.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-rx-dma-continuous.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-rx-dma-continuous.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-dma-duplex.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-dma-duplex.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-dma-duplex.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-dma-duplex-continuous.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-dma-duplex-continuous.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-dma-duplex-continuous.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-adc-continuous.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-adc-continuous.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-adc-continuous.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-i2c-irq.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-i2c-irq.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-i2c-irq.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-i2c-dma.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-i2c-dma.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/stm32-i2c-dma.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-rx-dma-idle.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-rx-dma-idle.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-rx-dma-idle.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-rx-dma-continuous.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-rx-dma-continuous.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-rx-dma-continuous.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-dma-duplex.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-dma-duplex.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-dma-duplex.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-dma-duplex-continuous.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-dma-duplex-continuous.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-dma-duplex-continuous.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-adc-continuous.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-adc-continuous.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-adc-continuous.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-i2c-irq.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-i2c-irq.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-i2c-irq.json"
+  },
+  {
+    "argv": [
+      "python3",
+      "/workspace/nexus/tools/measurement/resources.py",
+      "--elf",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.elf",
+      "--resolved",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/nexus-sdk/generated/resolved.json",
+      "--budget",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/nexus-sdk/generated/resource-budget.json",
+      "--report",
+      "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-i2c-dma.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-i2c-dma.log",
+    "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84",
+    "exit_code": 0,
+    "report": "/workspace/nexus-config-iteration-evidence/mode-arm-existing-budgets/gd32-i2c-dma.json"
+  }
+]

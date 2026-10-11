@@ -17,11 +17,30 @@
 
 /** \brief Check all rejection conditions before asserting CS or borrowing. */
 static nx_result_t admit(nx_native_spi_endpoint_state_t* endpoint,
-                         nx_spi_request_t* request,
-                         nx_request_state_t required) {
+                         nx_spi_request_t* request, nx_request_state_t required,
+                         uint8_t memory_flags) {
     if (endpoint == NULL || endpoint->port == NULL || request == NULL ||
         request->length == 0 || (request->tx == NULL && request->rx == NULL)) {
         return NX_ERROR_INVALID;
+    }
+    if ((memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
+            0U ||
+        (memory_flags != 0U && (request->tx == NULL || request->rx == NULL))) {
+        return NX_ERROR_INVALID;
+    }
+    if (memory_flags != 0U) {
+        size_t tx_span = (memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U
+                             ? 1U
+                             : request->length;
+        size_t rx_span = (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U
+                             ? 1U
+                             : request->length;
+        uintptr_t tx = (uintptr_t)request->tx;
+        uintptr_t rx = (uintptr_t)request->rx;
+        if (tx_span > UINTPTR_MAX - tx || rx_span > UINTPTR_MAX - rx ||
+            (tx < rx + rx_span && rx < tx + tx_span)) {
+            return NX_ERROR_INVALID;
+        }
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
@@ -45,6 +64,7 @@ static nx_result_t admit(nx_native_spi_endpoint_state_t* endpoint,
             ? nx_request_admit(&request->base, NX_REQUEST_ACTIVE)
             : nx_request_transition(&request->base, NX_REQUEST_ACTIVE);
     if (result == NX_SUCCESS) {
+        port->memory_flags = memory_flags;
         port->active_request = request;
         port->active_endpoint = endpoint;
         port->active = true;
@@ -61,14 +81,21 @@ static nx_result_t admit(nx_native_spi_endpoint_state_t* endpoint,
 
 /** \brief Admit a READY descriptor once into this endpoint's controller. */
 nx_result_t nx_native_spi_submit(void* context, nx_spi_request_t* request) {
-    return admit(context, request, NX_REQUEST_READY);
+    return admit(context, request, NX_REQUEST_READY, 0U);
+}
+
+/** \brief Explicit single-cell loans use the same finite wire lifecycle. */
+nx_result_t nx_native_spi_submit_memory(void* context,
+                                        nx_spi_request_t* request,
+                                        uint8_t memory_flags) {
+    return admit(context, request, NX_REQUEST_READY, memory_flags);
 }
 
 /** \brief Execute an existing adapter borrow without readmitting its storage.
  */
 nx_result_t nx_native_spi_start_admitted(void* context,
                                          nx_spi_request_t* request) {
-    return admit(context, request, NX_REQUEST_QUEUED);
+    return admit(context, request, NX_REQUEST_QUEUED, 0U);
 }
 
 /** \brief Cancellation records a terminal intent while retaining live storage.
@@ -129,7 +156,12 @@ void nx_native_spi_model_irq_step(const nx_spi_port_t* binding) {
         nx_irq_wake_signal(wake);
         return;
     }
-    uint8_t value = request->tx == NULL ? 0xff : request->tx[index];
+    uint8_t value =
+        request->tx == NULL
+            ? 0xff
+            : request->tx[(port->memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U
+                              ? 0U
+                              : index];
     uint8_t received = value;
     if (endpoint->registers != NULL) {
         if (index == 0) {
@@ -150,7 +182,10 @@ void nx_native_spi_model_irq_step(const nx_spi_port_t* binding) {
         }
     }
     if (request->rx != NULL) {
-        request->rx[index] = received;
+        request
+            ->rx[(port->memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U ? 0U
+                                                                     : index] =
+            received;
     }
     ++port->transferred;
     nx_arch_irq_restore(saved);

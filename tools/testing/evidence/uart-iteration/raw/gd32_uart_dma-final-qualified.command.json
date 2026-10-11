@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_gd32_uart_dma_test",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/gd32_uart_dma-final-qualified.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T17:00:47.667839+00:00",
+  "ended_at": "2026-10-11T17:00:47.670384+00:00",
+  "returncode": 0,
+  "log": "/workspace/nexus-io-implementation-evidence/uart-receive-tdd/gd32_uart_dma-final-qualified.txt"
+}

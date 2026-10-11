@@ -1,0 +1,27 @@
+Running main() from gmock_main.cc
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from GD32ADCStream
+[ RUN      ] GD32ADCStream.FullScanPublicationRequiresEngineDetach
+[       OK ] GD32ADCStream.FullScanPublicationRequiresEngineDetach (0 ms)
+[ RUN      ] GD32ADCStream.BackpressureNeverOverwritesAndResumeIsExplicit
+[       OK ] GD32ADCStream.BackpressureNeverOverwritesAndResumeIsExplicit (0 ms)
+[ RUN      ] GD32ADCStream.InvalidDomainAndRateRejectBeforeLoanOrEffects
+[       OK ] GD32ADCStream.InvalidDomainAndRateRejectBeforeLoanOrEffects (0 ms)
+[ RUN      ] GD32ADCStream.StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless
+[       OK ] GD32ADCStream.StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless (0 ms)
+[ RUN      ] GD32ADCStream.WakeUsesActualDmaPriorityAndLatchedPublication
+[       OK ] GD32ADCStream.WakeUsesActualDmaPriorityAndLatchedPublication (0 ms)
+[ RUN      ] GD32ADCStream.EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger
+[       OK ] GD32ADCStream.EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger (0 ms)
+[ RUN      ] GD32ADCStream.CalibrationTimeoutReleasesOnlyQuiescentProducer
+[       OK ] GD32ADCStream.CalibrationTimeoutReleasesOnlyQuiescentProducer (0 ms)
+[ RUN      ] GD32ADCStream.DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss
+[       OK ] GD32ADCStream.DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss (0 ms)
+[ RUN      ] GD32ADCStream.StabilityClockStartsAfterPowerStoreHasCompleted
+[       OK ] GD32ADCStream.StabilityClockStartsAfterPowerStoreHasCompleted (0 ms)
+[----------] 9 tests from GD32ADCStream (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 9 tests.

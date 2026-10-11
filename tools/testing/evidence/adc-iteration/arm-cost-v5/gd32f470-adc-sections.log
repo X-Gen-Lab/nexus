@@ -1,0 +1,19 @@
+/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.o  :
+section                            size   addr
+.text                                 0      0
+.data                                 0      0
+.bss                                  0      0
+.text.wait_clear                     64      0
+.text.nx_gd32_peripheral_barrier     14      0
+.text.power_on                      152      0
+.text.nx_gd32_adc_info               40      0
+.text.nx_gd32_adc_sample            344      0
+.text.nx_gd32_adc_initialize        600      0
+.text.nx_gd32_adc_stop               80      0
+.rodata.nx_gd32_adc_ops              36      0
+.bss.s_adc                            4      0
+.comment                             71      0
+.ARM.attributes                      52      0
+Total                              1457
+
+

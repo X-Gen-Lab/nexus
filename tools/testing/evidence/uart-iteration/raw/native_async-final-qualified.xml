@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:00:47.679" name="AllTests">
+  <testsuite name="NativeAsync" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:00:47.679">
+    <testcase name="SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects" file="/workspace/nexus/tests/google/native_async_test.cpp" line="45" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+    <testcase name="FixedDummyAndDiscardOnlyTouchTheirExplicitCells" file="/workspace/nexus/tests/google/native_async_test.cpp" line="98" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+    <testcase name="SPIQuarantineRetainsBorrowAndStopUntilDrain" file="/workspace/nexus/tests/google/native_async_test.cpp" line="143" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+    <testcase name="UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData" file="/workspace/nexus/tests/google/native_async_test.cpp" line="182" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+    <testcase name="UARTStopPublishesFinalPrefixAndKeepsConsumerStorage" file="/workspace/nexus/tests/google/native_async_test.cpp" line="233" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+    <testcase name="ADCTriggersPublishWholeScansAndNeverOverwriteLoans" file="/workspace/nexus/tests/google/native_async_test.cpp" line="260" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+    <testcase name="ADCFailedScanIsNotPublishedAndNextScanReportsLoss" file="/workspace/nexus/tests/google/native_async_test.cpp" line="295" status="run" result="completed" time="0." timestamp="2026-10-11T17:00:47.679" classname="NativeAsync" />
+  </testsuite>
+</testsuites>

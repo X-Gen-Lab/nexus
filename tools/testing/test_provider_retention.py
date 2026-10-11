@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import unittest
 
 from tools.evidence.common import EvidenceError
-from tools.measurement.retention import inspect_provider_retention
+from tools.measurement.retention import inspect_provider_retention, source_contracts
 from tools.measurement.elf import Elf32
 
 
@@ -22,13 +22,13 @@ static const nx_i2c_endpoint_t s_nx_device_face_sensor = {
 def image():
     """Model external linked bytes and metadata, not the auditing algorithm."""
     data = bytearray(512)
-    words = [0x08001010, 0x20000000, 0x08001014, 0x20000020,
-             0x08002001, 0x08002011]
-    struct.pack_into("<6I", data, 0, *words)
+    words = [0x08001010, 0x20000000, 0x08001024, 0x20000020,
+             0x08002001, 0, 0, 0, 0, 0x08002011, 0, 0, 0]
+    struct.pack_into("<13I", data, 0, *words)
     objects = [("s_nx_face_bus", 0x08001000, 8, 0, 1),
                ("s_nx_device_face_sensor", 0x08001008, 8, 0, 1),
-               ("nx_gd32_i2c_ops", 0x08001010, 4, 0, 1),
-               ("nx_gd32_i2c_endpoint_ops", 0x08001014, 4, 0, 1),
+               ("nx_gd32_i2c_ops", 0x08001010, 20, 0, 1),
+               ("nx_gd32_i2c_endpoint_ops", 0x08001024, 16, 0, 1),
                ("s_nx_port_bus", 0x20000000, 32, 2, 1),
                ("s_nx_device_sensor", 0x20000020, 8, 2, 1),
                ("nx_gd32_i2c_recover", 0x08002001, 16, 1, 2),
@@ -55,9 +55,9 @@ def image():
 
 def gpio_image():
     elf = image()
-    struct.pack_into("<8I", elf.data, 0, 0x08001010, 0x20000000,
+    struct.pack_into("<11I", elf.data, 0, 0x08001010, 0x20000000,
                      0x0800101c, 0x20000020, 0x08002001, 0x08002011,
-                     0x08002021, 0x08002031)
+                     0x08002021, 0x08002031, 0, 0, 0)
     elf.defined_symbols[2].update(name="nx_gd32_gpio_ops", size=12)
     elf.defined_symbols[6]["name"] = "nx_gd32_gpio_write"
     elf.defined_symbols[3]["value"] = 0x0800101c
@@ -73,9 +73,9 @@ def gpio_image():
 
 def spi_image():
     elf = image()
-    struct.pack_into("<10I", elf.data, 0, 0x08001010, 0x20000000,
+    struct.pack_into("<13I", elf.data, 0, 0x08001010, 0x20000000,
                      0x08001024, 0x20000020, 0x08002001, 0, 0, 0, 0,
-                     0x08002011)
+                     0x08002011, 0, 0, 0)
     elf.defined_symbols[2].update(name="nx_gd32_spi_ops", size=20)
     elf.defined_symbols[3]["value"] = 0x08001024
     elf.defined_symbols[6]["name"] = "nx_gd32_spi_recover"
@@ -85,9 +85,10 @@ def spi_image():
 
 def spi_dma_image():
     elf = image()
-    struct.pack_into("<10I", elf.data, 0, 0x08001010, 0x20000000,
+    struct.pack_into("<13I", elf.data, 0, 0x08001010, 0x20000000,
                      0x08001024, 0x20000020, 0x08002001, 0x08002011,
-                     0x08002021, 0x08002031, 0x08002041, 0x08002051)
+                     0x08002021, 0x08002031, 0x08002041, 0x08002051,
+                     0, 0, 0)
     elf.defined_symbols[2].update(name="nx_gd32_spi_dma_ops", size=20)
     elf.defined_symbols[3]["value"] = 0x08001024
     elf.defined_symbols = elf.defined_symbols[:6] + [
@@ -131,6 +132,14 @@ def file_symbol_elf():
 
 
 class ProviderRetentionTests(unittest.TestCase):
+    def test_shared_soc_operations_are_read_from_the_actual_common_source(self):
+        _, _, providers, _ = source_contracts()
+        provider = providers["nx_i2c_v1_async_ops"]
+        self.assertTrue(provider["source"]["path"].endswith(
+            "soc/common/i2c_v1_async.c"))
+        self.assertEqual(provider["fields"]["recover"], "recover")
+        self.assertIn("nx_i2c_v1_async_endpoint_ops", providers)
+
     def test_all_selected_faces_and_complete_method_tables_are_linked(self):
         report = inspect_provider_retention(image(), BINDINGS)
         self.assertEqual(report["status"], "passed")
@@ -158,7 +167,7 @@ class ProviderRetentionTests(unittest.TestCase):
 
     def test_face_cannot_point_to_another_selected_operations_table(self):
         elf = image()
-        struct.pack_into("<I", elf.data, 0, 0x08001014)
+        struct.pack_into("<I", elf.data, 0, 0x08001024)
         with self.assertRaisesRegex(EvidenceError, "operations pointer"):
             inspect_provider_retention(elf, BINDINGS)
 
@@ -215,12 +224,12 @@ class ProviderRetentionTests(unittest.TestCase):
 
     def test_trailing_method_slot_is_rejected_against_public_abi(self):
         elf = image()
-        elf.defined_symbols[2]["size"] = 8
+        elf.defined_symbols[2]["size"] = 24
         with self.assertRaisesRegex(EvidenceError, "operations layout"):
             inspect_provider_retention(elf, BINDINGS)
 
     def test_same_sized_table_cannot_substitute_for_another_face_type(self):
-        bindings = BINDINGS.replace("nx_i2c_port_t", "nx_i2c_endpoint_t")
+        bindings = BINDINGS.replace("nx_i2c_port_t", "nx_spi_port_t")
         with self.assertRaisesRegex(EvidenceError, "operations type"):
             inspect_provider_retention(image(), bindings)
 

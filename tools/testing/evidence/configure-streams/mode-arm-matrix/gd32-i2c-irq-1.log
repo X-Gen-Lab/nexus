@@ -1,0 +1,51 @@
+[1/48] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[2/48] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[3/48] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[4/48] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[5/48] Linking C static library nexus-sdk/lib/libnexus_core.a
+[6/48] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[7/48] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[8/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[9/48] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[10/48] Linking C static library nexus-sdk/lib/libnexus_arch.a
+[11/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[12/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[13/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[14/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[15/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[16/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[17/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[18/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[19/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[20/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[21/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[22/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[23/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[24/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[25/48] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[26/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.obj
+[27/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.obj
+[28/48] Linking C static library nexus-sdk/lib/libnexus_io.a
+[29/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c.obj
+[30/48] Building C object nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[31/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c.obj
+[32/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c.obj
+[33/48] Linking C static library nexus-sdk/lib/libnexus_gd32_sdk.a
+[34/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/timebase.c.obj
+[35/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/i2c_async.c.obj
+[36/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/i2c.c.obj
+[37/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/gpio.c.obj
+[38/48] Linking C static library nexus-sdk/lib/libnexus_os_wait.a
+[39/48] Building C object nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj
+FAILED: [code=1] nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj 
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus-config-iteration-evidence/mode-arm-matrix/gd32-i2c-irq/nexus-sdk/generated -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -O3 -DNDEBUG -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj -MF nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj.d -o nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj -c /workspace/nexus-config-iteration-evidence/mode-arm-matrix/gd32-i2c-irq/nexus-sdk/generated/bindings.c
+/workspace/nexus-config-iteration-evidence/mode-arm-matrix/gd32-i2c-irq/nexus-sdk/generated/bindings.c: In function 'stop_bus':
+/workspace/nexus-config-iteration-evidence/mode-arm-matrix/gd32-i2c-irq/nexus-sdk/generated/bindings.c:70:43: error: 'nx_port_bus' undeclared (first use in this function); did you mean 's_nx_port_bus'?
+   70 |     nx_result_t status = nx_i2c_port_stop(nx_port_bus);
+      |                                           ^~~~~~~~~~~
+      |                                           s_nx_port_bus
+/workspace/nexus-config-iteration-evidence/mode-arm-matrix/gd32-i2c-irq/nexus-sdk/generated/bindings.c:70:43: note: each undeclared identifier is reported only once for each function it appears in
+[40/48] Building C object CMakeFiles/gd32_controller_fixture.dir/controller_main.c.obj
+[41/48] Building C object nexus-sdk/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj
+[42/48] Building C object nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/workspace/nexus/soc/common/i2c_v1_async.c.obj
+ninja: build stopped: subcommand failed.

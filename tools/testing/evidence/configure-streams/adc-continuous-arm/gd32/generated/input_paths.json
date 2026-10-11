@@ -1,0 +1,6 @@
+{
+  "external/gd32.toml": "/workspace/nexus-config-iteration-evidence/adc-continuous-arm/gd32.toml",
+  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
+  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json",
+  "tests/contracts/gd32_assembly/software_board/board.json": "/workspace/nexus/tests/contracts/gd32_assembly/software_board/board.json"
+}

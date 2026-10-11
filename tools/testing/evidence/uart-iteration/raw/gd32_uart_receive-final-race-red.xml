@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="33" failures="5" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:49:37.025" name="AllTests">
+  <testsuite name="Gd32UartReceive" tests="33" failures="5" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:49:37.025">
+    <testcase name="StartProgramsCallerBufferWithoutCpuPayloadCopy" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="127" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="InvalidFutureBufferRejectsWithoutLoanOrMmioEffect" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="138" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="IdlePublishesOnlyTheStablePartialPrefix" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="147" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="RefusedDisableRetainsLoanUntilARealServiceRetryDrains" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="167" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="FullDmaBlockRequiresExplicitOwnerRearm" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="186" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="TransferErrorAbortsUnreliablePrefixAndLatchesLoss" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="202" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="StopClosesTransmitAdmissionWhileConsumerLoanExists" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="215" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="PendingIdleThenDmaFlagCannotPublishSameBufferTwice" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="233" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="245" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="ContinuousSwapsInactiveTargetBeforePublishingAndWraps" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="257" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.025" classname="Gd32UartReceive" />
+    <testcase name="ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="287" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="310" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="329" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousIdleFlushesCompletedHeadThenStablePartialFuture" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="355" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousUnexpectedParityOfBankStopsAndLatchesLoss" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="374" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="385" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="417" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="428" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ReceiveStopOnFreshStateFailsWithoutDereferencingHardware" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="438" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="444" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="IrqTransmitAbortMustDrainRxBeforeResettingSharedUsart" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="456" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="480" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="494" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="HardwareFlowSurvivesIrqTransmitAbortControllerReset" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="512" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="527" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ContinuousWrongAddressStoreFailsExactReplacementProof" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="542" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="563" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="ExactValidatorRejectsExpiredDescriptorWithoutBorrowOrMmio" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="605" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive" />
+    <testcase name="IdleRechecksErrorThatArrivesDuringActualDmaDisable" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="618" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:624&#x0A;Expected equality of these values:&#x0A;  slots[0].state&#x0A;    Which is: 2&#x0A;  NX_STREAM_SLOT_FREE&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:624
+Expected equality of these values:
+  slots[0].state
+    Which is: 2
+  NX_STREAM_SLOT_FREE
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:625&#x0A;Expected equality of these values:&#x0A;  stream.outstanding&#x0A;    Which is: 1&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:625
+Expected equality of these values:
+  stream.outstanding
+    Which is: 1
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:626&#x0A;Expected equality of these values:&#x0A;  stream.losses&#x0A;    Which is: 0&#x0A;  1U&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:626
+Expected equality of these values:
+  stream.losses
+    Which is: 0
+  1U
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:628&#x0A;Expected equality of these values:&#x0A;  nx_stream_acquire(&amp;stream, &amp;block)&#x0A;    Which is: 0&#x0A;  NX_ERROR_EMPTY&#x0A;    Which is: 9&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:628
+Expected equality of these values:
+  nx_stream_acquire(&stream, &block)
+    Which is: 0
+  NX_ERROR_EMPTY
+    Which is: 9
+]]></failure>
+    </testcase>
+    <testcase name="StopRechecksUartErrorBeforeClearingDataAndPublishingPrefix" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="631" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:635&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_stop(&amp;port)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:635
+Expected equality of these values:
+  nx_uart_port_rx_stop(&port)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:636&#x0A;Expected equality of these values:&#x0A;  slots[0].state&#x0A;    Which is: 2&#x0A;  NX_STREAM_SLOT_FREE&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:636
+Expected equality of these values:
+  slots[0].state
+    Which is: 2
+  NX_STREAM_SLOT_FREE
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:637&#x0A;Expected equality of these values:&#x0A;  stream.outstanding&#x0A;    Which is: 1&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:637
+Expected equality of these values:
+  stream.outstanding
+    Which is: 1
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:638&#x0A;Expected equality of these values:&#x0A;  stream.losses&#x0A;    Which is: 0&#x0A;  1U&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:638
+Expected equality of these values:
+  stream.losses
+    Which is: 0
+  1U
+    Which is: 1
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousConsumesCapturedTcWithExactlyOneAckStore" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="641" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:646&#x0A;Mock function called more times than expected - returning directly.&#x0A;    Function call: Acknowledge(32)&#x0A;         Expected: to be called once&#x0A;           Actual: called twice - over-saturated and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:646
+Mock function called more times than expected - returning directly.
+    Function call: Acknowledge(32)
+         Expected: to be called once
+           Actual: called twice - over-saturated and active
+]]></failure>
+    </testcase>
+    <testcase name="RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="655" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:660&#x0A;Expected equality of these values:&#x0A;  state.producer.stream&#x0A;    Which is: 0x562c76649620&#x0A;  nullptr&#x0A;    Which is: (nullptr)&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:660
+Expected equality of these values:
+  state.producer.stream
+    Which is: 0x562c76649620
+  nullptr
+    Which is: (nullptr)
+]]></failure>
+    </testcase>
+    <testcase name="RejectedSecondPrepostRollsBackEveryPrivateRetainedReference" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="664" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:37.026" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:671&#x0A;Expected equality of these values:&#x0A;  state.producer.stream&#x0A;    Which is: 0x562c76649620&#x0A;  nullptr&#x0A;    Which is: (nullptr)&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:671
+Expected equality of these values:
+  state.producer.stream
+    Which is: 0x562c76649620
+  nullptr
+    Which is: (nullptr)
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:672&#x0A;Expected equality of these values:&#x0A;  state.fill[0].data&#x0A;    Which is: 0x562c76649578&#x0A;  nullptr&#x0A;    Which is: (nullptr)&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:672
+Expected equality of these values:
+  state.fill[0].data
+    Which is: 0x562c76649578
+  nullptr
+    Which is: (nullptr)
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

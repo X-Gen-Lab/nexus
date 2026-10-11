@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "command": [
+    "build/iteration-bus/bin/nexus_gd32_spi_dma_test",
+    "--gtest_output=xml:build/iteration-bus/spi-memory-gd32-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

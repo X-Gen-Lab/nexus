@@ -7,6 +7,12 @@ def implementation(item):
     return mode_implementation(item.kind, item.mode)
 
 
+def operations(item):
+    """Name the actual readonly table; shared algorithms keep one identity."""
+    selected = implementation(item)
+    return f"nx_native_{selected}_ops"
+
+
 def includes(result):
     del result
     source = []

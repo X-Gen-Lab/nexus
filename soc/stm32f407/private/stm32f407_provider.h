@@ -207,6 +207,20 @@ nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
 /** \brief Initialize one fixed 8N1 UART; storage must outlive IRQ and stop. */
 nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
                                      uint32_t clock_hz);
+/**
+ * \brief           Select independent RTS/CTS only on an idle live controller.
+ * \param[in,out]   state: Startup-controlled UART, no active TX or RX DMA.
+ * \param[in]       rts: Actual hardware RTS output enable.
+ * \param[in]       cts: Actual hardware CTS transmit gate enable.
+ * \return          Success or INVALID/STATE/CONTEXT/BUSY before any write.
+ * \note            Board owns AF pins/wiring. RTS covers hardware receive
+ *                  register capacity, not application stream/ring backpressure.
+ *                  Default state has no extra RAM; other CR3 bits are
+ * preserved.
+ */
+nx_result_t nx_stm32_uart_flow_configure(nx_stm32_uart_state_t* state, bool rts,
+                                         bool cts);
+
 /** \brief Bounded USART IRQ dispatch for the statically bound instance. */
 void nx_stm32_uart_irq(nx_stm32_uart_state_t* port);
 /** \brief Advance only TX facts when an independent provider owns RX storage.
@@ -289,5 +303,16 @@ nx_result_t nx_stm32_adc_info(const void* context, nx_adc_info_t* info);
 nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
                                 size_t capacity, nx_time_us_t deadline,
                                 size_t* count);
+
+/**
+ * \brief           Side-effect-free checks shared with this exact TX start.
+ * \param[in]       context: Exact immutable face's selected provider state.
+ * \param[in]       request: Live descriptor, not admitted or retained here.
+ * \return          Same payload/domain/context/state/deadline rejection.
+ * \note            Task-only; reads facts but performs no MMIO store or borrow.
+ *                  RS485 binding must use this provider's matching validator.
+ */
+nx_result_t nx_stm32_uart_tx_validate(void* context,
+                                      const nx_uart_tx_request_t* request);
 
 #endif

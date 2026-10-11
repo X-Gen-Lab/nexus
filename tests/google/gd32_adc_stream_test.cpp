@@ -21,6 +21,11 @@ extern uint32_t g_gd32_model_barrier_advance;
 #include <sys/mman.h>
 
 static bool s_hold_dma;
+static bool s_refuse_target;
+static bool s_flip_target;
+static bool s_wrong_target;
+static bool s_error_target;
+static bool s_error_ack;
 
 /** \brief A disable store cannot manufacture stopped memory ownership. */
 extern "C" void nx_gd32_adc_dma_model_disable(uint32_t mask) {
@@ -32,8 +37,31 @@ extern "C" void nx_gd32_adc_dma_model_disable(uint32_t mask) {
 
 /** \brief Model hardware acknowledgement without clearing other channels. */
 extern "C" void nx_gd32_adc_dma_model_ack(uint32_t flags) {
+    if (s_error_ack) {
+        DMA_INTF0(DMA1) |= DMA_INTF_TAEIF;
+    }
     DMA_INTC0(DMA1) = flags;
     DMA_INTF0(DMA1) &= ~flags;
+}
+
+/** \brief Apply documented inactive write, or inject refusal/bank switch. */
+extern "C" void nx_gd32_adc_dma_model_target(unsigned bank, uint32_t address) {
+    if (s_wrong_target) {
+        address += 4U;
+    }
+    if (!s_refuse_target) {
+        if (bank == 0U) {
+            DMA_CH0M0ADDR(DMA1) = address;
+        } else {
+            DMA_CH0M1ADDR(DMA1) = address;
+        }
+    }
+    if (s_flip_target) {
+        DMA_CH0CTL(DMA1) ^= DMA_CHXCTL_MBS;
+    }
+    if (s_error_target) {
+        DMA_INTF0(DMA1) |= DMA_INTF_TAEIF;
+    }
 }
 
 /** \brief The shared register fixture has no implicit UART interrupt owner. */
@@ -63,6 +91,11 @@ class GD32ADCStream : public ::testing::Test {
         g_gd32_model_barrier_advance = 0;
         g_gd32_model_adc_works = true;
         s_hold_dma = false;
+        s_refuse_target = false;
+        s_flip_target = false;
+        s_wrong_target = false;
+        s_error_target = false;
+        s_error_ack = false;
         for (size_t i = 0; i < 2; ++i) {
             regions[i] = {reinterpret_cast<uintptr_t>(samples[i]),
                           sizeof(samples[i]), NX_DMA_MEMORY_WRITE};
@@ -79,6 +112,11 @@ class GD32ADCStream : public ::testing::Test {
     void TearDown() override {
         if (mapping != MAP_FAILED) {
             s_hold_dma = false;
+            s_refuse_target = false;
+            s_flip_target = false;
+            s_wrong_target = false;
+            s_error_target = false;
+            s_error_ack = false;
             (void)nx_adc_port_stream_stop(&port);
             for (size_t i = 0; i < 2; ++i) {
                 if (slots[i].state == NX_STREAM_SLOT_READY) {
@@ -281,4 +319,295 @@ TEST_F(GD32ADCStream, StabilityClockStartsAfterPowerStoreHasCompleted) {
     EXPECT_EQ(state.ready_at, g_gd32_model_now + 2);
     EXPECT_FALSE(nx_deadline_expired(state.ready_at, g_gd32_model_now));
     g_gd32_model_barrier_advance = 0;
+}
+
+class GD32ADCContinuous : public ::testing::Test {
+  protected:
+    nx_gd32_adc_continuous_state_t state = {};
+    uint8_t channels[2] = {0U, 1U};
+    uint8_t sample_times[2] = {1U, 1U};
+    uint16_t samples[3][4] = {};
+    nx_dma_memory_region_t regions[3] = {};
+    nx_stream_slot_t slots[3] = {};
+    nx_stream_t stream = {};
+    const nx_adc_port_t port = {&nx_gd32_adc_continuous_ops, &state};
+    void* mapping = MAP_FAILED;
+    void SetUp() override {
+        mapping =
+            mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x80000,
+                 PROT_READ | PROT_WRITE,
+                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        ASSERT_EQ(mapping, reinterpret_cast<void*>(UINT32_C(0x40000000)));
+        std::memset(&g_gd32_model_nvic, 0, sizeof(g_gd32_model_nvic));
+        g_gd32_model_now = 100U;
+        g_gd32_model_isr = false;
+        g_gd32_model_mask = 0U;
+        g_gd32_model_barrier_advance = 0U;
+        g_gd32_model_adc_works = true;
+        s_hold_dma = false;
+        s_refuse_target = false;
+        s_flip_target = false;
+        s_wrong_target = false;
+        s_error_target = false;
+        s_error_ack = false;
+        for (size_t i = 0; i < 3; ++i) {
+            regions[i] = {reinterpret_cast<uintptr_t>(samples[i]),
+                          sizeof(samples[i]), NX_DMA_MEMORY_WRITE};
+            slots[i].data = reinterpret_cast<uint8_t*>(samples[i]);
+            slots[i].capacity = sizeof(samples[i]);
+        }
+        state.base.regions = regions;
+        state.base.region_count = 3U;
+        state.sample_times = sample_times;
+        ASSERT_EQ(nx_stream_initialize(&stream, slots, 3U), NX_SUCCESS);
+        ASSERT_EQ(nx_gd32_adc_continuous_initialize(&state, channels, 2U, 3300U,
+                                                    10000U, 5U),
+                  NX_SUCCESS);
+    }
+    void TearDown() override {
+        if (mapping != MAP_FAILED) {
+            s_hold_dma = false;
+            s_refuse_target = false;
+            s_flip_target = false;
+            s_wrong_target = false;
+            s_error_target = false;
+            s_error_ack = false;
+            (void)nx_adc_port_stream_stop(&port);
+            for (size_t i = 0U; i < 3U; ++i) {
+                nx_stream_block_t block = {};
+                if (nx_stream_acquire(&stream, &block) == NX_SUCCESS) {
+                    (void)nx_stream_release(&stream, &block);
+                }
+                if (slots[i].state == NX_STREAM_SLOT_BORROWED) {
+                    block.data = slots[i].data;
+                    block.slot = i;
+                    block.epoch = slots[i].epoch;
+                    (void)nx_stream_release(&stream, &block);
+                }
+            }
+            EXPECT_EQ(nx_gd32_adc_continuous_stop(&state), NX_SUCCESS);
+            EXPECT_EQ(munmap(mapping, 0x80000), 0);
+        }
+    }
+    void Ready() {
+        ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+        g_gd32_model_now += 2U;
+        ASSERT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+        ASSERT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
+    }
+    void Complete(unsigned bank) {
+        DMA_CH0CTL(DMA1) =
+            (DMA_CH0CTL(DMA1) & ~static_cast<uint32_t>(DMA_CHXCTL_MBS)) |
+            (bank == 0U ? DMA_CHXCTL_MBS : 0U);
+        DMA_CH0CNT(DMA1) = 4U;
+        DMA_INTF0(DMA1) = DMA_INTF_FTFIF;
+        nx_gd32_adc_continuous_irq(&state);
+    }
+};
+
+TEST_F(GD32ADCContinuous, SwappedBankPublishesWhileOtherBankKeepsAcquiring) {
+    Ready();
+    EXPECT_NE(DMA_CH0CTL(DMA1) & DMA_CHXCTL_SBMEN, 0U);
+    EXPECT_EQ(stream.outstanding, 2U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    Complete(0U);
+    EXPECT_NE(TIMER_CTL0(TIMER2) & TIMER_CTL0_CEN, 0U);
+    EXPECT_NE(DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN, 0U);
+    ASSERT_EQ(nx_stream_acquire(&stream, &block), NX_SUCCESS);
+    EXPECT_EQ(block.data, reinterpret_cast<uint8_t*>(samples[0]));
+    EXPECT_EQ(DMA_CH0M0ADDR(DMA1),
+              static_cast<uint32_t>(reinterpret_cast<uintptr_t>(samples[2])));
+    ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
+    Complete(1U);
+    ASSERT_EQ(nx_stream_acquire(&stream, &block), NX_SUCCESS);
+    EXPECT_EQ(block.data, reinterpret_cast<uint8_t*>(samples[1]));
+    ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
+}
+
+TEST_F(GD32ADCContinuous, StarvationStopsAndNeverOverwritesBorrowedBlock) {
+    Ready();
+    Complete(0U);
+    nx_stream_block_t block = {};
+    ASSERT_EQ(nx_stream_acquire(&stream, &block), NX_SUCCESS);
+    Complete(1U);
+    EXPECT_EQ(TIMER_CTL0(TIMER2) & TIMER_CTL0_CEN, 0U);
+    EXPECT_EQ(DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN, 0U);
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(stream.losses, 1U);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    g_gd32_model_now += 2U;
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_SUCCESS);
+    EXPECT_NE(TIMER_CTL0(TIMER2) & TIMER_CTL0_CEN, 0U);
+}
+
+TEST_F(GD32ADCContinuous, FailedDisableRetainsBothTargetsUntilReadback) {
+    Ready();
+    s_hold_dma = true;
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_ERROR_BUSY);
+    EXPECT_EQ(state.posted.pending, 2U);
+    EXPECT_EQ(stream.outstanding, 2U);
+    s_hold_dma = false;
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+}
+
+TEST_F(GD32ADCContinuous, InvalidLateDomainAndUnequalScanCapacityNeverLoan) {
+    regions[2].permissions = NX_DMA_MEMORY_READ;
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_PERMISSION);
+    EXPECT_EQ(stream.epoch, 0U);
+    regions[2].permissions = NX_DMA_MEMORY_WRITE;
+    slots[2].capacity = 4U;
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(stream.epoch, 0U);
+    EXPECT_EQ(DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN, 0U);
+}
+
+TEST_F(GD32ADCContinuous, WrongBankPhaseStopsInsteadOfPublishingUnknownScan) {
+    Ready();
+    Complete(1U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+}
+
+TEST_F(GD32ADCContinuous, RefusedAddressWriteAndDrainRetainThreeLoans) {
+    Ready();
+    s_refuse_target = true;
+    s_hold_dma = true;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(stream.outstanding, 3U);
+    EXPECT_TRUE(state.base.filling);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    s_hold_dma = false;
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+    EXPECT_EQ(stream.outstanding, 0U);
+}
+
+TEST_F(GD32ADCContinuous, BankSwitchDuringTargetWriteRejectsPublication) {
+    Ready();
+    s_flip_target = true;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN, 0U);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+}
+
+TEST_F(GD32ADCContinuous, ExplicitSampleTimeCostsLimitTheCompleteScanRate) {
+    sample_times[0] = 7U;
+    sample_times[1] = 7U;
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 50000U),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(stream.epoch, 0U);
+    sample_times[0] = 0U;
+    sample_times[1] = 2U;
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    EXPECT_EQ(ADC_SAMPT1(ADC0) & 63U, 2U << 3U);
+    EXPECT_EQ(ADC_RSQ0(ADC0) & ADC_RSQ0_RL, 1U << 20U);
+}
+
+TEST_F(GD32ADCContinuous, IncorrectReplacementAddressNeverPublishesOldBlock) {
+    Ready();
+    s_wrong_target = true;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+}
+
+TEST_F(GD32ADCContinuous, DmaErrorAtTargetStoreRejectsPublication) {
+    Ready();
+    s_error_target = true;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+}
+
+TEST_F(GD32ADCContinuous, SequenceFactsReportSelectedCyclesAndNominalClocks) {
+    nx_adc_sequence_info_t facts = {};
+    ASSERT_EQ(nx_adc_port_sequence_info(&port, &facts), NX_SUCCESS);
+    EXPECT_EQ(facts.sample_times, sample_times);
+    EXPECT_EQ(facts.channels, channels);
+    EXPECT_EQ(facts.channel_count, 2U);
+    EXPECT_EQ(facts.scan_cycles, 54U);
+    EXPECT_EQ(facts.adc_clock_hz, 12500000U);
+    EXPECT_EQ(facts.timer_clock_hz, 100000000U);
+    EXPECT_EQ(DMA_CH0CTL(DMA1) & DMA_CHXCTL_CHEN, 0U);
+}
+
+TEST_F(GD32ADCContinuous, ObserverEpochTracksBlockAndRejectsReleasedLoan) {
+    nx_adc_observation_t records[3] = {};
+    nx_adc_observer_t observer = {};
+    ASSERT_EQ(nx_adc_observer_initialize(&observer, records, 3U), NX_SUCCESS);
+    ASSERT_EQ(nx_adc_port_attach_observer(&port, &observer), NX_SUCCESS);
+    Ready();
+    uint64_t before = g_gd32_model_now;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    ASSERT_EQ(nx_stream_acquire(&stream, &block), NX_SUCCESS);
+    nx_adc_observation_t observation = {};
+    ASSERT_EQ(nx_adc_port_block_observation(&port, &block, &observation),
+              NX_SUCCESS);
+    EXPECT_EQ(observation.epoch, block.epoch);
+    EXPECT_EQ(observation.sequence, 1U);
+    EXPECT_GE(observation.observed_at, before);
+    EXPECT_NE(observation.flags & NX_ADC_OBSERVATION_DISCONTINUITY, 0U);
+    EXPECT_EQ(nx_adc_port_attach_observer(&port, nullptr), NX_ERROR_BUSY);
+    ASSERT_EQ(nx_stream_release(&stream, &block), NX_SUCCESS);
+    EXPECT_EQ(nx_adc_port_block_observation(&port, &block, &observation),
+              NX_ERROR_STATE);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(observer.stream, nullptr);
+    EXPECT_EQ(nx_adc_port_attach_observer(&port, nullptr), NX_SUCCESS);
+}
+
+TEST_F(GD32ADCContinuous, CalibrationTimeoutDoesNotInventCompletedBlockLoss) {
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    g_gd32_model_now += 2U;
+    ASSERT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_BUSY);
+    g_gd32_model_adc_works = false;
+    ADC_CTL1(ADC0) |= ADC_CTL1_CLB;
+    g_gd32_model_now += 100U;
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_TIMEOUT);
+    EXPECT_EQ(stream.losses, 0U);
+    EXPECT_EQ(stream.outstanding, 0U);
+    g_gd32_model_adc_works = true;
+}
+
+TEST_F(GD32ADCContinuous, ErrorBeforeW1cCompletionStoreRemainsAuthoritative) {
+    Ready();
+    s_error_ack = true;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_IO);
+}
+
+TEST_F(GD32ADCContinuous,
+       ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission) {
+    stream.epoch = UINT64_MAX - 1U;
+    EXPECT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(stream.outstanding, 0U);
+    EXPECT_EQ(state.posted.pending, 0U);
+    EXPECT_EQ(state.base.stream, nullptr);
+}
+
+TEST_F(GD32ADCContinuous,
+       EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite) {
+    Ready();
+    stream.epoch = UINT64_MAX;
+    Complete(0U);
+    nx_stream_block_t block = {};
+    EXPECT_EQ(nx_stream_acquire(&stream, &block), NX_ERROR_EMPTY);
+    EXPECT_EQ(nx_adc_port_stream_service(&port), NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(stream.outstanding, 0U);
 }

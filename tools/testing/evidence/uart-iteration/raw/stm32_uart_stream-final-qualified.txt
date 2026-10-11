@@ -1,0 +1,22 @@
+Running main() from gmock_main.cc
+[==========] Running 5 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 2 tests from Stm32UartStream
+[ RUN      ] Stm32UartStream.IdlePublishesPartialAndBackpressureKeepsConsumerLoan
+[       OK ] Stm32UartStream.IdlePublishesPartialAndBackpressureKeepsConsumerLoan (0 ms)
+[ RUN      ] Stm32UartStream.DroppedReceptionProducesLossAtTheNextUsefulBlock
+[       OK ] Stm32UartStream.DroppedReceptionProducesLossAtTheNextUsefulBlock (0 ms)
+[----------] 2 tests from Stm32UartStream (0 ms total)
+
+[----------] 3 tests from Stm32UartStreamFacts
+[ RUN      ] Stm32UartStreamFacts.FullIdleHasOnePublicationWithBothObservedFacts
+[       OK ] Stm32UartStreamFacts.FullIdleHasOnePublicationWithBothObservedFacts (0 ms)
+[ RUN      ] Stm32UartStreamFacts.ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte
+[       OK ] Stm32UartStreamFacts.ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte (0 ms)
+[ RUN      ] Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan
+[       OK ] Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan (0 ms)
+[----------] 3 tests from Stm32UartStreamFacts (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 5 tests.

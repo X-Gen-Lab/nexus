@@ -1,0 +1,25 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (0.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[2/18] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
+[3/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[4/18] Linking C static library lib/libnexus_io.a
+[5/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[6/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[7/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[8/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[9/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[10/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[11/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[12/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[13/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[14/18] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[15/18] Linking C static library lib/libnexus_io_native.a
+[16/18] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o
+[17/18] Linking CXX executable bin/nexus_uart_rs485_test

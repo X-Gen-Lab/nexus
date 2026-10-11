@@ -20,6 +20,7 @@ try:
     from . import kernel
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
+                                   mode_traits, route_dma,
                                    resolve_interrupts, sequence,
                                    validate_selection)
 except ImportError:
@@ -27,6 +28,7 @@ except ImportError:
     import kernel
     from providers import maintained
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
+                                   mode_traits, route_dma,
                                   resolve_interrupts, sequence,
                                   validate_selection)
 
@@ -78,8 +80,12 @@ def dependency_identity(root, relative, expected=None):
     return {"path": relative, "commit": commit}
 
 
-def uses_dma(mode):
-    return mode.startswith("dma") or mode == "trigger-dma"
+def validate_resource_fact(value, provider, context):
+    """Validate the full physical fact before discarding DMA selectors."""
+    value = text(value, context)
+    if value.startswith("dma:"):
+        provider.validate_dma_resource(value)
+    return normalize_resource(value)
 
 
 def pairs(items):
@@ -226,6 +232,9 @@ def validate_soc(soc, part):
                 text(value, f"{name}.{field}")
         if not controller["modes"]:
             fail(f"Controller {name} has no maintained mode")
+        for resource in sequence(controller.get("resources", []),
+                                 f"{name}.resources"):
+            validate_resource_fact(resource, provider, "SoC resource")
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
@@ -299,7 +308,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     routes = {}
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
-                    "source"}, {"resources", "dma", "mode_resources"}, "route")
+                    "source"}, {"resources", "dma", "mode_dma", "mode_resources"}, "route")
         identity(route["id"], "route id")
         if route["id"] in routes:
             fail(f"Duplicate route id: {route['id']}")
@@ -317,15 +326,29 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail(f"Route {route['id']} does not match a maintained controller")
         if not set(route["modes"]).issubset(controller["modes"]):
             fail(f"Route {route['id']} advertises unsupported modes")
+        for dma in sequence(route.get("dma", []), "DMA route"):
+            provider.dma_irq(text(dma, "DMA route resource"))
+        mode_dma = obj(route.get("mode_dma", {}), set(), set(route["modes"]),
+                       "mode-specific DMA resources")
+        for mode, resources in mode_dma.items():
+            if not mode_traits(route["kind"], mode).dma:
+                fail("Mode-specific DMA resources require a DMA execution mode")
+            resources = sequence(resources, "mode-specific DMA resources")
+            if not resources:
+                fail("Mode-specific DMA resources must not be empty")
+            unique(resources, "mode-specific DMA resources")
+            for dma in resources:
+                provider.dma_irq(text(dma, "mode-specific DMA resource"))
+        for resource in sequence(route.get("resources", []), "route resources"):
+            validate_resource_fact(resource, provider, "route resource")
         mode_resources = obj(route.get("mode_resources", {}), set(), set(route["modes"]),
                              "mode-specific resources")
         for mode, resources in mode_resources.items():
             if mode not in route["modes"]:
                 fail("Mode-specific resource has no maintained route mode")
             for resource in sequence(resources, "mode-specific resources"):
-                if isinstance(resource, str) and resource.startswith("dma:"):
-                    provider.validate_dma_resource(resource)
-                normalize_resource(text(resource, "mode-specific resource"))
+                validate_resource_fact(resource, provider,
+                                       "mode-specific resource")
         pins = sequence(route["pins"], "route pins")
         unique([pin.get("pin") for pin in pins], "route pins")
         for pin in pins:
@@ -496,7 +519,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     irq_profile["maximum_priority"], "IRQ priority")
         if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
             fail("Polling SPI has no IRQ options")
-        if route["kind"] == "spi" and mode.startswith("dma") and "irq_priority" not in selection:
+        if route["kind"] == "spi" and mode_traits("spi", mode).dma and "irq_priority" not in selection:
             fail("DMA SPI requires an explicit IRQ priority")
         if "calls_os" in selection and type(selection["calls_os"]) is not bool:
             fail("calls_os must be boolean")
@@ -505,15 +528,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("OS-calling ISR violates the FreeRTOS syscall ceiling")
         if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
             fail("Controller speed exceeds maintained limit")
-        if uses_dma(mode) and not route.get("dma"):
+        traits = mode_traits(route["kind"], mode)
+        if traits.dma and not route_dma(route, mode):
             fail("DMA mode has no reviewed DMA route")
-        if uses_dma(mode):
+        if traits.dma:
             provider.validate_dma(route, mode, normalize_resource)
         if route["kind"] != "gpio":
             claim("controller:" + route["controller"], name, mode, route["id"])
         for pin in route["pins"]:
             claim("pin:" + pin["pin"], name, mode, route["id"])
-        if mode in {"irq-byte-event", "irq", "irq-blocks", "edge-event", "edge"} or uses_dma(mode):
+        if traits.irq:
             for irq in hardware["irq"]:
                 key = normalize_resource("irq:" + irq)
                 priority = selection.get("irq_priority")
@@ -531,15 +555,15 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
 
         for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
             claim(resource, name, mode, route["id"])
-        if uses_dma(mode):
-            for dma in route["dma"]:
+        if traits.dma:
+            for dma in route_dma(route, mode):
                 claim("dma:" + dma, name, mode, route["id"])
                 claim(provider.dma_irq(dma), name, mode, route["id"])
         selected.append({**selection, "controller": route["controller"],
                          "kind": route["kind"], "route": route["id"],
                          "pins": route["pins"], "initial": binding.get("initial", 0),
                          "mask": binding.get("mask", 0),
-                         **({"dma": route["dma"]} if uses_dma(mode) else {})})
+                         **({"dma": route_dma(route, mode)} if traits.dma else {})})
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
     device_ids = []

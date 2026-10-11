@@ -17,6 +17,10 @@ extern "C" {
 typedef struct nx_spi_port nx_spi_port_t;
 typedef struct nx_spi_endpoint nx_spi_endpoint_t;
 
+/** \brief Explicit single-cell DMA addresses, both borrowed until SETTLED. */
+#define NX_SPI_MEMORY_TX_FIXED 1U
+#define NX_SPI_MEMORY_RX_FIXED 2U
+
 /**
  * \brief           Caller-owned finite SPI request with one whole-CS interval.
  *
@@ -70,6 +74,8 @@ typedef struct {
     nx_result_t (*submit)(void* context, nx_spi_request_t* request);
     nx_result_t (*start_admitted)(void* context, nx_spi_request_t* request);
     bool (*on_port)(const void* context, const nx_spi_port_t* port);
+    nx_result_t (*submit_memory)(void* context, nx_spi_request_t* request,
+                                 uint8_t memory_flags);
 } nx_spi_endpoint_ops_t;
 /**
  * \brief           Immutable interface pointing to caller-owned state.
@@ -159,6 +165,26 @@ nx_result_t nx_spi_request_prepare(nx_spi_request_t* request, const uint8_t* tx,
  */
 nx_result_t nx_spi_endpoint_submit(const nx_spi_endpoint_t* endpoint,
                                    nx_spi_request_t* request);
+/**
+ * \brief           Submit explicit incrementing or single-cell DMA memory
+ * \param[in]       endpoint: Initialized single-executor DMA endpoint
+ * \param[in,out]   request: READY request with two non-NULL caller addresses
+ * \param[in]       memory_flags: TX_FIXED repeats one immutable dummy byte;
+ *                  RX_FIXED repeatedly writes one caller-owned discard byte;
+ *                  zero uses complete incrementing TX/RX buffers
+ * \return          ACCEPTED on SUCCESS; other results retain no references
+ * \note            Fixed directions require one byte, other directions length
+ *                  bytes, within reviewed DMA domains. The actual spans must
+ *                  not overlap. All addresses remain borrowed through drain
+ *                  until acquire-observed SETTLED. No hidden scratch is used.
+ *                  Both fixed flags permit explicit clock-only transfers.
+ *                  Request preparation does not retain these flags; only this
+ *                  successful admission selects them. Ordinary submit and the
+ *                  existing owner continue their ordinary buffer contract.
+ */
+nx_result_t nx_spi_endpoint_submit_memory(const nx_spi_endpoint_t* endpoint,
+                                          nx_spi_request_t* request,
+                                          uint8_t memory_flags);
 /**
  * \brief           Start an adapter-admitted QUEUED request without
  *                  readmission.

@@ -328,7 +328,11 @@
       "modes": [
         "irq-byte-event",
         "dma-tx",
-        "irq-blocks"
+        "irq-blocks",
+        "rx-dma-idle",
+        "dma-duplex",
+        "rx-dma-continuous",
+        "dma-duplex-continuous"
       ],
       "irq": [
         "USART0_IRQHandler"
@@ -356,13 +360,22 @@
     "I2C0": {
       "kind": "i2c",
       "modes": [
-        "poll-messages"
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
       ],
-      "irq": [],
+      "irq": [
+        "I2C0_EV",
+        "I2C0_ER"
+      ],
       "pins": [
         "PB6",
         "PB7"
-      ]
+      ],
+      "irq_numbers": {
+        "I2C0_EV": 31,
+        "I2C0_ER": 32
+      }
     },
     "FMC": {
       "kind": "flash",
@@ -407,7 +420,8 @@
       "modes": [
         "single-shot",
         "low-rate-scan",
-        "trigger-dma"
+        "trigger-dma",
+        "trigger-dma-continuous"
       ],
       "irq": [],
       "pins": [

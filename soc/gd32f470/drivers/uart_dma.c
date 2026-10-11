@@ -70,11 +70,11 @@ nx_result_t nx_gd32_uart_dma_initialize(nx_gd32_uart_dma_state_t* state,
     return NX_SUCCESS;
 }
 
-/** \brief Validate all rejectable inputs before unique request admission. */
-static nx_result_t start(nx_gd32_uart_dma_state_t* state,
-                         nx_uart_tx_request_t* request, bool admitted) {
+/** \brief Exact DMA-domain and controller checks, without stores or loans. */
+static inline nx_result_t validate_tx(nx_gd32_uart_dma_state_t* state,
+                                      const nx_uart_tx_request_t* request) {
     if (state == NULL || request == NULL || request->data == NULL ||
-        request->length == 0U || request->length > 65535U) {
+        request->length == 0U || request->length > UINT16_MAX) {
         return NX_ERROR_INVALID;
     }
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
@@ -86,20 +86,29 @@ static nx_result_t start(nx_gd32_uart_dma_state_t* state,
     if (result != NX_SUCCESS) {
         return result;
     }
+    if (!state->uart.initialized || state->uart.stopping) {
+        return NX_ERROR_STATE;
+    }
+    if (state->uart.active != NULL ||
+        (DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    return nx_deadline_expired(request->base.deadline, nx_time_now_us())
+               ? NX_ERROR_TIMEOUT
+               : NX_SUCCESS;
+}
+
+/** \brief Validate all rejectable inputs before unique request admission. */
+static nx_result_t start(nx_gd32_uart_dma_state_t* state,
+                         nx_uart_tx_request_t* request, bool admitted) {
+    nx_result_t result = validate_tx(state, request);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
     uint32_t saved = nx_gd32_critical_enter();
     nx_gd32_uart_state_t* uart = &state->uart;
-    if (!uart->initialized || uart->stopping) {
-        result = NX_ERROR_STATE;
-    } else if (uart->active != NULL ||
-               (DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
-        result = NX_ERROR_BUSY;
-    } else if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        result = NX_ERROR_TIMEOUT;
-    } else {
-        result = admitted
-                     ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
-                     : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
-    }
+    result = admitted ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
+                      : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (result != NX_SUCCESS) {
         nx_gd32_critical_leave(saved);
         return result;
@@ -131,13 +140,14 @@ static nx_result_t start(nx_gd32_uart_dma_state_t* state,
 }
 
 /** \brief Admission borrows memory only after strict DMA-domain validation. */
-static nx_result_t submit(void* context, nx_uart_tx_request_t* request) {
+nx_result_t nx_gd32_uart_dma_submit(void* context,
+                                    nx_uart_tx_request_t* request) {
     return start(context, request, false);
 }
 
 /** \brief Preserve the adapter admission without a second provider borrow. */
-static nx_result_t start_admitted(void* context,
-                                  nx_uart_tx_request_t* request) {
+nx_result_t nx_gd32_uart_dma_start_admitted(void* context,
+                                            nx_uart_tx_request_t* request) {
     if (request == NULL ||
         nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
         return NX_ERROR_STATE;
@@ -166,7 +176,8 @@ static void begin_drain(nx_gd32_uart_dma_state_t* state, nx_result_t terminal) {
 
 /** \brief Cancel closes the DMA source; it never converts NDTR into wire bytes.
  */
-static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
+nx_result_t nx_gd32_uart_dma_cancel(void* context,
+                                    nx_uart_tx_request_t* request) {
     nx_gd32_uart_dma_state_t* state = context;
     if (state == NULL || request == NULL) {
         return NX_ERROR_INVALID;
@@ -239,7 +250,7 @@ void nx_gd32_uart_dma_uart_irq(nx_gd32_uart_dma_state_t* state) {
 
 /** \brief Detach engine and IRQ references before the final release
  * publication. */
-static void service(void* context) {
+void nx_gd32_uart_dma_service(void* context) {
     nx_gd32_uart_dma_state_t* state = context;
     if (state == NULL || nx_gd32_in_isr() || nx_gd32_irq_masked()) {
         return;
@@ -294,7 +305,7 @@ static void service(void* context) {
 
 /** \brief Close admission while preserving active DMA and RX storage ownership.
  */
-static nx_result_t stop(void* context) {
+nx_result_t nx_gd32_uart_dma_stop(void* context) {
     nx_gd32_uart_dma_state_t* state = context;
     if (state == NULL) {
         return NX_ERROR_INVALID;
@@ -307,8 +318,8 @@ static nx_result_t stop(void* context) {
     }
     state->uart.stopping = true;
     if (state->uart.active != NULL) {
-        (void)cancel(state, state->uart.active);
-        service(state);
+        (void)nx_gd32_uart_dma_cancel(state, state->uart.active);
+        nx_gd32_uart_dma_service(state);
         if (state->uart.active != NULL) {
             return NX_ERROR_BUSY;
         }
@@ -363,12 +374,18 @@ static nx_result_t read_bytes(void* context, uint8_t* bytes, size_t capacity,
 /** \brief One immutable operation table for all selected finite UART DMA
  * instances. */
 const nx_uart_ops_t nx_gd32_uart_dma_ops = {
-    .submit = submit,
-    .start_admitted = start_admitted,
-    .cancel = cancel,
-    .service = service,
+    .submit = nx_gd32_uart_dma_submit,
+    .start_admitted = nx_gd32_uart_dma_start_admitted,
+    .cancel = nx_gd32_uart_dma_cancel,
+    .service = nx_gd32_uart_dma_service,
     .read_events = read_events,
     .read_bytes = read_bytes,
-    .stop = stop,
+    .stop = nx_gd32_uart_dma_stop,
     .attach_wake = attach_wake,
 };
+
+/** \brief Expose this exact DMA validator only for an opt-in adapter. */
+nx_result_t nx_gd32_uart_dma_tx_validate(void* context,
+                                         const nx_uart_tx_request_t* request) {
+    return validate_tx(context, request);
+}

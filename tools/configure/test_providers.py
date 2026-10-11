@@ -74,6 +74,29 @@ class ProviderContractTests(unittest.TestCase):
                     common.validate_selection(selection, route,
                                               maintained(family), 131072)
 
+    def test_mode_traits_are_explicit_immutable_and_directional(self):
+        from providers import common
+        for kind, mode, tx, rx, continuous in (
+                ("uart", "dma-tx", True, False, False),
+                ("uart", "rx-dma-idle", False, True, False),
+                ("uart", "dma-duplex", True, True, False),
+                ("uart", "rx-dma-continuous", False, True, True),
+                ("uart", "dma-duplex-continuous", True, True, True),
+                ("adc", "trigger-dma", False, True, False),
+                ("adc", "trigger-dma-continuous", False, True, True)):
+            with self.subTest(kind=kind, mode=mode):
+                traits = common.mode_traits(kind, mode)
+                self.assertTrue(traits.dma)
+                self.assertTrue(traits.irq)
+                self.assertEqual(traits.tx_dma, tx)
+                self.assertEqual(traits.rx_dma, rx)
+                self.assertEqual(traits.continuous, continuous)
+                with self.assertRaises(FrozenInstanceError):
+                    traits.tx_dma = False
+        self.assertFalse(common.mode_traits("spi", "short-poll").irq)
+        with self.assertRaisesRegex(ValueError, "mode"):
+            common.mode_traits("uart", "dma-unimplemented")
+
     def test_unknown_family_cannot_inherit_cortex_m4_abi(self):
         soc = gate.load(gate.ROOT / "soc/stm32f407/soc.json")
         soc["id"] = "unmaintained-m4"
