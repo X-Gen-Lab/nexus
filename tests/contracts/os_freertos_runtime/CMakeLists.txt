@@ -13,8 +13,9 @@ target_link_libraries(contract_freertos_posix PUBLIC Threads::Threads)
 
 # The real port cancels cond-waiting threads during task reclamation. Its event
 # backend must unlock on POSIX cancellation before port.c signals and joins.
-add_library(contract_freertos_posix_events OBJECT posix_event.c)
+add_library(contract_freertos_posix_events OBJECT posix_event.c posix_idle.c)
 target_include_directories(contract_freertos_posix_events PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${kernel_root}/include"
     "${kernel_root}/portable/ThirdParty/GCC/Posix")
 target_link_libraries(contract_freertos_posix_events PRIVATE
     Threads::Threads nexus_owned_warnings nexus_build_options)

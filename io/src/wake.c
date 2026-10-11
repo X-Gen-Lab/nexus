@@ -15,20 +15,49 @@
 
 /** \brief Match NVIC numerical urgency to the optional kernel syscall ceiling.
  */
-nx_result_t nx_irq_wake_validate(const nx_irq_wake_t* wake, uint8_t priority,
-                                 uint8_t priority_bits,
-                                 uint8_t syscall_ceiling) {
-    if (priority_bits == 0U || priority_bits > 8U) {
+nx_result_t nx_irq_wake_validate(const nx_irq_wake_t* wake,
+                                 const nx_irq_policy_t* policy,
+                                 const nx_irq_source_t* source) {
+    if (policy == NULL || source == NULL || policy->priority_bits == 0U ||
+        policy->priority_bits > 8U || policy->external_irq_count == 0U ||
+        policy->external_irq_count > 480U || source->irq_number < 0 ||
+        (uint16_t)source->irq_number >= policy->external_irq_count ||
+        source->priority_group > 7U || (wake != NULL && wake->notify == NULL)) {
         return NX_ERROR_INVALID;
     }
-    uint16_t levels = (uint16_t)(1U << priority_bits);
-    if (priority >= levels || syscall_ceiling >= levels ||
-        (wake != NULL && wake->notify == NULL)) {
+    uint16_t levels = (uint16_t)(1U << policy->priority_bits);
+    if (source->priority >= levels || policy->syscall_ceiling >= levels) {
         return NX_ERROR_INVALID;
     }
-    if (wake != NULL && wake->calls_kernel &&
-        (syscall_ceiling == 0U || priority < syscall_ceiling)) {
-        return NX_ERROR_PERMISSION;
+    switch (policy->kernel) {
+        case NX_IRQ_KERNEL_NONE:
+            if (policy->syscall_ceiling != 0U) {
+                return NX_ERROR_INVALID;
+            }
+            return wake != NULL && wake->calls_kernel ? NX_ERROR_PERMISSION
+                                                      : NX_SUCCESS;
+        case NX_IRQ_KERNEL_PRIMASK:
+            if (policy->syscall_ceiling != 0U || source->priority_group != 0U) {
+                return NX_ERROR_INVALID;
+            }
+            break;
+        case NX_IRQ_KERNEL_BASEPRI:
+            if (policy->syscall_ceiling == 0U) {
+                return NX_ERROR_INVALID;
+            }
+            if (wake != NULL && wake->calls_kernel) {
+                uint8_t maximum_group =
+                    policy->priority_bits < 7U
+                        ? (uint8_t)(7U - policy->priority_bits)
+                        : 0U;
+                if (source->priority_group > maximum_group ||
+                    source->priority < policy->syscall_ceiling) {
+                    return NX_ERROR_PERMISSION;
+                }
+            }
+            break;
+        default:
+            return NX_ERROR_INVALID;
     }
     return NX_SUCCESS;
 }

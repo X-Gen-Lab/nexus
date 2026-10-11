@@ -27,6 +27,7 @@ ARCH_MECHANISMS = frozenset({
     'nx_arch_mpu_v8_attribute_set', 'nx_arch_features',
     'nx_arch_security_state', 'nx_arch_sau_encode', 'nx_arch_sau_write',
     'nx_arch_sau_clear',
+    'nx_arch_wait_for_interrupt', 'nx_arch_idle_if_unchanged',
 })
 CORE_SYMBOLS = frozenset({
     'nx_request_initialize', 'nx_request_prepare', 'nx_request_admit',
@@ -41,6 +42,14 @@ FREERTOS_SYMBOLS = frozenset({
     'nx_freertos_task_start', 'nx_freertos_task_join',
     'nx_freertos_queue_init', 'nx_freertos_queue_send',
     'nx_freertos_queue_receive', 'nx_freertos_queue_destroy',
+    'nx_freertos_queue_send_until', 'nx_freertos_queue_receive_until',
+    'nx_freertos_direct_notify_init', 'nx_freertos_direct_notify_port',
+    'nx_freertos_direct_notify_destroy', 'nx_freertos_permanent_task_start',
+    'nx_freertos_queue_waiter_init', 'nx_freertos_queue_waiter_destroy',
+    'nx_freertos_closable_queue_init',
+    'nx_freertos_closable_queue_send_until',
+    'nx_freertos_closable_queue_receive_until',
+    'nx_freertos_closable_queue_close', 'nx_freertos_closable_queue_destroy',
     'SVC_Handler', 'PendSV_Handler', 'SysTick_Handler', 'vTaskStartScheduler',
 })
 
@@ -77,10 +86,12 @@ def source_inputs(root: Path) -> list[dict]:
                                             or path.name == 'CMakeLists.txt'))
     paths.update(root / name for name in (
         'tools/configure/cpu.py', 'tools/configure/runtime.py',
-        'tools/configure/ir.py', 'tools/configure/providers/common.py',
+        'tools/configure/ir.py', 'tools/configure/kernel.py',
+        'tools/configure/providers/common.py',
         'cmake/platform/Runtime.cmake', 'cmake/platform/Options.cmake',
         'cmake/platform/SDK.cmake', 'cmake/toolchains/arm-gcc.cmake',
         'os/freertos/prepare_m7_integer.py',
+        'os/freertos/mpu/prepare_port.py',
         'scripts/ci/cortex_runtime.py', 'scripts/ci/arch_compile.py',
         'tests/contracts/cortex_runtime/CMakeLists.txt',
         'tests/contracts/cortex_runtime/main.c',
@@ -372,7 +383,8 @@ def compiled_objects(root: Path, build: Path, variant: dict) -> list[dict]:
                 'arch/cortex_m/nx_arch_cortex_m.c',
                 'arch/cortex_m/nx_arch_cache.c',
                 'arch/cortex_m/nx_arch_mpu.c',
-                'arch/cortex_m/nx_arch_security.c', 'os/wait.c'}
+                'arch/cortex_m/nx_arch_security.c',
+                'arch/cortex_m/nx_arch_sleep.c', 'os/wait.c'}
     sources = set()
     generated_port = build / 'nexus-runtime/os/freertos/m7-integer-port/port.c'
     for item in result:

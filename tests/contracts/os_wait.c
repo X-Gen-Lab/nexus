@@ -61,11 +61,13 @@ static void native_lost_wake(void) {
     fixture_t fixture = {port, 0, 0};
     nx_native_task_t task = {0};
     void* stack;
-    CHECK(posix_memalign(&stack, 4096, 65536) == 0);
+    /* Explicit host sanitizer allowance; it is not an MCU stack budget. */
+    const size_t stack_bytes = 262144;
+    CHECK(posix_memalign(&stack, 4096, stack_bytes) == 0);
     CHECK(nx_native_task_start(&task, stack, 16, wait_task, &fixture) ==
           NX_ERROR_INVALID);
-    CHECK(nx_native_task_start(&task, stack, 65536, wait_task, &fixture) ==
-          NX_SUCCESS);
+    CHECK(nx_native_task_start(&task, stack, stack_bytes, wait_task,
+                               &fixture) == NX_SUCCESS);
     while (__atomic_load_n(&fixture.waiting, __ATOMIC_ACQUIRE) == 0) {
         struct timespec pause = {0, 100000};
         nanosleep(&pause, NULL);

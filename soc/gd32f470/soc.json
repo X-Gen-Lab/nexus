@@ -298,6 +298,7 @@
     "dsp": true,
     "dwt_cyccnt": true,
     "mpu_version": 7,
+    "mpu_regions": 8,
     "icache_line_bytes": 0,
     "dcache_line_bytes": 0,
     "security": "single",

@@ -22,7 +22,7 @@ nitpicky = True
 _external_types = (
     "size_t uint8_t uint16_t uint32_t uint64_t int16_t int32_t int64_t uintptr_t "
     "pthread_t pthread_mutex_t pthread_cond_t "
-    "QueueHandle_t SemaphoreHandle_t StackType_t StaticQueue_t "
+    "QueueHandle_t SemaphoreHandle_t StackType_t StaticQueue_t TaskFunction_t "
     "StaticSemaphore_t StaticTask_t TaskHandle_t TickType_t UBaseType_t "
     "nx_adc_port nx_exti_port nx_flash_port nx_gpio_port nx_i2c_endpoint "
     "nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port "

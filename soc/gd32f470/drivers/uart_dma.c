@@ -335,9 +335,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (!state->uart.initialized || state->uart.controller == NULL) {
         return NX_ERROR_STATE;
     }
-    uint8_t priority = (uint8_t)NVIC_GetPriority(DMA1_Channel7_IRQn);
     nx_result_t result =
-        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+        nx_gd32_irq_wake_validate(wake, DMA1_Channel7_IRQn, syscall_ceiling);
     return result == NX_SUCCESS ? nx_gd32_uart_ops.attach_wake(
                                       &state->uart, wake, syscall_ceiling)
                                 : result;

@@ -6,7 +6,7 @@ Workflow edits require build, tool, analyzer and documentation validation.
 
 | Workflow | Actual responsibility |
 |---|---|
-| `build-matrix.yml` | Three Native configurations each execute the complete CTest plan once and validate every GoogleTest/GoogleMock case; six exact Board/backend ARM assemblies; common components; software-only peripheral fixtures. |
+| `build-matrix.yml` | Four Native configurations (Debug, Release, ASan/UBSan, TSan) each execute the complete CTest plan and validate every GoogleTest/GoogleMock case; six exact Board/backend ARM assemblies; CPU runtime links; kernel profiles and measured static OS costs; optional MPU and dual-image TrustZone links; software-only peripheral fixtures. |
 | `quality-checks.yml` | Same staged style policy as local hooks; actual compile-database clang-tidy/cppcheck; missing tools or empty scope fail. |
 | `enterprise-tools.yml` | Configuration, artifact tamper, budget, HIL admission, real source SDK relocation and command-failure boundaries. |
 | `performance.yml` | Three-board O2/Os/O3 ±LTO minimum-image resource comparisons; GC and budget checks; no inferred cycles. |
@@ -32,6 +32,10 @@ requests separate case-level XML from each Google binary, including disabled
 cases. Both the CTest identities and Google case identities must exactly match
 discovery; missing, extra, stale, skipped or failed reports reject execution.
 The commit hook keeps its independent full `tdd_gate.py` execution unchanged.
+TSan instruments owned Native providers, adapters and tests. The pinned POSIX
+kernel library retains its separate vendor compile policy, so its internal memory
+accesses are not a complete kernel race audit. A host-only cooperative Idle hook
+allows tick signals to progress under the sanitizer; it changes no MCU Idle hook.
 Tool reporting/configuration suites no longer run a second time after every
 Native CTest execution. The independently callable tool workflow retains its
 complete suites, including on manual invocation. It has one automatic caller

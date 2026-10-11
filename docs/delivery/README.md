@@ -9,6 +9,7 @@
 |---|---|
 | [当前架构](architecture.md) | 物理目录、依赖方向、执行与资源责任 |
 | [Cortex-M 软件支持](cortex-m.md) | 九核 ABI/feature、Core/Arch/OS runtime 与配置示例 |
+| [OS 交付](os.md) | 配置、显式存储、外部多任务示例与 OS HIL 范围 |
 | [Arch 契约](../design/arch-contracts.md) | 原子操作、掩码、cache/MPU/SAU 的上下文和所有权 |
 | [支持范围](support.md) | 首发模式、三块 Board 与精确未知项 |
 | [派生能力矩阵](capabilities.md) | facts/routes、参考 Board、软件夹具和生产定义的一致性 |

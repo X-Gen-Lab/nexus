@@ -10,6 +10,9 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程的严格资源合同 |
+| [OS 执行与生命周期合同](os-contracts.md) | deadline、IRQ policy、任务/队列、低功耗与扩展边界 |
+| [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |
+| [OS01–OS55 台账](os-execution.csv) | 每项实际机制、证据及软件/物理状态 |
 | [Arch 与 CPU runtime 契约](arch-contracts.md) | 九核软件、原子操作、cache/MPU/SAU 和安全边界 |
 | [33项实施台账](next-generation-execution.csv) | 实现文件、证据入口、软件与物理状态分列 |
 | [本次 P0–P5 台账](factory-platform-execution.csv) | factory、TOML、TDD、多实例与 IRQ/DMA/block 实现 |

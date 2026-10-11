@@ -45,6 +45,19 @@ uint64_t nx_native_now_us(void) {
     return (uint64_t)value.tv_sec * 1000000u + (uint64_t)value.tv_nsec / 1000u;
 }
 
+/** \brief Never convert the infinite sentinel to an OS absolute time. */
+static int condition_wait(pthread_cond_t* condition, pthread_mutex_t* mutex,
+                          uint64_t deadline_us) {
+    if (deadline_us == NX_DEADLINE_NEVER) {
+        return pthread_cond_wait(condition, mutex);
+    }
+    if (nx_native_now_us() >= deadline_us) {
+        return ETIMEDOUT;
+    }
+    struct timespec deadline = absolute_time(deadline_us);
+    return pthread_cond_timedwait(condition, mutex, &deadline);
+}
+
 /** \brief Read wake sequence under the publisher mutex. */
 static uint32_t notify_arm(void* context) {
     nx_native_notify_t* notification = context;
@@ -58,7 +71,6 @@ static uint32_t notify_arm(void* context) {
 static nx_result_t notify_wait(void* context, uint32_t sequence,
                                uint64_t deadline_us) {
     nx_native_notify_t* notification = context;
-    struct timespec deadline = absolute_time(deadline_us);
     pthread_mutex_lock(&notification->mutex);
     if (notification->waiting) {
         pthread_mutex_unlock(&notification->mutex);
@@ -66,16 +78,22 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
     }
     notification->waiting = true;
     nx_result_t result = NX_SUCCESS;
-    while (notification->sequence == sequence) {
-        int error = pthread_cond_timedwait(&notification->condition,
-                                           &notification->mutex, &deadline);
+    for (;;) {
+        /* A wake is a hint, so it cannot extend the caller's finite budget. */
+        if (deadline_us != NX_DEADLINE_NEVER &&
+            nx_native_now_us() >= deadline_us) {
+            result = NX_ERROR_TIMEOUT;
+            break;
+        }
+        if (notification->sequence != sequence) {
+            break;
+        }
+        int error = condition_wait(&notification->condition,
+                                   &notification->mutex, deadline_us);
         if (error != 0) {
             result = error == ETIMEDOUT ? NX_ERROR_TIMEOUT : NX_ERROR_IO;
             break;
         }
-    }
-    if (notification->sequence != sequence) {
-        result = NX_SUCCESS;
     }
     notification->waiting = false;
     pthread_mutex_unlock(&notification->mutex);
@@ -175,7 +193,6 @@ static nx_result_t queue_transfer(nx_native_queue_t* queue, void* item,
     if (queue == NULL || !queue->initialized || item == NULL) {
         return NX_ERROR_INVALID;
     }
-    struct timespec deadline = absolute_time(deadline_us);
     pthread_mutex_lock(&queue->mutex);
     ++queue->users;
     nx_result_t result = NX_SUCCESS;
@@ -184,9 +201,9 @@ static nx_result_t queue_transfer(nx_native_queue_t* queue, void* item,
             result = NX_ERROR_STATE;
             break;
         }
-        int error = pthread_cond_timedwait(sending ? &queue->writable
-                                                   : &queue->readable,
-                                           &queue->mutex, &deadline);
+        int error =
+            condition_wait(sending ? &queue->writable : &queue->readable,
+                           &queue->mutex, deadline_us);
         if (error != 0) {
             result = error == ETIMEDOUT ? NX_ERROR_TIMEOUT : NX_ERROR_IO;
             break;

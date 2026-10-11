@@ -222,9 +222,8 @@ static nx_result_t gd32_exti_attach_wake(void* context,
         nx_gd32_critical_leave(saved);
         return NX_ERROR_STATE;
     }
-    uint8_t priority = (uint8_t)NVIC_GetPriority(vector(port->line));
     nx_result_t result =
-        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+        nx_gd32_irq_wake_validate(wake, vector(port->line), syscall_ceiling);
     if (result == NX_SUCCESS) {
         port->wake = wake;
     }

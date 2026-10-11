@@ -325,13 +325,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-#ifdef NEXUS_STM32_MODEL
-    uint8_t priority = 5U;
-#else
-    uint8_t priority = (uint8_t)NVIC_GetPriority(state->dma_irq);
-#endif
     nx_result_t result =
-        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+        nx_stm32_irq_wake_validate(wake, state->dma_irq, syscall_ceiling);
     return result == NX_SUCCESS ? nx_stm32_uart_ops.attach_wake(
                                       &state->uart, wake, syscall_ceiling)
                                 : result;

@@ -17,12 +17,14 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
+    from . import kernel
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                    resolve_interrupts, sequence,
                                    validate_selection)
 except ImportError:
     import cpu as cpu_profiles
+    import kernel
     from providers import maintained
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                   resolve_interrupts, sequence,
@@ -189,7 +191,8 @@ def validate_soc(soc, part):
         ranges.append((start, end, region["id"]))
     if sum(region["linker"] for region in memory) != 1:
         fail("Exactly one maintained default RAM linker domain is required")
-    cpu = obj(soc["cpu"], cpu_profiles.CPU_FIELDS, (),
+    cpu = obj(soc["cpu"], cpu_profiles.CPU_FIELDS,
+              cpu_profiles.CPU_OPTIONAL_FIELDS,
               "CPU facts")
     provider = maintained(soc["id"])
     if cpu_abi(cpu) != provider.CPU_ABI:
@@ -197,7 +200,7 @@ def validate_soc(soc, part):
     if (type(cpu["dwt_cyccnt"]) is not bool or
             cpu["dwt_cyccnt"] != provider.DWT_CYCCNT):
         fail("DWT cycle counter differs from maintained CPU facts")
-    if {key: cpu[key] for key in provider.CPU_FEATURES} != provider.CPU_FEATURES:
+    if {key: cpu.get(key) for key in provider.CPU_FEATURES} != provider.CPU_FEATURES:
         fail("Optional CPU capabilities differ from maintained SoC facts")
     irq = obj(soc["irq"], {"priority_bits", "external_count"}, (), "IRQ facts")
     bits = integer(irq["priority_bits"], 1, 8, "IRQ priority bits")
@@ -261,7 +264,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components"}, "assembly")
+                   {"abi", "optimization", "components", "os"}, "assembly")
     integer(assembly["schema_version"], 1, 1, "assembly schema")
     board_name = text(assembly["board_package"], "Board package")
     board_dir = (assembly_path.parent / board_name).resolve()
@@ -365,6 +368,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail(f"Unknown clock profile: {assembly['clock_profile']}")
     if clock["hse_hz"] != board["clocks"]["hse_hz"]:
         fail("Clock profile does not match the Board oscillator")
+    if "os" in assembly and not isinstance(assembly["os"], dict):
+        fail("OS policy: expected object")
+    kernel_profile = kernel.resolve(assembly.get("os"), cpu_profile,
+                                    clock["core_hz"])
+    cpu_profile = kernel.bind(cpu_profile, kernel_profile)
+    irq_profile = cpu_profile.to_dict()["irq"]
     if "abi" in assembly and assembly["abi"] != cpu_abi(soc["cpu"]):
         fail("Assembly ABI contradicts the selected SoC")
     optimization = assembly.get("optimization", "Os")
@@ -681,6 +690,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "part": part, "package": variant["package"], "backend": backend,
               "cpu": soc["cpu"], "irq": irq_profile,
               "cpu_profile": cpu_profile.to_dict(),
+              "kernel_profile": (kernel_profile.to_dict()
+                                 if kernel_profile is not None else None),
               "clock_profile": assembly["clock_profile"],
               "clock": clock, "memory": variant["memory"], "flash": variant["flash"],
               "layout": layout, "controllers": selected, "devices": assembly["devices"],
@@ -734,6 +745,8 @@ def generate(result, output):
     write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
                                       else result, indent=2, sort_keys=True) + "\n")
     profile = cpu_profiles.CpuProfileIR.from_validated(result["cpu_profile"])
+    policy = (kernel.KernelProfileIR.from_validated(result["kernel_profile"])
+              if result.get("kernel_profile") is not None else None)
     header = ["/* Generated from the sole resolved configuration. */",
               "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
               f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
@@ -742,10 +755,11 @@ def generate(result, output):
               f'#define NEXUS_HSE_HZ {result["clock"]["hse_hz"]}u',
               f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
               f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
-              *cpu_profiles.header_lines(profile)]
+              *cpu_profiles.header_lines(profile), *kernel.header_lines(policy)]
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
              *cpu_profiles.selection_lines(profile),
+             *kernel.selection_lines(policy),
              f'set(NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}")',
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',

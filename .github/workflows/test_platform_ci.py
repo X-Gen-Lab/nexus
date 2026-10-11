@@ -48,7 +48,8 @@ class WorkflowContracts(unittest.TestCase):
         configured = {p['name'] for p in presets['configurePresets']}
         self.assertLessEqual(selected, configured)
         native = set(jobs['native']['strategy']['matrix']['preset'])
-        self.assertEqual(native, {'native-debug', 'native-release', 'native-asan'})
+        self.assertEqual(native, {'native-debug', 'native-release', 'native-asan',
+                                  'native-tsan'})
         self.assertLessEqual(native, configured)
         for name in ('arm', 'native'):
             commands = '\n'.join(s.get('run', '') for s in jobs[name]['steps'])
@@ -115,6 +116,36 @@ class WorkflowContracts(unittest.TestCase):
         evidence = [step for step in job['steps']
                     if step.get('name') == 'Preserve compiler evidence'][0]
         self.assertIn('build/cortex-runtime/', evidence['with']['path'])
+
+    def test_os_cost_and_profile_gates_retain_actual_execution_artifacts(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        evidence = next(step for step in job['steps']
+                        if step.get('name') == 'Preserve compiler evidence')
+        for name in ('os_profiles', 'os_wait_cost', 'os_resources'):
+            self.assertEqual(commands.count('scripts/ci/' + name + '.py'), 1)
+            directory = 'build/' + name.replace('_', '-')
+            self.assertIn('--output ' + directory, commands)
+            self.assertIn(directory + '/', evidence['with']['path'])
+        native = workflow('build-matrix.yml')['jobs']['native']
+        execute = next(step for step in native['steps']
+                       if 'scripts/ci/native_contracts.py' in step.get('run', ''))
+        self.assertEqual(execute['env']['TSAN_OPTIONS'], 'halt_on_error=1')
+
+    def test_optional_os_security_has_actual_link_gates_and_artifacts(self):
+        job = workflow('build-matrix.yml')['jobs']['os-security']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        evidence = next(step for step in job['steps']
+                        if step.get('name') == 'Preserve security link evidence')
+        for name in ('os_mpu', 'os_secure_runtime'):
+            directory = 'build/' + name.replace('_', '-')
+            self.assertEqual(commands.count('scripts/ci/' + name + '.py'), 1)
+            self.assertIn('--output ' + directory, commands)
+            self.assertIn(directory + '/', evidence['with']['path'])
+            execute = next(step for step in job['steps']
+                           if 'scripts/ci/' + name + '.py' in
+                           step.get('run', ''))
+            self.assertIn('--compiler arm-none-eabi-gcc', execute['run'])
 
 
 class CTestAdmission(unittest.TestCase):

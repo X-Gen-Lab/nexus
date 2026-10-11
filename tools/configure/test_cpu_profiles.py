@@ -167,6 +167,26 @@ class CpuProfileTests(unittest.TestCase):
                                        irq(arch), "freertos")
             self.assertEqual(profile.irq.kernel_port, port)
 
+    def test_v8_single_world_is_not_inferred_as_nonsecure_execution(self):
+        for arch in ("cortex-m23", "cortex-m33", "cortex-m55", "cortex-m85"):
+            for security, expected in (("single", 1), ("secure", 1),
+                                       ("nonsecure", 0)):
+                for backend in ("baremetal", "freertos"):
+                    with self.subTest(arch=arch, security=security, backend=backend):
+                        profile = self.cpu.resolve(facts(arch, security=security),
+                                                   irq(arch), backend)
+                        self.assertEqual(profile.definitions["NEXUS_CPU_SECURE_ONLY"],
+                                         expected)
+                        self.assertEqual("-mcmse" in profile.compile_options,
+                                         security == "secure")
+                        self.assertEqual(profile.definitions["NEXUS_ARCH_SECURITY_STATE"],
+                                         {"single": 0, "secure": 1,
+                                          "nonsecure": 2}[security])
+        for arch in ("cortex-m0", "cortex-m0plus", "cortex-m3", "cortex-m4", "cortex-m7"):
+            with self.subTest(arch=arch):
+                profile = self.cpu.resolve(facts(arch), irq(arch), "freertos")
+                self.assertEqual(profile.definitions["NEXUS_CPU_SECURE_ONLY"], 0)
+
     def test_irq_width_and_count_do_not_overstate_the_architecture(self):
         for arch, record in (("cortex-m0", {"priority_bits": 4,
                                              "external_count": 32}),

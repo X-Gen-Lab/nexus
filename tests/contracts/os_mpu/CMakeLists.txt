@@ -1,0 +1,21 @@
+# Link real MPU kernel ports through the production Runtime graph.
+cmake_minimum_required(VERSION 3.31)
+project(nexus_os_mpu_contract LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT NEXUS_RUNTIME_ASSEMBLY OR NOT NEXUS_TEST_MPU_VERSION MATCHES "^[78]$")
+    message(FATAL_ERROR "MPU fixture requires an assembly and explicit MPU version")
+endif()
+get_filename_component(nexus_source "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+include("${nexus_source}/cmake/platform/Runtime.cmake")
+nexus_add_runtime(ASSEMBLY "${NEXUS_RUNTIME_ASSEMBLY}")
+add_executable(nexus_os_mpu main.c)
+target_link_libraries(nexus_os_mpu PRIVATE Nexus::Runtime)
+if(NEXUS_TEST_MPU_MISSING_IDLE_PROVIDER)
+    target_compile_definitions(nexus_os_mpu PRIVATE
+        NEXUS_TEST_MPU_MISSING_IDLE_PROVIDER=1)
+endif()
+set(runtime_linker "${CMAKE_CURRENT_LIST_DIR}/linker-v${NEXUS_TEST_MPU_VERSION}.ld")
+target_link_options(nexus_os_mpu PRIVATE "-T${runtime_linker}"
+    "-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/nexus_os_mpu.map")
+set_target_properties(nexus_os_mpu PROPERTIES SUFFIX ".elf")
+set_property(TARGET nexus_os_mpu APPEND PROPERTY LINK_DEPENDS "${runtime_linker}")

@@ -21,12 +21,14 @@ static uint32_t notify_arm(void* context) {
 static nx_result_t notify_wait(void* context, uint32_t sequence,
                                uint64_t deadline_us) {
     nx_baremetal_notify_t* notification = context;
+    if (deadline_us != NX_DEADLINE_NEVER &&
+        notification->now_us(notification->clock_context) >= deadline_us) {
+        return NX_ERROR_TIMEOUT;
+    }
     if (notify_arm(context) != sequence) {
         return NX_SUCCESS;
     }
-    return notification->now_us(notification->clock_context) >= deadline_us
-               ? NX_ERROR_TIMEOUT
-               : NX_ERROR_BUSY;
+    return NX_ERROR_BUSY;
 }
 
 /** \brief Publish a wake without allocation or a completion queue. */

@@ -14,6 +14,7 @@ software evidence are separate from physical hardware qualification.
 
    getting_started
    architecture
+   os
    configuration
    migration
    support

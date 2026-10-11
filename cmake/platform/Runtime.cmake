@@ -26,6 +26,12 @@ function(nexus_add_runtime)
             message(FATAL_ERROR "${override} is not a runtime override; use ASSEMBLY")
         endif()
     endforeach()
+    get_cmake_property(runtime_cache_variables CACHE_VARIABLES)
+    foreach(override IN LISTS runtime_cache_variables)
+        if(override MATCHES "^NEXUS_(CPU|ARCH|IRQ|OS)_")
+            message(FATAL_ERROR "${override} is not a runtime override; use ASSEMBLY")
+        endif()
+    endforeach()
     get_filename_component(NEXUS_SOURCE_DIR
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
     set(NEXUS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/nexus-runtime")
@@ -57,6 +63,7 @@ function(nexus_add_runtime)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
         "${NEXUS_SOURCE_DIR}/tools/configure/runtime.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/cpu.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/common.py")
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
@@ -81,3 +88,5 @@ function(nexus_add_runtime)
     add_library(Nexus::Runtime ALIAS nexus_runtime)
     message(STATUS "Nexus CPU runtime: ${NEXUS_CPU_ARCH}/${NEXUS_BACKEND}")
 endfunction()
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../os/freertos/secure/Integration.cmake")

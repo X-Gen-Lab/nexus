@@ -98,7 +98,7 @@ def ctest_names(plan, binaries):
 def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preset", required=True, choices=(
-        "native-debug", "native-release", "native-asan"))
+        "native-debug", "native-release", "native-asan", "native-tsan"))
     args = parser.parse_args(arguments)
     try:
         build = selected_build(args.preset)

@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import quality_tools
 from quality_tools import commands, compiler_query, run
 
 
@@ -86,6 +87,17 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
         self.assertEqual(selected[0]["nexus_production_source"],
                          "tests/contracts/os_freertos_runtime/posix_event.c")
+
+    def test_owned_posix_idle_signal_progress_is_analyzed(self):
+        support = self.root / "tests/contracts/os_freertos_runtime/posix_idle.c"
+        support.parent.mkdir(parents=True)
+        support.write_text("int idle_support;\n")
+        self.database([support])
+        selected = commands(self.root, self.build)
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["nexus_analysis_scope"], "host-model")
+        self.assertEqual(selected[0]["nexus_production_source"],
+                         "tests/contracts/os_freertos_runtime/posix_idle.c")
 
     def test_register_models_use_actual_production_compilation_entries(self):
         source = self.root / "soc/gd32f470/drivers/uart.c"
@@ -310,6 +322,170 @@ class RequiredAnalysisTests(unittest.TestCase):
         entry = {"directory": str(self.root), "file": str(self.source), "arguments": ["cc", "@unexpanded.rsp", "-c", str(self.source)]}
         with self.assertRaises(ValueError):
             compiler_query(entry)
+
+    def cppcheck_importer_fixture(self):
+        """Model the observed 2.13 importer boundary, use the real compiler."""
+        tool = self.root / 'system-import-consumer'
+        self.analyzer_log = self.root / 'system-consumer.jsonl'
+        tool.write_text(
+            f'#!{sys.executable}\nimport json, pathlib, shlex, subprocess, sys\n'
+            "if '--version' in sys.argv: print('Cppcheck importer boundary fixture'); sys.exit(0)\n"
+            "database = pathlib.Path(next(a.split('=', 1)[1] for a in sys.argv if a.startswith('--project=')))\n"
+            "entries = json.loads(database.read_text()); assert len(entries) == 1\n"
+            "entry = entries[0]; argv = entry.get('arguments') or shlex.split(entry['command'])\n"
+            # Actual Cppcheck 2.13 ignores these compilation-database arguments.
+            # All other flags/configuration remain intact in this process model.
+            "imported = []; index = 0\n"
+            "while index < len(argv):\n"
+            " if argv[index] == '-isystem': index += 2; continue\n"
+            " if argv[index].startswith('-isystem'): index += 1; continue\n"
+            " imported.append(argv[index]); index += 1\n"
+            "result = subprocess.run(imported, cwd=entry['directory'])\n"
+            f"with open({str(self.analyzer_log)!r}, 'a') as log: log.write(json.dumps(entry) + '\\n')\n"
+            "sys.exit(result.returncode)\n")
+        tool.chmod(0o700)
+        return str(tool)
+
+    def test_cppcheck_restores_each_actual_system_header_context(self):
+        self.assertIsNotNone(shutil.which('cc'), 'Real compiler required')
+        entries = []
+        self.source.write_text(
+            '#include <context.h>\n'
+            '#if PROFILE_VALUE != EXPECTED_VALUE\n'
+            '#error "different compilation header context"\n'
+            '#endif\nint sample(void) { return PROFILE_VALUE; }\n')
+        for label, value in [('first', 17), ('second', 23)]:
+            headers = self.root / ('system headers ' + label)
+            headers.mkdir()
+            (headers / 'context.h').write_text(f'#define EXPECTED_VALUE {value}\n')
+            argv = ['cc', '-isystem', str(headers), f'-DPROFILE_VALUE={value}',
+                    '-std=c11', '-c', str(self.source), '-o', str(self.root / (label + '.o'))]
+            real = subprocess.run(argv, capture_output=True, text=True, timeout=30)
+            self.assertEqual(real.returncode, 0, real.stdout + real.stderr)
+            entries.append({'directory': str(self.root), 'file': str(self.source),
+                            'arguments': argv})
+        (self.build / 'compile_commands.json').write_text(json.dumps(entries))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 0,
+                         self.report.read_text())
+        consumed = [json.loads(line) for line in self.analyzer_log.read_text().splitlines()]
+        self.assertEqual(len(consumed), 2)
+        for index, value in enumerate([17, 23]):
+            self.assertIn(f'-DPROFILE_VALUE={value}', consumed[index]['arguments'])
+            self.assertIn(str(self.root / ('system headers ' + ['first', 'second'][index])),
+                          consumed[index]['arguments'])
+        self.assertEqual(json.loads((self.build / 'compile_commands.json').read_text()), entries)
+
+    def test_cppcheck_preserves_gnu_regular_before_system_header_priority(self):
+        regular = self.root / 'regular headers'
+        system = self.root / 'system headers'
+        regular.mkdir(); system.mkdir()
+        (regular / 'shared.h').write_text('#define SHARED_VALUE 17\n')
+        (system / 'shared.h').write_text('#define SHARED_VALUE 23\n')
+        (system / 'system_only.h').write_text('#define SYSTEM_VALUE 41\n')
+        self.source.write_text(
+            '#include <shared.h>\n#include <system_only.h>\n'
+            '#if SHARED_VALUE != 17 || SYSTEM_VALUE != 41\n'
+            '#error "GNU include priority changed"\n'
+            '#endif\nint sample(void) { return SHARED_VALUE; }\n')
+        # GNU searches -I directories before -isystem irrespective of argv order.
+        argv = ['cc', '-isystem', str(system), '-I', str(regular), '-std=c11',
+                '-c', str(self.source), '-o', str(self.root / 'priority.o')]
+        real = subprocess.run(argv, capture_output=True, text=True, timeout=30)
+        self.assertEqual(real.returncode, 0, real.stdout + real.stderr)
+        (self.build / 'compile_commands.json').write_text(json.dumps([
+            {'directory': str(self.root), 'file': str(self.source),
+             'command': shlex.join(argv)}]))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 0,
+                         self.report.read_text())
+
+    def test_system_projection_preserves_joined_paths_abi_and_literal_defines(self):
+        argv = ['arm-none-eabi-gcc', '-isystemsystem headers', '-mcpu=cortex-m4',
+                '-mthumb', '-DOPAQUE=-isystem;$(literal)', '-Iregular',
+                '-UOTHER', '-c', str(self.source), '-o', 'discard.o']
+        entry = {'directory': str(self.root), 'file': str(self.source),
+                 'command': shlex.join(argv)}
+        original = json.loads(json.dumps(entry))
+        projected = quality_tools.cppcheck_compilation_entry(entry)
+        self.assertEqual(projected['arguments'], [*argv[:1], *argv[2:],
+                                                  '-I', 'system headers'])
+        self.assertEqual(entry, original)
+        self.assertNotIn('command', projected)
+
+    def test_missing_system_include_argument_fails_before_analysis(self):
+        entry = {'directory': str(self.root), 'file': str(self.source),
+                 'arguments': ['cc', '-c', str(self.source), '-isystem']}
+        with self.assertRaisesRegex(ValueError, 'system include'):
+            quality_tools.cppcheck_compilation_entry(entry)
+
+    def test_sysroot_relative_system_paths_require_explicit_expansion(self):
+        for directory in ('=/usr/include', '$SYSROOT/usr/include'):
+            with self.subTest(directory=directory):
+                entry = {'directory': str(self.root), 'file': str(self.source),
+                         'arguments': ['cc', '-isystem', directory, '-c', str(self.source)]}
+                with self.assertRaisesRegex(ValueError, 'system include'):
+                    quality_tools.cppcheck_compilation_entry(entry)
+
+    def header_scope_case(self, header, *, system=True):
+        header.parent.mkdir(parents=True, exist_ok=True)
+        if not header.exists():
+            header.write_text('extern int first, last;\n'
+                              'static inline int compare(void) {return &first < &last;}\n')
+        self.source.write_text(f'#include "{header}"\nint sample(void) {{return compare();}}\n')
+        entry = {'directory': str(self.root), 'file': str(self.source),
+                 'arguments': ['cc', '-isystem' if system else '-I',
+                               str(header.parent), '-c', str(self.source)]}
+        (self.build / 'compile_commands.json').write_text(json.dumps([entry]))
+        tool = self.root / 'header-ownership-analyzer'
+        tool.write_text(
+            f'#!{sys.executable}\nimport sys\n'
+            "if '--version' in sys.argv: print('header ownership fixture'); sys.exit(0)\n"
+            f"if {'--suppress=*:' + str(header)!r} in sys.argv: sys.exit(0)\n"
+            "print('<results><errors><error id=\"comparePointers\" severity=\"error\">')\n"
+            f"print('<location file=\"{header}\" line=\"2\"/></error></errors></results>')\n"
+            'sys.exit(2)\n')
+        tool.chmod(0o700)
+        return run('cppcheck', self.root, self.build, str(tool), self.report)
+
+    def test_exact_declared_external_system_header_is_outside_owned_checks(self):
+        header = self.root / 'vendors/fixture/include/header.h'
+        self.assertEqual(self.header_scope_case(header), 0, self.report.read_text())
+        self.assertIn('External system header exclusions:', self.report.read_text())
+        self.assertIn(str(header), self.report.read_text())
+
+    def test_owned_headers_are_checked_even_with_system_include_flags(self):
+        for system in (False, True):
+            with self.subTest(system=system):
+                header = self.root / 'os/include/header.h'
+                self.assertEqual(self.header_scope_case(header, system=system), 1)
+                self.assertIn('Exit code: 2', self.report.read_text())
+                self.assertIn('comparePointers', self.report.read_text())
+                self.assertNotIn('--suppress=*:' + str(header), self.report.read_text())
+
+    def test_external_implementation_file_is_not_a_header_exclusion(self):
+        header = self.root / 'ext/fixture/include/body.c'
+        self.assertEqual(self.header_scope_case(header), 1)
+        self.assertIn('Exit code: 2', self.report.read_text())
+        self.assertNotIn('--suppress=*:' + str(header), self.report.read_text())
+
+    def test_vendor_header_without_declared_system_scope_is_checked(self):
+        header = self.root / 'vendors/fixture/include/header.h'
+        self.assertEqual(self.header_scope_case(header, system=False), 1)
+        self.assertIn('Exit code: 2', self.report.read_text())
+        self.assertNotIn('--suppress=*:' + str(header), self.report.read_text())
+
+    def test_external_header_symlink_cannot_hide_owned_code(self):
+        owned = self.root / 'os/owned.h'
+        owned.parent.mkdir()
+        owned.write_text('extern int first, last;\n'
+                         'static inline int compare(void) {return &first < &last;}\n')
+        header = self.root / 'vendors/fixture/include/alias.h'
+        header.parent.mkdir(parents=True)
+        header.symlink_to(owned)
+        self.assertEqual(self.header_scope_case(header), 1)
+        self.assertIn('Exit code: 2', self.report.read_text())
+        self.assertNotIn('--suppress=*:' + str(header), self.report.read_text())
 
 
 if __name__ == "__main__":

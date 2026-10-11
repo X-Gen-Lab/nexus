@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        preset: [native-debug, native-release, native-asan]
+        preset: [native-debug, native-release, native-asan, native-tsan]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -38,6 +38,7 @@ jobs:
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
           UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+          TSAN_OPTIONS: halt_on_error=1
       - name: Preserve execution evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -77,6 +78,18 @@ jobs:
           --root "$GITHUB_WORKSPACE"
           --compiler arm-none-eabi-gcc
           --output build/cortex-runtime
+      - name: Verify explicit kernel profiles and missing hook rejection
+        run: >-
+          .venv/bin/python scripts/ci/os_profiles.py
+          --output build/os-profiles
+      - name: Compare actual wait ABI RAM and instruction costs
+        run: >-
+          .venv/bin/python scripts/ci/os_wait_cost.py
+          --output build/os-wait-cost
+      - name: Measure actual static OS objects and retained service paths
+        run: >-
+          .venv/bin/python scripts/ci/os_resources.py
+          --output build/os-resources
       - name: Preserve compiler evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -85,8 +98,46 @@ jobs:
           path: |
             build/arch-compiler/
             build/cortex-runtime/
+            build/os-profiles/
+            build/os-wait-cost/
+            build/os-resources/
           if-no-files-found: error
       # CPU reference links do not qualify a physical SoC, Board or hardware.
+
+  os-security:
+    name: Optional MPU and TrustZone software contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-build
+        with:
+          preset: native-debug
+          arm: 'true'
+      - name: Link real MPU ports and audit privilege domains
+        run: >-
+          .venv/bin/python scripts/ci/os_mpu.py
+          --compiler arm-none-eabi-gcc
+          --output build/os-mpu
+      - name: Link Secure and Nonsecure images through actual CMSE imports
+        run: >-
+          .venv/bin/python scripts/ci/os_secure_runtime.py
+          --compiler arm-none-eabi-gcc
+          --output build/os-secure-runtime
+      - name: Preserve security link evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: os-security-link-contracts
+          path: |
+            build/os-mpu/
+            build/os-secure-runtime/
+          if-no-files-found: error
+      # CPU software fixtures establish linkage and ownership. Physical fault
+      # injection, SAU/IDAU wiring and isolation remain station qualification.
 
   arm:
     name: ARM link and budgets (${{ matrix.preset }})

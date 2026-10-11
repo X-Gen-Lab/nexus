@@ -5,6 +5,7 @@
  */
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
+#include "nexus/os/tick.h"
 #include "nexus_config.h"
 #include <stdint.h>
 
@@ -17,32 +18,34 @@ extern "C" {
 /* MVE and scalar FP share the coprocessor register bank and extended exception
  * frame. This kernel switch enables its context/lazy-frame initialization; CPU
  * facts and +nofp compiler flags still distinguish integer-only MVE from FP. */
-#define configENABLE_FPU                             (NEXUS_CPU_HAS_FPU || NEXUS_CPU_HAS_MVE)
-#define configENABLE_MVE                             NEXUS_CPU_HAS_MVE
-#define configENABLE_MPU                             0
-#define configENABLE_TRUSTZONE                       0
-#define configRUN_FREERTOS_SECURE_ONLY               NEXUS_CPU_SECURE_ONLY
-#define configCPU_CLOCK_HZ                           NEXUS_CORE_HZ
-#define configTICK_RATE_HZ                           1000u
-#define configMAX_PRIORITIES                         8
-#define configMINIMAL_STACK_SIZE                     128u
-#define configMAX_TASK_NAME_LEN                      16
-#define configUSE_16_BIT_TICKS                       0
-#define configIDLE_SHOULD_YIELD                      1
-#define configUSE_TASK_NOTIFICATIONS                 1
-#define configTASK_NOTIFICATION_ARRAY_ENTRIES        1
-#define configSUPPORT_STATIC_ALLOCATION              1
-#define configKERNEL_PROVIDED_STATIC_MEMORY          1
+#define configENABLE_FPU                      (NEXUS_CPU_HAS_FPU || NEXUS_CPU_HAS_MVE)
+#define configENABLE_MVE                      NEXUS_CPU_HAS_MVE
+#define configENABLE_MPU                      NEXUS_OS_MEMORY_PROTECTION
+#define configENABLE_TRUSTZONE                NEXUS_OS_TRUSTZONE
+#define configRUN_FREERTOS_SECURE_ONLY        NEXUS_CPU_SECURE_ONLY
+#define configCPU_CLOCK_HZ                    NEXUS_CORE_HZ
+#define configTICK_RATE_HZ                    NEXUS_OS_TICK_HZ
+#define configMAX_PRIORITIES                  NEXUS_OS_MAX_PRIORITIES
+#define configMINIMAL_STACK_SIZE              NEXUS_OS_IDLE_STACK_WORDS
+#define configMAX_TASK_NAME_LEN               NEXUS_OS_MAX_TASK_NAME_LEN
+#define configUSE_16_BIT_TICKS                0
+#define configIDLE_SHOULD_YIELD               1
+#define configUSE_TASK_NOTIFICATIONS          NEXUS_OS_TASK_NOTIFICATIONS
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES NEXUS_OS_NOTIFICATION_SLOTS
+#define configSUPPORT_STATIC_ALLOCATION       1
+/* MPU storage and split-world Idle identities are composed by the consumer. */
+#define configKERNEL_PROVIDED_STATIC_MEMORY                                    \
+    (!NEXUS_OS_MEMORY_PROTECTION && !NEXUS_OS_TRUSTZONE)
 #define configSUPPORT_DYNAMIC_ALLOCATION             0
-#define configUSE_MUTEXES                            1
+#define configUSE_MUTEXES                            NEXUS_OS_MUTEXES
 #define configUSE_RECURSIVE_MUTEXES                  0
-#define configUSE_COUNTING_SEMAPHORES                1
+#define configUSE_COUNTING_SEMAPHORES                NEXUS_OS_COUNTING_SEMAPHORES
 #define configUSE_TIMERS                             0
 #define configTIMER_TASK_STACK_DEPTH                 configMINIMAL_STACK_SIZE
 #define configUSE_CO_ROUTINES                        0
-#define configUSE_TRACE_FACILITY                     0
+#define configUSE_TRACE_FACILITY                     NEXUS_OS_TRACE
 #define configUSE_STATS_FORMATTING_FUNCTIONS         0
-#define configGENERATE_RUN_TIME_STATS                0
+#define configGENERATE_RUN_TIME_STATS                NEXUS_OS_RUNTIME_STATS
 #define configCHECK_FOR_STACK_OVERFLOW               2
 #define configUSE_IDLE_HOOK                          0
 #define configUSE_TICK_HOOK                          0
@@ -63,6 +66,48 @@ extern "C" {
 #define vPortSVCHandler                     SVC_Handler
 #define xPortPendSVHandler                  PendSV_Handler
 #define xPortSysTickHandler                 SysTick_Handler
+
+#if NEXUS_OS_MEMORY_PROTECTION
+#define configUSE_MPU_WRAPPERS_V1                   0
+#define configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY 1
+#define configTOTAL_MPU_REGIONS                     NEXUS_CPU_MPU_REGIONS
+#define configSYSTEM_CALL_STACK_SIZE                NEXUS_OS_SYSTEM_CALL_STACK_WORDS
+#define configENABLE_ACCESS_CONTROL_LIST            0
+#define configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS  0
+#endif
+
+#if NEXUS_OS_TRUSTZONE
+/* Requested capacity only: the Secure image supplies its actual sealed stack
+ * and trusted immutable mapping for the caller-owned Nonsecure Idle TCB. */
+#define configMINIMAL_SECURE_STACK_SIZE NEXUS_OS_SECURE_IDLE_STACK_BYTES
+#endif
+
+#if NEXUS_OS_TICKLESS
+/* Custom suppression owns the sleep clock and Tick phase explicitly. The
+ * vendor's SysTick-only suppression path is never silently selected. */
+#define configUSE_TICKLESS_IDLE 2
+#define portSUPPRESS_TICKS_AND_SLEEP(ticks)                                    \
+    nx_freertos_suppress_ticks_and_sleep((uint32_t)(ticks))
+#else
+#define configUSE_TICKLESS_IDLE 0
+#endif
+
+#if NEXUS_OS_RUNTIME_STATS
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()                               \
+    nx_freertos_runtime_counter_start()
+#define portGET_RUN_TIME_COUNTER_VALUE() nx_freertos_runtime_counter_now()
+#endif
+
+#if NEXUS_OS_TRACE
+#include "nexus/os/freertos_diagnostics.h"
+#define traceTASK_SWITCHED_IN()                                                \
+    nx_freertos_trace_event(NX_FREERTOS_TRACE_SWITCH_IN,                       \
+                            (uintptr_t)pxCurrentTCB, 0u)
+#define traceTASK_CREATE(task)                                                 \
+    nx_freertos_trace_event(NX_FREERTOS_TRACE_CREATE, (uintptr_t)(task), 0u)
+#define traceTASK_DELETE(task)                                                 \
+    nx_freertos_trace_event(NX_FREERTOS_TRACE_DELETE, (uintptr_t)(task), 0u)
+#endif
 
 /**
  * \brief           Stop an invariant violation before continuing corrupted

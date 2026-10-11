@@ -101,6 +101,27 @@ typedef struct {
  */
 nx_result_t nx_native_uart_configure(const nx_native_uart_config_t* config);
 /**
+ * \brief           Copy explicit IRQ facts into a quiescent host UART model.
+ *
+ * \param[in]       binding: Configured Native UART face with no IRQ users.
+ *
+ * \param[in]       policy: Immutable CPU/kernel facts copied during this call.
+ *
+ * \param[in]       source: Actual modeled publisher facts copied during call.
+ *
+ * \return          Success, INVALID, CONTEXT, STATE or BUSY before side
+ * effects.
+ *
+ * \note            Task-only cold configuration; caller has stopped publishers.
+ *                  No active request, stream or attached wake may remain.
+ *                  Default preparation explicitly models BASEPRI/four-bit IRQs;
+ *                  this entry can model Baseline without inventing a SoC/Board.
+ */
+nx_result_t nx_native_uart_model_irq_configure(const nx_uart_port_t* binding,
+                                               const nx_irq_policy_t* policy,
+                                               const nx_irq_source_t* source);
+
+/**
  * \brief           Execute one deterministic TX IRQ byte/TC event.
  *
  * \note            No actual hardware IRQ, latency or wire timing is

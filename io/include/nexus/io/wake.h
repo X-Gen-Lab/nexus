@@ -29,30 +29,57 @@ typedef struct {
     bool calls_kernel;
 } nx_irq_wake_t;
 
+/** \brief Explicit kernel interrupt-mask policy, independent of any RTOS. */
+typedef enum {
+    NX_IRQ_KERNEL_NONE = 0,
+    NX_IRQ_KERNEL_PRIMASK = 1,
+    NX_IRQ_KERNEL_BASEPRI = 2
+} nx_irq_kernel_policy_t;
+
 /**
- * \brief           Reject wake targets that would call a kernel above its
- *                  ceiling.
+ * \brief           Immutable CPU and kernel facts for cold wake binding.
+ *
+ * \note            NONE and PRIMASK require a zero syscall ceiling. BASEPRI
+ *                  requires a nonzero unshifted ceiling. Configuration owns
+ *                  these facts; a wake target cannot weaken them.
+ */
+typedef struct {
+    nx_irq_kernel_policy_t kernel;
+    uint16_t external_irq_count;
+    uint8_t priority_bits;
+    uint8_t syscall_ceiling;
+} nx_irq_policy_t;
+
+/** \brief Actual publisher facts read before attaching any borrowed sink. */
+typedef struct {
+    int16_t irq_number;
+    uint8_t priority;
+    uint8_t priority_group;
+} nx_irq_source_t;
+
+/**
+ * \brief           Validate actual IRQ facts against an explicit kernel policy.
  *
  * \param[in]       wake: Optional immutable target; NULL disables notification.
  *
- * \param[in]       priority: Unshifted NVIC priority of the actual publisher
- *                  IRQ.
+ * \param[in]       policy: Immutable validated CPU and kernel configuration.
  *
- * \param[in]       priority_bits: Implemented NVIC priority width, one through
- *                  eight.
+ * \param[in]       source: External IRQ number, unshifted priority and group.
  *
- * \param[in]       syscall_ceiling: Unshifted minimum kernel-safe IRQ priority.
+ * \return          Success, INVALID for malformed facts/target, PERMISSION
+ *                  for a kernel-calling target in an unsafe interrupt domain.
  *
- * \return          Success, INVALID for malformed priorities/target, PERMISSION
- *                  for a kernel-calling target at an unsafe IRQ priority.
- *
- * \note            Cold check without attachment or callback effects.
- *                  Numerically smaller priorities are more urgent on maintained
- *                  Cortex-M.
+ * \note            Cold check without attachment or callback effects. No
+ *                  kernel target is accepted by NONE. PRIMASK permits every
+ *                  valid configurable IRQ with its fixed zero priority group.
+ *                  Kernel-calling BASEPRI targets require the maintained
+ *                  preemption grouping and a numerical priority at least the
+ *                  ceiling. Nonkernel hints do not impose kernel grouping.
+ *                  Binding does not authorize future CPU-context violations.
  */
-nx_result_t nx_irq_wake_validate(const nx_irq_wake_t* wake, uint8_t priority,
-                                 uint8_t priority_bits,
-                                 uint8_t syscall_ceiling);
+nx_result_t nx_irq_wake_validate(const nx_irq_wake_t* wake,
+                                 const nx_irq_policy_t* policy,
+                                 const nx_irq_source_t* source);
 
 /**
  * \brief           Deliver one bounded hint after authoritative state is

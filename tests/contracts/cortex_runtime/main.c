@@ -17,6 +17,7 @@
 #include "nexus/arch/cache.h"
 #include "nexus/arch/mpu.h"
 #include "nexus/arch/security.h"
+#include "nexus/arch/sleep.h"
 #include "nexus/core/request.h"
 #include "nexus/os/baremetal.h"
 #include "nexus_config.h"
@@ -103,6 +104,10 @@ void _start(void) {
     nx_arch_dmb();
     nx_arch_dsb();
     nx_arch_isb();
+    bool slept = false;
+    result_sink += (uint32_t)nx_arch_wait_for_interrupt();
+    result_sink +=
+        (uint32_t)nx_arch_idle_if_unchanged(&atomic_word, 0u, &slept);
     uint32_t cycles = 0;
     result_sink += (uint32_t)nx_arch_cycle_snapshot(&cycles);
     nx_arch_features_t features = nx_arch_features();
@@ -157,9 +162,15 @@ void _start(void) {
 #if defined(NEXUS_BACKEND_FREERTOS)
     static nx_freertos_notify_t notification;
     static nx_freertos_task_t task;
-    static StackType_t stack[128];
+    _Alignas(portBYTE_ALIGNMENT) static StackType_t stack[128];
+    static nx_freertos_permanent_task_t permanent;
+    _Alignas(portBYTE_ALIGNMENT) static StackType_t permanent_stack[128];
+    static nx_freertos_direct_notify_t direct;
     static nx_freertos_queue_t queue;
+    static nx_freertos_closable_queue_t closable;
+    static nx_freertos_queue_waiter_t waiter;
     static uint8_t items[8];
+    static uint8_t closable_items[8];
     result_sink += (uint32_t)nx_freertos_notify_init(&notification);
     nx_wait_port_t port = nx_freertos_notify_port(&notification);
     result_sink += (uint32_t)nx_wait_until(&port, fixture_ready, NULL, 0);
@@ -167,11 +178,31 @@ void _start(void) {
     result_sink += (uint32_t)nx_freertos_task_start(
         &task, "reference", stack, 128u, 1u, fixture_task, NULL);
     result_sink += (uint32_t)nx_freertos_task_join(&task, 0);
+    result_sink +=
+        (uint32_t)nx_freertos_direct_notify_init(&direct, task.handle, 0u);
+    nx_wait_port_t direct_port = nx_freertos_direct_notify_port(&direct);
+    result_sink +=
+        (uint32_t)nx_wait_until(&direct_port, fixture_ready, NULL, 0);
+    result_sink += (uint32_t)nx_freertos_direct_notify_destroy(&direct);
+    result_sink += (uint32_t)nx_freertos_permanent_task_start(
+        &permanent, "permanent", permanent_stack, 128u, 1u, fixture_task, NULL);
     result_sink += (uint32_t)nx_freertos_queue_init(&queue, items, 8u, 2u, 4u);
     result_sink += (uint32_t)nx_freertos_queue_send(&queue, items, 0);
     result_sink += (uint32_t)nx_freertos_queue_receive(&queue, items, 0);
+    result_sink += (uint32_t)nx_freertos_queue_send_until(&queue, items, 0);
+    result_sink += (uint32_t)nx_freertos_queue_receive_until(&queue, items, 0);
     result_sink += (uint32_t)nx_freertos_queue_destroy(&queue);
     result_sink += (uint32_t)nx_freertos_notify_destroy(&notification);
+    result_sink += (uint32_t)nx_freertos_queue_waiter_init(&waiter);
+    result_sink += (uint32_t)nx_freertos_closable_queue_init(
+        &closable, closable_items, 8u, 2u, 4u, 1u);
+    result_sink += (uint32_t)nx_freertos_closable_queue_send_until(
+        &closable, closable_items, 0, &waiter);
+    result_sink += (uint32_t)nx_freertos_closable_queue_receive_until(
+        &closable, closable_items, 0, &waiter);
+    result_sink += (uint32_t)nx_freertos_closable_queue_close(&closable);
+    result_sink += (uint32_t)nx_freertos_closable_queue_destroy(&closable);
+    result_sink += (uint32_t)nx_freertos_queue_waiter_destroy(&waiter);
     vTaskStartScheduler();
 #else
     nx_baremetal_notify_t notification;

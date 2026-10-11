@@ -7,6 +7,37 @@ import cortex_runtime as gate
 
 
 class RuntimeAuditTests(unittest.TestCase):
+    def test_runtime_retains_new_sleep_and_static_service_bodies(self):
+        sleep = {'nx_arch_wait_for_interrupt', 'nx_arch_idle_if_unchanged'}
+        services = {
+            'nx_freertos_queue_send_until', 'nx_freertos_queue_receive_until',
+            'nx_freertos_direct_notify_init', 'nx_freertos_direct_notify_port',
+            'nx_freertos_direct_notify_destroy',
+            'nx_freertos_permanent_task_start',
+            'nx_freertos_queue_waiter_init',
+            'nx_freertos_queue_waiter_destroy',
+            'nx_freertos_closable_queue_init',
+            'nx_freertos_closable_queue_send_until',
+            'nx_freertos_closable_queue_receive_until',
+            'nx_freertos_closable_queue_close',
+            'nx_freertos_closable_queue_destroy',
+        }
+        self.assertLessEqual(sleep, gate.required_symbols('baremetal'))
+        self.assertLessEqual(sleep | services,
+                             gate.required_symbols('freertos'))
+
+    def test_source_manifest_includes_the_kernel_configuration_authority(self):
+        root = Path(__file__).resolve().parents[2]
+        identities = gate.source_inputs(root)
+        self.assertIn(str(root / 'tools/configure/kernel.py'),
+                      {item['path'] for item in identities})
+
+    def test_source_manifest_binds_reviewed_mpu_port_derivation(self):
+        root = Path(__file__).resolve().parents[2]
+        identities = gate.source_inputs(root)
+        self.assertIn(str(root / 'os/freertos/mpu/prepare_port.py'),
+                      {item['path'] for item in identities})
+
     def test_matrix_resolves_every_backend_without_board_identity(self):
         matrix = gate.matrix()
         self.assertEqual(len(matrix), 104)
@@ -80,7 +111,8 @@ class RuntimeAuditTests(unittest.TestCase):
                      'arch/cortex_m/nx_arch_cortex_m.c',
                      'arch/cortex_m/nx_arch_cache.c',
                      'arch/cortex_m/nx_arch_mpu.c',
-                     'arch/cortex_m/nx_arch_security.c', 'os/wait.c')
+                     'arch/cortex_m/nx_arch_security.c',
+                     'arch/cortex_m/nx_arch_sleep.c', 'os/wait.c')
             sources = [root / name for name in names] + [
                 build / 'nexus-runtime/os/freertos/m7-integer-port/port.c']
             entries = []
@@ -98,6 +130,12 @@ class RuntimeAuditTests(unittest.TestCase):
             objects = gate.compiled_objects(root, build, variant)
             self.assertEqual(len(objects), len(sources))
             self.assertEqual(objects[-1]['source']['path'], str(sources[-1]))
+            incomplete = [item for item in entries
+                          if not item['file'].endswith('nx_arch_sleep.c')]
+            (build / 'compile_commands.json').write_text(json.dumps(incomplete))
+            with self.assertRaisesRegex(ValueError, 'source closure'):
+                gate.compiled_objects(root, build, variant)
+            (build / 'compile_commands.json').write_text(json.dumps(entries))
             # A caller CFLAGS value must not establish a second ABI truth.
             original = entries[0]['arguments'][:]
             for extra in ('-march=armv7e-m', '-mcpu=cortex-m7',

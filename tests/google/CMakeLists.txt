@@ -70,6 +70,10 @@ nexus_google_test(nexus_irq_wake_provider_test SOURCES irq_wake_test.cpp
     LIBRARIES Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 
+nexus_google_test(nexus_freertos_services_kernel_test
+    SOURCES freertos_services_kernel_test.cpp
+    LIBRARIES contract_os_freertos_posix)
+
 # A second assembly is a separate image, never linked to the default platform.
 set(native_factory_input
     "${NEXUS_SOURCE_DIR}/tests/contracts/native_assembly/multi.toml")
@@ -112,6 +116,16 @@ target_include_directories(nexus_stm32_uart_dma_test SYSTEM PRIVATE
 target_compile_definitions(nexus_stm32_uart_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
+nexus_google_test(nexus_irq_wake_stm32_test SOURCES irq_wake_stm32_test.cpp
+    "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
+    LIBRARIES Nexus::NativeModel Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
+target_include_directories(nexus_irq_wake_stm32_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+target_compile_definitions(nexus_irq_wake_stm32_test PRIVATE
+    NEXUS_STM32_MODEL STM32F407xx)
+
 target_sources(nexus_stm32_uart_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_dma.c")
 
@@ -121,6 +135,20 @@ target_compile_options(nexus_stm32_uart_dma_test PRIVATE
 # The host model compiles production register algorithms for two GD controllers.
 set(gd_multi_root "${NEXUS_SOURCE_DIR}/soc/gd32f470")
 set(gd_multi_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
+nexus_google_test(nexus_irq_wake_gd32_test SOURCES irq_wake_gd32_test.cpp
+    "${gd_multi_root}/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
+    LIBRARIES Nexus::IO
+    INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
+        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
+        "${NEXUS_SOURCE_DIR}/arch/include")
+target_include_directories(nexus_irq_wake_gd32_test SYSTEM PRIVATE
+    "${gd_multi_vendor}/CMSIS/GD/GD32F4xx/Include"
+    "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Include")
+target_compile_definitions(nexus_irq_wake_gd32_test PRIVATE GD32F470
+    HXTAL_VALUE=25000000)
+target_compile_options(nexus_irq_wake_gd32_test PRIVATE
+    "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
 nexus_google_test(nexus_gd32_multi_test SOURCES gd32_multi_test.cpp
     "${gd_multi_root}/drivers/uart.c" "${gd_multi_root}/drivers/spi.c"
     "${gd_multi_root}/drivers/gpio.c"
@@ -306,6 +334,10 @@ include(arch_mpu.cmake)
 include(arch_security.cmake)
 include(arch_native_mechanism.cmake)
 include(freertos_context.cmake)
+include(os_wait.cmake)
+include(os_optional.cmake)
+include(os_secure.cmake)
+include(freertos_mpu.cmake)
 include(gd32_arch.cmake)
 
 # GD32 tests replace the CPU boundary coherently; no partial Native Arch model.

@@ -466,13 +466,11 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (!state->initialized || state->stopping) {
         return NX_ERROR_STATE;
     }
-    nx_result_t result = nx_irq_wake_validate(
-        wake, (uint8_t)NVIC_GetPriority(DMA1_Channel3_IRQn), 4U,
-        syscall_ceiling);
+    nx_result_t result =
+        nx_gd32_irq_wake_validate(wake, DMA1_Channel3_IRQn, syscall_ceiling);
     if (result == NX_SUCCESS) {
-        result = nx_irq_wake_validate(
-            wake, (uint8_t)NVIC_GetPriority(DMA1_Channel4_IRQn), 4U,
-            syscall_ceiling);
+        result = nx_gd32_irq_wake_validate(wake, DMA1_Channel4_IRQn,
+                                           syscall_ceiling);
     }
     if (result == NX_SUCCESS) {
         uint32_t saved = nx_gd32_critical_enter();

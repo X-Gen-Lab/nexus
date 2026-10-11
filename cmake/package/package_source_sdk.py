@@ -33,6 +33,8 @@ REQUIRED_FILES = (
     "arch/include/nexus/arch/security.h", "arch/cortex_m/private/mechanisms.h",
     "arch/cortex_m/nx_arch_cache.c", "arch/cortex_m/nx_arch_mpu.c",
     "arch/cortex_m/nx_arch_security.c",
+    "arch/include/nexus/arch/sleep.h", "arch/cortex_m/nx_arch_sleep.c",
+    "arch/cortex_m/private/sleep.h",
     "core/src/request.c", "io/include/nexus/io/gpio.h",
     "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
     "boards/stm32f407_qiming_v31/board.json",
@@ -42,6 +44,28 @@ REQUIRED_FILES = (
     "tools/configure/configure.py", "cmake/platform/Firmware.cmake",
     "tools/configure/authored.py", "tools/configure/ir.py",
     "tools/configure/cpu.py", "tools/configure/runtime.py",
+    "tools/configure/kernel.py",
+    "os/freertos/tick.c", "os/freertos/include/nexus/os/tick.h",
+    "os/CMakeLists.txt", "os/diagnostic.c",
+    "os/include/nexus/os/diagnostic.h", "os/freertos/CMakeLists.txt",
+    "os/freertos/freertos.c", "os/freertos/hooks.c",
+    "os/freertos/include/nexus/os/freertos.h",
+    "os/freertos/lowpower.c", "os/freertos/diagnostics.c",
+    "os/freertos/include/nexus/os/lowpower.h",
+    "os/freertos/include/nexus/os/freertos_diagnostics.h",
+    "os/freertos/include/nexus/os/freertos_mpu.h",
+    "os/freertos/include/nexus/os/freertos_user.h",
+    "os/freertos/include/nexus/os/secure_context.h",
+    "os/freertos/mpu/prepare_port.py", "os/freertos/mpu/private.h",
+    "os/freertos/mpu/task.c", "os/freertos/mpu/layout.c",
+    "os/freertos/mpu/syscalls.c",
+    "os/freertos/mpu/guard.c", "os/freertos/mpu/guard_arm.c",
+    "os/freertos/mpu/guard.h",
+    "os/freertos/secure/Integration.cmake",
+    "os/freertos/secure/CMakeLists.txt",
+    "os/freertos/secure/config/FreeRTOSConfig.h",
+    "os/freertos/secure/private/hardware.h",
+    "os/freertos/secure/context.c", "os/freertos/secure/init.c",
     "cmake/platform/Runtime.cmake", "os/freertos/prepare_m7_integer.py",
     "tools/configure/providers/__init__.py",
     "tools/configure/providers/common.py",
@@ -58,7 +82,8 @@ REQUIRED_FILES = (
     "tools/configure/assemblies/sky-baremetal.toml",
     "tools/configure/assemblies/liangshan-baremetal.toml",
     "tools/measurement/workload.c",
-    "ext/freertos/tasks.c", "ext/freertos/LICENSE.md",
+    "ext/freertos/tasks.c", "ext/freertos/queue.c", "ext/freertos/list.c",
+    "ext/freertos/LICENSE.md",
     "vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h", "vendors/arm/CMSIS_5/LICENSE.txt",
     "vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s",
     "vendors/st/cmsis_device_f4/LICENSE.md",
@@ -70,14 +95,36 @@ MANIFEST = ".nexus-source-sdk.json"
 # Required payload identity is separate from CMake's production source graph.
 # Every exposed kernel profile must survive a rehashed omission attempt.
 for _port in ("ARM_CM0", "ARM_CM3", "ARM_CM4F", "ARM_CM7/r0p1",
+              "ARM_CM3_MPU", "ARM_CM4_MPU",
               "ARM_CM23_NTZ/non_secure", "ARM_CM33_NTZ/non_secure",
-              "ARM_CM55_NTZ/non_secure", "ARM_CM85_NTZ/non_secure"):
+              "ARM_CM55_NTZ/non_secure", "ARM_CM85_NTZ/non_secure",
+              "ARM_CM23/non_secure", "ARM_CM33/non_secure",
+              "ARM_CM55/non_secure", "ARM_CM85/non_secure"):
     REQUIRED_FILES += tuple(f"ext/freertos/portable/GCC/{_port}/{name}"
                             for name in ("port.c", "portmacro.h"))
     if _port in {"ARM_CM0", "ARM_CM23_NTZ/non_secure",
                   "ARM_CM33_NTZ/non_secure", "ARM_CM55_NTZ/non_secure",
+                  "ARM_CM85_NTZ/non_secure", "ARM_CM23/non_secure",
+                  "ARM_CM33/non_secure", "ARM_CM55/non_secure",
+                  "ARM_CM85/non_secure"}:
+        REQUIRED_FILES += tuple(f"ext/freertos/portable/GCC/{_port}/{name}"
+                                for name in ("portasm.c", "portasm.h"))
+    if _port.endswith("/non_secure"):
+        REQUIRED_FILES += (f"ext/freertos/portable/GCC/{_port}/portmacrocommon.h",)
+    if _port in {"ARM_CM3_MPU", "ARM_CM4_MPU", "ARM_CM23_NTZ/non_secure",
+                  "ARM_CM33_NTZ/non_secure", "ARM_CM55_NTZ/non_secure",
                   "ARM_CM85_NTZ/non_secure"}:
-        REQUIRED_FILES += (f"ext/freertos/portable/GCC/{_port}/portasm.c",)
+        REQUIRED_FILES += (f"ext/freertos/portable/GCC/{_port}/mpu_wrappers_v2_asm.c",)
+for _core in (23, 33, 55, 85):
+    REQUIRED_FILES += tuple(
+        f"ext/freertos/portable/GCC/ARM_CM{_core}/secure/{name}"
+        for name in ("secure_context_port.c", "secure_context.h",
+                     "secure_init.h", "secure_port_macros.h"))
+REQUIRED_FILES += tuple(f"ext/freertos/include/{name}" for name in (
+    "FreeRTOS.h", "task.h", "queue.h", "list.h", "semphr.h", "portable.h",
+    "projdefs.h", "stack_macros.h", "mpu_prototypes.h", "mpu_wrappers.h",
+    "mpu_syscall_numbers.h", "deprecated_definitions.h", "timers.h",
+    "event_groups.h", "stream_buffer.h"))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
 

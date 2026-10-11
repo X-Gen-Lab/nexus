@@ -7,6 +7,8 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+/* The adapter is a privileged kernel caller, never an MPU user gateway. */
+#define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 #include "nexus/os/freertos.h"
 #include "nexus/arch/arch.h"
 #include "nexus/arch/atomic.h"
@@ -28,6 +30,19 @@
 #else
 #define NEXUS_CPU_EXTERNAL_IRQ_COUNT 240
 #endif
+#endif
+
+/* Each maintained MCU port publishes its reviewed startup frame capacity.
+ * The host fixture has its own explicit storage contract. */
+#ifndef NEXUS_OS_MIN_STACK_WORDS
+#if defined(__arm__) || defined(__thumb__)
+#error "FreeRTOS requires a reviewed initial stack capacity"
+#else
+#define NEXUS_OS_MIN_STACK_WORDS 18U
+#endif
+#endif
+#ifndef NEXUS_OS_STACK_ALIGNMENT_BYTES
+#define NEXUS_OS_STACK_ALIGNMENT_BYTES portBYTE_ALIGNMENT
 #endif
 
 #if defined(__arm__) || defined(__thumb__) || defined(NEXUS_FREERTOS_MODEL)
@@ -139,16 +154,16 @@ static nx_result_t notify_wait(void* context, uint32_t sequence,
         return NX_ERROR_BUSY;
     }
     nx_result_t result = NX_SUCCESS;
-    while (notify_arm(context) == sequence) {
+    for (;;) {
         TickType_t ticks = deadline_ticks(deadline_us);
         if (ticks == 0) {
             result = NX_ERROR_TIMEOUT;
             break;
         }
+        if (notify_arm(context) != sequence) {
+            break;
+        }
         (void)xSemaphoreTake(notification->handle, ticks);
-    }
-    if (notify_arm(context) != sequence) {
-        result = NX_SUCCESS;
     }
     nx_atomic_u32_store_release(&notification->waiting, 0);
     return result;
@@ -228,6 +243,22 @@ static void task_entry(void* argument) {
     }
 }
 
+/** \brief Validate capacity before the kernel writes its initial frame. */
+static bool task_storage_valid(const char* name, const StackType_t* stack,
+                               size_t stack_words, UBaseType_t priority,
+                               void (*entry)(void*)) {
+    if (name == NULL || name[0] == '\0' || stack == NULL || entry == NULL ||
+        stack_words < NEXUS_OS_MIN_STACK_WORDS || stack_words > UINT32_MAX ||
+        (size_t)(configSTACK_DEPTH_TYPE)stack_words != stack_words ||
+        stack_words > SIZE_MAX / sizeof(*stack) ||
+        stack_words > (UINTPTR_MAX - (uintptr_t)stack) / sizeof(*stack) ||
+        (uintptr_t)stack % NEXUS_OS_STACK_ALIGNMENT_BYTES != 0 ||
+        priority >= configMAX_PRIORITIES) {
+        return false;
+    }
+    return true;
+}
+
 /** \brief Create only caller-selected static task resources. */
 nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
                                    StackType_t* stack, size_t stack_words,
@@ -236,9 +267,9 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
     if (!task_context_allowed()) {
         return NX_ERROR_CONTEXT;
     }
-    if (task == NULL || name == NULL || stack == NULL || entry == NULL ||
-        stack_words == 0 || stack_words > UINT32_MAX || task->handle != NULL ||
-        priority >= configMAX_PRIORITIES) {
+    if (task == NULL || (uintptr_t)task % _Alignof(nx_freertos_task_t) != 0 ||
+        !task_storage_valid(name, stack, stack_words, priority, entry) ||
+        task->handle != NULL || task->finished != NULL) {
         return NX_ERROR_INVALID;
     }
     task->finished = xSemaphoreCreateBinaryStatic(&task->finished_storage);
@@ -247,9 +278,9 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
     }
     task->entry = entry;
     task->context = context;
-    task->handle =
-        xTaskCreateStatic(task_entry, name, (configSTACK_DEPTH_TYPE)stack_words,
-                          task, priority, stack, &task->control);
+    task->handle = xTaskCreateStatic(
+        task_entry, name, (configSTACK_DEPTH_TYPE)stack_words, task,
+        priority | portPRIVILEGE_BIT, stack, &task->control);
     if (task->handle == NULL) {
         vSemaphoreDelete(task->finished);
         task->finished = NULL;
@@ -358,5 +389,405 @@ nx_result_t nx_freertos_queue_destroy(nx_freertos_queue_t* queue) {
     }
     vQueueDelete(queue->handle);
     queue->handle = NULL;
+    return NX_SUCCESS;
+}
+
+/** \brief Reuse a single absolute budget across bounded kernel waits. */
+static nx_result_t queue_until(nx_freertos_queue_t* queue, void* item,
+                               nx_time_us_t deadline, bool send) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (queue == NULL || queue->handle == NULL || item == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (xTaskGetSchedulerState() != taskSCHEDULER_RUNNING) {
+        return NX_ERROR_CONTEXT;
+    }
+    (void)nx_atomic_u32_fetch_add_acq_rel(&queue->users, 1);
+    TickType_t ticks = 0;
+    nx_result_t result = NX_SUCCESS;
+    for (;;) {
+        BaseType_t ready = send ? xQueueSend(queue->handle, item, ticks)
+                                : xQueueReceive(queue->handle, item, ticks);
+        if (ready == pdTRUE) {
+            break;
+        }
+        ticks = deadline_ticks(deadline);
+        if (ticks == 0) {
+            result = NX_ERROR_TIMEOUT;
+            break;
+        }
+    }
+    (void)nx_atomic_u32_fetch_sub_release(&queue->users, 1);
+    return result;
+}
+
+/** \brief Keep send payload borrowed only for this bounded call. */
+nx_result_t nx_freertos_queue_send_until(nx_freertos_queue_t* queue,
+                                         const void* item,
+                                         nx_time_us_t deadline) {
+    return queue_until(queue, (void*)item, deadline, true);
+}
+
+/** \brief Copy receive payload only when the kernel reports readiness. */
+nx_result_t nx_freertos_queue_receive_until(nx_freertos_queue_t* queue,
+                                            void* item, nx_time_us_t deadline) {
+    return queue_until(queue, item, deadline, false);
+}
+
+#if configUSE_TASK_NOTIFICATIONS == 1
+/** \brief Snapshot only this adapter's predicate-hint sequence. */
+static uint32_t direct_arm(void* context) {
+    nx_freertos_direct_notify_t* notification = context;
+    return nx_atomic_u32_load_acquire(&notification->sequence);
+}
+
+/** \brief Wait only in the explicitly bound receiver's exclusive slot. */
+static nx_result_t direct_wait(void* context, uint32_t sequence,
+                               uint64_t deadline) {
+    nx_freertos_direct_notify_t* notification = context;
+    if (!task_context_allowed() ||
+        xTaskGetSchedulerState() != taskSCHEDULER_RUNNING ||
+        xTaskGetCurrentTaskHandle() != notification->receiver) {
+        return NX_ERROR_CONTEXT;
+    }
+    uint32_t expected = 0;
+    if (!nx_atomic_u32_compare_exchange_acq_rel(&notification->waiting,
+                                                &expected, 1)) {
+        return NX_ERROR_BUSY;
+    }
+    nx_result_t result = NX_SUCCESS;
+    for (;;) {
+        TickType_t ticks = deadline_ticks(deadline);
+        if (ticks == 0) {
+            result = NX_ERROR_TIMEOUT;
+            break;
+        }
+        if (direct_arm(context) != sequence) {
+            break;
+        }
+        (void)ulTaskNotifyTakeIndexed(notification->index, pdTRUE, ticks);
+    }
+    nx_atomic_u32_store_release(&notification->waiting, 0);
+    return result;
+}
+
+/** \brief Release-publish a hint before notifying the bound receiver. */
+static nx_result_t direct_wake(void* context) {
+    nx_freertos_direct_notify_t* notification = context;
+    bool isr = nx_arch_in_isr();
+    if ((isr && !nx_freertos_isr_allowed()) ||
+        (!isr && !task_context_allowed())) {
+        return NX_ERROR_CONTEXT;
+    }
+    (void)nx_atomic_u32_fetch_add_release(&notification->sequence, 1);
+    if (isr) {
+        BaseType_t switch_required = pdFALSE;
+        (void)xTaskNotifyIndexedFromISR(notification->receiver,
+                                        notification->index, 0, eIncrement,
+                                        &switch_required);
+        portYIELD_FROM_ISR(switch_required);
+    } else {
+        (void)xTaskNotifyIndexed(notification->receiver, notification->index, 0,
+                                 eIncrement);
+    }
+    return NX_SUCCESS;
+}
+#endif
+
+/** \brief Bind explicit receiver storage without allocating a semaphore. */
+nx_result_t
+nx_freertos_direct_notify_init(nx_freertos_direct_notify_t* notification,
+                               TaskHandle_t receiver, UBaseType_t index) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+#if configUSE_TASK_NOTIFICATIONS == 1
+    if (notification == NULL || receiver == NULL ||
+        notification->receiver != NULL ||
+        index >= configTASK_NOTIFICATION_ARRAY_ENTRIES) {
+        return NX_ERROR_INVALID;
+    }
+    notification->receiver = receiver;
+    notification->index = index;
+    notification->sequence = 0;
+    notification->waiting = 0;
+    return NX_SUCCESS;
+#else
+    (void)notification;
+    (void)receiver;
+    (void)index;
+    return NX_ERROR_UNSUPPORTED;
+#endif
+}
+
+/** \brief Unsupported profiles expose an invalid port, never a kernel call. */
+nx_wait_port_t
+nx_freertos_direct_notify_port(nx_freertos_direct_notify_t* notification) {
+#if configUSE_TASK_NOTIFICATIONS == 1
+    if (notification != NULL && notification->receiver != NULL) {
+        nx_wait_port_t port = {notification, direct_arm, direct_wait,
+                               direct_wake};
+        return port;
+    }
+#else
+    (void)notification;
+#endif
+    nx_wait_port_t invalid = {0};
+    return invalid;
+}
+
+/** \brief Quiescence is external; the active-wait check is only a guard. */
+nx_result_t
+nx_freertos_direct_notify_destroy(nx_freertos_direct_notify_t* notification) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+#if configUSE_TASK_NOTIFICATIONS == 1
+    if (notification == NULL || notification->receiver == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_atomic_u32_load_acquire(&notification->waiting) != 0) {
+        return NX_ERROR_BUSY;
+    }
+    notification->receiver = NULL;
+    return NX_SUCCESS;
+#else
+    (void)notification;
+    return NX_ERROR_UNSUPPORTED;
+#endif
+}
+
+/** \brief Create an explicit permanent task without any join-only storage. */
+nx_result_t
+nx_freertos_permanent_task_start(nx_freertos_permanent_task_t* task,
+                                 const char* name, StackType_t* stack,
+                                 size_t stack_words, UBaseType_t priority,
+                                 void (*entry)(void*), void* context) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (task == NULL ||
+        (uintptr_t)task % _Alignof(nx_freertos_permanent_task_t) != 0 ||
+        !task_storage_valid(name, stack, stack_words, priority, entry) ||
+        task->handle != NULL) {
+        return NX_ERROR_INVALID;
+    }
+    task->handle = xTaskCreateStatic(
+        entry, name, (configSTACK_DEPTH_TYPE)stack_words, context,
+        priority | portPRIVILEGE_BIT, stack, &task->control);
+    return task->handle != NULL ? NX_SUCCESS : NX_ERROR_IO;
+}
+
+/** \brief Create one caller-owned binary latch, not a universal waiter pool. */
+nx_result_t nx_freertos_queue_waiter_init(nx_freertos_queue_waiter_t* waiter) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (waiter == NULL || waiter->handle != NULL) {
+        return NX_ERROR_INVALID;
+    }
+    waiter->active = 0;
+    waiter->next = NULL;
+    waiter->handle = xSemaphoreCreateBinaryStatic(&waiter->storage);
+    return waiter->handle != NULL ? NX_SUCCESS : NX_ERROR_IO;
+}
+
+/** \brief Reject reclamation while the waiter remains linked or borrowed. */
+nx_result_t
+nx_freertos_queue_waiter_destroy(nx_freertos_queue_waiter_t* waiter) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (waiter == NULL || waiter->handle == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_atomic_u32_load_acquire(&waiter->active) != 0) {
+        return NX_ERROR_BUSY;
+    }
+    vSemaphoreDelete(waiter->handle);
+    waiter->handle = NULL;
+    return NX_SUCCESS;
+}
+
+/** \brief Couple an exact raw queue with explicitly budgeted waiters. */
+nx_result_t nx_freertos_closable_queue_init(nx_freertos_closable_queue_t* queue,
+                                            uint8_t* storage,
+                                            size_t storage_bytes, size_t depth,
+                                            size_t item_size,
+                                            size_t maximum_waiters) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (queue == NULL || maximum_waiters == 0 || maximum_waiters > UINT32_MAX) {
+        return NX_ERROR_INVALID;
+    }
+    nx_result_t result = nx_freertos_queue_init(
+        &queue->queue, storage, storage_bytes, depth, item_size);
+    if (result == NX_SUCCESS) {
+        queue->send_waiters = NULL;
+        queue->receive_waiters = NULL;
+        queue->maximum_waiters = (uint32_t)maximum_waiters;
+        queue->closed = false;
+    }
+    return result;
+}
+
+/** \brief Call under the task scheduling guard; registration is bounded. */
+static void queue_broadcast(nx_freertos_queue_waiter_t* waiter) {
+    for (; waiter != NULL; waiter = waiter->next) {
+        /* A full binary latch still covers wake-before-sleep. */
+        (void)xSemaphoreGive(waiter->handle);
+    }
+}
+
+/** \brief Unlink before releasing active storage; close holds the same guard.
+ */
+static void queue_unregister(nx_freertos_queue_waiter_t** head,
+                             nx_freertos_queue_waiter_t* waiter) {
+    while (*head != NULL) {
+        if (*head == waiter) {
+            *head = waiter->next;
+            waiter->next = NULL;
+            break;
+        }
+        head = &(*head)->next;
+    }
+}
+
+/** \brief Serialize task-only state under a nested scheduler-suspension guard.
+ */
+static nx_result_t closable_transfer(nx_freertos_closable_queue_t* queue,
+                                     void* item, nx_time_us_t deadline,
+                                     nx_freertos_queue_waiter_t* waiter,
+                                     bool send) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (queue == NULL || queue->queue.handle == NULL || item == NULL ||
+        waiter == NULL || waiter->handle == NULL ||
+        queue->maximum_waiters == 0) {
+        return NX_ERROR_INVALID;
+    }
+    if (xTaskGetSchedulerState() != taskSCHEDULER_RUNNING) {
+        return NX_ERROR_CONTEXT;
+    }
+    uint32_t expected = 0;
+    if (!nx_atomic_u32_compare_exchange_acq_rel(&waiter->active, &expected,
+                                                1)) {
+        return NX_ERROR_BUSY;
+    }
+    (void)xSemaphoreTake(waiter->handle, 0);
+    /* Single-core task-only registry: suspension prevents a give from
+     * switching to an awakened task before broadcasting/unlinking finishes.
+     * Kernel queue calls own their individual short interrupt guards. */
+    nx_freertos_queue_waiter_t** head =
+        send ? &queue->send_waiters : &queue->receive_waiters;
+    bool registered = false;
+    bool expired = false;
+    nx_result_t result = NX_ERROR_BUSY;
+    vTaskSuspendAll();
+    if (queue->queue.users >= queue->maximum_waiters) {
+        (void)xTaskResumeAll();
+        nx_atomic_u32_store_release(&waiter->active, 0);
+        return NX_ERROR_BUSY;
+    }
+    ++queue->queue.users;
+    for (;;) {
+        if (send && queue->closed) {
+            result = NX_ERROR_CANCELLED;
+            break;
+        }
+        BaseType_t ready = send ? xQueueSend(queue->queue.handle, item, 0)
+                                : xQueueReceive(queue->queue.handle, item, 0);
+        if (ready == pdTRUE) {
+            queue_broadcast(send ? queue->receive_waiters
+                                 : queue->send_waiters);
+            result = NX_SUCCESS;
+            break;
+        }
+        if (queue->closed) {
+            result = NX_ERROR_CANCELLED;
+            break;
+        }
+        if (expired) {
+            result = NX_ERROR_TIMEOUT;
+            break;
+        }
+        if (!registered) {
+            waiter->next = *head;
+            *head = waiter;
+            registered = true;
+        }
+        (void)xTaskResumeAll();
+        TickType_t ticks = deadline_ticks(deadline);
+        expired = ticks == 0;
+        if (!expired) {
+            (void)xSemaphoreTake(waiter->handle, ticks);
+        }
+        vTaskSuspendAll();
+    }
+    if (registered) {
+        queue_unregister(head, waiter);
+    }
+    --queue->queue.users;
+    (void)xTaskResumeAll();
+    nx_atomic_u32_store_release(&waiter->active, 0);
+    return result;
+}
+
+/** \brief Every send shares admission serialization with close. */
+nx_result_t
+nx_freertos_closable_queue_send_until(nx_freertos_closable_queue_t* queue,
+                                      const void* item, nx_time_us_t deadline,
+                                      nx_freertos_queue_waiter_t* waiter) {
+    return closable_transfer(queue, (void*)item, deadline, waiter, true);
+}
+
+/** \brief Closed queues retain admitted items until consumers drain them. */
+nx_result_t
+nx_freertos_closable_queue_receive_until(nx_freertos_closable_queue_t* queue,
+                                         void* item, nx_time_us_t deadline,
+                                         nx_freertos_queue_waiter_t* waiter) {
+    return closable_transfer(queue, item, deadline, waiter, false);
+}
+
+/** \brief Suspend task switching while close latches every registered wake. */
+nx_result_t
+nx_freertos_closable_queue_close(nx_freertos_closable_queue_t* queue) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (queue == NULL || queue->queue.handle == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    vTaskSuspendAll();
+    queue->closed = true;
+    queue_broadcast(queue->send_waiters);
+    queue_broadcast(queue->receive_waiters);
+    (void)xTaskResumeAll();
+    return NX_SUCCESS;
+}
+
+/** \brief Quiescence, close and drain are all required before deletion. */
+nx_result_t
+nx_freertos_closable_queue_destroy(nx_freertos_closable_queue_t* queue) {
+    if (!task_context_allowed()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (queue == NULL || queue->queue.handle == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    vTaskSuspendAll();
+    bool busy = !queue->closed || queue->queue.users != 0 ||
+                queue->send_waiters != NULL || queue->receive_waiters != NULL ||
+                uxQueueMessagesWaiting(queue->queue.handle) != 0;
+    (void)xTaskResumeAll();
+    if (busy) {
+        return NX_ERROR_BUSY;
+    }
+    vQueueDelete(queue->queue.handle);
+    queue->queue.handle = NULL;
     return NX_SUCCESS;
 }

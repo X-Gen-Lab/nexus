@@ -29,6 +29,7 @@ extern "C" {
 namespace {
 uint64_t model_time;
 uint32_t model_mask;
+uint32_t model_ordering;
 bool model_isr;
 size_t model_message;
 size_t model_remaining;
@@ -213,7 +214,7 @@ extern "C" bool nx_arch_is_privileged(void) {
 }
 /** \brief Preserve host ordering without claiming hardware timing. */
 extern "C" void nx_arch_dmb(void) {
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    (void)__atomic_fetch_add(&model_ordering, 0U, __ATOMIC_SEQ_CST);
 }
 /** \brief The host register fixture has no physical instruction pipeline. */
 extern "C" void nx_arch_isb(void) {

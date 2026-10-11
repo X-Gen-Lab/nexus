@@ -19,6 +19,27 @@
 extern "C" {
 #endif
 
+/** \brief Apply an additional caller ceiling without weakening model facts. */
+static inline nx_result_t nx_native_irq_wake_validate(
+    const nx_irq_wake_t* wake, const nx_irq_policy_t* policy,
+    const nx_irq_source_t* source, uint8_t syscall_ceiling) {
+    if (policy == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    nx_irq_policy_t effective = *policy;
+    if (wake != NULL && wake->calls_kernel) {
+        if (effective.kernel == NX_IRQ_KERNEL_PRIMASK &&
+            syscall_ceiling != 0U) {
+            return NX_ERROR_INVALID;
+        }
+        if (effective.kernel == NX_IRQ_KERNEL_BASEPRI &&
+            syscall_ceiling > effective.syscall_ceiling) {
+            effective.syscall_ceiling = syscall_ceiling;
+        }
+    }
+    return nx_irq_wake_validate(wake, &effective, source);
+}
+
 typedef struct nx_native_gpio_state {
     uint32_t mask;
     uint32_t input;
@@ -30,6 +51,8 @@ typedef struct nx_native_uart_state {
     nx_uart_tx_request_t* active;
     const nx_irq_wake_t* wake;
     nx_native_uart_config_t config;
+    nx_irq_policy_t irq_policy;
+    nx_irq_source_t irq_source;
     size_t tx_index;
     size_t logged;
     size_t rx_head;

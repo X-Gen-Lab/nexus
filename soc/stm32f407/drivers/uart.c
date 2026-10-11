@@ -404,13 +404,8 @@ static nx_result_t stm32_uart_attach_wake(void* context,
         nx_arch_irq_restore(saved);
         return NX_ERROR_STATE;
     }
-#ifdef NEXUS_STM32_MODEL
-    uint8_t priority = 5U;
-#else
-    uint8_t priority = (uint8_t)NVIC_GetPriority(port->irq);
-#endif
     nx_result_t result =
-        nx_irq_wake_validate(wake, priority, 4U, syscall_ceiling);
+        nx_stm32_irq_wake_validate(wake, port->irq, syscall_ceiling);
     if (result == NX_SUCCESS) {
         port->wake = wake;
     }

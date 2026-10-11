@@ -15,6 +15,48 @@
 #include "nexus/io/uart.h"
 #include "nexus/io/watchdog.h"
 
+#include "gd32f4xx.h"
+#if !defined(NEXUS_TEST_GD32_CORE_CM4_H)
+#include "nexus_config.h"
+#endif
+
+/** \brief Check the actual publisher before borrowing any notification target.
+ */
+static inline nx_result_t nx_gd32_irq_wake_validate(const nx_irq_wake_t* wake,
+                                                    int irq,
+                                                    uint8_t syscall_ceiling) {
+#if defined(NEXUS_TEST_GD32_CORE_CM4_H)
+    nx_irq_policy_t policy = {NX_IRQ_KERNEL_BASEPRI, 91U, 4U, 5U};
+#else
+    nx_irq_policy_t policy = {
+        (nx_irq_kernel_policy_t)NEXUS_IRQ_KERNEL_POLICY,
+        NEXUS_CPU_EXTERNAL_IRQ_COUNT,
+        NEXUS_IRQ_PRIORITY_BITS,
+#if NEXUS_IRQ_KERNEL_POLICY == 2
+        NEXUS_IRQ_SYSCALL_PRIORITY
+#else
+        0U
+#endif
+    };
+#endif
+    if (irq < 0 || (unsigned)irq >= policy.external_irq_count) {
+        return NX_ERROR_INVALID;
+    }
+    if (wake != NULL && wake->calls_kernel) {
+        if (policy.kernel == NX_IRQ_KERNEL_PRIMASK && syscall_ceiling != 0U) {
+            return NX_ERROR_INVALID;
+        }
+        if (policy.kernel == NX_IRQ_KERNEL_BASEPRI &&
+            syscall_ceiling > policy.syscall_ceiling) {
+            policy.syscall_ceiling = syscall_ceiling;
+        }
+    }
+    const nx_irq_source_t source = {(int16_t)irq,
+                                    (uint8_t)NVIC_GetPriority((IRQn_Type)irq),
+                                    (uint8_t)NVIC_GetPriorityGrouping()};
+    return nx_irq_wake_validate(wake, &policy, &source);
+}
+
 /** \brief Read-only SoC UART resource facts; Board pin wiring is separate. */
 typedef struct {
     uint32_t registers;

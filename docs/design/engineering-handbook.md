@@ -336,6 +336,8 @@ owned production使用`Wall/Wextra`和经评审的prototype、shadow、conversio
 
 clang-tidy消费实际compile commands与生成配置，只检查owned边界。vendor代码按其target独立处理；不能通过全局静音隐藏自身错误。每条suppression要有具体原因和局部范围，不提交无解释的全目录排除。
 
+Cppcheck 2.13不读取编译数据库中的`-isystem`。工具按每个真实翻译单元将其投影为`-I`，保留普通目录先于系统目录的搜索顺序；编译器ABI查询仍使用原始参数。分析边界与clang-tidy一致：只对该翻译单元实际SYSTEM目录中、位于`vendors/`或`ext/`的第三方头文件逐一排除，并记录具体路径、规范路径与SHA-256。自有头文件、第三方实现文件、非SYSTEM目录及指向自有文件的别名仍接受检查；不能全局关闭诊断或重封基线。此边界用于分析自有代码，不能证明第三方代码没有缺陷。
+
 本规则集是工程检查基线，不构成MISRA、功能安全或其他认证。若产品要求标准符合性，另立准确standard/version、覆盖范围、deviation、工具资格与独立review项目，不能仅凭`cert-*`或analyzer配置宣称合规。
 
 ### 12.4 当前落实与历史迁移

@@ -161,7 +161,12 @@ static nx_result_t native_exti_attach_wake(void* context,
         nx_arch_irq_restore(saved);
         return NX_ERROR_STATE;
     }
-    nx_result_t result = nx_irq_wake_validate(wake, 5U, 4U, syscall_ceiling);
+    const nx_irq_policy_t policy = {NX_IRQ_KERNEL_BASEPRI, 240U, 4U,
+                                    syscall_ceiling > 5U ? syscall_ceiling
+                                                         : 5U};
+    const nx_irq_source_t source = {0, 5U, 0U};
+    nx_result_t result =
+        nx_native_irq_wake_validate(wake, &policy, &source, syscall_ceiling);
     if (result == NX_SUCCESS) {
         port->wake = wake;
     }

@@ -19,9 +19,11 @@ import tempfile
 from types import MappingProxyType
 
 try:
+    from . import kernel
     from .ir import CpuProfileIR
     from .providers.common import fail, integer
 except ImportError:
+    import kernel
     from ir import CpuProfileIR
     from providers.common import fail, integer
 
@@ -73,13 +75,15 @@ PROFILES = MappingProxyType({
 CPU_FIELDS = frozenset({"arch", "fpu", "float_abi", "dwt_cyccnt",
                         "mpu_version", "icache_line_bytes", "dcache_line_bytes",
                         "security", "sau", "mve", "dsp"})
+CPU_OPTIONAL_FIELDS = frozenset({"mpu_regions"})
 _BUNDLE = ".nexus-cpu-bundle"
 
 
-def fields(value, required, context):
+def fields(value, required, context, optional=()):
     if not isinstance(value, dict):
         fail(f"{context}: expected object")
-    missing, unknown = required - value.keys(), value.keys() - required
+    missing = required - value.keys()
+    unknown = value.keys() - required - set(optional)
     if missing or unknown:
         fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
 
@@ -92,7 +96,7 @@ def boolean(value, context):
 
 def resolve(cpu, irq, backend, *, enum_abi=None):
     """Resolve explicit capabilities without inferring optional hardware."""
-    fields(cpu, CPU_FIELDS, "CPU facts")
+    fields(cpu, CPU_FIELDS, "CPU facts", CPU_OPTIONAL_FIELDS)
     arch = cpu["arch"]
     if not isinstance(arch, str) or arch not in PROFILES:
         fail(f"Unsupported CPU architecture: {arch}")
@@ -131,6 +135,11 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
     mpu = integer(cpu["mpu_version"], 0, 8, "MPU version")
     if mpu not in {0, profile.mpu}:
         fail("MPU format differs from the CPU profile")
+    regions = integer(cpu.get("mpu_regions", 0), 0, 16, "MPU region count")
+    maintained_regions = {0, 8} if arch in {
+        "cortex-m0plus", "cortex-m3", "cortex-m4"} else {0, 8, 16}
+    if regions not in maintained_regions or (regions and mpu == 0):
+        fail("MPU region count differs from the declared CPU capability")
     for field in ("icache_line_bytes", "dcache_line_bytes"):
         line = integer(cpu[field], 0, 32, "CPU cache line")
         if line not in {0, 32} or (line and not profile.cache):
@@ -152,7 +161,7 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
     ceiling = None
     port = None
     if backend == "freertos":
-        ceiling = (10 if bits == 8 else 5) if profile.basepri else 0
+        ceiling = kernel.default_syscall(profile.basepri, bits)
         integer(ceiling, 1 if profile.basepri else 0, maximum,
                 "FreeRTOS syscall priority")
         if arch in {"cortex-m0", "cortex-m0plus"}:
@@ -189,6 +198,8 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
             flags.append(f"-mfpu={fpu}")
         flags.extend((f"-mfloat-abi={abi}", "-fshort-enums"))
     definitions = {
+        "NEXUS_IRQ_KERNEL_POLICY": (2 if profile.basepri else 1)
+        if backend == "freertos" else 0,
         "NEXUS_ARCH_HAS_DWT_CYCCNT": int(dwt),
         "NEXUS_ARCH_MPU_VERSION": mpu,
         "NEXUS_ARCH_ICACHE_LINE_BYTES": cpu["icache_line_bytes"],
@@ -200,7 +211,11 @@ def resolve(cpu, irq, backend, *, enum_abi=None):
         "NEXUS_CPU_HAS_FPU": int(fpu != "none"),
         "NEXUS_CPU_HAS_MVE": int(mve != "none"),
         "NEXUS_CPU_HAS_DSP": int(dsp),
-        "NEXUS_CPU_SECURE_ONLY": int(security == "secure"),
+        "NEXUS_CPU_MPU_REGIONS": regions,
+        # v8-M without split worlds uses the traditional EXC_RETURN world bits
+        # (RES1 when Security is absent). Only an explicit Nonsecure image may
+        # select the port's BC/B8 return encoding; this grants no CMSE access.
+        "NEXUS_CPU_SECURE_ONLY": int(profile.security and security != "nonsecure"),
         "NEXUS_CPU_EXTERNAL_IRQ_COUNT": count,
         "NEXUS_CPU_ATOMIC_BACKEND_IRQ": int(profile.atomic == "irq"),
     }
@@ -238,7 +253,8 @@ def header_lines(profile):
     return lines
 
 
-def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash):
+def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
+                 kernel_profile=None):
     """Write a complete bundle into the caller's fresh temporary directory."""
     integer(clock_hz, 1, context="CPU clock Hz")
     if (not isinstance(optimization, str) or
@@ -250,7 +266,12 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash):
     output = Path(output)
     if not output.is_dir() or any(output.iterdir()):
         fail("CPU emission requires an empty temporary directory")
+    if kernel_profile is None:
+        kernel_profile = kernel.resolve(None, profile, clock_hz)
+    profile = kernel.bind(profile, kernel_profile)
     resolved = {"schema_version": 1, "cpu_profile": profile.to_dict(),
+                "kernel_profile": (kernel_profile.to_dict()
+                                   if kernel_profile is not None else None),
                 "clock_hz": clock_hz, "optimization": optimization,
                 "input_sha256": inputhash}
     content = json.dumps(resolved, sort_keys=True, separators=(",", ":"))
@@ -258,7 +279,7 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash):
     resolved["configuration_sha256"] = digest
     (output / "resolved-cpu.json").write_text(
         json.dumps(resolved, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    cmake = selection_lines(profile) + [
+    cmake = selection_lines(profile) + kernel.selection_lines(kernel_profile) + [
         f'set(NEXUS_OPTIMIZATION "{optimization}")',
         f'set(NEXUS_CONFIG_SHA256 "{digest}")']
     (output / "selection.cmake").write_text("\n".join(cmake) + "\n",
@@ -268,7 +289,8 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash):
               f'#define NEXUS_CONFIG_SHA256 "{digest}"',
               f"#define NEXUS_CORE_HZ {clock_hz}u",
               f"#define NEXUS_BACKEND_{profile.backend.upper()} 1",
-              *header_lines(profile), "#endif", ""]
+              *header_lines(profile), *kernel.header_lines(kernel_profile),
+              "#endif", ""]
     (output / "nexus_config.h").write_text("\n".join(header), encoding="utf-8")
     (output / _BUNDLE).write_text("Nexus CPU runtime bundle\n",
                                  encoding="utf-8")

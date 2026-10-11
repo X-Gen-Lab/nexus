@@ -21,11 +21,11 @@ typedef struct {
 /**
  * \brief           Initialize storage before exposing it to any ISR
  * \param[out]      notification: Unused caller-owned storage
- * \param[in]       now_us: Monotonic microsecond source
- * \param[in]       clock_context: Clock source context
- * \return          NX_SUCCESS or NX_ERROR_INVALID
- * \note            Startup context; not a task/queue emulation. Word
- *                  publication uses the reviewed inline compiler/CPU port.
+ * \param[in]       now_us: Monotonic microsecond source, continuing while
+ * waiting \param[in]       clock_context: Clock source context \return
+ * NX_SUCCESS or NX_ERROR_INVALID \note            Startup context; not a
+ * task/queue emulation. Word publication uses the reviewed inline compiler/CPU
+ * port.
  */
 nx_result_t nx_baremetal_notify_init(nx_baremetal_notify_t* notification,
                                      uint64_t (*now_us)(void*),
@@ -33,11 +33,11 @@ nx_result_t nx_baremetal_notify_init(nx_baremetal_notify_t* notification,
 /**
  * \brief           Bind the explicit polling notification
  * \param[in]       notification: Initialized storage
- * \return          Port whose wait returns BUSY while unchanged before deadline
- * \note            wake uses compiler RMW or, on M0/M0+, a bounded saved
- *                  PRIMASK guard. That guard requires one CPU and privileged
- *                  Thread/configurable-IRQ callers; NMI/HardFault,
- *                  unprivileged, DMA and other security-domain access to its
+ * \return          Port whose wait returns BUSY while unchanged before
+ * deadline; NX_DEADLINE_NEVER disables expiry, never implies blocking \note
+ * wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That
+ * guard requires one CPU and privileged Thread/configurable-IRQ callers;
+ * NMI/HardFault, unprivileged, DMA and other security-domain access to its
  *                  metadata are unsupported. The
  *                  owner loop continues to service controller/drain after BUSY.
  *                  No WFI/WFE is inserted without a reviewed

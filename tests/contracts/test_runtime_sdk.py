@@ -264,6 +264,18 @@ class RuntimeCMakeTests(RuntimeConsumerAssertions, unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("not a runtime override", result.stdout + result.stderr)
 
+    def test_cache_kernel_policy_overrides_are_rejected(self):
+        for index, field in enumerate(("NEXUS_OS_TICK_HZ",
+                                       "NEXUS_OS_MEMORY_PROTECTION",
+                                       "NEXUS_OS_PROFILE",
+                                       "NEXUS_OS_UNKNOWN_FEATURE")):
+            with self.subTest(field=field):
+                source, build = prepare_consumer(self.directory / str(index),
+                                                  self.entry)
+                result = self.configure(source, build, f"-D{field}=1")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("not a runtime override", result.stdout + result.stderr)
+
     def test_second_assembly_cannot_replace_a_resolved_target_graph(self):
         source, build = self.consumer(
             'nexus_add_runtime(ASSEMBLY "runtime.toml")\n'
@@ -388,17 +400,10 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
         finally:
             target.write_bytes(original)
 
-    def test_rehashed_missing_runtime_and_cpu_mechanisms_fail_closed(self):
+    def assert_rehashed_omissions_fail_closed(self, names):
         identity = self.sdk / ".nexus-source-sdk.json"
         original_identity = identity.read_bytes()
-        for index, name in enumerate((
-                "cmake/platform/Runtime.cmake", "tools/configure/runtime.py",
-                "tools/configure/cpu.py", "arch/include/nexus/arch/atomic.h",
-                "arch/include/nexus/arch/features.h",
-                "arch/cortex_m/private/mechanisms.h",
-                "arch/cortex_m/nx_arch_cache.c",
-                "arch/cortex_m/nx_arch_mpu.c",
-                "arch/cortex_m/nx_arch_security.c")):
+        for index, name in enumerate(names):
             with self.subTest(name=name):
                 target = self.sdk / name
                 original_source = target.read_bytes()
@@ -420,6 +425,59 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
                 finally:
                     target.write_bytes(original_source)
                     identity.write_bytes(original_identity)
+
+    def test_rehashed_missing_runtime_and_cpu_mechanisms_fail_closed(self):
+        self.assert_rehashed_omissions_fail_closed((
+                "cmake/platform/Runtime.cmake", "tools/configure/runtime.py",
+                "tools/configure/cpu.py", "tools/configure/kernel.py",
+                "arch/include/nexus/arch/atomic.h",
+                "arch/include/nexus/arch/features.h",
+                "arch/cortex_m/private/mechanisms.h",
+                "arch/cortex_m/nx_arch_cache.c",
+                "arch/cortex_m/nx_arch_mpu.c",
+                "arch/cortex_m/nx_arch_security.c"))
+
+    def test_rehashed_missing_kernel_optional_closures_fail_closed(self):
+        files = (
+            "arch/include/nexus/arch/sleep.h", "os/diagnostic.c",
+            "os/freertos/include/nexus/os/freertos_mpu.h",
+            "os/freertos/include/nexus/os/freertos_user.h",
+            "os/freertos/include/nexus/os/secure_context.h",
+            "os/freertos/mpu/prepare_port.py", "os/freertos/mpu/private.h",
+            "os/freertos/mpu/syscalls.c", "os/freertos/mpu/layout.c",
+            "os/freertos/secure/Integration.cmake",
+            "os/freertos/secure/CMakeLists.txt",
+            "os/freertos/secure/config/FreeRTOSConfig.h",
+            "os/freertos/secure/private/hardware.h",
+            "os/freertos/secure/context.c", "os/freertos/secure/init.c",
+            "ext/freertos/portable/GCC/ARM_CM3_MPU/port.c",
+            "ext/freertos/portable/GCC/ARM_CM4_MPU/mpu_wrappers_v2_asm.c")
+        for core in (23, 33, 55, 85):
+            files += (
+                f"ext/freertos/portable/GCC/ARM_CM{core}_NTZ/non_secure/mpu_wrappers_v2_asm.c",
+                f"ext/freertos/portable/GCC/ARM_CM{core}/non_secure/portasm.c",
+                f"ext/freertos/portable/GCC/ARM_CM{core}/secure/secure_context_port.c",
+                f"ext/freertos/portable/GCC/ARM_CM{core}/secure/secure_context.h",
+                f"ext/freertos/portable/GCC/ARM_CM{core}/secure/secure_init.h",
+                f"ext/freertos/portable/GCC/ARM_CM{core}/secure/secure_port_macros.h")
+        self.assert_rehashed_omissions_fail_closed(files)
+
+    def test_rehashed_missing_mpu_bootstrap_guard_fails_closed(self):
+        self.assert_rehashed_omissions_fail_closed((
+            "os/freertos/mpu/guard.c", "os/freertos/mpu/guard_arm.c",
+            "os/freertos/mpu/guard.h"))
+
+    def test_rehashed_missing_actual_kernel_port_headers_fail_closed(self):
+        files = ("ext/freertos/portable/GCC/ARM_CM0/portasm.h",
+                 "ext/freertos/include/timers.h",
+                 "ext/freertos/include/event_groups.h",
+                 "ext/freertos/include/stream_buffer.h")
+        for core in (23, 33, 55, 85):
+            for suffix in ("_NTZ", ""):
+                files += tuple(
+                    f"ext/freertos/portable/GCC/ARM_CM{core}{suffix}/non_secure/{name}"
+                    for name in ("portasm.h", "portmacrocommon.h"))
+        self.assert_rehashed_omissions_fail_closed(files)
 
     def assert_package_modes_rejected(self, first, second):
         source = self.consumer_directory / "mode consumer source"

@@ -78,9 +78,39 @@ nx_native_uart_configure_instance(nx_native_uart_state_t* port,
     }
     *port = (nx_native_uart_state_t){0};
     port->config = *config;
+    port->irq_policy = (nx_irq_policy_t){NX_IRQ_KERNEL_BASEPRI, 240U, 4U, 5U};
+    port->irq_source = (nx_irq_source_t){0, 5U, 0U};
     port->opened = true;
     nx_arch_irq_restore(token);
     return NX_SUCCESS;
+}
+
+/** \brief Configure only explicit, quiescent model facts. */
+nx_result_t nx_native_uart_model_irq_configure(const nx_uart_port_t* binding,
+                                               const nx_irq_policy_t* policy,
+                                               const nx_irq_source_t* source) {
+    if (binding == NULL || binding->ops != &nx_native_uart_ops ||
+        binding->context == NULL ||
+        nx_irq_wake_validate(NULL, policy, source) != NX_SUCCESS) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_native_uart_state_t* port = binding->context;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_result_t result = NX_SUCCESS;
+    if (!port->opened || port->stopping) {
+        result = NX_ERROR_STATE;
+    } else if (port->active != NULL || port->rx_stream != NULL ||
+               port->wake != NULL) {
+        result = NX_ERROR_BUSY;
+    } else {
+        port->irq_policy = *policy;
+        port->irq_source = *source;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
 }
 
 /** \brief Operate on the explicit default fixture only. */
@@ -460,7 +490,8 @@ static nx_result_t native_uart_attach_wake(void* context,
         nx_arch_irq_restore(saved);
         return NX_ERROR_STATE;
     }
-    nx_result_t result = nx_irq_wake_validate(wake, 5U, 4U, syscall_ceiling);
+    nx_result_t result = nx_native_irq_wake_validate(
+        wake, &port->irq_policy, &port->irq_source, syscall_ceiling);
     if (result == NX_SUCCESS) {
         port->wake = wake;
     }

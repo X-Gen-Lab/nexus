@@ -15,9 +15,10 @@ import tomllib
 from types import MappingProxyType
 
 try:
-    from . import cpu
+    from . import cpu, kernel
 except ImportError:
     import cpu
+    import kernel
 
 
 class RuntimeError(ValueError):
@@ -27,6 +28,7 @@ class RuntimeError(ValueError):
 @dataclass(frozen=True)
 class RuntimeIR:
     profile: object
+    kernel: object
     backend: str
     optimization: str
     clock_hz: int
@@ -43,10 +45,11 @@ def _path(path):
     return result
 
 
-def _fields(value, fields, context):
+def _fields(value, fields, context, optional=()):
     if not isinstance(value, dict):
         raise RuntimeError(f"{context}: object required")
-    missing, unknown = fields - value.keys(), value.keys() - fields
+    missing = fields - value.keys()
+    unknown = value.keys() - fields - set(optional)
     if missing or unknown:
         raise RuntimeError(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
 
@@ -58,7 +61,7 @@ def resolve(assembly):
         authored = assembly.read_bytes()
         choices = tomllib.loads(authored.decode("utf-8"))
         _fields(choices, {"schema_version", "cpu_facts", "backend", "optimization"},
-                "Runtime assembly")
+                "Runtime assembly", {"os"})
         if type(choices["schema_version"]) is not int or choices["schema_version"] != 1:
             raise RuntimeError("Unsupported runtime assembly schema")
         relative = choices["cpu_facts"]
@@ -78,16 +81,19 @@ def resolve(assembly):
         if choices["optimization"] not in {"O2", "Os", "O3"}:
             raise RuntimeError("Unsupported runtime optimization")
         profile = cpu.resolve(facts["cpu"], facts["irq"], choices["backend"])
+        policy = kernel.resolve(choices.get("os"), profile, hz)
+        profile = kernel.bind(profile, policy)
         digest = hashlib.sha256()
         for label, data in ((b"assembly", authored), (b"cpu-facts", content)):
             digest.update(label + b"\0" + len(data).to_bytes(8, "big") + data)
         inputhash = digest.hexdigest()
         record = {"schema_version": 1, "cpu_profile": profile.to_dict(),
+                  "kernel_profile": policy.to_dict() if policy is not None else None,
                   "clock_hz": hz, "optimization": choices["optimization"],
                   "input_sha256": inputhash}
         configuration = hashlib.sha256(json.dumps(
             record, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-        return RuntimeIR(profile, choices["backend"], choices["optimization"], hz,
+        return RuntimeIR(profile, policy, choices["backend"], choices["optimization"], hz,
                          inputhash, configuration,
                          MappingProxyType({"assembly": str(assembly),
                                            "cpu_facts": str(facts_path)}),
@@ -131,7 +137,8 @@ def configure(assembly, output):
         emitted = cpu.emit_profile(result.profile, temporary,
                                    clock_hz=result.clock_hz,
                                    optimization=result.optimization,
-                                   inputhash=result.input_sha256)
+                                   inputhash=result.input_sha256,
+                                   kernel_profile=result.kernel)
         if emitted["configuration_sha256"] != result.configuration_sha256:
             raise RuntimeError("Resolved runtime identity changed during emission")
         with (temporary / "selection.cmake").open("a", encoding="utf-8") as stream:

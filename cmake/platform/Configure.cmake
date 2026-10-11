@@ -1,11 +1,19 @@
 # A failing configuration removes the previous owned generated bundle.
 function(nexus_resolve_assembly)
+    get_cmake_property(assembly_cache_variables CACHE_VARIABLES)
+    foreach(override IN LISTS assembly_cache_variables)
+        if(override MATCHES "^NEXUS_(CPU|ARCH|IRQ|OS)_")
+            message(FATAL_ERROR
+                "${override} is not a platform override; use NEXUS_ASSEMBLY_FILE")
+        endif()
+    endforeach()
     get_filename_component(assembly "${NEXUS_ASSEMBLY_FILE}" ABSOLUTE
         BASE_DIR "${CMAKE_SOURCE_DIR}")
     set(bundle "${NEXUS_BINARY_DIR}/generated")
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/cpu.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/authored.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/factory.py"
@@ -37,12 +45,14 @@ function(nexus_resolve_assembly)
                   NEXUS_ARCH_MPU_VERSION NEXUS_ARCH_ICACHE_LINE_BYTES
                   NEXUS_ARCH_DCACHE_LINE_BYTES NEXUS_ARCH_SECURITY_STATE
                   NEXUS_ARCH_HAS_SAU NEXUS_CPU_HAS_BASEPRI NEXUS_CPU_HAS_FPU
-                  NEXUS_CPU_HAS_MVE NEXUS_CPU_HAS_DSP NEXUS_CPU_SECURE_ONLY
+                  NEXUS_CPU_HAS_MVE NEXUS_CPU_HAS_DSP NEXUS_CPU_MPU_REGIONS
+                  NEXUS_CPU_SECURE_ONLY
                   NEXUS_CPU_EXTERNAL_IRQ_COUNT NEXUS_CPU_ATOMIC_BACKEND_IRQ
-                  NEXUS_CPU_COMPILE_OPTIONS
+                  NEXUS_CPU_COMPILE_OPTIONS NEXUS_IRQ_KERNEL_POLICY
                   NEXUS_FREERTOS_PORT
                   NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
-                  NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256)
+                  NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256
+                  NEXUS_OS_SELECTION_VARIABLES ${NEXUS_OS_SELECTION_VARIABLES})
         set(${value} "${${value}}" PARENT_SCOPE)
     endforeach()
     set(NEXUS_CONFIG_DIR "${bundle}" PARENT_SCOPE)

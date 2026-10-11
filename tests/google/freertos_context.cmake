@@ -13,8 +13,14 @@ function(nexus_freertos_context_model name basepri irq_count)
         "${NEXUS_SOURCE_DIR}/ext/freertos/include"
         "${NEXUS_SOURCE_DIR}/ext/freertos/portable/ThirdParty/GCC/Posix")
     target_compile_definitions(${name} PRIVATE NEXUS_FREERTOS_MODEL
+        NEXUS_OS_STACK_ALIGNMENT_BYTES=8
         NEXUS_CPU_HAS_BASEPRI=${basepri}
         NEXUS_CPU_EXTERNAL_IRQ_COUNT=${irq_count})
+    if(basepri EQUAL 0)
+        target_compile_definitions(${name} PRIVATE NEXUS_OS_MIN_STACK_WORDS=20)
+    else()
+        target_compile_definitions(${name} PRIVATE NEXUS_OS_MIN_STACK_WORDS=18)
+    endif()
     target_compile_options(${name} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/freertos_context_model.h")
 endfunction()
@@ -27,3 +33,7 @@ nexus_freertos_context_model(nexus_freertos_v8_context_test 1 480)
 nexus_freertos_context_model(nexus_freertos_priority8_context_test 1 480)
 target_include_directories(nexus_freertos_priority8_context_test BEFORE PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/freertos_context_priority8")
+
+nexus_freertos_context_model(nexus_freertos_notifications_disabled_test 1 240)
+target_include_directories(nexus_freertos_notifications_disabled_test
+    BEFORE PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/freertos_notifications_disabled")

@@ -81,6 +81,51 @@ class CpuProfileIR(Record):
 
 
 @dataclass(frozen=True)
+class KernelProfileIR(Record):
+    profile: str
+    tick_source: str
+    tick_hz: int
+    tick_reload: int | None
+    max_priorities: int
+    syscall_priority: int
+    kernel_policy: str
+    kernel_port: str
+    memory_protection: bool
+    system_call_stack_words: int
+    security_model: str
+    secure_idle_stack_bytes: int
+    idle_stack_words: int
+    max_task_name_len: int
+    mutexes: bool
+    counting_semaphores: bool
+    task_notifications: bool
+    notification_slots: int
+    trace: bool
+    runtime_stats: bool
+    tickless: bool
+    min_stack_words: int
+    stack_alignment_bytes: int
+    definitions: Mapping
+    values: Mapping
+
+    @classmethod
+    def from_validated(cls, record):
+        return cls(*(record[name] for name in (
+            "profile", "tick_source", "tick_hz", "tick_reload", "max_priorities",
+            "syscall_priority", "kernel_policy", "kernel_port",
+            "memory_protection", "system_call_stack_words", "security_model",
+            "secure_idle_stack_bytes",
+            "idle_stack_words",
+            "max_task_name_len", "mutexes", "counting_semaphores",
+            "task_notifications", "notification_slots", "trace", "runtime_stats",
+            "tickless", "min_stack_words", "stack_alignment_bytes")),
+                   freeze(record["definitions"]), freeze(record))
+
+    def to_dict(self):
+        return thaw(self)
+
+
+@dataclass(frozen=True)
 class GpioOptions:
     mask: int
     initial: int
@@ -214,6 +259,7 @@ class ConfigurationIR(Record):
     backend: str
     irq: InterruptProfileIR
     cpu_profile: CpuProfileIR
+    kernel: KernelProfileIR | None
     controllers: tuple[ControllerIR, ...]
     devices: tuple[EndpointIR, ...]
     memory_budget: MemoryBudgetIR
@@ -235,7 +281,9 @@ class ConfigurationIR(Record):
                                 budgets.get("flash_load_bytes"))
         irq = InterruptProfileIR(**result["irq"])
         cpu = CpuProfileIR.from_validated(result["cpu_profile"])
-        return cls(result["board"], result["soc_family"], result["backend"], irq, cpu,
+        kernel = (KernelProfileIR.from_validated(result["kernel_profile"])
+                  if result.get("kernel_profile") is not None else None)
+        return cls(result["board"], result["soc_family"], result["backend"], irq, cpu, kernel,
                    controllers, devices, memory, MappingProxyType(values))
 
     def to_dict(self):

@@ -27,6 +27,7 @@ typedef struct {
     uint32_t ICPR[8];
     uint32_t IABR[8];
     uint8_t IP[240];
+    uint32_t priority_group;
 } NVIC_Type;
 extern NVIC_Type g_gd32_model_nvic;
 #define NVIC (&g_gd32_model_nvic)
@@ -60,6 +61,10 @@ extern SCB_Type g_gd32_model_scb;
 extern uint32_t g_gd32_model_mask;
 extern bool g_gd32_model_isr;
 #define SCB (&g_gd32_model_scb)
+/** \brief Read the actual model priority grouping field. */
+static inline uint32_t NVIC_GetPriorityGrouping(void) {
+    return NVIC->priority_group & 7U;
+}
 /** \brief Host-only scheduler tick control storage. */
 typedef struct {
     uint32_t CTRL;

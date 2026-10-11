@@ -18,7 +18,7 @@ MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes"
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi"}
+TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os"}
 
 
 
@@ -94,7 +94,7 @@ def normalize(data, path, root, fail, obj, integer, text):
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("abi", "optimization", "components"):
+    for field in ("abi", "optimization", "components", "os"):
         if field in data:
             result[field] = data[field]
     return result
@@ -114,6 +114,11 @@ def read(path, snapshots, root, fail, obj, integer, text):
 
 def editor_schema():
     """Expose the same authoring fields for editor completion, not resolution."""
+    try:
+        from . import kernel
+    except ImportError:
+        import kernel
+
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}
         numeric = {"baud", "capacity", "priority", "main_stack_bytes", "libc_heap_bytes",
@@ -145,6 +150,7 @@ def editor_schema():
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})
+    properties["os"] = kernel.editor_schema()
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
     for kind, fields in ENDPOINT_FIELDS.items():

@@ -11,7 +11,7 @@ EXTERNAL_IRQ_COUNT = 82
 CPU_FEATURES = MappingProxyType({
     'dwt_cyccnt': True, 'mpu_version': 7, 'icache_line_bytes': 0,
     'dcache_line_bytes': 0, 'security': 'single', 'sau': False, 'mve': 'none',
-    'dsp': True,
+    'dsp': True, 'mpu_regions': 8,
 })
 PREFIX = 'stm32'
 MODEL = False

@@ -8,7 +8,8 @@ else()
 endif()
 add_library(nexus_arch STATIC "${nexus_arch_port}/nx_arch_${nexus_arch_port}.c")
 target_sources(nexus_arch PRIVATE cortex_m/nx_arch_cache.c
-    cortex_m/nx_arch_mpu.c cortex_m/nx_arch_security.c)
+    cortex_m/nx_arch_mpu.c cortex_m/nx_arch_security.c
+    cortex_m/nx_arch_sleep.c)
 target_include_directories(nexus_arch PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_arch PUBLIC nexus_abi_options
     PRIVATE nexus_build_options nexus_owned_warnings)

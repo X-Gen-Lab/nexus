@@ -232,7 +232,9 @@ nx_result_t nx_spi_port_stop(const nx_spi_port_t* port);
  *
  * \param[in]       wake: Immutable borrowed target or NULL to detach.
  *
- * \param[in]       syscall_ceiling: Unshifted minimum kernel-safe IRQ priority.
+ * \param[in]       syscall_ceiling: Optional additional unshifted kernel-safe
+ *                  priority floor; cannot weaken generated policy. PRIMASK
+ *                  kernel targets require zero. Ignored without kernel calls.
  *
  * \return          Success, PERMISSION for unsafe actual priority,
  *                  CONTEXT/STATE for illegal control or UNSUPPORTED for a

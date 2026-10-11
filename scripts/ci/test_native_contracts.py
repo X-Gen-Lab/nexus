@@ -100,11 +100,11 @@ class NativeExecutionTests(unittest.TestCase):
                                 text=True, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def execute(self):
+    def execute(self, preset="native-debug"):
         output = io.StringIO()
         with patch.object(native_contracts, "ROOT", self.root), \
                 redirect_stdout(output), redirect_stderr(output):
-            result = native_contracts.main(["--preset", "native-debug"])
+            result = native_contracts.main(["--preset", preset])
         return result, output.getvalue()
 
     def assert_rejected(self):
@@ -123,6 +123,20 @@ class NativeExecutionTests(unittest.TestCase):
         self.assertEqual(record["ctest"]["passed"], 3)
         for binary in self.binaries:
             self.assertEqual(binary.with_suffix(".count").read_text(), "1")
+
+    def test_thread_sanitizer_profile_uses_the_complete_unfiltered_plan(self):
+        path = self.root / "CMakePresets.json"
+        presets = json.loads(path.read_text())
+        for kind in ("configurePresets", "testPresets"):
+            presets[kind][0]["name"] = "native-tsan"
+        presets["testPresets"][0]["configurePreset"] = "native-tsan"
+        path.write_text(json.dumps(presets))
+        result, output = self.execute("native-tsan")
+        self.assertEqual(result, 0, output)
+        record = json.loads(self.summary.read_text())
+        self.assertEqual(record["preset"], "native-tsan")
+        self.assertEqual(record["ctest"]["passed"], 3)
+        self.assertEqual(record["passed"], 4)
 
     def test_partial_google_run_rejects_even_if_ctest_succeeds(self):
         (self.build / "mode").write_text("partial")

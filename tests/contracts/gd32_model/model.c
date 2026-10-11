@@ -25,6 +25,7 @@ bool g_gd32_model_tc_before_critical;
 uint32_t g_gd32_model_pulses;
 uint32_t g_gd32_model_mask;
 uint32_t g_gd32_model_barrier_advance;
+static uint32_t s_host_ordering;
 
 /** \brief           Model a progressing clock and selected hardware side
  * effects. */
@@ -90,11 +91,14 @@ bool nx_arch_is_privileged(void) {
 }
 /** \brief           Order synchronous host accesses without hardware claims. */
 void nx_arch_dmb(void) {
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    /* A real sequentially consistent operation retains host ordering and is
+     * observable by race instrumentation, unlike its unsupported fence hook.
+     * This fixture still establishes no physical MMIO completion or timing. */
+    (void)__atomic_fetch_add(&s_host_ordering, 0u, __ATOMIC_SEQ_CST);
 }
 /** \brief           The host register fixture has no instruction pipeline. */
 void nx_arch_isb(void) {
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    (void)__atomic_fetch_add(&s_host_ordering, 0u, __ATOMIC_SEQ_CST);
 }
 /** \brief           No physical DWT counter exists in the host fixture. */
 bool nx_arch_cycle_snapshot(uint32_t* cycles) {

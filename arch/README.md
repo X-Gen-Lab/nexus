@@ -33,6 +33,21 @@ enable or reset the counter and are not monotonic deadlines. Their wrap/frequenc
 limits are documented in the header. Reviewed capabilities are explicit CPU
 facts, never inferred by probing arbitrary registers or enabling optional units.
 
+`sleep.h` exposes two explicit shallow-sleep operations. The masked
+`nx_arch_wait_for_interrupt()` requires privileged Thread mode, PRIMASK=1,
+BASEPRI/FAULTMASK clear and SCR.SLEEPDEEP clear. It executes DSB/WFI/ISB without
+changing masks, clocks or pending interrupts. The caller owns the final readiness
+check and an enabled IRQ wake source; a pending enabled IRQ wakes WFI despite
+PRIMASK and runs after the caller restores its saved mask.
+`nx_arch_idle_if_unchanged()` instead requires all incoming masks clear, saves
+PRIMASK, rechecks an aligned published sequence with acquire semantics and sleeps
+only when it still matches the caller's snapshot. It restores the exact incoming
+mask; the caller retries the authoritative predicate and supplies an IRQ timer
+for finite deadlines. This is one CPU and one security state's publication
+domain. NMI/HardFault, DMA, SMP and other security-world publishers are excluded.
+Native reports unsupported. Compiler/model evidence does not qualify a concrete
+timer, clock continuity, physical power behavior or wake latency.
+
 `cache.h` exposes distinct data clean, invalidate, combined maintenance and
 instruction synchronization. Every range must own complete reviewed 32-byte
 lines, fit the CPU address space and be quiescent across CPU/DMA/security users.

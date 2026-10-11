@@ -38,6 +38,17 @@
             }
         },
         {
+            "name": "native-tsan",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/native-tsan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.toml",
+                "NEXUS_BUILD_TESTS": "ON",
+                "NEXUS_ENABLE_THREAD_SANITIZER": "ON"
+            }
+        },
+        {
             "name": "stm32-qiming-baremetal",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/stm32-qiming-baremetal",
@@ -118,6 +129,10 @@
             "configurePreset": "native-asan"
         },
         {
+            "name": "native-tsan",
+            "configurePreset": "native-tsan"
+        },
+        {
             "name": "stm32-qiming-baremetal",
             "configurePreset": "stm32-qiming-baremetal"
         },
@@ -166,6 +181,16 @@
         {
             "name": "native-asan",
             "configurePreset": "native-asan",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error"
+            }
+        },
+        {
+            "name": "native-tsan",
+            "configurePreset": "native-tsan",
             "output": {
                 "outputOnFailure": true
             },

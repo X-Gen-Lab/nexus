@@ -32,6 +32,9 @@ GENERATE_LATEX         = NO
 GENERATE_XML           = YES
 XML_OUTPUT             = xml
 ENABLE_PREPROCESSING   = YES
-MACRO_EXPANSION        = NO
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED            = "PRIVILEGED_FUNCTION=" \
+                        "NX_FREERTOS_USER_CODE="
 SEARCH_INCLUDES        = NO
 HAVE_DOT               = NO

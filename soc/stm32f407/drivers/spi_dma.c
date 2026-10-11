@@ -417,17 +417,11 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (!state->initialized) {
         return NX_ERROR_STATE;
     }
-#ifdef NEXUS_STM32_MODEL
-    uint8_t tx_priority = 5U;
-    uint8_t rx_priority = 5U;
-#else
-    uint8_t tx_priority = (uint8_t)NVIC_GetPriority(DMA2_Stream3_IRQn);
-    uint8_t rx_priority = (uint8_t)NVIC_GetPriority(DMA2_Stream0_IRQn);
-#endif
     nx_result_t result =
-        nx_irq_wake_validate(wake, tx_priority, 4U, syscall_ceiling);
+        nx_stm32_irq_wake_validate(wake, DMA2_Stream3_IRQn, syscall_ceiling);
     if (result == NX_SUCCESS) {
-        result = nx_irq_wake_validate(wake, rx_priority, 4U, syscall_ceiling);
+        result = nx_stm32_irq_wake_validate(wake, DMA2_Stream0_IRQn,
+                                            syscall_ceiling);
     }
     if (result == NX_SUCCESS) {
         nx_arch_irq_state_t saved = nx_arch_irq_save();

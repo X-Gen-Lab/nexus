@@ -18,6 +18,7 @@ extern "C" {
 #include <sys/mman.h>
 
 namespace {
+uint32_t s_host_ordering;
 enum class Fault {
     None,
     Stability,
@@ -163,7 +164,7 @@ extern "C" bool nx_arch_is_privileged(void) {
 
 /** \brief Host ordering does not establish physical peripheral completion. */
 extern "C" void nx_arch_dmb(void) {
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    (void)__atomic_fetch_add(&s_host_ordering, 0U, __ATOMIC_SEQ_CST);
 }
 
 /** \brief Host register fixtures expose no physical DWT counter. */

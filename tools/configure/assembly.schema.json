@@ -270,6 +270,93 @@
         "O3-lto"
       ]
     },
+    "os": {
+      "type": "object",
+      "properties": {
+        "counting_semaphores": {
+          "type": "boolean"
+        },
+        "memory_protection": {
+          "type": "boolean"
+        },
+        "mutexes": {
+          "type": "boolean"
+        },
+        "runtime_stats": {
+          "type": "boolean"
+        },
+        "task_notifications": {
+          "type": "boolean"
+        },
+        "tickless": {
+          "type": "boolean"
+        },
+        "trace": {
+          "type": "boolean"
+        },
+        "tick_hz": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "max_priorities": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "idle_stack_words": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "max_task_name_len": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "notification_slots": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "system_call_stack_words": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 65536
+        },
+        "secure_idle_stack_bytes": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 65536
+        },
+        "syscall_priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "profile": {
+          "enum": [
+            "diagnostic",
+            "lowpower",
+            "minimal",
+            "standard"
+          ]
+        },
+        "tick_source": {
+          "enum": [
+            "external",
+            "systick"
+          ]
+        },
+        "security_model": {
+          "enum": [
+            "single",
+            "split"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "pwm": {
       "type": "object",
       "additionalProperties": {

@@ -424,8 +424,9 @@ static void multi_producer(void) {
     nx_native_task_t tasks[4] = {0};
     void* stacks[4];
     for (size_t i = 0; i < 4; ++i) {
-        CHECK(posix_memalign(&stacks[i], 4096, 65536) == 0);
-        CHECK(nx_native_task_start(&tasks[i], stacks[i], 65536,
+        /* Host instrumentation storage, not an MCU stack budget. */
+        CHECK(posix_memalign(&stacks[i], 4096, 256U * 1024U) == 0);
+        CHECK(nx_native_task_start(&tasks[i], stacks[i], 256U * 1024U,
                                    i == 0 ? executor_task : producer_task,
                                    i == 0 ? (void*)&concurrent
                                           : (void*)&producers[i - 1]) ==

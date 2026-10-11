@@ -20,6 +20,8 @@ OWNED = {"core", "io", "os", "components", "arch", "boards", "soc", "tools"}
 HOST_MODELS = {
     "tests/contracts/os_freertos_runtime/posix_event.c":
         "tests/contracts/os_freertos_runtime/posix_event.c",
+    "tests/contracts/os_freertos_runtime/posix_idle.c":
+        "tests/contracts/os_freertos_runtime/posix_idle.c",
 }
 
 # Required portable-C correctness profile. Advisory exclusions and their
@@ -33,13 +35,8 @@ TIDY_CHECKS = ",".join((
 ))
 
 
-def compiler_query(entry: dict) -> tuple[list[str], list[str]]:
-    """Derive a GNU/Clang preprocessor query from one actual compile argv.
-
-    Preserve target, language, defines/undefines, include and ABI options. Remove
-    only the source and compile/dependency output actions; never invoke a shell.
-    Unsupported response files and launcher forms fail instead of guessing flags.
-    """
+def compilation_arguments(entry: dict) -> list[str]:
+    """Parse one actual compilation argv without invoking a shell."""
     arguments = entry.get("arguments")
     if arguments is not None:
         if not isinstance(arguments, list) or not arguments or any(not isinstance(arg, str) or not arg or "\0" in arg for arg in arguments):
@@ -51,6 +48,17 @@ def compiler_query(entry: dict) -> tuple[list[str], list[str]]:
             raise ValueError("invalid compilation command")
     else:
         raise ValueError("compilation argv or command required")
+    return argv
+
+
+def compiler_query(entry: dict) -> tuple[list[str], list[str]]:
+    """Derive a GNU/Clang preprocessor query from one actual compile argv.
+
+    Preserve target, language, defines/undefines, include and ABI options. Remove
+    only the source and compile/dependency output actions; never invoke a shell.
+    Unsupported response files and launcher forms fail instead of guessing flags.
+    """
+    argv = compilation_arguments(entry)
     compiler_index = 1 if Path(argv[0]).name in {"ccache", "sccache", "distcc"} else 0
     if len(argv) <= compiler_index:
         raise ValueError("compiler missing behind launcher")
@@ -227,6 +235,121 @@ def compilation_entry(entry: dict) -> dict:
             ("directory", "file", "arguments", "command", "output") if name in entry}
 
 
+INCLUDE_ARGUMENT_OPTIONS = {
+    "-I", "-D", "-U", "-include", "-imacros", "-iquote", "-idirafter",
+    "-x", "-o", "-MF", "-MT", "-MQ", "-MJ", "--sysroot", "-isysroot",
+    "-iprefix", "-iwithprefix", "-iwithprefixbefore", "-B", "-Xclang",
+    "-Xpreprocessor", "-Xassembler", "-Xlinker", "-target", "--target",
+}
+EXTERNAL_HEADER_SUFFIXES = {".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".tpp"}
+
+
+def system_include_arguments(entry: dict) -> tuple[list[str], list[str]]:
+    """Split observed system includes without treating option values as flags."""
+    argv = compilation_arguments(entry)
+    normal = []
+    systems = []
+    index = 0
+    while index < len(argv):
+        argument = argv[index]
+        if argument == "-isystem":
+            if index + 1 >= len(argv):
+                raise ValueError("missing system include directory")
+            directory = argv[index + 1]
+            index += 2
+        elif argument.startswith("-isystem"):
+            directory = argument[len("-isystem"):]
+            index += 1
+        else:
+            normal.append(argument)
+            index += 1
+            if argument in INCLUDE_ARGUMENT_OPTIONS and index < len(argv):
+                normal.append(argv[index])
+                index += 1
+            continue
+        if not directory or directory.startswith(("=", "$SYSROOT")):
+            raise ValueError("system include directory requires explicit expansion")
+        systems.append(directory)
+    return normal, systems
+
+
+def cppcheck_compilation_entry(entry: dict) -> dict:
+    """Project GNU system includes into Cppcheck's supported -I arguments.
+
+    Cppcheck 2.13 drops -isystem in compilation databases. Keep each context's
+    real headers, flags and ABI, while preserving GNU's regular-before-system
+    search order. A directory named in both classes remains a system directory.
+    Original compiler queries and reported source entries are never rewritten.
+    Sysroot-prefixed directories require explicit expansion rather than guessing.
+    """
+    normal, systems = system_include_arguments(entry)
+    if not systems:
+        return compilation_entry(entry)
+    cwd = Path(entry["directory"])
+    system_paths = {(cwd / path).resolve() for path in systems}
+    preserved = []
+    index = 0
+    while index < len(normal):
+        argument = normal[index]
+        if argument == "-I":
+            if index + 1 >= len(normal):
+                raise ValueError("missing regular include directory")
+            directory = normal[index + 1]
+            original = normal[index:index + 2]
+            index += 2
+        elif argument.startswith("-I"):
+            directory = argument[2:]
+            original = [argument]
+            index += 1
+        else:
+            preserved.append(argument)
+            index += 1
+            if argument in INCLUDE_ARGUMENT_OPTIONS and index < len(normal):
+                preserved.append(normal[index])
+                index += 1
+            continue
+        if directory == "-" or directory.startswith(("=", "$SYSROOT")):
+            raise ValueError("system include priority requires explicit path expansion")
+        if (cwd / directory).resolve() not in system_paths:
+            preserved.extend(original)
+    projected = compilation_entry(entry)
+    projected.pop("command", None)
+    projected["arguments"] = preserved + [arg for path in systems for arg in ("-I", path)]
+    return projected
+
+
+def external_system_headers(root: Path, entry: dict) -> list[dict]:
+    """Enumerate exact foreign header identities in this TU's SYSTEM paths.
+
+    This is the same ownership boundary as Clang's owned-header filter. It is
+    not a diagnostic baseline: first-party headers, implementation files, paths
+    not declared SYSTEM, and aliases of first-party files remain fully checked.
+    """
+    root = root.resolve()
+    foreign = (root / "vendors", root / "ext")
+    _, systems = system_include_arguments(entry)
+    headers = {}
+    for name in systems:
+        directory = (Path(entry["directory"]) / name).resolve()
+        if not directory.is_dir() or not any(directory.is_relative_to(path) for path in foreign):
+            continue
+        for header in sorted(directory.rglob("*")):
+            canonical = header.resolve()
+            if (header.suffix.lower() not in EXTERNAL_HEADER_SUFFIXES or
+                    canonical.suffix.lower() not in EXTERNAL_HEADER_SUFFIXES or
+                    not header.is_file() or
+                    not any(canonical.is_relative_to(path) for path in foreign)):
+                continue
+            if any(character in str(header) + str(canonical) for character in "*?"):
+                raise ValueError("external header ownership requires literal paths")
+            headers[str(header)] = {
+                "path": str(header), "canonical_path": str(canonical),
+                "sha256": hashlib.sha256(header.read_bytes()).hexdigest(),
+                "system_include_directory": str(directory),
+            }
+    return [headers[name] for name in sorted(headers)]
+
+
 def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
     report.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -273,14 +396,22 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                         # are never merged into one macro environment.
                         directory = Path(temp) / str(index)
                         directory.mkdir()
-                        (directory / "compile_commands.json").write_text(json.dumps([compilation_entry(entry)]))
+                        projected = cppcheck_compilation_entry(entry)
+                        (directory / "compile_commands.json").write_text(json.dumps([projected]))
                         output.write(f"Predefined source entry {index}: " + json.dumps(entry) + "\n")
+                        output.write(f"Cppcheck source projection {index}: " + json.dumps(projected) + "\n")
                         observed = predefines(entry, output)
+                        external = external_system_headers(root, entry)
+                        output.write("External system header exclusions: " + json.dumps(external) + "\n")
+                        output.write("External header ownership rule: exact header files in this configuration's SYSTEM paths under vendors/ or ext/ only; owned headers and implementation files remain checked.\n")
+                        exclusions = sorted({path for header in external for path in
+                                             (header["path"], header["canonical_path"])})
                         invocations.append([tool, "--project=" + str(directory / "compile_commands.json"),
                                             *observed, "--enable=warning,performance,portability",
                                             "--check-level=exhaustive",
                                             "--error-exitcode=2", "--xml", "--xml-version=2",
-                                            "--suppress=missingIncludeSystem"])
+                                            "--suppress=missingIncludeSystem",
+                                            *("--suppress=*:" + path for path in exclusions)])
                 for argv in invocations:
                     output.write("Invocation: " + json.dumps(argv) + "\n")
                     output.flush()
