@@ -1,0 +1,21 @@
+{
+  "GCC13_replay_pending": true,
+  "actual_remote_red": {
+    "bytes": 170895,
+    "path": "/tmp/nexus-final-native-remote/08bdfb765902c725c75a20b3d05bac31f8afe7c8/1791761004582/native-debug-job.log",
+    "sha256": "08048aaed86d45cffd689b8817e94380204db38449d5323f39237ba98fcd2429"
+  },
+  "before_raw": {
+    "bytes": 13106,
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/freertos_failstop_test.before.cpp.raw",
+    "sha256": "b0a221a133145eaa21b229d9b56fef0f10ded43c825f40420c7a37daae618111"
+  },
+  "before_source": {
+    "bytes": 13106,
+    "path": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+    "sha256": "b0a221a133145eaa21b229d9b56fef0f10ded43c825f40420c7a37daae618111"
+  },
+  "executions": 0,
+  "scope": "One Google fixture hard-bound correction; stage/production unchanged",
+  "started_at": "2026-10-11T23:26:18.694674+00:00"
+}

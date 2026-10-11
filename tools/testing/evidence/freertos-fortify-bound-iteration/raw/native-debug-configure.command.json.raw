@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/cmake",
+    "--preset",
+    "native-debug",
+    "-B",
+    "/tmp/nexus-freertos-failstop-fortify-validation/native-debug",
+    "-DPython3_EXECUTABLE=/workspace/nexus/.venv/bin/python"
+  ],
+  "cwd": "/workspace/nexus",
+  "duration_seconds": 4.2446801429614425,
+  "returncode": 0,
+  "stderr": {
+    "bytes": 0,
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-debug-configure.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 1523,
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-debug-configure.stdout.log",
+    "sha256": "e8ae7fd1abadf222623698cdabcb08a2aae0cfbfd7c388f0fde10730b24c230c"
+  }
+}

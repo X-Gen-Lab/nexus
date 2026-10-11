@@ -1,0 +1,106 @@
+{
+  "binary": {
+    "bytes": 4721128,
+    "path": "/tmp/nexus-freertos-failstop-fortify-validation/native-tsan/bin/nexus_freertos_failstop_test",
+    "sha256": "e7c4bc432d176a83d0de6d74ff81261917abb99c11fe46d05e5fdee0e3d7560d"
+  },
+  "framework_cases": [
+    [
+      "FreeRTOSFailStop",
+      "AssertObservesLocationBeforeMaskAndPark"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "StackOverflowNeverDereferencesTaskOrName"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "ReturningObserverCannotReclaimLoanOrContinueKernel"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "StrongerIncomingBasepriIsNeverWeakenedByPortStore"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "EqualIncomingBasepriStaysMaskedThroughObservation"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "PrimaskIsPreservedWithoutChangingAnotherMask"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "FaultmaskIsPreservedWithoutChangingAnotherMask"
+    ],
+    [
+      "FreeRTOSFailStop",
+      "WeakerIncomingBasepriIsRaisedToActualKernelCeiling"
+    ]
+  ],
+  "physical_status": "not_executed",
+  "report": {
+    "bytes": 2386,
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-tsan-execution/results.xml",
+    "sha256": "bead3ddf88b626a55a62b015a0f6ecda36a122705373d36a248bc3a60a24b9a7"
+  },
+  "sanitizers_suppressed": false,
+  "scope": "whole actual failstop Google fixture",
+  "source": {
+    "bytes": 13266,
+    "path": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+    "sha256": "d5d6b882503a7385223d0daf9a649453aece832bfacde8aa75d2194b1ecdd0ac"
+  },
+  "status": "passed",
+  "tests_filtered": false,
+  "validation": {
+    "cases": [
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "AssertObservesLocationBeforeMaskAndPark",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "StackOverflowNeverDereferencesTaskOrName",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "ReturningObserverCannotReclaimLoanOrContinueKernel",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "StrongerIncomingBasepriIsNeverWeakenedByPortStore",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "EqualIncomingBasepriStaysMaskedThroughObservation",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "PrimaskIsPreservedWithoutChangingAnotherMask",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "FaultmaskIsPreservedWithoutChangingAnotherMask",
+        "status": "passed"
+      },
+      {
+        "classname": "FreeRTOSFailStop",
+        "name": "WeakerIncomingBasepriIsRaisedToActualKernelCeiling",
+        "status": "passed"
+      }
+    ],
+    "errors": 0,
+    "failures": 0,
+    "passed": 8,
+    "report_sha256": "bead3ddf88b626a55a62b015a0f6ecda36a122705373d36a248bc3a60a24b9a7",
+    "skipped": 0,
+    "tests": 8
+  }
+}

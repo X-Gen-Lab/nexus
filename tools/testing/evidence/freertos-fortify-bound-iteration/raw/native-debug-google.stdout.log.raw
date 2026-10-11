@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "passed": 8,
+  "report": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-debug-execution/manifest.json",
+    "sha256": "223cbcc63c0f8618623fffab73e01dc2f516ba396691acf156ecfd8999987b01",
+    "bytes": 3023
+  }
+}

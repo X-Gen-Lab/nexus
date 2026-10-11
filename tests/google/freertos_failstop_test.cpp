@@ -151,9 +151,14 @@ struct Capture {
 };
 
 void read_evidence(int fd, Capture& capture) {
+    const size_t used = capture.used;
+    if (used >= sizeof(capture.partial)) {
+        capture.malformed = true;
+        return;
+    }
+    const size_t remaining = sizeof(capture.partial) - used;
     auto* bytes = reinterpret_cast<char*>(&capture.partial);
-    const ssize_t count =
-        read(fd, bytes + capture.used, sizeof(Evidence) - capture.used);
+    const ssize_t count = read(fd, bytes + used, remaining);
     if (count < 0 && (errno == EAGAIN || errno == EINTR)) {
         return;
     }

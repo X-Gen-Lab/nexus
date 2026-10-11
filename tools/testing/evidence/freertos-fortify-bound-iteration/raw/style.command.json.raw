@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/python",
+    "-B",
+    "scripts/ci/style_gate.py",
+    "--report",
+    "/workspace/nexus-freertos-failstop-fortify-iteration/style-report.json",
+    "tests/google/freertos_failstop_test.cpp"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "stdout": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/style.stdout.log",
+    "bytes": 88,
+    "sha256": "4ec3785a36e14f5edc68b2c118015d82795e85abc728cd38dd4c8183d8e721c5"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/style.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "report": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/style-report.json",
+    "bytes": 1020,
+    "sha256": "b0cd70a2720a3ea0257fcfcf71b1925401f707e396230ac69e21c35d7be16bab"
+  },
+  "earlier_argument_error": {
+    "argv_contained": "--paths",
+    "returncode": 2,
+    "source_effects": 0
+  }
+}

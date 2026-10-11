@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/python",
+    "-B",
+    "/workspace/nexus-freertos-failstop-iteration/run_google.py",
+    "--build",
+    "/tmp/nexus-freertos-failstop-fortify-validation/native-asan",
+    "--output",
+    "/workspace/nexus-freertos-failstop-fortify-iteration/native-asan-execution"
+  ],
+  "cwd": "/workspace/nexus",
+  "duration_seconds": 5.148631085001398,
+  "returncode": 0,
+  "stderr": {
+    "bytes": 0,
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-asan-google.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 263,
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-asan-google.stdout.log",
+    "sha256": "162de30a7f9aefdc5b57cb899b00e491070a06f4710dd44849c8a2008708b404"
+  }
+}

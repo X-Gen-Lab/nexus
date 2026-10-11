@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/tmp/nexus-freertos-failstop-fortify-validation/native-debug/bin/nexus_freertos_failstop_test",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-freertos-failstop-fortify-iteration/native-debug-execution/results.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "timeout": false,
+  "outer_bound_seconds": 30,
+  "duration_seconds": 5.046895826992113,
+  "stdout": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-debug-execution/execution.stdout",
+    "sha256": "ee6fd253f2a2ad3ddf8d97546aaa9d57015ec2bec1631983d83cb7a46dc47260",
+    "bytes": 1660
+  },
+  "stderr": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-debug-execution/execution.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+}
