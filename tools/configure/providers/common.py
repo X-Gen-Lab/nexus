@@ -49,12 +49,26 @@ def resolve_interrupts(cpu, irq, backend, provider):
     return result
 
 
-def dma_irq(dma, vector):
-    """Preserve physical stream identity while naming the family IRQ vector."""
-    match = re.fullmatch(r"DMA([12]):stream([0-7]):channel([0-7])", dma)
-    if match is None or vector is None:
+def validate_dma_resource(resource, topology):
+    """The selected provider supplies its actual numeric DMA topology."""
+    match = re.fullmatch(r"dma:DMA(0|[1-9][0-9]*):stream(0|[1-9][0-9]*)"
+                         r"(?::channel(0|[1-9][0-9]*))?", resource)
+    if match is None:
+        fail(f"DMA resource is outside provider topology: {resource}")
+    controller, stream = int(match[1]), int(match[2])
+    channel = int(match[3]) if match[3] is not None else None
+    if (controller not in topology[0] or stream not in topology[1] or
+            (channel is not None and channel not in topology[2])):
+        fail(f"DMA resource is outside provider topology: {resource}")
+    return controller, stream, channel
+
+
+def dma_irq(dma, vector, topology):
+    """Name the selected family vector after its explicit topology check."""
+    controller, stream, channel = validate_dma_resource("dma:" + dma, topology)
+    if channel is None or vector is None:
         fail(f"DMA route requires an explicit request selector: {dma}")
-    return f"irq:DMA{match[1]}_{vector}{match[2]}"
+    return f"irq:DMA{controller}_{vector}{stream}"
 
 
 def validate_dma(route, mode, expected, family, normalize, trigger=None):
@@ -84,7 +98,7 @@ def validate_selection(selection, route, provider, ram_size):
     if kind == "uart":
         if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
             fail("UART requires baud, RX profile and IRQ priority")
-        integer(selection["baud"], 1, 1000000, "UART baud")
+        integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
         if selection["rx_profile"] == "blocks":
             if selection["mode"] != "irq-blocks":
                 fail("UART RX blocks requires the implemented irq-blocks provider")
@@ -105,7 +119,7 @@ def validate_selection(selection, route, provider, ram_size):
     elif kind == "pwm":
         if not {"period_ticks", "duty_ticks", "tick_hz"}.issubset(selection):
             fail("PWM requires explicit period, duty and tick_hz")
-        integer(selection["period_ticks"], 1, 65535, "PWM period")
+        integer(selection["period_ticks"], 1, provider.LIMITS["pwm_period"], "PWM period")
         integer(selection["duty_ticks"], 0, selection["period_ticks"], "PWM duty")
         integer(selection["tick_hz"], 1, context="PWM tick_hz")
     elif kind == "adc":
@@ -123,7 +137,7 @@ def validate_selection(selection, route, provider, ram_size):
         for sample in samples:
             integer(sample, 0, 7, "ADC sample encoding")
         integer(selection["reference_mv"], 1, 3600, "ADC reference_mv")
-        if selection["mode"] in {"single-shot", "scan"} and (selection["mode"] == "single-shot") != (len(channels) == 1):
+        if selection["mode"] in {"single-shot", "low-rate-scan"} and (selection["mode"] == "single-shot") != (len(channels) == 1):
             fail("ADC mode contradicts its reviewed channel count")
         if selection["mode"] == "trigger-dma" and "irq_priority" not in selection:
             fail("ADC trigger-dma requires an explicit IRQ priority")

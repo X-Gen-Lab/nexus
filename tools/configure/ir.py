@@ -253,6 +253,11 @@ class MemoryBudgetIR:
 
 
 @dataclass(frozen=True)
+class FactoryOptions:
+    capabilities: bool
+
+
+@dataclass(frozen=True)
 class ConfigurationIR(Record):
     board: str
     soc_family: str
@@ -263,6 +268,7 @@ class ConfigurationIR(Record):
     controllers: tuple[ControllerIR, ...]
     devices: tuple[EndpointIR, ...]
     memory_budget: MemoryBudgetIR
+    factory: FactoryOptions
     values: Mapping
 
     @classmethod
@@ -284,7 +290,9 @@ class ConfigurationIR(Record):
         kernel = (KernelProfileIR.from_validated(result["kernel_profile"])
                   if result.get("kernel_profile") is not None else None)
         return cls(result["board"], result["soc_family"], result["backend"], irq, cpu, kernel,
-                   controllers, devices, memory, MappingProxyType(values))
+                   controllers, devices, memory,
+                   FactoryOptions(result.get("factory", {}).get("capabilities", False)),
+                   MappingProxyType(values))
 
     def to_dict(self):
         return thaw(self)

@@ -92,8 +92,8 @@ Implemented MCU modes are selected explicitly:
 | STM SPI1 | `short-poll`; `dma` finite full-duplex DMA2 stream3 TX/stream0 RX, selector3 |
 | GD SPI4 | `short-poll`; `dma-full-duplex` finite DMA1 channel4 TX/channel3 RX, selector2 |
 | GD SPI0 | `short-poll` |
-| STM ADC1 | `single-shot`/`scan`; `trigger-dma` TIM3 TRGO and DMA2 stream4/channel0 |
-| GD ADC0 | `single-shot`/`scan` fixed encoding7; `trigger-dma` TIMER2 TRGO and DMA1 channel0/selector0, fixed encoding1 (15 sample cycles) |
+| STM ADC1 | `single-shot`/`low-rate-scan`; `trigger-dma` TIM3 TRGO and DMA2 stream4/channel0 |
+| GD ADC0 | `single-shot`/`low-rate-scan` fixed encoding7; `trigger-dma` TIMER2 TRGO and DMA1 channel0/selector0, fixed encoding1 (15 sample cycles) |
 
 UART blocks requires `mode = "irq-blocks"` and `rx.format = "blocks"`.
 `rx.capacity` is rejected: `nx_uart_port_rx_start` supplies the exact caller-owned
@@ -257,8 +257,24 @@ Lookup performs no initialization, allocation, locks, string search or lifecycle
 changes. Factory IDs are assembly-local source interfaces, not a persistent or
 binary protocol ABI. Selected instances remain part of the selected platform.
 
+Consumers may include the generated `nexus_factory_strong.h` to use nominal
+references: `nx_gpio_ref_t`, `NX_GPIO_REF_LED_A` and `nx_factory_gpio_ref`.
+C11 and C++17 reject a UART reference passed to a GPIO getter, including raw
+scalar IDs. These inline wrappers call the existing static getters; they add
+no registry, hardware initialization or instance storage. The scalar getters
+remain available without including the optional wrapper header.
+
+The optional `[factory]` table accepts `capabilities = true`. It emits selected
+read-only `nx_factory_io_capability_t` records and pure
+`nx_factory_<class>_capability` getters. Descriptors describe the actual selected
+mode, transfer units, unit size, alignment and message bound. A zero upper bound
+means **not described**, not unlimited. Native records carry
+`NX_FACTORY_CAP_MODEL` and do not assert physical IRQ or DMA capability. Invalid
+IDs return NULL. Descriptors stay separate from interface faces and hot I/O
+dispatch; the default assembly does not generate them.
+
 The bundle contains `resolved.json`, `nexus_config.h`, `nexus_bindings.h`,
-`nexus_factory.h`, `bindings.c`, `selection.cmake`, `memory.ld`,
+`nexus_factory.h`, `nexus_factory_strong.h`, `bindings.c`, `selection.cmake`, `memory.ld`,
 `resource-budget.json`, declared input navigation and an ownership sentinel.
 Every authored and fact input is hash-bound. CMake reads the resolver's exact
 input paths for reconfiguration, including external packages; it never reparses

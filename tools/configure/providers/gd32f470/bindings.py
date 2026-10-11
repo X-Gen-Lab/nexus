@@ -4,6 +4,7 @@ try:
 except ImportError:
     from emission import dma_regions
 from ..common import controller_ir
+from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
 def _symbol(value):
@@ -249,14 +250,15 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         if item["controller"] != "TIMER2":
             raise ValueError("GD32 maintains TIMER2 channel 0 only")
         _pins(item, [("PA6", "ch0", 2)])
-        period = _integer(item.options.period_ticks, 1, 65535,
+        period = _integer(item.options.period_ticks, 1, LIMITS["pwm_period"],
                           "PWM requires a positive 16-bit period")
         duty = _integer(item.options.duty_ticks, 0, period,
                         "PWM duty must be within the fixed period")
-        tick = _integer(item.options.tick_hz, 1, 100000000,
+        timer_hz = LIMITS["timer_hz"]
+        tick = _integer(item.options.tick_hz, 1, timer_hz,
                         "PWM requires an explicit tick_hz")
-        if 100000000 % tick != 0 or not 1 <= 100000000 // tick <= 65536:
-            raise ValueError("PWM tick_hz must exactly divide the 100 MHz timer")
+        if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
+            raise ValueError(f"PWM tick_hz must exactly divide the {timer_hz} Hz timer")
         if item["initial"] != 0:
             raise ValueError("GD32 fixed PWM route supports inactive low only")
         declarations += [f"static nx_result_t prepare_{name}(void) {{",
@@ -268,9 +270,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     elif kind == "adc":
         stream = item["mode"] == "trigger-dma"
         if item["controller"] != "ADC0":
-            raise ValueError("GD32 maintains ADC0 polling only")
+            raise ValueError("ADC0 is the maintained GD32 controller")
         channels = list(item.options.channels)
-        if channels not in ([0], [0, 1]):
+        if tuple(channels) not in ADC_CHANNEL_SEQUENCES:
             raise ValueError("GD32 maintained ADC routes use PA0 or PA0/PA1")
         _pins(item, [(f"PA{channel}", f"channel{channel}", 0)
                      for channel in channels])

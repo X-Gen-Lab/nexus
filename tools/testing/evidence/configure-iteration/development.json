@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "kind": "configuration_iteration_development_tdd",
+  "scope": "Generated C11/C++17 and host GoogleTest/GoogleMock; maintained TOML through production resolvers.",
+  "physical_status": "not_executed",
+  "qualifies_source_candidate": false,
+  "limits": [
+    "Development evidence records a dirty source work-in-progress, not a clean candidate identity.",
+    "Native/model and compiler results do not establish MCU electrical or DMA timing behavior.",
+    "Explicit fragments receive TOML syntax validation, not complete assembly qualification."
+  ],
+  "records": [
+    {
+      "path": "tools/testing/evidence/configure-iteration/factory-red.log",
+      "sha256": "dba573dca74cc5b38294f72516a3c5f5ce1f578519067fa0413b3bbb8b08ad63",
+      "size": 6628,
+      "command": "python -m unittest discover -s tools/configure -p test_factory_features.py",
+      "exit_code": 1,
+      "purpose": "Expected RED: optional factory policy/header missing; six initial cases.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/factory-green.log",
+      "sha256": "cd9498bed19edee2283716208cf09ecc52eacb8aa3f9c51790d1fd7e9e2c1e08",
+      "size": 105,
+      "command": "python -m unittest discover -s tools/configure -p test_factory_features.py",
+      "exit_code": 0,
+      "purpose": "Seven cases, including compiled C11/C++17 nominal ID misuse and executed MCU metadata getters.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/factory-google-red-build.log",
+      "sha256": "c189b69e1f8191f3d65e3ff6748ae8f1bbcfe60ad3ee0210f1278170b72765ed",
+      "size": 9219,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH cmake --build /workspace/nexus-config-iteration-evidence/native --target nexus_native_factory_test",
+      "exit_code": 1,
+      "purpose": "Expected compiler RED: optional descriptor contract absent from the selected fixture.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/factory-google-green-build.log",
+      "sha256": "f345559ebf4b0a10e02cc293e880e4d5b50d161fa4bf9e655316e1a07967ec77",
+      "size": 2228,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH cmake --build /workspace/nexus-config-iteration-evidence/native --target nexus_native_factory_test",
+      "exit_code": 0,
+      "purpose": "Actual generated bindings and GoogleTest/GoogleMock target compiled.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/factory-google-green.log",
+      "sha256": "0b6c593c8648ae9bb2c3f4f942d9e2bdeaacc39e2a962f438230956c73d281f7",
+      "size": 1824,
+      "command": "/workspace/nexus-config-iteration-evidence/native/bin/nexus_native_factory_test --gtest_output=xml:/workspace/nexus-config-iteration-evidence/factory-google-green.xml",
+      "exit_code": 0,
+      "purpose": "Nine real Native factory contract cases.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/factory-google-green.xml",
+      "sha256": "e96a90ea6b6b11b367faeb981bcd4172cd64de5cc7ffaf8fa44107f9243dbd58",
+      "size": 2591,
+      "command": null,
+      "exit_code": 0,
+      "purpose": "Fresh JUnit from the preceding execution.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/documentation-red.log",
+      "sha256": "3004e027f681915c89006bbdc924128009e800d867cd04d1bcff02c2bd7e7187",
+      "size": 1058,
+      "command": "python -m unittest discover -s tools/configure -p test_documentation.py",
+      "exit_code": 1,
+      "purpose": "Expected RED: actual documentation resolver gate not implemented.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/documentation-boundary-red.log",
+      "sha256": "6df647491bd4e124a6e4425ff023dfb9316a685ba255ddb342c8ec6aefd0cc94",
+      "size": 2449,
+      "command": "python -m unittest discover -s tools/configure -p test_documentation.py",
+      "exit_code": 1,
+      "purpose": "Expected RED: unterminated fences and symlink parent facts silently accepted.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/documentation-green.log",
+      "sha256": "0d6653413f55f7cf64dbfab59b6b29c640ade8e63585414ab2a44a0892a5ed0a",
+      "size": 105,
+      "command": "python -m unittest discover -s tools/configure -p test_documentation.py",
+      "exit_code": 0,
+      "purpose": "Seven cases exercise real production assembly/runtime resolvers and documentation boundaries.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/provider-contract-red.log",
+      "sha256": "275b6991d6179d123231afe49de5e5ab9b40fa8a0129054428802b04f27bdde0",
+      "size": 4460,
+      "command": "python -m unittest discover -s tools/configure -p test_providers.py",
+      "exit_code": 1,
+      "purpose": "Expected RED: generic DMA topology hardcoding and ADC mode/sequence validation gaps.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/provider-contract-green.log",
+      "sha256": "352b71e886d63fae101d52aaeb4001a96926f2216dda59da2c3a97b92e2a2fef",
+      "size": 112,
+      "command": "python -m unittest discover -s tools/configure -p test_providers.py",
+      "exit_code": 0,
+      "purpose": "Thirteen provider contract cases.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/gpio-ir-red.log",
+      "sha256": "57fdeb075f9d20c7eb3d38042a29b67ba1bfacad6416e0f3dd9adb6207d911b8",
+      "size": 734,
+      "command": "python -m unittest discover -s tools/configure -p test_configure.py",
+      "exit_code": 1,
+      "purpose": "Expected RED: immutable GPIO options retained zero instead of reviewed effective mask.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/gpio-ir-green.log",
+      "sha256": "82517794e614f0a54f35a69fd0f393797f6be90d3e82d0b3d67d82bc3ab8e256",
+      "size": 160,
+      "command": "python -m unittest discover -s tools/configure -p test_configure.py",
+      "exit_code": 0,
+      "purpose": "Sixty-one resolver cases.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/capabilities-secondbatch-green.log",
+      "sha256": "ce0cd8c4c5dfab441e9031d34318d778102ead2947bc665d7cbd6523d2848342",
+      "size": 136,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH python tools/maintenance/capabilities.py",
+      "exit_code": 0,
+      "purpose": "Maintained capabilities check; two complete TOML examples and two explicitly marked fragments.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/vendor-dma-topology-red.log",
+      "sha256": "20a559154469786ed95f1bcfe844a8777d90c971be39f2492b7e48da761ba31f",
+      "size": 1362,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH python -m unittest discover -s tools/configure -p test_providers.py",
+      "exit_code": 1,
+      "purpose": "Actual vendor physical DMA naming: GD DMA0/1; STM DMA1/2. RED rejects GD DMA0; GREEN fourteen provider cases. Public opaque ID zero remains reserved independently.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/vendor-dma-topology-green.log",
+      "sha256": "f4b5c30ea5f5757fd4f518c357bf01b0a4e4d96a01bb3607dee95aab1e788cf3",
+      "size": 113,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH python -m unittest discover -s tools/configure -p test_providers.py",
+      "exit_code": 0,
+      "purpose": "Actual vendor physical DMA naming: GD DMA0/1; STM DMA1/2. RED rejects GD DMA0; GREEN fourteen provider cases. Public opaque ID zero remains reserved independently.",
+      "cwd": "/workspace/nexus"
+    },
+    {
+      "path": "tools/testing/evidence/configure-iteration/configure-secondbatch-green.log",
+      "sha256": "67487094c52be463be72680e4879b954f5515db82d4986e8202967625229b901",
+      "size": 388,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH python -m unittest discover -s tools/configure -p 'test_*.py'",
+      "exit_code": 0,
+      "purpose": "197 configuration cases.",
+      "cwd": "/workspace/nexus"
+    }
+  ]
+}

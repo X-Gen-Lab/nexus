@@ -17,6 +17,11 @@ CPU_FEATURES = MappingProxyType({
 PREFIX = 'native'
 MODEL = True
 DMA_VECTOR = None
+DMA_TOPOLOGY = (frozenset(), range(0), range(0))
+LIMITS = MappingProxyType({
+    'uart_baud': (1200, 1000000), 'spi_hz': (390625, 50000000),
+    'timer_hz': 100000000, 'pwm_period': 65535,
+})
 SPI_REQUIRES_ENDPOINT = False
 _FIXED_DMA = MappingProxyType({})
 
@@ -39,14 +44,14 @@ def validate_selection(selection, route):
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
-        common.integer(selection["baud"], 1200, 1000000, "UART baud")
+        common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
     elif kind == "pwm":
         tick = selection["tick_hz"]
-        clock = 100000000
+        clock = LIMITS["timer_hz"]
         if clock % tick or not 1 <= clock // tick <= 65536:
             common.fail("PWM tick_hz is not an exact maintained timer divider")
     elif kind == "spi":
-        common.integer(selection.get("max_hz", 1000000), 390625, 50000000,
+        common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
 
 
@@ -64,7 +69,11 @@ def validate_dma(route, mode, normalize):
 
 
 def dma_irq(dma):
-    return common.dma_irq(dma, DMA_VECTOR)
+    return common.dma_irq(dma, DMA_VECTOR, DMA_TOPOLOGY)
+
+
+def validate_dma_resource(resource):
+    return common.validate_dma_resource(resource, DMA_TOPOLOGY)
 
 
 def shares_irq(kind, key):

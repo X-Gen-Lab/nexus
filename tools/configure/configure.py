@@ -264,8 +264,13 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os"}, "assembly")
+                   {"abi", "optimization", "components", "os", "factory"}, "assembly")
     integer(assembly["schema_version"], 1, 1, "assembly schema")
+    factory_options = obj(assembly.get("factory", {}), (),
+                          {"capabilities"}, "factory policy")
+    if ("capabilities" in factory_options and
+            type(factory_options["capabilities"]) is not bool):
+        fail("Factory capabilities must be boolean")
     board_name = text(assembly["board_package"], "Board package")
     board_dir = (assembly_path.parent / board_name).resolve()
     if Path(assembly_path.parent / board_name).is_symlink():
@@ -318,6 +323,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             if mode not in route["modes"]:
                 fail("Mode-specific resource has no maintained route mode")
             for resource in sequence(resources, "mode-specific resources"):
+                if isinstance(resource, str) and resource.startswith("dma:"):
+                    provider.validate_dma_resource(resource)
                 normalize_resource(text(resource, "mode-specific resource"))
         pins = sequence(route["pins"], "route pins")
         unique([pin.get("pin") for pin in pins], "route pins")
@@ -413,12 +420,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if (route["kind"] == "gpio" or "mask" in binding) and (
                 binding.get("initial", 0) & ~actual_mask):
             fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
+        if route["kind"] == "gpio":
+            binding = {**binding, "mask": actual_mask}
         bindings[binding["id"]] = binding
     claims = {}
     claim_list = []
 
     def claim(key, owner, mode, source):
         text(key, "resource key")
+        if key.startswith("dma:"):
+            provider.validate_dma_resource(key)
         key = normalize_resource(key)
         previous = claims.get(key)
         record = {"key": key, "owner": owner, "mode": mode, "source": source}
@@ -439,6 +450,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             obj(reserved, {"key", "owner"}, (), "reserved resource")
             key, owner = reserved["key"], reserved["owner"]
         # A Board may restate a silicon reservation; it cannot release it.
+        if key.startswith("dma:"):
+            provider.validate_dma_resource(key)
         previous = claims.get(normalize_resource(text(key, "resource key")))
         if previous is not None and previous["owner"] == "soc-timebase":
             continue
@@ -517,7 +530,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     irq_owners[key] = (route["kind"], priority)
 
         for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
-            claim(normalize_resource(resource), name, mode, route["id"])
+            claim(resource, name, mode, route["id"])
         if uses_dma(mode):
             for dma in route["dma"]:
                 claim("dma:" + dma, name, mode, route["id"])
@@ -705,6 +718,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "limitations": board["unknowns"] + ["Physical qualification not executed"],
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
+    result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
     result["configuration_sha256"] = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return result
@@ -719,10 +733,11 @@ def normalize_resource(value):
     if timer is not None:
         return "controller:" + timer[1]
     if value.startswith("dma:"):
-        match = re.fullmatch(r"dma:DMA([12]):stream([0-7])(?::channel([0-7]))?", value)
+        match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
+                             r"(?::channel([0-9]+))?", value)
         if match is None:
             fail(f"Invalid physical DMA resource: {value}")
-        return f"dma:DMA{match[1]}:stream{match[2]}"
+        return f"dma:{match[1]}:stream{int(match[2])}"
     if value.startswith("irq:"):
         irq = value[4:]
         for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
@@ -783,11 +798,12 @@ def generate(result, output):
     except ImportError:
         from bindings import emit
     try:
-        from .factory import emit as emit_factory
+        from .factory import emit as emit_factory, emit_strong
     except ImportError:
-        from factory import emit as emit_factory
+        from factory import emit as emit_factory, emit_strong
     factory_header, factory_source = emit_factory(result)
     write("nexus_factory.h", factory_header)
+    write("nexus_factory_strong.h", emit_strong(result))
     bindings_header, bindings_source = emit(result)
     bindings_source += "\n" + factory_source
     write("nexus_bindings.h", bindings_header)

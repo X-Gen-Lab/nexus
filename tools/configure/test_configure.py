@@ -149,6 +149,14 @@ class ResolverTests(unittest.TestCase):
         self.mutate(self.board_path, update)
         self.assertEqual(self.resolve()["part"], "NATIVE_MODEL")
 
+    def test_gpio_effective_mask_is_materialized_in_the_typed_decision(self):
+        self.mutate(self.board_path,
+                    lambda item: item["bindings"][0].pop("mask", None))
+        self.data["controllers"] = [self.selected()]
+        self.resolve()
+        ir = gate.resolve_ir(self.assembly, self.root)
+        self.assertEqual(ir.controllers[0].options.mask, 1)
+
     def test_spi_builtin_cs_initial_is_not_a_gpio_bitmask(self):
         result = gate.resolve(gate.ROOT /
                               "tools/configure/assemblies/liangshan-baremetal.toml")

@@ -4,6 +4,7 @@ try:
 except ImportError:
     from emission import dma_regions
 from ..common import controller_ir
+from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
 def _symbol(value):
@@ -113,8 +114,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             maximum = child.get("max_hz", item.options.max_hz)
             if not isinstance(mode, int) or isinstance(mode, bool) or not 0 <= mode <= 3:
                 raise ValueError("SPI mode must be 0 through 3")
-            if not isinstance(maximum, int) or maximum < 328125 or maximum > 42000000:
-                raise ValueError("SPI1 maintained frequency is 328125 through 42000000 Hz")
+            minimum, upper = LIMITS["spi_hz"]
+            if type(maximum) is not int or not minimum <= maximum <= upper:
+                raise ValueError(f"SPI1 maintained frequency is {minimum} through {upper} Hz")
             base = endpoint + (".endpoint" if dma else "")
             body += [f"    {base}.port = &{bus};",
                      f"    {base}.cs = &s_nx_cs_{child_name};",
@@ -269,9 +271,10 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                               item.options.tick_hz)
         if not all(isinstance(value, int) for value in (period, duty, tick)):
             raise ValueError("PWM requires explicit period/duty/tick_hz")
-        if not 1 <= period <= 65535 or not 0 <= duty <= period or tick <= 0:
+        if not 1 <= period <= LIMITS["pwm_period"] or not 0 <= duty <= period or tick <= 0:
             raise ValueError("Invalid fixed TIM3 PWM counts")
-        if 84000000 % tick != 0 or not 1 <= 84000000 // tick <= 65536:
+        timer_hz = LIMITS["timer_hz"]
+        if timer_hz % tick != 0 or not 1 <= timer_hz // tick <= 65536:
             raise ValueError("PWM tick_hz is not an exact reviewed TIM3 divider")
         inactive = item["initial"]
         if inactive not in (0, 64):
@@ -281,7 +284,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;",
                  "    nx_arch_dsb();",
                  f"    if ((TIM3->CCER & 1u) != 0u || ((TIM3->CR1 & TIM_CR1_CEN) != 0u &&",
-                 f"        (TIM3->PSC != {84000000 // tick - 1}u || TIM3->ARR != {period - 1}u))) {{",
+                 f"        (TIM3->PSC != {timer_hz // tick - 1}u || TIM3->ARR != {period - 1}u))) {{",
                  "        status = NX_ERROR_BUSY; goto rollback;", "    }"]
         _check(body, "nx_stm32_gpio_clock_enable(0u)")
         _capture(body, "PA6")
@@ -295,7 +298,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    s_nx_port_{name}.inactive_high = {'true' if inactive else 'false'};",
                  f"    s_nx_port_{name}.channel = 1u;", f"    s_nx_port_{name}.period_ticks = {period}u;",
                  f"    s_nx_port_{name}.duty_ticks = {duty}u;", f"    s_nx_port_{name}.tick_hz = {tick}u;",
-                 f"    s_nx_port_{name}.prescaler = {84000000 // tick - 1}u;"]
+                 f"    s_nx_port_{name}.prescaler = {timer_hz // tick - 1}u;"]
         _check(body, f"nx_stm32_pwm_initialize(&s_nx_port_{name})")
         declarations += [f"static nx_result_t stop_{name}(void) {{",
                          f"    nx_result_t status = nx_pwm_port_stop(&s_nx_face_{name});",
@@ -311,7 +314,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         adc = f"s_nx_port_{name}" + (".adc" if stream else "")
         channels = list(item.options.channels)
         reviewed = [int(pin["pin"][2:]) for pin in item["pins"]]
-        if item["controller"] != "ADC1" or channels != reviewed or channels not in ([0], [0, 1]):
+        if item["controller"] != "ADC1" or channels != reviewed or tuple(channels) not in ADC_CHANNEL_SEQUENCES:
             raise ValueError("ADC channel sequence must match the reviewed PA0/PA1 route")
         sampling = list(item.options.sample_times)
         reference = item.options.reference_mv

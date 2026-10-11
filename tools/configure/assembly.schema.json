@@ -144,6 +144,15 @@
         "additionalProperties": false
       }
     },
+    "factory": {
+      "type": "object",
+      "properties": {
+        "capabilities": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
     "flash": {
       "type": "object",
       "additionalProperties": {

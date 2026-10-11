@@ -18,7 +18,7 @@ MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes"
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os"}
+TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory"}
 
 
 
@@ -94,7 +94,7 @@ def normalize(data, path, root, fail, obj, integer, text):
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("abi", "optimization", "components", "os"):
+    for field in ("abi", "optimization", "components", "os", "factory"):
         if field in data:
             result[field] = data[field]
     return result
@@ -151,6 +151,9 @@ def editor_schema():
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})
     properties["os"] = kernel.editor_schema()
+    properties["factory"] = {
+        "type": "object", "properties": {"capabilities": {"type": "boolean"}},
+        "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
     for kind, fields in ENDPOINT_FIELDS.items():

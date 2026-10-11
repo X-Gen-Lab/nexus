@@ -14,8 +14,10 @@
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
+#include "nexus_factory_strong.h"
 #include "provider.h"
 #include <gtest/gtest.h>
+#include <type_traits>
 
 namespace {
 
@@ -31,6 +33,52 @@ class NativeFactory : public testing::Test {
         EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
     }
 };
+
+static_assert(!std::is_convertible_v<nx_uart_ref_t, nx_gpio_ref_t>);
+static_assert(!std::is_convertible_v<nx_spi_ref_t, nx_spi_device_ref_t>);
+static_assert(!std::is_convertible_v<nx_gpio_id_t, nx_gpio_ref_t>);
+
+TEST_F(NativeFactory, NominalGettersPreserveIdentityWithoutStartingDevices) {
+    EXPECT_EQ(nx_factory_gpio_ref(NX_GPIO_REF_LED_A),
+              nx_factory_gpio(NX_GPIO_ID_LED_A));
+    EXPECT_EQ(nx_factory_uart_ref(NX_UART_REF_LINK_B),
+              nx_factory_uart(NX_UART_ID_LINK_B));
+    EXPECT_EQ(nx_factory_spi_device_ref(NX_SPI_DEVICE_REF_SENSOR_SPI_A),
+              nx_factory_spi_device(NX_SPI_DEVICE_ID_SENSOR_SPI_A));
+    EXPECT_EQ(nx_factory_gpio_ref(NX_GPIO_REF_COUNT), nullptr);
+    EXPECT_EQ(nx_factory_uart_ref(NX_UART_REF_COUNT), nullptr);
+    EXPECT_EQ(
+        nx_gpio_port_write(nx_factory_gpio_ref(NX_GPIO_REF_LED_A), 1U, 0U),
+        NX_ERROR_INVALID);
+}
+
+TEST_F(NativeFactory, SelectedCapabilitiesRemainReadonlyAndModelScoped) {
+    const nx_factory_io_capability_t* gpio =
+        nx_factory_gpio_capability(NX_GPIO_ID_LED_A);
+    ASSERT_NE(gpio, nullptr);
+    EXPECT_EQ(gpio, nx_factory_gpio_capability(NX_GPIO_ID_LED_A));
+    EXPECT_EQ(gpio->features, NX_FACTORY_CAP_MODEL);
+    EXPECT_EQ(nx_factory_gpio_capability(NX_GPIO_ID_COUNT), nullptr);
+    const nx_factory_io_capability_t* spi =
+        nx_factory_spi_capability(NX_SPI_ID_BUS_SPI_A);
+    ASSERT_NE(spi, nullptr);
+    EXPECT_EQ(spi->features, NX_FACTORY_CAP_MODEL | NX_FACTORY_CAP_POLLING);
+    EXPECT_EQ(spi->max_transfer_units, 0U);
+    EXPECT_EQ(spi->unit_bytes, 1U);
+    EXPECT_EQ(spi->buffer_alignment, 1U);
+    const nx_factory_io_capability_t* endpoint =
+        nx_factory_spi_device_capability(NX_SPI_DEVICE_ID_SENSOR_SPI_A);
+    ASSERT_NE(endpoint, nullptr);
+    EXPECT_EQ(endpoint->features, spi->features);
+    EXPECT_EQ(nx_factory_spi_device_capability(NX_SPI_DEVICE_ID_COUNT),
+              nullptr);
+    const nx_factory_io_capability_t* adc =
+        nx_factory_adc_capability(NX_ADC_ID_ADC0);
+    ASSERT_NE(adc, nullptr);
+    EXPECT_EQ(adc->max_transfer_units, 2U);
+    EXPECT_EQ(adc->unit_bytes, 2U);
+    EXPECT_EQ(adc->buffer_alignment, 2U);
+}
 
 TEST_F(NativeFactory, LookupBeforeStartupHasNoEffectsAndChecksEveryClass) {
     const nx_gpio_port_t* first = nx_factory_gpio(NX_GPIO_ID_LED_A);

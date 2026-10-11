@@ -11,6 +11,69 @@ import configure as gate
 
 
 class ProviderContractTests(unittest.TestCase):
+    def test_physical_key_normalization_has_no_silicon_topology(self):
+        self.assertEqual(
+            gate.normalize_resource("dma:GPDMA3:stream31:channel255"),
+            "dma:GPDMA3:stream31")
+        self.assertEqual(gate.normalize_resource("dma:DMA3:stream31:channel9"),
+                         "dma:DMA3:stream31")
+
+    def test_selected_provider_owns_dma_range_and_selector_checks(self):
+        from providers import maintained
+        for family in ("stm32f407", "gd32f470"):
+            provider = maintained(family)
+            provider.validate_dma_resource("dma:DMA1:stream7:channel7")
+            for invalid in ("dma:DMA3:stream7", "dma:DMA1:stream8",
+                            "dma:DMA1:stream0:channel8"):
+                with self.subTest(family=family, resource=invalid):
+                    with self.assertRaisesRegex(ValueError, "topology"):
+                        provider.validate_dma_resource(invalid)
+        with self.assertRaisesRegex(ValueError, "topology"):
+            maintained("native").validate_dma_resource("dma:DMA1:stream0")
+
+    def test_physical_dma_controller_names_follow_each_vendor(self):
+        from providers import maintained
+        gd = maintained("gd32f470")
+        self.assertEqual(gd.validate_dma_resource("dma:DMA0:stream6:channel1"),
+                         (0, 6, 1))
+        self.assertEqual(gd.dma_irq("DMA0:stream6:channel1"),
+                         "irq:DMA0_Channel6")
+        with self.assertRaisesRegex(ValueError, "topology"):
+            gd.validate_dma_resource("dma:DMA2:stream0:channel0")
+        stm = maintained("stm32f407")
+        stm.validate_dma_resource("dma:DMA2:stream7:channel4")
+        with self.assertRaisesRegex(ValueError, "topology"):
+            stm.validate_dma_resource("dma:DMA0:stream0:channel0")
+
+    def test_adc_scan_and_single_shot_have_distinct_channel_contracts(self):
+        from providers import common, maintained
+        for family in ("stm32f407", "gd32f470"):
+            provider = maintained(family)
+            for mode, channels in (("low-rate-scan", [0]),
+                                   ("single-shot", [0, 1])):
+                selection = {"id": "adc", "binding": "adc", "mode": mode,
+                             "channels": channels,
+                             "sample_times": [7] * len(channels),
+                             "reference_mv": 3300, "timeout_ms": 100}
+                route = {"kind": "adc", "pins": [
+                    {"pin": f"PA{channel}"} for channel in channels]}
+                with self.subTest(family=family, mode=mode):
+                    with self.assertRaisesRegex(ValueError, "channel count"):
+                        common.validate_selection(selection, route, provider,
+                                                  131072)
+
+    def test_adc_constructor_sequences_are_validated_before_generation(self):
+        from providers import common, maintained
+        selection = {"id": "adc", "binding": "adc", "mode": "low-rate-scan",
+                     "channels": [1, 0], "sample_times": [7, 7],
+                     "reference_mv": 3300, "timeout_ms": 100}
+        route = {"kind": "adc", "pins": [{"pin": "PA1"}, {"pin": "PA0"}]}
+        for family in ("stm32f407", "gd32f470"):
+            with self.subTest(family=family):
+                with self.assertRaisesRegex(ValueError, "channel sequence"):
+                    common.validate_selection(selection, route,
+                                              maintained(family), 131072)
+
     def test_unknown_family_cannot_inherit_cortex_m4_abi(self):
         soc = gate.load(gate.ROOT / "soc/stm32f407/soc.json")
         soc["id"] = "unmaintained-m4"

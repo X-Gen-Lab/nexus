@@ -16,6 +16,12 @@ CPU_FEATURES = MappingProxyType({
 PREFIX = 'stm32'
 MODEL = False
 DMA_VECTOR = 'Stream'
+DMA_TOPOLOGY = (frozenset((1, 2)), range(8), range(8))
+LIMITS = MappingProxyType({
+    'uart_baud': (1282, 1000000), 'spi_hz': (328125, 42000000),
+    'timer_hz': 84000000, 'pwm_period': 65535,
+})
+ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
 _FIXED_DMA = MappingProxyType({('USART1', 'dma-tx'): ('DMA2:stream7:channel4',), ('SPI1', 'dma'): ('DMA2:stream3:channel3', 'DMA2:stream0:channel3'), ('ADC1', 'trigger-dma'): ('DMA2:stream4:channel0',)})
 
@@ -43,15 +49,17 @@ def validate_selection(selection, route):
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
-        common.integer(selection["baud"], 1282, 1000000, "UART baud")
+        common.integer(selection["baud"], *LIMITS["uart_baud"], "UART baud")
     elif kind == "pwm":
         tick = selection["tick_hz"]
-        clock = 84000000
+        clock = LIMITS["timer_hz"]
         if clock % tick or not 1 <= clock // tick <= 65536:
             common.fail("PWM tick_hz is not an exact maintained timer divider")
     elif kind == "spi":
-        common.integer(selection.get("max_hz", 1000000), 328125, 42000000,
+        common.integer(selection.get("max_hz", 1000000), *LIMITS["spi_hz"],
                        "SPI max_hz")
+    elif kind == "adc" and tuple(selection["channels"]) not in ADC_CHANNEL_SEQUENCES:
+        common.fail("ADC channel sequence is not implemented by the provider")
 
 
 def mode_implementation(kind, mode):
@@ -68,7 +76,11 @@ def validate_dma(route, mode, normalize):
 
 
 def dma_irq(dma):
-    return common.dma_irq(dma, DMA_VECTOR)
+    return common.dma_irq(dma, DMA_VECTOR, DMA_TOPOLOGY)
+
+
+def validate_dma_resource(resource):
+    return common.validate_dma_resource(resource, DMA_TOPOLOGY)
 
 
 def shares_irq(kind, key):

@@ -1,0 +1,21 @@
+.......E......
+======================================================================
+ERROR: test_physical_dma_controller_names_follow_each_vendor (test_providers.ProviderContractTests.test_physical_dma_controller_names_follow_each_vendor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 37, in test_physical_dma_controller_names_follow_each_vendor
+    self.assertEqual(gd.validate_dma_resource("dma:DMA0:stream6:channel1"),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/gd32f470/__init__.py", line 91, in validate_dma_resource
+    return common.validate_dma_resource(resource, DMA_TOPOLOGY)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/common.py", line 57, in validate_dma_resource
+    fail(f"DMA resource is outside provider topology: {resource}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 12, in fail
+    raise ConfigurationError(message)
+providers.common.ConfigurationError: DMA resource is outside provider topology: dma:DMA0:stream6:channel1
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.346s
+
+FAILED (errors=1)

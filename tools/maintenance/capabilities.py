@@ -14,7 +14,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from tools.configure import bindings, configure  # noqa: E402
+from tools.configure import bindings, configure, documentation  # noqa: E402
 
 DOCUMENT = "docs/delivery/capabilities.md"
 START = "<!-- nexus-capabilities:start -->"
@@ -158,6 +158,7 @@ def main(arguments=None):
     parser.add_argument("--root", type=Path, default=ROOT)
     args = parser.parse_args(arguments)
     try:
+        examples = documentation.check(args.root)
         expected = render(collect(args.root))
         path = args.root / DOCUMENT
         document = path.read_text(encoding="utf-8")
@@ -173,6 +174,9 @@ def main(arguments=None):
         check_block(document, expected)
         print("Capability document matches facts and selected definitions; "
               "physical HIL is not assessed")
+        print(f"Resolved {sum(row['kind'] != 'fragment' for row in examples)} "
+              "TOML examples; "
+              f"{sum(row['kind'] == 'fragment' for row in examples)} explicit fragments")
     except (OSError, ValueError) as error:
         print(f"Capability consistency rejected: {error}", file=sys.stderr)
         return 1

@@ -1,0 +1,98 @@
+FEEFFE.
+======================================================================
+ERROR: test_capability_selection_is_explicit_and_immutable (test_factory_features.OptionalFactoryTests.test_capability_selection_is_explicit_and_immutable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 65, in test_capability_selection_is_explicit_and_immutable
+    self.generate("\n[factory]\ncapabilities = true\n")
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 23, in generate
+    return gate.configure(self.assembly, self.output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 863, in configure
+    result = resolve_ir(assembly, root, input_paths=input_paths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 741, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 263, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 249, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 112, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 26, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device"},
+  File "/workspace/nexus/tools/configure/configure.py", line 110, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 12, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['factory']
+
+======================================================================
+ERROR: test_default_factory_has_no_capability_descriptors (test_factory_features.OptionalFactoryTests.test_default_factory_has_no_capability_descriptors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 60, in test_default_factory_has_no_capability_descriptors
+    self.assertFalse(result["factory"]["capabilities"])
+                     ~~~~~~^^^^^^^^^^^
+KeyError: 'factory'
+
+======================================================================
+ERROR: test_optional_header_adds_no_global_objects (test_factory_features.OptionalFactoryTests.test_optional_header_adds_no_global_objects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 53, in test_optional_header_adds_no_global_objects
+    header = (self.output / "nexus_factory_strong.h").read_text()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmp8_imttn5/bundle/nexus_factory_strong.h'
+
+======================================================================
+FAIL: test_capabilities_requires_boolean (test_factory_features.OptionalFactoryTests.test_capabilities_requires_boolean)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['factory']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 84, in test_capabilities_requires_boolean
+    with self.assertRaisesRegex(ValueError, "boolean"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "boolean" does not match "assembly TOML: missing [], unknown ['factory']"
+
+======================================================================
+FAIL: test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes (test_factory_features.OptionalFactoryTests.test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes) (compiler='cc')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 45, in test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes
+    self.assertEqual(valid.returncode, 0, valid.stderr)
+AssertionError: 1 != 0 : /tmp/tmpw3y22yr6/consumer.c:1:10: fatal error: nexus_factory_strong.h: No such file or directory
+    1 | #include "nexus_factory_strong.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes (test_factory_features.OptionalFactoryTests.test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes) (compiler='c++')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_factory_features.py", line 45, in test_nominal_ids_compile_in_c11_and_cpp17_and_reject_other_classes
+    self.assertEqual(valid.returncode, 0, valid.stderr)
+AssertionError: 1 != 0 : /tmp/tmpw3y22yr6/consumer.cpp:1:10: fatal error: nexus_factory_strong.h: No such file or directory
+    1 | #include "nexus_factory_strong.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.033s
+
+FAILED (failures=3, errors=3)
