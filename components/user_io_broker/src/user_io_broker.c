@@ -296,9 +296,15 @@ nx_user_io_loan_acquire(nx_user_io_broker_t* broker, nx_user_io_loan_t* slot,
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     if (!live(broker)) {
         result.result = NX_ERROR_STATE;
-    } else if (retained(broker, slot) != NULL) {
+        nx_arch_irq_restore(saved);
+        return result;
+    }
+    if (retained(broker, slot) != NULL) {
         result.result = NX_ERROR_BUSY;
-    } else if (!loan_spans_valid(broker, slot, address, bytes, access, drain)) {
+        nx_arch_irq_restore(saved);
+        return result;
+    }
+    if (!loan_spans_valid(broker, slot, address, bytes, access, drain)) {
         result.result = NX_ERROR_INVALID;
     } else if (!permitted(broker->config, principal, address, bytes, access)) {
         result.result = NX_ERROR_PERMISSION;

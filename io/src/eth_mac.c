@@ -62,6 +62,10 @@ static bool overlaps(const void* a, size_t asize, const void* b, size_t bsize) {
 static uint32_t address(const void* pointer) {
     return (uint32_t)(uintptr_t)pointer;
 }
+/** \brief Advance within the validated nonempty descriptor ring. */
+static size_t ring_next(size_t index, size_t count) {
+    return index + 1U == count ? 0U : index + 1U;
+}
 static nx_result_t domain(nx_eth_mac_t* mac, const void* data, size_t length,
                           nx_dma_direction_t direction) {
     if (!NX_ETH_HOST_ADDRESSES && ((uintptr_t)data > UINT32_MAX ||
@@ -269,7 +273,7 @@ nx_result_t nx_eth_mac_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline) {
         nx_eth_descriptor_t* d = &mac->tx_descriptors[i];
         d->control = 0U;
         d->buffer = 0U;
-        d->next = address(&mac->tx_descriptors[(i + 1U) % mac->tx_count]);
+        d->next = address(&mac->tx_descriptors[ring_next(i, mac->tx_count)]);
         NX_ETH_DESCRIPTOR_STATUS(d, TX_CHAIN);
         mac->tx_slots[i].terminal = NX_SUCCESS;
     }
@@ -277,7 +281,7 @@ nx_result_t nx_eth_mac_initialize(nx_eth_mac_t* mac, nx_time_us_t deadline) {
         nx_eth_descriptor_t* d = &mac->rx_descriptors[i];
         d->control = RX_CHAIN | (uint32_t)mac->rx_slots[i].capacity;
         d->buffer = address(mac->rx_slots[i].data);
-        d->next = address(&mac->rx_descriptors[(i + 1U) % mac->rx_count]);
+        d->next = address(&mac->rx_descriptors[ring_next(i, mac->rx_count)]);
         mac->rx_slots[i].length = 0U;
         rearm(mac, i);
     }
@@ -383,7 +387,7 @@ static void progress_tx(nx_eth_mac_t* mac, nx_time_us_t now) {
     slot->request = NULL;
     slot->terminal = NX_SUCCESS;
     mac->snapshot.pending_tx--;
-    mac->tx_consumer = (index + 1U) % mac->tx_count;
+    mac->tx_consumer = ring_next(index, mac->tx_count);
     nx_request_settle(&request->base, terminal, transferred);
 }
 static void progress_rx(nx_eth_mac_t* mac, nx_time_us_t now) {
@@ -432,7 +436,7 @@ static void progress_rx(nx_eth_mac_t* mac, nx_time_us_t now) {
         mac->rx_ready_tail = index;
         saturate(&mac->snapshot.received);
     }
-    mac->rx_producer = (index + 1U) % mac->rx_count;
+    mac->rx_producer = ring_next(index, mac->rx_count);
 }
 static void progress(nx_eth_mac_t* mac, nx_time_us_t now) {
     uint32_t status = read_reg(mac, DMA_STATUS);
@@ -545,7 +549,7 @@ static nx_result_t submit(void* context, nx_eth_tx_request_t* request) {
         slot->request = request;
         slot->terminal = NX_SUCCESS;
         mac->snapshot.pending_tx++;
-        mac->tx_producer = (index + 1U) % mac->tx_count;
+        mac->tx_producer = ring_next(index, mac->tx_count);
         d->control = (uint32_t)request->length;
         d->buffer = address(request->data);
         nx_arch_dmb();

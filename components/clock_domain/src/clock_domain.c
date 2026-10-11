@@ -107,10 +107,12 @@ nx_result_t nx_clock_domain_acquire(nx_clock_domain_t* domain,
         return NX_ERROR_CONTEXT;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    nx_result_t result = NX_ERROR_STATE;
     if (!live(domain)) {
-        result = NX_ERROR_STATE;
-    } else if (!nx_clock_domain_span_valid(domain, lease, sizeof(*lease))) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_STATE;
+    }
+    nx_result_t result = NX_ERROR_STATE;
+    if (!nx_clock_domain_span_valid(domain, lease, sizeof(*lease))) {
         result = retained_identity(domain, lease) ? NX_ERROR_STATE
                                                   : NX_ERROR_INVALID;
     } else if (lease->owner != NULL || lease->next != NULL ||

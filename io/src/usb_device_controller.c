@@ -815,7 +815,8 @@ static nx_result_t submit(void* context, nx_usb_request_t* r) {
                ((ep->in || ep->number != 0U) &&
                 (NX_USB_READ(base, offset) & ENABLE) != 0U) ||
                (!ep->in && (NX_USB_READ(base, CONTROL) & 8U) != 0U)) {
-        result = NX_ERROR_BUSY;
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
     } else if (nx_time_now_us() >= r->base.deadline) {
         result = NX_ERROR_TIMEOUT;
     } else if (ep->in &&
@@ -1038,11 +1039,10 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
         result = NX_ERROR_BUSY;
     } else if (wake != NULL && !storage_valid(c, wake, sizeof(*wake), false)) {
         result = NX_ERROR_INVALID;
-    } else if (wake != NULL && nx_irq_wake_validate(wake, &c->irq_policy,
-                                                    &actual) != NX_SUCCESS) {
-        result = NX_ERROR_PERMISSION;
-    } else if (wake != NULL && wake->calls_kernel &&
-               actual.priority < ceiling) {
+    } else if (wake != NULL &&
+               (nx_irq_wake_validate(wake, &c->irq_policy, &actual) !=
+                    NX_SUCCESS ||
+                (wake->calls_kernel && actual.priority < ceiling))) {
         result = NX_ERROR_PERMISSION;
     } else {
         c->wake = wake;
