@@ -1,0 +1,3966 @@
+{
+  "schema": 1,
+  "kind": "development-contract-execution",
+  "preset": "native-debug explicit development subset",
+  "passed": 710,
+  "suites": [
+    {
+      "binary": "nexus_can_controller_test",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 30,
+      "cases": [
+        {
+          "name": "RejectsNonClassicFramesWithoutMutatingPreparedStorage",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "MailboxEmptyAloneNeverSettlesTheWireRequest",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "TxokAndCompletionDetachBeforeSettlement",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "RemoteFrameUsesRequestedDlcAndZeroTransferredBytes",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationWaitsForActualAbortAcknowledgement",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "CompletionRacingCancellationPreservesWireSuccess",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineExpiredRejectsWithNoMailboxEffect",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareOverrunReportsLowerBoundWithoutInventedExactCount",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "BusOffRemainsAuthoritativeWhenTheRingIsFull",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "FourthVectorPriorityCannotBypassKernelWakeCeiling",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "CompletionClearFailureCannotReleaseCallerStorage",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "StuckIrqDisableRetainsRingAndWakeUntilStopReadback",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "IncomingMaskRejectsTaskControlsWithoutAdmission",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "PrimaryClockIsActuallyAcquiredForTheFilterDomain",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "SecondControllerKeepsPrimaryClockAndPeerFiltersAlive",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "ColdUnownedTransmitCannotEscapeInitializationMode",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "UnownedHardwareAbortFailureRetainsDomainAndWakeLoans",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "StoppedReaderNeverTouchesReleasedReceiveStorage",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "LockedHardwareFifoOlderFramesPrecedeItsOverrunBoundary",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "FailedVectorEnableCannotReportSuccessfulInitialization",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "StopDrainsRetainedHardwareFifoBeforeReleasingTheRing",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "StuckFifoReleaseKeepsControllerAndRingResponsibility",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "AdmissionRejectsMutableRequestAliasingTheFilterPlan",
+          "classname": "ClassicCan",
+          "status": "passed"
+        },
+        {
+          "name": "StopJoinsAnInFlightNativeWakePublisherBeforeRelease",
+          "classname": "ClassicCan",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "739af8a3ae0dad92ff1e103accf873e91a61f18be7f5a757aecbdeabea083877"
+    },
+    {
+      "binary": "nexus_ethernet_native_test",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 7,
+      "cases": [
+        {
+          "name": "ExplicitEgressReturnsOwnBeforeActualProviderSettlement",
+          "classname": "EthernetNative",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitIngressCannotOverwriteAnAcquiredLoan",
+          "classname": "EthernetNative",
+          "status": "passed"
+        },
+        {
+          "name": "MdioReadsOnlyExplicitRegisterFileAndAddress",
+          "classname": "EthernetNative",
+          "status": "passed"
+        },
+        {
+          "name": "StopRetainsFailedIrqDetachAndLaterRecoversWithoutReplay",
+          "classname": "EthernetNative",
+          "status": "passed"
+        },
+        {
+          "name": "PendingStatusCannotBeReleasedWhileW1cIsStuck",
+          "classname": "EthernetNative",
+          "status": "passed"
+        },
+        {
+          "name": "ActualPriorityIsRevalidatedBeforeKernelWakeBinding",
+          "classname": "EthernetNative",
+          "status": "passed"
+        },
+        {
+          "name": "EpochSurvivesStopAndPreventsReleaseOfReusedStorage",
+          "classname": "EthernetNative",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "deb05c74ca4968b157400f7655b7e900a92373740ea353e9e44e8c3fe40e163a"
+    },
+    {
+      "binary": "nexus_g474_factory_test",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 14,
+      "cases": [
+        {
+          "name": "LookupIsPureStaticIdentityBeforeAnyHardwareAccess",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "ActualStartupBinds170MHzClockTimebasePinsAndIrq",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "SelectedGpioRejectsOutsideMaskWithoutRegisterAccess",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "GeneratedVectorBorrowsTransmitUntilActualWireComplete",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "GeneratedVectorReceivesIntoSelectedCallerBudgetedRing",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidObservedSiliconRejectsBeforeClockMutation",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignLiveUartRejectsBeforeAnyClockOrPinMutation",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignDmaControlRejectsBeforeAnyClockOrPinMutation",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedClockStartupDoesNotExposeAnyPeripheral",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedUartAcknowledgementRollsBackPinsAndOwnedGates",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPeripheralRollbackRetainsClockPinsAndResponsibility",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "StopFailurePreservesIdentityUntilActualIrqWithdrawal",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "UnrelatedPinAndClockFieldsSurviveStartAndStop",
+          "classname": "G474Factory",
+          "status": "passed"
+        },
+        {
+          "name": "StopRestoresSelectedFieldsAndRestartKeepsStaticIdentity",
+          "classname": "G474Factory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "0c019a0b72579f2b2fba9e55ad935737549919cb119b1effb113d490ea2707fb"
+    },
+    {
+      "binary": "nexus_g474_provider_test",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 23,
+      "cases": [
+        {
+          "name": "ExactPrescalerAndBrrWaitForRealAcknowledgement",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "UnsupportedProfileAndBaudRejectBeforeWrites",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignEnabledHardwareRejectsWithoutTakingIrq",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "TxSettlesOnlyAfterFinalWireTc",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "StaleTcBeforeLastTdrIsNotFinalWireCompletion",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "CancelKeepsBorrowQuarantinedUntilRealTc",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedWireFactWinsLaterDeadlineAndCancel",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "TcFirstObservedAtDeadlineIsTimeout",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "RingOverflowPreservesOlderBytesAndReportsLoss",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "CorruptByteIsDiscardedWithObservableAggregateLoss",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "ReadOutputCannotOverwriteRingOrActiveRequest",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "RequestMetadataCannotOverlapReceptionStorage",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "WakeCannotBeBorrowedFromDmaOrIrqOwnedRing",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "WakeUsesActualPriorityAndWaitsForCapturedCallback",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "FailedSourceWithdrawalRetainsAllStorage",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "TwoInstancesDoNotShareRequestOrRingCursors",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "GpioPreloadsSafeLevelAndRestrictsMasks",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidGpioMasksRejectBeforeAnyWrite",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "FailedGpioModeAcknowledgementNeedsSafeRollback",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "FailedGpioInitialLatchDoesNotExposeOutputMode",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "GpioElectricalModeMustBeObservedBeforePublication",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "UartPinPreloadFailureMustNotExposeAlternateOutput",
+          "classname": "G474Provider",
+          "status": "passed"
+        },
+        {
+          "name": "UnprivilegedGpioToggleRejectsBeforeAnyRegisterAccess",
+          "classname": "G474Provider",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "b22acae3cfad3cecc2961512efcd27c321dc881fd7f6e853eb8d3da6b3dc0a52"
+    },
+    {
+      "binary": "nexus_gd32_adc_stream_test",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 25,
+      "cases": [
+        {
+          "name": "FullScanPublicationRequiresEngineDetach",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "BackpressureNeverOverwritesAndResumeIsExplicit",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDomainAndRateRejectBeforeLoanOrEffects",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "WakeUsesActualDmaPriorityAndLatchedPublication",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "CalibrationTimeoutReleasesOnlyQuiescentProducer",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "StabilityClockStartsAfterPowerStoreHasCompleted",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "SwappedBankPublishesWhileOtherBankKeepsAcquiring",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "StarvationStopsAndNeverOverwritesBorrowedBlock",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDisableRetainsBothTargetsUntilReadback",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidLateDomainAndUnequalScanCapacityNeverLoan",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WrongBankPhaseStopsInsteadOfPublishingUnknownScan",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedAddressWriteAndDrainRetainThreeLoans",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "BankSwitchDuringTargetWriteRejectsPublication",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitSampleTimeCostsLimitTheCompleteScanRate",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "IncorrectReplacementAddressNeverPublishesOldBlock",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorAtTargetStoreRejectsPublication",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "SequenceFactsReportSelectedCyclesAndNominalClocks",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverEpochTracksBlockAndRejectsReleasedLoan",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "CalibrationTimeoutDoesNotInventCompletedBlockLoss",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "768088564dee8209a925793d72fdfccee881931dd372f7102b197b90a130117b"
+    },
+    {
+      "binary": "nexus_gd32_can_factory_test",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 6,
+      "cases": [
+        {
+          "name": "PureLookupPreservesSeparateIdentityBeforeStartup",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedSecondStartupIsIncludedInReverseCleanup",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "SecondPinFailureRestoresOnlyTheCapturedLeases",
+          "classname": "CanFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "f04698bc8af824ffc2a39e6b40c79b81c3924679334607c660df3415b8a3c02e"
+    },
+    {
+      "binary": "nexus_gd32_can_test",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 8,
+      "cases": [
+        {
+          "name": "ActualSdkClockModeTimingAndVectorsMatchTheMechanism",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "MailboxPackingAndSdkCompletionProveActualWireSuccess",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "SecondControllerDependsOnPrimaryClockWithoutResettingPeer",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FifoMailboxDlcAndReleaseUseExactSdkOffsets",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FailedExitAcknowledgementRetainsDomainResponsibility",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FalseCpuPriorityFactsRejectBeforeReenablingHardware",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
+          "classname": "CanSoc",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "f6208d7db89a129bdde70153c3bf87268ab6817cd3f3fa68ec1c21aa1a5919a7"
+    },
+    {
+      "binary": "nexus_gd32_eth_factory_test",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15,
+      "cases": [
+        {
+          "name": "PairedTypedGettersArePureAndShareOneMacIdentity",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ExactChosenStorageReviewedPadsAndNoGuessedPhyLink",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PairedCapabilitiesDescribeBusMasterAndPollingMdio",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedRmiiSelectorRestoreRetainsLeaseAndBlocksRestart",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignMacClockAndRmiiSelectionSurviveOwnedShutdown",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPartialPinConfigurationRestoresAcquiredPads",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPinRestoreKeepsClocksAndStorageUntilRetry",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ActualResetFailureIsCountedBeforeColdCallAndDrained",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FiniteMdioUsesPairedFaceWithoutInventingPhyNegotiation",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "IrqWithdrawalFailureRetainsPinsClocksAndRestartGate",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedDmaDomainDoesNotResetMacOrRetainPayload",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedReceiveEpochCannotBeResetByReconstruction",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "8b46d5ee840125528eb25bf75946149e5af9e586a2a87c4a7040f4fbbecb4e95"
+    },
+    {
+      "binary": "nexus_gd32_ethernet_test",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 36,
+      "cases": [
+        {
+          "name": "OwnHandoffRetainsBorrowUntilRealTransmitStatus",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationWaitsForActualEngineAndFifoDrain",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDomainRejectsBeforeResetOrOwnPublication",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "MdioTimeoutDoesNotInventReadValueOrClearBusy",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveOutputCannotAliasDmaBufferOrOtherLoans",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StateAndMdioOutputCannotOverwriteProviderStorage",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "LateFatalIrqClosesAdmissionBeforeNewOwnPublication",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "InitializationCannotResetForeignDescriptorEngine",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StopDoesNotReclaimStuckOwnOrHeldLoan",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CapturedWakeRemainsBorrowedDuringItsCallback",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "SocRejectsUnreviewedCcmAndWrongClockBeforeReset",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CrcLengthFragmentAndVlanAreDiscardedWithoutBorrow",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "RingFullRejectsWithoutChangingRejectedRequest",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "UnalignedPayloadRejectsWithoutDescriptorEffects",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "FatalBusErrorCannotTurnMissingStatusIntoSuccess",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "UnderflowIsLatchedAndDrainedWithoutReplay",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CancelPreservesAlreadyReturnedWireSuccess",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "FrameMetadataMustRemainValidForEveryOutstandingBorrow",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CoalescedCompletionsRependAfterConstantIrqBudget",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "WakeBindingUsesActualPriorityAfterExternalChange",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "MdioCompletionAtDeadlineDoesNotPublishLateValue",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ResetAcknowledgementAtDeadlineRetainsStartupOwner",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ModifiedReceiveTokenCannotRearmOriginalLoan",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveTokenBindsExactProviderIdentity",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "LinkChangeRequiresBothDirectionsQuiet",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "SameObservedLinkDoesNotRewriteActiveEngine",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "LinkDownMustDrainRxBeforeReconfiguration",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "WakeTargetCannotResideInDmaReceiveStorage",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "KnownWakeStorageCannotBeUsedAsMutableOutput",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "RequestMetadataCannotOverwriteBorrowedWakeTarget",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "WakeReplacementRechecksPublisherAfterColdValidation",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StopRechecksCapturedPublisherAfterNvicDisableBoundary",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesNewReceiveLoansBeforeDrainCompletes",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "FailedTableWithdrawalCannotReborrowDiscardedQueueHead",
+          "classname": "EthernetMac",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "d1f0c95672398152ca3d31b2e25620c818f6332b127efd6e1bba5f524c9db7d7"
+    },
+    {
+      "binary": "nexus_gd32_i2c_async_test",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 24,
+      "cases": [
+        {
+          "name": "OneByteNacksBeforeAddressClearAndWaitsStop",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FinalThreeWithdrawsAckBeforeNMinusTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ThreeByteAddressDisablesBufferInterruptBeforeBtf",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TwoBytesUsePosAndNackBeforeAddressClear",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FourBytesConsumesOneThenFinalOneAndTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitTxeDoesNotConfirmWirePrefix",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelBeforeStartDrainsLateMasterWithoutRevokingLoan",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ArbitrationNeverInjectsStopIntoOtherMaster",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredAdmissionAndForeignIdentityHaveNoEffects",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RepeatedStartKeepsOneLoanAndResetsReceiveWindow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MaskedAdmissionAndAsyncPollingNeverTouchHardware",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelRequiresExplicitLocalRecoveryBeforeReuse",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TxCounterZeroStillWaitsForBtf",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "SimultaneousPeripheralNackOutranksDmaCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CounterNotZeroNeverReportsPayloadCompleted",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableQuarantinesStorage",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "AllDomainsValidateBeforeAdmissionOrMmio",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "PeripheralErrorDuringStopDrainCannotPublishSuccess",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ColdRouteTamperingRejectsBeforeRegistersOrPublishers",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "UnsafeDmaPublisherPreventsKernelWakeBinding",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "337ad905957549e085d0adc5ac10a84e92c2e2a28624e33db79a93049de30dfa"
+    },
+    {
+      "binary": "nexus_gd32_i2c_register_test",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13,
+      "cases": [
+        {
+          "name": "ReceivesThreeFourAndMaximumLengthWithExactPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MixedReadsUseRepeatedStartWithoutIntermediateStop",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NackArbitrationAndBusErrorPreserveCompletedReadPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ContextAndOversizedMessagesRejectBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineRejectsBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StuckStopCannotReportSuccessAndRequiresRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "EightMessageBoundIsValidatedBeforeTheFirstStart",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedStopDoesNotIssueAnotherStopAfterMasterRelease",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StopBitClearWithoutMasterReleaseCannotReportSuccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "c344cdfe086ad781cb229e0e43cb4d8f273dc680d5f0b22f84b137fb259a76a4"
+    },
+    {
+      "binary": "nexus_gd32_spi_dma_test",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15,
+      "cases": [
+        {
+          "name": "ProgramsExactIndependentDmaRoutesWithoutCopying",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "PollingEndpointsProveSharedControllerWithoutDmaAlias",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitSingleCellSpansProgramFixedDmaWithoutScratch",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitDiscardRejectsInvalidSpansBeforeAnyEffects",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "BothDmaCompletionsRetainCsUntilIndependentWireIdle",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "EndpointIdentityAndBusySecondChildCannotAcquireCs",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableKeepsBorrowDespiteIdleWire",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorWakeObservesLatchedDrainAfterRestoringIncomingMask",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "BothActualIrqPrioritiesMustPermitKernelCallingWake",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedMemoryWithUnboundedRequestStillHasBoundedDrain",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "0454569163ec630dfe1c395e6042ccf16571026dc4c33db08807d35de6f20ce3"
+    },
+    {
+      "binary": "nexus_gd32_timer_factory_test",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 22,
+      "cases": [
+        {
+          "name": "LookupIsPureBeforeAnyClockOrPinEffects",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "UnprivilegedStopRejectsWithoutPeripheralOrClockEffects",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ActualPolicyAndStaticIrqContextsAreBound",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCaptureConstructorReleasesItsPartialSession",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedAdvancedConstructorUnwindsAcquiredResources",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedColdGateNeverBorrowsTimerOrPins",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedPendingClearRetainsExactProviderBeforeReuse",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PartialPinFailureRestoresRecordedLeaseBeforeRestart",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ActivePublisherPreventsStorageReuseEvenAfterDisable",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedPriorityRestorePreservesLeaseUntilRetry",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedPeripheralDetachPreservesCaptureRing",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedSafeOutputLatchDoesNotReleasePinOrClock",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "AllInactiveOutputProofsPrecedeAnyPinRelease",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedOriginalPinRestoreRetainsColdLease",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PreexistingClockAndUnrelatedGpioFieldsArePreserved",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "StopAndColdRestartReuseOnlyAProvedQuiescentSession",
+          "classname": "TimerFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "7b2675f483f77077622567095959da5970618544213dd23b126298fb9442285e"
+    },
+    {
+      "binary": "nexus_gd32_uart_dma_test",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 9,
+      "cases": [
+        {
+          "name": "DmaCompletionRetainsBorrowUntilIndependentWireIdle",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedDomainHasNoMemoryBorrowOrHardwareEffects",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationCannotReleaseMemoryWhenEngineStillOwnsIt",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "LateDmaIRQCannotReachSettledRequest",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineStillBoundsMissingWireCompletionAfterDma",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineStillBoundsRefusedEngineDisableAfterDma",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "3450b35d323613dc014cb6cd9a9f8ee07e5cfb52d800633eeecaa919e3c0d6ce"
+    },
+    {
+      "binary": "nexus_gd32_uart_receive_test",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 35,
+      "cases": [
+        {
+          "name": "StartProgramsCallerBufferWithoutCpuPayloadCopy",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidFutureBufferRejectsWithoutLoanOrMmioEffect",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdlePublishesOnlyTheStablePartialPrefix",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "FullDmaBlockRequiresExplicitOwnerRearm",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesTransmitAdmissionWhileConsumerLoanExists",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousSwapsInactiveTargetBeforePublishingAndWraps",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousIdleFlushesCompletedHeadThenStablePartialFuture",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousUnexpectedParityOfBankStopsAndLatchesLoss",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveStopOnFreshStateFailsWithoutDereferencingHardware",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IrqTransmitAbortMustDrainRxBeforeResettingSharedUsart",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowSurvivesIrqTransmitAbortControllerReset",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousWrongAddressStoreFailsExactReplacementProof",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ExactValidatorRejectsExpiredDescriptorWithoutBorrowOrMmio",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdleRechecksErrorThatArrivesDuringActualDmaDisable",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopRechecksUartErrorBeforeClearingDataAndPublishingPrefix",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousConsumesCapturedTcWithExactlyOneAckStore",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedSecondPrepostRollsBackEveryPrivateRetainedReference",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "2b2642a0c106e4cb28d7739fa44884f2ed3f47f4d4bcaa6cc7d6a4d337aa7d12"
+    },
+    {
+      "binary": "nexus_gd32_uart_stream_test",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 9,
+      "cases": [
+        {
+          "name": "ColdAssemblyAndRejectedAdmissionHaveNoRxStorageEffects",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "FullAndIdleBlocksNeverOverwriteHeldConsumer",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "OverallStopPublishesPrefixAndWaitsForConsumerRelease",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "TxRemainsIndependentAndResetLossRestoresRxSource",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "DistinctControllersHaveIndependentLoansAndRegisters",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "FullIdleHasOnePublicationWithBothObservedFacts",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFollowsPublicationAndUsesActualPriorityCeiling",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "FailedResetRetainsTxAndRxLoanUntilProvedDrain",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "658844d4969f337104bfe8f7584634e7aaae0d50862d78be535d2a5f15c41658"
+    },
+    {
+      "binary": "nexus_gd32_usb_factory_test",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 11,
+      "cases": [
+        {
+          "name": "PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "CapabilityDescribesExactlyOneSelectedPioPacket",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RealSelectedDirectionsFifoPlanAndClockConsumerAreBound",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedClockReleaseKeepsBothPinLeases",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPinReadbackRetainsOnlyTheUnreleasedLease",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PartialPinConfigurationRestoresExactlyCapturedPins",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RestartCannotReuseAStaleSetupEpochForSetAddress",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
+          "classname": "UsbFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "c484833c2adf70a09ca057ae703b1c99a25a993d7ddfd9c2842ac9e72adc7cf0"
+    },
+    {
+      "binary": "nexus_gd32f470_timer_advanced_test",
+      "tests": 55,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 55,
+      "cases": [
+        {
+          "name": "InterfacesKeepOptionalModesSeparate",
+          "classname": "TimerContracts",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureAuthorityRejectsBeforeMmio",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsUnrepresentableClockAndFilter",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureCannotReplaceEnabledController",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureReportsRawModuloTicksAndSeparateObservation",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureOverflowIsObservableWithoutOverwritingConsumer",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureStopRetainsQueuedRingUntilTaskDrain",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureFailedDetachRetainsRingAndIncomingMask",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsRingControlOutputAndOverflowAliases",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureW0cPreservesUnrelatedObservedFacts",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureErrorOnlyDoesNotInventAnEdge",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedAuthorityRejectsBeforeMmio",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDeadtimeRepresentabilityFollowsActualEncoding",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDoesNotRoundUnrepresentableDeadtime",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRejectsIrreversibleExistingLock",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDutyCannotModifyFixedBase",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDeadtimeClockIsIndependentOfPsc",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedHardwareBreakLatchesAndNeverAutorestarts",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedLateBreakBeforeMoeReadbackFailsStart",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedFailedMoeDetachKeepsOwnerResponsibility",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRejectsOutputThatOverwritesControl",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedClearsOnlyObservedBreakFlag",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRejectsWrongPhysicalBreakBitBeforeWrites",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedCannotEnableAlteredDeadtimeOrBreakPolarity",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedCannotEnableAlteredDtsClockDivider",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedColdConfigurationCannotAliasMutableState",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureProtectsActualInterfaceTableFromRingOverwrite",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsInterfaceFaceAndMethodsOutputAliases",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsAlteredInputSelectionAtStart",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "BothColdConstructorsRequireActualSelectedClockGates",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureFailedIrqAdmissionReturnsNoBorrow",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRestartCannotReplaceAnExistingBorrow",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureAndAdvancedTaskControlsRejectIsrMutation",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDoesNotClearAFaultUntilHardwareAcknowledge",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedPhysicalActiveLowBreakUsesActualPolarity",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRefusedDutyNeverChangesStagedValue",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRefusedChannelWithdrawPreventsCleanStop",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureUsesClockOnlyForActualPublishedValues",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureCannotInheritGatedClockOrXorInputSelection",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedCannotInheritSlaveModeOrRepetitionCounter",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureColdReleaseRequiresDrainAndSupportsNewSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedColdReleaseQuiescesSourceBeforeNewSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureFailedStopAcknowledgesLateSourceWithoutRingWrite",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureReadClearPreservesNewUnreadEdge",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureObservesOvercaptureAfterActualDataRead",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCaptureConstructorRetainsCleanupSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedAdvancedConstructorRetainsCleanupSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCaptureCleanupRetainsIdentityUntilRealReadback",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedAdvancedCleanupRetainsIdentityUntilRealReadback",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "UntouchedReleaseNeverWithdrawsForeignActiveTimer",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "UntouchedAdmissionRejectionsReleaseWithoutEffects",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedSessionReleaseChecksAllOwnedSourceBits",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedColdCaptureStopClosesSourceBeforePublisherJoin",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedColdAdvancedStopClosesSourceBeforePublisherJoin",
+          "classname": "TimerHardware",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "24fa3fe2929004d326b83b03cec5112b0543158138f9bff0efe9e4b50cdb9d30"
+    },
+    {
+      "binary": "nexus_gd32f470_usb_device_test",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 7,
+      "cases": [
+        {
+          "name": "RealRegisterFactsAndClockConsumerSurviveUntilDetach",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FalseCpuFactsRejectBeforeBorrowingTheClock",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignCoreIsNotReboundOrReset",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCoreResetKeepsClockAndOwnerStorage",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FreshResetFailureCanBeStoppedWithoutDereferencingNullEndpoint",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FreshFlushFailureRetainsClockUntilBoundedStopRetry",
+          "classname": "UsbSoc",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "6485d0c506d2e2837d251c69ebdda88815c6c6c1a1f27a34bf9f61d86876925d"
+    },
+    {
+      "binary": "nexus_io_state_machine_test",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 7,
+      "cases": [
+        {
+          "name": "UartCancellationAndEpochDoNotRevokeBorrow",
+          "classname": "IODescriptorSequences",
+          "status": "passed"
+        },
+        {
+          "name": "SpiCancellationAndEpochDoNotRevokeBorrow",
+          "classname": "IODescriptorSequences",
+          "status": "passed"
+        },
+        {
+          "name": "I2cCancellationAndEpochDoNotRevokeBorrow",
+          "classname": "IODescriptorSequences",
+          "status": "passed"
+        },
+        {
+          "name": "NativeUartThirtyTwoCancelDeadlineDrainHistories",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        },
+        {
+          "name": "NativeSpiSixteenCancelDeadlineDrainHistories",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        },
+        {
+          "name": "NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        },
+        {
+          "name": "I2cPublicDispatchAndObservationRetainAcrossDependencyRetries",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "36400df6d98c8644116842466567b6fa377e7f9781e75f71c7d737da4fa50f47"
+    },
+    {
+      "binary": "nexus_stm32_adc_stream_test",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 26,
+      "cases": [
+        {
+          "name": "StabilizationRequiresExplicitServiceBeforeFirstTrigger",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "ValidatesCompleteScanConversionBudgetBeforeAdmission",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedDisableNeverPublishesMutableDmaMemory",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "MisalignedOrPartialScanBlocksRejectWithoutTimerEffects",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "WarmupStartsAfterPowerStoreBarrierCompletes",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "ObservedDmaFaultCannotBeReplacedByLateTransferComplete",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "BasicAdcInitializationCannotBypassStreamClockValidation",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidStreamClockBoundsRejectBeforeAdmission",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "StoppedMultiChannelStreamRestoresIndependentPollShots",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "TwoPrepostedTargetsStayInvisibleUntilSwapped",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "HeldConsumerForcesStopAndExplicitWarmResume",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDrainRetainsBothPrepostedLoans",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WholeScanEqualCapacityAndDomainsValidateBeforeLoan",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WrongCompletionPhaseNeverPublishesUnprovenMemory",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedTargetWriteRetainsSpareUntilProvedDrain",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "BankFlipDuringAddressWriteNeverPublishesOldTarget",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "SequenceFactsAreColdAndDescribeCompleteScanCost",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverUsesLoanEpochAndSoftwareObservationClock",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverCountAndPayloadAliasRejectBeforeDmaLoan",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverSequenceNeverWrapsOrPublishesMissingRecord",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WrongAddressReadbackMustNotReleasePreviousTarget",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorArrivingDuringTargetWriteRejectsPublication",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "NewErrorAtCompletionAcknowledgementCannotDisappear",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "10369ca4f524f2628fba63f06c38ccc0bfe720badd09884bd300d3da9a4dd52c"
+    },
+    {
+      "binary": "nexus_stm32_can_factory_test",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 6,
+      "cases": [
+        {
+          "name": "PureLookupPreservesSeparateIdentityBeforeStartup",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedSecondStartupIsIncludedInReverseCleanup",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+          "classname": "CanFactory",
+          "status": "passed"
+        },
+        {
+          "name": "SecondPinFailureRestoresOnlyTheCapturedLeases",
+          "classname": "CanFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "f9ad156ce4bd9832df64e7aceed05337abe713bd2b52f609cb9871f1aa5939ee"
+    },
+    {
+      "binary": "nexus_stm32_can_test",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 8,
+      "cases": [
+        {
+          "name": "ActualSdkClockModeTimingAndVectorsMatchTheMechanism",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "MailboxPackingAndSdkCompletionProveActualWireSuccess",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "SecondControllerDependsOnPrimaryClockWithoutResettingPeer",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FifoMailboxDlcAndReleaseUseExactSdkOffsets",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FailedExitAcknowledgementRetainsDomainResponsibility",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FalseCpuPriorityFactsRejectBeforeReenablingHardware",
+          "classname": "CanSoc",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
+          "classname": "CanSoc",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "1a65a19c0d62863c837237606e679b53b39daba1b677a7c588bebbfd3aff3dbd"
+    },
+    {
+      "binary": "nexus_stm32_eth_factory_test",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15,
+      "cases": [
+        {
+          "name": "PairedTypedGettersArePureAndShareOneMacIdentity",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ExactChosenStorageReviewedPadsAndNoGuessedPhyLink",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PairedCapabilitiesDescribeBusMasterAndPollingMdio",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedRmiiSelectorRestoreRetainsLeaseAndBlocksRestart",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignMacClockAndRmiiSelectionSurviveOwnedShutdown",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPartialPinConfigurationRestoresAcquiredPads",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPinRestoreKeepsClocksAndStorageUntilRetry",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ActualResetFailureIsCountedBeforeColdCallAndDrained",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FiniteMdioUsesPairedFaceWithoutInventingPhyNegotiation",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "IrqWithdrawalFailureRetainsPinsClocksAndRestartGate",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedDmaDomainDoesNotResetMacOrRetainPayload",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedReceiveEpochCannotBeResetByReconstruction",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        },
+        {
+          "name": "StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
+          "classname": "EthernetFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "fad3904e5fbe4675b74c4a2e5ac4ff851b71899c638d0a3debce46b23f55fec2"
+    },
+    {
+      "binary": "nexus_stm32_ethernet_test",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 36,
+      "cases": [
+        {
+          "name": "OwnHandoffRetainsBorrowUntilRealTransmitStatus",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationWaitsForActualEngineAndFifoDrain",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDomainRejectsBeforeResetOrOwnPublication",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "MdioTimeoutDoesNotInventReadValueOrClearBusy",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveOutputCannotAliasDmaBufferOrOtherLoans",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StateAndMdioOutputCannotOverwriteProviderStorage",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "LateFatalIrqClosesAdmissionBeforeNewOwnPublication",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "InitializationCannotResetForeignDescriptorEngine",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StopDoesNotReclaimStuckOwnOrHeldLoan",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CapturedWakeRemainsBorrowedDuringItsCallback",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "SocRejectsUnreviewedCcmAndWrongClockBeforeReset",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CrcLengthFragmentAndVlanAreDiscardedWithoutBorrow",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "RingFullRejectsWithoutChangingRejectedRequest",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "UnalignedPayloadRejectsWithoutDescriptorEffects",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "FatalBusErrorCannotTurnMissingStatusIntoSuccess",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "UnderflowIsLatchedAndDrainedWithoutReplay",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CancelPreservesAlreadyReturnedWireSuccess",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "FrameMetadataMustRemainValidForEveryOutstandingBorrow",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "CoalescedCompletionsRependAfterConstantIrqBudget",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "WakeBindingUsesActualPriorityAfterExternalChange",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "MdioCompletionAtDeadlineDoesNotPublishLateValue",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ResetAcknowledgementAtDeadlineRetainsStartupOwner",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ModifiedReceiveTokenCannotRearmOriginalLoan",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveTokenBindsExactProviderIdentity",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "LinkChangeRequiresBothDirectionsQuiet",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "SameObservedLinkDoesNotRewriteActiveEngine",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "LinkDownMustDrainRxBeforeReconfiguration",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "WakeTargetCannotResideInDmaReceiveStorage",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "KnownWakeStorageCannotBeUsedAsMutableOutput",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "RequestMetadataCannotOverwriteBorrowedWakeTarget",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "WakeReplacementRechecksPublisherAfterColdValidation",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StopRechecksCapturedPublisherAfterNvicDisableBoundary",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesNewReceiveLoansBeforeDrainCompletes",
+          "classname": "EthernetMac",
+          "status": "passed"
+        },
+        {
+          "name": "FailedTableWithdrawalCannotReborrowDiscardedQueueHead",
+          "classname": "EthernetMac",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "9d78e2d84f44e95b137a6b9c04fa3c779273dc5fc40bcaa495abe9ae04e93b47"
+    },
+    {
+      "binary": "nexus_stm32_i2c_async_test",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 23,
+      "cases": [
+        {
+          "name": "OneByteNacksBeforeAddressClearAndWaitsStop",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FinalThreeWithdrawsAckBeforeNMinusTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ThreeByteAddressDisablesBufferInterruptBeforeBtf",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TwoBytesUsePosAndNackBeforeAddressClear",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FourBytesConsumesOneThenFinalOneAndTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitTxeDoesNotConfirmWirePrefix",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelBeforeStartDrainsLateMasterWithoutRevokingLoan",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ArbitrationNeverInjectsStopIntoOtherMaster",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredAdmissionAndForeignIdentityHaveNoEffects",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RepeatedStartKeepsOneLoanAndResetsReceiveWindow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MaskedAdmissionAndAsyncPollingNeverTouchHardware",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelRequiresExplicitLocalRecoveryBeforeReuse",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TxCounterZeroStillWaitsForBtf",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "SimultaneousPeripheralNackOutranksDmaCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CounterNotZeroNeverReportsPayloadCompleted",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableQuarantinesStorage",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "AllDomainsValidateBeforeAdmissionOrMmio",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "PeripheralErrorDuringStopDrainCannotPublishSuccess",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ColdRouteTamperingRejectsBeforeRegistersOrPublishers",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "c8864059777e9d45c6471baefb1083dbfa0c6d2f2f48bfd84416d81588c817e4"
+    },
+    {
+      "binary": "nexus_stm32_i2c_register_test",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 14,
+      "cases": [
+        {
+          "name": "ReceivesThreeFourAndMaximumLengthWithExactPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MixedReadsUseRepeatedStartWithoutIntermediateStop",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NackArbitrationAndBusErrorPreserveCompletedReadPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ContextAndOversizedMessagesRejectBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineRejectsBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StuckStopCannotReportSuccessAndRequiresRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "EightMessageBoundIsValidatedBeforeTheFirstStart",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedStopDoesNotIssueAnotherStopAfterMasterRelease",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StopBitClearWithoutMasterReleaseCannotReportSuccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MissingLineFactsRejectInitializationAndRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "11de83c007c46844709e2cced4bd607be4c5935c15c3debd10a0e422572359b6"
+    },
+    {
+      "binary": "nexus_stm32_spi_dma_test",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 11,
+      "cases": [
+        {
+          "name": "BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitDiscardBorrowsOneCellAndDisablesRxIncrement",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitDummyBorrowsOneCellAndDisablesTxIncrement",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "FixedMemoryRejectsUnknownOverlapAndMissingDomains",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "FollowingOrdinaryAdmissionRestoresBothMemoryIncrements",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "WrongBusIdentityAndInvalidDomainsFailBeforeAdmission",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "PollingEndpointsProveSharedControllerWithoutDmaAlias",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "LateServiceWithRealCompletionProofPreservesSuccess",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "71451a8ffbd272652bd456ddf7e04f6a59c3f1852b73e2cec61c03c09469a836"
+    },
+    {
+      "binary": "nexus_stm32_timer_factory_test",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 22,
+      "cases": [
+        {
+          "name": "LookupIsPureBeforeAnyClockOrPinEffects",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "UnprivilegedStopRejectsWithoutPeripheralOrClockEffects",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ActualPolicyAndStaticIrqContextsAreBound",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCaptureConstructorReleasesItsPartialSession",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedAdvancedConstructorUnwindsAcquiredResources",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedColdGateNeverBorrowsTimerOrPins",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedPendingClearRetainsExactProviderBeforeReuse",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PartialPinFailureRestoresRecordedLeaseBeforeRestart",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ActivePublisherPreventsStorageReuseEvenAfterDisable",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedPriorityRestorePreservesLeaseUntilRetry",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedPeripheralDetachPreservesCaptureRing",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedSafeOutputLatchDoesNotReleasePinOrClock",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "AllInactiveOutputProofsPrecedeAnyPinRelease",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedOriginalPinRestoreRetainsColdLease",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PreexistingClockAndUnrelatedGpioFieldsArePreserved",
+          "classname": "TimerFactory",
+          "status": "passed"
+        },
+        {
+          "name": "StopAndColdRestartReuseOnlyAProvedQuiescentSession",
+          "classname": "TimerFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "1dc7e2630a94463929596dcefe85ae1ce9ed0a9e615ba8ae356575e32697094f"
+    },
+    {
+      "binary": "nexus_stm32_uart_dma_test",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 10,
+      "cases": [
+        {
+          "name": "DmaTransferCompleteCannotSettleUntilUartTc",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDomainRejectsWithoutBorrowOrRegisterWrites",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDrainQuarantinesUntilActualWireIdle",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "WireIdleCannotReleaseMemoryWhenEngineRefusesDisable",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "DmaCompletionBoundsWireDrainWithoutRequestDeadline",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "LateServiceWithWireAndEngineProofPreservesSuccess",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "BlockRxRequiresTheSeparateStreamProvider",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "22896b00a4eda644bd7abbeee8fd6e6f37496d61386ee40995dc13796387ba19"
+    },
+    {
+      "binary": "nexus_stm32_uart_receive_test",
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 33,
+      "cases": [
+        {
+          "name": "StartProgramsCallerBufferWithoutCpuPayloadCopy",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidFutureBufferRejectsWithoutLoanOrMmioEffect",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdlePublishesOnlyTheStablePartialPrefix",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "FullDmaBlockRequiresExplicitOwnerRearm",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesTransmitAdmissionWhileConsumerLoanExists",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousSwapsInactiveTargetBeforePublishingAndWraps",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousIdleFlushesCompletedHeadThenStablePartialFuture",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousUnexpectedParityOfBankStopsAndLatchesLoss",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveStopOnFreshStateFailsWithoutDereferencingHardware",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousWrongAddressStoreFailsExactReplacementProof",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ExactValidatorRejectsExpiredDescriptorWithoutBorrowOrMmio",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdleRechecksErrorThatArrivesDuringActualDmaDisable",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopRechecksUartErrorBeforeClearingDataAndPublishingPrefix",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousConsumesCapturedTcWithExactlyOneAckStore",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedSecondPrepostRollsBackEveryPrivateRetainedReference",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "464eb3eb3c359a15df5e66aad24843d02a5d4138ab770dcd53690ebad22b73fe"
+    },
+    {
+      "binary": "nexus_stm32_uart_stream_test",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 5,
+      "cases": [
+        {
+          "name": "IdlePublishesPartialAndBackpressureKeepsConsumerLoan",
+          "classname": "Stm32UartStream",
+          "status": "passed"
+        },
+        {
+          "name": "DroppedReceptionProducesLossAtTheNextUsefulBlock",
+          "classname": "Stm32UartStream",
+          "status": "passed"
+        },
+        {
+          "name": "FullIdleHasOnePublicationWithBothObservedFacts",
+          "classname": "Stm32UartStreamFacts",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte",
+          "classname": "Stm32UartStreamFacts",
+          "status": "passed"
+        },
+        {
+          "name": "StopPublishesErrorPrefixAndJoinsConsumerLoan",
+          "classname": "Stm32UartStreamFacts",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "b11d1fab476077f4841f5ef9e3b73b17d1d8c66fee8d87365b7534af3a1304fb"
+    },
+    {
+      "binary": "nexus_stm32_usb_factory_test",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 12,
+      "cases": [
+        {
+          "name": "PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "CapabilityDescribesExactlyOneSelectedPioPacket",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RealSelectedDirectionsFifoPlanAndClockConsumerAreBound",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedClockReleaseKeepsBothPinLeases",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "FailedPinReadbackRetainsOnlyTheUnreleasedLease",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "PartialPinConfigurationRestoresExactlyCapturedPins",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RestartCannotReuseAStaleSetupEpochForSetAddress",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
+          "classname": "UsbFactory",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedOwnedGpioGateWithdrawalRetainsPlatformUntilReadback",
+          "classname": "UsbFactory",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "38574dab16269e0c33db7f8eb8a31030e74f947a973348d9ee35579dbe884757"
+    },
+    {
+      "binary": "nexus_stm32f407_timer_advanced_test",
+      "tests": 55,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 55,
+      "cases": [
+        {
+          "name": "InterfacesKeepOptionalModesSeparate",
+          "classname": "TimerContracts",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureAuthorityRejectsBeforeMmio",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsUnrepresentableClockAndFilter",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureCannotReplaceEnabledController",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureReportsRawModuloTicksAndSeparateObservation",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureOverflowIsObservableWithoutOverwritingConsumer",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureStopRetainsQueuedRingUntilTaskDrain",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureFailedDetachRetainsRingAndIncomingMask",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsRingControlOutputAndOverflowAliases",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureW0cPreservesUnrelatedObservedFacts",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureErrorOnlyDoesNotInventAnEdge",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedAuthorityRejectsBeforeMmio",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDeadtimeRepresentabilityFollowsActualEncoding",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDoesNotRoundUnrepresentableDeadtime",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRejectsIrreversibleExistingLock",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDutyCannotModifyFixedBase",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDeadtimeClockIsIndependentOfPsc",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedHardwareBreakLatchesAndNeverAutorestarts",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedLateBreakBeforeMoeReadbackFailsStart",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedFailedMoeDetachKeepsOwnerResponsibility",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRejectsOutputThatOverwritesControl",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedClearsOnlyObservedBreakFlag",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRejectsWrongPhysicalBreakBitBeforeWrites",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedCannotEnableAlteredDeadtimeOrBreakPolarity",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedCannotEnableAlteredDtsClockDivider",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedColdConfigurationCannotAliasMutableState",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureProtectsActualInterfaceTableFromRingOverwrite",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsInterfaceFaceAndMethodsOutputAliases",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRejectsAlteredInputSelectionAtStart",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "BothColdConstructorsRequireActualSelectedClockGates",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureFailedIrqAdmissionReturnsNoBorrow",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureRestartCannotReplaceAnExistingBorrow",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureAndAdvancedTaskControlsRejectIsrMutation",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedDoesNotClearAFaultUntilHardwareAcknowledge",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedPhysicalActiveLowBreakUsesActualPolarity",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRefusedDutyNeverChangesStagedValue",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedRefusedChannelWithdrawPreventsCleanStop",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureUsesClockOnlyForActualPublishedValues",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureCannotInheritGatedClockOrXorInputSelection",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedCannotInheritSlaveModeOrRepetitionCounter",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureColdReleaseRequiresDrainAndSupportsNewSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedColdReleaseQuiescesSourceBeforeNewSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureFailedStopAcknowledgesLateSourceWithoutRingWrite",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureReadClearPreservesNewUnreadEdge",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "CaptureObservesOvercaptureAfterActualDataRead",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCaptureConstructorRetainsCleanupSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedAdvancedConstructorRetainsCleanupSession",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCaptureCleanupRetainsIdentityUntilRealReadback",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedAdvancedCleanupRetainsIdentityUntilRealReadback",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "UntouchedReleaseNeverWithdrawsForeignActiveTimer",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "UntouchedAdmissionRejectionsReleaseWithoutEffects",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedSessionReleaseChecksAllOwnedSourceBits",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedColdCaptureStopClosesSourceBeforePublisherJoin",
+          "classname": "TimerHardware",
+          "status": "passed"
+        },
+        {
+          "name": "FailedColdAdvancedStopClosesSourceBeforePublisherJoin",
+          "classname": "TimerHardware",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "65a1452fa90d75dd97fc2b42eef5113ea30b963149230f21edb77f038fcd0d7a"
+    },
+    {
+      "binary": "nexus_stm32f407_usb_device_test",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 7,
+      "cases": [
+        {
+          "name": "RealRegisterFactsAndClockConsumerSurviveUntilDetach",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FalseCpuFactsRejectBeforeBorrowingTheClock",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignCoreIsNotReboundOrReset",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FailedCoreResetKeepsClockAndOwnerStorage",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FreshResetFailureCanBeStoppedWithoutDereferencingNullEndpoint",
+          "classname": "UsbSoc",
+          "status": "passed"
+        },
+        {
+          "name": "FreshFlushFailureRetainsClockUntilBoundedStopRetry",
+          "classname": "UsbSoc",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "efefd26a89f85fddfcdf6033622038ebf3a68b7343fb1f64c9d7820ce942bb31"
+    },
+    {
+      "binary": "nexus_uart_rs485_test",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13,
+      "cases": [
+        {
+          "name": "RejectsInvalidTransportBeforeDirectionOrBorrow",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "SetupThenTrueTransportSettlementThenMinimumHold",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "CancelDuringSetupNeverStartsUartAndWithdrawsDirection",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "ActiveCancelAndFailedDrainRetainOuterBorrowAndDirection",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDirectionWithdrawalQuarantinesUntilActualRetry",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesAdmissionAndDrainsDirectionBeforeTransportStop",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "SuccessAlreadySettledInTransportWinsLaterCancel",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "InitRejectsConfigOverlappingControlBeforeAnyDirectionStore",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDirectionMaskRejectsBeforeStartupStore",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "FailedTransportStartWithdrawsDirectionBeforeSettlingOuter",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "NativeWireTcAndSelectedDirectionHaveIndependentLifetimes",
+          "classname": "NativeUartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "NativeHeldDrainRetainsOuterDirectionUntilRealRetry",
+          "classname": "NativeUartRs485",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "608c5675159d41549188eea30bd0b8fc81c7b325b720c634b73a0364b7900f3b"
+    },
+    {
+      "binary": "nexus_usb_device_test",
+      "tests": 43,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 43,
+      "cases": [
+        {
+          "name": "FifoWriteDoesNotCompleteHostAcknowledgement",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "ShortOutCompletesOnlyAfterDataAndTransferFacts",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutOverflowCannotWriteBeyondCallerCapacity",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDisableKeepsRequestBorrowedThroughDrainDeadline",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "FifoFlushFailureCannotSettleDisabledEndpoint",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "StopCannotReleaseWakeOrClockWithAnEnabledIrq",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "NewSetupInvalidatesOldControlBeforeReusingStorage",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "AddressChangesOnlyAfterMatchingStatusInAcknowledgement",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "ResetDoesNotRevokeAnUnprovedEndpointLoan",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "StaleCompletionCannotFinishANewRequestEpoch",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "IllegalPacketAndIncomingMaskRejectWithNoBorrow",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "StallRequiresIdleAndClearResetsBulkDataPid",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "FullEventsPreserveAuthoritativeLatestSetup",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "SubsequentControlPacketsAvoidReservedEpZeroPidCommands",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "PacketBuffersCannotAliasTheClockConsumerControl",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "RestartDoesNotReuseAnEarlierControlEpoch",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "CancellingOutRestoresPeerAdmissionAfterActualDrain",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "PendingResetAtGlobalEnableRemainsObservableAfterColdStart",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "StopAndDetachJoinTheInFlightWakePublisher",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "StateOutputsCannotOverwriteControllerOrClockStorage",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "EventCountCannotAliasControllerQueueMetadata",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "EventOutputsCannotOverwriteClockOrAcceptedOutRequest",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "AttachedWakeObjectCannotBecomeAnOutBuffer",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "WakeCannotAttachInsideAnAlreadyBorrowedOutBuffer",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "EventPlanCannotOverwriteAnImmutableClockTable",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "ReadOnlyTxEmptyFlagCannotPreventColdStartOrSettlement",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "EmptyInTokenIsRetryInformationRatherThanATransferFailure",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutSetupDoneIsNotAnErrorOfTheFollowingControlData",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "ResetDiscardsAnUnorderedPendingSetupFromThePriorBusEpoch",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "InDisableWaitsForAnObservedNakEffectiveState",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutZeroFixedDisableBitUsesProvedPioFifoWithdrawal",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutZeroStopRetainsLoanWhenDisconnectReadbackFails",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutZeroStopRejectsAForeignEnabledDmaEngine",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "LateSetupCannotReopenAClosingControlEpoch",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "OutZeroStopWaitsForRxFifoAndIrqDetachBeforeSettlement",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "LateDisconnectLossCannotRevokeAnOutZeroLoan",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "StallDoesNotModifyAnUnknownEnabledBulkEndpoint",
+          "classname": "UsbDevice",
+          "status": "passed"
+        },
+        {
+          "name": "ClearStallRequiresActualBulkDataZeroReadback",
+          "classname": "UsbDevice",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "ddf162067c53ff50106456da2f85f85c6e3e425716c8549520fac6fac92a317b"
+    }
+  ],
+  "scope": "Development full-binary execution with existing tdd_gate helpers; no complete repository, clean candidate, or hardware qualification."
+}

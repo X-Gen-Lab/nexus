@@ -1,0 +1,38 @@
+test_baud_is_checked_against_actual_presc16_divisor (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_baud_is_checked_against_actual_presc16_divisor) ... ok
+test_clock_metadata_cannot_drift_from_fixed_implementation (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_clock_metadata_cannot_drift_from_fixed_implementation) ... ok
+test_constructor_projection_cannot_bypass_fixed_mode_validation (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_constructor_projection_cannot_bypass_fixed_mode_validation) ... ok
+test_cpu_and_clock_capabilities_are_immutable (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_cpu_and_clock_capabilities_are_immutable) ... ok
+test_cpu_contract_matches_official_irq_extent (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_cpu_contract_matches_official_irq_extent) ... ok
+test_dma_resource_and_dma_routes_are_unimplemented (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_dma_resource_and_dma_routes_are_unimplemented) ... ok
+test_empty_profile_retains_no_io_lease_or_provider_source (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_empty_profile_retains_no_io_lease_or_provider_source) ... ok
+test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback) ... FAIL
+test_gpios_and_uart_use_real_readonly_tables_without_forwarders (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_gpios_and_uart_use_real_readonly_tables_without_forwarders) ... ok
+test_memory_alias_is_counted_once_without_dma_advertisement (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_memory_alias_is_counted_once_without_dma_advertisement) ... ok
+test_nonbyte_profile_and_unimplemented_priority_are_rejected (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_nonbyte_profile_and_unimplemented_priority_are_rejected) ... ok
+test_only_actual_lpuart1_and_fixed_af12_route_are_accepted (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_only_actual_lpuart1_and_fixed_af12_route_are_accepted) ... ok
+test_only_gpioa_and_exact_authorized_mask_are_accepted (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_only_gpioa_and_exact_authorized_mask_are_accepted) ... ok
+test_reference_board_is_explicit_about_physical_uncertainty (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_reference_board_is_explicit_about_physical_uncertainty) ... ok
+test_uart_bytes_and_gpio_are_the_entire_initial_mode_set (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_uart_bytes_and_gpio_are_the_entire_initial_mode_set) ... ok
+test_uart_ctor_is_guarded_before_overwriting_retained_state (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_uart_ctor_is_guarded_before_overwriting_retained_state) ... FAIL
+test_uart_ctor_uses_selected_kernel_policy_without_hidden_os (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_uart_ctor_uses_selected_kernel_policy_without_hidden_os) ... ok
+
+======================================================================
+FAIL: test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/providers/stm32g474/test_provider.py", line 190, in test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback
+    self.assertIn("NX_ERROR_IO", source)
+AssertionError: 'NX_ERROR_IO' not found in '    s_nx_gpioa_lease.captured = false;\n    s_nx_platform_gpio_clocks_added = ~NX_G474_READ(&RCC->AHB2ENR) & RCC_AHB2ENR_GPIOAEN;\n    s_nx_platform_uart_clocks_added = ~NX_G474_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPUART1EN;\n    result.primary = nx_stm32g474_gpio_clock_enable(0u);\n    if (result.primary != NX_SUCCESS) {\n        result.cleanup = nx_platform_stop();\n        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;\n        return result;\n    }\n    s_nx_gpioa_lease.mode = NX_G474_READ(&GPIOA->MODER) & 3312u;\n    s_nx_gpioa_lease.type = NX_G474_READ(&GPIOA->OTYPER) & 44u;\n    s_nx_gpioa_lease.speed = NX_G474_READ(&GPIOA->OSPEEDR) & 3312u;\n    s_nx_gpioa_lease.pull = NX_G474_READ(&GPIOA->PUPDR) & 3312u;\n    s_nx_gpioa_lease.af = NX_G474_READ(&GPIOA->AFR[0]) & 15793920u;\n    s_nx_gpioa_lease.odr = NX_G474_READ(&GPIOA->ODR) & 44u;\n    s_nx_gpioa_lease.captured = true;'
+
+======================================================================
+FAIL: test_uart_ctor_is_guarded_before_overwriting_retained_state (tools.configure.providers.stm32g474.test_provider.G474ProviderTests.test_uart_ctor_is_guarded_before_overwriting_retained_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/providers/stm32g474/test_provider.py", line 156, in test_uart_ctor_is_guarded_before_overwriting_retained_state
+    self.assertIn("nx_uart_port_stop", source)
+AssertionError: 'nx_uart_port_stop' not found in 'static uint8_t s_nx_rx_console[64];\nstatic nx_result_t prepare_console(void) {\n    if (s_nx_port_console.retained || s_nx_port_console.initialized || s_nx_port_console.active != NULL || s_nx_port_console.wake != NULL || s_nx_port_console.wake_publishers != 0u) { return NX_ERROR_BUSY; }\n    s_nx_port_console.registers = LPUART1;\n    s_nx_port_console.rx_storage = s_nx_rx_console;\n    s_nx_port_console.rx_capacity = 64u;\n    s_nx_port_console.baud = 115200u;\n    s_nx_port_console.irq = LPUART1_IRQn;\n    s_nx_port_console.profile = NX_UART_RX_BYTES;\n    s_nx_port_console.irq_policy = (nx_irq_policy_t){ NX_IRQ_KERNEL_NONE, 102u, 4u, 0u };\n    nx_result_t status = nx_stm32g474_lpuart1_pins_prepare();\n    if (status != NX_SUCCESS) { return status; }\n    return nx_stm32g474_uart_initialize(&s_nx_port_console, 170000000u, 1000000u);\n}\nvoid LPUART1_IRQHandler(void);\n/** \\brief One selected controller, at most one TX/RX byte. */\nvoid LPUART1_IRQHandler(void) { nx_stm32g474_uart_irq(&s_nx_port_console); }'
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.002s
+
+FAILED (failures=2)

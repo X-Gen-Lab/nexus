@@ -10,6 +10,7 @@ from unittest.mock import patch
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.evidence.identity import canonical_digest
 from tools.hil.os_acceptance import main, os_plan, validate_os_run
+from tools.testing import test_hil_workloads
 
 
 class OSAcceptanceTests(unittest.TestCase):
@@ -17,8 +18,15 @@ class OSAcceptanceTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
+        self.protocol = test_hil_workloads.HilWorkloadTests()
+        self.protocol.setUp()
+        self.addCleanup(self.protocol.doCleanups)
         self.resolved = {"board": "fixture_board", "part": "fixture_part",
                          "backend": "freertos"}
+        self.protocol.fixture.update(board="fixture_board", part="fixture_part")
+        self.protocol.resolved.update(board="fixture_board", part="fixture_part")
+        self.protocol.resolved["cpu"] = {"arch": "cortex-m4", "fpu": "none",
+                                        "mve": "none"}
         self.admission = {"kind": "hil_admission", "status": "ready",
                           "station_id": "fixture", "board": "fixture_board",
                           "part": "fixture_part", "chip_uid": "fixture_uid",
@@ -31,9 +39,13 @@ class OSAcceptanceTests(unittest.TestCase):
                               "os_fail_response": {"maximum": 100, "unit": "us"}}}
         for key in ("station", "fixture", "elf", "resolved", "resources"):
             path = self.root / (key + ".json")
-            atomic_json(path, {"cpu": {"arch": "cortex-m4", "fpu": "none",
-                                       "mve": "none"}} if key == "resolved" else
-                        {"synthetic": "validator-only"})
+            value = {"synthetic": "validator-only"}
+            if key == "resolved":
+                value = copy.deepcopy(self.protocol.resolved)
+                value["configuration_sha256"] = canonical_digest(value)
+            elif key == "fixture":
+                value = self.protocol.fixture
+            atomic_json(path, value)
             self.admission[key] = file_identity(path)
         self.now = datetime.now(timezone.utc)
         context = {"schema_version": 1, "kind": "os_hil_context",
@@ -50,7 +62,8 @@ class OSAcceptanceTests(unittest.TestCase):
                        "fail_stop": {"maximum_response_us": 100}}}
         for key in ("workload", "instrument"):
             path = self.root / (key + ".json")
-            atomic_json(path, {"synthetic": key})
+            atomic_json(path, self.protocol.reviewed() if key == "workload"
+                        else {"synthetic": key})
             context[key] = file_identity(path)
         self.context_path = self.root / "acquisition-context.json"
         atomic_json(self.context_path, context)
@@ -248,9 +261,12 @@ class OSAcceptanceTests(unittest.TestCase):
     def test_fp_and_mve_full_shared_bank_is_checked(self):
         for fpu, mve in ((True, False), (False, True), (True, True)):
             resolved_path = Path(self.admission["resolved"]["path"])
-            atomic_json(resolved_path, {"cpu": {
+            resolved = copy.deepcopy(self.protocol.resolved)
+            resolved["cpu"] = {
                 "arch": "cortex-m55", "fpu": "fpv5-sp-d16" if fpu else "none",
-                "mve": "int" if mve else "none"}})
+                "mve": "int" if mve else "none"}
+            resolved["configuration_sha256"] = canonical_digest(resolved)
+            atomic_json(resolved_path, resolved)
             self.admission["resolved"] = file_identity(resolved_path)
             self.mock_admit.return_value = copy.deepcopy(self.admission)
             self.context["features"] = {"fpu": fpu, "mve": mve}

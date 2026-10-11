@@ -1,0 +1,42 @@
+{
+  "checked_files": 4,
+  "failing_diagnostics": 0,
+  "files": {
+    "tests/google/g474_factory_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "323910a84889b474aa0f85b9cc5b73914b54a44387379c52820a9e62964c7d1f"
+    },
+    "tests/google/i2c_pair_factory_model.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "822f3cee1ca67c51df2a1e8de08c2bd4bdf577b03fb87055ec84399e2451284a"
+    },
+    "tests/google/i2c_pair_factory_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "b60fe127db8b27eb8a4516f756cc1e41438f140c67b0cab0f02ac6a71cfc4db2"
+    },
+    "tests/google/native_factory_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "25912a5b716f5f09d3db53e41d90a6be28cac2065ae18d1c9d22fb8d219fad1d"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

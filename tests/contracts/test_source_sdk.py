@@ -43,6 +43,47 @@ class SourceSDKSelectionTests(unittest.TestCase):
                                 if argument.startswith("-DNEXUS_ASSEMBLY_FILE="))
                 self.assertTrue(assembly.endswith(".toml"), assembly)
 
+    def test_exposed_io_core_clock_and_provider_closures_are_required(self):
+        required = {
+            "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+            "os/wait.c", "os/include/nexus/os/wait.h",
+            "os/baremetal/notify.c", "os/native/native.c",
+            "components/CMakeLists.txt",
+            "core/include/nexus/core/fault.h", "core/src/fault.c",
+            "core/include/nexus/core/stack_observation.h",
+            "core/src/stack_observation.c", "io/CMakeLists.txt",
+            "io/include/nexus/io/usb_device.h", "io/src/usb_device.c",
+            "io/src/usb_device_controller.c", "io/private/usb_device_controller.h",
+            "io/native/usb_device_access.h", "io/native/usb_device.c",
+            "io/include/nexus/io/ethernet.h", "io/include/nexus/io/mdio.h",
+            "io/src/eth_mac.c", "io/private/eth_mac.h",
+            "io/native/ethernet_access.h", "io/native/ethernet.c",
+            "io/src/can_controller.c", "io/private/can_controller.h",
+            "io/include/nexus/io/timer_capture.h",
+            "io/include/nexus/io/advanced_pwm.h",
+            "io/private/timer_advanced_controller.h",
+            "tools/configure/bindings.py", "tools/configure/emission.py",
+            "tools/configure/usb_device.py", "tools/configure/ethernet.py",
+            "tools/configure/timer_advanced.py",
+            "cmake/platform/Configure.cmake", "cmake/platform/ControllerModes.cmake",
+            "os/freertos/timebase_lowpower.c",
+            "os/freertos/private/timebase_lowpower.h",
+            "os/freertos/stack_snapshot.c",
+            "os/freertos/include/nexus/os/freertos_stack.h",
+            "components/clock_domain/src/clock_domain.c",
+            "components/user_io_broker/src/user_io_broker.c",
+            "components/dp83848/src/dp83848.c",
+            "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
+        }
+        for family in ("stm32f407", "gd32f470"):
+            required.update(f"soc/{family}/" + name for name in (
+                "system.c", "timebase_lowpower.c", "usb_clock.c",
+                "drivers/usb_device.c", "drivers/ethernet.c", "drivers/can.c",
+                "drivers/timer_capture.c", "drivers/advanced_pwm.c",
+                "CMakeLists.txt", "soc.json", "routes.json"))
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+
 
 class SourceSDKThreadXSelectionTests(unittest.TestCase):
     def test_threadx_dependency_snapshot_is_exact_reviewed_source_closure(self):
@@ -78,7 +119,7 @@ class SourceSDKG4SelectionTests(unittest.TestCase):
         self.assertEqual(len(entries), 5)
         self.assertNotIn("Include/stm32g491xx.h", entries)
 
-    def test_g4_lock_verifier_and_all_five_files_are_required_without_board_feature(self):
+    def test_g4_lock_verifier_and_all_five_official_files_are_required(self):
         lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
         required = {"dependencies/stm32g4.lock.json",
                     "tools/maintenance/stm32g4_lock.py"}
@@ -86,7 +127,20 @@ class SourceSDKG4SelectionTests(unittest.TestCase):
                         for name in lock["files"])
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
         self.assertIn("vendors/st/cmsis_device_g4", source_sdk.REQUIRED_DEPENDENCIES)
-        self.assertNotIn("soc/stm32g474/drivers/uart.c", source_sdk.REQUIRED_FILES)
+
+    def test_closed_g4_owned_platform_and_reference_sources_are_required(self):
+        required = {
+            "soc/stm32g474/CMakeLists.txt", "soc/stm32g474/system.c",
+            "soc/stm32g474/drivers/gpio.c", "soc/stm32g474/drivers/uart.c",
+            "soc/stm32g474/private/stm32g474_system.h",
+            "soc/stm32g474/private/stm32g474_provider.h",
+            "soc/stm32g474/soc.json", "soc/stm32g474/routes.json",
+            "boards/stm32g474re_hse24_reference/board.json",
+            "tools/configure/providers/stm32g474/__init__.py",
+            "tools/configure/providers/stm32g474/bindings.py",
+            "tools/configure/providers/stm32g474/emission.py"}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
 
 
 class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
@@ -236,6 +290,65 @@ class SourceSDKTests(unittest.TestCase):
             resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
             self.assertEqual(resources["status"], "passed")
         self.check_private_includes(build)
+
+    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
+    def test_relocated_g474_selected_baremetal_and_freertos_consumers_link(self):
+        for backend, filename in (("baremetal", "io.toml"),
+                                  ("freertos", "io-freertos.toml")):
+            with self.subTest(backend=backend):
+                source, build, arguments = consumer_gate.prepare_consumer(
+                    self.prefix, self.directory, "g474 " + backend,
+                    self.run_ok, fixture=True, arm=True)
+                kernel = " LIBRARIES Nexus::OSFreeRTOS" if backend == "freertos" else ""
+                definitions = "NX_G474_IO_FIXTURE"
+                if backend == "freertos":
+                    definitions += " NX_G474_FREERTOS_FIXTURE"
+                (source / "CMakeLists.txt").write_text(
+                    'cmake_minimum_required(VERSION 3.31)\n'
+                    'project(installed_g474_consumer LANGUAGES C ASM)\n'
+                    'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+                    'find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)\n'
+                    f'nexus_add_firmware(installed_g474 SOURCES main.c{kernel})\n'
+                    f'target_compile_definitions(installed_g474 PRIVATE {definitions})\n'
+                    'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
+                    'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
+                    'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
+                    'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
+                fixture = ROOT / "tests/contracts/g474_assembly"
+                shutil.copyfile(fixture / "main.c", source / "main.c")
+                assembly = source / "g474.toml"
+                text = (fixture / filename).read_text()
+                text = text.replace(
+                    'board_package = "../../../boards/stm32g474re_hse24_reference"',
+                    f'board_package = "{self.sdk}/boards/stm32g474re_hse24_reference"')
+                assembly.write_text(text)
+                arguments = [argument for argument in arguments
+                             if not argument.startswith("-DNEXUS_ASSEMBLY_FILE=")]
+                arguments.append(f"-DNEXUS_ASSEMBLY_FILE={assembly}")
+                self.run_ok(arguments)
+                self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
+                self.run_ok(["cmake", "--build", str(build), "--parallel", "4",
+                             "--target", "installed_g474"])
+                image = build / "bin/installed_g474.elf"
+                resources = json.loads(
+                    (build / "bin/installed_g474.resources.json").read_text())
+                self.assertEqual(resources["status"], "passed")
+                self.assertGreater(image.stat().st_size, 0)
+                config = Path((build / "resolved-config.txt").read_text())
+                self.run_ok([sys.executable, "-B",
+                    str(self.sdk / "tools/measurement/retention.py"),
+                    "--elf", str(image), "--bindings", str(config / "bindings.c"),
+                    "--output", str(build / "provider-retention.json")])
+                retention = json.loads((build / "provider-retention.json").read_text())
+                self.assertEqual(retention["status"], "passed")
+                commands = json.loads((build / "compile_commands.json").read_text())
+                products = [entry for entry in commands
+                            if Path(entry["file"]).resolve() == source / "main.c"]
+                self.assertEqual(len(products), 1)
+                for entry in commands:
+                    self.assertNotIn(str(ROOT) + "/", entry["command"])
+                for private in ("/vendors/", "/soc/", "-DSTM32G474"):
+                    self.assertNotIn(private, products[0]["command"])
 
     def check_private_includes(self, build):
         commands = json.loads((build / "compile_commands.json").read_text())
@@ -400,6 +513,105 @@ class SourceSDKTests(unittest.TestCase):
                 finally:
                     target.write_bytes(original_source)
                     identity.write_bytes(original_identity)
+
+    def test_rehashed_default_target_source_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        for name in ("arch/CMakeLists.txt", "os/wait.c",
+                     "components/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+                     "tools/measurement/resources.py", "tools/evidence/common.py"):
+            with self.subTest(name=name):
+                target = self.sdk / name
+                old_source = target.read_bytes()
+                try:
+                    target.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0,
+                                        "Rehashed default target omission accepted: " + name)
+                    self.assertIn("missing required sources/licenses", result.stderr)
+                finally:
+                    target.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+
+    def test_rehashed_secondary_controller_generator_omission_rejects(self):
+        name = "tools/configure/secondary_controllers.py"
+        target = self.sdk / name
+        identity = self.sdk / source_sdk.MANIFEST
+        old_source = target.read_bytes()
+        old_identity = identity.read_bytes()
+        try:
+            target.unlink()
+            manifest = json.loads(old_identity)
+            manifest["files_sha256"].pop(name)
+            manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                manifest["files_sha256"], sort_keys=True,
+                separators=(",", ":")).encode())
+            identity.write_text(json.dumps(manifest) + "\n")
+            result = self.verify()
+            self.assertNotEqual(result.returncode, 0,
+                                "Rehashed controller generator omission accepted")
+            self.assertIn("missing required sources/licenses", result.stderr)
+        finally:
+            target.write_bytes(old_source)
+            identity.write_bytes(old_identity)
+
+    def test_rehashed_exposed_io_clock_and_cold_source_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        names = (
+            "core/src/fault.c", "core/include/nexus/core/fault.h",
+            "io/include/nexus/io/usb_device.h", "io/src/usb_device_controller.c",
+            "io/private/usb_device_controller.h", "io/native/usb_device_access.h",
+            "io/include/nexus/io/ethernet.h", "io/src/eth_mac.c",
+            "io/private/eth_mac.h", "io/include/nexus/io/mdio.h",
+            "soc/stm32f407/drivers/usb_device.c",
+            "soc/gd32f470/drivers/ethernet.c",
+            "soc/stm32f407/private/stm32f407_can.h",
+            "io/src/can_controller.c", "io/private/can_controller.h",
+            "io/include/nexus/io/advanced_pwm.h",
+            "io/private/timer_advanced_controller.h",
+            "soc/gd32f470/drivers/timer_capture.c",
+            "os/freertos/timebase_lowpower.c",
+            "os/freertos/private/timebase_lowpower.h",
+            "soc/stm32f407/timebase_lowpower.c", "soc/gd32f470/usb_clock.c",
+            "tools/configure/usb_device.py", "tools/configure/ethernet.py",
+            "tools/configure/timer_advanced.py", "tools/configure/bindings.py",
+            "cmake/platform/ControllerModes.cmake",
+            "components/clock_domain/private/clock_domain_impl.h",
+            "components/user_io_broker/include/nexus/components/user_io_broker.h",
+            "components/dp83848/include/nexus/dp83848/dp83848.h",
+            "soc/stm32g474/system.c", "soc/stm32g474/drivers/uart.c",
+            "soc/stm32g474/private/stm32g474_provider.h",
+            "soc/stm32g474/soc.json", "soc/stm32g474/routes.json",
+            "boards/stm32g474re_hse24_reference/board.json",
+            "tools/configure/providers/stm32g474/__init__.py",
+            "tools/configure/providers/stm32g474/bindings.py",
+            "tools/configure/providers/stm32g474/emission.py")
+        for name in names:
+            with self.subTest(name=name):
+                target = self.sdk / name
+                old_source = target.read_bytes()
+                try:
+                    target.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0,
+                                        "Rehashed exposed source omission accepted: " + name)
+                    self.assertIn("missing required sources/licenses", result.stderr)
+                finally:
+                    target.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
 
     def test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST

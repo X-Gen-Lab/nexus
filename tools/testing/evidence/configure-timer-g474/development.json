@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "scope": "dirty-development configuration and observer tests",
+  "sources": [
+    {
+      "path": "tools/configure/assembly.schema.json",
+      "size": 28195,
+      "sha256": "1ec8fdad8f97f1f00c63beafba2ce7c87faff2bf2cf54f2ad6ee1bf67b1b30c9",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/assembly.schema.json.raw"
+    },
+    {
+      "path": "tools/configure/authored.py",
+      "size": 12516,
+      "sha256": "bc95d4e62319ba84b0d6312b294dc4fcb1232b795d60c5b4b867eaaba89ac145",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/authored.py.raw"
+    },
+    {
+      "path": "tools/configure/bindings.py",
+      "size": 7851,
+      "sha256": "2cf921510eece0a51238c233fc74bddb842bbb26e2bc16935caf42615c798106",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/bindings.py.raw"
+    },
+    {
+      "path": "tools/configure/configure.py",
+      "size": 52543,
+      "sha256": "da026d499cad844e9e24fbc0493e203652d9840e7e48f737c58d3977cb855131",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/configure.py.raw"
+    },
+    {
+      "path": "tools/configure/factory.py",
+      "size": 12022,
+      "sha256": "7955cb1afd372f31c886522a727dca445761013790f0d82c300043baf47e220f",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/factory.py.raw"
+    },
+    {
+      "path": "tools/configure/ir.py",
+      "size": 13692,
+      "sha256": "4e1441bf3cf7aa16957dc7f93bd97d389e4678e79467e5e6a459b0a2a0a0dee7",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/ir.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/__init__.py",
+      "size": 515,
+      "sha256": "3253d01c0edfff856b295be9dee175cd545b07b80aef95b83183c1e7f88edbfc",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/__init__.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/common.py",
+      "size": 13772,
+      "sha256": "8f0a32f270df3d5647e377eda0694ff13587cbea42a88c5560e6cda8ae1de912",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/common.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/stm32f407/__init__.py",
+      "size": 5014,
+      "sha256": "4f47863a6e9e8dceb58af7c543afd42663ec50c969cec55ea1996802aedb8731",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/stm32f407/__init__.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/stm32f407/bindings.py",
+      "size": 38410,
+      "sha256": "386ba75c883de6b226cf476fb8dbd739cd49a78a38ff5ffd5e6553e39aa69382",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/stm32f407/bindings.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/stm32f407/emission.py",
+      "size": 7493,
+      "sha256": "1d77a77841e1247b4632984d148fa9fa0c1e9e48054db1b89714271c153ffa4c",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/stm32f407/emission.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/gd32f470/__init__.py",
+      "size": 5642,
+      "sha256": "6f5d38b16a964d803fe32241a0727b5d487e2d4a4209f68a5387b10dea0bf802",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/gd32f470/__init__.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/gd32f470/bindings.py",
+      "size": 24099,
+      "sha256": "7fa3a1870b93d92578445ae4c23bd28416cfe3e251c1b2fa2d59bea8c01ca38c",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/gd32f470/bindings.py.raw"
+    },
+    {
+      "path": "tools/configure/providers/gd32f470/emission.py",
+      "size": 5690,
+      "sha256": "51a38fba336b13b7be53a061991c70790612f7e4af9d70f9605461d676b4f694",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/providers/gd32f470/emission.py.raw"
+    },
+    {
+      "path": "tools/configure/timer_advanced.py",
+      "size": 13477,
+      "sha256": "8dffdfabb5841ef78dbfe2d7f0736887e561432f19029df53e3c2abfb4ec2b02",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/timer_advanced.py.raw"
+    },
+    {
+      "path": "tools/configure/test_timer_advanced.py",
+      "size": 7024,
+      "sha256": "ebc8222d251e91743ad334784897eaab739b7099ddb28b0e2a43a73ef136f806",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/test_timer_advanced.py.raw"
+    },
+    {
+      "path": "tools/configure/test_timer_capabilities.py",
+      "size": 4217,
+      "sha256": "bdc84a3d34359e279a8117fe52c117164d10c652d9ef62f76a35b88cad1275fc",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/test_timer_capabilities.py.raw"
+    },
+    {
+      "path": "tools/configure/test_g474.py",
+      "size": 4255,
+      "sha256": "cc03effde9880858da983b5a6a6383113d7ffc3d1d5e9d94b5ac0b34e24db974",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/configure/test_g474.py.raw"
+    },
+    {
+      "path": "tools/maintenance/capabilities.py",
+      "size": 10017,
+      "sha256": "f135ea002554619a1a0f43a2f75a646ff2f7b3a4a23034ea06f363f1aaba9cd2",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tools/maintenance/capabilities.py.raw"
+    },
+    {
+      "path": "soc/stm32f407/soc.json",
+      "size": 8550,
+      "sha256": "729091a3d0fad9242e1066ef11560e73f59555fd294d0c05c75cf43e6ccf5a57",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/soc/stm32f407/soc.json.raw"
+    },
+    {
+      "path": "soc/stm32f407/routes.json",
+      "size": 12615,
+      "sha256": "26f4fca8a597839f5128c62c8658abeb0968edcca25983491bd2f445b0f61a87",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/soc/stm32f407/routes.json.raw"
+    },
+    {
+      "path": "soc/gd32f470/soc.json",
+      "size": 10659,
+      "sha256": "3648ef7f014d3688ca3e3ad697286ca979c2395fb282b605aac4a336e9aa392d",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/soc/gd32f470/soc.json.raw"
+    },
+    {
+      "path": "soc/gd32f470/routes.json",
+      "size": 12291,
+      "sha256": "28aec61a112bafc7ba2074cd2de738f52edcbd6663b01e6d886d5a53c40c63cb",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/soc/gd32f470/routes.json.raw"
+    },
+    {
+      "path": "tests/contracts/usb_assembly/stm32-zg-freertos.toml",
+      "size": 823,
+      "sha256": "eff8afe44664e101953dbd49fce05ab00a3b9755ad82710bf14a7e44655e3469",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tests/contracts/usb_assembly/stm32-zg-freertos.toml.raw"
+    },
+    {
+      "path": "tests/contracts/usb_assembly/stm32-ve-freertos.toml",
+      "size": 823,
+      "sha256": "6c1f0e8bacb6c6750e303d255a786f5a8639c114e92d674fe532c8002d0589dc",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tests/contracts/usb_assembly/stm32-ve-freertos.toml.raw"
+    },
+    {
+      "path": "tests/contracts/usb_assembly/gd32-freertos.toml",
+      "size": 822,
+      "sha256": "724753792766778d73a360289b184072aa5c33aae12ea676322e0577fd1b7e2a",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tests/contracts/usb_assembly/gd32-freertos.toml.raw"
+    },
+    {
+      "path": "tests/contracts/ethernet_assembly/stm32-zg-freertos.toml",
+      "size": 422,
+      "sha256": "aa60c4cad95b05128fa2d4d86db67a5c65f9e97ef1f5644016e8c0f5ad2a0394",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tests/contracts/ethernet_assembly/stm32-zg-freertos.toml.raw"
+    },
+    {
+      "path": "tests/contracts/ethernet_assembly/gd32-freertos.toml",
+      "size": 421,
+      "sha256": "c9f7776a1b552445d1f606537983d60345b0722e9d0c0c6d7217ca8d17c60300",
+      "retained_path": "tools/testing/evidence/configure-timer-g474/frozen-source/tests/contracts/ethernet_assembly/gd32-freertos.toml.raw"
+    }
+  ],
+  "raw_artifacts": [
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/capabilities-green-selected.log",
+      "size": 1104,
+      "sha256": "e517ab43885258751df2e0fc6bee562663f6708e59a43c8e6d61dfcdd7f2012a",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/capabilities-green-selected.log",
+      "original_name": "capabilities-green-selected.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/capabilities-green.log",
+      "size": 4116,
+      "sha256": "f1dbdd98f0d6754129ff6defe3729b92f920e034ecff4ead24a836feeca23728",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/capabilities-green.log",
+      "original_name": "capabilities-green.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/capabilities-red.log",
+      "size": 9718,
+      "sha256": "0cc1703bb601f2dfd36ea87b1f6bd55ae5733e0eefb99370da720b6b7dd5863c",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/capabilities-red.log",
+      "original_name": "capabilities-red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/capabilities-strict-green.log",
+      "size": 1512,
+      "sha256": "cdc9b204fa40f2c5bbf0440fd5eed7f040f93fae2e64ac651057d363f04bc87c",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/capabilities-strict-green.log",
+      "original_name": "capabilities-strict-green.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/capabilities-strict-red.log",
+      "size": 6008,
+      "sha256": "7ce2a1ec4d30fe5dd232f5944253b277d3b8095635e48bf5bee6575df3d5ae25",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/capabilities-strict-red.log",
+      "original_name": "capabilities-strict-red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/configuration-green-all.log",
+      "size": 532,
+      "sha256": "5b5fc639d115747dadeae93e99bf5f2a337a025d1d5a79f586e25d5b908c9ee9",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/configuration-green-all.log",
+      "original_name": "configuration-green-all.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/edge-type-green.log",
+      "size": 119,
+      "sha256": "a36028d8c2cfef87d03fff5bb559bea636d0223fd71253d81d64e917c528f40e",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/edge-type-green.log",
+      "original_name": "edge-type-green.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/edge-type-red.log",
+      "size": 2815,
+      "sha256": "f2f0c79474695c26f0ac8b2adb41be1a182143631ee5a41091abb6c9fb2b9b34",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/edge-type-red.log",
+      "original_name": "edge-type-red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/final-tools/configure.log",
+      "size": 535,
+      "sha256": "3a010f051a5cf743e55b0f96f3f9be2f1f437fc1b4f81f65a8a8bc9e9e2ceb23",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/final-tools/configure.log",
+      "original_name": "configure.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/final-tools/manifest.json",
+      "size": 50225,
+      "sha256": "a9311c45aeda78e295e7af1fa473c06be3362c0e57c88d1dc962a6a24f2322d2",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/final-tools/manifest.json",
+      "original_name": "manifest.json"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/final-tools-discovery-rejected/configure.log",
+      "size": 1341,
+      "sha256": "a4253340202cf048cbc099ae32f42ea65780a96bb18bd8731b6ce1280417bd58",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/final-tools-discovery-rejected/configure.log",
+      "original_name": "configure.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/final-tools-discovery-rejected/manifest.json",
+      "size": 50244,
+      "sha256": "fb952b2e86ddeeb82af6200363d24a6cd82ab5d44a3f05cd242b73cc753f87b6",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/final-tools-discovery-rejected/manifest.json",
+      "original_name": "manifest.json"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/green-attempt1.log",
+      "size": 42242,
+      "sha256": "5150f88442a3175cd2aa9090fe9fe1cfadb31a477ccf74ea3dbeff8a93911324",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/green-attempt1.log",
+      "original_name": "green-attempt1.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/green-attempt2.log",
+      "size": 2398,
+      "sha256": "d66306e4a7cb9726fbab4856f410f22abe7fc66f747c1c252c8110170aa7c628",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/green-attempt2.log",
+      "original_name": "green-attempt2.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/inactive-proof-tools-green.log",
+      "size": 3812,
+      "sha256": "d6c7b8dd832f255cfee5dc3d07c0c8c43431976351411e7d670a5d4a67cde0eb",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/inactive-proof-tools-green.log",
+      "original_name": "inactive-proof-tools-green.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/integrate.py.raw",
+      "size": 8141,
+      "sha256": "1f7065d500031d012aefacd4ada2851e55a5dfe5dacf1ab3e5bbac740ff335ba",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/integrate.py",
+      "original_name": "integrate.py"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/privilege-tools-green.log",
+      "size": 119,
+      "sha256": "9d38804bfeb00c254c70ad246d03eebc41b842d0cc180a24885f5402f0d72bee",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/privilege-tools-green.log",
+      "original_name": "privilege-tools-green.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/privilege-tools-red.log",
+      "size": 3680,
+      "sha256": "a4f0c466458ceb857fedb9a083d32f85175cc1620db07c5f54e856d4bca3f6a9",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/privilege-tools-red.log",
+      "original_name": "privilege-tools-red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/red.log",
+      "size": 51866,
+      "sha256": "10be587ed36abc3258b62b9f7003a3af3458fd18408702f0d34ca764c5b4ea36",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/red.log",
+      "original_name": "red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/run_final_tools.py.raw",
+      "size": 2913,
+      "sha256": "54dfdcd893a284b15f39eeef6676d29a155a99ba97dddee3fc91fb23283e71c7",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/run_final_tools.py",
+      "original_name": "run_final_tools.py"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/timer-config/timer_advanced.before-inactive-proof.py.raw",
+      "size": 12979,
+      "sha256": "477778e9f97f532e60759f9fa631170ad570393cacdd4e7655b3ef7e7ec2b3df",
+      "original_path": "/workspace/nexus-config-iteration-evidence/timer-config/timer_advanced.before-inactive-proof.py.raw",
+      "original_name": "timer_advanced.before-inactive-proof.py.raw"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/actual-red.log",
+      "size": 6484,
+      "sha256": "a669699bfadce9acc2d02855fc24d0badc0bdbafbfc1b0c7d43fed4c0d5a2063",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/actual-red.log",
+      "original_name": "actual-red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/green-attempt1.log",
+      "size": 966,
+      "sha256": "67a3dc00b7d9940af3da579725ec3d33676420211ace6fecdcd5bd71abd016c7",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/green-attempt1.log",
+      "original_name": "green-attempt1.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/pre-count-replay/bindings.green.py.raw",
+      "size": 7319,
+      "sha256": "ee49b8af81e170fd6b46b70da2c74f1475cf782a4e4cc5214ef599483bf725ca",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/pre-count-replay/bindings.green.py.raw",
+      "original_name": "bindings.green.py.raw"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/pre-count-replay/bindings.historical-predicate.py.raw",
+      "size": 7267,
+      "sha256": "81d57ed6752ad5bb085ae8ff77ccbf5d59e3f004f404c03ad0a13f96ff6fd417",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/pre-count-replay/bindings.historical-predicate.py.raw",
+      "original_name": "bindings.historical-predicate.py.raw"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/pre-count-replay/python-green.log",
+      "size": 966,
+      "sha256": "cb67c9855a59f1a6ee01ae14321efb566a3800e3c6067334461f784a59598b55",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/pre-count-replay/python-green.log",
+      "original_name": "python-green.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/pre-count-replay/python-red.log",
+      "size": 935,
+      "sha256": "94a8205ee3a9620aa3c24d97bebfe6ce699ad1049872f671434c33b7f20bf949",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/pre-count-replay/python-red.log",
+      "original_name": "python-red.log"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/pre-count-replay/source-identities.json",
+      "size": 314,
+      "sha256": "841992095aea49f05dcd52c80e2e641e885d7ef5eac42cd5983bbfdb09e1341d",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/pre-count-replay/source-identities.json",
+      "original_name": "source-identities.json"
+    },
+    {
+      "path": "tools/testing/evidence/configure-timer-g474/raw/g474-config/red.log",
+      "size": 6484,
+      "sha256": "66d4c5545a84c5b4e9e36344e956e57bb6b29b6cd40bdb7cf4de8339dcd98b23",
+      "original_path": "/workspace/nexus-config-iteration-evidence/g474-config/red.log",
+      "original_name": "red.log"
+    }
+  ],
+  "executed_final_configuration": {
+    "manifest": "tools/testing/evidence/configure-timer-g474/raw/timer-config/final-tools/manifest.json",
+    "command": [
+      "/workspace/nexus/.venv/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/configure"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "source_unchanged": true,
+    "discovered_tests": 344
+  },
+  "historical_scope": {
+    "original_feature_red": [
+      "timer-config/red.log",
+      "g474-config/actual-red.log"
+    ],
+    "defect_red_green": [
+      "timer-config/capabilities-strict-red.log",
+      "timer-config/capabilities-strict-green.log",
+      "timer-config/privilege-tools-red.log",
+      "timer-config/privilege-tools-green.log",
+      "timer-config/edge-type-red.log",
+      "timer-config/edge-type-green.log"
+    ],
+    "explicit_historical_replay": "g474-config/pre-count-replay/source-identities.json",
+    "nonqualifying_attempts": {
+      "timer-config/green-attempt1.log": "Incomplete software-fixture Board provenance.",
+      "timer-config/capabilities-green.log": "The document drift check correctly failed; this is not a passing maintenance execution.",
+      "timer-config/final-tools-discovery-rejected/manifest.json": "Namespace start directory was rejected before test discovery.",
+      "g474-config/red.log": "Initial projection uses a mocked external dependency lookup; actual Gitlink execution follows separately."
+    }
+  },
+  "limits": [
+    "Current source hashes apply to the fresh final execution and frozen source inventory, not retroactively to prior RED logs.",
+    "Historical raw logs keep their original bytes and names; raw-only records do not invent unavailable invocation or pre-execution hashes.",
+    "Actual generated timer/G474 GoogleTest, sanitizer and ARM execution are archived by their independently assigned owners.",
+    "This archive does not establish clean Git, installed SDK, reproducibility, candidate, PCB or physical HIL qualification.",
+    "The pre-count replay explicitly reproduces a historical predicate after feature implementation; it is not represented as original chronological TDD."
+  ]
+}

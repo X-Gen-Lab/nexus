@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "Explicit bounded UART/SPI/I2C/ADC provider lifecycle and fault sequences for maintained STM32F407/GD32F470 and Native models. This catalogue is reviewed coverage, never universal semantic or physical proof.",
+  "scope": "Explicit reviewed bounded UART/SPI/I2C/ADC/CAN/USB/raw Ethernet/timer provider and generated-factory lifecycle fault sequences for STM32F407/GD32F470, selected STM32G474 software-reference providers and Native models. This is bounded source-bound coverage, never universal semantic or physical proof.",
   "properties": [
     {
       "id": "stm32f407.uart.dma-tx.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
@@ -2786,12 +2786,4080 @@
       ],
       "invariant": "Setup time consumes the same absolute request deadline and cannot start an expired transport.",
       "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "native.can.classic-irq.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&requests[i]),NX_SUCCESS)",
+        "EXPECT_EQ(nx_can_port_submit(&port,&requests[3]),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&requests[3].base),NX_REQUEST_READY)",
+        "EXPECT_EQ(model.controller.snapshot.pending,3U)"
+      ],
+      "calls": [
+        "nx_can_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "A fourth mailbox admission retains no request and preserves READY while the three accepted slots remain pending.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.TxokAndCompletionDetachBeforeSettlement",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.TxokAndCompletionDetachBeforeSettlement",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_can_complete(&model,0U,NX_SUCCESS),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&requests[0].base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(model.controller.slots[0].request,nullptr)",
+        "ASSERT_EQ(nx_request_result(&requests[0].base,&result,&transferred),NX_SUCCESS)",
+        "EXPECT_EQ(result,NX_SUCCESS)",
+        "EXPECT_EQ(transferred,8U)"
+      ],
+      "calls": [
+        "nx_can_controller_irq(",
+        "nx_can_port_submit(",
+        "nx_native_can_complete(",
+        "nx_request_result(",
+        "nx_request_state("
+      ],
+      "invariant": "Wire completion detaches the mailbox request before settlement and exposes only the confirmed transferred bytes.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.CancellationWaitsForActualAbortAcknowledgement",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.CancellationWaitsForActualAbortAcknowledgement",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_cancel(&port,&requests[0]),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&requests[0].base),NX_REQUEST_DRAINING)",
+        "ASSERT_EQ(nx_native_clock_advance(20U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_service(&port),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&requests[0].base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(model.controller.slots[0].request,&requests[0])",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_native_can_complete(&model,0U,NX_ERROR_CANCELLED),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&requests[0].base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(requests[0].base.result,NX_ERROR_CANCELLED)"
+      ],
+      "calls": [
+        "nx_can_port_cancel(",
+        "nx_can_port_service(",
+        "nx_can_port_stop(",
+        "nx_can_port_submit(",
+        "nx_native_can_complete(",
+        "nx_native_clock_advance(",
+        "nx_request_state("
+      ],
+      "invariant": "Abort failure retains the accepted request through quarantine; only actual hardware acknowledgement allows settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(100U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_service(&port),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&requests[0].base),NX_REQUEST_DRAINING)",
+        "ASSERT_EQ(nx_native_can_complete(&model,0U,NX_ERROR_CANCELLED),NX_SUCCESS)",
+        "EXPECT_EQ(requests[0].base.result,NX_ERROR_TIMEOUT)"
+      ],
+      "calls": [
+        "nx_can_port_service(",
+        "nx_can_port_submit(",
+        "nx_native_can_complete(",
+        "nx_native_clock_advance(",
+        "nx_request_state("
+      ],
+      "invariant": "Absolute timeout starts drain without reclaiming the request; an acknowledged abort settles TIMEOUT.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.DeadlineExpiredRejectsWithNoMailboxEffect",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_native_clock_advance(100U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_can_port_submit(&port,&requests[0]),NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(nx_request_state(&requests[0].base),NX_REQUEST_READY)",
+        "EXPECT_EQ(model.hardware.registers[0x180U/4U],0U)"
+      ],
+      "calls": [
+        "nx_can_port_submit(",
+        "nx_native_clock_advance(",
+        "nx_request_state("
+      ],
+      "invariant": "Expired admission preserves READY and performs no mailbox write.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_read_events(&port,output,4U,&count),NX_SUCCESS)",
+        "ASSERT_EQ(count,3U)",
+        "EXPECT_EQ(output[0].frame.id,0x123U)",
+        "EXPECT_EQ(output[1].frame.id,0x124U)",
+        "EXPECT_EQ(output[2].kind,NX_CAN_EVENT_LOSS)",
+        "EXPECT_EQ(output[2].lost,1U)",
+        "EXPECT_EQ(output[2].flags,NX_CAN_LOSS_SOFTWARE)",
+        "ASSERT_EQ(nx_can_port_read_events(&port,output,1U,&count),NX_SUCCESS)",
+        "EXPECT_EQ(output[0].frame.id,0x126U)"
+      ],
+      "calls": [
+        "nx_can_port_read_events("
+      ],
+      "invariant": "Bounded ring loss follows prior frames and precedes later frames without reordering or invention.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.HardwareOverrunReportsLowerBoundWithoutInventedExactCount",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_read_events(&port,&output,1U,&count),NX_SUCCESS)",
+        "EXPECT_EQ(output.kind,NX_CAN_EVENT_LOSS)",
+        "EXPECT_EQ(output.lost,1U)",
+        "EXPECT_NE(output.flags&NX_CAN_LOSS_HARDWARE_LOWER_BOUND,0U)"
+      ],
+      "calls": [
+        "nx_can_controller_irq(",
+        "nx_can_port_read_events("
+      ],
+      "invariant": "Hardware overrun reports an explicit lower bound, not an invented exact dropped-frame count.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.can.classic-irq.BusOffRemainsAuthoritativeWhenTheRingIsFull",
+      "family": "native",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_can_controller_test",
+      "case": "ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull",
+      "test_source": "tests/google/can_controller_test.cpp",
+      "production_sources": [
+        "io/src/can_controller.c",
+        "io/native/can.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_state(&port,&state),NX_SUCCESS)",
+        "EXPECT_TRUE(state.bus_off)",
+        "EXPECT_EQ(state.transmit_errors,255U)",
+        "EXPECT_EQ(nx_can_port_submit(&port,&requests[1]),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_can_port_recover(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_native_can_complete(&model,0U,NX_ERROR_IO),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_service(&port),NX_SUCCESS)",
+        "EXPECT_EQ(nx_can_port_recover(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_can_controller_irq(",
+        "nx_can_port_recover(",
+        "nx_can_port_service(",
+        "nx_can_port_state(",
+        "nx_can_port_submit(",
+        "nx_native_can_complete(",
+        "nx_native_can_error("
+      ],
+      "invariant": "Latched bus-off closes admission and recovery retains active abort responsibility despite a full event ring.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_test",
+      "case": "CanSoc.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
+      "test_source": "tests/google/can_soc_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h",
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_cancel(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(20U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_service(&port),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)"
+      ],
+      "calls": [
+        "nx_can_port_cancel(",
+        "nx_can_port_service(",
+        "nx_can_port_stop(",
+        "nx_can_port_submit(",
+        "nx_native_clock_advance(",
+        "nx_request_state("
+      ],
+      "invariant": "The actual SDK controller retains an unacknowledged abort through quarantine until stop obtains hardware completion.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.FailedExitAcknowledgementRetainsDomainResponsibility",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_test",
+      "case": "CanSoc.FailedExitAcknowledgementRetainsDomainResponsibility",
+      "test_source": "tests/google/can_soc_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h",
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(Initialize(&controller),NX_ERROR_IO)",
+        "EXPECT_TRUE(domain.retained)",
+        "EXPECT_EQ(domain.active_mask,1U)",
+        "EXPECT_EQ(nx_can_filter_domain_stop(&domain),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_can_filter_domain_stop(",
+        "nx_can_port_stop("
+      ],
+      "invariant": "Failed controller startup exit retains its shared filter/clock domain until successful drain.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_test",
+      "case": "CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
+      "test_source": "tests/google/can_soc_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h",
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(Initialize(&controller),NX_ERROR_INVALID)",
+        "EXPECT_FALSE(controller.snapshot.started)",
+        "EXPECT_EQ(hardware->registers[0],mode)"
+      ],
+      "calls": [
+        "nx_can_port_stop("
+      ],
+      "invariant": "A foreign filter-domain identity is rejected without mutating controller mode or starting it.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_factory_test",
+      "case": "CanFactory.BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(first_state->domain,second_state->domain)",
+        "EXPECT_NE(first_state->events,second_state->events)",
+        "EXPECT_EQ(first_state->capacity,8U)",
+        "EXPECT_EQ(second_state->capacity,8U)",
+        "EXPECT_EQ(first_state->domain->active_mask,3U)",
+        "EXPECT_EQ(first_state->domain->filter_count,2U)",
+        "EXPECT_NE(first_state->registers,second_state->registers)",
+        "EXPECT_EQ(first_state->sources[0].irq_number,19)",
+        "EXPECT_EQ(second_state->sources[0].irq_number,63)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Generated instances share exactly one filter domain and use separate selected rings, addresses and mailbox ownership.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_factory_test",
+      "case": "CanFactory.StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_EQ(first_state->domain->active_mask,3U)",
+        "EXPECT_TRUE(first_state->snapshot.started)",
+        "EXPECT_TRUE(second_state->snapshot.started)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(first_state->domain->active_mask,0U)",
+        "EXPECT_FALSE(first_state->domain->configured)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed secondary IRQ withdrawal retains both controllers and all pin/domain leases until retry succeeds.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.FailedSecondStartupIsIncludedInReverseCleanup",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_factory_test",
+      "case": "CanFactory.FailedSecondStartupIsIncludedInReverseCleanup",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_IO)",
+        "EXPECT_EQ(result.cleanup,NX_ERROR_BUSY)",
+        "EXPECT_NE(result.remaining_effects,0U)",
+        "EXPECT_TRUE(second_state->snapshot.started)",
+        "EXPECT_TRUE(first_state->snapshot.started)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_FALSE(second_state->snapshot.started)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "A failed secondary startup is included in reverse cleanup and cannot drop retained effects from the remaining-effects result.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.can.classic-irq.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "family": "stm32f407",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_stm32_can_factory_test",
+      "case": "CanFactory.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_IO)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(result.remaining_effects,0U)",
+        "EXPECT_EQ(first_state->domain->active_mask,0U)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Failure before pin capture has no filter-domain effects and no uncaptured lease release.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_test",
+      "case": "CanSoc.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
+      "test_source": "tests/google/can_soc_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h",
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_cancel(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(20U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_can_port_service(&port),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)"
+      ],
+      "calls": [
+        "nx_can_port_cancel(",
+        "nx_can_port_service(",
+        "nx_can_port_stop(",
+        "nx_can_port_submit(",
+        "nx_native_clock_advance(",
+        "nx_request_state("
+      ],
+      "invariant": "The actual SDK controller retains an unacknowledged abort through quarantine until stop obtains hardware completion.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.FailedExitAcknowledgementRetainsDomainResponsibility",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_test",
+      "case": "CanSoc.FailedExitAcknowledgementRetainsDomainResponsibility",
+      "test_source": "tests/google/can_soc_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h",
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(Initialize(&controller),NX_ERROR_IO)",
+        "EXPECT_TRUE(domain.retained)",
+        "EXPECT_EQ(domain.active_mask,1U)",
+        "EXPECT_EQ(nx_can_filter_domain_stop(&domain),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_can_port_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_can_filter_domain_stop(",
+        "nx_can_port_stop("
+      ],
+      "invariant": "Failed controller startup exit retains its shared filter/clock domain until successful drain.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_test",
+      "case": "CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
+      "test_source": "tests/google/can_soc_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h",
+        "io/native/can_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(Initialize(&controller),NX_ERROR_INVALID)",
+        "EXPECT_FALSE(controller.snapshot.started)",
+        "EXPECT_EQ(hardware->registers[0],mode)"
+      ],
+      "calls": [
+        "nx_can_port_stop("
+      ],
+      "invariant": "A foreign filter-domain identity is rejected without mutating controller mode or starting it.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_factory_test",
+      "case": "CanFactory.BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(first_state->domain,second_state->domain)",
+        "EXPECT_NE(first_state->events,second_state->events)",
+        "EXPECT_EQ(first_state->capacity,8U)",
+        "EXPECT_EQ(second_state->capacity,8U)",
+        "EXPECT_EQ(first_state->domain->active_mask,3U)",
+        "EXPECT_EQ(first_state->domain->filter_count,2U)",
+        "EXPECT_NE(first_state->registers,second_state->registers)",
+        "EXPECT_EQ(first_state->sources[0].irq_number,19)",
+        "EXPECT_EQ(second_state->sources[0].irq_number,63)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Generated instances share exactly one filter domain and use separate selected rings, addresses and mailbox ownership.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_factory_test",
+      "case": "CanFactory.StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_EQ(first_state->domain->active_mask,3U)",
+        "EXPECT_TRUE(first_state->snapshot.started)",
+        "EXPECT_TRUE(second_state->snapshot.started)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(first_state->domain->active_mask,0U)",
+        "EXPECT_FALSE(first_state->domain->configured)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed secondary IRQ withdrawal retains both controllers and all pin/domain leases until retry succeeds.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.FailedSecondStartupIsIncludedInReverseCleanup",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_factory_test",
+      "case": "CanFactory.FailedSecondStartupIsIncludedInReverseCleanup",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_IO)",
+        "EXPECT_EQ(result.cleanup,NX_ERROR_BUSY)",
+        "EXPECT_NE(result.remaining_effects,0U)",
+        "EXPECT_TRUE(second_state->snapshot.started)",
+        "EXPECT_TRUE(first_state->snapshot.started)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_FALSE(second_state->snapshot.started)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "A failed secondary startup is included in reverse cleanup and cannot drop retained effects from the remaining-effects result.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.can.classic-irq.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "family": "gd32f470",
+      "peripheral": "can",
+      "mode": "classic-irq",
+      "target": "nexus_gd32_can_factory_test",
+      "case": "CanFactory.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "test_source": "tests/google/can_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/can.c",
+        "io/src/can_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/can_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_IO)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(result.remaining_effects,0U)",
+        "EXPECT_EQ(first_state->domain->active_mask,0U)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Failure before pin capture has no filter-domain effects and no uncaptured lease release.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.FifoWriteDoesNotCompleteHostAcknowledgement",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,1,NX_USB_DATA,0,200),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_ACTIVE)",
+        "EXPECT_EQ(model.hardware.tx_count[1],1U)",
+        "ASSERT_EQ(nx_native_usb_complete(&model,1,true),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(request.base.transferred,1U)",
+        "EXPECT_EQ(endpoints[2].request,nullptr)"
+      ],
+      "calls": [
+        "nx_native_usb_complete(",
+        "nx_request_state(",
+        "nx_usb_controller_irq(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "PIO FIFO writes retain the request until host transfer-complete facts; settlement detaches the endpoint request.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.OutOverflowCannotWriteBeyondCallerCapacity",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_out_prepare(&request,bytes,2,NX_USB_DATA,0,200),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_usb_receive(&model,1,packet,3,false),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_OVERFLOW)",
+        "EXPECT_EQ(bytes[2],0xA5)"
+      ],
+      "calls": [
+        "nx_native_usb_receive(",
+        "nx_request_state(",
+        "nx_usb_controller_irq(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_out_prepare("
+      ],
+      "invariant": "Oversized OUT packets settle overflow without overwriting the capacity guard byte.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.FailedDisableKeepsRequestBorrowedThroughDrainDeadline",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,1,NX_USB_DATA,0,200),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_cancel(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(20),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_device_service(&device),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_usb_device_stop(&device),NX_ERROR_BUSY)",
+        "EXPECT_EQ(endpoints[2].request,&request)",
+        "EXPECT_EQ(model.hardware.consumers,1U)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_usb_device_service(",
+        "nx_usb_device_stop(",
+        "nx_usb_endpoint_cancel(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "Failed endpoint disable retains the request and controller clock through the drain deadline and quarantine.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.FifoFlushFailureCannotSettleDisabledEndpoint",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,1,NX_USB_DATA,0,200),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_cancel(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(20),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_device_service(&device),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(endpoints[2].request,&request)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_usb_device_service(",
+        "nx_usb_endpoint_cancel(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "Endpoint disable alone does not settle a request when FIFO withdrawal remains unproved.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.StopCannotReleaseWakeOrClockWithAnEnabledIrq",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_device_attach_wake(&device,&wake,0),NX_SUCCESS)",
+        "EXPECT_EQ(nx_usb_device_stop(&device),NX_ERROR_BUSY)",
+        "EXPECT_EQ(model.controller.wake,&wake)",
+        "EXPECT_EQ(model.hardware.consumers,1U)"
+      ],
+      "calls": [
+        "nx_usb_device_attach_wake(",
+        "nx_usb_device_stop("
+      ],
+      "invariant": "An enabled IRQ prevents wake and clock release at stop.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.NewSetupInvalidatesOldControlBeforeReusingStorage",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,4,NX_USB_DATA,epoch,200),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_usb_device_stop(&device),NX_ERROR_BUSY)",
+        "EXPECT_GT(model.controller.snapshot.epoch,epoch)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_usb_device_stop(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "New SETUP advances control epoch and drains an old accepted request without premature reuse.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.ResetDoesNotRevokeAnUnprovedEndpointLoan",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,4,NX_USB_DATA,0,200),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(nx_usb_device_stop(&device),NX_ERROR_BUSY)"
+      ],
+      "calls": [
+        "nx_native_usb_reset(",
+        "nx_request_state(",
+        "nx_usb_controller_irq(",
+        "nx_usb_device_stop(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "USB reset cannot revoke an endpoint loan while FIFO drain proof is missing.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.usb_device.device-fs.StaleCompletionCannotFinishANewRequestEpoch",
+      "family": "native",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_usb_device_test",
+      "case": "UsbDevice.StaleCompletionCannotFinishANewRequestEpoch",
+      "test_source": "tests/google/usb_device_test.cpp",
+      "production_sources": [
+        "io/src/usb_device_controller.c",
+        "io/native/usb_device.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/usb_device_access.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,4,NX_USB_DATA,0,200),NX_SUCCESS)",
+        "EXPECT_EQ(nx_usb_endpoint_submit(&port,&request),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "Uncleared prior completion blocks a new admission and preserves the new request as READY.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.FalseCpuFactsRejectBeforeBorrowingTheClock",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32f407_usb_device_test",
+      "case": "UsbSoc.FalseCpuFactsRejectBeforeBorrowingTheClock",
+      "test_source": "tests/google/usb_device_soc_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_usb_device_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(DEVICE_INIT(&controller,&clock),NX_ERROR_INVALID)",
+        "EXPECT_EQ(clock.consumers,0U)"
+      ],
+      "calls": [
+        "nx_usb_device_stop("
+      ],
+      "invariant": "False selected CPU priority facts reject the actual SDK binding without retaining a clock consumer.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.FailedCoreResetKeepsClockAndOwnerStorage",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32f407_usb_device_test",
+      "case": "UsbSoc.FailedCoreResetKeepsClockAndOwnerStorage",
+      "test_source": "tests/google/usb_device_soc_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_usb_device_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(DEVICE_INIT(&controller,&clock),NX_ERROR_IO)",
+        "EXPECT_EQ(clock.consumers,1U)",
+        "EXPECT_TRUE(controller.snapshot.closing)",
+        "EXPECT_EQ(CLOCK_STOP(&clock,200),NX_ERROR_BUSY)"
+      ],
+      "calls": [
+        "nx_usb_device_stop("
+      ],
+      "invariant": "Failed core reset retains the clock consumer and closing controller state until cleanup proof.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32_usb_factory_test",
+      "case": "UsbFactory.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_FS),face)",
+        "EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN),bulk)",
+        "EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_COUNT),nullptr)",
+        "EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_COUNT),nullptr)",
+        "EXPECT_NE(face->context,bulk->context)",
+        "EXPECT_EQ(face->ops,&nx_usb_fs_device_ops)",
+        "EXPECT_EQ(bulk->ops,&nx_usb_fs_endpoint_ops)",
+        "EXPECT_FALSE(state->snapshot.started)"
+      ],
+      "calls": [
+        "nx_factory_usb_device(",
+        "nx_factory_usb_endpoint("
+      ],
+      "invariant": "Typed factory lookup is pure and preserves distinct controller and endpoint identities.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32_usb_factory_test",
+      "case": "UsbFactory.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_IO)",
+        "EXPECT_EQ(result.cleanup,NX_ERROR_BUSY)",
+        "EXPECT_NE(result.remaining_effects,0U)",
+        "EXPECT_TRUE(state->clock_retained)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_FALSE(state->clock_retained)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed generated cold construction retains its clock and pins and reports the unproved cleanup effects.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32_usb_factory_test",
+      "case": "UsbFactory.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_in_prepare(&request,payload,sizeof(payload),NX_USB_DATA,0U,10000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(bulk,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(static_cast<nx_usb_endpoint_t*>(bulk->context)->request,&request)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "Platform stop preserves the accepted PIO request and its pins until actual endpoint detach and settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32_usb_factory_test",
+      "case": "UsbFactory.SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_FS),face)",
+        "EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN),bulk)",
+        "EXPECT_TRUE(state->clock_retained)"
+      ],
+      "calls": [
+        "nx_factory_usb_device(",
+        "nx_factory_usb_endpoint(",
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Proved drain allows restart with the same static controller/endpoint identities.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.RestartCannotReuseAStaleSetupEpochForSetAddress",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32_usb_factory_test",
+      "case": "UsbFactory.RestartCannotReuseAStaleSetupEpochForSetAddress",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_device_address(face,old_epoch,7U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_GT(state->snapshot.epoch,old_epoch)",
+        "EXPECT_EQ(nx_usb_device_address(face,old_epoch,7U),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_usb_device_address(face,state->snapshot.epoch,7U),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_usb_device_address("
+      ],
+      "invariant": "Restart preserves lifetime epoch monotonicity so old SETUP tokens cannot change the address.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.usb_device.device-fs.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
+      "family": "stm32f407",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_stm32_usb_factory_test",
+      "case": "UsbFactory.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/usb_device.c",
+        "soc/stm32f407/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(result.primary,NX_ERROR_INVALID)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(state->snapshot.epoch,UINT64_MAX)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Cold reconstruction cannot reset a saturated lifetime epoch or successfully reopen admission.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.FalseCpuFactsRejectBeforeBorrowingTheClock",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32f470_usb_device_test",
+      "case": "UsbSoc.FalseCpuFactsRejectBeforeBorrowingTheClock",
+      "test_source": "tests/google/usb_device_soc_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_usb_device_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(DEVICE_INIT(&controller,&clock),NX_ERROR_INVALID)",
+        "EXPECT_EQ(clock.consumers,0U)"
+      ],
+      "calls": [
+        "nx_usb_device_stop("
+      ],
+      "invariant": "False selected CPU priority facts reject the actual SDK binding without retaining a clock consumer.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.FailedCoreResetKeepsClockAndOwnerStorage",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32f470_usb_device_test",
+      "case": "UsbSoc.FailedCoreResetKeepsClockAndOwnerStorage",
+      "test_source": "tests/google/usb_device_soc_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_usb_device_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(DEVICE_INIT(&controller,&clock),NX_ERROR_IO)",
+        "EXPECT_EQ(clock.consumers,1U)",
+        "EXPECT_TRUE(controller.snapshot.closing)",
+        "EXPECT_EQ(CLOCK_STOP(&clock,200),NX_ERROR_BUSY)"
+      ],
+      "calls": [
+        "nx_usb_device_stop("
+      ],
+      "invariant": "Failed core reset retains the clock consumer and closing controller state until cleanup proof.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32_usb_factory_test",
+      "case": "UsbFactory.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_FS),face)",
+        "EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN),bulk)",
+        "EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_COUNT),nullptr)",
+        "EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_COUNT),nullptr)",
+        "EXPECT_NE(face->context,bulk->context)",
+        "EXPECT_EQ(face->ops,&nx_usb_fs_device_ops)",
+        "EXPECT_EQ(bulk->ops,&nx_usb_fs_endpoint_ops)",
+        "EXPECT_FALSE(state->snapshot.started)"
+      ],
+      "calls": [
+        "nx_factory_usb_device(",
+        "nx_factory_usb_endpoint("
+      ],
+      "invariant": "Typed factory lookup is pure and preserves distinct controller and endpoint identities.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32_usb_factory_test",
+      "case": "UsbFactory.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_IO)",
+        "EXPECT_EQ(result.cleanup,NX_ERROR_BUSY)",
+        "EXPECT_NE(result.remaining_effects,0U)",
+        "EXPECT_TRUE(state->clock_retained)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_FALSE(state->clock_retained)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed generated cold construction retains its clock and pins and reports the unproved cleanup effects.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32_usb_factory_test",
+      "case": "UsbFactory.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_in_prepare(&request,payload,sizeof(payload),NX_USB_DATA,0U,10000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_endpoint_submit(bulk,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(static_cast<nx_usb_endpoint_t*>(bulk->context)->request,&request)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_usb_endpoint_submit(",
+        "nx_usb_in_prepare("
+      ],
+      "invariant": "Platform stop preserves the accepted PIO request and its pins until actual endpoint detach and settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32_usb_factory_test",
+      "case": "UsbFactory.SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_FS),face)",
+        "EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN),bulk)",
+        "EXPECT_TRUE(state->clock_retained)"
+      ],
+      "calls": [
+        "nx_factory_usb_device(",
+        "nx_factory_usb_endpoint(",
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Proved drain allows restart with the same static controller/endpoint identities.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.RestartCannotReuseAStaleSetupEpochForSetAddress",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32_usb_factory_test",
+      "case": "UsbFactory.RestartCannotReuseAStaleSetupEpochForSetAddress",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_usb_device_address(face,old_epoch,7U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_GT(state->snapshot.epoch,old_epoch)",
+        "EXPECT_EQ(nx_usb_device_address(face,old_epoch,7U),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_usb_device_address(face,state->snapshot.epoch,7U),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_usb_device_address("
+      ],
+      "invariant": "Restart preserves lifetime epoch monotonicity so old SETUP tokens cannot change the address.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.usb_device.device-fs.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
+      "family": "gd32f470",
+      "peripheral": "usb_device",
+      "mode": "device-fs",
+      "target": "nexus_gd32_usb_factory_test",
+      "case": "UsbFactory.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
+      "test_source": "tests/google/usb_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/usb_device.c",
+        "soc/gd32f470/usb_clock.c",
+        "io/src/usb_device_controller.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/usb_device_soc_model.h",
+        "tests/google/usb_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(result.primary,NX_ERROR_INVALID)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(state->snapshot.epoch,UINT64_MAX)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Cold reconstruction cannot reset a saturated lifetime epoch or successfully reopen admission.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.OwnHandoffRetainsBorrowUntilRealTransmitStatus",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "EXPECT_EQ(own,tx[0].status&own)",
+        "EXPECT_EQ(reinterpret_cast<uintptr_t>(output)&UINT32_MAX,tx[0].buffer)",
+        "EXPECT_EQ(NX_REQUEST_ACTIVE,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(nullptr,txslots[0].request)",
+        "EXPECT_EQ(64U,request.base.transferred)",
+        "EXPECT_EQ(NX_SUCCESS,request.base.result)"
+      ],
+      "calls": [
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Descriptor OWN handoff and interrupt hints retain TX until actual returned completion status and detached request.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&first))",
+        "EXPECT_EQ(64U,first.length)",
+        "EXPECT_EQ(0U,rx[0].status&own)",
+        "EXPECT_EQ(0x22,first.data[0])",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&second))",
+        "EXPECT_EQ(NX_ERROR_EMPTY,nx_eth_port_acquire(&port,&second))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_release(&port,&first))",
+        "EXPECT_EQ(own,rx[0].status&own)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_release(&port,&first))"
+      ],
+      "calls": [
+        "nx_eth_port_acquire(",
+        "nx_eth_port_release("
+      ],
+      "invariant": "An acquired RX loan cannot be rearmed or overwritten at wrap; release validates its token.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.CancellationWaitsForActualEngineAndFifoDrain",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.CancellationWaitsForActualEngineAndFifoDrain",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_cancel(&port,&request))",
+        "EXPECT_EQ(NX_REQUEST_DRAINING,nx_request_state(&request.base))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_QUARANTINED,nx_request_state(&request.base))",
+        "EXPECT_EQ(&request,txslots[0].request)",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_CANCELLED,request.base.result)"
+      ],
+      "calls": [
+        "nx_eth_model_poll(",
+        "nx_eth_port_cancel(",
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Cancellation retains TX through engine/FIFO drain failure and quarantine until hardware proof allows settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.InitializationCannotResetForeignDescriptorEngine",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.InitializationCannotResetForeignDescriptorEngine",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,Initialize())",
+        "EXPECT_EQ(0U,regs[0x1000/4])",
+        "EXPECT_EQ(0U,rx[0].status)"
+      ],
+      "calls": [
+        "Initialize("
+      ],
+      "invariant": "Cold initialization rejects a foreign descriptor engine before reset or RX ownership effects.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.FatalBusErrorCannotTurnMissingStatusIntoSuccess",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.FatalBusErrorCannotTurnMissingStatusIntoSuccess",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "EXPECT_NE(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_IO,request.base.result)",
+        "EXPECT_TRUE(mac.snapshot.fatal_bus_error)"
+      ],
+      "calls": [
+        "nx_eth_mac_irq(",
+        "nx_eth_model_poll(",
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Fatal bus error remains authoritative and cannot synthesize a successful transmit completion.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_IO,request.base.result)",
+        "EXPECT_EQ(0U,request.base.transferred)"
+      ],
+      "calls": [
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Returned OWN without successful frame status settles IO with no invented transferred bytes.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.StopRechecksCapturedPublisherAfterNvicDisableBoundary",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_attach_wake(&port,&wake,0))",
+        "EXPECT_EQ(NX_ERROR_BUSY,nx_eth_port_stop(&port))",
+        "EXPECT_TRUE(mac.retained)",
+        "EXPECT_EQ(&wake,mac.wake)",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_stop(&port))"
+      ],
+      "calls": [
+        "nx_eth_model_poll(",
+        "nx_eth_port_attach_wake(",
+        "nx_eth_port_stop("
+      ],
+      "invariant": "Stop rechecks an in-flight wake publisher after IRQ withdrawal and retains wake/storage until publisher join.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.StopClosesNewReceiveLoansBeforeDrainCompletes",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_ethernet_test",
+      "case": "EthernetMac.StopClosesNewReceiveLoansBeforeDrainCompletes",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,nx_eth_port_stop(&port))",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_acquire(&port,&loan))",
+        "EXPECT_EQ(0U,mac.snapshot.held_rx)"
+      ],
+      "calls": [
+        "nx_eth_port_acquire(",
+        "nx_eth_port_stop("
+      ],
+      "invariant": "Closing stop prevents new RX loans before the existing hardware drain completes.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_eth_factory_test",
+      "case": "EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_IO,Stop())",
+        "EXPECT_EQ(0x0e000000U,ahb()&0x0e000000U)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(0U,ahb()&0x0e000000U)",
+        "EXPECT_EQ(NX_SUCCESS,nx_platform_start().primary)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Failed owned MAC clock withdrawal retains the platform and blocks restart until actual clock readback.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.FailedPinRestoreKeepsClocksAndStorageUntilRetry",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_eth_factory_test",
+      "case": "EthernetFactory.FailedPinRestoreKeepsClocksAndStorageUntilRetry",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_IO,Stop())",
+        "EXPECT_EQ(0x0e000000U,ahb()&0x0e000000U)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Failed restoration of captured pads keeps provider storage and clocks until successful retry.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_eth_factory_test",
+      "case": "EthernetFactory.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,Stop())",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_release(face,&first))",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_GT(second.epoch,first.epoch)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_release(face,&first))",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_release(face,&second))"
+      ],
+      "calls": [
+        "nx_eth_port_release(",
+        "nx_platform_start("
+      ],
+      "invariant": "An acquired RX loan prevents destructive platform stop and stale tokens cannot release a restarted loan.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.RejectedDmaDomainDoesNotResetMacOrRetainPayload",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_eth_factory_test",
+      "case": "EthernetFactory.RejectedDmaDomainDoesNotResetMacOrRetainPayload",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_PERMISSION,nx_platform_start().primary)",
+        "EXPECT_EQ(0U,registers()[0x1000U/4U])",
+        "EXPECT_FALSE(s_mac->retained)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(0U,ahb()&0x0e000000U)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Rejected DMA memory domain has no MAC reset/payload retention and cleanup restores the owned clock.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.ExhaustedReceiveEpochCannotBeResetByReconstruction",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_eth_factory_test",
+      "case": "EthernetFactory.ExhaustedReceiveEpochCannotBeResetByReconstruction",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(NX_ERROR_INVALID,nx_platform_start().primary)",
+        "EXPECT_EQ(UINT64_MAX,s_mac->epoch)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Cold reconstruction cannot reuse a saturated receive epoch.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.eth.raw-rmii.StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
+      "family": "stm32f407",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_stm32_eth_factory_test",
+      "case": "EthernetFactory.StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_apply_link(face,&link))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_tx_prepare(&request,output,sizeof(output),s_now+10000U))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(face,&request))",
+        "EXPECT_EQ(NX_ERROR_BUSY,Stop())",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_service(face))",
+        "EXPECT_EQ(NX_REQUEST_QUARANTINED,nx_request_state(&request.base))",
+        "EXPECT_EQ(&request,s_mac->tx_slots[0].request)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(nullptr,s_mac->tx_slots[0].request)"
+      ],
+      "calls": [
+        "nx_eth_model_poll(",
+        "nx_eth_port_apply_link(",
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_eth_tx_prepare(",
+        "nx_platform_start(",
+        "nx_request_state("
+      ],
+      "invariant": "A stuck TX engine preserves quarantined request storage and rejects restart until actual engine drain.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.OwnHandoffRetainsBorrowUntilRealTransmitStatus",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "EXPECT_EQ(own,tx[0].status&own)",
+        "EXPECT_EQ(reinterpret_cast<uintptr_t>(output)&UINT32_MAX,tx[0].buffer)",
+        "EXPECT_EQ(NX_REQUEST_ACTIVE,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(nullptr,txslots[0].request)",
+        "EXPECT_EQ(64U,request.base.transferred)",
+        "EXPECT_EQ(NX_SUCCESS,request.base.result)"
+      ],
+      "calls": [
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Descriptor OWN handoff and interrupt hints retain TX until actual returned completion status and detached request.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&first))",
+        "EXPECT_EQ(64U,first.length)",
+        "EXPECT_EQ(0U,rx[0].status&own)",
+        "EXPECT_EQ(0x22,first.data[0])",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&second))",
+        "EXPECT_EQ(NX_ERROR_EMPTY,nx_eth_port_acquire(&port,&second))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_release(&port,&first))",
+        "EXPECT_EQ(own,rx[0].status&own)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_release(&port,&first))"
+      ],
+      "calls": [
+        "nx_eth_port_acquire(",
+        "nx_eth_port_release("
+      ],
+      "invariant": "An acquired RX loan cannot be rearmed or overwritten at wrap; release validates its token.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.CancellationWaitsForActualEngineAndFifoDrain",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.CancellationWaitsForActualEngineAndFifoDrain",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_cancel(&port,&request))",
+        "EXPECT_EQ(NX_REQUEST_DRAINING,nx_request_state(&request.base))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_QUARANTINED,nx_request_state(&request.base))",
+        "EXPECT_EQ(&request,txslots[0].request)",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_CANCELLED,request.base.result)"
+      ],
+      "calls": [
+        "nx_eth_model_poll(",
+        "nx_eth_port_cancel(",
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Cancellation retains TX through engine/FIFO drain failure and quarantine until hardware proof allows settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.InitializationCannotResetForeignDescriptorEngine",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.InitializationCannotResetForeignDescriptorEngine",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,Initialize())",
+        "EXPECT_EQ(0U,regs[0x1000/4])",
+        "EXPECT_EQ(0U,rx[0].status)"
+      ],
+      "calls": [
+        "Initialize("
+      ],
+      "invariant": "Cold initialization rejects a foreign descriptor engine before reset or RX ownership effects.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.FatalBusErrorCannotTurnMissingStatusIntoSuccess",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.FatalBusErrorCannotTurnMissingStatusIntoSuccess",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "EXPECT_NE(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_IO,request.base.result)",
+        "EXPECT_TRUE(mac.snapshot.fatal_bus_error)"
+      ],
+      "calls": [
+        "nx_eth_mac_irq(",
+        "nx_eth_model_poll(",
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Fatal bus error remains authoritative and cannot synthesize a successful transmit completion.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(&port,&request))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_service(&port))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_IO,request.base.result)",
+        "EXPECT_EQ(0U,request.base.transferred)"
+      ],
+      "calls": [
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_request_state("
+      ],
+      "invariant": "Returned OWN without successful frame status settles IO with no invented transferred bytes.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.StopRechecksCapturedPublisherAfterNvicDisableBoundary",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_attach_wake(&port,&wake,0))",
+        "EXPECT_EQ(NX_ERROR_BUSY,nx_eth_port_stop(&port))",
+        "EXPECT_TRUE(mac.retained)",
+        "EXPECT_EQ(&wake,mac.wake)",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_stop(&port))"
+      ],
+      "calls": [
+        "nx_eth_model_poll(",
+        "nx_eth_port_attach_wake(",
+        "nx_eth_port_stop("
+      ],
+      "invariant": "Stop rechecks an in-flight wake publisher after IRQ withdrawal and retains wake/storage until publisher join.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.StopClosesNewReceiveLoansBeforeDrainCompletes",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_ethernet_test",
+      "case": "EthernetMac.StopClosesNewReceiveLoansBeforeDrainCompletes",
+      "test_source": "tests/google/ethernet_mac_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,nx_eth_port_stop(&port))",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_acquire(&port,&loan))",
+        "EXPECT_EQ(0U,mac.snapshot.held_rx)"
+      ],
+      "calls": [
+        "nx_eth_port_acquire(",
+        "nx_eth_port_stop("
+      ],
+      "invariant": "Closing stop prevents new RX loans before the existing hardware drain completes.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_eth_factory_test",
+      "case": "EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_IO,Stop())",
+        "EXPECT_EQ(0x0e000000U,ahb()&0x0e000000U)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(0U,ahb()&0x0e000000U)",
+        "EXPECT_EQ(NX_SUCCESS,nx_platform_start().primary)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Failed owned MAC clock withdrawal retains the platform and blocks restart until actual clock readback.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.FailedPinRestoreKeepsClocksAndStorageUntilRetry",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_eth_factory_test",
+      "case": "EthernetFactory.FailedPinRestoreKeepsClocksAndStorageUntilRetry",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_IO,Stop())",
+        "EXPECT_EQ(0x0e000000U,ahb()&0x0e000000U)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Failed restoration of captured pads keeps provider storage and clocks until successful retry.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_eth_factory_test",
+      "case": "EthernetFactory.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,Stop())",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_release(face,&first))",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_GT(second.epoch,first.epoch)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_release(face,&first))",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_release(face,&second))"
+      ],
+      "calls": [
+        "nx_eth_port_release(",
+        "nx_platform_start("
+      ],
+      "invariant": "An acquired RX loan prevents destructive platform stop and stale tokens cannot release a restarted loan.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.RejectedDmaDomainDoesNotResetMacOrRetainPayload",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_eth_factory_test",
+      "case": "EthernetFactory.RejectedDmaDomainDoesNotResetMacOrRetainPayload",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_PERMISSION,nx_platform_start().primary)",
+        "EXPECT_EQ(0U,registers()[0x1000U/4U])",
+        "EXPECT_FALSE(s_mac->retained)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(0U,ahb()&0x0e000000U)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Rejected DMA memory domain has no MAC reset/payload retention and cleanup restores the owned clock.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.ExhaustedReceiveEpochCannotBeResetByReconstruction",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_eth_factory_test",
+      "case": "EthernetFactory.ExhaustedReceiveEpochCannotBeResetByReconstruction",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(NX_ERROR_INVALID,nx_platform_start().primary)",
+        "EXPECT_EQ(UINT64_MAX,s_mac->epoch)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Cold reconstruction cannot reuse a saturated receive epoch.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.eth.raw-rmii.StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
+      "family": "gd32f470",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_gd32_eth_factory_test",
+      "case": "EthernetFactory.StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
+      "test_source": "tests/google/ethernet_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/ethernet.c",
+        "io/src/eth_mac.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/ethernet_model.h",
+        "tests/google/ethernet_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_apply_link(face,&link))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_tx_prepare(&request,output,sizeof(output),s_now+10000U))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_submit(face,&request))",
+        "EXPECT_EQ(NX_ERROR_BUSY,Stop())",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_service(face))",
+        "EXPECT_EQ(NX_REQUEST_QUARANTINED,nx_request_state(&request.base))",
+        "EXPECT_EQ(&request,s_mac->tx_slots[0].request)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_platform_start().primary)",
+        "EXPECT_EQ(NX_SUCCESS,Stop())",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(nullptr,s_mac->tx_slots[0].request)"
+      ],
+      "calls": [
+        "nx_eth_model_poll(",
+        "nx_eth_port_apply_link(",
+        "nx_eth_port_service(",
+        "nx_eth_port_submit(",
+        "nx_eth_tx_prepare(",
+        "nx_platform_start(",
+        "nx_request_state("
+      ],
+      "invariant": "A stuck TX engine preserves quarantined request storage and rejects restart until actual engine drain.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.eth.raw-rmii.ExplicitIngressCannotOverwriteAnAcquiredLoan",
+      "family": "native",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_ethernet_native_test",
+      "case": "EthernetNative.ExplicitIngressCannotOverwriteAnAcquiredLoan",
+      "test_source": "tests/google/ethernet_native_test.cpp",
+      "production_sources": [
+        "io/src/eth_mac.c",
+        "io/native/ethernet.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_native_eth_receive(&instance,frame,64,0x300))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&loan))",
+        "EXPECT_EQ(64U,loan.length)",
+        "EXPECT_EQ(NX_ERROR_OVERFLOW,nx_native_eth_receive(&instance,frame,64,0x300))",
+        "EXPECT_EQ(0,loan.data[0])",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_release(&port,&loan))",
+        "EXPECT_EQ(0x77,loan.data[0])",
+        "EXPECT_EQ(1U,instance.mac.snapshot.unavailable_events)"
+      ],
+      "calls": [
+        "nx_eth_mac_irq(",
+        "nx_eth_port_acquire(",
+        "nx_eth_port_release(",
+        "nx_native_eth_receive("
+      ],
+      "invariant": "Explicit Native ingress cannot overwrite a borrowed RX buffer and exposes subsequent payload only after release.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "native.eth.raw-rmii.EpochSurvivesStopAndPreventsReleaseOfReusedStorage",
+      "family": "native",
+      "peripheral": "eth",
+      "mode": "raw-rmii",
+      "target": "nexus_ethernet_native_test",
+      "case": "EthernetNative.EpochSurvivesStopAndPreventsReleaseOfReusedStorage",
+      "test_source": "tests/google/ethernet_native_test.cpp",
+      "production_sources": [
+        "io/src/eth_mac.c",
+        "io/native/ethernet.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_native_eth_receive(&instance,frame,64,0x300))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&old))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_release(&port,&old))",
+        "EXPECT_EQ(NX_ERROR_BUSY,nx_eth_port_stop(&port))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_stop(&port))",
+        "ASSERT_EQ(NX_SUCCESS,nx_native_eth_initialize(&instance,nx_time_now_us()+10000))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_apply_link(&port,&link))",
+        "ASSERT_EQ(NX_SUCCESS,nx_eth_port_acquire(&port,&current))",
+        "EXPECT_NE(old.epoch,current.epoch)",
+        "EXPECT_EQ(NX_ERROR_STATE,nx_eth_port_release(&port,&old))",
+        "EXPECT_EQ(NX_SUCCESS,nx_eth_port_release(&port,&current))"
+      ],
+      "calls": [
+        "nx_eth_mac_irq(",
+        "nx_eth_port_acquire(",
+        "nx_eth_port_apply_link(",
+        "nx_eth_port_release(",
+        "nx_eth_port_stop(",
+        "nx_native_eth_initialize(",
+        "nx_native_eth_poll(",
+        "nx_native_eth_receive(",
+        "nx_time_now_us("
+      ],
+      "invariant": "Native restart preserves epoch identity, preventing a stale token from releasing reused storage.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.uart.irq-byte-event.TxSettlesOnlyAfterFinalWireTc",
+      "family": "stm32g474",
+      "peripheral": "uart",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_provider_test",
+      "case": "G474Provider.TxSettlesOnlyAfterFinalWireTc",
+      "test_source": "tests/google/g474_provider_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32g474/system.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_uart_port_submit(&port,&request))",
+        "EXPECT_EQ(0x12U,registers.TDR)",
+        "EXPECT_EQ(0x34U,registers.TDR)",
+        "EXPECT_EQ(NX_REQUEST_ACTIVE,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_SUCCESS,request.base.result)",
+        "EXPECT_EQ(2U,request.base.transferred)",
+        "EXPECT_EQ(nullptr,state.active)",
+        "EXPECT_EQ(0U,registers.CR1&(USART_CR1_TXEIE|USART_CR1_TCIE))"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_stm32g474_uart_irq(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "TXE writes do not settle; actual final wire TC detaches the accepted request before successful settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.uart.irq-byte-event.CancelKeepsBorrowQuarantinedUntilRealTc",
+      "family": "stm32g474",
+      "peripheral": "uart",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_provider_test",
+      "case": "G474Provider.CancelKeepsBorrowQuarantinedUntilRealTc",
+      "test_source": "tests/google/g474_provider_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32g474/system.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_uart_port_submit(&port,&request))",
+        "ASSERT_EQ(NX_SUCCESS,nx_uart_port_cancel(&port,&request))",
+        "EXPECT_EQ(NX_REQUEST_DRAINING,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_REQUEST_QUARANTINED,nx_request_state(&request.base))",
+        "EXPECT_EQ(&request,state.active)",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))",
+        "EXPECT_EQ(NX_ERROR_CANCELLED,request.base.result)",
+        "EXPECT_EQ(1U,request.base.transferred)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_stm32g474_uart_irq(",
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Cancellation preserves the request through quarantine until final wire TC, retaining the confirmed prefix count.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.uart.irq-byte-event.CompletedWireFactWinsLaterDeadlineAndCancel",
+      "family": "stm32g474",
+      "peripheral": "uart",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_provider_test",
+      "case": "G474Provider.CompletedWireFactWinsLaterDeadlineAndCancel",
+      "test_source": "tests/google/g474_provider_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32g474/system.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(NX_SUCCESS,nx_uart_port_submit(&port,&request))",
+        "EXPECT_EQ(NX_SUCCESS,nx_uart_port_cancel(&port,&request))",
+        "EXPECT_EQ(NX_SUCCESS,request.base.result)",
+        "EXPECT_EQ(NX_REQUEST_SETTLED,nx_request_state(&request.base))"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_stm32g474_uart_irq(",
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Previously confirmed wire completion wins a later timeout/cancel without changing successful settlement.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.uart.irq-byte-event.CorruptByteIsDiscardedWithObservableAggregateLoss",
+      "family": "stm32g474",
+      "peripheral": "uart",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_provider_test",
+      "case": "G474Provider.CorruptByteIsDiscardedWithObservableAggregateLoss",
+      "test_source": "tests/google/g474_provider_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32g474/system.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_OVERFLOW,nx_uart_port_read_bytes(&port,&output,1,&count))",
+        "EXPECT_EQ(0U,count)",
+        "EXPECT_EQ(9,output)",
+        "EXPECT_EQ(0U,registers.ISR&USART_ISR_FE)"
+      ],
+      "calls": [
+        "nx_uart_port_read_bytes("
+      ],
+      "invariant": "Corrupt received bytes are discarded with observable loss and cannot alter caller output as valid bytes.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.uart.irq-byte-event.ReadOutputCannotOverwriteRingOrActiveRequest",
+      "family": "stm32g474",
+      "peripheral": "uart",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_provider_test",
+      "case": "G474Provider.ReadOutputCannotOverwriteRingOrActiveRequest",
+      "test_source": "tests/google/g474_provider_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32g474/system.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_INVALID,nx_uart_port_read_bytes(&port,ring,2,&count))",
+        "EXPECT_EQ(42U,count)",
+        "ASSERT_EQ(NX_SUCCESS,nx_uart_port_submit(&port,&request))",
+        "EXPECT_EQ(NX_ERROR_INVALID,nx_uart_port_read_bytes(&port,reinterpret_cast<uint8_t*>(&request),2,&count))",
+        "EXPECT_EQ(NX_REQUEST_ACTIVE,nx_request_state(&request.base))"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_uart_port_read_bytes(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Output aliases cannot overwrite selected RX storage or an accepted request.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.uart.irq-byte-event.FailedSourceWithdrawalRetainsAllStorage",
+      "family": "stm32g474",
+      "peripheral": "uart",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_provider_test",
+      "case": "G474Provider.FailedSourceWithdrawalRetainsAllStorage",
+      "test_source": "tests/google/g474_provider_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32g474/system.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_IO,nx_uart_port_stop(&port))",
+        "EXPECT_TRUE(state.retained)",
+        "EXPECT_EQ(NX_SUCCESS,nx_uart_port_stop(&port))",
+        "EXPECT_FALSE(state.retained)"
+      ],
+      "calls": [
+        "nx_uart_port_stop("
+      ],
+      "invariant": "Failed IRQ withdrawal retains provider storage until actual successful retry.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.platform.irq-byte-event.LookupIsPureStaticIdentityBeforeAnyHardwareAccess",
+      "family": "stm32g474",
+      "peripheral": "platform",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_factory_test",
+      "case": "G474Factory.LookupIsPureStaticIdentityBeforeAnyHardwareAccess",
+      "test_source": "tests/google/g474_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/system.c",
+        "soc/stm32g474/drivers/gpio.c",
+        "soc/stm32g474/drivers/uart.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h",
+        "tests/google/g474_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_NE(nullptr,gpio)",
+        "ASSERT_NE(nullptr,uart)",
+        "EXPECT_EQ(gpio,nx_factory_gpio(NX_GPIO_ID_LED))",
+        "EXPECT_EQ(uart,nx_factory_uart(NX_UART_ID_CONSOLE))",
+        "EXPECT_EQ(nullptr,nx_factory_gpio(NX_GPIO_ID_COUNT))",
+        "EXPECT_EQ(nullptr,nx_factory_uart(NX_UART_ID_COUNT))",
+        "EXPECT_EQ(0U,g_g474_model.reads)",
+        "EXPECT_EQ(0U,g_g474_model.writes)",
+        "EXPECT_EQ(NX_ERROR_INVALID,nx_gpio_port_write(gpio,1U<<5U,0U))"
+      ],
+      "calls": [
+        "nx_factory_gpio(",
+        "nx_factory_uart(",
+        "nx_gpio_port_write("
+      ],
+      "invariant": "Static lookup preserves typed identities and performs no hardware read/write before start.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.platform.irq-byte-event.ForeignLiveUartRejectsBeforeAnyClockOrPinMutation",
+      "family": "stm32g474",
+      "peripheral": "platform",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_factory_test",
+      "case": "G474Factory.ForeignLiveUartRejectsBeforeAnyClockOrPinMutation",
+      "test_source": "tests/google/g474_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/system.c",
+        "soc/stm32g474/drivers/gpio.c",
+        "soc/stm32g474/drivers/uart.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h",
+        "tests/google/g474_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,result.primary)",
+        "EXPECT_EQ(NX_SUCCESS,result.cleanup)",
+        "EXPECT_EQ(0U,result.remaining_effects)",
+        "EXPECT_EQ(0U,g_g474_model.writes)",
+        "EXPECT_EQ(RCC_APB1ENR2_LPUART1EN,RCC->APB1ENR2)",
+        "EXPECT_EQ(USART_CR1_UE|USART_CR1_TE|USART_CR1_RE,LPUART1->CR1)",
+        "EXPECT_FALSE(g_nx_stm32g474_system.started)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "A foreign active UART causes cold platform rejection with no clock or pin effects.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.platform.irq-byte-event.ForeignDmaControlRejectsBeforeAnyClockOrPinMutation",
+      "family": "stm32g474",
+      "peripheral": "platform",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_factory_test",
+      "case": "G474Factory.ForeignDmaControlRejectsBeforeAnyClockOrPinMutation",
+      "test_source": "tests/google/g474_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/system.c",
+        "soc/stm32g474/drivers/gpio.c",
+        "soc/stm32g474/drivers/uart.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h",
+        "tests/google/g474_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_BUSY,result.primary)",
+        "EXPECT_EQ(NX_SUCCESS,result.cleanup)",
+        "EXPECT_EQ(0U,result.remaining_effects)",
+        "EXPECT_EQ(0U,g_g474_model.writes)",
+        "EXPECT_EQ(RCC_APB1ENR2_LPUART1EN,RCC->APB1ENR2)",
+        "EXPECT_EQ(USART_CR3_DMAR,LPUART1->CR3)",
+        "EXPECT_FALSE(g_nx_stm32g474_system.started)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Foreign UART DMA control is rejected before clock, pins or system ownership mutation.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.platform.irq-byte-event.FailedPeripheralRollbackRetainsClockPinsAndResponsibility",
+      "family": "stm32g474",
+      "peripheral": "platform",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_factory_test",
+      "case": "G474Factory.FailedPeripheralRollbackRetainsClockPinsAndResponsibility",
+      "test_source": "tests/google/g474_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/system.c",
+        "soc/stm32g474/drivers/gpio.c",
+        "soc/stm32g474/drivers/uart.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h",
+        "tests/google/g474_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_NE(NX_SUCCESS,result.primary)",
+        "EXPECT_NE(NX_SUCCESS,result.cleanup)",
+        "EXPECT_NE(0U,result.remaining_effects)",
+        "EXPECT_TRUE(g_nx_stm32g474_system.started)",
+        "EXPECT_NE(0U,RCC->AHB2ENR&RCC_AHB2ENR_GPIOAEN)",
+        "EXPECT_EQ(NX_SUCCESS,nx_platform_stop())",
+        "EXPECT_EQ(0U,GPIOA->MODER)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed cold rollback exposes remaining effects and retains clock/pin responsibility until explicit cleanup.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32g474.platform.irq-byte-event.StopFailurePreservesIdentityUntilActualIrqWithdrawal",
+      "family": "stm32g474",
+      "peripheral": "platform",
+      "mode": "irq-byte-event",
+      "target": "nexus_g474_factory_test",
+      "case": "G474Factory.StopFailurePreservesIdentityUntilActualIrqWithdrawal",
+      "test_source": "tests/google/g474_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32g474/system.c",
+        "soc/stm32g474/drivers/gpio.c",
+        "soc/stm32g474/drivers/uart.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/contracts/g474_model.c",
+        "tests/contracts/g474_model.h",
+        "tests/google/g474_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(NX_ERROR_IO,nx_platform_stop())",
+        "EXPECT_EQ(face,nx_factory_uart(NX_UART_ID_CONSOLE))",
+        "EXPECT_TRUE(g_nx_stm32g474_system.started)",
+        "EXPECT_NE(0U,RCC->APB1ENR2&RCC_APB1ENR2_LPUART1EN)",
+        "EXPECT_EQ(NX_SUCCESS,nx_platform_stop())",
+        "EXPECT_FALSE(g_g474_model.irq_enabled[91])",
+        "EXPECT_FALSE(g_nx_stm32g474_system.started)"
+      ],
+      "calls": [
+        "nx_factory_uart(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed source withdrawal preserves static identity and its resources until actual IRQ detach.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.CaptureOverflowIsObservableWithoutOverwritingConsumer",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.CaptureOverflowIsObservableWithoutOverwritingConsumer",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_read(&cap,&event),NX_SUCCESS)",
+        "EXPECT_EQ(event.captured_ticks,1U)",
+        "EXPECT_EQ(event.captured_ticks,2U)",
+        "EXPECT_EQ(event.captured_ticks,4U)",
+        "EXPECT_EQ(event.flags,NX_TIMER_CAPTURE_OVERCAPTURE|NX_TIMER_CAPTURE_RING_LOSS)",
+        "ASSERT_EQ(nx_timer_capture_state(&cap,&state),NX_SUCCESS)",
+        "EXPECT_EQ(state.loss_incidents,2U)",
+        "EXPECT_EQ(state.counter_bits,16U)"
+      ],
+      "calls": [
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start(",
+        "nx_timer_capture_state("
+      ],
+      "invariant": "Ring overflow preserves older captured edges and reports overcapture/software loss incidents without overwriting the consumer.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.CaptureStopRetainsQueuedRingUntilTaskDrain",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.CaptureStopRetainsQueuedRingUntilTaskDrain",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_ERROR_BUSY)",
+        "EXPECT_EQ(capture.events,ring)",
+        "ASSERT_EQ(nx_timer_capture_read(&cap,&event),NX_SUCCESS)",
+        "EXPECT_EQ(event.captured_ticks,19U)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_SUCCESS)",
+        "EXPECT_EQ(capture.events,nullptr)",
+        "EXPECT_EQ(ring[0].captured_ticks,19U)"
+      ],
+      "calls": [
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start(",
+        "nx_timer_capture_stop("
+      ],
+      "invariant": "Stop keeps the caller ring borrowed while queued capture facts remain and releases it only after drain.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.CaptureFailedDetachRetainsRingAndIncomingMask",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.CaptureFailedDetachRetainsRingAndIncomingMask",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_ERROR_BUSY)",
+        "EXPECT_EQ(capture.events,ring)",
+        "EXPECT_EQ(s_mask,1U)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_timer_capture_start(",
+        "nx_timer_capture_stop("
+      ],
+      "invariant": "Failed capture source withdrawal retains its ring and incoming interrupt mask through retry.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.CaptureRejectsRingControlOutputAndOverflowAliases",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.CaptureRejectsRingControlOutputAndOverflowAliases",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_start(&cap,reinterpret_cast<nx_timer_capture_event_t*>(&capture),1U),NX_ERROR_INVALID)",
+        "EXPECT_EQ(nx_timer_capture_start(&cap,ring,SIZE_MAX),NX_ERROR_INVALID)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_read(&cap,ring),NX_ERROR_INVALID)",
+        "EXPECT_EQ(capture.count,1U)"
+      ],
+      "calls": [
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start("
+      ],
+      "invariant": "Ring/control/output overlap and impossible capacity reject without consuming a queued capture.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.AdvancedHardwareBreakLatchesAndNeverAutorestarts",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.AdvancedHardwareBreakLatchesAndNeverAutorestarts",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_advanced_pwm_start(&pwm),NX_SUCCESS)",
+        "EXPECT_TRUE(advanced.fault)",
+        "EXPECT_EQ(ADV_BDTR&32768U,0U)",
+        "EXPECT_EQ(nx_advanced_pwm_start(&pwm),NX_ERROR_STATE)",
+        "ASSERT_EQ(nx_advanced_pwm_stop(&pwm),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_clear_fault(&pwm),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_advanced_pwm_clear_fault(&pwm),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_start(&pwm),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_clear_fault(",
+        "nx_advanced_pwm_start(",
+        "nx_advanced_pwm_stop("
+      ],
+      "invariant": "A hardware break latches fault and disables output; clearing requires inactive hardware and explicit rearm.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.AdvancedFailedMoeDetachKeepsOwnerResponsibility",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.AdvancedFailedMoeDetachKeepsOwnerResponsibility",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_advanced_pwm_start(&pwm),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_stop(&pwm),NX_ERROR_BUSY)",
+        "EXPECT_EQ(ADV_BDTR&32768U,32768U)",
+        "EXPECT_EQ(nx_advanced_pwm_stop(&pwm),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_start(",
+        "nx_advanced_pwm_stop("
+      ],
+      "invariant": "Failed output disable retains advanced-timer owner responsibility until actual MOE withdrawal.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_start(&pwm),NX_ERROR_IO)",
+        "EXPECT_TRUE(advanced.fault)",
+        "EXPECT_EQ(s_moe_enable_writes,0U)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_start("
+      ],
+      "invariant": "A pending break at enable prevents any explicit output-enable write.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.UntouchedReleaseNeverWithdrawsForeignActiveTimer",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32f407_timer_advanced_test",
+      "case": "TimerHardware.UntouchedReleaseNeverWithdrawsForeignActiveTimer",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_ERROR_BUSY)",
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_ERROR_BUSY)",
+        "EXPECT_EQ(CAP_RELEASE(&capture),NX_SUCCESS)",
+        "EXPECT_EQ(ADV_RELEASE(&advanced),NX_SUCCESS)",
+        "EXPECT_EQ(CAP_CR1,1U)",
+        "EXPECT_EQ(CAP_DIER,2U)",
+        "EXPECT_EQ(CAP_CCER,1U)",
+        "EXPECT_EQ(ADV_CR1,1U)",
+        "EXPECT_EQ(ADV_DIER,128U)",
+        "EXPECT_EQ(ADV_CCER,5U)",
+        "EXPECT_EQ(ADV_BDTR,32768U)",
+        "EXPECT_EQ(s_writes,0U)"
+      ],
+      "calls": [
+        "CAP_INIT(",
+        "CAP_RELEASE(",
+        "ADV_INIT(",
+        "ADV_RELEASE("
+      ],
+      "invariant": "Rejected cold acquisition and untouched release cannot disable a foreign timer, IRQ source or output.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_CONTEXT)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(result.remaining_effects,0U)",
+        "EXPECT_EQ(s_writes,0U)",
+        "EXPECT_EQ(capture->config,nullptr)",
+        "EXPECT_EQ(advanced->config,nullptr)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Unprivileged platform start rejects before system, clock, pin or provider mutation.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_BUSY)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(PEER_DIER,1U)",
+        "EXPECT_EQ(advanced->config,nullptr)",
+        "EXPECT_EQ(NVIC->IP[24],0x30U)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Cold rejection of a foreign shared timer preserves its source bits and vector priority.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(advanced->config,nullptr)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(NVIC->IP[24],0x50U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed IRQ withdrawal retains selected pins, gates, configuration and blocks restart until retry succeeds.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.RefusedPendingClearRetainsExactProviderBeforeReuse",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.RefusedPendingClearRetainsExactProviderBeforeReuse",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(capture->config,nullptr)",
+        "EXPECT_NE(CAP_GATE&4U,0U)",
+        "EXPECT_NE(NVIC->ISPR[0]&(1U<<30U),0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Uncleared owned pending IRQ prevents reuse of exact provider storage and clocks.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.ActivePublisherPreventsStorageReuseEvenAfterDisable",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.ActivePublisherPreventsStorageReuseEvenAfterDisable",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(advanced->config,nullptr)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "An in-flight publisher prevents provider reuse even after vector disable.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_EQ(capture->events,ring)",
+        "EXPECT_NE(CAP_GATE&4U,0U)",
+        "ASSERT_EQ(nx_timer_capture_read(cap,&event),NX_SUCCESS)",
+        "EXPECT_EQ(event.captured_ticks,77U)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(capture->events,nullptr)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start("
+      ],
+      "invariant": "A queued capture ring loan prevents platform pin/clock release until caller drains its event.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.RefusedSafeOutputLatchDoesNotReleasePinOrClock",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.RefusedSafeOutputLatchDoesNotReleasePinOrClock",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_IO)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed inactive GPIO latch readback retains the output group and its clock rather than inventing a safe shutdown.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.AllInactiveOutputProofsPrecedeAnyPinRelease",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.AllInactiveOutputProofsPrecedeAnyPinRelease",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_IO)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Every selected advanced-output inactive proof precedes release of any pin in that output group.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_IO)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed owned clock withdrawal retains stop responsibility and rejects restart until readback.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "stm32f407.timer.capture-and-advanced.StopAndColdRestartReuseOnlyAProvedQuiescentSession",
+      "family": "stm32f407",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_stm32_timer_factory_test",
+      "case": "TimerFactory.StopAndColdRestartReuseOnlyAProvedQuiescentSession",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/timer_capture.c",
+        "soc/stm32f407/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(cap,ring,2U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_advanced_pwm_start(power),NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(capture->config,nullptr)",
+        "EXPECT_EQ(advanced->config,nullptr)",
+        "EXPECT_EQ(NVIC->IP[30],0x20U)",
+        "EXPECT_EQ(NVIC->IP[24],0x30U)",
+        "EXPECT_TRUE(capture->initialized)",
+        "EXPECT_TRUE(advanced->initialized)",
+        "EXPECT_EQ(advanced->duty_ticks,0U)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_start(",
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_timer_capture_start("
+      ],
+      "invariant": "Only proved source, queue, output and publisher quiescence permits cold static-session reuse.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.CaptureOverflowIsObservableWithoutOverwritingConsumer",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.CaptureOverflowIsObservableWithoutOverwritingConsumer",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_read(&cap,&event),NX_SUCCESS)",
+        "EXPECT_EQ(event.captured_ticks,1U)",
+        "EXPECT_EQ(event.captured_ticks,2U)",
+        "EXPECT_EQ(event.captured_ticks,4U)",
+        "EXPECT_EQ(event.flags,NX_TIMER_CAPTURE_OVERCAPTURE|NX_TIMER_CAPTURE_RING_LOSS)",
+        "ASSERT_EQ(nx_timer_capture_state(&cap,&state),NX_SUCCESS)",
+        "EXPECT_EQ(state.loss_incidents,2U)",
+        "EXPECT_EQ(state.counter_bits,16U)"
+      ],
+      "calls": [
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start(",
+        "nx_timer_capture_state("
+      ],
+      "invariant": "Ring overflow preserves older captured edges and reports overcapture/software loss incidents without overwriting the consumer.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.CaptureStopRetainsQueuedRingUntilTaskDrain",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.CaptureStopRetainsQueuedRingUntilTaskDrain",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_ERROR_BUSY)",
+        "EXPECT_EQ(capture.events,ring)",
+        "ASSERT_EQ(nx_timer_capture_read(&cap,&event),NX_SUCCESS)",
+        "EXPECT_EQ(event.captured_ticks,19U)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_SUCCESS)",
+        "EXPECT_EQ(capture.events,nullptr)",
+        "EXPECT_EQ(ring[0].captured_ticks,19U)"
+      ],
+      "calls": [
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start(",
+        "nx_timer_capture_stop("
+      ],
+      "invariant": "Stop keeps the caller ring borrowed while queued capture facts remain and releases it only after drain.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.CaptureFailedDetachRetainsRingAndIncomingMask",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.CaptureFailedDetachRetainsRingAndIncomingMask",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_ERROR_BUSY)",
+        "EXPECT_EQ(capture.events,ring)",
+        "EXPECT_EQ(s_mask,1U)",
+        "EXPECT_EQ(nx_timer_capture_stop(&cap),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_timer_capture_start(",
+        "nx_timer_capture_stop("
+      ],
+      "invariant": "Failed capture source withdrawal retains its ring and incoming interrupt mask through retry.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.CaptureRejectsRingControlOutputAndOverflowAliases",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.CaptureRejectsRingControlOutputAndOverflowAliases",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_start(&cap,reinterpret_cast<nx_timer_capture_event_t*>(&capture),1U),NX_ERROR_INVALID)",
+        "EXPECT_EQ(nx_timer_capture_start(&cap,ring,SIZE_MAX),NX_ERROR_INVALID)",
+        "ASSERT_EQ(nx_timer_capture_start(&cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_timer_capture_read(&cap,ring),NX_ERROR_INVALID)",
+        "EXPECT_EQ(capture.count,1U)"
+      ],
+      "calls": [
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start("
+      ],
+      "invariant": "Ring/control/output overlap and impossible capacity reject without consuming a queued capture.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.AdvancedHardwareBreakLatchesAndNeverAutorestarts",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.AdvancedHardwareBreakLatchesAndNeverAutorestarts",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_advanced_pwm_start(&pwm),NX_SUCCESS)",
+        "EXPECT_TRUE(advanced.fault)",
+        "EXPECT_EQ(ADV_BDTR&32768U,0U)",
+        "EXPECT_EQ(nx_advanced_pwm_start(&pwm),NX_ERROR_STATE)",
+        "ASSERT_EQ(nx_advanced_pwm_stop(&pwm),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_clear_fault(&pwm),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_advanced_pwm_clear_fault(&pwm),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_start(&pwm),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_clear_fault(",
+        "nx_advanced_pwm_start(",
+        "nx_advanced_pwm_stop("
+      ],
+      "invariant": "A hardware break latches fault and disables output; clearing requires inactive hardware and explicit rearm.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.AdvancedFailedMoeDetachKeepsOwnerResponsibility",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.AdvancedFailedMoeDetachKeepsOwnerResponsibility",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_advanced_pwm_start(&pwm),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_stop(&pwm),NX_ERROR_BUSY)",
+        "EXPECT_EQ(ADV_BDTR&32768U,32768U)",
+        "EXPECT_EQ(nx_advanced_pwm_stop(&pwm),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_start(",
+        "nx_advanced_pwm_stop("
+      ],
+      "invariant": "Failed output disable retains advanced-timer owner responsibility until actual MOE withdrawal.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_SUCCESS)",
+        "EXPECT_EQ(nx_advanced_pwm_start(&pwm),NX_ERROR_IO)",
+        "EXPECT_TRUE(advanced.fault)",
+        "EXPECT_EQ(s_moe_enable_writes,0U)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_start("
+      ],
+      "invariant": "A pending break at enable prevents any explicit output-enable write.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.UntouchedReleaseNeverWithdrawsForeignActiveTimer",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32f470_timer_advanced_test",
+      "case": "TimerHardware.UntouchedReleaseNeverWithdrawsForeignActiveTimer",
+      "test_source": "tests/google/timer_advanced_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_advanced_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(CAP_INIT(&capture,&cap_config),NX_ERROR_BUSY)",
+        "ASSERT_EQ(ADV_INIT(&advanced,&adv_config),NX_ERROR_BUSY)",
+        "EXPECT_EQ(CAP_RELEASE(&capture),NX_SUCCESS)",
+        "EXPECT_EQ(ADV_RELEASE(&advanced),NX_SUCCESS)",
+        "EXPECT_EQ(CAP_CR1,1U)",
+        "EXPECT_EQ(CAP_DIER,2U)",
+        "EXPECT_EQ(CAP_CCER,1U)",
+        "EXPECT_EQ(ADV_CR1,1U)",
+        "EXPECT_EQ(ADV_DIER,128U)",
+        "EXPECT_EQ(ADV_CCER,5U)",
+        "EXPECT_EQ(ADV_BDTR,32768U)",
+        "EXPECT_EQ(s_writes,0U)"
+      ],
+      "calls": [
+        "CAP_INIT(",
+        "CAP_RELEASE(",
+        "ADV_INIT(",
+        "ADV_RELEASE("
+      ],
+      "invariant": "Rejected cold acquisition and untouched release cannot disable a foreign timer, IRQ source or output.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_CONTEXT)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(result.remaining_effects,0U)",
+        "EXPECT_EQ(s_writes,0U)",
+        "EXPECT_EQ(capture->config,nullptr)",
+        "EXPECT_EQ(advanced->config,nullptr)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Unprivileged platform start rejects before system, clock, pin or provider mutation.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(result.primary,NX_ERROR_BUSY)",
+        "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
+        "EXPECT_EQ(PEER_DIER,1U)",
+        "EXPECT_EQ(advanced->config,nullptr)",
+        "EXPECT_EQ(NVIC->IP[24],0x30U)"
+      ],
+      "calls": [
+        "nx_platform_start("
+      ],
+      "invariant": "Cold rejection of a foreign shared timer preserves its source bits and vector priority.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(advanced->config,nullptr)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(NVIC->IP[24],0x50U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed IRQ withdrawal retains selected pins, gates, configuration and blocks restart until retry succeeds.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.RefusedPendingClearRetainsExactProviderBeforeReuse",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.RefusedPendingClearRetainsExactProviderBeforeReuse",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(capture->config,nullptr)",
+        "EXPECT_NE(CAP_GATE&4U,0U)",
+        "EXPECT_NE(NVIC->ISPR[0]&(1U<<30U),0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Uncleared owned pending IRQ prevents reuse of exact provider storage and clocks.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.ActivePublisherPreventsStorageReuseEvenAfterDisable",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.ActivePublisherPreventsStorageReuseEvenAfterDisable",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_NE(advanced->config,nullptr)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "An in-flight publisher prevents provider reuse even after vector disable.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(cap,ring,2U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_BUSY)",
+        "EXPECT_EQ(capture->events,ring)",
+        "EXPECT_NE(CAP_GATE&4U,0U)",
+        "ASSERT_EQ(nx_timer_capture_read(cap,&event),NX_SUCCESS)",
+        "EXPECT_EQ(event.captured_ticks,77U)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(capture->events,nullptr)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_timer_capture_read(",
+        "nx_timer_capture_start("
+      ],
+      "invariant": "A queued capture ring loan prevents platform pin/clock release until caller drains its event.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.RefusedSafeOutputLatchDoesNotReleasePinOrClock",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.RefusedSafeOutputLatchDoesNotReleasePinOrClock",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_IO)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed inactive GPIO latch readback retains the output group and its clock rather than inventing a safe shutdown.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.AllInactiveOutputProofsPrecedeAnyPinRelease",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.AllInactiveOutputProofsPrecedeAnyPinRelease",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_IO)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Every selected advanced-output inactive proof precedes release of any pin in that output group.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "EXPECT_EQ(nx_platform_stop(),NX_ERROR_IO)",
+        "EXPECT_NE(ADV_GATE&1U,0U)",
+        "EXPECT_EQ(nx_platform_start().primary,NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_platform_stop(),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_platform_start(",
+        "nx_platform_stop("
+      ],
+      "invariant": "Failed owned clock withdrawal retains stop responsibility and rejects restart until readback.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
+    },
+    {
+      "id": "gd32f470.timer.capture-and-advanced.StopAndColdRestartReuseOnlyAProvedQuiescentSession",
+      "family": "gd32f470",
+      "peripheral": "timer",
+      "mode": "capture-and-advanced",
+      "target": "nexus_gd32_timer_factory_test",
+      "case": "TimerFactory.StopAndColdRestartReuseOnlyAProvedQuiescentSession",
+      "test_source": "tests/google/timer_factory_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/timer_capture.c",
+        "soc/gd32f470/drivers/advanced_pwm.c",
+        "io/src/timer_capture.c",
+        "io/src/advanced_pwm.c"
+      ],
+      "model_sources": [
+        "tests/google/timer_factory_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_platform_start().primary,NX_SUCCESS)",
+        "ASSERT_EQ(nx_timer_capture_start(cap,ring,2U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_advanced_pwm_start(power),NX_SUCCESS)",
+        "ASSERT_EQ(nx_platform_stop(),NX_SUCCESS)",
+        "EXPECT_EQ(capture->config,nullptr)",
+        "EXPECT_EQ(advanced->config,nullptr)",
+        "EXPECT_EQ(NVIC->IP[30],0x20U)",
+        "EXPECT_EQ(NVIC->IP[24],0x30U)",
+        "EXPECT_TRUE(capture->initialized)",
+        "EXPECT_TRUE(advanced->initialized)",
+        "EXPECT_EQ(advanced->duty_ticks,0U)"
+      ],
+      "calls": [
+        "nx_advanced_pwm_start(",
+        "nx_platform_start(",
+        "nx_platform_stop(",
+        "nx_timer_capture_start("
+      ],
+      "invariant": "Only proved source, queue, output and publisher quiescence permits cold static-session reuse.",
+      "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
     }
   ],
   "unproven": [
     {
       "scope": "physical",
-      "reason": "No connected boards: DMA/USART/SPI/I2C waveforms, electrical effects, IRQ WCET, cache interactions and HIL fault timing are not executed."
+      "reason": "No connected boards: UART/SPI/I2C/CAN/USB/Ethernet buses, ADC/timer/PWM waveforms, electrical effects, IRQ WCET, cache interactions and HIL fault timing are not executed."
     },
     {
       "scope": "continuous duplex combinations",
@@ -2799,7 +6867,7 @@
     },
     {
       "scope": "non-streaming IO",
-      "reason": "GPIO/EXTI/PWM/watchdog/Flash/CAN/USB/Ethernet own distinct maintained suites; this finite request/block catalogue does not claim their complete lifecycle coverage."
+      "reason": "GPIO/EXTI/basic PWM/watchdog/Flash have independent maintained suites. The selected CAN/USB/Ethernet/timer rows here do not claim every lifecycle, controller, packet type or alternative mode."
     },
     {
       "scope": "IRQ-byte-event TX per MCU",
@@ -2816,6 +6884,10 @@
     {
       "scope": "test framework",
       "reason": "Only ordinary reviewed TEST/TEST_F bodies are indexed; parameterized/typed/death-only aggregate properties need explicit review rather than automatic name inference."
+    },
+    {
+      "scope": "external product outputs",
+      "reason": "Advanced-output readback is a modeled platform mechanism. No tested GPIO value establishes real product safety, transceiver/PHY wiring, a physical break path, a reset policy or a safety certification."
     }
   ],
   "contract_sources": [
@@ -2825,6 +6897,58 @@
     "io/include/nexus/io/uart.h",
     "io/include/nexus/io/spi.h",
     "io/include/nexus/io/i2c.h",
-    "io/include/nexus/io/adc.h"
+    "io/include/nexus/io/adc.h",
+    "io/include/nexus/io/can.h",
+    "io/include/nexus/io/ethernet.h",
+    "io/include/nexus/io/usb_device.h",
+    "io/include/nexus/io/timer_capture.h",
+    "io/include/nexus/io/advanced_pwm.h",
+    "tools/configure/configure.py",
+    "tools/configure/ir.py",
+    "tools/configure/providers/stm32f407/bindings.py",
+    "tools/configure/providers/stm32f407/emission.py",
+    "tools/configure/providers/gd32f470/bindings.py",
+    "tools/configure/providers/gd32f470/emission.py",
+    "tools/configure/providers/stm32g474/bindings.py",
+    "tools/configure/providers/stm32g474/emission.py",
+    "tests/google/can_runtime.cmake",
+    "tests/google/can_factory.cmake",
+    "tests/google/usb_device.cmake",
+    "tests/google/usb_factory.cmake",
+    "tests/google/ethernet.cmake",
+    "tests/google/ethernet_factory.cmake",
+    "tests/google/timer_advanced.cmake",
+    "tests/google/timer_factory.cmake",
+    "tests/google/g474_factory.cmake",
+    "tests/google/g474.cmake",
+    "tests/contracts/can_assembly/gd32-both.toml",
+    "tests/contracts/can_assembly/gd32-first.toml",
+    "tests/contracts/can_assembly/stm32-both.toml",
+    "tests/contracts/can_assembly/stm32-first.toml",
+    "tests/contracts/usb_assembly/gd32-freertos.toml",
+    "tests/contracts/usb_assembly/gd32.toml",
+    "tests/contracts/usb_assembly/stm32-ve-freertos.toml",
+    "tests/contracts/usb_assembly/stm32-ve.toml",
+    "tests/contracts/usb_assembly/stm32-zg-freertos.toml",
+    "tests/contracts/usb_assembly/stm32-zg.toml",
+    "tests/contracts/ethernet_assembly/gd32-freertos.toml",
+    "tests/contracts/ethernet_assembly/gd32.toml",
+    "tests/contracts/ethernet_assembly/stm32-zg-freertos.toml",
+    "tests/contracts/ethernet_assembly/stm32-zg.toml",
+    "tests/contracts/timer_assembly/gd32-freertos.toml",
+    "tests/contracts/timer_assembly/gd32.toml",
+    "tests/contracts/timer_assembly/stm32-ve-freertos.toml",
+    "tests/contracts/timer_assembly/stm32-ve.toml",
+    "tests/contracts/timer_assembly/stm32-zg-freertos.toml",
+    "tests/contracts/timer_assembly/stm32-zg.toml",
+    "tests/contracts/g474_assembly/empty-freertos.toml",
+    "tests/contracts/g474_assembly/empty.toml",
+    "tests/contracts/g474_assembly/io-freertos.toml",
+    "tests/contracts/g474_assembly/io.toml",
+    "tools/configure/bindings.py",
+    "tools/configure/emission.py",
+    "tools/configure/factory.py",
+    "tools/configure/timer_advanced.py",
+    "tools/configure/secondary_controllers.py"
   ]
 }

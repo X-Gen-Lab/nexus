@@ -1,0 +1,36 @@
+Nexus format, comment and text checks....................................Failed
+- hook id: nexus-style
+- exit code: 1
+
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:26: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:27: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:28: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:29: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:30: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:31: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:32: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:33: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:34: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:35: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:36: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:37: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:38: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/host-elf-layout/stdout.txt:39: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/memory-final-regular-build/stdout.txt:7: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/memory-final-sanitizer-build/stdout.txt:7: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/memory-tsan-build/stdout.txt:7: trailing whitespace
+tools/testing/evidence/ci-boundaries-iteration/raw/runtime-suite-run1/children/017.stdout.txt:3: trailing whitespace
+Nexus style: failed; checked 45 source files; unchanged legacy format/comment files: 0/0
+Nexus style: passed; checked 0 source files; unchanged legacy format/comment files: 0/0
+Nexus style: passed; checked 0 source files; unchanged legacy format/comment files: 0/0
+Nexus style: passed; checked 0 source files; unchanged legacy format/comment files: 0/0
+Nexus style: passed; checked 0 source files; unchanged legacy format/comment files: 0/0
+Nexus style: passed; checked 0 source files; unchanged legacy format/comment files: 0/0
+
+Nexus GoogleTest and GoogleMock contract execution.......................Failed
+- hook id: nexus-tdd-gate
+- exit code: 1
+
++ /home/agent/.cache/pre-commit/repoziakv3mv/py_env-python3.12/bin/python -B tools/testing/run_tool_tests.py --suite testing --report /workspace/nexus-60-automation-source/build/native-debug/tdd/tools-testing.json
+TDD gate rejected: Command failed (1); see /workspace/nexus-60-automation-source/build/native-debug/tdd/tools-testing.txt
+

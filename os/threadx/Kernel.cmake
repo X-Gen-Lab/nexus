@@ -63,22 +63,32 @@ return sem_clockwait(&semaphore, CLOCK_MONOTONIC, &deadline); }"
         if(NOT NEXUS_THREADX_HAS_SEM_CLOCKWAIT)
             message(FATAL_ERROR "ThreadX requires linked GNU sem_clockwait")
         endif()
-        set(original "${source_root}/ports/linux/gnu/src/tx_initialize_low_level.c")
         set(overlay_directory "${CMAKE_CURRENT_BINARY_DIR}/${target}-port")
         file(MAKE_DIRECTORY "${overlay_directory}")
-        set(overlay "${overlay_directory}/tx_initialize_low_level.c")
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${owned_root}/prepare_linux.py" "${original}")
-        execute_process(COMMAND "${Python3_EXECUTABLE}" -B
-            "${owned_root}/prepare_linux.py" --source "${original}"
-            --output "${overlay}" RESULT_VARIABLE prepared
-            OUTPUT_VARIABLE prepare_output ERROR_VARIABLE prepare_error)
-        if(NOT prepared EQUAL 0)
-            message(FATAL_ERROR "ThreadX monotonic overlay rejected: "
-                "${prepare_output}${prepare_error}")
-        endif()
-        list(REMOVE_ITEM sources "${original}")
-        list(APPEND sources "${overlay}")
+            "${owned_root}/prepare_linux.py")
+        foreach(kind lowlevel scheduler)
+            if(kind STREQUAL "lowlevel")
+                set(filename "tx_initialize_low_level.c")
+            else()
+                set(filename "tx_thread_schedule.c")
+            endif()
+            set(original "${source_root}/ports/linux/gnu/src/${filename}")
+            set(overlay "${overlay_directory}/${filename}")
+            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+                "${original}")
+            execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+                "${owned_root}/prepare_linux.py" --source "${original}"
+                --output "${overlay}" --kind "${kind}"
+                RESULT_VARIABLE prepared OUTPUT_VARIABLE prepare_output
+                ERROR_VARIABLE prepare_error)
+            if(NOT prepared EQUAL 0)
+                message(FATAL_ERROR "ThreadX ${kind} overlay rejected: "
+                    "${prepare_output}${prepare_error}")
+            endif()
+            list(REMOVE_ITEM sources "${original}")
+            list(APPEND sources "${overlay}")
+        endforeach()
     endif()
     add_library(${target} STATIC ${sources})
     target_include_directories(${target} SYSTEM PUBLIC

@@ -44,6 +44,7 @@ void rcu_timer_clock_prescaler_config(uint32_t divider) {
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 /* Actual absolute linker-symbol addresses, not mocked initializer functions. */
 asm(".globl __nx_flash_start\n.set __nx_flash_start, 0x08000000\n"
@@ -77,18 +78,38 @@ class MemoryBootFixture : public testing::Test {
     static constexpr uintptr_t addsram = 0x20030000U;
     static constexpr uintptr_t tcm = 0x10000000U;
 
-    static void map(uintptr_t address, size_t size) {
-        ASSERT_EQ(mmap(reinterpret_cast<void*>(address), size,
-                       PROT_READ | PROT_WRITE,
-                       MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0),
-                  reinterpret_cast<void*>(address));
+    struct Mapping {
+        uintptr_t address;
+        size_t size;
+        bool owned;
+    };
+    Mapping mappings[4] = {{0x40000000U, 0x40000U, false},
+                           {flash, 0x100000U, false},
+                           {addsram, 0x40000U, false},
+                           {tcm, 0x10000U, false}};
+
+    static bool reserve_exact(uintptr_t address, size_t size) {
+        void* mapping =
+            mmap(reinterpret_cast<void*>(address), size, PROT_READ | PROT_WRITE,
+                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        if (mapping == reinterpret_cast<void*>(address)) {
+            return true;
+        }
+        /* Kernels without NOREPLACE may ignore it and choose another address.
+         */
+        if (mapping != MAP_FAILED) {
+            munmap(mapping, size);
+        }
+        return false;
     }
 
     void SetUp() override {
-        map(0x40000000U, 0x40000U);
-        map(flash, 0x100000U);
-        map(addsram, 0x40000U);
-        map(tcm, 0x10000U);
+        /* Admission failure never permits a fill or teardown of foreign RAM.
+         */
+        for (auto& mapping : mappings) {
+            ASSERT_TRUE(reserve_exact(mapping.address, mapping.size));
+            mapping.owned = true;
+        }
         std::memset(reinterpret_cast<void*>(addsram), 0xA5, 0x40000U);
         std::memset(reinterpret_cast<void*>(tcm), 0x5A, 0x10000U);
         auto* source = reinterpret_cast<uint32_t*>(flash + 0x10000U);
@@ -101,16 +122,40 @@ class MemoryBootFixture : public testing::Test {
     }
 
     void TearDown() override {
-        ASSERT_EQ(munmap(reinterpret_cast<void*>(0x40000000U), 0x40000U), 0);
-        ASSERT_EQ(munmap(reinterpret_cast<void*>(flash), 0x100000U), 0);
-        ASSERT_EQ(munmap(reinterpret_cast<void*>(addsram), 0x40000U), 0);
-        ASSERT_EQ(munmap(reinterpret_cast<void*>(tcm), 0x10000U), 0);
+        for (auto& mapping : mappings) {
+            if (mapping.owned) {
+                EXPECT_EQ(munmap(reinterpret_cast<void*>(mapping.address),
+                                 mapping.size),
+                          0);
+                mapping.owned = false;
+            }
+        }
     }
 
     static uint32_t word(uintptr_t address, size_t index) {
         return reinterpret_cast<const uint32_t*>(address)[index];
     }
 };
+
+TEST_F(MemoryBootFixture, OccupiedAddressKeepsItsOriginalOwnerAndContents) {
+    constexpr size_t page = 4096U;
+    void* existing = mmap(nullptr, page, PROT_READ | PROT_WRITE,
+                          MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    ASSERT_NE(existing, MAP_FAILED);
+    auto* value = static_cast<uint32_t*>(existing);
+    *value = 0x13579BDFU;
+    EXPECT_FALSE(reserve_exact(reinterpret_cast<uintptr_t>(existing), page));
+    EXPECT_EQ(*value, 0x13579BDFU);
+    EXPECT_EQ(munmap(existing, page), 0);
+}
+
+TEST_F(MemoryBootFixture, HostImageAndHeapStayAboveEveryHardwareWindow) {
+    constexpr uintptr_t host_base = 0x60000000U;
+    void* heap = sbrk(0);
+    ASSERT_NE(heap, reinterpret_cast<void*>(-1));
+    EXPECT_GE(reinterpret_cast<uintptr_t>(&g_gd32_model_scb), host_base);
+    EXPECT_GE(reinterpret_cast<uintptr_t>(heap), host_base);
+}
 
 TEST_F(MemoryBootFixture, ResetInitializesOnlyAuthoredRegions) {
     SystemInit();

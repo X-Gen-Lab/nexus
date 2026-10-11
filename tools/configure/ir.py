@@ -208,6 +208,27 @@ class AdcOptions:
 
 
 @dataclass(frozen=True)
+class TimerCaptureOptions:
+    tick_hz: int
+    edge: str
+    filter: int
+    exclusive: bool
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class AdvancedPwmOptions:
+    tick_hz: int
+    period_ticks: int
+    deadtime_ticks: int
+    break_active_high: bool
+    idle_high: bool
+    idle_complement_high: bool
+    exclusive: bool
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
 class EthernetOptions:
     tx_count: int
     rx_count: int
@@ -286,7 +307,8 @@ class NoOptions:
 
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | AdcOptions | CanOptions |
-                     UsbDeviceOptions | EthernetOptions | NoOptions)
+                     UsbDeviceOptions | EthernetOptions | TimerCaptureOptions |
+                     AdvancedPwmOptions | NoOptions)
 
 
 def mode_options(values):
@@ -303,6 +325,13 @@ def mode_options(values):
         return UsbDeviceOptions(*(values[key] for key in (
             "event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
             "drain_timeout_us", "clock_timeout_us")), irq)
+    if kind == "timer_capture":
+        return TimerCaptureOptions(*(values[key] for key in (
+            "tick_hz", "edge", "filter", "exclusive")), irq)
+    if kind == "advanced_pwm":
+        return AdvancedPwmOptions(*(values[key] for key in (
+            "tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
+            "idle_high", "idle_complement_high", "exclusive")), irq)
     if kind == "eth":
         return EthernetOptions(values["tx_count"], values["rx_count"],
                                values["rx_storage_bytes"], tuple(values["address"]),

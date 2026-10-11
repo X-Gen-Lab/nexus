@@ -1,0 +1,7 @@
+Capability document matches facts and selected definitions; physical HIL is not assessed
+Resolved 3 TOML examples; 2 explicit fragments
+{"branch_protection_verified": false, "github_access_verified": false, "independent_human_review_verified": false, "named_members_required": false, "responsible_agent": "codex", "seats": 10, "status": "agent_managed", "unassigned_roles": []}
++ binary --gtest_filter=*
+HIL workloads: failed; equipment not operated
+HIL workloads: prepared_unbound; equipment not operated
+OS HIL: passed; equipment not operated

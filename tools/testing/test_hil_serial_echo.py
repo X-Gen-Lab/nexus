@@ -385,5 +385,154 @@ class HilSerialEchoTests(unittest.TestCase):
             "--record", str(self.record)]), 1)
 
 
+class HilTraceDescriptorTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.root = Path(directory.name)
+
+    def close_if_open(self, descriptor):
+        try:
+            os.fstat(descriptor)
+        except OSError as error:
+            if error.errno != errno.EBADF:
+                raise
+        else:
+            os.close(descriptor)
+
+    def assert_closed(self, descriptors):
+        for descriptor in descriptors:
+            with self.assertRaises(OSError) as closed:
+                os.fstat(descriptor)
+            self.assertEqual(closed.exception.errno, errno.EBADF)
+
+    def test_fdopen_failure_closes_unconverted_and_prior_descriptors(self):
+        descriptors = []
+        real_open, real_fdopen = os.open, os.fdopen
+        conversions = []
+        original = OSError(errno.EMFILE, "conversion failed")
+
+        def opened(*args, **kwargs):
+            descriptor = real_open(*args, **kwargs)
+            descriptors.append(descriptor)
+            self.addCleanup(self.close_if_open, descriptor)
+            return descriptor
+
+        def converted(descriptor, *args, **kwargs):
+            conversions.append(descriptor)
+            if len(conversions) == 2:
+                raise original
+            return real_fdopen(descriptor, *args, **kwargs)
+
+        with patch("tools.hil.serial_echo.os.open", side_effect=opened), \
+                patch("tools.hil.serial_echo.os.fdopen", side_effect=converted):
+            with self.assertRaises(OSError) as failure:
+                serial_echo._Trace(self.root)
+        self.assertIs(failure.exception, original)
+        self.assertEqual(len(descriptors), 2)
+        self.assert_closed(descriptors)
+
+    def test_json_fdopen_failure_closes_the_raw_descriptor(self):
+        descriptors = []
+        real_open = os.open
+        original = OSError(errno.EMFILE, "conversion failed")
+
+        def opened(*args, **kwargs):
+            descriptor = real_open(*args, **kwargs)
+            descriptors.append(descriptor)
+            self.addCleanup(self.close_if_open, descriptor)
+            return descriptor
+
+        with patch("tools.hil.serial_echo.os.open", side_effect=opened), \
+                patch("tools.hil.serial_echo.os.fdopen", side_effect=original):
+            with self.assertRaises(OSError) as failure:
+                serial_echo._json_new(self.root / "result.json", {"failed": True})
+        self.assertIs(failure.exception, original)
+        self.assertEqual(len(descriptors), 1)
+        self.assert_closed(descriptors)
+
+    def test_constructor_cleanup_error_cannot_replace_conversion_error(self):
+        descriptors = []
+        conversions = []
+        original = OSError(errno.EMFILE, "conversion failed first")
+        later = OSError(errno.EIO, "cleanup flush failed later")
+        real_open, real_fdopen = os.open, os.fdopen
+
+        def opened(*args, **kwargs):
+            descriptor = real_open(*args, **kwargs)
+            descriptors.append(descriptor)
+            self.addCleanup(self.close_if_open, descriptor)
+            return descriptor
+
+        def converted(descriptor, *args, **kwargs):
+            if conversions:
+                raise original
+            stream = real_fdopen(descriptor, *args, **kwargs)
+            conversions.append(stream)
+            self.addCleanup(stream.close)
+            flush = patch.object(stream, "flush", side_effect=later)
+            flush.start()
+            self.addCleanup(flush.stop)
+            return stream
+
+        with patch("tools.hil.serial_echo.os.open", side_effect=opened), \
+                patch("tools.hil.serial_echo.os.fdopen", side_effect=converted):
+            with self.assertRaises(OSError) as failure:
+                serial_echo._Trace(self.root)
+        self.assertIs(failure.exception, original)
+        self.assertEqual(len(descriptors), 2)
+        self.assert_closed(descriptors)
+
+    def trace(self):
+        result = serial_echo._Trace(self.root)
+        self.addCleanup(result.close)
+        descriptors = [stream.fileno() for stream in result.streams.values()]
+        return result, descriptors
+
+    def test_first_flush_error_does_not_abandon_remaining_descriptors(self):
+        trace, descriptors = self.trace()
+        first = trace.streams["tx"]
+        original = OSError(errno.EIO, "flush failed")
+        with patch.object(first, "flush", side_effect=original):
+            with self.assertRaises(OSError) as failure:
+                trace.close()
+        self.assertIs(failure.exception, original)
+        self.assert_closed(descriptors)
+
+    def test_first_fsync_error_does_not_abandon_remaining_descriptors(self):
+        trace, descriptors = self.trace()
+        original = OSError(errno.EIO, "sync failed")
+        real_fsync = os.fsync
+
+        def synchronize(descriptor):
+            if descriptor == descriptors[0]:
+                raise original
+            return real_fsync(descriptor)
+
+        with patch("tools.hil.serial_echo.os.fsync", side_effect=synchronize):
+            with self.assertRaises(OSError) as failure:
+                trace.close()
+        self.assertIs(failure.exception, original)
+        self.assert_closed(descriptors)
+
+    def test_cleanup_close_error_retains_first_flush_error_and_drains_peers(self):
+        trace, descriptors = self.trace()
+        first = trace.streams["tx"]
+        original = OSError(errno.EIO, "flush failed first")
+        later = OSError(errno.EIO, "close failed later")
+        real_close = first.close
+
+        def close():
+            real_close()
+            raise later
+
+        with patch.object(first, "flush", side_effect=original), \
+                patch.object(first, "close", side_effect=close):
+            with self.assertRaises(OSError) as failure:
+                trace.close()
+        self.assertIs(failure.exception, original)
+        self.assert_closed(descriptors)
+
+
 if __name__ == "__main__":
     unittest.main()

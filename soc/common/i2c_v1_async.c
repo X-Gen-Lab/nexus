@@ -540,6 +540,12 @@ static nx_result_t stop(void* context) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
+    /* A factory face exists before its cold controller is prepared. Once
+     * registers are bound, even failed initialization keeps cleanup ownership.
+     */
+    if (state->registers == NULL) {
+        return NX_ERROR_STATE;
+    }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }

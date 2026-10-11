@@ -72,6 +72,8 @@ class HilPreparationTests(unittest.TestCase):
             if path.name == "station.template.json":
                 continue
             fixture = json.loads(path.read_text())
+            if fixture.get("scope") == "software_reference":
+                continue
             with self.subTest(board=fixture["board"]):
                 self.assertLessEqual(required,
                     {case["id"] for case in fixture["pending_qualification"]})

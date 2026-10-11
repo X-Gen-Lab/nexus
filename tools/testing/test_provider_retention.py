@@ -23,7 +23,7 @@ def image():
     """Model external linked bytes and metadata, not the auditing algorithm."""
     data = bytearray(512)
     words = [0x08001010, 0x20000000, 0x08001024, 0x20000020,
-             0x08002001, 0, 0, 0, 0, 0x08002011, 0, 0, 0]
+             0x08002001, 0, 0, 0, 0, 0x08002011, 0, 0, 0x08002021]
     struct.pack_into("<13I", data, 0, *words)
     objects = [("s_nx_face_bus", 0x08001000, 8, 0, 1),
                ("s_nx_device_face_sensor", 0x08001008, 8, 0, 1),
@@ -33,7 +33,7 @@ def image():
                ("s_nx_device_sensor", 0x20000020, 8, 2, 1),
                ("nx_gd32_i2c_recover", 0x08002001, 16, 1, 2),
                ("nx_gd32_i2c_endpoint_transaction", 0x08002011, 16, 1, 2)]
-    return SimpleNamespace(data=data, sections=[
+    elf = SimpleNamespace(data=data, sections=[
         {"name": ".rodata", "flags": 2, "address": 0x08001000,
          "offset": 0, "size": 256, "kind": 1},
         {"name": ".text", "flags": 6, "address": 0x08002000,
@@ -51,17 +51,22 @@ def image():
         {"name": name, "value": value, "size": size, "section": section,
          "type": kind, "binding": 0 if name.startswith("s_nx_") else 1}
         for name, value, size, section, kind in objects])
+    elf.defined_symbols.append({
+        "name": "on_port", "value": 0x08002021, "size": 16,
+        "section": 1, "type": 2, "binding": 0, "file": "i2c.c"})
+    return elf
 
 
 def gpio_image():
     elf = image()
     struct.pack_into("<11I", elf.data, 0, 0x08001010, 0x20000000,
                      0x0800101c, 0x20000020, 0x08002001, 0x08002011,
-                     0x08002021, 0x08002031, 0, 0, 0)
+                     0x08002021, 0x08002031, 0, 0, 0x08002041)
     elf.defined_symbols[2].update(name="nx_gd32_gpio_ops", size=12)
     elf.defined_symbols[6]["name"] = "nx_gd32_gpio_write"
     elf.defined_symbols[3]["value"] = 0x0800101c
-    elf.defined_symbols[-1]["value"] = 0x08002031
+    elf.defined_symbols[7]["value"] = 0x08002031
+    elf.defined_symbols[8]["value"] = 0x08002041
     elf.defined_symbols.extend([
         {"name": "nx_gd32_gpio_read", "value": 0x08002011, "size": 16,
          "section": 1, "type": 2, "binding": 1},
@@ -75,7 +80,7 @@ def spi_image():
     elf = image()
     struct.pack_into("<13I", elf.data, 0, 0x08001010, 0x20000000,
                      0x08001024, 0x20000020, 0x08002001, 0, 0, 0, 0,
-                     0x08002011, 0, 0, 0)
+                     0x08002011, 0, 0, 0x08002021)
     elf.defined_symbols[2].update(name="nx_gd32_spi_ops", size=20)
     elf.defined_symbols[3]["value"] = 0x08001024
     elf.defined_symbols[6]["name"] = "nx_gd32_spi_recover"
@@ -88,7 +93,7 @@ def spi_dma_image():
     struct.pack_into("<13I", elf.data, 0, 0x08001010, 0x20000000,
                      0x08001024, 0x20000020, 0x08002001, 0x08002011,
                      0x08002021, 0x08002031, 0x08002041, 0x08002051,
-                     0, 0, 0)
+                     0, 0, 0x08002061)
     elf.defined_symbols[2].update(name="nx_gd32_spi_dma_ops", size=20)
     elf.defined_symbols[3]["value"] = 0x08001024
     elf.defined_symbols = elf.defined_symbols[:6] + [
@@ -97,7 +102,9 @@ def spi_dma_image():
         for index, name in enumerate(("recover", "cancel", "service", "stop",
                                       "attach_wake"))] + [
         {"name": "nx_gd32_i2c_endpoint_transaction", "value": 0x08002051,
-         "size": 16, "section": 1, "type": 2, "binding": 1}]
+         "size": 16, "section": 1, "type": 2, "binding": 1},
+        {"name": "on_port", "value": 0x08002061, "size": 16,
+         "section": 1, "type": 2, "binding": 0, "file": "i2c.c"}]
     return elf, BINDINGS.replace("nx_i2c_port_t", "nx_spi_port_t").replace(
         "nx_gd32_i2c_ops", "nx_gd32_spi_dma_ops")
 
@@ -154,10 +161,33 @@ class ProviderRetentionTests(unittest.TestCase):
         self.assertEqual(report["status"], "passed")
         self.assertEqual(report["face_count"], 2)
         self.assertEqual(report["operations_table_count"], 2)
-        self.assertEqual(report["method_count"], 2)
+        self.assertEqual(report["method_count"], 3)
         names = {method["symbols"][0] for table in report["tables"]
                  for method in table["methods"]}
         self.assertIn("nx_gd32_i2c_endpoint_transaction", names)
+
+    def test_endpoint_identity_slot_retains_actual_local_provider_method(self):
+        report = inspect_provider_retention(image(), BINDINGS)
+        table = report["tables"][1]
+        self.assertEqual(table["type"], "nx_i2c_endpoint_ops_t")
+        self.assertEqual([method["name"] for method in table["methods"]],
+                         ["transaction", "on_port"])
+        identity = table["methods"][1]
+        self.assertEqual(identity["slot"], 3)
+        self.assertEqual(identity["definitions"], [
+            {"name": "on_port", "binding": 0, "file": "i2c.c"}])
+
+    def test_missing_endpoint_identity_method_is_rejected(self):
+        elf = image()
+        struct.pack_into("<I", elf.data, 48, 0)
+        with self.assertRaisesRegex(EvidenceError, "initialized method"):
+            inspect_provider_retention(elf, BINDINGS)
+
+    def test_endpoint_identity_from_another_source_is_rejected(self):
+        elf = image()
+        elf.defined_symbols[8]["file"] = "spi_dma.c"
+        with self.assertRaisesRegex(EvidenceError, "initializer source"):
+            inspect_provider_retention(elf, BINDINGS)
 
     def test_public_wrapper_alone_cannot_certify_a_provider(self):
         elf = image()
@@ -221,7 +251,8 @@ class ProviderRetentionTests(unittest.TestCase):
 
     def test_weak_method_does_not_substitute_for_a_concrete_provider(self):
         elf = image()
-        elf.defined_symbols[-1]["binding"] = 2
+        next(symbol for symbol in elf.defined_symbols
+             if symbol["name"] == "nx_gd32_i2c_endpoint_transaction")["binding"] = 2
         with self.assertRaisesRegex(EvidenceError, "method"):
             inspect_provider_retention(elf, BINDINGS)
 
@@ -250,7 +281,7 @@ class ProviderRetentionTests(unittest.TestCase):
     def test_optional_null_methods_are_explicit(self):
         elf, bindings = spi_image()
         report = inspect_provider_retention(elf, bindings)
-        self.assertEqual(report["method_count"], 2)
+        self.assertEqual(report["method_count"], 3)
         self.assertEqual(report["tables"][0]["null_methods"], 4)
 
     def test_empty_operations_table_is_not_a_complete_provider(self):
@@ -298,7 +329,7 @@ class ProviderRetentionTests(unittest.TestCase):
     def test_local_method_from_the_actual_initializer_source_is_retained(self):
         elf, bindings = spi_dma_image()
         report = inspect_provider_retention(elf, bindings)
-        self.assertEqual(report["method_count"], 6)
+        self.assertEqual(report["method_count"], 7)
 
     def test_same_named_local_method_from_another_source_is_rejected(self):
         elf, bindings = spi_dma_image()

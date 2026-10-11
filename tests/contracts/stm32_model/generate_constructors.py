@@ -5,12 +5,12 @@ from pathlib import Path
 root = Path(sys.argv[1]).resolve()
 output = Path(sys.argv[2])
 sys.path.insert(0, str(root / "tools/configure"))
-from configure import resolve  # noqa: E402
+from configure import resolve_ir  # noqa: E402
 from providers.stm32f407.bindings import constructor, shared_irq_definitions  # noqa: E402
 
 lines = []
 for fixture in ("ve-exti.toml", "ve-pwm.toml", "ve-spi.toml", "ve-i2c.toml"):
-    result = resolve(root / "tests/contracts/stm32_assembly" / fixture, root)
+    result = resolve_ir(root / "tests/contracts/stm32_assembly" / fixture, root)
     for item in result["controllers"]:
         name = item["id"].replace("-", "_")
         lines.append(f"static nx_stm32_{item['kind']}_state_t s_nx_port_{name};")

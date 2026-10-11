@@ -17,7 +17,7 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet
+    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers
     from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
@@ -31,6 +31,8 @@ except ImportError:
     import threadx
     import usb_device
     import ethernet
+    import timer_advanced
+    import secondary_controllers
     import metadata
     import factory
     import memory as memory_regions
@@ -46,7 +48,8 @@ UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "timer", "pwm", "adc", "can", "usb_device", "eth"}
+         "timer", "pwm", "adc", "can", "usb_device", "eth",
+         "timer_capture", "advanced_pwm"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -248,6 +251,8 @@ def validate_soc(soc, part):
     can.validate_soc(soc, provider)
     usb_device.validate_soc(soc, provider)
     ethernet.validate_soc(soc, provider)
+    timer_advanced.validate_soc(soc, provider)
+    secondary_controllers.validate_soc(soc, provider)
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
@@ -411,7 +416,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail("Native is a host model; its backend cannot qualify MCU execution")
     if backend == "threadx":
         threadx.validate_platform(board["id"], family)
-    irq_profile = resolve_interrupts(soc["cpu"], soc["irq"], backend, provider)
+    resolve_interrupts(soc["cpu"], soc["irq"], backend, provider)
     cpu_profile = cpu_profiles.resolve(soc["cpu"], soc["irq"], backend,
                                        enum_abi=provider.ENUM_ABI)
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
@@ -527,7 +532,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
              "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
              "bitrate", "timing", "drain_timeout_us", "poll_limit",
              "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
-             "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us"}, "controller selection")
+             "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
+             "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
+             "idle_complement_high"}, "controller selection")
         name = identity(selection["id"], "instance id")
         c_identity(name)
         instance_ids.append(name)
@@ -736,12 +743,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if isinstance(lock, str):
             inputs.append(contained_file(root, lock))
         else:
-            obj(lock, {"cmsis_core", "cmsis_device_f4"}, (), "SoC source lock")
+            device_key = {"stm32f407": "cmsis_device_f4",
+                          "stm32g474": "cmsis_device_g4"}.get(family)
+            if device_key is None:
+                fail("SoC has no maintained Git source dependency contract")
+            obj(lock, {"cmsis_core", device_key}, (), "SoC source lock")
             if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value)
                    for value in lock.values()):
                 fail("SDK Git dependencies require exact commit identities")
             for key, path in {"cmsis_core": "vendors/arm/CMSIS_5",
-                              "cmsis_device_f4": "vendors/st/cmsis_device_f4"}.items():
+                              device_key: "vendors/st/" + device_key}.items():
                 source_dependencies.append(dependency_identity(root, path, lock[key]))
     if backend == "freertos":
         source_dependencies.append(dependency_identity(root, "ext/freertos"))

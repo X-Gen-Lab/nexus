@@ -1,0 +1,20 @@
++ /workspace/nexus-60-automation-source/.venv/bin/cmake --preset native-debug
+Preset CMake variables:
+
+  CMAKE_BUILD_TYPE="Debug"
+  NEXUS_ASSEMBLY_FILE="/workspace/nexus-60-automation-source/tools/configure/assemblies/native.toml"
+  NEXUS_BUILD_TESTS="ON"
+
+-- Found Python3: /home/agent/.cache/pre-commit/repoziakv3mv/py_env-python3.12/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Found Python3: /home/agent/.cache/pre-commit/repoziakv3mv/py_env-python3.12/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus-60-automation-source/build/native-debug/generated/resolved.json
+-- Configuring incomplete, errors occurred!
+CMake Error at tests/google/CMakeLists.txt:462 (include):
+  include could not find requested file:
+
+    g474.cmake
+
+

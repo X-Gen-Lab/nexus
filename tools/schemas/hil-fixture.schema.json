@@ -19,7 +19,8 @@
       "enum": [
         "STM32F407ZGT6",
         "STM32F407VET6",
-        "GD32F470ZGT6"
+        "GD32F470ZGT6",
+        "STM32G474RET6"
       ]
     },
     "transport": {
@@ -114,6 +115,9 @@
           }
         }
       }
+    },
+    "scope": {
+      "const": "software_reference"
     }
   },
   "required": [
@@ -127,5 +131,21 @@
     "required_tests",
     "physical_status",
     "pending_qualification"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "part": {
+            "const": "STM32G474RET6"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "scope"
+        ]
+      }
+    }
   ]
 }

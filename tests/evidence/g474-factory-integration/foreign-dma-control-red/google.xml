@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="14" failures="1" disabled="0" errors="0" time="0.007" timestamp="2026-10-11T19:54:32.037" name="AllTests">
+  <testsuite name="G474Factory" tests="14" failures="1" disabled="0" skipped="0" errors="0" time="0.007" timestamp="2026-10-11T19:54:32.037">
+    <testcase name="LookupIsPureStaticIdentityBeforeAnyHardwareAccess" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="57" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="ActualStartupBinds170MHzClockTimebasePinsAndIrq" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="SelectedGpioRejectsOutsideMaskWithoutRegisterAccess" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="90" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="GeneratedVectorBorrowsTransmitUntilActualWireComplete" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="105" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="GeneratedVectorReceivesIntoSelectedCallerBudgetedRing" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="125" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="InvalidObservedSiliconRejectsBeforeClockMutation" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="139" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="ForeignLiveUartRejectsBeforeAnyClockOrPinMutation" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="148" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="ForeignDmaControlRejectsBeforeAnyClockOrPinMutation" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="161" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.037" classname="G474Factory">
+      <failure message="/workspace/nexus/tests/google/g474_factory_test.cpp:168&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_g474_model.writes&#x0A;    Which is: 56&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/g474_factory_test.cpp:168
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_g474_model.writes
+    Which is: 56
+]]></failure>
+    </testcase>
+    <testcase name="FailedClockStartupDoesNotExposeAnyPeripheral" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="174" status="run" result="completed" time="0.004" timestamp="2026-10-11T19:54:32.037" classname="G474Factory" />
+    <testcase name="FailedUartAcknowledgementRollsBackPinsAndOwnedGates" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="185" status="run" result="completed" time="0.003" timestamp="2026-10-11T19:54:32.041" classname="G474Factory" />
+    <testcase name="FailedPeripheralRollbackRetainsClockPinsAndResponsibility" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="199" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.044" classname="G474Factory" />
+    <testcase name="StopFailurePreservesIdentityUntilActualIrqWithdrawal" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="214" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.044" classname="G474Factory" />
+    <testcase name="UnrelatedPinAndClockFieldsSurviveStartAndStop" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="228" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.044" classname="G474Factory" />
+    <testcase name="StopRestoresSelectedFieldsAndRestartKeepsStaticIdentity" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="243" status="run" result="completed" time="0." timestamp="2026-10-11T19:54:32.044" classname="G474Factory" />
+  </testsuite>
+</testsuites>

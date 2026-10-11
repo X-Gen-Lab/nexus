@@ -1,0 +1,29 @@
+test_actual_commit_context_drift_is_blocking (tools.testing.test_secret_scan.SecretScanTests.test_actual_commit_context_drift_is_blocking) ... ok
+test_closed_policy_rejects_unknown_fields_duplicates_or_wildcards (tools.testing.test_secret_scan.SecretScanTests.test_closed_policy_rejects_unknown_fields_duplicates_or_wildcards) ... ok
+test_fail_flag_exit_must_agree_with_actual_candidates (tools.testing.test_secret_scan.SecretScanTests.test_fail_flag_exit_must_agree_with_actual_candidates) ... ok
+test_malformed_numeric_enum_types_cannot_match_reviewed_policy (tools.testing.test_secret_scan.SecretScanTests.test_malformed_numeric_enum_types_cannot_match_reviewed_policy) ... ok
+test_malformed_output_and_duplicate_json_keys_reject (tools.testing.test_secret_scan.SecretScanTests.test_malformed_output_and_duplicate_json_keys_reject) ... ok
+test_missing_commit_is_blocking_without_git_failure_leak (tools.testing.test_secret_scan.SecretScanTests.test_missing_commit_is_blocking_without_git_failure_leak) ... ok
+test_nonfinite_json_extension_is_rejected_before_admission (tools.testing.test_secret_scan.SecretScanTests.test_nonfinite_json_extension_is_rejected_before_admission) ... ok
+test_other_path_detector_decoder_or_repository_is_blocking (tools.testing.test_secret_scan.SecretScanTests.test_other_path_detector_decoder_or_repository_is_blocking) ... ok
+test_scan_error_exit_cannot_be_accepted_as_reviewed (tools.testing.test_secret_scan.SecretScanTests.test_scan_error_exit_cannot_be_accepted_as_reviewed) ... ok
+test_two_reviewed_contexts_are_accepted_without_printing_raw (tools.testing.test_secret_scan.SecretScanTests.test_two_reviewed_contexts_are_accepted_without_printing_raw) ... ok
+test_unknown_requires_actual_error_and_boolean_verified (tools.testing.test_secret_scan.SecretScanTests.test_unknown_requires_actual_error_and_boolean_verified) ... ok
+test_unknown_same_file_other_hash_is_blocking (tools.testing.test_secret_scan.SecretScanTests.test_unknown_same_file_other_hash_is_blocking) ... ok
+test_verified_candidate_is_always_blocking (tools.testing.test_secret_scan.SecretScanTests.test_verified_candidate_is_always_blocking) ... ok
+test_actual_reviewed_source_uses_monotonic_clock_and_clockwait (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_actual_reviewed_source_uses_monotonic_clock_and_clockwait) ... ok
+test_changed_predecessor_is_never_upgraded (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_changed_predecessor_is_never_upgraded) ... ok
+test_existing_different_output_is_not_overwritten (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_existing_different_output_is_not_overwritten) ... ok
+test_existing_exact_output_is_idempotent_without_rewriting (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_existing_exact_output_is_idempotent_without_rewriting) ... ok
+test_incomplete_patch_cannot_be_published (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_incomplete_patch_cannot_be_published) ... ok
+test_input_and_output_symlinks_fail_closed (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_input_and_output_symlinks_fail_closed) ... ok
+test_mismatching_exact_patch_boundary_is_rejected (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_mismatching_exact_patch_boundary_is_rejected) ... ok
+test_parent_symlink_and_traversal_are_rejected (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_parent_symlink_and_traversal_are_rejected) ... ok
+test_reviewed_exact_predecessor_is_atomically_upgraded (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_reviewed_exact_predecessor_is_atomically_upgraded) ... ok
+test_source_change_during_derivation_is_rejected (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_source_change_during_derivation_is_rejected) ... ok
+test_unreviewed_source_bytes_fail_before_output (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_unreviewed_source_bytes_fail_before_output) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.297s
+
+OK

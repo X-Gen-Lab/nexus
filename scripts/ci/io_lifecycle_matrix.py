@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from scripts.ci.tdd_gate import validate_google_report
+from scripts.ci.tdd_gate import checked_binary, validate_google_report
 
 
 def digest(path):
@@ -138,28 +138,48 @@ def build_inputs(root, build, catalogue):
         raise ValueError("Catalogue target is not in the actual CMake graph")
     binary_ids = {}
     for name in targets:
-        path = binaries[name]
-        if not path.is_relative_to(build):
-            raise ValueError("Google executable is outside selected build")
+        path = checked_binary(binaries[name], build)
         binary_ids[name] = {"path": str(path), "sha256": digest(path)}
     database_path = build / "compile_commands.json"
     entries = read_json(database_path)
     contexts = {name: [] for name in compiled}
+    target_contexts = {name: [] for name in sorted(targets)}
     for entry in entries:
         directory = Path(entry["directory"])
         source = Path(entry["file"])
         source = source if source.is_absolute() else directory / source
+        command = entry.get("arguments") or shlex.split(entry["command"])
+        if "-o" not in command or command.index("-o") + 1 >= len(command):
+            if source.is_relative_to(root) and str(source.relative_to(root)) in contexts:
+                raise ValueError("Reviewed compiled context has no actual output")
+            continue
+        output = Path(command[command.index("-o") + 1])
+        output = output if output.is_absolute() else directory / output
+        local = [name for name in target_contexts if
+                 "/CMakeFiles/" + name + ".dir/" in output.as_posix()]
+        if local:
+            if len(local) != 1:
+                raise ValueError("Ambiguous target-local compiled context")
+            target = local[0]
+            canonical_source, canonical_output = source.resolve(), output.resolve()
+            if not (canonical_source.is_relative_to(root.resolve()) or
+                    canonical_source.is_relative_to(build.resolve())):
+                raise ValueError("Target-local source is outside checkout/build")
+            marker = "/CMakeFiles/" + target + ".dir/"
+            if (not canonical_output.is_relative_to(build.resolve()) or
+                    marker not in canonical_output.as_posix()):
+                raise ValueError("Target-local object escapes its build/target")
+            target_contexts[target].append({
+                "source": str(source), "source_sha256": digest(source),
+                "directory": str(directory), "command": command,
+                "object": str(output), "object_sha256": digest(output),
+            })
         if not source.is_relative_to(root):
             continue
         name = str(source.relative_to(root))
         if name not in contexts:
             continue
-        command = entry.get("arguments") or shlex.split(entry["command"])
-        if "-o" not in command or command.index("-o") + 1 >= len(command):
-            raise ValueError("Reviewed compiled context has no actual output")
-        output = Path(command[command.index("-o") + 1])
-        output = output if output.is_absolute() else directory / output
-        if not output.is_relative_to(build):
+        if not output.resolve().is_relative_to(build.resolve()):
             raise ValueError("Compiled object is outside selected build")
         if output.is_file():
             contexts[name].append({"directory": str(directory),
@@ -177,7 +197,8 @@ def build_inputs(root, build, catalogue):
             "plan_sha256": digest(plan_path),
             "compile_commands_sha256": digest(database_path),
             "sources": {name: digest(root / name) for name in sorted(sources)},
-            "compiled": contexts, "binaries": binary_ids}
+            "compiled": contexts, "target_compiled": target_contexts,
+            "binaries": binary_ids}
 
 
 def capture(root, build, catalogue, output):

@@ -14,6 +14,7 @@ from tools.evidence.identity import canonical_digest
 from tools.hil.admit import validate_raw, validate_station
 from tools.hil.measure import measurement_plan, validate_measurements
 from tests.contracts import test_hil_admission
+from tools.testing import test_hil_workloads
 
 
 class HilMeasurementTests(unittest.TestCase):
@@ -22,6 +23,12 @@ class HilMeasurementTests(unittest.TestCase):
         self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
         self.root = self.fixture.root
+        self.protocol = test_hil_workloads.HilWorkloadTests()
+        self.protocol.setUp()
+        self.addCleanup(self.protocol.doCleanups)
+        self.protocol.fixture = copy.deepcopy(self.fixture.fixture)
+        self.protocol.resolved.update(board=self.fixture.fixture["board"],
+                                      part=self.fixture.fixture["part"])
         self.fixture.station["budgets"] = {
             "irq_latency": {"maximum": 100, "unit": "us"},
             "throughput": {"minimum": 1000, "maximum": 1000000,
@@ -39,6 +46,9 @@ class HilMeasurementTests(unittest.TestCase):
                 value = self.fixture.station
             elif key == "fixture":
                 value = self.fixture.fixture
+            elif key == "resolved":
+                value = copy.deepcopy(self.protocol.resolved)
+                value["configuration_sha256"] = canonical_digest(value)
             atomic_json(path, value)
             files[key] = file_identity(path)
         admission = {"schema_version": 1, "kind": "hil_admission",
@@ -67,7 +77,7 @@ class HilMeasurementTests(unittest.TestCase):
             "traces": [],
         }
         workload = self.root / "workload.txt"
-        workload.write_text("synthetic acquisition; no physical workload")
+        atomic_json(workload, self.protocol.reviewed())
         instrument = self.root / "instrument.txt"
         instrument.write_text("synthetic calibration model, not an instrument")
         context = {

@@ -55,7 +55,9 @@ def _reviewed(recipe_path: Path, admission_path: Path) -> tuple[dict, dict]:
             "reviewed acquisition recipe required")
     require(recipe["admission_sha256"] == canonical_digest(admission),
             "acquisition recipe is not bound to admission")
-    verify_file_identity(recipe["workload"])
+    # Reuse the single protocol validator before any station adapter can run.
+    from tools.hil.workloads import admitted_workload
+    admitted_workload(recipe["workload"], admission)
     lock = recipe["station_lock"]
     require(isinstance(lock, str) and Path(lock).is_absolute(),
             "absolute station-owned exclusive lock required")

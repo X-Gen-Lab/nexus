@@ -1,0 +1,11 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "scripts.ci.test_provider_assemblies.ActualCommandRecording.test_successful_parent_cannot_leave_artifact_writer_running",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

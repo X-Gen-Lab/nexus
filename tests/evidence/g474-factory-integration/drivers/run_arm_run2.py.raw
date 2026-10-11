@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""Actual four-assembly development software proof, no hardware execution."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import struct
+import sys
+import time
+
+sys.path.insert(0, '/workspace/nexus')
+from tools.measurement.elf import Elf32
+from tools.evidence.common import file_identity
+
+ROOT=Path('/workspace/nexus')
+DEST=Path('/workspace/nexus-g474-iteration-evidence/arm-four-run2')
+ARM=Path('/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin')
+CM=ROOT/'.venv/bin/cmake'
+
+def write(path, data):
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False)+'\n')
+
+def scoped():
+    paths={ROOT/'CMakeLists.txt'}
+    for name in ('core','arch','io','os/freertos','soc/stm32g474','boards/stm32g474re_hse24_reference','tools/configure','cmake','tools/measurement','tests/contracts/g474_assembly'):
+        for p in (ROOT/name).rglob('*'):
+            if p.is_file() and p.suffix in {'.c','.h','.S','.s','.cmake','.json','.toml','.py','.txt'} and '__pycache__' not in p.parts and not p.name.startswith('test_'):
+                paths.add(p)
+    paths.update((ROOT/'dependencies').glob('*.json'))
+    paths.add(ROOT/'tools/maintenance/stm32g4_lock.py')
+    return [file_identity(p) for p in sorted(paths)]
+
+def main():
+    DEST.mkdir(exist_ok=False)
+    env={k:v for k,v in os.environ.items() if not k.startswith(('GTEST_','GIT_'))}
+    env['PATH']=str(ROOT/'.venv/bin')+os.pathsep+str(ARM)+os.pathsep+env.get('PATH','')
+    report={'schema_version':1,'kind':'g474-four-assembly-development-execution','status':'failed',
+            'scope':'Actual reviewed reference empty/selected assembly ARM links against pinned source dependencies, scoped dirty development source. No clean-candidate or PCB qualification.',
+            'physical_status':'not_executed','driver':file_identity(__file__),'rows':[]}
+    def command(row,name,argv):
+        output=Path(row['directory'])/(name+'.output')
+        started=time.time_ns()
+        with output.open('xb') as stream:
+            done=subprocess.run(argv,cwd=ROOT,env=env,stdout=stream,stderr=subprocess.STDOUT,timeout=300)
+        item={'argv':argv,'return_code':done.returncode,'started_ns':started,'completed_ns':time.time_ns(),'output':file_identity(output)}
+        row['commands'].append(item)
+        write(Path(row['directory'])/'commands.json',row['commands'])
+        if done.returncode:
+            raise ValueError(f"Actual {name} failed: {output}")
+    try:
+        for label in ('empty','io','empty-freertos','io-freertos'):
+            directory=DEST/label
+            directory.mkdir()
+            build=directory/'build'
+            row={'assembly':file_identity(ROOT/f'tests/contracts/g474_assembly/{label}.toml'),'directory':str(directory),'commands':[],'status':'failed'}
+            report['rows'].append(row)
+            before=scoped()
+            write(directory/'source-before.json',before)
+            row['source_before']=file_identity(directory/'source-before.json')
+            command(row,'configure',[str(CM),'-S',str(ROOT/'tests/contracts/g474_assembly'),'-B',str(build),'-G','Ninja',f'-DNEXUS_SOURCE_ROOT={ROOT}',f'-DNEXUS_ASSEMBLY_FILE={ROOT}/tests/contracts/g474_assembly/{label}.toml','-DCMAKE_BUILD_TYPE=Release',f'-DCMAKE_TOOLCHAIN_FILE={ROOT}/cmake/toolchains/arm-gcc.cmake'])
+            compdb=build/'compile_commands.json'
+            units=json.loads(compdb.read_text())
+            row['compile_commands']=file_identity(compdb)
+            row['compiled_sources']=[file_identity(p) for p in sorted({Path(unit['file']) for unit in units})]
+            command(row,'build',[str(CM),'--build',str(build),'--target','g474_assembly','--parallel','1'])
+            elf=build/'bin/g474_assembly.elf'
+            resource=build/'bin/g474_assembly.resources.json'
+            metrics=json.loads(resource.read_text())
+            if metrics['status']!='passed' or metrics['elf']!=file_identity(elf):
+                raise ValueError('Budget report does not bind the actual passed ELF')
+            row['artifacts']=[file_identity(elf),file_identity(build/'bin/g474_assembly.bin'),file_identity(build/'bin/g474_assembly.map'),file_identity(resource)]
+            row['flash_bytes']=metrics['metrics']['flash']['footprint_bytes']
+            row['ram_bytes']=sum(domain['reserved_bytes'] for domain in metrics['metrics']['ram'].values())
+            generated=build/'nexus-sdk/generated'
+            row['resolved']=file_identity(generated/'resolved.json')
+            row['selection']=file_identity(generated/'selection.cmake')
+            row['generated_bindings']=file_identity(generated/'bindings.c')
+            observed=Elf32(elf.read_bytes())
+            symbols=observed.symbols
+            all_names={symbol['name'] for symbol in observed.defined_symbols}
+            selected=label.startswith('io')
+            if selected:
+                retention=build/'bin/provider-retention.json'
+                retained=json.loads(retention.read_text())
+                if retained['status']!='passed' or retained['face_count']!=2:
+                    raise ValueError('Actual selected two-face retention was not passed')
+                row['retention']=file_identity(retention)
+                if not all(name in symbols for name in ('nx_stm32g474_uart_ops','LPUART1_IRQHandler','nx_stm32g474_gpio_ops')):
+                    raise ValueError('Selected actual runtime is missing')
+            else:
+                if 'static const nx_' in (generated/'bindings.c').read_text():
+                    raise ValueError('Empty bindings unexpectedly selected a static face')
+                if any(name in all_names for name in ('nx_stm32g474_uart_ops','nx_stm32g474_uart_initialize','nx_stm32g474_gpio_ops','s_nx_port_console','s_nx_rx_console','s_nx_face_console')):
+                    raise ValueError('Unused G474 UART/GPIO runtime survived in empty image')
+                if (symbols['LPUART1_IRQHandler'] & ~1) != (symbols['Default_Handler'] & ~1):
+                    raise ValueError('Empty UART vector is not the official default alias')
+                row['default_gc']={'status':'passed','selected_faces':0,'basis':'actual emitted no-face bindings plus actual ARM symbols/default vector alias','physical_status':'not_executed'}
+            if 'TIM2_IRQHandler' not in symbols or (symbols['TIM2_IRQHandler'] & ~1)==(symbols['Default_Handler'] & ~1):
+                raise ValueError('Independent timebase IRQ not retained')
+            if 'freertos' in label:
+                for name in ('SVC_Handler','PendSV_Handler','SysTick_Handler'):
+                    if name not in symbols or (symbols[name] & ~1)==(symbols['Default_Handler'] & ~1):
+                        raise ValueError('Actual FreeRTOS vector not retained: '+name)
+            vector=next(section for section in observed.sections if section['name']=='.isr_vector')
+            slots={'TIM2_IRQHandler':44,'LPUART1_IRQHandler':107}
+            if 'freertos' in label:
+                slots.update(SVC_Handler=11,PendSV_Handler=14,SysTick_Handler=15)
+            row['vector_observation']={}
+            for name,slot in slots.items():
+                value=struct.unpack_from('<I',observed.data,vector['offset']+4*slot)[0]
+                if value!=symbols[name]:
+                    raise ValueError('Actual vector word does not bind selected handler: '+name)
+                row['vector_observation'][name]={'slot':slot,'word':value,'symbol':symbols[name]}
+            if 'freertos' in label:
+                config=(generated/'nexus_config.h').read_text()
+                for define in ('#define NEXUS_CORE_HZ 170000000u','#define NEXUS_OS_TICK_HZ 1000u','#define NEXUS_OS_EXTERNAL_TICK 0u','#define NEXUS_OS_SYSTICK_RELOAD 169999u'):
+                    if define not in config:
+                        raise ValueError('Generated FreeRTOS tick differs from reviewed policy: '+define)
+                row['tick_policy']={'core_hz':170000000,'tick_hz':1000,'reload':169999,'source':'systick','physical_status':'not_executed'}
+            after=scoped()
+            write(directory/'source-after.json',after)
+            row['source_after']=file_identity(directory/'source-after.json')
+            row['source_unchanged']=before==after
+            if before!=after:
+                raise ValueError('Scoped source changed during actual ARM execution')
+            row['status']='passed'
+            write(DEST/'manifest.json',report)
+        report['status']='passed'
+    except (OSError,ValueError,KeyError,subprocess.TimeoutExpired) as error:
+        report['error']=str(error)
+    write(DEST/'manifest.json',report)
+    print(json.dumps({'status':report['status'],'error':report.get('error'),'rows':len(report['rows']),'manifest':str(DEST/'manifest.json')}))
+    return 0 if report['status']=='passed' else 1
+
+if __name__=='__main__':
+    raise SystemExit(main())

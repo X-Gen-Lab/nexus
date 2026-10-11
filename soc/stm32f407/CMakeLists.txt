@@ -12,7 +12,8 @@ foreach(required "${stm32_device}/Include/stm32f407xx.h"
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 set(stm32_sources)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth)
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
+        timer_capture advanced_pwm)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
         continue()
@@ -25,7 +26,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth)
         list(APPEND stm32_sources "drivers/${kind}.c")
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth|timer_capture|advanced_pwm)$")
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")

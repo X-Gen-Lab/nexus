@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "kind": "provider_retention_external_elf_fixture_corrective",
+  "status": "passed_for_development_test_scope",
+  "owned_sources": [
+    {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 20182,
+      "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+    }
+  ],
+  "context_source_inputs": [
+    {
+      "path": "/workspace/nexus/tools/measurement/retention.py",
+      "bytes": 20078,
+      "sha256": "865f9adc4ea7819ced3c50240e7791c222abcdea895adeb9c8eb9cc6b6312a35"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/i2c.c",
+      "bytes": 15319,
+      "sha256": "25ee035c32ea99b1bfffd1d09bee7c6c386c25f0b528bbfc7bb651160980675c"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+      "bytes": 9481,
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3"
+    }
+  ],
+  "production_algorithm_changed": false,
+  "red": {
+    "argv": [
+      ".venv/bin/python",
+      "-B",
+      "-m",
+      "unittest",
+      "tools.testing.test_provider_retention",
+      "-v"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 1,
+    "started_ns": 1791753342750702974,
+    "ended_ns": 1791753343767410510,
+    "source_before": {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 18595,
+      "sha256": "4094c8bcb77f2e222b5fbead63b075a628007b56a8e5594cd814171d0e9715b1"
+    },
+    "source_after": {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 18595,
+      "sha256": "4094c8bcb77f2e222b5fbead63b075a628007b56a8e5594cd814171d0e9715b1"
+    },
+    "stdout": {
+      "path": "/workspace/nexus-retention-fixture-fix/existing-red/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "/workspace/nexus-retention-fixture-fix/existing-red/stderr.txt",
+      "bytes": 12880,
+      "sha256": "b1c6de6510b09e09477fa86a377d5d5d224e476c8acef790455b2f709ce56343"
+    }
+  },
+  "final_fixture_green": {
+    "argv": [
+      ".venv/bin/python",
+      "-B",
+      "-m",
+      "unittest",
+      "tools.testing.test_provider_retention",
+      "-v"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "started_ns": 1791753548401458441,
+    "ended_ns": 1791753549518772530,
+    "source_before": {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 20182,
+      "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+    },
+    "source_after": {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 20182,
+      "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+    },
+    "stdout": {
+      "path": "/workspace/nexus-retention-fixture-fix/fixture-final-green/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "path": "/workspace/nexus-retention-fixture-fix/fixture-final-green/stderr.txt",
+      "bytes": 7429,
+      "sha256": "9d1b8ed92a8511ad45ccc22976dcf556b02fe101157a87cb91d431bfd03016a0"
+    }
+  },
+  "final_whole_tools_green": {
+    "argv": [
+      ".venv/bin/python",
+      "-B",
+      "tools/testing/run_tool_tests.py",
+      "--suite",
+      "testing",
+      "--report",
+      "/workspace/nexus-retention-fixture-fix/tools-testing-final-green.json"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "started_ns": 1791753549661877367,
+    "ended_ns": 1791753586602174859,
+    "source_before": {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 20182,
+      "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+    },
+    "source_after": {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 20182,
+      "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+    },
+    "stdout": {
+      "path": "/workspace/nexus-retention-fixture-fix/tools-final-green/stdout.txt",
+      "bytes": 545,
+      "sha256": "a257d1fbaffe41259aee5c1f405faebcdca5f9e648223b69480c14a19eff4913"
+    },
+    "stderr": {
+      "path": "/workspace/nexus-retention-fixture-fix/tools-final-green/stderr.txt",
+      "bytes": 1318,
+      "sha256": "ebe3a4243666b5f1c4a978ef5aaba03441d514d3043e0d74771b4c362bfd012e"
+    }
+  },
+  "whole_tool_execution": {
+    "suite": "testing",
+    "discovered": 433,
+    "executed": 433,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "expected_failures": 0,
+    "unexpected_successes": 0,
+    "status": "passed"
+  },
+  "distinct_retention_contracts": 41,
+  "correction": "External synthetic ELF now retains the actual polling endpoint on_port slot and local i2c.c method; complete method counts include that identity method.",
+  "negative_contracts": [
+    "Original missing, weak global, wrong method, Thumb, LOAD and local-file provenance assertions preserved.",
+    "Additional missing on_port and wrong local source tests assert rejection."
+  ],
+  "retained_environment_failure": {
+    "path": "raw/tools-green/command.json",
+    "reason": "Initial whole-suite child environment omitted .venv/bin PATH, so CMake-dependent tests failed; same full suite later executed with correct tools PATH and no skips."
+  },
+  "final_execution_environment": {
+    "path_prefix": "/workspace/nexus/.venv/bin"
+  },
+  "original_root_stage_red": {
+    "path": "/workspace/nexus-retention-fixture-fix/original-root-stage-tools-testing-red.txt",
+    "bytes": 8252,
+    "sha256": "c83fb9164a233d16632c2b81497babc8a7a29e078f0058ce69d079734763b815"
+  },
+  "archive_index": {
+    "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/archive-index.json",
+    "bytes": 13202,
+    "sha256": "b30e7d9af573bea5e620d036ae797881957ef78f183b19ec5422141a865d5f6a"
+  },
+  "source_status": "working_tree_development_not_clean_candidate",
+  "physical_status": "not_executed",
+  "limits": [
+    "Synthetic ELF bytes test the real inspector, not executable MCU firmware.",
+    "No production inspector relaxation, filtering, hook bypass or remote CI inference.",
+    "Whole tools testing is 433 actual cases; it does not imply Google/full firmware qualification."
+  ]
+}

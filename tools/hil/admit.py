@@ -26,7 +26,7 @@ def require(condition: bool, message: str) -> None:
 def validate_fixture(fixture: dict) -> None:
     fields(fixture, {"schema_version", "kind", "board", "part", "transport",
         "probe_interfaces", "serial", "required_tests", "physical_status",
-        "pending_qualification"})
+        "pending_qualification"}, {"scope"})
     require(type(fixture["schema_version"]) is int and fixture["schema_version"] == 1 and
             fixture["kind"] == "hil_fixture", "unsupported HIL fixture")
     for key in ("board", "part"):
@@ -34,6 +34,12 @@ def validate_fixture(fixture: dict) -> None:
     require(fixture["transport"] == "swd", "only reviewed SWD transport")
     require(fixture["physical_status"] == "not_executed",
             "fixture template cannot establish physical qualification")
+    if "scope" in fixture:
+        require(fixture["scope"] == "software_reference",
+                "unknown preparation fixture scope")
+    if fixture["part"] == "STM32G474RET6":
+        require(fixture.get("scope") == "software_reference",
+                "G474 currently has only a software-reference HIL fixture")
     require(fixture["required_tests"] == ["probe_identity", "flash_readback",
             "reset", "uart_echo"], "required physical checks cannot be weakened")
     require(isinstance(fixture["probe_interfaces"], list) and
@@ -70,6 +76,8 @@ def validate_fixture(fixture: dict) -> None:
 
 
 def validate_station(station: dict, fixture: dict) -> None:
+    require(fixture.get("scope") != "software_reference",
+            "software-reference fixture cannot admit a physical station")
     reject_secret_fields(station)
     fields(station, {"schema_version", "kind", "station_id", "board",
         "part", "pcb_revision", "chip_uid", "probe", "serial", "power",

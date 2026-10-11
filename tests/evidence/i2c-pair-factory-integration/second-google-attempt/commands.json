@@ -1,0 +1,24 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/host-build",
+      "--target",
+      "nexus_stm32_i2c_pair_factory_test",
+      "nexus_stm32_i2c_pair_irq_factory_test",
+      "nexus_gd32_i2c_pair_factory_test",
+      "nexus_gd32_i2c_pair_irq_factory_test",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750827875528297,
+    "completed_ns": 1791750840197299954,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/second-google-attempt/build.output",
+      "sha256": "2259382e44510f63f3b0b0a2b6306a5693ad0d2c898cb035286df687b33aaa1e",
+      "bytes": 6359
+    }
+  }
+]

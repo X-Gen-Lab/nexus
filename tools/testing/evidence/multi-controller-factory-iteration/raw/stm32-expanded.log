@@ -1,0 +1,53 @@
+Running main() from gmock_main.cc
+[==========] Running 22 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 22 tests from MultipleFactory
+[ RUN      ] MultipleFactory.LookupBindsFiveDistinctControllersWithoutEffects
+[       OK ] MultipleFactory.LookupBindsFiveDistinctControllersWithoutEffects (0 ms)
+[ RUN      ] MultipleFactory.ActualGeneratedStartupAcquiresEachSelectedPublisher
+[       OK ] MultipleFactory.ActualGeneratedStartupAcquiresEachSelectedPublisher (0 ms)
+[ RUN      ] MultipleFactory.IncomingMaskRejectsBeforeClockOrPinEffects
+[       OK ] MultipleFactory.IncomingMaskRejectsBeforeClockOrPinEffects (0 ms)
+[ RUN      ] MultipleFactory.UnprivilegedColdOwnerRejectsBeforeSystemOrMmio
+[       OK ] MultipleFactory.UnprivilegedColdOwnerRejectsBeforeSystemOrMmio (0 ms)
+[ RUN      ] MultipleFactory.UnprivilegedStopRetainsTheEntireColdSession
+[       OK ] MultipleFactory.UnprivilegedStopRetainsTheEntireColdSession (0 ms)
+[ RUN      ] MultipleFactory.ForeignIdleDmaPublisherIsPreservedOnColdRefusal
+[       OK ] MultipleFactory.ForeignIdleDmaPublisherIsPreservedOnColdRefusal (0 ms)
+[ RUN      ] MultipleFactory.PartialGpioClockFailureReversesItsRecordedEffect
+[       OK ] MultipleFactory.PartialGpioClockFailureReversesItsRecordedEffect (0 ms)
+[ RUN      ] MultipleFactory.FailedSecondaryPinPrepareRestoresThePartialLease
+[       OK ] MultipleFactory.FailedSecondaryPinPrepareRestoresThePartialLease (0 ms)
+[ RUN      ] MultipleFactory.RefusedSelectedVectorJoinRetainsResourcesUntilRetry
+[       OK ] MultipleFactory.RefusedSelectedVectorJoinRetainsResourcesUntilRetry (0 ms)
+[ RUN      ] MultipleFactory.SecondaryActivePublisherCannotBeReusedAfterDisable
+[       OK ] MultipleFactory.SecondaryActivePublisherCannotBeReusedAfterDisable (0 ms)
+[ RUN      ] MultipleFactory.RefusedPendingJoinKeepsTheSelectedSession
+[       OK ] MultipleFactory.RefusedPendingJoinKeepsTheSelectedSession (0 ms)
+[ RUN      ] MultipleFactory.ColdPriorityRefusalReversesTheConstructedProvider
+[       OK ] MultipleFactory.ColdPriorityRefusalReversesTheConstructedProvider (0 ms)
+[ RUN      ] MultipleFactory.ColdInactiveCsRefusalRetainsOnlyItsUnfinishedLease
+[       OK ] MultipleFactory.ColdInactiveCsRefusalRetainsOnlyItsUnfinishedLease (0 ms)
+[ RUN      ] MultipleFactory.StopProvesInactiveCsBeforeRestoringAnySelectedSpiPin
+[       OK ] MultipleFactory.StopProvesInactiveCsBeforeRestoringAnySelectedSpiPin (0 ms)
+[ RUN      ] MultipleFactory.RefusedSelectedPriorityRestoreRetainsColdLease
+[       OK ] MultipleFactory.RefusedSelectedPriorityRestoreRetainsColdLease (0 ms)
+[ RUN      ] MultipleFactory.RefusedOriginalPinRestoreDoesNotAdmitRestart
+[       OK ] MultipleFactory.RefusedOriginalPinRestoreDoesNotAdmitRestart (0 ms)
+[ RUN      ] MultipleFactory.RefusedOwnedDmaClockReleaseRetainsItsMarker
+[       OK ] MultipleFactory.RefusedOwnedDmaClockReleaseRetainsItsMarker (0 ms)
+[ RUN      ] MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines
+[       OK ] MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines (0 ms)
+[ RUN      ] MultipleFactory.ForeignSpiEndpointRejectsBeforeDmaOrRequestBorrow
+[       OK ] MultipleFactory.ForeignSpiEndpointRejectsBeforeDmaOrRequestBorrow (0 ms)
+[ RUN      ] MultipleFactory.GeneratedSpiVectorsPreservePeerFlagsAndBorrow
+[       OK ] MultipleFactory.GeneratedSpiVectorsPreservePeerFlagsAndBorrow (0 ms)
+[ RUN      ] MultipleFactory.BufferOutsideGeneratedDmaDomainHasNoAdmissionEffect
+[       OK ] MultipleFactory.BufferOutsideGeneratedDmaDomainHasNoAdmissionEffect (0 ms)
+[ RUN      ] MultipleFactory.FullReverseCleanupAllowsOnlyQuiescentColdRestart
+[       OK ] MultipleFactory.FullReverseCleanupAllowsOnlyQuiescentColdRestart (0 ms)
+[----------] 22 tests from MultipleFactory (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 22 tests from 1 test suite ran. (2 ms total)
+[  PASSED  ] 22 tests.

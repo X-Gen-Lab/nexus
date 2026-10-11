@@ -7,7 +7,7 @@ except ImportError:
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm")
 
 
 def symbol(name):
@@ -16,6 +16,8 @@ def symbol(name):
 
 def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
+    if class_name in {"timer_capture", "advanced_pwm"}:
+        return f"nx_{class_name}_t"
     if class_name in {"eth", "mdio"}:
         return f"nx_{class_name}_port_t"
     if class_name == "usb_device":

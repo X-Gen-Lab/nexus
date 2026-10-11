@@ -172,6 +172,23 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('"$fixture"/*.toml', commands)
         self.assertNotIn('"$fixture"/*.json', commands)
 
+    def test_all_arm_provider_fixtures_use_the_source_bound_audit_gate(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        selected = set(job['strategy']['matrix'].get('fixture', []))
+        self.assertEqual(selected, {
+            'stm32_assembly', 'gd32_assembly', 'can_assembly', 'usb_assembly',
+            'ethernet_assembly', 'timer_assembly', 'g474_assembly',
+            'multi_controller_assembly'})
+        for name in selected:
+            self.assertTrue(list((ROOT / 'tests/contracts' / name).glob('*.toml')))
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/provider_assemblies.py'), 1)
+        self.assertIn('arguments+=(--fixture "$assembly")', commands)
+        self.assertIn('"${arguments[@]}"', commands)
+        self.assertIn('--compiler arm-none-eabi-gcc', commands)
+        self.assertNotIn('cmake --build', commands)
+        self.assertNotIn('NEXUS_BACKEND', commands)
+
     def test_cpu_runtime_matrix_executes_real_kernel_links_and_keeps_evidence(self):
         job = workflow('build-matrix.yml')['jobs']['arch']
         commands = '\n'.join(step.get('run', '') for step in job['steps'])

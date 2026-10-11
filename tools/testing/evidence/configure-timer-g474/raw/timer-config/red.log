@@ -1,0 +1,601 @@
+test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) ... 
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=0) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=127) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=128) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=254) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=256) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=504) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=512) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=1008) ... ERROR
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=129) ... FAIL
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=255) ... FAIL
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=257) ... FAIL
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=505) ... FAIL
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=511) ... FAIL
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=1009) ... FAIL
+  test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=-1) ... FAIL
+test_default_assembly_has_no_optional_timer_state_or_methods (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_default_assembly_has_no_optional_timer_state_or_methods) ... ok
+test_dma_or_generated_ring_options_do_not_enter_timer_contract (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_dma_or_generated_ring_options_do_not_enter_timer_contract) ... ok
+test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) ... 
+  test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='exclusive=false') ... FAIL
+  test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='exclusive=1') ... FAIL
+  test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='break_active_high=1') ... FAIL
+  test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='') ... FAIL
+  test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='idle_complement_high=0') ... FAIL
+test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) ... 
+  test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='tick_hz=999999') ... FAIL
+  test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='edge="invalid"') ... FAIL
+  test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='filter=16') ... FAIL
+  test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='filter=true') ... FAIL
+  test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='period_ticks=65536') ... FAIL
+  test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='period_ticks=0') ... FAIL
+test_public_factory_types_and_caller_owned_capture_storage (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_public_factory_types_and_caller_owned_capture_storage) ... ERROR
+test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) ... 
+  test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) (label='stm32-zg') ... ERROR
+  test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) (label='stm32-ve') ... ERROR
+  test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) (label='gd32') ... ERROR
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=127)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=128)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=254)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=256)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=504)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=512)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=1008)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 70, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    result = gate.resolve_ir(self.assembly(change=lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_public_factory_types_and_caller_owned_capture_storage (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_public_factory_types_and_caller_owned_capture_storage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 46, in test_public_factory_types_and_caller_owned_capture_storage
+    gate.configure(self.assembly(), output)
+  File "/workspace/nexus/tools/configure/configure.py", line 918, in configure
+    result = resolve_ir(assembly, root, input_paths=input_paths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) (label='stm32-zg')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 29, in test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector
+    result = gate.resolve_ir(self.assembly(label))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) (label='stm32-ve')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 29, in test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector
+    result = gate.resolve_ir(self.assembly(label))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+ERROR: test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector) (label='gd32')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 29, in test_three_exact_parts_bind_two_exclusive_controllers_and_shared_break_vector
+    result = gate.resolve_ir(self.assembly(label))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 289, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 129, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 35, in normalize
+    obj(data, TOP_REQUIRED, TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
+  File "/workspace/nexus/tools/configure/configure.py", line 125, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=129)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=255)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=257)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=505)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=511)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=1009)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding) (ticks=-1)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 74, in test_deadtime_accepts_exact_encoding_boundaries_and_rejects_rounding
+    with self.subTest(ticks=ticks), self.assertRaisesRegex(ValueError, "Timer deadtime"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer deadtime" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='exclusive=false')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_exclusive_and_safe_polarities_are_explicit_boolean_policy
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='exclusive=1')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_exclusive_and_safe_polarities_are_explicit_boolean_policy
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='break_active_high=1')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_exclusive_and_safe_polarities_are_explicit_boolean_policy
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_exclusive_and_safe_polarities_are_explicit_boolean_policy
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_exclusive_and_safe_polarities_are_explicit_boolean_policy (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_exclusive_and_safe_polarities_are_explicit_boolean_policy) (new='idle_complement_high=0')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_exclusive_and_safe_polarities_are_explicit_boolean_policy
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='tick_hz=999999')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 64, in test_non_exact_divider_filter_edge_and_period_reject
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='edge="invalid"')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 64, in test_non_exact_divider_filter_edge_and_period_reject
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='filter=16')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 64, in test_non_exact_divider_filter_edge_and_period_reject
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='filter=true')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 64, in test_non_exact_divider_filter_edge_and_period_reject
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='period_ticks=65536')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 64, in test_non_exact_divider_filter_edge_and_period_reject
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+======================================================================
+FAIL: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='period_ticks=0')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 64, in test_non_exact_divider_filter_edge_and_period_reject
+    with self.subTest(new=new), self.assertRaisesRegex(ValueError, "Timer"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Timer" does not match "assembly TOML: missing [], unknown ['advanced_pwm', 'timer_capture']"
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.067s
+
+FAILED (failures=18, errors=12)

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="4" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-10-11T21:25:56.397" name="AllTests">
+  <testsuite name="ThreadXLinuxPort" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T21:25:56.397">
+    <testcase name="ProductionTimerUsesOneMonotonicDeadlineDomain" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="78" status="run" result="completed" time="0." timestamp="2026-10-11T21:25:56.397" classname="ThreadXLinuxPort" />
+    <testcase name="ExactNanosecondCarryCannotProduceInvalidTimespec" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="95" status="run" result="completed" time="0." timestamp="2026-10-11T21:25:56.398" classname="ThreadXLinuxPort" />
+    <testcase name="SuspendSignalPreservesInterruptedCallerErrno" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="112" status="run" result="completed" time="0." timestamp="2026-10-11T21:25:56.398" classname="ThreadXLinuxPort" />
+    <testcase name="NestedSuspendPreservesErrnoBeforeEarlyReturn" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="122" status="run" result="completed" time="0." timestamp="2026-10-11T21:25:56.398" classname="ThreadXLinuxPort" />
+  </testsuite>
+</testsuites>

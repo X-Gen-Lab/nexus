@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-timer-iteration/stm-test",
+    "--gtest_output=xml:tools/testing/evidence/timer-iteration/stm-green1.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:03:43.719716+00:00",
+  "ended_at": "2026-10-11T18:03:43.723628+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-stm-tests-green1.log"
+}

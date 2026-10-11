@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_hil_platform_extensions",
+    "tools.testing.test_hil_protocol_admission",
+    "tools.testing.test_hil_workloads",
+    "tools.testing.test_hil_acquire",
+    "tools.testing.test_hil_measurements",
+    "tools.testing.test_os_acceptance",
+    "tools.testing.test_hil_serial_echo",
+    "tests.contracts.test_hil_prepare",
+    "tests.contracts.test_hil_admission"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1,
+  "path_toolchain": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin"
+}

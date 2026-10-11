@@ -11,6 +11,7 @@
 | STM32F407ZGT6 / 启明欣欣 V3.1 | Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes | 实际 PCB 修订、晶振、供电、连续性、波形与负载 |
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
 | GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
+| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；生成 factory 和裸机/FreeRTOS ELF | 实际 PCB／晶振／焊桥未观察；未授权 DMA；独立 SDK／clean-source／实板资格 |
 | Native | Linux/POSIX 行为模型、实际线程与持久化文件故障模型 | 不构成 MCU 或电气资格 |
 
 裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建
@@ -37,6 +38,9 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 [Cortex-M 软件支持](cortex-m.md) 与 [Arch 契约](../design/arch-contracts.md)。
 
 ## 首发模式
+
+以下完整外设表对应 F407/F470 首发实现。G474 仅开放上表的 GPIO／LPUART 字节
+纵切片，不从芯片型号或通用接口推断其他外设、DMA、ThreadX 或低功耗模式。
 
 | 接口 | 已实现模式与限制 |
 |---|---|
@@ -67,13 +71,18 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 | Input capture | STM TIM4 CH1 / GD TIMER3 CH0，PB6 AF2、16-bit modulo count、caller event ring；软件观测时间不是 edge aperture；装配接入独立验收 |
 | Complementary PWM / break | STM TIM1 / GD TIMER0，PA8/PB13/PB12 AF1；不可变精确 deadtime 与 BKIN，禁止自动重启；没有功率级安全资格 |
 | User I/O broker | 特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；未实现 SVC/MPU/TZ userspace transport 或异步用户 DMA |
-| STM32G474RET6 / MB1367 | 初始 source-reviewed clock/startup/TIM2/GPIOA/LPUART1 纵切片；平台 facts、SDK、factory/backend 集成另行验收；不继承 F407/F470 其他外设 |
 
 参考 Board 默认不声明 Ethernet PHY/REFCLK/reset 接线。启明 ZG 可选 RMII 来源
 涉及 PG11/13/14，因此不授权 VE100 封装；天空星和梁山派无 reviewed PHY 路线。
 协议、电缆、PHY power/reset、产品 MAC 地址和恢复策略留在外部。详见
 [Ethernet](../design/ethernet.md)、[高级 timer](../design/timer-advanced.md)、
 [用户 I/O broker](../design/user-io-broker.md) 与 [G474](../design/stm32g474.md)。
+
+G474 已执行真实 generated factory 主机合同、独立 system/provider 回归，以及
+四个 empty／selected × 裸机／FreeRTOS ARM 镜像的预算、操作表保留、未选驱动
+裁剪和向量字节检查。它们使用 reviewed Board 资料与锁定的官方 CMSIS，不能
+证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。新增 SDK 与候选仍需按最终
+clean source 验收，不能继承此前 F407/F470 候选的资格。
 
 Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM
 128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不
@@ -151,6 +160,6 @@ GD32 Flash 的重新上锁读回失败会保留静态 provider 并拒绝继续�
 验证故障后拒绝读取／写入／重新取得控制器，不构成实板资格。
 生命周期与扫描诊断的解释见[安全审查](security-review.md)。
 
-硬件未接入，三板 clock、reset、GPIO safe output、UART TC/abort/RX、SPI/I2C
+硬件未接入，全部 MCU 目标的 clock、reset、GPIO safe output、UART TC/abort/RX、SPI/I2C
 电气、Flash 掉电、watchdog reset、EXTI 波形、PWM 与 ADC 精度均未执行。当前
 支持声明不能替代物理 HIL 或产品 release promotion。

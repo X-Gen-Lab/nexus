@@ -1,0 +1,11 @@
+{
+  "tool": "scripts.ci.style_gate.check_text",
+  "scope": "three_owned_files_not_full_index_qualification",
+  "paths": [
+    ".pre-commit-config.yaml",
+    "scripts/ci/style_gate.py",
+    "scripts/ci/test_style_gate.py"
+  ],
+  "errors": [],
+  "returncode": 0
+}

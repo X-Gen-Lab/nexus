@@ -1,0 +1,15 @@
+test_quoted_template_name_cannot_shadow_another_owned_header (tools.testing.test_provider_templates.ProviderTemplateTests.test_quoted_template_name_cannot_shadow_another_owned_header) ... FAIL
+
+======================================================================
+FAIL: test_quoted_template_name_cannot_shadow_another_owned_header (tools.testing.test_provider_templates.ProviderTemplateTests.test_quoted_template_name_cannot_shadow_another_owned_header)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_templates.py", line 110, in test_quoted_template_name_cannot_shadow_another_owned_header
+    with self.assertRaisesRegex(EvidenceError, "ambiguous"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.003s
+
+FAILED (failures=1)

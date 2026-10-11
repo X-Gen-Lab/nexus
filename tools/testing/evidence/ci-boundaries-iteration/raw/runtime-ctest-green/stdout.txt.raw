@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /workspace/nexus/build/ci-boundary-memory
+Test project /workspace/nexus/build/ci-boundary-memory
+    Start 3: contract_runtime_sdk
+1/1 Test #3: contract_runtime_sdk .............   Passed  249.05 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 249.05 sec

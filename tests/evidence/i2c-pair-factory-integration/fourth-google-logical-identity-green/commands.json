@@ -1,0 +1,152 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/host-build",
+      "--target",
+      "nexus_stm32_i2c_pair_factory_test",
+      "nexus_stm32_i2c_pair_irq_factory_test",
+      "nexus_gd32_i2c_pair_factory_test",
+      "nexus_gd32_i2c_pair_irq_factory_test",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751173802787559,
+    "completed_ns": 1791751189749270265,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/build.output",
+      "sha256": "b471638d940929dc018e6a705bebbe5acf940e9d613b51502e231dbc7b63cfd0",
+      "bytes": 2638
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189767649056,
+    "completed_ns": 1791751189771417893,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_stm32_i2c_pair_factory_test-discovery.output",
+      "sha256": "c9c8b447c9041272b0d866734bdf974517cd10111cb67379fbf83bd903d8a1b8",
+      "bytes": 777
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_stm32_i2c_pair_factory_test.xml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189771722225,
+    "completed_ns": 1791751189775291120,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_stm32_i2c_pair_factory_test-execution.output",
+      "sha256": "1e003d10a31a9eacda4620352eec87161fcfb0fa0dfef14ded3dba6b412916bc",
+      "bytes": 2634
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189790181595,
+    "completed_ns": 1791751189793958764,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_stm32_i2c_pair_irq_factory_test-discovery.output",
+      "sha256": "b735dfba24d160003b3d016af138418ca92507a0d30fc212bdb19050cf137985",
+      "bytes": 733
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_stm32_i2c_pair_irq_factory_test.xml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189794325088,
+    "completed_ns": 1791751189798061597,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_stm32_i2c_pair_irq_factory_test-execution.output",
+      "sha256": "7dc08617742e81eca9405f69f80eb47fbc0cb793b51824044155b7d57035bee0",
+      "bytes": 2487
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189811863297,
+    "completed_ns": 1791751189815703625,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_gd32_i2c_pair_factory_test-discovery.output",
+      "sha256": "c9c8b447c9041272b0d866734bdf974517cd10111cb67379fbf83bd903d8a1b8",
+      "bytes": 777
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_gd32_i2c_pair_factory_test.xml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189816182716,
+    "completed_ns": 1791751189819847123,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_gd32_i2c_pair_factory_test-execution.output",
+      "sha256": "1e003d10a31a9eacda4620352eec87161fcfb0fa0dfef14ded3dba6b412916bc",
+      "bytes": 2634
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189832079934,
+    "completed_ns": 1791751189835914965,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_gd32_i2c_pair_irq_factory_test-discovery.output",
+      "sha256": "b735dfba24d160003b3d016af138418ca92507a0d30fc212bdb19050cf137985",
+      "bytes": 733
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_gd32_i2c_pair_irq_factory_test.xml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751189836434826,
+    "completed_ns": 1791751189840001408,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fourth-google-logical-identity-green/nexus_gd32_i2c_pair_irq_factory_test-execution.output",
+      "sha256": "7dc08617742e81eca9405f69f80eb47fbc0cb793b51824044155b7d57035bee0",
+      "bytes": 2487
+    }
+  }
+]

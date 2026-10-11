@@ -1,0 +1,382 @@
+{
+  "text_files": 10,
+  "text_errors": [],
+  "discovery": [
+    {
+      "command": [
+        "/workspace/nexus-industrial-design/physical-factory-tests/build/test-import/nexus_stm32_physical_platform_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 0,
+      "binary_sha256": "93c77b81ef8bc815d29dea8335097939aa72ed0ef0fd5e3323ff4a2a183999d9",
+      "discovered_cases": [
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1"
+      ],
+      "validation": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 12,
+        "cases": [
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          }
+        ],
+        "report_sha256": "6ba60d19f57d50b75fcfc7c4874d1cd20a4bd8cd3f8b9706f7ce750ba91cef07"
+      }
+    },
+    {
+      "command": [
+        "/workspace/nexus-industrial-design/physical-factory-tests/build/test-import/nexus_gd32_physical_platform_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 0,
+      "binary_sha256": "4be144fe5cc13f01f87b206ac33568353b50c3cf356012bbc5390ce626c136e8",
+      "discovered_cases": [
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1"
+      ],
+      "validation": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 12,
+        "cases": [
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          }
+        ],
+        "report_sha256": "599d0fac04e7368ed4f6b4856b5d73279fc41be2ff4fff47df290fc4f400c13b"
+      }
+    },
+    {
+      "command": [
+        "/workspace/nexus-industrial-design/physical-factory-tests/build-sanitizer/test-import/nexus_stm32_physical_platform_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 0,
+      "binary_sha256": "5bb7a155721dd17b8a696e55768cd8dab358ce6599125b594ceb228c2c4b6c06",
+      "discovered_cases": [
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1"
+      ],
+      "validation": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 12,
+        "cases": [
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          }
+        ],
+        "report_sha256": "10447ed301f0d766447d551a9d8d63a16af846c33dcb2ec2d70d1b1e5cf18ccd"
+      }
+    },
+    {
+      "command": [
+        "/workspace/nexus-industrial-design/physical-factory-tests/build-sanitizer/test-import/nexus_gd32_physical_platform_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 0,
+      "binary_sha256": "a8c849ccd0ee49b7c9da5ffde395f084bd5e04a889786c77e3db12669d9b312f",
+      "discovered_cases": [
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1"
+      ],
+      "validation": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 12,
+        "cases": [
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedColdStartHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedUntouchedStopHasNoOuterEffects/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedStopRetainsStartedSession/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "UnprivilegedCleanupRetryRetainsOuterLease/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "IncomingMaskRejectsAndRemainsSaved/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/0",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          },
+          {
+            "name": "PrivilegedOwnerCanRestartActualSelectedGraph/1",
+            "classname": "EmptyAndGPIO/PhysicalPlatformFactory",
+            "status": "passed"
+          }
+        ],
+        "report_sha256": "05e995b1214c8cbb4cce2692eabb6a7ca59518682b3d8a81a2cc052973f1e0c0"
+      }
+    }
+  ]
+}

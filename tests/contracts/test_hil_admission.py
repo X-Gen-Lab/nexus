@@ -69,7 +69,8 @@ class HilAdmissionTests(unittest.TestCase):
 
     def test_three_actual_templates_are_unqualified(self):
         fixtures = list(Path("tools/hil/fixtures").glob("*.json"))
-        actual = [path for path in fixtures if path.name != "station.template.json"]
+        actual = [path for path in fixtures if path.name != "station.template.json"
+                  and json.loads(path.read_text()).get("scope") != "software_reference"]
         self.assertEqual(len(actual), 3)
         for path in actual:
             value = json.loads(path.read_text())

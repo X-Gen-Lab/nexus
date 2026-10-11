@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "stm32-zg-ethernet-software-pad-contract",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
+  "source_revision": "software-only-RMII-A-C-G-pad-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "rmii",
+      "controller": "ETH",
+      "route": "rmii-a-c-g"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only pad contract: PHY presence/address/reset, external 50 MHz reference clock, connector/magnetics and electrical routing are not qualified.",
+    "MAC address is authored product policy for a software fixture, never a Board address allocation.",
+    "No physical traffic, PHY negotiation or electrical HIL was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "scope": "Reviewed SoC AF11 RMII pads only; not a Board PHY connection or clock source claim."
+    }
+  ]
+}

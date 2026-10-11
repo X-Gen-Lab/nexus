@@ -44,9 +44,14 @@ _FIXED_DMA = MappingProxyType({('USART0', 'dma-tx'): ('DMA1:stream7:channel4',),
                                'DMA1:stream3:channel2'),
  ('ADC0', 'trigger-dma'): ('DMA1:stream0:channel0',),
  ('ADC0', 'trigger-dma-continuous'): ('DMA1:stream0:channel0',),
- ('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1')})
+ ('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1'),
+ ('USART1', 'dma-tx'): ('DMA0:stream6:channel4',),
+ ('SPI0', 'dma-full-duplex'): ('DMA1:stream5:channel3', 'DMA1:stream2:channel3'),
+ ('I2C1', 'dma-messages'): ('DMA0:stream2:channel7', 'DMA0:stream7:channel7')})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('timer_capture', 'edge-capture'): 'timer_capture',
+    ('advanced_pwm', 'complementary-pwm'): 'advanced_pwm',
     ('eth', 'raw-rmii'): 'eth',
     ('usb_device', 'device-fs'): 'usb_device',
     ('can', 'classic-irq'): 'can',

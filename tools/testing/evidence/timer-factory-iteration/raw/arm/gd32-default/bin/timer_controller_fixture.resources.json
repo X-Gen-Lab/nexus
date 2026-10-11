@@ -1,0 +1,126 @@
+{
+  "board": "gd32f470zg-liangshan",
+  "budget": {
+    "path": "/workspace/nexus-industrial-design/timer-arm/gd32-default/nexus-sdk/generated/resource-budget.json",
+    "sha256": "4c37b8d170b11ed6ac70f1ef8fb9c556a89a11e65c90f4e183ea046cc391dce4",
+    "size": 202
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/gd32f470_liangshan/board.json",
+        "sha256": "6aa6f232593de796cf311d74a753c402c3e960ff7ecc0dd8c753ea9379914b7c",
+        "size": 1653
+      },
+      "label": "boards/gd32f470_liangshan/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/routes.json",
+        "sha256": "28aec61a112bafc7ba2074cd2de738f52edcbd6663b01e6d886d5a53c40c63cb",
+        "size": 12291
+      },
+      "label": "soc/gd32f470/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/soc.json",
+        "sha256": "3648ef7f014d3688ca3e3ad697286ca979c2395fb282b605aac4a336e9aa392d",
+        "size": 10659
+      },
+      "label": "soc/gd32f470/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal-empty.toml",
+        "sha256": "a886c9f8508700edb3e8107b59b1662adef455ae5c919ed30fd18cc34ba4065f",
+        "size": 223
+      },
+      "label": "tools/configure/assemblies/liangshan-baremetal-empty.toml"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-industrial-design/timer-arm/gd32-default/bin/timer_controller_fixture.elf",
+    "sha256": "390f99b0687c6245daa348dc55d69755ac16fed7b7ff20f91725666bec90a9a2",
+    "size": 16360
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 2916,
+      "loaded_bytes": 2916,
+      "ranges": [
+        [
+          134217728,
+          134220644
+        ]
+      ]
+    },
+    "ram": {
+      "addsram": {
+        "capacity_bytes": 262144,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 196608,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870936
+          ],
+          [
+            537065472,
+            537067520
+          ]
+        ],
+        "reserved_bytes": 2072
+      },
+      "tcm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536870936,
+        "start": 536870936
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537067520,
+        "start": 537065472
+      }
+    }
+  },
+  "part": "GD32F470ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-industrial-design/timer-arm/gd32-default/nexus-sdk/generated/resolved.json",
+    "sha256": "21d7f36f42be3c8ad6a50e391983d0262f00a74c06fdec990b8b589aad0afc2d",
+    "size": 24924
+  },
+  "schema_version": 1,
+  "soc_family": "gd32f470",
+  "status": "passed",
+  "violations": []
+}

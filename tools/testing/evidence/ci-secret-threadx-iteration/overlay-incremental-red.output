@@ -1,0 +1,26 @@
+test_actual_reviewed_source_uses_monotonic_clock_and_clockwait (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_actual_reviewed_source_uses_monotonic_clock_and_clockwait) ... ok
+test_changed_predecessor_is_never_upgraded (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_changed_predecessor_is_never_upgraded) ... ok
+test_existing_different_output_is_not_overwritten (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_existing_different_output_is_not_overwritten) ... ok
+test_existing_exact_output_is_idempotent_without_rewriting (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_existing_exact_output_is_idempotent_without_rewriting) ... ok
+test_incomplete_patch_cannot_be_published (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_incomplete_patch_cannot_be_published) ... ok
+test_input_and_output_symlinks_fail_closed (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_input_and_output_symlinks_fail_closed) ... ok
+test_mismatching_exact_patch_boundary_is_rejected (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_mismatching_exact_patch_boundary_is_rejected) ... ok
+test_parent_symlink_and_traversal_are_rejected (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_parent_symlink_and_traversal_are_rejected) ... ok
+test_reviewed_exact_predecessor_is_atomically_upgraded (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_reviewed_exact_predecessor_is_atomically_upgraded) ... ERROR
+test_source_change_during_derivation_is_rejected (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_source_change_during_derivation_is_rejected) ... ok
+test_unreviewed_source_bytes_fail_before_output (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_unreviewed_source_bytes_fail_before_output) ... ok
+
+======================================================================
+ERROR: test_reviewed_exact_predecessor_is_atomically_upgraded (tools.testing.test_threadx_linux_overlay.ThreadXLinuxOverlayTests.test_reviewed_exact_predecessor_is_atomically_upgraded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_threadx_linux_overlay.py", line 80, in test_reviewed_exact_predecessor_is_atomically_upgraded
+    prepare.prepare(source, output)
+  File "/workspace/nexus/os/threadx/prepare_linux.py", line 73, in prepare
+    raise ValueError("Reserved derived output has different contents")
+ValueError: Reserved derived output has different contents
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.006s
+
+FAILED (errors=1)

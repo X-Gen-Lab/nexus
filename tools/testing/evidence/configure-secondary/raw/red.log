@@ -1,0 +1,246 @@
+test_both_authored_backends_resolve_the_same_physical_controller_routes (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_both_authored_backends_resolve_the_same_physical_controller_routes) ... ERROR
+test_secondary_receive_dma_modes_do_not_gain_unimplemented_support (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_receive_dma_modes_do_not_gain_unimplemented_support) ... ok
+test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) ... 
+  test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) (label='stm32-zg') ... FAIL
+  test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) (label='gd32') ... FAIL
+test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) ... 
+  test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) (label='stm32-zg') ... ERROR
+  test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) (label='gd32') ... ERROR
+test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) ... 
+  test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) (label='stm32-zg') ... ERROR
+  test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) (label='stm32-ve') ... ERROR
+  test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) (label='gd32') ... ERROR
+test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) ... 
+  test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-zg', mode='dma-messages') ... ERROR
+  test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-zg', mode='irq-messages') ... ERROR
+  test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-ve', mode='dma-messages') ... ERROR
+  test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-ve', mode='irq-messages') ... ERROR
+  test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='gd32', mode='dma-messages') ... ERROR
+  test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='gd32', mode='irq-messages') ... ERROR
+
+======================================================================
+ERROR: test_both_authored_backends_resolve_the_same_physical_controller_routes (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_both_authored_backends_resolve_the_same_physical_controller_routes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 98, in test_both_authored_backends_resolve_the_same_physical_controller_routes
+    bare = gate.resolve_ir(self.assembly(label))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) (label='stm32-zg')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 60, in test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts
+    gate.configure(self.assembly(label), output)
+  File "/workspace/nexus/tools/configure/configure.py", line 927, in configure
+    result = resolve_ir(assembly, root, input_paths=input_paths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) (label='gd32')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 60, in test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts
+    gate.configure(self.assembly(label), output)
+  File "/workspace/nexus/tools/configure/configure.py", line 927, in configure
+    result = resolve_ir(assembly, root, input_paths=input_paths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 549, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-messages for secondary-i2c
+
+======================================================================
+ERROR: test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) (label='stm32-zg')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 28, in test_three_parts_bind_five_independent_exact_controllers
+    result = gate.resolve_ir(self.assembly(label))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) (label='stm32-ve')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 28, in test_three_parts_bind_five_independent_exact_controllers
+    result = gate.resolve_ir(self.assembly(label))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) (label='gd32')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 28, in test_three_parts_bind_five_independent_exact_controllers
+    result = gate.resolve_ir(self.assembly(label))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 549, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-messages for secondary-i2c
+
+======================================================================
+ERROR: test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-zg', mode='dma-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 44, in test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses
+    result = gate.resolve_ir(path)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-zg', mode='irq-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 44, in test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses
+    result = gate.resolve_ir(path)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-ve', mode='dma-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 44, in test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses
+    result = gate.resolve_ir(path)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='stm32-ve', mode='irq-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 44, in test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses
+    result = gate.resolve_ir(path)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 465, in resolve
+    fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+======================================================================
+ERROR: test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='gd32', mode='dma-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 44, in test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses
+    result = gate.resolve_ir(path)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 549, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-messages for secondary-i2c
+
+======================================================================
+ERROR: test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) (label='gd32', mode='irq-messages')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 44, in test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses
+    result = gate.resolve_ir(path)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 549, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode irq-messages for secondary-i2c
+
+======================================================================
+FAIL: test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) (label='stm32-zg')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Board binding secondary-uart has no reviewed exact-part route
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 85, in test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream
+    with self.subTest(label=label), self.assertRaisesRegex(ValueError, "Resource conflict.*stream6"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Resource conflict.*stream6" does not match "Board binding secondary-uart has no reviewed exact-part route"
+
+======================================================================
+FAIL: test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) (label='gd32')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-messages for secondary-i2c
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_secondary_controllers.py", line 85, in test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream
+    with self.subTest(label=label), self.assertRaisesRegex(ValueError, "Resource conflict.*stream6"):
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Resource conflict.*stream6" does not match "Unsupported mode dma-messages for secondary-i2c"
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.041s
+
+FAILED (failures=2, errors=12)

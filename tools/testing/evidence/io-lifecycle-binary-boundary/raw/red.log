@@ -1,0 +1,14 @@
+...................F......
+======================================================================
+FAIL: test_parent_components_cannot_borrow_an_external_binary (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_parent_components_cannot_borrow_an_external_binary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 87, in test_parent_components_cannot_borrow_an_external_binary
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 26 tests in 0.079s
+
+FAILED (failures=1)

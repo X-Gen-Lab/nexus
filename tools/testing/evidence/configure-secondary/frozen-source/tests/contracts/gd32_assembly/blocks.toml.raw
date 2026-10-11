@@ -1,0 +1,72 @@
+schema = 2
+board_package = "software_board"
+backend = "baremetal"
+clock = "hxtal25-pll200"
+
+[memory]
+main_stack_bytes = 2048
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+libc_heap_bytes = 0
+
+[uart.link_a]
+binding = "uart0"
+mode = "dma-tx"
+baud = 115200
+[uart.link_a.rx]
+format = "events"
+capacity = 4
+[uart.link_a.irq]
+priority = 5
+
+[uart.link_b]
+binding = "uart1"
+mode = "irq-blocks"
+baud = 115200
+[uart.link_b.rx]
+format = "blocks"
+[uart.link_b.irq]
+priority = 5
+
+[spi.bus_spi_a]
+binding = "spi0"
+mode = "dma-full-duplex"
+[spi.bus_spi_a.irq]
+priority = 5
+
+[spi.bus_spi_b]
+binding = "spi1"
+mode = "short-poll"
+
+[spi_device.sensor_spi_a]
+controller = "bus_spi_a"
+
+[spi_device.sensor_spi_b]
+controller = "bus_spi_b"
+cs_binding = "cs1"
+
+[i2c.bus_i2c_a]
+binding = "i2c0"
+mode = "poll-messages"
+
+[i2c.bus_i2c_b]
+binding = "i2c1"
+mode = "poll-messages"
+
+[i2c_device.sensor_i2c_a]
+controller = "bus_i2c_a"
+address = 80
+
+[i2c_device.sensor_i2c_b]
+controller = "bus_i2c_b"
+address = 80
+
+[adc.adc0]
+binding = "adc_scan"
+mode = "trigger-dma"
+channels = [0, 1]
+sample_times = [1, 1]
+reference_mv = 3300
+timeout_ms = 100
+[adc.adc0.irq]
+priority = 5

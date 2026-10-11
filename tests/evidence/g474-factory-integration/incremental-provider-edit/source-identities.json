@@ -1,0 +1,14 @@
+{
+  "source": "/workspace/nexus/tools/configure/providers/stm32g474/emission.py",
+  "operation": "actual source write; no manual timestamp changes",
+  "original": {
+    "bytes": 7032,
+    "sha256": "dd3af048e2aafa85b87ec20da172a2d60ff0604e6618fb3cac4c9a1452de7303"
+  },
+  "mutated": {
+    "bytes": 7103,
+    "sha256": "181467638239e6ac4932857f7b6a79e532feb277a4d33efdc7863b5d964063d0"
+  },
+  "observed_mtime_ns": 1791748689091447092,
+  "observed_wall_ns": 1791748689091582463
+}

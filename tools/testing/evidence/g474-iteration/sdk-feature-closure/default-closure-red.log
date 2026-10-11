@@ -1,0 +1,42 @@
+test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) ... 
+  test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='arch/CMakeLists.txt') ... FAIL
+  test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='os/wait.c') ... FAIL
+  test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='components/CMakeLists.txt') ... FAIL
+  test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='cmake/toolchains/arm-gcc.cmake') ... FAIL
+
+======================================================================
+FAIL: test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='arch/CMakeLists.txt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 475, in test_rehashed_default_target_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed default target omission accepted: arch/CMakeLists.txt
+
+======================================================================
+FAIL: test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='os/wait.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 475, in test_rehashed_default_target_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed default target omission accepted: os/wait.c
+
+======================================================================
+FAIL: test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='components/CMakeLists.txt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 475, in test_rehashed_default_target_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed default target omission accepted: components/CMakeLists.txt
+
+======================================================================
+FAIL: test_rehashed_default_target_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_default_target_source_omissions_reject) (name='cmake/toolchains/arm-gcc.cmake')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 475, in test_rehashed_default_target_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed default target omission accepted: cmake/toolchains/arm-gcc.cmake
+
+----------------------------------------------------------------------
+Ran 1 test in 12.805s
+
+FAILED (failures=4)

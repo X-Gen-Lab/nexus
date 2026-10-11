@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Archive exact I2C/Native/G474 raw development evidence after actual success."""
+from pathlib import Path
+import hashlib
+import json
+import shutil
+
+ROOT = Path('/workspace/nexus')
+OUT = Path('/workspace/nexus-i2c-pair-iteration-evidence')
+ARCHIVE = ROOT / 'tests/evidence/i2c-pair-factory-integration'
+FINAL = ['final-combined-regular-after-overlay', 'final-combined-sanitizer-after-overlay']
+PHASES = ['configuration-red', 'first-google-attempt', 'second-google-attempt',
+          'third-google-attempt', 'fourth-google-logical-identity-green',
+          'fifth-google-pair-sanitizer-green', 'native-pure-identity-red',
+          'sixth-cold-stop-red', 'g474-unprivileged-restore-retry-red',
+          'final-combined-regular', *FINAL, 'static-identity-cost', 'final-owned-style',
+          'pre-green-test-source', 'native-identity-red-source', 'cold-stop-red-source',
+          'g474-stop-retry-red-source']
+SOURCES = ['tests/google/i2c_pair_factory.cmake',
+           'tests/google/i2c_pair_factory_model.h',
+           'tests/google/i2c_pair_factory_test.cpp',
+           'tests/google/native_factory_test.cpp',
+           'tests/google/g474_factory_test.cpp']
+RAW_SUFFIXES = {'.c', '.h', '.cpp', '.py', '.cmake', '.ld', '.toml'}
+
+
+def identity(path):
+    raw = path.read_bytes()
+    return {'path': str(path), 'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+
+
+def write(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def main():
+    for phase in FINAL:
+        value = json.loads((OUT/phase/'manifest.json').read_text())
+        if value['status'] != 'passed' or not value['source_unchanged']:
+            raise ValueError('No stable actual final execution: ' + phase)
+        if len(value['rows']) != 6 or sum(r['google']['tests'] for r in value['rows']) != 83:
+            raise ValueError('Unexpected real case catalogue')
+        if any(any(r['google'][key] for key in ['failures', 'errors', 'disabled', 'skipped'])
+               for r in value['rows']):
+            raise ValueError('Incomplete successful case execution')
+    ARCHIVE.mkdir(exist_ok=False)
+    preserved, external = [], []
+    for phase in PHASES:
+        for original in sorted((OUT/phase).rglob('*')):
+            if not original.is_file():
+                continue
+            if original.suffix == '.executable':
+                external.append(identity(original))
+                continue
+            destination = ARCHIVE/phase/original.relative_to(OUT/phase)
+            if original.suffix in RAW_SUFFIXES:
+                destination = destination.with_name(destination.name + '.raw')
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(original, destination)
+            copied = identity(destination)
+            prior = identity(original)
+            if prior['sha256'] != copied['sha256'] or prior['bytes'] != copied['bytes']:
+                raise ValueError('Changed historical bytes')
+            preserved.append({'original': prior, 'preserved': copied})
+    for original in sorted([*OUT.glob('capture*.py'), Path(__file__)]):
+        destination = ARCHIVE/'drivers'/(original.name + '.raw')
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original, destination)
+        preserved.append({'original': identity(original), 'preserved': identity(destination)})
+    sources = []
+    for name in SOURCES:
+        original = ROOT/name
+        destination = ARCHIVE/'final-sources'/(name + '.raw')
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original, destination)
+        sources.append({'source': identity(original), 'preserved': identity(destination)})
+    README = '''# Paired I2C factory and cold lifecycle integration
+
+The final regular and ASAN/UBSAN executions each run all 83 discovered Google
+cases: STM DMA 15, STM IRQ 14, GD DMA 15, GD IRQ 14, Native factory 10 and
+G474 factory 15. Each has zero failures or skips and unchanged captured source.
+These are scoped dirty development executions, not a clean software candidate,
+physical qualification or a binary compatibility promise.
+
+Paired tests compile the actual generated factory, common I2C V1 algorithm,
+family adapters and official GPIO code. Only external CPU/MMIO/NVIC/hardware
+clock leaves and the separately tested SoC system-clock port are substituted.
+They do not mock request admission, completion, cancel, stop, static factory or
+pin helpers. GD vendor reset dependencies fail the test if invoked. The actual
+configured SRAM domain is mapped for DMA buffers; no generated memory facts are
+rewritten to admit ordinary host pointers.
+
+The two controllers expose independent static faces and addressed children,
+share read-only methods, and accept the same address on distinct buses. Tests
+exercise event/error/DMA isolation, buffer rejection, cancellation, wire drain,
+failed DMA withdrawal, IRQ quarantine, pin restoration and restart. IRQ mode
+checks final three-byte receive windows without creating DMA ownership.
+
+Genuine RED records establish these corrective contracts:
+
+- Pure lookup confirms controller/address identity before hardware startup.
+  Four paired cases and the Native cold case initially failed. Static bindings
+  and pure polling predicates close the discrepancy; lookup never initializes.
+- First-use cold I2C stop originally terminated its child with SIGSEGV. The
+  exit test requires a normal STATE/INVALID result with zero hardware effects.
+  Prepared non-null state still performs cleanup after its initialized flag is
+  cleared; the fix does not discard partial or post-stop responsibilities.
+- G474 pin restoration failure leaves residual resources after providers drain.
+  An unprivileged retry originally performed 17 reads and 9 writes and revoked
+  pin/clock fields. The platform now rejects before any hardware mutation and
+  allows the privileged lifecycle owner to finish the retained cleanup.
+
+Initial missing routes/modes, fixture symbol/link errors and the stale reserved
+ThreadX derivation refusal are preserved as build failures. They are not claimed
+as executed production regression failures. The final ordinary CMake build
+accepts only the reviewed predecessor derivation through the maintained tool;
+no derived output was deleted to bypass its refusal.
+
+Actual host ELF symbols show each V1 child remains 16 bytes on the 64-bit host.
+Static logical initializers move these existing objects from BSS to DATA, which
+requires load-image bytes; this is not a measured MCU or total-product cost.
+The maintained selected-provider ARM gate independently measures actual MCU
+images. This record does not claim PCB pull-ups, bus speed, electrical timing,
+physical DMA behavior, power behavior or connected hardware execution.
+
+`manifest.json` binds original and preserved raw byte identities. Historical
+source/generation files have `.raw` suffixes and are never reformatted. Original
+reports retain their original paths and hashes; the preservation table maps
+these to repository copies. Host executable bytes remain in immutable external
+phase copies and are explicitly identified rather than asserted to remain at
+reused build paths. Normal staged commit hooks and final clean-SDK/offline
+qualification are separate root-maintained gates.
+'''
+    (ARCHIVE/'README.md').write_text(README)
+    report = {'schema_version': 1, 'kind': 'i2c-pair-and-cold-lifecycle-development-record',
+              'status': 'development_passed', 'physical_status': 'not_executed',
+              'scope': 'Actual generated factory and owned provider algorithm execution with external hardware boundaries; no clean candidate or physical qualification.',
+              'cases': {'paired_regular': 58, 'native_regular': 10, 'g474_factory_regular': 15,
+                        'regular_total': 83, 'asan_ubsan_total': 83},
+              'final_regular': identity(ARCHIVE/FINAL[0]/'manifest.json'),
+              'final_sanitizer': identity(ARCHIVE/FINAL[1]/'manifest.json'),
+              'polling_identity': identity(ROOT/'tools/testing/evidence/i2c-polling-identity-iteration/manifest.json'),
+              'historical_g474': identity(ROOT/'tests/evidence/g474-factory-integration/manifest.json'),
+              'preserved_raw_bytes': preserved, 'final_sources': sources,
+              'external_immutable_executables': external,
+              'readme': identity(ARCHIVE/'README.md'), 'archive_driver': identity(Path(__file__)),
+              'limits': ['No hardware has executed.', 'No compatibility epoch or clean candidate is inferred.',
+                         'Historical source/execution hashes are not rewritten or inherited by final source.',
+                         'ARM retention/resources and the final SDK are qualified independently.']}
+    write(ARCHIVE/'manifest.json', report)
+    print(json.dumps({'archive': str(ARCHIVE), 'files': len(preserved) + len(sources) + 2,
+                      'manifest': identity(ARCHIVE/'manifest.json')}))
+
+
+if __name__ == '__main__':
+    main()

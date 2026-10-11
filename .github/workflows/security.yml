@@ -98,14 +98,22 @@ jobs:
         with:
           fetch-depth: 0
       - name: Detect verified and unknown secret candidates
-        uses: trufflesecurity/trufflehog@005b692bdfd0764e5da402887d9ab9196f8023dc # v3.99.1
+        env:
+          SCAN_BASE: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          SCAN_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python3 -B scripts/ci/secret_scan.py \
+            --source "$GITHUB_WORKSPACE" --base "$SCAN_BASE" --head "$SCAN_HEAD" \
+            --report secret-scan-report.json
+      # Exact archive and binary SHA pin 3.99.1. Only reviewed negative-test
+      # unknowns with matching Raw/context hashes and Git path may pass.
+      # Verified candidates and scanner failures remain blocking. No raw
+      # credentials or verification errors are printed or uploaded.
+      - name: Preserve redacted scanner decision
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          path: ./
-          base: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
-          head: ${{ github.event.pull_request.head.sha || github.sha }}
-          version: '3.99.1'
-          extra_args: --results=verified,unknown
-      # The action revision is pinned by the repository dependency lock.
-      # Its implementation supplies --fail; repeating it prevents scanning.
-      # The container version is explicit; a verified image digest is pending.
-      # Scanner/tool failures are failures; no blanket exception suppression.
+          name: secret-scan-decision
+          path: secret-scan-report.json
+          if-no-files-found: error
+          retention-days: 30

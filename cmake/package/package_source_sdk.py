@@ -169,6 +169,120 @@ _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_byte
 stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
                         for name in _g4_lock["files"])
+# Complete declared platform surfaces must remain present after an attacker
+# removes a payload and rehashes its file map. This is a required-source identity
+# contract, not another build graph: CMake still owns every selected target.
+# Explicit names make omissions fail closed; scanning an installed SDK would
+# derive a reduced requirement from precisely the missing files being checked.
+REQUIRED_FILES += (
+    "core/CMakeLists.txt", "core/src/time.c", "core/src/fault.c",
+    "core/src/stack_observation.c", "io/CMakeLists.txt",
+    "tools/configure/bindings.py", "tools/configure/emission.py",
+    "tools/configure/usb_device.py", "tools/configure/ethernet.py",
+    "tools/configure/timer_advanced.py", "tools/configure/assembly.schema.json",
+    "tools/configure/secondary_controllers.py",
+    "cmake/platform/Configure.cmake", "cmake/platform/ControllerModes.cmake",
+    "cmake/platform/Options.cmake", "cmake/platform/SDK.cmake",
+    "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
+    "tools/maintenance/dependency_proposals.py",
+    "os/freertos/timebase_lowpower.c",
+    "os/freertos/private/timebase_lowpower.h", "os/freertos/stack_snapshot.c",
+    "os/freertos/include/nexus/os/freertos_stack.h",
+    "os/threadx/private/irq_model.h", "os/threadx/private/m4_model.h",
+    "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h")
+REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
+    "fault", "memory", "request", "request_observer", "stack_observation",
+    "status", "time"))
+REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
+    "adc", "adc_observer", "advanced_pwm", "can", "dma", "ethernet",
+    "exti", "flash", "gpio", "i2c", "i2c_bus_clear", "mdio", "native/model",
+    "spi", "stream", "stream_budget", "timer", "timer_capture", "uart",
+    "uart_rs485", "usb_device", "wake", "watchdog"))
+REQUIRED_FILES += tuple("io/src/" + name + ".c" for name in (
+    "adc", "adc_observer", "advanced_pwm", "can", "can_controller", "dma",
+    "eth_mac", "ethernet", "exti", "flash", "flash_region", "gpio", "i2c",
+    "i2c_bus_clear", "mdio", "spi", "stream", "stream_budget", "timer",
+    "timer_capture", "uart", "uart_rs485", "usb_device",
+    "usb_device_controller", "wake", "watchdog"))
+REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
+    "advanced_pwm_impl", "can_controller", "eth_mac",
+    "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
+REQUIRED_FILES += tuple("io/native/" + name + ".c" for name in (
+    "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
+    "spi_async", "stream", "time", "timer", "uart", "usb_device", "watchdog"))
+REQUIRED_FILES += tuple("io/native/" + name + ".h" for name in (
+    "can", "can_access", "ethernet", "ethernet_access", "provider",
+    "usb_device", "usb_device_access"))
+for _family in ("stm32f407", "gd32f470"):
+    REQUIRED_FILES += tuple("soc/" + _family + "/" + name for name in (
+        "CMakeLists.txt", "system.c", "sleep.c", "timebase_lowpower.c",
+        "usb_clock.c", "soc.json", "routes.json"))
+    REQUIRED_FILES += tuple("soc/" + _family + "/drivers/" + name + ".c"
+                            for name in (
+        "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
+        "ethernet", "exti", "flash", "gpio", "i2c", "i2c_async", "spi",
+        "spi_dma", "timer", "timer_capture", "uart", "uart_dma",
+        "uart_receive", "uart_stream", "usb_device", "watchdog"))
+    REQUIRED_FILES += tuple("soc/" + _family + "/private/" + _family + "_"
+                            + name + ".h" for name in (
+        "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
+        "timer_advanced", "uart_receive", "usb_clock", "usb_device"))
+REQUIRED_FILES += (
+    "soc/stm32f407/private/stm32f407_system.h",
+    "soc/stm32f407/private/stm32f407_stream.h",
+    "soc/gd32f470/timebase.c", "soc/gd32f470/private/system.h",
+    "soc/gd32f470/private/gd32f470_adc_stream.h",
+    "soc/gd32f470/private/gd32f470_spi_dma.h",
+    "soc/gd32f470/private/gd32f470_uart_stream.h",
+    "soc/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32f470/private/usb_conf.h")
+for _component, _include, _private in (
+        ("clock_domain", "nexus/components/clock_domain.h", "clock_domain_impl.h"),
+        ("user_io_broker", "nexus/components/user_io_broker.h", "user_io_broker_impl.h"),
+        ("dp83848", "nexus/dp83848/dp83848.h", None)):
+    REQUIRED_FILES += tuple("components/" + _component + "/" + name for name in (
+        "CMakeLists.txt", "src/" + _component + ".c", "include/" + _include))
+    if _private is not None:
+        REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
+# G474 owned support joins only after the actual generated factory and four
+# bare-metal/FreeRTOS ARM links passed. The official vendor closure stays five
+# locked files; no additional MCU headers or unreviewed SDK unit is selected.
+REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
+    "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
+    "private/stm32g474_system.h", "private/stm32g474_provider.h",
+    "soc.json", "routes.json"))
+REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
+REQUIRED_FILES += tuple("tools/configure/providers/stm32g474/" + name for name in (
+    "__init__.py", "bindings.py", "emission.py"))
+# These shared inputs are opened by the default target graph even when no
+# optional device is selected. Keep its exported components and actual resource
+# observers complete as well; a rehashed map alone cannot prove their presence.
+REQUIRED_FILES += (
+    "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+    "cmake/package/verify_consumers.py", "components/CMakeLists.txt",
+    "os/wait.c", "os/baremetal/notify.c", "os/native/native.c",
+    "os/include/nexus/os/wait.h", "os/include/nexus/os/baremetal.h",
+    "os/native/include/nexus/os/native.h",
+    "tools/measurement/resources.py", "tools/measurement/retention.py",
+    "tools/measurement/elf.py", "tools/evidence/common.py",
+    "tools/evidence/identity.py")
+REQUIRED_FILES += tuple("components/bus_owner/src/" + name + ".c" for name in (
+    "bus_owner", "spi_owner", "spi_async_owner", "uart_owner"))
+REQUIRED_FILES += tuple("components/bus_owner/include/nexus/components/" + name
+                        + ".h" for name in (
+    "bus_owner", "spi_owner", "spi_async_owner", "uart_owner"))
+REQUIRED_FILES += (
+    "components/bmp280/src/bmp280.c", "components/bmp280/src/spi_transport.c",
+    "components/bmp280/include/nexus/components/bmp280.h",
+    "components/bmp280/include/nexus/components/bmp280_spi.h",
+    "components/log/src/log.c", "components/log/include/nexus/components/log.h",
+    "components/modbus/src/modbus_rtu.c",
+    "components/modbus/include/nexus/components/modbus_rtu.h")
+REQUIRED_FILES += tuple("components/storage/src/" + name + ".c" for name in (
+    "storage", "flash_storage", "file_flash"))
+REQUIRED_FILES += tuple("components/storage/include/nexus/components/" + name
+                        + ".h" for name in (
+    "storage", "flash_storage", "file_flash"))
+REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
 

@@ -1,0 +1,55 @@
+test_actual_root_official_checkout_is_hash_verified (tools.testing.test_threadx_lock.ThreadXLockTests.test_actual_root_official_checkout_is_hash_verified) ... ok
+test_changed_source_and_header_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_changed_source_and_header_reject) ... ok
+test_cli_dangling_sdk_manifest_rejects_despite_valid_git (tools.testing.test_threadx_lock.ThreadXLockTests.test_cli_dangling_sdk_manifest_rejects_despite_valid_git) ... FAIL
+test_cli_success_and_failed_hash_have_actual_exit_codes (tools.testing.test_threadx_lock.ThreadXLockTests.test_cli_success_and_failed_hash_have_actual_exit_codes) ... ok
+test_closed_graph_omission_rejects_even_if_file_map_rehashed (tools.testing.test_threadx_lock.ThreadXLockTests.test_closed_graph_omission_rejects_even_if_file_map_rehashed) ... ok
+test_duplicate_graph_path_rejects (tools.testing.test_threadx_lock.ThreadXLockTests.test_duplicate_graph_path_rejects) ... ok
+test_duplicate_json_key_rejects (tools.testing.test_threadx_lock.ThreadXLockTests.test_duplicate_json_key_rejects) ... ok
+test_extra_identity_without_graph_path_rejects (tools.testing.test_threadx_lock.ThreadXLockTests.test_extra_identity_without_graph_path_rejects) ... ok
+test_extra_source_in_owned_directory_rejects (tools.testing.test_threadx_lock.ThreadXLockTests.test_extra_source_in_owned_directory_rejects) ... ok
+test_invalid_scalar_and_identity_types_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_invalid_scalar_and_identity_types_reject) ... ok
+test_license_content_and_declared_expression_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_license_content_and_declared_expression_reject) ... ok
+test_missing_source_or_wrong_size_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_missing_source_or_wrong_size_reject) ... ok
+test_path_traversal_absolute_backslash_and_wrong_family_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_path_traversal_absolute_backslash_and_wrong_family_reject) ... ok
+test_real_git_source_and_both_ports_verify_without_changes (tools.testing.test_threadx_lock.ThreadXLockTests.test_real_git_source_and_both_ports_verify_without_changes) ... ok
+test_symlink_source_or_directory_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_symlink_source_or_directory_reject) ... ok
+test_unknown_or_missing_field_rejects (tools.testing.test_threadx_lock.ThreadXLockTests.test_unknown_or_missing_field_rejects) ... ok
+test_unknown_port_rejects (tools.testing.test_threadx_lock.ThreadXLockTests.test_unknown_port_rejects) ... ok
+test_wrong_head_tag_or_origin_reject (tools.testing.test_threadx_lock.ThreadXLockTests.test_wrong_head_tag_or_origin_reject) ... ok
+test_actual_official_root_checkout_is_hash_verified (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_actual_official_root_checkout_is_hash_verified) ... ok
+test_changed_or_missing_each_selected_file_and_notice_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_changed_or_missing_each_selected_file_and_notice_reject) ... ok
+test_cli_checks_real_source_and_rejects_missing_git_without_manifest (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_cli_checks_real_source_and_rejects_missing_git_without_manifest) ... ok
+test_cli_dangling_sdk_manifest_rejects_despite_valid_git (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_cli_dangling_sdk_manifest_rejects_despite_valid_git) ... FAIL
+test_closed_file_map_omission_extra_and_unsafe_paths_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_closed_file_map_omission_extra_and_unsafe_paths_reject) ... ok
+test_duplicate_json_key_boolean_schema_and_nonfinite_identity_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_duplicate_json_key_boolean_schema_and_nonfinite_identity_reject) ... ok
+test_invalid_bytes_hash_and_unknown_identity_field_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_invalid_bytes_hash_and_unknown_identity_field_reject) ... ok
+test_packaged_commit_requires_exact_identity_without_git_fallback (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_packaged_commit_requires_exact_identity_without_git_fallback) ... ok
+test_real_git_source_verifies_exact_part_and_does_not_change_checkout (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_real_git_source_verifies_exact_part_and_does_not_change_checkout) ... ok
+test_source_alias_and_lock_symlink_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_source_alias_and_lock_symlink_reject) ... ok
+test_source_and_parent_directory_symlinks_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_source_and_parent_directory_symlinks_reject) ... ok
+test_unknown_or_missing_schema_fields_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_unknown_or_missing_schema_fields_reject) ... ok
+test_unknown_part_origin_commit_and_license_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_unknown_part_origin_commit_and_license_reject) ... ok
+test_wrong_actual_head_origin_and_untracked_checkout_reject (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_wrong_actual_head_origin_and_untracked_checkout_reject) ... ok
+
+======================================================================
+FAIL: test_cli_dangling_sdk_manifest_rejects_despite_valid_git (tools.testing.test_threadx_lock.ThreadXLockTests.test_cli_dangling_sdk_manifest_rejects_despite_valid_git)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_threadx_lock.py", line 242, in test_cli_dangling_sdk_manifest_rejects_despite_valid_git
+    self.assertNotEqual(rejected.returncode, 0,
+AssertionError: 0 == 0 : Dangling SDK manifest accepted as Git checkout: {"commit": "de5a5e735a97acde7540f72cafa522e0d6fe1a46", "kind": "nexus-threadx-source-verification", "license": "MIT", "port": "linux", "software_qualified": false, "source_kind": "git_checkout", "verified_files": 215}
+
+
+======================================================================
+FAIL: test_cli_dangling_sdk_manifest_rejects_despite_valid_git (tools.testing.test_stm32g4_lock.STM32G4LockTests.test_cli_dangling_sdk_manifest_rejects_despite_valid_git)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_stm32g4_lock.py", line 229, in test_cli_dangling_sdk_manifest_rejects_despite_valid_git
+    self.assertNotEqual(rejected.returncode, 0,
+AssertionError: 0 == 0 : Dangling SDK manifest accepted as Git checkout: {"commit": "09ebcf375db22d5f4cc0b8937cdd08c18261159b", "kind": "nexus-g4-source-verification", "license": "Apache-2.0", "selected_part": "STM32G474RET6", "software_qualified": false, "source_kind": "git_checkout", "verified_files": 5}
+
+
+----------------------------------------------------------------------
+Ran 32 tests in 2.449s
+
+FAILED (failures=2)

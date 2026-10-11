@@ -1,0 +1,116 @@
+test_style_hook_checks_one_complete_staged_index (scripts.ci.test_style_gate.StyleGateTests.test_style_hook_checks_one_complete_staged_index) ... FAIL
+test_staged_check_reports_bad_first_file_and_all_later_good_files (scripts.ci.test_style_gate.StyleGateTests.test_staged_check_reports_bad_first_file_and_all_later_good_files) ... FAIL
+test_staged_check_rejects_filename_subset_that_hides_bad_file (scripts.ci.test_style_gate.StyleGateTests.test_staged_check_rejects_filename_subset_that_hides_bad_file) ... FAIL
+test_staged_nul_selection_preserves_odd_names (scripts.ci.test_style_gate.StyleGateTests.test_staged_nul_selection_preserves_odd_names) ... FAIL
+test_staged_deletion_is_not_read_and_rename_checks_new_path (scripts.ci.test_style_gate.StyleGateTests.test_staged_deletion_is_not_read_and_rename_checks_new_path) ... FAIL
+test_staged_ownership_checks_cannot_hide_deleted_old_owned_name (scripts.ci.test_style_gate.StyleGateTests.test_staged_ownership_checks_cannot_hide_deleted_old_owned_name) ... FAIL
+test_ci_full_environment_keeps_full_owned_check_with_clean_index (scripts.ci.test_style_gate.StyleGateTests.test_ci_full_environment_keeps_full_owned_check_with_clean_index) ... FAIL
+test_real_hook_does_not_overwrite_bad_first_batch_with_later_pass (scripts.ci.test_style_gate.StyleGateTests.test_real_hook_does_not_overwrite_bad_first_batch_with_later_pass) ... FAIL
+
+======================================================================
+FAIL: test_style_hook_checks_one_complete_staged_index (scripts.ci.test_style_gate.StyleGateTests.test_style_hook_checks_one_complete_staged_index)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 122, in test_style_hook_checks_one_complete_staged_index
+    self.assertIn("--staged", matches[0]["entry"].split())
+AssertionError: '--staged' not found in ['python', 'scripts/ci/style_gate.py', '--report', 'build/quality/style-gate.json']
+
+======================================================================
+FAIL: test_staged_check_reports_bad_first_file_and_all_later_good_files (scripts.ci.test_style_gate.StyleGateTests.test_staged_check_reports_bad_first_file_and_all_later_good_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 131, in test_staged_check_reports_bad_first_file_and_all_later_good_files
+    result, report = self.staged_check()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 114, in staged_check
+    self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+AssertionError: False is not true : usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
+                     [files ...]
+style_gate.py: error: unrecognized arguments: --staged
+
+
+======================================================================
+FAIL: test_staged_check_rejects_filename_subset_that_hides_bad_file (scripts.ci.test_style_gate.StyleGateTests.test_staged_check_rejects_filename_subset_that_hides_bad_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 143, in test_staged_check_rejects_filename_subset_that_hides_bad_file
+    result, report = self.staged_check("z-good.txt")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 114, in staged_check
+    self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+AssertionError: False is not true : usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
+                     [files ...]
+style_gate.py: error: unrecognized arguments: --staged
+
+
+======================================================================
+FAIL: test_staged_nul_selection_preserves_odd_names (scripts.ci.test_style_gate.StyleGateTests.test_staged_nul_selection_preserves_odd_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 155, in test_staged_nul_selection_preserves_odd_names
+    result, report = self.staged_check()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 114, in staged_check
+    self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+AssertionError: False is not true : usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
+                     [files ...]
+style_gate.py: error: unrecognized arguments: --staged
+
+
+======================================================================
+FAIL: test_staged_deletion_is_not_read_and_rename_checks_new_path (scripts.ci.test_style_gate.StyleGateTests.test_staged_deletion_is_not_read_and_rename_checks_new_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 167, in test_staged_deletion_is_not_read_and_rename_checks_new_path
+    result, report = self.staged_check()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 114, in staged_check
+    self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+AssertionError: False is not true : usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
+                     [files ...]
+style_gate.py: error: unrecognized arguments: --staged
+
+
+======================================================================
+FAIL: test_staged_ownership_checks_cannot_hide_deleted_old_owned_name (scripts.ci.test_style_gate.StyleGateTests.test_staged_ownership_checks_cannot_hide_deleted_old_owned_name)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 176, in test_staged_ownership_checks_cannot_hide_deleted_old_owned_name
+    result, report = self.staged_check()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 114, in staged_check
+    self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+AssertionError: False is not true : usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
+                     [files ...]
+style_gate.py: error: unrecognized arguments: --staged
+
+
+======================================================================
+FAIL: test_ci_full_environment_keeps_full_owned_check_with_clean_index (scripts.ci.test_style_gate.StyleGateTests.test_ci_full_environment_keeps_full_owned_check_with_clean_index)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 182, in test_ci_full_environment_keeps_full_owned_check_with_clean_index
+    result, report = self.staged_check(full=True)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 114, in staged_check
+    self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+AssertionError: False is not true : usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
+                     [files ...]
+style_gate.py: error: unrecognized arguments: --staged
+
+
+======================================================================
+FAIL: test_real_hook_does_not_overwrite_bad_first_batch_with_later_pass (scripts.ci.test_style_gate.StyleGateTests.test_real_hook_does_not_overwrite_bad_first_batch_with_later_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 205, in test_real_hook_does_not_overwrite_bad_first_batch_with_later_pass
+    self.assertEqual(report["status"], "failed")
+AssertionError: 'passed' != 'failed'
+- passed
++ failed
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 1.011s
+
+FAILED (failures=8)

@@ -13,7 +13,9 @@ add_test(NAME contract_runtime_sdk
     COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tests/contracts/test_runtime_sdk.py")
 set_tests_properties(contract_runtime_sdk PROPERTIES
-    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" TIMEOUT 180)
+    # This suite builds multiple relocated C/C++ SDK consumers. Its aggregate
+    # budget is separate from each child's retained 180-second process timeout.
+    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" TIMEOUT 900)
 
 function(nexus_behavior_test name)
     cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES;INCLUDES;DEFINITIONS" ${ARGN})

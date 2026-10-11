@@ -1,0 +1,51 @@
+[1/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[2/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[3/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj
+[4/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj
+[5/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/fault.c.obj
+[6/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[7/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[8/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[9/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[10/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[11/49] Linking C static library nexus-sdk/lib/libnexus_core.a
+[12/49] Linking C static library nexus-sdk/lib/libnexus_arch.a
+[13/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[14/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[15/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[16/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[17/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[18/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[19/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[20/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[21/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[22/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[23/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[24/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[25/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[26/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[27/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[28/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[29/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj
+[30/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.obj
+[31/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj
+[32/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj
+[33/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj
+[34/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj
+[35/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj
+[36/49] Linking C static library nexus-sdk/lib/libnexus_io.a
+[37/49] Building C object nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[38/49] Building C object nexus-sdk/soc/stm32g474/CMakeFiles/nexus_soc_stm32g474.dir/drivers/gpio.c.obj
+[39/49] Building C object nexus-sdk/soc/stm32g474/CMakeFiles/nexus_soc_stm32g474.dir/drivers/uart.c.obj
+[40/49] Building C object nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj
+[41/49] Linking C static library nexus-sdk/lib/libnexus_os_wait.a
+[42/49] Building C object nexus-sdk/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj
+[43/49] Linking C static library nexus-sdk/lib/libnexus_soc_stm32g474.a
+[44/49] Building C object CMakeFiles/g474_assembly.dir/main.c.obj
+[45/49] Building ASM object CMakeFiles/g474_assembly_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+[46/49] Building C object CMakeFiles/g474_assembly_nexus_startup.dir/workspace/nexus/soc/stm32g474/system.c.obj
+[47/49] Linking C static library nexus-sdk/lib/libnexus_platform.a
+[48/49] Linking C static library nexus-sdk/lib/libnexus_os_baremetal.a
+[49/49] Linking C executable bin/g474_assembly.elf
+ELF budget: passed
+Retained 2 selected faces, 2 concrete tables and 10 method slots

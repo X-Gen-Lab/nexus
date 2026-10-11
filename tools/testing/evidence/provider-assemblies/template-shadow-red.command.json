@@ -1,0 +1,11 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.testing.test_provider_templates.ProviderTemplateTests.test_quoted_template_name_cannot_shadow_another_owned_header",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

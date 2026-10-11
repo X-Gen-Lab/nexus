@@ -1,0 +1,10 @@
+CMake Error at /workspace/nexus/cmake/platform/Runtime.cmake:54 (message):
+  CPU runtime rejected:
+
+  Runtime configuration rejected: CPU clock_hz must be a positive uint32 fact
+
+Call Stack (most recent call first):
+  CMakeLists.txt:11 (nexus_add_runtime)
+
+
+ninja: error: rebuilding 'build.ninja': subcommand failed

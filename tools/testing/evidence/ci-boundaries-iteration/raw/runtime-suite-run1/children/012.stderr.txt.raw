@@ -1,0 +1,6 @@
+CMake Error at /workspace/nexus/cmake/platform/Runtime.cmake:12 (message):
+  nexus_add_runtime requires exactly one ASSEMBLY
+Call Stack (most recent call first):
+  CMakeLists.txt:11 (nexus_add_runtime)
+
+

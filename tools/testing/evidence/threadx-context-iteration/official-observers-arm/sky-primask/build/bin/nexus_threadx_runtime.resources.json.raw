@@ -1,0 +1,124 @@
+{
+  "board": "stm32f407ve-sky-qingchun",
+  "budget": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/official-observers-arm/sky-primask/build/nexus/generated/resource-budget.json",
+    "sha256": "a62f7fad79c1b379afcc7f8cefa0fc059ec01d238ca1f9b82f20c2bfc084970f",
+    "size": 184
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/official-observers-arm/sky-primask/inputs/assembly.toml",
+        "sha256": "f2948781a0b1996571513a17426ca38550e35b1c9b20196f28b85c96c1c71414",
+        "size": 257
+      },
+      "label": "external/assembly.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/stm32f407ve_sky_qingchun/board.json",
+        "sha256": "1ac4d6d1d771803b8e7ff3fa5e79bb39e4e078b568845969213b30142b485f80",
+        "size": 1412
+      },
+      "label": "boards/stm32f407ve_sky_qingchun/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "2e222fbec8a95265651e62ef7b027f719c406a7b468e466048d5324e429bd1b2",
+        "size": 14670
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "5d5e651faac4186d9ea955cd40fdbefb7bce188046a0f7ca6afc3654c25a2139",
+        "size": 9374
+      },
+      "label": "soc/stm32f407/soc.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/official-observers-arm/sky-primask/build/bin/nexus_threadx_runtime.elf",
+    "sha256": "aedc0a6846ab116f3137c147cee82cca950270a88ed38681e389e708ae1833fa",
+    "size": 34388
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 524288,
+      "footprint_bytes": 10544,
+      "loaded_bytes": 10544,
+      "ranges": [
+        [
+          134217728,
+          134228272
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870956
+          ],
+          [
+            536870960,
+            536875192
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 6324
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536875192,
+        "start": 536875192
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407VET6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/official-observers-arm/sky-primask/build/nexus/generated/resolved.json",
+    "sha256": "c92fa16e8524f8dadaf2c387143059ee9126b9fb4d5ecfaa0f96b2bb07992ed4",
+    "size": 22536
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

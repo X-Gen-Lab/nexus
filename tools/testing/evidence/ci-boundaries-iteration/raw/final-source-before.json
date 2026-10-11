@@ -1,0 +1,46 @@
+{
+  "scope": "development_narrow_changed_sources_and_production_memory_runtime",
+  "git_commit": "f4468c9ff668f2e2b33133f8eae86632e6f592bd",
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/tests/google/gd32_memory_boot_test.cpp",
+      "bytes": 7027,
+      "sha256": "6ad18cbd40ef6361510654c4f870943a8f29bfcd4c90e3dd91a8609a913586de"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/gd32_memory.cmake",
+      "bytes": 2324,
+      "sha256": "d51d75b8cc761c6d41c795105d8e90bd8166cc1572dd6f6db4791259e4274529"
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/CMakeLists.txt",
+      "bytes": 5253,
+      "sha256": "2359282b663775b79f67fcf36bd10dbd23f3ce7ba527b4f4d488b75f0e1930e2"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/os_backend_probe.py",
+      "bytes": 24883,
+      "sha256": "ee58e45062fcd5e498bfeabe8974fd662f5954feabe77bb107627de073322b4b"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/system.c",
+      "bytes": 8430,
+      "sha256": "711d6e4f5a4a673360523697b875e1c47d91a44a4ac974be056ecafe6cdb8f76"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/memory_init.c",
+      "bytes": 3565,
+      "sha256": "0f3502565b87febe4ed3e833fdf5ac9eef6f91f09ec52a356a1ba4b2d6bcbe87"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/memory_init.h",
+      "bytes": 1991,
+      "sha256": "31a96ed0a74cd5f41f1906aa87aaee449a6affadc3505f081b4cc52f9531bd0b"
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/test_runtime_sdk.py",
+      "bytes": 24143,
+      "sha256": "4b57dd82e19a19b82211de1ab143975d426a2e34dbf041e4c4e67d806be28c2b"
+    }
+  ]
+}

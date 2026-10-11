@@ -120,13 +120,25 @@ def _device(name: str):
                 os.close(descriptor)
 
 
+def _new_stream(path: Path):
+    """Transfer an exclusive raw descriptor only after fdopen succeeds."""
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL |
+                         os.O_NOFOLLOW, 0o600)
+    try:
+        return os.fdopen(descriptor, "wb")
+    except BaseException:
+        try:
+            os.close(descriptor)
+        except BaseException:
+            pass  # Retain the conversion error; do not retry a recycled fd.
+        raise
+
+
 def _json_new(path: Path, value: dict) -> None:
     """O_EXCL keeps a late competing output from replacing retained bytes."""
     data = (json.dumps(value, indent=2, sort_keys=True, allow_nan=False) +
             "\n").encode()
-    descriptor = os.open(_path(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL |
-                         os.O_NOFOLLOW, 0o600)
-    with os.fdopen(descriptor, "wb") as stream:
+    with _new_stream(_path(path)) as stream:
         stream.write(data)
         stream.flush()
         os.fsync(stream.fileno())
@@ -148,11 +160,12 @@ class _Trace:
         self.events = []
         try:
             for name, path in self.paths.items():
-                descriptor = os.open(path, os.O_WRONLY | os.O_CREAT |
-                                     os.O_EXCL | os.O_NOFOLLOW, 0o600)
-                self.streams[name] = os.fdopen(descriptor, "wb")
+                self.streams[name] = _new_stream(path)
         except BaseException:
-            self.close()
+            try:
+                self.close()
+            except BaseException:
+                pass  # All streams were attempted; preserve creation failure.
             raise
 
     def retain(self, name: str, data: bytes, started: int, finished: int):
@@ -170,13 +183,23 @@ class _Trace:
                 "serial raw stream exceeded capture bound")
 
     def close(self):
+        failure = None
         for stream in self.streams.values():
             if not stream.closed:
                 try:
                     stream.flush()
                     os.fsync(stream.fileno())
+                except BaseException as error:
+                    if failure is None:
+                        failure = error
                 finally:
-                    stream.close()
+                    try:
+                        stream.close()
+                    except BaseException as error:
+                        if failure is None:
+                            failure = error
+        if failure is not None:
+            raise failure
 
 
 def _ready(descriptor: int, deadline: float, *, write: bool = False) -> bool:

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "gd32-physical-entry-software-contract",
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470",
+  "source_revision": "software-only-platform-entry-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000
+  },
+  "bindings": [
+    {
+      "id": "output",
+      "controller": "GPIOD",
+      "route": "gpiod7",
+      "initial": 0,
+      "mask": 128
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only existing silicon route; no new PCB, connector, voltage or physical qualification claim."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "scope": "Existing reviewed GPIO silicon route only; modeled outer lifecycle entry boundary."
+    }
+  ]
+}

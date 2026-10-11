@@ -511,6 +511,150 @@
         }
       ],
       "source": "RMII AF11 silicon pad mux only. PHY, reset, external 50MHz clock and Board electric route remain external, unqualified. STM32F407 DS8626 AF11 / RM0090 Rev21"
+    },
+    {
+      "id": "capture-pb6",
+      "controller": "TIM4",
+      "kind": "timer_capture",
+      "variants": [
+        "STM32F407ZGT6",
+        "STM32F407VET6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "STM32F407 DS8626 alternate-function table; RM0090 TIM1 complementary CH1/CH1N/BKIN and TIM4_CH1 silicon route only."
+    },
+    {
+      "id": "complementary-pa8-pb12-pb13",
+      "controller": "TIM1",
+      "kind": "advanced_pwm",
+      "variants": [
+        "STM32F407ZGT6",
+        "STM32F407VET6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "output",
+          "af": 1
+        },
+        {
+          "pin": "PB13",
+          "function": "complement",
+          "af": 1
+        },
+        {
+          "pin": "PB12",
+          "function": "break",
+          "af": 1
+        }
+      ],
+      "source": "STM32F407 DS8626 alternate-function table; RM0090 TIM1 complementary CH1/CH1N/BKIN and TIM4_CH1 silicon route only."
+    },
+    {
+      "id": "usart2-pa2-pa3",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA3",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "dma-tx"
+      ],
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "dma": [
+        "DMA1:stream6:channel4"
+      ]
+    },
+    {
+      "id": "spi2-pb13-pb14-pb15",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "SPI2",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PB13",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PB14",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PB15",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "dma"
+      ],
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "dma": [
+        "DMA1:stream4:channel0",
+        "DMA1:stream3:channel0"
+      ]
+    },
+    {
+      "id": "i2c2-pb10-pb11",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "controller": "I2C2",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB10",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB11",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "irq-messages",
+        "dma-messages"
+      ],
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA1:stream2:channel7",
+          "DMA1:stream7:channel7"
+        ]
+      }
     }
   ]
 }

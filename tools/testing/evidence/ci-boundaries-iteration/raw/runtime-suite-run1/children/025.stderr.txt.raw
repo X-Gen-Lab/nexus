@@ -1,0 +1,6 @@
+CMake Error at /workspace/nexus/cmake/platform/Runtime.cmake:17 (message):
+  nexus_add_runtime requires ASSEMBLY and known arguments
+Call Stack (most recent call first):
+  CMakeLists.txt:11 (nexus_add_runtime)
+
+

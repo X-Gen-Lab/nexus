@@ -1,0 +1,28 @@
+{
+  "checked_files": 2,
+  "failing_diagnostics": 0,
+  "files": {
+    "tests/google/multi_controller_factory_model.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "f7daf323acf2ef9eb9829972ca6215bf47d1c64727426a69c96adc7fe7e6fbcd"
+    },
+    "tests/google/multi_controller_factory_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "ff48936b85b5f39135c34ce0d68cf3cf2ec618b515290f7bcafbd5014fa815fa"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

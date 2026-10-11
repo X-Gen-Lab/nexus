@@ -1,0 +1,21 @@
+{
+  "checked_files": 1,
+  "failing_diagnostics": 0,
+  "files": {
+    "tests/google/threadx_linux_port_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "7d868e7b74e4993e9059c98bee380efde17a42fb89970b285be1c8f7234df9a8"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

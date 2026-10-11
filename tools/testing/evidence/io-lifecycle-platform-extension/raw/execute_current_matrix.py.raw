@@ -1,0 +1,51 @@
+"""One-shot development use of the existing maintained execution helpers."""
+from pathlib import Path
+import json
+import subprocess
+import sys
+
+ROOT = Path('/workspace/nexus')
+sys.path.insert(0, str(ROOT))
+from scripts.ci.tdd_gate import environment, execute, validate_google_report
+from scripts.validation.junit import prepare_report
+from scripts.ci.io_lifecycle_matrix import capture, audit, discovery_names
+
+BUILD = ROOT / 'build/native-debug'
+OUT = Path('/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1')
+OUT.mkdir(parents=True, exist_ok=False)
+CATALOGUE = ROOT / 'tools/testing/io_lifecycle_matrix.json'
+SNAPSHOT = OUT / 'preexecution.json'
+source_state = {'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+                'status': subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True),
+                'scope': 'Dirty development checkout; explicit 37-target subset, not candidate qualification.'}
+(OUT / 'checkout-before.json').write_text(json.dumps(source_state, indent=2) + '\n')
+capture(ROOT, BUILD, CATALOGUE, SNAPSHOT)
+targets = sorted({row['target'] for row in json.loads(CATALOGUE.read_text())['properties']})
+results = []
+env = environment()
+for index, target in enumerate(targets):
+    binary = BUILD / 'bin' / target
+    listing = execute([str(binary), '--gtest_filter=*', '--gtest_list_tests'], env,
+                      OUT / f'discovery-{index}.txt')
+    count = len(discovery_names(listing))
+    xml = OUT / f'google-{index}.xml'
+    started = prepare_report(xml)
+    execute([str(binary), '--gtest_filter=*', '--gtest_repeat=1',
+             '--gtest_also_run_disabled_tests', '--gtest_output=xml:' + str(xml)],
+            env, OUT / f'execution-{index}.txt')
+    result = validate_google_report(xml, not_before_ns=started, expected_cases=count)
+    results.append({'binary': binary.name, **result})
+    print(target, result['passed'], flush=True)
+summary = {'schema': 1, 'kind': 'development-contract-execution',
+           'preset': 'native-debug explicit development subset',
+           'passed': sum(s['passed'] for s in results), 'suites': results,
+           'scope': 'Development full-binary execution with existing tdd_gate helpers; no complete repository, clean candidate, or hardware qualification.'}
+(OUT / 'execution.json').write_text(json.dumps(summary, indent=2) + '\n')
+report = audit(ROOT, BUILD, CATALOGUE, SNAPSHOT, OUT, allow_subset=True)
+(OUT / 'matrix-report.json').write_text(json.dumps(report, indent=2) + '\n')
+(OUT / 'checkout-after.json').write_text(json.dumps({
+    'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+    'status': subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True),
+    'bound_inputs_unchanged': True}, indent=2) + '\n')
+print('PASS', len(report['properties']), 'bounded properties', summary['passed'],
+      'actual Google cases', len(results), 'targets', flush=True)

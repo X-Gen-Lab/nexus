@@ -2,6 +2,9 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "timer_capture": {"binding", "mode", "tick_hz", "edge", "filter", "exclusive", "irq"},
+    "advanced_pwm": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks",
+                     "break_active_high", "idle_high", "idle_complement_high", "exclusive", "irq"},
     "eth": {"binding", "mode", "tx_count", "rx_count", "rx_storage_bytes",
             "address", "init_timeout_us", "drain_timeout_us", "irq"},
     "usb_device": {"binding", "mode", "event_capacity", "rx_fifo_words",
@@ -78,7 +81,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["calls_os"] = irq["calls_os"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth", "timer_capture", "advanced_pwm"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -146,12 +149,14 @@ def editor_schema():
                    "bitrate", "drain_timeout_us", "poll_limit", "prescaler",
                    "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo",
                    "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words",
-                   "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us"}
+                   "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
+                   "filter", "deadtime_ticks"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
-        for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing"}:
+        for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
+                             "break_active_high", "idle_high", "idle_complement_high", "exclusive"}:
             properties[name] = {"type": "boolean"}
         if "timing" in fields:
             properties["timing"] = record(

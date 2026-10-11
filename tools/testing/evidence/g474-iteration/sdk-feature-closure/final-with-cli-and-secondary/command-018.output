@@ -1,0 +1,25 @@
+-- The C compiler identification is GNU 14.2.0
+-- The CXX compiler identification is GNU 14.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring incomplete, errors occurred!
+CMake Error at CMakeLists.txt:4 (find_package):
+  Could not find a configuration file for package "Nexus" that exactly
+  matches requested version "99.0.0".
+
+  The following configuration files were considered but not accepted:
+
+    /tmp/nexus installed source sdk 8k132d2a/relocated prefix with spaces/lib/cmake/Nexus/NexusConfig.cmake, version: 1.0.0
+
+
+

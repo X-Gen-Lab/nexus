@@ -1,0 +1,7 @@
+{
+  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
+  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
+  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json",
+  "tests/contracts/multi_controller_assembly/gd32-board/board.json": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-board/board.json",
+  "tests/contracts/multi_controller_assembly/gd32.toml": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32.toml"
+}

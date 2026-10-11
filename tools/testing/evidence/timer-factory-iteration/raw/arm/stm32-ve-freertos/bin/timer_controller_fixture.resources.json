@@ -1,0 +1,120 @@
+{
+  "board": "stm32-ve-timer-software-pad-contract",
+  "budget": {
+    "path": "/workspace/nexus-industrial-design/timer-arm/stm32-ve-freertos/nexus-sdk/generated/resource-budget.json",
+    "sha256": "308d991923bde7816ede5655bb7a8b74ed042aa3dd719506a5a3e23bf11fcd66",
+    "size": 184
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "26f4fca8a597839f5128c62c8658abeb0968edcca25983491bd2f445b0f61a87",
+        "size": 12615
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "729091a3d0fad9242e1066ef11560e73f59555fd294d0c05c75cf43e6ccf5a57",
+        "size": 8550
+      },
+      "label": "soc/stm32f407/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/timer_assembly/stm32-ve-board/board.json",
+        "sha256": "29a6ec2302b47a42a383d692622010a34be567a2b3e0b8cd780f3466db443958",
+        "size": 1283
+      },
+      "label": "tests/contracts/timer_assembly/stm32-ve-board/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/timer_assembly/stm32-ve-freertos.toml",
+        "sha256": "3ddef158fb9e582a9290493800f329f8356fc919bf958e61e8f15ee51c114dbe",
+        "size": 655
+      },
+      "label": "tests/contracts/timer_assembly/stm32-ve-freertos.toml"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-industrial-design/timer-arm/stm32-ve-freertos/bin/timer_controller_fixture.elf",
+    "sha256": "25cbab031d6c5c5df1ce2011f813002d858578bd1cd0b8513ccf0d812b4bf286",
+    "size": 23128
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 524288,
+      "footprint_bytes": 7804,
+      "loaded_bytes": 7804,
+      "ranges": [
+        [
+          134217728,
+          134225532
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536871160
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 2296
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871160,
+        "start": 536871160
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407VET6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-industrial-design/timer-arm/stm32-ve-freertos/nexus-sdk/generated/resolved.json",
+    "sha256": "4e95d06dc0eaf1f5c18864f3add423738034b75a75f103c3af6aafd16775e9e0",
+    "size": 23830
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/timer-factory-tests/replay/build/replay_inactive-proof_stm32",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/replay/stm32-inactive-proof-abi-red.xml"
+    ],
+    "exit_code": 1,
+    "test_filter_environment": "removed",
+    "scope": "actual previously generated C snapshot replay with maintained default enum ABI"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/timer-factory-tests/replay/build/replay_inactive-proof_gd32",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/replay/gd32-inactive-proof-abi-red.xml"
+    ],
+    "exit_code": 1,
+    "test_filter_environment": "removed",
+    "scope": "actual previously generated C snapshot replay with maintained default enum ABI"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/timer-factory-tests/replay/build/replay_privilege_stm32",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/replay/stm32-privilege-abi-red.xml"
+    ],
+    "exit_code": 1,
+    "test_filter_environment": "removed",
+    "scope": "actual previously generated C snapshot replay with maintained default enum ABI"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/timer-factory-tests/replay/build/replay_privilege_gd32",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/replay/gd32-privilege-abi-red.xml"
+    ],
+    "exit_code": 1,
+    "test_filter_environment": "removed",
+    "scope": "actual previously generated C snapshot replay with maintained default enum ABI"
+  }
+]

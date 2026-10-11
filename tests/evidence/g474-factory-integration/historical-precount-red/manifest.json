@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "g474-factory-development-execution",
+  "scope": "Actual production factory/system/provider host execution. Scoped dirty development input capture, not complete clean software candidate or physical qualification.",
+  "physical_status": "not_executed",
+  "status": "failed",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-g474-iteration-evidence/host-build",
+        "--target",
+        "nexus_g474_factory_test",
+        "--parallel",
+        "1"
+      ],
+      "return_code": 0,
+      "started_ns": 1791748235460899080,
+      "completed_ns": 1791748239242653184,
+      "output": {
+        "path": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/build.output",
+        "sha256": "5b02317ddbc1120cc276b80ecb28d63078bfbdd54aa6ee18e11e6c1305c2d86a",
+        "bytes": 964
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791748239248239103,
+      "completed_ns": 1791748239251854979,
+      "output": {
+        "path": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/discovery.output",
+        "sha256": "bdfaf6f55155b2c60d771ee351a749e720663117988ccf0728bce5f5ecc1b091",
+        "bytes": 688
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-g474-iteration-evidence/historical-precount-red/google.xml"
+      ],
+      "return_code": 1,
+      "started_ns": 1791748239252224367,
+      "completed_ns": 1791748239267849684,
+      "output": {
+        "path": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/execution.output",
+        "sha256": "6c6eec2ca033c0b902372f6fab42206628df608a6f63957afce8a589c6151dc9",
+        "bytes": 4076
+      }
+    }
+  ],
+  "driver": {
+    "path": "/workspace/nexus-g474-iteration-evidence/run_phase.py",
+    "sha256": "5d605038c3b47814128f0add5ce0ad9aacb15891dd2059350850b2abb7c996a1",
+    "bytes": 5678
+  },
+  "source_before": {
+    "path": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/source-before.json",
+    "sha256": "2f3977500683b9de50198b74e16be482eb8ce3b8499d2e9dcf24eefe73f1a68c",
+    "bytes": 43782
+  },
+  "executable": {
+    "path": "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+    "sha256": "2f8a698219d1771caf9d761146d38807e93358eeba42ce6007bd2bbfc23e5a7d",
+    "bytes": 4912560
+  },
+  "discovered_cases": [
+    "G474Factory.LookupIsPureStaticIdentityBeforeAnyHardwareAccess",
+    "G474Factory.ActualStartupBinds170MHzClockTimebasePinsAndIrq",
+    "G474Factory.SelectedGpioRejectsOutsideMaskWithoutRegisterAccess",
+    "G474Factory.GeneratedVectorBorrowsTransmitUntilActualWireComplete",
+    "G474Factory.GeneratedVectorReceivesIntoSelectedCallerBudgetedRing",
+    "G474Factory.InvalidObservedSiliconRejectsBeforeClockMutation",
+    "G474Factory.FailedClockStartupDoesNotExposeAnyPeripheral",
+    "G474Factory.FailedUartAcknowledgementRollsBackPinsAndOwnedGates",
+    "G474Factory.FailedPeripheralRollbackRetainsClockPinsAndResponsibility",
+    "G474Factory.StopFailurePreservesIdentityUntilActualIrqWithdrawal",
+    "G474Factory.UnrelatedPinAndClockFieldsSurviveStartAndStop",
+    "G474Factory.StopRestoresSelectedFieldsAndRestartKeepsStaticIdentity"
+  ],
+  "xml": {
+    "path": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/google.xml",
+    "sha256": "3d267edff3d1c8adbb857716b1a07d70eeb3cf825720bf26e266eb3bc6a7c8b6",
+    "bytes": 6844
+  },
+  "google": {
+    "tests": 12,
+    "failures": 4,
+    "disabled": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "error": "Actual Google behavior failed",
+  "source_after": {
+    "path": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/source-after.json",
+    "sha256": "2f3977500683b9de50198b74e16be482eb8ce3b8499d2e9dcf24eefe73f1a68c",
+    "bytes": 43782
+  },
+  "source_unchanged": true
+}

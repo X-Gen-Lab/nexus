@@ -1,0 +1,12 @@
+Running main() from gmock_main.cc
+NativeFactory.
+  NominalGettersPreserveIdentityWithoutStartingDevices
+  ColdI2CChildrenKeepPureControllerAndAddressIdentity
+  SelectedCapabilitiesRemainReadonlyAndModelScoped
+  LookupBeforeStartupHasNoEffectsAndChecksEveryClass
+  GeneratedGPIOAndUARTHaveIndependentStateAndStorage
+  GeneratedBusControllersAndEndpointMemoriesAreDistinct
+  StopRevokesOperationsAndRestartRetainsStaticIdentity
+  StopRetainsQuarantinedBorrowUntilProviderDrain
+  AllNineClassesStopAndRestartWithRetainedWatchdogEffect
+  PlatformStopKeepsADCStreamLoanUntilConsumerRelease

@@ -1,0 +1,19 @@
+[  6%] Building C object CMakeFiles/timer_arch.dir/workspace/nexus/arch/native/nx_arch_native.c.o
+[ 13%] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/timer_capture.c.o
+[ 20%] Linking C static library libtimer_arch.a
+[ 20%] Built target timer_arch
+[ 26%] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/advanced_pwm.c.o
+[ 33%] Linking C static library libtimer_api.a
+[ 33%] Built target timer_api
+[ 40%] Building CXX object test-import/CMakeFiles/nexus_gd32_timer_factory_test.dir/workspace/nexus/tests/google/timer_factory_test.cpp.o
+[ 46%] Building CXX object test-import/CMakeFiles/nexus_stm32_timer_factory_test.dir/workspace/nexus/tests/google/timer_factory_test.cpp.o
+[ 53%] Building C object test-import/CMakeFiles/nexus_gd32_timer_factory_test.dir/timer-factory-gd32/bindings.c.o
+[ 60%] Building C object test-import/CMakeFiles/nexus_stm32_timer_factory_test.dir/timer-factory-stm32/bindings.c.o
+[ 66%] Building C object test-import/CMakeFiles/nexus_gd32_timer_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/timer_capture.c.o
+[ 73%] Building C object test-import/CMakeFiles/nexus_stm32_timer_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/timer_capture.c.o
+[ 80%] Building C object test-import/CMakeFiles/nexus_gd32_timer_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c.o
+[ 86%] Building C object test-import/CMakeFiles/nexus_stm32_timer_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/advanced_pwm.c.o
+[ 93%] Linking CXX executable nexus_gd32_timer_factory_test
+[100%] Linking CXX executable nexus_stm32_timer_factory_test
+[100%] Built target nexus_gd32_timer_factory_test
+[100%] Built target nexus_stm32_timer_factory_test

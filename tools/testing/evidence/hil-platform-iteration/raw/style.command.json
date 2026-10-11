@@ -1,0 +1,28 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "scripts/ci/style_gate.py",
+    "--report",
+    "/workspace/nexus-io-implementation-evidence/hil-platform/style-report.json",
+    "tests/contracts/test_hil_admission.py",
+    "tests/contracts/test_hil_prepare.py",
+    "tools/hil/README.md",
+    "tools/hil/acquire.py",
+    "tools/hil/admit.py",
+    "tools/hil/measure.py",
+    "tools/hil/os_acceptance.py",
+    "tools/hil/templates/workload.json",
+    "tools/hil/workloads.py",
+    "tools/schemas/hil-fixture.schema.json",
+    "tools/hil/fixtures/stm32g474re_hse24_reference.json",
+    "tools/testing/test_hil_acquire.py",
+    "tools/testing/test_hil_measurements.py",
+    "tools/testing/test_hil_workloads.py",
+    "tools/testing/test_os_acceptance.py",
+    "tools/testing/test_hil_platform_extensions.py",
+    "tools/testing/test_hil_protocol_admission.py"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 1
+}

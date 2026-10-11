@@ -185,10 +185,19 @@ void nx_native_i2c_fault(nx_result_t result, bool stuck) {
  */
 const nx_i2c_ops_t nx_native_i2c_ops = {.recover = native_i2c_recover};
 
+/** \brief Match immutable child/controller identity before any bus startup. */
+static bool native_i2c_on_port(const void* context, const nx_i2c_port_t* port) {
+    const nx_native_i2c_endpoint_state_t* endpoint = context;
+    return endpoint != NULL && port != NULL &&
+           port->ops == &nx_native_i2c_ops && port->context != NULL &&
+           endpoint->port == port->context && endpoint->address >= 8U &&
+           endpoint->address <= 119U;
+}
+
 /** \brief Addressed devices share code without sharing their memory or cursor.
  */
 const nx_i2c_endpoint_ops_t nx_native_i2c_endpoint_ops = {
-    .transaction = native_i2c_transaction};
+    .transaction = native_i2c_transaction, .on_port = native_i2c_on_port};
 
 /** \brief Select exactly one Native face without affecting default fixtures. */
 nx_result_t nx_native_i2c_model_configure(const nx_i2c_endpoint_t* binding,

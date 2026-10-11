@@ -1,0 +1,41 @@
+....EE...
+======================================================================
+ERROR: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='edge=["both"]')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_non_exact_divider_filter_edge_and_period_reject
+    gate.resolve_ir(self.assembly(change=lambda text: text.replace(old, new)))
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 550, in resolve
+    validate_selection(selection, route, provider, ram["size"])
+  File "/workspace/nexus/tools/configure/providers/common.py", line 208, in validate_selection
+    timer_advanced.validate_selection(selection, route, provider)
+  File "/workspace/nexus/tools/configure/timer_advanced.py", line 65, in validate_selection
+    if selection["edge"] not in {"rising", "falling", "both"}:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'
+
+======================================================================
+ERROR: test_non_exact_divider_filter_edge_and_period_reject (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_non_exact_divider_filter_edge_and_period_reject) (new='edge={kind="both"}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 84, in test_non_exact_divider_filter_edge_and_period_reject
+    gate.resolve_ir(self.assembly(change=lambda text: text.replace(old, new)))
+  File "/workspace/nexus/tools/configure/configure.py", line 842, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 550, in resolve
+    validate_selection(selection, route, provider, ram["size"])
+  File "/workspace/nexus/tools/configure/providers/common.py", line 208, in validate_selection
+    timer_advanced.validate_selection(selection, route, provider)
+  File "/workspace/nexus/tools/configure/timer_advanced.py", line 65, in validate_selection
+    if selection["edge"] not in {"rising", "falling", "both"}:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'dict'
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.391s
+
+FAILED (errors=2)

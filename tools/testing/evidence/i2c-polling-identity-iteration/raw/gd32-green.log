@@ -1,0 +1,44 @@
+Running main() from gmock_main.cc
+[==========] Running 16 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 13 tests from I2CRegisters
+[ RUN      ] I2CRegisters.ReceivesThreeFourAndMaximumLengthWithExactPrefix
+[       OK ] I2CRegisters.ReceivesThreeFourAndMaximumLengthWithExactPrefix (0 ms)
+[ RUN      ] I2CRegisters.MixedReadsUseRepeatedStartWithoutIntermediateStop
+[       OK ] I2CRegisters.MixedReadsUseRepeatedStartWithoutIntermediateStop (0 ms)
+[ RUN      ] I2CRegisters.NackArbitrationAndBusErrorPreserveCompletedReadPrefix
+[       OK ] I2CRegisters.NackArbitrationAndBusErrorPreserveCompletedReadPrefix (0 ms)
+[ RUN      ] I2CRegisters.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges
+[       OK ] I2CRegisters.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges (0 ms)
+[ RUN      ] I2CRegisters.ContextAndOversizedMessagesRejectBeforeHardwareAccess
+[       OK ] I2CRegisters.ContextAndOversizedMessagesRejectBeforeHardwareAccess (0 ms)
+[ RUN      ] I2CRegisters.NeverDeadlineRejectsBeforeHardwareAccess
+[       OK ] I2CRegisters.NeverDeadlineRejectsBeforeHardwareAccess (0 ms)
+[ RUN      ] I2CRegisters.DeadlineDuringReadReturnsOnlyTheCompletedPrefix
+[       OK ] I2CRegisters.DeadlineDuringReadReturnsOnlyTheCompletedPrefix (0 ms)
+[ RUN      ] I2CRegisters.StuckStopCannotReportSuccessAndRequiresRecovery
+[       OK ] I2CRegisters.StuckStopCannotReportSuccessAndRequiresRecovery (0 ms)
+[ RUN      ] I2CRegisters.EightMessageBoundIsValidatedBeforeTheFirstStart
+[       OK ] I2CRegisters.EightMessageBoundIsValidatedBeforeTheFirstStart (0 ms)
+[ RUN      ] I2CRegisters.CompletedStopDoesNotIssueAnotherStopAfterMasterRelease
+[       OK ] I2CRegisters.CompletedStopDoesNotIssueAnotherStopAfterMasterRelease (0 ms)
+[ RUN      ] I2CRegisters.StopBitClearWithoutMasterReleaseCannotReportSuccess
+[       OK ] I2CRegisters.StopBitClearWithoutMasterReleaseCannotReportSuccess (0 ms)
+[ RUN      ] I2CRegisters.ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt
+[       OK ] I2CRegisters.ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt (0 ms)
+[ RUN      ] I2CRegisters.RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear
+[       OK ] I2CRegisters.RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear (0 ms)
+[----------] 13 tests from I2CRegisters (0 ms total)
+
+[----------] 3 tests from I2CPollingIdentity
+[ RUN      ] I2CPollingIdentity.ColdChildrenMatchExactControllerWithoutPortAccess
+[       OK ] I2CPollingIdentity.ColdChildrenMatchExactControllerWithoutPortAccess (0 ms)
+[ RUN      ] I2CPollingIdentity.ForeignControllerMethodsAndMissingBindingsReject
+[       OK ] I2CPollingIdentity.ForeignControllerMethodsAndMissingBindingsReject (0 ms)
+[ RUN      ] I2CPollingIdentity.FixedNonreservedAddressIsValidatedWithoutStartup
+[       OK ] I2CPollingIdentity.FixedNonreservedAddressIsValidatedWithoutStartup (0 ms)
+[----------] 3 tests from I2CPollingIdentity (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 16 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 16 tests.

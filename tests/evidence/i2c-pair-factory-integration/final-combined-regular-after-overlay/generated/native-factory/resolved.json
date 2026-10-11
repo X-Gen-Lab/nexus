@@ -1,0 +1,872 @@
+{
+  "backend": "native",
+  "board": "native-multi-contract",
+  "board_bindings": {
+    "adc0": {
+      "controller": "ADC0",
+      "id": "adc0",
+      "route": "adc0"
+    },
+    "exti0": {
+      "controller": "EXTI6",
+      "id": "exti0",
+      "route": "exti0"
+    },
+    "flash0": {
+      "controller": "FLASH0",
+      "id": "flash0",
+      "route": "flash0"
+    },
+    "i2c0": {
+      "controller": "I2C0",
+      "id": "i2c0",
+      "route": "i2c0"
+    },
+    "i2c1": {
+      "controller": "I2C1",
+      "id": "i2c1",
+      "route": "i2c1"
+    },
+    "led0": {
+      "controller": "GPIOA",
+      "id": "led0",
+      "initial": 0,
+      "mask": 1,
+      "route": "gpio-pa0"
+    },
+    "led1": {
+      "controller": "GPIOA",
+      "id": "led1",
+      "initial": 0,
+      "mask": 8,
+      "route": "gpio-pa3"
+    },
+    "pwm0": {
+      "controller": "PWM0",
+      "id": "pwm0",
+      "route": "pwm0"
+    },
+    "spi0": {
+      "controller": "SPI0",
+      "id": "spi0",
+      "route": "spi0"
+    },
+    "spi1": {
+      "controller": "SPI1",
+      "id": "spi1",
+      "route": "spi1"
+    },
+    "uart0": {
+      "controller": "UART0",
+      "id": "uart0",
+      "route": "uart0"
+    },
+    "uart1": {
+      "controller": "UART1",
+      "id": "uart1",
+      "route": "uart1"
+    },
+    "watchdog0": {
+      "controller": "IWDG",
+      "id": "watchdog0",
+      "route": "watchdog0"
+    }
+  },
+  "can_controllers": [],
+  "can_domain": null,
+  "claims": [
+    {
+      "key": "controller:ADC0",
+      "mode": "low-rate-scan",
+      "owner": "adc0",
+      "source": "adc0"
+    },
+    {
+      "key": "pin:PA8",
+      "mode": "low-rate-scan",
+      "owner": "adc0",
+      "source": "adc0"
+    },
+    {
+      "key": "pin:PA9",
+      "mode": "low-rate-scan",
+      "owner": "adc0",
+      "source": "adc0"
+    },
+    {
+      "key": "controller:EXTI6",
+      "mode": "edge-event",
+      "owner": "exti0",
+      "source": "exti0"
+    },
+    {
+      "key": "pin:PA6",
+      "mode": "edge-event",
+      "owner": "exti0",
+      "source": "exti0"
+    },
+    {
+      "key": "controller:FLASH0",
+      "mode": "poll-byte",
+      "owner": "flash0",
+      "source": "flash0"
+    },
+    {
+      "key": "pin:PA0",
+      "mode": "output",
+      "owner": "led_a",
+      "source": "gpio-pa0"
+    },
+    {
+      "key": "pin:PA3",
+      "mode": "output",
+      "owner": "led_b",
+      "source": "gpio-pa3"
+    },
+    {
+      "key": "controller:I2C0",
+      "mode": "poll-messages",
+      "owner": "bus_i2c_a",
+      "source": "i2c0"
+    },
+    {
+      "key": "controller:I2C1",
+      "mode": "poll-messages",
+      "owner": "bus_i2c_b",
+      "source": "i2c1"
+    },
+    {
+      "key": "controller:PWM0",
+      "mode": "fixed-pwm",
+      "owner": "pwm0",
+      "source": "pwm0"
+    },
+    {
+      "key": "pin:PA7",
+      "mode": "fixed-pwm",
+      "owner": "pwm0",
+      "source": "pwm0"
+    },
+    {
+      "key": "controller:SPI0",
+      "mode": "short-poll",
+      "owner": "bus_spi_a",
+      "source": "spi0"
+    },
+    {
+      "key": "controller:SPI1",
+      "mode": "short-poll",
+      "owner": "bus_spi_b",
+      "source": "spi1"
+    },
+    {
+      "key": "controller:UART0",
+      "mode": "irq-byte-event",
+      "owner": "link_a",
+      "source": "uart0"
+    },
+    {
+      "key": "pin:PA1",
+      "mode": "irq-byte-event",
+      "owner": "link_a",
+      "source": "uart0"
+    },
+    {
+      "key": "pin:PA2",
+      "mode": "irq-byte-event",
+      "owner": "link_a",
+      "source": "uart0"
+    },
+    {
+      "key": "controller:UART1",
+      "mode": "irq-byte-event",
+      "owner": "link_b",
+      "source": "uart1"
+    },
+    {
+      "key": "pin:PA4",
+      "mode": "irq-byte-event",
+      "owner": "link_b",
+      "source": "uart1"
+    },
+    {
+      "key": "pin:PA5",
+      "mode": "irq-byte-event",
+      "owner": "link_b",
+      "source": "uart1"
+    },
+    {
+      "key": "controller:IWDG",
+      "mode": "independent",
+      "owner": "watchdog0",
+      "source": "watchdog0"
+    }
+  ],
+  "clock": {
+    "core_hz": 1000000,
+    "hse_hz": 1000000
+  },
+  "clock_profile": "model",
+  "components": [],
+  "configuration_sha256": "f8fb9fef4890d9ab0655d8089e88cb416af476e3f02a36b62409f061acb9939a",
+  "controllers": [
+    {
+      "binding": "adc0",
+      "channels": [
+        8,
+        9
+      ],
+      "controller": "ADC0",
+      "id": "adc0",
+      "initial": 0,
+      "kind": "adc",
+      "mask": 0,
+      "mode": "low-rate-scan",
+      "pins": [
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA8"
+        },
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA9"
+        }
+      ],
+      "reference_mv": 3300,
+      "route": "adc0",
+      "sample_times": [
+        7,
+        7
+      ]
+    },
+    {
+      "binding": "exti0",
+      "controller": "EXTI6",
+      "edge": "both",
+      "event_capacity": 4,
+      "id": "exti0",
+      "initial": 0,
+      "irq_priority": 5,
+      "kind": "exti",
+      "mask": 0,
+      "mode": "edge-event",
+      "pins": [
+        {
+          "af": 0,
+          "function": "input",
+          "pin": "PA6"
+        }
+      ],
+      "route": "exti0"
+    },
+    {
+      "binding": "flash0",
+      "controller": "FLASH0",
+      "id": "flash0",
+      "initial": 0,
+      "kind": "flash",
+      "mask": 0,
+      "mode": "poll-byte",
+      "pins": [],
+      "route": "flash0"
+    },
+    {
+      "binding": "led0",
+      "controller": "GPIOA",
+      "id": "led_a",
+      "initial": 0,
+      "kind": "gpio",
+      "mask": 1,
+      "mode": "output",
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PA0"
+        }
+      ],
+      "route": "gpio-pa0"
+    },
+    {
+      "binding": "led1",
+      "controller": "GPIOA",
+      "id": "led_b",
+      "initial": 0,
+      "kind": "gpio",
+      "mask": 8,
+      "mode": "output",
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PA3"
+        }
+      ],
+      "route": "gpio-pa3"
+    },
+    {
+      "binding": "i2c0",
+      "controller": "I2C0",
+      "id": "bus_i2c_a",
+      "initial": 0,
+      "kind": "i2c",
+      "mask": 0,
+      "mode": "poll-messages",
+      "pins": [],
+      "route": "i2c0"
+    },
+    {
+      "binding": "i2c1",
+      "controller": "I2C1",
+      "id": "bus_i2c_b",
+      "initial": 0,
+      "kind": "i2c",
+      "mask": 0,
+      "mode": "poll-messages",
+      "pins": [],
+      "route": "i2c1"
+    },
+    {
+      "binding": "pwm0",
+      "controller": "PWM0",
+      "duty_ticks": 0,
+      "id": "pwm0",
+      "initial": 0,
+      "kind": "pwm",
+      "mask": 0,
+      "mode": "fixed-pwm",
+      "period_ticks": 1000,
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PA7"
+        }
+      ],
+      "route": "pwm0",
+      "tick_hz": 1000000
+    },
+    {
+      "binding": "spi0",
+      "controller": "SPI0",
+      "id": "bus_spi_a",
+      "initial": 0,
+      "kind": "spi",
+      "mask": 0,
+      "mode": "short-poll",
+      "pins": [],
+      "route": "spi0"
+    },
+    {
+      "binding": "spi1",
+      "controller": "SPI1",
+      "id": "bus_spi_b",
+      "initial": 0,
+      "kind": "spi",
+      "mask": 0,
+      "mode": "short-poll",
+      "pins": [],
+      "route": "spi1"
+    },
+    {
+      "baud": 115200,
+      "binding": "uart0",
+      "controller": "UART0",
+      "id": "link_a",
+      "initial": 0,
+      "irq_priority": 5,
+      "kind": "uart",
+      "mask": 0,
+      "mode": "irq-byte-event",
+      "pins": [
+        {
+          "af": 0,
+          "function": "tx",
+          "pin": "PA1"
+        },
+        {
+          "af": 0,
+          "function": "rx",
+          "pin": "PA2"
+        }
+      ],
+      "route": "uart0",
+      "rx_capacity": 4,
+      "rx_profile": "events"
+    },
+    {
+      "baud": 115200,
+      "binding": "uart1",
+      "controller": "UART1",
+      "id": "link_b",
+      "initial": 0,
+      "irq_priority": 5,
+      "kind": "uart",
+      "mask": 0,
+      "mode": "irq-byte-event",
+      "pins": [
+        {
+          "af": 0,
+          "function": "tx",
+          "pin": "PA4"
+        },
+        {
+          "af": 0,
+          "function": "rx",
+          "pin": "PA5"
+        }
+      ],
+      "route": "uart1",
+      "rx_capacity": 4,
+      "rx_profile": "events"
+    },
+    {
+      "binding": "watchdog0",
+      "controller": "IWDG",
+      "id": "watchdog0",
+      "initial": 0,
+      "kind": "watchdog",
+      "mask": 0,
+      "mode": "independent",
+      "pins": [],
+      "route": "watchdog0"
+    }
+  ],
+  "cpu": {
+    "arch": "native",
+    "dcache_line_bytes": 0,
+    "dsp": false,
+    "dwt_cyccnt": false,
+    "float_abi": "native",
+    "fpu": "none",
+    "icache_line_bytes": 0,
+    "mpu_version": 0,
+    "mve": "none",
+    "sau": false,
+    "security": "single"
+  },
+  "cpu_profile": {
+    "arch": "native",
+    "arch_macro": "",
+    "atomic_backend": "native",
+    "backend": "native",
+    "compile_options": [],
+    "cpu": {
+      "arch": "native",
+      "dcache_line_bytes": 0,
+      "dsp": false,
+      "dwt_cyccnt": false,
+      "float_abi": "native",
+      "fpu": "none",
+      "icache_line_bytes": 0,
+      "mpu_version": 0,
+      "mve": "none",
+      "sau": false,
+      "security": "single"
+    },
+    "definitions": {
+      "NEXUS_ARCH_DCACHE_LINE_BYTES": 0,
+      "NEXUS_ARCH_HAS_DWT_CYCCNT": 0,
+      "NEXUS_ARCH_HAS_SAU": 0,
+      "NEXUS_ARCH_ICACHE_LINE_BYTES": 0,
+      "NEXUS_ARCH_MPU_VERSION": 0,
+      "NEXUS_ARCH_SECURITY_STATE": 0,
+      "NEXUS_CPU_ATOMIC_BACKEND_IRQ": 0,
+      "NEXUS_CPU_EXTERNAL_IRQ_COUNT": 0,
+      "NEXUS_CPU_HAS_BASEPRI": 0,
+      "NEXUS_CPU_HAS_DSP": 0,
+      "NEXUS_CPU_HAS_FPU": 0,
+      "NEXUS_CPU_HAS_MVE": 0,
+      "NEXUS_CPU_MPU_REGIONS": 0,
+      "NEXUS_CPU_SECURE_ONLY": 0,
+      "NEXUS_IRQ_KERNEL_POLICY": 0
+    },
+    "enum_abi": "native-int",
+    "float_abi": "native",
+    "fpu": "none",
+    "has_basepri": false,
+    "irq": {
+      "external_count": 0,
+      "kernel_port": null,
+      "mask_kind": "primask",
+      "maximum_priority": 15,
+      "priority_bits": 4,
+      "syscall_priority": null
+    }
+  },
+  "devices": [
+    {
+      "controller": "bus_spi_a",
+      "driver": "spi-endpoint",
+      "id": "sensor_spi_a",
+      "model_bytes": 64
+    },
+    {
+      "controller": "bus_spi_a",
+      "driver": "spi-endpoint",
+      "id": "sensor_spi_b",
+      "model_bytes": 64
+    },
+    {
+      "controller": "bus_spi_b",
+      "driver": "spi-endpoint",
+      "id": "sensor_spi_c",
+      "model_bytes": 64
+    },
+    {
+      "address": 80,
+      "controller": "bus_i2c_a",
+      "driver": "i2c-endpoint",
+      "id": "sensor_i2c_a",
+      "model_bytes": 64
+    },
+    {
+      "address": 81,
+      "controller": "bus_i2c_a",
+      "driver": "i2c-endpoint",
+      "id": "sensor_i2c_b",
+      "model_bytes": 64
+    },
+    {
+      "address": 80,
+      "controller": "bus_i2c_b",
+      "driver": "i2c-endpoint",
+      "id": "sensor_i2c_c",
+      "model_bytes": 64
+    }
+  ],
+  "enum_abi": "native-int",
+  "factory": {
+    "capabilities": true
+  },
+  "flash": {
+    "erase_blocks": [
+      1048576
+    ],
+    "origin": 134217728,
+    "size": 1048576
+  },
+  "inputs": [
+    {
+      "path": "dependencies/platform-compatibility.json",
+      "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae"
+    },
+    {
+      "path": "soc/native/routes.json",
+      "sha256": "65758edf6d8b40f811c353ae58e89f7ea639782681db81e15bda2be822427060"
+    },
+    {
+      "path": "soc/native/soc.json",
+      "sha256": "bd42c1a4dc49d9d8c5acff8fe5fb8f509a874a6319c20133fb0e55f9fa326a6e"
+    },
+    {
+      "path": "tests/contracts/native_assembly/multi.toml",
+      "sha256": "665973b8773896c1bcd70d46273e63d51859a3d64e145e31878cc29d522f8168"
+    },
+    {
+      "path": "tests/contracts/native_assembly/multi_board/board.json",
+      "sha256": "4788e7fadc0548aa2659fac2e7547b12355cde6c67fda4d38b71c7052038b839"
+    }
+  ],
+  "irq": {
+    "external_count": 0,
+    "kernel_port": null,
+    "mask_kind": "primask",
+    "maximum_priority": 15,
+    "priority_bits": 4,
+    "syscall_priority": null
+  },
+  "kernel_profile": null,
+  "layout": {
+    "erase_blocks": [
+      1048576
+    ],
+    "origin": 134217728,
+    "size": 1048576
+  },
+  "limitations": [
+    "Host model does not qualify physical clock, memory or electrical behavior",
+    "Physical qualification not executed"
+  ],
+  "memory": [
+    {
+      "dma": false,
+      "id": "model-ram",
+      "linker": true,
+      "origin": 536870912,
+      "size": 1048576
+    }
+  ],
+  "memory_budgets": {
+    "libc_heap_bytes": 0,
+    "main_stack_bytes": 2048
+  },
+  "optimization": "Os",
+  "package": "host-model",
+  "part": "NATIVE_MODEL",
+  "physical_pcb_revision": null,
+  "physical_qualified": false,
+  "platform_metadata": {
+    "configured_backends": [
+      "baremetal",
+      "native",
+      "freertos",
+      "threadx"
+    ],
+    "factory_abi_epoch": 1,
+    "kind": "nexus-platform-compatibility",
+    "schema_version": 1,
+    "schemas": {
+      "assembly_authoring": 2,
+      "assembly_projection": 1,
+      "board": 1,
+      "cpu_facts": 1,
+      "routes": 1,
+      "runtime_assembly": 1,
+      "runtime_resolved": 1,
+      "soc": 1,
+      "source_sdk_manifest": 1,
+      "typed_ir": 1
+    },
+    "semantic_version": "1.0.0",
+    "source_sdk": {
+      "binary_abi": "unsupported",
+      "delivery": "source_only",
+      "version_matching": "exact"
+    }
+  },
+  "routes": {
+    "adc0": {
+      "controller": "ADC0",
+      "id": "adc0",
+      "kind": "adc",
+      "modes": [
+        "low-rate-scan"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA8"
+        },
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA9"
+        }
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "exti0": {
+      "controller": "EXTI6",
+      "id": "exti0",
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "input",
+          "pin": "PA6"
+        }
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "flash0": {
+      "controller": "FLASH0",
+      "id": "flash0",
+      "kind": "flash",
+      "modes": [
+        "poll-byte"
+      ],
+      "pins": [],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "gpio-pa0": {
+      "controller": "GPIOA",
+      "id": "gpio-pa0",
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PA0"
+        }
+      ],
+      "source": "Host virtual model; no physical wiring",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "gpio-pa3": {
+      "controller": "GPIOA",
+      "id": "gpio-pa3",
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PA3"
+        }
+      ],
+      "source": "Host independent virtual GPIO view; no physical wiring",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "i2c0": {
+      "controller": "I2C0",
+      "id": "i2c0",
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "pins": [],
+      "source": "Host independent I2C model; no physical timing",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "i2c1": {
+      "controller": "I2C1",
+      "id": "i2c1",
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "pins": [],
+      "source": "Host independent I2C model; no physical timing",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "pwm0": {
+      "controller": "PWM0",
+      "id": "pwm0",
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PA7"
+        }
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "spi0": {
+      "controller": "SPI0",
+      "id": "spi0",
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "pins": [],
+      "source": "Host virtual model; no physical timing",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "spi1": {
+      "controller": "SPI1",
+      "id": "spi1",
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "pins": [],
+      "source": "Host independent SPI model; no physical timing",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "uart0": {
+      "controller": "UART0",
+      "id": "uart0",
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "tx",
+          "pin": "PA1"
+        },
+        {
+          "af": 0,
+          "function": "rx",
+          "pin": "PA2"
+        }
+      ],
+      "source": "Host virtual model; no physical timing",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "uart1": {
+      "controller": "UART1",
+      "id": "uart1",
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "tx",
+          "pin": "PA4"
+        },
+        {
+          "af": 0,
+          "function": "rx",
+          "pin": "PA5"
+        }
+      ],
+      "source": "Host independent UART model; no physical timing",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    },
+    "watchdog0": {
+      "controller": "IWDG",
+      "id": "watchdog0",
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "pins": [],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification",
+      "variants": [
+        "NATIVE_MODEL"
+      ]
+    }
+  },
+  "schema_version": 1,
+  "soc_family": "native",
+  "source_dependencies": []
+}

@@ -435,7 +435,8 @@
       "kind": "uart",
       "modes": [
         "irq-byte-event",
-        "irq-blocks"
+        "irq-blocks",
+        "dma-tx"
       ],
       "irq": [
         "USART1_IRQn"
@@ -444,37 +445,45 @@
         "PA2",
         "PA3"
       ],
+      "clock_hz": 50000000,
       "max_hz": 1000000
     },
     "SPI0": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma-full-duplex"
       ],
-      "irq": [
-        "SPI0_IRQn"
-      ],
+      "irq": [],
       "pins": [
         "PA5",
         "PA6",
         "PA7"
       ],
+      "clock_hz": 100000000,
       "max_hz": 50000000
     },
     "I2C1": {
       "kind": "i2c",
       "modes": [
-        "poll-messages"
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
       ],
       "irq": [
-        "I2C1_EV_IRQn",
-        "I2C1_ER_IRQn"
+        "I2C1_EV",
+        "I2C1_ER"
       ],
       "pins": [
         "PB10",
         "PB11"
       ],
-      "max_hz": 100000
+      "clock_hz": 50000000,
+      "max_hz": 100000,
+      "irq_numbers": {
+        "I2C1_EV": 33,
+        "I2C1_ER": 34
+      }
     },
     "GPIOB": {
       "kind": "gpio",
@@ -586,6 +595,47 @@
         "clock:ETHMACTX",
         "clock:ETHMACRX",
         "controller:SYSCFG_RMII"
+      ]
+    },
+    "TIMER3": {
+      "kind": "timer_capture",
+      "modes": [
+        "edge-capture"
+      ],
+      "irq": [
+        "TIMER3"
+      ],
+      "irq_numbers": [
+        30
+      ],
+      "clock_hz": 100000000,
+      "pins": [
+        "PB6"
+      ],
+      "resources": [
+        "clock:TIMER3"
+      ]
+    },
+    "TIMER0": {
+      "kind": "advanced_pwm",
+      "modes": [
+        "complementary-pwm"
+      ],
+      "irq": [
+        "TIMER0_BRK_TIMER8"
+      ],
+      "irq_numbers": [
+        24
+      ],
+      "clock_hz": 200000000,
+      "pins": [
+        "PA8",
+        "PB13",
+        "PB12"
+      ],
+      "resources": [
+        "clock:TIMER0",
+        "controller:TIMER8"
       ]
     }
   },

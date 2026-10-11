@@ -1,0 +1,18 @@
+[==========] Running 30 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from ThreadXOfficial
+[ RUN      ] ThreadXOfficial.ReallyRunsKernelThread
+[       OK ] ThreadXOfficial.ReallyRunsKernelThread (1 ms)
+[----------] 1 test from ThreadXOfficial (1 ms total)
+
+[----------] 3 tests from ThreadXAdapter
+[ RUN      ] ThreadXAdapter.LatchInitializesAndDestroys
+[       OK ] ThreadXAdapter.LatchInitializesAndDestroys (0 ms)
+[ RUN      ] ThreadXAdapter.OddByteItemsHaveExactFIFOAndNoOutputOnTimeout
+[       OK ] ThreadXAdapter.OddByteItemsHaveExactFIFOAndNoOutputOnTimeout (0 ms)
+[ RUN      ] ThreadXAdapter.InvalidCapacityIsRejectedBeforeKernelCreation
+[       OK ] ThreadXAdapter.InvalidCapacityIsRejectedBeforeKernelCreation (0 ms)
+[----------] 3 tests from ThreadXAdapter (0 ms total)
+
+[----------] 7 tests from ThreadXTasks
+[ RUN      ] ThreadXTasks.ReturnJoinDeletesBeforeStorageReuse

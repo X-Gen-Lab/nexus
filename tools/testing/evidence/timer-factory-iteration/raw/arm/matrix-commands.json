@@ -1,0 +1,226 @@
+[
+  {
+    "label": "stm32-ve",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-ve",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/timer_assembly/stm32-ve.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-ve",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-ve",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gd32",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/gd32",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/timer_assembly/gd32.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gd32",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/gd32",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-zg-freertos",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-zg-freertos",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/timer_assembly/stm32-zg-freertos.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-zg-freertos",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-zg-freertos",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-ve-freertos",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-ve-freertos",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/timer_assembly/stm32-ve-freertos.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-ve-freertos",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-ve-freertos",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gd32-freertos",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/timer_assembly/gd32-freertos.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gd32-freertos",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-default",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-default",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tools/configure/assemblies/qiming-baremetal-empty.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "stm32-default",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/stm32-default",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gd32-default",
+    "stage": "configure",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/timer_assembly",
+      "-B",
+      "/workspace/nexus-industrial-design/timer-arm/gd32-default",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus/.venv/bin/ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tools/configure/assemblies/liangshan-baremetal-empty.toml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "gd32-default",
+    "stage": "build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/timer-arm/gd32-default",
+      "--target",
+      "timer_controller_fixture",
+      "--parallel",
+      "2"
+    ],
+    "exit_code": 0
+  }
+]

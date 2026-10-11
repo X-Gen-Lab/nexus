@@ -33,7 +33,10 @@ foreach(memory_variant default both)
         HXTAL_VALUE=25000000 NX_GD32_CLOCK_MODEL)
     target_compile_options(${memory_target} PRIVATE -fno-pie
         -ffunction-sections -fdata-sections -Wno-int-to-pointer-cast)
-    target_link_options(${memory_target} PRIVATE -no-pie -Wl,--gc-sections)
+    # A low non-PIE randomized brk can overlap an MCU address window. Keep the
+    # host image and its brk above all modeled hardware; never replace a mapping.
+    target_link_options(${memory_target} PRIVATE -no-pie -Wl,--gc-sections
+        -Wl,-Ttext-segment=0x60000000)
     if(memory_selected)
         target_sources(${memory_target} PRIVATE
             "${NEXUS_SOURCE_DIR}/soc/gd32f470/memory_init.c")

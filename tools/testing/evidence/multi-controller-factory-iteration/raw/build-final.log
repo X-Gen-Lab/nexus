@@ -1,0 +1,11 @@
+[  5%] Built target timer_arch
+[ 29%] Built target timer_api
+[ 41%] Built target nexus_gd32_multi_controller_factory_test_vendor
+[ 44%] Built target nexus_stm32_multi_controller_factory_test_gpio
+[ 47%] Built target nexus_gd32_multi_controller_factory_test_gpio
+[ 50%] Building CXX object test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/tests/google/multi_controller_factory_test.cpp.o
+[ 52%] Building CXX object test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/tests/google/multi_controller_factory_test.cpp.o
+[ 55%] Linking CXX executable nexus_stm32_multi_controller_factory_test
+[ 58%] Linking CXX executable nexus_gd32_multi_controller_factory_test
+[ 79%] Built target nexus_stm32_multi_controller_factory_test
+[100%] Built target nexus_gd32_multi_controller_factory_test

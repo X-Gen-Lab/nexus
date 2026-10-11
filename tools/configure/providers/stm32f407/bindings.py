@@ -5,11 +5,13 @@ except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
 try:
-    from ... import can, usb_device, ethernet
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
 except ImportError:
     import can
     import usb_device
     import ethernet
+    import timer_advanced
+    import secondary_controllers
 from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
@@ -196,10 +198,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             child_name = _symbol(child["id"])
             endpoint = f"s_nx_endpoint_{name}" if not index else f"s_nx_endpoint_{child_name}"
             if index:
-                declarations.append(f"static nx_stm32_i2c_async_endpoint_state_t {endpoint};")
+                declarations.append(f"static nx_stm32_i2c_async_endpoint_state_t {endpoint} = {{ .port = &s_nx_port_{name}, .address = {child['address']}u }};")
             declarations += _endpoint_face("i2c", child_name, endpoint, "i2c_async")
-            body += [f"    {endpoint}.port = &s_nx_port_{name};",
-                     f"    {endpoint}.address = {child['address']}u;"]
         _check(body, f"nx_stm32_i2c_async_initialize(&s_nx_port_{name}, {item.options.irq.priority}u)")
         declarations += [f"static nx_result_t stop_{name}(void) {{",
                          f"    nx_result_t status = nx_i2c_port_stop(&s_nx_face_{name});",
@@ -251,10 +251,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                 raise ValueError("Reserved I2C addresses are not maintained")
             endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
             if index != 0:
-                declarations.append(f"static nx_stm32_i2c_endpoint_state_t {endpoint};")
+                declarations.append(f"static nx_stm32_i2c_endpoint_state_t {endpoint} = {{ .port = &s_nx_port_{name}, .address = {address}u }};")
             declarations += [*_endpoint_face("i2c", child_name, endpoint)]
-            body += [f"    {endpoint}.port = &s_nx_port_{name};",
-                     f"    {endpoint}.address = {address}u;"]
         _check(body, f"nx_stm32_i2c_initialize(&s_nx_port_{name})")
         declarations += [f"static nx_result_t stop_{name}(void) {{",
                          f"    if (s_nx_port_{name}.active) {{ return NX_ERROR_BUSY; }}",
@@ -629,6 +627,10 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f407")
+    if secondary_controllers.applies(item, result, "stm32"):
+        return secondary_controllers.constructor(item, result, "stm32")
+    if item.kind in timer_advanced.KINDS:
+        return timer_advanced.constructor(item, result, "stm32")
     if item.kind == "can":
         return can.constructor(item, result, "stm32")
     if item.kind == "eth":

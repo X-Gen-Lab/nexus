@@ -32,6 +32,13 @@ decisions. Unknown PCB routes remain unknown until reviewed. Preparation,
 admission and validation do not operate probes, power boards, flash firmware or
 open serial devices. Explicit acquisition execution is a separate station action.
 
+The three maintained first-release PCB fixtures still need observed PCB revisions
+and equipment. `stm32g474re_hse24_reference.json` supplies only the software
+reference's part and console facts. Its `software_reference` scope is mandatory
+for STM32G474RET6 and station admission rejects it; deleting the scope cannot
+promote it into a physical fixture. A future station needs a separately reviewed
+physical fixture and a corresponding tooling change, not a copied plan.
+
 
 `measure.py plan` generates seven generic acquisition cases bound to an exact
 fixture and resolved build. It requires no station or equipment and leaves all
@@ -128,10 +135,14 @@ records test tooling and never establish qualification for the three boards.
 
 ## Reviewed acquisition adapters
 
-`workloads.py plan` adds thirteen explicit acquisition protocols for station
+`workloads.py plan` supplies twenty-one explicit acquisition protocols for station
 binding; clock/reset/GPIO/watchdog; UART/SPI/DMA; I2C; ADC/PWM/EXTI; Flash power
 loss; concurrent load; M4F context; time/deadlines; all task/MSP peaks; lifecycle
-endurance; tickless timer-port wake; and fail-stop/external safe outputs.
+endurance; tickless timer-port wake; and fail-stop/external safe outputs. Separate
+protocols cover RX DMA/IDLE/continuous loans, UART flow and direction adapters,
+continuous ADC, classic CAN, raw RMII Ethernet, USB FS device, timer capture and
+advanced PWM break. The mode checks use the maintained configuration mode traits;
+selecting a UART alone does not install RTS/CTS, DE wiring or a transceiver.
 `templates/workload.json` is an incomplete authoring template, not a reviewed
 station. Budgets, instrument identities, wiring and safety steps must come from
 the actual station owner. Missing selected controllers/modes stay
@@ -147,8 +158,30 @@ python tools/hil/workloads.py plan \
 Supplying `--workload station/reviewed-workload.json` checks strict bindings,
 stimulation, raw observations, instrument bytes, safety actions and numeric
 limits. Endurance duration and power-cut cases need reviewed positive work
-lower bounds. A valid protocol remains `prepared_unbound` / `not_executed`:
+lower bounds. RX bytes, sample/packet/frame/edge counts and flow/break cases also
+need positive integer lower bounds. The template keeps all such limits null.
+A valid protocol remains `prepared_unbound` / `not_executed`:
 describing measurements does not execute them or qualify equipment.
+
+Acquisition recipe validation, measurement validation and OS acceptance all
+revalidate the content-pinned workload against its admitted fixture and canonical
+resolved configuration. A matching file hash does not admit missing stimulation,
+wrong controller bindings, absent instrument bytes or unreviewed limits. This
+check runs before acquisition equipment operations. It validates authored
+obligations, not the truth of an instrument description or physical observation.
+
+ThreadX workload preparation currently fails closed: these OS acquisition cases
+have a FreeRTOS physical contract and are not inherited by another backend.
+ThreadX software/model results do not qualify a ThreadX station. Likewise, the
+new peripheral protocols describe station-owned stimuli and retained raw bytes;
+they do not add automatic CAN peers, USB hosts, Ethernet links or waveform
+instrument drivers. The existing validator qualifies only its recorded smoke,
+metric and OS scope, not every declared protocol.
+
+Fail-stop protocols require the observer record, incoming masks, retained loans
+and terminal progress. Products bind their own safe-output port and observed
+electrical behavior. Neither an observer callback nor a terminal kernel ceiling
+establishes DMA quiescence, successful output shutdown or a hardware safety claim.
 
 `acquire.py plan` rebuilds an existing admission and verifies a station-owned
 recipe without opening equipment. It is `prepared_bound` / `not_executed`;

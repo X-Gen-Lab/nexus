@@ -1,0 +1,602 @@
+{
+  "schema_version": 1,
+  "kind": "os_resource_exact_development_refresh",
+  "status": "passed",
+  "scope": "actual_m0_m4f_objects_and_instruction_shape_not_board_or_cycles",
+  "source_before": {
+    "root": "/workspace/nexus",
+    "commit": "51596bace222fce9a93d676744b697e05faf9a05",
+    "tree": "136e14e3e94de31e845db81b1eecc1ca4f666ac5",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (heads/master)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (heads/master)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)"
+    ]
+  },
+  "source_after": {
+    "root": "/workspace/nexus",
+    "commit": "51596bace222fce9a93d676744b697e05faf9a05",
+    "tree": "136e14e3e94de31e845db81b1eecc1ca4f666ac5",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (heads/master)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (heads/master)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)"
+    ]
+  },
+  "source_inputs_stable": true,
+  "tools_stable": true,
+  "outer_returncode": 0,
+  "actual_command_count": 56,
+  "actual_variant_count": 8,
+  "identity_reference_checks": 1136,
+  "unique_identity_checks": 786,
+  "all_raw_identities_verified": true,
+  "archive_index": {
+    "path": "/workspace/nexus/tools/testing/evidence/os-resource-refresh/archive-index.json",
+    "bytes": 525679,
+    "sha256": "11e942a908903fa78c28ba259b9243cfee5c047e2a388d1a507738f3f5d4483c"
+  },
+  "actual_report": {
+    "path": "/workspace/nexus/tools/testing/evidence/os-resource-refresh/raw/run1/report.json",
+    "bytes": 749349,
+    "sha256": "815c1b53400a7b2111c312a292d95d02bdfd51c992b0b36c7b8dadb786cd187e"
+  },
+  "actual_execution": {
+    "path": "/workspace/nexus/tools/testing/evidence/os-resource-refresh/raw/execution/run1-execution.json",
+    "bytes": 3001,
+    "sha256": "4dbba57997534dd217eac89f9e66f25a9daf2a3f19bdd208354d16e9d823a6a4"
+  },
+  "metadata_failure_retained": {
+    "path": "/workspace/nexus/tools/testing/evidence/os-resource-refresh/raw/execution/archive-attempt1-failure.json",
+    "bytes": 796,
+    "sha256": "1f491f1402f15af7e4bdc1620d35ae6315fca8518945821ae81f9db70cfc7d41"
+  },
+  "metadata_completion_driver": {
+    "path": "/workspace/nexus/tools/testing/evidence/os-resource-refresh/raw/execution/archive_run1_completion.py.raw",
+    "bytes": 6586,
+    "sha256": "c08479893f18512fb8c95b9f555c2ef87f74c5138b2b77d09408e6491bd81f57"
+  },
+  "variants": [
+    {
+      "name": "cortex-m0-standard-Os",
+      "cpu": "cortex-m0",
+      "profile": "standard",
+      "optimization": "Os",
+      "kernel_port": "GCC/ARM_CM0",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 84
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": 68,
+        "direct_notify_supported": true,
+        "idle_total": 596,
+        "other_fixture_and_kernel_ram": 336,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1768,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2696,
+        "data": 4,
+        "flash_load": 11312,
+        "static_ram": 2700,
+        "text": 11308
+      },
+      "retained_hot_path_count": 27,
+      "compiled_object_count": 44,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m0-standard-O2",
+      "cpu": "cortex-m0",
+      "profile": "standard",
+      "optimization": "O2",
+      "kernel_port": "GCC/ARM_CM0",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 84
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": 68,
+        "direct_notify_supported": true,
+        "idle_total": 596,
+        "other_fixture_and_kernel_ram": 336,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1768,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2696,
+        "data": 4,
+        "flash_load": 12580,
+        "static_ram": 2700,
+        "text": 12576
+      },
+      "retained_hot_path_count": 22,
+      "compiled_object_count": 44,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m0-minimal-Os",
+      "cpu": "cortex-m0",
+      "profile": "minimal",
+      "optimization": "Os",
+      "kernel_port": "GCC/ARM_CM0",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 60
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": null,
+        "direct_notify_supported": false,
+        "idle_total": 572,
+        "other_fixture_and_kernel_ram": 256,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1696,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2520,
+        "data": 4,
+        "flash_load": 9564,
+        "static_ram": 2524,
+        "text": 9560
+      },
+      "retained_hot_path_count": 24,
+      "compiled_object_count": 44,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m0-minimal-O2",
+      "cpu": "cortex-m0",
+      "profile": "minimal",
+      "optimization": "O2",
+      "kernel_port": "GCC/ARM_CM0",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 60
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": null,
+        "direct_notify_supported": false,
+        "idle_total": 572,
+        "other_fixture_and_kernel_ram": 256,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1696,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2520,
+        "data": 4,
+        "flash_load": 10668,
+        "static_ram": 2524,
+        "text": 10664
+      },
+      "retained_hot_path_count": 20,
+      "compiled_object_count": 44,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m4-standard-Os",
+      "cpu": "cortex-m4",
+      "profile": "standard",
+      "optimization": "Os",
+      "kernel_port": "GCC/ARM_CM4F",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 84
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": 68,
+        "direct_notify_supported": true,
+        "idle_total": 596,
+        "other_fixture_and_kernel_ram": 341,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1768,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2701,
+        "data": 4,
+        "flash_load": 11604,
+        "static_ram": 2705,
+        "text": 11600
+      },
+      "retained_hot_path_count": 24,
+      "compiled_object_count": 43,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m4-standard-O2",
+      "cpu": "cortex-m4",
+      "profile": "standard",
+      "optimization": "O2",
+      "kernel_port": "GCC/ARM_CM4F",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 172,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 88,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 84,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 84
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": 68,
+        "direct_notify_supported": true,
+        "idle_total": 596,
+        "other_fixture_and_kernel_ram": 341,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1768,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2701,
+        "data": 4,
+        "flash_load": 12636,
+        "static_ram": 2705,
+        "text": 12632
+      },
+      "retained_hot_path_count": 22,
+      "compiled_object_count": 43,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m4-minimal-Os",
+      "cpu": "cortex-m4",
+      "profile": "minimal",
+      "optimization": "Os",
+      "kernel_port": "GCC/ARM_CM4F",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 60
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": null,
+        "direct_notify_supported": false,
+        "idle_total": 572,
+        "other_fixture_and_kernel_ram": 261,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1696,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2525,
+        "data": 4,
+        "flash_load": 9780,
+        "static_ram": 2529,
+        "text": 9776
+      },
+      "retained_hot_path_count": 21,
+      "compiled_object_count": 43,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    },
+    {
+      "name": "cortex-m4-minimal-O2",
+      "cpu": "cortex-m4",
+      "profile": "minimal",
+      "optimization": "O2",
+      "kernel_port": "GCC/ARM_CM4F",
+      "sizes": {
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_queue": 80,
+        "semaphore": 72,
+        "stack_word": 4,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_storage": {
+        "closable_payload": 12,
+        "closable_queue": 96,
+        "direct_notify": 16,
+        "join_stack": 512,
+        "joinable_task": 148,
+        "notify": 84,
+        "permanent_stack": 512,
+        "permanent_task": 64,
+        "queue_waiter": 84,
+        "raw_payload": 12,
+        "raw_queue": 80,
+        "tcb": 60,
+        "wait_port": 16
+      },
+      "actual_idle": {
+        "stack": 512,
+        "tcb": 60
+      },
+      "accounting": {
+        "closable_queue_increment": 16,
+        "direct_notify_saved": null,
+        "direct_notify_supported": false,
+        "idle_total": 572,
+        "other_fixture_and_kernel_ram": 261,
+        "permanent_task_saved": 84,
+        "physical_status": "not_executed",
+        "probe_storage_total": 1696,
+        "scope": "actual_32bit_abi_and_identical_software_consumer",
+        "waiter_increment_per_concurrent_call": 84
+      },
+      "fixture_image": {
+        "bss": 2525,
+        "data": 4,
+        "flash_load": 10716,
+        "static_ram": 2529,
+        "text": 10712
+      },
+      "retained_hot_path_count": 20,
+      "compiled_object_count": 43,
+      "physical_status": "not_executed",
+      "cycles_status": "not_measured"
+    }
+  ],
+  "profile_comparisons": [
+    {
+      "cpu": "cortex-m0",
+      "fixture_ram_saved": 176,
+      "optimization": "O2",
+      "per_tcb_saved": 24,
+      "physical_status": "not_executed"
+    },
+    {
+      "cpu": "cortex-m0",
+      "fixture_ram_saved": 176,
+      "optimization": "Os",
+      "per_tcb_saved": 24,
+      "physical_status": "not_executed"
+    },
+    {
+      "cpu": "cortex-m4",
+      "fixture_ram_saved": 176,
+      "optimization": "O2",
+      "per_tcb_saved": 24,
+      "physical_status": "not_executed"
+    },
+    {
+      "cpu": "cortex-m4",
+      "fixture_ram_saved": 176,
+      "optimization": "Os",
+      "per_tcb_saved": 24,
+      "physical_status": "not_executed"
+    }
+  ],
+  "candidate_qualification": "not_qualified_dirty_development_source",
+  "physical_status": "not_executed",
+  "cycles_status": "not_measured",
+  "runtime_instruction_counts": "static_shapes_only_no_cycle_measurement",
+  "created_at": "2026-10-11T20:25:38.854929+00:00"
+}

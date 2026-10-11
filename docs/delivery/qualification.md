@@ -11,9 +11,9 @@
 | 正式软件资格 | source/config/dependency/tool/ELF 同身份；非零 fresh tests 与 budget | `tools/evidence/qualification.py` 不接受空报告、错 scope 或失效证据 |
 | 离线复现 | 密封 OCI/toolchain，两个独立 fresh roots，正式 build network=none | `reproduce.py` 真实执行并比较 ELF/BIN；map 保留原始字节；recipe 或摘要不代替执行 |
 | 候选封存 | 同一 source/config/artifact 的 qualification、reproduction 与 SDK | `candidate.py`/`proof.py` 验证后封存；不自动创建产品发布 |
-| 物理 HIL | 实际 PCB/UID/probe/serial/power/station、同候选 image 与预算 | 当前硬件未接入，三板全部 `not_executed` |
+| 物理 HIL | 实际 PCB/UID/probe/serial/power/station、同候选 image 与预算 | 当前硬件未接入，全部 MCU 目标 `not_executed` |
 
-HIL 三个 fixture 和 station template 位于 `tools/hil/fixtures/`。空 station、错误
+HIL fixture 和 station template 位于 `tools/hil/fixtures/`。空 station、错误
 Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算会被准入拒绝。
 准备工装不等于已经刷写、串口测试、测量波形或完成掉电试验。
 
@@ -23,6 +23,13 @@ user I/O broker 的证据各自绑定独立 source scope。ThreadX 的真实 Lin
 精准负链接不同于 MCU 运行。安装 SDK 的 retention-only 永久任务程序只建立链接；
 有限退出的真实 Linux kernel consumer 另外建立运行证据。不能从链接程序的存在
 推断已运行 scheduler，也不能从两个 host case 推断完整 MCU backend 资格。
+
+G474 已有真实 typed factory 主机执行、system/provider 回归和四个显式 TOML
+ARM 镜像（empty／selected × 裸机／FreeRTOS）。镜像预算、操作表保留、未选
+GPIO／UART 裁剪及实际向量字节分别检查；SysTick 的 170 MHz／1 kHz／reload169999
+是编译配置与链接证明，不是时间精度测量。主机 sanitizer 只检查被执行的软件
+路径。参考配置的晶振／PCB／焊桥、硬件时序、同最终 clean HEAD 的 SDK／离线
+复现与新候选有各自退出条件，不能据此把 G474 的其他外设或 ThreadX 记为支持。
 
 USB 的 packet/clock/factory 模型与软件 Board ELF 不提供 VBUS、connector、PHY、
 enumeration 或 flush 周期的物理证明。浅 Sleep 的 1 MHz timer 模型只建立被执行

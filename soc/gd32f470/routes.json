@@ -295,9 +295,13 @@
       ],
       "modes": [
         "irq-byte-event",
-        "irq-blocks"
+        "irq-blocks",
+        "dma-tx"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "GD32F470xx Datasheet Rev 2.2 AF tables and GD32F4xx User Manual Rev 3.3 Tables 10-2/10-3; maintained exact GD SDK",
+      "dma": [
+        "DMA0:stream6:channel4"
+      ]
     },
     {
       "id": "spi0-pa5-pa7",
@@ -324,9 +328,14 @@
         }
       ],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma-full-duplex"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "GD32F470xx Datasheet Rev 2.2 AF tables and GD32F4xx User Manual Rev 3.3 Tables 10-2/10-3; maintained exact GD SDK",
+      "dma": [
+        "DMA1:stream5:channel3",
+        "DMA1:stream2:channel3"
+      ]
     },
     {
       "id": "i2c1-pb10-pb11",
@@ -348,9 +357,17 @@
         }
       ],
       "modes": [
-        "poll-messages"
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
       ],
-      "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+      "source": "GD32F470xx Datasheet Rev 2.2 AF tables and GD32F4xx User Manual Rev 3.3 Tables 10-2/10-3; maintained exact GD SDK",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA0:stream2:channel7",
+          "DMA0:stream7:channel7"
+        ]
+      }
     },
     {
       "id": "gpiob0",
@@ -520,6 +537,54 @@
         }
       ],
       "source": "RMII AF11 silicon pad mux only. PHY, reset, external 50MHz clock and Board electric route remain external, unqualified. GD32F470xx Datasheet Rev2.2 AF11 / GD32F4xx UM Rev3.3"
+    },
+    {
+      "id": "capture-pb6",
+      "controller": "TIMER3",
+      "kind": "timer_capture",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "source": "GD32F470xx datasheet Rev2.2 AF tables: TIMER3_CH0 PB6 AF2, TIMER0_CH0 PA8/CH0_ON PB13/BRKIN PB12 AF1; silicon pads only."
+    },
+    {
+      "id": "complementary-pa8-pb12-pb13",
+      "controller": "TIMER0",
+      "kind": "advanced_pwm",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "output",
+          "af": 1
+        },
+        {
+          "pin": "PB13",
+          "function": "complement",
+          "af": 1
+        },
+        {
+          "pin": "PB12",
+          "function": "break",
+          "af": 1
+        }
+      ],
+      "source": "GD32F470xx datasheet Rev2.2 AF tables: TIMER3_CH0 PB6 AF2, TIMER0_CH0 PA8/CH0_ON PB13/BRKIN PB12 AF1; silicon pads only."
     }
   ]
 }

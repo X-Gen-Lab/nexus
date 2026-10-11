@@ -6,7 +6,7 @@
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
 | `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot | 无 SDK／OS；原语编译与整平台资格分别记录 |
-| `soc/stm32f407/`、`soc/gd32f470/` | 精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；G474 初始纵切片另行接入 |
+| `soc/stm32f407/`、`soc/gd32f470/`、`soc/stm32g474/` | 精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
 | `io/` | typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同 | 公共头不含厂商类型；Native 是行为模型 |
 | `os/` | 可选 wait/wake、按对象静态 task/stack/TCB/queue 适配 | driver 不依赖 OS；不创建应用 worker |
@@ -24,6 +24,14 @@ CMake 从同一 resolved 结果读取选中的 controller kind/mode，仅查询�
 源码集合仍由各家族 CMake 维护。未选择的驱动不参与编译，端点所需 base driver
 按组合补齐。STM 空配置不编译外设驱动；GD 保留 system/timebase 所需的基础
 SDK 源码。最终 section GC 继续消除未引用函数，编译裁剪与镜像裁剪分别验证。
+
+G474 的 HSE24/170 MHz 参考配置已经通过真实生成 factory、时钟／GPIO／LPUART
+算法的主机执行，以及 empty／selected × 裸机／FreeRTOS 四个 ARM graph。
+空配置没有 GPIO／UART provider；选中 LPUART 的 IRQ91 和系统 TIM2 的 IRQ28
+实际绑定到向量字节。FreeRTOS 保留真实 SVC／PendSV／SysTick，170 MHz 时钟和
+1 kHz Tick 对应 reload169999。启动先拒绝被占用的 LPUART 控制寄存器，再改动
+系统时钟；失败构造对象进入逆序清理，撤销失败仍保留时钟／引脚／状态责任。
+这些是独立开发证据，未建立参考 PCB、实板时序或 ThreadX G474 支持。
 
 Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级控制器 route
 可以在明确标为软件测试夹具的外部 Board 包中编译／链接；这不意味着三块参考 PCB

@@ -1,0 +1,7 @@
+{
+  "kind": "development-archive-input-check",
+  "status": "rejected",
+  "exit_code": 1,
+  "first_mismatch": "tools/configure/providers/gd32f470/emission.py",
+  "scope": "Actual property execution/audit already completed PASS; later source changes cannot be archived as original source bytes. This is an archival rejection, not a production regression or a candidate requalification."
+}

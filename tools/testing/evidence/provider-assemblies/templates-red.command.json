@@ -1,0 +1,13 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.testing.test_provider_templates",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:56:05.960367+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/provider-assemblies/templates-red.log"
+}

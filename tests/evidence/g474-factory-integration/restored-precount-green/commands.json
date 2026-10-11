@@ -1,0 +1,53 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/host-build",
+      "--target",
+      "nexus_g474_factory_test",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748276766449144,
+    "completed_ns": 1791748280346554430,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/restored-precount-green/build.output",
+      "sha256": "627af488ee9bfaae0b7d3bdda165d370cb2df89fcc5c2cf909c72022e2c362b0",
+      "bytes": 964
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748280352512381,
+    "completed_ns": 1791748280356174335,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/restored-precount-green/discovery.output",
+      "sha256": "bdfaf6f55155b2c60d771ee351a749e720663117988ccf0728bce5f5ecc1b091",
+      "bytes": 688
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-g474-iteration-evidence/restored-precount-green/google.xml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748280356461140,
+    "completed_ns": 1791748280372165720,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/restored-precount-green/execution.output",
+      "sha256": "d00a0aaa24e84cf714ee4957cf51d91459ea11b168582d6cfd51762aa4a066a7",
+      "bytes": 2266
+    }
+  }
+]

@@ -2,11 +2,13 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device, ethernet
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
 except ImportError:
     import can
     import usb_device
     import ethernet
+    import timer_advanced
+    import secondary_controllers
 
 
 def implementation(item):
@@ -47,6 +49,10 @@ def includes(result):
     if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
            for item in selections):
         source.append('#include "gd32f470_i2c_async.h"')
+    if any(item.kind in timer_advanced.KINDS for item in selections):
+        source.append('#include "gd32f470_timer_advanced.h"')
+        source.append('#include "gd32f4xx_timer.h"')
+        source.append('#include "gd32f4xx_gpio.h"')
     if any(item.kind == "eth" for item in selections):
         source.append('#include "gd32f470_eth.h"')
         source.append('#include "gd32f4xx_syscfg.h"')
@@ -65,9 +71,14 @@ def instance_declarations(item, result):
     name = item.id.replace("-", "_")
     kind = item.kind
     if kind in {"spi", "i2c"}:
+        initializer = ""
+        if kind == "i2c":
+            child = next((device for device in result.devices if device["controller"] == item.id), None)
+            if child is not None:
+                initializer = f" = {{ .port = &s_nx_port_{name}, .address = {child['address']}u }}"
         source.append('static nx_gd32'
                       f"_{implementation(item)}_endpoint_state_t "
-                      f"s_nx_endpoint_{name};")
+                      f"s_nx_endpoint_{name}{initializer};")
     return source
 
 
@@ -88,6 +99,8 @@ def state_declarations(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
     source.extend(can.state_declarations(result, "gd32"))
     source.extend(ethernet.state_declarations(result, "gd32"))
+    source.extend(timer_advanced.state_declarations(result, "gd32"))
+    source.extend(secondary_controllers.state_declarations(result, "gd32"))
     source.extend(usb_device.state_declarations(result, "gd32"))
     return source
 
@@ -101,10 +114,18 @@ def stop_system(result):
     dma_clock = has_dma(result)
     source = can.stop_domain(result, "gd32")
     source.extend(ethernet.stop_system(result, "gd32"))
+    source.extend(timer_advanced.stop_system(result, "gd32"))
+    source.extend(secondary_controllers.stop_system(result, "gd32"))
     source.extend(usb_device.stop_system(result, "gd32"))
     if dma_clock:
-        source += ['    if (s_nx_platform_started) { RCU_AHB1EN &= ~s_nx_platform_dma_clocks_added; }',
-                   '    nx_arch_dsb();']
+        source += ['    if (s_nx_platform_started) {',
+                   '        NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN,',
+                   '            RCU_AHB1EN & ~s_nx_platform_dma_clocks_added);',
+                   '        nx_arch_dsb();',
+                   '        if ((RCU_AHB1EN & s_nx_platform_dma_clocks_added) != 0u) {',
+                   '            return NX_ERROR_IO;', '        }',
+                   '        s_nx_platform_dma_clocks_added = 0u;',
+                   '    }']
     source += ['    if (s_nx_platform_started && nx_gd32_soc_stop() != 0) { return NX_ERROR_IO; }']
     return source
 
@@ -128,6 +149,8 @@ def start_system(result):
 def start_resources(result):
     source = usb_device.start_resources(result, "gd32")
     source.extend(ethernet.start_resources(result, "gd32"))
+    source.extend(timer_advanced.start_resources(result, "gd32"))
+    source.extend(secondary_controllers.start_resources(result, "gd32"))
     mask = _dma_clock_mask(result)
     if mask:
         source += [f'    s_nx_platform_dma_clocks_added = ~RCU_AHB1EN & ({mask});',

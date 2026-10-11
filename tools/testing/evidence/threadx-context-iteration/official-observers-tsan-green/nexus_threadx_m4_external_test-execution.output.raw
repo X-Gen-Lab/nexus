@@ -1,0 +1,15 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from ThreadXM4External
+[ RUN      ] ThreadXM4External.ActualExternalHookLeavesSysTickAndOtherPrioritiesOwned
+[       OK ] ThreadXM4External.ActualExternalHookLeavesSysTickAndOtherPrioritiesOwned (0 ms)
+[ RUN      ] ThreadXM4External.TimerSetupFailureCallsRetainingProductFailStop
+[       OK ] ThreadXM4External.TimerSetupFailureCallsRetainingProductFailStop (0 ms)
+[ RUN      ] ThreadXM4External.ObserverPrecedesOverriddenTimerFailureHook
+[       OK ] ThreadXM4External.ObserverPrecedesOverriddenTimerFailureHook (0 ms)
+[----------] 3 tests from ThreadXM4External (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 3 tests.

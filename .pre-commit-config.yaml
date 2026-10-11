@@ -5,10 +5,10 @@ repos:
     hooks:
       - id: nexus-style
         name: Nexus format, comment and text checks
-        entry: python scripts/ci/style_gate.py --report build/quality/style-gate.json
+        entry: python scripts/ci/style_gate.py --staged --report build/quality/style-gate.json
         language: python
         stages: [pre-commit]
-        pass_filenames: true
+        pass_filenames: false
         always_run: true
         require_serial: true
       - id: nexus-commit-message

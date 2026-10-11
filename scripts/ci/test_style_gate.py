@@ -95,6 +95,135 @@ class StyleGateTests(unittest.TestCase):
     def check(self, *files, full=False):
         return gate.run_checks(self.root, list(files), all_files=full)
 
+    def staged_check(self, *files, full=False):
+        python = ROOT / (
+            ".venv/Scripts/python.exe" if os.name == "nt" else ".venv/bin/python"
+        )
+        report = self.root / "build/quality/staged-style.json"
+        environment = {
+            key: value for key, value in os.environ.items()
+            if not key.startswith("NEXUS_STYLE_")
+        }
+        if full:
+            environment["NEXUS_STYLE_FULL"] = "1"
+        result = subprocess.run(
+            [str(python), "scripts/ci/style_gate.py", "--staged",
+             "--report", str(report), *files],
+            cwd=self.root, capture_output=True, env=environment,
+        )
+        self.assertTrue(report.is_file(), result.stderr.decode("utf-8", "replace"))
+        return result, json.loads(report.read_text())
+
+    def test_style_hook_checks_one_complete_staged_index(self):
+        configuration = yaml.safe_load((ROOT / ".pre-commit-config.yaml").read_text())
+        matches = [hook for repo in configuration["repos"] for hook in repo["hooks"]
+                   if hook["id"] == "nexus-style"]
+        self.assertEqual(len(matches), 1)
+        self.assertIn("--staged", matches[0]["entry"].split())
+        self.assertFalse(matches[0]["pass_filenames"])
+        self.assertTrue(matches[0]["always_run"])
+        self.assertTrue(matches[0]["require_serial"])
+
+    def test_staged_check_reports_bad_first_file_and_all_later_good_files(self):
+        (self.root / "a-bad.txt").write_bytes(b"bad trailing whitespace \n")
+        (self.root / "z-good.txt").write_bytes(b"Good\n")
+        self.git("add", "a-bad.txt", "z-good.txt")
+        result, report = self.staged_check()
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["selection_scope"], "staged")
+        self.assertEqual(report["selected_files"], ["a-bad.txt", "z-good.txt"])
+        self.assertTrue(any("a-bad.txt:1: trailing whitespace" in item
+                            for item in report["errors"]))
+
+    def test_staged_check_rejects_filename_subset_that_hides_bad_file(self):
+        (self.root / "a-bad.txt").write_bytes(b"Bad \n")
+        (self.root / "z-good.txt").write_bytes(b"Good\n")
+        self.git("add", "a-bad.txt", "z-good.txt")
+        result, report = self.staged_check("z-good.txt")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertTrue(any("--staged cannot select a filename subset" in item
+                            for item in report["errors"]))
+
+    @unittest.skipIf(os.name == "nt", "POSIX newline/tab filename fixture")
+    def test_staged_nul_selection_preserves_odd_names(self):
+        names = ["space name.txt", "tab\tname.txt", "line\nname.txt",
+                 "中文.txt", "-option.txt"]
+        for name in names:
+            (self.root / name).write_bytes(b"Good\n")
+        self.git("add", "--", *names)
+        result, report = self.staged_check()
+        self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+        self.assertEqual(report["selected_files"], sorted(names))
+        self.assertEqual(report["text_files_selected"], len(names))
+
+    def test_staged_deletion_is_not_read_and_rename_checks_new_path(self):
+        for name in ("removed.txt", "old.txt"):
+            (self.root / name).write_bytes(b"Good\n")
+        self.git("add", "removed.txt", "old.txt")
+        self.git("commit", "-qm", "test: prepare staged rename fixture")
+        self.git("rm", "removed.txt")
+        self.git("mv", "old.txt", "new name.txt")
+        result, report = self.staged_check()
+        self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+        self.assertEqual(report["selected_files"], ["new name.txt"])
+
+    def test_staged_check_rejects_unmerged_index_before_selection(self):
+        source = self.git("rev-parse", ":src/main.c").stdout.decode().strip()
+        entries = (
+            f"0 {'0' * 40}\tsrc/main.c\n"
+            f"100644 {source} 2\tsrc/main.c\n"
+        ).encode()
+        result = subprocess.run(
+            ["git", "update-index", "--index-info"], cwd=self.root,
+            input=entries, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+        result, report = self.staged_check()
+        self.assertEqual(result.returncode, 1)
+        self.assertTrue(any("unmerged entries" in item for item in report["errors"]))
+
+    def test_staged_ownership_checks_cannot_hide_deleted_old_owned_name(self):
+        (self.root / "vendors").mkdir()
+        self.git("mv", "src/main.c", "vendors/main.c")
+        (self.root / "src/remaining.c").write_bytes(GOOD.replace(b"return 0;", b"return 1;"))
+        self.git("add", "src/remaining.c")
+        result, report = self.staged_check()
+        self.assertEqual(result.returncode, 1)
+        self.assertTrue(any("cannot move outside ownership" in item
+                            for item in report["errors"]))
+
+    def test_ci_full_environment_keeps_full_owned_check_with_clean_index(self):
+        result, report = self.staged_check(full=True)
+        self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
+        self.assertTrue(report["full_source_check"])
+        self.assertEqual(report["source_files_checked"], 1)
+        self.assertEqual(report["selection_scope"], "full")
+
+    @unittest.skipIf(os.name == "nt", "POSIX long argument batching fixture")
+    def test_real_hook_does_not_overwrite_bad_first_batch_with_later_pass(self):
+        self.install_hooks()
+        bad = "a-bad.txt"
+        (self.root / bad).write_bytes(b"Bad \n")
+        directory = Path("z" * 210) / ("x" * 210) / ("y" * 210)
+        (self.root / directory).mkdir(parents=True)
+        names = [bad]
+        for number in range(260):
+            name = (directory / f"good-{number:03}.txt").as_posix()
+            (self.root / name).write_bytes(b"Good\n")
+            names.append(name)
+        self.git("add", "--", *names)
+        before = self.git("write-tree").stdout
+        result = self.git("commit", "-qm", "test: reject first bad batch", check=False)
+        self.assertNotEqual(result.returncode, 0)
+        report = json.loads((self.root / "build/quality/style-gate.json").read_text())
+        output = result.stdout + result.stderr
+        self.assertEqual(report["status"], "failed", output.decode("utf-8", "replace"))
+        self.assertEqual(report["selected_files"], sorted(names))
+        self.assertEqual(output.count(b"Nexus style:"), 1, output.decode("utf-8", "replace"))
+        self.assertEqual(self.git("write-tree").stdout, before)
+
     def test_clean_source_passes_real_formatter_and_comments(self):
         result = self.check("src/main.c", full=True)
         self.assertFalse(result["errors"])

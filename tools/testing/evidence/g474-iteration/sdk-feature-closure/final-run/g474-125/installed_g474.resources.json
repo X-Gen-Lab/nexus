@@ -1,0 +1,126 @@
+{
+  "board": "stm32g474re-hse24-reference",
+  "budget": {
+    "path": "/tmp/nexus installed source sdk jducych8/g474 baremetal build/nexus-sdk/generated/resource-budget.json",
+    "sha256": "48de0ebb0d028088225a617b25a1b5031ff4f8541d120b56464d537014eb6d6f",
+    "size": 174
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/tmp/nexus installed source sdk jducych8/g474 baremetal source/g474.toml",
+        "sha256": "f9e562f7a05a15b706c82efc5298705db8e576c2d087fbdf5d9c1f5e6a985e5a",
+        "size": 552
+      },
+      "label": "external/g474.toml"
+    },
+    {
+      "file": {
+        "path": "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/.nexus-source-sdk.json",
+        "sha256": "b3200b496ec80cb9a6853e1bbcca0a7170ad6614533b905da371aa72e2826180",
+        "size": 2410873
+      },
+      "label": ".nexus-source-sdk.json"
+    },
+    {
+      "file": {
+        "path": "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/boards/stm32g474re_hse24_reference/board.json",
+        "sha256": "6db394749153f691d43343eb78e105aa329dabe9ea1d65ed7f3bcb449f1bfa1c",
+        "size": 1776
+      },
+      "label": "boards/stm32g474re_hse24_reference/board.json"
+    },
+    {
+      "file": {
+        "path": "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/soc/stm32g474/routes.json",
+        "sha256": "b731f659b0afd3fff78ccefd1f7b410370a3358bfebb5bf412403bab5699c874",
+        "size": 1118
+      },
+      "label": "soc/stm32g474/routes.json"
+    },
+    {
+      "file": {
+        "path": "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/soc/stm32g474/soc.json",
+        "sha256": "0c8e4ece490edd06190295601139b0182a29249d6734744892c272e74420dd56",
+        "size": 6459
+      },
+      "label": "soc/stm32g474/soc.json"
+    }
+  ],
+  "elf": {
+    "path": "/tmp/nexus installed source sdk jducych8/g474 baremetal build/bin/installed_g474.elf",
+    "sha256": "df5e3ee5d1c694570f6c663ebbc0da579e382e9c9bd5a4ef78d0741a026f41cc",
+    "size": 27824
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 524288,
+      "footprint_bytes": 8424,
+      "loaded_bytes": 8424,
+      "ranges": [
+        [
+          134217728,
+          134226152
+        ]
+      ]
+    },
+    "ram": {
+      "cpu-sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870972
+          ],
+          [
+            536870976,
+            536871200
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 2332
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "cpu-sram",
+        "end": 536871200,
+        "start": 536871200
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "cpu-sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32G474RET6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/tmp/nexus installed source sdk jducych8/g474 baremetal build/nexus-sdk/generated/resolved.json",
+    "sha256": "69a85b5dbd3f6ca111e342b042293b02c651d8d66a45096239c3763fe0c372dc",
+    "size": 15044
+  },
+  "schema_version": 1,
+  "soc_family": "stm32g474",
+  "status": "passed",
+  "violations": []
+}

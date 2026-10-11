@@ -380,6 +380,12 @@ def run(args) -> int:
               'commands': recorder.commands, 'probes': []}
     try:
         contract = validate_contract(json.loads(args.contract.read_text()))
+        kernel = contract['kernel']
+        kernel_lock = None
+        if kernel is not None:
+            kernel_lock = (ROOT / kernel['lock']).resolve()
+            if not kernel_lock.is_relative_to(ROOT) or not kernel_lock.is_file():
+                raise ValueError('kernel source lock must exist inside source tree')
         report['contract'] = arch_compile.digest(args.contract)
         report['backend'] = contract['backend']
         build = actual_build(args.build_dir)
@@ -407,11 +413,8 @@ def run(args) -> int:
         report['cmake'] = arch_compile.digest(Path(cmake))
         recorder.execute([cmake, '--version'], 'cmake-version')
         before = source_inputs(args.contract, builds)
-        if contract['kernel'] is not None:
-            lock = (ROOT / contract['kernel']['lock']).resolve()
-            if not lock.is_relative_to(ROOT) or not lock.is_file():
-                raise ValueError('kernel source lock must exist inside source tree')
-            before[str(lock)] = arch_compile.digest(lock)
+        if kernel_lock is not None:
+            before[str(kernel_lock)] = arch_compile.digest(kernel_lock)
         report['source_inputs'] = before
         recorder.execute([cmake, '--build', str(build), '--parallel', '2',
                           '--target', *args.target, '--verbose'], 'probe-build')
@@ -450,15 +453,15 @@ def run(args) -> int:
             verify_compile_profile(measured['cpu_profile'], json.loads(
                 (firmware_build / 'compile_commands.json').read_text()))
             measured['cpu_resolution'] = arch_compile.digest(args.cpu_resolution)
-            if contract['kernel'] is not None:
-                missing = set(contract['kernel']['required_symbols']) - set(
+            if kernel is not None:
+                missing = set(kernel['required_symbols']) - set(
                     measured['symbols'])
                 if missing:
                     raise ValueError('real kernel API not retained: ' + str(missing))
             report['firmware'] = measured
         after = source_inputs(args.contract, builds)
-        if contract['kernel'] is not None:
-            after[str(lock)] = arch_compile.digest(lock)
+        if kernel_lock is not None:
+            after[str(kernel_lock)] = arch_compile.digest(kernel_lock)
         report['source_inputs_stable'] = before == after
         if before != after:
             raise ValueError('source or generated inputs changed during execution')

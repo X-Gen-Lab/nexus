@@ -5,11 +5,13 @@ except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
 try:
-    from ... import can, usb_device, ethernet
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
 except ImportError:
     import can
     import usb_device
     import ethernet
+    import timer_advanced
+    import secondary_controllers
 from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
@@ -252,10 +254,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             child_name = _symbol(child["id"])
             endpoint = f"s_nx_endpoint_{name}" if not index else f"s_nx_endpoint_{child_name}"
             if index:
-                declarations.append(f"static nx_gd32_i2c_async_endpoint_state_t {endpoint};")
+                declarations.append(f"static nx_gd32_i2c_async_endpoint_state_t {endpoint} = {{ .port = &s_nx_port_{name}, .address = {child['address']}u }};")
             declarations += _endpoint_face("i2c", child_name, endpoint, "i2c_async")
-            before += [f"    {endpoint}.port = &s_nx_port_{name};",
-                       f"    {endpoint}.address = {child['address']}u;"]
         call = f"nx_gd32_i2c_async_initialize(&s_nx_port_{name}, {item.options.irq.priority}u)"
         declarations += prepared(name, [(pin, 2, 1, True, None) for pin in item["pins"]], call, before=before)
         declarations += released(name, item["pins"], f"nx_i2c_port_stop(&s_nx_face_{name})")
@@ -279,10 +279,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             child_name = _symbol(child["id"])
             endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
             if index:
-                declarations.append(f"static nx_gd32_i2c_endpoint_state_t {endpoint};")
+                declarations.append(f"static nx_gd32_i2c_endpoint_state_t {endpoint} = {{ .port = &s_nx_port_{name}, .address = {child['address']}u }};")
             declarations += _endpoint_face("i2c", child_name, endpoint)
-            after += [f"    {endpoint}.port = &s_nx_port_{name};",
-                      f"    {endpoint}.address = {child['address']}u;"]
         line_gpio = item["pins"][0]["pin"][1]
         line_mask = sum(1 << int(pin["pin"][2:]) for pin in item["pins"])
         call = (f"nx_gd32_i2c_initialize_at(&s_nx_port_{name}, &s_nx_endpoint_{name}, "
@@ -391,6 +389,10 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed GD32 instance, including explicit GPIO construction."""
     item = controller_ir(item, "gd32f470")
+    if secondary_controllers.applies(item, result, "gd32"):
+        return secondary_controllers.constructor(item, result, "gd32")
+    if item.kind in timer_advanced.KINDS:
+        return timer_advanced.constructor(item, result, "gd32")
     if item.kind == "can":
         return can.constructor(item, result, "gd32")
     if item.kind == "eth":

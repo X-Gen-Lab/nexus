@@ -86,8 +86,9 @@ def _context(identity, admission):
             context["kind"] == "os_hil_context" and
             context["admission_sha256"] == canonical_digest(admission),
             "OS context must bind the exact admission")
-    for key in ("workload", "instrument"):
-        verify_file_identity(context[key])
+    from tools.hil.workloads import admitted_workload
+    admitted_workload(context["workload"], admission)
+    verify_file_identity(context["instrument"])
     for key in ("load", "executor"):
         require(isinstance(context[key], str) and
                 0 < len(context[key].strip()) <= 4096,

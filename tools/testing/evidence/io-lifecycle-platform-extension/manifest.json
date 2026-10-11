@@ -1,0 +1,2639 @@
+{
+  "schema": 1,
+  "kind": "bounded-io-lifecycle-platform-development-evidence",
+  "qualifies_candidate": false,
+  "physical_status": "not_executed",
+  "scope": "Explicit 37-target dirty-source development subset; root clean whole-plan qualification remains required.",
+  "properties": 203,
+  "added_properties": 123,
+  "added_groups": {
+    "can": 22,
+    "usb_device": 24,
+    "eth": 30,
+    "g474_uart_and_factory": 11,
+    "timer": 36
+  },
+  "old_first_80_property_objects_unchanged": true,
+  "old_first_80_sha256": "13c7b90b98b6924d7b66f8c6289d1cbe94c188b3f56a250446aa4f82da4612a4",
+  "actual_google_cases": 710,
+  "actual_targets": 37,
+  "bound_catalogue_sources": 161,
+  "reviewed_tus": 79,
+  "reviewed_compiled_contexts": 142,
+  "target_local_compiled_contexts": 122,
+  "generated_factory_tus": 9,
+  "maintained_sources": [
+    {
+      "path": "scripts/ci/io_lifecycle_matrix.py",
+      "sha256": "f64d15617c956bb40fb504e70c42bf84a8c344af2d2940fb4f95a8e1d0389529"
+    },
+    {
+      "path": "tools/testing/test_io_lifecycle_matrix.py",
+      "sha256": "78fcffb0b953a32c21239f29121429286b40a145af574e12902bf7a4aba039c9"
+    },
+    {
+      "path": "tools/testing/io_lifecycle_matrix.json",
+      "sha256": "88c1a08a9108e19cd962d8f71ac0b53c778011bcc054ce24dad71adedc16c538"
+    },
+    {
+      "path": "docs/design/io-lifecycle-matrix.md",
+      "sha256": "5b02c0ea2bfe380aa5ce36673f3547f5f201a836f866a2a46df02399964b4b10"
+    }
+  ],
+  "tdd": {
+    "red": {
+      "log": "raw/generated-context-red.log",
+      "exit_code": 1,
+      "behavior": "Seven new capture/audit boundary cases: six assertion failures and one missing new field; original 18 cases remain passing."
+    },
+    "green": {
+      "log": "raw/generated-context-green.log",
+      "exit_code": 0,
+      "cases": 25
+    },
+    "final_tools": {
+      "log": "raw/matrix-tool-final.log",
+      "exit_code": 0,
+      "cases": 29,
+      "scope": "25 matrix boundary cases plus four existing gate integration cases."
+    }
+  },
+  "build_attempts": [
+    {
+      "command": "raw/actual-target-configure.command.json",
+      "exit_code": 1,
+      "status": "Preserved real typed-model fixture mismatch, no test execution from stale binaries."
+    },
+    {
+      "command": "raw/actual-target-configure-after-model-fix.command.json",
+      "exit_code": 0
+    },
+    {
+      "command": "raw/actual-target-build.command.json",
+      "exit_code": 0
+    },
+    {
+      "command": "raw/actual-target-configure-final-plan.command.json",
+      "exit_code": 0
+    },
+    {
+      "command": "raw/actual-target-build-final-plan.command.json",
+      "exit_code": 0
+    }
+  ],
+  "execution": "raw/matrix-execution-attempt1/execution.json",
+  "property_report": "raw/matrix-execution-attempt1/matrix-report.json",
+  "review_status": "Author source/assertion review; independent tool-boundary review queued, not claimed completed.",
+  "limits": [
+    "Source assertion anchors and fresh selected-model execution do not establish formal or exhaustive interleaving proof.",
+    "Factory generated TU identities are observed from the existing actual compile database; no second registry or runner.",
+    "Objects and executables are hash-bound in the report but their large binary bytes are not copied into this source archive.",
+    "Original 80-property archive remains byte-for-byte historical evidence; these 203 properties require fresh whole-plan execution for a candidate.",
+    "No physical CAN/USB/PHY/timer waveform, electrical safe output, actual IRQ latency, or new station qualification."
+  ],
+  "unavailable_historical_source_capsules": [
+    {
+      "checkout_path": "tools/configure/providers/gd32f470/emission.py",
+      "expected_sha256": "a6bb559f07d259fa25e87d88fc0dc6ccdd0485425e14075b59bd17f09dfa509c",
+      "observed_later_sha256": "7c7f8b560b04d01d7d206b1359bc90f398c3bb801f10f129850d432a7c611e65",
+      "reason": "Another active source batch changed this input after successful execution/audit; exact historical bytes were unavailable at archival. Report retains its original identity; current later source is not qualified by that report."
+    },
+    {
+      "checkout_path": "tools/configure/providers/stm32f407/emission.py",
+      "expected_sha256": "915b53ff8b0982a685bba91945ec758e0fe6a3b205a7723a9c2172d3e1d68cf1",
+      "observed_later_sha256": "7fac80d84ef5f5d916d6e6f07a16c291369467f776694ba61de39fb8b28214f4",
+      "reason": "Another active source batch changed this input after successful execution/audit; exact historical bytes were unavailable at archival. Report retains its original identity; current later source is not qualified by that report."
+    },
+    {
+      "checkout_path": "tools/configure/secondary_controllers.py",
+      "expected_sha256": "70f1b39078240cc6c91bc63e5ae4231c8fb6ba8a6ad620237a91900766ce50ba",
+      "observed_later_sha256": "c1205631b453f7381a5e3bc9a2f6f8f2c1b9943151bcae7869c920d0a64f50b3",
+      "reason": "Another active source batch changed this input after successful execution/audit; exact historical bytes were unavailable at archival. Report retains its original identity; current later source is not qualified by that report."
+    }
+  ],
+  "raw_files": [
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-build-final-plan.command.json",
+      "stored_path": "raw/actual-target-build-final-plan.command.json",
+      "sha256": "2572f1726e68fbd5938d17fe0680d049ac5e71bf6dfa8ee583512768f5fc6e15",
+      "bytes": 1484
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-build-final-plan.log",
+      "stored_path": "raw/actual-target-build-final-plan.log",
+      "sha256": "6019392848d74efd0c19539de16de326e7e40071bb13afd7d23169731a9f472a",
+      "bytes": 4575
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-build.command.json",
+      "stored_path": "raw/actual-target-build.command.json",
+      "sha256": "2572f1726e68fbd5938d17fe0680d049ac5e71bf6dfa8ee583512768f5fc6e15",
+      "bytes": 1484
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-build.log",
+      "stored_path": "raw/actual-target-build.log",
+      "sha256": "ee705c71eea38ea85b7233bc7cccc85f74c342cab5d7eecc66974040965546a2",
+      "bytes": 17828
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-configure-after-model-fix.command.json",
+      "stored_path": "raw/actual-target-configure-after-model-fix.command.json",
+      "sha256": "b6d0ef5c08d5698fa30e51f96f2c2a2ea17405c34fe47afee1e0132ab54a4716",
+      "bytes": 171
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-configure-after-model-fix.log",
+      "stored_path": "raw/actual-target-configure-after-model-fix.log",
+      "sha256": "d57e2578d95065c03d05794323c87884620dde78005e60ab7e1b2073162a3328",
+      "bytes": 691
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-configure-final-plan.command.json",
+      "stored_path": "raw/actual-target-configure-final-plan.command.json",
+      "sha256": "b6d0ef5c08d5698fa30e51f96f2c2a2ea17405c34fe47afee1e0132ab54a4716",
+      "bytes": 171
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-configure-final-plan.log",
+      "stored_path": "raw/actual-target-configure-final-plan.log",
+      "sha256": "2fd291ff8ea60912d4f757adab89c19d4186ca2a1aefaa0ff9a1a79b1a1879a2",
+      "bytes": 840
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-configure.command.json",
+      "stored_path": "raw/actual-target-configure.command.json",
+      "sha256": "38b8895233751254197ec2fde06390a5e7594bc8fa281fb110879092d5b45646",
+      "bytes": 171
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/actual-target-configure.log",
+      "stored_path": "raw/actual-target-configure.log",
+      "sha256": "3e156feb63ae3925ac2a154a68e9fb5f8e92f3598edb2e3249b42e8e03e314aa",
+      "bytes": 1280
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/archive-source-change-attempt1.json",
+      "stored_path": "raw/archive-source-change-attempt1.json",
+      "sha256": "efa2bf63b16cb834019b67ed5d6a77d35427b16d388ae5ac8d77ddc84cef9a45",
+      "bytes": 387
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/archive-source-change-attempt1.py.raw",
+      "stored_path": "raw/archive-source-change-attempt1.py.raw",
+      "sha256": "c937ae46f601b5c3c584acafa4e6cf8c86f80be5f2bc025d14dea747f820d462",
+      "bytes": 6162
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/execute_current_matrix.py",
+      "stored_path": "raw/execute_current_matrix.py.raw",
+      "sha256": "05597ce7a62b100497994baf39d8c28a63e660b62044c0553a8e73e76eb5749a",
+      "bytes": 3017
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/extend_catalogue.py",
+      "stored_path": "raw/extend_catalogue.py.raw",
+      "sha256": "516b20f632ea5e309f4bfaef5004790676807310927064d08fe8856a35e90adf",
+      "bytes": 21362
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/generated-context-green.command.json",
+      "stored_path": "raw/generated-context-green.command.json",
+      "sha256": "5dcbcb031098838e6b84e74c40789cbc5731a438bd7dd8a1c6e27dee3347b7a1",
+      "bytes": 166
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/generated-context-green.log",
+      "stored_path": "raw/generated-context-green.log",
+      "sha256": "e600d32f25cb4dc8dab461d11e49246d318f976a68253a30af86d0e37ce882e6",
+      "bytes": 124
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/generated-context-red-sources/scripts/ci/io_lifecycle_matrix.py.raw",
+      "stored_path": "raw/generated-context-red-sources/scripts/ci/io_lifecycle_matrix.py.raw",
+      "sha256": "3379ccf8ba0fe143f4b25b99f015fa522e574e9c867f9cb0e8d2983dde0eea69",
+      "bytes": 15078
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/generated-context-red-sources/tools/testing/test_io_lifecycle_matrix.py.raw",
+      "stored_path": "raw/generated-context-red-sources/tools/testing/test_io_lifecycle_matrix.py.raw",
+      "sha256": "78fcffb0b953a32c21239f29121429286b40a145af574e12902bf7a4aba039c9",
+      "bytes": 13429
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/generated-context-red.command.json",
+      "stored_path": "raw/generated-context-red.command.json",
+      "sha256": "f96ce0a34c6a56106051ea02f19365baa98c915a2824fc3be9e022d24e7adfe1",
+      "bytes": 166
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/generated-context-red.log",
+      "stored_path": "raw/generated-context-red.log",
+      "sha256": "b47901ecc9dba7e6956bf342fa3c30da4206af19f86fce080be0549ea4fd3e4b",
+      "bytes": 4525
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/checkout-after.json",
+      "stored_path": "raw/matrix-execution-attempt1/checkout-after.json",
+      "sha256": "b994c4ca49dbdc9a094e6c903af79b8ed4cdf7e178935328ee10c2d9aef83c8f",
+      "bytes": 37884
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/checkout-before.json",
+      "stored_path": "raw/matrix-execution-attempt1/checkout-before.json",
+      "sha256": "f524d80b12749b08c3ca9eb72f21f2eb6b290cfdb972b9a2608a69fed2a8756d",
+      "bytes": 37948
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-0.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-0.command.json",
+      "sha256": "d362f01d5923f36e603845dc45f3e3a8e6de35d8c36d127d30697f40392186a1",
+      "bytes": 207
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-0.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-0.txt.raw",
+      "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba",
+      "bytes": 1637
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-1.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-1.command.json",
+      "sha256": "6789beae991469cacd1a5593f51e9e2043717f525fb66c8b30c253f48c9c1910",
+      "bytes": 208
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-1.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-1.txt.raw",
+      "sha256": "576e6cb5ae9edd3462333d466d33da26f3ab289c4e93cb2d44b3158271280896",
+      "bytes": 411
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-10.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-10.command.json",
+      "sha256": "7019a5bbd0adda8d83d6024cb6b560d25f3a4f3b186697438ef6d76360e88edf",
+      "bytes": 210
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-10.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-10.txt.raw",
+      "sha256": "00af654cd96a16675406048f2f874bec713d4334ea2cd0b78b33347596849fa7",
+      "bytes": 738
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-11.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-11.command.json",
+      "sha256": "08ebe2e5eaa101313fea2ca70d1705683b6ac8532c3f7d96edf91452711bf11c",
+      "bytes": 205
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-11.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-11.txt.raw",
+      "sha256": "dba3cbf36b9e672fdfd0c1f0d6cfb91e00212c28c7d71c2a47fca7b883707320",
+      "bytes": 870
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-12.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-12.command.json",
+      "sha256": "053afa1d8a0f88be66d3905cd10737807ab267f39f09c614f1e1000d5fabe98c",
+      "bytes": 211
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-12.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-12.txt.raw",
+      "sha256": "6e082606235ee31f01553e85a63aae4ae4a666378ad654373df56bfc8a5ba971",
+      "bytes": 1169
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-13.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-13.command.json",
+      "sha256": "2d5c9ecaae8d70366d7480c93d20f527d22381bd230965048042ecb2ae56f753",
+      "bytes": 206
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-13.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-13.txt.raw",
+      "sha256": "d1f31df5cf87776a19bd01fea228fb50bd469737d14603d64fa658683750f8df",
+      "bytes": 515
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-14.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-14.command.json",
+      "sha256": "2f6de492f1349db2f3d5eed9f16e18e962e5031e70c528555011c1d9c6411e98",
+      "bytes": 210
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-14.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-14.txt.raw",
+      "sha256": "ad79bc462759232a75efd715910a6de98f30b80ec56cfa7f0284a0d597543b66",
+      "bytes": 2062
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-15.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-15.command.json",
+      "sha256": "01084d73ce3c1a1438af0e7bfb94ef63b0b710fe3a23539559d4fd0a469cb5ae",
+      "bytes": 209
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-15.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-15.txt.raw",
+      "sha256": "f2ee957c51d75511ddcfcdf1096d645bcbe1e9df0c8e9d50cd1c59552b86a5be",
+      "bytes": 516
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-16.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-16.command.json",
+      "sha256": "8de127f51d035fc169842b0f9cdbf78f30473eb65dd7230b864ded446983afa8",
+      "bytes": 209
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-16.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-16.txt.raw",
+      "sha256": "6e563425dc943027ce29e18589e7cea6a397645c4514d851f4fedd42dcbe8800",
+      "bytes": 628
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-17.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-17.command.json",
+      "sha256": "b80e53dce7b575c343d09d0f6dd8ad32e92c0a268574d3c78c70067c36e4ce66",
+      "bytes": 216
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-17.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-17.txt.raw",
+      "sha256": "503a13f1125e3b00a35dbd96b310d8cb27585f6bc148dc74354a6eb14414cd9b",
+      "bytes": 2728
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-18.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-18.command.json",
+      "sha256": "55936ce4a81b0f86aec3a625005043e503df28c3146d7b43f723ba732b1e4e01",
+      "bytes": 212
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-18.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-18.txt.raw",
+      "sha256": "e12b4431ac70305593ae59756cee9925fadb32a0c98d8b8d190da0b94863af57",
+      "bytes": 388
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-19.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-19.command.json",
+      "sha256": "d0c501c8d01628ab556bc13e4e0824376d4117b9947e715f0fefa89cf3328d12",
+      "bytes": 209
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-19.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-19.txt.raw",
+      "sha256": "32ae3619199d588ebf8a75370392ae28a4c6e7e1ce17f15c9a8d7b993180e555",
+      "bytes": 426
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-2.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-2.command.json",
+      "sha256": "01a19ae41409359a54c9bd60c7d015c90007b42669fbc0b116c4bfdc71ae20ed",
+      "bytes": 205
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-2.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-2.txt.raw",
+      "sha256": "25bb494c21cd469eb3e8212b76705a74a29e07d69b9a4e94e29a9933f83fd350",
+      "bytes": 794
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-20.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-20.command.json",
+      "sha256": "f303e1a1c5831f2ec99dd9e1f2278954b2b12f4ca8fbdd2cf8f38cf86b59464c",
+      "bytes": 209
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-20.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-20.txt.raw",
+      "sha256": "6cc315b94c1ec500935a915dfb12e9e052b6cceee61236eefff478b2e293ade3",
+      "bytes": 1425
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-21.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-21.command.json",
+      "sha256": "452dc9f88634dd001ffae8ced6fd93fef0da41ddaa0aa48c38800ece5247e131",
+      "bytes": 210
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-21.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-21.txt.raw",
+      "sha256": "77f6dc73f10eebad63cd883cb83e856b522f474c57b0a3eb7ce5962e7f8481e1",
+      "bytes": 360
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-22.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-22.command.json",
+      "sha256": "31e0e993abb4765e5c62e96c2b000e890012d53b736bca04e78350224dce99b8",
+      "bytes": 202
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-22.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-22.txt.raw",
+      "sha256": "aff5cecc1eb63d6412048fb3c800e0e68747873513261708afadfff27ffe2b8a",
+      "bytes": 485
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-23.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-23.command.json",
+      "sha256": "25228541b3fb325494dedb071cc2530b102ec9c17c14ec50857afb8b73e75233",
+      "bytes": 210
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-23.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-23.txt.raw",
+      "sha256": "bbfcefc728b8ac8d88fca53952b2fe6f2d1347b7fdf6fcfb1ddc241ec089e047",
+      "bytes": 855
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-24.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-24.command.json",
+      "sha256": "a17cb641902585c0fd336faa16f26025b4bb5270a2628435aa3ff61198592dd4",
+      "bytes": 207
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-24.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-24.txt.raw",
+      "sha256": "dcdff908432513129c4a72b5fc6719516288cd3ba90a959eb029c547d9096b4b",
+      "bytes": 1805
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-25.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-25.command.json",
+      "sha256": "43e683f09e9bfbe56f6d17a84e1e1c028eaa0365ef1461d5265938f3ce5d369d",
+      "bytes": 208
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-25.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-25.txt.raw",
+      "sha256": "15414b903b28312a2af19e0a8f51a197306c00ec5c8fe25e9f53f75a8f1417c3",
+      "bytes": 1166
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-26.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-26.command.json",
+      "sha256": "16acee77f3b0675becb1cd69c5995cee8371e7a51c6ac6c2e93ff6bf46c7a572",
+      "bytes": 211
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-26.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-26.txt.raw",
+      "sha256": "bbf672837c13a0c62ac845af6aebdc53ab7178634798c2f2459a45f192529580",
+      "bytes": 788
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-27.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-27.command.json",
+      "sha256": "245dc9fd0451f9a2df499aaf2c708ba7a3301a78ff53afaad38eb88b36983a4f",
+      "bytes": 206
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-27.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-27.txt.raw",
+      "sha256": "7236059ac185e62d913a8852c6a3f71d6a438f11b433e52c3f1564f309d880da",
+      "bytes": 644
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-28.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-28.command.json",
+      "sha256": "d0218a968926f5f414214bd6705dd147545bf0892d8981bcf6874b4fefcb041e",
+      "bytes": 212
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-28.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-28.txt.raw",
+      "sha256": "6e082606235ee31f01553e85a63aae4ae4a666378ad654373df56bfc8a5ba971",
+      "bytes": 1169
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-29.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-29.command.json",
+      "sha256": "38afc941cf3907dbe71ffe564a6bb6c3971c15609bf421f41f082ac3f46e5841",
+      "bytes": 207
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-29.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-29.txt.raw",
+      "sha256": "1c2c2d0d0436350c85f4a1e6c7da4829500bdd1896a1b24075b52d6b27554384",
+      "bytes": 554
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-3.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-3.command.json",
+      "sha256": "f21f17abf9ca763728c255b7eefe6b7a426e9ed2e04981fa73b978c448e75115",
+      "bytes": 206
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-3.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-3.txt.raw",
+      "sha256": "8ab3699896eb000cad3935581a740c11794b233d0e82fae99a0c3353845c9bd2",
+      "bytes": 1108
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-30.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-30.command.json",
+      "sha256": "8a6e95de2619cf3ae84b291a911c5c193b22b76b216d0f9b35441d842d14851a",
+      "bytes": 211
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-30.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-30.txt.raw",
+      "sha256": "40f58ac2a74f2cdec0d2b85d3a831fe74eec156d63181ddfaa0a9c26439771d8",
+      "bytes": 1953
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-31.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-31.command.json",
+      "sha256": "21ad68198fbba3579a3d92b1a4f26acee3ca12c9618695767bb6599ee34da87a",
+      "bytes": 210
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-31.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-31.txt.raw",
+      "sha256": "805c2ce33e416f7748cbb86f17d49217c44051e20bd3f6c490e9fcf03fd45fe1",
+      "bytes": 325
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-32.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-32.command.json",
+      "sha256": "5263a8046735e13ceed8b2c5aa3014488f4714bfb478b33381c8251384389f72",
+      "bytes": 210
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-32.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-32.txt.raw",
+      "sha256": "721ae085db40e8c4224bf559900403d2ffc78aa1fc96ec78b9fb54d19e026bd0",
+      "bytes": 689
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-33.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-33.command.json",
+      "sha256": "1221686e93540543bd27834ccfb0f4b1cd9daac5d377996d054932709a879cba",
+      "bytes": 217
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-33.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-33.txt.raw",
+      "sha256": "503a13f1125e3b00a35dbd96b310d8cb27585f6bc148dc74354a6eb14414cd9b",
+      "bytes": 2728
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-34.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-34.command.json",
+      "sha256": "ff5b31631d951dda25c6b6ea106aa2b4553463f6dea034640129d1a6048f0e89",
+      "bytes": 213
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-34.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-34.txt.raw",
+      "sha256": "e12b4431ac70305593ae59756cee9925fadb32a0c98d8b8d190da0b94863af57",
+      "bytes": 388
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-35.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-35.command.json",
+      "sha256": "de4030a8364fef2f1df5e73a28321584a5ce0bb71b34b86808d53974cadee875",
+      "bytes": 203
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-35.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-35.txt.raw",
+      "sha256": "fd2a00143ac4c92b3333fa6c4e63feeadec7481b780eec2aec29c299ec7d8662",
+      "bytes": 782
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-36.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-36.command.json",
+      "sha256": "f0cdeb8e37c3fcd72f9c30b7c44148ab44cf91b4f2494f65f48052a70b59f99a",
+      "bytes": 203
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-36.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-36.txt.raw",
+      "sha256": "70c1b08a19a59690c1b05a2cac9e68c31becb88902d8193f8a6d56ef0c6bc067",
+      "bytes": 2222
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-4.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-4.command.json",
+      "sha256": "e2328a6e242d369452f0d491c6db951766a527f7b86fc0f4ae94873ed6502675",
+      "bytes": 208
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-4.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-4.txt.raw",
+      "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc",
+      "bytes": 1342
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-5.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-5.command.json",
+      "sha256": "57026da2c835e4fe4ad1a9c2b667181f133dc27fd92411d9e157d8d0ba6acc75",
+      "bytes": 209
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-5.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-5.txt.raw",
+      "sha256": "77f6dc73f10eebad63cd883cb83e856b522f474c57b0a3eb7ce5962e7f8481e1",
+      "bytes": 360
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-6.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-6.command.json",
+      "sha256": "20529862888c393a66e40adb82bafdded94cdff46a22b42636bb0337cf2e435c",
+      "bytes": 201
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-6.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-6.txt.raw",
+      "sha256": "aff5cecc1eb63d6412048fb3c800e0e68747873513261708afadfff27ffe2b8a",
+      "bytes": 485
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-7.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-7.command.json",
+      "sha256": "84a2ac8dd2425ba0ae83b380738015d598eaf078136ce97074bb530b0e5824c6",
+      "bytes": 209
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-7.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-7.txt.raw",
+      "sha256": "bbfcefc728b8ac8d88fca53952b2fe6f2d1347b7fdf6fcfb1ddc241ec089e047",
+      "bytes": 855
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-8.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-8.command.json",
+      "sha256": "46047fd072dc7698f198d97ca0b0c04ebb12be646772461f765bb6ff5b8a01e9",
+      "bytes": 206
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-8.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-8.txt.raw",
+      "sha256": "dcdff908432513129c4a72b5fc6719516288cd3ba90a959eb029c547d9096b4b",
+      "bytes": 1805
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-9.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-9.command.json",
+      "sha256": "2711e899143a7ce4d85aa93c5f6d34522cf6d2bf9bd88182ee81972c2d9c1397",
+      "bytes": 207
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/discovery-9.txt",
+      "stored_path": "raw/matrix-execution-attempt1/discovery-9.txt.raw",
+      "sha256": "13bec836d5bdb51ffec7f5b8ecdc51b9f4e48cdbdc9e1e164c9e313d0b11f7af",
+      "bytes": 1212
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-0.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-0.command.json",
+      "sha256": "42ff25c624c13053e98499c1c57772326c1106de53c9dc70898b674b0f11aaa4",
+      "bytes": 374
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-0.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-0.txt.raw",
+      "sha256": "c677d58f074f7337152aa849e99cb8ca7e3a1a71bdc3fa4fe36b471aac5fb48a",
+      "bytes": 5058
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-1.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-1.command.json",
+      "sha256": "da7ff180cafd991e4ea294139039bfa8de66f6f3523360727c9a8d1719d0935e",
+      "bytes": 375
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-1.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-1.txt.raw",
+      "sha256": "39081636e8e31eac6d9f07c11bdc5580a4123ca33df043bcae797958f41bc6f9",
+      "bytes": 1484
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-10.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-10.command.json",
+      "sha256": "0ea81cbe5b94dc2b041ede8fe2ec164b83c42d61891a2ef70b7d0cc43814df26",
+      "bytes": 378
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-10.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-10.txt.raw",
+      "sha256": "484a40c194005f6e9794f6bb9f599297c0c1f0467cccd48210ad956d4f649486",
+      "bytes": 2445
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-11.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-11.command.json",
+      "sha256": "fc58fcef6bf8c1aff90897286eae73d81749142eea29765b56f90575a01c9569",
+      "bytes": 373
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-11.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-11.txt.raw",
+      "sha256": "4dba19c73fa82710f404f781b4de1509d4c7af9dc6df47868e3135050d54a52f",
+      "bytes": 2759
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-12.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-12.command.json",
+      "sha256": "c3159a759c63b9053470f80464719ace647330b306e929725b13ed6b843da1ca",
+      "bytes": 379
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-12.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-12.txt.raw",
+      "sha256": "ea362d414e4317480e87b966a8447d87bbf841e8deaaa3506d29063f0c9c4705",
+      "bytes": 3802
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-13.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-13.command.json",
+      "sha256": "ee225d3f60148a53d2ce02c3623f8c1a1d7e8ba194c61b76a078f945be66b88e",
+      "bytes": 374
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-13.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-13.txt.raw",
+      "sha256": "1268aac108e0b772a098180c822f38007c5fd70667ace7267994d983f6510dfb",
+      "bytes": 1756
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-14.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-14.command.json",
+      "sha256": "871a7d1526a9ac3bca646c612911726783e76ea0158ee9e70d6bd1c1c078ac77",
+      "bytes": 378
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-14.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-14.txt.raw",
+      "sha256": "9d5d873d6253b7efe84b94af12553f44d4de2f6bb9fc534dbc20fd8ac8ffa0cf",
+      "bytes": 6513
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-15.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-15.command.json",
+      "sha256": "e43bbf4f07f2e791b578ec4319eb50b38d04eec315287fa8c1fb49faf8374b0e",
+      "bytes": 377
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-15.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-15.txt.raw",
+      "sha256": "d7a92e6870b47cb2fa93405dbcf34dac731ed86134392e76cd113be3e4b04292",
+      "bytes": 1812
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-16.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-16.command.json",
+      "sha256": "656e3c1fe2fea8937505c7a9d2ac51b8eccb273961a421a578c536f0b25654e8",
+      "bytes": 377
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-16.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-16.txt.raw",
+      "sha256": "278440d3d85de0e7f98a0cd80094cc475bb1fe679d6d3c093c44b476e80dda5e",
+      "bytes": 2071
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-17.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-17.command.json",
+      "sha256": "8d8202cba095dd0cd81b1f65e37564aa23709b19b768e99fbb9d5146fb23de59",
+      "bytes": 384
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-17.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-17.txt.raw",
+      "sha256": "f2a0823e18ca4a6f00f2be2ce112944d6eed21336fbf7995d3faee01a286303d",
+      "bytes": 8911
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-18.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-18.command.json",
+      "sha256": "9fcf6016bc32ed34b7c80debb14f3984fe29c43ef3d374c7427da096e14f7e78",
+      "bytes": 380
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-18.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-18.txt.raw",
+      "sha256": "524b913ab9ee14311fdeb9d3c4f272a4cb518a38a13183499ab7b1aeeba65e27",
+      "bytes": 1326
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-19.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-19.command.json",
+      "sha256": "3855ba161869f85bd336150212981f26c57446d41d793365c784d0a3be61bc9c",
+      "bytes": 377
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-19.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-19.txt.raw",
+      "sha256": "c0f99b7d54becdd23c3b16be7cabd9f4ee840d147d1fadcaaa212e0b75315ab3",
+      "bytes": 1662
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-2.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-2.command.json",
+      "sha256": "45f5f057922290965d4b8683451be00cccc871def2633a38f2bfab9eb44e8431",
+      "bytes": 372
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-2.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-2.txt.raw",
+      "sha256": "d5334c5e7ea769632297511d46482c1c4e5dec934d80cf246c5ac1549740c9b8",
+      "bytes": 2584
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-20.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-20.command.json",
+      "sha256": "084ac48ff346d06ffdd02ab0c1a4b155316d667c6d0321a40c23b42cc5d1714c",
+      "bytes": 377
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-20.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-20.txt.raw",
+      "sha256": "412c803313daad0bbd039058f507e20d79c6c22a24a21870bf4bdff06c75fb2b",
+      "bytes": 4834
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-21.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-21.command.json",
+      "sha256": "f12127d6c9eec4d14b48b89d33271364f05b9f8108d6d51876abfd77d2de4f59",
+      "bytes": 378
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-21.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-21.txt.raw",
+      "sha256": "57f700a1a334c35fea8ab6ce93705a180e4c862dbc53c4fd8c6036383a72480a",
+      "bytes": 1275
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-22.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-22.command.json",
+      "sha256": "ea406a2686975c371753108f0eda08eaed3f887f7e118562f55bd73b7dc335db",
+      "bytes": 370
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-22.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-22.txt.raw",
+      "sha256": "e911671da4f8ed33b1d636c0ab9966d7c52c63cd16730b75db2ac1ac167aef21",
+      "bytes": 1563
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-23.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-23.command.json",
+      "sha256": "839e78893d9c4136ca3704d4060f013df617f0be184321754a0b474c3a15483d",
+      "bytes": 378
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-23.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-23.txt.raw",
+      "sha256": "727a0e95050007a85331eadf718a8f8088584d74f948e0bbfd6f8d7c1cb3d3ee",
+      "bytes": 2879
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-24.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-24.command.json",
+      "sha256": "c47f5c4ed0939b477e1112a1afd5200cf5ce69b6e9d61e398127271d83b3973c",
+      "bytes": 375
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-24.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-24.txt.raw",
+      "sha256": "3a4403026b227b69581597c9abb15f68013e71987ca7eabec3984f809509c68a",
+      "bytes": 5772
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-25.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-25.command.json",
+      "sha256": "204334fbbe8addb3de45d212cb2201e3c5afaf968f8e3e716d93656ca50b614f",
+      "bytes": 376
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-25.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-25.txt.raw",
+      "sha256": "819f7ae4c46d76bf10e8d641ebc30373821ab33fdb1b717fc035b3877e3586fb",
+      "bytes": 4115
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-26.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-26.command.json",
+      "sha256": "ab6f1bac76dbacc7c20ced0afc676c44071b27e0edd04fd0410bc05efb26d72e",
+      "bytes": 379
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-26.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-26.txt.raw",
+      "sha256": "f658e0015a0e7cdff1ca32d98280ebbc82ebf19ca1029067d50dcfc20707ffba",
+      "bytes": 2600
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-27.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-27.command.json",
+      "sha256": "9ecee450cc776e43231ee1343b8f5ba552961da4031615b917573f85c635c8be",
+      "bytes": 374
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-27.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-27.txt.raw",
+      "sha256": "07e905cf1c67566bb422561b85830083c51f113d12ed4bad5f9f7cb683e47268",
+      "bytes": 2125
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-28.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-28.command.json",
+      "sha256": "71cd00abe877402caf0fb841cbdc8334ae627a4718e2414b9ee3fcefc991ee0c",
+      "bytes": 380
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-28.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-28.txt.raw",
+      "sha256": "ea362d414e4317480e87b966a8447d87bbf841e8deaaa3506d29063f0c9c4705",
+      "bytes": 3802
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-29.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-29.command.json",
+      "sha256": "73d52f853f619151dc3b6e503b6832cd3e38759f9745d5f8f7d2fce6be98c3f0",
+      "bytes": 375
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-29.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-29.txt.raw",
+      "sha256": "7b2a48bf0da5f81e3d4b1c318b0a71764645756a156ac139f8524c5a3421bf1d",
+      "bytes": 1912
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-3.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-3.command.json",
+      "sha256": "bb9b66c26c28b9d62b687f6f8ac6d148d53676c53604bd39fa210ae49a3dea86",
+      "bytes": 373
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-3.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-3.txt.raw",
+      "sha256": "3377b5f7b156eb799a53c7901e2bc4a90735ca9ec1df629eaa604b791ce35f55",
+      "bytes": 3735
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-30.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-30.command.json",
+      "sha256": "6d6bd04ea96c7e71465f20a30536d59361ff8b336e757319df73add1fcc40311",
+      "bytes": 379
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-30.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-30.txt.raw",
+      "sha256": "406f34e1d6aa06a707556ae4382c1be8c3650d432d05ca7c0d32715a964e2531",
+      "bytes": 6239
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-31.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-31.command.json",
+      "sha256": "3ff3894e49236ce2e985755333c80606d7782e97912d066d17cc5974a1ca49e2",
+      "bytes": 378
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-31.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-31.txt.raw",
+      "sha256": "2be6a9c223493fd0b6cb007d13b8d33e7e075a95620d1152df7535e161e6a6b8",
+      "bytes": 1300
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-32.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-32.command.json",
+      "sha256": "d42b76e48b6f8989791357604f495f051e313b0f4692ff1702d71966fdee99d1",
+      "bytes": 378
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-32.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-32.txt.raw",
+      "sha256": "cf6090e2b0091d94a440823ba809c81783acc035476db894b9714f70eed658b2",
+      "bytes": 2244
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-33.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-33.command.json",
+      "sha256": "186762b77f682dcc2ba280bcd5419e88e9692f3443e085074deab12d6611f1d1",
+      "bytes": 385
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-33.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-33.txt.raw",
+      "sha256": "f2a0823e18ca4a6f00f2be2ce112944d6eed21336fbf7995d3faee01a286303d",
+      "bytes": 8911
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-34.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-34.command.json",
+      "sha256": "2be14ca53cc9b3acf3ef99c029e6d39f5ad1df8444f3deabcf4aafe4be23300f",
+      "bytes": 381
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-34.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-34.txt.raw",
+      "sha256": "bc7370a98c432d07b49dcdf6202aee0689de6818c15d9e259d864781fc25b679",
+      "bytes": 1326
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-35.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-35.command.json",
+      "sha256": "c1ab6347df31a19a18f50eb161387224410fd1afdc878b93653db09c80e5417d",
+      "bytes": 371
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-35.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-35.txt.raw",
+      "sha256": "d7f1ecf2c54f941a58bab5612cc5ed2a1550b325065088cb3fd57a31fb52f6e6",
+      "bytes": 2545
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-36.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-36.command.json",
+      "sha256": "7ddd17a267c0b12232763db84db783c861ca641aab92d079151922d0b42dc4f5",
+      "bytes": 371
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-36.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-36.txt.raw",
+      "sha256": "7ee3e64cebc396bbfa5fc710c0b2f625152bfa575afe7c9e1ae99562e240f481",
+      "bytes": 6805
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-4.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-4.command.json",
+      "sha256": "eaec89e8d07521ecef870b8270ea8735786a6afdf34a58d803b1b70539a8a3dc",
+      "bytes": 375
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-4.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-4.txt.raw",
+      "sha256": "00380cd716d315efcec54741c20060d1428a4b156424e51cacc0a898e26fff60",
+      "bytes": 4557
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-5.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-5.command.json",
+      "sha256": "e3753c96e70e4701ed435f146c6a70d401525b38b8927cdf7f63fb657fdf758d",
+      "bytes": 376
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-5.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-5.txt.raw",
+      "sha256": "351c09cfe84b332d87f9816b3de8fb3c84f097674de8a43e327e827167c82d40",
+      "bytes": 1275
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-6.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-6.command.json",
+      "sha256": "31128f1f671b2af6554359422379ca3477c8a24b0799d774ba65aad173a621a8",
+      "bytes": 368
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-6.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-6.txt.raw",
+      "sha256": "e911671da4f8ed33b1d636c0ab9966d7c52c63cd16730b75db2ac1ac167aef21",
+      "bytes": 1563
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-7.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-7.command.json",
+      "sha256": "2b7f58dbd05c7353936a1540222b309397791e3f9c649bc997c46beda0697d91",
+      "bytes": 376
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-7.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-7.txt.raw",
+      "sha256": "641396441a6a54b2eabed11bfcd453310420cea544eb18ef13bca003278f9e1f",
+      "bytes": 2879
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-8.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-8.command.json",
+      "sha256": "a17f1e9987636c455ff41f5b9963c0cbbc571555fb512da6249c7021214825e8",
+      "bytes": 373
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-8.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-8.txt.raw",
+      "sha256": "3a4403026b227b69581597c9abb15f68013e71987ca7eabec3984f809509c68a",
+      "bytes": 5772
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-9.command.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution-9.command.json",
+      "sha256": "da0db6cab6208dd9007af6bb560c785e8e9bf4dc61b38cb5313b930d9a574ed1",
+      "bytes": 374
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution-9.txt",
+      "stored_path": "raw/matrix-execution-attempt1/execution-9.txt.raw",
+      "sha256": "25db5821591090cd3753cefeac87588e313a3b5c700db06a3e59953777db703a",
+      "bytes": 4268
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/execution.json",
+      "stored_path": "raw/matrix-execution-attempt1/execution.json",
+      "sha256": "74e93cb136bdc5380c37edfaf6e0353649d09a69c91423d9770dd1d2910a4c68",
+      "bytes": 123885
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-0.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-0.xml",
+      "sha256": "739af8a3ae0dad92ff1e103accf873e91a61f18be7f5a757aecbdeabea083877",
+      "bytes": 7766
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-1.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-1.xml",
+      "sha256": "deb05c74ca4968b157400f7655b7e900a92373740ea353e9e44e8c3fe40e163a",
+      "bytes": 2089
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-10.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-10.xml",
+      "sha256": "c344cdfe086ad781cb229e0e43cb4d8f273dc680d5f0b22f84b137fb259a76a4",
+      "bytes": 3556
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-11.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-11.xml",
+      "sha256": "0454569163ec630dfe1c395e6042ccf16571026dc4c33db08807d35de6f20ce3",
+      "bytes": 4048
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-12.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-12.xml",
+      "sha256": "7b2675f483f77077622567095959da5970618544213dd23b126298fb9442285e",
+      "bytes": 5767
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-13.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-13.xml",
+      "sha256": "3450b35d323613dc014cb6cd9a9f8ee07e5cfb52d800633eeecaa919e3c0d6ce",
+      "bytes": 2550
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-14.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-14.xml",
+      "sha256": "2b2642a0c106e4cb28d7739fa44884f2ed3f47f4d4bcaa6cc7d6a4d337aa7d12",
+      "bytes": 9453
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-15.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-15.xml",
+      "sha256": "658844d4969f337104bfe8f7584634e7aaae0d50862d78be535d2a5f15c41658",
+      "bytes": 2604
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-16.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-16.xml",
+      "sha256": "c484833c2adf70a09ca057ae703b1c99a25a993d7ddfd9c2842ac9e72adc7cf0",
+      "bytes": 3023
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-17.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-17.xml",
+      "sha256": "24fa3fe2929004d326b83b03cec5112b0543158138f9bff0efe9e4b50cdb9d30",
+      "bytes": 14048
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-18.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-18.xml",
+      "sha256": "6485d0c506d2e2837d251c69ebdda88815c6c6c1a1f27a34bf9f61d86876925d",
+      "bytes": 2012
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-19.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-19.xml",
+      "sha256": "36400df6d98c8644116842466567b6fa377e7f9781e75f71c7d737da4fa50f47",
+      "bytes": 2291
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-2.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-2.xml",
+      "sha256": "0c019a0b72579f2b2fba9e55ad935737549919cb119b1effb113d490ea2707fb",
+      "bytes": 3802
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-20.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-20.xml",
+      "sha256": "10369ca4f524f2628fba63f06c38ccc0bfe720badd09884bd300d3da9a4dd52c",
+      "bytes": 7139
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-21.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-21.xml",
+      "sha256": "f9ad156ce4bd9832df64e7aceed05337abe713bd2b52f609cb9871f1aa5939ee",
+      "bytes": 1793
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-22.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-22.xml",
+      "sha256": "1a65a19c0d62863c837237606e679b53b39daba1b677a7c588bebbfd3aff3dbd",
+      "bytes": 2237
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-23.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-23.xml",
+      "sha256": "fad3904e5fbe4675b74c4a2e5ac4ff851b71899c638d0a3debce46b23f55fec2",
+      "bytes": 4174
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-24.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-24.xml",
+      "sha256": "9d78e2d84f44e95b137a6b9c04fa3c779273dc5fc40bcaa495abe9ae04e93b47",
+      "bytes": 9078
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-25.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-25.xml",
+      "sha256": "c8864059777e9d45c6471baefb1083dbfa0c6d2f2f48bfd84416d81588c817e4",
+      "bytes": 6311
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-26.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-26.xml",
+      "sha256": "11de83c007c46844709e2cced4bd607be4c5935c15c3debd10a0e422572359b6",
+      "bytes": 3801
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-27.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-27.xml",
+      "sha256": "71451a8ffbd272652bd456ddf7e04f6a59c3f1852b73e2cec61c03c09469a836",
+      "bytes": 3071
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-28.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-28.xml",
+      "sha256": "1dc7e2630a94463929596dcefe85ae1ce9ed0a9e615ba8ae356575e32697094f",
+      "bytes": 5767
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-29.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-29.xml",
+      "sha256": "22896b00a4eda644bd7abbeee8fd6e6f37496d61386ee40995dc13796387ba19",
+      "bytes": 2806
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-3.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-3.xml",
+      "sha256": "b22acae3cfad3cecc2961512efcd27c321dc881fd7f6e853eb8d3da6b3dc0a52",
+      "bytes": 5894
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-30.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-30.xml",
+      "sha256": "464eb3eb3c359a15df5e66aad24843d02a5d4138ab770dcd53690ebad22b73fe",
+      "bytes": 9001
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-31.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-31.xml",
+      "sha256": "b11d1fab476077f4841f5ef9e3b73b17d1d8c66fee8d87365b7534af3a1304fb",
+      "bytes": 1774
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-32.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-32.xml",
+      "sha256": "38574dab16269e0c33db7f8eb8a31030e74f947a973348d9ee35579dbe884757",
+      "bytes": 3276
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-33.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-33.xml",
+      "sha256": "65a1452fa90d75dd97fc2b42eef5113ea30b963149230f21edb77f038fcd0d7a",
+      "bytes": 14048
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-34.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-34.xml",
+      "sha256": "efefd26a89f85fddfcdf6033622038ebf3a68b7343fb1f64c9d7820ce942bb31",
+      "bytes": 2009
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-35.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-35.xml",
+      "sha256": "608c5675159d41549188eea30bd0b8fc81c7b325b720c634b73a0364b7900f3b",
+      "bytes": 3687
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-36.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-36.xml",
+      "sha256": "ddf162067c53ff50106456da2f85f85c6e3e425716c8549520fac6fac92a317b",
+      "bytes": 10673
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-4.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-4.xml",
+      "sha256": "768088564dee8209a925793d72fdfccee881931dd372f7102b197b90a130117b",
+      "bytes": 6804
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-5.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-5.xml",
+      "sha256": "f04698bc8af824ffc2a39e6b40c79b81c3924679334607c660df3415b8a3c02e",
+      "bytes": 1799
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-6.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-6.xml",
+      "sha256": "f6208d7db89a129bdde70153c3bf87268ab6817cd3f3fa68ec1c21aa1a5919a7",
+      "bytes": 2237
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-7.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-7.xml",
+      "sha256": "8b46d5ee840125528eb25bf75946149e5af9e586a2a87c4a7040f4fbbecb4e95",
+      "bytes": 4171
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-8.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-8.xml",
+      "sha256": "d1f0c95672398152ca3d31b2e25620c818f6332b127efd6e1bba5f524c9db7d7",
+      "bytes": 9078
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/google-9.xml",
+      "stored_path": "raw/matrix-execution-attempt1/google-9.xml",
+      "sha256": "337ad905957549e085d0adc5ac10a84e92c2e2a28624e33db79a93049de30dfa",
+      "bytes": 6561
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/matrix-report.json",
+      "stored_path": "raw/matrix-execution-attempt1/matrix-report.json",
+      "sha256": "cfe644ba6519b782cc7a7e713f90cd5ef94a07975fc41120cbc21e78787994b2",
+      "bytes": 4817331
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-attempt1/preexecution.json",
+      "stored_path": "raw/matrix-execution-attempt1/preexecution.json",
+      "sha256": "4c0331a99603626b55e262dc8685ee520376a6e32819e809a9ff33d8d618fc2d",
+      "bytes": 604154
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-execution-console.log",
+      "stored_path": "raw/matrix-execution-console.log",
+      "sha256": "a1ec043e48062928275a322f234a51149302a943ccb08fe816c72d9b0726dd1f",
+      "bytes": 14668
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-text-report.json",
+      "stored_path": "raw/matrix-text-report.json",
+      "sha256": "fe5065403ca26fed27c4abf7b7af20e7411aba70a0b90f5a7b816f4f4eb66ee1",
+      "bytes": 282
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-tool-current.command.json",
+      "stored_path": "raw/matrix-tool-current.command.json",
+      "sha256": "17661d80aa183272531e89cc7bcf5803320b7e05a77929b50f0318cd9af7e0b4",
+      "bytes": 215
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-tool-current.log",
+      "stored_path": "raw/matrix-tool-current.log",
+      "sha256": "5de6e7c6ad205d72ff518b02d15a7e7e8bc53a5f0e99f84e928199bdabf01677",
+      "bytes": 128
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-tool-final.command.json",
+      "stored_path": "raw/matrix-tool-final.command.json",
+      "sha256": "f4ccbfd89dc5a5363eee25510efd8f2c6ea5e0d3aa57cbe6199a99508ac6c4c8",
+      "bytes": 1192
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-extensions/matrix-tool-final.log",
+      "stored_path": "raw/matrix-tool-final.log",
+      "sha256": "e83299c897fff57e6cf65abf2e60c2117a60f9d909c533c2f1c5cf1982639c03",
+      "bytes": 128
+    }
+  ],
+  "source_capsules": [
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/can-factory-gd32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/can-factory-gd32/bindings.c.raw",
+      "sha256": "74f07500d1e109ad16a1a705bac8aac5b2ff134e2af3e2985942d2531fa74007",
+      "bytes": 17376,
+      "checkout_path": "build/native-debug/tests/contracts/google/can-factory-gd32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/can-factory-stm32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/can-factory-stm32/bindings.c.raw",
+      "sha256": "e3d1b26f8448104fc5eb5f2b3c4023d2b19f86f12387e8e85b4a0db13b236e5e",
+      "bytes": 17847,
+      "checkout_path": "build/native-debug/tests/contracts/google/can-factory-stm32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/eth-factory-gd32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/eth-factory-gd32/bindings.c.raw",
+      "sha256": "902d761725eadc8f22f38f4c4001945d059272e9e18ec57b0c4506a7e0fe30c9",
+      "bytes": 20112,
+      "checkout_path": "build/native-debug/tests/contracts/google/eth-factory-gd32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/eth-factory-stm32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/eth-factory-stm32/bindings.c.raw",
+      "sha256": "621e209025313f82a593959e54b5f5e025a15dfddb02aeef10b73b67d21a5f84",
+      "bytes": 20449,
+      "checkout_path": "build/native-debug/tests/contracts/google/eth-factory-stm32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/g474-factory/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/g474-factory/bindings.c.raw",
+      "sha256": "27c20fe709918a4132128e9dbef2514113e9a1be9f4e79c265a498ca1b9ac98c",
+      "bytes": 16451,
+      "checkout_path": "build/native-debug/tests/contracts/google/g474-factory/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/timer-factory-gd32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/timer-factory-gd32/bindings.c.raw",
+      "sha256": "e34a48b2e6b5850fa28da552fe800d6df2b3c0e9e7f9f68257b7096f503fe7f8",
+      "bytes": 21285,
+      "checkout_path": "build/native-debug/tests/contracts/google/timer-factory-gd32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/timer-factory-stm32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/timer-factory-stm32/bindings.c.raw",
+      "sha256": "313bab97c1e066e64bc9935b6689c6b17273aae930a3c4bdd019ab128cc64214",
+      "bytes": 21433,
+      "checkout_path": "build/native-debug/tests/contracts/google/timer-factory-stm32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/usb-factory-gd32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/usb-factory-gd32/bindings.c.raw",
+      "sha256": "a1f45df7ba88c2c87a894071113b194007e21a02eb31b76df65db9c685af084e",
+      "bytes": 16043,
+      "checkout_path": "build/native-debug/tests/contracts/google/usb-factory-gd32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/tests/contracts/google/usb-factory-stm32/bindings.c",
+      "stored_path": "source-capsules/build/native-debug/tests/contracts/google/usb-factory-stm32/bindings.c.raw",
+      "sha256": "ce28161fe5bedec72e1e24a73a21e4293d14a5325653cd418fce1f9c0eddc80f",
+      "bytes": 16411,
+      "checkout_path": "build/native-debug/tests/contracts/google/usb-factory-stm32/bindings.c"
+    },
+    {
+      "original_path": "/workspace/nexus/core/include/nexus/core/request.h",
+      "stored_path": "source-capsules/core/include/nexus/core/request.h.raw",
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55",
+      "bytes": 7004,
+      "checkout_path": "core/include/nexus/core/request.h"
+    },
+    {
+      "original_path": "/workspace/nexus/core/src/request.c",
+      "stored_path": "source-capsules/core/src/request.c.raw",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8",
+      "bytes": 6864,
+      "checkout_path": "core/src/request.c"
+    },
+    {
+      "original_path": "/workspace/nexus/docs/design/io-lifecycle-matrix.md",
+      "stored_path": "source-capsules/docs/design/io-lifecycle-matrix.md.raw",
+      "sha256": "5b02c0ea2bfe380aa5ce36673f3547f5f201a836f866a2a46df02399964b4b10",
+      "bytes": 4928,
+      "checkout_path": "docs/design/io-lifecycle-matrix.md"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/adc.h",
+      "stored_path": "source-capsules/io/include/nexus/io/adc.h.raw",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1",
+      "bytes": 9218,
+      "checkout_path": "io/include/nexus/io/adc.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/advanced_pwm.h",
+      "stored_path": "source-capsules/io/include/nexus/io/advanced_pwm.h.raw",
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410",
+      "bytes": 3514,
+      "checkout_path": "io/include/nexus/io/advanced_pwm.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/can.h",
+      "stored_path": "source-capsules/io/include/nexus/io/can.h.raw",
+      "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084",
+      "bytes": 7325,
+      "checkout_path": "io/include/nexus/io/can.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/ethernet.h",
+      "stored_path": "source-capsules/io/include/nexus/io/ethernet.h.raw",
+      "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6",
+      "bytes": 7906,
+      "checkout_path": "io/include/nexus/io/ethernet.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+      "stored_path": "source-capsules/io/include/nexus/io/i2c.h.raw",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3",
+      "bytes": 9481,
+      "checkout_path": "io/include/nexus/io/i2c.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/spi.h",
+      "stored_path": "source-capsules/io/include/nexus/io/spi.h.raw",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+      "bytes": 11660,
+      "checkout_path": "io/include/nexus/io/spi.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/stream.h",
+      "stored_path": "source-capsules/io/include/nexus/io/stream.h.raw",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a",
+      "bytes": 11194,
+      "checkout_path": "io/include/nexus/io/stream.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/timer_capture.h",
+      "stored_path": "source-capsules/io/include/nexus/io/timer_capture.h.raw",
+      "sha256": "6fb9f2e812cee50a3077e50b697e072e66152dc02c073c3204ee23928d7deee4",
+      "bytes": 3989,
+      "checkout_path": "io/include/nexus/io/timer_capture.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/uart.h",
+      "stored_path": "source-capsules/io/include/nexus/io/uart.h.raw",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc",
+      "bytes": 10872,
+      "checkout_path": "io/include/nexus/io/uart.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/include/nexus/io/usb_device.h",
+      "stored_path": "source-capsules/io/include/nexus/io/usb_device.h.raw",
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e",
+      "bytes": 8447,
+      "checkout_path": "io/include/nexus/io/usb_device.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/adc.c",
+      "stored_path": "source-capsules/io/native/adc.c.raw",
+      "sha256": "da6bdfc1c499be71457d62650a6a2315b578f61bc748d0d32c50561437ec110a",
+      "bytes": 5790,
+      "checkout_path": "io/native/adc.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/can.c",
+      "stored_path": "source-capsules/io/native/can.c.raw",
+      "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3",
+      "bytes": 7817,
+      "checkout_path": "io/native/can.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/can_access.h",
+      "stored_path": "source-capsules/io/native/can_access.h.raw",
+      "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649",
+      "bytes": 1298,
+      "checkout_path": "io/native/can_access.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/ethernet.c",
+      "stored_path": "source-capsules/io/native/ethernet.c.raw",
+      "sha256": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2",
+      "bytes": 7429,
+      "checkout_path": "io/native/ethernet.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/provider.h",
+      "stored_path": "source-capsules/io/native/provider.h.raw",
+      "sha256": "628c6ca46264e2521c7fcec2cddcc8ac2571442f08820a5f9910aeb10550620b",
+      "bytes": 12330,
+      "checkout_path": "io/native/provider.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/spi.c",
+      "stored_path": "source-capsules/io/native/spi.c.raw",
+      "sha256": "2a399db21828d8b23eb57d979a0321863bdd1ad1af2102ed8151ac4fe1376247",
+      "bytes": 8170,
+      "checkout_path": "io/native/spi.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/uart.c",
+      "stored_path": "source-capsules/io/native/uart.c.raw",
+      "sha256": "82dc0e7923dc2f38c6bc54d66a288e3cc7de0ffc53ef725a8f562510ecf10b33",
+      "bytes": 20720,
+      "checkout_path": "io/native/uart.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/usb_device.c",
+      "stored_path": "source-capsules/io/native/usb_device.c.raw",
+      "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a",
+      "bytes": 11210,
+      "checkout_path": "io/native/usb_device.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/native/usb_device_access.h",
+      "stored_path": "source-capsules/io/native/usb_device_access.h.raw",
+      "sha256": "fc824b75afae99e990bda75a209d83c04412fc748fdbfad64d77e2fb830b32a2",
+      "bytes": 1298,
+      "checkout_path": "io/native/usb_device_access.h"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/advanced_pwm.c",
+      "stored_path": "source-capsules/io/src/advanced_pwm.c.raw",
+      "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5",
+      "bytes": 2805,
+      "checkout_path": "io/src/advanced_pwm.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/can_controller.c",
+      "stored_path": "source-capsules/io/src/can_controller.c.raw",
+      "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb",
+      "bytes": 37366,
+      "checkout_path": "io/src/can_controller.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/eth_mac.c",
+      "stored_path": "source-capsules/io/src/eth_mac.c.raw",
+      "sha256": "9123d006b36a8bd26ca1137093fd245d88dd9602a7fb4bfab17b1c0049a0c566",
+      "bytes": 35654,
+      "checkout_path": "io/src/eth_mac.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/stream.c",
+      "stored_path": "source-capsules/io/src/stream.c.raw",
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e",
+      "bytes": 14946,
+      "checkout_path": "io/src/stream.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/timer_capture.c",
+      "stored_path": "source-capsules/io/src/timer_capture.c.raw",
+      "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945",
+      "bytes": 3102,
+      "checkout_path": "io/src/timer_capture.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/uart_rs485.c",
+      "stored_path": "source-capsules/io/src/uart_rs485.c.raw",
+      "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7",
+      "bytes": 14081,
+      "checkout_path": "io/src/uart_rs485.c"
+    },
+    {
+      "original_path": "/workspace/nexus/io/src/usb_device_controller.c",
+      "stored_path": "source-capsules/io/src/usb_device_controller.c.raw",
+      "sha256": "94ce3e0fed2adaa1e66483fd880378838740b434989b2e82683161cbdd8298b4",
+      "bytes": 45743,
+      "checkout_path": "io/src/usb_device_controller.c"
+    },
+    {
+      "original_path": "/workspace/nexus/scripts/ci/io_lifecycle_matrix.py",
+      "stored_path": "source-capsules/scripts/ci/io_lifecycle_matrix.py.raw",
+      "sha256": "f64d15617c956bb40fb504e70c42bf84a8c344af2d2940fb4f95a8e1d0389529",
+      "bytes": 16451,
+      "checkout_path": "scripts/ci/io_lifecycle_matrix.py"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/common/i2c_v1_async.c",
+      "stored_path": "source-capsules/soc/common/i2c_v1_async.c.raw",
+      "sha256": "7e4afc3e53294bb3ed2ae4fc133b47878d4283c6b72d7920f3ca7f75d597149d",
+      "bytes": 25991,
+      "checkout_path": "soc/common/i2c_v1_async.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/adc.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/adc.c.raw",
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32",
+      "bytes": 9663,
+      "checkout_path": "soc/gd32f470/drivers/adc.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/adc_continuous.c.raw",
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181",
+      "bytes": 20238,
+      "checkout_path": "soc/gd32f470/drivers/adc_continuous.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/adc_stream.c.raw",
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512",
+      "bytes": 16230,
+      "checkout_path": "soc/gd32f470/drivers/adc_stream.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/advanced_pwm.c.raw",
+      "sha256": "e3008f26eef7f868770a21d24532dc43e67dd5ef5109d7ef5f97d76644618a3a",
+      "bytes": 2143,
+      "checkout_path": "soc/gd32f470/drivers/advanced_pwm.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/can.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/can.c.raw",
+      "sha256": "ea96e8d5dbb9e058390bab1c6a55e95c806a6c66098deb57eed696d343642c13",
+      "bytes": 4753,
+      "checkout_path": "soc/gd32f470/drivers/can.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/ethernet.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/ethernet.c.raw",
+      "sha256": "befdeb0084e868422c40fe31b5673e8da356352c252ce457a3319ffb3e0ea491",
+      "bytes": 11696,
+      "checkout_path": "soc/gd32f470/drivers/ethernet.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/i2c.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/i2c.c.raw",
+      "sha256": "22e4c4bd0cb349bd7609f320f72220a65ea5f6cf8affb24f03d7f96fa325122e",
+      "bytes": 14865,
+      "checkout_path": "soc/gd32f470/drivers/i2c.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/i2c_async.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/i2c_async.c.raw",
+      "sha256": "3e4c1918f6718ef00159f8883bed715b7affa1a268a5ea0bd08aba8fee803271",
+      "bytes": 9489,
+      "checkout_path": "soc/gd32f470/drivers/i2c_async.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/spi.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/spi.c.raw",
+      "sha256": "1dfbb4e22d75da90e1d52f05f2b6edfbbe8c0c2a87825db2539483826b952794",
+      "bytes": 10500,
+      "checkout_path": "soc/gd32f470/drivers/spi.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/spi_dma.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/spi_dma.c.raw",
+      "sha256": "93750f13a2c377aa9c68d22c005410cf479060afd67d89815656e66dbf9c396f",
+      "bytes": 25925,
+      "checkout_path": "soc/gd32f470/drivers/spi_dma.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/timer_capture.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/timer_capture.c.raw",
+      "sha256": "decb30804b049687cd755c11b1e53b3a5a6471e30736f785326b38c793ee12db",
+      "bytes": 1809,
+      "checkout_path": "soc/gd32f470/drivers/timer_capture.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/uart.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/uart.c.raw",
+      "sha256": "3759de1117f6d952a5dbbfd1af1ec66b3675a1feb97e853e0253ea576b12469b",
+      "bytes": 19683,
+      "checkout_path": "soc/gd32f470/drivers/uart.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/uart_dma.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/uart_dma.c.raw",
+      "sha256": "ada4692deda20e644b8d08581e0701ed280e8988ee9b42686f9afa2e89251acb",
+      "bytes": 19426,
+      "checkout_path": "soc/gd32f470/drivers/uart_dma.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/uart_receive.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/uart_receive.c.raw",
+      "sha256": "f9b8babd5f5f24a859ebe6361ecc32232a6ac934a47e7a7c9aff6d91c6bfc6b6",
+      "bytes": 30851,
+      "checkout_path": "soc/gd32f470/drivers/uart_receive.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/uart_stream.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/uart_stream.c.raw",
+      "sha256": "b27fbeddbfef75e0dd4e8ba8627f6148a24143986045c8ab42e53e9d79f94f3b",
+      "bytes": 9479,
+      "checkout_path": "soc/gd32f470/drivers/uart_stream.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/drivers/usb_device.c",
+      "stored_path": "source-capsules/soc/gd32f470/drivers/usb_device.c.raw",
+      "sha256": "7e97eb795e84df0c3726fc1762dab5ac05df167f8aa8c17bf793da6338e09432",
+      "bytes": 3330,
+      "checkout_path": "soc/gd32f470/drivers/usb_device.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/gd32f470/usb_clock.c",
+      "stored_path": "source-capsules/soc/gd32f470/usb_clock.c.raw",
+      "sha256": "fca632154fd0cb985780382d107dead46993a3f5278c88b201f7ad59737cc5dc",
+      "bytes": 7883,
+      "checkout_path": "soc/gd32f470/usb_clock.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/adc.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/adc.c.raw",
+      "sha256": "d10f7c0df236765296c5a598e4504d0559dada030b8f27c39602302e72070217",
+      "bytes": 4911,
+      "checkout_path": "soc/stm32f407/drivers/adc.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/adc_continuous.c.raw",
+      "sha256": "25506290b03308aa8417e4cf5735e9ce17cdab5b4cd6c81021088e35fee6e61e",
+      "bytes": 17996,
+      "checkout_path": "soc/stm32f407/drivers/adc_continuous.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/adc_stream.c.raw",
+      "sha256": "b7e15782abd9b4d7126efe55761cdb4364ad8ef73336154e9970485fbc4210b6",
+      "bytes": 14753,
+      "checkout_path": "soc/stm32f407/drivers/adc_stream.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/advanced_pwm.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/advanced_pwm.c.raw",
+      "sha256": "d41e0e9312446aaf4391d7c709e398439e4c7686227758741e066329f093744f",
+      "bytes": 1776,
+      "checkout_path": "soc/stm32f407/drivers/advanced_pwm.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/can.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/can.c.raw",
+      "sha256": "0962e0f364a84f4baab4d88a58bb3a2d993d6fe3d70c1c832a8115413f4453ed",
+      "bytes": 4957,
+      "checkout_path": "soc/stm32f407/drivers/can.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/ethernet.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/ethernet.c.raw",
+      "sha256": "ff4edd1671aac5dc0a85ff5554f1a54a0735f513ca447e69c093e46db887dbd3",
+      "bytes": 7762,
+      "checkout_path": "soc/stm32f407/drivers/ethernet.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/gpio.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/gpio.c.raw",
+      "sha256": "cc9f96ded9b52f11f15fc24552dfebfc2bbd45b66b293ae55bfa6f9e6f954559",
+      "bytes": 7466,
+      "checkout_path": "soc/stm32f407/drivers/gpio.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/i2c.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/i2c.c.raw",
+      "sha256": "6df7da48f22a1dca7849a127c429f46d799d3f58cd6b7277d5a7ad093b075c9d",
+      "bytes": 11798,
+      "checkout_path": "soc/stm32f407/drivers/i2c.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/i2c_async.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/i2c_async.c.raw",
+      "sha256": "3577634c493a8afd3f54afe5be700f6dc26bcb571d062d75013a8de7a64bf6d0",
+      "bytes": 9539,
+      "checkout_path": "soc/stm32f407/drivers/i2c_async.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/spi.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/spi.c.raw",
+      "sha256": "900a93cf28e9f85fe35063078609fac433a232ac7a1d12c13721e4e31a474d2b",
+      "bytes": 7532,
+      "checkout_path": "soc/stm32f407/drivers/spi.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/spi_dma.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/spi_dma.c.raw",
+      "sha256": "49bee3167e8663fe0e90ec451cbc9552d89fdfdb312662fe23b62816c7873ca9",
+      "bytes": 21505,
+      "checkout_path": "soc/stm32f407/drivers/spi_dma.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/timer_capture.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/timer_capture.c.raw",
+      "sha256": "3cdbaaaae4eed8fd5b3c1f26690000e0cb808bfeac8b5bbf999fe94d08b14da4",
+      "bytes": 1546,
+      "checkout_path": "soc/stm32f407/drivers/timer_capture.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/uart.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/uart.c.raw",
+      "sha256": "3d89f535de8c89708155df99d6ca10283e94fa67f037c78f09a4505e26d4816d",
+      "bytes": 17121,
+      "checkout_path": "soc/stm32f407/drivers/uart.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/uart_dma.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/uart_dma.c.raw",
+      "sha256": "aac5943bb0a6e4b958934d7350fefa56468140bfa5907d6ce539918a9bced4d2",
+      "bytes": 16492,
+      "checkout_path": "soc/stm32f407/drivers/uart_dma.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/uart_receive.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/uart_receive.c.raw",
+      "sha256": "6a9a0c68a5346fd785b15e705614a17d6fff1154649d4080333e5d35a072d390",
+      "bytes": 29026,
+      "checkout_path": "soc/stm32f407/drivers/uart_receive.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/uart_stream.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/uart_stream.c.raw",
+      "sha256": "ab37eb506ad3ec3f9c8676d48dfab801aa463269889a2267cf3a8856c1751bfe",
+      "bytes": 7749,
+      "checkout_path": "soc/stm32f407/drivers/uart_stream.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/drivers/usb_device.c",
+      "stored_path": "source-capsules/soc/stm32f407/drivers/usb_device.c.raw",
+      "sha256": "98f80491c5a7f872bf32070b9bda3a5208e5f3c0f12a3ce474d850297927d24a",
+      "bytes": 3862,
+      "checkout_path": "soc/stm32f407/drivers/usb_device.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32f407/usb_clock.c",
+      "stored_path": "source-capsules/soc/stm32f407/usb_clock.c.raw",
+      "sha256": "11e93443be03983abfa24d952d8c1b9896d7103be8b61d9b70768d338ae5b044",
+      "bytes": 4694,
+      "checkout_path": "soc/stm32f407/usb_clock.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32g474/drivers/gpio.c",
+      "stored_path": "source-capsules/soc/stm32g474/drivers/gpio.c.raw",
+      "sha256": "b8deb02e97bd97f1363edd84ed82db92e561555d582a3d4535980547a2efb2f8",
+      "bytes": 6967,
+      "checkout_path": "soc/stm32g474/drivers/gpio.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32g474/drivers/uart.c",
+      "stored_path": "source-capsules/soc/stm32g474/drivers/uart.c.raw",
+      "sha256": "098256a5e593d2ec16b7d571b9abe5be4528d69935252f12c5bf73fb1b3232ff",
+      "bytes": 16954,
+      "checkout_path": "soc/stm32g474/drivers/uart.c"
+    },
+    {
+      "original_path": "/workspace/nexus/soc/stm32g474/system.c",
+      "stored_path": "source-capsules/soc/stm32g474/system.c.raw",
+      "sha256": "b549ea0108f6346758ebdacc110e8b36c6985ab6a45754ae0cef3e60ad2b2a02",
+      "bytes": 12038,
+      "checkout_path": "soc/stm32g474/system.c"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/can_assembly/gd32-both.toml",
+      "stored_path": "source-capsules/tests/contracts/can_assembly/gd32-both.toml.raw",
+      "sha256": "7effa029ecbfc051768b3cac675c2190ae0ec275b0ca01b287de09bc5e4226fe",
+      "bytes": 930,
+      "checkout_path": "tests/contracts/can_assembly/gd32-both.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/can_assembly/gd32-first.toml",
+      "stored_path": "source-capsules/tests/contracts/can_assembly/gd32-first.toml.raw",
+      "sha256": "3fd8b5bf5d4c1358e99b46b5367cb26bba3976132bc989701254635020b5ebc6",
+      "bytes": 587,
+      "checkout_path": "tests/contracts/can_assembly/gd32-first.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/can_assembly/stm32-both.toml",
+      "stored_path": "source-capsules/tests/contracts/can_assembly/stm32-both.toml.raw",
+      "sha256": "1961086adc371e65be7fb2d1eba205041683cacb0502939300784e2021429057",
+      "bytes": 929,
+      "checkout_path": "tests/contracts/can_assembly/stm32-both.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/can_assembly/stm32-first.toml",
+      "stored_path": "source-capsules/tests/contracts/can_assembly/stm32-first.toml.raw",
+      "sha256": "f8f7a76cc28e51e325da31c970fa2f534f7c7abca971b9efcba44872627cee12",
+      "bytes": 586,
+      "checkout_path": "tests/contracts/can_assembly/stm32-first.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/ethernet_assembly/gd32-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/ethernet_assembly/gd32-freertos.toml.raw",
+      "sha256": "c9f7776a1b552445d1f606537983d60345b0722e9d0c0c6d7217ca8d17c60300",
+      "bytes": 421,
+      "checkout_path": "tests/contracts/ethernet_assembly/gd32-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/ethernet_assembly/gd32.toml",
+      "stored_path": "source-capsules/tests/contracts/ethernet_assembly/gd32.toml.raw",
+      "sha256": "2a17a0948b7e56b4a876c4d1e8e99e2ec0d812184daab0f937528883f5c628d9",
+      "bytes": 422,
+      "checkout_path": "tests/contracts/ethernet_assembly/gd32.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/ethernet_assembly/stm32-zg-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/ethernet_assembly/stm32-zg-freertos.toml.raw",
+      "sha256": "aa60c4cad95b05128fa2d4d86db67a5c65f9e97ef1f5644016e8c0f5ad2a0394",
+      "bytes": 422,
+      "checkout_path": "tests/contracts/ethernet_assembly/stm32-zg-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/ethernet_assembly/stm32-zg.toml",
+      "stored_path": "source-capsules/tests/contracts/ethernet_assembly/stm32-zg.toml.raw",
+      "sha256": "ac7c1ca1f53d6fa92c8632256398a60dc34231b79390e49c01f7fa2d489b9dc7",
+      "bytes": 423,
+      "checkout_path": "tests/contracts/ethernet_assembly/stm32-zg.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/g474_assembly/empty-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/g474_assembly/empty-freertos.toml.raw",
+      "sha256": "cadd56c1ea34d711f1d2e36f1efe26aa783686812a99710276ffcbe56a191806",
+      "bytes": 351,
+      "checkout_path": "tests/contracts/g474_assembly/empty-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/g474_assembly/empty.toml",
+      "stored_path": "source-capsules/tests/contracts/g474_assembly/empty.toml.raw",
+      "sha256": "7dcb7d788bd4d88b28274ae3598e0ef37bea7583e0f26fb677b9caf9c7ce0260",
+      "bytes": 265,
+      "checkout_path": "tests/contracts/g474_assembly/empty.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/g474_assembly/io-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/g474_assembly/io-freertos.toml.raw",
+      "sha256": "05061e6ede111edec20c02b8be3335b22afd5d8f3b1792a8f8238495e5b82cd5",
+      "bytes": 561,
+      "checkout_path": "tests/contracts/g474_assembly/io-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/g474_assembly/io.toml",
+      "stored_path": "source-capsules/tests/contracts/g474_assembly/io.toml.raw",
+      "sha256": "5f92b1e7a22e518cea5b948405a66633408c1f695ce1b7f4c835766315751ab3",
+      "bytes": 475,
+      "checkout_path": "tests/contracts/g474_assembly/io.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/g474_model.c",
+      "stored_path": "source-capsules/tests/contracts/g474_model.c.raw",
+      "sha256": "f8fb8dcb7f96af84d5520966c3e7fba042bc821159979580057e2d9f88d62bdc",
+      "bytes": 4881,
+      "checkout_path": "tests/contracts/g474_model.c"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/g474_model.h",
+      "stored_path": "source-capsules/tests/contracts/g474_model.h.raw",
+      "sha256": "d215ed0d9f92e2063c078bcb5f1a98d2b0c1f695e0078ec8a2840a29f1b166cb",
+      "bytes": 2613,
+      "checkout_path": "tests/contracts/g474_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/gd32_model/model.c",
+      "stored_path": "source-capsules/tests/contracts/gd32_model/model.c.raw",
+      "sha256": "21d4b0d674f620364097a73ec17d1fa78bfdafe3b2c6b49bdfe4093307387053",
+      "bytes": 8442,
+      "checkout_path": "tests/contracts/gd32_model/model.c"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/timer_assembly/gd32-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/timer_assembly/gd32-freertos.toml.raw",
+      "sha256": "b16700c38b58b342897294dc83276e39465b2138383950be1c4bff6c7ac5329f",
+      "bytes": 654,
+      "checkout_path": "tests/contracts/timer_assembly/gd32-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/timer_assembly/gd32.toml",
+      "stored_path": "source-capsules/tests/contracts/timer_assembly/gd32.toml.raw",
+      "sha256": "3e4e54dec607779622306a9e5b4b201c249fe4bee14d3fd26599ca4746ee476a",
+      "bytes": 655,
+      "checkout_path": "tests/contracts/timer_assembly/gd32.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/timer_assembly/stm32-ve-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/timer_assembly/stm32-ve-freertos.toml.raw",
+      "sha256": "3ddef158fb9e582a9290493800f329f8356fc919bf958e61e8f15ee51c114dbe",
+      "bytes": 655,
+      "checkout_path": "tests/contracts/timer_assembly/stm32-ve-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/timer_assembly/stm32-ve.toml",
+      "stored_path": "source-capsules/tests/contracts/timer_assembly/stm32-ve.toml.raw",
+      "sha256": "c6f891681943c775e0fa35269e510f807f21a49974f240181d366c08d7ea5540",
+      "bytes": 656,
+      "checkout_path": "tests/contracts/timer_assembly/stm32-ve.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/timer_assembly/stm32-zg-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/timer_assembly/stm32-zg-freertos.toml.raw",
+      "sha256": "cb55f47869b1997446198416730090b034eec19e7290e6ddc9f2b7d7078c096c",
+      "bytes": 655,
+      "checkout_path": "tests/contracts/timer_assembly/stm32-zg-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/timer_assembly/stm32-zg.toml",
+      "stored_path": "source-capsules/tests/contracts/timer_assembly/stm32-zg.toml.raw",
+      "sha256": "070d486868ea82bc2cc148e5704fca785f1a2d8df9a266e13065553214313adf",
+      "bytes": 656,
+      "checkout_path": "tests/contracts/timer_assembly/stm32-zg.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/usb_assembly/gd32-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/usb_assembly/gd32-freertos.toml.raw",
+      "sha256": "724753792766778d73a360289b184072aa5c33aae12ea676322e0577fd1b7e2a",
+      "bytes": 822,
+      "checkout_path": "tests/contracts/usb_assembly/gd32-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/usb_assembly/gd32.toml",
+      "stored_path": "source-capsules/tests/contracts/usb_assembly/gd32.toml.raw",
+      "sha256": "7f7275b676333c15a117e5f383887ccff5cf2f29e1463528340417d2c6450066",
+      "bytes": 823,
+      "checkout_path": "tests/contracts/usb_assembly/gd32.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/usb_assembly/stm32-ve-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/usb_assembly/stm32-ve-freertos.toml.raw",
+      "sha256": "6c1f0e8bacb6c6750e303d255a786f5a8639c114e92d674fe532c8002d0589dc",
+      "bytes": 823,
+      "checkout_path": "tests/contracts/usb_assembly/stm32-ve-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/usb_assembly/stm32-ve.toml",
+      "stored_path": "source-capsules/tests/contracts/usb_assembly/stm32-ve.toml.raw",
+      "sha256": "64dc715ccf5bf21253015c761bdc6d53e0a43d96e0078ca8750a8ba66cdfeddf",
+      "bytes": 824,
+      "checkout_path": "tests/contracts/usb_assembly/stm32-ve.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/usb_assembly/stm32-zg-freertos.toml",
+      "stored_path": "source-capsules/tests/contracts/usb_assembly/stm32-zg-freertos.toml.raw",
+      "sha256": "eff8afe44664e101953dbd49fce05ab00a3b9755ad82710bf14a7e44655e3469",
+      "bytes": 823,
+      "checkout_path": "tests/contracts/usb_assembly/stm32-zg-freertos.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/contracts/usb_assembly/stm32-zg.toml",
+      "stored_path": "source-capsules/tests/contracts/usb_assembly/stm32-zg.toml.raw",
+      "sha256": "ad7edd056b8fa41bf893df05b0000268fa89cd99dcf1bd1a04d023161c26c5d1",
+      "bytes": 824,
+      "checkout_path": "tests/contracts/usb_assembly/stm32-zg.toml"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/can_controller_test.cpp",
+      "stored_path": "source-capsules/tests/google/can_controller_test.cpp.raw",
+      "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d",
+      "bytes": 19775,
+      "checkout_path": "tests/google/can_controller_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/can_factory.cmake",
+      "stored_path": "source-capsules/tests/google/can_factory.cmake.raw",
+      "sha256": "65380a4cd6a7a1624fea0d209235adda311c26389cfb3f11272b6d6e73c53aed",
+      "bytes": 3027,
+      "checkout_path": "tests/google/can_factory.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/can_factory_test.cpp",
+      "stored_path": "source-capsules/tests/google/can_factory_test.cpp.raw",
+      "sha256": "0910010f4cc1c99c440a59b9d2c46dd4e04fe623bb4409f1aa51747d337d0805",
+      "bytes": 9797,
+      "checkout_path": "tests/google/can_factory_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/can_runtime.cmake",
+      "stored_path": "source-capsules/tests/google/can_runtime.cmake.raw",
+      "sha256": "da23f3194bf333cd4235abf339f9efd43e0928194d0d2fa54bd54ab471405233",
+      "bytes": 2066,
+      "checkout_path": "tests/google/can_runtime.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/can_soc_model.h",
+      "stored_path": "source-capsules/tests/google/can_soc_model.h.raw",
+      "sha256": "6a3b396a35c2489b4af8a36380887272b0c556682617ae3c2bbc881870cf02c6",
+      "bytes": 265,
+      "checkout_path": "tests/google/can_soc_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/can_soc_test.cpp",
+      "stored_path": "source-capsules/tests/google/can_soc_test.cpp.raw",
+      "sha256": "25211e8844de940cd7db699b52aad38e46e212c7df5e4556a9d5618918079354",
+      "bytes": 9099,
+      "checkout_path": "tests/google/can_soc_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet.cmake",
+      "stored_path": "source-capsules/tests/google/ethernet.cmake.raw",
+      "sha256": "8748562c6c5e3f34a2a52a7e48276d7464bd4931a111ab3db10746adb6ddf79e",
+      "bytes": 2598,
+      "checkout_path": "tests/google/ethernet.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet_factory.cmake",
+      "stored_path": "source-capsules/tests/google/ethernet_factory.cmake.raw",
+      "sha256": "62e2ad13fbdf7a87a5abc500f4901b1659a5915376cc61b3c2df77b172148c1a",
+      "bytes": 3071,
+      "checkout_path": "tests/google/ethernet_factory.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet_factory_model.h",
+      "stored_path": "source-capsules/tests/google/ethernet_factory_model.h.raw",
+      "sha256": "5895f510fae128fc9d52573d40954c958da9ecb101931f32e33e6d044eaffe5a",
+      "bytes": 672,
+      "checkout_path": "tests/google/ethernet_factory_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet_factory_test.cpp",
+      "stored_path": "source-capsules/tests/google/ethernet_factory_test.cpp.raw",
+      "sha256": "c99a4388bef8230c6198d796f19a4cf36ba9ce743bee08b5f552db67ec788b6f",
+      "bytes": 19841,
+      "checkout_path": "tests/google/ethernet_factory_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet_mac_test.cpp",
+      "stored_path": "source-capsules/tests/google/ethernet_mac_test.cpp.raw",
+      "sha256": "224425f853b7a41aded9de78a85adcdf3733f5a6513852e86b6f7e900a9166c2",
+      "bytes": 28354,
+      "checkout_path": "tests/google/ethernet_mac_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet_model.h",
+      "stored_path": "source-capsules/tests/google/ethernet_model.h.raw",
+      "sha256": "7465cecd5deb97988e39a6b8ea25a9c963b212ec2c0c765be2dd7d191d2ac1de",
+      "bytes": 1583,
+      "checkout_path": "tests/google/ethernet_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/ethernet_native_test.cpp",
+      "stored_path": "source-capsules/tests/google/ethernet_native_test.cpp.raw",
+      "sha256": "2a38473389eafbaa7bdc515489128edc2fc519719abee15c168a61afeb527a73",
+      "bytes": 6990,
+      "checkout_path": "tests/google/ethernet_native_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/g474.cmake",
+      "stored_path": "source-capsules/tests/google/g474.cmake.raw",
+      "sha256": "7022e3bf502d174aec630cb1ccc2ab2a6736d6f8e324e7e1af0d3b31023f69ed",
+      "bytes": 1024,
+      "checkout_path": "tests/google/g474.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/g474_factory.cmake",
+      "stored_path": "source-capsules/tests/google/g474_factory.cmake.raw",
+      "sha256": "b5b408ab78f47449dd17c7b9a37825222b64b503b97a272e4dde33c9ea7a90f0",
+      "bytes": 2293,
+      "checkout_path": "tests/google/g474_factory.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/g474_factory_model.h",
+      "stored_path": "source-capsules/tests/google/g474_factory_model.h.raw",
+      "sha256": "754d40e9cbb88841fb343f7228b2bcd9ea6d2950acc0606b3121bdb56b6f1cc9",
+      "bytes": 796,
+      "checkout_path": "tests/google/g474_factory_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/g474_factory_test.cpp",
+      "stored_path": "source-capsules/tests/google/g474_factory_test.cpp.raw",
+      "sha256": "0a32b7af259c5920c964209fb32cd41fbe20dbed5bf876b3ab34a0dd22315b19",
+      "bytes": 9849,
+      "checkout_path": "tests/google/g474_factory_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/g474_provider_test.cpp",
+      "stored_path": "source-capsules/tests/google/g474_provider_test.cpp.raw",
+      "sha256": "9e35fd9b6aec25a9dc18a6e4abda4e3b8ebc7d4ece0b1a30e55cee05f71a2bd0",
+      "bytes": 13988,
+      "checkout_path": "tests/google/g474_provider_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_adc_stream_model.h",
+      "stored_path": "source-capsules/tests/google/gd32_adc_stream_model.h.raw",
+      "sha256": "1e65ce15ed5d6a896a769a876d323b0ff705f63d5969bf80cb649f5b161be59a",
+      "bytes": 1069,
+      "checkout_path": "tests/google/gd32_adc_stream_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_adc_stream_test.cpp",
+      "stored_path": "source-capsules/tests/google/gd32_adc_stream_test.cpp.raw",
+      "sha256": "c0ee34378acfd389637d509a48d3d8495119a07a434fcaf7058d530c1546b692",
+      "bytes": 24323,
+      "checkout_path": "tests/google/gd32_adc_stream_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_spi_dma_model.h",
+      "stored_path": "source-capsules/tests/google/gd32_spi_dma_model.h.raw",
+      "sha256": "181db2b183b9825887e457cf32831e355c1f4ef8e6ca9f92422d72358c7f8db6",
+      "bytes": 830,
+      "checkout_path": "tests/google/gd32_spi_dma_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_spi_dma_test.cpp",
+      "stored_path": "source-capsules/tests/google/gd32_spi_dma_test.cpp.raw",
+      "sha256": "519e75c3ca7b0a94e66213659102788f674b27ef127c0cbb588b6e5229f3483b",
+      "bytes": 17768,
+      "checkout_path": "tests/google/gd32_spi_dma_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_uart_dma_model.h",
+      "stored_path": "source-capsules/tests/google/gd32_uart_dma_model.h.raw",
+      "sha256": "a30d28c49e3dc179f6e2f647f3c60f86cf53b8ace1cd3d17e76930bfbe94dde5",
+      "bytes": 811,
+      "checkout_path": "tests/google/gd32_uart_dma_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_uart_dma_test.cpp",
+      "stored_path": "source-capsules/tests/google/gd32_uart_dma_test.cpp.raw",
+      "sha256": "7e2fb42e6fa770b10e8affaffb706e9d8fab7e4d251ba51db6050c002ede0e83",
+      "bytes": 9399,
+      "checkout_path": "tests/google/gd32_uart_dma_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_uart_receive_model.h",
+      "stored_path": "source-capsules/tests/google/gd32_uart_receive_model.h.raw",
+      "sha256": "f82769afb42c836182fa07eb175a0b44c2af539c8350d3e8d5e0a3dabf691d55",
+      "bytes": 1504,
+      "checkout_path": "tests/google/gd32_uart_receive_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_uart_receive_test.cpp",
+      "stored_path": "source-capsules/tests/google/gd32_uart_receive_test.cpp.raw",
+      "sha256": "2daf28fed4466b5d7147ebf538900a8dd56d159a033e27504f0082e08981d81b",
+      "bytes": 30039,
+      "checkout_path": "tests/google/gd32_uart_receive_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/gd32_uart_stream_test.cpp",
+      "stored_path": "source-capsules/tests/google/gd32_uart_stream_test.cpp.raw",
+      "sha256": "5abeab27d626d658fb65889baeb908078aac4ff6308006f66d9ad42bfd3aefaa",
+      "bytes": 11826,
+      "checkout_path": "tests/google/gd32_uart_stream_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/i2c_async_register_model.h",
+      "stored_path": "source-capsules/tests/google/i2c_async_register_model.h.raw",
+      "sha256": "43aa4c517b9c369d3f8c21234e76b1860782c2152e29457641b037bee381c33b",
+      "bytes": 913,
+      "checkout_path": "tests/google/i2c_async_register_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/i2c_async_register_test.cpp",
+      "stored_path": "source-capsules/tests/google/i2c_async_register_test.cpp.raw",
+      "sha256": "ff01f3a63b3fef65c1733e985d97754852f66408894d7c302d412e4837162c57",
+      "bytes": 23539,
+      "checkout_path": "tests/google/i2c_async_register_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/i2c_register_model.h",
+      "stored_path": "source-capsules/tests/google/i2c_register_model.h.raw",
+      "sha256": "49114751f453c9259ad31dff3cd1e9084434140dade05a856ca3a2a8b0e85e78",
+      "bytes": 1407,
+      "checkout_path": "tests/google/i2c_register_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/i2c_register_test.cpp",
+      "stored_path": "source-capsules/tests/google/i2c_register_test.cpp.raw",
+      "sha256": "47245430eddd8e8f2b8c53a8ef4f4e26c024a3dd8cdfa773a4149089db2020c4",
+      "bytes": 22895,
+      "checkout_path": "tests/google/i2c_register_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/io_state_machine_test.cpp",
+      "stored_path": "source-capsules/tests/google/io_state_machine_test.cpp.raw",
+      "sha256": "f1be87789b4cbadb271dc9a8c2a36507a8c22f3804061c1b33702c87f16d2b0e",
+      "bytes": 15054,
+      "checkout_path": "tests/google/io_state_machine_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_adc_stream_model.h",
+      "stored_path": "source-capsules/tests/google/stm32_adc_stream_model.h.raw",
+      "sha256": "9fd5bde480c6e363c800aeed241771e46227e4220a3a67b14cfcf33b9cf1d6e5",
+      "bytes": 1327,
+      "checkout_path": "tests/google/stm32_adc_stream_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_adc_stream_test.cpp",
+      "stored_path": "source-capsules/tests/google/stm32_adc_stream_test.cpp.raw",
+      "sha256": "1dd14bcd36b1982dccc65ac1fac5518470a4c07d1bad3face711af4b6bf844f4",
+      "bytes": 25020,
+      "checkout_path": "tests/google/stm32_adc_stream_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_dma_model.h",
+      "stored_path": "source-capsules/tests/google/stm32_dma_model.h.raw",
+      "sha256": "96ca49eea8b59128ce5972fec052016ff27edf0a14ab6fa82c8ccb5f878f4871",
+      "bytes": 586,
+      "checkout_path": "tests/google/stm32_dma_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_spi_dma_test.cpp",
+      "stored_path": "source-capsules/tests/google/stm32_spi_dma_test.cpp.raw",
+      "sha256": "3b709bad61e2a4f97917d47625429e415ec50332ba1d3cf9b272ba0badafdea7",
+      "bytes": 10618,
+      "checkout_path": "tests/google/stm32_spi_dma_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_uart_dma_model.h",
+      "stored_path": "source-capsules/tests/google/stm32_uart_dma_model.h.raw",
+      "sha256": "55c41e42e3001a762049a303e7b8cd0ef26613b9232d5769054ae7149cc38ed2",
+      "bytes": 630,
+      "checkout_path": "tests/google/stm32_uart_dma_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_uart_dma_test.cpp",
+      "stored_path": "source-capsules/tests/google/stm32_uart_dma_test.cpp.raw",
+      "sha256": "f59c28e518393527de6f669640661638dcdd18e140950b0deb4d334248187a31",
+      "bytes": 9211,
+      "checkout_path": "tests/google/stm32_uart_dma_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_uart_receive_model.h",
+      "stored_path": "source-capsules/tests/google/stm32_uart_receive_model.h.raw",
+      "sha256": "374f9491306ba37d18e3b618c688f8c53eedb919bc7e538ffddf6b3183efbfb5",
+      "bytes": 1232,
+      "checkout_path": "tests/google/stm32_uart_receive_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_uart_receive_test.cpp",
+      "stored_path": "source-capsules/tests/google/stm32_uart_receive_test.cpp.raw",
+      "sha256": "439e2ad6e5442f60dd09964dc6cdb1b328b98ca3af4cd4d7d98153811513ec3f",
+      "bytes": 27904,
+      "checkout_path": "tests/google/stm32_uart_receive_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/stm32_uart_stream_test.cpp",
+      "stored_path": "source-capsules/tests/google/stm32_uart_stream_test.cpp.raw",
+      "sha256": "35d173e9b03daa4e3337ae8aa1cbbeb5a1c9f62c1b6001e0c796a38995fdc145",
+      "bytes": 6211,
+      "checkout_path": "tests/google/stm32_uart_stream_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/timer_advanced.cmake",
+      "stored_path": "source-capsules/tests/google/timer_advanced.cmake.raw",
+      "sha256": "848851f6389f5675548c1a0b0080da160d5ea1d4ed6b609312d5faf4e134aa45",
+      "bytes": 1883,
+      "checkout_path": "tests/google/timer_advanced.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/timer_advanced_model.h",
+      "stored_path": "source-capsules/tests/google/timer_advanced_model.h.raw",
+      "sha256": "341eb2af4ba125bee6beafbe5387f12da413d0c15a5daf75386d8993fcd73f23",
+      "bytes": 787,
+      "checkout_path": "tests/google/timer_advanced_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/timer_advanced_test.cpp",
+      "stored_path": "source-capsules/tests/google/timer_advanced_test.cpp.raw",
+      "sha256": "5a923fed1e329602f3f552ec7fea65d370773ae7f64bfc1076312506d3f8058c",
+      "bytes": 34011,
+      "checkout_path": "tests/google/timer_advanced_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/timer_factory.cmake",
+      "stored_path": "source-capsules/tests/google/timer_factory.cmake.raw",
+      "sha256": "ddc45e88fd114b249631ea8d86294bd2f50aef02cc9d44a27cf2466a266b2552",
+      "bytes": 3373,
+      "checkout_path": "tests/google/timer_factory.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/timer_factory_model.h",
+      "stored_path": "source-capsules/tests/google/timer_factory_model.h.raw",
+      "sha256": "d9da5a18188fc5acd9bf29d1053020aabbaadf642d5457e84d0abe9f3348ef4b",
+      "bytes": 1554,
+      "checkout_path": "tests/google/timer_factory_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/timer_factory_test.cpp",
+      "stored_path": "source-capsules/tests/google/timer_factory_test.cpp.raw",
+      "sha256": "35dfb7c13ce3120028cf5a164cbde3a9066eb241913e4ffff931ee200a6bfefe",
+      "bytes": 23543,
+      "checkout_path": "tests/google/timer_factory_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/uart_rs485_test.cpp",
+      "stored_path": "source-capsules/tests/google/uart_rs485_test.cpp.raw",
+      "sha256": "4014052794bba6c45d2fdab010c52c0d70ddd0bce7292a215b7d1f46543aef20",
+      "bytes": 14100,
+      "checkout_path": "tests/google/uart_rs485_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_device.cmake",
+      "stored_path": "source-capsules/tests/google/usb_device.cmake.raw",
+      "sha256": "8c2b2b856f6dc5203a475c197f7d3b6fe17f9d51f5be638a1fd943f4c85da0db",
+      "bytes": 1928,
+      "checkout_path": "tests/google/usb_device.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_device_soc_model.h",
+      "stored_path": "source-capsules/tests/google/usb_device_soc_model.h.raw",
+      "sha256": "a45366e59d30513573ddd79db39d110757f932b46fdf2f32a5dc2a3c6c8f6f31",
+      "bytes": 302,
+      "checkout_path": "tests/google/usb_device_soc_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_device_soc_test.cpp",
+      "stored_path": "source-capsules/tests/google/usb_device_soc_test.cpp.raw",
+      "sha256": "041ba6871382424eac3887b5ad6c02ae68ee41ef5964571bfc9dc0bd4cf7a4e9",
+      "bytes": 8227,
+      "checkout_path": "tests/google/usb_device_soc_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_device_test.cpp",
+      "stored_path": "source-capsules/tests/google/usb_device_test.cpp.raw",
+      "sha256": "07ec5ad1c1b1f964b6bb0e9e8847e4bdf2eb507dd113f3e904dc8d99930c3614",
+      "bytes": 30601,
+      "checkout_path": "tests/google/usb_device_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_factory.cmake",
+      "stored_path": "source-capsules/tests/google/usb_factory.cmake.raw",
+      "sha256": "2ed241f698d537b86a37218608a443453128ef5a4280cfc469a1408bde580f8b",
+      "bytes": 3134,
+      "checkout_path": "tests/google/usb_factory.cmake"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_factory_model.h",
+      "stored_path": "source-capsules/tests/google/usb_factory_model.h.raw",
+      "sha256": "771c69e54cc555362fb7747dfd9f45ea5c8d9d40cdb7ef32bcd480b5acd507c0",
+      "bytes": 812,
+      "checkout_path": "tests/google/usb_factory_model.h"
+    },
+    {
+      "original_path": "/workspace/nexus/tests/google/usb_factory_test.cpp",
+      "stored_path": "source-capsules/tests/google/usb_factory_test.cpp.raw",
+      "sha256": "0648651e6a3042f2b30cbfe6c52645d265e840a35748de8e0cdf61cdfce90197",
+      "bytes": 14966,
+      "checkout_path": "tests/google/usb_factory_test.cpp"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/bindings.py",
+      "stored_path": "source-capsules/tools/configure/bindings.py.raw",
+      "sha256": "3d6110ec2bac57f2fec518c11876e7f3ac2b963c3330fff1b64088803659489e",
+      "bytes": 8090,
+      "checkout_path": "tools/configure/bindings.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/configure.py",
+      "stored_path": "source-capsules/tools/configure/configure.py.raw",
+      "sha256": "b505d432e1833040a5b03b537865f607dee21e3e994e2c8f7bd64a47f977103c",
+      "bytes": 52653,
+      "checkout_path": "tools/configure/configure.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/emission.py",
+      "stored_path": "source-capsules/tools/configure/emission.py.raw",
+      "sha256": "e4cf387c840f2a4af8df2191239a18ea85bdfa58a9af48037ebad7a1ec2068d4",
+      "bytes": 767,
+      "checkout_path": "tools/configure/emission.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/factory.py",
+      "stored_path": "source-capsules/tools/configure/factory.py.raw",
+      "sha256": "7955cb1afd372f31c886522a727dca445761013790f0d82c300043baf47e220f",
+      "bytes": 12022,
+      "checkout_path": "tools/configure/factory.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/ir.py",
+      "stored_path": "source-capsules/tools/configure/ir.py.raw",
+      "sha256": "4e1441bf3cf7aa16957dc7f93bd97d389e4678e79467e5e6a459b0a2a0a0dee7",
+      "bytes": 13692,
+      "checkout_path": "tools/configure/ir.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/providers/common.py",
+      "stored_path": "source-capsules/tools/configure/providers/common.py.raw",
+      "sha256": "8f0a32f270df3d5647e377eda0694ff13587cbea42a88c5560e6cda8ae1de912",
+      "bytes": 13772,
+      "checkout_path": "tools/configure/providers/common.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/providers/gd32f470/bindings.py",
+      "stored_path": "source-capsules/tools/configure/providers/gd32f470/bindings.py.raw",
+      "sha256": "77b2e58cdfcc7d98c7821fcd47c3cea9e4deea82b3f721b0247cb5f9aa908376",
+      "bytes": 24286,
+      "checkout_path": "tools/configure/providers/gd32f470/bindings.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/providers/stm32f407/bindings.py",
+      "stored_path": "source-capsules/tools/configure/providers/stm32f407/bindings.py.raw",
+      "sha256": "da5dc8ab4e5bfea1513ce54ffc4e34246cee2747cc95200963dc85d5b9002f83",
+      "bytes": 38599,
+      "checkout_path": "tools/configure/providers/stm32f407/bindings.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/providers/stm32g474/bindings.py",
+      "stored_path": "source-capsules/tools/configure/providers/stm32g474/bindings.py.raw",
+      "sha256": "80eaed6351bfe58c0862d871b8e870efe951f95bc3f82ac420f4fc414cb3b6b3",
+      "bytes": 3219,
+      "checkout_path": "tools/configure/providers/stm32g474/bindings.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/providers/stm32g474/emission.py",
+      "stored_path": "source-capsules/tools/configure/providers/stm32g474/emission.py.raw",
+      "sha256": "dd3af048e2aafa85b87ec20da172a2d60ff0604e6618fb3cac4c9a1452de7303",
+      "bytes": 7032,
+      "checkout_path": "tools/configure/providers/stm32g474/emission.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/configure/timer_advanced.py",
+      "stored_path": "source-capsules/tools/configure/timer_advanced.py.raw",
+      "sha256": "8dffdfabb5841ef78dbfe2d7f0736887e561432f19029df53e3c2abfb4ec2b02",
+      "bytes": 13477,
+      "checkout_path": "tools/configure/timer_advanced.py"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/testing/io_lifecycle_matrix.json",
+      "stored_path": "source-capsules/tools/testing/io_lifecycle_matrix.json.raw",
+      "sha256": "88c1a08a9108e19cd962d8f71ac0b53c778011bcc054ce24dad71adedc16c538",
+      "bytes": 314907,
+      "checkout_path": "tools/testing/io_lifecycle_matrix.json"
+    },
+    {
+      "original_path": "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py",
+      "stored_path": "source-capsules/tools/testing/test_io_lifecycle_matrix.py.raw",
+      "sha256": "78fcffb0b953a32c21239f29121429286b40a145af574e12902bf7a4aba039c9",
+      "bytes": 13429,
+      "checkout_path": "tools/testing/test_io_lifecycle_matrix.py"
+    }
+  ],
+  "build_identity_files": [
+    {
+      "original_path": "/workspace/nexus/build/native-debug/compile_commands.json",
+      "stored_path": "build-identity/compile_commands.json.raw",
+      "sha256": "de82716253efefbdf75f3ed6fb7d979bdc80fc3966f4405d1fde3aa164be07e2",
+      "bytes": 860633
+    },
+    {
+      "original_path": "/workspace/nexus/build/native-debug/google-contracts.json",
+      "stored_path": "build-identity/google-contracts.json.raw",
+      "sha256": "2afba5a227c6c33533306e5faa4e03a8cb526f8558bc97a6d40c10fb9e9cee4d",
+      "bytes": 11180
+    }
+  ]
+}

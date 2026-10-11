@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "reviewed_utc": "2026-10-11T21:38:15.705841+00:00",
+  "reviewer": "/root/arch_runtime/inactive_cache_proc_review",
+  "status": "reviewed-no-blocker-within-declared-scope",
+  "scope": "Independent read-only Native CI shared binary boundary delta review. No build, test rerun, runner execution, source/index/HEAD mutation or hardware qualification. One external review file written.",
+  "reviewer_test_executions": 0,
+  "reviewer_build_executions": 0,
+  "freeze": {
+    "path": "/workspace/nexus-native-binary-boundary-iteration/freeze.json",
+    "sha256": "5b8c47fc50041494f7fe9077d316566245a12ddbeadf3ab1d1e6ea06d5c8ee19",
+    "bytes": 3871,
+    "verified": true
+  },
+  "sources": [
+    {
+      "path": "scripts/ci/native_contracts.py",
+      "sha256": "a88209e25c1849ce4b0aaed3bb0751cd8d8e76cebc4e1ec3fa053be2a1834a4d",
+      "bytes": 8225,
+      "freeze_match": true
+    },
+    {
+      "path": "tools/testing/test_native_contracts.py",
+      "sha256": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+      "bytes": 5199,
+      "freeze_match": true
+    },
+    {
+      "path": "scripts/ci/tdd_gate.py",
+      "sha256": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b",
+      "bytes": 10533,
+      "freeze_match": true
+    }
+  ],
+  "head_comparison": {
+    "baseline_native_contracts_sha256": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+    "test_file_new_relative_to_HEAD": true,
+    "production_changed_functions": [
+      "google_binaries"
+    ],
+    "production_unchanged_functions": [
+      "execute",
+      "discovered_cases",
+      "selected_build",
+      "ctest_names",
+      "main"
+    ],
+    "exact_ast_delta": "Import existing checked_binary from scripts.ci.tdd_gate; replace Path(name).resolve() with checked_binary(name, build) for every manifest executable. All remaining production AST identical to HEAD.",
+    "no_second_validator_or_runner": true
+  },
+  "review_findings": [
+    {
+      "id": "shared-unaliased-path-admission",
+      "result": "closed",
+      "detail": "Every plan entry passes the unchanged shared checked_binary before CTest plan discovery. It requires a regular file, rejects a symlink at the file or any ancestor, and rejects canonical escape from selected build."
+    },
+    {
+      "id": "manifest-and-unique-report-names",
+      "result": "preserved",
+      "detail": "Nonempty schema-1 string list, original duplicate-name guard, per-binary report basename uniqueness, regular files and lexical build containment retained. Manifest order retained."
+    },
+    {
+      "id": "ctest-report-and-case-binding",
+      "result": "preserved",
+      "detail": "Exact single unfiltered CTest command registration; complete planned/executed identity equality, no skipped CTest cases, exact Google XML report set, expected discovery counts and framework case identity equality remain unchanged. Complete CTest run remains single pass."
+    },
+    {
+      "id": "new-tests-exercise-production",
+      "result": "reviewed",
+      "detail": "11 new cases cover regular order, file/parent symlinks, canonical escape, missing/nonregular file, ambiguous basename and malformed manifests. Two execution cases compose the pre-existing disposable fixture, patch only ROOT, and exercise actual Native main/admission/CTest; they require rejection before CTest discovery, execution counters or success summary."
+    },
+    {
+      "id": "retained-red-green",
+      "result": "source-bound-owner-evidence-observed",
+      "detail": "All 16 retained evidence entries match SHA256 and byte length. Valid red2.log ran 11 actual cases: 4 behavioral failures and 7 passes against original HEAD production; two alias cases actually executed 3 CTest/4 synthetic Google cases and incorrectly published success. GREEN contains 84 unique actual rows in 7 suite modules with OK, zero failures/errors/skips, and owner source hashes unchanged. Initial red.log is retained fixture/setup failure with imported TestCase discovery and missing prepared CMake PATH; excluded from behavior RED."
+    }
+  ],
+  "owner_evidence_counts": {
+    "red.log": {
+      "cases_observed": 25,
+      "suite_modules": {
+        "tools.testing.test_native_contracts": 11,
+        "scripts.ci.test_native_contracts": 14
+      },
+      "failure_names": [
+        "test_file_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_file_alias_cannot_execute_or_publish_native_success)",
+        "test_parent_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_parent_alias_cannot_execute_or_publish_native_success)",
+        "test_directory_symlink_to_real_directory_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_directory_symlink_to_real_directory_inside_build_is_rejected)",
+        "test_file_symlink_to_real_binary_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_file_symlink_to_real_binary_inside_build_is_rejected)",
+        "test_all_ctest_and_google_cases_execute_once_with_clean_settings (scripts.ci.test_native_contracts.NativeExecutionTests.test_all_ctest_and_google_cases_execute_once_with_clean_settings)",
+        "test_duplicate_case_identity_rejects (scripts.ci.test_native_contracts.NativeExecutionTests.test_duplicate_case_identity_rejects)",
+        "test_duplicate_executable_manifest_rejects (scripts.ci.test_native_contracts.NativeExecutionTests.test_duplicate_executable_manifest_rejects)",
+        "test_empty_google_run_rejects (scripts.ci.test_native_contracts.NativeExecutionTests.test_empty_google_run_rejects)",
+        "test_equal_count_with_different_case_identity_rejects (scripts.ci.test_native_contracts.NativeExecutionTests.test_equal_count_with_different_case_identity_rejects)",
+        "test_extra_case_rejects (scripts.ci.test_native_contracts.NativeExecutionTests.test_extra_case_rejects)",
+        "test_failed_ordinary_ctest_rejects_google_success (scripts.ci.test_native_contracts.NativeExecutionTests.test_failed_ordinary_ctest_rejects_google_success)",
+        "test_missing_google_xml_cannot_reuse_previous_success (scripts.ci.test_native_contracts.NativeExecutionTests.test_missing_google_xml_cannot_reuse_previous_success)",
+        "test_mixed_skipped_ctest_cannot_establish_complete_execution (scripts.ci.test_native_contracts.NativeExecutionTests.test_mixed_skipped_ctest_cannot_establish_complete_execution)",
+        "test_partial_google_run_rejects_even_if_ctest_succeeds (scripts.ci.test_native_contracts.NativeExecutionTests.test_partial_google_run_rejects_even_if_ctest_succeeds)",
+        "test_preset_filter_cannot_hide_an_ordinary_contract (scripts.ci.test_native_contracts.NativeExecutionTests.test_preset_filter_cannot_hide_an_ordinary_contract)",
+        "test_thread_sanitizer_profile_uses_the_complete_unfiltered_plan (scripts.ci.test_native_contracts.NativeExecutionTests.test_thread_sanitizer_profile_uses_the_complete_unfiltered_plan)",
+        "test_unplanned_google_report_rejects (scripts.ci.test_native_contracts.NativeExecutionTests.test_unplanned_google_report_rejects)",
+        "test_unregistered_google_binary_rejects_before_execution (scripts.ci.test_native_contracts.NativeExecutionTests.test_unregistered_google_binary_rejects_before_execution)"
+      ],
+      "error_names": [],
+      "footer": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 25 tests in 0.009s",
+        "",
+        "FAILED (failures=18)"
+      ]
+    },
+    "red2.log": {
+      "cases_observed": 11,
+      "suite_modules": {
+        "tools.testing.test_native_contracts": 11
+      },
+      "failure_names": [
+        "test_file_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_file_alias_cannot_execute_or_publish_native_success)",
+        "test_parent_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_parent_alias_cannot_execute_or_publish_native_success)",
+        "test_directory_symlink_to_real_directory_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_directory_symlink_to_real_directory_inside_build_is_rejected)",
+        "test_file_symlink_to_real_binary_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_file_symlink_to_real_binary_inside_build_is_rejected)"
+      ],
+      "error_names": [],
+      "footer": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 11 tests in 0.757s",
+        "",
+        "FAILED (failures=4)"
+      ]
+    },
+    "green.log": {
+      "cases_observed": 84,
+      "suite_modules": {
+        "tools.testing.test_native_contracts": 11,
+        "scripts.ci.test_native_contracts": 14,
+        "tools.testing.test_tdd_gate": 3,
+        "tools.testing.test_io_lifecycle_matrix": 26,
+        "tools.testing.test_tdd_matrix_integration": 4,
+        "tools.testing.test_google_report": 17,
+        "tools.testing.test_staged_execution": 9
+      },
+      "failure_names": [],
+      "error_names": [],
+      "footer": [
+        "",
+        "----------------------------------------------------------------------",
+        "Ran 84 tests in 5.440s",
+        "",
+        "OK"
+      ]
+    }
+  },
+  "owner_execution_command_records": {
+    "red-command.json": {
+      "command": [
+        "/workspace/nexus/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tools.testing.test_native_contracts",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "returncode": 1,
+      "elapsed_seconds": 0.10865030600689352,
+      "source_before": {
+        "scripts/ci/native_contracts.py": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+        "tools/testing/test_native_contracts.py": "1b8d4405fac8c7133b0ec0e26fc0efc5f43bf064b5d3e3add527e2555c10989f",
+        "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b"
+      },
+      "source_after": {
+        "scripts/ci/native_contracts.py": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+        "tools/testing/test_native_contracts.py": "1b8d4405fac8c7133b0ec0e26fc0efc5f43bf064b5d3e3add527e2555c10989f",
+        "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b"
+      },
+      "source_unchanged": true
+    },
+    "red2-command.json": {
+      "command": [
+        "/workspace/nexus/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tools.testing.test_native_contracts",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "returncode": 1,
+      "elapsed_seconds": 0.8628255689982325,
+      "source_before": {
+        "scripts/ci/native_contracts.py": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+        "tools/testing/test_native_contracts.py": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+        "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b"
+      },
+      "source_after": {
+        "scripts/ci/native_contracts.py": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+        "tools/testing/test_native_contracts.py": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+        "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b"
+      },
+      "source_unchanged": true
+    },
+    "green-command.json": {
+      "command": [
+        "/workspace/nexus/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tools.testing.test_native_contracts",
+        "scripts.ci.test_native_contracts",
+        "tools.testing.test_tdd_gate",
+        "tools.testing.test_io_lifecycle_matrix",
+        "tools.testing.test_tdd_matrix_integration",
+        "tools.testing.test_google_report",
+        "tools.testing.test_staged_execution",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "returncode": 0,
+      "elapsed_seconds": 5.553445969999302,
+      "source_before": {
+        "scripts/ci/native_contracts.py": "a88209e25c1849ce4b0aaed3bb0751cd8d8e76cebc4e1ec3fa053be2a1834a4d",
+        "tools/testing/test_native_contracts.py": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+        "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b"
+      },
+      "source_after": {
+        "scripts/ci/native_contracts.py": "a88209e25c1849ce4b0aaed3bb0751cd8d8e76cebc4e1ec3fa053be2a1834a4d",
+        "tools/testing/test_native_contracts.py": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+        "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b"
+      },
+      "source_unchanged": true
+    }
+  },
+  "retained_artifact_identities": [
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/README.md",
+      "sha256": "b248a6aafe6cf42753db211cad8dc859fa2079b21fd15ef72a0426d604450e6f",
+      "bytes": 1209,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/final-source/scripts/ci/native_contracts.py",
+      "sha256": "a88209e25c1849ce4b0aaed3bb0751cd8d8e76cebc4e1ec3fa053be2a1834a4d",
+      "bytes": 8225,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/final-source/tools/testing/test_native_contracts.py",
+      "sha256": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+      "bytes": 5199,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/green-command.json",
+      "sha256": "44329a3ca2b82a9fb44d22a9b640de866214386a389e6200ef77d5a45a1f765a",
+      "bytes": 1693,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/green.log",
+      "sha256": "f3b40ee8fbf0d802e3b60a4fc8641e09cc77a2fa619ce50f529a4ec2531c6df9",
+      "bytes": 14084,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red-command.json",
+      "sha256": "6bddf6102ab9d37280b902528c47b7702556bb27ef49110986efcb57814dd292",
+      "bytes": 955,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red-source/scripts/ci/native_contracts.py",
+      "sha256": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+      "bytes": 8193,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red-source/scripts/ci/tdd_gate.py",
+      "sha256": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b",
+      "bytes": 10533,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red-source/tools/testing/test_native_contracts.py",
+      "sha256": "1b8d4405fac8c7133b0ec0e26fc0efc5f43bf064b5d3e3add527e2555c10989f",
+      "bytes": 5199,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red.log",
+      "sha256": "0cd36f5b9b89be52d622511cbdee262edb20d897656bb13c4613d9b1d8b34dfc",
+      "bytes": 15540,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red2-command.json",
+      "sha256": "9b5c95457cda214ab0f69f36df266dbf86ecb3531595af93534f83dfd1ee2199",
+      "bytes": 1441,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red2-source/scripts/ci/native_contracts.py",
+      "sha256": "f2d8e310c2fb10bade118c1a0522e32a5b74cedde8555f77d4be296311f595b1",
+      "bytes": 8193,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red2-source/scripts/ci/tdd_gate.py",
+      "sha256": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b",
+      "bytes": 10533,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red2-source/tools/testing/test_native_contracts.py",
+      "sha256": "a06fb0eb88d1a332433b612b8ee79092bee6dcd86b3fe37de4960bce12865584",
+      "bytes": 5199,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/red2.log",
+      "sha256": "f6be041c18abd1dae97354974f5523e53fe855974aa26ddf208ae22f00854ba3",
+      "bytes": 6271,
+      "identity_verified": true
+    },
+    {
+      "path": "/workspace/nexus-native-binary-boundary-iteration/text-check.json",
+      "sha256": "29ec0c7a195895cb2600ba07215c106ebe9e4b1c6bb3e909eb9823a286f93683",
+      "bytes": 169,
+      "identity_verified": true
+    }
+  ],
+  "limitations": [
+    "Reviewer performed zero test or build executions; owner logs are retained evidence, not newly reproduced qualification.",
+    "Trusted local generated absolute build-plan boundary; no filesystem race, malicious concurrent replacement or formal verification guarantee.",
+    "Root clean-source/full qualification and physical HIL validation remain separate."
+  ],
+  "source_unchanged_after_review": true
+}

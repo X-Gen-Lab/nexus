@@ -1,0 +1,71 @@
+/**
+ * \file            nexus_bindings.h
+ * \brief           Fixed typed aliases selected by one assembly.
+ * \author          Nexus Team
+ */
+#ifndef NEXUS_BINDINGS_H
+#define NEXUS_BINDINGS_H
+#include "nexus/core/status.h"
+#include "nexus/io/adc.h"
+#include "nexus/io/exti.h"
+#include "nexus/io/flash.h"
+#include "nexus/io/gpio.h"
+#include "nexus/io/i2c.h"
+#include "nexus/io/timer.h"
+#include "nexus/io/spi.h"
+#include "nexus/io/uart.h"
+#include "nexus/io/watchdog.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+typedef struct {
+    nx_result_t primary;
+    nx_result_t cleanup;
+    uint32_t remaining_effects;
+} nx_platform_start_result_t;
+/** \brief Startup-only; no scheduler or product worker is created.
+ * \return Primary/cleanup errors and retained effects. On error
+ * all ports remain unusable; preserve contexts until cleanup.
+ */
+nx_platform_start_result_t nx_platform_start(void);
+/** \brief Stop after direct writers/IRQ consumers quiesce.
+ * \return SUCCESS after drain; BUSY retains all storage and clock.
+ * The owner must continue service before retrying BUSY.
+ */
+nx_result_t nx_platform_stop(void);
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_adc_port_t* const nx_binding_adc0;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_exti_port_t* const nx_binding_exti0;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_flash_port_t* const nx_binding_flash0;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_gpio_port_t* const nx_binding_led_a;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_gpio_port_t* const nx_binding_led_b;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_i2c_port_t* const nx_binding_bus_i2c_a;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_i2c_port_t* const nx_binding_bus_i2c_b;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_pwm_port_t* const nx_binding_pwm0;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_spi_port_t* const nx_binding_bus_spi_a;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_spi_port_t* const nx_binding_bus_spi_b;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_uart_port_t* const nx_binding_link_a;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_uart_port_t* const nx_binding_link_b;
+/** \brief Fixed static identity; lifecycle stays explicit. */
+extern const nx_watchdog_port_t* const nx_binding_watchdog0;
+extern const nx_spi_endpoint_t* const nx_device_sensor_spi_a;
+extern const nx_spi_endpoint_t* const nx_device_sensor_spi_b;
+extern const nx_spi_endpoint_t* const nx_device_sensor_spi_c;
+extern const nx_i2c_endpoint_t* const nx_device_sensor_i2c_a;
+extern const nx_i2c_endpoint_t* const nx_device_sensor_i2c_b;
+extern const nx_i2c_endpoint_t* const nx_device_sensor_i2c_c;
+#ifdef __cplusplus
+}
+#endif
+#endif

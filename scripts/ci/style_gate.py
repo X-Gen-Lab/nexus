@@ -151,7 +151,7 @@ def check_text(path, relative):
     return errors
 
 
-def check_ownership_change(root, tracked, owned, base_ref):
+def check_ownership_change(root, tracked, owned, base_ref, *, staged=False):
     """Do not hide previously owned source with an exclusion or a rename."""
     previous = blob(root, base_ref, ".clang-format-dirs")
     if previous is None:
@@ -177,7 +177,8 @@ def check_ownership_change(root, tracked, owned, base_ref):
         if was_owned(name) and name not in owned:
             raise ValueError(f"Previously owned source cannot be excluded: {name}")
     entries = iter(git(
-        root, "diff", "--find-renames", "--name-status", "-z", base_ref, "--",
+        root, "diff", *(["--cached"] if staged else []),
+        "--find-renames", "--name-status", "-z", base_ref, "--",
     ).split(b"\0")[:-1])
     for status in entries:
         old_name = next(entries).decode("utf-8")
@@ -187,7 +188,23 @@ def check_ownership_change(root, tracked, owned, base_ref):
                 raise ValueError(f"Owned source cannot move outside ownership: {old_name} -> {new_name}")
 
 
-def run_checks(root, filenames, *, all_files=False, base_ref="HEAD"):
+def staged_files(root):
+    """Read the full index selection once; deletion has no content to inspect."""
+    if git(root, "ls-files", "--unmerged", "-z"):
+        raise ValueError("Cannot check an index with unmerged entries")
+    return [
+        item.decode("utf-8") for item in git(
+            root, "diff", "--cached", "--name-only", "--diff-filter=ACMRT",
+            "-z", "--",
+        ).split(b"\0") if item
+    ]
+
+
+def run_checks(root, filenames, *, all_files=False, base_ref="HEAD", staged=False):
+    if staged:
+        if filenames:
+            raise ValueError("--staged cannot select a filename subset")
+        filenames = staged_files(root)
     if base_ref == "0" * 40:
         # A new remote ref has no previous commit. Its only reviewed debt source
         # is the fixed pre-automation snapshot, not a candidate's parent.
@@ -211,7 +228,7 @@ def run_checks(root, filenames, *, all_files=False, base_ref="HEAD"):
     owned = {path.relative_to(root).as_posix(): path for path in owned_paths}
     if not owned:
         raise ValueError("Full owned source set is empty")
-    check_ownership_change(root, tracked, owned, base_ref)
+    check_ownership_change(root, tracked, owned, base_ref, staged=staged)
     changed = {
         item.decode("utf-8") for item in git(
             root, "diff", "--name-only", "-z", base_ref, "--",
@@ -271,6 +288,9 @@ def run_checks(root, filenames, *, all_files=False, base_ref="HEAD"):
     return {
         "schema_version": 1, "status": "failed" if errors else "passed",
         "base_ref": base_ref, "debt_source_ref": debt_base, "full_source_check": full,
+        "selection_scope": "full" if full else ("staged" if staged else "paths"),
+        "input_files": sorted(names),
+        "selected_files": sorted(selected | text_names),
         "source_files_checked": len(selected), "text_files_selected": len(text_names),
         "legacy_format_files": sum(item["legacy_format_debt"] for item in records),
         "legacy_comment_files": sum(bool(item["comment_rules"]) for item in records),
@@ -286,6 +306,10 @@ def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("files", nargs="*")
     parser.add_argument("--all", action="store_true", dest="all_files")
+    parser.add_argument(
+        "--staged", action="store_true",
+        help="Check the complete staged index; filename subsets are forbidden",
+    )
     parser.add_argument("--base-ref", default=os.environ.get("NEXUS_STYLE_BASE_REF", "HEAD"))
     parser.add_argument("--report", type=Path)
     args = parser.parse_args(arguments)
@@ -294,6 +318,7 @@ def main(arguments=None):
             ROOT, args.files,
             all_files=args.all_files or os.environ.get("NEXUS_STYLE_FULL") == "1",
             base_ref=args.base_ref,
+            staged=args.staged,
         )
         if args.report:
             args.report.parent.mkdir(parents=True, exist_ok=True)

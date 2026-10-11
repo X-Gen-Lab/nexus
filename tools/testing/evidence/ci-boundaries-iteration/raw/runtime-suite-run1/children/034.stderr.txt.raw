@@ -1,0 +1,6 @@
+CMake Error at /tmp/runtime source SDK xcj2_a50/relocated prefix with spaces/lib/cmake/Nexus/NexusConfig.cmake:38 (message):
+  One build cannot mix Nexus Runtime and Platform package modes
+Call Stack (most recent call first):
+  CMakeLists.txt:4 (find_package)
+
+

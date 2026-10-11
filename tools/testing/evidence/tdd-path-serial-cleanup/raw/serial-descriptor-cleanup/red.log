@@ -1,0 +1,49 @@
+FFFF
+======================================================================
+FAIL: test_cleanup_close_error_retains_first_flush_error_and_drains_peers (tools.testing.test_hil_serial_echo.HilTraceDescriptorTests.test_cleanup_close_error_retains_first_flush_error_and_drains_peers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 483, in test_cleanup_close_error_retains_first_flush_error_and_drains_peers
+    self.assert_closed(descriptors)
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 405, in assert_closed
+    with self.assertRaises(OSError) as closed:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: OSError not raised
+
+======================================================================
+FAIL: test_fdopen_failure_closes_unconverted_and_prior_descriptors (tools.testing.test_hil_serial_echo.HilTraceDescriptorTests.test_fdopen_failure_closes_unconverted_and_prior_descriptors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 433, in test_fdopen_failure_closes_unconverted_and_prior_descriptors
+    self.assert_closed(descriptors)
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 405, in assert_closed
+    with self.assertRaises(OSError) as closed:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: OSError not raised
+
+======================================================================
+FAIL: test_first_flush_error_does_not_abandon_remaining_descriptors (tools.testing.test_hil_serial_echo.HilTraceDescriptorTests.test_first_flush_error_does_not_abandon_remaining_descriptors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 449, in test_first_flush_error_does_not_abandon_remaining_descriptors
+    self.assert_closed(descriptors)
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 405, in assert_closed
+    with self.assertRaises(OSError) as closed:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: OSError not raised
+
+======================================================================
+FAIL: test_first_fsync_error_does_not_abandon_remaining_descriptors (tools.testing.test_hil_serial_echo.HilTraceDescriptorTests.test_first_fsync_error_does_not_abandon_remaining_descriptors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 465, in test_first_fsync_error_does_not_abandon_remaining_descriptors
+    self.assert_closed(descriptors)
+  File "/workspace/nexus/tools/testing/test_hil_serial_echo.py", line 405, in assert_closed
+    with self.assertRaises(OSError) as closed:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: OSError not raised
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+FAILED (failures=4)

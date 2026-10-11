@@ -1,0 +1,9 @@
+{
+  "gd32-bindings.c": "882195b55e6143f5cbc493db3b96a1372aa51fe307c660eadeddbf8c5baaa9ee",
+  "stm32-bindings.c": "58774d7ecbca3c499e8fd4fe35ab19e72b418a757ca21403c3bf035ca21f915c",
+  "tests/google/timer_factory.cmake": "ddc45e88fd114b249631ea8d86294bd2f50aef02cc9d44a27cf2466a266b2552",
+  "tests/google/timer_factory_model.h": "d9da5a18188fc5acd9bf29d1053020aabbaadf642d5457e84d0abe9f3348ef4b",
+  "tests/google/timer_factory_test.cpp": "da90c8a30cf1ca925ce0b532aecfe24952994c969592fe5e9a40bdb8ce04bd78",
+  "tools/configure/bindings.py": "6b78edd6f48784e10460e4dcbabbb00e0bc94b911fd02c0bebcd98bd88ae3065",
+  "tools/configure/timer_advanced.py": "6d48eb4d39a2c05a5ed9893f96ee4ae4858a268c018de9b86bce2e154080b758"
+}

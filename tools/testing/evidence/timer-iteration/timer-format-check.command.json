@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python",
+    "scripts/tools/format.py",
+    "--check",
+    "--files",
+    "io/include/nexus/io/timer_capture.h",
+    "io/include/nexus/io/advanced_pwm.h",
+    "io/src/timer_capture.c",
+    "io/src/advanced_pwm.c",
+    "io/private/timer_advanced_controller.h",
+    "io/private/timer_capture_impl.h",
+    "io/private/advanced_pwm_impl.h",
+    "tests/google/timer_advanced_test.cpp",
+    "tests/google/timer_advanced_model.h",
+    "soc/stm32f407/drivers/timer_capture.c",
+    "soc/stm32f407/drivers/advanced_pwm.c",
+    "soc/stm32f407/private/stm32f407_timer_advanced.h",
+    "soc/gd32f470/drivers/timer_capture.c",
+    "soc/gd32f470/drivers/advanced_pwm.c",
+    "soc/gd32f470/private/gd32f470_timer_advanced.h"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:13:41.981111+00:00",
+  "ended_at": "2026-10-11T18:13:42.507647+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-format-check.log"
+}

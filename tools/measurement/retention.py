@@ -35,6 +35,85 @@ def selected_faces(bindings):
     return connections
 
 
+def conditional_at(source, offset):
+    """Reject a lexical projection whose initializer depends on preprocessing."""
+    depth = 0
+    for directive in re.findall(r"^[ \t]*#[ \t]*(if|ifdef|ifndef|endif)\b",
+                                source[:offset], flags=re.MULTILINE):
+        depth += -1 if directive == "endif" else 1
+        if depth < 0:
+            raise EvidenceError("malformed conditional provider source")
+    return depth != 0
+
+
+def provider_initializers(path, source, root):
+    """Project only direct ops macros and actual unambiguous private includes.
+
+    The wrapper remains the translation unit for local ELF method provenance.
+    This is deliberately narrower than a C preprocessor: complex or conditional
+    table selection is refused rather than inferred from a provider-name map.
+    """
+    yield source, None
+    definitions = list(re.finditer(
+        r"^[ \t]*#[ \t]*define[ \t]+([A-Z]\w*_OPS)\b([^\r\n]*)$",
+        source, flags=re.MULTILINE))
+    seen = set()
+    for definition in definitions:
+        macro, value = definition.groups()
+        if macro in seen:
+            raise EvidenceError("duplicate provider operations macro")
+        seen.add(macro)
+        if conditional_at(source, definition.start()):
+            raise EvidenceError("conditional provider operations macro")
+        if not re.fullmatch(r"[ \t]+nx_\w+_ops[ \t]*", value):
+            raise EvidenceError("provider operations macro must be direct")
+        if re.search(r"^[ \t]*#[ \t]*undef[ \t]+" + re.escape(macro) + r"\b",
+                     source, flags=re.MULTILINE):
+            raise EvidenceError("provider operations macro was redefined")
+        concrete = value.strip()
+        candidates = []
+        for include in re.finditer(
+            r'^[ \t]*#[ \t]*include[ \t]+"([^"\r\n]+)"[ \t]*$',
+            source, flags=re.MULTILINE):
+            name = include.group(1)
+            if Path(name).name != name:
+                raise EvidenceError("provider template must be a direct private include")
+            template_path = root / "io/private" / name
+            if not template_path.is_file():
+                continue
+            template = re.sub(r"/\*.*?\*/|//[^\n]*", " ",
+                              template_path.read_text(), flags=re.DOTALL)
+            if re.search(r"^[ \t]*#[ \t]*(?:define|undef)[ \t]+" +
+                         re.escape(macro) + r"\b", template, flags=re.MULTILINE):
+                raise EvidenceError("provider operations macro was redefined in template")
+            tables = list(re.finditer(
+                r"\bconst\s+(nx_\w+_ops_t)\s+" + re.escape(macro) +
+                r"\s*=\s*\{([^{}]*)\}\s*;", template))
+            if tables:
+                if definition.start() > include.start():
+                    raise EvidenceError("provider operations macro must bind before include")
+                owned = set()
+                for directory in (root / "soc", root / "io"):
+                    owned.update(directory.rglob(name))
+                local = path.parent / name
+                if local.is_file():
+                    owned.add(local)
+                if owned != {template_path}:
+                    raise EvidenceError("ambiguous provider private template include")
+            for table in tables:
+                if (conditional_at(source, include.start()) or
+                        conditional_at(template, table.start())):
+                    raise EvidenceError("conditional provider template table")
+                kind, body = table.groups()
+                projected = f"const {kind} {concrete} = {{{body}}};"
+                candidates.append((projected, file_identity(template_path)))
+        if not candidates:
+            raise EvidenceError("missing direct provider template initializer: " + str(path))
+        if len(candidates) != 1:
+            raise EvidenceError("ambiguous provider template initializer")
+        yield candidates[0]
+
+
 def source_contracts(root=ROOT):
     """Read public ABI and provider initializers without a mode registry."""
     faces, layouts, providers, inputs = {}, {}, {}, []
@@ -71,9 +150,12 @@ def source_contracts(root=ROOT):
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
-        for kind, name, body in re.findall(
+        initializers = [(kind, name, body, template_source)
+            for initializer, template_source in provider_initializers(path, source, root)
+            for kind, name, body in re.findall(
                 r"\bconst\s+(nx_\w+_ops_t)\s+(nx_\w+_ops)\s*=\s*"
-                r"\{([^{}]*)\}\s*;", source):
+                r"\{([^{}]*)\}\s*;", initializer)]
+        for kind, name, body, template_source in initializers:
             if name in providers or kind not in layouts:
                 raise EvidenceError(
                     f"unsupported concrete operations initializer: {path}:{name}")
@@ -94,6 +176,8 @@ def source_contracts(root=ROOT):
                 raise EvidenceError("unsupported concrete operations initializer")
             providers[name] = {"type": kind, "fields": dict(fields),
                                "source": file_identity(path)}
+            if template_source is not None:
+                providers[name]["template_source"] = template_source
     if not faces or not layouts or not providers:
         raise EvidenceError("missing public/provider operations contracts")
     return faces, layouts, providers, inputs
@@ -216,10 +300,10 @@ def concrete_method(elf, pointer):
             "definitions": matching}
 
 
-def inspect_provider_retention(elf, bindings):
+def inspect_provider_retention(elf, bindings, *, root=ROOT):
     """Trace selected faces through exact tables and all non-NULL methods."""
     connections = selected_faces(bindings)
-    face_types, layouts, providers, public_inputs = source_contracts()
+    face_types, layouts, providers, public_inputs = source_contracts(root)
     faces, tables = [], {}
     for face_type, name, operations, context in connections:
         expected_type = face_types.get(face_type)
@@ -278,6 +362,8 @@ def inspect_provider_retention(elf, bindings):
                               "slots": slot_names, "methods": methods,
                               "null_methods": sum(pointer == 0
                                                   for pointer in slots)}
+        if "template_source" in provider:
+            tables[operations]["template_source"] = provider["template_source"]
     return {"schema_version": 1, "kind": "linked_provider_retention",
             "status": "passed", "face_count": len(faces),
             "operations_table_count": len(tables),

@@ -1,0 +1,1208 @@
+Archive member included to satisfy reference by file (symbol)
+
+nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                              CMakeFiles/installed_g474.dir/main.c.obj (nx_platform_start)
+nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                              CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj (nx_arch_irq_save)
+nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+                              CMakeFiles/installed_g474.dir/main.c.obj (nx_freertos_task_start)
+nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+                              nexus-sdk/lib/libnexus_platform.a(bindings.c.obj) (nx_stm32g474_gpio_initialize)
+nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+                              nexus-sdk/lib/libnexus_platform.a(bindings.c.obj) (nx_stm32g474_uart_irq)
+nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+                              CMakeFiles/installed_g474.dir/main.c.obj (nx_gpio_port_write)
+nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+                              CMakeFiles/installed_g474.dir/main.c.obj (nx_uart_tx_prepare)
+nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+                              nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj) (nx_irq_wake_validate)
+nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                              nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj) (xTaskCreateStatic)
+nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+                              nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj) (xQueueGenericCreateStatic)
+nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+                              nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj) (vListInitialise)
+nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                              nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj) (pxPortInitialiseStack)
+nexus-sdk/lib/libnexus_core.a(time.c.obj)
+                              nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj) (nx_deadline_expired)
+nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                              CMakeFiles/installed_g474.dir/main.c.obj (nx_request_initialize)
+nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+                              nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj (nx_fault_observe)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+                              nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj) (__aeabi_uldivmod)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+                              /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o) (__udivmoddi4)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+                              /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o) (__aeabi_ldiv0)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+                              nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj) (memset)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                              CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj (__libc_init_array)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+                              nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj) (memcpy)
+
+Discarded input sections
+
+ .text          0x00000000       0x14 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+ .data          0x00000000        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+ .bss           0x00000000        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+ .text          0x00000000        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+ .data          0x00000000        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+ .text          0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .data          0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .bss           0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .text.nx_freertos_lowpower_port
+                0x00000000        0x4 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .text.nx_freertos_suppress_ticks_and_sleep
+                0x00000000        0x2 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .comment       0x00000000       0x47 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .ARM.attributes
+                0x00000000       0x34 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+ .text          0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+ .data          0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+ .bss           0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+ .text.nx_freertos_trace_event
+                0x00000000        0x2 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+ .comment       0x00000000       0x47 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+ .ARM.attributes
+                0x00000000       0x34 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+ .text          0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+ .data          0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+ .bss           0x00000000        0x0 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+ .text          0x00000000        0x0 CMakeFiles/installed_g474.dir/main.c.obj
+ .data          0x00000000        0x0 CMakeFiles/installed_g474.dir/main.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/installed_g474.dir/main.c.obj
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_flash
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_watchdog
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_exti
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_pwm
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_adc
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_can
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_device
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_eth
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_timer_capture
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_advanced_pwm
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi_device
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c_device
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_endpoint
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_mdio
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_gpio_capability
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_uart_capability
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_flash_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_watchdog_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_exti_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_pwm_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_adc_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_can_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_device_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_eth_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_timer_capture_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_advanced_pwm_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi_device_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c_device_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_endpoint_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_mdio_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_capability_uart_console
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_capability_gpio_led
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.nx_binding_console
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.nx_binding_led
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_exception_number
+                0x00000000        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_dmb
+                0x00000000        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_cycle_snapshot
+                0x00000000       0x40 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.queue_broadcast
+                0x00000000       0x18 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.deadline_ticks
+                0x00000000       0x8c nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_atomic_u32_load_acquire
+                0x00000000        0x8 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.notify_arm
+                0x00000000        0x6 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.direct_arm
+                0x00000000        0x6 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.queue_until
+                0x00000000       0x90 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.closable_transfer
+                0x00000000      0x164 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.notify_wait
+                0x00000000       0x74 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.direct_wait
+                0x00000000       0x84 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_isr_allowed
+                0x00000000       0x44 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.notify_wake
+                0x00000000       0x6a nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.direct_wake
+                0x00000000       0x74 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_notify_init
+                0x00000000       0x38 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_notify_port
+                0x00000000       0x38 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_notify_destroy
+                0x00000000       0x34 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_task_discard_before_scheduler
+                0x00000000       0x5a nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_task_join
+                0x00000000       0x7e nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_init
+                0x00000000       0x56 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_send
+                0x00000000       0x70 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_receive
+                0x00000000       0x6e nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_destroy
+                0x00000000       0x3e nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_send_until
+                0x00000000        0xe nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_receive_until
+                0x00000000        0xe nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_direct_notify_init
+                0x00000000       0x2c nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_direct_notify_port
+                0x00000000       0x38 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_direct_notify_destroy
+                0x00000000       0x2a nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_permanent_task_start
+                0x00000000       0x5e nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_waiter_init
+                0x00000000       0x38 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_queue_waiter_destroy
+                0x00000000       0x34 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_closable_queue_init
+                0x00000000       0x4a nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_closable_queue_send_until
+                0x00000000       0x12 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_closable_queue_receive_until
+                0x00000000       0x12 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_closable_queue_close
+                0x00000000       0x36 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.nx_freertos_closable_queue_destroy
+                0x00000000       0x58 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .text.nx_gpio_port_read
+                0x00000000       0x18 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .text.nx_gpio_port_toggle
+                0x00000000       0x18 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text.nx_uart_port_attach_wake
+                0x00000000       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text.nx_uart_port_start_admitted
+                0x00000000       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text.nx_uart_port_read_events
+                0x00000000       0x24 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text.nx_uart_port_read_bytes
+                0x00000000       0x24 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text.nx_uart_port_rx_start
+                0x00000000       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text.nx_uart_port_rx_stop
+                0x00000000       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.prvTaskIsTaskSuspended
+                0x00000000       0x40 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskDelete
+                0x00000000       0xcc nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskResume
+                0x00000000       0x94 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskResumeFromISR
+                0x00000000       0xc0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskEndScheduler
+                0x00000000       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGetTickCount
+                0x00000000        0xc nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGetTickCountFromISR
+                0x00000000       0x10 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.uxTaskGetNumberOfTasks
+                0x00000000        0xc nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.pcTaskGetName
+                0x00000000       0x24 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGetStaticBuffers
+                0x00000000       0x38 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskDelay
+                0x00000000       0x4c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskCatchUpTicks
+                0x00000000       0x3c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskPlaceOnUnorderedEventList
+                0x00000000       0x68 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskRemoveFromUnorderedEventList
+                0x00000000       0xbc nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskSetTimeOutState
+                0x00000000       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.uxTaskGetStackHighWaterMark
+                0x00000000       0x1c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGetCurrentTaskHandle
+                0x00000000        0xc nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGetCurrentTaskHandleForCore
+                0x00000000       0x10 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskPriorityInherit
+                0x00000000       0xa0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskPriorityDisinheritAfterTimeout
+                0x00000000       0xa8 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.uxTaskResetEventItemValue
+                0x00000000       0x18 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.pvTaskIncrementMutexHeldCount
+                0x00000000       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.ulTaskGenericNotifyTake
+                0x00000000       0xb0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGenericNotifyWait
+                0x00000000       0xd4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGenericNotify
+                0x00000000      0x12c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGenericNotifyFromISR
+                0x00000000      0x17c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskGenericNotifyGiveFromISR
+                0x00000000      0x10c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskGenericNotifyStateClear
+                0x00000000       0x40 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.ulTaskGenericNotifyValueClear
+                0x00000000       0x3c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vApplicationGetIdleTaskMemory
+                0x00000000       0x18 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vApplicationGetTimerTaskMemory
+                0x00000000       0x18 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.vTaskResetState
+                0x00000000       0x64 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.uxTimerTaskStack.0
+                0x00000000      0x200 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xTimerTaskTCB.1
+                0x00000000       0x54 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.prvIsQueueEmpty
+                0x00000000       0x16 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.prvCopyDataFromQueue
+                0x00000000       0x2a nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueGenericGetStaticBuffers
+                0x00000000       0x30 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueCreateCountingSemaphoreStatic
+                0x00000000       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueCreateMutexStatic
+                0x00000000       0x2a nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueGenericSendFromISR
+                0x00000000       0xc0 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueGiveFromISR
+                0x00000000       0xa4 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueReceive
+                0x00000000      0x124 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueSemaphoreTake
+                0x00000000      0x150 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueuePeek
+                0x00000000      0x120 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueReceiveFromISR
+                0x00000000       0xa8 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueuePeekFromISR
+                0x00000000       0x68 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.uxQueueMessagesWaiting
+                0x00000000       0x24 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.uxQueueSpacesAvailable
+                0x00000000       0x28 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.uxQueueMessagesWaitingFromISR
+                0x00000000       0x18 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.uxQueueGetQueueItemSize
+                0x00000000        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.uxQueueGetQueueLength
+                0x00000000        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueIsQueueEmptyFromISR
+                0x00000000       0x20 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.xQueueIsQueueFullFromISR
+                0x00000000       0x20 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .text.vPortEndScheduler
+                0x00000000       0x20 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .text.vPortValidateInterruptPriority
+                0x00000000       0x54 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .text.nx_clock32_initialize
+                0x00000000       0x1e nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .text.nx_clock32_observe
+                0x00000000       0xc4 nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .text.nx_request_result
+                0x00000000       0x2c nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .text.nx_request_slot_bind
+                0x00000000       0x3c nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .text.nx_request_slot_lookup
+                0x00000000       0x1e nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .text.nx_request_slot_release
+                0x00000000       0x20 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.extab.text.__udivmoddi4
+                0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+RAM              0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+LOAD CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+LOAD nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+LOAD nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+LOAD nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+LOAD CMakeFiles/installed_g474.dir/main.c.obj
+LOAD nexus-sdk/lib/libnexus_platform.a
+LOAD nexus-sdk/lib/libnexus_arch.a
+LOAD nexus-sdk/lib/libnexus_os_freertos.a
+LOAD nexus-sdk/lib/libnexus_os_freertos.a
+LOAD nexus-sdk/lib/libnexus_soc_stm32g474.a
+LOAD nexus-sdk/lib/libnexus_io.a
+LOAD nexus-sdk/lib/libnexus_arch.a
+LOAD nexus-sdk/lib/libnexus_os_wait.a
+LOAD nexus-sdk/lib/libnx_freertos_kernel.a
+LOAD nexus-sdk/lib/libnexus_core.a
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+END GROUP
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+                0x08000000                        __nx_flash_start = ORIGIN (FLASH)
+                0x08080000                        __nx_flash_end = (ORIGIN (FLASH) + LENGTH (FLASH))
+                0x20020000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+                0x20020000                        _sp = _estack
+                0x00000800                        _Min_Stack_Size = 0x800
+                0x00000000                        _Min_Heap_Size = 0x0
+                0x2001f800                        __nx_msp_start = (_estack - _Min_Stack_Size)
+                0x20020000                        __nx_msp_end = _estack
+                0x9014441e                        __nx_resolved_sha256_0 = 0x9014441e
+                0x206fe932                        __nx_resolved_sha256_1 = 0x206fe932
+                0x0fe7e541                        __nx_resolved_sha256_2 = 0xfe7e541
+                0xe2bdd795                        __nx_resolved_sha256_3 = 0xe2bdd795
+                0xbdf6835e                        __nx_resolved_sha256_4 = 0xbdf6835e
+                0x58990fde                        __nx_resolved_sha256_5 = 0x58990fde
+                0x08f64d81                        __nx_resolved_sha256_6 = 0x8f64d81
+                0xcb4a2391                        __nx_resolved_sha256_7 = 0xcb4a2391
+
+.isr_vector     0x08000000      0x1d8
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1d8 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+                0x08000000                g_pfnVectors
+ *(.vectors)
+
+.text           0x080001e0     0x33ec
+ *(.text*)
+ .text.Reset_Handler
+                0x080001e0       0x50 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+                0x080001e0                Reset_Handler
+ .text.Default_Handler
+                0x08000230        0x2 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+                0x08000230                RTC_Alarm_IRQHandler
+                0x08000230                EXTI2_IRQHandler
+                0x08000230                TIM8_TRG_COM_IRQHandler
+                0x08000230                TIM8_CC_IRQHandler
+                0x08000230                HRTIM1_Master_IRQHandler
+                0x08000230                DebugMon_Handler
+                0x08000230                SPI4_IRQHandler
+                0x08000230                FDCAN3_IT0_IRQHandler
+                0x08000230                TIM1_CC_IRQHandler
+                0x08000230                HardFault_Handler
+                0x08000230                HRTIM1_FLT_IRQHandler
+                0x08000230                HRTIM1_TIMF_IRQHandler
+                0x08000230                USB_HP_IRQHandler
+                0x08000230                CORDIC_IRQHandler
+                0x08000230                HRTIM1_TIMD_IRQHandler
+                0x08000230                DMA2_Channel8_IRQHandler
+                0x08000230                NMI_Handler
+                0x08000230                EXTI3_IRQHandler
+                0x08000230                I2C3_ER_IRQHandler
+                0x08000230                EXTI0_IRQHandler
+                0x08000230                I2C2_EV_IRQHandler
+                0x08000230                FPU_IRQHandler
+                0x08000230                FDCAN1_IT1_IRQHandler
+                0x08000230                TIM1_UP_TIM16_IRQHandler
+                0x08000230                UsageFault_Handler
+                0x08000230                ADC1_2_IRQHandler
+                0x08000230                HRTIM1_TIME_IRQHandler
+                0x08000230                SPI1_IRQHandler
+                0x08000230                TIM6_DAC_IRQHandler
+                0x08000230                HRTIM1_TIMC_IRQHandler
+                0x08000230                TIM8_UP_IRQHandler
+                0x08000230                DMA2_Channel2_IRQHandler
+                0x08000230                DMA1_Channel4_IRQHandler
+                0x08000230                TIM20_TRG_COM_IRQHandler
+                0x08000230                USART3_IRQHandler
+                0x08000230                DMA1_Channel7_IRQHandler
+                0x08000230                UART5_IRQHandler
+                0x08000230                ADC3_IRQHandler
+                0x08000230                TIM4_IRQHandler
+                0x08000230                DMA2_Channel1_IRQHandler
+                0x08000230                QUADSPI_IRQHandler
+                0x08000230                I2C1_EV_IRQHandler
+                0x08000230                DMA1_Channel6_IRQHandler
+                0x08000230                UART4_IRQHandler
+                0x08000230                DMA2_Channel4_IRQHandler
+                0x08000230                TIM3_IRQHandler
+                0x08000230                RCC_IRQHandler
+                0x08000230                TIM20_UP_IRQHandler
+                0x08000230                DMA1_Channel1_IRQHandler
+                0x08000230                Default_Handler
+                0x08000230                DMA2_Channel7_IRQHandler
+                0x08000230                RTC_TAMP_LSECSS_IRQHandler
+                0x08000230                FMAC_IRQHandler
+                0x08000230                EXTI15_10_IRQHandler
+                0x08000230                DMA1_Channel8_IRQHandler
+                0x08000230                HRTIM1_TIMA_IRQHandler
+                0x08000230                TIM7_DAC_IRQHandler
+                0x08000230                FDCAN3_IT1_IRQHandler
+                0x08000230                TIM5_IRQHandler
+                0x08000230                UCPD1_IRQHandler
+                0x08000230                I2C3_EV_IRQHandler
+                0x08000230                EXTI9_5_IRQHandler
+                0x08000230                RTC_WKUP_IRQHandler
+                0x08000230                PVD_PVM_IRQHandler
+                0x08000230                SPI2_IRQHandler
+                0x08000230                MemManage_Handler
+                0x08000230                ADC5_IRQHandler
+                0x08000230                DMA2_Channel5_IRQHandler
+                0x08000230                CRS_IRQHandler
+                0x08000230                DMA1_Channel5_IRQHandler
+                0x08000230                USB_LP_IRQHandler
+                0x08000230                EXTI4_IRQHandler
+                0x08000230                RNG_IRQHandler
+                0x08000230                HRTIM1_TIMB_IRQHandler
+                0x08000230                TIM1_TRG_COM_TIM17_IRQHandler
+                0x08000230                FDCAN2_IT1_IRQHandler
+                0x08000230                DMA1_Channel3_IRQHandler
+                0x08000230                ADC4_IRQHandler
+                0x08000230                WWDG_IRQHandler
+                0x08000230                I2C4_EV_IRQHandler
+                0x08000230                FDCAN2_IT0_IRQHandler
+                0x08000230                DMA2_Channel6_IRQHandler
+                0x08000230                FDCAN1_IT0_IRQHandler
+                0x08000230                COMP7_IRQHandler
+                0x08000230                COMP1_2_3_IRQHandler
+                0x08000230                EXTI1_IRQHandler
+                0x08000230                USART2_IRQHandler
+                0x08000230                COMP4_5_6_IRQHandler
+                0x08000230                TIM20_BRK_IRQHandler
+                0x08000230                I2C2_ER_IRQHandler
+                0x08000230                DMA1_Channel2_IRQHandler
+                0x08000230                TIM8_BRK_IRQHandler
+                0x08000230                FLASH_IRQHandler
+                0x08000230                TIM20_CC_IRQHandler
+                0x08000230                BusFault_Handler
+                0x08000230                USART1_IRQHandler
+                0x08000230                SPI3_IRQHandler
+                0x08000230                I2C1_ER_IRQHandler
+                0x08000230                FMC_IRQHandler
+                0x08000230                LPTIM1_IRQHandler
+                0x08000230                DMAMUX_OVR_IRQHandler
+                0x08000230                I2C4_ER_IRQHandler
+                0x08000230                USBWakeUp_IRQHandler
+                0x08000230                SAI1_IRQHandler
+                0x08000230                DMA2_Channel3_IRQHandler
+                0x08000230                TIM1_BRK_TIM15_IRQHandler
+ .text.task_context
+                0x08000232       0x24 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+ *fill*         0x08000256        0x2 
+ .text.SystemInit
+                0x08000258       0x38 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x08000258                SystemInit
+ .text.nx_stm32g474_validate_identity
+                0x08000290       0x40 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x08000290                nx_stm32g474_validate_identity
+ .text.nx_stm32g474_system_stop
+                0x080002d0      0x1f4 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x080002d0                nx_stm32g474_system_stop
+ .text.nx_stm32g474_system_start
+                0x080004c4      0x398 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x080004c4                nx_stm32g474_system_start
+ .text.nx_stm32g474_system_timer_irq
+                0x0800085c       0x1e CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x0800085c                nx_stm32g474_system_timer_irq
+ .text.nx_stm32g474_system_now
+                0x0800087a       0x3e CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x0800087a                nx_stm32g474_system_now
+ .text.nx_time_now_us
+                0x080008b8        0xc CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x080008b8                nx_time_now_us
+ .text.TIM2_IRQHandler
+                0x080008c4        0xc CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x080008c4                TIM2_IRQHandler
+ .text.park     0x080008d0       0x34 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+ .text.nx_freertos_assert_failed
+                0x08000904        0xc nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+                0x08000904                nx_freertos_assert_failed
+ .text.vApplicationStackOverflowHook
+                0x08000910       0x10 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+                0x08000910                vApplicationStackOverflowHook
+ .text.task_entry
+                0x08000920        0x2 CMakeFiles/installed_g474.dir/main.c.obj
+ *fill*         0x08000922        0x2 
+ .text.startup.main
+                0x08000924       0x9c CMakeFiles/installed_g474.dir/main.c.obj
+                0x08000924                main
+ .text._init    0x080009c0        0x2 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x080009c0                _init
+ .text._fini    0x080009c2        0x2 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x080009c2                _fini
+ .text.LPUART1_IRQHandler
+                0x080009c4        0xc nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x080009c4                LPUART1_IRQHandler
+ .text.nx_platform_stop
+                0x080009d0      0x1a0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x080009d0                nx_platform_stop
+ .text.nx_platform_start
+                0x08000b70      0x1f0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x08000b70                nx_platform_start
+ .text.nx_factory_gpio
+                0x08000d60       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x08000d60                nx_factory_gpio
+ .text.nx_factory_uart
+                0x08000d70       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x08000d70                nx_factory_uart
+ .text.nx_arch_irq_save
+                0x08000d80       0x10 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000d80                nx_arch_irq_save
+ .text.nx_arch_irq_restore
+                0x08000d90        0xe nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000d90                nx_arch_irq_restore
+ .text.nx_arch_irq_masks
+                0x08000d9e       0x16 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000d9e                nx_arch_irq_masks
+ .text.nx_arch_irq_is_masked
+                0x08000db4       0x20 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000db4                nx_arch_irq_is_masked
+ .text.nx_arch_is_privileged
+                0x08000dd4       0x16 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000dd4                nx_arch_is_privileged
+ .text.nx_arch_in_isr
+                0x08000dea        0xc nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000dea                nx_arch_in_isr
+ .text.nx_arch_dsb
+                0x08000df6        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000df6                nx_arch_dsb
+ .text.nx_arch_isb
+                0x08000dfc        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000dfc                nx_arch_isb
+ *fill*         0x08000e02        0x2 
+ .text.task_storage_valid
+                0x08000e04       0x3c nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.task_context_allowed
+                0x08000e40       0x44 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .text.task_entry
+                0x08000e84       0x2a nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ *fill*         0x08000eae        0x2 
+ .text.nx_freertos_task_start
+                0x08000eb0       0xa8 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+                0x08000eb0                nx_freertos_task_start
+ .text.read     0x08000f58       0x46 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .text.write    0x08000f9e       0x3e nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .text.toggle   0x08000fdc       0x40 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .text.nx_stm32g474_gpio_initialize
+                0x0800101c       0xf4 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+                0x0800101c                nx_stm32g474_gpio_initialize
+ .text.nx_stm32g474_gpio_stop
+                0x08001110       0x62 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+                0x08001110                nx_stm32g474_gpio_stop
+ *fill*         0x08001172        0x2 
+ .text.nx_stm32g474_gpio_clock_enable
+                0x08001174       0x48 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+                0x08001174                nx_stm32g474_gpio_clock_enable
+ .text.nx_stm32g474_lpuart1_pins_prepare
+                0x080011bc       0xc0 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+                0x080011bc                nx_stm32g474_lpuart1_pins_prepare
+ .text.__NVIC_GetPriority
+                0x0800127c       0x24 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.protected_span
+                0x080012a0       0x50 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.output_alias
+                0x080012f0       0x40 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.observe_tc
+                0x08001330       0x4c nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.task_context
+                0x0800137c       0x24 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.read_bytes
+                0x080013a0       0xba nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ *fill*         0x0800145a        0x2 
+ .text.begin_drain
+                0x0800145c       0x58 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.service  0x080014b4       0xb0 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.cancel   0x08001564       0x6a nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ *fill*         0x080015ce        0x2 
+ .text.attach_wake
+                0x080015d0       0x98 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.stop     0x08001668      0x122 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.start    0x0800178a      0x106 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.start_admitted
+                0x08001890       0x24 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.submit   0x080018b4        0x6 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .text.nx_stm32g474_uart_irq
+                0x080018ba      0x138 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+                0x080018ba                nx_stm32g474_uart_irq
+ *fill*         0x080019f2        0x2 
+ .text.nx_stm32g474_uart_initialize
+                0x080019f4      0x2a0 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+                0x080019f4                nx_stm32g474_uart_initialize
+ .text.nx_gpio_port_write
+                0x08001c94       0x18 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+                0x08001c94                nx_gpio_port_write
+ .text.nx_uart_tx_prepare
+                0x08001cac       0x22 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+                0x08001cac                nx_uart_tx_prepare
+ .text.nx_uart_port_submit
+                0x08001cce       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+                0x08001cce                nx_uart_port_submit
+ .text.nx_uart_port_cancel
+                0x08001ce6       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+                0x08001ce6                nx_uart_port_cancel
+ .text.nx_uart_port_service
+                0x08001cfe       0x12 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+                0x08001cfe                nx_uart_port_service
+ .text.nx_uart_port_stop
+                0x08001d10       0x18 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+                0x08001d10                nx_uart_port_stop
+ .text.nx_irq_wake_validate
+                0x08001d28       0x9e nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+                0x08001d28                nx_irq_wake_validate
+ .text.nx_irq_wake_signal
+                0x08001dc6        0xe nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+                0x08001dc6                nx_irq_wake_signal
+ .text.prvCheckTasksWaitingTermination
+                0x08001dd4       0x3c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.prvIdleTask
+                0x08001e10       0x28 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.prvAddCurrentTaskToDelayedList
+                0x08001e38       0xac nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.prvResetNextTaskUnblockTime
+                0x08001ee4       0x24 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .text.xTaskCreateStatic
+                0x08001f08      0x1f0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08001f08                xTaskCreateStatic
+ .text.vTaskStartScheduler
+                0x080020f8       0x84 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x080020f8                vTaskStartScheduler
+ .text.vTaskSuspendAll
+                0x0800217c       0x10 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x0800217c                vTaskSuspendAll
+ .text.xTaskIncrementTick
+                0x0800218c      0x18c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x0800218c                xTaskIncrementTick
+ .text.xTaskResumeAll
+                0x08002318      0x15c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002318                xTaskResumeAll
+ .text.vTaskSwitchContext
+                0x08002474       0x9c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002474                vTaskSwitchContext
+ .text.vTaskSuspend
+                0x08002510       0xd4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002510                vTaskSuspend
+ .text.vTaskPlaceOnEventList
+                0x080025e4       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x080025e4                vTaskPlaceOnEventList
+ .text.xTaskRemoveFromEventList
+                0x08002618       0xd0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002618                xTaskRemoveFromEventList
+ .text.vTaskInternalSetTimeOutState
+                0x080026e8       0x18 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x080026e8                vTaskInternalSetTimeOutState
+ .text.xTaskCheckForTimeOut
+                0x08002700       0x6c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002700                xTaskCheckForTimeOut
+ .text.vTaskMissedYield
+                0x0800276c        0xc nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x0800276c                vTaskMissedYield
+ .text.xTaskGetSchedulerState
+                0x08002778       0x20 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002778                xTaskGetSchedulerState
+ .text.xTaskPriorityDisinherit
+                0x08002798       0x9c nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x08002798                xTaskPriorityDisinherit
+ .text.prvCopyDataToQueue
+                0x08002834       0x66 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .text.prvUnlockQueue
+                0x0800289a       0x6c nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ *fill*         0x08002906        0x2 
+ .text.xQueueGenericReset
+                0x08002908       0x98 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+                0x08002908                xQueueGenericReset
+ .text.xQueueGenericCreateStatic
+                0x080029a0       0x68 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+                0x080029a0                xQueueGenericCreateStatic
+ .text.xQueueGenericSend
+                0x08002a08      0x144 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+                0x08002a08                xQueueGenericSend
+ .text.vQueueDelete
+                0x08002b4c       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+                0x08002b4c                vQueueDelete
+ .text.vListInitialise
+                0x08002b60       0x16 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+                0x08002b60                vListInitialise
+ .text.vListInitialiseItem
+                0x08002b76        0x6 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+                0x08002b76                vListInitialiseItem
+ .text.vListInsertEnd
+                0x08002b7c       0x16 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+                0x08002b7c                vListInsertEnd
+ .text.vListInsert
+                0x08002b92       0x2e nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+                0x08002b92                vListInsert
+ .text.uxListRemove
+                0x08002bc0       0x1e nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+                0x08002bc0                uxListRemove
+ *fill*         0x08002bde        0x2 
+ .text.SVC_Handler
+                0x08002be0       0x24 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002be0                SVC_Handler
+ .text.prvPortStartFirstTask
+                0x08002c04       0x28 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ *fill*         0x08002c2c        0x4 
+ .text.PendSV_Handler
+                0x08002c30       0x64 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002c30                PendSV_Handler
+ .text.vPortEnableVFP
+                0x08002c94       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .text.prvTaskExitError
+                0x08002ca8       0x3c nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .text.pxPortInitialiseStack
+                0x08002ce4       0x2c nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002ce4                pxPortInitialiseStack
+ .text.vPortEnterCritical
+                0x08002d10       0x3c nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002d10                vPortEnterCritical
+ .text.vPortExitCritical
+                0x08002d4c       0x28 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002d4c                vPortExitCritical
+ .text.SysTick_Handler
+                0x08002d74       0x2c nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002d74                SysTick_Handler
+ .text.vPortSetupTimerInterrupt
+                0x08002da0       0x18 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002da0                vPortSetupTimerInterrupt
+ .text.xPortStartScheduler
+                0x08002db8      0x154 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x08002db8                xPortStartScheduler
+ .text.nx_deadline_expired
+                0x08002f0c       0x1e nexus-sdk/lib/libnexus_core.a(time.c.obj)
+                0x08002f0c                nx_deadline_expired
+ .text.nx_deadline_after
+                0x08002f2a       0x1e nexus-sdk/lib/libnexus_core.a(time.c.obj)
+                0x08002f2a                nx_deadline_after
+ .text.nx_request_initialize
+                0x08002f48       0x1a nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                0x08002f48                nx_request_initialize
+ .text.nx_request_state
+                0x08002f62       0x10 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                0x08002f62                nx_request_state
+ .text.nx_request_prepare
+                0x08002f72       0x28 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                0x08002f72                nx_request_prepare
+ .text.nx_request_admit
+                0x08002f9a       0x22 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                0x08002f9a                nx_request_admit
+ .text.nx_request_transition
+                0x08002fbc       0x38 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                0x08002fbc                nx_request_transition
+ .text.nx_request_settle
+                0x08002ff4       0x1e nexus-sdk/lib/libnexus_core.a(request.c.obj)
+                0x08002ff4                nx_request_settle
+ .text.nx_fault_observe
+                0x08003012        0x2 nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+                0x08003012                nx_fault_observe
+ .text          0x08003014       0x30 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+                0x08003014                __aeabi_uldivmod
+ .text.__udivmoddi4
+                0x08003044      0x2f8 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+                0x08003044                __udivmoddi4
+ .text          0x0800333c        0x4 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+                0x0800333c                __aeabi_ldiv0
+                0x0800333c                __aeabi_idiv0
+ .text.memset   0x08003340       0x10 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+                0x08003340                memset
+ .text.__libc_init_array
+                0x08003350       0x48 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                0x08003350                __libc_init_array
+ .text.memcpy   0x08003398       0x1c /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+                0x08003398                memcpy
+ *(.rodata*)
+ .rodata.vApplicationStackOverflowHook.str1.1
+                0x080033b4      0x1cd nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+                                 0x6a (size before relaxing)
+ .rodata.main.str1.1
+                0x08003581        0x8 CMakeFiles/installed_g474.dir/main.c.obj
+ *fill*         0x08003581        0x3 
+ .rodata.s_nx_face_console
+                0x08003584        0x8 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_face_led
+                0x0800358c        0x8 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.nx_stm32g474_gpio_ops
+                0x08003594        0xc nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+                0x08003594                nx_stm32g474_gpio_ops
+ .rodata.nx_stm32g474_uart_ops
+                0x080035a0       0x28 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+                0x080035a0                nx_stm32g474_uart_ops
+ .rodata.prvTaskIsTaskSuspended.str1.1
+                0x080035c8       0x6b nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .rodata.vTaskStartScheduler.str1.1
+                0x080035c8        0x5 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .rodata.uxTopUsedPriority
+                0x080035c8        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .rodata.xQueueGenericReset.str1.1
+                0x080035cc       0x6b nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .rodata.prvTaskExitError.str1.1
+                0x080035cc       0x80 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ *(.init)
+ *(.fini)
+
+.glue_7         0x080035cc        0x0
+ .glue_7        0x080035cc        0x0 linker stubs
+
+.glue_7t        0x080035cc        0x0
+ .glue_7t       0x080035cc        0x0 linker stubs
+
+.vfp11_veneer   0x080035cc        0x0
+ .vfp11_veneer  0x080035cc        0x0 linker stubs
+
+.v4_bx          0x080035cc        0x0
+ .v4_bx         0x080035cc        0x0 linker stubs
+
+.iplt           0x080035cc        0x0
+ .iplt          0x080035cc        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx      0x080035cc        0x8
+                0x080035cc                        __exidx_start = .
+ *(.ARM.exidx*)
+ .ARM.exidx.text.__udivmoddi4
+                0x080035cc        0x8 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+                0x080035d4                        __exidx_end = .
+
+.rel.dyn        0x080035d4        0x0
+ .rel.iplt      0x080035d4        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+
+.preinit_array  0x080035d4        0x0
+                0x080035d4                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array*)
+                0x080035d4                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x080035d4        0x0
+                0x080035d4                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_NAME(.init_array.*))
+ *(.init_array*)
+                0x080035d4                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x080035d4        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_NAME(.fini_array.*))
+ *(.fini_array*)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+                0x080035d4                        _sidata = LOADADDR (.data)
+
+.data           0x20000000       0x40 load address 0x080035d4
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data*)
+ .data.g_nx_stm32g474_system
+                0x20000000       0x38 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                0x20000000                g_nx_stm32g474_system
+ .data.s_data   0x20000038        0x2 CMakeFiles/installed_g474.dir/main.c.obj
+ *fill*         0x2000003a        0x2 
+ .data.uxCriticalNesting
+                0x2000003c        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+                0x20000040                        . = ALIGN (0x4)
+                0x20000040                        _edata = .
+
+.igot.plt       0x20000040        0x0 load address 0x08003614
+ .igot.plt      0x20000040        0x0 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+
+.bss            0x20000040      0x72c
+                0x20000040                        . = ALIGN (0x4)
+                0x20000040                        _sbss = .
+ *(.bss*)
+ .bss.s_request
+                0x20000040       0x20 CMakeFiles/installed_g474.dir/main.c.obj
+ .bss.s_task_stack
+                0x20000060      0x200 CMakeFiles/installed_g474.dir/main.c.obj
+ .bss.s_task    0x20000260       0xac CMakeFiles/installed_g474.dir/main.c.obj
+ .bss.s_nx_rx_console
+                0x2000030c       0x40 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *fill*         0x2000034c        0x4 
+ .bss.s_nx_port_console
+                0x20000350       0x48 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_port_led
+                0x20000398        0xc nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_uart_clocks_added
+                0x200003a4        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_gpioa_lease
+                0x200003a8       0x1c nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_gpio_clocks_added
+                0x200003c4        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_initialized
+                0x200003c8        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_started
+                0x200003cc        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *fill*         0x200003cd        0x3 
+ .bss.uxIdleTaskStack.2
+                0x200003d0      0x200 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xIdleTaskTCB.3
+                0x200005d0       0x54 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.uxSchedulerSuspended
+                0x20000624        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xIdleTaskHandles
+                0x20000628        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xNextTaskUnblockTime
+                0x2000062c        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.uxTaskNumber
+                0x20000630        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xNumOfOverflows
+                0x20000634        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xYieldPendings
+                0x20000638        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xPendedTicks
+                0x2000063c        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xSchedulerRunning
+                0x20000640        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.uxTopReadyPriority
+                0x20000644        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xTickCount
+                0x20000648        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.uxCurrentNumberOfTasks
+                0x2000064c        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xSuspendedTaskList
+                0x20000650       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.uxDeletedTasksWaitingCleanUp
+                0x20000664        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xTasksWaitingTermination
+                0x20000668       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xPendingReadyList
+                0x2000067c       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.pxOverflowDelayedTaskList
+                0x20000690        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.pxDelayedTaskList
+                0x20000694        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xDelayedTaskList2
+                0x20000698       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.xDelayedTaskList1
+                0x200006ac       0x14 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.pxReadyTasksLists
+                0x200006c0       0xa0 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .bss.pxCurrentTCB
+                0x20000760        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+                0x20000760                pxCurrentTCB
+ .bss.ulMaxPRIGROUPValue
+                0x20000764        0x4 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .bss.ucMaxSysCallPriority
+                0x20000768        0x1 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ *(COMMON)
+                0x2000076c                        . = ALIGN (0x4)
+ *fill*         0x20000769        0x3 
+                0x2000076c                        _ebss = .
+
+.reserved       0x2000076c        0x4
+                0x20000770                        . = ALIGN (0x8)
+ *fill*         0x2000076c        0x4 
+                0x20000770                        __heap_start = .
+                0x20000770                        __nx_heap_start = .
+                0x20000770                        . = (. + _Min_Heap_Size)
+                0x20000770                        __heap_end = .
+                0x20000770                        __nx_heap_end = .
+
+.msp            0x2001f800      0x800
+                0x20020000                        . = (. + _Min_Stack_Size)
+ *fill*         0x2001f800      0x800 
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+                0x00000001                        ASSERT (((_ebss + _Min_Heap_Size) <= (_estack - _Min_Stack_Size)), RAM stack/heap overlap)
+OUTPUT(bin/installed_g474.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x35
+ .ARM.attributes
+                0x00000000       0x21 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/vendors/st/cmsis_device_g4/Source/Templates/gcc/startup_stm32g474xx.s.obj
+ .ARM.attributes
+                0x00000021       0x34 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+ .ARM.attributes
+                0x00000055       0x34 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+ .ARM.attributes
+                0x00000089       0x34 CMakeFiles/installed_g474.dir/main.c.obj
+ .ARM.attributes
+                0x000000bd       0x34 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .ARM.attributes
+                0x000000f1       0x34 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .ARM.attributes
+                0x00000125       0x34 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .ARM.attributes
+                0x00000159       0x34 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .ARM.attributes
+                0x0000018d       0x34 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .ARM.attributes
+                0x000001c1       0x34 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .ARM.attributes
+                0x000001f5       0x34 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .ARM.attributes
+                0x00000229       0x34 nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+ .ARM.attributes
+                0x0000025d       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .ARM.attributes
+                0x00000291       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .ARM.attributes
+                0x000002c5       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+ .ARM.attributes
+                0x000002f9       0x34 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .ARM.attributes
+                0x0000032d       0x34 nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .ARM.attributes
+                0x00000361       0x34 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .ARM.attributes
+                0x00000395       0x34 nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+ .ARM.attributes
+                0x000003c9       0x22 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .ARM.attributes
+                0x000003eb       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.attributes
+                0x0000041f       0x22 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x00000441       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .ARM.attributes
+                0x00000475       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .ARM.attributes
+                0x000004a9       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+
+.comment        0x00000000       0x46
+ .comment       0x00000000       0x46 CMakeFiles/installed_g474_nexus_startup.dir/tmp/nexus_installed_source_sdk_jducych8/relocated_prefix_with_spaces/share/nexus/src/soc/stm32g474/system.c.obj
+                                 0x47 (size before relaxing)
+ .comment       0x00000046       0x47 nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+ .comment       0x00000046       0x47 CMakeFiles/installed_g474.dir/main.c.obj
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_os_freertos.a(freertos.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_soc_stm32g474.a(gpio.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_soc_stm32g474.a(uart.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_io.a(gpio.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_io.a(uart.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_io.a(wake.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnx_freertos_kernel.a(tasks.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnx_freertos_kernel.a(queue.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnx_freertos_kernel.a(list.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnx_freertos_kernel.a(port.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_core.a(time.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_core.a(request.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_core.a(fault.c.obj)
+
+.debug_line_str
+                0x00000000       0xce
+ .debug_line_str
+                0x00000000       0xce /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+                                 0xc2 (size before relaxing)
+ .debug_line_str
+                0x000000ce       0xc6 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+
+.debug_frame    0x00000000       0xd4
+ .debug_frame   0x00000000       0x2c /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .debug_frame   0x0000002c       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .debug_frame   0x00000060       0x20 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .debug_frame   0x00000080       0x2c /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .debug_frame   0x000000ac       0x28 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)

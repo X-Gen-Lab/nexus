@@ -666,3 +666,96 @@ TEST_F(I2CRegisters, MissingLineFactsRejectInitializationAndRecovery) {
     EXPECT_EQ(control(&state), before);
 }
 #endif
+
+TEST(I2CPollingIdentity, ColdChildrenMatchExactControllerWithoutPortAccess) {
+    State first = {};
+    State second = {};
+    EndpointState child = {&first, 0x50};
+    EndpointState other_address = {&first, 0x51};
+#ifdef NEXUS_I2C_STM32_TEST
+    const nx_i2c_ops_t* operations = &nx_stm32_i2c_ops;
+    const nx_i2c_endpoint_ops_t* endpoint_operations =
+        &nx_stm32_i2c_endpoint_ops;
+#else
+    const nx_i2c_ops_t* operations = &nx_gd32_i2c_ops;
+    const nx_i2c_endpoint_ops_t* endpoint_operations =
+        &nx_gd32_i2c_endpoint_ops;
+#endif
+    const nx_i2c_port_t first_face = {operations, &first};
+    const nx_i2c_port_t same_context = {operations, &first};
+    const nx_i2c_port_t second_face = {operations, &second};
+    const nx_i2c_endpoint_t face = {endpoint_operations, &child};
+    const nx_i2c_endpoint_t addressed = {endpoint_operations, &other_address};
+    uint8_t first_before[sizeof(first)];
+    uint8_t second_before[sizeof(second)];
+    uint8_t child_before[sizeof(child)];
+    std::memcpy(first_before, &first, sizeof(first));
+    std::memcpy(second_before, &second, sizeof(second));
+    std::memcpy(child_before, &child, sizeof(child));
+    model_time = 123U;
+    model_mask = 1U;
+    model_isr = true;
+    EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &first_face));
+    EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &same_context));
+    EXPECT_TRUE(nx_i2c_endpoint_on_port(&addressed, &first_face));
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, &second_face));
+    EXPECT_EQ(std::memcmp(&first, first_before, sizeof(first)), 0);
+    EXPECT_EQ(std::memcmp(&second, second_before, sizeof(second)), 0);
+    EXPECT_EQ(std::memcmp(&child, child_before, sizeof(child)), 0);
+    EXPECT_EQ(model_time, 123U);
+    EXPECT_EQ(model_mask, 1U);
+    EXPECT_TRUE(model_isr);
+}
+
+TEST(I2CPollingIdentity, ForeignControllerMethodsAndMissingBindingsReject) {
+    State state = {};
+    EndpointState child = {&state, 0x50};
+#ifdef NEXUS_I2C_STM32_TEST
+    const nx_i2c_ops_t* operations = &nx_stm32_i2c_ops;
+    const nx_i2c_endpoint_ops_t* endpoint_operations =
+        &nx_stm32_i2c_endpoint_ops;
+#else
+    const nx_i2c_ops_t* operations = &nx_gd32_i2c_ops;
+    const nx_i2c_endpoint_ops_t* endpoint_operations =
+        &nx_gd32_i2c_endpoint_ops;
+#endif
+    const nx_i2c_ops_t foreign_operations = *operations;
+    const nx_i2c_port_t matching = {operations, &state};
+    const nx_i2c_port_t foreign = {&foreign_operations, &state};
+    const nx_i2c_port_t no_context = {operations, nullptr};
+    const nx_i2c_port_t no_methods = {nullptr, &state};
+    const nx_i2c_endpoint_t face = {endpoint_operations, &child};
+    EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &matching));
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, &foreign));
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, &no_context));
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, &no_methods));
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, nullptr));
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(nullptr, &matching));
+    ASSERT_NE(endpoint_operations->on_port, nullptr);
+    EXPECT_FALSE(endpoint_operations->on_port(nullptr, &matching));
+    EXPECT_FALSE(endpoint_operations->on_port(&child, nullptr));
+    child.port = nullptr;
+    EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, &matching));
+}
+
+TEST(I2CPollingIdentity, FixedNonreservedAddressIsValidatedWithoutStartup) {
+    State state = {};
+    EndpointState child = {&state, 8U};
+#ifdef NEXUS_I2C_STM32_TEST
+    const nx_i2c_port_t port = {&nx_stm32_i2c_ops, &state};
+    const nx_i2c_endpoint_t face = {&nx_stm32_i2c_endpoint_ops, &child};
+#else
+    const nx_i2c_port_t port = {&nx_gd32_i2c_ops, &state};
+    const nx_i2c_endpoint_t face = {&nx_gd32_i2c_endpoint_ops, &child};
+#endif
+    EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &port));
+    child.address = 119U;
+    EXPECT_TRUE(nx_i2c_endpoint_on_port(&face, &port));
+    constexpr uint8_t invalid[] = {0U, 7U, 120U, 127U, 255U};
+    for (uint8_t address : invalid) {
+        child.address = address;
+        EXPECT_FALSE(nx_i2c_endpoint_on_port(&face, &port));
+        EXPECT_EQ(child.address, address);
+        EXPECT_EQ(child.port, &state);
+    }
+}

@@ -1,0 +1,52 @@
+{
+  "base": "",
+  "blocking_count": 1,
+  "candidate_count": 3,
+  "candidates": [
+    {
+      "classification": "blocking_candidate",
+      "commit": "e0fa609da174ff10e47d8a0f33aef0807e72197d",
+      "path": "other.txt",
+      "raw_sha256": "d6c6d1554cae5a8b02770ff4c5e236361df29c08d0506313a630da0ab3dc36f7"
+    },
+    {
+      "classification": "reviewed_unknown_fixture",
+      "commit": "e0fa609da174ff10e47d8a0f33aef0807e72197d",
+      "path": "tools/testing/test_dependency_proposals.py",
+      "raw_sha256": "8d3331ee208c72c30fba199e4e2b8a65d69a5034e49875a2f20dbea3a4f2f976"
+    },
+    {
+      "classification": "reviewed_unknown_fixture",
+      "commit": "e0fa609da174ff10e47d8a0f33aef0807e72197d",
+      "path": "tools/testing/test_dependency_proposals.py",
+      "raw_sha256": "1340e191f197d87f9a6b772ca28aab13ba201dcff4036b49b531df0945c3a66a"
+    }
+  ],
+  "command": [
+    "/workspace/nexus-ci-security-iteration/trufflehog",
+    "git",
+    "file:///workspace/nexus-ci-security-iteration/foreign-candidate-git",
+    "--branch",
+    "e0fa609da174ff10e47d8a0f33aef0807e72197d",
+    "--results=verified,unknown",
+    "--json",
+    "--no-update",
+    "--fail",
+    "--fail-on-scan-errors",
+    "--no-ignore-tag"
+  ],
+  "head": "e0fa609da174ff10e47d8a0f33aef0807e72197d",
+  "policy_sha256": "7d667f47e1b1b8214caa8834e24cf7c7d2417fe6e76d5be7b3f5a90302b1a5a5",
+  "result_selection": [
+    "verified",
+    "unknown"
+  ],
+  "reviewed_unknown_count": 2,
+  "scanner_exit_code": 183,
+  "scanner_sha256": "df190aa9f2833297dca7d287c3ba274819d17002f18b938421f594e453f60d83",
+  "scanner_version": "3.99.1",
+  "schema_version": 1,
+  "status": "failed",
+  "stderr_sha256": "9cd999e135324cb0dacffd0cac0243b8e1cceda6261b94e172b075d8ae31fd01",
+  "stdout_sha256": "bd11db50daaa0b4376c0d0e8ae95b91fbcfc1187ba3929105621c05e02569a00"
+}

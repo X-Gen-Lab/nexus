@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "kind": "independent_readonly_hil_content_scope_review",
+  "created_utc": "2026-10-11T20:46:01.566694+00:00",
+  "status": "closed_no_new_blocker",
+  "reviewer": "arch_runtime",
+  "scope": "Changed shared workload semantic admission and exact selected modes, caller ordering before acquisition and trace acceptance, G474 software-reference nonpromotion, unchanged first-release fixture identity",
+  "freeze": {
+    "path": "/workspace/nexus-io-implementation-evidence/hil-platform/hil-platform-freeze.json",
+    "sha256": "0d9479b59585f58d1563e75798b48148bedbfcd13d95bb42e953768757ccdb97",
+    "source_count": 17,
+    "all_source_hashes_match": true
+  },
+  "reviewed_sources": {
+    "tools/hil/workloads.py": "841dfc5106ace70b5c574d0a927fb735be664086711c6c6f666381be3c934b32",
+    "tools/hil/acquire.py": "1444706f714a12aa8f256f11f5dfab4f80826bd4a6b3889893d70dd6e5a13677",
+    "tools/hil/measure.py": "46bcdd3ce13cca129424f986b9560a58c816c48274c53bab2d37a81c4d9601ed",
+    "tools/hil/os_acceptance.py": "4fa246da90cd57c1b3d5f287bc4d565e6acf844d6be3897e1d8da718b9b5fc0b",
+    "tools/hil/admit.py": "c55ee171020cdfd74096baa94540ab9d4e9d1796e011612811d980657d75f693",
+    "tools/schemas/hil-fixture.schema.json": "e27065812f1399470a089f7388718ec627e678e46ec3b4d18bea7d6d581d5fa5",
+    "tools/hil/fixtures/stm32g474re_hse24_reference.json": "f1862c3075aff32c7f3ead61f2aa780ca048ddb05bfad8468f2e5524aee0e52d",
+    "tools/hil/README.md": "1d8da1571df2c03b28508634287823f843835aae032c54c96bcab1c34299b293",
+    "tools/testing/test_hil_platform_extensions.py": "f57e86eb65397596d3f7fd9290eab5a0f13ae288df35424dd38f78bd7c9a5e8b",
+    "tools/testing/test_hil_protocol_admission.py": "e5dbc1d7126f73bc8001fef7c2af58b7b89e79161e64a7179daea4610c080d84"
+  },
+  "all_frozen_source_identities": {
+    "tests/contracts/test_hil_admission.py": "d938e28f38445d2a099d59f40aac23614e7ae3f9e05accc3927202655bc9473d",
+    "tests/contracts/test_hil_prepare.py": "6f4d7cf968e44493ae4b0f8d263a9817e31d0229c6832f341bb18c09f73e308c",
+    "tools/hil/README.md": "1d8da1571df2c03b28508634287823f843835aae032c54c96bcab1c34299b293",
+    "tools/hil/acquire.py": "1444706f714a12aa8f256f11f5dfab4f80826bd4a6b3889893d70dd6e5a13677",
+    "tools/hil/admit.py": "c55ee171020cdfd74096baa94540ab9d4e9d1796e011612811d980657d75f693",
+    "tools/hil/measure.py": "46bcdd3ce13cca129424f986b9560a58c816c48274c53bab2d37a81c4d9601ed",
+    "tools/hil/os_acceptance.py": "4fa246da90cd57c1b3d5f287bc4d565e6acf844d6be3897e1d8da718b9b5fc0b",
+    "tools/hil/templates/workload.json": "12ab85160ab4b6986ab79f25dcfcbc9364a5490714a551b1c0d05172e7f956f5",
+    "tools/hil/workloads.py": "841dfc5106ace70b5c574d0a927fb735be664086711c6c6f666381be3c934b32",
+    "tools/schemas/hil-fixture.schema.json": "e27065812f1399470a089f7388718ec627e678e46ec3b4d18bea7d6d581d5fa5",
+    "tools/hil/fixtures/stm32g474re_hse24_reference.json": "f1862c3075aff32c7f3ead61f2aa780ca048ddb05bfad8468f2e5524aee0e52d",
+    "tools/testing/test_hil_acquire.py": "87303ba387b500ce212b6338676f69296042ab065f18656196eb667e4059524c",
+    "tools/testing/test_hil_measurements.py": "70698282489b8d956508a2c71af770a5999700967db4ad1e171ae3afe9863f51",
+    "tools/testing/test_hil_workloads.py": "fcabe8f362a9b926e95af43243787d979043ab721f85c099ff81f1bcc22f56db",
+    "tools/testing/test_os_acceptance.py": "9c5b3569bf5cdfdade8078968ce6185ee72c85a5f4a32191ec8620041b941050",
+    "tools/testing/test_hil_platform_extensions.py": "f57e86eb65397596d3f7fd9290eab5a0f13ae288df35424dd38f78bd7c9a5e8b",
+    "tools/testing/test_hil_protocol_admission.py": "e5dbc1d7126f73bc8001fef7c2af58b7b89e79161e64a7179daea4610c080d84"
+  },
+  "supporting_readonly_sources": {
+    "tools/configure/providers/common.py": "8f0a32f270df3d5647e377eda0694ff13587cbea42a88c5560e6cda8ae1de912",
+    "tools/hil/prepare.py": "c58e342e40a960e43bb72ab6fb4b197d70f443331b2adf7e5131c1872270786e",
+    "tools/evidence/common.py": "5193254a7803dea7e8dcae7f01e2847b517bda9ab3c61b05db575d36dccf78e9",
+    "tools/evidence/identity.py": "87392736b01456a9dc7875994532147507bd623d21aa18a94eff977371eb4ace"
+  },
+  "first_release_fixtures": {
+    "tools/hil/fixtures/stm32f407_qiming_v31.json": {
+      "sha256": "d70ca3d5f00fd3c18293bafc890ed1880d7c557319a8947aa1e58d2e82eda0ee",
+      "head_bytes_unchanged": true
+    },
+    "tools/hil/fixtures/stm32f407ve_sky_qingchun.json": {
+      "sha256": "9ccf9d90633c60360e3edc3a85623119bfaa3fc14dc179c7c027013dbc6c6fb8",
+      "head_bytes_unchanged": true
+    },
+    "tools/hil/fixtures/gd32f470_liangshan.json": {
+      "sha256": "0dc84d36ab738c5e507810a0874ba8f7f91a750d2fc9a79ef962728fc300908c",
+      "head_bytes_unchanged": true
+    }
+  },
+  "conclusions": [
+    "The acquisition recipe and measurement/OS contexts now validate workload content against verified fixture/resolved inputs through one admitted_workload helper. A file-map hash alone or rehashed opaque object cannot replace schema/case/binding/numeric protocol checks.",
+    "All acquisition entry points reconstruct exact admission before workload validation. The shared semantic validator runs before station locks and subprocess equipment actions; measurement/OS paths run it before accepting raw traces.",
+    "Twenty-one maintained protocols are acquisition obligations. Exact immutable mode_traits selects DMA/RX-block/continuous/IRQ shapes and rejects unknown spellings; selected silicon capability never creates Board adapters, PHYs, connectors or a transceiver.",
+    "The workload schema requires bounded selected controller IDs, all required controller kinds, exact provider mode bindings, instrument file identities, complete nonempty review descriptions and finite numeric limits. Discrete work amounts have positive integer minima. Null template budgets are not authored admission.",
+    "G474 scope software_reference is required by exact part in Python fixture validation and schema, and station validation rejects that scope. Removing the scope cannot promote the same G474 part into physical admission.",
+    "Original three PCB fixture bytes remain identical to current HEAD. The new reference file names PA5/LPUART PA2/PA3 as source facts and explicitly defers actual PCB fitting, bridges, frequency, probe/UID and electrical behavior.",
+    "Fault workload adds observer/masks/loans/terminal observations; these are obligations rather than evidence that a physical fail-stop or safe-output test has executed."
+  ],
+  "reviewer_execution": {
+    "test_runs": 0,
+    "builds": 0,
+    "equipment_actions": 0,
+    "physical_status": "not_executed"
+  },
+  "owner_execution_note": "The frozen owner manifest reports136 actual stdlib cases and zero skips; independent reviewer did not rerun or inherit those executions.",
+  "limitations": [
+    "Trusted reviewed acquisition adapters and truthful station observations remain required. Hashes do not authenticate physical records or sandbox executable scripts.",
+    "Finite descriptions and semantic protocol validation cannot prove actual wiring, physical timing, WCET, kernel safety, released loans or certification.",
+    "The review closes the requested narrow changed-source scope; it is not an adversarial OS or concurrent filesystem security audit."
+  ]
+}

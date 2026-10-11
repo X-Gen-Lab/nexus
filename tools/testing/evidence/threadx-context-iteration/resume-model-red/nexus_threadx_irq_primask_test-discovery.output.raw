@@ -1,0 +1,5 @@
+Running main() from gmock_main.cc
+ThreadXIRQPrimask.
+  EveryReviewedExternalPriorityIsAdmitted
+  SystemExceptionsAndOutOfRangeIRQsAreRejected
+  UnprivilegedOrMaskedIRQIsRejected

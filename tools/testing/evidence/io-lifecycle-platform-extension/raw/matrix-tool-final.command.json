@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_io_lifecycle_matrix",
+    "tools.testing.test_tdd_matrix_integration"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "source_before": {
+    "scripts/ci/io_lifecycle_matrix.py": "f64d15617c956bb40fb504e70c42bf84a8c344af2d2940fb4f95a8e1d0389529",
+    "tools/testing/test_io_lifecycle_matrix.py": "78fcffb0b953a32c21239f29121429286b40a145af574e12902bf7a4aba039c9",
+    "tools/testing/io_lifecycle_matrix.json": "88c1a08a9108e19cd962d8f71ac0b53c778011bcc054ce24dad71adedc16c538",
+    "docs/design/io-lifecycle-matrix.md": "5b02c0ea2bfe380aa5ce36673f3547f5f201a836f866a2a46df02399964b4b10"
+  },
+  "source_after": {
+    "scripts/ci/io_lifecycle_matrix.py": "f64d15617c956bb40fb504e70c42bf84a8c344af2d2940fb4f95a8e1d0389529",
+    "tools/testing/test_io_lifecycle_matrix.py": "78fcffb0b953a32c21239f29121429286b40a145af574e12902bf7a4aba039c9",
+    "tools/testing/io_lifecycle_matrix.json": "88c1a08a9108e19cd962d8f71ac0b53c778011bcc054ce24dad71adedc16c538",
+    "docs/design/io-lifecycle-matrix.md": "5b02c0ea2bfe380aa5ce36673f3547f5f201a836f866a2a46df02399964b4b10"
+  },
+  "source_unchanged": true
+}

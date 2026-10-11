@@ -1,0 +1,21 @@
+schema = 2
+board_package = "zg_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[i2c.i2c0]
+binding = "i2c0"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.device0]
+controller = "i2c0"
+driver = "i2c-endpoint"
+address = 80

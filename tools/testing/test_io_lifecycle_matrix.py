@@ -72,6 +72,21 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         self.binary.write_bytes(b"different binary")
         with self.assertRaises(ValueError): self.run_audit()
 
+    def test_parent_components_cannot_borrow_an_external_binary(self):
+        foreign = self.root / "foreign" / self.binary.name
+        foreign.parent.mkdir()
+        foreign.write_bytes(self.binary.read_bytes())
+        escaped = self.build / ".." / "foreign" / self.binary.name
+        self.assertTrue(escaped.is_file())
+        self.assertFalse(escaped.is_symlink())
+        self.assertFalse(escaped.resolve().is_relative_to(self.build))
+        plan_path = self.build / "google-contracts.json"
+        plan = json.loads(plan_path.read_text())
+        plan["executables"] = [str(escaped)]
+        plan_path.write_text(json.dumps(plan))
+        with self.assertRaises(ValueError):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
     def test_different_case_with_same_count_rejected(self):
         (self.execution / "discovery-0.txt").write_text("Provider.\n  Other\n")
         with self.assertRaises(ValueError): self.run_audit()
@@ -152,6 +167,85 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         result = matrix.audit(self.root, self.build, self.catalogue, self.snapshot,
                               self.execution, allow_subset=True)
         self.assertEqual(result["execution_scope"], "development-subset")
+
+    def generated_context(self):
+        source = self.build / "generated/bindings.c"
+        source.parent.mkdir(parents=True)
+        source.write_text("void assembled(void) {}\n")
+        output = (self.build / "CMakeFiles/nexus_provider_test.dir" /
+                  "generated-bindings.c.o")
+        output.write_bytes(b"actual generated context fixture")
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        entries.append({"directory": str(self.build), "file": str(source),
+                        "arguments": ["cc", "-c", str(source),
+                                      "-o", str(output)]})
+        database.write_text(json.dumps(entries))
+        return source, output
+
+    def test_actual_generated_target_context_binds_source_and_object(self):
+        source, output = self.generated_context()
+        record = matrix.capture(self.root, self.build, self.catalogue,
+                                self.snapshot)
+        contexts = record["target_compiled"][self.binary.name]
+        generated = next(item for item in contexts
+                         if item["source"] == str(source))
+        self.assertEqual(generated["source_sha256"], matrix.digest(source))
+        self.assertEqual(generated["object_sha256"], matrix.digest(output))
+
+    def test_generated_source_change_cannot_certify_prior_execution(self):
+        source, _ = self.generated_context()
+        matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+        self.write_execution()
+        source.write_text("void different_assembly(void) {}\n")
+        with self.assertRaises(ValueError):
+            self.run_audit()
+
+    def test_generated_object_change_cannot_certify_prior_execution(self):
+        _, output = self.generated_context()
+        matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+        self.write_execution()
+        output.write_bytes(b"replaced generated object")
+        with self.assertRaises(ValueError):
+            self.run_audit()
+
+    def test_missing_generated_object_rejects_before_execution(self):
+        _, output = self.generated_context()
+        output.unlink()
+        with self.assertRaises(ValueError):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_target_local_source_outside_checkout_and_build_rejected(self):
+        source, _ = self.generated_context()
+        with tempfile.TemporaryDirectory() as directory:
+            foreign = Path(directory) / source.name
+            foreign.write_bytes(source.read_bytes())
+            database = self.build / "compile_commands.json"
+            entries = json.loads(database.read_text())
+            entries[-1]["file"] = str(foreign)
+            entries[-1]["arguments"][2] = str(foreign)
+            database.write_text(json.dumps(entries))
+            with self.assertRaises(ValueError):
+                matrix.capture(self.root, self.build, self.catalogue,
+                               self.snapshot)
+
+    def test_target_local_generated_symlink_cannot_expand_ownership(self):
+        source, _ = self.generated_context()
+        source.unlink()
+        source.symlink_to(self.production)
+        with self.assertRaises(ValueError):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_target_marker_cannot_hide_an_escaped_object_path(self):
+        _, output = self.generated_context()
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        escaped = output.parent / "../../../external.o"
+        escaped.write_bytes(output.read_bytes())
+        entries[-1]["arguments"][-1] = str(escaped)
+        database.write_text(json.dumps(entries))
+        with self.assertRaises(ValueError):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
 if __name__ == "__main__":
     unittest.main()

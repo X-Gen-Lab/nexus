@@ -1,0 +1,1 @@
+Style check failed: Files are not in the Git index: ['tests/contracts/g474_assembly/CMakeLists.txt', 'tests/contracts/g474_assembly/README.md', 'tests/contracts/g474_assembly/empty.toml', 'tests/contracts/g474_assembly/io.toml', 'tests/contracts/g474_assembly/main.c', 'tests/google/g474_factory.cmake', 'tests/google/g474_factory_model.h', 'tests/google/g474_factory_test.cpp']

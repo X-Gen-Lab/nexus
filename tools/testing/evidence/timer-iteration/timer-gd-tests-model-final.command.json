@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-timer-iteration/gd-test",
+    "--gtest_output=xml:tools/testing/evidence/timer-iteration/gd-final.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:08:17.921695+00:00",
+  "ended_at": "2026-10-11T18:08:17.927335+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-gd-tests-model-final.log"
+}

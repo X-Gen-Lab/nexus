@@ -1,0 +1,27 @@
+[0/1] Re-running CMake...
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-threadx-probe/integration-build
+[1/22] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[2/22] Building C object CMakeFiles/contract_threadx_linux.dir/contract_threadx_linux-port/tx_initialize_low_level.c.o
+[3/22] Linking C static library core/libnexus_core.a
+[4/22] Linking C static library libcontract_threadx_linux.a
+[5/22] Building C object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[6/22] Building CXX object CMakeFiles/nexus_threadx_bootstrap_test.dir/workspace/nexus/tests/google/threadx_bootstrap_test.cpp.o
+[7/22] Building C object CMakeFiles/nexus_threadx_bootstrap_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[8/22] Building C object CMakeFiles/nexus_threadx_m4_test.dir/workspace/nexus/os/threadx/m4.c.o
+[9/22] Building C object CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[10/22] Building C object CMakeFiles/nexus_threadx_m4_primask_test.dir/workspace/nexus/os/threadx/m4.c.o
+[11/22] Building C object CMakeFiles/nexus_threadx_irq_primask_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[12/22] Building CXX object CMakeFiles/nexus_threadx_m4_external_test.dir/workspace/nexus/tests/google/threadx_m4_external_test.cpp.o
+[13/22] Building C object CMakeFiles/nexus_threadx_m4_external_test.dir/workspace/nexus/os/threadx/m4.c.o
+[14/22] Linking CXX executable nexus_threadx_kernel_test
+[15/22] Linking CXX executable nexus_threadx_bootstrap_test
+[16/22] Linking CXX executable nexus_threadx_m4_test
+[17/22] Linking CXX executable nexus_threadx_irq_test
+[18/22] Linking CXX executable nexus_threadx_m4_primask_test
+[19/22] Linking CXX executable nexus_threadx_irq_primask_test
+[20/22] Linking CXX executable nexus_threadx_m4_external_test
+[21/22] Linking CXX executable nexus_threadx_linux_port_test

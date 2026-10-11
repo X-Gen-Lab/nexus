@@ -20,6 +20,7 @@ from tools.evidence.identity import resolved_identity
 from tools.hil.admit import require
 from tools.hil.measure import _identity_paths
 from tools.hil.prepare import preparation_plan
+from tools.configure.providers.common import ConfigurationError, mode_traits
 
 
 def _definition(work_item, kinds, stimulus, observations, instruments, safety,
@@ -137,21 +138,133 @@ WORKLOADS = MappingProxyType({
     "fail_stop": _definition(
         30, (), "Trigger assert and stack overflow in an isolated fixture",
         ("assert_trigger_safe_timestamps", "overflow_trigger_safe_timestamps",
-         "expected_observed_outputs", "reset_recovery_record"),
+         "expected_observed_outputs", "reset_recovery_record",
+         "fault_observer_record", "incoming_masks", "retained_loans",
+         "terminal_progress"),
         ("logic_analyzer", "debug_probe"),
         ("outputs_disconnected", "external_safe_output_policy",
          "non_destructive_failure_fixture", "reviewed_reset_recovery"),
         {"response_time": "us", "unsafe_outputs": "count"}),
+    "uart_rx_dma": _definition(
+        12, ("uart",), "Exercise the selected finite/continuous RX DMA mode",
+        ("wire_sequence_idle", "block_loans_wrap", "overflow_loss",
+         "dma_counter_flags", "cancel_stop_retained_loans",
+         "simultaneous_tx_wire_completion"),
+        ("logic_analyzer", "serial_generator", "debug_probe"),
+        ("selected_rx_mode", "reviewed_dma_memory", "no_reuse_before_drain",
+         "bounded_rate_and_service_window"),
+        {"received_bytes": "count", "loss": "count",
+         "stop_lateness": "us"}),
+    "uart_direction_flow": _definition(
+        14, ("uart",), "Exercise an explicitly supplied RTS/CTS or RS485 adapter",
+        ("firmware_adapter_binding", "rts_cts_backpressure",
+         "tx_tc_de_setup_hold", "cancel_drain_direction", "retained_loans"),
+        ("logic_analyzer", "reviewed_transceiver", "adapter_policy"),
+        ("explicit_external_adapter", "reviewed_signal_voltage_routes",
+         "isolated_bus", "no_assumed_board_transceiver"),
+        {"flow_cases": "count", "direction_errors": "count",
+         "setup_hold_error": "us"}),
+    "adc_continuous": _definition(
+        15, ("adc",), "Exercise selected continuous trigger DMA at reviewed load",
+        ("calibrated_samples_trigger_rate", "two_dma_target_addresses",
+         "ready_borrowed_blocks", "starvation_overrun_loss",
+         "trigger_stop_drain"),
+        ("reference_source", "signal_generator", "debug_probe"),
+        ("analog_limits", "selected_continuous_mode", "reviewed_dma_memory",
+         "no_borrowed_block_overwrite"),
+        {"sample_count": "count", "sample_error": "counts", "loss": "count",
+         "trigger_rate_error": "ppm"}),
+    "can_bus": _definition(
+        54, ("can",), "Exercise selected classic CAN with reviewed bus faults",
+        ("bus_frames_ack_arbitration", "mailbox_abort_wire_order",
+         "rx_filter_controller_isolation", "bus_off_recovery",
+         "retained_tx_frames", "overflow_loss"),
+        ("can_analyzer", "reviewed_transceiver", "oscilloscope"),
+        ("reviewed_bit_timing", "reviewed_termination_voltage",
+         "isolated_fault_injection", "external_bus_off_policy"),
+        {"frame_count": "count", "frame_errors": "count", "loss": "count",
+         "recovery_lateness": "us"}),
+    "ethernet_raw": _definition(
+        55, ("eth",), "Exercise selected raw RMII frames with a reviewed PHY",
+        ("rmii_clock_link_mdio", "tx_rx_frames_crc", "descriptor_ownership",
+         "rx_loan_starvation", "dma_stop_readback", "link_down_recovery"),
+        ("ethernet_peer", "logic_analyzer", "reviewed_phy"),
+        ("explicit_phy_clock_and_reset", "reviewed_rmii_routes",
+         "legal_descriptor_memory", "no_assumed_board_phy"),
+        {"frame_count": "count", "frame_errors": "count", "loss": "count",
+         "throughput": "bytes_per_s"}),
+    "usb_device": _definition(
+        56, ("usb_device",), "Exercise selected FS device with reviewed host load",
+        ("actual_48mhz_usb_clock", "setup_endpoint_packets",
+         "reset_epoch_cancel", "stall_recovery", "disconnect_irq_drain",
+         "retained_endpoint_loans"),
+        ("usb_analyzer", "reviewed_host", "oscilloscope"),
+        ("reviewed_vbus_power", "reviewed_dm_dp_routes",
+         "external_descriptors_policy", "no_assumed_board_connector"),
+        {"packet_count": "count", "packet_errors": "count", "loss": "count",
+         "stop_lateness": "us"}),
+    "timer_capture": _definition(
+        57, ("timer_capture",), "Apply reviewed edges to the selected capture",
+        ("input_edge_timestamps", "counter_wrap_overcapture",
+         "filter_polarity", "ring_overflow_loss", "irq_stop_drain"),
+        ("signal_generator", "logic_analyzer", "debug_probe"),
+        ("reviewed_pin_load", "selected_timer_clock", "bounded_edge_rate"),
+        {"edge_count": "count", "timestamp_error": "ns", "loss": "count"}),
+    "advanced_pwm_break": _definition(
+        57, ("advanced_pwm",), "Exercise isolated complementary PWM and break",
+        ("complementary_period_duty", "deadtime_waveform", "break_latch",
+         "off_state_and_stop", "controlled_rearm_policy"),
+        ("oscilloscope", "logic_analyzer", "reviewed_break_source"),
+        ("outputs_disconnected", "reviewed_polarity_idle_levels",
+         "bounded_break_fixture", "external_safe_rearm_policy"),
+        {"break_cases": "count", "deadtime_error": "ns", "break_lateness": "us",
+         "unsafe_outputs": "count"}),
 })
 
 MAX_VALUE = 2 ** 64 - 1
+WORK_AMOUNTS = frozenset({"duration", "iterations", "power_cut_cases",
+                          "received_bytes", "flow_cases", "sample_count",
+                          "frame_count", "packet_count", "edge_count",
+                          "break_cases"})
 TASK_CASES = frozenset({"m4f_context", "stack_peaks", "lifecycle_endurance",
                         "tickless_timer", "fail_stop"})
 
 
 def _selected_dma(controller):
-    modes = {"uart": ("dma-tx",), "spi": ("dma", "dma-full-duplex")}
-    return controller["mode"] in modes.get(controller["kind"], ())
+    if controller["kind"] not in ("uart", "spi"):
+        return False
+    try:
+        return mode_traits(controller["kind"], controller["mode"]).dma
+    except ConfigurationError:
+        return False
+
+
+MODE_CASES = frozenset({"uart_rx_dma", "uart_direction_flow", "adc_continuous",
+                        "can_bus", "ethernet_raw", "usb_device",
+                        "timer_capture", "advanced_pwm_break"})
+
+
+def _selected_protocol(name, controller):
+    """An observation protocol is not a second provider capability table."""
+    expected = {
+        "uart_rx_dma": "uart", "uart_direction_flow": "uart",
+        "adc_continuous": "adc", "can_bus": "can", "ethernet_raw": "eth",
+        "usb_device": "usb_device", "timer_capture": "timer_capture",
+        "advanced_pwm_break": "advanced_pwm",
+    }
+    if controller["kind"] != expected[name]:
+        return False
+    try:
+        traits = mode_traits(controller["kind"], controller["mode"])
+    except ConfigurationError:
+        return False
+    if name == "uart_rx_dma":
+        return traits.rx_dma and traits.block_stream
+    if name == "adc_continuous":
+        return traits.rx_dma and traits.continuous
+    # Electrical-adapter selection still requires an explicit external binding.
+    # A selected UART does not install RTS/CTS or an RS485 transceiver.
+    return traits.irq
 
 
 def _selection(name, definition, resolved):
@@ -170,6 +283,9 @@ def _selection(name, definition, resolved):
     if name == "uart_spi_dma" and not any(
             _selected_dma(item) for item in selected):
         gaps.append("uart_or_spi_dma")
+    if name in MODE_CASES and not any(
+            _selected_protocol(name, item) for item in selected):
+        gaps.append("selected_" + name + "_mode")
     if name == "tickless_timer" and not (
             isinstance(resolved.get("kernel_profile"), dict) and
             resolved["kernel_profile"].get("tickless") is True):
@@ -178,7 +294,7 @@ def _selection(name, definition, resolved):
 
 
 def workload_plan(fixture: dict, resolved: dict, workload: dict | None = None):
-    """Prepare thirteen obligations; no plan establishes station readiness."""
+    """Prepare maintained obligations; no plan establishes station readiness."""
     base = preparation_plan(fixture, resolved)
     require(resolved.get("backend") in ("native", "baremetal", "freertos"),
             "maintained workload backend required")
@@ -246,9 +362,13 @@ def _limits(value, units):
                         "reviewed finite workload bound required")
         require(bound.get("minimum", 0) <= bound["maximum"],
                 "reversed workload bounds")
-        if metric in ("duration", "iterations", "power_cut_cases"):
+        if metric in WORK_AMOUNTS:
             require("minimum" in bound and bound["minimum"] > 0,
                     "positive reviewed amount of workload required")
+            if metric != "duration":
+                require(type(bound["minimum"]) is int and
+                        type(bound["maximum"]) is int,
+                        "discrete workload amount requires integer bounds")
 
 
 def validate_workload(workload: dict, fixture: dict, resolved: dict):
@@ -297,6 +417,10 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
         if name == "uart_spi_dma":
             require(any(_selected_dma(selected[value]) for value in bound_ids),
                     "DMA workload must bind its selected UART/SPI controller")
+        if name in MODE_CASES:
+            require(any(_selected_protocol(name, selected[value])
+                        for value in bound_ids),
+                    "workload must bind its actual selected provider mode")
         _text(case["stimulus"], "stimulus")
         _descriptions(case["raw_observations"], definition["raw_observations"],
                       "raw acquisition")
@@ -306,6 +430,14 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
             verify_file_identity(instrument)
         _limits(case["limits"], definition["metric_units"])
     return copy.deepcopy(workload)
+
+
+def admitted_workload(identity: dict, admission: dict):
+    """Hash identity cannot substitute for a reviewed acquisition protocol."""
+    path = verify_file_identity(identity)
+    fixture = load_json(verify_file_identity(admission["fixture"]))
+    resolved, _ = resolved_identity(verify_file_identity(admission["resolved"]))
+    return validate_workload(load_json(path), fixture, resolved)
 
 
 def _new_destination(path: Path):

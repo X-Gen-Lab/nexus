@@ -1,0 +1,94 @@
+test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call (tools.configure.test_g474.G474ConfigurationTests.test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call) ... ERROR
+test_fixed_lpuart_rejects_events_blocks_dma_and_priority_drift (tools.configure.test_g474.G474ConfigurationTests.test_fixed_lpuart_rejects_events_blocks_dma_and_priority_drift) ... ok
+test_freertos_policy_and_exact_clock_rejection (tools.configure.test_g474.G474ConfigurationTests.test_freertos_policy_and_exact_clock_rejection) ... ERROR
+test_g4_source_dependency_uses_g4_checkout_identity (tools.configure.test_g474.G474ConfigurationTests.test_g4_source_dependency_uses_g4_checkout_identity) ... ERROR
+test_single_ram_alias_exact_irqs_and_initial_provider_scope (tools.configure.test_g474.G474ConfigurationTests.test_single_ram_alias_exact_irqs_and_initial_provider_scope) ... ERROR
+
+======================================================================
+ERROR: test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call (tools.configure.test_g474.G474ConfigurationTests.test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_g474.py", line 51, in test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call
+    gate.configure(self.assembly(), output)
+  File "/workspace/nexus/tools/configure/configure.py", line 918, in configure
+    result = resolve_ir(assembly, root, input_paths=input_paths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 313, in resolve
+    provider = maintained(family)
+               ^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/__init__.py", line 13, in maintained
+    fail(f"Unmaintained SoC provider: {family}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unmaintained SoC provider: stm32g474
+
+======================================================================
+ERROR: test_freertos_policy_and_exact_clock_rejection (tools.configure.test_g474.G474ConfigurationTests.test_freertos_policy_and_exact_clock_rejection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_g474.py", line 71, in test_freertos_policy_and_exact_clock_rejection
+    result = self.resolve(self.assembly(lambda text: text.replace(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/test_g474.py", line 26, in resolve
+    return gate.resolve_ir(path)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 313, in resolve
+    provider = maintained(family)
+               ^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/__init__.py", line 13, in maintained
+    fail(f"Unmaintained SoC provider: {family}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unmaintained SoC provider: stm32g474
+
+======================================================================
+ERROR: test_g4_source_dependency_uses_g4_checkout_identity (tools.configure.test_g474.G474ConfigurationTests.test_g4_source_dependency_uses_g4_checkout_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_g474.py", line 42, in test_g4_source_dependency_uses_g4_checkout_identity
+    result = gate.resolve_ir(self.assembly())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 313, in resolve
+    provider = maintained(family)
+               ^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/__init__.py", line 13, in maintained
+    fail(f"Unmaintained SoC provider: {family}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unmaintained SoC provider: stm32g474
+
+======================================================================
+ERROR: test_single_ram_alias_exact_irqs_and_initial_provider_scope (tools.configure.test_g474.G474ConfigurationTests.test_single_ram_alias_exact_irqs_and_initial_provider_scope)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_g474.py", line 29, in test_single_ram_alias_exact_irqs_and_initial_provider_scope
+    result = self.resolve(self.assembly())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/test_g474.py", line 26, in resolve
+    return gate.resolve_ir(path)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 833, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 313, in resolve
+    provider = maintained(family)
+               ^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/__init__.py", line 13, in maintained
+    fail(f"Unmaintained SoC provider: {family}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unmaintained SoC provider: stm32g474
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.008s
+
+FAILED (errors=4)

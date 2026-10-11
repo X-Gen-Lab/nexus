@@ -98,6 +98,16 @@ def environment():
     return result
 
 
+def checked_binary(name, build):
+    """Require regular, unaliased executable bytes in the selected build."""
+    path = Path(name)
+    if (not path.is_file() or
+            any(part.is_symlink() for part in (path, *path.parents)) or
+            not path.resolve().is_relative_to(Path(build).resolve())):
+        raise ValueError("GoogleTest binary is missing, symlink or outside build")
+    return path
+
+
 def execute(command, env, log):
     """Record the real subprocess result without accepting console success text."""
     print("+ " + " ".join(map(str, command)), flush=True)
@@ -182,9 +192,7 @@ def main(arguments=None):
         io_lifecycle_matrix.capture(ROOT, build, catalogue, matrix_snapshot)
         results = []
         for index, name in enumerate(manifest["executables"]):
-            binary = Path(name)
-            if not binary.is_file() or not binary.is_relative_to(build):
-                raise ValueError("GoogleTest binary is missing or outside build")
+            binary = checked_binary(name, build)
             listing = execute([str(binary), "--gtest_filter=*",
                                "--gtest_list_tests"], env,
                               output / f"discovery-{index}.txt")

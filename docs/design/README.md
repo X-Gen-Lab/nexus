@@ -19,6 +19,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [Raw Ethernet / MDIO](ethernet.md) | caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置 |
 | [高级 timer](timer-advanced.md) | capture 事件、complementary PWM/deadtime/break；共享资源与实际安全边界 |
 | [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO、可信 principal/pin/copy；未接 userspace SVC/MPU/TZ |
+| [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
 | [STM32G474 初始接入](stm32g474.md) | 精确型号、MB1367 来源、clock/startup/time/GPIO/LPUART 纵切片与未维护功能 |
 | [I2C 总线恢复](i2c-bus-clear.md) | 调用者独占 GPIO、有限时序与失败后继续清理的合同 |
@@ -28,7 +29,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [33项实施台账](next-generation-execution.csv) | 实现文件、证据入口、软件与物理状态分列 |
 | [本次 P0–P5 台账](factory-platform-execution.csv) | factory、TOML、TDD、多实例与 IRQ/DMA/block 实现 |
 | [故障观察与停机](fault-observation.md) | 无状态观察窄端口、保持中断屏蔽、外部安全输出与实板边界 |
-| [I/O 生命周期检查](io-lifecycle-matrix.md) | 80 项有界性质、真实生产编译、同一测试执行和来源校验 |
+| [I/O 生命周期检查](io-lifecycle-matrix.md) | 203 项有界性质、真实生产编译、同一测试执行和来源校验 |
 | [60项完善台账](platform-refinement-execution.csv) | 本轮实现、软件执行、实板与外部阻塞分别记录；全部维护责任由Codex承担 |
 | [实际架构](../delivery/architecture.md) | 当前目录、公共 factory 和多态接口、依赖方向 |
 | [当前资格边界](../delivery/qualification.md) | 开发执行、clean软件候选、实板pending的区别 |

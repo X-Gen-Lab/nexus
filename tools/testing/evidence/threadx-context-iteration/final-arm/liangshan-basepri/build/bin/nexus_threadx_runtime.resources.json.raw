@@ -1,0 +1,126 @@
+{
+  "board": "gd32f470zg-liangshan",
+  "budget": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/final-arm/liangshan-basepri/build/nexus/generated/resource-budget.json",
+    "sha256": "4c37b8d170b11ed6ac70f1ef8fb9c556a89a11e65c90f4e183ea046cc391dce4",
+    "size": 202
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/final-arm/liangshan-basepri/inputs/assembly.toml",
+        "sha256": "9d0293f734bfb78cd3f17130cffb7a9d3bdfb1ab7b7f91883ec169836c45618a",
+        "size": 254
+      },
+      "label": "external/assembly.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/gd32f470_liangshan/board.json",
+        "sha256": "6aa6f232593de796cf311d74a753c402c3e960ff7ecc0dd8c753ea9379914b7c",
+        "size": 1653
+      },
+      "label": "boards/gd32f470_liangshan/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/routes.json",
+        "sha256": "e6b68f987a61d08b9044b63dc4891b9e13941137c9382abaf364899ce45c25ae",
+        "size": 12762
+      },
+      "label": "soc/gd32f470/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/soc.json",
+        "sha256": "0fbdc271b34227f0dfd3e4aaf7fa7daf702f3fc3d5989915de88cff382167f2d",
+        "size": 10877
+      },
+      "label": "soc/gd32f470/soc.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/final-arm/liangshan-basepri/build/bin/nexus_threadx_runtime.elf",
+    "sha256": "85fd504b0b2688a12d1ea7a18c9fe3440ff38d49583f7bc429b025d72029a4ad",
+    "size": 35940
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 12156,
+      "loaded_bytes": 12156,
+      "ranges": [
+        [
+          134217728,
+          134229884
+        ]
+      ]
+    },
+    "ram": {
+      "addsram": {
+        "capacity_bytes": 262144,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 196608,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536875168
+          ],
+          [
+            537065472,
+            537067520
+          ]
+        ],
+        "reserved_bytes": 6304
+      },
+      "tcm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536875168,
+        "start": 536875168
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537067520,
+        "start": 537065472
+      }
+    }
+  },
+  "part": "GD32F470ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/final-arm/liangshan-basepri/build/nexus/generated/resolved.json",
+    "sha256": "de892c1cdadf288c548d9f12c369a7301030d2dafbf84b25599a383085148ee1",
+    "size": 26516
+  },
+  "schema_version": 1,
+  "soc_family": "gd32f470",
+  "status": "passed",
+  "violations": []
+}

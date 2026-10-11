@@ -61,6 +61,12 @@ nexus_google_test(nexus_i2c_bus_clear_test
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_uart_rs485_test SOURCES uart_rs485_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch)
+nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
+    LIBRARIES Nexus::OwnerObserver Nexus::IO)
+nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
+    LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
+        Nexus::SPIAsyncOwner Nexus::NativeModel
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 nexus_google_test(nexus_stream_storage_test SOURCES stream_storage_test.cpp
     LIBRARIES Nexus::IO Nexus::Arch)
 nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
@@ -78,9 +84,7 @@ nexus_google_test(nexus_freertos_services_kernel_test
         freertos_owner_endurance_test.cpp
         "${NEXUS_SOURCE_DIR}/os/freertos/stack_snapshot.c"
     LIBRARIES contract_os_freertos_posix Nexus::UARTOwner
-    INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/os_freertos_runtime"
-        "${NEXUS_SOURCE_DIR}/io/native"
-        "${NEXUS_SOURCE_DIR}/os/freertos/include")
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 
 # A second assembly is a separate image, never linked to the default platform.
 set(native_factory_input
@@ -417,6 +421,7 @@ include(os_optional.cmake)
 include(os_secure.cmake)
 include(freertos_mpu.cmake)
 include(gd32_arch.cmake)
+include(gd32_memory.cmake)
 
 # GD32 tests replace the CPU boundary coherently; no partial Native Arch model.
 foreach(gd_target nexus_gd32_multi_test nexus_gd32_uart_dma_test
@@ -430,40 +435,42 @@ endforeach()
 
 include(plan.cmake)
 
-include(gd32_memory.cmake)
-nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
-    LIBRARIES Nexus::OwnerObserver Nexus::IO)
-nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
-    LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
-        Nexus::SPIAsyncOwner Nexus::NativeModel)
-target_include_directories(nexus_io_state_machine_test PRIVATE
-    "${NEXUS_SOURCE_DIR}/io/native")
-
-include(can_runtime.cmake)
-include(can_factory.cmake)
+include(usb_clock.cmake)
 
 include(stack_observation.cmake)
 
-include(clock_domain.cmake)
+include(can_factory.cmake)
 
-include(user_io_broker.cmake)
-
-include(usb_clock.cmake)
-
+include(can_runtime.cmake)
+include(ethernet.cmake)
 include(usb_device.cmake)
+include(timer_advanced.cmake)
+
+include(timer_factory.cmake)
+
+include(multi_controller_factory.cmake)
+
+include(i2c_pair_factory.cmake)
+
+include(physical_platform_factory.cmake)
+include(timebase_lowpower.cmake)
 
 include(usb_factory.cmake)
 
-include(timebase_lowpower.cmake)
+include(clock_domain.cmake)
+
+include(g474.cmake)
+
+include(g474_factory.cmake)
 
 include(threadx.cmake)
 
-include(ethernet.cmake)
+include(i2c_multi_controller.cmake)
+
+include(user_io_broker.cmake)
+
+include(failstop.cmake)
 
 include(ethernet_factory.cmake)
 
-include(i2c_multi_controller.cmake)
-
 include(dma_multi_controller.cmake)
-
-include(failstop.cmake)

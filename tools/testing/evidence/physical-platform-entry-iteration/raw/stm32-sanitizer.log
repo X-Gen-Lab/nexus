@@ -1,0 +1,33 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from EmptyAndGPIO/PhysicalPlatformFactory
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1 (1 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0 (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1 (0 ms)
+[----------] 12 tests from EmptyAndGPIO/PhysicalPlatformFactory (14 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (15 ms total)
+[  PASSED  ] 12 tests.

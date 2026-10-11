@@ -3,10 +3,12 @@ try:
     from .providers import maintained
     from .ir import ConfigurationIR
     from .factory import interface_type, public_header
+    from . import secondary_controllers
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
     from factory import interface_type, public_header
+    import secondary_controllers
 
 
 def symbol(name):
@@ -18,6 +20,11 @@ def emit(result):
     if not isinstance(result, ConfigurationIR):
         result = ConfigurationIR.from_validated(result)
     selections = result.controllers
+    context_guard = "nx_arch_in_isr() || nx_arch_irq_is_masked()"
+    if not provider.MODEL:
+        # Physical cold operations require a privileged hardware owner before
+        # any system, clock, pin or vector lease can be modified.
+        context_guard += " || !nx_arch_is_privileged()"
     header = ['/**', ' * \\file            nexus_bindings.h',
               ' * \\brief           Fixed typed aliases selected by one assembly.',
               ' * \\author          Nexus Team', ' */',
@@ -48,6 +55,8 @@ def emit(result):
               '#include "nexus/arch/arch.h"']
     source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
                "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
+               "#endif", "#ifndef NX_PLATFORM_PRIORITY_WRITE",
+               "#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))",
                "#endif"]
     source.extend(provider.includes(result))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
@@ -61,10 +70,12 @@ def emit(result):
                    f'extern const {exported_type}* const nx_binding_{name};']
         implementation = provider.implementation(item)
         prefix = provider.PREFIX
-        state_type = ("nx_eth_mac_t" if item.kind == "eth" else
-                      "nx_usb_controller_t" if item.kind == "usb_device" else
-                      "nx_can_controller_t" if item.kind == "can" else
-                      f"nx_{prefix}_{implementation}_state_t")
+        state_type = {
+            "eth": "nx_eth_mac_t", "usb_device": "nx_usb_controller_t",
+            "can": "nx_can_controller_t",
+            "timer_capture": "nx_timer_capture_controller_t",
+            "advanced_pwm": "nx_advanced_pwm_controller_t",
+        }.get(item.kind, f"nx_{prefix}_{implementation}_state_t")
         source += [f'static {state_type} s_nx_port_{name};',
                    f'static const {exported_type} s_nx_face_{name} = {{',
                    f'    &{provider.operations(item)}, &s_nx_port_{name}', '};',
@@ -85,7 +96,7 @@ def emit(result):
     source.extend(provider.shared_irqs(result))
     source += ['/** \\brief Stop only the initialized selected interfaces. */',
                'nx_result_t nx_platform_stop(void) {',
-               '    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) { return NX_ERROR_CONTEXT; }']
+               f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}']
     for index in range(len(initialize), 0, -1):
         source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
         for counter, (_, expression) in enumerate(entry for entry in stop if entry[0] == index):
@@ -97,14 +108,16 @@ def emit(result):
     source += ['/** \\brief Start explicit hardware only; rollback retains error facts. */',
                'nx_platform_start_result_t nx_platform_start(void) {',
                '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };',
-               '    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {',
+               f'    if ({context_guard}) {{',
                '        result.primary = NX_ERROR_CONTEXT; return result; }',
                '    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }']
     source.extend(provider.start_system(result))
     source.append("    s_nx_platform_started = true;")
     source.extend(provider.start_resources(result))
     for index, expression in enumerate(initialize):
-        if selections[index].kind in {"can", "usb_device", "eth"}:
+        if (selections[index].kind in {"can", "usb_device", "eth", "timer_capture", "advanced_pwm"} or
+                provider.PREFIX == "stm32g474" or
+                secondary_controllers.applies(selections[index], result, provider.PREFIX)):
             # Cold failure may retain live hardware; include that instance
             # in reverse cleanup before attempting initialization.
             source.append(f"    s_nx_platform_initialized = {index + 1}u;")

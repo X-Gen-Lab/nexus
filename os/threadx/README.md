@@ -147,11 +147,51 @@ fixtures bind the first actually permitted CPU; they do not enable the port's
 random multi-core affinity option. These tests prove behavior, not MCU RAM,
 real-time timing, physical IRQ priority or host privilege.
 
-`prepare_linux.py` produces a fresh build-local overlay from one exact reviewed
-source SHA. It preserves upstream copyright/license and leaves the checkout
-unchanged. Only the timer clock, corresponding semaphore wait and exact 1e9
-nanosecond carry are corrected: CLOCK_MONOTONIC + GNU `sem_clockwait`, and `>=`
-normalization. Unknown source/patch/output or a symlink is rejected. A selecting
+Linux task admission first checks the actual port's thread-local task identity,
+then observes current TCB, interrupt nesting and preemption state under the
+existing port mutex. It checks the real pthread identity and ThreadX interrupt
+posture without changing that posture or retaining another mutex depth. The
+port's timed lock retry remains active. An unrelated pthread cannot borrow the
+currently scheduled task. Bootstrap ownership is callback-thread-local; cold
+calls reject before touching an uninitialized scheduler mutex. These Linux
+observations do not add locks or thread-local storage to the Cortex-M path.
+
+The Linux-only `tx_user.h` overrides the official system-state, current-thread
+and system-return-check macros. Their observers read the actual values under the
+same recursive mutex; the return check snapshots system state and preemption
+flags together. One lock/unlock pair preserves an already masked caller's depth
+and posture. Successful recursive-mutex initialization publishes readiness with
+release ordering before creating the timer pthread. Before an acquire observes
+readiness, the supported single bootstrap thread reads the real initialization
+sentinel/current pointer without locking. Concurrent raw kernel calls during
+initialization remain outside the adapter contract. The overrides protect these
+observations rather than serializing every subsequent preemption decision.
+
+`prepare_linux.py` produces build-local low-level and scheduler derivatives from
+their two exact reviewed source SHAs. It preserves upstream copyright/license
+and leaves the checkout unchanged. The timer uses CLOCK_MONOTONIC + GNU
+`sem_clockwait`, with `>=` normalization of the exact 1e9 nanosecond carry. The
+scheduler retains its mutex through the selected task's existing run
+acknowledgement. It omits a redundant timer suspend/resume there because timer
+context save already requires that mutex. The timer-origin ISR handshake stays
+unchanged.
+
+The suspend handler preserves the interrupted caller's `errno`, including nested
+early return, and consumes the blocked resume signal with GNU `sigwait`. Its
+full handler mask and suspend acknowledgement stay in place; a resume arriving
+before the wait remains pending. Synchronous consumption avoids a nested resume
+handler corrupting GCC ThreadSanitizer's saved signal mask. The normal and
+instrumented host use the same derivative; no diagnostic suppression or raw
+syscall bypass is involved. An invalid wait aborts rather than falsely resuming.
+This is an explicitly reviewed Linux GNU libc syscall/cancellation path, not a
+portable POSIX async-safety claim. Raw termination/reset of executing product
+code retains the upstream cancellation caveat and is outside the adapter's
+completed-task or never-executed-bootstrap deletion contract. The Cortex-M
+implementation path and the official Gitlink remain unchanged.
+Unknown source/patch/output or a symlink is rejected. An existing output can be
+atomically upgraded only if its complete SHA matches an explicitly reviewed
+predecessor derived from the same exact official source. A self-declared sidecar
+does not establish ownership. A selecting
 CMake target must genuinely compile and link a `_GNU_SOURCE`/`Threads::Threads`
 `sem_clockwait` capability probe and fail when unavailable. The derivative never
 substitutes an unbounded realtime wait or weak fallback.
@@ -193,6 +233,8 @@ external-Tick provider as a separate negative link. It verifies same-address
 strong official PendSV aliases, all locked compiled kernel objects, resolved
 policy, ELF budget and exact evidence identities. Host Google contracts select
 an independent real Linux kernel through `tests/google/threadx.cmake`; eight
-executables currently exercise 30 runtime cases, six actual initialization
-callback cases and 14 external-boundary mechanism cases. Final clean candidate,
+executables discover and execute their complete runtime, initialization and
+external-boundary case sets with fresh reports. The Linux signal contracts also
+exercise complete mask restoration and a real resume queued before its wait.
+Final clean candidate,
 SDK and physical qualification remain separate from development execution.

@@ -1,0 +1,68 @@
+.E...........FF..F...FFF.
+======================================================================
+ERROR: test_actual_generated_target_context_binds_source_and_object (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_actual_generated_target_context_binds_source_and_object)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 175, in test_actual_generated_target_context_binds_source_and_object
+    contexts = record["target_compiled"][self.binary.name]
+               ~~~~~~^^^^^^^^^^^^^^^^^^^
+KeyError: 'target_compiled'
+
+======================================================================
+FAIL: test_generated_object_change_cannot_certify_prior_execution (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_generated_object_change_cannot_certify_prior_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 194, in test_generated_object_change_cannot_certify_prior_execution
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_generated_source_change_cannot_certify_prior_execution (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_generated_source_change_cannot_certify_prior_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 186, in test_generated_source_change_cannot_certify_prior_execution
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_missing_generated_object_rejects_before_execution (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_missing_generated_object_rejects_before_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 200, in test_missing_generated_object_rejects_before_execution
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_target_local_generated_symlink_cannot_expand_ownership (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_target_local_generated_symlink_cannot_expand_ownership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 221, in test_target_local_generated_symlink_cannot_expand_ownership
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_target_local_source_outside_checkout_and_build_rejected (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_target_local_source_outside_checkout_and_build_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 213, in test_target_local_source_outside_checkout_and_build_rejected
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_target_marker_cannot_hide_an_escaped_object_path (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_target_marker_cannot_hide_an_escaped_object_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 232, in test_target_marker_cannot_hide_an_escaped_object_path
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.068s
+
+FAILED (failures=6, errors=1)

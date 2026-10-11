@@ -3,7 +3,8 @@ add_library(nexus_io STATIC
     src/gpio.c src/uart.c src/spi.c src/i2c.c src/flash.c
     src/watchdog.c src/exti.c src/timer.c src/adc.c src/flash_region.c
     src/dma.c src/stream.c src/wake.c src/i2c_bus_clear.c src/adc_observer.c
-    src/uart_rs485.c src/stream_budget.c src/can.c src/ethernet.c src/mdio.c src/usb_device.c)
+    src/uart_rs485.c src/stream_budget.c src/can.c src/ethernet.c src/mdio.c
+    src/usb_device.c src/timer_capture.c src/advanced_pwm.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(nexus_io PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private")
 target_link_libraries(nexus_io PUBLIC nexus_core PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
@@ -12,7 +13,8 @@ if(NEXUS_SOC_FAMILY STREQUAL "native")
     add_library(nexus_io_native STATIC
         native/time.c native/gpio.c native/uart.c native/spi.c native/i2c.c
         native/flash.c native/watchdog.c native/exti.c native/timer.c native/adc.c
-        native/spi_async.c native/stream.c native/can.c native/ethernet.c native/usb_device.c)
+        native/spi_async.c native/stream.c native/can.c native/ethernet.c
+        native/usb_device.c)
     target_link_libraries(nexus_io_native PUBLIC nexus_io nexus_arch
         PRIVATE nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_io_native PRIVATE

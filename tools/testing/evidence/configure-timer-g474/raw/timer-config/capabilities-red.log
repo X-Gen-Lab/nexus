@@ -1,0 +1,99 @@
+test_actual_selected_timer_faces_use_real_public_types (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_actual_selected_timer_faces_use_real_public_types) ... ERROR
+test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) ... 
+  test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) (source='#define NX_TABLE nx_a_ops\n#define NX_TABLE nx_b_ops\n#include "template.h"\n') ... ERROR
+  test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) (source='#define NX_TABLE nx_a_ops\n#include "../template.h"\n') ... ERROR
+test_literal_specialization_binds_actual_const_table_only (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_literal_specialization_binds_actual_const_table_only) ... ERROR
+test_macro_mentions_without_actual_table_definition_are_rejected (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_macro_mentions_without_actual_table_definition_are_rejected) ... ERROR
+test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) ... 
+  test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='stm32f407', kind='timer_capture') ... ERROR
+  test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='stm32f407', kind='advanced_pwm') ... ERROR
+  test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='gd32f470', kind='timer_capture') ... ERROR
+  test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='gd32f470', kind='advanced_pwm') ... ERROR
+
+======================================================================
+ERROR: test_actual_selected_timer_faces_use_real_public_types (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_actual_selected_timer_faces_use_real_public_types)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 49, in test_actual_selected_timer_faces_use_real_public_types
+    rows = capabilities.collect(configure.ROOT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/capabilities.py", line 112, in collect
+    raise ValueError("Selected ops has no production definition: "
+ValueError: Selected ops has no production definition: /workspace/nexus/tests/contracts/timer_assembly/gd32.toml:power
+
+======================================================================
+ERROR: test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) (source='#define NX_TABLE nx_a_ops\n#define NX_TABLE nx_b_ops\n#include "template.h"\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 46, in test_conflicting_macro_identity_and_escaped_template_fail_closed
+    capabilities.source_ops(self.source, self.root)
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) (source='#define NX_TABLE nx_a_ops\n#include "../template.h"\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 46, in test_conflicting_macro_identity_and_escaped_template_fail_closed
+    capabilities.source_ops(self.source, self.root)
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_literal_specialization_binds_actual_const_table_only (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_literal_specialization_binds_actual_const_table_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 36, in test_literal_specialization_binds_actual_const_table_only
+    self.assertEqual(capabilities.source_ops(self.source, self.root), {"nx_gpio_ops"})
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_macro_mentions_without_actual_table_definition_are_rejected (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_macro_mentions_without_actual_table_definition_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 30, in test_macro_mentions_without_actual_table_definition_are_rejected
+    self.assertEqual(capabilities.source_ops(self.source, self.root), set())
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='stm32f407', kind='timer_capture')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 23, in test_real_four_timer_tables_are_derived_from_the_selected_source
+    self.assertEqual(capabilities.source_ops(source, configure.ROOT),
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='stm32f407', kind='advanced_pwm')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 23, in test_real_four_timer_tables_are_derived_from_the_selected_source
+    self.assertEqual(capabilities.source_ops(source, configure.ROOT),
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='gd32f470', kind='timer_capture')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 23, in test_real_four_timer_tables_are_derived_from_the_selected_source
+    self.assertEqual(capabilities.source_ops(source, configure.ROOT),
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+======================================================================
+ERROR: test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) (family='gd32f470', kind='advanced_pwm')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_capabilities.py", line 23, in test_real_four_timer_tables_are_derived_from_the_selected_source
+    self.assertEqual(capabilities.source_ops(source, configure.ROOT),
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'tools.maintenance.capabilities' has no attribute 'source_ops'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.896s
+
+FAILED (errors=9)

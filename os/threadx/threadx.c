@@ -12,6 +12,11 @@
 #include "nexus/arch/atomic.h"
 #include "nexus/core/fault.h"
 #include "tx_initialize.h"
+#if defined(__linux__) && !defined(__arm__) && !defined(__thumb__)
+#include "tx_thread.h"
+#define NX_TX_LINUX_CONTEXT
+static _Thread_local bool s_bootstrap_owner;
+#endif
 #include <limits.h>
 #include <string.h>
 #if defined(__arm__) || defined(__thumb__)
@@ -47,7 +52,9 @@ _Static_assert(sizeof(ULONG) == 4 && sizeof(UINT) == 4,
  * suspend API. Bootstrap deletion uses narrow unchecked services only while
  * this adapter owns the actual tx_application_define callback scope. */
 extern volatile ULONG _tx_thread_system_state;
+#ifndef NX_TX_LINUX_CONTEXT
 extern UINT _tx_thread_preempt_disable;
+#endif
 static uint32_t s_phase;
 static void (*s_startup)(void*);
 static void* s_startup_context;
@@ -71,9 +78,38 @@ static void fail_stop(nx_result_t reason) {
 /** \brief Observe bootstrap only inside the actual kernel application callback.
  */
 static bool bootstrap(void) {
+#ifdef NX_TX_LINUX_CONTEXT
+    /* Only the actual callback thread owns initialization. The timer is still
+     * parked until the kernel enters its scheduler. Foreign pthreads must not
+     * borrow this scope or touch the not-yet-started scheduler mutex. */
+    if (!s_bootstrap_owner) {
+        return false;
+    }
+#endif
     return nx_atomic_u32_load_acquire(&s_phase) == NX_TX_BOOTSTRAP &&
            _tx_thread_system_state == TX_INITIALIZE_IN_PROGRESS;
 }
+
+/** \brief Observe Linux scheduler facts under its existing recursive mutex. */
+#ifdef NX_TX_LINUX_CONTEXT
+static bool running_context(void) {
+    if (!_tx_linux_threadx_thread) {
+        return false;
+    }
+    /* The port's timed retry preserves its suspend-signal lost-wake handling.
+     * tx_thread_identify would change interrupt posture under this extra lock.
+     * Read only while locked, then remove exactly our own recursion depth. */
+    tx_linux_mutex_lock(_tx_linux_mutex);
+    TX_THREAD* current = _tx_thread_current_ptr;
+    bool allowed =
+        _tx_thread_system_state == 0 && _tx_thread_preempt_disable == 0 &&
+        current != TX_NULL &&
+        pthread_equal(current->tx_thread_linux_thread_id, pthread_self()) &&
+        current->tx_thread_linux_int_disabled_flag == 0;
+    tx_linux_mutex_unlock(_tx_linux_mutex);
+    return allowed;
+}
+#endif
 
 /** \brief Canonical context inside the actual initialization callback. */
 static bool bootstrap_context(void) {
@@ -103,8 +139,12 @@ static bool task_allowed(bool running) {
            masks.faultmask == 0 &&
            nx_atomic_u32_load_acquire(&s_phase) == NX_TX_RUNNING &&
            masks.primask == 0 && masks.basepri == 0 &&
+#ifdef NX_TX_LINUX_CONTEXT
+           running_context();
+#else
            _tx_thread_system_state == 0 && _tx_thread_preempt_disable == 0 &&
            tx_thread_identify() != TX_NULL;
+#endif
 }
 
 /** \brief Reject wrapping and overlapping known caller storage intervals. */
@@ -176,9 +216,15 @@ void tx_application_define(void* unused_memory) {
         !bootstrap_context()) {
         fail_stop(NX_ERROR_CONTEXT);
     }
+#ifdef NX_TX_LINUX_CONTEXT
+    s_bootstrap_owner = true;
+#endif
     nx_atomic_u32_store_release(&s_phase, NX_TX_BOOTSTRAP);
     s_startup(s_startup_context);
     s_startup = NULL;
+#ifdef NX_TX_LINUX_CONTEXT
+    s_bootstrap_owner = false;
+#endif
     nx_atomic_u32_store_release(&s_phase, NX_TX_RUNNING);
 }
 

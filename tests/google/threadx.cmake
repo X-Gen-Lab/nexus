@@ -13,6 +13,8 @@ nexus_google_test(nexus_threadx_kernel_test
         threadx_wait_test.cpp threadx_admission_test.cpp ${tx_service_sources}
     LIBRARIES ${tx_service_libraries}
     INCLUDES ${tx_service_includes})
+target_link_options(nexus_threadx_kernel_test PRIVATE
+    -Wl,--wrap=pthread_mutex_timedlock)
 
 nexus_google_test(nexus_threadx_bootstrap_test
     SOURCES threadx_bootstrap_test.cpp ${tx_service_sources}
@@ -66,7 +68,8 @@ nexus_google_test(nexus_threadx_linux_port_test
     SOURCES threadx_linux_port_test.cpp
     LIBRARIES contract_threadx_linux)
 target_link_options(nexus_threadx_linux_port_test PRIVATE
-    -Wl,--wrap=nice -Wl,--wrap=sem_wait -Wl,--wrap=clock_gettime
+    -Wl,--wrap=nice -Wl,--wrap=sem_wait -Wl,--wrap=sem_post
+    -Wl,--wrap=sigsuspend -Wl,--wrap=sigwait -Wl,--wrap=clock_gettime
     -Wl,--wrap=sem_timedwait -Wl,--wrap=sem_clockwait
     -Wl,--wrap=_tx_thread_context_save -Wl,--wrap=_tx_timer_interrupt
     -Wl,--wrap=_tx_thread_context_restore)

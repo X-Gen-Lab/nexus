@@ -28,13 +28,18 @@ class HilWorkloadTests(unittest.TestCase):
             "kernel_profile": {"tickless": True},
             "controllers": [],
         }
-        for kind in ("gpio", "uart", "spi", "watchdog", "i2c", "adc",
-                     "pwm", "exti", "flash"):
+        modes = {"gpio": "output", "uart": "dma-duplex-continuous",
+                 "spi": "dma", "watchdog": "independent",
+                 "i2c": "poll-messages", "adc": "trigger-dma-continuous",
+                 "pwm": "fixed-pwm", "exti": "edge-event", "flash": "poll-byte",
+                 "can": "classic-irq", "eth": "raw-rmii",
+                 "usb_device": "device-fs", "timer_capture": "edge-capture",
+                 "advanced_pwm": "complementary-pwm"}
+        for kind, mode in modes.items():
             self.resolved["controllers"].append({
                 "id": kind + "0", "kind": kind,
                 "controller": "USART1" if kind == "uart" else kind.upper(),
-                "mode": "dma-tx" if kind == "uart" else "dma" if
-                kind == "spi" else "synthetic-validator-mode",
+                "mode": mode,
                 "route": "synthetic-validator-route-" + kind, "pins": [],
             })
         uart = self.resolved["controllers"][1]
@@ -70,7 +75,7 @@ class HilWorkloadTests(unittest.TestCase):
                 "safety": {key: "Review and isolate " + key for
                            key in item["safety"]},
                 "limits": {key: {"minimum": 1 if key in
-                                 ("duration", "iterations", "power_cut_cases")
+                                 self.module.WORK_AMOUNTS
                                  else 0, "maximum": 100,
                                  "unit": unit} for key, unit in
                            item["metric_units"].items()},
@@ -97,11 +102,11 @@ class HilWorkloadTests(unittest.TestCase):
             "plan", "--fixture", str(fixture), "--resolved", str(resolved),
             "--report", str(report), *map(str, extra)])
 
-    def test_thirteen_cases_cover_requested_items_without_measurements(self):
+    def test_twenty_one_cases_cover_requested_items_without_measurements(self):
         report = self.plan()
-        self.assertEqual(len(report["cases"]), 13)
+        self.assertEqual(len(report["cases"]), 21)
         self.assertEqual({item["work_item"] for item in report["cases"]},
-                         set(range(47, 54)) | set(range(25, 31)))
+                         set(range(47, 58)) | set(range(25, 31)) | {12, 14, 15})
         self.assertEqual(report["status"], "prepared_unbound")
         self.assertEqual(report["physical_status"], "not_executed")
         for item in report["cases"]:
@@ -382,7 +387,7 @@ class HilWorkloadTests(unittest.TestCase):
         self.assertEqual(template["kind"], "hil_workload")
         self.assertIsNone(template["board"])
         self.assertIsNone(template["part"])
-        self.assertEqual(len(template["cases"]), 13)
+        self.assertEqual(len(template["cases"]), 21)
         with self.assertRaises(EvidenceError):
             self.validate(template)
 

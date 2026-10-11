@@ -439,6 +439,97 @@
         "clock:ETHMACRX",
         "controller:SYSCFG_RMII"
       ]
+    },
+    "TIM4": {
+      "kind": "timer_capture",
+      "modes": [
+        "edge-capture"
+      ],
+      "irq": [
+        "TIM4"
+      ],
+      "irq_numbers": [
+        30
+      ],
+      "clock_hz": 84000000,
+      "pins": [
+        "PB6"
+      ],
+      "resources": [
+        "clock:TIM4"
+      ]
+    },
+    "TIM1": {
+      "kind": "advanced_pwm",
+      "modes": [
+        "complementary-pwm"
+      ],
+      "irq": [
+        "TIM1_BRK_TIM9"
+      ],
+      "irq_numbers": [
+        24
+      ],
+      "clock_hz": 168000000,
+      "pins": [
+        "PA8",
+        "PB13",
+        "PB12"
+      ],
+      "resources": [
+        "clock:TIM1",
+        "controller:TIM9"
+      ]
+    },
+    "USART2": {
+      "kind": "uart",
+      "modes": [
+        "dma-tx"
+      ],
+      "irq": [
+        "USART2_IRQn"
+      ],
+      "pins": [
+        "PA2",
+        "PA3"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 1000000
+    },
+    "SPI2": {
+      "kind": "spi",
+      "modes": [
+        "dma"
+      ],
+      "irq": [],
+      "pins": [
+        "PB13",
+        "PB14",
+        "PB15"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 21000000
+    },
+    "I2C2": {
+      "kind": "i2c",
+      "modes": [
+        "irq-messages",
+        "dma-messages"
+      ],
+      "irq": [
+        "I2C2_EV",
+        "I2C2_ER"
+      ],
+      "pins": [
+        "PB10",
+        "PB11"
+      ],
+      "clock_hz": 42000000,
+      "max_hz": 100000,
+      "irq_numbers": {
+        "I2C2_EV": 33,
+        "I2C2_ER": 34
+      }
     }
   },
   "reserved_resources": [

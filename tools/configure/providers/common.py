@@ -31,12 +31,15 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("timer_capture", "edge-capture"): ModeTraits(irq=True),
+    ("advanced_pwm", "complementary-pwm"): ModeTraits(irq=True),
     ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
     ("usb_device", "device-fs"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
+    ("uart", "irq-bytes"): ModeTraits(irq=True),
     ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
     ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
     ("uart", "rx-dma-idle"): ModeTraits(
@@ -178,6 +181,9 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "timer_capture": {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"},
+        "advanced_pwm": {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
+                         "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"},
         "eth": {"tx_count", "rx_count", "rx_storage_bytes", "address",
                 "init_timeout_us", "drain_timeout_us", "irq_priority", "calls_os"},
         "usb_device": {"event_capacity", "rx_fifo_words", "vbus_sensing",
@@ -194,7 +200,13 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    if kind == "eth":
+    if kind in {"timer_capture", "advanced_pwm"}:
+        try:
+            from .. import timer_advanced
+        except ImportError:
+            import timer_advanced
+        timer_advanced.validate_selection(selection, route, provider)
+    elif kind == "eth":
         try:
             from .. import ethernet
         except ImportError:

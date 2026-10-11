@@ -1,0 +1,36 @@
+{
+  "source_files": [
+    {
+      "path": "tools/configure/timer_advanced.py",
+      "sha256": "477778e9f97f532e60759f9fa631170ad570393cacdd4e7655b3ef7e7ec2b3df"
+    },
+    {
+      "path": "tools/configure/bindings.py",
+      "sha256": "6b78edd6f48784e10460e4dcbabbb00e0bc94b911fd02c0bebcd98bd88ae3065"
+    },
+    {
+      "path": "tests/google/timer_factory_test.cpp",
+      "sha256": "d22bf4ec1b9b7155d7b28d808f2d849036ff7002279ac86fccc140394f58c3a5"
+    },
+    {
+      "path": "tests/google/timer_factory_model.h",
+      "sha256": "7502c4058a5cde25b48bbe9a39f486fc7b95ec7f5eaef1d6a4280810c078bf38"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/workspace/nexus-industrial-design/timer-factory-tests/build/test-import/nexus_stm32_timer_factory_test",
+        "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/stm32-inactive-proof-red.xml"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "/workspace/nexus-industrial-design/timer-factory-tests/build/test-import/nexus_gd32_timer_factory_test",
+        "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/gd32-inactive-proof-red.xml"
+      ],
+      "exit_code": 1
+    }
+  ]
+}

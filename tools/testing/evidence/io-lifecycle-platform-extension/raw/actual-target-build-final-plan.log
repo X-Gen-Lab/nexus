@@ -1,0 +1,40 @@
++ /workspace/nexus/.venv/bin/cmake --build --preset native-debug --target nexus_can_controller_test nexus_ethernet_native_test nexus_g474_factory_test nexus_g474_provider_test nexus_gd32_adc_stream_test nexus_gd32_can_factory_test nexus_gd32_can_test nexus_gd32_eth_factory_test nexus_gd32_ethernet_test nexus_gd32_i2c_async_test nexus_gd32_i2c_register_test nexus_gd32_spi_dma_test nexus_gd32_timer_factory_test nexus_gd32_uart_dma_test nexus_gd32_uart_receive_test nexus_gd32_uart_stream_test nexus_gd32_usb_factory_test nexus_gd32f470_timer_advanced_test nexus_gd32f470_usb_device_test nexus_io_state_machine_test nexus_stm32_adc_stream_test nexus_stm32_can_factory_test nexus_stm32_can_test nexus_stm32_eth_factory_test nexus_stm32_ethernet_test nexus_stm32_i2c_async_test nexus_stm32_i2c_register_test nexus_stm32_spi_dma_test nexus_stm32_timer_factory_test nexus_stm32_uart_dma_test nexus_stm32_uart_receive_test nexus_stm32_uart_stream_test nexus_stm32_usb_factory_test nexus_stm32f407_timer_advanced_test nexus_stm32f407_usb_device_test nexus_uart_rs485_test nexus_usb_device_test --parallel 2
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/native-debug/generated/resolved.json
+-- Configuring done (2.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus/build/native-debug
+[0/4] Re-checking globbed directories...
+[1/30] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/can-factory-stm32/bindings.c.o
+[2/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/can_factory_test.cpp.o
+[3/30] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/can-factory-gd32/bindings.c.o
+[4/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/can_factory_test.cpp.o
+[5/30] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_timer_factory_test.dir/timer-factory-stm32/bindings.c.o
+[6/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_timer_factory_test.dir/timer_factory_test.cpp.o
+[7/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_timer_factory_test.dir/timer_factory_test.cpp.o
+[8/30] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_timer_factory_test.dir/timer-factory-gd32/bindings.c.o
+[9/30] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/usb-factory-stm32/bindings.c.o
+[10/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/usb_factory_test.cpp.o
+[11/30] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/usb-factory-gd32/bindings.c.o
+[12/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/usb_factory_test.cpp.o
+[13/30] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/g474-factory/bindings.c.o
+[14/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/g474_factory_test.cpp.o
+[15/30] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/eth-factory-stm32/bindings.c.o
+[16/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+[17/30] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/eth-factory-gd32/bindings.c.o
+[18/30] Linking CXX executable bin/nexus_stm32_can_factory_test
+[19/30] Linking CXX executable bin/nexus_gd32_can_factory_test
+[20/30] Linking CXX executable bin/nexus_stm32_timer_factory_test
+[21/30] Linking CXX executable bin/nexus_gd32_timer_factory_test
+[22/30] Linking CXX executable bin/nexus_stm32_usb_factory_test
+[23/30] Linking CXX executable bin/nexus_gd32_usb_factory_test
+[24/30] Linking CXX executable bin/nexus_g474_factory_test
+[25/30] Linking CXX executable bin/nexus_stm32_eth_factory_test
+[26/30] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+[27/30] Linking CXX executable bin/nexus_gd32_eth_factory_test

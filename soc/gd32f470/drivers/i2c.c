@@ -387,7 +387,16 @@ const nx_i2c_ops_t nx_gd32_i2c_ops = {
     .recover = nx_gd32_i2c_recover,
 };
 
+/** \brief Match immutable child/controller identity without MMIO or startup. */
+static bool on_port(const void* context, const nx_i2c_port_t* port) {
+    const nx_gd32_i2c_endpoint_state_t* endpoint = context;
+    return endpoint != NULL && port != NULL && port->ops == &nx_gd32_i2c_ops &&
+           port->context != NULL && endpoint->port == port->context &&
+           endpoint->address >= 8U && endpoint->address <= 119U;
+}
+
 /** \brief One shared immutable method table for this execution mode. */
 const nx_i2c_endpoint_ops_t nx_gd32_i2c_endpoint_ops = {
     .transaction = nx_gd32_i2c_endpoint_transaction,
+    .on_port = on_port,
 };

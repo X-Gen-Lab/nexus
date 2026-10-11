@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "g474-factory-development-execution",
+  "scope": "Actual production factory/system/provider host execution. Scoped dirty development input capture, not complete clean software candidate or physical qualification.",
+  "physical_status": "not_executed",
+  "status": "passed",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-g474-iteration-evidence/host-build",
+        "--target",
+        "nexus_g474_factory_test",
+        "--parallel",
+        "1"
+      ],
+      "return_code": 0,
+      "started_ns": 1791748445766696864,
+      "completed_ns": 1791748449449789644,
+      "output": {
+        "path": "/workspace/nexus-g474-iteration-evidence/foreign-uart-green/build.output",
+        "sha256": "627af488ee9bfaae0b7d3bdda165d370cb2df89fcc5c2cf909c72022e2c362b0",
+        "bytes": 964
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791748449456026486,
+      "completed_ns": 1791748449459662291,
+      "output": {
+        "path": "/workspace/nexus-g474-iteration-evidence/foreign-uart-green/discovery.output",
+        "sha256": "95434e1177cb686e120ba9d3c1aa38a1da121c9e6291c26136bc8a25e63968d1",
+        "bytes": 740
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-g474-iteration-evidence/foreign-uart-green/google.xml"
+      ],
+      "return_code": 0,
+      "started_ns": 1791748449459915948,
+      "completed_ns": 1791748449475741745,
+      "output": {
+        "path": "/workspace/nexus-g474-iteration-evidence/foreign-uart-green/execution.output",
+        "sha256": "65e1620d3422c7fb6e5f5275d126c41f1badeb696e41f7481dd6cd605d77078c",
+        "bytes": 2423
+      }
+    }
+  ],
+  "driver": {
+    "path": "/workspace/nexus-g474-iteration-evidence/run_phase.py",
+    "sha256": "5d605038c3b47814128f0add5ce0ad9aacb15891dd2059350850b2abb7c996a1",
+    "bytes": 5678
+  },
+  "source_before": {
+    "path": "/workspace/nexus-g474-iteration-evidence/foreign-uart-green/source-before.json",
+    "sha256": "c3d3efd5cbdc33e42cc2e7631fb6ee78507bf9a069c8e1cd6d14df4b140153ac",
+    "bytes": 43782
+  },
+  "executable": {
+    "path": "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+    "sha256": "641a01cfe17673442db3ab23750f6697ead091e4f411f0658d9d7e5345ee6071",
+    "bytes": 4933048
+  },
+  "discovered_cases": [
+    "G474Factory.LookupIsPureStaticIdentityBeforeAnyHardwareAccess",
+    "G474Factory.ActualStartupBinds170MHzClockTimebasePinsAndIrq",
+    "G474Factory.SelectedGpioRejectsOutsideMaskWithoutRegisterAccess",
+    "G474Factory.GeneratedVectorBorrowsTransmitUntilActualWireComplete",
+    "G474Factory.GeneratedVectorReceivesIntoSelectedCallerBudgetedRing",
+    "G474Factory.InvalidObservedSiliconRejectsBeforeClockMutation",
+    "G474Factory.ForeignLiveUartRejectsBeforeAnyClockOrPinMutation",
+    "G474Factory.FailedClockStartupDoesNotExposeAnyPeripheral",
+    "G474Factory.FailedUartAcknowledgementRollsBackPinsAndOwnedGates",
+    "G474Factory.FailedPeripheralRollbackRetainsClockPinsAndResponsibility",
+    "G474Factory.StopFailurePreservesIdentityUntilActualIrqWithdrawal",
+    "G474Factory.UnrelatedPinAndClockFieldsSurviveStartAndStop",
+    "G474Factory.StopRestoresSelectedFieldsAndRestartKeepsStaticIdentity"
+  ],
+  "xml": {
+    "path": "/workspace/nexus-g474-iteration-evidence/foreign-uart-green/google.xml",
+    "sha256": "9f662f5ebbf19ed0f3af18a63b778b4af1774dcc9e1ee96d0f7f115ab741a314",
+    "bytes": 3554
+  },
+  "google": {
+    "tests": 13,
+    "failures": 0,
+    "disabled": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "source_after": {
+    "path": "/workspace/nexus-g474-iteration-evidence/foreign-uart-green/source-after.json",
+    "sha256": "c3d3efd5cbdc33e42cc2e7631fb6ee78507bf9a069c8e1cd6d14df4b140153ac",
+    "bytes": 43782
+  },
+  "source_unchanged": true
+}

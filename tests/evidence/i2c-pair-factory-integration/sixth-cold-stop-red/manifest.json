@@ -1,0 +1,553 @@
+{
+  "schema_version": 1,
+  "kind": "i2c-pair-generated-development-execution",
+  "status": "failed",
+  "physical_status": "not_executed",
+  "scope": "Actual generated paired factory, common algorithm and silicon GPIO/I2C code. External CPU/MMIO/NVIC/hardwareclock and separately tested systemclock port only are mocked. Dirty development inputs, no physical or clean candidate qualification.",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-g474-iteration-evidence/host-build",
+        "--target",
+        "nexus_stm32_i2c_pair_factory_test",
+        "nexus_stm32_i2c_pair_irq_factory_test",
+        "nexus_gd32_i2c_pair_factory_test",
+        "nexus_gd32_i2c_pair_irq_factory_test",
+        "--parallel",
+        "1"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751579229489390,
+      "completed_ns": 1791751594590584124,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/build.output",
+        "sha256": "75c004fa5264d3ce172e628a7fffec072fee6547591bb36db396fd0ba6e88006",
+        "bytes": 2638
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751594607631061,
+      "completed_ns": 1791751594611439735,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_factory_test-discovery.output",
+        "sha256": "1d2ee3efd3f2c0685fb104dfcb551d8fadf7b12aae75ade60204e5388ffde5c4",
+        "bytes": 829
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_factory_test.xml"
+      ],
+      "return_code": 1,
+      "started_ns": 1791751594611749255,
+      "completed_ns": 1791751594615277714,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_factory_test-execution.output",
+        "sha256": "018b06f5783c36fb3137bb1f53a67af3dc5a603e1d4b29c760cc4e3f7ff1ea4b",
+        "bytes": 3469
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751594628134060,
+      "completed_ns": 1791751594631886010,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_irq_factory_test-discovery.output",
+        "sha256": "84a3ed3c84742590ce30c90d2c28477c25620662571fbca3fa26945f6f2ac11a",
+        "bytes": 785
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_irq_factory_test.xml"
+      ],
+      "return_code": 1,
+      "started_ns": 1791751594632473552,
+      "completed_ns": 1791751594640195045,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_irq_factory_test-execution.output",
+        "sha256": "1aad3ab1e2794f9cbfa7bdcb340c65f8246a4d492b45414bff76236a7569de72",
+        "bytes": 3322
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751594653684672,
+      "completed_ns": 1791751594657368822,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_factory_test-discovery.output",
+        "sha256": "1d2ee3efd3f2c0685fb104dfcb551d8fadf7b12aae75ade60204e5388ffde5c4",
+        "bytes": 829
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_factory_test.xml"
+      ],
+      "return_code": 1,
+      "started_ns": 1791751594657747744,
+      "completed_ns": 1791751594661776315,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_factory_test-execution.output",
+        "sha256": "4d1f72af92eb5ab260303868ac9cf9e8df27b11573b8140861655332cd639788",
+        "bytes": 3483
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751594674835352,
+      "completed_ns": 1791751594678685809,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_irq_factory_test-discovery.output",
+        "sha256": "84a3ed3c84742590ce30c90d2c28477c25620662571fbca3fa26945f6f2ac11a",
+        "bytes": 785
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_irq_factory_test.xml"
+      ],
+      "return_code": 1,
+      "started_ns": 1791751594679111651,
+      "completed_ns": 1791751594682682152,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_irq_factory_test-execution.output",
+        "sha256": "4d0942717461b52604aac40b20ac8a19ed61faf1e0a9da59de79055b2d45eb8b",
+        "bytes": 3336
+      }
+    }
+  ],
+  "rows": [
+    {
+      "target": "nexus_stm32_i2c_pair_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_factory_test.executable",
+        "sha256": "4c45cd01e9e45baf462c97015bc542be7fc1ffdbe0094a16da14efaa5c0da85a",
+        "bytes": 5457936
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_factory_test",
+      "status": "failed",
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_factory_test.xml",
+        "sha256": "4d0c8f8f8e1e6551b14381ca4bcebc28e5bca90552dd2812e3d4e9ef43a0ccd6",
+        "bytes": 5338
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.ColdStopRejectsWithoutReferencesOrHardwareEffects",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.DmaTerminalPreservesPeerFlagsEngineAndBorrow",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedSecondaryDmaDisableQuarantinesOnlyItsLoan",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields"
+      ],
+      "google": {
+        "tests": 15,
+        "failures": 1,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "target": "nexus_stm32_i2c_pair_irq_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_irq_factory_test.executable",
+        "sha256": "d8f2ae8b643425ed9e1dad0018ef5d2bbc4cd6dabc8f4e0cce416ccbb617b4b7",
+        "bytes": 5444304
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+      "status": "failed",
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_stm32_i2c_pair_irq_factory_test.xml",
+        "sha256": "e615ccdbbe9356c8d13d6585bd39980f92e3377a8f3a8786774d52ab9e73e56a",
+        "bytes": 5096
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.ColdStopRejectsWithoutReferencesOrHardwareEffects",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields",
+        "I2CPairFactory.IrqThreeByteWindowCompletesOnlyAfterWireRelease",
+        "I2CPairFactory.IrqModeCanUseOrdinaryBufferWithoutCreatingDmaOwnership"
+      ],
+      "google": {
+        "tests": 14,
+        "failures": 1,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "target": "nexus_gd32_i2c_pair_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_factory_test.executable",
+        "sha256": "27cc21a3587c24424d043acdec56986116c5eee4fb1639edce6f7a9ebd2b2778",
+        "bytes": 5463920
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_factory_test",
+      "status": "failed",
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_factory_test.xml",
+        "sha256": "6cdeeac3d5b9d67a6fb36b6432ceb5680d0a45efb9e5d285de590027a9614a3d",
+        "bytes": 5360
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.ColdStopRejectsWithoutReferencesOrHardwareEffects",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.DmaTerminalPreservesPeerFlagsEngineAndBorrow",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedSecondaryDmaDisableQuarantinesOnlyItsLoan",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields"
+      ],
+      "google": {
+        "tests": 15,
+        "failures": 1,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "target": "nexus_gd32_i2c_pair_irq_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_irq_factory_test.executable",
+        "sha256": "b6f51b92e1db50a62de3e824a5aeb61e5503b9b1f98591f9ec609ba0610e067e",
+        "bytes": 5450304
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+      "status": "failed",
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/nexus_gd32_i2c_pair_irq_factory_test.xml",
+        "sha256": "757f014a003c34bca0d417bf8b30fc54d5316cf502be6454f32ddd0baa5645a4",
+        "bytes": 5115
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.ColdStopRejectsWithoutReferencesOrHardwareEffects",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields",
+        "I2CPairFactory.IrqThreeByteWindowCompletesOnlyAfterWireRelease",
+        "I2CPairFactory.IrqModeCanUseOrdinaryBufferWithoutCreatingDmaOwnership"
+      ],
+      "google": {
+        "tests": 14,
+        "failures": 1,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "driver": {
+    "path": "/workspace/nexus-i2c-pair-iteration-evidence/capture_v2.py",
+    "sha256": "10c5f2e11ad95145f6d1249993911455066cf7d6bcf18d40b1f6105fbedc9c50",
+    "bytes": 7531
+  },
+  "source_before": {
+    "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/source-before.json",
+    "sha256": "d10a60161431ca2158b2dfd43c7cbb60423590e4413df7ae01b8f89e888d6408",
+    "bytes": 67817
+  },
+  "source_after": {
+    "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/source-after.json",
+    "sha256": "d10a60161431ca2158b2dfd43c7cbb60423590e4413df7ae01b8f89e888d6408",
+    "bytes": 67817
+  },
+  "source_unchanged": true,
+  "generated": [
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/.nexus-config-bundle",
+      "sha256": "d46a3942d45d24c2a6fd9c1084e900c9cd41dded22f1595f6439eae4e3696afc",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/bindings.c",
+      "sha256": "568d81a38cbc38cdaf9dbfe0ea67d7fcd7f6275273b8c4925f17ec99b18d02a3",
+      "bytes": 29606
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/input_paths.json",
+      "sha256": "dc490bcbd93ca7de5450dd91dfd81629d01c53624e86d0fda0f0aa9d6b86672a",
+      "bytes": 554
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/memory.ld",
+      "sha256": "6ed5810262f16806ec236d7c9ea84f1de82cd24c853ed15c5cf9151c1445dfe7",
+      "bytes": 2783
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/nexus_config.h",
+      "sha256": "b7c799bbd1900c7550aec0cc3399c6b9ddd5a72cae3017be53635b5481035d42",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/resolved.json",
+      "sha256": "1de26526965f38811bda89d1669ff39a6750ef368efcac07b9aaf1571e848e3f",
+      "bytes": 29436
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/resource-budget.json",
+      "sha256": "43787a37e48eb2e3c86f7a0fcd4e8e1921c69b4c1fa5b90f47d3b0359369821e",
+      "bytes": 202
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-dma/selection.cmake",
+      "sha256": "cd5b9eecf57324d4ef11a4ac478fed66ee4b7d0de2b1ebbaf5adfedb754addb4",
+      "bytes": 1151
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/.nexus-config-bundle",
+      "sha256": "00573af425eb2474c9bd50fcd8cb946102b8d6bbea64778328e5ba421e37d72c",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/bindings.c",
+      "sha256": "984fc9c5120c568f8e9d3894868a4805577d2294ceef92ce6cb5399f9e09b211",
+      "bytes": 23880
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/input_paths.json",
+      "sha256": "eb48c241d976f2ae6627074beea07703d483086dbf82e6076441a96dbdcef1ad",
+      "bytes": 562
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/memory.ld",
+      "sha256": "bff991d7e5cd9f692845d14e01c7341cca984af64f69dafb4ae777a070426100",
+      "bytes": 2783
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/nexus_config.h",
+      "sha256": "b882c86391d5b6ce10c11b9288b3688f4ed8056053f0daa42a72b6cefa9f2146",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/resolved.json",
+      "sha256": "81708464f254c968e58f9fa45e2234c533fd9974dac89b5655ba16387c06e7b5",
+      "bytes": 28146
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/resource-budget.json",
+      "sha256": "43787a37e48eb2e3c86f7a0fcd4e8e1921c69b4c1fa5b90f47d3b0359369821e",
+      "bytes": 202
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-gd32-irq/selection.cmake",
+      "sha256": "57d2ec84490a9ce9fb0e69e2e74ab6230bff38d5e6be52a8b5a1134c42e0657a",
+      "bytes": 1151
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/.nexus-config-bundle",
+      "sha256": "00664a2dd4bc00d25f0940c6b4a14c900ababac03efa54b6cca99a2a16644ad3",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/bindings.c",
+      "sha256": "468ec0cff683cb4e6b82aad7f73bdc150387b6a652eacdbdc2868e407ad333aa",
+      "bytes": 29749
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/input_paths.json",
+      "sha256": "d392d37348465e1702ad830a0df42c178c41842ea78335e938f04ccef06389a9",
+      "bytes": 574
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/memory.ld",
+      "sha256": "f51d2a34717670c601d14ccc7947698b917a4eaa69e742c00c9fe6dfe4f827b3",
+      "bytes": 2531
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/nexus_config.h",
+      "sha256": "b9e681c17394da10c425265097e93ed8d2d3fedeb697013bc1f3d8dc1cbd2ea5",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/resolved.json",
+      "sha256": "07d3a3df70d79a454750d6cee2d3101183d899d1da2eb0aafb612ff2066753f9",
+      "bytes": 25842
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/resource-budget.json",
+      "sha256": "308d991923bde7816ede5655bb7a8b74ed042aa3dd719506a5a3e23bf11fcd66",
+      "bytes": 184
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-dma/selection.cmake",
+      "sha256": "4309623d140bfc5cd4e753c9de8d2f645af514819bb67040f2ec5b5d13cdce59",
+      "bytes": 1153
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/.nexus-config-bundle",
+      "sha256": "6da8fa6010d96e8dcd00b4d7ac2de3c46d42ffc81fb0991c2c50d2be594b95d9",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/bindings.c",
+      "sha256": "11a7e7fe42e1aa724a3574f831d12c83490e85ce1aafad2ee7ac4dfdcba14af7",
+      "bytes": 24213
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/input_paths.json",
+      "sha256": "d4a2fcbd46098ee58f57972d9fa104c5b146d93890b49f2f85b277f7d6464967",
+      "bytes": 582
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/memory.ld",
+      "sha256": "0350b674c3f6a01315c6db4090ad4398b649ff59c70f3219ff717b1a7951c288",
+      "bytes": 2531
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/nexus_config.h",
+      "sha256": "fb61e189bf529640f9352ea53164ae2713f11f119307a92eea60d241a7fa7fd6",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/resolved.json",
+      "sha256": "bc76350ce836f42459ee692f6973e8e0617d9c8456fc5578d5a79f0505d43cee",
+      "bytes": 24556
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/resource-budget.json",
+      "sha256": "308d991923bde7816ede5655bb7a8b74ed042aa3dd719506a5a3e23bf11fcd66",
+      "bytes": 184
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/sixth-cold-stop-red/generated/i2c-pair-stm32-irq/selection.cmake",
+      "sha256": "f6fd46903357f5f9391841c029de82718158079395e19fa2fd4cfdcf17551924",
+      "bytes": 1153
+    }
+  ]
+}

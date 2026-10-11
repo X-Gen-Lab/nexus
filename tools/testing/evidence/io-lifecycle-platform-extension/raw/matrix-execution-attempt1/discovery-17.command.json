@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/build/native-debug/bin/nexus_gd32f470_timer_advanced_test",
+    "--gtest_filter=*",
+    "--gtest_list_tests"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

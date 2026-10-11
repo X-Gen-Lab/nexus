@@ -14,6 +14,7 @@ from unittest.mock import patch
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.evidence.identity import canonical_digest
 from tools.hil.acquire import acquisition_plan, execute_acquisition
+from tools.testing import test_hil_workloads
 
 
 class HilAcquireTests(unittest.TestCase):
@@ -21,16 +22,28 @@ class HilAcquireTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
+        self.protocol = test_hil_workloads.HilWorkloadTests()
+        self.protocol.setUp()
+        self.addCleanup(self.protocol.doCleanups)
         self.python = file_identity(Path(sys.executable).resolve())
         self.station = {
             "station_id": "synthetic-station", "board": "synthetic-board",
             "part": "synthetic-part", "chip_uid": "synthetic-uid",
             "probe": {"serial": "synthetic-probe", "tool": self.python}}
+        self.station.update(board=self.protocol.fixture["board"],
+                            part=self.protocol.fixture["part"])
         self.inputs = {}
         for name in ("station", "fixture", "elf", "resolved", "resources"):
             path = self.root / (name + ".json")
-            atomic_json(path, self.station if name == "station" else
-                        {"scope": "synthetic tooling test; no MCU executed"})
+            value = {"scope": "synthetic tooling test; no MCU executed"}
+            if name == "station":
+                value = self.station
+            elif name == "fixture":
+                value = self.protocol.fixture
+            elif name == "resolved":
+                value = copy.deepcopy(self.protocol.resolved)
+                value["configuration_sha256"] = canonical_digest(value)
+            atomic_json(path, value)
             self.inputs[name] = file_identity(path)
         self.admission = {
             "schema_version": 1, "kind": "hil_admission", "status": "ready",
@@ -61,7 +74,7 @@ class HilAcquireTests(unittest.TestCase):
         config = self.root / "reviewed-config.txt"
         config.write_text("synthetic acquisition config; no equipment\n")
         self.workload = self.root / "workload.json"
-        atomic_json(self.workload, {"scope": "synthetic tool-only workload"})
+        atomic_json(self.workload, self.protocol.reviewed())
         self.recipe = {
             "schema_version": 1, "kind": "hil_acquisition_recipe",
             "admission_sha256": canonical_digest(self.admission),

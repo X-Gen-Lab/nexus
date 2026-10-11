@@ -33,6 +33,21 @@ def ops_definitions(source):
                           c_code(source)))
 
 
+def source_ops(path, root=ROOT):
+    """Reuse the ELF observer's exact source specialization contract.
+
+    This source projection is not execution evidence. Conditional, ambiguous,
+    duplicate or opaque template selections fail closed in the shared helper;
+    the wrapper remains the actual translation unit for method provenance.
+    """
+    from tools.measurement.retention import provider_initializers
+    source = re.sub(r"/\*.*?\*/|//[^\n]*", " ",
+                    path.read_text(encoding="utf-8"), flags=re.DOTALL)
+    return set().union(*(ops_definitions(initializer)
+                         for initializer, _ in provider_initializers(
+                             path, source, root)))
+
+
 def collect(root=ROOT):
     """Reject failed resolution or missing selected production definitions."""
     root = root.resolve()
@@ -63,7 +78,7 @@ def collect(root=ROOT):
             route_index[identity] = route
         routes[soc["id"]] = route_index
         for source in sorted((path.parent / "drivers").glob("*.c")):
-            for symbol in ops_definitions(source.read_text(encoding="utf-8")):
+            for symbol in source_ops(source, root):
                 if symbol in exports:
                     raise ValueError(f"Duplicate ops definition: {symbol}")
                 exports[symbol] = source.relative_to(root).as_posix()
@@ -72,7 +87,7 @@ def collect(root=ROOT):
     shared_sources = (set((root / "soc/common").glob("*.c"))
                       | set((root / "io/src").glob("*.c")))
     for source in sorted(shared_sources):
-        for symbol in ops_definitions(source.read_text(encoding="utf-8")):
+        for symbol in source_ops(source, root):
             if symbol in exports:
                 raise ValueError(f"Duplicate ops definition: {symbol}")
             exports[symbol] = source.relative_to(root).as_posix()
@@ -106,7 +121,7 @@ def collect(root=ROOT):
             name = bindings.symbol(item["id"])
             face_name = re.escape("s_nx_face_" + name)
             matches = re.findall(
-                rf"\bstatic\s+const\s+nx_\w+_port_t\s+{face_name}"
+                rf"\bstatic\s+const\s+nx_\w+_t\s+{face_name}"
                 r"\s*=\s*\{\s*&(?P<ops>nx_\w+_ops)\s*,", source)
             if len(matches) != 1 or matches[0] not in exports:
                 raise ValueError("Selected ops has no production definition: "

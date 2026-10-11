@@ -1,0 +1,110 @@
+{
+  "qualification": "development-only; no MCU/HIL",
+  "command": [
+    "python",
+    "-m",
+    "unittest",
+    "tools.testing.test_threadx_linux_overlay"
+  ],
+  "exit_code": 0,
+  "source_before": [
+    {
+      "path": "os/threadx/threadx.c",
+      "sha256": "b9227721d6a9ee87fe241f322e81838627fab5e3516b20c0a77adcbf054cb921",
+      "bytes": 30031
+    },
+    {
+      "path": "os/threadx/Kernel.cmake",
+      "sha256": "2e105fffd44445fcbd1459ec45d5cddb369bea0a51162f9e005e0e413eafa673",
+      "bytes": 5106
+    },
+    {
+      "path": "os/threadx/prepare_linux.py",
+      "sha256": "d25586c880a9f315317c91e08de3051138c91ec52ec0cfe08a7a1eeb3dd3546e",
+      "bytes": 10053
+    },
+    {
+      "path": "os/threadx/README.md",
+      "sha256": "e17303d54ca0b74b28280cf8371c7b2134b8aecfbd575139f12e94b04c0a445f",
+      "bytes": 15233
+    },
+    {
+      "path": "os/threadx/config/tx_user.h",
+      "sha256": "aac4dc6f995b52b863d07537abcedddee0f82989052517e5067b13066fe62ba7",
+      "bytes": 1255
+    },
+    {
+      "path": "tests/google/threadx_kernel_test.cpp",
+      "sha256": "7edf68d505fc79aebef74fdca8a701bbe9144e4d75ce6c03d9c8f9d3cd84ccf3",
+      "bytes": 11256
+    },
+    {
+      "path": "tests/google/threadx_linux_port_test.cpp",
+      "sha256": "9615b72b8c7674e4757ec34ea06fc53a6c7aa64fe0861aff5ce8d75b0b1bbab3",
+      "bytes": 6729
+    },
+    {
+      "path": "tests/google/threadx.cmake",
+      "sha256": "32dcdd9ee41982c031dcbd2d744a2ee8098125c7e4fd4e4deb5797f231c32576",
+      "bytes": 3516
+    },
+    {
+      "path": "tools/testing/test_threadx_linux_overlay.py",
+      "sha256": "b4ee08f445a49b34379187b45097339f54ae5cba9946fa5b8c61b7d6552a389d",
+      "bytes": 9726
+    }
+  ],
+  "source_after": [
+    {
+      "path": "os/threadx/threadx.c",
+      "sha256": "b9227721d6a9ee87fe241f322e81838627fab5e3516b20c0a77adcbf054cb921",
+      "bytes": 30031
+    },
+    {
+      "path": "os/threadx/Kernel.cmake",
+      "sha256": "2e105fffd44445fcbd1459ec45d5cddb369bea0a51162f9e005e0e413eafa673",
+      "bytes": 5106
+    },
+    {
+      "path": "os/threadx/prepare_linux.py",
+      "sha256": "d25586c880a9f315317c91e08de3051138c91ec52ec0cfe08a7a1eeb3dd3546e",
+      "bytes": 10053
+    },
+    {
+      "path": "os/threadx/README.md",
+      "sha256": "e17303d54ca0b74b28280cf8371c7b2134b8aecfbd575139f12e94b04c0a445f",
+      "bytes": 15233
+    },
+    {
+      "path": "os/threadx/config/tx_user.h",
+      "sha256": "aac4dc6f995b52b863d07537abcedddee0f82989052517e5067b13066fe62ba7",
+      "bytes": 1255
+    },
+    {
+      "path": "tests/google/threadx_kernel_test.cpp",
+      "sha256": "7edf68d505fc79aebef74fdca8a701bbe9144e4d75ce6c03d9c8f9d3cd84ccf3",
+      "bytes": 11256
+    },
+    {
+      "path": "tests/google/threadx_linux_port_test.cpp",
+      "sha256": "9615b72b8c7674e4757ec34ea06fc53a6c7aa64fe0861aff5ce8d75b0b1bbab3",
+      "bytes": 6729
+    },
+    {
+      "path": "tests/google/threadx.cmake",
+      "sha256": "32dcdd9ee41982c031dcbd2d744a2ee8098125c7e4fd4e4deb5797f231c32576",
+      "bytes": 3516
+    },
+    {
+      "path": "tools/testing/test_threadx_linux_overlay.py",
+      "sha256": "b4ee08f445a49b34379187b45097339f54ae5cba9946fa5b8c61b7d6552a389d",
+      "bytes": 9726
+    }
+  ],
+  "source_unchanged": true,
+  "output": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/final-observers-tools.output",
+    "sha256": "938170522077765b26f6292b200d0dbc0f8d4d0557fa800d07bbf54446c026ff",
+    "bytes": 116
+  }
+}

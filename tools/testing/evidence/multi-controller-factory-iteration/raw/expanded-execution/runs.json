@@ -1,0 +1,12 @@
+[
+  {
+    "family": "stm32",
+    "returncode": 0,
+    "binary_sha256": "f37a79b13730a9f71250e627fcdb6f3694a3391a12715a6cfda9d1d19db6ccd5"
+  },
+  {
+    "family": "gd32",
+    "returncode": 0,
+    "binary_sha256": "bcf63d94d8ac1e53df60df1f6de2cde0dbbfec663382ec32c7dc83fd85947566"
+  }
+]

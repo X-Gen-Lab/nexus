@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T20:38:16.055" name="AllTests">
+  <testsuite name="CanSoc" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:38:16.055">
+    <testcase name="ActualSdkClockModeTimingAndVectorsMatchTheMechanism" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="97" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="MailboxPackingAndSdkCompletionProveActualWireSuccess" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="118" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="138" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="SecondControllerDependsOnPrimaryClockWithoutResettingPeer" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="150" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="FifoMailboxDlcAndReleaseUseExactSdkOffsets" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="179" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="FailedExitAcknowledgementRetainsDomainResponsibility" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="198" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="FalseCpuPriorityFactsRejectBeforeReenablingHardware" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="209" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+    <testcase name="ForeignPrimaryFilterDomainRejectsWithoutControllerEffects" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="218" status="run" result="completed" time="0." timestamp="2026-10-11T20:38:16.055" classname="CanSoc" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="12" failures="1" disabled="0" errors="0" time="0.007" timestamp="2026-10-11T19:48:36.150" name="AllTests">
+  <testsuite name="G474Factory" tests="12" failures="1" disabled="0" skipped="0" errors="0" time="0.007" timestamp="2026-10-11T19:48:36.151">
+    <testcase name="LookupIsPureStaticIdentityBeforeAnyHardwareAccess" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="57" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.151" classname="G474Factory" />
+    <testcase name="ActualStartupBinds170MHzClockTimebasePinsAndIrq" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.151" classname="G474Factory" />
+    <testcase name="SelectedGpioRejectsOutsideMaskWithoutRegisterAccess" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="90" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.151" classname="G474Factory">
+      <failure message="/workspace/nexus/tests/google/g474_factory_test.cpp:101&#x0A;Expected equality of these values:&#x0A;  1U &lt;&lt; 5U&#x0A;    Which is: 32&#x0A;  (&amp;g_g474_model.gpio)-&gt;ODR&#x0A;    Which is: 36&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/g474_factory_test.cpp:101
+Expected equality of these values:
+  1U << 5U
+    Which is: 32
+  (&g_g474_model.gpio)->ODR
+    Which is: 36
+]]></failure>
+    </testcase>
+    <testcase name="GeneratedVectorBorrowsTransmitUntilActualWireComplete" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.151" classname="G474Factory" />
+    <testcase name="GeneratedVectorReceivesIntoSelectedCallerBudgetedRing" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="124" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.151" classname="G474Factory" />
+    <testcase name="InvalidObservedSiliconRejectsBeforeClockMutation" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="138" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.151" classname="G474Factory" />
+    <testcase name="FailedClockStartupDoesNotExposeAnyPeripheral" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="147" status="run" result="completed" time="0.004" timestamp="2026-10-11T19:48:36.151" classname="G474Factory" />
+    <testcase name="FailedUartAcknowledgementRollsBackPinsAndOwnedGates" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="158" status="run" result="completed" time="0.003" timestamp="2026-10-11T19:48:36.155" classname="G474Factory" />
+    <testcase name="FailedPeripheralRollbackRetainsClockPinsAndResponsibility" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="172" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.158" classname="G474Factory" />
+    <testcase name="StopFailurePreservesIdentityUntilActualIrqWithdrawal" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.158" classname="G474Factory" />
+    <testcase name="UnrelatedPinAndClockFieldsSurviveStartAndStop" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="201" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.158" classname="G474Factory" />
+    <testcase name="StopRestoresSelectedFieldsAndRestartKeepsStaticIdentity" file="/workspace/nexus/tests/google/g474_factory_test.cpp" line="216" status="run" result="completed" time="0." timestamp="2026-10-11T19:48:36.158" classname="G474Factory" />
+  </testsuite>
+</testsuites>

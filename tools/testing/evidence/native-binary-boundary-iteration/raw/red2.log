@@ -1,0 +1,68 @@
+test_file_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_file_alias_cannot_execute_or_publish_native_success) ... FAIL
+test_parent_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_parent_alias_cannot_execute_or_publish_native_success) ... FAIL
+test_directory_symlink_to_real_directory_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_directory_symlink_to_real_directory_inside_build_is_rejected) ... FAIL
+test_distinct_binaries_with_ambiguous_report_names_are_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_distinct_binaries_with_ambiguous_report_names_are_rejected) ... ok
+test_file_symlink_to_real_binary_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_file_symlink_to_real_binary_inside_build_is_rejected) ... FAIL
+test_malformed_empty_or_repeated_manifest_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_malformed_empty_or_repeated_manifest_is_rejected) ... ok
+test_missing_binary_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_missing_binary_is_rejected) ... ok
+test_nonregular_directory_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_nonregular_directory_is_rejected) ... ok
+test_parent_component_escape_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_parent_component_escape_is_rejected) ... ok
+test_regular_binary_order_is_preserved (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_regular_binary_order_is_preserved) ... ok
+test_regular_binary_outside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_regular_binary_outside_build_is_rejected) ... ok
+
+======================================================================
+FAIL: test_file_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_file_alias_cannot_execute_or_publish_native_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 117, in test_file_alias_cannot_execute_or_publish_native_success
+    self.reject_before_discovery(alias)
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 108, in reject_before_discovery
+    self.assertEqual(result, 1, output)
+AssertionError: 0 != 1 : + /workspace/nexus/.venv/bin/ctest --test-dir /tmp/nexus CI contracts nrw5ky_7/build/native-debug --show-only=json-v1
++ /tmp/nexus CI contracts nrw5ky_7/build/native-debug/first --gtest_filter=* --gtest_list_tests
++ /tmp/nexus CI contracts nrw5ky_7/build/native-debug/second --gtest_filter=* --gtest_list_tests
++ /workspace/nexus/.venv/bin/ctest --preset native-debug --output-on-failure --no-tests=error --parallel 1 --output-junit /tmp/nexus CI contracts nrw5ky_7/build/native-debug/ctest-results.xml
+Executed 3 CTest entries and 4 GoogleTest cases once; evidence: /tmp/nexus CI contracts nrw5ky_7/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_parent_alias_cannot_execute_or_publish_native_success (tools.testing.test_native_contracts.NativeAliasedExecutionTests.test_parent_alias_cannot_execute_or_publish_native_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 122, in test_parent_alias_cannot_execute_or_publish_native_success
+    self.reject_before_discovery(alias / self.fixture.binaries[0].name)
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 108, in reject_before_discovery
+    self.assertEqual(result, 1, output)
+AssertionError: 0 != 1 : + /workspace/nexus/.venv/bin/ctest --test-dir /tmp/nexus CI contracts grsc0k5t/build/native-debug --show-only=json-v1
++ /tmp/nexus CI contracts grsc0k5t/build/native-debug/first --gtest_filter=* --gtest_list_tests
++ /tmp/nexus CI contracts grsc0k5t/build/native-debug/second --gtest_filter=* --gtest_list_tests
++ /workspace/nexus/.venv/bin/ctest --preset native-debug --output-on-failure --no-tests=error --parallel 1 --output-junit /tmp/nexus CI contracts grsc0k5t/build/native-debug/ctest-results.xml
+Executed 3 CTest entries and 4 GoogleTest cases once; evidence: /tmp/nexus CI contracts grsc0k5t/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_directory_symlink_to_real_directory_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_directory_symlink_to_real_directory_inside_build_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 51, in test_directory_symlink_to_real_directory_inside_build_is_rejected
+    self.rejected([alias / "third", self.second])
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 31, in rejected
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_file_symlink_to_real_binary_inside_build_is_rejected (tools.testing.test_native_contracts.NativeBinaryBoundaryTests.test_file_symlink_to_real_binary_inside_build_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 42, in test_file_symlink_to_real_binary_inside_build_is_rejected
+    self.rejected([alias, self.second])
+  File "/workspace/nexus/tools/testing/test_native_contracts.py", line 31, in rejected
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.757s
+
+FAILED (failures=4)

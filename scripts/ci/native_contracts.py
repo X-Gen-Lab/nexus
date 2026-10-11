@@ -11,7 +11,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from scripts.ci.tdd_gate import environment, validate_google_report
+from scripts.ci.tdd_gate import (
+    checked_binary, environment, validate_google_report,
+)
 from scripts.validation.junit import prepare_report, validate_junit
 
 
@@ -67,7 +69,7 @@ def google_binaries(build):
             or any(not isinstance(name, str) for name in names)
             or len(names) != len(set(names))):
         raise ValueError("Missing or duplicate GoogleTest executable plan")
-    binaries = [Path(name).resolve() for name in names]
+    binaries = [checked_binary(name, build) for name in names]
     if (len({binary.name for binary in binaries}) != len(binaries)
             or any(not binary.is_file() or not binary.is_relative_to(build)
                    for binary in binaries)):

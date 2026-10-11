@@ -1,0 +1,73 @@
+[1/73] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[2/73] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[3/73] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.o
+[4/73] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[5/73] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.o
+[6/73] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.o
+[7/73] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.o
+[8/73] Linking C static library nexus-sdk/lib/libnexus_core.a
+[9/73] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/native/nx_arch_native.c.o
+[10/73] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.o
+[11/73] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.o
+[12/73] Linking C static library nexus-sdk/lib/libnexus_arch.a
+[13/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.o
+[14/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[15/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.o
+[16/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[17/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.o
+[18/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.o
+[19/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.o
+[20/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.o
+[21/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[22/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.o
+[23/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.o
+[24/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.o
+[25/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+[26/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.o
+[27/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
+[28/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[29/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.o
+[30/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+[31/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+[32/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.o
+[33/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.o
+[34/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+[35/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.o
+[36/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[37/73] Linking C static library nexus-sdk/lib/libnexus_io.a
+[38/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[39/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[40/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[41/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[42/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[43/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[44/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[45/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[46/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[47/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[48/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/ethernet.c.o
+[49/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[50/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/can.c.o
+[51/73] Building C object nexus-sdk/io/CMakeFiles/nexus_io_native.dir/native/usb_device.c.o
+[52/73] Building C object nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.o
+[53/73] Building C object nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.o
+[54/73] Linking C static library nexus-sdk/lib/libnexus_os_wait.a
+[55/73] Building C object nexus-sdk/io/CMakeFiles/nexus_can_native_engine.dir/src/can_controller.c.o
+[56/73] Building C object nexus-sdk/os/CMakeFiles/nexus_os_native.dir/native/native.c.o
+[57/73] Building C object nexus-sdk/components/CMakeFiles/nexus_bmp280.dir/bmp280/src/bmp280.c.o
+[58/73] Building C object nexus-sdk/components/CMakeFiles/nexus_log.dir/log/src/log.c.o
+[59/73] Building C object CMakeFiles/parent_plain.dir/parent.c.o
+[60/73] Building C object CMakeFiles/installed_c.dir/main.c.o
+[61/73] Building C object nexus-sdk/io/CMakeFiles/nexus_eth_native_engine.dir/src/eth_mac.c.o
+[62/73] Building CXX object CMakeFiles/installed_cpp.dir/main.cpp.o
+[63/73] Building C object nexus-sdk/components/CMakeFiles/nexus_storage.dir/storage/src/storage.c.o
+[64/73] Linking C static library nexus-sdk/lib/libnexus_os_native.a
+[65/73] Building C object nexus-sdk/io/CMakeFiles/nexus_usb_native_engine.dir/src/usb_device_controller.c.o
+[66/73] Linking C static library nexus-sdk/lib/libnexus_log.a
+[67/73] Linking C static library nexus-sdk/lib/libnexus_bmp280.a
+[68/73] Linking C static library nexus-sdk/lib/libnexus_storage.a
+[69/73] Linking C static library nexus-sdk/lib/libnexus_io_native.a
+[70/73] Linking C static library nexus-sdk/lib/libnexus_platform.a
+[71/73] Linking C executable parent_plain
+[72/73] Linking CXX executable bin/installed_cpp
+[73/73] Linking C executable bin/installed_c

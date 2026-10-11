@@ -1,0 +1,77 @@
+"""Integrate reviewed SDK secondary tuples after actual configuration RED."""
+import json
+from pathlib import Path
+
+ROOT = Path("/workspace/nexus")
+
+for family, prefix in (("stm32f407", "stm32"), ("gd32f470", "gd32")):
+    package = ROOT / "tools/configure/providers" / family
+    path = package / "emission.py"
+    text = path.read_text().replace(
+        "from ... import can, usb_device, ethernet, timer_advanced",
+        "from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers")
+    text = text.replace("    import timer_advanced\n", "    import timer_advanced\n    import secondary_controllers\n")
+    for function in ("state_declarations", "start_resources", "stop_system"):
+        needle = f'    source.extend(timer_advanced.{function}(result, "{prefix}"))'
+        text = text.replace(needle, needle + f'\n    source.extend(secondary_controllers.{function}(result, "{prefix}"))')
+    path.write_text(text)
+    path = package / "__init__.py"
+    text = path.read_text()
+    if prefix == "stm32":
+        old = "('I2C1', 'dma-messages'): ('DMA1:stream0:channel1', 'DMA1:stream6:channel1')})"
+        new = """('I2C1', 'dma-messages'): ('DMA1:stream0:channel1', 'DMA1:stream6:channel1'),
+ ('USART2', 'dma-tx'): ('DMA1:stream6:channel4',),
+ ('SPI2', 'dma'): ('DMA1:stream4:channel0', 'DMA1:stream3:channel0'),
+ ('I2C2', 'dma-messages'): ('DMA1:stream2:channel7', 'DMA1:stream7:channel7')})"""
+    else:
+        old = "('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1')})"
+        new = """('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1'),
+ ('USART1', 'dma-tx'): ('DMA0:stream6:channel4',),
+ ('SPI0', 'dma-full-duplex'): ('DMA1:stream5:channel3', 'DMA1:stream2:channel3'),
+ ('I2C1', 'dma-messages'): ('DMA0:stream2:channel7', 'DMA0:stream7:channel7')})"""
+    if old not in text:
+        raise ValueError("Changed fixed DMA assertion baseline")
+    path.write_text(text.replace(old, new))
+    soc_path = ROOT / "soc" / family / "soc.json"
+    soc = json.loads(soc_path.read_text())
+    stm = prefix == "stm32"
+    controllers = ("USART2", "SPI2", "I2C2") if stm else ("USART1", "SPI0", "I2C1")
+    pads = (("PA2", "PA3"), ("PB13", "PB14", "PB15") if stm else ("PA5", "PA6", "PA7"), ("PB10", "PB11"))
+    modes = (("dma-tx",), ("dma",), ("irq-messages", "dma-messages")) if stm else (
+        ("irq-byte-event", "irq-blocks", "dma-tx"), ("short-poll", "dma-full-duplex"),
+        ("poll-messages", "irq-messages", "dma-messages"))
+    route_names = ("usart2-pa2-pa3", "spi2-pb13-pb14-pb15", "i2c2-pb10-pb11") if stm else (
+        "usart1-pa2-pa3", "spi0-pa5-pa7", "i2c1-pb10-pb11")
+    dma = (("DMA1:stream6:channel4",), ("DMA1:stream4:channel0", "DMA1:stream3:channel0"),
+           ("DMA1:stream2:channel7", "DMA1:stream7:channel7")) if stm else (
+        ("DMA0:stream6:channel4",), ("DMA1:stream5:channel3", "DMA1:stream2:channel3"),
+        ("DMA0:stream2:channel7", "DMA0:stream7:channel7"))
+    routes_path = ROOT / "soc" / family / "routes.json"
+    routes = json.loads(routes_path.read_text())
+    for kind, name, pins, supported, route_id, tuples in zip(
+            ("uart", "spi", "i2c"), controllers, pads, modes, route_names, dma):
+        irqs = [name + "_IRQn"] if kind == "uart" else ([] if kind == "spi" else [name + "_EV", name + "_ER"])
+        hz = (42000000 if stm else 50000000) if kind != "spi" else (42000000 if stm else 100000000)
+        item = {"kind": kind, "modes": list(supported), "irq": irqs, "pins": list(pins),
+                "clock_hz": hz, "max_hz": (1000000 if kind == "uart" else hz // 2 if kind == "spi" else 100000)}
+        if kind == "i2c":
+            item["irq_numbers"] = {name + "_EV": 33, name + "_ER": 34}
+        soc["controllers"][name] = item
+        functions = ("tx", "rx") if kind == "uart" else (("sck", "miso", "mosi") if kind == "spi" else ("scl", "sda"))
+        route = {"id": route_id, "variants": list(soc["variants"]), "controller": name,
+                 "kind": kind, "pins": [{"pin": pin, "function": function, "af": {"uart": 7, "spi": 5, "i2c": 4}[kind]}
+                                        for pin, function in zip(pins, functions)],
+                 "modes": list(supported),
+                 "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK" if stm else
+                           "GD32F470xx Datasheet Rev 2.2 AF tables and GD32F4xx User Manual Rev 3.3 Tables 10-2/10-3; maintained exact GD SDK"}
+        if kind == "i2c":
+            route["mode_dma"] = {"dma-messages": list(tuples)}
+        else:
+            route["dma"] = list(tuples)
+        index = next((index for index, old_route in enumerate(routes["routes"]) if old_route["id"] == route_id), None)
+        if index is None:
+            routes["routes"].append(route)
+        else:
+            routes["routes"][index] = route
+    soc_path.write_text(json.dumps(soc, indent=2) + "\n")
+    routes_path.write_text(json.dumps(routes, indent=2) + "\n")

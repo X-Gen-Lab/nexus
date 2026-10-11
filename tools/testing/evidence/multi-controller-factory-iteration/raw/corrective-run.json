@@ -1,0 +1,10 @@
+[
+  {
+    "family": "stm32",
+    "returncode": 0
+  },
+  {
+    "family": "gd32",
+    "returncode": 0
+  }
+]

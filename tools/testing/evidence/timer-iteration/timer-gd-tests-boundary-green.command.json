@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-timer-iteration/gd-test",
+    "--gtest_output=xml:tools/testing/evidence/timer-iteration/gd-boundary-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:06:42.557260+00:00",
+  "ended_at": "2026-10-11T18:06:42.562140+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-gd-tests-boundary-green.log"
+}

@@ -337,13 +337,21 @@ jobs:
       # Probe/serial execution and physical timing remain separate HIL evidence.
 
   controller-routes:
-    name: Advanced controller software fixtures (${{ matrix.family }})
+    name: Provider assembly audits (${{ matrix.fixture }})
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        family: [stm32, gd32]
+        fixture:
+          - stm32_assembly
+          - gd32_assembly
+          - can_assembly
+          - usb_assembly
+          - ethernet_assembly
+          - timer_assembly
+          - g474_assembly
+          - multi_controller_assembly
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -353,31 +361,28 @@ jobs:
         with:
           preset: native-debug
           arm: 'true'
-      - name: Link each explicitly marked software board and peripheral mode
+      - name: Link and audit each authored software assembly
         env:
-          FAMILY: ${{ matrix.family }}
+          FIXTURE: ${{ matrix.fixture }}
         run: |
-          fixture="tests/contracts/${FAMILY}_assembly"
-          count=0
+          fixture="tests/contracts/$FIXTURE"
+          arguments=()
           for assembly in "$fixture"/*.toml; do
-            name="$(basename "$assembly" .toml)"
-            output="build/controller-routes/$FAMILY/$name"
-            .venv/bin/cmake -S "$fixture" -B "$output" -G Ninja \
-              -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/cmake/toolchains/arm-gcc.cmake" \
-              -DNEXUS_SOURCE_ROOT="$GITHUB_WORKSPACE" \
-              -DNEXUS_ASSEMBLY_FILE="$GITHUB_WORKSPACE/$assembly"
-            .venv/bin/cmake --build "$output" --parallel 4
-            count=$((count + 1))
+            arguments+=(--fixture "$assembly")
           done
-          test "$count" -gt 0
+          .venv/bin/python scripts/ci/provider_assemblies.py \
+            --root "$GITHUB_WORKSPACE" \
+            --compiler arm-none-eabi-gcc \
+            --output "build/controller-routes/$FIXTURE" \
+            --parallel 4 "${arguments[@]}"
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
         with:
-          job: routes-${{ matrix.family }}
+          job: routes-${{ matrix.fixture }}
           result: ${{ job.status }}
           expected-commit: ${{ github.sha }}
-          output: build/job-identities/routes-${{ matrix.family }}
+          output: build/job-identities/routes-${{ matrix.fixture }}
           require-dependencies: 'true'
           artifacts: |
             build/controller-routes/
@@ -389,10 +394,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: controller-software-${{ matrix.family }}
+          name: controller-software-${{ matrix.fixture }}
           path: |
             build/controller-routes/
-            build/job-identities/routes-${{ matrix.family }}/
+            build/job-identities/routes-${{ matrix.fixture }}/
           retention-days: 30
           include-hidden-files: true
           if-no-files-found: error

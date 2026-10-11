@@ -9,11 +9,20 @@
  */
 #include "nexus/os/threadx.h"
 #include "tx_api.h"
+#include "tx_initialize.h"
+#include "tx_thread.h"
+#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sched.h>
+#include <thread>
 namespace {
+std::atomic<unsigned> mutex_calls;
+unsigned cold_observer_calls;
+ULONG cold_observer_state;
+ULONG cold_observer_flags;
+TX_THREAD* cold_observer_current;
 TX_THREAD runner;
 alignas(8) unsigned char stack[8192];
 void execute(ULONG) {
@@ -24,11 +33,75 @@ TEST(ThreadXOfficial, ReallyRunsKernelThread) {
     EXPECT_EQ(tx_thread_sleep(1), TX_SUCCESS);
     EXPECT_GE(tx_time_get(), 1U);
 }
+TEST(ThreadXOfficial, AsynchronousTicksPreserveTaskSignalPosture) {
+    sigset_t before{}, after{};
+    ASSERT_EQ(pthread_sigmask(SIG_SETMASK, nullptr, &before), 0);
+    const auto until = nx_deadline_after(nx_time_now_us(), 10000);
+    /* Keep this actual kernel task runnable across asynchronous timer ticks.
+     * Read the host monotonic clock without taking a kernel scheduler lock. */
+    while (nx_time_now_us() < until) {
+    }
+    ASSERT_EQ(pthread_sigmask(SIG_SETMASK, nullptr, &after), 0);
+    EXPECT_EQ(sigismember(&before, SIGUSR1), 0);
+    EXPECT_EQ(sigismember(&after, SIGUSR1), 0);
+    for (int signal = 1; signal < NSIG; ++signal) {
+        SCOPED_TRACE(signal);
+        EXPECT_EQ(sigismember(&after, signal), sigismember(&before, signal));
+    }
+}
+TEST(ThreadXOfficial, ContextObserversPreserveColdAndCriticalLockPosture) {
+    EXPECT_EQ(cold_observer_calls, 0U);
+    EXPECT_EQ(cold_observer_state, TX_INITIALIZE_IN_PROGRESS);
+    EXPECT_EQ(cold_observer_flags, TX_INITIALIZE_IN_PROGRESS);
+    EXPECT_EQ(cold_observer_current, nullptr);
+    const auto previous = tx_interrupt_control(TX_INT_DISABLE);
+    const auto depth = tx_linux_mutex_recursive_count;
+    const auto calls = mutex_calls.load(std::memory_order_relaxed);
+    const auto state = TX_THREAD_GET_SYSTEM_STATE();
+    TX_THREAD* current;
+    TX_THREAD_GET_CURRENT(current)
+    const auto preempt = _tx_thread_preempt_disable;
+    ULONG flags;
+    TX_THREAD_SYSTEM_RETURN_CHECK(flags)
+    const auto observed_depth = tx_linux_mutex_recursive_count;
+    const auto observed_calls = mutex_calls.load(std::memory_order_relaxed);
+    tx_interrupt_control(previous);
+    EXPECT_EQ(state, 0U);
+    EXPECT_EQ(current, &runner);
+    EXPECT_EQ(flags, state | preempt);
+    EXPECT_EQ(observed_depth, depth);
+    EXPECT_EQ(observed_calls - calls, 3U);
+}
 TEST(ThreadXAdapter, LatchInitializesAndDestroys) {
     nx_threadx_notify_t notify{};
     ASSERT_EQ(nx_threadx_notify_init(&notify), NX_SUCCESS);
     EXPECT_NE(nx_threadx_notify_port(&notify).wake, nullptr);
     EXPECT_EQ(nx_threadx_notify_destroy(&notify), NX_SUCCESS);
+}
+TEST(ThreadXAdapter, ForeignPthreadCannotBorrowCurrentKernelTask) {
+    nx_threadx_notify_t notify{};
+    nx_result_t result = NX_SUCCESS;
+    std::thread foreign([&] { result = nx_threadx_notify_init(&notify); });
+    foreign.join();
+    EXPECT_EQ(result, NX_ERROR_CONTEXT);
+    if (notify.live) {
+        EXPECT_EQ(nx_threadx_notify_destroy(&notify), NX_SUCCESS);
+    }
+    EXPECT_FALSE(notify.live);
+}
+TEST(ThreadXAdapter, ActualPortInterruptMaskRejectsWithoutChangingDepth) {
+    nx_threadx_notify_t notify{};
+    const auto previous = tx_interrupt_control(TX_INT_DISABLE);
+    const auto before = tx_linux_mutex_recursive_count;
+    const auto result = nx_threadx_notify_init(&notify);
+    const auto after = tx_linux_mutex_recursive_count;
+    tx_interrupt_control(previous);
+    EXPECT_EQ(result, NX_ERROR_CONTEXT);
+    EXPECT_EQ(after, before);
+    if (notify.live) {
+        EXPECT_EQ(nx_threadx_notify_destroy(&notify), NX_SUCCESS);
+    }
+    EXPECT_FALSE(notify.live);
 }
 TEST(ThreadXAdapter, OddByteItemsHaveExactFIFOAndNoOutputOnTimeout) {
     nx_threadx_queue_t queue{};
@@ -133,6 +206,8 @@ TEST(ThreadXTasks, InvalidStackAndPriorityHaveNoLiveObjects) {
     EXPECT_EQ(calls, 0U);
 }
 nx_result_t bootstrap_start, bootstrap_discard, before_entry;
+nx_result_t foreign_bootstrap;
+bool foreign_bootstrap_live;
 unsigned bootstrap_calls;
 nx_threadx_task_t bootstrap_task{};
 alignas(8) unsigned char bootstrap_stack[1024];
@@ -143,9 +218,30 @@ TEST(ThreadXTasks, PrestartDiscardIsProvenActualKernelBootstrap) {
     EXPECT_EQ(bootstrap_calls, 0U);
     EXPECT_FALSE(bootstrap_task.live);
 }
+TEST(ThreadXTasks, ForeignPthreadCannotBorrowBootstrapCallback) {
+    EXPECT_EQ(foreign_bootstrap, NX_ERROR_CONTEXT);
+    EXPECT_FALSE(foreign_bootstrap_live);
+}
 
 } /* namespace */
+extern "C" int __real_pthread_mutex_timedlock(pthread_mutex_t*,
+                                              const struct timespec*);
+extern "C" int __wrap_pthread_mutex_timedlock(pthread_mutex_t* mutex,
+                                              const struct timespec* until) {
+    mutex_calls.fetch_add(1, std::memory_order_relaxed);
+    return __real_pthread_mutex_timedlock(mutex, until);
+}
 void startup(void*) {
+    nx_threadx_notify_t notification{};
+    std::thread foreign([&] {
+        foreign_bootstrap = nx_threadx_notify_init(&notification);
+        foreign_bootstrap_live = notification.live;
+    });
+    foreign.join();
+    if (notification.live &&
+        nx_threadx_notify_destroy(&notification) != NX_SUCCESS) {
+        std::abort();
+    }
     bootstrap_start = nx_threadx_task_start(
         &bootstrap_task, "prestart", bootstrap_stack, sizeof bootstrap_stack, 8,
         increment, &bootstrap_calls);
@@ -159,6 +255,12 @@ void startup(void*) {
 }
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
+    const auto cold_before = mutex_calls.load(std::memory_order_relaxed);
+    cold_observer_state = TX_THREAD_GET_SYSTEM_STATE();
+    TX_THREAD_SYSTEM_RETURN_CHECK(cold_observer_flags)
+    TX_THREAD_GET_CURRENT(cold_observer_current)
+    cold_observer_calls =
+        mutex_calls.load(std::memory_order_relaxed) - cold_before;
     before_entry = nx_threadx_task_discard_before_scheduler(&bootstrap_task);
     cpu_set_t allowed;
     if (sched_getaffinity(0, sizeof allowed, &allowed) != 0)

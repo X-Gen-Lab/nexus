@@ -1,0 +1,10 @@
+Running main() from gmock_main.cc
+CanSoc.
+  ActualSdkClockModeTimingAndVectorsMatchTheMechanism
+  MailboxPackingAndSdkCompletionProveActualWireSuccess
+  UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion
+  SecondControllerDependsOnPrimaryClockWithoutResettingPeer
+  FifoMailboxDlcAndReleaseUseExactSdkOffsets
+  FailedExitAcknowledgementRetainsDomainResponsibility
+  FalseCpuPriorityFactsRejectBeforeReenablingHardware
+  ForeignPrimaryFilterDomainRejectsWithoutControllerEffects

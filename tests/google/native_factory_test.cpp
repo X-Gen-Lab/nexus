@@ -52,6 +52,38 @@ TEST_F(NativeFactory, NominalGettersPreserveIdentityWithoutStartingDevices) {
         NX_ERROR_INVALID);
 }
 
+TEST_F(NativeFactory, ColdI2CChildrenKeepPureControllerAndAddressIdentity) {
+    const nx_i2c_port_t* ports[] = {nx_factory_i2c(NX_I2C_ID_BUS_I2C_A),
+                                    nx_factory_i2c(NX_I2C_ID_BUS_I2C_B)};
+    const nx_i2c_endpoint_t* children[] = {
+        nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_I2C_A),
+        nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_I2C_B),
+        nx_factory_i2c_device(NX_I2C_DEVICE_ID_SENSOR_I2C_C)};
+    const unsigned controller[] = {0U, 0U, 1U};
+    const uint8_t address[] = {80U, 81U, 80U};
+    const nx_time_us_t before = nx_time_now_us();
+    for (unsigned i = 0U; i < 3U; ++i) {
+        ASSERT_NE(nullptr, children[i]);
+        const auto* child = static_cast<const nx_native_i2c_endpoint_state_t*>(
+            children[i]->context);
+        ASSERT_NE(nullptr, child);
+        EXPECT_EQ(ports[controller[i]]->context, child->port);
+        EXPECT_EQ(address[i], child->address);
+        EXPECT_TRUE(nx_i2c_endpoint_on_port(children[i], ports[controller[i]]));
+        EXPECT_FALSE(
+            nx_i2c_endpoint_on_port(children[i], ports[1U - controller[i]]));
+    }
+    for (const auto* port : ports) {
+        ASSERT_NE(nullptr, port);
+        const auto* state =
+            static_cast<const nx_native_i2c_state_t*>(port->context);
+        EXPECT_FALSE(state->opened);
+        EXPECT_FALSE(state->active);
+        EXPECT_EQ(NX_SUCCESS, state->fault);
+    }
+    EXPECT_EQ(before, nx_time_now_us());
+}
+
 TEST_F(NativeFactory, SelectedCapabilitiesRemainReadonlyAndModelScoped) {
     const nx_factory_io_capability_t* gpio =
         nx_factory_gpio_capability(NX_GPIO_ID_LED_A);

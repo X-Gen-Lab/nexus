@@ -314,7 +314,7 @@ model_bytes=128
         for text in ("nx_gd32_spi_dma_state_t", "nx_gd32_spi_dma_endpoint_state_t",
                      "&nx_gd32_spi_dma_endpoint_ops", "nx_gd32_spi_dma_initialize",
                      "void DMA1_Channel3_IRQHandler(void)", "void DMA1_Channel4_IRQHandler(void)",
-                     "nx_spi_port_stop(nx_binding_bus_spi_a)"):
+                     "stop_bus_spi_a()", "nx_spi_port_stop(&s_nx_face_bus_spi_a)"):
             self.assertIn(text, generated)
         claims = {claim["key"] for claim in gate.resolve_ir(self.assembly)["claims"]}
         self.assertTrue({"dma:DMA1:stream3", "dma:DMA1:stream4", "dma:DMA1:stream7"} <= claims)

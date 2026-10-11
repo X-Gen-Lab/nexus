@@ -88,7 +88,8 @@ def _positive_number(value, label: str) -> None:
             and math.isfinite(value), "positive bounded " + label + " required")
 
 
-def _context(identity: dict, admission_digest: str, budgets: dict) -> dict:
+def _context(identity: dict, admission_digest: str, budgets: dict,
+             admission: dict) -> dict:
     """Bind load and acquisition conditions separately from statistics."""
     context = load_json(verify_file_identity(identity))
     fields(context, {"schema_version", "kind", "admission_sha256", "workload",
@@ -99,7 +100,8 @@ def _context(identity: dict, admission_digest: str, budgets: dict) -> dict:
             context["kind"] == "hil_acquisition_context" and
             context["admission_sha256"] == admission_digest,
             "acquisition context is not bound to admission")
-    verify_file_identity(context["workload"])
+    from tools.hil.workloads import admitted_workload
+    admitted_workload(context["workload"], admission)
     require(type(context["cpu_clock_hz"]) is int and
             0 < context["cpu_clock_hz"] <= 2 ** 32 - 1,
             "observed CPU clock required")
@@ -227,7 +229,8 @@ def validate_measurements(raw: dict, admission: dict, *,
     admission_digest = canonical_digest(admission)
     require(raw["admission_sha256"] == admission_digest,
             "measurement record is not bound to admission")
-    context = _context(raw["context"], admission_digest, admission["budgets"])
+    context = _context(raw["context"], admission_digest, admission["budgets"],
+                       admission)
     traces = raw["traces"]
     require(isinstance(traces, list) and 0 < len(traces) <= MAX_TRACES,
             "measurement trace enumeration empty or excessive")

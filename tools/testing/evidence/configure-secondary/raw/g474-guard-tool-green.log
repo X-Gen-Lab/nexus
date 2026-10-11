@@ -1,0 +1,17 @@
+test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call (tools.configure.test_g474.G474ConfigurationTests.test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call) ... ok
+test_fixed_lpuart_rejects_events_blocks_dma_and_priority_drift (tools.configure.test_g474.G474ConfigurationTests.test_fixed_lpuart_rejects_events_blocks_dma_and_priority_drift) ... ok
+test_freertos_policy_and_exact_clock_rejection (tools.configure.test_g474.G474ConfigurationTests.test_freertos_policy_and_exact_clock_rejection) ... ok
+test_g4_source_dependency_uses_g4_checkout_identity (tools.configure.test_g474.G474ConfigurationTests.test_g4_source_dependency_uses_g4_checkout_identity) ... ok
+test_single_ram_alias_exact_irqs_and_initial_provider_scope (tools.configure.test_g474.G474ConfigurationTests.test_single_ram_alias_exact_irqs_and_initial_provider_scope) ... ok
+test_both_authored_backends_resolve_the_same_physical_controller_routes (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_both_authored_backends_resolve_the_same_physical_controller_routes) ... ok
+test_maintained_constructor_model_uses_the_formal_typed_assembly (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_maintained_constructor_model_uses_the_formal_typed_assembly) ... ok
+test_secondary_receive_dma_modes_do_not_gain_unimplemented_support (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_receive_dma_modes_do_not_gain_unimplemented_support) ... ok
+test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) ... ok
+test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) ... ok
+test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) ... ok
+test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.698s
+
+OK

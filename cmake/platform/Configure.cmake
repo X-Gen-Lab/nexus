@@ -18,6 +18,8 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/usb_device.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ethernet.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/timer_advanced.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/secondary_controllers.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/threadx.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/lowpower.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
@@ -36,6 +38,9 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/__init__.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/bindings.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/emission.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/__init__.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/bindings.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/emission.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/emission.py")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"

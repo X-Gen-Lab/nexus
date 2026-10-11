@@ -202,6 +202,35 @@ class STM32G4LockTests(unittest.TestCase):
         result = subprocess.run(command, capture_output=True, text=True, timeout=30)
         self.assertNotEqual(result.returncode, 0)
 
+    def test_cli_dangling_sdk_manifest_rejects_despite_valid_git(self):
+        sdk = self.folder / "prefix/share/nexus/src"
+        destination = sdk / "vendors/st/cmsis_device_g4"
+        destination.parent.mkdir(parents=True)
+        self.source.rename(destination)
+        self.source = destination
+        self.lock_path = sdk / "dependencies/stm32g4.lock.json"
+        self.lock_path.parent.mkdir()
+        self.write_lock()
+        shutil.copyfile(ROOT / "dependencies/threadx.lock.json",
+                        sdk / "dependencies/threadx.lock.json")
+        checker = sdk / "cmake/package/package_source_sdk.py"
+        checker.parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / "cmake/package/package_source_sdk.py", checker)
+        command = [sys.executable, "-B", str(ROOT / "tools/maintenance/stm32g4_lock.py"),
+                   "--source", str(self.source), "--lock", str(self.lock_path)]
+        baseline = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        self.assertEqual(baseline.returncode, 0, baseline.stdout + baseline.stderr)
+        self.assertEqual(json.loads(baseline.stdout)["source_kind"], "git_checkout")
+        manifest = sdk / ".nexus-source-sdk.json"
+        manifest.symlink_to(sdk / "missing-manifest.json")
+        self.assertTrue(manifest.is_symlink())
+        self.assertFalse(manifest.exists())
+        rejected = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        self.assertNotEqual(rejected.returncode, 0,
+                            "Dangling SDK manifest accepted as Git checkout: " + rejected.stdout)
+        self.assertIn("cannot follow symlinks", rejected.stderr)
+        self.assertEqual(self.git("status", "--porcelain"), "")
+
 
 if __name__ == "__main__":
     unittest.main()

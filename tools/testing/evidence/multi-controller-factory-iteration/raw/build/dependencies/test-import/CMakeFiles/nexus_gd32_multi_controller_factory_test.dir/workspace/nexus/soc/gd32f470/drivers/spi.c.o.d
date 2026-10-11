@@ -1,0 +1,57 @@
+test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/spi.c.o: \
+ /workspace/nexus/soc/gd32f470/drivers/spi.c /usr/include/stdc-predef.h \
+ /workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h \
+ /usr/lib/gcc/x86_64-linux-gnu/14/include/stdbool.h \
+ /usr/lib/gcc/x86_64-linux-gnu/14/include/stdint.h /usr/include/stdint.h \
+ /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+ /usr/include/features.h /usr/include/features-time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/bits/timesize.h \
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/long-double.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h \
+ /workspace/nexus/tests/contracts/gd32_model/core_cm4.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h \
+ /workspace/nexus/soc/gd32f470/private/gd32f4xx_libopt.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h \
+ /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h \
+ /workspace/nexus/soc/gd32f470/private/gd32f470_provider.h \
+ /workspace/nexus/io/include/nexus/io/adc.h \
+ /workspace/nexus/core/include/nexus/core/time.h \
+ /workspace/nexus/core/include/nexus/core/status.h \
+ /usr/lib/gcc/x86_64-linux-gnu/14/include/stddef.h \
+ /workspace/nexus/io/include/nexus/io/adc_observer.h \
+ /workspace/nexus/io/include/nexus/io/stream.h \
+ /workspace/nexus/io/include/nexus/io/wake.h \
+ /workspace/nexus/io/include/nexus/io/exti.h \
+ /workspace/nexus/io/include/nexus/io/flash.h \
+ /workspace/nexus/io/include/nexus/io/gpio.h \
+ /workspace/nexus/io/include/nexus/io/i2c.h \
+ /workspace/nexus/core/include/nexus/core/request.h \
+ /workspace/nexus/io/include/nexus/io/spi.h \
+ /workspace/nexus/io/include/nexus/io/timer.h \
+ /workspace/nexus/io/include/nexus/io/uart.h \
+ /workspace/nexus/io/include/nexus/io/watchdog.h \
+ /workspace/nexus/soc/gd32f470/private/system.h \
+ /workspace/nexus/arch/include/nexus/arch/arch.h

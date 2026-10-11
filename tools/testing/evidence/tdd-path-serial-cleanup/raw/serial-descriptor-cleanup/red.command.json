@@ -1,0 +1,15 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_hil_serial_echo.HilTraceDescriptorTests"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 1,
+  "sources": {
+    "tools/hil/serial_echo.py": "8d72d8b5ea8215256889d6dca9e6887e292ff511bbb7a04a8339003f2e7ba83a",
+    "tools/testing/test_hil_serial_echo.py": "b95bc337582740f413351d51805ff399e58b192c966c94b3f0a0fb2b51bd56fc"
+  }
+}

@@ -1,0 +1,972 @@
+{
+  "backend": "threadx",
+  "board": "stm32f407ve-sky-qingchun",
+  "board_bindings": {
+    "flash0": {
+      "controller": "FLASH",
+      "id": "flash0",
+      "route": "flash-internal"
+    },
+    "iwdg0": {
+      "controller": "IWDG",
+      "id": "iwdg0",
+      "route": "iwdg"
+    },
+    "led0": {
+      "controller": "GPIOB",
+      "id": "led0",
+      "initial": 0,
+      "mask": 4,
+      "route": "gpio-pb2"
+    },
+    "uart1": {
+      "controller": "USART1",
+      "id": "uart1",
+      "route": "usart1-pa9-pa10"
+    }
+  },
+  "can_controllers": [],
+  "can_domain": null,
+  "claims": [
+    {
+      "key": "controller:TIM2",
+      "mode": "reserved",
+      "owner": "soc-timebase",
+      "source": "stm32f407"
+    },
+    {
+      "key": "irq:TIM2",
+      "mode": "reserved",
+      "owner": "soc-timebase",
+      "source": "stm32f407"
+    },
+    {
+      "key": "pin:PA13",
+      "mode": "reserved",
+      "owner": "board-reserved",
+      "source": "stm32f407ve-sky-qingchun"
+    },
+    {
+      "key": "pin:PA14",
+      "mode": "reserved",
+      "owner": "board-reserved",
+      "source": "stm32f407ve-sky-qingchun"
+    },
+    {
+      "key": "irq:PendSV",
+      "mode": "kernel",
+      "owner": "threadx",
+      "source": "ThreadX cortex_m4/gnu"
+    },
+    {
+      "key": "irq:SysTick",
+      "mode": "kernel",
+      "owner": "threadx",
+      "source": "ThreadX cortex_m4/gnu"
+    }
+  ],
+  "clock": {
+    "apb1_hz": 42000000,
+    "apb2_hz": 84000000,
+    "core_hz": 168000000,
+    "hse_hz": 8000000
+  },
+  "clock_profile": "hse8-pll168",
+  "components": [],
+  "configuration_sha256": "b0fa3bf27b6a6211af2c2b1b1ea40f76f33685642e0e8fc204bcdd134d3b7370",
+  "controllers": [],
+  "cpu": {
+    "arch": "cortex-m4",
+    "dcache_line_bytes": 0,
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "float_abi": "hard",
+    "fpu": "fpv4-sp-d16",
+    "icache_line_bytes": 0,
+    "mpu_regions": 8,
+    "mpu_version": 7,
+    "mve": "none",
+    "sau": false,
+    "security": "single"
+  },
+  "cpu_profile": {
+    "arch": "cortex-m4",
+    "arch_macro": "__ARM_ARCH_7EM__",
+    "atomic_backend": "exclusive",
+    "backend": "threadx",
+    "compile_options": [
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "-mfpu=fpv4-sp-d16",
+      "-mfloat-abi=hard",
+      "-fshort-enums"
+    ],
+    "cpu": {
+      "arch": "cortex-m4",
+      "dcache_line_bytes": 0,
+      "dsp": true,
+      "dwt_cyccnt": true,
+      "float_abi": "hard",
+      "fpu": "fpv4-sp-d16",
+      "icache_line_bytes": 0,
+      "mpu_regions": 8,
+      "mpu_version": 7,
+      "mve": "none",
+      "sau": false,
+      "security": "single"
+    },
+    "definitions": {
+      "NEXUS_ARCH_DCACHE_LINE_BYTES": 0,
+      "NEXUS_ARCH_HAS_DWT_CYCCNT": 1,
+      "NEXUS_ARCH_HAS_SAU": 0,
+      "NEXUS_ARCH_ICACHE_LINE_BYTES": 0,
+      "NEXUS_ARCH_MPU_VERSION": 7,
+      "NEXUS_ARCH_SECURITY_STATE": 0,
+      "NEXUS_CPU_ATOMIC_BACKEND_IRQ": 0,
+      "NEXUS_CPU_EXTERNAL_IRQ_COUNT": 82,
+      "NEXUS_CPU_HAS_BASEPRI": 1,
+      "NEXUS_CPU_HAS_DSP": 1,
+      "NEXUS_CPU_HAS_FPU": 1,
+      "NEXUS_CPU_HAS_MVE": 0,
+      "NEXUS_CPU_MPU_REGIONS": 8,
+      "NEXUS_CPU_SECURE_ONLY": 0,
+      "NEXUS_IRQ_KERNEL_POLICY": 1
+    },
+    "enum_abi": "short-enums",
+    "float_abi": "hard",
+    "fpu": "fpv4-sp-d16",
+    "has_basepri": true,
+    "irq": {
+      "external_count": 82,
+      "kernel_port": "cortex_m4/gnu",
+      "mask_kind": "primask",
+      "maximum_priority": 15,
+      "priority_bits": 4,
+      "syscall_priority": 0
+    }
+  },
+  "devices": [],
+  "enum_abi": "short-enums",
+  "factory": {
+    "capabilities": false
+  },
+  "flash": {
+    "erase_blocks": [
+      16384,
+      16384,
+      16384,
+      16384,
+      65536,
+      131072,
+      131072,
+      131072
+    ],
+    "origin": 134217728,
+    "size": 524288
+  },
+  "inputs": [
+    {
+      "path": "external/assembly.toml",
+      "sha256": "f2948781a0b1996571513a17426ca38550e35b1c9b20196f28b85c96c1c71414"
+    },
+    {
+      "path": "boards/stm32f407ve_sky_qingchun/board.json",
+      "sha256": "1ac4d6d1d771803b8e7ff3fa5e79bb39e4e078b568845969213b30142b485f80"
+    },
+    {
+      "path": "dependencies/platform-compatibility.json",
+      "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae"
+    },
+    {
+      "path": "soc/stm32f407/routes.json",
+      "sha256": "2e222fbec8a95265651e62ef7b027f719c406a7b468e466048d5324e429bd1b2"
+    },
+    {
+      "path": "soc/stm32f407/soc.json",
+      "sha256": "5d5e651faac4186d9ea955cd40fdbefb7bce188046a0f7ca6afc3654c25a2139"
+    }
+  ],
+  "irq": {
+    "external_count": 82,
+    "kernel_port": "cortex_m4/gnu",
+    "mask_kind": "primask",
+    "maximum_priority": 15,
+    "priority_bits": 4,
+    "syscall_priority": 0
+  },
+  "kernel_profile": {
+    "backend": "threadx",
+    "definitions": {
+      "NEXUS_IRQ_KERNEL_POLICY": 1,
+      "NEXUS_OS_EXTERNAL_TICK": 0,
+      "NEXUS_OS_HOST_TICK": 0,
+      "NEXUS_OS_MAX_PRIORITIES": 32,
+      "NEXUS_OS_MIN_STACK_BYTES": 200,
+      "NEXUS_OS_STACK_ALIGNMENT_BYTES": 8,
+      "NEXUS_OS_SYSTICK_RELOAD": 167999,
+      "NEXUS_OS_TICK_HZ": 1000,
+      "NEXUS_THREADX_BASEPRI": 0,
+      "NEXUS_THREADX_TIMER_PROCESS_IN_ISR": 1
+    },
+    "interrupt_mask": "primask",
+    "kernel_policy": "primask",
+    "kernel_port": "cortex_m4/gnu",
+    "max_priorities": 32,
+    "min_stack_bytes": 200,
+    "profile": "static",
+    "stack_alignment_bytes": 8,
+    "syscall_priority": 0,
+    "tick_hz": 1000,
+    "tick_reload": 167999,
+    "tick_source": "systick",
+    "timer_process_in_isr": true
+  },
+  "layout": {
+    "erase_blocks": [
+      16384,
+      16384,
+      16384,
+      16384,
+      65536,
+      131072,
+      131072,
+      131072
+    ],
+    "origin": 134217728,
+    "size": 524288
+  },
+  "limitations": [
+    "Physical PCB revision and fitted options not inspected",
+    "SPI/I2C/PWM/ADC/EXTI external wiring not bound or physically qualified",
+    "Physical qualification not executed"
+  ],
+  "memory": [
+    {
+      "dma": true,
+      "id": "sram",
+      "linker": true,
+      "origin": 536870912,
+      "size": 131072
+    },
+    {
+      "dma": false,
+      "id": "ccm",
+      "linker": false,
+      "origin": 268435456,
+      "size": 65536
+    }
+  ],
+  "memory_budgets": {
+    "flash_load_bytes": 65536,
+    "libc_heap_bytes": 0,
+    "main_stack_bytes": 2048,
+    "static_ram_bytes": 32768
+  },
+  "optimization": "Os",
+  "package": "LQFP100",
+  "part": "STM32F407VET6",
+  "physical_pcb_revision": null,
+  "physical_qualified": false,
+  "platform_metadata": {
+    "configured_backends": [
+      "baremetal",
+      "native",
+      "freertos",
+      "threadx"
+    ],
+    "factory_abi_epoch": 1,
+    "kind": "nexus-platform-compatibility",
+    "schema_version": 1,
+    "schemas": {
+      "assembly_authoring": 2,
+      "assembly_projection": 1,
+      "board": 1,
+      "cpu_facts": 1,
+      "routes": 1,
+      "runtime_assembly": 1,
+      "runtime_resolved": 1,
+      "soc": 1,
+      "source_sdk_manifest": 1,
+      "typed_ir": 1
+    },
+    "semantic_version": "1.0.0",
+    "source_sdk": {
+      "binary_abi": "unsupported",
+      "delivery": "source_only",
+      "version_matching": "exact"
+    }
+  },
+  "routes": {
+    "adc1-ch0-pa0": {
+      "controller": "ADC1",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "id": "adc1-ch0-pa0",
+      "kind": "adc",
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      },
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA0"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "adc1-scan-pa0-pa1": {
+      "controller": "ADC1",
+      "dma": [
+        "DMA2:stream4:channel0"
+      ],
+      "id": "adc1-scan-pa0-pa1",
+      "kind": "adc",
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM3"
+        ],
+        "trigger-dma-continuous": [
+          "controller:TIM3"
+        ]
+      },
+      "modes": [
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA0"
+        },
+        {
+          "af": 0,
+          "function": "analog",
+          "pin": "PA1"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "can1-pa11-pa12": {
+      "controller": "CAN1",
+      "id": "can1-pa11-pa12",
+      "kind": "can",
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "af": 9,
+          "function": "can_rx",
+          "pin": "PA11"
+        },
+        {
+          "af": 9,
+          "function": "can_tx",
+          "pin": "PA12"
+        }
+      ],
+      "source": "STM32F407 datasheet alternate functions AF9; Qiming V3.1 CAN sample blobs 8731616cf0d5bf02917c76463c49e722b39eb415",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "can2-pb12-pb13": {
+      "controller": "CAN2",
+      "id": "can2-pb12-pb13",
+      "kind": "can",
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "af": 9,
+          "function": "can_rx",
+          "pin": "PB12"
+        },
+        {
+          "af": 9,
+          "function": "can_tx",
+          "pin": "PB13"
+        }
+      ],
+      "source": "STM32F407 datasheet alternate functions AF9; Qiming V3.1 CAN sample blobs ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "capture-pb6": {
+      "controller": "TIM4",
+      "id": "capture-pb6",
+      "kind": "timer_capture",
+      "modes": [
+        "edge-capture"
+      ],
+      "pins": [
+        {
+          "af": 2,
+          "function": "capture",
+          "pin": "PB6"
+        }
+      ],
+      "source": "STM32F407 DS8626 alternate-function table; RM0090 TIM1 complementary CH1/CH1N/BKIN and TIM4_CH1 silicon route only.",
+      "variants": [
+        "STM32F407ZGT6",
+        "STM32F407VET6"
+      ]
+    },
+    "complementary-pa8-pb12-pb13": {
+      "controller": "TIM1",
+      "id": "complementary-pa8-pb12-pb13",
+      "kind": "advanced_pwm",
+      "modes": [
+        "complementary-pwm"
+      ],
+      "pins": [
+        {
+          "af": 1,
+          "function": "output",
+          "pin": "PA8"
+        },
+        {
+          "af": 1,
+          "function": "complement",
+          "pin": "PB13"
+        },
+        {
+          "af": 1,
+          "function": "break",
+          "pin": "PB12"
+        }
+      ],
+      "source": "STM32F407 DS8626 alternate-function table; RM0090 TIM1 complementary CH1/CH1N/BKIN and TIM4_CH1 silicon route only.",
+      "variants": [
+        "STM32F407ZGT6",
+        "STM32F407VET6"
+      ]
+    },
+    "exti0-pa0": {
+      "controller": "EXTI0",
+      "id": "exti0-pa0",
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "input",
+          "pin": "PA0"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "exti5-pa5": {
+      "controller": "EXTI5",
+      "id": "exti5-pa5",
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "input",
+          "pin": "PA5"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "exti6-pa6": {
+      "controller": "EXTI6",
+      "id": "exti6-pa6",
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "input",
+          "pin": "PA6"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "flash-internal": {
+      "controller": "FLASH",
+      "id": "flash-internal",
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "pins": [],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "gpio-pb2": {
+      "controller": "GPIOB",
+      "id": "gpio-pb2",
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PB2"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "gpio-pe3": {
+      "controller": "GPIOE",
+      "id": "gpio-pe3",
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PE3"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "gpio-pe4": {
+      "controller": "GPIOE",
+      "id": "gpio-pe4",
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PE4"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "gpio-pg9": {
+      "controller": "GPIOG",
+      "id": "gpio-pg9",
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "pins": [
+        {
+          "af": 0,
+          "function": "output",
+          "pin": "PG9"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407ZGT6"
+      ]
+    },
+    "i2c1-pb6-pb7": {
+      "controller": "I2C1",
+      "id": "i2c1-pb6-pb7",
+      "kind": "i2c",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA1:stream0:channel1",
+          "DMA1:stream6:channel1"
+        ]
+      },
+      "modes": [
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
+      ],
+      "pins": [
+        {
+          "af": 4,
+          "function": "scl",
+          "pin": "PB6"
+        },
+        {
+          "af": 4,
+          "function": "sda",
+          "pin": "PB7"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "i2c2-pb10-pb11": {
+      "controller": "I2C2",
+      "id": "i2c2-pb10-pb11",
+      "kind": "i2c",
+      "mode_dma": {
+        "dma-messages": [
+          "DMA1:stream2:channel7",
+          "DMA1:stream7:channel7"
+        ]
+      },
+      "modes": [
+        "irq-messages",
+        "dma-messages"
+      ],
+      "pins": [
+        {
+          "af": 4,
+          "function": "scl",
+          "pin": "PB10"
+        },
+        {
+          "af": 4,
+          "function": "sda",
+          "pin": "PB11"
+        }
+      ],
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "iwdg": {
+      "controller": "IWDG",
+      "id": "iwdg",
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "pins": [],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "rmii-a-c-g": {
+      "controller": "ETH",
+      "id": "rmii-a-c-g",
+      "kind": "eth",
+      "modes": [
+        "raw-rmii"
+      ],
+      "pins": [
+        {
+          "af": 11,
+          "function": "refclk",
+          "pin": "PA1"
+        },
+        {
+          "af": 11,
+          "function": "mdio",
+          "pin": "PA2"
+        },
+        {
+          "af": 11,
+          "function": "crs_dv",
+          "pin": "PA7"
+        },
+        {
+          "af": 11,
+          "function": "mdc",
+          "pin": "PC1"
+        },
+        {
+          "af": 11,
+          "function": "rxd0",
+          "pin": "PC4"
+        },
+        {
+          "af": 11,
+          "function": "rxd1",
+          "pin": "PC5"
+        },
+        {
+          "af": 11,
+          "function": "txen",
+          "pin": "PG11"
+        },
+        {
+          "af": 11,
+          "function": "txd0",
+          "pin": "PG13"
+        },
+        {
+          "af": 11,
+          "function": "txd1",
+          "pin": "PG14"
+        }
+      ],
+      "source": "RMII AF11 silicon pad mux only. PHY, reset, external 50MHz clock and Board electric route remain external, unqualified. STM32F407 DS8626 AF11 / RM0090 Rev21",
+      "variants": [
+        "STM32F407ZGT6"
+      ]
+    },
+    "spi1-pa5-pa6-pa7": {
+      "controller": "SPI1",
+      "dma": [
+        "DMA2:stream3:channel3",
+        "DMA2:stream0:channel3"
+      ],
+      "id": "spi1-pa5-pa6-pa7",
+      "kind": "spi",
+      "modes": [
+        "short-poll",
+        "dma"
+      ],
+      "pins": [
+        {
+          "af": 5,
+          "function": "sck",
+          "pin": "PA5"
+        },
+        {
+          "af": 5,
+          "function": "miso",
+          "pin": "PA6"
+        },
+        {
+          "af": 5,
+          "function": "mosi",
+          "pin": "PA7"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "spi2-pb13-pb14-pb15": {
+      "controller": "SPI2",
+      "dma": [
+        "DMA1:stream4:channel0",
+        "DMA1:stream3:channel0"
+      ],
+      "id": "spi2-pb13-pb14-pb15",
+      "kind": "spi",
+      "modes": [
+        "dma"
+      ],
+      "pins": [
+        {
+          "af": 5,
+          "function": "sck",
+          "pin": "PB13"
+        },
+        {
+          "af": 5,
+          "function": "miso",
+          "pin": "PB14"
+        },
+        {
+          "af": 5,
+          "function": "mosi",
+          "pin": "PB15"
+        }
+      ],
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "tim3-ch1-pa6": {
+      "controller": "TIM3",
+      "id": "tim3-ch1-pa6",
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "pins": [
+        {
+          "af": 2,
+          "function": "ch1",
+          "pin": "PA6"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "usart1-pa9-pa10": {
+      "controller": "USART1",
+      "dma": [
+        "DMA2:stream7:channel4"
+      ],
+      "id": "usart1-pa9-pa10",
+      "kind": "uart",
+      "mode_dma": {
+        "dma-duplex": [
+          "DMA2:stream7:channel4",
+          "DMA2:stream2:channel4"
+        ],
+        "dma-duplex-continuous": [
+          "DMA2:stream7:channel4",
+          "DMA2:stream2:channel4"
+        ],
+        "rx-dma-continuous": [
+          "DMA2:stream2:channel4"
+        ],
+        "rx-dma-idle": [
+          "DMA2:stream2:channel4"
+        ]
+      },
+      "modes": [
+        "irq-byte-event",
+        "dma-tx",
+        "irq-blocks",
+        "rx-dma-idle",
+        "dma-duplex",
+        "rx-dma-continuous",
+        "dma-duplex-continuous"
+      ],
+      "pins": [
+        {
+          "af": 7,
+          "function": "tx",
+          "pin": "PA9"
+        },
+        {
+          "af": 7,
+          "function": "rx",
+          "pin": "PA10"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "usart2-pa2-pa3": {
+      "controller": "USART2",
+      "dma": [
+        "DMA1:stream6:channel4"
+      ],
+      "id": "usart2-pa2-pa3",
+      "kind": "uart",
+      "modes": [
+        "dma-tx"
+      ],
+      "pins": [
+        {
+          "af": 7,
+          "function": "tx",
+          "pin": "PA2"
+        },
+        {
+          "af": 7,
+          "function": "rx",
+          "pin": "PA3"
+        }
+      ],
+      "source": "STM32 DS8626 alternate-function tables and RM0090 Table 43 DMA mapping; maintained official CMSIS device SDK",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    },
+    "usbfs-pa11-pa12": {
+      "controller": "OTG_FS",
+      "id": "usbfs-pa11-pa12",
+      "kind": "usb_device",
+      "modes": [
+        "device-fs"
+      ],
+      "pins": [
+        {
+          "af": 10,
+          "function": "dm",
+          "pin": "PA11"
+        },
+        {
+          "af": 10,
+          "function": "dp",
+          "pin": "PA12"
+        }
+      ],
+      "source": "STM32F405xx/STM32F407xx DS8626 AF10; RM0090 Rev21 OTG FS internal PHY. Pad route only, no PCB connector/electrical claim.",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ]
+    }
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "source_dependencies": [
+    {
+      "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+      "path": "vendors/arm/CMSIS_5"
+    },
+    {
+      "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1",
+      "path": "vendors/st/cmsis_device_f4"
+    },
+    {
+      "commit": "93387b0a60382a29579bbad5045c68328e3751df",
+      "path": "ext/threadx"
+    }
+  ]
+}

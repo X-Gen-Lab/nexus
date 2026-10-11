@@ -1,0 +1,38 @@
+FFF
+======================================================================
+FAIL: test_uncatalogued_file_symlink_rejected_before_subprocess (tools.testing.test_tdd_gate.TDDBinaryPlanBoundaryTests.test_uncatalogued_file_symlink_rejected_before_subprocess)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_gate.py", line 49, in test_uncatalogued_file_symlink_rejected_before_subprocess
+    self.reject_additional_binary(alias)
+  File "/workspace/nexus/tools/testing/test_tdd_gate.py", line 29, in reject_additional_binary
+    self.assertEqual(status, 1, output)
+AssertionError: 0 != 1 : Executed 2 GoogleTest cases; evidence: /tmp/tmpkssnpyfi/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_uncatalogued_parent_escape_rejected_before_subprocess (tools.testing.test_tdd_gate.TDDBinaryPlanBoundaryTests.test_uncatalogued_parent_escape_rejected_before_subprocess)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_gate.py", line 42, in test_uncatalogued_parent_escape_rejected_before_subprocess
+    self.reject_additional_binary(escaped)
+  File "/workspace/nexus/tools/testing/test_tdd_gate.py", line 29, in reject_additional_binary
+    self.assertEqual(status, 1, output)
+AssertionError: 0 != 1 : Executed 2 GoogleTest cases; evidence: /tmp/tmpkqitqzr_/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_uncatalogued_parent_symlink_rejected_before_subprocess (tools.testing.test_tdd_gate.TDDBinaryPlanBoundaryTests.test_uncatalogued_parent_symlink_rejected_before_subprocess)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_gate.py", line 58, in test_uncatalogued_parent_symlink_rejected_before_subprocess
+    self.reject_additional_binary(alias)
+  File "/workspace/nexus/tools/testing/test_tdd_gate.py", line 29, in reject_additional_binary
+    self.assertEqual(status, 1, output)
+AssertionError: 0 != 1 : Executed 2 GoogleTest cases; evidence: /tmp/tmp78_isioz/build/native-debug/tdd/execution.json
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.007s
+
+FAILED (failures=3)

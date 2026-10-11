@@ -1,0 +1,6 @@
+CMake Error at /workspace/nexus/cmake/platform/Runtime.cmake:20 (message):
+  One build may contain only one resolved Nexus assembly
+Call Stack (most recent call first):
+  CMakeLists.txt:12 (nexus_add_runtime)
+
+
