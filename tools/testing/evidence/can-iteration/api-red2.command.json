@@ -1,0 +1,10 @@
+{
+  "command": [
+    ".venv/bin/cmake",
+    "--build",
+    "/workspace/nexus-industrial-design/can-tests/build"
+  ],
+  "exit_code": 2,
+  "expected_failure": "New CAN API/provider undefined symbols; initial attempt had a corrected stale native-library path",
+  "stage": "RED"
+}

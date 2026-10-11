@@ -175,12 +175,51 @@ class AdcOptions:
 
 
 @dataclass(frozen=True)
+class CanTimingOptions:
+    prescaler: int
+    segment1: int
+    segment2: int
+    sjw: int
+
+
+@dataclass(frozen=True)
+class CanOptions:
+    operation: str
+    event_capacity: int
+    bitrate: int
+    timing: CanTimingOptions
+    irq: IrqOptions
+    drain_timeout_us: int
+    poll_limit: int
+    fifo_order: bool
+
+
+@dataclass(frozen=True)
+class CanFilterIR:
+    controller: str
+    controller_index: int
+    bank: int
+    id: int
+    mask: int
+    format: str
+    fifo: int
+    remote: bool
+    match_remote: bool
+
+
+@dataclass(frozen=True)
+class CanDomainIR:
+    split: int
+    filters: tuple[CanFilterIR, ...]
+
+
+@dataclass(frozen=True)
 class NoOptions:
     """Flash and watchdog have no authored construction options."""
 
 
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
-                     ExtiOptions | PwmOptions | AdcOptions | NoOptions)
+                     ExtiOptions | PwmOptions | AdcOptions | CanOptions | NoOptions)
 
 
 def mode_options(values):
@@ -188,6 +227,11 @@ def mode_options(values):
     kind = values["kind"]
     irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False))
            if "irq_priority" in values else None)
+    if kind == "can":
+        return CanOptions(values["operation"], values["event_capacity"],
+                          values["bitrate"], CanTimingOptions(**values["timing"]),
+                          irq, values["drain_timeout_us"], values["poll_limit"],
+                          values["fifo_order"])
     if kind == "gpio":
         return GpioOptions(values["mask"], values["initial"])
     if kind == "uart":
@@ -277,6 +321,7 @@ class ConfigurationIR(Record):
     devices: tuple[EndpointIR, ...]
     memory_budget: MemoryBudgetIR
     factory: FactoryOptions
+    can_domain: CanDomainIR | None
     values: Mapping
 
     @classmethod
@@ -303,6 +348,10 @@ class ConfigurationIR(Record):
         return cls(result["board"], result["soc_family"], result["backend"], irq, cpu, kernel,
                    controllers, devices, memory,
                    FactoryOptions(result.get("factory", {}).get("capabilities", False)),
+                   (CanDomainIR(result["can_domain"]["split"],
+                                tuple(CanFilterIR(**item) for item in
+                                      result["can_domain"]["filters"]))
+                    if result.get("can_domain") is not None else None),
                    MappingProxyType(values))
 
     def to_dict(self):

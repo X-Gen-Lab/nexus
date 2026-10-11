@@ -1,0 +1,49 @@
+[
+  {
+    "command": [
+      "cmake",
+      "-S",
+      "/workspace/nexus",
+      "-B",
+      "/workspace/nexus/build/can-config-model",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Debug",
+      "-DNEXUS_BUILD_TESTS=ON",
+      "-DNEXUS_BUILD_WORKLOAD=OFF"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/can-factory-model-capabilities-red2/0.log",
+    "sha256": "443579cdce242755b67adf17fb87874c9bc094b32854f4f5f799d003051ff095",
+    "exit_code": 0,
+    "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "/workspace/nexus/build/can-config-model",
+      "--target",
+      "nexus_stm32_can_factory_test",
+      "nexus_gd32_can_factory_test",
+      "-j",
+      "4"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/can-factory-model-capabilities-red2/1.log",
+    "sha256": "f24ad2081f62a9f8ba780c9dbe168c59e13cb225c5e172bfc6e9c4624e9ed71e",
+    "exit_code": 0,
+    "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/can-config-model/bin/nexus_stm32_can_factory_test",
+      "--gtest_output=xml:/workspace/nexus-config-iteration-evidence/can-factory-model-capabilities-red2/stm32.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/can-factory-model-capabilities-red2/2.log",
+    "sha256": "5e3f5a280b34a5b523ecec85a4702ae491eff704f39d1bf1b8cbeaffac50ced5",
+    "exit_code": 1,
+    "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+  }
+]

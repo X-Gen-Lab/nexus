@@ -1,0 +1,68 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from CanSoc
+[ RUN      ] CanSoc.ActualSdkClockModeTimingAndVectorsMatchTheMechanism
+[       OK ] CanSoc.ActualSdkClockModeTimingAndVectorsMatchTheMechanism (0 ms)
+[ RUN      ] CanSoc.MailboxPackingAndSdkCompletionProveActualWireSuccess
+[       OK ] CanSoc.MailboxPackingAndSdkCompletionProveActualWireSuccess (0 ms)
+[ RUN      ] CanSoc.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion
+[       OK ] CanSoc.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion (0 ms)
+[ RUN      ] CanSoc.SecondControllerDependsOnPrimaryClockWithoutResettingPeer
+[       OK ] CanSoc.SecondControllerDependsOnPrimaryClockWithoutResettingPeer (0 ms)
+[ RUN      ] CanSoc.FifoMailboxDlcAndReleaseUseExactSdkOffsets
+[       OK ] CanSoc.FifoMailboxDlcAndReleaseUseExactSdkOffsets (0 ms)
+[ RUN      ] CanSoc.FailedExitAcknowledgementRetainsDomainResponsibility
+[       OK ] CanSoc.FailedExitAcknowledgementRetainsDomainResponsibility (0 ms)
+[ RUN      ] CanSoc.FalseCpuPriorityFactsRejectBeforeReenablingHardware
+/workspace/nexus/tests/google/can_soc_test.cpp:212: Failure
+Expected equality of these values:
+  Initialize(&controller)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/can_soc_test.cpp:213: Failure
+Value of: controller.snapshot.started
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/can_soc_test.cpp:214: Failure
+Expected equality of these values:
+  hardware->registers[0]
+    Which is: 24
+  mode
+    Which is: 25
+
+[  FAILED  ] CanSoc.FalseCpuPriorityFactsRejectBeforeReenablingHardware (0 ms)
+[ RUN      ] CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects
+/workspace/nexus/tests/google/can_soc_test.cpp:221: Failure
+Expected equality of these values:
+  Initialize(&controller)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/can_soc_test.cpp:222: Failure
+Value of: controller.snapshot.started
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/can_soc_test.cpp:223: Failure
+Expected equality of these values:
+  hardware->registers[0]
+    Which is: 24
+  mode
+    Which is: 25
+
+[  FAILED  ] CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects (0 ms)
+[----------] 8 tests from CanSoc (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 6 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] CanSoc.FalseCpuPriorityFactsRejectBeforeReenablingHardware
+[  FAILED  ] CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects
+
+ 2 FAILED TESTS

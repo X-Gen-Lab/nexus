@@ -12,7 +12,7 @@ foreach(required "${stm32_device}/Include/stm32f407xx.h"
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 set(stm32_sources)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
         continue()
@@ -23,7 +23,7 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
         list(APPEND stm32_sources "drivers/${kind}.c")
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can)$")
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
@@ -46,6 +46,8 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
             list(APPEND stm32_sources drivers/i2c_async.c
                 "${CMAKE_CURRENT_SOURCE_DIR}/../common/i2c_v1_async.c")
         endif()
+    elseif(kind STREQUAL "can")
+        list(APPEND stm32_sources "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/can_controller.c")
     elseif(kind STREQUAL "adc")
         if("trigger-dma" IN_LIST modes
             OR "trigger-dma-continuous" IN_LIST modes)
@@ -63,7 +65,8 @@ if(stm32_sources)
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32f407 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
-        "${CMAKE_CURRENT_SOURCE_DIR}/../common")
+        "${CMAKE_CURRENT_SOURCE_DIR}/../common"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../io/private")
     target_include_directories(nexus_soc_stm32f407 SYSTEM PRIVATE
         "${stm32_device}/Include" "${stm32_cmsis}")
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)

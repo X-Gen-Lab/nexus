@@ -54,7 +54,9 @@ def emit(result):
                    f'extern const {exported_type}* const nx_binding_{name};']
         implementation = provider.implementation(item)
         prefix = provider.PREFIX
-        source += [f'static nx_{prefix}_{implementation}_state_t s_nx_port_{name};',
+        state_type = ("nx_can_controller_t" if item.kind == "can" else
+                      f"nx_{prefix}_{implementation}_state_t")
+        source += [f'static {state_type} s_nx_port_{name};',
                    f'static const {exported_type} s_nx_face_{name} = {{',
                    f'    &{provider.operations(item)}, &s_nx_port_{name}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
@@ -91,6 +93,10 @@ def emit(result):
     source.append("    s_nx_platform_started = true;")
     source.extend(provider.start_resources(result))
     for index, expression in enumerate(initialize):
+        if selections[index].kind == "can":
+            # Cold CAN failure may retain live hardware; include that instance
+            # in reverse cleanup before attempting initialization.
+            source.append(f"    s_nx_platform_initialized = {index + 1}u;")
         source += [f'    result.primary = {expression};',
                    '    if (result.primary != NX_SUCCESS) {',
                    '        result.cleanup = nx_platform_stop();',

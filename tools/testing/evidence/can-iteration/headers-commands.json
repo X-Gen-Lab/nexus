@@ -1,0 +1,36 @@
+[
+  {
+    "command": [
+      "/usr/bin/gcc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-I/workspace/nexus/core/include",
+      "-I/workspace/nexus/io/include",
+      "-fsyntax-only",
+      "/workspace/nexus-industrial-design/can-tests/can-header.c"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-I/workspace/nexus/core/include",
+      "-I/workspace/nexus/io/include",
+      "-fsyntax-only",
+      "/workspace/nexus-industrial-design/can-tests/can-header.cpp"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

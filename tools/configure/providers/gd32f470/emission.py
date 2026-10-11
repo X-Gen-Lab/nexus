@@ -1,6 +1,10 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings
 from ..common import mode_traits
+try:
+    from ... import can
+except ImportError:
+    import can
 
 
 def implementation(item):
@@ -11,6 +15,8 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.kind == "can":
+        return "nx_classic_can_ops"
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
     return f"nx_gd32_{selected}_ops"
@@ -35,6 +41,8 @@ def includes(result):
     if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
            for item in selections):
         source.append('#include "gd32f470_i2c_async.h"')
+    if any(item.kind == "can" for item in selections):
+        source.append('#include "gd32f470_can.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -67,6 +75,7 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
+    source.extend(can.state_declarations(result, "gd32"))
     return source
 
 
@@ -77,7 +86,7 @@ def shared_irqs(result):
 
 def stop_system(result):
     dma_clock = has_dma(result)
-    source = []
+    source = can.stop_domain(result, "gd32")
     if dma_clock:
         source += ['    if (s_nx_platform_started) { RCU_AHB1EN &= ~s_nx_platform_dma_clocks_added; }',
                    '    nx_arch_dsb();']
@@ -88,6 +97,8 @@ def stop_system(result):
 def start_system(result):
     dma_clock = has_dma(result)
     source = []
+    if result.get("can_domain") is not None:
+        source.append("    s_nx_can_gpio_clocks_added = 0u;")
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')
     source += ['    if (nx_gd32_soc_start() != 0) {',

@@ -15,6 +15,8 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'gd32'
 MODEL = False
+CAN_CONTROLLERS = ('CAN0', 'CAN1')
+CAN_CLOCK_HZ = 50000000
 DMA_VECTOR = 'Channel'
 DMA_TOPOLOGY = (frozenset((0, 1)), range(8), range(8))
 LIMITS = MappingProxyType({
@@ -36,6 +38,7 @@ _FIXED_DMA = MappingProxyType({('USART0', 'dma-tx'): ('DMA1:stream7:channel4',),
  ('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1')})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ('can', 'classic-irq'): 'can',
     ('gpio', 'input'): 'gpio',
     ('gpio', 'output'): 'gpio',
     ('uart', 'irq-byte-event'): 'uart',

@@ -7,7 +7,7 @@ except ImportError:
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can")
 
 
 def symbol(name):
@@ -152,6 +152,9 @@ def _capability(item, model):
         unit_bytes, alignment = 2, 2
         count = len(item["channels"])
         units = 65535 - 65535 % count if traits.dma else count
+    elif kind == "can":
+        # Each submitted request borrows one frame, not all TX mailboxes.
+        units, unit_bytes, messages = 8, 1, 1
     elif kind == "flash":
         unit_bytes = alignment = 1 if model else 4
     return " | ".join(flags) or "0U", units, unit_bytes, alignment, messages

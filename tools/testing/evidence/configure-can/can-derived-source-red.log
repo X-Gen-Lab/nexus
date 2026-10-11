@@ -1,0 +1,17 @@
+test_derived_capability_uses_actual_common_io_operations_source (tools.configure.test_can.CanConfigurationTests.test_derived_capability_uses_actual_common_io_operations_source) ... ERROR
+
+======================================================================
+ERROR: test_derived_capability_uses_actual_common_io_operations_source (tools.configure.test_can.CanConfigurationTests.test_derived_capability_uses_actual_common_io_operations_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_can.py", line 100, in test_derived_capability_uses_actual_common_io_operations_source
+    rows = capabilities.collect(gate.ROOT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/capabilities.py", line 110, in collect
+    raise ValueError("Selected ops has no production definition: "
+ValueError: Selected ops has no production definition: /workspace/nexus/tests/contracts/can_assembly/gd32-both.toml:bus0
+
+----------------------------------------------------------------------
+Ran 1 test in 0.020s
+
+FAILED (errors=1)

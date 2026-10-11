@@ -1,0 +1,124 @@
+{
+  "board": "stm32f407zg-qiming-v31",
+  "budget": {
+    "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-both-freertos/nexus-sdk/generated/resource-budget.json",
+    "sha256": "7876e28845a8fe54eb19b738b9d9e8e8b379f85ef79ee19617ca0ee3c14982dd",
+    "size": 183
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-both-freertos.toml",
+        "sha256": "75ea6f18fd3c73c33455768b6c654b8255ebbbd15f7275ee33a8fd9cf80a2ba8",
+        "size": 928
+      },
+      "label": "external/stm32-both-freertos.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
+        "sha256": "9899b6036e9bc7d11eada7bc6a62a9601124099e440bbf9d862b760adbf75cf8",
+        "size": 2580
+      },
+      "label": "boards/stm32f407_qiming_v31/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "b3551672d2fae2619674aaa5444c53cec6238fdd53d378bb8d095edbd204c54d",
+        "size": 492
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "db9482fd6d3f023f4c0ffe7834c8f2d1867e65c7bfb3609855294c41a7653c35",
+        "size": 9629
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "36f003b17a765cfd455228a452dca0784e0ae8c7ae1435445c96ef61bfaa7b2d",
+        "size": 6955
+      },
+      "label": "soc/stm32f407/soc.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-both-freertos/bin/can_controller_fixture.elf",
+    "sha256": "e8085c54e7cf495d7f486ca34ca67870c8837f0ef181e08348dd9c4a9a914ca7",
+    "size": 27204
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 8944,
+      "loaded_bytes": 8944,
+      "ranges": [
+        [
+          134217728,
+          134226672
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870980
+          ],
+          [
+            536870984,
+            536872040
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 3172
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536872040,
+        "start": 536872040
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-both-freertos/nexus-sdk/generated/resolved.json",
+    "sha256": "775730a61b93c25f9ea3ee11cb9d4c2ba81146fa4312699e2104ac8af311d87c",
+    "size": 23144
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

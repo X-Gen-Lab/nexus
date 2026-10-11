@@ -30,6 +30,7 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
@@ -151,6 +152,8 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
+                "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
         "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
         "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
@@ -160,7 +163,13 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
-    if kind == "uart":
+    if kind == "can":
+        try:
+            from .. import can
+        except ImportError:
+            import can
+        can.validate_selection(selection, provider, ram_size)
+    elif kind == "uart":
         if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
             fail("UART requires baud, RX profile and IRQ priority")
         integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")

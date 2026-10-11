@@ -433,3 +433,6 @@ nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
         Nexus::SPIAsyncOwner Nexus::NativeModel)
 target_include_directories(nexus_io_state_machine_test PRIVATE
     "${NEXUS_SOURCE_DIR}/io/native")
+
+include(can_runtime.cmake)
+include(can_factory.cmake)

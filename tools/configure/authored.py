@@ -2,6 +2,8 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
+            "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
     "gpio": {"binding", "mode"},
     "uart": {"binding", "mode", "baud", "rx", "irq"},
     "spi": {"binding", "mode", "max_hz", "irq"},
@@ -18,7 +20,7 @@ MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes"
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory"}
+TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain"}
 
 
 
@@ -69,7 +71,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["calls_os"] = irq["calls_os"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c", "can"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -94,7 +96,7 @@ def normalize(data, path, root, fail, obj, integer, text):
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("abi", "optimization", "components", "os", "factory"):
+    for field in ("abi", "optimization", "components", "os", "factory", "can_domain"):
         if field in data:
             result[field] = data[field]
     return result
@@ -124,11 +126,19 @@ def editor_schema():
         numeric = {"baud", "capacity", "priority", "main_stack_bytes", "libc_heap_bytes",
                    "static_ram_limit_bytes", "flash_load_limit_bytes", "max_hz",
                    "event_capacity", "period_ticks", "duty_ticks", "tick_hz",
-                   "reference_mv", "timeout_ms", "address", "model_bytes"}
+                   "reference_mv", "timeout_ms", "address", "model_bytes",
+                   "bitrate", "drain_timeout_us", "poll_limit", "prescaler",
+                   "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
+        for name in fields & {"fifo_order", "remote", "match_remote"}:
+            properties[name] = {"type": "boolean"}
+        if "timing" in fields:
+            properties["timing"] = record(
+                {"prescaler", "segment1", "segment2", "sjw"},
+                {"prescaler", "segment1", "segment2", "sjw"})
         if "mode" in fields and "controller" in fields:
             properties["mode"] = {"type": "integer", "minimum": 0, "maximum": 3}
         if "irq" in fields:
@@ -156,6 +166,11 @@ def editor_schema():
     properties["memory"]["properties"]["regions"]["additionalProperties"][
         "properties"]["limit_bytes"] = {"type": "integer", "minimum": 4,
                                         "multipleOf": 4}
+    properties["can_domain"] = record({"split", "filters"}, {"split", "filters"})
+    filter_fields = {"controller", "bank", "id", "mask", "format", "fifo",
+                     "remote", "match_remote"}
+    properties["can_domain"]["properties"]["filters"] = {
+        "type": "array", "items": record(filter_fields, filter_fields)}
     properties["os"] = kernel.editor_schema()
     properties["factory"] = {
         "type": "object", "properties": {"capabilities": {"type": "boolean"}},

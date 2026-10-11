@@ -1,0 +1,338 @@
+{
+  "scope": "Dirty-source development software evidence, two MCU families, one/two CAN ports, baremetal/FreeRTOS, 8 actual production graphs. No physical HIL execution or candidate qualification.",
+  "source_sha": "6232f0b4580a61b35157e8abd765647e3dc6a832",
+  "failures": [
+    {
+      "configuration": "stm32-first-baremetal",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "stm32-first-freertos",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "stm32-both-baremetal",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "stm32-both-freertos",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "gd32-first-baremetal",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "gd32-first-freertos",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "gd32-both-baremetal",
+      "stage": "build",
+      "exit_code": 1
+    },
+    {
+      "configuration": "gd32-both-freertos",
+      "stage": "build",
+      "exit_code": 1
+    }
+  ],
+  "source_inputs": [],
+  "artifacts": [],
+  "commands": [
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-baremetal-configure.log",
+      "sha256": "f9ce4777f969bf9accbdad4b8b5dee357c9031aa9981356940028cdbbf26f9f0",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-baremetal",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-baremetal-build.log",
+      "sha256": "fe89137e0fb89618b5b7e94b8471c48761bc33243f03a81699b1a3db603673b2",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-freertos-configure.log",
+      "sha256": "8b47765ced44b7d2be2ac3dcf34ed495797f4eb76e0d09110c455ec6706c43eb",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-freertos",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-first-freertos-build.log",
+      "sha256": "06c2d9f880b6a332cd6157ca7277b41ccb8e9ad9ab23440aa9643f29835a3bd6",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-baremetal-configure.log",
+      "sha256": "f691cc83859d5c976adbe40e136c01773ca8465fd944701bf730c18b3a2deca6",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-baremetal",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-baremetal-build.log",
+      "sha256": "b30f00c0e529fcfe3f6423f22424e48ade036823e38a8cef40f4a442f6fbbd60",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-freertos-configure.log",
+      "sha256": "a150901b9e0b3e32a4b300cc53e9c5f012e47c97e0ae0c10353cf12af0faaed6",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-freertos",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/stm32-both-freertos-build.log",
+      "sha256": "f59f20b53fc78b2e7a14c093738004825a73c9f88fffad8d80eea2bf8d36c64f",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-baremetal-configure.log",
+      "sha256": "a87de2c9796de0982d98277340048033bc7819064aa3213038235a0b03391a11",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-baremetal",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-baremetal-build.log",
+      "sha256": "70721fedef39e2c0adfc11404b5ab215d8ca8e9a997b689694202c48f3d8f2d3",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-freertos-configure.log",
+      "sha256": "58766fdc6e831be9c019edd15056b8400d31708c930ffbc37cf8e5aaa6af3bd0",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-freertos",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-first-freertos-build.log",
+      "sha256": "40d0db851f81d002fc8612af2e32bd6f72e5832b92ff641ae463e14ab783d15c",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-baremetal-configure.log",
+      "sha256": "851ea061a25da4db39ca2a8ef9b0d0451d59019a429b11d1635d62afe7b2a9d3",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-baremetal",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-baremetal-build.log",
+      "sha256": "b4b4febd90d58b9aadbd04502fdf28f47de6824e6cd8e41fbbeb848d19ee0655",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/can_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-freertos-configure.log",
+      "sha256": "493d62b9009ed69495b5e94d3ec33722ef787772c8c773d64b933aff422b5f5a",
+      "exit_code": 0,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-freertos",
+        "--target",
+        "can_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/can-arm-matrix/gd32-both-freertos-build.log",
+      "sha256": "0e4672d23fddafd6de21890fa315a3c09987476d97fa08f59e9da5f9c5bbe28a",
+      "exit_code": 1,
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+    }
+  ]
+}

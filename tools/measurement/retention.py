@@ -57,21 +57,40 @@ def source_contracts(root=ROOT):
             if name + "_t" in faces:
                 raise EvidenceError("duplicate public face type")
             faces[name + "_t"] = operations
+        for operations, name in re.findall(
+                r"typedef\s+struct\s*\{\s*const\s+(nx_\w+_ops_t)\s*"
+                r"\*\s*ops\s*;\s*void\s*\*\s*context\s*;\s*\}\s*"
+                r"(nx_\w+_t)\s*;", source):
+            if name in faces:
+                raise EvidenceError("duplicate public face type")
+            faces[name] = operations
     provider_sources = set((root / "soc").glob("*/drivers/*.c"))
     provider_sources.update((root / "soc/common").glob("*.c"))
+    provider_sources.update((root / "io/src").glob("*.c"))
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
         for kind, name, body in re.findall(
                 r"\bconst\s+(nx_\w+_ops_t)\s+(nx_\w+_ops)\s*=\s*"
                 r"\{([^{}]*)\}\s*;", source):
-            fields = re.findall(r"\.\s*(\w+)\s*=\s*(\w+)\s*,", body)
-            remainder = re.sub(r"\.\s*\w+\s*=\s*\w+\s*,", "", body).strip()
-            if (name in providers or kind not in layouts or remainder
-                    or len(fields) != len(dict(fields))
-                    or not set(dict(fields)).issubset(layouts[kind])):
+            if name in providers or kind not in layouts:
                 raise EvidenceError(
-                    "unsupported concrete operations initializer")
+                    f"unsupported concrete operations initializer: {path}:{name}")
+            tokens = [token.strip() for token in body.strip().rstrip(",").split(",")]
+            if all(re.fullmatch(r"[A-Za-z_]\w*|0", token) for token in tokens):
+                if len(tokens) > len(layouts[kind]):
+                    raise EvidenceError("too many positional operations fields")
+                fields = list(zip(layouts[kind], tokens))
+            else:
+                matches = [re.fullmatch(
+                    r"\.\s*(\w+)\s*=\s*([A-Za-z_]\w*|0)", token)
+                           for token in tokens]
+                if not all(matches):
+                    raise EvidenceError("unsupported concrete operations initializer")
+                fields = [match.groups() for match in matches]
+            if (len(fields) != len(dict(fields))
+                    or not set(dict(fields)).issubset(layouts[kind])):
+                raise EvidenceError("unsupported concrete operations initializer")
             providers[name] = {"type": kind, "fields": dict(fields),
                                "source": file_identity(path)}
     if not faces or not layouts or not providers:

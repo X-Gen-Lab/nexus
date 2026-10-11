@@ -1,0 +1,47 @@
+Running main() from gmock_main.cc
+[==========] Running 19 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 19 tests from ClassicCan
+[ RUN      ] ClassicCan.RejectsNonClassicFramesWithoutMutatingPreparedStorage
+[       OK ] ClassicCan.RejectsNonClassicFramesWithoutMutatingPreparedStorage (0 ms)
+[ RUN      ] ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries
+[       OK ] ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries (0 ms)
+[ RUN      ] ClassicCan.MailboxEmptyAloneNeverSettlesTheWireRequest
+[       OK ] ClassicCan.MailboxEmptyAloneNeverSettlesTheWireRequest (0 ms)
+[ RUN      ] ClassicCan.TxokAndCompletionDetachBeforeSettlement
+[       OK ] ClassicCan.TxokAndCompletionDetachBeforeSettlement (0 ms)
+[ RUN      ] ClassicCan.RemoteFrameUsesRequestedDlcAndZeroTransferredBytes
+[       OK ] ClassicCan.RemoteFrameUsesRequestedDlcAndZeroTransferredBytes (0 ms)
+[ RUN      ] ClassicCan.CancellationWaitsForActualAbortAcknowledgement
+[       OK ] ClassicCan.CancellationWaitsForActualAbortAcknowledgement (0 ms)
+[ RUN      ] ClassicCan.CompletionRacingCancellationPreservesWireSuccess
+[       OK ] ClassicCan.CompletionRacingCancellationPreservesWireSuccess (0 ms)
+[ RUN      ] ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility
+[       OK ] ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility (0 ms)
+[ RUN      ] ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect
+[       OK ] ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect (0 ms)
+[ RUN      ] ClassicCan.ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata
+[       OK ] ClassicCan.ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata (0 ms)
+[ RUN      ] ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames
+[       OK ] ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames (0 ms)
+[ RUN      ] ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount
+[       OK ] ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount (0 ms)
+[ RUN      ] ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull
+[       OK ] ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull (0 ms)
+[ RUN      ] ClassicCan.FourthVectorPriorityCannotBypassKernelWakeCeiling
+[       OK ] ClassicCan.FourthVectorPriorityCannotBypassKernelWakeCeiling (0 ms)
+[ RUN      ] ClassicCan.CompletionClearFailureCannotReleaseCallerStorage
+[       OK ] ClassicCan.CompletionClearFailureCannotReleaseCallerStorage (0 ms)
+[ RUN      ] ClassicCan.StuckIrqDisableRetainsRingAndWakeUntilStopReadback
+[       OK ] ClassicCan.StuckIrqDisableRetainsRingAndWakeUntilStopReadback (0 ms)
+[ RUN      ] ClassicCan.IncomingMaskRejectsTaskControlsWithoutAdmission
+[       OK ] ClassicCan.IncomingMaskRejectsTaskControlsWithoutAdmission (0 ms)
+[ RUN      ] ClassicCan.FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit
+[       OK ] ClassicCan.FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit (0 ms)
+[ RUN      ] ClassicCan.WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects
+[       OK ] ClassicCan.WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects (0 ms)
+[----------] 19 tests from ClassicCan (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 19 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 19 tests.

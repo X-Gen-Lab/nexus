@@ -1,0 +1,5 @@
+[  9%] Building C object CMakeFiles/can_engine.dir/workspace/nexus/io/src/can_controller.c.o
+[ 18%] Linking C static library libcan_engine.a
+[ 81%] Built target can_engine
+[ 90%] Linking CXX executable can_contract
+[100%] Built target can_contract

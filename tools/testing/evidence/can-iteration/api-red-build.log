@@ -1,0 +1,4 @@
+[ 50%] Building CXX object CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o
+gmake[2]: *** No rule to make target '/workspace/nexus/build/native-debug/lib/libnexus_native_model.a', needed by 'can_contract'.  Stop.
+gmake[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/can_contract.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

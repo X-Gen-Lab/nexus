@@ -69,7 +69,9 @@ def collect(root=ROOT):
                 exports[symbol] = source.relative_to(root).as_posix()
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
-    for source in sorted((root / "soc/common").glob("*.c")):
+    shared_sources = (set((root / "soc/common").glob("*.c"))
+                      | set((root / "io/src").glob("*.c")))
+    for source in sorted(shared_sources):
         for symbol in ops_definitions(source.read_text(encoding="utf-8")):
             if symbol in exports:
                 raise ValueError(f"Duplicate ops definition: {symbol}")

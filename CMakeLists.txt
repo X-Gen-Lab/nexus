@@ -73,7 +73,8 @@ else()
     set(nexus_provider "nexus_soc_${NEXUS_SOC_FAMILY}")
 endif()
 add_library(nexus_platform STATIC "${NEXUS_CONFIG_DIR}/bindings.c")
-target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}")
+target_include_directories(nexus_platform PUBLIC "${NEXUS_CONFIG_DIR}"
+    PRIVATE "${NEXUS_SOURCE_DIR}/io/private")
 target_link_libraries(nexus_platform PUBLIC ${nexus_provider}
     PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
 if(NEXUS_SYSTEM_PRIVATE_INCLUDES)

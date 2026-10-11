@@ -1,0 +1,7 @@
+   text	   data	    bss	    dec	    hex	filename
+    376	      0	      0	    376	    178	/workspace/nexus/tools/testing/evidence/can-iteration/arm/stm32f407-src-can.o
+   5112	      0	      0	   5112	   13f8	/workspace/nexus/tools/testing/evidence/can-iteration/arm/stm32f407-src-can_controller.o
+    264	      0	      0	    264	    108	/workspace/nexus/tools/testing/evidence/can-iteration/arm/stm32f407-drivers-can.o
+    376	      0	      0	    376	    178	/workspace/nexus/tools/testing/evidence/can-iteration/arm/gd32f470-src-can.o
+   5112	      0	      0	   5112	   13f8	/workspace/nexus/tools/testing/evidence/can-iteration/arm/gd32f470-src-can_controller.o
+    264	      0	      0	    264	    108	/workspace/nexus/tools/testing/evidence/can-iteration/arm/gd32f470-drivers-can.o

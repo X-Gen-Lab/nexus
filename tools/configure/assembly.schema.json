@@ -115,6 +115,152 @@
     "board_package": {
       "type": "string"
     },
+    "can": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "bitrate": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "drain_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "event_capacity": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "fifo_order": {
+            "type": "boolean"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "poll_limit": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "timing": {
+            "additionalProperties": false,
+            "properties": {
+              "prescaler": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "segment1": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "segment2": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sjw": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "prescaler",
+              "segment1",
+              "segment2",
+              "sjw"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "can_domain": {
+      "additionalProperties": false,
+      "properties": {
+        "filters": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bank": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "controller": {
+                "type": "string"
+              },
+              "fifo": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "format": {
+                "type": "string"
+              },
+              "id": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "mask": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "match_remote": {
+                "type": "boolean"
+              },
+              "remote": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "bank",
+              "controller",
+              "fifo",
+              "format",
+              "id",
+              "mask",
+              "match_remote",
+              "remote"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "split": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "filters",
+        "split"
+      ],
+      "type": "object"
+    },
     "clock": {
       "type": "string"
     },

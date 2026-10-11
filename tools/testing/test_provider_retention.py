@@ -132,6 +132,15 @@ def file_symbol_elf():
 
 
 class ProviderRetentionTests(unittest.TestCase):
+    def test_shared_can_provider_uses_actual_source_and_public_face(self):
+        faces, layouts, providers, _ = source_contracts()
+        self.assertEqual(faces.get("nx_can_port_t"), "nx_can_ops_t")
+        self.assertEqual(providers["nx_classic_can_ops"]["type"], "nx_can_ops_t")
+        self.assertTrue(providers["nx_classic_can_ops"]["source"]["path"].endswith(
+            "/io/src/can_controller.c"))
+        self.assertEqual(set(providers["nx_classic_can_ops"]["fields"]),
+                         set(layouts["nx_can_ops_t"]))
+
     def test_shared_soc_operations_are_read_from_the_actual_common_source(self):
         _, _, providers, _ = source_contracts()
         provider = providers["nx_i2c_v1_async_ops"]

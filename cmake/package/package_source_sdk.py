@@ -52,7 +52,7 @@ REQUIRED_FILES = (
     "tools/configure/authored.py", "tools/configure/ir.py",
     "tools/configure/cpu.py", "tools/configure/runtime.py",
     "tools/configure/kernel.py", "tools/configure/metadata.py",
-    "tools/configure/memory.py", "dependencies/platform-compatibility.json",
+    "tools/configure/memory.py", "tools/configure/can.py", "dependencies/platform-compatibility.json",
     "os/freertos/tick.c", "os/freertos/include/nexus/os/tick.h",
     "os/CMakeLists.txt", "os/diagnostic.c",
     "os/include/nexus/os/diagnostic.h", "os/freertos/CMakeLists.txt",

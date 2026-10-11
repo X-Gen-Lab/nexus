@@ -7,10 +7,12 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.evidence.common import EvidenceError
 from tools.evidence.identity import canonical_digest
 from tools.maintenance import job_identity as identity
+from tools.configure import cpu, metadata, runtime
 
 
 class JobIdentityTests(unittest.TestCase):
@@ -108,23 +110,82 @@ class JobIdentityTests(unittest.TestCase):
         facts = self.artifacts / 'cpu.json'
         assembly.write_text('schema_version = 1\n')
         facts.write_text('{"fixture": true}\n')
+        policy = self.artifacts / 'platform-compatibility.json'
+        policy.write_bytes((metadata.ROOT / metadata.POLICY).read_bytes())
         checksum = hashlib.sha256()
-        for label, path in ((b'assembly', assembly), (b'cpu-facts', facts)):
+        for label, path in ((b'assembly', assembly), (b'cpu-facts', facts),
+                            (b'platform-metadata', policy)):
             data = path.read_bytes()
             checksum.update(label + b'\0' + len(data).to_bytes(8, 'big') + data)
         resolved = {'schema_version': 1, 'cpu_profile': {'fixture': True},
+                    'platform_metadata': metadata.policy_contract(
+                        json.loads(policy.read_text())),
                     'input_sha256': checksum.hexdigest()}
         resolved['configuration_sha256'] = canonical_digest(resolved)
         (self.artifacts / 'resolved-cpu.json').write_text(json.dumps(resolved))
         (self.artifacts / 'input_paths.json').write_text(json.dumps({
-            'assembly': str(assembly), 'cpu_facts': str(facts)}))
+            'assembly': str(assembly), 'cpu_facts': str(facts),
+            'platform_metadata': str(policy)}))
         record = self.capture()
         self.assertEqual(record['configurations'][0]['validation'], 'valid')
-        self.assertEqual(len(record['configurations'][0]['inputs']), 2)
+        self.assertEqual(len(record['configurations'][0]['inputs']), 3)
         self.output = self.root / 'build/tampered-cpu'
         facts.write_text('changed generated facts')
         with self.assertRaisesRegex(EvidenceError, 'input changed'):
             self.capture()
+
+    def prepare_actual_cpu_inputs(self):
+        policy = self.root / metadata.POLICY
+        policy.write_bytes((metadata.ROOT / metadata.POLICY).read_bytes())
+        self.git('add', str(policy))
+        self.git('commit', '-qm', 'declare actual compatibility policy')
+        self.commit = self.git('rev-parse', 'HEAD')
+        native = json.loads((metadata.ROOT / 'soc/native/soc.json').read_text())
+        facts = self.artifacts / 'cpu.json'
+        facts.write_text(json.dumps({'schema_version': 1, 'cpu': native['cpu'],
+                                     'irq': native['irq'], 'clock_hz': 1000000}))
+        return facts
+
+    def test_actual_runtime_generated_metadata_is_bound(self):
+        self.prepare_actual_cpu_inputs()
+        assembly = self.artifacts / 'runtime.toml'
+        assembly.write_text('schema_version = 1\ncpu_facts = "cpu.json"\n'
+                            'backend = "baremetal"\noptimization = "Os"\n')
+        output = self.artifacts / 'runtime-generated'
+        with patch.object(runtime, 'ROOT', self.root):
+            runtime.configure(assembly, output)
+        record = self.capture()
+        configuration = record['configurations'][0]
+        self.assertEqual(configuration['validation'], 'valid')
+        self.assertEqual({item['label'] for item in configuration['inputs']},
+                         {'assembly', 'cpu_facts', 'platform_metadata'})
+        navigation = output / 'input_paths.json'
+        paths = json.loads(navigation.read_text())
+        paths.pop('platform_metadata')
+        navigation.write_text(json.dumps(paths))
+        with self.assertRaisesRegex(EvidenceError, 'navigation'):
+            identity._configuration(output / 'resolved-cpu.json')
+        paths['platform_metadata'] = str(self.root / metadata.POLICY)
+        navigation.write_text(json.dumps(paths))
+        resolved_path = output / 'resolved-cpu.json'
+        resolved = json.loads(resolved_path.read_text())
+        resolved['platform_metadata']['semantic_version'] = '9.9.9'
+        resolved.pop('configuration_sha256')
+        resolved['configuration_sha256'] = canonical_digest(resolved)
+        resolved_path.write_text(json.dumps(resolved))
+        with self.assertRaisesRegex(EvidenceError, 'metadata facts'):
+            identity._configuration(resolved_path)
+
+    def test_actual_cpu_cli_metadata_is_bound_without_an_assembly(self):
+        facts = self.prepare_actual_cpu_inputs()
+        output = self.artifacts / 'cpu-generated'
+        with patch.object(cpu, 'ROOT', self.root):
+            self.assertEqual(cpu.main(['--facts', str(facts), '--output',
+                                      str(output), '--backend', 'baremetal']), 0)
+        record = self.capture()
+        self.assertEqual({item['label'] for item in
+                          record['configurations'][0]['inputs']},
+                         {'cpu_facts', 'platform_metadata'})
 
     def test_artifact_mutation_during_version_execution_is_rejected(self):
         script = self.root / 'build/artifact-mutating-tool'

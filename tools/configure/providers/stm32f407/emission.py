@@ -1,6 +1,10 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings
 from ..common import mode_traits
+try:
+    from ... import can
+except ImportError:
+    import can
 
 
 def implementation(item):
@@ -11,6 +15,8 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.kind == "can":
+        return "nx_classic_can_ops"
     if selected == "i2c_async":
         return "nx_i2c_v1_async_ops"
     return f"nx_stm32_{selected}_ops"
@@ -32,6 +38,8 @@ def includes(result):
     if any(item.kind == "i2c" and mode_traits(item.kind, item.mode).irq
            for item in selections):
         source.append('#include "stm32f407_i2c_async.h"')
+    if any(item.kind == "can" for item in selections):
+        source.append('#include "stm32f407_can.h"')
     source += ['void _init(void);', 'void _fini(void);',
                r'/** \brief C runtime hooks; constructors use .init_array. */',
                'void _init(void) {}', 'void _fini(void) {}']
@@ -80,6 +88,7 @@ def state_declarations(result):
         source.append('static uint32_t s_nx_platform_gpio_clocks_added;')
     if any(item["kind"] == "exti" for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
+    source.extend(can.state_declarations(result, "stm32"))
     return source
 
 
@@ -90,7 +99,7 @@ def shared_irqs(result):
 def stop_system(result):
     selections = result.controllers
     dma_clock = has_dma(result)
-    source = []
+    source = can.stop_domain(result, "stm32")
     gpio_clock_mask = _gpio_clock_mask(result)
     if gpio_clock_mask:
         source += ['    if (s_nx_platform_started) { RCC->AHB1ENR &= ~s_nx_platform_gpio_clocks_added; }']

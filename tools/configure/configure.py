@@ -17,7 +17,7 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel, memory as memory_regions, metadata, factory
+    from . import kernel, memory as memory_regions, metadata, factory, can
     from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
@@ -27,6 +27,7 @@ try:
 except ImportError:
     import cpu as cpu_profiles
     import kernel
+    import can
     import metadata
     import factory
     import memory as memory_regions
@@ -42,7 +43,7 @@ UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "timer", "pwm", "adc"}
+         "timer", "pwm", "adc", "can"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -170,7 +171,7 @@ def contained_file(package, name):
 
 def validate_soc(soc, part):
     obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
-              "controllers"}, {"provenance", "source_lock", "reserved_resources"},
+              "controllers"}, {"provenance", "source_lock", "reserved_resources", "can_domain"},
         "SoC")
     integer(soc["schema_version"], 1, 1, "SoC schema")
     identity(soc["id"], "SoC id")
@@ -227,7 +228,7 @@ def validate_soc(soc, part):
     for name, controller in soc["controllers"].items():
         identity(name, "controller")
         obj(controller, {"kind", "modes", "irq", "pins"},
-            {"resources", "max_hz", "irq_numbers", "channel_count"}, name)
+            {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz"}, name)
         if controller["kind"] not in KINDS:
             fail(f"Unmaintained controller kind: {controller['kind']}")
         for field in ("modes", "irq", "pins"):
@@ -240,6 +241,7 @@ def validate_soc(soc, part):
         for resource in sequence(controller.get("resources", []),
                                  f"{name}.resources"):
             validate_resource_fact(resource, provider, "SoC resource")
+    can.validate_soc(soc, provider)
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
@@ -281,7 +283,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os", "factory"}, "assembly")
+                   {"abi", "optimization", "components", "os", "factory", "can_domain"}, "assembly")
     integer(assembly["schema_version"], 1, 1, "assembly schema")
     factory_options = obj(assembly.get("factory", {}), (),
                           {"capabilities"}, "factory policy")
@@ -503,7 +505,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             {"irq_priority", "rx_capacity", "baud", "max_hz", "event_capacity",
              "period_ticks", "duty_ticks", "channels", "sample_cycles",
              "timeout_ms", "calls_os", "rx_profile", "sample_times",
-             "reference_mv", "tick_hz", "edge", "authored_kind"}, "controller selection")
+             "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
+             "bitrate", "timing", "drain_timeout_us", "poll_limit",
+             "fifo_order"}, "controller selection")
         name = identity(selection["id"], "instance id")
         c_identity(name)
         instance_ids.append(name)
@@ -575,9 +579,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                          "kind": route["kind"], "route": route["id"],
                          "pins": route["pins"], "initial": binding.get("initial", 0),
                          "mask": binding.get("mask", 0),
-                         **({"dma": route_dma(route, mode)} if traits.dma else {})})
+                         **({"dma": route_dma(route, mode)} if traits.dma else {}),
+                         **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
+    can_domain = can.resolve_domain(assembly.get("can_domain"), selected,
+                                    soc, provider, claim, claims)
     device_ids = []
     addresses = set()
     chip_selects = set()
@@ -747,6 +754,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "clock_profile": assembly["clock_profile"],
               "clock": clock, "memory": selected_memory, "flash": variant["flash"],
               "layout": layout, "controllers": selected, "devices": assembly["devices"],
+              "can_domain": can_domain,
+              "can_controllers": list(provider.CAN_CONTROLLERS) if can_domain else [],
               "components": components, "claims": claim_list, "memory_budgets": budgets,
               "board_bindings": bindings, "routes": routes,
               "optimization": optimization, "inputs": records,

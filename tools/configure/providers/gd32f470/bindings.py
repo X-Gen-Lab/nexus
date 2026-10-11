@@ -4,6 +4,10 @@ try:
 except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
+try:
+    from ... import can
+except ImportError:
+    import can
 from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
@@ -385,6 +389,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed GD32 instance, including explicit GPIO construction."""
     item = controller_ir(item, "gd32f470")
+    if item.kind == "can":
+        return can.constructor(item, result, "gd32")
     if item.kind != "gpio":
         return _controller_constructor(item, result, board_bindings, routes,
                                        devices)

@@ -1,0 +1,12 @@
+test_derived_capability_uses_actual_common_io_operations_source (tools.configure.test_can.CanConfigurationTests.test_derived_capability_uses_actual_common_io_operations_source) ... ok
+test_filter_bank_owner_split_format_and_duplicate_claim_are_checked (tools.configure.test_can.CanConfigurationTests.test_filter_bank_owner_split_format_and_duplicate_claim_are_checked) ... ok
+test_generated_factory_and_partial_start_cleanup_are_explicit (tools.configure.test_can.CanConfigurationTests.test_generated_factory_and_partial_start_cleanup_are_explicit) ... ok
+test_no_can_configuration_produces_no_domain_state_or_driver_calls (tools.configure.test_can.CanConfigurationTests.test_no_can_configuration_produces_no_domain_state_or_driver_calls) ... ok
+test_timing_requires_exact_apb_bitrate_and_valid_sampling_segments (tools.configure.test_can.CanConfigurationTests.test_timing_requires_exact_apb_bitrate_and_valid_sampling_segments) ... ok
+test_two_controllers_share_one_immutable_domain_and_distinct_exact_irqs (tools.configure.test_can.CanConfigurationTests.test_two_controllers_share_one_immutable_domain_and_distinct_exact_irqs) ... ok
+test_zero_storage_unbounded_drain_and_unknown_operations_are_rejected (tools.configure.test_can.CanConfigurationTests.test_zero_storage_unbounded_drain_and_unknown_operations_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.503s
+
+OK

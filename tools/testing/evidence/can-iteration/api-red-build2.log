@@ -1,0 +1,94 @@
+[ 50%] Linking CXX executable can_contract
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: warning: relocation against `nx_classic_can_ops' in read-only section `.text._ZN10ClassicCanC2Ev[_ZN10ClassicCanC5Ev]'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_RejectsNonClassicFramesWithoutMutatingPreparedStorage_Test::TestBody()':
+can_controller_test.cpp:(.text+0x4f): undefined reference to `nx_can_tx_prepare'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x214): undefined reference to `nx_can_tx_prepare'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x321): undefined reference to `nx_can_tx_prepare'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries_Test::TestBody()':
+can_controller_test.cpp:(.text+0x53d): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x646): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_MailboxEmptyAloneNeverSettlesTheWireRequest_Test::TestBody()':
+can_controller_test.cpp:(.text+0x9e4): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0xae4): undefined reference to `nx_can_port_service'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_TxokAndCompletionDetachBeforeSettlement_Test::TestBody()':
+can_controller_test.cpp:(.text+0xd83): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0xe98): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0xf99): undefined reference to `nx_can_controller_irq'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_RemoteFrameUsesRequestedDlcAndZeroTransferredBytes_Test::TestBody()':
+can_controller_test.cpp:(.text+0x15fb): undefined reference to `nx_can_tx_prepare'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x1719): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x19ac): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x1a8e): undefined reference to `nx_can_controller_irq'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_CancellationWaitsForActualAbortAcknowledgement_Test::TestBody()':
+can_controller_test.cpp:(.text+0x1d33): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x1e51): undefined reference to `nx_can_port_cancel'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x2153): undefined reference to `nx_can_port_service'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x2439): undefined reference to `nx_can_port_stop'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x251f): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x260a): undefined reference to `nx_can_port_service'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_CompletionRacingCancellationPreservesWireSuccess_Test::TestBody()':
+can_controller_test.cpp:(.text+0x2be0): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x2cc7): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x2dc3): undefined reference to `nx_can_port_cancel'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility_Test::TestBody()':
+can_controller_test.cpp:(.text+0x30af): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x32be): undefined reference to `nx_can_port_service'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x348f): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x357a): undefined reference to `nx_can_port_service'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_DeadlineExpiredRejectsWithNoMailboxEffect_Test::TestBody()':
+can_controller_test.cpp:(.text+0x39f6): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata_Test::TestBody()':
+can_controller_test.cpp:(.text+0x3dde): undefined reference to `nx_can_port_read_events'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames_Test::TestBody()':
+can_controller_test.cpp:(.text+0x474e): undefined reference to `nx_can_port_read_events'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x4d9a): undefined reference to `nx_can_port_read_events'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_HardwareOverrunReportsLowerBoundWithoutInventedExactCount_Test::TestBody()':
+can_controller_test.cpp:(.text+0x51c9): undefined reference to `nx_can_controller_irq'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5225): undefined reference to `nx_can_port_read_events'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_BusOffRemainsAuthoritativeWhenTheRingIsFull_Test::TestBody()':
+can_controller_test.cpp:(.text+0x56d1): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x57e7): undefined reference to `nx_native_can_error'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x57fa): undefined reference to `nx_can_controller_irq'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5838): undefined reference to `nx_can_port_state'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5b32): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5c10): undefined reference to `nx_can_port_recover'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5ced): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5dd8): undefined reference to `nx_can_port_service'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x5ec3): undefined reference to `nx_can_port_recover'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_FourthVectorPriorityCannotBypassKernelWakeCeiling_Test::TestBody()':
+can_controller_test.cpp:(.text+0x6288): undefined reference to `nx_can_port_attach_wake'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x6443): undefined reference to `nx_can_port_attach_wake'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x6522): undefined reference to `nx_can_port_attach_wake'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_CompletionClearFailureCannotReleaseCallerStorage_Test::TestBody()':
+can_controller_test.cpp:(.text+0x6733): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x6848): undefined reference to `nx_native_can_complete'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x6955): undefined reference to `nx_can_port_service'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x6bfa): undefined reference to `nx_can_port_service'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_StuckIrqDisableRetainsRingAndWakeUntilStopReadback_Test::TestBody()':
+can_controller_test.cpp:(.text+0x7004): undefined reference to `nx_can_port_attach_wake'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x711f): undefined reference to `nx_can_port_stop'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x748e): undefined reference to `nx_can_port_stop'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_IncomingMaskRejectsTaskControlsWithoutAdmission_Test::TestBody()':
+can_controller_test.cpp:(.text+0x7934): undefined reference to `nx_can_port_submit'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x79fd): undefined reference to `nx_can_port_service'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit_Test::TestBody()':
+can_controller_test.cpp:(.text+0x7f9d): undefined reference to `nx_can_filter_domain_initialize'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan_WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects_Test::TestBody()':
+can_controller_test.cpp:(.text+0x81cb): undefined reference to `nx_can_port_stop'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x82e5): undefined reference to `nx_can_filter_domain_initialize'
+/usr/bin/ld: can_controller_test.cpp:(.text+0x8499): undefined reference to `nx_native_can_initialize'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan::SetUp()':
+can_controller_test.cpp:(.text._ZN10ClassicCan5SetUpEv[_ZN10ClassicCan5SetUpEv]+0x2d2): undefined reference to `nx_can_tx_prepare'
+/usr/bin/ld: can_controller_test.cpp:(.text._ZN10ClassicCan5SetUpEv[_ZN10ClassicCan5SetUpEv]+0x3c8): undefined reference to `nx_native_can_initialize'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan::TearDown()':
+can_controller_test.cpp:(.text._ZN10ClassicCan8TearDownEv[_ZN10ClassicCan8TearDownEv]+0x4e): undefined reference to `nx_can_port_stop'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan::Receive(unsigned int, unsigned char)':
+can_controller_test.cpp:(.text._ZN10ClassicCan7ReceiveEjh[_ZN10ClassicCan7ReceiveEjh]+0x44): undefined reference to `nx_native_can_receive'
+/usr/bin/ld: can_controller_test.cpp:(.text._ZN10ClassicCan7ReceiveEjh[_ZN10ClassicCan7ReceiveEjh]+0x113): undefined reference to `nx_can_controller_irq'
+/usr/bin/ld: CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o: in function `ClassicCan::ClassicCan()':
+can_controller_test.cpp:(.text._ZN10ClassicCanC2Ev[_ZN10ClassicCanC5Ev]+0xd7): undefined reference to `nx_classic_can_ops'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+gmake[2]: *** [CMakeFiles/can_contract.dir/build.make:108: can_contract] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/can_contract.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

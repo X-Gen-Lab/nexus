@@ -339,6 +339,52 @@
       "resources": [
         "exti:line:6"
       ]
+    },
+    "CAN1": {
+      "kind": "can",
+      "modes": [
+        "classic-irq"
+      ],
+      "irq": [
+        "CAN1_TX",
+        "CAN1_RX0",
+        "CAN1_RX1",
+        "CAN1_SCE"
+      ],
+      "irq_numbers": [
+        19,
+        20,
+        21,
+        22
+      ],
+      "clock_hz": 42000000,
+      "pins": [
+        "PA11",
+        "PA12"
+      ]
+    },
+    "CAN2": {
+      "kind": "can",
+      "modes": [
+        "classic-irq"
+      ],
+      "irq": [
+        "CAN2_TX",
+        "CAN2_RX0",
+        "CAN2_RX1",
+        "CAN2_SCE"
+      ],
+      "irq_numbers": [
+        63,
+        64,
+        65,
+        66
+      ],
+      "clock_hz": 42000000,
+      "pins": [
+        "PB12",
+        "PB13"
+      ]
     }
   },
   "reserved_resources": [
@@ -356,5 +402,13 @@
   "irq": {
     "priority_bits": 4,
     "external_count": 82
+  },
+  "can_domain": {
+    "primary": "CAN1",
+    "controllers": [
+      "CAN1",
+      "CAN2"
+    ],
+    "filter_banks": 28
   }
 }

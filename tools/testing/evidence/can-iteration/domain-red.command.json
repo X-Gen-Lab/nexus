@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/workspace/nexus-industrial-design/can-tests/build/can_contract",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/domain-red.xml"
+  ],
+  "exit_code": 1,
+  "expected_failure": "Shared primary and secondary CAN clocks are not acquired by production domain",
+  "stage": "RED"
+}

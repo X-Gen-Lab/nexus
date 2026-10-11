@@ -23,6 +23,7 @@ from tools.evidence.identity import (
     resolved_input_files,
 )
 from tools.evidence.reproduce import run_logged
+from tools.configure import metadata
 
 
 def _contained(root: Path, path: Path) -> Path:
@@ -48,12 +49,17 @@ def _configuration(path: Path) -> dict:
     resolved, identity = resolved_identity(path)
     if path.name == 'resolved-cpu.json':
         navigation = load_json(path.parent / 'input_paths.json')
-        if not isinstance(navigation, dict) or set(navigation) != {
-                'assembly', 'cpu_facts'}:
+        expected = {'cpu_facts', 'platform_metadata'}
+        if isinstance(navigation, dict) and 'assembly' in navigation:
+            expected.add('assembly')
+        if not isinstance(navigation, dict) or set(navigation) != expected:
             raise EvidenceError('CPU configuration input navigation mismatch')
         checksum, inputs = hashlib.sha256(), []
-        for key, label in (('assembly', b'assembly'),
-                           ('cpu_facts', b'cpu-facts')):
+        labels = [('cpu_facts', b'cpu-facts'),
+                  ('platform_metadata', b'platform-metadata')]
+        if 'assembly' in navigation:
+            labels.insert(0, ('assembly', b'assembly'))
+        for key, label in labels:
             source = regular_file(navigation[key])
             observed = file_identity(source)
             checksum.update(label + b'\0' +
@@ -65,6 +71,9 @@ def _configuration(path: Path) -> dict:
             inputs.append({'label': key, 'file': observed})
         if checksum.hexdigest() != resolved.get('input_sha256'):
             raise EvidenceError('CPU configuration input changed')
+        if metadata.policy_contract(load_json(navigation['platform_metadata'])) != \
+                resolved.get('platform_metadata'):
+            raise EvidenceError('CPU configuration metadata facts changed')
     else:
         inputs = resolved_input_files(path, resolved)
     return {'file': identity, 'validation': 'valid',

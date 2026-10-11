@@ -1,0 +1,15 @@
+test_second_controller_cannot_touch_reserved_primary_filter_domain (tools.configure.test_can.CanConfigurationTests.test_second_controller_cannot_touch_reserved_primary_filter_domain) ... FAIL
+
+======================================================================
+FAIL: test_second_controller_cannot_touch_reserved_primary_filter_domain (tools.configure.test_can.CanConfigurationTests.test_second_controller_cannot_touch_reserved_primary_filter_domain)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_can.py", line 141, in test_second_controller_cannot_touch_reserved_primary_filter_domain
+    with self.assertRaisesRegex(ValueError, 'CAN.*reserved'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.032s
+
+FAILED (failures=1)

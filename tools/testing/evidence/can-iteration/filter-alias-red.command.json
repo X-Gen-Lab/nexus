@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/workspace/nexus-industrial-design/can-tests/build/can_contract",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/filter-alias-red.xml"
+  ],
+  "exit_code": 1,
+  "stage": "RED",
+  "expected_failure": "Borrowed request aliases immutable filter-plan span"
+}

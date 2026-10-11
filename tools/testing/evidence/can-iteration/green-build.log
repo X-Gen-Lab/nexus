@@ -1,0 +1,20 @@
+[ 16%] Building C object CMakeFiles/can_engine.dir/workspace/nexus/io/src/can.c.o
+[ 33%] Building C object CMakeFiles/can_engine.dir/workspace/nexus/io/src/can_controller.c.o
+In file included from <command-line>:
+/workspace/nexus/io/src/can_controller.c: In function ‘nx_can_controller_initialize’:
+/workspace/nexus/io/native/can_access.h:25:5: error: implicit declaration of function ‘nx_native_can_irq_set’; did you mean ‘nx_native_can_write’? [-Wimplicit-function-declaration]
+   25 |     nx_native_can_irq_set((controller), (vector), (enabled))
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/io/src/can_controller.c:288:9: note: in expansion of macro ‘NX_CAN_IRQ_SET’
+  288 |         NX_CAN_IRQ_SET(controller, i, true);
+      |         ^~~~~~~~~~~~~~
+/workspace/nexus/io/src/can_controller.c: In function ‘stop’:
+/workspace/nexus/io/native/can_access.h:27:5: error: implicit declaration of function ‘nx_native_can_irq_enabled’; did you mean ‘nx_native_can_read’? [-Wimplicit-function-declaration]
+   27 |     nx_native_can_irq_enabled((controller), (vector))
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/io/src/can_controller.c:663:21: note: in expansion of macro ‘NX_CAN_IRQ_ENABLED’
+  663 |         detached = !NX_CAN_IRQ_ENABLED(controller, i) && detached;
+      |                     ^~~~~~~~~~~~~~~~~~
+gmake[2]: *** [CMakeFiles/can_engine.dir/build.make:93: CMakeFiles/can_engine.dir/workspace/nexus/io/src/can_controller.c.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:122: CMakeFiles/can_engine.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

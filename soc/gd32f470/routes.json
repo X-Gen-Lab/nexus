@@ -389,6 +389,54 @@
         "output"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf"
+    },
+    {
+      "id": "can0-pa11-pa12",
+      "controller": "CAN0",
+      "kind": "can",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "can_rx",
+          "af": 9
+        },
+        {
+          "pin": "PA12",
+          "function": "can_tx",
+          "af": 9
+        }
+      ],
+      "source": "GD32F470xx Datasheet Rev2.2 Table 2-7 / 2-8 AF9; exact ZG LQFP144 pin tables"
+    },
+    {
+      "id": "can1-pb12-pb13",
+      "controller": "CAN1",
+      "kind": "can",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "pin": "PB12",
+          "function": "can_rx",
+          "af": 9
+        },
+        {
+          "pin": "PB13",
+          "function": "can_tx",
+          "af": 9
+        }
+      ],
+      "source": "GD32F470xx Datasheet Rev2.2 Table 2-7 / 2-8 AF9; exact ZG LQFP144 pin tables"
     }
   ]
 }

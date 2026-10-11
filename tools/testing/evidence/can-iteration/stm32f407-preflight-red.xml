@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="2" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:47:34.426" name="AllTests">
+  <testsuite name="CanSoc" tests="8" failures="2" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:47:34.426">
+    <testcase name="ActualSdkClockModeTimingAndVectorsMatchTheMechanism" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="96" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc" />
+    <testcase name="MailboxPackingAndSdkCompletionProveActualWireSuccess" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="117" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc" />
+    <testcase name="UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="137" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc" />
+    <testcase name="SecondControllerDependsOnPrimaryClockWithoutResettingPeer" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="149" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc" />
+    <testcase name="FifoMailboxDlcAndReleaseUseExactSdkOffsets" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="178" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc" />
+    <testcase name="FailedExitAcknowledgementRetainsDomainResponsibility" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="197" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc" />
+    <testcase name="FalseCpuPriorityFactsRejectBeforeReenablingHardware" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="208" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc">
+      <failure message="/workspace/nexus/tests/google/can_soc_test.cpp:212&#x0A;Expected equality of these values:&#x0A;  Initialize(&amp;controller)&#x0A;    Which is: 0&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/can_soc_test.cpp:212
+Expected equality of these values:
+  Initialize(&controller)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/can_soc_test.cpp:213&#x0A;Value of: controller.snapshot.started&#x0A;  Actual: true&#x0A;Expected: false&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/can_soc_test.cpp:213
+Value of: controller.snapshot.started
+  Actual: true
+Expected: false
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/can_soc_test.cpp:214&#x0A;Expected equality of these values:&#x0A;  hardware-&gt;registers[0]&#x0A;    Which is: 24&#x0A;  mode&#x0A;    Which is: 25&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/can_soc_test.cpp:214
+Expected equality of these values:
+  hardware->registers[0]
+    Which is: 24
+  mode
+    Which is: 25
+]]></failure>
+    </testcase>
+    <testcase name="ForeignPrimaryFilterDomainRejectsWithoutControllerEffects" file="/workspace/nexus/tests/google/can_soc_test.cpp" line="217" status="run" result="completed" time="0." timestamp="2026-10-11T16:47:34.426" classname="CanSoc">
+      <failure message="/workspace/nexus/tests/google/can_soc_test.cpp:221&#x0A;Expected equality of these values:&#x0A;  Initialize(&amp;controller)&#x0A;    Which is: 0&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/can_soc_test.cpp:221
+Expected equality of these values:
+  Initialize(&controller)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/can_soc_test.cpp:222&#x0A;Value of: controller.snapshot.started&#x0A;  Actual: true&#x0A;Expected: false&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/can_soc_test.cpp:222
+Value of: controller.snapshot.started
+  Actual: true
+Expected: false
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/can_soc_test.cpp:223&#x0A;Expected equality of these values:&#x0A;  hardware-&gt;registers[0]&#x0A;    Which is: 24&#x0A;  mode&#x0A;    Which is: 25&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/can_soc_test.cpp:223
+Expected equality of these values:
+  hardware->registers[0]
+    Which is: 24
+  mode
+    Which is: 25
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

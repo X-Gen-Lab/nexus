@@ -16,6 +16,7 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/memory.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/authored.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"

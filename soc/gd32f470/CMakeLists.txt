@@ -18,7 +18,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 # SystemInit needs RCU/FMC; the always-present monotonic timebase needs TIMER.
 set(gd_sdk_units rcu fmc timer)
 set(gd_sources timebase.c)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
         continue()
@@ -29,11 +29,11 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
         list(APPEND gd_sources "drivers/${kind}.c")
     endif()
     # Generated UART/SPI/I2C acquisition and rollback use Nexus pin helpers.
-    if(kind MATCHES "^(gpio|uart|spi|i2c)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|can)$")
         list(APPEND gd_sources drivers/gpio.c)
     endif()
     # EXTI/PWM/ADC configure pins through the SDK without Nexus GPIO helpers.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can)$")
         list(APPEND gd_sdk_units gpio)
     endif()
     if(kind STREQUAL "uart")
@@ -63,6 +63,8 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc)
         endif()
     elseif(kind STREQUAL "watchdog")
         list(APPEND gd_sdk_units fwdgt)
+    elseif(kind STREQUAL "can")
+        list(APPEND gd_sources "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/can_controller.c")
     elseif(kind STREQUAL "adc")
         list(APPEND gd_sdk_units adc)
         if("trigger-dma" IN_LIST modes
@@ -93,7 +95,8 @@ target_link_libraries(nexus_soc_gd32f470 PUBLIC nexus_io
 target_include_directories(nexus_soc_gd32f470 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/private"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../common")
+    "${CMAKE_CURRENT_SOURCE_DIR}/../common"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../io/private")
 target_include_directories(nexus_soc_gd32f470 SYSTEM PRIVATE
     "${gd_firmware}/CMSIS" "${gd_device}/Include"
     "${gd_peripheral}/Include")

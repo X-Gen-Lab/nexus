@@ -1,0 +1,105 @@
+Running main() from gmock_main.cc
+[==========] Running 23 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 23 tests from ClassicCan
+[ RUN      ] ClassicCan.RejectsNonClassicFramesWithoutMutatingPreparedStorage
+[       OK ] ClassicCan.RejectsNonClassicFramesWithoutMutatingPreparedStorage (0 ms)
+[ RUN      ] ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries
+[       OK ] ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries (0 ms)
+[ RUN      ] ClassicCan.MailboxEmptyAloneNeverSettlesTheWireRequest
+[       OK ] ClassicCan.MailboxEmptyAloneNeverSettlesTheWireRequest (0 ms)
+[ RUN      ] ClassicCan.TxokAndCompletionDetachBeforeSettlement
+[       OK ] ClassicCan.TxokAndCompletionDetachBeforeSettlement (0 ms)
+[ RUN      ] ClassicCan.RemoteFrameUsesRequestedDlcAndZeroTransferredBytes
+[       OK ] ClassicCan.RemoteFrameUsesRequestedDlcAndZeroTransferredBytes (0 ms)
+[ RUN      ] ClassicCan.CancellationWaitsForActualAbortAcknowledgement
+[       OK ] ClassicCan.CancellationWaitsForActualAbortAcknowledgement (0 ms)
+[ RUN      ] ClassicCan.CompletionRacingCancellationPreservesWireSuccess
+[       OK ] ClassicCan.CompletionRacingCancellationPreservesWireSuccess (0 ms)
+[ RUN      ] ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility
+[       OK ] ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility (0 ms)
+[ RUN      ] ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect
+[       OK ] ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect (0 ms)
+[ RUN      ] ClassicCan.ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata
+[       OK ] ClassicCan.ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata (0 ms)
+[ RUN      ] ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames
+[       OK ] ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames (0 ms)
+[ RUN      ] ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount
+[       OK ] ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount (0 ms)
+[ RUN      ] ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull
+[       OK ] ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull (0 ms)
+[ RUN      ] ClassicCan.FourthVectorPriorityCannotBypassKernelWakeCeiling
+[       OK ] ClassicCan.FourthVectorPriorityCannotBypassKernelWakeCeiling (0 ms)
+[ RUN      ] ClassicCan.CompletionClearFailureCannotReleaseCallerStorage
+[       OK ] ClassicCan.CompletionClearFailureCannotReleaseCallerStorage (0 ms)
+[ RUN      ] ClassicCan.StuckIrqDisableRetainsRingAndWakeUntilStopReadback
+[       OK ] ClassicCan.StuckIrqDisableRetainsRingAndWakeUntilStopReadback (0 ms)
+[ RUN      ] ClassicCan.IncomingMaskRejectsTaskControlsWithoutAdmission
+[       OK ] ClassicCan.IncomingMaskRejectsTaskControlsWithoutAdmission (0 ms)
+[ RUN      ] ClassicCan.FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit
+[       OK ] ClassicCan.FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit (0 ms)
+[ RUN      ] ClassicCan.WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects
+[       OK ] ClassicCan.WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects (0 ms)
+[ RUN      ] ClassicCan.PrimaryClockIsActuallyAcquiredForTheFilterDomain
+[       OK ] ClassicCan.PrimaryClockIsActuallyAcquiredForTheFilterDomain (0 ms)
+[ RUN      ] ClassicCan.SecondControllerKeepsPrimaryClockAndPeerFiltersAlive
+[       OK ] ClassicCan.SecondControllerKeepsPrimaryClockAndPeerFiltersAlive (0 ms)
+[ RUN      ] ClassicCan.ColdUnownedTransmitCannotEscapeInitializationMode
+/workspace/nexus/tests/google/can_controller_test.cpp:305: Failure
+Expected equality of these values:
+  nx_can_controller_initialize(&model.controller)
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+/workspace/nexus/tests/google/can_controller_test.cpp:306: Failure
+Value of: model.controller.snapshot.closing
+  Actual: false
+Expected: true
+
+/workspace/nexus/tests/google/can_controller_test.cpp:307: Failure
+Expected equality of these values:
+  model.hardware.registers[0] & 1U
+    Which is: 0
+  1U
+    Which is: 1
+
+/workspace/nexus/tests/google/can_controller_test.cpp:310: Failure
+Expected equality of these values:
+  model.hardware.registers[0x180U / 4U] & 1U
+    Which is: 1
+  0U
+    Which is: 0
+
+[  FAILED  ] ClassicCan.ColdUnownedTransmitCannotEscapeInitializationMode (0 ms)
+[ RUN      ] ClassicCan.UnownedHardwareAbortFailureRetainsDomainAndWakeLoans
+/workspace/nexus/tests/google/can_controller_test.cpp:318: Failure
+Expected equality of these values:
+  nx_can_port_stop(&port)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+/workspace/nexus/tests/google/can_controller_test.cpp:319: Failure
+Value of: model.controller.snapshot.started
+  Actual: false
+Expected: true
+
+/workspace/nexus/tests/google/can_controller_test.cpp:320: Failure
+Expected equality of these values:
+  nx_can_filter_domain_stop(&domain)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+[  FAILED  ] ClassicCan.UnownedHardwareAbortFailureRetainsDomainAndWakeLoans (0 ms)
+[----------] 23 tests from ClassicCan (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 23 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 21 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] ClassicCan.ColdUnownedTransmitCannotEscapeInitializationMode
+[  FAILED  ] ClassicCan.UnownedHardwareAbortFailureRetainsDomainAndWakeLoans
+
+ 2 FAILED TESTS

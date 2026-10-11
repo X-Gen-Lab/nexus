@@ -4,6 +4,10 @@ try:
 except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
+try:
+    from ... import can
+except ImportError:
+    import can
 from . import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
@@ -623,6 +627,8 @@ def _uart_constructor(item, result):
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f407")
+    if item.kind == "can":
+        return can.constructor(item, result, "stm32")
     if item.kind == "gpio":
         return _gpio_constructor(item)
     if item.kind == "uart":

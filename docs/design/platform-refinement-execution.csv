@@ -5,10 +5,10 @@ IO-03,GPIO inferred mask validation,implemented,development_passed,not_applicabl
 IO-04,Current support documentation,implemented,development_passed,not_applicable,tools/configure/documentation.py;docs/delivery/support.md,tools/testing/evidence/configure-iteration,mode MPU split and reviewed route statements match production,codex
 IO-05,SPI polling owner identity,implemented,development_passed,not_executed,components/bus_owner/src/spi_owner.c,tools/testing/evidence/spi-polling-identity-green.log,foreign controller rejected before borrowing or hardware,codex
 IO-06,Example startup rollback,implemented,development_passed,not_executed,os/freertos/freertos.c;X-Gen-Lab/nexus-examples,X-Gen-Lab/nexus-examples/tests/evidence/startup-rollback;X-Gen-Lab/nexus-examples/tests/evidence/scheduler-return,close drain join or prestart discard; preserve cleanup responsibility,codex
-IO-07,I/O service diagnostics,planned,pending,not_executed,io;components,pending,progress and failures observable without hidden worker,codex
+IO-07,I/O service diagnostics,implemented,targeted_passed,not_executed,io;components,tools/testing/evidence/io-observer-iteration,progress and failures observable without hidden worker,codex
 IO-08,Mode ownership cancellation matrix,planned,pending,not_executed,soc;tests/google,pending,count loss deadline and drain contracts cover selected modes,codex
-IO-09,Quarantine integration and recovery,planned,pending,not_executed,components;X-Gen-Lab/nexus-examples,pending,retain borrowed storage; explicit recovery owner,codex
-IO-10,Stream capacity backpressure budget,planned,pending,not_executed,io/src/stream.c;tools/hil,pending,bounded capacity and caller policy; no overwritten loans,codex
+IO-09,Quarantine integration and recovery,implemented,targeted_passed,not_executed,components;X-Gen-Lab/nexus-examples,tools/testing/evidence/io-observer-iteration,retain borrowed storage; explicit recovery owner,codex
+IO-10,Stream capacity backpressure budget,implemented,targeted_passed,not_executed,io/src/stream.c;tools/hil,tools/testing/evidence/io-observer-iteration,bounded capacity and caller policy; no overwritten loans,codex
 IO-11,Optional read-only capabilities,implemented,development_passed,not_applicable,tools/configure/factory.py;tools/configure/providers/common.py,tools/testing/evidence/configure-iteration,selected descriptors; simulated Native flags; no hot path cost,codex
 IO-12,UART RX DMA and IDLE,implemented,targeted_passed,not_executed,soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c,tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-streams,reviewed DMA routes; finite and continuous ownership,codex
 IO-13,UART duplex DMA blocks,implemented,targeted_passed,not_executed,soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c,tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-streams,TX DMA plus RX blocks without default state growth,codex
@@ -52,7 +52,7 @@ IO-50,Physical I2C electrical protocol,blocked,pending,blocked,tools/hil,pending
 IO-51,Physical ADC PWM EXTI,blocked,pending,blocked,tools/hil,pending,real stimulus and independent instrument observations,codex
 IO-52,Physical Flash power interruption,blocked,pending,blocked,tools/hil;X-Gen-Lab/nexus-examples,pending,destructive test region explicitly owned externally,codex
 IO-53,Physical concurrent endurance and latency,blocked,pending,blocked,tools/hil,pending,same firmware soak interrupt latency stack load evidence,codex
-IO-54,CAN platform interface and controllers,in_progress,pending,not_executed,io;soc,pending,static bounded frames; classic CAN on current silicon; no fake CAN FD,codex
+IO-54,CAN platform interface and controllers,implemented,targeted_passed,not_executed,io;soc,tools/testing/evidence/can-iteration;tools/testing/evidence/configure-can,classic CAN IRQ request/frame rings; shared filter-domain ownership; two generated instances; no physical bus claim,codex
 IO-55,Ethernet MAC PHY raw frames,planned,pending,not_executed,io;soc,pending,caller descriptors buffers; cache/domain; external network policy,codex
 IO-56,USB clock endpoints lifecycle,planned,pending,not_executed,io;soc,pending,legal 48 MHz profile; reset cancel drain; no GD default clock promise,codex
 IO-57,Timer capture advanced PWM,planned,pending,not_executed,io;soc,pending,input capture timestamps; break deadtime safe ownership,codex

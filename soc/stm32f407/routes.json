@@ -377,6 +377,56 @@
         "edge-event"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions"
+    },
+    {
+      "id": "can1-pa11-pa12",
+      "controller": "CAN1",
+      "kind": "can",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "can_rx",
+          "af": 9
+        },
+        {
+          "pin": "PA12",
+          "function": "can_tx",
+          "af": 9
+        }
+      ],
+      "source": "STM32F407 datasheet alternate functions AF9; Qiming V3.1 CAN sample blobs 8731616cf0d5bf02917c76463c49e722b39eb415"
+    },
+    {
+      "id": "can2-pb12-pb13",
+      "controller": "CAN2",
+      "kind": "can",
+      "variants": [
+        "STM32F407VET6",
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "classic-irq"
+      ],
+      "pins": [
+        {
+          "pin": "PB12",
+          "function": "can_rx",
+          "af": 9
+        },
+        {
+          "pin": "PB13",
+          "function": "can_tx",
+          "af": 9
+        }
+      ],
+      "source": "STM32F407 datasheet alternate functions AF9; Qiming V3.1 CAN sample blobs ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa"
     }
   ]
 }
