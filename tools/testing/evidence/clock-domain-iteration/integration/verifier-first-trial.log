@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/workspace/nexus-industrial-design/sleep-consumer/check_evidence.py", line 13, in <module>
+    assert bool(re.search(r'\b'+symbol+r'$',symbols,re.M))==selected,(label,symbol)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('stm32-selected-final2', 'nx_arch_idle_if_unchanged')

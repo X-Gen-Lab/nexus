@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "/tmp/nexus-pre-fix-soc-bge33wmc/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-r5a4xbzl",
+      "-B",
+      "/tmp/nexus-sleep-cmake-r5a4xbzl/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.28108126495499164,
+    "stdout": "red-cmake-0-stdout.log",
+    "stderr": "red-cmake-0-stderr.log",
+    "captured_fixture": "red-cmake-0-fixture"
+  },
+  {
+    "command": [
+      "/tmp/nexus-pre-fix-soc-bge33wmc/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-9dceoi41",
+      "-B",
+      "/tmp/nexus-sleep-cmake-9dceoi41/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.25351897900691256,
+    "stdout": "red-cmake-1-stdout.log",
+    "stderr": "red-cmake-1-stderr.log",
+    "captured_fixture": "red-cmake-1-fixture"
+  },
+  {
+    "command": [
+      "/tmp/nexus-pre-fix-soc-bge33wmc/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-hiel3nx7",
+      "-B",
+      "/tmp/nexus-sleep-cmake-hiel3nx7/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.20326392800780013,
+    "stdout": "red-cmake-2-stdout.log",
+    "stderr": "red-cmake-2-stderr.log",
+    "captured_fixture": "red-cmake-2-fixture"
+  },
+  {
+    "command": [
+      "/tmp/nexus-pre-fix-soc-bge33wmc/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-2fwnz6rv",
+      "-B",
+      "/tmp/nexus-sleep-cmake-2fwnz6rv/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.20040396199328825,
+    "stdout": "red-cmake-3-stdout.log",
+    "stderr": "red-cmake-3-stderr.log",
+    "captured_fixture": "red-cmake-3-fixture"
+  }
+]

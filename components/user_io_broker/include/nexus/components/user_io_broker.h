@@ -13,7 +13,11 @@
 extern "C" {
 #endif
 /** \brief Only scalar GPIO operations are admitted by this message ABI. */
-enum { NX_USER_IO_ABI = 1U, NX_USER_GPIO_READ = 1U, NX_USER_GPIO_WRITE = 2U };
+enum nx_user_io_constants {
+    NX_USER_IO_ABI = 1U,
+    NX_USER_GPIO_READ = 1U,
+    NX_USER_GPIO_WRITE = 2U
+};
 /**
  * \brief           Untrusted copied message; identity never comes from users
  * \note            No arbitrary port, MMIO, callback, slot or principal
