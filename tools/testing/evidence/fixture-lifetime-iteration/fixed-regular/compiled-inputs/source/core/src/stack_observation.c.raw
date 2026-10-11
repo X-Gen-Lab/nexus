@@ -1,0 +1,31 @@
+/**
+ * \file            stack_observation.c
+ * \brief           Bounded caller-provenance paint observation
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+
+#include "nexus/core/stack_observation.h"
+
+/** \brief Sample only a bounded prefix; never paint or retain stack storage. */
+nx_result_t nx_stack_observe(const void* base, size_t bytes, uint8_t paint,
+                             nx_stack_observation_t* out) {
+    uintptr_t first = (uintptr_t)base;
+    uintptr_t output = (uintptr_t)out;
+    if (base == NULL || out == NULL || bytes == 0U ||
+        bytes > UINTPTR_MAX - first || sizeof(*out) > UINTPTR_MAX - output ||
+        (first < output + sizeof(*out) && output < first + bytes)) {
+        return NX_ERROR_INVALID;
+    }
+    const uint8_t* stack = base;
+    size_t untouched = 0U;
+    while (untouched < bytes && stack[untouched] == paint) {
+        ++untouched;
+    }
+    *out = (nx_stack_observation_t){.capacity_bytes = bytes,
+                                    .untouched_bytes = untouched,
+                                    .touched_bytes = bytes - untouched};
+    return NX_SUCCESS;
+}

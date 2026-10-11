@@ -1,0 +1,9 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from FreeRTOSFailStop
+[ RUN      ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark
+[       OK ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark (2 ms)
+[ RUN      ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName
+[       OK ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName (2 ms)
+[ RUN      ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel

@@ -1,0 +1,46 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--preset",
+      "native-asan",
+      "-B",
+      "/tmp/nexus-freertos-failstop-iteration/green-native-asan"
+    ],
+    "cwd": "/workspace/nexus",
+    "environment": {
+      "PATH": "/workspace/nexus/.venv/bin:/usr/local/bin:/usr/bin:/bin",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "exit_code": 0,
+    "log": {
+      "bytes": 1554,
+      "path": "/workspace/nexus-freertos-failstop-iteration/green-configure-native-asan.log",
+      "sha256": "c0b633b406aa09e5b5b406f6bab37c1c8157cba31fd5df07638d096c092447e2"
+    },
+    "observation": "Actual unified exec command and resumed process returned0; preserved raw output"
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/tmp/nexus-freertos-failstop-iteration/green-native-asan",
+      "--target",
+      "nexus_freertos_failstop_test",
+      "--parallel",
+      "2"
+    ],
+    "cwd": "/workspace/nexus",
+    "environment": {
+      "PATH": "/workspace/nexus/.venv/bin:/usr/local/bin:/usr/bin:/bin",
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "exit_code": 0,
+    "log": {
+      "bytes": 1228,
+      "path": "/workspace/nexus-freertos-failstop-iteration/green-build-native-asan.log",
+      "sha256": "c7aa93b1d189daea035d8f6a90a6b6a13122b73d09f7233bbc546e64ebcd2cbb"
+    },
+    "observation": "Actual unified exec command and resumed process returned0; preserved raw output"
+  }
+]

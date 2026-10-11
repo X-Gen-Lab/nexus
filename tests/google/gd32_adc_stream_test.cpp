@@ -330,6 +330,9 @@ class GD32ADCContinuous : public ::testing::Test {
     nx_dma_memory_region_t regions[3] = {};
     nx_stream_slot_t slots[3] = {};
     nx_stream_t stream = {};
+    /* Retained observation storage survives fatal assertions and TearDown. */
+    nx_adc_observation_t records[3] = {};
+    nx_adc_observer_t observer = {};
     const nx_adc_port_t port = {&nx_gd32_adc_continuous_ops, &state};
     void* mapping = MAP_FAILED;
     void SetUp() override {
@@ -544,8 +547,6 @@ TEST_F(GD32ADCContinuous, SequenceFactsReportSelectedCyclesAndNominalClocks) {
 }
 
 TEST_F(GD32ADCContinuous, ObserverEpochTracksBlockAndRejectsReleasedLoan) {
-    nx_adc_observation_t records[3] = {};
-    nx_adc_observer_t observer = {};
     ASSERT_EQ(nx_adc_observer_initialize(&observer, records, 3U), NX_SUCCESS);
     ASSERT_EQ(nx_adc_port_attach_observer(&port, &observer), NX_SUCCESS);
     Ready();

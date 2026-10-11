@@ -1,0 +1,25 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from FreeRTOSFailStop
+[ RUN      ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark
+[       OK ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark (1 ms)
+[ RUN      ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName
+[       OK ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName (1 ms)
+[ RUN      ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel
+[       OK ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel (1006 ms)
+[ RUN      ] FreeRTOSFailStop.StrongerIncomingBasepriIsNeverWeakenedByPortStore
+[       OK ] FreeRTOSFailStop.StrongerIncomingBasepriIsNeverWeakenedByPortStore (1005 ms)
+[ RUN      ] FreeRTOSFailStop.EqualIncomingBasepriStaysMaskedThroughObservation
+[       OK ] FreeRTOSFailStop.EqualIncomingBasepriStaysMaskedThroughObservation (1010 ms)
+[ RUN      ] FreeRTOSFailStop.PrimaskIsPreservedWithoutChangingAnotherMask
+[       OK ] FreeRTOSFailStop.PrimaskIsPreservedWithoutChangingAnotherMask (1011 ms)
+[ RUN      ] FreeRTOSFailStop.FaultmaskIsPreservedWithoutChangingAnotherMask
+[       OK ] FreeRTOSFailStop.FaultmaskIsPreservedWithoutChangingAnotherMask (1010 ms)
+[ RUN      ] FreeRTOSFailStop.WeakerIncomingBasepriIsRaisedToActualKernelCeiling
+[       OK ] FreeRTOSFailStop.WeakerIncomingBasepriIsRaisedToActualKernelCeiling (1 ms)
+[----------] 8 tests from FreeRTOSFailStop (5049 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (5049 ms total)
+[  PASSED  ] 8 tests.

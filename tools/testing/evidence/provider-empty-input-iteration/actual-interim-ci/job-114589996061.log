@@ -1,0 +1,486 @@
+﻿2026-10-11T22:19:53.3243198Z Current runner version: '2.337.0'
+2026-10-11T22:19:53.3262857Z ##[group]Runner Image Provisioner
+2026-10-11T22:19:53.3263562Z Hosted Compute Agent
+2026-10-11T22:19:53.3264108Z Version: 20261002.596
+2026-10-11T22:19:53.3264662Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-11T22:19:53.3265581Z Build Date: 2026-10-02T22:28:27Z
+2026-10-11T22:19:53.3266164Z Worker ID: {083717af-7494-42e8-a799-a6d4b319790f}
+2026-10-11T22:19:53.3266739Z Region: westus3
+2026-10-11T22:19:53.3267238Z Cloud: Azure
+2026-10-11T22:19:53.3267717Z ##[endgroup]
+2026-10-11T22:19:53.3268849Z ##[group]Operating System
+2026-10-11T22:19:53.3269434Z Ubuntu
+2026-10-11T22:19:53.3269881Z 24.04.5
+2026-10-11T22:19:53.3270341Z LTS
+2026-10-11T22:19:53.3270821Z ##[endgroup]
+2026-10-11T22:19:53.3271290Z ##[group]Runner Image
+2026-10-11T22:19:53.3272021Z Image: ubuntu-24.04
+2026-10-11T22:19:53.3272515Z Version: 20261004.327.1
+2026-10-11T22:19:53.3273604Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-11T22:19:53.3274842Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-11T22:19:53.3275700Z ##[endgroup]
+2026-10-11T22:19:53.3276589Z ##[group]GITHUB_TOKEN Permissions
+2026-10-11T22:19:53.3278396Z Contents: read
+2026-10-11T22:19:53.3278904Z Metadata: read
+2026-10-11T22:19:53.3279422Z ##[endgroup]
+2026-10-11T22:19:53.3281098Z Secret source: Actions
+2026-10-11T22:19:53.3282097Z Cache mode: write
+2026-10-11T22:19:53.3282671Z Prepare workflow directory
+2026-10-11T22:19:53.3621191Z Prepare all required actions
+2026-10-11T22:19:53.3666784Z Getting action download info
+2026-10-11T22:19:53.6704001Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-10-11T22:19:53.7608705Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-10-11T22:19:54.6296989Z Uses: X-Gen-Lab/nexus/.github/workflows/build-matrix.yml@refs/heads/codex/next-generation-platform (471b4a1480e318448bcfa75e41c5a077cd2e1cf5)
+2026-10-11T22:19:54.6301663Z Complete job name: Build & Test / Provider assembly audits (stm32_assembly)
+2026-10-11T22:19:54.6931638Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-10-11T22:19:54.6932611Z with:
+2026-10-11T22:19:54.6932999Z   submodules: false
+2026-10-11T22:19:54.6933408Z   fetch-depth: 0
+2026-10-11T22:19:54.6933822Z   repository: X-Gen-Lab/nexus
+2026-10-11T22:19:54.6937793Z   token: ***
+2026-10-11T22:19:54.6938181Z   ssh-strict: true
+2026-10-11T22:19:54.6938574Z   ssh-user: git
+2026-10-11T22:19:54.6938980Z   persist-credentials: true
+2026-10-11T22:19:54.6939431Z   clean: true
+2026-10-11T22:19:54.6939877Z   sparse-checkout-cone-mode: true
+2026-10-11T22:19:54.6940354Z   fetch-tags: false
+2026-10-11T22:19:54.6940762Z   show-progress: true
+2026-10-11T22:19:54.6941167Z   lfs: false
+2026-10-11T22:19:54.6941654Z   set-safe-directory: true
+2026-10-11T22:19:54.6942150Z   allow-unsafe-pr-checkout: false
+2026-10-11T22:19:54.6942819Z ##[endgroup]
+2026-10-11T22:19:54.7735165Z Syncing repository: X-Gen-Lab/nexus
+2026-10-11T22:19:54.7737285Z ##[group]Getting Git version info
+2026-10-11T22:19:54.7738325Z Working directory is '/home/runner/work/nexus/nexus'
+2026-10-11T22:19:54.7739826Z [command]/usr/bin/git version
+2026-10-11T22:19:54.7765141Z git version 2.55.0
+2026-10-11T22:19:54.7783852Z ##[endgroup]
+2026-10-11T22:19:54.7789188Z Temporarily overriding HOME='/home/runner/work/_temp/da0c67f6-c177-4450-a24c-fed19c33c16d' before making global git config changes
+2026-10-11T22:19:54.7791526Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-11T22:19:54.7793419Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/nexus/nexus
+2026-10-11T22:19:54.7837400Z Deleting the contents of '/home/runner/work/nexus/nexus'
+2026-10-11T22:19:54.7840667Z ##[group]Determining repository object format
+2026-10-11T22:19:54.7842547Z ##[endgroup]
+2026-10-11T22:19:54.7843531Z ##[group]Initializing the repository
+2026-10-11T22:19:54.7847172Z [command]/usr/bin/git init /home/runner/work/nexus/nexus
+2026-10-11T22:19:54.7920750Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-11T22:19:54.7922499Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-11T22:19:54.7923982Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-11T22:19:54.7925108Z hint: call:
+2026-10-11T22:19:54.7925652Z hint:
+2026-10-11T22:19:54.7926372Z hint: 	git config --global init.defaultBranch <name>
+2026-10-11T22:19:54.7927284Z hint:
+2026-10-11T22:19:54.7928108Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-11T22:19:54.7929532Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-11T22:19:54.7930635Z hint:
+2026-10-11T22:19:54.7931237Z hint: 	git branch -m <name>
+2026-10-11T22:19:54.7932065Z hint:
+2026-10-11T22:19:54.7933003Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-11T22:19:54.7934529Z Initialized empty Git repository in /home/runner/work/nexus/nexus/.git/
+2026-10-11T22:19:54.7937061Z [command]/usr/bin/git remote add origin https://github.com/X-Gen-Lab/nexus
+2026-10-11T22:19:54.7971025Z ##[endgroup]
+2026-10-11T22:19:54.7972295Z ##[group]Disabling automatic garbage collection
+2026-10-11T22:19:54.7974052Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-11T22:19:54.8003337Z ##[endgroup]
+2026-10-11T22:19:54.8004324Z ##[group]Setting up auth
+2026-10-11T22:19:54.8005049Z Removing SSH command configuration
+2026-10-11T22:19:54.8007392Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T22:19:54.8035760Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T22:19:54.8338220Z Removing HTTP extra header
+2026-10-11T22:19:54.8343916Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T22:19:54.8378891Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T22:19:54.8571542Z Removing includeIf entries pointing to credentials config files
+2026-10-11T22:19:54.8575000Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:19:54.8609658Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T22:19:54.8799422Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-11T22:19:54.8831642Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/nexus/nexus/.git.path /home/runner/work/_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:19:54.8860744Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:19:54.8893576Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:19:54.8923482Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:19:54.8949557Z ##[endgroup]
+2026-10-11T22:19:54.8950234Z ##[group]Fetching the repository
+2026-10-11T22:19:54.8954834Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-11T22:20:05.4465799Z From https://github.com/X-Gen-Lab/nexus
+2026-10-11T22:20:05.4466558Z  * [new branch]        codex/industrial-platform-modernization -> origin/codex/industrial-platform-modernization
+2026-10-11T22:20:05.4467183Z  * [new branch]        codex/next-generation-platform -> origin/codex/next-generation-platform
+2026-10-11T22:20:05.4467601Z  * [new branch]        main       -> origin/main
+2026-10-11T22:20:05.4474661Z [command]/usr/bin/git branch --list --remote origin/codex/next-generation-platform
+2026-10-11T22:20:05.4499798Z   origin/codex/next-generation-platform
+2026-10-11T22:20:05.4505987Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/next-generation-platform
+2026-10-11T22:20:05.4528186Z 471b4a1480e318448bcfa75e41c5a077cd2e1cf5
+2026-10-11T22:20:05.4532189Z ##[endgroup]
+2026-10-11T22:20:05.4532811Z ##[group]Determining the checkout info
+2026-10-11T22:20:05.4536291Z ##[endgroup]
+2026-10-11T22:20:05.4542339Z [command]/usr/bin/git sparse-checkout disable
+2026-10-11T22:20:05.4581072Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-11T22:20:05.4614178Z ##[group]Checking out the ref
+2026-10-11T22:20:05.4614851Z [command]/usr/bin/git checkout --progress --force -B codex/next-generation-platform refs/remotes/origin/codex/next-generation-platform
+2026-10-11T22:20:06.3976906Z Switched to a new branch 'codex/next-generation-platform'
+2026-10-11T22:20:06.3982982Z branch 'codex/next-generation-platform' set up to track 'origin/codex/next-generation-platform'.
+2026-10-11T22:20:06.4016804Z ##[endgroup]
+2026-10-11T22:20:06.4072263Z [command]/usr/bin/git log -1 --format=%H
+2026-10-11T22:20:06.4087957Z 471b4a1480e318448bcfa75e41c5a077cd2e1cf5
+2026-10-11T22:20:06.4338582Z Prepare all required actions
+2026-10-11T22:20:06.4339052Z Getting action download info
+2026-10-11T22:20:06.5560949Z Download action repository 'actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97' (SHA:5fda3b95a4ea91299a34e894583c3862153e4b97)
+2026-10-11T22:20:06.8490385Z ##[group]Run ./.github/actions/setup-build
+2026-10-11T22:20:06.8490647Z with:
+2026-10-11T22:20:06.8490815Z   preset: native-debug
+2026-10-11T22:20:06.8490994Z   arm: true
+2026-10-11T22:20:06.8491148Z   os: ubuntu-24.04
+2026-10-11T22:20:06.8491323Z ##[endgroup]
+2026-10-11T22:20:06.8538756Z ##[start-action display=Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97;id=__self.__actions_setup-python]
+2026-10-11T22:20:06.8602269Z ##[group]Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+2026-10-11T22:20:06.8602569Z with:
+2026-10-11T22:20:06.8602750Z   python-version: 3.11
+2026-10-11T22:20:06.8602935Z   check-latest: false
+2026-10-11T22:20:06.8604974Z   token: ***
+2026-10-11T22:20:06.8605187Z   update-environment: true
+2026-10-11T22:20:06.8605388Z   allow-prereleases: false
+2026-10-11T22:20:06.8605573Z   freethreaded: false
+2026-10-11T22:20:06.8605751Z ##[endgroup]
+2026-10-11T22:20:06.9519414Z ##[group]Installed versions
+2026-10-11T22:20:07.0218789Z Successfully set up CPython (3.11.17)
+2026-10-11T22:20:07.0219408Z ##[endgroup]
+2026-10-11T22:20:07.0313705Z ##[end-action id=__self.__actions_setup-python;outcome=success;conclusion=success;duration_ms=177]
+2026-10-11T22:20:07.0316105Z ##[start-action display=Install the locked local build and commit tools;id=__self.__run]
+2026-10-11T22:20:07.0344644Z ##[group]Run python scripts/setup/install_dev_tools.py --skip-hooks
+2026-10-11T22:20:07.0345126Z [36;1mpython scripts/setup/install_dev_tools.py --skip-hooks[0m
+2026-10-11T22:20:07.0345479Z [36;1m.venv/bin/python -m pip install -r requirements.txt[0m
+2026-10-11T22:20:07.0345789Z [36;1mecho "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"[0m
+2026-10-11T22:20:07.0569925Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T22:20:07.0570258Z env:
+2026-10-11T22:20:07.0570497Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:07.0570850Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:20:07.0571579Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:07.0571906Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:07.0572202Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:07.0572498Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:20:07.0572757Z ##[endgroup]
+2026-10-11T22:20:11.5981096Z Collecting pre-commit==4.3.0 (from -r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:11.6484433Z   Downloading pre_commit-4.3.0-py2.py3-none-any.whl.metadata (1.2 kB)
+2026-10-11T22:20:11.9874048Z Collecting clang-format==14.0.6 (from -r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 3))
+2026-10-11T22:20:11.9976039Z   Downloading clang_format-14.0.6-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (4.6 kB)
+2026-10-11T22:20:12.0382781Z Collecting cfgv>=2.0.0 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.0481093Z   Downloading cfgv-3.5.0-py2.py3-none-any.whl.metadata (8.9 kB)
+2026-10-11T22:20:12.0997876Z Collecting identify>=1.0.0 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.1100272Z   Downloading identify-2.6.20-py2.py3-none-any.whl.metadata (4.4 kB)
+2026-10-11T22:20:12.1275010Z Collecting nodeenv>=0.11.1 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.1378638Z   Downloading nodeenv-1.11.0-py2.py3-none-any.whl.metadata (40 kB)
+2026-10-11T22:20:12.1494811Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.0/41.0 kB 3.2 MB/s eta 0:00:00
+2026-10-11T22:20:12.1838774Z Collecting pyyaml>=5.1 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.1938059Z   Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-10-11T22:20:12.2632300Z Collecting virtualenv>=20.10.0 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.2731225Z   Downloading virtualenv-21.14.6-py3-none-any.whl.metadata (4.1 kB)
+2026-10-11T22:20:12.3334225Z Collecting distlib<1,>=0.4.3 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.3433456Z   Downloading distlib-0.4.3-py2.py3-none-any.whl.metadata (5.3 kB)
+2026-10-11T22:20:12.3758196Z Collecting filelock<5,>=3.24.2 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.3854851Z   Downloading filelock-4.1.1-py3-none-any.whl.metadata (2.0 kB)
+2026-10-11T22:20:12.4062432Z Collecting packaging>=26.3 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.4163755Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-11T22:20:12.4625706Z Collecting platformdirs<5,>=4.4 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.4727894Z   Downloading platformdirs-4.13.0-py3-none-any.whl.metadata (5.5 kB)
+2026-10-11T22:20:12.5206436Z Collecting python-discovery>=1.6.1 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T22:20:12.5305227Z   Downloading python_discovery-1.6.2-py3-none-any.whl.metadata (5.1 kB)
+2026-10-11T22:20:12.5788880Z Downloading pre_commit-4.3.0-py2.py3-none-any.whl (220 kB)
+2026-10-11T22:20:12.5983257Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.0/221.0 kB 11.9 MB/s eta 0:00:00
+2026-10-11T22:20:12.6093040Z Downloading clang_format-14.0.6-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (1.1 MB)
+2026-10-11T22:20:12.6571573Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 24.6 MB/s eta 0:00:00
+2026-10-11T22:20:12.6670256Z Downloading cfgv-3.5.0-py2.py3-none-any.whl (7.4 kB)
+2026-10-11T22:20:12.6781124Z Downloading identify-2.6.20-py2.py3-none-any.whl (99 kB)
+2026-10-11T22:20:12.6810543Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 99.5/99.5 kB 57.2 MB/s eta 0:00:00
+2026-10-11T22:20:12.6908404Z Downloading nodeenv-1.11.0-py2.py3-none-any.whl (34 kB)
+2026-10-11T22:20:12.7024033Z Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+2026-10-11T22:20:12.7168744Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 60.9 MB/s eta 0:00:00
+2026-10-11T22:20:12.7267696Z Downloading virtualenv-21.14.6-py3-none-any.whl (5.5 MB)
+2026-10-11T22:20:12.7840628Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 98.1 MB/s eta 0:00:00
+2026-10-11T22:20:12.7938918Z Downloading distlib-0.4.3-py2.py3-none-any.whl (470 kB)
+2026-10-11T22:20:12.8104328Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 470.6/470.6 kB 30.5 MB/s eta 0:00:00
+2026-10-11T22:20:12.8202720Z Downloading filelock-4.1.1-py3-none-any.whl (132 kB)
+2026-10-11T22:20:12.8610993Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.5/132.5 kB 3.1 MB/s eta 0:00:00
+2026-10-11T22:20:12.8709596Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-11T22:20:12.8805914Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 130.0/130.0 kB 14.7 MB/s eta 0:00:00
+2026-10-11T22:20:12.8904278Z Downloading platformdirs-4.13.0-py3-none-any.whl (32 kB)
+2026-10-11T22:20:12.9135756Z Downloading python_discovery-1.6.2-py3-none-any.whl (38 kB)
+2026-10-11T22:20:12.9950837Z Installing collected packages: distlib, clang-format, pyyaml, platformdirs, packaging, nodeenv, identify, filelock, cfgv, python-discovery, virtualenv, pre-commit
+2026-10-11T22:20:13.5965461Z Successfully installed cfgv-3.5.0 clang-format-14.0.6 distlib-0.4.3 filelock-4.1.1 identify-2.6.20 nodeenv-1.11.0 packaging-26.3 platformdirs-4.13.0 pre-commit-4.3.0 python-discovery-1.6.2 pyyaml-6.0.3 virtualenv-21.14.6
+2026-10-11T22:20:13.6716448Z 
+2026-10-11T22:20:13.6716968Z [notice] A new release of pip is available: 24.0 -> 26.2.1
+2026-10-11T22:20:13.6717768Z [notice] To update, run: /home/runner/work/nexus/nexus/.venv/bin/python -m pip install --upgrade pip
+2026-10-11T22:20:14.0464294Z Git hook installation skipped.
+2026-10-11T22:20:14.0464717Z Development tools verified in /home/runner/work/nexus/nexus/.venv.
+2026-10-11T22:20:14.0465138Z Run this .venv's Python with -m pre_commit run --all-files; see --help for activation.
+2026-10-11T22:20:14.2993263Z Requirement already satisfied: pre-commit==4.3.0 in ./.venv/lib/python3.11/site-packages (from -r dependencies/development-tools.txt (line 2)) (4.3.0)
+2026-10-11T22:20:14.3000394Z Requirement already satisfied: clang-format==14.0.6 in ./.venv/lib/python3.11/site-packages (from -r dependencies/development-tools.txt (line 3)) (14.0.6)
+2026-10-11T22:20:14.4301292Z Collecting cmake==3.31.6 (from -r dependencies/environment-tools.txt (line 2))
+2026-10-11T22:20:14.4548023Z   Downloading cmake-3.31.6-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.3 kB)
+2026-10-11T22:20:14.4825932Z Collecting ninja==1.13.2 (from -r dependencies/environment-tools.txt (line 3))
+2026-10-11T22:20:14.4860490Z   Downloading ninja-1.13.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.4 kB)
+2026-10-11T22:20:14.4890925Z Requirement already satisfied: PyYAML==6.0.3 in ./.venv/lib/python3.11/site-packages (from -r requirements.txt (line 5)) (6.0.3)
+2026-10-11T22:20:14.4919233Z Requirement already satisfied: cfgv>=2.0.0 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (3.5.0)
+2026-10-11T22:20:14.4927910Z Requirement already satisfied: identify>=1.0.0 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (2.6.20)
+2026-10-11T22:20:14.4941591Z Requirement already satisfied: nodeenv>=0.11.1 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (1.11.0)
+2026-10-11T22:20:14.4950596Z Requirement already satisfied: virtualenv>=20.10.0 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (21.14.6)
+2026-10-11T22:20:14.5062514Z Requirement already satisfied: distlib<1,>=0.4.3 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (0.4.3)
+2026-10-11T22:20:14.5072046Z Requirement already satisfied: filelock<5,>=3.24.2 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (4.1.1)
+2026-10-11T22:20:14.5079694Z Requirement already satisfied: packaging>=26.3 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (26.3)
+2026-10-11T22:20:14.5086939Z Requirement already satisfied: platformdirs<5,>=4.4 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (4.13.0)
+2026-10-11T22:20:14.5094510Z Requirement already satisfied: python-discovery>=1.6.1 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (1.6.2)
+2026-10-11T22:20:14.5216292Z Downloading cmake-3.31.6-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (27.8 MB)
+2026-10-11T22:20:14.8138841Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 27.8/27.8 MB 51.6 MB/s eta 0:00:00
+2026-10-11T22:20:14.8177673Z Downloading ninja-1.13.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (183 kB)
+2026-10-11T22:20:14.8213099Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 183.4/183.4 kB 85.9 MB/s eta 0:00:00
+2026-10-11T22:20:14.9107672Z Installing collected packages: ninja, cmake
+2026-10-11T22:20:15.6259692Z Successfully installed cmake-3.31.6 ninja-1.13.2
+2026-10-11T22:20:15.6427045Z 
+2026-10-11T22:20:15.6428044Z [notice] A new release of pip is available: 24.0 -> 26.2.1
+2026-10-11T22:20:15.6428626Z [notice] To update, run: /home/runner/work/nexus/nexus/.venv/bin/python -m pip install --upgrade pip
+2026-10-11T22:20:15.7025928Z ##[end-action id=__self.__run;outcome=success;conclusion=success;duration_ms=8670]
+2026-10-11T22:20:15.7028345Z ##[start-action display=Initialize selected vendor and scheduler sources;id=__self.__run_2]
+2026-10-11T22:20:15.7230578Z ##[group]Run git submodule update --init --recursive ext/freertos ext/threadx vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/cmsis_device_g4
+2026-10-11T22:20:15.7231566Z [36;1mgit submodule update --init --recursive ext/freertos ext/threadx vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/cmsis_device_g4[0m
+2026-10-11T22:20:15.7287274Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T22:20:15.7287547Z env:
+2026-10-11T22:20:15.7287759Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:15.7288104Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:20:15.7288430Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:15.7288717Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:15.7289017Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:15.7289306Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:20:15.7289560Z ##[endgroup]
+2026-10-11T22:20:15.7568878Z Submodule 'ext/freertos' (https://github.com/FreeRTOS/FreeRTOS-Kernel.git) registered for path 'ext/freertos'
+2026-10-11T22:20:15.7575067Z Submodule 'ext/threadx' (https://github.com/eclipse-threadx/threadx.git) registered for path 'ext/threadx'
+2026-10-11T22:20:15.7581639Z Submodule 'vendors/arm/CMSIS_5' (https://github.com/ARM-software/CMSIS_5.git) registered for path 'vendors/arm/CMSIS_5'
+2026-10-11T22:20:15.7588818Z Submodule 'vendors/st/cmsis_device_f4' (https://github.com/STMicroelectronics/cmsis_device_f4.git) registered for path 'vendors/st/cmsis_device_f4'
+2026-10-11T22:20:15.7595468Z Submodule 'vendors/st/cmsis_device_g4' (https://github.com/STMicroelectronics/cmsis-device-g4.git) registered for path 'vendors/st/cmsis_device_g4'
+2026-10-11T22:20:15.7619226Z Cloning into '/home/runner/work/nexus/nexus/ext/freertos'...
+2026-10-11T22:20:22.6112358Z Cloning into '/home/runner/work/nexus/nexus/ext/threadx'...
+2026-10-11T22:20:24.7582428Z Cloning into '/home/runner/work/nexus/nexus/vendors/arm/CMSIS_5'...
+2026-10-11T22:20:36.1933916Z Cloning into '/home/runner/work/nexus/nexus/vendors/st/cmsis_device_f4'...
+2026-10-11T22:20:37.7951937Z Cloning into '/home/runner/work/nexus/nexus/vendors/st/cmsis_device_g4'...
+2026-10-11T22:20:38.6850452Z Submodule path 'ext/freertos': checked out 'dbf70559b27d39c1fdb68dfb9a32140b6a6777a0'
+2026-10-11T22:20:38.6871476Z Submodule 'ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports' (https://github.com/FreeRTOS/FreeRTOS-Kernel-Community-Supported-Ports) registered for path 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T22:20:38.6876874Z Submodule 'ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports' (https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports) registered for path 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T22:20:38.6901008Z Cloning into '/home/runner/work/nexus/nexus/ext/freertos/portable/ThirdParty/Community-Supported-Ports'...
+2026-10-11T22:20:39.6103000Z Cloning into '/home/runner/work/nexus/nexus/ext/freertos/portable/ThirdParty/Partner-Supported-Ports'...
+2026-10-11T22:20:40.2646726Z Submodule path 'ext/freertos/portable/ThirdParty/Community-Supported-Ports': checked out '9c5bad7b2f42b4e8420f12290b9bc085d3309e8b'
+2026-10-11T22:20:40.2845674Z Submodule path 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports': checked out 'dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9'
+2026-10-11T22:20:40.6802691Z Submodule path 'ext/threadx': checked out '93387b0a60382a29579bbad5045c68328e3751df'
+2026-10-11T22:20:40.8926598Z Submodule path 'vendors/arm/CMSIS_5': checked out '55b19837f5703e418ca37894d5745b1dc05e4c91'
+2026-10-11T22:20:40.9559544Z Submodule path 'vendors/st/cmsis_device_f4': checked out '3c77349ce04c8af401454cc51f85ea9a50e34fc1'
+2026-10-11T22:20:41.0112556Z Submodule path 'vendors/st/cmsis_device_g4': checked out '626ee412334a5ed2e5b320af5a8d77d69f03a558'
+2026-10-11T22:20:41.0145556Z ##[end-action id=__self.__run_2;outcome=success;conclusion=success;duration_ms=25311]
+2026-10-11T22:20:41.0147735Z ##[start-action display=Install the locked ARM compiler;id=__self.__run_3]
+2026-10-11T22:20:41.0166865Z ##[group]Run .venv/bin/python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+2026-10-11T22:20:41.0167477Z [36;1m.venv/bin/python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"[0m
+2026-10-11T22:20:41.0167921Z [36;1mecho "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"[0m
+2026-10-11T22:20:41.0224148Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T22:20:41.0224432Z env:
+2026-10-11T22:20:41.0224644Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:41.0224986Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:20:41.0225313Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:41.0225602Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:41.0225891Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:20:41.0226185Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:20:41.0226434Z ##[endgroup]
+2026-10-11T22:21:04.5579616Z /home/runner/work/_temp/nexus-arm-toolchain/bin
+2026-10-11T22:21:04.5677817Z ##[end-action id=__self.__run_3;outcome=success;conclusion=success;duration_ms=23552]
+2026-10-11T22:21:04.5713324Z ##[group]Run fixture="tests/contracts/$FIXTURE"
+2026-10-11T22:21:04.5713628Z [36;1mfixture="tests/contracts/$FIXTURE"[0m
+2026-10-11T22:21:04.5714000Z [36;1marguments=()[0m
+2026-10-11T22:21:04.5714200Z [36;1mfor assembly in "$fixture"/*.toml; do[0m
+2026-10-11T22:21:04.5714443Z [36;1m  arguments+=(--fixture "$assembly")[0m
+2026-10-11T22:21:04.5714662Z [36;1mdone[0m
+2026-10-11T22:21:04.5714885Z [36;1m.venv/bin/python scripts/ci/provider_assemblies.py \[0m
+2026-10-11T22:21:04.5715173Z [36;1m  --root "$GITHUB_WORKSPACE" \[0m
+2026-10-11T22:21:04.5715407Z [36;1m  --compiler arm-none-eabi-gcc \[0m
+2026-10-11T22:21:04.5715670Z [36;1m  --output "build/controller-routes/$FIXTURE" \[0m
+2026-10-11T22:21:04.5715931Z [36;1m  --parallel 4 "${arguments[@]}"[0m
+2026-10-11T22:21:04.5771178Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T22:21:04.5771529Z env:
+2026-10-11T22:21:04.5771747Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:04.5772125Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:21:04.5772454Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:04.5772759Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:04.5773052Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:04.5773356Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:21:04.5773623Z   FIXTURE: stm32_assembly
+2026-10-11T22:21:04.5773809Z ##[endgroup]
+2026-10-11T22:21:06.6856025Z ##[error]Process completed with exit code 1.
+2026-10-11T22:21:06.6935599Z Prepare all required actions
+2026-10-11T22:21:06.6995278Z ##[group]Run ./.github/actions/record-identity
+2026-10-11T22:21:06.6995522Z with:
+2026-10-11T22:21:06.6995693Z   job: routes-stm32_assembly
+2026-10-11T22:21:06.6995884Z   result: failure
+2026-10-11T22:21:06.6996110Z   expected-commit: 471b4a1480e318448bcfa75e41c5a077cd2e1cf5
+2026-10-11T22:21:06.6996411Z   output: build/job-identities/routes-stm32_assembly
+2026-10-11T22:21:06.6996658Z   require-dependencies: true
+2026-10-11T22:21:06.6996865Z   artifacts: build/controller-routes/
+
+2026-10-11T22:21:06.6997151Z   tools: python=python3
+cmake=cmake
+compiler=arm-none-eabi-gcc
+
+2026-10-11T22:21:06.6997415Z env:
+2026-10-11T22:21:06.6997620Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.6997942Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:21:06.6998282Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.6998612Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.6998908Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.6999221Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:21:06.6999466Z ##[endgroup]
+2026-10-11T22:21:06.7003510Z ##[start-action display=Observe source, configuration closure and artifact bytes;id=__self_2.__run]
+2026-10-11T22:21:06.7016915Z ##[group]Run python3 - <<'PY'
+2026-10-11T22:21:06.7017165Z [36;1mpython3 - <<'PY'[0m
+2026-10-11T22:21:06.7017348Z [36;1mimport os[0m
+2026-10-11T22:21:06.7017527Z [36;1mimport subprocess[0m
+2026-10-11T22:21:06.7017714Z [36;1mimport sys[0m
+2026-10-11T22:21:06.7017874Z [36;1m[0m
+2026-10-11T22:21:06.7018033Z [36;1mdef required(name):[0m
+2026-10-11T22:21:06.7018262Z [36;1m    value = os.environ['NEXUS_IDENTITY_' + name][0m
+2026-10-11T22:21:06.7018521Z [36;1m    if not value.strip():[0m
+2026-10-11T22:21:06.7018782Z [36;1m        raise SystemExit('missing identity input: ' + name)[0m
+2026-10-11T22:21:06.7019068Z [36;1m    return value[0m
+2026-10-11T22:21:06.7019245Z [36;1m[0m
+2026-10-11T22:21:06.7019485Z [36;1marguments = [sys.executable, 'tools/maintenance/job_identity.py',[0m
+2026-10-11T22:21:06.7019841Z [36;1m             '--job', required('JOB'), '--result', required('RESULT'),[0m
+2026-10-11T22:21:06.7020148Z [36;1m             '--expected-commit', required('COMMIT'),[0m
+2026-10-11T22:21:06.7020420Z [36;1m             '--output', required('OUTPUT')][0m
+2026-10-11T22:21:06.7020727Z [36;1mfor name, flag in (('ARTIFACTS', '--artifact'), ('TOOLS', '--tool')):[0m
+2026-10-11T22:21:06.7021183Z [36;1m    for value in required(name).splitlines():[0m
+2026-10-11T22:21:06.7021591Z [36;1m        if value.strip():[0m
+2026-10-11T22:21:06.7021826Z [36;1m            arguments.extend([flag, value.strip()])[0m
+2026-10-11T22:21:06.7022095Z [36;1mdependencies = required('DEPENDENCIES')[0m
+2026-10-11T22:21:06.7022334Z [36;1mif dependencies == 'false':[0m
+2026-10-11T22:21:06.7022619Z [36;1m    arguments.append('--observe-uninitialized-dependencies')[0m
+2026-10-11T22:21:06.7022906Z [36;1melif dependencies != 'true':[0m
+2026-10-11T22:21:06.7023171Z [36;1m    raise SystemExit('invalid identity dependency policy')[0m
+2026-10-11T22:21:06.7023467Z [36;1mraise SystemExit(subprocess.call(arguments))[0m
+2026-10-11T22:21:06.7023707Z [36;1mPY[0m
+2026-10-11T22:21:06.7079281Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T22:21:06.7079549Z env:
+2026-10-11T22:21:06.7079759Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.7080095Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:21:06.7080422Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.7080715Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.7081003Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:06.7081606Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:21:06.7081891Z   NEXUS_IDENTITY_JOB: routes-stm32_assembly
+2026-10-11T22:21:06.7082127Z   NEXUS_IDENTITY_RESULT: failure
+2026-10-11T22:21:06.7082380Z   NEXUS_IDENTITY_COMMIT: 471b4a1480e318448bcfa75e41c5a077cd2e1cf5
+2026-10-11T22:21:06.7082679Z   NEXUS_IDENTITY_ARTIFACTS: build/controller-routes/
+
+2026-10-11T22:21:06.7083014Z   NEXUS_IDENTITY_TOOLS: python=python3
+cmake=cmake
+compiler=arm-none-eabi-gcc
+
+2026-10-11T22:21:06.7083380Z   NEXUS_IDENTITY_OUTPUT: build/job-identities/routes-stm32_assembly
+2026-10-11T22:21:06.7083668Z   NEXUS_IDENTITY_DEPENDENCIES: true
+2026-10-11T22:21:06.7083867Z ##[endgroup]
+2026-10-11T22:21:07.2334361Z ##[end-action id=__self_2.__run;outcome=success;conclusion=success;duration_ms=533]
+2026-10-11T22:21:07.2373328Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+2026-10-11T22:21:07.2373643Z with:
+2026-10-11T22:21:07.2373830Z   name: controller-software-stm32_assembly
+2026-10-11T22:21:07.2374150Z   path: build/controller-routes/
+build/job-identities/routes-stm32_assembly/
+
+2026-10-11T22:21:07.2374451Z   retention-days: 30
+2026-10-11T22:21:07.2374634Z   include-hidden-files: true
+2026-10-11T22:21:07.2374829Z   if-no-files-found: error
+2026-10-11T22:21:07.2375021Z   compression-level: 6
+2026-10-11T22:21:07.2375208Z   overwrite: false
+2026-10-11T22:21:07.2375375Z   archive: true
+2026-10-11T22:21:07.2375531Z env:
+2026-10-11T22:21:07.2375739Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:07.2376069Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T22:21:07.2376404Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:07.2376738Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:07.2377039Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T22:21:07.2377329Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T22:21:07.2377582Z ##[endgroup]
+2026-10-11T22:21:07.3564176Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-11T22:21:07.3566178Z The least common ancestor is /home/runner/work/nexus/nexus/build. This will be the root directory of the artifact
+2026-10-11T22:21:07.3566677Z With the provided path, there will be 5 files uploaded
+2026-10-11T22:21:07.3570459Z Artifact name is valid!
+2026-10-11T22:21:07.3570898Z Root directory input is valid!
+2026-10-11T22:21:07.6974963Z Uploading artifact: controller-software-stm32_assembly.zip
+2026-10-11T22:21:07.7007808Z Beginning upload of artifact content to blob storage
+2026-10-11T22:21:07.9476662Z Uploaded bytes 4176
+2026-10-11T22:21:08.0080646Z Finished uploading artifact content to blob storage!
+2026-10-11T22:21:08.0081666Z SHA256 digest of uploaded artifact is 8716df804d7da519bf0985d9cf3c32505d9886c37151dc3a5f18846f9db966dd
+2026-10-11T22:21:08.0082269Z Finalizing artifact upload
+2026-10-11T22:21:08.3651781Z Artifact controller-software-stm32_assembly successfully finalized. Artifact ID 11716394550
+2026-10-11T22:21:08.3652895Z Artifact controller-software-stm32_assembly has been successfully uploaded! Final size is 4176 bytes. Artifact ID is 11716394550
+2026-10-11T22:21:08.3655372Z Artifact download URL: https://github.com/X-Gen-Lab/nexus/actions/runs/38179856977/artifacts/11716394550
+2026-10-11T22:21:08.3794843Z Post job cleanup.
+2026-10-11T22:21:08.3797965Z ##[start-action display=Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97;id=__0fc055db-693b-433c-bfaa-1f105b39da1b.__actions_setup-python]
+2026-10-11T22:21:08.3800576Z ##[end-action id=__0fc055db-693b-433c-bfaa-1f105b39da1b.__actions_setup-python;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-11T22:21:08.3850305Z Post job cleanup.
+2026-10-11T22:21:08.4512931Z [command]/usr/bin/git version
+2026-10-11T22:21:08.4542883Z git version 2.55.0
+2026-10-11T22:21:08.4572245Z Temporarily overriding HOME='/home/runner/work/_temp/84eb59d7-7c32-40a9-84f7-10c9f55cee1a' before making global git config changes
+2026-10-11T22:21:08.4572954Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-11T22:21:08.4576380Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/nexus/nexus
+2026-10-11T22:21:08.4603305Z Removing SSH command configuration
+2026-10-11T22:21:08.4608298Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T22:21:08.4637489Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T22:21:08.4863624Z Entering 'ext/freertos'
+2026-10-11T22:21:08.4901116Z Entering 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T22:21:08.4951649Z Entering 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T22:21:08.4991300Z Entering 'ext/threadx'
+2026-10-11T22:21:08.5042090Z Entering 'vendors/arm/CMSIS_5'
+2026-10-11T22:21:08.5085625Z Entering 'vendors/st/cmsis_device_f4'
+2026-10-11T22:21:08.5128185Z Entering 'vendors/st/cmsis_device_g4'
+2026-10-11T22:21:08.5179635Z Removing HTTP extra header
+2026-10-11T22:21:08.5185086Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T22:21:08.5218052Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T22:21:08.5429986Z Entering 'ext/freertos'
+2026-10-11T22:21:08.5468763Z Entering 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T22:21:08.5506660Z Entering 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T22:21:08.5547467Z Entering 'ext/threadx'
+2026-10-11T22:21:08.5597897Z Entering 'vendors/arm/CMSIS_5'
+2026-10-11T22:21:08.5640010Z Entering 'vendors/st/cmsis_device_f4'
+2026-10-11T22:21:08.5678469Z Entering 'vendors/st/cmsis_device_g4'
+2026-10-11T22:21:08.5724274Z Removing includeIf entries pointing to credentials config files
+2026-10-11T22:21:08.5730088Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.5756134Z includeif.gitdir:/home/runner/work/nexus/nexus/.git.path
+2026-10-11T22:21:08.5756760Z includeif.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path
+2026-10-11T22:21:08.5757174Z includeif.gitdir:/github/workspace/.git.path
+2026-10-11T22:21:08.5757531Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-11T22:21:08.5772377Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/nexus/nexus/.git.path
+2026-10-11T22:21:08.5789469Z /home/runner/work/_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:21:08.5799136Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/nexus/nexus/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-4c2b04b2\-5850\-4b00\-bfae\-0b1fd4b094a9\.config
+2026-10-11T22:21:08.5836388Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path
+2026-10-11T22:21:08.5860697Z /home/runner/work/_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:21:08.5877239Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-4c2b04b2\-5850\-4b00\-bfae\-0b1fd4b094a9\.config
+2026-10-11T22:21:08.5912224Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-11T22:21:08.5936487Z /github/runner_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:21:08.5944057Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-4c2b04b2\-5850\-4b00\-bfae\-0b1fd4b094a9\.config
+2026-10-11T22:21:08.6022408Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-11T22:21:08.6026261Z /github/runner_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config
+2026-10-11T22:21:08.6028206Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-4c2b04b2\-5850\-4b00\-bfae\-0b1fd4b094a9\.config
+2026-10-11T22:21:08.6040642Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T22:21:08.6242011Z Entering 'ext/freertos'
+2026-10-11T22:21:08.6262453Z file:/home/runner/work/nexus/nexus/.git/modules/ext/freertos/config	remote.origin.url
+2026-10-11T22:21:08.6278818Z Entering 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T22:21:08.6296432Z file:/home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports/config	remote.origin.url
+2026-10-11T22:21:08.6312244Z Entering 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T22:21:08.6329185Z file:/home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports/config	remote.origin.url
+2026-10-11T22:21:08.6347229Z Entering 'ext/threadx'
+2026-10-11T22:21:08.6364232Z file:/home/runner/work/nexus/nexus/.git/modules/ext/threadx/config	remote.origin.url
+2026-10-11T22:21:08.6392423Z Entering 'vendors/arm/CMSIS_5'
+2026-10-11T22:21:08.6409170Z file:/home/runner/work/nexus/nexus/.git/modules/vendors/arm/CMSIS_5/config	remote.origin.url
+2026-10-11T22:21:08.6429185Z Entering 'vendors/st/cmsis_device_f4'
+2026-10-11T22:21:08.6446015Z file:/home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_f4/config	remote.origin.url
+2026-10-11T22:21:08.6462762Z Entering 'vendors/st/cmsis_device_g4'
+2026-10-11T22:21:08.6479511Z file:/home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_g4/config	remote.origin.url
+2026-10-11T22:21:08.6507678Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/freertos/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6536447Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6563175Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6590316Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/threadx/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6619091Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/vendors/arm/CMSIS_5/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6647681Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_f4/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6676143Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_g4/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T22:21:08.6707142Z Removing credentials config '/home/runner/work/_temp/git-credentials-4c2b04b2-5850-4b00-bfae-0b1fd4b094a9.config'
+2026-10-11T22:21:08.6826701Z Cleaning up orphan processes
+

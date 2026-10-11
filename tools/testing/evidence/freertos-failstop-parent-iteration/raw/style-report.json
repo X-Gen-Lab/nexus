@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "base_ref": "HEAD",
+  "debt_source_ref": "HEAD",
+  "full_source_check": false,
+  "selection_scope": "paths",
+  "input_files": [
+    "tests/google/freertos_failstop_test.cpp"
+  ],
+  "selected_files": [
+    "tests/google/freertos_failstop_test.cpp"
+  ],
+  "source_files_checked": 1,
+  "text_files_selected": 1,
+  "legacy_format_files": 0,
+  "legacy_comment_files": 0,
+  "tool_version": "clang-format version 14.0.6 (https://github.com/ssciwr/clang-format-wheel e79d44a98fc6eeb3e9751220e441da03812564c1)",
+  "records": [
+    {
+      "path": "tests/google/freertos_failstop_test.cpp",
+      "source_sha256": "b0a221a133145eaa21b229d9b56fef0f10ded43c825f40420c7a37daae618111",
+      "legacy_format_debt": false,
+      "comment_rules": {},
+      "comment_status": "new_or_unlisted_strict"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Mechanical comment rules do not prove API contract semantics.",
+    "Unchanged sealed debt is reported, not declared style-conformant."
+  ]
+}

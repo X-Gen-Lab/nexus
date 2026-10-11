@@ -1,0 +1,44 @@
+{
+  "blockers": [],
+  "findings": [
+    {
+      "reason": "valid_evidence requires exact observer/query/(conditional disable) count/order, observed=1, correct fault identity, unchanged incoming mask tuple, expected port-only BASEPRI change, and ACTIVE retained loan.",
+      "result": "closed",
+      "topic": "ordered evidence"
+    },
+    {
+      "reason": "Three-second overall monotonic deadline; one-second quiet live interval after complete actual records retains original horizon. Child return/exit, malformed/extra/partial/missing evidence or wait errors fail.",
+      "result": "closed",
+      "topic": "finite liveness"
+    },
+    {
+      "reason": "Missing-evidence child exits without reports; premature-exit child publishes valid reports then waits parent ACK and exits93, ensuring valid frames alone cannot establish terminal park.",
+      "result": "closed",
+      "topic": "negative controls"
+    },
+    {
+      "reason": "Parent checks waitpid exact child, then sends SIGKILL to that owned unreaped child and requires reaped exact PID with SIGKILL terminal status. Pipe and ACK descriptors close on all shown paths. No production device borrow reclaim from process cleanup.",
+      "result": "closed",
+      "topic": "exact child cleanup"
+    },
+    {
+      "reason": "Returning-observer cases require no SIGALRM handler or sanitizer signal safepoint inside production terminal loop; publication uses normal external Arch/port/observer callbacks.",
+      "result": "closed",
+      "topic": "sanitizer independence"
+    }
+  ],
+  "kind": "independent_failstop_parent_fixture_review",
+  "limitations": [
+    "Finite same-case model observation is not formal infinite-parking proof, hardware mask behavior or physical safety qualification.",
+    "This reviewer executed no tests; regular/TSan whole-suite evidence belongs to owner."
+  ],
+  "reviewer": "final_native_contracts",
+  "schema_version": 1,
+  "scope": "Readonly fixture/process controller only; production park unchanged; no independent test execution",
+  "source": {
+    "bytes": 13106,
+    "path": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+    "sha256": "b0a221a133145eaa21b229d9b56fef0f10ded43c825f40420c7a37daae618111"
+  },
+  "status": "closed"
+}

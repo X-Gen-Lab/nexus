@@ -1,6 +1,7 @@
 """Reject incomplete or stale selected-provider assembly evidence."""
 
 from pathlib import Path
+import hashlib
 import json
 import os
 import signal
@@ -203,6 +204,95 @@ class OutputAdmission(unittest.TestCase):
                 {}, {}, {"nx_any_uart_ops": {}}, [])):
             with self.assertRaisesRegex(EvidenceError, "unselected"):
                 gate.empty_retention(elf, "", {"controllers": [], "devices": []})
+
+
+class EmptySourceInputs(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name)
+        (self.root / "CMakeLists.txt").write_text("project(test)\n")
+        self.source = self.root / "io/src/empty.c"
+        self.source.parent.mkdir(parents=True)
+        self.source.write_bytes(b"")
+
+    def test_empty_source_and_header_remain_in_the_input_closure(self):
+        header = self.source.with_suffix(".h")
+        header.write_bytes(b"")
+        inputs = gate.source_inputs(self.root, [])
+        for path in (self.source, header):
+            identity = next(item for item in inputs if item["path"] == str(path))
+            self.assertEqual(identity["bytes"], 0)
+            self.assertEqual(identity["sha256"], hashlib.sha256(b"").hexdigest())
+        gate.verify_inputs(inputs)
+        gate.verify_snapshot(self.root, [], inputs)
+
+    def test_empty_locked_vendor_source_is_not_dropped(self):
+        vendor = self.root / "vendors/locked/component.h"
+        vendor.parent.mkdir(parents=True)
+        vendor.write_bytes(b"")
+        fixture = {"assembly": str(self.root / "tests/contracts/fixture/a.toml"),
+                   "resolved": {"source_dependencies": [
+                       {"path": "vendors/locked"}]}, "inputs": []}
+        inputs = gate.source_inputs(self.root, [fixture])
+        self.assertIn(str(vendor), {item["path"] for item in inputs})
+        gate.verify_snapshot(self.root, [fixture], inputs)
+
+    def test_empty_source_content_change_is_rejected(self):
+        inputs = gate.source_inputs(self.root, [])
+        self.source.write_text("void changed(void) {}\n")
+        with self.assertRaisesRegex(EvidenceError, "changed"):
+            gate.verify_inputs(inputs)
+        with self.assertRaisesRegex(EvidenceError, "snapshot"):
+            gate.verify_snapshot(self.root, [], inputs)
+
+    def test_removed_empty_source_is_not_an_unchanged_snapshot(self):
+        inputs = gate.source_inputs(self.root, [])
+        self.source.unlink()
+        with self.assertRaisesRegex(EvidenceError, "snapshot"):
+            gate.verify_snapshot(self.root, [], inputs)
+
+    def test_declared_missing_input_is_still_rejected(self):
+        self.source.unlink()
+        fixture = {"assembly": str(self.root / "tests/contracts/fixture/a.toml"),
+                   "resolved": {"source_dependencies": []},
+                   "inputs": [{"path": str(self.source)}]}
+        with self.assertRaisesRegex(EvidenceError, "missing"):
+            gate.source_inputs(self.root, [fixture])
+
+    def test_symlink_cannot_substitute_for_an_empty_input(self):
+        inputs = gate.source_inputs(self.root, [])
+        target = self.root / "other-empty.c"
+        target.write_bytes(b"")
+        self.source.unlink()
+        self.source.symlink_to(target)
+        with self.assertRaisesRegex(EvidenceError, "symlink|changed"):
+            gate.verify_inputs(inputs)
+        with self.assertRaisesRegex(EvidenceError, "symlink"):
+            gate.verify_snapshot(self.root, [], inputs)
+
+    def test_actual_empty_compiler_dependency_remains_recorded(self):
+        text = f"source.o: #deps 1, deps mtime 1 (VALID)\n    {self.source}\n"
+        self.assertEqual(gate.dependency_paths(text, self.root), [self.source])
+
+    def test_missing_compiler_dependency_is_still_rejected(self):
+        missing = self.root / "missing.h"
+        text = f"source.o: #deps 1, deps mtime 1 (VALID)\n    {missing}\n"
+        with self.assertRaisesRegex(EvidenceError, "missing"):
+            gate.dependency_paths(text, self.root)
+
+    def test_symlink_compiler_dependency_is_still_rejected(self):
+        target = self.root / "target.h"
+        target.write_bytes(b"")
+        alias = self.root / "alias.h"
+        alias.symlink_to(target)
+        text = f"source.o: #deps 1, deps mtime 1 (VALID)\n    {alias}\n"
+        with self.assertRaisesRegex(EvidenceError, "symlink"):
+            gate.dependency_paths(text, self.root)
+
+    def test_empty_firmware_artifact_is_still_rejected(self):
+        with self.assertRaisesRegex(EvidenceError, "missing or empty"):
+            gate.one([self.source], "firmware ELF")
 
 
 if __name__ == "__main__":

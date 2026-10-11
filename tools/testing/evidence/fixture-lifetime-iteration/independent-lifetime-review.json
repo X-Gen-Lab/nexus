@@ -1,0 +1,55 @@
+{
+  "assertions_removed_or_suppressed": false,
+  "blocking_findings": [],
+  "findings": [
+    {
+      "change": "ClassicCan now owns storage[8] as an initialized fixture member; the default events[2] and public/controller configuration are unchanged",
+      "original_issue": "TestBody-local eight-entry events ring ended on fatal assertion before fixture TearDown withdrawal",
+      "path": "tests/google/can_controller_test.cpp",
+      "proof": "Fixture members outlive TestBody even on ASSERT return; TearDown runs before member destruction. Assigning controller.events=storage still selects exact8capacity for the same test. All original data-order,overflow, stop ASSERT/EXPECT checks remain. This fixes borrow lifetime, not a proven runtime UAF; stop implementation previously did not dereference ring bytes",
+      "verdict": "Reported scope defect closed by source-bound minimal relocation"
+    },
+    {
+      "change": "The original owner state is function-static zero initialized with an invariant comment; rejected replacement remains automatic and unborrowed",
+      "original_issue": "Expected relock quarantine leaves module-global s_flash retained after TestBody-local state would expire; there is no image reset or successful withdrawal stub",
+      "path": "tests/google/gd32_flash_fault_test.cpp",
+      "proof": "Static owner now remains valid throughout process/image lifetime including successful expected INVALID/BUSY path and any early ASSERT. Physical mmap withdrawal in TearDown does not reclaim this control object; its initialized=false prevents new IO and global retained owner still denies reinit. No fake cleanup, reset, hardware recovery, or altered SUCCESS expectation added",
+      "verdict": "Reported sticky-owner lifetime defect closed; intentional quarantine behavior preserved"
+    },
+    {
+      "change": "Observer and exact records[3] are zero-initialized GD32ADCContinuous fixture members; same initialize/attach/epoch/release/detach steps preserved",
+      "original_issue": "Attached TestBody-local observer/records ended on fatal ASSERT before TearDown continuous stop calls nx_adc_observer_unbind",
+      "path": "tests/google/gd32_adc_stream_test.cpp",
+      "proof": "Both observer and associated record ring survive all TestBody exits through actual fixture stop/unbind in TearDown; normal explicit detach remains. Adding members changes host test fixture storage only, not production state layout or default image RAM",
+      "verdict": "Reported adjacent observer lifetime defect closed by source-bound minimal relocation"
+    }
+  ],
+  "git_mutations": false,
+  "history": "Original ordinary successful suites passed; no fabricated failing execution or actual UAF reproduction is claimed. Owner is running fresh full regular+ASAN/UBSAN proof separately.",
+  "independent_builds": 0,
+  "independent_sanitizer_runs": 0,
+  "independent_test_cases": 0,
+  "production_changes_observed": false,
+  "qualification": "independent read-only final3-source fixture-lifetime correction review; no inherited execution, canonical final qualification or physical claims",
+  "reviewed_at_utc": "2026-10-11T22:50:24.530001+00:00",
+  "schema": 1,
+  "source_edits": false,
+  "source_files": [
+    {
+      "bytes": 19853,
+      "path": "tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1"
+    },
+    {
+      "bytes": 3654,
+      "path": "tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f"
+    },
+    {
+      "bytes": 24402,
+      "path": "tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6"
+    }
+  ],
+  "source_root": "/workspace/nexus"
+}

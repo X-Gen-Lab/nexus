@@ -23,6 +23,8 @@ class ClassicCan : public testing::Test {
                               0U,     NX_CAN_STANDARD, false, true};
     nx_can_filter_domain_t domain = {};
     nx_can_event_t events[2] = {};
+    /* Keep the borrowed ring alive through fatal assertions and TearDown. */
+    nx_can_event_t storage[8] = {};
     const nx_can_port_t port = {&nx_classic_can_ops, &model.controller};
     nx_can_tx_request_t requests[4] = {};
     nx_can_frame_t frame = {
@@ -340,7 +342,6 @@ TEST_F(ClassicCan, StoppedReaderNeverTouchesReleasedReceiveStorage) {
 }
 TEST_F(ClassicCan, LockedHardwareFifoOlderFramesPrecedeItsOverrunBoundary) {
     ASSERT_EQ(nx_can_port_stop(&port), NX_SUCCESS);
-    nx_can_event_t storage[8] = {};
     model.controller.events = storage;
     model.controller.capacity = 8U;
     ASSERT_EQ(nx_can_controller_initialize(&model.controller), NX_SUCCESS);

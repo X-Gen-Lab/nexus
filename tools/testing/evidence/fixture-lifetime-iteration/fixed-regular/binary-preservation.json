@@ -1,0 +1,38 @@
+[
+  {
+    "original": {
+      "path": "/tmp/nexus-fixture-lifetime-builds/regular/bin/nexus_can_controller_test",
+      "sha256": "76986758bc33f01a2725c16ba267bfb1c9683838eec6753c76f19dda9723cd61",
+      "size": 5240408
+    },
+    "retained": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-regular/executables/nexus_can_controller_test",
+      "sha256": "76986758bc33f01a2725c16ba267bfb1c9683838eec6753c76f19dda9723cd61",
+      "size": 5240408
+    }
+  },
+  {
+    "original": {
+      "path": "/tmp/nexus-fixture-lifetime-builds/regular/bin/nexus_gd32_flash_fault_test",
+      "sha256": "6d82ef7db7fe6756772d6b58ad5c9a9c68ad085f9871c9e105ed866533ed0a53",
+      "size": 4551208
+    },
+    "retained": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-regular/executables/nexus_gd32_flash_fault_test",
+      "sha256": "6d82ef7db7fe6756772d6b58ad5c9a9c68ad085f9871c9e105ed866533ed0a53",
+      "size": 4551208
+    }
+  },
+  {
+    "original": {
+      "path": "/tmp/nexus-fixture-lifetime-builds/regular/bin/nexus_gd32_adc_stream_test",
+      "sha256": "5ab7eb192196e99c12d9a617879dfce7bcf73669caeba7f33029cfc842442def",
+      "size": 5239888
+    },
+    "retained": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-regular/executables/nexus_gd32_adc_stream_test",
+      "sha256": "5ab7eb192196e99c12d9a617879dfce7bcf73669caeba7f33029cfc842442def",
+      "size": 5239888
+    }
+  }
+]

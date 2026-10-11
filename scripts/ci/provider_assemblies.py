@@ -165,7 +165,8 @@ def dependency_paths(text, build):
             if objects == 0:
                 raise EvidenceError("compiler dependencies have no object identity")
             path = Path(line.strip())
-            files.add(regular_file(path if path.is_absolute() else build / path))
+            files.add(regular_file(path if path.is_absolute() else build / path,
+                                   nonempty=False))
     if not objects or not files:
         raise EvidenceError("actual compiler dependencies missing")
     return sorted(files)
@@ -240,7 +241,8 @@ def inspect(build, fixture, compiler, *, root=ROOT):
         path = Path(entry["file"])
         if not path.is_absolute():
             path = Path(entry["directory"]) / path
-        compile_sources.append(arch_compile.digest(regular_file(path)))
+        compile_sources.append(arch_compile.digest(
+            regular_file(path, nonempty=False)))
     row = {"status": "passed", "family": resolved["soc_family"],
            "part": resolved["part"], "backend": resolved["backend"],
            "configuration_sha256": resolved["configuration_sha256"],
@@ -275,7 +277,10 @@ def source_inputs(root, fixtures):
         paths.update(path for path in directory.rglob("*") if path.is_file()
             and (path.suffix in {".c", ".h", ".S", ".s", ".cmake", ".py", ".json", ".toml", ".ld"}
                  or path.name == "CMakeLists.txt") and ".git" not in path.parts)
-    return [arch_compile.digest(regular_file(path)) for path in sorted(paths)]
+    # Empty C/header inputs are valid, including locked vendor placeholders.
+    # Keep their zero-byte identities in the closure; artifacts stay nonempty.
+    return [arch_compile.digest(regular_file(path, nonempty=False))
+            for path in sorted(paths)]
 
 
 def verify_snapshot(root, fixtures, original):

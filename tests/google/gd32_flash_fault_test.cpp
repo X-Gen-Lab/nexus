@@ -63,7 +63,8 @@ class GD32FlashFault : public ::testing::Test {
 };
 
 TEST_F(GD32FlashFault, RelockFailureCannotReleaseOrReacquireController) {
-    nx_gd32_flash_state_t state = {};
+    /* Sticky relock quarantine outlives TestBody and fixture teardown. */
+    static nx_gd32_flash_state_t state = {};
     nx_gd32_flash_state_t replacement = {};
     const nx_flash_port_t port = {&nx_gd32_flash_ops, &state};
     ASSERT_EQ(nx_gd32_flash_initialize(&state), NX_SUCCESS);

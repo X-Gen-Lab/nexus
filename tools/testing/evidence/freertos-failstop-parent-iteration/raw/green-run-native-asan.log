@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "passed": 8,
+  "report": {
+    "path": "/workspace/nexus-freertos-failstop-iteration/green-run-native-asan/manifest.json",
+    "sha256": "e3f3b1dc363ba3e4f216f549334cbfdadbd59551d64db32ad7a71622f530d9d0",
+    "bytes": 3010
+  }
+}
