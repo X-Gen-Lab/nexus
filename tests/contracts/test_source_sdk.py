@@ -30,6 +30,22 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertTrue(source_sdk.selected("io/include/nexus/io/factory.h"))
         self.assertTrue(source_sdk.selected("tools/configure/assemblies/native.toml"))
 
+    def test_audit_archives_stay_outside_sdk_but_operational_tools_remain(self):
+        for name in ("tools/testing/evidence/report.json",
+                     "tools/testing/evidence/nested/results.xml",
+                     "tools/testing/evidence/sources/provider.c.raw",
+                     "tools/testing/evidence/firmware.elf"):
+            with self.subTest(name=name):
+                self.assertFalse(source_sdk.selected(name))
+        for name in ("tools/testing/evidence.py",
+                     "tools/testing/evidence_extra/report.json",
+                     "tools/testing/test_source_identity.py",
+                     "tools/evidence/verify.py",
+                     "tools/maintenance/stm32g4_lock.py",
+                     "dependencies/googletest.lock.json"):
+            with self.subTest(name=name):
+                self.assertTrue(source_sdk.selected(name))
+
     def test_consumer_uses_authored_toml_for_each_maintained_family(self):
         with tempfile.TemporaryDirectory(prefix="SDK consumer inputs ") as value:
             directory = Path(value)
@@ -198,6 +214,40 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
         self.assertEqual(blobs["core/committed.c"], b"int committed_source;\n")
         self.assertNotEqual(blobs["core/committed.c"],
                             (self.repository / "core/committed.c").read_bytes())
+
+    def test_real_git_snapshots_exclude_archives_in_both_package_modes(self):
+        committed = ("tools/testing/evidence/committed/report.json",
+                     "tools/testing/evidence.py",
+                     "tools/testing/evidence_extra/committed.json")
+        for name in committed:
+            self.write(name, "committed SDK selection fixture\n")
+        self.git("add", *committed)
+        self.git("-c", "user.name=SDK test", "-c",
+                 "user.email=sdk-test@local.invalid", "commit", "--quiet",
+                 "-m", "committed archive and operational tool boundaries")
+        entries = source_sdk.tree_entries(self.repository)
+        staged = ("tools/testing/evidence/staged/results.xml",
+                  "tools/testing/evidence_extra/staged.py")
+        for name in staged:
+            self.write(name, "staged SDK selection fixture\n")
+        self.git("add", *staged)
+        untracked = ("tools/testing/evidence/untracked/provider.c.raw",
+                     "tools/evidence/verify.py")
+        for name in untracked:
+            self.write(name, "untracked SDK selection fixture\n")
+        index_before = self.git("write-tree")
+        for development in (False, True):
+            with self.subTest(development=development):
+                names = source_sdk.snapshot_files(
+                    self.repository, entries, development_fixture=development)
+                self.assertNotIn(committed[0], names)
+                self.assertNotIn(staged[0], names)
+                self.assertNotIn(untracked[0], names)
+                self.assertIn(committed[1], names)
+                self.assertIn(committed[2], names)
+                self.assertEqual(staged[1] in names, development)
+                self.assertEqual(untracked[1] in names, development)
+        self.assertEqual(self.git("write-tree"), index_before)
 
 
 class SourceSDKTests(unittest.TestCase):

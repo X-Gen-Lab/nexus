@@ -1,0 +1,37 @@
+{
+  "scope": "actual narrow TDD RED SDK selector regression",
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-B",
+    "tests/contracts/test_source_sdk.py",
+    "SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain",
+    "SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1,
+  "started": "2026-10-11T22:18:02.108931+00:00",
+  "finished": "2026-10-11T22:18:02.228272+00:00",
+  "sources": [
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "size": 35427,
+      "sha256": "896d4a18754848d0e405e2a84d750a2bc116edbf1bec9db4d47ab3a74f9d4f70",
+      "retained_path": "/workspace/nexus-source-sdk-archive-exclusion/red/source/cmake/package/package_source_sdk.py.raw"
+    },
+    {
+      "path": "tests/contracts/test_source_sdk.py",
+      "size": 50946,
+      "sha256": "6a1811724fbcee4960bb1788c1748b5681e325f481be9c72d92c2b9d1750850d",
+      "retained_path": "/workspace/nexus-source-sdk-archive-exclusion/red/source/tests/contracts/test_source_sdk.py.raw"
+    }
+  ],
+  "raw": {
+    "path": "/workspace/nexus-source-sdk-archive-exclusion/red/unittest.log",
+    "size": 6069,
+    "sha256": "33492bf8908b1cfb7eae8bbff525a55049edc12d84e11552f5d880e8648cccc0"
+  },
+  "limits": [
+    "This is a dirty-development regression, not canonical qualification."
+  ]
+}

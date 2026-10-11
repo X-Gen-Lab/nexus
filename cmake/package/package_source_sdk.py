@@ -359,6 +359,9 @@ def dependency_entries(root, dependency):
 
 
 def selected(name):
+    # Historical audit archives belong to the repository, not the source SDK.
+    if name.startswith("tools/testing/evidence/"):
+        return False
     # Host test frameworks never become firmware source dependencies. Their
     # reviewed lock stays in the SDK provenance, without host-only payloads.
     if name.startswith("dependencies/source/"):

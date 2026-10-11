@@ -1,0 +1,61 @@
+test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) ... 
+  test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/report.json') ... FAIL
+  test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/nested/results.xml') ... FAIL
+  test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/sources/provider.c.raw') ... FAIL
+  test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/firmware.elf') ... FAIL
+test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) ... 
+  test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) (development=False) ... FAIL
+  test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) (development=True) ... FAIL
+
+======================================================================
+FAIL: test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/report.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 39, in test_audit_archives_stay_outside_sdk_but_operational_tools_remain
+    self.assertFalse(source_sdk.selected(name))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/nested/results.xml')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 39, in test_audit_archives_stay_outside_sdk_but_operational_tools_remain
+    self.assertFalse(source_sdk.selected(name))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/sources/provider.c.raw')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 39, in test_audit_archives_stay_outside_sdk_but_operational_tools_remain
+    self.assertFalse(source_sdk.selected(name))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) (name='tools/testing/evidence/firmware.elf')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 39, in test_audit_archives_stay_outside_sdk_but_operational_tools_remain
+    self.assertFalse(source_sdk.selected(name))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) (development=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 243, in test_real_git_snapshots_exclude_archives_in_both_package_modes
+    self.assertNotIn(committed[0], names)
+AssertionError: 'tools/testing/evidence/committed/report.json' unexpectedly found in {'tools/testing/evidence.py', 'tools/testing/evidence_extra/committed.json', 'arch/cortex_m/staged.c', 'core/committed.c', 'tools/testing/evidence/committed/report.json'}
+
+======================================================================
+FAIL: test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) (development=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 243, in test_real_git_snapshots_exclude_archives_in_both_package_modes
+    self.assertNotIn(committed[0], names)
+AssertionError: 'tools/testing/evidence/committed/report.json' unexpectedly found in {'tools/testing/evidence.py', 'tools/testing/evidence_extra/committed.json', 'tools/testing/evidence/untracked/provider.c.raw', 'tools/testing/evidence_extra/staged.py', 'tools/testing/evidence/staged/results.xml', 'arch/cortex_m/staged.c', 'core/committed.c', 'tools/evidence/verify.py', 'tools/testing/evidence/committed/report.json', 'tools/untracked.py'}
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.028s
+
+FAILED (failures=6)

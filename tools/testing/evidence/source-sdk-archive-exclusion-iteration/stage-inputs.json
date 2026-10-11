@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "source_root": "/workspace/nexus",
+  "freeze": {
+    "path": "/workspace/nexus-source-sdk-archive-exclusion/freeze.json",
+    "size": 1626315,
+    "sha256": "e908ccac4229569204729e03eebe66c12d7f6518b3c3a4f3e758cc911a04ae6c"
+  },
+  "source_paths": [
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "absolute_path": "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "size": 35577,
+      "sha256": "832a3bdeeeb7975e29d5245bfaba81c52c1dcd429e1a928830daa57c9fdaab12"
+    },
+    {
+      "path": "tests/contracts/test_source_sdk.py",
+      "absolute_path": "/workspace/nexus/tests/contracts/test_source_sdk.py",
+      "size": 50946,
+      "sha256": "6a1811724fbcee4960bb1788c1748b5681e325f481be9c72d92c2b9d1750850d"
+    }
+  ],
+  "external_evidence": [
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/archives-after.json",
+      "size": 3964356,
+      "sha256": "b09cc84992dc85934bb4dd5f98521a375cc05e096aa658a112847954c24c92a2"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/before.json",
+      "size": 8971234,
+      "sha256": "c2509be82f71fc9f1f3f42b3999c0c22add66e8044a15fab003f1d9e7d9c8aba"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/copied-green-sources.json",
+      "size": 493,
+      "sha256": "1598e605c44db0d7ff7e7cb91a931133061c39dfe9d0c62f8adbec678e05cfe0"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/final-source/cmake/package/package_source_sdk.py.raw",
+      "size": 35577,
+      "sha256": "832a3bdeeeb7975e29d5245bfaba81c52c1dcd429e1a928830daa57c9fdaab12"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/final-source/tests/contracts/test_source_sdk.py.raw",
+      "size": 50946,
+      "sha256": "6a1811724fbcee4960bb1788c1748b5681e325f481be9c72d92c2b9d1750850d"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/manifest.json",
+      "size": 1888,
+      "sha256": "d04c17deb75b2617f0ceae74445de99cd80c0769721b6afa44f201a86add06b5"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/source-after.json",
+      "size": 4670328,
+      "sha256": "e6cff0383bd3e9a440abe356ae967a45001ece75f9c1a455b0f76f179a73b7f0"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/source-before.json",
+      "size": 4670328,
+      "sha256": "e6cff0383bd3e9a440abe356ae967a45001ece75f9c1a455b0f76f179a73b7f0"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/unittest.log",
+      "size": 3292,
+      "sha256": "6ed7e15e42d17b57303ac3bae874fee98e330a7c51654efd916ce735ad02c0b8"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green2/manifest.json",
+      "size": 1905,
+      "sha256": "3087b399ddbc1205a5978733519c7e20d3b174336375584484d41469b393c165"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green2/source-after.json",
+      "size": 4670854,
+      "sha256": "c7b98c7b475d56dea2d4053ab7ce6fe7b3a93b90364ea781dda773d3c6f6bd9b"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green2/source-before.json",
+      "size": 4670854,
+      "sha256": "c7b98c7b475d56dea2d4053ab7ce6fe7b3a93b90364ea781dda773d3c6f6bd9b"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green2/unittest.log",
+      "size": 7195,
+      "sha256": "6cbed45862a80db50ad378c801fb6c981823e7ca9a5f0114ba66f2f613cd0100"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/narrow-green/manifest.json",
+      "size": 1480,
+      "sha256": "940a73537888805eddf1aa0eaf1597c8e21193a4aac112710f592283adf250cb"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/narrow-green/source/cmake/package/package_source_sdk.py.raw",
+      "size": 35577,
+      "sha256": "832a3bdeeeb7975e29d5245bfaba81c52c1dcd429e1a928830daa57c9fdaab12"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/narrow-green/source/tests/contracts/test_source_sdk.py.raw",
+      "size": 50946,
+      "sha256": "6a1811724fbcee4960bb1788c1748b5681e325f481be9c72d92c2b9d1750850d"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/narrow-green/unittest.log",
+      "size": 450,
+      "sha256": "62869c8b1a8470a72fa1080d91ec7244e90d88cce1f0185065d937cae76971f4"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/original-source/cmake/package/package_source_sdk.py.raw",
+      "size": 35427,
+      "sha256": "896d4a18754848d0e405e2a84d750a2bc116edbf1bec9db4d47ab3a74f9d4f70"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/original-source/tests/contracts/test_source_sdk.py.raw",
+      "size": 48204,
+      "sha256": "07c5aac69d3213839b0534d9fdb65bb63fc95a10f29a27c352c3e9bd4d22c927"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/red/manifest.json",
+      "size": 1422,
+      "sha256": "f7930e30a59280842b78b494c4ffd389e9ca73ebccfe77c1ead1e88adb1c30d2"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/red/source/cmake/package/package_source_sdk.py.raw",
+      "size": 35427,
+      "sha256": "896d4a18754848d0e405e2a84d750a2bc116edbf1bec9db4d47ab3a74f9d4f70"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/red/source/tests/contracts/test_source_sdk.py.raw",
+      "size": 50946,
+      "sha256": "6a1811724fbcee4960bb1788c1748b5681e325f481be9c72d92c2b9d1750850d"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/red/unittest.log",
+      "size": 6069,
+      "sha256": "33492bf8908b1cfb7eae8bbff525a55049edc12d84e11552f5d880e8648cccc0"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/run_whole_sdk.py",
+      "size": 3968,
+      "sha256": "9c0eb7b967b1130cde00509203ca6600138937eacd071279f250928f0fa06caf"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/run_whole_sdk_green2.py",
+      "size": 4294,
+      "sha256": "7f52641bc46e13c8be16d8cbf0dabe9d430c550c79be0e63b4b8f62862818211"
+    },
+    {
+      "path": "/workspace/nexus-source-sdk-archive-exclusion/selection-after.json",
+      "size": 1587645,
+      "sha256": "f66cdf628047fe9dca9a09a41834bd6ecac860d5082ee64c938a66d744394f4d"
+    }
+  ],
+  "independent_review": {
+    "path": "/workspace/nexus-sdk-archive-exclusion-independent-review.json",
+    "size": 4831,
+    "sha256": "2717e19316f8779ab453c6fd81aa740ac6cab09d9d12cfdf6f49a6c26e45fadb"
+  },
+  "provenance_repair": {
+    "path": "/workspace/nexus-sdk-selector-tdd-provenance-repair.json",
+    "size": 434,
+    "sha256": "9b9685b32d219b24295f8742946191efee6f5d1045c7c5714d3dd8abd2257164"
+  },
+  "limits": [
+    "Read-only staged-input handoff; does not stage files or alter any Git state.",
+    "Retained external development evidence does not imply formal finalcanonical sourceSDK qualification."
+  ]
+}
