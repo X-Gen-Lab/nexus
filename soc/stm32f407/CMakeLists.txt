@@ -82,3 +82,21 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${stm32_cmsis}" PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32F407xx PARENT_SCOPE)
 set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c" PARENT_SCOPE)
+
+# Fixed clock profile sleep is an explicitly selected caller-owned component.
+function(nexus_add_stm32f407_sleep target)
+    if(NOT ARGC EQUAL 1 OR TARGET "${target}")
+        message(FATAL_ERROR "Sleep target requires one unused target name")
+    endif()
+    add_library(${target} STATIC EXCLUDE_FROM_ALL
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c")
+    target_link_libraries(${target} PRIVATE Nexus::ClockDomain Nexus::Arch
+        nexus_build_options nexus_owned_warnings)
+    target_include_directories(${target} PRIVATE
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/private"
+        "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+    target_include_directories(${target} SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
+        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    target_compile_definitions(${target} PRIVATE STM32F407xx)
+endfunction()

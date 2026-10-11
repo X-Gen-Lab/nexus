@@ -1,0 +1,118 @@
+[
+  {
+    "command": [
+      ".venv/bin/clang-format",
+      "--dry-run",
+      "--Werror",
+      "components/clock_domain/include/nexus/components/clock_domain.h",
+      "components/clock_domain/private/clock_domain_impl.h",
+      "components/clock_domain/src/clock_domain.c",
+      "soc/stm32f407/private/stm32f407_sleep.h",
+      "soc/stm32f407/sleep.c",
+      "soc/gd32f470/private/gd32f470_sleep.h",
+      "soc/gd32f470/sleep.c",
+      "tests/google/clock_domain_test.cpp",
+      "tests/google/clock_sleep_soc_test.cpp",
+      "tests/google/clock_sleep_soc_model.h"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "python",
+      "scripts/ci/comment_style.py",
+      "--files",
+      "components/clock_domain/include/nexus/components/clock_domain.h",
+      "components/clock_domain/private/clock_domain_impl.h",
+      "components/clock_domain/src/clock_domain.c",
+      "soc/stm32f407/private/stm32f407_sleep.h",
+      "soc/stm32f407/sleep.c",
+      "soc/gd32f470/private/gd32f470_sleep.h",
+      "soc/gd32f470/sleep.c",
+      "tests/google/clock_domain_test.cpp",
+      "tests/google/clock_sleep_soc_test.cpp",
+      "tests/google/clock_sleep_soc_model.h",
+      "--json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      ".venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/clock-tests/build",
+      "-j2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/clock-tests/build/clock_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/clock_contract-build-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "clock_contract-build-final.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/clock-tests/build/sleep_stm32f407_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/sleep_stm32f407_contract-build-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "sleep_stm32f407_contract-build-final.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/clock-tests/build/sleep_gd32f470_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/sleep_gd32f470_contract-build-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "sleep_gd32f470_contract-build-final.log"
+  },
+  {
+    "command": [
+      ".venv/bin/cmake",
+      "-S",
+      "/workspace/nexus-industrial-design/clock-tests",
+      "-B",
+      "/workspace/nexus-industrial-design/clock-tests/asan",
+      "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      ".venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/clock-tests/asan",
+      "-j2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/clock-tests/asan/clock_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/clock_contract-asan-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "clock_contract-asan-final.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/clock-tests/asan/sleep_stm32f407_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/sleep_stm32f407_contract-asan-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "sleep_stm32f407_contract-asan-final.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/clock-tests/asan/sleep_gd32f470_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/sleep_gd32f470_contract-asan-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "sleep_gd32f470_contract-asan-final.log"
+  }
+]

@@ -56,6 +56,6 @@ IO-54,CAN platform interface and controllers,implemented,targeted_passed,not_exe
 IO-55,Ethernet MAC PHY raw frames,planned,pending,not_executed,io;soc,pending,caller descriptors buffers; cache/domain; external network policy,codex
 IO-56,USB clock endpoints lifecycle,planned,pending,not_executed,io;soc,pending,legal 48 MHz profile; reset cancel drain; no GD default clock promise,codex
 IO-57,Timer capture advanced PWM,planned,pending,not_executed,io;soc,pending,input capture timestamps; break deadtime safe ownership,codex
-IO-58,SoC sleep and clock lifecycle,planned,pending,not_executed,soc;os,pending,drain restore timer monotonic and pending IRQ contract,codex
+IO-58,SoC sleep and clock lifecycle,implemented,targeted_passed,not_executed,soc;os,tools/testing/evidence/clock-domain-iteration,caller-owned clock leases and exact fixed-profile shallow sleep; actual drain/wake/clock readback models; dynamic PLL/STOP and physical timing not supported,codex
 IO-59,Additional SoC Board complete vertical,planned,pending,not_executed,soc;boards;tools/configure,pending,exact hardware facts; real startup route linker model ARM validation,codex
 IO-60,Narrow user I/O isolation contracts,planned,pending,not_executed,os;io,pending,validate privileged broker ranges and retained user loans; no arbitrary pointer syscall,codex

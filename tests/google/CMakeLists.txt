@@ -443,3 +443,5 @@ include(can_runtime.cmake)
 include(can_factory.cmake)
 
 include(stack_observation.cmake)
+
+include(clock_domain.cmake)

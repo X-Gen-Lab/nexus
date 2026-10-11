@@ -116,3 +116,22 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${gd_firmware}/CMSIS"
     "${gd_device}/Include" "${gd_peripheral}/Include" PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS GD32F470 HXTAL_VALUE=25000000 PARENT_SCOPE)
+
+# Fixed clock profile sleep is an explicitly selected caller-owned component.
+function(nexus_add_gd32f470_sleep target)
+    if(NOT ARGC EQUAL 1 OR TARGET "${target}")
+        message(FATAL_ERROR "Sleep target requires one unused target name")
+    endif()
+    add_library(${target} STATIC EXCLUDE_FROM_ALL
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c")
+    target_link_libraries(${target} PRIVATE Nexus::ClockDomain Nexus::Arch
+        nexus_build_options nexus_owned_warnings)
+    target_include_directories(${target} PRIVATE
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/private"
+        "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
+    set(sleep_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
+    target_include_directories(${target} SYSTEM PRIVATE
+        "${sleep_vendor}/CMSIS" "${sleep_vendor}/CMSIS/GD/GD32F4xx/Include"
+        "${sleep_vendor}/GD32F4xx_standard_peripheral/Include")
+    target_compile_definitions(${target} PRIVATE GD32F470 HXTAL_VALUE=25000000)
+endfunction()

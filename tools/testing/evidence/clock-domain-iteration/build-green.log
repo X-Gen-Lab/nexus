@@ -1,0 +1,3 @@
+[ 25%] Building C object CMakeFiles/clock_contract.dir/workspace/nexus/components/clock_domain/src/clock_domain.c.o
+[ 50%] Linking CXX executable clock_contract
+[100%] Built target clock_contract

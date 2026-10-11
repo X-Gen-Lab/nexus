@@ -1,0 +1,4 @@
+#include "clock_domain_impl.h"
+char size_clock_domain[sizeof(nx_clock_domain_t)];
+char size_clock_lease[sizeof(nx_clock_lease_t)];
+char size_clock_barrier[sizeof(nx_clock_barrier_t)];

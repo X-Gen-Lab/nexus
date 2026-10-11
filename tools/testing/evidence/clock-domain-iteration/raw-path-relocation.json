@@ -1,0 +1,19 @@
+{
+  "scope": "unmodified historical compiler-input archives; original command paths remain historical raw values",
+  "records": [
+    {
+      "original_path": "arm/gd32f470-sizes.c",
+      "archived_path": "arm/gd32f470-sizes.c.raw",
+      "sha256": "631bed79c28c5585dee82f8a7e6fe350282f7ee55d9d9949bec8927b38c192e5",
+      "bytes": 184,
+      "byte_modification": false
+    },
+    {
+      "original_path": "arm/stm32f407-sizes.c",
+      "archived_path": "arm/stm32f407-sizes.c.raw",
+      "sha256": "631bed79c28c5585dee82f8a7e6fe350282f7ee55d9d9949bec8927b38c192e5",
+      "bytes": 184,
+      "byte_modification": false
+    }
+  ]
+}
