@@ -1,0 +1,31 @@
+[1/3] Building C object CMakeFiles/g474_system_test.dir/tests/contracts/g474_model.c.o
+[2/3] Building CXX object CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o
+[3/3] Linking CXX executable g474_system_test
+FAILED: [code=1] g474_system_test 
+: && /usr/bin/c++  -Wl,--dependency-file=CMakeFiles/g474_system_test.dir/link.d CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o CMakeFiles/g474_system_test.dir/tests/contracts/g474_model.c.o -o g474_system_test  /workspace/nexus/build/iteration-bus/lib/libnexus_io.a  /workspace/nexus/build/iteration-bus/lib/libnexus_core.a  /workspace/nexus/build/iteration-bus/lib/libnexus_arch.a  /workspace/nexus/build/iteration-bus/lib/libgmock_main.a  /workspace/nexus/build/iteration-bus/lib/libgmock.a  /workspace/nexus/build/iteration-bus/lib/libgtest.a  -lpthread && :
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_Exact170MHzProfileUsesBoostFlashAndDelayedAhbSwitch_Test::TestBody()':
+g474_system_test.cpp:(.text+0x23): undefined reference to `nx_stm32g474_system_start'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_HseFailureRollsBackAllOwnedFields_Test::TestBody()':
+g474_system_test.cpp:(.text+0x1144): undefined reference to `nx_stm32g474_system_start'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_FailedRollbackRetainsActualClockOwnership_Test::TestBody()':
+g474_system_test.cpp:(.text+0x1b4d): undefined reference to `nx_stm32g474_system_start'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_LiveForeignClockIsRejectedWithoutWrites_Test::TestBody()':
+g474_system_test.cpp:(.text+0x1faa): undefined reference to `nx_stm32g474_system_start'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_FlashReadbackFailureDoesNotSwitchClock_Test::TestBody()':
+g474_system_test.cpp:(.text+0x22cf): undefined reference to `nx_stm32g474_system_start'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o:g474_system_test.cpp:(.text+0x2660): more undefined references to `nx_stm32g474_system_start' follow
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_PendingWrapSnapshotDoesNotDoubleCountIrq_Test::TestBody()':
+g474_system_test.cpp:(.text+0x2be0): undefined reference to `nx_stm32g474_system_now'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x2cb7): undefined reference to `nx_stm32g474_system_timer_irq'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x2cc6): undefined reference to `nx_stm32g474_system_now'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_StopRetainsTimebaseUntilIrqDisableIsObserved_Test::TestBody()':
+g474_system_test.cpp:(.text+0x2f89): undefined reference to `nx_stm32g474_system_start'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x30ae): undefined reference to `nx_stm32g474_system_stop'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x325e): undefined reference to `nx_stm32g474_system_stop'
+/usr/bin/ld: CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o: in function `G474System_DensityDeviceAndDbankAreExplicitPrerequisites_Test::TestBody()':
+g474_system_test.cpp:(.text+0x363c): undefined reference to `nx_stm32g474_validate_identity'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x3716): undefined reference to `nx_stm32g474_validate_identity'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x37ed): undefined reference to `nx_stm32g474_validate_identity'
+/usr/bin/ld: g474_system_test.cpp:(.text+0x38c5): undefined reference to `nx_stm32g474_validate_identity'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

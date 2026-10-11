@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="10" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:11:45.594" name="AllTests">
+  <testsuite name="G474System" tests="10" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:11:45.594">
+    <testcase name="Exact170MHzProfileUsesBoostFlashAndDelayedAhbSwitch" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="18" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="HseFailureRollsBackAllOwnedFields" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="38" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="FailedRollbackRetainsActualClockOwnership" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="56" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="LiveForeignClockIsRejectedWithoutWrites" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="65" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="FlashReadbackFailureDoesNotSwitchClock" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="72" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="PllAndSourceAcknowledgementFailuresAreBounded" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="79" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="PendingWrapSnapshotDoesNotDoubleCountIrq" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="90" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="StopRetainsTimebaseUntilIrqDisableIsObserved" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="102" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="DensityDeviceAndDbankAreExplicitPrerequisites" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="114" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+    <testcase name="PowerSnapshotsRequireObservedInterfaceClock" file="/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_system_test.cpp" line="127" status="run" result="completed" time="0." timestamp="2026-10-11T19:11:45.594" classname="G474System" />
+  </testsuite>
+</testsuites>

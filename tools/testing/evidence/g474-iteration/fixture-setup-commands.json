@@ -1,0 +1,265 @@
+[
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus",
+      "worktree",
+      "add",
+      "--detach",
+      "/workspace/nexus-g4-source-proof",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-00.log"
+  },
+  {
+    "command": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/ext/freertos",
+      "/workspace/nexus-g4-source-proof/ext/freertos"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-01.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/ext/freertos",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/FreeRTOS/FreeRTOS-Kernel.git"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-02.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/ext/freertos",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-03.log"
+  },
+  {
+    "command": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/vendors/arm/CMSIS_5",
+      "/workspace/nexus-g4-source-proof/vendors/arm/CMSIS_5"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-04.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/arm/CMSIS_5",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/ARM-software/CMSIS_5.git"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-05.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/arm/CMSIS_5",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "55b19837f5703e418ca37894d5745b1dc05e4c91"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-06.log"
+  },
+  {
+    "command": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/vendors/st/cmsis_device_f4",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_f4"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-07.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_f4",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/STMicroelectronics/cmsis_device_f4.git"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-08.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_f4",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-09.log"
+  },
+  {
+    "command": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/ext/threadx",
+      "/workspace/nexus-g4-source-proof/ext/threadx"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-10.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/ext/threadx",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/eclipse-threadx/threadx.git"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-11.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/ext/threadx",
+      "config",
+      "core.sparseCheckout",
+      "true"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-12.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/ext/threadx",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "93387b0a60382a29579bbad5045c68328e3751df"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-13.log"
+  },
+  {
+    "command": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/vendors/st/cmsis_device_g4",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_g4"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-14.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_g4",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/STMicroelectronics/cmsis-device-g4.git"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-15.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_g4",
+      "config",
+      "core.sparseCheckout",
+      "true"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-16.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof/vendors/st/cmsis_device_g4",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "626ee412334a5ed2e5b320af5a8d77d69f03a558"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-17.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "add",
+      "--all"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-18.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "-c",
+      "core.hooksPath=/dev/null",
+      "-c",
+      "user.name=SDK fixture",
+      "-c",
+      "user.email=sdk-fixture@local.invalid",
+      "commit",
+      "--quiet",
+      "-m",
+      "test: actual committed five-source SDK fixture"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-setup-19.log"
+  }
+]

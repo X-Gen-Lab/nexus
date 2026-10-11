@@ -32,6 +32,14 @@ class DependencyProposalTests(unittest.TestCase):
 
     def test_actual_inventory_observes_pins_not_latest_claims(self):
         expected = {item.path for item in source_catalogue.SOURCE_DEPENDENCIES}
+        declared = proposals.git(ROOT, "show", "HEAD:.gitmodules")
+        if any('path = ' + path not in declared and 'path=' + path not in declared
+               for path in expected):
+            # New dependency declarations and Gitlinks must be committed
+            # together. An unfinished source-graph change remains rejected.
+            with self.assertRaisesRegex(ValueError, "catalogue review|Missing committed source Gitlink"):
+                proposals.inventory(ROOT)
+            return
         missing = [path for path in expected
                    if not proposals.git(ROOT, "ls-tree", "HEAD", "--", path)]
         if missing:
@@ -224,9 +232,18 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         self.environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
         self.git(self.root, "init", "--quiet")
-        self.write(self.root / ".gitmodules", (ROOT / ".gitmodules").read_bytes())
         self.threadx_lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
-        for item in source_catalogue.SOURCE_DEPENDENCIES:
+        self.g4_lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
+        dependencies = list(source_catalogue.SOURCE_DEPENDENCIES)
+        if not any(item.identifier == "stm32g4_cmsis" for item in dependencies):
+            dependencies.append(source_catalogue.SourceDependency(
+                "stm32g4_cmsis", "vendors/st/cmsis_device_g4",
+                "https://github.com/STMicroelectronics/cmsis-device-g4.git",
+                "LICENSE.md", "dependencies/stm32g4.lock.json"))
+        self.write(self.root / ".gitmodules", "".join(
+            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.origin}\n'
+            for item in dependencies).encode())
+        for item in dependencies:
             checkout = self.root / item.path
             checkout.mkdir(parents=True)
             self.git(checkout, "init", "--quiet")
@@ -234,6 +251,8 @@ class DependencyInventoryGitTests(unittest.TestCase):
             paths = [item.notice]
             if item.identifier == "threadx":
                 paths.extend(self.threadx_lock["files"])
+            elif item.identifier == "stm32g4_cmsis":
+                paths.extend(self.g4_lock["files"])
             for name in paths:
                 self.write(checkout / name, (ROOT / item.path / name).read_bytes())
             self.git(checkout, "add", ".")
@@ -241,8 +260,12 @@ class DependencyInventoryGitTests(unittest.TestCase):
             if item.identifier == "threadx":
                 self.threadx_lock["commit"] = self.git(checkout, "rev-parse", "HEAD")
                 self.git(checkout, "tag", self.threadx_lock["tag"])
+            elif item.identifier == "stm32g4_cmsis":
+                self.g4_lock["commit"] = self.git(checkout, "rev-parse", "HEAD")
         self.write(self.root / "dependencies/threadx.lock.json",
                    (json.dumps(self.threadx_lock) + "\n").encode())
+        self.write(self.root / "dependencies/stm32g4.lock.json",
+                   (json.dumps(self.g4_lock) + "\n").encode())
         for name in ("dependencies/googletest.lock.json", "dependencies/source/googletest-LICENSE.txt",
                      "dependencies/toolchains.lock.json", "dependencies/environment.lock.json",
                      "dependencies/development-tools.txt", "dependencies/environment-tools.txt",
@@ -278,6 +301,38 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.assertGreaterEqual(len(record["identities"]), 217)
         self.assertFalse(result["source_dirty"])
         self.assertFalse(result["software_qualified"])
+
+    def test_five_committed_gitlinks_observe_actual_g4_origin_license_and_sources(self):
+        result = proposals.inventory(self.root)
+        record = next(x for x in result["dependencies"] if x["id"] == "stm32g4_cmsis")
+        self.assertEqual(record["revision"], self.g4_lock["commit"])
+        self.assertEqual(record["upstream_url"], self.g4_lock["repository"])
+        observed = {Path(x["path"]).relative_to(self.root).as_posix()
+                    for x in record["identities"]}
+        required = {".gitmodules", "dependencies/stm32g4.lock.json"}
+        required.update("vendors/st/cmsis_device_g4/" + name
+                        for name in self.g4_lock["files"])
+        self.assertEqual(observed, required)
+        self.assertFalse(result["software_qualified"])
+
+    def test_g4_uncommitted_gitlink_foreign_origin_and_rehashed_omission_reject(self):
+        path = self.root / "dependencies/stm32g4.lock.json"
+        changed = copy.deepcopy(self.g4_lock)
+        del changed["files"]["Include/stm32g474xx.h"]
+        path.write_text(json.dumps(changed))
+        with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+        path.write_text(json.dumps(self.g4_lock) + "\n")
+        self.git(self.root / "vendors/st/cmsis_device_g4", "remote", "set-url", "origin",
+                 "https://example.com/g4.git")
+        with self.assertRaises(ValueError):
+            proposals.inventory(self.root)
+        self.git(self.root / "vendors/st/cmsis_device_g4", "remote", "set-url", "origin",
+                 self.g4_lock["repository"])
+        self.git(self.root, "rm", "--cached", "vendors/st/cmsis_device_g4")
+        self.commit(self.root, "actual parent without G4 gitlink")
+        with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
+            proposals.inventory(self.root)
 
     def test_checkout_change_and_foreign_origin_reject_without_repair(self):
         file = self.root / "ext/threadx" / self.threadx_lock["common"][0]

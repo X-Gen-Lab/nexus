@@ -1,0 +1,72 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/g474-regular-build",
+      "--parallel",
+      "4"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-0.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-regular-build/g474_system_test",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-regular-system.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-1.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-regular-build/g474_provider_test",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-regular-provider.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-2.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/g474-build",
+      "--parallel",
+      "4"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-3.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-build/g474_system_test",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-san-system.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-4.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-build/g474_provider_test",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-san-provider.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-5.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/workspace/nexus-iteration-bus-design/g474-src/arm_check.py"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-6.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/workspace/nexus-iteration-bus-design/g474-src/link_startup.py"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-formatted-green-7.log"
+  }
+]

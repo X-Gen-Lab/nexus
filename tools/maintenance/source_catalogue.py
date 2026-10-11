@@ -1,7 +1,7 @@
 """Reviewed source dependencies shared by maintenance and SDK provenance.
 
 This catalogue owns approved module origins and notice/lock locations. Gitlinks
-own current commits; each maintained source lock owns its kernel source graph.
+own current commits; each maintained source lock owns its selected source graph.
 Adding a dependency requires review, never filesystem discovery or fallback.
 """
 from __future__ import annotations
@@ -27,6 +27,9 @@ SOURCE_DEPENDENCIES = (
     SourceDependency("threadx", "ext/threadx",
                      "https://github.com/eclipse-threadx/threadx.git", "LICENSE.txt",
                      "dependencies/threadx.lock.json"),
+    SourceDependency("stm32g4_cmsis", "vendors/st/cmsis_device_g4",
+                     "https://github.com/STMicroelectronics/cmsis-device-g4.git", "LICENSE.md",
+                     "dependencies/stm32g4.lock.json"),
 )
 
 

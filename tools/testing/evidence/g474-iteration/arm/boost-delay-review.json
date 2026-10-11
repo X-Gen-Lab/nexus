@@ -1,0 +1,6 @@
+{
+  "source": "ARM Cortex-M4 dependent85 SUBS+BNE iterations at observed SYSCLK170MHz/AHB2=85MHz; singleissue execution requires at least170instructions/corecycles => minimum2microseconds; IRQs only extend elapsed time.",
+  "verified": "Actual GCC14.3 -Os object contains immediate85 counter plus SUBS and conditional backward branch between PLL SWS proof and AHB divide removal; volatile inlineasm memoryclobber prevents elision/reordering.",
+  "limit": "Instruction minimum and ordering reviewed; physical oscillator/PLL/voltage/Flash/silicon timing not measured, HIL remains not executed.",
+  "disassembly": "/workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system-disassembly.log"
+}

@@ -1,0 +1,38 @@
+[1/4] Building C object CMakeFiles/g474_provider_test.dir/tests/contracts/g474_model.c.o
+[2/4] Building C object CMakeFiles/g474_provider_test.dir/soc/stm32g474/system.c.o
+[3/4] Building CXX object CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o
+[4/4] Linking CXX executable g474_provider_test
+FAILED: [code=1] g474_provider_test 
+: && /usr/bin/c++ -g -fsanitize=address,undefined -fno-omit-frame-pointer -fsanitize=address,undefined   -Wl,--dependency-file=CMakeFiles/g474_provider_test.dir/link.d CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o CMakeFiles/g474_provider_test.dir/tests/contracts/g474_model.c.o CMakeFiles/g474_provider_test.dir/soc/stm32g474/system.c.o -o g474_provider_test  /workspace/nexus/build/iteration-bus/lib/libnexus_io.a  /workspace/nexus/build/iteration-bus/lib/libnexus_core.a  /workspace/nexus/build/iteration-bus/lib/libnexus_arch.a  /workspace/nexus/build/iteration-bus/lib/libgmock_main.a  /workspace/nexus/build/iteration-bus/lib/libgmock.a  /workspace/nexus/build/iteration-bus/lib/libgtest.a  -lpthread && :
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: warning: relocation against `nx_stm32g474_uart_ops' in read-only section `.text._ZN12G474ProviderC2Ev[_ZN12G474ProviderC5Ev]'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_UnsupportedProfileAndBaudRejectBeforeWrites_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:61:(.text+0x18d1): undefined reference to `nx_stm32g474_uart_initialize'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:66:(.text+0x217d): undefined reference to `nx_stm32g474_uart_initialize'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_ForeignEnabledHardwareRejectsWithoutTakingIrq_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:72:(.text+0x2bdd): undefined reference to `nx_stm32g474_uart_initialize'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_TxSettlesOnlyAfterFinalWireTc_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:80:(.text+0x3cca): undefined reference to `nx_stm32g474_uart_irq'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:83:(.text+0x42ee): undefined reference to `nx_stm32g474_uart_irq'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:88:(.text+0x4ca0): undefined reference to `nx_stm32g474_uart_irq'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_StaleTcBeforeLastTdrIsNotFinalWireCompletion_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:99:(.text+0x6723): undefined reference to `nx_stm32g474_uart_irq'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:101:(.text+0x6aa5): undefined reference to `nx_stm32g474_uart_irq'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o:/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:109: more undefined references to `nx_stm32g474_uart_irq' follow
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_TwoInstancesDoNotShareRequestOrRingCursors_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:254:(.text+0x160e6): undefined reference to `nx_stm32g474_uart_initialize'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:255:(.text+0x163f6): undefined reference to `nx_stm32g474_uart_ops'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_GpioPreloadsSafeLevelAndRestrictsMasks_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:264:(.text+0x178e4): undefined reference to `nx_stm32g474_gpio_ops'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:265:(.text+0x17935): undefined reference to `nx_stm32g474_gpio_initialize'
+/usr/bin/ld: /workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:270:(.text+0x1873d): undefined reference to `nx_stm32g474_gpio_stop'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider_InvalidGpioMasksRejectBeforeAnyWrite_Test::TestBody()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:276:(.text+0x1956b): undefined reference to `nx_stm32g474_gpio_initialize'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider::Start()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:40:(.text._ZN12G474Provider5StartEv[_ZN12G474Provider5StartEv]+0x150): undefined reference to `nx_stm32g474_uart_initialize'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider::Byte(unsigned char, unsigned int)':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:47:(.text._ZN12G474Provider4ByteEhj[_ZN12G474Provider4ByteEhj]+0x47b): undefined reference to `nx_stm32g474_uart_irq'
+/usr/bin/ld: CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o: in function `G474Provider::G474Provider()':
+/workspace/nexus-iteration-bus-design/g474-src/tests/google/g474_provider_test.cpp:14:(.text._ZN12G474ProviderC2Ev[_ZN12G474ProviderC5Ev]+0x86d): undefined reference to `nx_stm32g474_uart_ops'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

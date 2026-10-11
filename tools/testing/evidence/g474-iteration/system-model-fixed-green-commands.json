@@ -1,0 +1,19 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/g474-build",
+      "-j",
+      "2"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-build/g474_system_test",
+      "--gtest_output=xml:/workspace/nexus-iteration-bus-design/g474-src/evidence/system-model-fixed-green.xml"
+    ],
+    "returncode": 0
+  }
+]

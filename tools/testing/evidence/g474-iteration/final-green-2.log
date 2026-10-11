@@ -1,0 +1,53 @@
+Running main() from gmock_main.cc
+[==========] Running 22 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 22 tests from G474Provider
+[ RUN      ] G474Provider.ExactPrescalerAndBrrWaitForRealAcknowledgement
+[       OK ] G474Provider.ExactPrescalerAndBrrWaitForRealAcknowledgement (0 ms)
+[ RUN      ] G474Provider.UnsupportedProfileAndBaudRejectBeforeWrites
+[       OK ] G474Provider.UnsupportedProfileAndBaudRejectBeforeWrites (0 ms)
+[ RUN      ] G474Provider.ForeignEnabledHardwareRejectsWithoutTakingIrq
+[       OK ] G474Provider.ForeignEnabledHardwareRejectsWithoutTakingIrq (0 ms)
+[ RUN      ] G474Provider.TxSettlesOnlyAfterFinalWireTc
+[       OK ] G474Provider.TxSettlesOnlyAfterFinalWireTc (0 ms)
+[ RUN      ] G474Provider.StaleTcBeforeLastTdrIsNotFinalWireCompletion
+[       OK ] G474Provider.StaleTcBeforeLastTdrIsNotFinalWireCompletion (0 ms)
+[ RUN      ] G474Provider.CancelKeepsBorrowQuarantinedUntilRealTc
+[       OK ] G474Provider.CancelKeepsBorrowQuarantinedUntilRealTc (0 ms)
+[ RUN      ] G474Provider.CompletedWireFactWinsLaterDeadlineAndCancel
+[       OK ] G474Provider.CompletedWireFactWinsLaterDeadlineAndCancel (0 ms)
+[ RUN      ] G474Provider.TcFirstObservedAtDeadlineIsTimeout
+[       OK ] G474Provider.TcFirstObservedAtDeadlineIsTimeout (0 ms)
+[ RUN      ] G474Provider.RingOverflowPreservesOlderBytesAndReportsLoss
+[       OK ] G474Provider.RingOverflowPreservesOlderBytesAndReportsLoss (0 ms)
+[ RUN      ] G474Provider.CorruptByteIsDiscardedWithObservableAggregateLoss
+[       OK ] G474Provider.CorruptByteIsDiscardedWithObservableAggregateLoss (0 ms)
+[ RUN      ] G474Provider.ReadOutputCannotOverwriteRingOrActiveRequest
+[       OK ] G474Provider.ReadOutputCannotOverwriteRingOrActiveRequest (0 ms)
+[ RUN      ] G474Provider.RequestMetadataCannotOverlapReceptionStorage
+[       OK ] G474Provider.RequestMetadataCannotOverlapReceptionStorage (0 ms)
+[ RUN      ] G474Provider.WakeCannotBeBorrowedFromDmaOrIrqOwnedRing
+[       OK ] G474Provider.WakeCannotBeBorrowedFromDmaOrIrqOwnedRing (0 ms)
+[ RUN      ] G474Provider.WakeUsesActualPriorityAndWaitsForCapturedCallback
+[       OK ] G474Provider.WakeUsesActualPriorityAndWaitsForCapturedCallback (0 ms)
+[ RUN      ] G474Provider.FailedSourceWithdrawalRetainsAllStorage
+[       OK ] G474Provider.FailedSourceWithdrawalRetainsAllStorage (0 ms)
+[ RUN      ] G474Provider.TwoInstancesDoNotShareRequestOrRingCursors
+[       OK ] G474Provider.TwoInstancesDoNotShareRequestOrRingCursors (0 ms)
+[ RUN      ] G474Provider.GpioPreloadsSafeLevelAndRestrictsMasks
+[       OK ] G474Provider.GpioPreloadsSafeLevelAndRestrictsMasks (0 ms)
+[ RUN      ] G474Provider.InvalidGpioMasksRejectBeforeAnyWrite
+[       OK ] G474Provider.InvalidGpioMasksRejectBeforeAnyWrite (0 ms)
+[ RUN      ] G474Provider.FailedGpioModeAcknowledgementNeedsSafeRollback
+[       OK ] G474Provider.FailedGpioModeAcknowledgementNeedsSafeRollback (0 ms)
+[ RUN      ] G474Provider.FailedGpioInitialLatchDoesNotExposeOutputMode
+[       OK ] G474Provider.FailedGpioInitialLatchDoesNotExposeOutputMode (0 ms)
+[ RUN      ] G474Provider.GpioElectricalModeMustBeObservedBeforePublication
+[       OK ] G474Provider.GpioElectricalModeMustBeObservedBeforePublication (0 ms)
+[ RUN      ] G474Provider.UartPinPreloadFailureMustNotExposeAlternateOutput
+[       OK ] G474Provider.UartPinPreloadFailureMustNotExposeAlternateOutput (0 ms)
+[----------] 22 tests from G474Provider (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 22 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 22 tests.

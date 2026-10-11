@@ -26,7 +26,7 @@ from tools.configure.metadata import (  # noqa: E402
 from tools.maintenance.source_catalogue import (  # noqa: E402
     SOURCE_DEPENDENCIES, declared_modules,
 )
-from tools.maintenance import threadx_lock  # noqa: E402
+from tools.maintenance import stm32g4_lock, threadx_lock  # noqa: E402
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
          "board_arm", "resource_budgets", "installed_sdk",
@@ -88,14 +88,17 @@ def inventory(root=ROOT):
             raise ValueError("Source checkout differs from locked clean Gitlink: " + path)
         references = [module_identity, identity(checkout / notice)]
         if dependency.source_lock is not None:
-            if name != "threadx":
-                raise ValueError("Source lock validator requires catalogue review")
             lock_path = root / dependency.source_lock
             lock_bytes, lock_identity = snapshot(lock_path)
             locked = parse_json(lock_bytes)
-            threadx_lock.verify(checkout, lock_path, "linux")
+            if name == "threadx":
+                threadx_lock.verify(checkout, lock_path, "linux")
+            elif name == "stm32g4_cmsis":
+                stm32g4_lock.verify(checkout, lock_path)
+            else:
+                raise ValueError("Source lock validator requires catalogue review")
             if locked["commit"] != entry[2]:
-                raise ValueError("ThreadX lock differs from committed source Gitlink")
+                raise ValueError("Source lock differs from committed source Gitlink: " + path)
             references.extend([lock_identity,
                                *[identity(checkout / filename)
                                  for filename in sorted(locked["files"])]])

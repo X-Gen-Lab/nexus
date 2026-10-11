@@ -24,7 +24,7 @@ SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
-    from tools.maintenance import threadx_lock
+    from tools.maintenance import stm32g4_lock, threadx_lock
     from tools.configure.metadata import parse_json, snapshot
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -163,6 +163,12 @@ _threadx_lock = parse_json((SOURCE_ROOT / "dependencies/threadx.lock.json").read
 threadx_lock.contract(_threadx_lock)
 REQUIRED_FILES += tuple("ext/threadx/" + name for name in _threadx_lock["files"])
 REQUIRED_FILES += ("ext/threadx/" + _threadx_lock["license"]["path"],)
+REQUIRED_FILES += ("dependencies/stm32g4.lock.json",
+                   "tools/maintenance/stm32g4_lock.py")
+_g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_bytes())
+stm32g4_lock.contract(_g4_lock)
+REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
+                        for name in _g4_lock["files"])
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
 
@@ -220,7 +226,7 @@ def tree_entries(root):
 
 
 def dependency_entries(root, dependency):
-    """Keep ThreadX redistribution inside its reviewed source/notice closure."""
+    """Redistribute only the locked source closure for reviewed imports."""
     entries = tree_entries(root / dependency)
     if dependency == "ext/threadx":
         raw, _ = snapshot(root / "dependencies/threadx.lock.json")
@@ -228,6 +234,12 @@ def dependency_entries(root, dependency):
         names = threadx_lock.contract(lock) | {lock["license"]["path"]}
         if not names.issubset(entries):
             raise SDKError("ThreadX committed source graph is incomplete")
+        entries = {name: entries[name] for name in names}
+    elif dependency == "vendors/st/cmsis_device_g4":
+        raw, _ = snapshot(root / "dependencies/stm32g4.lock.json")
+        names = stm32g4_lock.contract(parse_json(raw))
+        if not names.issubset(entries):
+            raise SDKError("G4 committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
     return entries
 
@@ -341,6 +353,8 @@ def prepare(source, output, development_fixture=False):
     entries = tree_entries(source)
     dependencies = dependency_records(source, entries)
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
+    stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
+                       source / "dependencies/stm32g4.lock.json")
     sys.path.insert(0, str(source / "scripts/ci"))
     from vendor_import_identity import reviewed_import
     imports = [reviewed_import(source / "vendors/gigadevice/gd32f4xx", source)]
@@ -466,6 +480,11 @@ def verify(root):
     threadx = next(record for record in records if record["path"] == "ext/threadx")
     threadx_lock.verify(root / "ext/threadx", root / "dependencies/threadx.lock.json",
                         "linux", packaged_commit=threadx["commit"])
+    g4 = next(record for record in records
+              if record["path"] == "vendors/st/cmsis_device_g4")
+    stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
+                       root / "dependencies/stm32g4.lock.json",
+                       packaged_commit=g4["commit"])
     sys.path.insert(0, str(root / "scripts/ci"))
     from vendor_import_identity import validate_import_record
     imports = identity["reviewed_imports"]

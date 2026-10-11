@@ -70,6 +70,25 @@ class SourceSDKThreadXSelectionTests(unittest.TestCase):
         self.assertIn("ext/threadx", source_sdk.REQUIRED_DEPENDENCIES)
 
 
+class SourceSDKG4SelectionTests(unittest.TestCase):
+    def test_g4_snapshot_contains_only_five_reviewed_sources_and_original_notice(self):
+        lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
+        entries = source_sdk.dependency_entries(ROOT, "vendors/st/cmsis_device_g4")
+        self.assertEqual(set(entries), set(lock["files"]))
+        self.assertEqual(len(entries), 5)
+        self.assertNotIn("Include/stm32g491xx.h", entries)
+
+    def test_g4_lock_verifier_and_all_five_files_are_required_without_board_feature(self):
+        lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
+        required = {"dependencies/stm32g4.lock.json",
+                    "tools/maintenance/stm32g4_lock.py"}
+        required.update("vendors/st/cmsis_device_g4/" + name
+                        for name in lock["files"])
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
+        self.assertIn("vendors/st/cmsis_device_g4", source_sdk.REQUIRED_DEPENDENCIES)
+        self.assertNotIn("soc/stm32g474/drivers/uart.c", source_sdk.REQUIRED_FILES)
+
+
 class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK staged source ")
@@ -460,6 +479,118 @@ class SourceSDKTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
         finally:
             source.write_bytes(old_source)
+
+    def test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        lock = json.loads((self.sdk / "dependencies/stm32g4.lock.json").read_text())
+        names = ["vendors/st/cmsis_device_g4/" + name for name in lock["files"]]
+        names.extend(("dependencies/stm32g4.lock.json",
+                      "tools/maintenance/stm32g4_lock.py"))
+        for name in names:
+            with self.subTest(name=name):
+                file = self.sdk / name
+                old_source = file.read_bytes()
+                try:
+                    file.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    self.assertNotEqual(self.verify().returncode, 0)
+                finally:
+                    file.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+
+    def test_rehashed_g4_wrong_commit_changed_source_or_reduced_graph_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        source = self.sdk / "vendors/st/cmsis_device_g4/Include/stm32g474xx.h"
+        lock_path = self.sdk / "dependencies/stm32g4.lock.json"
+        original_source = source.read_bytes()
+        original_lock = lock_path.read_bytes()
+        try:
+            manifest = json.loads(old_identity)
+            next(x for x in manifest["dependencies"]
+                 if x["path"] == "vendors/st/cmsis_device_g4")["commit"] = "a" * 40
+            identity.write_text(json.dumps(manifest))
+            self.assertNotEqual(self.verify().returncode, 0)
+            for file, content in ((source, original_source + b"\n/* unreviewed */\n"),
+                                  (lock_path, json.dumps({**json.loads(original_lock),
+                                      "files": {}}).encode())):
+                file.write_bytes(content)
+                manifest = json.loads(old_identity)
+                manifest["files_sha256"][file.relative_to(self.sdk).as_posix()] = source_sdk.digest(content)
+                manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                    manifest["files_sha256"], sort_keys=True,
+                    separators=(",", ":")).encode())
+                identity.write_text(json.dumps(manifest))
+                self.assertNotEqual(self.verify().returncode, 0)
+                source.write_bytes(original_source)
+                lock_path.write_bytes(original_lock)
+        finally:
+            source.write_bytes(original_source)
+            lock_path.write_bytes(original_lock)
+            identity.write_bytes(old_identity)
+
+    def test_installed_g4_cli_verifies_manifest_readonly_without_git_fallback(self):
+        before = {p.relative_to(self.sdk).as_posix()
+                  for p in self.sdk.rglob("*") if p.is_file()}
+        command = [sys.executable, str(self.sdk / "tools/maintenance/stm32g4_lock.py"),
+                   "--source", str(self.sdk / "vendors/st/cmsis_device_g4"),
+                   "--lock", str(self.sdk / "dependencies/stm32g4.lock.json")]
+        result = self.run_process(command)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["verified_files"], 5)
+        self.assertEqual(json.loads(result.stdout)["source_kind"], "installed_source_sdk")
+        after = {p.relative_to(self.sdk).as_posix()
+                 for p in self.sdk.rglob("*") if p.is_file()}
+        self.assertEqual(after, before)
+        source = self.sdk / "vendors/st/cmsis_device_g4/Include/stm32g474xx.h"
+        old_source = source.read_bytes()
+        try:
+            source.write_bytes(b"corrupted")
+            result = self.run_process(command)
+            self.assertNotEqual(result.returncode, 0)
+        finally:
+            source.write_bytes(old_source)
+
+    def test_git_checkout_inside_sdk_cannot_bypass_whole_manifest(self):
+        for family, dependency, lock_name, extra in (
+                ("G4", "vendors/st/cmsis_device_g4", "stm32g4", []),
+                ("ThreadX", "ext/threadx", "threadx", ["--port", "linux"])):
+            with self.subTest(dependency=dependency):
+                source = self.sdk / dependency
+                private = self.directory / ("private " + family + " Git metadata")
+                self.run_ok(["git", "clone", "--shared", "--no-checkout", "--quiet",
+                             str(ROOT / dependency), str(private)])
+                lock_path = self.sdk / ("dependencies/" + lock_name + ".lock.json")
+                lock = json.loads(lock_path.read_text())
+                self.run_ok(["git", "-C", str(private), "remote", "set-url", "origin",
+                             lock["repository"]])
+                self.run_ok(["git", "-C", str(private), "config", "core.sparseCheckout", "true"])
+                names = set(lock["files"]) | {lock["license"]["path"]}
+                (private / ".git/info/sparse-checkout").write_text(
+                    "".join("/" + name + "\n" for name in sorted(names)))
+                self.run_ok(["git", "-C", str(private), "checkout", "--quiet", "--detach",
+                             lock["commit"]])
+                (private / ".git").rename(source / ".git")
+                other = self.sdk / "CMakeLists.txt"
+                original = other.read_bytes()
+                try:
+                    self.assertEqual(self.run_ok(["git", "-C", str(source), "status",
+                                                 "--porcelain"]).stdout, "")
+                    other.write_bytes(original + b"\n# altered SDK composition\n")
+                    result = self.run_process([
+                        sys.executable, "-B", str(self.sdk / ("tools/maintenance/" + lock_name + "_lock.py")),
+                        "--source", str(source), "--lock", str(lock_path), *extra])
+                    self.assertNotEqual(result.returncode, 0,
+                                        "Valid source Git must not bypass SDK manifest verification")
+                finally:
+                    other.write_bytes(original)
+                    shutil.rmtree(source / ".git")
 
     def test_additional_file_and_symlink_are_rejected(self):
         extra = self.sdk / "unexpected.c"

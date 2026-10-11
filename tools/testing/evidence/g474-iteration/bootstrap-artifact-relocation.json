@@ -1,0 +1,18 @@
+{
+  "files": [
+    {
+      "original": "tools/testing/evidence/g474-iteration/arm/sizes.c",
+      "archived": "tools/testing/evidence/g474-iteration/arm/sizes.c.raw",
+      "bytes": 284,
+      "sha256": "5fa5aaa873b5a3aab9054b154a07188ccf3e73f4b2ae1d2d950d973525c546ac",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    },
+    {
+      "original": "tools/testing/evidence/g474-iteration/arm/startup-entry.c",
+      "archived": "tools/testing/evidence/g474-iteration/arm/startup-entry.c.raw",
+      "bytes": 2120,
+      "sha256": "05d9e06af4b0bfeae2c1023faa25c8fc238a3f2bfab2b4181d51d36f09499baf",
+      "reason": "original raw fixture/source/compile metadata retained verbatim"
+    }
+  ]
+}

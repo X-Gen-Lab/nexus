@@ -13,3 +13,7 @@
 [submodule "ext/threadx"]
 	path = ext/threadx
 	url = https://github.com/eclipse-threadx/threadx.git
+
+[submodule "vendors/st/cmsis_device_g4"]
+	path = vendors/st/cmsis_device_g4
+	url = https://github.com/STMicroelectronics/cmsis-device-g4.git
