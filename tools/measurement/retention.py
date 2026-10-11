@@ -17,7 +17,8 @@ FACE_DECLARATION = re.compile(
     r"static\s+const\s+(nx_\w+_t)\s+(s_nx_(?:device_)?face_\w+)\s*="
 )
 FACE_INITIALIZER = re.compile(
-    FACE_DECLARATION.pattern + r"\s*\{\s*&(nx_\w+_ops)\s*,\s*&(\w+)\s*\}\s*;"
+    FACE_DECLARATION.pattern + r"\s*\{\s*&(nx_\w+_ops)\s*,\s*"
+    r"&(\w+(?:\[(?:0|[1-9][0-9]*)\])?)\s*\}\s*;"
 )
 
 
@@ -156,6 +157,36 @@ def object_words(elf, symbol, section):
     return struct.unpack_from("<" + "I" * (size // 4), elf.data, offset)
 
 
+def context_object(elf, bindings, expression):
+    """Resolve a scalar or literal array element from the actual linked size."""
+    match = re.fullmatch(r"(\w+)(?:\[([0-9]+)\])?", expression)
+    if match is None:
+        raise EvidenceError("unsupported context expression")
+    name, index_text = match.groups()
+    state, _ = linked_object(elf, name, "context", writable=True)
+    if not 0 <= state["value"] < state["value"] + state["size"] <= 1 << 32:
+        raise EvidenceError("context address range exceeds ARM address space")
+    if index_text is None:
+        return state["value"], {}
+    declarations = re.findall(
+        r"\bstatic\s+\w+\s+" + re.escape(name)
+        + r"\s*\[\s*(0|[1-9][0-9]*)\s*\]", bindings)
+    if len(declarations) != 1:
+        raise EvidenceError("missing or duplicate context array declaration")
+    count, index = int(declarations[0]), int(index_text)
+    if not 0 <= index < count <= 0xffffffff:
+        raise EvidenceError("context array index exceeds declared bounds")
+    if state["size"] % count or state["size"] // count == 0:
+        raise EvidenceError("linked context array element size is not integral")
+    element_bytes = state["size"] // count
+    offset = index * element_bytes
+    return state["value"] + offset, {
+        "context_symbol": name, "context_index": index,
+        "context_offset": offset, "context_element_bytes": element_bytes,
+        "context_array_count": count,
+    }
+
+
 def concrete_method(elf, pointer):
     """A concrete table word must name retained strong Thumb function code."""
     if not pointer & 1:
@@ -205,13 +236,14 @@ def inspect_provider_retention(elf, bindings):
         if table["size"] != 4 * len(slot_names):
             raise EvidenceError(
                 "concrete operations layout differs from public ABI")
-        state, _ = linked_object(elf, context, "context", writable=True)
+        context_address, context_facts = context_object(elf, bindings, context)
         if words[0] != table["value"]:
             raise EvidenceError("face operations pointer differs from assembly")
-        if words[1] != state["value"]:
+        if words[1] != context_address:
             raise EvidenceError("face context pointer differs from assembly")
         faces.append({"name": name, "type": face_type, "operations": operations,
-                      "context": context, "address": face["value"]})
+                      "context": context, "address": face["value"],
+                      **context_facts})
         if operations in tables:
             continue
         slots = object_words(elf, table, table_section)

@@ -1,0 +1,121 @@
+test_array_address_overflow_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_array_address_overflow_is_rejected) ... FAIL
+test_array_element_pointer_cannot_alias_the_neighbor (tools.testing.test_provider_retention.ArrayContextTests.test_array_element_pointer_cannot_alias_the_neighbor) ... FAIL
+test_missing_or_duplicate_array_declaration_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_missing_or_duplicate_array_declaration_is_rejected) ... 
+  test_missing_or_duplicate_array_declaration_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_missing_or_duplicate_array_declaration_is_rejected) (source='\nstatic const nx_i2c_port_t s_nx_face_bus = {\n    &nx_gd32_i2c_ops, &s_nx_port_bus\n};\nstatic const nx_i2c_endpoint_t s_nx_device_face_sensor = {\n    &nx_gd32_i2c_endpoint_ops, &s_nx_device_sensor[1]\n};\n') ... FAIL
+  test_missing_or_duplicate_array_declaration_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_missing_or_duplicate_array_declaration_is_rejected) (source='static nx_endpoint_state_t s_nx_device_sensor[2];\n\nstatic const nx_i2c_port_t s_nx_face_bus = {\n    &nx_gd32_i2c_ops, &s_nx_port_bus\n};\nstatic const nx_i2c_endpoint_t s_nx_device_face_sensor = {\n    &nx_gd32_i2c_endpoint_ops, &s_nx_device_sensor[1]\n};\nstatic nx_endpoint_state_t s_nx_device_sensor[2];') ... FAIL
+test_non_integral_linked_element_size_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_non_integral_linked_element_size_is_rejected) ... FAIL
+test_nonconstant_negative_or_noncanonical_index_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_nonconstant_negative_or_noncanonical_index_is_rejected) ... ok
+test_nonzero_index_uses_linked_array_size_and_declared_count (tools.testing.test_provider_retention.ArrayContextTests.test_nonzero_index_uses_linked_array_size_and_declared_count) ... ERROR
+test_out_of_bounds_constant_index_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_out_of_bounds_constant_index_is_rejected) ... FAIL
+test_zero_index_uses_actual_writable_array_symbol (tools.testing.test_provider_retention.ArrayContextTests.test_zero_index_uses_actual_writable_array_symbol) ... ERROR
+
+======================================================================
+ERROR: test_nonzero_index_uses_linked_array_size_and_declared_count (tools.testing.test_provider_retention.ArrayContextTests.test_nonzero_index_uses_linked_array_size_and_declared_count)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 347, in test_nonzero_index_uses_linked_array_size_and_declared_count
+    report = inspect_provider_retention(elf, bindings)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/measurement/retention.py", line 190, in inspect_provider_retention
+    connections = selected_faces(bindings)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/measurement/retention.py", line 32, in selected_faces
+    raise EvidenceError(
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+======================================================================
+ERROR: test_zero_index_uses_actual_writable_array_symbol (tools.testing.test_provider_retention.ArrayContextTests.test_zero_index_uses_actual_writable_array_symbol)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 341, in test_zero_index_uses_actual_writable_array_symbol
+    report = inspect_provider_retention(elf, bindings)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/measurement/retention.py", line 190, in inspect_provider_retention
+    connections = selected_faces(bindings)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/measurement/retention.py", line 32, in selected_faces
+    raise EvidenceError(
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+======================================================================
+FAIL: test_array_address_overflow_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_array_address_overflow_is_rejected)
+----------------------------------------------------------------------
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 386, in test_array_address_overflow_is_rejected
+    with self.assertRaisesRegex(EvidenceError, 'address range'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "address range" does not match "duplicate or unsupported generated face initializer"
+
+======================================================================
+FAIL: test_array_element_pointer_cannot_alias_the_neighbor (tools.testing.test_provider_retention.ArrayContextTests.test_array_element_pointer_cannot_alias_the_neighbor)
+----------------------------------------------------------------------
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 370, in test_array_element_pointer_cannot_alias_the_neighbor
+    with self.assertRaisesRegex(EvidenceError, 'context pointer'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "context pointer" does not match "duplicate or unsupported generated face initializer"
+
+======================================================================
+FAIL: test_missing_or_duplicate_array_declaration_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_missing_or_duplicate_array_declaration_is_rejected) (source='\nstatic const nx_i2c_port_t s_nx_face_bus = {\n    &nx_gd32_i2c_ops, &s_nx_port_bus\n};\nstatic const nx_i2c_endpoint_t s_nx_device_face_sensor = {\n    &nx_gd32_i2c_endpoint_ops, &s_nx_device_sensor[1]\n};\n')
+----------------------------------------------------------------------
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 359, in test_missing_or_duplicate_array_declaration_is_rejected
+    with self.subTest(source=source), self.assertRaisesRegex(EvidenceError, 'array declaration'):
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "array declaration" does not match "duplicate or unsupported generated face initializer"
+
+======================================================================
+FAIL: test_missing_or_duplicate_array_declaration_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_missing_or_duplicate_array_declaration_is_rejected) (source='static nx_endpoint_state_t s_nx_device_sensor[2];\n\nstatic const nx_i2c_port_t s_nx_face_bus = {\n    &nx_gd32_i2c_ops, &s_nx_port_bus\n};\nstatic const nx_i2c_endpoint_t s_nx_device_face_sensor = {\n    &nx_gd32_i2c_endpoint_ops, &s_nx_device_sensor[1]\n};\nstatic nx_endpoint_state_t s_nx_device_sensor[2];')
+----------------------------------------------------------------------
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 359, in test_missing_or_duplicate_array_declaration_is_rejected
+    with self.subTest(source=source), self.assertRaisesRegex(EvidenceError, 'array declaration'):
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "array declaration" does not match "duplicate or unsupported generated face initializer"
+
+======================================================================
+FAIL: test_non_integral_linked_element_size_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_non_integral_linked_element_size_is_rejected)
+----------------------------------------------------------------------
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 364, in test_non_integral_linked_element_size_is_rejected
+    with self.assertRaisesRegex(EvidenceError, 'array element'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "array element" does not match "duplicate or unsupported generated face initializer"
+
+======================================================================
+FAIL: test_out_of_bounds_constant_index_is_rejected (tools.testing.test_provider_retention.ArrayContextTests.test_out_of_bounds_constant_index_is_rejected)
+----------------------------------------------------------------------
+tools.evidence.common.EvidenceError: duplicate or unsupported generated face initializer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_provider_retention.py", line 353, in test_out_of_bounds_constant_index_is_rejected
+    with self.assertRaisesRegex(EvidenceError, 'array index'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "array index" does not match "duplicate or unsupported generated face initializer"
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+FAILED (failures=6, errors=2)

@@ -1,0 +1,43 @@
+{
+  "scope": "constant array face contexts from actual ELF symbol sizes; external ELF fixtures test auditing logic",
+  "behavior_red": {
+    "new_cases": 8,
+    "failures": 6,
+    "errors": 2
+  },
+  "first_green_attempt": "37/38; overflow fixture exposed unrelated first context before target; retained unchanged",
+  "green": {
+    "executed": 38,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "raw": [
+    {
+      "path": "tools/testing/evidence/retention-array/retention-array-green.log",
+      "sha256": "bccbc29bf4b1b30b74d2630350a34f5ba5ec64dcad8ef589b3ae9f4e0a0ac45a",
+      "bytes": 7722
+    },
+    {
+      "path": "tools/testing/evidence/retention-array/retention-array-green2.log",
+      "sha256": "99f4f7f64d6665943519aa740ed1808098f3dc0a157efe30f7ff2fea6ba1ac08",
+      "bytes": 6879
+    },
+    {
+      "path": "tools/testing/evidence/retention-array/retention-array-red.log",
+      "sha256": "97712abc37c6a8b8812696f81cb32d3461ca2b6d94f0eaaa9a2420c924733471",
+      "bytes": 10217
+    }
+  ],
+  "source": [
+    {
+      "path": "tools/measurement/retention.py",
+      "sha256": "84861e2a90c579cf75a6f097ddf596f33be2282eac3c69fcbb193803a926c752"
+    },
+    {
+      "path": "tools/testing/test_provider_retention.py",
+      "sha256": "4094c8bcb77f2e222b5fbead63b075a628007b56a8e5594cd814171d0e9715b1"
+    }
+  ],
+  "physical_status": "not_executed"
+}

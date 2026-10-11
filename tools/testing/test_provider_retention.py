@@ -326,5 +326,68 @@ class ProviderRetentionTests(unittest.TestCase):
             inspect_provider_retention(image(), "")
 
 
+class ArrayContextTests(unittest.TestCase):
+    def fixture(self, index=1, count=2, size=16):
+        elf = image()
+        elf.defined_symbols[5]['size'] = size
+        struct.pack_into('<I', elf.data, 12, 0x20000020 + index * 8)
+        bindings = (f'static nx_endpoint_state_t s_nx_device_sensor[{count}];\n'
+                    + BINDINGS.replace('&s_nx_device_sensor',
+                                       f'&s_nx_device_sensor[{index}]'))
+        return elf, bindings
+
+    def test_zero_index_uses_actual_writable_array_symbol(self):
+        elf, bindings = self.fixture(0)
+        report = inspect_provider_retention(elf, bindings)
+        self.assertEqual(report['faces'][1]['context_offset'], 0)
+        self.assertEqual(report['faces'][1]['context_element_bytes'], 8)
+
+    def test_nonzero_index_uses_linked_array_size_and_declared_count(self):
+        elf, bindings = self.fixture()
+        report = inspect_provider_retention(elf, bindings)
+        self.assertEqual(report['faces'][1]['context_offset'], 8)
+        self.assertEqual(report['faces'][1]['context_element_bytes'], 8)
+
+    def test_out_of_bounds_constant_index_is_rejected(self):
+        elf, bindings = self.fixture(2)
+        with self.assertRaisesRegex(EvidenceError, 'array index'):
+            inspect_provider_retention(elf, bindings)
+
+    def test_missing_or_duplicate_array_declaration_is_rejected(self):
+        elf, bindings = self.fixture()
+        for source in (bindings.split('\n', 1)[1], bindings + bindings.split('\n')[0]):
+            with self.subTest(source=source), self.assertRaisesRegex(EvidenceError, 'array declaration'):
+                inspect_provider_retention(elf, source)
+
+    def test_non_integral_linked_element_size_is_rejected(self):
+        elf, bindings = self.fixture(size=15)
+        with self.assertRaisesRegex(EvidenceError, 'array element'):
+            inspect_provider_retention(elf, bindings)
+
+    def test_array_element_pointer_cannot_alias_the_neighbor(self):
+        elf, bindings = self.fixture()
+        struct.pack_into('<I', elf.data, 12, 0x20000020)
+        with self.assertRaisesRegex(EvidenceError, 'context pointer'):
+            inspect_provider_retention(elf, bindings)
+
+    def test_nonconstant_negative_or_noncanonical_index_is_rejected(self):
+        elf, bindings = self.fixture()
+        for token in ('x', '-1', '01', '0x1', '4294967296'):
+            source = bindings.replace('&s_nx_device_sensor[1]',
+                                      f'&s_nx_device_sensor[{token}]')
+            with self.subTest(token=token), self.assertRaises(EvidenceError):
+                inspect_provider_retention(elf, source)
+
+    def test_array_address_overflow_is_rejected(self):
+        elf, bindings = self.fixture()
+        elf.defined_symbols[4].update(value=0xffffffe0, size=16)
+        struct.pack_into('<I', elf.data, 4, 0xffffffe0)
+        elf.defined_symbols[5]['value'] = 0xfffffff8
+        elf.sections[2]['address'] = 0xffffffe0
+        elf.loads[2]['virtual'] = 0xffffffe0
+        with self.assertRaisesRegex(EvidenceError, 'address range'):
+            inspect_provider_retention(elf, bindings)
+
+
 if __name__ == "__main__":
     unittest.main()
